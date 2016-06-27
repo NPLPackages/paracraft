@@ -1,0 +1,158 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/CompoundBoxPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CompoundBoxPage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+CompoundBoxPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CompoundBoxPage");
+CompoundBoxPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetContainerView()
+    return CompoundBoxPage.GetContainerView();
+end
+
+function DS_Func_Items(index)
+    if(not index) then
+        return 27;
+    else
+        if(index <= 27) then
+            return {bagpos = index};
+        end
+    end
+end
+function DS_Func_Items(index)
+    if(not index) then
+        return 36;
+    else
+        if(index <= 36) then
+            return {bagpos = index};
+        end
+    end
+end
+
+]]></script>
+<aries:window title="合成台" onclose="ClosePage" style="width:410px;height:410px;" mode="lite">
+    <div style="position:relative;margin-top:190px;margin-left:-4px;width:408px;height:1px;"class="mc_line"/>
+    <div style="position:relative;margin-top:2px;margin-left:160px;width:1px;height:187px;"class="mc_line"/>
+    <div style="float:left;width:160px;height:185px;">
+        <!--<div style="position:relative;height:30px;">
+            <pe:if condition="<%=not DoModifyName() %>">
+                <input type="button" style="position:relative;margin-top:12px;margin-left:175px;width:8px;height:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 156 8 8);" />
+                <div style="position:relative;margin-top:6px;margin-left:20px;width:180px;text-align:center;color:#ffffff;">
+                    <%=GetPlayerName() %>
+                </div>
+                
+            </pe:if>
+        </div>
+        <div style="position:relative;margin-top:30px;margin-left:20px;height:145px;">
+            <div style="float:left;">
+                <div style="margin-left:0px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </div>
+            <div style="float:left;margin-left:7px;width:92px;height:150px;" class="mc_item">
+                <div style="position:relative;float:left;margin-left:-74px;margin-top:-75px;width:92px;height:144px;" >
+                    <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:240px;height:240px;" IsInteractive="false"/>
+                </div>
+            </div>
+            <div style="float:left;margin-left:7px;">
+                <div style="margin-left:0px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </div>
+        </div>-->
+    </div>
+    <div style="float:left;margin-top:0px;height:185px;">
+        <div style="margin-left:0px;margin-top:28px;">
+            <div style="float:left;margin-left:13px;margin-top:35px;">
+                <div style="margin-left:17px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-top:17px;margin-left:3px;">
+                    <input type="button" style="float:left;margin-left:3px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub" />
+                    <input type="text" value="5" style="float:left;margin-left:3px;width:34px;height:16px;font-size:6px;" name="text_pos_x" class="mc_text"/>
+                    <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add" />
+                </div>
+            </div>   
+            <input type="button" style="float:left;margin-left:5px;margin-top:44px;width:20px;height:17px;background:url(texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#121 179 21 17)" />
+            <div style="float:left;margin-left:12px;">
+                <div style="position:relative;margin-left:0px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:38px;margin-top:0px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:76px;margin-top:0px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:0px;margin-top:38px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:38px;margin-top:38px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:76px;margin-top:38px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:0px;margin-top:76px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:38px;margin-top:76px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="position:relative;margin-left:76px;margin-top:76px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </div> 
+        </div>
+        <div style="margin-top:18px;">
+            <input type="button" value="合成" style="margin-left:27px;margin-top:0px;color:#ffffff" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" value="取消" style="margin-left:82px;margin-top:0px;color:#ffffff" class="mc_light_grey_button_with_fillet"/>
+        </div>
+        
+    </div>
+    <div style="margin-left:0px;width:400px;">
+        <div style="position:relative;margin-top:10px;text-align:center;color:#ffffff;">背包</div>
+        <input type="button" style="position:relative;margin-left:341px;margin-top:12px;font-size:12px;height:20px;width:40px;" value="整理" onclick="" class="mc_light_grey_button_with_fillet"/>
+        <pe:gridview name="BagItems" style="margin-left:20px;margin-top:35px;" DataSource="<%=DS_Func_Items%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:2px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='<%=Eval("bagpos")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+        
+    </div>
+
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>

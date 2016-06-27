@@ -1,0 +1,314 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>system settings, by LiXizhi, 2009/10/18</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false" src="SystemSettingsPage.lua"><![CDATA[
+SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+SystemSettingsPage.OnInit();
+function TotalDragTime(value)
+    ParaCamera.GetAttributeObject():SetField("TotalDragTime", value)
+end
+function SmoothFramesNum(value)
+    ParaCamera.GetAttributeObject():SetField("SmoothFramesNum", math.floor(value))
+end
+
+function GetCategoryDSIndex()
+    return SystemSettingsPage.category_ds_index;
+end
+
+function GetTabviewButtons()
+    return SystemSettingsPage.category_ds;  
+end
+
+function OnChangeTabview(index)
+    SystemSettingsPage.category_ds_index = tonumber(index);
+    Page:Refresh(0.01);
+end
+
+function GetDS(index)
+    local ds_index = SystemSettingsPage.category_ds_index;
+    local ds = nil;
+    if(ds_index == 1) then
+        ds = SystemSettingsPage.category_show;
+    elseif(ds_index == 2) then
+        ds = SystemSettingsPage.category_game;
+    elseif(ds_index == 3) then
+        ds = SystemSettingsPage.category_operation;
+    end
+    if(index) then
+        return ds[index];
+    else
+        return #ds;
+    end
+end
+
+function GetDsIndex()
+    local index = SystemSettingsPage.category_ds_index;
+    if(index) then
+        return index;
+    end
+end
+
+function ChangeFullScreenMode()
+    SystemSettingsPage.OnClickEnableFullScreenMode();
+end
+
+]]></script>
+<!--<aries:window title="系统设置" style="width:350px;height:430px;" onclose="MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage.OnCancel">-->
+    <div style="width:350px;height:430px;" class="mc_panel">
+        <!--<input type="button" class="mc_close_button" onclick="MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage.OnCancel" />-->
+        <div style="margin-left:15px;margin-top:10px;height:35px;">
+            <pe:repeat DataSource="<%=GetTabviewButtons()%>" >
+                <pe:repeatitem style="float:left;min-width:50px;">
+                    <pe:if condition='<%=GetCategoryDSIndex() == Eval("index") %>' >
+                        <input type="button" spacing="5" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:12px;margin-top:1px;color:#ffffff;font-size:14px;min-width:45px;height:26px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8)" />
+                    </pe:if>
+                    <pe:if condition='<%=GetCategoryDSIndex() ~= Eval("index") %>' >
+                        <input type="button" spacing="5" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:12px;margin-top:4px;color:#ffffff;font-size:14px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        <div style="margin-left:0px;margin-top:-1px;width:350px;height:1px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8)"/>
+        <div style="margin-left:11px;margin-top:13px;width:330px;height:330px;" class="mc_light_grey_button_with_fillet">
+            <pe:treeview style="margin-top:6px;color:#cccccc;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#0 0 4 4:2 2 2 2);" VerticalScrollBarStep="25" VerticalScrollBarPageSize="100" >
+                <div style="color:#cccccc;">
+                <pe:if condition='<%=GetCategoryDSIndex() == 1 %>' >
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"分辨率" %></div>
+                        <div style="float:left;margin-left:12px;font-size:11px;">
+                            <select name = "ScreenResolution" AllowUserEdit="false" style="height:22px">
+                                <option value="400 × 266">400 × 266</option>
+                                <option value="400 × 300">400 × 300</option>
+                                <option value="480 × 280">480 × 280</option>
+                                <option value="640 × 480">640 × 480</option>
+                                <option value="800 × 533">800 × 533</option>
+                                <option value="800 × 600">800 × 600</option>
+                                <option value="960 × 560" selected="true">960 × 560(默认)</option>
+                                <option value="1020 × 595">1020 × 595</option>
+                                <option value="1020 × 680">1020 × 680</option>
+                                <option value="1024 × 768">1024 × 768</option>
+                                <option value="1280 × 720">1280 × 720(推荐)</option>
+                                <option value="1440 × 900">1440 × 900</option>
+                                <option value="1600 × 800">1600 × 800</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"立体输出" %></div>
+                        <div style="float:left;margin-left:20px;">
+                            <pe:checkbox_button name="stereomode" checked="<%= GameLogic.options:IsStereoMode()%>" onclick="SystemSettingsPage.OnChangeStereoMode()" style="float:left;color:#ffffff;width:40px;height:24px;"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"左右眼间距" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <pe:sliderbar name="stereo_eye_dist" min="0.0" max="0.2" min_step="0.01" value="0.1" style="float:left;height:25px;width:140px" onchange="SystemSettingsPage.OnChangeStereoEyeDist" />
+                        </div>
+                    </div>
+                    <!--<div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" >图像品质</div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value='' type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" >全屏</div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name="btn_FullScreenMode" value="" type="button" enabled="false" onclick="ChangeFullScreenMode" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>-->
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"能见度" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_RenderDist' value='' type="button" onclick='SystemSettingsPage.OnClickChangeRenderDist' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <!--<div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" >性能</div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value='' type="button" enabled="false" onclick='' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>-->
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"视角摇晃" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_ViewBobbing' value='' type="button" onclick='SystemSettingsPage.OnToggleViewBobbing' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"隐藏角色" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_ShowPlayer' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShowMainPlayer' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"真实光影" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_Shader' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShader' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"禁止光影命令" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_DisableShaderCmd' value='' type="button" onclick='SystemSettingsPage.OnClickDisableShaderCommand' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"水面反射" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_WaterReflection' value='' type="button" onclick='SystemSettingsPage.OnClickEnableWaterReflection' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"场景投影" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_Shadow' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShadow' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=GetCategoryDSIndex() == 2 %>' >
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"反转鼠标" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_MouseInverse' value='' type="button" onclick='SystemSettingsPage.OnClickEnableMouseInverse' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"鼠标灵敏度" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value='' type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"锁定摄像机" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_LockCamera' value="" enabled="false" type="button" onclick='' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"平滑摄像机" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value="" type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"锁定鼠标滚轮" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value="" type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"UI自动缩放" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value="" type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"允许传送" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value="" type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"允许作弊" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='' value='' type="button" onclick='' enabled="false" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"音乐" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name="btn_EnableSound" value="" type="button" onclick="SystemSettingsPage.OnClickEnableSound" style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"音量" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_SoundVolume' value="" type="button" onclick='SystemSettingsPage.OnClickChangeSoundVolume' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"消除方块" %></div>
+                        <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
+                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 186 11 13)"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"放置方块" %></div>
+                        <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
+                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 186 11 13)"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"选择方块" %></div>
+                        <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
+                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#69 186 11 13)"/>
+                        </div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向前" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">W</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向左" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">A</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"后退" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">S</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向右" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">D</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"跳跃" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Space</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"潜行" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Shift</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"飞翔" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">F</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"帮助" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">F1</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"撤销上步操作" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Ctrl + Z</div>
+                    </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"返回上步操作" %></div>
+                        <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Ctrl + Y</div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=GetCategoryDSIndex() == 4 %>' >
+                    <div>
+                        <input type="button" name="clearCache" value='<%=L"清空缓存" %>' class="mc_light_grey_button_with_fillet" onclick="SystemSettingsPage.OnClearCache()" />
+                        <span style="margin-left:5px;">temp/webcache/*</span>
+                    </div>
+                </pe:if>
+                </div>
+            </pe:treeview>
+        </div>
+        <div style="margin-top:5px;" >
+            <input type="button" name="OK" value='<%=L"确定" %>' style="margin-left:40px;height:26px;width:80px;color:#cccccc;" class="mc_light_grey_button_with_fillet" onclick="SystemSettingsPage.OnOK()"/>
+            <input type="button" name="Cancel" value='<%=L"关闭" %>' style="margin-left:90px;height:26px;width:80px;color:#cccccc;" class="mc_light_grey_button_with_fillet" onclick="SystemSettingsPage.OnCancel()"/>
+        </div>
+    </div>
+</pe:mcml> 
+</body>
+</html>

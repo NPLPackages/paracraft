@@ -1,0 +1,382 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/EnvFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EnvFramePage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+FancyV1 = GameLogic.GetShaderManager():GetFancyShader();
+EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
+WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+
+local uiversion = tonumber(Page:GetRequestParam("version")) or 0;
+EnvFramePage.OnInit(uiversion);
+
+function GetShaderDS()
+    return EnvFramePage.shader_ds;
+end
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return EnvFramePage.category_ds;
+end
+
+function OnChangeCategory(index)
+    EnvFramePage.OnChangeCategory(index);
+end
+
+function Dummy()
+end
+
+function OnToggleShader(name, value)
+    local res = GameLogic.RunCommand("/shader "..value);
+    if(res==false) then
+        if(value ~= "1") then 
+            Page:SetValue("comboShader", "1");
+            _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
+        end
+    elseif(res=="disabled") then
+        _guihelper.MessageBox(L"/shader命令被禁止, 请在设置中解禁");
+    else
+        -- WorldCommon.GetWorldInfo().rendermethod = value;
+    end
+end
+
+function OnToggleReflection(bChecked)
+    ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", bChecked==true)
+    WorldCommon.GetWorldInfo().waterreflection = tostring(bChecked);
+end
+
+function OnToggleShadow(bChecked)
+    ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", bChecked==true)
+    WorldCommon.GetWorldInfo().shadow = tostring(bChecked);
+end
+
+function OnRenderDistChanged(value)
+    GameLogic.options:SetRenderDist(value);
+    WorldCommon.GetWorldInfo().renderdist = tostring(value);
+end
+
+function OnSuperRenderDistChanged(value)
+    GameLogic.options:SetSuperRenderDist(value);
+    if(value and value > GameLogic.options:GetRenderDist() and value>64) then
+        GameLogic.options:SetFogEnd(value - 64);
+    end
+end
+
+function OnCloudnessChanged(value)
+    GameLogic.options:SetCloudThickness(value);
+end
+    
+function OnChangeEyeBrightness(value)
+    GameLogic.options:SetEyeBrightness(value);
+end
+
+function ChangeWeather(name,mcmlNode)
+    NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
+	local SkyPage = commonlib.gettable("MyCompany.Aries.Creator.SkyPage");
+    if(string.match(name,"sun")) then
+        SkyPage.OnChangeSkybox(2);
+    elseif(string.match(name,"cloudy")) then
+        SkyPage.OnChangeSkybox(1);
+    elseif(string.match(name,"rain")) then
+        GameLogic.RunCommand("/rain");
+    elseif(string.match(name,"snow")) then
+        GameLogic.RunCommand("/snow");
+    end
+end
+
+function SetLightColor(name,mcmlNode)    
+    local color_name = string.match(name,"btn_(.*)");
+    EnvFramePage.SetLightColor(color_name);
+end
+
+]]></script>
+
+<div>
+    <!--<div style="width:240px;height:35px;margin-left:13px;margin-top:0px;">
+        <pe:repeat DataSource="<%=GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;margin-top:0px;width:45px;">
+                <pe:if condition='<%=EnvFramePage.category_index == Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=EnvFramePage.category_index ~= Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;" class="mc_button_grey"/>
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>-->
+    <div style="margin-left:8px;margin-top:5px;padding-left:5px;width:225px;color:#cccccc;">
+        <pe:if condition='<%=EnvFramePage.category_index == 1%>'>
+            <div style="padding:8px;padding-right:5px;width:220px;height:60px;" class="mc_border" >
+                <div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"天气设置"%></div>
+                <!--<div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>-->
+                <div>
+                    <input type="button" name="weather_sun" style="margin-left:9px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
+                    <input type="button" name="weather_cloudy" style="margin-left:11px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
+                    <input type="button" name="weather_rain" style="margin-left:14px;width:11px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
+                    <input type="button" name="weather_snow" style="margin-left:14px;width:17px;height:18px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
+                </div>
+                
+            </div>
+            <div style="padding:8px;padding-right:5px;margin-top:7px;width:220px;" class="mc_border" >
+                <!--<div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"时间设置"%></div>-->
+                <div style="margin-left:5px;margin-top:10px;">
+                    <div style="float:left;margin-left:3px;margin-top:0px;width:21px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
+                    <div style="float:left;margin-top:6px;width:138;height:7px;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
+                        <pe:sliderbar name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
+                    </div>
+                    <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
+                </div>
+            </div>
+            <div style="padding:8px;padding-right:5px;margin-top:7px;width:220px;height:105px;" class="mc_border" >
+                <div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"光源颜色设置"%></div>
+                <!--<div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>-->
+                <div>
+                    <pe:colorpicker tooltip='<%=L"火把等积木的颜色"%>' version="1" style="color:#cccccc"  name="NewBlockColorpicker" onchange="EnvFramePage.OnBlockColorChanged" />
+                </div>
+                <div style="margin-top:2px;">
+                    <input type="button" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="SetLightColor"/>
+                </div>            
+            </div>
+            <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
+                <div style="float:left;margin-left:7px;margin-top:-2px;"><%=L"效果设置"%></div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"真实光影"%></div>
+                    <div style="float:left;margin-top:0px;margin-left:9px;">
+                        <select name="comboShader" style="margin-top:0px;height:22px" onselect="OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"需要shader HDR下生效,可调整画面整体亮度"%>'><%=L"眼睛亮度"%></div>
+                    <div style="float:left;margin-top:1px;margin-left:9px;">
+                        <pe:sliderbar name="eye_bightness" min="0.01" max="0.9" value="0.5" style="width:80px;height:22px;" onchange="OnChangeEyeBrightness()"></pe:sliderbar>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"多云"%></div>
+                    <div style="float:left;margin-top:1px;margin-left:9px;">
+                        <pe:sliderbar name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="OnCloudnessChanged()"></pe:sliderbar>
+                    </div>
+                </div>
+                <!--<div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"反射"%></div>
+                    <div style="float:left;margin-top:4px;margin-left:9px;">
+                        <input name="checkboxReflection" type="checkbox" onclick="OnToggleReflection" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"场景投影"%></div>
+                    <div style="float:left;margin-top:4px;margin-left:9px;">
+                        <input name="checkboxShadow" type="checkbox" onclick="OnToggleShadow" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>-->
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"过大会导致运行缓慢, 可以考虑使用超级远景"%>'><%=L"可视距离"%></div>
+                    <div style="float:left;margin-top:1px;margin-left:9px;">
+                        <pe:sliderbar name="renderDist" min="30" max="200" value="96" style="width:80px;height:22px;" onchange="OnRenderDistChanged()" ></pe:sliderbar>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"摄影机不动时,会持续渲染几公里内的场景,并不消耗显存"%>'><%=L"超级远景"%></div>
+                    <div style="float:left;margin-top:4px;margin-left:9px;">
+                        <pe:sliderbar name="superRenderDist" min="0" max="2000" value="96" style="width:80px;height:22px;" onchange="OnSuperRenderDistChanged()"></pe:sliderbar>
+                    </div>
+                </div>
+            </div>
+        </pe:if>
+        <pe:if condition='<%=EnvFramePage.category_index == 2%>'>
+            <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
+                <div style="float:left;margin-left:9px;margin-top:-2px;">游 戏 习 惯 设 置</div>
+                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                <pe:gridview style="margin:0px;height:75px;" name="gvw_game_1Items" VerticalScrollBarOffsetX="10" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "22" 
+                    DataSource='<%=EnvFramePage.category_game[1]%>'>
+	                <Columns>
+                            <div style="color:#cccccc;margin-top:5px;">
+                            <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black"><%=Eval("left_text") %></div>
+                            <pe:if condition='<%=Eval("quest_mark")%>'>
+                                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>    
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "button"%>'>
+                                <div style="float:left;margin-top:3px;margin-left:5px;">
+                                    <input name="checkboxViewBobbing" value='<%= Eval("right_value")%>' type="checkbox" onclick='<%= Eval("onclick")%>' style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "text"%>'>
+                                <div style="float:left;margin-left:12px;">
+                                    <%= Eval("right_value")%>
+                                </div>
+                            </pe:if>
+                                
+                                
+                        </div>
+                    </Columns>
+	                <EmptyDataTemplate>
+	                </EmptyDataTemplate>
+	                    
+                </pe:gridview>
+            </div>
+            <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
+                <div style="float:left;margin-left:9px;margin-top:-2px;">按 键 控 制</div>
+                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                <pe:gridview style="margin:0px;height:234px;" name="gvw_game_2Items" VerticalScrollBarOffsetX="10" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "22" 
+                    DataSource='<%=EnvFramePage.category_game[2]%>'>
+	                <Columns>
+                            <div style="color:#cccccc;margin-top:5px;">
+                            <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black"><%=Eval("left_text") %></div>
+                            <pe:if condition='<%=Eval("quest_mark")%>'>
+                                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>    
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "button"%>'>
+                                <div style="float:left;margin-top:3px;margin-left:5px;">
+                                    <input name="checkboxViewBobbing" value='<%= Eval("right_value")%>' type="checkbox" onclick='<%= Eval("onclick")%>' style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "text"%>'>
+                                <div style="float:left;margin-left:12px;">
+                                    <%= Eval("right_value")%>
+                                </div>
+                            </pe:if>
+                                
+                                
+                        </div>
+                    </Columns>
+	                <EmptyDataTemplate>
+	                </EmptyDataTemplate>
+	                    
+                </pe:gridview>
+                <!--<div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">鼠标左键</div>
+                    <div style="float:left;margin-left:12px;">
+                        消除方块
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">鼠标右键</div>
+                    <div style="float:left;margin-left:12px;">
+                        放置方块
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">鼠标中键</div>
+                    <div style="float:left;margin-left:12px;">
+                        选择方块
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">W</div>
+                    <div style="float:left;margin-left:12px;">
+                        向前
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">A</div>
+                    <div style="float:left;margin-left:12px;">
+                        向左
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">S</div>
+                    <div style="float:left;margin-left:12px;">
+                        后退
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">D</div>
+                    <div style="float:left;margin-left:12px;">
+                        向右
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">Space</div>
+                    <div style="float:left;margin-left:12px;">
+                        跳跃
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">Ctrl + X</div>
+                    <div style="float:left;margin-left:12px;">
+                        撤销上步操作
+                    </div>
+                </div>-->
+            </div>
+        </pe:if>
+        <pe:if condition='<%=EnvFramePage.category_index == 3%>'>
+            <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
+                <div style="float:left;margin-left:9px;margin-top:-2px;">游 戏 习 惯 设 置</div>
+                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                <pe:gridview style="margin:0px;height:105px;" name="gvw_others_1Items" VerticalScrollBarOffsetX="10" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "22" 
+                    DataSource='<%=EnvFramePage.category_others[1]%>'>
+	                <Columns>
+                            <div style="color:#cccccc;margin-top:5px;">
+                            <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black"><%=Eval("left_text") %></div>
+                            <pe:if condition='<%=Eval("quest_mark")%>'>
+                                <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>    
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "button"%>'>
+                                <div style="float:left;margin-top:3px;margin-left:5px;">
+                                    <input name="checkboxViewBobbing" value='<%= Eval("right_value")%>' type="checkbox" onclick='<%= Eval("onclick")%>' style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("right_type") == "text"%>'>
+                                <div style="float:left;margin-left:12px;">
+                                    <%= Eval("right_value")%>
+                                </div>
+                            </pe:if>
+                                
+                                
+                        </div>
+                    </Columns>
+	                <EmptyDataTemplate>
+	                </EmptyDataTemplate>
+	                    
+                </pe:gridview>
+                <!--<div>
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">背景音乐</div>
+                    <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                    <div style="float:left;margin-top:3px;margin-left:5px;">
+                        <input type="checkbox" onclick="" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">游戏音效</div>
+                    <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                    <div style="float:left;margin-top:3px;margin-left:5px;">
+                        <input type="checkbox" onclick="" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">图像品质</div>
+                    <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                    <div style="float:left;margin-top:3px;margin-left:5px;">
+                        <input type="checkbox" onclick="" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center" class="mc_button_black">视角摇晃</div>
+                    <div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>
+                    <div style="float:left;margin-top:3px;margin-left:5px;">
+                        <input type="checkbox" onclick="" style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                    </div>
+                </div>-->
+            </div>
+        </pe:if>
+    </div>  
+</div>
+</pe:mcml>
+</body>
+</html>
+

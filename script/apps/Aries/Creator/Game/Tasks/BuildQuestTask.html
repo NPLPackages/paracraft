@@ -1,0 +1,496 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuildQuestTask.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
+local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest")
+BuildQuest.OnInit(BuildQuest.template_theme_index,BuildQuest.template_task_index)
+
+isEditing = false;
+--local theme_index = BuildQuest.cur_theme_index;
+local theme_index = BuildQuest.template_theme_index
+local task_index = BuildQuest.cur_task_index;
+
+function RestEditing()
+    isEditing = false;
+end
+
+function ClosePage()
+    Page:CloseWindow();
+    --BuildQuest.ClosePage(true);
+    --BuildQuest.EndEditing(true);
+end
+
+function GetCurrentPosText()
+    local center_x, center_y, center_z, radius, region_x, region_z = BuildQuest.GetPosition()
+    return string.format("%d,%d,%d", center_x, center_y, center_z);
+end
+
+function GetTheme_DS(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+     if(not index) then
+        return #themesDS;
+    else
+        return themesDS[index];
+    end
+end
+
+function GetCurThemeIndex()
+    return theme_index;
+end
+
+function ChangeTheme(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    index = tonumber(index);
+    theme_index = index;
+    --BuildQuest.cur_theme_index = index;
+    BuildQuest.template_theme_index = index;
+    BuildQuest.OnInit(BuildQuest.template_theme_index,1);
+    task_index = BuildQuest.cur_task_index;
+    RestEditing();
+    Page:Refresh(0.1);
+end
+
+function GetTask_DS(index)
+    local tasksDS = BuildQuestProvider.GetTasks_DS(theme_index);
+    if(not index) then
+        return #tasksDS;
+    else
+        return tasksDS[index];
+    end
+end
+
+function GetTaskName()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    if(task) then
+        return task.name or "";
+    else
+        return "";
+    end
+end
+
+function GetTaskImage()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local image = "";
+    if(task) then
+        image = task.image;
+    end
+    return image;
+end
+
+function GetTaskDesc()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local desc = "";
+    if(task) then
+        desc = task.desc;
+    end
+    return desc;
+end
+
+
+function GetTaskID(index)
+    return tostring(index);
+end
+
+function GetTaskIcon(index)
+    local task = BuildQuestProvider.GetTask(theme_index,index);
+    local icon = "";
+    if(task) then
+        icon = task.icon;
+    end
+    return icon;
+end
+
+function TaskIsLocked(index)
+    if(index > (BuildQuest.cur_task_index)) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function TaskIsFinished(index)
+    local task = BuildQuestProvider.GetTask(theme_index,index);
+    if(index < BuildQuest.cur_task_index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ChangeTask(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    task_index = tonumber(index);
+    BuildQuest.template_task_index = index;
+    RestEditing();
+    Page:Refresh(0.1);
+end
+
+function GetBlock_DS(index)
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local ds;
+    if(task) then
+        ds = task:GetBlockTypes();
+    end
+    if(ds) then
+        if(not index) then
+            return #ds;
+        else
+            return ds[index];
+        end
+    end
+    
+end
+
+function CurTaskIsLocked()
+    local islocked = TaskIsLocked(task_index);
+    return islocked;
+end
+
+function CurTaskIsFinished()
+    local isfinished = TaskIsFinished(task_index);
+    return isfinished;
+end
+    
+function StartBuild()
+    --[[
+    local islocked = TaskIsLocked(task_index);
+    if(islocked) then
+        _guihelper.MessageBox(L"该任务还未解锁，目前不可建造！");
+        return;
+    end
+    --]]
+    local cur_task = BuildQuest.GetCurrentQuest();
+    if(BuildQuest.IsTaskUnderway() and cur_task.theme_id == theme_index) then
+        BuildQuest.EndEditing();
+        return;
+    end
+    local UseAbsolutePos = mouse_button=="right";
+    local ClickOnceDeploy = UseAbsolutePos;
+    local task = BuildQuest:new({theme_id=BuildQuest.cur_theme_index, task_id=task_index, step_id=1, 
+        UseAbsolutePos = UseAbsolutePos, ClickOnceDeploy=ClickOnceDeploy})
+    task:Run();
+    --BuildQuest.ClosePage(true)
+    ClosePage()
+end
+
+function GetQuestTriggerText()
+    local s ="";
+    local cur_task = BuildQuest.GetCurrentQuest();
+    if(BuildQuest.IsTaskUnderway() and cur_task and cur_task.theme_id == theme_index) then
+        s = L"放弃建造";
+    else
+        local task = BuildQuestProvider.GetTask(theme_index,task_index);
+        if(task and task:IsClickOnceDeploy()) then
+            s = L"一键完成";
+        else
+            s = L"开始建造";
+        end
+    end
+    return s;
+end
+
+function IsUseAbsPosition()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    if(task and task:IsUseAbsolutePos()) then
+        return true;
+    else
+        return false;
+    end
+end
+
+
+function GetQuestOutBorder(index)
+    local bk="";
+    if(task_index == index) then
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 128 34 34";
+    else
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 89 34 34";
+    end
+    return bk;
+end
+
+function TaskIsSelected(index)
+    if(task_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function OnFAQ()
+    ParaGlobal.ShellExecute("open", GameLogic.options.ask_for_help_url, "", "", 1);
+end
+
+function QuickBuilding(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    task_index = tonumber(index);
+    BuildQuest.QuickBuilding(theme_index,task_index, mouse_button=="right");
+end
+
+function beShowTheLineOfOfficialAndUnofficial(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+    if(index == 1) then
+        return false;
+    elseif(themesDS[index] and themesDS[index - 1]) then
+        if(themesDS[index]["official"] == false and themesDS[index - 1]["official"] == true) then
+            return true;
+        else
+            return false;
+        end
+    end
+    return false;
+end
+
+function OnOpenMyTemplateFolder()
+    BuildQuest.OnOpenMyTemplateFolder();
+end
+
+function CanEditing()
+    local curTheme = GetTheme_DS(theme_index);
+    if(curTheme) then
+        if(curTheme.official) then
+            return false;
+        else
+            return true;
+        end
+    end
+    return false;
+end
+
+function OnChangeTaskDesc()
+    isEditing = true;
+    Page:Refresh(0.1);
+end
+
+function OnSaveTaskDesc()
+    isEditing = false;
+    local content = Page:GetValue("content", "");
+    local desc = string.gsub(content,"\r\n","<br/>")
+    --_guihelper.MessageBox(desc);
+    BuildQuestProvider.OnSaveTaskDesc(theme_index,task_index,desc);
+    Page:Refresh(0.1);
+end
+
+function CreateNewTheme()
+    BuildQuest.new_theme_category_dir = "worlds/DesignHouse/blocktemplates/";
+    BuildQuest.ShowCreateNewThemePage("template");
+end
+
+]]></script>
+<aries:window mode="thin" title='<%=L"模板管理"%>' style="width:636px;height:450px;" onclose="ClosePage">
+    <div style="width:636px;height:436px;margin-left:10px;margin-top:-4px;padding:0px;">
+        <!--<input type="button" tooltip="关闭" style="position:relative;margin-left:398px;margin-top:1px;width:36px;height:36px;margin:0px;padding:0px;color:#ffffff;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#218 469 36 36)" onclick="ClosePage"/>-->
+        <div style="float:left;margin-left:0px;margin-top:15px;width:117px;">
+            <pe:gridview name="gvwMCTheme" DefaultNodeHeight="32" DataSource="<%=GetTheme_DS%>" pagesize="10" ItemsPerLine="1" style="margin-left:-5px;" AllowPaging="true">
+                <Columns>
+                    <div style="height:32px;">
+                        <!--<pe:if condition='<%= beShowTheLineOfOfficialAndUnofficial(Eval("index")) %>'>
+                            <div style="margin-left:5px;margin-top:-4px;width:128px;height:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8:1 1 1 1)"/>
+                        </pe:if>-->
+                        <pe:if condition='<%= Eval("name") == "empty" %>'>
+                            <div style="margin-left:35px;margin-top:1px;width:68px;height:23px;">
+                                <input type="button" onclick="CreateNewTheme" tooltip='<%=L"点击创建新模板种类"%>' style="margin-left:15px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)"/>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= Eval("name") ~= "empty" %>'>
+                            <pe:if condition='<%= GetCurThemeIndex() == Eval("index") %>'>
+                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-top:1px;width:110px;height:23px;font-size:12px;margin:0px;padding:0px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)"/>    
+                            </pe:if>
+                            <pe:if condition='<%= GetCurThemeIndex() ~= Eval("index") %>'>
+                                <input type="button" value='<%=Eval("name") %>' onclick="ChangeTheme" param1='<%=Eval("index") %>' style="margin-top:1px;width:110px;height:23px;font-size:12px;margin:0px;padding:0px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)"/>    
+                            </pe:if>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <PagerSettings Position="Bottom" height="1"/>
+                <PagerTemplate AutoHidePager="true">
+				    <form>
+                        <label name="page" style="height:18px;margin-left:59px;margin-top:-95px;color:#ffffff;"/>
+					    <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:35px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15"/>
+	                    <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:40px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15"/>
+	                </form>
+			    </PagerTemplate>   
+            </pe:gridview>
+            <!--<input type="button" value='<%=L"模板目录"%>' onclick="OnOpenMyTemplateFolder" style="margin-left:32px;margin-top:-70px;width:68px;height:20px;font-size:12px;margin:0px;padding:0px;color:#ffffff;" class='mc_light_grey_button_with_fillet'/>-->    
+            <!--<input type="button" value='<%=L"在线问题"%>' onclick="OnFAQ" style="margin-left:32px;margin-top:-40px;width:68px;height:20px;font-size:12px;margin:0px;" class='mc_light_grey_button_with_fillet'/>-->    
+        </div>
+        <div style="float:left;margin-left:10px;margin-top:5px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
+        <div style="float:left;width:160px;margin-top:15px;margin-left:10px;">
+            <pe:gridview name="gvwMCTask" DefaultNodeHeight="32" DataSource="<%=GetTask_DS%>" pagesize="10" ItemsPerLine="1" AllowPaging="true">
+                <Columns>
+                    <div style="height:32px;">
+                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                            <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-top:1px;width:110px;height:23px;font-size:12px;margin:0px;padding:0px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)"/>    
+                            <input type="button" tooltip='<%=L"快速建造:左键相对位置, 右键绝对位置"%>' onclick="QuickBuilding" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:5px;width:18px;height:16px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 420 18 16)"/>    
+                        </pe:if>
+                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                            <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-top:1px;width:110px;height:23px;font-size:12px;margin:0px;padding:0px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)"/>    
+                            <!--<input type="button" tooltip="快速建造" onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:5px;width:18px;height:16px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 420 18 16)"/>    -->
+                        </pe:if>
+                    </div>
+                </Columns>  
+                <EmptyDataTemplate>
+                    <div style="color:#ffffff;margin-left:20px;">
+                        <b><%=L"当前没有模板"%></b>
+                    </div>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b><%=L"请稍等 ... "%></b>
+			    </FetchingDataTemplate>
+                <PagerSettings Position="Bottom" height="1"/>
+                <PagerTemplate AutoHidePager="true">
+				    <form>
+                        <label name="page" style="height:18px;margin-left:59px;margin-top:-45px;color:#ffffff;"/>
+					    <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="上一页" style="margin-left:35px;margin-top:-43px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15"/>
+	                    <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="下一页" style="margin-left:40px;margin-top:-43px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15"/>
+	                </form>
+			    </PagerTemplate>          
+            </pe:gridview>
+        </div>
+        <div style="float:left;margin-left:-10px;margin-top:5px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
+        <div style="float:left;margin-left:0px;margin-top:0px;">
+            <div style="margin-left:1px;margin-top:1px;height:260px;">
+                <input type="button" value='<%=GetTaskName()%>' name="task_name_btn" style="position:relative;margin-left:100px;margin-top:12px;height:20px;width:110px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)" enabled="false" />
+                    <!--<img style="position:relative;margin-left:70px;margin-top:45px;height:160px;width:160px;" src='<%= GetTaskImage() %>' />-->
+
+                
+                <pe:if condition='<%=not Eval("isEditing") %>'>
+                    <pe:if condition='<%=CanEditing() %>'>
+                        <input type="button" name="btn_rename" tooltip='<%=L"修改描述"%>' onclick="OnChangeTaskDesc" style="position:relative;margin-left:5px;margin-top:46px;width:8px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 155 8 9)"/>
+                    </pe:if>
+                    <div style="position:relative;margin:20px;margin-top:40px;color:#cccccc;"><%=GetTaskDesc() %> </div>    
+                </pe:if>
+                <pe:if condition='<%=Eval("isEditing") %>'>
+                    <input type="button" tooltip='<%=L"保存"%>' onclick="OnSaveTaskDesc" style="position:relative;margin-left:5px;margin-top:46px;width:9px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9)"/>    
+                    <div style="margin:20px;margin-top:40px;" class="mc_text">
+                        <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="10" value='<%=GetTaskDesc()%>' style="color:#cccccc;background:;" >
+                        </textarea>
+                    </div>
+                    
+                </pe:if>
+                <div style="position:relative;margin-top:210px;margin-left:24px;">
+                    <!--<pe:gridview name="gvwMCTask" DefaultNodeHeight="34" DataSource="<%=GetTask_DS%>" pagesize="5" ItemsPerLine="5" style="margin-top:1px;" AllowPaging="true">
+                        <Columns>
+                            <div style="height:34px;width:52px;">
+                                <div style="position:relative;margin-left:15px;margin-top:10px;" >
+                                    <pe:textsprite value='<%=GetTaskID(Eval("index")) %>' style="font-size:22px;color:#cccccc" />
+                                </div>
+                                <pe:if condition='<%= TaskIsLocked(Eval("index")) == true %>'>
+                                    <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                        <div style="margin-top:3px;margin-left:7px;height:38px;width:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#306 127 38 38)" >
+                                            <img style="position:relative;margin-left:3px;margin-top:3px;width:32px;height:32px;margin:0px;padding:0px;" src='<%= GetTaskIcon(Eval("index")) %>'/>
+                                            <input type="button" tooltip="点击查看详细信息" onclick="ChangeTask" param1='<%=Eval("index") %>' style="position:relative;margin-left:3px;margin-top:3px;width:32px;height:32px;margin:0px;padding:0px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#348 90 32 32:4 4 4 4)" />    
+                                            <img onclick="ChangeTask" param1='<%=Eval("index") %>' style="position:relative;margin-left:24px;margin-top:21px;width:9px;height:12px;margin:0px;padding:0px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#372 45 9 12)" />
+                                        </div>    
+                                    </pe:if>
+                                    <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                        <div style="margin-top:5px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)" >
+                                            <img style="position:relative;margin-left:1px;margin-top:1px;width:32px;height:32px;margin:0px;padding:0px;" src='<%= GetTaskIcon(Eval("index")) %>'/>
+                                            <input type="button" tooltip="点击查看详细信息" onclick="ChangeTask" param1='<%=Eval("index") %>' style="position:relative;margin-left:1px;margin-top:1px;width:32px;height:32px;margin:0px;padding:0px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#348 90 32 32:4 4 4 4)" />    
+                                            <img onclick="ChangeTask" param1='<%=Eval("index") %>' style="position:relative;margin-left:22px;margin-top:19px;width:9px;height:12px;margin:0px;padding:0px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#372 45 9 12)" />
+                                        </div>
+                                    </pe:if>
+                                
+                                </pe:if>  
+                                <pe:if condition='<%= TaskIsLocked(Eval("index")) == false %>'>
+                                    <pe:if condition='<%= TaskIsFinished(Eval("index")) == true %>'>
+                                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                            <div style="margin-top:3px;margin-left:7px;height:38px;width:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#306 127 38 38)" >
+                                                <input type="button" onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:3px;margin-top:3px;width:32px;height:32px;margin:0px;padding:0px;" background='<%= GetTaskIcon(Eval("index")) %>'/>
+                                            </div>    
+                                        </pe:if>
+                                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                            <div style="margin-top:5px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)" >
+                                                <input type="button" onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:1px;margin-top:1px;width:32px;height:32px;margin:0px;padding:0px;" background='<%= GetTaskIcon(Eval("index")) %>'/>
+                                            </div>    
+                                        </pe:if>
+
+                                    </pe:if>
+                                    <pe:if condition='<%= TaskIsFinished(Eval("index")) == false %>'>
+                                    
+                                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                            <div style="margin-top:3px;margin-left:7px;height:38px;width:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#306 127 38 38)" >
+                                                <input type="button" onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:3px;margin-top:3px;width:32px;height:32px;margin:0px;padding:0px;" background='<%= GetTaskIcon(Eval("index")) %>'/>    
+                                            </div>    
+                                        </pe:if>
+                                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                            <div style="margin-top:5px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)" >
+                                                <input type="button" onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:1px;margin-top:1px;width:32px;height:32px;margin:0px;padding:0px;" background='<%= GetTaskIcon(Eval("index")) %>'/>    
+                                            </div>    
+                                        </pe:if>
+
+                                    </pe:if>
+                                </pe:if>
+                            </div>    
+                        </Columns>  
+                        <EmptyDataTemplate>
+	                        <b>该主题当前没有任务</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>请稍等 ... </b>
+			            </FetchingDataTemplate>
+                        <PagerSettings Position="Bottom" height="1"/>
+                        <PagerTemplate AutoHidePager="true">
+				            <form>
+					            <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="上一页" style="margin-left:-16px;margin-top:-36px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15"/>
+	                            <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="下一页" style="margin-left:263px;margin-top:-36px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15"/>
+	                        </form>
+			            </PagerTemplate>          
+                    </pe:gridview>-->          
+                </div>
+            </div>
+            <div style="float:left;margin-left:0px;margin-top:-1px;width:330px;height:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8)"/>
+            <div style="margin-left:20px;margin-top:3px;">
+                <div style="margin-left:35px;margin-top:0px;color:#ffffff;">
+                    <%=L"所需资源"%>
+                </div> 
+                <div style="margin-left:24px;margin-top:-8px;">
+                    <pe:gridview name="gvwMCBlock" DefaultNodeHeight="44" DataSource="<%=GetBlock_DS%>" pagesize="10" ItemsPerLine="5" style="margin-top:5px;" AllowPaging="true">
+                        <Columns>
+                            <div style="height:44px;width:52px;">
+                                <div style="margin-top:10px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+                                    <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:1px;margin-top:1px;width:32px;height:32px;" isclickable = "false"/>
+                                </div>
+                            </div>    
+                        </Columns>
+                        <EmptyDataTemplate>
+	                        <b><%=L"该主题当前没有任务"%></b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b><%=L"请稍等 ... "%></b>
+			            </FetchingDataTemplate>
+                        <PagerSettings Position="Bottom" height="1"/>
+                        <PagerTemplate AutoHidePager="true">
+				            <form>
+					            <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="上一页" style="margin-left:-18px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 486 16 16)"/>
+	                            <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip="下一页" style="margin-left:262px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 470 16 16)"/>
+	                        </form>
+			            </PagerTemplate>          
+                    </pe:gridview> 
+                </div>  
+                <!--<pe:if condition='<%= CurTaskIsLocked() == false%>'>
+                    <input type="button" value='<%=GetQuestTriggerText() %>' style="margin-left:118px;margin-top:-34px;height:24px;color:#ffffff;font-size:16px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:10 10 10 10)" onclick="StartBuild" />
+                </pe:if>
+                <pe:if condition='<%= CurTaskIsLocked() == true %>'>
+                    <input type="button" tooltip="建筑还未解锁，不能建造" value="任务锁定" style="margin-left:118px;margin-top:-34px;height:24px;color:#ffffff;font-size:16px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:10 10 10 10)" enabled="false"/>
+                </pe:if>-->
+                <input type="button" value='<%=GetQuestTriggerText() %>' tooltip='<%=L"左键相对人物;右键为绝对位置"%>' style="margin-left:118px;margin-top:-44px;height:24px;color:#ffffff;font-size:16px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:10 10 10 10)" onclick="StartBuild" />
+            </div>
+        </div>
+    </div>
+</aries:window>
+
+</pe:mcml> 
+</body>
+</html>
+

@@ -1,0 +1,17 @@
+.svn*
+/*
+!/.git*
+!/*.md
+!/LICENSE
+!/script/
+/script/*
+script/ide
+!/script/apps
+/script/apps/*
+!/script/apps/Aries/
+/script/apps/Aries/*
+!/script/apps/Aries/Creator
+!/script/apps/Aries/app_main.lua
+
+
+

@@ -1,0 +1,90 @@
+---++ Block Engine 
+| Date | 2012.10.18 |
+
+---+++ Overview
+CGlobalTerrain --> 32*32 Terrain --> 1 Region -> 32*32 chunks --> 16 cubes --> 16*16*16 blocks --> block classes --> base_block class 
+All blocks in a (512*512m^2) terrain are stored in a region object. 
+A region represents 512×512×256（height）blocks. blocks in a region are stored in 32*32 chunks;  
+each chunk has 16 cubes, each cube has 16*16*16 block ids; each non-empty blockid maps to a block object. 
+
+block{
+     blockState: "opaque", "liquid", "deco", "empty":
+     isDestroyed: only in game mode, the scripting interface may respawn a given block.
+     respawnRate:0
+     sides[]: a pointer to object id like torches, only shown when adjacent block is empty
+     Texture: this is also used when playing the block destruction animation.
+precalculated data to accelarate computing:
+     vector3 vPos;
+}
+
+cube{
+     vector<int16> [16][16][16] block_ids; index to blocks. special index 0 means empty. 
+     vector<block> blocks;
+     is_all_empty
+     is_all_solid
+}
+
+chunk{
+     vector<cube> [16] all_cubes; containing 16 cubes from low to high
+     is_all_empty
+     is_all_solid
+precalculated data to accelarate computing:
+     vector3 vOrigin; origin relative to region. 
+     lowCubeId, highCubeId;    
+}
+Region{
+     float fOriginY; default to -128*block_size. 
+     vector<chunk> [32][32] all_chunks
+Functions:
+     block Picking(point, direction, length);
+     float GetElevation(x,z): get the highest block y pos from x,z.
+     state GetBlockType(x,y,z); return empty, or block type. 
+     SetBlockType(x,y,z,state); 
+     block CreateBlock(x,y,z, type);
+     block GetBlock();
+}
+Terrain{
+     standard terrain
+     Region  block_region; 
+}
+CGlobalTerrain{
+	many Terrain tiles. 
+}
+
+
+---++ Lighting model
+http://www.minecraftwiki.net/wiki/Light
+
+In Classic, “sunlight” is emitted by the top edge of the map and will hit any block 
+that is under it. It will pass through transparent blocks to light blocks underneath. 
+Blocks that do not receive light are in a dim shadow that remains at the same level of 
+brightness no matter how far they are from a light source.
+
+http://www.sea-of-memes.com/LetsCode35/LetsCode35.html
+Sure enough, there are two arrays in the chunk file, "SkyLight" which records the 
+amount of sun, and "BlockLight" which records light from torches/lava. The values are per block, 
+not per face of a block, so I figure I'm supposed to use the light of the adjacent block when 
+displaying a face. I implement this and it seems to be right. See Figure 1.
+
+Unless Notch has some super-fast lighting code now, I think he must be keeping three values in each 
+vertex and combining them in the shader. The values are the sky lighting for that vertex, the block lighting,
+ and something for his "smooth" lighting.
+
+ This seems like an expensive technique to use in real time, but I guess it depends on how far you cast the rays. 
+ If Notch is keeping them very short, then only close blocks would affect the lighting. Playing with Minecraft, 
+ this seems to be the case. The "SkyLight" and "BlockLight" values dominate the lighting, and the "smooth" lighting 
+ only responds to nearby blocks.
+
+ From observation while playing the game, I believe that Minecraft's lighting works in the following way:
+   The world grid includes a light level for each cell. This is used to determine the base brightness of 
+   an entity whose origin lies in that cell. You can see that if you walk into a lighting glitch, 
+   your tool becomes dark, and if an entity enters an opaque block (this can happen with minecarts and arrows) it turns black.
+
+   In addition, there is global directional lighting (in classic OpenGL style), which causes adjacent faces 
+   of objects to not have exactly the same color, adding definition to corners.
+
+   Thus the final displayed color of a textured surface would be
+     worldBrightness * directionalLight * texel
+
+
+http://mcp.ocean-labs.de/files/jd132/client/

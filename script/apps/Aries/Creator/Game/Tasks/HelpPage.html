@@ -1,0 +1,599 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/HelpPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="HelpPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HelpPage.lua");
+local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
+HelpPage.OnInit()
+
+local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest")
+
+BuildQuest.OnInit(HelpPage.cur_theme_index);
+
+isEditing = false;
+local theme_index = BuildQuest.cur_theme_index;
+local task_index = BuildQuest.cur_task_index;
+
+function RestEditing()
+    isEditing = false;
+end
+
+function ClosePage()
+    Page:CloseWindow();
+    --BuildQuest.ClosePage(true);
+    --BuildQuest.EndEditing(true);
+end
+
+function GetCurrentPosText()
+    local center_x, center_y, center_z, radius, region_x, region_z = BuildQuest.GetPosition()
+    return string.format("%d,%d,%d", center_x, center_y, center_z);
+end
+
+function GetTheme_DS(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+     if(not index) then
+        return #themesDS;
+    else
+        return themesDS[index];
+    end
+end
+
+function GetCurThemeIndex()
+    return theme_index;
+end
+
+function ChangeTheme(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    index = tonumber(index);
+    if(HelpPage.cur_category == "tutorial") then    
+        theme_index = index;
+        --BuildQuest.cur_theme_index = index;
+        HelpPage.cur_theme_index = index;
+        BuildQuest.OnInit();
+        task_index = BuildQuest.cur_task_index;
+        Page:Refresh(0.1);
+    elseif(HelpPage.cur_category == "blockwiki") then
+        HelpPage.OnChangeBlockWikiTheme(index);
+    elseif(HelpPage.cur_category == "command") then
+
+    end
+    
+end
+
+function GetGridview_DS(index)
+    return HelpPage.GetGridview_DS(index);
+end
+
+function GetTask_DS(index)
+    local tasksDS = BuildQuestProvider.GetTasks_DS(HelpPage.select_item_index,HelpPage.cur_category);
+    if(not tasksDS) then
+        return 0;
+    end
+    if(not index) then
+        return #tasksDS;
+    else
+        return tasksDS[index];
+    end
+end
+
+function GetTaskName()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index,HelpPage.cur_category);
+    if(task) then
+        return task.name or "";
+    else
+        return "";
+    end
+end
+
+function GetTaskImage()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index,HelpPage.cur_category);
+    local image = "";
+    if(task) then
+        image = task.image;
+    end
+    return image;
+end
+
+function GetTaskDesc()
+    local task = BuildQuestProvider.GetTask(HelpPage.select_item_index,HelpPage.select_task_index,HelpPage.cur_category);
+    local desc = "";
+    if(task) then
+        desc = task.desc;
+        if(desc == "") then
+            desc = task.name;
+        end
+    end
+    return desc;
+end
+
+
+function GetTaskID(index)
+    return tostring(index);
+end
+
+function GetTaskIcon(index)
+    local task = BuildQuestProvider.GetTask(theme_index,index,HelpPage.cur_category);
+    local icon = "";
+    if(task) then
+        icon = task.icon;
+    end
+    return icon;
+end
+
+function TaskIsLocked(index)
+    if(index > (BuildQuest.cur_task_index)) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function TaskIsFinished(index)
+    --return false;
+    --local task = BuildQuestProvider.GetTask(HelpPage.select_item_index,index,HelpPage.cur_category);
+    if(index < BuildQuest.cur_task_index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ChangeTask(name,mcmlNode)
+    HelpPage.ChangeTask(name,mcmlNode);
+end
+
+function GetBlock_DS(index)
+    local task = BuildQuestProvider.GetTask(HelpPage.select_item_index,HelpPage.select_task_index,HelpPage.cur_category);
+    local ds;
+    if(task) then
+        ds = task:GetBlockTypes();
+    end
+    if(ds) then
+        if(not index) then
+            return #ds;
+        else
+            return ds[index];
+        end
+    end
+end
+
+function CurTaskIsLocked()
+    local islocked = TaskIsLocked(task_index);
+    return islocked;
+end
+
+function CurTaskIsFinished()
+    local isfinished = TaskIsFinished(task_index);
+    return isfinished;
+end
+    
+function StartBulid()
+    local cur_task = BuildQuest.GetCurrentQuest();
+    --[[
+    if(not cur_task) then
+        _guihelper.MessageBox(L"请先选择教程");
+        return;
+    end
+    if(HelpPage.cur_category == "tutorial") then
+        local islocked = TaskIsLocked(HelpPage.select_task_index);
+        if(islocked) then
+            _guihelper.MessageBox(L"该建筑还未解锁,请先完成前置内容.");
+            return;
+        end  
+    end
+    ]]  
+    
+    if(BuildQuest.IsTaskUnderway() and cur_task and cur_task.theme_id == theme_index) then
+        BuildQuest.EndEditing();
+        return;
+    end
+    local task = BuildQuest:new({theme_id=HelpPage.select_item_index, task_id=HelpPage.select_task_index, step_id=1,category = HelpPage.cur_category})
+    task:Run();
+    HelpPage.ClosePage();
+end
+
+function GetQuestTriggerText()
+    local s ="";
+    local cur_task = BuildQuest.GetCurrentQuest();
+    if(BuildQuest.IsTaskUnderway() and cur_task.theme_id == theme_index) then
+        s = L"放弃建造";
+    else
+        s = L"开始建造";
+    end
+    return s;
+end
+
+function GetQuestOutBorder(index)
+    local bk="";
+    if(task_index == index) then
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 128 34 34";
+    else
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 89 34 34";
+    end
+    return bk;
+end
+
+function TaskIsSelected(index)
+    if(HelpPage.select_task_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function OnFAQ()
+    ParaGlobal.ShellExecute("open", GameLogic.options.ask_for_help_url, "", "", 1);
+end
+
+function QuickBuilding(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    task_index = tonumber(index);
+    BuildQuest.QuickBuilding(theme_index,task_index);
+end
+
+function beShowTheLineOfOfficialAndUnofficial(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+    if(index == 1) then
+        return false;
+    elseif(themesDS[index] and themesDS[index - 1]) then
+        if(themesDS[index]["official"] == false and themesDS[index - 1]["official"] == true) then
+            return true;
+        else
+            return false;
+        end
+    end
+    return false;
+end
+
+function GetTypeText(type_index)
+    local ds = HelpPage.GetHelpDS();
+    local text = ds[type_index]["text"];
+    return text;
+end
+
+function TypeBeOpen(type_index)
+    local ds = HelpPage.GetHelpDS();
+    if(HelpPage.select_type_index == type_index) then
+        local open = ds[type_index]["open"]
+        if(open) then
+            return true;
+        else
+            return false;
+        end
+    else
+        return false;
+    end
+end
+
+function GetTypeDS()
+    local ds = HelpPage.GetHelpDS();
+    return ds;
+end
+
+function ChangeType(treenode)
+    local attr = treenode.mcmlNode:GetPreValue("this");
+    local index = attr.index;
+    local ds = HelpPage.GetHelpDS();
+    if(not ds[index][1]) then
+        _guihelper.MessageBox(L"当前选项无模板");
+    end
+    HelpPage.SelectCategory(index);
+end
+
+function TypeBeSelected(index)
+    if(HelpPage.select_type_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function GetCurTypeIndex()
+    return HelpPage.select_type_index;
+end
+
+function GetCurItemIndex()
+    return HelpPage.select_item_index;
+end
+
+function ChangeItem(name,mcmlNode)
+    HelpPage.select_type_index = tonumber(mcmlNode:GetAttribute("param1"));
+    HelpPage.select_item_index = tonumber(mcmlNode:GetAttribute("param2"));
+    HelpPage.cur_category = HelpPage.GetCurrentCategory();
+    HelpPage.select_task_index = 1;
+    if(HelpPage.select_type_index == 3) then
+        HelpPage.cur_gridview_ds = HelpPage.GetCurGridviewDS(name);
+    end
+    Page:Refresh(0.1);
+end
+
+function IsTutorialCategory()
+    if(HelpPage.select_type_index == 1) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function IsBlockWikiCategory()
+    if(HelpPage.select_type_index == 2) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function IsCommandCategory()
+    if(HelpPage.select_type_index == 3) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function IsShortCutKeyCategory()
+    if(HelpPage.select_type_index == 4) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function Return()
+    HelpPage.ClosePage();
+end
+
+function TypeBeSelected(index)
+    if(HelpPage.select_type_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function TypeBeExpand(expanded)
+    if(expanded and expanded == true) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ItemBeSelected(type_index,item_index)
+    if(HelpPage.select_type_index == type_index and HelpPage.select_item_index == item_index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function GetAnimStr()
+    local str = HelpPage.GetAnimStr();
+    return str or L"空";
+end
+
+function GetCmdStr()
+    local words;
+
+    -- item is anim item;
+    if(HelpPage.IsAnimItem()) then
+        words = GetAnimStr();
+        return words;
+    end
+
+    local command = HelpPage.cur_gridview_ds[HelpPage.select_task_index];
+    if(command) then
+        local title = string.format("<div style='font-weight:bold;'>%s</div><div>%s</div>",L"命令格式:",command.quick_ref);
+
+        local param_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令参数:");
+        local params = command.params;
+        if(params and next(params)) then
+            for i = 1,#params do
+                local param = params[i];
+                param_words = string.format("%s%s:%s",param_words,param.name,param.desc);
+                if(i < #params) then
+                    param_words = string.format("%s<br/>",param_words);
+                end
+            end
+        else
+            param_words = "";
+        end
+        local command_desc = string.format("<div style='font-weight:bold;'>%s</div><div>%s</div>",L"命令描述:",command.desc);
+        
+        local instance_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令实例:");
+        local instances = command.instances;
+        if(instances and next(instances)) then
+            for i = 1,#instances do
+                local instance = instances[i];
+                instance_words = string.format("%s%s<br/>%s",instance_words,instance.content,instance.desc);
+                if(i < #instances) then
+                    instance_words = string.format("%s<br/>",instance_words);
+                end
+            end
+        else
+            instance_words = "";
+        end
+         
+        words = string.format("%s%s%s%s",title,param_words,command_desc,instance_words);
+    else
+        words = L"没有相应的命令存在";
+    end
+    
+    return words;
+end
+
+function GetShortCutKeyStr()
+    local str = HelpPage.GetShortCutKeyStr();
+    return str or L"空";
+end
+
+]]></script>
+<aries:window mode="thin" title='<%=L("帮助").." (Ctrl+F1)"%>' style="width:650px;height:450px;" onclose="ClosePage">
+    <div style="float:left;margin-left:2px;margin-top:5px;width:131px;">
+        <pe:treeview name="tvwHelp" DataSource='<%=GetTypeDS()%>' OnClick="ChangeType" ItemToggleSize="0" style="height:400px;background:" VerticalScrollBarOffsetX="6">
+	        <NodeTemplates>
+		        <NodeTemplate DataType="type">
+                    <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="type_template">
+                    <div style="margin-left:0px;margin-top:5px;height:23px;width:123px;" class="mc_button_grey">
+                        <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
+                            <div style="float:left;margin-left:7px;margin-top:5px;width:6px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#476 74 6 11);"/>
+                        </pe:if>
+                        <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
+                            <div style="float:left;margin-left:4px;margin-top:8px;width:11px;height:6px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#417 81 11 6);"/>
+                        </pe:if>
+                        <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|index") %>' style="margin-left:5px;width:100px;height:23px;font-weight:bold;color:#ffffff;text-offset-y:-2;text-align:left;background:" />    
+                    </div>
+                </NodeTemplate>
+                <NodeTemplate DataType="item">
+                    <div style="height:32px;margin-left:2px;" MouseOverBG="">
+                        <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
+                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                        </pe:if>
+                        <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
+                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                        </pe:if>
+                    </div>
+                </NodeTemplate>
+	        </NodeTemplates>
+        </pe:treeview>
+    </div>
+    <div style="float:left;margin-left:10px;margin-top:1px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
+    <div style="float:left;width:160px;padding-top:6px;">
+        <pe:gridview name="gvwMCTask" style="height:416px;" VerticalScrollBarStep="32" DefaultNodeHeight="32" DataSource="<%=GetGridview_DS%>" ItemsPerLine="1" AllowPaging="false" RememberScrollPos="true">
+            <Columns>
+                <div style="height:32px;">
+                    <pe:if condition='<%= IsCommandCategory() %>'>
+                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                            <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:10px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                        </pe:if>
+                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                            <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:10px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                        </pe:if>
+                    </pe:if>
+                    <pe:if condition='<%= not IsCommandCategory() %>'>
+                        <pe:if condition='<%= IsTutorialCategory() %>'>
+                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
+                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                            </pe:if>
+                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
+                                <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == true %>'>
+                                    <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_green"/>    
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == false %>'>
+                                    <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                                </pe:if>  
+                            </pe:if>
+                        </pe:if>
+                        <pe:if condition='<%= IsBlockWikiCategory() %>'>
+                                
+                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
+                                <div style="margin-left:5px;width:137px;height:32px;" class="mc_button_blue">
+                                    <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
+                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:100px;height:23px;color:#ffffff;text-align:left;background:"/>    
+                                </div>
+                                    
+                            </pe:if>
+                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
+                                <div style="margin-left:5px;width:137px;height:32px;background:"  onclick="ChangeTask" param1='<%= Eval("task_index") %>'>
+                                    <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
+                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:100px;height:23px;color:#ffffff;text-align:left;background:"/>
+                                </div>
+                                    
+                            </pe:if>
+                        </pe:if>
+                        <pe:if condition='<%= IsShortCutKeyCategory() %>'>
+                            <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:20px;margin-top:1px;width:100px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                            </pe:if>
+                            <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:20px;margin-top:1px;width:100px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                            </pe:if>
+                        </pe:if>
+                    </pe:if>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+                <div style="color:#ffffff;margin-left:20px;">
+                    <b><%=L"空"%></b>
+                </div>
+            </EmptyDataTemplate>
+            <FetchingDataTemplate>
+                <b><%=L"请稍等 ... "%></b>
+			</FetchingDataTemplate>       
+        </pe:gridview>
+    </div>
+    <div style="float:left;margin-left:-10px;margin-top:1px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
+    <div style="float:left;margin-left:0px;margin-top:0px;">
+        <pe:if condition='<%= IsShortCutKeyCategory() %>'>
+            <pe:treeview name="shortcutkeyStr" VerticalScrollBarStep="21" style="margin-top:12px;margin-bottom:12px;height:400px;background:;" VerticalScrollBarOffsetX="10">
+                <div style="margin-left:-5px;width:320px;color:#ffffff;text-align:left;">
+                    <%=GetShortCutKeyStr() %>
+                </div>
+            </pe:treeview>
+        </pe:if>
+        <pe:if condition='<%= IsCommandCategory()%>'>
+            <pe:treeview name="cmdStr" VerticalScrollBarStep="21" style="margin-top:12px;margin-bottom:12px;height:400px;background:;" VerticalScrollBarOffsetX="10">
+                <div style="margin-left:5px;width:320px;color:#ffffff;text-align:left;">
+                    <%=GetCmdStr() %>
+                </div>
+            </pe:treeview>
+        </pe:if>
+        <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
+            <div style="margin-left:10px;margin-top:10px;width:320px;height:250px;color:#ffffff;text-align:left;">
+                <%=GetTaskDesc() %>
+            </div>
+            <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
+                <div style="float:left;margin-left:0px;margin-top:-1px;width:352px;height:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8)"/>
+            </pe:if>
+            <div style="margin-left:25px;margin-top:5px;height:110px;">
+                <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
+                    <div style="margin-left:35px;margin-top:2px;color:#ffffff;">
+                        <%=L"所需资源"%>
+                    </div> 
+                    <div style="margin-left:16px;margin-top:-8px;">
+                        <pe:gridview name="gvwMCBlock" DefaultNodeHeight="44" DataSource="<%=GetBlock_DS%>" pagesize="10" ItemsPerLine="5" style="margin-top:5px;" AllowPaging="true">
+                            <Columns>
+                                <div style="height:44px;width:52px;">
+                                    <div style="margin-top:10px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+                                        <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:1px;margin-top:1px;width:32px;height:32px;" isclickable = "false"/>
+                                    </div>
+                                </div>    
+                            </Columns>
+                            <EmptyDataTemplate>
+	                            <b><%=L"该主题当前没有任务"%></b>
+                            </EmptyDataTemplate>
+                            <FetchingDataTemplate>
+                                <b><%=L"请稍等 ..."%></b>
+			                </FetchingDataTemplate>
+                            <PagerSettings Position="Bottom" height="1"/>
+                            <PagerTemplate AutoHidePager="true">
+				                <form>
+					                <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:-18px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 486 16 16)"/>
+	                                <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:262px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 470 16 16)"/>
+	                            </form>
+			                </PagerTemplate>          
+                        </pe:gridview> 
+                    </div> 
+                </pe:if>
+            </div>
+            <div style="">
+                <input type="button" value='<%= GetQuestTriggerText() %>' style="margin-left:120px;margin-top:10px;min-width:100px;height:23px;font-weight:bold;font-size:14px;" class="mc_button_orange" onclick="StartBulid" />
+            </div>
+        </pe:if>
+    </div>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>
+

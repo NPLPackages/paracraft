@@ -1,0 +1,113 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/SkinPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="SkinPage.lua"><![CDATA[
+
+SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPage");
+SkinPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function DS_Items(index)
+    local ds = SkinPage.official_ds;
+    if(index == nil) then
+        return #ds;
+    else
+        return ds[index];
+    end
+end
+
+function SkinIsSelected(index)
+    if(SkinPage.select_skin_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ChangeSkin(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    index = tonumber(index);
+    SkinPage.select_skin_index = index;
+    SkinPage.ChangeSkin(index);
+    --Page:Refresh(0.01);
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOK()
+    SkinPage.OnOK();
+    ClosePage();
+end
+
+]]></script>
+<aries:window mode="thin" style="width:500px;height:400px;" title='<%=L"角色外貌"%>' onclose="ClosePage">
+    <div style="float:left;width:180px;margin-left:13px;margin-top:3px;">
+        <div style="position:relative;margin-left:-48px;margin-top:10px;width:256px;height:226px;">
+            <div >
+                <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" isinteractive="false" />
+            </div>
+            <!--<input type="button" enabled="false" value="更改造型" style="position:relative;margin-top:210px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>-->
+        </div>
+    </div>
+    <div style="float:left;margin-left:8px;margin-top:10px;width:270px;height:335px;color:#cccccc">
+        <div class="mc_border" style="margin-top:5px;padding:10px;">
+            <div style="float:left;margin-left:20px;color:#ffffff;">
+                ID
+            </div>
+            <div style="float:left;margin-left:80px;color:#ffffff;">
+                <%=L"描述"%>
+            </div>
+    <!--        <div>
+        
+            </div>-->
+            <pe:gridview style="margin-top:5px;height:260px;" name="gvwSkins" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="height:32px;">
+                        <pe:if condition='<%= SkinIsSelected(Eval("index")) == true %>'>
+                            <div style="float:left;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
+                                <div style="float:left;margin-left:10px;width:30px;text-align:center;">
+                                    <%= Eval("id") %>
+                                </div>
+                                <div style="float:left;width:180px;text-align:center;">
+                                    <%= Eval("name") %>
+                                </div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= SkinIsSelected(Eval("index")) == false %>'>
+                            <div style="position:relative;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)">
+                                <div style="float:left;margin-left:10px;width:30px;text-align:center;">
+                                    <%= Eval("id") %>
+                                </div>
+                                <div style="float:left;width:180px;text-align:center;">
+                                    <%= Eval("name") %>
+                                </div>
+                            </div>
+                            <input type="button" onclick="ChangeSkin" name="btn_change" param1='<%=Eval("index") %>' style="position:relative;min-width:200px;background:"/>
+                        </pe:if>
+                    </div>
+                </Columns> 
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+    <div style="height:30px;">
+        <input type="button" onclick="OnOK"  value='<%=L"确定"%>' style="margin-top:-10px;margin-left:240px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

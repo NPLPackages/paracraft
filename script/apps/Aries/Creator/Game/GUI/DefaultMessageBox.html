@@ -1,0 +1,66 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html" -->
+<html>
+<body>
+<pe:mcml>
+<script type="text/npl" src="script/ide/MessageBox.lua" refresh="false"><![CDATA[
+function ClosePage()
+	_guihelper.CloseMessageBox();
+end
+]]></script>
+<aries:window  mode="thin" style="width:340px" title='<%=L"信息"%>' onclose="ClosePage">
+  <div style="padding:5px;width:330px;color:#cccccc">
+        <pe:if condition='<%=type(_guihelper.values.icon)=="string"%>'>
+            <img style="margin-right:5px;width:24px;height:24px;" src='<%=_guihelper.values.icon%>'/>
+        </pe:if>
+        <pe:if condition='<%=type(_guihelper.values.icon)=="table"%>'>
+            <img style="margin-right:5px;width:24px;height:24px;" src='<%=_guihelper.values.icon.src%>'animstyle='<%=_guihelper.values.icon.animstyle%>'/>
+        </pe:if>
+        <pe:if condition='<%=type(_guihelper.values.icon)=="number"%>'>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Asterisk%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Error%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/Creator/Objects/error.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Exclamation%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/FriendsWnd_BuddyIcon_Online.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Warning%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Information%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/info.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Stop%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Question%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/Help.png);width:24px;height:24px;" /></pe:if>
+        </pe:if>    
+        <div style="float:left;padding:16px;">
+            <!-- tricky: always reference content like below. It allows MCML code that needs page:Refresh to work inside content.-->
+            <script refresh="false" IsInitialized='<%=_guihelper.values.IsInitialized%>'>
+                document.write(_guihelper.values.content);
+            </script>
+        </div>
+    </div>
+  <pe:if condition='<%=_guihelper.values.buttons~=_guihelper.MessageBoxButtons.Nothing%>'>
+    <div style="padding:5px;padding-bottom:10px;">
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel%>'>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:72px;margin-top:5px;width:90px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK%>'>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:125px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNo%>'>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNoCancel%>'>
+            <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:20px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="mc_big_button" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.AbortRetryIgnore%>'>
+        <input type="button" class="mc_big_button" name="Abort" value='<%=L"终止"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" name="Retry" value='<%=L"重试"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" name="Ignore" value='<%=L"忽略"%>' style="margin-left:25px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.RetryCancel%>'>
+        <input type="button" class="mc_big_button" name="Retry" value='<%=L"重试"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+    </div>
+  </pe:if>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>

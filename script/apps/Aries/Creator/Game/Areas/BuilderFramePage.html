@@ -1,0 +1,178 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="BuilderFramePage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
+
+local uiversion = tonumber(Page:GetRequestParam("version")) or 0;
+BuilderFramePage.OnInit(uiversion);
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return BuilderFramePage.GetCategoryButtons();
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #BuilderFramePage.Current_Item_DS;
+    else
+        return BuilderFramePage.Current_Item_DS[index];
+    end
+end
+
+function OnClickBlock(block_id)
+    if(mouse_button == "left") then
+        BuilderFramePage.OnClickBlock(block_id);
+    elseif(mouse_button == "right") then
+        -- show block wiki page
+        GameLogic.RunCommand("/wiki "..tostring(block_id));
+    end
+end
+
+function OnChangeCategory(index)
+    BuilderFramePage.OnChangeCategory(index);
+end
+
+function OnClickBlocksShop()
+    _guihelper.MessageBox(L"测试期间, 模板商城暂未开放~");
+end
+
+function DS_GetBlockTemplates()
+   return BlockTemplatePage.GetAllTemplatesDS();
+end
+
+function OnClickRefreshAllTemplates()
+   BlockTemplatePage.GetAllTemplatesDS(true);
+   Page:Refresh(0.1);
+end
+
+function OnClickOpenTemplateDir()
+    BlockTemplatePage.OnClickOpenTemplateDir()
+end
+
+function OnSelectNode(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    --Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
+    BlockTemplatePage.CreateFromTemplate(item.filename);
+end
+
+function SearchBlock(name,mcmlNode)
+    local search_ctl = Page:FindUIControl("block_search_text_ctl");
+    if(search_ctl and search_ctl.text) then
+        BuilderFramePage.SearchBlock(string.lower(search_ctl.text));
+    end
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function OnClickManageTemplateWnd()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+	local BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest");
+    BuildQuest.ShowPage();
+end
+
+function dummy()
+end
+]]></script>
+<div style="">
+    <div style="margin-left:13px;margin-top:5px;width:210px;">
+        <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+            <input type="text" EmptyText='<%=L"搜索: 输入ID或名字"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
+        </div>
+    </div>
+    <div style="width:240px;height:60px;margin-left:13px;margin-top:3px;">
+        <pe:repeat DataSource="<%=GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;width:60px;">
+                <pe:if condition='<%=BuilderFramePage.category_index == Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' uiname = "builder_cur_category_btn" onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=BuilderFramePage.category_index ~= Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <div style="margin-left:8px;margin-top:1px;width:240px;height:335px;color:#cccccc">
+        <pe:if condition='<%=BuilderFramePage.category_name ~= "template" and BuilderFramePage.category_name ~= "playerbag"%>'>
+            <pe:gridview style="margin:0px" name="new_builder_gvwItems" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="width:32px;height:32px;" >
+                        <pe:mc_block block_id='<%=Eval("block_id")%>' style="width:32px;height:32px;" tooltip2='<%=L"右键帮助"%>' onclick="OnClickBlock"/>    
+                    </div>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </pe:if>
+        <pe:if condition='<%=BuilderFramePage.category_name == "playerbag"%>'>
+            <pe:gridview name="MyItems" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+                <Columns>
+                    <div style="margin-left:4px;font-weight:bold;" class="mc_item">
+                        <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                    </div>
+			    </Columns>
+            </pe:gridview>
+        </pe:if>
+        <pe:if condition='<%=BuilderFramePage.category_name == "template"%>'>
+            <div style="margin-left:2px;margin-top:7px;margin-bottom:3px;width:218px;">
+                <!--<div style="float:left;padding:2px;" class="mc_border" >
+                    <input type="button" style="position:relative;min-width:43px;margin-top:10px;background:;color:#cccccc" value='<%=L"预览"%>' />
+                    <img name="CurrentSnapshot" zorder="1" style="width:60px;height:50px;"/>
+                </div>-->
+                <div style="float:left;margin-left:5px;">
+                    <div>
+                        <%=L"Ctrl+左键点击场景可保存模版"%>
+                    </div>
+                </div>
+                <div style="margin-left:1px;margin-top:0px;">
+                    <input type="button" name="refresh" style="font-size:12px;color:#cccccc;background-color:#cccccc" value='<%=L"刷新"%>' class="linkbutton" onclick="OnClickRefreshAllTemplates"/>
+                    <input type="button" name="opendir" style="margin-left:10px;font-size:12px;color:#cccccc;background-color:#cccccc" value='<%=L"目录"%>' tooltip='<%=L"打开模板文件目录"%>' class="linkbutton" onclick="OnClickOpenTemplateDir"/>
+                    <input type="button" name="fullwnd" style="position:relative;font-size:12px;color:#cccccc;background-color:#cccccc;align:right;" value='<%=L"管理"%>' tooltip='<%=L"打开模板管理窗口"%>' class="linkbutton" onclick="OnClickManageTemplateWnd"/>
+                </div>
+            </div>
+            <pe:treeview name="gvwBlockTemplates" class="mc_border" VerticalScrollBarStep="20" RememberScrollPos="true" DataSource='<%=DS_GetBlockTemplates()%>' DefaultNodeHeight="20" OnClick="tvwOnClickNode()" style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;height:235px;">
+	            <NodeTemplates>
+                    <NodeTemplate DataType="folder">
+                        <pe:treenode text='<%=XPath("this|text")%>' style="color:#cccccc" expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+                    </NodeTemplate>
+		            <NodeTemplate DataType="file">
+                        <div style="height:20px;">
+                            <input type="button" class="listbutton_unselected" value='<%=XPath("this|text")%>' onclick='OnSelectNode'
+						        style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" MouseOver_BG="Texture/alphadot.png"/>
+                        </div>
+                    </NodeTemplate>
+	            </NodeTemplates>
+            </pe:treeview>
+        </pe:if>
+    </div>
+</div>
+
+</pe:mcml>
+</body>
+</html>
+

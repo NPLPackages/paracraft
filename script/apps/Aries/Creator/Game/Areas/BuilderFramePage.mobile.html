@@ -1,0 +1,189 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BuilderFramePage.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="BuilderFramePage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
+
+local uiversion = tonumber(Page:GetRequestParam("version")) or 0;
+BuilderFramePage.OnInit(uiversion);
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #BuilderFramePage.Current_Item_DS;
+    else
+        return BuilderFramePage.Current_Item_DS[index];
+    end
+end
+
+function GetCategoryButtons(index)
+    local ds = BuilderFramePage.GetCategoryButtons();
+    if(not index) then
+        return #ds;
+    else
+        return ds[index];
+    end
+    --return BuilderFramePage.GetCategoryButtons();
+end
+
+function OnClickBlock(block_id)
+    BuilderFramePage.OnClickBlock(block_id);
+end
+
+function OnChangeCategory(name)
+    local index = tonumber(name);
+    if(index == 6) then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+        local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+        QuickSelectBar.SwitchInventoryPage();
+    --elseif(index > 1 and index < 6) then
+    else
+        BuilderFramePage.OnChangeCategory(index);
+    end
+    --BuilderFramePage.OnChangeCategory(index);
+end
+
+function OnClickBlocksShop()
+    _guihelper.MessageBox("测试期间, 模板商城暂未开放~");
+end
+
+function DS_GetBlockTemplates()
+   return BlockTemplatePage.GetAllTemplatesDS();
+end
+
+function OnClickRefreshAllTemplates()
+   BlockTemplatePage.GetAllTemplatesDS(true);
+   Page:Refresh(0.1);
+end
+
+function OnClickOpenTemplateDir()
+    BlockTemplatePage.OnClickOpenTemplateDir()
+end
+
+function OnSelectNode(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
+    BlockTemplatePage.CreateFromTemplate(item.filename);
+end
+
+function OnSearchBlock()
+    BuilderFramePage.isSearching = true;
+    Page:Refresh(0.1);
+end
+
+function SearchBlock(name,mcmlNode)
+    local search_ctl = Page:FindUIControl("block_search_text_ctl");
+    if(search_ctl and search_ctl.text) then
+        BuilderFramePage.SearchBlock(search_ctl.text);
+    end
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function dummy()
+end
+]]></script>
+<div style="width:920px;height:542px;background:;background-color:#000000cc">
+    <div style="float:left;margin-left:5px;margin-top:15px;width:120px;">
+        <pe:gridview style="margin:0px;width:120px;" name="new_gvwItems" CellPadding="0" VerticalScrollBarStep="84" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "84" 
+            DataSource='<%=GetCategoryButtons%>'>
+	        <Columns>
+                <div>
+                    <pe:if condition='<%= Eval("index") == 5%>'>
+                        <div style="position:relative;width:106px;height:80px;background-color:#ffffff90;background:" />
+                    </pe:if>
+                    <pe:if condition='<%= Eval("index") ~= 5%>'>
+                        <pe:if condition='<%= Eval("index") == BuilderFramePage.category_index%>'>
+                            <div style="position:relative;width:106px;height:80px;background-color:#ffffff60;" class="mobile_button">
+                                <!--<pe:if condition='<%= Eval("index") == 1%>'>
+                                    <div style="margin-left:27px;margin-top:26px;width:51px;height:24px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#262 181 51 24)"/>
+                                </pe:if>-->
+                                <pe:if condition='<%= Eval("index") == 1%>'>
+                                    <div style="margin-left:32px;margin-top:21px;width:42px;height:42px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#212 171 42 42)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 2%>'>
+                                    <div style="margin-left:29px;margin-top:13px;width:48px;height:54px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#157 160 48 54)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 3%>'>
+                                    <div style="margin-left:29px;margin-top:12px;width:49px;height:57px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#50 158 49 57)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 4%>'>
+                                    <div style="margin-left:28px;margin-top:22px;width:50px;height:37px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#103 161 50 37)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 6%>'>
+                                    <div style="margin-left:34px;margin-top:19px;width:43px;height:43px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#2 164 43 43)"/>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= Eval("index") ~= BuilderFramePage.category_index%>'>
+                            <div style="position:relative;width:106px;height:80px;background-color:#ffffff30;" class="mobile_button">
+                                <!--<pe:if condition='<%= Eval("index") == 1%>'>
+                                    <div style="margin-left:27px;margin-top:26px;width:51px;height:24px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#262 181 51 24)"/>
+                                </pe:if>-->
+                                <pe:if condition='<%= Eval("index") == 1%>'>
+                                    <div style="margin-left:32px;margin-top:21px;width:42px;height:42px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#212 171 42 42)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 2%>'>
+                                    <div style="margin-left:29px;margin-top:13px;width:48px;height:54px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#157 160 48 54)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 3%>'>
+                                    <div style="margin-left:29px;margin-top:12px;width:49px;height:57px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#50 158 49 57)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 4%>'>
+                                    <div style="margin-left:28px;margin-top:22px;width:50px;height:37px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#103 161 50 37)"/>
+                                </pe:if>
+                                <pe:if condition='<%= Eval("index") == 6%>'>
+                                    <div style="margin-left:34px;margin-top:19px;width:43px;height:43px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#2 164 43 43)"/>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <input type="button" name='<%=Eval("index")%>' onclick="OnChangeCategory" style="position:relative;width:106px;height:80px;background:" />
+                    </pe:if>
+                    
+                </div>
+            </Columns>
+	        <EmptyDataTemplate>
+	        </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+    <div style="float:left;margin-left:-5px;margin-top:0px;background-color:#ffffff50;padding:5px;padding-left:15px;" class="mobile_button">
+        <pe:gridview style="margin:0px;height:532px;" name="new_gvwItems" VerticalScrollBarStep="76" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="10" DefaultNodeHeight = "76" 
+            DataSource='<%=DS_Items%>'>
+	        <Columns>
+                <div style="width:74px;height:74px;margin:1px;padding:6px;background-color:#ffffff60;" class="mobile_button">
+                    <pe:mc_block block_id='<%=Eval("block_id")%>' style="width:64px;height:64px;" onclick="OnClickBlock"/>    
+                </div>
+            </Columns>
+	        <EmptyDataTemplate>
+	        </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

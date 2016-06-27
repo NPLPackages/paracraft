@@ -1,0 +1,110 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/NatureBuilder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="NatureBuilder.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+NatureBuilder = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.NatureBuilder");
+NatureBuilder.OnInit();
+
+NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
+MyCompany.Aries.Creator.SkyPage.OnInit();
+
+NPL.load("(gl)script/apps/Aries/Creator/Env/OceanPage.lua");
+MyCompany.Aries.Creator.OceanPage.OnInit();
+
+NPL.load("(gl)script/apps/Aries/Creator/Env/TerrainPage.lua");
+MyCompany.Aries.Creator.TerrainPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+]]></script>
+<div style="width:260px;height:450px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >自然环境</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+
+    <pe:tabs name="NatureTabs"  class="tabs" >
+      <pe:tab-item name="paintTab" text="天空" selected="true" style="padding:10px;padding-top:10px;">
+        <div>
+            光照: 
+            <div style="float:left" width="128px">
+                <div style="width:128px;height:32px;background:url(Texture/3DMapSystem/Env/skytime.png)" >
+                    <input type="button" style="width:43px;height:30px;background:;" name="SetTimeMorning" tooltip="清晨" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeMorning()"/>
+                    <input type="button" style="width:43px;height:30px;background:;" name="SetTimeNoon" tooltip="正午" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeNoon()"/>
+                    <input type="button" style="width:40px;height:30px;background:;" name="SetTimeNight" tooltip="夜晚" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeNight()"/>
+                </div>
+                <br />
+                <pe:sliderbar name="TimeSlider" min="0" max="100" value="30" onchange="MyCompany.Aries.Creator.SkyPage.OnTimeSliderChanged()" tooltip="拖动滑块调整光线强调"></pe:sliderbar>
+            </div>
+        </div>
+        <div>
+            天空背景:
+            <pe:gridview ItemsPerLine="3" style="height:143px;" name="gvwSkyboxes" DataSource='<%=MyCompany.Aries.Creator.SkyPage.DS_SkyBox_Func%>' CellPadding="0" DefaultNodeHeight="68">
+                <Columns>
+                    <a onclick="MyCompany.Aries.Creator.SkyPage.OnChangeSkybox" param1='<%=Eval("index")%>' style="padding-left:5px;padding-right:5px;font-size:12px;">
+	                    <img src='<%=Eval("bg")%>'width="48" height="48"/><br/><%=Eval("text")%>
+	                </a>
+                </Columns>
+            </pe:gridview>
+        </div>    
+        <div>
+            云的颜色:
+            <pe:colorpicker tooltip="拖动滑块调整云的颜色" name="FogColorpicker" onchange="NatureBuilder.OnSkyColorChanged()"/>
+        </div>
+        <!--<div>
+            天空色调:
+            <pe:colorpicker tooltip="拖动滑块调整天空的色调" name="SkyColorpicker" onchange="MyCompany.Aries.Creator.SkyPage.OnSkyColorChanged()"/>
+        </div>-->
+        <div>
+            发光积木的颜色:
+            <pe:colorpicker tooltip="火把等积木的颜色" name="BlockColorpicker" onchange="NatureBuilder.OnBlockColorChanged()"/>
+        </div>
+      </pe:tab-item>
+      <pe:tab-item name="paintTab" text="地表" condition='<%=GameLogic.options.has_real_terrain == true%>' onclick="MyCompany.Aries.Creator.TerrainPage.OnClickPaintTab()"  style="padding:10px;padding-top:10px;">
+        <iframe name="TerraPaintFrame" src="script/apps/Aries/Creator/Env/TerraPaintPage.html" ></iframe>
+      </pe:tab-item>
+      <pe:tab-item name="elevTab" text="山脉" condition='<%=GameLogic.options.has_real_terrain == true%>' onclick="MyCompany.Aries.Creator.TerrainPage.OnClickFormTab()"  style="padding:10px;padding-top:10px;">
+        <iframe name="TerraFrame" src="script/apps/Aries/Creator/Env/TerraFormPage.html" ></iframe>
+      </pe:tab-item>
+      <pe:tab-item name="paintTab" text="海洋" condition='<%=GameLogic.options.has_real_terrain == true%>' style="padding:10px;padding-top:10px;">
+        <div>水面高度: <br/>
+            <div style="float:left">
+                <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="1" param2="true">
+                    <img style="background:url(Texture/3DMapSystem/Env/waterup.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">增高1米</div>
+                </a><br />
+                <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="0" param2="true">
+                    <img style="background:url(Texture/3DMapSystem/Env/waterfeet.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">当前人物高度</div>
+                </a><br />
+                <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="-1" param2="true">
+                    <img style="background:url(Texture/3DMapSystem/Env/waterlower.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">降低1米</div>
+                </a><br />
+            </div>
+            <div style="float:left">
+                <pe:sliderbar tooltip="拖动滑块调整水面高度" style="width:10px;height:100px" name="OceanLevel" value="0" min="-3.1415926" max="3.1415926" min_step="3.1415926/18" direction="vertical" onchange="MyCompany.Aries.Creator.OceanPage.OnOceanLevelSlider()" />
+            </div>
+            <div style="background:url(Texture/3DMapSystem/Env/water_bg.png);width:128px;height:64px">
+                <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="0" param2="false">
+                    <img style="background:url(Texture/3DMapSystem/Env/nowater.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">取消水面</div>
+                </a><br />
+            </div>    
+        </div>
+        <div>水体颜色:
+            <pe:colorpicker name="OceanColorpicker" tooltip="拖动滑块调整水体颜色" onchange="MyCompany.Aries.Creator.OceanPage.OnOceanColorChanged()"/>
+        </div>
+      </pe:tab-item>
+    </pe:tabs>  
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

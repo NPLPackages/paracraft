@@ -1,0 +1,244 @@
+<!-- "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CreateNewWorld.lua"><![CDATA[
+
+local page = document:GetPageCtrl();
+local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+CreateNewWorld.page = page;
+CreateNewWorld.OnInit();
+local cur_mode = CreateNewWorld.init_mode;
+
+function getBGStyle()
+    return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
+end
+
+function SelectedWorld(name,node)
+    local world = node:GetPreValue("this", true);
+    MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnSelectWorld(world,true);
+    --local selected = item.selected;
+
+end
+
+function ReturnLastStep()
+    page:CloseWindow();
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    if(not WorldCommon.GetWorldInfo()) then
+        MainLogin.state.IsLoadMainWorldRequested = nil;
+        MainLogin:next_step();
+    end
+end
+
+function GetAuthor(name)
+    local s = L"制作者:";
+    if(name) then
+        s = s..name;
+    end
+    return s;
+end
+
+function GetGameStyleDescription() 
+    local style = CreateNewWorld.cur_style;
+    local des = style.description;
+    return des;
+end
+
+function GetGameDifficultyDescription()
+    local grade = CreateNewWorld.cur_difficulty;
+    local des = grade.description;
+    return des;
+end
+
+function GetGameTerrainDescription()
+    local terrain = CreateNewWorld.cur_terrain;
+    local des = terrain.description;
+    return des;
+end
+
+
+
+function GetCurWorldAuthor() 
+    --return cur_world.author;
+    return "None";
+end
+
+function GetCurWorldIP() 
+    return "127.0.0.1";
+end
+
+
+function OnClickModify(name,node)
+    local item_tag = node:GetAttribute("param1");
+    local item_index = node:GetAttribute("param2");
+    local index = tonumber(item_index);
+    local table_name = item_tag.."_info";
+    local cur_item = "cur_"..item_tag;
+    CreateNewWorld[cur_item] = CreateNewWorld[table_name][index];
+    page:Rebuild();
+end
+
+function GetCurWorldMode()
+    return CreateNewWorld.cur_style.show_value or "";
+end
+
+function GetCurWorldGrade() 
+    return CreateNewWorld.cur_difficulty.show_value or "";
+end
+    
+function GetTerrainBtnValue()
+    return CreateNewWorld.cur_terrain.show_value or "";
+end
+
+function GetOneDayTimeBtnValue()
+    return CreateNewWorld.cur_oneday_time.show_value or "";
+end
+
+CreateNewWorld.LastWorldName = CreateNewWorld.LastWorldName or L"默认名字2";
+function GetWorldName()
+    return CreateNewWorld.LastWorldName;
+end
+
+function OnWorldNameChange()
+    CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
+end
+
+function BtnBeSelected(item_name,index)
+    local item = CreateNewWorld[item_name];
+    if(item.index == index) then
+        return "mc_blue_button_with_fillet";
+    else
+        return "mc_light_grey_button_with_fillet";
+    end
+end
+]]></script>
+<aries:window mode="thin" width="700" height="450" title='<%=L"创建世界" %>'>
+    <div style="margin-top:10px;margin-left:10px;height:350px;width:670px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)" >
+        <div style="float:left;margin-left:0px;margin-top:0px;width:256px;height:256px;">
+            <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false"/>
+        </div>
+        <div style="float:left;margin-left:30px;">
+            <div style="margin-top:110px;">
+                <div style="float:left;margin-top:3px;color:#ffffffff;font-weight:bold;font-size:14px;">
+                    <%=L"世界名称" %>
+                </div>
+                <input type="text" name="new_world_name" value='<%=GetWorldName()%>' onkeyup="OnWorldNameChange" style="float:left;margin-top:0px;margin-left:10px;width:150px;height:25px;font-size:18px;base-font-size:18;font-weight:bold;" class="mc_text"/>
+            </div>
+            <!--<div style="margin-top:30px;">
+                <div style="float:left;margin-left:28px;margin-top:2px;color:#ffffffff;font-weight:bold;font-size:14px;">
+                    <%=L"模式" %>
+                </div>
+                <input type="button" value='<%=L"创作" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_style",2) %>' onclick="OnClickModify" param1="style" param2="2"/>
+                <input type="button" value='<%=L"生存" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_style",1) %>' onclick="OnClickModify" param1="style" param2="1"/>
+            </div>-->
+            <div style="margin-top:30px;">
+                <div style="float:left;margin-top:2px;color:#ffffffff;font-weight:bold;font-size:14px;">
+                    <%=L"初始地形" %>
+                </div>
+                <input type="button" value='<%=L"超平坦" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
+                <input type="button" value='<%=L"随机地形" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",2) %>' onclick="OnClickModify" param1="terrain" param2="2"/>
+                <input type="button" value='<%=L"空" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",3) %>' onclick="OnClickModify" param1="terrain" param2="3"/>
+            </div>
+        </div>
+    </div>
+    <div style="height:45px; margin-top:8px;margin-bottom:10px;">
+        <input type="button" value='<%=L"创建新世界" %>' style="spacing:20px;margin-left:180px;height:40px;min-width:120px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" class="mc_light_orange_button_with_fillet" onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
+        <input type="button" value='<%=L"返回" %>' spacing="10" style="margin-left:160px;margin-top:6px;height:32px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="ReturnLastStep"/>
+    </div>
+</aries:window>
+
+<!--<pe:container alignment="_ct" style="position:relative;margin-left:-400px;margin-top:-250px;width:800px;height:450px;background:">
+    <div style="width:800px;height:400px;">
+        <div style="float:left;margin-top:8px;margin-left:27px;width:160px;height:384px;">
+            <div style="width:160px;height:112px;">
+                <div style="width:160px;height:112px;" class="mc_outer_panel">
+                    <input type="button" value="单机模式" style="text-offset-y:-3;margin-top:19px;margin-left:15px;width:130px;height:34px;" class="mc_big_button_selected"/>
+                    <input type="button" enabled="false" value="局域网模式" style="margin-top:10px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>
+                </div>
+            </div>
+            <div style="margin-top:16px;width:160px;height:256px;">
+                <div style="width:160px;height:256px;" class="mc_outer_panel">
+                    <div style="position:relative;float:left;margin-left:-48px;margin-top:-40px;width:256px;height:256px;">
+                        <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false"/>
+                    </div>
+                    <input type="button" enabled="false" value="更改造型" style="position:relative;margin-top:210px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;margin-top:8px;margin-left:38px;width:353px;height:384px;" class="mc_outer_panel">
+            <div>
+                <div style="position:relative;">
+                    <div style="position:relative;margin-top:15px;font-size:16px;base-font-size:16;font-weight:bold;text-align:center;">
+                        新的世界
+                    </div>
+                    <input  name="new_world_name"  value='<%=GetWorldName()%>' onkeyup="OnWorldNameChange" style="position:relative;margin-top:40px;margin-left:100px;width:150px;height:25px;font-size:18px;base-font-size:18;font-weight:bold;" class="mc_inner_panel"/>
+                </div>
+                <div style="position:relative;margin-top:100px;margin-left:25px;">
+                    <div style="font-size:16px;base-font-size:16;font-weight:bold;">
+                        模式
+                    </div>
+                    <input type="button" name="style_info" value="<%=GetCurWorldMode() %>" style="width:110px;height:30px;text-offset-y:-3"  class="mc_small_button" onclick="OnClickModify"/>
+                    <div>
+                        <%=GetGameStyleDescription() %>
+                    </div>
+                </div>
+                <div style="position:relative;margin-top:100px;margin-left:180px;">
+                    <div style="font-size:16px;base-font-size:16;font-weight:bold;">
+                        地形
+                    </div>
+                    <input type="button" name="terrain_info" value="<%=GetTerrainBtnValue() %>" style="width:110px;height:30px;text-offset-y:-3" onclick="OnClickModify" class="mc_small_button"/>
+                    <div>
+                        <%=GetGameTerrainDescription() %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;margin-top:8px;margin-left:27px;width:160px;height:384px;" class="mc_outer_panel">
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="position:relative;font-size:16px;base-font-size:16;font-weight:bold;margin-top:15px;margin-left:20px;">
+                    0%
+                </div>
+                <div style="position:relative;font-size:13px;margin-top:20px;margin-left:65px;">
+                    完成度
+                </div>
+                <div style="text-align:center;font-size:13px;margin-top:45px;margin-left:4px;">
+                创作时间长
+                </div>
+                <div style="text-align:center;font-size:13px;margin-top:3px;margin-left:6px;">
+                0天0小时0分钟
+                </div>
+            </div>
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="margin-top:7px;">
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">模式</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldMode() %></font><br/>
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">难度</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldGrade()%></font>
+                </div>
+                    
+            </div>
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="margin-top:7px;">
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">作者</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldAuthor() %></font><br/>
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">IP地址</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldIP() %></font>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:800px;height:30px;margin-top:20px;margin-left:120px;">
+        <input type="button" value="创建新世界" style="font-weight:bold;margin-left:38px;height:32px;width:120px;" class="mc_big_button" onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
+        <input type="button" value="返回" style="margin-left:186px;height:32px;width:120px;" class="mc_big_button" onclick="ReturnLastStep"/>
+    </div>
+</pe:container>-->
+</pe:mcml>
+</body>
+</html>

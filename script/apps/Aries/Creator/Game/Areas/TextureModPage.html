@@ -1,0 +1,96 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/TextureModPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="TextureModPage.lua"><![CDATA[
+local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
+TextureModPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetTextureDS()
+    return TextureModPage.GetTexturePackDS();
+end
+
+function OnOpenTexturePackFolder()
+    TextureModPage.OnOpenTexturePackFolder();
+end
+
+function OnSelectTexturePack(name, value)
+    TextureModPage.OnApplyTexturePack(value);
+end
+
+function OnClickMakeAsset()
+    ClosePage();
+    NPL.load("(gl)script/apps/Aries/Creator/Assets/CreateAssetBagPage.lua");
+	local CreateAssetBagPage = commonlib.gettable("MyCompany.Aries.Creator.CreateAssetBagPage")
+	CreateAssetBagPage.ShowPage();
+end
+
+]]></script>
+<div style="width:400px;height:350px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >材质包与Mod</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+        <pe:tabs name="extensionPage" class="tabs" >
+            <pe:tab-item name="texturePack" text="材质包" selected="true" style="padding-top:0px;padding:10px;padding-bottom:10px">
+                <div style="margin-top:10px;font-weight:bold">
+                    选择材质包: 
+                    <select name="TexturePack" AllowUserEdit="true" style="height:24px;" onselect="OnSelectTexturePack" DataSource='<%=GetTextureDS() %>'>
+                    </select>
+                </div>
+                
+                <div style="margin-top:10px;font-weight:bold">
+                    如何安装材质包?
+                </div>
+                <div>
+                    <div>方法1：将网上下载的材质包文件 blocktexture_[材质名称].zip, 拖到游戏窗口中即可. </div>
+                    <div>方法2：直接解压缩到<a onclick="OnOpenTexturePackFolder">这里</a>的[材质名称]文件夹中</div>
+                </div>
+                <div style="margin-top:10px;font-weight:bold">
+                    如何制作材质包?
+                </div>
+                <div>
+                    材质包是一个名字是blocktexture_[材质名称].zip的文件. zip包中有正方形的贴图文件:1.png, 2.png, ...99.png. 对应相应的块ID.
+                    贴图大小是2的N次方, 可以是PNG或JPG等格式. 
+                </div>
+            </pe:tab-item>
+            <pe:tab-item name="texturePack" text="Mod" style="padding-top:0px;padding:10px;padding-bottom:10px">
+                <div style="margin-top:10px;">
+                    <input type="button" class="button" value="装饰品编辑器" onclick="OnClickMakeAsset"/>
+                </div>
+                <div style="margin-top:10px;font-weight:bold">
+                    如何制作模型
+                </div>
+                <div>
+                    <div>
+                        方法1：装饰品编辑器可以自定义你喜欢的模型到装饰品菜单
+                    </div>
+                    <div>
+                        <div style="margin-top:10px;">
+                            方法2：用3dsMax导出插件将制作好的3D模型或人物填加到世界中. 
+                            将模型保存到个人世界子目录中, 可以同世界一起打包分享
+                        </div>
+                        <div style="margin-top:10px;">
+                            方法3：命令行 <div style="float:left;margin-left:5px;color:#003300;font-weight:bold;">/create [filename]</div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

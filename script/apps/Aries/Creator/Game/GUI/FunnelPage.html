@@ -1,0 +1,103 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/FunnelPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="FunnelPage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+FunnelPage = commonlib.gettable("MyCompany.Aries.Game.GUI.FunnelPage");
+FunnelPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetContainerView()
+    return FunnelPage.GetContainerView();
+end
+
+function DS_Func_Items(index)
+    if(not index) then
+        return 27;
+    else
+        if(index <= 27) then
+            return {bagpos = index};
+        end
+    end
+end
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {bagpos = index+9};
+        else
+            return {bagpos = index-27};
+        end
+    end
+end
+
+function GetFireBackground()
+    local bg="";
+    if(FunnelPage.firing) then
+        bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;33 354 23 21"
+    else
+        bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;33 382 23 21"
+    end
+    return bg;
+end
+
+]]></script>
+<aries:window title="漏斗" onclose="ClosePage" style="width:410px;height:290px;" mode="lite">
+    <div style="position:relative;margin-top:82px;margin-left:-4px;width:408px;height:1px;"class="mc_line"/>
+    <!--<div style="position:relative;margin-top:2px;margin-left:160px;width:1px;height:187px;"class="mc_line"/>-->
+    <div style="float:left;height:82px;">
+        
+        <div style="position:relative;margin-top:13px;margin-left:60px;height:145px;">
+            <div style="float:left;">
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='1' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-left:0px;width:400px;">
+        <div style="position:relative;margin-top:10px;text-align:center;color:#ffffff;">背包</div>
+        <input type="button" style="position:relative;margin-left:341px;margin-top:12px;font-size:12px;height:20px;width:40px;" value="整理" onclick="" class="mc_light_grey_button_with_fillet"/>
+        <pe:gridview name="BagItems" style="margin-left:20px;margin-top:35px;" DataSource="<%=DS_Func_Items%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:2px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot DestInventory='' bagpos ='<%=Eval("bagpos")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+        
+    </div>
+
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>

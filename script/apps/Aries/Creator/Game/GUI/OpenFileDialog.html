@@ -1,0 +1,49 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="OpenFileDialog.lua"><![CDATA[
+OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+OpenFileDialog.OnInit()
+function OnClose()
+    Page:CloseWindow();
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"输入窗"%>' style="width:460px;" onclose="OnClose">
+<div style="margin:10px;">
+    <div style="color:#ffffff;margin:5px;">
+        <%=OpenFileDialog.GetText()%>
+    </div>
+    <div>
+        <input type="text" name="text" style="height:24px;width:320px"/>
+        <input type="button" class="mc_light_grey_button_with_fillet" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenFileDialog.OnOpenFileDialog"/>
+        <pe:if condition='<%=OpenFileDialog.editButton~=nil%>'>
+            <input type="button" class="mc_light_grey_button_with_fillet" name="btnEdit" value='<%=type(OpenFileDialog.editButton)=="table" and OpenFileDialog.editButton.text or L"编辑" %>' onclick="OpenFileDialog.OnClickEdit()" style="height:24px;margin-left:3px;min-width:30px;" />
+        </pe:if>
+    </div>
+    <div style="margin-top:5px;">
+        <input type="button" name="OK" DefaultButton="true" align="left" style="margin-left:323px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenFileDialog.OnOK" value='<%=L"确定"%>' />
+    </div>
+</div>
+<%
+    function SetFocus()
+        local t = Page:FindControl("text")
+        if(t) then
+            t:Focus();
+        end	
+    end
+    SetFocus()
+    local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+	    SetFocus()
+    end})
+    mytimer:Change(200);
+%>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

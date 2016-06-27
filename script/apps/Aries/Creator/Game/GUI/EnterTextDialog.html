@@ -1,0 +1,52 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EnterTextDialog.lua"><![CDATA[
+EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+EnterTextDialog.OnInit()
+function OnClose()
+    Page:CloseWindow();
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"输入窗"%>' style="width:400px;" onclose="OnClose">
+<div style="margin:10px;">
+    <div style="color:#ffffff;margin:5px;">
+        <%=EnterTextDialog.GetText()%>
+    </div>
+    <div>
+        <pe:if condition='<%=not EnterTextDialog.IsMultiLine()%>'>
+            <input type="text" name="text" style="height:24px;"/>
+        </pe:if>
+        <pe:if condition='<%=EnterTextDialog.IsMultiLine()%>'>
+            <div class="mc_paper_panel" style="padding:5px;margin-bottom:5px;margin-right:5px;">
+                <textarea rows="4" name="text_multi" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" />
+            </div>
+        </pe:if>
+    </div>
+    <div>
+        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-right:20px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="EnterTextDialog.OnOK" value='<%=L"确定"%>' />
+    </div>
+</div>
+<%
+    function SetFocus()
+        local t = Page:FindControl("text")
+        if(t) then
+            t:Focus();
+        end	
+    end
+    SetFocus()
+    local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+	    SetFocus()
+    end})
+    mytimer:Change(200);
+%>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

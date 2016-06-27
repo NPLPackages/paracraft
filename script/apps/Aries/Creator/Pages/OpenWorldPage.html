@@ -1,0 +1,99 @@
+﻿<!-- "script/apps/Aries/Creator/Pages/OpenWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="OpenWorldPage.lua"><![CDATA[
+MyCompany.Aries.Creator.OpenWorldPage.OnInit()
+
+function DS_Func_World_Template(index)  
+    return MyCompany.Aries.Creator.OpenWorldPage.DS_Func_World_Template(index)
+end
+function DS_Func_MyWorlds(index)  
+    return MyCompany.Aries.Creator.OpenWorldPage.DS_Func_MyWorlds(index)
+end
+]]></script>
+<div style="width:800px;height:600px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<input style="margin-left:745px;margin-top:-10px;width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.OpenWorldPage.ClosePage()" value=""/>
+<div style="text-align:center;">欢迎来到设计空间</div>
+<div style="text-align:center;">在这里你可以设计属于自己的秘密领地，还可以将你的设计方案发送给罗德镇长哦！</div>
+<div >
+<input style="margin-left:40px;margin-top:0px;width:200px;height:48px;" type="button" name="template_world" onclick="MyCompany.Aries.Creator.OpenWorldPage.ChangeState()" value="创建新的领地"/>
+<input style="margin-left:20px;margin-top:0px;width:200px;height:48px;" type="button" name="my_world" onclick="MyCompany.Aries.Creator.OpenWorldPage.ChangeState()" value="打开我的领地"/>
+
+</div>
+<pe:if condition = '<%=MyCompany.Aries.Creator.OpenWorldPage.state == 0 %>' >
+<pe:gridview style="margin-left:40px;margin-top:10px;width:720;height:300px" name="World_Template" DataSource="<%=DS_Func_World_Template%>"  ItemsPerLine="5" AllowPaging="true" pagesize="5">
+        <Columns>
+        <div style="margin-left:10px;margin-top:40px;">
+            <div style="margin-left:0px;margin-top:0px;width:128px;text-align:center;">
+                <%=Eval("name")%><%=Eval("index")%>
+            </div>
+            <a onclick="MyCompany.Aries.Creator.OpenWorldPage.OnSelected" param1='<%=Eval("index")%>' 
+                        tooltip = '<%=Eval("name")%>'
+                        style="width:128px;height:128px;">
+            <div style="margin-left:0px;margin-top:0px;width:128px;height:128px;background:url(Texture/Aries/Inventory/item_slot_32bits.png#3 3 72 68:24 24 24 24)">
+            </div>
+            </a>
+        </div>
+        </Columns>
+        <EmptyDataTemplate>
+            <b>空</b>
+        </EmptyDataTemplate>
+        <FetchingDataTemplate>
+            <b>请稍等 ... </b>
+        </FetchingDataTemplate>
+        <PagerSettings Position="Bottom" height="36" style="margin-left:440px;margin-top:30px;width:168px;height:36px;" PreviousPageText="previous page" NextPageText="next page"/>
+        <PagerTemplate>
+            <form>
+                <input type="button" name="pre" zorder=2 style="width:32px;height:32px;background:Texture/Aries/homeland/arrow_left_32bits.png;"/>
+                <div style="float:right;margin-top:4px;width:0px;">
+                    <label name="page" style="text-align:center;width:0px;height:0px;margin:4px"/>
+                </div>
+                <input type="button" name="next" zorder=2 style="width:32px;height:32px;background:Texture/Aries/homeland/arrow_right_32bits.png;"/>
+            </form>
+        </PagerTemplate>
+</pe:gridview>
+<input style="margin-left:40px;margin-top:0px;width:200px;height:48px;" type="button" name="create" onclick="MyCompany.Aries.Creator.OpenWorldPage.DoCreate()" value="创建"/>
+</pe:if>
+<pe:if condition = '<%=MyCompany.Aries.Creator.OpenWorldPage.state == 1 %>' >
+<pe:gridview style="margin-left:40px;margin-top:10px;width:720;height:300px" name="My_World" DataSource="<%=DS_Func_MyWorlds%>"  ItemsPerLine="5" AllowPaging="true" pagesize="5">
+        <Columns>
+        <div style="margin-left:10px;margin-top:40px;">
+            <div style="margin-left:0px;margin-top:0px;width:128px;text-align:center;">
+                <%=Eval("name")%><%=Eval("index")%>
+            </div>
+            <a onclick="MyCompany.Aries.Creator.OpenWorldPage.OnSelected" param1='<%=Eval("index")%>'
+                tooltip = '<%=Eval("name")%>' 
+                        style="width:128px;height:128px;">
+            <div style="margin-left:0px;margin-top:0px;width:128px;height:128px;background:url(Texture/Aries/Inventory/item_slot_32bits.png#3 3 72 68:24 24 24 24)">
+            </div>
+            </a>
+        </div>
+        </Columns>
+        <EmptyDataTemplate>
+            <b>空</b>
+        </EmptyDataTemplate>
+        <FetchingDataTemplate>
+            <b>请稍等 ... </b>
+        </FetchingDataTemplate>
+        <PagerSettings Position="Bottom" height="36" style="margin-left:440px;margin-top:30px;width:168px;height:36px;" PreviousPageText="previous page" NextPageText="next page"/>
+        <PagerTemplate>
+            <form>
+                <input type="button" name="pre" zorder=2 style="width:32px;height:32px;background:Texture/Aries/homeland/arrow_left_32bits.png;"/>
+                <div style="float:right;margin-top:4px;width:0px;">
+                    <label name="page" style="text-align:center;width:0px;height:0px;margin:4px"/>
+                </div>
+                <input type="button" name="next" zorder=2 style="width:32px;height:32px;background:Texture/Aries/homeland/arrow_right_32bits.png;"/>
+            </form>
+        </PagerTemplate>
+</pe:gridview>
+<input style="margin-left:40px;margin-top:0px;width:200px;height:48px;" type="button" name="open" onclick="MyCompany.Aries.Creator.OpenWorldPage.DoOpen()" value="打开"/>
+</pe:if>
+</pe:mcml> 
+</body>
+</html>

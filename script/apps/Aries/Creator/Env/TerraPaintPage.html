@@ -1,0 +1,84 @@
+﻿<!-- "script/apps/Aries/Creator/Env/TerraPaintPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="TerraPaintPage.lua"><![CDATA[
+MyCompany.Aries.Creator.TerraPaintPage.OnInit()
+]]></script>
+<div><span style="color:#808080;">改变地表贴图</span>
+    <pe:gridview AllowPaging="false" pagesize="32" ItemsPerLine="4" style="height:114px;width:180px;" name="gvwDetailTextures" DataSource='<%=MyCompany.Aries.Creator.TerraPaintPage.DS_TerrainTex_Func%>' DefaultNodeHeight="38">
+        <Columns>
+            <pe:if condition='<%=Eval("index")==MyCompany.Aries.Creator.TerraPaintPage.SelectedIndex%>'>
+                <div style="float:left;padding:3px;background:url(Texture/whitedot.png);background-color:#CCCC00">
+                    <div onclick="MyCompany.Aries.Creator.TerraPaintPage.OnDeselectTexture">
+                        <img src='<%=Eval("filename")%>'width="32" height="32"/>
+                    </div>
+                </div>
+            </pe:if>
+            <pe:if condition='<%=Eval("index")~=MyCompany.Aries.Creator.TerraPaintPage.SelectedIndex and not Eval("InCell")%>'>
+                <a onclick="MyCompany.Aries.Creator.TerraPaintPage.OnSelectTexture" param1='<%=Eval("index")%>'>
+	                <img src='<%=Eval("filename")%>'width="36" height="36"/>
+	            </a>
+            </pe:if>
+            <pe:if condition='<%=Eval("index")~=MyCompany.Aries.Creator.TerraPaintPage.SelectedIndex and Eval("InCell")%>'>
+                <a onclick="MyCompany.Aries.Creator.TerraPaintPage.OnSelectTexture" param1='<%=Eval("index")%>'>
+                    <div style="float:left;padding:3px;background:url(Texture/whitedot.png);background-color:#00CC00">
+                        <img src='<%=Eval("filename")%>'width="30" height="30"/>
+	                </div>
+	            </a>    
+            </pe:if>
+        </Columns>
+    </pe:gridview>
+    <div style="margin-top:2px">
+        <div style="float:left;margin-top:10px" tooltip="选择常用的大,中,小刷子">选择刷子:</div>
+        <div style="float:left">
+            <input type="button" style="background:url(Texture/Aries/Creator/range1.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnClickBrush" name="1" />
+            <input type="button" style="background:url(Texture/Aries/Creator/range2.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnClickBrush" name="2" />
+            <input type="button" style="margin-left:5px;background:url(Texture/Aries/Creator/range3.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnClickBrush" name="3" /><br />
+        </div>
+    </div>
+    <div style="margin-top:2px">
+        <input type="button" class="button" style="margin-left:0px;height:25px;" name="eraserBtn" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnSelectEraser()" value="橡皮擦"/>
+        <input type="button" class="button" style="margin-left:10px;height:25px;" name="DeleteBtn" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnDeleteTexture()" value="删除地表贴图"/>
+    </div>
+    <pe:treeview style="background:;">
+        <pe:treenode text="高级设置" indent="0" expanded="false">
+        <div>
+            <!--<input type="button" style="margin-left:0px" name="SetTextureBtn" value="贴图..." onclick="MyCompany.Aries.Creator.TerraPaintPage.OnSetTexture()"/>-->
+            <!--<input type="button" style="margin-left:4px" name="RefreshBtn" onclick="MyCompany.Aries.Creator.TerraPaintPage.OnReset()" value="重置"/>-->
+            <div style="margin-top:10px">
+                <div style="float:left" tooltip="刷子的半径">半径:</div>
+                <div style="float:left">
+                    <pe:sliderbar style="width:100px" name="BrushSize" IsShowEditor="true" value="1" min="0.1" max="50" min_step="0.1" no_value_check="true" onchange="MyCompany.Aries.Creator.TerraPaintPage.OnSetBrushSize" />
+                </div><br />
+                <div style="float:left" tooltip="每次点击的绘制强度: 值越小, 颜色越淡">强度:</div>
+                <div style="float:left">
+                    <pe:sliderbar style="width:100px" name="BrushStrength" IsShowEditor="true" EditorFormat="%.2f" value="0.7" min="0" max="1" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraPaintPage.OnSetBrushStrength" />
+                </div><br />
+                <div style="float:left" tooltip="笔刷Alpha通道的峰值: 值越小, 最终的颜色越淡">峰值:</div>
+                <div style="float:left">
+                    <pe:sliderbar style="width:100px" name="BrushSoftness" IsShowEditor="true" EditorFormat="%.2f" value="1" min="0" max="1" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraPaintPage.OnSetBrushSoftness" />
+                </div><br />
+                <div style="float:left" tooltip="鼠标按下后的灵敏度: 值越大, 越灵敏">灵敏:</div>
+                <div style="float:left">
+                    <pe:sliderbar style="width:100px" name="BrushRepeatInterval" IsShowEditor="true" EditorFormat="%.2f" value="0.9" min="0.8" max="0.95" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraPaintPage.OnSetBrushRepeatInterval" />
+                </div><br />
+            </div>
+        </div>
+        </pe:treenode>
+    </pe:treeview>
+    <!--<pe:treeview style="background:;">
+        <pe:treenode text="帮助说明" expanded="false">
+            <div>选择贴图通道, 点击设置贴图更换贴图, 用按住鼠标左键不放在场景中拖动绘制</div>
+            <div>选择没有贴图的通道, 可以擦除贴图</div>
+            <div>ESC键取消选择, -/+键放缩半径</div>
+            <div>将鼠标放在属性名上, 获得功能提示</div>
+            <div>选择贴图通道, 点击删除, 将删除当前地块中的所有此类贴图</div>
+            <div>为了性能, 请将当前地表的叠加贴图数控制在3张以内. </div>
+        </pe:treenode>
+    </pe:treeview>-->
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,71 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/GameMarketPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="GameMarketPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local GameMarketPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameMarketPage");
+
+GameMarketPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+
+function OnFlowerRanking()
+    ClosePage()
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+    if(Desktop.OnShowRankingPage) then
+        Desktop.OnShowRankingPage()
+    end
+end
+]]></script>
+<div style="width:640px;height:480px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >【创意市场】</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <!--<input type="button" value="作品排行榜" onclick="OnFlowerRanking" style="position:relative;margin-left:50px;margin-top:2px;font-size:14px;font-weight:bold;height:30px;width:100px;" class="linkbutton_yellow"/>-->
+    <div class="clientarea" style="margin-left:5px;margin-right:5px;">
+        <pe:tabs class="tabs" >
+            <pe:tab-item name="recommend" style="padding:5px;" selected="true" text="推荐世界">
+                TODO: 所有世界是免费的。 作者可以从世界中获得所有创意捐赠中的收益。 
+                只有在创意市场中的作品， 才可以有产出世界内的收益。 
+                DBServer上有线程专门记录榜上的作品。 GameServer仅对榜上的作品产生收益。 
+                <br />
+                推荐作品
+                <br />
+                最新发布
+                <br />
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="美景观光">
+            
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="角色扮演">
+            
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="动作&跑酷">
+            
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="射击">
+            
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="探险解谜">
+            
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="社交养成">
+            
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

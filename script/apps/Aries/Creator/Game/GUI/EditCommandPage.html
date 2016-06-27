@@ -1,0 +1,130 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/EditCommandPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditCommandPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Text/beautify.lua");
+beautify = commonlib.gettable("MyCompany.Aries.Game.Common.Text.beautify");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EditCommandPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditCommandPage");
+EditCommandPage.OnInit();
+
+
+isEditing = false;
+function OnClose()
+    Page:CloseWindow();
+end
+
+local last_content = nil;
+local last_lines_ds = {};
+
+function beautify_code(text)
+    if(text) then
+        
+    end
+end
+
+function GetContentDS(index)
+    local content = EditCommandPage.GetCode();
+    if(content ~= last_content) then
+        last_content = content;
+        last_lines_ds = {};
+        for line in string.gmatch(last_content, "([^#]+)#?") do
+            last_lines_ds[#last_lines_ds+1] = {text=line};
+        end
+    end
+    
+    if(not index) then
+        return #last_lines_ds;
+    else
+        return last_lines_ds[index];
+    end
+end
+
+function GetEditContent()
+    local content = EditCommandPage.GetCode();
+    if(content) then
+        content = content:gsub("#", "\n");
+    end
+    return content;
+end
+
+function OnEdit()
+    isEditing = true;
+    Page:Refresh(0.01)
+end
+
+function QuickSave()
+    isEditing = false;
+    local content = Page:GetValue("content", "");
+    content = content:gsub("#","+"):gsub("\r?\n", "#");
+    EditCommandPage.SetCode(content);
+end
+
+function OnSave()
+    QuickSave();
+    Page:Refresh(0.01)
+end
+
+function OnSaveAndClose()
+    QuickSave();
+    OnClose();
+end
+
+function OnCopyAll()
+   ParaMisc.CopyTextToClipboard(Page:GetValue("content", ""));
+end
+
+function OnClearAll()
+    Page:SetUIValue("content", "");
+end
+
+function GetTitle()
+    return format(L"%s(Ctrl+右键执行)", EditCommandPage.GetItemStack():GetDisplayName());
+end
+]]></script>
+<aries:window mode="thin" title='<%=GetTitle()%>' style="width:360px;" onclose="OnClose">
+    <div style="height:320px;margin-right:4px; margin-left:-4px;padding:5px;padding-right:0px;" class="mc_paper_panel" width="100%" >
+        <pe:if condition='<%=not Eval("isEditing") %>'>
+            <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
+                <div style="position:relative;" width="100%" height="100%" onclick="OnEdit" zorder="1"></div>
+            </pe:if>
+            <pe:gridview name="gvwContent" CellPadding="0" AllowPaging="false" DefaultNodeHeight = "15" pagesize="100" DataSource='<%=GetContentDS%>'>
+	            <Columns>
+			        <div style="color: #000000; margin-top: 2px;"><%=beautify:beautify_cmd(Eval("text")) %></div>
+	            </Columns>
+	            <EmptyDataTemplate>
+		            <div style="color:#000000">
+                        <%=L"没有写任何内容"%>
+                    </div>
+	            </EmptyDataTemplate>
+	            <PagerSettings Position="Bottom" height="26" PreviousPageText="previous page" NextPageText="next page"/>
+            </pe:gridview>
+        </pe:if>
+        <pe:if condition='<%=Eval("isEditing") %>'>
+            <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="15" value='<%=GetEditContent()%>' style="background:;color:#ffffff"></textarea>
+        </pe:if>
+    </div>
+    <div style="margin-top:5px;padding-bottom:10px;">
+        <pe:if condition='<%=Eval("isEditing") %>'>
+            <input type="button" name="clear" style="margin-left:0px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearAll" value='<%=L"清空"%>' />
+            <input type="button" name="copyall" style="margin-left:10px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnCopyAll" value='<%=L"复制"%>' />
+            <input type="button" name="save" style="margin-left:10px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnSave" value='<%=L"保存"%>' />
+            <input type="button" name="close" align="right" style="margin-right:10px;min-width:90px;" class="mc_light_grey_button_with_fillet" onclick="OnSaveAndClose" value='<%=L"保存并关闭"%>' />
+        </pe:if>
+        <pe:if condition='<%=not Eval("isEditing")%>'>
+            <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
+                <input type="button" name="edit" style="margin-left:180px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnEdit" value='<%=L"编辑"%>' />
+            </pe:if>
+            <input type="button" name="close" align="right" style="margin-right:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"关闭"%>' />
+        </pe:if>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,46 @@
+---++ 《哈奇创意空间》用户手册
+
+左键点击删除
+长按左键不放手并移动鼠标可以连续删除
+
+右键创建
+Shift+左键: editor mode: 删除选择块周围3*3内的所有的块。game mode: 删除选中的块。 
+Shift+右键: 复制当前鼠标的块直到被拦截 （创建线）
+Ctrl+右键: 用当前块替换与鼠标所在的块相连的所有块 （批量替换颜色）
+Alt+右键: 用当前块替换与鼠标所在的块（替换单个颜色的块）
+Ctrl+左键: 进入选择多块AABB选择模式。 再次Ctrl+左键可以增加新的选择， 左键点击任意地方退出选择模式。  
+F键：进入/退出飞行模式 
+X键: 与最近的NPC对话
+地表上长按左键不放手: 放置TNT， Ctrl键引爆
+
+右键点击快捷栏Icon：将第一个块在点击位置创建快捷方式
+
+TAB: 角色向上一层
+Shift+TAB: 角色向下一层
+
+Ctrl+Z: Undo
+Ctrl+Y: Redo
+Ctrl+S: 快速保存
+
+左键选择人物或模型， Ctrl+左键（可以选择多块积木）： 
+	- 再次点击左键可以移动（人物，模型，积木）， Ctrl+左键可以复制多分（人物，模型，积木）
+当选中多块积木时， shift+左键, 可以移动当前选中的所有积木到新的位置。 （多次点击可以复制多份）
+
+[作废]长按Shift+W/X/SPACE: 将人物周围的块消除
+
+---++ 命令行
+Enter键然后在聊天框中输入下面指令
+/save
+/del
+/ring radius [thickness]
+/circle radius
+/create filename
+/makeasset 制作模型列表
+/upload 上传世界
+/loadworld
+
+---++ 配置文件
+config/Creator/block_types.xml : 默认块的定义
+[world]/Player.xml: 角色信息，背包等
+[world]/blockWorld/
+[world]/blockWorld.lastsave/

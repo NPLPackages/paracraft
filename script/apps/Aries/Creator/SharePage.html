@@ -1,0 +1,27 @@
+﻿<!-- "script/apps/Aries/Creator/SharePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.2.7 LiXizhi</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true" src="SharePage.lua"><![CDATA[
+MyCompany.Aries.Creator.SharePage.OnInit();
+]]></script>
+<div style="position:absolute;margin-left:490px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.SharePage.CloseWindow()" value=""/>
+</div>
+<div style="padding-left:25px;padding-top:30px;padding-right:35px;padding-bottom:55px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<pe:tabs name="PublishWorldTabs" style="width:480px;height:250px;">
+  <pe:tab-item name="tabPhotos" text="分享图片" style="padding-left:5px;" selected="true">
+    <iframe name="share_photo_frame" src="SharePhotosPage.html"></iframe>
+  </pe:tab-item>
+  <pe:tab-item name="tabWorlds" text="分享领地" style="padding-left:5px;">
+    <iframe name="share_world_frame" src="ShareWorldpage.html"></iframe>
+  </pe:tab-item>
+</pe:tabs>
+</div>
+</pe:mcml>
+</body>
+</html>

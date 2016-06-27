@@ -1,0 +1,40 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/EditCodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="EditCodePage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EditCodePage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditCodePage");
+EditCodePage.OnInit();
+
+function OnClose()
+    Page:CloseWindow();
+end
+]]></script>
+<aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" onclose="OnClose">
+    <div style="height: 320px; margin-right: 4px; margin-left: -4px; padding: 5px; padding-right: 0px;" class="mc_paper_panel" width="100%" >
+        <textarea name="content" ReadOnly="true" verticalscrollbarstep="40" rows="15" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
+    </div>
+   <div style="margin-top:5px;padding-bottom:10px;">
+        <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
+            <div style="float:left;min-width:230px;">
+                <div style="float:left" class="linkbutton_yellow" onclick="EditCodePage.OnEditScript" tooltip='<%=L"左键:打开文件\n右键:打开所在文件夹"%>'>
+                    <%=EditCodePage.GetScriptFileName()%>
+                </div>
+                <input type="button" name="edit" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickEdit" value='<%=L"编辑"%>' />
+            </div>
+            <input type="button" name="changefile" style="margin-left:5px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnCreateNewFile" value='<%=L"新建/更改"%>' />
+        </pe:if>
+        <pe:if condition='<%=not GameLogic.GameMode:CanEditBlock() %>'>
+            <input type="button" name="close" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"关闭"%>' />
+        </pe:if>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

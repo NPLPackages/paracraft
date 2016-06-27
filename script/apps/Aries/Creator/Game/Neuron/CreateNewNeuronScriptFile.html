@@ -1,0 +1,205 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CreateNewNeuronScriptFile.lua"><![CDATA[
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+CreateNewNeuronScriptFile = commonlib.gettable("MyCompany.Aries.Game.Tasks.CreateNewNeuronScriptFile");
+CreateNewNeuronScriptFile.OnInit()
+CreateNewNeuronScriptFile.template_file = nil;
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickCategory(node)
+    local name = node.Name;
+    -- todo: toggle MyTemplateDS datasource 
+    -- _guihelper.MessageBox(node.Name);
+    if(name == "currentworld") then
+        Page:SetValue("fileTabs", "tabLocalFile");
+    else
+        Page:SetValue("fileTabs", "tabTemplate");
+    end
+end
+    
+function OnClickFile(node)
+    local filename = node.tooltip;
+    local name = node.Name;
+    if(filename) then
+        local file = ParaIO.open(filename, "r");
+	    if(file:IsValid()) then
+		    local text = file:GetText();
+		    if(text and text~="") then
+			   Page:SetUIValue("filecontent", text);
+               CreateNewNeuronScriptFile.template_file = {filename=filename, name=name, text=node.Text};
+               local default_filename = filename:match("([%w_]+%.lua)$");
+               if(default_filename) then
+                    Page:SetUIValue("filename", default_filename);
+               end
+		    end
+		    file:close();
+        else
+            _guihelper.MessageBox(format("%s not found", filename));
+	    end	
+    end
+    -- _guihelper.MessageBox({filename, name});
+end
+
+function OnSelectFile(name, filepath)
+    local root_dir = GetScriptRootFolder();
+    if(mouse_button=="right") then
+        ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0)..filepath, "", "", 1); 
+        return;
+    end
+    local filename = filepath:sub(#root_dir+1, -1);
+
+    local file = ParaIO.open(filepath, "r");
+	if(file:IsValid()) then
+		local text = file:GetText();
+		if(text and text~="") then
+			Page:SetUIValue("filecontent", text);
+            CreateNewNeuronScriptFile.template_file = nil;
+		end
+		file:close();
+	end	
+
+    Page:SetUIValue("filename", filename);
+end
+
+
+function GetScriptRootFolder()
+    return GameLogic.BuildResourceFilepath("script/blocks/");
+end
+
+function OnClickOK()
+    local filename = Page:GetUIValue("filename", "");
+    
+    local filename_valid = filename:gsub("[^a-zA-Z0-9%.%/_]", "");
+    if(filename ~= filename_valid) then
+        _guihelper.MessageBox(L"文件名存在非法字符, 请用英文");
+        Page:SetUIValue("filename", filename_valid);
+        return;
+    end
+    if(filename == "") then
+        _guihelper.MessageBox(L"没有指定文件名将取消关联, 是否取消关联?", function(res)
+            if(res and res == _guihelper.DialogResult.Yes) then
+		        OnFinishedFile(filename)
+	        end
+        end, _guihelper.MessageBoxButtons.YesNo);
+        return;
+    end
+    if(not filename:match("%.lua$")) then
+        filename = filename..".lua";
+    end
+    filename = "script/blocks/"..filename;
+
+    local template_name;
+    local from_file = "script/apps/Aries/Creator/Game/Neuron/Templates/example_empty.lua";
+    if(CreateNewNeuronScriptFile.template_file) then
+        template_name = CreateNewNeuronScriptFile.template_file.text;
+        from_file = CreateNewNeuronScriptFile.template_file.filename;
+    end
+
+    local filename_full = GameLogic.BuildResourceFilepath(filename);
+
+    if(not ParaIO.DoesFileExist(filename_full)) then
+        _guihelper.MessageBox(format(L"确定要创建并关联脚本文件?<br/>%s<br/>基于模板:%s", filename, template_name or "无"), function(res)
+            if(res and res == _guihelper.DialogResult.Yes) then
+		        ParaIO.CreateDirectory(filename_full);
+                if(ParaIO.CopyFile(from_file, filename_full, false)) then
+                    OnFinishedFile(filename)
+                end
+	        end
+        end, _guihelper.MessageBoxButtons.YesNo);
+    else
+        _guihelper.MessageBox(format(L"是否关联已经存在的文件?<br/>%s<br/>", filename), function(res)
+            if(res and res == _guihelper.DialogResult.Yes) then
+		        OnFinishedFile(filename)
+	        end
+        end, _guihelper.MessageBoxButtons.YesNo);
+    end
+end
+
+function OnFinishedFile(filename)
+    filename = filename:gsub("^script/blocks/", "");
+    CreateNewNeuronScriptFile.OnFinishedFile(filename);
+end
+
+]]></script>
+<Resource style="display:none" name="MyCategoryDS" >
+    <file name="currentworld" text="Scripts in world"></file>
+    <folder name="folder" text="All Installed" expanded="true">
+        <file name="all" text="All (4)"></file>
+    </folder>
+</Resource>
+<Resource style="display:none" name="MyTemplateDS" >
+    <file name="t:empty" text="empty script" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/example_empty.lua"></file>
+    <file name="t:blocks" text="block example" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/example_blocks.lua"></file>
+    <file name="t:movie" text="movie example" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/example_movie.lua"></file>
+    <file name="t:example" text="entity event" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/entity_event.lua"></file>
+    <file name="t:example" text="homepoint event" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/homepoint_event.lua"></file>
+    <file name="t:example" text="basics example" tooltip="script/apps/Aries/Creator/Game/Neuron/Templates/example.lua"></file>
+</Resource>
+<aries:window mode="thin" class="default" title='<%=L"创建与物品关联的脚本文件"%>' style="width:700px;" onclose="ClosePage">
+    <div style="margin-right:3px;">
+    <div style="height:330px;">
+        <div style="float:left;padding-top:5px;" class="mc_paper_panel" width="30%">
+            <pe:treeview  class="defaulttreeview" name="templateDir" style="font-size:12px;" DataSourceID='MyCategoryDS' DefaultNodeHeight="22">
+	            <NodeTemplates>
+		            <NodeTemplate DataType="folder">
+                        <pe:treenode style="font-size:12px;" can_select="true" text='<%=XPath("this|text")%>' expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="file">
+                        <pe:treenode style="font-size:12px;" name='<%=XPath("this|name")%>' can_select="true" text='<%=XPath("this|text")%>' OnClick="OnClickCategory()"></pe:treenode>
+                    </NodeTemplate>
+	            </NodeTemplates>
+                <DataNodePlaceholder xpath="*"/>
+            </pe:treeview>
+        </div>
+        <div style="float:left;" width="70%">
+            <div style="height:25px;margin-left:10px;">
+                <%=L"请选择一个模板文件或已经存在的文件:"%>
+            </div>
+            <div>
+                <div style="float:left;" width="40%">
+                    <pe:tabs name="fileTabs" class="tabs" style="background:;">
+                        <pe:tab-item name="tabTemplate" class="mc_paper_panel" text='<%=L"模板"%>' selected="true" style="padding-top:5px">    
+                            <pe:treeview style="background:;" name="templateFiles" DataSourceID='MyTemplateDS' DefaultNodeHeight="26">
+	                            <NodeTemplates>
+		                            <NodeTemplate DataType="file">
+                                        <pe:treenode style="font-size:13px;" name='<%=XPath("this|name")%>' tooltip='<%=XPath("this|tooltip")%>' text='<%=XPath("this|text")%>' can_select="true" OnClick="OnClickFile()"></pe:treenode>
+                                    </NodeTemplate>
+	                            </NodeTemplates>
+                                <DataNodePlaceholder xpath="*"/>
+                            </pe:treeview>
+                        </pe:tab-item>
+                        <pe:tab-item name="tabLocalFile" class="mc_paper_panel" text='<%=L"已有文件"%>' style="padding-top:5px">
+                            <pe:filebrowser style="background:;" name="scriptFileBrowser" rootfolder='<%=GetScriptRootFolder() %>' filter="*.lua" onclick="OnSelectFile"/>
+                        </pe:tab-item>
+                    </pe:tabs>
+                </div>
+                <div style="float:left;padding:5px;padding-top:3px;height:305px;" width="60%" class="mc_paper_panel" >
+                    <div style="height:20px;margin-left:8px;"><%=L"文件预览:"%></div>
+                    <hr />
+                    <textarea name="filecontent" rows="13" syntax_map="NPL">
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>    
+    <div style="margin-left:80px;margin-bottom:5px;">
+        <%=L"文件名:"%>
+        <input name="filename" class="mc_text" value="test" style="width:400px;height:22px;" />
+        <input type="button" name="btnOK" value='<%=L"确定"%>' onclick="OnClickOK" style="margin-left:5px;min-width:60px;margin-top:0px;" class="button"/>
+        <input type="button" name="btnCancel" value='<%=L"取消"%>' onclick="ClosePage" style="margin-left:5px;min-width:60px;margin-top:0px;" class="button"/>
+    </div>
+</aries:window>            
+</pe:mcml> 
+</body>
+</html>

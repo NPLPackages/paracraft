@@ -1,0 +1,29 @@
+﻿<!--script/apps/Aries/Creator/Game/GUI/MirrorWnd.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="MirrorWnd.lua">
+MirrorWnd = commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd");
+MirrorWnd.Init()
+function OnClose()
+    Page:CloseWindow();
+end
+</script>
+<aries:window mode="thin" title='<%=L"镜像"%>' style="width:150px;" onclose="OnClose">
+<div style="color: #ffffff; margin-left:5px;margin-bottom: 10px; margin-right: 8px;" width="100%" >
+    <%=L"镜像的轴:"%>
+    <div style="margin-left:10px;">
+        <div><input type="radio" checked="true" onclick="MirrorWnd.OnChangeAxis" style="margin:2px" name="xyz" id="x" value="x"/><div style="float:left;" for="x"><%=L"X (YZ面)"%></div></div>
+        <div><input type="radio" style="margin:2px" onclick="MirrorWnd.OnChangeAxis" name="xyz" id="y" value="y"/><div style="float:left;" for="y"><%=L"Y (XZ面)"%></div></div>
+        <div><input type="radio" style="margin:2px" onclick="MirrorWnd.OnChangeAxis" name="xyz" id="z" value="z"/><div style="float:left;" for="z"><%=L"Z (YX面)"%></div></div>
+    </div>
+    <%=L"复制方式:"%>
+    <div style="margin-left:10px;">
+        <div><input type="radio" style="margin:2px" name="method" id="no_clone" value="no_clone"/><div style="float:left;" for="no_clone"><%=L"不复制"%></div></div>
+        <div><input type="radio" checked="true" style="margin:2px" name="method" id="clone" value="clone"/><div style="float:left;" for="clone"><%=L"复制"%></div></div>
+    </div>
+    <div style="margin-top:10px;margin-left:15px;">
+        <input type="button" name="OK" value='<%=L"确定"%>' class="mc_light_grey_button_with_fillet" onclick="MirrorWnd.OnOK"/>
+        <input type="button" style="margin-left:25px;" name="RemoveInstance" class="mc_light_grey_button_with_fillet" value='<%=L"关闭"%>' onclick="OnClose"/>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>

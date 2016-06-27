@@ -1,0 +1,58 @@
+﻿<!-- "script/apps/Aries/BBSChat/ChatSystem/ChatWindow.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ChatWndow, by zrf, 2011/3/9</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+local page = document:GetPageCtrl();
+MyCompany.Aries.ChatSystem.ChatWindow.Init();
+
+function OnSwitchChannelDisplay(name, tabitem_mcmlNode)
+    if(false) then
+        -- Click to change display
+        MyCompany.Aries.ChatSystem.ChatWindow.OnSwitchChannelDisplay(name);
+    else
+        -- Click to change input
+        MyCompany.Aries.ChatSystem.ChatWindow.OnSwitchChannelDisplay(name);
+        if(name == "0") then
+            name = "1"; -- click 0 channels will write to all.
+        end
+        MyCompany.Aries.ChatSystem.ChatEdit.OnClickChannel(name, tabitem_mcmlNode:GetAttribute("text"));
+    end
+end
+]]></script>
+<div>
+    <!--<div width="100%" style="height:72px;">
+        <div style="position:relative;width:420px;">
+            <pe:custom id="1" oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateBroadTreeView" style="margin-left:10px;height:72px;" />
+        </div>
+    </div>-->
+    <pe:if condition="<%= not System.options.IsMobilePlatform %>">
+        <pe:container name="canvas" ClickThrough="true" style="position:relative;margin:0px;padding:0px;background:" zorder="-1">
+            <div width="100%" height="100%" style="margin-top:2px;margin-bottom:1px;background-color:#000000a0;">
+                <div style="float:left;margin-top:-1px;margin-bottom:1px;" height="100%">
+                    <pe:custom oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateTreeViewScrollBar()" style="width:10px;" />
+                </div>
+            </div>
+        </pe:container>
+    </pe:if>
+    <pe:if condition="<%= System.options.IsMobilePlatform %>">
+        <pe:container name="canvas" ClickThrough="true" style="position:relative;margin:0px;padding:0px;background:" zorder="-1">
+            <div width="100%" height="100%" style="margin-top:2px;margin-bottom:1px;background-color:#ffffff80;" class="mobile_button">
+                <div style="float:left;margin-top:-1px;margin-bottom:1px;" height="100%">
+                    <pe:custom oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateTreeViewScrollBar()" style="width:10px;" />
+                </div>
+            </div>
+        </pe:container>
+    </pe:if>    
+    <div style="margin-top:4px;margin-bottom:0px;" width="100%" height="100%">
+        <pe:custom oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateTreeView()" style="margin-left:10px;" />
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

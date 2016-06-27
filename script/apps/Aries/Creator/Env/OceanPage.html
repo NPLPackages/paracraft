@@ -1,0 +1,43 @@
+﻿<!-- "script/apps/Aries/Creator/Env/OceanPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Ocean Editing Page by LiXizhi 2008.6.8</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="OceanPage.lua"><![CDATA[
+MyCompany.Aries.Creator.OceanPage.OnInit();
+]]></script>
+<div style="position:absolute;margin-left:200px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.MainToolBar.ReturnToEditMode()" value=""/>
+</div>
+<div style="font-size:12px;width:250px;padding-left:30px;padding-top:30px;padding-right:35px;padding-bottom:60px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<div>水面高度: <br/>
+    <div style="float:left">
+        <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="1" param2="true">
+            <img style="background:url(Texture/3DMapSystem/Env/waterup.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">增高1米</div>
+        </a><br />
+        <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="0" param2="true">
+            <img style="background:url(Texture/3DMapSystem/Env/waterfeet.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">当前人物高度</div>
+        </a><br />
+        <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="-1" param2="true">
+            <img style="background:url(Texture/3DMapSystem/Env/waterlower.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">降低1米</div>
+        </a><br />
+    </div>
+    <div style="float:left">
+        <pe:sliderbar tooltip="拖动滑块调整水面高度" style="width:10px;height:100px" name="OceanLevel" value="0" min="-3.1415926" max="3.1415926" min_step="3.1415926/18" direction="vertical" onchange="MyCompany.Aries.Creator.OceanPage.OnOceanLevelSlider()" />
+    </div>
+    <div style="background:url(Texture/3DMapSystem/Env/water_bg.png);width:128px;height:64px">
+        <a onclick="MyCompany.Aries.Creator.OceanPage.WaterLevel" param1="0" param2="false">
+            <img style="background:url(Texture/3DMapSystem/Env/nowater.png);width:32px;height:32px"/><div style="float:left;margin-top:7px">取消水面</div>
+        </a><br />
+    </div>    
+</div>
+<div>水体颜色:
+    <pe:colorpicker name="OceanColorpicker" tooltip="拖动滑块调整水体颜色" onchange="MyCompany.Aries.Creator.OceanPage.OnOceanColorChanged()"/>
+</div>
+</div>
+</pe:mcml>
+</body>
+</html>

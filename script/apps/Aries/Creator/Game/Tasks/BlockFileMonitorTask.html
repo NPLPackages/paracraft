@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BlockFileMonitorTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BlockFileMonitorTask.lua"><![CDATA[
+BlockFileMonitor = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockFileMonitor")
+BlockFileMonitor.OnInit()
+
+function ClosePage()
+    BlockFileMonitor.EndEditing(true);
+end
+
+]]></script>
+<div style="width:128px;height:512px;margin:0px;padding:0px;">
+    <input name="btnClose" type="button" zorder="1" value="" style="position:relative;margin-left:96px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/close_small_32bits.png)" onclick="ClosePage"/>
+    <div style="width:128px;height:128px;margin:0px;padding:0px;background:Texture/Aries/Dock/SunFlowerOuter_32bits.png;" class="box">
+        <div style="width:128px;height:128px;background:Texture/Aries/Dock/SunFlowerInner_32bits.png;" class="box" >
+            <div style="margin-top:40px;">
+                <div style="text-align:center">积木个数</div>
+                <input type="button" name="blockcount" value='0' style="background:;font-size:12px;width:128px;"/>
+            </div>
+        </div>
+    </div>
+    <div style="margin-left:8px;margin-top:-5px;">
+        <div>
+            <input type="button" name="save_template" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/To_remove_32bits.png#0 0 55 55);" 
+                onclick="BlockFileMonitor.DoClick"
+                tooltip='存为模板'/>
+            <input type="button" name="delete" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/Eradication_32bits.png#0 0 55 55);" 
+                onclick="BlockFileMonitor.DoClick"
+                tooltip="全部删除(快捷键 Del)"/>
+        </div>
+        <div>
+            <input type="button" name="camera_down" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/descale_32bits.png#0 0 55 55);" 
+                onclick="BlockFileMonitor.DoClick"
+                />
+            <input type="button" name="camera_up" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/scale_32bits.png#0 0 55 55);" 
+                onclick="BlockFileMonitor.DoClick"
+                />
+        </div>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>
+

@@ -1,0 +1,59 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/GameShop.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="GameShop.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local GameShopPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameShopPage");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+
+GameShopPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnFlowerRanking()
+    ClosePage()
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+    if(Desktop.OnShowRankingPage) then
+        Desktop.OnShowRankingPage()
+    end
+end
+
+function GetWorldName()
+    return WorldCommon.GetWorldTag("nid");
+end
+
+]]></script>
+<div style="width:512px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >【创意商城】</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <!--<input type="button" value="作品排行榜" onclick="OnFlowerRanking" style="position:relative;margin-left:50px;margin-top:2px;font-size:14px;font-weight:bold;height:30px;width:100px;" class="linkbutton_yellow"/>-->
+    <div class="clientarea" style="margin-left:5px;margin-right:5px;">
+        <pe:tabs class="tabs" >
+            <pe:tab-item name="recommend" style="padding:5px;" selected="true" text="支持作者">
+                TODO: 您在这里购买的每一样东西， 收益都会贡献给世界的作者<pe:name nid='<%=GetWorldName() %>' />
+                <div>复活药剂10魔豆：原地立即复活</div>
+                <div>补血药剂10魔豆：立即满血</div>
+                <div>当前世界当天无限次复活20魔豆：立即满血</div>
+            </pe:tab-item>
+            <pe:tab-item name="recommend" style="padding:5px;" text="官方商城">
+                TODO： 这里的东西是不予作者分成的。 
+                <div>成为创意会员100魔豆：保存世界， 免费分享世界， 使用小地图功能</div>
+                
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

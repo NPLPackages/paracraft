@@ -1,0 +1,119 @@
+<!-- "script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2014.4.1</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" src="SelectModulePage.lua"><![CDATA[
+local page = document:GetPageCtrl();
+local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
+
+function DS_Items(index)
+    return SelectModulePage.DS_Items(index);
+end
+
+function OnSwitchModStatus(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    local item = mcmlNode:GetPreValue("this",true);
+    SelectModulePage.OnSwitchModStatus(not item.checked,item.name,index);
+    Page:Refresh(0.01);
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOk()
+    SelectModulePage.ResetLoadedMods();
+    ClosePage();
+end
+
+function CanChecked()
+    
+end
+
+function CanUseMod()
+
+end
+
+function SwitchAllModStatus()
+
+end
+
+function OnOpenModDir()
+    Map3DSystem.App.Commands.Call("File.WinExplorer", SelectModulePage.dir);
+end
+
+function OnCancel()
+    ClosePage();
+end
+
+function GetStatus(checked)
+    local word = "";
+    if(not checked) then
+        word = L"加载";
+    else
+        word = L"停用";
+    end
+    return word;
+end
+
+function GetBackground(checked)
+    local bg = "";
+    if(not checked) then
+        bg = "mobile_panel_black";
+    else
+        bg = "mobile_panel_green";
+    end
+    return bg;
+end
+
+function ShowModDir()
+    _guihelper.MessageBox(string.format(L"Mod目录：%s",ParaIO.GetWritablePath()));
+end
+
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" zorder="-1" class = "mobile_panel" style="position:relative;"/>
+<pe:container alignment="_ct" style="position:relative;margin-left:-480px;margin-top:-320px;width:960px;height:640px;background:">
+    <div style="width:960px;height:640px;color:#ffffff;font-size:40px;base-font-size:40;font-weight:bold;">
+        <div style="margin-top:0px;height:60px;">
+            <div style="float:left;margin-left:18px;margin-top:12px;color:#ffffff;font-size:40px;base-font-size:40;font-weight:bold;">
+                <%=L"加载Mod"%>
+            </div>
+            <input type="button" class="mobile_button_white" onclick="ShowModDir" value='<%=L"目录"%>' style="float:left;margin-left:400px;margin-top:11px;min-width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+            <input type="button" class="mobile_button_white" onclick="OnOk" value='<%=L"确定"%>' style="float:left;margin-left:25px;margin-top:11px;min-width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+        </div>
+        <div class="mobile_line" style="width:960px;height:2px;margin-top:5px;"/>
+        <div class="mobile_panel_grey_black" style="width:910px;height:522px;margin-left:25px;margin-top:20px;">
+            <pe:gridview style="margin:10px" name="gvwModTable" CellPadding="0"  AllowPaging="false" DefaultNodeHeight = "110" ItemsPerLine="1"
+                DataSource="<%=DS_Items%>" >
+	            <Columns>
+		            <div style="color:#ffffff;height:110px">
+                        <div style="float:left;height:88px;margin-top:5px;padding-top:12px;color:#ffffff;font-size:40px;base-font-size:40;font-weight:bold;text-align:center;width:760px;" class='<%= GetBackground(Eval("checked")) %>'>
+                            <%=Eval("text") %>
+                        </div>
+                        <input type="button" value='<%= GetStatus(Eval("checked")) %>' style="margin-left:30px;margin-top:5px;height:88px;width:86px;font-size:40px;font-weight:bold;text-align:center;" onclick="OnSwitchModStatus" class="mobile_button_white" param1='<%=Eval("index") %>'/>
+                    </div>
+	            </Columns>
+	            <EmptyDataTemplate>
+		            <div style="color:#ffffff;font-size:40px;base-font-size:40;font-weight:bold;"><%=L"无Mod"%></div>
+	            </EmptyDataTemplate>
+	            <FetchingDataTemplate>
+		            <div style="color:#ffffff;font-size:40px;base-font-size:40;font-weight:bold;"><%=L"无Mod"%></div>
+	            </FetchingDataTemplate>
+	            <!--<PagerSettings Position="TopAndBottom" height="26" PreviousPageText="" NextPageText=""/>-->
+	            <!--<PagerTemplate><form><input type="button" name="pre" value="previous page"/><input type="button" name="next" value="next page"/><label name="page" style="height:18px;margin:4px"/></form></PagerTemplate>-->
+            </pe:gridview>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+</pe:mcml>
+</body>
+</html>

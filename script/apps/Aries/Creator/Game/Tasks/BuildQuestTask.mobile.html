@@ -1,0 +1,356 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuildQuestTask.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
+local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest")
+BuildQuest.OnInit()
+
+isEditing = false;
+local theme_index = BuildQuest.cur_theme_index;
+local task_index = BuildQuest.cur_task_index;
+
+function RestEditing()
+    isEditing = false;
+end
+
+function ClosePage()
+    BuildQuest.ClosePage(true);
+    --BuildQuest.EndEditing(true);
+end
+
+function GetCurrentPosText()
+    local center_x, center_y, center_z, radius, region_x, region_z = BuildQuest.GetPosition()
+    return string.format("%d,%d,%d", center_x, center_y, center_z);
+end
+
+function GetTheme_DS(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+     if(not index) then
+        return #themesDS;
+    else
+        return themesDS[index];
+    end
+end
+
+function GetCurThemeIndex()
+    return theme_index;
+end
+
+function ChangeTheme(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    index = tonumber(index);
+    theme_index = index;
+    BuildQuest.cur_theme_index = index;
+    BuildQuest.OnInit();
+    task_index = BuildQuest.cur_task_index;
+    RestEditing();
+    Page:Refresh(0.1);
+end
+
+function GetTask_DS(index)
+    local tasksDS = BuildQuestProvider.GetTasks_DS(theme_index);
+    if(not tasksDS) then
+        return 0;
+    end
+    if(not index) then
+        return #tasksDS;
+    else
+        return tasksDS[index];
+    end
+end
+
+function GetTaskName()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    if(task) then
+        return task.name or "";
+    else
+        return "";
+    end
+end
+
+function GetTaskImage()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local image = "";
+    if(task) then
+        image = task.image;
+    end
+    return image;
+end
+
+function GetTaskDesc()
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local desc = "";
+    if(task) then
+        desc = task.desc;
+    end
+    return desc;
+end
+
+
+function GetTaskID(index)
+    return tostring(index);
+end
+
+function GetTaskIcon(index)
+    local task = BuildQuestProvider.GetTask(theme_index,index);
+    local icon = "";
+    if(task) then
+        icon = task.icon;
+    end
+    return icon;
+end
+
+function TaskIsLocked(index)
+    if(index > (BuildQuest.cur_task_index)) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function TaskIsFinished(index)
+    local task = BuildQuestProvider.GetTask(theme_index,index);
+    if(index < BuildQuest.cur_task_index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ChangeTask(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    task_index = tonumber(index);
+    RestEditing();
+    Page:Refresh(0.1);
+end
+
+function GetBlock_DS(index)
+    local task = BuildQuestProvider.GetTask(theme_index,task_index);
+    local ds;
+    if(task) then
+        ds = task:GetBlockTypes();
+    end
+    if(not index) then
+        return #ds;
+    else
+        return ds[index];
+    end
+end
+
+function CurTaskIsLocked()
+    local islocked = TaskIsLocked(task_index);
+    return islocked;
+end
+
+function CurTaskIsFinished()
+    local isfinished = TaskIsFinished(task_index);
+    return isfinished;
+end
+    
+function StartBulid()
+    local cur_task = BuildQuest.GetCurrentQuest();
+    --[[
+    if(not cur_task) then
+        _guihelper.MessageBox("请先选择教程！");
+        return;
+    end
+    ]]
+    local islocked = TaskIsLocked(task_index);
+    if(islocked) then
+        _guihelper.MessageBox("该建筑还未解锁，请先完成前置内容！");
+        return;
+    end    
+
+    
+    if(BuildQuest.IsTaskUnderway() and cur_task.theme_id == theme_index) then
+        BuildQuest.EndEditing();
+        return;
+    end
+    local task = BuildQuest:new({theme_id=BuildQuest.cur_theme_index, task_id=task_index, step_id=1})
+    task:Run();
+    BuildQuest.ClosePage();
+end
+
+function GetQuestTriggerText()
+    local s ="";
+    local cur_task = BuildQuest.GetCurrentQuest();
+    if(BuildQuest.IsTaskUnderway() and cur_task and cur_task.theme_id == theme_index) then
+        s = "放弃建造";
+    else
+        local task = BuildQuestProvider.GetTask(theme_index,task_index);
+        if(task and task:IsClickOnceDeploy()) then
+            s = "一键完成";
+        else
+            s = "开始建造";
+        end
+    end
+    return s;
+end
+
+function GetQuestOutBorder(index)
+    local bk="";
+    if(task_index == index) then
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 128 34 34";
+    else
+        bk = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 89 34 34";
+    end
+    return bk;
+end
+
+function TaskIsSelected(index)
+    if(task_index == index) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function OnFAQ()
+    ParaGlobal.ShellExecute("open", GameLogic.options.ask_for_help_url, "", "", 1);
+end
+
+function QuickBuilding(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    task_index = tonumber(index);
+    BuildQuest.QuickBuilding(theme_index,task_index);
+end
+
+function beShowTheLineOfOfficialAndUnofficial(index)
+    local themesDS = BuildQuestProvider.GetThemes_DS();
+    if(index == 1) then
+        return false;
+    elseif(themesDS[index] and themesDS[index - 1]) then
+        if(themesDS[index]["official"] == false and themesDS[index - 1]["official"] == true) then
+            return true;
+        else
+            return false;
+        end
+    end
+    return false;
+end
+
+function OnOpenMyTemplateFolder()
+    BuildQuest.OnOpenMyTemplateFolder();
+end
+
+function CanEditing()
+    local curTheme = GetTheme_DS(theme_index);
+    if(curTheme) then
+        if(curTheme.official) then
+            return false;
+        else
+            return true;
+        end
+    end
+    return false;
+end
+
+function OnChangeTaskDesc()
+    isEditing = true;
+    Page:Refresh(0.1);
+end
+
+function OnSaveTaskDesc()
+    isEditing = false;
+    local content = Page:GetValue("content", "");
+    local desc = string.gsub(content,"\r\n","<br/>")
+    --echo("desc:"..desc);
+    --_guihelper.MessageBox(desc);
+    BuildQuestProvider.OnSaveTaskDesc(theme_index,task_index,desc);
+    Page:Refresh(0.1);
+end
+
+function Return()
+    BuildQuest.ClosePage();
+end
+
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" zorder="-1" class = "mobile_panel" style="position:relative;background-color:#ffffff90;"/>
+<pe:container alignment="_ct" style="position:relative;margin-left:-480px;margin-top:-320px;width:960px;height:640px;background:">
+    <div style="width:960px;height:640px;">
+        <div style="margin-top:0px;height:60px;">
+            <div style="float:left;margin-left:18px;margin-top:12px;color:#ffffff;font-size:40px;base-font-size:40px;font-weight:bold;">
+                帮助
+            </div>
+            <input type="button" class="mobile_button_white" onclick="Return" value="返回" style="float:left;margin-left:650px;margin-top:11px;width:86px;height:46px;font-size:15px;font-weight:bold;"/>
+        </div>
+        <div class="mobile_line" style="width:960px;height:2px;margin-top:5px;"/>
+        <div class="mobile_button_black" style="width:910px;height:522px;margin-left:25px;margin-top:20px;">
+            <div style="float:left;margin-left:20px;margin-top:15px;width:260px;height:500px;background:;">
+                <pe:gridview RememberScrollPos="true" style="height:500px" AllowPaging="false" DefaultNodeHeight="100" ItemsPerLine="1" CellPadding="0" name="gvwMCTheme" DataSource='<%=GetTheme_DS%>' >
+                    <Columns>
+                        <div style="height:100px;">
+                            <pe:if condition='<%= GetCurThemeIndex() == Eval("index") %>'>
+                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:5px;margin-top:15px;width:240px;height:70px;base-font-size:40px;font-size:40px;font-weight:bold;color:#ffffff;text-align:center;padding-top:10px;" class="mobile_panel_blue"/>    
+                            </pe:if>
+                            <pe:if condition='<%= GetCurThemeIndex() ~= Eval("index") %>'>
+                                <input type="button" value='<%=Eval("name") %>' onclick="ChangeTheme" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:15px;width:240px;height:70px;base-font-size:40px;font-size:40px;font-weight:bold;color:#ffffff;text-align:center;padding-top:10px;" class="mobile_panel_grey"/>    
+                            </pe:if>
+                        </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff;font-size:20px;">空</div>
+                    </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff;font-size:20px;">正在搜索, 请稍候 ... </div>
+                    </FetchingDataTemplate>
+                </pe:gridview>
+            </div>
+            <div class="mobile_line" style="float:left;width:2px;height:522px;margin-left:10px;margin-top:0px;" />
+            <div style="float:left;margin-left:10px;margin-top:10px;width:190px;">
+                <pe:gridview name="gvwMCTask" DefaultNodeHeight="70" DataSource="<%=GetTask_DS%>" ItemsPerLine="1" AllowPaging="false">
+                    <Columns>
+                        <div style="height:80px;">
+                            <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:15px;margin-top:15px;width:155px;height:65px;base-font-size:30px;font-size:30px;color:#ffffff;" class="mc_button_blue"/>    
+                            </pe:if>
+                            <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                <pe:if condition='<%= TaskIsFinished(Eval("index")) == true %>'>
+                                    <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:15px;margin-top:15px;width:155px;height:65px;base-font-size:30px;font-size:30px;color:#ffffff;" class="mobile_panel_green"/>    
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsFinished(Eval("index")) == false %>'>
+                                    <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:15px;margin-top:15px;width:155px;height:65px;base-font-size:30px;font-size:30px;color:#ffffff;" class="mc_button_grey"/>    
+                                </pe:if>
+                                    
+                            </pe:if>
+                        </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <div style="color:#ffffff;margin-left:20px;">
+                            <b>空</b>
+                        </div>
+                    </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+                        <b>请稍等 ... </b>
+			        </FetchingDataTemplate>       
+                </pe:gridview>
+            </div>
+            <div class="mobile_line" style="float:left;width:2px;height:522px;margin-left:5px;margin-top:0px;" />
+            <div style="float:left;margin-left:20px;margin-top:10px;width:380px;">
+                <div style="margin-left:50px;margin-top:10px;width:320px;height:200px;font-size:30px;base-font-size:30px;color:#ffffff;text-align:left;">
+                    <%=GetTaskDesc() %>
+                </div>
+                <div style="margin-left:5px;margin-top:30px;height:170px;">
+                    
+                </div>
+                <div style="">
+                    <input type="button" textscale="1.4" value='<%= GetQuestTriggerText() %>' style="margin-left:90px;margin-top:10px;height:46px;width:180px;base-font-size:20px;font-size:20px;" class="mobile_button_white" onclick="StartBulid" />
+                </div>
+            </div>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>
+

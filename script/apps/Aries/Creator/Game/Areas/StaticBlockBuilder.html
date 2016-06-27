@@ -1,0 +1,119 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/StaticBlockBuilder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="StaticBlockBuilder.lua"><![CDATA[
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local StaticBlockBuilder = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.StaticBlockBuilder");
+StaticBlockBuilder.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+local ds_passable_table = StaticBlockBuilder.ds_blocks_obstructed;
+
+function DS_Passable(index)
+    if(index == nil) then
+        return #ds_passable_table;
+    else
+        return ds_passable_table[index];
+    end
+end
+
+
+function OnClickBlock(block_id)
+    StaticBlockBuilder.OnClickBlock(block_id)
+end
+
+function OnClickBlocksShop()
+    _guihelper.MessageBox("测试期间, 模板商城暂未开放~");
+end
+
+function DS_GetBlockTemplates()
+   return BlockTemplatePage.GetAllTemplatesDS();
+end
+
+function OnClickRefreshAllTemplates()
+   BlockTemplatePage.GetAllTemplatesDS(true);
+   Page:Refresh();
+end
+
+function OnClickOpenTemplateDir()
+    BlockTemplatePage.OnClickOpenTemplateDir()
+end
+
+function OnSelectNode(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
+    BlockTemplatePage.CreateFromTemplate(item.filename);
+end
+]]></script>
+<div style="width:250px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >建造</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+        <pe:tabs name="builder" class="tabs" >
+            <pe:tab-item name="passable" text="积木" selected="true" style="padding-top:0px;padding:5px;padding-bottom:10px">
+                <pe:gridview style="margin:0px" name="gvwPassable" CellPadding="4"  AllowPaging="True" ItemsPerLine="6" DefaultNodeHeight = "34" pagesize="42"
+                    DataSource='<%=DS_Passable%>'>
+	                <Columns>
+			            <input name='<%=Eval("block_id")%>' tooltip='<%=block_types.GetTooltip(Eval("block_id"))%>' onclick="OnClickBlock" type="button" class="button" value="" style='<%=format("width:32px;height:32px;background:url(%s)", Eval("icon"))%>' />
+	                </Columns>
+	                <EmptyDataTemplate>
+	                </EmptyDataTemplate>
+	                <PagerSettings Position="Bottom" />
+                    <PagerTemplate AutoHidePager="false" style="margin-left:20px;">
+					    <form>
+						    <input type="button" name="pre" invisibleondisabled="false" value="上一页" class="pagerbuttonleft" />
+							    <input type="button" name="page" class="pagerbuttontext" /> 
+						    <input type="button" name="next" invisibleondisabled="false" value="下一页" class="pagerbuttonright" />
+	                    </form>
+				    </PagerTemplate>
+                </pe:gridview>
+            </pe:tab-item>
+            <pe:tab-item name="mytemplate" text="我的模板" style="padding:5px">
+                <div style="margin-left:0px;margin-top:0px;margin-bottom:3px;">
+                    <div style="float:left;padding:2px;background:url(Texture/Aries/common/picbg16_32bits.png#0 0 16 16: 3 3 3 3);">
+                        <input type="button" style="position:relative;width:64px;margin-top:20px;background:;color:#808080" value="预览" />
+                        <img name="CurrentSnapshot" zorder="1" style="width:64px;height:64px;"/>
+                    </div>
+                    <!--<input type="button" tooltip="模板商城" onclick="OnClickBlocksShop" style="margin-top:5px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/shop_inside_32bits.png#0 0 55 55);"/>-->
+                    <div style="float:left;margin-left:5px;margin-right:5px;">
+                        <div>
+                            【Ctrl+左键】点击多个积木可以保存为模板. 
+                        </div>
+                        <input type="button" name="refresh" style="font-size:12px;" value="刷新" class="linkbutton" onclick="OnClickRefreshAllTemplates"/>
+                        <input type="button" name="refresh" style="margin-left:10px;font-size:12px;" value="目录" tooltip="打开模板文件目录" class="linkbutton" onclick="OnClickOpenTemplateDir"/>
+                    </div>
+                </div>
+                <pe:treeview name="gvwBlockTemplates" RememberScrollPos="true" DataSource='<%=DS_GetBlockTemplates()%>' DefaultNodeHeight="20" OnClick="tvwOnClickNode()">
+	                <NodeTemplates>
+                        <NodeTemplate DataType="folder">
+                            <pe:treenode text='<%=XPath("this|text")%>' expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+                        </NodeTemplate>
+		                <NodeTemplate DataType="file">
+                            <div style="height:20px;">
+                                <input type="button" class="listbutton_unselected" value='<%=XPath("this|text")%>' onclick='OnSelectNode'
+								    style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;" />
+                            </div>
+                        </NodeTemplate>
+	                </NodeTemplates>
+                </pe:treeview>
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

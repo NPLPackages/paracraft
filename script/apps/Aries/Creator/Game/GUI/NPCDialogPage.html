@@ -1,0 +1,64 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/NPCDialogPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="NPCDialogPage.lua"><![CDATA[
+NPCDialogPage = commonlib.gettable("MyCompany.Aries.Game.GUI.NPCDialogPage");
+NPCDialogPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetContent()
+    local item = NPCDialogPage.GetDialogItem();
+    return item and item.content or "";
+end
+
+function GetButtonsDS(index)
+    local buttons = NPCDialogPage.GetDialogButtons();
+    return index and buttons[index] or #buttons;
+end
+
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" onclick="ClosePage()" style="background:" />
+<pe:container alignment="_mb" width="0" height="170" style="background:">
+<pe:container alignment="_ctt" ClickThrough="true" width="600" height="256" style="background:;">
+<div style="width:520px;height:162px;" class="mc_border" align="center">
+    <input tooltip='<%=L"关闭"%>' type="button" class="mc_close_button" style="" name="close" onclick="ClosePage()" value=""/>
+    <div>
+        <div style="position:relative;">
+            <div style="margin-left:-68px;margin-top:-100px;">
+                <pe:mc_entity_canvas entity='<%=NPCDialogPage.GetAvatarEntity()%>' miniscenegraphname="NPCDialog_miniscene" style="width:256px;height:256px;" background="" IsPortrait="true" IsInteractive="false" />
+            </div>
+            <input type="button" value='<%=NPCDialogPage.GetAvatarName()%>' style="background:;margin-left:5px;font-size:14px;font-weight:bold;margin-top:-20px;width:110px;height:20px;color:#ffffff" />
+        </div>
+        <div style="float:left;margin-top:15px;margin-left:120px;margin-right:20px">
+            <div style="height:55px;color:#ffffff;">
+                <pe:container style="color:#ffffff;base-font-size:16;font-size:16;font-weight:bold;line-height:16px;background:" valign="center">
+                    <div style="min-height:40px;">
+                    <%=GetContent() %>
+                    </div>
+                </pe:container>
+            </div>
+             <div style="margin-left:0px;margin-top:10px;">
+                <pe:gridview DataSource="<%=GetButtonsDS%>" name="gvButtons" style="" 
+                        VerticalScrollBarStep="28" CellPadding="0"  DefaultNodeHeight = "28" ItemsPerLine="1" AllowPaging="false" pagesize="100">
+                    <Columns>
+                        <input type="button" name='<%=Eval("index")%>' onclick="NPCDialogPage.OnClickButton()" class="mc_questbutton" style="text-align:left;margin-top:0px;background:;height:28px;font-size:14px;" width="100%" value='<%=Eval("label") %>' />
+                    </Columns>
+                </pe:gridview>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

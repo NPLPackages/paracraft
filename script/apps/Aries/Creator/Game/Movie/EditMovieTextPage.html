@@ -1,0 +1,114 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditMovieTextPage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EditMovieTextPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditMovieTextPage");
+EditMovieTextPage.OnInit();
+
+function GetFontSizeDS()
+    return {
+        {value=20, text=L"小"},
+        {value=25, text=L"默认", selected=true},
+        {value=30, text=L"中"},
+        {value=40, text=L"大"},
+    };
+end
+function GetFontColorDS()
+    return {
+        {value="#ffffff", text=L"白色", selected=true},
+        {value="#000000", text=L"黑色"},
+    };
+end
+function GetTextAnimDS()
+    return {
+        {value="", text=L"立即出现", selected=true},
+        {value="fadeinout", text=L"淡入淡出"},
+        {value="fadein", text=L"淡入"},
+        {value="fadeout", text=L"淡出"},
+    };
+end
+function GetBGColorDS()
+    return {
+        {value="", text=L"无", selected=true},
+        {value="#ffffff", text=L"白色"},
+        {value="#000000", text=L"黑色"},
+    };
+end
+function GetTextPosDS()
+    return {
+        {value="center", text=L"屏幕中间"},
+        {value="bottom", text=L"屏幕下方", selected=true},
+    };
+end
+function GetBGAnimDS()
+    return {
+        {value="", text=L"立即出现", selected=true},
+        {value="fadeinout", text=L"淡入淡出"},
+        {value="fadein", text=L"淡入"},
+        {value="fadeout", text=L"淡出"},
+    };
+end
+
+function OnClearText()
+    Page:SetValue("text", "");
+end
+]]></script>
+<aries:window mode="thin" style="width:640px;" title='<%=EditMovieTextPage.GetTitle()%>' onclose="EditMovieTextPage.OnClose">
+<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+    <div style="margin-top: 5px;">
+        <div style="float:left;">
+            <%=L"字号:"%>
+            <select name="fontsize" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetFontSizeDS()%>'>
+            </select>
+        </div>
+        <div style="float:left;margin-left:20px;">
+            <%=L"字体颜色:"%>
+            <select name="fontcolor" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetFontColorDS()%>'>
+            </select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <%=L"文字动画:"%>
+            <select name="textanim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetTextAnimDS()%>'>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div style="float:left;">
+            <%=L"背景:"%>
+            <select name="bgcolor" AllowUserEdit="false" style="height:24px;"  DataSource='<%=GetBGColorDS()%>'>
+            </select>
+        </div>
+        <div style="float:left;margin-left:20px;">
+            <%=L"位置:"%>
+            <select name="textpos" AllowUserEdit="false" style="height:24px;"  DataSource='<%=GetTextPosDS()%>'>
+            </select>
+        </div>
+        <div style="float:left;margin-left:20px;">
+            <%=L"背景动画:"%>
+            <select name="bganim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetBGAnimDS()%>'>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 10px; ">
+        <div style="float:left;"><%=L"文字:"%></div>
+        <div class="mc_paper_panel" style="float: left; margin-left:0px; padding:5px;margin-right:5px;">
+            <input type="text" autofocus="true" name="text" EmptyText='<%=L"在这里输入字幕"%>' rows="3" CaretColor="#FFFFFFFF" style="background:;" />
+        </div>
+    </div>
+    <div style="margin-top:10px;">
+        <input type="button" name="Reset" style="margin-left:40px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
+        <input type="button" name="ClearText" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearText" value='<%=L"清除文字"%>' />
+        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnOK" value='<%=L"确定"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

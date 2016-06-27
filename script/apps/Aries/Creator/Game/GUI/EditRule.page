@@ -1,0 +1,21 @@
+﻿<?npl
+wp_enqueue_script("ace", "/wp-includes/js/ace/ace.js"); 
+wp_enqueue_script("angular", "/wp-includes/js/angular/angular.min.js");
+?>
+<pre id="editor"><?npl echo("1234567"); ?></pre>
+<script>
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/github");
+  editor.session.setMode("ace/mode/html");
+  editor.setAutoScrollEditorIntoView(true);
+  editor.setOption("maxLines", 30);
+  editor.setOption("minLines", 5);
+  editor.commands.addCommand({
+    name: 'myCommand',
+    bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
+    exec: function(editor) {
+      // $('#runcode').trigger('click');
+    },
+    readOnly: true
+  });
+</script>

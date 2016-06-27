@@ -1,0 +1,155 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Test/GameTestPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="GameTestPage.lua"><![CDATA[
+local GameTestPage = commonlib.gettable("MyCompany.Aries.Creator.Game.GameTestPage");
+GameTestPage.OnInit();
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/Test/test_block_engine.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
+BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+BlockEngine:Connect();
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+GameLogic.Init();
+
+-- all objects here
+local all_objects = {
+    {value="random_block", selected=true},
+    {value="spawn_room"},
+};
+function GetAllObjects()
+    return all_objects;
+end
+
+
+function togglecamera()
+    GameLogic.ToggleCamera();
+end
+
+function OnClickCreateObject(obj_name)
+    if(obj_name=="createobj") then
+        obj_name = Page:GetUIValue("obj_name", "random_block");
+    end
+    GameLogic.CreateObject(obj_name, nil, nil, nil, true);
+    echo(obj_name)
+end
+
+function GotoOverworld()
+    GameLogic.GotoOverworld()
+end
+
+function GotoBlockWorld()
+    GameLogic.GotoBlockWorld()
+end
+
+function OnClickUndoBlock()
+    GameLogic.UndoBlock();
+end
+
+function TurnOnPerf()
+    commonlib.npl_profiler.perf_enable();
+    commonlib.npl_profiler.perf_show(nil, true);
+end
+
+function OnClickCreateBlock()
+    local x,y,z = ParaScene.GetPlayer():GetPosition();
+    ParaTerrain.SetBlockTemplate(x,y+0.1,z,1);
+end
+
+function OnClickDeleteBlock()
+    local x,y,z = ParaScene.GetPlayer():GetPosition();
+    ParaTerrain.SetBlockTemplate(x,y+0.1,z,0);
+end
+
+function OnClickLeaveWorld()
+     ParaTerrain.LeaveBlockWorld();
+end
+
+function OnClickEnterWorld()
+    x,y,z = ParaScene.GetPlayer():GetPosition();
+    ParaTerrain.EnterBlockWorld(x,y,z);
+end
+
+function Save()
+   ParaTerrain.SaveBlockWorld();
+end
+
+function Load()
+   ParaTerrain.LoadBlockWorld();
+end
+
+function CreateTestWorld()
+    local radius = 80;
+    local x,y,z = ParaScene.GetPlayer():GetPosition();
+    local startX = x - radius;
+    local endX = x + radius;
+    local startY = 0;
+    local endY = radius;
+    local startZ = z - radius;
+    local endZ = z + radius
+    
+    for i = 0,20000 do
+         local curX = math.random(startX,endX);
+         local curY = math.random(startY,endY);
+         local curZ = math.random(startZ,endZ);
+         ParaTerrain.SetBlockTemplate(curX,curY,curZ, i%2+1);
+    end
+end
+
+function CreateCorner()
+    local x,y,z = ParaScene.GetPlayer():GetPosition();
+    x,y,z = BlockEngine:block(x,y,z)
+    local i,j,k;
+    for i = 0, 4 do
+        for j = 0, 4 do
+            ParaTerrain.SetBlockTemplateByIdx(x+i, y+j, z, 1);
+            ParaTerrain.SetBlockTemplateByIdx(x, y+j, z+i, 1);
+            ParaTerrain.SetBlockTemplateByIdx(x+i, y+4, z+j, 1);
+        end
+    end
+end
+]]></script>
+<div style="margin:10px">
+    <div>
+        <input type="checkbox" name="TurnOnPerf" onclick="TurnOnPerf" /><div for="TurnOnPerf" style="float:left;margin-right:20px;">性能分析</div>
+        <input type="button" name="random_block" onclick="GotoOverworld" value="地上世界" />
+        <input type="button" name="random_block" onclick="GotoBlockWorld" value="地下世界" />
+        <input type="button" name="togglecamera" onclick="togglecamera" value="切换摄影机模式" /><br />
+        <div style="font-weight:bold">Object Creations:</div>
+        <div>
+            <input type="button" name="random_block" onclick="OnClickCreateObject" value="随机方块" /> 
+            <input type="button" name="random_block" onclick="OnClickUndoBlock" value="Undo" /> 
+        </div>
+        <div>
+            <input type="button" name="spawn_room" onclick="OnClickCreateObject" value="地下出生点" />
+        </div>
+        <select name="obj_name" DataSource='<%=GetAllObjects()%>'>
+        </select>
+        <input type="button" name="createobj" onclick="OnClickCreateObject" value="Create!" />
+
+        <div>
+            <input type="button" name="createBlock" onclick="OnClickCreateBlock" value="create block" /> 
+            <input type="button" name="deleteBlock" onclick="OnClickDeleteBlock" value="delete block" /> 
+            <input type="button" name="enterWorld" onclick="OnClickEnterWorld" value="enter world" /> 
+            <input type="button" name="leaveWorld" onclick="OnClickLeaveWorld" value="leave world" /> 
+            <br />
+            <input type="button" name="Save" onclick="Save" value="Save" /> 
+            <input type="button" name="Load" onclick="Load" value="Load" /> 
+            <br />
+            <input type="button" name="testWorld" onclick="CreateTestWorld" value="压力测试" /> 
+            <input type="button" name="testWorld" onclick="CreateCorner" value="墙角物理" /> 
+        </div>
+
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

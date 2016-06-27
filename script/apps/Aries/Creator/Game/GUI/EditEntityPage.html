@@ -1,0 +1,130 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/EditEntityPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditEntityPage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+EditEntityPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditEntityPage");
+EditEntityPage.OnInit()
+
+function GetInventoryView()
+    return EditEntityPage.GetEntity().inventoryView;
+end
+
+function DS_Func_Inventory(index)
+    return GetInventoryView():GetSlotDS(index);
+end
+
+function GetRulebagView()
+    return EditEntityPage.GetEntity().rulebagView;
+end
+
+function DS_Func_Rulebag(index)
+    return GetRulebagView():GetSlotDS(index);
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        return {slotNumber = index};
+    end
+end
+
+function OnDummy()
+end
+
+function OnClickEmptyRuleSlot(mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    if(item and item.slotNumber) then
+        EditEntityPage.OnClickEmptyRuleSlot(item.slotNumber);
+    end
+end
+function OnClickEmptyBagSlot(mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    if(item and item.slotNumber) then
+        EditEntityPage.OnClickEmptyBagSlot(item.slotNumber);
+    end
+end
+    
+]]></script>
+<pe:container style="background:;">
+<pe:container class="mc_border" style="color:#cccccc;">
+<div width="100%" style="padding:5px;">
+    <div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+        <pe:mc_block block_id='<%=EditEntityPage.GetItemID()%>' style="width:32px;height:32px;"/>
+    </div>
+    <div style="float:left;width:200px;margin-left:10px;">
+        <div>
+            <div style="float:left"><%=L"名称:"%></div>
+            <%=tostring(EditEntityPage.GetItemName() or "")%>
+        </div>
+        <div>
+            <div style="float:left">ID:</div>
+            <%=tostring(EditEntityPage.GetItemID())%>
+        </div>
+    </div>
+    <div style="float:left;">
+        <input type="button" name="save" value='<%=L"关闭"%>' onclick="EditEntityPage.OnClickOK" class="mc_big_button" style="margin-top:5px;min-width:80px;"/>
+    </div>
+</div>
+<pe:if condition='<%=EditEntityPage.GetEntity():HasCommand()%>'>
+<div width="100%">
+    <div class="mc_line" width="100%" height="1"></div>
+    <div style="text-align:center;padding-left:5px;padding-right:5px;"><%=EditEntityPage.GetEntity():GetCommandTitle() or ""%></div>
+    <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
+        <input name="command" rows="3" value='<%=EditEntityPage.GetCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
+    </div>
+</div>
+</pe:if>
+<pe:if condition='<%=EditEntityPage.GetEntity():HasRule()%>'>
+<div width="100%" >
+    <div class="mc_line" width="100%" height="1"></div>
+    <div style="padding-left:5px;padding-right:5px;"><%=EditEntityPage.GetEntity():GetRuleTitle() or L"规则"%></div>
+    <div>
+        <pe:gridview name="RuleItems" style="height:84px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
+                    <pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+    </div>
+</div>
+</pe:if>
+<pe:if condition='<%=EditEntityPage.GetEntity():HasBag()%>'>
+<div width="100%" style="padding-bottom:5px;">
+    <div class="mc_line" width="100%" height="1"></div>
+    <div style="padding-left:5px;padding-right:5px;"><%=EditEntityPage.GetEntity():GetBagTitle() or ""%></div>
+    <div>
+        <pe:gridview name="InventoryItems" style="height:80px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Inventory%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:8px;margin-top:4px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyBagSlot" ContainerView='<%=GetInventoryView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+    </div>
+</div>
+</pe:if>
+</pe:container>
+<pe:if condition='<%=EditEntityPage.GetEntity():HasBag() or EditEntityPage.GetEntity():HasRule()%>'>
+    <div class="mc_border" style="padding-top:2px;">
+         <pe:gridview name="MyItems" style="height:42px;" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="0" DefaultNodeHeight = "38" VerticalScrollBarStep="19" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:8px;margin-top:4px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' DestInventory='<%=EditEntityPage.GetEntity().inventory %>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+    </div>
+</pe:if>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

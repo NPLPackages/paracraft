@@ -1,0 +1,34 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ObjectSelectPage.lua"><![CDATA[
+ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
+ObjectSelectPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function CreateObjTreeView(params)
+    ObjectSelectPage.CreateObjTreeView(params)
+end
+]]></script>
+<aries:window mode="thin" title="物体选择" onclose="ClosePage">
+<div style="padding:5px;padding-left:0px;padding-bottom:10px;color:#cccccc">
+<div >
+    <input style="margin-left:10px;" name="btnUpdateObjects" type="button" class="mc_light_grey_button_with_fillet" value="删除全部" onclick="ObjectSelectPage.OnDeleteAll"/>
+</div>
+<div >
+    <pe:custom oncreate="CreateObjTreeView" class="mc_paper_panel"/>  
+</div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

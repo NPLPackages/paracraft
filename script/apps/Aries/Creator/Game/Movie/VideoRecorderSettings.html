@@ -1,0 +1,108 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="VideoRecorderSettings.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
+TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+VideoRecorderSettings = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorderSettings");
+VideoRecorderSettings.OnInit();
+
+function OnToggleShader(bChecked)
+    if(not GameLogic.GetShaderManager():SetShaders(if_else(bChecked, 2,1))) then
+        if(bChecked) then 
+            Page:SetValue("checkboxShader", false);
+            _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
+        end
+    end
+end
+function HasShader()
+    return ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) == 2
+end
+
+]]></script>
+<aries:window mode="thin" style="width:400px;" title='<%=L"录制视频"%>' onclose="VideoRecorderSettings.OnClose">
+    <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+        <div><%=L"输出格式"%>:
+        <select name="Preset" style="height:23px" onselect="VideoRecorderSettings.OnSelectPreset">
+            <option value="mp4" selected="true">MPEG4 480p (.mp4)</option>
+            <option value="mp4 560p">MPEG4 560p (.mp4)</option>
+            <option value="mp4 720p">MPEG4 720p (.mp4)</option>
+            <option value="mp4 stereo">MPEG4 L/R 3D(.mp4)</option>
+            <option value="flv" >Flash(.flv)</option>
+            <option value="gif">GIF(.gif)</option>
+            <option value="avi">Xvid (.avi)</option>
+            <option value="mov">mov (.mov)</option>
+        </select>
+    </div>
+    <div  style="margin:5px;"><hr /></div>
+    <div><%=L"分辨率"%>:
+        <select name="VideoResolution" style="height:23px">
+            <option value="320*240">320*240</option>
+            <option value="640*480" selected="true">640*480</option>
+            <option value="960*560">960*560</option>
+            <option value="1280*720">1280*720</option>
+            <option value="current">current</option>
+        </select>
+        <div style="float:left;margin-left:10px;"><%=L"立体输出"%></div>
+        <pe:checkbox_button name="stereomode" checked="<%= VideoRecorderSettings.GetStereoMode()~=0 %>" style="float:left;color:#ffffff;margin-left:5px;width:36px;height:22px;"/>
+    </div>
+    <div><%=L"码率(清晰度)"%>:
+        <select name="VideoBitRate" style="height:23px">
+            <option value="400000">400KB/s</option>
+            <option value="800000">800KB/s</option>
+            <option value="1200000" selected="true">1200KB/s</option>
+            <option value="2400000">2400KB/s</option>
+            <option value="5120000">5120KB/s (720P)</option>
+        </select>
+    </div>
+    <div>
+        <div style="float:left;">
+            <%=L"帧率(FPS)"%>:
+            <select name="FPS" style="height:23px">
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25" selected="selected">25</option>
+                <option value="30">30</option>
+            </select>
+        </div>
+        <div style="float:left;margin-left:20px;">
+            <%=L"录制区域边界"%>:
+            <select name="safemargin" style="height:23px">
+                <option value="1">1</option>
+                <option value="16" selected="true">16</option>
+                <option value="32">32</option>
+                <option value="64">64</option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <input type="checkbox" name="IsRecordAudio" style="margin-top:3px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsRecordAudio"><%=L"录制声音"%></div>
+        <input type="checkbox" name="IsShowLogo" style="margin-top:3px;margin-left:20px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsShowLogo"><%=L"显示水印"%></div>
+        <input type="checkbox" name="checkboxShader" onclick="OnToggleShader" style="margin-top:3px;margin-left:20px;" checked='<%=HasShader()%>'/><div style="float:left;margin-left:3px;" for="checkboxShader"><%=L"真实光影"%></div>
+    </div>
+    <div  style="margin:5px;"><hr /></div>
+    <div>
+        <div><%=L"材质包: "%><input type="button" name="texturemod" tooltip='<%=L"点击切换"%>' onclick="TextureModPage.ShowPage" value='<%=TextureModPage.GetCurrentTexturePackName()%>' style="color:#36a402;background:;margin-top:0px;" /></div>
+        <%=L"输出文件名: "%><input type="button" name="filename" tooltip='<%=L"点击打开所在目录"%>' value='<%=commonlib.Encoding.DefaultToUtf8(VideoRecorderSettings.GetOutputFilepath())%>' style="color: #ff6a00; background:; margin-top: 0px;text-align:left;max-width:245px;" onclick="VideoRecorderSettings.OnOpenOutputFolder"/>
+        <input type="button" tooltip='<%=L"修改输出目录"%>' style="width:20px;margin-top:0px;margin-left:5px;" value="..." class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnClickSelectOutputFolder"/>
+    </div>
+    <div  style="margin:5px;"><hr /></div>
+    <div style="margin-top:5px;">
+        <input type="button" name="Reset" style="margin-left:0px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>'/>
+        <input type="button" name="Start" DefaultButton="true" style="margin-left:5px;min-width:80px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnStartAfterThreeSecond" value='<%=L"3秒后开始"%>' />
+        <input type="button" name="OK" DefaultButton="true" style="margin-left:20px;min-width:60px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnOK" value='<%=L"确定"%>' />
+        <input type="button" name="Cancel" DefaultButton="true" style="margin-left:20px;min-width:60px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnClose" value='<%=L"取消"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

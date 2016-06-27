@@ -1,0 +1,54 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/SaveWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="SaveWorldPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SaveWorldPage");
+SaveWorldPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnSaveWorld()
+    local worldname = Page:GetUIValue("worldname")
+    ClosePage();
+    SaveWorldPage.OnSaveWorld(worldname);
+end
+
+function OnUploadWorld()
+    ClosePage();
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
+	local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
+	WorldUploadPage.ShowPage();
+end
+]]></script>
+<div style="width:380px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >保存世界</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:10px;margin-right:10px;margin-bottom:10px;">
+        <div style="margin-top:5px;padding:10px;margin-left:0px;color:#000000" class="inborder_golden" width="100%">
+            <div class="default" style="margin-top:3px;">
+                <div style="margin:3px;">
+                    保存为: <input type="text" name="worldname" value='' style="width:200px;height:24px;"/>
+                </div>
+                <div style="margin-top:10px;">
+                    <input type="button" class="button_highlight" value="本地保存" tooltip="世界只保存在了您的个人电脑上" style="margin-left:110px;width:80px" onclick="OnSaveWorld"/>
+                    <input type="button" class="button" value="上传分享" tooltip="上传到服务器, 其他玩家可访问" style="margin-left:10px;width:80px" onclick="OnUploadWorld"/>
+                    <input type="button" class="button" value="关闭" style="margin-left:10px;" onclick="ClosePage"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

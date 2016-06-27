@@ -1,0 +1,55 @@
+<!-- "script/apps/Aries/Creator/Game/Login/DonatePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2015.10.7</title>
+</head>
+<body> 
+<pe:mcml>
+<script refresh="false" type="text/npl"><![CDATA[
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function OnClickOK()
+        local text = Page:GetValue("text")
+        if(text) then
+            if(ParaEngine.ActivateProduct(text)) then
+                Page:Refresh(0.01);
+            else
+                _guihelper.MessageBox(L"无效的Key");
+            end
+        end
+    end
+]]></script>
+<div style="width:200px;background-color:#f5cef9;padding:10px;">
+    <pe:if condition='<%=ParaEngine.IsProductActivated()%>'>
+        <div style="font-size:18px;color:#1d5606">
+            <%=L"你太棒了! 感谢你的捐赠!"%>
+        </div>
+        <div style="margin-top:5px;">
+            <%=L"授权: 免费+捐赠Key"%>
+        </div>
+        <div style="margin-top:10px;">
+            <input type="button" value='<%=L"确定"%>' align="right" style="margin-right:10px;min-width:60px;" onclick="ClosePage" />
+        </div>
+    </pe:if>
+    <pe:if condition='<%=not ParaEngine.IsProductActivated()%>'>
+        <div style="">
+            <%=L"授权: 免费"%>
+        </div>
+        <div style="margin-top:5px;">
+            <%=L"请输入捐赠KEY:"%>
+        </div>
+        <div style="margin-top:5px;">
+            <input type="text" name="text" value="" style="width:150px;height:22px;" />
+        </div>
+        <div style="margin-top:5px;">
+            <input type="button" value='<%=L"确定"%>' style="min-width:60px;" onclick="OnClickOK" />
+            <input type="button" value='<%=L"取消"%>' style="margin-left:10px;min-width:60px;" onclick="ClosePage" />
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</body>
+</html>

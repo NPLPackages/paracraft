@@ -1,0 +1,105 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/OtherPeopleWorlds.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="OtherPeopleWorlds.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local OtherPeopleWorlds = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.OtherPeopleWorlds");
+OtherPeopleWorlds.OnInit();
+
+nid = Page:GetRequestParam("nid")
+local slot_id = Page:GetRequestParam("slot_id") or -1
+if(slot_id) then
+    slot_id = tonumber(slot_id);
+end
+function GetSlotID()
+    return slot_id;
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+local save_records = OtherPeopleWorlds.LoadRecordData(nid);
+
+function DsCreativeSpaceWorlds(index)
+    if(not index) then
+        return #save_records;
+    else
+        return save_records[index];
+    end
+end
+
+function VisitCreativeSpace(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    ClosePage();
+    System.App.Commands.Call("Profile.Aries.GotoHomeLand", {nid = nid, type="creativespace", world = item});
+end
+
+function VisitHomeLand()
+    ClosePage();
+    System.App.Commands.Call("Profile.Aries.GotoHomeLand", {nid = nid, type="homeland"});
+end
+function OnClickShare(name, mcmlNode)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/ShareWorldToWeb.lua");
+    local ShareWorldToWeb = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ShareWorldToWeb");
+    ShareWorldToWeb.ShowPage(nid, tonumber(name))
+end
+
+]]></script>
+<div style="width:380px;height:300px" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" style="text-align:left;margin-left:60px;">作者: <pe:name nid='<%=Eval("nid")%>'  linked="false"/></div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:10px;margin-right:10px;margin-bottom:10px;">
+        <pe:if condition='<%=System.options.version == "kids" and GetSlotID()==-1%>'>
+            <div style="margin-top:5px;padding:10px;margin-left:0px;color:#000000" class="inborder_golden" width="100%">
+                <div style="font-size:13px;color:#ffff00">
+                    <div style="float:left;background:url(Texture/Aries/Dock/Web/homeland_icon_32bits.png);width:32px;height:32px;"></div> 
+                    <div style="float:left;margin-left:5px">个人家园：</div>
+                </div>
+                <input type="button" value="访问家园" class="button_highlight" onclick="VisitHomeLand" style="width:320px;font-size:14px;font-weight:bold;height:30px;"/>
+            </div>
+        </pe:if>
+        <div style="margin-top:5px;padding:10px;padding-right:0px;margin-left:0px;color:#000000" class="inborder_golden" width="100%">
+            <div style="font-size:13px;color:#ffff00">
+                <div style="float:left;background:url(Texture/Aries/Dock/Web/creator_icon_32bits.png);width:32px;height:32px;"></div> 
+                <div style="float:left;margin-left:5px">创意空间：</div>
+            </div>
+            <div>
+                <pe:gridview name="gvwTableCSWorlds" CellPadding="0"  AllowPaging="false" DefaultNodeHeight = "35" pagesize="100"
+                    DataSource='<%=DsCreativeSpaceWorlds%>' >
+	                <Columns>
+                        <pe:if condition='<%=Eval("index") == GetSlotID()%>'>
+                            <pe:arrowpointer name="quest_tip_window" direction="2" style="float:left;position:relative;margin-top:-70px;margin-left:90px;width:82px;height:32px;background:url(Texture/Aries/Common/ThemeKid/tip/text_tip_bg_32bits.png:7 7 7 7)" >
+                                <div style="position:relative;margin-left:45px;margin-top:29px;width:32px;height:32px;background:url(Texture/Aries/Common/ThemeKid/tip/text_tip_arrow_down_32bits.png)" />
+	                            <div style="margin-top:4px;margin-left:3px;line-height:20px;text-align:center;font-size:13px;font-weight:bold;text-shadow:true;shadow-quality:8;shadow-color:#60ffffff">点击这里</div>
+                            </pe:arrowpointer>
+                        </pe:if>
+			            <input type="button" onclick="VisitCreativeSpace" tooltip='<%=format("存档日期:%s", Eval("date") or "") %>' value='<%=format("存档%d: [%s] 版本:%d",  Eval("index"), Eval("worldname") or "空", Eval("revision") or 0)%>' class="button" style="margin-top:5px;width:290px;font-size:14px;font-weight:bold;height:30px;"/>
+                        <input type="button" name='<%=Eval("index")%>' value="分享" class="button" tooltip="分享到互联网" style="position:relative;margin-left:5px;margin-top:5px;width:40px;height:30px;" onclick="OnClickShare" />
+	                </Columns>
+	                <EmptyDataTemplate>
+                        <input type="button" value="尚未发布作品" class="button_lightgrey" style="margin-top:5px;width:320px;font-size:14px;font-weight:bold;height:30px;"/>
+                        <div style="font-size:12px;margin:10px">
+                            新版创意空间可以分享世界给其他人
+                        </div>
+	                </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+		                <div style="margin:10px;">正在获取用户的空间信息...</div>
+	                </FetchingDataTemplate>
+                </pe:gridview>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

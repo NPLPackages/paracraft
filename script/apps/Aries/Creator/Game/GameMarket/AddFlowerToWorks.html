@@ -1,0 +1,63 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/AddFlowerToWorks.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="AddFlowerToWorks.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+AddFlowerToWorks = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.AddFlowerToWorks");
+AddFlowerToWorks.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+AddFlowerToWorks.ds_count = AddFlowerToWorks.ds_count or {
+    {text="1", value="1"},
+    {text="2", value="2"},
+    {text="5", value="5"},
+    {text="10", value="10"},
+    {text="20", value="20"},
+}
+
+function OnSelectFlower(name)
+    Page:SetUIValue("txtCount", name)
+end
+
+function OnDonateFlower(name)
+    local count = tonumber(Page:GetUIValue("txtCount"));
+    if(count) then
+        ClosePage();
+        AddFlowerToWorks.OnDonateFlower(count);
+    end
+end
+]]></script>
+<div style="width:350px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" style="text-align:left;">【送鲜花】
+            <div style="float:left;margin-left:20px;">你手上有<div style="color:#ee0000;float:left;"><%=AddFlowerToWorks.GetMyFlowerCount() %></div>朵鲜花</div>
+        </div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px;margin-bottom:7px;">
+       <div style="margin-top:5px;">
+           <div style="float:left;width:170px;height:40px;">
+               <pe:gridview DataSource='<%=AddFlowerToWorks.ds_count%>' AllowPaging="false" DefaultNodeHeight = "20" pagesize="5" ItemsPerLine="5">
+                    <Columns>
+                        <input type="button" style="margin-left:5px;width:25px;" onclick="OnSelectFlower" value='<%=Eval("text") %>' name='<%=Eval("value")%>' class="button"/>
+		            </Columns>
+               </pe:gridview>
+           </div>
+           <div style="float:left;">
+                <input type="text" name="txtCount" style="margin-top:2px;width:40px;"/><div style="float:left;margin-left:5px;margin-top:2px;">朵</div>
+                <input type="button" name="btnDonate" value="赠送" style="margin-left:5px;color:#ee0000;width:60px;" onclick="OnDonateFlower" class="button"/>
+           </div>
+       </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

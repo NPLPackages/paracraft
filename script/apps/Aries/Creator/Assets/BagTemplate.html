@@ -1,0 +1,35 @@
+﻿<!-- script/apps/Aries/Creator/Assets/BagTemplate.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>by LiXizhi, 2010/1/24</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false" src="AssetsCommon.lua"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local bagfile = pageCtrl:GetRequestParam("bagfile") or "temp/mybag/helloassets/grass.bag.xml";
+DS_Func = MyCompany.Aries.Creator.AssetsCommon.Get_DS_Func_FromAssetsXMLFile(bagfile)
+]]></script>
+<div style="position:absolute;margin-left:200px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.MainToolBar.ReturnToEditMode()" value=""/>
+</div>
+<div style="width:250px;padding-left:25px;padding-top:30px;padding-right:35px;padding-bottom:55px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+    <pe:gridview name="gvwGrassBags" CellPadding="0" style="height:320px;" DefaultNodeHeight="38" AllowPaging="true" pagesize="24" ItemsPerLine="4" DataSource='<%=DS_Func%>'>
+        <Columns>
+            <pe:asset onclick="MyCompany.Aries.Creator.AssetsCommon.OnCreateObject" src='<%=Eval("src")%>' type='<%=Eval("type")%>' scaling='<%=Eval("scaling")%>' tooltip='<%=Eval("DisplayName")%>'/>
+        </Columns>
+        <EmptyDataTemplate>
+            <b>空</b>
+        </EmptyDataTemplate>
+        <FetchingDataTemplate>
+            <b>请稍等 ... </b>
+        </FetchingDataTemplate>
+        <PagerSettings Position="Bottom" style="margin-left:30px;" PreviousPageText="" NextPageText=""/>
+    </pe:gridview>
+</div>
+</pe:mcml> 
+</body>
+</html>
+

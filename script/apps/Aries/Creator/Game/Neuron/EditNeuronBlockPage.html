@@ -1,0 +1,56 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Neuron/EditNeuronBlockPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditNeuronBlockPage.lua"><![CDATA[
+EditNeuronBlockPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditNeuronBlockPage");
+EditNeuronBlockPage.OnInit()
+
+function OnClose()
+    EditNeuronBlockPage.EndEditing();
+end
+]]></script>
+<aries:window title='<%=L"编程模式"%>' mode="thin" onclose="OnClose">
+    <div style="padding:5px;padding-bottom:10px;">
+    <div style="margin-top:6px;height:64px;" tooltip='<%=L"左键 建立新链接\n右键 切换目标"%>'>
+        <div style="margin-left:40px;padding:3px;padding-left:6px;padding-right:6px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
+            <pe:mc_block block_id='<%=EditNeuronBlockPage.GetBlockId() %>' style="float:left;width:32px;height:32px;" />
+        </div>
+        <input type="button" name="title" value='<%=format(L"连接数:%d", EditNeuronBlockPage.GetConnectionNumber() or 0) %>' style="background:;font-size:12px;width:120px;color:#cccccc"/>
+    </div>
+    <div>
+        <input type="button" value='<%=L"记忆学习"%>' tooltip='<%=L"建立当前块与所有连接块之间的记忆关联"%>' onclick="EditNeuronBlockPage.OnFireLearnSignal" class="mc_light_grey_button_with_fillet" />
+        <input type="button" value='<%=L"测试"%>' tooltip='<%=L"删除所有链接的方格, 然后用刚刚学习的记忆重建"%>' onclick="EditNeuronBlockPage.OnTestNeuron" class="mc_light_grey_button_with_fillet" /><br />
+        <input type="button" value='<%=L"消除"%>' tooltip='<%=L"消除链接的所有的块"%>' onclick="EditNeuronBlockPage.OnClearBlocksInAxons" class="mc_light_grey_button_with_fillet" />
+        <input type="button" value='<%=L"重置"%>' tooltip='<%=L"取消所有链接"%>' onclick="EditNeuronBlockPage.RemoveAllAxons" class="mc_light_grey_button_with_fillet" /><br />
+        <!--<input type="button" value="激活" onclick="EditNeuronBlockPage.OnClickNeuron" class="mc_light_grey_button_with_fillet" />-->
+        <hr />
+        <div style="margin:5px;margin-left:0px;">
+            <pe:if condition='<%=EditNeuronBlockPage.GetScriptFileName()~=nil %>'>
+                <div style="width:64px;">
+                    <div style="width:512px;">
+                        <div class="linkbutton_yellow" onclick="EditNeuronBlockPage.OnEditScript" tooltip='<%=L"打开NPL脚本文件所在文件夹"%>'>
+                            <%=EditNeuronBlockPage.GetScriptFileName()%>
+                        </div>
+                    </div>
+                </div>
+                <input type="button" name="change" value='<%=L"脚本"%>' tooltip='<%=L"替换成其它他脚本文件..."%>' onclick="EditNeuronBlockPage.OnChangeScript" class="mc_light_grey_button_with_fillet" />
+                <!--<input type="button" name="reload" value="刷新" tooltip="一般会自动重新加载" onclick="EditNeuronBlockPage.OnReloadScript" class="mc_light_grey_button_with_fillet" />-->
+            </pe:if>
+            <pe:if condition='<%=EditNeuronBlockPage.GetScriptFileName()==nil %>'>
+                <input type="button" name="create" value='<%=L"脚本"%>' tooltip='<%=L"新建NPL脚本文件..."%>' onclick="EditNeuronBlockPage.OnChangeScript" class="mc_light_grey_button_with_fillet" />
+            </pe:if>
+        </div>
+        <hr />
+        <input type="button" value='<%=L"帮助..."%>' onclick="EditNeuronBlockPage.OnHelp" class="mc_light_grey_button_with_fillet" />
+    </div>
+    </div>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>

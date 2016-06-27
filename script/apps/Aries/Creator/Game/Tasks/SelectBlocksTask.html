@@ -1,0 +1,116 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SelectBlocksTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks")
+SelectBlocks.OnInit()
+
+function OnClose()
+    SelectBlocks.CancelSelection();
+end
+
+function IsMCVersion()
+    return System.options.mc;
+end
+
+]]></script>
+<aries:window style="width:120px;" title='<%=L"属性"%>' mode="thin" onclose="OnClose">
+    <div style="margin-top:6px;height:55px;">
+        <div style="margin-left:40px;padding:3px;padding-left:6px;padding-right:6px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
+            <div style="position:relative;margin-left:36px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(3) %>' style="float:left;width:24px;height:24px;" />
+            </div>
+            <div style="position:relative;margin-left:20px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(2) %>' style="float:left;width:28px;height:28px;" />
+            </div>
+            <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(1) %>' style="float:left;width:32px;height:32px;" />
+        </div>
+        <input type="button" name="title" value='<%=format(L"选中了%d块", SelectBlocks.selected_count or 1) %>' style="background:;font-size:12px;width:120px;color:#cccccc"/>
+    </div>
+    <div style="margin-top:2px;">
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"保存"%>' tooltip='<%=L"存为模板"%>' name="btn_template" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"删除"%>' tooltip='<%=L"全部删除(快捷键 Del)"%>' name="delete" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"全选"%>' tooltip='<%=L"选择上方全部联通的方块. 快捷键Ctrl+A\nCtrl+shift+click切换单选\nCtrl+alt+click过滤同种方块"%>' name="btn_selectall" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"镜像"%>' name="btn_mirror" tooltip='<%=L"Alt+左键设定参考点"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"变换"%>' tooltip='<%=L"shift+左键移动到鼠标所在位置\nShift+点击下方箭头拉伸(-/+)\n放大/缩小(Ctrl -/+)"%>' name="btn_transform" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <pe:if condition='<%=SelectBlocks.selected_count == 1 %>'>
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"编程"%>' tooltip='<%=L"进入编程模式"%>' name="NeuronMode" onclick="SelectBlocks.EnterNeuronEditMode" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%=SelectBlocks.selected_count == 1 and GameLogic.options.has_real_terrain==true %>'>
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"地表"%>' tooltip='<%=L"将选中的块变成实数地表"%>' name="RealTerrainToBlocks" onclick="SelectBlocks.ConvertBlocksToRealTerrain" class="mc_light_grey_button_with_fillet"/>    
+        </pe:if>
+    </div>
+    <div style="margin-left:12px;margin-top:4px;height:60px;">
+        <div style="width:95px;height:44px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#35 297 95 44)">
+            <input type="button" name="btn_moveto_up" 
+                style="position:relative;margin-left:12px;margin-top:0px;width:13px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#3 3 4 4:1 1 1 1);" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 20" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;341 299 13 20" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;341 299 13 20" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 20" 
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_moveto_down" 
+                style="position:relative;margin-left:13px;margin-top:30px;width:13px;height:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#359 305 13 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;359 305 13 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;359 305 13 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 14"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_moveto_right" 
+                style="position:relative;margin-left:0px;margin-top:10px;width:15px;height:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#321 306 15 12)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 15 12" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;321 306 15 12" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;321 306 15 12" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 15 12"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_moveto_left" 
+                style="position:relative;margin-left:20px;margin-top:21px;width:17px;height:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#297 304 17 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 17 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;297 304 17 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;297 304 17 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 17 14"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_moveto_front" 
+                style="position:relative;margin-left:0px;margin-top:22px;width:18px;height:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#397 304 18 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 18 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;397 304 18 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;397 304 18 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 18 14"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_moveto_back" 
+                style="position:relative;margin-left:25px;margin-top:10px;width:14px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#376 307 14 11)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 14 11" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;376 307 14 11" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;376 307 14 11" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 14 11"
+                onclick="SelectBlocks.DoClick"/>
+
+            <input type="button" name="btn_rotate_right" 
+                style="position:relative;margin-left:46px;margin-top:12px;width:21px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#239 300 21 20)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 21 20" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;239 300 21 20" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;239 300 21 20" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 21 20"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" name="btn_rotate_left" 
+                style="position:relative;margin-left:75px;margin-top:13px;width:22px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#268 301 22 19)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 22 19" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;268 301 22 19" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;268 301 22 19" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 22 19"
+                onclick="SelectBlocks.DoClick"/>
+                
+        </div>
+    </div>
+</aries:window>
+
+</pe:mcml> 
+</body>
+</html>

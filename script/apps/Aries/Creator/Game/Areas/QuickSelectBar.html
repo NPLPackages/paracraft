@@ -1,0 +1,105 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="QuickSelectBar.lua"><![CDATA[
+QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+QuickSelectBar.OnInit();
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+
+function GetKeyNum(index)
+    if(not index)then return end
+    local n = math.mod(index,QuickSelectBar.static_view_len);
+    if(n == 0)then n = QuickSelectBar.static_view_len end;
+    return n;
+end
+function PageIndexChanged(ctrlName, nPageIndex)
+    QuickSelectBar.static_view_page_index = nPageIndex;
+end
+
+function ds_CustomBtn(index)
+    if(not index) then
+        return #(QuickSelectBar.custombtn_nodes);
+    else
+        return QuickSelectBar.custombtn_nodes[index];
+    end
+end
+
+function OnClickItem(mcmlNode)
+    GameLogic.GetPlayerController():OnClickHandToolIndex(mcmlNode.slot.slotIndex);
+end
+
+function GetExpValue()
+    return 16;
+end
+
+function OnCreateExpBar(params,node)
+    local _this = ParaUI.CreateUIObject("button", "mc_exp_bar", 
+        params.alignment, params.left, params.top, params.width, params.height);
+	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;340 45 10 4:4 2 4 2";
+    _guihelper.SetUIColor(_this, "#ffffffff");
+	params.parent:AddChild(_this);
+end
+]]></script>
+<div style="width:412px;height:96px;" >
+    <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
+        <div style="position:relative;height:12px;margin-left:5px;margin-top:27px;">
+            <pe:container name="progress_wnd" visible='<%=QuickSelectBar.IProgressBar~=nil %>' style="background:;width:390px;">
+                <div style="float:left;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#355 45 10 7:4 3 4 3);width:360px;height:7px;">
+                    <pe:custom name="mc_exp_bar" oncreate="OnCreateExpBar" style="margin-left:2px;margin-top:2px;width:70px;height:4px;" />   
+                </div>
+                <div style="position:relative;float:left;">
+                    <input type="button" name="btnAccelerate" tooltip='<%=L"自动完成"%>' onclick="QuickSelectBar.OnClickAccelerateProgress" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#445 127 32 16);margin-left:0px;margin-top:-3px;width:24px;height:12px;" />
+                </div>
+            </pe:container>
+        </div>
+    </pe:if>
+    <!-- 自定义按钮 -->
+    <div style="height:36px;margin-top:6px;width:412px;"></div>
+    <pe:container style="margin-top:5px;background:;width:412px;height:42px;">
+        <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:-1px;margin-left:3px;width:42px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)">
+        </pe:container>
+        <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" style="color:#cccccc;position:relative;font-weight:bold;font-size:14px;margin-top:-36px;background-color:#ffffffff;margin-left:3px;width:100px;height:28px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)" />
+        <script type="text/npl"><![CDATA[
+            QuickSelectBar:OnHandToolIndexChanged();
+        ]]></script>
+        <pe:container zorder="-2" style="position:relative;background:;width:373px;">
+            <pe:gridview style="position:relative;margin-left:1px;" RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="9" AllowPaging="false" DefaultNodeHeight="40" pagesize="9"
+                DataSource='<%=ds_CustomBtn%>'>
+	            <Columns>
+                    <div style="width:40px;height:40px;padding:3px;margin-left:1px;">
+                        <div zorder="-1" style="position:relative;margin-top:-3px;margin-left:-3px;width:38px;height:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)"></div>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </pe:container>
+        <div style="position:relative;margin-left:1px;width:373px;" >
+            <pe:gridview RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="9" AllowPaging="false" DefaultNodeHeight="40" pagesize="9"
+                DataSource='<%=ds_CustomBtn%>'>
+	            <Columns>
+		            <div style="width:40px;height:40px;padding:3px;margin-left:1px;">
+                        <pe:mc_slot tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:32px;height:32px;" onclick='OnClickItem' />
+                    </div>
+	            </Columns>
+            </pe:gridview>
+        </div>
+        <div style="position:relative;margin-left:373px;margin-top:0px;">
+            <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
+                <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#350 342 36 36)"/>
+            </pe:if>
+            <pe:if condition='<%=not GameLogic.GameMode:IsEditor()%>'>
+                <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#389 342 36 36)"/>
+            </pe:if>
+            
+        </div>
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>
+

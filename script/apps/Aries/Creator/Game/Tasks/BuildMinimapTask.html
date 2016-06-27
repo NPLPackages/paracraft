@@ -1,0 +1,63 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BuildMinimapTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuildMinimapTask.lua"><![CDATA[
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+BuildMinimap = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildMinimap")
+BuildMinimap.OnInit()
+
+function ClosePage()
+    BuildMinimap.EndEditing(true);
+end
+
+function GetCurrentPosText()
+    local center_x, center_y, center_z, radius, region_x, region_z = BuildMinimap.GetPosition()
+    return string.format("%d,%d,%d", center_x, center_y, center_z);
+end
+
+]]></script>
+<div style="width:128px;height:512px;margin:0px;padding:0px;">
+    <input name="btnClose" type="button" zorder="1" value="" style="position:relative;margin-left:96px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/close_small_32bits.png)" onclick="ClosePage"/>
+    <div style="width:128px;height:128px;margin:0px;padding:0px;background:Texture/Aries/Dock/SunFlowerOuter_32bits.png;" class="box">
+        <div style="width:128px;height:128px;background:Texture/Aries/Dock/SunFlowerInner_32bits.png;" class="box" >
+            <div style="margin-top:40px;">
+                <div style="text-align:center">生产小地图</div>
+                <input type="button" name="title" value='<%=GetCurrentPosText()%>' style="background:;font-size:12px;width:128px;"/>
+            </div>
+        </div>
+    </div>
+    <div style="margin-left:8px;margin-top:-5px;">
+        <div>
+            <input type="button" name="camera_down" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/descale_32bits.png#0 0 55 55);" 
+                onclick="BuildMinimap.DoClick"
+                />
+            <input type="button" name="camera_up" animstyle="22" 
+                style="float:left;margin:0px;width:55px;height:55px;background:url(Texture/Aries/Homeland/v1/scale_32bits.png#0 0 55 55);" 
+                onclick="BuildMinimap.DoClick"
+                />
+        </div>
+        <div>
+            半径: 
+            <select name="radius"  AllowUserEdit="false" style="height:22px;">
+                <option selected="true">64</option>
+                <option >128</option>
+                <option >192</option>
+                <option >256</option>
+                <option >384</option>
+                <option >512</option>
+            </select>
+            <input type="button" name="btnGenmap" value="生成地图" class="button" onclick="BuildMinimap.OnGenMinimap()" style="margin-left:20px;"/>
+        </div>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>
+

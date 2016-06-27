@@ -1,0 +1,54 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SelectOPCTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SelectOPCTask.lua"><![CDATA[
+SelectOPC = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectOPC")
+SelectOPC.OnInit()
+
+
+function GetParams()
+    return SelectOPC.GetObjParams();
+end
+
+function IsCharacter()
+    return SelectOPC.IsCharacterSelected();
+end
+
+function OnClose()
+    SelectOPC.EndEditing();
+end
+]]></script>
+
+<div style="width:128px;height:512px;margin:0px;padding:0px;">
+    <input name="btnClose" type="button" zorder="1" value="" style="position:relative;margin-left:96px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/close_small_32bits.png)" onclick="OnClose"/>
+    <div style="width:128px;height:128px;margin:0px;padding:0px;background:Texture/Aries/Dock/SunFlowerOuter_32bits.png;" class="box">
+        <div style="width:128px;height:128px;background:Texture/Aries/Dock/SunFlowerInner_32bits.png;" class="box" >
+            <div style="margin-top:48px;">
+                <div style="margin-left:19px;"><pe:name nid='<%=SelectOPC.GetNid()%>'></pe:name></div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-left:28px;margin-top:-5px;">
+        <div>
+            <input type="button" name="view_profile" value = "玩家资料" class = "button"
+                onclick="SelectOPC.DoClick"
+                />
+        </div>
+        <div>
+            <input type="button" name="view_space" value = "它的空间" class = "button"
+                onclick="SelectOPC.DoClick"
+                />
+        </div>
+    </div>
+</div>
+
+</pe:mcml> 
+</body>
+</html>
+

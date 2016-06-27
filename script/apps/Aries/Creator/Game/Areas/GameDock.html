@@ -1,0 +1,54 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/GameDock.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="GameDock.lua"><![CDATA[
+GameDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameDock");
+GameDock.OnInit();
+
+if(not GameDock.ds_game_buttons) then
+    if(System.options.version == "kids") then
+        GameDock.ds_game_buttons = {
+            --{name="player_builder", tooltip="建造静态积木", onclick=GameDock.OnToggleBuilder, style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            --{name="creator_machine", tooltip="合成特殊关卡道具", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/castmachine_btn_32bits.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            {name="screenshot", tooltip="拍照,分享", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/share_btn_32bits.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            {name="system", tooltip="系统", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/system_btn_32bits.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+        }
+    else
+        GameDock.ds_game_buttons = {
+            --{name="player_builder", text="建造", tooltip="建造静态积木", onclick=GameDock.OnToggleBuilder, style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.teen.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            --{name="creator_machine", text="合成", tooltip="合成特殊关卡道具", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/castmachine_btn_32bits.teen.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            {name="screenshot", text="拍照", tooltip="拍照,分享", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/share_btn_32bits.teen.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+            {name="system", text="系统", tooltip="系统", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/system_btn_32bits.teen.png#0 0 50 55)", onclick=GameDock.OnToggleBuilder},
+        }
+    end
+end
+function Ds_Func_Game(index)
+    if(not index) then
+        return #(GameDock.ds_game_buttons);
+    else
+        return GameDock.ds_game_buttons[index];
+    end
+end
+]]></script>
+<div style="position:relative;height:42px;margin-top:18px;width:135px;"  class="creator_dock_bg"/>
+<div style="margin-left:15px;">
+    <pe:gridview name="buffview" ItemsPerLine="12" AllowPaging="false" DefaultNodeHeight = "55" pagesize="12" DataSource='<%=Ds_Func_Game%>'>
+	    <Columns>
+            <input type="button" name='<%=Eval("name")%>' tooltip='<%=Eval("tooltip")%>' style='<%=Eval("style")%>' onclick="GameDock.OnToggleBuilder()"/>
+            <pe:if condition='<%=Eval("text")~=""%>'>
+                <div style="float:left;position:relative;margin-left:-50px;margin-top:35px;width:55px;text-align:center;font-size:14px;color:#76e6ad;font-weight:bold;shadow-color:#80025487" class="bordertext">
+                    <%=Eval("text")%>
+                </div>
+            </pe:if>
+        </Columns>
+    </pe:gridview>
+</div>
+</pe:mcml> 
+</body>
+</html>

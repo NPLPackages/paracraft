@@ -1,0 +1,68 @@
+<quest>
+  <!--<id>1001</id>: file name is used as id-->
+  <title>quest title</title>
+  <detail>Detailed quest description here</detail>
+  <icon></icon>
+  <!--precondition must be met before quest is active-->
+  <precondition>
+    <quest id="quest1000" value="1" />
+    <item id="101" value="1" topvalue="40" />
+  </precondition>
+  <!--goals must be completed before quest can be completed-->
+  <goals></goals>
+  <!--items to be substracted when quest is completed. -->
+  <cost>
+    <items id="0" choice="-1">
+      <itemstack id="100" count="1" />
+    </items>
+  </cost>
+  <!--items to be given when quest is completed, according to the user's choice. -->
+  <reward>
+    <items id="0" choice="-1">
+      <itemstack id="103" count="1" />
+    </items>
+    <items id="1" choice="1">
+      <itemstack id="104" count="1"/>
+    </items>
+  </reward>
+  <!--dialogs to show when quest is active, but can not be completed. -->
+  <startdialog>
+    <dialog>
+      <item>
+        <avatar></avatar>
+        <content>
+          this is dialog to show before quest is accepted
+        </content>
+        <buttons>
+          <button action="gotonext">OK, what is next?</button>
+        </buttons>
+      </item>
+      <item>
+        <avatar></avatar>
+        <content>click the button to accept this quest. when quest is accepted, a virtual item is written to the quest log. </content>
+        <buttons>
+          <button action="doaccept" >OK. I will accept the quest</button>
+        </buttons>
+      </item>
+    </dialog>
+  </startdialog>
+  <!--dialogs to show when quest can be completed. -->
+  <enddialog>
+    <dialog>
+      <item>
+        <avatar></avatar>
+        <content>
+          congratulations, you have completed the quest so fast
+        </content>
+        <buttons>
+          <button action="dofinished" >you are welcome</button>
+        </buttons>
+      </item>
+    </dialog>
+  </enddialog>
+  <!--if quest is not repeatable, we will generate an internal quest finished item.-->
+  <repeatable>0</repeatable>
+  <acceptquestsilentmode>1</acceptquestsilentmode>
+  <finishquestsilentmode>0</finishquestsilentmode>
+  <autoshowstartdialog>1</autoshowstartdialog>
+</quest>

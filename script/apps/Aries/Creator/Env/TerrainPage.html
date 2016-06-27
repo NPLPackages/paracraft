@@ -1,0 +1,27 @@
+﻿<!-- "script/apps/Aries/Creator/Env/TerrainPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Terrain Editing Page by LiXizhi 2010.1.26</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" src="TerrainPage.lua"><![CDATA[
+MyCompany.Aries.Creator.TerrainPage.OnInit();
+]]></script>
+<div style="position:absolute;margin-left:200px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.MainToolBar.ReturnToEditMode()" value=""/>
+</div>
+<div style="font-size:12px;width:250px;padding-left:30px;padding-top:35px;padding-right:35px;padding-bottom:60px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<pe:tabs name="TerraTabs" style="background:;" TextFont="System;12;norm" >
+  <pe:tab-item name="paintTab" text="地表图图" selected="true" onclick="MyCompany.Aries.Creator.TerrainPage.OnClickPaintTab()">
+    <iframe name="TerraPaintFrame" src="TerraPaintPage.html"></iframe>
+  </pe:tab-item>
+  <pe:tab-item name="elevTab" text="愚公移山" onclick="MyCompany.Aries.Creator.TerrainPage.OnClickFormTab()">
+    <iframe name="TerraFrame" src="TerraFormPage.html"></iframe>
+  </pe:tab-item>
+</pe:tabs>  
+</div>
+</pe:mcml>
+</body>
+</html>

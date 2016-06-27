@@ -1,0 +1,50 @@
+﻿<pe:mcml>
+<script type="text/npl" refresh="false" src="TeleportListPage.lua">
+TeleportListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.TeleportListPage");
+TeleportListPage.Init()
+function OnClose()
+    Page:CloseWindow();
+end
+</script>
+<aries:window mode="thin" title='<%=L"位置信息"%>' style="width:260px;" onclose="OnClose">
+<div style="color: #ffffff; margin-bottom: 10px; margin-right: 8px;" width="100%" >
+<form name="PEToolsObjInstancesEditorForm">
+    <div><%=format(L"实例数据: %s [%d]个", (TeleportListPage.name or ""), #(TeleportListPage.GetDataSource()))%></div>
+    <Resource style="display:none" name="SampleDataSource">
+        <instance index="1" position="0,0,0" facing="0" scaling="1" >
+            <goto /><set_current /><view/>
+        </instance>
+        <instance index="2" position="2,2,2" facing="2" scaling="2" >
+            <goto /><set_current /><view/>
+        </instance>
+    </Resource>
+    <div class="mc_paper_panel">
+        <pe:treeview name="tvwObjInstances" DataSource='<%=TeleportListPage.GetDataSource()%>' DefaultNodeHeight="26" style="height:300px;background:;">
+            <NodeTemplates>
+		        <NodeTemplate DataType="instance">
+                    <pe:treenode OnClick="TeleportListPage.OnClickInstance" can_select="true" text='<%=format("[%s]%s %s", tostring(XPath("this|index")), XPath("this|name") or "",  XPath("this|position") or "")%>' tooltip='<%=format("pos{%s}, facing:%s, scaling:%s", XPath("this|position") or "", XPath("this|facing") or "", XPath("this|scaling") or "")%>'></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="goto">
+                    <pe:treenode indent="20" icon="Texture/3DMapSystem/common/world_go.png" text='<%=L"传送到这个位置"%>' OnClick="TeleportListPage.GotoNode"></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="set_current">
+                    <pe:treenode indent="20" icon="Texture/3DMapSystem/common/wand.png" text='<%=L"使用当前人物位置"%>' OnClick="TeleportListPage.UserCurrentPosition"></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="view">
+                    <div style="margin:3px;margin-left:25px;">
+                        <%=L"位置:"%> <input type="text" style="margin-right:10px;height:22px;" width="100%" value='<%=XPath("this|position")%>'/><br />
+                        <%=L"名称:"%> <input type="text" style="margin-right: 10px; height: 22px;" width="100%" value='<%=XPath("this|name")%>' onchange="TeleportListPage.OnSetName"/>
+                        <!--<%=L"方向:"%> <input type="text" style="width:30px;margin-right:10px" value='<%=XPath("this|facing")%>'/>
+                        <%=L"放缩:"%> <input type="text" style="width:30px;" value='<%=XPath("this|scaling")%>'/>-->
+                    </div>
+                </NodeTemplate>
+            </NodeTemplates>
+	        <DataNodePlaceholder xpath="*"/>
+        </pe:treeview>
+    </div>
+    <input type="button" name="AddInstance" value='<%=L"添加实例"%>' class="mc_light_grey_button_with_fillet" onclick="TeleportListPage.AddInstance"/>
+    <input type="button" style="margin-left:5px;" name="RemoveInstance" class="mc_light_grey_button_with_fillet" value='<%=L"删除实例"%>' onclick="TeleportListPage.RemoveInstance"/>
+</form>
+</div>
+</aries:window>
+</pe:mcml>

@@ -1,0 +1,54 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/CreateNewItem.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CreateNewItem.lua"><![CDATA[
+CreateNewItem = commonlib.gettable("MyCompany.Aries.Game.GUI.CreateNewItem");
+CreateNewItem.OnInit()
+function OnClose()
+    Page:CloseWindow();
+end
+
+function DS_Func_Items(index)
+    if(not index) then
+        return #(CreateNewItem.itemStackArray);
+    else
+        return CreateNewItem.itemStackArray[index];
+    end
+end
+
+function OnSelectItem(blockId, mcmlNode)
+    CreateNewItem.result = mcmlNode:GetPreValue("this", true);
+    OnClose();
+end
+]]></script>
+<div style="padding:5px;padding-bottom:10px;max-width:400px;" class="mc_panel">
+    <div>
+        <div style="margin-left:8px;" class="default">
+            <input type="button" tooltip='<%=L"关闭"%>' name="cancel" DefaultButton="true" align="left" style="margin-right:5px;width:24px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='X' />
+            <%=L"新建物品"%>
+        </div>
+        <pe:repeat DataSource="<%=CreateNewItem.itemStackArray%>">
+            <pe:repeatitem>
+                <div style="float:left;margin-left:8px;margin-top:4px;" class="mc_item">
+                    <pe:mc_block block_id='<%=Eval("id")%>' onclick="OnSelectItem" style="margin:1px;width:32px;height:32px;"></pe:mc_block>
+                </div>
+            </pe:repeatitem>
+        </pe:repeat>
+        <!--<pe:gridview name="NewItems" style="height:300px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Items%>" CellPadding="0" DefaultNodeHeight="38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:8px;margin-top:4px;font-weight:bold;" class="mc_item">
+                    <pe:mc_block block_id='<%=Eval("id")%>' onclick="OnSelectItem" style="margin:1px;width:32px;height:32px;"></pe:mc_block>
+                </div>
+            </Columns>
+        </pe:gridview>-->
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ChangeLanguagePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2015.9.22</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Translation.lua");
+local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
+curLang = Translation.GetCustomLanguage() or "auto";
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOk()
+    ClosePage();
+end
+
+function DS_Languages()
+    return {
+        {name="auto", text=L"系统默认:"..Translation.GetSystemLanguage()},
+        {name="enUS", text="English"},
+        {name="zhCN", text="简体中文"},
+    }
+end
+
+function OnSelectLanguage(name)
+    if(name) then
+        Translation.SetCustomLanguage(name, true);
+        Page:Refresh(0.01);
+    end
+end
+]]></script>
+<aries:window title='<%=L"更改语言..."%>' mode="thin" onclose="ClosePage" style="width:350px;">
+    <div style="margin:10px;color:#ffffff;">
+        <%=L"请选择当前使用的语言:"%>
+    </div>
+    <pe:gridview style="margin:10px;height:230px" name="gvwModTable" CellPadding="5"  AllowPaging="false" DefaultNodeHeight = "20" ItemsPerLine="1"
+            DataSource="<%=DS_Languages()%>" >
+	    <Columns>
+		    <pe:if condition='<%=curLang==Eval("name")%>'>
+                <input name='<%=Eval("name")%>' type="button" value='<%=Eval("text")%>' style="width:300px;height:46px;font-size:18px;base-font-size:18px;" class="mc_button_green"/>
+            </pe:if>
+            <pe:if condition='<%=curLang~=Eval("name")%>'>
+                <input name='<%=Eval("name")%>' type="button" value='<%=Eval("text")%>' style="width:300px;height:46px;font-size:18px;base-font-size:18px;" onclick="OnSelectLanguage" class="mc_button_grey"/>
+            </pe:if>
+	    </Columns>
+	    <EmptyDataTemplate>
+	    </EmptyDataTemplate>
+	    <FetchingDataTemplate>
+	    </FetchingDataTemplate>
+    </pe:gridview>
+    <div style="margin-top:15px;margin-bottom:20px;">
+        <input type="button" value='<%=L"关闭"%>' align="right" style="float:left;margin-right:20px;min-width:108px;height:32px;" onclick="ClosePage" class="mc_light_grey_button_with_fillet"/>
+    </div>
+</aries:window>
+
+</pe:mcml>
+</body>
+</html>

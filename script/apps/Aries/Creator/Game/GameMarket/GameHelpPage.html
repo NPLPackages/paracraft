@@ -1,0 +1,196 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/GameHelpPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="GameHelpPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local GameHelpPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameHelpPage");
+GameHelpPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+]]></script>
+<div style="width:680px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >新版创意空间指南</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px;margin-bottom:7px;">
+        <pe:tabs name="help" class="tabs" >
+            <pe:tab-item name="key" text="基本操作" selected="true" style="padding-top:0px;padding:10px;padding-bottom:10px">
+                <b>游戏模式：</b>
+                <div style="margin-left:10px;">
+                    E键:打开背包; WASD键行走. Q键: 扔掉手中的方块<br />
+                    长按鼠标左键不放:删除; 点击鼠标右键创建物体<br />
+                    X键: 与最近的NPC对话<br />
+                    F键：进入/退出飞行模式. Space上升, X下降<br />
+                    右键点击快捷栏中物品：可移动物品<br />
+                    双击并按住W键可加速奔跑。～键打开望远镜<br />
+                    鼠标滚轮切换物品, Ctrl+鼠标滚轮:摄影机距离<br />
+                </div>
+                <b>创造模式：</b>
+                <div style="margin-left:10px;">
+                    Ctrl+Z: 撤销上一步操作;  Ctrl+Y: 反撤销; Ctrl+D:切换选择区<br />
+                    Shift+左键: 创造模式: 删除选择块周围3*3内的所有同类的块。<br />
+                    Shift+右键: 复制当前鼠标的块直到被拦截 （创建线）<br />
+                    Alt+左键: 用当前块替换手中的块<br />
+                    Alt+右键: 用当前块替换与鼠标所在的块（替换单个颜色的块）<br />
+                    Alt+Shift+右键: 用当前块替换与鼠标所在的块相连的所有块 （批量替换颜色）<br />
+                    Ctrl+左键: 进入选择多块AABB选择模式。 再次Ctrl+左键可以增加新的选择， 左键点击任意地方退出选择模式。Ctrl+左键拖动：区域选择  <br />
+                    实数地表上长按左键不放手可选择地面<br />
+                    TAB: 角色向上一层; Shift+TAB: 角色向下一层<br />
+                    Ctrl+S: 快速保存; Ctrl+F12: 隐藏UI<br />
+                    左键选择人物或模型， Ctrl+左键（可以选择多块积木）<br />
+                    - 再次点击左键可以移动，Ctrl+左键可以复制多分<br />
+                    当选中多块积木时， shift+左键, 可以移动当前选中的所有积木到新的位置<br />
+                    鼠标中键瞬移. F3查看位置信息
+                </div>
+            </pe:tab-item>
+            <pe:tab-item name="key" text="命令" style="padding:10px;padding-bottom:10px">
+Enter键然后在聊天框中输入下面指令<br />
+/save:存盘<br />
+/ring radius [thickness]: 创建环形<br />
+/circle radius: 创建圆形<br />
+/create [id|filename] [bx] [by] [bz] 创建名为[filename]的模型或ID的物品<br />
+/del: 删除当前选中的块<br />
+/del -below [radius:1-256]: 删除当前人物高度以下的虽有所有块<br />
+/del -mode [real|block]：更改删除模式 实数或积木<br />
+/terrain -r [radius:1-256]: 删除当前人物周围的实数地表<br />
+/terrain -repair [radius:1-256]: 恢复当前人物周围的实数地表<br />
+/tp x y z: 传送到指定3D位置 /tp x z: 传送到指定2D位置  /tp home 返回出生点<br />
+/goto x y z: 传送到指定块的位置. 
+/home 回家  /sethome 设置出生点<br />
+/fps:第一人称<br />
+/sel [radius] [height]:选择人物下方的方块<br />
+/replace [-all] [from_id] [to_id] [radius]: 批量替换块. radius默认为256.<br />
+/fill [block_id]: 选中区域用制定的块填充<br />
+/where 当前tile的Pos<br />
+/hide 隐藏当前角色  /hide desktop 隐藏UI<br />
+/show 显示当前角色  /show desktop 显示UI<br />
+/day [minutes_in_a_day] 多少分钟为1天. 无参数表示无限长<br />
+/time [-1,1] 设置当前时间, 0或空位是中午,-1或1是晚上<br />
+
+            </pe:tab-item>
+             <pe:tab-item name="key" text="命令2" style="padding:10px;padding-bottom:10px">
+Enter键然后在聊天框中输入下面指令<br />
+/shader 2 切换到高级渲染 /shader 1 切换到普通渲染<br />
+/shadow [0,1] <br />
+/skin [filename or id] 更换主角贴图皮肤. 空是随机<br />
+/renderdist [10-200] 可视距离<br />
+/light [0,2] [0,2] [0,2] 设置发光块的颜色. <br />
+/text [-w] [-p] [string] 在下方显示电影文字 -w  用户必须等待  -p  用户点击鼠标才继续<br />
+/tip [-name] string 在中间显示广播Tip消息. name是名字 <br />
+/addrule name value 增加游戏规则<br />
+/rule 显示游戏规则<br />
+/rule [reset|reload] 重置或加载游戏规则<br />
+/dostring any_script_in_sandbox 运行一行脚本<br />
+/take [block] 将物品拿在手中<br />
+/give [block] 将物品送给人物<br />
+/setblock x y z [block] [data] 创建或消除方块（绝对位置）<br />
+/setblock ~-1 ~1 ~ (~-1 ~2 ~) [block] [data] 创建或消除一组2*3*1的方块（相对位置）<br />
+/clearbag 清空人物的背包<br />
+/offsetworld offsetY 将整个世界纵向移动offsetY格子(慎用)<br />
+            </pe:tab-item>
+            <pe:tab-item name="combo" text="命令3" style="padding:10px;padding-bottom:10px">
+/mode [game|editor]  锁定游戏模式，无法用Ctrl+G切换. <br />
+/gravity [@playername] [value|9.8] 设置重力加速度<br />
+/speedscale [value|1] 设置人物运动相对速度。1是默认速度<br />
+/viewbobbing [true|false] 摄影机摇摆<br />
+/clone [-update] from_x from_y from_z (dx dy dz) to to_x to_y to_z (dx dy dz) [where sameblock]<br />
+/density  1.2  设置人物的密度<br />
+/name [name#tooltip1#tooltip2] 给手中的物品起名字<br />
+/t seconds  [/其他命令]  在seconds秒后执行后面的命令<br />
+/move [@playername] [x y z] 可以移动指定人物到指定位置<br />
+/velocity [add|set] [@playername] x [y] [z] 增加|设置动物或人物的速度<br />
+/speeddecay [@playername] [surface_decay] [air_decay] 设置动物或角色在地面和空气中的摩擦力<br />
+/facing [@playername] angle 可以设置人物方向<br />
+/lookat [@playername] [x y z] 让当前人物看某个人物或方向<br />
+/scaling [@playername] size 改变人物的大小<br />
+/tickrate [@playername] rate 改变人物的更新刷新率，默认20. 30或60都OK<br />
+/fov [fieldofview:1.57] [animSpeed]  可以改变摄影机的FieldOfView<br />
+/loadworld [worldname|url|filepath]  可以在世界中切换世界<br />
+/loadregion [x y z] [radius] 强制加载所在位置坐标的地形范围的东西<br />
+/rain [strength] 、 /rain [strength] 开启<br />
+/record 开启关闭视频输出<br />
+/end 终止电影片段 例如 /t 30 /end  30秒后停止播放.<br />
+/movieclip [-stop]     暂停当前的电影片段<br />
+            </pe:tab-item>
+            <pe:tab-item name="combo" text="命令4" style="padding:10px;padding-bottom:10px">
+/music [filename|1~6] [from_seconds]  播放指定ID的背景音乐或文件<br />
+/loadtemplate [x y z] templatename<br />
+/loadtemplate -a [seconds] [templatename]  模拟人创建场景的过程<br />
+/loadtemplate -r [templatename] 清空场景<br />
+/savetemplate [templatename] 保存模板，原点为Pivot<br />
+/durability [value] 设置目前手中装备的耐久度<br />
+/testblock x y z [(dx dy dz)] blockid [data]  用来判断目标或一个区域是否为指定方块<br />
+/compareblocks ~ ~-1 ~ (2 2 2) to ~5 ~ ~ 比较2个矩形区域中的方块是否完全一样<br />
+/anim [@playername] anim_name[,anim_name,...] 让人物做动作<br />
+/flood [radius or 10] [block_id] [x] [y] [z] 用水的方式填充人物所在区域<br />
+/unflood [radius or 10] [x] [y] [z] 吸干人物所在区域的水<br />
+/ellipsoid radiusX radiusY radiusZ beSolid  画椭圆体<br />
+/blockimage [-xy|-yz|-xz] [colors] filename [x y z] 将任意图片转换为方块<br />
+/sky [-tex] [sim|white|green|filename] 改变天空或天空的贴图.<br />
+/fog [-color|skycolor|fogstart|fogend] values  改变雾的颜色和距离<br />
+/torchcolor [r] [g] [b] 改变光源（火把）的颜色<br />
+/applytexturepack [folder_or_zipfile] 应用指定文件和目录的材质包。<br />
+/registeritem [block_id:2000-2999] texture [base_block_id]  创建新的物品类型。<br />
+例如: /registeritem 2000 Texture/blocks/lapis_ore.png 234<br />
+/hsv [h s v] [multiply_r multiply_g multiply_b] 调节整个屏幕的色相与饱和度<br />
+/grey [r g b] [glow_r glow_g glow_b] 开启全屏灰色效果<br />
+/viewport [@id] [alignment:_lt|_fi|_rt] [left] [top] [width] [height]改变主视图<br />
+/stereo [on|off] [eye_dist] 开启关闭3D立体输出模式<br />
+            </pe:tab-item>
+<pe:tab-item name="combo" text="逻辑命令" style="padding:10px;padding-bottom:10px">
+/set -p name [=] prompt_msg  可以提示用户输入文字。<br />
+/set -p password=请输入密码:<br />
+/t ~1 /tip 你输入的密码是%password%<br />
+/call [code with return value] 执行任意代码. 例如:<br />
+/set mode=/call return GameLogic.GameMode:GetMode()<br />
+/if %mode%== "editor" /tip you are in editor mode<br />
+/if var1==var2 /othercommand   当var1==var2 时，运行后面的指令。命令支持>= > ==  <= < 操作符号<br />
+/jumpto [line_offset|end|begin]  跳转到指定位置的代码。<br />
+<div>
+/if %name% == "0" /jumpto 3<br />
+/tip your name is NOT 0<br />
+/jumpto end<br />
+/tip your name is 0<br />
+</div>
+/activate [x y z]   可以激活自己或其它方块。 可以用命令方块写GameLoop了。<br />
+/return [number|bool] 返回true<br />
+/pause  暂停当前人物或命令方块的所有/t指令的执行<br />
+/resume  继续当前人物或命令方块的所有/t指令的执行<br />
+/advancetime [~][time] 快进当前人物或命令方块的时间。 无参数表示快进到下一个关键帧。 ～表示相对时间否则是绝对时间。<br />
+/open [-p] url   可以打开URL地址. -p表示需要取得用户同意确认<br />
+/disableinput [@playername] [x y z] [true|false]  禁止命令方块，含羞草，或人物等Entity的所有输入.
+在命令行中加入，可以产生让剧情对话只能看一遍的效果<br />
+</pe:tab-item>
+<pe:tab-item name="net" text="网络" style="padding:10px;padding-bottom:10px">
+/startserver [ip_host] [port]  开启个人服务器<br />
+/connect [ip] [port] [username] [password]  链接到别人的服务器<br />
+/chat XXX  联网模式下可以聊天<br />
+/register username password  注册一个新用户: 用户数据在/config/ParaCraft/password.txt文件中, 管理员可自己添加。 如果删除这个文件为可自由加入. <br />
+/unregister username   删除一个用户<br />
+/configserver 打开服务器配置目录<br />
+</pe:tab-item>
+            <pe:tab-item name="combo" text="组合" style="padding:10px;padding-bottom:10px">
+                传送块的下方是发光块时， 人物站到传送块上后会自动触发记忆，如果没有记忆则移动到邻近的传送块<br />
+                水块会根据周围的块改变自己的形状<br />
+            </pe:tab-item>
+            <pe:tab-item name="combo" text="设置" style="padding:10px;padding-bottom:10px">
+                alt+ctrl+PageUp|PageDown: 调整摄影机高度<br />
+                F9: 开始/结束视频录制<br />
+                SHIFT: 缓慢移动, 在摄影机模式下为无视物理碰撞. 
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

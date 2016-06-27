@@ -1,0 +1,44 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Neuron/Mod/MovieText.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="MovieText.lua"><![CDATA[
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+MovieText = commonlib.gettable("MyCompany.Aries.Game.Mod.MovieText");
+MovieText.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickScreen()
+    if(mouse_button=="left")then
+        MovieText.result = "click_screen"
+        ClosePage();
+    end
+end
+
+function GetContent()
+    return MovieText.GetContent()
+end
+]]></script>
+<pe:container alignment="_mt" ClickThrough="true" width="0" height="60" style="background-color:#04131eee">
+</pe:container>
+<pe:container alignment="_fi" zorder="-1" name="btnCanvas" onclick="OnClickScreen" style="background:url()">
+</pe:container>
+<pe:container alignment="_mb" ClickThrough="true" width="0" height="145" style="background-color:#04131eee">
+    <pe:container alignment="_ctt" ClickThrough="true" width="940" height="145" style="background:;">
+        <pe:container style="color:#52dff4;base-font-size:16;font-size:16;font-weight:bold;line-height:16px;background:" valign="center">
+            <div style="min-height:40px;">
+                <%=GetContent() %>
+            </div>
+        </pe:container>
+    </pe:container>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>

@@ -1,0 +1,83 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/EditorModeSwitchPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EditorModeSwitchPage.lua"><![CDATA[
+EditorModeSwitchPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EditorModeSwitchPage");
+EditorModeSwitchPage.OnInit();
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+
+
+function OnEsc()
+    -- trigger esc
+    local input = Map3DSystem.InputMsg;
+    NPL.load("(gl)script/ide/event_mapping.lua");
+
+    local event_map = Event_Mapping;
+    input.virtual_key = event_map.EM_KEY_ESCAPE;
+    input.wndName = "key_down";
+    input.IsSceneEnabled = ParaScene.IsSceneEnabled()
+    -- call hook for "input" application
+    if(CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROC, 0, "input", input) ==nil) then
+        return
+    end
+end
+function OnHelp()
+    -- trigger help
+    local input = Map3DSystem.InputMsg;
+    NPL.load("(gl)script/ide/event_mapping.lua");
+
+    local event_map = Event_Mapping;
+    input.virtual_key = event_map.EM_KEY_F1;
+    input.wndName = "key_down";
+    input.IsSceneEnabled = ParaScene.IsSceneEnabled()
+    -- call hook for "input" application
+    if(CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROC, 0, "input", input) ==nil) then
+        return
+    end
+end
+function OnToggleView()
+    -- trigger help
+    local input = Map3DSystem.InputMsg;
+    NPL.load("(gl)script/ide/event_mapping.lua");
+
+    local event_map = Event_Mapping;
+    input.virtual_key = event_map.EM_KEY_F5;
+    input.wndName = "key_down";
+    input.IsSceneEnabled = ParaScene.IsSceneEnabled()
+    -- call hook for "input" application
+    if(CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROC, 0, "input", input) ==nil) then
+        return
+    end
+end
+function OnTakeScreenShot()
+    -- trigger screenshot
+    local input = Map3DSystem.InputMsg;
+    NPL.load("(gl)script/ide/event_mapping.lua");
+
+    local event_map = Event_Mapping;
+    input.virtual_key = event_map.EM_KEY_F3;
+    input.wndName = "key_down";
+    input.IsSceneEnabled = ParaScene.IsSceneEnabled()
+    -- call hook for "input" application
+    if(CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROC, 0, "input", input) ==nil) then
+        return
+    end
+end
+
+function ShowCreator()
+    GameLogic.ToggleDesktop("builder");
+end
+
+]]></script>
+<div style="margin-left:0px;width:32px;height:80px;" onclick="ShowCreator" >
+    <input type="button" style="margin-left:15px;width: 17px; height: 76px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#354 127 17 76);" />
+</div>
+</pe:mcml>
+</body>
+</html>

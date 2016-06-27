@@ -1,0 +1,48 @@
+﻿<!-- "script/apps/Aries/Creator/AI/RenamePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.2.2 LiXizhi</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false" src="RenamePage.lua"><![CDATA[
+local RenamePage = commonlib.gettable("MyCompany.Aries.Creator.AI.RenamePage")
+RenamePage.OnInit();
+
+function ClosePage()
+	Page:CloseWindow();
+end
+
+]]></script>
+<div style="width:350px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >人物属性</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:10px;margin-right:10px;margin-bottom:12px;">
+        <div>
+            <div style="float:left;width:90px;text-align:right">名字：</div>
+            <div style="float:left;"><input type="text" name="_name" style="width:180px;height:25px"/></div>
+        </div>
+        <div>
+            <div style="float:left;width:90px;text-align:right">人物模型：</div>
+            <div style="float:left;">
+                <div>
+                    <input type="text" name="assetfile" style="height:25px"/>
+                </div>
+                <div>
+                    <pe:if condition='<%=System.options.version == "kids" %>'>
+                        点击<a href="">这里</a>查看更多可用资源
+                    </pe:if>
+                </div>
+            </div>
+        </div>
+        <div style="width:90px;" align="right">
+            <input type="button" name="OK"  value="确定" class="button" style="margin-top:20px;width:80px;" onclick="MyCompany.Aries.Creator.AI.RenamePage.DoSave()"/>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

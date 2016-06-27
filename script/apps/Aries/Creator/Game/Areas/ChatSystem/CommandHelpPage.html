@@ -1,0 +1,164 @@
+﻿<!-- "script/apps/Aries/BBSChat/ChatSystem/CommandHelpPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ChatWndow, by zrf, 2011/3/9</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="CommandHelpPage.lua"><![CDATA[
+local page = document:GetPageCtrl();
+CommandHelpPage = commonlib.gettable("MyCompany.Aries.ChatSystem.CommandHelpPage");
+CommandHelpPage.Init();
+
+local width = 600;
+
+function DSBeEmpty()
+    local value;
+    if(next(CommandHelpPage.cur_ds)) then
+        value = false;
+    else
+        value = true;
+    end
+    return value;
+end
+
+function GetDS(index)
+    local ds = CommandHelpPage.cur_ds;
+    if(not index) then
+        return #ds;
+    else
+        return ds[index];
+    end
+end
+
+function OnShowCmdHelp()
+    local command = (CommandHelpPage.cur_ds)[1];
+    if(command and command.name) then
+        GameLogic.RunCommand("/wiki cmd_"..command.name);
+    end
+end
+
+function GetCommandStr()
+    local words;
+    local command = (CommandHelpPage.cur_ds)[1];
+    if(command) then
+        local title = string.format("<div style='font-weight:bold;'>%s <input type='button' value='%s' style='float:left;margin-left:10px;' onclick='OnShowCmdHelp' class='mc_button_blue' /></div><div>%s</div>",L"命令格式",L"帮助", command.quick_ref);
+
+        local param_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令参数");
+        local params = command.params;
+        if(next(params)) then
+            for i = 1,#params do
+                local param = params[i];
+                param_words = string.format("%s%s:%s",param_words,param.name,param.desc);
+                if(i < #params) then
+                    param_words = string.format("%s<br/>",param_words);
+                end
+            end
+        else
+            param_words = "";
+        end
+        local command_desc = string.format("<div style='font-weight:bold;'>%s</div><div>%s</div>",L"命令描述",command.desc);
+        
+        local instance_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令实例");
+        local instances = command.instances;
+        if(next(instances)) then
+            for i = 1,#instances do
+                local instance = instances[i];
+                instance_words = string.format("%s%s<br/>%s",instance_words,instance.content,instance.desc);
+                if(i < #instances) then
+                    instance_words = string.format("%s<br/>",instance_words);
+                end
+            end
+        else
+            instance_words = "";
+        end
+         
+        words = string.format("%s%s%s%s",title,param_words,command_desc,instance_words);
+    else
+        words = L"没有相应的命令存在";
+    end
+    
+    return words;
+end
+
+function ClosePage()
+    CommandHelpPage.ClosePage();
+end
+
+function GetStyle()
+    local height = CommandHelpPage.height + 10;
+
+    --[[
+    if(System.options.mc) then
+        height = 295;
+    else
+        height = 150;
+    end
+    ]]
+    local style = string.format("width:%dpx;height:%dpx;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:5 5 5 5);",width,height);
+    return style;
+end
+
+function GetBtnStyle(index)
+    local style;
+    if(index == CommandHelpPage.cur_cmd_index) then
+        style = string.format("margin-left:3px;width:%dpx;color:#ffffff;text-align:left;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8);",width-15)
+    else
+        style = string.format("margin-left:3px;width:%dpx;color:#ffffff;text-align:left;background:;",width-15)
+    end
+    return style;
+end
+
+function GetGridviewStyle()
+    local style = string.format("margin-left:5px;margin-top:5px;height:%dpx;width:590px;",CommandHelpPage.height)
+    return style;
+end
+
+function OnClickCmd(name,mcmlNode)
+    local index = mcmlNode:GetAttribute("param1");
+    if(CommandHelpPage.cur_cmd_index == index) then
+        CommandHelpPage.OnKeyUp_RETURN();
+    else
+        CommandHelpPage.cur_cmd_index = index;
+        Page:Refresh(0.01);
+    end
+    
+end
+
+function GetGridviewCellHight()
+    return CommandHelpPage.gridview_cell_hight;
+end
+
+function GetNotCmdDesc()
+    local word = string.format(L"不存在【%s】开头的命令",CommandHelpPage.cmd_name)
+    return word;
+end
+
+]]></script>
+<div style="<%=GetStyle()%>">
+    <pe:if condition ='<%=not CommandHelpPage.HasGotCommandName%>'>
+        <pe:gridview style='<%=GetGridviewStyle()%>' name="gvwCmds" CellPadding="0" VerticalScrollBarStep="29" AllowPaging="false" DefaultNodeHeight = "29"
+            DataSource='<%=GetDS%>'>
+	        <Columns>
+                <input type="button" onclick="OnClickCmd" param1='<%=Eval("index") %>' value='<%=Eval("quick_ref") %>' style='<%=GetBtnStyle(Eval("index")) %>' />
+            </Columns>
+	        <EmptyDataTemplate>
+                <div style="color:#ffffff">
+                    <%=GetNotCmdDesc() %>
+                </div>
+	        </EmptyDataTemplate>
+        </pe:gridview>
+    </pe:if>
+    <pe:if condition ='<%= CommandHelpPage.HasGotCommandName%>'>
+        <pe:treeview name="categories" style="background:;margin-top:5px;margin-bottom:5px;" VerticalScrollBarStep="29" >
+            <div style="color:#ffffff;margin-left:-5px;margin-right:5px;">
+                <%= GetCommandStr() %>
+            </div>
+        </pe:treeview>
+    </pe:if>
+</div>
+</pe:mcml> 
+</body>
+</html>

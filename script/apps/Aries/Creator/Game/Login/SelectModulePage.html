@@ -1,0 +1,118 @@
+<!-- "script/apps/Aries/Creator/Game/Login/SelectModulePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2014.4.1</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" src="SelectModulePage.lua"><![CDATA[
+local page = document:GetPageCtrl();
+local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
+
+function DS_Items(index)
+    return SelectModulePage.DS_Items(index);
+end
+
+function OnSwitchModStatus(name,mcmlNode)
+    local item = mcmlNode:GetPreValue("this",true);
+    item.checked = not item.checked;
+    SelectModulePage.OnSwitchModStatus(item.checked,item.name);
+    Page:Refresh(0.01);
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOk()
+    SelectModulePage.ResetLoadedMods();
+    ClosePage();
+end
+
+
+function CanUseMod()
+
+end
+
+function SwitchAllModStatus()
+
+end
+
+function OnOpenModDir()
+    Map3DSystem.App.Commands.Call("File.WinExplorer", SelectModulePage.dir);
+end
+
+SelectModulePage.url_getSDK = "https://github.com/LiXizhi/ParaCraftSDK";
+function OnGetSDK()
+    ParaGlobal.ShellExecute("open", SelectModulePage.url_getSDK, "", "", 1);
+end
+
+SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
+function OnInstallNewPlugins()
+    ParaGlobal.ShellExecute("open", SelectModulePage.url_installNewPlugins, "", "", 1);
+end
+    
+function OnCancel()
+    ClosePage();
+end
+]]></script>
+<aries:window title='<%=L"MOD加载"%>' mode="thin" onclose="ClosePage" style="width:600px;">
+    <!--<input type="button" value="禁用MOD" style="position:relative;margin-left:480px;margin-top:20px;width:70px;height:22px;font-size:14px;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="SwitchAllModStatus" class="mc_light_grey_button_with_fillet"/>-->
+    <pe:if condition='<%= System.options.isDevEnv == true %>'>
+        <div style="position:relative;margin-left:520px;margin-top:2px;color:#FF3030;">
+            <%=L"开发者版本"%>
+        </div>
+    </pe:if>
+    <div style="margin-left:5px;margin-top:10px;color:#ffffff;">
+        <input type="button" value='<%=L"安装新插件"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" onclick="OnInstallNewPlugins" tooltip='<%=SelectModulePage.url_installNewPlugins%>'/>
+        <input type="button" value='<%=L"下载SDK"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" onclick="OnGetSDK" tooltip='<%=SelectModulePage.url_getSDK%>' />
+        <pe:if condition='<%= System.options.isDevEnv == false %>'>
+            <input type="button" value='<%=L"打开目录"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" tooltip='<%=L"点击打开Mod所在文件夹"%>' onclick="OnOpenModDir" />
+        </pe:if>
+    </div>
+    <!--<div style="margin-left:15px;width:450px;min-height:55px;margin-top:10px;color:#ffffff;">
+        <%=L"请确保mod文件中包含正确编写脚本,否则可能会导致不可预期结果"%>
+    </div>-->
+    <div class = "mc_light_grey_button_with_fillet" style="margin-left:15px;margin-top:8px;width:560px;height:350px;">
+        <pe:gridview style="margin:10px" name="gvwModTable" CellPadding="5"  AllowPaging="false" DefaultNodeHeight = "20" ItemsPerLine="1"
+                DataSource="<%=DS_Items%>" >
+	        <Columns>
+		        <div style="color:#ffffff;" onclick="OnSwitchModStatus">
+                    <div style="float:left;" >
+                        <input type="checkbox" style="margin-top:2px;margin-right:3px" checked='<%=Eval("checked") %>' />
+                        <pe:if condition='<%=Eval("checked") %>'>
+                            <div style="float:left;min-width:60px;color:#81f515">
+                                <%=L"加载"%>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=not Eval("checked") %>'>
+                            <div style="float:left;min-width:60px;color:#ff6a00">
+                                <%=L"禁用"%>
+                            </div>
+                        </pe:if>
+                    </div>
+                    <div style="float:left;margin-left:10px;color:#ffffff;">
+                        <%=Eval("text") %>
+                    </div>
+                </div>
+	        </Columns>
+	        <EmptyDataTemplate>
+		        <b><%=L"无Mod"%></b>
+	        </EmptyDataTemplate>
+	        <FetchingDataTemplate>
+		        <b><%=L"无Mod"%></b>
+	        </FetchingDataTemplate>
+        </pe:gridview>
+    </div>
+    <div style="margin-top:15px;margin-bottom:20px;">
+        <input type="button" value='<%=L"确定"%>' style="float:left;margin-left:170px;width:108px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="OnOk" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" value='<%=L"取消"%>' style="float:left;margin-left:40px;width:108px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="OnCancel" class="mc_light_grey_button_with_fillet"/>
+    </div>
+</aries:window>
+
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,59 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/NewDesktopPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" ><![CDATA[
+local page = document:GetPageCtrl();
+
+CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
+CreatorDesktop.new_page = page;
+
+function GetTabviewButtons()
+    return CreatorDesktop.tabview_ds;
+end
+
+function OnChangeTabview(index)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua");
+    local BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
+    BuilderFramePage.isSearching = false;
+    CreatorDesktop.tabview_index = tonumber(index);
+    page:Refresh(0.01);
+end
+
+function ConvertCurPage()
+    CreatorDesktop.ShowNewPage()
+end
+
+function OnDummy()
+end
+]]></script>
+<pe:container style="width:257px;height:480px;background:;" onclick="OnDummy">
+    <input type="button" style="float: left; margin-top: 210px; width: 17px; height: 76px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#354 127 17 76);" onclick="ConvertCurPage" />    
+    <div style="float:left;margin-left:0px;width:240px;height:480px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 31 34:8 8 8 8);">
+        <div style="position:relative;margin-left:13px;margin-top:13px;width:240px">
+            <pe:repeat DataSource="<%=GetTabviewButtons()%>">
+                <pe:repeatitem style="float:left;width:50px;">
+                    <pe:if condition='<%=CreatorDesktop.tabview_index == Eval("index") %>' >
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:12px;margin-top:1px;color:#ffffff;font-size:14px;min-width:45px;height:26px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8)" />
+                    </pe:if>
+                    <pe:if condition='<%=CreatorDesktop.tabview_index ~= Eval("index") %>' >
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:12px;margin-top:4px;color:#ffffff;font-size:14px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        <div style="position:relative;margin-left:1px;margin-top:41px;width:240px;height:1px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#352 66 8 1:1 1 1 1)"/>
+        <div style="position:relative;margin-top:45px;width:240px;height:440px;">
+            <iframe name="building_wnd" src='<%=CreatorDesktop.GetTab().url or "" %>'></iframe>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

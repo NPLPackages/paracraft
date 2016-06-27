@@ -1,0 +1,131 @@
+﻿<!-- "script/apps/Aries/Creator/SharePhotosPageStandalone.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>save world page by LiXizhi 2008.6.27</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" refresh="false" src="SharePhotosPage.lua"><![CDATA[
+local SharePhotosPage = commonlib.gettable("MyCompany.Aries.Creator.SharePhotosPage")
+local image_path = SharePhotosPage.default_image_path or SharePhotosPage.DefaultSnapShot
+function OnInit()
+    local options = SharePhotosPage.ReadConfig();
+    Page:SetNodeValue("screenshot_path", options.SnapshotSaveDiskPath);
+
+    Page:SetNodeValue("CurrentSnapshot", image_path);
+
+    Page:SetNodeValue("checkIncludeUI", options.SnapshotIncludeUI);
+
+    Page:SetNodeValue("ShowHeadOnDisplay", options.ShowHeadOnDisplay);
+end
+OnInit();
+
+function OnClickIncludeUI(bChecked, mcmlNode)
+    SharePhotosPage.Options.SnapshotIncludeUI = bChecked;
+    MyCompany.Aries.Player.SaveLocalData("SharePhotosPage.options.SnapshotIncludeUI", bChecked, true);
+end
+
+function onClickShowHeadOnDisplay(bChecked, mcmlNode)
+    SharePhotosPage.Options.ShowHeadOnDisplay = bChecked;
+    MyCompany.Aries.Player.SaveLocalData("SharePhotosPage.options.ShowHeadOnDisplay", bChecked, true);
+end
+
+function OnClose()
+    Page:CloseWindow();
+end
+
+function OnSharePhotoSNS(name)
+    local content = Page:GetUIValue("share_text", "");
+    NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
+    local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
+    if(name == "pengyou") then
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.QQ, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+    elseif(name == "sina") then
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.Sina, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+    elseif(name == "baidu") then
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.BaiduTieba, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+    else
+        Platforms.CallMethod("postToFeed", {title="魔法哈奇我的作品", url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+    end
+end
+
+function OnOpenAlbum()
+    OnClose();
+    System.App.Commands.Call("File.MCMLWindowFrame", {
+			url = "script/apps/Aries/Creator/SharePhotosPageStandaloneCollections.html", 
+			name = "Aries.SharePhotosPageCollections",
+			app_key = MyCompany.Aries.app.app_key, 
+			isShowTitleBar = false,
+			DestroyOnClose = true, 
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = true,
+			enable_esc_key = true,
+			directPosition = true,
+				align = "_ct",
+				x = -640/2,
+				y = -530/2,
+				width = 640,
+				height = 530,
+		});
+end
+]]></script>
+
+<div style="position:relative;margin-left:490px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="OnClose()" value=""/>
+</div>
+<div style="width:540px;height:330px;padding-left:35px;padding-top:30px;padding-right:45px;padding-bottom:55px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<div>
+    <div style="float:left;margin-bottom:5px">
+        <div style="padding:2px;background:url(Texture/Aries/Creator/imageboarder.png: 3 3 3 3)">
+            <img name="CurrentSnapshot" style="width:200px;height:120px;"/>
+        </div>
+    </div>
+    <div style="float:left;margin-left:10px;margin-right:5px;margin-bottom:5px">
+        <div>
+            <div style="font-weight:bold">拍摄照片<div style="font-weight:normal;float:left;color:#808080">(快捷键F11)</div></div>
+            <div style ="margin-left:20px;margin:3px;">
+                <input type="button" value="拍照" onclick="MyCompany.Aries.Creator.SharePhotosPage.TakeSnapshot" class="button_highlight" style="min-width:70;" tooltip="点击F11键, 可以快速截图并自动命名保存到本地" name="TakeWorldImage" />
+            </div>
+            <!--<div style="font-weight:bold;margin-top:5px;margin-bottom:5px;">你想如何拍摄图片?</div>-->
+            <input type="checkbox" name="checkIncludeUI" onclick="OnClickIncludeUI" checked="false"/><div style="float:left" for="checkIncludeUI">包含UI界面</div><br />
+            <input type="checkbox" name="ShowHeadOnDisplay" onclick="onClickShowHeadOnDisplay"/><div style="float:left" for="ShowHeadOnDisplay">包含人物头顶文字</div><br />
+            <!--<div style="margin-top:5px;">
+            <div style="float:left">选择保存路径:</div>
+             <select name="screenshot_path" style="width:120px;height:22px;">
+                <option value="default" selected="true">默认路径</option>
+                <option value="my_documents">我的文档</option>
+                <option value="my_photos">我的图片收藏夹</option>
+             </select>
+             </div>-->
+             <div style="margin-top:5px;">
+                <input type="button" class="button" value="从相册中选..." name="openAlbum" style="" onclick="OnOpenAlbum" tooltip="点击打开我的画册"/>
+                <input type="button" class="button" value="打开目录" name="openDiskAlbum" style="margin-left:5px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/>
+             </div>
+        </div>
+    </div>
+</div>
+<div style="background:url(Texture/Aries/ChatSystem/kids/chatbox_bg_32bits.png: 6 6 6 6);">
+<textarea type="text" rows="2" name="share_text" value="《魔法哈奇》3D创想乐园"/>
+</div>
+<div style="height:32px;margin-top:5px;margin-bottom:5px;">
+    <pe:if condition='<%=(System.options.platform_id==nil)%>' >
+        <input type="button" name="SharePhoto" value="分享图片" class="button_highlight" onclick="OnSharePhotoSNS" style="margin-top:3px;margin-bottom:5px;min-width:90;height:26px;" tooltip="分享到QQ空间,微博&#10;第一次分享会有仙豆奖励，魔法星用户领取的奖励会翻倍。&#10;第二次分享奖励再次翻倍，魔法星用户领取的奖励也会翻倍。" />
+    </pe:if>
+    <div style="float:left;margin-left:5px;">
+       <a href="http://qzone.qq.com/" tooltip="点击查看QQ空间中的图片"  ><img src="Texture/Aries/Advertisement/SNS/qzone_icon_32bits.png" style="width:32px;height:32px" /><div style="float:left;margin-top:5px;margin-left:2px;height:20px;">查看</div></a>
+       <!--<a href="http://t.qq.com" ><img src="Texture/Aries/Advertisement/SNS/qqweibo_icon_32bits.png" style="width:32px;height:32px" /><div style="float:left;margin-top:5px;margin-left:2px;height:20px;">QQ微博</div></a>-->
+       <input type="button" name="pengyou" value="" animstyle="12" tooltip="分享当前图片到朋友网" class="button" onclick="OnSharePhotoSNS" style="margin-left:5px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Advertisement/SNS/pengyou_icon_32bits.png)" />
+       <input type="button" name="sina" value="" animstyle="12" tooltip="分享当前图片到新浪微博" class="button" onclick="OnSharePhotoSNS" style="margin-left:5px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Advertisement/SNS/sina_icon_32bits.png)" />
+       <input type="button" name="baidu" value="" animstyle="12" tooltip="分享当前图片到百度贴吧" class="button" onclick="OnSharePhotoSNS" style="margin-left:5px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Advertisement/SNS/baidu_icon_32bits.png)" />
+    </div>
+</div>
+<hr />
+<div style="float:left;margin-left:5px;font-size:11px;color:#808080">分享可以<span style='color:#00a000'>免费得仙豆</span>！</div>
+<img style="background:url(Texture/3DMapSystem/common/exclamation.png);width:16px;height:16px;"/>
+<div style="float:left;margin-left:5px;font-size:11px;color:#808080">哈奇们可以编辑故事到<a href="http://www.aipai.com/game_gameid-47617.html">哈奇爱拍专区</a></div>
+<label name="result" style="float:left;height:30px;color:#003366;margin-left:5px;"></label>
+</div>
+</pe:mcml>
+</body>
+</html>

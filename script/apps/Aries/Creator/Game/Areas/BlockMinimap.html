@@ -1,0 +1,107 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BlockMinimap.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="BlockMinimap.lua"><![CDATA[
+BlockMinimap = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockMinimap");
+BlockMinimap.OnInit();
+
+function OnCopyPos()
+    local x, y, z = ParaScene.GetPlayer():GetPosition();
+    ParaMisc.CopyTextToClipboard(string.format("/tp %.2f %.2f %.2f", x, y, z));
+end
+
+function DS_Func_tex(index)
+    return BlockMinimap.DS_Func_MapTexture(index);
+end
+
+function zoom_map(fScaleFactor)
+    local radius = Page:CallMethod("block_mini_map", "GetClipRadius") or 500;
+    radius = radius*fScaleFactor;
+    if(radius > 1000) then
+        radius = 1000;
+    elseif(radius < 16) then
+        radius = 16;
+    end
+    Page:CallMethod("block_mini_map", "SetClipRadius", radius, true);
+end
+
+function OnMapScaleDown()
+    zoom_map(1.1)
+end
+
+function OnMapScaleUp()
+    zoom_map(0.9)
+end
+
+function OnChangeMode()
+    BlockMinimap.OnChangeMode();
+end
+
+function GetModeText()
+    if(BlockMinimap.ui_mode == "map") then
+        return "社交"
+    else
+        return "地图"
+    end
+end
+
+function OnViewBag()
+    System.App.Commands.Call("Profile.Aries.SpecialAreaShow", {id = 3});
+end
+]]></script>
+<div style="margin-top:5px;">
+    <pe:if condition='<%=System.User.nid ~=0%>'>
+        <pe:hotkey name="2" hotkey="DIK_B" onclick="OnViewBag"/>
+    </pe:if>
+    <div>
+        <input name="pos" type="button" style="width:134px;font-size:11px;background:;height:14px;text-align:right" enabled="false" />
+        <input type="button" style="margin-left:3px;width:16px;height:16px;background:url(Texture/Aries/Common/Teen/chat/move_32bits.png);background-color:#ffffff80" tooltip="复制位置坐标&#10;传送命令:/tp x y z" onclick="OnCopyPos"/>
+        <input type="button" name="btnMode" class="button" value='<%=GetModeText()%>' style="margin-left:3px;margin-top:0px;width:36px;height:18px;font-size:12px;background-color:#ffffff80" tooltip="切换地图/社交模式" onclick="OnChangeMode"/>
+    </div>
+    <pe:if condition='<%=BlockMinimap.ui_mode ~= "map"%>'>
+        <pe:if condition='<%=not System.options.mc%>'>
+            <div style="width:80px;font-size:12px;" align="right">
+                鲜花:<input type="button" style="float:left;text-align:left;max-width:40px;height:14px;background:;color:#ee0000;font-weight:bold;" value='<%=tostring(BlockMinimap.GetFlowerCount())%>' />
+                <!--<input type="button" value="赠送" onclick="BlockMinimap.OnDonateFlower" class="linkbutton" style="font-size:12px;width:26px;height:18px;margin-top:0px;color:#ee0000;background-color:#ee0000"/>-->
+            </div>
+            <div style="width:54px;font-size:12px;margin-top:3px;" align="right">
+                <input type="button" value="功能▼" onclick="BlockMinimap.OnClickMenu" class="button" style="font-size:12px;width:46px;height:22px;margin-top:0px;"/>
+            </div>
+        </pe:if>
+    </pe:if>
+    <pe:if condition='<%=BlockMinimap.ui_mode == "map"%>'>
+        <div zorder="-2" style="position:relative;margin-left:47px;margin-top:0px;background:url(Texture/Aries/WorldMaps/common/kids/minimap_bg.png#0 0 153 153);width:153px;height:153px;">
+            <div style="position:relative;">
+                <input name="btnClose" type="button" value="G" class="button" tooltip="生成小地图" style="position:relative;background-color:#ffffff80;margin-left:126px;margin-top:6px;width:20px;height:20px;" onclick="BlockMinimap.OnClickGenMinimap"/>
+                <input name="btnScaleDown" type="button" value="" tooltip="缩小地图" style="position:relative;margin-left:118px;margin-top:130px;width:16px;height:16px;background:url(Texture/Aries/WorldMaps/common/kids/map_minimize.png)" onclick="OnMapScaleDown"/>
+                <input name="btnScaleUp" type="button" value="" tooltip="放大地图" style="position:relative;margin-left:132px;margin-top:115px;width:16px;height:16px;background:url(Texture/Aries/WorldMaps/common/kids/map_enlarge.png)" onclick="OnMapScaleUp"/>
+            </div>
+            <pe:container zorder="-1" style="margin-left:4px;margin-top:4px;width:145px;height:145px;background:">
+                <pe:aries_map name="block_mini_map" style="width:145px;height:145px;background:"
+                    update_interval="200"
+                    flip_vertical = "true"
+                    center_on_player = "true"
+                    show_camera  = "true"
+                    show_player = "true"
+                    show_friends = "true"
+                    show_opc = "true" 
+                    hide_names = "true"
+                    mask_texture="Texture/Aries/Common/circular_mask.png" 
+                    >
+                    <pe:texture_grid>
+                        <pe:textureassemble name="tex" DataSource='<%=DS_Func_tex %>' />
+                    </pe:texture_grid>
+                </pe:aries_map>
+            </pe:container>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,34 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/MovieTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="MovieTask.lua"><![CDATA[
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+local Movie = commonlib.gettable("MyCompany.Aries.Game.Tasks.Movie")
+Movie.OnInit()
+
+function ClosePage()
+    Movie.EndEditing(true);
+end
+
+]]></script>
+<pe:container alignment="_mb" width="0" height="210" style="background:">
+<pe:container alignment="_ctt" ClickThrough="true" width="930" height="210" style="background:;">
+<div style="width:867px;height:210px;background:url(Texture/Aries/Quest/Dialog_bg3.dds#0 0 867 210);" align="center">
+    <div style="position:relative;margin-right:-20px;margin-top:30px;width:86px;height:65px;" align="right">
+        <input tooltip="关闭" style="width:86px;height:65px;background:url(Texture/Aries/Quest/quest_common_close_32bits.png#0 0 86 55);" type="button" name="close" onclick="ClosePage()" value=""/>
+    </div>
+    <div>
+    </div>
+</div>
+</pe:container>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>
+

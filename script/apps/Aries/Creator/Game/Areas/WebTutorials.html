@@ -1,0 +1,49 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/WebTutorials.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="WebTutorials.lua"><![CDATA[
+WebTutorials = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WebTutorials");
+WebTutorials:Init();
+function OnClickPlay()
+    if(WebTutorials:GetCurrent()) then
+        WebTutorials:GetCurrent():Play();
+    end
+end
+function OnClose()
+    WebTutorials:Close();
+    -- _guihelper.MessageBox(L"点击是, 不再显示这个教程.<br /> 点击否, 彻底关闭教程窗口, 关闭后你仍可以从帮助菜单中随时打开它.", function(res)
+	--     if(res == _guihelper.DialogResult.Yes) then
+	-- 	    WebTutorials:Dismiss();
+    --     elseif(res == _guihelper.DialogResult.No) then
+    --         WebTutorials:Close();
+	--     end
+    -- end, _guihelper.MessageBoxButtons.YesNoCancel);
+end
+]]></script>
+<div style="background-color:#ebf8fe;padding:5px">
+    <pe:if condition='<%=WebTutorials:GetCurrent()~=nil%>'>
+        <div>
+            <pe:identicon value='<%=WebTutorials:GetCurrent():GetID()%>' style="width:48px;height:48px;background-color:#f0f0f0"></pe:identicon>
+            <div style="float:left;margin-left:5px;">
+                <div style="font-weight:bold;font-size:14px;">
+                    <span style="margin-top:2px;"><%=WebTutorials:GetCurrent():GetTitle()%></span>
+                    <input type="button" value='<%=L"帮助"%>' onclick="OnClickPlay" style="margin-left:3px;" tooltip='<%=L"用外部浏览器打开帮助百科"%>' />
+                    <input type="button" value='X' onclick="OnClose" style="margin-left:3px;" tooltip='<%=L"关闭"%>' />
+                </div>
+                <div style="font-size:12px;margin-top:4px;color:#999292">
+                    <!--<%=L"难度:"%><%=WebTutorials:GetCurrent():GetDifficultyText()%>
+                    <span style="margin-left:10px;"><%=L"时长:"%><%=WebTutorials:GetCurrent():GetTimeLengthText()%></span>-->
+                </div>
+            </div>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</body>
+</html>

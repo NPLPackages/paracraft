@@ -1,0 +1,82 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/DecoBuilder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="DecoBuilder.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Assets/AssetsCommon.lua");
+local DecoBuilder = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DecoBuilder");
+DecoBuilder.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+local filename_map = {
+["indoor"] = "temp/mybag/aries/furniture.bag.xml",
+["outdoor"] = "temp/mybag/aries/grass.bag.xml",
+["char"] = "temp/mybag/aries/characters.bag.xml",
+["animals"] = "temp/mybag/aries/animals.bag.xml",
+}
+
+DS_Func_ = nil
+
+function DS_Func(index)
+    if(DS_Func_) then
+        return DS_Func_(index);
+    else
+        if(not index) then
+            return 0;
+        end
+    end
+end
+
+function ChangeDsFunc(tabName)
+    local bagfile = filename_map[tabName];
+    if(bagfile) then
+        DS_Func_ = MyCompany.Aries.Creator.AssetsCommon.Get_DS_Func_FromAssetsXMLFile(bagfile)
+    end
+end
+
+function OnSelectTab(tabName)
+    ChangeDsFunc(tabName)
+    Page:CallMethod("bags", "DataBind");
+end
+
+ChangeDsFunc(Page:GetValue("builderDeco", "outdoor"));
+
+]]></script>
+<div style="width:250px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >装饰</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px;">
+        <pe:tabs name="builderDeco" class="tabs_nobg" style="height:27px" onclick="OnSelectTab">
+            <pe:tab-item name="outdoor" text="户外" selected="true" style="padding:5px"></pe:tab-item>
+            <pe:tab-item name="indoor" text="室内" style="padding:5px"></pe:tab-item>
+            <pe:tab-item name="char" text="人物" style="padding:5px"></pe:tab-item>
+            <pe:tab-item name="animals" text="动物" style="padding:5px"></pe:tab-item>
+        </pe:tabs>
+        <div class="tab_inborder" style="padding:5px;padding-left:10px;">
+            <pe:gridview name="bags" CellPadding="0" DefaultNodeHeight="38" AllowPaging="true" pagesize="24" ItemsPerLine="4" DataSource='<%=DS_Func%>'>
+                <Columns>
+                    <pe:asset onclick="MyCompany.Aries.Creator.Game.Desktop.DecoBuilder.OnCreateObject" src='<%=Eval("src")%>' type='<%=Eval("type")%>' scaling='<%=Eval("scaling")%>' tooltip='<%=Eval("DisplayName")%>'/>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>空</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>请稍等 ... </b>
+                </FetchingDataTemplate>
+                <PagerSettings Position="Bottom" style="margin-left:40px;" PreviousPageText="" NextPageText=""/>
+            </pe:gridview>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

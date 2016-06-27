@@ -1,0 +1,70 @@
+﻿<!-- "script/apps/Aries/Creator/SaveWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>save world page by LiXizhi 2008.6.27</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" src="SaveWorldPage.lua"><![CDATA[
+MyCompany.Aries.Creator.SaveWorldPage.OnInit();
+
+function OnClose()
+    Page:CloseWindow();
+end
+]]></script>
+<div style="padding-left:30px;padding-top:30px;padding-right:40px;padding-bottom:50px;width:530px;height:320px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<div style="position:absolute;margin-left:450px;margin-top:-40px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" 
+        onclick="OnClose()" value=""/>
+</div>
+<div>
+    <div style="float:left;margin-bottom:5px">
+        <div style="float:left;margin-top:1px;color:#808080">世界预览图YY:</div>
+        <a tooltip="用截图替换世界预览图" name="TakeWorldImage" onclick="MyCompany.Aries.Creator.SaveWorldPage.TakeWorldImage">拍照</a><br />
+        <img name="WorldImage" src="Texture/Aries/brand/noimageavailable.png" width="180" height="110"/><br />
+    </div>
+    <form name="saveWorldFrm">
+    <div style="float:left;margin-left:10px;margin-right:5px;margin-bottom:5px">
+        <div>
+            <img style="margin-right:5px;background:url(Texture/3DMapSystem/common/disk.png);width:16px;height:16px"/>
+            <div style="float:left;font-weight:bold;font-size:12px;">您希望保存当前世界么?</div>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="float:left;width:70px;text-align:right">领地名称:</div><input name="world_name" style="width:120px;height:22px;background:url(Texture/Aries/Common/MultilineEditbox_32bits.png:5 5 5 5)"/>
+        </div>
+        <div>
+            <div style="float:left;width:70px;text-align:right">世界路径:</div>
+            <a onclick="MyCompany.Aries.Creator.SaveWorldPage.OnOpenWorldDir" tooltip="点击打开文件夹">
+                <img style="margin-right:3px;margin-top:2px;background:url(Texture/3DMapSystem/common/ViewFiles.png);width:16px;height:16px;"/>
+                <label name="worldpath" style="color:#808080;height:20px;"/>
+            </a>
+        </div>
+        <div>
+            <div style="height:60px;">
+                <div style="float:left;width:70px;text-align:right">领地大小:</div>
+                <select name="world_size" style="width:120px;height:22px;">
+                    <option value="100">100米</option>
+                    <option value="200">200米</option>
+                    <option value="500" selected="true">500米(推荐)</option>
+                    <option value="1000">1000米</option>
+                    <option value="5000">5000米</option>
+                    <option value="10000">1万米</option>
+                    <option value="20000">无穷大</option>
+                </select>
+            </div>
+            <!--<div style="float:left;background:url(Texture/Aries/Common/MultilineEditbox_32bits.png:5 5 5 5)">
+                <textarea name="world_desc" WordWrap="true" SingleLineEdit="true" rows="3"></textarea>
+            </div>-->
+            <input type="submit" class="defaultbutton" style="margin-left:70px;margin-top:5px;width:120px;height:26px;" name="saveall" value="保存" tooltip="保存所有加载的内容" onclick="MyCompany.Aries.Creator.SaveWorldPage.OnSaveAll()"/>
+        </div>
+    </div>
+    </form>
+</div>
+<hr />
+<img style="background:url(Texture/3DMapSystem/common/exclamation.png);width:16px;height:16px;"/>
+<label name="result" style="float:left;height:30px;color:#006600;margin-left:5px;font-weight:bold">点击保存, 你只是将3D世界保存在了本地电脑中; 你需要发布世界, 才能让网络中的其他用户访问并登陆你的世界. </label>
+</div>
+</pe:mcml>
+</body>
+</html>

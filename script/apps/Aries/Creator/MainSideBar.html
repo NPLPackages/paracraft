@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/MainSideBar.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.1.24</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true" src="MainSideBar.lua"><![CDATA[
+    MyCompany.Aries.Creator.MainSideBar.OnInit();
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    region_id = ExternalUserModule:GetRegionID();
+]]></script>
+<div style="width:64px;">
+<div style="margin-bottom:5px;">
+    <input type="button" name="visitors" animstyle="22" 
+        style="margin:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/manageworld_32bits.png);" 
+        onclick="MyCompany.Aries.Creator.MainSideBar.OnClickWorldManager"
+        tooltip="领地管理"/>
+</div>
+
+<div style="margin-bottom:5px;">
+    <input type="button" name="save" animstyle="22" 
+        style="margin:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/saveworld_32bits.png);" 
+        onclick="MyCompany.Aries.Creator.MainSideBar.OnClickSave"
+        tooltip="保存"/>
+</div>
+<pe:if condition='<%=Eval("region_id")==0%>' >
+<div style="margin-bottom:5px;">
+    <input type="button" name="save" animstyle="22" 
+        style="margin:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/shareworlds_32bits.png);" 
+        onclick="MyCompany.Aries.Creator.MainSideBar.OnClickShare"
+        tooltip="上传分享"/>
+</div>
+</pe:if>
+<!--<div style="margin-bottom:5px;">
+    <input type="button" name="shop" animstyle="22" 
+        style="margin:0px;width:64px;height:64px;background:url(Texture/Aries/Homeland/v1/shop_32bits.png#0 0 68 64);" 
+        onclick="MyCompany.Aries.Creator.MainSideBar.OnClickWikiBook"
+        tooltip="百科全书"/>
+</div>
+-->
+<div style="margin-bottom:5px;">
+    <input type="button" name="edit" animstyle="22" 
+        style="margin:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/editworld_32bits.png);" 
+        onclick="MyCompany.Aries.Creator.MainSideBar.OnClickEdit"
+        tooltip="切换编辑/游戏模式"/>
+</div>
+</div>
+</pe:mcml>
+</body>
+</html>
+
+
+

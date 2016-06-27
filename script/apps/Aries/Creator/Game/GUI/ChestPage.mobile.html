@@ -1,0 +1,71 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/ChestPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ChestPage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+ChestPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ChestPage");
+ChestPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetContainerView()
+    return ChestPage.GetContainerView();
+end
+
+function DS_Func_Items(index)
+    return GetContainerView():GetSlotDS(index);
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+]]></script>
+<aries:window mode="thin" title="箱子" title_height="36" onclose="ClosePage">
+<div style="padding:10px;color:#cccccc">
+    <div>
+        <div style="margin-left:8px;font-size:20;base-font-size:20;margin-bottom:2px;">
+            <div style="float:left;margin-left:5px;">箱子:点击可移动物品, 长按可查看</div>
+        </div>
+        <pe:gridview name="ChestBagItems" style="height:170px;" DataSource="<%=DS_Func_Items%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="27">
+            <Columns>
+                <div style="margin-left:4px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot ContainerView='<%=GetContainerView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:48px;height:48px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+    </div>
+    <div class="mc_line" width="100%" height="1"></div>
+    <div style="margin-top:5px;">
+        <div style="margin-left:8px;font-size:20;base-font-size:20;margin-bottom:2px;">
+            <div style="float:left;margin-left:5px;">背包</div>
+        </div>
+        <pe:gridview name="ChestMyItems" style="height:225px;" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:4px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' DestInventory='<%=ChestPage.GetEntity().inventory %>' style="margin:1px;width:48px;height:48px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

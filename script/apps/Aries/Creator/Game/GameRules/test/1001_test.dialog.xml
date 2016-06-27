@@ -1,0 +1,113 @@
+<!--There are three types of dialogs: gossips, quests and triggers-->
+<dialogs title="this is the mouse over text">
+  <!--gossips dialogs are triggered randomly when no other triggers are available-->
+  <gossips>
+    <dialog>
+      <item>
+        <avatar name="test">Mr. Avatar</avatar>
+        <content>
+          If no buttons are provided, a default one will be used.
+        </content>
+      </item>
+      <item>
+        <avatar name="player"></avatar>
+        <content>if avatar name is player, it will show current player.</content>
+        <buttons>
+          <button action="doaccept" >OK. I got it.</button>
+        </buttons>
+      </item>
+    </dialog>
+    <dialog>
+      <item name="name1">
+        <content>
+          This demonstrate button action with "goto"
+          this is first one.
+        </content>
+        <buttons>
+          <button action="goto name3">goto 3</button>
+        </buttons>
+      </item>
+      <item name="name2">
+        <content>
+          This is second one
+        </content>
+        <buttons>
+          <button action="goto name1">goto 1</button>
+        </buttons>
+      </item>
+      <item name="name3">
+        <content>
+          This is third
+        </content>
+        <buttons>
+          <button action="goto name2">goto 2</button>
+        </buttons>
+      </item>
+    </dialog>
+  </gossips>
+  <!--quest dialog is triggered according to quest's active, accept, finish state.-->
+  <quests>
+    <!--here we will handle triggers from quest id 1001-->
+    <quest id="1001">
+      <!--dialogs to show when quest is active, but can not be completed. -->
+      <startdialog>
+        <item>
+          <avatar name="test">Mr. Avatar</avatar>
+          <content>
+            If no buttons are provided, a default one will be used.
+          </content>
+        </item>
+        <item>
+          <avatar name="player"></avatar>
+          <content>if avatar name is player, it will show current player.</content>
+          <buttons>
+            <button action="doaccept" >OK. I got it.</button>
+          </buttons>
+        </item>
+      </startdialog>
+      <!--dialogs to show when quest can be completed. -->
+      <enddialog>
+        <item>
+          <avatar></avatar>
+          <content>
+            congratulations, you have completed the quest so fast
+          </content>
+          <buttons>
+            <button action="dofinished" >you are welcome</button>
+          </buttons>
+        </item>
+      </enddialog>
+    </quest>
+  </quests>
+  <!--triggers are simple quest system. It is simple three phase design: 
+  inputs are deleted, dialog is shown and then output is given.-->
+  <triggers>
+    <trigger>
+      <input>
+        <!--please note items will be deleted when dialog is confirmed-->
+        <virtualitem id="quest1111" value="1" />
+        <item id="62" value="1" />
+      </input>
+      <dialog>
+        <item>
+          <avatar></avatar>
+          <content>
+            You must have `quest1111` and id:62 to trigger this dialog.
+          </content>
+        </item>
+        <item>
+          <avatar></avatar>
+          <content>
+            when you click OK, you will be given `quest2222`. `quest1111` and id:62 will be removed.
+          </content>
+          <buttons>
+            <button action="accept">OK</button>
+          </buttons>
+        </item>
+      </dialog>
+      <output>
+        <virtualitem id="quest2222" value="1" />
+      </output>
+    </trigger>
+  </triggers>
+</dialogs>

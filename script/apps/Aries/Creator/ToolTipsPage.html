@@ -1,0 +1,154 @@
+﻿<!-- "script/apps/Aries/Creator/ToolTipsPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.1.27 LiXizhi</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true" src="ToolTipsPage.lua"><![CDATA[
+page = document:GetPageCtrl();
+MyCompany.Aries.Creator.ToolTipsPage.OnInit()
+tab = page:GetRequestParam("tab");
+]]></script>
+<pe:if condition='<%=not MyCompany.Aries.Creator.ToolTipsPage.isExpanded%>'>
+<div style="position:relative;margin-left:0px;width:32px;height:175px;background:url(Texture/Aries/Creator/tips_sidebar_bg_32bits.png#0 0 32 175)">
+    <input name="toggleViewBtn" tooltip="显示/隐藏操作提示" type="button" style="margin-left:2px;margin-top:20px;width:22px;height:24px;background:url(Texture/Aries/Creator/arrow_right.png#0 0 22 24)" onclick="MyCompany.Aries.Creator.ToolTipsPage.OnClickToggleView"/>
+    <br/>
+    <input name="morehelpBtn" tooltip="更多帮助" type="button" style="margin-left:1px;margin-top:87px;width:25px;height:27px;background:url(Texture/Aries/Creator/tips_help_32bits.png#0 0 25 27)" onclick="MyCompany.Aries.Creator.ToolTipsPage.OnClickMoreHelp"/>
+</div>
+</pe:if>
+<pe:if condition='<%=MyCompany.Aries.Creator.ToolTipsPage.isExpanded%>'>
+<div style="position:relative;margin-left:170px;width:32px;height:175px;background:url(Texture/Aries/Creator/tips_sidebar_bg_32bits.png#0 0 32 175)">
+    <input name="toggleViewBtn" tooltip="显示/隐藏操作提示" type="button" style="margin-left:2px;margin-top:20px;width:22px;height:24px;background:url(Texture/Aries/Creator/arrow_left.png#0 0 22 24)" onclick="MyCompany.Aries.Creator.ToolTipsPage.OnClickToggleView"/>
+    <br/>
+    <input name="morehelpBtn" tooltip="更多帮助" type="button" style="margin-left:1px;margin-top:87px;width:25px;height:27px;background:url(Texture/Aries/Creator/tips_help_32bits.png#0 0 25 27)" onclick="MyCompany.Aries.Creator.ToolTipsPage.OnClickMoreHelp"/>
+</div>
+<div style="margin-top:-46px;font-size:12px;width:170px;min-height:250px;padding:7px;padding-right:15px;padding-bottom:15px;background:url(Texture/Aries/Creator/tooltip_bg_32bits.png:24 24 24 24)">
+<div style="margin:6px;margin-left:25px;">
+    <img style="margin:3px;width:16px;height:16px;background:url(Texture/Aries/Creator/tips_32bits.png);"/>
+    <div style="float:left;font-size:14px;font-weight:bold">操作提示</div>
+</div>
+<div>
+<pe:if condition='<%=Eval("tab")=="getting_started"%>'>
+    <div style="color:#003366;margin-left:10px">
+        哈奇-创意空间<br/>
+        - 设计自己的领地<br/>
+        - 制作自己的故事<br/>
+        <div style="width:64px;height:10px;"/>
+        点击编辑按钮
+        <div style="float:left;width:32px;height:32px;background:url(Texture/Aries/Creator/editworld_32bits.png);"/>
+        <br />
+        <div style="float:left;margin-top:8px;">开始你的创意设计！</div>
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="getting_started_mc"%>'>
+    <div style="color:#003366;margin-left:5px">
+        <b>F1</b>快捷帮助<br/>
+        <b>W,A,S,D</b>移动<br/>
+        <b>右键拖动</b>旋转视角<br/>
+        <b>左键</b>删除<br/>
+        <b>长按左键</b>连续删除<br/>
+        <b>右键</b>创建<br/>
+        <b>F：</b>飞行模式<br/>
+        <b>Shift+右键:</b> 创建直线<br/>
+        <b>Ctrl+右键:</b>批量替换颜色<br/>
+        <div style="float:left;margin-top:8px;">
+        <b>Ctrl+Z(Y) </b>撤销/反撤销<br/>
+        <b>Tab(+Shift)</b>向上/下传送<br/>
+        </div>
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="sky_modify"%>'>
+    
+    <div style="color:#003366;margin-left:10px">
+        使用右边的编辑面板，
+        <br/>
+        设计天空。
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="terra_paint"%>'>
+    <!--从右侧列表中选择一个图案,然后<br />-->
+    <div style="color:#003366">
+        <div style="font-weight:bold;">绘制：</div>
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)"/>
+        <div style="float:left;">从右侧列表选择一个图案，按住鼠标左键，同时移动鼠标；</div><br />
+        
+        <div style="font-weight:bold;">擦除：</div><br />
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)"/>
+        <div style="float:left;">选择橡皮擦，按住鼠标左键，同时移动鼠标；</div><br />
+        
+        <div style="font-weight:bold;">刷子：</div><br />
+        <div style="float:left;padding-left:8px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">+</div>键放大
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">-</div>键缩小<br />
+        <div style="float:left;padding-left:3px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">esc</div>键取消
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="terra_form"%>'>
+    <div style="color:#003366">
+        <div style="font-weight:bold;">绘制：</div>
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)"/>
+        <div style="float:left;">从右侧列表选择一个工具，按住鼠标左键，同时移动鼠标；</div><br />
+        
+        <div style="font-weight:bold;">刷子：</div><br />
+        <div style="float:left;padding-left:8px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">+</div>键放大
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">-</div>键缩小<br />
+        <div style="float:left;padding-left:3px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">esc</div>或
+        <img style="width:24px;height:24px;margin-left:-6px;background:url(Texture/Aries/Quest/TutorialMouse_RightClick_small_32bits.png)"/>
+        <div style="float:left;">鼠标右键取消；</div><br />
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="ocean_modify"%>'>
+    <div style="color:#003366;margin-left:10px">
+        拖动右边的编辑面板中<br/>
+        的滑块，调整水面高度<br/>
+        和水体颜色。
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="asset_create"%>'>
+    <div style="color:#003366">
+        <div style="font-weight:bold;">创建：</div>
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)"/>
+        <div style="float:left;">从右侧列表选择一个物体；</div><br />
+        
+        <div style="font-weight:bold;">编辑和删除：</div><br />
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_RightClick_small_32bits.png)"/>
+        <div style="float:left;">移动鼠标到物品上，点击鼠标右键；</div><br />
+        
+        <div style="font-weight:bold;">移动过程中：</div><br/>
+        <div style="float:left;padding-left:8px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">+</div>
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">-</div>键放大缩小<br />
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">[</div>
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">]</div>
+        键旋转
+    </div>
+</pe:if>
+<pe:if condition='<%=Eval("tab")=="role_edit"%>'>
+    <div style="color:#003366">
+        <div style="font-weight:bold;">创建：</div>
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)"/>
+        <div style="float:left;">从右侧列表选择一个角色；</div><br />
+        
+        <div style="font-weight:bold;">编辑和删除：</div><br />
+        <img style="width:24px;height:24px;background:url(Texture/Aries/Quest/TutorialMouse_RightClick_small_32bits.png)"/>
+        <div style="float:left;">移动鼠标到角色上，点击鼠标右键；</div><br />
+        
+        <div style="font-weight:bold;">移动过程中：</div><br/>
+        <div style="float:left;padding-left:8px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">+</div>
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">-</div>键放大缩小<br />
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">[</div>
+        <div style="float:left;padding-left:10px;width:24px;height:24px;background:url(Texture/Aries/Quest/keyboard_btn.png)">]</div>
+        键旋转
+    </div>
+</pe:if>
+
+
+</div>
+</div>
+</pe:if>
+</pe:mcml>
+</body>
+</html>
+
+
+

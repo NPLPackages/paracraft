@@ -1,0 +1,61 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BuilderDock.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuilderDock.lua"><![CDATA[
+BuilderDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderDock");
+BuilderDock.OnInit();
+
+if(not BuilderDock.ds_builder_buttons) then
+    if(System.options.version == "kids") then
+        BuilderDock.ds_builder_buttons = {
+            {name="nature", tooltip="自然界:天，地，水", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/nature_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="static_blocks", tooltip="建造静态积木", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="creator_desktop", tooltip="建造", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="special_blocks", tooltip="机关,特殊关卡道具", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/special_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="deco", tooltip="装饰:模型，人物", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/deco_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="task", tooltip="编辑任务目标", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/task_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="system", tooltip="系统:保存，分享", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/system_btn_32bits.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+        }
+    else
+        BuilderDock.ds_builder_buttons = {
+            {name="nature", text="自然界", tooltip="自然界:天，地，水", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/nature_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="static_blocks", text="建造", tooltip="建造静态积木", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="creator_desktop", text="建造", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/build_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="special_blocks", text="机关", tooltip="机关,特殊关卡道具", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/special_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="deco", text="装饰", tooltip="装饰:模型，人物", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/deco_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            --{name="task", text="任务", tooltip="编辑任务目标", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/task_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+            {name="system", text="系统", tooltip="系统:保存，分享", style="width:50px;height:55px;background:url(Texture/Aries/Creator/dock/system_btn_32bits.teen.png#0 0 50 55)", onclick=BuilderDock.OnToggleBuilder},
+        }
+    end
+end
+function Ds_Func_Builder(index)
+    if(not index) then
+        return #(BuilderDock.ds_builder_buttons);
+    else
+        return BuilderDock.ds_builder_buttons[index];
+    end
+end
+
+]]></script>
+<div style="position:relative;height:42px;margin-top:18px;width:230px;"  class="creator_dock_bg"/>
+<div style="margin-left:15px;">
+    <pe:gridview name="buffview" ItemsPerLine="12" AllowPaging="false" DefaultNodeHeight = "55" pagesize="12" DataSource='<%=Ds_Func_Builder%>'>
+	    <Columns>
+            <input type="button" name='<%=Eval("name")%>' tooltip='<%=Eval("tooltip")%>' style='<%=Eval("style")%>' onclick="BuilderDock.OnToggleBuilder()"/>
+            <pe:if condition='<%=Eval("text")~=""%>'>
+                <div style="float:left;position:relative;margin-left:-50px;margin-top:35px;width:55px;text-align:center;font-size:14px;color:#76e6ad;font-weight:bold;shadow-color:#80025487" class="bordertext">
+                    <%=Eval("text")%>
+                </div>
+            </pe:if>
+        </Columns>
+    </pe:gridview>
+</div>
+</pe:mcml> 
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!-- "script/apps/Aries/Creator/Game/Login/LoginPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+showchar = Page:GetRequestParam("showchar");
+showcopyright = Page:GetRequestParam("showcopyright");
+showtoplogo = Page:GetRequestParam("showtoplogo");
+showbg = Page:GetRequestParam("showbg");
+ClientVersion = "version 0.01";
+
+function getBGStyle()
+    return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
+end
+
+]]></script>
+<pe:if condition='<%=Eval("showbg") == "true"%>'>
+    <pe:container zorder="-1" alignment="_fi" width="100%" height="100%" style='<%=format("position:relative;background:url(%s)", getBGStyle() or "")%>' >
+    </pe:container>
+</pe:if>
+<pe:container alignment="_ct" style="position:relative;margin-left:-510px;margin-top:-300px;width:1020px;height:600px;background:">
+    <pe:if condition='<%=Eval("showtoplogo") == "true"%>'>
+        <div style='<%="float:left;position:relative;"..MyCompany.Aries.ExternalUserModule:GetConfig().product_logo_url%>' align="center"></div>
+    </pe:if>
+</pe:container>
+<pe:container alignment="_mb" width="0" height="85px" style="position:relative;background:">
+    <pe:if condition='<%=Eval("showcopyright") == "true"%>'>
+        <pe:container alignment="_ctt" style="position:relative;margin-top:0px;width:970px;background:">
+            <div style='<%="position:relative;"..MyCompany.Aries.ExternalUserModule:GetConfig().copyright_text_style%>'width="970" height="85" align="center" valign="bottom">
+                <input type="button" name="dummy" enabled="false" class="bordertext" 
+                        value='<%=MyCompany.Aries.ExternalUserModule:GetConfig().developer_copyright_text%>'
+                        style="margin-top:2px;margin-bottom:2px;background:;font-size:11px;font-weight:bold;color:#ffffff;width:970px;height:14px;"/><br />
+                <input type="button" name="dummy" enabled="false" class="bordertext" 
+                        value="抵制不良游戏  拒绝盗版游戏  注意自我保护  谨防受骗上当  适度游戏益脑  沉迷游戏伤身  合理安排时间  享受健康生活"
+                        style="margin-top:2px;margin-bottom:2px;background:;font-size:11px;font-weight:bold;color:#ffffff;width:970px;height:14px;"/><br />
+            </div>
+        </pe:container>
+        <pe:container align="left" style="position:relative;color:#8f815f;font-size:12px;font-weight:bold;margin-top:50px;margin-left:20px;width:111px;background:">
+            <%=Eval("ClientVersion")%>
+        </pe:container>
+        <pe:container alignment="_rt" style="position:relative;width:128px;height:85px;background:">
+            <div style="position:relative;margin-top:0px;margin-left:0px;width:128px;height:58px">
+            <pe:if condition="<%=MyCompany.Aries.ExternalUserModule:GetConfig().developer_logo~=nil%>">
+                <div style='<%=MyCompany.Aries.ExternalUserModule:GetConfig().developer_logo%>' >
+                    <input type="button" name="btnPESite" style="width:128px;height:32px;margin-top:0px;margin-bottom:0px;background:" />
+                </div>
+            </pe:if>
+            </div>
+        </pe:container>
+    </pe:if>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

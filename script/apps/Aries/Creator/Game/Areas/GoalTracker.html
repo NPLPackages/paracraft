@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/GoalTracker.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="GoalTracker.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/API/UserProfile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/API/ExpTable.lua");
+ExpTable = commonlib.gettable("MyCompany.Aries.Creator.Game.API.ExpTable");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local UserProfile = commonlib.gettable("MyCompany.Aries.Creator.Game.API.UserProfile");
+profile = UserProfile.GetUser();
+ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GoalTracker");
+GoalTracker.OnInit();
+names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
+
+function OnClick(name)
+    -- _guihelper.MessageBox("TODO:")
+end
+
+function OpenServerPage()
+    
+end
+
+]]></script>
+<pe:container name="game" ClickThrough="true" visible='<%=not GameLogic.GameMode:IsEditor()%>' style="position:relative;margin-left:0px;margin-top:34px;background:;">
+    <div style="float:left;" >
+        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);background-color:#ffffff80">
+            <pe:mc_slot bagpos ='1' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity().inventoryView%>"/>
+        </div>
+        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12); background-color: #ffffff80;">
+            <pe:mc_slot bagpos ='2' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity().inventoryView%>"/>
+        </div>
+    </div>
+</pe:container>
+<pe:container name="editor" visible='<%=GameLogic.GameMode:IsEditor() and GoalTracker.IsTaskActive()%>' style="position:relative;margin-left:5px;margin-top:68px;background:;">
+    <div style="float:left;margin-left:-6px;width:40px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#270 89 31 34:15 16 15 16);">
+        <input name="cody" type="button" onclick="GoalTracker.OnClickCody" tooltip='<%=L"创作百科"%>' style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#216 203 30 32);margin-left:5px;margin-top:5px;width:30px;height:32px;"/>
+    </div>
+    <pe:container name="tip" visible='<%=GoalTracker.tip_text ~= nil %>' style="float:left;margin-left:10px;margin-top:-5px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);padding:5px;padding-bottom:8px;">
+        <input type="button" name="text" onclick="GoalTracker.OnClickCody" style="height:49px;width:240px;text-singleline:false;text-wordbreak:true;background:;font-size:14px;color:#ffffff;" value='<%=GoalTracker.tip_text %>' />
+    </pe:container>
+    <!--<div style="margin-left:-6px;margin-top:-10px;width:40px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#270 89 31 34:15 16 15 16);">
+        <input name="paidashi" type="button" onclick="" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#245 202 34 36);margin-left:3px;margin-top:4px;width:34px;height:36px;"/>
+    </div>-->
+</pe:container>
+</pe:mcml>
+</body>
+</html>

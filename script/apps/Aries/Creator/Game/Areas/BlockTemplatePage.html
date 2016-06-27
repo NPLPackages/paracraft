@@ -1,0 +1,134 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="BlockTemplatePage.lua"><![CDATA[
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+BlockTemplatePage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickTakeSnapshot()
+    BlockTemplatePage.OnClickTakeSnapshot()
+end
+
+function OnClickSave()
+    BlockTemplatePage.OnClickSave()
+end
+
+function GetThemeDS()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
+    local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+    local theme_category_ds = BlockTemplatePage.GetCategoryDS();
+    local themeKey = theme_category_ds[BlockTemplatePage.category_index or 1]["tag"];
+    local ds = BuildQuestProvider.GetThemesType_DS(themeKey)
+    --local ds = BuildQuestProvider.GetLocalThemes_DS();
+    ds = commonlib.clone(ds);
+    commonlib.insertArrayItem(ds,1,{value=0,text=L"当前世界", selected=true});
+    commonlib.insertArrayItem(ds,2,{value=-1,text=BlockTemplatePage.global_template_dir});
+    return ds;
+end
+
+function ChangeCategory(name,value)
+    BlockTemplatePage.ChangeCategory(name,value)
+    Page:Refresh(0.01);
+end
+
+function GetCategoryDS()
+    return BlockTemplatePage.GetCategoryDS();
+end
+
+function CreateNewTheme()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+    local BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest");
+    BuildQuest.new_theme_category_dir = BlockTemplatePage.template_save_dir;
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+    MyCompany.Aries.Game.Tasks.BuildQuest.ShowCreateNewThemePage(BlockTemplatePage.themeKey,function()
+        Page:Refresh(0.01);
+    end)
+end
+
+]]></script>
+<aries:window style="width:420px;height:400px;color:#ffffff" title='<%=L"保存模板"%>' onclose="ClosePage" mode="thin">
+    <div style="margin-top:10px;margin-left:18px;">
+        <div style="float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#263 346 36 36:5 5 5 5);">
+            <img name="CurrentSnapshot" tooltip='<%=L"点击重新截图"%>' style="width:60px;height:60px;" onclick="OnClickTakeSnapshot" />
+        </div>
+        <div style="float:left;margin-left:10px;">
+            <pe:if condition='<%= System.options.isAB_SDK %>'>
+                <div>
+                    <div style="float:left;">
+                        <%=L"种类:"%>
+                    </div>
+                    <select name="template_type" AllowUserEdit="false" style="height:22px;" onclick="ChangeCategory" DataSource='<%=GetCategoryDS()%>'>
+                    </select>
+                </div>    
+            </pe:if>
+            <div>
+                <input type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>
+                <div for="checkboxRelativeMotion" style="float:left" tooltip='<%=L"不选表示使用绝对位置"%>'><%=L"演员使用相对位置"%></div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:7px;margin-left:10px;margin-right:10px;">
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+               <%=L"模型名称:"%>
+            </div>
+            <input type="text" name="name" class="mc_text" value="" style="float:left;height:22px;"/>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+                <%=L"目录:"%>
+            </div>
+            <select name="template_dir" AllowUserEdit="false" style="height:22px;width:256px;" DataSource='<%=GetThemeDS()%>'>
+            </select>
+            <input type="button" onclick="CreateNewTheme" tooltip='<%=L"点击创建模版目录"%>' style="margin-left:5px;margin-top:5px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)"/>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+                <%=L"模型描述:"%>
+            </div>
+            <div style="margin-top:5px;margin-left:8px;" class="mc_paper_panel">
+                <textarea name="template_desc" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="20" rows="4" style="color:#cccccc;" >
+                </textarea>
+            </div>
+        </div>
+        
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+                <%=L"方块数量:"%>
+            </div>
+            <input type="button" name="statsButton" value="xxx" style="color:#ffffff;float:left;margin-top:-1px;height:22px;min-width:40px;background:;"/>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+                <%=L"创建者:"%>
+            </div>
+            <div style="float:left;width:88px;text-align:right;">
+            </div>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="float:left;">
+                <%=L"创建时间:"%>
+            </div>
+            <div style="float:left;width:88px;text-align:right;">
+                <%=ParaGlobal.GetDateFormat("yyyy-MM-dd") %>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:7px;margin-bottom:12px;">
+        <input type="button" name="save" class="mc_light_grey_button_with_fillet" style="margin-left:200px;min-width:50px;" onclick="OnClickSave" value='<%=L"保存"%>'/>
+        <input type="button" name="cancel" class="mc_light_grey_button_with_fillet" value='<%=L"取消"%>' style="margin-left:30px;min-width:50px;"onclick="ClosePage"/>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

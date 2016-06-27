@@ -1,0 +1,61 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/MobPropertyPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="MobPropertyPage.lua"><![CDATA[
+MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobPropertyPage");
+MobPropertyPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+]]></script>
+<aries:window mode="thin" title='<%=L"人物属性"%>' onclose="ClosePage">
+<div style="padding:10px;padding-bottom:15px;color:#cccccc">
+    <div style="float:left;margin-top:3px;margin-left:5px;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+        <pe:mc_block block_id='<%=MobPropertyPage.GetItemID()%>' style="width:32px;height:32px;"/>
+    </div>
+    <div style="float:left;margin-left:0px;">
+        <div>
+            <div style="float:left;width:50px;text-align:right;"><%=L"名称:"%></div>
+            <input type="text" name="name" class="mc_text" value='<%=tostring(MobPropertyPage.GetItemName() or "") %>' style="width:120px;height:25px"/>
+            <div style="float:left;width:50px;text-align:right;">ID:</div>
+            <%=tostring(MobPropertyPage.GetItemID())%>
+        </div>
+        <div>
+            <input type="checkbox" name="showHeadonName" style="margin-left:10px;margin-top:2px;margin-right:5px;" /><%=L"显示头顶文字"%>
+        </div>
+    </div>
+    <div style="margin-top:5px;">
+        <div style="float:left;min-width:90px;"><%=L"人物模型:"%></div>
+        <div style="float:left;">
+            <div>
+                <select name="assetfile" onselect="MobPropertyPage.OnChangeAssetFile" class="mc_text" DataSource='<%=MobPropertyPage.GetAssetFileDS()%>' AllowUserEdit="true" style="width:200px;height:25px;"/>
+                <input type="button" class="mc_light_grey_button_with_fillet" name="openfile" value='...' tooltip='<%=L"打开文件浏览器"%>' style="min-width:30px;height:25px;margin-left:3px;" onclick="MobPropertyPage.OnOpenAssetFile"/>
+            </div>
+            <div>
+                <input type="button" class="mc_light_grey_button_with_fillet" name="randomSkin" value='<%=L"选择皮肤"%>' style="width:100px;" onclick="MobPropertyPage.ShowSkinPage"/>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div style="margin-left:5px;">
+        <input type="checkbox" name="canRandomWalk" style="margin-top:2px;margin-right:5px;" /><%=L"是否自主运动"%>
+    </div>
+    <div style="margin-top:10px;margin-bottom:10px;">
+        <hr />
+    </div>
+    <div style="width:90px;" align="right">
+        <input type="button" name="OK"  value='<%=L"确定"%>' class="mc_light_grey_button_with_fillet" style="min-width:80px;" onclick="MobPropertyPage.OnClickOK"/>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

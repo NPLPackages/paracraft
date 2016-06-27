@@ -1,0 +1,56 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/CreateTerrainHoleTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CreateTerrainHoleTask.lua"><![CDATA[
+CreateTerrainHole = commonlib.gettable("MyCompany.Aries.Game.Tasks.CreateTerrainHole");
+CreateTerrainHole.OnInit();
+
+function OnClose()
+    CreateTerrainHole.EndEditing();
+end
+]]></script>
+
+<div style="width:128px;height:512px;margin:0px;padding:0px;">
+    <input name="btnClose" type="button" zorder="1" value="" tooltip="右键点击场景可关闭" style="position:relative;margin-left:96px;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/close_small_32bits.png)" onclick="OnClose"/>
+    <div style="width:128px;height:128px;margin:0px;padding:0px;background:Texture/Aries/Dock/SunFlowerOuter_32bits.png;" class="box">
+        <div style="width:128px;height:128px;margin:0px;padding:0px;background:Texture/Aries/Dock/SunFlowerInner_32bits.png;" class="box" >
+            <div style="width:128;height:128;text-align:center;padding-top:56px">
+                积木地形
+            </div>
+            <div style="margin-left:8px;margin-top:-5px;">
+                <div>
+                    <div style="float:left;padding:10px;width:55px;height:55px;background:url(Texture/Aries/Homeland/empty_seed_slot_32bits.png);" >
+                        <input type="button" name="CreateTerrainHole" animstyle="22" 
+                            style="float:left;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/dig64_32bits.png)" 
+                            onclick="CreateTerrainHole.DoClick"
+                            tooltip="开辟山洞"/>
+                    </div>
+                    <div style="float:left;padding:10px;width:55px;height:55px;background:url(Texture/Aries/Homeland/empty_seed_slot_32bits.png);" >
+                        <input type="button" name="RealTerrainToBlocks" animstyle="22" 
+                            style="float:left;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/flatten64_32bits.png)" 
+                            onclick="CreateTerrainHole.DoClick"
+                            tooltip="积木地表"/>
+                    </div>
+                </div>
+                <!--<div>
+                    <div style="float:left;padding:10px;width:55px;height:55px;background:url(Texture/Aries/Homeland/empty_seed_slot_32bits.png);" >
+                        <input type="button" name="BlocksToRealTerrain" animstyle="22" 
+                            style="float:left;margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/reset64.png)" 
+                            onclick="CreateTerrainHole.DoClick"
+                            tooltip="将选中的积木区域还原成实数地表"/>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+</pe:mcml> 
+</body>
+</html>

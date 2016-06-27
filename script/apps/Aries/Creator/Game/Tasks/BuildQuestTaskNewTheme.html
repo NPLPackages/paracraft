@@ -1,0 +1,58 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuildQuestTask.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
+local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest")
+
+function ClosePage()
+   Page:CloseWindow();
+end
+
+function OnOK()
+    local name = Page:GetValue("name","");
+    if(not name or name == "") then
+        _guihelper.MessageBox(L"名称不能为空");
+        return;
+    end
+    local themesDS = BuildQuestProvider.GetThemes_DS(BuildQuest.new_theme_key);
+    for i = 1,#themesDS do
+        if(themesDS[i]["name"] == name) then
+            _guihelper.MessageBox(L"该名称已存在");
+            return;
+        end
+    end
+    BuildQuest.CreateNewTheme(name)
+    Page:CloseWindow();
+end
+
+function OnCancel()
+    Page:CloseWindow();
+end
+
+]]></script>
+<aries:window mode="thin" width="320" style="float:left;" onclose="ClosePage" title='<%=L"新建模版目录"%>'>
+    <div style="margin:10px;">
+    <div style="color: #ffffff; ">
+        <%=L"请输入目录名称:"%>
+    </div>
+    <div style="margin-top:5px;">
+        <input type="text" name="name" autofocus="true" value="" rows="1" style="margin-top:0px;margin-left:0px;height:22px;" class="mc_text"/>
+    </div>
+    <div style="margin-top:5px;">
+        <input type="button" value='<%=L"确定"%>' onclick="OnOK" style="margin-left: 100px; min-width: 60px; height: 22px; color: #ffffff;" class="mc_light_grey_button_with_fillet" />
+        <input type="button" value='<%=L"取消"%>' onclick="OnCancel" style="margin-left: 20px; min-width: 60px; height: 22px; color: #ffffff;" class="mc_light_grey_button_with_fillet" />
+    </div>
+    </div>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>
+

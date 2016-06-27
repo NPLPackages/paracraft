@@ -1,0 +1,29 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/SpecialBlockBuilder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="SpecialBlockBuilder.lua"><![CDATA[
+local SpecialBlockBuilder = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SpecialBlockBuilder");
+SpecialBlockBuilder.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+]]></script>
+<div style="width:250px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >机关</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+        功能暂未开放
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

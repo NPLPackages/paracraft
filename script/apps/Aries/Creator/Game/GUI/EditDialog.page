@@ -1,0 +1,193 @@
+﻿<?npl
+if(is_ajax()) then
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/Dialog.lua");
+	local Dialog = commonlib.gettable("MyCompany.Aries.Game.Rules.Dialog");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	local filename = request:get("filename");
+    local fullpath = Files.FindFile(filename);
+
+	add_action('wp_ajax_get_dialog_file', function()
+		local output;
+		if(fullpath) then
+			output = Dialog:new():LoadFromFile(fullpath):ToJsonObject();
+		else
+			output = Dialog:new():ToJsonObject();
+		end
+		wp_send_json(output, true);
+	end)
+
+	add_action('wp_ajax_save_dialog_file', function()
+		local output = {success = false};
+		if(not filename or filename == "") then
+            filename = nil;
+			-- TODO: a new file?
+		end
+        if(filename) then
+		    local dialog = request:get("json");
+            if(dialog) then
+                output.success = Dialog:new(dialog):SaveToFile(filename);
+                output.filename = Files.FindFile(filename) or filename;
+            end
+        end
+		wp_send_json(output);
+	end)
+	return;
+end
+
+wp_enqueue_script("ace", "/wp-includes/js/ace/ace.js");
+wp_enqueue_script("angular", "/wp-includes/js/angular/angular.min.js");
+
+?>
+<script src="script/apps/Aries/Creator/Game/GUI/EditDialog.js"></script>
+<div ng-app="DialogItem" ng-controller="DialogItemController as dialogs" style="margin-top:10px;" class="form-horizontal" >
+    <div>
+		<input type="text" placeholder="dialog filename" ng-model="filename" required />
+		<button ng-click="reload()"><i class="glyphicon glyphicon-refresh"></i>reload</button>
+		<button ng-click="save()"><i class="glyphicon glyphicon-upload"></i>save</button>
+		<span style="color:green">{{last_message}}</span>
+	</div>
+    <div style="margin-top:10px">
+        Title: <input type="text" placeholder="Enter Dialog Title (max 10 words)" ng-model="data.title" required />
+    </div>
+    <div>
+        <h2>total gossips: {{data.gossips.length}} </h2>
+        <div style="margin-left:20px;">
+            <div ng-repeat="gossip in data.gossips">
+                <div>
+                    <h3>
+                        gossip {{$index+1}} has {{gossip.length}} text
+                        <button ng-click="removeItem(data.gossips, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                        <button ng-click="moveItemUp(data.gossips, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                    </h3>
+                </div>
+                <div style="margin-left:20px;">
+                    <blockquote ng-repeat="item in gossip">
+                        <div>
+                            item {{$index+1}}:
+                            <input type="text" ng-model="item.name" placeholder="dialog item name" />
+                            <button ng-click="removeItem(gossip, $index, 1)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                            <button ng-click="moveItemUp(gossip, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                        </div>
+                        <div>
+                            avatar: <input type="text" ng-model="item.avatar.name" placeholder="avatar name" list="avatarNames"/>
+                            <input type="text" ng-model="item.avatar.text" placeholder="avatar display text" />
+                        </div>
+                        <div>
+                            <textarea ng-model="item.content" style="width:100%" placeholder="dialog text"></textarea>
+                        </div>
+                        <div align="right">
+                            <div ng-repeat="button in item.buttons">
+                                <input type="text" ng-model="button.label" placeholder="button text" />
+                                <input type="text" ng-model="button.action" placeholder="click action" list="buttonActions">
+                                <button ng-click="removeItem(item.buttons, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                                <button ng-click="moveItemUp(item.buttons, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                            </div>
+                            <div>
+                                <button ng-click="addDialogButton(item)"><i class="glyphicon glyphicon-plus-sign"></i>add button</button>
+                            </div>
+                        </div>
+                    </blockquote>
+                    <button ng-click="addDialogitem(gossip)"><i class="glyphicon glyphicon-plus-sign"></i>add text</button>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <button ng-click="addGossip()"><i class="glyphicon glyphicon-plus-sign"></i>add gossip</button>
+            </div>
+        </div>
+        <h2>total triggers: {{data.triggers.length}} </h2>
+        <div style="margin-left:20px;">
+            <div ng-repeat="trigger in data.triggers">
+                <div>
+                    <h3>
+                        trigger {{$index+1}}
+                        <button ng-click="removeItem(data.triggers, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                        <button ng-click="moveItemUp(data.triggers, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                    </h3>
+                </div>
+                <div style="margin-left:20px;">
+                    <div>
+                        <h4>Input:</h4>
+                        <blockquote>
+                            <div ng-repeat="item in trigger.input">
+                                <select ng-model="item.name">
+                                    <option ng-repeat="c in itemTypes">{{c}}</option>
+                                </select>
+                                <input type="text" ng-model="item.id" placeholder="item id" />
+                                <input type="number" ng-model="item.count" style="width:70px;" placeholder="item count" />
+                                <button ng-click="removeItem(trigger.input, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                                <button ng-click="moveItemUp(trigger.input, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                            </div>
+                        </blockquote>
+                        <button ng-click="addRuleitem(trigger.input, $index)"><i class="glyphicon glyphicon-plus-sign"></i>add input</button>
+                    </div>
+                    <div>
+                        <h4>Dialog:</h4>
+                        <blockquote ng-repeat="item in trigger.dialog">
+                            <div>
+                                item {{$index+1}}:
+                                <input type="text" ng-model="item.name" placeholder="dialog item name" />
+                                <button ng-click="removeItem(trigger.dialog, $index, 1)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                                <button ng-click="moveItemUp(trigger.dialog, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                            </div>
+                            <div>
+                                avatar: <input type="text" ng-model="item.avatar.name" placeholder="avatar name" list="avatarNames"/>
+                                <input type="text" ng-model="item.avatar.text" placeholder="avatar display text" />
+                            </div>
+                            <div>
+                                <textarea ng-model="item.content" style="width:100%" placeholder="dialog text"></textarea>
+                            </div>
+                            <div align="right">
+                                <div ng-repeat="button in item.buttons">
+                                    <input type="text" ng-model="button.label" placeholder="button text" />
+                                    <input type="text" ng-model="button.action" placeholder="click action" list="buttonActions">
+                                    <button ng-click="removeItem(item.buttons, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                                    <button ng-click="moveItemUp(item.buttons, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                                </div>
+                                <div>
+                                    <button ng-click="addDialogButton(item)"><i class="glyphicon glyphicon-plus-sign"></i>add button</button>
+                                </div>
+                            </div>
+                        </blockquote>
+                        <button ng-click="addDialogitem(trigger.dialog)"><i class="glyphicon glyphicon-plus-sign"></i>add text</button>
+                    </div>
+                    <div>
+                        <h4>Output:</h4>
+                        <blockquote>
+                            <div ng-repeat="item in trigger.output">
+                                <select ng-model="item.name">
+                                    <option ng-repeat="c in itemTypes">{{c}}</option>
+                                </select>
+                                <input type="text" ng-model="item.id" placeholder="item id" />
+                                <input type="number" ng-model="item.count" style="width:70px;" placeholder="item count" />
+                                <button ng-click="removeItem(trigger.output, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                                <button ng-click="moveItemUp(trigger.output, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                            </div>
+                        </blockquote>
+                        <button ng-click="addRuleitem(trigger.output, $index)"><i class="glyphicon glyphicon-plus-sign"></i>add output</button>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <button ng-click="addTrigger()"><i class="glyphicon glyphicon-plus-sign"></i>add trigger</button>
+            </div>
+        </div>
+        <h2>total quests: {{data.quests.length}} </h2>
+        <div style="margin-left:20px;">
+            <div ng-repeat="quest in data.quests">
+                <div>
+                    <h3>
+                        TODO: quest {{$index+1}}
+                        <button ng-click="removeItem(data.quests, $index, 0)"><i class="glyphicon glyphicon-remove-sign"></i></button>
+                        <button ng-click="moveItemUp(data.quests, $index)"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+	<datalist id="buttonActions">
+        <option ng-repeat="c in buttonActions">{{c}}</option>
+    </datalist>
+	<datalist id="avatarNames">
+        <option ng-repeat="c in avatarNames">{{c}}</option>
+    </datalist>
+</div>

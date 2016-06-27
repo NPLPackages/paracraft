@@ -1,0 +1,48 @@
+﻿<!-- "script/apps/Aries/Creator/ShareWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>save world page by LiXizhi 2008.6.27</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" src="ShareWorldPage.lua"><![CDATA[
+MyCompany.Aries.Creator.ShareWorldPage.OnInit();
+]]></script>
+<div>
+<div>
+    <form name="sharePhotosFrm">
+    <div style="float:left;margin-bottom:5px">
+        <div style="float:left;margin-top:1px;color:#808080">名称:</div><pe:label name="world_name" style="margin-left:0px;height:22px;width:100px" /><br/>
+        <div style="padding:2px;background:url(Texture/Aries/Creator/imageboarder.png: 3 3 3 3)">
+            <img name="WorldImage" tooltip="领地预览" src="Texture/Aries/brand/noimageavailable.png" width="180" height="110"/>
+        </div>
+        <div style="margin-top:5px;">
+            <input type="checkbox" name="checkSaveWhenShare" style="margin-right:5px;" checked="true"/>分享的同时保存该领地 
+        </div>
+    </div>
+    <div style="float:left;margin-left:10px;margin-right:5px;margin-bottom:5px">
+        <div>
+            <div style="font-weight:bold;margin-top:5px;margin-bottom:5px;">你想如何分享你的领地呢?</div>
+            <input type="radio" name="radioReceiver" value="official" checked="true" style="margin-right:5px;"/>提交给罗德镇长 
+        </div>
+        <div style="margin-top:20px;">
+            <div style="color:#808080">向罗德镇长推荐一下你的领地吧：</div>
+            <div style="float:left;background:url(Texture/Aries/Common/MultilineEditbox_32bits.png:5 5 5 5)">
+                <textarea name="world_desc" WordWrap="true" SingleLineEdit="true" rows="2"></textarea>
+            </div>
+        </div>
+        <div>
+            <input type="submit" class="defaultbutton" style="margin-left:0px;margin-top:5px;width:80px;height:32px;background:url(Texture/Aries/Creator/button_32bits.png# 0 0 32 30: 15 14 15 14);color:#660033;" name="btnOK" value="确定" tooltip="点击提交领地" onclick="MyCompany.Aries.Creator.ShareWorldPage.OnClickSubmit()"/>
+            <input type="button" style="margin-left:20px;margin-top:5px;width:80px;height:32px;background:url(Texture/Aries/Creator/button_32bits.png# 0 0 32 30: 15 14 15 14);color:#660033;" name="btnCancel" value="取消" onclick="MyCompany.Aries.Creator.ShareWorldPage.OnClose()"/>
+        </div>
+    </div>
+    </form>
+</div>
+<hr />
+<img style="background:url(Texture/3DMapSystem/common/exclamation.png);width:16px;height:16px;"/>
+<label name="result" style="float:left;height:30px;color:#003366;margin-left:5px;">每天只能提交5次. 如果你的领地发生了变化, 需要重新提交.</label>
+</div>
+</pe:mcml>
+</body>
+</html>

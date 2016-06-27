@@ -1,0 +1,209 @@
+<!-- "script/apps/Aries/Creator/Game/Login/LocalLoadWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false" src="LocalLoadWorld.lua"><![CDATA[
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local page = document:GetPageCtrl();
+local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+LocalLoadWorld.page = page;
+LocalLoadWorld.OnInit();
+local cur_world = LocalLoadWorld.SelectedWorld;
+
+function getBGStyle()
+    return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
+end
+
+function GetClass(selected)
+    local class;
+    if(selected) then
+        class = "mc_inner_panel_selected"
+    else
+        class = "mc_inner_panel"
+    end
+    return class;
+end
+
+function SelectedWorld(name,node)
+    local world = node:GetPreValue("this", true);
+    MyCompany.Aries.Game.MainLogin.LocalLoadWorld.OnSelectWorld(world,true);
+    --local selected = item.selected;
+
+end
+
+function ReturnLastStep()
+    page:CloseWindow();
+    if(not GameLogic.IsStarted) then
+        MainLogin:next_step({IsLoginModeSelected = false});
+    end
+end
+
+function GetAuthor(name)
+    local s = "制作者:";
+    if(name) then
+        s = s..name;
+    end
+    return s;
+end
+
+function GetMode(mode)
+    local s = "";
+    if(mode == "survival") then
+        s = "生存模式";
+    elseif(mode == "create") then
+        s = "创造模式";
+    end
+    return s;
+end
+
+function GetCurWorldProgress() 
+    local i = (cur_world.progress or 0) * 100;
+    --local s = ""
+    --if(i == 0) then
+    --    s = "0";
+    --else
+    --    s = tostring(i).."%";
+    --end
+    local s = tostring(i).."%";
+    return s;
+end
+
+function GetCurWorldCostTime() 
+    local time = cur_world.costTime;
+    local day, hour, minute = string.match(time,"(%d+):(%d+):(%d+)");
+    day = tostring(day);
+    hour = tostring(hour);
+    minute = tostring(minute);
+    local s = day.."天"..hour.."小时"..minute.."分钟";
+    return s;
+end
+
+function GetCurWorldMode() 
+    local mode = cur_world.mode;
+    local s = "";
+    if(mode == "survival") then
+        s = "生存模式";
+    elseif(mode == "create") then
+        s = "创造模式";
+    end
+    return s;
+end
+
+function GetCurWorldGrade() 
+    local grade = cur_world.grade;
+    local s = "";
+    if(grade == "primary") then
+        s = "初级";
+    elseif(grade == "middle") then
+        s = "中级";
+    elseif(grade == "adventure") then
+        s = "高级";
+    elseif(grade == "ultimate") then
+        s = "极限";
+    end
+    return s;
+end
+
+function GetCurWorldAuthor() 
+    return cur_world.author;
+end
+
+function GetCurWorldIP() 
+    return cur_world.ip;
+end
+
+function CreateNewWorld()
+    MainLogin:next_step({IsLoadMainWorldRequested = true});
+    page:CloseWindow();
+end
+]]></script>
+
+<pe:container alignment="_ct" style="position:relative;margin-left:-400px;margin-top:-250px;width:800px;height:450px;background:">
+    <div style="width:800px;height:400px;">
+        <div style="float:left;margin-top:8px;margin-left:27px;width:160px;height:384px;">
+            <div style="width:160px;height:112px;">
+                <div style="width:160px;height:112px;" class="mc_outer_panel">
+                    <input type="button" value="单机模式" style="text-offset-y:-3;margin-top:19px;margin-left:15px;width:130px;height:34px;" class="mc_big_button_selected"/>
+                    <input type="button" enabled="false" value="局域网模式" style="margin-top:10px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>
+                </div>
+            </div>
+            <div style="margin-top:16px;width:160px;height:256px;">
+                <div style="width:160px;height:256px;" class="mc_outer_panel">
+                    <div style="position:relative;float:left;margin-left:-48px;margin-top:-40px;width:256px;height:256px;">
+                        <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false"/>
+                    </div>
+                    <input type="button" enabled="false" value="更改造型" style="position:relative;margin-top:210px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;margin-top:8px;margin-left:38px;width:353px;height:384px;" class="mc_outer_panel">
+            <div style="margin-top:10px;margin-left:10px;width:333px;height:364px;">
+                <pe:gridview RememberScrollPos="true" AllowPaging="false" VerticalScrollBarStep="72" ItemsPerLine="1" name="gwOpenWorlds" DataSource='<%=MyCompany.Aries.Game.MainLogin.LocalLoadWorld.DS_Func_Open%>' DefaultNodeHeight="72" >
+                    <Columns>
+                        <div style="margin-top:10px;margin-left:10px;width:280px;height:62px;">
+                            <input type="button" style="position:relative;width:280px;height:62px;background-color:#ffffffff;" class='<%= GetClass(Eval("selected")) %>' onclick="SelectedWorld"/>
+                            <input type="button" enabled="false" style="margin-top:10px;margin-left:38px;width:40px;height:46px;background:url(Texture/Aries/Creator/Theme/CommonControl_32bits.png#32 202 16 16:6 6 6 6);"  />
+                            <input type="button" enabled="false" value='<%=Eval("Title")%>' style="width:100px;font-weight:bold;font-size:14px;margin-top:7px;margin-left:40px;background:;"/>
+                            <input type="button" enabled="false" value='<%= GetAuthor(Eval("author")) %>' style="width:100px;margin-top:-33px;margin-left:120px;background:;"/>
+                            <input type="button" enabled="false" value='<%= GetMode(Eval("mode")) %>' style="width:100px;margin-top:-16px;margin-left:120px;background:;"/>
+                        </div>  
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <div style="margin:10px;font-weight:bold;">你没有在这台电脑上创造过任何世界,请先创建新世界</div>
+                    </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+                        <b>正在搜索, 请稍候 ... </b>
+                    </FetchingDataTemplate>
+                </pe:gridview>
+            </div>
+        
+        </div>
+        <div style="float:left;margin-top:8px;margin-left:27px;width:160px;height:384px;" class="mc_outer_panel">
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="position:relative;font-size:16px;base-font-size:16;font-weight:bold;margin-top:15px;margin-left:20px;">
+                    <%=GetCurWorldProgress() %><!--85%-->
+                </div>
+                <div style="position:relative;font-size:13px;margin-top:20px;margin-left:65px;">
+                    完成度
+                </div>
+                <div style="text-align:center;font-size:13px;margin-top:45px;margin-left:4px;">
+                创作时长
+                </div>
+                <div style="text-align:center;font-size:13px;margin-top:3px;margin-left:6px;">
+                <%=GetCurWorldCostTime() %><!--12天12小时12分钟-->
+                </div>
+            </div>
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="margin-top:7px;">
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">模式</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldMode() %><!--生存模式--></font><br/>
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">难度</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldGrade()%><!--普通--></font>
+                </div>
+                    
+            </div>
+            <div style="margin-top:22px;margin-left:15px;width:130px;height:100px;" class="mc_inner_panel">
+                <div style="margin-top:7px;">
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">作者</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldAuthor() %><!--KidD--></font><br/>
+                    <font style ="font-size:14px;base-font-size:14;font-weight:bold;text-align:center;">IP地址</font><br/>
+                    <font style ="font-size:13px;text-align:center;"><%=GetCurWorldIP() %><!--192.168.0.15--></font>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:800px;height:30px;margin-top:20px;margin-left:120px;">
+        <input type="button" value="创建新世界" style="margin-left:38px;height:32px;width:120px;" class="mc_big_button" onclick="CreateNewWorld"/>
+        <input type="button" value="进入世界" style="font-weight:bold;margin-left:38px;height:32px;width:120px;" class="mc_big_button" onclick="MyCompany.Aries.Game.MainLogin.LocalLoadWorld.OnClickLoadWorld"/>
+        <input type="button" value="返回" style="margin-left:38px;height:32px;width:120px;" class="mc_big_button" onclick="ReturnLastStep"/>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

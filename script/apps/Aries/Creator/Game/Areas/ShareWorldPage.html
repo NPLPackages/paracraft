@@ -1,0 +1,96 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/ShareWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl"><![CDATA[
+
+local page = document:GetPageCtrl();
+
+NPL.load("(gl)script/apps/Aries/Creator/SaveWorldPage.lua");
+local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.SaveWorldPage")
+SaveWorldPage.sharepage = page;
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function TakeImage()
+    SaveWorldPage.TakeSharePageImage();
+end
+
+function OnClickShareWorld()
+    ParaGlobal.ShellExecute("open", L"http://www.paracraft.cn/shareworld", "", "", 1);
+end
+
+]]></script>
+<aries:window style="width:310px;" title='<%=L"分享世界"%>' onclose="ClosePage" mode="lite">
+    <div style="margin-top:15px;margin-left:20px;padding:2px;background:">
+        <img name="ShareWorldImage" zorder="1" width="260" height="175"/>
+    </div>
+    <div style="margin-top:7px;margin-bottom:15px;">
+        <input type="button" style="float:left;margin-left:30px;" value='<%=L"重新截图"%>'  class="mc_light_grey_button_with_fillet" onclick="TakeImage"/>
+        <input type="button" style="float:left;margin-left:30px;" value='<%=L"立刻分享"%>' class="mc_light_grey_button_with_fillet" onclick="OnClickShareWorld"/>
+    </div>
+</aries:window>
+<!--<div style="margin-left:-5px;margin-top:10px;padding-left:5px;width:225px;height:400px;color:#cccccc">
+    
+    <pe:if condition='<%=WorldFramePage.category_index == 2%>'>
+        <div style="margin-top:5px;padding:10px;margin-left:0px;" class="mc_border" width="100%">
+            <div style="font-weight:bold">第一步: 将世界打包成zip文件 </div>
+            <div style="float:left;margin-left:5px;width:270px;">
+                <div style="margin-top:5px;">
+                    <div style="float:left;width:70px;text-align:right">领地名称:</div><input name="world_name" style="width:120px;height:22px;"/>
+                </div>
+                <div>
+                    <div style="float:left;width:70px;text-align:right">世界路径:</div>
+                    <a onclick="MyCompany.Aries.Creator.SaveWorldPage.OnOpenWorldDir" tooltip="点击打开文件夹">
+                        <img style="margin-right:3px;margin-top:2px;background:url(Texture/3DMapSystem/common/ViewFiles.png);width:16px;height:16px;"/>
+                        <label name="worldpath" style="color:#cccccc;"/>
+                    </a>
+                </div>
+                <input type="button" class="mc_big_button" onclick="OnClickCreatePackage" style="margin-top:5px;width:120px;height:32px;font-weight:bold;" value="开始打包..."/><br />
+                <label name="result" style="color:#303030;height:30px;"></label>
+            </div>
+            <div style="float:left;margin-top:-22px;margin-left:5px;">
+                <div style="margin-top:1px;font-weight:bold;color:#aaaaaa">
+                    世界预览图: 
+                    <input type="button" onclick="MyCompany.Aries.Creator.SaveWorldPage.TakeWorldImage" name="takesnapshot" style="font-size:12px;margin-top:-2px;min-width:60px;" class="mc_small_button" value="截图"/>
+                </div>
+                <div style="padding:2px;background:url(Texture/Aries/common/picbg16_32bits.png#0 0 16 16: 3 3 3 3);">
+                    <img name="WorldImage" zorder="1" width="180" height="110"/>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:5px;padding:10px;margin-left:0px;" class="mc_border" width="100%">
+            <div style="font-weight:bold">第二步: 上传分享 </div>
+            <div style="float:left;margin-left:10px;margin-top:5px;">
+                您可以将<a tooltip="点击打开所在目录" onclick="OnClickOpenPackageDir"><%=GetPkgFileName()%></a>上传到
+                <pe:if condition='<%=System.options.version == "kids" %>'>
+                <a href="http://tieba.baidu.com/f?kw=%C4%A7%B7%A8%B9%FE%C6%E6">魔法哈奇百度贴吧</a>方便大家交流
+                </pe:if>
+                <pe:if condition='<%=System.options.version == "teen" %>'>
+                    官方论坛
+                </pe:if>
+            </div>
+        </div>
+        <div style="margin-top:5px;padding:10px;margin-left:0px;" class="mc_border" width="100%">
+            <div style="font-weight:bold">第三步: 推广你的世界</div>
+            <div style="float:left;margin-left:10px;margin-top:5px;">
+                您可以通过全区大喇叭, 邀请好友下载和参观你的世界<br />
+                <pe:if condition='<%=System.options.version == "kids" %>'>
+                您也可以将自己的世界拍摄成视频, 上传到<a href="http://www.aipai.com/game_gameid-47617.html">魔法哈奇爱拍社区</a><br />
+                您也可以在魔法哈奇贴吧中用图片直播自己创造世界的过程.
+                </pe:if>
+            </div>
+        </div>
+    </pe:if>
+</div>-->
+</pe:mcml>
+</body>
+</html>
+

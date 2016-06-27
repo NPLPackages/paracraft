@@ -1,0 +1,462 @@
+<!-- "script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false" src="InternetLoadWorld.lua"><![CDATA[
+local page = Page;
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+InternetLoadWorld.OnInit();
+local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+
+function IsMCVersion()
+    if(System.options.mc) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function GetWorldSize(size)
+    local s;
+    
+    if(size and size ~= "") then
+        s = string.format("%sM",size);
+    else
+        s = nil;
+    end
+    
+    return s or "5M";
+end
+
+function GetWorldType()
+    return InternetLoadWorld.type_ds;
+end
+
+function CreateNewWorld()
+    page:CloseWindow();
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+    CreateNewWorld.ShowPage();
+end
+
+function GetCurWorldInfo(info_type,world_index)
+    local index = tonumber(world_index);
+    local selected_world = InternetLoadWorld.cur_ds[world_index]
+    --local cur_world = InternetLoadWorld:GetCurrentWorld();
+    if(selected_world) then
+        if(info_type == "mode") then
+            local mode = selected_world["world_mode"]
+            if(mode == "edit") then
+                return L"创作";
+            else
+                return L"参观";
+            end
+        else
+            return selected_world[info_type];
+        end
+    end
+end
+
+function GetNetSpeed()
+    return "100ms";
+end
+
+function GetPeopleNumOnline()
+    return "????";
+end
+
+function InputSearchContent()
+    InternetLoadWorld.isSearching = true;
+    Page:Refresh(0.1);
+end
+
+function ClosePage()
+    if(IsMCVersion()) then
+        InternetLoadWorld.ReturnLastStep();
+    else
+        Page:CloseWindow();
+    end
+end
+
+function GetDefaultValueForAddress()
+    local s = "";
+    if(IsMCVersion()) then
+        s = L"输入服务器地址";
+    else
+        s = L"输入服务器地址或者米米号";
+    end
+    return s;
+end
+
+function LookPlayerInform()
+    local cur_page = InternetLoadWorld.GetCurrentServerPage();
+    local nid = cur_page.player_nid;
+    if(nid) then
+        Map3DSystem.App.Commands.Call(Map3DSystem.options.ViewProfileCommand, nid)
+    end
+end
+
+function IsBlockWorld()
+    local cur_page = InternetLoadWorld.GetCurrentServerPage();
+    if(cur_page.player_nid and cur_page.player_nid ~= "") then
+        return false;
+    else
+        return true;
+    end
+end
+
+function OpenBBS()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+    local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")   
+    local url = options.bbs_home_url;
+    ParaGlobal.ShellExecute("open", url, "", "", 1);
+end
+
+function OnImportWorld()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+    local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")        
+    ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0)..LocalLoadWorld.GetWorldFolder(), "", "", 1);
+end
+
+function GetDesForWorld()
+    local str = ""
+    return str;
+end
+
+function GetOnlineDes()
+    local isOnline = System.User.isOnline;
+    local des = L"你的状态:";
+    if(isOnline) then
+        des = des..L"已登录";
+    else
+        des = des..L"未登录";
+    end
+    return des;
+end
+
+function QQLogin()
+    InternetLoadWorld.QQLogin();
+end
+
+function OnChangeType(index)
+    InternetLoadWorld.OnChangeType(index);
+end
+
+function BeHasWorldInSlot(is_empty_slot,is_buy_slot)
+    local value;
+    if(is_empty_slot or is_buy_slot) then
+        value = false;
+    else
+        value = true;
+    end
+    return value;
+end
+
+function OnPurchaseSaveSlot()
+    if(System.options.mc) then
+        _guihelper.MessageBox(L"此功能暂未开放");
+    else
+        _guihelper.MessageBox(L"你尚未开启这个存档槽. 每购买一个会员物品, 可永久获得一个存档槽.", function(res)
+            if(res) then
+                local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
+                System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd"):Call({gsid = WorldUploadPage.ExtendedSlotCountGsid});
+            end
+        end);
+    end
+    
+end
+
+function OnSaveToSlot(name)
+    local slot_id = tonumber(name);
+    InternetLoadWorld.OnSaveToSlot(slot_id);
+end
+
+function IsSelfOnlineWorld()
+    local cur_svr_page = InternetLoadWorld.GetCurrentServerPage() or {};
+
+    if(InternetLoadWorld.type_index == 1 and cur_svr_page.name and cur_svr_page.name == "onlineworld") then
+        return true;
+    else
+        return false;
+    end
+end
+
+function IsChangingName()
+    return InternetLoadWorld.changedName;
+end
+
+function IsChangingQQ()
+    return InternetLoadWorld.changedQQ;
+end
+
+function ChangeName()
+    InternetLoadWorld.changedName = true;
+    Page:Refresh(0.1);
+end
+
+function SaveName()
+    InternetLoadWorld.ChangeNickName();
+    --changedName = false;
+    --Page:Refresh(0.1);
+end
+
+function ChangeQQ()
+    InternetLoadWorld.changedQQ = true;
+    Page:Refresh(0.1);
+end
+
+function SaveQQ()
+    InternetLoadWorld.changedQQ = false;
+    Page:Refresh(0.1);
+end
+
+function GetUserNickName()
+    return System.User.NickName or L"匿名";
+end
+
+function CancelChangeName()
+    InternetLoadWorld.changedName = false;
+    Page:Refresh(0.1);
+end
+
+]]></script>
+<div style="width:860px;height:470px;">
+    <div style="float:left;margin-top:0px;width:160px;height:470px;" class="mc_panel">
+        <pe:if condition='<%= System.options.mc%>'>
+            <div style="position:relative;margin-left:0px;margin-top:0px;">
+                <div style="margin-left:0px;margin-top:0px;">
+                    <pe:if condition='<%= System.User.isOnline%>'>
+                        <pe:if condition='<%= not IsChangingName()%>'>
+                            <div style="margin-top: 20px; text-align: center; color: #ffffff;">
+                                <%= GetUserNickName() %>
+                            </div>
+                            <div style="margin-left:45px;margin-top:10px;">
+                                <input type="button" value="修改名称" onclick="ChangeName" style="width: 70px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= IsChangingName()%>'>
+                            <div style="margin-left:15px;margin-top:20px;">
+                                <input type="text" name="nickname" autofocus="true" value='<%=GetUserNickName()%>' rows="1" style="margin-top:0px;margin-left:0px;width:130px;height:22px;" class="mc_text" />
+                            </div>
+                            <div style="margin-left: 0px; margin-top: 10px;">
+                                <input type="button" value="确定" onclick="SaveName" style="float: left; margin-left: 15px; width: 60px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                                <input type="button" value="取消" onclick="CancelChangeName" style="float: left; margin-left: 10px; width: 60px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                            </div>
+                        </pe:if>
+                    </pe:if>
+                </div>
+            </div>
+            <div style="position:relative;margin-left:-48px;margin-top:90px;width:256px;height:226px;">
+                <div>
+                    <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" isinteractive="false" />
+                </div>
+                <!--<input type="button" enabled="false" value="更改造型" style="position:relative;margin-top:210px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>-->
+            </div>
+            <div style="position:relative;margin-left:0px;margin-top:340px;height:256px;">
+                <div style="margin-left:0px;margin-top:0px;height:50px;">
+                    <pe:if condition='<%= System.User.isOnline%>'>
+                        <!--<pe:if condition='<%= not IsChangingName()%>'>
+                            <div style="margin-top: 20px; text-align: center; color: #ffffff;">
+                                <%= GetUserNickName() %>
+                            </div>
+                            <div style="margin-left:45px;margin-top:10px;">
+                                <input type="button" value="修改名称" onclick="ChangeName" style="width: 70px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= IsChangingName()%>'>
+                            <div style="margin-left:15px;margin-top:20px;">
+                                <input type="text" name="nickname" autofocus="true" value='<%=GetUserNickName()%>' rows="1" style="margin-top:0px;margin-left:0px;width:130px;height:22px;" class="mc_text" />
+                            </div>
+                            <div style="margin-left: 0px; margin-top: 10px;">
+                                <input type="button" value="确定" onclick="SaveName" style="float: left; margin-left: 15px; width: 60px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                                <input type="button" value="取消" onclick="CancelChangeName" style="float: left; margin-left: 10px; width: 60px; height: 22px; color: #ffffff; " class="mc_light_grey_button_with_fillet" />
+                            </div>
+                        </pe:if>-->
+                    </pe:if>
+                    <pe:if condition='<%= not System.User.isOnline%>'>
+                        <!--<input type="button" value="QQ登录" style="margin-left:47px;margin-top:17px;width:60px;height:22px;font-size:14px;" onclick="QQLogin" class="mc_light_grey_button_with_fillet" />-->
+                    </pe:if>
+                </div>
+                <!--<div style="text-align:center;color:#ffffff;">
+                    <%= GetOnlineDes() %>
+                </div>-->
+            </div>
+        </pe:if>
+    </div>
+    <aries:window mode="thin" width="700" height="470" style="float:left;" title='<%=L"服务器列表" %>' onclose="ClosePage">
+        <div style="float: left; margin-left: 19px; height: 30px;">
+            <div style="position:relative;">
+                <pe:repeat DataSource="<%=GetWorldType()%>">
+                    <pe:repeatitem style="float:left;">
+                        <pe:if condition='<%=InternetLoadWorld.type_index == Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeType" style="font-weight:bold;margin-right:10px;margin-top:8px;margin-bottom:0px;color:#33ff33;font-size:14px;min-width:66px;height:25px;" class="mc_green_button_with_fillet"/>
+                        </pe:if>
+                        <pe:if condition='<%=InternetLoadWorld.type_index ~= Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeType" style="margin-right:10px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;min-width:66px;height:25px;" class="mc_light_grey_button_with_fillet"/>
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+            <div style="position:relative;margin-left: 310px; margin-top: 9px; height: 25px; background: ;">
+                <input type="text" name="content" EmptyText='<%=GetDefaultValueForAddress() %>' rows="1" CaretColor="#FFFFFFFF" style="textcolor:#ffffff;float:left;margin-top:0px;margin-left:5px;width:285px;height:26px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#263 346 36 36:15 15 15 15);" />
+                <input type="button" value='<%=L"添加" %>' class="mc_light_grey_button_with_fillet" onclick="InternetLoadWorld.OnAddSearchPage" style="margin-left:4px;margin-top:2px;height:22px;min-width:50px"/>
+            </div>
+        </div>
+        <div style="margin-left:17px;margin-top:10px;width:660px;height:345px;background-color:#333333">
+            <!--categories--> 
+            <div style="float:left;margin-left:4px;margin-top:10px;width:290px;height:325px;">
+                <pe:gridview RememberScrollPos="true" style="margin-top:0px;" AllowPaging="false" VerticalScrollBarStep="42" DefaultNodeHeight="42" ItemsPerLine="1" CellPadding="5" name="gwSvrPageList" DataSource='<%=InternetLoadWorld.DS_Func_ServerPages%>' >
+                    <Columns>
+                        <pe:if condition='<%= Eval("index") == InternetLoadWorld.ServerPage_index%>'>
+                            <div style="margin-left:8px;width:250px;height:36px;" class="mc_button_blue">
+                                <div style="position:relative;margin-left:8px;margin-top:6px;">
+                                    <%=Eval("text") %>
+                                </div>
+                                <pe:if condition='<%=Eval("readonly")~=true %>'>
+                                    <pe:if condition='<%=Eval("addmark")~=true %>'>
+                                        <input type="button" name="btn_rename" onclick="InternetLoadWorld.RenameSvr" style="position:relative;margin-left:198px;margin-top:4px;width:8px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 155 8 9)"/>
+                                    </pe:if>
+                                    <input type="button" name="btn_delete" tooltip='<%=L"删除" %>' onclick="InternetLoadWorld.DeleteSvr" style="position:relative;margin-left:197px;margin-top:20px;width:9px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 124 9 11)"/>
+                                    <!--<input type="button" name="btn_up"     onclick="" style="position:relative;margin-left:190px;margin-top:10px;width:8px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 155 8 9)"/>
+                                    <input type="button" name="btn_down"   onclick="" style="position:relative;margin-left:190px;margin-top:32px;width:8px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 155 8 9)"/>-->
+                                    <pe:if condition="<%=IsBlockWorld()%>">
+                                        <input type="button" name="btn_wiki" onclick="InternetLoadWorld.OnClickOpenWiki" value="wiki" style="position:relative;margin-left:215px;margin-top:10px;width:30px;height:18px;" class="mc_light_grey_button_with_fillet"/>
+                                    </pe:if>
+                                    <pe:if condition="<%= not IsBlockWorld()%>">
+                                        <input type="button" name="btn_inform" onclick="LookPlayerInform" value='<%=L"信息" %>' style="position:relative;margin-left:213px;margin-top:10px;width:40px;height:21px;" class="mc_light_grey_button_with_fillet"/>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("addmark")==true %>'>
+                                        <div style="position:relative;margin-left:8px;margin-top:6px;">
+                                            <input type="text" name="svr_mark" autofocus="true" value='<%=Eval("text")%>' uiname="svr_remark_obj" rows="1" style="margin-top:0px;margin-left:0px;width:130px;height:22px;" class="mc_text"/>
+                                        </div>    
+                                        <div style="position:relative;margin-left:197px;margin-top:4px;width:11px;height:12px;" class="mc_button_grey">
+                                            <input type="button" DefaultButton="true" tooltip="保存" onclick="InternetLoadWorld.SaveSvrMark" style="width:9px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9)"/>    
+                                        </div>
+                                    </pe:if>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= Eval("index") ~= InternetLoadWorld.ServerPage_index%>'>
+                            <div style="margin-left:8px;width:250px;height:36px;" class="mc_button_black">
+                                <div style="position:relative;margin-left:8px;margin-top:6px;">
+                                    <%=Eval("text") %>
+                                </div>
+                                <input type="button" style="position:relative;margin-left:13px;margin-top:4px;width:266px;height:52px;background:" name='<%=Eval("index")%>' onclick="InternetLoadWorld.OnChangeServerPage" />
+                            </div>
+                        </pe:if>
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff">'<%=L"空" %>'</div>
+                    </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff">'<%=L"正在搜索, 请稍候 ... " %>'</div>
+                    </FetchingDataTemplate>
+                </pe:gridview>
+            </div>
+            <!--line--> 
+            <div style="float:left;width:2px;height:345px;margin-left:0px;margin-top:0px;background-color:#676767"/>
+            <!--worlds--> 
+            <div style="float:left;margin-left:8px;margin-top:10px;height:320px;">
+                <pe:gridview RememberScrollPos="true" style="margin-left:5px;" AllowPaging="false" VerticalScrollBarStep="59" DefaultNodeHeight="59" ItemsPerLine="1" name="gw_world_ds" DataSource='<%=InternetLoadWorld.DS_Func_Worlds%>' >
+                    <Columns>
+                        <pe:if condition='<%= BeHasWorldInSlot(Eval("is_empty_slot"),Eval("is_buy_slot"))%>'>
+                            <pe:if condition='<%= Eval("index") == InternetLoadWorld.selected_world_index%>'>
+                                <div name='<%=Eval("index")%>' style="position:relative;margin-left:3px;margin-top:5px;height:54px;width:330px;" class="mc_button_green">
+                                    <div style="position:relative;margin-left:10px;margin-top:5px;base-font-size:18px;font-size:18px;text-align:left;color:#ffffff;font-weight:bold;">
+                                        <%=Eval("text") %><%=if_else(Eval("is_zip")==true, L".zip", "")%>
+                                    </div>
+                                    <div style="position:relative;margin-left:10px;margin-top:32px;font-size:12px;color:#9e9e9e">
+                                        <span style="margin-left:0px;"><%=GetCurWorldInfo("revision",Eval("index")) %></span>
+                                        <span style="margin-left:10px;"><%=GetWorldSize(Eval("size")) %></span>
+                                        <span style="margin-left:10px;"><%=Eval("author") %></span>
+                                    </div>
+                                    <!--<%=GetCurWorldInfo("mode",Eval("index")) %>-->
+                                    <pe:if condition='<%= IsSelfOnlineWorld()%>'>
+                                        <div style="position:relative;margin-left:10px;margin-top:28px;font-size:12px;color:#9e9e9e">
+                                            <input type="button" name='<%=Eval("slot_id")%>' value="在线保存" tooltip="上传本地世界到服务器" style="width:68px;height:20px;font-size:12px;" onclick="OnSaveToSlot" class="mc_light_grey_button_with_fillet"/>
+                                            <input type="button" name='<%=Eval("slot_id")%>' value="下载本地" tooltip="将本地世界和服务器存档同步或从服务器下载世界" style="margin-left:10px;width:68px;height:20px;font-size:12px;" onclick="InternetLoadWorld.OnCopyFormSlot" class="mc_light_grey_button_with_fillet" />
+                                            <!--<input name='<%=Eval("slot_id")%>' type="button" value="上传当前世界" style="position:relative;margin-left:100px;margin-top:12px;width:120px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="OnSaveToSlot" class="mc_light_grey_button_with_fillet"/>-->
+                                        </div>
+                                    </pe:if>
+                                    <input type="button" tooltip='<%=L"右键删除"%>' style="position:relative;width:280px;height:57px;background:" name='<%=Eval("index")%>' onclick="InternetLoadWorld.OnClickSelectedWorld" />
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%= Eval("index") ~= InternetLoadWorld.selected_world_index%>'>
+                                <div name='<%=Eval("index")%>' style="position:relative;margin-left:3px;margin-top:5px;height:54px;width:330px;" class="mc_button_black">
+                                    <div style="position:relative;margin-left:10px;margin-top:5px;base-font-size:18px;font-size:18px;text-align:left;color:#ffffff;font-weight:bold;">
+                                        <%=Eval("text") %><%=if_else(Eval("is_zip")==true, L".zip", "")%>
+                                    </div>
+                                    <div style="position:relative;margin-left:10px;margin-top:32px;font-size:12px;color:#9e9e9e">
+                                        <span style="margin-left:0px;"><%=GetCurWorldInfo("revision",Eval("index")) %></span>
+                                        <span style="margin-left:10px;"><%=GetWorldSize(Eval("size")) %></span>
+                                        <span style="margin-left:10px;"><%=Eval("author") %></span>
+                                    </div>
+                                    <input type="button" style="position:relative;width:280px;height:57px;background:" name='<%=Eval("index")%>' onclick="InternetLoadWorld.OnSwitchWorld" />
+                                </div>
+                            </pe:if>
+                            <div style="position:relative;margin-left:270px;margin-top:8px;">
+                                <pe:if condition='<%= InternetLoadWorld:GetDownloadPercent(Eval("index")) == 100%>'>
+                                    <input type="button" value='<%=L"进入" %>' style="min-width:60px;height:46px;font-size:12px;font-weight:bold;" onclick="InternetLoadWorld.EnterWorld" name='<%=Eval("index")%>' class="mc_button_blue"/>
+                                </pe:if>
+                                <pe:if condition='<%= InternetLoadWorld:GetDownloadPercent(Eval("index")) < 100 %>'>
+                                    <pe:if condition='<%= InternetLoadWorld:GetDownloadPercent(Eval("index")) >= 0 %>'>
+                                        <input type="button" value='<%=L"下载中" %>' style="min-width:60px;height:46px;font-size:12px;font-weight:bold;" onclick="InternetLoadWorld.DownLoadWorld" name='<%=Eval("index")%>' class="mc_button_grey"/>
+                                    </pe:if>
+                                    <pe:if condition='<%= InternetLoadWorld:GetDownloadPercent(Eval("index")) < 0 %>'>
+                                        <input type="button" value='<%=L"下载" %>' style="min-width:60px;height:46px;font-size:12px;font-weight:bold;color:#333333" onclick="InternetLoadWorld.DownLoadWorld" name='<%=Eval("index")%>' class="mc_button_grey"/>
+                                    </pe:if>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= not BeHasWorldInSlot(Eval("is_empty_slot"),Eval("is_buy_slot"))%>'>
+                            <pe:if condition='<%= Eval("is_empty_slot")%>'>
+                                <div name='<%=Eval("index")%>' style="margin-left:3px;margin-top:4px;height:55px;width:315px;" class="mc_button_black">
+                                    <input name='<%=Eval("slot_id")%>' type="button" value="上传当前世界" style="position:relative;margin-left:100px;margin-top:12px;width:120px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="OnSaveToSlot" class="mc_light_grey_button_with_fillet"/>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%= Eval("is_buy_slot")%>'>
+                                <div name='<%=Eval("index")%>' style="margin-left:3px;margin-top:4px;height:55px;width:315px;" class="mc_button_black">
+                                    <input name='<%=Eval("slot_id")%>' type="button" value="购买存档槽" style="position:relative;margin-left:105px;margin-top:12px;width:108px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="OnPurchaseSaveSlot" class="mc_light_grey_button_with_fillet"/>
+                                </div>
+                            </pe:if>
+                        </pe:if>
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff"><%=L"空" %></div>
+                        <div>
+                            <input type="button" class="mc_light_grey_button_with_fillet" onclick="InternetLoadWorld.RefreshCurrentServerList" value='<%=L"刷新" %>' style="float:left;margin-left:10px;width:86px;height:22px;font-weight:bold;font-size:14px;"/>
+                        </div>
+                    </EmptyDataTemplate>
+                    <FetchingDataTemplate>
+                        <div style="margin:10px;font-weight:bold;color:#ffffff"><%=L"正在搜索, 请稍候 ... " %></div>
+                    </FetchingDataTemplate>
+                </pe:gridview>
+            </div>
+
+            <!--<div style="margin-left:10px;margin-top:7px;width:640px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#263 346 36 36:15 15 15 15);">
+                <input type="text" name="content" EmptyText="点击添加: 服务器URL, IP地址, 用户WIKI页" rows="1" value='<%=GetDefaultValueForAddress() %>' CaretColor="#FFFFFFFF" style="textcolor:#ffffff;float:left;margin-top:0px;margin-left:5px;width:582px;height:26px;background:;" />
+                <input type="button" value="添加" class="mc_light_grey_button_with_fillet" onclick="InternetLoadWorld.OnAddSearchPage" style="margin-left:2px;margin-top:2px;height:22px;width:50px"/>
+            </div>-->
+        
+        </div>
+        <div>
+            <div style="float:left;position:relative">
+                <input type="button" value='<%=L"导入/导出..." %>' style="margin-left:20px;margin-top:17px;height:22px;font-weight:bold;font-size:14px;" onclick="OnImportWorld" class="mc_light_grey_button_with_fillet"/>
+                <input type="button" value='<%=L"刷新" %>' style="margin-left:10px;margin-top:17px;height:22px;font-weight:bold;font-size:14px;" onclick="InternetLoadWorld.RefreshCurrentServerList" class="mc_light_grey_button_with_fillet"/>
+            </div>
+            <input type="button" value='<%=L"创建世界" %>' style="position:relative;spacing:10px;margin-left:330px;margin-top:12px;min-width:108px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" onclick="CreateNewWorld" class="mc_light_grey_button_with_fillet"/>
+            <!--<input name="" type="button" value='<%=L"进入世界" %>' onclick="InternetLoadWorld.EnterWorld" style="position:relative;margin-left:370px;margin-top:12px;width:108px;height:32px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#72 351 40 18:18 8 18 8)" />-->
+            <input type="button" value='<%=L"官方论坛" %>' align="right" style="position:relative;margin-right:40px;margin-top:17px;min-width:80px;height:22px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;font-size:14px;" onclick="OpenBBS" class="mc_blue_button_with_fillet"/>
+        </div>
+    </aries:window>
+</div>
+</pe:mcml>
+</body>
+</html>

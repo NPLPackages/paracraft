@@ -1,0 +1,154 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/WorldUploadPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="true" type="text/npl" src="WorldUploadPage.lua"><![CDATA[
+WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+WorldUploadPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickCreatePackage()
+    GameLogic.SaveAll(false);
+    WorldUploadPage.OnGeneratePackage();
+end
+
+function OnClickOpenPackageDir()
+    Map3DSystem.App.Commands.Call("File.WinExplorer", {filepath = ParaWorld.GetWorldDirectory():gsub("[^/\\]+[/\\]$", ""), silentmode=true});
+end
+
+function GetPkgFileName()
+    local filename = ParaWorld.GetWorldDirectory():match("([^/\\]+)[/\\]$");
+    return format("%s.zip文件", filename);
+end
+
+local RecordGsid = WorldUploadPage.RecordGsid
+local ItemManager = commonlib.gettable("Map3DSystem.Item.ItemManager");
+local save_records = WorldUploadPage.LoadRecordData();
+
+function DsCreativeSpaceWorlds(index)
+    if(not index) then
+        return #save_records;
+    else
+        return  save_records[index];
+    end
+end
+
+function OnPurchaseSaveSlot()
+    _guihelper.MessageBox("你尚未开启这个存档槽. 每购买一个会员物品, 可永久获得一个存档槽.", function(res)
+        if(res) then
+            --_guihelper.MessageBox("功能暂未开放!")
+            System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd"):Call({gsid = WorldUploadPage.ExtendedSlotCountGsid});
+        end
+    end);
+end
+    
+function OnSaveToSlot(name, mcmlNode)
+    -- local item = mcmlNode:GetPreValue("this", true);
+    -- _guihelper.MessageBox("服务保存功能即将开放！");
+    WorldUploadPage.ClickOncePublish(name);
+end
+
+function OnClickShare(name, mcmlNode)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/ShareWorldToWeb.lua");
+    local ShareWorldToWeb = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ShareWorldToWeb");
+    ShareWorldToWeb.ShowPage(nil, tonumber(name))
+end
+
+]]></script>
+<div style="width:512px;height:430px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >分享你的世界</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px;margin-bottom:7px;">
+        <pe:tabs name="builder" class="tabs" >
+            <pe:tab-item name="serverRecords" selected="true" text="服务器存档" style="padding-top:10px;padding:10px;">
+                <div>
+                    可用存档槽:<pe:slot style="float:left;" type="count" gsid='<%=WorldUploadPage.RecordGsid %>'></pe:slot>
+                    <pe:label name="progress" style="float:left;margin-left:20spx;height:23px;">点击你要覆盖的存档. </pe:label>
+                </div>
+                <div>
+                    <pe:gridview name="gvwTableCSWorlds" CellPadding="0"  AllowPaging="false" DefaultNodeHeight = "35" pagesize="100"
+                        DataSource='<%=DsCreativeSpaceWorlds%>' >
+	                    <Columns>
+                            <pe:if condition='<%=Eval("type") ~= "empty" %>'>
+                                <input type="button" name='<%=Eval("index")%>' tooltip='<%=format("存档日期:%s", Eval("date") or "") %>'  onclick="OnSaveToSlot" value='<%=format("存档%d: [%s] 版本:%d",  Eval("index"), Eval("worldname") or "空", Eval("revision") or 0)%>' class="button_highlight" style="margin-top:5px;width:410px;font-size:14px;font-weight:bold;height:30px;"/>
+                                <pe:if condition='<%=Eval("revision") ~= 0 %>'>
+                                    <input type="button" name='<%=Eval("index")%>' value="分享" class="button_highlight" tooltip="分享到互联网" style="margin-top:5px;margin-left:3px;width:40px;height:30px;" onclick="OnClickShare" />
+                                </pe:if>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("type") == "empty" %>'>
+                                <input type="button" onclick="OnPurchaseSaveSlot" value="空存档 [未开启]" class="button_lightgrey" style="margin-top:5px;width:410px;font-size:14px;font-weight:bold;height:30px;"/>
+                            </pe:if>
+	                    </Columns>
+                        <FetchingDataTemplate>
+		                    <div style="margin:10px;">正在获取信息...</div>
+	                    </FetchingDataTemplate>
+                    </pe:gridview>
+                </div>
+            </pe:tab-item>
+            <pe:tab-item name="manualrRecords" text="手工分享" style="padding-top:0px;padding:5px;padding-bottom:10px">
+                <div style="margin-top:5px;padding:10px;margin-left:0px;" class="inborder_golden" width="100%">
+                    <div style="font-weight:bold">第一步: 将世界打包成zip文件 </div>
+                    <div style="float:left;margin-left:5px;width:270px;">
+                        <div style="margin-top:5px;">
+                            <div style="float:left;width:70px;text-align:right">领地名称:</div><input name="world_name" style="width:120px;height:22px;"/>
+                        </div>
+                        <div>
+                            <div style="float:left;width:70px;text-align:right">世界路径:</div>
+                            <a onclick="MyCompany.Aries.Creator.SaveWorldPage.OnOpenWorldDir" tooltip="点击打开文件夹">
+                                <img style="margin-right:3px;margin-top:2px;background:url(Texture/3DMapSystem/common/ViewFiles.png);width:16px;height:16px;"/>
+                                <label name="worldpath" style="color:#303030;"/>
+                            </a>
+                        </div>
+                        <input type="button" class="button_highlight" onclick="OnClickCreatePackage" style="margin-top:5px;width:120px;height:26px;font-weight:bold;font-size:14px" value="开始打包..."/><br />
+                        <label name="result" style="color:#303030;height:30px;"></label>
+                    </div>
+                    <div style="float:left;margin-top:-22px;margin-left:5px;">
+                        <div style="margin-top:1px;font-weight:bold;color:#303030">
+                            世界预览图: 
+                            <input type="button" onclick="MyCompany.Aries.Creator.SaveWorldPage.TakeWorldImage" name="takesnapshot" style="font-size:12px;margin-top:-2px;min-width:60px;" class="button" value="截图"/>
+                        </div>
+                        <div style="padding:2px;background:url(Texture/Aries/common/picbg16_32bits.png#0 0 16 16: 3 3 3 3);">
+                            <img name="WorldImage" zorder="1" width="180" height="110"/>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:5px;padding:10px;margin-left:0px;" class="inborder_golden" width="100%">
+                    <div style="font-weight:bold">第二步: 上传分享 </div>
+                    <div style="float:left;margin-left:10px;margin-top:5px;">
+                        您可以将<a tooltip="点击打开所在目录" onclick="OnClickOpenPackageDir"><%=GetPkgFileName()%></a>上传到
+                        <pe:if condition='<%=System.options.version == "kids" %>'>
+                        <a href="http://tieba.baidu.com/f?kw=%C4%A7%B7%A8%B9%FE%C6%E6">魔法哈奇百度贴吧</a>方便大家交流
+                        </pe:if>
+                        <pe:if condition='<%=System.options.version == "teen" %>'>
+                            官方论坛
+                        </pe:if>
+                    </div>
+                </div>
+                <div style="margin-top:5px;padding:10px;margin-left:0px;" class="inborder_golden" width="100%">
+                    <div style="font-weight:bold">第三步: 推广你的世界</div>
+                    <div style="float:left;margin-left:10px;margin-top:5px;">
+                        您可以通过全区大喇叭, 邀请好友下载和参观你的世界<br />
+                        <pe:if condition='<%=System.options.version == "kids" %>'>
+                        您也可以将自己的世界拍摄成视频, 上传到<a href="http://www.aipai.com/game_gameid-47617.html">魔法哈奇爱拍社区</a><br />
+                        您也可以在魔法哈奇贴吧中用图片直播自己创造世界的过程.
+                        </pe:if>
+                    </div>
+                </div>
+            </pe:tab-item>
+        </pe:tabs>
+        
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,66 @@
+﻿<!-- "script/apps/Aries/Creator/Assets/CreateAssetBagPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.2.2 LiXizhi</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true" src="CreateAssetBagPage.lua"><![CDATA[
+MyCompany.Aries.Creator.CreateAssetBagPage.OnInit();    
+DS_Func_imp = MyCompany.Aries.Creator.CreateAssetBagPage.GetCurBagDS_Func()
+function DS_Func(index)
+    return DS_Func_imp(index)
+end
+function ClosePage()
+    Page:CloseWindow();
+end
+]]></script>
+<div style="width:540px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >自定义资源</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+        <form name="assetbag">
+        <div>
+        资源列表:
+        <select name="bag_path" style="width:300px;height:25px;" onselect="MyCompany.Aries.Creator.CreateAssetBagPage.OnBagChanged">
+            <option>temp/mybag/aries/grass.bag.xml</option>
+            <option>temp/mybag/aries/building.bag.xml</option>
+            <option>temp/mybag/aries/deco.bag.xml</option>
+            <option>temp/mybag/aries/special.bag.xml</option>
+            <option>temp/mybag/aries/furniture.bag.xml</option>
+            <option>temp/mybag/aries/others.bag.xml</option>
+            <option>temp/mybag/aries/characters.bag.xml</option>
+            <option>temp/mybag/aries/animals.bag.xml</option>
+        </select>
+        <input type="submit" name="btnSelectBag" class="button" style="margin-left:5px;" value="刷新" onclick = "MyCompany.Aries.Creator.CreateAssetBagPage.OnClickSelectBag"/>
+        <input type="button" name="btnEditBagFile" class="button" style="margin-left:5px;" value="查看文件" tooltip="你也可以手工编辑文件" onclick = "MyCompany.Aries.Creator.CreateAssetBagPage.OnClickViewBagSourceFile"/>
+        </div>
+        <div>
+            <input type="button" name="btnAddSelection" class="button" value="添加物体" onclick = "MyCompany.Aries.Creator.CreateAssetBagPage.OnClickAddSelection"/>
+            <input type="text" name="model_filename" style="margin-left:5px;height:24px;"/>
+        </div>
+        </form>
+        <div>
+            <pe:gridview name="gvwGrassBags" CellPadding="0" DefaultNodeHeight="38" AllowPaging="true" pagesize="50" ItemsPerLine="10" DataSource='<%=DS_Func%>'>
+                <Columns>
+                    <div class="block">
+                    <pe:asset onclick="MyCompany.Aries.Creator.CreateAssetBagPage.OnClickItem" src='<%=Eval("src")%>' tooltip='<%=(Eval("DisplayName") or "").."(右键删除,中键信息)"%>'  icon='<%=Eval("icon")%>' type='<%=Eval("type")%>'/>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>空</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>请稍等 ... </b>
+                </FetchingDataTemplate>
+                <PagerSettings Position="Bottom" style="margin-left:200px;" PreviousPageText="" NextPageText=""/>
+            </pe:gridview>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

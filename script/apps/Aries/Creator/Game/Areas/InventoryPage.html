@@ -1,0 +1,199 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/InventoryPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="true" type="text/npl" src="InventoryPage.lua"><![CDATA[
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+InventoryPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InventoryPage");
+local cur_player
+InventoryPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function DoModifyName()
+    return InventoryPage.modifyName;
+end
+
+function RenameOrSavename()
+    if(InventoryPage.modifyName) then
+        InventoryPage.SetPlayerDisplayName();
+    end
+    InventoryPage.modifyName = not InventoryPage.modifyName;
+    Page:Refresh(0.01);
+end
+
+function GetPlayerName()
+    local name = InventoryPage.GetPlayerDisplayName();
+    return name or "";
+end
+
+function GetTotalHP()
+    local value = 222222;
+    value = string.format("血量:%d",value);
+    return value;
+end
+
+function GetTotalMagicAttack()
+    local value = 222222;
+    value = string.format("魔法:%d",value);
+    return value;
+end
+
+function GetTotalPhysicalAttack()
+    local value = 222222;
+    value = string.format("攻击:%d",value);
+    return value;
+end
+
+function GetTotalPhysicalResist()
+    local value = 222222;
+    value = string.format("物防:%d",value);
+    return value;
+end
+
+function GetTotalMagicResist()
+    local value = 222222;
+    value = string.format("魔抗:%d",value);
+    return value;
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function SwitchSkin()
+    --[[
+    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+    CommandManager:RunCommand("/skin");
+    Page:Refresh(0.01);
+    ]]
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");
+    local SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPage");
+    SkinPage.ShowPage();
+    ClosePage();
+end
+
+]]></script>
+<aries:window title="背包" onclose="ClosePage" style="width:430px;height:480px;" mode="thin">
+    <div style="position:relative;margin-top:190px;margin-left:-4px;width:428px;height:1px;"class="mc_line"/>
+    <div style="position:relative;margin-top:2px;margin-left:290px;width:1px;height:188px;"class="mc_line"/>
+    <div style="float:left;width:290px;height:185px;">
+        <pe:if condition="<%= System.options.mc %>">
+            <input type="button" value="改变外貌" style="position:relative;margin-top:5px;margin-left:228px;text-offset-y:-1;height:20px;width:58px;font-size:12px;" onclick="SwitchSkin" class="mc_light_grey_button_with_fillet"/>    
+        </pe:if>
+        <div style="position:relative;height:30px;">
+            <pe:if condition="<%=not DoModifyName() %>">
+                <input type="button" onclick="RenameOrSavename" style="position:relative;margin-top:12px;margin-left:195px;width:8px;height:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 156 8 8);" />
+                <div style="position:relative;margin-top:6px;margin-left:50px;width:140px;text-align:center;color:#ffffff;">
+                    <%=GetPlayerName() %>
+                </div>                
+            </pe:if>
+            <pe:if condition="<%=DoModifyName() %>">
+                <input type="button" onclick="RenameOrSavename" style="position:relative;margin-top:12px;margin-left:195px;width:8px;height:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9);" />
+                <div style="position:relative;margin-top:6px;margin-left:50px;width:140px;text-align:center;color:#ffffff;">
+                    <input type="text" name="svr_mark" autofocus="true" value='<%=GetPlayerName() %>' uiname="inventory_player_displayname" rows="1" style="margin-top:0px;margin-left:0px;width:140px;height:22px;" class="mc_text"/>
+                </div>
+                
+            </pe:if>
+        </div>
+        <div style="position:relative;margin-top:30px;margin-left:20px;height:145px;">
+            <div style="float:left;margin-left:15px;width:32px;">
+                <!--<div style="margin-left:0px;" class="mc_item">
+                    <pe:mc_slot bagpos ='42' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='43' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='44' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='45' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>-->
+            </div>
+            <div style="float:left;margin-left:1px;width:100px;height:150px;" >
+                <div style="position:relative;float:left;margin-left:-74px;margin-top:-75px;width:92px;height:144px;" >
+                    <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:240px;height:240px;" IsInteractive="false" IsActiveRendering="true"/>
+                </div>
+            </div>
+            <!--<div style="float:left;margin-left:7px;">
+                <div style="margin-left:0px;" class="mc_item">
+                    <pe:mc_slot bagpos ='37' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='38' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='39' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+                <div style="margin-left:0px;margin-top:4px;" class="mc_item">
+                    <pe:mc_slot bagpos ='40' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </div>-->
+            <!--<div style="float:left;margin-left:7px;font-size:12px;">
+                <div style="margin-top:7px;color:#ffffff;"><%=GetTotalHP() %></div>
+                <div style="margin-top:7px;color:#ffffff;"><%=GetTotalMagicAttack() %></div>
+                <div style="margin-top:7px;color:#ffffff;"><%=GetTotalPhysicalAttack() %></div>
+                <div style="margin-top:7px;color:#ffffff;"><%=GetTotalPhysicalResist() %></div>
+                <div style="margin-top:7px;color:#ffffff;"><%=GetTotalMagicResist() %></div>
+            </div>-->
+        </div>
+    </div>
+    <div style="float:left;margin-top:0px;height:185px;">
+        <!--<div style="position:relative;margin-top:6px;text-align:center;color:#ffffff;">合成</div>
+        <div style="position:relative;margin-left:28px;margin-top:30px;">
+            <div style="position:relative;margin-left:0px;" class="mc_item">
+                <pe:mc_slot bagpos ='37' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+            </div>
+            <div style="position:relative;margin-left:38px;margin-top:0px;" class="mc_item">
+                <pe:mc_slot bagpos ='38' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+            </div>
+            <div style="position:relative;margin-left:0px;margin-top:38px;" class="mc_item">
+                <pe:mc_slot bagpos ='39' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+            </div>
+            <div style="position:relative;margin-left:38px;margin-top:38px;" class="mc_item">
+                <pe:mc_slot bagpos ='40' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+            </div>
+        </div>
+        <input type="button" style="position:relative;margin-left:55px;margin-top:105px;width:17px;height:20px;background:url(texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 179 17 20)" />
+        <div style="position:relative;margin-left:45px;margin-top:125px;" class="mc_item">
+            <pe:mc_slot bagpos ='41' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+        </div>
+        <div style="position:relative;margin-left:30px;margin-top:165px;">
+            <input type="button" style="float:left;margin-left:4px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub" />
+            <input type="text" spacing="0" value="1" style="float:left;margin-left:3px;width:34px;height:16px;font-size:6px;" name="text_pos_x" class="mc_text"/>
+            <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add" />
+        </div>-->
+    </div>
+    <div style="margin-left:0px;width:400px;height:210px;">
+        <pe:gridview name="MyInventoryBagItems" style="margin-left:27px;margin-top:15px;height:180px;" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+            <Columns>
+                <div style="margin-left:2px;font-weight:bold;" class="mc_item">
+                    <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+			</Columns>
+        </pe:gridview>
+        <!--<input type="button" style="margin-left:360px;margin-top:-19px;font-size:12px;height:20px;width:40px;" value="整理" onclick="" class="mc_light_grey_button_with_fillet"/>-->
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

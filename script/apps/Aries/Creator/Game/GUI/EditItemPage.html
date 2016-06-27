@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/EditItemPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditItemPage.lua"><![CDATA[
+EditItemPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditItemPage");
+
+function OnClose()
+    Page:CloseWindow();
+end
+
+]]></script>
+<aries:window mode="thin" title="物品编辑" style="width:360px;" onclose="OnClose">
+<div width="100%" style="padding:5px;color:#cccccc;">
+    <div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+        <pe:mc_block block_id='<%=EditItemPage.GetItemID()%>' style="width:32px;height:32px;"/>
+    </div>
+    <div style="float:left;width:200px;margin-left:10px;">
+        <div>
+            <div style="float:left">名称:</div>
+            <%=tostring(EditItemPage.GetItemName() or "")%>
+        </div>
+        <div>
+            <div style="float:left">ID:</div>
+            <%=tostring(EditItemPage.GetItemID())%>
+        </div>
+    </div>
+</div>
+
+</aries:window>
+</pe:mcml>
+</body>
+</html>

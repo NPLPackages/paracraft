@@ -1,0 +1,60 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="DesktopMenuPage.lua"><![CDATA[
+DesktopMenu = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenu");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+DesktopMenuPage.OnInit();
+
+function OnClickMenu(name)
+    DesktopMenu.OnClickMenuItem(name);
+end
+]]></script>
+<pe:container ClickThrough="true" alignment="_mt" width="0" height="32px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#497 342 2 32)">
+    <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:32px;">
+        <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
+            <input type="button" value='<%=L"编辑模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到播放模式(shortcut Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_blue"/>
+        </pe:if>
+        <pe:if condition='<%=not GameLogic.GameMode:IsEditor()%>'>
+            <input type="button" value='<%=L"播放模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到编辑模式(shortcut Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_grey"/>
+        </pe:if>
+        <pe:repeat DataSource="<%=DesktopMenuPage.GetCurrentMenu()%>">
+            <pe:repeatitem style="float:left;">
+                <input type="button" value='<%=Eval("text")%>' spacing="10" name='<%=Eval("name")%>' onclick="OnClickMenu" 
+                           style="color:#ffffff;font-size:14px;height:28px;background:;margin-top:1px;background2:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 364 25 26:6 6 6 6);" />
+            </pe:repeatitem>
+        </pe:repeat>
+    </pe:container>
+    <pe:container alignment="_rt" style="position:relative;width:36px;height:32px;background:;">
+        <div tooltip='<%=L"自动隐藏"%>' name="btnPinMenu" onclick="DesktopMenuPage.TogglePinned" style="padding:2px;width:30px;height:30px;background:;background2:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 364 25 26:6 6 6 6);">
+            <pe:if condition='<%=DesktopMenuPage.IsPinned==true%>'>
+                <div zorder="1" style="width:26px;height:27px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 62 26 27);" />
+            </pe:if>
+            <pe:if condition='<%=DesktopMenuPage.IsPinned~=true%>'>
+                <div zorder="1" style="width:26px;height:27px;background-color:#808080;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 62 26 27);" />
+            </pe:if>
+        </div>
+    </pe:container>
+</pe:container>
+<pe:if condition='<%=GameLogic.GameMode:IsEditor()%>' >
+    <pe:container ClickThrough="true" alignment="_lt" style="background:;position:relative;margin-top:34px;width:128px;">
+       <div style="float:left;" >
+        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);background-color:#ffffff80">
+            <pe:mc_slot bagpos ='1' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity().inventoryView%>"/>
+        </div>
+        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12); background-color: #ffffff80;">
+            <pe:mc_slot bagpos ='2' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity().inventoryView%>"/>
+        </div>
+       </div>
+    </pe:container>
+</pe:if>
+</pe:mcml>
+</body>
+</html>

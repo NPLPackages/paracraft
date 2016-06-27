@@ -1,0 +1,171 @@
+﻿<!-- "script/apps/Aries/Creator/CreateOpenWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.1.22</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CreateOpenWorld.lua">
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+CreateOpenWorld.OnInit();
+if(CreateOpenWorld.tab_name) then
+    Page:SetNodeValue("OpenCreateWorldTabs", CreateOpenWorld.tab_name);
+end
+function OnFlowerRanking()
+    CreateOpenWorld.ClosePage();
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+    Desktop.OnShowRankingPage();
+end
+
+function OnVisitSpace()
+    local nid = Page:GetUIValue("txtNID") or "";
+    nid = nid:match("%d+")
+    if(nid) then
+        nid = tonumber(nid);
+        NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/OtherPeopleWorlds.lua");
+        local OtherPeopleWorlds = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.OtherPeopleWorlds");
+        OtherPeopleWorlds.ShowPage(nid, 0)
+    end
+end
+</script>
+<input type="hidden" name="filepath" />
+<input type="hidden" name="template_path" />
+
+<div class="window" style="width:600px;height:480px;">
+    <div class="titlebar" width="100%">
+      <div class="windowlabel" >创意空间</div>
+      <input type="button" style="margin-top:1px;margin-right:5px" onclick="MyCompany.Aries.Creator.CreateOpenWorld.ClosePage" class="closewindow"/>
+    </div>
+<div class="clientarea">
+<div style="margin-left:200px;font-weight:bold;font-size:14px;">欢迎来到创意空间！</div>
+<div style="width:150px;position:relative;" align="right">
+    <input type="button" value="作品排行榜" tooltip="鲜花榜" zorder="1" onclick="OnFlowerRanking" style="margin-top:25px;font-size:14px;font-weight:bold;height:23px;width:100px;" class="linkbutton_yellow"/>
+</div>
+<div style="width:150px;position:relative;" align="right">
+    帐号:<input type="text" name='txtNID' style="width:80px;height:22px;" />
+    <input type="button" DefaultButton="true" name="CreateWorld" tooltip="输入玩家帐号, 并点击进入" style="margin-top:-2px;width:32px;height:32px;background:url(Texture/Aries/Login/ServerSelect/enter_32bits.png)" onclick="OnVisitSpace"/>
+</div>
+
+<div style="margin-left:30px;margin-bottom:10px;">在这里你可以设计和分析属于自己的秘密领地！
+</div>
+<pe:tabs name="OpenCreateWorldTabs" class="tabs" >
+  <pe:tab-item name="newWorld" text="创建新的领地">
+    <div style="margin:10px;margin-top:5px;">
+    <pe:gridview style="margin-top:40px;margin-left:20px;width:520px;height:170px;" name="gwNewWorlds" DataSource="<%=MyCompany.Aries.Creator.CreateOpenWorld.DS_Func_Create%>"  ItemsPerLine="3" AllowPaging="true" pagesize="3">
+        <Columns>
+         <pe:if condition='<%=Eval("selected")%>'>
+            <div style="margin-left:0px;margin-right:3px;background:url(Texture/alphadot.png)">
+                <div style="width:160px;text-align:center;">
+                    <%=Eval("name")%>
+                </div>
+                <div style="width:163px;height:128px;margin-left:2px;margin-top:5px;background:url(Texture/Aries/Inventory/item_slot_32bits.png#3 3 72 68:24 24 24 24)">
+                    <img style="margin-left:4px;margin-right:5px;margin-top:13px;width:150px;height:100px;" src='<%=Eval("world_path").."/preview.jpg"%>'/>
+                </div>
+            </div>
+         </pe:if>
+         <pe:if-not condition='<%=Eval("selected")%>'>
+            <div style="margin-left:0px;margin-right:2px;">
+            <a onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnSelectWorldTemplate" param1='<%=Eval("index")%>' tooltip = '<%=Eval("name")%>'>
+                <div style="width:160px;text-align:center;">
+                    <%=Eval("name")%>
+                </div>
+                <div style="width:163px;height:128px;margin-top:5px;background:url(Texture/Aries/Inventory/item_slot_32bits.png#3 3 72 68:24 24 24 24)">
+                    <img style="margin-left:4px;margin-right:5px;margin-top:13px;width:150px;height:100px;" src='<%=Eval("world_path").."/preview.jpg"%>'/>
+                </div>
+            </a>
+            </div>
+         </pe:if-not>
+        
+        </Columns>
+        <EmptyDataTemplate>
+            <b>空</b>
+        </EmptyDataTemplate>
+        <FetchingDataTemplate>
+            <b>请稍等 ... </b>
+        </FetchingDataTemplate>
+        <PagerSettings Position="Bottom" height="0" style="margin-top:-100px;height:36px;"/>
+        <PagerTemplate>
+            <form>
+                <input type="button" name="pre" style="margin-left:-32px;width:32px;height:32px;background:Texture/Aries/homeland/arrow_left_32bits.png;"/>
+                <input type="button" name="next" style="margin-left:500px;width:32px;height:32px;background:Texture/Aries/homeland/arrow_right_32bits.png;"/>
+            </form>
+        </PagerTemplate>
+    </pe:gridview>
+    <div style="margin-left:150px;margin-top:10px;">
+        <div>
+            <div style="float:left;width:228px;height:47px;background:url(Texture/Aries/Login/ServerSelect/searchinput_32bits.png#0 0 63 47:30 23 32 23)">
+                <input name="NewWorldName" tooltip="请输入领地名称" style="margin-left:20px;margin-top:10px;width:156px;height:24px;background:;"/>
+                <input type="button" name="CreateWorld" tooltip="创建领地" style="margin-left:10px;margin-top:6px;width:32px;height:32px;background:url(Texture/Aries/Login/ServerSelect/enter_32bits.png)" onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnClickCreateWorld"/>
+            </div>
+            <div style="float:left">
+                <input type="button" name="CreateWorld" value="确定" style="margin-top:6px;height:26px;" onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnClickCreateWorld" class="button"/>
+            </div>
+        </div>
+        <div style="margin-left:50px;">起个好听的名字吧</div>
+    </div>
+    </div>
+  </pe:tab-item>
+  <pe:tab-item name="openWorld" text="打开我的领地" selected="true">
+    <div style="margin:10px;margin-top:5px;">
+    <div style="margin-bottom:5px;">选择你要打开的领地名称：</div>
+        <div style="float:left;width:240px;">
+            <pe:gridview RememberScrollPos="true" AllowPaging="false" VerticalScrollBarStep="54" ItemsPerLine="1" name="gwOpenWorlds" DataSource='<%=MyCompany.Aries.Creator.CreateOpenWorld.DS_Func_Open%>' DefaultNodeHeight="54">
+                <Columns>
+                    <pe:if condition='<%=Eval("selected")%>'>
+                        <div style="background:url(Texture/alphadot.png)">
+                            <img style="width:16px;height:16px;margin-right:4px;" src='<%=Eval("icon")%>'/>
+                            <div style="float:left;font-weight:bold;width:180px;"><%=Eval("Title")%></div>
+                            <br /><div style="float:left;font-size:11px;margin-left:20px;"><%=Eval("time_text")%></div>
+                            <div style="height:16px;font-size:11px;margin-left:20px;">作者:
+                                <pe:if condition='<%=Eval("nid")~=0%>' >
+                                    <pe:name linked="false" nid='<%=Eval("nid")%>'></pe:name>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("nid")==0%>' >
+                                    zip文件
+                                </pe:if>
+                            </div>
+                        </div>   
+                    </pe:if>
+                    <pe:if-not condition='<%=Eval("selected")%>'>
+                        <a param1='<%=Eval("index")%>' onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnSelectWorld">
+                            <img style="width:16px;height:16px;margin-right:4px;" src='<%=Eval("icon")%>'/>
+                            <div style="float:left;font-weight:bold;width:180px;"><%=Eval("Title")%></div>
+                            <br /><div style="float:left;font-size:11px;margin-left:20px;"><%=Eval("time_text")%></div>
+                            <div style="height:16px;font-size:11px;margin-left:20px;">作者:
+                                <pe:if condition='<%=Eval("nid")~=0%>' >
+                                    <pe:name linked="false" nid='<%=Eval("nid")%>'></pe:name>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("nid")==0%>' >
+                                    hq文件
+                                </pe:if>
+                             </div>
+                        </a>    
+                    </pe:if-not>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>你没有在这台电脑上创造过任何领地</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>正在搜索, 请稍候 ... </b>
+                </FetchingDataTemplate>
+            </pe:gridview>
+        </div>
+        <div style="float:left;margin-left:10px;">
+            <img name="WorldImage" style="width:256px;height:150px;margin-left:10px"/>
+            <hr />
+            <input type="button" name="LoadWorld" style="width:120px" class="button_highlight" value="打开" onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnClickLoadWorld()"/>
+            <input style="margin-left:10px" type="button" name="DeleteWorld" class="button" value="删除" onclick="MyCompany.Aries.Creator.CreateOpenWorld.OnClickDeleteWorld()"/>
+        </div>
+    </div>
+  </pe:tab-item>
+</pe:tabs>
+</div>
+</div>
+</pe:mcml>
+</body>
+</html>
+
+
+

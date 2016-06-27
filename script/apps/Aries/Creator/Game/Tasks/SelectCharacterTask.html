@@ -1,0 +1,84 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SelectCharacterTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SelectCharacterTask.lua"><![CDATA[
+local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
+local SelectCharacter = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectCharacter")
+SelectCharacter.OnInit()
+
+function ClosePage()
+    SelectCharacter.EndEditing(true);
+end
+
+function GetDialogNpcName()
+    local obj = SelectCharacter.GetObj();
+    if(obj) then
+        return obj:GetDynamicField("DisplayName", "")
+    end
+end
+
+function GetParams()
+    return SelectCharacter.GetObjParams();
+end
+
+function GetDialogNpc()
+    return nil;
+end
+
+function GetContent()
+    return SelectCharacter.GetContent()
+end
+
+function OnClickNext()
+    SelectCharacter.OnNextTalkText();
+end
+
+]]></script>
+<pe:container alignment="_mb" width="0" height="210" style="background:">
+<pe:container alignment="_ctt" ClickThrough="true" width="930" height="210" style="background:;">
+<div style="width:867px;height:210px;background:url(Texture/Aries/Quest/Dialog_bg3.dds#0 0 867 210);" align="center">
+    <div style="position:relative;margin-right:-20px;margin-top:30px;width:86px;height:65px;" align="right">
+        <input tooltip='<%=L"关闭"%>' style="width:86px;height:65px;background:url(Texture/Aries/Quest/quest_common_close_32bits.png#0 0 86 55);" type="button" name="close" onclick="ClosePage()" value=""/>
+    </div>
+    <div>
+        <div style="position:relative;width:258px;height:248px;">
+            <div style="width:220px;height:220px;margin-left:13px;margin-top:22px;">
+                <div style="width:204px;height:204px;">
+                    <pe:canvas3d miniscenegraphname="NPCDialog_miniscene" DefaultRotY="5.0" style="width:204px;height:204px;" value='<%=GetParams()%>' background="" MaskTexture="Texture/Aries/Quest/NewSunFlowerMask.dds" />
+                </div>
+                <input type="button" value='<%=GetDialogNpcName() %>' style="background:;margin-left:0px;font-size:14px;font-weight:bold;margin-top:-46px;width:190px;height:20px;color:#6d2f00" />
+            </div>
+        </div>
+        <div style="float:left;margin-top:60px;margin-left:240px;margin-right:60px;">
+            <div style="height:55px;color:#6d2f00;">
+                <pe:container style="color:#6d2f00;base-font-size:16;font-size:16;font-weight:bold;line-height:16px;background:" valign="center">
+                    <div style="min-height:40px;">
+                    <%=GetContent() or "" %>
+                    </div>
+                </pe:container>
+            </div>
+            <div style="width:540px;">
+                <div style="float:left;">
+                    <img src="Texture/Aries/Common/ThemeTeen/others/mark6_32bits.png" style="width:16px;height:16px;background-color:#6e3001"/>
+                </div>
+                <div style="float:left;">
+                    <input type="button" name="s" value='<%=L"继续..."%>' onclick="OnClickNext()"
+                        style="margin-top:0px;width:520px;text-align:left;height:18px;color:#6e3001;font-size:13px;font-weight:bold;shadow-quality:8;shadow-color:#30ffffff;text-shadow:true"
+                        class="questbutton_selected" /> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:container>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>
+

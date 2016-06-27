@@ -1,0 +1,28 @@
+<!-- "script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2014.1.14</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+showbg = Page:GetRequestParam("showbg") or "true";
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+ClientVersion = string.format(L"Paracraft创意空间 v%s", options.GetClientVersion());
+]]></script>
+<pe:if condition='<%=Eval("showbg") == "true"%>'>
+    <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 0 512 256)" ></pe:container>
+</pe:if>
+<pe:container alignment="_mb" width="0" height="85px" style="position:relative;background:">
+    <pe:container align="left" style="position:relative;color:#8f815f;font-size:12px;font-weight:bold;margin-left:20px;background:">
+        <div style="margin-top:35px"><%=Eval("ClientVersion")%></div>
+        <div style="margin-top:0px;"><%=L"(c)Tatfook.".." "..L"written in NPL. http://www.nplproject.com"%></div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

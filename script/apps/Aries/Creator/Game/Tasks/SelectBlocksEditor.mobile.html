@@ -1,0 +1,42 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SelectBlocksEditor.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SelectBlocksTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks")
+--SelectBlocks.OnInit()
+
+function OnClose()
+    Page:CloseWindow();
+end
+
+function IsMCVersion()
+    return System.options.mc;
+end
+
+]]></script>
+ <div style="width:340px;height:290px;background-color:#ffffff60" class="mobile_panel">
+    <div style="margin-top:0px;height:60px;">
+        <div style="float:left;margin-left:18px;margin-top:12px;color:#ffffff;font-size:30px;base-font-size:30px;font-weight:bold;">
+            编辑
+        </div>
+        <input type="button" class="mobile_button_white" onclick="OnClose" value="关闭" style="float:left;margin-left:140px;margin-top:11px;width:80px;height:36px;font-size:15px;font-weight:bold;"/>
+    </div>
+    <div class="mobile_line" style="width:340px;height:2px;margin-top:5px;"/>
+    <div style="width:340px;">
+        <input type="button" class="mobile_button_white" name="btn_transform" onclick="SelectBlocks.DoClick" value="变换" style="float:left;margin-left:22px;margin-top:20px;width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+        <input type="button" class="mobile_button_white" name="btn_mirror"    onclick="SelectBlocks.DoClick" value="镜像" style="float:left;margin-left:22px;margin-top:20px;width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+        <input type="button" class="mobile_button_white" name="btn_rotate"    onclick="SelectBlocks.DoClick" value="旋转" style="float:left;margin-left:22px;margin-top:20px;width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+        <input type="button" class="mobile_button_white" name="btn_delete"    onclick="SelectBlocks.DoClick" value="删除" style="float:left;margin-left:22px;margin-top:20px;width:86px;height:40px;font-size:15px;font-weight:bold;"/>
+    </div>
+</div>
+
+</pe:mcml> 
+</body>
+</html>

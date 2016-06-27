@@ -1,0 +1,78 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/ShareWorldToWeb.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="ShareWorldToWeb.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local ShareWorldToWeb = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ShareWorldToWeb");
+ShareWorldToWeb.OnInit();
+
+nid = Page:GetRequestParam("nid")
+slot_id = Page:GetRequestParam("slot_id")
+if(slot_id) then
+    slot_id = tonumber(slot_id);
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+local save_records = ShareWorldToWeb.LoadRecordData(nid);
+
+function DsCreativeSpaceWorlds(index)
+    if(not index) then
+        return #save_records;
+    else
+        return save_records[index];
+    end
+end
+
+params = DsCreativeSpaceWorlds(slot_id or 1) or {};
+
+function GetURL()
+    return ShareWorldToWeb.GetWebUrl();
+end
+
+function OnClickCopyToClipboard()
+    local url = ShareWorldToWeb.GetWebUrl();
+    ParaMisc.CopyTextToClipboard(url);
+    MyCompany.Aries.ChatSystem.ChatEdit.SetText(format("分享%s 快来看看吧！", url));
+end
+]]></script>
+<div style="width:380px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" style="text-align:left;margin-left:60px;">作者: <pe:name nid='<%=Eval("nid")%>'  linked="false"/></div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:10px;margin-right:10px;margin-bottom:10px;">
+        <div style="margin-top:5px;padding:10px;margin-left:0px;color:#000000" class="inborder_golden" width="100%">
+            <div style="font-size:13px;color:#ffff00">
+                <div style="float:left;background:url(Texture/Aries/Dock/Web/creator_icon_32bits.png);width:32px;height:32px;"></div> 
+                <div style="float:left;margin-left:5px">创意空间可以分享到互联网</div>
+            </div>
+            <div class="default">
+                <div><%=format("存档%d: [%s] 版本:%d", slot_id or 1, params.worldname or "空", params.revision or 0)%></div>
+                <div><%=format("存档日期:%s", params.date or "") %></div>
+            </div>
+            <div class="default" style="margin-top:3px;">
+                <div style="font-weight:bold;">请发送下面内容到你的微博, 论坛或游戏聊天框中. 其他人点击就可以访问这个创意空间啦～
+                </div>
+                <div style="margin:3px;">
+                    <!--<textarea name="url" rows="2" value='<%=GetURL() %>' ></textarea>-->
+                    <input type="text" name="url" value='<%=GetURL() %>' style="height:26px;"/>
+                </div>
+                <input type="button" class="button_highlight" value="复制超链接" style="margin-left:200px;" onclick="OnClickCopyToClipboard"/>
+                <input type="button" class="button_highlight" value="关闭" style="margin-left:10px;" onclick="ClosePage"/>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

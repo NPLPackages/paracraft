@@ -1,0 +1,49 @@
+﻿<!-- "script/apps/Aries/Creator/Env/SkyPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Sky Editing Page by LiXizhi 2010.1.26</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" src="SkyPage.lua"><![CDATA[
+MyCompany.Aries.Creator.SkyPage.OnInit();
+]]></script>
+<div style="position:absolute;margin-left:200px;margin-top:-5px;">
+    <input style="width:48px;height:48px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" onclick="MyCompany.Aries.Creator.MainToolBar.ReturnToEditMode()" value=""/>
+</div>
+<div style="font-size:12px;width:250px;padding-left:30px;padding-top:30px;padding-right:35px;padding-bottom:60px;background:url(Texture/Aries/MiniGame/messagebox_blue_32bits.png# 0 0 445 495:50 50 50 50)">
+<div>
+    光照: 
+    <div style="float:left" width="128px">
+        <div style="width:128px;height:32px;background:url(Texture/3DMapSystem/Env/skytime.png)" >
+            <input type="button" style="width:43px;height:30px;background:;" name="SetTimeMorning" tooltip="清晨" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeMorning()"/>
+            <input type="button" style="width:43px;height:30px;background:;" name="SetTimeNoon" tooltip="正午" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeNoon()"/>
+            <input type="button" style="width:40px;height:30px;background:;" name="SetTimeNight" tooltip="夜晚" onclick="MyCompany.Aries.Creator.SkyPage.SetTimeNight()"/>
+        </div>
+        <br />
+        <pe:sliderbar name="TimeSlider" min="0" max="100" value="30" onchange="MyCompany.Aries.Creator.SkyPage.OnTimeSliderChanged()" tooltip="拖动滑块调整光线强调"></pe:sliderbar>
+    </div>
+</div>
+<div>
+    天空背景:
+    <pe:gridview ItemsPerLine="2" style="height:143px;width:170px" name="gvwSkyboxes" DataSource='<%=MyCompany.Aries.Creator.SkyPage.DS_SkyBox_Func%>' CellPadding="0" DefaultNodeHeight="68">
+        <Columns>
+            <a onclick="MyCompany.Aries.Creator.SkyPage.OnChangeSkybox" param1='<%=Eval("index")%>' style="padding-left:5px;padding-right:5px;font-size:12px;">
+	            <img src='<%=Eval("bg")%>'width="48" height="48"/><br/><%=Eval("text")%>
+	        </a>
+        </Columns>
+    </pe:gridview>
+</div>    
+<div>
+    云的颜色:
+    <pe:colorpicker tooltip="拖动滑块调整云的颜色" name="FogColorpicker" onchange="MyCompany.Aries.Creator.SkyPage.OnFogColorChanged()"/>
+</div>
+<div>
+    天空色调:
+    <pe:colorpicker tooltip="拖动滑块调整天空的色调" name="SkyColorpicker" onchange="MyCompany.Aries.Creator.SkyPage.OnSkyColorChanged()"/>
+</div>
+</div>
+</pe:mcml>
+</body>
+</html>

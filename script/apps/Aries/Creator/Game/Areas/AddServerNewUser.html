@@ -1,0 +1,45 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/AddServerNewUser.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="ServerPage.lua"><![CDATA[
+ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage")
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOK()
+    local username = Page:GetValue("username", "");
+    local password = Page:GetValue("password", "");
+    ServerPage.AddUser(username,password);
+    ClosePage();
+end
+]]></script>
+<aries:window mode="thin" style="width:270px;height:160px;" title="添加新用户" onclose="ClosePage">
+    
+    <div style="position: relative; margin-left: 20px; margin-top: 20px; color: #ffffff; ">
+        用户名
+    </div>
+    <div style="position:relative;margin-left:80px;margin-top:20px;">
+        <input type="text" name="username" autofocus="true" value="" rows="1" style="margin-top:0px;margin-left:0px;width:130px;height:24px;" class="mc_text"/>
+    </div>
+    <div style="position: relative; margin-left: 20px; margin-top: 60px; color: #ffffff; ">
+        密码
+    </div>
+    <div style="position:relative;margin-left:80px;margin-top:60px;">
+        <input type="text" name="password" value="" rows="1" style="margin-top:0px;margin-left:0px;width:130px;height:24px;" class="mc_text"/>
+    </div>
+    <div style="height:34px;margin-top: 95px;">
+        <input type="button" value="确定" onclick="OnOK" style="margin-top: 0px; margin-left: 110px; width: 60px; height: 22px; color: #ffffff;" class="mc_light_grey_button_with_fillet" />
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WorldDescriptor>
+  <SDKPath>$(SolutionDir)</SDKPath>
+  <WorldPath>worldpath</WorldPath>
+  <CmdLine>"$(SolutionDir)ParaEngineClient.exe" debug="main"  mc="true" single="false" bootstrapper="script/apps/Aries/main_loop.lua"</CmdLine>
+  <!--实体模板,默认是在插件安装路径下面Config/EntityTemplate.xml-->
+  <!--可以自定义一个绝对路径的文件-->
+  <EntityTemplate>$(SolutionDir)script/PETools/EntityTemplate.xml</EntityTemplate>
+  <!--可以为空，如果为空则自动生成一个与*.peworld同名的xml文件：*.peworld.filter.xml-->
+  <EntityInstanceFolder></EntityInstanceFolder>
+</WorldDescriptor>

@@ -1,0 +1,123 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="QuickSelectBar.lua"><![CDATA[
+QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+QuickSelectBar.OnInit();
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+
+function GetKeyNum(index)
+    if(not index)then return end
+    local n = math.mod(index,QuickSelectBar.static_view_len);
+    if(n == 0)then n = QuickSelectBar.static_view_len end;
+    return n;
+end
+function PageIndexChanged(ctrlName, nPageIndex)
+    QuickSelectBar.static_view_page_index = nPageIndex;
+end
+
+function ds_CustomBtn(index)
+    if(not index) then
+        return #(QuickSelectBar.custombtn_nodes);
+    else
+        return QuickSelectBar.custombtn_nodes[index];
+    end
+end
+        
+function GetExpValue()
+    return 16;
+end
+
+function OnCreateExpBar(params,node)
+    local _this = ParaUI.CreateUIObject("button", "mc_exp_bar", 
+        params.alignment, params.left, params.top, params.width, params.height);
+	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;340 45 10 4:4 2 4 2";
+    _guihelper.SetUIColor(_this, "#ffffffff");
+	params.parent:AddChild(_this);
+end
+
+function OnCreateHPAndHunger(params,node)
+    local name = node:GetAttribute("name");
+    local background;
+    if(name:match("mc_hp")) then
+        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;118 68 18 18"
+    elseif(name:match("mc_hunger")) then
+        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;118 45 18 22"
+    end
+    local _this = ParaUI.CreateUIObject("button", name, 
+        params.alignment, params.left, params.top, params.width, params.height);
+	_this.background = background;
+    _this.enabled = false;
+    _guihelper.SetUIColor(_this, "#ffffffff");
+
+	params.parent:AddChild(_this);
+end
+
+function OpenInventoryPage()
+    QuickSelectBar.SwitchInventoryPage();
+end
+
+]]></script>
+<div style="width:400px;height:100px;" >
+    <pe:container style="margin-top:0px;background:;">
+        <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:0px;margin-left:4px;width:76px;height:76px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#308 1 34 34:12 12 12 12)">
+        </pe:container>
+        <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" class="text" style="color:#cccccc;position:relative;font-weight:bold;margin-top:-45px;margin-left:3px;width:100px;height:36px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#344 2 32 32:12 12 12 12)" />
+        <script type="text/npl"><![CDATA[
+            QuickSelectBar:OnHandToolIndexChanged();
+        ]]></script>
+        <pe:container zorder="-2" style="position:relative;margin-left:1px;background:;">
+            <pe:gridview style="position:relative;margin-left:0px;" RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="5" AllowPaging="false" DefaultNodeHeight="76" pagesize="5"
+                DataSource='<%=ds_CustomBtn%>'>
+	            <Columns>
+                    <pe:if condition='<%=Eval("index") ~= 5%>'>
+                        <div style="width:76px;height:76px;padding:1px;margin-left:1px;">
+                            <div zorder="-1" style="position:relative;width:74px;height:74px;background-color:#ffffff60;" class="mobile_button"></div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=Eval("index") == 5%>'>
+                        <div style="width:76px;height:76px;padding:1px;margin-left:1px;">
+                            <div zorder="-1" style="position:relative;width:74px;height:74px;background-color:#ffffff60;" class="mobile_button">
+                                <div style="float:left;margin-left:19px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
+                                </div>
+                                <div style="float:left;margin-left:10px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
+                                </div>
+                                <div style="float:left;margin-left:10px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
+                                </div>
+                            </div>
+                        </div>
+                    </pe:if>
+                </Columns>
+            </pe:gridview>
+        </pe:container>
+        <pe:gridview style="position:relative;margin-left:1px;" RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="5" AllowPaging="false" DefaultNodeHeight="76" pagesize="5"
+            DataSource='<%=ds_CustomBtn%>'>
+	        <Columns>
+                <pe:if condition='<%=Eval("index") ~= 5%>'>
+                    <div style="width:76px;height:76px;padding:6px;margin-left:1px;">
+                        <pe:mc_slot bagpos ='<%=Eval("index")%>' style="width:64px;height:64px;" ontouch='QuickSelectBar.OnTouchItem' />
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=Eval("index") == 5%>'>
+                    <input type="button" zorder="1" style="width:76px;height:76px;padding:6px;margin-left:1px;background:;" onclick="OpenInventoryPage"/>
+                </pe:if>
+	        </Columns>
+        </pe:gridview>
+       <!-- <div style="position:relative;width:76px;height:76px;padding:1px;margin-left:311px;background-color:#ffffff80;background:url(Texture/Aries/Creator/Mobile/UI_32bits.png#2 2 32 32:12 12 12 12)">
+            <div style="position:relative;margin-left:48px;width:6px;height:6px;" class="mobile-line"/>
+            <div style="position:relative;margin-left:10px;width:6px;height:6px;" class="mobile-line"/>
+            <div style="position:relative;margin-left:10px;width:6px;height:6px;" class="mobile-line"/>
+            <input type="button" zorder="-1" style="position:relative;width:74px;height:74px;background:;"/>
+        </div>-->
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>
+

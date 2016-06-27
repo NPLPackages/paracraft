@@ -1,0 +1,44 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tools/TouchSelectionBarTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="TouchSelectionBar.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+TouchSelectionBar = commonlib.gettable("MyCompany.Aries.Game.Tools.TouchSelectionBar")
+TouchSelectionBar:OnInit();
+
+function OpenEditPage()
+    TouchSelectionBar:EditSelection()
+end
+
+function DeleteSelectedBlocks()
+    TouchSelectionBar:DeleteSelection();
+end
+
+function ExtrudeSelectedBlocks()
+    TouchSelectionBar:ExtrudeSelection(0,1,0);
+end
+
+]]></script>
+<pe:container alignment="_rt" ClickThrough="true" style="width:95px;height:300px;margin-top:0px;background:;">
+    <div style="width:89px;height:76px;background-color:#ffffff30;" class="mobile_button">
+        <div style="position:relative;margin-left:26px;margin-top:19px;width:38px;height:38px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#203 115 38 38)"/>
+        <input type="button" style="position:relative;width:89px;height:76px;background:;" onclick="OpenEditPage"/>
+    </div>
+    <div style="margin-top:6px;width:89px;height:76px;background-color:#ffffff30;" class="mobile_button">
+        <div style="position:relative;margin-left:24px;margin-top:17px;width:41px;height:42px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#158 68 41 42)"/>
+        <input type="button" style="position:relative;width:89px;height:76px;background:;" onclick="ExtrudeSelectedBlocks"/>
+    </div>
+    <div style="margin-top:6px;width:89px;height:76px;background-color:#ffffff30;" class="mobile_button">
+        <div style="position:relative;margin-left:26px;margin-top:19px;width:37px;height:38px;background-color:#ffffff50;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#202 71 37 38)"/>
+        <input type="button" style="position:relative;width:89px;height:76px;background:;" onclick="DeleteSelectedBlocks"/>
+    </div>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>

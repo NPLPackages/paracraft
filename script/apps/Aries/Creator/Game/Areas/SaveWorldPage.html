@@ -1,0 +1,88 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/SaveWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="SaveWorldPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.SaveWorldPage");
+SaveWorldPage.OnInit();
+
+local do_modify = false;
+
+function ISModifying()
+    return do_modify;
+end
+
+function ConvertStatus()
+    if(do_modify) then
+        local name = Page:GetUIValue("worldname");
+        WorldCommon.world_tag.name = name;
+        SaveWorldPage.worldname = name;
+    end
+    do_modify = not do_modify;
+    Page:Refresh(0);
+    --SaveWorldPage.TakeImage()
+    Page:SetUIValue("WorldImage", SaveWorldPage.image_filepath);
+end
+
+function GetWorldName()
+    return SaveWorldPage.worldname;
+end
+
+function OnSaveWorld()
+    local worldname = Page:GetUIValue("worldname")
+    ClosePage();
+    SaveWorldPage.OnSaveWorld(worldname);
+end
+
+function OnUploadWorld()
+    ClosePage();
+    --[[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
+	local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
+	WorldUploadPage.ShowPage();
+    ]]
+end
+
+function OnClickTakeImage()
+    SaveWorldPage.TakeImage()
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+
+]]></script>
+<aries:window style="width:310px;" title='<%=L"保存世界"%>' onclose="ClosePage" mode="thin">
+    <div style="margin-left:40px;">
+        <pe:if condition='<%=not ISModifying()%>'>
+            <div style="float:left;margin-top:4px;height:24px;color:#ffffff;width:160px;">
+                <%=GetWorldName() %>
+            </div>  
+            <input type="button" style="float:left;margin-left:10px;margin-top:4px;" value='<%=L"修改"%>' onclick="ConvertStatus" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%=ISModifying()%>'>
+            <input type="text" name="worldname" value='' style="float:left;margin-top:4px;width:160px;height:22px;" class="mc_text"/>    
+            <input type="button" value='<%=L"保存"%>' style="float:left;margin-top:4px;margin-left:10px;" onclick="ConvertStatus" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+    </div>
+    
+    <div style="margin-top:1px;margin-left:35px;padding:2px;background:" tooltip='<%=L"点击重新截图"%>' onclick="OnClickTakeImage">
+        <img name="WorldImage" width="230" height="145"/>
+    </div>
+    <div style="margin-top:7px;margin-bottom:15px;">
+        <input type="button" style="float:left;margin-left:40px;color:#ffffff" value='<%=L"上传大厅"%>' tooltip='<%=L"上传到服务器, 其他玩家可访问"%>' class="mc_light_grey_button_with_fillet" onclick="OnUploadWorld"/>
+        <input type="button" style="margin-left:20px;color:#ffffff" value='<%=L"本地保存"%>' tooltip='<%=L"世界只保存在了您的个人电脑上"%>' class="mc_light_grey_button_with_fillet" onclick="OnSaveWorld"/>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

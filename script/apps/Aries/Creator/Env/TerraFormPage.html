@@ -1,0 +1,102 @@
+﻿<!-- "script/apps/Aries/Creator/Env/TerraFormPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="TerraFormPage.lua"><![CDATA[
+TerraFormPage = commonlib.gettable("MyCompany.Aries.Creator.TerraFormPage");
+TerraFormPage.OnInit();
+
+function OnToggleAdv()
+    TerraFormPage.IsAdvExpanded = not TerraFormPage.IsAdvExpanded
+end
+]]></script>
+<div><span style="color:#808080;">改变地形地貌</span>
+    <pe:gridview AllowPaging="False" pagesize="10" ItemsPerLine="4" style="height:95px" name="gvwTerraFilters" DataSource='<%=MyCompany.Aries.Creator.TerraFormPage.DS_TerrainTex_Func%>' DefaultNodeHeight="44">
+        <Columns>
+            <pe:if condition='<%=Eval("index")==MyCompany.Aries.Creator.TerraFormPage.SelectedIndex%>'>
+                <div style="float:left;padding:3px;background:url(Texture/whitedot.png);background-color:#CCCC00">
+                    <div tooltip='<%=Eval("tooltip")%>' onclick="MyCompany.Aries.Creator.TerraFormPage.OnDeselectFilter">
+                        <img src='<%=Eval("icon")%>'width="38" height="38"/>
+                    </div>
+                </div>
+            </pe:if>
+            <pe:if-not condition='<%=Eval("index")==MyCompany.Aries.Creator.TerraFormPage.SelectedIndex%>'>
+                <a tooltip='<%=Eval("tooltip")%>' onclick="MyCompany.Aries.Creator.TerraFormPage.OnSelectFilter" param1='<%=Eval("index")%>'>
+	                <img src='<%=Eval("icon")%>'width="42" height="42"/>
+	            </a>
+            </pe:if-not>
+        </Columns>
+    </pe:gridview>
+    <div style="margin-top:2px">
+        <div style="float:left;margin-top:10px" tooltip="选择常用的大,中,小刷子">选择刷子:</div>
+        <div style="float:left">
+            <input type="button" style="background:url(Texture/Aries/Creator/range1.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraFormPage.OnClickBrush" name="1" />
+            <input type="button" style="background:url(Texture/Aries/Creator/range2.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraFormPage.OnClickBrush" name="2" />
+            <input type="button" style="margin-left:5px;background:url(Texture/Aries/Creator/range3.png);width:32px;height:32px" onclick="MyCompany.Aries.Creator.TerraFormPage.OnClickBrush" name="3" /><br />
+        </div>
+    </div>
+    <pe:treeview style="background:;">
+    <pe:treenode text="高级设置" indent="0" expanded='<%=TerraFormPage.IsAdvExpanded==true%>' can_select="true" OnClick='OnToggleAdv' >
+        <div>
+        <div style="float:left" tooltip="刷子的半径">半径:</div>
+        <div style="float:left">
+            <pe:sliderbar style="width:100px" name="BrushSize" IsShowEditor="true" value="10" min="2" max="120" min_step="0.1" no_value_check="true" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetBrushSize" />
+        </div><br />
+        <div style="float:left" tooltip="每次点击的绘制强度: 值越小, 变化越小">强度:</div>
+        <div style="float:left">
+            <pe:sliderbar style="width:100px" name="BrushStrength" IsShowEditor="true" EditorFormat="%.2f" value="0.2" min="0" max="1" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetBrushStrength" />
+        </div><br />
+        <div style="float:left" tooltip="笔刷边缘过度的柔和度: 值越大, 边缘越柔和">柔和:</div>
+        <div style="float:left">
+            <pe:sliderbar style="width:100px" name="BrushSoftness" IsShowEditor="true" EditorFormat="%.2f" value="0.5" min="0" max="1" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetBrushSoftness" />
+        </div><br />
+        <div style="float:left" tooltip="鼠标按下后的灵敏度: 值越大, 越灵敏">灵敏:</div>
+        <div style="float:left">
+            <pe:sliderbar style="width:100px" name="BrushRepeatInterval" IsShowEditor="true" EditorFormat="%.2f" value="0.9" min="0.8" max="0.95" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetBrushRepeatInterval" />
+        </div><br />
+        <div name="GaussianHill" display="none">
+            <div style="float:left" tooltip="Standard Deviation:值越大, 山顶越平">形状:</div>
+            <div style="float:left">
+                <pe:sliderbar style="width:100px" name="gaussian_deviation" IsShowEditor="true" EditorFormat="%.2f" value="0.9" min="0.1" max="1" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetGaussianDeviation" />
+            </div><br />
+            <div style="float:left" tooltip="HeightScale:值越大, 形成的山越高.">峰值:</div>
+            <div style="float:left">
+                <pe:sliderbar style="width:100px" name="HeightScale" IsShowEditor="true" EditorFormat="%.2f" value="3" min="0" max="10" min_step="0.01" onchange="MyCompany.Aries.Creator.TerraFormPage.OnSetHeightScale" />
+            </div><br />
+        </div><br />
+        <div name="Flatten" display="none">
+            <div style="float:left" tooltip="">类型:</div>
+            <div style="float:left">
+                <select style="height:22px" name="FlattenOperation" onclick="MyCompany.Aries.Creator.TerraFormPage.OnSetFlattenOperation">
+                    <option value="-1">中心高度铲平</option>
+                    <option value="0">向上铲平</option>
+                    <option value="1">向下铲平</option>
+                    <option value="2" selected="true">上下铲平</option>
+                </select>
+            </div><br />
+            <div style="float:left" tooltip="铲平到的高度(绝对值)">高度:</div>
+            <div style="float:left">
+                <pe:numericupdown style="width:60px" name="Elevation" onchange="MyCompany.Aries.Creator.TerraFormPage.OnElevationChanged()" min="-2000" max="2000" min_step="0.01" value="0" valueformat="%.2f"/><br />
+                <!--<input tooltip="使用当前人物的高度" style="margin-left:0px" type="button" name="ElevToCurrentHeight" class="button" value="当前高度" onclick="MyCompany.Aries.Creator.TerraFormPage.OnSetElevationToCur"/>-->
+                <input type="checkbox" tooltip="锁定当前人物的高度" checked='<%=TerraFormPage.LockFlattenElevation==true %>' style="margin-left:0px" name="LockElevation" onclick="MyCompany.Aries.Creator.TerraFormPage.OnLockElevation" /><div for="LockElevation" style="float:left;" >锁定高度</div>
+            </div><br />
+        </div>
+        </div>
+    </pe:treenode>
+    </pe:treeview>
+    <!--<pe:treeview style="background:;">
+        <pe:treenode text="帮助说明" expanded="false">
+            <div>选择地形工具, 用按住鼠标左键不放在场景中拖动绘制</div>
+            <div>ESC键取消选择, -/+键放缩半径</div>
+            <div>将鼠标放在属性名上, 获得功能提示</div>
+            <div>【注】平滑操作时, 强度大于0.5将使用5*5filter, 否则为3*3</div>
+            <div>【注】山洞操作时, 强度小于0.5将开辟山洞, 强度大于0.5将填充山洞</div>
+            <div>【注】斜面操作时, 鼠标点击再松开, 形成一条直线</div>
+            <div>上下铲平操作, 可以用来在山间开路, 过产生平原或盆地</div>
+        </pe:treenode>
+    </pe:treeview>-->
+</div>
+</pe:mcml>
+</body>
+</html>

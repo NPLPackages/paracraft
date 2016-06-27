@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/SharePhotosPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>save world page by LiXizhi 2008.6.27</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" src="SharePhotosPage.lua"><![CDATA[
+MyCompany.Aries.Creator.SharePhotosPage.OnInit();
+]]></script>
+<div>
+<div>
+    <div style="float:left;margin-bottom:5px">
+        <div style="float:left;margin-top:1px;color:#808080">截图预览:</div>
+        <input type="button" value="" tooltip="拍照" name="TakeWorldImage" style="width:40px;height:32px;background:url(Texture/Aries/Creator/snapshot_32bits.png# 0 0 40 32)" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnClickTakeSnapshot" /><br />
+        <div style="padding:2px;background:url(Texture/Aries/Creator/imageboarder.png: 3 3 3 3)">
+            <img name="CurrentSnapshot" style="width:180px;height:110px;"/>
+        </div>
+        <br />
+    </div>
+    <form name="sharePhotosFrm">
+    <div style="float:left;margin-left:10px;margin-right:5px;margin-bottom:5px">
+        <div style="margin-top:5px;">
+            <div style="float:left;">图片名称:</div><input name="photo_name" style="width:120px;height:22px;background:url(Texture/Aries/Common/MultilineEditbox_32bits.png:5 5 5 5)"/>
+        </div>
+        <div>
+            <div style="font-weight:bold;margin-top:5px;margin-bottom:5px;">你想如何分享你的图片呢?</div>
+            <input type="checkbox" name="checkUploadToWeb" style="margin-right:5px;"/>分享到官网 
+            <input type="button" name="openWebAlbum" style="margin-left:0px;margin-top:2px;background:url(Texture/3DMapSystem/common/ViewFiles.png);width:16px;height:16px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenWebDir" tooltip="点击打开我的官网画册"/><br />
+            <input type="checkbox" name="checkSaveToDisk" style="margin-right:5px;" checked="true"/>保存到本地
+            <input type="button" name="openDiskAlbum" style="margin-left:0px;margin-top:2px;background:url(Texture/3DMapSystem/common/ViewFiles.png);width:16px;height:16px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/><br />
+            <div style="margin-top:5px;">
+            <div style="float:left">选择保存路径:</div>
+             <select name="screenshot_path" style="width:120px;height:22px;">
+                <option value="default" selected="true">默认路径</option>
+                <option value="my_documents">我的文档</option>
+                <option value="my_photos">我的图片收藏夹</option>
+             </select>
+             </div>
+        </div>
+        <div>
+            <input type="submit" class="defaultbutton" style="margin-left:0px;margin-top:5px;width:80px;height:32px;background:url(Texture/Aries/Creator/button_32bits.png# 0 0 32 30: 15 14 15 14);color:#660033;" name="btnOK" value="确定" tooltip="点击提交" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnClickSave()"/>
+            <input type="button" style="margin-left:20px;margin-top:5px;width:80px;height:32px;background:url(Texture/Aries/Creator/button_32bits.png# 0 0 32 30: 15 14 15 14);color:#660033;" name="btnCancel" value="取消" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnClose()"/>
+        </div>
+    </div>
+    </form>
+</div>
+<hr />
+<img style="background:url(Texture/3DMapSystem/common/exclamation.png);width:16px;height:16px;"/>
+<label name="result" style="float:left;height:30px;color:#003366;margin-left:5px;">点击F11键, 可以快速截图并自动命名保存到本地</label>
+</div>
+</pe:mcml>
+</body>
+</html>

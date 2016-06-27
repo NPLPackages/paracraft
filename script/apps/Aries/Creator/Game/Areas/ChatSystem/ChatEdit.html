@@ -1,0 +1,59 @@
+﻿<!-- "script/apps/Aries/BBSChat/ChatSystem/ChatEdit.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ChatEdit, by lixizhi, 2011/3/14</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="ChatEdit.lua"><![CDATA[
+local page = document:GetPageCtrl();
+MyCompany.Aries.ChatSystem.ChatEdit.Init();
+
+function OnQuickword(sName)
+    local btn = page:FindUIControl(sName);
+    if(btn and btn:IsValid())then
+        local name = btn.name;
+        local x,y,width, height = btn:GetAbsPosition();
+        NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/BattleQuickWord.lua");
+        MyCompany.Aries.ChatSystem.BattleQuickWord.OnQuickword(x,y,width, height);
+    end
+end
+function OnClickSmiley()
+    MyCompany.Aries.Desktop.Dock.OnClickSmiley();
+end
+
+function OnTest()
+    _guihelper.MessageBox("111111")
+end
+]]></script>
+<pe:if condition="<%= not System.options.IsMobilePlatform %>">
+    <div width="100%" style="height:24px;background-color:#000000a0;">
+        <!--<div style="float:left;margin-left:1px;">
+            <input type="button" tooltip="快捷语言" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Quickword_32bits.png);" 
+                onclick="OnQuickword()" name="quickword_btn"/>
+            <input type="button" tooltip="表情" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
+                onclick="OnClickSmiley()" name="onsmiley_btn"/>
+        </div>-->
+        <div width="100%" style="position:relative;float:left;margin-top:2px;margin-left:5px;margin-right:22px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
+            <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#000000" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
+        </div>   
+        <input value='X' type="button" align="right" style="position:relative;margin-right:2px;width:20px;margin-top:2px;height:20px;" class="mc_light_grey_button_with_fillet" 
+            name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+    </div>
+</pe:if>
+<pe:if condition="<%= System.options.IsMobilePlatform %>">
+    <div width="100%" style="height:45px;background-color:#ffffffff;" class="mobile_button">
+        <div width="100%" style="position:relative;float:left;margin-top:2px;margin-left:5px;margin-right:175px;height:40px;background-color:#000000cc" class="mobile_button_white">
+            <input type="text" name="chatedit_words_mobile" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:5px;height:30px;font-size:20px;background:;" class="mobile_button_black"/>
+        </div>
+        <input zorder="1" align="right" value='<%=L"取消"%>' type="button" style="position:relative;margin-right:5px;font-size:14px;margin-top:3px;min-width:85px;height:38px;" class="mobile_button_white" 
+                name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+        <input zorder="1" align="right" value='<%=L"发送"%>' type="button" style="position:relative;margin-right:95px;font-size:14px;margin-top:3px;min-width:70px;height:38px;" class="mobile_button_white" 
+                name="send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+    </div>
+</pe:if>
+</pe:mcml> 
+</body>
+</html>

@@ -1,0 +1,63 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/TaskBuilder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="TaskBuilder.lua"><![CDATA[
+local TaskBuilder = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TaskBuilder");
+TaskBuilder.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+local ds_task_items = TaskBuilder.ds_task_items;
+
+function DS_Items(index)
+    if(index == nil) then
+        return #ds_task_items;
+    else
+        return ds_task_items[index];
+    end
+end
+
+function OnClickBlock(block_id)
+    block_id = tonumber(block_id);
+    TaskBuilder.OnClickBlock(block_id)
+end
+]]></script>
+<div style="width:250px;height:400px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >创造任务目标</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+        <pe:tabs name="builder" class="tabs" >
+            <pe:tab-item name="passable" text="物品" selected="true" style="padding-top:0px;padding:5px;padding-bottom:10px">
+                <pe:gridview style="margin:0px" name="gvwPassable" CellPadding="4"  AllowPaging="True" ItemsPerLine="4" DefaultNodeHeight = "72" pagesize="20"
+                    DataSource='<%=DS_Items%>'>
+	                <Columns>
+			            <input name='<%=Eval("block_id")%>' tooltip='<%=Eval("tooltip")%>' onclick="OnClickBlock" type="button" class="button" value="" style='<%=format("width:48px;height:48px;background:url(%s)", Eval("icon"))%>' /><br />
+                        <input type="button" name="text" value='<%=Eval("text")%>' style="width:50px;height:12px;font-size:12px;margin-top:0px;background:url();"/>
+	                </Columns>
+	                <EmptyDataTemplate>
+	                </EmptyDataTemplate>
+	                <PagerSettings Position="Bottom" />
+                    <PagerTemplate AutoHidePager="false" style="margin-left:20px;">
+					    <form>
+						    <input type="button" name="pre" invisibleondisabled="false" value="上一页" class="pagerbuttonleft" />
+							    <input type="button" name="page" class="pagerbuttontext" /> 
+						    <input type="button" name="next" invisibleondisabled="false" value="下一页" class="pagerbuttonright" />
+	                    </form>
+				    </PagerTemplate>
+                </pe:gridview>
+            </pe:tab-item>
+        </pe:tabs>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

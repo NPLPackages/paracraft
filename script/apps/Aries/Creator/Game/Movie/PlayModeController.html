@@ -1,0 +1,23 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/PlayModeController.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="PlayModeController.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+PlayModeController = commonlib.gettable("MyCompany.Aries.Game.Movie.PlayModeController");
+PlayModeController.OnInit();
+]]></script>
+<pe:container name="touch_scene" style="position:relative;background:;" alignment="_fi" width="100%" height="100%" ontouch="PlayModeController.OnTouch">
+        <!--TODO: shall we add skip, resume, pause button here? -->
+</pe:container>
+<script refresh="true" type="text/npl"><![CDATA[
+PlayModeController:OnPostLoad();
+]]></script>
+</pe:mcml>
+</body>
+</html>

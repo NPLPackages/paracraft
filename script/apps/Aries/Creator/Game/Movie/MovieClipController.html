@@ -1,0 +1,105 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/MovieClipController.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="MovieClipController.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+MovieClipController.OnInit();
+
+function GetTitle()
+    return format("%s", MovieClipController.GetTitle());
+end
+
+function IsActorSlotEmpty(slotNumber)
+    local view = MovieClipController.GetActorInventoryView();
+    if(view) then
+        local itemStack = view:GetSlotItemStack(slotNumber)
+        if(itemStack) then
+            return true;
+        end
+    end
+end
+
+function IsSelectedActor(slotNumber)
+    local view = MovieClipController.GetActorInventoryView();
+    if(view) then
+        local itemStack = view:GetSlotItemStack(slotNumber)
+        if(itemStack) then
+            return MovieClipController.GetItemStack() == itemStack;
+        end
+    end
+    return false;
+end
+
+function DS_Actor_Inventory(index)
+	local view = MovieClipController.GetActorInventoryView();
+	if(view) then
+        return view:GetSlotDS(index);
+	else
+		if(index == nil) then
+			return 0;
+        end
+	end
+end
+
+function OnClickEmptySlot(mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    if(item and item.slotNumber) then
+        MovieClipController.OnClickEmptySlot(item.slotNumber);
+    end
+end
+
+]]></script>
+<aries:window mode="thin" style="width:200px;" title='<%=L"电影片段"%>' onclose="MovieClipController.OnClose">
+    <pe:if condition='<%=not MovieClipController.IsPlayingMode()%>'>
+    <div>
+        <div>
+            <div class="mc_item" style="float:left;width: 34px; height: 34px;">
+                <input type="button" zorder="1" name="AddNPC" value="+" tooltip='<%=L"添加演员"%>' style="margin-left:4px;margin-top:4px;width:26px;height:26px;" class="mc_light_grey_button_with_fillet" onclick="MovieClipController.OnClickAddNPC()"/>
+            </div>
+            <div class="mc_item" style="float: left; width: 34px; height: 34px;">
+                <input type="button" zorder="1" name="godview" tooltip='<%=L"主角"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="MovieClipController.OnClickGodMode()"/>
+            </div>
+        </div>
+        <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="30">
+            <Columns>
+                <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
+                    <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
+                        <pe:mc_slot ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
+                    <div class="mc_item">
+                        <pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                    </div>
+                </pe:if>
+			</Columns>
+        </pe:gridview>
+    </div>
+    <div style="margin-top:0px;">
+        <input type="button" name="addkeyframe" tooltip='<%=L"左键:加入关键帧(K)\n右键:锁定/解锁角色(L)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/key_off.png)" onclick="MovieClipController.OnClickAddKeyFrameButton()"/>
+        <input type="button" name="record" tooltip='<%=L"扮演录制/暂停(R)\nshift+左键:清空所有录制的动作"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/auto_off.png)" onclick="MovieClipController.OnRecord()"/>
+        <input type="button" name="settings" tooltip='<%=L"设置或修改当前角色"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="MovieClipController.OnSettings()"/>
+    </div>
+    </pe:if>
+    <div style="padding-bottom:8px;">
+        <!--<input type="button" name="pause" tooltip='<%=L"暂停"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="MovieClipController.OnPause()"/>-->
+        <input type="button" name="to_begin" tooltip='<%=L"到开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/back_off.png);" onclick="MovieClipController.OnGotoBeginFrame()"/>
+        <input type="button" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="MovieClipController.OnPlay()"/>
+        <pe:if condition='<%=MovieClipController.IsPlayingMode()%>'>
+            <input type="button" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/rec_off.png); " onclick="MovieClipController.OnCaptureVideo()"/>
+        </pe:if>
+        <input type="button" name="to_end" tooltip='<%=L"到结束"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/go_off.png); " onclick="MovieClipController.OnGotoEndFrame()"/>
+        <!--current time display-->
+        <input type="button" name="text" enabled="false" style="margin-left:10px;margin-top:6px;width:70px;background:;font-size:14px;color:#00ff00;font-weight:bold;text-align:left;"/>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

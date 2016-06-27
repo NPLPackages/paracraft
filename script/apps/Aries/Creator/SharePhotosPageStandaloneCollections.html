@@ -1,0 +1,95 @@
+﻿<!-- "script/apps/Aries/Creator/SharePhotosPageStandaloneCollections.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>save world page by LiXizhi 2008.6.27</title>
+</head>
+<body>
+<pe:mcml trans="ParaworldMCML">
+<script type="text/npl" refresh="false" src="SharePhotosPage.lua"><![CDATA[
+local SharePhotosPage = commonlib.gettable("MyCompany.Aries.Creator.SharePhotosPage")
+SharePhotosPage.dsFiles = {};
+function OnInit()
+    -- add folders
+	local folderPath = "Screen Shots";
+	SharePhotosPage.dsFiles = {};
+
+	local output = SharePhotosPage.SearchFiles(nil, folderPath, SharePhotosPage.MaxItemPerFolder or 500, "*.jpg");
+	if(output and #output>0) then
+		local _, item;
+		for _, item in ipairs(output) do
+            table.insert(SharePhotosPage.dsFiles, {filepath = folderPath.."/"..item.filename, 
+                writedate = item.writedate, filesize=item.filesize});
+		end
+	end
+end
+OnInit();
+
+
+function OnClose()
+    Page:CloseWindow();
+end
+
+function GetDataSource(index)
+    if(index == nil) then
+		return #(SharePhotosPage.dsFiles);
+	else
+		return SharePhotosPage.dsFiles[index];
+	end
+end
+
+function OnClickShare(name)
+    OnClose();
+    local photo = GetDataSource(tonumber(name))
+    if(photo.filepath) then
+        SharePhotosPage.ShowPage(photo.filepath);
+    end
+end
+
+]]></script>
+
+<div class="window" style="width:640px;height:530px;">
+    <div class="titlebar" width="100%">
+      <div class="windowlabel" >我的相册</div>
+      <input type="button" style="margin-top:1px;margin-right:5px" onclick="OnClose" class="closewindow"/>
+    </div>
+    <div class="clientarea" style="margin-left:10px;margin-right:10px;margin-top:3px;margin-bottom:10px;">
+        <pe:gridview name="gvwPhotos" pagesize="9" DefaultNodeHeight="150"
+            CellPadding="1" ItemsPerLine="3" AllowPaging="true" DataSource='<%=GetDataSource %>'>
+		    <Columns>
+                <div style="width:204px;">
+                    <div>
+                        <img animstyle="18" src='<%=Eval("filepath")%>' name='<%=Eval("index")%>' onclick="OnClickShare" style="width:200px;height:120px;"/>
+                    </div>
+                    <div style="margin-top:2px;height:22px;">
+                        <input type="button" name='<%=Eval("index")%>' value="分享" class="button_highlight" onclick="OnClickShare" style="width:70px;margin-left:60px;height:22px;"/> 
+                        <!--<div style="float:left;"><%=Eval("writedate")%></div>-->
+                    </div>
+                </div>                      
+		    </Columns>
+            <EmptyDataTemplate>
+                <b>没有找到符合条件的世界</b>
+            </EmptyDataTemplate>
+            <FetchingDataTemplate>
+                <b>正在搜索, 请稍候 ... </b>
+            </FetchingDataTemplate>
+            <PagerSettings Position="Bottom" height="26" PreviousPageText="上一页" NextPageText="下一页"/>
+            <PagerTemplate>
+	            <form>
+                    <div>
+                        <input type="button" class="button" value="打开相册目录" name="openDiskAlbum" style="position:relative;margin-left:25px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/><br />
+                    </div>
+                    <input type="button" name="pre" zorder="2" style="width:22px;height:22px;margin-left:275px;background:url(Texture/Aries/common/themekid/cards/left_arrow_32bits.png#0 0 21 21);"/>
+	                <div style="float:right;margin-top:0px;width:53px;">
+	                    <label name="page" style="color:#FFFFFF;text-align:center;width:53px;height:18px;margin:4px"/>
+	                </div>
+	                <input type="button" name="next" zorder=2 style="width:22px;height:22px;background:url(Texture/Aries/common/themekid/cards/right_arrow_32bits.png#0 0 21 21)"/>
+	            </form>
+	        </PagerTemplate>
+		</pe:gridview>
+    </div>
+</div>
+
+</pe:mcml>
+</body>
+</html>

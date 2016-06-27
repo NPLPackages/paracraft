@@ -1,0 +1,172 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EnterGamePage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+local CreateOpenWorld = commonlib.gettable("MyCompany.Aries.Creator.CreateOpenWorld")
+local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
+
+EnterGamePage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickNewWorld()
+    ClosePage();
+    local _right = EnterGamePage.HaveRight("entergame");
+	paraworld.PostLog({action = "user_click_new_world_mc", ver=System.options.version, hasright=_right},"user_click_new_world_mc", function(msg)  end);
+    CreateOpenWorld.ShowCreateWorldPage();
+end
+
+function OnClickLoadWorld()
+    ClosePage();
+    local _right = EnterGamePage.HaveRight("entergame");
+    paraworld.PostLog({action = "user_click_load_world_mc", ver=System.options.version, hasright=_right}, "user_click_load_world_mc", function(msg) end);
+    CreateOpenWorld.ShowOpenWorldPage();
+end
+
+function CanEnter()
+	return EnterGamePage.HaveRight("entergame");
+end
+
+function OnClickTrial()
+    local ctl = Page:FindControl("NonMemberCanvas");
+    if(ctl) then
+        ctl.visible = false;
+    end
+end
+
+function OnClickEnterMember()
+    local ctl = Page:FindControl("MemberCanvas");
+    if(ctl) then
+        ctl.visible = false;
+    end
+end
+
+function GetVersionString()
+    return "0.1.0";
+end
+
+function OnFlowerRanking()
+    ClosePage()
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+    if(Desktop.OnShowRankingPage) then
+        Desktop.OnShowRankingPage()
+    end
+end
+
+function OnEnterOldGame()
+    ClosePage()
+    NPL.load("(gl)script/apps/Aries/Creator/CreateOpenWorld.lua");
+	MyCompany.Aries.Creator.CreateOpenWorld.ShowPage();
+end
+]]></script>
+<div style="width:512px;" class="window">
+    <div class="titlebar" width="100%">
+        <div class="windowlabel" >新版创意空间</div>
+        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
+    </div>
+    <pe:container class="clientarea" style="margin-left:7px;margin-right:7px;margin-bottom:9px;background:;">
+        <div style="height:200px;margin-left:0px;" class="inborder_golden" width="100%">
+            <input type="button" value="作品排行榜" onclick="OnFlowerRanking" style="position:relative;margin-left:50px;margin-top:2px;font-size:14px;font-weight:bold;height:30px;width:100px;" class="linkbutton_yellow"/>
+            <pe:if condition='<%=System.options.version == "kids" %>'>
+                <div style="position:relative;margin-left:20px;margin-top:140px;">
+                    <input type="button" value="视频教学(上)" href="http://www.aipai.com/c13/Pz4gIyUqIiZqJWQhLw.html" style="font-size:12px;" class="button_highlight" /><br />
+                    <input type="button" value="视频教学(下)" href="http://www.aipai.com/c15/Pz4gIyojIi1qJWQsKA.html" style="font-size:12px;" class="button_highlight" /><br />
+                    <pe:slot style="position:relative;float:left;" type="count" gsid="17394"></pe:slot>
+                </div>
+                <div style="margin:2px;height:196px;background:url(Texture/Aries/Advertisement/Creator/mc_poster.png)" width="100%"></div>
+            </pe:if>
+            <pe:if condition='<%=System.options.version == "teen" %>'>
+                <div style="margin:2px;height:196px;background:url(Texture/Aries/Advertisement/Creator/mc_poster.teen.png)" width="100%">
+                    <div style="margin-left:5px;margin-top:170px;"><%=format("版本:%s", GetVersionString())%></div>
+                </div>
+            </pe:if>
+        </div>
+        <pe:if condition='<%=not CanEnter()%>'>
+            <pe:container name="NonMemberCanvas" zorder='1' alignment="_fi" style="margin-top:5px;position:relative;padding:10px;background:url(Texture/whitedot.png);background-color:#000000c0;color:#ffffff" >
+                <pe:if condition='<%=System.options.version == "teen" %>'>
+                    <div style="margin-bottom:5px;font-weight:bold" >
+                    说明： 创意空间是由玩家创作的可互访的3D世界. 2种方法进入：</div>
+                    <div>
+                        <span>方法1:</span>
+                        <div style="float:left;">
+                            成为<pe:item gsid='17394' is_container="true" style="float:left;width:120px;height:22px;color:#ff0000;">创意空间会员</pe:item> 每天限量10名创意爱好者加入。<br />
+                            <!--<span style="font-size:12px;">（内测结束后，此次加入的绝版会员将可继续享受今后新版创意空间中的功能与服务）</span>-->
+                            <pe:item gsid='17394' is_container="true" style="float:left;width:140px;height:22px;font-size:12px;"><div class="linkbutton_yellow">我要成为创意会员</div></pe:item>
+                        </div>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <span>方法2:</span>
+                        <div style="float:left;">
+                            <span style="float:left;">
+                                升到40级. （你的等级不够, 快点升级吧）
+                            </span>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=System.options.version == "kids" %>'>
+                    <div style="margin-bottom:5px;font-weight:bold;font-size:14px;" >新版创意空间开放了！ 如果你喜欢创意空间, 请成为创意会员</div>
+                    <div>
+                        <div style="float:left;margin-left:20px;">
+                            成为<pe:item gsid='17394' is_container="true" style="float:left;width:120px;height:22px;color:#ff0000;">创意空间绝版会员</pe:item>, 每天限量100名创意爱好者加入。<br />
+                            <pe:item gsid='17394' is_container="true" style="float:left;width:140px;height:22px;font-size:12px;"><div class="linkbutton_yellow">我要成为创意会员</div></pe:item>
+                        </div>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <div>如何免费成为会员？</div>
+                        <div style="float:left;margin-left:20px;">
+                            <span style="float:left;">
+                                在贴吧或爱拍社区中有优秀个人作品的玩家, 工作人员会不定期发放会员资格。 
+                            </span>
+                            <a href="http://www.aipai.com/game_gameid-47617.html" style="font-size:12px;" isbuttonstyle="true" class="linkbutton_yellow">我要发布我的视频</a>
+                        </div>
+                    </div>
+                </pe:if>
+                <input type="button" onclick="OnClickTrial" value="开始免费体验" tooltip="会员才能上传世界" class="linkbutton_yellow" style="position:relative;margin-left:340px;"/>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=CanEnter() and System.options.version == "kids"%>'>
+            <pe:container name="MemberCanvas" zorder='1' style="margin-top:5px;position:relative;height:200px;padding:10px;background:url(Texture/whitedot.png);background-color:#000000c0;color:#ffffff" width="100%" >
+                <!--<div style="position:relative;color:#f0f000" class="bordertext">
+                    创意会员等级：<pe:slot style="float:left;" type="count" gsid="17394"></pe:slot>
+                </div>-->
+                <div style="position:relative;width:300px;" align="center">
+                    <input type="button" value="开始游戏" onclick="OnClickEnterMember" style="margin-top:42px;font-size:14px;font-weight:bold;height:30px;width:300px;" class="button"/>
+                </div>
+                <div style="position:relative;margin-top:100px">
+                    <div style="margin-bottom:5px;font-weight:bold" >感谢您成为创意空间会员！ 我们正在广泛征集新版创意空间的教学视频。 如果你是创意达人， 请将作品上传爱拍。 优秀作品将获得官方大奖！</div>
+                    <div style="margin-top:5px;margin-left:270px;"><a href="http://www.aipai.com/game_gameid-47617.html" style="font-size:12px;" isbuttonstyle="true" class="linkbutton_yellow">我要发布我的视频</a></div>
+                </div>
+            </pe:container>
+        </pe:if>
+        <div style="margin-top:5px;padding:10px;margin-left:0px;" class="inborder_golden" width="100%">
+            <div style="width:300px;" align="center">
+                <input type="button" value="新建世界..." onclick="OnClickNewWorld" style="margin-top:2px;font-size:14px;font-weight:bold;height:30px;width:300px;" class="button"/>
+                <input type="button" value="加载世界..." onclick="OnClickLoadWorld" style="margin-top:10px;font-size:14px;font-weight:bold;height:30px;width:300px;" class="button"/>
+            </div>
+        </div>
+        <div style="margin-top:5px;padding:10px;margin-left:0px;min-height:105px;" class="inborder_golden" width="100%">
+            您可以将从网络上下载的*.zip文件拖到这里, 我们将自动为您打开. 
+            <div style="color:#303030;margin-top:5px;">
+            <div style="margin-top:35px;position:relative"><input type="button" value="旧版入口" class="button" onclick="OnEnterOldGame" style="font-size:12px;" name="btnOld"/></div>
+            <pe:if condition='<%=System.options.version == "kids" %>'>
+                [说明:] 新版创意空间, 引入了3D积木概念. 目前在测试阶段. 我们征集广大玩家的创意和创造, 请将您的世界上传分享到<a href="http://tieba.baidu.com/f?kw=%C4%A7%B7%A8%B9%FE%C6%E6">魔法哈奇贴吧</a>，方便大家交流。<br />
+                <div style="text-align:right">powered by ParaEngine (c) 2007-2013</div>
+            </pe:if>
+            <pe:if condition='<%=System.options.version == "teen" %>'>
+                我们正在广泛征集新版创意空间的教学视频。 如果你是创意达人， 请将作品截图或视频上传论坛！
+            </pe:if>    
+            </div>
+        </div>
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>

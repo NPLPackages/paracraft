@@ -1,0 +1,48 @@
+﻿<!-- "script/apps/Aries/Creator/MainToolBar.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>2010.1.24</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true" src="MainToolBar.lua">
+    MyCompany.Aries.Creator.MainToolBar.OnInit();
+</script>
+<div style="position:absolute;margin-left:660px;margin-top:-5px;"><input style="width:40px;height:40px;background:url(Texture/Aries/Creator/close_32bits.png#0 0 40 40);" type="button" name="close" onclick="MyCompany.Aries.Creator.MainToolBar.ReturnToPlayMode()"/></div>
+<!--<div style="margin-left:24px;">
+    <input type="radio" name="OutdoorTabs" checked="checked" value="all" style="width:102px;height:28px;"
+        CheckedBG="Texture/Aries/Homeland/hometab_all_32bits.png;0 0 102 28" 
+        UncheckedBG="Texture/Aries/Homeland/hometab_all_up_32bits.png;0 0 102 28" 
+        onclick=""/>
+</div>-->
+<div style="height:77px;padding-top:12px;padding-left:12px;padding-right:35px;background:url(Texture/Aries/Creator/mainbar_bg_32bits.png#0 0 64 72:31 40 30 30)">
+    <pe:ribbonbar label="天, 地, 水" style="width:170px;height:64px;margin-left:4px;padding:12px;padding-top:9px;padding-bottom:15px;color:#02428A;background:url(Texture/Aries/Creator/ribbon_bg_32bits.png#0 0 64 60:32 54 31 5);background2:url(Texture/Aries/Creator/ribbon_bg_hl_32bits.png#0 0 64 60:32 54 31 5)">
+        <input type="button" name="skyBtn" tooltip="天空" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/Sky_32bits.png#0 0 48 48)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickSkyBtn()"/>
+        <input type="button" name="terrainBtn" tooltip="大地" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/Terrain_32bits.png#0 0 48 48)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickTerrainBtn()"/>
+        <input type="button" name="waterBtn" tooltip="水泽" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/Water_32bits.png#0 0 48 48)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickOceanBtn()"/>
+    </pe:ribbonbar>
+    <pe:ribbonbar label="物品仓库" style="width:290px;height:64px;margin-left:4px;padding:12px;padding-top:9px;padding-bottom:15px;color:#02428A;background:url(Texture/Aries/Creator/ribbon_bg_32bits.png#0 0 64 60:32 54 31 5);background2:url(Texture/Aries/Creator/ribbon_bg_hl_32bits.png#0 0 64 60:32 54 31 5)">
+        <input type="button" name="grassBtn" tooltip="花草树木" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Plants_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickGrassBtn()"/>
+        <input type="button" name="buildingBtn" tooltip="建筑" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_SmallBuilding_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickBuildingBtn()"/>
+        <input type="button" name="decoBtn" tooltip="室外装饰" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Prop_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickDecoBtn()"/>
+        <input type="button" name="specialBtn" tooltip="特效" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Particle_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickSpecialBtn()"/>
+        <input type="button" name="furnitureBtn" tooltip="家具" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Furniture_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickFurnitureBtn()"/>
+        <input type="button" name="othersBtn" tooltip="其他" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Deco_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickOthersBtn()"/>
+    </pe:ribbonbar>
+    <pe:ribbonbar label="人物, 剧情" style="width:170px;height:64px;margin-left:4px;padding:12px;padding-top:9px;padding-bottom:15px;color:#02428A;background:url(Texture/Aries/Creator/ribbon_bg_32bits.png#0 0 64 60:32 54 31 5);background2:url(Texture/Aries/Creator/ribbon_bg_hl_32bits.png#0 0 64 60:32 54 31 5)">
+        <input type="button" name="npcBtn" tooltip="人物" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NC_NPC_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickCharacterBtn()"/>
+        <input type="button" name="animalBtn" tooltip="动物" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NC_Pets_32bits.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickAnimalBtn()"/>
+        <input type="button" name="screenshotBtn" tooltip="截图" style="margin-left:11px;width:32px;height:32px;background:url(Texture/3DMapSystem/AppIcons/videorecorder_64.dds)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickScreenShot()"/>
+    </pe:ribbonbar>
+    <!--<pe:ribbonbar label="宣传" style="width:140px;height:64px;margin-left:4px;padding:12px;padding-top:9px;padding-bottom:15px;color:#02428A;background:url(Texture/Aries/Creator/ribbon_bg_32bits.png#0 0 64 60:32 54 31 5);background2:url(Texture/Aries/Creator/ribbon_bg_hl_32bits.png#0 0 64 60:32 54 31 5)">
+        <input type="button" name="vehicleBtn" tooltip="交通工具" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NC_Vehicle.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickGrassBtn()"/>
+        <input type="button" name="particleBtn" tooltip="粒子" style="margin-left:11px;width:32px;height:32px;background:url(Texture/Aries/Creator/NM_Particle.png)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickGrassBtn()"/>
+        <input type="button" name="screenshotBtn" tooltip="截图" style="margin-left:11px;width:32px;height:32px;background:url(Texture/3DMapSystem/AppIcons/videorecorder_64.dds)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickScreenShot()"/>
+        <input type="button" name="storyBtn" tooltip="写故事" style="margin-left:11px;width:32px;height:32px;background:url(Texture/3DMapSystem/AppIcons/book_64.dds)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickEBook()"/>
+        <input type="button" name="uploadBtn" tooltip="上传领地" style="margin-left:11px;width:32px;height:32px;background:url(Texture/3DMapSystem/AppIcons/ScreenShot_64.dds)" animstyle="14" onclick="MyCompany.Aries.Creator.MainToolBar.OnClickUpload()"/>
+    </pe:ribbonbar>-->
+</div>
+</pe:mcml>
+</body>
+</html>
