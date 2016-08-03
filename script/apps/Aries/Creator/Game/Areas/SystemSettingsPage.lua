@@ -1274,3 +1274,14 @@ function SystemSettingsPage.OnChangeStereoEyeDist(value)
 		GameLogic.options:SetStereoEyeSeparationDist(value);
 	end
 end
+
+function SystemSettingsPage.OnChangeUIScaling(value)
+	GameLogic.options:SetUIScaling(value);
+end
+
+function SystemSettingsPage.OnClickResetUIScaling()
+	GameLogic.options:SetUIScaling(0);
+	if(page) then
+		page:SetValue("UI_Scaling", GameLogic.options:GetUIScaling());
+	end
+end

@@ -73,7 +73,7 @@ function RedirectContext:deactivate()
 	if(RedirectContext._super.deactivate(self)) then
 		if(not self.is_closing) then
 			if(self.redirect_cmd and self.redirect_cmd.OnExit) then
-				self.redirect_cmd.OnExit();
+				self.redirect_cmd:OnExit();
 			end
 		end
 		return true;

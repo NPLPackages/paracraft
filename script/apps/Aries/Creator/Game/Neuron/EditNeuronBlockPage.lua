@@ -129,14 +129,13 @@ end
 
 function EditNeuronBlockPage.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function EditNeuronBlockPage.UnregisterHooks()
 	local self = cur_instance;
 	if(self) then
-		self.sceneContext:close();
+		self:UnloadSceneContext();
 	end
 end
 
@@ -261,7 +260,7 @@ function EditNeuronBlockPage:keyPressEvent(event)
 	elseif(dik_key == "DIK_DELETE" or dik_key == "DIK_DECIMAL")then
 		EditNeuronBlockPage.RemoveAllAxons();
 	else
-		self.sceneContext:keyPressEvent(event);
+		self:GetSceneContext():keyPressEvent(event);
 	end	
 end
 

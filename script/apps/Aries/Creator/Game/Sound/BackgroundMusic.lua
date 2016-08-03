@@ -48,7 +48,7 @@ end
 
 -- get audio source from file name. 
 function BackgroundMusic:GetMusic(filename)
-	if(not filename) then
+	if(not filename or filename=="") then
 		return;
 	end
 	filename = default_music_map[filename] or filename;

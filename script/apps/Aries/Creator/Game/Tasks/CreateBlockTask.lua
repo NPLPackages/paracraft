@@ -87,10 +87,10 @@ function CreateBlock:Run()
 
 		if(self:TryCreateSingleBlock()) then
 
-			local block_id = BlockEngine:GetBlockId(self.blockX,self.blockY,self.blockZ);
-			local block_data = BlockEngine:GetBlockData(self.blockX,self.blockY,self.blockZ);
+			local block_id, block_data, entity_data = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
 			if(block_id == self.block_id) then
 				self.data = block_data;
+				self.entity_data = entity_data;
 
 				local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
 				GameLogic.PlayAnimation({facingTarget = {x=tx, y=ty, z=tz},});
@@ -161,7 +161,7 @@ end
 
 function CreateBlock:Redo()
 	if(self.blockX and self.block_id) then
-		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.block_id, self.data,3);
+		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.block_id, self.data, 3, self.entity_data);
 	elseif((#self.history)>0) then
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[7], nil, b[8]);

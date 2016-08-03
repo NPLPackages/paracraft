@@ -160,6 +160,7 @@ end
 
 function WorldClient:CreateClientPlayer(clientEntityId, netClientHandler)
 	local entityMP = GameLogic.GetPlayerController():CreateNewClientPlayerMP(self, clientEntityId, netClientHandler or self.net_handler);
+	entityMP:Attach();
 	GameLogic.GetPlayerController():SetMainPlayer(entityMP);
 	return entityMP;
 end

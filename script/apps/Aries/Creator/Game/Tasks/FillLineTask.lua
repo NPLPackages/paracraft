@@ -32,12 +32,10 @@ end
 function FillLine:Run()
 	if(self.blockX and self.side) then
 		if(not self.fill_id) then
-			-- self.fill_id = GameLogic.GetBlockInRightHand(); 
-			self.fill_id = ParaTerrain.GetBlockTemplateByIdx(self.blockX, self.blockY, self.blockZ);
+			self.fill_id, self.fill_data, self.fill_sdata = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
 			if(self.fill_id == 0) then
 				return;
 			end
-			self.fill_data = ParaTerrain.GetBlockUserDataByIdx(self.blockX, self.blockY, self.blockZ);
 			if(self.fill_data == 0) then
 				self.fill_data = nil;
 			end
@@ -86,7 +84,7 @@ function FillLine:FrameMove()
 	self.blockZ = self.blockZ + (self.dz or 0);
 
 	if(ParaTerrain.GetBlockTemplateByIdx(self.blockX,self.blockY,self.blockZ) == 0 and self.step <= self.radius) then
-		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data, 3);
+		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data, 3, self.fill_sdata);
 		if(GameLogic.GameMode:CanAddToHistory()) then
 			self.history[#(self.history)+1] = {self.blockX,self.blockY,self.blockZ};
 		end
@@ -103,7 +101,7 @@ end
 function FillLine:Redo()
 	if(self.blockX and self.fill_id and (#self.history)>0) then
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], self.fill_id, self.fill_data, 3);
+			BlockEngine:SetBlock(b[1],b[2],b[3], self.fill_id, self.fill_data, 3, self.fill_sdata);
 		end
 	end
 end

@@ -33,7 +33,15 @@ end
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx,camy,camz, lookat_x,lookat_y,lookat_z)
 	local data = 0;
 	if(side) then
-		data = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+		data = Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+		if(data == 4) then
+			-- horizontal
+			local direction = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+			data = 4 + direction;
+		elseif(data == 5) then
+			local direction = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+			data = 8 + direction;
+		end
 	end
 	return data;
 end

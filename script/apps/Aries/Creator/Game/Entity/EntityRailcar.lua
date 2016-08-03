@@ -60,6 +60,7 @@ Entity.smoothFrames = 0;
 
 -- mapping from direction data to from:{x,y,z} to:{x,y,z} where mc_id  pc_id
 local RailDirMatrix = {
+	[0] = {{ -1, 0, 0}, {1, 0, 0}}, -- 1 1
 	-- x,z straight
 	{{ -1, 0, 0}, {1, 0, 0}}, -- 1 1
 	{{0, 0, -1}, {0, 0, 1}},  -- 0 2
@@ -530,6 +531,7 @@ function Entity:GetRailPointFromPos(posX, posY, posZ, isInputBlockIndex)
 		end
 
 		local matRotRail = RailDirMatrix[blockData];
+
 		-- relative distance traveled on the rail.  
         local distTraveled = 0;
         local fromX = bx + 0.5 + matRotRail[1][1] * 0.5;

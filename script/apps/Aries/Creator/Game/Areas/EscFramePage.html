@@ -135,6 +135,10 @@ end
 function OnClickRevision()
     GameLogic.RunCommand("/menu file.worldrevision");
 end
+function OnClickViewHistory()
+    GameLogic.RunCommand("/menu file.openbackupfolder");
+end
+    
 function OnReturnLastWorld()
     ClosePage();
     WorldStacks:ReturnLastWorld();
@@ -154,6 +158,7 @@ end
             <%=format("%s", GetCurWorldName() or "") %>
             <input type="button" value='...' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_button_blue"/>
         </div>
+        <input type="button" value='<%=L"历史版本"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_button_blue" onclick="OnClickViewHistory"/>
     </div>
     <div style="margin-left:25px;">
         <div style="margin-top:10px;">

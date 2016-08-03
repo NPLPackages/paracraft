@@ -187,15 +187,15 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 			end
 
 			if(movieclipEntity:HasCamera()) then
+				-- child movie clip contains local camera
 				movieclip:SetTime(localClipTime);
 
 				if(movieclip ~= activeMovieClip and activeMovieClip) then
 					movieclip:UpdateActors(0);
 
-					-- use the local movie clip's camera if movie sequence actor is playing or paused but with ActorCommands selected. 
+					-- use the child local movie clip's camera if movie sequence actor is playing or paused but with ActorCommands selected. 
 					local actorSelected = activeMovieClip:GetSelectedActor();
-					if( isPlayingMode or (activeMovieClip:IsPlaying() and actorSelected and actorSelected.class_name~="ActorCamera")
-						or (actorSelected and actorSelected.class_name=="ActorCommands")) then
+					if( isPlayingMode or (actorSelected and actorSelected.class_name=="ActorCommands")) then
 						-- actorFocus
 						local localCameraActor = movieclip:GetCamera();
 						if(not localCameraActor:HasFocus()) then
@@ -208,11 +208,14 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 				if(movieclip ~= activeMovieClip) then
 					movieclip:UpdateActors(0);
 				end
-				-- if local movie does not has camera, use the movie sequence actor's camera. 
+				-- if child local movie does not has camera, use the movie sequence actor's camera. 
 				if(activeMovieClip) then
-					local actorCamera = activeMovieClip:GetCamera()
-					if(actorCamera and not actorCamera:HasFocus()) then
-						actorCamera:SetFocus();
+					local actorSelected = activeMovieClip:GetSelectedActor();
+					if(actorSelected and (actorSelected.class_name=="ActorCommands" or actorSelected.class_name=="ActorCamera")) then
+						local actorCamera = activeMovieClip:GetCamera()
+						if(actorCamera and not actorCamera:HasFocus()) then
+							actorCamera:SetFocus();
+						end
 					end
 				end
 			end

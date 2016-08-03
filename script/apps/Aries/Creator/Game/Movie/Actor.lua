@@ -129,6 +129,14 @@ function Actor:IsAllowUserControl()
 	end
 end
 
+-- user is using WASD key to control this actor now. 
+function Actor:IsUserControlled()
+	local entity = self:GetEntity();
+	if(entity) then
+		return entity:HasFocus() and not entity:IsControlledExternally();
+	end
+end
+
 -- get the movie clip that contains this actor. 
 function Actor:GetMovieClip()
 	if(self.movieclipEntity) then

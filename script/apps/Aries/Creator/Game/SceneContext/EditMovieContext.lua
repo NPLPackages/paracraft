@@ -344,14 +344,14 @@ function EditMovieContext:OnAfterActorFocusChanged()
 	end
 end
 
--- @param bLock: if nil, means toggle
-function EditMovieContext:ToggleLockAllActors(bLock)
+-- @param block: if nil, means toggle
+function EditMovieContext:ToggleLockAllActors(block)
 	local movieclip = MovieManager:GetActiveMovieClip();
 	if(movieclip and not movieclip:IsPlayingMode()) then
 		if(movieclip:IsPaused()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-			MovieClipController.ToggleLockAllActors(bLock);
+			MovieClipController.ToggleLockAllActors(block);
 		end
 		return true;
 	end

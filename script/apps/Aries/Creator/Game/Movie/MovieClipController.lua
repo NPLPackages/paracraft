@@ -399,7 +399,7 @@ end
 
 function MovieClipController.OnRecord()
 	local actor = MovieClipController.GetMovieActor();
-    if(actor) then
+	if(actor) then
 		if(actor.class_name == "ActorCamera_CANCELED") then
 			-- _guihelper.MessageBox("摄影机不支持扮演");
 		else

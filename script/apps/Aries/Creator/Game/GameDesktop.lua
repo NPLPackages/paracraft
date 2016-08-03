@@ -170,6 +170,7 @@ function Desktop.OnActivateDesktop(mode)
 	end
 
 	Desktop.SelectSceneContext();
+	GameLogic.GetPlayerController():InitMainPlayerHandTool();
 
 	if(not System.options.mc and type(commonlib.getfield("MyCompany.Aries.Pet.EnterIndoorMode")) == "function") then
 		MyCompany.Aries.Pet.EnterIndoorMode(System.User.nid);

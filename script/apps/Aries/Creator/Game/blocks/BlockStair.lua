@@ -246,6 +246,92 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the mirrored block data. 
 function block:MirrorBlockData(blockData, axis)
-	-- TODO: 
+	if(axis == "x") then
+		if(blockData == 10) then
+			blockData = 12;
+		elseif(blockData == 2) then
+			blockData = 1;
+		elseif(blockData == 12) then
+			blockData = 10;
+		elseif(blockData == 1) then
+			blockData = 2;
+		elseif(blockData == 7) then
+			blockData = 8;
+		elseif(blockData == 8) then
+			blockData = 7;
+		elseif(blockData == 6) then
+			blockData = 5;
+		elseif(blockData == 5) then
+			blockData = 6;
+		elseif(blockData == 16) then
+			blockData = 17;
+		elseif(blockData == 17) then
+			blockData = 16;
+		elseif(blockData == 15) then
+			blockData = 14
+		elseif(blockData == 14) then
+			blockData = 15;
+		end
+	elseif(axis == "z") then
+		if(blockData == 11) then
+			blockData = 13;
+		elseif(blockData == 3) then
+			blockData = 4;
+		elseif(blockData == 13) then
+			blockData = 11;
+		elseif(blockData == 4) then
+			blockData = 3;
+		elseif(blockData == 6) then
+			blockData = 7;
+		elseif(blockData == 7) then
+			blockData = 6;
+		elseif(blockData == 5) then
+			blockData = 8;
+		elseif(blockData == 8) then
+			blockData = 5;
+		elseif(blockData == 15) then
+			blockData = 16;
+		elseif(blockData == 16) then
+			blockData = 15;
+		elseif(blockData == 14) then
+			blockData = 17;
+		elseif(blockData == 17) then
+			blockData = 14;
+		end
+	else -- "y"
+		if(blockData == 12) then
+			blockData = 1;
+		elseif(blockData == 1) then
+			blockData = 12;
+		elseif(blockData == 3) then
+			blockData = 11;
+		elseif(blockData == 11) then
+			blockData = 3;
+		elseif(blockData == 2) then
+			blockData = 10;
+		elseif(blockData == 10) then
+			blockData = 2;
+		elseif(blockData == 13) then
+			blockData = 4;
+		elseif(blockData == 4) then
+			blockData = 13;
+		elseif(blockData == 7) then
+			blockData = 16;
+		elseif(blockData == 16) then
+			blockData = 7;
+		elseif(blockData == 8) then
+			blockData = 17;
+		elseif(blockData == 17) then
+			blockData = 8;
+		elseif(blockData == 14) then
+			blockData = 5;
+		elseif(blockData == 5) then
+			blockData = 14;
+		elseif(blockData == 6) then
+			blockData = 15;
+		elseif(blockData == 15) then
+			blockData = 6;
+		end
+	end
 	return blockData;
 end

@@ -36,14 +36,13 @@ end
 
 function SelectCharacter.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function SelectCharacter.UnregisterHooks()
 	local self = cur_instance;
 	if(self) then
-		self.sceneContext:close();
+		self:UnloadSceneContext();
 	end
 end
 

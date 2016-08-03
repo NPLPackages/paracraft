@@ -163,3 +163,32 @@ function Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lo
 		end
 	end
 end
+
+
+-- local quat = mathlib.QuatFromAxisAngle(0, 0, 1, 1.57);
+-- echo(quat);
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 3.14), quat));
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, -1.57), quat));
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 1.57), quat));
+
+-- local quat = mathlib.QuatFromAxisAngle(0, 0, 1, -1.57);
+-- echo(quat);
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 3.14), quat));
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, -1.57), quat));
+-- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 1.57), quat));
+local quats = {
+	[1] = {y=0,x=0,w=1,z=0,},
+	[4] = {y=0,x=0,w=0.70739,z=0.70683,},
+	[5] = {y=0.70739,x=0.70683,w=0.00057,z=0.00057,},
+	[6] = {y=-0.5,x=-0.4996,w=0.5004,z=0.5,},
+	[7] = {y=0.5,x=0.4996,w=0.5004,z=0.5,},
+	[8] = {y=0,x=0,w=0.70739,z=-0.70683,},
+	[9] = {y=0.70739,x=-0.70683,w=0.00057,z=-0.00057,},
+	[10] = {y=-0.5,x=0.4996,w=0.5004,z=-0.5,},
+	[11] = {y=0.5,x=-0.4996,w=0.5004,z=-0.5,},
+}
+
+-- @param data: [4,11]
+function Direction.GetQuaternionByData(data)
+	return (data and data>=4 and data<=11) and quats[data] or quats[1];
+end

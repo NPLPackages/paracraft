@@ -39,14 +39,13 @@ end
 
 function BlockFileMonitor.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function BlockFileMonitor.UnregisterHooks()
 	local self = cur_instance;
 	if(self) then
-		self.sceneContext:close();
+		self:UnloadSceneContext();
 	end
 end
 

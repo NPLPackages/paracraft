@@ -66,33 +66,37 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 	local old_value = default_value or self:GetValue(keyname, curTime);
 	local old_value_str;
 	if(old_value and old_value[1]) then
-		old_value_str = string.format("%s %f", old_value[1], old_value[2] or 0);
+		if(old_value[1] == "") then
+			old_value_str = "";
+		else
+			old_value_str = string.format("%s %f", old_value[1], old_value[2] or 0);
+		end
 	end
 	local title = format(L"起始时间%s, 请输入文件名与播放位置:<br/>xxx.mp3 [开始时间(单位秒)]", strTime);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage(title, function(result)
-		if(result and result~="") then
+		if(result) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 			local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 			local cmd_text = result;
 			local filename, start_time;
 			filename, cmd_text = CmdParser.ParseString(cmd_text);
+			filename = filename or "";
 			start_time, cmd_text = CmdParser.ParseInt(cmd_text);
 			start_time = start_time or 0;
-			if(filename) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
-				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-				if(not Files.GetWorldFilePath(filename)) then
-					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
-				else
-					local value = {filename, start_time};
-					self:AddKeyFrameByName(keyname, nil, value);
-					self:FrameMovePlaying(0);
-					if(callbackFunc) then
-						callbackFunc(true);
-					end
+
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			if(filename~="" and not Files.GetWorldFilePath(filename)) then
+				_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
+			else
+				local value = {filename, start_time};
+				self:AddKeyFrameByName(keyname, nil, value);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
 				end
 			end
 		end
@@ -158,6 +162,13 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 		self.last_audio_src = audio_src;
 		self.last_start_time = start_time;
 		self.last_music_time = curTime;
+	elseif(filename=="") then
+		if(cur_music) then
+			BackgroundMusic:Stop();
+			self.last_audio_src = nil;
+			self.last_start_time = nil;
+			self.last_music_time = nil;
+			self.last_is_paused = nil;
+		end
 	end
-	
 end

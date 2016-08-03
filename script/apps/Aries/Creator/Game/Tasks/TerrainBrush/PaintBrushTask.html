@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+    <script type="text/npl" src="PaintBrushTask.lua" refresh="true">
+        <![CDATA[
+        PaintBrushTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.PaintBrushTask");
+        PaintBrushTask.InitPage(Page);
+        task = PaintBrushTask.GetInstance();
+        ]]>
+    </script>
+    <div style="padding:5px;background-color:#808080;color:#ffffff">
+        <pe:repeat value="tool in PaintBrushTask.GetTools()" style="float:left;margin-right:5px;">
+            <span style='<%=tool.name==task:GetToolName() and "background-color:#008000" %>'>
+                <input name='<%=tool.name%>' tooltip='<%=tool.tooltip%>' type="button" onclick="PaintBrushTask.OnClickTool"
+                       style='<%=format("float:left;padding:5px;width:32px;height:32px;background:url(%s);", tool.icon)%>' />
+            </span>
+        </pe:repeat>
+        <div>
+            <input type="text" name="strength" tooltip='<%=L"笔刷强度(0,1]"%>' value='<%=tostring(task:GetBrushStrength())%>' style="width:32px;" onchange="task.OnChangeStrength" />
+        </div>
+    </div>
+</pe:mcml>
+</html>
+

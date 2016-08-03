@@ -120,7 +120,6 @@ function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
 		BuilderFramePage.category_name = category.name;
 	end
 
-
 	BuilderFramePage.isSearching = false;
     
 	if(bRefreshPage~=false and page) then

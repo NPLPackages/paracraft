@@ -78,14 +78,13 @@ end
 
 function CreateTerrainHole.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function CreateTerrainHole.UnregisterHooks()
 	local self = cur_instance;
 	if(self) then
-		self.sceneContext:close();
+		self:UnloadSceneContext();
 	end
 end
 
@@ -247,7 +246,7 @@ function CreateTerrainHole.EndEditing()
 end
 
 function CreateTerrainHole:mouseReleaseEvent(event)
-	self.sceneContext:mouseReleaseEvent(event);
+	self:GetSceneContext():mouseReleaseEvent(event);
 
 	if(event.mouse_button == "left") then
 		-- left click to cancel selection.
@@ -279,7 +278,7 @@ function CreateTerrainHole:keyPressEvent(event)
 	elseif(dik_key == "DIK_RBRACKET")then
 		CreateTerrainHole.TransformSelection(nil,nil,nil, -1.57)
 	else
-		self.sceneContext:keyPressEvent(event);
+		self:GetSceneContext():keyPressEvent(event);
 	end	
 end
 

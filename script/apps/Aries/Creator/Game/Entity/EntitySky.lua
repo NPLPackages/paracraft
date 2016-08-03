@@ -60,6 +60,7 @@ Entity.maxSubMeshCount = 1;
 local skyboxes = {
 	[1] = {name = "sim1", is_simulated=true, file = ""},
 	[2] = {name = "skybox15", file = "model/skybox/skybox15/skybox15.x", },
+	-- [2] = {name = "skybox15", file = Entity.default_skyfilename, texture = "Texture/blocks/sky/sky1.png"},
 	[3] = {name = "skybox6", file = "model/skybox/skybox6/skybox6.x", },
 	[4] = {name = "skybox7", file = "model/skybox/skybox7/skybox7.x", },
 	[5] = {name = "rain_1", file = "model/skybox/skybox16/skybox16.x", },
@@ -143,6 +144,9 @@ function Entity:RefreshSky()
 		sky:SetField("SkyFogAngleFrom", 0);
 		sky:SetField("SkyFogAngleTo", 0.2);
 		sky:SetField("SkyMeshFile", filename);
+		if(self.skyTexture) then
+			sky:SetField("SkyMeshTexture", self.skyTexture);
+		end
 		GameLogic.world_sim:OnTickDayLight(true);
 	else
 		sky:SetField("SimulatedSky", true);

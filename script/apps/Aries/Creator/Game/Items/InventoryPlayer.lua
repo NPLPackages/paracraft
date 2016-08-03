@@ -147,19 +147,21 @@ end
 -- @param last_block_id, block_id: if both nil, it means that last block id is not trackable. 
 function InventoryPlayer:NotifyBlockInHandChanged(last_block_id, block_id)
 	if(self:IsMainPlayer()) then
-		if(last_block_id ~= block_id) then
-			self.last_block_inhand_id = block_id;
-			if(last_block_id and last_block_id>0) then
-				local item = ItemClient.CreateGetByBlockID(last_block_id);
-				item:OnDeSelect();
-			end
-			if(block_id and block_id>0) then
-				local item = ItemClient.CreateGetByBlockID(block_id);
-				item:OnSelect();
-			end
-			EntityManager.GetPlayer():RefreshRightHand();
-			GameLogic.events:DispatchEvent({type = "SetBlockInRightHand" , block_id = block_id, last_block_id=last_block_id});
+		self.last_block_inhand_id = block_id;
+		if(last_block_id and last_block_id>0) then
+			local item = ItemClient.CreateGetByBlockID(last_block_id);
+			item:OnDeSelect();
 		end
+		if(block_id and block_id>0) then
+			local item = ItemClient.CreateGetByBlockID(block_id);
+			local itemStack = self:GetItemInRightHand();
+			if(not itemStack or itemStack.id ~= block_id) then
+				itemStack = nil;
+			end
+			item:OnSelect(itemStack);
+		end
+		EntityManager.GetPlayer():RefreshRightHand();
+		GameLogic.events:DispatchEvent({type = "SetBlockInRightHand" , block_id = block_id, last_block_id=last_block_id});
 	end
 end
 

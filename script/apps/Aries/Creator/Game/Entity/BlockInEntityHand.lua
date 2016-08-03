@@ -22,6 +22,7 @@ local modelScalings = {
 	["model/blockworld/BlockModel/block_model_cross.x"] = 0.4,
 	["model/blockworld/BlockModel/block_model_one.x"] = 0.3,
 	["model/blockworld/BlockModel/block_model_four.x"] = 0.3,
+	["model/blockworld/BlockModel/block_model_slope.x"] = 0.3,
 }
 
 local modelOffsets = {
@@ -30,6 +31,7 @@ local modelOffsets = {
 	["model/blockworld/BlockModel/block_model_one.x"] = {0,0,0},
 	["model/blockworld/BlockModel/block_model_four.x"] = {0,0,0},
 	["model/blockworld/IconModel/IconModel_32x32.x"] = {0,0.2,0},
+	["model/blockworld/BlockModel/block_model_slope.x"] = {0,0,0},
 }
 
 -- @param entity: the parent entity such as EntityPlayer or EntityNPC. 

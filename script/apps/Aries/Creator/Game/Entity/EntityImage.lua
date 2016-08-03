@@ -39,6 +39,7 @@ Entity.is_regional = true;
 Entity.text_offset = {x=0,y=0.45,z=0.315};
 
 Entity.load_image_times = 0;
+Entity.modelFile = "model/blockworld/Painting/Painting.x";
 
 local sys_images = {
 	["logo"] = "Texture/3DMapSystem/brand/paraworld_text_256X128.png",
@@ -50,6 +51,7 @@ Entity.rows_to_bottom = 0;
 Entity.columns_to_left = 0;
 Entity.columns_to_right = 0;
 
+Entity.maxExpandLength = 200;
 Entity.rows = 1;
 Entity.columns = 1;
 Entity.start_block_coord = nil;
@@ -142,7 +144,7 @@ function Entity:GetFullFilePath(filename)
 end
 
 function Entity:GetImageFacing()
-	return Direction.directionTo3DFacing[self.block_data or 0] or 0;
+	return (self.block_data or 0) % 4;
 end
 
 -- clean up all nearby paintings which are derived from this one. 
@@ -175,11 +177,11 @@ function Entity:ResetDerivedPaintings()
 
 			if(facing == 0) then
 				block_z = block_z + 1;
-			elseif(facing == 1.57) then
+			elseif(facing == 3) then
 				block_x = block_x + 1;
-			elseif(facing == 3.14) then
+			elseif(facing == 1) then
 				block_z = block_z - 1;
-			elseif(facing == -1.57) then
+			elseif(facing == 2) then
 				block_x = block_x - 1;
 			end
 		end
@@ -232,6 +234,89 @@ function Entity:LoadImageFile()
 	end
 end
 
+local data_expand_dir = {
+	zero = {0, 0, 0},
+	[0] = {0, 1, -1},
+	[1] = {0, 1, 1},
+	[2] = {1, 1, 0},
+	[3] = {-1, 1, 0},
+};
+
+-- return a vector relative to current block. 
+function Entity:GetExpandDirectionByData(data)
+	return data_expand_dir[data or 0] or data_expand_dir.zero;
+end
+
+-- LiXizhi: half-done work: for images on the ground. 
+-- @return length_x, length_y, length_z;
+function Entity:CalculateLengths()
+	-- if any neighbour has EntityImage's block_id but the entity is not ready yet. 
+	local bHasInvalidImageEntity;
+
+	-- the root entity information;
+	local root_x = self.bx;
+	local root_y = self.by;
+	local root_z = self.bz;
+	local root_block_id = self:GetBlockId();
+	local root_block_facing = self:GetImageFacing();
+
+	-- calculate length_x, length_y, length_z;
+	local length_x, length_y, length_z;
+	local x,y,z = root_x,root_y,root_z;
+	local dir = self:GetExpandDirectionByData(self.block_data);
+	local bFirstBoundary = true;
+	for dx = 0, Entity.maxExpandLength do
+		for dy = 0, Entity.maxExpandLength do	
+			for dz = 0, Entity.maxExpandLength do
+				local lx, ly, lz = dx*dir[1], dy*dir[2], dz*dir[3];
+				local x, y, z = root_x+lx, root_y+ly, root_z+lz;
+				local neighbor_id = BlockEngine:GetBlockId(x,y,z);
+				local bIsBoundary;
+				if(root_block_id ~= neighbor_id) then
+					bIsBoundary = true;
+				else
+					local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+					if(neighbor_entity) then
+						neighbor_facing = neighbor_entity:GetImageFacing();
+						if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+							bIsBoundary = true;
+						end
+					else
+						bHasInvalidImageEntity = true;
+						bIsBoundary = true;
+					end
+				end
+				
+				if(bIsBoundary) then
+					if(bFirstBoundary) then
+						bFirstBoundary = false;
+						length_x = (dx > 0) and dx or length_x;
+						length_y = (dy > 0) and dy or length_y;
+						length_z = (dz > 0) and dz or length_z;
+					else
+						length_x = (not length_x and dx > 0) and dx or length_x;
+						length_y = (not length_y and dy > 0) and dy or length_y;
+						length_z = (not length_z and dz > 0) and dz or length_z;
+					end
+					break;
+				end
+				if(dir.z == 0 or (length_z and dz >= length_z)) then
+					break
+				end
+			end
+			if(dir.y == 0 or (length_y and dy >= length_y)) then
+				break
+			end
+		end
+		if(dir.x == 0 or (length_x and dx >= length_x)) then
+			break
+		end
+	end
+	self.length_x =	 length_x or 1;
+	self.length_y =	 length_y or 1;
+	self.length_z =	 length_z or 1;
+end
+
 -- only called for the block containing the actual image to calculate the total block 
 -- size(self.rows, self.columns) and position(self.start_block_coord) that this block image should be expanded to. 
 -- expansion data is written to self.start_block_coord, self.rows,self.columns,
@@ -240,6 +325,9 @@ function Entity:CaculateImageExpansionData()
 	if(self:IsRemote()) then
 		return;
 	end
+	-- if any neighbour has EntityImage's block_id but the entity is not ready yet. 
+	local bHasInvalidImageEntity;
+
 	-- the root entity information;
 	local root_x = self.bx;
 	local root_y = self.by;
@@ -258,9 +346,7 @@ function Entity:CaculateImageExpansionData()
 	local z = root_z;
 
 	local neighbor_id,neighbor_facing;
-	-- if any neighbour has EntityImage's block_id but the entity is not ready yet. 
-	local bHasInvalidImageEntity;
-
+	
 	while(true) do
 		y = y + 1;
 		neighbor_id = BlockEngine:GetBlockId(x,y,z)
@@ -315,11 +401,11 @@ function Entity:CaculateImageExpansionData()
 		while(true) do
 			if(root_block_facing == 0) then
 				z = z - 1;
-			elseif(root_block_facing == 1.57) then
+			elseif(root_block_facing == 3) then
 				x = x - 1;
-			elseif(root_block_facing == 3.14) then
+			elseif(root_block_facing == 1) then
 				z = z + 1;
-			elseif(root_block_facing == -1.57) then
+			elseif(root_block_facing == 2) then
 				x = x + 1;
 			end
 			neighbor_id = BlockEngine:GetBlockId(x,y,z)
@@ -346,11 +432,11 @@ function Entity:CaculateImageExpansionData()
 		while(true) do
 			if(root_block_facing == 0) then
 				z = z + 1;
-			elseif(root_block_facing == 1.57) then
+			elseif(root_block_facing == 3) then
 				x = x + 1;
-			elseif(root_block_facing == 3.14) then
+			elseif(root_block_facing == 1) then
 				z = z - 1;
-			elseif(root_block_facing == -1.57) then
+			elseif(root_block_facing == 2) then
 				x = x - 1;
 			end
 			neighbor_id = BlockEngine:GetBlockId(x,y,z)
@@ -393,11 +479,11 @@ function Entity:CaculateImageExpansionData()
 	--start_block_y = origin_block.y + top_image_blocks_number;
 	if(root_block_facing == 0) then
 		start_block_z = root_z - left_blocks_number;
-	elseif(root_block_facing == 1.57) then
+	elseif(root_block_facing == 3) then
 		start_block_x = root_x - left_blocks_number;
-	elseif(root_block_facing == 3.14) then
+	elseif(root_block_facing == 1) then
 		start_block_z = root_z + left_blocks_number;
-	elseif(root_block_facing == -1.57) then
+	elseif(root_block_facing == 2) then
 		start_block_x = root_x + left_blocks_number;
 	end
 	if(start_block_x == nil) then
@@ -474,11 +560,11 @@ function Entity:ApplyExpansionData()
 				
 				if(facing == 0) then
 					z = z + 1;
-				elseif(facing == 1.57) then
+				elseif(facing == 3) then
 					x = x + 1;
-				elseif(facing == 3.14) then
+				elseif(facing == 1) then
 					z = z - 1;
-				elseif(facing == -1.57) then
+				elseif(facing == 2) then
 					x = x - 1;
 				end
 				l = l + w;
@@ -554,7 +640,7 @@ function Entity:Refresh(bForceRefresh)
 		if(filename) then
 			-- only create C++ object when image is not empty
 			if(not self.obj) then
-				local obj = self:CreateInnerObject("model/blockworld/Painting/Painting.x", nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
+				local obj = self:CreateInnerObject(self.modelFile, nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
 				if(obj) then
 					-- making it using custom renderer since we are using chunk buffer to render. 
 					obj:SetAttribute(0x20000, true);
@@ -568,12 +654,15 @@ function Entity:Refresh(bForceRefresh)
 				local data = self.block_data or 0;
 				if(data < 4) then
 					obj:SetFacing(Direction.directionTo3DFacing[data]);
+				elseif(data < 12) then
+					obj:SetFacing(0);
+					obj:SetRotation(Direction.GetQuaternionByData(data));
 				end
 			end
 			self.last_filename = filename;
 			if(self.derived_image_filename) then
-				self.text_offset.y = 0.53;
-				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 105, 105, nil, self.text_offset, -1.57);
+				self.text_offset.y = 0.5;
+				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100, 100, nil, self.text_offset, -1.57);
 			else
 				self.text_offset.y = 0.45;
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 90, 90, nil, self.text_offset, -1.57);

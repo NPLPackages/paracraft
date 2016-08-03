@@ -93,6 +93,8 @@ Commands["menu"] = {
 			else
 				_guihelper.MessageBox("世界是只读的，无需备份");
 			end
+		elseif(name == "file.openbackupfolder") then
+			GameLogic.world_revision:OnOpenRevisionDir();
 		elseif(name == "file.uploadworld") then
 			if(System.options.mc) then
 				NPL.load("(gl)script/apps/Aries/Creator/SaveWorldPage.lua");

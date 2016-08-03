@@ -46,14 +46,13 @@ end
 
 function BuildMinimap.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function BuildMinimap.UnregisterHooks()
 	local self = cur_instance;
 	if(self) then
-		self.sceneContext:close();
+		self:UnloadSceneContext();
 	end
 end
 

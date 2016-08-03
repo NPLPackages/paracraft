@@ -211,6 +211,15 @@ function PlayerController:GetHandToolIndex()
 	end
 end
 
+-- called when player is loaded and GUI scene context is initialized. 
+function PlayerController:InitMainPlayerHandTool()
+	local player = EntityManager.GetPlayer();
+	if(player.inventory and not player.is_hand_tool_initialized) then
+		player.is_hand_tool_initialized = true;
+		player.inventory:OnInventoryChanged(player.inventory:GetHandToolIndex());
+	end
+end
+
 -- return the block id in the right hand of the player. 
 function PlayerController:GetBlockInRightHand()
 	local player = EntityManager.GetPlayer();

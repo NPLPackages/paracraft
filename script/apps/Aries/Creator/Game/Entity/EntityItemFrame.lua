@@ -128,7 +128,7 @@ function Entity:Refresh()
 				obj:SetFacing(Direction.directionTo3DFacing[data]);
 			elseif(data < 12) then
 				obj:SetFacing(0);
-				obj:SetRotation(quats[data]);
+				obj:SetRotation(Direction.GetQuaternionByData(data));
 			end
 		end
 		Image3DDisplay.ShowHeadonDisplay(true, obj, icon_path or "", 80, 80, nil, self.text_offset, -1.57);

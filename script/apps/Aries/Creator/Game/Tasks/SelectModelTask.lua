@@ -41,15 +41,13 @@ end
 
 function SelectModel.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
-	self.sceneContext:UpdateManipulators();
+	self:LoadSceneContext();
 end
 
 function SelectModel.UnregisterHooks()
 	local self = cur_instance;
-	if(self and self.sceneContext) then
-		self.sceneContext:close();
+	if(self) then
+		self:UnloadSceneContext();
 	end
 end
 
@@ -62,13 +60,13 @@ function SelectModel:FrameMove()
 end
 
 function SelectModel:UpdateManipulators()
-	self.sceneContext:DeleteManipulators();
+	self:DeleteManipulators();
 	if(self.entity) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/ActorSelectManipContainer.lua");
 		local ActorSelectManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.ActorSelectManipContainer");
 		local manipCont = ActorSelectManipContainer:new();
 		manipCont:init();
-		self.sceneContext:AddManipulator(manipCont);
+		self:AddManipulator(manipCont);
 		manipCont:connectToDependNode(self.entity);
 	end
 end
@@ -403,7 +401,7 @@ function SelectModel:mousePressEvent(event)
 end
 
 function SelectModel:mouseMoveEvent(event)
-	local result = self.sceneContext:CheckMousePick();
+	local result = self:GetSceneContext():CheckMousePick();
 
 	if(SelectModel.IsEntity()) then
 		return;
@@ -468,7 +466,7 @@ function SelectModel:keyPressEvent(event)
 	elseif(dik_key == "DIK_DELETE" or dik_key == "DIK_DECIMAL")then
 		SelectModel.DoRemove();
 	else
-		self.sceneContext:keyPressEvent(event);
+		self:GetSceneContext():keyPressEvent(event);
 	end	
 end
 

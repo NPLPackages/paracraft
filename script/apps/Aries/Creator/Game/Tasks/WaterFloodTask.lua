@@ -1,9 +1,8 @@
 --[[
-Title: Create Line
+Title: Water flood
 Author(s): LiXizhi
 Date: 2013/1/19
-Desc: Replace blocks in the direction specifed until it is blocked by another block or max_radius is reached. 
-Support undo/redo
+Desc: 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WaterFloodTask.lua");

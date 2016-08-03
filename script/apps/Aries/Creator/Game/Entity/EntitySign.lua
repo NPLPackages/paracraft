@@ -61,27 +61,6 @@ function Entity:UpdateBlockDataByFacing()
 	BlockEngine:SetBlockData(x,y,z, dir_id);	
 end
 
--- local quat = mathlib.QuatFromAxisAngle(0, 0, 1, 1.57);
--- echo(quat);
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 3.14), quat));
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, -1.57), quat));
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 1.57), quat));
-
--- local quat = mathlib.QuatFromAxisAngle(0, 0, 1, -1.57);
--- echo(quat);
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 3.14), quat));
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, -1.57), quat));
--- echo(mathlib.QuaternionMultiply(mathlib.QuatFromAxisAngle(0, 1, 0, 1.57), quat));
-local quats = {
-	[4] = {y=0,x=0,w=0.70739,z=0.70683,},
-	[5] = {y=0.70739,x=0.70683,w=0.00057,z=0.00057,},
-	[6] = {y=-0.5,x=-0.4996,w=0.5004,z=0.5,},
-	[7] = {y=0.5,x=0.4996,w=0.5004,z=0.5,},
-	[8] = {y=0,x=0,w=0.70739,z=-0.70683,},
-	[9] = {y=0.70739,x=-0.70683,w=0.00057,z=-0.00057,},
-	[10] = {y=-0.5,x=0.4996,w=0.5004,z=-0.5,},
-	[11] = {y=0.5,x=-0.4996,w=0.5004,z=-0.5,},
-}
 function Entity:Refresh()
 	local hasText = self.cmd and self.cmd~=""
 	if(hasText) then
@@ -104,7 +83,7 @@ function Entity:Refresh()
 				obj:SetFacing(Direction.directionTo3DFacing[data]);
 			elseif(data < 12) then
 				obj:SetFacing(0);
-				obj:SetRotation(quats[data]);
+				obj:SetRotation(Direction.GetQuaternionByData(data));
 			end
 		end
 		Text3DDisplay.ShowText3DDisplay(true, obj, if_else(self.cmd, self.cmd, ""), self.text_color, self.text_offset, -1.57);

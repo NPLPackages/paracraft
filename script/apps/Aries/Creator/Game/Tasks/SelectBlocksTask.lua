@@ -107,23 +107,21 @@ end
 
 function SelectBlocks.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
-	self.sceneContext:UpdateManipulators();
+	self:LoadSceneContext();
 end
 
 function SelectBlocks.UnregisterHooks()
 	local self = cur_instance;
-	if(self and self.sceneContext) then
-		self.sceneContext:close();
+	if(self) then
+		self:UnloadSceneContext();
 	end
 	ParaTerrain.DeselectAllBlock(groupindex_hint);
 	GameLogic.AddBBS("SelectBlocks", nil);
 end
 
--- redirected function from self.sceneContext:UpdateManipulators()
+-- virtual function: 
 function SelectBlocks:UpdateManipulators()
-	self.sceneContext:DeleteManipulators();
+	self:DeleteManipulators();
 
 	NPL.load("(gl)script/ide/System/Scene/Manipulators/BlockPivotManipContainer.lua");
 	local BlockPivotManipContainer = commonlib.gettable("System.Scene.Manipulators.BlockPivotManipContainer");
@@ -136,13 +134,13 @@ function SelectBlocks:UpdateManipulators()
 	-- manipCont.showArrowHead = false;
 	manipCont:init();
 	manipCont:SetPivotPointPlugName("PivotPoint");
-	self.sceneContext:AddManipulator(manipCont);
+	self:AddManipulator(manipCont);
 	manipCont:connectToDependNode(self);
 
 	local BlockPivotManipContainer = commonlib.gettable("System.Scene.Manipulators.BlockPivotManipContainer");
 	local manipCont = BlockPivotManipContainer:new():init();
 	manipCont:SetPivotPointPlugName("position");
-	self.sceneContext:AddManipulator(manipCont);
+	self:AddManipulator(manipCont);
 	-- Use first block as position.
 	local b = self.blocks[1];
 	if(b) then
@@ -551,8 +549,8 @@ end
 
 function SelectBlocks:mouseWheelEvent(event)
 	-- disable other mouse wheel event 
-	if(self.sceneContext) then
-		self.sceneContext:handleCameraWheelEvent(event);
+	if(self:GetSceneContext()) then
+		self:GetSceneContext():handleCameraWheelEvent(event);
 	end
 end
 
@@ -661,7 +659,7 @@ function SelectBlocks:keyPressEvent(event)
 			event:accept();
 		end
 	else
-		self.sceneContext:keyPressEvent(event);
+		self:GetSceneContext():keyPressEvent(event);
 	end	
 end
 

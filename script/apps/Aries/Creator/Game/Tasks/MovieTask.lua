@@ -44,15 +44,12 @@ end
 
 function Movie.RegisterHooks()
 	local self = cur_instance;
-	self.sceneContext = self.sceneContext or Game.SceneContext.RedirectContext:new():RedirectInput(self);
-	self.sceneContext:activate();
+	self:LoadSceneContext();
 end
 
 function Movie.UnregisterHooks()
 	local self = cur_instance;
-	if(self) then
-		self.sceneContext:close();
-	end
+	self:UnloadSceneContext();
 end
 
 function Movie:Run()

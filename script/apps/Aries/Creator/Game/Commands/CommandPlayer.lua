@@ -358,6 +358,7 @@ if NPC run this command from its rule bag, the NPC will be animated.
 /anim lie
 /anim @p sit
 /anim lie,0   : lie down first and then play idle 0
+/anim [filename].fbx    : play any fbx or x file in current world.
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity, anims;
@@ -373,9 +374,12 @@ if NPC run this command from its rule bag, the NPC will be animated.
 		anims, cmd_text = CmdParser.ParseStringList(cmd_text);
 		if(anims and playerEntity) then
 			if(#anims == 1) then
-				playerEntity:SetAnimation(anims[1]);
+				local name = anims[1];
+				if(type(name) == "string" and name:match("%.")) then
+					name = Files.GetWorldFilePath(name);
+				end
+				playerEntity:SetAnimation(name);
 			else
-				
 				playerEntity:SetAnimation(anims);
 			end
 		end

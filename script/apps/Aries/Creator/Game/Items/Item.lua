@@ -37,6 +37,7 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 
 local Item = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.Item"));
@@ -95,7 +96,13 @@ function Item:OnClickInHand(itemStack, entityPlayer)
 	end
 end
 
--- click from user interface
+-- virtual function: called when user clicked some other item while holding this item in hand.
+-- @return true will cause other item to ignore the click event. This is useful when the hand block needs to process click event itself
+function Item:HandleClickOtherItem(other_item_id)
+	-- return true;
+end
+
+-- virtual: click from user interface
 function Item:OnClick()
 	local block_id = self.id;
 	if(self.CreateAtPlayerFeet) then
@@ -107,6 +114,13 @@ function Item:OnClick()
 	if(self.auto_equip) then
 		
 	else
+		local hand_block_id = GameLogic.GetBlockInRightHand();
+		if(hand_block_id and hand_block_id>0) then
+			local hand_item = ItemClient.GetItem(hand_block_id);
+			if(hand_item and hand_item:HandleClickOtherItem(block_id)) then
+				return;
+			end
+		end
 		-- normal block
 		if(GameMode:IsUseCreatorBag()) then
 			GameLogic.SetBlockInRightHand(block_id);
@@ -424,7 +438,7 @@ function Item:OnUse()
 end
 
 -- virtual function: when selected in right hand
-function Item:OnSelect()
+function Item:OnSelect(itemStack)
 	
 end
 

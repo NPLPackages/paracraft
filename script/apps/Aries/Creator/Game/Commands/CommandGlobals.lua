@@ -359,6 +359,23 @@ Commands["maxrenderdist"] = {
 	end,
 };
 
+Commands["uiscaling"] = {
+	name="uiscaling", 
+	quick_ref="/uiscaling [0-2]", 
+	desc=[[UI scaling. 0 is the original unscaled scaling is used. Value is usually in [1,2].  where 1 means the 960*640, which is the smallest UI size allowed. 
+/uiscaling 1
+]], 
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params)
+		if(cmd_text) then
+			local scaling = tonumber(cmd_text) or 0;
+			if(scaling >=-1 and scaling<=10) then
+				GameLogic.options:SetUIScaling(scaling);
+			end
+		end
+	end,
+};
 
 Commands["map"] = {
 	name="map", 

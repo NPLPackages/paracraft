@@ -19,11 +19,8 @@ TaskManager.AddTask(task)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/STL.lua");
-NPL.load("(gl)script/apps/Aries/SlashCommand/Command.lua");
-local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Task.lua");
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
-local Task = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Command"), commonlib.gettable("MyCompany.Aries.Game.Task"));
 
 local task_list = commonlib.List:new();
 local exclusive_task_list = commonlib.List:new();
@@ -118,20 +115,3 @@ end
 function TaskManager.GetTopLevelTask()
 	return top_level_task;
 end
-
----------------------------------
--- base task class
----------------------------------
--- @param id: uint16 type. need to be larger than 1024 if not system type. 
-function Task:ctor()
-end
-
-function Task:FrameMove()
-	self.finished = true;
-end
-
-function Task:Run()
-	TaskManager.AddTask(self);
-end
-
-

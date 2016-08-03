@@ -73,6 +73,8 @@ Commands["sky"] = {
 					if(filename) then
 						GameLogic.GetSkyEntity():SetSkyTexture(filename);
 					end
+				else
+					GameLogic.GetSkyEntity():SetSkyTexture("Texture/whitedot.png");
 				end
 			elseif(option == "add") then
 				filename, cmd_text = CmdParser.ParseString(cmd_text);

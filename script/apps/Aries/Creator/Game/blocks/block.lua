@@ -1339,6 +1339,7 @@ local offsets_map = {
 	["model/blockworld/BlockModel/block_model_cross.x"] = 0;
 	["model/blockworld/BlockModel/block_model_slab.x"] = 0;
 	["model/blockworld/BlockModel/block_model_plate.x"] = 0;
+	["model/blockworld/BlockModel/block_model_slope.x"] = 0;
 	["model/blockworld/IconModel/IconModel_16x16.x"] = nil;
 	[""] = 0;
 }
@@ -1349,6 +1350,7 @@ local modelNameToModel = {
 	["slab"] = "model/blockworld/BlockModel/block_model_slab.x",
 	["plate"] = "model/blockworld/BlockModel/block_model_plate.x",
 	["carpet"] = "model/blockworld/BlockModel/block_model_plate.x",
+	["slope"] = "model/blockworld/BlockModel/block_model_slope.x",
 }
 -- get model file for item display
 function block:GetItemModel()

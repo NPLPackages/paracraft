@@ -813,7 +813,11 @@ end
 -- make sure that the low level C++ attributes contains the latest value.
 function Actor:UpdateAnimInstance()
 	if(self:GetTime() ~= self.lastPlayTime) then
+		local bIsUserControlled = self:IsUserControlled();
 		self:FrameMovePlaying(0);
+		if(bIsUserControlled) then
+			self:SetControllable(bIsUserControlled);
+		end
 	end
 	local bones = self:GetBonesVariable();
 	if(bones) then
