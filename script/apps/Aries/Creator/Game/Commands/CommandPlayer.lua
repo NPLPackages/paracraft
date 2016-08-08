@@ -245,12 +245,20 @@ Commands["move"] = {
 			
 			fromEntity = fromEntity or playerEntity
 			x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
+			if(not x) then
+				local location;
+				location, cmd_text = CmdParser.ParseString(cmd_text);
+				if(location == "home") then
+					x,y,z = GameLogic.GetHomePosition();
+					x,y,z = BlockEngine:block(x,y+0.1,z);
+				end
+			end
 			if( not x and fromEntity) then
 				x, y, z = fromEntity:GetBlockPos();
 			end
 
 			if(x and y and z and playerEntity) then
-				playerEntity:SetBlockPos(x,y,z);
+				playerEntity:TeleportToBlockPos(x,y,z);
 			end
 		end
 	end,

@@ -75,12 +75,20 @@ function Entity:CreateInnerObject(...)
 	return obj;
 end
 
+-- framemove this entity when it is riding (mounted) on another entity. 
+-- we will update according to mounted entity's position. 
+function Entity:FrameMoveRidding(deltaTime)
+	Entity._super.FrameMoveRidding(self, deltaTime);
+
+	self:SendMotionUpdates();
+end
+
 -- Called to update the entity's position/logic.
 function Entity:FrameMove(deltaTime)
 	Entity._super.FrameMove(self, deltaTime);
         
     if (self:IsRiding()) then
-        -- TODO: 
+        -- this is never called, instead self:FrameMoveRidding() is called.  
     else
 		-- LOG.std(nil, "debug", "EntityMPClient", "SendMotionUpdates entity id %d", self.entityId);
         self:SendMotionUpdates();
@@ -159,13 +167,16 @@ function Entity:SendMotionUpdates()
     local dz = self.z - self.oldPosZ;
     local dRotY = self.facing - self.oldRotationYaw;
     local dRotPitch = self.rotationPitch - self.oldRotationPitch;
-    local hasMovedOrForceTick = (dx * dx + dy * dy + dz * dz) > 0.001 or self.motionUpdateTickCount >= 20;
+	local distSqMoved = (dx * dx + dy * dy + dz * dz);
+    local hasMovedOrForceTick = distSqMoved > 0.001 or self.motionUpdateTickCount >= 20;
     local hasRotation = dRotY ~= 0 or dRotPitch ~= 0;
 
-    if (self.ridingEntity) then
-        -- self:AddToSendQueue(Packtets.PacketPlayerLookMove:new():Init());
-        hasMovedOrForceTick = false;
-    elseif (hasMovedOrForceTick and hasRotation) then
+    if (self:IsRiding()) then
+		-- make riding entity send movement update less frequently, such as when moving one meter. 
+        hasMovedOrForceTick = hasMovedOrForceTick and (distSqMoved > 2 or self.motionUpdateTickCount >= 20);
+	end
+
+    if (hasMovedOrForceTick and hasRotation) then
         self:AddToSendQueue(Packets.PacketPlayerLookMove:new():Init(self.x, self.y, self.y, self.z, self.facing, self.rotationPitch, self.onGround));
     elseif (hasMovedOrForceTick) then
         self:AddToSendQueue(Packets.PacketPlayerPosition:new():Init(self.x, self.y, self.y, self.z, self.onGround));

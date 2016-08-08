@@ -76,3 +76,9 @@ function ChunkLocation.FromChunkToPackedChunk(chunkX, chunkZ)
    return lshift(chunkX, 12) + chunkZ;
 end
 
+-- static function:
+function ChunkLocation.FromPackedChunkToPos(chunkPackedPos)
+	local chunkX = rshift(chunkPackedPos,12);
+	local chunkZ = band(chunkPackedPos, 0xFFF);
+    return chunkX, chunkZ;
+end

@@ -359,7 +359,8 @@ function ServerManager:PlayerLoggedOut(entityMP)
     local worldserver = entityMP:GetWorldServer();
 
     if (entityMP.ridingEntity) then
-        worldserver:RemovePlayerEntityDangerously(entityMP.ridingEntity);
+        -- worldserver:RemovePlayerEntityDangerously(entityMP.ridingEntity);
+		entityMP:MountEntity(nil);
     end
 
     worldserver:RemoveEntity(entityMP);

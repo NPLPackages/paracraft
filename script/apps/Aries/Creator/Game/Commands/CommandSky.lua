@@ -240,6 +240,7 @@ Commands["sun"] = {
 			r,g,b = validate_rgb(r), validate_rgb(g), validate_rgb(b);
 			if(r and g and b) then
 				-- setting the sun color
+				GameLogic.options.auto_skycolor  = false;
 				local att = ParaScene.GetAttributeObjectSunLight();
 				att:SetField("Diffuse", {r,g,b});
 			end

@@ -30,8 +30,7 @@ local bor = mathlib.bit.bor;
 local NetServerHandler = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Network.NetHandler"), commonlib.gettable("MyCompany.Aries.Game.Network.NetServerHandler"));
 
 function NetServerHandler:ctor()
-	-- is true when the player has moved since his last movement packet
-	self.hasMoved = true;
+	-- is true when the player has moved since login or last teleport 
 	self.currentTicks = 0;
 end
 
@@ -75,7 +74,6 @@ end
 -- Moves the player to the specified destination and rotation
 -- This function is only called during login, or when server detects that client pos and server server differs too much. 
 function NetServerHandler:SetPlayerLocation(x,y,z, yaw, pitch)
-    self.hasMoved = false;
     self.lastPosX = x;
     self.lastPosY = y;
     self.lastPosZ = z;
@@ -109,123 +107,117 @@ function NetServerHandler:handleMove(packet_move)
     self.bHasMovePacketSinceLastTick = true;
 
 	if (not self.playerEntity.bDisableServerMovement) then
-        if (not self.hasMoved and packet_move.y) then
-            local dy = packet_move.y - self.lastPosY;
-            if (math.abs(packet_move.x-self.lastPosX)<0.01 and dy * dy < 0.01 and math.abs(packet_move.z-self.lastPosZ)<0.01) then
-                self.hasMoved = true;
-            end
-        end
+		--local hasMovedOrForceTick;
+		--if (packet_move.y) then
+            --local dy = packet_move.y - self.lastPosY;
+            --hasMovedOrForceTick = math.abs(packet_move.x-self.lastPosX)>0.01 or dy * dy > 0.01 or math.abs(packet_move.z-self.lastPosZ)>0.01;
+        --end
+		--hasMovedOrForceTick = hasMovedOrForceTick or (self.currentTicks % 20 == 0);
 
-        if (self.hasMoved) then
-            if (self.playerEntity.ridingEntity) then
-				-- TODO:
-                return;
-            end
-
-            if (self.playerEntity:IsPlayerSleeping()) then
-                self.playerEntity:OnUpdateEntity();
-                self.playerEntity:SetPositionAndRotation(self.lastPosX, self.lastPosY, self.lastPosZ, self.playerEntity.facing, self.playerEntity.rotationPitch);
-                worldserver:UpdateEntity(self.playerEntity);
-                return;
-            end
-
-            local lastY = self.playerEntity.y;
-			local posX = self.playerEntity.x;
-            local posY = self.playerEntity.y;
-            local posZ = self.playerEntity.z;
-            self.lastPosX = posX;
-            self.lastPosY = posY;
-            self.lastPosZ = posZ;
-            
-            local rotYaw = self.playerEntity.facing;
-            local rotPitch = self.playerEntity.rotationPitch;
-
-            if (packet_move.moving and packet_move.y == -999 and packet_move.stance == -999) then
-                packet_move.moving = false;
-            end
-
-            
-            if (packet_move.moving) then
-                posX = packet_move.x;
-                posY = packet_move.y;
-                posZ = packet_move.z;
-                -- local jumpheight = packet_move.stance - packet_move.y;
-				-- checking for illegal positions:
-
-                if (math.abs(packet_move.x) > 320000 or math.abs(packet_move.z) > 320000) then
-                    self:KickPlayerFromServer("Illegal position");
-                    return;
-                end
-            end
-
-            if (packet_move.rotating) then
-                rotYaw = packet_move.yaw;
-                rotPitch = packet_move.pitch;
-            end
-
+		if (self.playerEntity:IsPlayerSleeping()) then
             self.playerEntity:OnUpdateEntity();
-            self.playerEntity:SetPositionAndRotation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
+            self.playerEntity:SetPositionAndRotation(self.lastPosX, self.lastPosY, self.lastPosZ, self.playerEntity.facing, self.playerEntity.rotationPitch);
+            worldserver:UpdateEntity(self.playerEntity);
+            return;
+        end
 
-            if (not self.hasMoved) then
+        local lastY = self.playerEntity.y;
+		local posX = self.playerEntity.x;
+        local posY = self.playerEntity.y;
+        local posZ = self.playerEntity.z;
+        self.lastPosX = posX;
+        self.lastPosY = posY;
+        self.lastPosZ = posZ;
+            
+		if (self.playerEntity:IsRiding()) then
+			-- only update rotation, position is updated by the server. 
+			if (packet_move.rotating) then
+				self.playerEntity:SetRotation(packet_move.yaw, packet_move.pitch);
+			end
+			self.playerEntity:GetWorldServer():GetPlayerManager():UpdateMovingPlayer(self.playerEntity);
+			return;
+		end
+
+        local rotYaw = self.playerEntity.facing;
+        local rotPitch = self.playerEntity.rotationPitch;
+
+        if (packet_move.moving and packet_move.y == -999 and packet_move.stance == -999) then
+            packet_move.moving = false;
+        end
+    
+        if (packet_move.moving and not self:IsTeleporting()) then
+            posX = packet_move.x;
+            posY = packet_move.y;
+            posZ = packet_move.z;
+            -- local jumpheight = packet_move.stance - packet_move.y;
+			-- checking for illegal positions:
+
+            if (math.abs(packet_move.x) > 320000 or math.abs(packet_move.z) > 320000) then
+                self:KickPlayerFromServer("Illegal position");
                 return;
             end
-
-            local dx = posX - self.playerEntity.x;
-            local dy = posY - self.playerEntity.y;
-            local dz = posZ - self.playerEntity.z;
-            local mx = math.max(math.abs(dx), math.abs(self.playerEntity.motionX));
-            local my = math.max(math.abs(dy), math.abs(self.playerEntity.motionY));
-            local mz = math.max(math.abs(dz), math.abs(self.playerEntity.motionZ));
-            local mDistSq = mx * mx + my * my + mz * mz;
-
-			local collision_offset = 0.0625;
-
-            if (mDistSq > 100) then
-				LOG.std(nil, "warn", "NetServerHandler", "%s moved too fast", self.playerEntity:GetUserName());
-				-- server rule1: revert to old position
-                -- self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, self.playerEntity.facing, self.playerEntity.rotationPitch);
-				-- return
-
-				-- server rule2: teleport to the given position. 
-				self.playerEntity:SetPositionAndRotation(posX, posY+collision_offset, posZ, rotYaw, rotPitch);
-            else
-				local bNoCollision = worldserver:GetCollidingBoundingBoxes(self.playerEntity:GetCollisionAABB():clone_from_pool():Expand(-collision_offset, -collision_offset, -collision_offset), self.playerEntity) == nil;
-
-				-- LOG.std(nil, "debug", "NetServerHandler", "handleMove entity id %d: displacement: %f %f %f  time:%d", self.playerEntity.entityId, dx, dy, dz, ParaGlobal.timeGetTime());
-				self.playerEntity:MoveEntityByDisplacement(dx, dy, dz);
-				self.playerEntity.onGround = packet_move.onGround;
-				local cur_dy = dy;
-				dx = posX - self.playerEntity.x;
-				dy = posY - self.playerEntity.y;
-
-				if (dy > -0.5 or dy < 0.5) then
-					dy = 0;
-				end
-
-				dz = posZ - self.playerEntity.z;
-				mDistSq = dx * dx + dy * dy + dz * dz;
-				local bMovedTooMuch = false;
-
-				if (mDistSq > 0.0625 and not self.playerEntity:IsPlayerSleeping()) then
-					bMovedTooMuch = true;
-					LOG.std(nil, "warn", "NetServerHandler", "%s moved wrongly", self.playerEntity:GetUserName());
-				end
-
-				self.playerEntity:SetPositionAndRotation(posX, posY, posZ, rotYaw, rotPitch);
-				local bNoCollisionAfterMove = worldserver:GetCollidingBoundingBoxes(self.playerEntity:GetCollisionAABB():clone_from_pool():Expand(-collision_offset, -collision_offset, -collision_offset), self.playerEntity) == nil;
-
-				if (bNoCollision and (bMovedTooMuch or not bNoCollisionAfterMove) and not self.playerEntity:IsPlayerSleeping()) then
-					-- client has moved into a solid block or something, reset to old position.  
-					self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
-					return;
-				end	    
-            end
-            self.playerEntity.onGround = packet_move.onGround;
-			self.playerEntity:GetWorldServer():GetPlayerManager():UpdateMovingPlayer(self.playerEntity);
-            self.playerEntity:UpdateFallStateMP(self.playerEntity.y - lastY, packet_move.onGround);
-        elseif (self.currentTicks % 20 == 0) then
-            self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, self.playerEntity.facing, self.playerEntity.rotationPitch);
         end
+
+        if (packet_move.rotating) then
+            rotYaw = packet_move.yaw;
+            rotPitch = packet_move.pitch;
+        end
+
+		self.playerEntity:OnUpdateEntity();
+		self.playerEntity:SetPositionAndRotation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
+
+        local dx = posX - self.playerEntity.x;
+        local dy = posY - self.playerEntity.y;
+        local dz = posZ - self.playerEntity.z;
+        local mx = math.max(math.abs(dx), math.abs(self.playerEntity.motionX));
+        local my = math.max(math.abs(dy), math.abs(self.playerEntity.motionY));
+        local mz = math.max(math.abs(dz), math.abs(self.playerEntity.motionZ));
+        local mDistSq = mx * mx + my * my + mz * mz;
+
+		local collision_offset = 0.0625;
+
+		if (mDistSq > 100) then
+			LOG.std(nil, "warn", "NetServerHandler", "%s moved too fast", self.playerEntity:GetUserName());
+			-- server rule1: revert to old position
+			-- self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
+
+			-- server rule2: teleport to the given position. 
+			self.playerEntity:SetPositionAndRotation(posX, posY+collision_offset, posZ, rotYaw, rotPitch);
+		else
+			local bNoCollision = worldserver:GetCollidingBoundingBoxes(self.playerEntity:GetCollisionAABB():clone_from_pool():Expand(-collision_offset, -collision_offset, -collision_offset), self.playerEntity) == nil;
+
+			-- LOG.std(nil, "debug", "NetServerHandler", "handleMove entity id %d: displacement: %f %f %f  time:%d", self.playerEntity.entityId, dx, dy, dz, ParaGlobal.timeGetTime());
+			self.playerEntity:MoveEntityByDisplacement(dx, dy, dz);
+			self.playerEntity.onGround = packet_move.onGround;
+			local cur_dy = dy;
+			dx = posX - self.playerEntity.x;
+			dy = posY - self.playerEntity.y;
+
+			if (dy > -0.5 or dy < 0.5) then
+				dy = 0;
+			end
+
+			dz = posZ - self.playerEntity.z;
+			mDistSq = dx * dx + dy * dy + dz * dz;
+			local bMovedTooMuch = false;
+
+			if (mDistSq > 0.0625 and not self.playerEntity:IsPlayerSleeping()) then
+				bMovedTooMuch = true;
+				LOG.std(nil, "warn", "NetServerHandler", "%s moved wrongly", self.playerEntity:GetUserName());
+			end
+
+			self.playerEntity:SetPositionAndRotation(posX, posY, posZ, rotYaw, rotPitch);
+			local bNoCollisionAfterMove = worldserver:GetCollidingBoundingBoxes(self.playerEntity:GetCollisionAABB():clone_from_pool():Expand(-collision_offset, -collision_offset, -collision_offset), self.playerEntity) == nil;
+
+			if (bNoCollision and (bMovedTooMuch or not bNoCollisionAfterMove) and not self.playerEntity:IsPlayerSleeping()) then
+				-- client has moved into a solid block or something, reset to old position.  
+				self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
+				return;
+			end	    
+		end
+		self.playerEntity.onGround = packet_move.onGround;
+		self.playerEntity:GetWorldServer():GetPlayerManager():UpdateMovingPlayer(self.playerEntity);
+		self.playerEntity:UpdateFallStateMP(self.playerEntity.y - lastY, packet_move.onGround);
     end
 end
 
@@ -335,7 +327,7 @@ function NetServerHandler:handleClientCommand(packet_ClientCommand)
 	if(cmd) then
 		local cmd_class, cmd_name, cmd_text = CommandManager:GetCmdByString(cmd);
 		if(cmd_class and not cmd_class:IsLocal()) then
-			CommandManager:RunFromConsole(cmd);
+			CommandManager:RunFromConsole(cmd, self.playerEntity);
 		end
 	end
 end
@@ -362,4 +354,17 @@ function NetServerHandler:handleEntityFunction(packet_EntityFunction)
 			-- TODO: for other one time commmand
 		end
 	end
+end
+
+function NetServerHandler:SetTeleporting(bValue)
+	self.isServerTeleporting = bValue;
+end
+
+-- if true, we will ignore all client move packets
+function NetServerHandler:IsTeleporting()
+	return self.isServerTeleporting;
+end
+
+function NetServerHandler:handleEntityTeleport(packet_EntityTeleport)
+	self:SetTeleporting(false);
 end

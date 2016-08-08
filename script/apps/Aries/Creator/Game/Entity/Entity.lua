@@ -1131,6 +1131,11 @@ function Entity:SetLocationAndAngles(x,y,z, yaw, pitch)
     self:SetPosition(x, y, z);
 end
 
+-- teleport to a given block position. 
+function Entity:TeleportToBlockPos(x,y,z)
+	self:SetBlockPos(x,y,z);
+end
+
 -- Sets the entity's position and rotation. But it does not change last tick position. 
 function Entity:SetPositionAndRotation(x,y,z,yaw, pitch)
 	self:SetRotation(yaw, pitch);

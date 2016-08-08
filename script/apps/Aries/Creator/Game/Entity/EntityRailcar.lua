@@ -380,9 +380,11 @@ function Entity:FrameMove(deltaTime)
             local newX = self.x + (self.targetX - self.x) / self.smoothFrames;
             local newY = self.y + (self.targetY - self.y) / self.smoothFrames;
             local newZ = self.z + (self.targetZ - self.z) / self.smoothFrames;
+
             self.rotationYaw = (self.rotationYaw + mathlib.WrapAngleTo180(self.targetYaw - self.rotationYaw) / self.smoothFrames);
             self.rotationPitch = (self.rotationPitch + mathlib.WrapAngleTo180(self.targetPitch - self.rotationPitch) / self.smoothFrames);
 			self.smoothFrames = self.smoothFrames - 1;
+
 			self:SetPosition(newX, newY, newZ);
         else
 			local newX = self.targetX or self.x;

@@ -117,24 +117,26 @@ function Entity:OnLivingUpdate()
 	self:UpdateEntityActionState();
 
 	if (self.smoothFrames > 0) then
-		local x = self.targetX - self.x
-		local y = self.targetY - self.y;
-		local z = self.targetZ - self.z;
-		if(math.abs(x) < 20 and math.abs(y) < 20 and math.abs(z) < 20) then
-			x = self.x + x / self.smoothFrames;
-			y = self.y + y / self.smoothFrames;
-			z = self.z + z / self.smoothFrames;
-		else
-			x = self.targetX;
-			y = self.targetY;
-			z = self.targetZ;
+		if(not self:IsRiding()) then
+			local x = self.targetX - self.x
+			local y = self.targetY - self.y;
+			local z = self.targetZ - self.z;
+			if(math.abs(x) < 20 and math.abs(y) < 20 and math.abs(z) < 20) then
+				x = self.x + x / self.smoothFrames;
+				y = self.y + y / self.smoothFrames;
+				z = self.z + z / self.smoothFrames;
+			else
+				x = self.targetX;
+				y = self.targetY;
+				z = self.targetZ;
+			end
+			self:SetPosition(x, y, z);
 		end
+
         local deltaFacing = mathlib.ToStandardAngle(self.targetFacing - self.facing);
         self.facing = self.facing + deltaFacing / self.smoothFrames;
         self.rotationPitch = self.rotationPitch + (self.targetPitch - self.rotationPitch) / self.smoothFrames;
         self.smoothFrames = self.smoothFrames - 1;
-
-        self:SetPosition(x, y, z);
         self:SetRotation(self.facing, self.rotationPitch);
     end
 	if(self.smoothFramesHead > 0) then
@@ -147,9 +149,4 @@ function Entity:OnLivingUpdate()
 			obj:SetField("HeadUpdownAngle", self.rotationHeadPitch);
 		end
 	end
-end
-
-
-function Entity:MountEntity(targetEntity)
-	Entity._super.MountEntity(self, targetEntity);
 end

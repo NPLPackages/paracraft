@@ -182,6 +182,11 @@ function Entity:OnUpdateServerPlayer()
 	
 end
 
+-- framemove this entity when it is riding (mounted) on another entity. 
+-- we will update according to mounted entity's position. 
+function Entity:FrameMoveRidding(deltaTime)
+	Entity._super.FrameMoveRidding(self, deltaTime);
+end
 
 -- update the entity's position and logic per tick.
 -- the actually framemove is in NetServerHandler:handleMove, so here we just send cached changes to client. 
@@ -199,8 +204,7 @@ function Entity:OnUpdate()
 		
 		self.destroyedItemsNetCache:clear();
     end
-
-    if (not self.loadedChunks:empty()) then
+	if (not self.loadedChunks:empty()) then
         local chunkList = commonlib.vector:new();
         local tileEntities = commonlib.vector:new();
 
@@ -222,7 +226,7 @@ function Entity:OnUpdate()
         end
 
         if (not chunkList:empty()) then
-            self:SendPacketToPlayer(Packets.PacketMapChunks:new():Init(chunkList));
+			self:SendPacketToPlayer(Packets.PacketMapChunks:new():Init(chunkList));
             
 			for i, entity in ipairs(tileEntities) do
 				self:SendBlockEntityToPlayer(entity);
@@ -316,6 +320,22 @@ function Entity:SendBlockEntityToPlayer(tileEntity)
     end
 end
 
+-- teleport to a given block position. 
+function Entity:TeleportToBlockPos(x,y,z)
+	if(self:IsRiding()) then
+		self:MountEntity(nil);
+	end
+	self:SetBlockPos(x,y,z);
+
+	if (self.playerNetServerHandler) then
+		self.playerNetServerHandler:SetTeleporting(true);
+	end
+	local scaledX = math.floor(32*self.x);
+	local scaledY = math.floor(32*self.y);
+	local scaledZ = math.floor(32*self.z);
+	local packet = Packets.PacketEntityTeleport:new():Init(self.entityId, scaledX, scaledY, scaledZ);
+	self:SendPacketToPlayer(packet);
+end
 
 -- Takes in the distance the entity has fallen this tick and whether its on the ground to update the fall distance
 -- and deal fall damage if landing on the ground.  

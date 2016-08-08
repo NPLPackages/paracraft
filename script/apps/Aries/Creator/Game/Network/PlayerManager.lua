@@ -180,7 +180,7 @@ function PlayerManager:UpdateMovingPlayer(entityMP)
             for cx = chunkX - chunkViewRadius, chunkX + chunkViewRadius do
                 for cz = chunkZ - chunkViewRadius, chunkZ + chunkViewRadius do
                     if (not self:IsRectOverlap(cx, cz, lastChunkX, lastChunkZ, chunkViewRadius)) then
-                        self:GetOrCreateChunkObserver(cx, cz, true):AddPlayer(entityMP);
+						self:GetOrCreateChunkObserver(cx, cz, true):AddPlayer(entityMP);
                     end
 
                     if (not self:IsRectOverlap(cx - offsetX, cz - offsetZ, chunkX, chunkZ, chunkViewRadius)) then
@@ -192,8 +192,7 @@ function PlayerManager:UpdateMovingPlayer(entityMP)
                     end
                 end
             end
-
-            self:FilterChunkLoadQueue(entityMP);
+			self:FilterChunkLoadQueue(entityMP);
             entityMP.managedPosBX = entityMP.bx;
             entityMP.managedPosBZ = entityMP.bz;
         end
@@ -217,9 +216,10 @@ function PlayerManager:FilterChunkLoadQueue(entityMP)
     local chunkViewRadius = self.playerChunkViewRadius;
 	local chunkX = rshift(entityMP.bx, 4);
     local chunkZ = rshift(entityMP.bz, 4);
+
     local packedChunkPos = self:GetOrCreateChunkObserver(chunkX, chunkZ, true):GetChunkLocation():GetPackedChunkPos();
 
-	-- we will remove all loadedd chunks, and add only visible ones again. 
+	-- we will remove all loaded chunks, and add only visible ones again. 
     entityMP.loadedChunks:clear();
 
     if (lastLoadedChunks:contains(packedChunkPos)) then

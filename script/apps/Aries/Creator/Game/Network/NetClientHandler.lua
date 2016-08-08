@@ -217,30 +217,89 @@ end
 function NetClientHandler:handlePlayerInfo(packet_PlayerInfo)
 end
 
--- the server tells us to teleport to this location. 
-function NetClientHandler:handleMove(packet_Move)
-	local curPlayer = self.worldClient:GetPlayer();
-	local posX = curPlayer.x;
-    local posY = curPlayer.y;
-    local posZ = curPlayer.z;
-    local yaw = curPlayer.facing;
-    local pitch = curPlayer.rotationPitch;
-	if (packet_Move.x) then
-        posX = packet_Move.x;
-        posY = packet_Move.y;
-        posZ = packet_Move.z;
+
+-- this is usaully called periodially in addition to RelEntity, to force a complete position update. 
+function NetClientHandler:handleEntityMove(packet_EntityMove)
+	local entityOther = self:GetEntityByID(packet_EntityMove.entityId);
+    if (entityOther) then
+        entityOther.serverPosX = packet_EntityMove.x;
+        entityOther.serverPosY = packet_EntityMove.y;
+        entityOther.serverPosZ = packet_EntityMove.z;
+        local x = entityOther.serverPosX / 32;
+        local y = entityOther.serverPosY / 32 + 0.015625;
+        local z = entityOther.serverPosZ / 32;
+        local facing;
+		if(packet_EntityMove.facing) then
+			facing = packet_EntityMove.facing / 32;
+		end
+		local pitch;
+		if(packet_EntityMove.pitch) then
+			pitch = packet_EntityMove.pitch / 32;
+		end
+		entityOther:SetPositionAndRotation(x, y, z, facing, pitch);
     end
-	if (packet_Move.yaw) then
-        yaw = packet_Move.yaw;
-        pitch = packet_Move.pitch;
-    end
-	curPlayer:SetPositionAndRotation(posX, posY, posZ, yaw, pitch);
-	packet_Move.x = curPlayer.x;
-    packet_Move.y = curPlayer.y;
-	packet_Move.stance = curPlayer.y;
-    packet_Move.z = curPlayer.z;
-	self:AddToSendQueue(packet_Move);
 end
+
+-- server wants us to teleport to a given position. 
+function NetClientHandler:handleEntityTeleport(packet_EntityTeleport)
+	local entityOther = self:GetEntityByID(packet_EntityTeleport.entityId);
+
+    if (entityOther) then
+        entityOther.serverPosX = packet_EntityTeleport.x;
+        entityOther.serverPosY = packet_EntityTeleport.y;
+        entityOther.serverPosZ = packet_EntityTeleport.z;
+        local x = entityOther.serverPosX / 32;
+        local y = entityOther.serverPosY / 32 + 0.015625;
+        local z = entityOther.serverPosZ / 32;
+        local facing;
+		if(packet_EntityTeleport.facing) then
+			facing = packet_EntityTeleport.facing / 32;
+		end
+		local pitch;
+		if(packet_EntityTeleport.pitch) then
+			pitch = packet_EntityTeleport.pitch / 32;
+		end
+		entityOther:SetPositionAndRotation(x, y, z, facing, pitch);
+
+		-- send acknowledge msg back to server
+		self:AddToSendQueue(Packets.PacketEntityTeleport:new());
+    end
+end
+
+-- the server tells us to move to this accurate and unscaled location. 
+function NetClientHandler:handleMove(packet_Move)
+	local curPlayer;
+	if(packet_Move.entityId) then
+		curPlayer = self:GetEntityByID(packet_Move.entityId);
+	else
+		curPlayer = self.worldClient:GetPlayer();
+	end
+	
+	if(curPlayer) then
+		-- teleport the player, and confirm with a reply
+		local posX = curPlayer.x;
+		local posY = curPlayer.y;
+		local posZ = curPlayer.z;
+		local yaw = curPlayer.facing;
+		local pitch = curPlayer.rotationPitch;
+		if (packet_Move.x) then
+			posX = packet_Move.x;
+			posY = packet_Move.y;
+			posZ = packet_Move.z;
+		end
+		if (packet_Move.yaw) then
+			yaw = packet_Move.yaw;
+			pitch = packet_Move.pitch;
+		end
+		curPlayer:SetPositionAndRotation(posX, posY, posZ, yaw, pitch);
+		packet_Move.x = curPlayer.x;
+		packet_Move.y = curPlayer.y;
+		packet_Move.stance = curPlayer.y;
+		packet_Move.z = curPlayer.z;
+		self:AddToSendQueue(packet_Move);
+	end
+end
+
 
 function NetClientHandler:handleEntityPlayerSpawn(packet_EntityPlayerSpawn)
 	local x = packet_EntityPlayerSpawn.x / 32;
@@ -305,29 +364,6 @@ function NetClientHandler:handleRelEntity(packet_RelEntity)
 		local pitch;
 		if(packet_RelEntity.pitch) then
 			pitch = packet_RelEntity.pitch / 32;
-		end
-        entityOther:SetPositionAndRotation2(x, y, z, facing, pitch, 3);
-    end
-end
-
--- called periodially in addition to RelEntity, to force a complete position update. 
-function NetClientHandler:handleEntityTeleport(packet_EntityTeleport)
-	local entityOther = self:GetEntityByID(packet_EntityTeleport.entityId);
-
-    if (entityOther) then
-        entityOther.serverPosX = packet_EntityTeleport.x;
-        entityOther.serverPosY = packet_EntityTeleport.y;
-        entityOther.serverPosZ = packet_EntityTeleport.z;
-        local x = entityOther.serverPosX / 32;
-        local y = entityOther.serverPosY / 32 + 0.015625;
-        local z = entityOther.serverPosZ / 32;
-        local facing;
-		if(packet_EntityTeleport.rotating) then
-			facing = packet_EntityTeleport.facing / 32;
-		end
-		local pitch;
-		if(packet_EntityTeleport.pitch) then
-			pitch = packet_EntityTeleport.pitch / 32;
 		end
         entityOther:SetPositionAndRotation2(x, y, z, facing, pitch, 3);
     end

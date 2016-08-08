@@ -77,14 +77,14 @@ function ChunkObserver:FlagChunkForUpdate(x, y, z)
 end
 
 function ChunkObserver:AddPlayer(playerMP)
-    if (self.playersInChunk:contains(playerMP)) then
+	if (self.playersInChunk:contains(playerMP)) then
 		-- player already in chunk
         return;
     else
         if (#(self.playersInChunk) == 0) then
             self.lastUpdateTime = commonlib.TimerManager.GetCurrentTime();
+			EntityManager.SetChunkActive(self.chunkLocation:GetPackedChunkPos(), nil, true);
         end
-        self.playersInChunk:add(playerMP);
         playerMP.loadedChunks:add(self.chunkLocation:GetPackedChunkPos());
     end
 end
@@ -110,8 +110,8 @@ function ChunkObserver:RemovePlayer(playerMP)
 			playerMP:SendPacketToPlayer(Packets.PacketMapChunk:new():Init(chunk, true, 0));
 		end
         self.playersInChunk:removeByValue(playerMP);
-        playerMP.loadedChunks:removeByValue(self.chunkLocation:GetPackedChunkPos());
-
+		playerMP.loadedChunks:removeByValue(self.chunkLocation:GetPackedChunkPos());
+		
         if (self.playersInChunk:empty()) then
 
             local chunkPackedPos = self.chunkLocation:GetPackedChunkPos();
@@ -123,7 +123,7 @@ function ChunkObserver:RemovePlayer(playerMP)
             if (self.numBlocksToUpdate > 0) then
                 self.thePlayerManager:GetChunkObserversWithPlayers():removeByValue(self);
             end
-
+			EntityManager.SetChunkActive(chunkPackedPos, nil, false);
             self.thePlayerManager:GetWorldServer():GetChunkProvider():UnloadChunksIfNotNearSpawn(self.chunkLocation.chunkX, self.chunkLocation.chunkZ);
         end
     end

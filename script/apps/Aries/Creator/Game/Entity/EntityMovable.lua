@@ -756,10 +756,30 @@ function Entity:SetPositionAndRotation2(x,y,z, facing, pitch, posRotIncrements)
     self.targetFacing = facing or self.targetFacing;
     self.targetPitch = pitch or self.targetPitch;
 	self.smoothFrames = (posRotIncrements or 1);
+			
 	if(self.framemove_interval>=0.1) then
 		self.lastFrameMoveInterval = self.framemove_interval;
 		self:SetFrameMoveInterval(0.02);
 	end
+end
+
+function Entity:FrameMoveRidding(deltaTime)
+	if(GameLogic.isRemote and not self:HasFocus()) then
+		if (self.smoothFrames > 0) then
+			local lastFacing = self:GetFacing();
+			local deltaFacing = mathlib.ToStandardAngle(self.targetFacing - lastFacing);
+			local facing = lastFacing + deltaFacing / self.smoothFrames;
+			local lastRotPitch = self.rotationPitch or 0;
+			local rotationPitch = lastRotPitch + (self.targetPitch - lastRotPitch) / self.smoothFrames;
+			self.smoothFrames = self.smoothFrames - 1;
+			self:SetRotation(facing, lastRotPitch);
+		else
+			if(self.lastFrameMoveInterval) then
+				self:SetFrameMoveInterval(self.lastFrameMoveInterval);
+			end
+        end
+	end
+	Entity._super.FrameMoveRidding(self, deltaTime);
 end
 
 -- called every frame

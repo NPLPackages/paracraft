@@ -40,7 +40,7 @@ function PacketEntityTeleport:Init2(entityId, scaledX, scaledY, scaledZ, facing,
     self.y = scaledY;
     self.z = scaledZ;
     self.facing = facing;
-    self.pitch = facing;
+    self.pitch = pitch;
 	return self;
 end
 

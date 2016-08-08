@@ -72,23 +72,28 @@ function EntityTrackerEntry:SendLocationToAllClients(playerEntityList)
     end
 
 	-- updata location, facing, and watched data(current animation, etc). 
-	if ( (self.ticks % self.updateFrequency) == 0 or entity.isAirBorne or entity:HasChanges()) then
-		if (not entity.ridingEntity ) then
-			self.ticksSinceLastForcedTeleport = self.ticksSinceLastForcedTeleport + 1;
-			local scaledX = math.floor(32*entity.x);
-			local scaledY = math.floor(32*entity.y);
-			local scaledZ = math.floor(32*entity.z);
-			local facing = math.floor(32*(entity.rotationYaw or entity.facing or 0));
-			local pitch = math.floor(32*(entity.rotationPitch or 0));
-			local dx = scaledX - self.lastScaledXPosition;
-			local dy = scaledY - self.lastScaledYPosition;
-			local dz = scaledZ - self.lastScaledZPosition;
-			local bPosHasChanges = math.abs(dx) >= 4 or math.abs(dy) >= 4 or math.abs(dz) >= 4 or self.ticks % 60 == 0;
-			local bRotHasChanges = math.abs(facing - self.lastYaw) >= 4 or math.abs(pitch - self.lastPitch) >= 4;
+	if ( (self.ticks % self.updateFrequency) == 0 or entity:HasChanges()) then
+		self.ticksSinceLastForcedTeleport = self.ticksSinceLastForcedTeleport + 1;
+		local scaledX = math.floor(32*entity.x);
+		local scaledY = math.floor(32*entity.y);
+		local scaledZ = math.floor(32*entity.z);
+		local facing = math.floor(32*(entity.rotationYaw or entity.facing or 0));
+		local pitch = math.floor(32*(entity.rotationPitch or 0));
+		local dx = scaledX - self.lastScaledXPosition;
+		local dy = scaledY - self.lastScaledYPosition;
+		local dz = scaledZ - self.lastScaledZPosition;
+		local bPosHasChanges = math.abs(dx) >= 4 or math.abs(dy) >= 4 or math.abs(dz) >= 4 or self.ticks % 60 == 0;
+		local bRotHasChanges = math.abs(facing - self.lastYaw) >= 4 or math.abs(pitch - self.lastPitch) >= 4;
 
-			local packet;
-			if (self.ticks > 0) then
-				if (dx >= -128 and dx < 128 and dy >= -128 and dy < 128 and dz >= -128 and dz < 128 and self.ticksSinceLastForcedTeleport <= 400 and not self.ridingEntity) then
+		local packet;
+		if (self.ticks > 0) then
+			if (dx >= -128 and dx < 128 and dy >= -128 and dy < 128 and dz >= -128 and dz < 128 
+				and self.ticksSinceLastForcedTeleport <= 400) then
+				if(entity.ridingEntity) then
+					if (bRotHasChanges) then
+						packet = Packets.PacketRelEntityLook:new():Init(entity.entityId, facing, pitch);
+					end
+				else
 					if (bPosHasChanges and bRotHasChanges) then
 						packet = Packets.PacketRelEntityMoveLook:new():Init(entity.entityId, dx, dy, dz, facing, pitch);
 					elseif (bPosHasChanges) then
@@ -96,58 +101,56 @@ function EntityTrackerEntry:SendLocationToAllClients(playerEntityList)
 					elseif (bRotHasChanges) then
 						packet = Packets.PacketRelEntityLook:new():Init(entity.entityId, facing, pitch);
 					end
-				else
-					self.ticksSinceLastForcedTeleport = 0;
-					packet = Packets.PacketEntityTeleport:new():Init(entity.entityId, scaledX, scaledY, scaledZ, facing, pitch);
 				end
+			else
+				self.ticksSinceLastForcedTeleport = 0;
+				packet = Packets.PacketEntityMove:new():Init(entity.entityId, scaledX, scaledY, scaledZ, facing, pitch);
 			end
+		end
 
-			if (self.sendVelocityUpdates and entity.motionX) then
-				local dMotionX = entity.motionX - self.motionX;
-				local dMotionY = entity.motionY - self.motionY;
-				local dMotionZ = entity.motionZ - self.motionZ;
-				local minMotionDelta = 0.02;
-				local deltaSpeedScaleSq = dMotionX * dMotionX + dMotionY * dMotionY + dMotionZ * dMotionZ;
+		if (self.sendVelocityUpdates and entity.motionX) then
+			local dMotionX = entity.motionX - self.motionX;
+			local dMotionY = entity.motionY - self.motionY;
+			local dMotionZ = entity.motionZ - self.motionZ;
+			local minMotionDelta = 0.02;
+			local deltaSpeedScaleSq = dMotionX * dMotionX + dMotionY * dMotionY + dMotionZ * dMotionZ;
 
-				if (deltaSpeedScaleSq > minMotionDelta * minMotionDelta or deltaSpeedScaleSq > 0 and entity.motionX == 0 and entity.motionY == 0 and entity.motionZ == 0) then
-					self.motionX = entity.motionX;
-					self.motionY = entity.motionY;
-					self.motionZ = entity.motionZ;
+			if (deltaSpeedScaleSq > minMotionDelta * minMotionDelta or deltaSpeedScaleSq > 0 and entity.motionX == 0 and entity.motionY == 0 and entity.motionZ == 0) then
+				self.motionX = entity.motionX;
+				self.motionY = entity.motionY;
+				self.motionZ = entity.motionZ;
+				if (not entity.ridingEntity ) then
 					self:SendPacketToAllTrackingPlayers(Packets.PacketEntityVelocity(entity.entityId, self.motionX, self.motionY, self.motionZ));
 				end
 			end
-
-			if (packet) then
-				self:SendPacketToAllTrackingPlayers(packet);
-			end
-
-			self:SendWatchedData();
-
-			if (bPosHasChanges) then
-				self.lastScaledXPosition = scaledX;
-				self.lastScaledYPosition = scaledY;
-				self.lastScaledZPosition = scaledZ;
-			end
-
-			if (bRotHasChanges) then
-				self.lastYaw = facing;
-				self.lastPitch = pitch;
-			end
-
-			self.ridingEntity = false;
 		end
 
+		if (packet) then
+			self:SendPacketToAllTrackingPlayers(packet);
+		end
+
+		self:SendWatchedData();
+		
+
+		if (bPosHasChanges) then
+			self.lastScaledXPosition = scaledX;
+			self.lastScaledYPosition = scaledY;
+			self.lastScaledZPosition = scaledZ;
+		end
+
+		if (bRotHasChanges) then
+			self.lastYaw = facing;
+			self.lastPitch = pitch;
+		end
+		
 		local headYaw = math.floor(entity:GetRotationYawHead() * 32);
 		local headPitch = math.floor((entity.rotationHeadPitch or 0) * 32);
 
-		if (math.abs(headYaw - self.lastHeadYaw) >= 4 or math.abs(headPitch - self.lastPitch) >= 4) then
+		if (math.abs(headYaw - self.lastHeadYaw) >= 4 or math.abs(headPitch - self.lastHeadPitch) >= 4) then
 			self:SendPacketToAllTrackingPlayers(Packets.PacketEntityHeadRotation:new():Init(entity.entityId, headYaw, headPitch));
 			self.lastHeadYaw = headYaw;
 			self.lastHeadPitch = headPitch;
 		end
-
-		
-		entity.isAirBorne = false;
 	end
     self.ticks = self.ticks + 1;
 end
@@ -205,7 +208,7 @@ function EntityTrackerEntry:TrySendEventToPlayer(entityMP)
                     entityMP:SendPacketToPlayer(Packets.PacketEntityVelocity:new():Init(self.entity.entityId, self.entity.motionX, self.entity.motionY, self.entity.motionZ));
                 end
 
-                if (not self.entity.ridingEntity) then
+                if (self.entity.ridingEntity) then
                     entityMP:SendPacketToPlayer(Packets.PacketAttachEntity:new():Init(0, self.entity, self.entity.ridingEntity));
                 end
 

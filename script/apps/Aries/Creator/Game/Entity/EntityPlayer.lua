@@ -481,6 +481,46 @@ function Entity:MoveEntity(deltaTime)
 	self:CheckCollision(deltaTime);
 end
 
+-- called every framemove by the ridden entity, instead of framemove.
+function Entity:FrameMoveRidding(deltaTime)
+	if (not self.ridingEntity or self.ridingEntity:IsDead()) then
+        self.ridingEntity = nil;
+    else
+		if (self.ridingEntity) then
+			local preX, preY, preZ = self:GetPosition();
+			self.ridingEntity:UpdateRiderPosition();
+			local x, y, z = self:GetPosition();
+			local deltaY = preY - y;
+			local obj = self:GetInnerObject();
+			if(deltaY > 2) then
+				-- unmount if jumps up too high
+				if(GameLogic.isRemote) then
+					self:AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, nil));
+				else
+					self:MountEntity(nil);
+					local bx, by, bz = self:GetBlockPos();
+					self:PushOutOfBlocks(bx, by, bz);
+				end
+			elseif(deltaY > 0) then
+				if(obj:GetField("VerticalSpeed", 0) ~= 0) then
+					-- allow jumping using C++ biped. 
+					self:SetPosition(x, preY, z);
+				else
+					obj:SetField("VerticalSpeed", 0);
+					obj:ToCharacter():Stop();
+					-- obj:ToCharacter():PlayAnimation(0);
+				end
+			else
+				obj:SetField("VerticalSpeed", 0);
+				obj:ToCharacter():Stop();
+				-- obj:ToCharacter():PlayAnimation(0);
+			end
+		end
+    end
+	self:UpdateActionState();
+	self:OnUpdate();
+end
+
 -- called every frame
 function Entity:FrameMove(deltaTime)
 	if(self:HasFocus()) then
@@ -790,40 +830,6 @@ function Entity:GetCurrentSpeedScale()
 		speed = GameLogic.options.WalkSpeedScale;
 	end
 	return speed * (self.speedscale or 1);	
-end
-
-function Entity:FrameMoveRidding(deltaTime)
-	if (not self.ridingEntity or self.ridingEntity:IsDead()) then
-        self.ridingEntity = nil;
-    else
-		if (self.ridingEntity) then
-			local preX, preY, preZ = self:GetPosition();
-			self.ridingEntity:UpdateRiderPosition();
-			local x, y, z = self:GetPosition();
-			local deltaY = preY - y;
-			local obj = self:GetInnerObject();
-			if(deltaY > 2) then
-				-- unmount if jumps up too high
-				self:MountEntity(nil);
-				local bx, by, bz = self:GetBlockPos();
-				self:PushOutOfBlocks(bx, by, bz);
-			elseif(deltaY > 0) then
-				if(obj:GetField("VerticalSpeed", 0) ~= 0) then
-					-- allow jumping using C++ biped. 
-					self:SetPosition(x, preY, z);
-				else
-					obj:SetField("VerticalSpeed", 0);
-					obj:ToCharacter():Stop();
-					-- obj:ToCharacter():PlayAnimation(0);
-				end
-			else
-				obj:SetField("VerticalSpeed", 0);
-				obj:ToCharacter():Stop();
-				-- obj:ToCharacter():PlayAnimation(0);
-			end
-		end
-    end
-	self:UpdateActionState();
 end
 
 -- Wake up the player if they're sleeping.

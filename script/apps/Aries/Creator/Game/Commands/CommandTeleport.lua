@@ -20,6 +20,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["tp"] = {
 	name="tp", 
 	quick_ref="/tp [x] [y] [z]", 
+	isLocal = true,
 	desc=[[teleport to a given position. 
 format: /tp [x] [y] [z]  
 format: /tp [y]  -- teleport to y

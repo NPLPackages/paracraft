@@ -21,6 +21,12 @@ function PacketMove:Init(bOnGround)
 	return self;
 end
 
+
+function PacketMove:SetEntity(entity)
+	self.entityId = entity and entity.entityId;
+	return self;
+end
+
 function PacketMove:ReadPacket(msg)
 	PacketMove._super.ReadPacket(self, msg);
 	--self.moving = (self.x~=nil);

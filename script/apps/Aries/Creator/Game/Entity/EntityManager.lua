@@ -71,6 +71,8 @@ local entity_id_maps = {};
 
 -- mapping from entity to true. 
 local senstient_list = {};
+-- mapping from chunk_index to frame_tick or -1. if -1 it is always active
+local active_chunks = {};
 
 -- temp framemove list
 local framemove_queue_size = 0;
@@ -174,6 +176,7 @@ function EntityManager.Clear()
 	players = {};
 	senstient_list = {};
 	framemove_queue = {};
+	active_chunks = {};
 
 	last_trigger_entity = nil;
 	EntityPool:ClearAllPools();
@@ -570,9 +573,10 @@ function EntityManager.SetBlockContainer(bx,by,bz, block_container)
 	block_containers[sparse_index] = block_container; 
 end
 
+-- @param cx, cz: chunk pos, if cz is nil, cx is packed index
 -- return array of all entities in a given chunk column
 function EntityManager.GetEntitiesInChunkColumn(cx, cz, bCreateIfNotExist)
-	local packedChunkPos = ChunkLocation.FromChunkToPackedChunk(cx, cz);
+	local packedChunkPos = cz and ChunkLocation.FromChunkToPackedChunk(cx, cz) or cx;
 	local chunk_column = chunk_column_entities[packedChunkPos];
 	if(not chunk_column and bCreateIfNotExist) then
 		chunk_column = commonlib.UnorderedArraySet:new();
@@ -626,6 +630,34 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 	end
 
 	EntityManager.SaveAllPlayers();
+end
+
+-- @param chunkX, chunkZ: chunk pos, if chunkZ is nil, chunkX is packed index
+-- make the chunk at location always active or not. 
+function EntityManager.SetChunkActive(chunkX, chunkZ, isActive)
+	local nIndex = chunkZ and ChunkLocation.FromChunkToPackedChunk(chunkX, chunkZ) or chunkX;
+	if(not active_chunks[nIndex]) then
+		if(isActive) then
+			active_chunks[nIndex] = -1;
+		end
+	else
+		if(isActive) then
+			active_chunks[nIndex] = -1;
+		else
+			active_chunks[nIndex] = nil;
+		end
+	end
+end
+
+-- @param chunkX, chunkZ: chunk pos, if chunkZ is nil, chunkX is packed index
+-- @param tick: if nil, default to current frame_count
+function EntityManager.TickChunk(chunkX, chunkZ, tick)
+	local nIndex = chunkZ and ChunkLocation.FromChunkToPackedChunk(chunkX, chunkZ) or chunkX;
+	local chunkValue = active_chunks[nIndex];
+	tick = tick or frame_count;
+	if(chunkValue~=-1 and chunkValue~=tick) then
+		active_chunks[nIndex] = tick;
+	end
 end
 
 -- set an entity so that its framemove function should always be called regardless of player position
@@ -684,9 +716,10 @@ function EntityManager.FrameMove(deltaTime)
 	-- for always sentient objects, like CommandEntity with timed event
 	EntityManager.FrameMoveSentientList(deltaTime, cur_time, destroy_list)
 
-	-- only frame move objects near the current player
-	EntityManager.FrameMoveChunksByPlayer(player, player:GetSentientRadius(), deltaTime, cur_time, destroy_list);
-
+	-- make chunks near the current player active
+	EntityManager.MakeChunksNearPlayerActive(player, player:GetSentientRadius(), frame_count);
+	-- also framemove entities in active chunks
+	EntityManager.FrameMoveAllActiveChunks(deltaTime, cur_time, destroy_list);
 
 	-- frame move entities in pending queues in this frame. 
 	EntityManager.FrameMoveQueueThisFrame(deltaTime, cur_time, destroy_list);
@@ -746,26 +779,40 @@ function EntityManager.FrameMoveDynamicObjects(deltaTime, cur_time, destroy_list
 	commonlib.npl_profiler.perf_end("EntityManager.FrameMoveDynamicObjects");
 end
 
+function EntityManager.FrameMoveAllActiveChunks(deltaTime, cur_time, destroy_list)
+	local inactive_chunks;
+	local count = 0;
+	for chunkIndex, value in pairs(active_chunks) do
+		if(value == -1 or value == frame_count) then
+			local entities = EntityManager.GetEntitiesInChunkColumn(chunkIndex);
+			if(entities and #entities > 0) then
+				EntityManager.FrameMoveEntities(entities, deltaTime, cur_time, destroy_list);
+			end
+			count = count + 1;
+		else
+			inactive_chunks = inactive_chunks or {};
+			inactive_chunks[#inactive_chunks+1] = chunkIndex;
+		end
+	end
+	if(inactive_chunks) then
+		for _, chunkIndex in ipairs(inactive_chunks) do
+			if(active_chunks[chunkIndex] ~= -1) then
+				active_chunks[chunkIndex] = nil;
+			end
+		end
+	end
+end
+
 -- all entities in the radius of the given player is framemoved. 
 -- @param grid_radius: if nil, default to playerEntity:GetSentientRadius(). 
-function EntityManager.FrameMoveChunksByPlayer(playerEntity, grid_radius, deltaTime, cur_time, destroy_list)
+function EntityManager.MakeChunksNearPlayerActive(playerEntity, grid_radius)
 	local blockX, blockY, blockZ = playerEntity:GetBlockPos(); 
 	local cx, cz = ChunkLocation:GetChunkPosFromWorldPos(blockX, blockZ);
 	grid_radius = grid_radius or playerEntity:GetSentientRadius(); -- so the actual radius is 8*16 = 128 meters. 
 	local chunk_radius = math.floor(grid_radius / 16);
 	for i = -chunk_radius, chunk_radius do
 		for j = -chunk_radius, chunk_radius do
-			local entities = EntityManager.GetEntitiesInChunkColumn(cx+i, cz+j);
-			if(entities and #entities > 0) then
-				local dist = math.sqrt(i^2+j^2)*16;
-				for i=1, #entities do 
-					local entity = entities[i];
-					if(entity and entity:GetSentientRadius()<dist) then
-						entities[i] = false;
-					end
-				end
-				EntityManager.FrameMoveEntities(entities, deltaTime, cur_time, destroy_list);
-			end
+			EntityManager.TickChunk(cx+i, cz+j);
 		end
 	end
 end

@@ -169,18 +169,24 @@ function CommandManager:RunWithVariables(variables, cmd, ...)
 end
 
 -- run command from console for the current player
-function CommandManager:RunFromConsole(cmd)
-	local variables;
-	if (cmd and EntityManager.GetPlayer and EntityManager.GetPlayer()) then
-		variables = EntityManager.GetPlayer():GetVariables();
-	end
+-- @param player: fromEntity, if nil, this is current player. 
+function CommandManager:RunFromConsole(cmd, player)
 	local cmd_class, cmd_name, cmd_text = self:GetCmdByString(cmd);
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(cmd));
 		elseif(not GameLogic.isRemote or cmd_class:IsLocal()) then
+			local variables;
+			if(not player) then
+				if(EntityManager.GetPlayer) then
+					player = EntityManager.GetPlayer();
+				end
+			end
+			if(player) then
+				variables = player:GetVariables();	
+			end
 			if(cmd_class:CheckGameMode(GameLogic.GameMode:GetMode())) then
-				return self:RunWithVariables(variables, cmd);
+				return self:RunWithVariables(variables, cmd, player);
 			else
 				BroadcastHelper.PushLabel({id="cmderror", label = format("当前模式下不可执行命令%s", cmd_name), max_duration=3000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 				return;
