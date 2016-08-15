@@ -2,7 +2,7 @@
 Title: Slab Based Block
 Author(s): LiXizhi
 Date: 2013/1/23
-Desc: Such as a character or mob that can walk and attack. 
+Desc: 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockSlab.lua");

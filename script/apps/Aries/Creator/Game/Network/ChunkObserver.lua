@@ -85,6 +85,7 @@ function ChunkObserver:AddPlayer(playerMP)
             self.lastUpdateTime = commonlib.TimerManager.GetCurrentTime();
 			EntityManager.SetChunkActive(self.chunkLocation:GetPackedChunkPos(), nil, true);
         end
+		self.playersInChunk:add(playerMP);
         playerMP.loadedChunks:add(self.chunkLocation:GetPackedChunkPos());
     end
 end
