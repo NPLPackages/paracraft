@@ -169,12 +169,12 @@ end
 
 -- Shuts down the network with the specified reason. 
 function ConnectionBase:NetworkShutdown(reason)
-	self:CloseConnection();
+	self:CloseConnection(reason);
 end
 
-function ConnectionBase:CloseConnection()
+function ConnectionBase:CloseConnection(reason)
 	if(self.nid) then
-		NPL.reject(self.nid);
+		NPL.reject({["nid"]=self.nid, ["reason"]=reason});
 		self.connectionClosed = true;
 	end
 end

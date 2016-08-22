@@ -18,20 +18,23 @@ OUTPUT:%(RelativeDir)%(Filename).fxo
 /** whether to enable debug view. lt:bloom textures, lr:bloom sum, lb:original, rb:final. */
 // #define SHOW_DEBUG_VIEW
 
+#include "CommonFunction.fx"
+
 float4x4 matView;
 float4x4 matViewInverse;
 float4x4 matProjection;
 float4x4 mShadowMapTex;
 float4x4 mShadowMapViewProj;
+float2	viewportOffset;
+float2	viewportScale;
 
 float3   g_FogColor;
 
 // x is shadow map size(such as 2048), y = 1/x
 float2  ShadowMapSize;
+// usually 40 meters
+float	ShadowRadius; 
 
-#define SHADOW_BIAS 0.0001
-/** define this to sample shadowmap 16 times to obtain soft shadow value. undefine to sample once*/
-#define ENABLE_SOFT_SHADOWS
 /** whether to desaturate and apply blue tint at dark night. */
 #define NIGHT_EYE_EFFECT
 
@@ -66,8 +69,6 @@ static const float3 offsets[16] = {
 	-float3(0.008, 0.0, 1.0), -float3(0.006, 0.0, 1.2), -float3(0.004, 0.0, 1.3), -float3(0.002, 0.0, 1.5),
 	-float3(0.0, 0.008, 1.0), -float3(0.0, 0.006, 1.2), -float3(0.0, 0.004, 1.3), -float3(0.0, 0.002, 1.5)
 };
-// this should match DEFAULT_SHADOW_RADIUS defined in sceneobject.cpp.
-static const float shadow_end = 40.0;
 
 texture sourceTexture0;
 sampler colorSampler:register(s0) = sampler_state
@@ -237,7 +238,7 @@ VSOutput CompositeQuadVS(float3 iPosition:POSITION,
 
 	// for reconstructing world position from depth value
 	float3 outCameraEye = float3(iPosition.x*TanHalfFOV*ViewAspect, iPosition.y*TanHalfFOV, 1);
-		o.CameraEye = outCameraEye;
+	o.CameraEye = outCameraEye;
 
 	return o;
 }
@@ -254,16 +255,16 @@ float3  GetAlbedoLinear(float2 texCoord)
 void DoNightEye(inout float3 color, float amount)
 {
 	float3 rodColor = float3(0.2, 0.5, 1.0); 	//Cyan color that humans percieve when viewing extremely low light levels via rod cells in the eye
-		float colorDesat = dot(color, float3(1, 1, 1)); 	//Desaturated color
+	float colorDesat = dot(color, float3(1, 1, 1)); 	//Desaturated color
 	color = lerp(color, rodColor*colorDesat, amount);
 }
 
 float2 convertCameraSpaceToScreenSpace(float3 cameraSpace)
 {
 	float4 clipSpace = mul(float4(cameraSpace, 1.0), matProjection);
-		float2 NDCSpace = clipSpace.xy / clipSpace.w;
-		float2 ScreenPos = 0.5 * NDCSpace + 0.5;
-		return float2(ScreenPos.x, 1 - ScreenPos.y);
+	float2 NDCSpace = clipSpace.xy / clipSpace.w;
+	float2 ScreenPos = 0.5 * NDCSpace + 0.5;
+	return float2(ScreenPos.x, 1 - ScreenPos.y) * viewportScale + viewportOffset;
 }
 
 
@@ -275,21 +276,21 @@ float4 	ComputeRayTraceReflection(float3 cameraSpacePosition, float3 cameraSpace
 	//int maxRefinements = 0;
 
 	float3 cameraSpaceViewDir = normalize(cameraSpacePosition);
-		float3 cameraSpaceVector = normalize(reflect(cameraSpaceViewDir, cameraSpaceNormal)) * initialStepAmount;
-		float3 oldPosition = cameraSpacePosition;
-		float3 cameraSpaceVectorPosition = oldPosition + cameraSpaceVector;
-		float2 currentPosition = convertCameraSpaceToScreenSpace(cameraSpaceVectorPosition);
-		float4 color = float4(0, 0, 0, 0);
-		float2 finalSamplePos = float2(0, 0);
-		float ray_length = initialStepAmount;
+	float3 cameraSpaceVector = normalize(reflect(cameraSpaceViewDir, cameraSpaceNormal)) * initialStepAmount;
+	float3 oldPosition = cameraSpacePosition;
+	float3 cameraSpaceVectorPosition = oldPosition + cameraSpaceVector;
+	float2 currentPosition = convertCameraSpaceToScreenSpace(cameraSpaceVectorPosition);
+	float4 color = float4(0, 0, 0, 0);
+	float2 finalSamplePos = float2(0, 0);
+	float ray_length = initialStepAmount;
 	int numSteps = 0;
 	int max_step = 12; // cameraFarPlane/initialStepAmount; 4 * (1.5^10) = 230
 	while (numSteps < max_step &&
 		(currentPosition.x > 0 && currentPosition.x < 1 &&
-		currentPosition.y > 0 && currentPosition.y < 1))
+			currentPosition.y > 0 && currentPosition.y < 1))
 	{
 		float2 samplePos = currentPosition.xy;
-			float sampleDepth = tex2Dlod(depthSampler, float4(samplePos, 0, 0)).r;
+		float sampleDepth = tex2Dlod(depthSampler, float4(samplePos, 0, 0)).r;
 
 		float currentDepth = cameraSpaceVectorPosition.z;
 		float diff = currentDepth - sampleDepth;
@@ -315,7 +316,7 @@ float4 	ComputeRayTraceReflection(float3 cameraSpacePosition, float3 cameraSpace
 	{
 		// compute point color
 		float2 texCoord = finalSamplePos.xy;
-			color.rgb = GetAlbedoLinear(texCoord);
+		color.rgb = GetAlbedoLinear(texCoord);
 		color.a = clamp(1 - pow(distance(float2(0.5, 0.5), finalSamplePos.xy)*2.0, 2.0), 0.0, 1.0);
 	}
 	return color;
@@ -364,57 +365,21 @@ float 	CalculateDirectLighting(in SurfaceStruct surface)
 // @return [0,1]: 1 is no shadow(fully visible), 0 is completely in shadow(dark, unvisible)
 float 	CalculateSunlightVisibility(inout SurfaceStruct surface, in ShadingStruct shading)
 {
-	if (RenderOptions.x < 0.99f || rainStrength >= 0.99f){
-		surface.shadow = 1.0;
+	if (RenderOptions.x < 0.99f || rainStrength >= 0.99f) {
+		// no shadow when raining
+		surface.shadow = 1.0; 
 		return 1.0f;
 	}
-	//return float(tex2D(ShadowMapSampler, surface.texCoord).r > 10);
-
+	
 	// only apply global sun shadows when there is enough sun light on the material
 	if (shading.direct > 0.0f)
 	{
-		float shading = 0.0;
-		float shadowMult = 0.0;
-
 		// reconstruct world space vector
 		float4 vWorldPosition = float4(surface.cameraSpacePos, 1);
-			vWorldPosition = mul(vWorldPosition, matViewInverse);
+		vWorldPosition = mul(vWorldPosition, matViewInverse);
 
-		float4 vPosShadowSpace = mul(vWorldPosition, mShadowMapViewProj);
-			float4 vShadowMapCoord = mul(vWorldPosition, mShadowMapTex);
-
-			// transform to texel space
-			float2 shadowTexCoord = vShadowMapCoord.xy / vShadowMapCoord.w;
-
-			if (surface.depth < shadow_end && vPosShadowSpace.z > 0 &&
-				//Avoid computing shadows past the shadow map projection
-				shadowTexCoord.x < 1.0f && shadowTexCoord.x > 0.0f && shadowTexCoord.y < 1.0f && shadowTexCoord.y > 0.0f &&
-				// avoid shadow if the center point is not completely in shadow
-				(vPosShadowSpace.z - tex2D(ShadowMapSampler, shadowTexCoord).r) >= SHADOW_BIAS)
-			{
-				// Calculate shadowMult to fade shadows out for the last few meters in the shadow_end
-				shadowMult = clamp((shadow_end - surface.depth) * 0.15f, 0.0f, 1.0f);
-#ifdef	ENABLE_SOFT_SHADOWS
-				float2 texelpos;
-				for (float i = -1.0f; i <= 1.0f; i += 1.0f) {
-					for (float j = -1.0f; j <= 1.0f; j += 1.0f) {
-						texelpos = shadowTexCoord + float2(i*ShadowMapSize.y, j*ShadowMapSize.y);
-						shading += float((vPosShadowSpace.z - tex2D(ShadowMapSampler, texelpos).r) < SHADOW_BIAS);
-					}
-				}
-				shading /= 9;
-#else
-				shading = 0;
-#endif
-			}
-			else
-			{
-				// not in shadow 
-				shading = 1.0;
-			}
-		shading = lerp(1.0f, shading, shadowMult); // fade out shadow
-		surface.shadow = shading;
-		return shading;
+		surface.shadow = calculateShadowFactor(ShadowMapSampler, vWorldPosition, surface.depth, mShadowMapTex, mShadowMapViewProj, ShadowMapSize.x, ShadowMapSize.y, ShadowRadius);
+		return surface.shadow;
 	}
 	else
 	{
@@ -447,7 +412,7 @@ float 	GetLightmapSky(float skylight) {
 //Function that retrieves the screen space surface normals. Used for lighting calculations
 float4  GetNormal(float2 texCoord) {
 	float4 norm = tex2D(normalSampler, texCoord);
-		return float4(norm.rgb * 2.0 - 1.0, norm.w);
+	return float4(norm.rgb * 2.0 - 1.0, norm.w);
 }
 
 /* linear depth in camera space. [0, cameraFarPlane] */
@@ -487,8 +452,8 @@ void 	CalculateMasks(inout SurfaceStruct surface)
 bool CalculateSunspot(inout SurfaceStruct surface)
 {
 	float3 npos = normalize(surface.CameraEye);
-		float3 halfVector2 = normalize(-mul(sunDirection, (float3x3)matView).xyz + npos);
-		float sunProximity = 1.0f - dot(halfVector2, npos);
+	float3 halfVector2 = normalize(-mul(sunDirection, (float3x3)matView).xyz + npos);
+	float sunProximity = 1.0f - dot(halfVector2, npos);
 	surface.sky.sunProximity = sunProximity;
 	return (sunProximity > 0.96f);
 }
@@ -503,7 +468,7 @@ void AddSunglow(inout SurfaceStruct surface)
 void CalculateAtmosphericScattering(inout float3 color, in SurfaceStruct surface)
 {
 	float3 fogColor = g_FogColor.rgb;
-		float fogFactor = pow(surface.depth / 1500.0f, 2.0f);
+	float fogFactor = pow(surface.depth / 1500.0f, 2.0f);
 	// only paint on non-sky area
 	fogFactor *= lerp(1.0f, 0.0f, float(surface.mask_sky));
 	//add scattered low frequency light
@@ -515,7 +480,7 @@ void CalculateAtmosphericScattering(inout float3 color, in SurfaceStruct surface
 void ApplyDistanceFog(inout float3 color, in SurfaceStruct surface)
 {
 	float3 fogColor = g_FogColor.rgb;
-		float fogFactor = clamp((surface.depth - FogStart) / (cameraFarPlane - 16) * 6.0, 0.0, 1.0);
+	float fogFactor = clamp((surface.depth - FogStart) / (cameraFarPlane - 16) * 6.0, 0.0, 1.0);
 	// only paint on non-sky area
 	fogFactor *= lerp(1.0f, 0.0f, float(surface.mask_sky));
 	color = lerp(color, fogColor, fogFactor);
@@ -538,7 +503,7 @@ PSOut CompositePS0(VSOutput input)
 	surface.cameraSpacePos = input.CameraEye * surface.depth;
 	// r:category id,  g: sun light value, b: torch light value
 	float4 block_info = tex2D(matInfoSampler, texCoord);
-		surface.category_id = (int)(block_info.r * 255.0 + 0.4);
+	surface.category_id = (int)(block_info.r * 255.0 + 0.4);
 	float sun_light_strength = block_info.g;
 	float torch_light_strength = block_info.b;
 
@@ -581,7 +546,7 @@ PSOut CompositePS0(VSOutput input)
 	// lightmap.nolight = float3(0.05f, 0.05f, 0.05f);
 	// also give torch light some fake shading to make custom model look more dimentional at night. 
 	float fakeTorchShading = 1.0;
-	if (surface.category_id == 255){
+	if (surface.category_id == 255) {
 		fakeTorchShading = (directSunShading * 0.6 + 0.4);
 		lightmap.skylight *= fakeTorchShading;
 	}
@@ -607,7 +572,7 @@ PSOut CompositePS0(VSOutput input)
 	float3 finalComposite;
 	finalComposite = final.sunlight	    * 1.0f					//Add direct sunlight
 		+ final.skylight     * 0.05f					//Add ambient skylight
-		// + final.nolight	    * 0.03f					//Add base ambient light
+														// + final.nolight	    * 0.03f					//Add base ambient light
 		+ final.torchlight   * 2.0					//Add light coming from emissive blocks
 		+ final.glow_torch   * 3.0f					// add torch, lamp, lava glow
 		;
@@ -644,7 +609,7 @@ void CalculateSpecularReflections(inout SurfaceStruct2 surface)
 	surface.mask_sky = surface.depth < 0.01;
 	surface.mask_water = (category_id == 8 || category_id == 9);
 	surface.mask_metal = (category_id == 50);
-	
+
 	if (surface.mask_water || surface.mask_metal)
 	{
 		// water is 1 (full), metal is has a week reflective color. 
@@ -675,9 +640,9 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 
 		const float fresnelPower = 6.0;
 		float fresnel = pow(saturate(1.0 - dot(cameraSpaceViewDir, cameraSpaceNormal)), fresnelPower) * 0.98 + 0.02;
-		float spec = pow(HdotN, gloss*5000 + 10.0);
+		float spec = pow(HdotN, gloss * 5000 + 10.0);
 		spec *= fresnel;
-		spec *= gloss*600 + 0.02; // 0.02 is base specular for all blocks.
+		spec *= gloss * 600 + 0.02; // 0.02 is base specular for all blocks.
 		spec *= surface.sunlightVisibility;
 		spec *= 1.0 - rainStrength;
 		float3 specularHighlight = spec * SunColor;
@@ -696,27 +661,27 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 float4 CompositePS1(VSOutput input) :COLOR
 {
 	SurfaceStruct2 surface = (SurfaceStruct2)0;
-	float2 texCoord = input.texCoord;
-	surface.texCoord = texCoord;
-	surface.color = GetAlbedoLinear(texCoord);
-	surface.sunlightVisibility = GetSunlightVisibility(texCoord);
-	// get world space normal
-	float4 normal_ = GetNormal(texCoord);
-	surface.normal = normal_.xyz;
-	surface.specularity = 1.0 - normal_.w;
-	surface.depth = GetDepth(texCoord);
-	surface.CameraEye = input.CameraEye;
-	surface.cameraSpacePos = input.CameraEye * surface.depth;
-	// r:category id,  g: sun light value, b: torch light value
-	float4 block_info = tex2D(matInfoSampler, texCoord);
-	surface.category_id = (int)(block_info.r * 255.0 + 0.4);
-	// float sun_light_strength = block_info.g;
-	surface.torch_light_strength = block_info.b;
+float2 texCoord = input.texCoord;
+surface.texCoord = texCoord;
+surface.color = GetAlbedoLinear(texCoord);
+surface.sunlightVisibility = GetSunlightVisibility(texCoord);
+// get world space normal
+float4 normal_ = GetNormal(texCoord);
+surface.normal = normal_.xyz;
+surface.specularity = 1.0 - normal_.w;
+surface.depth = GetDepth(texCoord);
+surface.CameraEye = input.CameraEye;
+surface.cameraSpacePos = input.CameraEye * surface.depth;
+// r:category id,  g: sun light value, b: torch light value
+float4 block_info = tex2D(matInfoSampler, texCoord);
+surface.category_id = (int)(block_info.r * 255.0 + 0.4);
+// float sun_light_strength = block_info.g;
+surface.torch_light_strength = block_info.b;
 
-	CalculateSpecularReflections(surface);
-	CalculateSpecularHighlight(surface);
+CalculateSpecularReflections(surface);
+CalculateSpecularHighlight(surface);
 
-	return float4(surface.color.rgb, 1.0);
+return float4(surface.color.rgb, 1.0);
 }
 
 // calculate bloom at given level of detail and write it to a given offset position
@@ -732,7 +697,7 @@ float3 CalculateBloom(float2 texcoord, int LOD, float2 offset)
 		&&  texcoord.y - offset.y + padding > 0.0f) {
 
 		float3 bloom = float1(0.0f).xxx;
-			float allWeights = 0.0f;
+		float allWeights = 0.0f;
 		const float3 glowThreshold = float3(1.0, 1.0, 1.0);
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 6; j++) {
@@ -740,11 +705,11 @@ float3 CalculateBloom(float2 texcoord, int LOD, float2 offset)
 				weight = 1.0f - cos(weight * 3.1416f / 2.0f);
 				weight = pow(weight, 2.0f);
 				float2 coord = float2(i - 2.5, j - 2.5);
-					coord /= screenParam;
+				coord /= screenParam;
 
 				float2 finalCoord = (texcoord.xy + coord.xy - offset.xy) * scale;
-					// glow threshold is set to 
-					bloom += max(float3(0, 0, 0), tex2D(colorSampler, finalCoord).rgb - glowThreshold) * weight;
+				// glow threshold is set to 
+				bloom += max(float3(0, 0, 0), tex2D(colorSampler, finalCoord).rgb - glowThreshold) * weight;
 				allWeights += weight;
 			}
 		}
@@ -783,8 +748,8 @@ float4 GlowDownsizePS(VSOutput input) :COLOR
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			float2 coord = float2(i, j) * texStep;
-				float2 finalCoord = (texcoord.xy + coord.xy);
-				bloom += tex2D(colorSampler, finalCoord).rgb;
+			float2 finalCoord = (texcoord.xy + coord.xy);
+			bloom += tex2D(colorSampler, finalCoord).rgb;
 		}
 	}
 	return float4(bloom.rgb / 16.0, 1.0f);
@@ -818,7 +783,7 @@ float3 	GetColorTexture(float2 coord)
 float3 DepthOfField(float2 pos)
 {
 	float cursorDepth = centerDepthSmooth;
-	if (cursorDepth == 0.0){
+	if (cursorDepth == 0.0) {
 		// just in case it is first person view. 
 		cursorDepth = tex2D(depthSampler, float2(0.5, 0.5)).x;
 	}
@@ -827,15 +792,15 @@ float3 DepthOfField(float2 pos)
 
 	float2 aspectcorrect = float2(1.0, ViewAspect) * 1.5;
 
-		float depth = tex2D(depthSampler, pos).x;
+	float depth = tex2D(depthSampler, pos).x;
 	// depth += float(isHand) * 0.36f;
 
 	float factor = (depth - cursorDepth) / cameraFarPlane;
 
 	float2 dofblur = clamp(factor * DepthOfViewFactor, -blurclamp, blurclamp).xx;
 
-		float3 col = float3(0.0, 0.0, 0.0);
-		col += GetColorTexture(pos);
+	float3 col = float3(0.0, 0.0, 0.0);
+	col += GetColorTexture(pos);
 
 	col += GetColorTexture(pos + (float2(0.0, 0.4)*aspectcorrect) * dofblur);
 	col += GetColorTexture(pos + (float2(0.15, 0.37)*aspectcorrect) * dofblur);
@@ -882,7 +847,7 @@ float3 DepthOfField(float2 pos)
 	col += GetColorTexture(pos + (float2(0.0, 0.4)*aspectcorrect) * dofblur*0.4);
 
 	float3 color = col / 41;
-		return color;
+	return color;
 }
 
 struct BloomDataStruct
@@ -911,7 +876,7 @@ void GetBloom(float2 texcoord, inout BloomDataStruct bloomData) {
 	};
 
 	float2 recipres = float2(1.0, 1.0) / screenParam;
-		texcoord -= recipres;
+	texcoord -= recipres;
 
 	bloomData.blur0 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 2.0f)) + float2(0.0f, 0.0f) + float2(0.000f, 0.000f)).rgb;
 	bloomData.blur1 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 3.0f)) + float2(0.0f, 0.25f) + float2(0.000f, 0.025f)).rgb;
@@ -975,7 +940,7 @@ float3 TonemapReinhard_Good(float3 color)
 	const float averageLuminance = 0.00003f;
 	const float contrast = 0.9f;
 	float3 value = pow(color.rgb, contrast);
-		value = value / (value + EyeBrightness.xxx);
+	value = value / (value + EyeBrightness.xxx);
 	color.rgb = value;
 	return color;
 }
@@ -1021,6 +986,28 @@ float4 FinalPS(VSOutput input) :COLOR
 	color.rgb = pow(color.rgb, (1.0f / 2.2f));
 
 	return float4(color, 1.0f);
+}
+
+float4 CompositeFXAA(VSOutput input) :COLOR
+{
+	return FxaaPixelShader(
+	input.texCoord,							// FxaaFloat2 pos,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsolePosPos,
+		colorSampler,							// FxaaTex tex,
+		colorSampler,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
+		colorSampler,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
+		1.0 / screenParam,							// FxaaFloat2 fxaaQualityRcpFrame,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,
+		0.75f,									// FxaaFloat fxaaQualitySubpix,
+		0.166f,									// FxaaFloat fxaaQualityEdgeThreshold,
+		0.0833f,								// FxaaFloat fxaaQualityEdgeThresholdMin,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeSharpness,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeThreshold,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeThresholdMin,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f)		// FxaaFloat fxaaConsole360ConstDir,
+		);
 }
 
 technique Default_Normal
@@ -1069,5 +1056,15 @@ technique Default_Normal
 		FogEnable = False;
 		VertexShader = compile vs_3_0 FinalQuadVS();
 		PixelShader = compile ps_3_0 GlowDownsizePS();
+	}
+	pass P5
+	{
+		cullmode = none;
+		ZEnable = false;
+		ZWriteEnable = false;
+		FogEnable = False;
+		AlphaBlendEnable = false;
+		VertexShader = compile vs_3_0 CompositeQuadVS();
+		PixelShader = compile ps_3_0 CompositeFXAA();
 	}
 }

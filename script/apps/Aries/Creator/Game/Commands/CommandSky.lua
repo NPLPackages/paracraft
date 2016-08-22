@@ -19,7 +19,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["sky"] = {
 	name="sky", 
-	quick_ref="/sky [-tex filename] [-add filename] [-clear] [-none] [-sim] [-sun sun_size sun_glow] [-moon moon_size moon_glow] [-cloud thickness]  [sim|white|green|filename]", 
+	quick_ref="/sky [-tex filename] [-add filename] [-clear] [-none] [-sim] [-sun sun_size sun_glow] [-moon moon_size moon_glow] [-cloud thickness]  [sim|white|black|green|filename]", 
 	desc=[[change sky model or its textures
 -- changing to simulated sky
 /sky sim
@@ -97,13 +97,16 @@ Commands["sky"] = {
 
 		if(filename == "sim") then
 			GameLogic.GetSkyEntity():UseSimulatedSky();
-		elseif(filename == "sim") then
+		elseif(filename == "none") then
 			GameLogic.GetSkyEntity():UseNoneSky();
-		elseif(filename == "white" or filename=="green") then
+		elseif(filename == "white" or filename=="green" or filename=="black") then
 			GameLogic.GetSkyEntity():UseSkybox("");
 			if(filename == "green") then
 				CommandManager:Run("/fog -skycolor 0 1 0");
 				CommandManager:Run("/fog -color 0 1 0");
+			elseif(filename == "black") then
+				CommandManager:Run("/fog -skycolor 0 0 0");
+				CommandManager:Run("/fog -color 0 0 0");
 			else
 				CommandManager:Run("/fog -skycolor 1 1 1");
 				CommandManager:Run("/fog -color 1 1 1");

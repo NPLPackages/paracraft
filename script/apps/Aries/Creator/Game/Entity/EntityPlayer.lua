@@ -492,28 +492,30 @@ function Entity:FrameMoveRidding(deltaTime)
 			local x, y, z = self:GetPosition();
 			local deltaY = preY - y;
 			local obj = self:GetInnerObject();
-			if(deltaY > 2) then
-				-- unmount if jumps up too high
-				if(GameLogic.isRemote) then
-					self:AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, nil));
-				else
-					self:MountEntity(nil);
-					local bx, by, bz = self:GetBlockPos();
-					self:PushOutOfBlocks(bx, by, bz);
-				end
-			elseif(deltaY > 0) then
-				if(obj:GetField("VerticalSpeed", 0) ~= 0) then
-					-- allow jumping using C++ biped. 
-					self:SetPosition(x, preY, z);
+			if(obj) then
+				if(deltaY > 2) then
+					-- unmount if jumps up too high
+					if(GameLogic.isRemote) then
+						self:AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, nil));
+					else
+						self:MountEntity(nil);
+						local bx, by, bz = self:GetBlockPos();
+						self:PushOutOfBlocks(bx, by, bz);
+					end
+				elseif(deltaY > 0) then
+					if(obj:GetField("VerticalSpeed", 0) ~= 0) then
+						-- allow jumping using C++ biped. 
+						self:SetPosition(x, preY, z);
+					else
+						obj:SetField("VerticalSpeed", 0);
+						obj:ToCharacter():Stop();
+						-- obj:ToCharacter():PlayAnimation(0);
+					end
 				else
 					obj:SetField("VerticalSpeed", 0);
 					obj:ToCharacter():Stop();
 					-- obj:ToCharacter():PlayAnimation(0);
 				end
-			else
-				obj:SetField("VerticalSpeed", 0);
-				obj:ToCharacter():Stop();
-				-- obj:ToCharacter():PlayAnimation(0);
 			end
 		end
     end

@@ -97,11 +97,13 @@ function Entity:CreateInnerObject(...)
 end
 
 function Entity:MountEntity(targetEntity)
-	Entity._super.MountEntity(self, targetEntity);
-	if(self.playerNetServerHandler) then
-		self.playerNetServerHandler:SendPacketToPlayer(Packets.PacketAttachEntity:new():Init(0, self, self.ridingEntity));
-		self.playerNetServerHandler:SetPlayerLocation(self.x, self.y, self.z, self.facing, self.rotationPitch);
+	if(targetEntity) then
+		-- unmount last rider if any. 
+		if(targetEntity.riddenByEntity and targetEntity.riddenByEntity~=self) then
+			targetEntity.riddenByEntity:MountEntity(nil);
+		end
 	end
+	Entity._super.MountEntity(self, targetEntity);
 end
 
 -- make player always sentient

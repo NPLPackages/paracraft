@@ -13,17 +13,22 @@ OUTPUT:%(RelativeDir)%(Filename).fxo
 /** only for debugging purposes*/
 // #define DEBUG_MODE_SHOW_DEPTH
 
+#include "CommonFunction.fx"
+
 float4x4 matView;
 float4x4 matViewInverse;
 float4x4 matProjection;
 float4x4 mShadowMapTex;
 float4x4 mShadowMapViewProj;
+float2	viewportOffset;
+float2	viewportScale;
 
 float3  g_FogColor;
 float2	g_shadowFactor = float2(0.35,0.65);
-float	g_fShadowRadius = 40;
 // x is shadow map size(such as 2048), y = 1/x
 float2  ShadowMapSize;
+// usually 40 meters
+float	ShadowRadius;
 
 #define SHADOW_BIAS 0.0001
 /** define this to sample shadowmap 16 times to obtain soft shadow value. undefine to sample once*/
@@ -184,7 +189,7 @@ float2 convertCameraSpaceToScreenSpace(float3 cameraSpace)
 	float4 clipSpace = mul(float4(cameraSpace, 1.0), matProjection);
 	float2 NDCSpace = clipSpace.xy / clipSpace.w;
 	float2 ScreenPos = 0.5 * NDCSpace + 0.5;
-	return float2(ScreenPos.x, 1-ScreenPos.y);
+	return float2(ScreenPos.x, 1-ScreenPos.y) * viewportScale + viewportOffset;
 }
 
 
@@ -317,50 +322,7 @@ float ComputeSunShading(float directSunLight, float sun_light_strength, float4 v
 	{
 		if(directSunLight > 0)
 		{
-			float4 vPosShadowSpace = mul(vWorldPosition, mShadowMapViewProj);
-			
-			float4 vShadowMapCoord = mul(vWorldPosition, mShadowMapTex);
-				
-			#ifdef	MULTI_SAMPLE_SHADOWMAP
-				// transform to texel space
-				float shadowTestDepth = vPosShadowSpace.z - SHADOW_BIAS;
-				float2 shadowTexCoord = vShadowMapCoord.xy / vShadowMapCoord.w;
-				float2 texelpos = ShadowMapSize.x * shadowTexCoord;
-			    
-				// Determine the lerp amounts           
-				float shadow_depth_value = tex2Dproj(ShadowMapSampler, vShadowMapCoord).r;
-				float shadowCoverage = vPosShadowSpace.z - shadow_depth_value;
-
-				if(shadowCoverage >= SHADOW_BIAS)
-				{
-					float shading = 0;
-					for (float i = -1.5f; i <= 1.5f; i += 1.0f) {
-						for (float j = -1.5f; j <= 1.5f; j += 1.0f) {
-							texelpos = shadowTexCoord + float2(i*ShadowMapSize.y, j*ShadowMapSize.y);
-							shading += clamp( (vPosShadowSpace.z - tex2D( ShadowMapSampler, texelpos ).r)*256, 0, 1);
-						}
-					}
-					shading /= 16;
-					shadow  = 1 - shading;
-				}
-				else
-				{
-					// not in shadow 
-					shadow = 1;
-				}
-			#else
-				float shadowTestDepth = vPosShadowSpace.z - SHADOW_BIAS;
-				float shadow_depth_value = tex2Dproj(ShadowMapSampler, vShadowMapCoord).r;
-				shadow = shadow_depth_value >= shadowTestDepth;
-			#endif
-
-			if(shadow < 1)
-			{
-				// shadow blending factor, so that the near camera shadow is darker
-				// (z-shadow_fade_start)/sow_fade_range, so that the shadow end is shadow_fade_start+shadow_fade_range, this should match DEFAULT_SHADOW_RADIUS defined in sceneobject.cpp.
-				float shadow_darkness = saturate((depth - 25)/15); 
-				shadow = lerp(shadow, 1, shadow_darkness);
-			}
+			shadow = calculateShadowFactor(ShadowMapSampler, vWorldPosition, depth, mShadowMapTex, mShadowMapViewProj, ShadowMapSize.x, ShadowMapSize.y, ShadowRadius);
 			// this final step is important to obtain the final sun's shading
 			shadow = directSunLight * shadow;
 		}
@@ -507,7 +469,7 @@ float4 CompositeLitePS(VSOutput input):COLOR
 
 		// 1 is no shadow, 0 is full shadow(dark)
 		float shadow = ComputeSunShading(directSunLight, sun_light_strength, vWorldPosition, depth);
-		
+
 		// other blocks
 		float3 sun_light = color.xyz * SunColor.rgb * sun_light_strength;
 
@@ -522,6 +484,28 @@ float4 CompositeLitePS(VSOutput input):COLOR
 			color.xyz = lerp(color.xyz, g_FogColor.xyz, 1.0 - clamp((FogEnd - eyeDist) / (FogEnd - FogStart), 0.0, 1.0));
 	}
 	return color;
+}
+
+float4 CompositeFXAA(VSOutput input) :COLOR
+{
+	return FxaaPixelShader(
+		input.texCoord,							// FxaaFloat2 pos,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsolePosPos,
+		colorSampler,							// FxaaTex tex,
+		colorSampler,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
+		colorSampler,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
+		1.0 / screenParam,							// FxaaFloat2 fxaaQualityRcpFrame,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,
+		0.75f,									// FxaaFloat fxaaQualitySubpix,
+		0.166f,									// FxaaFloat fxaaQualityEdgeThreshold,
+		0.0833f,								// FxaaFloat fxaaQualityEdgeThresholdMin,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeSharpness,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeThreshold,
+		0.0f,									// FxaaFloat fxaaConsoleEdgeThresholdMin,
+		FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f)		// FxaaFloat fxaaConsole360ConstDir,
+		);
 }
 
 technique Default_Normal
@@ -539,6 +523,16 @@ technique Default_Normal
         PixelShader = compile ps_3_0 Composite1PS();
 #endif
     }
+	pass P1
+	{
+		cullmode = none;
+		ZEnable = false;
+		ZWriteEnable = false;
+		FogEnable = False;
+		AlphaBlendEnable = false;
+		VertexShader = compile vs_3_0 CompositeQuadVS();
+		PixelShader = compile ps_3_0 CompositeFXAA();
+	}
 }
 
 technique Default_Lite

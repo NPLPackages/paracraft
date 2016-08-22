@@ -554,7 +554,10 @@ end
 
 function NetClientHandler:handleAttachEntity(packet_AttachEntity)
 	local fromEntity = self:GetEntityByID(packet_AttachEntity.entityId);
-	local toEntity = self:GetEntityByID(packet_AttachEntity.vehicleEntityId);
+	local toEntity;
+	if(packet_AttachEntity.vehicleEntityId and packet_AttachEntity.vehicleEntityId>=0) then
+		toEntity = self:GetEntityByID(packet_AttachEntity.vehicleEntityId);
+	end
 	if(fromEntity) then
 		fromEntity:MountEntity(toEntity);
 	end

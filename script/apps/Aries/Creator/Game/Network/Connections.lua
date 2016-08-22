@@ -48,18 +48,20 @@ end
 function Connections.OnNetworkEvent()
 	local msg = msg;
 	local code = msg.code;
+	local msg_msg = msg.msg;
 	if(code == NPLReturnCode.NPL_ConnectionDisconnected) then
-		Connections:OnConnectionLost(msg.nid or msg.tid);
-	end	
+		Connections:OnConnectionLost(msg.nid or msg.tid, msg_msg);
+	end
 end
 
 -- connection lost
-function Connections:OnConnectionLost(nid)
+function Connections:OnConnectionLost(nid, msg)
 	-- LOG.std(nil, "info", "Connections", "nid %s disconnected", tostring(nid));
 	local connection = Connections:GetConnection(nid);
 	if(connection) then
 		connection:OnConnectionLost();
 		-- inform the netServerHandler about it.
-		connection:OnError("OnConnectionLost");
+		local reason = msg or "unknown";
+		connection:OnError("OnConnectionLost with reason = "..reason);
 	end
 end

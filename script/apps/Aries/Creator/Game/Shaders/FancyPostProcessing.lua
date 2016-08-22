@@ -19,6 +19,10 @@ FancyV1:Property({"BloomEffect", false, "HasBloomEffect", "EnableBloomEffect", a
 FancyV1:Property({"DepthOfViewEffect", false, "HasDepthOfViewEffect", "EnableDepthOfViewEffect", auto=true});
 FancyV1:Property({"DepthOfViewFactor", 0.01, "GetDepthOfViewFactor", "SetDepthOfViewFactor", auto=true});
 FancyV1:Property({"EyeBrightness", 0.5, auto=true, desc="(0-1), used for HDR tone mapping"});
+FancyV1:Property({"BloomScale", 1.1, "GetBloomScale", "SetBloomScale", auto=true});
+FancyV1:Property({"BloomCount", 2, "GetBloomCount", "SetBloomCount", auto=true});
+FancyV1:Property({"AOFactor", 0.8, "GetAOFactor", "SetAOFactor", auto=true});
+FancyV1:Property({"AOWidth", 0.2, "GetAOWidth", "SetAOWidth", auto=true});
 
 FancyV1.BlockRenderMethod = {
 	FixedFunction = 0,
@@ -26,7 +30,34 @@ FancyV1.BlockRenderMethod = {
 	Fancy = 2,
 }
 
+local lTimeParameters;
+local function _loadFromFile(filePath)
+  local time_parameters=nil;
+  local xml_root = ParaXML.LuaXML_ParseFile(filePath);
+  if xml_root then
+    time_parameters={};
+    for time_node in commonlib.XPath.eachNode(xml_root,"/parameters/time") do
+      local node=commonlib.XPath.selectNode(time_node,"/lighting");
+      time_parameters[#time_parameters+1]={};
+      time_parameters[#time_parameters].time=tonumber(time_node.attr.value);
+      time_parameters[#time_parameters].ambient={tonumber(node.attr.ambientr),tonumber(node.attr.ambientg),tonumber(node.attr.ambientb)};
+      time_parameters[#time_parameters].sundiffuse={tonumber(node.attr.sundiffuser),tonumber(node.attr.sundiffuseg),tonumber(node.attr.sundiffuseb)};
+      time_parameters[#time_parameters].sunintensity=tonumber(node.attr.sunintensity);
+      time_parameters[#time_parameters].shadowradius=tonumber(node.attr.shadowradius);
+      node=commonlib.XPath.selectNode(time_node,"/bloom");
+      time_parameters[#time_parameters].bloomscale=tonumber(node.attr.bloomscale);
+      time_parameters[#time_parameters].bloomcount=tonumber(node.attr.bloomcount);
+      node=commonlib.XPath.selectNode(time_node,"/ao");
+      time_parameters[#time_parameters].aofactor=tonumber(node.attr.aofactor);
+      time_parameters[#time_parameters].aowidth=tonumber(node.attr.aowidth);
+    end
+  end
+  return time_parameters;
+end
+
 function FancyV1:ctor()
+	lTimeParameters=_loadFromFile("config/Fancy.xml");
+	self.mTimeParameters=lTimeParameters;
 end
 
 -- return true if succeed. 
@@ -38,6 +69,7 @@ function FancyV1:SetEnabled(bEnable)
 			ParaTerrain.GetBlockAttributeObject():SetField("PostProcessingAlphaScript", "MyCompany.Aries.Game.Shaders.FancyV1.OnRender(1)")
 			ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", true);
 			ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", true);
+			-- ParaScene.GetAttributeObject():SetField("ShadowMapSize", {4096,4096});
 			self:SetBlockRenderMethod(self.BlockRenderMethod.Fancy);
 			return true;
 		elseif(reason == "AA_IS_ON") then
@@ -110,10 +142,10 @@ end
 
 -- @param nPass: 0 for opache pass, 1 for alpha blended pass. 
 function FancyV1:OnRenderLite(ps_scene, nPass)
-	if(nPass and nPass >= 1) then
-		-- no need to alpha pass.
-		return;
-	end
+	--if(nPass and nPass >= 1) then
+		---- no need to alpha pass.
+		--return;
+	--end
 
 	local effect = ParaAsset.LoadEffectFile("compositeLite","script/apps/Aries/Creator/Game/Shaders/compositeLite.fxo");
 	effect = ParaAsset.GetEffectFile("compositeLite");
@@ -121,71 +153,92 @@ function FancyV1:OnRenderLite(ps_scene, nPass)
 	if(effect:Begin()) then
 		-- 0 stands for S0_POS_TEX0,  all data in stream 0: position and tex0
 		ParaEngine.SetVertexDeclaration(0); 
-
-		-- save the current render target
-		local old_rt = ParaEngine.GetRenderTarget();
-			
-		-- create/get a temp render target: "_ColorRT" is an internal name 
-		local _ColorRT = ParaAsset.LoadTexture("_ColorRT", "_ColorRT", 0); 
-			
-		----------------------- down sample pass ----------------
-		-- copy content from one surface to another
-		ParaEngine.StretchRect(old_rt, _ColorRT);
-			
-		local attr = ParaTerrain.GetBlockAttributeObject();
 		local params = effect:GetParamBlock();
-		self:ComputeShaderUniforms();
-		params:SetParam("mShadowMapTex", "mat4ShadowMapTex");
-		params:SetParam("mShadowMapViewProj", "mat4ShadowMapViewProj");
-		params:SetParam("ShadowMapSize", "vec2ShadowMapSize");
-		
-		params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
-		params:SetParam("screenParam", "vec2ScreenSize");
+		if(nPass == 0) then
+			-- save the current render target
+			local old_rt = ParaEngine.GetRenderTarget();
 			
-		params:SetParam("matView", "mat4View");
-		params:SetParam("matViewInverse", "mat4ViewInverse");
-		params:SetParam("matProjection", "mat4Projection");
+			-- create/get a temp render target: "_ColorRT" is an internal name 
+			local _ColorRT = ParaAsset.LoadTexture("_ColorRT", "_ColorRT", 0); 
+			
+			----------------------- down sample pass ----------------
+			-- copy content from one surface to another
+			ParaEngine.StretchRect(old_rt, _ColorRT);
+			
+			local attr = ParaTerrain.GetBlockAttributeObject();
+			self:ComputeShaderUniforms();
+			params:SetParam("mShadowMapTex", "mat4ShadowMapTex");
+			params:SetParam("mShadowMapViewProj", "mat4ShadowMapViewProj");
+			params:SetParam("ShadowMapSize", "vec2ShadowMapSize");
+			params:SetParam("ShadowRadius", "floatShadowRadius");
 		
-		params:SetParam("g_FogColor", "vec3FogColor");
-		params:SetParam("ViewAspect", "floatViewAspect");
-		params:SetParam("TanHalfFOV", "floatTanHalfFOV");
-		params:SetParam("cameraFarPlane", "floatCameraFarPlane");
-		params:SetFloat("FogStart", GameLogic.options:GetFogStart());
-		params:SetFloat("FogEnd", GameLogic.options:GetFogEnd());
+			params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
+			params:SetParam("screenParam", "vec2ScreenSize");
+			params:SetParam("viewportOffset", "vec2ViewportOffset");
+			params:SetParam("viewportScale", "vec2ViewportScale");
+			
+			params:SetParam("matView", "mat4View");
+			params:SetParam("matViewInverse", "mat4ViewInverse");
+			params:SetParam("matProjection", "mat4Projection");
+		
+			params:SetParam("g_FogColor", "vec3FogColor");
+			params:SetParam("ViewAspect", "floatViewAspect");
+			params:SetParam("TanHalfFOV", "floatTanHalfFOV");
+			params:SetParam("cameraFarPlane", "floatCameraFarPlane");
+			params:SetFloat("FogStart", GameLogic.options:GetFogStart());
+			params:SetFloat("FogEnd", GameLogic.options:GetFogEnd());
 
-		params:SetFloat("timeMidnight", timeMidnight);
-		local sunIntensity = attr:GetField("SunIntensity", 1);
-		params:SetFloat("sunIntensity", sunIntensity);
+			params:SetFloat("timeMidnight", timeMidnight);
+			local sunIntensity = attr:GetField("SunIntensity", 1);
+			params:SetFloat("sunIntensity", sunIntensity);
 		
-		params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
-		params:SetParam("cameraPosition", "vec3cameraPosition");
-		params:SetParam("sunDirection", "vec3SunDirection");
-		params:SetVector3("RenderOptions", 
-			if_else(attr:GetField("UseSunlightShadowMap", false),1,0), 
-			if_else(attr:GetField("UseWaterReflection", false),1,0),
-			0);
-		params:SetParam("TorchLightColor", "vec3BlockLightColor");
-		params:SetParam("SunColor", "vec3SunColor");
+			params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
+			params:SetParam("cameraPosition", "vec3cameraPosition");
+			params:SetParam("sunDirection", "vec3SunDirection");
+			params:SetParam("sunAmbient", "vec3SunAmbient");
+
+			params:SetVector3("RenderOptions", 
+				if_else(attr:GetField("UseSunlightShadowMap", false),1,0), 
+				if_else(attr:GetField("UseWaterReflection", false),1,0),
+				0);
+			params:SetParam("TorchLightColor", "vec3BlockLightColor");
+			params:SetParam("SunColor", "vec3SunColor");
 								
-		-----------------------compose lum texture with original texture --------------
-		ParaEngine.SetRenderTarget(old_rt);
+			-----------------------compose lum texture with original texture --------------
+			ParaEngine.SetRenderTarget(old_rt);
 		
-		effect:BeginPass(0);
-			-- color render target. 
-			params:SetTextureObj(0, _ColorRT);
-			-- entity and lighting texture
-			params:SetTextureObj(1, ParaAsset.LoadTexture("_BlockInfoRT", "_BlockInfoRT", 0));
-			-- shadow map
-			params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture_R32F", "_SMColorTexture_R32F", 0));
-			-- depth texture 
-			params:SetTextureObj(3, ParaAsset.LoadTexture("_DepthTexRT_R32F", "_DepthTexRT_R32F", 0));
-			-- normal texture 
-			params:SetTextureObj(4, ParaAsset.LoadTexture("_NormalRT", "_NormalRT", 0));
+			if(effect:BeginPass(0)) then
+				-- color render target. 
+				params:SetTextureObj(0, _ColorRT);
+				-- entity and lighting texture
+				params:SetTextureObj(1, ParaAsset.LoadTexture("_BlockInfoRT", "_BlockInfoRT", 0));
+				-- shadow map
+				params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture_R32F", "_SMColorTexture_R32F", 0));
+				-- depth texture 
+				params:SetTextureObj(3, ParaAsset.LoadTexture("_DepthTexRT_R32F", "_DepthTexRT_R32F", 0));
+				-- normal texture 
+				params:SetTextureObj(4, ParaAsset.LoadTexture("_NormalRT", "_NormalRT", 0));
 
-			effect:CommitChanges();
-			ParaEngine.DrawQuad();
-		effect:EndPass();
-		
+				effect:CommitChanges();
+				ParaEngine.DrawQuad();
+				effect:EndPass();
+			end
+		elseif(nPass == 1) then
+			params:SetParam("screenParam", "vec2ScreenSize");
+			
+			-- create/get a temp render target: "_ColorRT" is an internal name 
+			local _ColorRT = ParaAsset.LoadTexture("_ColorRT", "_ColorRT", 0); 
+
+			--FXAA: Fast Approximate Anti-Aliasing (FXAA) is an anti-aliasing algorithm created by Timothy Lottes under NVIDIA
+			ParaEngine.StretchRect(ParaEngine.GetRenderTarget(), _ColorRT);
+			if(effect:BeginPass(1)) then
+				-- color render target. 
+				params:SetTextureObj(0, _ColorRT);
+				effect:CommitChanges();
+				ParaEngine.DrawQuad();
+				effect:EndPass();
+			end
+		end
 		-- Make sure the render target isn't still set as a source texture
 		-- this will prevent d3d warning in debug mode
 		effect:SetTexture(0, "");
@@ -225,9 +278,12 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetParam("mShadowMapTex", "mat4ShadowMapTex");
 		params:SetParam("mShadowMapViewProj", "mat4ShadowMapViewProj");
 		params:SetParam("ShadowMapSize", "vec2ShadowMapSize");
+		params:SetParam("ShadowRadius", "floatShadowRadius");
 		
 		params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
 		params:SetParam("screenParam", "vec2ScreenSize");
+		params:SetParam("viewportOffset", "vec2ViewportOffset");
+		params:SetParam("viewportScale", "vec2ViewportScale");
 			
 		params:SetParam("matView", "mat4View");
 		params:SetParam("matViewInverse", "mat4ViewInverse");
@@ -242,6 +298,7 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
 		params:SetParam("cameraPosition", "vec3cameraPosition");
 		params:SetParam("sunDirection", "vec3SunDirection");
+		params:SetParam("sunAmbient", "vec3SunAmbient");
 		params:SetParam("g_FogColor", "vec3FogColor");
 
 		params:SetFloat("rainStrength", math.min(1, GameLogic.options:GetRainStrength()/10));
@@ -386,6 +443,15 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 				effect:EndPass();
 			end
 			effect:SetTexture(0, "");
+
+			--FXAA: Fast Approximate Anti-Aliasing (FXAA) is an anti-aliasing algorithm created by Timothy Lottes under NVIDIA
+			ParaEngine.StretchRect(ParaEngine.GetRenderTarget(), _ColorRT);
+			effect:BeginPass(5);
+			-- color render target. 
+			params:SetTextureObj(0, _ColorRT);
+			effect:CommitChanges();
+			ParaEngine.DrawQuad();
+			effect:EndPass();
 		end
 		-- Make sure the render target isn't still set as a source texture. this will prevent d3d warning in debug mode
 		effect:SetTexture(1, "");

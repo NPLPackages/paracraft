@@ -103,7 +103,11 @@ end
                     <div style="height:25px;margin-top:4px;">
                         <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"立体输出" %></div>
                         <div style="float:left;margin-left:20px;">
-                            <pe:checkbox_button name="stereomode" checked="<%= GameLogic.options:IsStereoMode()%>" onclick="SystemSettingsPage.OnChangeStereoMode()" style="float:left;color:#ffffff;width:40px;height:24px;"/>
+                            <select name="stereomode" AllowUserEdit="false" style="height:22px" onselect="SystemSettingsPage.OnChangeStereoMode">
+                                <option value="0" selected="true">Off</option>
+                                <option value="2">Left/Right</option>
+                                <option value="5">Red/Blue</option>
+                            </select>
                         </div>
                     </div>
                     <div style="height:25px;margin-top:4px;">

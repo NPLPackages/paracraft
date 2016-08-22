@@ -264,23 +264,34 @@ Commands["stereo"] = {
 	name="stereo", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/stereo [on|off] [eye_dist]", 
+	quick_ref="/stereo [on|off|red|left] [eye_dist]", 
 	desc=[[turn on/off stereo mode. 
 e.g.
 /stereo on 0.1			with 0.1 eye distance
 /stereo 0.03			with 0.03 eye distance
 /stereo off				turn 3d off
+/stereo red				red/blue mode 
+/stereo left			left/right mode
 /stereo					toggle
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local mode,eyeDist;
-		mode, cmd_text = CmdParser.ParseFormated(cmd_text, "o%w+");
+		mode, cmd_text = CmdParser.ParseFormated(cmd_text, "[^%d]%w+");
 		eyeDist, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(not mode and not eyeDist) then
 			-- toggle mode
 			mode = if_else(GameLogic.options:IsStereoMode(), "off", "on");
 		end
-		GameLogic.options:EnableStereoMode(mode == "on");
+		if(mode) then
+			if(mode:match("^on") or mode:match("^left")) then
+				mode = 2;
+			elseif(mode:match("^red")) then
+				mode = 5;
+			else
+				mode = 0;
+			end
+			GameLogic.options:EnableStereoMode(mode);
+		end
 		if(eyeDist) then
 			GameLogic.options:SetStereoEyeSeparationDist(eyeDist);
 		end

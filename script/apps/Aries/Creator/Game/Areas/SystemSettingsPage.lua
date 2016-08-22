@@ -179,20 +179,12 @@ function SystemSettingsPage.InitPageParams()
 	local screen_resolution =  string.format("%d × %d", att:GetDynamicField("ScreenWidth", 1020), att:GetDynamicField("ScreenHeight", 680))
 	page:SetNodeValue("ScreenResolution", screen_resolution) -- 分辨率	
 	ds["screen_resolution"] = screen_resolution;
-	-- 锁定摄像机
-	--local lock_camera;
-	--local AutoCameraController = commonlib.gettable("MyCompany.Aries.AutoCameraController");
-	--if(AutoCameraController.IsEnabled) then
-		----page:SetNodeValue("checkBoxLockCamera", AutoCameraController:IsEnabled())
-		--lock_camera = false;
-	--else
-		--lock_camera = true;
-	--end
-	--page:SetNodeValue("btn_LockCamera", GetCheckBoxText(lock_camera))
-	--ds["lock_camera"] = lock_camera;
---
-	--page:SetNodeValue("viewBobbing", GetCheckBoxText(GameLogic.options.ViewBobbing));
 
+	-- stereo view mode
+	local stereoMode = GameLogic.options:GetStereoMode();
+	page:SetNodeValue("stereomode", tostring(stereoMode))
+	ds["stereomode"] = tostring(stereomode);
+	
 	-- 音乐开关
 	local open_sound = if_else(ParaAudio.GetVolume()>0,true,false)
 	page:SetNodeValue("btn_EnableSound", if_else(open_sound,CheckBoxText.on, CheckBoxText.off))
@@ -237,96 +229,6 @@ function SystemSettingsPage.InitPageParams()
 	local render_dist_text = GetRenderDistText(render_dist);
 	page:SetNodeValue("btn_RenderDist", render_dist_text);
 	ds["render_dist"] = render_dist_text;
-
-	--ParaScene.GetAttributeObject():SetField("ShowMainPlayer", false);
-
-
-
-	--page:SetValue("checkboxShadow", ParaTerrain.GetBlockAttributeObject():GetField("UseSunlightShadowMap", false) == true);
-	--page:SetValue("checkboxReflection", ParaTerrain.GetBlockAttributeObject():GetField("UseWaterReflection", false) == true);
-	--local is_full_screen = att:GetField("IsFullScreenMode", false);
-	--value_ds["checkBoxFullScreenMode"] = if_else(is_full_screen,"开启","关闭");
-	--if(page:GetNode("btn_FullScreenMode")) then
-		--local node = page:GetNode("btn_FullScreenMode")
---
-	--end
-	--page:SetNodeValue("comboBoxMultiSampleType", tostring(att:GetField("MultiSampleType", 0)))
-	--page:SetNodeValue("comboBoxMultiSampleQuality", tostring(att:GetField("MultiSampleQuality", 0)))
-	--page:SetNodeValue("checkBoxInverseMouse", att:GetField("IsMouseInverse", false))
-	--page:SetNodeValue("graphic_quality", tostring(att:GetField("Effect Level", 0)))    -- 图像品质
-	
-	--page:SetNodeValue("TotalDragTime", att:GetField("TotalDragTime", 0));
-	--page:SetNodeValue("SmoothFramesNum", att:GetField("SmoothFramesNum", 0));
-	-- page:SetNodeValue("texture_lod", tostring(att:GetField("TextureLOD", 0)))
-	
-	--page:SetNodeValue("checkBoxFreeWindowSize", not att:GetField("IgnoreWindowSizeChange", true))
-	
-	
-	--page:SetNodeValue("checkBoxLockCamera", if_else(auto_camera,"开启","关闭"))
-
-	--page:SetNodeValue("checkBoxUseShadow", att:GetField("SetShadow", false))  --物体阴影
-	-- page:SetNodeValue("checkBoxUseGlow", att:GetField("FullScreenGlow", false))
-	--page:SetNodeValue("trackBarViewDistance", ParaCamera.GetAttributeObject():GetField("FarPlane", 120)) -- 可视距离
-	--page:SetNodeValue("trackBarVolume", ParaAudio.GetVolume()) -- 音量大小
-	--page:SetNodeValue("EnableSound", if_else(open_sound,"开启","关闭")) -- 开关声音
-	--page:SetNodeValue("EnableSound", ParaAudio.GetVolume()>0) -- 开关声音
-
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.EnableBackgroundMusic",true, true);
-	--page:SetNodeValue("EnableBackgroundMusic", bChecked);
---
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.hide_family_name",false);
-	--page:SetNodeValue("hide_family_name", bChecked);
-
-	--page:SetNodeValue("checkBoxShowHeadOnDisplay", att:GetField("ShowHeadOnDisplay", true)) -- 头顶名字
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.checkBoxEnableTeamInvite",true);
-	--page:SetNodeValue("checkBoxEnableTeamInvite", bChecked);
---
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.checkBoxEnableHeadonTextScaling",true);
-	--page:SetNodeValue("checkBoxEnableHeadonTextScaling", bChecked);
-
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.checkBoxAllowAddFriend",true);
-	--page:SetNodeValue("checkBoxAllowAddFriend", bChecked);
-
-	--local bChecked = System.options.EnableFriendTeleport;    -- 允许好友传送
-	--page:SetNodeValue("checkBoxEnableFriendTeleport", bChecked);
-	
-	--local bChecked = System.options.EnableAutoPickSingleTarget;
-	--page:SetNodeValue("checkBoxEnableAutoPickSingleTarget", bChecked);
-	
-	--local bChecked = System.options.EnableForceHideHead;
-	--page:SetNodeValue("checkBoxEnableForceHideHead", bChecked);
-	
-	--local bChecked = System.options.EnableForceHideBack;
-	--page:SetNodeValue("checkBoxEnableForceHideBack", bChecked);
-
-	--local FamilyChatWnd = commonlib.gettable("MyCompany.Aries.Chat.FamilyChatWnd");
-	--page:SetNodeValue("checkBoxDisableFamilyChat", FamilyChatWnd.is_blocked);
-	
-	--local bChecked = Game.PlayerController:LoadLocalData("SystemSettingsPage.checkBoxAutoHPPotion",true);
-	--page:SetNodeValue("checkBoxAutoHPPotion", bChecked);
-	
-	--if(System.options.version=="teen") then
-		--NPL.load("(gl)script/apps/Aries/Desktop/Dock/LoopTips.lua");
-		--local LoopTips = commonlib.gettable("MyCompany.Aries.Desktop.LoopTips");
-		--page:SetNodeValue("checkBoxRightBottomTips", LoopTips.is_expanded);
-	--end
-
-	--local total_ds = {SystemSettingsPage.category_show,SystemSettingsPage.category_game,SystemSettingsPage.category_operation}
-	--SystemSettingsPage.total_ds = total_ds;
-	----SystemSettingsPage.DataBind(value_ds);
-	--local ds;
-	--for _,ds in ipairs(total_ds) do
-		--for _,item in ipairs(ds) do
-			--local name = item.name;
-			--if(name and name ~= "") then
-				--if(value_ds[name]) then
-					--item.value = value_ds[name];
-				--end
-			--end
-		--end
-	--end
-	
-	
 end
 
 function SystemSettingsPage.OnClose()
@@ -1260,7 +1162,7 @@ function SystemSettingsPage.OnToggleViewBobbing()
 	end
 end
 
-function SystemSettingsPage.OnChangeStereoMode(value)
+function SystemSettingsPage.OnChangeStereoMode(name, value)
 	GameLogic.options:EnableStereoMode(value);
 end
 

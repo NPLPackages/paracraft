@@ -56,6 +56,12 @@ function ShaderManager:RegisterAllEffects()
 	local finalEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.finalEffect");
 	local effect = finalEffect:new():Init(self);
 	self:RegisterEffect(effect);
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/RedBlueStereoEffect.lua");
+	local RedBlueStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.RedBlueStereoEffect");
+	local effect = RedBlueStereoEffect:new():Init(self);
+	self:RegisterEffect(effect);
+
 	-- TODO: add more
 end
 

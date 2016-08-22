@@ -68,7 +68,7 @@ function EntityTrackerEntry:SendLocationToAllClients(playerEntityList)
 	if ( self.lastRidingEntity ~= entity.ridingEntity 
 		or (entity.ridingEntity ~= nil and (self.ticks % 60) == 0)) then
         self.lastRidingEntity = entity.ridingEntity;
-        self:SendPacketToAllTrackingPlayers(Packets.PacketAttachEntity:new():Init(0, self.entity, self.entity.ridingEntity));
+		self:SendPacketToAllAssociatedPlayers(Packets.PacketAttachEntity:new():Init(0, self.entity, self.entity.ridingEntity));
     end
 
 	-- updata location, facing, and watched data(current animation, etc). 

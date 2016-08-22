@@ -128,8 +128,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	force_save_interval = 20000,
 	-- whether to switch back from fly mode to walk mode, when player's feet is on ground.
 	auto_disable_fly_when_on_ground = false,
-	-- whether it is stereo mode. 
-	bIsStereoMode = false,
+	-- stereo mode value. 
+	stereoMode = 0,
 	-- 960*640 which is the minimum UI size allowed. 
 	min_ui_height = 640,
 });
@@ -750,7 +750,11 @@ function options:IsShowInfoWindow()
 end
 
 function options:IsStereoMode()
-	return self.bIsStereoMode;
+	return self.stereoMode~=0;
+end
+
+function options:GetStereoMode()
+	return self.stereoMode;
 end
 
 local MOVIE_CAPTURE_MODE = {
@@ -759,16 +763,29 @@ local MOVIE_CAPTURE_MODE = {
 	MOVIE_CAPTURE_MODE_STEREO_LEFT_RIGHT = 2,
 	MOVIE_CAPTURE_MODE_STEREO_ABOVE_BELOW = 3,
 	MOVIE_CAPTURE_MODE_STEREO_FRAME_INTERLACED = 4,
+	MOVIE_CAPTURE_MODE_STEREO_RED_BLUE = 5, 
 };
 
+-- @param value: 0 or false is disable, 2 or true is left/right, 5 is red/blue
 function options:EnableStereoMode(value)
-	self.bIsStereoMode = value;
+	if(value == true) then
+		value = 2; -- default to left/right
+	elseif(not value) then
+		value = 0;
+	end
+	self.stereoMode = tonumber(value) or 0;
 	if(ParaMovie and ParaMovie.GetAttributeObject) then
 		local attr = ParaMovie.GetAttributeObject();
-		if(self.bIsStereoMode) then
-			attr:SetField("StereoCaptureMode", MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_LEFT_RIGHT);
+		if(self.stereoMode~=0) then
+			attr:SetField("StereoCaptureMode", self.stereoMode);
 		else
 			attr:SetField("StereoCaptureMode", 0);
+		end
+		if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE) then
+			local effect = GameLogic.GetShaderManager():GetEffect("RedBlueStereo");
+			if(effect) then
+				effect:SetEnabled(true);
+			end
 		end
 	end
 end
