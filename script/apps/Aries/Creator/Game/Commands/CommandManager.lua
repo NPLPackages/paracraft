@@ -169,7 +169,8 @@ function CommandManager:RunWithVariables(variables, cmd, ...)
 end
 
 -- run command from console for the current player
--- @param player: fromEntity, if nil, this is current player. 
+-- @param player: fromEntity, if nil, this is current player. last trigger entity is also set to this player. 
+-- after command is run, it will set back to previous value. 
 function CommandManager:RunFromConsole(cmd, player)
 	local cmd_class, cmd_name, cmd_text = self:GetCmdByString(cmd);
 	if(cmd_class) then
@@ -186,7 +187,16 @@ function CommandManager:RunFromConsole(cmd, player)
 				variables = player:GetVariables();	
 			end
 			if(cmd_class:CheckGameMode(GameLogic.GameMode:GetMode())) then
-				return self:RunWithVariables(variables, cmd, player);
+				local last_trigger_entity = false;
+				if(player and EntityManager.SetLastTriggerEntity) then
+					last_trigger_entity = EntityManager.GetLastTriggerEntity();
+					EntityManager.SetLastTriggerEntity(player);
+				end
+				local res, res2 = self:RunWithVariables(variables, cmd, player);
+				if(last_trigger_entity~=false) then
+					EntityManager.SetLastTriggerEntity(last_trigger_entity);
+				end
+				return res, res2;
 			else
 				BroadcastHelper.PushLabel({id="cmderror", label = format("当前模式下不可执行命令%s", cmd_name), max_duration=3000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 				return;

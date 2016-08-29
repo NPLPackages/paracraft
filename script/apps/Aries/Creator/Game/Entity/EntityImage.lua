@@ -149,6 +149,9 @@ end
 
 -- clean up all nearby paintings which are derived from this one. 
 function Entity:ResetDerivedPaintings()
+	if(self:IsRemote()) then
+		return;
+	end
 	local rows = self.rows;
 	local columns = self.columns;
 	local facing = self:GetImageFacing();
@@ -171,7 +174,7 @@ function Entity:ResetDerivedPaintings()
 
 			if(image_entity) then
 				image_entity.root_entity_coord = nil; 
-				image_entity.derived_image_filename = nil;
+				image_entity:SetDerivedImageFilename(nil);
 				image_entity:Refresh();
 			end
 
@@ -554,7 +557,7 @@ function Entity:ApplyExpansionData()
 				if(image_entity) then
 					-- set target image, and save a reference to the root block's coordinate.  
 					image_entity.root_entity_coord = root_entity_coord; 
-					image_entity.derived_image_filename = filename..";"..tostring(l).." "..tostring(t).." "..tostring(w).." "..tostring(h);
+					image_entity:SetDerivedImageFilename(filename..";"..tostring(l).." "..tostring(t).." "..tostring(w).." "..tostring(h));
 					image_entity:Refresh();
 				end
 				
@@ -577,7 +580,7 @@ function Entity:ApplyExpansionData()
 		end
 	else
 		self.root_entity_coord = nil; 
-		self.derived_image_filename = nil;	
+		self:SetDerivedImageFilename(nil);
 	end
 end
 
@@ -633,9 +636,8 @@ function Entity:Refresh(bForceRefresh)
 		end		
 	end	
 
-	if(self.derived_image_filename) then
-		filename = self.derived_image_filename;
-	end
+	filename = self:GetDerivedImageFilename() or filename;
+	
 	if(self.last_filename ~= filename) then
 		if(filename) then
 			-- only create C++ object when image is not empty
@@ -660,7 +662,7 @@ function Entity:Refresh(bForceRefresh)
 				end
 			end
 			self.last_filename = filename;
-			if(self.derived_image_filename) then
+			if(self:GetDerivedImageFilename()) then
 				self.text_offset.y = 0.5;
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100, 100, nil, self.text_offset, -1.57);
 			else
@@ -703,16 +705,30 @@ function Entity:EndEdit()
 	self:MarkForUpdate();
 end
 
+function Entity:GetDerivedImageFilename()
+	return self.derived_image_filename;
+end
+
+function Entity:SetDerivedImageFilename(filename)
+	if(self.derived_image_filename~=filename) then
+		self.derived_image_filename = filename;
+		if(not self:IsRemote()) then
+			self:MarkForUpdate();
+		end
+	end
+end
+
 -- Overriden in a sign to provide the text.
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
-	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data);
+	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data, self:GetDerivedImageFilename());
 end
 
 -- update from packet. 
 function Entity:OnUpdateFromPacket(packet_UpdateEntitySign)
 	if(packet_UpdateEntitySign:isa(Packets.PacketUpdateEntitySign)) then
 		self:SetCommand(packet_UpdateEntitySign.text);
+		self:SetDerivedImageFilename(packet_UpdateEntitySign.text2);
 		self.block_data = packet_UpdateEntitySign.data;
 		self:Refresh(true);
 	end

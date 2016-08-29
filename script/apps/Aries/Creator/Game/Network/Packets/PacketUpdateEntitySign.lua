@@ -17,12 +17,14 @@ local PacketUpdateEntitySign = commonlib.inherit(commonlib.gettable("MyCompany.A
 function PacketUpdateEntitySign:ctor()
 end
 
-function PacketUpdateEntitySign:Init(x, y, z, text, data)
+-- @param text2: is only for EntityImage 
+function PacketUpdateEntitySign:Init(x, y, z, text, data, text2)
 	self.x = x;
 	self.y = y;
 	self.z = z;
 	self.text = text;
 	self.data = data;
+	self.text2 = text2;
 	return self;
 end
 

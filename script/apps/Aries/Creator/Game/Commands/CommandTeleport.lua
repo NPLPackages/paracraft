@@ -79,7 +79,8 @@ format: /tp home -- teleport to home
 
 Commands["goto"] = {
 	name="goto", 
-	quick_ref="/goto [@playername] [x y z]", 
+	quick_ref="/goto [@playername] [home] [x y z]", 
+	isLocal=false,
 	desc=[[teleport current player to a given block position relative to given player. Similar to /tp except that it uses block position. 
 format: /goto x y z  abs position
 format: /goto ~ ~1 ~  relative position
@@ -87,36 +88,61 @@ format: /goto home -- teleport to home
 format: /goto [@playername] [x y z]
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local options;
-		options, cmd_text = CmdParser.ParseOptions(cmd_text);
-		
-		if(cmd_text == "") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");
-			local TeleportListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.TeleportListPage");
-			TeleportListPage.ShowPage(nil, true);
-			return
-		end
+		if(GameLogic.IsServerWorld()) then
+			local options;
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
 
-		if(System.options.mc or System.options.is_mcworld) then
-			local playerEntity, x, y, z, home;
-			playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
+			local playerEntity, x, y, z, home, hasInputName;
+			playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+			playerEntity = playerEntity or EntityManager.GetLastTriggerEntity();
+
 			home, cmd_text = CmdParser.ParseText(cmd_text, "home");
 
 			x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, playerEntity);
 			if(home and not x) then
-				-- TODO: get home pos from fromEntity
 				x, y, z = GameLogic.GetHomePosition();
 				x, y, z = BlockEngine:block(x, y, z);
 			end
-			playerEntity = playerEntity or EntityManager.GetPlayer();
+			
 			if( not x and playerEntity) then
 				x, y, z = playerEntity:GetBlockPos();
 			end
 
 			if(x and y and z and playerEntity) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
-				local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX=x, blockY=y, blockZ=z})
-				task:Run();
+				playerEntity:TeleportToBlockPos(x,y,z);
+			end
+		else
+			local options;
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		
+			if(cmd_text == "") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");
+				local TeleportListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.TeleportListPage");
+				TeleportListPage.ShowPage(nil, true);
+				return
+			end
+
+			if(System.options.mc or System.options.is_mcworld) then
+				local playerEntity, x, y, z, home;
+				playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
+				home, cmd_text = CmdParser.ParseText(cmd_text, "home");
+
+				x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, playerEntity);
+				if(home and not x) then
+					-- TODO: get home pos from fromEntity
+					x, y, z = GameLogic.GetHomePosition();
+					x, y, z = BlockEngine:block(x, y, z);
+				end
+				playerEntity = playerEntity or EntityManager.GetPlayer();
+				if( not x and playerEntity) then
+					x, y, z = playerEntity:GetBlockPos();
+				end
+
+				if(x and y and z and playerEntity) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
+					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX=x, blockY=y, blockZ=z})
+					task:Run();
+				end
 			end
 		end
 	end,
@@ -126,13 +152,22 @@ format: /goto [@playername] [x y z]
 Commands["home"] = {
 	name="home", 
 	quick_ref="/home", 
+	isLocal = false,
 	desc="go to home born position" , 
-	handler = function(cmd_name, cmd_text, cmd_params)
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local x, y, z = GameLogic.GetHomePosition();
 		if(x and y and z) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({x=x, y=y, z=z})
-			task:Run();
+			if(GameLogic.IsServerWorld()) then
+				local entityPlayer = EntityManager.GetLastTriggerEntity();
+				if(entityPlayer) then
+					local bx, by, bz = BlockEngine:block(x,y,z);
+					entityPlayer:TeleportToBlockPos(bx, by, bz);
+				end
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
+				local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({x=x, y=y, z=z})
+				task:Run();
+			end
 		end
 	end,
 };

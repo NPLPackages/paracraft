@@ -100,6 +100,17 @@ end
 
 -- right click to show item
 function Entity:OnClick(x, y, z, mouse_button)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		-- check if the entity has mount position. If so, we will set current player to this location.  
+		if(obj:HasAttachmentPoint(0)) then
+			local x, y, z = obj:GetAttachmentPosition(0);
+			local entityPlayer = EntityManager.GetPlayer();
+			if(entityPlayer) then
+				entityPlayer:SetPosition(x,y,z);
+			end
+		end
+	end
 	return true;
 end
 
