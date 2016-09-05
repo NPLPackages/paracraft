@@ -582,9 +582,17 @@ function BaseContext:TryDestroyBlock(result, is_allow_delete_terrain)
 		local click_data = self:GetClickData();
 		-- removed the block
 		local block_template = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);
+		
 		if(block_template and block_template:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ)) then
 			if(EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
 				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, is_allow_delete_terrain=is_allow_delete_terrain})
+				task:Run();
+			end
+		elseif(result.entity) then
+			local bx, by, bz = result.entity:GetBlockPos();
+			local block_template = BlockEngine:GetBlock(bx, by, bz);
+			if(block_template and block_template:CanDestroyBlockAt(bx, by, bz)) then
+				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = bx,blockY = by, blockZ = bz, })
 				task:Run();
 			end
 		else

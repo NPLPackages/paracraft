@@ -339,7 +339,7 @@ end
 
 
 -- get movie length in seconds
-function Entity:GetMovieClipLength(bForceRefresh)
+function Entity:GetMovieClipLength()
 	if(not self.length) then
 		self:UpdateMovieClipLength();
 	end
@@ -349,6 +349,63 @@ end
 -- this will generate a command: /t seconds /end 
 function Entity:SetMovieClipLength(seconds)
 	self:UpdateMovieClipLength(seconds);
+end
+
+-- this will generate a command: /t seconds
+-- only if seconds is not 0
+function Entity:SetMovieStartTime(seconds)
+	self:UpdateMovieStartTime(seconds)
+end
+
+function Entity:GetMovieStartTime()
+	if(not self.start_seconds) then
+		self:UpdateMovieStartTime();
+	end
+	return self.start_seconds or 0;
+end
+
+function Entity:UpdateMovieStartTime(new_time)
+	local start_seconds;
+	local cmds = self:GetCommandTable();
+	if(cmds) then
+		local end_cmd_index;
+		for i, cmd in ipairs(cmds) do
+			local time = cmd:match("^/t%s*([%d%.]+)$");
+			if(time) then
+				time = tonumber(time);
+				if(time) then
+					if(time >= (start_seconds or 0)) then
+						start_seconds = time;
+						end_cmd_index = i;
+					end
+				end
+			end
+		end
+		if(new_time and new_time~=start_seconds) then
+			if(end_cmd_index) then
+				if(new_time~=0) then
+					local cmd = cmds[end_cmd_index];
+					cmds[end_cmd_index] = cmd:gsub("^(/t%s*)([%d%.]+)", "%1"..tostring(new_time));
+					self:SetCommandTable(cmds);
+				else
+					commonlib.removeArrayItem(cmds, end_cmd_index);
+					self:SetCommandTable(cmds);
+				end
+			elseif(new_time~=0) then
+				cmds[#cmds+1] = string.format("/t %f", new_time);
+				self:SetCommandTable(cmds);
+			end
+			
+			start_seconds = new_time;
+		end
+	else
+		if(new_time) then
+			self:SetCommandTable({string.format("/t %f", new_time)});
+			start_seconds = new_time;
+		end
+	end
+	
+	self.start_seconds = start_seconds or 0;
 end
 
 function Entity:UpdateMovieClipLength(new_length)
@@ -372,8 +429,10 @@ function Entity:UpdateMovieClipLength(new_length)
 			if(end_cmd_index) then
 				local cmd = cmds[end_cmd_index];
 				cmds[end_cmd_index] = cmd:gsub("^(/t%s*~?)([%d%.]+)", "%1"..tostring(new_length));
-				self:SetCommandTable(cmds);
+			else
+				cmds[#cmds+1] = string.format("/t %f /end", new_length);
 			end
+			self:SetCommandTable(cmds);
 			length = new_length;
 		end
 	else
@@ -397,6 +456,15 @@ function Entity:HasCamera()
 	return self:GetCameraItemStack() ~= nil;
 end
 
+-- this is necessary to force update actors when entity time is changed?
+--function Entity:SetTime(time)
+	--Entity._super.SetTime(self, time);
+	--local movieClip = self:GetMovieClip();
+	--if(movieClip) then
+		--movieClip:SetTime(math.floor(time*1000));
+	--end
+--end
+
 -- @param bIgnoreNeuronActivation: true to ignore neuron activation. 
 -- @param bIgnoreOutput: ignore output
 function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOutput)
@@ -415,6 +483,7 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 		end
 	end
 
+	-- internal commmands are executed afterwards
 	return Entity._super.ExecuteCommand(self, entityPlayer, bIgnoreNeuronActivation, bIgnoreOutput);
 end
 

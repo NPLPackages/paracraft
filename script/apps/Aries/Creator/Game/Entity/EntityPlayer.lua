@@ -332,12 +332,6 @@ function Entity:PlayStepSound()
 	end
 end
 
--- try to move to the given position
--- @param : real world pos
-function Entity:SetBlockPos(x,y,z)
-	Entity._super.SetBlockPos(self, x,y,z);
-end
-
 -- this is used to test whether this entity can pick the block. 
 function Entity:CanReachBlockAt(x,y,z)
 	return (GameLogic.GameMode:IsEditor() and (not GameLogic.IsFPSView or System.options.IsMobilePlatform)) or (self:DistanceSqTo(x,y,z) <= ((self:GetPickingDist()+0.5) ^ 2));

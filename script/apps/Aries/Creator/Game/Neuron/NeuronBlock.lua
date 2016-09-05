@@ -621,9 +621,11 @@ function NeuronBlock:OnActivated_Default(msg, src_neuron)
 						if(dest_block) then
 							if(dest_block.hasAction) then
 								-- if the block template contains action, we will the toggle message will generate another click message on itself. 
-								self:Activate(msg_templates["click"]);
+								local out_msg = commonlib.copy(msg_templates["click"]);
+								out_msg.entity = msg.entity;
+								self:Activate(out_msg);
 							end
-							dest_block:OnToggle(self.x, self.y, self.z);
+							dest_block:OnToggle(self.x, self.y, self.z, msg.entity);
 						end
 					end
 				end
@@ -641,7 +643,7 @@ function NeuronBlock:OnActivated_Default(msg, src_neuron)
 			if(not action or action == "toggle" or action == "user_toggle") then
 				local block_template = self:GetBlockTemplate();
 				if(block_template) then
-					block_template:OnToggle(self.x, self.y, self.z);
+					block_template:OnToggle(self.x, self.y, self.z, msg.entity);
 				end
 				if(action == "user_toggle") then
 					if(self:GetAxonsCount() == 0) then
@@ -651,9 +653,13 @@ function NeuronBlock:OnActivated_Default(msg, src_neuron)
 						return;
 					end
 				end
-				return msg_templates["toggle"];
+				local out_msg = commonlib.copy(msg_templates["toggle"])
+				out_msg.entity = msg.entity;
+				return out_msg;
 			elseif(msg_templates[action]) then
-				return msg_templates[action];
+				local out_msg = commonlib.copy(msg_templates[action])
+				out_msg.entity = msg.entity;
+				return out_msg;
 			end
 		elseif(msg_type == "script") then
 			

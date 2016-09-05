@@ -26,6 +26,7 @@ block_types.RegisterItemClass("ItemImage", ItemImage);
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemImage:ctor()
+	self:SetOwnerDrawIcon(true);
 end
 
 -- just incase the tooltip contains the image path
@@ -66,5 +67,27 @@ function ItemImage:CompareItems(left, right)
 		if(left and right and left:GetTooltip() == right:GetTooltip()) then
 			return true;
 		end
+	end
+end
+
+
+function ItemImage:GetImageFileName(itemStack)
+	return itemStack and itemStack:GetDataField("tooltip");
+end
+
+
+-- virtual: draw icon with given size at current position (0,0)
+-- @param width, height: size of the icon
+-- @param itemStack: this may be nil. or itemStack instance. 
+function ItemImage:DrawIcon(painter, width, height, itemStack)
+	ItemImage._super.DrawIcon(self, painter, width, height, itemStack);
+	local filename = self:GetImageFileName(itemStack);
+	if(filename and filename~="") then
+		filename = filename:match("[^/]+$"):gsub("%..*$", "");
+		filename = filename:sub(1, 6);
+		painter:SetPen("#33333380");
+		painter:DrawRect(0,0, width, 14);
+		painter:SetPen("#ffffff");
+		painter:DrawText(1,0, filename);
 	end
 end

@@ -214,6 +214,11 @@ function MovieClip:GetLengthSeconds()
 	return self.entity:GetMovieClipLength();
 end
 
+function MovieClip:SetStartTime(time)
+	self.entity:SetMovieStartTime(time/1000);
+	self:timeChanged();
+end
+
 -- set movie clip length in ms seconds
 function MovieClip:SetLength(time)
 	self.entity:SetMovieClipLength(time/1000);
@@ -221,17 +226,18 @@ function MovieClip:SetLength(time)
 end
 
 function MovieClip:UpdateDisplayTimeRange(fromTime, toTime)
-	self.start_time = fromTime;
+	self.display_time_from = fromTime;
+	self.display_time_to = toTime;
 	self:timeChanged();
 end
 
 -- only for editors, during play mode, start time is always 0. 
 function MovieClip:GetStartTime()
-	return self.start_time;
+	return math.floor(self.entity:GetMovieStartTime() * 1000);
 end
 
 function MovieClip:GotoBeginFrame()
-	self:SetTime(0);
+	self:SetTime(self:GetStartTime() or 0);
 end
 
 function MovieClip:GotoEndFrame()

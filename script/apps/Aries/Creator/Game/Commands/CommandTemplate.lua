@@ -81,17 +81,24 @@ default name is "default"
 			end
 		end
 		if(x) then
-			local templatename = cmd_text:gsub("^blocktemplates/", ""):gsub("%.blocks%.xml$", "");
-			if(templatename == "") then
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			local filename = cmd_text;
+			if(filename=="") then
 				templatename = "default";
 			end
-			local filename = format("%sblocktemplates/%s.blocks.xml", GameLogic.current_worlddir, templatename);
-
-			local task = BlockTemplate:new({operation = operation, filename = filename,
-				blockX = x,blockY = y, blockZ = z, bSelect=nil, load_anim_duration=load_anim_duration,
-				UseAbsolutePos = UseAbsolutePos,TeleportPlayer=TeleportPlayer,
-				})
-			task:Run();
+			if(not filename:match("%.blocks%.xml$")) then
+				filename = filename..".blocks.xml";
+			end
+			local fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
+			if(fullpath) then
+				local task = BlockTemplate:new({operation = operation, filename = fullpath,
+					blockX = x,blockY = y, blockZ = z, bSelect=nil, load_anim_duration=load_anim_duration,
+					UseAbsolutePos = UseAbsolutePos,TeleportPlayer=TeleportPlayer,
+					})
+				task:Run();
+			else
+				LOG.std(nil, "info", "loadtemplate", "file %s not found", filename);
+			end
 		end
 	end,
 };

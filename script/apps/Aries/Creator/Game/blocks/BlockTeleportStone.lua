@@ -68,13 +68,13 @@ function block:OnStep(x,y,z, entity)
 						neuron:AddCoolDown(3);
 						neuron:Activate(NeuronBlock.msg_templates["script"]);
 					else
-						self:OnActivated(x,y,z)
+						self:OnActivated(x,y,z, entity)
 					end
 				else
 					neuron:AddCoolDown(1.5);
 					-- if no axon is found on the teleport stone, we will try to run the follow blocks
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FollowBlocksTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.FollowBlocks:new({blockX = x,blockY = y, blockZ = z, block_id=self.id})
+					local task = MyCompany.Aries.Game.Tasks.FollowBlocks:new({blockX = x,blockY = y, blockZ = z, block_id=self.id, entity=entity})
 					task:Run();
 				end
 			end
@@ -83,12 +83,10 @@ function block:OnStep(x,y,z, entity)
 end
 
 -- teleport the player to this block. It will only teleport if 2 blocks above this block is empty. 
-function block:OnToggle(x, y, z)
-	if(not GameLogic.isRemote) then
+function block:OnToggle(x, y, z, entity)
+	if(not GameLogic.isRemote and entity) then
 		if(BlockEngine:IsBlockFreeSpace(x, y+1, z) and BlockEngine:IsBlockFreeSpace(x, y+2, z)) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX = x,blockY = y, blockZ = z})
-			task:Run();
+			entity:TeleportToBlockPos(x,y+1,z);
 		end
 	end
 end

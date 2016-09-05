@@ -17,6 +17,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 
 local FollowBlocks = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.FollowBlocks"));
@@ -25,6 +26,10 @@ local FollowBlocks = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.
 local move_tick_count = 2;
 
 function FollowBlocks:ctor()
+end
+
+function FollowBlocks:GetEntity()
+	return self.entity or EntityManager.GetPlayer();
 end
 
 function FollowBlocks:Run()
@@ -38,7 +43,7 @@ function FollowBlocks:Run()
 		return;
 	end
 
-	local oldPosX, oldPosY, oldPosZ = ParaScene.GetPlayer():GetPosition();
+	local oldPosX, oldPosY, oldPosZ = self:GetEntity():GetPosition();
 	self.oldPosX, self.oldPosY, self.oldPosZ = oldPosX, oldPosY, oldPosZ;
 	
 	self.ticks = 0;
@@ -65,13 +70,9 @@ function FollowBlocks:TryMoveTo(bx,by,bz)
 					self.blockY = by;
 					self.blockZ = bz;
 
-					local player = ParaScene.GetPlayer();
-					if(player:IsStanding()) then
-						local newPosX, newPosY, newPosZ = BlockEngine:real(bx, by, bz);
-						newPosY = newPosY + BlockEngine.half_blocksize + 0.1;
-						self.newPosX, self.newPosY, self.newPosZ = newPosX, newPosY, newPosZ;
-						ParaScene.GetPlayer():SetPosition(self.newPosX, self.newPosY, self.newPosZ);
-
+					local player = self:GetEntity():GetInnerObject();
+					if(player and player:IsStanding()) then
+						self:GetEntity():TeleportToBlockPos(bx, by+1, bz);
 						return true;
 					end
 				end

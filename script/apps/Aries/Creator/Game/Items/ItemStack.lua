@@ -239,6 +239,15 @@ function ItemStack:LoadFromXMLNode(node)
 	end
 end
 
+function ItemStack:SerializeXMLData(sData)
+	if(type(sData) == "string" and sData:match("  ")) then
+		-- for two spaces in the text, we will use cdata to prevent xml to remove extra space.
+		return {name="![CDATA[", [1] = sData};
+	else
+		return sData;
+	end
+end
+
 function ItemStack:SaveToXMLNode(node)
 	attr = node.attr;
 	if(not attr) then
@@ -251,14 +260,9 @@ function ItemStack:SaveToXMLNode(node)
 	if(self.serverdata) then
 		if(type(self.serverdata) == "table") then
 			local sData = commonlib.serialize_compact(self.serverdata);
-			if(sData and sData:match("  ")) then
-				-- for two spaces in the text, we will use cdata to prevent xml to remove extra space.
-				node[1] = {name="![CDATA[", [1] = sData};
-			else
-				node[1] = sData;
-			end
+			node[1] = self:SerializeXMLData(sData);
 		else
-			node[1] = self.serverdata;
+			node[1] = self:SerializeXMLData(self.serverdata);
 		end
 	end
 	return node;

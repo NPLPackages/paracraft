@@ -10,6 +10,7 @@ local ItemBlockModel = commonlib.gettable("MyCompany.Aries.Game.Items.ItemBlockM
 local item = ItemBlockModel:new({icon,});
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -18,7 +19,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 
-local ItemBlockModel = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemBlockModel"));
+local ItemBlockModel = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemBlockModel"));
 
 block_types.RegisterItemClass("ItemBlockModel", ItemBlockModel);
 
@@ -27,6 +28,15 @@ local default_inhand_offset = {0.15, 0.3, 0}
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemBlockModel:ctor()
+	self:SetOwnerDrawIcon(true);
+end
+
+-- we will use C++ polygon-level physics engine for real physics. 
+function ItemBlockModel:HasRealPhysics()
+	local block_template = self:GetBlock();
+	if(block_template) then
+		return not block_template.obstruction;
+	end
 end
 
 -- item offset when hold in hand. 
@@ -167,9 +177,41 @@ end
 
 -- virtual function: when selected in right hand
 function ItemBlockModel:OnSelect()
+	ItemBlockModel._super.OnSelect(self);
 	GameLogic.SetStatus(L"Ctrl+左键选择方块与骨骼, 左键点击物品图标保存模型");
 end
 
 function ItemBlockModel:OnDeSelect()
+	ItemBlockModel._super.OnDeSelect(self);
 	GameLogic.SetStatus(nil);
+end
+
+
+function ItemBlockModel:GetModelFileName(itemStack)
+	return itemStack and itemStack:GetDataField("tooltip");
+end
+
+-- virtual: draw icon with given size at current position (0,0)
+-- @param width, height: size of the icon
+-- @param itemStack: this may be nil. or itemStack instance. 
+function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
+	ItemBlockModel._super.DrawIcon(self, painter, width, height, itemStack);
+	local filename = self:GetModelFileName(itemStack);
+	if(filename and filename~="") then
+		filename = filename:match("[^/]+$"):gsub("%..*$", "");
+		filename = filename:sub(1, 6);
+		painter:SetPen("#33333380");
+		painter:DrawRect(0,0, width, 14);
+		painter:SetPen("#ffffff");
+		painter:DrawText(1,0, filename);
+	end
+end
+
+-- virtual function: 
+function ItemBlockModel:CreateTask()
+	if(self:HasRealPhysics()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+		return EditModelTask:new();
+	end
 end

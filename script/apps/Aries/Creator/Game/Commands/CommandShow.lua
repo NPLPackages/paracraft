@@ -25,7 +25,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|perf|info|touch|terrain|mod] [on|off]", 
+	quick_ref="/show [desktop|player|boundingbox|perf|info|touch|terrain|mod|physics] [on|off]", 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -63,6 +63,8 @@ e.g.
 			ParaTerrain.GetAttributeObject():SetField("RenderTerrain", if_else(bIsShow==nil, true, bIsShow));
 		elseif(name == "player") then
 			EntityManager.GetPlayer():SetVisible(true);
+		elseif(name == "physics") then
+			ParaScene.GetAttributeObject():SetField("PhysicsDebugDrawMode", (bIsShow or bIsShow==nil) and -1 or 0);
 		elseif(name == "mod" or name=="plugin") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");
 			local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")

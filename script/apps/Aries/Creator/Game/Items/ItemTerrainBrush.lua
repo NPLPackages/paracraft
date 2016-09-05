@@ -38,7 +38,7 @@ ItemTerrainBrush.max_radius = 32;
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemTerrainBrush:ctor()
-	self.m_bIsOwnerDrawIcon = true;
+	self:SetOwnerDrawIcon(true);
 end
 
 -- @param itemStack: if nil it is current selected one

@@ -771,9 +771,10 @@ function MovieClipTimeLine.OnChangeStartTime()
 				if(movieClip) then
 					page:SetNodeValue("starttime", value);
 					-- from seconds to ms
-					value = value * 1000;
+					value = math.floor(value * 1000);
 					if(value>=0 and value<=movieClip:GetLength()) then
-						movieClip:UpdateDisplayTimeRange(value, nil);
+						movieClip:SetStartTime(value);
+						-- movieClip:UpdateDisplayTimeRange(value, nil);
 					end
 				end
 			end
@@ -791,7 +792,8 @@ function MovieClipTimeLine.OnChangeEndTime()
 					page:SetNodeValue("endtime", value);
 					local movieClip = MovieManager:GetActiveMovieClip();
 					if(movieClip) then
-						movieClip:SetLength(value*1000);
+						value = math.floor(value * 1000)
+						movieClip:SetLength(value);
 					end
 				end
 			end

@@ -109,6 +109,20 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 				result.blockX, result.blockY, result.blockZ = blockX, blockY-1, blockZ;
 				result.side = 5;
 				result.block_id = nil;
+				local entityName = pt:GetName();
+				if(entityName) then
+					local bx, by, bz = entityName:match("^(%d+),(%d+),(%d+)$");
+					if(bx and by and bz) then
+						bx = tonumber(bx);
+						by = tonumber(by);
+						bz = tonumber(bz);
+						local entity = BlockEngine:GetBlockEntity(bx, by, bz);
+						if(entity) then
+							result.entity = entity;
+							result.blockY = blockY; -- restore blockY-1 in case terrain point is picked. 
+						end
+					end
+				end
 			end
 		end
 	end

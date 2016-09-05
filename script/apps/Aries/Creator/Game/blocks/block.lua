@@ -1302,7 +1302,7 @@ function block:OnActivated(bx, by, bz, entity)
 	if(neuron) then
 		-- TODO: play a different sound
 		self:play_click_sound();
-		neuron:Activate({type="click", action="user_toggle"});
+		neuron:Activate({type="click", action="user_toggle", entity=entity});
 		return true;
 	end
 end
