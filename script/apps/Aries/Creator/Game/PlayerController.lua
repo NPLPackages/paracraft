@@ -220,6 +220,13 @@ function PlayerController:InitMainPlayerHandTool()
 	end
 end
 
+function PlayerController:DeselectMainPlayerHandTool()
+	local item = self:GetItemInRightHand();
+	if(item) then
+		item:OnDeSelect();
+	end
+end
+
 -- return the block id in the right hand of the player. 
 function PlayerController:GetBlockInRightHand()
 	local player = EntityManager.GetPlayer();

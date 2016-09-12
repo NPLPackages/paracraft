@@ -480,6 +480,7 @@ function Entity:FrameMoveRidding(deltaTime)
 	if (not self.ridingEntity or self.ridingEntity:IsDead()) then
         self.ridingEntity = nil;
     else
+		
 		if (self.ridingEntity) then
 			local preX, preY, preZ = self:GetPosition();
 			self.ridingEntity:UpdateRiderPosition();
@@ -487,6 +488,11 @@ function Entity:FrameMoveRidding(deltaTime)
 			local deltaY = preY - y;
 			local obj = self:GetInnerObject();
 			if(obj) then
+				if(obj:GetField("VerticalSpeed", 0) ~= 0) then
+					obj:SetField("VerticalSpeed", 0);
+					obj:CallField("ForceStop");
+				end
+				--[[
 				if(deltaY > 2) then
 					-- unmount if jumps up too high
 					if(GameLogic.isRemote) then
@@ -510,8 +516,10 @@ function Entity:FrameMoveRidding(deltaTime)
 					obj:ToCharacter():Stop();
 					-- obj:ToCharacter():PlayAnimation(0);
 				end
+				]]
 			end
 		end
+		
     end
 	self:UpdateActionState();
 	self:OnUpdate();

@@ -669,7 +669,13 @@ end
 
 function GameLogic.Exit()
 	GameLogic.IsStarted = false;
+	local playerController = GameLogic.GetPlayerController();
+	if(playerController) then
+		playerController:DeselectMainPlayerHandTool();
+	end
+	
 	MovieManager:Exit();
+	
 	if(GameLogic.world_revision) then
 		if(GameLogic.world_revision:IsModified()) then
 			-- always backup on exit when modified. 
@@ -687,8 +693,10 @@ function GameLogic.Exit()
 	UndoManager.Clear();
 	PhysicsWorld.Clear();
 	EntityManager.Clear();
-	if(GameLogic.GetPlayerController()) then
-		GameLogic.GetPlayerController().force_can_fly = false;
+
+	
+	if(playerController) then
+		playerController.force_can_fly = false;
 	end
 	CommandManager:Destroy();
 	BlockEngine:Disconnect();

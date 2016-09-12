@@ -209,6 +209,17 @@ end
 -- this is called on each tick, when this entity has focus and user is pressing and holding shift key. 
 function Entity:OnShiftKeyPressed()
 	if (self.ridingEntity) then
+		self:DoUserUnmount();
+	else
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:ToCharacter():PlayAnimation(66);
+		end
+	end
+end
+
+function Entity:DoUserUnmount()
+	if (self.ridingEntity) then
 		if(GameLogic.isRemote) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, nil));
 		else
@@ -216,11 +227,6 @@ function Entity:OnShiftKeyPressed()
 			-- teleport entity to a free block nearby
 			local bx, by, bz = self:GetBlockPos();
 			self:PushOutOfBlocks(bx, by, bz);
-		end
-	else
-		local obj = self:GetInnerObject();
-		if(obj) then
-			obj:ToCharacter():PlayAnimation(66);
 		end
 	end
 end
@@ -231,6 +237,13 @@ function Entity:OnShiftKeyReleased()
 	if(obj) then
 		obj:ToCharacter():PlayAnimation(0);
 	end
+end
+
+function Entity:Jump()
+	if(self.ridingEntity) then
+		self:DoUserUnmount();
+	end
+	return Entity._super.Jump(self);
 end
 
 function Entity:LoadFromXMLNode(node)
