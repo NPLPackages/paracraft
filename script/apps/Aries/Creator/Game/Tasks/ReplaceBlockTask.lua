@@ -30,6 +30,7 @@ function ReplaceBlock:ctor()
 	self.blocks = self.blocks or {};
 	self.new_blocks = {};
 	self.history = {};
+	self.replaced_map = {};
 end
 
 function ReplaceBlock:Run()
@@ -109,10 +110,14 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 			end
 		end
 	elseif( from_id == self.from_id and from_data == self.from_data) then
-		self.new_blocks[#(self.new_blocks)+1] = {x,y,z};
-		BlockEngine:SetBlock(x,y,z, self.to_id, self.to_data or 0, 3);
-		if(GameLogic.GameMode:CanAddToHistory()) then
-			self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
+		local idx = BlockEngine:GetSparseIndex(x,y,z);
+		if(not self.replaced_map[idx]) then
+			self.replaced_map[idx] = true;
+			self.new_blocks[#(self.new_blocks)+1] = {x,y,z};
+			BlockEngine:SetBlock(x,y,z, self.to_id, self.to_data or 0, 3);
+			if(GameLogic.GameMode:CanAddToHistory()) then
+				self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
+			end
 		end
 	end
 end
