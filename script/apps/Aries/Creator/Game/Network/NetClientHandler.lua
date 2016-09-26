@@ -14,6 +14,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/ConnectionTCP.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/Packet_Types.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ConnectionTCP = commonlib.gettable("MyCompany.Aries.Game.Network.ConnectionTCP");
@@ -590,5 +592,16 @@ function NetClientHandler:handlePlayerInventory(packet_PlayerInventory)
 	if(fromEntity and fromEntity.inventory and packet_PlayerInventory.slot_index) then
 		local itemStack = packet_PlayerInventory.itemStack or {};
 		fromEntity.inventory:SetItemByBagPos(packet_PlayerInventory.slot_index, itemStack.id, itemStack.count);
+	end
+end
+
+function NetClientHandler:handleClientCommand(packet_ClientCommand)
+	local cmd = packet_ClientCommand.cmd;
+	if(cmd) then
+		local cmd_class, cmd_name, cmd_text = CommandManager:GetCmdByString(cmd);
+		-- only local command is callable by server. 
+		if(cmd_class and cmd_class:IsLocal()) then
+			CommandManager:RunFromConsole(cmd, self.playerEntity);
+		end
 	end
 end

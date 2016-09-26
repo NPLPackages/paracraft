@@ -52,6 +52,11 @@ function Entity:IsBlockEntity()
 	return true;
 end
 
+function Entity:GetBlockEntityName()
+	local bx, by, bz = self:GetBlockPos();
+	return format("%d,%d,%d", bx, by, bz);
+end
+
 -- call init when block is first loaded. 
 function Entity:OnBlockLoaded(x,y,z)
 end

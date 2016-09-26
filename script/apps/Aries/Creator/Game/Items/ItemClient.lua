@@ -68,6 +68,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemCarpet.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemTerrainBrush.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemPaintBrush.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLight.lua");
 end
 
 function ItemClient.OnInit()

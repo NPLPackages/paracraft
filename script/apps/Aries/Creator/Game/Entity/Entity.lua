@@ -273,7 +273,6 @@ function Entity:LoadFromXMLNode(node)
 			end
 		end
 
-		local i, sub_node;
 		for i=1, #node do
 			sub_node = node[i];
 			if(sub_node.name == "mem") then

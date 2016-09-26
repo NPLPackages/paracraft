@@ -32,16 +32,15 @@ Entity.is_regional = true;
 Entity.default_file = "character/common/headquest/headquest.x";
 
 function Entity:ctor()
-	local id = self:GetBlockId();
-	local block_template = block_types.get(id);
-	if(block_template) then
-		self.useRealPhysics = not block_template.obstruction;
-	end
 end
 
 function Entity:init()
 	if(not Entity._super.init(self)) then
 		return
+	end
+	local block_template = block_types.get(self:GetBlockId());
+	if(block_template) then
+		self.useRealPhysics = not block_template.obstruction;
 	end
 	self:CreateInnerObject(self.filename, self.scale);
 	self:Refresh();
@@ -51,11 +50,6 @@ end
 -- we will use C++ polygon-level physics engine for real physics. 
 function Entity:HasRealPhysics()
 	return self.useRealPhysics;
-end
-
-function Entity:GetBlockEntityName()
-	local bx, by, bz = self:GetBlockPos();
-	return format("%d,%d,%d", bx, by, bz);
 end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 

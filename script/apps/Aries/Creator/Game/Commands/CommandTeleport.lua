@@ -108,8 +108,9 @@ format: /goto [@playername] [x y z]
 				x, y, z = playerEntity:GetBlockPos();
 			end
 
-			if(x and y and z and playerEntity) then
-				playerEntity:TeleportToBlockPos(x,y,z);
+			fromEntity = fromEntity or EntityManager.GetLastTriggerEntity();
+			if(x and y and z and fromEntity and fromEntity.TeleportToBlockPos) then
+				fromEntity:TeleportToBlockPos(x,y,z);
 			end
 		else
 			local options;
