@@ -1,0 +1,444 @@
+<!--config/Aries/creator/block_types_template.xml
+template used in block_types.xml
+many block instance may share the same block template. In block_types.xml we can specify intance with the template attribute
+e.g.
+<block template="Torch?filename=model/blockworld/Torch/Torch" ... />
+
+
+@param model.condition: 2,8(2 posX, 8 negX) and 4,6(4 posZ, 6 negZ) are horizontal neighbour. 0 is top, 5 is bottom. 
+  0(numerical): block must not be of the same type;
+  1(numerical): block must be of the same type
+  -1(numerical): block should be empty
+  'solid':block should be solid
+  'obstruction':block should be obstruction
+@param model.id_data: data field associated with the block
+-->
+<block_templates>
+  <!--cube model with many sub meta data-->
+  <block name="DataOnly" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+    <model id_data="6" />
+    <model id_data="7" />
+    <model id_data="8" />
+    <model id_data="9" />
+    <model id_data="10" />
+    <model id_data="11" />
+    <model id_data="12" />
+    <model id_data="13" />
+    <model id_data="14" />
+    <model id_data="15" />
+    <model id_data="16" />
+    <model id_data="17" />
+    <model id_data="18" />
+    <model id_data="19" />
+    <model id_data="20" />
+    <model id_data="21" />
+    <model id_data="22" />
+    <model id_data="23" />
+  </block>
+  <block name="DataOnlyTwo" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+  </block>
+  <!-- a flat plane snapping to one of th six neighbour surfaces -->
+  <block name="vine" shape="vine" modelName="vine" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+  </block>
+  <!-- a carpet is a plate similar to vine but with a thinkness-->
+  <block name="carpet" class="BlockCarpet" item_class="ItemCarpet"  material="carpet" shape="carpet" modelName="carpet" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+    <model id_data="6" />
+    <model id_data="7" />
+    <model id_data="8" />
+    <model id_data="9" />
+    <model id_data="10" />
+    <model id_data="11" />
+    <model id_data="12" />
+    <model id_data="13" />
+    <model id_data="14" />
+    <model id_data="15" />
+    <model id_data="16" />
+    <model id_data="17" />
+    <model id_data="18" />
+    <model id_data="19" />
+    <model id_data="20" />
+    <model id_data="21" />
+  </block>
+  <!-- a plate is a plate similar to vine but with a thinkness-->
+  <block name="plate" class="BlockCarpet" shape="plate" modelName="plate" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+  </block>
+  <!-- a flat plane snapping to one of th six neighbour surfaces -->
+  <block name="halfvine" shape="halfvine" modelName="halfvine" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+  </block>
+  <!-- four state plant: 128*32 textures: mature,  growing, tiny, withered. where all 4 models are cross shape -->
+  <block name="plant" shape="plant" modelName="plant" cubeMode="true" customModel="true" hasAction="true" >
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+  </block>
+  <!-- four state plant: 128*32 textures: mature,  growing, seed, withered, where all 4 models are cross shape, except for the seed state, which is flat shape.  -->
+  <block name="seed_plant" shape="plant" modelName="seed_plant" cubeMode="true" customModel="true" hasAction="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+  </block>
+  <!--lever that snap to 6 faces automatically -->
+  <block name="Lever" customBlockModel="true" texture="" customModel="true">
+    <model id_data="1" assetfile="[filename]_off.x" facing="3.14" condition="{[2]='solid',}"></model>
+    <model id_data="2" assetfile="[filename]_off.x" facing="4.71" condition="{[6]='solid',}"></model>
+    <model id_data="3" assetfile="[filename]_off.x" facing="0" condition="{[8]='solid',}"></model>
+    <model id_data="4" assetfile="[filename]_off.x" facing="1.57" condition="{[4]='solid',}"></model>
+    <model id_data="5" assetfile="[filename]_off.x" facing="0" transform="0,1,0,-1,0,0,0,0,1,0,0,0" condition="{[5]='solid'}"></model>
+    <model id_data="6" assetfile="[filename]_off.x" facing="0" transform="0,-1,0,1,0,0,0,0,1,0,0,0" condition="{[0]='solid',}"></model>
+    <model id_data="7" assetfile="[filename]_off.x" facing="0" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+
+    <model id_data="9" assetfile="[filename]_on.x" texture_index="2" facing="3.14"></model>
+    <model id_data="10" assetfile="[filename]_on.x" texture_index="2" facing="4.71"></model>
+    <model id_data="11" assetfile="[filename]_on.x" texture_index="2" facing="0"></model>
+    <model id_data="12" assetfile="[filename]_on.x" texture_index="2" facing="1.57"></model>
+    <model id_data="13" assetfile="[filename]_on.x" texture_index="2" facing="0" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="14" assetfile="[filename]_on.x" texture_index="2" facing="0" transform="0,-1,0,1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="15" assetfile="[filename]_on.x" texture_index="2" facing="0" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+  </block>
+  <block name="Torch" texture="" customBlockModel="true" customModel="true" itemModel="model/blockworld/Redstone_Torch/Redstone_Torch_off_Side.x">
+    <model id_data="1" sides="0" assetfile="[filename]_Side.x" facing="0" condition="{[2]='solid',}"></model>
+    <model id_data="2" sides="3" assetfile="[filename]_Side.x" facing="1.57" condition="{[6]='solid',}"></model>
+    <model id_data="3" sides="1" assetfile="[filename]_Side.x" facing="3.14" condition="{[8]='solid',}"></model>
+    <model id_data="4" sides="2" assetfile="[filename]_Side.x" facing="4.71" condition="{[4]='solid',}"></model>
+    <model id_data="5" sides="5" assetfile="[filename]_ground.x" facing="0" condition="{[5]='solid'}"></model>
+    <model id_data="6" sides="4" assetfile="[filename]_ceiling.x" facing="0" condition="{[0]='solid',}"></model>
+    <model id_data="5" assetfile="[filename]_ground.x" facing="0" condition="{[5]='obstruction'}"></model>
+  </block>
+  <block name="Stairs" shape="stairs" class="BlockStair" texture="" customBlockModel="true" modelName="stairs" obstruction="true" blockcamera="true" customModel="true">
+    <!--  corner:    -->
+    <model id_data="14" assetfile="[filename]_corner.x" facing="1.57" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=1,[4]=1,[6]=0,[8]=0,[0]='solid'}"></model>
+    <model id_data="5" assetfile="[filename]_corner.x" facing="3.14"  condition="{[2]=1,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="15" assetfile="[filename]_corner.x" facing="0" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]=0,[4]=1,[6]=0,[8]=1,[0]='solid'}"></model>
+    <model id_data="6" assetfile="[filename]_corner.x" facing="1.57" condition="{[2]=0,[4]=1,[6]=0,[8]=1}"></model>
+    <model id_data="16" assetfile="[filename]_corner.x" facing="4.71" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=0,[4]=0,[6]=1,[8]=1,[0]='solid'}"></model>
+    <model id_data="7" assetfile="[filename]_corner.x" facing="0" condition="{[2]=0,[4]=0,[6]=1,[8]=1}"></model>
+    <model id_data="17" assetfile="[filename]_corner.x" facing="3.14" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]=1,[4]=0,[6]=1,[8]=0,[0]='solid'}"></model>
+    <model id_data="8" assetfile="[filename]_corner.x" facing="4.71" condition="{[2]=1,[4]=0,[6]=1,[8]=0}"></model>
+
+    <!--  direction   -->
+    <model id_data="10" assetfile="[filename].x" facing="0"  transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]='~obstruction',[8]='obstruction',[0]='solid'}"></model>
+    <model id_data="2" sides="1,4,5" assetfile="[filename].x" facing="0"  condition="{[2]='~obstruction',[8]='solid'}"></model>
+    <model id_data="11" assetfile="[filename].x" facing="1.57" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[4]='solid',[6]='~obstruction',[0]='solid'}"></model>
+    <model id_data="3" sides="2,4,5" assetfile="[filename].x" facing="1.57" condition="{[4]='solid',[6]='~obstruction'}"></model>
+    <model id_data="12" assetfile="[filename].x" facing="3.14" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]='solid',[8]='~obstruction',[0]='solid'}"></model>
+    <model id_data="1" sides="0,4,5" assetfile="[filename].x" facing="3.14" condition="{[2]='solid',[8]='~obstruction'}"></model>
+    <model id_data="13" assetfile="[filename].x" facing="4.71" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[4]='~obstruction',[6]='solid',[0]='solid'}"></model>
+    <model id_data="4" sides="3,4,5" assetfile="[filename].x" facing="4.71" condition="{[4]='~obstruction',[6]='solid'}"></model>
+
+    <model id_data="2" sides="1,4,5" assetfile="[filename].x" facing="0"    condition="{[2]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="3" sides="2,4,5" assetfile="[filename].x" facing="1.57" condition="{[4]='obstruction',[6]='~obstruction'}"></model>
+    <model id_data="1" sides="0,4,5" assetfile="[filename].x" facing="3.14" condition="{[2]='obstruction',[8]='~obstruction'}"></model>
+    <model id_data="4" sides="3,4,5" assetfile="[filename].x" facing="4.71" condition="{[4]='~obstruction',[6]='obstruction'}"></model>
+    <model id_data="4" assetfile="[filename].x" facing="4.71" ></model>
+
+    <!--  reverse corner:   -->
+    <model id_data="22" assetfile="[filename]_reverse_corner.x" facing="1.57" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=1,[4]=1,[6]=0,[8]=0,[0]='solid'}"></model>
+    <model id_data="18" assetfile="[filename]_reverse_corner.x" facing="3.14"  condition="{[2]=1,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="23" assetfile="[filename]_reverse_corner.x" facing="0" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]=0,[4]=1,[6]=0,[8]=1,[0]='solid'}"></model>
+    <model id_data="19" assetfile="[filename]_reverse_corner.x" facing="1.57" condition="{[2]=0,[4]=1,[6]=0,[8]=1}"></model>
+    <model id_data="24" assetfile="[filename]_reverse_corner.x" facing="4.71" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=0,[4]=0,[6]=1,[8]=1,[0]='solid'}"></model>
+    <model id_data="20" assetfile="[filename]_reverse_corner.x" facing="0" condition="{[2]=0,[4]=0,[6]=1,[8]=1}"></model>
+    <model id_data="25" assetfile="[filename]_reverse_corner.x" facing="3.14" transform="1,0,0,0,-1,0,0,0,-1,0,0,0" condition="{[2]=1,[4]=0,[6]=1,[8]=0,[0]='solid'}"></model>
+    <model id_data="21" assetfile="[filename]_reverse_corner.x" facing="4.71" condition="{[2]=1,[4]=0,[6]=1,[8]=0}"></model>
+  </block>
+  <block name="Rails" texture="" customBlockModel="true" customModel="true" handleNeighborChange="true">
+    <!--  middle: - -   -->
+    <model id_data="1" assetfile="[filename].x" facing="0"   condition="{[2]=1,[4]=0,[6]=0,[8]=1}"></model>
+    <model id_data="2" assetfile="[filename].x" facing="1.57" condition="{[2]=0,[4]=1,[6]=1,[8]=0}"></model>
+
+    <!--  corner: -i   -->
+    <model id_data="3" assetfile="[filename]_Turning.x" facing="0"    condition="{[2]=1,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="4" assetfile="[filename]_Turning.x" facing="4.71" condition="{[2]=0,[4]=1,[6]=0,[8]=1}"></model>
+    <model id_data="5" assetfile="[filename]_Turning.x" facing="3.14" condition="{[2]=0,[4]=0,[6]=1,[8]=1}"></model>
+    <model id_data="6" assetfile="[filename]_Turning.x" facing="1.57" condition="{[2]=1,[4]=0,[6]=1,[8]=0}"></model>
+
+    <!--  slope: /   -->
+    <model id_data="7" assetfile="[filename]_Slope.x" facing="3.14"  condition="{[12]=1,}"></model>
+    <model id_data="8" assetfile="[filename]_Slope.x" facing="1.57"  condition="{[14]=1}"></model>
+    <model id_data="9" assetfile="[filename]_Slope.x" facing="0" condition="{[18]=1}"></model>
+    <model id_data="10" assetfile="[filename]_Slope.x" facing="4.71" condition="{[16]=1}"></model>
+
+    <!--  ending: - -   -->
+    <model id_data="1" assetfile="[filename].x" facing="0"    condition="{[2]=1,[4]=0,[6]=0,[8]=0}"></model>
+    <model id_data="1" assetfile="[filename].x" facing="0"    condition="{[2]=0,[4]=0,[6]=0,[8]=1}"></model>
+    <model id_data="2" assetfile="[filename].x" facing="1.57"  condition="{[2]=0,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="2" assetfile="[filename].x" facing="1.57" ></model>
+    
+    <!--  middle: - -   -->
+    <model id_data="17" assetfile="[filename].x" facing="0"   texture_index="2"></model>
+    <model id_data="18" assetfile="[filename].x" facing="1.57" texture_index="2"></model>
+
+    <!--  corner: -i   -->
+    <model id_data="19" assetfile="[filename]_Turning.x" facing="0"   texture_index="2"  ></model>
+    <model id_data="20" assetfile="[filename]_Turning.x" facing="4.71" texture_index="2" ></model>
+    <model id_data="21" assetfile="[filename]_Turning.x" facing="3.14" texture_index="2" ></model>
+    <model id_data="22" assetfile="[filename]_Turning.x" facing="1.57" texture_index="2" ></model>
+
+    <!--  slope: /   -->
+    <model id_data="23" assetfile="[filename]_Slope.x" facing="3.14"  texture_index="2" ></model>
+    <model id_data="24" assetfile="[filename]_Slope.x" facing="1.57"  texture_index="2" ></model>
+    <model id_data="25" assetfile="[filename]_Slope.x" facing="0" texture_index="2" ></model>
+    <model id_data="26" assetfile="[filename]_Slope.x" facing="4.71" texture_index="2" ></model>
+  </block>
+  <block name="RailsFBX" texture="" customBlockModel="true" customModel="true" handleNeighborChange="true">
+    <!--  middle: - -   -->
+    <model id_data="1" assetfile="[filename].fbx" facing="0"   condition="{[2]=1,[4]=0,[6]=0,[8]=1}"></model>
+    <model id_data="2" assetfile="[filename].fbx" facing="1.57" condition="{[2]=0,[4]=1,[6]=1,[8]=0}"></model>
+
+    <!--  corner: -i   -->
+    <model id_data="3" assetfile="[filename]_Turning.fbx" facing="0"    condition="{[2]=1,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="4" assetfile="[filename]_Turning.fbx" facing="4.71" condition="{[2]=0,[4]=1,[6]=0,[8]=1}"></model>
+    <model id_data="5" assetfile="[filename]_Turning.fbx" facing="3.14" condition="{[2]=0,[4]=0,[6]=1,[8]=1}"></model>
+    <model id_data="6" assetfile="[filename]_Turning.fbx" facing="1.57" condition="{[2]=1,[4]=0,[6]=1,[8]=0}"></model>
+
+    <!--  slope: /   -->
+    <model id_data="7" assetfile="[filename]_Slope.fbx" facing="3.14"  condition="{[12]=1,}"></model>
+    <model id_data="8" assetfile="[filename]_Slope.fbx" facing="1.57"  condition="{[14]=1}"></model>
+    <model id_data="9" assetfile="[filename]_Slope.fbx" facing="0" condition="{[18]=1}"></model>
+    <model id_data="10" assetfile="[filename]_Slope.fbx" facing="4.71" condition="{[16]=1}"></model>
+
+    <!--  ending: - -   -->
+    <model id_data="1" assetfile="[filename].fbx" facing="0"    condition="{[2]=1,[4]=0,[6]=0,[8]=0}"></model>
+    <model id_data="1" assetfile="[filename].fbx" facing="0"    condition="{[2]=0,[4]=0,[6]=0,[8]=1}"></model>
+    <model id_data="2" assetfile="[filename].fbx" facing="1.57"  condition="{[2]=0,[4]=1,[6]=0,[8]=0}"></model>
+    <model id_data="2" assetfile="[filename].fbx" facing="1.57" ></model>
+    
+    <!--  middle: - -   -->
+    <model id_data="17" assetfile="[filename].fbx" facing="0"   texture_index="2"></model>
+    <model id_data="18" assetfile="[filename].fbx" facing="1.57" texture_index="2"></model>
+
+    <!--  corner: -i   -->
+    <model id_data="19" assetfile="[filename]_Turning.fbx" facing="0"   texture_index="2"  ></model>
+    <model id_data="20" assetfile="[filename]_Turning.fbx" facing="4.71" texture_index="2" ></model>
+    <model id_data="21" assetfile="[filename]_Turning.fbx" facing="3.14" texture_index="2" ></model>
+    <model id_data="22" assetfile="[filename]_Turning.fbx" facing="1.57" texture_index="2" ></model>
+
+    <!--  slope: /   -->
+    <model id_data="23" assetfile="[filename]_Slope.fbx" facing="3.14"  texture_index="2" ></model>
+    <model id_data="24" assetfile="[filename]_Slope.fbx" facing="1.57"  texture_index="2" ></model>
+    <model id_data="25" assetfile="[filename]_Slope.fbx" facing="0" texture_index="2" ></model>
+    <model id_data="26" assetfile="[filename]_Slope.fbx" facing="4.71" texture_index="2" ></model>
+  </block>
+  <block name="Fence" texture="" class="BlockFence" customBlockModel="true" itemModel="model/blockworld/Fence/Fence_Middle.x" shape="Fence" obstruction="true" customModel="true" handleNeighborChange="true">
+    <!--  single: i   -->
+    <model id_data="1" assetfile="[filename]_Single.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <!--  half: -   -->
+    <model id_data="2" assetfile="[filename]_HalfSide.x" facing="0"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="3" assetfile="[filename]_HalfSide.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <model id_data="4" assetfile="[filename]_HalfSide.x" facing="3.14" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="5" assetfile="[filename]_HalfSide.x" facing="4.71" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <!--  corner: -i   -->
+    <model id_data="6" assetfile="[filename]_Corner.x" facing="4.71"    condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="7" assetfile="[filename]_Corner.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="8" assetfile="[filename]_Corner.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="9" assetfile="[filename]_Corner.x" facing="0" condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  TShape: -|   -->
+    <model id_data="10" assetfile="[filename]_TShape.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="11" assetfile="[filename]_TShape.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="12" assetfile="[filename]_TShape.x" facing="4.71" condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="13" assetfile="[filename]_TShape.x" facing="0" condition="{[2]='obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  middle: - -   -->
+    <model id_data="14" assetfile="[filename]_Middle.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="15" assetfile="[filename]_Middle.x" facing="0" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  cross: +   -->
+    <model id_data="16" assetfile="[filename]_Cross.x" facing="0" condition="{[2]='obstruction',[4]='obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+  </block>
+  <block name="Trapdoor" toggle_sound="door_open" texture="" obstruction="true" customBlockModel="true" customModel="true">
+    <model id_data="1" sides="0" assetfile="[filename].x" facing="1.57"    ></model>
+    <model id_data="2" sides="1" assetfile="[filename].x" facing="1.57" ></model>
+    <model id_data="3" sides="2" assetfile="[filename].x" facing="0"    ></model>
+    <model id_data="4" sides="3" assetfile="[filename].x" facing="0" ></model>
+    
+    <!--
+    <model id_data="1" sides="0" assetfile="[filename].x" facing="0" transform="0,-1,0,1,0,0,0,0,1,0,0,0" condition="{[0]=-1,[5]=-1,}"></model>
+    <model id_data="4" assetfile="[filename].x" facing="0" transform="0,-1,0,1,0,0,0,0,1,0,-0.4,0" condition="{[2]=-1,[8]=-1,[4]=-1,[6]=-1,[5]='obstruction'}"></model>
+    <model id_data="2" assetfile="[filename].x" facing="1.57"    condition="{[4]=-1,[6]=-1}"></model>
+    <model id_data="3" assetfile="[filename].x" facing="0" condition="{[2]=-1,[8]=-1}"></model>
+    <model id_data="3" assetfile="[filename].x" facing="0" ></model>-->
+  </block>
+  <block name="Trapdoor_On" toggle_sound="door_open" texture="" customBlockModel="true" customModel="true">
+    <model id_data="1" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,0.4,0,0" ></model>
+    <model id_data="2" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,-0.4,0,0" ></model>
+    <model id_data="3" assetfile="[filename].x" facing="1.57"    transform="1,0,0,0,1,0,0,0,1,-0.4,0,0"></model>
+    <model id_data="4" assetfile="[filename].x" facing="1.57"    transform="1,0,0,0,1,0,0,0,1,0.4,0,0"></model>
+    <!--
+    <model id_data="1" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,0.45,0.5,0" condition="{[2]='solid', [0]=-1,[5]=-1,}"></model>
+    <model id_data="6" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,-0.45,0.5,0" condition="{[8]='solid', [0]=-1,[5]=-1,}"></model>
+    <model id_data="7" assetfile="[filename].x" facing="1.57" transform="1,0,0,0,1,0,0,0,1,-0.45,0.5,0" condition="{[4]='solid', [0]=-1,[5]=-1,}"></model>
+    <model id_data="8" assetfile="[filename].x" facing="1.57" transform="1,0,0,0,1,0,0,0,1,0.45,0.5,0" condition="{[6]='solid', [0]=-1,[5]=-1,}"></model>
+
+    <model id_data="4" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,0.4,0,0.5" condition="{[4]=-1,[6]=-1,[2]='solid'}"></model>
+    <model id_data="2" assetfile="[filename].x" facing="0" transform="1,0,0,0,1,0,0,0,1,-0.4,0,0.5" condition="{[4]=-1,[6]=-1}"></model>
+    <model id_data="5" assetfile="[filename].x" facing="1.57"    transform="1,0,0,0,1,0,0,0,1,-0.4,0,0.5" condition="{[2]=-1,[8]=-1,[4]='solid'}"></model>
+    <model id_data="3" assetfile="[filename].x" facing="1.57"    transform="1,0,0,0,1,0,0,0,1,0.4,0,0.5" condition="{[2]=-1,[8]=-1}"></model>
+
+    <model id_data="1" assetfile="[filename].x" facing="0"    transform="1,0,0,0,1,0,0,0,1,-0.5,0.5,0"></model>-->
+  </block>
+  <block name="GlassPane" handleNeighborChange="true" customBlockModel="true" break_sound="glass1" break_sound1="glass2" break_sound2="glass3" texture="" obstruction="true" blockcamera="true" customModel="true">
+    <!--  half: -   -->
+    <model id_data="1" assetfile="[filename]_Middle.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="2" assetfile="[filename]_Middle.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <model id_data="1" assetfile="[filename]_Middle.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="2" assetfile="[filename]_Middle.x" facing="0" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <!--  corner: -i   -->
+    <model id_data="3" assetfile="[filename]_Corner.x" facing="4.71"    condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="4" assetfile="[filename]_Corner.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="5" assetfile="[filename]_Corner.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="6" assetfile="[filename]_Corner.x" facing="0" condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  TShape: -|   -->
+    <model id_data="7" assetfile="[filename]_TShape.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="8" assetfile="[filename]_TShape.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="9" assetfile="[filename]_TShape.x" facing="4.71" condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="10" assetfile="[filename]_TShape.x" facing="0" condition="{[2]='obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  middle: - -   -->
+    <model id_data="1" assetfile="[filename]_Middle.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="2" assetfile="[filename]_Middle.x" facing="0" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  cross: +   -->
+    <model id_data="11" assetfile="[filename]_Cross.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="11" assetfile="[filename]_Cross.x" facing="0" condition="{[2]='1',[4]='1',[6]='1',[8]='1'}"></model>
+  </block>
+  
+  <block name="Wall" texture="" handleNeighborChange="true" customBlockModel="true" itemModel="model/blockworld/StoneWall/StoneWall_Middle.x"obstruction="true" customModel="true">
+    <!--  single: i   -->
+    <model id_data="1" assetfile="[filename]_Single.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <!--  half: -   -->
+    <model id_data="2" assetfile="[filename]_HalfSide.x" facing="0"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="3" assetfile="[filename]_HalfSide.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <model id_data="4" assetfile="[filename]_HalfSide.x" facing="3.14" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="5" assetfile="[filename]_HalfSide.x" facing="4.71" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <!--  corner: -i   -->
+    <model id_data="6" assetfile="[filename]_Corner.x" facing="4.71"    condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
+    <model id_data="7" assetfile="[filename]_Corner.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="8" assetfile="[filename]_Corner.x" facing="1.57" condition="{[2]='~obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="9" assetfile="[filename]_Corner.x" facing="0" condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  TShape: -|   -->
+    <model id_data="10" assetfile="[filename]_TShape.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="11" assetfile="[filename]_TShape.x" facing="3.14" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+    <model id_data="12" assetfile="[filename]_TShape.x" facing="4.71" condition="{[2]='obstruction',[4]='obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="13" assetfile="[filename]_TShape.x" facing="0" condition="{[2]='obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  middle: - -   -->
+    <model id_data="14" assetfile="[filename]_Middle.x" facing="1.57"    condition="{[0]=1, [2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="15" assetfile="[filename]_Middle.x" facing="0" condition="{[0]=1, [2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <model id_data="16" assetfile="[filename]_Wall.x" facing="1.57"    condition="{[2]='obstruction',[4]='~obstruction',[6]='~obstruction',[8]='obstruction'}"></model>
+    <model id_data="17" assetfile="[filename]_Wall.x" facing="0" condition="{[2]='~obstruction',[4]='obstruction',[6]='obstruction',[8]='~obstruction'}"></model>
+    <!--  cross: +   -->
+    <model id_data="18" assetfile="[filename]_Cross.x" facing="0" condition="{[2]='obstruction',[4]='obstruction',[6]='obstruction',[8]='obstruction'}"></model>
+  </block>
+
+  <block name="Repeater" customBlockModel="true" customModel="true">
+    <model id_data="0" assetfile="[filename]1.x" facing="0"/>
+    <model id_data="1" assetfile="[filename]1.x" facing="3.14"/>
+    <model id_data="2" assetfile="[filename]1.x" facing="4.71"/>
+    <model id_data="3" assetfile="[filename]1.x" facing="1.57"/>
+    <model id_data="4" assetfile="[filename]2.x" texture_index="2" facing="0"/>
+    <model id_data="5" assetfile="[filename]2.x" texture_index="2" facing="3.14"/>
+    <model id_data="6" assetfile="[filename]2.x" texture_index="2" facing="4.71"/>
+    <model id_data="7" assetfile="[filename]2.x" texture_index="2" facing="1.57"/>
+    <model id_data="8" assetfile="[filename]3.x" texture_index="3" facing="0"/>
+    <model id_data="9" assetfile="[filename]3.x" texture_index="3" facing="3.14"/>
+    <model id_data="10" assetfile="[filename]3.x" texture_index="3" facing="4.71"/>
+    <model id_data="11" assetfile="[filename]3.x" texture_index="3" facing="1.57"/>
+    <model id_data="12" assetfile="[filename]4.x" texture_index="4" facing="0"/>
+    <model id_data="13" assetfile="[filename]4.x" texture_index="4" facing="3.14"/>
+    <model id_data="14" assetfile="[filename]4.x" texture_index="4" facing="4.71"/>
+    <model id_data="15" assetfile="[filename]4.x" texture_index="4" facing="1.57"/>
+  </block>
+  <block name="RepeaterOff" customBlockModel="true" customModel="true">
+    <model id_data="0" assetfile="[filename]1.x" facing="0"/>
+    <model id_data="1" assetfile="[filename]1.x" facing="3.14"/>
+    <model id_data="2" assetfile="[filename]1.x" facing="4.71"/>
+    <model id_data="3" assetfile="[filename]1.x" facing="1.57"/>
+    <model id_data="4" assetfile="[filename]2.x" facing="0"/>
+    <model id_data="5" assetfile="[filename]2.x" facing="3.14"/>
+    <model id_data="6" assetfile="[filename]2.x" facing="4.71"/>
+    <model id_data="7" assetfile="[filename]2.x" facing="1.57"/>
+    <model id_data="8" assetfile="[filename]3.x" facing="0"/>
+    <model id_data="9" assetfile="[filename]3.x" facing="3.14"/>
+    <model id_data="10" assetfile="[filename]3.x" facing="4.71"/>
+    <model id_data="11" assetfile="[filename]3.x" facing="1.57"/>
+    <model id_data="12" assetfile="[filename]4.x" facing="0"/>
+    <model id_data="13" assetfile="[filename]4.x" facing="3.14"/>
+    <model id_data="14" assetfile="[filename]4.x" facing="4.71"/>
+    <model id_data="15" assetfile="[filename]4.x" facing="1.57"/>
+  </block>
+  <block name="Plate" toggle_sound="door_open" customBlockModel="true" texture="" customModel="true">
+      <model id_data="0" assetfile="[filename]_off.x" facing="0" ></model>
+      <model id_data="1" assetfile="[filename]_on.x" facing="0" ></model>
+  </block>
+
+  <!--lever that snap to 6 faces automatically -->
+  <block name="Piston" texture="" customBlockModel="true" customModel="true">
+    <model id_data="0" assetfile="[filename]_off.x" facing="4.71" ></model>
+    <model id_data="1" assetfile="[filename]_off.x" facing="1.57" ></model>
+    <model id_data="2" assetfile="[filename]_off.x" facing="3.14" ></model>
+    <model id_data="3" assetfile="[filename]_off.x" facing="0" ></model>
+    <model id_data="4" assetfile="[filename]_off.x" facing="0" transform="1,0,0,0,0,1,0,-1,0,0,0,0" ></model>
+    <model id_data="5" assetfile="[filename]_off.x" facing="0" transform="1,0,0,0,0,-1,0,1,0,0,0,0" ></model>
+
+    <model id_data="8" assetfile="[filename]_on.x" facing="4.71" ></model>
+    <model id_data="9" assetfile="[filename]_on.x" facing="1.57" ></model>
+    <model id_data="10" assetfile="[filename]_on.x" facing="3.14" ></model>
+    <model id_data="11" assetfile="[filename]_on.x" facing="0" ></model>
+    <model id_data="12" assetfile="[filename]_on.x" facing="0" transform="1,0,0,0,0,1,0,-1,0,0,0,0" ></model>
+    <model id_data="13" assetfile="[filename]_on.x" facing="0" transform="1,0,0,0,0,-1,0,1,0,0,0,0" ></model>
+  </block>
+  <block name="model" texture="" customModel="true">
+    <model id_data="0" assetfile="[filename].x" ></model>
+  </block>
+  <block name="image" texture="" customBlockModel="true" customModel="true">
+    <model id_data="0" assetfile="[filename].x" facing="0" ></model>
+    <model id_data="1" assetfile="[filename].x" facing="3.14" ></model>
+    <model id_data="2" assetfile="[filename].x" facing="4.71" ></model>
+    <model id_data="3" assetfile="[filename].x" facing="1.57" ></model>
+    <model id_data="4" assetfile="[filename].x" facing="0" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="5" assetfile="[filename].x" facing="3.14" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="6" assetfile="[filename].x" facing="4.71" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="7" assetfile="[filename].x" facing="1.57" transform="0,1,0,-1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="8" assetfile="[filename].x" facing="0" transform="0,-1,0,1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="9" assetfile="[filename].x" facing="3.14" transform="0,-1,0,1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="10" assetfile="[filename].x" facing="4.71" transform="0,-1,0,1,0,0,0,0,1,0,0,0"></model>
+    <model id_data="11" assetfile="[filename].x" facing="1.57" transform="0,-1,0,1,0,0,0,0,1,0,0,0"></model>
+  </block>
+  <block name="bone" texture="" customBlockModel="true" customModel="true" >
+    <model id_data="0" assetfile="[filename].x" facing="1.57" transform="1,0,0,0,0,-1,0,1,0,0,0,0"></model>
+    <model id_data="1" assetfile="[filename].x" facing="-1.57" transform="1,0,0,0,0,-1,0,1,0,0,0,0"></model>
+    <model id_data="2" assetfile="[filename].x" facing="0" transform="1,0,0,0,0,-1,0,1,0,0,0,0" ></model>
+    <model id_data="3" assetfile="[filename].x" facing="0" transform="1,0,0,0,0,1,0,-1,0,0,0,0" ></model>
+    <model id_data="4" assetfile="[filename].x" facing="0" transform="-1,0,0,0,-1,0,0,0,1,0,0,0" ></model>
+    <model id_data="5" assetfile="[filename].x" facing="0" ></model>
+  </block>
+</block_templates>

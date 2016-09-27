@@ -1,0 +1,606 @@
+<!--config/Aries/creator/block_types.xml
+all system defined item/block types in paracraft. For mod/plugins, one can also register/modify programmatically. 
+@param id: unique id
+@param categoryID: in range [0,255].  category id (usually the one used for simulation and shader rendering)
+   50 for metal with normal map. 31 for waving grass. 8 for water with reflection. 9 for mirror.  5 for lava. 
+@param mc_id: [id:data]. auxilary mc id(NOT used)
+@param obstruction: whether to enable block physics
+@param framemove or tick_random: "true" to tick randomly
+@param solid: whether to collide with camera
+@param hasAction: if true, user left-click the block will trigger 
+@param selection_effect: "none" to disable mouse over selection effect. "model_highlight" to highlight its custom model. useful for some custom model block.
+@param toggle_blockid: which block id to toggle. toggle_blockid is automatically a associated_blockid.
+@param associated_blockid: such as water and still_water
+@param torchLightValue: 0-15
+@param climbable: whether can climb
+@param speedReduction: 0-1. default to 1
+@param onload: true to invoke onBlockLoaded function. this attribute is usually auto set for entity and customModels. 
+@param icon: icon path
+@param disable_gen_icon: if true, we will not automatically generate the icon but use icon attribute instead. 
+@param itemModel: model to be used to render handheld object. if "icon", it will use the icon model
+@param itemModelScaling: default 1.
+@param inhandOffset: nil or a table of "{x,y,z}" for inhand offset when hold in player's hand
+@param material: material name, such as "water", "circuits"
+@param alphaTestTexture: if the texture is alpha tested. 
+@param ProvidePower: default to "false".
+@param shape: nil or "stairs", some known shape has different creation logics accoring to side and click point. 
+@param template: reference to block_types_template.xml. such as "Lever?filename=model/04deco/v5/blockworld/Lever/Lever_Up"
+@param handleNeighborChange: true to handle neighbor change event
+@param searchkey:keyword search
+Sound related: 
+@param break_sound, break_sound1, break_sound2, break_sound3, break_sound5, break_sound5: 击碎声音 随机一个
+@param create_sound, create_sound1, create_sound2, create_sound3, create_sound4, create_sound5: 
+@param step_sound, step_sound1, step_sound2, step_sound3, step_sound4, step_sound5: 走在上面的脚本声音
+@param click_sound, click_sound1, click_sound2: 
+@param toggle_sound, toggle_sound1, toggle_sound2: 
+@param slipperiness:distance to slide on surface of the block before an entity stops moving. 
+@param mapcolor: color to be shown on the mini map. usually top surface color. 
+@param color_data: whether block can be painted with colors. 
+@param opacity: [1,15] 1 for air. 2 for water and ice, 15 for solid block. value is automatically set, unless you want to explicitly adjust the default.
+-->
+<blocks>
+  <block singleSideTex="true" name="Stone" text="石块" searchkey="石块条纹棕" mc_id="1" id="56" mapcolor="#827a57" material="rock" step_sound="stone" icon="Texture/blocks/items/stone.png" texture="Texture/blocks/stone.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" name="Grass" text="草皮" searchkey="草皮泥土表层棕绿" mc_id="2" id="62" mapcolor="#75ae23" step_sound="grass" icon="Texture/blocks/items/grassdirt.png" texture="Texture/blocks/top_grass_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Dirt" text="泥土" searchkey="泥土棕" mc_id="3" id="55" mapcolor="#735439" step_sound="gravel" icon="Texture/blocks/items/dirt.png" texture="Texture/blocks/dirt.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Cobblestone" text="圆石" searchkey="圆石青砖墙花纹双色灰" mc_id="4" id="58" mapcolor="#b3ad90" material="rock" step_sound="stone" icon="Texture/blocks/items/cobblestone.png" texture="Texture/blocks/cobblestone.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Oak_Wood_Planks" text="橡木木板" searchkey="橡木木板条纹棕色" mc_id="5" id="81" mapcolor="#776034" step_sound="wood" material="wood" icon="Texture/blocks/items/planks_oak.png" texture="Texture/blocks/planks_oak.png" obstruction="true" soliden ="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3 云杉木板-->
+  <block singleSideTex="true" name="Spruce_Wood_Planks" text="云杉木板" searchkey="云杉木板条纹棕红" mc_id="5:1" id="138" mapcolor="#4c331d" step_sound="wood" material="wood" icon="Texture/blocks/items/planks_spruce.png" texture="Texture/blocks/planks_spruce.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3 桦木木板-->
+  <block singleSideTex="true" name="Birch_Wood_Planks" text="桦木木板" searchkey="桦木木板条纹棕灰" mc_id="5:2" id="139" mapcolor="#a18e64"  step_sound="wood" material="wood" icon="Texture/blocks/items/planks_birch.png" texture="Texture/blocks/planks_birch.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3 丛林木板-->
+  <block singleSideTex="true" name="Jungle_Wood_Planks" text="丛林木板" searchkey="丛林木板咖啡棕条纹" mc_id="5:3" id="140" mapcolor="#8b562e" step_sound="wood" material="wood" icon="Texture/blocks/items/planks_jungle.png" texture="Texture/blocks/planks_jungle.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Sapling" text="树苗" searchkey="" mc_id="6"-->
+  <block name="Oak_Sapling" text="橡树树苗" searchkey="橡树树苗绿小" mc_id="6" id="119"  class="BlockSapling" singleSideTex="true" texture="Texture/blocks/sapling_oak.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.3: name="Sapling" text="树苗" searchkey="" mc_id="6"-->
+  <block name="Spruce_Sapling" text="云杉树苗" searchkey="云杉树苗绿小" mc_id="6:1" id="120"  class="BlockSapling" singleSideTex="true" texture="Texture/blocks/sapling_spruce.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.3: name="Sapling" text="树苗" searchkey="" mc_id="6"-->
+  <block name="Birch_Sapling" text="桦木树苗" searchkey="桦木树苗绿小" mc_id="6:2" id="121"  class="BlockSapling" singleSideTex="true" texture="Texture/blocks/sapling_birch.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.3: name="Sapling" text="树苗" searchkey="" mc_id="6"-->
+  <block name="Jungle_Sapling" text="丛林树苗" searchkey="丛林树苗绿小" mc_id="6:3" id="122"  class="BlockSapling" singleSideTex="true" texture="Texture/blocks/sapling_jungle.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.3: name="Bedrock" text="基岩" searchkey="" mc_id="7"-->
+  <block singleSideTex="true" name="Bedrock" text="基岩" searchkey="基岩石深黑条纹砖" mc_id="7" id="123" mapcolor="#2d251e" material="rock" step_sound="stone" icon="Texture/blocks/items/stone_bedrock.png" texture="Texture/blocks/bedrock.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Water" text="水" disable_gen_icon="true" searchkey="水流动蓝兰" mc_id="8" id="75" mapcolor="#ddeaf0" speedReduction="0.4" associated_blockid="76" class="BlockLiquidFlow" material="water" categoryID="8" normalMap="Texture/ripple/WaterBumpMap.dds" texture="Texture/blocks/water/water_fps10_a009.png" liquid="true" blendedTexture="true" transparent="true" cubeMode="true"  />
+  <!--name="Stationary_Water" text="静态水" searchkey="" mc_id="9"-->
+  <block singleSideTex="true" name="Still_Water" text="静态水" disable_gen_icon="true" searchkey="" mc_id="9" speedReduction="0.4" id="76" mapcolor="#ddeaf0" associated_blockid="75" class="BlockLiquidStill" material="water" categoryID="8" normalMap="Texture/ripple/WaterBumpMap.dds" texture="Texture/blocks/water/water_fps10_a009.png" liquid="true" blendedTexture="true" transparent="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Lava" text="岩浆" searchkey="岩浆发光熔岩红" mc_id="10" id="82" mapcolor="#f88633" icon="Texture/blocks/items/lava_flow.png" texture="Texture/blocks/lava/lava_fps10_a010.png" light="true" categoryID="5" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Stationary_Lava" text="静态岩浆" searchkey="" mc_id="11"-->
+  <block singleSideTex="true" name="Sand" text="沙子" searchkey="沙子灰白纯" mc_id="12" id="51" mapcolor="#ebdcb3" step_sound="sand" material="sand" icon="Texture/blocks/items/sand.png" texture="Texture/blocks/sand.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Gravel" text="沙砾" searchkey="沙砾灰黑" mc_id="13" mapcolor="#735439" id="12" step_sound="gravel" material="sand" icon="Texture/blocks/items/gravel.png" texture="Texture/blocks/gravel.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Gold_Ore" text="金矿石" searchkey="金矿石黄" mc_id="14" id="18" mapcolor="#8d8860" material="rock" step_sound="stone" icon="Texture/blocks/items/ore_gold.png" texture="Texture/blocks/gold_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Iron_Ore" text="铁矿石" searchkey="" mc_id="15"-->
+  <block singleSideTex="true" name="Iron_Ore" text="铁矿石" searchkey="铁矿石灰" mc_id="15" id="124" mapcolor="#847e68" material="rock" step_sound="stone" icon="Texture/blocks/items/ore_iron.png"
+  texture="Texture/blocks/iron_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Coal_Ore" text="煤矿石" searchkey="" mc_id="16"-->
+  <block singleSideTex="true" name="Coal_Ore" text="煤炭" searchkey="煤炭矿石黑" mc_id="16" id="125" mapcolor="#352c25" step_sound="gravel" icon="Texture/blocks/items/ore_coal.png" texture="Texture/blocks/coal_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" name="Oak_Wood" text="橡木" searchkey="橡木树干深色黑色树皮" mc_id="17" id="98" mapcolor="#2d2313" step_sound="wood" material="wood" icon="Texture/blocks/items/log_oak.png" texture="Texture/blocks/log_oak_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Spruce_Wood" text="云杉木" searchkey="" mc_id="17:1"-->
+  <block threeSideTex="true" name="Spruce_Wood" text="云杉木" searchkey="云杉木" mc_id="17:1" id="126" mapcolor="#0b0709" step_sound="wood" material="wood" icon="Texture/blocks/items/log_spruce.png" texture="Texture/blocks/log_spruce_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--(Modified Xizhi 2013.11.4 id is 99)added by Jingqi 2013.11.3: name="Birch_Wood" text="白桦木" searchkey="" mc_id="17:2"-->
+  <block threeSideTex="true" name="Birch_Wood" text="桦木" searchkey="桦木树干浅色淡色白色树皮" mc_id="17:2" id="99" mapcolor="#807b64" step_sound="wood" material="wood" icon="Texture/blocks/items/log_birch.png" texture="Texture/blocks/log_birch_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Jungle_Wood" text="丛林木" searchkey="" mc_id="17:3"-->
+  <block threeSideTex="true" name="Jungle_Wood" text="丛林木" searchkey="丛林木深色黑色树皮" mc_id="17:3" id="128" mapcolor="#1c1509" step_sound="wood" material="wood" icon="Texture/blocks/items/log_jungle.png" texture="Texture/blocks/log_jungle_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--transparent leaves-->
+  <block singleSideTex="true" name="Oak_Leaves" text="橡树树叶" searchkey="橡树树叶绿" mc_id="18" id="86" mapcolor="#8db427" step_sound="grass" categoryID="31" icon="Texture/blocks/items/leaves_oak.png" texture="Texture/blocks/leaves_oak.png" transparent="true" alphaTestTexture="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Spruce_Leaves" text="云杉树叶" searchkey="云杉树叶绿" mc_id="18:1" id="91" mapcolor="#3e6405" step_sound="grass" categoryID="31" icon="Texture/blocks/items/leaves_spruce.png" texture="Texture/blocks/leaves_spruce.png" transparent="true" alphaTestTexture="true" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Birch_Leaves" text="白桦树叶" searchkey="" mc_id="18:2"-->
+  <block singleSideTex="true" name="Birch_Leaves" text="白桦树叶" searchkey="白桦树叶绿" mc_id="18:2" id="129" mapcolor="#8cbd19" step_sound="grass" categoryID="31" icon="Texture/blocks/items/leaves_birch.png" texture="Texture/blocks/leaves_birch.png" transparent="true" alphaTestTexture="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Jungle_Leaves" text="丛林树叶" searchkey="丛林树叶绿" mc_id="18:3" id="85" mapcolor="#4fab18" step_sound="grass" categoryID="31" icon="Texture/blocks/items/leaves_jungle.png" texture="Texture/blocks/leaves_jungle.png" transparent="true" alphaTestTexture="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Cherry_Blossoms" text="樱花" searchkey="樱花粉红" id="92" mapcolor="#c85ea6" icon="Texture/blocks/items/leaves_maple.png" step_sound="grass" categoryID="31" texture="Texture/blocks/pink_leaves.png" transparent="true" alphaTestTexture="true" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22: name="Sponge" text="海绵" searchkey="" mc_id="19"-->
+  <block singleSideTex="true" name="Sponge" class="BlockSponge" text="吸水海绵" searchkey="吸水海绵黄色" mc_id="19" id="174" mapcolor="#e5d06d" icon="Texture/blocks/items/sponge.png" texture="Texture/blocks/sponge.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Lapis_Lazuli_Ore" text="青金石矿石" searchkey="" mc_id="21"-->
+  <block singleSideTex="true" name="Lapis_Lazuli_Ore" text="青金石矿石" searchkey="青金石矿石蓝色灰色" mc_id="21" id="130" mapcolor="#887e63" step_sound="stone" icon="Texture/blocks/items/ore_lapis.png" texture="Texture/blocks/lapis_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.23: name="Lapis_Lazuli_Block" text="青金石块" searchkey="" mc_id="22"-->
+  <block singleSideTex="true" name="Lapis_Lazuli_Block" text="青金石块" searchkey="青金石块深色蓝色" mc_id="22" id="131" mapcolor="#887e63" step_sound="stone" icon="Texture/blocks/items/lapis_block.png" texture="Texture/blocks/lapis_block_new.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Dispenser" text="发射器" searchkey="" mc_id="23" 先不做-->
+  
+  <!--关键字更新到这里-->
+  
+  
+  <block singleSideTex="true" name="Sandstone" text="沙石" searchkey="沙石" mc_id="24" id="4" mapcolor="#e4d4a9" material="sand" step_sound="stone" icon="Texture/blocks/items/sandstone.png" texture="Texture/blocks/sandstone_top.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22-->
+  <block threeSideTex="true" name="Chiseled_Sandstone" text="錾制沙石" searchkey="錾制沙石" mc_id="24:1" id="170" mapcolor="#beb491" step_sound="stone" material="sand" icon="Texture/blocks/items/sandstone_carved.png" texture="Texture/blocks/sandstone_carved_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22-->
+  <block threeSideTex="true" name="Smooth_Sandstone" text="平滑沙石" searchkey="平滑沙石" mc_id="24:2" id="171" mapcolor="#afa794" step_sound="stone" material="sand" icon="Texture/blocks/items/sandstone_smooth.png" texture="Texture/blocks/sandstone_smooth_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Xizhi 2014.1.9 name="Note_Block" text="音符盒" searchkey="" mc_id="25"-->
+  <block singleSideTex="true" name="Note_Block" text="音符盒" searchkey="音符盒" mc_id="25" id="216" mapcolor="#271b19" entity_class="EntityNote" class="BlockNote" step_sound="cloth" icon="Texture/blocks/items/Noteblock.png" hasAction="true" texture="Texture/blocks/noteblock.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Xizhi 2014.1.9 -->
+  <block threeSideTex="true" name="MusicBox" text="唱片机" searchkey="唱片机" mc_id="84" id="217" mapcolor="#271b19" entity_class="EntityMusicBox" class="BlockMusicBox" step_sound="cloth" hasAction="true" icon="Texture/blocks/items/Jukebox.png" texture="Texture/blocks/Jukebox.png" obstruction="true" solid="true" cubeMode="true" />
+  <!--name="Bed" text="床" searchkey="" mc_id="26" 建星做-->
+  <block name="Cobweb" text="蜘蛛网" searchkey="蜘蛛网" mc_id="30" id="118"  singleSideTex="true" speedReduction="0.33" texture="Texture/blocks/web.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <!--name="Dead_Shrub" text="" searchkey="" mc_id="31" 与32重复，不需做-->
+  <block name="TallGrass" text="草" searchkey="草" mc_id="31:1" id="113"  categoryID="31" material="grass" singleSideTex="true" texture="Texture/blocks/glass09.png" disable_gen_icon="true" class="BlockGrass" modelName="grass" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <block name="Fern" text="蕨" searchkey="蕨" mc_id="31:2" id="114" categoryID="31" material="grass" singleSideTex="true" texture="Texture/blocks/fern.png" disable_gen_icon="true" class="BlockGrass" modelName="grass" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <!--added by Jingqi 2013.11.3: name="DeadBush" text="枯灌木" mc_id="32"-->
+  <block name="DeadBush" text="枯灌木" searchkey="枯灌木" mc_id="32" id="132" singleSideTex="true" material="grass" texture="Texture/blocks/deadbush.png" disable_gen_icon="true" class="BlockGrass" modelName="grass" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <!--added by Xizhi 2014.5.4: name="White_Carpet" text="白色地毯" mc_id="171"-->
+  <block singleSideTex="true" name="White_Carpet" text="白色地毯" mc_id="171" id="234" mapcolor="#f8f7db" step_sound="grass" icon="Texture/blocks/items/carpet_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Orange_Carpet" text="橙色地毯" mc_id="171:1" id="235" mapcolor="#fdcc49" step_sound="grass" icon="Texture/blocks/items/carpet_orange.png" texture="Texture/blocks/wool_colored_orange.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Magenta_Carpet" text="品红色地毯" mc_id="171:2" id="236" mapcolor="#e4adcc" step_sound="grass" icon="Texture/blocks/items/carpet_magenta.png" texture="Texture/blocks/wool_colored_magenta.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Light_Blue_Carpet" text="淡蓝色地毯" mc_id="171:3" id="237" mapcolor="#90b5c8" step_sound="grass" icon="Texture/blocks/items/carpet_lightblue.png" texture="Texture/blocks/wool_colored_light_blue.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Yellow_Carpet" text="黄色地毯" mc_id="171:4" id="238" mapcolor="#f9ec50" step_sound="grass" icon="Texture/blocks/items/carpet_yellow.png" texture="Texture/blocks/wool_colored_yellow.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Lime_Carpet" text="黄绿色地毯" mc_id="171:5" id="239" mapcolor="#cbde61" step_sound="grass" icon="Texture/blocks/items/carpet_lime.png" texture="Texture/blocks/wool_colored_lime.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Pink_Carpet" text="粉红色地毯" mc_id="171:6" id="240" mapcolor="#f6c491" step_sound="grass" icon="Texture/blocks/items/carpet_pink.png" texture="Texture/blocks/wool_colored_pink.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Gray_Carpet" text="灰色地毯" mc_id="171:7" id="241" mapcolor="#524630" step_sound="grass" icon="Texture/blocks/items/carpet_gray.png" texture="Texture/blocks/wool_colored_gray.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Light_Gray_Carpet" text="淡灰色地毯" mc_id="171:8" id="242" mapcolor="#d0cbad" step_sound="grass" icon="Texture/blocks/items/carpet_lightgray.png" texture="Texture/blocks/wool_colored_silver.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Cyan_Carpet" text="青色地毯" mc_id="171:9" id="243" mapcolor="#7cb7a3" step_sound="grass" icon="Texture/blocks/items/carpet_cyan.png" texture="Texture/blocks/wool_colored_cyan.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Purple_Carpet" text="紫色地毯" mc_id="171:10" id="244" mapcolor="#794a52" step_sound="grass" icon="Texture/blocks/items/carpet_purple.png" texture="Texture/blocks/wool_colored_purple.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Blue_Carpet" text="蓝色地毯" mc_id="171:11" id="245" mapcolor="#3f557a" step_sound="grass" icon="Texture/blocks/items/carpet_blue.png" texture="Texture/blocks/wool_colored_blue.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Brown_Carpet" text="棕色地毯" mc_id="171:12" id="246" mapcolor="#71542c" step_sound="grass" icon="Texture/blocks/items/carpet_brown.png" texture="Texture/blocks/wool_colored_brown.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Green_Carpet" text="绿色地毯" mc_id="171:13" id="247" mapcolor="#5f7415" step_sound="grass" icon="Texture/blocks/items/carpet_green.png" texture="Texture/blocks/wool_colored_green.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Red_Carpet" text="红色地毯" mc_id="171:14" id="248" mapcolor="#ca4f26" step_sound="grass" icon="Texture/blocks/items/carpet_red.png" texture="Texture/blocks/wool_colored_red.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Black_Carpet" text="黑色地毯" mc_id="171:15" id="249" mapcolor="#0c0500" step_sound="grass" icon="Texture/blocks/items/carpet_black.png" texture="Texture/blocks/wool_colored_black.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="Glass_Carpet" text="玻璃地毯" id="74" mapcolor="#f8f7db" icon="Texture/blocks/items/carpet_white.png" material="glass_carpet" step_sound="grass" break_sound="glass1" break_sound1="glass2" break_sound2="glass3" texture="Texture/blocks/glass_pane.png" transparent="true" blendedTexture="true" blockcamera="true" obstruction="true" cubeMode="true" template="carpet"  />
+  
+  <block singleSideTex="true" name="Mirror" text="镜子" searchkey="镜子" id="252" material="glass" icon="Texture/blocks/items/mirror.png" categoryID="9" step_sound="glass" texture="Texture/blocks/mirror.png" obstruction="true" solid="true" cubeMode="true" />
+  <block threeSideTex="true" name="Bone" text="骨骼" searchkey="骨骼" class="BlockBone" entity_class="EntityBlockBone" item_class="ItemBlockBone" id="253" hasAction="true" material="glass" disable_gen_icon="true" icon="Texture/blocks/items/bone.png" step_sound="glass" texture="Texture/blocks/wool_colored_silver.png" obstruction="true" blockcamera="true" template="bone?filename=model/blockworld/Bone/Bone"/>
+  <block threeSideTex="true" name="BlockModel" id="254" text="模型" searchkey="模型" class="BlockModel" entity_class="EntityBlockModel" item_class="ItemBlockModel" hasAction="true" icon="Texture/blocks/items/ts_char_off.png" texture="Texture/blocks/wool_colored_white.png" obstruction="true"/>
+  <block threeSideTex="true" name="PhysicsModel" id="22"  text="物理模型" searchkey="物理模型" class="BlockModel" entity_class="EntityBlockModel" item_class="ItemBlockModel" hasAction="true" icon="Texture/blocks/items/ts_char_on.png" texture="Texture/blocks/wool_colored_white.png" />
+  <block singleSideTex="true" name="BlockArrow" text="箭头" searchkey="" class="BlockArrow" id="255" texture="Texture/blocks/arrow.png" transparent="true" alphaTestTexture="true"  template="DataOnly" shape="vine" modelName="vine" cubeMode="true" customModel="true"/>
+  
+  <block singleSideTex="true" name="Stone_Slope" text="石斜面" searchkey="" class="BlockSlope" id="256" mapcolor="#aaa484" step_sound="stone" texture="Texture/blocks/stone_slab_three.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Sand_Slope" text="沙石斜面" searchkey="" class="BlockSlope" id="257" mapcolor="#d9c7a3" step_sound="sand" material="sand" texture="Texture/blocks/sandstone_three.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Oak_Wood_Slope" text="橡木斜面" searchkey="" class="BlockSlope" id="258" mapcolor="#715c2f" step_sound="wood" texture="Texture/blocks/planks_oak.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Cobblestone_Slope" text="圆石斜面" searchkey="" class="BlockSlope" id="259" mapcolor="#7e7761" step_sound="stone" texture="Texture/blocks/cobblestone.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Brick_Slope" text="砖斜面" searchkey="" class="BlockSlope" id="260" mapcolor="#a17342" step_sound="stone" texture="Texture/blocks/brick.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="StoneBrick_Slope" text="石砖斜面" searchkey="" class="BlockSlope" id="261" mapcolor="#9a9581" step_sound="stone" texture="Texture/blocks/stonebrick.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="NetherBrick_Slope" text="地狱砖斜面" searchkey="" class="BlockSlope" id="262" mapcolor="#28110b" step_sound="stone" texture="Texture/blocks/nether_brick.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Quartz_Slope" text="石英斜面" searchkey="" class="BlockSlope" id="263" mapcolor="#f3f2d3" step_sound="stone" texture="Texture/blocks/quartz_block_top.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  
+  <!--spot light, directional light, etc-->
+  <block singleSideTex="true" name="BlockLight" text="聚光灯" searchkey="" class="BlockLight" entity_class="EntityLight" item_class="ItemLight"  light="true" torchLightValue="5"  id="264" texture="Texture/blocks/wool_colored_white.png" obstruction="false" cubeMode="true" template="carpet" />
+  
+  <!--name="Hardened_Clay" text="硬化粘土" mc_id="172" 先不做-->
+  <!--name="Block_Of_Coal" text="煤炭块" mc_id="173" 先不做-->
+  
+  <!--added by Jingqi 2013.11.3: name="White_Wool" text="白色羊毛" mc_id="35"-->
+  <block singleSideTex="true" name="White_Wool" text="白色羊毛" searchkey="白色羊毛" mc_id="35" id="133" mapcolor="#f8f7db" step_sound="cloth" icon="Texture/blocks/items/wool_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Orange_Wool" text="橙色羊毛" searchkey="橙色羊毛" mc_id="35:1" id="94" mapcolor="#fdcc49" step_sound="cloth" icon="Texture/blocks/items/wool_orange.png" texture="Texture/blocks/wool_colored_orange.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Magenta_Wool" text="品红色羊毛" searchkey="品红色羊毛" mc_id="35:2" id="25" mapcolor="#e4adcc" step_sound="cloth" icon="Texture/blocks/items/wool_magenta.png" texture="Texture/blocks/wool_colored_magenta.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Light_Blue_Wool" text="淡蓝色羊毛" searchkey="淡蓝色羊毛" mc_id="35:3" id="21" mapcolor="#90b5c8" step_sound="cloth" icon="Texture/blocks/items/wool_lightblue.png" texture="Texture/blocks/wool_colored_light_blue.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Yellow_Wool" text="黄色羊毛" searchkey="黄色羊毛" mc_id="35:4" id="27" mapcolor="#f9ec50" step_sound="cloth" icon="Texture/blocks/items/wool_yellow.png" texture="Texture/blocks/wool_colored_yellow.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Lime_Wool" text="黄绿色羊毛" searchkey="黄绿色羊毛" mc_id="35:5" id="93" mapcolor="#cbde61" step_sound="cloth" icon="Texture/blocks/items/wool_lime.png" texture="Texture/blocks/wool_colored_lime.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Pink_Wool" text="粉红色羊毛" searchkey="粉红色羊毛" mc_id="35:6" id="96" mapcolor="#f6c491" step_sound="cloth" icon="Texture/blocks/items/wool_pink.png" texture="Texture/blocks/wool_colored_pink.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Gray_Wool" text="灰色羊毛" searchkey="灰色羊毛" mc_id="35:7" id="134" mapcolor="#524630" step_sound="cloth" icon="Texture/blocks/items/wool_gray.png" texture="Texture/blocks/wool_colored_gray.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Light_Gray_Wool" text="淡灰色羊毛" searchkey="淡灰色羊毛" mc_id="35:8" id="135" mapcolor="#d0cbad" step_sound="cloth" icon="Texture/blocks/items/wool_lightgray.png" texture="Texture/blocks/wool_colored_silver.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Cyan_Wool" text="青色羊毛" searchkey="青色羊毛" mc_id="35:9" id="20" mapcolor="#7cb7a3" step_sound="cloth" icon="Texture/blocks/items/wool_cyan.png" texture="Texture/blocks/wool_colored_cyan.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Purple_Wool" text="紫色羊毛" searchkey="紫色羊毛" mc_id="35:10" id="24" mapcolor="#794a52" step_sound="cloth" icon="Texture/blocks/items/wool_purple.png" texture="Texture/blocks/wool_colored_purple.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Blue_Wool" text="蓝色羊毛" searchkey="蓝色羊毛" mc_id="35:11" id="19" mapcolor="#3f557a" step_sound="cloth" icon="Texture/blocks/items/wool_blue.png" texture="Texture/blocks/wool_colored_blue.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Brown_Wool" text="棕色羊毛" searchkey="棕色羊毛" mc_id="35:12" id="136" mapcolor="#71542c" step_sound="cloth" icon="Texture/blocks/items/wool_brown.png" texture="Texture/blocks/wool_colored_brown.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Green_Wool" text="绿色羊毛" searchkey="绿色羊毛" mc_id="35:13" id="137" mapcolor="#5f7415" step_sound="cloth" icon="Texture/blocks/items/wool_green.png" texture="Texture/blocks/wool_colored_green.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--light block-->
+  <block singleSideTex="true" name="Red_Wool" text="红色羊毛" searchkey="红色羊毛发光" mc_id="35:14" id="23" mapcolor="#ca4f26" step_sound="cloth" icon="Texture/blocks/items/wool_red.png" texture="Texture/blocks/wool_colored_red.png" light="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Black_Wool" text="黑色羊毛" searchkey="黑色羊毛" mc_id="35:15" id="71" mapcolor="#0c0500" step_sound="cloth" icon="Texture/blocks/items/wool_black.png" texture="Texture/blocks/wool_colored_black.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block name="Yellow_Flower" text="蒲公英" searchkey="蒲公英" mc_id="37" id="116"  singleSideTex="true" texture="Texture/blocks/flower_dandelion.png" disable_gen_icon="true" class="BlockGrass" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <block name="Red_Rose" text="红玫瑰" searchkey="红玫瑰" mc_id="38" id="115" singleSideTex="true" texture="Texture/blocks/flower_rose.png" disable_gen_icon="true" class="BlockGrass" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.3: name="Brown_Mushroom" text="棕色蘑菇" searchkey="" mc_id="39"-->
+  <block name="Brown_Mushroom" text="棕色蘑菇" searchkey="棕色蘑菇" mc_id="39" id="141" singleSideTex="true" texture="Texture/blocks/mushroom_brown.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <block name="Red_Mushroom" text="红色蘑菇" searchkey="红色蘑菇" mc_id="40" id="117" singleSideTex="true" texture="Texture/blocks/mushroom_red.png" disable_gen_icon="true" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true">
+  </block>
+  <!--added by Jingqi 2013.11.23: name="Gold_Block" text="金块" searchkey="" mc_id="41"-->
+  <block singleSideTex="true" name="Gold_Block" text="金块" searchkey="金块" mc_id="41" id="142" mapcolor="#847e68" material="rock" step_sound="stone" icon="Texture/blocks/items/gold_block.png" texture="Texture/blocks/gold_block_new.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.23: name="Iron_Block" text="铁块" searchkey="" mc_id="42"-->
+  <block singleSideTex="true" name="Iron_Block" text="铁块" searchkey="铁块" mc_id="42" id="143" mapcolor="#847e68" material="rock" step_sound="stone" icon="Texture/blocks/items/iron_block.png" texture="Texture/blocks/iron_block_new.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" name="Double_Stone_Slab" text="双层石台阶"  searchkey="双层石台阶" mc_id="43" id="59" mapcolor="#807b64" step_sound="stone" icon="Texture/blocks/items/double_stone_slab.png" texture="Texture/blocks/stone_slab_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22: name="Stone_Slab" text="石台阶" searchkey="" mc_id="44"-->
+  <block threeSideTex="true" name="Stone_Slab" text="石台阶" searchkey="石台阶" mc_id="44" id="176" mapcolor="#aaa484" step_sound="stone" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_stone.png" texture="Texture/blocks/stone_slab_three.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--name="Sandstone_Slab" text="沙石台阶" searchkey="" mc_id="44:1"-->
+  <block threeSideTex="true" name="Sandstone_Slab" text="沙石台阶" searchkey="沙石台阶" mc_id="44:1" id="177" mapcolor="#d9c7a3" step_sound="sand" material="sand" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_sandstone.png" texture="Texture/blocks/sandstone_three.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--Added Xizhi 2013.11.6：name="Oak_Wood_Slab" text="橡木台阶" searchkey="" mc_id="44:2"-->
+  <block singleSideTex="true" name="Oak_Wood_Slab" text="橡木台阶" searchkey="橡木台阶" mc_id="44:2" id="160" mapcolor="#715c2f" step_sound="wood" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_oak.png" texture="Texture/blocks/planks_oak.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="Cobblestone_Slab" text="圆石台阶" searchkey="" mc_id="44:3"-->
+  <block singleSideTex="true" name="Cobblestone_Slab" text="圆石台阶" searchkey="圆石台阶" mc_id="44:3" id="178" mapcolor="#7e7761" step_sound="stone" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_cobblestone.png" texture="Texture/blocks/cobblestone.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="Brick_Slab" text="砖台阶" searchkey="" mc_id="44:4"-->
+  <block singleSideTex="true" name="Brick_Slab" text="砖台阶" searchkey="砖台阶" mc_id="44:4" id="179" mapcolor="#a17342" class="BlockSlab" item_class="ItemSlab" step_sound="stone" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_brick.png" texture="Texture/blocks/brick.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="StoneBrick_Slab" text="石砖台阶" searchkey="" mc_id="44:5"-->
+  <block singleSideTex="true" name="StoneBrick_Slab" text="石砖台阶" searchkey="石砖台阶" mc_id="44:5" id="180" mapcolor="#9a9581" class="BlockSlab" item_class="ItemSlab" step_sound="stone" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_stonebrick_new.png" texture="Texture/blocks/stonebrick.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="NetherBrick_Slab" text="地狱转台阶" searchkey="" mc_id="44:6"-->
+  <block singleSideTex="true" name="NetherBrick_Slab" text="地狱砖台阶" searchkey="地狱砖台阶" mc_id="44:6" id="181" mapcolor="#28110b" class="BlockSlab" item_class="ItemSlab" step_sound="stone" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_nether.png" texture="Texture/blocks/nether_brick.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="Quartz_Slab" text="石英台阶" searchkey="" mc_id="44:7" -->
+  <block singleSideTex="true" name="Quartz_Slab" text="石英台阶" searchkey="石英台阶" mc_id="44:7" id="182" mapcolor="#f3f2d3" class="BlockSlab" item_class="ItemSlab" step_sound="stone" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_quartz.png" texture="Texture/blocks/quartz_block_top.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <block singleSideTex="true" name="Brick" text="砖块" searchkey="砖块" mc_id="45" id="70" mapcolor="#ae804c" icon="Texture/blocks/items/brick_new.png" step_sound="stone" material="rock" texture="Texture/blocks/brick.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Xizhi 2013.12.6. name="TNT" text="TNT" searchkey="" mc_id="46" -->
+  <block threeSideTex="true" name="TNT" text="TNT" searchkey="TNT" mc_id="46" id="196" mapcolor="#574723" class="BlockTNT" icon="Texture/blocks/items/tnt.png" hasAction="true" texture="Texture/blocks/tnt_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Bookshelf" text="书架" searchkey="" mc_id="47"-->
+  <block threeSideTex="true" name="Bookshelf" text="书架" searchkey="书架" mc_id="47" id="144" mapcolor="#574723" icon="Texture/blocks/items/bookshelf.png" texture="Texture/blocks/bookshelf_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Mossy_Cobblestone" text="苔石" searchkey="" mc_id="48"-->
+  <block singleSideTex="true" name="Moss_Stone" text="苔石" searchkey="苔石" mc_id="48" id="145" mapcolor="#515c1f" icon="Texture/blocks/items/cobblestone_mossy.png" material="rock" step_sound="stone" texture="Texture/blocks/cobblestone_mossy.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Obsidian" text="黑曜石" searchkey="" mc_id="49"-->
+  <!--TODO 2014.1.27: use Texture/blocks/obsidianBlack.png-->
+  <block singleSideTex="true" name="Obsidian" text="黑曜石" searchkey="黑曜石" mc_id="49" id="146" mapcolor="#261a1a" icon="Texture/blocks/items/stone_obsidian.png" material="rock" step_sound="stone" texture="Texture/blocks/obsidian.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--Light source-->
+  <block name="Torch" text="火把" searchkey="火把" mc_id="50" id="100" class="BlockTorch" itemModel="icon" itemModelScaling="1" inhandOffset="{0,0.3,0}" icon="model/blockworld/Torch/Torch_ground.x.png" texture="Texture/blocks/torch.png" light="true" categoryID="5" torchLightValue="14" customModel="true" template="Torch?filename=model/blockworld/Torch/Torch"/>
+  <!--name="Fire" text="火" searchkey="" mc_id="51" 建星做-->
+  <!--name="Mob_Spawner" text="刷怪箱" searchkey="" mc_id="52" 先不做-->
+  <block name="Oak_Wood_Stairs" text="橡木楼梯" searchkey="橡木楼梯" mc_id="53" id="112" mapcolor="#73582b" icon="Texture/blocks/items/stairs_oak.png" step_sound="wood" texture="Texture/blocks/planks_oak.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood" />
+  <!--Added LiXizhi 2014.1.7: name="Chest" text="箱子" searchkey="" mc_id="54"-->
+  <block name="Chest" text="箱子" searchkey="箱子" mc_id="54" id="215" mapcolor="#73582b" class="BlockChest" material="wood" entity_class="EntityChest" hasAction="true" icon="Texture/blocks/items/Chest.png" texture="Texture/blocks/Chest.png" obstruction="true" solid="true" transparent="true" customModel="true" />
+  <!--Added LiXizhi 2013.12.2: name="Redstone_Wire" text="红石线" searchkey="" mc_id="55" 先不做-->
+  <block name="Redstone_Wire" text="红石线" searchkey="红石线" mc_id="55" id="189" class="BlockRedstoneWire" icon="Texture/blocks/items/redstone_dust.png" texture="Texture/blocks/Redstone_Wire_mip1.png" shape="wire" cubeMode="true" customModel="true" transparent="true" blendedTexture="true" modelName="wire" />
+  
+  <!--added by Jingqi 2013.11.3: name="Diamond_Ore" text="钻石矿石" searchkey="" mc_id="56"-->
+  <block singleSideTex="true" name="Diamond_Ore" text="钻石矿石" searchkey="钻石矿石" mc_id="56" id="147" mapcolor="#736c4f" icon="Texture/blocks/items/ore_diamond.png" material="rock" step_sound="stone" texture="Texture/blocks/diamond_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.23: name="Diamond_Block" text="钻石块" searchkey="" mc_id="57"-->
+  <block singleSideTex="true" name="Diamond_Block" text="钻石块" searchkey="钻石块" mc_id="57" id="148" mapcolor="#6edece" icon="Texture/blocks/items/diamond_block.png" material="rock" step_sound="stone" texture="Texture/blocks/diamond_block_new.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Workbench" text="工作台" searchkey="" mc_id="58" 先不做-->
+  <!--added by Xizhi 2013.11.8: name="Crops" text="小麦种子" searchkey="" mc_id="59" 以后用农作物替换-->
+  <!--<block name="Crops" text="小麦种子" class="BlockPlant" searchkey="" mc_id="59" id="164"  singleSideTex="true" icon="Texture/blocks/wheat_all.png#0 0 32 32" texture="Texture/blocks/wheat_all.png" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" template="plant"/>-->
+  <block searchkey="小麦" mc_id="59" id="164" name="Wheat" class="BlockPlant" text="小麦" mapcolor="#998113" icon="Texture/blocks/items/1001_Wheat.png" texture="Texture/blocks/1001_Wheat.png" singleSideTex="true" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" template="seed_plant"/>
+  <block id="208" name="Tomato" class="BlockPlant" text="西红柿" searchkey="西红柿" icon="Texture/blocks/items/1000_Tomato.png" texture="Texture/blocks/1000_Tomato.png" singleSideTex="true" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" template="seed_plant"/>
+
+  <block singleSideTex="true" name="Soil" text="耕地" searchkey="耕地" mc_id="60" id="13" mapcolor="#65482a" icon="Texture/blocks/items/farmland.png" step_sound="gravel" texture="Texture/blocks/farmland_dry.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Furnace" text="熔炉" searchkey="" mc_id="61" 建星做-->
+  <!--name="Burning_Furnace" text="燃烧的熔炉" searchkey="" mc_id="62" 建星检查材质图，做图标-->
+  <!--added Xizhi 2013.12.23:  name="Wall_Sign" text="物品展示框" searchkey="" mc_id="68" -->
+  <block name="Wall_Sign" text="物品展示框" searchkey="物品展示框" mc_id="68"  id="213" class="BlockItemFrame" entity_class="EntityItemFrame" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/itemframe.png" texture="Texture/blocks/ItemFrame.png" customModel="true" template="image?filename=model/blockworld/ItemFrame/ItemFrame"/>
+  <block name="Painting" text="相册" searchkey="相册" mc_id="321" id="218" item_class="ItemImage" class="BlockImage" entity_class="EntityImage" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/painting.png" texture="Texture/blocks/ItemFrame.png" customModel="true" template="image?filename=model/blockworld/Painting/Painting"/>
+  <!--added Xizhi 2013.12.18: name="Sign_Post" text="告示牌" searchkey="" mc_id="63"-->
+  <block name="Sign_Post" text="告示牌" searchkey="告示牌" mc_id="63" id="211" class="BlockSign" item_class="ItemSign" entity_class="EntitySign" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/textframe.png" customModel="true" texture="Texture/blocks/ItemFrame.png" template="image?filename=model/blockworld/TextFrame/TextFrame"/>
+  <!--Added Xizhi 2013.12.21 name="Command_Block" text="命令方块" searchkey="" mc_id="137"-->
+  <block singleSideTex="true" name="Command_Block" text="命令方块" searchkey="命令方块" mc_id="137" id="212" mapcolor="#656043" class="BlockCommandBlock" entity_class="EntityCommandBlock" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/Command_Block.png" cubeMode="true" obstruction="true" solid="true" />
+  <!--Added Xizhi 2014.3.28 added movie clip-->
+  <block threeSideTex="true" name="MovieClip" text="电影方块" searchkey="电影" id="228" mapcolor="#8f8f8f" class="BlockCommandBlock" entity_class="EntityMovieClip" toggle_sound="click" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/movie.png" texture="Texture/blocks/movie_three.png" cubeMode="true" obstruction="true" solid="true"/>
+  
+  <!--Added Xizhi 2014.2.12-->
+  <block singleSideTex="true" name="CmdTextureReplacer" text="材质转换器" searchkey="材质转换器" id="223" class="BlockEntityBase" entity_class="EntityCmdTextureReplacer" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/stonebrick_chiseled.png" cubeMode="true" obstruction="true" solid="true" />
+  
+  <!--name="Ladder" text="梯子" searchkey="" mc_id="65"-->
+  <block name="Ladder" text="梯子" class="BlockVine" searchkey="梯子" mc_id="65" id="166" icon="Texture/blocks/ladder.png" texture="Texture/blocks/ladder.png" transparent="true" alphaTestTexture="true" climbable="true" template="vine" />
+  <block name="CornerGrass" text="含羞草" searchkey="含羞草" id="221" hasAction="true" material="cornergrass" class="BlockCollisionSensor" entity_class="EntityCollisionSensor"  icon="Texture/blocks/wheat_stage_0.png" texture="Texture/blocks/wheat_stage_0.png" transparent="true" alphaTestTexture="true" climbable="true" template="halfvine" />
+  <block singleSideTex="true" name="BlockUpdateDetector" text="含羞草石" searchkey="含羞草石" id="227" mapcolor="#766c53" class="BlockBlockUpdateDetector" texture="Texture/blocks/sensor_stone.png" icon="Texture/blocks/items/sensor_stone.png" cubeMode="true" obstruction="true" solid="true" />
+  
+  <!--Rail road-->
+  <block name="Rails" text="铁轨" searchkey="铁轨" mc_id="66" id="103" mapcolor="#6c5734" class="BlockRailBase" disable_gen_icon="true" icon="Texture/blocks/rail_normal.png" texture="Texture/blocks/rail_normal.png" customBlockModel="true" customModel="true" template="Rails?filename=model/blockworld/Rail/Rail" />
+  <!--Added Xizhi 2014.6.12 RailPowered-->
+  <block name="RailPowered" text="动力铁轨" searchkey="" mc_id="27" id="250" mapcolor="#6c5734" class="BlockRailPowered" disable_gen_icon="true" icon="Texture/blocks/rail_activator_powered.png" texture="Texture/blocks/rail_activator.png" texture2="Texture/blocks/rail_activator_powered.png" customModel="true" template="Rails?filename=model/blockworld/Rail/Rail" />
+  <!--Added Xizhi 2014.6.17 RailDetector-->
+  <block name="RailDetector" text="探测铁轨" searchkey="" mc_id="28" id="251" mapcolor="#6c5734" class="BlockRailDetector" disable_gen_icon="true" icon="Texture/blocks/rail_detector.png" texture="Texture/blocks/rail_detector.png" texture2="Texture/blocks/rail_activator_powered.png" customModel="true" template="Rails?filename=model/blockworld/Rail/Rail" />
+  
+  <!--Added Xizhi 2013.11.22 name="Cobblestone_Stairs" text="圆石楼梯" searchkey="" mc_id="67"-->
+  <block name="Cobblestone_Stairs" text="圆石楼梯" searchkey="圆石楼梯" mc_id="67" id="175" mapcolor="#8c8569" icon="Texture/blocks/items/stairs_cobblestone.png" step_sound="stone" texture="Texture/blocks/cobblestone.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood" />
+  
+  <block name="Lever" text="拉杆" searchkey="拉杆" mc_id="69" id="190" class="BlockLever" disable_gen_icon="true" icon="model/blockworld/Redstone_Lever/Redstone_Lever_off.x.png" click_sound="click" toggle_sound="click" selection_effect="model_highlight" texture="Texture/blocks/Redstone_Button_off.png" texture2="Texture/blocks/Redstone_Button_on.png" customModel="true" hasAction="true" template="Lever?filename=model/blockworld/Redstone_Lever/Redstone_Lever" /> 
+  <block name="Stone_Pressure_Plate" text="石压力板" searchkey="石压力板" mc_id="70" id="200" mapcolor="#8c8569" class="BlockPressurePlate" icon="Texture/blocks/items/Stone_Pressure_Plate.png" toggle_sound="click"  texture="Texture/blocks/stone.png" customModel="true" template="Plate?filename=model/blockworld/PressurePlate/PressurePlate" />
+  <block name="Wooden_Pressure_Plate" text="木压力板" searchkey="木压力板" mc_id="72" id="201" mapcolor="#534322" class="BlockPressurePlate" icon="Texture/blocks/items/Wooden_Pressure_Plate.png" toggle_sound="click"  texture="Texture/blocks/piston_top_normal.png" customModel="true" template="Plate?filename=model/blockworld/PressurePlate/PressurePlate" />
+  <!--Added Xizhi 2013.12.92 Pistons-->
+  <block name="StickyPiston" text="粘性活塞" isSticky="true" searchkey="粘性活塞" mc_id="29" id="202" mapcolor="#776b31" class="BlockPiston" icon="model/blockworld/Piston_Viscous/Piston_Viscous_off.x.png" texture="Texture/blocks/Piston_Viscous.png" toggle_sound="click"  obstruction="true" customModel="true" template="Piston?filename=model/blockworld/Piston_Viscous/Piston_Viscous" />
+  <block name="Piston" text="活塞" searchkey="活塞" mc_id="33" id="203" mapcolor="#776b31" class="BlockPiston" icon="model/blockworld/Piston/Piston_off.x.png" toggle_sound="click"  customModel="true" texture="Texture/blocks/Piston.png" obstruction="true" template="Piston?filename=model/blockworld/Piston/Piston" />
+  <block name="PistonHead" text="活塞臂" searchkey="活塞臂" mc_id="204" id="204" mapcolor="#776b31" class="BlockPistonExtension" icon="model/blockworld/Piston/Piston_on.x.png" toggle_sound="click"  obstruction="true" />
+  <block name="PistonMoving" text="运动中的活塞" searchkey="运动中的活塞" mc_id="204" id="205" mapcolor="#776b31" class="BlockPistonMoving" icon="model/blockworld/Piston/Piston_on.x.png" obstruction="true" />
+  <!--added by Jingqi 2013.11.3: name="Redstone_Ore" text="红石矿石" searchkey="" mc_id="73"-->
+  <block singleSideTex="true" name="Redstone_Ore" text="红石矿石" searchkey="红石矿石" mc_id="73" id="16" mapcolor="#871804" icon="Texture/blocks/items/ore_redstone.png" texture="Texture/blocks/redstone_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Lamp" text="灯" searchkey="灯" mc_id="124" id="6" mapcolor="#f4c249" icon="Texture/blocks/items/Light.png" texture="Texture/blocks/redstoneLight_lit.png" light="true" categoryID="5" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Redstone_Lamp" text="红石灯" searchkey="红石灯" mc_id="123" id="199" mapcolor="#f2c849" class="BlockRedstoneLight" toggle_blockid="207" icon="Texture/blocks/items/redstoneLight_on.png" texture="Texture/blocks/redstone_lamp_off.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Redstone_Lamp_On" text="开启的红石灯" searchkey="开启的红石灯" mc_id="124" id="207" mapcolor="#ffd65b" class="BlockRedstoneLight" toggle_blockid="199" icon="Texture/blocks/items/redstoneLight_on.png" texture="Texture/blocks/redstone_lamp_on.png" light="true" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Pumpkin_Lantern" text="南瓜灯" searchkey="" mc_id="91" 最好换个材质脸（夏日风情的南瓜灯是无脸的）-->
+  <block threeSideTex="true" name="Pumpkin_Lantern" text="南瓜灯" searchkey="南瓜灯" mc_id="91" id="220" mapcolor="#f1be51" icon="Texture/blocks/items/pumpkin_lantern.png" texture="Texture/blocks/pumpkinLight_three.png" light="true" categoryID="5" obstruction="true" solid="true" cubeMode="true"  />
+
+  <!--name="Redstone_Ore_Glowing" text="发光的红石矿石" searchkey="" mc_id="74" 先不做-->
+  <!--Added Xizhi 2013.12.4: name="Redstone_Torch" text="红石火把" searchkey="" mc_id="75"-->
+  <block name="Redstone_Torch" text="红石火把" itemModel="icon" searchkey="红石火把" mc_id="75" id="191" class="BlockRedstoneTorch" icon="Texture/blocks/items/redstone_torch.png" texture="Texture/blocks/redstone_torch_off.png" toggle_blockid="192" customModel="true" template="Torch?filename=model/blockworld/Redstone_Torch/Redstone_Torch_off" />
+  <!--Added Xizhi 2013.12.4: name="Redstone_Torch_On" text="点亮的红石火把" searchkey="" mc_id="76"-->
+  <block name="Redstone_Torch_On" text="红石火把" itemModel="icon" searchkey="红石火把" mc_id="76" id="192" class="BlockRedstoneTorch" icon="Texture/blocks/items/redstone_torch.png" texture="Texture/blocks/redstone_torch_on.png"  toggle_blockid="191" light="true" categoryID="5" torchLightValue="7" customModel="true" template="Torch?filename=model/blockworld/Redstone_Torch/Redstone_Torch_on" />
+  <!--Added Xizhi 2014.2.18: -->
+  <block threeSideTex="true" name="Redstone_Conductor" text="向上导体" searchkey="向上导体" id="225" mapcolor="#c1221a" class="BlockRedstoneConductor" toggle_blockid="226" icon="Texture/blocks/items/redstone_conductor.png" texture="Texture/blocks/redstone_conductor_off.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" name="Redstone_Conductor_On" text="充能的向上导体" searchkey="充能的向上导体" id="226" mapcolor="#c1221a" class="BlockRedstoneConductor" toggle_blockid="225" icon="Texture/blocks/items/redstone_conductor.png" texture="Texture/blocks/redstone_conductor_on.png" light="true" categoryID="5" torchLightValue="7" obstruction="true" solid="true" cubeMode="true"  />
+  <!--Added Xizhi 2013.12.4: name="Stone_Button" text="按钮" searchkey="" mc_id="77" 建星做-->
+  <block name="Stone_Button" text="按钮" searchkey="按钮" mc_id="77" id="105" class="BlockButton" disable_gen_icon="true" icon="model/blockworld/Redstone_Button/Redstone_Button_off.x.png" click_sound="click" toggle_sound="click" selection_effect="model_highlight" texture="Texture/blocks/Redstone_Button_off.png" texture2="Texture/blocks/Redstone_Button_on.png" customModel="true" hasAction="true" template="Lever?filename=model/blockworld/Redstone_Button/Redstone_Button" />
+  <!--(Modified Xizhi 2013.11.4) 为snowcover，按厚度有7种不同的状态，建星做-->
+  <block threeSideTex="true" name="Snow" text="雪" searchkey="雪" mc_id="78" id="52" mapcolor="#f2fcfc" icon="Texture/blocks/items/snowdirt.png" texture="Texture/blocks/snow_dirt_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--ice (solid liquid) block-->
+  <block singleSideTex="true" name="Ice" text="冰" searchkey="冰" mc_id="79" id="17" mapcolor="#eaf7fd" icon="Texture/blocks/items/ice.png" material="glass" break_sound="glass2" break_sound1="glass1" blendedTexture="true" break_sound2="glass3" texture="Texture/blocks/ice.png" transparent="true" liquid="true" obstruction="true" solid="true" cubeMode="true"  slipperiness="100"/>
+  <block singleSideTex="true" name="Snow_Block" text="雪块" searchkey="雪块" mc_id="80" id="5" mapcolor="#eaf7fd" icon="Texture/blocks/items/snow.png" texture="Texture/blocks/snow.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added Xizhi 2013.11.8 name="Cactus" text="仙人掌" searchkey="" mc_id="81"-->
+  <block threeSideTex="true" name="Cactus" text="仙人掌" searchkey="仙人掌" mc_id="81" id="165" mapcolor="#738031" modelName="cactus" icon="Texture/blocks/items/cactus.png" texture="Texture/blocks/leaves_cactus_three.png" obstruction="true" transparent="true" alphaTestTexture="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Clay" text="粘土块" searchkey="粘土块" mc_id="82" id="53" mapcolor="#ecdb6f" icon="Texture/blocks/items/clay.png" texture="Texture/blocks/clay.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added Xizhi 2013.11.6 name="Reed" text="甘蔗" searchkey="" mc_id="83"-->
+  <block name="Reed" text="甘蔗" searchkey="甘蔗" mc_id="83" id="161"  singleSideTex="true" disable_gen_icon="true" texture="Texture/blocks/reeds.png" class="BlockGrass" modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <!--name="Jukebox" text="唱片机" searchkey="" mc_id="84" 先不做-->
+  <!--fence: obstruction but not solid, camera only collide with solid object-->
+  <block name="Fence" text="栅栏" searchkey="栅栏" mc_id="85" id="101" icon="Texture/blocks/items/Fence.png" texture="Texture/blocks/planks_oak.png" obstruction="true" customModel="true" template="Fence?filename=model/blockworld/Fence/Fence" />
+  <!--added by Jingqi 2013.11.3: name="Pumpkin" text="南瓜" searchkey="" mc_id="86"-->
+  <block threeSideTex="true" name="Pumpkin" text="南瓜" searchkey="南瓜" mc_id="86" id="149" modelName="dirCube" icon="Texture/blocks/items/pumpkin.png" texture="Texture/blocks/pumpkin_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Netherrack" text="地狱岩" searchkey="" mc_id="87"-->
+  <block singleSideTex="true" name="Netherrack" text="地狱岩" searchkey="地狱岩" mc_id="87" id="150" mapcolor="#321511" step_sound="gravel" icon="Texture/blocks/items/stone_nether.png" texture="Texture/blocks/netherrack.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.3: name="Soul_Sand" text="灵魂沙" searchkey="" mc_id="88"-->
+  <block singleSideTex="true" name="Soul_Sand" text="灵魂沙" searchkey="灵魂沙" mc_id="88" id="151" mapcolor="#3e2d1b" step_sound="sand" material="sand" icon="Texture/blocks/items/soul_sand.png" texture="Texture/blocks/soul_sand.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--light block-->
+  <block singleSideTex="true" name="Glowstone" text="萤石块" searchkey="萤石块" mc_id="89" id="87" mapcolor="#cfab3d" step_sound="gravel" icon="Texture/blocks/items/stone_glow.png" texture="Texture/blocks/stone_glow.png" light="true" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Portal" text="下界传送门方块" searchkey="" mc_id="90" 先不做-->
+  <!--added by Jingqi 2013.11.23: 要做成半格高-->
+  <block singleSideTex="true" name="Cake" text="蛋糕" searchkey="蛋糕" mc_id="92" id="84" step_sound="gravel" texture="Texture/blocks/cake_top.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--Added Xizhi 2013.12.7: name="Redstone_Repeater" text="红石中继器" searchkey="" mc_id="93" -->
+  <block name="Redstone_Repeater" text="红石中继器" searchkey="红石中继器" mc_id="93" class="BlockRedstoneRepeater" id="197" disable_gen_icon="true" icon="Texture/blocks/items/Redstone_Repeater.png" toggle_blockid="198" click_sound="click" toggle_sound="click" hasAction="true" customModel="true" texture="Texture/blocks/Redstone_Repeater_off.png" template="RepeaterOff?filename=model/blockworld/Redstone_Repeater/Redstone_Repeater_off" />
+  <!--Added Xizhi 2013.12.7: name="Redstone_Repeater_On" text="激活的红石中继器" searchkey="" mc_id="94" -->
+  <block name="Redstone_Repeater_On" text="激活的红石中继器" searchkey="激活的红石中继器" mc_id="94" class="BlockRedstoneRepeater" id="198" disable_gen_icon="true" icon="Texture/blocks/items/Redstone_Repeater.png" toggle_blockid="197" light="true" torchLightValue="7" click_sound="click" toggle_sound="click"  hasAction="true" customModel="true" texture="Texture/blocks/Redstone_Repeater_on1.png" texture2="Texture/blocks/Redstone_Repeater_on2.png" texture3="Texture/blocks/Redstone_Repeater_on3.png" texture4="Texture/blocks/Redstone_Repeater_on4.png" template="Repeater?filename=model/blockworld/Redstone_Repeater/Redstone_Repeater_on" />
+  <!--name="LockedChest" text="上锁的箱子" searchkey="" mc_id="95" 建星做-->
+  <!--door with toggle_blockid 可以和MC做成同一材质吗-->
+  <block name="Wooden_Door" text="木门" searchkey="木门" mc_id="64" id="232" class="BlockTrapDoor" item_class="ItemDoor" icon="Texture/blocks/items/door_wood.png" toggle_blockid="233" toggle_sound="door_open" texture="Texture/blocks/door_wood_lower.png" hasAction="true" obstruction="true" blockcamera="true" customModel="true" template="Trapdoor?filename=model/blockworld/DoorWood/DoorWood" />
+  <block name="Wooden_Door_On" text="木门(开)" searchkey="木门(开)" id="233" class="BlockTrapDoor" item_class="ItemDoor" icon="Texture/blocks/items/door_wood.png" toggle_blockid="232" toggle_sound="door_open" texture="Texture/blocks/door_wood_lower.png" hasAction="true" customModel="true" template="Trapdoor_On?filename=model/blockworld/DoorWood/DoorWood" />
+  <block name="Iron_Door" text="铁门" searchkey="铁门" id="230" class="BlockTrapDoor" item_class="ItemDoor" icon="Texture/blocks/items/door_iron.png" toggle_blockid="231" toggle_sound="door_open" texture="Texture/blocks/door_iron_lower.png" obstruction="true" blockcamera="true" customModel="true" template="Trapdoor?filename=model/blockworld/DoorIron/DoorIron" />
+  <block name="Iron_Door_On" text="铁门(开)" searchkey="铁门(开)" id="231" mc_id="71" class="BlockTrapDoor" item_class="ItemDoor" icon="Texture/blocks/items/door_iron.png" toggle_blockid="230" toggle_sound="door_open" texture="Texture/blocks/door_iron_lower.png" customModel="true" template="Trapdoor_On?filename=model/blockworld/DoorIron/DoorIron" />
+  <block name="Trapdoor" text="木窗" searchkey="木窗" mc_id="96" id="108" class="BlockTrapDoor" icon="model/blockworld/WindowWood/WindowWood.x.png" toggle_blockid="109" toggle_sound="door_open" texture="Texture/blocks/door_wood_upper.png" hasAction="true" obstruction="true" customModel="true" transparent="true" alphaTestTexture="true" template="Trapdoor?filename=model/blockworld/WindowWood/WindowWood" />
+  <block name="Trapdoor_On" text="木窗(开)" searchkey="木窗(开)" mc_id="96" class="BlockTrapDoor" id="109" icon="model/blockworld/WindowWood/WindowWood.x.png" toggle_blockid="108" toggle_sound="door_open" texture="Texture/blocks/door_wood_upper.png" hasAction="true" customModel="true" transparent="true" alphaTestTexture="true" template="Trapdoor_On?filename=model/blockworld/WindowWood/WindowWood" />
+  <block name="IronTrapdoor" text="铁窗" searchkey="铁窗" id="194" class="BlockTrapDoor" icon="model/blockworld/WindowIron/WindowIron.x.png" toggle_blockid="195" toggle_sound="door_open" texture="Texture/blocks/door_iron_upper.png" obstruction="true" customModel="true" transparent="true" alphaTestTexture="true" template="Trapdoor?filename=model/blockworld/WindowWood/WindowWood" />
+  <block name="IronTrapdoor_On" text="铁窗(开)" searchkey="铁窗(开)" id="195" class="BlockTrapDoor" icon="model/blockworld/WindowIron/WindowIron.x.png" toggle_blockid="194" toggle_sound="door_open" texture="Texture/blocks/door_iron_upper.png" customModel="true" transparent="true" alphaTestTexture="true" template="Trapdoor_On?filename=model/blockworld/WindowWood/WindowWood" />
+  <!--added by Jingqi 2013.11.3: name="Block_Of_Redstone" text="红石块" searchkey="" mc_id="152"-->
+  <block singleSideTex="true" name="Block_Of_Redstone" text="红石块"  class="BlockPowered" searchkey="红石块" mc_id="155" id="157" mapcolor="#"  icon="Texture/blocks/items/redstone_block.png" texture="Texture/blocks/redstone_block_new.png" obstruction="true" solid="true" light="true" categoryID="5" torchLightValue="7" cubeMode="true"  />
+
+  <!--name="SilverfishStone" text="隐藏的蠹虫" searchkey="" mc_id="97" 先不做-->
+  <block singleSideTex="true" name="StoneBrick" text="石砖" searchkey="石砖" mc_id="98" id="68" mapcolor="#b3ad90" material="rock" step_sound="stone" icon="Texture/blocks/items/stonebrick.png" texture="Texture/blocks/stonebrick.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Mossy_StoneBrick" text="苔石砖" searchkey="苔石砖" mc_id="98:1" id="69" mapcolor="#4c5623" step_sound="stone" icon="Texture/blocks/items/stonebrick_mossy.png" texture="Texture/blocks/stonebrick_mossy.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Cracked_StoneBrick" text="裂石砖" searchkey="裂石砖" mc_id="98:2" id="66" mapcolor="#666141" step_sound="stone" icon="Texture/blocks/items/stonebrick_cracked.png" texture="Texture/blocks/stonebrick_cracked.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Chiseled_StoneBrick" text="錾制石砖" searchkey="錾制石砖" mc_id="98:3" id="89" mapcolor="#807b5d" step_sound="stone" icon="Texture/blocks/items/stonebrick_chiseled.png" texture="Texture/blocks/stonebrick_chiseled.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="BrownMushroomCap" text="巨型棕色蘑菇" searchkey="" mc_id="99" 先不做-->
+  <!--name="RedMushroomCap" text="巨型红色蘑菇" searchkey="" mc_id="100" 先不做-->
+  <!--added by Xizhi 2013.12.16 name="IronBars" text="铁栏杆" searchkey="" mc_id="101"-->
+  <block name="IronBars" text="铁栏杆" searchkey="铁栏杆" mc_id="101" id="209" icon="Texture/blocks/iron_bars.png" break_sound="glass1" break_sound1="glass2" break_sound2="glass3" texture="Texture/blocks/iron_bars.png" obstruction="true" blockcamera="true" transparent="true" alphaTestTexture="true" customModel="true" template="GlassPane?filename=model/blockworld/GlassPane/GlassPane" />
+  <!--GlassPane: obstruction but not solid, camera only collide with solid object-->
+  <block name="GlassPane" text="玻璃板" searchkey="玻璃板" mc_id="102" id="102" mapcolor="#647475" icon="Texture/blocks/items/GlassPane.png" material="glass" break_sound="glass1" break_sound1="glass2" break_sound2="glass3" texture="Texture/blocks/glass_pane.png" obstruction="true" blockcamera="true" transparent="true" blendedTexture="true" customModel="true" template="GlassPane?filename=model/blockworld/GlassPane/GlassPane" />
+  <block singleSideTex="true" name="Glass" text="玻璃" searchkey="玻璃蓝色透明" mc_id="20" id="95" mapcolor="#647475" material="glass" icon="Texture/blocks/items/glass.png" step_sound="glass" texture="Texture/blocks/glass_pane.png" transparent="true" alphaTestTexture="true" obstruction="true" cubeMode="true" blendedTexture="true" />
+  <!--added by Jingqi 2013.11.3: name="Melon" text="西瓜" searchkey="" mc_id="103"-->
+  <block threeSideTex="true" name="Melon" text="西瓜" searchkey="西瓜" mc_id="103" id="152" mapcolor="#60771d" icon="Texture/blocks/items/melonblock.png" texture="Texture/blocks/melon_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="PumpkinStem" text="南瓜梗" searchkey="" mc_id="104" 建星做-->
+  <!--name="MelonStem" text="西瓜梗" searchkey="" mc_id="105" 建星做-->
+  <!--name="FenceGate" text="栅栏门" searchkey="" mc_id="107" 以后做-->
+  <!--added by Jingqi 2013.11.24: name="Brick_Stairs" text="砖楼梯" searchkey="" mc_id="108" 建星做-->
+   <block name="Brick_Stairs" text="砖楼梯" searchkey="砖楼梯" mc_id="108" id="167" mapcolor="#ae804c" icon="Texture/blocks/items/stairs_brick.png" step_sound="stone" texture="Texture/blocks/brick.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood" />
+  <!--added by Jingqi 2013.11.24: name="StoneBrick_Stairs" text="石砖楼梯" searchkey="" mc_id="109" 建星做-->
+  <block name="StoneBrick_Stairs" text="石砖楼梯" searchkey="石砖楼梯" mc_id="109" id="168" mapcolor="#878066" icon="Texture/blocks/items/stairs_stonebrick.png" step_sound="stone" texture="Texture/blocks/stonebrick.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood" />
+  <!--added by Jingqi 2013.11.3: name="Mycelium" text="菌丝" searchkey="" mc_id="110"-->
+  <block threeSideTex="true" name="Mycelium" text="菌丝" searchkey="菌丝" mc_id="110" id="153" mapcolor="#7e7143" icon="Texture/blocks/items/mycelium.png" texture="Texture/blocks/mycelium_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Xizhi 2013.11.8 name="Vines" text="藤蔓" searchkey="" mc_id="106" -->
+  <block name="Vines" text="藤蔓" class="BlockVine" searchkey="藤蔓" mc_id="106" id="162" icon="Texture/blocks/vine.png" texture="Texture/blocks/vine.png" transparent="true" alphaTestTexture="true" climbable="true" template="vine" />
+  <!--name="LilyPad" text="睡莲" searchkey="" mc_id="111" -->
+  <block name="LilyPad" text="睡莲" class="BlockLilypad" searchkey="睡莲" mc_id="111" id="222" mapcolor="#85a31d" icon="Texture/blocks/waterlily.png" texture="Texture/blocks/waterlily.png" transparent="true" alphaTestTexture="true" obstruction="true" climbable="true" template="vine" />
+  <!--added by Xizhi 2014.2.13-->
+  <block name="bloodstain" text="血迹" class="BlockLilypad" searchkey="血迹" id="224" icon="Texture/blocks/bloodstain.png" texture="Texture/blocks/bloodstain.png" transparent="true" alphaTestTexture="true" template="vine" />
+  <!--added by Jingqi 2013.11.3: name="NetherBrick" text="地狱砖块" searchkey="" mc_id="112"-->
+  <block singleSideTex="true" name="NetherBrick" text="地狱砖块" searchkey="地狱砖块" mc_id="112" id="154" mapcolor="#331610" icon="Texture/blocks/items/stonebrick_nether.png" step_sound="stone" texture="Texture/blocks/nether_brick.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.24: name="NetherBrickFence" text="地狱砖栅栏" searchkey="" mc_id="113"-->
+  <block name="NetherBrickFence" text="地狱砖栅栏" searchkey="地狱砖栅栏" mc_id="113" id="214" icon="Texture/blocks/items/nether_brick.png" step_sound="stone" texture="Texture/blocks/nether_brick.png" template="Fence?filename=model/blockworld/Fence/Fence" />
+  <!--added by Jingqi 2013.11.24: name="NetherBrick_Stairs" text="地狱砖楼梯" searchkey="" mc_id="114" -->
+  <block singleSideTex="true" name="NetherBrick_Stairs" text="地狱砖楼梯" searchkey="地狱砖楼梯" mc_id="114" id="169" mapcolor="#331610" step_sound="stone" icon="Texture/blocks/items/stairs_nether.png" texture="Texture/blocks/nether_brick.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <!--name="NetherWart" text="地狱疣" searchkey="" mc_id="115" 先不做-->
+  <!--name="Enchantment_Table" text="附魔台" searchkey="" mc_id="116" 先不做-->
+  <!--name="Brewing_Stand" text="酿造台" searchkey="" mc_id="117" 先不做-->
+  <!--name="Cauldron" text="炼药锅" searchkey="" mc_id="118" 先不做-->
+  <!--name="End_Portal" text="末地传送门方块" searchkey="" mc_id="119" 先不做-->
+  <!--name="End_Portal" text="末地传送门框架" searchkey="" mc_id="120" 先不做-->
+  <!--added by Jingqi 2013.11.3: name="End_Stone" text="末地石" searchkey="" mc_id="121"-->
+  <block singleSideTex="true" name="End_Stone" text="末地石" searchkey="末地石" mc_id="121" id="155" mapcolor="#c4bd9a" step_sound="stone" icon="Texture/blocks/items/stone_end.png" texture="Texture/blocks/end_stone.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Dragon_Egg" text="龙蛋" searchkey="" mc_id="122" 先不做-->
+  <!--name="Wooden_Double_Slab" text="双层木台阶" searchkey="" mc_id="125" c重复，不需做-->
+  <!--name="Wooden_Slab" text="木台阶" searchkey="" mc_id="126" 与44:2重复，不需做-->
+  <!--added by Jingqi 2013.11.22: name="Spruce_Wood_Slab" text="云杉木台阶" searchkey="" mc_id="126:1"-->
+  <block singleSideTex="true" name="Spruce_Wood_Slab" text="云杉木台阶" searchkey="云杉木台阶" mc_id="126:1" id="183" mapcolor="#593a1d" class="BlockSlab" item_class="ItemSlab" step_sound="wood" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_spruce.png" texture="Texture/blocks/planks_spruce.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="Birch_Wood_Slab" text="桦木台阶" searchkey="" mc_id="126:2"-->
+  <block singleSideTex="true" name="Birch_Wood_Slab" text="桦木台阶" searchkey="桦木台阶" mc_id="126:2" id="184" mapcolor="#b8a771" class="BlockSlab" item_class="ItemSlab" step_sound="wood" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_birch.png" texture="Texture/blocks/planks_birch.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--added by Jingqi 2013.11.22: name="Jungle_Wood_Slab" text="丛林木台阶" searchkey="" mc_id="126:3"-->
+  <block singleSideTex="true" name="Jungle_Wood_Slab" text="丛林木台阶" searchkey="丛林木台阶" mc_id="126:3" id="185" mapcolor="#88572f" class="BlockSlab" item_class="ItemSlab" step_sound="wood" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_jungle.png" texture="Texture/blocks/planks_jungle.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <!--name="Cocoa" text="可可果" searchkey="" mc_id="127" 先不做-->
+  <!--Stairs: -->
+  <!--added by Jingqi 2013.11.22-->
+  <block threeSideTex="true" name="Sandstone_Stairs" text="沙石楼梯" searchkey="沙石楼梯" mc_id="128" id="104" mapcolor="#dfd0a5" step_sound="sand" material="sand" icon="Texture/blocks/items/stairs_sandstone.png" texture="Texture/blocks/sandstone_three.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <block singleSideTex="true" name="Emerald_Ore" text="绿宝石矿石" searchkey="绿宝石矿石" mc_id="129" id="2" mapcolor="#867f55" step_sound="stone" icon="Texture/blocks/items/ore_emerald.png" texture="Texture/blocks/emerald_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Ender_Chest" text="末影箱" searchkey="" mc_id="130" 先不做-->
+  <!--name="Tripwire_Hook" text="绊线钩" searchkey="" mc_id="131" 先不做-->
+  <!--name="Tripwire" text="绊线" searchkey="" mc_id="132" 先不做-->
+  <!--added by Jingqi 2013.11.3: name="Block_Of_Emerald" text="绿宝石块" searchkey="" mc_id="133"-->
+  <block singleSideTex="true" name="Block_Of_Emerald" text="绿宝石块" searchkey="绿宝石块" mc_id="133" id="156" mapcolor="#6be18d" step_sound="stone" icon="Texture/blocks/items/emerald_block.png" texture="Texture/blocks/emerald_block_new.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22: name="Spruce_Wood_Stairs" text="云杉木楼梯" searchkey="" mc_id="134"-->
+  <block singleSideTex="true" name="Spruce_Wood_Stairs" text="云杉木楼梯" searchkey="云杉木楼梯" mc_id="134" id="172" mapcolor="#915b2d" step_sound="wood" icon="Texture/blocks/items/stairs_spruce.png" texture="Texture/blocks/planks_spruce.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <!--added by Jingqi 2013.11.22: name="Birch_Wood_Stairs" text="桦木楼梯" searchkey="" mc_id="135"-->
+  <block singleSideTex="true" name="Birch_Wood_Stairs" text="桦木楼梯" searchkey="桦木楼梯" mc_id="135" id="173" mapcolor="#7c6e4b" step_sound="wood"  icon="Texture/blocks/items/stairs_birch.png" texture="Texture/blocks/planks_birch.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <!--added by Jingqi 2013.11.22: name="Jungle_Wood_Stairs" text="丛林木楼梯" searchkey="" mc_id="136"-->
+  <block singleSideTex="true" name="Jungle_Wood_Stairs" text="丛林木楼梯" searchkey="丛林木楼梯" mc_id="136" id="188" mapcolor="#7a4c2a" step_sound="wood" icon="Texture/blocks/items/stairs_jungle.png" texture="Texture/blocks/planks_jungle.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <!--name="Beacon" text="信标" searchkey="" mc_id="138" 以后要做-->
+  <!--StoneWall: similar to fence-->
+  <block name="Cobblestone_Wall" text="圆石墙" searchkey="圆石墙" mc_id="139" id="111" mapcolor="#948a71" icon="Texture/blocks/items/cobblestone_wall.png" step_sound="stone" texture="Texture/blocks/cobblestone.png" template="Wall?filename=model/blockworld/StoneWall/StoneWall" />
+  <block name="Mossy_Cobblestone_Wall" text="苔石墙" searchkey="苔石墙" mc_id="139:1" id="206" mapcolor="#66693e" icon="Texture/blocks/items/cobblestone_wall_mossy.png" step_sound="stone" texture="Texture/blocks/cobblestone_mossy.png" template="Wall?filename=model/blockworld/StoneWall/StoneWall" />
+  <!--name="Flower_Pot" text="花盆" searchkey="" mc_id="140" 以后做-->
+  <!--name="Carrots" text="胡萝卜" searchkey="" mc_id="141" 建星做：以及其他farmville农作物和1.7.2版本中双层植物-->
+  <!--name="Potatoes" text="马铃薯" searchkey="" mc_id="142" 建星做-->
+  <!--name="Wooden_Button" text="木质按钮" searchkey="" mc_id="143" 先不做-->
+  <!--name="Mob_Head" text="生物头颅" searchkey="" mc_id="144" 先不做-->
+  <!--name="Anvil" text="铁砧" searchkey="" mc_id="145" 先不做-->
+  <!--name="Trapped_Chest" text="陷阱箱" searchkey="" mc_id="146" 建星做-->
+  <!--name="Weighted_Pressure_Plate_Light" text="轻质测重压力板" searchkey="" mc_id="147"-->
+  <!--name="Weighted_Pressure_Plate_Heavy" text="重质测重压力板" searchkey="" mc_id="148"-->
+  <!--name="Redstone_Comparator" text="红石比较器" searchkey="" mc_id="149"-->
+  <!--name="Redstone_Comparator_On" text="开启的红石比较器" searchkey="" mc_id="150"-->
+  <!--name="Daylight_Sensor" text="阳光传感器" searchkey="" mc_id="151"-->
+  <!--added by Jingqi 2013.11.3: name="Nether_Quartz_Ore" text="下界石英矿石" searchkey="" mc_id="153"-->
+  <block singleSideTex="true" name="Nether_Quartz_Ore" text="下界石英矿石" searchkey="下界石英矿石" mc_id="153" id="158" mapcolor="#2f120e" step_sound="gravel" icon="Texture/blocks/items/ore_quartz.png" texture="Texture/blocks/quartz_ore.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--name="Hopper" text="漏斗" searchkey="" mc_id="154" 先不做-->
+  <block singleSideTex="true" name="Block_Of_Quartz" text="石英块" searchkey="石英块" mc_id="155" id="97" mapcolor="#f5f6d6" step_sound="glass" icon="Texture/blocks/items/quartz_block.png" texture="Texture/blocks/quartz_block_top.png" obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22-->
+  <block singleSideTex="true" name="Chiseled_Quartz_Block" text="錾制石英块" searchkey="錾制石英块" mc_id="155:1" id="8" mapcolor="#5d5844" step_sound="glass" material="glass" icon="Texture/blocks/items/quartz_block_chiseled.png" texture="Texture/blocks/quartz_block_chiseled_top.png"
+  obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22: name="Lines_Quartz_Block" text="竖纹石英块" searchkey="" mc_id="155:2"-->
+  <block singleSideTex="true" name="Lines_Quartz_Block" text="竖纹石英块" searchkey="竖纹石英块" mc_id="155:2" id="159" mapcolor="#fcfae4" step_sound="glass" material="glass" icon="Texture/blocks/items/quartz_block_lines.png" texture="Texture/blocks/quartz_block_lines_top.png"
+  obstruction="true" solid="true" cubeMode="true"  />
+  <!--added by Jingqi 2013.11.22: name="Quartz_Stairs" text="石英楼梯" searchkey="" mc_id="156"-->
+  <block singleSideTex="true" name="Quartz_Stairs" text="石英楼梯" searchkey="石英楼梯" mc_id="156" id="187" mapcolor="#f5f6d6" step_sound="glass" icon="Texture/blocks/items/stairs_quartz.png" texture="Texture/blocks/quartz_block_top.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <!--name="Activator_Rail" text="激活铁轨" searchkey="" mc_id="157" 先不做-->
+  <!--name="Dropper" text="投掷器" searchkey="" mc_id="158" 先不做-->
+  <!--added by Jingqi 2013.11.23: name="Hay_Block" text="干草块" searchkey="" mc_id="170"-->
+  <block threeSideTex="true" name="Hay_Block" text="干草块" searchkey="干草块" mc_id="170" id="186" mapcolor="#b5980e" step_sound="grass" icon="Texture/blocks/items/hay_block.png" texture="Texture/blocks/hay_block_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="BrokenIce" text="碎冰" searchkey="碎冰" id="28" mapcolor="#43b9d3" icon="Texture/blocks/items/ice1_single.png" step_sound="glass" material="glass" texture="Texture/blocks/ice_single.png" obstruction="true" solid="true" cubeMode="true"  />
+
+  <block singleSideTex="true" name="ColorBlock" id="10" item_class="ItemColorBlock" text="彩色方块" searchkey="彩色方块" disable_gen_icon="true" icon="Texture/blocks/items/color_block.png" texture="Texture/blocks/colorblock.png" color_data="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="MetalBlock" id="50" categoryID="50" item_class="ItemColorBlock" text="金属方块" searchkey="金属方块" disable_gen_icon="true" icon="Texture/blocks/items/metal_block.png" material="glass" texture="Texture/blocks/colorblock.png" color_data="true" normalMap="Texture/blocks/metal_normal.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="TransparentColorBlock"  id="73" item_class="ItemColorBlock" text="透明彩色方块" searchkey="透明彩色方块" disable_gen_icon="true" icon="Texture/blocks/items/transparent_block.png" texture="Texture/blocks/transparent_colorblock.png" color_data="true" obstruction="true" solid="true" cubeMode="true" blendedTexture="true" transparent="true" liquid="true" />
+  <block singleSideTex="true" text="草地" searchkey="草地" id="26" mapcolor="#92aa16" icon="Texture/blocks/items/grass.png" step_sound="grass" texture="Texture/blocks/grass_top.png" obstruction="true" solid="true" cubeMode="true"  />
+    
+  <!--following is deprecated and used in haqi-->
+    <block singleSideTex="true" id="3" texture="Texture/tileset/blocks/carpet_block_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block threeSideTex="true" id="7" texture="Texture/tileset/blocks/doortop_three.dds" light="true" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="9" texture="Texture/tileset/blocks/earch_layered_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="11" texture="Texture/tileset/blocks/earth2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="14" texture="Texture/tileset/blocks/earth_purple_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="15" texture="Texture/tileset/blocks/earth_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="29" texture="Texture/tileset/blocks/ice2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block threeSideTex="true" id="30" texture="Texture/tileset/blocks/ladder_three.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="31" texture="Texture/tileset/blocks/leaf_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="32" texture="Texture/tileset/blocks/leaves_blue_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="33" texture="Texture/tileset/blocks/leaves_brown_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="34" texture="Texture/tileset/blocks/leaves_greenlight_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="35" texture="Texture/tileset/blocks/leaves_green_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="36" texture="Texture/tileset/blocks/leaves_orange_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="37" texture="Texture/tileset/blocks/leaves_purpledark_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="38" texture="Texture/tileset/blocks/leaves_purple_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="39" texture="Texture/tileset/blocks/leaves_reddrak_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="40" texture="Texture/tileset/blocks/leaves_red_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="41" texture="Texture/tileset/blocks/leaves_yellow_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="42" texture="Texture/tileset/blocks/roof_blue_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="43" texture="Texture/tileset/blocks/roof_brown_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="44" texture="Texture/tileset/blocks/roof_green_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="45" texture="Texture/tileset/blocks/roof_pink_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="46" texture="Texture/tileset/blocks/roof_purple_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="47" texture="Texture/tileset/blocks/roof_red_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="48" texture="Texture/tileset/blocks/roof_white_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+    <block singleSideTex="true" id="49" texture="Texture/tileset/blocks/roof_yellow_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <!--above is deprecated and used in haqi-->
+  
+  <block singleSideTex="true" text="蓝色裂石" searchkey="蓝色裂石" id="54" icon="Texture/blocks/items/stone_blue.png" texture="Texture/tileset/blocks/stone2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" text="青色裂石" searchkey="青色裂石" id="57" icon="Texture/blocks/items/stone_cyan.png" texture="Texture/tileset/blocks/stone_round_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" text="黄色裂石" searchkey="黄色裂石" id="60"  icon="Texture/blocks/items/stone_yellow.png" texture="Texture/tileset/blocks/stone_yellow_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block sixSideTex="true" id="61" toggle_sound="door_open" texture="Texture/tileset/blocks/test_six.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" id="63" texture="Texture/tileset/blocks/top_ice_three.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" id="64" texture="Texture/tileset/blocks/treetrunk2_three.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" id="65" texture="Texture/tileset/blocks/treetrunk_three.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" id="67" texture="Texture/tileset/blocks/wall_block_red_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" id="72" texture="Texture/tileset/blocks/wall_white2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <!--liquid-->
+  <!--<block singleSideTex="true" text="浅蓝波纹石" id="76" texture="Texture/tileset/blocks/water2_single.dds" obstruction="true" solid="true" cubeMode="true"  />-->
+  <block singleSideTex="true" text="深蓝波纹石" searchkey="深蓝波纹石" id="77" texture="Texture/tileset/blocks/water3_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" text="蓝绿波纹石" searchkey="蓝绿波纹石" id="78" texture="Texture/tileset/blocks/water4_single.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" id="79" texture="Texture/tileset/blocks/window_three.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" text="木箱" searchkey="木箱" id="80" mapcolor="#67542c" icon="Texture/blocks/items/planks_oak.png" texture="Texture/blocks/trapdoor.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" name="PhysicalBox" text="可移动木箱" searchkey="可移动木箱" id="83" mapcolor="#67542c" hasAction="true" class="BlockDynamic" icon="Texture/blocks/items/movablebox.png" texture="Texture/blocks/box_three.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block threeSideTex="true" text="灯笼鼓" searchkey="灯笼鼓" id="90" icon="Texture/blocks/items/drum.png" texture="Texture/blocks/drum.png" light="true" categoryID="5" obstruction="true" solid="true" cubeMode="true"  />
+
+  <!--lever button 2 states with toggle_blockid -->
+  <!--<block text="开关(0)" id="106" icon="model/04deco/v5/blockworld/Lever/Lever_Up.x.png" click_sound="wood_click" toggle_sound="wood_click" toggle_blockid="107" selection_effect="model_highlight" texture="" customModel="true" hasAction="true" template="Lever?filename=model/04deco/v5/blockworld/Lever/Lever_Up" />
+  <block text="开关(1)" id="107" icon="model/04deco/v5/blockworld/Lever/Lever_Down.x.png" click_sound="wood_click" toggle_sound="wood_click" toggle_blockid="106" selection_effect="model_highlight" texture="" customModel="true" hasAction="true" template="Lever?filename=model/04deco/v5/blockworld/Lever/Lever_Down" />-->
+  <!--teleport to this block when toggled-->
+  <block threeSideTex="true" name="TeleportStone" text="传送石" searchkey="传送石" class="BlockTeleportStone" id="110" icon="Texture/blocks/items/TeleportStone.png" texture="Texture/blocks/TeleportStone.png"  obstruction="true" solid="true" cubeMode="true"  />
+  <block name="WaterDrop" text="水滴" searchkey="水滴" id="163" disable_gen_icon="true" icon="Texture/blocks/items/waterdrop.png" texture="Texture/blocks/items/waterdrop.png" singleSideTex="true"  modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
+  <block singleSideTex="true" name="WhiteButter" text="奶油块" searchkey="奶油块" class="BlockTeleportStone" id="219" icon="Texture/blocks/items/snow.png" texture="Texture/tileset/blocks/snow_single.dds"  obstruction="true" solid="true" cubeMode="true"  />
+
+  <!--Added Xizhi 2014.3.28 added movie clip-->
+  <block name="Apple" text="苹果" searchkey="苹果" id="229" disable_gen_icon="true" icon="Texture/blocks/items/apple.png"  obstruction="true" template="model?filename=model/blockworld/Apple/Apple"/>
+
+  <!--
+  model/06props/v5/06combat/Common/PKSword/PKSword.x
+  model/06props/v5/06combat/Common/WarBanner/WarBanner_Gray.x
+  model/06props/v5/DragonEgg/DragonEgg_blue/DragonEgg_blue.x
+  model/06props/v6/01stone/CrystalShard/CrystalShard0[1-9].x
+  model/06props/v6/01stone/Stone/Stone03.x
+  model/06props/v6/03quest/ChristmasLiHe/ChristmasLiHe01.x
+  character/v5/09effect/TransmittalDoor/TransmittalDoor.x
+  -->
+  <!--收集品： id: 10000-10999-->
+  <block id="10001" name="blue_star"></block>
+  <block id="10011" name="gold_coin" text="金币" searchkey="金币" tooltip="" item_class="ItemCollectable" icon="character/v5/06quest/JinBi/JinBiYellow.x.png" gold_count="1" max_count = "100">
+    <model assetfile="character/v5/06quest/JinBi/JinBiYellow.x" scaling="0.6" ></model>
+  </block>
+  <block id="10012" name="silver_coin"></block>
+  <block id="10021" name="heart_blue" text="飞翔的心" searchkey="飞翔的心" tooltip="" item_class="ItemCollectable" icon="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonBlue.x.png" gold_count="5" max_count="5">
+    <model assetfile="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonBlue.x" scaling="0.6" ></model>
+  </block>
+  <block id="10030" name="gun_snipper" text="狙击枪" searchkey="狙击枪" tooltip="" item_class="ItemSnipper" icon="Texture/Aries/Item/1908_RightHand_Normal_Level10.png" max_count="5">
+    <model assetfile="character/v3/Item/ObjectComponents/WEAPON/1912_RightHand_Legend_Level10.anim.x" offset_y = "0.5" scaling="1"></model>
+  </block>
+  <block id="10032" name="rocket"></block>
+  <block id="10042" name="rocket_ammo"></block>
+  <block id="10051" name="first_aid"></block>
+  <block id="10052" name="Book" text="书" searchkey="书" item_class="ItemBook" tooltip="书:右键阅读" icon="Texture/blocks/items/ItemBook.png"></block>
+  <block id="10053" name="wood_hoe" text="木锄头" searchkey="木锄头" item_class="ItemTool" icon="Texture/blocks/items/wood_hoe.png"></block>
+  <block id="10054" name="Code" text="代码" searchkey="代码" item_class="ItemCode" tooltip="程序代码:右键阅读" icon="Texture/blocks/items/Code.png"></block>
+  <block id="10055" name="Dialog" text="对话剧本" searchkey="对话剧本" item_class="ItemDialog" tooltip="对话剧本:点击编辑" icon="Texture/blocks/items/book_writable.png"></block>
+  <block id="10056" name="Rule" text="规则" searchkey="规则" item_class="ItemRule" tooltip="规则:右键阅读" icon="Texture/blocks/items/book_writable.png"></block>
+  <block id="10058" name="BlockTemplate" text="模板" searchkey="模板" item_class="ItemBlockTemplate" tooltip="模板" icon="Texture/blocks/items/book_writable.png"></block>
+  <block id="10059" name="CommandLine" text="命令行" searchkey="命令行" item_class="ItemCommandLine" tooltip="命令行" icon="Texture/blocks/items/CommandLine.png"></block>
+  <block id="10060" name="CmdUrl" text="URL" searchkey="URL" item_class="ItemCmdUrl" tooltip="右键点击访问Url" icon="Texture/blocks/items/feather.png"></block>
+  <block id="10057" name="TimeSeries" text="时间序列" searchkey="时间序列" item_class="ItemTimeSeries" tooltip="时间序列:右键编辑" icon="Texture/blocks/items/ts_block.png"></block>
+  <block id="10061" name="TimeSeriesCamera" text="摄影机" searchkey="时间序列摄影机" item_class="ItemTimeSeriesCamera" tooltip="摄影机:右键编辑" icon="Texture/blocks/items/ts_camera.png">
+    <model assetfile="character/CC/02human/Camera/Camera.x" scaling="0.5" ></model>
+  </block>
+  <block id="10062" name="TimeSeriesNPC" text="演员" searchkey="时间序列演员" item_class="ItemTimeSeriesNPC" tooltip="演员:右键编辑" icon="Texture/blocks/items/ts_npc.png">
+    <model assetfile="character/CC/02human/actor/actor.x" skin="Texture/blocks/human/boy_worker01.png" ></model>
+  </block>
+  <block id="10063" name="TimeSeriesCommands" text="命令序列" searchkey="命令序列" item_class="ItemTimeSeriesCommands" tooltip="命令序列" icon="Texture/blocks/items/ts_block.png"></block>
+  <block id="10064" name="Minimap" text="小地图" searchkey="小地图" item_class="ItemMinimap" tooltip="小地图" icon="Texture/blocks/items/map_empty.png"></block>
+  <block id="10065" name="TimeSeriesOverlay" text="图层" searchkey="" item_class="ItemTimeSeriesOverlay" tooltip="图层" icon="Texture/blocks/items/ts_block.png"></block>
+  <block id="10066" name="QuestLog" text="任务日志" searchkey="任务日志" item_class="ItemBook" tooltip="" icon="Texture/blocks/items/book_writable.png"></block>
+  <block id="10067" name="TerrainBrush" text="地形笔刷" item_class="ItemTerrainBrush" tooltip="" icon="Texture/blocks/items/raise.png"></block>
+  <block id="10068" name="PaintBrush" text="画笔" item_class="ItemPaintBrush" tooltip="" icon="Texture/blocks/items/brush.png"></block>
+  
+  <!--怪物和动物： id: 20000-20999-->
+  <block id="20001" name="simple_mob" text="怪物" searchkey="怪物" tooltip="" item_class="ItemMob" icon="character/CC/03animals/treemonster/treemonster.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/treemonster/treemonster.x" scaling="0.5" ></model>
+  </block>
+  <block id="20002" name="player_spawn_point" text="出生点" searchkey="出生点" tooltip="" entity_class="EntityHomePoint" item_class="ItemCollectable" icon="Texture/blocks/items/spawnpoint.png" can_pick = "false" max_count = "1">
+    <model assetfile="character/CC/05effect/Birthplace/Birthplace.x" scaling="0.6" ></model>
+  </block>
+
+  <block id="20003" name="cow" text="奶牛" searchkey="奶牛" tooltip="" item_class="ItemMob" icon="character/CC/03animals/cow/cow.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/cow/cow.x" scaling="1" ></model>
+  </block>
+  <block id="20004" name="pig" text="小猪" searchkey="小猪" tooltip="" item_class="ItemMob" icon="character/CC/03animals/pig/pig.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/pig/pig.x" scaling="1" ></model>
+  </block>
+  <block id="20005" name="sheep" text="棉羊" searchkey="棉羊" tooltip="" item_class="ItemMob" icon="character/CC/03animals/sheep/sheep.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/sheep/sheep.x" scaling="1" ></model>
+  </block>
+  <block id="20006" name="chicken" text="小鸡" searchkey="小鸡" tooltip="" item_class="ItemMob" icon="character/CC/03animals/chicken/chicken.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/chicken/chicken.x" scaling="1" ></model>
+  </block>
+  <block id="20007" name="enderman" text="小黑" searchkey="小黑" tooltip="" item_class="ItemMob" icon="character/CC/04mobs/enderman/enderman.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/04mobs/enderman/enderman.x" scaling="1" ></model>
+  </block>
+  <block id="20008" name="skeleton" text="骷髅射手" searchkey="骷髅射手" tooltip="" item_class="ItemMob" icon="character/CC/04mobs/skeleton/skeleton.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/04mobs/skeleton/skeleton.x" scaling="1" ></model>
+  </block>
+  <block id="20009" name="creeper" text="苦力帕" searchkey="苦力帕" tooltip="" item_class="ItemMob" icon="character/CC/04mobs/creeper/creeper.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/04mobs/creeper/creeper.x" scaling="1" ></model>
+  </block>
+  <block id="20010" name="zombie" text="僵尸" searchkey="僵尸" tooltip="" item_class="ItemMob" icon="character/CC/04mobs/zombie/zombie.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/04mobs/zombie/zombie.x" scaling="1" ></model>
+  </block>
+  <block id="20011" name="bird" text="鸟" searchkey="鸟" tooltip="" item_class="ItemMob" icon="character/CC/03animals/bird/bird.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/bird/bird.x" scaling="1" ></model>
+  </block>
+  <block id="20012" name="railcar" text="矿车" searchkey="矿车" tooltip="" item_class="ItemRailcar" icon="Texture/blocks/items/minecart_normal.png" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/06vehicle/minecart/minecart.x" scaling="1" ></model>
+  </block>
+  <block id="20013" name="pigeon" text="鸽子" searchkey="鸽子" tooltip="" item_class="ItemMob" icon="character/CC/03animals/pigeon/pigeon.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/pigeon/pigeon.x" scaling="1" ></model>
+  </block>
+  <block id="20014" name="dog" text="狗" searchkey="狗" tooltip="" item_class="ItemMob" icon="character/CC/03animals/dog/dog.x.png" gold_count="5" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/03animals/dog/dog.x" scaling="1" ></model>
+  </block>
+  <!--NPC： id: 30000-30999-->
+  <block id="30001" name="villager" text="通用人物" searchkey="通用人物" tooltip="" item_class="ItemNPC" icon="Texture/blocks/items/skull_steve.png" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/01char/char_male.x" skin="Texture/blocks/human/boy_worker01.png" ></model>
+  </block>
+  <!--this is the default player, to change default player model and skin, replace it here-->
+  <block id="30002" name="player" text="主角" searchkey="" tooltip="" item_class="ItemNPC" icon="Texture/blocks/items/skull_steve.png" hp="100" respawn_time="300000">
+    <model assetfile="character/CC/01char/char_male.x" skin="Texture/blocks/human/boy_blue_shirt01.png" ></model>
+  </block>
+
+  <!--example of creating other liquid blocks like water. you need a pairs of blocks, with associated blocks directed to each other-->
+  <!--<block singleSideTex="true" name="LavaMoving" text="流动中的岩浆" disable_gen_icon="true" opacity="12" light="true" torchLightValue="10" categoryID="5" searchkey="" id="375" mapcolor="#ddeaf0" speedReduction="0.1" associated_blockid="376" class="BlockLiquidFlow" material="water" texture="Texture/blocks/lava/lava_fps10_a010.png" liquid="true" transparent="true" cubeMode="true"  />
+  <block singleSideTex="true" name="LavaStill" text="静态岩浆" disable_gen_icon="true" opacity="12" light="true" torchLightValue="10" categoryID="5" searchkey="" speedReduction="0.1" id="376" mapcolor="#ddeaf0" associated_blockid="375" class="BlockLiquidStill" material="water" texture="Texture/blocks/lava/lava_fps10_a010.png" liquid="true" transparent="true" cubeMode="true"  />-->
+  
+</blocks>
