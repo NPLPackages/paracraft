@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EditModelTask.lua" refresh="true">
+<![CDATA[
+EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+EditModelTask.InitPage(Page);
+task = EditModelTask.GetInstance();
+]]>
+</script>
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff", task:IsTransformMode() and "#8080ff" or "#808080") %>' >
+    <%=L"当前模式:"%>
+    <input name="toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" onclick="EditModelTask.OnClickToggleMode" />
+    <pe:if condition='<%=task:IsTransformMode()%>'>
+        <div>
+            <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
+                <%=task:GetSelectedModel():GetModelFile()%>
+            </pe:if>
+            <pe:if condition='<%=not task:GetSelectedModel()%>'>
+                <%=L"左键点击场景选择模型"%>
+            </pe:if>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</html>
+
