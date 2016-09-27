@@ -12,6 +12,12 @@ script/ide
 /script/apps/Aries/*
 !/script/apps/Aries/Creator
 !/script/apps/Aries/app_main.lua
-
-
-
+!/config/
+/config/*
+!/config/Aries
+/config/Aries/*
+!/config/Aries/creator
+/config/Aries/creator/blocktemplates
+!/config/Aries/Audio
+/config/Aries/Audio/*
+!/config/Aries/Audio/CreatorSound.bank.xml
