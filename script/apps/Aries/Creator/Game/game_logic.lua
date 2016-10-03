@@ -544,21 +544,8 @@ function GameLogic.CheckCreateFileWatcher()
 		end
 		watcher:AddDirectory(GameLogic.current_worlddir)
 		watcher.OnFileChanged = function (msg)
-			msg.fullname = msg.fullname:gsub("\\", "/");
 			msg = GameLogic.GetFilters():apply_filters("worldFileChanged", msg);
-			if(msg.type == "modified" or msg.type == "added" or msg.type=="renamed_new_name") then
-				local ext = msg.fullname:match("%.(%w+)$");
-				if(ext == "lua") then
-					local filename = msg.filename:match("script/blocks/(.*)$");
-					if(filename) then
-						NeuronManager.ReloadScript(filename);
-					end
-				end
-				--if(ParaAsset.Refresh(msg.fullname)) then
-					-- commonlib.log("AssetMonitor: File %s is refreshed in dir %s\n", msg.fullname, msg.dirname)
-				--end
-			end
-			GameLogic:worldFileChanged(); -- signal
+			GameLogic:worldFileChanged(msg); -- signal
 		end
 		GameLogic.file_watcher = watcher;
 
