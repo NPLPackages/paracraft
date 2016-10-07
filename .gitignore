@@ -1,5 +1,7 @@
 .svn*
 /*
+!/*.csproj
+!/*.sln
 !/.git*
 !/*.md
 !/LICENSE
