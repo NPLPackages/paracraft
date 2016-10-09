@@ -19,6 +19,7 @@ script/kids/*
 !script/kids/3DMapSystemApp
 script/kids/3DMapSystemApp/*
 !script/kids/3DMapSystemApp/mcml
+!script/kids/3DMapSystemApp/localserver
 !/config/
 /config/*
 !/config/Aries
