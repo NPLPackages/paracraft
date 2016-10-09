@@ -1,0 +1,67 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/SocialTagsTest.html-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>testing social MCML tags by LiXizhi 2008/5/5</title>
+</head>
+<body>
+<!-- Some user ids
+LiXizhi:  e0dba2eb-8495-4b7d-8c3c-cf76d7cc85df
+ParaEngine:  8ec11316-bc2e-491d-8f18-667501687e69
+Andy:  6ea770c6-92b2-4b2b-86da-6f574641ec11
+Leio: f114ae44-f5e5-4072-9e40-0d792a9cfe7a
+Clayman: f5f3de7a-05b2-42a0-bd78-415a939020c2
+CYF: ed06733e-986d-4236-8fc8-9f8300456c21
+-->
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    local pageCtrl = document:GetPageCtrl();  
+]]>
+</script>
+<pe:tabs name="SocialTagParent" style="margin:5px">
+  <pe:tab-item text="pe:name测试" selected="true">
+      <div style="margin:5px">
+        <div>测试pe:name uid="loggedinuser"结果: <pe:name uid="loggedinuser"/></div>
+        <div>测试pe:name uid="loggedinuser" useyou="false"结果: <pe:name uid="loggedinuser" useyou="false"/></div>
+        <div>测试pe:name uid="loggedinuser" useyou="false" linked="false"结果: <pe:name uid="loggedinuser" useyou="false" linked="false"/></div>
+        <hr />
+        <div>测试pe:name uid="e0dba2eb-8495-4b7d-8c3c-cf76d7cc85df"结果: <pe:name uid="e0dba2eb-8495-4b7d-8c3c-cf76d7cc85df" useyou="false"/></div>
+        <div>测试pe:name uid="6ea770c6-92b2-4b2b-86da-6f574641ec11"结果: <pe:name uid="6ea770c6-92b2-4b2b-86da-6f574641ec11"/></div>
+        <div>测试pe:name uid="f114ae44-f5e5-4072-9e40-0d792a9cfe7a" linked="false"结果: <pe:name uid="f114ae44-f5e5-4072-9e40-0d792a9cfe7a" useyou="false" linked="false"/></div>
+        <hr />
+        <div>测试pe:profile-photo uid="loggedinuser"结果: </div>
+        <div>测试pe:profile-photo uid="e0dba2eb-8495-4b7d-8c3c-cf76d7cc85df" linked="true"结果:</div>
+        <div>测试pe:profile-photo uid="f114ae44-f5e5-4072-9e40-0d792a9cfe7a"结果:</div>
+        <div>
+            <div style="float:left;margin:5px">
+                <pe:profile-photo uid="loggedinuser"/><br />
+                <pe:name uid="loggedinuser"/>
+            </div>
+            <div style="float:left;margin:5px">
+                <pe:profile-photo uid="6ea770c6-92b2-4b2b-86da-6f574641ec11"  linked="true"/><br />
+                <pe:name uid="6ea770c6-92b2-4b2b-86da-6f574641ec11"/>
+            </div>
+            <div style="float:left;margin:5px">
+                <pe:profile-photo uid="f114ae44-f5e5-4072-9e40-0d792a9cfe7a"/><br />
+                <pe:name uid="f114ae44-f5e5-4072-9e40-0d792a9cfe7a"/>
+            </div>
+            <div style="float:left;margin:5px">
+                <pe:profile-photo uid="f5f3de7a-05b2-42a0-bd78-415a939020c2"/><br />
+                <pe:name uid="f5f3de7a-05b2-42a0-bd78-415a939020c2"/>
+            </div>
+            <div style="float:left;margin:5px">
+                <pe:profile-photo uid="ed06733e-986d-4236-8fc8-9f8300456c21"/><br />
+                <pe:name uid="ed06733e-986d-4236-8fc8-9f8300456c21"/>
+            </div>
+        </div>
+        <hr />
+      </div>
+  </pe:tab-item>
+  <pe:tab-item text="测试2">
+     <div style="margin:5px">其他测试内容</div><hr />
+  </pe:tab-item>
+</pe:tabs>
+</pe:mcml>
+</body>
+</html>

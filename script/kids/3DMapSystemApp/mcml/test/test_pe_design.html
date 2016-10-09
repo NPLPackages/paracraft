@@ -1,0 +1,200 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_design.html" 
+Author:LiXizhi
+Date: 2008.6.6
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+function OnSliderValue(value)
+    log(value.."\n")
+end
+function OnColorPicker(r, g, b)
+    commonlib.echo({r, g, b})
+end
+function OnLoaderProgress(itemLeft)
+    commonlib.echo({itemLeft = itemLeft})
+end
+
+local value = 10;
+function OnClickAddProgressValue(itemLeft)
+    value = value +10;
+    Page:SetValue("progressbar_autosized", value);
+    Page:SetValue("progressbar_autosized_vertical", value);
+end
+
+function OnClickTabButton(tab_name)
+    _guihelper.MessageBox(tab_name);
+end
+
+function OnGetTextValue()
+    _guihelper.MessageBox(Page:GetUIValue("MyTextArea"));
+end
+]]>
+</script>
+<div>
+<pe:tabs name="testArtStyles" onclick="OnClickTabButton" TextColor="#0000FF" ItemSpacing="5" style="height:160px;padding-top:30px;">
+    <pe:tab-item name="text_area" tooltip="this is optional tooltip" selected="true" TextColor="#FF0000" SelectedTextColor="#FF0000" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="customTabBG" style="padding:10px" >    
+        this is page 1
+        <form name="aaa"> 
+            <textarea style="width:230px;" name="MyTextArea" rows="3"></textarea>
+            <input type="button" onclick="OnGetTextValue" value="GetValue"/>
+        </form>
+    </pe:tab-item>
+    <pe:tab-item name="2" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="Test" style="padding:10px" >    
+        this is page 2
+    </pe:tab-item>
+    <pe:tab-item name="3" text="UseParentBG" style="padding:10px" >    
+        this is page 3
+    </pe:tab-item>
+    <pe:tab-item name="3" text="fixedWidth" width="200" style="padding:10px" >    
+        this is page 4
+    </pe:tab-item>
+</pe:tabs>
+</div>
+<div style="float:left">
+    <pe:tabs name="testArtStyles" TabPosition="left" DefaultNodeHeight="25" onclick="OnClickTabButton" TextColor="#0000FF" ItemSpacing="5" style="height:160px;width:300px;padding-left:50px;">
+        <pe:tab-item name="text_area" tooltip="this is optional tooltip" selected="true" TextColor="#FF0000" SelectedTextColor="#FF0000" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="customTabBG" style="padding:10px" >    
+            this is page 1
+        </pe:tab-item>
+        <pe:tab-item name="2" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="Test" style="padding:10px" >    
+            this is page 2
+        </pe:tab-item>
+        <pe:tab-item name="3" condition='<%=false %>' text="UseParentBG" style="padding:10px" >    
+            this is page 3
+        </pe:tab-item>
+        <pe:tab-item name="3" text="fixedWidth" width="200" style="padding:10px" >    
+            this is page 4
+        </pe:tab-item>
+    </pe:tabs>
+</div>
+<div style="float:left">
+    <pe:tabs name="testArtStyles" TabPosition="right" DefaultNodeHeight="25" onclick="OnClickTabButton" TextColor="#0000FF" ItemSpacing="5" style="height:160px;width:300px;padding-right:50px;">
+        <pe:tab-item name="text_area" tooltip="this is optional tooltip" selected="true" TextColor="#FF0000" SelectedTextColor="#FF0000" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="customTabBG" style="padding:10px" >    
+            this is page 1
+        </pe:tab-item>
+        <pe:tab-item name="2" SelectedMenuItemBG="Texture/Aries/Button_HighLight.png:8 8 7 7" UnSelectedMenuItemBG="Texture/Aries/Button_Normal.png:8 8 7 7" text="Test" style="padding:10px" >    
+            this is page 2
+        </pe:tab-item>
+        <pe:tab-item name="3" text="UseParentBG" style="padding:10px" >    
+            this is page 3
+        </pe:tab-item>
+        <pe:tab-item name="3" text="fixedWidth" width="200" style="padding:10px" >    
+            this is page 4
+        </pe:tab-item>
+    </pe:tabs>
+</div>
+<pe:tabs name="testTabs" style="width:400px;height:300px;">
+    <pe:tab-item name="1" text="pe:progressbar" style="padding:10px" >    
+        <pe:progressbar name="progressbar_autosized"  isshowtooltip = "true" 
+            background = "Texture/Aries/Loader/progressbar_bg_32bits.png;0 0 215 9" 
+            blockimage = "Texture/Aries/Loader/progressbar_overlay_32bits.png;0 0 215 9" 
+            block_bg_autosize = "true"
+            style="margin:6px;width:215px;height:9px;"
+            Minimum = "0" Maximum = "100" Value = "50"
+            /> 
+        <pe:progressbar name="progressbar_autosized_vertical"  is_vertical="true"
+            background = "Texture/Aries/Loader/progressbar_bg_32bits.png;0 0 215 9" 
+            blockimage = "Texture/Aries/Loader/progressbar_overlay_32bits.png;0 0 215 9" 
+            block_bg_autosize = "true"
+            style="margin:6px;width:90px;height:180px;"
+            Minimum = "0" Maximum = "100" Value = "50"
+            /> 
+        <input type="button" value="add" onclick="OnClickAddProgressValue" />
+    </pe:tab-item>
+    <pe:tab-item name="2" text="flash_player" style="padding:10px">
+        <pe:flash style="width:300px;height:200px;" src="Texture/flash_externalinterface_sample.swf"/>
+    </pe:tab-item>
+    <pe:tab-item name="2" text="pe:canvas3d" style="padding:10px" selected="true">
+        
+        <!--<pe:canvas3d name="canvas1" style="width:256px;height:256px;">
+        {
+			name= "test model",
+			AssetFile= "character/v5/02animals/PoliceDog/PoliceDog.x",
+            IsCharacter=true,
+			x=0,y=0,z=0,
+        }
+        </pe:canvas3d>-->
+        
+        <pe:player style="width:256px;height:256px;" nid='31001' DefaultRotY="3.5" object="npc" 
+            name='no name' miniscenegraphname="NPCDialog_miniscene_test" background=""  
+            IsInteractive="true" />
+
+    </pe:tab-item>
+    <pe:tab-item name="3" text="pe:canvas3dui" style="padding:10px">
+        <pe:canvas3dui name="MyTestCanvas3DUI" miniscenegraphname="DefaultCanvas3DUI" 
+            LookAtX="0" LookAtY="2" LookAtZ="0"
+            RotY="1.57" LiftupAngle="0.3" CameraObjectDist="15" 
+            originX="255" originY="0" originZ="255"
+            OnLoadSceneScript = "worlds/myworlds/arieslogin/script/arieslogin_0_0.onload.lua"
+            OnLoadNPCDB = "worlds/myworlds/arieslogin/arieslogin.npc.db" />
+        <pe:canvas3d name="Avatar1" miniscenegraphname="Avatar1" 
+            ExternalSceneName="DefaultCanvas3DUI" ExternalOffsetX="0" ExternalOffsetY="0" ExternalOffsetZ="0">
+            {
+                name= "test model",
+	            AssetFile= "model/05plants/01flower/01flower/flower10_v_a.x",
+	            x=0,y=0,z=0,
+            }
+         </pe:canvas3d>
+    </pe:tab-item>
+    <pe:tab-item name="4" text="remote textures" style="padding:10px">
+        remote textures
+        <img width="64" height="64" src="http://hydra-media.cursecdn.com/minecraft.gamepedia.com/5/5d/Sign.png"/>
+        <pe:preloader name="" onprogress="OnLoaderProgress()" text="Loading..." style="width:64px;height:64px;background:url(Texture/msg_box.png)">
+		    <textures>
+			    Texture/ParaEngineLogo.png;
+			    Texture/KeysHelp_en.png;
+		    </textures>	
+		    <LoaderUITemplate>
+			    <img src="Texture/unradiobox.png" width="32" height="32"/><br/>
+			    Loading, please stand by...
+		    </LoaderUITemplate>
+	    </pe:preloader>
+    </pe:tab-item>
+    <pe:tab-item name="5" text="pe:bag" style="padding:10px">
+        <pe:bag style="margin:5px;padding:10px" DataSource="script/kids/3DMapSystemApp/mcml/test/test_pe_design.html" row="5" col="3" allowdrag="true" type="local_asset" autosave="true" itemanimstyle="14"/>
+    </pe:tab-item>
+    <pe:tab-item name="6" text="pe:asset" style="padding:10px">
+        <pe:asset src="model/06props/shared/pops/muzhuang.x"/>
+        <pe:asset src="model/06props/shared/pops/木桶.x" cmd="File.MCMLBrowser" params='<%={url="script/apps/HelloChat/Ribbons/ToolsTab.html"}%>'/>
+        <pe:asset src="model/05plants/02tree/01tree/tree11/tree11.x"/>
+        <pe:asset src="character/v3/Pet/XM/XM.xml" type="char"/>
+    </pe:tab-item>
+    <pe:tab-item name="7" text="pe:ribbonbar" style="padding:10px">
+        <pe:ribbonbar label="世界" tooltip="some text here some text here">
+            some text here some text here
+            <pe:command />
+            <pe:command />
+            <pe:command />
+        </pe:ribbonbar>
+        <pe:ribbonbar style="color:#FF0000" label="创造" tooltip="Click to login" labelcommand="Profile.Login">
+            some text here
+            <pe:command cmd="Profile.Login"/>
+            <pe:command cmd="File.MCMLBrowser" params="script/apps/HelloChat/Ribbons/CreationTab.html"/>
+	        <pe:command cmd="File.MCMLBrowser" params='<%={url="script/apps/HelloChat/Ribbons/ToolsTab.html"}%>'/>
+        </pe:ribbonbar>
+        <pe:ribbonbar label="大自然">
+            some text here
+            <pe:command />
+            <pe:command />
+            <pe:command />
+        </pe:ribbonbar>
+    </pe:tab-item>
+    <pe:tab-item name="8" text="sliderbar&Colorpicker" style="padding:10px">
+        pe:sliderbar test
+        <pe:sliderbar name="MySlider" onchange="OnSliderValue()" min="0" max="100" value="10"></pe:sliderbar>
+        pe:colorpicker test
+        <pe:colorpicker name="MyColorpicker" onchange="OnColorPicker()" value="128 64 255"/>
+        <br />numeric input
+        <pe:numericupdown name="MyNumber" onchange="OnSliderValue()" min="0" max="100" min_step="1" value="0" valueformat="%.3f"/> end of line<br />
+    </pe:tab-item>
+</pe:tabs>
+</pe:mcml>
+</body>
+</html>
+

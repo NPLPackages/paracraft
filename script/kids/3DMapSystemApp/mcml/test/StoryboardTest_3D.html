@@ -1,0 +1,239 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/StoryboardTest_3D.html-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>testing Storyboard lib based MCML code by Leio 2008/7/23</title>
+</head>
+<body>
+
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    local pageCtrl = document:GetPageCtrl();  
+    function pageCtrl:OnCreate()       
+        local engine =  pageCtrl:CallMethod("Storyboard1", "GetEngine", "其他参数");
+        if(engine) then
+            engine.OnMotionStart = OnPlay;
+            engine.OnMotionPause = OnPause;
+            engine.OnMotionResume =OnResume;
+            engine.OnMotionStop = OnStop;
+            engine.OnMotionEnd = OnEnd;
+            
+            engine.OnTimeChange =OnTimeChange;
+            
+            local txt = engine:ReverseToMcml();
+            pageCtrl:SetUIValue("output_txt_write",txt);
+        end   
+        
+        
+        local ctl = pageCtrl:FindControl("avatar_test_animation");
+		if(ctl) then
+			ctl:ShowModel({
+				["IsCharacter"] = true,
+				["y"] = 0,
+				["x"] = 0,
+				["facing"] = -1.57,
+				["name"] = "pe:avatar:11",
+				["z"] = 0,
+				["AssetFile"] = "character/v1/01human/baru/baru.x",
+				["CCSInfoStr"] = "0#0#4#2#0#@0#F#0#0#0#0#0#F#0#0#0#0#0#F#0#0#0#0#0#F#0#0#0#0#0#F#0#0#0#0#0#F#0#0#0#0#0#F#0#0#0#0#@0#0#0#214#0#135#163#0#0#0#0#0#0#0#",
+			});
+		end 
+    end
+
+    function ReverseToMcml(btnName)
+        local engine =  pageCtrl:CallMethod("Storyboard1", "GetEngine", "其他参数");
+         local txt = engine:ReverseToMcml();
+         pageCtrl:SetUIValue("output_txt_write",txt);
+    end
+
+    function Play(btnName)
+       
+        pageCtrl:CallMethod("Storyboard1", "Play", "其他参数");
+    end
+     function Pause(btnName)
+        
+         pageCtrl:CallMethod("Storyboard1", "Pause", "其他参数");
+    end
+     function Resume(btnName)
+       
+         pageCtrl:CallMethod("Storyboard1", "Resume", "其他参数");
+    end
+    function Stop(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "Stop", "其他参数");
+    end
+    function End(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "End", "其他参数");
+    end
+    ---------
+    function preframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "preframe", "其他参数");
+    end
+     function nextframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "nextframe", "其他参数");
+    end
+     function pretime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "pretime", "其他参数");
+    end
+     function nexttime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "nexttime", "其他参数");
+    end
+    ----------
+     function speedpreframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speedpreframe", "5");
+    end
+     function speednextframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speednextframe", "5");
+    end
+     function speedpretime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speedpretime", "00:00:02");
+    end
+     function speednexttime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speednexttime", "00:00:02");
+    end
+    ---------
+    
+    -- event
+    
+    function OnPlay(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在播放");
+    end
+    function OnPause(sControlName)
+       -- pageCtrl:SetUIValue("anim_status", sControlName.."现在暂停了");
+    end
+    function OnResume(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在继续播放");
+    end
+    function OnStop(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."停止了");
+    end
+     function OnEnd(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."停止到最后");
+    end
+    function OnTimeChange(sControlName,frame)
+
+        frame = frame - 1
+        local time = CommonCtrl.Animation.TimeSpan.GetTime(frame);
+        if(not time)then
+            time = "wrong time";
+        end
+        pageCtrl:SetUIValue("anim_status", "目前为第："..frame.."帧"..",时间："..time);
+    end
+    
+  
+]]>
+</script>
+<pe:tabs name="MotionTabParent" style="margin:5px">
+  <pe:tab-item text="3D 测试" selected="true">
+      <div style="margin:5px">
+        <input type="button" name="PlayBtn" value="播放" onclick="Play()"/>
+        <input type="button" name="PlayBtn" value="暂停" onclick="Pause()"/>
+        <input type="button" name="ResumeBtn" value="继续" onclick="Resume()"/>
+        <input type="button" name="StopBtn" value="停止" onclick="Stop()"/>
+        <input type="button" name="EndBtn" value="停止到最后" onclick="End()"/>
+        <input type="button" name="EndBtn" value="ReverseToMcml" onclick="ReverseToMcml()"/>
+        <br />
+        <input type="button"  value="< frame" onclick="preframe()"/>
+        <input type="button"  value="> frame" onclick="nextframe()"/>
+        <input type="button"  value="< second" onclick="pretime()"/>
+        <input type="button"  value="> second" onclick="nexttime()"/>
+        <br />
+        <input type="button"  value="<< frame" onclick="speedpreframe()"/>
+        <input type="button"  value=">> frame" onclick="speednextframe()"/>
+        <input type="button"  value="<< second" onclick="speedpretime()"/>
+        <input type="button"  value=">> second" onclick="speednexttime()"/>
+        <br />
+        <label name="anim_status" style="margin-left:10px;margin-top:5px;height:20px;font-weight:bold;color:#006600">请点击按钮</label>
+        <hr />
+      </div>
+      <div style="margin:5px">
+      <textarea name="output_txt_write" rows="10" ShowLineNumber="true" ReadOnly="true"></textarea>
+      </div>
+  </pe:tab-item>
+  
+</pe:tabs>
+
+<!-- Storyboard binding is here-->
+<pe:storyboard name="Storyboard1" repeatCount = "1">
+<pe:objectAnimationUsingKeyFrames TargetName="object_editor" TargetProperty="CreateMeshPhysicsObject">
+<pe:discreteObjectKeyFrame KeyTime="00:00:5">
+{
+[1]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=255,
+["name"]="男人类26519",
+["facing"]=3.9000000953674,
+["AssetFile"]="character/v3/Human/Male/HumanMale.x",
+["z"]=255,
+}
+,
+[2]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=256.73315429688,
+["name"]="男人类2643726519",
+["facing"]=-0.64987850189209,
+["AssetFile"]="character/v3/Human/Male/HumanMale.x",
+["z"]=255,
+}
+,
+[3]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=259.24011230469,
+["name"]="男人类2644126519",
+["facing"]=0,
+["AssetFile"]="character/v3/Human/Male/HumanMale.x",
+["z"]=255,
+}
+,
+[4]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=261.78948974609,
+["name"]="女人类26519",
+["facing"]=0,
+["AssetFile"]="character/v3/Human/Female/HumanFemale.x",
+["z"]=255,
+}
+,
+}
+</pe:discreteObjectKeyFrame>
+<pe:discreteObjectKeyFrame KeyTime="00:00:7">
+{
+[1]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=264.91687011719,
+["name"]="女人类2646726526",
+["facing"]=0.63587248325348,
+["AssetFile"]="character/v3/Human/Female/HumanFemale.x",
+["z"]=253.95852661133,
+}
+,
+[2]={
+["IsCharacter"]=true,
+["price"]=0,
+["y"]=0,
+["x"]=265.96392822266,
+["name"]="女人类2647026526",
+["facing"]=0.63587248325348,
+["AssetFile"]="character/v3/Human/Female/HumanFemale.x",
+["z"]=253.1856842041,
+}
+,
+}
+</pe:discreteObjectKeyFrame>
+
+</pe:objectAnimationUsingKeyFrames>
+
+</pe:storyboard>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,72 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_viewport.html" -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TimesMagazineWeb, by zrf</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+local page = document:GetPageCtrl();
+local pointdata = {
+{x=0, y=0,width=40,tooltip="0,0", text="some very long text here"}, 
+{x=20, y=20,tooltip="20,20"},
+{x=30, y=30,tooltip="30,30"},
+{x=50, y=50,tooltip="50,10"},
+
+};
+local texdata = { 
+{left=-100,top=-100,right=0,bottom=0,background="Texture/16number.png",}, 
+{left=0,top=-100,right=100,bottom=0,background="Texture/16number.png",}, 
+{left=0,top=0,right=100,bottom=100,background="Texture/16number.png",}, 
+{left=-100,top=0,right=0,bottom=100,background="Texture/16number.png",}, 
+};
+
+function DS_Func_tex(index)
+    if(index==nil)then
+        return #texdata;
+    else
+        return texdata[index];
+    end
+end
+
+function DS_Func_point(index)
+    if(index==nil)then
+        return #pointdata;
+    else
+        return pointdata[index];
+    end
+end
+
+function onClickNPC()
+    commonlib.echo("!!:onClickNPC");
+end
+
+]]></script>
+<div style="width:600px;height:600px">
+    <pe:viewport style="width:160px;height:160px;background:url(Texture/alphadot.png)" 
+        name="my_minimap" active_rendering="true" mask_texture="Texture/Aries/Common/circular_mask.png" 
+        ClipCircle="0,0,100" >
+<!--        <pe:texture_grid>
+            <pe:texture  name="tex1" left="-100" top="-100" right="0" bottom="0" filename="Texture/16number.png"/>
+            <pe:texture  name="tex2" left="0" top="-100" right="100" bottom="0" filename="Texture/16number.png"/>
+            <pe:texture  name="tex3" left="0" top="0" right="100" bottom="100" filename="Texture/16number.png"/>
+            <pe:texture  name="tex4" left="-100" top="0" right="0" bottom="100" filename="Texture/16number.png"/>
+        </pe:texture_grid>-->
+        <pe:texture_grid>
+            <pe:textureassemble name="tex" DataSource='<%=DS_Func_tex %>' />
+        </pe:texture_grid>
+        <pe:point_cache>
+<!--            <pe:point name="pt1" x="0" y="0" tooltip="0,0"/>
+            <pe:point name="pt2" x="60" y="60" tooltip="60,60"/>
+            <pe:point name="pt13" x="-60" y="-60" tooltip="-60,-60"/>-->
+            <pe:pointassemble name="po" default_width="20" default_height="40" default_background="Texture/Aries/WorldMaps/HaqiTownMap/MagicForest2_32bits.png; 0 0 60 52" DataSource='<%=DS_Func_point %>' />
+        </pe:point_cache>
+
+    </pe:viewport>
+</div>
+</pe:mcml>
+</body>
+</html>

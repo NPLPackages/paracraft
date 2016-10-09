@@ -1,0 +1,155 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_treeview.html" 
+Author:LiXizhi
+Date: 2010.9.13
+-->
+<pe:mcml>
+<%
+function tvwOnClickNode(treenode)
+    _guihelper.MessageBox({treenode.mcmlNode:GetPreValue("this"), treenode.mcmlNode.attr});
+end
+function tvwOnClickNode2(treenode)
+    _guihelper.MessageBox("This is per treenode click!");
+end
+function isMain()
+    return true;
+end
+function getSource()
+    --local list = {{{{name="folder",attr={state=2,label="xxx",questid=60004,QuestGroup1=0,QuestGroup2=0,},},{name="folder",attr={state=2,label="bbbb",questid=60001,QuestGroup1=0,QuestGroup2=0,},},{name="folder",attr={state=3,label="cccc",questid=60005,QuestGroup1=0,QuestGroup2=0,},},{name="folder",attr={state=3,label="dddd",questid=60002,QuestGroup1=0,QuestGroup2=0,},},attr={label="aaaaa",},name="folder",},{name="folder",attr={label="bbbbb",},},name="folder",attr={label="main",},},{{name="folder",attr={label="ccc",},},{name="folder",attr={label="ddd",},},name="folder",attr={label="branch",},},name="folder",attr={label="root",},}
+    local list = { {name="folder", attr={text="parent_folder", expanded=false, label="main", }, 
+        {name="file", attr={text="filename"}},}, };
+    return list;
+end
+%>
+<!--this is a sample embedded data source which is referenced by name-->
+<Resource style="display:none" name="MySampleDataSource" >
+    <folder text="folder1" expanded="true">
+        <folder text="folder1_1" expanded="true">
+            <file text="some file1" finished="true"></file>
+        </folder>
+        <file text="some file2"></file>
+        <file text="some file3"></file>
+    </folder>
+    <mcml_folder text="folder2">
+        <file text="some file4" finished="true"></file>
+    </mcml_folder>
+    <file_canclick text="some file5 (Click me!!!)"></file_canclick>
+    <file_canclick2 text="some file6 (Click me unique!!!)"></file_canclick2>
+</Resource>
+
+<pe:tabs name="testTreeView">
+<pe:tab-item text="Bind Table" selected="true">
+    <pe:treeview name="tvwXMLTest" DataSource='<%={ {name="folder", attr={text="parent_folder", expanded=true}, {name="file", attr={text="filename"}}, }}%>'
+		    DefaultNodeHeight="20" OnClick="tvwOnClickNode()" ItemToggleSize="10" ItemToggleRightSpacing="6">
+	    <pe:treenode text="static nodes">
+		    <div>this is static nodes that are not bound to any data source. it can shown either before or after NodeTemplates</div>
+	    </pe:treenode>
+	    <NodeTemplates>
+		    <NodeTemplate DataType="folder">
+                <pe:treenode text='<%=XPath("this|text")%>' expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+            </NodeTemplate>
+            <NodeTemplate DataType="file">
+                <div style="height:20px;">
+                    <%=XPath("this|text")%>
+				    <span color="#008000">(已完成)</span>
+                </div>
+            </NodeTemplate>
+	    </NodeTemplates>
+        <!--this is where the data binded treenode to appear-->
+        <DataNodePlaceholder xpath="*"/>
+        <pe:treenode text="Select all file nodes" expanded="true">
+            <DataNodePlaceholder xpath="//file"/>
+	    </pe:treenode>
+	    <div>some other static tree node after the data binded node</div>
+    </pe:treeview>
+</pe:tab-item>
+<pe:tab-item text="Bind with XPath">
+    <pe:treeview name="tvwXMLTest2" DataSourceID='MySampleDataSource' DefaultNodeHeight="20" OnClick="tvwOnClickNode()">
+	    <NodeTemplates>
+		    <NodeTemplate DataType="folder">
+                <pe:treenode text='<%=XPath("this|text")%>' expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+            </NodeTemplate>
+            <NodeTemplate DataType="mcml_folder" >
+                <pe:treenode RenderTemplate="mcml_folder_template" expanded='<%=XPath("this|expanded")%>' MouseOverBG=""/>
+            </NodeTemplate>
+            <NodeTemplate DataType="mcml_folder_template">
+                <div color="#008000" style="font-weight:bold"><%=XPath("this|text")%> [with mcml]</div>
+            </NodeTemplate>
+            <NodeTemplate DataType="file">
+                <div style="height:20px;">
+                    <%=XPath("this|text")%>
+                    <pe:if condition='<%=XPath("this|finished")%>'>
+				        <span color="#008000">(已完成)</span>
+                    </pe:if>
+                </div>
+            </NodeTemplate>
+            <NodeTemplate DataType="file_canclick">
+                <pe:treenode RenderTemplate="file" MouseOverBG=""/>
+            </NodeTemplate>
+            <NodeTemplate DataType="file_canclick2">
+                <pe:treenode RenderTemplate="file" MouseOverBG="" OnClick="tvwOnClickNode2()"/>
+            </NodeTemplate>
+            <NodeTemplate DataType="mcml_finished_template">
+                <div color="#008000" style="font-weight:bold">[finished nodes] [with mcml]</div>
+            </NodeTemplate>
+	    </NodeTemplates>
+        <pe:treenode text="[all nodes without filter]" expanded="true">
+            <DataNodePlaceholder xpath="*"/>
+        </pe:treenode>
+        <pe:treenode RenderTemplate="mcml_finished_template" MouseOverBG="" expanded="true">
+            <DataNodePlaceholder xpath="//file[@finished = 'true']"/>
+	    </pe:treenode>
+    </pe:treeview>
+</pe:tab-item>
+<pe:tab-item text="Test Simple" >
+    <pe:treeview name="tvwXMLTest3" DataSource='<%=getSource()%>' DefaultNodeHeight="20" >
+	    <NodeTemplates>
+            <NodeTemplate DataType="folder">
+                <pe:treenode RenderTemplate="folder_template" ItemToggleSize="0" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+            </NodeTemplate>
+            <NodeTemplate DataType="folder_template">
+                <pe:if condition='<%=XPath("treenode|Expanded")%>'>
+                    <div style="height:30px;">folder opened: <%=XPath("this|label")%></div>
+                </pe:if>
+                <pe:if condition='<%=not XPath("treenode|Expanded")%>'>
+                    <div style="height:30px;">folder closed: <%=XPath("this|label")%></div>
+                </pe:if>
+            </NodeTemplate>
+            <NodeTemplate DataType="file">
+                <div style="height:20px;">
+                    <%=XPath("this|text")%>
+				    <span color="#008000">(已完成)</span>
+                </div>
+            </NodeTemplate>
+	    </NodeTemplates>
+        <DataNodePlaceholder xpath="//folder[@label='main']"/>
+    </pe:treeview>
+</pe:tab-item>
+<pe:tab-item text="Nested TreeView" >
+    <pe:treeview name="tvwXMLTest4" DefaultNodeHeight="20" style="width:300px;height:120px">
+	    <pe:treenode text="root" expanded="true">
+            <div>the following node is a nested treeview</div>
+            <pe:treeview name="tvwXMLTest4_nested" DataSourceID='MySampleDataSource' DefaultNodeHeight="20" style="width:200px;height:60px">
+                <NodeTemplates>
+		            <NodeTemplate DataType="folder">
+                        <pe:treenode text='<%=XPath("this|text")%>' expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="file">
+                        <div style="height:20px;">
+                            <%=XPath("this|text")%>
+				            <span color="#008000">(已完成)</span>
+                        </div>
+                    </NodeTemplate>
+	            </NodeTemplates>
+                <pe:treenode text="root" expanded="true">
+                    <div>child1</div>
+                    <div>child2</div>
+                </pe:treenode>
+                <div>child3</div>
+            </pe:treeview>
+            <div>child4</div>
+        </pe:treenode>
+        <div>child5</div>
+    </pe:treeview>
+</pe:tab-item>
+</pe:tabs>
+</pe:mcml>

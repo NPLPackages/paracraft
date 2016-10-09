@@ -1,0 +1,64 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_movie.html" 
+Author:leio
+Date:2012/10/16
+-->
+
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+local page = document:GetPageCtrl();
+NPL.load("(gl)script/ide/Director/CardMovieHelper.lua");
+local CardMovieHelper = commonlib.gettable("Director.CardMovieHelper");
+local old_list = {
+		[1] = 22102,
+		--[3] = 22102,
+		[4] = 22102,
+	}
+    local card_source_list = {
+		22102,22103,22104,22105,22106,22107,22108,22109,22110,22111,22112,22113,
+	};
+function LoadMovieSource()
+    return CardMovieHelper.LoadMovieSource(old_list,card_source_list)
+end
+
+function PlayCallback()
+    echo("PlayCallback");
+end
+function StopCallback()
+    echo("StopCallback");
+end
+function DoPlay()
+    page:CallMethod("test_player","DoPlay");
+end
+function DoStop()
+    page:CallMethod("test_player","DoStop");
+end
+]]></script>
+         <pe:div name="movie_item_parent" style="margin-left:20px;margin-top:20px;" />
+
+<div>
+    <div>
+        <pe:div name="test_scale" style="float:left;margin-left:10px;width:79px;height:121px;" >
+            <pe:item gsid='22102' style="width:79px;height:121px;" isclickable="false" />
+        </pe:div>
+        <pe:item gsid='22102' style="float:left;margin-left:10px;width:79px;height:120px;" isclickable="false" />
+    </div>
+        <input type="button" onclick="DoPlay" value="play"/>
+        <input type="button" onclick="DoStop" value="stop"/>
+</div>
+<aries:movie name="test_player" begin="PlayCallback" end="StopCallback" DataSource="<%=LoadMovieSource()%>" />
+ <aries:movie name="test_player__" begin="PlayCallback" end="StopCallback" >
+    <Motions>
+        <Motion Duration="1500" >
+             <MotionLine TargetType="Mcml" RenderParent="movie_item_parent">
+                <Frame Time="0" Visible="true" X="0" Y="0" Width="79" Height="121" tag="22102" AssetFile="script/apps/Aries/Animation/CardContent.html" />
+                <Frame Time="1000" Visible="true" X="100" Y="0" Width="79" Height="121" tag="22102" FrameType="easeInQuad" AssetFile="script/apps/Aries/Animation/CardContent.html" />
+            </MotionLine>
+            <MotionLine TargetType="Mcml" RenderParent="movie_item_parent">
+                <Frame Time="0" Visible="true" X="100" Y="0" Width="79" Height="121" tag="22102" AssetFile="script/apps/Aries/Animation/CardContent.html" />
+                <Frame Time="500" Visible="true" X="100" Y="0" Width="79" Height="121" tag="22102" AssetFile="script/apps/Aries/Animation/CardContent.html" />
+                <Frame Time="1000" Visible="true" X="200" Y="0" Width="79" Height="121" tag="22102" FrameType="easeInQuad" AssetFile="script/apps/Aries/Animation/CardContent.html" />
+            </MotionLine>
+        </Motion>
+    </Motions>
+</aries:movie>
+</pe:mcml>

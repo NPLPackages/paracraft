@@ -1,7 +1,7 @@
 .svn*
 /*
 !/*.csproj
-!/*.sln
+!/NPLPackageParacraft.sln
 !/.git*
 !/*.md
 !/LICENSE
@@ -14,6 +14,11 @@ script/ide
 /script/apps/Aries/*
 !/script/apps/Aries/Creator
 !/script/apps/Aries/app_main.lua
+!script/kids/
+script/kids/*
+!script/kids/3DMapSystemApp
+script/kids/3DMapSystemApp/*
+!script/kids/3DMapSystemApp/mcml
 !/config/
 /config/*
 !/config/Aries

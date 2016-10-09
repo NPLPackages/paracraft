@@ -1,0 +1,243 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/StoryboardTest.html-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>testing Storyboard lib based MCML code by Leio 2008/7/22</title>
+</head>
+<body>
+
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    local pageCtrl = document:GetPageCtrl();  
+    function pageCtrl:OnCreate()       
+        local engine =  pageCtrl:CallMethod("Storyboard1", "GetEngine", "其他参数");
+        if(engine) then
+            engine.OnMotionStart = OnPlay;
+            engine.OnMotionPause = OnPause;
+            engine.OnMotionResume =OnResume;
+            engine.OnMotionStop = OnStop;
+            engine.OnMotionEnd = OnEnd;
+            
+            engine.OnTimeChange =OnTimeChange;
+        end    
+    end
+    function Play(btnName)
+       
+        pageCtrl:CallMethod("Storyboard1", "Play", "其他参数");
+    end
+     function Pause(btnName)
+        
+         pageCtrl:CallMethod("Storyboard1", "Pause", "其他参数");
+    end
+     function Resume(btnName)
+       
+         pageCtrl:CallMethod("Storyboard1", "Resume", "其他参数");
+    end
+    function Stop(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "Stop", "其他参数");
+    end
+    function End(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "End", "其他参数");
+    end
+    ---------
+    function preframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "preframe", "其他参数");
+    end
+     function nextframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "nextframe", "其他参数");
+    end
+     function pretime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "pretime", "其他参数");
+    end
+     function nexttime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "nexttime", "其他参数");
+    end
+    ----------
+     function speedpreframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speedpreframe", "5");
+    end
+     function speednextframe(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speednextframe", "5");
+    end
+     function speedpretime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speedpretime", "00:00:02");
+    end
+     function speednexttime(btnName) 
+         pageCtrl:CallMethod("Storyboard1", "speednexttime", "00:00:02");
+    end
+    ---------
+    
+    -- event
+    
+    function OnPlay(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在播放");
+    end
+    function OnPause(sControlName)
+       -- pageCtrl:SetUIValue("anim_status", sControlName.."现在暂停了");
+    end
+    function OnResume(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在继续播放");
+    end
+    function OnStop(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."停止了");
+    end
+     function OnEnd(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."停止到最后");
+    end
+    function OnTimeChange(sControlName,frame)
+
+        frame = frame - 1
+        local time = CommonCtrl.Animation.TimeSpan.GetTime(frame);
+        if(not time)then
+            time = "wrong time";
+        end
+        pageCtrl:SetUIValue("anim_status", "目前为第："..frame.."帧"..",时间："..time);
+    end
+    
+  
+]]>
+</script>
+<pe:tabs name="MotionTabParent" style="margin:5px">
+  <pe:tab-item text="2D 测试" selected="true">
+      <div style="margin:5px">
+        <input type="button" name="PlayBtn" value="播放" onclick="Play()"/>
+        <input type="button" name="PlayBtn" value="暂停" onclick="Pause()"/>
+        <input type="button" name="ResumeBtn" value="继续" onclick="Resume()"/>
+        <input type="button" name="StopBtn" value="停止" onclick="Stop()"/>
+        <input type="button" name="EndBtn" value="停止到最后" onclick="End()"/>
+        <br />
+        <input type="button"  value="< frame" onclick="preframe()"/>
+        <input type="button"  value="> frame" onclick="nextframe()"/>
+        <input type="button"  value="< second" onclick="pretime()"/>
+        <input type="button"  value="> second" onclick="nexttime()"/>
+        <br />
+        <input type="button"  value="<< frame" onclick="speedpreframe()"/>
+        <input type="button"  value=">> frame" onclick="speednextframe()"/>
+        <input type="button"  value="<< second" onclick="speedpretime()"/>
+        <input type="button"  value=">> second" onclick="speednexttime()"/>
+        <br />
+        <label name="anim_status" style="margin-left:10px;margin-top:5px;height:20px;font-weight:bold;color:#006600">请点击按钮</label>
+        <hr />
+      </div>
+      <div style="margin:5px" >
+        可以运动的图片包括: img, div(any simple tags), text input, button, inner text, etc<br />
+        <img name="ImgControl1" style="width:128px;height:64px" src="Texture/3DMapSystem/brand/paraworld_text_256X128.png"/>
+        <div name="DivControl1" style="float:left;width:64px;height:64px;margin-left:10px;" class="box"></div>
+        <input type="text" style="width:70px;" name = "editboxControl1" value="文本框"/>
+        <input type="button" name = "buttonControl1" value="按钮动画"/>
+        <span name="InnerTextControl1" style="text-align:center;font-weight:bold;color:#006600;font-size:17px;margin-top:3px;text-shadow:true;">请点击按钮请点击按钮请点击按钮请点击按钮</span>
+      </div>
+       
+  </pe:tab-item>
+  
+  
+</pe:tabs>
+<pe:storyboard name="Storyboard1">
+     <pe:stringAnimationUsingKeyFrames TargetName="InnerTextControl1" TargetProperty="text">
+     <pe:stringAnimationUsingKeyFrames_Value>
+      <![CDATA[
+        [offset:1000]
+        [00:03.13]歌曲名：安静
+        [00:04.65]歌词：
+        [00:05.63]    词曲：周杰伦
+
+
+        [02:27.54][00:27.76]只剩下钢琴陪我谈了一天
+        [02:32.83][00:33.19]睡着的大提琴 安静的旧旧的
+
+        [02:40.55][00:41.06]我想你已表现的非常明白
+        [02:46.03][00:46.48]我懂我也知道 你没有舍不得
+
+        [02:53.77][00:54.88]你说你也会难过我不相信
+        [03:00.61][01:00.82]牵着你陪着我 也只是曾经
+        [03:06.43][01:06.99]希望他是真的比我还要爱你
+        [03:13.08][01:14.95]我才会逼自己离开
+
+        [03:21.04][01:21.31]你要我说多难堪 我根本不想分开
+        [03:27.35][01:28.05]为什么还要我用微笑来带过
+        [03:34.15][01:34.28]我没有这种天份 包容你也接受他
+        [03:40.71][01:40.87]不用担心的太多 我会一直好好过
+        [03:47.51][01:47.58]你已经远远离开 我也会慢慢走开
+        [03:54.07][01:54.15]为什么我连分开都迁就着你
+        [04:00.84][02:00.91]我真的没有天份 安静的没这么快
+        [04:07.17][02:07.80]我会学着放弃你 是因为我太爱你
+    ]]>
+     </pe:stringAnimationUsingKeyFrames_Value>
+    </pe:stringAnimationUsingKeyFrames>
+    
+</pe:storyboard>
+<!-- Storyboard binding is here-->
+<pe:storyboard name="Storyboard2">
+    <pe:doubleAnimationUsingKeyFrames TargetName="ImgControl1" TargetProperty="y">
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01" Value="200" SimpleEase = "1" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:02" Value="80" />
+        <pe:discreteDoubleKeyFrame KeyTime="00:00:04" Value="10" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:05" Value="40" />
+    </pe:doubleAnimationUsingKeyFrames>
+    <pe:doubleAnimationUsingKeyFrames TargetName="ImgControl1" TargetProperty="rotation">
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01" Value="300" SimpleEase = "1" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:02" Value="360"  />
+    </pe:doubleAnimationUsingKeyFrames>
+    <pe:doubleAnimationUsingKeyFrames TargetName="ImgControl1" TargetProperty="alpha">
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01" Value="0.1"  />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01.5" Value="0.8" SimpleEase = "-1" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:04.5" Value="0.1" SimpleEase = "-1" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:06" Value="1" SimpleEase = "-1" />
+    </pe:doubleAnimationUsingKeyFrames>
+    <pe:doubleAnimationUsingKeyFrames TargetName="DivControl1;editboxControl1;buttonControl1" TargetProperty="x;y">
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01" Value="50" SimpleEase = "1" />
+        <pe:discreteDoubleKeyFrame KeyTime="00:00:03" Value="80" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:04" Value="40" />
+    </pe:doubleAnimationUsingKeyFrames>
+     <pe:stringAnimationUsingKeyFrames TargetName="buttonControl1" TargetProperty="text">
+        <pe:discreteStringKeyFrame KeyTime="00:00:01" Value="测试2" />
+        <pe:discreteStringKeyFrame KeyTime="00:00:02" Value="测试3" />
+        <pe:discreteStringKeyFrame KeyTime="00:00:03" Value="测试4" />
+    </pe:stringAnimationUsingKeyFrames>
+    <pe:stringAnimationUsingKeyFrames TargetName="InnerTextControl1" TargetProperty="visible">
+        <pe:discreteStringKeyFrame KeyTime="00:00:01" Value="false" />
+        <pe:discreteStringKeyFrame KeyTime="00:00:03" Value="true" />
+    </pe:stringAnimationUsingKeyFrames>
+    <pe:doubleAnimationUsingKeyFrames TargetName="ImgControl1;DivControl1;editboxControl1;buttonControl1" TargetProperty="scaleX;scaleY">
+        <pe:linearDoubleKeyFrame KeyTime="00:00:01" Value="1.5" SimpleEase = "1" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:02" Value="0.4" />
+        <pe:linearDoubleKeyFrame KeyTime="00:00:04" Value="1" SimpleEase = "1"  />
+    </pe:doubleAnimationUsingKeyFrames>
+     <pe:stringAnimationUsingKeyFrames TargetName="container1" TargetProperty="text">
+     <pe:stringAnimationUsingKeyFrames_Value>
+      <![CDATA[
+        [offset:1000]
+        [00:03.13]歌曲名：安静
+        [00:04.65]歌词：
+        [00:05.63]    词曲：周杰伦
+
+
+        [02:27.54][00:27.76]只剩下钢琴陪我谈了一天
+        [02:32.83][00:33.19]睡着的大提琴 安静的旧旧的
+
+        [02:40.55][00:41.06]我想你已表现的非常明白
+        [02:46.03][00:46.48]我懂我也知道 你没有舍不得
+
+        [02:53.77][00:54.88]你说你也会难过我不相信
+        [03:00.61][01:00.82]牵着你陪着我 也只是曾经
+        [03:06.43][01:06.99]希望他是真的比我还要爱你
+        [03:13.08][01:14.95]我才会逼自己离开
+
+        [03:21.04][01:21.31]你要我说多难堪 我根本不想分开
+        [03:27.35][01:28.05]为什么还要我用微笑来带过
+        [03:34.15][01:34.28]我没有这种天份 包容你也接受他
+        [03:40.71][01:40.87]不用担心的太多 我会一直好好过
+        [03:47.51][01:47.58]你已经远远离开 我也会慢慢走开
+        [03:54.07][01:54.15]为什么我连分开都迁就着你
+        [04:00.84][02:00.91]我真的没有天份 安静的没这么快
+        [04:07.17][02:07.80]我会学着放弃你 是因为我太爱你
+    ]]>
+     </pe:stringAnimationUsingKeyFrames_Value>
+    </pe:stringAnimationUsingKeyFrames>
+</pe:storyboard>
+</pe:mcml>
+
+</pe:mcml>
+</body>
+</html>

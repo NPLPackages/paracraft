@@ -1,0 +1,44 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_template.html" -->
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+]]></script>
+<pe:dialog NPC_id = '0' >
+    <pe:template filename="script/kids/3DMapSystemApp/mcml/test/test_pe_template_templ.html">
+        <pe:placeholder id="portrait" source="{this}" nid='30132' name='NoName' />
+        <pe:placeholder id="content" source="{pe:state}" />
+        <pe:placeholder id="button31" />
+        <pe:placeholder id="button2" />
+        <pe:placeholder id="ok" />
+        <!--we can also omit pe:placeholder, where template_id will automatically insert one here at runtime, thus removing duplicated code -->
+        <pe:placeholder id="later" />
+    </pe:template>
+    <pe:state id = "0">
+		<pe:answer autoexec = "true">
+			<pe:answer-if condition = 'true' target_state = "1"/>
+		</pe:answer>
+	</pe:state>
+    <pe:state id = "1">
+        this is state 1
+        <pe:answer text="Go to 2" template_id="button1">
+			<pe:answer-if condition = 'true' target_state = "2"/>
+		</pe:answer>
+        <pe:answer text="exit" template_id="later">
+			<pe:answer-if condition = 'true' target_state = "-1"/>
+		</pe:answer>
+    </pe:state>
+    <pe:state id = "2">
+        this is state 2 
+        <span style="color:#FF0000" >red text</span>
+        some text that should wrap to next line. 但是不会识别英文单词。
+        <span style="color:#0000FF" >UTF8</span>
+        中文也可以自动换行的。
+        中文也可以自动换行的。
+        <pe:answer text="Go to 1" template_id="button1">
+			<pe:answer-if condition = 'true' target_state = "1"/>
+		</pe:answer>
+        <pe:answer text="exit" template_id="ok">
+			<pe:answer-if condition = 'true' target_state = "-1"/>
+		</pe:answer>
+    </pe:state>
+</pe:dialog>
+</pe:mcml>

@@ -1,0 +1,32 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_multiradio.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+local pageCtrl = document:GetPageCtrl();
+function OnRadioClick(value)
+    local v,values = pageCtrl:GetValue("group2");
+    commonlib.echo({value, v, values});
+end
+pageCtrl:Refresh(0);
+]]>
+</script>
+<div>
+Multi radio box text
+<br />
+<input type="radio" name="group2" max="2" checked="true" value="1" />1
+<input type="radio" name="group2" max="2" value="2" />2
+<input type="radio" name="group2" max="2" value="3" onclick="OnRadioClick()"/>3
+<br />
+<input type="button" name="btn1" value="hello" tooltip="button with padding and background2" style="padding:10px;background2:url(Texture/alphadot.png);" />
+</div>
+
+</pe:mcml>
+</body>
+</html>
+

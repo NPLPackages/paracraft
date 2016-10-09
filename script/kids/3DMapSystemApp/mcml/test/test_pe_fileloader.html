@@ -1,0 +1,104 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_fileloader.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+local pageCtrl = document:GetPageCtrl();
+function OnClickStartLoader1()
+    local loader = pageCtrl:FindControl("loader1");
+    if(loader)then
+        loader:Start();
+    end
+end
+function OnClickStartLoader2()
+    local loader = pageCtrl:FindControl("61haqitown_map_loader");
+    if(loader)then
+        loader:Start();
+    end
+end
+
+local list = {
+    { filename = "Texture/Aries/Books/FashionMagazine_v1/cloth_pic00.png",},
+	{ filename = "Texture/Aries/Books/FashionMagazine_v1/cloth_pic01.png" },
+};
+function datasource()
+    return list;
+end
+
+function OnUpdateProgress_dummy(args)
+end
+
+function OnUpdateProgress(args)
+    if(not args)then return end
+    local type = args.type;
+    local p = 0;
+    if(type == "start")then
+        p = 0;
+    elseif(type == "loading")then
+        p = args.percent or 0;
+    elseif(type == "finish")then
+        p = 1;
+    end
+    p = math.floor(p * 100);
+	local loading_bar = pageCtrl:FindControl("loading_bar");
+    if(loading_bar)then
+        pageCtrl:SetUIValue("loading_bar",p);
+    end
+    local progress_text = pageCtrl:FindControl("progress_text");
+    if(loading_bar)then
+        local s = string.format("下载进度：%d/100",p);
+        pageCtrl:SetUIValue("progress_text",s);
+    end
+end
+]]>
+</script>
+<div>
+    <pe:tabs name="testFileLoaderTabs">
+        <pe:tab-item name="1" text="Manual Download" style="padding:10px" selected="true">    
+            <pe:fileloader name="loader1" autoload="false" loading_show="#loading_1" loading_hide="#loaded_1" set_value_target="loading_bar" set_text_target="progress_text" loader_callback="OnUpdateProgress_dummy" datasource="<%=datasource() %>">
+                <asset key="aaa.dds" />
+                <asset key="b.x" />
+            </pe:fileloader>
+            <input type="button" value="下载" onclick="OnClickStartLoader1"/>
+            <div name="loaded_1" >下载成功后显示的UI
+            </div>
+            <div name="loading_1" >下载当中显示的UI
+                <pe:progressbar name="loading_bar"  
+                    style="margin:6px;width:250px;height:20px;"
+                    Minimum = "0" Maximum = "100" Value = "10"
+                /> <pe:label name="progress_text" style="height:20px;width:40px;">0%</pe:label>
+                <!--we can usually reference another file for the loader UI-->
+                <pe:template filename="script/apps/Aries/Dialog/AriesPageLoaderTemplate.html"></pe:template>
+            </div>
+        </pe:tab-item>
+        <pe:tab-item name="2" text="Auto download" style="padding:10px" >    
+            <pe:fileloader name="loader2" logname="log/test" loading_show="#loading_2" loading_hide="#loaded_2" datasource="<%=datasource() %>">
+                <asset key="aaa.dds" />
+                <asset key="b.x" />
+            </pe:fileloader>
+            <div name="loaded_2">下载成功后显示的UI</div>
+            <div name="loading_2">下载当中显示的UI</div>
+        </pe:tab-item>
+        <pe:tab-item name="1" text="Manual Download Aries " style="padding:10px">    
+            <pe:fileloader name="61haqitown_map_loader" autoload="false" loading_show="#page_loading" loading_hide="#page_loaded" set_value_target="progressbar_normal" set_text_target="txt_percent_normal" loader_callback="OnUpdateProgress_dummy">
+                <asset key="Texture/Aries/WorldMaps/HaqiTownMap/HaqiTownMap_bg.dds" />
+                <asset key="Texture/Aries/Common/Close_RedCross_32bits.png" />
+            </pe:fileloader>
+            <div name="page_loading" >
+    	        <pe:template filename="script/apps/Aries/Dialog/AriesPageLoaderTemplate.html" />
+            </div>
+            <div name="page_loaded">下载成功后显示的UI</div>
+
+            <input type="button" value="下载" onclick="OnClickStartLoader2"/>
+        </pe:tab-item>
+    </pe:tabs>
+</div>
+</pe:mcml>
+</body>
+</html>
+

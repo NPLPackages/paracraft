@@ -1,0 +1,103 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/MotionTest.html-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>testing motion lib based MCML code by LiXizhi 2008/5/4</title>
+</head>
+<body>
+
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    local pageCtrl = document:GetPageCtrl();  
+    function pageCtrl:OnCreate()       
+        local engine =  pageCtrl:CallMethod("AnimGroup1", "GetEngine", "其他参数");
+        if(engine) then
+            engine.OnMotionStart = OnPlay;
+            engine.OnMotionPause = OnPause;
+            engine.OnMotionResume =OnResume;
+            engine.OnMotionEnd = OnStop;
+            engine.OnTimeChange =OnTimeChange;
+        end    
+    end
+    function Play(btnName)
+       
+        pageCtrl:CallMethod("AnimGroup1", "Play", "其他参数");
+    end
+     function Pause(btnName)
+        
+         pageCtrl:CallMethod("AnimGroup1", "Pause", "其他参数");
+    end
+     function Resume(btnName)
+       
+         pageCtrl:CallMethod("AnimGroup1", "Resume", "其他参数");
+    end
+    function Stop(btnName) 
+         pageCtrl:CallMethod("AnimGroup1", "Stop", "其他参数");
+    end
+    
+    -- event
+    
+    function OnPlay(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在播放");
+    end
+    function OnPause(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."现在暂停了");
+    end
+    function OnResume(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."正在继续播放");
+    end
+    function OnStop(sControlName)
+        pageCtrl:SetUIValue("anim_status", sControlName.."停止了");
+    end
+    function OnTimeChange(sControlName,time)
+        --commonlib.echo(time);
+    end
+    
+  
+]]>
+</script>
+<pe:tabs name="MotionTabParent" style="margin:5px">
+  <pe:tab-item text="测试 Motion 1" selected="true">
+      <div style="margin:5px">
+        我们将用<a href="MotionTestData.xml">MotionTestData.xml</a>文件, 运动下面的图片<br />
+        <input type="button" name="PlayBtn" value="播放" onclick="Play()"/>
+        <input type="button" name="PlayBtn" value="暂停" onclick="Pause()"/>
+        <input type="button" name="ResumeBtn" value="继续" onclick="Resume()"/>
+        <input type="button" name="StopBtn" value="停止" onclick="Stop()"/>
+        <label name="anim_status" style="margin-left:10px;margin-top:5px;height:20px;font-weight:bold;color:#006600">请点击按钮</label>
+        <hr />
+      </div>
+      <div style="margin:5px">
+        可以运动的图片包括: img, div(any simple tags), text input, button, inner text, etc<br />
+        <img name="ImgControl1" style="width:128px;height:64px" src="Texture/3DMapSystem/brand/paraworld_text_256X128.png"/>
+        <div name="DivControl1" style="float:left;width:64px;height:64px;margin-left:10px;" class="box"></div>
+        <input type="text" style="width:70px;" name = "editboxControl1" value="文本框"/>
+        <input type="button" name = "buttonControl1" value="按钮动画"/>
+        <span name="InnerTextControl1" style="color:#006600;">Span内部文字</span>
+      </div>
+  </pe:tab-item>
+  
+  <pe:tab-item text="测试 Motion 2">
+     <div style="margin:5px">其他测试内容</div><hr />
+  </pe:tab-item>
+</pe:tabs>
+
+<!-- motion binding is here-->
+<pe:animgroup name="AnimGroup1">
+    <pe:animlayer>
+        <pe:animator for="ImgControl1" src="MotionTestData.xml"/>
+        <pe:animator for="DivControl1" src="MotionTestData.xml"/>
+        <pe:animator for="editboxControl1" src="MotionTestData.xml"/>
+    </pe:animlayer> 
+    <pe:animlayer>    
+        <pe:animator for="buttonControl1" src="MotionTestData.xml"/>
+        <pe:animator for="InnerTextControl1" src="MotionTestData.xml"/>
+        <pe:animator for="Non-Existent-Control" src="MotionTestData.xml"/>
+    </pe:animlayer>
+</pe:animgroup>
+
+
+</pe:mcml>
+</body>
+</html>

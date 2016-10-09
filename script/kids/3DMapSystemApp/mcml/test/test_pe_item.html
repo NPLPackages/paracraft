@@ -1,0 +1,31 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_item.html" 
+Author:LiXizhi
+Date: 2009.9.25
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+]]>
+</script>
+<pe:tabs name="testItemsTabs">
+    <pe:tab-item text="SimpleItem" style="padding:10px" selected="true">
+         <!--ordinary item that take up some space-->
+         <pe:item gsid='1028' style="width:64px;height:64px"/>
+         <!--item with absolute positioning that does not take up any space-->
+         <pe:item gsid='16019' style="position:absolute;left:200px;top:200px;width:64px;height:64px"/>
+         <!--item with relative positioning that does not take up any space-->
+         <pe:item gsid='16019' style="position:relative;left:10px;top:70px;width:64px;height:64px"/>
+         <!--ordinary item that take up some space, which just shows that it follows the first item in layout. -->
+         <pe:item gsid='1028' style="width:64px;height:64px"/>
+    </pe:tab-item>
+</pe:tabs>
+</pe:mcml>
+</body>
+</html>
+

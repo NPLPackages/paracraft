@@ -1,0 +1,37 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/test_Eval.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+local page = document:GetPageCtrl();
+button_click_count = 0;
+
+function OnClickIncreaseCount()
+    button_click_count = button_click_count + 1
+    page:Refresh(0);
+    log("page is refreshed "..button_click_count.."\n")
+end
+
+function OnClickToggleVisible()
+    local _txtUIObj = page:FindControl("my_container");
+    if(_txtUIObj and _txtUIObj:IsValid()) then
+        if(_txtUIObj.visible) then
+            page:FindControl("txtIME").text="";
+        end
+        _txtUIObj.visible = not _txtUIObj.visible;
+    end
+end
+]]></script>
+<form name="testEval_form">
+    You have clicked <%=Eval("button_click_count")%> <br />
+    <input type="button" value="Click Me!" onclick="OnClickIncreaseCount()" /><br />
+
+    test IME visible toggle:
+    <pe:container name="my_container" style="float:left;width:120px;64px;">
+        <input type="text" textcolor="#FF0000" name="txtIME" style="width:100px;" enable_ime="true" />
+    </pe:container>
+    <input type="button" value="toggle visible" onclick="OnClickToggleVisible()" />
+    <div style="width:100px;font-size:11px;line-height:11px;background-color:#808080;">一些很长的文件</div>
+    <div style="font-size:14px;line-height:120%;background-color:#00FFFF;">长些很长长</div>
+    <div style="font-size:16px;font-weight:bold;line-height:120%;background-color:#00FFFF;">长些很长长</div>
+    长些<div style="float:left;">很长</div>长
+</form>
+</pe:mcml>

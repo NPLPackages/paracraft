@@ -1,0 +1,163 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_gridview.html" 
+Author:LiXizhi
+Date: 2008.5.15
+-->
+<pe:mcml>
+<%
+-- binding to an empty table
+function ShowEmptyTable()
+    local self = document:GetPageCtrl()
+    if(self) then
+        self:CallMethod("gvwTableTest", "SetDataSource", {})
+        self:CallMethod("gvwTableTest", "DataBind");
+    end
+end
+
+-- binding to a long test table for paging and scrolling test
+function ShowTestTable()
+    local self = document:GetPageCtrl()
+    if(self) then
+        self:CallMethod("gvwTableTest", "SetDataSource", {
+            {username="LiXizhi_test", Company="ParaEngine"}, 
+            {username="Andy_test", Company="ParaEngine"}, 
+            {username="Gandhi_test", Company="PE"},
+            {username="ParaEngine_test", Company="PE"},
+            {username="ParaEngine1", Company="PE"},
+            {username="ParaEngine2", Company="PE"},
+            {username="ParaEngine3", Company="PE"},
+            {username="ParaEngine4", Company="PE"},
+            {username="ParaEngine5", Company="PE"},
+            {username="ParaEngine6", Company="PE"},
+            {username="ParaEngine7", Company="PE"},
+            {username="ParaEngine8", Company="PE"},
+            {username="ParaEngine9", Company="PE"},
+        })
+        self:CallMethod("gvwTableTest", "DataBind");
+    end
+end
+
+function gvwTableTest_PageIndexChanging(ctrlName, nPageIndex)
+    commonlib.echo({"PageIndexChanging", ctrlName, nPageIndex})
+end
+
+function gvwTableTest_PageIndexChanged(ctrlName, nPageIndex)
+    commonlib.echo({"PageIndexChanged", ctrlName, nPageIndex})
+end
+
+function gvwTableTest_DataBound(ctrlName, datasource)
+    commonlib.echo(datasource)
+end
+
+function MyDataProvider(index)
+    if(index == nil) then
+        return 6;
+    elseif(index<=6) then
+        return {name = "Value"..tostring(index)}
+    end
+end
+
+%>
+<pe:tabs name="testGridView">
+    <pe:tab-item text="Bind Table" selected="true">
+    Binding gridview to a NPL data table <input type="button" value="Bind Empty" onclick="ShowEmptyTable()"/> <input type="button" value="Bind Test Table" onclick="ShowTestTable()"/>
+    <pe:gridview style="margin:10px" name="gvwTableTest" CellPadding="5"  AllowPaging="True" DefaultNodeHeight = "20" pagesize="10"
+        DataSource='<%={{username="LiXizhi"}, {username="Andy", Company="ParaEngine"}, {username="Gandhi"}}%>'
+        DataBound = "gvwTableTest_DataBound()" OnPageIndexChanging="gvwTableTest_PageIndexChanging()" OnPageIndexChanged="gvwTableTest_PageIndexChanged()">
+	    <Columns>
+			Row index is <%=Eval("index")%><a href='<%="profile?name="..Eval("username")%>'>User Name is <%=Eval("username")%></a>Company: <%=Eval("Company")%>
+	    </Columns>
+	    <EmptyDataTemplate>
+		    <b>NO MATCHING USER IS FOUND 没有找到符合要求的用户</b>
+	    </EmptyDataTemplate>
+	    <PagerSettings Position="TopAndBottom" height="26" PreviousPageText="previous page" NextPageText="next page"/>
+	    <!--<PagerTemplate><form><input type="button" name="pre" value="previous page"/><input type="button" name="next" value="next page"/><label name="page" style="height:18px;margin:4px"/></form></PagerTemplate>-->
+    </pe:gridview>
+
+    </pe:tab-item>
+    
+    <pe:tab-item text="FitHeight">
+        FitHeight property is set the true. 
+        <div style="background:url(Texture/alphadot.png)" >
+            <pe:gridview name="gvwApps" FitHeight="true" DataSourceID="InternalXMLDataSource" CellPadding="5"  AllowPaging="false" DefaultNodeHeight = "20" pagesize="12" >
+		        <Columns>
+                    <div style="height:20px;">
+			            Name: <%=XPath("name")%> Author:<%=XPath("Author")%>
+                    </div>
+		        </Columns>
+	        </pe:gridview>
+        </div>
+    </pe:tab-item>
+
+    <pe:tab-item text="Internal XML data source">
+        Binding to an xml data source file 
+        <pe:gridview name="gvwApps" DataSourceID="InternalXMLDataSource" style="margin:10px" CellPadding="5"  AllowPaging="True" DefaultNodeHeight = "20" pagesize="12" >
+		    <Columns>
+			    Name: <%=XPath("name")%> Author:<%=XPath("Author")%>
+		    </Columns>
+	    </pe:gridview>
+    </pe:tab-item>
+    
+    <pe:tab-item text="external XML XPath" >
+        Binding to an <a href="script/kids/3DMapSystemApp/mcml/test/XmlDataSource_sample.xml">external xml data source file </a> using XPath
+        <pe:gridview name="gvwExtApps" DataSourceID="ExternalXmlDataSource" style="margin:10px" CellPadding="5"  AllowPaging="True" DefaultNodeHeight = "20" pagesize="12" >
+		    <Columns>
+			    Name: <%=XPath("name")%>;<%=XPath("Author")%>; <%=XPath("text")%>; <%=XPath("Company.text")%>;<%=XPath("Company.address.text")%>;
+		    </Columns>
+	    </pe:gridview>
+    </pe:tab-item>
+
+    <pe:tab-item text="Bind Function">
+    Binding to a NPL function
+        <pe:gridview name="gvwFunctions" DataSource='<%=MyDataProvider%>'>'>
+	        <Columns>
+		        Name: <%=Eval("name")%>;
+	        </Columns>
+        </pe:gridview>
+    
+    </pe:tab-item>
+   
+    <pe:tab-item text="MQL query">
+        MQL query
+    	
+	    <pe:gridview name="gvwFriends" DataSourceID="FriendsDataSource" style="margin:10px" CellPadding="5"  AllowPaging="True" DefaultNodeHeight = "20" pagesize="10" >
+		    <Columns>
+			    uname: <%=Eval("uname")%>
+			    uid: <%=Eval("uid")%>
+			    create date: <%=Eval("createDate")%>
+		    </Columns>
+	    </pe:gridview>
+    
+    </pe:tab-item>
+   
+</pe:tabs>
+
+
+<!--strange : this can not be put in the end-->
+<pe:mqldatasource name="FriendsDataSource" DataSourceMode="DataReader" SelectCommand="select uid,createDate,uname from users order by createDate desc" cachepolicy="access plus 10 hour">
+    <SelectParameters>
+        <pe:parameter name="username" type="string" defaultvalue="ParaEngine" />
+        <pe:parameter name="age" type="number" defaultvalue="10" />
+    </SelectParameters>
+</pe:mqldatasource>
+
+
+<pe:xmldatasource name="InternalXMLDataSource" XPath="//category[@name='OfficialApps']"> 
+	<data>
+        <app name="Dance" Author="ParaEngine"/>
+        <app name="RPG Maker" Author="ParaEngine"/>
+        <category name="OfficialApps">
+            <app name="Creation" Author="ParaEngine" IsBeta="True"/>
+            <app name="Environment" Author="ParaEngine"/>
+            <app name="Avatar" Author="ParaEngine"/>
+        </category>
+        <category name="Game">
+            <app name="Dance" Author="ParaEngine"/>
+            <app name="RPG Maker" Author="ParaEngine"/>
+        </category>
+	</data>
+</pe:xmldatasource>
+
+
+<pe:xmldatasource name="ExternalXmlDataSource" DataFile="script/kids/3DMapSystemApp/mcml/test/XmlDataSource_sample.xml" XPath="//category[@name='OfficialApps']" /> 
+
+</pe:mcml>

@@ -1,0 +1,61 @@
+<!--
+author: LiXizhi
+date: 2008.2.18
+desc: profile sample xml
+used by: 
+-->
+<pe:profile uid="1234-1234-1234-0000" version="1.0">
+  
+  <pe:userinfo name="Xizhi" photo="" sex="1" age="25">
+  </pe:userinfo>
+  
+  <pe:friends uids="XXXX-0001, XXXX-0002, XXXX-0002, XXXX-0004, XXXX-0005"/>
+
+  <pe:app app_key="GUID_CCS">
+    我的形象
+    <pe:avatar AssetFile="character/.../xxx.x"></pe:avatar>
+  </pe:app>
+
+  <pe:app app_key="GUID_MyFriends">
+
+    <pe:profile-box>
+      你有5个朋友
+      <pe:name uid="XXXX-0001"></pe:name>
+      <pe:name uid="XXXX-0002"></pe:name>
+      <pe:editor-button text="查看全部好友"/>
+   </pe:profile-box>
+
+ </pe:app>
+
+  <pe:app app_key="GUID_map">
+    <pe:profile-box>
+      我的家
+      <myhomemark>
+        <pe:map-mark markid="00001"/>
+      </myhomemark>
+      拥有的世界
+      <worldlist>
+        <pe:world worldid="00001"/>
+        <pe:world worldid="00002"/>
+        <pe:world worldid="00003"/>
+      </worldlist>
+      拥有的土地
+      <tilelist>
+        <pe:map-tile tileid="00001"/>
+        <pe:map-tile tileid="00002"/>
+      </tilelist>
+    </pe:profile-box>
+
+    <pe:worldip>
+      <pe:model x="0" y="0" z="0" AssetFile="model/../xx.x"/>
+      <pe:model x="2" y="0" z="2" AssetFile="model/../xx.x"/>
+    </pe:worldip>
+  </pe:app>
+
+  <pe:app app_key="GUID_EditApp">
+    全部安装的应用程序
+    <pe:app-home-button app_key="GUID_Blueprint"/>
+    <pe:app-home-button app_key="GUID_Chat"/>
+    <pe:app-home-button app_key="GUID_Dance"/>
+  </pe:app>
+</pe:profile>

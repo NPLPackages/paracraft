@@ -1,0 +1,64 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_stackview.html" 
+Author:LiXizhi
+Date: 2010.9.16
+-->
+<pe:mcml>
+<%
+function getSource()
+    return { {name="folder", attr={text="parent_folder"}, {name="file", attr={text="filename"}}, }};
+end
+%>
+<!--this is a sample embedded data source which is referenced by name-->
+<Resource style="display:none" name="MySampleDataSource" >
+    <file text="item1"></file>
+    <file text="item2"></file>
+    <file text="item3"></file>
+    <file text="item5"></file>
+    <file text="item6"></file>
+    <file text="item7"></file>
+    <file text="item8"></file>
+    <file text="item9"></file>
+    <file text="item10"></file>
+    <folder text="folder1">
+        <file text="itemC"></file>
+    </folder>
+    <file text="itemF1"></file>
+    <file text="itemF2"></file>
+    <file text="itemF3"></file>
+</Resource>
+
+<pe:tabs name="teststackview">
+<pe:tab-item text="Bind Table" selected="true">
+    <pe:stackview name="tvwXMLTest" style="width:300px;height:200px" DataSourceID="MySampleDataSource" >
+	    <NodeTemplates>
+		    <NodeTemplate DataType="folder">
+                <div style="float:left;margin:5px;width:100px;"><%=XPath("this|text")%></div>
+            </NodeTemplate>
+            <NodeTemplate DataType="file">
+                <div style="float:left;margin:5px;width:60px">
+                    <%=XPath("this|text")%>
+                </div>
+            </NodeTemplate>
+	    </NodeTemplates>
+        <!--this is where the data binded stacknode to appear-->
+        <DataNodePlaceholder xpath="*"/>
+    </pe:stackview>
+</pe:tab-item>
+<pe:tab-item text="Test Simple" >
+    <pe:stackview name="tvwXMLTest3" DataSource='<%=getSource()%>'>
+	    <NodeTemplates>
+		    <NodeTemplate DataType="folder">
+                <div><%=XPath("this|text")%></div>
+            </NodeTemplate>
+            <NodeTemplate DataType="file">
+                <div style="height:20px;">
+                    <%=XPath("this|text")%>
+				    <span color="#008000">(已完成)</span>
+                </div>
+            </NodeTemplate>
+	    </NodeTemplates>
+        <DataNodePlaceholder xpath="//file"/>
+    </pe:stackview>
+</pe:tab-item>
+</pe:tabs>
+</pe:mcml>

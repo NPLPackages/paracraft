@@ -1,0 +1,26 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_iframe_sub.html" -->
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+
+local class = pageCtrl:GetRequestParam("A");
+local subclass = pageCtrl:GetRequestParam("B");
+commonlib.echo(class)
+commonlib.echo(subclass)
+
+function MyDataProvider(index)
+    if(index == nil) then
+        return 1;
+    elseif(index ==1) then
+        return {uid = "d124f837-d1e5-432d-a36d-f05fb3c5f3b2"};
+    end
+end
+]]></script>
+    <pe:name uid='d124f837-d1e5-432d-a36d-f05fb3c5f3b2' linked=false/>
+    <pe:gridview name="testiFramepename" DataSource='<%=MyDataProvider%>'>'>
+        <Columns>
+            <%=Eval("uid")%>
+	        <pe:name uid='<%=Eval("uid")%>' linked=false/>
+        </Columns>
+    </pe:gridview>
+</pe:mcml>

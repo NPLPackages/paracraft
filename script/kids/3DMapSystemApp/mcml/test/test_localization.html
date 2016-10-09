@@ -1,0 +1,9 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/test_localization.html-->
+<pe:mcml variables="$=locale.TEST;$enUS=locale.TEST_enUS">
+<script type="text/npl" refresh="false"><![CDATA[
+local page = document:GetPageCtrl();
+]]></script>
+<div>current locale is <%=ParaEngine.GetLocale() %></div>
+<div>default lang is ${SOME_LANG_ID}; english version is $enUS{SOME_LANG_ID}</div>
+<div style="height:40px;${SOME_LANG_BACKGROND}">div text</div>
+</pe:mcml>

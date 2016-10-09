@@ -1,0 +1,59 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/LoginFrontPage.xml" -->
+<pre>
+  <pe:mcml>
+    <div class="white" style="background-color:#0000FF;width:128px;height:64px;padding:10px;color:#FFFFFF;float:left;">iParaWorld</div>
+    <div style="margin-left:20px;float:left;">
+      <hr/>
+      <div style="padding:15px">
+        ParaWorld is a <font color="#0000FF">3D social platform</font> that <font color="#0000FF">connects you</font> with the people around you.
+      </div>
+      <hr/>
+    </div>
+    <br/>
+    <div style="margin-top:10px">
+      <div style="padding:10px;width:300px;float:left;">
+        <font color="#0000FF">Use ParaWorld to&#8230;</font>
+        <ul>
+          <li>Keep up with friends and family</li>
+          <li>Share photos and videos</li>
+          <li>Control privacy online</li>
+          <li>Reconnect with old classmates</li>
+          <li>Discuss interests and hobbies</li>
+          <li>Plan parties and other events</li>
+        </ul>
+      </div>
+      <div style="width:320px;float:left;">
+        <pe:editor labelwidth="120">
+          <font color="#0000FF">Sign up for ParaWorld</font>
+          <div style="margin-left:30px">It's free and anyone can join.</div>
+          <div style="width:120px;float:left;">Full name:</div><input type="text"/><br/>
+          <div style="width:120px;float:left;">Your Email:</div><input type="text"/><br/>
+          <div style="width:120px;float:left;">New Password:</div><input type="text"/><br/>
+          <div style="width:120px;float:left;">Birthday:</div>
+          <div style="width:180px;float:left;">
+            <select name="BirthMonth">
+              <option selected="selected">Month:</option>
+              <option>12</option>
+              <option>11</option>
+              <option>10</option>
+            </select>
+            <select name="BirthDay">
+              <option selected="selected">Day:</option>
+              <option>26</option>
+              <option>27</option>
+              <option>28</option>
+            </select>
+            <select name="BirthYear">
+              <option selected="selected">Year:</option>
+              <option>1982</option>
+              <option>1981</option>
+              <option>1980</option>
+            </select>
+            <div>Why do I need to provide this?</div>
+            <button>Sign up!</button>
+          </div>
+        </pe:editor>
+      </div>
+    </div>
+  </pe:mcml>
+</pre>

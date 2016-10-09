@@ -1,0 +1,89 @@
+<!--
+author: LiXizhi
+date: 2008.2.16
+used by: mcml/test/test_pe_design.lua
+-->
+<pe:dialog title="test all mcml design tags" x="100" y="50" width="400" height="360" onclick="test_pe_dialog_onclick">
+  <pe:tabs name="testTabs">
+    
+    <!--treeview test-->
+    <pe:tab-item text="treeview test">
+      the following is from a treeview control
+      <div style="width:350;height:300">
+        <pe:treeview text="treeview test">
+          plain text
+          <p style="color:#55AA22">p style="color:#55AA22"</p>
+          long text auto tree node height;long text auto tree node height;long text auto tree node height
+          <pe:treenode text="this is a tree node" expanded="false">
+            sub node1
+            <p style="color:#55AA22">p style="color:#55AA22"</p>
+            long text auto tree node height;long text auto tree node height;long text auto tree node height
+          </pe:treenode>
+          <pe:treenode text="this is a tree node" expanded="false">
+            <h1>h1 title</h1>
+            <h2>h2 title</h2>
+            <h3>h3 title</h3>
+            <h4>h4 title</h4>
+            <hr/>
+            <p>para graph test here </p>
+            <a href="http://www.paraengine.com">HTML href text: pe_a </a>
+            <img width="64" height="64" src="script/test/Movie_2.png" title="image inside text"/>
+            <ul>
+              <li>list 1: </li>
+              <li>list 2: long text long text long text long text long text long text long text </li>
+              <li>list 3: </li>
+            </ul>
+          </pe:treenode>
+        </pe:treeview>
+      </div>
+
+    </pe:tab-item>
+    
+    <!--html test-->
+    <pe:tab-item text="html test">
+      some inner text some inner text some inner text some inner text some inner text some inner text
+      <h1>h1 title</h1>
+      <h2>h2 title</h2>
+      <h3>h3 title</h3>
+      <h4>h4 title</h4>
+      <hr/>
+      <p>para graph test here </p>
+      <a href="http://www.paraengine.com">HTML href text: pe_a </a>
+      <img width="64" height="64" src="script/test/Movie_2.png" title="image inside text"/>
+      <div style="color:#55AA22;position:absolute;left:87px;top:40px;width:250">
+        style="position:absolute;left:87px;top:40px;width:250" and image inside a href
+        <a href="http://www.lixizhi.net">
+          <img width="64" height="64" src="script/test/Movie_2.png"/>
+        </a>
+      </div>
+      <ul>
+        <li>list 1: </li>
+        <li>list 2: long text long text long text long text long text long text long text </li>
+        <li>list 3: </li>
+      </ul>
+    </pe:tab-item>
+    
+    <!--editor test-->
+    <pe:tab-item text="editor test" selected="true">
+      <!--test pe:editor-->
+      <pe:editor labelwidth="120">
+        some inner text some inner text some inner text some inner text some inner text some inner text
+        <!--test pe:editor-buttonset-->
+        <pe:editor-buttonset>
+          <pe:editor-button text="button3.set1"/>
+          <pe:editor-button text="button3.set1"/>
+        </pe:editor-buttonset>
+        <!--test pe:editor-text-->
+        <pe:editor-text name="edtBox1" label="pe:editor-text" text="default text"/>
+        <pe:editor-text name="edtBox2" label="multi-line(3 rows)" text="default text" rows="3"/>
+        <!--test pe:editor-divider-->
+        <pe:editor-divider />
+        <!--test pe:editor-custom-->
+        <pe:editor-custom label ="pe:editor-custom" height="30"></pe:editor-custom>
+        <pe:editor-divider />
+        <pe:editor-button name="TestSubmitBtn" text="test submit" onclick="test_pe_editor_button_onclick"/>
+      </pe:editor>
+      trailing test
+    </pe:tab-item>
+  </pe:tabs>
+</pe:dialog>

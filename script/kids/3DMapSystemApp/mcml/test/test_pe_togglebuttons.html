@@ -1,0 +1,34 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/test_pe_togglebuttons.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+local togglebuttons = commonlib.gettable("test.togglebuttons");
+
+local page = document:GetPageCtrl();
+if(not togglebuttons.list)then
+    togglebuttons.list = {
+        { label="aaaa" },
+        { label="bbb",selected = true, },
+        { label="ccc" },
+        { label="ddd" },
+}
+end
+function GetDataSource()
+    return togglebuttons.list
+end
+function OnClickBtn(datasource,index)
+    page:Refresh(0);
+end
+]]></script>
+<div>
+    <pe:togglebuttons name="aa" DataSource='<%=GetDataSource() %>' 
+    ItemSpacing="2"
+    ButtonWidth="100"
+    ButtonHeight="50"
+    SelectedTextColor="#ff0000"
+    TextColor="#ffff00"
+    TextFont="System;12;norm"
+    SelectedMenuItemBG="Texture/Aries/HaqiShop/radiobg1_32bits.png:12 14 12 14" 
+    UnSelectedMenuItemBG="Texture/Aries/HaqiShop/radiobg2_32bits.png:12 14 12 14" 
+    onclick='OnClickBtn'/>
+</div>
+</pe:mcml>

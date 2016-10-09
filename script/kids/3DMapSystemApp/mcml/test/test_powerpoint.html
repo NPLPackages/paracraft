@@ -1,0 +1,113 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_powerpoint.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2010.10.18</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+
+function onGotoPage()
+    Page:SetValue("MyPPT", "2")
+end
+function onGotoNextPage()
+    Page:SetValue("MyPPT", "next")
+end
+function onGotoPrevPage()
+    Page:SetValue("MyPPT", "prev")
+end
+]]></script>
+<input type="button" zorder="300" onclick="onGotoPrevPage" name="prev" value="Goto prev page"/>
+<input type="button" zorder="300" onclick="onGotoNextPage" name="next" value="Goto next page"/>
+
+<pe:powerpoint name="MyPPT" value="1" style="width:500px;height:300px;">
+	<div name="1">
+		<pe:maskarea zorder="-1" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<div style="position:relative;margin-left:100px;margin-top:50px;width:150px;height:30px;">
+			This can be some tooltip text 1
+		</div>
+	</div>
+	<div name="2">
+		<pe:maskarea zorder="-1" method="add" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+        <pe:arrowpointer name="ui_tip" direction="1" style="float:left;position:relative;margin-left:50px;margin-top:200px;width:32px;height:32px;" />
+		<div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			装备背包，点击可看到自己的装备
+		</div>
+	</div>
+    <div name="inventory1">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+        <pe:arrowpointer name="ui_tip" direction="8" style="float:left;position:relative;margin-left:200px;margin-top:40px;width:32px;height:32px;" />
+		<div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			这是你已获得的装备，现在用鼠标点击它一下，穿戴到身上
+		</div>
+	</div>
+    <div name="inventory2">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<pe:arrowpointer name="ui_tip" direction="4" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+        <div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			这是你穿在身上的装备，现在用鼠标点击它一下，把这它放回背包里
+		</div>
+	</div>
+
+    <div name="inventory3">
+		<pe:maskarea zorder="-1" method="full" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<div zorder="300" style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			好了，穿和脱装备就这么简单，其他衣服和鞋子也都是一样，以后自己多试试吧！
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+
+    <div name="card1">
+		<pe:maskarea zorder="-1" method="add" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<pe:arrowpointer name="ui_tip" direction="1" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+        <div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			卡片背包，点击可看到自己的魔法卡片
+		</div>
+	</div>
+    <div name="card2">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<pe:arrowpointer name="ui_tip" direction="2" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+        <div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			这是战斗背包卡片，放进这里的技能卡片，在战斗中才能使用
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+    <div name="card3">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+        <pe:arrowpointer name="ui_tip" direction="2" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+		<div style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			这里是你已经学习过的技能卡片，鼠标点击卡片可以把它放入左边的格子；同样，点击左边格子里的卡片，也能把再卡片放回来
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+    <div name="card4">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+        <pe:arrowpointer name="ui_tip" direction="6" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+		<div zorder="300" style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			卡片左侧小圆点的的个数，表示这张卡片可以放入左侧格子的最大数量，如3个点，代表可以最多点击3次，放3张进去
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+    <div name="card5">
+		<pe:maskarea zorder="-1" method="substract" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+        <pe:arrowpointer name="ui_tip" direction="6" style="float:left;position:relative;margin-left:100px;margin-top:40px;width:32px;height:32px;" />
+		<div zorder="300" style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			这里是装备卡片格子，里面的卡片在战斗过程中也能使用；如果你携带的宠物或装备本身带有卡片，这些卡片会自动出现在这里！
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+    <div name="card6">
+		<pe:maskarea zorder="-1" method="full" style="position:relative;margin-left:100px;margin-top:50px;width:50px;height:30px;"/>
+		<div zorder="300" style="margin-left:100px;padding:8px;padding-left:18px;padding-bottom:26px;color:#4f7dbb;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41)">
+			战斗中每个回合出现的8张卡片都是在左侧的技能卡片格和装备卡片格中随机抽取出来的，如果这里面的卡片都用完了，你就弹尽粮绝了
+            <input type="button" onclick="onGotoNextPage" name="next" value="知道了" />
+		</div>
+	</div>
+</pe:powerpoint>
+
+</pe:mcml>
+</body>
+
+</html>
+

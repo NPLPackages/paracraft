@@ -1,0 +1,153 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/test_pe_html.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+local page = document:GetPageCtrl();
+function OnClickBtn(name)
+    _guihelper.MessageBox(name);
+end
+
+function OnShortCutKey(key)
+    _guihelper.MessageBox(key);
+end
+]]></script>
+<pe:tabs name="testTabs">
+    <pe:tab-item name="0" text="input" style="padding:10px;"  selected="true" >
+        <div class="default">
+            <div style="width:180px;">
+                Line wrapping Line wrapping<font style='font-weight:bolder;color:#FF0000;font-size:13px;'>4000000000</font>Line wrapping Line wrapping
+            </div>
+            <div style="float:left;text-singleline:true;width:30px;background:url(Texture/whitedot.png)">text-singleline</div>________
+            <div style="font-size:11px">11 English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:11px;font-weight:bold">English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:12px">12 English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:12px;font-weight:bold">English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:13px">13 English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:13px;font-weight:bold">English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:14px;">14 English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:14px;font-weight:bold">English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:15px;base-font-size:15px">15 English 中文村  ท้้ท้ลวแเไ </div>
+            <div style="font-size:15px;base-font-size:15px;font-weight:bold">English 中文村  ท้้ท้ลวแเไ </div>
+            <input type="button" value="Hachi new game เกมใหม่ล่าสุด 2013" style="font-size:12px;font-weight:bold;base-font-size:16px;" name="a"/>
+            <input type="button" value="Hachi new game เกมใหม่ล่าสุด 2013" style="font-size:12px;base-font-size:16px;" name="a"/>
+        </div>
+    </pe:tab-item>
+    <pe:tab-item name="1" text="input" style="padding:10px"  >
+        <input type="button" name="offset" value="中文offset-x" style="text-offset-x:-4;text-offset-y:-4;" />
+        <pe:arrowpointer name="tip" direction="2" style="position:relative;width:82px;height:32px;background:url(Texture/Aries/Common/ThemeKid/tip/text_tip_bg_32bits.png:7 7 7 7)" >
+            <div style="position:relative;margin-left:28px;margin-top:29px;width:32px;height:32px;background:url(Texture/Aries/Common/ThemeKid/tip/text_tip_arrow_down_32bits.png)" />
+	        <div style="margin-top:4px;margin-left:3px;line-height:20px;text-align:center;font-size:13px;font-weight:bold;text-shadow:true;shadow-quality:8;shadow-color:#80ffffff">点击传送</div>
+        </pe:arrowpointer>
+        <div style="text-shadow:true;color:#00ff00;shadow-quality:8;shadow-color:#80ff0000">
+            text shadow<span style="color:#ff0000">some red text</span>
+        </div>
+        <img src="http://fmn.rrimg.com/fmn062/20120817/1015/original_hm0m_452900002223125f.jpg" style="width:64px;height:64px"/>
+        <div style="width:150px;background:Texture/alphadot.png">
+            <div style="float:left">float:left block</div><a href="#">asda</a>testing text flow <span style="margin-left:-8px;margin-top:-3px;color:#ff0000">some red text</span>testing text flow 
+            <span>Span with div <div style="float:left">div float</div> asdas as as as </span>
+        </div>
+        <div style="float:left;position:relative;font-size:8px;">font-size:8px;纵纹</div>
+        <div style="width:200px;background:url(Texture/Aries/Common/gradient_white_32bits.png);background-color:#000000;text-align:center;color:#ff0000">abcdalsfjskfaslfsj</div>
+        <div style="width:200px;background:url(Texture/Aries/Common/gradient_white_32bits.png);background-color:#00FF00;text-align:center">asdasdad</div>
+        <input name="text" value="中文是什么的中文是什么的中文是什么的" type="button" style="text-noclip:true;text-align:right;width:100px;height:60px;" />
+
+        <select name="blood" AllowUserEdit="false">
+            <option value="0" selected="selected">O</option>
+            <option value="2">A</option>
+            <option value="3">B</option> 
+            <option value="4">AB</option>
+        </select><br/>
+        Select with data source:
+        <select name="testSelectControl" AllowUserEdit="false" DataSource='<%={{value="0", text="zero", selected="true"},{value="1", text="1"},{value="2"},}%>'></select>
+        <input type="button" name="btn" value="button long text long textlong text" style="width:60px;" />
+        <br />
+        <textarea name="multilineedit" style="width:150px;" rows="3"/>
+        shortcut key X<pe:hotkey name="2" hotkey="DIK_X" onclick="OnShortCutKey"/>
+        <input type="button" name="btn" value="Hotkey Y" hotkey="DIK_Y" onclick="OnShortCutKey"/>
+    </pe:tab-item>
+    <pe:tab-item name="2" text="div" style="padding:10px" >
+        <div style="line-height:20px;font-size:12px;width:200px;" >
+            Label attribute "for" is supported. Clicking the text will have similar effect of clicking button, checkbox, radio, mini_keyboard,etc. 
+        </div>
+        <div>
+            <input type="button" name="btn" value="button" onclick="OnClickBtn" id="button1" /><div style="float:left" for="button1">div forwording onclick to button</div>
+        </div>
+        <div>
+            <input type="radio" name="sex" value="0" checked="true" id="male" /><div style="float:left" for="male">Male</div>
+            <input type="radio" name="sex" value="1" id="female" /><div style="float:left" for="female">Female</div>
+        </div>
+        <div>
+            <input type="checkbox" name="checkbox" id="checkbox1" /><div style="float:left" for="checkbox1">checkbox1</div>
+            <input type="checkbox" name="checkbox" id="checkbox2" /><div style="float:left" for="checkbox2">checkbox2</div>
+        </div>
+        <div>
+	        <input type="text" name="txtEditBox" style="width:200px;height:25px;" />
+	        <input type="button" name="mini2" value="UseMiniKeyboard" for="minikeyboard"/>
+	        <pe:minikeyboard name="minikeyboard" for="txtEditBox" />
+        </div>
+        UV wrapping is used by default:
+        <div style="float:left;width:100px;height:100px;background:url(Texture/radiobox.png#0 0 100 100);"></div>
+        <div style="float:left;width:100px;height:100px;background:url(Texture/radiobox.png#-10 -10 100 100);"></div>
+        <pe:progressbar name="MyProgress"  style="width:150px;height:25px;" block_overlay_bg="Texture/Aries/Common/ThemeKid/progressbar_tile_32bits.png" Minimum = "0" Maximum = "100" Value = "50" Step = "10"/>
+        <pe:progressbar name="progressbar_normal"  isshowtooltip = "true" 
+                                background = "Texture/Aries/Login/Login/teen/loading_gray_32bits.png:7 7 8 8" 
+                                blockimage = "Texture/Aries/Login/Login/teen/loading_green_32bits.png:7 7 8 8" 
+                                block_overlay_bg="Texture/Aries/Login/Login/teen/progressbar_green_tile.png"
+                                Value = "100"
+                                style="margin-top:3px;width:340px;height:16px;"/>
+    </pe:tab-item>
+    <pe:tab-item name="3" text="webbrowser" style="padding:10px" >
+        <script type="text/npl" refresh="false"><![CDATA[
+        local page = document:GetPageCtrl();
+        function OnPageChanged(url)
+            Page:SetValue("url", url);
+        end
+
+        function RefreshPage()
+            Page:CallMethod("mybrowser", "Refresh");
+        end
+
+        function StopPage()
+            Page:CallMethod("mybrowser", "Stop");
+        end
+
+        function GoBack()
+            Page:CallMethod("mybrowser", "GoBack");
+        end
+
+        function GoForward()
+            Page:CallMethod("mybrowser", "GoForward");
+        end
+
+        function Goto()
+            Page:CallMethod("mybrowser","Goto", Page:GetUIValue("url"));
+        end
+
+        function SetContent()
+            Page:CallMethod("mybrowser","SetContent", Page:GetUIValue("Content"));
+        end
+
+        function GetContent()
+            local content = Page:CallMethod("mybrowser","GetContent", "")
+            echo(content);
+        end
+        
+        function FindText()
+            Page:CallMethod("mybrowser","FindText", Page:GetUIValue("FindText"));
+        end
+        ]]></script>
+        <div>
+            URL: <input type="text" name="url" style="width:500px;height:25px" /> <input  type="button" name="Goto" value="Go!" onclick="Goto"/>
+        </div>
+        <div>
+            <input  type="button" name="Refresh" value="Refresh" onclick="RefreshPage"/>
+            <input  type="button" name="Stop" value="Stop" onclick="StopPage"/>
+            <input  type="button" name="GoBack" value="GoBack" onclick="GoBack"/>
+            <input  type="button" name="GoForward" value="GoForward" onclick="GoForward"/>
+            <input  type="text" name="Content" style="width:120px;" /> <input  type="button" name="btnSetContent" value="SetContent" onclick="SetContent"/>
+            <input  type="button" name="btnGetContent" value="GetContent" onclick="GetContent"/>
+            <input  type="text" name="FindText" style="width:120px;" /> <input  type="button" name="btnFindText" value="FindText" onclick="FindText"/>
+        </div>
+        <pe:webbrowser name="mybrowser" url="www.baidu.com" onchange="OnPageChanged" style="width:600px;height:480px;"></pe:webbrowser>
+    </pe:tab-item>
+</pe:tabs>
+</pe:mcml>

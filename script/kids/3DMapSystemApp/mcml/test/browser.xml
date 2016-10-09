@@ -1,0 +1,152 @@
+<!--
+author: LiXizhi
+date: 2008.3.10
+used by: 
+file: script/kids/3DMapSystemApp/mcml/test/browser.xml
+mcml/test/test_mcmlBrowser.lua
+-->
+<pe:mcml>
+  <pe:script>
+    <![CDATA[
+        function TestFileBrowser_onclick(name, filepath)
+          document:GetPageCtrl():SetUIValue("filepath", filepath);
+        end
+        
+        function TestFileBrowser_OnDoubleClick(name, filepath)
+          _guihelper.MessageBox(tostring(filepath));
+        end
+        
+        function TestSwitchTab(name, filepath)
+          document:GetPageCtrl():SetUIValue("testTabs", 1);
+        end
+        
+        function OnCheckFileBrowser(name, treeNode, filepath, Checked)
+          if(treeNode and filepath) then
+            if(Checked) then
+              _guihelper.MessageBox("you checked "..filepath);
+            else
+              _guihelper.MessageBox("you UNchecked "..filepath);
+            end
+          end 
+        end
+        
+        function OnCreateNodeFileBrowser(name, treeNode, filepath)
+          if(treeNode and filepath) then
+            if(string.find(filepath, "lua$"))then
+              -- check all *.lua file and make the text blue
+              treeNode.TextColor = "#0066cc";
+              treeNode.Checked = true;
+            end
+          end
+        end
+        
+        function RefreshPage()
+          document:GetPageCtrl():SetUIValue("RefreshCounter", "page will be refreshed in 3 seconds");
+          document:GetPageCtrl():SetNodeValue("RefreshCounter", "Page refreshed!!!");
+          document:GetPageCtrl():Refresh(3);
+        end
+        
+        function OnClickTabItem(tabpagename)
+          _guihelper.MessageBox(tabpagename.." is clicked after controls inside are created\n");
+        end
+
+    ]]>
+  </pe:script>
+  <pe:tabs name="testTabs">
+  <pe:tab-item text="fileBrowser Canvas3D">
+
+    <div style="float:left;width:300px;margin:10px">
+      <input name="filepath">Please select from below</input>
+      <br/>
+      <pe:filebrowser name="myFileBrowser" filter="*.lua;*.txt" rootfolder="script" onclick="TestFileBrowser_onclick()" ondoubleclick="TestFileBrowser_OnDoubleClick()" CheckBoxes="true" oncheck="OnCheckFileBrowser" oncreatenode="OnCreateNodeFileBrowser"></pe:filebrowser>
+    </div>
+    <div style="float:left;margin:10px">
+      This is an canvas 3d: <br/>
+      <pe:canvas3d name="canvas1" autoRotateSpeed="0.12">
+        <![CDATA[
+        {
+          name= "test model",
+	        AssetFile= "model/05plants/01flower/01flower/flower10_v_a.x",
+	        x=0,y=0,z=0,
+        }
+        ]]>
+      </pe:canvas3d>
+    </div>
+  </pe:tab-item>
+  <!--treeview test-->
+
+  <pe:tab-item text="class test"  name="classTest" onclick="OnClickTabItem">
+    <input type="button" value="test switch tab" onclick="TestSwitchTab"/><br/>
+    the &#32;&#32;&#32;&#32;following is from a treeview control
+    <div class="box" style="width:200;height:200;color:#FFFFFF">
+      <div style="margin:5;padding:5;background-color:#FF0000;" class="white">
+        <div style="margin:5;padding:5;background-color:#00FF00" class="white">
+          <div style="margin:5;padding:5;background-color:#0000FF" class="white">
+            Start&nspb;Begin&#21457;&#32593;&#30340;&#35745;&#21010;End
+          </div>
+        </div>
+      </div>
+    </div>
+    <br/>
+    <font style="color:#FF0000">some red text</font>
+    <br/>
+    <pe:editor-buttonset class="box">
+      <pe:editor-button text="button3.set1" class="highlightbutton"/>
+      <pe:editor-button text="button3.set1"/>
+    </pe:editor-buttonset>
+
+  </pe:tab-item>
+
+  <!--alignment test-->
+  <pe:tab-item text="alignment">
+    file uploader test
+    <input style="width:300px" type="file" dir="script" name="ImageUploaderTest1"/>
+    <input style="float:left" type="file" name="ImageUploaderTest"/>
+    <input type="file" name="ImageUploaderTest2" fileext="images(*.jpg;*.bmp;)">
+      <input style="width:200px"/>
+      <input type="button" value="browse..."/>
+    </input>
+    container alignment test
+    <pe:container class="box" style="width:500px;height:280px">
+      <pe:container style="float:right;vertical-align: bottom">right bottom</pe:container>
+      <pe:container style="float:left;vertical-align: bottom">left bottom</pe:container>
+      <pe:container style="float:right;">right top</pe:container>
+      <pe:container alignment="_ctt">_ctt:center top</pe:container>
+      <pe:container alignment="_ctb">_ctb:center bottom</pe:container>
+      <pe:container alignment="_ctl">_ctb:center left</pe:container>
+      <pe:container alignment="_ctr">_ctb:center right</pe:container>
+      <pe:container alignment="_ct">_ct:center</pe:container>
+    </pe:container>
+  </pe:tab-item>
+
+    <!--page refresh test-->
+    <pe:tab-item text="pagerefresh" selected="true">
+      page refresh test
+      <input type="button" value="Refresh" onclick="RefreshPage"/>
+      <label name="RefreshCounter" style="height:20px">Page is loaded. hit the refresh button to see page refresh.</label>
+    </pe:tab-item>
+  
+  <!--editor test-->
+  <pe:tab-item text="editor test">
+    <!--test pe:editor-->
+    <pe:editor labelwidth="120">
+      some inner text some inner text some inner text some inner text some inner text some inner text
+      <!--test pe:editor-buttonset-->
+      <pe:editor-buttonset>
+        <pe:editor-button text="button3.set1"/>
+        <pe:editor-button text="button3.set1"/>
+      </pe:editor-buttonset>
+      <!--test pe:editor-text-->
+      <pe:editor-text name="edtBox1" label="pe:editor-text" text="default text"/>
+      <pe:editor-text name="edtBox2" label="multi-line(3 rows)" text="default text" rows="3"/>
+      <!--test pe:editor-divider-->
+      <pe:editor-divider />
+      <!--test pe:editor-custom-->
+      <pe:editor-custom label ="pe:editor-custom" height="30"></pe:editor-custom>
+      <pe:editor-divider />
+      <pe:editor-button name="TestSubmitBtn" text="test submit" onclick="test_pe_editor_button_onclick"/>
+    </pe:editor>
+    trailing test
+  </pe:tab-item>
+</pe:tabs>
+</pe:mcml>

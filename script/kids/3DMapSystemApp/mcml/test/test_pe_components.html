@@ -1,0 +1,94 @@
+﻿<!--
+date: 2008.3.10
+script/kids/3DMapSystemApp/mcml/test/test_pe_components.html
+-->
+<pe:mcml>
+<%
+function OnCreate_Pe_Custom_Test(params)
+    local _this = ParaUI.CreateUIObject("button", params.name, "_lt", params.left,params.top,params.width,params.height)
+    _this.text = "this is from pe:custom";
+    params.parent:AddChild(_this);
+end
+%>
+<pe:tabs name="testComponents">
+  <pe:tab-item text="pe:download" selected="true" style="padding:5px">
+    <b>Customizable template</b> <br />
+    <pe:download src="http://ufies.org/txt/mozilla1280.jpg" dest="Temp/Textures/mozilla1280.jpg" cachepolicy="access plus 2 days">
+	    <notready enabled="true">
+	        <label name="status" class="box" style="height:18px;width:120px;margin:3px"/><br />
+		    <input type="button" name="start" value="Start Download"/>
+			<input type="button" name="stop" value="Stop Download"/>
+	    </notready>
+	    <ready>
+		    Successfully downloaded<br/>
+		    <input type="button" name="refresh" value="Refresh"/>
+		    <img width="64" height="64" src="Temp/Textures/mozilla1280.jpg"/>
+	    </ready><br />
+    </pe:download>
+    <hr />
+    <b>static(non-interactive) notready template</b><br />
+    
+    <pe:download src="http://pedn.paraengine.com/twiki/pub/Main/AssetsApp/AssetManagerWnd.jpg" dest="temp/textures/AssetManagerWnd.jpg">
+	    <notready>
+		    Static template<br />
+		    <label name="status" class="box" style="height:18px;width:120px;margin:3px"/>
+	    </notready>
+	    <ready>
+		    Successfully downloaded<br/>
+		    <input type="button" name="refresh" value="Refresh"/>
+		    <img width="64" height="64" src="temp/textures/AssetManagerWnd.jpg"/>
+	    </ready>
+    </pe:download>
+    <hr />
+    
+    <b>Default template</b><br />
+    <pe:download src="http://ufies.org/txt/mozilla1280.jpg" dest="Temp/Textures/mozilla1280.jpg">
+        <div style="margin:5px">
+            <a href="#">tag a inside pe:download.</a>
+        </div>
+    </pe:download>
+  </pe:tab-item>
+  
+  <pe:tab-item text="pe:custom">
+    <pe:custom oncreate="OnCreate_Pe_Custom_Test" style="width:100px;height:50px">
+  </pe:tab-item>
+  
+  <pe:tab-item text="pe:world">
+    TODO:
+  </pe:tab-item>
+  
+  <pe:tab-item text="pe:app">
+    TODO:
+  </pe:tab-item>
+  
+</pe:tabs>
+</pe:mcml>
+
+<!--
+<pe:a dest="Temp/Textures/mozilla1280.jpg" src="http://ufies.org/txt/mozilla1280.jpg">Mozilla1<img width="64" height="64" src="Favorite_5.png"/></pe:a>
+<pe:a dest="Temp/Textures/black-1280x960.jpg" src="http://www.geckoandfly.com/wp-content/uploads/2007/11/black-1280x960.jpg">Mozilla2<img width="64" height="64" src="Favorite_5.png"/></pe:a>
+
+    <pe:editor>
+      <a>href flow</a> followed by some plain text
+      <div style="width:200">
+        plain text flow test <a>href flow</a> followed by some long plain text  followed by some long plain text followed by some long plain text
+      </div>
+    <pe:a href="worlds/Templates/Favorites/&#23612;&#32599;&#27827;/WorldInfo.html" name="Templates/Favorites/&#23612;&#32599;&#27827;" onclick="Map3DSystem.mcml.PageCtrl.Pages.NewWorldWizardPage.OnClickTemplate" target="WorldInfoIFrame">
+      <div style="width:64;height:88px;float:left;">
+        <img style="width:64px;height:64px;" src="&#23612;&#32599;&#27827;/PreviewSmall.png"/>
+        <pe:editor-button text="&#23612;&#32599;&#27827;" style="width:64px;height:24px;background:;"/>
+      </div>
+    </pe:a>
+    <pe:a href="worlds/Templates/Favorites/&#26862;&#26519;&#21382;&#38505;/WorldInfo.html" name="Templates/Favorites/&#26862;&#26519;&#21382;&#38505;" onclick="Map3DSystem.mcml.PageCtrl.Pages.NewWorldWizardPage.OnClickTemplate" target="WorldInfoIFrame">
+      <div style="width:64;height:88px;float:left;">
+        <img style="width:64px;height:64px;" src="&#26862;&#26519;&#21382;&#38505;/PreviewSmall.png"/>
+        <pe:editor-button text="&#26862;&#26519;&#21382;&#38505;" style="width:64px;height:24px;background:;"/>
+      </div>
+    </pe:a>
+      <pe:a src="http://www.mozilla24.com/download/wp_a/a_2048x1280.png" dest="Temp/Textures/a_2048x1280.png">Mozilla3</pe:a>
+      <pe:a src="http://mozilla.tlk.fr/gfx/splash/mozilla_orbit.jpg" dest="Temp/Textures/mozilla_orbit.jpg">Mozilla4</pe:a>
+      <pe:a src="http://firefox.evolutionx.be/wallpapers/firefox_1280_1024.jpg" dest="Temp/Textures/firefox_1280_1024.jpg">Mozilla5</pe:a>
+      <div >
+        plain text flow test <a>href flow long long long href flow long long long href flow long long long</a> followed by some long plain text  followed by some long plain text
+      </div>
+    </pe:editor>-->

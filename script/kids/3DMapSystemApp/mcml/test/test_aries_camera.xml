@@ -1,0 +1,9 @@
+<camera id="follow2" >
+  <camera:empty style="duration:0"/>
+  <camera:point style="duration:0;frametype:easeOutQuad;CameraObjectDistance:5;CameraLiftupAngle:0.55;CameraRotY:0;"/>
+  <camera:track style="duration:0;frametype:track;x:0;y:0;z:0;CameraObjectDistance:5;CameraLiftupAngle:0.55;CameraRotY:0;"/>
+  <camera:dynamic style="duration:0;frametype:dynamic;d_x:0;d_y:0;d_z:0;d_CameraObjectDistance:5;d_CameraLiftupAngle:0.55;d_CameraRotY:0;"/>
+  <camera:caster style="duration:0;frametype:caster;radius:4;angle:30;"/>
+  <camera:follow target="" style="duration:0;frametype:follow;CameraObjectDistance:5;CameraLiftupAngle:0.55;CameraRotY:0;" />
+  <camera:target style="duration:0;frametype:target;radius:4;angle:30;"/>
+</camera>

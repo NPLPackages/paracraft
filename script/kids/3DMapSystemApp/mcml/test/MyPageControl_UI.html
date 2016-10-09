@@ -1,0 +1,35 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/MyPageControll_UI.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Test my page control</title>
+</head>
+<body>
+<!--<pre>-->
+  <pe:mcml>
+  <pe:tabs name="LoginTabParent" class="box" style="margin-top:5px;margin-bottom:40px">
+    <pe:tab-item text="注册" selected="true">
+        <pe:editor labelwidth="120">
+          <span style="font-weight:bold;font-size:14px">立即注册新用户</span>
+          <input type="hidden" name="referrer" value="116" />
+          <div style="float:left;margin-left:11px;margin-top:2px;font-size:11px">它是免费的</div><br />
+          <div style="width:120px;float:left;text-align:right">姓名:</div><input name="username" type="text"/><br/>
+          <div style="width:120px;float:left;text-align:right">电子邮箱:</div><input name="email" type="text"/><br/>
+          <div style="width:120px;float:left;text-align:right">设置密码:</div><input name="password" type="password"/><br/>
+          <div style="width:120px;float:left;text-align:right">确认密码:</div><input name="password_confirm" type="password"/><br/>
+          <div style="width:120px;float:left;text-align:right">性别:</div>
+            <input type="radio" name="gender" value="male" checked="checked" id="gender" />男
+		    <input type="radio" name="gender" value="female" id="Radio1" />女
+            <input type="submit" class="defaultbutton" name="register" value="接受条款并注册!" style="height:26px" onclick="Map3DSystem.App.Login.ParaworldStartPage.OnMCML_UserRegister"/>
+        </pe:editor>
+    </pe:tab-item>
+    <pe:tab-item text="我可以做些什么?">
+    </pe:tab-item>
+    <pe:tab-item text="开发网">
+    </pe:tab-item>
+  </pe:tabs>
+  </pe:mcml>
+<!--</pre>-->
+</body>
+</html>
+

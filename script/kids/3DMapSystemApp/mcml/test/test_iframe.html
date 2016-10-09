@@ -1,0 +1,33 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_iframe.html" -->
+<!--we need to use &amp; in XML-->
+<pe:mcml>
+<pe:tabs name="testIFrames">
+    <pe:tab-item text="iframe Form action" selected="true">
+        <form target="iframe1" action="http://www.google.com">
+        <script type="text/npl" src="script/kids/3DMapSystemApp/mcml/test/test_mcmlBrowser.lua" />
+        <script type="text/npl">
+        <![CDATA[
+	      document.write("<p>Hello ")
+	      document.write(commonlib.getfield("Map3DSystem.User.Name"))
+	      document.write("!</p>")
+	    ]]>
+	    </script>
+          Also testing: iframe margin, padding and background, background-color. <br />
+          <input type="submit" name="btnGotoURL" value="GO"/> Url: <input name="url" value="script/kids/3DMapSystemApp/mcml/test/test_iframe.html" />
+        </form>
+        <div style="background-color:#FF0000;" class="white">
+            <iframe name="iframe1" src="script/kids/3DMapSystemApp/mcml/test/test_iframe_sub.html?A=1&amp;B=2" style="background-color:#00FF00;margin:10px;padding:10px" class="box">
+            </iframe>
+         </div>
+    </pe:tab-item>
+    
+    <pe:tab-item text="iframe A href">
+        <pe:editor>
+          <a href="script/kids/3DMapSystemApp/Login/AppRegPage.html" target="iframeTest">iframe test1</a>
+          <a href="script/kids/3DMapSystemApp/mcml/test/RegistrationPage.html" target="iframeTest">iframe test2</a>
+          <a href="script/kids/3DMapSystemApp/profiles/ProfileRegPage.html" target="iframeTest">iframe test3</a>
+          <iframe name="iframeTest"/>
+        </pe:editor>
+    </pe:tab-item>
+</pe:tabs>
+</pe:mcml>

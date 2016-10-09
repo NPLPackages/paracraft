@@ -1,0 +1,27 @@
+<!-- "script/kids/3DMapSystemApp/mcml/test/test_pe_downlistbutton.html" -->
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+
+function onclick(name)
+    commonlib.echo("!!:onclick");
+    commonlib.echo(name);
+end
+
+]]></script>
+
+<div style="width:500px;height:500px;">
+
+<input type="button" name="next" zorder=2 value="发送"
+Normal_BG="Texture/Aries/Login/UserSelect_PageRight2_32bits.png; 0 0 40 40"
+MouseOver_BG="Texture/Aries/Login/UserSelect_PageRight2_light_32bits.png; 0 0 40 40"
+Disabled_BG="Texture/Aries/Login/UserSelect_PageRight2_grey_32bits.png; 0 0 40 40"
+style="width:40px;height:40px;background:url();"/>
+
+<input type="button" style="width:60px;height:26px;background:;" 
+        Normal_BG="Texture/Aries/ChatSystem/anniubg.png;0 0 32 21:10 10 10 10" 
+        MouseOver_BG="Texture/Aries/Login/UserSelect_PageRight2_light_32bits.png; 0 0 40 40"
+Disabled_BG="Texture/Aries/Login/UserSelect_PageRight2_grey_32bits.png; 0 0 40 40"
+        
+        name="send" value="发送" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+</div>
+</pe:mcml>

@@ -1,0 +1,21 @@
+﻿<!-- "script/kids/3DMapSystemApp/mcml/test/test_mcml_jquery.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>jquery test page</title>
+</head>
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+Page("a").show();
+Page:jquery("a#my_name").print();
+Page("a#my_name.my_class").print();
+log(Page("#my_name").text().." is the last node's inner text\n");
+Page("div#my_name").hide();
+]]></script>
+<a href="#">test1</a>
+<a display="none" name="my_name" href="#">test2</a>
+<a name="my_name" href="#" class="my_class">test3</a>
+<div name="my_name">test4</a>
+</pe:mcml>
+</html>
+

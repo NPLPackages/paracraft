@@ -1,0 +1,24 @@
+<!--
+author: LiXizhi
+date: 2008.5.19
+file: "script/kids/3DMapSystemApp/mcml/test/XmlDataSource_sample.xml"
+-->
+<app name="Dance" Author="ParaEngine"/>
+<app name="RPG Maker" Author="ParaEngine"/>
+<category name="OfficialApps">
+  <app name="Creation" Author='XPath("Author")'>
+    XPath("text")
+    <Company>
+      XPath("Company.text")
+      <address>XPath("Company.address.text")</address>
+    </Company>
+  </app>
+  <app name="Environment" Author="ParaEngine"/>
+  <app name="Avatar" Author="ParaEngine"/>
+  <app name="Environment" Author="ParaEngine"/>
+  <app name="Avatar" Author="ParaEngine"/>
+</category>
+<category name="Game">
+  <app name="Dance" Author="ParaEngine"/>
+  <app name="RPG Maker" Author="ParaEngine"/>  
+</category>
