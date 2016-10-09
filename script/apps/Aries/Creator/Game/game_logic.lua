@@ -162,11 +162,7 @@ end
 
 -- static method called at the very beginning when paracraft start
 function GameLogic.InitMod()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
-	
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");
-	local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
-	SelectModulePage.LoadMods();
+	ModManager:GetLoader():LoadAllPlugins();
 end
 
 -- called by both Init() and StaticInit()

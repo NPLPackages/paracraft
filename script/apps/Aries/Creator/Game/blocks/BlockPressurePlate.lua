@@ -146,7 +146,7 @@ function block:setStateIfEntityInteractsWithPlate(x,y,z,power)
 		
 		if(cur_power > 0) then
 			-- neuron activation
-			block._super.OnActivated(self, x, y, z); 
+			block._super.OnActivated(self, x, y, z, entity); 
 		end
         self:DoNotifyNeighbors(x,y,z);
     end

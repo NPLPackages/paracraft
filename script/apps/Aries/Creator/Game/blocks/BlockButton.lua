@@ -138,7 +138,7 @@ function block:OnActivated(x, y, z, entity)
 		GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self.id, self:tickRate());
 
 		-- do neuron activation
-		block._super.OnActivated(self, x, y, z);
+		block._super.OnActivated(self, x, y, z, entity);
 		return true;
 	end
 end

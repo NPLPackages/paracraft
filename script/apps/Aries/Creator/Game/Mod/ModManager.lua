@@ -10,72 +10,17 @@ local ModManager = commonlib.gettable("Mod.ModManager");
 ModManager:OnLoadWorld();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Plugins/PluginManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
+local PluginManager = commonlib.gettable("System.Plugins.PluginManager");
 
-local ModManager = commonlib.gettable("Mod.ModManager");
+local ModManager = commonlib.inherit(PluginManager, {});
+ModManager:Property({"Name", "Paracraft"});
 
--- array of all mod
-local mods = {};
--- mapping from name to mod
-local mods_name_map = {};
--- mapping mod object to true
-local mods_map = {};
-
+function ModManager:ctor()
+end
 
 function ModManager:Init()
-
-end
-
--- clean up all mods
-function ModManager:Cleanup()
-	self:OnDestroy();
-	mods = {};
-	mods_name_map = {};
-	mods_map = {};
-end
-
-function ModManager:GetMod(name)
-	return mods_name_map[name or ""];
-end
-
-function ModManager:GetLoadedModCount()
-	return #mods;
-end
-
-function ModManager:IsModLoaded(mod_)
-	return mod_ and mods_map[mod_];
-end
-
--- add mod to the mod plugin. 
-function ModManager:AddMod(name, mod)
-	if(not mod or not mod.InvokeMethod or self:IsModLoaded(mod)) then
-		return;
-	end
-	name = name or mod:GetName() or "";
-	mod:InvokeMethod("init");
-
-	mods[#mods+1] = mod;
-	mods_map[mod] = true;
-	if(not mods_name_map[name]) then
-		LOG.std(nil, "info", "ModManager", "mod: %s (%s) is added", name, mod:GetName() or "");
-		mods_name_map[name] = mod;
-	else
-		LOG.std(nil, "info", "ModManager", "overriding mod with same name: %s", name);
-	end
-	return true;
-end
-
--- private function: invoke method on all plugins. if the plugin does not have the method, it does nothing. 
--- it only calls method if the mod is enabled. 
--- @return the return value of the last non-nil plugin. 
-function ModManager:InvokeMethod(method_name, ...)
-	local result;
-	for _, mod in ipairs(mods) do
-		if(mod:IsEnabled()) then
-			result = mod:InvokeMethod(method_name, ...) or result;
-		end
-	end
-	return result;
 end
 
 function ModManager:handleKeyEvent(event)
@@ -130,3 +75,7 @@ end
 function ModManager:OnClickExitApp(bForceExit, bRestart)
 	return self:InvokeMethod("OnClickExitApp",bForceExit, bRestart);
 end
+
+-- create singleton and assign it to Mod.ModManager
+local g_Instance = ModManager:new(commonlib.gettable("Mod.ModManager"));
+PluginManager.AddInstance(g_Instance);

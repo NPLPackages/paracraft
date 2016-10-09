@@ -49,14 +49,6 @@ Entity.smoothFrames = 0;
 Entity:Property({"group_id", GameLogic.SentientGroupIDs.Mob})
 
 Entity.sentient_fields = {[GameLogic.SentientGroupIDs.Player] = true};
--- how much this entity likes the block
-Entity.path_blocks_weight = {
-	[block_types.names.Grass] = 500,
-	[block_types.names.Wheat] = 1000,
-	[block_types.names.Water] = -1000,
-	[block_types.names.Still_Water] = -1000,
-	[block_types.names.Lava] = -1000,
-}
 
 -- between (0,1), how much the player's head can look up.  1 is full. 
 Entity.lookup_angle_percent = 0.8;
@@ -468,6 +460,20 @@ function Entity:WalkTo(x,y,z)
 	self:MoveTo(x,y,z);
 end
 
+-- how much this entity likes the block
+function Entity:GetPathBlocksWeight(id)
+	if(not self.path_blocks_weight) then
+		self.path_blocks_weight = {
+			[block_types.names.Grass] = 500,
+			[block_types.names.Wheat] = 1000,
+			[block_types.names.Water] = -1000,
+			[block_types.names.Still_Water] = -1000,
+			[block_types.names.Lava] = -1000,
+		};
+	end
+	return self.path_blocks_weight[id or 0] or 0
+end
+
 -- virtual:
 -- returns a weight to determine how likely this entity will try to path to the block.
 -- usually the block type at (x,y-1,z) or light value of (x,y,z) determines the likelyhood.
@@ -503,7 +509,7 @@ function Entity:GetBlockPathWeight(x, y, z)
 		weight = weight + 1;
 		local block = BlockEngine:GetBlock(x, y-1, z);
 		if(block) then
-			weight = weight + (self.path_blocks_weight[block.id] or 0);
+			weight = weight + self:GetPathBlocksWeight(block.id);
 		end
 		if(block and block.obstruction) then
 			-- add some low likelyhood for solid block types. 

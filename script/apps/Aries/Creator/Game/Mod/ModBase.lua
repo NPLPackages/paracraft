@@ -3,42 +3,28 @@ Title: base class for mod (plugin)
 Author(s): LiXizhi
 Date: 2014/4/6
 Desc: base class for mod. 
+virtual functions:
+  init(): 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
 local ModBase = commonlib.gettable("Mod.ModBase");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Plugins/PluginBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 local ModManager = commonlib.gettable("Mod.ModManager");
 
-local ModBase = commonlib.inherit(nil, commonlib.gettable("Mod.ModBase"));
+local ModBase = commonlib.inherit(commonlib.gettable("System.Plugins.PluginBase"), commonlib.gettable("Mod.ModBase"));
 
-ModBase.enabled = true;
+ModBase:Property({"Name", "unknown name"});
+ModBase:Property({"Desc", "mod is a special kind of plugin in paracraft"});
 
 function ModBase:ctor()
 end
 
 function ModBase:IsMod()
 	return true;
-end
-
--- virtual function get mod name
-function ModBase:GetName()
-	return "unknown name"
-end
-
--- virtual function get mod description 
-function ModBase:GetDesc()
-	return "mod is a special kind of plugin in paracraft"
-end
-
-function ModBase:SetEnable(bEnabled)
-	self.enabled = bEnabled;
-end
-
-function ModBase:IsEnabled()
-	return self.enabled;
 end
 
 -- get mod manager.
