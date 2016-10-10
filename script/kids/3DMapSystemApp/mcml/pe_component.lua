@@ -315,7 +315,7 @@ function pe_download.StartDownload(mcmlNode, pageInstName, cachepolicy)
 		mcmlNode.status_text = Locale.downloading;
 		
 		-- resource store
-		local ls = Map3DSystem.localserver.CreateStore(nil, 1);
+		local ls = System.localserver.CreateStore(nil, 1);
 		if(not ls) then
 			log("error: failed creating local server ResourceStore \n")
 			return 
@@ -323,10 +323,10 @@ function pe_download.StartDownload(mcmlNode, pageInstName, cachepolicy)
 		
 		-- testing: get file with a clear all. 
 		-- ls:DeleteAll();
-		-- ls:GetFile(Map3DSystem.localserver.CachePolicy:new("access plus 0"),
+		-- ls:GetFile(System.localserver.CachePolicy:new("access plus 0"),
 		
 		
-		ls:GetFile(Map3DSystem.localserver.CachePolicy:new(cachepolicy or mcmlNode:GetAttribute("cachepolicy") or "access plus 2 days"),
+		ls:GetFile(System.localserver.CachePolicy:new(cachepolicy or mcmlNode:GetAttribute("cachepolicy") or "access plus 2 days"),
 			src,
 			function (entry)
 				if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then

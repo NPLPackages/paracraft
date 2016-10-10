@@ -1203,11 +1203,11 @@ function pe_editor_button.OnSubmit(editorInstName, buttonName, url, pageCtrlName
 		if(url) then
 			local ctl = CommonCtrl.GetControl(pageCtrlName);
 			if(ctl ~= nil) then
-				NPL.load("(gl)script/kids/3DMapSystemApp/localserver/UrlHelper.lua");
-				url = Map3DSystem.localserver.UrlHelper.BuildURLQuery(url, values);
+				NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
+				url = System.localserver.UrlHelper.BuildURLQuery(url, values);
 				--_guihelper.MessageBox(url.."\n"..pageCtrlName.."\n");
 				-- disable caching for page get in this place
-				local cachePolicy = Map3DSystem.localserver.CachePolicy:new("access plus 0");
+				local cachePolicy = System.localserver.CachePolicy:new("access plus 0");
 				ctl:Init(url, cachePolicy, true);
 			else
 				log("warning: unable to find page ctrl "..pageCtrlName.."\n")	

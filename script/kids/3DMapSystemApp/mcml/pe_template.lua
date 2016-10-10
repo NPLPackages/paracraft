@@ -125,7 +125,7 @@ function pe_template.create(rootName, mcmlNode, bindingContext, _parent, left, t
 	-- no need to recreate it if we have created it before
 	if(not template_root) then
 		-- TODO: find a way to cache frequently used template file to avoid reparsing it. 
-		local params = Map3DSystem.localserver.UrlHelper.url_getparams_table(url);
+		local params = System.localserver.UrlHelper.url_getparams_table(url);
 		if(params) then
 			-- merge request params if any. 
 			local params_parent = mcmlNode:GetPageCtrl():GetRequestParam();

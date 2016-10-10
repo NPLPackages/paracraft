@@ -209,7 +209,7 @@ function ServerPage.GetInternetIP()
 end
 
 function ServerPage.GetIP()
-	NPL.load("(gl)script/kids/3DMapSystemApp/localserver/URLResourceStore.lua");
+	NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
 	local get_ip_urls = {"http://pv.sohu.com/cityjson","http://20140507.ip138.com/ic.asp"};
 
 	

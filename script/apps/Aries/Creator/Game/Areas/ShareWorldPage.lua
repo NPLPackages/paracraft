@@ -13,7 +13,7 @@ SaveWorldPage.ShowPage()
 NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/OtherPeopleWorlds.lua");
-NPL.load("(gl)script/kids/3DMapSystemApp/localserver/UrlHelper.lua");
+NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")

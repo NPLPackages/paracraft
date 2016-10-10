@@ -13,7 +13,7 @@ ShareWorldToWeb.ShowPage(nid, slot_id)
 NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/OtherPeopleWorlds.lua");
-NPL.load("(gl)script/kids/3DMapSystemApp/localserver/UrlHelper.lua");
+NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
 local OtherPeopleWorlds = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.OtherPeopleWorlds");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
@@ -60,7 +60,7 @@ function ShareWorldToWeb.ShowPage_imp(nid, slot_id)
 	if(System.options.version == "kids") then
 		-- TODO: make this url from ParaEngine.com
 		local root_url = "http://haqi.61.com/";
-		ShareWorldToWeb.url = Map3DSystem.localserver.UrlHelper.BuildURLQuery(root_url, params);
+		ShareWorldToWeb.url = System.localserver.UrlHelper.BuildURLQuery(root_url, params);
 	else
 		ShareWorldToWeb.url = "此功能暂未开放";
 	end

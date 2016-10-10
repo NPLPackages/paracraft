@@ -120,13 +120,13 @@ function pe_xmldatasource.GetDataRootNode(mcmlNode)
 					-- the "fetching" attribute is set after the remote request is issued. We also check if the result is available immediately after the call, 
 					-- because some unexpired/expired version maybe returned and we can display it without waiting for the actual asynchronous result. 
 					if(not mcmlNode:GetAttribute("fetching")) then
-						local ls = Map3DSystem.localserver.CreateStore(nil, 2);
+						local ls = System.localserver.CreateStore(nil, 2);
 						if(ls)then
 							local cachepolicy = mcmlNode:GetString("cachepolicy");
 							if(cachepolicy) then
-								cachepolicy = Map3DSystem.localserver.CachePolicy:new(cachepolicy)
+								cachepolicy = System.localserver.CachePolicy:new(cachepolicy)
 							else
-								cachepolicy = Map3DSystem.localserver.CachePolicies["1 hour"]
+								cachepolicy = System.localserver.CachePolicies["1 hour"]
 							end
 							local bFetching = ls:CallXML(cachepolicy, datafile, pe_xmldatasource.OnDownloaded_CallBack, {rootName= rootName, mcmlNode=mcmlNode})
 							mcmlNode:SetAttribute("fetching", bFetching==true)
@@ -298,9 +298,9 @@ function pe_mqldatasource.Select(mcmlNode, pageInstName, bForeceUpdate)
 		};
 		local cachepolicy = mcmlNode:GetString("cachepolicy");
 		if(cachepolicy) then
-			msg.cache_policy = Map3DSystem.localserver.CachePolicy:new(cachepolicy)
+			msg.cache_policy = System.localserver.CachePolicy:new(cachepolicy)
 		else
-			msg.cache_policy = Map3DSystem.localserver.CachePolicies["1 hour"]
+			msg.cache_policy = System.localserver.CachePolicies["1 hour"]
 		end
 		
 		local bFetching = paraworld.MQL.query(msg, "paraworld", function(msg)

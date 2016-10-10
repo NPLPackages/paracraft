@@ -186,12 +186,12 @@ function OtherPeopleWorlds.EnterCreativeSpace(nid, world)
 			return;
 		end
 
-		local ls = Map3DSystem.localserver.CreateStore(nil, 1);
+		local ls = System.localserver.CreateStore(nil, 1);
 		if(not ls) then
 			return 
 		end
 		BroadcastHelper.PushLabel({id="userworlddownload", label = format("世界%s: 正在下载中,请耐心等待", world.worldname), max_duration=20000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
-		ls:GetFile(Map3DSystem.localserver.CachePolicy:new("access plus 5 mins"),
+		ls:GetFile(System.localserver.CachePolicy:new("access plus 5 mins"),
 			src,
 			function (entry)
 				if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then

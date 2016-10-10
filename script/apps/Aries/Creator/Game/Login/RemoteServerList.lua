@@ -215,7 +215,7 @@ function RemoteServerList:LoadFromHttpURL()
 	if(not url:match("%?")) then
 		url = format("%s?skin=plain", url);
 	end
-	NPL.load("(gl)script/kids/3DMapSystemApp/localserver/URLResourceStore.lua");
+	NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
 
 	local ls = System.localserver.CreateStore(nil, 3, "userdata");
 	if(ls) then

@@ -77,7 +77,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 		end
 	end
 	
-	local ls = Map3DSystem.localserver.CreateStore(nil, 1);
+	local ls = System.localserver.CreateStore(nil, 1);
 	if(not ls) then
 		OnFail(L"本地数据失败");
 		return;
@@ -94,7 +94,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 	if(self.text ~= "official_texture_package") then
 		BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text), max_duration=20000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 	end
-	local res = ls:GetFile(Map3DSystem.localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
+	local res = ls:GetFile(System.localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
 		src,
 		function (entry)
 			if(dest) then

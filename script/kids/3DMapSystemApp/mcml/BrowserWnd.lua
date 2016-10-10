@@ -18,11 +18,11 @@ ctl:Show();
 -- One can also create NavBar elsewhere, like below
 ctl:CreateNavBar(_parent, "_mt", 0, 0, 0,32)
 ctl:Goto("%WIKI%/Main/ParaWorldFrontPageMCML");
-ctl:Goto(url, Map3DSystem.localserver.CachePolicy:new("access plus 1 day"));
+ctl:Goto(url, System.localserver.CachePolicy:new("access plus 1 day"));
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/mcml.lua");
-NPL.load("(gl)script/kids/3DMapSystemApp/localserver/factory.lua");
+NPL.load("(gl)script/ide/System/localserver/factory.lua");
 
 --------------------------------------------------------------------
 -- a browser window instance: internally it is a PageCtrl
@@ -394,6 +394,6 @@ function Map3DSystem.mcml.BrowserWnd.OnClickNavRefresh(sCtrlName)
 		log("error getting BrowserWnd instance "..sCtrlName.."\r\n");
 		return;
 	end
-	self:Goto(self:GetUrl(), Map3DSystem.localserver.CachePolicy:new("access plus 0"), true)
+	self:Goto(self:GetUrl(), System.localserver.CachePolicy:new("access plus 0"), true)
 end
 

@@ -915,7 +915,7 @@ function pe_iframe.create(rootName,mcmlNode, bindingContext, _parent, left, top,
 	-- create PageCtrl 
 	local cache_policy = mcmlNode:GetString("cachepolicy");
 	if(cache_policy) then
-		cache_policy = Map3DSystem.localserver.CachePolicy:new(cache_policy)
+		cache_policy = System.localserver.CachePolicy:new(cache_policy)
 	end	
 	local srcPage = Map3DSystem.mcml.PageCtrl:new({
 		url = mcmlNode:GetAbsoluteURL(mcmlNode:GetAttributeWithCode("src",nil,true)),
@@ -1146,7 +1146,7 @@ function pe_a.OnClickHRefToTarget(href, pageCtrlName)
 	if(href and href~="") then
 		local ctl = CommonCtrl.GetControl(pageCtrlName);
 		if(ctl ~= nil) then
-			local cachePolicy -- = Map3DSystem.localserver.CachePolicy:new("access plus 0");
+			local cachePolicy -- = System.localserver.CachePolicy:new("access plus 0");
 			ctl:Init(href, cachePolicy, true);
 		end
 	end	
@@ -1283,7 +1283,7 @@ function pe_pe_a.create(rootName,mcmlNode, bindingContext, _parent, left, top, w
 		UIAnimManager.PlayUIAnimationSequence(_waiting, fileName, "WaitingSpin", true);
 		
 		-- resource store
-		local ls = Map3DSystem.localserver.CreateStore("Downloader", 1);
+		local ls = System.localserver.CreateStore("Downloader", 1);
 		if(not ls) then
 			log("error: failed creating local server ResourceStore \n")
 			return 
@@ -1295,8 +1295,8 @@ function pe_pe_a.create(rootName,mcmlNode, bindingContext, _parent, left, top, w
 		--ls:DeleteAll();
 
 		-- testing  get file
-		--ls:GetFile(Map3DSystem.localserver.CachePolicy:new("access plus 1 hour"),
-		ls:GetFile(Map3DSystem.localserver.CachePolicy:new("access plus 0"),
+		--ls:GetFile(System.localserver.CachePolicy:new("access plus 1 hour"),
+		ls:GetFile(System.localserver.CachePolicy:new("access plus 0"),
 			src,
 			function (entry)
 				local _waiting = ParaUI.GetUIObject(ID);

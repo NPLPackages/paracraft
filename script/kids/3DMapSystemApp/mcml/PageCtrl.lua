@@ -39,8 +39,8 @@ log(Page(".my_class").text().." is the last node's inner text\n");
 ]]
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/mcml.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/API/webservice_constants.lua");
-NPL.load("(gl)script/kids/3DMapSystemApp/localserver/factory.lua");
-NPL.load("(gl)script/kids/3DMapSystemApp/localserver/UrlHelper.lua");
+NPL.load("(gl)script/ide/System/localserver/factory.lua");
+NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
 NPL.load("(gl)script/ide/XPath.lua");
 			
 local pe_script = commonlib.gettable("Map3DSystem.mcml_controls.pe_script");
@@ -57,7 +57,7 @@ local PageCtrl = {
 	-- a function to be called when a new page is downloaded. 
 	OnPageDownloaded = nil,
 	-- default policy if no one is specified. 
-	cache_policy = Map3DSystem.localserver.CachePolicy:new("access plus 1 hour"),
+	cache_policy = System.localserver.CachePolicy:new("access plus 1 hour"),
 	-- default refresh page delay time in seconds. More information, please see Refresh() method. 
 	DefaultRefreshDelayTime = 1,
 	-- default page redirect delay time in seconds. More information, please see Redirect() method. 
@@ -127,7 +127,7 @@ function PageCtrl:Init(url, cache_policy, bRefresh)
 		self.status_line = "正在刷新页面请等待......";
 		self:OnRefresh();
 		-- for remote url, use the local server to retrieve the data
-		local ls = Map3DSystem.localserver.CreateStore(nil, 2);
+		local ls = System.localserver.CreateStore(nil, 2);
 		if(ls)then
 			ls:CallXML(cache_policy or self.cache_policy, url, PageCtrl.OnPageDownloaded_CallBack, self)
 		end
@@ -540,7 +540,7 @@ function PageCtrl:GetRequestParam(paramName)
 	local request_url = self:GetRequestURL();
 	local params = self.mcmlNode:GetAttribute("request_params");
 	if(not params or params.url__ ~= request_url) then
-		params = Map3DSystem.localserver.UrlHelper.url_getparams_table(request_url) or {};
+		params = System.localserver.UrlHelper.url_getparams_table(request_url) or {};
 		params.url__ = request_url;
 		self.mcmlNode:SetAttribute("request_params", params);
 	end
