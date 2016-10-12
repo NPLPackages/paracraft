@@ -45,6 +45,7 @@ Special css property
 | line-height | it can be "100%", or absolute values like "12px" |
 | font-size | font size |
 | base-font-size | force using a given font size without scaling |
+| zorder | default is 0. this is like z-index |
 
 background property: the css background can be of following. e.g.
    1. background:a.jpg; This is an image relative to the current page's directory.
@@ -1723,8 +1724,7 @@ end
 -----------------------------------
 -- pe_br: line break
 -----------------------------------
-local pe_br = {};
-Map3DSystem.mcml_controls.pe_br = pe_br;
+local pe_br = commonlib.gettable("Map3DSystem.mcml_controls.pe_br");
 function pe_br.create(rootName,mcmlNode, bindingContext, _parent, left, top, width, height, style, parentLayout)
 	parentLayout:NewLine();
 end

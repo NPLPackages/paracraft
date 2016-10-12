@@ -52,6 +52,7 @@ NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_downlistbutton.lua");
 
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_minikeyboard.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_togglebuttons.lua");
+NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_style.lua");
 local L = CommonCtrl.Locale("IDE");
 
 -- the null node
@@ -219,6 +220,7 @@ local default_control_mapping = {
 	["button"] = mcml_controls.pe_editor_button,
 	["iframe"] = mcml_controls.pe_iframe,
 	["script"] = mcml_controls.pe_script,
+	["style"] = mcml_controls.pe_style,
 	["unknown"] = mcml_controls.pe_script, -- this will handle <%embeded code block%>
 	["label"] = mcml_controls.pe_label,
 	["pe:togglebuttons"] = mcml_controls.pe_togglebuttons,
@@ -231,6 +233,7 @@ local default_control_mapping = {
 	["pe:a"] = mcml_controls.pe_pe_a,
 	["pe:script"] = mcml_controls.pe_script,
 	["pe:code"] = mcml_controls.pe_code,
+	["pe:style"] = mcml_controls.pe_style,
 	
 	-- the following aries tags are moved to apps folder and use RegisterUserControl() function. 
 	-- aries tags

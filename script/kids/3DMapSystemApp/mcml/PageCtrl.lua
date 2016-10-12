@@ -42,6 +42,8 @@ NPL.load("(gl)script/kids/3DMapSystemApp/API/webservice_constants.lua");
 NPL.load("(gl)script/ide/System/localserver/factory.lua");
 NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
 NPL.load("(gl)script/ide/XPath.lua");
+NPL.load("(gl)script/ide/System/Windows/mcml/Style.lua");
+local Style = commonlib.gettable("System.Windows.mcml.Style");
 			
 local pe_script = commonlib.gettable("Map3DSystem.mcml_controls.pe_script");
 
@@ -110,6 +112,7 @@ function PageCtrl:Init(url, cache_policy, bRefresh)
 		-- clear all 
 		self.status = nil;
 		self.mcmlNode = nil;
+		self.style = nil;
 		self:OnRefresh();
 		return
 	elseif(type(url) == "table" and table.getn(url)>0) then
@@ -447,7 +450,7 @@ end
 -- it calls this Refresh method of the associated page with a delay time. Hence, when the last delay time is reached, the page is rebuilt 
 -- and the dynamic content will be accessible by then. 
 -- @param DelayTime: if nil, it will default to self.DefaultRefreshDelayTime (usually 1.5 second). 
--- tip: If one set this to a nagative value, it may causes an immediate page refresh. 
+-- tip: If one set this to a negative value, it may causes an immediate page refresh. 
 function PageCtrl:Refresh(DelayTime)
 	CommonCtrl.AddControl(self.name, self);
 	DelayTime = DelayTime or self.DefaultRefreshDelayTime;
@@ -825,6 +828,14 @@ function PageCtrl:GetPageScope()
 	return self._PAGESCRIPT;
 end	
 
+-- Get the page style object
+function PageCtrl:GetStyle()
+	if(not self.style) then
+		self.style = Style:new();
+	end
+	return self.style;
+end
+
 --------------------------------------
 -- private method
 --------------------------------------
@@ -841,6 +852,7 @@ function PageCtrl.OnPageDownloaded_CallBack(xmlRoot, entry, self)
 				-- ready status
 				self.status=1;
 				self.mcmlNode = mcmlNode;
+				self.style = nil;
 				self._PAGESCRIPT = nil; -- clear page scope
 				
 				-- rebuild UI
@@ -858,5 +870,3 @@ function PageCtrl.OnPageDownloaded_CallBack(xmlRoot, entry, self)
 		end
 	end	
 end
-
-

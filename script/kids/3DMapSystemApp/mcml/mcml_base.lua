@@ -26,7 +26,8 @@ end
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
-
+NPL.load("(gl)script/ide/System/Windows/mcml/StyleItem.lua");
+local StyleItem = commonlib.gettable("System.Windows.mcml.StyleItem");
 local pe_css = commonlib.gettable("Map3DSystem.mcml_controls.pe_css");
 
 if(not Map3DSystem.mcml) then Map3DSystem.mcml = {} end
@@ -528,19 +529,23 @@ function mcml.baseNode:GetCssStyle(attrName)
 	end
 end
 
-local number_fields = {
-	["height"] = true,
-	["min-height"] = true,
-	["max-height"] = true,
-	["width"] = true,
-	["min-width"] = true,
-	["max-width"] = true,
-	["left"] = true,
-	["top"] = true,
-	["font-size"] = true,
-	["spacing"] = true,
-	["base-font-size"] = true,
-};
+-- apply any css classnames in class attribute
+function mcml.baseNode:ApplyClasses()
+	-- apply attribute class names
+	if(self.attr and self.attr.class) then
+		local pageStyle = self:GetPageStyle();
+		if(pageStyle) then
+			local style = self:GetStyle();
+			local class_names = self:GetAttributeWithCode("class", nil, true);
+			if(class_names) then
+				for class_name in class_names:gmatch("[^ ]+") do
+					style:Merge(pe_css.default[class_name]);
+					pageStyle:ApplyToStyleItem(style, class_name);
+				end
+			end
+		end
+	end
+end
 
 -- get the css style object if any. Style will only be evaluated once and saved to self.style as a table object, unless style attribute is changed by self:SetAttribute("style", value) method. 
 -- @param baseStyle: nil or parent node's style object with which the current node's style is merged.
@@ -551,65 +556,21 @@ function mcml.baseNode:GetStyle(baseStyle, base_baseStyle)
 	if(self.style) then
 		return self.style;
 	end
-	local style;
-	
-	--
-	-- apply base of base if any
-	--
-	if(type(base_baseStyle) == "table") then
-		style = style or {};
-		commonlib.partialcopy(style, base_baseStyle)
-	end	
-	--
-	-- apply base if any
-	--
-	if(type(baseStyle) == "table") then
-		style = style or {};
-		commonlib.partialcopy(style, baseStyle)
-	end	
-	--
-	-- apply class if any
-	--
-	if(self.attr and self.attr.class) then
-		local class_name = self:GetAttributeWithCode("class", nil, true);
-		if(pe_css.default[class_name]) then
-			style = style or {};
-			commonlib.partialcopy(style, pe_css.default[class_name])
-		end
-		--log(string_format("warning: unkown css class name %s in mcml file\n", self.attr.class))
-	end
+	local style = StyleItem:new();
+	self.style = style;
+
+	style:Merge(base_baseStyle);
+	style:Merge(baseStyle);
+
+	self:ApplyClasses();
+
 	--
 	-- apply instance if any
 	--
 	if(self.attr and self.attr.style) then
-		style = style or {};
 		local style_code = self:GetAttributeWithCode("style", nil, true);
-		--local style_code = self:GetAttributeWithCode("style");
-		if(type(style_code) == "string") then
-			local name, value;
-			for name, value in string.gfind(style_code, "([%w%-]+)%s*:%s*([^;]*)[;]?") do
-				name = string_lower(name);
-				value = string_gsub(value, "%s*$", "");
-				if(number_fields[name] or string_find(name,"^margin") or string_find(name,"^padding")) then
-					local _, _, cssvalue = string_find(value, "([%+%-]?%d+)");
-					if(cssvalue~=nil) then
-						value = tonumber(cssvalue);
-					else
-						value = nil;
-					end
-				elseif(string_match(name, "^background[2]?$") or name == "background-image") then
-					value = string_gsub(value, "url%((.*)%)", "%1");
-					value = string_gsub(value, "#", ";");
-				end
-				style[name] = value;
-			end
-		elseif(type(style_code) == "table") then
-			style = style_code;
-		end
-	else
-		style = style or baseStyle	
+		style:Merge(style_code);
 	end
-	self.style = style;
 	return style;
 end
 
@@ -692,6 +653,14 @@ end
 function mcml.baseNode:GetPageCtrl()
 	return self:GetAttribute("page_ctrl") or self:GetParentAttribute("page_ctrl");
 end	
+
+-- get the page style object shared by all page elements.
+function mcml.baseNode:GetPageStyle()
+	local page = self:GetPageCtrl();
+	if(page) then
+		return page:GetStyle();
+	end
+end
 
 -- search all parent with a given attribute name. It will search recursively for all ancesters.  
 -- this function is usually used for getting the "request_url" field which is inserted by MCML web browser to the top level node. 
