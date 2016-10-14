@@ -90,6 +90,10 @@ function GameMode:ActivateDefaultContext()
 	else
 		context = AllContext:GetContext("play");
 	end
+
+	-- one can replace default context using this filter
+	context = GameLogic.GetFilters():apply_filters("DefaultContext", context, self.mode);
+
 	if(context) then
 		return context:activate();
 	end
