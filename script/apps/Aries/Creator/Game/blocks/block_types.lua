@@ -407,7 +407,7 @@ function block_types.LoadBlockTemplates(filename)
 	if(xmlRoot) then
 		local templates = block_types.templates;
 		local count = 0;
-		local node;
+		xmlRoot = GameLogic.GetFilters():apply_filters("block_types_template", xmlRoot);
 		for node in commonlib.XPath.eachNode(xmlRoot, "/block_templates/block") do
 			local attr = node.attr;
 			if(attr.name) then
@@ -462,7 +462,8 @@ function block_types.LoadFromFile(filename)
 	filename = filename or "config/Aries/creator/block_types.xml";
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
-		local node;
+		xmlRoot = GameLogic.GetFilters():apply_filters("block_types", xmlRoot);
+		
 		for node in commonlib.XPath.eachNode(xmlRoot, "/blocks/block") do
 			local attr = node.attr;
 			local block_id = tonumber(attr.id);

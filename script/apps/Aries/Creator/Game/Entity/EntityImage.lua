@@ -126,7 +126,7 @@ function Entity:GetFullFilePath(filename)
 	local bExist
 	local old_filename = filename;
 	if(filename and filename~="") then
-		if(filename:match("^http://")) then
+		if(filename:match("^https?://")) then
 			bExist = true;
 		else
 			filename = filename:gsub("[;:].*$", "")
@@ -152,46 +152,52 @@ function Entity:ResetDerivedPaintings()
 	if(self:IsRemote()) then
 		return;
 	end
-	local rows = self.rows;
-	local columns = self.columns;
-	local facing = self:GetImageFacing();
+	if(self.start_block_coord and self.rows) then
+		local rows = self.rows;
+		local columns = self.columns;
+		local facing = self:GetImageFacing();
 
-	local start_block_x = self.start_block_coord.x;
-	local start_block_y = self.start_block_coord.y;
-	local start_block_z = self.start_block_coord.z;
+		local start_block_x = self.start_block_coord.x;
+		local start_block_y = self.start_block_coord.y;
+		local start_block_z = self.start_block_coord.z;
 
-	local block_x = start_block_x;
-	local block_y = start_block_y;
-	local block_z = start_block_z;
+		local block_x = start_block_x;
+		local block_y = start_block_y;
+		local block_z = start_block_z;
 
-	local get_new_root_entity = false;
-	local new_root_entity_coord;
+		local get_new_root_entity = false;
+		local new_root_entity_coord;
 	
-	local row_index,column_index;
-	for row_index = 1,rows do
-		for column_index = 1,columns do
-			local image_entity = EntityManager.GetEntityInBlock(block_x,block_y,block_z,"EntityImage");
+		local row_index,column_index;
+		for row_index = 1,rows do
+			for column_index = 1,columns do
+				local image_entity = EntityManager.GetEntityInBlock(block_x,block_y,block_z,"EntityImage");
 
-			if(image_entity) then
-				image_entity.root_entity_coord = nil; 
-				image_entity:SetDerivedImageFilename(nil);
-				image_entity:Refresh();
+				if(image_entity) then
+					image_entity.root_entity_coord = nil; 
+					image_entity:SetDerivedImageFilename(nil);
+					image_entity:Refresh();
+				end
+
+				if(facing == 0) then
+					block_z = block_z + 1;
+				elseif(facing == 3) then
+					block_x = block_x + 1;
+				elseif(facing == 1) then
+					block_z = block_z - 1;
+				elseif(facing == 2) then
+					block_x = block_x - 1;
+				end
 			end
 
-			if(facing == 0) then
-				block_z = block_z + 1;
-			elseif(facing == 3) then
-				block_x = block_x + 1;
-			elseif(facing == 1) then
-				block_z = block_z - 1;
-			elseif(facing == 2) then
-				block_x = block_x - 1;
-			end
+			block_x = start_block_x;
+			block_y = block_y - 1;
+			block_z = start_block_z;
 		end
-
-		block_x = start_block_x;
-		block_y = block_y - 1;
-		block_z = start_block_z;
+	else
+		self.root_entity_coord = nil; 
+		self:SetDerivedImageFilename(nil);
+		self:Refresh();
 	end
 end
 
@@ -221,7 +227,7 @@ function Entity:LoadImageFile()
 		end
 		--self.imagefile_loaded_times = self.imagefile_loaded_times + 1;
 		if(self.imagefile_loaded_times >= 4) then
-			if(self.image_filename and self.image_filename:match("^http://")) then
+			if(self.image_filename and self.image_filename:match("^https?://")) then
 				self.texture:LoadAsset();
 				-- http textures will have a much longer timeout.
 				self.imagefile_loaded_times=2*self.imagefile_loaded_times;

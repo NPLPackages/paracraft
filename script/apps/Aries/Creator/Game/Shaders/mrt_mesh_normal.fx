@@ -28,6 +28,7 @@ bool g_bRGBOnlyTexturAnim  :boolean7;
 float g_bReflectFactor	:reflectfactor;
 float3 g_EyePositionW	:worldcamerapos;
 float2 g_TexAnim		:ConstVector0; // TODO: for testing texture animation: x,y for translation
+float2 g_CategoryID		:ConstVector1; 
 //bool g_bNormalMap		:boolean6;
 float g_opacity			:opacity = 1.0; 
 
@@ -112,7 +113,10 @@ BlockPSOut pixelShader(Interpolants i)
 	o.w *= g_opacity;
 	
 	output.Color = o;
-	output.BlockInfo = float4(1, BlockLightStrength.x, BlockLightStrength.y, 1);
+	float category = 1.0;
+	if (g_CategoryID.x > 0)
+		category = g_CategoryID.x / 256.0;
+	output.BlockInfo = float4(category, BlockLightStrength.x, BlockLightStrength.y, 1);
 	output.Depth = float4(i.normal.a, 0, 0, 1);
 	output.Normal = float4(i.normal.xyz, 1);
 	return output;
