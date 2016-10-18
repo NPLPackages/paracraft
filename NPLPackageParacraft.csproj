@@ -51,6 +51,9 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="config\Aries\creator\block_list.xml" />
+    <Content Include="config\Aries\creator\block_types.xml" />
+    <Content Include="config\Aries\creator\block_types_template.xml" />
     <Content Include="script\**" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
