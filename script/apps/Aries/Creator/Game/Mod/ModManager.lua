@@ -7,11 +7,13 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 local ModManager = commonlib.gettable("Mod.ModManager");
+ModManager:Init();
 ModManager:OnLoadWorld();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Plugins/PluginManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local PluginManager = commonlib.gettable("System.Plugins.PluginManager");
 
 local ModManager = commonlib.inherit(PluginManager, {});
@@ -20,7 +22,20 @@ ModManager:Property({"Name", "Paracraft"});
 function ModManager:ctor()
 end
 
+-- called only once
 function ModManager:Init()
+	if(self.inited) then
+		return;
+	end
+	self.inited = true;
+
+	GameLogic.GetFilters():add_filter("InitDesktop", function(bSkipDefaultDesktop)
+		return self:OnInitDesktop();
+	end);
+
+	GameLogic.GetFilters():add_filter("ActivateDesktop", function(bIgnoreDefaultDesktop, mode)
+		return self:OnActivateDesktop(mode);
+	end);
 end
 
 function ModManager:handleKeyEvent(event)
@@ -58,7 +73,7 @@ function ModManager:OnLogin()
 	self:InvokeMethod("OnLogin");
 end
 
--- virtual: called when a desktop is inited such as displaying the initial user interface. 
+-- called when a desktop is inited such as displaying the initial user interface. 
 -- return true to prevent further processing.
 function ModManager:OnInitDesktop()
 	return self:InvokeMethod("OnInitDesktop");

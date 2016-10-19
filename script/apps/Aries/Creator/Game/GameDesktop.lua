@@ -89,11 +89,10 @@ function Desktop.InitDesktop()
 	local GUIChat = commonlib.gettable("MyCompany.Aries.Game.GUI.GUIChat");
 	commonlib.setfield("MyCompany.Aries.Creator.Game.Desktop.GUI.chat", GUIChat:new());
 
-	-- init desktop gui: plugin system first.
-	if(ModManager:OnInitDesktop()) then
-		-- in case, plugin handles its own desktop.
-		return;
-	else
+	-- init desktop gui
+	Desktop.bSkipDefaultDesktop = false;
+	Desktop.bSkipDefaultDesktop = GameLogic.GetFilters():apply_filters("InitDesktop", Desktop.bSkipDefaultDesktop);
+	if(not Desktop.bSkipDefaultDesktop) then
 		-- init default desktop gui
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
 		local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
@@ -180,19 +179,24 @@ function Desktop.OnActivateDesktop(mode)
 	-- not view mode by default.
 	GameLogic.GameMode:SetViewMode(false);
 
-	if(ModManager:OnActivateDesktop(mode)) then
+	local bIgnoreDefaultDesktop = false;
+	bIgnoreDefaultDesktop = GameLogic.GetFilters():apply_filters("ActivateDesktop", bIgnoreDefaultDesktop, mode);
+
+	if(bIgnoreDefaultDesktop) then
 		return;
 	end
-	Desktop.ShowAllAreas();
 
-	if(isToggleMode) then
-		if(Desktop.mode == "editor") then
-			GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
-		else
-			GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
+	if(not Desktop.bSkipDefaultDesktop) then
+		Desktop.ShowAllAreas();
+		if(isToggleMode) then
+			if(Desktop.mode == "editor") then
+				GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
+			else
+				GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
+			end
 		end
+		Desktop.mode = mode;
 	end
-	Desktop.mode = mode;
 end
 
 -- get Desktop.mode

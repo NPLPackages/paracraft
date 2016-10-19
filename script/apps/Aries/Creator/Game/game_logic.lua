@@ -162,6 +162,7 @@ end
 
 -- static method called at the very beginning when paracraft start
 function GameLogic.InitMod()
+	ModManager:Init();
 	ModManager:GetLoader():LoadAllPlugins();
 end
 
@@ -172,8 +173,8 @@ function GameLogic.InitCommon()
 	CreatorAPISandbox.Cleanup();
 
 	GameLogic.InitMod();
-
 	GameLogic:InitSingleton();
+	
 	if(not GameLogic.theParticleManager) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ParticlePoolManager.lua");
 		local ParticlePoolManager = commonlib.gettable("MyCompany.Aries.Game.Effects.ParticlePoolManager");

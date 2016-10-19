@@ -1376,6 +1376,9 @@ function block:GetItemModel()
 			return "model/blockworld/BlockModel/block_model_one.x";
 		elseif(self.threeSideTex) then
 			return "model/blockworld/BlockModel/block_model_four.x";
+		elseif(not self.sixSideTex) then
+			-- default to single side
+			return "model/blockworld/BlockModel/block_model_one.x";
 		end
 	end
 end
