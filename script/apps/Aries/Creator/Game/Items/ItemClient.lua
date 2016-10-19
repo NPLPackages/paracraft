@@ -107,6 +107,7 @@ function ItemClient.LoadGlobalBlockList()
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
 		LOG.std(nil, "info", "ItemClient", "loaded block list category from file %s", filename);
+		xmlRoot = GameLogic.GetFilters():apply_filters("block_list", xmlRoot);
 
 		local version = if_else(System.options.mc, "mc", "haqi");
 		local is_sdk = System.options.isAB_SDK;
