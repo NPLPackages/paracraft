@@ -40,6 +40,7 @@ other files...
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local filename = commonlib.Encoding.Utf8ToDefault(cmd_text);
 		local ext = filename:match("%.(%w+)$");
+		ext = ext and ext:lower();
 		if(ext == "zip") then
 			DragDropHandlers.handleZipFile(filename);
 		elseif(ext == "mca" or filename:match("%.mc[ra]%.tmp$")) then

@@ -292,7 +292,7 @@ function Item:GetIcon()
 			if(model_filename and model_filename ~= "icon") then
 				-- only add block with real models. 
 				local atlas = self:GetIconAtlas();
-				if(self.block_id and self.block_id>0 and self.block_id < 10000) then
+				if(self.block_id and self.block_id>0 and self.block_id < 4096) then
 					local region = atlas:AddRegionByBlockId(self.block_id);
 					if(region) then
 						self.icon = region:GetTexturePath();

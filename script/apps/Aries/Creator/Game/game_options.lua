@@ -986,3 +986,10 @@ function options:GetSuperRenderDist()
 		return 0;
 	end
 end
+
+-- enabled by default. if enabled, we will ignore camera-block collision,
+-- when both eye and the look-at point are in sunlight.
+-- another way to set: `/property set -camera IgnoreEyeBlockCollisionInSunlight false`
+function options:SetIgnoreEyeBlockCollisionInSunlight(bIgnored)
+	ParaCamera.GetAttributeObject():GetField("IgnoreEyeBlockCollisionInSunlight", bIgnored == true);
+end

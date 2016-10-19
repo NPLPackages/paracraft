@@ -21,7 +21,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 
 local allowed_root_names = {
-	all = true, scene=true, npl=true, asset=true, gui=true
+	all = true, scene=true, npl=true, asset=true, gui=true, camera=true,
 }
 
 local paths = {
@@ -53,6 +53,7 @@ Examples:
 /property set -all WindowText helloworld
 /property WindowText helloworld short cut
 /property AsyncChunkMode false
+/property set -camera IgnoreEyeBlockCollisionInSunlight false
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local set_get, objPath, name, value;

@@ -131,7 +131,7 @@ Commands["texgen"] = {
 					for _,category_ds in pairs(ds_src) do
 						for index, item in ipairs(category_ds) do 
 							local block_id = item.id;
-							if(block_id and block_id>0 and block_id < 10000) then
+							if(block_id and block_id>0 and block_id < 4096) then
 								texture_atlas:AddRegionByBlockId(block_id);
 							end
 						end	
@@ -141,7 +141,7 @@ Commands["texgen"] = {
 					for _,category_ds in pairs(ds_src) do
 						for index, item in ipairs(category_ds) do 
 							local block_id = item.id;
-							if(block_id and block_id>0 and block_id < 10000) then
+							if(block_id and block_id>0 and block_id < 4096) then
 								texture_atlas:AddRegionByBlockId(block_id);
 							end
 						end	
