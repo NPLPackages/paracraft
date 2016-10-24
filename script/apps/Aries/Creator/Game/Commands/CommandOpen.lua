@@ -32,27 +32,74 @@ Examples:
 /open -p http://www.paraengine.com
 /open npl://learn	open NPL code wiki pages
 /open -d temp/
+/open hello.html  open mcml file relative to world or root directory. Page is always center aligned and auto sized.
+/open mcml://hello.html     same as above.  
+
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
 
-		local url = GameLogic.GetFilters():apply_filters("cmd_open_url", cmd_text);
+		local url = cmd_text;
+		url = GameLogic.GetFilters():apply_filters("cmd_open_url", url, options);
+
 		if(not url) then
 			return;
 		end
+
 		if(options.d) then
 			Map3DSystem.App.Commands.Call("File.WinExplorer", url);
-		elseif(url and (url:match("^https?:") or url:match("^%w+://"))) then
-			if(options.p) then
-				_guihelper.MessageBox(L"你确定要打开:"..url, function()
-					ParaGlobal.ShellExecute("open", url, "", "", 1);
-				end)
-			else
-				ParaGlobal.ShellExecute("open", url, "", "", 1);
+		elseif(url) then
+			local protocol = url:match("^(%w+)://");
+			if(not protocol) then
+				if(url:match("%.html")) then
+					protocol = "mcml";
+				end
 			end
-		elseif(url and url~="")then
-			_guihelper.MessageBox(L"只能打开http://开头的URL地址");
+			if(protocol == "http" or protocol == "https") then
+				if(options.p) then
+					_guihelper.MessageBox(L"你确定要打开:"..url, function()
+						ParaGlobal.ShellExecute("open", url, "", "", 1);
+					end)
+				else
+					ParaGlobal.ShellExecute("open", url, "", "", 1);
+				end
+			elseif(protocol == "mcml") then
+				url = url:gsub("^%w+://", "");
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				local filepath = Files.GetFilePath(url); 
+				if(not filepath) then
+					LOG.std(nil, "warn", "cmd_open", "can not find file %s", url);
+					return;
+				end
+				local params = {
+						url = filepath, 
+						name = "cmd_open.ShowPage", 
+						isShowTitleBar = false,
+						DestroyOnClose = true,
+						bToggleShowHide=false, 
+						style = CommonCtrl.WindowFrame.ContainerStyle,
+						allowDrag = true,
+						enable_esc_key = true,
+						bShow = true,
+						click_through = false, 
+						refresh = true,
+						zorder = 1,
+						app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+						bAutoSize = true,
+						directPosition = true,
+							align = "_ct",
+							x = -400,
+							y = -300,
+							width = 800,
+							height = 600,
+					};
+				System.App.Commands.Call("File.MCMLWindowFrame", params);
+			elseif(url and url~="")then
+				_guihelper.MessageBox(L"只能打开http://开头的URL地址");
+			end
 		end
 	end,
 };

@@ -275,13 +275,14 @@ Commands["runat"] = {
 	name="runat", 
 	quick_ref="/runat @name /any_command", 
 	desc=[[Run a local client side command at given player's console
-@param @name: @all for all connected players. @name for given player name. `__MP__` can be ignored.
+@param @name: @all for all connected players. @p for last trigger entity. @name for given player name. `__MP__` can be ignored.
 @param /any_command: if command is local, it can be sent to client for execution, otherwise it can only run on server.
 Examples:
 /runat @all /tip hello everyone    send message to every connected user
 /runat @__MP__admin /tip hi, admin   send to admin host
 /runat @admin /tip hi, admin         send to admin host
 /runat @username /tip hi, username   send to a given user
+/runat @p /tip hi, username			send to triggering user
 ]],
 	mode_deny = "",
 	mode_allow = "",
@@ -304,18 +305,24 @@ Examples:
 				-- also run on the server side 
 				CommandManager:RunFromConsole(cmd_text, EntityManager.GetPlayer());
 			elseif(playername) then
-				local targetPlayer = EntityManager.GetEntity(playername);
-				if(not targetPlayer) then
-					if(not playername:match("^__MP__")) then
-						playername = "__MP__"..playername;
-						targetPlayer = EntityManager.GetEntity(playername);
+				local targetPlayer;
+				if(playername == "p") then
+					targetPlayer = EntityManager.GetLastTriggerEntity();
+				else
+					targetPlayer = EntityManager.GetEntity(playername);
+					if(not targetPlayer) then
+						if(not playername:match("^__MP__")) then
+							playername = "__MP__"..playername;
+							targetPlayer = EntityManager.GetEntity(playername);
+						end
 					end
 				end
-				targetPlayer = targetPlayer or EntityManager.GetLastTriggerEntity();
-				if(targetPlayer == EntityManager.GetPlayer()) then
-					CommandManager:RunFromConsole(cmd_text, targetPlayer);
-				elseif(targetPlayer and targetPlayer.SendPacketToPlayer) then
-					targetPlayer:SendPacketToPlayer(GameLogic.Packets.PacketClientCommand:new():Init(cmd_text));
+				if(targetPlayer) then
+					if(targetPlayer == EntityManager.GetPlayer()) then
+						CommandManager:RunFromConsole(cmd_text, targetPlayer);
+					elseif(targetPlayer.SendPacketToPlayer) then
+						targetPlayer:SendPacketToPlayer(GameLogic.Packets.PacketClientCommand:new():Init(cmd_text));
+					end
 				end
 			end
 		else

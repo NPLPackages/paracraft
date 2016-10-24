@@ -42,7 +42,8 @@ This givens an overview of filters in paracraft. Please search the source code o
 - GUI:
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI
   - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. 
-
+  - "show", name, bIsShow: hook `/show name` command to display a custom gui via command
+  - "cmd_open_url", url, options: hook `/open url` command to display a custom url via command
 - world:
   - "before_generate_chunk", x, z:
   - "after_generate_chunk", x, z:
@@ -53,12 +54,10 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "OnLoadBlockRegion", true, x, y:
   - "OnUnLoadBlockRegion", true, x, y:
   - "worldFileChanged", msg:
+  - "GetWorldGeneratorClass", generator, name: get world generator by name filter. Use this to add custom world generators
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:
-  - "cmd_open_url", cmd_text: 
-  - "show", name, bIsShow: 
-  - "hide", name: 
   - "new_item", itemStackArray, self:
   - "item_client_new_item_type_added", block_id, item:
 - file exporters:

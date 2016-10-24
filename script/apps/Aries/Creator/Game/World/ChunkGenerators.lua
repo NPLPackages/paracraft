@@ -42,7 +42,7 @@ function ChunkGenerators:RegisterBuildinGenerators()
 	local NullChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.NullChunkGenerator");
 	ChunkGenerators:Register("null", NullChunkGenerator);
 
-	-- TODO: add other buildin generators here. plugins can register using self:Register function. 
+	-- TODO: add other buildin generators here. plugins can register using self:Register function or via GetWorldGeneratorClass filters. 
 end
 
 -- @param generator_class: please note this is the class, not class instance. 
@@ -53,7 +53,9 @@ end
 -- get generator class by name. if not found, the default flat generator class is returned. 
 function ChunkGenerators:GetGeneratorClass(name)
 	self:Init();
-	return generators[name or "flat"] or generators["flat"];
+	local generator = generators[name or "flat"] or generators["flat"]
+	generator = GameLogic.GetFilters():apply_filters("GetWorldGeneratorClass", generator, name);
+	return generator;
 end
 
 

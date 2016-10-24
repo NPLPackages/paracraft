@@ -125,7 +125,11 @@ end
 function InventoryPlayer:OnInventoryChanged(slot_index)
 	InventoryPlayer._super.OnInventoryChanged(self);
 	if(self:IsMainPlayer()) then
-		if(slot_index == self:GetHandToolIndex()) then
+		if(not slot_index) then
+			if(self.last_block_inhand_id ~= self:GetBlockInRightHand()) then
+				self:NotifyBlockInHandChanged(self.last_block_inhand_id, self:GetBlockInRightHand());
+			end
+		elseif(slot_index == self:GetHandToolIndex()) then
 			self:NotifyBlockInHandChanged(self.last_block_inhand_id, self:GetBlockInRightHand());
 		end
 	end

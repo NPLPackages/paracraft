@@ -84,10 +84,11 @@ end
 -- @param cmd_name: this can be command name or full command text that begin with "/" or nothing. 
 function CommandManager:RunCommand(cmd_name, cmd_text, ...)
 	if(not cmd_text) then
-		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
+		return self:RunFromConsole(cmd_name, nil);
+	else
+		cmd_text = self:RunInlineCommand(cmd_text, ...);
+		return SlashCommand.GetSingleton():RunCommand(cmd_name, cmd_text, ...);
 	end
-	cmd_text = self:RunInlineCommand(cmd_text, ...);
-	return SlashCommand.GetSingleton():RunCommand(cmd_name, cmd_text, ...);
 end
 
 function CommandManager:GetCommandName(cmd_text)

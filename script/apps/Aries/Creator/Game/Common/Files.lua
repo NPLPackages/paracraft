@@ -7,6 +7,8 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+-- search and cache the relative path
+local filepath = Files.GetFilePath("readme.md"); 
 local filepath = Files.FindFile("readme.md");
 
 Files:ClearFindFileCache();

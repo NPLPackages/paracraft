@@ -42,7 +42,7 @@ function SwitchAllModStatus()
 end
 
 function OnOpenModDir()
-    Map3DSystem.App.Commands.Call("File.WinExplorer", SelectModulePage.dir);
+    Map3DSystem.App.Commands.Call("File.WinExplorer", SelectModulePage.GetPluginLoader():GetPluginFolder());
 end
 
 SelectModulePage.url_getSDK = "https://github.com/LiXizhi/ParaCraftSDK";

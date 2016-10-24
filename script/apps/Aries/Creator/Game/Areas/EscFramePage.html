@@ -154,11 +154,11 @@ end
     
     <div style="margin-top:5px;">
         <input type="button" tooltip='<%=L"点击备份并查看历史版本"%>' value='<%=format(L"版本:%d", GameLogic.options:GetRevision())%>' style="margin-left:25px;font-size:11px;height:20px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickRevision"/>
+        <input type="button" value='<%=L"历史"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickViewHistory" />
         <div style="float:left;margin-left: 5px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
             <%=format("%s", GetCurWorldName() or "") %>
             <input type="button" value='...' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_button_blue"/>
         </div>
-        <input type="button" value='<%=L"历史版本"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_button_blue" onclick="OnClickViewHistory"/>
     </div>
     <div style="margin-left:25px;">
         <div style="margin-top:10px;">
