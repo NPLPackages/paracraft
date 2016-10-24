@@ -47,9 +47,9 @@ function Entity:ctor()
 	local dataWatcher = self:GetDataWatcher(true);
 end
 
+
 function Entity:init(username, world)
-	self.username = username or "";
-	self.name = "__MP__"..self.username;
+	self:SetUserName(username);
 	self.worldObj = world; -- Entity._super.init(self, world);
 	local x, y, z = world:GetSpawnPoint();
 	self:SetLocationAndAngles(x, y, z, 0, 0);

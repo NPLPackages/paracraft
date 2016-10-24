@@ -66,3 +66,6 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "GetExporters", exporters: file exporters
   - "export_to_file", filename:
   - "select_exporter", id:
+     
+## Adding New filters
+If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

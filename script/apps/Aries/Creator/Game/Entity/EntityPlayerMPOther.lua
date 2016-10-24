@@ -40,9 +40,9 @@ end
 
 -- @param entityId: this is usually from the server. 
 function Entity:init(world, username, entityId)
+	self:SetUserName(username);
 	self:SetEntityId(entityId);
 	self.worldObj = world; -- Entity._super.init(self, world);
-	self.username = username;
 	-- append "other_" for debugging
 	self:SetDisplayName(self.username);
 	local x, y, z = world:GetSpawnPoint();

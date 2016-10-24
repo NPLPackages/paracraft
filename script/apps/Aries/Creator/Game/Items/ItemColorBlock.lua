@@ -58,21 +58,30 @@ function ItemColorBlock:GetRandomColor()
 end
 
 -- get current selected pen color
-function ItemColorBlock:GetPenColor()
-	return self.pen_color;
+function ItemColorBlock:GetPenColor(itemStack)
+	itemStack = itemStack or self:GetSelectedItemStack();
+	if(itemStack) then
+		return itemStack:GetDataField("color") or self.pen_color;
+	else
+		return self.pen_color;
+	end
 end
 
 -- @param color: either 0xffffff, or string like "#ff0000"
 function ItemColorBlock:SetPenColor(color)
 	color = Color.ToValue(color);
-	if(color and color ~= self.pen_color) then
+	if(color and color ~= self:GetPenColor()) then
 		self.pen_color = color;
+		local itemStack = self:GetSelectedItemStack();
+		if(itemStack) then
+			itemStack:SetDataField("color", color);
+		end
 	end
 end
 
 function ItemColorBlock:GetTooltipFromItemStack(itemStack)
 	local text = self:GetTooltip();
-	return string.format("%s Color:#%06x", text or "", self:GetPenColor());
+	return string.format("%s Color:#%06x", text or "", self:GetPenColor(itemStack));
 end
 
 function ItemColorBlock:PaintBlock(x,y,z, color)
@@ -97,7 +106,7 @@ end
 -- @param entityPlayer: can be nil
 -- @return isUsed: isUsed is true if something happens.
 function ItemColorBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
-	data = self:ColorToData(self:GetPenColor());
+	data = self:ColorToData(self:GetPenColor(itemStack));
 
 	-- create with currently selected pen
 	return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
@@ -288,7 +297,7 @@ end
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function ItemColorBlock:DrawIcon(painter, width, height, itemStack)
-	painter:SetPen(Color.ChangeOpacity(self:GetPenColor()));
+	painter:SetPen(Color.ChangeOpacity(self:GetPenColor(itemStack)));
 	painter:DrawRect(0,0,width, height);
 	ItemColorBlock._super.DrawIcon(self, painter, width, height, itemStack);
 end

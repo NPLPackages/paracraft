@@ -39,9 +39,9 @@ e.g.
 /walk -away @a -dist 10 walk away from nearby player until distance is 10. 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or fromEntity;
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and fromEntity);
 
 		if(not playerEntity or not playerEntity.WalkTo) then
 			return;
@@ -113,9 +113,9 @@ e.g.
 /togglefly @test on    : enable fly mode
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or fromEntity;
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and fromEntity);
 		if(playerEntity) then
 			local bFly;
 			bFly, cmd_text = CmdParser.ParseBool(cmd_text);	

@@ -138,6 +138,12 @@ function Entity:SetBlockInRightHand(blockid_or_item_stack)
 	return res;
 end
 
+-- the actual name is "__MP__"..username
+function Entity:SetUserName(username)
+	self.username = username or "";
+	self.name = "__MP__"..self.username;
+end
+
 -- Gets the name of the entity
 function Entity:GetUserName()
     return self.username;

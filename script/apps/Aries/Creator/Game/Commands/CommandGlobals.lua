@@ -64,21 +64,38 @@ Commands["msg"] = {
 
 Commands["tip"] = {
 	name="tip", 
-	quick_ref="/tip [-name] [text]", 
+	quick_ref="/tip [-color #ff0000] [-duration 5000] [-name] [text]", 
 	desc=[[show a screen message to a channel name with a given string
-/tip -name hello			show text in name channel
-/tip -name					clear name
+@param -color: text color, default to black
+@param -duration: in milliseconds. default to 10000 or 10 seconds
+e.g.
+/tip hello world
+/tip -color #ff0000 -duration 1000  red text with 1 second
+/tip -name1 hello			show text in name1 channel
+/tip -name1					clear name1
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		LOG.std(nil, "info", "tip", cmd_text);
 		
-		local name;
-		name, text = CmdParser.ParseOption(cmd_text);
+		local name, color, duration, text;
+		local option_name = "";
+		while (option_name and cmd_text) do
+			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option_name == "color") then
+				color, cmd_text = CmdParser.ParseColor(cmd_text);
+			elseif(option_name == "duration") then
+				duration, cmd_text = CmdParser.ParseInt(cmd_text);
+			else
+				name = option_name;
+			end
+		end
+		text = cmd_text;
+		
 		local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 		if(text == "" or not text) then
 			BroadcastHelper.Clear(name or default);
 		else
-			BroadcastHelper.PushLabel({id=name or default, label = text, max_duration=10000, color = "0 0 0", scaling=1, bold=true, shadow=true,});
+			BroadcastHelper.PushLabel({id=name or default, label = text, max_duration=duration or 10000, color = color or "0 0 0", scaling=1, bold=true, shadow=true,});
 		end
 	end,
 };

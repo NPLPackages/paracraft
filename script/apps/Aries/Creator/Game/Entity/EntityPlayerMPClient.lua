@@ -35,8 +35,7 @@ end
 -- @param entityId: this is usually from the server. 
 function Entity:init(world, netHandler, entityId)
 	self:SetEntityId(entityId);
-	--self.username = username or "";
-	--self.name = "__MP__"..self.username;
+	self:SetUserName(netHandler:GetUserName());
 	self.worldObj = world; -- Entity._super.init(self, world);
 	self.netHandler = netHandler;
 	self.oldPosX = 0;

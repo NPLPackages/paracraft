@@ -37,9 +37,9 @@ Commands["disableinput"] = {
 	quick_ref="/disableinput [@playername] [x y z] [true|false]", 
 	desc="disableinput for a given entity or block entity" , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, x, y, z;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or fromEntity;
+		local playerEntity, x, y, z, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and fromEntity);
 
 		x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
 		if(x) then

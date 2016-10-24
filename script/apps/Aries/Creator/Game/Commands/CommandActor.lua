@@ -59,9 +59,9 @@ Commands["focus"] = {
 	quick_ref="/focus [@playername]", 
 	desc="focus on a given player. if no player, the current player is used. " , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, x, y, z;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or EntityManager.GetPlayer();
+		local playerEntity, x, y, z, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 
 		if(playerEntity) then
 			playerEntity:SetFocus();

@@ -34,9 +34,9 @@ Commands["set"] = {
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
 
-		local playerEntity;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or EntityManager.GetPlayer();
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 
 		local name, value;
 		name, cmd_text = CmdParser.ParseString(cmd_text);

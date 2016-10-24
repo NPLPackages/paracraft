@@ -40,12 +40,12 @@ Commands["clearbag"] = {
 		if(not System.options.is_mcworld) then
 			return;
 		end
-		local item_id, item_count, playerEntity;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local item_id, item_count, playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		item_id,cmd_text  = CmdParser.ParseInt(cmd_text);
 		item_count, cmd_text = CmdParser.ParseInt(cmd_text);
 		
-		playerEntity = playerEntity or EntityManager.GetPlayer();
+		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 		if(playerEntity and playerEntity.inventory) then
 			if(item_id) then
 				playerEntity.inventory:ClearItems(item_id, item_count);
@@ -68,13 +68,13 @@ e.g.
 /give BlockModel {tooltip="blocktemplates/1.bmax"}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, blockid, count, data, method, serverdata;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local playerEntity, blockid, count, data, method, serverdata, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		blockid, cmd_text = CmdParser.ParseBlockId(cmd_text);
 		count, cmd_text = CmdParser.ParseInt(cmd_text);
 		serverdata, cmd_text = CmdParser.ParseServerData(cmd_text);
 		if(blockid) then
-			playerEntity = playerEntity or EntityManager.GetPlayer();
+			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
 				local item = ItemStack:new():Init(blockid, count or 1, serverdata);
 				playerEntity.inventory:AddItemToInventory(item);
@@ -94,13 +94,13 @@ e.g.
 /take BlockModel {tooltip="blocktemplates/1.bmax"}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local playerEntity, blockid, count, data, method, serverdata;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local playerEntity, blockid, count, data, method, serverdata, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		blockid, cmd_text = CmdParser.ParseBlockId(cmd_text);
 		count, cmd_text = CmdParser.ParseInt(cmd_text);
 		serverdata, cmd_text = CmdParser.ParseServerData(cmd_text);
 		if(blockid) then
-			playerEntity = playerEntity or EntityManager.GetPlayer();
+			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
 				local item = ItemStack:new():Init(blockid, count or 1, serverdata);
 				if(playerEntity.SetBlockInRightHand) then
@@ -122,13 +122,13 @@ Examples:
 /gravity @test 9.81   only set the player's gravity to 9.81
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local gravity, playerEntity;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local gravity, playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		gravity, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(gravity) then
 			if(playerEntity) then
 				playerEntity:SetGravity(gravity);
-			else
+			elseif(not hasInputName) then
 				GameLogic.options:SetGravity(gravity);
 			end
 		end
@@ -142,8 +142,7 @@ Commands["density"] = {
 /density [value]
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local density, playerEntity;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local density;
 		density, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(density) then
 			GameLogic.options:SetDensity(density);
@@ -196,15 +195,15 @@ Examples:
 		if(not System.options.is_mcworld) then
 			return;
 		end
-		local playerEntity, list, bIsAdd;
+		local playerEntity, list, bIsAdd, hasInputName;
 		-- default to set velocity
 		bIsAdd, cmd_text = CmdParser.ParseText(cmd_text, "add");
 		if(not bIsAdd) then
 			bIsAdd, cmd_text = CmdParser.ParseText(cmd_text, "set");
 			bIsAdd = nil;
 		end
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or EntityManager.GetPlayer();
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 		list, cmd_text = CmdParser.ParseNumberList(cmd_text, nil, "|,%s")
 		if(list and playerEntity) then
 			local x, y, z;
@@ -277,10 +276,10 @@ Examples:
 			return;
 		end
 
-		local playerEntity, list;
+		local playerEntity, list, hasInputName;
 		-- default to add velocity
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or EntityManager.GetPlayer();
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 		list, cmd_text = CmdParser.ParseNumberList(cmd_text, nil, "|,%s")
 		if(list and playerEntity) then
 			local surface_decay, air_decay;
@@ -306,11 +305,11 @@ Commands["facing"] = {
 /facing [@playername] angle
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, facing;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local playerEntity, facing, hasInputName;
+		playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
 		facing, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(facing) then
-			playerEntity = playerEntity or EntityManager.GetPlayer();
+			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity) then
 				playerEntity:SetFacing(facing);
 			end
@@ -325,11 +324,11 @@ Commands["scaling"] = {
 /scaling [@playername] size
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, scaling;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+		local playerEntity, scaling, hasInputName;
+		playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
 		scaling, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(scaling) then
-			playerEntity = playerEntity or EntityManager.GetPlayer();
+			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity) then
 				playerEntity:SetScaling(scaling);
 			end
@@ -369,9 +368,9 @@ if NPC run this command from its rule bag, the NPC will be animated.
 /anim [filename].fbx    : play any fbx or x file in current world.
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity, anims;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
-		if(not playerEntity) then
+		local playerEntity, anims, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		if(not playerEntity and not hasInputName) then
 			if(fromEntity and fromEntity:IsBiped()) then
 				playerEntity = fromEntity;
 			else
@@ -406,9 +405,9 @@ Commands["skin"] = {
 /skin @test 1:  change 'test' player's skin to id=1
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local playerEntity;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
-		if(not playerEntity) then
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		if(not playerEntity and not hasInputName) then
 			if(fromEntity and fromEntity:IsBiped()) then
 				playerEntity = fromEntity;
 			else
@@ -438,9 +437,9 @@ Commands["/avatar"] = {
 /avator @test test.fbx :change 'test' player to a fbx file in current world directory. 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local playerEntity;
-		playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
-		if(not playerEntity) then
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
+		if(not playerEntity and not hasInputName) then
 			if(fromEntity and fromEntity:IsBiped()) then
 				playerEntity = fromEntity;
 			else

@@ -33,9 +33,12 @@ Example:
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(cmd_text) then
-			local playerEntity, lookat_x, lookat_y, lookat_z;
-			playerEntity, cmd_text  = CmdParser.ParsePlayer(cmd_text);
+			local playerEntity, lookat_x, lookat_y, lookat_z, hasInputName;
+			playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
 			if(not playerEntity) then
+				if(hasInputName) then
+					return;
+				end
 				lookat_x, lookat_y, lookat_z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
 				if(lookat_x) then
 					lookat_x, lookat_y, lookat_z = BlockEngine:real(lookat_x, lookat_y, lookat_z);

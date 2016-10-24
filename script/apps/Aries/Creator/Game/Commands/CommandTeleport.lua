@@ -124,8 +124,8 @@ format: /goto [@playername] [x y z]
 			end
 
 			if(System.options.mc or System.options.is_mcworld) then
-				local playerEntity, x, y, z, home;
-				playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
+				local playerEntity, x, y, z, home, hasInputName;
+				playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 				home, cmd_text = CmdParser.ParseText(cmd_text, "home");
 
 				x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, playerEntity);
@@ -134,7 +134,7 @@ format: /goto [@playername] [x y z]
 					x, y, z = GameLogic.GetHomePosition();
 					x, y, z = BlockEngine:block(x, y, z);
 				end
-				playerEntity = playerEntity or EntityManager.GetPlayer();
+				playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 				if( not x and playerEntity) then
 					x, y, z = playerEntity:GetBlockPos();
 				end

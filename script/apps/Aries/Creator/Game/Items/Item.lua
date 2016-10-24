@@ -71,6 +71,12 @@ function Item:GetBlock()
 	return block_types.get(self.block_id);
 end
 
+-- static function:
+-- get item current selected item stack
+function Item:GetSelectedItemStack()
+	return EntityManager.GetPlayer() and EntityManager.GetPlayer():GetItemInRightHand();
+end
+
  -- Called whenever this item is equipped and the right mouse button is pressed.
 -- @return itemStack, hasHandled:  the new item stack to put in the position. hasHandled is true if handled. 
 function Item:OnItemRightClick(itemStack, entityPlayer)

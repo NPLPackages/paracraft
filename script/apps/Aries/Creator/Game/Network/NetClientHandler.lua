@@ -67,6 +67,10 @@ function NetClientHandler:SendLoginPacket(username, password)
 	self:AddToSendQueue(Packets.PacketAuthUser:new():Init(username, password));
 end
 
+function NetClientHandler:GetUserName()
+	return self.last_username;
+end
+
 function NetClientHandler:GetNid()
 	return self.connection:GetNid();
 end

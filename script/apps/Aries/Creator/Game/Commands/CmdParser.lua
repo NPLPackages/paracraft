@@ -49,7 +49,7 @@ function CmdParser.ParsePlayer(cmd_text, fromEntity)
 	elseif(player_name) then
 		return EntityManager.GetEntity(player_name), cmd_text_remain;
 	end
-	return nil, cmd_text, cmd_text_remain~=cmd_text;
+	return nil, cmd_text, cmd_text_remain~=nil and cmd_text_remain~=cmd_text;
 end
 
 -- 3d position absolute or relative with ~

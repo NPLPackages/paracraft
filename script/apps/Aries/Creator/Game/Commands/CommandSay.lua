@@ -32,9 +32,10 @@ e.g.
 /say -duration -2d hello   : render as 2d
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local playerEntity;
-		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
-		playerEntity = playerEntity or fromEntity;
+		local playerEntity, hasInputName;
+		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+		
+		playerEntity = playerEntity or (not hasInputName and fromEntity);
 
 		local duration;
 		local option = "";
