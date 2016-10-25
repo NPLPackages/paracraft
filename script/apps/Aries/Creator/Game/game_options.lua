@@ -396,6 +396,15 @@ function options:ShowTouchPad(bShow)
 	end
 end
 
+function options:SetLoginPosition(x, y, z)
+	if(self.login_pos[1] == nil) then
+		if(x and y and z) then
+			GameLogic.GetFilters():apply_filters("PlayerHasLoginPosition", nil, x,y,z)	
+		end
+	end
+	self.login_pos[1], self.login_pos[2], self.login_pos[3] = x, y, z;
+end
+
 function options:OnLeaveWorld()
 	self.login_pos = {};
 	-- this will stop any midi sound if any. 

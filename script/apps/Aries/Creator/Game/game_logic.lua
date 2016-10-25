@@ -448,10 +448,7 @@ end
 
 -- find the most suitable login position. 
 function GameLogic.AutoFindLoginPos()
-	local x, y, z = GameLogic.GetHomePosition();
-	if(x and y and z) then
-		EntityManager.GetPlayer():AutoFindPosition(true);
-	end
+	EntityManager.GetPlayer():AutoFindPosition(true);
 end
 
 

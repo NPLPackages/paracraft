@@ -591,7 +591,7 @@ function Entity:AutoFindPosition(bUseSpawnPoint)
 	local x, y, z = self.worldObj:GetSpawnPoint();
 	if(bUseSpawnPoint and x and y and z) then
 		self:SetPosition(x,y,z);
-		GameLogic.options.login_pos = {x, y, z};
+		GameLogic.options:SetLoginPosition(x, y, z);
 		local bx, by, bz = self:GetBlockPos();
 		LOG.std(nil, "info", "AutoFindVerticalPosition", "player is spawned at world spawn point: %d %d %d", bx, by, bz);
 	else
@@ -610,7 +610,7 @@ function Entity:AutoFindPosition(bUseSpawnPoint)
 			y = y + BlockEngine.half_blocksize + 0.1;
 
 			self:SetPosition(x,y,z);
-			GameLogic.options.login_pos = {x, y, z};
+			GameLogic.options:SetLoginPosition(x, y, z);
 			local bx, by, bz = self:GetBlockPos();
 			LOG.std(nil, "info", "AutoFindVerticalPosition", "player is spawned at highest solid block: %d %d %d", bx, by, bz);
 		end	

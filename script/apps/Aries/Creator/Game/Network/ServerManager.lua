@@ -284,8 +284,8 @@ function ServerManager:InitializeConnectionToPlayer(playerConnection, entityMP)
     local born_x, born_y, born_z = worldserver:GetSpawnPoint();
     local net_handler = NetServerHandler:new():Init(playerConnection, entityMP, self);
 
+	net_handler:SendPacketToPlayer(Packets.PacketSpawnPosition:new():Init(born_x, born_y, born_z));
     net_handler:SendPacketToPlayer(Packets.PacketLogin:new():Init(entityMP.entityId, worldserver:GetWorldInfo():GetTerrainType(), self:GetMaxPlayers()));
-    net_handler:SendPacketToPlayer(Packets.PacketSpawnPosition:new():Init(born_x, born_y, born_z));
     self:SendChatMsg(ChatMessage:new():Init("multiplayer.player.joined", {entityMP:GetDisplayName()}));
     self:PlayerLoggedIn(entityMP);
     net_handler:SetPlayerLocation(entityMP.x, entityMP.y, entityMP.z, entityMP.facing, entityMP.rotationPitch);

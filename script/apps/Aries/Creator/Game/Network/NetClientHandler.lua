@@ -201,6 +201,8 @@ end
 function NetClientHandler:handleLogin(packet_login)
 	local entityPlayer = self.worldClient:CreateClientPlayer(packet_login.clientEntityId, self);
 	self.currentServerMaxPlayers = packet_login.maxPlayers;
+	packet_login = GameLogic.GetFilters():apply_filters("handleLogin", packet_login);
+	entityPlayer:AutoFindPosition(true);
 end
 
 function NetClientHandler:handleSpawnPosition(packet_SpawnPosition)

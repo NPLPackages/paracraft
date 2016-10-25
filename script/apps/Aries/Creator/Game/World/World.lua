@@ -216,19 +216,24 @@ end
 -- set player home position. 
 -- @param x, y, z: if nil, the current player position is used. 
 function World:SetSpawnPoint(x,y,z)
-	local entity = EntityManager.GetEntity("player_spawn_point")
-	if(not entity) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
-		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({block_id = block_types.names.player_spawn_point, blockX=x, blockY=y, blockZ=z})
-		task:Run();
-		entity = EntityManager.GetEntity("player_spawn_point")
-	end
-	if(entity) then
-		if(not x) then
-			x,y,z = ParaScene.GetPlayer():GetPosition();
+	local pos = GameLogic.GetFilters():apply_filters("BeforeSetSpawnPoint", {x,y,z});
+	if(pos) then
+		x,y,z = unpack(pos);
+		local entity = EntityManager.GetEntity("player_spawn_point")
+		if(not entity) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({block_id = block_types.names.player_spawn_point, blockX=x, blockY=y, blockZ=z})
+			task:Run();
+			entity = EntityManager.GetEntity("player_spawn_point")
 		end
-		entity:SetPosition(x,y,z);
+		if(entity) then
+			if(not x) then
+				x,y,z = ParaScene.GetPlayer():GetPosition();
+			end
+			entity:SetPosition(x,y,z);
+		end
 	end
+	GameLogic.GetFilters():apply_filters("SetSpawnPoint", nil, x,y,z);
 	return x,y,z;
 end
 

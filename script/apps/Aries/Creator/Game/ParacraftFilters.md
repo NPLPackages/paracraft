@@ -41,10 +41,13 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "DefaultContext", context, mode: getting the default scene context for user input
 - GUI:
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI
-  - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. 
+  - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. This is the place to initialize your custom GUI. 
   - "show", name, bIsShow: hook `/show name` command to display a custom gui via command
   - "cmd_open_url", url, options: hook `/open url` command to display a custom url via command
 - world:
+  - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
+  - "BeforeSetSpawnPoint", {x,y,z}: before player spawn point is set
+  - "SetSpawnPoint", nil, x,y,z: whenever the player spawn point is set. 
   - "before_generate_chunk", x, z:
   - "after_generate_chunk", x, z:
   - "load_world_info", worldInfo, node：
@@ -65,6 +68,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "GetExporters", exporters: file exporters
   - "export_to_file", filename:
   - "select_exporter", id:
-     
+- Networking:
+  - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
+  
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 
