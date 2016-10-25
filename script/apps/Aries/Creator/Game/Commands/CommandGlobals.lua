@@ -85,17 +85,18 @@ e.g.
 				color, cmd_text = CmdParser.ParseColor(cmd_text);
 			elseif(option_name == "duration") then
 				duration, cmd_text = CmdParser.ParseInt(cmd_text);
-			else
+			elseif(option_name) then
 				name = option_name;
 			end
 		end
 		text = cmd_text;
 		
+		name = name or "default";
 		local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 		if(text == "" or not text) then
-			BroadcastHelper.Clear(name or default);
+			BroadcastHelper.Clear(name);
 		else
-			BroadcastHelper.PushLabel({id=name or default, label = text, max_duration=duration or 10000, color = color or "0 0 0", scaling=1, bold=true, shadow=true,});
+			BroadcastHelper.PushLabel({id=name, label = text, max_duration=duration or 10000, color = color or "0 0 0", scaling=1, bold=true, shadow=true,});
 		end
 	end,
 };
