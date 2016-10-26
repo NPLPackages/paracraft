@@ -84,10 +84,16 @@ end
 -- @param cmd_name: this can be command name or full command text that begin with "/" or nothing. 
 function CommandManager:RunCommand(cmd_name, cmd_text, ...)
 	if(not cmd_text) then
-		return self:RunFromConsole(cmd_name, nil);
-	else
-		cmd_text = self:RunInlineCommand(cmd_text, ...);
-		return SlashCommand.GetSingleton():RunCommand(cmd_name, cmd_text, ...);
+		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
+	end
+	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand(cmd_name);
+	if(cmd_class) then
+		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
+			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(format("/%s %s", cmd_name, cmd_text)));
+		elseif(not GameLogic.isRemote or cmd_class:IsLocal()) then
+			cmd_text = self:RunInlineCommand(cmd_text, ...);
+			return SlashCommand.GetSingleton():RunCommand(cmd_name, cmd_text, ...);
+		end
 	end
 end
 
