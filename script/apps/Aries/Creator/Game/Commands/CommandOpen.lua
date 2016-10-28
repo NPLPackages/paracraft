@@ -56,15 +56,7 @@ Examples:
 					protocol = "mcml";
 				end
 			end
-			if(protocol == "http" or protocol == "https") then
-				if(options.p) then
-					_guihelper.MessageBox(L"你确定要打开:"..url, function()
-						ParaGlobal.ShellExecute("open", url, "", "", 1);
-					end)
-				else
-					ParaGlobal.ShellExecute("open", url, "", "", 1);
-				end
-			elseif(protocol == "mcml") then
+			if(protocol == "mcml") then
 				url = url:gsub("^%w+://", "");
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
@@ -97,8 +89,18 @@ Examples:
 							height = 600,
 					};
 				System.App.Commands.Call("File.MCMLWindowFrame", params);
-			elseif(url and url~="")then
-				_guihelper.MessageBox(L"只能打开http://开头的URL地址");
+			elseif(protocol) then
+				if(options.p) then
+					_guihelper.MessageBox(L"你确定要打开:"..url, function()
+						ParaGlobal.ShellExecute("open", url, "", "", 1);
+					end)
+				else
+					ParaGlobal.ShellExecute("open", url, "", "", 1);
+				end
+			else
+				if(url and url~="")then
+					_guihelper.MessageBox(L"只能打开http://开头的URL地址");
+				end
 			end
 		end
 	end,

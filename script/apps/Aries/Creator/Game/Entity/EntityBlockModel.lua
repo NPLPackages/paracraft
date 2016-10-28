@@ -54,7 +54,7 @@ end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 
 function Entity:CreateInnerObject(filename, scale)
-	filename = Files.WorldPathToFullPath(filename, true) or self.default_file;
+	filename = Files.GetFilePath(filename) or self.default_file;
 	local x, y, z = self:GetPosition();
 
 	if(filename == self.default_file) then

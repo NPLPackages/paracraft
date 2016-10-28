@@ -52,6 +52,10 @@ end
 
 SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
 function OnInstallNewPlugins()
+    -- start webserver
+    NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+    WebServer:Start("script/apps/WebServer/admin", "0.0.0.0", 8099);
+    -- open url
     ParaGlobal.ShellExecute("open", SelectModulePage.url_installNewPlugins, "", "", 1);
 end
     

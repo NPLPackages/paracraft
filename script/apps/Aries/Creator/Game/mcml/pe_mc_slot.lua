@@ -105,7 +105,7 @@ function pe_mc_slot.render_callback(mcmlNode, rootName, bindingContext, _parent,
 				local itemStack = mcmlNode.slot:GetStack();
 				if(itemStack) then
 					local tooltip = itemStack:GetTooltip();
-					return "script/apps/Aries/Creator/Game/mcml/item_tooltip.html?text="..tooltip;
+					return "script/apps/Aries/Creator/Game/mcml/item_tooltip.html?text="..(tooltip or "");
 				end
 			end
 		end, mcmlNode:GetNumber("tooltip_offset_x"), mcmlNode:GetNumber("tooltip_offset_y"),
