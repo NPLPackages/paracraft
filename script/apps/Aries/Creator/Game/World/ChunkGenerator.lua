@@ -176,7 +176,8 @@ end
 -- @param dist_from_player: if nil, it will always be in range
 -- return true, if there is still pending chunks
 function ChunkGenerator:TryProcessChunk(cx,cz, dist_from_player)
-	if(self.pending_chunks[GetChunkIndex(cx, cz)]) then
+	local c = self.pending_chunks[GetChunkIndex(cx, cz)];
+	if(c) then
 		if((dist_from_player or 0)<= self.must_gen_dist or self.ProcessedCount < 1) then
 			self.ProcessedCount = self.ProcessedCount + 1;
 			if(self._World) then
@@ -352,6 +353,8 @@ function ChunkGenerator:ApplyChunkData(x,z, chunkData)
 	local index = GetChunkIndex(x, z);
 	local chunk = self.pending_chunks[index];
 	if(type(chunk) == "table") then
+		self.pending_chunks[index] = nil;
+		self.forced_chunks[index] = nil;
 		-- data is available now. 
 		local is_suspended_before = ParaTerrain.GetBlockAttributeObject():GetField("IsLightUpdateSuspended", false);
 		if(not is_suspended_before) then
@@ -362,12 +365,14 @@ function ChunkGenerator:ApplyChunkData(x,z, chunkData)
 
 		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
 			-- copy from chunkData to chunk;
-			chunkData = Chunk:new():InitFromChunkData(chunkData);
-			
-			local ParaTerrain_SetBlockTemplateByIdx = ParaTerrain.SetBlockTemplateByIdx;
-			for worldX, worldY, worldZ, block_id in chunkData:EachBlockW() do
-				ParaTerrain_SetBlockTemplateByIdx(worldX, worldY, worldZ, block_id);
-			end
+			--chunkData = Chunk:new():InitFromChunkData(chunkData);
+			--
+			--local ParaTerrain_SetBlockTemplateByIdx = ParaTerrain.SetBlockTemplateByIdx;
+			--for worldX, worldY, worldZ, block_id in chunkData:EachBlockW() do
+				--ParaTerrain_SetBlockTemplateByIdx(worldX, worldY, worldZ, block_id);
+			--end
+
+			chunk:ApplyMapChunkData(chunkData, 0xffff);
 
 			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
 		end
@@ -511,7 +516,7 @@ NPL.this(function()
 				gen:GenerateChunkImp(chunk, msg.x, msg.z)
 			end
 			NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
-				cmd="ApplyChunkData", data = chunk, x = msg.x, z = msg.z, gen_id = msg.gen_id
+				cmd="ApplyChunkData", data = chunk:GetMapChunkData(), x = msg.x, z = msg.z, gen_id = msg.gen_id
 			});
 		end
 	elseif( msg.cmd == "ApplyChunkData") then

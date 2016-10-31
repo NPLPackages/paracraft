@@ -610,5 +610,5 @@ function NatureV1ChunkGenerator:GetClassAddress()
 end
 
 function NatureV1ChunkGenerator:IsSupportAsyncMode()
-	return false;
+	return true;
 end

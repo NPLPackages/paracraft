@@ -269,8 +269,65 @@ function Chunk:BlockNeedsUpdate(blockX, blockY, blockZ)
 end
 
 
+-- this function matches exactly with the C++ implementation of same function. 
 function Chunk:GetMapChunkData(bIncludeInit, verticalSectionFilter)
-	return;
+	verticalSectionFilter = verticalSectionFilter or 0xffff;
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/BlockDataCodec.lua");
+	local SameIntegerEncoder = commonlib.gettable("MyCompany.Aries.Game.Common.SameIntegerEncoder");
+	local outputStream = ParaIO.open("<memory>", "w");
+
+	-- append version format
+	outputStream:WriteString("chunkV1");
+	local nChunkSize = 0;
+	local nChunkSizeLocation = outputStream:GetFileSize();
+	outputStream:WriteInt(nChunkSize);
+		
+	local blockIdEncoder = SameIntegerEncoder:new():init(outputStream);
+	local blockDataEncoder = SameIntegerEncoder:new():init(outputStream);
+
+	for y = 0, 15 do
+		if ( band(verticalSectionFilter, lshift(1,y)) ~= 0) then
+			outputStream:WriteInt(y);
+			local nBlockCount = 0;
+			local nBlockCountIndex = outputStream:GetFileSize();
+			outputStream:WriteInt(nBlockCount);
+			local pChunk = self._Sections[y];
+			if (pChunk and next(pChunk)) then
+				blockIdEncoder:Reset();
+				local nCount = 4096;
+				for i = 0, nCount do
+					local blockId = pChunk[i];
+					if (blockId) then
+						blockIdEncoder:Append(blockId);
+						nBlockCount = nBlockCount + 1;
+					else
+						blockIdEncoder:Append(0);
+					end
+				end
+				blockIdEncoder:Finalize();
+				-- TODO: data not supported at the moment. 
+				blockDataEncoder:Reset();
+				blockDataEncoder:Append(0, 4096);
+				blockDataEncoder:Finalize();
+			else
+				blockIdEncoder:Reset();
+				blockIdEncoder:Append(0, 4096);
+				blockIdEncoder:Finalize();
+				blockDataEncoder:Reset();
+				blockDataEncoder:Append(0, 4096);
+				blockDataEncoder:Finalize();
+			end
+			outputStream:seek(nBlockCountIndex);
+			outputStream:WriteInt(nBlockCount);
+			outputStream:SetFilePointer(0, 2); -- 2 is relative to end of file
+		end
+	end
+	outputStream:seek(nChunkSizeLocation);
+	outputStream:WriteInt(outputStream:GetFileSize() - nChunkSizeLocation - 4);
+	outputStream:SetFilePointer(0, 2); -- 2 is relative to end of file
+	local data = outputStream:GetText(0, -1);
+	outputStream:close();
+	return data;
 end
 
 function Chunk:ApplyMapChunkData(chunkData, verticalSectionFilter)
