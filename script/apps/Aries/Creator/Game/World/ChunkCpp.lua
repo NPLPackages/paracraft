@@ -128,7 +128,7 @@ end
 
 -- @param pos: section_id
 function Chunk:AddNewSection(pos)
-	local section = Section.Load(self, pos);
+	local section = {};
 	self._Sections[pos] = section;
 	return section;
 end

@@ -65,7 +65,7 @@ function NatureV1ChunkGenerator:InitGen()
 	end
 	self.GenInit = true;
 	local _Seed = self._Seed;
-	LOG.std(nil, "info", "NatureV1ChunkGenerator", "initialized with seed %d", _Seed);
+	LOG.std(nil, "debug", "NatureV1ChunkGenerator", "initialized with seed %d", _Seed);
 
 	self._Gen1 = PerlinNoise:new({seed = _Seed});
     self._Gen2 = PerlinNoise:new({seed = _Seed + 1});
@@ -489,7 +489,7 @@ function NatureV1ChunkGenerator:GenerateFlora(c, x, z)
             local worldZ = bz + z * 16;
 
 			-- search downward from 127 to 64
-			local by = self:FindFirstBlock(worldX, 127, worldZ, 5, 63);
+			local by = self:FindFirstBlock(worldX, 127, worldZ, 5, 63, c);
 			
             if(by and c:GetType(bx, by, bz) == names.Grass) then
 				local worldY = by;
@@ -599,4 +599,16 @@ function NatureV1ChunkGenerator:GenerateChunkImp(chunk, x, z, external)
 	
 	self:GenerateTerrain(chunk, x, z);
 	self:GenerateFlora(chunk, x, z);
+end
+
+-- virtual function: get the class address for sending to worker thread. 
+function NatureV1ChunkGenerator:GetClassAddress()
+	return {
+		filename="script/apps/Aries/Creator/Game/World/generators/NatureV1ChunkGenerator.lua", 
+		classpath="MyCompany.Aries.Game.World.Generators.NatureV1ChunkGenerator"
+	};
+end
+
+function NatureV1ChunkGenerator:IsSupportAsyncMode()
+	return false;
 end

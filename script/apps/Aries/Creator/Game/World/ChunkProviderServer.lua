@@ -106,8 +106,9 @@ function ChunkProviderServer:AutoGenerateChunk(chunk)
 		local timeStamp = chunk:GetTimeStamp();
 		if(timeStamp == 0) then
 			-- only generate if it has not been generated before. 
-			self:GetGenerator():GenerateChunk(chunk, chunk.chunkX, chunk.chunkZ);
-			self:GetWorld():OnChunkGenerated(chunk.chunkX, chunk.chunkZ);
+			if(self:GetGenerator():GenerateChunk(chunk, chunk.chunkX, chunk.chunkZ)) then
+				self:GetWorld():OnChunkGenerated(chunk.chunkX, chunk.chunkZ);
+			end
 		end
 	end
 end

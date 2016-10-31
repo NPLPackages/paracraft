@@ -58,4 +58,12 @@ function ChunkGenerators:GetGeneratorClass(name)
 	return generator;
 end
 
+-- this is usually called from a worker thread
+function ChunkGenerators:GetClassByAddress(address)
+	if(address) then
+		NPL.load(address.filename);
+		local generator = commonlib.gettable(address.classpath);
+		return generator;
+	end
+end
 

@@ -54,6 +54,104 @@ function Chunk:Init(world, chunkX, chunkZ)
 	return self;
 end
 
+-- @param data: is actually another chunk without meta tables. 
+function Chunk:InitFromChunkData(data)
+	self.chunkX = data.chunkX;
+	self.chunkZ = data.chunkZ;
+	self.elapsedTime = data.elapsedTime;
+	self._Sections = data._Sections;
+	self._BiomesArray = data._BiomesArray;
+	return self;
+end
+
+-- @param index: [0, 4096)  16*16*16
+local function UnpackBlockIndex(index)
+	local cy = rshift(index, 8);
+	index = band(index, 0xff);
+	local cz = rshift(index, 4);
+	local cx = band(index, 0xf);
+	return cx, cy, cz;
+end
+
+-- iterator (worldX, worldY, worldZ, block_id) of all blocks in the chunk
+-- block pos is in world coordinate system
+function Chunk:EachBlockW()
+	local iSection, section = next(self._Sections, nil)
+	local packedIndex, block_id;
+	
+	local worldXOffset = self.chunkX*16;
+	local worldYOffset = (iSection or 0)*16;
+	local worldZOffset = self.chunkZ*16;
+	return function()
+		if(section) then
+			packedIndex, block_id = next(section, packedIndex);
+			if(not packedIndex) then
+				iSection, section = next(self._Sections, iSection);
+				if(section) then
+					worldYOffset = iSection*16;
+					packedIndex, block_id = next(section, packedIndex);
+				end
+			end
+		end
+		if(packedIndex) then
+			local worldX, worldY, worldZ = UnpackBlockIndex(packedIndex);
+			return worldXOffset+worldX, worldYOffset+worldY, worldZOffset+worldZ, block_id;
+		end
+	end
+end
+
+-- @param x,y,z: in world coordinates
+-- @param side: 4 upward, 5 downward
+-- @return the distance to first block.
+function Chunk:FindFirstBlock(x, y, z, side, max_dist)
+	x = x - self.chunkX*16;
+	z = z - self.chunkZ*16;
+	max_dist = max_dist or 256;
+	local dist = 0;
+
+	-- skip first block when dist==0
+	dist = dist + 1;
+	if(side == 4) then
+		y = y + 1;
+	elseif(side == 5) then
+		y = y - 1;
+	else
+		return -1;
+	end
+
+	while(y>=0 and y <= 256 and dist <= max_dist) do
+		local section = self._Sections[rshift(y, 4)];
+		if (not section) then
+			if(side == 4) then
+				local new_y = band(y, 0xff0) + 16;
+				dist = dist + (new_y - y);
+				y = new_y;
+			elseif(side == 5) then
+				new_y = band(y, 0xff0) - 1;
+				dist = dist + (y-new_y);
+				y = new_y;
+			else
+				return -1;
+			end
+		else
+			local block_id = section[bor(lshift(band(y,0xF), 8),  bor(lshift(z, 4), x))] or 0;
+			if(block_id == 0) then
+				dist = dist + 1;
+				if(side == 4) then
+					y = y + 1;
+				elseif(side == 5) then
+					y = y - 1;
+				else
+					return -1;
+				end
+			else
+				return dist;
+			end
+		end
+	end
+	return -1;
+end
+
 function Chunk:InitBlockChangesTimer()
 end
 
@@ -111,7 +209,8 @@ end
 
 -- @param pos: section_id
 function Chunk:AddNewSection(pos)
-	local section = Section.Load(self, pos);
+	-- local section = Section.Load(self, pos);
+	local section = {};
 	self._Sections[pos] = section;
 	return section;
 end

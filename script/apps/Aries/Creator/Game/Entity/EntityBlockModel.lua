@@ -16,6 +16,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockModel"));
 
@@ -43,7 +44,6 @@ function Entity:init()
 		self.useRealPhysics = not block_template.obstruction;
 	end
 	self:CreateInnerObject(self.filename, self.scale);
-	self:Refresh();
 	return self;
 end
 
@@ -52,13 +52,21 @@ function Entity:HasRealPhysics()
 	return self.useRealPhysics;
 end
 
+-- @param filename: if nil, self.filename is used
+function Entity:GetModelDiskFilePath(filename)
+	return Files.GetFilePath(filename or self:GetModelFile());
+end
+
 -- this is helper function that derived class can use to create an inner mesh or character object. 
 function Entity:CreateInnerObject(filename, scale)
-	filename = Files.GetFilePath(filename) or self.default_file;
+	filename = Files.GetFilePath(self:GetModelDiskFilePath(filename)) or self.default_file;
 	local x, y, z = self:GetPosition();
 
 	if(filename == self.default_file) then
-		LOG.std(nil, "warn", "EntityBlockModel", "filename: %s not found at %d %d %d", self.filename or "", self.bx or 0, self.by or 0, self.bz or 0);
+		if(self.filename and self.filename~="") then
+			-- TODO: fetch from remote server?
+			LOG.std(nil, "warn", "EntityBlockModel", "filename: %s not found at %d %d %d", self.filename or "", self.bx or 0, self.by or 0, self.bz or 0);	
+		end
 	end
 
 	local model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x,y,z);
@@ -108,12 +116,26 @@ function Entity:setScale(scale)
 	end
 end
 
+function Entity:EndEdit()
+	Entity._super.EndEdit(self);
+end
+
 function Entity:Destroy()
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
 end
 
 function Entity:Refresh()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("assetfile", self:GetModelDiskFilePath() or self.default_file);
+	end
+end
+
+
+function Entity:EndEdit()
+	Entity._super.EndEdit(self);
+	self:MarkForUpdate();
 end
 
 function Entity:LoadFromXMLNode(node)
@@ -144,6 +166,31 @@ function Entity:SaveToXMLNode(node)
 		node.attr.scale = self:getScale();
 	end
 	return node;
+end
+
+-- Overriden in a sign to provide the text.
+function Entity:GetDescriptionPacket()
+	local x,y,z = self:GetBlockPos();
+	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:GetModelFile(), self:getYaw(), self:getScale());
+end
+
+-- update from packet. 
+function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
+	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
+		local filename = packet_UpdateEntityBlock.data1;
+		local yaw = packet_UpdateEntityBlock.data2;
+		local scaling = packet_UpdateEntityBlock.data3;
+		if(filename) then
+			self:SetModelFile(filename);
+		end
+		if(yaw) then
+			self:setYaw(yaw);
+		end
+		if(scaling) then
+			self:setScale(scaling);
+		end
+		self:Refresh();
+	end
 end
 
 -- right click to show item

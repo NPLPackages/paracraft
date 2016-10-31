@@ -56,7 +56,7 @@ function EditModelManipContainer:OnValueChange(name, value)
 	end
 end
 
--- @param node: it should be ItemEditModel object. 
+-- @param node: it should be EntityBlockModel object. 
 function EditModelManipContainer:connectToDependNode(node)
 	local plugPos = node:findPlug(self.PositionPlugName);
 	local plugScale = node:findPlug(self.ScalePlugName);
@@ -95,6 +95,12 @@ function EditModelManipContainer:connectToDependNode(node)
 			self:addPlugToManipConversionCallback(manipYawPlug, function(self, manipPlug)
 				return plugYaw:GetValue() or 0;
 			end);
+		end
+
+		-- force Begin/End edit pairs for updating result to network.
+		if(node.BeginEdit) then
+			node:BeginEdit();
+			self:Connect("beforeDestroyed", node, "EndEdit"); 
 		end
 	end
 	-- should be called only once after all conversion callbacks to setup real connections

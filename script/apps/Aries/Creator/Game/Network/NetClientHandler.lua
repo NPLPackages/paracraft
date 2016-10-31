@@ -492,6 +492,13 @@ function NetClientHandler:handleUpdateEntitySign(packet_UpdateEntitySign)
 	end
 end
 
+function NetClientHandler:handleUpdateEntityBlock(packet_UpdateEntityBlock)
+	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z)
+	if(blockEntity) then
+		blockEntity:OnUpdateFromPacket(packet_UpdateEntityBlock);
+	end
+end
+
 function NetClientHandler:handleMobSpawn(packet_MobSpawn)
 	local x = packet_MobSpawn.x / 32;
     local y = packet_MobSpawn.y / 32;

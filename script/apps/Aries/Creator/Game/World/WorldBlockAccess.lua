@@ -81,6 +81,20 @@ function WorldBlockAccess:Init(server_manager)
 	self.server_manager = server_manager;
 end
 
+function WorldBlockAccess:GetChunkProvider()
+	return self.chunkProvider;
+end
+
+function WorldBlockAccess:SetChunkProvider(chunkProvider)
+	self.chunkProvider = chunkProvider;
+end
+
+
+function WorldBlockAccess:GetServerManager()
+	return nil;
+end
+
+
 function WorldBlockAccess:GetChunk(chunkX, chunkZ, bCreateIfNotExist)
 	return self:GetChunkProvider():GetChunk(chunkX, chunkZ, bCreateIfNotExist);
 end

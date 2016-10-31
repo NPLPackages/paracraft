@@ -72,4 +72,20 @@ function FlatChunkGenerator:GenerateChunkImp(chunk, x, z, external)
 	self:GenerateFlat(chunk, x, z);
 end
 
+-- virtual function: this is run in worker thread. It should only use data in the provided chunk.
+-- if this function returns false, we will use GenerateChunkImp() instead. 
+function FlatChunkGenerator:GenerateChunkAsyncImp(chunk, x, z)
+	return false
+end
 
+function FlatChunkGenerator:IsSupportAsyncMode()
+	return false;
+end
+
+-- virtual function: get the class address for sending to worker thread. 
+function FlatChunkGenerator:GetClassAddress()
+	return {
+		filename="script/apps/Aries/Creator/Game/World/generators/FlatChunkGenerator.lua", 
+		classpath="MyCompany.Aries.Game.World.Generators.FlatChunkGenerator"
+	};
+end

@@ -8,17 +8,35 @@ Virtual functions:
 	GenerateChunkImp(chunk, x, z, external)
 	OnExit()
 
+	IsSupportAsyncMode
+	GetClassAddress
+	GenerateChunkAsyncImp
+
 Simply overwrite GenerateChunkImp and register the provider by name. 
 see FlatChunkGenerator.lua for example. 
+
+## Generator with async generator. 
+If one wants to enable async generator (running in separate worker threads). 
+One should overwrite `IsSupportAsyncMode` and `GetClassAddress`. 
+There is limitations of non-main thread generator. The `GenerateChunkImp` should only 
+set chunk data base on local information. It can not query or set entity or advanced information 
+that is only available in the main thread. 
+
+See `NatureV1ChunkGenerator` generator for example. 
 
 -----------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
 local ChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator");
 -----------------------------------------------
 ]]
+NPL.load("(gl)script/ide/commonlib.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerators.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/UniversalCoords.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/Chunk.lua");
+local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
+local ChunkGenerators = commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerators");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local UniversalCoords = commonlib.gettable("MyCompany.Aries.Game.Common.UniversalCoords");
-local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 
 local ChunkGenerator = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"))
 
@@ -28,6 +46,8 @@ ChunkGenerator.is_empty_generator = false;
 ChunkGenerator.must_gen_dist = 3;
 -- generate one when camera is not moving. 6*16 = 96 meters 
 ChunkGenerator.max_gen_radius = math.max(ChunkGenerator.must_gen_dist, 6);
+-- max number of generator worker threads in async mode. See IsSupportAsyncMode().
+ChunkGenerator.worker_count = 2;
 
 local function GetChunkIndex(cx,cz)
 	return cx*4096+cz;
@@ -39,7 +59,12 @@ local function UnpackChunkIndex(index)
 	return cx, cz;
 end
 
+
+-- there can be only one generator at a time
+local cur_generator = nil;
+
 function ChunkGenerator:ctor()
+	cur_generator = nil;
 	self.pending_chunks = {}
 	self.forced_chunks = {};
 	self.last_pos = UniversalCoords:new();
@@ -53,6 +78,10 @@ function ChunkGenerator:Init(world, seed)
 	self._World = world;
 	self.cpp_chunk = world.cpp_chunk;
 	return self;
+end
+
+function ChunkGenerator:GetSeed()
+	return self._Seed;
 end
 
 function ChunkGenerator:OnExit()
@@ -80,9 +109,15 @@ function ChunkGenerator:AddPendingChunksFrom(chunkGenerator)
 end
 
 -- @return y : height of the grass block
-function ChunkGenerator:FindFirstBlock(x, y, z, side, dist)
+function ChunkGenerator:FindFirstBlock(x, y, z, side, dist, chunk)
 	if(self.cpp_chunk) then
 		local dist = ParaTerrain.FindFirstBlock(x,y,z,5, dist);
+		if(dist>0) then
+			y = y - dist;
+			return y;
+		end
+	elseif(chunk) then
+		local dist = chunk:FindFirstBlock(x, y, z, side, dist);
 		if(dist>0) then
 			y = y - dist;
 			return y;
@@ -90,18 +125,15 @@ function ChunkGenerator:FindFirstBlock(x, y, z, side, dist)
 	end
 end
 
-function ChunkGenerator:CanSeeTheSky(x, y, z, c)
+function ChunkGenerator:CanSeeTheSky(x, y, z, chunk)
 	if(self.cpp_chunk) then
 		if(y < 128) then
 			return (ParaTerrain.FindFirstBlock(x,y,z,4, 128-y ) < 0);
 		end
-	else
-		local by=y;
-		-- TODO: test opacity instead of Air(0)
-		while(c:GetType(x, by, z) == 0 and by<128) do
-			by = by + 1
+	elseif(chunk) then
+		if(y < 128) then
+			return (chunk:FindFirstBlock(x,y,z,4, 128-y ) < 0);
 		end
-		return by == 128;
 	end
 end
 
@@ -263,10 +295,105 @@ function ChunkGenerator:AddPendingChunk(region_x, region_y, cx, cz)
 	end
 end
 
+
+-- simple function for testing: generate flat plane at given height
+function ChunkGenerator:GeneratePlane(c, x, z, height, block_id)
+	local by = height or 4;
+	block_id = block_id or 62; -- default to grass
+	for bx = 0, 15 do
+		for bz = 0, 15 do
+			c:SetType(bx, by, bz, block_id, false);
+		end
+	end
+end
+
+local workers = {};
+local worker_index = 0;
+-- return the activation file name
+function ChunkGenerator:GetFreeWorkerName()
+	worker_index = (worker_index+1) % (self.worker_count);
+	local worker_name = workers[worker_index];
+	if(not worker_name) then
+		local name = "gen"..worker_index;
+		worker_name = format("(%s)%s", name, "script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
+		workers[worker_index] = worker_name;
+		NPL.CreateRuntimeState(name, 0):Start();
+		local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+		NPL.activate(worker_name, {cmd="InitBlockTypes", names = names});
+		LOG.std(nil, "info", "chunk generator", "generator worker thread `%s` created", name);
+	end
+	return worker_name;
+end
+
+local next_gen_id = 1;
+function ChunkGenerator:GetId()
+	if(not self.id) then
+		self.id = next_gen_id;
+		next_gen_id = next_gen_id + 1;
+	end
+	return self.id;
+end
+
+-- protected function:
+-- @param chunk: 
+function ChunkGenerator:GenerateChunkAsync(chunk, x, z, external)
+	local index = GetChunkIndex(x, z);
+	if(self.pending_chunks[index] ~= true) then
+		return;
+	end
+	self.pending_chunks[index] = chunk;
+	local worker_name = self:GetFreeWorkerName();
+	cur_generator = self;
+	NPL.activate(worker_name, {x=x, z=z, gen_id=self:GetId(), cmd="GenerateChunk", seed = self:GetSeed(), address = self:GetClassAddress()});
+end
+
+-- apply chunk data in main thread
+function ChunkGenerator:ApplyChunkData(x,z, chunkData)
+	local index = GetChunkIndex(x, z);
+	local chunk = self.pending_chunks[index];
+	if(type(chunk) == "table") then
+		-- data is available now. 
+		local is_suspended_before = ParaTerrain.GetBlockAttributeObject():GetField("IsLightUpdateSuspended", false);
+		if(not is_suspended_before) then
+			ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
+		end
+
+		LOG.std(nil, "debug", "ApplyChunkData", "chunk %d %d", x, z);
+
+		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
+			-- copy from chunkData to chunk;
+			chunkData = Chunk:new():InitFromChunkData(chunkData);
+			
+			local ParaTerrain_SetBlockTemplateByIdx = ParaTerrain.SetBlockTemplateByIdx;
+			for worldX, worldY, worldZ, block_id in chunkData:EachBlockW() do
+				ParaTerrain_SetBlockTemplateByIdx(worldX, worldY, worldZ, block_id);
+			end
+
+			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
+		end
+
+		if(not is_suspended_before) then
+			ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
+		end
+
+		if(self._World) then
+			chunk:MarkToSave();
+			chunk:SetTimeStamp(1);
+			chunk:Clear();
+		end
+		return chunk;
+	end
+end
+
 -- public function:
 -- @param chunk: if nil, a new chunk will be created. 
 -- @param x, z: chunk pos
+-- @return chunk if chunk is generated. or nil if it is async generated. 
 function ChunkGenerator:GenerateChunk(chunk, x, z, external)
+	if(self:IsSupportAsyncMode()) then
+		return self:GenerateChunkAsync(chunk, x, z, external);
+	end
+
 	local index = GetChunkIndex(x, z);
 	self.pending_chunks[index] = nil;
 	self.forced_chunks[index] = nil;
@@ -297,11 +424,30 @@ function ChunkGenerator:GenerateChunk(chunk, x, z, external)
 	return chunk;
 end
 
--- protected virtual funtion:
+-- max number of generator worker threads in async mode. See IsSupportAsyncMode().
+function ChunkGenerator:SetWorkerThreadCount(worker_count)
+	self.worker_count = worker_count;
+end
+
+-- virtual function: 
+-- whether this chunk generator can run in any thread, if so, we may run it in several threads. 
+-- if this one returns true, one must also provide GetClassAddress() function
+function ChunkGenerator:IsSupportAsyncMode()
+	return false;
+end
+
+-- virtual function: get the class address for sending to worker thread. 
+function ChunkGenerator:GetClassAddress()
+	LOG.std(nil, "warn", "ChunkGenerator", "GetClassAddress must be implemented if IsSupportAsyncMode() returns true");
+	return {filename="script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", classpath="MyCompany.Aries.Game.World.ChunkGenerator"}
+end
+
+-- protected virtual funtion: overwrite this function to provide your own chunk generator
 -- generate chunk for the entire chunk column at x, z
 -- @param chunk: chunk object
 -- @param x, z: chunk pos
 function ChunkGenerator:GenerateChunkImp(chunk, x, z, external)
+	LOG.std(nil, "warn", "ChunkGenerator", "GenerateChunkImp not implemented");
 	-- TODO: call lots of set blocks here in your custom chunk provider. for example:
 	--local block_id, block_data = 62, 0;
 	--for by = 0, 1 do
@@ -315,3 +461,67 @@ function ChunkGenerator:GenerateChunkImp(chunk, x, z, external)
 		--end
 	--end
 end
+
+-- virtual function: this is run in worker thread. It should only use data in the provided chunk.
+-- if this function returns false, we will use GenerateChunkImp() instead. 
+function ChunkGenerator:GenerateChunkAsyncImp(chunk, x, z)
+	return false
+end
+
+-- return gen_id of the most recent request
+local function VerifyOutOfWorldRequest()
+	local thread = __rts__;
+	local nSize = thread:GetCurrentQueueSize();
+	local processed;
+	local gen_id;
+	for i=nSize-1, 0, -1 do
+		local msg = thread:PeekMessage(i, {filename=true, msg=true});
+		if( msg and msg.filename == "script/apps/Aries/Creator/Game/World/ChunkGenerator.lua" and type(msg.msg)=="table" and msg.msg.cmd == "GenerateChunk") then
+			if(not gen_id) then
+				gen_id = msg.msg.gen_id;
+			else
+				if(msg.msg.gen_id ~= gen_id) then
+					LOG.std(nil, "debug", "GenerateChunkAsync", "skipping out of world chunk %d %d", msg.msg.x, msg.msg.z);
+					-- pop message without processing it
+					thread:PopMessageAt(i, {});
+					i = i + 1;
+				end
+			end
+		end
+	end
+	return gen_id;
+end
+
+NPL.this(function()
+	local msg = msg;
+	if( msg.cmd == "GenerateChunk") then
+		-- TODO: peek message queue and remove chunks whose gen_id is different from the top. 
+		if((VerifyOutOfWorldRequest() or msg.gen_id) ~= msg.gen_id) then
+			LOG.std(nil, "debug", "GenerateChunkAsync", "skipping out of world chunk %d %d", msg.x, msg.z);
+			return;
+		end
+		local generator = ChunkGenerators:GetClassByAddress(msg.address);
+		local world = {};
+		local gen = generator:new():Init(world, msg.seed);
+		if(gen) then
+			local chunk = Chunk:new():Init(world, msg.x, msg.z);
+			LOG.std(nil, "debug", "GenerateChunkAsync", "chunk %d %d", msg.x, msg.z);
+			-- create chunk and world.
+			if(not gen:GenerateChunkAsyncImp(chunk, msg.x, msg.z)) then
+				gen:GenerateChunkImp(chunk, msg.x, msg.z)
+			end
+			NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
+				cmd="ApplyChunkData", data = chunk, x = msg.x, z = msg.z, gen_id = msg.gen_id
+			});
+		end
+	elseif( msg.cmd == "ApplyChunkData") then
+		if(cur_generator and cur_generator:GetId() == msg.gen_id) then
+			cur_generator:ApplyChunkData(msg.x, msg.z, msg.data);
+		else
+			LOG.std(nil, "debug", "GenerateChunkAsync", "discard out of world chunk %d %d", msg.x, msg.z);
+		end
+	elseif( msg.cmd == "InitBlockTypes") then
+		local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+		commonlib.partialcopy(names, msg.names);
+	end
+end);
