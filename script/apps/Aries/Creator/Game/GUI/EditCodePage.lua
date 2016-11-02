@@ -83,7 +83,7 @@ end
 
 function EditCodePage.GetScriptFileName()
 	local content = curItemStack:GetData();
-	if(type(content) == "string" and content:match("%.lua$")) then
+	if(type(content) == "string" and (content:match("%.lua$") or content:match("%.npl$"))) then
 		return content;
 	end
 end

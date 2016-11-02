@@ -37,7 +37,7 @@ function OnClickFile(node)
 		    if(text and text~="") then
 			   Page:SetUIValue("filecontent", text);
                CreateNewNeuronScriptFile.template_file = {filename=filename, name=name, text=node.Text};
-               local default_filename = filename:match("([%w_]+%.lua)$");
+               local default_filename = filename:match("([%w_]+%.%w+)$");
                if(default_filename) then
                     Page:SetUIValue("filename", default_filename);
                end
@@ -93,7 +93,7 @@ function OnClickOK()
         end, _guihelper.MessageBoxButtons.YesNo);
         return;
     end
-    if(not filename:match("%.lua$")) then
+    if(not filename:match("%.%w+$")) then
         filename = filename..".lua";
     end
     filename = "script/blocks/"..filename;
@@ -179,7 +179,7 @@ end
                             </pe:treeview>
                         </pe:tab-item>
                         <pe:tab-item name="tabLocalFile" class="mc_paper_panel" text='<%=L"已有文件"%>' style="padding-top:5px">
-                            <pe:filebrowser style="background:;" name="scriptFileBrowser" rootfolder='<%=GetScriptRootFolder() %>' filter="*.lua" onclick="OnSelectFile"/>
+                            <pe:filebrowser style="background:;" name="scriptFileBrowser" rootfolder='<%=GetScriptRootFolder() %>' filter="*.lua;*.npl" onclick="OnSelectFile"/>
                         </pe:tab-item>
                     </pe:tabs>
                 </div>

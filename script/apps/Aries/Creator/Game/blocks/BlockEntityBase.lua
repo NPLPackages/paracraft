@@ -71,11 +71,11 @@ end
 
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
-function block:OnClick(x, y, z, mouse_button, entity, side)
+function block:OnClick(x, y, z, mouse_button, triggerEntity, side)
 	if(self.hasAction) then
 		local entity = self:GetBlockEntity(x,y,z)
 		if(entity) then
-			return entity:OnClick(x,y,z, mouse_button, entity, side);
+			return entity:OnClick(x,y,z, mouse_button, triggerEntity, side);
 		end
 	end
 end

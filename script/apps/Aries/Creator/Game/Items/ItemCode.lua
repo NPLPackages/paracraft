@@ -11,7 +11,6 @@ local item_ = ItemCode:new({icon,});
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
-local Player = commonlib.gettable("MyCompany.Aries.Player");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")

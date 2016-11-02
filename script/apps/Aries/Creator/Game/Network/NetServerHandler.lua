@@ -292,6 +292,11 @@ end
 
 function NetServerHandler:handleClickEntity(packet_ClickEntity)
 	local playerEntity = self:GetEntityByID(packet_ClickEntity.playerEntityId);
+	if(playerEntity ~= self.playerEntity) then
+		-- TODO: we only allow click event on behalf of the client player.
+		playerEntity = self.playerEntity;
+	end
+
 	local targetEntity;
 	if(packet_ClickEntity.targetBlockX) then
 		targetEntity = EntityManager.GetBlockEntity(packet_ClickEntity.targetBlockX, packet_ClickEntity.targetBlockY, packet_ClickEntity.targetBlockZ);
