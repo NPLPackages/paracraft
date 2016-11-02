@@ -3,6 +3,9 @@ Title: Block Model
 Author(s): LiXizhi
 Date: 2015/5/25
 Desc: 
+- non-physics model: left click to activate and ctrl+right click to edit model.
+- physics model: left click to activate and right click to edit model.
+
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockModel.lua");
@@ -10,6 +13,10 @@ local EntityBlockModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
+local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
+local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -33,6 +40,9 @@ Entity.is_regional = true;
 Entity.default_file = "character/common/headquest/headquest.x";
 
 function Entity:ctor()
+	self.inventory = self.inventory or InventoryBase:new():Init();
+	self.inventoryView = ContainerView:new():Init(self.inventory);
+	self.inventory:SetClient();
 end
 
 function Entity:init()
@@ -55,6 +65,16 @@ end
 -- @param filename: if nil, self.filename is used
 function Entity:GetModelDiskFilePath(filename)
 	return Files.GetFilePath(filename or self:GetModelFile());
+end
+
+-- the title text to display (can be mcml)
+function Entity:GetBagTitle()
+	return L"背包";
+end
+
+-- bool: whether show the bag panel
+function Entity:HasBag()
+	return true;
 end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 
@@ -193,22 +213,6 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 	end
 end
 
--- right click to show item
-function Entity:OnClick(x, y, z, mouse_button)
-	local obj = self:GetInnerObject();
-	if(obj) then
-		-- check if the entity has mount position. If so, we will set current player to this location.  
-		if(obj:HasAttachmentPoint(0)) then
-			local x, y, z = obj:GetAttachmentPosition(0);
-			local entityPlayer = EntityManager.GetPlayer();
-			if(entityPlayer) then
-				entityPlayer:SetPosition(x,y,z);
-			end
-			return true;
-		end
-	end
-end
-
 function Entity:OnBlockAdded(x,y,z)
 	if(not self.facing) then
 		--self.facing = Direction.GetFacingFromCamera();
@@ -220,6 +224,56 @@ function Entity:OnBlockAdded(x,y,z)
 	end
 end
 
--- called every frame
-function Entity:FrameMove(deltaTime)
+function Entity:HasAnyRule()
+	return (self.cmd or "")~="" or not self.inventory:IsEmpty();
 end
+
+-- called when the user clicks on the block
+-- @return: return true if it is an action block and processed . 
+function Entity:OnClick(x, y, z, mouse_button, entity, side)
+	if(GameLogic.isRemote) then
+		if(mouse_button=="left") then
+			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+		end
+	else
+		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+			local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+			if(ctrl_pressed or self:HasRealPhysics()) then
+				self:OpenEditor("entity", entity);
+				return true;
+			end
+		elseif(mouse_button=="left") then
+			self:OnActivated(entity);
+		end
+	end
+
+	-- this is run for both client and server. 
+	if(entity and entity == EntityManager.GetPlayer()) then
+		local obj = self:GetInnerObject();
+		if(obj) then
+			-- check if the entity has mount position. If so, we will set current player to this location.  
+			if(obj:HasAttachmentPoint(0)) then
+				local x, y, z = obj:GetAttachmentPosition(0);
+				local entityPlayer = entity;
+				if(entityPlayer) then
+					entityPlayer:SetPosition(x,y,z);
+				end
+				return true;
+			end
+		end
+	end
+	
+	if(self:HasRealPhysics() or self:HasAnyRule()) then
+		return true;
+	end
+end
+
+-- virtual function: handle some external input. 
+-- default is do nothing. return true is something is processed. 
+function Entity:OnActivated(triggerEntity)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua");
+	local EntityCommandBlock = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock")
+	-- tricky: just emulate the command block. 
+	EntityCommandBlock.ExecuteCommand(self, triggerEntity, true, true);
+end
+

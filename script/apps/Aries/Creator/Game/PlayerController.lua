@@ -422,8 +422,8 @@ function PlayerController:OnClickBlock(block_id, bx, by, bz, mouse_button, entit
 end
 
 -- return true if processed. 
-function PlayerController:OnClickEntity(target_entity, bx, by, bz, mouse_button)
+function PlayerController:OnClickEntity(target_entity, bx, by, bz, mouse_button, triggerEntity)
 	if(target_entity) then
-		return target_entity:OnClick(bx, by, bz, mouse_button);
+		return target_entity:OnClick(bx, by, bz, mouse_button, triggerEntity);
 	end
 end

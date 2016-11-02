@@ -292,8 +292,13 @@ end
 
 function NetServerHandler:handleClickEntity(packet_ClickEntity)
 	local playerEntity = self:GetEntityByID(packet_ClickEntity.playerEntityId);
-	local targetEntity = self:GetEntityByID(packet_ClickEntity.targetEntityId);
-	GameLogic.GetPlayerController():OnClickEntity(target_entity, packet_ClickEntity.x, packet_ClickEntity.y, packet_ClickEntity.z, packet_ClickEntity.mouse_button);
+	local targetEntity;
+	if(packet_ClickEntity.targetBlockX) then
+		targetEntity = EntityManager.GetBlockEntity(packet_ClickEntity.targetBlockX, packet_ClickEntity.targetBlockY, packet_ClickEntity.targetBlockZ);
+	else
+		targetEntity = self:GetEntityByID(packet_ClickEntity.targetEntityId);	
+	end
+	GameLogic.GetPlayerController():OnClickEntity(targetEntity, packet_ClickEntity.x, packet_ClickEntity.y, packet_ClickEntity.z, packet_ClickEntity.mouse_button, playerEntity);
 end
 
 function NetServerHandler:handleEntityMetadata(packet_EntityMetadata)

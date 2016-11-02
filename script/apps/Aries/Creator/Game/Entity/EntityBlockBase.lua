@@ -69,7 +69,9 @@ end
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
-		-- GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+		if(mouse_button == "left") then
+			-- GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+		end
 		return true;
 	else
 		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then

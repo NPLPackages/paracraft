@@ -145,19 +145,6 @@ function EditModelTask:ShowPage()
 	});
 end
 
-
-function EditModelTask:mousePressEvent(event)
-	if(not GameLogic.GameMode:IsEditor()) then
-		return;
-	end
-	if(event:button() == "left") then
-		self:PickModelAtMouse();
-		event:accept();
-	else
-		self:GetSceneContext():mousePressEvent(event);
-	end
-end
-
 -- @param result: can be nil
 function EditModelTask:PickModelAtMouse(result)
 	local result = result or Game.SelectionManager:MousePickBlock(true, true, false);
@@ -165,17 +152,22 @@ function EditModelTask:PickModelAtMouse(result)
 		local x,y,z = result.blockX,result.blockY,result.blockZ;
 		local modelEntity = BlockEngine:GetBlockEntity(x,y,z) or result.entity;
 		if(modelEntity and modelEntity:isa(EntityManager.EntityBlockModel)) then
-			self:SelectModel(modelEntity);
+			return modelEntity;
 		end
 	end
 end
 
-function EditModelTask:mouseReleaseEvent(event)
-	if(event:button() == "left") then
-		-- TODO: 
-		event:accept();
-	else
-		self:GetSceneContext():mouseReleaseEvent(event);
+function EditModelTask:handleLeftClickScene(event, result)
+	local modelEntity = self:PickModelAtMouse();
+	if(modelEntity) then
+		self:SelectModel(modelEntity);
+	end
+end
+
+function EditModelTask:handleRightClickScene(event, result)
+	local modelEntity = self:PickModelAtMouse();
+	if(modelEntity) then
+		modelEntity:OpenEditor("entity", modelEntity);
 	end
 end
 

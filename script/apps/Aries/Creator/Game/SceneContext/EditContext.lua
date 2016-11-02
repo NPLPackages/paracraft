@@ -123,7 +123,13 @@ function EditContext:handleLeftClickScene(event, result)
 			local is_processed
 			if(not is_shift_pressed and not alt_pressed and not ctrl_pressed and result and result.blockX) then
 				-- if it is a left click, first try the game logics if it is processed. such as an action neuron block.
-				is_processed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side);
+				if(result.entity and result.entity:IsBlockEntity() and result.entity:GetBlockId() == result.block_id) then
+					-- this fixed a bug where block entity is larger than the block like the physics block model.
+					local bx, by, bz = result.entity:GetBlockPos();
+					is_processed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, bx, by, bz, event.mouse_button, EntityManager.GetPlayer(), result.side);	
+				else
+					is_processed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side);	
+				end
 			end
 			if(not is_processed) then
 				if(alt_pressed and result and result.blockX) then

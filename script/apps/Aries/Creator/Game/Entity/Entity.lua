@@ -657,7 +657,7 @@ end
 -- default is do nothing. return true is something is processed. 
 function Entity:OnActivated(triggerEntity)
 	if(self == triggerEntity) then
-		self:ActivateRules();
+		self:ActivateRules(triggerEntity);
 	end
 end
 
@@ -764,7 +764,7 @@ end
 -- this function is called automatically when this entity is activated. 
 -- override this function to change behavior.
 -- build, reload and activate all rules in the self.rulebag
-function Entity:ActivateRules()
+function Entity:ActivateRules(triggerEntity)
 	if(self.rulebag) then
 		-- clear all time event
 		self:ClearTimeEvent();

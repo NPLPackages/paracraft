@@ -2,25 +2,46 @@
 Title: Base class for generating Chunks
 Author(s): LiXizhi
 Date: 2013/8/27, refactored 2015.11.17
-Desc: There can be many custom chunk providers deriving from this class. 
+Desc: 
+There can be many custom chunk providers deriving from this base class. 
+
+```
 Virtual functions:
 	Init(world, seed)
 	GenerateChunkImp(chunk, x, z, external)
+	PostGenerateChunkImp(chunk, x, z)
 	OnExit()
 
 	IsSupportAsyncMode
 	GetClassAddress
 	GenerateChunkAsyncImp
+```
 
-Simply overwrite GenerateChunkImp and register the provider by name. 
-see FlatChunkGenerator.lua for example. 
+## Synchronous generator
+By default generator runs in the main thread, so that your generator can safely use all API. 
+Simply derive from `ChunkGenerator` and overwrite `GenerateChunkImp`, and register the provider by name. 
 
-## Generator with async generator. 
-If one wants to enable async generator (running in separate worker threads). 
-One should overwrite `IsSupportAsyncMode` and `GetClassAddress`. 
-There is limitations of non-main thread generator. The `GenerateChunkImp` should only 
-set chunk data base on local information. It can not query or set entity or advanced information 
-that is only available in the main thread. 
+see `FlatChunkGenerator.lua` for example. 
+
+## Asynchronous generator
+Some generators may take a long time to compute and generate large number of blocks. 
+It becomes impossible to run it in the main thread without dropping render frame rates. 
+In such occasions, one needs to use asynchronous generator, which runs in one or more worker threads. 
+Actually, you can turn your synchronous generator into asynchronous ones by simply 
+overwriting `IsSupportAsyncMode` and `GetClassAddress` method. 
+
+If `IsSupportAsyncMode` returns true, the chunk provider will send each chunk request 
+to one of the worker threads for processing (see `SetWorkerThreadCount` function). 
+The worker thread picks up the request and recreate the chunk provider instance 
+based on `GetClassAddress` in that thread and pass a fake in-memory `Chunk` object (see also Chunk.lua)
+to its `GenerateChunkImp` function. Finally it sends back the data in `Chunk` object in compressed
+binary format to the main thread, which will apply the chunk data to the real `ChunkCpp` object (see also ChunkCpp.lua) in the main thread. 
+BTW, applying all chunk data to chunk column in one API may be one-hundred times faster than setting individual blocks in the chunk. 
+
+However, there is limitations of asynchronous generator. The `GenerateChunkImp` should only 
+set or get chunk data based on the requested chunk only. It can not query or set entities or advanced information 
+that is only available in the main thread. However, one can overwrite `PostGenerateChunkImp` to generate 
+some add-on blocks/entities in the main thread, because `PostGenerateChunkImp` is always called for both async and sync mode in the main thread.
 
 See `NatureV1ChunkGenerator` generator for example. 
 
@@ -361,18 +382,11 @@ function ChunkGenerator:ApplyChunkData(x,z, chunkData)
 			ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
 		end
 
-		LOG.std(nil, "debug", "ApplyChunkData", "chunk %d %d", x, z);
+		-- LOG.std(nil, "debug", "ApplyChunkData", "chunk %d %d", x, z);
 
 		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
-			-- copy from chunkData to chunk;
-			--chunkData = Chunk:new():InitFromChunkData(chunkData);
-			--
-			--local ParaTerrain_SetBlockTemplateByIdx = ParaTerrain.SetBlockTemplateByIdx;
-			--for worldX, worldY, worldZ, block_id in chunkData:EachBlockW() do
-				--ParaTerrain_SetBlockTemplateByIdx(worldX, worldY, worldZ, block_id);
-			--end
-
 			chunk:ApplyMapChunkData(chunkData, 0xffff);
+			self:PostGenerateChunkImp(chunk, x, z);
 
 			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
 		end
@@ -413,6 +427,7 @@ function ChunkGenerator:GenerateChunk(chunk, x, z, external)
 
 		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
 			self:GenerateChunkImp(chunk, x, z, external);
+			self:PostGenerateChunkImp(chunk, x, z);
 			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
 		end
 
@@ -467,6 +482,11 @@ function ChunkGenerator:GenerateChunkImp(chunk, x, z, external)
 	--end
 end
 
+-- virtual function:
+-- This is always called for both async and sync mode in the main thread.
+function ChunkGenerator:PostGenerateChunkImp(chunk, x, z)
+end
+
 -- virtual function: this is run in worker thread. It should only use data in the provided chunk.
 -- if this function returns false, we will use GenerateChunkImp() instead. 
 function ChunkGenerator:GenerateChunkAsyncImp(chunk, x, z)
@@ -500,14 +520,21 @@ end
 NPL.this(function()
 	local msg = msg;
 	if( msg.cmd == "GenerateChunk") then
-		-- TODO: peek message queue and remove chunks whose gen_id is different from the top. 
+		-- peek message queue and remove chunks whose gen_id is different from the top. 
 		if((VerifyOutOfWorldRequest() or msg.gen_id) ~= msg.gen_id) then
 			LOG.std(nil, "debug", "GenerateChunkAsync", "skipping out of world chunk %d %d", msg.x, msg.z);
 			return;
 		end
-		local generator = ChunkGenerators:GetClassByAddress(msg.address);
-		local world = {};
-		local gen = generator:new():Init(world, msg.seed);
+		
+		if(not cur_generator or cur_generator.id ~= msg.gen_id or cur_generator:GetSeed() ~= msg.seed) then
+			local world = {};
+			local generator = ChunkGenerators:GetClassByAddress(msg.address);
+			cur_generator = generator:new():Init(world, msg.seed);
+			cur_generator.id = msg.gen_id;
+		end
+
+		local gen = cur_generator;
+		
 		if(gen) then
 			local chunk = Chunk:new():Init(world, msg.x, msg.z);
 			LOG.std(nil, "debug", "GenerateChunkAsync", "chunk %d %d", msg.x, msg.z);
@@ -528,5 +555,8 @@ NPL.this(function()
 	elseif( msg.cmd == "InitBlockTypes") then
 		local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 		commonlib.partialcopy(names, msg.names);
+	elseif( msg.cmd == "ReleaseGenerator") then
+		cur_generator = nil;
+		collectgarbage("collect");
 	end
 end);

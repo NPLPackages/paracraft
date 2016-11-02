@@ -1,11 +1,18 @@
 --[[
-Title: Chunk
+Title: Chunk column
 Author(s): LiXizhi
 Date: 2013/8/27
-Desc: 16*16(*256) block columns
+Desc: This is in-memory implementation of Chunk column. 
+A chunk column contains 16*16(*256) blocks. 
+Each vertical section contains 16^3 blocks. 
 -----------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/Chunk.lua");
 local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
+
+chunkData = Chunk:new():InitFromChunkData(chunkData);
+for worldX, worldY, worldZ, block_id in chunkData:EachBlockW() do
+	ParaTerrain.SetBlockTemplateByIdx(worldX, worldY, worldZ, block_id);
+end
 -----------------------------------------------
 ]]
 NPL.load("(gl)script/ide/timer.lua");
@@ -295,7 +302,7 @@ function Chunk:GetMapChunkData(bIncludeInit, verticalSectionFilter)
 			if (pChunk and next(pChunk)) then
 				blockIdEncoder:Reset();
 				local nCount = 4096;
-				for i = 0, nCount do
+				for i = 0, nCount-1 do
 					local blockId = pChunk[i];
 					if (blockId) then
 						blockIdEncoder:Append(blockId);

@@ -717,7 +717,14 @@ function BaseContext:handleRightClickScene(event, result)
 		if(click_data.right_holding_time<400) then
 			if(not event.is_shift_pressed and not event.alt_pressed and result.block_id and result.block_id>0) then
 				-- if it is a right click, first try the game logics if it is processed. such as an action neuron block.
-				isProcessed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side);
+				if(result.entity and result.entity:IsBlockEntity() and result.entity:GetBlockId() == result.block_id) then
+					-- this fixed a bug where block entity is larger than the block like the physics block model.
+					local bx, by, bz = result.entity:GetBlockPos();
+					isProcessed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, bx, by, bz, event.mouse_button, EntityManager.GetPlayer(), result.side);
+				else
+					isProcessed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side);
+				end
+				
 			end
 		end
 	end

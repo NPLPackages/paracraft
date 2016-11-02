@@ -16,9 +16,9 @@ virtual or redirected functions:
 	mouseWheelEvent(event)
 	keyPressEvent(event)
 	
-	handleLeftClickScene(event)
-	handleRightClickScene(event)
-	handleMiddleClickScene(event)
+	handleLeftClickScene(event, result)
+	handleRightClickScene(event, result)
+	handleMiddleClickScene(event, result)
 	handlePlayerKeyEvent(event)
 	UpdateManipulators()
 
@@ -96,10 +96,10 @@ function RedirectContext:OnUnselect()
 end
 
 -- return true if redirection occurs
-function RedirectContext:RedirectEvent(eventName, event)
+function RedirectContext:RedirectEvent(eventName, event, ...)
 	if(self.redirect_cmd and self.redirect_cmd[eventName] and not self.is_redirecting) then
 		self.is_redirecting = true;
-		self.redirect_cmd[eventName](self.redirect_cmd, event);
+		self.redirect_cmd[eventName](self.redirect_cmd, event, ...);
 		self.is_redirecting = false;
 		return true;
 	end
@@ -141,20 +141,20 @@ function RedirectContext:mouseMoveEvent(event)
 	end
 end
 
-function RedirectContext:handleLeftClickScene(event)
-	if(self:RedirectEvent("handleLeftClickScene", event)) then
+function RedirectContext:handleLeftClickScene(event, result)
+	if(self:RedirectEvent("handleLeftClickScene", event, result)) then
 		return;
 	end
 end
 
-function RedirectContext:handleRightClickScene(event)
-	if(self:RedirectEvent("handleRightClickScene", event)) then
+function RedirectContext:handleRightClickScene(event, result)
+	if(self:RedirectEvent("handleRightClickScene", event, result)) then
 		return;
 	end
 end
 
-function RedirectContext:handleMiddleClickScene(event)
-	if(self:RedirectEvent("handleMiddleClickScene", event)) then
+function RedirectContext:handleMiddleClickScene(event, result)
+	if(self:RedirectEvent("handleMiddleClickScene", event, result)) then
 		return;
 	end
 	return RedirectContext._super.handleMiddleClickScene(self, event);

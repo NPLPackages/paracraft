@@ -119,6 +119,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 						local entity = BlockEngine:GetBlockEntity(bx, by, bz);
 						if(entity) then
 							result.entity = entity;
+							result.block_id = result.block_id or entity:GetBlockId();
 							result.blockY = blockY; -- restore blockY-1 in case terrain point is picked. 
 						end
 					end

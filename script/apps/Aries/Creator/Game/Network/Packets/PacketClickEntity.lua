@@ -22,7 +22,12 @@ function PacketClickEntity:Init(playerEntity, targetEntity, mouse_button, x, y, 
 		self.playerEntityId = playerEntity.entityId;
 	end
 	if(targetEntity) then
-		self.targetEntityId = targetEntity.entityId;
+		if(targetEntity:IsBlockEntity()) then
+			local x,y,z = targetEntity:GetBlockPos();
+			self.targetBlockX, self.targetBlockY, self.targetBlockZ = x, y, z;
+		else
+			self.targetEntityId = targetEntity.entityId;	
+		end
 	end
 	self.mouse_button = mouse_button;
 	self.x = x;
