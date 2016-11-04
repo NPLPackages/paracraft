@@ -888,7 +888,7 @@ local jquery_metatable = {
 			setmetatable(func, {
 				-- the first parameter is always the mcml_node. 
 				-- the return value is always the last node's result
-				__call = function(self, ...)
+				__call = function(self, self1, ...)
 					local output;
 					local i, node
 					for i, node in ipairs(t) do
@@ -907,28 +907,39 @@ local jquery_metatable = {
 }
 
 -- provide jquery-like syntax to find all nodes that match a given name pattern and then use the returned object to invoke a method on all returned nodes. 
---  e.g. node:jquery("a").show();
--- @param pattern: The valid format is [tag_name][#name_id][.class_name]. 
+-- it can also be used to create a new node like "<div />"
+--  e.g. node:jquery("a"):show();
+-- @param pattern: The valid format is [tag_name][#name_id][.class_name] or "<tag_name />". 
 --  e.g. "div#name.class_name", "#some_name", ".some_class", "div"
-function mcml.baseNode:jquery(pattern)
-	local output = {}
-	if(pattern) then
-		local tag_name, pattern = pattern:match("^([^#%.]*)(.*)");
-		if(tag_name == "") then
-			tag_name = nil;
-		end
-		local id;
+--  e.g. "<div />" will create a new node. 
+-- @param param1: additional xml node when pattern is "<tag_name />"
+function mcml.baseNode:jquery(pattern, param1)
+	local tagName = pattern and pattern:match("^<([^%s/>]*)");
+	if(tagName) then
+		param1 = param1 or {name=tagName, attr={}};
+		param1.name = param1.name or tagName;
+		return System.mcml.new(nil, param1);
+	else
+		local output = {}
 		if(pattern) then
-			id = pattern:match("#([^#%.]+)");
+			local tag_name, pattern = pattern:match("^([^#%.]*)(.*)");
+			if(tag_name == "") then
+				tag_name = nil;
+			end
+			local id;
+			if(pattern) then
+				id = pattern:match("#([^#%.]+)");
+			end
+			local class_name;
+			if(pattern) then
+				class_name = pattern:match("%.([^#%.]+)");
+			end
+			self:GetAllChildWithNameIDClass(tag_name, id, class_name, output);
+		
 		end
-		local class_name;
-		if(pattern) then
-			class_name = pattern:match("%.([^#%.]+)");
-		end
-		self:GetAllChildWithNameIDClass(tag_name, id, class_name, output);
+		setmetatable(output, jquery_metatable)
+		return output;
 	end
-	setmetatable(output, jquery_metatable)
-	return output;
 end
 
 -- show this node. one may needs to refresh the page if page is already rendered
@@ -949,6 +960,16 @@ function mcml.baseNode:text()
 	else
 		return ""
 	end
+end
+
+-- get ui or node value of the node. 
+function mcml.baseNode:value()
+	local value_ = self:GetUIValue();
+	if(value_==nil) then
+		return self:GetValue();
+	else
+		return value_;	
+	end	
 end
 
 -- return a table containing all child nodes whose name is name. (it will search recursively)

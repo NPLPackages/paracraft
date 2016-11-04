@@ -21,6 +21,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 local OpenCommand = {};
 
+local mcml2_window = nil;
+
 Commands["open"] = {
 	name="open", 
 	quick_ref="/open [-p] [-d] url", 
@@ -33,8 +35,8 @@ Examples:
 /open npl://learn	open NPL code wiki pages
 /open -d temp/
 /open hello.html  open mcml file relative to world or root directory. Page is always center aligned and auto sized.
-/open mcml://hello.html     same as above.  
-
+/open mcml://hello.html     open with mcml v1
+/open mcml2://hello.html    open with mcml v2
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
@@ -56,7 +58,7 @@ Examples:
 					protocol = "mcml";
 				end
 			end
-			if(protocol == "mcml") then
+			if(protocol == "mcml" or protocol == "mcml1" or protocol == "mcml2") then
 				url = url:gsub("^%w+://", "");
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
@@ -66,29 +68,49 @@ Examples:
 					LOG.std(nil, "warn", "cmd_open", "can not find file %s", url);
 					return;
 				end
-				local params = {
-						url = filepath, 
-						name = "cmd_open.ShowPage", 
-						isShowTitleBar = false,
+
+				if(protocol == "mcml" or protocol == "mcml1") then
+					local params = {
+							url = filepath, 
+							name = "cmd_open.ShowPage", 
+							isShowTitleBar = false,
+							DestroyOnClose = true,
+							bToggleShowHide=false, 
+							style = CommonCtrl.WindowFrame.ContainerStyle,
+							allowDrag = true,
+							enable_esc_key = true,
+							bShow = true,
+							click_through = false, 
+							refresh = true,
+							zorder = 1,
+							app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+							bAutoSize = true,
+							directPosition = true,
+								align = "_ct",
+								x = -400,
+								y = -300,
+								width = 800,
+								height = 600,
+						};
+					System.App.Commands.Call("File.MCMLWindowFrame", params);
+				
+				elseif(protocol == "mcml2") then
+					-- remove old window
+					if(mcml2_window and mcml2_window.CloseWindow) then
+						mcml2_window:CloseWindow(true);
+					end
+					-- create a new window
+					NPL.load("(gl)script/ide/System/Windows/Window.lua");
+					local Window = commonlib.gettable("System.Windows.Window");
+					mcml2_window = Window:new();
+					mcml2_window:Show({
+						url=filepath, 
 						DestroyOnClose = true,
-						bToggleShowHide=false, 
-						style = CommonCtrl.WindowFrame.ContainerStyle,
-						allowDrag = true,
 						enable_esc_key = true,
-						bShow = true,
-						click_through = false, 
-						refresh = true,
-						zorder = 1,
-						app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-						bAutoSize = true,
-						directPosition = true,
-							align = "_ct",
-							x = -400,
-							y = -300,
-							width = 800,
-							height = 600,
-					};
-				System.App.Commands.Call("File.MCMLWindowFrame", params);
+						alignment="_ct", left = -400, top = -300, width = 800, height = 600,
+					});
+				end
+
 			elseif(protocol) then
 				if(options.p) then
 					_guihelper.MessageBox(L"你确定要打开:"..url, function()

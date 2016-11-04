@@ -31,10 +31,10 @@ MyApp.MyPage:Create("instanceName", _parent, "_fi", 0, 0, 0, 0)
 MyApp.MyPage:Goto(url, cache_policy, bRefresh)
 
 -- jquery-like syntax (some syntactic sugar)
-Page("div#my_name").hide();
-Page("a#my_name.my_class").show();
-Page("#my_name").print();
-log(Page(".my_class").text().." is the last node's inner text\n");
+Page("div#my_name"):hide();
+Page("a#my_name.my_class"):show();
+Page("#my_name"):print();
+log(Page(".my_class"):text().." is the last node's inner text\n");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/mcml.lua");
@@ -92,7 +92,7 @@ end
 PageCtrl.__index = PageCtrl;
 
 -- constructor
-function PageCtrl:new (o)
+function PageCtrl:new(o)
 	o = o or {}   -- create object if user does not provide one
 	setmetatable(o, self);
 	-- this will prevent recursive calls to self:Refresh(), which makes self:Refresh(0) pretty safe. 
@@ -609,7 +609,7 @@ function PageCtrl:GetRoot()
 end
 
 -- provide jquery-like syntax to find all nodes that match a given name pattern and then use the returned object to invoke a method on all returned nodes. 
---  e.g. node:jquery("a").show();
+--  e.g. node:jquery("a"):show();
 -- @param pattern: The valid format is [tag_name][#name_id][.class_name]. 
 --  e.g. "div#name.class_name", "#some_name", ".some_class", "div"
 function PageCtrl:jquery(...)
