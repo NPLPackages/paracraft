@@ -132,7 +132,7 @@ function ItemTerrainBrush:DrawIcon(painter, width, height, itemStack)
 end
 
 -- virtual function: 
-function ItemTerrainBrush:CreateTask()
+function ItemTerrainBrush:CreateTask(itemStack)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TerrainBrush/TerrainBrushTask.lua");
 	local TerrainBrushTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.TerrainBrushTask");
 	return TerrainBrushTask:new():Init(self);

@@ -22,6 +22,27 @@ local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters")
 function DefaultFilters:Install()
 	local filters = GameLogic.GetFilters();
 	filters:add_filter("cmd_open_url", DefaultFilters.cmd_open_url)	
+	filters:add_filter("worldFileChanged", DefaultFilters.worldFileChanged);
+end
+
+function DefaultFilters.worldFileChanged(msg)
+	local ext = string.lower(msg.fullname:match("%.(%w+)$"));
+	if(msg.type == "modified" or msg.type == "added" or msg.type=="renamed_new_name") then
+		local isAsset;
+		if(ext == "fbx" or ext == "x") then
+			isAsset = true;
+		elseif(ext == "bmax") then
+			isAsset = true;
+		elseif(ext == "png" or ext == "jpg") then
+			isAsset = true;
+		end	
+		if(isAsset) then
+			if(ParaAsset.Refresh(msg.fullname)) then
+				LOG.std(nil, "info", "worldFileChanged", "AssetMonitor: File %s is refreshed in dir %s\n", msg.fullname, msg.dirname);
+			end	
+		end
+	end
+	return msg;
 end
 
 function DefaultFilters.cmd_open_url(url)

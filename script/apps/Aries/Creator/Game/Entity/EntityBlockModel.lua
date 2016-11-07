@@ -64,7 +64,7 @@ end
 
 -- @param filename: if nil, self.filename is used
 function Entity:GetModelDiskFilePath(filename)
-	return Files.GetFilePath(filename or self:GetModelFile());
+	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
 end
 
 -- the title text to display (can be mcml)

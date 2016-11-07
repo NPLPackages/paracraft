@@ -58,7 +58,7 @@ function ItemBlockModel:UnpackIntoWorld(itemStack, filename)
 		filename = local_filename;
 	end
 	if(filename) then
-		filename = Files.GetWorldFilePath(filename);
+		filename = Files.FindFile(commonlib.Encoding.Utf8ToDefault(filename));
 	end
 	if(filename) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.lua");
@@ -71,7 +71,10 @@ function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 	local local_filename = itemStack:GetDataField("tooltip");
 	local filename = local_filename;
 	if(filename) then
-		filename = Files.GetWorldFilePath(filename);
+		filename = Files.FindFile(commonlib.Encoding.Utf8ToDefault(filename));
+		if(filename) then
+			filename = commonlib.Encoding.DefaultToUtf8(filename);
+		end
 	end
 	if(not filename) then
 		self:OpenChangeFileDialog(itemStack);
@@ -176,8 +179,8 @@ function ItemBlockModel:OnClickInHand(itemStack, entityPlayer)
 end
 
 -- virtual function: when selected in right hand
-function ItemBlockModel:OnSelect()
-	ItemBlockModel._super.OnSelect(self);
+function ItemBlockModel:OnSelect(itemStack)
+	ItemBlockModel._super.OnSelect(self, itemStack);
 	GameLogic.SetStatus(L"Ctrl+左键选择方块与骨骼, 左键点击物品图标保存模型");
 end
 
@@ -208,7 +211,7 @@ function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 end
 
 -- virtual function: 
-function ItemBlockModel:CreateTask()
+function ItemBlockModel:CreateTask(itemStack)
 	if(self:HasRealPhysics()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");

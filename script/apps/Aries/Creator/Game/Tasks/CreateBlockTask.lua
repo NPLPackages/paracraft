@@ -7,7 +7,7 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
 -- @param side: this is OPPOSITE of the touching side
-local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, data=nil, side = nil, side_region=[nil, "upper", "lower"], block_id = 1, entityPlayer})
+local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, data=nil, side = nil, side_region=[nil, "upper", "lower"], block_id = 1, entityPlayer, itemStack})
 task:Run();
 
 -- create several blocks
@@ -39,7 +39,7 @@ function CreateBlock:TryCreateSingleBlock()
 		local itemStack;
 		local isUsed;
 		if(entityPlayer) then
-			itemStack = itemStack or entityPlayer.inventory:GetItemInRightHand();
+			itemStack = self.itemStack or entityPlayer.inventory:GetItemInRightHand();
 			if(itemStack) then
 				if(GameLogic.GameMode:IsEditor()) then
 					EntityManager.GetPlayer().inventory:PickBlock(block_id);

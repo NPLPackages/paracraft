@@ -293,7 +293,7 @@ function BaseContext:ClearPickDisplay()
 	end
 end
 
--- called every 30 seconds, when user is holding the left button without releasing it. 
+-- called every 30 milliseconds, when user is holding the left button without releasing it. 
 -- @param fDelta: 
 function BaseContext:OnLeftMouseHold(fDelta)
 	local last_x, last_y, last_z = click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ;

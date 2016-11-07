@@ -32,7 +32,7 @@ ItemPaintBrush.max_radius = 32;
 function ItemPaintBrush:ctor()
 end
 
-function ItemPaintBrush:CreateTask()
+function ItemPaintBrush:CreateTask(itemStack)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TerrainBrush/PaintBrushTask.lua");
 	local PaintBrushTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.PaintBrushTask");
 	return PaintBrushTask:new():Init(self);

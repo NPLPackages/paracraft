@@ -51,7 +51,7 @@ function ItemLight:DrawIcon(painter, width, height, itemStack)
 end
 
 -- virtual function: 
-function ItemLight:CreateTask()
+function ItemLight:CreateTask(itemStack)
 	--NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.lua");
 	--local EditLightTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditLightTask");
 	--return EditLightTask:new();

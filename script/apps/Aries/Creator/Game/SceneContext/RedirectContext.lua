@@ -20,6 +20,9 @@ virtual or redirected functions:
 	handleRightClickScene(event, result)
 	handleMiddleClickScene(event, result)
 	handlePlayerKeyEvent(event)
+	OnLeftMouseHold(fDelta)
+	OnRightMouseHold(fDelta)
+	OnLeftLongHoldBreakBlock()
 	UpdateManipulators()
 
 use the lib:
@@ -158,6 +161,51 @@ function RedirectContext:handleMiddleClickScene(event, result)
 		return;
 	end
 	return RedirectContext._super.handleMiddleClickScene(self, event);
+end
+
+function RedirectContext:OnLeftMouseHold(fDelta)
+	if(self:RedirectEvent("OnLeftMouseHold", event)) then
+		return;
+	end
+	local click_data = self:GetClickData();
+	
+	local last_x, last_y, last_z = click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ;
+	local result = self:CheckMousePick();
+	
+	if(result) then
+		if(result.block_id) then
+			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
+			local block = block_types.get(result.block_id);
+
+			if(block) then
+				self:UpdateClickStrength(fDelta, result);
+
+				click_data.left_holding_time = click_data.left_holding_time + fDelta;
+
+				if(click_data.strength and click_data.strength > self.max_break_time) then
+					self:OnLeftLongHoldBreakBlock();
+					click_data.left_holding_time = 0;
+				end
+			end
+		elseif(result.blockX) then
+			self:UpdateClickStrength(fDelta, result);
+			click_data.left_holding_time = click_data.left_holding_time + fDelta;
+		end
+	end
+end
+
+function RedirectContext:OnRightMouseHold(fDelta)
+	if(self:RedirectEvent("OnRightMouseHold", event)) then
+		return;
+	end
+	local click_data = self:GetClickData();
+	click_data.right_holding_time = click_data.right_holding_time + fDelta;
+end
+
+function RedirectContext:OnLeftLongHoldBreakBlock(fDelta)
+	if(self:RedirectEvent("OnLeftLongHoldBreakBlock", event)) then
+		return;
+	end
 end
 
 -- virtual: 

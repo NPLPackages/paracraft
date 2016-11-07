@@ -73,7 +73,7 @@ function ItemToolBase:OnSelect(itemStack)
 	if(not GameLogic.GameMode:IsEditor()) then
 		return;
 	end
-	self.curTask = self:CreateTask();
+	self.curTask = self:CreateTask(itemStack);
 	if(self.curTask) then
 		self.curTask:Run();
 	end
@@ -91,6 +91,10 @@ function ItemToolBase:OnDeSelect()
 	self:SetCurrentItemStack(nil);
 end
 
+function ItemToolBase:GetTask()
+	return self.curTask;
+end
+
 -- virutal function: return a new task command object
-function ItemToolBase:CreateTask()
+function ItemToolBase:CreateTask(itemStack)
 end
