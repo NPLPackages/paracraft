@@ -2,14 +2,14 @@
 date: 2016.10.13
 -->
 <pe:mcml>
-<pe:container name="titleBar" alignment="_mt" style="width:0px;height:64px;background:url(Texture/alphadot.png)" >
-    <div style="position:relative;float:left;margin:5px;">drag this title bar to move the native win32 window</div>
-    <pe:container name="winButtons" alignment="_rt" style="position:relative;padding:5px;margin:5px;width:100px;background:url(Texture/whitedot.png)">
-        <input type="button" name="toggleBtn" tooltip="press Z key to toggle" onclick="toggleTitleBar" value="ToggleTitle" class="button"/>
+    <pe:container name="titleBar" alignment="_mt" style="width:0px;height:64px;background:url(Texture/alphadot.png)">
+        <div style="position:relative;float:left;margin:5px;">drag this title bar to move the native win32 window</div>
+        <pe:container name="winButtons" alignment="_rt" style="position:relative;padding:5px;margin:5px;width:100px;background:url(Texture/whitedot.png)">
+            <input type="button" name="toggleBtn" tooltip="press Z key to toggle" onclick="toggleTitleBar" value="ToggleTitle" class="button" />
+        </pe:container>
+        <pe:hotkey name="2" hotkey="DIK_Z" onclick="toggleTitleBar" />
     </pe:container>
-    <pe:hotkey name="2" hotkey="DIK_Z" onclick="toggleTitleBar" />
-</pe:container>
-<%
+<script src="text/npl" refresh="true"><![CDATA[
 -- This line will allow the user to drag this container to move the window.
 Page:FindControl("titleBar"):SetField("EnableClientTest", true);
 
@@ -17,6 +17,5 @@ function toggleTitleBar()
     local bShowTitle = ParaEngine.GetAttributeObject():GetField("ShowWindowTitleBar", true)
     ParaEngine.GetAttributeObject():SetField("ShowWindowTitleBar", not bShowTitle);
 end
-%>
+]]></script>
 </pe:mcml>
-

@@ -1226,7 +1226,6 @@ Map3DSystem.mcml_controls.pe_editor_text = pe_editor_text;
 -- increment top by the height of the control. 
 -- the control takes up (22*rows) pixels in height, and editbox itself is 22 pixel height. 
 function pe_editor_text.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, style, parentLayout)
-	local name = mcmlNode:GetString("name");
 	local name = mcmlNode:GetAttributeWithCode("name",nil,true);
 	local text =  mcmlNode:GetAttribute("text") or mcmlNode:GetAttributeWithCode("value",nil,true) or mcmlNode:GetInnerText();
 	local rows =  mcmlNode:GetNumber("rows") or 1;
