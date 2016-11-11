@@ -223,16 +223,16 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 		if(refreshMode == "auto") then
 			GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
 			
-			-- get http headers only
+			-- get http headers only (take care of 302 http redirect)
 			System.os.GetUrl(src, function(err, msg)
 				GameLogic.AddBBS("RemoteWorld", nil);
 				local bUseLocalVersion;
-				if(msg.rcode ~= 200 or not msg.header) then
+				if(msg.rcode ~= 200 and (not msg.header or not msg.header:lower():find("\nlocation:", 1 , true))) then
 					LOG.std(nil, "info", "RemoteWorld", "remote world can not be fetched, a previous downloaded world %s is used", dest);
 					OnCallbackFunc(true, dest);
 					return;
 				else
-					local content_length = msg.header:match("Content%-Length: (%d+)");
+					local content_length = msg.header:lower():match("content%-length: (%d+)");
 					if(content_length) then
 						content_length = tonumber(content_length);
 						local local_filesize = ParaIO.GetFileSize(dest);
