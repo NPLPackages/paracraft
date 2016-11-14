@@ -191,9 +191,6 @@ function EditModelTask:keyPressEvent(event)
 		UndoManager.Undo();
 	elseif(dik_key == "DIK_Y")then
 		UndoManager.Redo();
-	elseif(dik_key == "DIK_ESCAPE")then
-		self:OnExit();
-		return;
 	end
 	self:GetSceneContext():keyPressEvent(event);
 end

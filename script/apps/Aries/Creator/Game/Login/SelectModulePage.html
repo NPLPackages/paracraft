@@ -11,6 +11,7 @@ local page = document:GetPageCtrl();
 local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 
 SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
+SelectModulePage.OnInit();
 
 function DS_Items(index)
     return SelectModulePage.DS_Items(index);
@@ -20,7 +21,7 @@ function OnSwitchModStatus(name,mcmlNode)
     local item = mcmlNode:GetPreValue("this",true);
     item.checked = not item.checked;
     SelectModulePage.OnSwitchModStatus(item.checked,item.name);
-    Page:Refresh(0.01);
+    Page:CallMethod("gvwModTable", "DataBind");
 end
 
 function ClosePage()
@@ -50,13 +51,28 @@ function OnGetSDK()
     ParaGlobal.ShellExecute("open", SelectModulePage.url_getSDK, "", "", 1);
 end
 
-SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
+-- SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
+SelectModulePage.url_installNewPlugins = "http://wikicraft.cn/wiki/mod/packages";
+
 function OnInstallNewPlugins()
-    -- start webserver
-    NPL.load("(gl)script/apps/WebServer/WebServer.lua");
-    WebServer:Start("script/apps/WebServer/admin", "0.0.0.0", 8099);
+    SelectModulePage.StartLocalInstallService();
     -- open url
     ParaGlobal.ShellExecute("open", SelectModulePage.url_installNewPlugins, "", "", 1);
+end
+
+function OnClickOpen(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this",true);
+    if(item and item.homepage) then
+        ParaGlobal.ShellExecute("open", item.homepage, "", "", 1);
+    end
+end
+function OnClickDelete(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this",true);
+    if(item and item.name) then
+        _guihelper.MessageBox(format(L"你确定要删除:%s?", item.text), function()
+            SelectModulePage.GetPluginLoader():DeletePlugin(item.name);
+        end)
+    end
 end
     
 function OnCancel()
@@ -71,7 +87,7 @@ end
         </div>
     </pe:if>
     <div style="margin-left:5px;margin-top:10px;color:#ffffff;">
-        <input type="button" value='<%=L"安装新插件"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" onclick="OnInstallNewPlugins" tooltip='<%=SelectModulePage.url_installNewPlugins%>'/>
+        <input type="button" value='<%=L"安装新插件"%>' class="mc_blue_button_with_fillet" style="color:#ffffff;margin-left:10px;min-width:80px;" onclick="OnInstallNewPlugins" tooltip='<%=SelectModulePage.url_installNewPlugins%>'/>
         <input type="button" value='<%=L"下载SDK"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" onclick="OnGetSDK" tooltip='<%=SelectModulePage.url_getSDK%>' />
         <pe:if condition='<%= System.options.isDevEnv == false %>'>
             <input type="button" value='<%=L"打开目录"%>' class="mc_light_grey_button_with_fillet" style="margin-left:10px;min-width:80px;" tooltip='<%=L"点击打开Mod所在文件夹"%>' onclick="OnOpenModDir" />
@@ -84,8 +100,8 @@ end
         <pe:gridview style="margin:10px" name="gvwModTable" CellPadding="5"  AllowPaging="false" DefaultNodeHeight = "20" ItemsPerLine="1"
                 DataSource="<%=DS_Items%>" >
 	        <Columns>
-		        <div style="color:#ffffff;" onclick="OnSwitchModStatus">
-                    <div style="float:left;" >
+		        <div style="color:#ffffff;" >
+                    <div style="float:left;" onclick="OnSwitchModStatus">
                         <input type="checkbox" style="margin-top:2px;margin-right:3px" checked='<%=Eval("checked") %>' />
                         <pe:if condition='<%=Eval("checked") %>'>
                             <div style="float:left;min-width:60px;color:#81f515">
@@ -98,8 +114,29 @@ end
                             </div>
                         </pe:if>
                     </div>
-                    <div style="float:left;margin-left:10px;color:#ffffff;">
-                        <%=Eval("text") %>
+                    <div style='<%=format("float:left;margin-left:10px;color:%s;", Eval("checked") and "#ffffff" or "#808080")%>'>
+                        <div>
+                            <pe:if condition="<%=Eval('displayName')~=false%>">
+                                <div style="float:left;margin-right:10px;"><%=Eval("displayName") %></div>
+                            </pe:if>
+                            <pe:if condition="<%=Eval('version')~=false%>">
+                                <div style="float:left;margin-right:10px;"><%=Eval("version") %></div>
+                            </pe:if>
+                            <pe:if condition="<%=Eval('author')~=false%>">
+                                <div style="float:left;margin-right:10px;"><%=Eval("author") %></div>
+                            </pe:if>
+                            <pe:if condition="<%=Eval('homepage')~=false%>">
+                                <div style="float:left;margin-right:10px;">
+                                    <input type="button" style="color:#ffffff" onclick="OnClickOpen" value='<%=L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
+                                </div>
+                            </pe:if><br />
+                            <div>
+                                <div style="float:left"><%=Eval("text") %></div>
+                                <pe:if condition='<%=not Eval("checked") %>'>
+                                    <input style="margin-left:10px;color:#808080" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet"/>
+                                </pe:if>
+                            </div>
+                        </div>
                     </div>
                 </div>
 	        </Columns>

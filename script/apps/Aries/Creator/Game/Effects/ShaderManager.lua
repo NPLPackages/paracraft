@@ -102,6 +102,12 @@ function ShaderManager:SetShaders(shader_method)
 	end
 end
 
+-- return true if we are using deferred shading pipeline. at least shader 2. 
+function ShaderManager:IsDeferredShading()
+	return ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) >= 2;
+end
+
+
 
 -- this mode is used to blur the 3d scene so to focus on UI. 
 function ShaderManager:SetUse3DGreyBlur(bEnable)

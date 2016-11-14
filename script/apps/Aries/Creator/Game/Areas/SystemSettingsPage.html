@@ -147,7 +147,7 @@ end
                         </div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"隐藏角色" %></div>
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"显示角色" %></div>
                         <div style="float:left;margin-top:-2px;margin-left:20px;">
                             <input name='btn_ShowPlayer' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShowMainPlayer' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
                         </div>
@@ -181,7 +181,7 @@ end
                         <div style="float:left;margin-top:-2px;margin-left:20px;">
                             <input type="button" style="max-width:50px" name="orignalScaling" value='<%=L"重置"%>' onclick='SystemSettingsPage.OnClickResetUIScaling' class="mc_light_grey_button_with_fillet"/>
                             <div style="float:left;margin-left:5px;">
-                                <pe:sliderbar name="UI_Scaling" min="1" max="2" min_step="0.1" value="<%=GameLogic.options:GetUIScaling() %>" style="float:left;height:25px;width:100px;" onchange="SystemSettingsPage.OnChangeUIScaling" />
+                                <pe:sliderbar name="UI_Scaling" min="0" max="2" min_step="0.1" value="<%=GameLogic.options:GetUIScaling() %>" style="float:left;height:25px;width:100px;" onchange="SystemSettingsPage.OnChangeUIScaling" />
                             </div>
                         </div>
                     </div>

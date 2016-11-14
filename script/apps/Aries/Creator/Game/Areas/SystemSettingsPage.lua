@@ -29,19 +29,6 @@ local SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desk
 
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 
-local CheckBoxText = {
-	on = L"开",
-	off = L"关",
-}
-
-local function GetCheckBoxText(value)
-	if(value == true or value == "true") then
-		return CheckBoxText.on;
-	else
-		return CheckBoxText.off;
-	end
-end
-
 local recommended_resolution = {1020,595}
 local recommended_resolution_web_browser = {960,560}
 local recommended_resolution_teen = {1280,760}
@@ -152,28 +139,50 @@ local function GetSoundVolumeText(value)
 	return text;
 end
 
+
+local CheckBoxText = {
+	on = L"开",
+	off = L"关",
+}
+
+local function GetCheckBoxText(value)
+	if(value == true or value == "true") then
+		return CheckBoxText.on;
+	else
+		return CheckBoxText.off;
+	end
+end
+
+local function UpdateCheckBox(name, bChecked)
+	if(page) then
+		bChecked = bChecked == true or bChecked == "true";
+		page:SetValue(name, GetCheckBoxText(bChecked))
+		page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 197 40 18:8 8 8 8" or "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4");
+	end
+end
+
 function SystemSettingsPage.InitPageParams()
 	local ds = SystemSettingsPage.setting_ds;
 	-- load the current settings. 
 	local att = ParaEngine.GetAttributeObject();
 	-- 反转鼠标
 	local mouse_inverse = att:GetField("IsMouseInverse", false);
-	page:SetNodeValue("btn_MouseInverse", if_else(mouse_inverse,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_MouseInverse", mouse_inverse);
 	ds["mouse_inverse"] = mouse_inverse;
 
 	-- 视角摇晃
 	local view_bobbing = GameLogic.options.ViewBobbing;
-	page:SetNodeValue("btn_ViewBobbing", if_else(view_bobbing,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_ViewBobbing", view_bobbing);
 	ds["view_bobbing"] = view_bobbing;
 
 
 	-- 全屏
 	--local is_full_screen = att:GetField("IsFullScreenMode", false);
-	--page:SetNodeValue("btn_FullScreenMode", GetCheckBoxText(is_full_screen))
+	--UpdateCheckBox("btn_FullScreenMode", is_full_screen)
 	--ds["is_full_screen"] = is_full_screen;
 	-- 鼠标反转
 	--local is_mouse_inverse = att:GetField("IsMouseInverse", false);
-	--page:SetNodeValue("btn_MouseInverse", GetCheckBoxText(is_mouse_inverse))
+	--UpdateCheckBox("btn_MouseInverse", is_mouse_inverse)
 	--ds["is_mouse_inverse"] = is_mouse_inverse;
 	-- 分辨率
 	local screen_resolution =  string.format("%d × %d", att:GetDynamicField("ScreenWidth", 1020), att:GetDynamicField("ScreenHeight", 680))
@@ -187,7 +196,7 @@ function SystemSettingsPage.InitPageParams()
 	
 	-- 音乐开关
 	local open_sound = if_else(ParaAudio.GetVolume()>0,true,false)
-	page:SetNodeValue("btn_EnableSound", if_else(open_sound,CheckBoxText.on, CheckBoxText.off))
+	UpdateCheckBox("btn_EnableSound", open_sound)
 	ds["open_sound"] = open_sound;
 
 	-- 音量大小
@@ -199,29 +208,29 @@ function SystemSettingsPage.InitPageParams()
 
 
 	-- 真实光影
-	local emulational_lighting = if_else(ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) == 2,true,false)
-	page:SetNodeValue("btn_Shader", if_else(emulational_lighting,CheckBoxText.on, CheckBoxText.off));
-	ds["emulational_lighting"] = emulational_lighting;
+	local enable_deferred_shading = GameLogic.GetShaderManager():IsDeferredShading();
+	UpdateCheckBox("btn_Shader", enable_deferred_shading);
+	ds["enable_deferred_shading"] = enable_deferred_shading;
 
 	-- disable shader command
 	local bDisableShaderCmd = GameLogic.options:IsDisableShaderCommand();
-	page:SetNodeValue("btn_DisableShaderCmd", if_else(bDisableShaderCmd,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_DisableShaderCmd", bDisableShaderCmd);
 	ds["disableShaderCmd"] = bDisableShaderCmd;
 
 	
 	-- 场景投影
 	local sunlight_shadow = if_else(ParaTerrain.GetBlockAttributeObject():GetField("UseSunlightShadowMap", false) == true,true,false);
-	page:SetNodeValue("btn_Shadow", if_else(sunlight_shadow,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_Shadow", sunlight_shadow);
 	ds["sunlight_shadow"] = sunlight_shadow;
 
 	-- 水面反射
 	local water_reflection = if_else(ParaTerrain.GetBlockAttributeObject():GetField("UseWaterReflection", false) == true,true,false);
-	page:SetNodeValue("btn_WaterReflection", if_else(water_reflection,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_WaterReflection", water_reflection);
 	ds["water_reflection"] = water_reflection;
 
 	-- 主角显示
 	local show_mainplayer = if_else(ParaScene.GetAttributeObject():GetField("ShowMainPlayer", false) == true,true,false);
-	page:SetNodeValue("btn_ShowPlayer", if_else(show_mainplayer,CheckBoxText.on, CheckBoxText.off));
+	UpdateCheckBox("btn_ShowPlayer", show_mainplayer);
 	ds["show_mainplayer"] = show_mainplayer;
 
 	-- 能见度, 低：30 - 90 中：90 - 150 高：150 - 210
@@ -259,46 +268,46 @@ function SystemSettingsPage.onclickFreeWindowSize(bChecked)
 end
 
 function SystemSettingsPage.checkBoxEnableTeamInvite(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.checkBoxEnableTeamInvite", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.checkBoxEnableTeamInvite", bChecked);
 end
 
 function SystemSettingsPage.checkBoxDisableFamilyChat(bChecked)
-	-- MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.checkBoxDisableFamilyChat", bChecked);
+	-- GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.checkBoxDisableFamilyChat", bChecked);
 	NPL.load("(gl)script/apps/Aries/Chat/FamilyChatWnd.lua");
 	local FamilyChatWnd = commonlib.gettable("MyCompany.Aries.Chat.FamilyChatWnd");
 	FamilyChatWnd.BlockChat(bChecked);
 end
 
 function SystemSettingsPage.checkBoxAutoHPPotion(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.checkBoxAutoHPPotion", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.checkBoxAutoHPPotion", bChecked);
 end
 
 function SystemSettingsPage.checkBoxEnableHeadonTextScaling(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.checkBoxEnableHeadonTextScaling", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.checkBoxEnableHeadonTextScaling", bChecked);
 	ParaScene.GetAttributeObject():SetField("HeadOn3DScalingEnabled", bChecked);
 end
 
 function SystemSettingsPage.checkBoxAllowAddFriend(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.checkBoxAllowAddFriend", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.checkBoxAllowAddFriend", bChecked);
 	System.options.isAllowAddFriend = bChecked;
 end
 
 
 function SystemSettingsPage.checkBoxEnableFriendTeleport(bChecked)
 	System.options.EnableFriendTeleport = bChecked;
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.EnableFriendTeleport", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.EnableFriendTeleport", bChecked);
 	ParaScene.GetAttributeObject():SetField("checkBoxEnableFriendTeleport", bChecked);
 end
 
 function SystemSettingsPage.checkBoxEnableAutoPickSingleTarget(bChecked)
 	System.options.EnableAutoPickSingleTarget = bChecked;
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.EnableAutoPickSingleTarget", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.EnableAutoPickSingleTarget", bChecked);
 	ParaScene.GetAttributeObject():SetField("checkBoxEnableAutoPickSingleTarget", bChecked);
 end
 
 function SystemSettingsPage.checkBoxEnableForceHideHead(bChecked)
 	System.options.EnableForceHideHead = bChecked;
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.EnableForceHideHead", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.EnableForceHideHead", bChecked);
 	ParaScene.GetAttributeObject():SetField("checkBoxEnableForceHideHead", bChecked);
 	-- force refresh avatar
 	System.Item.ItemManager.RefreshMyself();
@@ -306,7 +315,7 @@ end
 
 function SystemSettingsPage.checkBoxEnableForceHideBack(bChecked)
 	System.options.EnableForceHideBack = bChecked;
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.EnableForceHideBack", bChecked);
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.EnableForceHideBack", bChecked);
 	ParaScene.GetAttributeObject():SetField("checkBoxEnableForceHideBack", bChecked);
 	-- force refresh avatar
 	System.Item.ItemManager.RefreshMyself();
@@ -753,11 +762,11 @@ function SystemSettingsPage.OnClickEnableSound()
 		MapArea.EnableMusic(next_state);
 	end
 	local key = "Paracraft_System_Sound_State";
-	MyCompany.Aries.Player.SaveLocalData(key,next_state,true);
+	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
 end
 
 function SystemSettingsPage.OnClickEnableShader()
-	local cur_state = SystemSettingsPage.setting_ds["emulational_lighting"];
+	local cur_state = SystemSettingsPage.setting_ds["enable_deferred_shading"];
 	local next_state = not cur_state;
 	if(not GameLogic.GetShaderManager():SetShaders(if_else(next_state, 2,1))) then
         if(next_state) then 
@@ -765,9 +774,11 @@ function SystemSettingsPage.OnClickEnableShader()
             _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
         end
     else
-		page:SetValue("btn_Shader", GetCheckBoxText(next_state));
-		SystemSettingsPage.setting_ds["emulational_lighting"] = next_state;
+		UpdateCheckBox("btn_Shader", next_state);
+		SystemSettingsPage.setting_ds["enable_deferred_shading"] = next_state;
 		WorldCommon.GetWorldInfo().rendermethod = tostring(if_else(next_state, 2,1));
+		local key = "Paracraft_use_deferred_shading";
+		GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
     end
 end
 
@@ -775,7 +786,7 @@ function SystemSettingsPage.OnClickDisableShaderCommand()
 	local cur_state = SystemSettingsPage.setting_ds["disableShaderCmd"];
 	local next_state = not cur_state;
 	GameLogic.options:SetDisableShaderCommand(next_state);
-	page:SetValue("btn_DisableShaderCmd", GetCheckBoxText(next_state));
+	UpdateCheckBox("btn_DisableShaderCmd", next_state);
 	SystemSettingsPage.setting_ds["disableShaderCmd"] = next_state;
 end
 
@@ -783,7 +794,7 @@ end
 function SystemSettingsPage.OnClickEnableShadow()
 	local cur_state = SystemSettingsPage.setting_ds["sunlight_shadow"];
 	local next_state = not cur_state;
-	page:SetValue("btn_Shadow", GetCheckBoxText(next_state));
+	UpdateCheckBox("btn_Shadow", next_state);
     ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", next_state);
 	SystemSettingsPage.setting_ds["sunlight_shadow"] = next_state;
 	WorldCommon.GetWorldInfo().shadow = tostring(next_state);
@@ -792,7 +803,7 @@ end
 function SystemSettingsPage.OnClickEnableShowMainPlayer()
 	local cur_state = SystemSettingsPage.setting_ds["show_mainplayer"];
 	local next_state = not cur_state;
-	page:SetValue("btn_ShowPlayer", GetCheckBoxText(next_state));
+	UpdateCheckBox("btn_ShowPlayer", next_state);
 	ParaScene.GetAttributeObject():SetField("ShowMainPlayer", next_state);
 	SystemSettingsPage.setting_ds["show_mainplayer"] = next_state;
 end
@@ -800,7 +811,7 @@ end
 function SystemSettingsPage.OnClickEnableWaterReflection()
 	local cur_state = SystemSettingsPage.setting_ds["water_reflection"];
 	local next_state = not cur_state;
-	page:SetValue("btn_WaterReflection", GetCheckBoxText(next_state));
+	UpdateCheckBox("btn_WaterReflection", next_state);
 	ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", next_state)
 	SystemSettingsPage.setting_ds["water_reflection"] = next_state;
 	WorldCommon.GetWorldInfo().waterreflection = tostring(next_state);
@@ -809,12 +820,12 @@ end
 function SystemSettingsPage.OnClickEnableMouseInverse()
 	local cur_state = SystemSettingsPage.setting_ds["mouse_inverse"];
 	local next_state = not cur_state;
-	page:SetValue("btn_MouseInverse", GetCheckBoxText(next_state));
+	UpdateCheckBox("btn_MouseInverse", next_state);
 	ParaEngine.GetAttributeObject():SetField("IsMouseInverse", next_state);
 	--ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", not value)
 	SystemSettingsPage.setting_ds["mouse_inverse"] = next_state;
 	local key = "Paracraft_System_Mouse_Inverse";
-	MyCompany.Aries.Player.SaveLocalData(key,next_state,true);
+	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
 end
 
 function SystemSettingsPage.OnClickChangeRenderDist()
@@ -840,11 +851,11 @@ function SystemSettingsPage.OnClickChangeSoundVolume()
 	end
 	SystemSettingsPage.setting_ds["sound_volume"] = new_text;
 	local key = "Paracraft_System_Sound_Volume";
-	MyCompany.Aries.Player.SaveLocalData(key,next_volume,true);
+	GameLogic.GetPlayerController():SaveLocalData(key,next_volume,true);
 end
 
 function SystemSettingsPage.OnClickEnableBackgroundMusic(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.EnableBackgroundMusic", bChecked, true)
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.EnableBackgroundMusic", bChecked, true)
 	System.options.EnableBackgroundMusic = bChecked;
 	if(bChecked) then
 		Scene.ResumeRegionBGMusic()
@@ -854,7 +865,7 @@ function SystemSettingsPage.OnClickEnableBackgroundMusic(bChecked)
 end
 
 function SystemSettingsPage.OnClick_hide_family_name(bChecked)
-	MyCompany.Aries.Player.SaveLocalData("SystemSettingsPage.hide_family_name", bChecked)
+	GameLogic.GetPlayerController():SaveLocalData("SystemSettingsPage.hide_family_name", bChecked)
 	System.options.hide_family_name = bChecked;
 
 	MyCompany.Aries.Player.ShowHeadonTextForNID(tostring(System.User.nid));
@@ -890,7 +901,7 @@ function SystemSettingsPage.OnClickEnableFullScreenMode()
 		fullScreen = false;
 	end	
 
-	page:SetValue("btn_FullScreenMode", GetCheckBoxText(not fullScreen));
+	UpdateCheckBox("btn_FullScreenMode", not fullScreen);
 	--ds["is_full_screen"] = is_full_screen;
 end
 
@@ -1110,7 +1121,7 @@ function SystemSettingsPage.OnOK()
 
 	if(bNeedRestart or bNeedUpdateScreen) then
 		NPL.load("(gl)script/apps/Aries/Player/main.lua");
-		MyCompany.Aries.Player.SaveLocalData("user_confirmed", true, true, false)
+		GameLogic.GetPlayerController():SaveLocalData("user_confirmed", true, true, false)
 	end
 		
 	if(bNeedRestart) then
@@ -1158,7 +1169,7 @@ function SystemSettingsPage.OnToggleViewBobbing()
 	local value = not GameLogic.options:GetViewBobbing();
 	GameLogic.options:SetViewBobbing(value);
 	if(page) then
-		page:SetValue("btn_ViewBobbing", GetCheckBoxText(value));
+		UpdateCheckBox("btn_ViewBobbing", value);
 	end
 end
 

@@ -27,6 +27,7 @@ SelectModulePage.page = nil;
 
 -- init function. page script fresh is set to false.
 function SelectModulePage.OnInit()
+	SelectModulePage.page = document:GetPageCtrl();
 end
 
 function SelectModulePage.GetPluginLoader()
@@ -55,12 +56,26 @@ function SelectModulePage.ResetLoadedMods()
 	SelectModulePage.GetPluginLoader():SaveModTableToFile();
 end
 
+function SelectModulePage.StartLocalInstallService()
+	if(not SelectModulePage.isStarted) then
+		SelectModulePage.isStarted = true;
+		-- start webserver
+		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+		WebServer:Start("script/apps/WebServer/admin", "0.0.0.0", 8099);
+	end
+end
+
 -- show page
 function SelectModulePage.ShowPage()
-	SelectModulePage.OnInit();
+	SelectModulePage.StartLocalInstallService();
+
 	SelectModulePage.GetPluginLoader():RebuildModuleList();
+
+	SelectModulePage.GetPluginLoader():Connect("contentChanged", SelectModulePage, SelectModulePage.OnChanged, "UniqueConnection");
+
+	local params;
 	if(System.options.IsMobilePlatform) then
-		System.App.Commands.Call("File.MCMLWindowFrame", {
+		params = {
 			url = "script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html", 
 			name = "SelectModulePage.ShowMobilePage", 
 			isShowTitleBar = false,
@@ -76,9 +91,10 @@ function SelectModulePage.ShowPage()
 				y = 0,
 				width = 0,
 				height = 0,
-		});
+		};
+		
 	else
-		System.App.Commands.Call("File.MCMLWindowFrame", {
+		params = {
 			url = "script/apps/Aries/Creator/Game/Login/SelectModulePage.html", 
 			name = "SelectModulePage", 
 			isShowTitleBar = false,
@@ -94,6 +110,22 @@ function SelectModulePage.ShowPage()
 				width = 600,
 				height = 500,
 			cancelShowAnimation = true,
-		});
+		};
 	end
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		if(callbackFunc) then
+			SelectModulePage.GetPluginLoader():Disconnect("contentChanged", SelectModulePage, SelectModulePage.OnChanged);
+		end
+	end
+end
+
+function SelectModulePage:OnChanged(type)
+	if(SelectModulePage.page) then
+		if(type ~= "pluginEnabled") then
+			-- either delete or added new plugin, we need to rebuild the list. 
+			SelectModulePage.GetPluginLoader():RebuildModuleList();
+		end
+		SelectModulePage.page:Refresh(0.01);
+	end	
 end

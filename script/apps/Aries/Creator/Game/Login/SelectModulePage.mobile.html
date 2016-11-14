@@ -11,6 +11,7 @@ local page = document:GetPageCtrl();
 local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 
 local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
+SelectModulePage.OnInit();
 
 function DS_Items(index)
     return SelectModulePage.DS_Items(index);

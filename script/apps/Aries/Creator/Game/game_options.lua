@@ -144,6 +144,22 @@ function options:OneTimeInit()
 	if(System.options.IsMobilePlatform) then
 		self:SetUIScaling(nil);
 	end
+
+	local key = "Paracraft_System_Sound_State";
+	local sound_state = GameLogic.GetPlayerController():LoadLocalData(key,true,true);
+	if(sound_state == true or sound_state == "true") then
+		ParaAudio.SetVolume(1);
+	else
+		ParaAudio.SetVolume(0);
+	end
+
+	local key = "Paracraft_use_deferred_shading";
+	local use_deferred_shading = GameLogic.GetPlayerController():LoadLocalData(key,false,true);
+	if(use_deferred_shading and not GameLogic.GetShaderManager():IsDeferredShading()) then
+		if(not GameLogic.GetShaderManager():SetShaders(use_deferred_shading and 2 or 1)) then
+			GameLogic.GetPlayerController():SaveLocalData(key, false, true);
+		end
+	end
 end
 
 -- transient options can be modified by game rule and reset when loading a new world.
@@ -300,14 +316,6 @@ function options:OnLoadWorld()
 		player:SetField("Gravity", self.Gravity*2);
 		
 		self:SetWalkSpeedScale(0.92);
-
-		local key = "Paracraft_System_Sound_State";
-		local sound_state = GameLogic.GetPlayerController():LoadLocalData(key,true,true);
-		if(sound_state == true or sound_state == "true") then
-			ParaAudio.SetVolume(1);
-		else
-			ParaAudio.SetVolume(0);
-		end
 
 		self:SetVolume(nil);
 		self:SetStereoEyeSeparationDist(nil);
