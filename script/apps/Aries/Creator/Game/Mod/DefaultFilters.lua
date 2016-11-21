@@ -26,8 +26,8 @@ function DefaultFilters:Install()
 end
 
 function DefaultFilters.worldFileChanged(msg)
-	local ext = string.lower(msg.fullname:match("%.(%w+)$"));
 	if(msg.type == "modified" or msg.type == "added" or msg.type=="renamed_new_name") then
+		local ext = string.lower(msg.fullname:match("%.(%w+)$") or "");
 		local isAsset;
 		if(ext == "fbx" or ext == "x") then
 			isAsset = true;

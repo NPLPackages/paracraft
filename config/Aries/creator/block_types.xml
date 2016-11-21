@@ -4,9 +4,11 @@ all system defined item/block types in paracraft. For mod/plugins, one can also 
 @param categoryID: in range [0,255].  category id (usually the one used for simulation and shader rendering)
    50 for metal with normal map. 31 for waving grass. 8 for water with reflection. 9 for mirror.  5 for lava. 
 @param mc_id: [id:data]. auxilary mc id(NOT used)
-@param obstruction: whether to enable block physics
 @param framemove or tick_random: "true" to tick randomly
-@param solid: whether to collide with camera
+@param obstruction: whether to enable block physics
+@param blockcamera: whether to collide with camera
+@param solid: if light can not pass through
+@param transparent: texture is transparent. 
 @param hasAction: if true, user left-click the block will trigger 
 @param selection_effect: "none" to disable mouse over selection effect. "model_highlight" to highlight its custom model. useful for some custom model block.
 @param toggle_blockid: which block id to toggle. toggle_blockid is automatically a associated_blockid.

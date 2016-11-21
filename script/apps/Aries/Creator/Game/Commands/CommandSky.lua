@@ -140,6 +140,7 @@ Commands["fog"] = {
 /fog 100    only start fog after 100 meters and end by view_distance
 /fog 0.6    if value is smaller than 1, it means 0.6*view_distance
 -- change fog color to white, and disable auto fog color according to time
+-- this command is only valid for non-simulated sky mesh. 
 /fog -color 1 1 1
 -- enable auto fog color according to time of day
 /fog
