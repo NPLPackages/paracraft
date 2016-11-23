@@ -6,9 +6,15 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMob.lua");
-local EntityMob = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMob")
-local entity = MyCompany.Aries.Game.EntityManager.EntityMob:new({x,y,z,radius});
-entity:Attach();
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+-- create a temporary static and physical blocker entity
+local x,y,z = EntityManager.GetPlayer():GetPosition();
+local entity = EntityManager.EntityMob:Create({x=x,y=y+1, z=z, item_id = 20001});
+entity:SetPersistent(false);
+entity:EnablePhysics(true);
+entity:SetStaticBlocker(true);
+entity:SetCanRandomMove(false);
+EntityManager.AddObject(entity);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
@@ -104,7 +110,7 @@ function Entity:SetMainAssetPath(name)
 end
 
 function Entity:OnRespawn()
-	local item = self:GetItem();
+	local item = self:GetItemClass();
 	if(item) then
 		self.hp = item.hp or 1;
 		self:SetVisible(true);
@@ -119,7 +125,7 @@ function Entity:OnDead()
 
 	if(not self.collected) then
 		self.collected = true;
-		local item = self:GetItem();
+		local item = self:GetItemClass();
 		if(item) then
 			GameLogic.events:DispatchEvent({type = "OnCollectItem" , block_id = self.item_id, count = 1});
 			item:CreateBlockPieces(self.bx, self.by, self.bz);
@@ -246,9 +252,6 @@ function Entity:SaveToXMLNode(node)
 	return node;
 end
 
-function Entity:CanBePushedBy(fromEntity)
-    return true;
-end
 
 -- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 
 -- @return nil or array of item stack.

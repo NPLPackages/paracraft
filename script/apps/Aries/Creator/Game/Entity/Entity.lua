@@ -2455,3 +2455,18 @@ function Entity:OnClickEmptySlot(slot)
 	end
 	self:CreateItemOnSlot(slot);
 end
+
+-- This function is almost always used to enable polygon level collision for static entities only.  
+-- Please be very careful NOT to enable physics for moving entities. Physics are automatically unloaded 
+-- when geometry or position changed, thus a moving entity may frequently load and unload physics causing performance issues. 
+-- @param bForceLoadPhysics: default to nil. by default it is lazy loading when main player collide with it, one can also explicitly load physics
+function Entity:EnablePhysics(bEnable, bForceLoadPhysics)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("EnablePhysics", bEnable == true);
+		-- by default it is lazy loading when main player collide with it, one can also explicitly load physics by following line. 
+		if(bForceLoadPhysics) then
+			obj:LoadPhysics(); 
+		end
+	end
+end

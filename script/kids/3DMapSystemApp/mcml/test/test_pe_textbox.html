@@ -1,0 +1,11 @@
+﻿<!--script/kids/3DMapSystemApp/mcml/test/test_pe_textbox.html-->
+<pe:mcml>
+    <div>
+        Text: <input type="text" name="myAutoFocusEditBox" />
+    </div>
+    ... many other div here...
+    <!-- This should be the last in the page -->
+    <script type="text/npl" refresh="true">
+        Page("#myAutoFocusEditBox"):GetControl():Focus();
+    </script>
+</pe:mcml>
