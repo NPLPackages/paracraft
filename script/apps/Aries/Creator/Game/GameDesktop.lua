@@ -280,6 +280,9 @@ function Desktop.DoAutoAdjustUIScaling(bForceUpdate)
 end
 
 function Desktop.ShowAllAreas()
+	if(Desktop.bSkipDefaultDesktop) then
+		return;
+	end
 	local mode = Desktop.mode;
 	
 	if(mode == "editor") then
