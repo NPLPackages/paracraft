@@ -10,6 +10,9 @@ local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.Backgroun
 BackgroundMusic:Play(filename)
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 
 local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
@@ -75,11 +78,21 @@ function BackgroundMusic:GetMusic(filename)
 end
 
 -- @param filename: file name or known audio key name. The filepath can be relative to current world directory or root directory. 
+-- this can be a http or https asset file
 -- @return: audio source object or nil
 function BackgroundMusic:Play(filename, bToggleIfSame)
-	local audio_src = BackgroundMusic:GetMusic(filename)
-	if(audio_src) then
-		return self:PlayBackgroundSound(audio_src, bToggleIfSame);
+	self.lastFilename = filename;
+	if(filename and filename:match("^http")) then
+		HttpFiles.GetHttpFilePath(filename, function(err, diskfilename) 
+			if(diskfilename and self.lastFilename == filename) then
+				self:Play(diskfilename, bToggleIfSame);
+			end
+		end)
+	else
+		local audio_src = BackgroundMusic:GetMusic(filename)
+		if(audio_src) then
+			return self:PlayBackgroundSound(audio_src, bToggleIfSame);
+		end
 	end
 end
 

@@ -60,19 +60,22 @@ function PlayerController:GetMainAssetPath()
 	end
 end
 
--- static function:
+-- static function: if no skin is set, we will return the default one set is block_types.xml. 
 function PlayerController:GetSkinTexture()
 	local player = EntityManager.GetPlayer();
+	local skin;
 	if(player) then
-		return player:GetSkin();
-	else
+		skin = player:GetSkin();
+	end
+	if(not skin) then
 		-- this function may be called before world is loaded, so check load block_types
 		block_types.init();
 		local item = ItemClient.GetItem(block_types.names.player);
 		if(item) then
-			return item:GetSkinFile();
+			skin = item:GetSkinFile();
 		end
 	end
+	return skin;
 end
 
 function PlayerController:PickBlockAt(x, y, z)

@@ -27,6 +27,7 @@ Commands["music"] = {
 	mode_allow = "",
 	quick_ref="/music [filename|1~6] [from_time]", 
 	desc=[[change background music. specify a number for internal music
+@param filename: can be disk or http url file
 /music music.ogg 0	play music.ogg at current world directory from the beginning (0 seconds) 
 /music 1			play music 1 
 /music stop			to stop the music
@@ -38,20 +39,61 @@ Commands["music"] = {
 		local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
 
 		local filename, from_time
-		filename, cmd_text = CmdParser.ParseString(cmd_text);
+		filename, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
 		from_time, cmd_text = CmdParser.ParseInt(cmd_text);
 
 		if(not filename or filename=="" or filename=="stop") then
 			BackgroundMusic:Stop();
 		else
-			local sound = BackgroundMusic:GetMusic(filename);
-			if(sound) then
-				if(from_time) then
-					sound:stop();
-					sound:seek(from_time);
+			if(filename and filename:match("^http")) then
+				BackgroundMusic:Play(filename);
+			else
+				local sound = BackgroundMusic:GetMusic(filename);
+				if(sound) then
+					if(from_time) then
+						sound:stop();
+						sound:seek(from_time);
+					end
+					BackgroundMusic:PlayBackgroundSound(sound);
 				end
-				BackgroundMusic:PlayBackgroundSound(sound);
 			end
+		end
+	end,
+};
+
+Commands["voice"] = {
+	name="voice", 
+	quick_ref="/voice [-speed number] [-lang zh] [-male|female] text", 
+	desc=[[Using the free baidu tts(text-to-speech) service to play a given text in human voice
+You must have internet connection to use this.
+/voice 你好 Paracraft
+/voice -speed 2  欢迎使用Paracraft
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local speed, lang;
+		local option = true;
+		while(option) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option == "speed") then
+				speed, cmd_text = CmdParser.ParseInt(cmd_text);
+			elseif(option == "lang") then
+				lang, cmd_text = CmdParser.ParseString(cmd_text);
+			end
+		end
+		speed = speed or 5;
+		lang = lang or "zh";
+
+		if(cmd_text~="") then
+			local url = format("http://tts.baidu.com/text2audio?lan=%s&ie=UTF-8&spd=%d&text=%s", lang, speed, commonlib.Encoding.url_encode(cmd_text));
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+			local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+			HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
+				if(diskfilename) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+					local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+					SoundManager:PlaySound(diskfilename:match("[^/\\]+$"), diskfilename);
+				end
+			end)
 		end
 	end,
 };

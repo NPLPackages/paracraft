@@ -555,7 +555,13 @@ Commands["clearcache"] = {
 /clearcache     clear all    
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		-- asset files
 		ParaAsset.ClearTextureCache();
+		-- world http files
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+		local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+		HttpFiles.ClearDiskCache();
+
 		GameLogic.AddBBS(nil, "Downloaded Web Cache Cleared");
 	end,
 };

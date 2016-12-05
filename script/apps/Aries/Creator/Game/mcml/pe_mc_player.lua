@@ -81,9 +81,9 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	local player = EntityManager.GetFocus();
 	if(player and player.GetSkin) then
 		skin = player:GetSkin();
-	else
-		skin = MyCompany.Aries.Game.PlayerController:GetSkinTexture();
 	end
+	skin = skin or MyCompany.Aries.Game.PlayerController:GetSkinTexture();
+	
 	obj_params.ReplaceableTextures = {[2] = skin };
 	obj_params.facing = 1.57;
 	-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 

@@ -331,9 +331,16 @@ function Entity:PlayStepSound()
 		self.last_step_time = cur_time;
 		self.last_step_dist = self.dist_walked;
 		local x,y,z = self:GetBlockPos();
-		local step_block = BlockEngine:GetBlock(x,y-1, z);
-		if(step_block) then
+		local step_block = BlockEngine:GetBlock(x,y, z);
+		if(step_block and step_block.step_sound) then
+			-- in case of slab block
 			step_block:play_step_sound(0.15);
+		else
+			-- solid block
+			step_block = BlockEngine:GetBlock(x,y-1, z);
+			if(step_block) then
+				step_block:play_step_sound(0.15);
+			end	
 		end
 	end
 end
