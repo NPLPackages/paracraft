@@ -92,6 +92,10 @@ function InternetLoadWorld.OnStaticInit()
 end
 
 function InternetLoadWorld.ShowPage(bShow)
+	if(not GameLogic.GetFilters():apply_filters("InternetLoadWorld.ShowPage", true, bShow)) then
+		return false;
+	end
+
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html", 
 		name = "LoadMainWorld", 

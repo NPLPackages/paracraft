@@ -131,8 +131,12 @@ function SaveWorldPage.OnSaveAll(name, values)
 end
 
 
-
+-- share world page 
 function SaveWorldPage.ShowSharePage()
+	if(not GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true)) then
+		return false;
+	end
+
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 			url = "script/apps/Aries/Creator/Game/Areas/ShareWorldPage.html",
 			name = "SaveWorldPage.ShowSharePage",

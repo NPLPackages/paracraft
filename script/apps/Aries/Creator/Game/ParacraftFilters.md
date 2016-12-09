@@ -44,6 +44,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. This is the place to initialize your custom GUI. 
   - "show", name, bIsShow: hook `/show name` command to display a custom gui via command
   - "cmd_open_url", url, options: hook `/open url` command to display a custom url via command
+  - "InternetLoadWorld.ShowPage", bEnable, bShow: whether to show the default load world window. We can use this filter to replace the default load world window.
+  - "SaveWorldPage.ShowSharePage", bEnable: We can use this filter to replace the default share world window.
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
   - "BeforeSetSpawnPoint", {x,y,z}: before player spawn point is set

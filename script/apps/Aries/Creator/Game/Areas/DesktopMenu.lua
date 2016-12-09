@@ -178,7 +178,7 @@ end
 -- click top menu item, normally this will show context menu
 function DesktopMenu.OnClickMenuItem(name)
 	-- close the esc frame page if any
-	-- DesktopMenu.CloseEscFramePage();
+	-- DesktopMenu.CloseEscFramePage();	
 
 	local menuItem = DesktopMenu.GetMenuItem(name);
 	if(menuItem) then
