@@ -4,7 +4,8 @@
 <pe:mcml>
 <script type="text/npl" src="script/ide/MessageBox.lua" refresh="false"><![CDATA[
 function ClosePage()
-	_guihelper.CloseMessageBox();
+    -- _guihelper.CloseMessageBox();
+    _guihelper.OnMessageBoxClick("Cancel");
 end
 ]]></script>
 <aries:window  mode="thin" style="width:340px" title='<%=L"信息"%>' onclose="ClosePage">

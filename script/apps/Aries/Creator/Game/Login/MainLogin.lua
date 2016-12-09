@@ -560,12 +560,9 @@ function MainLogin:LoadMainWorld()
 	if(self:CheckLoadWorldFromCmdLine()) then
 		return;
 	end
-
-	local page = GameLogic.GetFilters():apply_filters("LoginPage");
-
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 	local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
-	InternetLoadWorld.ShowPage(nil,page);
+	InternetLoadWorld.ShowPage();
 	--if(InternetLoadWorld.inited) then
 		--InternetLoadWorld.ResetDataSource();	
 	--else

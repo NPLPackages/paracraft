@@ -91,19 +91,19 @@ function InternetLoadWorld.OnStaticInit()
 	--TextureModPage.DownloadOfficialTexturePack();
 end
 
-function InternetLoadWorld.ShowPage(bShow,page)
-	if(not page) then
-		page = "script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html";
+function InternetLoadWorld.ShowPage(bShow)
+	if(not GameLogic.GetFilters():apply_filters("InternetLoadWorld.ShowPage", true, bShow)) then
+		return false;
 	end
 
 	System.App.Commands.Call("File.MCMLWindowFrame", {
-		url  = page, 
+		url = "script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html", 
 		name = "LoadMainWorld", 
 		isShowTitleBar = false,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		zorder = 0,
-		allowDrag = true,
+		allowDrag = false,
 		bShow = bShow,
 		directPosition = true,
 			align = "_ct",
