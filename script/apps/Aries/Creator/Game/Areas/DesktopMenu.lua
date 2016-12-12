@@ -81,7 +81,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"帮助...(Ctrl+F1)",name = "help.help", onclick=nil},
 				{text = L"快捷键",name = "help.help.shortcutkey", onclick=nil},
 				{text = L"提交Bug",name = "help.bug", onclick=nil},
-				{text = L"NPL Code Wiki...(F11)",name = "help.npl_code_wiki", onclick=nil},
+				{text = L"NPL Code Wiki...(F11)",name = "help.npl_code_wiki", autoclose=true, onclick=nil},
 				{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},
 				{text = L"关于Paracraft...",name = "help.about", onclick=nil},
 				{text = L"Credits",name = "help.Credits", onclick=nil},
@@ -177,9 +177,6 @@ end
 
 -- click top menu item, normally this will show context menu
 function DesktopMenu.OnClickMenuItem(name)
-	-- close the esc frame page if any
-	-- DesktopMenu.CloseEscFramePage();	
-
 	local menuItem = DesktopMenu.GetMenuItem(name);
 	if(menuItem) then
 		if(menuItem.ctl and menuItem.children) then
@@ -196,6 +193,11 @@ function DesktopMenu.OnClickMenuItem(name)
 			else
 				GameLogic.RunCommand(format("/menu %s", menuItem.name));
 			end
+			
+			-- close the esc frame page if any
+			DesktopMenu.CloseEscFramePage();	
+			local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+			DesktopMenuPage.ActivateMenu(false);
 		end
 	end
 end
