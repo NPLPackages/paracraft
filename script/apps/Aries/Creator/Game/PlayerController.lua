@@ -160,6 +160,7 @@ function PlayerController:IsInAir()
 	else -- if(self.asset_gsid)then
 		local speed = math.abs(player:GetField("VerticalSpeed", -1000));
 		if(speed > 0.01) then
+			-- LOG.std(nil, "info", "category", speed);
 			return true;
 		end
 	end
@@ -428,5 +429,15 @@ end
 function PlayerController:OnClickEntity(target_entity, bx, by, bz, mouse_button, triggerEntity)
 	if(target_entity) then
 		return target_entity:OnClick(bx, by, bz, mouse_button, triggerEntity);
+	end
+end
+
+function PlayerController:SetFlyUsingCameraDir(bEnable)
+	local player = EntityManager.GetPlayer();
+	if(player) then
+		local obj = player:GetInnerObject();
+		if(obj) then
+			obj:SetField("FlyUsingCameraDir", bEnable == true);
+		end
 	end
 end

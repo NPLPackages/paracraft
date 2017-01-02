@@ -16,6 +16,7 @@ TouchController.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT);
 NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchButton.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tools/ToolManager.lua");
+local PlayerController = commonlib.gettable("MyCompany.Aries.Game.PlayerController")
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local ToolManager = commonlib.gettable("MyCompany.Aries.Game.Tools.ToolManager");
 local TouchSceneController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchSceneController");
@@ -235,6 +236,8 @@ function TouchController.ShowPage(bShow)
 	if(GameLogic.GameMode:IsMovieMode() and not GameLogic.GameMode:IsEditor() and bShow) then
 		return;
 	end
+	PlayerController:SetFlyUsingCameraDir(not bShow);
+
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/TouchController.html", 
 			name = "PC.TouchController", 
