@@ -38,6 +38,8 @@ Entity.is_persistent = true;
 Entity.is_regional = true;
 -- if model is invalid, use this model file. 
 Entity.default_file = "character/common/headquest/headquest.x";
+-- whether to force load physics, if false, it will only load when player collide with it. 
+Entity.bIsForceLoadPhysics = true;
 
 function Entity:ctor()
 	self.inventory = self.inventory or InventoryBase:new():Init();
@@ -77,6 +79,11 @@ function Entity:HasBag()
 	return true;
 end
 
+-- whether to force load physics, if false, it will only load when player collide with it. 
+function Entity:IsForceLoadPhysics()
+	return self.bIsForceLoadPhysics;
+end
+
 -- this is helper function that derived class can use to create an inner mesh or character object. 
 function Entity:CreateInnerObject(filename, scale)
 	filename = Files.GetFilePath(self:GetModelDiskFilePath(filename)) or self.default_file;
@@ -103,6 +110,9 @@ function Entity:CreateInnerObject(filename, scale)
 	model:SetField("RenderDistance", 100);
 	if(self:HasRealPhysics()) then
 		model:SetField("EnablePhysics", true);
+		if(self:IsForceLoadPhysics()) then
+			model:LoadPhysics(); 
+		end
 	end
 
 	self:SetInnerObject(model);

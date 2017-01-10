@@ -33,6 +33,7 @@ Commands["music"] = {
 /music stop			to stop the music
 /music				empty is also to stop the music
 /music 1.mp3 10.1   play 1.mp3 from 10.1 seconds
+/music http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
@@ -100,18 +101,19 @@ You must have internet connection to use this.
 
 Commands["sound"] = {
 	name="sound", 
-	quick_ref="/sound name [filename] [from_time] [volume:0-1] [pitch:0-1]", 
+	quick_ref="/sound name_or_filename [filename] [from_time] [volume:0-1] [pitch:0-1]", 
 	desc=[[play a non-loop sound by a given name. There can be only one sound playing for each name
-/sound name [filename] [from_time:0] [volume:0-1] [pitch:0-2]   
+@param filename: filepath can be relative to current world or a http:// url. 
 /sound anyname break.ogg 0.2 1.3			play break.ogg in channel anyname
 /sound break							play a predefined sound
 /sound 1.mp3							play 1.mp3 on its own channel.
 /sound 1.mp3 10.1						play 1.mp3 from 10.1 seconds
+/sound http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local sound_name, filename, fromtime, volume, pitch;
-		sound_name, cmd_text = CmdParser.ParseString(cmd_text);
-		filename, cmd_text = CmdParser.ParseString(cmd_text);
+		sound_name, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
+		filename, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
 		if(filename and filename:match("^[%d%.]+$")) then
 			fromtime = tonumber(filename);
 			filename = nil;
@@ -128,18 +130,31 @@ Commands["sound"] = {
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 		local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 		if(sound_name) then
-			SoundManager:PlaySound(sound_name, filename, fromtime, volume, pitch);
+			local url = filename or sound_name;
+			if(url and url:match("^http")) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+				local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+				HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
+					if(diskfilename) then
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+						local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+						SoundManager:PlaySound(sound_name, diskfilename);
+					end
+				end)
+			else
+				SoundManager:PlaySound(sound_name, filename, fromtime, volume, pitch);	
+			end
 		end
 	end,
 };
 
 Commands["stopsound"] = {
 	name="stopsound", 
-	quick_ref="/sound name ", 
+	quick_ref="/sound name", 
 	desc="stop a sound", 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local sound_name, filename, volume, pitch;
-		sound_name, cmd_text = CmdParser.ParseString(cmd_text);
+		sound_name, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 		local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 		if(sound_name) then

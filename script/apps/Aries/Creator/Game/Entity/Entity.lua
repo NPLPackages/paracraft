@@ -1424,6 +1424,7 @@ function Entity:CheckCollision(deltaTime)
 		block:OnStep(bx,by-1,bz, self);
 	else
 		-- only falls down when no speed at all. 
+		-- NOTE: this is inaccurate, for half-block height slab block, but vertical speed is reset to 0 in C++ physics engine anyway. 
 		if(not self:HasSpeed() and not self:IsFlying()) then
 			self:FallDown(deltaTime);
 		end
