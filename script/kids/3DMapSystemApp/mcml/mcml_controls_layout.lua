@@ -69,7 +69,7 @@ end
 
 -- create a new layout, that is the same size of the preferred size but left, top is 0,0;
 function layout:new_child()
-	local o = layout:new(o)
+	local o = layout:new()
 	local width, height = self:GetPreferredSize();
 	o:reset(0, 0, width, height);
 	return o;
