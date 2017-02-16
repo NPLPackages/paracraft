@@ -124,4 +124,12 @@ function ModBase:RegisterCommand(name, cmd)
 	local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 	Commands[name] = cmd;
 end
+
+function ModBase:SetWorldData()
+
+end
+
+function ModBase:GetWorldData()
+
+end
 	
