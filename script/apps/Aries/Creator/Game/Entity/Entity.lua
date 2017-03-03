@@ -2461,6 +2461,7 @@ end
 -- Please be very careful NOT to enable physics for moving entities. Physics are automatically unloaded 
 -- when geometry or position changed, thus a moving entity may frequently load and unload physics causing performance issues. 
 -- @param bForceLoadPhysics: default to nil. by default it is lazy loading when main player collide with it, one can also explicitly load physics
+-- make sure to call this function after model is loaded (Due to async loading, the model is not loaded until visible by a camera and loading is done in a separate loading thread)
 function Entity:EnablePhysics(bEnable, bForceLoadPhysics)
 	local obj = self:GetInnerObject();
 	if(obj) then

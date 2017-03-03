@@ -63,13 +63,14 @@ local block_attribute_map = {
 	alphaTestTexture= 0x0000400,
 	singleSideTex   = 0x0000800,
 	threeSideTex	= 0x0001000,
-	sixSideTex		= 0x0002000,
-	climbable		= 0x0004000,
-	blockcamera		= 0x0008000,
-	framemove		= 0x0010000, -- whether to tick randomly, framemove or tick_random are the same
-	tick_random		= 0x0010000, -- whether to tick randomly, framemove or tick_random are the same
-	onload			= 0x0020000, -- whether has onBlockLoaded
-	color_data		= 0x0040000, -- whether the block contains color in its block data.
+	fourSideTex		= 0x0002000,
+	sixSideTex		= 0x0004000,
+	climbable		= 0x0008000,
+	blockcamera		= 0x0010000,
+	framemove		= 0x0020000, -- whether to tick randomly, framemove or tick_random are the same
+	tick_random		= 0x0020000, -- whether to tick randomly, framemove or tick_random are the same
+	onload			= 0x0040000, -- whether has onBlockLoaded
+	color_data		= 0x0080000, -- whether the block contains color in its block data.
 }
 
 block.attributes = block_attribute_map;
@@ -307,6 +308,8 @@ function block:GetIcon()
 			if(self.singleSideTex) then
 				self.icon = self.texture;
 			elseif(self.threeSideTex) then
+				self.icon = format("%s#0 128 128 128", self.texture);
+			elseif(self.fourSideTex) then
 				self.icon = format("%s#0 128 128 128", self.texture);
 			elseif(self.sixSideTex) then
 				self.icon = format("%s#0 0 128 128", self.texture);
@@ -1375,6 +1378,8 @@ function block:GetItemModel()
 		if(self.singleSideTex) then
 			return "model/blockworld/BlockModel/block_model_one.x";
 		elseif(self.threeSideTex) then
+			return "model/blockworld/BlockModel/block_model_four.x";
+		elseif(self.fourSideTex) then
 			return "model/blockworld/BlockModel/block_model_four.x";
 		elseif(not self.sixSideTex) then
 			-- default to single side

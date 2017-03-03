@@ -492,6 +492,7 @@ function block_types.LoadFromFile(filename)
 				attr.light = attr.light == "true";
 				attr.threeSideTex = attr.threeSideTex == "true";
 				attr.singleSideTex = attr.singleSideTex == "true";
+				attr.fourSideTex = attr.fourSideTex == "true";
 				attr.sixSideTex = attr.sixSideTex == "true";
 				attr.customModel = attr.customModel == "true";
 				-- custom block model is read from x file, but cached in chunk render buffer like ordinary cubeModel. 
@@ -644,11 +645,13 @@ function block_types.GenerateFromDirFile(filename)
 			local singleSideTex = name:match("_single");
 			local sixSideTex = name:match("_six");
 			local threeSideTex = name:match("_three");
+			local fourSideTex = name:match("_four");
 			id = id + 1;
 			output[#output+1] = {name="block", attr={id=id, texture="Texture/tileset/blocks/"..name, 
 				singleSideTex = if_else(singleSideTex, "true", nil),
 				sixSideTex = if_else(sixSideTex, "true", nil),
 				threeSideTex = if_else(threeSideTex, "true", nil),
+				fourSideTex = if_else(fourSideTex, "true", nil),
 			 }}
 		end
 		line = file:readline()

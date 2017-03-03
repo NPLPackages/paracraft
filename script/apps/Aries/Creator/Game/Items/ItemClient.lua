@@ -69,6 +69,8 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemTerrainBrush.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemPaintBrush.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLight.lua");
+
+	GameLogic.GetFilters():apply_filters("register_item");
 end
 
 function ItemClient.OnInit()
@@ -460,6 +462,7 @@ function ItemClient.RegisterCustomItem(params)
 		new_block.cubeMode = base_block.cubeMode;
 		new_block.light = params.light or base_block.light;
 		new_block.threeSideTex = base_block.threeSideTex;
+		new_block.fourSideTex = base_block.fourSideTex;
 		new_block.singleSideTex = base_block.singleSideTex;
 		new_block.sixSideTex = base_block.sixSideTex;
 		new_block.customModel = base_block.customModel;
