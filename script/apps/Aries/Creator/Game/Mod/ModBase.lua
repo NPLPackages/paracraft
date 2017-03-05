@@ -134,50 +134,52 @@ end
 -- @param dataTable: table data type
 -- e.g self:SetWorldData("mydata",{hello="world",thank="you"})
 function ModBase:SetWorldData(dataBundle,dataTable)
-	local modName   = self.Name;
-	local worldName = GameLogic.GetWorldDirectory();
-	local filePath  = worldName .. "mod/" .. modName .. ".xml";
+	if(self.worldData == nil) then
+		local modName   = self.Name;
+		local worldName = GameLogic.GetWorldDirectory();
+		local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
-	local xmlFile = ParaXML.LuaXML_ParseFile(filePath);
-	--LOG.std(nil,"debug","xmlFile",xmlFile);
-	if(xmlFile) then
+		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
+	end
+
+	if(self.worldData) then
 		--LOG.std(nil,"debug","xmlFileExist");
 		--If exist the same dataBundle,delete it.
-		for key,value in pairs(xmlFile[1]) do
+		for key,value in pairs(self.worldData[1]) do
 			if(type(value) == "table" and value.name == dataBundle) then
-				xmlFile[1][key] = nil;
+				self.worldData[1][key] = nil;
 			end
 		end
 	else
 		--LOG.std(nil,"debug","xmlFileNotExist");
-		xmlFile = {{name=modName}};
+		self.worldData = {{name=modName}};
 		ParaIO.CreateDirectory(worldName .. "mod/");
 	end
 
 	local count = 0;
-	for key,value in pairs(xmlFile[1]) do
+	for key,value in pairs(self.worldData[1]) do
 		if(type(key) == "number") then
 			count = count + 1;
 		end
 	end
 
-	if(type(dataTable) == "table")then
-		attrBundle={type="table"};
-	else
-		attrBundle={type="string"};
+	if(type(dataTable) ~= "table")then
+		LOG.std(nil,"info","dataTable must be table");
+		return false;
 	end
 
-	xmlFile[1][count+1] = {dataTable,name=dataBundle,attr=attrBundle};
-	--LOG.std(nil,"debug","xmlFile",xmlFile);
+	local xmlTable = {};
 
-	local saveXml = commonlib.Lua2XmlString(xmlFile);
-	--LOG.std(nil,"debug","saveXml",saveXml);
+	for name,value in pairs(dataTable) do
+		local thisTable = {};
+		thisTable[1]      = value;
+		thisTable['name'] = name;
+		thisTable['attr'] = {type = type(value)};
 
-	--LOG.std(nil,"debug","filePath",Encoding.DefaultToUtf8(filePath));
-	local file = ParaIO.open(filePath, "w");
+		xmlTable[#xmlTable+1] = thisTable;
+	end
 
-	file:write(saveXml,#saveXml);
-	file:close();
+	self.worldData[1][count+1] = {xmlTable,name=dataBundle,attr={type="table"}};
 
 	return nil;
 end
@@ -185,22 +187,49 @@ end
 -- get any data
 -- @param dataBundle: bundle name
 -- e.g self:GetWorldData("myname")
+-- return {hello="world",thank="you"}
 function ModBase:GetWorldData(dataBundle)
+	if(self.worldData == nil) then
+		local modName   = self.Name;
+		local worldName = GameLogic.GetWorldDirectory();
+		local filePath  = worldName .. "mod/" .. modName .. ".xml";
+
+		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
+	end
+
+	if(self.worldData) then
+		for key,value in pairs(self.worldData[1]) do
+			if(type(value) == "table" and value.name == dataBundle) then
+				local returnDataBundle = {};
+
+				for bundleKey,bundleValue in pairs(value) do
+					if(bundleKey ~= "name" and bundleKey ~= "attr") then
+						returnDataBundle[bundleValue['name']] = bundleValue[1];
+					end
+				end
+
+				return returnDataBundle;
+			end
+		end
+
+		return nil;
+	else
+		return nil;
+	end
+end
+
+function ModBase:SaveWorldData()
 	local modName   = self.Name;
 	local worldName = GameLogic.GetWorldDirectory();
 	local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
-	local xmlFile = ParaXML.LuaXML_ParseFile(filePath);
-	if(xmlFile) then
-		--LOG.std(nil,"debug","xmlFileExist");
-		--If exist the same dataBundle,delete it.
-		for key,value in pairs(xmlFile[1]) do
-			if(type(value) == "table" and value.name == dataBundle) then
-				return value;
-			end
-		end
-	else
-		return false;
-	end
+	local saveXml = commonlib.Lua2XmlString(self.worldData);
+	--LOG.std(nil,"debug","saveXml",saveXml);
+
+	--LOG.std(nil,"debug","filePath",Encoding.DefaultToUtf8(filePath));
+	local file = ParaIO.open(filePath, "w");
+
+	file:write(saveXml,#saveXml);
+	file:close();
 end
 	
