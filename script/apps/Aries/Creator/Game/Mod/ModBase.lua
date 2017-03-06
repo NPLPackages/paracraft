@@ -134,8 +134,9 @@ end
 -- @param dataTable: table data type
 -- e.g self:SetWorldData("mydata",{hello="world",thank="you"})
 function ModBase:SetWorldData(dataBundle,dataTable)
+	local modName = self.Name;
+
 	if(self.worldData == nil) then
-		local modName   = self.Name;
 		local worldName = GameLogic.GetWorldDirectory();
 		local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
@@ -145,7 +146,7 @@ function ModBase:SetWorldData(dataBundle,dataTable)
 	if(self.worldData) then
 		--If exist the same dataBundle,delete it.
 		for key,value in pairs(self.worldData[1]) do
-			if(type(value) == "table" and value.name == dataBundle) then
+			if(value.name == dataBundle) then
 				self.worldData[1][key] = nil;
 			end
 		end
@@ -155,14 +156,17 @@ function ModBase:SetWorldData(dataBundle,dataTable)
 	end
 
 	local count = 0;
+	local newWorldData = {{name=modName}};
+
 	for key,value in pairs(self.worldData[1]) do
 		if(type(key) == "number") then
 			count = count + 1;
+			newWorldData[1][count] = value;
 		end
 	end
 
-	self.worldData[1][count+1] = {commonlib.serialize_compact(dataTable),name=dataBundle,attr={type="string"}};
-
+	newWorldData[1][count+1] = {commonlib.serialize_compact(dataTable),name=dataBundle,attr={type=type(dataTable)}};
+	self.worldData = newWorldData;
 	return nil;
 end
 
@@ -181,8 +185,16 @@ function ModBase:GetWorldData(dataBundle)
 
 	if(self.worldData) then
 		for key,value in pairs(self.worldData[1]) do
-			if(type(value) == "table" and value.name == dataBundle) then
-				return NPL.LoadTableFromString(value);
+			if(value.name == dataBundle) then
+				if(value.attr.type == "table") then
+					return NPL.LoadTableFromString(value[1]);
+				elseif(value.attr.type == "string") then
+					return value[1];
+				elseif(value.attr.type == "number") then
+					return tonumber(value[1]);
+				elseif(value.attr.type == "boolean") then
+					return value[1] == "true";
+				end
 			end
 		end
 
