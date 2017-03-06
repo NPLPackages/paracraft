@@ -341,3 +341,21 @@ e.g.
 		end
 	end,
 };
+
+Commands["pointtexture"] = {
+	name="pointtexture", 
+	quick_ref="/pointtexture [on|off]", 
+	desc=[[turn point texture filter on or off for meshes in block world. By default, it is on. 
+/pointtexture on
+/pointtexture off
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local bIsOn;
+		bIsOn, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(bIsOn == nil) then
+			bIsOn = true;
+		end
+		LOG.std(nil, "info", "pointtexture", bIsOn);
+		ParaTerrain.GetBlockAttributeObject():SetField("UsePointTextureFiltering", bIsOn);
+	end,
+};
