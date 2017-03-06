@@ -143,7 +143,6 @@ function ModBase:SetWorldData(dataBundle,dataTable)
 	end
 
 	if(self.worldData) then
-		--LOG.std(nil,"debug","xmlFileExist");
 		--If exist the same dataBundle,delete it.
 		for key,value in pairs(self.worldData[1]) do
 			if(type(value) == "table" and value.name == dataBundle) then
@@ -151,7 +150,6 @@ function ModBase:SetWorldData(dataBundle,dataTable)
 			end
 		end
 	else
-		--LOG.std(nil,"debug","xmlFileNotExist");
 		self.worldData = {{name=modName}};
 		ParaIO.CreateDirectory(worldName .. "mod/");
 	end
@@ -163,23 +161,7 @@ function ModBase:SetWorldData(dataBundle,dataTable)
 		end
 	end
 
-	if(type(dataTable) ~= "table")then
-		LOG.std(nil,"info","dataTable must be table");
-		return false;
-	end
-
-	local xmlTable = {};
-
-	for name,value in pairs(dataTable) do
-		local thisTable = {};
-		thisTable[1]      = value;
-		thisTable['name'] = name;
-		thisTable['attr'] = {type = type(value)};
-
-		xmlTable[#xmlTable+1] = thisTable;
-	end
-
-	self.worldData[1][count+1] = {xmlTable,name=dataBundle,attr={type="table"}};
+	self.worldData[1][count+1] = {commonlib.serialize_compact(dataTable),name=dataBundle,attr={type="string"}};
 
 	return nil;
 end
@@ -200,15 +182,7 @@ function ModBase:GetWorldData(dataBundle)
 	if(self.worldData) then
 		for key,value in pairs(self.worldData[1]) do
 			if(type(value) == "table" and value.name == dataBundle) then
-				local returnDataBundle = {};
-
-				for bundleKey,bundleValue in pairs(value) do
-					if(bundleKey ~= "name" and bundleKey ~= "attr") then
-						returnDataBundle[bundleValue['name']] = bundleValue[1];
-					end
-				end
-
-				return returnDataBundle;
+				return NPL.LoadTableFromString(value);
 			end
 		end
 
@@ -224,7 +198,6 @@ function ModBase:SaveWorldData()
 	local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
 	local saveXml = commonlib.Lua2XmlString(self.worldData);
-	--LOG.std(nil,"debug","saveXml",saveXml);
 
 	--LOG.std(nil,"debug","filePath",Encoding.DefaultToUtf8(filePath));
 	local file = ParaIO.open(filePath, "w");
