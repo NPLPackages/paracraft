@@ -13,9 +13,13 @@ local ModBase = commonlib.gettable("Mod.ModBase");
 ]]
 NPL.load("(gl)script/ide/System/Plugins/PluginBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-local ModManager = commonlib.gettable("Mod.ModManager");
+NPL.load("(gl)script/ide/LuaXML.lua");
+NPL.load("(gl)script/ide/Encoding.lua");
+NPL.load("(gl)script/ide/Files.lua");
 
-local ModBase = commonlib.inherit(commonlib.gettable("System.Plugins.PluginBase"), commonlib.gettable("Mod.ModBase"));
+local ModManager = commonlib.gettable("Mod.ModManager");
+local ModBase    = commonlib.inherit(commonlib.gettable("System.Plugins.PluginBase"), commonlib.gettable("Mod.ModBase"));
+local Encoding   = commonlib.gettable("commonlib.Encoding");
 
 ModBase:Property({"Name", "unknown name"});
 ModBase:Property({"Desc", "mod is a special kind of plugin in paracraft"});
@@ -123,5 +127,94 @@ end
 function ModBase:RegisterCommand(name, cmd)
 	local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 	Commands[name] = cmd;
+end
+
+-- set any kind of data
+-- @param dataBundle: bundles of data
+-- @param dataTable: table data type
+-- e.g self:SetWorldData("mydata",{hello="world",thank="you"})
+function ModBase:SetWorldData(dataBundle,dataTable)
+	local modName = self.Name;
+
+	if(self.worldData == nil) then
+		local worldName = GameLogic.GetWorldDirectory();
+		local filePath  = worldName .. "mod/" .. modName .. ".xml";
+
+		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
+	end
+
+	if(self.worldData) then
+		--If exist the same dataBundle,delete it.
+		for key,value in pairs(self.worldData[1]) do
+			if(value.name == dataBundle) then
+				self.worldData[1][key] = nil;
+			end
+		end
+	else
+		self.worldData = {{name=modName}};
+		ParaIO.CreateDirectory(worldName .. "mod/");
+	end
+
+	local count = 0;
+	local newWorldData = {{name=modName}};
+
+	for key,value in pairs(self.worldData[1]) do
+		if(type(key) == "number") then
+			count = count + 1;
+			newWorldData[1][count] = value;
+		end
+	end
+
+	newWorldData[1][count+1] = {commonlib.serialize_compact(dataTable),name=dataBundle,attr={type=type(dataTable)}};
+	self.worldData = newWorldData;
+	return nil;
+end
+
+-- get any data
+-- @param dataBundle: bundle name
+-- e.g self:GetWorldData("myname")
+-- return {hello="world",thank="you"}
+function ModBase:GetWorldData(dataBundle)
+	if(self.worldData == nil) then
+		local modName   = self.Name;
+		local worldName = GameLogic.GetWorldDirectory();
+		local filePath  = worldName .. "mod/" .. modName .. ".xml";
+
+		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
+	end
+
+	if(self.worldData) then
+		for key,value in pairs(self.worldData[1]) do
+			if(value.name == dataBundle) then
+				if(value.attr.type == "table") then
+					return NPL.LoadTableFromString(value[1]);
+				elseif(value.attr.type == "string") then
+					return value[1];
+				elseif(value.attr.type == "number") then
+					return tonumber(value[1]);
+				elseif(value.attr.type == "boolean") then
+					return value[1] == "true";
+				end
+			end
+		end
+
+		return nil;
+	else
+		return nil;
+	end
+end
+
+function ModBase:SaveWorldData()
+	local modName   = self.Name;
+	local worldName = GameLogic.GetWorldDirectory();
+	local filePath  = worldName .. "mod/" .. modName .. ".xml";
+
+	local saveXml = commonlib.Lua2XmlString(self.worldData);
+
+	--LOG.std(nil,"debug","filePath",Encoding.DefaultToUtf8(filePath));
+	local file = ParaIO.open(filePath, "w");
+
+	file:write(saveXml,#saveXml);
+	file:close();
 end
 	

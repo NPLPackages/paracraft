@@ -150,6 +150,10 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 			end)
 		end,
 	};
+
+	LOG.std(nil,"debug","GameStart",commandName);
+	LOG.std(nil,"debug","Game.loadworld_params",Game.loadworld_params);
+
 	System.App.Commands.Call(commandName, Game.loadworld_params);
 end
 
