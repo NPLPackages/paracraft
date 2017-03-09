@@ -134,12 +134,11 @@ end
 -- @param dataTable: table data type
 -- e.g self:SetWorldData("mydata",{hello="world",thank="you"})
 function ModBase:SetWorldData(dataBundle,dataTable)
+	local worldName = GameLogic.GetWorldDirectory();
 	local modName = self.Name;
 
 	if(self.worldData == nil) then
-		local worldName = GameLogic.GetWorldDirectory();
 		local filePath  = worldName .. "mod/" .. modName .. ".xml";
-
 		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
 	end
 
