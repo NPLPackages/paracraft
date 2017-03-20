@@ -32,7 +32,7 @@ end
 
 --virtual function:
 function ColorEffect:SetEnabled(bEnable)
-	self._super.SetEnabled(self, bEnable);
+	ColorEffect._super.SetEnabled(self, bEnable);
 end
 
 -- @param h,s,v: hue, saturation, value(brightness)

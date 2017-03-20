@@ -44,7 +44,7 @@ function ConnectionTCP:OnConnectionLost(reason)
 end
 
 function ConnectionTCP:AddToSendQueue(msg, neuronfile)
-	return self._super.AddToSendQueue(self, msg, neuronfile);
+	return ConnectionTCP._super.AddToSendQueue(self, msg, neuronfile);
 end
 
 function ConnectionTCP:OnNetReceive(msg)

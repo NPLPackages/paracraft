@@ -32,13 +32,13 @@ function ItemSign:PickItemFromPosition(x,y,z)
 			return itemStack;
 		end
 	end
-	return self._super.PickItemFromPosition(self, x,y,z);
+	return ItemSign._super.PickItemFromPosition(self, x,y,z);
 end
 
 -- return true if items are the same. 
 -- @param left, right: type of ItemStack or nil. 
 function ItemSign:CompareItems(left, right)
-	if(self._super.CompareItems(self, left, right)) then
+	if(ItemSign._super.CompareItems(self, left, right)) then
 		if(left and right and left:GetTooltip() == right:GetTooltip()) then
 			return true;
 		end
@@ -49,7 +49,7 @@ end
 function ItemSign:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 	local text = itemStack:GetDataField("tooltip");
 
-	local res = self._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
+	local res = ItemSign._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
 	if(res and text and text~="") then
 		local entity = self:GetBlock():GetBlockEntity(x,y,z);
 		if(entity and entity:GetBlockId() == self.id) then

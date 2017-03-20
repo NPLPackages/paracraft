@@ -57,13 +57,13 @@ function ItemImage:PickItemFromPosition(x,y,z)
 			return itemStack;
 		end
 	end
-	return self._super.PickItemFromPosition(self, x,y,z);
+	return ItemImage._super.PickItemFromPosition(self, x,y,z);
 end
 
 -- return true if items are the same. 
 -- @param left, right: type of ItemStack or nil. 
 function ItemImage:CompareItems(left, right)
-	if(self._super.CompareItems(self, left, right)) then
+	if(ItemImage._super.CompareItems(self, left, right)) then
 		if(left and right and left:GetTooltip() == right:GetTooltip()) then
 			return true;
 		end

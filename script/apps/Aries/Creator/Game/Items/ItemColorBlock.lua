@@ -129,7 +129,7 @@ end
 -- when alt key is pressed to pick a block in edit mode. 
 function ItemColorBlock:PickItemFromPosition(x,y,z)
 	self:PickPenColorAtPos(x,y,z);
-	return self._super.PickItemFromPosition(self, x,y,z);
+	return ItemColorBlock._super.PickItemFromPosition(self, x,y,z);
 end
 
 function ItemColorBlock:PickPenColorAtPos(x,y,z)

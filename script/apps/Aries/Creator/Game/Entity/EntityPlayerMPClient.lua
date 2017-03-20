@@ -94,6 +94,15 @@ function Entity:FrameMove(deltaTime)
     end
 end
 
+-- not controlled remotely, this avoid MoveEntity to be controlled by server.
+function Entity:IsRemote()
+	return false;
+end
+
+function Entity:MoveEntity(deltaTime)
+	Entity._super.MoveEntity(self, deltaTime);	
+end
+
 function Entity:IsNearbyChunkLoaded()
 	return self.isNearbyChunkLoaded;
 end

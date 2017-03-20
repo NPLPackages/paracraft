@@ -27,7 +27,7 @@ end
 
 --virtual function:
 function finalEffect:SetEnabled(bEnable)
-	self._super.SetEnabled(self, bEnable);
+	finalEffect._super.SetEnabled(self, bEnable);
 	if(bEnable) then
 		-- enable advanced shader
 		self:GetEffectManager():SetShaders(2);
