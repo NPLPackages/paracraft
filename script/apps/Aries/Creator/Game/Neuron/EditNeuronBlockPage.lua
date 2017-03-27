@@ -204,7 +204,7 @@ end
 function EditNeuronBlockPage:handleLeftClickScene(event)
 	local neuron = self.neuron;
 	local ctrl_pressed = event.ctrl_pressed;
-	local is_shift_pressed = event.is_shift_pressed;
+	local is_shift_pressed = event.shift_pressed;
 
 	local result = Game.SelectionManager:MousePickBlock();
 	if(result.blockX) then

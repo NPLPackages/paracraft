@@ -760,11 +760,14 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			obj:SetField("AnimID", self:GetLastAnimId() or 0);
 		end
 
+		-- LOG.std(nil, "info", "category", {self.motionX,self.motionY,self.motionZ, self:GetGravity()*2*deltaTime*deltaTime});
+
 		-- apply gravity
 		if(not bFlying) then
 			-- we will double gravity to make it look better
 			self.motionY = math.max(-1, self.motionY - self:GetGravity()*2*deltaTime*deltaTime);
 		end
+		
 		self:MoveEntityByDisplacement(self.motionX,self.motionY,self.motionZ);
 
 		if(dist_sq == 0 and self.onGround) then

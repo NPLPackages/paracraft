@@ -225,7 +225,7 @@ function MainLogin:next_step(state_update)
 end
 
 function MainLogin:CheckGraphicsSettings()
-	if(System.options.mc) then
+	if(System.options.mc or System.options.servermode) then
 		MainLogin:next_step({CheckGraphicsSettings = true});
 		return;
 	end
@@ -241,7 +241,7 @@ function MainLogin:CheckGraphicsSettings()
 end 
 
 function MainLogin:AutoAdjustGraphicsSettings()
-	if(System.options.mc) then
+	if(System.options.mc or System.options.servermode) then
 		MainLogin:next_step({CheckGraphicsSettings = true});
 		return;
 	end
@@ -280,6 +280,9 @@ end
 
 -- login handler
 function MainLogin:LoadBackground3DScene()
+	if(System.options.servermode) then
+		return self:next_step({Loaded3DScene = true});
+	end
 	ParaEngine.SetWindowText(string.format("%s -- ver %s", L"创意空间 ParaCraft", GameLogic.options.GetClientVersion()));
 
 	-- just in case it is from web browser. inform to switch to 3d display. 
@@ -345,6 +348,9 @@ function MainLogin:LoadBackground3DScene()
 end
 
 function MainLogin:HasInitedTexture()
+	if(System.options.servermode) then
+		return self:next_step({HasInitedTexture = true});
+	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 	local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 
@@ -354,7 +360,9 @@ end
 
 -- handles local or internet user login. 
 function MainLogin:Handle_UserLoginProcess()
-	if(System.options.loginmode == "local") then
+	if(System.options.servermode) then
+		self:next_step({HasSignedIn = true});
+	elseif(System.options.loginmode == "local") then
 		-- this is just a silent step to perform local sign in
 		self:next_step({HasSignedIn = true});
 
@@ -499,6 +507,13 @@ function MainLogin:CheckCommandLine()
 	local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
 	UrlProtocolHandler:CheckInstallUrlProtocol();
 	UrlProtocolHandler:ParseCommand(ParaEngine.GetAppCommandLine());
+	if(System.options.servermode) then
+		-- TODO: for server only world
+		if(not System.options.cmdline_world or System.options.cmdline_world=="") then
+			System.options.cmdline_world = "worlds/DesignHouse/defaultserverworld";
+			LOG.std(nil, "warn", "serverworld", "no server world specified, we will use %s", System.options.cmdline_world);
+		end
+	end
 	self:next_step({IsCommandLineChecked = true});	
 end
 
@@ -541,7 +556,20 @@ function MainLogin:CheckLoadWorldFromCmdLine()
 	if(worldpath and worldpath~="" and not self.cmdWorldLoaded) then
 		self.cmdWorldLoaded = true;
 
-		if(worldpath:match("^http(s)://")) then
+		if(System.options.servermode) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
+			local Game = commonlib.gettable("MyCompany.Aries.Game")
+			Game.Start(worldpath, nil, 0, nil, nil, function()
+				LOG.std(nil, "info", "MainLogin", "server mode load world: %s", worldpath);
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+				CommandManager:Init();
+				local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
+				local port = ParaEngine.GetAppCommandLineByParam("port", "");
+				GameLogic.RunCommand("startserver", ip.." "..port);
+			end);
+
+		elseif(worldpath:match("^http(s)://")) then
 			LOG.std(nil, "info", "MainLogin", "loading world: %s", worldpath);
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -557,7 +585,7 @@ function MainLogin:CheckLoadWorldFromCmdLine()
 end
 
 function MainLogin:LoadMainWorld()
-	if(self:CheckLoadWorldFromCmdLine()) then
+	if(self:CheckLoadWorldFromCmdLine() or System.options.servermode) then
 		return;
 	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");

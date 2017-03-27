@@ -248,3 +248,7 @@ end
 function Game.FrameMove(timer)
 	GameLogic.FrameMove(timer);
 end
+
+local function activate()
+end
+NPL.this(activate);

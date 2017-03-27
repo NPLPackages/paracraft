@@ -2126,7 +2126,7 @@ function Entity:MoveEntityByDisplacement(dx,dy,dz)
 
 		if(dy~=0) then
 			for i= 1, listCollisions:size() do
-				dy = listCollisions:get(i):CalculateYOffset(boundingBox, dy);
+				dy = listCollisions:get(i):CalculateYOffset(boundingBox, dy, 0.01);
 			end
 			boundingBox:Offset(0, dy, 0);
 			if (not self.bContinueMoveOnCollision and dy1 ~= dy) then
