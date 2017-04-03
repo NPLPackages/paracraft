@@ -690,40 +690,54 @@ local myThemePath = "worlds/DesignHouse/blocktemplates/";
 local myThemeIndex;
 local myTaskMap = {};
 
+local string_byte = string.byte;
 BuildQuestProvider.NeedRefreshDS = true;
-
 local function GetFiles(path,filter,zipfile)
 	local output = commonlib.Files.Find({}, path,0, 10000, filter, zipfile);
 	table.sort(output, function(a, b)
-		local a_date = a.createdate;
-		local b_date = b.createdate;
-		if(a_date == b_date) then
-			return false;
+		-- sort by filename
+		local filename1 = a.filename;
+		local filename2 = b.filename;
+		for i=1, math.min(#filename1, #filename2) do
+			local c1 = string_byte(filename1, i);
+			local c2 = string_byte(filename2, i);
+			if(c1 < c2) then
+				return true;
+			elseif(c1 > c2) then
+				return false;
+			end
 		end
-		local a_year,a_month,a_day,a_hour,a_minute = string.match(a_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
-		a_year = tonumber(a_year);
-		a_month = tonumber(a_month);
-		a_day = tonumber(a_day);
-		a_hour = tonumber(a_hour);
-		a_minute = tonumber(a_minute);
-		local b_year,b_month,b_day,b_hour,b_minute = string.match(b_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
-		b_year = tonumber(b_year);
-		b_month = tonumber(b_month);
-		b_day = tonumber(b_day);
-		b_hour = tonumber(b_hour);
-		b_minute = tonumber(b_minute);
-		if(a_year ~= b_year) then
-			return a_year < b_year;
-		elseif(a_month ~= b_month) then
-			return a_month < b_month;
-		elseif(a_day ~= b_day) then
-			return a_day < b_day;
-		elseif(a_hour ~= b_hour) then
-			return a_hour < b_hour;
-		elseif(a_minute ~= b_minute) then
-			return a_minute < b_minute;
-		end
-		return false;
+		return (#filename1) < (#filename2);
+
+--		local a_date = a.createdate;
+--		local b_date = b.createdate;
+--		if(a_date == b_date) then
+--			return false;
+--		end
+--		local a_year,a_month,a_day,a_hour,a_minute = string.match(a_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
+--		a_year = tonumber(a_year);
+--		a_month = tonumber(a_month);
+--		a_day = tonumber(a_day);
+--		a_hour = tonumber(a_hour);
+--		a_minute = tonumber(a_minute);
+--		local b_year,b_month,b_day,b_hour,b_minute = string.match(b_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
+--		b_year = tonumber(b_year);
+--		b_month = tonumber(b_month);
+--		b_day = tonumber(b_day);
+--		b_hour = tonumber(b_hour);
+--		b_minute = tonumber(b_minute);
+--		if(a_year ~= b_year) then
+--			return a_year < b_year;
+--		elseif(a_month ~= b_month) then
+--			return a_month < b_month;
+--		elseif(a_day ~= b_day) then
+--			return a_day < b_day;
+--		elseif(a_hour ~= b_hour) then
+--			return a_hour < b_hour;
+--		elseif(a_minute ~= b_minute) then
+--			return a_minute < b_minute;
+--		end
+--		return false;
 	end);
 	local out = {};
 	for i = 1,#output do
