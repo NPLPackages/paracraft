@@ -653,6 +653,7 @@ function GameLogic.Exit()
 	local playerController = GameLogic.GetPlayerController();
 	if(playerController) then
 		playerController:DeselectMainPlayerHandTool();
+		-- playerController:FlushLocalData();
 	end
 	
 	MovieManager:Exit();

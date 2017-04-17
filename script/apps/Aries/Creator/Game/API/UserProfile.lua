@@ -184,7 +184,7 @@ function UserProfile:FinishBuilding(theme_index, task_index,category)
 	else
 		theme.count = (theme.count or 0) + 1;
 	end
-	self:SaveData("BuildProgress", self.BuildProgress);
+	self:SaveData("BuildProgress", self.BuildProgress, nil, true);
 	self:GetEvents():DispatchEvent({type = "BuildProgressChanged", theme = theme_index, category = category, value = self.BuildProgress,});
 end
 
@@ -279,8 +279,9 @@ function UserProfile:AddCreateBlock(count)
 end
 
 -- save data
-function UserProfile:SaveData(name, value, bIsGlobal)
-	return self:SaveLocalData(name, value, bIsGlobal, true);
+-- @param bForceFlush: true to flush to disk immediately
+function UserProfile:SaveData(name, value, bIsGlobal, bForceFlush)
+	return self:SaveLocalData(name, value, bIsGlobal, not bForceFlush);
 end
 
 -- flush local data

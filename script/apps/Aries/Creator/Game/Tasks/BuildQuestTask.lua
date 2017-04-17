@@ -209,7 +209,7 @@ end
 
 function BuildQuest:OnClickAccelerateProgress()
 	if(self.step) then
-		if(self:TaskIsFinishedBefore()) then
+		if(true or self:TaskIsFinishedBefore()) then
 			self.step:SetAccelerating();
 		else
 			local curTime = commonlib.TimerManager.GetCurrentTime();

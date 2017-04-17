@@ -25,13 +25,13 @@ local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.Build
 local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 
 local type_ds = {
-	{name = "type",attr = {text=L"新手教程",index = 1,category="tutorial"}},
-	{name = "type",attr = {text=L"建筑百科",index = 2,category="blockwiki"}},
+	{name = "type",attr = {text=L"新手教程",index = 1,category="tutorial", expanded = true}},
+	{name = "type",attr = {text=L"方块百科",index = 2,category="blockwiki"}},
 	{name = "type",attr = {text=L"命令帮助",index = 3,category="command"}},
 	{name = "type",attr = {text=L"快捷操作",index = 4,category="shortcutkey"}},
 }
--- default to category="shortcutkey"
-HelpPage.select_type_index = nil;
+-- default to category="tutorial"
+HelpPage.select_type_index = nil; -- can be nil 
 
 local shortcurkey_ds = {};
 local anim_ds = {};
@@ -95,7 +95,13 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name)
 		end
 
 		HelpPage.select_type_index = index;
-		ds[index]["attr"]["expanded"] = not ds[index]["attr"]["expanded"];
+
+		-- instead of toggle, we will always select one category
+		-- ds[index]["attr"]["expanded"] = not ds[index]["attr"]["expanded"];
+		for i, item in ipairs(ds) do
+			item.attr.expanded = (i == index)
+		end
+		
 
 		if(subcategory_name) then
 			for index, subitem in ipairs(ds[index]) do
@@ -105,25 +111,31 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name)
 				end
 			end
 		end
-
+		HelpPage.OnTypeItemChanged();
 		HelpPage.cur_category = HelpPage.GetCurrentCategory();
-		--BuildQuest.cur_theme_index = 1;
-		HelpPage.cur_theme_index = 1;
 		if(page) then
 			page:Refresh(0.1);
 		end
 	end
 end
 
+function HelpPage.OnTypeItemChanged()
+	HelpPage.cur_category = HelpPage.GetCurrentCategory();
+	if(HelpPage.cur_category == "tutorial") then 
+		BuildQuest.cur_theme_index = HelpPage.select_item_index or 1;
+		BuildQuest.OnInit();
+	end
+end
+
 function HelpPage.OnInit()
 	page = document:GetPageCtrl();
 	BuildQuestProvider.Init();
-	--BuildQuest.cur_theme_index = BuildQuest.cur_theme_index or 1;
-	HelpPage.cur_theme_index = HelpPage.cur_theme_index or 1;
+
 	HelpPage.cur_category = HelpPage.GetCurrentCategory();
 	if(HelpPage.inited) then
 		return;
 	end
+	
 	HelpPage.select_type_index = HelpPage.select_type_index or 1;
 	HelpPage.select_item_index = HelpPage.select_item_index or 1;
 	HelpPage.OnInitDS();
