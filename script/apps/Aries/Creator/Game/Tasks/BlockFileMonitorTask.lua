@@ -7,25 +7,16 @@ when the file changes, the block is automatically updated.
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockFileMonitorTask.lua");
-local task = MyCompany.Aries.Game.Tasks.BlockFileMonitor:new({filename="worlds/DesignHouse/blockdisk/box.blocks.xml"})
+local task = MyCompany.Aries.Game.Tasks.BlockFileMonitor:new({filename="worlds/DesignHouse/blockdisk/box.blocks.xml", cx=nil, cy=nil, cz = nil })
 task:Run();
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Assets/AssetsCommon.lua");
-NPL.load("(gl)script/ide/Display3D/SceneNode.lua");
-NPL.load("(gl)script/ide/Display3D/SceneManager.lua");
-NPL.load("(gl)script/apps/Aries/Creator/AI/LocalNPC.lua");
-local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
-local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
-local ObjEditor = commonlib.gettable("ObjEditor");
-local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
-local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 
 local BlockFileMonitor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockFileMonitor"));
 
@@ -61,8 +52,11 @@ function BlockFileMonitor:Run()
 		return
 	end
 
-	local x, y, z = ParaScene.GetPlayer():GetPosition();
-	self.cx, self.cy, self.cz = BlockEngine:block(x, y+0.1, z);
+	local bx, by, bz = EntityManager.GetPlayer():GetBlockPos();
+	self.cx = self.cx or bx;
+	self.cy = self.cy or by;
+	self.cz = self.cz or bz;
+	
 
 	BlockFileMonitor.mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 		BlockFileMonitor.OnUpdateBlocks();

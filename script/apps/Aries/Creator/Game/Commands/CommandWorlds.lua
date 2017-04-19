@@ -46,9 +46,15 @@ Commands["upload"] = {
 	quick_ref="/upload", 
 	desc="upload the world", 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
-		local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
-		WorldUploadPage.ShowPage(true)
+		if(System.options.is_mcworld) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ShareWorldPage.lua");
+			local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage");
+			ShareWorldPage.ShowPage()
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
+			local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
+			WorldUploadPage.ShowPage(true);
+		end
 	end,
 };
 

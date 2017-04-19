@@ -298,7 +298,6 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	if(keyname == "anim") then
 		local title = format(L"起始时间%s, 请输入动画ID或名称:", strTime);
 
-		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
@@ -313,7 +312,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value)
+		end,old_value, "select", {{value=0, text=L"待机"}, {value=4, text=L"走路"}, {value=5, text=L"跑步"}})
 	elseif(keyname == "assetfile") then
 		local title = format(L"起始时间%s, 请输入模型路经或名称(默认default)", strTime);
 

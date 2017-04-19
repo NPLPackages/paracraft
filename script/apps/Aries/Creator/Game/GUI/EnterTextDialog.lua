@@ -22,11 +22,45 @@ function EnterTextDialog.OnInit()
 	page = document:GetPageCtrl();
 end
 
+-- @param type_: nil|text|multiline|select.  if nil, it is single line text, if "multiline" it is multiline text. 
+function EnterTextDialog.SetType(type_)
+	EnterTextDialog.type = type_;
+end
+
+function EnterTextDialog.GetType()
+	return EnterTextDialog.type;
+end
+
+function EnterTextDialog.IsMultiLine()
+	return EnterTextDialog.GetType() == "multiline";
+end
+
+function EnterTextDialog.IsSelectText()
+	return EnterTextDialog.GetType() == "select";
+end
+
+function EnterTextDialog.IsSingleLine()
+	return not EnterTextDialog.IsMultiLine() and not EnterTextDialog.IsSelectText();
+end
+
+
 -- @param default_text: default text to be displayed. 
-function EnterTextDialog.ShowPage(text, OnClose, default_text, bIsMultiLine)
+-- @param type_: if true, it is multi-line text. otherwise it is nil|text|multiline|select.
+-- @param options: only used when type is "select". such as {{value="0", text="zero"},{value="1"}}
+function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
 	EnterTextDialog.result = nil;
 	EnterTextDialog.text = text;
-	EnterTextDialog.bIsMultiLine = bIsMultiLine;
+	if(bIsMultiLine == true) then
+		EnterTextDialog.SetType("multiline");
+	else
+		EnterTextDialog.SetType(type_);
+	end
+	if(options) then
+		for _, option in pairs(options) do
+			option.selected = option.value == default_text;
+		end
+	end
+	EnterTextDialog.options = options;
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
@@ -53,6 +87,8 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, bIsMultiLine)
 	if(default_text) then
 		if(EnterTextDialog.IsMultiLine()) then
 			params._page:SetUIValue("text_multi", default_text);
+		elseif(EnterTextDialog.IsSelectText()) then
+			params._page:SetValue("text_select", default_text);
 		else
 			params._page:SetUIValue("text", default_text);
 		end
@@ -64,14 +100,12 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, bIsMultiLine)
 	end
 end
 
-function EnterTextDialog.IsMultiLine()
-	return EnterTextDialog.bIsMultiLine == true;
-end
-
 function EnterTextDialog.OnOK()
 	if(page) then
 		if(EnterTextDialog.IsMultiLine()) then
 			EnterTextDialog.result = page:GetValue("text_multi");
+		elseif(EnterTextDialog.IsSelectText()) then
+			EnterTextDialog.result = page:GetValue("text_select");
 		else
 			EnterTextDialog.result = page:GetValue("text");
 		end

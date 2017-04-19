@@ -20,13 +20,17 @@ end
         <%=EnterTextDialog.GetText()%>
     </div>
     <div>
-        <pe:if condition='<%=not EnterTextDialog.IsMultiLine()%>'>
+        <pe:if condition='<%=EnterTextDialog.IsSingleLine()%>'>
             <input type="text" name="text" style="height:24px;"/>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsMultiLine()%>'>
             <div class="mc_paper_panel" style="padding:5px;margin-bottom:5px;margin-right:5px;">
                 <textarea rows="4" name="text_multi" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" />
             </div>
+        </pe:if>
+        <pe:if condition='<%=EnterTextDialog.IsSelectText()%>'>
+            <select name="text_select" AllowUserEdit="false" style="height:24px;" DataSource='<%=EnterTextDialog.options%>'>
+            </select>
         </pe:if>
     </div>
     <div>

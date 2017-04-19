@@ -7,20 +7,16 @@
 </head>
 <body>
     <pe:mcml>
-<script refresh="false" type="text/npl"><![CDATA[
-
-local page = document:GetPageCtrl();
-
-NPL.load("(gl)script/apps/Aries/Creator/SaveWorldPage.lua");
-local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.SaveWorldPage")
-SaveWorldPage.sharepage = page;
+<script refresh="false" type="text/npl" file="ShareWorldPage.lua"><![CDATA[
+local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage");
+ShareWorldPage.OnInit();
 
 function ClosePage()
     Page:CloseWindow();
 end
 
 function TakeImage()
-    SaveWorldPage.TakeSharePageImage();
+    ShareWorldPage.TakeSharePageImage();
 end
 
 function OnClickShareWorld()

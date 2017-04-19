@@ -610,3 +610,36 @@ Example:
 		end
 	end,
 };
+
+Commands["blockfilemonitor"] = {
+	name="blockfilemonitor", 
+	quick_ref="/blockfilemonitor [x y z] [filename]", 
+	desc=[[monitor a given file
+@param x y z: center block position where to show the block content, if not provided, it is the block where the player is standing
+@param filename: default to "temp/blocks.stream.xml", this can be relative to root or world directory. 
+Example:
+/blockfilemonitor     :block at player position
+/blockfilemonitor ~ ~1 ~ temp/blocks.stream.xml    :relative to player position. 
+/blockfilemonitor blocktemplates/test.bmax :monitor a bmax file
+	]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local x, y, z, filename;
+		x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
+		if(not x) then
+			x, y, z = EntityManager.GetPlayer():GetBlockPos();
+		end
+		filename, cmd_text = CmdParser.ParseString(cmd_text);
+		filename = filename or "temp/blocks.stream.xml"
+		if(not ParaIO.DoesFileExist(filename)) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			filename = Files.GetWorldFilePath(filename)
+		end
+
+		if(filename) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockFileMonitorTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.BlockFileMonitor:new({filename=filename, cx=x, cy=y, cz=z})
+			task:Run();
+		end
+	end,
+};
