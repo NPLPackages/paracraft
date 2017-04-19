@@ -133,51 +133,7 @@ end
 
 -- share world page 
 function SaveWorldPage.ShowSharePage()
-	if(not GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true)) then
-		return false;
-	end
-
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Areas/ShareWorldPage.html",
-			name = "SaveWorldPage.ShowSharePage",
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			isTopLevel = true,
-			directPosition = true,
-				align = "_ct",
-				x = -310/2,
-				y = -270/2,
-				width = 310,
-				height = 270,
-		});
-	SaveWorldPage.TakeSharePageImage();
-end
-
-function SaveWorldPage.TakeSharePageImage()
-	local page = SaveWorldPage.sharepage;
-	NPL.load("(gl)script/kids/3DMapSystemUI/ScreenShot/SnapshotPage.lua");	
-	local filepath = ParaWorld.GetWorldDirectory().."preview.jpg";
-	
-	local function SaveAsWorldPreview()
-		if(MyCompany.Apps.ScreenShot.SnapshotPage.TakeSnapshot(filepath,300,200, false)) then
-			--page:SetUIValue("result", string.format("世界截图保存成功:%s", filepath));
-			page:SetUIValue("ShareWorldImage", filepath);
-		end
-	end
-	
-	if(ParaIO.DoesFileExist(filepath, true)) then
-        SaveAsWorldPreview();
-		ParaAsset.LoadTexture("",filepath,1):UnloadAsset();
-        --[[
-		_guihelper.MessageBox(string.format("世界预览图已经存在, 是否要覆盖它?"), function()
-			SaveAsWorldPreview();
-			ParaAsset.LoadTexture("",filepath,1):UnloadAsset();
-		end);
-        ]]
-	else
-		SaveAsWorldPreview();
-	end
-
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ShareWorldPage.lua");
+	local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage");
+	ShareWorldPage.ShowPage()
 end
