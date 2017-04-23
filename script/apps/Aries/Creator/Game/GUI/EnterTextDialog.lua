@@ -88,7 +88,7 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
 		if(EnterTextDialog.IsMultiLine()) then
 			params._page:SetUIValue("text_multi", default_text);
 		elseif(EnterTextDialog.IsSelectText()) then
-			params._page:SetValue("text_select", default_text);
+			params._page:SetUIValue("text_select", default_text);
 		else
 			params._page:SetUIValue("text", default_text);
 		end

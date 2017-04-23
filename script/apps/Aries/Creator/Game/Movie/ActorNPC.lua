@@ -296,13 +296,36 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	local old_value = self:GetValue(keyname, curTime);
 
 	if(keyname == "anim") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/EntityAnimation.lua");
+		local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
+			
+		-- get {{value, text}} array of all animations in the asset file. 
+		local options = {};
+		local assetfile = self:GetValue("assetfile", curTime);
+		if(assetfile) then
+			assetfile = PlayerAssetFile:GetFilenameByName(assetfile)
+			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
+			local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
+			local attr = ParaXModelAttr:new():initFromAssetFile(assetfile);
+			local animations = attr:GetAnimations()
+			if(animations) then
+				for _, anim in ipairs(animations) do
+					if(anim.animID) then
+						options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID)}
+					end
+				end
+				table.sort(options, function(a, b)
+					return a.value < b.value;
+				end)
+			end
+		end
+
 		local title = format(L"起始时间%s, 请输入动画ID或名称:", strTime);
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
-			local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
-			if(result) then
+			if(result and result ~= "") then
 				result = EntityAnimation.CreateGetAnimId(result);	
 				if( type(result) == "number") then
 					self:AddKeyFrameByName(keyname, nil, result);
@@ -312,7 +335,8 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value, "select", {{value=0, text=L"待机"}, {value=4, text=L"走路"}, {value=5, text=L"跑步"}})
+		end,old_value, "select", options);
+
 	elseif(keyname == "assetfile") then
 		local title = format(L"起始时间%s, 请输入模型路经或名称(默认default)", strTime);
 
