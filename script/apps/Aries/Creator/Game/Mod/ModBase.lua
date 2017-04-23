@@ -133,8 +133,11 @@ end
 -- @param dataBundle: bundles of data
 -- @param dataTable: table data type
 -- e.g self:SetWorldData("mydata",{hello="world",thank="you"})
-function ModBase:SetWorldData(dataBundle,dataTable)
-	local worldName = GameLogic.GetWorldDirectory();
+function ModBase:SetWorldData(dataBundle, dataTable, worldName)
+	if(not worldName) then
+		worldName = GameLogic.GetWorldDirectory();
+	end
+
 	local modName = self.Name;
 
 	if(self.worldData == nil) then
@@ -173,10 +176,14 @@ end
 -- @param dataBundle: bundle name
 -- e.g self:GetWorldData("myname")
 -- return {hello="world",thank="you"}
-function ModBase:GetWorldData(dataBundle)
+function ModBase:GetWorldData(dataBundle, worldName)
 	if(self.worldData == nil) then
 		local modName   = self.Name;
-		local worldName = GameLogic.GetWorldDirectory();
+
+		if(not worldName) then
+			worldName = GameLogic.GetWorldDirectory();
+		end
+
 		local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
 		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
@@ -203,9 +210,13 @@ function ModBase:GetWorldData(dataBundle)
 	end
 end
 
-function ModBase:SaveWorldData()
+function ModBase:SaveWorldData(worldName)
 	local modName   = self.Name;
-	local worldName = GameLogic.GetWorldDirectory();
+
+	if(not worldName) then
+		worldName = GameLogic.GetWorldDirectory();
+	end
+
 	local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
 	local saveXml = commonlib.Lua2XmlString(self.worldData);
