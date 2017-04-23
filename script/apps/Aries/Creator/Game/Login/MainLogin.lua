@@ -524,22 +524,9 @@ end
 
 -- load predefined mod packages if any
 function MainLogin:LoadPackages()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-	local ModManager = commonlib.gettable("Mod.ModManager");
-	local pluginloader = ModManager:GetLoader();
-
-	-- TODO: use a filter here
-	local buildin_mods = {
-		{package_path = "npl_packages/BMaxToParaXExporter/", displayName = "ParaX 3D模型导出"},
-		{package_path = "npl_packages/NPLCAD/", displayName = "NPL CAD编程建模"},
-		-- TODO: add more preinstalled paracraft mod package here
-	}
-
-	for _, mod in ipairs(buildin_mods) do
-		if(NPL.load(mod.package_path)~=false) then
-			pluginloader:AddSystemModule(mod.name or mod.package_path, {displayName = mod.displayName});
-		end
-	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
+	local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
+	BuildinMod.LoadBuildinMod();
 
 	self:next_step({IsPackagesLoaded = true});
 end

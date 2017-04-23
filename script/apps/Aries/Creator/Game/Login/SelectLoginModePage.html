@@ -52,6 +52,17 @@ function OnClickCredits()
     ParaGlobal.ShellExecute("open", L"https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits", "", "", 1);
 end
     
+function GetModCountAsString()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+    local ModManager = commonlib.gettable("Mod.ModManager");
+    local pluginloader = ModManager:GetLoader();
+    local nCount = pluginloader:GetActiveModCount();
+    if(nCount>0) then
+        return format("(%d)", nCount);
+    else
+        return "";
+    end
+end
     
 ]]></script>
 <pe:container alignment="_ct" style="position:relative;background:;margin-left:-260px;margin-top:-200px;width:520px;height:500px;">
@@ -71,7 +82,7 @@ end
     </div>
     <div style="margin-top:16px;margin-left:110px;">
         <pe:if condition='<%= System.options.isDevEnv == false %>'>
-            <input type="button" value='<%=L"MOD加载..." %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
+            <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
             <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />    
         </pe:if>
         <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
