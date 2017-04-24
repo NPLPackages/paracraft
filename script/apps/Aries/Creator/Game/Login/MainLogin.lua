@@ -526,7 +526,7 @@ end
 function MainLogin:LoadPackages()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
 	local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
-	BuildinMod.LoadBuildinMod();
+	BuildinMod.AddBuildinMods();
 
 	self:next_step({IsPackagesLoaded = true});
 end

@@ -123,6 +123,14 @@ end
                         </div>
                     </pe:if>
                     <div style='<%=format("float:left;margin-left:10px;color:%s;", Eval("checked") and "#ffffff" or "#808080")%>'>
+                        <div align="right" style="position:relative;float:left;width:100px;">
+                            <pe:if condition='<%=not Eval("isSystem") %>'>
+                                <input style="color:#808080;margin-right:5px;" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet" />
+                            </pe:if>
+                            <pe:if condition="<%=Eval('homepage')~=false%>">
+                                <input type="button" style="color:#ffffff" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
+                            </pe:if>
+                        </div>
                         <div>
                             <pe:if condition="<%=Eval('displayName')~=false%>">
                                 <div style="float:left;margin-right:10px;"><%=Eval("displayName") %></div>
@@ -133,16 +141,9 @@ end
                             <pe:if condition="<%=Eval('author')~=false%>">
                                 <div style="float:left;margin-right:10px;"><%=Eval("author") %></div>
                             </pe:if>
-                            <pe:if condition="<%=Eval('homepage')~=false%>">
-                                <div style="float:left;margin-right:10px;">
-                                    <input type="button" style="color:#ffffff" onclick="OnClickOpen" value='<%=L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
-                                </div>
-                            </pe:if><br />
+                            <br/>
                             <div>
                                 <div style="float:left"><%=Eval("text") %></div>
-                                <pe:if condition='<%=not Eval("checked") %>'>
-                                    <input style="margin-left:10px;color:#808080" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet"/>
-                                </pe:if>
                             </div>
                         </div>
                     </div>

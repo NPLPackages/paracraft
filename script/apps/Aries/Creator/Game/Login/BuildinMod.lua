@@ -7,7 +7,7 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
 local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
-BuildinMod.LoadBuildinMod();
+BuildinMod.AddBuildinMods();
 ------------------------------------------------------------
 ]]
 -- create class
@@ -21,6 +21,7 @@ BuildinMod.buildin_mods = {
 		displayName = "ParaX 3D模型导出", 
 		text="系统内置插件",
 		version = "1.0",
+		homepage = "https://github.com/tatfook/BMaxToParaXExporter",
 	},
 	{
 		name = "NPLCAD", 
@@ -28,12 +29,21 @@ BuildinMod.buildin_mods = {
 		displayName = "NPL CAD编程建模", 
 		text="系统内置插件",
 		version = "1.0",
+		homepage = "https://github.com/tatfook/NPLCAD",
+	},
+	{
+		name = "STLExporter", 
+		package_path = "npl_packages/STLExporter/", 
+		displayName = "STL 3D打印模型导出", 
+		text="系统内置插件",
+		version = "1.0",
+		homepage = "https://github.com/LiXizhi/stlexporter",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
 
--- called at the very beginning 
-function BuildinMod.LoadBuildinMod()
+-- called at the very beginning before plugins are loaded.
+function BuildinMod.AddBuildinMods()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 	local ModManager = commonlib.gettable("Mod.ModManager");
 	local pluginloader = ModManager:GetLoader();
