@@ -17,7 +17,8 @@ local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod
 BuildinMod.buildin_mods = {
 	{
 		name = "ParaXExporter", 
-		package_path = "npl_packages/BMaxToParaXExporter/", 
+		-- package_path = "npl_packages/BMaxToParaXExporter/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "ParaX 3D模型导出", 
 		text="系统内置插件",
 		version = "1.0",
@@ -25,7 +26,8 @@ BuildinMod.buildin_mods = {
 	},
 	{
 		name = "NPLCAD", 
-		package_path = "npl_packages/NPLCAD/", 
+		--package_path = "npl_packages/NPLCAD/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "NPL CAD编程建模", 
 		text="系统内置插件",
 		version = "1.0",
@@ -33,11 +35,21 @@ BuildinMod.buildin_mods = {
 	},
 	{
 		name = "STLExporter", 
-		package_path = "npl_packages/STLExporter/", 
+		-- package_path = "npl_packages/STLExporter/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "STL 3D打印模型导出", 
 		text="系统内置插件",
 		version = "1.0",
 		homepage = "https://github.com/LiXizhi/stlexporter",
+	},
+	{
+		name = "WorldShare", 
+		-- package_path = "npl_packages/WorldShare/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = "KeepWork世界分享", 
+		text="系统内置插件",
+		version = "1.0",
+		homepage = "https://github.com/tatfook/WorldShare",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
