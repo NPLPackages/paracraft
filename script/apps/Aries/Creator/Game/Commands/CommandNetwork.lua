@@ -298,12 +298,16 @@ Examples:
 		
 		if(GameLogic.IsServerWorld()) then
 			if(playername == "all") then
-				local servermanager = GameLogic.GetWorld():GetServerManager();
-				if(servermanager) then
-					servermanager:SendPacketToAllPlayers(GameLogic.Packets.PacketClientCommand:new():Init(cmd_text));
+				if (EntityManager.GetPlayer() == fromEntity) then
+				-- only admin can runat other palyers
+					local servermanager = GameLogic.GetWorld():GetServerManager();
+					if(servermanager) then
+						
+						servermanager:SendPacketToAllPlayers(GameLogic.Packets.PacketClientCommand:new():Init(cmd_text));
+					end
+					-- also run on the server side 
+					CommandManager:RunFromConsole(cmd_text, EntityManager.GetPlayer());
 				end
-				-- also run on the server side 
-				CommandManager:RunFromConsole(cmd_text, EntityManager.GetPlayer());
 			elseif(playername) then
 				local targetPlayer;
 				if(playername == "p") then
@@ -317,7 +321,10 @@ Examples:
 						end
 					end
 				end
-				if(targetPlayer) then
+				-- only admin can runat other palyers
+				if(targetPlayer 
+					and (EntityManager.GetPlayer() == fromEntity 
+						or targetPlayer == fromEntity)) then
 					if(targetPlayer == EntityManager.GetPlayer()) then
 						CommandManager:RunFromConsole(cmd_text, targetPlayer);
 					elseif(targetPlayer.SendPacketToPlayer) then
