@@ -113,6 +113,8 @@ function Entity:OnLivingUpdate()
 	local chunkX = rshift(bx, 4);
 	local chunkZ = rshift(bz, 4);
 	local chunk = self.worldObj:GetChunkFromChunkCoords(chunkX, chunkZ);
+
+	-- check if nearby chunk is already loaded from server. 
 	if(not chunk or chunk:GetTimeStamp()<=0) then
 		self.isNearbyChunkLoaded = false;
 
@@ -122,11 +124,26 @@ function Entity:OnLivingUpdate()
 			obj:SetField("VerticalSpeed", 0);
 		end
 
-		-- TODO: chunk is not loaded, do not let the player to move. 
+		-- fixed bug: this will force client position to be sent to server.
+		-- because SendMotionUpdates() is not called when nearly chunks are not loaded on server
+		local dx = self.x - self.oldPosX;
+		local dy = self.y - self.oldPosY;
+		local dz = self.z - self.oldPosZ;
+		local distSqMoved = (dx * dx + dy * dy + dz * dz);
+		local hasMovedOrForceTick = distSqMoved > 0.001;
+		if(hasMovedOrForceTick) then
+			self.oldPosX = self.x;
+			self.oldMinY = self.y;
+			self.oldPosY = self.y;
+			self.oldPosZ = self.z;
+			self:AddToSendQueue(Packets.PacketPlayerPosition:new():Init(self.x, self.y, self.y, self.z, self.onGround));
+		end
+
+		-- TODO: if chunk is not loaded, do not let the player to move. 
 		-- for simplicity, just goto the spawn point. This is not the case, when server teleport the player to a position. 
 		-- it should be the server to reset the player position. after chunk is loaded. 
-		local x, y, z = self.worldObj:GetSpawnPoint();
-		self:SetPosition(x, y, z);
+		-- local x, y, z = self.worldObj:GetSpawnPoint();
+		-- self:SetPosition(x, y, z);
 	else
 		self.isNearbyChunkLoaded = true;
 	end

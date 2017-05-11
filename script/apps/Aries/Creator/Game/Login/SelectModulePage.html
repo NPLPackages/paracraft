@@ -52,7 +52,7 @@ function OnGetSDK()
 end
 
 -- SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
-SelectModulePage.url_installNewPlugins = "http://wikicraft.cn/wiki/mod/packages";
+SelectModulePage.url_installNewPlugins = "http://keepwork.com/wiki/mod/packages";
 
 function OnInstallNewPlugins()
     SelectModulePage.StartLocalInstallService();
@@ -101,20 +101,36 @@ end
                 DataSource="<%=DS_Items%>" >
 	        <Columns>
 		        <div style="color:#ffffff;" >
-                    <div style="float:left;" onclick="OnSwitchModStatus">
-                        <input type="checkbox" style="margin-top:2px;margin-right:3px" checked='<%=Eval("checked") %>' />
-                        <pe:if condition='<%=Eval("checked") %>'>
-                            <div style="float:left;min-width:60px;color:#81f515">
-                                <%=L"加载"%>
-                            </div>
-                        </pe:if>
-                        <pe:if condition='<%=not Eval("checked") %>'>
-                            <div style="float:left;min-width:60px;color:#ff6a00">
-                                <%=L"禁用"%>
-                            </div>
-                        </pe:if>
-                    </div>
+                    <pe:if condition='<%=not Eval("isSystem") %>'>
+                        <div style="float:left;" onclick="OnSwitchModStatus">
+                            <input type="checkbox" style="margin-top:2px;margin-right:3px" checked='<%=Eval("checked") %>' />
+                            <pe:if condition='<%=Eval("checked") %>'>
+                                <div style="float:left;min-width:60px;color:#81f515">
+                                    <%=L"加载"%>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%=not Eval("checked") %>'>
+                                <div style="float:left;min-width:60px;color:#ff6a00">
+                                    <%=L"禁用"%>
+                                </div>
+                            </pe:if>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=Eval("isSystem") %>'>
+                        <input type="checkbox" enabled ="false" style="margin-top:2px;margin-right:3px" checked='<%=Eval("checked") %>' />
+                        <div style="float:left;min-width:60px;color:#81f515">
+                            <%=L"系统"%>
+                        </div>
+                    </pe:if>
                     <div style='<%=format("float:left;margin-left:10px;color:%s;", Eval("checked") and "#ffffff" or "#808080")%>'>
+                        <div align="right" style="position:relative;float:left;width:100px;">
+                            <pe:if condition='<%=not Eval("isSystem") %>'>
+                                <input style="color:#808080;margin-right:5px;" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet" />
+                            </pe:if>
+                            <pe:if condition="<%=Eval('homepage')~=false%>">
+                                <input type="button" style="color:#ffffff" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
+                            </pe:if>
+                        </div>
                         <div>
                             <pe:if condition="<%=Eval('displayName')~=false%>">
                                 <div style="float:left;margin-right:10px;"><%=Eval("displayName") %></div>
@@ -125,16 +141,9 @@ end
                             <pe:if condition="<%=Eval('author')~=false%>">
                                 <div style="float:left;margin-right:10px;"><%=Eval("author") %></div>
                             </pe:if>
-                            <pe:if condition="<%=Eval('homepage')~=false%>">
-                                <div style="float:left;margin-right:10px;">
-                                    <input type="button" style="color:#ffffff" onclick="OnClickOpen" value='<%=L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
-                                </div>
-                            </pe:if><br />
+                            <br/>
                             <div>
                                 <div style="float:left"><%=Eval("text") %></div>
-                                <pe:if condition='<%=not Eval("checked") %>'>
-                                    <input style="margin-left:10px;color:#808080" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet"/>
-                                </pe:if>
                             </div>
                         </div>
                     </div>

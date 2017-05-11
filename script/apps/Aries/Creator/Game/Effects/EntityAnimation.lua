@@ -42,6 +42,37 @@ local anim_map_haqi = {
 
 local anim_map_default;
 
+local id_to_names = {
+	[0] = L"待机", 
+	[1] = L"倒下", 
+	[4] = L"走路", 
+	[5] = L"跑步", 
+	[13] = L"向后走", 
+	[37] = L"向上跳的起始动作", 
+	[38] = L"跳动中，在空中的动作", 
+	[39] = L"落地的动作", 
+	[41] = L"游泳（水中）的待机", 
+	[42] = L"向前游动", 
+	[43] = L"向左游动", 
+	[44] = L"向右游动", 
+	[45] = L"向后游动", 
+	[91] = L"缺省的坐骑", 
+	[153] = L"随机待机1", 
+	[154] = L"随机待机2", 
+	[155] = L"随机待机3", 
+	[156] = L"随机待机4", 
+	[20001] = L"躺下", 
+	[20002] = L"坐下", 
+	[20003] = L"选择", 
+}
+function EntityAnimation.GetAnimTextByID(id)
+	local text = id_to_names[id or -1];
+	if(text) then
+		text = format("%d (%s)", id, text);
+	end
+	return text;
+end
+
 function EntityAnimation.Init()
 	if(EntityAnimation.isInited) then
 		return

@@ -53,6 +53,51 @@ other files...
 	end,
 };
 
+-- get zip file type according to zip file by searching for featured file content
+-- @param filename: file name of the zip archive file. such as "temp/abc.zip"
+-- @return nil | "world" | "blocktexture" | "mod" | "npl_package"
+function DragDropHandlers.GetZipFileType(filename)
+	if(filename:match("%.zip$") and ParaAsset.OpenArchive(filename, false)) then
+		local zipType;
+		if(not zipType) then
+			local result = commonlib.Files.Find({}, "", 0, 1, "Mod/*/main.lua", filename);
+			if(#result > 0) then
+				zipType = "mod";
+			end
+		end
+		if(not zipType) then
+			local result = commonlib.Files.Find({}, "", 0, 1, "*/Mod/*/main.lua", filename);
+			if(#result > 0) then
+				zipType = "mod";
+			end
+		end
+		if(not zipType) then
+			local result = commonlib.Files.Find({}, "", 0, 1, "worldconfig.txt", filename);
+			if(#result > 0) then
+				zipType = "world";
+			end
+		end
+		if(not zipType) then
+			local result = commonlib.Files.Find({}, "", 0, 1, "*/worldconfig.txt", filename);
+			if(#result > 0) then
+				zipType = "world";
+			end
+		end
+		if(not zipType) then
+			local result = commonlib.Files.Find({}, "", 0, 10, "*/*.png", filename);
+			if(#result > 0) then
+				for _, item in ipairs(result) do
+					if(item.filename:match("/%d+_[^/]+$")) then
+						zipType = "blocktexture";
+						break;
+					end
+				end
+			end
+		end
+		ParaAsset.CloseArchive(filename);
+		return zipType;
+	end
+end
 
 function DragDropHandlers.handleZipFile(filename)
 	local beWorld;
@@ -60,36 +105,29 @@ function DragDropHandlers.handleZipFile(filename)
 	local file_dir = string.gsub(filename,name,"");
 	local temp_dir = "temp/dropfiles/";
 	local temp_path = temp_dir..name;
+	local zipType;
 	if(ParaIO.CopyFile(filename, temp_path, true)) then
-		ParaAsset.OpenArchive(temp_path, true);	
-		local out = commonlib.Files.Find({}, temp_dir, 0, 200, "*.", "*.zip");
-		local zip_name = string.match(out[1]["filename"],"([^/]*)");
-		local zip_dir = temp_dir..zip_name;
-		local result = commonlib.Files.Find({}, zip_dir, 0, 2000, "*.*", "*.zip");
-		local item;
-		for _, item in ipairs(result) do
-			if(item.filename == "worldconfig.txt") then
-				beWorld = true;
-				break;
-			end
-		end
-		ParaAsset.CloseArchive(temp_path);
+		zipType = DragDropHandlers.GetZipFileType(temp_path)
 		ParaIO.DeleteFile(temp_path);
-	else
-		if(filename:match("[/\\]blocktexture[^/\\]+%.zip$")) then
-			beWorld = false;
-		else
-			beWorld = true;
-		end
 	end
-	if(not beWorld) then
+	LOG.std(nil, "info", "handleZipFile", "%s is of type %s", filename, zipType or "unknown");
+	if(zipType == "blocktexture") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 		local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 		TextureModPage.InstallTexturePack(filename);
-	else
+	elseif(zipType == "world") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
 		local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
 		EnterGamePage.OnOpenPkgFile(filename)
+	elseif(zipType == "mod") then
+		_guihelper.MessageBox(format(L"确定要按照Mod插件: %s?", name), function(res)
+			if(res == _guihelper.DialogResult.Yes) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+				local ModManager = commonlib.gettable("Mod.ModManager");
+				local pluginloader = ModManager:GetLoader();
+				pluginloader:InstallFromZipFile(filename);
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
 	end
 end
 

@@ -22,6 +22,7 @@ MainLogin.state = {
 	CheckGraphicsSettings = nil,
 	Loaded3DScene = nil,
 	IsCommandLineChecked = nil,
+	IsPackagesLoaded = nil,
 	IsLoginModeSelected = nil,
 	IsPluginLoaded = nil,
 	HasSignedIn = nil,
@@ -97,6 +98,8 @@ function MainLogin:start(init_callback)
 		LoadBackground3DScene = self.LoadBackground3DScene,
 		-- check command line
 		CheckCommandLine = self.CheckCommandLine,
+		-- select local or internet game
+		LoadPackages = self.LoadPackages,
 		-- select local or internet game
 		ShowLoginModePage = self.ShowLoginModePage,
 
@@ -204,6 +207,8 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("LoadBackground3DScene");
 	elseif(not state.IsCommandLineChecked) then
 		self:Invoke_handler("CheckCommandLine");
+	elseif(not state.IsPackagesLoaded) then
+		self:Invoke_handler("LoadPackages");
 	elseif(not state.IsLoginModeSelected) then
 		self:Invoke_handler("ShowLoginModePage");
 	--elseif(not state.HasSignedIn) then
@@ -515,6 +520,15 @@ function MainLogin:CheckCommandLine()
 		end
 	end
 	self:next_step({IsCommandLineChecked = true});	
+end
+
+-- load predefined mod packages if any
+function MainLogin:LoadPackages()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
+	local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
+	BuildinMod.AddBuildinMods();
+
+	self:next_step({IsPackagesLoaded = true});
 end
 
 function MainLogin:ShowLoginModePage()
