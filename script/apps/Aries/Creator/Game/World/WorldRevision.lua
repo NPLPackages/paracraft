@@ -242,6 +242,24 @@ function WorldRevision:SaveRevision()
 		file:close();
 		LOG.std(nil, "info", "WorldRevision", "save revision %d for world %s", revision, self.revision_filename);
 	end
+
+	WorldRevision:SetWorldFileSize();
+end
+
+function WorldRevision:SetWorldFileSize()
+	local files = commonlib.Files.Find({}, GameLogic.GetWorldDirectory(), 0, 500, function(item)
+		return true;
+	end);
+
+	local filesTotal = 0;
+
+	for key,value in ipairs(files) do
+		--LOG.std(nil,"debug","value.file_path",value.file_path);
+		filesTotal = filesTotal + tonumber(value.filesize);
+	end
+
+	WorldCommon.world_info.size = filesTotal;
+	WorldCommon:SaveWorldTag();
 end
 
 -- TODO: not implemented
