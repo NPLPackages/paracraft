@@ -262,6 +262,20 @@ function WorldRevision:SetWorldFileSize()
 	WorldCommon:SaveWorldTag();
 end
 
+-- update world file size in tag.xml
+function WorldRevision:UpdateWorldFileSize()
+	local files = commonlib.Files.Find({}, GameLogic.GetWorldDirectory(), 5, 5000, function(item)
+		return true;
+	end);
+	local filesTotal = 0;
+	for key, value in ipairs(files) do
+		-- LOG.std(nil,"debug", "file", value);
+		filesTotal = filesTotal + tonumber(value.filesize);
+	end
+	WorldCommon.world_info.size = filesTotal;
+	WorldCommon:SaveWorldTag();
+end
+
 -- TODO: not implemented
 -- @param intervalSeconds: number seconds to do auto save. must be at least 10 seconds.
 function WorldRevision:SetAutoSave(intervalSeconds)
