@@ -374,15 +374,25 @@ function Desktop.OnExit(bForceExit, bRestart)
 			Desktop.ForceExit(bRestart);
 		else
 			Desktop.is_exiting = true;
-			_guihelper.MessageBox(string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), function(res)
-				Desktop.is_exiting = false;
-				if(res and res == _guihelper.DialogResult.Yes) then
-					GameLogic.QuickSave();
-					Desktop.ForceExit();
-				elseif(res and res == _guihelper.DialogResult.No) then
-					Desktop.ForceExit(bRestart);
+			local dialog = {
+				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
+				callback = function(res)
+					Desktop.is_exiting = false;
+					if(res and res == _guihelper.DialogResult.Yes) then
+						GameLogic.QuickSave();
+						Desktop.ForceExit();
+					elseif(res and res == _guihelper.DialogResult.No) then
+						Desktop.ForceExit(bRestart);
+					end
 				end
-			end, _guihelper.MessageBoxButtons.YesNoCancel);
+			};
+			-- use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
+			dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+
+			if(dialog and dialog.callback and dialog.text) then
+				_guihelper.MessageBox(dialog.text, 
+					dialog.callback, _guihelper.MessageBoxButtons.YesNoCancel);
+			end
 		end
 	end
 end
