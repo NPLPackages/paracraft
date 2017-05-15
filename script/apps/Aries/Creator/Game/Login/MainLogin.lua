@@ -583,7 +583,7 @@ function MainLogin:CheckLoadWorldFromCmdLine()
 				GameLogic.RunCommand("startserver", ip.." "..port);
 			end);
 
-		elseif(worldpath:match("^http(s)://")) then
+		elseif(worldpath:match("^https?://")) then
 			LOG.std(nil, "info", "MainLogin", "loading world: %s", worldpath);
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
