@@ -631,6 +631,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	EntityManager.SaveToFile(bSaveToLastSaveFolder==true);
 	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	ModManager:OnWorldSave();
+	GameLogic.world_revision:UpdateWorldFileSize();
 end
 
 -- let a given character to play an animation. 

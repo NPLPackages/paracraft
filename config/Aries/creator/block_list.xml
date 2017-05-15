@@ -283,6 +283,7 @@ to_id： 可以是一组连续的ID
     <block name="BlockArrow"/>
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
+    <block name="MemoryBlock"/>
   </category>
 
   <category name="tool" text="工具">
@@ -319,5 +320,6 @@ to_id： 可以是一组连续的ID
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="villager"/>
+    <block name="MemoryBlock"/>
   </category>
 </blocklist>

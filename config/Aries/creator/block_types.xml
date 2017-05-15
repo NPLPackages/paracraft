@@ -443,10 +443,11 @@ Sound related:
   <block singleSideTex="true" name="TransparentColorBlock"  id="73" item_class="ItemColorBlock" text="透明彩色方块" searchkey="透明彩色方块" disable_gen_icon="true" icon="Texture/blocks/items/transparent_block.png" texture="Texture/blocks/transparent_colorblock.png" color_data="true" obstruction="true" solid="true" cubeMode="true" blendedTexture="true" transparent="true" liquid="true" />
   <block singleSideTex="true" text="草地" searchkey="草地" id="26" mapcolor="#92aa16" icon="Texture/blocks/items/grass.png" step_sound="grass" texture="Texture/blocks/grass_top.png" obstruction="true" solid="true" cubeMode="true"  />
     
+  <block singleSideTex="true" name="MemoryBlock" id="9" item_class="ItemColorBlock" text="记忆方块" searchkey="记忆方块" texture="Texture/blocks/command_block_on.png" color_data="true" obstruction="true" solid="true" cubeMode="true"  />
+  
   <!--following is deprecated and used in haqi-->
     <block singleSideTex="true" id="3" texture="Texture/tileset/blocks/carpet_block_single.dds" obstruction="true" solid="true" cubeMode="true"  />
     <block threeSideTex="true" id="7" texture="Texture/tileset/blocks/doortop_three.dds" light="true" obstruction="true" solid="true" cubeMode="true"  />
-    <block singleSideTex="true" id="9" texture="Texture/tileset/blocks/earch_layered_single.dds" obstruction="true" solid="true" cubeMode="true"  />
     <block singleSideTex="true" id="11" texture="Texture/tileset/blocks/earth2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
     <block singleSideTex="true" id="14" texture="Texture/tileset/blocks/earth_purple_single.dds" obstruction="true" solid="true" cubeMode="true"  />
     <block singleSideTex="true" id="15" texture="Texture/tileset/blocks/earth_single.dds" obstruction="true" solid="true" cubeMode="true"  />
