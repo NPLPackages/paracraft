@@ -860,6 +860,7 @@ function BaseContext:HandleGlobalKey(event)
 			CommandManager:RunCommand("/open npl://console");
 			event:accept();
 		else
+			-- ctrl + Keys
 			if(ctrl_pressed) then
 				if(dik_key == "DIK_T") then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWindow.lua");
@@ -876,6 +877,9 @@ function BaseContext:HandleGlobalKey(event)
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 					SelectBlocks.ToggleLastInstance();
+				elseif(dik_key == "DIK_M") then
+					-- show module manager
+					GameLogic.RunCommand("/show mod");
 				end
 			end
 		end

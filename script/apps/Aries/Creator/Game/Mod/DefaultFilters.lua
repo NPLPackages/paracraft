@@ -57,6 +57,25 @@ function DefaultFilters.cmd_open_url(url)
 		if(not addr) then
 			GameLogic.CommandManager:RunCommand("/webserver");
 			addr = WebServer:site_url();
+			if(not addr) then
+				local count = 0;
+				local function CheckServerStarted()
+					commonlib.TimerManager.SetTimeout(function()  
+						local addr = WebServer:site_url();
+						if(addr) then
+							GameLogic.CommandManager:RunCommand("/open "..url);
+						else
+							count = count + 1;
+							-- try 5 times in 5 seconds
+							if(count < 5)  then
+								CheckServerStarted();
+							end
+						end
+					end, 1000);
+				end
+				CheckServerStarted();
+				return;
+			end
 		end
 		if(addr) then
 			url = url:gsub("^npl:?/*", addr);

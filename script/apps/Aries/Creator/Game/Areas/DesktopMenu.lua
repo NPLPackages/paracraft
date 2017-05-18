@@ -71,7 +71,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"信息(F3)",name = "window.info",onclick=nil},
 				{text = L"位置坐标...",name = "window.pos",onclick=nil},
 				{text = "NPL Debugger... (Ctrl+Alt+I)",name = "window.debugger", cmd="/open npl://debugger"},
-				{text = L"MOD插件加载...",name = "window.mod",cmd="/show mod"},
+				{text = L"MOD插件加载...".."(Ctrl+M)",name = "window.mod",cmd="/show mod"},
 			},
 		},
 		{text = L"帮助", order=6, name = "help",children = 
