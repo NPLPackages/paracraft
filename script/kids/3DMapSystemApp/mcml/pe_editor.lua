@@ -82,6 +82,7 @@ if it is "_mcmlblank", it will be opened in a new popup mcml window.
 | VerticalScrollBarStep | |
 | fontsize | font size to use for multiline text. | 
 | css.lineheight | line height for multiline text. |
+| spacing	| for text or button control.  |
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_editor.lua");
