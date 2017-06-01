@@ -104,6 +104,7 @@ GameLogic:Signal("userActed", function(actionName) end);
 GameLogic:Signal("texturePackChanged", function() end);
 -- whenever a file in the current directory changed. 
 GameLogic:Signal("worldFileChanged");
+GameLogic:Signal("frameMoved");
 
 -- current game mode. 
 GameLogic.mode = "editor";
@@ -844,6 +845,8 @@ function GameLogic.FrameMove(timer)
 	GameLogic.CheckCurrentPlayerLocation();
 
 	CameraController.OnFrameMove();
+	GameLogic:frameMoved(timer); -- signal
+
 	npl_profiler.perf_end("GameLogic.FrameMove");
 end
 

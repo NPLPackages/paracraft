@@ -115,6 +115,24 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 			OnClose(OpenFileDialog.result);
 		end
 	end
+	
+	params._page.OnDropFiles = function(filelist)
+		if filelist then
+			local _, firstFile = next(filelist);
+			
+			if(firstFile and page) then
+				local fileItem = Files.ResolveFilePath(firstFile);
+				if(fileItem and fileItem.relativeToWorldPath) then
+					local filename = fileItem.relativeToWorldPath;
+					params._page:SetValue("text", filename);
+				end
+			end
+			
+			return true;
+		else
+			return false;
+		end
+	end
 end
 
 
@@ -127,10 +145,12 @@ end
 
 function OpenFileDialog.OnOpenFileDialog()
 	NPL.load("(gl)script/ide/OpenFileDialog.lua");
+
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
 		OpenFileDialog.title,
 		ParaIO.GetCurDirectory(0)..(GameLogic.GetWorldDirectory() or ""), 
 		OpenFileDialog.IsSaveMode);
+		
 	if(filename and page) then
 		local fileItem = Files.ResolveFilePath(filename);
 		if(fileItem and fileItem.relativeToWorldPath) then
