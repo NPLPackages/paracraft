@@ -1388,8 +1388,22 @@ function Entity:PushOutOfBlocks(x,y,z)
 	end
 end
 
+-- default to true. 
+function Entity:SetCheckCollision(bCheck)
+	self.bIgnoreCollision = not bCheck;
+end
+
+-- whether we will check collision for this entity
+function Entity:IsCheckCollision()
+	return not self.bIgnoreCollision;
+end
+
+
 -- virtual function: check if the entity collide with other entity or block. if so, we will fire event and adjust position.
 function Entity:CheckCollision(deltaTime)
+	if(not self:IsCheckCollision()) then
+		return
+	end
 	local bx,by,bz = self:GetBlockPos();
 
 	-- checking collision with blocks
@@ -2471,4 +2485,14 @@ function Entity:EnablePhysics(bEnable, bForceLoadPhysics)
 			obj:LoadPhysics(); 
 		end
 	end
+end
+
+-- the memory context
+function Entity:GetMemoryContext()
+	if(not self.memoryContext and not self:IsRemote()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/MemoryContext.lua");
+		local MemoryContext = commonlib.gettable("MyCompany.Aries.Game.Memory.MemoryContext");
+		self.memoryContext = MemoryContext:new():Init(self);
+	end
+	return self.memoryContext;
 end

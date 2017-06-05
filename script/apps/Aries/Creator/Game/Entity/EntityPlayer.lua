@@ -419,6 +419,9 @@ end
 
 -- check collisiton with nearby entities
 function Entity:CheckCollision(deltaTime)
+	if(not self:IsCheckCollision()) then
+		return
+	end
 	Entity._super.CheckCollision(self);
 	local bx,by,bz = self:GetBlockPos();
 	

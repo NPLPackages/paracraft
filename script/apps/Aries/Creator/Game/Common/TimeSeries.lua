@@ -213,3 +213,17 @@ function TimeSeries:GetEndFrame(varName, animID)
 	local timesID = self.data[varName].ranges[animID][2];
 	return self.data[varName].times[timesID];
 end
+
+-- get the last time in all time series
+function TimeSeries:GetLastTime()
+	local lastTime = 0;
+	for k,v in pairs(self.data) do
+		if(type(v) == "table" and v.GetLastTime) then
+			local lastTime_  = v:GetLastTime() or 0;
+			if(lastTime_ > lastTime) then
+				lastTime = lastTime_;
+			end
+		end	
+	end
+	return lastTime;
+end
