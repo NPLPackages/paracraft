@@ -250,6 +250,8 @@ Sound related:
   <block singleSideTex="true" name="Command_Block" text="命令方块" searchkey="命令方块" mc_id="137" id="212" mapcolor="#656043" class="BlockCommandBlock" entity_class="EntityCommandBlock" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/Command_Block.png" cubeMode="true" obstruction="true" solid="true" />
   <!--Added Xizhi 2014.3.28 added movie clip-->
   <block threeSideTex="true" name="MovieClip" text="电影方块" searchkey="电影" id="228" mapcolor="#8f8f8f" class="BlockCommandBlock" entity_class="EntityMovieClip" toggle_sound="click" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/movie.png" texture="Texture/blocks/movie_three.png" cubeMode="true" obstruction="true" solid="true"/>
+  <!--Added Xizhi 2017.6.4 added memory block-->
+  <block singleSideTex="true" name="MemoryBlock" id="9" text="记忆方块" searchkey="记忆方块" class="BlockMemory" entity_class="EntityMemory" texture="Texture/blocks/command_block_on.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--Added Xizhi 2014.2.12-->
   <block singleSideTex="true" name="CmdTextureReplacer" text="材质转换器" searchkey="材质转换器" id="223" class="BlockEntityBase" entity_class="EntityCmdTextureReplacer" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/stonebrick_chiseled.png" cubeMode="true" obstruction="true" solid="true" />
@@ -442,8 +444,6 @@ Sound related:
   <block singleSideTex="true" name="MetalBlock" id="50" categoryID="50" item_class="ItemColorBlock" text="金属方块" searchkey="金属方块" disable_gen_icon="true" icon="Texture/blocks/items/metal_block.png" material="glass" texture="Texture/blocks/colorblock.png" color_data="true" normalMap="Texture/blocks/metal_normal.png" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" name="TransparentColorBlock"  id="73" item_class="ItemColorBlock" text="透明彩色方块" searchkey="透明彩色方块" disable_gen_icon="true" icon="Texture/blocks/items/transparent_block.png" texture="Texture/blocks/transparent_colorblock.png" color_data="true" obstruction="true" solid="true" cubeMode="true" blendedTexture="true" transparent="true" liquid="true" />
   <block singleSideTex="true" text="草地" searchkey="草地" id="26" mapcolor="#92aa16" icon="Texture/blocks/items/grass.png" step_sound="grass" texture="Texture/blocks/grass_top.png" obstruction="true" solid="true" cubeMode="true"  />
-    
-  <block singleSideTex="true" name="MemoryBlock" id="9" item_class="ItemColorBlock" text="记忆方块" searchkey="记忆方块" texture="Texture/blocks/command_block_on.png" color_data="true" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--following is deprecated and used in haqi-->
     <block singleSideTex="true" id="3" texture="Texture/tileset/blocks/carpet_block_single.dds" obstruction="true" solid="true" cubeMode="true"  />

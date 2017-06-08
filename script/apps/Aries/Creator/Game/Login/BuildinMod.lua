@@ -21,7 +21,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "ParaX 3D模型导出", 
 		text="系统内置插件",
-		version = "1.0",
+		version = "1.1",
 		homepage = "https://github.com/tatfook/BMaxToParaXExporter",
 	},
 	{
@@ -30,7 +30,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "NPL CAD编程建模", 
 		text="系统内置插件",
-		version = "1.0",
+		version = "4.6",
 		homepage = "https://github.com/tatfook/NPLCAD",
 	},
 	{
@@ -39,7 +39,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "STL 3D打印模型导出", 
 		text="系统内置插件",
-		version = "1.0",
+		version = "1.1",
 		homepage = "https://github.com/LiXizhi/stlexporter",
 	},
 	{
@@ -48,7 +48,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "KeepWork世界分享", 
 		text="系统内置插件",
-		version = "1.0",
+		version = "1.1",
 		homepage = "https://github.com/tatfook/WorldShare",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
