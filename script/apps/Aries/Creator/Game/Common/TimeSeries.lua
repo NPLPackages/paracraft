@@ -214,7 +214,7 @@ function TimeSeries:GetEndFrame(varName, animID)
 	return self.data[varName].times[timesID];
 end
 
--- get the last time in all time series
+-- get the last time in all time series and child time series
 function TimeSeries:GetLastTime()
 	local lastTime = 0;
 	for k,v in pairs(self.data) do
@@ -223,7 +223,17 @@ function TimeSeries:GetLastTime()
 			if(lastTime_ > lastTime) then
 				lastTime = lastTime_;
 			end
-		end	
+		end
+	end
+	if(self.children) then
+		for k,v in pairs(self.children) do
+			if(type(v) == "table" and v.GetLastTime) then
+				local lastTime_  = v:GetLastTime() or 0;
+				if(lastTime_ > lastTime) then
+					lastTime = lastTime_;
+				end
+			end
+		end
 	end
 	return lastTime;
 end

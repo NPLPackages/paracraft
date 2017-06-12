@@ -48,7 +48,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = "KeepWork世界分享", 
 		text="系统内置插件",
-		version = "1.1",
+		version = "1.2",
 		homepage = "https://github.com/tatfook/WorldShare",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
