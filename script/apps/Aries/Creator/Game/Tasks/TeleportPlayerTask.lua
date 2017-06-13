@@ -33,7 +33,7 @@ end
 function TeleportPlayer:Run()
 	self.finished = true;
 
-	local entityPlayer = EntityManager.GetFocus();
+	local entityPlayer = self.playerEntity or EntityManager.GetFocus();
 	if(not entityPlayer) then
 		return;
 	end
