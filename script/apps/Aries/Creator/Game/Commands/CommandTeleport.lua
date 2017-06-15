@@ -124,24 +124,24 @@ format: /goto [@playername] [x y z]
 			end
 
 			if(System.options.mc or System.options.is_mcworld) then
-				local playerEntity, x, y, z, home, hasInputName;
-				playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
+				local playerEntityCmd, x, y, z, home, hasInputName;
+				playerEntityCmd, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 				home, cmd_text = CmdParser.ParseText(cmd_text, "home");
 
-				x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, playerEntity);
+				x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, playerEntityCmd);
 				if(home and not x) then
 					-- TODO: get home pos from fromEntity
 					x, y, z = GameLogic.GetHomePosition();
 					x, y, z = BlockEngine:block(x, y, z);
 				end
-				playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
+				playerEntity = playerEntityCmd or (not hasInputName and EntityManager.GetPlayer());
 				if( not x and playerEntity) then
 					x, y, z = playerEntity:GetBlockPos();
 				end
 
 				if(x and y and z and playerEntity) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX=x, blockY=y, blockZ=z})
+					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX=x, blockY=y, blockZ=z, playerEntity=playerEntityCmd})
 					task:Run();
 				end
 			end

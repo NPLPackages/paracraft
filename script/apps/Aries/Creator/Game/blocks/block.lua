@@ -127,6 +127,11 @@ function block:ctor()
 	self:UpdateBlockBounds();
 end
 
+-- Indicate if a material is a normal solid opaque cube. Normal cube block also provide weak power when activated by a wire. 
+function block:isBlockNormalCube()
+	return (self.cubeMode and self.solid and not self.ProvidePower);
+end
+
 -- not used. allowing to specify "glass4", and "glass[1-4]" is used. 
 function block:LoadSound(name, max_count, volume, pitch)
 	if(self[name]) then

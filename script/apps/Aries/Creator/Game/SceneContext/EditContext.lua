@@ -297,5 +297,12 @@ function EditContext:keyPressEvent(event)
 			TeleportListPage.GotoNextLocation();
 		end
 		event:accept();
+	elseif(dik_key == "DIK_0") then
+		-- activate last memory
+		local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
+		if(memoryContext) then
+			GameLogic.AddBBS("memory", "force working memory activation");
+			memoryContext:ActivateRecentWorkingMemoryClip();
+		end
 	end
 end
