@@ -420,8 +420,8 @@ end
 -- called every framemove when activated.  
 -- @param deltaTime: in milli seconds. 
 function MovieClip:FrameMove(deltaTime)
-	if(self == MovieManager:GetActiveMovieClip()) then
-		if(self:IsPaused()) then
+	if(self:IsPaused()) then
+		if(self == MovieManager:GetActiveMovieClip()) then
 			-- make the actor controllable when paused. 
 			local actor = self:GetFocus();
 			if(actor) then
@@ -431,12 +431,9 @@ function MovieClip:FrameMove(deltaTime)
 					actor:SetControllable(false);
 				end
 			end
-			return
 		end
-	else
-		if(self:IsPaused()) then
-			return;
-		end
+		-- always return when paused
+		return
 	end
 
 	self.entity:AdvanceTime(deltaTime/1000);
@@ -447,8 +444,10 @@ function MovieClip:FrameMove(deltaTime)
 		self:SetTime(self:GetLength());
 		self:Pause();
 
-		-- TODO: it is better to call UpdateActors to render the last frame. 
-		-- self:UpdateActors(deltaTime);
+		-- call UpdateActors to render the last frame. 
+		if(deltaTime > 0) then
+			self:UpdateActors(deltaTime);
+		end
 	else
 		self:UpdateActors(deltaTime);
 	end

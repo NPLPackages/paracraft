@@ -276,9 +276,14 @@ function Entity:SetLastCommandResult(last_result)
 		local x, y, z = self:GetBlockPos();
 
 		if(type(output) == "number" and output>0) then
-			-- does not deactivate immediately, instead deactivate after 2 second, just in case another movie clip is started. 
-			-- setting it back after 2 second. 40 ticks
-			GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self:GetBlockId(), 40);
+			if(output > 1) then
+				-- does not deactivate immediately, instead deactivate after 2 second, just in case another movie clip is started. 
+				-- setting it back after 2 seconds. 40 ticks
+				GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self:GetBlockId(), 40);
+			elseif(output == 1) then
+				-- end immediately
+				GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self:GetBlockId(), 0);
+			end
 		end
 
 		BlockEngine:NotifyNeighborBlocksChange(x, y, z, BlockEngine:GetBlockId(x, y, z));
