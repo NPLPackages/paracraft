@@ -162,7 +162,7 @@ function LocalNPC:SaveToFile(filename)
 	local xml_data = commonlib.Lua2XmlString(pe_root, true);
 	
 	if(xml_data) then
-		if (#xml_data >= 1024) then
+		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
 			if (writer:IsValid()) then
 				writer:ZipAddData("data", xml_data);
