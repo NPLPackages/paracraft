@@ -130,7 +130,7 @@ function MovieManager:TryPopMovieMode()
 		GameLogic.options:SetClickToContinue(true);
 	end
 	
-	GameLogic.GetFilters():apply_filters("pop_moive_mode", self.lastmode);
+	GameLogic.GetFilters():apply_filters("pop_movie_mode", self.lastmode);
 end
 
 function MovieManager:IsLastModeEditor()
