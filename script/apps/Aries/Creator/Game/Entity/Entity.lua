@@ -2487,6 +2487,15 @@ function Entity:EnablePhysics(bEnable, bForceLoadPhysics)
 	end
 end
 
+-- only call this function when the entity may has active memory context 
+-- i.e. it has autonomous behaviors on its own.  EntityPlayer can move on its own. 
+-- @return true if the entity is controlled by memory context
+function Entity:FrameMoveMemoryContext(deltaTime)
+	if(self.memoryContext) then
+		return self:GetMemoryContext():FrameMove(deltaTime);
+	end
+end
+
 -- the memory context
 function Entity:GetMemoryContext()
 	if(not self.memoryContext and not self:IsRemote()) then

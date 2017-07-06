@@ -544,7 +544,10 @@ end
 -- called every frame
 function Entity:FrameMove(deltaTime)
 	if(self:HasFocus()) then
-		if(self:HasMotion()) then
+		if(self:FrameMoveMemoryContext(deltaTime)) then
+			-- entity is autonomously animated, we will skip physics. 
+
+		elseif(self:HasMotion()) then
 			-- if there is motion, we will move by motion
 			Entity._super.FrameMove(self, deltaTime);
 		else
