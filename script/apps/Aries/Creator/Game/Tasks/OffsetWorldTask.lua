@@ -63,7 +63,8 @@ function OffsetWorldTask:EndProcess()
 	ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
 	-- never resume light update: since it will make the CPU really busy. 
 	-- ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
-	_guihelper.MessageBox("OffsetWorld finished. Lighting is disabled. Now save the world or discard")
+	GameLogic.AddBBS("offsetworld", "done");
+	_guihelper.MessageBox(L"OffsetWorld finished. Lighting is disabled. Now save the world or discard. Need a world reload for lighting to take effect");
 end
 
 function OffsetWorldTask:LoadAllRegions(coords)
@@ -75,6 +76,7 @@ end
 
 function OffsetWorldTask:OffsetInRegions(coords, offsetY)
 	for _, coord in ipairs(coords) do
+		GameLogic.AddBBS("offsetworld", format("processing region(%d, %d)", coord:GetRegionX(), coord:GetRegionZ()));
 		LOG.std(nil, "info", "OffsetBlockInRegion", {coord:GetRegionX(), coord:GetRegionZ()});
 		ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
 		local chunkX, chunkZ = coord:GetChunkX(), coord:GetChunkZ();
@@ -100,7 +102,12 @@ function OffsetWorldTask:OffsetBlockInChunk(chunkX, chunkZ, offsetY)
 				if(x and block_id) then
 					local block_id, block_data, entity_data = BlockEngine:GetBlockFull(x,y,z);
 					if( (y+offsetY) >=0) then
-						BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, nil, entity_data);
+						-- this fixed a bug where some blocks like rail blocks wrongly notify nearby block changes. 
+						if(entity_data) then
+							BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, nil, entity_data);
+						else
+							BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, 0, entity_data);	
+						end
 					end
 					BlockEngine:SetBlockToAir(x,y,z);
 				end
@@ -111,7 +118,12 @@ function OffsetWorldTask:OffsetBlockInChunk(chunkX, chunkZ, offsetY)
 				if(x and block_id) then
 					local block_id, block_data, entity_data = BlockEngine:GetBlockFull(x,y,z);
 					if( (y+offsetY) < 256) then
-						BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, nil, entity_data);
+						-- this fixed a bug where some blocks like rail blocks wrongly notify nearby block changes. 
+						if(entity_data) then
+							BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, nil, entity_data);
+						else
+							BlockEngine:SetBlock(x,y+offsetY,z,block_id, block_data, 0, entity_data);
+						end
 					end
 					BlockEngine:SetBlockToAir(x,y,z);
 				end
