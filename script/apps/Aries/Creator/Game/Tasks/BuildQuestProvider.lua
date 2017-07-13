@@ -18,7 +18,7 @@ local UserProfile = commonlib.gettable("MyCompany.Aries.Creator.Game.API.UserPro
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 
-local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+local BuildQuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
 local categoryPaths = {
 	["template"]  = "worlds/DesignHouse/blocktemplates/",
 	["tutorial"]  = "config/Aries/creator/blocktemplates/buildingtask/",

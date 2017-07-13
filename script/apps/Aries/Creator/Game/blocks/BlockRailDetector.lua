@@ -2,7 +2,9 @@
 Title: block rail detector
 Author(s): LiXizhi
 Date: 2014/6/17
-Desc: block rail detector
+Desc: only strongly power the block beneath it if a car in on top of it. 
+It will also provide power on its own if the car and the player are on top of it. 
+One can therefore put a repeater near the rail to detect if the player is inside the car. 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRailDetector.lua");
@@ -26,8 +28,27 @@ local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.blocks.
 -- register
 block_types.RegisterBlockClass("BlockRailDetector", block);
 
+
 function block:ctor()
 	self.canHasPower = true;
+	self.blockpowers = {};
+end
+
+
+-- called when world is loaded
+function block:OnWorldLoaded()
+	self.blockpowers = {};
+end
+
+-- get the temporary block internal state power. This value is not persistent and only used when new entity collides. 
+-- this may return nil if last power is not stored
+function block:GetPowerTemp(x,y,z)
+	return self.blockpowers[BlockEngine:GetSparseIndex(x,y,z)]
+end
+
+-- set the temporary block internal state power. This value is not persistent and only used when new entity collides. 
+function block:SetPowerTemp(x,y,z, power)
+	self.blockpowers[BlockEngine:GetSparseIndex(x,y,z)] = power;
 end
 
 function block:canProvidePower()
@@ -43,6 +64,11 @@ function block:OnBlockAdded(x, y, z)
 	if(not GameLogic.isRemote) then
 		self:SetStateIfEntityCollided(x,y,z, BlockEngine:GetBlockData(x,y,z));
 	end
+end
+
+function block:OnBlockRemoved(x,y,z, last_id, last_data)
+	block._super.OnBlockRemoved(self, x,y,z, last_id, last_data);
+	self.blockpowers[BlockEngine:GetSparseIndex(x,y,z)] = nil;
 end
 
 -- Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
@@ -92,10 +118,7 @@ end
 function block:OnEntityCollided(x,y,z, entity, deltaTime)
 	if(not GameLogic.isRemote) then
 		local data = BlockEngine:GetBlockData(x,y,z);
-
-		if (data < 16) then
-			self:SetStateIfEntityCollided(x,y,z, data);
-		end
+		self:SetStateIfEntityCollided(x,y,z, data);
 	end
 end
 
@@ -117,23 +140,31 @@ function block:SetStateIfEntityCollided(x,y,z, data)
     if (entities and #entities > 0) then
         bIsEntityCollided = true;
     end
-
+	local lastPower = self:GetPowerTemp(x,y,z);
+	if(not lastPower) then
+		lastPower = self:GetInternalStateNumber(x,y,z)
+		self:SetPowerTemp(x,y,z, lastPower);
+	end
+		
     if (bIsEntityCollided and not hasPower) then
         BlockEngine:SetBlockData(x, y, z, data + 16, 3);
         BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);
         BlockEngine:NotifyNeighborBlocksChange(x, y - 1, z, self.id);
-    end
-
-    if (not bIsEntityCollided and hasPower) then
+    elseif (not bIsEntityCollided and hasPower) then
         BlockEngine:SetBlockData(x, y, z, data - 16, 3);
         BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);
         BlockEngine:NotifyNeighborBlocksChange(x, y - 1, z, self.id);
+	elseif(hasPower) then
+		local curPower = self:GetInternalStateNumber(x,y,z)
+		if(curPower ~= lastPower) then
+			self:SetPowerTemp(x,y,z, curPower);
+			BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);	
+		end
     end
-
+	
     if (bIsEntityCollided) then
         GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self.id, self:tickRate());
     end
-
     -- BlockEngine:NotifyComparatorAtBlock(x, y, z, self.id);
 end
 
@@ -146,3 +177,4 @@ function block:updateTick(x,y,z)
 		end
 	end
 end
+

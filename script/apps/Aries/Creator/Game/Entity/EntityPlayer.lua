@@ -419,6 +419,9 @@ end
 
 -- check collisiton with nearby entities
 function Entity:CheckCollision(deltaTime)
+	if(not self:IsCheckCollision()) then
+		return
+	end
 	Entity._super.CheckCollision(self);
 	local bx,by,bz = self:GetBlockPos();
 	
@@ -541,7 +544,10 @@ end
 -- called every frame
 function Entity:FrameMove(deltaTime)
 	if(self:HasFocus()) then
-		if(self:HasMotion()) then
+		if(self:FrameMoveMemoryContext(deltaTime)) then
+			-- entity is autonomously animated, we will skip physics. 
+
+		elseif(self:HasMotion()) then
 			-- if there is motion, we will move by motion
 			Entity._super.FrameMove(self, deltaTime);
 		else

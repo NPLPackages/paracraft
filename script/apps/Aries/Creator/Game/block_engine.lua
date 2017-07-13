@@ -1029,9 +1029,7 @@ end
 -- Indicate if a material is a normal solid opaque cube.
 function BlockEngine:isBlockNormalCube(x,y,z)
 	local block = BlockEngine:GetBlockTemplateByIdx(x,y,z);
-	if(block and block.cubeMode and block.solid and not block.ProvidePower) then
-		return true;
-	end
+	return block and block:isBlockNormalCube();
 end
 
 -- Gets the indirect(weak) power level of this block to a given side. 

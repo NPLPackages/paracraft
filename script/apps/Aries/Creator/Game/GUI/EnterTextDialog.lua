@@ -50,7 +50,7 @@ end
 function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
 	EnterTextDialog.result = nil;
 	EnterTextDialog.text = text;
-	if(bIsMultiLine == true) then
+	if(type_ == true) then
 		EnterTextDialog.SetType("multiline");
 	else
 		EnterTextDialog.SetType(type_);

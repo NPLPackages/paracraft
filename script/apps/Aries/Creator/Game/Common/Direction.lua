@@ -75,6 +75,14 @@ function Direction.GetDirectionFromFacing(facing)
 	return facing_to_dir[math.floor(facing/1.57+0.5) % 4];
 end
 
+-- nomalize facing to 0, 1.57, 3.14, -1.57
+function Direction.NormalizeFacing(facing)
+	if(facing <0) then
+		facing = facing + 6.28;
+	end
+	return math.floor(facing/1.57+0.5)*1.57 - 3.14;
+end
+
 -- @param camx,camy,camz: camera eye position  if nil current camera is used
 -- @param lookat_x,lookat_y,lookat_z: camera lookat position. if nil current camera lookat is used. 
 function Direction.GetDirectionFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z)

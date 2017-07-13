@@ -263,6 +263,7 @@ function WorldRevision:SetWorldFileSize()
 end
 
 -- update world file size in tag.xml
+-- return the new size
 function WorldRevision:UpdateWorldFileSize()
 	local files = commonlib.Files.Find({}, GameLogic.GetWorldDirectory(), 5, 5000, function(item)
 		return true;
@@ -274,6 +275,7 @@ function WorldRevision:UpdateWorldFileSize()
 	end
 	WorldCommon.world_info.size = filesTotal;
 	WorldCommon:SaveWorldTag();
+	return filesTotal;
 end
 
 -- TODO: not implemented

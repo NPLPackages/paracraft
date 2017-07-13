@@ -78,6 +78,7 @@ end
 -- @param filename: if nil, it is "[currentworld]/LocalNPC.xml"
 -- @return true if there is local NPC file. or nil if not. 
 function LocalNPC:LoadFromFile(filename)
+	
 	if(not filename) then
 		filename = ParaWorld.GetWorldDirectory()..self.defaultNPCFile;
 	end
@@ -104,7 +105,10 @@ function LocalNPC:LoadFromFile(filename)
 		end
 		return true;
 	end
+	
+	
 end
+
 
 -- Save all NPCs to a given XML file. 
 -- @param filename: if nil, it is "[currentworld]/LocalNPC.xml"
@@ -206,7 +210,7 @@ function LocalNPC:CreateNPCCharacter(obj_params, AI_node)
 		
 		-- make it non-persistent
 		obj_params.IsPersistent = false;
-	
+		
 		char = ObjEditor.CreateObjectByParams(obj_params);
 		
 		if(char and char:IsValid()) then
@@ -216,6 +220,9 @@ function LocalNPC:CreateNPCCharacter(obj_params, AI_node)
 			commonlib.log("Local NPC %s is created\n", obj_params.name);
 			-- commonlib.echo(obj_params)
 			char:SetPersistent(false);
+			
+			-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
+			char:SetAttribute(0x80, true);
 			
 			-- add default head on display text. 
 			local att = char:GetAttributeObject();

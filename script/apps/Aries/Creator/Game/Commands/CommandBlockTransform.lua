@@ -21,13 +21,13 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 
 
---[[translate blocks e.g.
-/translate ~ ~-1 ~ (1 1 1) to 0 3 0
-]]
 Commands["translate"] = {
 	name="translate", 
 	quick_ref="/translate from_x from_y from_z (dx dy dz) to offset_x offset_y offset_z", 
-	desc="translate blocks", 
+	desc=[[/translate from_x from_y from_z (dx dy dz) to offset_x offset_y offset_z
+translate blocks e.g.
+/translate ~ ~-1 ~ (1 1 1) to 0 3 0
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local from_x, from_y, from_z, from_dx, from_dy, from_dz;
 		local offset_x, offset_y, offset_z;
@@ -74,15 +74,15 @@ Commands["translate"] = {
 	end,
 };
 
---[[ rotate a region of blocks along a given axis
-/rotate [x|y|z] from_x from_y from_z (dx dy dz) angle [to pivot_x pivot_y pivot_z]
-/rotate x ~ ~ ~ (3 2 3) 1.57 to ~4 ~ ~
-/rotate y ~ ~ ~ (3 2 3) 1.57
-]]
+--
 Commands["rotate"] = {
 	name="rotate", 
 	quick_ref="/rotate [x|y|z] from_x from_y from_z (dx dy dz) angle [to pivot_x pivot_y pivot_z]", 
-	desc="rotate a region of blocks to along a given axis" , 
+	desc=[[ rotate a region of blocks along a given axis
+/rotate [x|y|z] from_x from_y from_z (dx dy dz) angle [to pivot_x pivot_y pivot_z]
+/rotate x ~ ~ ~ (3 2 3) 1.57 to ~4 ~ ~
+/rotate y ~ ~ ~ (3 2 3) 1.57
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local from_x, from_y, from_z, from_dx, from_dy, from_dz;
 		local pivot_x, pivot_y, pivot_z, rotate_axis, angle;
@@ -127,14 +127,14 @@ Commands["rotate"] = {
 		end
 	end,
 };
---[[ Just in case, we wants to offset the world vertically to make room for very low or high blocks. 
-This is a very time comsuming job and should be used with care. 
-/offsetworld 2
-]]
+
 Commands["offsetworld"] = {
 	name="offsetworld", 
-	quick_ref="/offsetworld offsetY]", 
-	desc="offset the world vertically to make room for scene" , 
+	quick_ref="/offsetworld offsetY", 
+	desc=[[Offset the entire world vertically to make room for very low or high blocks. 
+This is a very time comsuming job and should be used with care. It will search disk for all blocks.
+/offsetworld 2    : move all world blocks upwards by 2 blocks. 
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local offsetY;
 		offsetY, cmd_text = CmdParser.ParseInt(cmd_text);

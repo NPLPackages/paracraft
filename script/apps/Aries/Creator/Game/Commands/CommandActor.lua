@@ -69,17 +69,24 @@ Commands["focus"] = {
 	end,
 };
 
---[[ same as SetLastCommandResult to 15 and /return 15
-usually used in a movieclip to end the current movie and fire a redstone output.  usually used with /t like
-/t 10 /end
-]]
+
 Commands["end"] = {
 	name="end", 
-	quick_ref="/end", 
-	desc="same as /return 15" , 
+	quick_ref="/end [output_number]", 
+	desc=[[same as SetLastCommandResult to 15 and /return 15
+usually used in a movieclip to end the current movie and fire a redstone output.  usually used with /t like
+/t 10 /end     end the movie block 2 seconds after it stops
+/t 10 /end 1   end the movie block immediately after it stops
+@param output_number: default to 15. if 1, it means immediate output. 
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(fromEntity and fromEntity.SetLastCommandResult) then
-			fromEntity:SetLastCommandResult(15);
+			local output;
+			if(cmd_text and cmd_text~="" and cmd_text:match("^%d+$")) then
+				output = tonumber(cmd_text);
+			end
+
+			fromEntity:SetLastCommandResult(output or 15);
 		end
 		return 15;
 	end,

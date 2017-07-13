@@ -60,6 +60,15 @@ function BonesVariable:UpdateAnimInstance()
 	end
 end
 
+-- clear the binded entity's bone external animations. 
+function BonesVariable:UnbindAnimInstance()
+	local animInstance = self:GetAnimInstance();
+	if(not animInstance) then
+		return;
+	end
+	animInstance:RemoveAllDynamicFields();
+end
+
 -- load data from actor's timeseries to animation instance in C++ side if any 
 function BonesVariable:LoadFromActor()
 	local animInstance = self:GetAnimInstance();
