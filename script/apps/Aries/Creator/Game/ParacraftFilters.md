@@ -74,6 +74,7 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "select_exporter", id:
 - Networking:
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
-  
+- Movie: 
+  - "pop_movie_mode", lastMode:when the movie mode is popped
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 
