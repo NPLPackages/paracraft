@@ -16,6 +16,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRailBase"));
@@ -130,7 +131,12 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
     end
 
     if (shapeData < 0) then
-        shapeData = 1;
+		local dir = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+		if(dir == 0 or dir ==1) then
+			shapeData = 1;
+		else
+			shapeData = 2;
+		end
     end
 
     local blockData = shapeData;

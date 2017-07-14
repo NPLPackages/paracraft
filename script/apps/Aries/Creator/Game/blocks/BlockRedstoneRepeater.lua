@@ -2,7 +2,7 @@
 Title: RedstoneRepeater Based Block
 Author(s): LiXizhi
 Date: 2013/1/23
-Desc: Such as a character or mob that can walk and attack. 
+Desc: recharge and forward red stone energy in fixed direction only if the input end block is powered. 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneRepeater.lua");
