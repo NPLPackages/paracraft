@@ -54,13 +54,16 @@ function OffsetWorldTask:Run()
 end
 
 function OffsetWorldTask:BeginProcess()
-	ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
-	ParaTerrain.GetBlockAttributeObject():SetField("IsServerWorld", true);
+	local blockAtt = ParaTerrain.GetBlockAttributeObject();
+	
+	blockAtt:CallField("SuspendLightUpdate");
+	blockAtt:SetField("IsServerWorld", true);
+	blockAtt:CallField("ResetAllLight");
 end
 
 function OffsetWorldTask:EndProcess()
 	LOG.std(nil, "info", "OffsetBlockInRegion", "finished OffsetWorldTask");
-	ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
+	ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
 	-- never resume light update: since it will make the CPU really busy. 
 	-- ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
 	GameLogic.AddBBS("offsetworld", "done");

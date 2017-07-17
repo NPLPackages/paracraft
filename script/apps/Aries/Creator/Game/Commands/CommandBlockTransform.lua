@@ -145,3 +145,34 @@ This is a very time comsuming job and should be used with care. It will search d
 		end
 	end,
 };
+
+Commands["touchworld"] = {
+	name = "touchworld";
+	quick_ref = "/touchworld";
+	desc = "set all region is modified";
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/OffsetWorldTask.lua");
+		local WorldFileProvider = commonlib.gettable("MyCompany.Aries.Game.World.WorldFileProvider");
+		local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+		
+		local fileprovider = WorldFileProvider:new():Init();
+		local coords = fileprovider:GetAllRegionCoords();
+		
+		local blockWorld = GameLogic.GetBlockWorld()
+		
+		for _, coord in ipairs(coords) do
+			ParaBlockWorld.LoadRegion(blockWorld, coord.WorldX, coord.WorldY, coord.WorldZ);
+			EntityManager.GetRegionContainer(coord.WorldX,coord.WorldZ);
+		end
+		
+		local worldAtt = ParaBlockWorld.GetBlockAttributeObject(blockWorld);
+		local count = worldAtt:GetChildCount();
+
+		for i = 0, count - 1 do
+			local regionAtt = worldAtt:GetChildAt(i);
+			regionAtt:SetField("IsModified", true);
+		end
+		
+	end
+}
