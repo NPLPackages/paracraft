@@ -7,7 +7,7 @@ Support undo/redo
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
-local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, to_id, to_data=nil, max_radius = 20})
+local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, [from_data,] to_id, to_data=nil, max_radius = 20})
 -- if max_radius=0, it just replace the one clicked
 local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blocks={}, to_id=number})
 task:Run();
