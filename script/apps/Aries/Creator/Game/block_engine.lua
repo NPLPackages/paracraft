@@ -783,12 +783,25 @@ end
 -- get full info about a given block
 -- @return block_id, block_data, entity_data
 function BlockEngine:GetBlockFull(x,y,z)
-	local block_id = self:GetBlockId(x,y,z);
-	if(block_id and block_id>0) then
-		return block_id, self:GetBlockData(x,y,z), self:GetBlockEntityData(x,y,z);
+	local block_id, user_data = ParaTerrain.GetBlockFullData(x, y, z);
+	
+	if block_id > 0 then
+
+		local block = block_types.get(block_id);
+		local node;
+		if(block) then
+			local entity = block:GetBlockEntity(x,y,z);
+			if(entity) then
+				node = entity:SaveToXMLNode();
+			end
+		end
+
+
+		return block_id, user_data, node;
 	else
 		return block_id;
-	end
+	end 
+
 end
 
 -- return array of {x,y,z, id, data, entity_data}
