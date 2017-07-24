@@ -27,11 +27,13 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["block"] = {
 	name="block", 
 	quick_ref="/block block_id attr_name attr_value", 
-	desc=[[ set a block attribute currently only "speedReduction" is supported. e.g.
-/block block_id attr_name attr_value
+	desc=[[set a block template's attribute 
+@param block_id: block id or name
+@param attr_name: "speedReduction", "visible", etc 
+e.g.
+/block MovieClip visible false     :hide all movie blocks
 /block 8 speedReduction 0.3
-/block 9 speedReduction 0.3
-/block 118 speedReduction 0.1
+/block 8 speedReduction 0.3
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, name, value;
@@ -39,14 +41,17 @@ Commands["block"] = {
 		if(blockid) then
 			name, cmd_text = CmdParser.ParseString(cmd_text);
 			if(name) then
-				value, cmd_text = CmdParser.ParseInt(cmd_text);
-				value = value or cmd_text;
 				local block_template = block_types.get(blockid);
 				if(block_template) then
 					if(name == "speedReduction") then
+						value, cmd_text = CmdParser.ParseInt(cmd_text);
+						value = value or cmd_text;
 						if(type(value) == "number") then
 							block_template:SetSpeedReduction(value);
 						end
+					elseif(name == "visible") then
+						value, cmd_text = CmdParser.ParseBool(cmd_text);
+						block_template:SetVisible(value);
 					else
 						-- TODO: 
 					end

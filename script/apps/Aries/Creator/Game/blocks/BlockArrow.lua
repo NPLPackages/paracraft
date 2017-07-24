@@ -56,7 +56,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 		if(side ==4 or side == 5) then
 			local dir = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
 			if(dir>=0 and dir<4) then
-				echo({side=side, dir=dir, "1111111"})
+				-- echo({side=side, dir=dir, "1111111"})
 				data = dir_side_to_data[side][dir]*6+data;
 			end
 		elseif(side<4) then

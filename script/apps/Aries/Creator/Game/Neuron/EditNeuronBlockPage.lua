@@ -161,7 +161,7 @@ function EditNeuronBlockPage:SelectNeuron(x, y, z)
 	scene:AddChild(obj);
 
 	self.neuron = NeuronManager.GetNeuron(x, y, z, true);
-	ParaTerrain.DeselectAllBlock();
+	ParaTerrain.DeselectAllBlock(groupindex_hint);
 	self:ClearAABBSelection();
 	self.need_refresh = true;
 	self:FrameMove();
@@ -326,7 +326,7 @@ function EditNeuronBlockPage.RemoveAllAxons()
 	local self = cur_instance;
 	if(page and self.neuron) then
 		self.neuron:ClearAxons();
-		ParaTerrain.DeselectAllBlock();
+		ParaTerrain.DeselectAllBlock(groupindex_hint);
 		self:UpdateBlockNumber();
 	end
 end
