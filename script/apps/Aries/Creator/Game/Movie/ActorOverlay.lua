@@ -457,8 +457,34 @@ function Actor:CheckInstallCodeEnv(painter)
 				if(filename) then
 					if(not width or not height) then
 						local texture = ParaAsset.LoadTexture("", filename, 1);
-						width = width or texture:GetWidth();
-						height = height or texture:GetHeight();
+						
+						-- fix display bug under opengl
+						local function hackLenth(pLen)
+							if not pLen then
+								return;
+							end
+							
+							NPL.load("(gl)script/ide/math/bit.lua");
+							local rshift = mathlib.bit.rshift;
+							local bor = mathlib.bit.bor;
+
+							local ret = pLen;
+							
+							ret = ret - 1;
+							
+							ret = bor(ret, rshift(ret, 1));
+							ret = bor(ret, rshift(ret, 2));
+							ret = bor(ret, rshift(ret, 4));
+							ret = bor(ret, rshift(ret, 8));
+							ret = bor(ret, rshift(ret, 16));
+							
+							ret = ret + 1;
+							
+							return ret;
+						end
+						
+						width = hackLenth(width or texture:GetWidth());
+						height = hackLenth(height or texture:GetHeight());
 					end
 					x,y,width, height = x or 0, y or 0, width or 64, height or 64;
 					self:ExtendAABB(x, y);
