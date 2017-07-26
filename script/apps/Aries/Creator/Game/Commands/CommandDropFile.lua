@@ -120,7 +120,7 @@ function DragDropHandlers.handleZipFile(filename)
 		local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
 		EnterGamePage.OnOpenPkgFile(filename)
 	elseif(zipType == "mod") then
-		_guihelper.MessageBox(format(L"确定要按照Mod插件: %s?", name), function(res)
+		_guihelper.MessageBox(format(L"确定要安装Mod插件: %s?", name), function(res)
 			if(res == _guihelper.DialogResult.Yes) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 				local ModManager = commonlib.gettable("Mod.ModManager");

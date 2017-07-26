@@ -269,6 +269,13 @@ function Entity:OnFocusOut()
 	self.inventory.isClient = nil;
 	local obj = self:GetInnerObject();
 	if(obj) then
+		-- this fixed a bug that the player may be moving forward while focus is set to camera in a movie block. 
+		obj:ToCharacter():Stop();
+		-- if walking or running animation is being played, stop it. 
+		local animId = obj:GetField("AnimID", 0);
+		if(animId == 4 or animId == 5) then
+			obj:SetField("AnimID", 0);
+		end
 		-- make it linear movement style
 		obj:SetField("MovementStyle", 3);
 		-- obj:SetField("SkipPicking", false);

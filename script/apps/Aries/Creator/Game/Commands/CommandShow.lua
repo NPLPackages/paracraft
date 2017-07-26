@@ -25,13 +25,13 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|perf|info|touch|terrain|mod|physics] [on|off]", 
+	quick_ref="/show [desktop|player|boundingbox|perf|info|touch|terrain|mod|physics|vision] [on|off]", 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
 /show movie.controller
-e.g.
 /show desktop.builder.movie
+/show vision   : AI memory vision
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name, bIsShow;
@@ -71,6 +71,11 @@ e.g.
 			SelectModulePage.ShowPage();
 		elseif(name == "") then
 			ParaScene.GetAttributeObject():SetField("ShowMainPlayer", true);
+		elseif(name == "vision") then
+			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
+			if(memoryContext) then
+				memoryContext:SetVisible(true);
+			end
 		end
 	end,
 };
@@ -79,7 +84,7 @@ e.g.
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|touch]", 
+	quick_ref="/hide [desktop|player|boundingbox|touch|vision]", 
 	desc="hide different type of things" , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
@@ -100,6 +105,11 @@ Commands["hide"] = {
 			EntityManager.GetPlayer():SetVisible(false);
 		elseif(name == "") then
 			ParaScene.GetAttributeObject():SetField("ShowMainPlayer", false);
+		elseif(name == "vision") then
+			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
+			if(memoryContext) then
+				memoryContext:SetVisible(false);
+			end
 		end
 	end,
 };

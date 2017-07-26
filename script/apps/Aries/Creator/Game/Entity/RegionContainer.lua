@@ -76,7 +76,49 @@ function RegionContainer:SaveToFile(filename)
 			return;
 		end
 	end
+	
+	local root = {name='entities', attr={file_version="0.1"} }
+	for entity in pairs(self.entities) do 
+		if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
+			local node = {name='entity', attr={}};
+			entity:SaveToXMLNode(node);
+			if(node) then
+				root[#root+1] = node;
+			end
+		end
+	end
+	
+	local bSuccessed = false;
+	if(root) then
+		table.sort(root, function(a,b)
+			return (a.attr.class or "0") < (b.attr.class or "0");
+		end);
+		
+		local xml_data = commonlib.Lua2XmlString(root, true) or "";
+		
+		if (#xml_data >= 10240) then
+			local writer = ParaIO.CreateZip(filename, "");
+			if (writer:IsValid()) then
+				writer:ZipAddData("data", xml_data);
+				writer:close();
+				bSuccessed = true;
+			end
+		else
+			local file = ParaIO.open(filename, "w");
+			if(file:IsValid()) then
+				file:WriteString(xml_data);
+				file:close();
+				
+				bSuccessed = true;
+			end
+		end
+	end
+	
+	if bSuccessed then
+		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
+	end
 
+	--[[
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
 		local root = {name='entities', attr={file_version="0.1"} }
@@ -98,6 +140,7 @@ function RegionContainer:SaveToFile(filename)
 		file:close();
 		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
 	end
+	]]
 end
 
 function RegionContainer:LoadFromFile(filename)

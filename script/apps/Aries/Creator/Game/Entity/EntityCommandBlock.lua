@@ -163,7 +163,7 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 						self:ExecuteCommand();
 					end
 				end})
-				self.timer:Change(100, nil);
+				self.timer:Change(30, nil);
 			end
 		end
 	end

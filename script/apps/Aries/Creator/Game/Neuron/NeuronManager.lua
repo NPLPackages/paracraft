@@ -218,24 +218,39 @@ function NeuronManager.SaveToFile(bSaveToLastSaveFolder)
 	else
 		filename = format("%sblockworld/%s", ParaWorld.GetWorldDirectory(), default_filename);
 	end
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		file:WriteString([[<neurons offsets="0,0,0" file_version="0.1">]]);
-		file:WriteString("\n");
-
+	
+	local strList = {};
+	table.insert(strList, [[<neurons offsets="0,0,0" file_version="0.1">]]);
+	table.insert(strList, "\n");
+	do
 		local index, neuron;
 		for index, neuron in pairs(neuron_cache) do
 			if( not neuron:IsEmpty()) then
 				local str = neuron:SerializeToXMLString();
 				if(str) then
-					file:WriteString(str);
+					table.insert(strList, str);
 				end
 			end
 		end
-
-		file:WriteString([[</neurons>]]);
-		file:close();
 	end
+	
+	table.insert(strList, [[</neurons>]]);
+	
+	local xml_data = table.concat(strList);
+	if (#xml_data >= 10240) then
+		local writer = ParaIO.CreateZip(filename, "");
+		if (writer:IsValid()) then
+			writer:ZipAddData("data", xml_data);
+			writer:close();
+		end
+	else
+		local file = ParaIO.open(filename, "w");
+		if(file:IsValid()) then
+			file:WriteString(xml_data);
+			file:close();
+		end
+	end
+
 end
 
 -- this function can be called when traversing the active_neurons table

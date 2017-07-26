@@ -173,11 +173,14 @@ if block_id is omitted, it will be the current block in hand.
 
 Commands["replace"] = {
 	name="replace", 
-	quick_ref="/replace [-all] [from_id] [to_id] [radius]", 
-	desc=[[replace all blocks in selected area(aabb) from from_id to to_id, or replace in region specified by radius around current player
-format: /replace [-all] [from_id] [to_id] [radius]
-if block_id is omitted, it will be the current block in hand. 
--all: if nothing is selected, one need to specify -all and a radius value. 
+	quick_ref="/replace [-all] [from_id:from_data] [to_id:to_data] [radius]", 
+	desc=[[replace all blocks in selected area(aabb) from from_id to to_id, 
+or replace in region specified by radius around current player position.
+@param -all: if nothing is selected, one need to specify -all and a radius value around player position. 
+@param from_data, to_data: are optional block data. both of which default to 0.
+e.g.
+/replace -all 62 100 30
+/replace -all 10:4095 10:2000 30     :replace color blocks with block data
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options = {};
@@ -186,12 +189,22 @@ if block_id is omitted, it will be the current block in hand.
 			options[option] = true;
 		end
 
-		local from_id, to_id;
-		from_id, to_id, radius = cmd_text:match("%s*(%d+)%s+(%d+)%s+(%d+)$");
-		if(not radius) then
-			from_id, to_id = cmd_text:match("%s*(%d*)%s+(%d*)$");
+		local from_id, from_data, to_id, to_data, radius = cmd_text:match("%s*(%d+):?(%d*)%s+(%d+):?(%d*)%s*(%d*)$");
+		if(from_data == "") then
+			from_data = nil;
+		else
+			from_data = tonumber(from_data);
 		end
-		
+		if(to_data == "") then
+			to_data = nil;
+		else
+			to_data = tonumber(to_data);
+		end
+		if(radius == "") then
+			radius = nil;
+		else
+			radius = tonumber(radius);
+		end
 
 		-- remove all terrain where the player stand
 		if(from_id and to_id) then
@@ -203,7 +216,8 @@ if block_id is omitted, it will be the current block in hand.
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
-				local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({mode="all", from_id = from_id, to_id=to_id, blockX = x, blockZ = z, radius = radius or 256});
+				local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({mode="all", from_id = from_id, from_data = from_data, 
+					to_id=to_id, to_data = to_data, blockX = x, blockZ = z, radius = radius or 256});
 				task:Run();
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");

@@ -186,8 +186,7 @@ end
 function BlockTemplate:SaveTemplate()
 	local filename = self.filename;
 	ParaIO.CreateDirectory(filename);
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then 
+	do
 		self.params = self.params or {};
 		self.params.auto_scale = self.auto_scale;
 		local o = {name="pe:blocktemplate", attr = self.params};
@@ -207,9 +206,23 @@ function BlockTemplate:SaveTemplate()
 			end
 		end
 
-		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks),}
-		file:WriteString(commonlib.Lua2XmlString(o, true));
-		file:close();
+		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks),};
+		local xml_data = commonlib.Lua2XmlString(o, true);
+		if (xml_data) then
+			if #xml_data >= 10240 then
+				local writer = ParaIO.CreateZip(filename, "");
+				if (writer:IsValid()) then
+					writer:ZipAddData("data", xml_data);
+					writer:close();
+				end
+			else
+				local file = ParaIO.open(filename, "w");
+				if(file:IsValid()) then
+					file:WriteString(xml_data);
+					file:close();
+				end
+			end
+		end
 		
 		if(filename:match("%.bmax$")) then
 			-- refresh it if it is a bmax model.
