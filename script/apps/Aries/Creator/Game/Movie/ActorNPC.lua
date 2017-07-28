@@ -216,6 +216,7 @@ function Actor:Init(itemStack, movieclipEntity)
 			self.entity:SetCanRandomMove(false);
 			self.entity:SetDisplayName(name);
 			self.entity:EnableAnimation(not animate_by_script);
+			-- self.entity:EnableLOD(false);
 			self.entity:Attach();
 			self:CheckLoadBonesAnims();
 		end

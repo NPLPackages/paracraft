@@ -138,7 +138,7 @@ function CreateAssetBagPage.OnClickAddSelection()
 			ParaIO.CreateDirectory(dataSource);
 			local file = ParaIO.open(dataSource, "w");
 			if(file:IsValid()) then
-				file:WriteString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n");
+				file:WriteString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 				file:WriteString(commonlib.Lua2XmlString(xmlRoot, true));
 				file:close();
 			else
@@ -193,7 +193,7 @@ function CreateAssetBagPage.OnDeleteAsset(obj_params)
 		ParaIO.CreateDirectory(dataSource);
 		local file = ParaIO.open(dataSource, "w");
 		if(file:IsValid()) then
-			file:WriteString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n");
+			file:WriteString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 			file:WriteString(commonlib.Lua2XmlString(xmlRoot, true));
 			file:close();
 		else

@@ -2,7 +2,9 @@
 Title: Item Client
 Author(s): LiXizhi
 Date: 2013/7/14
-Desc: all block template. 
+Desc: all block template.
+User defined custom blocks in the current world directory is saved in `blockworld.lastsave/customblocks.xml`
+
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
@@ -376,7 +378,7 @@ function ItemClient.LoadCustomBlocks()
 	end
 end
 
--- custom block is used defined blocks in the current world directory. 
+-- custom block is user defined blocks in the current world directory. 
 function ItemClient.SaveCustomBlocks()
 	local from_id, to_id = custom_block_id_begin, custom_block_id_begin+custom_block_id_max_count;
 	local root = {name="customblocks", attr={desc=string.format("ID must be in range:%d-%d", from_id, to_id)}}
