@@ -92,14 +92,16 @@ function InfoWindow.UpdateInfo()
 			last_info.relativemouseposText = string.format("%s: ~%d ~%d ~%d (%d %d %d)", relTargetName or "", x-ox,y-oy,z-oz, rx, ry, rz);
 		else
 			last_info.mousepos = string.format("%d %d %d", result.blockX,result.blockY,result.blockZ);
+			local block_id = 0;
 			local block_data = BlockEngine:GetBlockData(result.blockX,result.blockY,result.blockZ);
 			local block_template = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);
 			local block_name = "";
 			if(block_template) then
 				block_name = block_template:GetDisplayName();
+				block_id = block_template.id;
 			end
 			
-			last_info.mouseposText = string.format("%s:%s:%d side(%d)", last_info.mousepos, block_name, block_data, result.side or -1);
+			last_info.mouseposText = string.format("%s %s %d:%d side:%d", last_info.mousepos, block_name, block_id, block_data, result.side or -1);
 		
 			if(curSelection and #curSelection == 1) then
 				-- single selection

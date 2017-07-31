@@ -57,16 +57,48 @@ function Actor:SetRecording(isRecording)
 	return false;
 end
 
+local curTextOrder = 0;
+local text_actors = {};
+
+function Actor:GetCurrentTextOrder()
+	return curTextOrder;
+end
+
+function Actor:SetCurrentTextOrder(order)
+	curTextOrder = order;
+end
+
+-- this actor can only write text on order that is equal to self:GetCurrentTextOrder().
+function Actor:GetTextOrder()
+	if(not self.textOrder) then
+		self:SetCurrentTextOrder(self:GetCurrentTextOrder() + 1);
+		self.textOrder = self:GetCurrentTextOrder();
+		text_actors[self.textOrder] = true;
+	end
+	return self.textOrder;
+end
+
 -- remove GUI text
 function Actor:OnRemove()
-	if(self.uiobject_id) then
-		local obj = self:GetTextObj(false);
-		if(obj) then
-			ParaUI.Destroy(obj.parent.id);
+	text_actors[self:GetTextOrder()] = nil;
+	if(self:GetTextOrder() == self:GetCurrentTextOrder()) then
+		self:SetCurrentTextOrder(1);
+		for i = self:GetTextOrder() - 1, 1, -1 do
+			if(text_actors[i]) then
+				self:SetCurrentTextOrder(i);
+				break;
+			end
 		end
-		-- ParaUI.Destroy(self.uiobject_id);
-		self.uiobject_id = nil;
+	
+		if(self.uiobject_id) then
+			local obj = self:GetTextObj(false);
+			if(obj) then
+				ParaUI.Destroy(obj.parent.id);
+			end
+			-- ParaUI.Destroy(self.uiobject_id);
+		end
 	end
+	self.uiobject_id = nil;
 end
 
 -- add movie text at the current time. 
@@ -141,7 +173,7 @@ function Actor:Islocked()
 	return Actor.isLocked;
 end
 
--- return the text gui object. 
+-- return the text gui object or nil. 
 function Actor:GetTextObj(bCreateIfNotExist)
 	if(self.uiobject_id) then
 		local _this = ParaUI.GetUIObject(self.uiobject_id);
@@ -264,6 +296,10 @@ function Actor:FrameMovePlaying(deltaTime)
 	local values = self:GetValue("text", curTime);
 	local var = self:GetVariable("text");
 	if(var and values) then
+		if(self:GetTextOrder() ~= self:GetCurrentTextOrder()) then
+			return;
+		end
+
 		local fromTime, toTime = var:getTimeRange(1, curTime);
 		
 		local firstTime = var:GetFirstTime();

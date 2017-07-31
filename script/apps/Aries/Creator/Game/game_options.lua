@@ -258,6 +258,15 @@ function options:SetShowMainPlayer(bShow)
 	return ParaScene.GetAttributeObject():SetField("ShowMainPlayer", bShow == true);
 end
 
+-- enable internel mesh level of details if any. 
+function options:EnableLOD(bEnable)
+	ParaScene.GetAttributeObject():SetField("IsLodEnabled", bEnable == true);
+end
+
+function options:IsLODEnabled()
+	return ParaScene.GetAttributeObject():GetField("IsLodEnabled", true);
+end
+
 -- async load or download from url
 function options:ApplyTexturePack()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");

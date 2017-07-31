@@ -71,7 +71,7 @@ function NetworkMain:StartServerViaTunnel(host, port, room_key, username, passwo
 	-- this is a pure client, so do not listen on any port. Just start the network interface. 
 	NPL.StartNetServer("127.0.0.1", "0");
 
-	self.tunnelClient:ConnectServer(ip, port, room_key, username, password, function(result)
+	self.tunnelClient:ConnectServer(host, port, room_key, username, password, function(result)
 		if(result) then
 			self.tunnelClient:LoginTunnel(function(result)
 				if(result) then

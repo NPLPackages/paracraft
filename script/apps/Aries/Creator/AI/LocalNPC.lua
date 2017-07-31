@@ -160,12 +160,22 @@ function LocalNPC:SaveToFile(filename)
 	end
 	
 	local xml_data = commonlib.Lua2XmlString(pe_root, true);
+	
 	if(xml_data) then
-		local file = ParaIO.open(filename, "w");
-		if(file:IsValid()) then
-			file:WriteString(xml_data)
-			file:close();
-			commonlib.log("local NPC file is successfully saved to disk: %s\n", filename)
+		if (#xml_data >= 10240) then
+			local writer = ParaIO.CreateZip(filename, "");
+			if (writer:IsValid()) then
+				writer:ZipAddData("data", xml_data);
+				writer:close();
+				commonlib.log("local NPC file is successfully saved to disk: %s\n", filename)
+			end
+		else
+			local file = ParaIO.open(filename, "w");
+			if(file:IsValid()) then
+				file:WriteString(xml_data)
+				file:close();
+				commonlib.log("local NPC file is successfully saved to disk: %s\n", filename)
+			end
 		end
 	end	
 	

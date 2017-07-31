@@ -873,7 +873,12 @@ end
 ------------------------
 local page;
 function BuildQuest.ShowPage()
+	if(not GameLogic.GetFilters():apply_filters("BuildQuest.ShowPage")) then
+		return false;
+	end
+
 	HelpPage.cur_category = nil;
+
 	if(System.options.IsMobilePlatform) then
 		MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(false);
 

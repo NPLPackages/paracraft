@@ -75,15 +75,14 @@ Example:
 	end,
 };
 
---[[change field of view with an animation. e.g.
-/fov   default field of view
-/fov 0.5		zoomin
-/fov 0.4 0.01   zoomin with animation
-]]
 Commands["fov"] = {
 	name="fov", 
 	quick_ref="/fov [fieldofview:1.04] [animSpeed]", 
-	desc="change field of view with an animation. default value is 1.04", 
+	desc=[[change field of view with an animation. default value is 1.04. e.g.
+/fov   default field of view
+/fov 0.5		zoomin
+/fov 0.4 0.01   zoomin with animation
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(cmd_text) then
 			local target_fov, speed_fov;
@@ -100,3 +99,20 @@ Commands["fov"] = {
 		end
 	end,
 };
+
+Commands["cameradist"] = {
+	name="cameradist", 
+	quick_ref="/cameradist [1-20]", 
+	desc="change the camera to player distance", 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if(cmd_text) then
+			local dist;
+			dist, cmd_text  = CmdParser.ParseInt(cmd_text);
+			if(dist) then
+				GameLogic.options:SetCameraObjectDistance(dist)
+			end
+		end
+	end,
+};
+
+

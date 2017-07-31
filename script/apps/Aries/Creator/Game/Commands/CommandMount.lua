@@ -36,6 +36,9 @@ e.g.
 		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
 		playerEntity = playerEntity or fromEntity or EntityManager.GetPlayer();
 
+		if(playerEntity:IsBlockEntity()) then
+			return
+		end
 		local target;
 		local radius = 2;
 		local option = "";
@@ -81,7 +84,7 @@ e.g.
 		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
 		playerEntity = playerEntity or fromEntity or EntityManager.GetPlayer();
 
-		if(playerEntity) then
+		if(playerEntity and not playerEntity:IsBlockEntity()) then
 			playerEntity:MountEntity(nil);
 			local bx, by, bz = playerEntity:GetBlockPos();
 			playerEntity:PushOutOfBlocks(bx, by, bz);
