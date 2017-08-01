@@ -78,23 +78,41 @@ function RegionContainer:SaveToFile(filename)
 	end
 	
 	local root = {name='entities', attr={file_version="0.1"} }
+	local sortEntities = {};
+	
 	for entity in pairs(self.entities) do 
 		if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
 			local node = {name='entity', attr={}};
 			entity:SaveToXMLNode(node);
-			if(node) then
-				root[#root+1] = node;
-			end
+			local x, y, z = entity:GetBlockPos();
+			table.insert(sortEntities, {pos = {x, y, z}, node = node});
+
 		end
 	end
 	
+	table.sort(sortEntities, function(a, b)
+		local pos1 = a.pos;
+		local pos2 = b.pos;
+		
+		local value1 = pos1[1] * 100000000 +  pos1[2] * 1000000 + pos1[3];
+		local value2 = pos2[1] * 100000000 +  pos2[2] * 1000000 + pos2[3];
+		
+		return value1 < value2;
+	end);
+	
+	for _, entity in ipairs(sortEntities) do
+		table.insert(root, entity.node);
+	end
+
+	
 	local bSuccessed = false;
 	if(root) then
-		table.sort(root, function(a,b)
-			return (a.attr.class or "0") < (b.attr.class or "0");
-		end);
 		
-		local xml_data = commonlib.Lua2XmlString(root, true) or "";
+		local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
+		
+		--NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
+		--local Encoding = commonlib.gettable("System.Encoding");
+		--print(Encoding.sha1(xml_data, "hex"));
 		
 		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
@@ -117,30 +135,6 @@ function RegionContainer:SaveToFile(filename)
 	if bSuccessed then
 		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
 	end
-
-	--[[
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		local root = {name='entities', attr={file_version="0.1"} }
-		for entity in pairs(self.entities) do 
-			if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
-				local node = {name='entity', attr={}};
-				entity:SaveToXMLNode(node);
-				if(node) then
-					root[#root+1] = node;
-				end
-			end
-		end
-		if(root) then
-			table.sort(root, function(a,b)
-				return (a.attr.class or "0") < (b.attr.class or "0");
-			end);
-			file:WriteString(commonlib.Lua2XmlString(root,true) or "");
-		end
-		file:close();
-		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
-	end
-	]]
 end
 
 function RegionContainer:LoadFromFile(filename)

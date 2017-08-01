@@ -456,7 +456,7 @@ function Entity:SaveToXMLNode(node)
 	node = Entity._super.SaveToXMLNode(self, node);
 	node.attr.skin = self.skin;
 	if(self.tp_list) then
-		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list), name="teleport_list"};
+		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list, true), name="teleport_list"};
 	end
 	self.capabilities:SaveToXMLNode(node);
 	return node;

@@ -324,7 +324,7 @@ function Entity:SaveToXMLNode(node)
 		attr.anim = self.anim;
 	end
 	if(self.memory and next(self.memory)) then
-		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory)};
+		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory, true)};
 	end
 	if(self.cmd and self.cmd~="") then
 		if(commonlib.Encoding.HasXMLEscapeChar(self.cmd)) then
