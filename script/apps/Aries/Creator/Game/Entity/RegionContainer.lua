@@ -111,9 +111,9 @@ function RegionContainer:SaveToFile(filename)
 		
 		local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
 		
-		NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
-		local Encoding = commonlib.gettable("System.Encoding");
-		print(Encoding.sha1(xml_data, "hex"));
+		--NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
+		--local Encoding = commonlib.gettable("System.Encoding");
+		--print(Encoding.sha1(xml_data, "hex"));
 		
 		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
