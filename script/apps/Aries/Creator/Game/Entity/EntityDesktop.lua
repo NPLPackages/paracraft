@@ -70,8 +70,8 @@ function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	return node;
 end
 

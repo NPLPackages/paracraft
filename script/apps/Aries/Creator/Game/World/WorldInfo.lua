@@ -52,7 +52,7 @@ function WorldInfo:LoadFromXMLNode(node)
 	end
 end
 
-function WorldInfo:SaveToXMLNode(node)
+function WorldInfo:SaveToXMLNode(node, bSort)
 	node = node or {name='pe:world', attr={}};
 
 	node.attr = {

@@ -189,8 +189,8 @@ function Entity:GetModelFile()
 	return self.filename;
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.filename = self:GetModelFile();
 	if(self:getScale()~= 1) then
 		node.attr.scale = self:getScale();

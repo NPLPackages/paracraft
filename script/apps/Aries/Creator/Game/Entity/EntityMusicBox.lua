@@ -79,8 +79,8 @@ function Entity:LoadFromXMLNode(node)
 	self.isPowered = node.attr.isPowered == "true";
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	if(self.isPowered) then
 		node.attr.isPowered = true;
 	end

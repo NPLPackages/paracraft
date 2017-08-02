@@ -241,8 +241,8 @@ function Entity:LoadFromXMLNode(node)
 	end
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	if(not self.can_random_move) then
 		node.attr.can_random_move = false;
 	end

@@ -42,8 +42,13 @@ function DataContainer:LoadFromXMLNode(node)
 	end
 end
 
-function DataContainer:SaveToXMLNode(node)
-	for name, value in pairs(self.datafields) do
+function DataContainer:SaveToXMLNode(node, bSort)
+	local pairsFunc = pairs;
+	if bSort then
+		pairsFunc = commonlib.keysorted_pairs;
+	end
+	
+	for name, value in pairsFunc(self.datafields) do
 		local data_type = type(value);
 		if(data_type == "number") then
 			node[#node+1] = {name="number", attr={value=value}};
@@ -53,7 +58,7 @@ function DataContainer:SaveToXMLNode(node)
 			if(value.class_name == "ItemStack") then
 				node[#node+1] = {name="itemstack", attr={id=value.id, count=value.count, serverdata = value.serverdata}};
 			else
-				node[#node+1] = {name="table", attr={value=commonlib.serialize_compact(value)}};
+				node[#node+1] = {name="table", attr={value=commonlib.serialize_compact(value, bSort)}};
 			end
 			
 		end

@@ -83,8 +83,9 @@ function RegionContainer:SaveToFile(filename)
 	for entity in pairs(self.entities) do 
 		if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
 			local node = {name='entity', attr={}};
-			entity:SaveToXMLNode(node);
+			entity:SaveToXMLNode(node, true);
 			local x, y, z = entity:GetBlockPos();
+
 			table.insert(sortEntities, {pos = {x, y, z}, node = node});
 
 		end
@@ -110,9 +111,9 @@ function RegionContainer:SaveToFile(filename)
 		
 		local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
 		
-		--NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
-		--local Encoding = commonlib.gettable("System.Encoding");
-		--print(Encoding.sha1(xml_data, "hex"));
+		NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
+		local Encoding = commonlib.gettable("System.Encoding");
+		print(Encoding.sha1(xml_data, "hex"));
 		
 		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
