@@ -707,6 +707,10 @@ function EntityManager.FrameMove(deltaTime)
 		focus_entity:UpdatePosition();
 		focus_entity:UpdateRotation();
 	end
+	if(player ~= focus_entity) then
+		player:UpdatePosition();
+		player:UpdateRotation();
+	end
 
 	frame_count = frame_count + 1;
 	

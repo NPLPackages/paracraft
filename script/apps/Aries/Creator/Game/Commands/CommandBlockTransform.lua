@@ -149,7 +149,7 @@ This is a very time comsuming job and should be used with care. It will search d
 Commands["touchworld"] = {
 	name = "touchworld";
 	quick_ref = "/touchworld";
-	desc = "set all region is modified";
+	desc = "Set all regions as modified. You can then save the world";
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/OffsetWorldTask.lua");

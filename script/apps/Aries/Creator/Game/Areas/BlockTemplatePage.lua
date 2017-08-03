@@ -148,7 +148,7 @@ function BlockTemplatePage.OnClickSave()
 	local template_base_dir = BlockTemplatePage.template_save_dir or default_template_dir;
     local name = page:GetUIValue("name") or page:GetUIValue("tl_name") or "";
 	local desc = page:GetUIValue("template_desc") or page:GetUIValue("template_desc") or "";
-    desc = string.gsub(desc,"\r\n","<br/>")
+    desc = string.gsub(desc,"\r?\n","<br/>")
 	name = name:gsub("%s", "");
 	if(name == "")  then
 		_guihelper.MessageBox(L"名字不能为空~")

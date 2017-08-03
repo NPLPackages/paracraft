@@ -353,6 +353,12 @@ function block:SetSpeedReduction(value)
 	self:UpdateAttribute("speedReduction", value)
 end
 
+-- make all blocks of this type visible or invisible. Please note, invisible block will maintain all of its functions. 
+-- one may like to hide blocks like movie blocks in game mode. 
+function block:SetVisible(bVisible)
+	self:UpdateAttribute("isVisible", bVisible == true)
+end
+
 function block:GetSpeedReduction()
 	return self.speedReduction or 1;
 end

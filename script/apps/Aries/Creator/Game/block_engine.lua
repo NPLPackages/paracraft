@@ -745,6 +745,32 @@ function BlockEngine:GetBlockId(x,y,z)
 	return ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 end
 
+function BlockEngine:GetBlockIdAndData(x, y, z)
+	return ParaTerrain.GetBlockFullData(x, y, z);
+end
+
+-- get full info about a given block
+-- @return block_id, block_data, entity_data
+function BlockEngine:GetBlockFull(x,y,z)
+	local block_id, user_data = ParaTerrain.GetBlockFullData(x, y, z);
+	
+	if block_id > 0 then
+		local block = block_types.get(block_id);
+		local node;
+		if(block) then
+			local entity = block:GetBlockEntity(x,y,z);
+			if(entity) then
+				node = entity:SaveToXMLNode();
+			end
+		end
+
+		return block_id, user_data, node;
+	else
+		return block_id;
+	end 
+
+end
+
 function BlockEngine:GetBlockEntityData(x,y,z)
 	local block = self:GetBlock(x,y,z)
 	if(block) then
@@ -786,7 +812,6 @@ function BlockEngine:GetBlockFull(x,y,z)
 	local block_id, user_data = ParaTerrain.GetBlockFullData(x, y, z);
 	
 	if block_id > 0 then
-
 		local block = block_types.get(block_id);
 		local node;
 		if(block) then
@@ -795,7 +820,6 @@ function BlockEngine:GetBlockFull(x,y,z)
 				node = entity:SaveToXMLNode();
 			end
 		end
-
 
 		return block_id, user_data, node;
 	else

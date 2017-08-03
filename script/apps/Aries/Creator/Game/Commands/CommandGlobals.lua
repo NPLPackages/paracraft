@@ -565,3 +565,20 @@ Commands["clearcache"] = {
 		GameLogic.AddBBS(nil, "Downloaded Web Cache Cleared");
 	end,
 };
+
+Commands["lod"] = {
+	name="lod", 
+	quick_ref="/lod [on|off]", 
+	desc=[[Turn global level of detail for meshes on and off. Default it on. 
+/lod off     : turn off lod
+/lod on      : turn on lod
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local bLOD;
+		bLOD, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(bLOD == nil) then
+			bLOD = true;
+		end
+		GameLogic.options:EnableLOD(bLOD);
+	end,
+};

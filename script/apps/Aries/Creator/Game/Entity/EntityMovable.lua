@@ -754,7 +754,8 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 		if(bFlying) then
 			dist_sq = dist_sq + self.motionY ^ 2;
 		end
-		if(dist_sq > 0.0001 or (bFlying and not self.onGround) ) then
+
+		if(not self.ridingEntity and (dist_sq > 0.0001 or (bFlying and not self.onGround) )) then
 			obj:SetField("AnimID", 5);
 		else
 			obj:SetField("AnimID", self:GetLastAnimId() or 0);

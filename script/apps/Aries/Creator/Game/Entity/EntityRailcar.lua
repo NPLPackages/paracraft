@@ -2,7 +2,7 @@
 Title: rail car
 Author(s): LiXizhi
 Date: 2014/6/8
-Desc: a car that runs on rails
+Desc: a car that runs on rails. It will slow down immediately when on a non-powered PowerRail
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityRailcar.lua");

@@ -126,8 +126,7 @@ end
 function Entity:RefreshSky()
 	local filename;
 
-	local bCloudySky = self:IsSnowing() or self:IsRaining();
-	if(bCloudySky) then
+	if(not self.bForceSkyFileOnce and (self:IsSnowing() or self:IsRaining()) ) then
 		-- set cloudy sky
 		filename = self:GetSkyTemplate(8);
 	else
@@ -137,6 +136,8 @@ function Entity:RefreshSky()
 			filename = self:GetSkyTemplate(self.filename) or self.filename;
 		end
 	end
+	self.bForceSkyFileOnce = nil;
+	
 
 	local sky = self:GetSkyAttr();
 	if(filename) then
@@ -158,6 +159,7 @@ end
 
 function Entity:UseSimulatedSky()
 	self.IsSimulatedSky = true;
+	self.bForceSkyFileOnce = true;
 	self:RefreshSky();
 end
 
@@ -165,6 +167,7 @@ end
 function Entity:UseNoneSky()
 	self.IsSimulatedSky = false;
 	self.filename = "";
+	self.bForceSkyFileOnce = true;
 	self:RefreshSky();
 end
 
@@ -173,6 +176,7 @@ end
 function Entity:UseSkybox(filename)
 	self.IsSimulatedSky = false;
 	self.filename = filename;
+	self.bForceSkyFileOnce = true;
 	self:RefreshSky();
 end
 

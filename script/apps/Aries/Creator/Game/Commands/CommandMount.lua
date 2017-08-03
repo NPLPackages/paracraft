@@ -29,6 +29,7 @@ Commands["mount"] = {
 e.g.
 /mount      :mount the player or calling entity to nearby railcars if any
 /mount @p   :mount the last trigger entity or player to nearby railcars if any
+/mount @a   :mount the closet player entity to nearby railcars if any
 /mount @test    :mount the "test" NPC to nearby railcars if any
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
@@ -36,6 +37,9 @@ e.g.
 		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
 		playerEntity = playerEntity or fromEntity or EntityManager.GetPlayer();
 
+		if(playerEntity:IsBlockEntity()) then
+			return
+		end
 		local target;
 		local radius = 2;
 		local option = "";
@@ -71,17 +75,19 @@ e.g.
 
 Commands["unmount"] = {
 	name="unmount", 
-	quick_ref="/mount [@entityname]", 
+	quick_ref="/unmount [@entityname]", 
 	desc=[[unmount player or the given entity from its currently riding entity. 
+@param entityname: name of the entity, if nil, it means the calling entity, such as inside the entity's inventory.  
 e.g.
-/unmount
+/unmount      : unmount the player or calling entity
+/unmount @a   : unmount closest player entity
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity;
 		playerEntity, cmd_text = CmdParser.ParsePlayer(cmd_text);
 		playerEntity = playerEntity or fromEntity or EntityManager.GetPlayer();
 
-		if(playerEntity) then
+		if(playerEntity and not playerEntity:IsBlockEntity()) then
 			playerEntity:MountEntity(nil);
 			local bx, by, bz = playerEntity:GetBlockPos();
 			playerEntity:PushOutOfBlocks(bx, by, bz);

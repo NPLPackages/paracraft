@@ -469,6 +469,22 @@ function Entity:ToggleWalkRun(bWalking)
 	end
 end
 
+-- enable internel mesh level of details if any. 
+function Entity:EnableLOD(bEnable)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("IsLodEnabled", bEnable == true);
+	end
+end
+
+function Entity:IsLODEnabled()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("IsLodEnabled", true)
+	end
+	return true;
+end
+
 -- all entity default to running (not walking). 
 function Entity:IsWalking()
 	local obj = self:GetInnerObject();
