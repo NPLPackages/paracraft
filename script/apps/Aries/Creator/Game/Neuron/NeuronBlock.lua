@@ -238,7 +238,7 @@ function NeuronBlock:SerializeToXMLString()
 	out[#out+1] = ">\n"
 	if(self.memory and next(self.memory)~=nil) then
 		out[#out+1] = "<mem>";
-		out[#out+1] = commonlib.serialize_compact(self.memory);
+		out[#out+1] = commonlib.serialize_compact(self.memory, true);
 		out[#out+1] = "</mem>\n";
 	end
 	local axons = self.axons;
@@ -255,6 +255,7 @@ function NeuronBlock:SerializeToXMLString()
 	out[#out+1] = "</neuron>\n";
 	return table.concat(out);
 end
+
 
 function NeuronBlock:SetModified()
 	self.is_dirty = true;

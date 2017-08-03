@@ -118,7 +118,19 @@ function LocalNPC:SaveToFile(filename)
 	end
 	local pe_root = {name="pe:mcml",  attr = {npc_version = LocalNPC.Version} }
 	local name, npc_instance
+	
+	local sortNpcs = {};
 	for name, npc_instance in pairs(self.npcs) do
+		table.insert(sortNpcs, {name = name, npc_instance = npc_instance});
+	end
+	
+	table.sort(sortNpcs, function(a, b) return a.name < b.name; end);
+
+	for _, npc in ipairs(sortNpcs) do
+		
+		name = npc.name;
+		npc_instance = npc.npc_instance;
+		
 		local char = ParaScene.GetObject(name);
 		if(char:IsCharacter()) then
 			local att = char:GetAttributeObject();
@@ -140,14 +152,26 @@ function LocalNPC:SaveToFile(filename)
 			pe_root[#pe_root + 1] = pe_npc;
 			
 			local aimod_name, aimod_data
+			local sortAimods = {};
+			
 			for aimod_name, aimod_data in pairs(npc_instance.ai_mods) do
+				table.insert(sortAimods, {aimod_name = aimod_name, aimod_data = aimod_data});
+			end
+			
+			table.sort(sortAimods, function(a, b) return a.aimod_name < b.aimod_name; end);
+			
+			for _, oneData in ipairs(sortAimods) do
+				aimod_name = oneData.aimod_name;
+				aimod_data = oneData.aimod_data;
+				
 				-- serialize each npc mod for this npc
 				local aimod = self:GetAIModule(aimod_name);
+				
 				if(aimod) then
 					local ai_data = aimod.Serialize(char, aimod_data);
 					local pe_aimod = {name="pe:aimod", attr = {name = aimod.name, version = aimod.version},};
 					if(ai_data) then
-						local cdata = commonlib.serialize_compact(ai_data)
+						local cdata = commonlib.serialize_compact(ai_data, true);
 						if(cdata) then
 							-- cdata = "<![CDATA["..cdata.."]]>";
 							pe_aimod[1] = cdata;
@@ -159,7 +183,8 @@ function LocalNPC:SaveToFile(filename)
 		end	
 	end
 	
-	local xml_data = commonlib.Lua2XmlString(pe_root, true);
+	local xml_data = commonlib.Lua2XmlString(pe_root, true, true);
+	
 	
 	if(xml_data) then
 		if (#xml_data >= 10240) then

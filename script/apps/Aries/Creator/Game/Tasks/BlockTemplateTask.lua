@@ -206,9 +206,10 @@ function BlockTemplate:SaveTemplate()
 			end
 		end
 
-		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks),};
-		local xml_data = commonlib.Lua2XmlString(o, true);
+		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
+		local xml_data = commonlib.Lua2XmlString(o, true, true);
 		if (xml_data) then
+			
 			if #xml_data >= 10240 then
 				local writer = ParaIO.CreateZip(filename, "");
 				if (writer:IsValid()) then

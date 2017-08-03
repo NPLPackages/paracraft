@@ -87,8 +87,8 @@ function Entity:Destroy()
 end
 
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	local attr = node.attr;
 	attr.snowStrength = self:GetSnowStrength();
 	attr.rainStrength = self:GetRainStrength();

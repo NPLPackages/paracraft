@@ -41,11 +41,11 @@ function InventoryPlayer:LoadFromXMLNode(node)
 	return InventoryPlayer._super.LoadFromXMLNode(self, node);
 end
 
-function InventoryPlayer:SaveToXMLNode(node)
+function InventoryPlayer:SaveToXMLNode(node, bSort)
 	node.attr = node.attr or {};
 	node.attr.handtool_bagpos = self.handtool_bagpos or 1;
 
-	return InventoryPlayer._super.SaveToXMLNode(self, node);
+	return InventoryPlayer._super.SaveToXMLNode(self, node, bSort);
 end
 
 -- the number of slots in the inventory.

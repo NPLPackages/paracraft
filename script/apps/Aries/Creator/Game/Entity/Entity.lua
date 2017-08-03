@@ -306,7 +306,7 @@ function Entity:GetVariables()
 	return self.variables;
 end
 
-function Entity:SaveToXMLNode(node)
+function Entity:SaveToXMLNode(node, bSort)
 	node = node or {name='entity', attr={}};
 	local attr = node.attr;
 	attr.class = self.class_name;
@@ -324,7 +324,7 @@ function Entity:SaveToXMLNode(node)
 		attr.anim = self.anim;
 	end
 	if(self.memory and next(self.memory)) then
-		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory)};
+		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory, bSort)};
 	end
 	if(self.cmd and self.cmd~="") then
 		if(commonlib.Encoding.HasXMLEscapeChar(self.cmd)) then
@@ -335,10 +335,10 @@ function Entity:SaveToXMLNode(node)
 	end
 
 	if(self.inventory and not self.inventory:IsEmpty()) then
-		node[#node+1] = self.inventory:SaveToXMLNode({name="inventory"});
+		node[#node+1] = self.inventory:SaveToXMLNode({name="inventory"}, bSort);
 	end
 	if(self.rulebag and not self.rulebag:IsEmpty()) then
-		node[#node+1] = self.rulebag:SaveToXMLNode({name="rulebag"});
+		node[#node+1] = self.rulebag:SaveToXMLNode({name="rulebag"}, bSort);
 	end
 
 	--if(self.data_container and not self.data_container:IsEmpty()) then
