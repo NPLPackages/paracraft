@@ -606,24 +606,58 @@ end
 function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 	local filename = format("%s%s", ParaWorld.GetWorldDirectory(), default_filename);
 	
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
+	--local file = ParaIO.open(filename, "w");
+	--if(file:IsValid()) then
 		local root = {name='entities', attr={file_version="0.1"} }
 		local entity;
+		local sortEntities = {};
+		
+		local x, y, z, posValue;
 		for entity in pairs(static_objects) do 
-			if( entity:IsPersistent() and not entity:IsRegional() and not entity:IsDead()) then
+			if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
 				local node = {name='entity', attr={}};
-				entity:SaveToXMLNode(node);
-				if(node) then
-					root[#root+1] = node;
-				end
+				entity:SaveToXMLNode(node, true);
+				x, y, z = entity:GetBlockPos();
+
+				posValue = (x or 0) * 100000000 +  (y or 0) * 1000000 + (z or 0);
+
+				table.insert(sortEntities, {pos = posValue, node = node});
+
 			end
 		end
+		
+		table.sort(sortEntities, function(a, b)
+			return a.pos < b.pos;
+		end);
+		
+		for _, entity in ipairs(sortEntities) do
+			table.insert(root, entity.node);
+		end
+		
+		--print("!!!!!!!!!!!!!!!!!!!!")
+		
+		local xml_data = commonlib.Lua2XmlString(root,true, true) or "";
+		if (#xml_data >= 10240) then
+			local writer = ParaIO.CreateZip(filename, "");
+			if (writer:IsValid()) then
+				writer:ZipAddData("data", xml_data);
+				writer:close();
+			end
+		else
+			local file = ParaIO.open(filename, "w");
+			if(file:IsValid()) then
+				file:WriteString(xml_data);
+				file:close();
+			end
+		end
+		
+		--[[
 		if(root) then
-			file:WriteString(commonlib.Lua2XmlString(root,true) or "");
+			file:WriteString(commonlib.Lua2XmlString(root,true, true) or "");
 		end
 		file:close();
-	end
+		]]
+	--end
 		
 	for _, region in pairs(regions) do
 		if(region:IsModified()) then
