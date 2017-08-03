@@ -634,7 +634,7 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 			table.insert(root, entity.node);
 		end
 		
-		print("!!!!!!!!!!!!!!!!!!!!")
+		--print("!!!!!!!!!!!!!!!!!!!!")
 		
 		local xml_data = commonlib.Lua2XmlString(root,true, true) or "";
 		if (#xml_data >= 10240) then
