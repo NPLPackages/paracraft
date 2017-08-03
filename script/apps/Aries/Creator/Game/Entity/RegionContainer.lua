@@ -86,7 +86,7 @@ function RegionContainer:SaveToFile(filename)
 			entity:SaveToXMLNode(node, true);
 			local x, y, z = entity:GetBlockPos();
 
-			table.insert(sortEntities, {pos = {x, y, z}, node = node});
+			table.insert(sortEntities, {pos = {x or 0, y or 0, z or 0}, node = node});
 
 		end
 	end
