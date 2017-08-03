@@ -80,25 +80,22 @@ function RegionContainer:SaveToFile(filename)
 	local root = {name='entities', attr={file_version="0.1"} }
 	local sortEntities = {};
 	
+	local x, y, z, posValue;
 	for entity in pairs(self.entities) do 
 		if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
 			local node = {name='entity', attr={}};
 			entity:SaveToXMLNode(node, true);
-			local x, y, z = entity:GetBlockPos();
+			x, y, z = entity:GetBlockPos();
 
-			table.insert(sortEntities, {pos = {x or 0, y or 0, z or 0}, node = node});
+			posValue = (x or 0) * 100000000 +  (y or 0) * 1000000 + (z or 0);
+
+			table.insert(sortEntities, {pos = posValue, node = node});
 
 		end
 	end
 	
 	table.sort(sortEntities, function(a, b)
-		local pos1 = a.pos;
-		local pos2 = b.pos;
-		
-		local value1 = pos1[1] * 100000000 +  pos1[2] * 1000000 + pos1[3];
-		local value2 = pos2[1] * 100000000 +  pos2[2] * 1000000 + pos2[3];
-		
-		return value1 < value2;
+		return a.pos < b.pos;
 	end);
 	
 	for _, entity in ipairs(sortEntities) do
