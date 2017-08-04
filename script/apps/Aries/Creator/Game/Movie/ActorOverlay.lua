@@ -352,8 +352,6 @@ function Actor:FrameMoveRecording(deltaTime)
 	self:EndUpdate();
 end
 
-print("")
-
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
 	local entity = self.entity;
