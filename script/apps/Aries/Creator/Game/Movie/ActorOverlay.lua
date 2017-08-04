@@ -476,9 +476,7 @@ function Actor:CheckInstallCodeEnv(painter)
 							-- if power of 2
 							if((ret > 0) and (band(ret, (ret-1)) == 0)) then
 								return ret;
-							end
-							
-							
+							end							
 							
 							ret = ret - 1;
 							
@@ -492,7 +490,6 @@ function Actor:CheckInstallCodeEnv(painter)
 							
 							return ret;
 						end
-						
 						width = hackLength(width or texture:GetWidth());
 						height = hackLength(height or texture:GetHeight());
 					end
