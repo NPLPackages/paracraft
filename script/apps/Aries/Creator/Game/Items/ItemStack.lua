@@ -248,7 +248,7 @@ function ItemStack:SerializeXMLData(sData)
 	end
 end
 
-function ItemStack:SaveToXMLNode(node)
+function ItemStack:SaveToXMLNode(node, bSort)
 	attr = node.attr;
 	if(not attr) then
 		attr = {id=self.id, count = self.count, };
@@ -259,7 +259,7 @@ function ItemStack:SaveToXMLNode(node)
 	end
 	if(self.serverdata) then
 		if(type(self.serverdata) == "table") then
-			local sData = commonlib.serialize_compact(self.serverdata);
+			local sData = commonlib.serialize_compact(self.serverdata, bSort);
 			node[1] = self:SerializeXMLData(sData);
 		else
 			node[1] = self:SerializeXMLData(self.serverdata);

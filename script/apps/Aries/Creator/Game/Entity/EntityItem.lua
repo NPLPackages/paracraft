@@ -84,10 +84,10 @@ function Entity:LoadFromXMLNode(node)
 	end
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 
-	node[#node+1] = self:GetItemStack():SaveToXMLNode({name="itemstack"});
+	node[#node+1] = self:GetItemStack():SaveToXMLNode({name="itemstack"}, bSort);
 	return node;
 end
 

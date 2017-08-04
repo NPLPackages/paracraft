@@ -91,8 +91,8 @@ function Entity:LoadFromXMLNode(node)
 	end
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	local attr = node.attr;
 	attr.px = self.LocalPivot[1];
 	attr.py = self.LocalPivot[2];

@@ -224,7 +224,18 @@ function NeuronManager.SaveToFile(bSaveToLastSaveFolder)
 	table.insert(strList, "\n");
 	do
 		local index, neuron;
+
+		local sortCache = {};
 		for index, neuron in pairs(neuron_cache) do
+			table.insert(sortCache, {index = index, neuron = neuron});
+		end
+		
+		table.sort(sortCache, function(a, b) return a.index < b.index end);
+		
+		for _, cache in ipairs(sortCache) do
+			--index = cache.index;
+			neuron = cache.neuron;
+			
 			if( not neuron:IsEmpty()) then
 				local str = neuron:SerializeToXMLString();
 				if(str) then
@@ -237,6 +248,7 @@ function NeuronManager.SaveToFile(bSaveToLastSaveFolder)
 	table.insert(strList, [[</neurons>]]);
 	
 	local xml_data = table.concat(strList);
+	
 	if (#xml_data >= 10240) then
 		local writer = ParaIO.CreateZip(filename, "");
 		if (writer:IsValid()) then

@@ -340,7 +340,7 @@ function InventoryBase:LoadFromXMLNode(node)
 	end
 end
 
-function InventoryBase:SaveToXMLNode(node)
+function InventoryBase:SaveToXMLNode(node, bSort)
 	local last_empty;
 	for i = 1, self:GetSlotCount() do
 		local item = self:GetItem(i);
@@ -351,7 +351,7 @@ function InventoryBase:SaveToXMLNode(node)
 				end
 				last_empty = nil;
 			end
-			node[#node+1] = item:SaveToXMLNode({name="slot",});
+			node[#node+1] = item:SaveToXMLNode({name="slot",}, bSort);
 		else
 			if(not last_empty) then
 				last_empty = i;

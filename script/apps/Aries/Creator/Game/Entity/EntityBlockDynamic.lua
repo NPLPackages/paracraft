@@ -150,8 +150,8 @@ function Entity:LoadFromXMLNode(node)
 	self.block_data = tonumber(attr.block_data) or 0;
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 
 	node.attr.sim_time = self.sim_time;
 	node.attr.block_id = self.block_id;

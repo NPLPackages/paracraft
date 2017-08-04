@@ -459,13 +459,13 @@ function Entity:LoadFromXMLNode(node)
 	self.capabilities:LoadFromXMLNode(node);
 end
 
-function Entity:SaveToXMLNode(node)
-	node = Entity._super.SaveToXMLNode(self, node);
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.skin = self.skin;
 	if(self.tp_list) then
-		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list), name="teleport_list"};
+		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list, bSort), name="teleport_list"};
 	end
-	self.capabilities:SaveToXMLNode(node);
+	self.capabilities:SaveToXMLNode(node, bSort);
 	return node;
 end
 
