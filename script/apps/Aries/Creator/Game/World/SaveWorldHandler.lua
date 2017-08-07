@@ -47,7 +47,7 @@ function SaveWorldHandler:SaveWorldInfo(world_info)
 		local node = {name="pe:mcml",
 			[1] = world_info:SaveToXMLNode(nil),
 		}
-		file:WriteString(commonlib.Lua2XmlString(node, true));
+		file:WriteString(commonlib.Lua2XmlString(node, true, true));
 		file:close();
 		LOG.std(nil, "info", "WorldInfo",  "saved");
 		-- save success

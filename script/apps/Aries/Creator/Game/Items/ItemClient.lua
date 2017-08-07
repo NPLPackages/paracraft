@@ -389,10 +389,13 @@ function ItemClient.SaveCustomBlocks()
 			root[#root+1] = node;
 		end
 	end
+	table.sort(root, function(a, b)
+		return (a.attr.id or 0) < (b.attr.id or 0);
+	end)
 	local filename = format("%sblockWorld.lastsave/customblocks.xml", ParaWorld.GetWorldDirectory())
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
-		file:WriteString(commonlib.Lua2XmlString(root,true) or "");
+		file:WriteString(commonlib.Lua2XmlString(root,true,true) or "");
 		file:close();
 	end
 end

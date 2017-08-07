@@ -292,7 +292,7 @@ function TexturePackageList.GenerateTexturePackagesInfo(filename, official_ds,lo
 			end
 			o[i] = packages;
 		end	
-		file:WriteString(commonlib.Lua2XmlString(o, true));
+		file:WriteString(commonlib.Lua2XmlString(o, true, true));
 		file:close();
 		return true;
 	end

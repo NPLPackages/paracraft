@@ -219,7 +219,7 @@ function ModBase:SaveWorldData(worldName)
 
 	local filePath  = worldName .. "mod/" .. modName .. ".xml";
 
-	local saveXml = commonlib.Lua2XmlString(self.worldData);
+	local saveXml = commonlib.Lua2XmlString(self.worldData, true, true);
 
 	--LOG.std(nil,"debug","filePath",Encoding.DefaultToUtf8(filePath));
 	local file = ParaIO.open(filePath, "w");

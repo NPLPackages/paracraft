@@ -112,7 +112,7 @@ function PlayerController:SaveToCurrentWorld()
 
 		local input = {name="player", attr={version=1}, };
 		
-		local code = commonlib.Lua2XmlString(input, true);
+		local code = commonlib.Lua2XmlString(input, true, true);
 		local file = ParaIO.open(filename, "w");
 		file:WriteString(code);
 		file:close();

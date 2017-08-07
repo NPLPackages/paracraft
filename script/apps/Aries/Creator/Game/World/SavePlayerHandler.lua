@@ -34,7 +34,7 @@ function SavePlayerHandler:WritePlayerData(entity)
 	if(file:IsValid()) then
 		local node = {name='entity', attr={}};
 		entity:SaveToXMLNode(node);
-		file:WriteString(commonlib.Lua2XmlString(node,true) or "");
+		file:WriteString(commonlib.Lua2XmlString(node,true, true) or "");
 		file:close();
 		LOG.std(nil,"info", "SavePlayerHandler", "saved player %s to file", name);
 		return true;

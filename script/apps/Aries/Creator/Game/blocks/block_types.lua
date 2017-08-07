@@ -659,7 +659,7 @@ function block_types.GenerateFromDirFile(filename)
 	end
 	file:close();
 
-	local code = commonlib.Lua2XmlString(output, true);
+	local code = commonlib.Lua2XmlString(output, true, true);
 	local file = ParaIO.open(filename..".result", "w");
 	file:WriteString(code);
 	file:close();

@@ -187,7 +187,7 @@ function Dialog:SaveToFile(filename)
 		local file = ParaIO.open(fullpath, "w");
 		if(file:IsValid()) then
 			LOG.std(nil, "info", "Dialog", "successfully saved to %s", fullpath);
-			file:WriteString(commonlib.Lua2XmlString(output, true));
+			file:WriteString(commonlib.Lua2XmlString(output, true, true));
 			file:close();
 
 			-- refresh filename

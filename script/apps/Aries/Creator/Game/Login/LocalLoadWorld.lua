@@ -428,7 +428,7 @@ function LocalLoadWorld.CreateWorld(values)
 				end
 				local node = {name="pe:mcml", [1] = {name="pe:world",attr = attr,},}
 				NPL.load("(gl)script/ide/LuaXML.lua");
-				file:WriteString(commonlib.Lua2XmlString(node, true));
+				file:WriteString(commonlib.Lua2XmlString(node, true, true));
 				file:close();
 				
 				-- load success UI
