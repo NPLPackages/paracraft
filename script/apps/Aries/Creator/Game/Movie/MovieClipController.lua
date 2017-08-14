@@ -396,6 +396,19 @@ function MovieClipController.UpdateUI()
 	end
 end
 
+-- called when R key is pressed to toggle recording, usually in scene context. 
+-- return true if key processed.
+function MovieClipController.OnRecordKeyPressed()
+	local movieclip = MovieManager:GetActiveMovieClip();
+	if(movieclip) then
+		if(not movieclip:IsPlayingMode()) then
+			MovieClipController.OnRecord();
+		else
+			MovieManager:ToggleCapture();
+		end
+		return true;
+	end
+end
 
 function MovieClipController.OnRecord()
 	local actor = MovieClipController.GetMovieActor();

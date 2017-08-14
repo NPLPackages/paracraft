@@ -266,7 +266,7 @@ end
 -- called before focus is lost
 function Entity:OnFocusOut()
 	self.has_focus = nil;
-	self.inventory.isClient = nil;
+	-- self.inventory.isClient = nil;
 	local obj = self:GetInnerObject();
 	if(obj) then
 		-- this fixed a bug that the player may be moving forward while focus is set to camera in a movie block. 

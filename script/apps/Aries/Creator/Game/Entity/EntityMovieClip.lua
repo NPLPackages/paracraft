@@ -518,6 +518,8 @@ function Entity:OnBlockTick()
 			movieClip:Pause();
 			movieClip:RemoveAllActors();
 			MovieManager:RemoveMovieClip(movieClip);
+			-- reset time to beginning
+			movieClip:SetTime(0);
 		end
 	end
 end

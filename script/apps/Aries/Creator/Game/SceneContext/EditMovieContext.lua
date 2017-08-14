@@ -431,21 +431,10 @@ function EditMovieContext:HandleGlobalKey(event)
 		end
 	elseif(dik_key == "DIK_R") then
 		if(not event.ctrl_pressed) then
-			local movieclip = MovieManager:GetActiveMovieClip();
-			if(movieclip) then
-				if(not movieclip:IsPlayingMode()) then
-					if(not movieclip:IsPaused()) then
-						movieclip:Pause();
-					else
-						movieclip:SetRecording(true);
-						movieclip:Resume();
-					end
-				else
-					MovieManager:ToggleCapture();
-				end
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
+			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+			if(MovieClipController.OnRecordKeyPressed()) then
 				event:accept();
-			else
-				-- CommandManager:RunCommand("record");
 			end
 		end
 	elseif(dik_key == "DIK_P") then
@@ -524,6 +513,14 @@ function EditMovieContext:HighlightPickEntity(result)
 	end
 end
 
+-- whether actor is in recording mode. 
+function EditMovieContext:IsActorRecording()
+	local actor = self:GetActor();
+	if(actor and actor:IsRecording()) then
+		return true;
+	end
+end
+
 function EditMovieContext:mouseReleaseEvent(event)
 	if(self:IsReadOnlyMode()) then
 		return
@@ -552,7 +549,7 @@ function EditMovieContext:mouseReleaseEvent(event)
 				end
 			end
 
-			if(self:HasManipulators()) then
+			if(self:HasManipulators() and not self:IsActorRecording()) then
 				return;
 			end
 
@@ -561,7 +558,7 @@ function EditMovieContext:mouseReleaseEvent(event)
 			end
 		end
 
-		if(self:HasManipulators()) then
+		if(self:HasManipulators() and not self:IsActorRecording()) then
 			return;
 		end
 
@@ -586,7 +583,7 @@ end
 
 -- virtual: 
 function EditMovieContext:mouseWheelEvent(event)
-	if(event.shift_pressed) then
+	if(event.shift_pressed or self:IsActorRecording()) then
 		EditMovieContext._super.mouseWheelEvent(self, event);
 	else
 		self:handleCameraWheelEvent(event);
