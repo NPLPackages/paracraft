@@ -81,6 +81,7 @@ end
 -- spawn an item.
 -- @param checkedRadiusSq: if not nil, we will not spawn if max entities count is reached and all existing ones are already within radius. 
 -- otherwise we will spawn and remove the farthest one. 
+-- return entityCreated
 function Spawner:Spawn(item_id, itemStack, targetEntity, x,y,z, bPersistent, checkedRadiusSq)
 	local item = ItemClient.GetItem(item_id);
 	if(item) then
@@ -107,6 +108,7 @@ function Spawner:Spawn(item_id, itemStack, targetEntity, x,y,z, bPersistent, che
 				self.entities[#self.entities+1] = entityCreated;
 			end
 		end
+		return entityCreated;
 	end
 end
 
@@ -122,7 +124,7 @@ Entities that are farther way are destroyed when new entity is spawned.
 @param [-radius 3]: specify a radius, default to 1.
 @param [-p x y z (dx dy dz)]: specify a location or cubic region to spawn (may be relative to containing block). if not specified, it uses entityname's position.
 @param [-s|persistent]: if the spawned object is persistent, default to false.
-@param [-name string]: give a name to the entity
+@param [-name string]: give an internal name to the entity
 Examples:
 /spawn    : spawn randomly near the current player using items in the command block.
 /spawn -p ~ ~1 ~     : spawn on top of the command block.
@@ -183,7 +185,12 @@ Examples:
 
 				if(fromEntity) then
 					fromEntity.m_spawner = fromEntity.m_spawner or Spawner:new():init(fromEntity);
-					fromEntity.m_spawner:Spawn(item_id, itemStack, targetEntity, x,y,z, bPersistent, checkedRadiusSq);
+					local entity = fromEntity.m_spawner:Spawn(item_id, itemStack, targetEntity, x,y,z, bPersistent, checkedRadiusSq);
+					if(entity) then
+						if(name) then
+							entity:SetName(name);
+						end
+					end
 				end
 			end
 		end

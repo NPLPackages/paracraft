@@ -744,6 +744,12 @@ function Entity:IsFlying()
 	return self.bFlying;
 end
 
+function Entity:SetDead()
+	if(not self:IsRemote()) then
+		GameLogic.OnDead();
+	end
+end
+
 -- press "F" to toggle the fly mode
 -- @param bFly: nil to toggle. otherise force fly or not. 
 -- @return is_flying

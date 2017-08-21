@@ -26,16 +26,15 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
 
---[[ disableinput for a given entity or block entity
+Commands["disableinput"] = {
+	name="disableinput", 
+	quick_ref="/disableinput [@playername] [x y z] [true|false]", 
+	desc=[[disableinput for a given entity or block entity
 /disableinput
 /disableinput ~ ~ ~
 /disableinput @test false
 /disableinput 20000 10 20000 true
-]]
-Commands["disableinput"] = {
-	name="disableinput", 
-	quick_ref="/disableinput [@playername] [x y z] [true|false]", 
-	desc="disableinput for a given entity or block entity" , 
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity, x, y, z, hasInputName;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
@@ -57,7 +56,7 @@ Commands["disableinput"] = {
 	end,
 };
 
--- TODO:
+
 Commands["createentity"] = {
 	name="createentity", 
 	quick_ref="/createentity [class_name] [name] [x y z] [filename] [...]", 
@@ -118,6 +117,27 @@ Commands["createmob"] = {
 			end
 		else
 			GameLogic.AddBBS(nil, "create mob needs a name");
+		end
+	end,
+};
+
+Commands["kill"] = {
+	name="kill", 
+	quick_ref="/kill @category{entity_selectors}", 
+	desc=[[kill or destroy given entity.
+/kill @e{r=5, type="Railcar"}    :kill all railcar entities within 5 meters from the triggering entity
+/kill @e{r=5, type="Railcar", count=1}    :kill the closet one railcar within 5 meters from the triggering entity
+/kill @e{r=5, name="abc"}    :kill entity whose name is abc
+/kill @e{r=5, nontype="Player"}    :kill entities that is not a player within 5 meters from the triggering entity
+/kill @p{r=5, }    :kill all players within 5 meters from the triggering entity
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local entities;
+		entities, cmd_text = CmdParser.ParseEntities(cmd_text, fromEntity);
+		if(entities and #entities>0) then
+			for _, entity in ipairs(entities) do
+				entity:SetDead();
+			end
 		end
 	end,
 };

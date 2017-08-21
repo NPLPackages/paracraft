@@ -878,3 +878,161 @@ function EntityManager.FrameMoveSentientList(deltaTime, cur_time, destroy_list)
 		end
 	end
 end
+
+-- filter entity by params
+-- @param params: {name, type, nontype, mname, count}
+-- name: only entities with given name.
+-- mname: match regular expression of the given name
+-- type: only entities of given type. 
+-- nontype: only entities not of the given type
+-- r: get entities only less than r blocks from the origin
+-- rm: get entities only more than rm blocks from the origin.
+-- count: return as most this number of objects, usually in order of distance from the origin.
+-- @param entities: nil or array of comparing entities
+-- @return entity of nil
+function EntityManager.FilterEntity(entity, params, entities)
+	if(params.nontype and entity:IsOfType(params.nontype)) then
+		return;
+	end
+	if(params.type and not entity:IsOfType(params.type)) then
+		return;
+	end
+	if(params.name and entity:GetName() ~= params.name) then
+		return;
+	end
+	if(params.mname and not entity:GetName():match(params.mname)) then
+		return;
+	end
+	local distSq = 0;
+	if(params.x) then
+		distSq = entity:DistanceSqTo(params.x, params.y, params.z)
+	end
+	if(params.r and params.r*params.r < distSq) then
+		return
+	end
+	if(params.rm and params.rm*params.rm > distSq) then
+		return
+	end
+	if(params.count and entities and #entities>=params.count) then
+		if(params.x) then
+			-- replace by distance
+			for i, entity_ in ipairs(entities) do
+				if(entity_:DistanceSqTo(params.x, params.y, params.z) > distSq) then
+					entities[i] = entity;
+					break;
+				end
+			end
+		end
+	else
+		return entity;
+	end
+end
+
+-- find entities by a number of matching parameters. block entities are always escaped
+-- @param params: {category, type, nontype, name, x,y,z,dz,dy,dz,r,rm, count}
+-- category: "e" all entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
+-- name: only entities with given name.
+-- type: only entities of given type. 
+-- nontype: only entities not of the given type
+-- x,y,z: center of origin to selects entities. 
+-- r: get entities only less than r blocks from the origin
+-- rm: get entities only more than rm blocks from the origin.
+-- dx,dy,dz: this is a cubic volume as defined by extending these blocks from the origin.
+-- count: return as most this number of objects, usually in order of distance from the origin.
+-- @return nil or array of entities
+function EntityManager.FindEntities(params)
+	local output;
+	if(not params.category or params.category == "e") then
+		-- entities including players
+		if(params.x) then
+			if(params.r) then
+				local radius = params.r;
+				local min_x, min_y, min_z = params.x-radius, params.y-radius, params.z-radius;
+				local max_x, max_y, max_z = params.x+radius, params.y+radius, params.z+radius;
+			
+				for x = min_x, max_x do
+					for z = min_z, max_z do
+						if(((x - params.x)^2 + (z - params.z)^2) <= radius*radius ) then
+							for y = min_y, max_y do
+								local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+								if(entities) then
+									for entity,_ in pairs(entities) do
+										if(not entity:IsBlockEntity() and EntityManager.FilterEntity(entity, params, output)) then
+											output = output or {};
+											output[#output+1] = entity;
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			elseif(params.dx or params.dy or params.dz) then
+				local min_x, min_y, min_z = params.x, params.y, params.z;
+				local max_x, max_y, max_z = params.x+(params.dx or 0), params.y+(params.dy or 0), params.z+(params.dz or 0);
+				for x = min_x, max_x do
+					for z = min_z, max_z do
+						for y = min_y, max_y do
+							local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+							if(entities) then
+								for entity,_ in pairs(entities) do
+									if(not entity:IsBlockEntity() and EntityManager.FilterEntity(entity, params, output)) then
+										output = output or {};
+										output[#output+1] = entity;
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		elseif(params.name) then
+			local entity = EntityManager.GetEntity(params.name);
+			if(entity) then
+				output = output or {};
+				output[#output+1] = entity;
+			end
+		end
+	elseif(params.category == "p") then
+		-- nearest players
+		if(params.name) then
+			local entity = EntityManager.GetPlayer(params.name);
+			if(entity) then
+				output = output or {};
+				output[#output+1] = entity;
+			end
+		else
+			for name, player in pairs(players) do
+				if(EntityManager.FilterEntity(player, params, output)) then
+					output = output or {};
+					output[#output+1] = player;
+				end
+			end
+		end
+	elseif(params.category == "r") then
+		-- random player, just return 1
+		local i = 0;
+		for name, player in pairs(players) do
+			i = i + 1;
+		end
+		local index = i>1 and math.random(1, i) or 1;
+		i = 0;
+		for name, player in pairs(players) do
+			i = i + 1;
+			if(i == index) then
+				output = output or {};
+				output[#output+1] = player;
+				break;
+			end
+		end
+	elseif(params.category == "a") then
+		-- all players
+		for name, player in pairs(players) do
+			if(EntityManager.FilterEntity(player, params, output)) then
+				output = output or {};
+				output[#output+1] = player;
+			end
+		end
+	end
+	return output;
+end

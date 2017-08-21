@@ -8,6 +8,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.lua");
 local ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
 ObjectSelectPage.SelectByScreenRect(left, top, width, height);
+ObjectSelectPage.SelectEntities({})
 -------------------------------------------------------
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -28,6 +29,19 @@ function ObjectSelectPage.OnInit()
 end
 
 local last_result = {}; 
+
+-- @param entities: array of entities to show in select dialog
+function ObjectSelectPage.SelectEntities(entities)
+	last_result = {};
+	for _, entity in ipairs(entities) do
+		local obj = entity:GetInnerObject();
+		if(obj) then
+			last_result[#last_result + 1] = obj;
+		end
+	end
+	ObjectSelectPage.ShowPage();
+	ObjectSelectPage.UpdateView(true);
+end
 
 -- @param left, top, width, height: if nil, default to full screen
 function ObjectSelectPage.SelectByScreenRect(left, top, width, height)
@@ -81,10 +95,11 @@ function ObjectSelectPage.GetSelection()
 	return last_result;
 end
 
+
 -- search nodes in a area
-function ObjectSelectPage.UpdateView()
+-- @param includeMyself: whether to include current player
+function ObjectSelectPage.UpdateView(includeMyself)
 	local self = ObjectSelectPage;
-	local includeMyself = false;
 	
 	local objList = {};
 	local result = ObjectSelectPage.GetSelection();
@@ -99,11 +114,8 @@ function ObjectSelectPage.UpdateView()
 				local id = obj:GetID();
 				local name = obj.name or "";
 				local node = CommonCtrl.TreeNode:new({ Name = name, ID = id,})
-				if(id == player_id)then
-					if(includeMyself == true)then
-						ctl.RootNode:AddChild(node);
-						table.insert(objList,id);
-					end
+				if(not includeMyself and id == player_id)then
+					
 				else
 					ctl.RootNode:AddChild(node);
 					table.insert(objList,id);
@@ -158,7 +170,7 @@ function ObjectSelectPage.DeleteObj(id)
 	if(obj and obj:IsValid())then
 		local entity = EntityManager.GetEntityByObjectID(id);
 		if(entity) then
-			-- TODO: shall we delete certain type of entities?
+			entity:SetDead();
 		else
 			if(not obj:CheckAttribute(0x8000)) then
 				-- OBJ_SKIP_PICKING = 0x1<<15:

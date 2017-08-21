@@ -260,15 +260,6 @@ function WorldRevision:UpdateWorldFileSize()
 	return filesTotal;
 end
 
--- TODO: not implemented
--- @param intervalSeconds: number seconds to do auto save. must be at least 10 seconds.
-function WorldRevision:SetAutoSave(intervalSeconds)
-	if(intervalSeconds and intervalSeconds<10) then
-		return;
-	end 
-	self.autoSaveInterval = intervalSeconds;
-end
-
 -- ticks every second
 function WorldRevision:Tick()
 	

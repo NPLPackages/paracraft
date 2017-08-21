@@ -52,6 +52,30 @@ function CmdParser.ParsePlayer(cmd_text, fromEntity)
 	return nil, cmd_text, cmd_text_remain~=nil and cmd_text_remain~=cmd_text;
 end
 
+-- get array of entities using with given filter conditions.  This is advanced way of CmdParser.ParsePlayer
+-- @param cmd_text: @category{name=value, ...}, such as '@e{r=10, type="Railcar"}'
+-- @return entities, cmd_text_remain: entities may be nil, empty table, or entity array. 
+function CmdParser.ParseEntities(cmd_text, fromEntity)
+	local category, cmd_text_remain = cmd_text:match("^%s*@([^%s{]+)%s*(.*)$");
+	if(category) then
+		local entities;
+		local params, cmd_text_remain2 = cmd_text_remain:match("^({[^}]*})%s*(.*)$");
+		if(params) then
+			cmd_text_remain = cmd_text_remain2;
+			params = NPL.LoadTableFromString(params);
+		end
+		params = params or {};
+		params.category = category;
+		if(not params.x and fromEntity) then
+			params.x, params.y, params.z = fromEntity:GetBlockPos();
+		end
+		entities = EntityManager.FindEntities(params);
+		return entities, cmd_text_remain;
+	else
+		return nil, cmd_text;
+	end
+end
+
 -- 3d position absolute or relative with ~
 -- e.g. "20000 0 20000" or "~ ~1 ~" or "~1 ~-2 ~-3"
 -- return x,y,z, cmd_text_remain: cmd_text_remaining is remaining unparsed text. 

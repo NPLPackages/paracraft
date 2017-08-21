@@ -109,14 +109,29 @@ Commands["select"] = {
 };
 
 
--- select objects
 Commands["selectobj"] = {
 	name="selectobj", 
-	quick_ref="/selectobj", 
-	desc="selectobj" , 
+	quick_ref="/selectobj @category{entity_selectors}", 
+	desc=[[select entities by parameters. 
+/selectobj		: if no parameters, it will select all objects in current viewport.
+/selectobj @e{r=5, type="Railcar"}    :select all railcar entities within 5 meters from the triggering entity
+/selectobj @e{r=5, type="Railcar", count=1}    :select the closet one railcar within 5 meters from the triggering entity
+/selectobj @e{r=5, name="abc"}    :select entity whose name is abc
+/selectobj @e{r=5, nontype="Player"}    :select entities that is not a player within 5 meters from the triggering entity
+/selectobj @p{r=5, }    :select all players within 5 meters from the triggering entity
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.lua");
 		local ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
-		ObjectSelectPage.SelectByScreenRect();
+			
+		if(cmd_text == "") then
+			ObjectSelectPage.SelectByScreenRect();
+		else
+			local entities;
+			entities, cmd_text = CmdParser.ParseEntities(cmd_text, fromEntity);
+			if(entities and #entities>0) then
+				ObjectSelectPage.SelectEntities(entities);	
+			end
+		end
 	end,
 };

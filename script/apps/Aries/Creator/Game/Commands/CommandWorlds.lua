@@ -41,6 +41,37 @@ Commands["save"] = {
 	end,
 };
 
+Commands["autosave"] = {
+	name="autosave", 
+	quick_ref="/autosave [on|off] [mins]", 
+	desc=[[automatically save the world every few mins. 
+@param interval: how many minutes to auto save the world. 
+e.g.
+/autosave        :enable auto save
+/autosave on     :enable auto save
+/autosave off    :disable autosave
+/autosave on 10  :enable auto save every 10 minutes
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldRevision.lua");
+		local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision");
+		local interval, bEnabled;
+		bEnabled, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(bEnabled == false) then
+			GameLogic.CreateGetAutoSaver():SetTipMode();
+			GameLogic.AddBBS("autosave", L"自动保存模式关闭");
+		else
+			GameLogic.CreateGetAutoSaver():SetSaveMode();
+			GameLogic.AddBBS("autosave", L"自动保存模式开启");
+		end
+
+		interval, cmd_text = CmdParser.ParseInt(cmd_text);
+		if(interval) then
+			GameLogic.CreateGetAutoSaver():SetInterval(interval);
+		end
+	end,
+};
+
 Commands["upload"] = {
 	name="upload", 
 	quick_ref="/upload", 

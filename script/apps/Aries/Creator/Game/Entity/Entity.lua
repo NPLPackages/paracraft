@@ -158,8 +158,15 @@ function Entity:event(event)
 	end
 end
 
+-- static method
 function Entity:GetType()
 	return self.class_name;
+end
+
+-- static method: recursively check if entity is derived from a given type.
+-- @param class_name: if nil, it will always return true. 
+function Entity:IsOfType(class_name)
+	return class_name==nil or self.class_name == class_name or (self._super and self._super.IsOfType and self._super:IsOfType(class_name));
 end
 
 function Entity:Reset()

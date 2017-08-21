@@ -98,6 +98,7 @@ _G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
 local GameLogic = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.GameLogic"));
 GameLogic:Signal("WorldLoaded");
 GameLogic:Signal("WorldUnloaded");
+GameLogic:Signal("WorldSaved");
 GameLogic:Signal("ModeChanged", function(mode) end);
 -- user has performed a given action, such as open an GUI or clicked somewhere. 
 GameLogic:Signal("userActed", function(actionName) end);
@@ -196,6 +197,8 @@ function GameLogic.InitCommon()
 	GameLogic:Connect("ModeChanged", PlayModeController, "OnModeChanged", "UniqueConnection");
 
 	Game.SelectionManager:Clear();
+
+	GameLogic.CreateGetAutoSaver();
 end
 
 -- call this when user first enters a game world.
@@ -292,6 +295,15 @@ end
 
 function GameLogic.GetPlayer()
 	return EntityManager.GetPlayer();
+end
+
+function GameLogic.CreateGetAutoSaver()
+	if(not GameLogic.auto_saver) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/AutoSaver.lua");
+		local AutoSaver = commonlib.gettable("MyCompany.Aries.Creator.Game.AutoSaver");
+		GameLogic.auto_saver = AutoSaver:new();
+	end
+	return GameLogic.auto_saver;
 end
 
 -- @return false to disable loading region from file
@@ -633,6 +645,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	ModManager:OnWorldSave();
 	GameLogic.world_revision:UpdateWorldFileSize();
+	GameLogic:WorldSaved(); -- signal
 end
 
 -- let a given character to play an animation. 
@@ -851,7 +864,7 @@ function GameLogic.FrameMove(timer)
 end
 
 function GameLogic.OnDead()
-	_guihelper.MessageBox("你挂了, 将被传送到出生点", function()
+	_guihelper.MessageBox(L"你挂了, 将被传送到出生点", function()
 		CommandManager:RunCommand("/tp home");
 	end)
 end
