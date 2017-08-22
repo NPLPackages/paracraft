@@ -358,7 +358,7 @@ end
 
 -- protected function:
 -- @param chunk: 
-function ChunkGenerator:GenerateChunkAsync(chunk, x, z, external)
+function ChunkGenerator:GenerateChunkAsync(chunk, x, z)
 	local index = GetChunkIndex(x, z);
 	if(self.pending_chunks[index] ~= true) then
 		return;
@@ -386,7 +386,7 @@ function ChunkGenerator:ApplyChunkData(x,z, chunkData)
 
 		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
 			chunk:ApplyMapChunkData(chunkData, 0xffff);
-			self:PostGenerateChunkImp(chunk, x, z);
+			self:PostGenerateChunk(chunk, x, z);
 
 			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
 		end
@@ -407,10 +407,11 @@ end
 -- public function:
 -- @param chunk: if nil, a new chunk will be created. 
 -- @param x, z: chunk pos
+-- @param bForceSyncMode: this is usually nil. only true when in server mode.
 -- @return chunk if chunk is generated. or nil if it is async generated. 
-function ChunkGenerator:GenerateChunk(chunk, x, z, external)
-	if(self:IsSupportAsyncMode()) then
-		return self:GenerateChunkAsync(chunk, x, z, external);
+function ChunkGenerator:GenerateChunk(chunk, x, z, bForceSyncMode)
+	if(self:IsSupportAsyncMode() and not bForceSyncMode) then
+		return self:GenerateChunkAsync(chunk, x, z);
 	end
 
 	local index = GetChunkIndex(x, z);
@@ -427,7 +428,7 @@ function ChunkGenerator:GenerateChunk(chunk, x, z, external)
 
 		if(GameLogic.GetFilters():apply_filters("before_generate_chunk", x, z)) then
 			self:GenerateChunkImp(chunk, x, z, external);
-			self:PostGenerateChunkImp(chunk, x, z);
+			self:PostGenerateChunk(chunk, x, z);
 			GameLogic.GetFilters():apply_filters("after_generate_chunk", x, z)
 		end
 
@@ -492,6 +493,15 @@ end
 function ChunkGenerator:GenerateChunkAsyncImp(chunk, x, z)
 	return false
 end
+
+-- This is always called for both async and sync mode in the main thread.
+function ChunkGenerator:PostGenerateChunk(chunk, x, z)
+	self:PostGenerateChunkImp(chunk, x, z);
+	if(self._World) then
+		self._World:OnChunkGenerated(x, z)
+	end
+end
+
 
 -- return gen_id of the most recent request
 local function VerifyOutOfWorldRequest()

@@ -101,12 +101,20 @@ function ChunkProviderServer:LoadChunkImp(chunkX, chunkZ)
 	return chunk;
 end
 
+function ChunkProviderServer:IsForceSyncMode()
+	return self.isForceSyncMode;
+end
+
+function ChunkProviderServer:SetForceSyncMode(isForceSyncMode)
+	self.isForceSyncMode = isForceSyncMode ;
+end
+
 function ChunkProviderServer:AutoGenerateChunk(chunk)
 	if(chunk and self:GetGenerator()) then
 		local timeStamp = chunk:GetTimeStamp();
 		if(timeStamp == 0) then
 			-- only generate if it has not been generated before. 
-			if(self:GetGenerator():GenerateChunk(chunk, chunk.chunkX, chunk.chunkZ)) then
+			if(self:GetGenerator():GenerateChunk(chunk, chunk.chunkX, chunk.chunkZ, self:IsForceSyncMode())) then
 				self:GetWorld():OnChunkGenerated(chunk.chunkX, chunk.chunkZ);
 			end
 		end

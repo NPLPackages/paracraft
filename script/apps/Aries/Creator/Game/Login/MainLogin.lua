@@ -580,7 +580,21 @@ function MainLogin:CheckLoadWorldFromCmdLine()
 				CommandManager:Init();
 				local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
 				local port = ParaEngine.GetAppCommandLineByParam("port", "");
+				local autosaveInterval = ParaEngine.GetAppCommandLineByParam("autosave", "");
+				-- Fixed onsoleted code, we have done this in c++: UseAsyncLoadWorld must be set to false in server mode, otherwise server chunks can not be served properly. 
+				-- GameLogic.RunCommand("property", "UseAsyncLoadWorld false");
 				GameLogic.RunCommand("startserver", ip.." "..port);
+				
+				if(autosaveInterval and autosaveInterval~="") then
+					if(autosaveInterval == "true") then
+						autosaveInterval = "";
+						GameLogic.RunCommand("autosave", "on");
+					elseif(autosaveInterval:match("^%d+$")) then
+						GameLogic.RunCommand("autosave", "on "..autosaveInterval);
+					else
+						GameLogic.RunCommand("autosave", autosaveInterval);
+					end
+				end
 			end);
 
 		elseif(worldpath:match("^https?://")) then
