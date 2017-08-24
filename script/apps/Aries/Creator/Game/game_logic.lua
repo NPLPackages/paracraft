@@ -46,7 +46,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldRevision.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/PlayerController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Ticks.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");

@@ -19,11 +19,11 @@ task:Run();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TaskManager.lua");
-NPL.load("(gl)script/apps/Aries/SlashCommand/Command.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Command.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
-local Task = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Command"), commonlib.gettable("MyCompany.Aries.Game.Task"));
+local Task = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Command"), commonlib.gettable("MyCompany.Aries.Game.Task"));
 
 -- @param id: uint16 type. need to be larger than 1024 if not system type. 
 function Task:ctor()

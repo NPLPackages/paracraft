@@ -3,6 +3,9 @@ Title: main loop file for creator game
 Author(s): LiXizhi
 Date: 2012/10/18
 Desc: 
+```
+npl servermode="true" world="worlds/DesignHouse/test" ip="0.0.0.0" port="6001" autosave="10" mc="true" bootstrapper="script/apps/Aries/Creator/Game/main.lua"
+```
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
@@ -12,7 +15,7 @@ Game.Start();
 ]]
 -- load paracraft packages if any
 NPL.load("npl_packages/paracraft/");
-NPL.load("(gl)script/ide/commonlib.lua"); 
+NPL.load("(gl)script/ide/System/System.lua");
 NPL.load("(gl)script/kids/ParaWorldCore.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
@@ -311,8 +314,8 @@ local function activate()
 		System.options.MaxCharTriangles_show = 150000;
 		MyCompany.Aries.Creator.Game.Theme.Default:Load();
 
-		NPL.load("(gl)script/apps/Aries/SlashCommand/Command.lua");
-		local Command = commonlib.gettable("MyCompany.Aries.Command");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Command.lua");
+		local Command = commonlib.gettable("MyCompany.Aries.Game.Command");
 		local cmdLoadWorld = Command:new({
 			name="Paracraft.LoadWorld", 
 			handler = function(cmd_name, cmd_text, cmd_params)
