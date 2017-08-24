@@ -10,6 +10,10 @@ local Game = commonlib.gettable("MyCompany.Aries.Game")
 Game.Start();
 -------------------------------------------------------
 ]]
+-- load paracraft packages if any
+NPL.load("npl_packages/paracraft/");
+NPL.load("(gl)script/ide/commonlib.lua"); 
+NPL.load("(gl)script/kids/ParaWorldCore.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
@@ -104,7 +108,7 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 	MyCompany.Aries.Game.mcml_controls.register_all();
 
 	-- this is for offline mode just in case it happens.
-	Map3DSystem.User.nid = Map3DSystem.User.nid or 0;
+	System.User.nid = System.User.nid or 0;
 
 	if(not System.options.mc) then
 		NPL.load("(gl)script/apps/Aries/Desktop/Areas/BattleChatArea.lua");
@@ -249,6 +253,77 @@ function Game.FrameMove(timer)
 	GameLogic.FrameMove(timer);
 end
 
+function Game.StartServer(worldpath)
+	System.options.mc = true;
+	System.options.cmdline_world = ParaEngine.GetAppCommandLineByParam("world","");
+	worldpath = worldpath or System.options.cmdline_world;
+
+	Game.Start(worldpath, nil, 0, nil, nil, function()
+		LOG.std(nil, "info", "Game", "server mode load world: %s", worldpath);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+		CommandManager:Init();
+		local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
+		local port = ParaEngine.GetAppCommandLineByParam("port", "");
+		local autosaveInterval = ParaEngine.GetAppCommandLineByParam("autosave", "");
+		-- Fixed onsoleted code, we have done this in c++: UseAsyncLoadWorld must be set to false in server mode, otherwise server chunks can not be served properly. 
+		-- GameLogic.RunCommand("property", "UseAsyncLoadWorld false");
+		GameLogic.RunCommand("startserver", ip.." "..port);
+				
+		if(autosaveInterval and autosaveInterval~="") then
+			if(autosaveInterval == "true") then
+				autosaveInterval = "";
+				GameLogic.RunCommand("autosave", "on");
+			elseif(autosaveInterval:match("^%d+$")) then
+				GameLogic.RunCommand("autosave", "on "..autosaveInterval);
+			else
+				GameLogic.RunCommand("autosave", autosaveInterval);
+			end
+		end
+	end);
+end
+
+-- handle load world command
+function Game.handleLoadWorldCmd(params)
+	System.options.is_mcworld = true;
+	LOG.std(nil, "info", "Game", "Load World from %s", params.worldpath);
+	ParaTerrain.GetAttributeObject():SetField("EnableTerrain", false);
+
+	NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
+	local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
+
+	params.res = System.LoadWorld({
+		worldpath = params.worldpath,
+	})
+	ParaTerrain.GetBlockAttributeObject():SetField("IsRemote", params.isRemoteWorld == true);
+
+	if(type(params.on_finish) == "function") then
+		params.on_finish(res);
+	end
+end
+
 local function activate()
+	if(not Game.main_state) then
+		Game.main_state = "started";
+		System.init();
+		
+		NPL.load("(gl)script/apps/Aries/Creator/Game/DefaultTheme.mc.lua");
+		System.options.MaxCharTriangles_show = 150000;
+		MyCompany.Aries.Creator.Game.Theme.Default:Load();
+
+		NPL.load("(gl)script/apps/Aries/SlashCommand/Command.lua");
+		local Command = commonlib.gettable("MyCompany.Aries.Command");
+		local cmdLoadWorld = Command:new({
+			name="Paracraft.LoadWorld", 
+			handler = function(cmd_name, cmd_text, cmd_params)
+				Game.handleLoadWorldCmd(cmd_params);
+			end,
+		});
+		System.App.Commands.Add(cmdLoadWorld);
+		-- change the load world command to use our own module
+		System.App.Commands.SetDefaultCommand("LoadWorld", cmdLoadWorld.name);
+
+		Game.StartServer();
+	end
 end
 NPL.this(activate);
