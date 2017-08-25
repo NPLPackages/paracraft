@@ -298,6 +298,9 @@ function Game.handleLoadWorldCmd(params)
 	if(params.res and type(params.on_finish) == "function") then
 		params.on_finish(params.res);
 	end
+	if(not params.res) then
+		LOG.std(nil, "warn", "loadWorldCmd", "failed to load %s because %s", params.worldpath, errMsg or "");
+	end
 	return params.res, errMsg;
 end
 

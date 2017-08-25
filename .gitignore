@@ -12,6 +12,9 @@ script/ide
 /script/apps/*
 !/script/apps/Aries/
 /script/apps/Aries/*
+!/script/apps/Aries/SlashCommand/
+/script/apps/Aries/SlashCommand/*
+!/script/apps/Aries/SlashCommand/SlashCommand.lua
 !/script/apps/Aries/Creator
 !/script/apps/Aries/app_main.lua
 !script/kids/
