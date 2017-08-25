@@ -88,7 +88,7 @@ function Entity:CreateInnerObject(...)
 		-- make it linear movement style
 		obj:SetField("MovementStyle", 3);
 
-		if(self:IsShowHeadOnDisplay()) then
+		if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 			System.ShowHeadOnDisplay(true, obj, self:GetDisplayName(), GameLogic.options.NPCHeadOnTextColor);	
 		end
 	end

@@ -68,7 +68,7 @@ end
 function Entity:CreateInnerObject(...)
 	local obj = Entity._super.CreateInnerObject(self, self:GetMainAssetPath(), true, 0, 1);
 
-	if(self:IsShowHeadOnDisplay()) then
+	if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 		System.ShowHeadOnDisplay(true, obj, "me" or self:GetDisplayName(), GameLogic.options.NPCHeadOnTextColor);	
 	end
 	return obj;

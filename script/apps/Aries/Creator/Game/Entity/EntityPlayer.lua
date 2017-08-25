@@ -696,7 +696,7 @@ function Entity:UpdateDisplayName(text)
 	if(self:GetDisplayName()~=text) then
 		self:SetDisplayName(text);
 		local obj = self:GetInnerObject();
-		if(self:IsShowHeadOnDisplay()) then
+		if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 			System.ShowHeadOnDisplay(true, obj, text or "", GameLogic.options.NPCHeadOnTextColor);	
 		end
 	end
