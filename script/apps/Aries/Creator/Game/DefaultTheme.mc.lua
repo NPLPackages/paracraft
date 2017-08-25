@@ -990,7 +990,9 @@ function DefaultTheme:LoadHeadDisplayStyle()
 	att:SetField("HeadOnMaxUIScaling", 1);
 	att:SetField("HeadOnAlphaFadePercentage", 0.3);
 
-	HeadonDisplay.InitHeadOnTemplates(true);
+	if(HeadonDisplay.InitHeadOnTemplates) then
+		HeadonDisplay.InitHeadOnTemplates(true);
+	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/Image3DDisplay.lua");
 	local Image3DDisplay = commonlib.gettable("MyCompany.Aries.Game.Effects.Image3DDisplay");

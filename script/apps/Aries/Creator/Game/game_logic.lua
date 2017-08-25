@@ -508,11 +508,15 @@ function GameLogic.LoadGame()
 
 	GameRules:LoadFromFile();
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SwfLoadingBar.lua");
-	local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar");
-	SwfLoadingBar.ShowForLightCalculation(function()
+	if(not System.options.servermode) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SwfLoadingBar.lua");
+		local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar");
+		SwfLoadingBar.ShowForLightCalculation(function()
+			GameLogic.Resume();
+		end);
+	else
 		GameLogic.Resume();
-	end);
+	end
 	
 	ModManager:OnWorldLoad();
 	GameLogic:WorldLoaded();

@@ -121,10 +121,7 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 	-- leaving the previous block world. 
 	ParaTerrain.LeaveBlockWorld();
 
-	local ItemManager = commonlib.gettable("Map3DSystem.Item.ItemManager");
-	local _vip_item_gsid = 17394;
-	local bHas = ItemManager.IfOwnGSItem(_vip_item_gsid);
-	paraworld.PostLog({action = "mc_enter_world", ver=System.options.version, hasright=_right},"mc_enter_world", function(msg)  end);
+	-- paraworld.PostLog({action = "mc_enter_world", ver=System.options.version, hasright=_right},"mc_enter_world", function(msg)  end);
 
 	if(filename:match("^worlds/DesignHouse/userworlds/")) then
 		Game.CleanupUserDownloadFolder();
@@ -292,28 +289,26 @@ function Game.handleLoadWorldCmd(params)
 	LOG.std(nil, "info", "Game", "Load World from %s", params.worldpath);
 	ParaTerrain.GetAttributeObject():SetField("EnableTerrain", false);
 
-	NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
-	local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
-
-	params.res = System.LoadWorld({
+	local errMsg;
+	params.res, errMsg = System.Scene.World:LoadWorld({
 		worldpath = params.worldpath,
 	})
 	ParaTerrain.GetBlockAttributeObject():SetField("IsRemote", params.isRemoteWorld == true);
 
-	if(type(params.on_finish) == "function") then
-		params.on_finish(res);
+	if(params.res and type(params.on_finish) == "function") then
+		params.on_finish(params.res);
 	end
+	return params.res, errMsg;
 end
 
+-- only for server mode.
 local function activate()
 	if(not Game.main_state) then
 		Game.main_state = "started";
+		System.options.mc = true;
+		System.options.servermode = ParaEngine.GetAppCommandLineByParam("servermode", "false") == "true";
 		System.init();
 		
-		NPL.load("(gl)script/apps/Aries/Creator/Game/DefaultTheme.mc.lua");
-		System.options.MaxCharTriangles_show = 150000;
-		MyCompany.Aries.Creator.Game.Theme.Default:Load();
-
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Command.lua");
 		local Command = commonlib.gettable("MyCompany.Aries.Game.Command");
 		local cmdLoadWorld = Command:new({
