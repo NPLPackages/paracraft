@@ -631,6 +631,9 @@ function BaseContext:OnCreateSingleBlock(x,y,z, block_id, result)
 end
 
 function BaseContext:OnCreateBlock(result)
+	if result.blockX == nil or result.blockY == nil or result.blockZ == nil then
+		return;
+	end	
 	local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
 	local itemStack = EntityManager.GetPlayer():GetItemInRightHand();
 	local block_id = 0;
