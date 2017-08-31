@@ -309,7 +309,7 @@ local function activate()
 	if(not Game.main_state) then
 		Game.main_state = "started";
 		System.options.mc = true;
-		System.options.servermode = ParaEngine.GetAppCommandLineByParam("servermode", "false") == "true";
+		System.options.servermode = ParaEngine.GetAppCommandLineByParam("servermode", "true") == "true";
 		System.init();
 		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Command.lua");
