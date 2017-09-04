@@ -17,34 +17,58 @@ end
 
 
 ]]></script>
-<div style="padding-left:6px;padding-right:6px;padding-bottom:5px" class="mc_panel">
-    <div style="margin-top:12px;color:#ffffff">
+<style type="text/mcss">
+{
+    btn_add ={
+        float="left", width = 8, height=10, ["margin-top"] = 3, ["margin-left"] = 3, background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10"
+    },
+    btn_sub = {
+        float ="left", width = 10, height=10, ["margin-top"] = 3, ["margin-left"] = 3, background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10"
+    },
+    text_field = {
+        float ="left", width = 40, height=18, ["margin-left"] = 3
+    },
+}
+</style>
+<div style="padding-left:6px;padding-right:6px;padding-bottom:7px" class="mc_panel">
+    <div style="margin-top:10px;color:#ffffff">
         <div><input type="radio" checked="true" style="margin:2px" name="method" id="no_clone" value="no_clone"/><div style="float:left;" for="no_clone"><%=L"不复制"%></div></div>
         <div><input type="radio" style="margin:2px" name="method" id="clone" value="clone"/><div style="float:left;" for="clone"><%=L"复制"%></div></div>
     </div>
-    <div style="margin-top:12px;">
+    <div style="margin-top:10px;">
         <input type="button" style="float:left;margin-top:-3px;color:#ff0000" value="X" enabled="false" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="float:left;margin-left:3px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub_x" onclick="TransformWnd.ChangeCoordinate"/>
-        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" style="float:left;margin-left:3px;width:40px;height:18px;" name="text_pos_x" class="mc_text"/>
-        <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add_x" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="button" class="btn_sub"  name="btn_sub_x" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" name="text_pos_x" class="mc_text text_field"/>
+        <input type="button" class="btn_add"  name="btn_add_x" onclick="TransformWnd.ChangeCoordinate"/>
     </div>
-    <div style="margin-top:12px;">
+    <div style="margin-top:10px;">
         <input type="button" style="float:left;margin-top:-3px;color:#645efb" value="Y" enabled="false" class="mc_light_grey_button_with_fillet"/>
-        <input type="button"style="float:left;margin-left:3px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub_y" onclick="TransformWnd.ChangeCoordinate"/>
-        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" style="float:left;margin-left:3px;width:40px;height:16px;" name="text_pos_y" class="mc_text"/>
-        <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add_y" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="button"class="btn_sub"  name="btn_sub_y" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" name="text_pos_y" class="mc_text text_field"/>
+        <input type="button" class="btn_add"  name="btn_add_y" onclick="TransformWnd.ChangeCoordinate"/>
     </div>
-    <div style="margin-top:12px;">
+    <div style="margin-top:10px;">
         <input type="button" style="float:left;margin-top:-3px;color:#00ff00" value="Z" enabled="false" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="float:left;margin-left:3px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub_z" onclick="TransformWnd.ChangeCoordinate"/>
-        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" style="float:left;margin-left:3px;width:40px;height:16px;" name="text_pos_z" class="mc_text"/>
-        <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add_z" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="button" class="btn_sub"  name="btn_sub_z" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" name="text_pos_z" class="mc_text text_field"/>
+        <input type="button" class="btn_add"  name="btn_add_z" onclick="TransformWnd.ChangeCoordinate"/>
     </div>
-    <div style="margin-top:12px;">
-        <input type="button" style="float:left;margin-top:-3px;color:#ffffff" value="Scaling" enabled="false" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="float:left;margin-left:3px;width:8px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10)" name="btn_sub_scaling" onclick="TransformWnd.ChangeCoordinate"/>
-        <input type="button" style="float:left;margin-left:3px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)" name="btn_add_scaling" onclick="TransformWnd.ChangeCoordinate"/><br />
-        <input type="text" text="1,1,1" spacing="0" style="margin-left:5px;width:80px;height:18px;" name="text_scaling" class="mc_text"/>
+    <div style="margin-top:10px;">
+        <span style="color:#0afafa"><%=L"放缩"%></span>
+        <input type="button" class="btn_sub" style="margin-top:5px;" name="btn_sub_scaling" onclick="TransformWnd.ChangeCoordinate"/>
+        <input type="button" class="btn_add" style="margin-top:5px;" name="btn_add_scaling" onclick="TransformWnd.ChangeCoordinate"/><br />
+        <input type="text" text="1,1,1" spacing="0" style="width:80px;" name="text_scaling" class="mc_text text_field"/>
+    </div>
+    <div style="margin-top:10px;">
+        <div style="float:left;color:#0066ff;min-width:30px;"><%=L"旋转"%></div>
+        <select name="axis" AllowUserEdit="false" style="width:40px;height:22px;" >
+            <option value="x">X</option>
+            <option selected="selected" value="y">Y</option>
+            <option value="z">Z</option>
+        </select><br/>
+        <input type="button" class="btn_add" style="margin-left:20px;" name="btn_sub_axis" onclick="TransformWnd.ChangeRotation" />
+        <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" name="text_rot" class="mc_text text_field" />
+        <input type="button" class="btn_sub" name="btn_add_axis" onclick="TransformWnd.ChangeRotation" />
     </div>
     <div style="margin-top:5px;">
         <input type="button" style="" value='<%=L"确定"%>' tooltip='<%=L"Ctrl+C复制,Ctrl+X剪切,Ctrl+V粘贴"%>' onclick="TransformWnd.TransformSelection" class="mc_light_grey_button_with_fillet"/>
