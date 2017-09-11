@@ -21,6 +21,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
+NetworkMain.worlds = {};
 
 local clients = {};
 

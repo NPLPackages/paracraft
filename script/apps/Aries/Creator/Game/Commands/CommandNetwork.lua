@@ -69,7 +69,6 @@ Commands["startserver"] = {
 	end,
 };
 
---[[ ]]
 Commands["stopserver"] = {
 	name="stopserver", 
 	quick_ref="/stopserver", 
