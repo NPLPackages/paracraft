@@ -513,6 +513,7 @@ function GameLogic.LoadGame()
 		local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar");
 		SwfLoadingBar.ShowForLightCalculation(function()
 			GameLogic.Resume();
+			GameLogic.GetFilters():apply_filters("on_loadworld_finsh");
 		end);
 	else
 		GameLogic.Resume();
