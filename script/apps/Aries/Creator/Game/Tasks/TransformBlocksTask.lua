@@ -13,6 +13,8 @@ local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({x = 20000, y=0, z=2
 
 -- rotation
 local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({rot_y = 1, aabb=aabb, blocks={},})
+local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({rot_axis = "y", rot_angle=1.57, aabb=aabb, blocks={},})
+
 -- scaling
 local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({scaling = 1.2, scalingY=2, aabb=aabb, blocks={},})
 
@@ -52,6 +54,13 @@ function TransformBlocks:Run()
 		-- for translation
 		self:DoTranslation(dx,dy,dz, self.blocks, final_blocks);
 
+		if(self.rot_axis == "x") then
+			self.rot_x = self.rot_angle or self.rot_x;
+		elseif(self.rot_axis == "y") then
+			self.rot_y = self.rot_angle or self.rot_y;
+		elseif(self.rot_axis == "z") then
+			self.rot_z = self.rot_angle or self.rot_z;
+		end
 		-- for rotation an axis
 		if(self.rot_y and self.rot_y~=0) then
 			self:DoRotation(self.rot_y, "y", self.blocks, final_blocks);
@@ -200,17 +209,25 @@ end
 -- @param blocks: source block
 -- @param aabb: aabb  of source block. 
 -- @param final_blocks: the transformed block output. 
-function TransformBlocks:DoRotation(rot_angle, axis, blocks, final_blocks)
+-- @param bSnapToRightAngle: default to true. whether to snap to 90 degree angles
+function TransformBlocks:DoRotation(rot_angle, axis, blocks, final_blocks, bSnapToRightAngle)
 	if(rot_angle and rot_angle~=0 and self.aabb) then
 		local center = self.aabb:GetCenter();
 		local cx, cy, cz;
-		if(self.pivot_x and self.pivot_y and self.pivot_z) then
+		if(self.pivot and not self.pivot_x) then
+			cx, cy, cz = self.pivot[1], self.pivot[2], self.pivot[3]
+		elseif(self.pivot_x and self.pivot_y and self.pivot_z) then
 			cx, cy, cz = self.pivot_x, self.pivot_y, self.pivot_z;
 		else
 			cx, cy, cz = math_floor(center[1]), math_floor(center[2]), math_floor(center[3]);
 		end
 		
-		local sin_t, cos_t = math_floor(math.sin(rot_angle)+0.5), math_floor(math.cos(rot_angle)+0.5);
+		local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
+		if(bSnapToRightAngle ~= false) then
+			if(math.floor(rot_angle*180/3.14+0.5) % 45 == 0) then
+				sin_t, cos_t = math_floor(sin_t+0.5), math_floor(cos_t+0.5);
+			end
+		end
 		
 		for i = 1, #(blocks) do
 			local b = blocks[i];

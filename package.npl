@@ -1,0 +1,17 @@
+--[[
+Author: LiXizhi@yeah.net
+Date: 2017-8-30
+License: GPL
+Website: http://www.paracraft.cn
+Desc: paracraft source code.
+-----------------------------------------------
+npl world="worlds/DesignHouse/test" ip="0.0.0.0" port="6001" loadpackage="npl_packages/paracraft/"
+-----------------------------------------------
+]]
+{
+	-- do not add search path when loading the containing folder via NPL.load. default to true.
+	-- searchpath = false,
+	bootstrapper = "script/apps/Aries/Creator/Game/main.lua",
+	-- main script
+	-- main = "XXX.lua",
+}

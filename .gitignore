@@ -4,6 +4,7 @@
 !/NPLPackageParacraft.sln
 !/.git*
 !/*.md
+!/package.npl
 !/LICENSE
 !/script/
 /script/*

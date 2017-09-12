@@ -34,7 +34,11 @@ local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local SelectBlocks = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks"));
 
 SelectBlocks:Property({"PivotPoint", {0,0,0}, "GetPivotPoint", "SetPivotPoint"})
+SelectBlocks:Property({"PivotPointReal", {0,0,0}})
 SelectBlocks:Property({"position", {0,0,0}, "GetPosition", "SetPosition"})
+SelectBlocks:Property({"yaw", 0, "GetYaw", "SetYaw", auto=true})
+SelectBlocks:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true})
+SelectBlocks:Property({"roll", 0, "GetRoll", "SetRoll", auto=true})
 SelectBlocks:Property({"PivotPointColor", "#00ffff",})
 
 SelectBlocks:Signal("valueChanged");
@@ -63,6 +67,7 @@ function SelectBlocks:ctor()
 	self.blocks = self.blocks or {};
 	self.cursor = vector3d:new();
 	self.PivotPoint = vector3d:new(0,0,0);
+	self.PivotPointReal = vector3d:new(0,0,0);
 	self.position = vector3d:new(0,0,0);
 
 	GameLogic.GetFilters():add_filter("file_exported", SelectBlocks.filter_file_exported);
@@ -149,6 +154,18 @@ function SelectBlocks:UpdateManipulators()
 		self:SetManipulatorPosition({self.blockX, self.blockY, self.blockZ});
 	end
 	manipCont:connectToDependNode(self);
+
+	-- For rotation of blocks
+	NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
+	local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
+	local manipCont = RotateManipContainer:new():init();
+	manipCont:SetPositionPlugName("PivotPointReal");
+	manipCont:SetRealTimeUpdate(false);
+	manipCont:SetYawInverted(true);
+	-- manipCont:SetRollInverted(true);
+	-- manipCont:SetPitchInverted(true);
+	self:AddManipulator(manipCont);
+	manipCont:connectToDependNode(self);
 end
 
 -- change manipulator position, but does not translate the blocks
@@ -179,6 +196,40 @@ function SelectBlocks:GetPosition()
 	return self.position;
 end
 
+function SelectBlocks:SetYaw(value)
+	if(self.yaw ~= value) then
+		self:valueChanged();
+		if(not TransformWnd:IsVisible()) then
+			SelectBlocks.ShowTransformWnd();
+		end
+		TransformWnd:Rotate("y", value, self:GetPivotPoint());
+		GameLogic.AddBBS("SelectBlocks", L"回车键确认操作");
+	end
+end
+
+function SelectBlocks:SetRoll(value)
+	if(self.roll ~= value) then
+		self:valueChanged();
+		if(not TransformWnd:IsVisible()) then
+			SelectBlocks.ShowTransformWnd();
+		end
+		TransformWnd:Rotate("z", value, self:GetPivotPoint());
+		GameLogic.AddBBS("SelectBlocks", L"回车键确认操作");
+	end
+end
+
+function SelectBlocks:SetPitch(value)
+	if(self.pitch ~= value) then
+		self:valueChanged();
+		if(not TransformWnd:IsVisible()) then
+			SelectBlocks.ShowTransformWnd();
+		end
+		TransformWnd:Rotate("x", value, self:GetPivotPoint());
+		GameLogic.AddBBS("SelectBlocks", L"回车键确认操作");
+	end
+end
+
+
 -- set pivot point vector3d in block coordinate system
 function SelectBlocks:SetPivotPoint(vec)
 	if(not vec) then
@@ -186,6 +237,7 @@ function SelectBlocks:SetPivotPoint(vec)
 	end
 	if(not self.PivotPoint:equals(vec)) then
 		self.PivotPoint:set(vec);
+		self.PivotPointReal:set(BlockEngine:real(vec[1], vec[2], vec[3]));
 		SelectBlocks.GetEventSystem():DispatchEvent({type = "OnSelectionChanged" , data = "pivot"});
 		self:valueChanged();
 	end
@@ -599,7 +651,7 @@ function SelectBlocks:handleLeftClickScene(event)
 			local pivot_x, pivot_y, pivot_z = self:GetSelectionPivot();
 			local dx, dy, dz = x - pivot_x,y - pivot_y,z - pivot_z;
 			if (dx~=0 or dy ~=0 or dz~=0) then
-				SelectBlocks.TransformSelection(dx,dy,dz);
+				SelectBlocks.TransformSelection({dx=dx,dy=dy,dz=dz});
 				self.aabb:Offset(dx,dy,dz);
 			end
 		end	
@@ -619,20 +671,20 @@ function SelectBlocks:keyPressEvent(event)
 		SelectBlocks.DeleteSelection();
 	elseif(dik_key == "DIK_EQUALS")then
 		if(event.ctrl_pressed) then
-			SelectBlocks.TransformSelection(nil,nil,nil, nil, 2,2,2)
+			SelectBlocks.TransformSelection({scalingX = 2, scalingY = 2, scalingZ = 2})
 		else
 			SelectBlocks.AutoExtrude(true);
 		end
 	elseif(dik_key == "DIK_MINUS")then
 		if(event.ctrl_pressed) then
-			SelectBlocks.TransformSelection(nil,nil,nil, nil, 0.5, 0.5, 0.5)
+			SelectBlocks.TransformSelection({scalingX = 0.5, scalingY = 0.5, scalingZ = 0.5})
 		else
 			SelectBlocks.AutoExtrude(false);
 		end
 	elseif(dik_key == "DIK_LBRACKET")then
-		SelectBlocks.TransformSelection(nil,nil,nil, 1.57)
+		SelectBlocks.TransformSelection({rot_angle=1.57, rot_axis = "y"})
 	elseif(dik_key == "DIK_RBRACKET")then
-		SelectBlocks.TransformSelection(nil,nil,nil, -1.57)
+		SelectBlocks.TransformSelection({rot_angle=-1.57, rot_axis = "y"})
 	elseif(dik_key == "DIK_A" and event.ctrl_pressed)then
 		SelectBlocks.SelectAll(true)
 	elseif(dik_key == "DIK_C" or dik_key == "DIK_V" or dik_key == "DIK_X" )then
@@ -769,21 +821,21 @@ function SelectBlocks.DoClick(name)
 	elseif(name == "btnTransform" or name == "btn_transform")then
 		SelectBlocks.ShowTransformWnd();
 	elseif(name == "left_rot" or name == "btn_rotate_left")then
-		SelectBlocks.TransformSelection(nil,nil,nil, 1.57)
+		SelectBlocks.TransformSelection({rot_angle=1.57, rot_axis = "y"})
 	elseif(name == "right_rot" or name == "btn_rotate_right")then
-		SelectBlocks.TransformSelection(nil,nil,nil, -1.57)
+		SelectBlocks.TransformSelection({rot_angle=-1.57, rot_axis = "y"})
 	elseif(name == "dx_positive" or name == "btn_moveto_front")then
-		SelectBlocks.TransformSelection(1,nil,nil)
+		SelectBlocks.TransformSelection({dx=1})
 	elseif(name == "dx_negative" or name == "btn_moveto_back")then
-		SelectBlocks.TransformSelection(-1,nil,nil)
+		SelectBlocks.TransformSelection({dx=-1})
 	elseif(name == "dy_positive" or name == "btn_moveto_up")then
-		SelectBlocks.TransformSelection(nil,1,nil)
+		SelectBlocks.TransformSelection({dy=1})
 	elseif(name == "dy_negative" or name == "btn_moveto_down")then
-		SelectBlocks.TransformSelection(nil,-1,nil)
+		SelectBlocks.TransformSelection({dy=-1})
 	elseif(name == "dz_positive" or name == "btn_moveto_left")then
-		SelectBlocks.TransformSelection(nil,nil, 1)
+		SelectBlocks.TransformSelection({dz=1})
 	elseif(name == "dz_negative" or name == "btn_moveto_right")then
-		SelectBlocks.TransformSelection(nil,nil, -1)
+		SelectBlocks.TransformSelection({dz=-1})
 	elseif(name == "dz_negative" or name == "btn_mirror")then
 		SelectBlocks.MirrorSelection()
 	end
@@ -1036,7 +1088,7 @@ function SelectBlocks:PasteBlocks(bx, by, bz)
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
 				local dx,dy,dz = MyCompany.Aries.Game.Tasks.TransformBlocks:GetDeltaPosition(copy_task.x,copy_task.y,copy_task.z, copy_task.aabb);
 				
-				TransformWnd.ShowPage(copy_task.blocks, {x=dx, y=dy, z=dz, facing=0, method=copy_task.operation}, function(trans, res)
+				TransformWnd.ShowPage(copy_task.blocks, {x=dx, y=dy, z=dz, method=copy_task.operation}, function(trans, res)
 					if(trans and res == "ok") then
 						copy_task.dx = trans.x;
 						copy_task.dy = trans.y;
@@ -1101,17 +1153,19 @@ function SelectBlocks.ShowTransformWnd()
 		local self = cur_instance;
 		
 		SelectBlocks.GetEventSystem():AddEventListener("OnSelectionChanged", OnTransformSelectionChanged, nil, "TransformWnd");
-		TransformWnd.ShowPage(cur_selection, {x=0, y=0, z=0, facing=0}, function(trans, res)
+		TransformWnd.ShowPage(cur_selection, {x=0, y=0, z=0,}, function(trans, res)
 			SelectBlocks.GetEventSystem():RemoveEventListener("OnSelectionChanged", OnTransformSelectionChanged);
 			if(trans and res == "ok") then
-				SelectBlocks.TransformSelection(trans.x, trans.y, trans.z, trans.facing*3.14/180, trans.scalingX, trans.scalingY, trans.scalingZ, trans.method);
+				SelectBlocks.TransformSelection({dx=trans.x, dy=trans.y, dz=trans.z, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, 
+					scalingX = trans.scalingX, scalingY = trans.scalingY, scalingZ = trans.scalingZ, method = trans.method});
 			end
 		end)
 	end
 end
 
+-- @param trans: {dx,dy,dz, pivot, rot_axis, rot_angle, scalingX, scalingY, scalingZ, method}
 -- @param method: nil or "clone"
-function SelectBlocks.TransformSelection(dx,dy,dz, rot_y, scalingX, scalingY, scalingZ, method)
+function SelectBlocks.TransformSelection(trans)
 	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
 		local self = cur_instance;
 		local mExtents = cur_instance.aabb.mExtents;
@@ -1120,13 +1174,13 @@ function SelectBlocks.TransformSelection(dx,dy,dz, rot_y, scalingX, scalingY, sc
 		if(not shift_pressed) then
 			self:UpdateSelectionEntityData();
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = dx, dy=dy, dz=dz, rot_y=rot_y, scalingX=scalingX, scalingY=scalingY, scalingZ=scalingZ, blocks=cur_selection, aabb=cur_instance.aabb, operation = method})
+			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = trans.dx, dy=trans.dy, dz=trans.dz, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, scalingX=trans.scalingX, scalingY=trans.scalingY, scalingZ=trans.scalingZ, blocks=cur_selection, aabb=cur_instance.aabb, operation = trans.method})
 			task:Run();
 
 			self:ReplaceSelection(commonlib.clone(task.final_blocks));
 		else
 			-- if shift is pressed, we will extrude
-			SelectBlocks.ExtrudeSelection(dx, dy, dz);
+			SelectBlocks.ExtrudeSelection(trans.dx, trans.dy, trans.dz);
 		end
 	end
 end
