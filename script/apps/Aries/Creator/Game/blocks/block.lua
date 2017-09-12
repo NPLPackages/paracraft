@@ -71,6 +71,7 @@ local block_attribute_map = {
 	tick_random		= 0x0020000, -- whether to tick randomly, framemove or tick_random are the same
 	onload			= 0x0040000, -- whether has onBlockLoaded
 	color_data		= 0x0080000, -- whether the block contains color in its block data.
+	randomTexture	= 0x0200000,
 }
 
 block.attributes = block_attribute_map;
