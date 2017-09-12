@@ -299,6 +299,8 @@ function Entity:UpdateEntityActionState()
 	if(curBlockIdInHand~=self:GetBlockInRightHand()) then
 		self:SetBlockInRightHand(curBlockIdInHand);
 	end
+
+	GameLogic.GetFilters():apply_filters("entity_player_mp_entity_action_state_updated", self);
 end
 
 -- Called in OnUpdate() of Framemove() to frequently update entity state every tick as required. 
