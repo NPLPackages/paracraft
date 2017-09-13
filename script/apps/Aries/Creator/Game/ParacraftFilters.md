@@ -74,6 +74,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "select_exporter", id:
 - Networking:
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
+  - "entity_player_mp_other_entity_action_state_updated", entity_player_mp_other: after every time entity action state get updated for EntityPlayerMPOther
+  - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
 - Movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
 ## Adding New filters
