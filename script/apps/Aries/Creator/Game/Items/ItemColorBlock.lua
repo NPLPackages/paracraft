@@ -220,10 +220,9 @@ function ItemColorBlock:ChangePenColor(dSaturation, dLightness)
 	end
 end
 
-function ItemColorBlock:mousePressEvent(event)
-	if(event.alt_pressed and not event.shift_pressed and event:button() == "left") then
-		event:accept();
-		self:PickPenColorAtMouse();
+function ItemColorBlock:mouseReleaseEvent(event)
+	if(event:isAccepted()) then
+		return
 	end
 	if(event:button() == "right" and GameLogic.GameMode:IsEditor()) then
 		local result = Game.SelectionManager:MousePickBlock(true, false, false);
@@ -253,6 +252,13 @@ function ItemColorBlock:mousePressEvent(event)
 				end
 			end
 		end
+	end
+end
+
+function ItemColorBlock:mousePressEvent(event)
+	if(event.alt_pressed and not event.shift_pressed and event:button() == "left") then
+		event:accept();
+		self:PickPenColorAtMouse();
 	end
 end
 

@@ -166,6 +166,7 @@ function TransformWnd.UpdateHintLocation(blocks, dx,dy,dz, axis, rot_angle)
 		end
 		axis = axis or page:GetValue("axis", "y");
 		rot_angle = rot_angle or (TransformWnd.GetNumberValue("text_rot", 0))*3.14/180;
+		local bIsRightAngle = math.floor(rot_angle*180/3.14+0.5) % 90 == 0;
 
 		local final_blocks = {};
 		if(dx~=0 or dy~=0 or dz~=0) then
@@ -179,6 +180,9 @@ function TransformWnd.UpdateHintLocation(blocks, dx,dy,dz, axis, rot_angle)
 		if(rot_angle ~= 0) then
 			local cx, cy, cz = unpack(TransformWnd.pivot);
 			local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
+			if(bIsRightAngle) then
+				sin_t, cos_t = math.floor(sin_t+0.5), math.floor(cos_t+0.5);
+			end
 
 			for i = 1, #(blocks) do
 				local b = blocks[i];
@@ -186,22 +190,22 @@ function TransformWnd.UpdateHintLocation(blocks, dx,dy,dz, axis, rot_angle)
 					local x, y = b[2] - cy, b[3] - cz;
 					final_blocks[i] = {
 						b[1],
-						x*cos_t - y*sin_t + cy,
-						x*sin_t + y*cos_t + cz,
+						math.floor(x*cos_t - y*sin_t+0.5) + cy,
+						math.floor(x*sin_t + y*cos_t+0.5) + cz,
 					};
 				elseif(axis== "z") then
 					local x, y = b[1] - cx, b[2] - cy;
 					final_blocks[i] = {
-						x*cos_t - y*sin_t + cx,
-						x*sin_t + y*cos_t + cy,
+						math.floor(x*cos_t - y*sin_t+0.5) + cx,
+						math.floor(x*sin_t + y*cos_t+0.5) + cy,
 						b[3],
 					};
 				else -- if(axis== "y") then
 					local x, y = b[1] - cx, b[3] - cz;
 					final_blocks[i] = {
-						x*cos_t - y*sin_t + cx,
+						math.floor(x*cos_t - y*sin_t+0.5) + cx,
 						b[2],
-						x*sin_t + y*cos_t + cz,
+						math.floor(x*sin_t + y*cos_t+0.5) + cz,
 					};
 				end
 			end
