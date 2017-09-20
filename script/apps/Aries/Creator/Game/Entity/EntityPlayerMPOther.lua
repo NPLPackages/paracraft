@@ -110,6 +110,7 @@ function Entity:UpdateEntityActionState()
 		self:SetBlockInRightHand(curBlockIdInHand);
 		self:RefreshRightHand();
 	end
+	GameLogic.GetFilters():apply_filters("entity_player_mp_other_entity_action_state_updated", self);
 end
 
 -- Called in OnUpdate() of Framemove() to frequently update entity state every tick as required. 
@@ -132,16 +133,16 @@ function Entity:OnLivingUpdate()
 			end
 			self:SetPosition(x, y, z);
 		end
-
-        local deltaFacing = mathlib.ToStandardAngle(self.targetFacing - self.facing);
-        self.facing = self.facing + deltaFacing / self.smoothFrames;
-        self.rotationPitch = self.rotationPitch + (self.targetPitch - self.rotationPitch) / self.smoothFrames;
-        self.smoothFrames = self.smoothFrames - 1;
-        self:SetRotation(self.facing, self.rotationPitch);
-    end
+		
+		local deltaFacing = mathlib.ToStandardAngle(self.targetFacing - self.facing);
+		self.facing = self.facing + deltaFacing / self.smoothFrames;
+		self.rotationPitch = self.rotationPitch + (self.targetPitch - self.rotationPitch) / self.smoothFrames;
+		self.smoothFrames = self.smoothFrames - 1;
+		self:SetRotation(self.facing, self.rotationPitch);
+	end
 	if(self.smoothFramesHead > 0) then
 		self.rotationHeadYaw = self.rotationHeadYaw + (self.targetHeadYaw - self.rotationHeadYaw) / self.smoothFramesHead;
-        self.rotationHeadPitch = self.rotationHeadPitch + (self.targetHeadPitch - self.rotationHeadPitch) / self.smoothFramesHead;
+		self.rotationHeadPitch = self.rotationHeadPitch + (self.targetHeadPitch - self.rotationHeadPitch) / self.smoothFramesHead;
 		self.smoothFramesHead = self.smoothFramesHead - 1;
 		local obj = self:GetInnerObject();
 		if(obj) then

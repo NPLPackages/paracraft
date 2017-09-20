@@ -205,12 +205,185 @@ function TransformBlocks:DoTranslation(dx,dy,dz, blocks, final_blocks)
 	end
 end
 
+-- rotating blocks with arbitrary angle will result in gaps. 
+-- This algorithm will first scale the original blocks 2 times (8 times in volume)
+-- and then rotate and shrink to orignal size. This will effectively remove all gaps. 
+function TransformBlocks:RotateBlocksWithFillingGap(blocks, final_blocks, rot_angle, axis, cx, cy, cz)
+	local blocks_origin = {};
+	local blocks_scaled = {};
+
+	local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
+
+	-- taking negative value into account
+	function GetSparseIndex(x, y, z)
+		return (y+256)*30000*30000+(x+10000)*30000+(z+10000);
+	end
+
+	-- convert from sparse index to block x,y,z
+	-- @return x,y,z
+	function FromSparseIndex(index)
+		local x, y, z;
+		y = math.floor(index / (30000*30000));
+		index = index - y*30000*30000;
+		x = math.floor(index / (30000));
+		z = index - x*30000;
+		return x-10000,y-256,z-10000;
+	end
+
+	local function RotateBlock(x,y,z)
+		if(axis== "x") then
+			return x, math.floor(y*cos_t - z*sin_t+0.5), math.floor(y*sin_t + z*cos_t + 0.5);
+		elseif(axis== "z") then
+			return math.floor(x*cos_t - y*sin_t + 0.5), math.floor(x*sin_t + y*cos_t + 0.5), z;
+		else 
+			return math.floor(x*cos_t - z*sin_t + 0.5), y, math.floor(x*sin_t + z*cos_t + 0.5);
+		end
+	end
+
+	for i = 1, #(blocks) do
+		local b = blocks[i];
+		local bn = {b[1]-cx, b[2]-cy, b[3]-cz};
+		blocks_origin[i] = bn;
+		local k = (i-1)*8;
+		local bn2 = {bn[1]*2, bn[2]*2, bn[3]*2, b};
+		blocks_scaled[k+1] = bn2;
+		blocks_scaled[k+2] = {bn2[1], bn2[2], bn2[3]+1, b};
+		blocks_scaled[k+3] = {bn2[1], bn2[2]+1, bn2[3], b};
+		blocks_scaled[k+4] = {bn2[1], bn2[2]+1, bn2[3]+1, b};
+		blocks_scaled[k+5] = {bn2[1]+1, bn2[2], bn2[3], b};
+		blocks_scaled[k+6] = {bn2[1]+1, bn2[2], bn2[3]+1, b};
+		blocks_scaled[k+7] = {bn2[1]+1, bn2[2]+1, bn2[3], b};
+		blocks_scaled[k+8] = {bn2[1]+1, bn2[2]+1, bn2[3]+1, b};
+	end
+
+	local block_scaled_map = {};
+	for i = 1, #(blocks_scaled) do
+		local b = blocks_scaled[i];
+		local x, y, z = RotateBlock(b[1], b[2], b[3]);
+		block_scaled_map[GetSparseIndex(x, y, z)] = b[4];
+	end
+
+	local count=0;
+	local bmap = {{}, {}, {}, {}, {}, {},{}, {},};
+	local function CountBlock_reset()
+		count = 0;
+		for i=1, 8 do
+			if(bmap[i].block) then
+				bmap[i].block=false;
+				bmap[i].count=0;
+			else
+				break;
+			end
+		end
+	end
+	local function CountBlock(b2)
+		if(b2) then
+			count = count + 1;	
+			for i=1, 8 do
+				if(not bmap[i].block) then
+					bmap[i].block = b2;
+					bmap[i].count = 1;
+				elseif(bmap[i].block == b2) then
+					bmap[i].count = bmap[i].count + 1;
+					if(i>1) then
+						for j=i, 2, -1 do
+							if(bmap[j-1].count < bmap[j].count) then
+								bmap[j-1], bmap[j] = bmap[j], bmap[j-1];
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	local function GetCountAndBlock()
+		return count, bmap[1].block;
+	end
+
+	local block_map = {};
+	for index, b in pairs(block_scaled_map) do
+		local x, y, z = FromSparseIndex(index);
+		local x0, y0, z0 = math.floor(x/2), math.floor(y/2), math.floor(z/2);
+		local sparse_index = GetSparseIndex(x0, y0, z0);
+		if(not block_map[sparse_index]) then
+			block_map[sparse_index] = true;
+			local x2, y2, z2 = x0*2, y0*2, z0*2;
+			CountBlock_reset();
+			CountBlock(block_scaled_map[GetSparseIndex(x2, y2, z2)])
+			CountBlock(block_scaled_map[GetSparseIndex(x2, y2, z2+1)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2, y2+1, z2)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2, y2+1, z2+1)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2+1, y2, z2)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2+1, y2, z2+1)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2+1, y2+1, z2)]);
+			CountBlock(block_scaled_map[GetSparseIndex(x2+1, y2+1, z2+1)]);
+
+			local count;
+			count, b = GetCountAndBlock();
+			if(count >= 4 and b) then
+				local blockTemplate = block_types.get(b[4]);
+				local blockData = b[5];
+				if(blockTemplate and blockData) then
+					blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+				end
+				final_blocks[#final_blocks+1] = {x0+cx, y0+cy, z0+cz, b[4], blockData, b[6],}
+			end
+		end
+	end
+end
+
+-- right angle transform. 
+-- @param rot_angle: always snap to -1.57, 1.57, 3.14
+function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle, axis, cx, cy, cz)
+	local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
+	-- snap to right angle
+	sin_t, cos_t = math_floor(sin_t+0.5), math_floor(cos_t+0.5);
+	for i = 1, #(blocks) do
+		local b = blocks[i];
+		local blockTemplate = block_types.get(b[4]);
+		local blockData = b[5];
+		if(blockTemplate and blockData) then
+			blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+		end
+		if(axis== "x") then
+			local x, y = b[2] - cy, b[3] - cz;
+			final_blocks[i] = {
+				b[1],
+				x*cos_t - y*sin_t + cy,
+				x*sin_t + y*cos_t + cz,
+				b[4],
+				blockData,
+				b[6],
+			};
+		elseif(axis== "z") then
+			local x, y = b[1] - cx, b[2] - cy;
+			final_blocks[i] = {
+				x*cos_t - y*sin_t + cx,
+				x*sin_t + y*cos_t + cy,
+				b[3],
+				b[4],
+				blockData,
+				b[6],
+			};
+		else -- if(axis== "y") then
+			local x, y = b[1] - cx, b[3] - cz;
+			final_blocks[i] = {
+				x*cos_t - y*sin_t + cx,
+				b[2],
+				x*sin_t + y*cos_t + cz,
+				b[4],
+				blockData,
+				b[6],
+			};
+		end
+	end
+end
+
 -- @param rot_y: angle in radian
 -- @param blocks: source block
 -- @param aabb: aabb  of source block. 
 -- @param final_blocks: the transformed block output. 
--- @param bSnapToRightAngle: default to true. whether to snap to 90 degree angles
-function TransformBlocks:DoRotation(rot_angle, axis, blocks, final_blocks, bSnapToRightAngle)
+function TransformBlocks:DoRotation(rot_angle, axis, blocks, final_blocks)
 	if(rot_angle and rot_angle~=0 and self.aabb) then
 		local center = self.aabb:GetCenter();
 		local cx, cy, cz;
@@ -222,51 +395,11 @@ function TransformBlocks:DoRotation(rot_angle, axis, blocks, final_blocks, bSnap
 			cx, cy, cz = math_floor(center[1]), math_floor(center[2]), math_floor(center[3]);
 		end
 		
-		local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
-		if(bSnapToRightAngle ~= false) then
-			if(math.floor(rot_angle*180/3.14+0.5) % 45 == 0) then
-				sin_t, cos_t = math_floor(sin_t+0.5), math_floor(cos_t+0.5);
-			end
-		end
-		
-		for i = 1, #(blocks) do
-			local b = blocks[i];
-			local blockTemplate = block_types.get(b[4]);
-			local blockData = b[5];
-			if(blockTemplate and blockData) then
-				blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
-			end
-			if(axis== "x") then
-				local x, y = b[2] - cy, b[3] - cz;
-				final_blocks[i] = {
-					b[1],
-					x*cos_t - y*sin_t + cy,
-					x*sin_t + y*cos_t + cz,
-					b[4],
-					blockData,
-					b[6],
-				};
-			elseif(axis== "z") then
-				local x, y = b[1] - cx, b[2] - cy;
-				final_blocks[i] = {
-					x*cos_t - y*sin_t + cx,
-					x*sin_t + y*cos_t + cy,
-					b[3],
-					b[4],
-					blockData,
-					b[6],
-				};
-			else -- if(axis== "y") then
-				local x, y = b[1] - cx, b[3] - cz;
-				final_blocks[i] = {
-					x*cos_t - y*sin_t + cx,
-					b[2],
-					x*sin_t + y*cos_t + cz,
-					b[4],
-					blockData,
-					b[6],
-				};
-			end
+		local bIsRightAngle = math.floor(rot_angle*180/3.14+0.5) % 90 == 0;
+		if(bIsRightAngle) then
+			self:RotateBlocksRightAngle(blocks, final_blocks, rot_angle, axis, cx, cy, cz);
+		else
+			self:RotateBlocksWithFillingGap(blocks, final_blocks, rot_angle, axis, cx, cy, cz);
 		end
 	end
 end

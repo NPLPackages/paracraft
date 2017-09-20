@@ -788,7 +788,7 @@ function MovieClipTimeLine.OnChangeEndTime()
 		if(value) then
 			value = tonumber(value);
 			if(value) then
-				if(value>=0 and value<=3600) then
+				if(value>=0) then
 					page:SetNodeValue("endtime", value);
 					local movieClip = MovieManager:GetActiveMovieClip();
 					if(movieClip) then

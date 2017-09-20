@@ -17,6 +17,7 @@ local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local EditContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"), commonlib.gettable("MyCompany.Aries.Game.SceneContext.EditContext"));
 
 EditContext:Property("Name", "EditContext");
@@ -30,6 +31,34 @@ end
 function EditContext:OnSelect()
 	EditContext._super.OnSelect(self);
 	self:EnableMousePickTimer(true);
+end
+
+-- add select manip if ctrl key is pressed. and exit select manip when ctrl key is not pressed. 
+function EditContext:UpdateManipulators()
+	if(Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
+		if(not self.select_timer) then
+			self.select_timer = commonlib.Timer:new({callbackFunc = function(timer)
+				if(not Keyboard:IsCtrlKeyPressed() and not Keyboard:IsShiftKeyPressed()) then
+					self.select_timer:Change();
+					self:UpdateManipulators();
+					self:EnableAutoCamera(true);
+				end
+			end})
+		end
+		if(not self.select_timer:IsEnabled())then
+			self.select_timer:Change(50, 50);
+
+			self:DeleteManipulators();
+			NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/SelectBlocksManipContainer.lua");
+			local SelectBlocksManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.SelectBlocksManipContainer");
+			local manip = SelectBlocksManipContainer:new();
+			manip:init();
+			self:AddManipulator(manip);
+			self:EnableAutoCamera(false);
+		end
+	else
+		self:DeleteManipulators();
+	end
 end
 
 -- virtual function: 
@@ -53,21 +82,8 @@ function EditContext:mousePressEvent(event)
 	end
 
 	local click_data = self:GetClickData();
-	if(event.ctrl_pressed and GameLogic.GameMode:IsEditor()) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ScreenRectSelector.lua");
-		local ScreenRectSelector = commonlib.gettable("MyCompany.Aries.Game.GUI.Selectors.ScreenRectSelector");
-		click_data.selector = ScreenRectSelector:new():Init(5,5,"left");
-		click_data.selector:BeginSelect(function(mode, left, top, width, height)
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.lua");
-			local ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
-			if(mode == "selected") then
-				ObjectSelectPage.SelectByScreenRect(left, top, width, height);
-			else
-				ObjectSelectPage.CloseWindow();
-			end
-		end)
+	if(event.ctrl_pressed) then
 	else
-		click_data.selector = nil;
 		self:EnableMouseDownTimer(true);
 	end
 	
@@ -192,13 +208,6 @@ function EditContext:mouseReleaseEvent(event)
 	if(event:isAccepted()) then
 		return
 	end
-	local click_data = self:GetClickData();
-	if(click_data.selector) then
-		if(click_data.selector:OnUpdate() == "selected") then
-			self.is_click = nil;
-		end
-		click_data.selector = nil;
-	end
 
 	if(self.is_click) then
 		local result = self:CheckMousePick();
@@ -304,5 +313,8 @@ function EditContext:keyPressEvent(event)
 			GameLogic.AddBBS("memory", "force working memory activation");
 			memoryContext:ActivateRecentWorkingMemoryClip();
 		end
+	elseif(event.ctrl_pressed or event.shift_pressed) then
+		-- when ctrl is pressed, enter select block manipulator
+		self:UpdateManipulators();
 	end
 end
