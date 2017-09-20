@@ -552,6 +552,24 @@ function block_types.LoadFromFile(filename)
 
 				attr.texture = LocalTextures:GetBlockTexture(attr.texture);
 
+				if (attr.randomTexture) then
+					local maxnum = 8;
+					local path, regex = attr.randomTexture:match("^(.*)/([^/\\]+)$");    
+					path = path or ""
+					regex = regex or attr.randomTexture;
+					local index = 2;
+					commonlib.Files.Find(nil, path, 0, 1000, function (f)
+						if f.filename:match(regex) then
+							if index >= maxnum then
+								return;
+							end
+							attr["texture" .. index] = LocalTextures:GetBlockTexture(path .. "/" .. f.filename);
+							index = index + 1;
+						end
+					end)
+					attr.randomTexture = true;
+				end
+
 				if (attr.src) then
 					NPL.load("(gl)"..attr.src);
 				end
