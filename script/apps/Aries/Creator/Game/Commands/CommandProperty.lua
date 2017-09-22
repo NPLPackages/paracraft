@@ -35,6 +35,7 @@ local name_to_objpath = {
 	["UseAsyncLoadWorld"] = paths.BlockWorldClient,
 	["MaxBufferRebuildPerTick_FarChunk"] = paths.BlockWorldClient,
 	["MaxBufferRebuildPerTick"] = paths.BlockWorldClient,
+	["MaxCacheRegionCount"] = paths.BlockWorldClient,
 }
 
 Commands["property"] = {
@@ -53,6 +54,8 @@ Examples:
 /property set -all WindowText helloworld
 /property WindowText helloworld short cut
 /property AsyncChunkMode false
+/property UseAsyncLoadWorld false
+/property MaxCacheRegionCount 16
 /property set -camera IgnoreEyeBlockCollisionInSunlight false
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
