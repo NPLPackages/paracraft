@@ -173,6 +173,7 @@ function SelectBlocksManipContainer:paintEvent(painter)
 		return;
 	end
 	if(self:IsPickingPass()) then
+		return
 	end
 
 	local from_x,from_y,from_z = BlockEngine:real(unpack(self.from_pos));

@@ -148,7 +148,7 @@ end
 -- block_id can be number or block name.
 -- return block_id, cmd_text_remain
 function CmdParser.ParseBlockId(cmd_text)
-	local blockid, cmd_text_remain = cmd_text:match("^%s*([%d%w_]+)%s*(.*)$");
+	local blockid, cmd_text_remain = cmd_text:match("^%s*([%d%w_]+)[%s:]*(.*)$");
 	if(blockid) then
 		if(blockid:match("^%d+$")) then
 			blockid = tonumber(blockid);

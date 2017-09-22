@@ -230,11 +230,11 @@ e.g.
 
 Commands["setblock"] = {
 	name="setblock", 
-	quick_ref="/setblock x y z (dx dy dz) [block] [data] [entityDataTable] [where sameblock]", 
+	quick_ref="/setblock x y z (dx dy dz) [block][:][data] [entityDataTable] [where sameblock]", 
 	desc=[[ set block at given absolute or relative position. 
 /setblock x y z [block] [data]
 /setblock ~ ~1 ~ [block] [data]
-/setblock ~-1 ~1 ~ (-1 2 ~) [block] [data] where sameblock
+/setblock ~-1 ~1 ~ (-1 2 ~) [block:data] where sameblock
 @param xyz are the coordinates of the block. relative position begins with ~
 @param block is the BlockID of the block (includes id:0)
 @param data is the block data
@@ -242,6 +242,7 @@ Commands["setblock"] = {
 @param where sameblock can be used to only modify block data of a given block in the region. 
 Examples:
 /setblock ~-1 ~0 ~-2 254 0 {attr={filename="blocktemplates/111.bmax", scale=2, facing=3.14}}
+/setblock ~-1 ~0 ~-2 105:5
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, data, method, dataTag, dx, dy, dz;
