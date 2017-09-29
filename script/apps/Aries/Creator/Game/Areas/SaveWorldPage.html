@@ -43,11 +43,7 @@ end
 
 function OnUploadWorld()
     ClosePage();
-    --[[
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
-	local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
-	WorldUploadPage.ShowPage();
-    ]]
+    GameLogic.RunCommand("/menu file.uploadworld");
 end
 
 function OnClickTakeImage()

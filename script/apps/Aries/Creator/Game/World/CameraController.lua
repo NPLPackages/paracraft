@@ -338,25 +338,17 @@ function CameraController.ApplyPlayerAcceleration()
 	if ( EntityManager.GetPlayer() == playerEntity) then
 		local speed = player:GetField("LastSpeed", 0);
 		local speed_scale = playerEntity:GetCurrentSpeedScale();
+		player:SetField("Speed Scale", speed_scale);
 		local accel_dist = player:GetField("AccelerationDist",0)
 		if(accel_dist == 0) then
 			speed = player:GetField("CurrentSpeed", 0);
 		end
-		if(speed ~= 0) then
+		if( speed ~= 0) then
 			-- slow down the walking animation just in case the acceleration mode is turned on. 
 			local cur_speed = player:GetField("CurrentSpeed", 0);
-			local target_speed = math.max(cur_speed, 5);
-			local src_speed = math.abs(speed);
-			-- scale between 0.2 and 1
-			if(src_speed<target_speed) then
-				player:SetField("Speed Scale", 0.3+0.7*math.min(src_speed/target_speed, speed_scale));
-			else
-				player:SetField("Speed Scale", speed_scale);
-			end
-			-- return true if we are slowing down
+			-- return true if we are slowing down. current speed is 0 but last speed is not. 
 			return cur_speed == 0;
 		else
-			player:SetField("Speed Scale", speed_scale);
 			CameraController.CheckSetShiftKeyStandingMode(player);
 		end
 	else
@@ -378,10 +370,13 @@ function CameraController.UpdateViewBobbing()
 	local player = ParaScene.GetPlayer();
 	local speed = player:GetField("LastSpeed", 0);
 
-	if(bIsSlowingDown and player:GetField("AccelerationDist",0)>1) then
-		-- if it is sliding, stop animation. 
-		speed = 0;
-		player:ToCharacter():PlayAnimation(0);
+	
+	if(bIsSlowingDown) then
+		-- if it is sliding and last sliding speed is not too big, stop animation. 
+		if(math.abs(speed) < 3) then
+			speed = 0;
+			player:ToCharacter():PlayAnimation(0);
+		end
 	end
 	
 	-- swing amplitude

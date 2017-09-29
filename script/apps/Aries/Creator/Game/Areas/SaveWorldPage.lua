@@ -105,12 +105,13 @@ end
 
 function SaveWorldPage.TakeImage(bTakeIfFileDoesNotExist)
 	--local page = SaveWorldPage.sharepage;
-	NPL.load("(gl)script/kids/3DMapSystemUI/ScreenShot/SnapshotPage.lua");	
 	local filepath = ParaWorld.GetWorldDirectory().."preview.jpg";
 	SaveWorldPage.image_filepath = filepath;
 	
 	local function SaveAsWorldPreview()
-		if(MyCompany.Apps.ScreenShot.SnapshotPage.TakeSnapshot(filepath,300,200, false)) then
+		NPL.load("(gl)script/ide/System/Util/ScreenShot.lua");
+		local ScreenShot = commonlib.gettable("System.Util.ScreenShot");
+		if(ScreenShot.TakeSnapshot(filepath,300,200, false)) then
 			--page:SetUIValue("result", string.format("世界截图保存成功:%s", filepath));
 			page:SetUIValue("WorldImage", filepath);
 		end

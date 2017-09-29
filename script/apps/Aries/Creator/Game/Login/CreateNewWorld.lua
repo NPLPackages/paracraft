@@ -17,7 +17,7 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
 local worlds_template = {
 	-- this is pure block world with "flat" generator
-	{name = "积木世界", world_path = "worlds/Templates/Empty/flatsandland",icon = "", world_generator = "flat", seed = nil, },
+	{name = "积木世界", icon = "", world_generator = "flat", seed = nil, },
 };
 
 CreateNewWorld.SelectedWorldTemplate_Index = nil;
@@ -289,7 +289,7 @@ function CreateNewWorld.OnClickCreateWorld()
 		worldname = world_name_locale,
 		title = world_name,
 		creationfolder = CreateNewWorld.GetWorldFolder(),
-		parentworld = templ_world.world_path,
+		parentworld = templ_world.parent_world_path,
 		world_generator = CreateNewWorld.cur_terrain.terrain or templ_world.world_generator,
 		seed = templ_world.seed or world_name,
 		inherit_scene = true,
