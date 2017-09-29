@@ -116,11 +116,25 @@ function WorldCommon.SetPlayerMovableRegion(world_radius)
 	end	
 end
 
+function WorldCommon.SavePreviewImageIfNot()
+	local filepath = ParaWorld.GetWorldDirectory().."preview.jpg";
+
+	if(not ParaIO.DoesFileExist(filepath, true)) then
+		NPL.load("(gl)script/ide/System/Util/ScreenShot.lua");
+		local ScreenShot = commonlib.gettable("System.Util.ScreenShot");
+		if(ScreenShot.TakeSnapshot(filepath,300,200, false)) then
+			LOG.std(nil, "info", "WorldCommon", "screen shot saved to %s", filepath);
+			return true;
+		end
+	end
+end
+
 -- auto save the current world. It will save regardless of whether the world is modified or not.
 function WorldCommon.SaveWorld()
 	NPL.load("(gl)script/apps/Aries/Creator/AI/LocalNPC.lua");
 	local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
 	LocalNPC:SaveToFile();
+	WorldCommon.SavePreviewImageIfNot();
 	WorldCommon.SaveWorldTag();
 	
 	if(System.options.mc) then
