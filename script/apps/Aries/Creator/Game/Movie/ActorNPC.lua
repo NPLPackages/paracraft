@@ -1002,7 +1002,6 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then
 			bNeedRefreshModel = true;
 		end
-		
 		entity:SetSkin(skin);
 		entity:SetBlockInRightHand(blockinhand);
 
