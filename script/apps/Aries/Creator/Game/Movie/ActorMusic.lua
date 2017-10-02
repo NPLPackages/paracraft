@@ -127,13 +127,11 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 	if(firstTime > curTime) then
 		return;
 	end
-	
-
-	local activeMovieClip = MovieManager:GetActiveMovieClip();
-	local isPlayingMode = activeMovieClip:GetEntity():IsPlayingMode();
+		
 	local cur_music = BackgroundMusic:GetCurrentMusic();
 	local audio_src = BackgroundMusic:GetMusic(filename);
 	if(audio_src) then
+		local activeMovieClip = MovieManager:GetActiveMovieClip();
 		if( (math.abs(curTime - (self.last_music_time or 0)) > 500) or
 			(self.last_audio_src ~= audio_src or self.last_start_time~=start_time) or 
 			(deltaTime == 0 and activeMovieClip and activeMovieClip:IsPaused()) or 
@@ -145,7 +143,7 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 			if(cur_music ~= audio_src) then
 				BackgroundMusic:SetMusic(audio_src);
 			end
-			if(activeMovieClip:IsPaused()) then
+			if(activeMovieClip and activeMovieClip:IsPaused()) then
 				if(not self.last_is_paused) then
 					audio_src:pause();
 					self.last_is_paused = true;
