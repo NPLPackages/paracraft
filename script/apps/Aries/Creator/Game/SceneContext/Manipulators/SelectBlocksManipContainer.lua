@@ -41,6 +41,34 @@ function SelectBlocksManipContainer:ctor()
 	self.op_mode = "select"; -- select, create, delete
 end
 
+---------------------------------
+-- class AxisManip: draw a readonly axis indicator
+---------------------------------
+NPL.load("(gl)script/ide/System/Scene/Manipulators/TranslateManip.lua");
+local AxisManip = commonlib.inherit(commonlib.gettable("System.Scene.Manipulators.TranslateManip"), {});
+
+function AxisManip:ctor()
+	self:SetFixOrigin(true);
+end
+
+function AxisManip:paintEvent(painter)
+	if(not self.parent.dragging or not self.parent.from_pos or not self.parent.to_pos) then
+		return;
+	end
+	if(self:IsPickingPass()) then
+		return;
+	end
+	-- always draw relative to parent position
+	local cx,cy,cz = self.parent:GetPosition();
+	local to_x, to_y, to_z = BlockEngine:real(unpack(self.parent.to_pos));
+	painter:TranslateMatrix(to_x-cx, to_y-cy, to_z-cz);
+	AxisManip._super.paintEvent(self, painter);
+end
+
+function SelectBlocksManipContainer:createChildren()
+	self.axisManip = AxisManip:new():init(self);
+end
+
 function SelectBlocksManipContainer:mousePressEvent(event)
 	self.isFaceMode = false;
 	self.op_mode = nil;
