@@ -36,8 +36,8 @@ Commands["loadtemplate"] = {
 @param -r: remove blocks
 @param -abspos: whether load using absolute position. 
 @param -tp: whether teleport player to template player's location. 
-@param x,y,z: position or current player position
-@param templatename: relative to current world. the file is at blocktemplates/[templatename].blocks.xml
+@param x,y,z: absolute or relative position, default to current player position
+@param templatename: filename relative to current world or blocktemplates/. If no file extension is specified, [name].blocks.xml is used. 
 default name is "default"
 /loadtemplate ~0 ~2 ~ test
 /loadtemplate -a 3 test
@@ -86,7 +86,7 @@ default name is "default"
 			if(filename=="") then
 				templatename = "default";
 			end
-			if(not filename:match("%.blocks%.xml$")) then
+			if(not filename:match("%.xml$") and not filename:match("%.bmax$")) then
 				filename = filename..".blocks.xml";
 			end
 			local fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
