@@ -2,7 +2,7 @@
 Title: a simple mcml web page browser window
 Author(s): LiXizhi
 Date: 2008/3/10
-Desc: a thin wrapper of PageCtrl in a web browser style API. 
+Desc: a thin wrapper of mcml v1 page or v2 window  in a web browser style API. 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/BrowserWnd.lua");
@@ -25,7 +25,7 @@ NPL.load("(gl)script/kids/3DMapSystemApp/mcml/mcml.lua");
 NPL.load("(gl)script/ide/System/localserver/factory.lua");
 
 --------------------------------------------------------------------
--- a browser window instance: internally it is a PageCtrl
+-- a browser window instance
 --------------------------------------------------------------------
 local BrowserWnd = {
 	-- the top level control name
@@ -48,7 +48,7 @@ local BrowserWnd = {
 	historyFileName = "config/mcmlbrowser_urls.txt";
 	-- max number of history files 
 	max_history_items = 200,
-	-- window object that will be passed to the internal pageCtrl.
+	-- window object that will be passed to the internal v1 page control.
 	window = nil,
 }
 Map3DSystem.mcml.BrowserWnd = BrowserWnd;
@@ -133,7 +133,7 @@ function BrowserWnd:CreateNavBar(_parent, alignment, left, right, width, height)
 	local ctl = CommonCtrl.dropdownlistbox:new{
 		name = self.name.."comboBoxAddress",
 		alignment = "_mt",
-		left = addrLeft,
+		left = 0,
 		top = 5,
 		width = left,
 		height = 24,
@@ -199,17 +199,8 @@ function BrowserWnd:Show(bShow)
 			self:CreateNavBar(_parent, "_mt", 0,top,0,32);
 			top = top+32;
 		end
-		-------------------------
-		-- create PageCtrl 
-		if(self.pageCtrl == nil) then
-			NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
-			self.pageCtrl = Map3DSystem.mcml.PageCtrl:new({
-				url = self.url,
-				OnPageDownloaded = string.format("Map3DSystem.mcml.BrowserWnd.OnPage_CallBack(%q)", self.name),
-				window = self.window,
-			});
-		end	
-		self.pageCtrl:Create(self.name.."_pageCtrl", _parent, "_fi", 0, top, 0, 0);
+		self.clientTop = top;
+
 		UICreated = true;
 	else
 		if(bShow == nil) then
@@ -224,20 +215,85 @@ end
 -- public method
 --------------------------------------
 
+-- create get v1 page
+function BrowserWnd:GetPageRenderer(pageType)
+	pageType = pageType or self.pageType;
+	if(pageType ~= "mcml2") then
+		-- v1
+		self:CloseRendererV2(true)
+		if(not self.pageCtrl ) then
+			NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
+			self.pageCtrl = Map3DSystem.mcml.PageCtrl:new({
+				url = self.url,
+				OnPageDownloaded = string.format("Map3DSystem.mcml.BrowserWnd.OnPage_CallBack(%q)", self.name),
+				window = self.window,
+			});
+			self.pageCtrl:Create(self.name.."_pageCtrl", ParaUI.GetUIObject(self.name), "_fi", 0, self.clientTop or 0, 0, 0);
+		end
+		return self.pageCtrl;
+	else
+		-- v2
+		self:CloseRendererV1(true)
+		if(not self.windowCtrl) then
+			self.windowCtrl = System.Windows.Window:new();
+			self.windowCtrl:Show({url="", alignment="_fi", left=0, top=self.clientTop or 0, width=0, height=0, allowDrag=false, parent = ParaUI.GetUIObject(self.name)});
+			self.windowCtrl:Connect("urlChanged", self, function()
+				BrowserWnd.OnPage_CallBack(self.name);
+			end, "UniqueConnection");
+		end
+		return self.windowCtrl;
+	end
+end
+
+function BrowserWnd:CloseRendererV1(bDestroy)
+	if(self.pageCtrl) then
+		if(self.pageCtrl.OnClose) then
+			self.pageCtrl:OnClose(bDestroy);
+		end
+		self.pageCtrl:Close();
+		self.pageCtrl = nil;
+	end
+end
+
+function BrowserWnd:CloseRendererV2(bDestroy)
+	if(self.windowCtrl) then
+		self.windowCtrl:CloseWindow(bDestroy);
+		self.windowCtrl = nil;
+	end
+end
+
+-- close all v1 and v2 renderers if any. 
+function BrowserWnd:CloseAllRenderers(bDestroy)
+	self:CloseRendererV1(bDestroy)
+	self:CloseRendererV2(bDestroy)
+end
+-- call back function. This function is called by MCMLBrowserWnd whenever OnClose Windows message is received. 
+-- @param bDestroy:
+function BrowserWnd:OnClose(bDestroy)
+	self:CloseAllRenderers(bDestroy);
+end
+
 -- go to a given url, refresh
 -- @param url: if nil it will clear the browser. it can also be string "backward", "forward" which opens last page and forward page. 
 function BrowserWnd:Goto(url, cache_policy, bRefresh)
-	if(self.pageCtrl~= nil) then
-		self.pageCtrl:Goto(url, cachePolicy, bRefresh);
+	local protocol = url and url:match("^(mcml%d?)://");
+	if(protocol) then
+		url = url:gsub("^(mcml%d?://)", "");
+	end
+	self.pageType = protocol;
+	if(protocol == "mcml2") then
+		self:GetPageRenderer():Goto(url);
+	else
+		self:GetPageRenderer():Goto(url, cachePolicy, bRefresh);
 	end
 end
 
 -- return nil or current url 
 function BrowserWnd:GetUrl()
-	if(self.pageCtrl~= nil) then
-		return self.pageCtrl.url;
+	if(self.pageType == "mcml2") then
+		return "mcml2://"..(self:GetPageRenderer().url or "");
 	else
-		return self.url
+		return "mcml1://"..(self:GetPageRenderer().url or "");
 	end
 end
 
@@ -246,15 +302,6 @@ function BrowserWnd:ShowNavBar(bShow)
 	if(self.DisplayNavBar ~= bShow) then
 		self.DisplayNavBar = bShow;
 		ParaUI.GetUIObject(self.name.."navBar").visible = bShow
-		--if(self.pageCtrl) then
-			--local top = 0;
-			--if(bShow)then
-				--top = 32;
-			--end
-			--commonlib.echo({ParaUI.GetUIObject(self.name.."_pageCtrl"):IsValid(), top})
-			--ParaUI.GetUIObject(self.name.."_pageCtrl"):Reposition("_fi", 0, top, 0, 0);
-			--self.pageCtrl:Refresh(0)
-		--end	
 	end
 end
 
@@ -322,10 +369,8 @@ end
 -- replace the context in this window with input mcmlNode. 
 -- @param mcmlNode: must be a raw mcmlNode, such as from a url or local server. 
 function BrowserWnd:open(mcmlNode)
-	if(self.pageCtrl) then
-		self:ShowMessage(nil);
-		self.pageCtrl:Init(mcmlNode, nil, true)
-	end	
+	self:ShowMessage(nil);
+	self:GetPageRenderer():Init(mcmlNode, nil, true)
 end
 
 -- show a message to inform the user about a background action or status. 
@@ -338,15 +383,6 @@ function BrowserWnd:ShowMessage(text)
 	else	
 		_guihelper.MessageBox(text);
 	end	
-end
-
-
--- call back function. This function is called by MCMLBrowserWnd whenever OnClose Windows message is received. 
--- @param bDestroy:
-function BrowserWnd:OnClose(bDestroy)
-	if(self.pageCtrl and self.pageCtrl.OnClose) then
-		self.pageCtrl:OnClose(bDestroy);
-	end
 end
 
 -- navigate to last url
