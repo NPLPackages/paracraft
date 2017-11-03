@@ -35,7 +35,8 @@ Examples:
 /open npl://learn	open NPL code wiki pages
 /open -d temp/
 /open hello.html  open mcml file relative to world or root directory. Page is always center aligned and auto sized.
-/open mcml://hello.html     open with mcml v1
+/open mcml://hello.html     default to open with mcml v1 (may change in future)
+/open mcml1://hello.html    open with mcml v1
 /open mcml2://hello.html    open with mcml v2
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
