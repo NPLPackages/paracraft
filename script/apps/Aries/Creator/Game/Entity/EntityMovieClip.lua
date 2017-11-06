@@ -419,7 +419,7 @@ function Entity:UpdateMovieClipLength(new_length)
 	if(cmds) then
 		local end_cmd_index;
 		for i, cmd in ipairs(cmds) do
-			local time = cmd:match("^/t%s*~?([%d%.]+)");
+			local time = cmd:match("^/t%s*~?([%d%.]+)%s+/end");
 			if(time) then
 				time = tonumber(time);
 				if(time) then
