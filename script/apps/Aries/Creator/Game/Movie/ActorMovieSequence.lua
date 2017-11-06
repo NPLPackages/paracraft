@@ -185,11 +185,10 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 					locked_actor_text = true;
 				end
 			end
+			movieclip:SetTime(localClipTime + movieclip:GetStartTime());
 
 			if(movieclipEntity:HasCamera()) then
 				-- child movie clip contains local camera
-				movieclip:SetTime(localClipTime);
-
 				if(movieclip ~= activeMovieClip and activeMovieClip) then
 					movieclip:UpdateActors(0);
 
@@ -204,7 +203,6 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 					end
 				end
 			else
-				movieclip:SetTime(localClipTime);
 				if(movieclip ~= activeMovieClip) then
 					movieclip:UpdateActors(0);
 				end

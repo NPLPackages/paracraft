@@ -231,7 +231,7 @@ function MovieClip:UpdateDisplayTimeRange(fromTime, toTime)
 	self:timeChanged();
 end
 
--- only for editors, during play mode, start time is always 0. 
+-- at which time to start playing the movie in play and edit mode. default to 0. 
 function MovieClip:GetStartTime()
 	return math.floor(self.entity:GetMovieStartTime() * 1000);
 end
