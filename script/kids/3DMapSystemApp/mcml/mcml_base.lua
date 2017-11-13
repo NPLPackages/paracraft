@@ -1410,8 +1410,9 @@ function mcml.baseNode:DrawDisplayBlock(rootName, bindingContext, _parent, left,
 	-- whether this control takes up space
 	local bUseSpace; 
 	if(css.float) then
-		if(css.width) then
-			if(availWidth<(css.width+margin_left+margin_right)) then
+		local minWidth = css.width or css["min-width"];
+		if(minWidth) then
+			if(availWidth<(minWidth+margin_left+margin_right)) then
 				parentLayout:NewLine();
 			end
 		end	

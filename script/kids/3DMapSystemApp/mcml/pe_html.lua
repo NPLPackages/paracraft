@@ -118,7 +118,6 @@ use the lib:
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_html.lua");
 -------------------------------------------------------
 ]]
-local L = CommonCtrl.Locale("IDE");
 local type = type;
 local mcml_controls = commonlib.gettable("Map3DSystem.mcml_controls");
 
@@ -1057,7 +1056,7 @@ function pe_a.create(rootName,mcmlNode, bindingContext, _parent, left, top, widt
 		if(mcmlNode:GetAttributeWithCode("tooltip")) then
 			_this.tooltip = mcmlNode:GetAttributeWithCode("tooltip")
 		else
-			_this.tooltip = "点击打开:"..href;
+			_this.tooltip = L"点击打开:"..href;
 		end
 			
 		local _targetName = mcmlNode:GetString("target");
