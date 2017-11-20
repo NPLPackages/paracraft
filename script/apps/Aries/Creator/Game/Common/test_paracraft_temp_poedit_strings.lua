@@ -266,6 +266,7 @@ L"告示牌"
 L"命令方块"
 L"电影方块"
 L"电影"
+L"记忆方块"
 L"材质转换器"
 L"梯子"
 L"含羞草"
@@ -628,12 +629,11 @@ L"悬空抬右手"
 L"跑步"
 L"待机休息"
 -- config/Aries/creator/blocktemplates/buildingtask/MovieMaking/info.xml
-L"电影制作"
+L"电影教学"
 -- config/Aries/creator/blocktemplates/buildingtask/newusertutorial/info.xml
 L"新手教学"
 -- config/Aries/creator/blocktemplates/buildingtask/newyearbuilding/info.xml
-L"新年建筑"
 -- config/Aries/creator/blocktemplates/buildingtask/redstone/info.xml
-L"红石电路"
+L"电路教学"
 -- config/Aries/creator/blocktemplates/buildingtask/smallstructure/info.xml
 L"小型建筑"

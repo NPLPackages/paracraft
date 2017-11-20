@@ -91,12 +91,12 @@ function SwitchSkin()
 end
 
 ]]></script>
-<aries:window title="背包" onclose="ClosePage" style="width:430px;height:480px;" mode="thin">
+<aries:window title='<%=L"背包"%>' onclose="ClosePage" style="width:430px;height:480px;" mode="thin">
     <div style="position:relative;margin-top:190px;margin-left:-4px;width:428px;height:1px;"class="mc_line"/>
     <div style="position:relative;margin-top:2px;margin-left:290px;width:1px;height:188px;"class="mc_line"/>
     <div style="float:left;width:290px;height:185px;">
         <pe:if condition="<%= System.options.mc %>">
-            <input type="button" value="改变外貌" style="position:relative;margin-top:5px;margin-left:228px;text-offset-y:-1;height:20px;width:58px;font-size:12px;" onclick="SwitchSkin" class="mc_light_grey_button_with_fillet"/>    
+            <input type="button" value='<%=L"改变外貌"%>' style="position:relative;margin-top:5px;margin-left:228px;text-offset-y:-1;height:20px;min-width:58px;font-size:12px;" onclick="SwitchSkin" class="mc_light_grey_button_with_fillet"/>    
         </pe:if>
         <div style="position:relative;height:30px;">
             <pe:if condition="<%=not DoModifyName() %>">
@@ -106,7 +106,7 @@ end
                 </div>                
             </pe:if>
             <pe:if condition="<%=DoModifyName() %>">
-                <input type="button" onclick="RenameOrSavename" style="position:relative;margin-top:12px;margin-left:195px;width:8px;height:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9);" />
+                <input type="button" onclick="RenameOrSavename" style="position:relative;margin-top:12px;margin-left:195px;width:9px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9);" />
                 <div style="position:relative;margin-top:6px;margin-left:50px;width:140px;text-align:center;color:#ffffff;">
                     <input type="text" name="svr_mark" autofocus="true" value='<%=GetPlayerName() %>' uiname="inventory_player_displayname" rows="1" style="margin-top:0px;margin-left:0px;width:140px;height:22px;" class="mc_text"/>
                 </div>
