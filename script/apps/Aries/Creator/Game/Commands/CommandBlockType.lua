@@ -29,11 +29,12 @@ Commands["block"] = {
 	quick_ref="/block block_id attr_name attr_value", 
 	desc=[[set a block template's attribute 
 @param block_id: block id or name
-@param attr_name: "speedReduction", "visible", etc 
+@param attr_name: "speedReduction", "visible", "light", "lightvalue", etc 
 e.g.
 /block MovieClip visible false     :hide all movie blocks
 /block 8 speedReduction 0.3
-/block 8 speedReduction 0.3
+/block 62 light true
+/block 52 lightvalue 8
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, name, value;
@@ -52,6 +53,14 @@ e.g.
 					elseif(name == "visible") then
 						value, cmd_text = CmdParser.ParseBool(cmd_text);
 						block_template:SetVisible(value);
+					elseif(name == "light") then
+						value, cmd_text = CmdParser.ParseBool(cmd_text);
+						block_template:SetLightValue(value and 15 or 0);
+					elseif(name == "lightvalue") then
+						value, cmd_text = CmdParser.ParseInt(cmd_text);
+						if(value and value>=0 and value<=15) then
+							block_template:SetLightValue(value);
+						end
 					else
 						-- TODO: 
 					end

@@ -109,10 +109,10 @@ function WorldRevision:Backup()
 		ParaIO.CreateDirectory(filename);
 		self:GeneratePackage(filename);
 		LOG.std(nil, "info", "WorldRevision", "save world backup to %s", filename);
-		BroadcastHelper.PushLabel({id="backup", label = format("版本%d 备份完毕", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+		BroadcastHelper.PushLabel({id="backup", label = format(L"版本%d 备份完毕", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	else
 		LOG.std(nil, "error", "WorldRevision", "backup file already exist %s", filename);
-		BroadcastHelper.PushLabel({id="backup", label = format("版本%d 之前备份过了", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+		BroadcastHelper.PushLabel({id="backup", label = format(L"版本%d 之前备份过了", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	end
 end
 

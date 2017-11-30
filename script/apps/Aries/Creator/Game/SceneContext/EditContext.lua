@@ -286,6 +286,11 @@ function EditContext:keyPressEvent(event)
 		return;
 	end
 
+	-- in case there are manipulators, disable all key handlings. 
+	if(self:HasManipulators()) then
+		return;
+	end
+
 	local dik_key = event.keyname;
 	if(dik_key == "DIK_F2") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");

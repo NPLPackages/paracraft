@@ -125,13 +125,13 @@ end
                     <div style='<%=format("float:left;margin-left:10px;color:%s;", Eval("checked") and "#ffffff" or "#808080")%>'>
                         <div align="right" style="position:relative;float:left;width:100px;">
                             <pe:if condition='<%=not Eval("isSystem") %>'>
-                                <input style="color:#808080;margin-right:5px;max-width:45px;" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet" />
+                                <input style="color:#808080;margin-right:5px;min-width:45px;" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet" />
                             </pe:if>
                             <pe:if condition="<%=Eval('homepage')~=false%>">
-                                <input type="button" style="color:#ffffff;max-width:50px;" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"升级"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
+                                <input type="button" style="color:#ffffff;min-width:50px;" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"更新"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
                             </pe:if>
                         </div>
-                        <div>
+                        <div style="max-width:330px">
                             <pe:if condition="<%=Eval('displayName')~=false%>">
                                 <div style="float:left;margin-right:10px;font-weight:bold;"><%=Eval("displayName") %></div>
                             </pe:if>
