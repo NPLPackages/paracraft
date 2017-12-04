@@ -30,7 +30,10 @@ function DS_Items(index)
     if(index == nil) then
         return #BuilderFramePage.Current_Item_DS;
     else
-        return BuilderFramePage.Current_Item_DS[index];
+        local item = BuilderFramePage.Current_Item_DS[index];
+        if(item) then
+            return {block_id = item.block_id};
+        end
     end
 end
 

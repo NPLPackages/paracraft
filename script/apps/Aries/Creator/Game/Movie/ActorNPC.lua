@@ -34,6 +34,8 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorNPC"));
 
 Actor.class_name = "ActorNPC";
+-- asset file is changed
+Actor:Signal("assetfileChanged");
 
 -- recommended to set to true to use script to calculate pose for each frame precisely. 
 local animate_by_script = true;
@@ -156,6 +158,7 @@ function Actor:GetBonesVariable()
 	if(not self.bones_variable) then
 		self.bones_variable = BonesVariable:new():init(self);
 		self:Connect("dataSourceChanged", self.bones_variable, self.bones_variable.LoadFromActor)
+		self:Connect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
 	end
 	return self.bones_variable;
 end
@@ -998,17 +1001,12 @@ function Actor:FrameMovePlaying(deltaTime)
 		obj:SetField("roll", roll or 0);
 		obj:SetField("pitch", pitch or 0);
 		
-		local bNeedRefreshModel;
 		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then
-			bNeedRefreshModel = true;
+			self:assetfileChanged();
 		end
 		entity:SetSkin(skin);
 		entity:SetBlockInRightHand(blockinhand);
 
-		if(bNeedRefreshModel) then
-			entity:RefreshClientModel();
-		end
-		
 		if(anim) then
 			if(anim~=obj:GetField("AnimID", 0)) then
 				obj:SetField("AnimID", anim);

@@ -52,6 +52,11 @@ function BonesVariable:GetAnimInstance()
 	return self.animInstance;
 end
 
+-- this should be called when animation instance's asset file is changed. 
+function BonesVariable:OnAssetFileChanged()
+	self:UnloadCachedVariables();
+end
+
 -- make sure that the low level C++ attributes contains the latest value.
 function BonesVariable:UpdateAnimInstance()
 	local anim = self:GetAnimInstance();
@@ -69,6 +74,14 @@ function BonesVariable:UnbindAnimInstance()
 	animInstance:RemoveAllDynamicFields();
 end
 
+function BonesVariable:UnloadCachedVariables()
+	if(self.bone_count) then
+		self.variables:clear();
+		self.variable_names = nil;
+		self.bone_count = nil;
+	end
+end
+
 -- load data from actor's timeseries to animation instance in C++ side if any 
 function BonesVariable:LoadFromActor()
 	local animInstance = self:GetAnimInstance();
@@ -76,8 +89,7 @@ function BonesVariable:LoadFromActor()
 		return;
 	end
 	animInstance:RemoveAllDynamicFields();
-	self.variables:clear();
-	self.variable_names = nil;
+	self:UnloadCachedVariables();
 
 	local actor = self.actor;
 	local bones = actor:GetTimeSeries():GetChild("bones");
