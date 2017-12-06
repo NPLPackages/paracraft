@@ -409,16 +409,21 @@ end
 function step_class:GetTemplateFilename()
 	if(not self.src_disk and self.parent) then
 		local task = self.parent;
-		local default_src  = commonlib.Encoding.Utf8ToDefault(self.src);
-		local default_name = commonlib.Encoding.Utf8ToDefault(task.name);
-		local default_dir  = task.dir;
-		if(not ParaIO.DoesFileExist(default_src, false)) then
-			default_src = string.format("%s%s",default_dir,default_src);
-			if(not ParaIO.DoesFileExist(default_src, false)) then
-				default_src = task.filepath:gsub("%.xml$", ".blocks.xml");
-				LOG.std(nil, "info", "task_class", "try fixing filename encoding for %s", default_src);
+		local default_src = self.src;
+		if(self.src == "") then
+			default_src  = (task.filepath or self.src):gsub("%.xml$", ".blocks.xml");
+		else
+			default_src  = commonlib.Encoding.Utf8ToDefault(self.src);
+			local default_dir  = task.dir;
+			if(not ParaIO.DoesFileExist(default_src, true)) then
+				default_src = string.format("%s%s",default_dir,default_src);
+				if(not ParaIO.DoesFileExist(default_src, true)) then
+					default_src = task.filepath:gsub("%.xml$", ".blocks.xml");
+					LOG.std(nil, "info", "task_class", "try fixing filename encoding for %s", self.src);
+				end
 			end
 		end
+		
 		self.src_disk = default_src;
 	end
 	return self.src_disk;
@@ -924,7 +929,8 @@ function BuildQuestProvider.LoadFromTemplate(themeKey,themePath)
 				commonlib.partialcopy(tasksDS[#tasksDS],node.attr);
 				tasksDS[#tasksDS].task_index = #tasksDS;
 				local task_index = #tasks+1;
-				tasks[task_index] = task_class:new(node.attr):Init(node, theme, task_index, themeKey);
+				local task = task_class:new(node.attr):Init(node, theme, task_index, themeKey);
+				tasks[task_index] = task;
 				
 				if(themeKey == "blockwiki") then
 					local block_id,task_name = string.match(tasksDS[#tasksDS].name,"(%d*)_(.*)");

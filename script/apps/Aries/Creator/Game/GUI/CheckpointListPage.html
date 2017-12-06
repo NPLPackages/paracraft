@@ -1,0 +1,47 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/CheckpointListPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="">
+            <![CDATA[
+
+            function ClosePage()
+            Page:CloseWindow();
+            end
+            ]]>
+        </script>
+        <pe:container class="mc_border" style="color:#cccccc;">
+            <div width="100%" style="padding:5px;">
+                <div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+                    <pe:mc_block block_id='<%=Game.block_types.names.Checkpoint%>' style="width:32px;height:32px;" />
+                </div>
+                <div style="float:left;width:200px;margin-left:10px;">
+                    <div>
+                        <div style="float:left"><%=L"名称:"%></div>
+                        <%=tostring(L"存盘点")%>
+                    </div>
+                    <div>
+                        <div style="float:left">ID:</div>
+                        <%=tostring(Game.block_types.names.Checkpoint)%>
+                    </div>
+                </div>
+                <div style="float:left;">
+                    <input type="button" name="save" onclick="ClosePage" value='<%=L"关闭"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
+                </div>
+            </div>
+            <div width="100%">
+                <div class="mc_line" width="100%" height="1"></div>
+                <div style="padding:5px;">TODO here: list page here</div>
+                <div>
+
+                </div>
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

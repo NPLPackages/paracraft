@@ -27,6 +27,8 @@ local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.P
 
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Memory.MemoryActor"), commonlib.gettable("MyCompany.Aries.Game.Memory.MemoryActorNPC"));
 Actor:Property("Name", "MemoryActorNPC");
+-- ignore any skin parameter set in the movie block. 
+Actor:Property({"IgnoreSkin", true, "IsIgnoreSkin", "SetIgnoreSkin", auto=true,});
 
 function Actor:ctor()
 end
@@ -144,7 +146,9 @@ function Actor:FrameMovePlaying(deltaTime)
 			bNeedRefreshModel = true;
 		end
 		
-		entity:SetSkin(skin);
+		if(skin and not self:IsIgnoreSkin()) then
+			entity:SetSkin(skin);
+		end
 		entity:SetBlockInRightHand(blockinhand);
 
 		if(bNeedRefreshModel) then
