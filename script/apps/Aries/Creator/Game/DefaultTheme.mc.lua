@@ -114,6 +114,7 @@ function DefaultTheme:Load()
 	_this=ParaUI.GetDefaultObject("button");
 	_this.font = fontStr;
 	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4";
+	-- _guihelper.SetFontColor(_this, "#ffffff");
 	
 	_this=ParaUI.GetDefaultObject("listbox");
 	_this.font = fontStr;

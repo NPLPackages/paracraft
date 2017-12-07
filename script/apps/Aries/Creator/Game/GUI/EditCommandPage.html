@@ -89,7 +89,7 @@ function GetTitle()
 end
 ]]></script>
 <aries:window mode="thin" title='<%=GetTitle()%>' style="width:360px;" onclose="OnClose">
-    <div style="height:320px;margin-right:4px; margin-left:-4px;padding:5px;padding-right:0px;" class="mc_paper_panel" width="100%" >
+    <div style="height:320px;margin-right:4px; margin-left:-4px;padding:5px;" class="mc_paper_panel" width="100%" >
         <pe:if condition='<%=not Eval("isEditing") %>'>
             <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
                 <div style="position:relative;" width="100%" height="100%" onclick="OnEdit" zorder="1"></div>
@@ -107,7 +107,7 @@ end
             </pe:gridview>
         </pe:if>
         <pe:if condition='<%=Eval("isEditing") %>'>
-            <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="15" value='<%=GetEditContent()%>' style="background:;color:#ffffff"></textarea>
+            <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="15" UseSystemControl="true" value='<%=GetEditContent()%>' style="background:;color:#ffffff"></textarea>
         </pe:if>
     </div>
     <div style="margin-top:5px;padding-bottom:10px;">
