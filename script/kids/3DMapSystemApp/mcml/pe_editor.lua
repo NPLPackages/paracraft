@@ -83,6 +83,7 @@ if it is "_mcmlblank", it will be opened in a new popup mcml window.
 | fontsize | font size to use for multiline text. | 
 | css.lineheight | line height for multiline text. |
 | spacing	| for text or button control.  |
+| UseSystemControl | true to use advanced multiple line edit box in new system control |
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_editor.lua");
@@ -1276,6 +1277,7 @@ function pe_editor_text.create(rootName, mcmlNode, bindingContext, _parent, left
 			textcolor = mcmlNode:GetString("textcolor") or css.textcolor,
 			empty_text = mcmlNode:GetAttributeWithCode("EmptyText"),
 			container_bg = "",
+			bUseSystemControl = mcmlNode:GetBool("UseSystemControl"),
 		};
 		local onkeyup = mcmlNode:GetString("onkeyup");
 		if(onkeyup)then

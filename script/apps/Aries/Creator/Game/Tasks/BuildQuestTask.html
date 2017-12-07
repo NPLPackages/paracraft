@@ -373,7 +373,7 @@ end
                 <pe:if condition='<%=Eval("isEditing") %>'>
                     <input type="button" tooltip='<%=L"保存"%>' onclick="OnSaveTaskDesc" style="position:relative;margin-left:5px;margin-top:46px;width:9px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9)"/>    
                     <div style="margin:20px;margin-top:40px;" class="mc_text">
-                        <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="10" value='<%=GetTaskDesc()%>' style="color:#cccccc;background:;" >
+                        <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="10" UseSystemControl="true" value='<%=GetTaskDesc()%>' style="color:#cccccc;background:;" >
                         </textarea>
                     </div>
                     
