@@ -77,6 +77,9 @@ function CommandManager:Init()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMount.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandQuest.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWiki.lua");
+
+	GameLogic.GetFilters():apply_filters("register_command", msg);
+
 	self:Register(SlashCommand.GetSingleton());
 end
 
