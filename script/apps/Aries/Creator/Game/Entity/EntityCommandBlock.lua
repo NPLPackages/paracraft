@@ -72,7 +72,7 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 	-- clear all time event
 	self:ClearTimeEvent();
 
-	-- just in case the command contains variables. 
+	-- just in case wo1the command contains variables. 
 	local variables = (entityPlayer or self):GetVariables();
 	local last_result;
 	local cmd_list = self:GetCommandList();
