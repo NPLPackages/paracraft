@@ -445,6 +445,12 @@ function LocalLoadWorld.CreateWorld(values)
 end
 
 
+function LocalLoadWorld.CloseLastArchive()
+	if(LocalLoadWorld.LastZipFile) then
+		ParaAsset.CloseArchive(LocalLoadWorld.LastZipFile);
+		LocalLoadWorld.LastZipFile = nil;
+	end
+end
 
 function LocalLoadWorld.PreloadWorldHeaders(world)
 	if(not world) then 
@@ -470,7 +476,7 @@ function LocalLoadWorld.PreloadWorldHeaders(world)
 		-- we will open the zip file to access the file, however shall we close the zip file when it is no longer needed. 
 		
 		if(LocalLoadWorld.LastZipFile and LocalLoadWorld.LastZipFile ~= filepath and LocalLoadWorld.LastZipFile~=Map3DSystem.World.worldzipfile) then
-			ParaAsset.CloseArchive(LocalLoadWorld.LastZipFile);
+			LocalLoadWorld.CloseLastArchive();
 		end
 		LocalLoadWorld.LastZipFile = filepath;
 		ParaAsset.OpenArchive(filepath, true);

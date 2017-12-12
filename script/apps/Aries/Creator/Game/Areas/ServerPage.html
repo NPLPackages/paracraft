@@ -214,7 +214,7 @@ end
                     <pe:if condition='<%=isEditServerDetail == true %>'>
                         <input type="button" tooltip='<%=L"保存"%>' onclick="SaveServerDetail" style="position:relative;margin-left:-20px;margin-top:9px;width:9px;height:9px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#495 141 9 9)"/>    
                         <div style="margin-top:5px;width:330px;height:170px;" class="mc_text">
-                            <textarea name="text_server_detail_change" EmptyText="" VerticalScrollBarStep="40" rows="10" value='<%=GetInfo()%>' style="color:#cccccc;background:;" >
+                            <textarea name="text_server_detail_change" EmptyText="" VerticalScrollBarStep="40" rows="8" UseSystemControl="true" value='<%=GetInfo()%>' style="color:#cccccc;background:;" >
                             </textarea>
                         </div>
                     </pe:if>
@@ -228,7 +228,7 @@ end
             </pe:if>
             <pe:if condition='<%=not IsInServer() %>'>
                 <div style="margin-top:5px;width:330px;height:170px;" class="mc_text">
-                    <textarea name="text_server_detail_create" EmptyText="" VerticalScrollBarStep="40" rows="10" value='<%=GetInfo()%>' style="color:#cccccc;background:;" >
+                    <textarea name="text_server_detail_create" EmptyText="" VerticalScrollBarStep="40" rows="8" UseSystemControl="true" value='<%=GetInfo()%>' style="color:#cccccc;background:;" >
                     </textarea>
                 </div>
             </pe:if>

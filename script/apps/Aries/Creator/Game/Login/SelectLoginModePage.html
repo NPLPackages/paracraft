@@ -83,7 +83,7 @@ end
     <div style="margin-top:16px;margin-left:110px;">
         <pe:if condition='<%= System.options.isDevEnv == false %>'>
             <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
-            <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />    
+            <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />
         </pe:if>
         <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
         <pe:if condition='<%= System.options.isDevEnv == true %>'>
@@ -91,7 +91,9 @@ end
                 <%=L"开发者模式" %><br/>
                 <%= GetModDes()%>
             </div>
+            <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:70px" onclick="OnChangeLanguagePage" />
         </pe:if>
+        
     </div>
 </pe:container>
 <!--persistent setting button-->

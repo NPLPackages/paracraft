@@ -106,6 +106,7 @@ function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
 		self:RefreshClientModel(true);
+		return true;
 	end
 end
 

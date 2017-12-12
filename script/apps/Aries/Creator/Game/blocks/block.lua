@@ -359,6 +359,12 @@ function block:SetVisible(bVisible)
 	self:UpdateAttribute("isVisible", bVisible == true)
 end
 
+-- @param nValue: [0-15] a value of 0 means no light. 
+function block:SetLightValue(nValue)
+	self:UpdateAttribute("torchLightValue", tonumber(nValue) or 0);
+end
+
+
 function block:GetSpeedReduction()
 	return self.speedReduction or 1;
 end

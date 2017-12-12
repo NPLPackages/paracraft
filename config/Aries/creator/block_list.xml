@@ -280,10 +280,12 @@ to_id： 可以是一组连续的ID
     <block name="Bone"/>
     <block name="Minimap"/>
     <block name="player_spawn_point"/>
+    <block name="Checkpoint"/>
     <block name="BlockArrow"/>
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
+    
   </category>
 
   <category name="tool" text="工具">

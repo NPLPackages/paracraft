@@ -235,4 +235,5 @@ end
 -- add other unknown text here to be automatically added
 function Translation.ManuallyAddedText()
 	L"点击这里继续";
+	L"点击打开:";
 end

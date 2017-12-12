@@ -57,18 +57,21 @@ end
 
 function block:OnBlockRemoved(x, y, z, last_id, last_data)
 	if(not GameLogic.isRemote) then
-		local op_dir = Direction.directionToOpFacing[getOrientation(last_data)];
-		x = x + Direction.offsetX[op_dir];
-		y = y + Direction.offsetY[op_dir];
-		z = z + Direction.offsetZ[op_dir];
-		local block_id = BlockEngine:GetBlockId(x,y,z);
+		local dir = getOrientation(last_data);
+		if(dir<=5) then
+			local op_dir = Direction.directionToOpFacing[dir];
+			x = x + Direction.offsetX[op_dir];
+			y = y + Direction.offsetY[op_dir];
+			z = z + Direction.offsetZ[op_dir];
+			local block_id = BlockEngine:GetBlockId(x,y,z);
 
-		if (block_id == block_types.names.Piston or block_id == block_types.names.StickyPiston) then
-			local data = BlockEngine:GetBlockData(x,y,z);
+			if (block_id == block_types.names.Piston or block_id == block_types.names.StickyPiston) then
+				local data = BlockEngine:GetBlockData(x,y,z);
 
-			if (block_types.blocks.Piston.isExtended(data)) then
-				block_types.blocks.Piston:DropBlockAsItem(x,y,z);
-				BlockEngine:SetBlockToAir(x,y,z);
+				if (block_types.blocks.Piston.isExtended(data)) then
+					block_types.blocks.Piston:DropBlockAsItem(x,y,z);
+					BlockEngine:SetBlockToAir(x,y,z);
+				end
 			end
 		end
 	end

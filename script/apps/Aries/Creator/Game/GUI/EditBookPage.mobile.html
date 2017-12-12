@@ -92,7 +92,7 @@ end
             </pe:gridview>
         </pe:if>
         <pe:if condition='<%=Eval("isEditing") %>'>
-            <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="15" value='<%=GetEditContent()%>' style="background:;color:#ffffff"></textarea>
+            <textarea name="content" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" rows="15" UseSystemControl="true" value='<%=GetEditContent()%>' style="background:;color:#ffffff"></textarea>
         </pe:if>
     </div>
     <div style="margin-top:5px;padding-bottom:10px;">
