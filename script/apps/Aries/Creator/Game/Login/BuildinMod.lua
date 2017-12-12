@@ -21,7 +21,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"ParaX 3D模型导出", 
 		text=L"系统内置插件",
-		version = "1.1",
+		version = "1.2",
 		homepage = "https://github.com/tatfook/BMaxToParaXExporter",
 	},
 	{
@@ -48,7 +48,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"KeepWork世界分享", 
 		text=L"系统内置插件",
-		version = "1.2",
+		version = "1.3",
 		homepage = "https://github.com/tatfook/WorldShare",
 	},
 	{

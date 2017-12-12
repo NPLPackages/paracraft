@@ -36,10 +36,10 @@ end
 function OpenFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
 		return {
-			{L"全部文件(*.fbx,*.x,*.bmax)",  "*.fbx;*.x;*.bmax"},
+			{L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
-			{L"ParaX模型(*.x)",  "*.x"},
+			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
 		};
 	elseif(filterName == "bmax") then

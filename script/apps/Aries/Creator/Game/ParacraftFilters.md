@@ -72,11 +72,13 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "GetExporters", exporters: file exporters
   - "export_to_file", filename:
   - "select_exporter", id:
-- Networking:
+- command:
+  - "register_command": register additional commands
+- networking:
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
   - "entity_player_mp_other_entity_action_state_updated", entity_player_mp_other: after every time entity action state get updated for EntityPlayerMPOther
   - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
-- Movie: 
+- movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 
