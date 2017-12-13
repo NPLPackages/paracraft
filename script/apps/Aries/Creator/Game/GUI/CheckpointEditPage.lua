@@ -56,9 +56,27 @@ function CheckpointEditPage.GetItemName()
 	end
 end
 
-function CheckpointEditPage.GetCommand()
+function CheckpointEditPage.GetCheckPointCommand()
 	if(cur_entity) then
-		return cur_entity:GetCommand();
+		local cpData = cur_entity:GetBindCheckPoint();
+		if (cpData) then
+			return cpData.attr.cmdList;
+		end
+	end
+end
+
+function CheckpointEditPage.GetCheckpointPos()
+	if(cur_entity) then
+		local cpData = cur_entity:GetBindCheckPoint();
+		if (cpData) then
+			if cpData.attr.x then
+				return string.format("%d %d %d", cpData.attr.x, cpData.attr.y, cpData.attr.z);
+			end
+		end
+		
+		
+		local x,y,z = cur_entity:GetBlockPos();
+		return string.format("%d %d %d", x, y + 1, z);
 	end
 end
 
@@ -81,33 +99,7 @@ function CheckpointEditPage.ShowPage(entity, triggerEntity)
 		cur_entity = entity;
 	end
 	entity:BeginEdit();
-	local params;
-	if(System.options.IsMobilePlatform) then
-		params = {
-			url = format("script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.mobile.html?id=%d", entity:GetBlockId()), 
-			name = "CheckpointEditPage.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			bToggleShowHide=false, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			enable_esc_key = true,
-			bShow = true,
-			click_through = true, 
-			zorder = -1,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			bAutoSize = true,
-			bAutoHeight = true,
-			-- cancelShowAnimation = true,
-			directPosition = true,
-				align = "_ct",
-				x = -280,
-				y = -300,
-				width = 560,
-				height = 600,
-		};
-	else
-		params = {
+	local params = {
 			url = format("script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html?id=%d", entity:GetBlockId()), 
 			name = "CheckpointEditPage.ShowPage", 
 			isShowTitleBar = false,
@@ -129,8 +121,8 @@ function CheckpointEditPage.ShowPage(entity, triggerEntity)
 				y = -250,
 				width = 400,
 				height = 560,
-		};
-	end
+	};
+
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
 		EntityManager.SetLastTriggerEntity(nil);
@@ -148,12 +140,24 @@ end
 function CheckpointEditPage.OnClickOK()
 	local entity = CheckpointEditPage.GetEntity();
 	if(entity) then
-		local command = page:GetValue("command", "")
-		command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
-		entity:SetCommand(command);
+
 		
 		local cpname = page:GetValue("cpname", "")
-		entity:SetCheckpointName(cpname);		
+		entity:SetCheckpointName(cpname);
+		
+		local command = page:GetValue("command", "")
+		command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
+		local posStr = page:GetValue("CheckpointPos", "")
+		
+		local x, y, z, posStr = posStr:match("^([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s*(.*)$");
+		if(x) then
+			x = tonumber(x);
+			y = tonumber(y);
+			z = tonumber(z);
+		end
+		
+		entity:writeCheckPoint({cmdList = command, x = x, y = y, z = z});
+
 		entity:Refresh(true);
 	end
 	page:CloseWindow();
@@ -162,7 +166,7 @@ end
 function CheckpointEditPage.OnClickEmptyRuleSlot(slotNumber)
 	local entity = CheckpointEditPage.GetEntity()
 	if(entity) then
-		local contView = entity.rulebagView;
+		local contView = entity.cmpBagView;
 		if(contView and slotNumber) then
 			local slot = contView:GetSlot(slotNumber);
 			entity:OnClickEmptySlot(slot);

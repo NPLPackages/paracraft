@@ -10,11 +10,27 @@
         <script refresh="false" type="text/npl" src="">
             <![CDATA[
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.lua");
+			EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 			CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
 			CheckpointEditPage.OnInit()
             function ClosePage()
                 Page:CloseWindow();
             end
+			
+			function GetRulebagView()
+				return CheckpointEditPage.GetEntity().cmpBagView;
+			end		
+
+			function DS_Func_Rulebag(index)
+				return GetRulebagView():GetSlotDS(index);
+			end	
+
+			function OnClickEmptyRuleSlot(mcmlNode)
+				local item = mcmlNode:GetPreValue("this", true);
+				if(item and item.slotNumber) then
+					CheckpointEditPage.OnClickEmptyRuleSlot(item.slotNumber);
+				end
+			end			
             ]]>
         </script>
         <pe:container class="mc_border" style="color:#cccccc;">
@@ -38,70 +54,48 @@
             </div>
             <div width="100%">
                 <div class="mc_line" width="100%" height="1"></div>
-					<pe:container style="background:;">
-					<pe:container class="mc_border" style="color:#cccccc;">
+				<div width="100%">
+					<div class="mc_line" width="100%" height="1"></div>
+					<div style="float:left;width:180px;text-align:right;"><%=L"存盘点名称: "%></div>
 					
-					<div width="100%">
-						<div class="mc_line" width="100%" height="1"></div>
-						<div style="text-align:center;padding-left:5px;padding-right:5px;"><%="check name"%></div>
-						<div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
-							<input name="cpname" rows="2" UseSystemControl="true" value='<%=CheckpointEditPage.GetCheckpointName()%>' EmptyText='<%=L"名字..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
-						</div>
-					</div>					
+					<input type="text" name="cpname" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointName()%>' style="width:120px;height:25px"/>
 
-					<pe:if condition='<%=CheckpointEditPage.GetEntity():HasCommand()%>'>
-					<div width="100%">
-						<div class="mc_line" width="100%" height="1"></div>
-						<div style="text-align:center;padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetCommandTitle() or ""%></div>
-						<div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
-							<input name="command" rows="3" UseSystemControl="true" value='<%=CheckpointEditPage.GetCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
-						</div>
-					</div>
-					</pe:if>
-					<pe:if condition='<%=CheckpointEditPage.GetEntity():HasRule()%>'>
-					<div width="100%" >
-						<div class="mc_line" width="100%" height="1"></div>
-						<div style="padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetRuleTitle() or L"规则"%></div>
-						<div>
-							<pe:gridview name="RuleItems" style="height:84px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
-								<Columns>
-									<div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
-										<pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
-									</div>
-								</Columns>
-							</pe:gridview>
-						</div>
-					</div>
-					</pe:if>
-					<pe:if condition='<%=CheckpointEditPage.GetEntity():HasBag()%>'>
-					<div width="100%" style="padding-bottom:5px;">
-						<div class="mc_line" width="100%" height="1"></div>
-						<div style="padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetBagTitle() or ""%></div>
-						<div>
-							<pe:gridview name="InventoryItems" style="height:80px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Inventory%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
-								<Columns>
-									<div style="margin-left:8px;margin-top:4px;font-weight:bold;" class="mc_item">
-										<pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyBagSlot" ContainerView='<%=GetInventoryView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
-									</div>
-								</Columns>
-							</pe:gridview>
-						</div>
-					</div>
-					</pe:if>
-					</pe:container>
-					<pe:if condition='<%=CheckpointEditPage.GetEntity():HasBag() or CheckpointEditPage.GetEntity():HasRule()%>'>
-						<div class="mc_border" style="padding-top:2px;">
-							 <pe:gridview name="MyItems" style="height:42px;" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="0" DefaultNodeHeight = "38" VerticalScrollBarStep="19" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
-								<Columns>
-									<div style="margin-left:8px;margin-top:4px;font-weight:bold;" class="mc_item">
-										<pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' DestInventory='<%=CheckpointEditPage.GetEntity().inventory %>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
-									</div>
-								</Columns>
-							</pe:gridview>
-						</div>
-					</pe:if>
-					</pe:container>	
+				</div>
             </div>
+			
+            <div width="100%">
+                <div class="mc_line" width="100%" height="1"></div>
+				<div width="100%">
+					<div class="mc_line" width="100%" height="1"></div>
+					<div style="float:left;width:180px;text-align:right;"><%=L"触发坐标: "%></div>
+					
+					<input type="text" name="CheckpointPos" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointPos()%>' style="width:120px;height:25px"/>
+
+				</div>
+            </div>			
+			
+			<div width="100%">
+				<div class="mc_line" width="100%" height="1"></div>
+				<div style="text-align:center;padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetCommandTitle2() or ""%></div>
+				<div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
+					<input name="command" rows="3" UseSystemControl="true" value='<%=CheckpointEditPage.GetCheckPointCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
+				</div>
+			</div>
+					
+			<div width="100%" >
+				<div class="mc_line" width="100%" height="1"></div>
+				<div style="padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetRuleTitle2() or L"规则"%></div>
+				<div>
+					<pe:gridview name="RuleItems" style="height:84px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+						<Columns>
+							<div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
+								<pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+							</div>
+						</Columns>
+					</pe:gridview>
+				</div>
+			</div>
+			
         </pe:container>
 		
 

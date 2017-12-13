@@ -50,24 +50,14 @@ Commands["checkpoint"] = {
 				commonlib.echo(string.format("check point name:%s status:%s", v.name, tostring(v.isOpen or false)));
 			end	
 		elseif cp_options == "save" then	
-			local name, posX, posY, posZ, isForce;
+			local name, isUser;
 			name, cmd_text = CmdParser.ParseString(cmd_text);
-			posX, posY, posZ, cmd_text = CmdParser.ParsePos(cmd_text);
-			--isUser, cmd_text = CmdParser.ParseBool(cmd_text);
+			isUser, cmd_text = CmdParser.ParseBool(cmd_text);
 			
-			local cmd_list;
-			if posX then
-				local entity = BlockEngine:GetBlockEntity(posX, posY, posZ);
-				cmd_list = entity:GetCommand()
-			end	
 			local attr = 
 			{
-				x = posX;
-				y = posY + 1;
-				z = posZ;
-				cmdList = cmd_list;
 			}
-			CheckPointIO.write(name, attr, true);
+			CheckPointIO.write(name, attr, isUser or true);
 		elseif cp_options == "load" then	
 			local name;
 			name, cmd_text = CmdParser.ParseString(cmd_text);
@@ -86,15 +76,21 @@ Commands["checkpoint"] = {
 					
 					--local player = EntityManager.GetPlayer();
 					--player:TeleportToBlockPos(ret.attr.x, ret.attr.y + 10, ret.attr.z);
-					
+					local player = EntityManager.GetPlayer();
 					local last_result;
 					if (ret.attr.cmdList) then
-						local player = EntityManager.GetPlayer();
 						if(player) then
 							local cmdList = CommandManager:GetCmdList(ret.attr.cmdList)
 							last_result = CommandManager:RunCmdList(cmdList, player:GetVariables(), self);
 						end
-						
+					end
+					
+					if (ret[1] and ret[1].name == "cmpBag") then
+						player.inventory:Clear();
+						player.inventory:LoadFromXMLNode(ret[1]);
+						player:RefreshRightHand(player:GetInnerObject());
+						local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+						QuickSelectBar.Refresh();						
 					end
 				end
 			end

@@ -31,10 +31,36 @@ local function writeXml(xmlTable, xmlFile)
 end
 
 local function writeXmlElement(xmlTable, name, element)
+	local function moveChild(checkNode)
+		for kkk, vvv in pairs(checkNode.attr) do
+			if type(vvv) == "table" and vvv.isChildXml then
+				
+				checkNode.attr[kkk] = nil;
+				vvv.isChildXml = nil;
+				local isFind = false;
+				for k, v in ipairs(checkNode) do
+					if v.name == vvv.name then
+						checkNode[k] = vvv;
+						isFind = true;
+						break;
+					end
+				end
+				
+				if not isFind then
+					checkNode[#checkNode + 1] = vvv;
+				end	
+				break;
+			end
+		end	
+	end
+	
 	local isFind = false;
 	for k, v in pairs(xmlTable) do
 		if v.name == name then
 			v.attr = element;
+			
+			moveChild(v);
+			
 			isFind = true;
 			break;
 		end
@@ -45,6 +71,7 @@ local function writeXmlElement(xmlTable, name, element)
 		xmlTable[newInx] = {};
 		xmlTable[newInx].name = name;
 		xmlTable[newInx].attr = element;
+		moveChild(xmlTable[newInx]);
 	end
 end
 
@@ -88,17 +115,17 @@ function CheckPointIO.readAll(worldName)
 	end
 	
 	for _, v in pairs(CheckPointIO.user_points) do
-		local existWorldAttr;
+		local existWorldNode;
 		if not CheckPointIO.check_points[v.name] then
 			CheckPointIO.check_points[v.name] = {};
 			CheckPointIO.check_points[v.name].name = v.name;
 			CheckPointIO.check_points[v.name].attr = {};
 		else
-			existWorldAttr = CheckPointIO.check_points[v.name].attr;
+			existWorldNode = CheckPointIO.check_points[v.name];
 		end
 		
-		if(existWorldAttr) then
-			local checkRet = CheckPointIO.checkUser(v.attr, existWorldAttr);
+		if(existWorldNode) then
+			local checkRet = CheckPointIO.checkUser(v, existWorldNode);
 			CheckPointIO.check_points[v.name].isOpen = checkRet;
 		end
 		
@@ -123,7 +150,7 @@ function CheckPointIO._writeWorld()
 end	
 
 function CheckPointIO.write(name, params, isUser)
-	local existWorldAttr;
+	local existWorldNode;
 	if not CheckPointIO.check_points[name] then
 		CheckPointIO.check_points[name] = {};
 		CheckPointIO.check_points[name].name = name;
@@ -132,7 +159,7 @@ function CheckPointIO.write(name, params, isUser)
 		
 		for _, v in pairs(CheckPointIO.world_points) do
 			if name == v.name then
-				existWorldAttr = v.attr;
+				existWorldNode = v;
 				break;
 			end
 		end	
@@ -148,11 +175,9 @@ function CheckPointIO.write(name, params, isUser)
 		end
 	end
 	
-	if(existWorldAttr) then
-		local checkRet = CheckPointIO.checkUser(CheckPointIO.check_points[name].attr, existWorldAttr);
-		if checkRet then
-			CheckPointIO.check_points[v.name].isOpen = checkRet;
-		end
+	if(existWorldNode) then
+		local checkRet = CheckPointIO.checkUser(CheckPointIO.check_points[name], existWorldNode);
+		CheckPointIO.check_points[name].isOpen = checkRet;
 	end
 	
 	if (isUser) then		
@@ -172,8 +197,8 @@ function CheckPointIO.readUser(inx)
 	return CheckPointIO.user_points[inx];
 end
 
-function CheckPointIO.checkUser(userAttr, worldAttr)
-	if userAttr.name == worldAttr.name then
+function CheckPointIO.checkUser(userNode, worldnode)
+	if userNode.name == worldnode.name then
 		return true;
 	else
 		return false;
