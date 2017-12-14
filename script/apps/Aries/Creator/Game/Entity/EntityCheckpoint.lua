@@ -58,10 +58,10 @@ end
 -- virtual function: handle some external input. 
 -- default is do nothing. return true is something is processed. 
 function Entity:OnActivated(triggerEntity)
-	local load_cmd = string.format("/checkpoint load %s", self:GetCheckpointName());
 	local save_cmd = string.format("/checkpoint save %s", self:GetCheckpointName());
-	GameLogic.RunCommand(load_cmd);
+	local load_cmd = string.format("/checkpoint load %s", self:GetCheckpointName());
 	GameLogic.RunCommand(save_cmd);
+	GameLogic.RunCommand(load_cmd);
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
@@ -166,10 +166,9 @@ function Entity:writeCheckPoint(params)
 	
 	local cmpBagNode = self.cmpBag:SaveToXMLNode({name="cmpBag"}, true);
 	
-	params.cmpBag = cmpBagNode;
-	params.cmpBag.isChildXml = true;
+	local childNodes = {[1] = cmpBagNode};
 	
-	CheckPointIO.write(cpName, params, false);
+	CheckPointIO.write(cpName, params, false, childNodes);
 end
 
 -- called when the user clicks on the block

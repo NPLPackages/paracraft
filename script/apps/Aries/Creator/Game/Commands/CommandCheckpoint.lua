@@ -52,12 +52,15 @@ Commands["checkpoint"] = {
 		elseif cp_options == "save" then	
 			local name, isUser;
 			name, cmd_text = CmdParser.ParseString(cmd_text);
-			isUser, cmd_text = CmdParser.ParseBool(cmd_text);
 			
 			local attr = 
 			{
 			}
-			CheckPointIO.write(name, attr, isUser or true);
+			
+			local player = EntityManager.GetPlayer();
+			local bagNode = player.inventory:SaveToXMLNode({name="cmpBag"}, true);
+			local childNodes = {[1] = bagNode};
+			CheckPointIO.write(name, attr, true, childNodes);
 		elseif cp_options == "load" then	
 			local name;
 			name, cmd_text = CmdParser.ParseString(cmd_text);
@@ -71,20 +74,11 @@ Commands["checkpoint"] = {
 			if name then
 				local ret = CheckPointIO.read(name);
 				if ret then
+					local player = EntityManager.GetPlayer();
+					
 					local gotoCmd = string.format("/goto @a %d %d %d", ret.attr.x, ret.attr.y, ret.attr.z);
 					GameLogic.RunCommand(gotoCmd);
-					
-					--local player = EntityManager.GetPlayer();
-					--player:TeleportToBlockPos(ret.attr.x, ret.attr.y + 10, ret.attr.z);
-					local player = EntityManager.GetPlayer();
-					local last_result;
-					if (ret.attr.cmdList) then
-						if(player) then
-							local cmdList = CommandManager:GetCmdList(ret.attr.cmdList)
-							last_result = CommandManager:RunCmdList(cmdList, player:GetVariables(), self);
-						end
-					end
-					
+
 					if (ret[1] and ret[1].name == "cmpBag") then
 						player.inventory:Clear();
 						player.inventory:LoadFromXMLNode(ret[1]);
@@ -92,12 +86,17 @@ Commands["checkpoint"] = {
 						local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 						QuickSelectBar.Refresh();						
 					end
+					
+					
+					local last_result;
+					if (ret.attr.cmdList) then
+						if(player) then
+							local cmdList = CommandManager:GetCmdList(ret.attr.cmdList)
+							last_result = CommandManager:RunCmdList(cmdList, player:GetVariables(), self);
+						end
+					end					
 				end
 			end
-		elseif cp_options == "setLoad" then
-			local loaderInx;
-			loaderInx, cmd_text = CmdParser.ParseString(cmd_text);
-			EntityCheckpoint.setLoadInx(loaderInx);
 		end
 	end,
 };

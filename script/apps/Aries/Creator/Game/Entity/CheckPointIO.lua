@@ -30,36 +30,45 @@ local function writeXml(xmlTable, xmlFile)
 	end	
 end
 
-local function writeXmlElement(xmlTable, name, element)
-	local function moveChild(checkNode)
-		for kkk, vvv in pairs(checkNode.attr) do
-			if type(vvv) == "table" and vvv.isChildXml then
-				
-				checkNode.attr[kkk] = nil;
-				vvv.isChildXml = nil;
-				local isFind = false;
-				for k, v in ipairs(checkNode) do
-					if v.name == vvv.name then
-						checkNode[k] = vvv;
-						isFind = true;
-						break;
+local function attachChildXmlNode(checkNode, childNodes, bNotOverWrite)
+	if childNodes and checkNode then
+		local checkList = {};
+		for index, nowNode in ipairs(checkNode) do
+			checkList[nowNode.name] = index;
+		end
+		
+		for _, linkNode in ipairs(childNodes) do
+			if checkList[linkNode.name] then
+				local inx = checkList[linkNode.name];
+								
+				if bNotOverWrite then
+					if not checkNode[inx].attr then
+						checkNode[inx].attr = linkNode.attr;
+					end	
+					
+					for slotInx, slot in ipairs(linkNode) do
+						local nowSlotNode = checkNode[inx][slotInx];
+						if  not (nowSlotNode and nowSlotNode.attr) then
+							nowSlotNode.attr = slot.attr;
+						end
 					end
+				else	
+					checkNode[inx] = linkNode;
 				end
-				
-				if not isFind then
-					checkNode[#checkNode + 1] = vvv;
-				end	
-				break;
+			else
+				checkNode[#checkNode + 1] = linkNode;
 			end
-		end	
+		end
 	end
-	
+end
+
+local function writeXmlElement(xmlTable, name, element, childNodes)
 	local isFind = false;
 	for k, v in pairs(xmlTable) do
 		if v.name == name then
 			v.attr = element;
 			
-			moveChild(v);
+			attachChildXmlNode(v, childNodes);
 			
 			isFind = true;
 			break;
@@ -71,9 +80,11 @@ local function writeXmlElement(xmlTable, name, element)
 		xmlTable[newInx] = {};
 		xmlTable[newInx].name = name;
 		xmlTable[newInx].attr = element;
-		moveChild(xmlTable[newInx]);
+		attachChildXmlNode(xmlTable[newInx], childNodes);
 	end
 end
+
+
 
 function CheckPointIO.getUserFileName(worldName)
 	local keepWorkUserName;
@@ -109,6 +120,8 @@ function CheckPointIO.readAll(worldName)
 	local userFile = CheckPointIO.getUserFileName(worldName);
 	local user_points = ParaXML.LuaXML_ParseFile(userFile);
 	CheckPointIO.user_points = user_points or {};	
+	
+	CheckPointIO.check_points = {};
 
 	for _, v in pairs(CheckPointIO.world_points) do
 		CheckPointIO.check_points[v.name] = commonlib.deepcopy(v);
@@ -134,8 +147,6 @@ function CheckPointIO.readAll(worldName)
 				CheckPointIO.check_points[v.name].attr[kv] = vv;
 			end
 		end
-		
-
 	end	
 end
 
@@ -149,7 +160,7 @@ function CheckPointIO._writeWorld()
 	writeXml(CheckPointIO.world_points, localFile);			
 end	
 
-function CheckPointIO.write(name, params, isUser)
+function CheckPointIO.write(name, params, isUser, childNodes)
 	local existWorldNode;
 	if not CheckPointIO.check_points[name] then
 		CheckPointIO.check_points[name] = {};
@@ -174,6 +185,7 @@ function CheckPointIO.write(name, params, isUser)
 			CheckPointIO.check_points[name].attr[k] = v;
 		end
 	end
+	attachChildXmlNode(CheckPointIO.check_points[name], childNodes, isUser);
 	
 	if(existWorldNode) then
 		local checkRet = CheckPointIO.checkUser(CheckPointIO.check_points[name], existWorldNode);
@@ -181,10 +193,10 @@ function CheckPointIO.write(name, params, isUser)
 	end
 	
 	if (isUser) then		
-		writeXmlElement(CheckPointIO.user_points, name, params);
+		writeXmlElement(CheckPointIO.user_points, name, params, childNodes);
 		CheckPointIO._writeUser();
 	else
-		writeXmlElement(CheckPointIO.world_points, name, params);
+		writeXmlElement(CheckPointIO.world_points, name, params, childNodes);
 		CheckPointIO._writeWorld();
 	end
 end
