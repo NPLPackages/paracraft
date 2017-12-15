@@ -32,9 +32,9 @@ Commands["sky"] = {
 -- sun size and glow size defaults to 500, 12
 /sky -sun sun_size[10-1000] sun_glow
 /sky -sun 500 12
--- moon size and glow size defaults to 500, 12
+-- moon size and glow size defaults to 500, 100
 /sky -moon moon_size[10-1000] moon_glow
-/sky -moon 500 12
+/sky -moon 500 100
 -- cloud density
 /sky -cloud density[0-1]
 /sky -cloud 0.1
@@ -59,7 +59,7 @@ Commands["sky"] = {
 				local moon_size, moon_glow;
 				moon_size, cmd_text = CmdParser.ParseInt(cmd_text);
 				moon_glow, cmd_text = CmdParser.ParseInt(cmd_text);
-				GameLogic.GetSkyEntity():SetMoonSize(moon_size or 500, moon_glow or 12);
+				GameLogic.GetSkyEntity():SetMoonSize(moon_size or 500, moon_glow or 100);
 			elseif(option == "cloud") then
 				local cloud;
 				cloud, cmd_text = CmdParser.ParseInt(cmd_text);

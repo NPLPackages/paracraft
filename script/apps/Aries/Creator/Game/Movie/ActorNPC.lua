@@ -322,8 +322,21 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					return a.value < b.value;
 				end)
 			end
+			if(assetfile:match("%.bmax$")) then
+				-- we will add some more default values
+				local hasAnims = {};
+				for _, option in ipairs(options) do
+					hasAnims[option.value] = true;
+				end
+				local default_anim_placeholders = {0,4,5,13, 37,38,39,41,42,43,44,45,91,135,153, 154, 155, 156,}
+				for _, animId in ipairs(default_anim_placeholders) do
+					if(not hasAnims[animId]) then
+						options[#options+1] = {value = animId, text = EntityAnimation.GetAnimTextByID(animId)};
+					end
+				end
+			end
 		end
-
+		
 		local title = format(L"起始时间%s, 请输入动画ID或名称:", strTime);
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");

@@ -57,6 +57,7 @@ local id_to_names = {
 	[44] = L"向右游动", 
 	[45] = L"向后游动", 
 	[91] = L"缺省的坐骑", 
+	[135] = L"飞行", 
 	[153] = L"随机待机1", 
 	[154] = L"随机待机2", 
 	[155] = L"随机待机3", 
@@ -65,6 +66,7 @@ local id_to_names = {
 	[20002] = L"坐下", 
 	[20003] = L"选择", 
 }
+
 function EntityAnimation.GetAnimTextByID(id)
 	local text = id_to_names[id or -1];
 	if(text) then

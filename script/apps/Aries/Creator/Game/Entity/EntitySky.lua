@@ -119,7 +119,7 @@ end
 -- set moon size in simulated sky
 function Entity:SetMoonSize(moon_size, moon_glow)
 	local sky = self:GetSkyAttr();
-	sky:SetField("SunSize", {moon_size or 500, moon_glow or 12});
+	sky:SetField("MoonSize", {moon_size or 500, moon_glow or 100});
 end
 
 -- refresh the sky box according to current settings. 
