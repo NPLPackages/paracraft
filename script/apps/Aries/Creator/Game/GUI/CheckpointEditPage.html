@@ -14,11 +14,11 @@
 			CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
 			CheckpointEditPage.OnInit()
             function ClosePage()
-                Page:CloseWindow();
+				CheckpointEditPage.OnClose();
             end
 			
 			function GetRulebagView()
-				return CheckpointEditPage.GetEntity().cmpBagView;
+				return CheckpointEditPage.GetRulebagView();
 			end		
 
 			function DS_Func_Rulebag(index)
@@ -30,75 +30,173 @@
 				if(item and item.slotNumber) then
 					CheckpointEditPage.OnClickEmptyRuleSlot(item.slotNumber);
 				end
+			end	
+
+			function DS_Items(index)
+				local ds = CheckpointEditPage.getCheckPointDs();
+				if ds then
+					if(index == nil) then
+						return #ds;
+					else
+						return ds[index];
+					end
+				end
+			end		
+
+			function CheckPointIsSelected(index)
+				if(CheckpointEditPage.isSelected(index)) then
+					return true;
+				else
+					return false;
+				end
+			end
+
+			function ChangeCheckPoint(name,mcmlNode)
+				local index = mcmlNode:GetAttribute("param1");
+				index = tonumber(index);
+				CheckpointEditPage.SetCurCheckpoint(index);
+			end		
+
+			function OnBind()
+				CheckpointEditPage.OnClickBind();
+			end
+			
+			function OnCreate()
+				CheckpointEditPage.OnClickCreate();
+			end
+
+			function OnUp()
+				CheckpointEditPage.OnClickUp();
+			end
+
+			function OnDown()
+				CheckpointEditPage.OnClickDown();
 			end			
             ]]>
         </script>
         <pe:container class="mc_border" style="color:#cccccc;">
-            <div width="100%" style="padding:5px;">
-                <div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
-                    <pe:mc_block block_id='<%=Game.block_types.names.Checkpoint%>' style="width:32px;height:32px;" />
-                </div>
-                <div style="float:left;width:200px;margin-left:10px;">
-                    <div>
-                        <div style="float:left"><%=L"名称:"%></div>
-                        <%=tostring(L"存盘点")%>
-                    </div>
-                    <div>
-                        <div style="float:left">ID:</div>
-                        <%=tostring(Game.block_types.names.Checkpoint)%>
-                    </div>
-                </div>
-                <div style="float:left;">
-                    <input type="button" name="save" onclick="CheckpointEditPage.OnClickOK" value='<%=L"关闭"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
-                </div>
-            </div>
-            <div width="100%">
-                <div class="mc_line" width="100%" height="1"></div>
-				<div width="100%">
-					<div class="mc_line" width="100%" height="1"></div>
-					<div style="float:left;width:180px;text-align:right;"><%=L"存盘点名称: "%></div>
-					
-					<input type="text" name="cpname" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointName()%>' style="width:120px;height:25px"/>
-
-				</div>
-            </div>
-			
-            <div width="100%">
-                <div class="mc_line" width="100%" height="1"></div>
-				<div width="100%">
-					<div class="mc_line" width="100%" height="1"></div>
-					<div style="float:left;width:180px;text-align:right;"><%=L"触发坐标: "%></div>
-					
-					<input type="text" name="CheckpointPos" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointPos()%>' style="width:120px;height:25px"/>
-
-				</div>
-            </div>			
-			
-			<div width="100%">
-				<div class="mc_line" width="100%" height="1"></div>
-				<div style="text-align:center;padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetCommandTitle2() or ""%></div>
-				<div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
-					<input name="command" rows="3" UseSystemControl="true" value='<%=CheckpointEditPage.GetCheckPointCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
-				</div>
-			</div>
-					
-			<div width="100%" >
-				<div class="mc_line" width="100%" height="1"></div>
-				<div style="padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetRuleTitle2() or L"规则"%></div>
-				<div>
-					<pe:gridview name="RuleItems" style="height:84px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+		
+			<div style="float:left;margin-left:20px;margin-top:10px;width:270px;height:400px;color:#cccccc">
+				<div class="mc_border" style="margin-top:5px;padding:10px;">
+					<div style="float:left;margin-left:20px;color:#ffffff;">
+						ID
+					</div>
+					<div style="float:left;margin-left:80px;color:#ffffff;">
+						<%=L"描述"%>
+					</div>
+			<!--        <div>
+				
+					</div>-->
+					<pe:gridview style="margin-top:5px;height:260px;" name="gvwCheckPoints" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+						DataSource='<%=DS_Items%>'>
 						<Columns>
-							<div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
-								<pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+							<div style="height:32px;">
+								<pe:if condition='<%= CheckPointIsSelected(Eval("index")) == true %>'>
+									<div style="float:left;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= Eval("id") %>
+										</div>
+										<div style="float:left;width:180px;text-align:center;">
+											<%= Eval("name") %>
+										</div>
+									</div>
+								</pe:if>
+								<pe:if condition='<%= CheckPointIsSelected(Eval("index")) == false %>'>
+									<div style="position:relative;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)">
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= Eval("id") %>
+										</div>
+										<div style="float:left;width:180px;text-align:center;">
+											<%= Eval("name") %>
+										</div>
+									</div>
+									<input type="button" onclick="ChangeCheckPoint" name="btn_change" param1='<%=Eval("index") %>' style="position:relative;min-width:200px;background:"/>
+								</pe:if>
 							</div>
 						</Columns>
+						
+						<EmptyDataTemplate>
+						</EmptyDataTemplate>						
 					</pe:gridview>
 				</div>
-			</div>
+			</div>	
 			
-        </pe:container>
-		
+			
+			<div style="float:left;margin-left:10px;margin-top:10px;width:400px;height:400px;">
+				<div width="100%">
+					<div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+						<pe:mc_block block_id='<%=Game.block_types.names.Checkpoint%>' style="width:32px;height:32px;" />
+					</div>
+					<div style="float:left;width:100px;margin-left:10px;">
+						<div>
+							<div style="float:left"><%=L""%></div>
+							<%=tostring(L"存盘点")%>
+						</div>
+					</div>
+					<div style="float:left;">
+						<input type="button" name="save" onclick="CheckpointEditPage.OnClickDelete" value='<%=L"删除"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
+					</div>
+					<div style="float:left;">
+						<input type="button" name="save" onclick="CheckpointEditPage.OnClickSave" value='<%=L"保存"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
+					</div>
+					<div style="float:left;">
+						<input type="button" name="save" onclick="CheckpointEditPage.CloseWindow" value='<%=L"关闭"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
+					</div>					
+				</div>
+			   <div width="100%">
+					<div class="mc_line" width="100%" height="1"></div>
+					<div width="100%">
+						<div class="mc_line" width="100%" height="1"></div>
+						<div style="float:left;width:180px;text-align:right;"><%=L"存盘点名称: "%></div>
+						
+						<input type="text" name="cpname" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointName()%>' style="width:120px;height:25px"/>
 
+					</div>
+				</div>
+				
+				<div width="100%">
+					<div class="mc_line" width="100%" height="1"></div>
+					<div width="100%">
+						<div class="mc_line" width="100%" height="1"></div>
+						<div style="float:left;width:180px;text-align:right;"><%=L"触发坐标: "%></div>
+						
+						<input type="text" name="CheckpointPos" class="mc_text" value='<%=CheckpointEditPage.GetCheckpointPos()%>' style="width:120px;height:25px"/>
+
+					</div>
+				</div>			
+				
+				<div width="100%">
+					<div class="mc_line" width="100%" height="1"></div>
+					<div style="text-align:center;padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetCommandTitle2() or ""%></div>
+					<div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
+						<input name="command" rows="3" UseSystemControl="true" value='<%=CheckpointEditPage.GetCheckPointCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:5px;margin-top:5px;margin-left:4px;margin-right:5px;textcolor:#000000" />
+					</div>
+				</div>
+						
+				<div width="100%" >
+					<div class="mc_line" width="100%" height="1"></div>
+					<div style="padding-left:5px;padding-right:5px;"><%=CheckpointEditPage.GetEntity():GetRuleTitle2() or L"规则"%></div>
+					<div>
+						<pe:gridview name="RuleItems" style="height:200px;" VerticalScrollBarStep="40" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+							<Columns>
+								<div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
+									<pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+								</div>
+							</Columns>
+						</pe:gridview>
+					</div>
+				</div>
+			</div>
+			<div style="height:0px;">
+			<div name="nowBindName" style="margin-left: 20px; margin-top:-75px;float:left;width:280px;text-align:left;"><%=L"当前绑定:" .. (CheckpointEditPage.GetBindName() or L"暂无")%></div>
+			</div>
+			<div style="height:0px;">
+				<input type="button" onclick="OnBind"  value='<%=L"绑定"%>' style="margin-top:-40px;margin-left:20px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+				<input type="button" onclick="OnCreate"  value='<%=L"新增"%>' style="margin-top:-40px;margin-left:10px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+				<input type="button" onclick="OnUp"  value='<%=L"上移"%>' style="margin-top:-40px;margin-left:10px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+				<input type="button" onclick="OnDown"  value='<%=L"下移"%>' style="margin-top:-40px;margin-left:10px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+			</div>		
+        </pe:container>
     </pe:mcml>
 </body>
 </html>

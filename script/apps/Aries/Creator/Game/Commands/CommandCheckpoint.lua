@@ -12,6 +12,9 @@ NPL.load("(gl)script/ide/STL.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CheckPointIO.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCheckpoint.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointListPage.lua");
+
+
 
 
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -24,6 +27,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 
 local CheckPointIO = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CheckPointIO")
+local CheckpointListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointListPage");
 local EntityCheckpoint = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCheckpoint");
 
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
@@ -45,10 +49,7 @@ Commands["checkpoint"] = {
 		local cp_options, cmd_text = CmdParser.ParseString(cmd_text);
 		
 		if cp_options == "list" then
-			CheckPointIO.readAll();
-			for _, v in pairs(CheckPointIO.check_points) do
-				commonlib.echo(string.format("check point name:%s status:%s", v.name, tostring(v.isOpen or false)));
-			end	
+			CheckpointListPage.ShowPage();
 		elseif cp_options == "save" then	
 			local name, isUser;
 			name, cmd_text = CmdParser.ParseString(cmd_text);

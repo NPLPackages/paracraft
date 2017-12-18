@@ -14,7 +14,9 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
+local CheckPointIO = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CheckPointIO");
 
+local cur_checkpoint;
 local cur_entity;
 local page;
 
@@ -22,9 +24,15 @@ function CheckpointEditPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
+function CheckpointEditPage.OnClose()
+    page:CloseWindow();
+	page = nil;
+end
+
 function CheckpointEditPage.GetEntity()
 	return cur_entity;
 end
+
 
 function CheckpointEditPage.GetItemID()
 	if(cur_entity) then
@@ -34,10 +42,42 @@ function CheckpointEditPage.GetItemID()
 	end
 end
 
+function CheckpointEditPage.isSelected(index)
+	if(CheckpointEditPage.select_checkpoint_index == index) then
+		return true;
+	else
+		return false;
+	end	
+end	
+
+
+function CheckpointEditPage.SetCurCheckpoint(index)
+	CheckpointEditPage.select_checkpoint_index = index;
+	cur_checkpoint = CheckPointIO.world_points[index];
+	
+	if cur_checkpoint then
+		local cpData = CheckPointIO.read(cur_checkpoint.name);
+		if cpData and cpData[1] and cpData[1].name == "cmpBag" then
+			if cur_entity then
+				cur_entity.cmpBag:Clear();
+				cur_entity.cmpBag:LoadFromXMLNode(cpData[1]);
+				
+				if page then
+					page:Refresh(0.01);
+				end
+			end
+		end
+	end
+end	
+
+function CheckpointEditPage.GetRulebagView()
+	return cur_entity.cmpBagView;
+end
+
 function CheckpointEditPage.GetItemName()
 	local name;
-	if(CheckpointEditPage.GetEntity()) then
-		name = CheckpointEditPage.GetEntity():GetDisplayName();
+	if(cur_entity) then
+		name = cur_entity:GetDisplayName();
 	end
 	local type_name;
     local block = block_types.get(CheckpointEditPage.GetItemID())
@@ -57,32 +97,35 @@ function CheckpointEditPage.GetItemName()
 end
 
 function CheckpointEditPage.GetCheckPointCommand()
-	if(cur_entity) then
-		local cpData = cur_entity:GetBindCheckPoint();
-		if (cpData) then
-			return cpData.attr.cmdList;
-		end
+	if (cur_checkpoint) then
+		return cur_checkpoint.attr.cmdList;
+	else
+		return "";
 	end
 end
 
 function CheckpointEditPage.GetCheckpointPos()
-	if(cur_entity) then
-		local cpData = cur_entity:GetBindCheckPoint();
-		if (cpData) then
-			if cpData.attr.x then
-				return string.format("%d %d %d", cpData.attr.x, cpData.attr.y, cpData.attr.z);
-			end
+	if (cur_checkpoint) then
+		if cur_checkpoint.attr.x then
+			return string.format("%d %d %d", cur_checkpoint.attr.x, cur_checkpoint.attr.y, cur_checkpoint.attr.z);
 		end
-		
-		
+	elseif (cur_entity) then	
 		local x,y,z = cur_entity:GetBlockPos();
-		return string.format("%d %d %d", x, y + 1, z);
+		return string.format("%d %d %d", x, y + 1, z);		
+	end
+end
+
+function CheckpointEditPage.GetBindName()
+	if(cur_entity) then
+		return cur_entity:GetBindName();
 	end
 end
 
 function CheckpointEditPage.GetCheckpointName()
-	if(cur_entity) then
-		return cur_entity:GetCheckpointName();
+	if cur_checkpoint then
+		return cur_checkpoint.name;
+	elseif cur_entity then
+		return cur_entity:GetDefaultCheckPointName();
 	end
 end
 
@@ -92,12 +135,24 @@ function CheckpointEditPage.ShowPage(entity, triggerEntity)
 	end
 	EntityManager.SetLastTriggerEntity(entity);
 	
-	if(cur_entity~=entity) then
-		if(page) then
-			page:CloseWindow();
-		end
-		cur_entity = entity;
+	CheckpointEditPage.select_checkpoint_index = nil;
+	cur_checkpoint = nil;
+	
+	if(page) then
+		page:CloseWindow();
 	end
+	cur_entity = entity;
+	cur_checkpoint = cur_entity:GetBindCheckPoint();
+	
+	if cur_checkpoint then
+		for inx, wp in ipairs(CheckPointIO.world_points) do
+			if wp.name == cur_checkpoint.name then
+				CheckpointEditPage.SetCurCheckpoint(inx);
+				break;
+			end
+		end
+	end
+
 	entity:BeginEdit();
 	local params = {
 			url = format("script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html?id=%d", entity:GetBlockId()), 
@@ -119,8 +174,8 @@ function CheckpointEditPage.ShowPage(entity, triggerEntity)
 				align = "_ct",
 				x = -200,
 				y = -250,
-				width = 400,
-				height = 560,
+				width = 800,
+				height = 500,
 	};
 
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
@@ -137,14 +192,22 @@ function CheckpointEditPage.CloseWindow()
 	end
 end
 
-function CheckpointEditPage.OnClickOK()
-	local entity = CheckpointEditPage.GetEntity();
+function CheckpointEditPage.OnClickDelete()
+	local entity = cur_entity;
 	if(entity) then
+		local cpname = page:GetValue("cpname", "");
+		if CheckPointIO.writeEmpty(cpname) then
+			if page then
+				page:Refresh(0.01);
+			end
+		end
+	end
+end
 
-		
+function CheckpointEditPage.OnClickSave()
+	local entity = cur_entity;
+	if(entity) then		
 		local cpname = page:GetValue("cpname", "")
-		entity:SetCheckpointName(cpname);
-		
 		local command = page:GetValue("command", "")
 		command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
 		local posStr = page:GetValue("CheckpointPos", "")
@@ -156,15 +219,26 @@ function CheckpointEditPage.OnClickOK()
 			z = tonumber(z);
 		end
 		
-		entity:writeCheckPoint({cmdList = command, x = x, y = y, z = z});
+		entity:writeCheckPoint({cmdList = command, x = x, y = y, z = z}, cpname);
 
 		entity:Refresh(true);
+		
+		cur_checkpoint = CheckPointIO.read(cpname);
+		
+		if cur_checkpoint then
+			for inx, wp in ipairs(CheckPointIO.world_points) do
+				if wp.name == cur_checkpoint.name then
+					CheckpointEditPage.SetCurCheckpoint(inx);
+					break;
+				end
+			end
+		end
 	end
-	page:CloseWindow();
+
 end
 
 function CheckpointEditPage.OnClickEmptyRuleSlot(slotNumber)
-	local entity = CheckpointEditPage.GetEntity()
+	local entity = cur_entity
 	if(entity) then
 		local contView = entity.cmpBagView;
 		if(contView and slotNumber) then
@@ -175,7 +249,7 @@ function CheckpointEditPage.OnClickEmptyRuleSlot(slotNumber)
 end
 
 function CheckpointEditPage.OnClickEmptyBagSlot(slotNumber)
-	local entity = CheckpointEditPage.GetEntity()
+	local entity = cur_entity
 	if(entity) then
 		local contView = entity.inventoryView;
 		if(contView and slotNumber) then
@@ -183,4 +257,52 @@ function CheckpointEditPage.OnClickEmptyBagSlot(slotNumber)
 			entity:OnClickEmptySlot(slot);
 		end
 	end
+end
+
+function CheckpointEditPage.getCheckPointDs()
+	local worldPointDs = {};
+	
+	
+	for kk, vv in ipairs(CheckPointIO.world_points) do
+		worldPointDs[kk] = {};
+		worldPointDs[kk].name = vv.name;
+		worldPointDs[kk].id = kk;
+	end
+	return worldPointDs;
+end
+
+function CheckpointEditPage.OnClickBind()
+	if(cur_entity and cur_checkpoint) then
+		cur_entity:SetBindName(cur_checkpoint.name);
+		if page then
+			page:Refresh(0.01);
+		end
+	end
+end
+
+function CheckpointEditPage.OnClickCreate()
+	CheckpointEditPage.select_checkpoint_index = nil;
+	cur_checkpoint = nil;
+	
+	cur_entity.cmpBag:Clear();
+	--cur_entity:SetCheckpointName();
+	if page then
+		page:Refresh(0.01);
+	end
+end
+
+function CheckpointEditPage.OnClickUp()
+	if CheckpointEditPage.select_checkpoint_index > 1 then
+		CheckPointIO.switchWorldPos(CheckpointEditPage.select_checkpoint_index, CheckpointEditPage.select_checkpoint_index - 1);
+		CheckPointIO._writeWorld();
+		CheckpointEditPage.SetCurCheckpoint(CheckpointEditPage.select_checkpoint_index - 1)
+	end	
+end
+
+function CheckpointEditPage.OnClickDown()
+	if CheckpointEditPage.select_checkpoint_index < #CheckPointIO.world_points then
+		CheckPointIO.switchWorldPos(CheckpointEditPage.select_checkpoint_index, CheckpointEditPage.select_checkpoint_index + 1);
+		CheckPointIO._writeWorld();
+		CheckpointEditPage.SetCurCheckpoint(CheckpointEditPage.select_checkpoint_index + 1)
+	end	
 end

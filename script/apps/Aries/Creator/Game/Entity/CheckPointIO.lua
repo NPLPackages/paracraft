@@ -158,6 +158,30 @@ end
 function CheckPointIO._writeWorld()
 	local localFile = CheckPointIO.getWorldFileName();
 	writeXml(CheckPointIO.world_points, localFile);			
+end
+
+function CheckPointIO.writeEmpty(name)
+	if CheckPointIO.check_points[name] then
+		CheckPointIO.check_points[name] = nil;
+
+		for cpos, v in pairs(CheckPointIO.world_points) do
+			if name == v.name then
+				table.remove(CheckPointIO.world_points, cpos);
+				CheckPointIO._writeWorld();
+				break;
+			end
+		end
+		
+		for cpos, v in pairs(CheckPointIO.user_points) do
+			if name == v.name then
+				table.remove(CheckPointIO.user_points, cpos);
+				CheckPointIO._writeUser();
+				break;
+			end
+		end
+		
+		return true;
+	end
 end	
 
 function CheckPointIO.write(name, params, isUser, childNodes)
@@ -202,7 +226,9 @@ function CheckPointIO.write(name, params, isUser, childNodes)
 end
 
 function CheckPointIO.read(name)
-	return CheckPointIO.check_points[name];
+	if name then
+		return CheckPointIO.check_points[name];
+	end	
 end
 
 function CheckPointIO.readUser(inx)
@@ -214,5 +240,13 @@ function CheckPointIO.checkUser(userNode, worldnode)
 		return true;
 	else
 		return false;
+	end
+end
+
+function CheckPointIO.switchWorldPos(aPos, bPos)
+	if CheckPointIO.world_points[aPos] and CheckPointIO.world_points[bPos] then
+		local remain = CheckPointIO.world_points[aPos];
+		table.remove(CheckPointIO.world_points, aPos);
+		table.insert(CheckPointIO.world_points, bPos, remain);
 	end
 end

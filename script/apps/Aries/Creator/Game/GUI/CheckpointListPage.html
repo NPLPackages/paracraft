@@ -9,10 +9,53 @@
     <pe:mcml>
         <script refresh="false" type="text/npl" src="">
             <![CDATA[
-
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointListPage.lua");
+			EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+			CheckpointListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointListPage");
+			CheckpointListPage.OnInit()
             function ClosePage()
-            Page:CloseWindow();
+				CheckpointListPage.OnClose();
             end
+			
+			function DS_Items(index)
+				local ds = CheckpointListPage.getCheckPointDs();
+				if ds then
+					if(index == nil) then
+						return #ds;
+					else
+						return ds[index];
+					end
+				end
+			end
+
+			function CheckPointIsSelected(index)
+				if(CheckpointListPage.isSelected(index)) then
+					return true;
+				else
+					return false;
+				end
+			end
+
+			function SelectCheckPoint(name,mcmlNode)
+				local index = mcmlNode:GetAttribute("param1");
+				index = tonumber(index);
+				local isOpen = mcmlNode:GetAttribute("param2");				
+				CheckpointListPage.SetCurCheckpoint(index, isOpen);			
+			end
+			
+			function OnGo()
+				if CheckpointListPage.LoadCheckPoint() then
+					ClosePage();
+				end	
+			end
+
+			function ShowStatusStr(isOpen)
+				if isOpen then
+					return "yes";
+				else
+					return "no";
+				end
+			end
             ]]>
         </script>
         <pe:container class="mc_border" style="color:#cccccc;">
@@ -35,12 +78,62 @@
                 </div>
             </div>
             <div width="100%">
-                <div class="mc_line" width="100%" height="1"></div>
-                <div style="padding:5px;">TODO here: list page here</div>
+                <div class="mc_line" width="100%" height="1"></div> 
                 <div>
-
+				
+					<div style="float:left;margin-left:20px;color:#ffffff;">
+						ID
+					</div>
+					<div style="float:left;margin-left:80px;color:#ffffff;">
+						<%=L"描述"%>
+					</div>
+					<div style="float:left;margin-left:100px;color:#ffffff;">
+						<%=L"可选"%>
+					</div>					
+					<pe:gridview style="margin-top:5px;height:260px;" name="gvwCheckPoints" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+						DataSource='<%=DS_Items%>'>
+						<Columns>
+							<div style="height:32px;">
+								<pe:if condition='<%= CheckPointIsSelected(Eval("index")) == true %>'>
+									<div style="float:left;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= Eval("id") %>
+										</div>
+										<div style="float:left;width:180px;text-align:center;">
+											<%= Eval("name") %>
+										</div>
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= ShowStatusStr(Eval("isOpen") or false) %>
+										</div>										
+									</div>
+								</pe:if>
+								<pe:if condition='<%= CheckPointIsSelected(Eval("index")) == false %>'>
+									<div style="position:relative;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:4 4 4 4)">
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= Eval("id") %>
+										</div>
+										<div style="float:left;width:180px;text-align:center;">
+											<%= Eval("name") %>
+										</div>
+										
+										<div style="float:left;margin-left:10px;width:30px;text-align:center;">
+											<%= ShowStatusStr(Eval("isOpen") or false) %>
+										</div>										
+									</div>
+									<input type="button" onclick="SelectCheckPoint" name="btn_change" param1='<%=Eval("index") %>' param2='<%=Eval("isOpen") %>' style="position:relative;min-width:300px;background:"/>
+								</pe:if>
+							</div>
+						</Columns>
+						
+						<EmptyDataTemplate>
+						</EmptyDataTemplate>						
+					</pe:gridview>
                 </div>
             </div>
+			
+			<div style="height:0px;">
+				<input type="button" onclick="OnGo"  value='<%=L"前往"%>' style="margin-top:-40px;margin-left:20px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+			</div>				
         </pe:container>
     </pe:mcml>
 </body>

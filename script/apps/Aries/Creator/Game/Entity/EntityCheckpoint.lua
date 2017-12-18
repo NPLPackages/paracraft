@@ -11,8 +11,10 @@ local EntityCheckpoint = commonlib.gettable("MyCompany.Aries.Game.EntityManager.
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointListPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CheckPointIO.lua");
 
+local CheckpointListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointListPage");
 local CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
 local CheckPointIO = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CheckPointIO");
 			
@@ -58,10 +60,12 @@ end
 -- virtual function: handle some external input. 
 -- default is do nothing. return true is something is processed. 
 function Entity:OnActivated(triggerEntity)
-	local save_cmd = string.format("/checkpoint save %s", self:GetCheckpointName());
-	local load_cmd = string.format("/checkpoint load %s", self:GetCheckpointName());
-	GameLogic.RunCommand(save_cmd);
-	GameLogic.RunCommand(load_cmd);
+	if self.bindName then
+		local save_cmd = string.format("/checkpoint save %s", self.bindName);
+		local load_cmd = string.format("/checkpoint load %s", self.bindName);
+		GameLogic.RunCommand(save_cmd);
+		GameLogic.RunCommand(load_cmd);
+	end
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
@@ -84,31 +88,8 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 end
 
 -- TODO: move this function to `/checkpoint list `
-function Entity:ShowListPage()
-	local params = {
-		url = "script/apps/Aries/Creator/Game/GUI/CheckpointListPage.html", 
-		name = "CheckpointListPage.ShowPage", 
-		isShowTitleBar = false,
-		DestroyOnClose = true,
-		bToggleShowHide=false, 
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
-		enable_esc_key = true,
-		bShow = true,
-		click_through = true, 
-		zorder = -1,
-		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-		bAutoSize = true,
-		bAutoHeight = true,
-		-- cancelShowAnimation = true,
-		directPosition = true,
-			align = "_ct",
-			x = -200,
-			y = -250,
-			width = 400,
-			height = 560,
-	};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
+function Entity:ShowListPage()	
+	CheckpointListPage.ShowPage();
 end
 
 -- the title text to display (can be mcml)
@@ -117,7 +98,7 @@ function Entity:GetCommandTitle2()
 end
 
 function Entity:GetBindCheckPoint()
-	local name = self:GetCheckpointName();
+	local name = self.bindName;
 	local ret = CheckPointIO.read(name);
 	return ret;
 end	
@@ -127,18 +108,17 @@ function Entity:OpenEditor(editor_name, entity)
 	CheckpointEditPage.ShowPage(self, entity);
 end
 
-function Entity:GetCheckpointName()
-	--return self:GetCommand() or "default";
-	if self.bindName then
-		return self.bindName;
-	else
-		local x,y,z = self:GetBlockPos();
-		local defaultName = string.format("cb_%d_%d_%d", x, y, z);
-		return defaultName;
-	end
+function Entity:GetDefaultCheckPointName()
+	local x,y,z = self:GetBlockPos();
+	local defaultName = string.format("cb_%d_%d_%d", x, y, z);
+	return defaultName;
 end
 
-function Entity:SetCheckpointName(cpname)
+function Entity:GetBindName()
+	return self.bindName;
+end
+
+function Entity:SetBindName(cpname)
 	self.bindName = cpname;
 end
 
@@ -153,22 +133,15 @@ function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local attr = node.attr;
 	self.bindName = attr.bindName;
-	
-	local cpName = self:GetCheckpointName();
-	local cpData = CheckPointIO.read(cpName);
-	if cpData and cpData[1] and cpData[1].name == "cmpBag" then
-		self.cmpBag:LoadFromXMLNode(cpData[1]);
-	end	
 end
 
-function Entity:writeCheckPoint(params)
-	local cpName = self:GetCheckpointName();
-	
-	local cmpBagNode = self.cmpBag:SaveToXMLNode({name="cmpBag"}, true);
-	
-	local childNodes = {[1] = cmpBagNode};
-	
-	CheckPointIO.write(cpName, params, false, childNodes);
+function Entity:writeCheckPoint(params, cpName)
+	local cpName = cpName or self:GetBindName();	
+	if cpName then
+		local cmpBagNode = self.cmpBag:SaveToXMLNode({name="cmpBag"}, true);	
+		local childNodes = {[1] = cmpBagNode};	
+		CheckPointIO.write(cpName, params, false, childNodes);
+	end	
 end
 
 -- called when the user clicks on the block
