@@ -74,7 +74,7 @@ function CheckpointListPage.ShowPage()
 			align = "_ct",
 			x = -200,
 			y = -250,
-			width = 400,
+			width = 300,
 			height = 560,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
