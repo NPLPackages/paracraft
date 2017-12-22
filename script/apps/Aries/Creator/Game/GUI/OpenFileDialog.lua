@@ -73,8 +73,9 @@ end
 -- @param default_text: default text to be displayed. 
 -- @param filters: "model", "bmax", "audio", "texture", "xml", nil for any file, or filters table
 -- @param editButton: this can be nil or a function(filename) end or {text="edit", callback=function(filename) end}
+-- @param customInitialdir: this can be nil or a initialdir path
 -- the callback function can return a new filename to be displayed. 
-function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton)
+function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton, customInitialdir)
 	OpenFileDialog.result = nil;
 	OpenFileDialog.text = text;
 	OpenFileDialog.title = title;
@@ -84,6 +85,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 	OpenFileDialog.filters = filters;
 	OpenFileDialog.editButton = editButton;
 	OpenFileDialog.IsSaveMode = IsSaveMode == true;
+	OpenFileDialog.customInitialdir = customInitialdir;
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html", 
@@ -121,14 +123,21 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 			local _, firstFile = next(filelist);
 			
 			if(firstFile and page) then
-				local fileItem = Files.ResolveFilePath(firstFile);
-				if(fileItem and fileItem.relativeToWorldPath) then
-					local filename = fileItem.relativeToWorldPath;
-					params._page:SetValue("text", filename);
+				if OpenFileDialog.customInitialdir then
+					local fileItem = Files.ResolveFilePath(firstFile);
+					if(fileItem and fileItem.relativeToRootPath) then
+						local filename = fileItem.relativeToRootPath;
+						params._page:SetValue("text", filename);
+					end				
+				else
+					local fileItem = Files.ResolveFilePath(firstFile);
+					if(fileItem and fileItem.relativeToWorldPath) then
+						local filename = fileItem.relativeToWorldPath;
+						params._page:SetValue("text", filename);
+					end
 				end
 			end
 			
-			return true;
 		else
 			return false;
 		end
@@ -145,17 +154,25 @@ end
 
 function OpenFileDialog.OnOpenFileDialog()
 	NPL.load("(gl)script/ide/OpenFileDialog.lua");
-
+	local initialdir = OpenFileDialog.customInitialdir or (ParaIO.GetCurDirectory(0)..(GameLogic.GetWorldDirectory() or ""));
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
 		OpenFileDialog.title,
-		ParaIO.GetCurDirectory(0)..(GameLogic.GetWorldDirectory() or ""), 
+		initialdir,
 		OpenFileDialog.IsSaveMode);
 		
 	if(filename and page) then
-		local fileItem = Files.ResolveFilePath(filename);
-		if(fileItem and fileItem.relativeToWorldPath) then
-			local filename = fileItem.relativeToWorldPath;
-			page:SetValue("text", filename);
+		if OpenFileDialog.customInitialdir then
+			local fileItem = Files.ResolveFilePath(filename);
+			if(fileItem and fileItem.relativeToRootPath) then
+				local filename = fileItem.relativeToRootPath;
+				page:SetValue("text", filename);
+			end			
+		else	
+			local fileItem = Files.ResolveFilePath(filename);
+			if(fileItem and fileItem.relativeToWorldPath) then
+				local filename = fileItem.relativeToWorldPath;
+				page:SetValue("text", filename);
+			end
 		end
 	end
 end

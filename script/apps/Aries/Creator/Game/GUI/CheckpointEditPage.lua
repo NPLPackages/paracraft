@@ -9,30 +9,103 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.lua");
 local CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
 CheckpointEditPage.ShowPage(block_entity);
 -------------------------------------------------------
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ShareWorldPage.lua");
 ]]
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local CheckpointEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.CheckpointEditPage");
 local CheckPointIO = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CheckPointIO");
+local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage");
+
+------------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+
+------------------------------------------------------------
 
 local cur_checkpoint;
 local cur_entity;
 local page;
 
+local function getUserPath(worldName)
+	local keepWorkUserName;
+	local loginMain = commonlib.gettable("Mod.WorldShare.login.loginMain");
+	if loginMain then
+		keepWorkUserName = loginMain.username;
+	end	
+	if not keepWorkUserName or keepWorkUserName == "" then
+		keepWorkUserName = "tempUser";
+	end
+	
+	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+	local world_name = worldName or WorldCommon.GetWorldTag("name");
+	local userPath = "temp/saves/" .. keepWorkUserName .. "/" .. world_name .. "/";
+	ParaIO.CreateDirectory(userPath);
+	return userPath;
+end
+	
+local function getWorldPath()
+	local path = GameLogic.current_worlddir .. "mod/";
+	ParaIO.CreateDirectory(path);
+	return path;
+end
+
 function CheckpointEditPage.OnInit()
-	page = document:GetPageCtrl();
+	page = document:GetPageCtrl();	
 end
 
 function CheckpointEditPage.OnClose()
     page:CloseWindow();
 	page = nil;
+	
+	CheckpointEditPage.select_checkpoint_index = nil;
+	cur_checkpoint = nil;
+	CheckpointEditPage.previewImagePath = nil;
+	cur_entity = nil;	
+end
+
+function CheckpointEditPage.snapshot()
+	if cur_checkpoint then
+		ShareWorldPage.TakeSharePageImage();
+		CheckpointEditPage.previewImagePath = ShareWorldPage.GetPreviewImagePath();
+		page:SetUIValue("previewimg", CheckpointEditPage.previewImagePath);
+	end
+end
+
+function CheckpointEditPage.OnSelectImage()
+	local local_filename = "";
+	OpenFileDialog.ShowPage(L"请输入存盘点图片文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
+		if(result and result~="" and result~=local_filename) then
+			CheckpointEditPage.previewImagePath = result;
+			CheckpointEditPage.UpdateImage(true);
+			page:SetUIValue("previewimg", result);
+		end
+	end, local_filename, L"选择图片文件", "texture", nil, nil, getWorldPath())
+end
+
+function CheckpointEditPage.GetPreviewImagePath()
+	if CheckpointEditPage.previewImagePath then
+		if ParaIO.DoesFileExist(CheckpointEditPage.previewImagePath) then
+			return CheckpointEditPage.previewImagePath;
+		end	
+	end
+	return ShareWorldPage.GetPreviewImagePath();
+end
+
+function CheckpointEditPage.UpdateImage(bRefreshAsset)
+	if(page) then
+		local filepath = CheckpointEditPage.GetPreviewImagePath();
+		if(bRefreshAsset) then
+			ParaAsset.LoadTexture("",filepath,1):UnloadAsset();
+		end
+	end
 end
 
 function CheckpointEditPage.GetEntity()
 	return cur_entity;
 end
-
 
 function CheckpointEditPage.GetItemID()
 	if(cur_entity) then
@@ -50,17 +123,25 @@ function CheckpointEditPage.isSelected(index)
 	end	
 end	
 
+function CheckpointEditPage.RefreshPreviewImagePath()
+	if cur_checkpoint and cur_checkpoint.attr.previewImagePath then
+		CheckpointEditPage.previewImagePath = cur_checkpoint.attr.previewImagePath;
+	else
+		CheckpointEditPage.previewImagePath = ShareWorldPage.GetPreviewImagePath();
+	end
+end
 
 function CheckpointEditPage.SetCurCheckpoint(index)
 	CheckpointEditPage.select_checkpoint_index = index;
 	cur_checkpoint = CheckPointIO.world_points[index];
 	
-	if cur_checkpoint then
-		local cpData = CheckPointIO.read(cur_checkpoint.name);
-		if cpData and cpData[1] and cpData[1].name == "cmpBag" then
+	if cur_checkpoint then		
+		if cur_checkpoint[1] and cur_checkpoint[1].name == "cmpBag" then
 			if cur_entity then
 				cur_entity.cmpBag:Clear();
-				cur_entity.cmpBag:LoadFromXMLNode(cpData[1]);
+				cur_entity.cmpBag:LoadFromXMLNode(cur_checkpoint[1]);
+				
+				CheckpointEditPage.RefreshPreviewImagePath();
 				
 				if page then
 					page:Refresh(0.01);
@@ -100,18 +181,12 @@ function CheckpointEditPage.GetCheckPointCommand()
 	if (cur_checkpoint) then
 		return cur_checkpoint.attr.cmdList;
 	else
-		return "";
-	end
-end
-
-function CheckpointEditPage.GetCheckpointPos()
-	if (cur_checkpoint) then
-		if cur_checkpoint.attr.x then
-			return string.format("%d %d %d", cur_checkpoint.attr.x, cur_checkpoint.attr.y, cur_checkpoint.attr.z);
+		if (cur_entity) then	
+			local x,y,z = cur_entity:GetBlockPos();
+			return string.format("/goto %d %d %d", x, y + 1, z);
+		else
+			return "";
 		end
-	elseif (cur_entity) then	
-		local x,y,z = cur_entity:GetBlockPos();
-		return string.format("%d %d %d", x, y + 1, z);		
 	end
 end
 
@@ -135,16 +210,14 @@ function CheckpointEditPage.ShowPage(entity, triggerEntity)
 	end
 	EntityManager.SetLastTriggerEntity(entity);
 	
-	CheckpointEditPage.select_checkpoint_index = nil;
-	cur_checkpoint = nil;
-	
 	if(page) then
-		page:CloseWindow();
+		CheckpointEditPage.OnClose();
 	end
 	cur_entity = entity;
 	cur_checkpoint = cur_entity:GetBindCheckPoint();
 	
 	if cur_checkpoint then
+		CheckpointEditPage.previewImagePath = cur_checkpoint.attr.previewImagePath;
 		for inx, wp in ipairs(CheckPointIO.world_points) do
 			if wp.name == cur_checkpoint.name then
 				CheckpointEditPage.SetCurCheckpoint(inx);
@@ -210,16 +283,13 @@ function CheckpointEditPage.OnClickSave()
 		local cpname = page:GetValue("cpname", "")
 		local command = page:GetValue("command", "")
 		command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
-		local posStr = page:GetValue("CheckpointPos", "")
 		
-		local x, y, z, posStr = posStr:match("^([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s*(.*)$");
-		if(x) then
-			x = tonumber(x);
-			y = tonumber(y);
-			z = tonumber(z);
+		if CheckpointEditPage.previewImagePath ==  ShareWorldPage.GetPreviewImagePath() then
+			CheckpointEditPage.previewImagePath = getWorldPath() .. cpname .. "auto.jpg";
+			ParaIO.CopyFile(ShareWorldPage.GetPreviewImagePath(), CheckpointEditPage.previewImagePath, true);
 		end
 		
-		entity:writeCheckPoint({cmdList = command, x = x, y = y, z = z}, cpname);
+		entity:writeCheckPoint({cmdList = command, previewImagePath = CheckpointEditPage.previewImagePath}, cpname);
 
 		entity:Refresh(true);
 		
@@ -238,25 +308,16 @@ function CheckpointEditPage.OnClickSave()
 end
 
 function CheckpointEditPage.OnClickEmptyRuleSlot(slotNumber)
+--[[
 	local entity = cur_entity
 	if(entity) then
 		local contView = entity.cmpBagView;
 		if(contView and slotNumber) then
 			local slot = contView:GetSlot(slotNumber);
-			entity:OnClickEmptySlot(slot);
-		end
-	end
-end
 
-function CheckpointEditPage.OnClickEmptyBagSlot(slotNumber)
-	local entity = cur_entity
-	if(entity) then
-		local contView = entity.inventoryView;
-		if(contView and slotNumber) then
-			local slot = contView:GetSlot(slotNumber);
-			entity:OnClickEmptySlot(slot);
 		end
 	end
+--]]	
 end
 
 function CheckpointEditPage.getCheckPointDs()

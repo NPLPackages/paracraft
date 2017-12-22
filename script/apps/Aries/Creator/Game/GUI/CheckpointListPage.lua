@@ -36,6 +36,14 @@ function CheckpointListPage.isSelected(index)
 	end	
 end
 
+function CheckpointListPage.GetPreviewImagePath(cpname)
+	local cpData = CheckPointIO.read(cpname);
+	if cpData and cpData.attr.previewImagePath then
+		return cpData.attr.previewImagePath;
+	end
+	--return ParaWorld.GetWorldDirectory().."preview.jpg";
+end
+
 function CheckpointListPage.getCheckPointDs()
 	local worldPointDs = {};
 	
@@ -74,8 +82,8 @@ function CheckpointListPage.ShowPage()
 			align = "_ct",
 			x = -200,
 			y = -250,
-			width = 300,
-			height = 560,
+			width = 800,
+			height = 500,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
@@ -91,9 +99,9 @@ end
 function CheckpointListPage.SetCurCheckpoint(index, isOpen)
 	CheckpointListPage.select_checkpoint_index = index;
 	CheckpointListPage.select_checkpoint_open = isOpen;
-	if page then
-		page:Refresh(0.01);
-	end	
+	--if page then
+	--	page:Refresh(0.01);
+	--end	
 end
 
 function CheckpointListPage.LoadCheckPoint()

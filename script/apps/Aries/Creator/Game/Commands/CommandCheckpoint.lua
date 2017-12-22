@@ -76,9 +76,6 @@ Commands["checkpoint"] = {
 				local ret = CheckPointIO.read(name);
 				if ret then
 					local player = EntityManager.GetPlayer();
-					
-					local gotoCmd = string.format("/goto @a %d %d %d", ret.attr.x, ret.attr.y, ret.attr.z);
-					GameLogic.RunCommand(gotoCmd);
 
 					if (ret[1] and ret[1].name == "cmpBag") then
 						player.inventory:Clear();
@@ -87,8 +84,7 @@ Commands["checkpoint"] = {
 						local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 						QuickSelectBar.Refresh();						
 					end
-					
-					
+
 					local last_result;
 					if (ret.attr.cmdList) then
 						if(player) then

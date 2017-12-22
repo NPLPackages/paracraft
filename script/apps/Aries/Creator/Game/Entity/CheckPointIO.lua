@@ -49,7 +49,8 @@ local function attachChildXmlNode(checkNode, childNodes, bNotOverWrite)
 					for slotInx, slot in ipairs(linkNode) do
 						local nowSlotNode = checkNode[inx][slotInx];
 						if  not (nowSlotNode and nowSlotNode.attr) then
-							nowSlotNode.attr = slot.attr;
+							checkNode[inx][slotInx] = {};
+							checkNode[inx][slotInx].attr = slot.attr;
 						end
 					end
 				else	
