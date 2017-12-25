@@ -108,7 +108,9 @@ function CheckpointListPage.LoadCheckPoint()
 	if CheckpointListPage.select_checkpoint_open then
 		local cpData = CheckPointIO.world_points[CheckpointListPage.select_checkpoint_index];
 		if cpData then
+			local save_cmd = string.format("/checkpoint save %s", cpData.name);
 			local load_cmd = string.format("/checkpoint load %s", cpData.name);
+			GameLogic.RunCommand(save_cmd);
 			GameLogic.RunCommand(load_cmd);
 			return true;
 		end
