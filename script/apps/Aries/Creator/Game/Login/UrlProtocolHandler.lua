@@ -4,8 +4,8 @@ Author(s): LiXizhi
 Date: 2016/1/19
 Desc: singleton class
 
----++ paracraft://cmd/loadworld/[url_filename]
-paracraft://cmd/loadworld/https://github.com/LiXizhi/HourOfCode/archive/master.zip
+## paracraft://cmd/loadworld/[url_filename]
+`paracraft://cmd/loadworld/https://github.com/LiXizhi/HourOfCode/archive/master.zip`
 
 Use Lib:
 -------------------------------------------------------
@@ -23,7 +23,9 @@ local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlP
 function UrlProtocolHandler:ParseCommand(cmdline)
 	local cmdline = cmdline or ParaEngine.GetAppCommandLine();
 	local urlProtocol = string.match(cmdline or "", "paracraft://(.*)$");
+
 	if(urlProtocol) then
+
 		NPL.load("(gl)script/ide/Encoding.lua");
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);
 		LOG.std(nil, "info", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
