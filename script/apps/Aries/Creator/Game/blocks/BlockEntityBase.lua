@@ -53,6 +53,7 @@ function block:OnBlockAdded(x,y,z, block_data, serverdata)
 	if(not entity) then
 		entity = self:CreateBlockEntity(x,y,z,block_data, serverdata);
 		-- LOG.std(nil, "debug", "BlockEntityBase", "OnBlockAdded block %d: %d %d %d", self.id, x, y, z);
+		GameLogic.GetFilters():apply_filters("block_entity_base_on_block_added", self, x, y, z);
 	end
 	if(entity) then
 		entity:OnBlockAdded(x,y,z, block_data, serverdata);
@@ -65,6 +66,7 @@ function block:OnBlockLoaded(x,y,z, block_data)
 		entity = self:CreateBlockEntity(x,y,z, block_data);
 	end
 	if(entity) then
+		GameLogic.GetFilters():apply_filters("block_entity_base_on_block_loaded", self, x, y, z);
 		entity:OnBlockLoaded(x,y,z, block_data);
 	end
 end

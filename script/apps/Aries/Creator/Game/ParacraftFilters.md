@@ -38,6 +38,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "block_list", xmlRoot: for registering new item type in builder GUI
   - "block_types_template", xmlRoot: for registering or modify block type's template
   - "register_item": for registering new item type in client
+  - "block_entity_base_on_block_added", self, x, y, z: called after new entity based block added into world
+  - "block_entity_base_on_block_loaded", self, x, y, z: called after new entity based block loaded into world
 - user input mouse and keyboard:
   - "DefaultContext", context, mode: getting the default scene context for user input
 - GUI:
