@@ -48,7 +48,7 @@ other files...
 		elseif(filename:match("%.blocks%.stream%.xml$")) then
 			DragDropHandlers.handleBlockStreamFile(filename)
 		elseif(ext == "fbx" or ext == "x" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
-			DragDropHandlers.handleModelFile(filename);
+			DragDropHandlers.handleModelFile(filename, ext);
 		end
 	end,
 };
@@ -169,7 +169,7 @@ function DragDropHandlers.SendFileToSceneContext(filename, fileType)
 	end
 end
 
-function DragDropHandlers.handleModelFile(filename)
+function DragDropHandlers.handleModelFile(filename, ext)
 	if(not System.options.is_mcworld) then
 		return;
 	end
@@ -182,6 +182,14 @@ function DragDropHandlers.handleModelFile(filename)
 		
 		local function CopyFiles()
 			local res = ParaIO.CopyFile(filename, destfile, true);
+			if(ext == "fbx") then
+				-- also copy the xml file associated with the fbx if any
+				local xmlFile = filename:gsub("%.%w%w%w$", ".xml");
+				if(Files.FileExists(xmlFile)) then
+					local destXmlFile = destfile:gsub("%.%w%w%w$", ".xml");
+					res = ParaIO.CopyFile(xmlFile, destXmlFile, true) and res;
+				end
+			end
 			return res;
 		end
 

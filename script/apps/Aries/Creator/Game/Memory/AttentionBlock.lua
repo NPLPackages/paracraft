@@ -11,6 +11,8 @@ local AttentionBlock = commonlib.gettable("MyCompany.Aries.Game.Memory.Attention
 ]]
 NPL.load("(gl)script/ide/System/Scene/Overlays/ShapesDrawer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/AttentionBase.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/PatternBlockEdge.lua");
+local PatternBlockEdge = commonlib.gettable("MyCompany.Aries.Game.Memory.PatternBlockEdge");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
 local AttentionBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Memory.AttentionBase"), commonlib.gettable("MyCompany.Aries.Game.Memory.AttentionBlock"));
@@ -18,6 +20,8 @@ AttentionBlock:Property("Name", "AttentionBlock");
 AttentionBlock:Property({"render_size", 0.2});
 
 function AttentionBlock:ctor()
+	-- self.edges = {}
+	-- self.view_direction
 end
 
 function AttentionBlock:init(bx, by, bz)
@@ -37,4 +41,12 @@ function AttentionBlock:Draw(painter, visionContext)
 	local x, y, z = self.bx-rx, self.by-ry, self.bz-rz;
 	painter:SetBrush(self:GetPowerColor());
 	ShapesDrawer.DrawCube(painter, x * BlockEngine.blocksize, y * BlockEngine.blocksize, z * BlockEngine.blocksize, self.render_size)
+
+	if(self.edges) then
+		for _, edge in ipairs(self.edges) do
+			if(edge == PatternBlockEdge.face_bottom) then
+				
+			end
+		end
+	end
 end

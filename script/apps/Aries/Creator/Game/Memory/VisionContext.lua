@@ -8,10 +8,12 @@ Each object in the vision context has an attention value, the more memory matche
 But attention value of objects also decays fast and only last a few frames if no matched. 
 Each object is also linked with matching memory clips. 
 
-This is what the player can detect from its recent viewpoints and standing position.
-For example, only the front of a wall or top of the floor blocks are included in the vision context. 
-Some block with bmax, or scene entities may have more attentions that others in the vision context. 
-
+The following things will affect block attention in decreasing order:
+- the player position and facing: block faces and edges close to the player viewpoint has greater attention.
+- Eye attention: any activated movie clip that has recently applied to the vision context get the eye attention. Eye attention will usually last 1 or 2 seconds
+- Block pattern recognition: block patterns that has more valid matches to memory movie clips get higher attention. 
+- Entity pattern: Some block with bmax, or scene entities may have more attentions that others in the vision context. 
+- Blocks near the mouse cursor usually have more attention, but it is not menditoray. 
 
 use the lib:
 -------------------------------------------------------
@@ -44,6 +46,10 @@ function VisionContext:ctor()
 	-- attentioned objects 
 	self.attention_blocks = {};
 	self.attention_entites = {};
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/PatternGenBlocks.lua");
+	local PatternGenBlocks = commonlib.gettable("MyCompany.Aries.Game.Memory.PatternGenBlocks");
+	self.pattern_genBlocks = PatternGenBlocks:new();
 end
 
 -- this should be called every frame to decay attention values. 
@@ -68,6 +74,8 @@ function VisionContext:Update(playerContext)
 	self:DecreaseOutOfViewPower(eye_x, eye_y, eye_z, viewDist)
 	self:AddPowerToVisibleObject(eye_x, eye_y, eye_z, lookat_dir, viewDist)
 	self:CleanUnusedAttentionBlocks();
+
+	self.pattern_genBlocks:Generate(self.attention_blocks, eye_x, eye_y, eye_z, lookat_dir, viewDist-2);
 end
 
 function VisionContext:DecreaseOutOfViewPower(eye_x, eye_y, eye_z, viewDist)

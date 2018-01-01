@@ -35,6 +35,11 @@ function DefaultFilters.worldFileChanged(msg)
 			isAsset = true;
 		elseif(ext == "png" or ext == "jpg") then
 			isAsset = true;
+		elseif(ext == "xml") then
+			local filename = msg.fullname:gsub("xml$", "x");
+			if(ParaIO.DoesFileExist(filename, false)) then
+				isAsset = true;
+			end
 		end	
 		if(isAsset) then
 			if(ParaAsset.Refresh(msg.fullname)) then
