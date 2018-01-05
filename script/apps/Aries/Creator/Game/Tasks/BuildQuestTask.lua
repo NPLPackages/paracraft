@@ -116,6 +116,7 @@ function BuildQuest:RegisterHooks()
 	if(not System.options.IsMobilePlatform) then
 		QuickSelectBar.BindProgressBar(self);
 	end
+	GameLogic.GetFilters():add_filter("blockengine_setblock", BuildQuest.OnSetBlock);
 end
 
 function BuildQuest:UnregisterHooks()
@@ -124,6 +125,7 @@ function BuildQuest:UnregisterHooks()
 	if(not System.options.IsMobilePlatform) then
 		QuickSelectBar.BindProgressBar(nil);
 	end
+	GameLogic.GetFilters():remove_filter("blockengine_setblock", BuildQuest.OnSetBlock);
 end
 
 -- handle click once deploy via the template interface, instead of the task interface.  
@@ -191,6 +193,58 @@ function BuildQuest:Run()
 	-- BuildQuest.ShowPage();
 
 	self:StartEditing();
+end
+
+function BuildQuest.OnSetBlock(x,y,z,block_id, block_data)
+	if(cur_instance) then
+		local self = cur_instance;
+		if not self.buildingBlocks then
+			self.buildingBlocks = {};
+		end
+		local sparse_index =x*30000*30000+y*30000+z;
+		
+		if block_id == 0 then
+			self.buildingBlocks[sparse_index] = nil;
+		else
+			self.buildingBlocks[sparse_index] = {x, y, z, block_id, block_data};	
+		end
+
+	end
+end
+
+function BuildQuest.onFinishedCustomBuild()
+	if(cur_instance) then
+		local self = cur_instance;
+		if self.isCustomBuild then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+			
+			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+			
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			
+			local fileName = format("%s%s", Files.getUserFolder(), self.finished_name);
+
+			local params = {}
+
+			local saveBlocks = {};
+			local px, py, pz = EntityManager.GetPlayer():GetBlockPos()
+			
+			if self.buildingBlocks then
+				for _, b in pairs(self.buildingBlocks) do
+					b[1] = b[1] - px;
+					b[2] = b[2] - py;
+					b[3] = b[3] - pz;
+					saveBlocks[#saveBlocks + 1] = b;	
+				end
+			end
+			
+			local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = fileName, params = params, blocks = saveBlocks})
+			task:Run();
+			
+			local cache = Files:GetFileCache();
+			cache[self.finished_name] = nil;
+		end
+	end
 end
 
 -- whether current task has been finished before
@@ -324,6 +378,7 @@ function BuildQuest.EndEditing(bCommitChange)
 		self:UnregisterHooks();
 		self:ResetHints();
 		self.finished = true;
+		self.buildingBlocks = nil;
 		cur_instance = nil;
 		local profile = UserProfile.GetUser();
 		profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "end",});
@@ -476,7 +531,7 @@ function BuildQuest:FinishBlock(block, i)
 		end
 	end
 
-	if(self.bom:IsFinished()) then
+	if(self.bom:IsFinished() and self.isFree ~= true) then
 		self:OnDoNextStep();
 	end
 end
@@ -484,6 +539,7 @@ end
 function BuildQuest:OnFinished()
 	local profile = UserProfile.GetUser();
 	profile:FinishBuilding(self.task:GetThemeID(), self.task:GetIndex(),HelpPage.cur_category);
+	BuildQuest.onFinishedCustomBuild();
 	self:OnExit();
 end
 

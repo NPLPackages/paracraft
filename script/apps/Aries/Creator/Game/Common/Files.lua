@@ -28,6 +28,9 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
+--
+Files.prioritySearchDatas = {};
+
 -- @param filename: the filename maybe relative to the current world or the SDK root. 
 -- in case it is relative to the world, we will return a path relative to SDK root. 
 -- @param search_folder: if nil, it is current world directory, otherwise, one can specify an additional search folder in addition to current world directory. 
@@ -39,7 +42,15 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 		if(any_filename:match("^/\\")) then
 			any_filename = any_filename:gsub("^/\\+", "");
 		end
-		if(not ParaIO.DoesAssetFileExist(any_filename, true)) then
+		
+		for _, searchData in ipairs(Files.prioritySearchDatas) do
+			local filename = searchData.path .. any_filename;
+			if(ParaIO.DoesAssetFileExist(filename, true)) then
+				return filename;
+			end		
+		end
+		
+		if(not ParaIO.DoesAssetFileExist(any_filename, true)) then			
 			local filename = GameLogic.GetWorldDirectory()..any_filename;
 			if(ParaIO.DoesAssetFileExist(filename, true)) then
 				any_filename = filename;
@@ -146,6 +157,31 @@ function Files.GetFilePath(filename)
 	end
 end
 
+function Files.getUserFolder()
+	local keepWorkUserName;
+	local loginMain = commonlib.gettable("Mod.WorldShare.login.loginMain");
+	if loginMain then
+		keepWorkUserName = loginMain.username;
+	end	
+	if not keepWorkUserName or keepWorkUserName == "" then
+		keepWorkUserName = "0";
+	end
+	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+	local world_name = WorldCommon.GetWorldTag("name");
+	local folder = "temp/saves/" .. keepWorkUserName .. "/" .. world_name .. "/";
+
+	return folder;
+end
+
+function Files.AddPrioritySearchPath(searchpath, priority)
+	local datas = Files.prioritySearchDatas;
+	datas[#datas + 1] = {path = searchpath, priority = priority or 0};
+	local function sortFunc(a, b)
+		return a.priority >= b.priority;
+	end
+	table.sort(datas, sortFunc);
+end	
+
 
 -- find a given file by its file path. 
 -- see also: Files.GetCachedFilePath()
@@ -154,10 +190,16 @@ end
 -- @param searchpaths: nil or additional search path seperated by ";". such as such as "Texture/blocks/human/"
 -- @return the real file or nil if not exist 
 function Files.FindFile(filename, searchpaths)
+	if not Files.hasAddUserFolder then
+		Files.AddPrioritySearchPath(Files.getUserFolder());
+		Files.hasAddUserFolder = true;
+	end	
+	
 	if(not filename) then
 		return;
 	end
 	local filepath = Files:GetFileFromCache(filename);
+		
 	if(not filepath) then
 		filepath = Files.GetWorldFilePath(filename, searchpaths);
 		if(filepath) then

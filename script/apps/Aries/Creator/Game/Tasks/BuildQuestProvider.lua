@@ -242,10 +242,12 @@ function bom_class:Init(filename, parent)
 	end
 	if(xmlRoot) then
 		local template_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
-		self.player_pos = template_node.attr.player_pos;
-		self.pivot = template_node.attr.pivot;
-		self.name = template_node.attr.name;
-
+		if template_node.attr then
+			self.player_pos = template_node.attr.player_pos;
+			self.pivot = template_node.attr.pivot;
+			self.name = template_node.attr.name;
+		end
+		
 		local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate/pe:blocks");
 		if(node and node[1]) then
 			local blocks = NPL.LoadTableFromString(node[1]) or {};
@@ -399,6 +401,10 @@ end
 function step_class:GetBom()
 	if(not self.template) then
 		self.template = bom_class:new():Init(self:GetTemplateFilename(), self);
+		
+		if self.template:GetTask().isCustomBmax and self.tips[1] then
+			self.tips[1].attr.block_to = #self.template.blocks;
+		end
 	end
 	return self.template;
 end
@@ -479,6 +485,7 @@ end
 function task_class:Init(xml_node, theme, task_index, category)
 	self.UseAbsolutePos = if_else(self.UseAbsolutePos == "true" or self.beAbsolutePos == "true",true,false);
 	self.click_once_deploy = self.click_once_deploy == "true";
+	self.isCustomBmax = self.isCustomBmax == "true";
 	self:AddID()
 	self.task_index = task_index;
 	self.category =  category;
@@ -1129,4 +1136,37 @@ function BuildQuestProvider.OnSaveTaskDesc(theme_index,task_index,desc)
 			end
 		end
     end
+end
+
+function BuildQuestProvider.getCustomBmaxTask(src)
+
+	local node = {};
+	node.name = "Task";
+	node.attr = {};
+	node.attr.click_once_deploy= "false";
+	node.attr.filepath="";
+	node.attr.UseAbsolutePos="false";
+	node.attr.dir="";
+	node.attr.desc="";
+	node.attr.icon="";
+	node.attr.name="custombamx";
+	node.attr.image="";
+	node.attr.isCustomBmax="true";
+	
+	node[1] = {};
+	node[1].name = "Step";
+	node[1].attr = {};
+	node[1].attr.auto_create = "false";
+	node[1].attr.src = src;
+	
+	node[1][1] = {};
+	node[1][1].name = "tip";
+	node[1][1].attr = {};
+	node[1][1].attr.block = "0-0";
+	
+	local task = task_class:new(node.attr):Init(node, nil, 1, nil);
+	BuildQuestProvider.customBmaxTask = task;
+
+	task.src = src;
+	return task;
 end

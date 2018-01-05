@@ -167,22 +167,26 @@ function UserProfile:GetBuildProgress(theme_index,category)
 end
 
 function UserProfile:FinishBuilding(theme_index, task_index,category)
-	local category_ds = self.BuildProgress[category];
-	if(not category_ds) then
-		category_ds = {};
-		self.BuildProgress[category] = category_ds;
-	end
-	local theme = category_ds[theme_index];
-	if(not theme) then
-		theme = {};
-		category_ds[theme_index] = theme;
-	end
-	if(task_index) then
-		if(not theme.count or theme.count < task_index) then
-			theme.count = task_index;
+	if category then
+		local category_ds = self.BuildProgress[category];
+		if(not category_ds) then
+			category_ds = {};
+			self.BuildProgress[category] = category_ds;
 		end
-	else
-		theme.count = (theme.count or 0) + 1;
+		
+		local theme = category_ds[theme_index];
+		if(not theme) then
+			theme = {};
+			category_ds[theme_index] = theme;
+		end	
+
+		if(task_index) then
+			if(not theme.count or theme.count < task_index) then
+				theme.count = task_index;
+			end
+		else
+			theme.count = (theme.count or 0) + 1;
+		end	
 	end
 	self:SaveData("BuildProgress", self.BuildProgress, nil, true);
 	self:GetEvents():DispatchEvent({type = "BuildProgressChanged", theme = theme_index, category = category, value = self.BuildProgress,});
