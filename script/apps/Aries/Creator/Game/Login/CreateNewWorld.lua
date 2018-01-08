@@ -331,6 +331,11 @@ function CreateNewWorld.CreateWorld(values)
 		if(not string.match(worldfolder, "/$")) then
 			worldfolder = worldfolder.."/"
 		end
+
+		if(not commonlib.Files.IsAbsolutePath(worldfolder)) then
+			worldfolder = ParaIO.GetWritablePath()..worldfolder;
+		end
+
 		local worldpath = (worldfolder..worldname);
 		
 		-- create a new world

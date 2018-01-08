@@ -1523,3 +1523,15 @@ function block:GetBlockColor(x,y,z)
 	color = Color.ToValue(color);
 	return color;
 end
+
+-- return color in RGB, without alpha
+function block:GetBlockColorByData(blockData)
+	local color; 
+	if(self.color_data) then
+		color = Color.convert16_32(blockData);
+	elseif(self.mapcolor) then
+		color = self.mapcolor;
+	end
+	color = Color.ToValue(color);
+	return color;
+end

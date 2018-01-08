@@ -213,13 +213,19 @@ function Files.ResolveFilePath(filename)
 		info.relativeToRootPath = filename;
 	end
 
-	if(info.relativeToRootPath) then
-		local world_root = GameLogic.GetWorldDirectory()
-		if(info.relativeToRootPath:sub(1, #world_root) == world_root) then
-			info.relativeToWorldPath = info.relativeToRootPath:sub(#world_root+1, -1);
+	local world_root = GameLogic.GetWorldDirectory();
+	if(info.isAbsoluteFilepath and commonlib.Files.IsAbsolutePath(world_root)) then
+		if(filename:sub(1, #world_root) == world_root) then
+			info.relativeToWorldPath = filename:sub(#world_root+1, -1);
 			info.isInWorldDirectory = true;
 		end
+	elseif(info.relativeToRootPath and info.relativeToRootPath:sub(1, #world_root) == world_root) then
+		info.relativeToWorldPath = info.relativeToRootPath:sub(#world_root+1, -1);
+		info.isInWorldDirectory = true;
 	end
+
+	
+
 	info.filename = filename:match("([^/]+)$");
 	return info;
 end

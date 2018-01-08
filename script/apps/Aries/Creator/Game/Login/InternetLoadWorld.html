@@ -122,7 +122,7 @@ end
 function OnImportWorld()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
     local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")        
-    ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0)..LocalLoadWorld.GetWorldFolder(), "", "", 1);
+    ParaGlobal.ShellExecute("open", LocalLoadWorld.GetWorldFolderFullPath(), "", "", 1);
 end
 
 function GetDesForWorld()

@@ -148,7 +148,7 @@ function OpenFileDialog.OnOpenFileDialog()
 
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
 		OpenFileDialog.title,
-		ParaIO.GetCurDirectory(0)..(GameLogic.GetWorldDirectory() or ""), 
+		GameLogic.GetWorldDirectory() or "", 
 		OpenFileDialog.IsSaveMode);
 		
 	if(filename and page) then
