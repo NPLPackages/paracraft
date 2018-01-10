@@ -30,18 +30,22 @@ local page;
 
 local taskKeyTable =
 {
-	["-free"] = L"自由";
+	["-free"] = L"自由(默认)";
 	["-strict"] = L"严格";	
 }
 
 function BuildTaskEditPage.OnInit()
-	page = document:GetPageCtrl();	
-	
+	page = document:GetPageCtrl();
+	BuildTaskEditPage._init();
+end
+
+function BuildTaskEditPage._init()
 	if page and cur_entity then
 		local buildTaskType = taskKeyTable[cur_entity.taskType];
 		if not buildTaskType then
 			buildTaskType = taskKeyTable["-free"];
-		end	
+		end
+		BuildTaskEditPage.bmaxPath = cur_entity.bindBmaxPath;
 		page:SetNodeValue("buildTaskType", buildTaskType) -- 分辨率			
 	end
 end
@@ -67,11 +71,7 @@ function BuildTaskEditPage.ShowPage(entity, triggerEntity)
 	if(page) then
 		BuildTaskEditPage.OnClose();
 
-		local buildTaskType = taskKeyTable[cur_entity.taskType];
-		if not buildTaskType then
-			buildTaskType = taskKeyTable["-free"];
-		end	
-		page:SetNodeValue("buildTaskType", buildTaskType) -- 分辨率		
+		BuildTaskEditPage._init();	
 	end
 	
 
@@ -116,7 +116,14 @@ function BuildTaskEditPage.CloseWindow()
 end
 
 function BuildTaskEditPage.GetText()
-	return BuildTaskEditPage.bmaxPath or "";
+	if BuildTaskEditPage.bmaxPath then
+		return BuildTaskEditPage.bmaxPath;
+	elseif cur_entity and cur_entity.bindBmaxPath then
+		return cur_entity.bindBmaxPath;
+	else
+		return "";
+	end
+	
 end
 
 function BuildTaskEditPage.OnSelectBmax()
