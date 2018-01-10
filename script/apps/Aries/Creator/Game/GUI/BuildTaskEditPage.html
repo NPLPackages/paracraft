@@ -1,0 +1,79 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/BuildTaskEditPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="">
+            <![CDATA[
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/BuildTaskEditPage.lua");
+			EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+			BuildTaskEditPage = commonlib.gettable("MyCompany.Aries.Game.GUI.BuildTaskEditPage");
+			BuildTaskEditPage.OnInit()
+            function ClosePage()
+				BuildTaskEditPage.OnClose();
+            end
+			function selectBmax()
+				BuildTaskEditPage.OnSelectBmax();
+			end			
+            ]]>
+        </script>
+        <pe:container class="mc_border" style="color:#cccccc;">
+		
+
+			
+			
+			<div style="float:left;margin-left:10px;margin-top:10px;width:400px;height:400px;">
+				<div width="100%">
+					<div style="margin-top:3px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+						<pe:mc_block block_id='<%=Game.block_types.names.Checkpoint%>' style="width:32px;height:32px;" />
+					</div>
+					<div style="float:left;width:100px;margin-left:10px;">
+						<div>
+							<div style="float:left"><%=L""%></div>
+							<%=tostring(L"BTM")%>
+						</div>
+					</div>
+					
+					<div style="float:left;">
+						<input type="button" name="save" onclick="ClosePage" value='<%=L"关闭"%>' class="mc_big_button" style="margin-top:5px;min-width:80px;" />
+					</div>					
+					
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"进度判断:" %></div>
+                        <div style="float:left;margin-left:12px;font-size:11px;">
+                            <select name = "buildTaskType" AllowUserEdit="false" style="height:22px">
+                                <option value="-free">自由</option>
+                                <option value="-strict">严格</option>
+                            </select>
+                        </div>
+                    </div>				
+				</div>
+
+				
+				<div width="100%">
+					<div style="float:left">
+						<div style="width:120px;margin-left:5px;margin-top:22px;text-align:center;font-size:12px;"><%=L"模板路径: "%></div>
+					
+						<input type="button" onclick="selectBmax()"  value='<%="..."%>' style="margin-top:-20px;margin-left:135px;height:26px;width:60px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
+								
+					
+						<div style="float:left;margin-left:5px;margin-top:-20px;text-align:left;color:#ffffff;margin:5px;">
+							<%=BuildTaskEditPage.GetText()%>
+						</div>	
+
+					</div>	
+				</div>
+				
+
+						
+
+			</div>
+
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

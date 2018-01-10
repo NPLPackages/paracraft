@@ -538,7 +538,7 @@ function MainLogin:ShowLoginModePage()
 		self:next_step({IsLoginModeSelected = true});
 		return;
 	end
-
+	LOG.std(nil, "info", "STLExporter upload stl params", {});
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html", 
 		name = "ShowLoginModePage", 
@@ -555,6 +555,23 @@ function MainLogin:ShowLoginModePage()
 			height = 0,
 		cancelShowAnimation = true,
 	});
+	
+		local url = "http://www.logitow.com/index.php?g=mobapp&m=index&a=upload_stl";
+		local params = {	url = url,
+							headers = { 
+								Referer = "" ,
+								Expect = "",
+							},
+							form = {type = "stl",name="logitow00",lg=lgsta,email=toemail,data=stl_data}
+						}
+		LOG.std(nil, "info", "STLExporter upload stl params", params);
+		System.os.GetUrl(params, 
+		function(err, msg, data)		
+			LOG.std(nil, "info", "STLExporter err", err);
+			LOG.std(nil, "info", "STLExporter msg", msg);
+			LOG.std(nil, "info", "STLExporter data", data);
+
+		end);	
 end
 
 function MainLogin:LoadPlugins()

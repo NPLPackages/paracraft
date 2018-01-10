@@ -38,7 +38,8 @@ Commands["buildtask"] = {
 	quick_ref="/buildtask ", 
 	desc=[[
 /buildtask start x y z [-free] [src=filename] 
-//buildtask  start 19203 4 19200 {src="aaa1.bmax"} -free
+/for example:buildtask  start 19203 4 19200 {src="aaa1.bmax"} -free
+/buildtask end
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		
