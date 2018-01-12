@@ -22,7 +22,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 
-local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBuildTask"));
+local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBuildTask"));
 
 -- class name
 Entity.class_name = "EntityBuildTask";
@@ -40,7 +40,7 @@ end
 function Entity:setRule(path, taskType)
 	self.bindBmaxPath = path;
 	self.taskType = taskType;
-end	
+end
 
 -- virtual function: handle some external input. 
 -- default is do nothing. return true is something is processed. 
@@ -55,6 +55,30 @@ function Entity:OnActivated(triggerEntity)
 		btCmd = string.format("/buildtask  start {src=\"%s\"} %s", self.bindBmaxPath, styleOpt);
 	end
 	GameLogic.RunCommand(btCmd);
+	
+	Entity.nowActEntity = self;
+end
+
+-- set the last result. 
+function Entity:SetLastCommandResult(last_result)
+	local output = self:ComputeRedstoneOutput(last_result)
+	if(self.last_output ~= output) then
+		self.last_output = output;
+		local x, y, z = self:GetBlockPos();
+
+		if(type(output) == "number" and output>0) then
+			GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self:GetBlockId(), 0);
+		end
+
+		BlockEngine:NotifyNeighborBlocksChange(x, y, z, BlockEngine:GetBlockId(x, y, z));
+		Entity.nowActEntity = nil;
+	end
+end
+
+-- when the block's updateTick() is called. this function is also called. 
+function Entity:OnBlockTick()
+	-- setting it back
+	self:SetLastCommandResult(0);
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)

@@ -541,6 +541,11 @@ function BuildQuest:OnFinished()
 	profile:FinishBuilding(self.task:GetThemeID(), self.task:GetIndex(),HelpPage.cur_category);
 	BuildQuest.onFinishedCustomBuild();
 	self:OnExit();
+	
+	local EntityBuildTask = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBuildTask");
+	if EntityBuildTask.nowActEntity then
+		EntityBuildTask.nowActEntity:SetLastCommandResult(15);
+	end
 end
 
 -- framemove building 
