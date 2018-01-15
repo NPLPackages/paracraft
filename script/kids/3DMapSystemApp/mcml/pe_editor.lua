@@ -1270,7 +1270,7 @@ function pe_editor_text.create(rootName, mcmlNode, bindingContext, _parent, left
 			DefaultNodeHeight = lineheight,
 			fontsize = mcmlNode:GetNumber("fontsize"),
 			ReadOnly = mcmlNode:GetBool("ReadOnly"),
-			ShowLineNumber = mcmlNode:GetAttribute("ShowLineNumber"),
+			ShowLineNumber = mcmlNode:GetBool("ShowLineNumber"),
 			SingleLineEdit = mcmlNode:GetBool("SingleLineEdit"),
 			VerticalScrollBarStep = mcmlNode:GetNumber("VerticalScrollBarStep"),
 			WordWrap = mcmlNode:GetBool("WordWrap"),
