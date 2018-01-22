@@ -34,6 +34,7 @@ EditMovieContext:Property({"ModeCanSelect", nil, "GetModeCanSelect", });
 EditMovieContext:Property({"ModeCanRightClickToCreateBlock", nil, "GetModeCanRightClickToCreateBlock", });
 EditMovieContext:Property({"ModeHasJumpRestriction", true});
 
+
 function EditMovieContext:ctor()
 end
 
@@ -70,6 +71,7 @@ function EditMovieContext:OnSelect()
 	-- initialize manipulators and actors
 	self:OnSelectedActorChange();
 	SelectionManager:Connect("selectedActorChanged", self, self.OnSelectedActorChange);
+	SelectionManager:Connect("selectedActorVariableChanged", self, self.OnSelectedActorVariableChange);
 	BaseContext.OnSelect(self);
 	self:EnableMousePickTimer(true);
 	MovieClipController:Connect("afterActorFocusChanged", self, self.OnAfterActorFocusChanged, "UniqueConnection");
@@ -81,6 +83,7 @@ end
 function EditMovieContext:OnUnselect()
 	EditMovieContext._super.OnUnselect(self);
 	SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
+	SelectionManager:Disconnect("selectedActorVariableChanged", self, self.OnSelectedActorVariableChange);
 	self:SetActorAt("cur_actor", nil);
 	GameLogic.AddBBS("EditMovieContext", nil);
 	self:SetUseFreeCamera(false);
@@ -92,6 +95,22 @@ function EditMovieContext:OnSelectedActorChange(actor)
 	local actor = SelectionManager:GetSelectedActor();
 	self:SetActorAt("cur_actor", actor);
 	self:updateManipulators();
+end
+
+function EditMovieContext:OnSelectedActorVariableChange(variable, actor)
+	if(actor and actor.class_name == "ActorCommands" and variable and (variable.name=="blocks" or variable.name=="movieblock")) then
+		self:SetAllowEditMode(true);
+	else
+		self:SetAllowEditMode(false);
+	end
+end
+
+function EditMovieContext:IsAllowEditMode()
+	return self.is_allow_edit_mode_;
+end
+
+function EditMovieContext:SetAllowEditMode(bAllow)
+	self.is_allow_edit_mode_ = bAllow;
 end
 
 local channels = {"cur_actor", }
@@ -138,6 +157,7 @@ function EditMovieContext:updateManipulators()
 	if(actor) then
 		local var = actor:GetEditableVariable();
 		if(var) then
+			self:SetAllowEditMode(false);
 			if(var.name == "pos") then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/MoveManipContainer.lua");
 				local MoveManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.MoveManipContainer");
@@ -479,7 +499,7 @@ function EditMovieContext:mouseMoveEvent(event)
 end
 
 function EditMovieContext:HighlightPickBlock(result)
-	if(self:HasManipulators()) then
+	if(self:HasManipulators() and not self:IsInSelectMode() and not self:IsAllowEditMode()) then
 		-- we will only highlight movie block
 		if(result.block_id == block_types.names.MovieClip) then
 			EditMovieContext._super.HighlightPickBlock(self, result);
@@ -558,7 +578,7 @@ function EditMovieContext:mouseReleaseEvent(event)
 			end
 		end
 
-		if(self:HasManipulators() and not self:IsActorRecording()) then
+		if(self:HasManipulators() and not self:IsActorRecording() and not self:IsInSelectMode() and not self:IsAllowEditMode()) then
 			return;
 		end
 
