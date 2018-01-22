@@ -154,7 +154,7 @@ end
 
 function OpenFileDialog.OnOpenFileDialog()
 	NPL.load("(gl)script/ide/OpenFileDialog.lua");
-	local initialdir = OpenFileDialog.customInitialdir or (ParaIO.GetCurDirectory(0)..(GameLogic.GetWorldDirectory() or ""));
+	local initialdir = OpenFileDialog.customInitialdir or (GameLogic.GetWorldDirectory() or "");
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
 		OpenFileDialog.title,
 		initialdir,

@@ -20,6 +20,8 @@ echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -180,8 +182,14 @@ function Files.AddPrioritySearchPath(searchpath, priority)
 		return a.priority >= b.priority;
 	end
 	table.sort(datas, sortFunc);
-end	
+end
 
+
+function Files.ResetPrioritySearchPath()
+	Files.prioritySearchDatas = {};
+	Files.AddPrioritySearchPath(Files.getUserFolder());
+end
+GameLogic:Connect("WorldLoaded", Files, Files.ResetPrioritySearchPath, "Files");
 
 -- find a given file by its file path. 
 -- see also: Files.GetCachedFilePath()
@@ -189,12 +197,7 @@ end
 -- internally it will use a cache which only last for the current world, to accelerate for repeated calls. 
 -- @param searchpaths: nil or additional search path seperated by ";". such as such as "Texture/blocks/human/"
 -- @return the real file or nil if not exist 
-function Files.FindFile(filename, searchpaths)
-	if not Files.hasAddUserFolder then
-		Files.AddPrioritySearchPath(Files.getUserFolder());
-		Files.hasAddUserFolder = true;
-	end	
-	
+function Files.FindFile(filename, searchpaths)	
 	if(not filename) then
 		return;
 	end
@@ -255,13 +258,19 @@ function Files.ResolveFilePath(filename)
 		info.relativeToRootPath = filename;
 	end
 
-	if(info.relativeToRootPath) then
-		local world_root = GameLogic.GetWorldDirectory()
-		if(info.relativeToRootPath:sub(1, #world_root) == world_root) then
-			info.relativeToWorldPath = info.relativeToRootPath:sub(#world_root+1, -1);
+	local world_root = GameLogic.GetWorldDirectory();
+	if(info.isAbsoluteFilepath and commonlib.Files.IsAbsolutePath(world_root)) then
+		if(filename:sub(1, #world_root) == world_root) then
+			info.relativeToWorldPath = filename:sub(#world_root+1, -1);
 			info.isInWorldDirectory = true;
 		end
+	elseif(info.relativeToRootPath and info.relativeToRootPath:sub(1, #world_root) == world_root) then
+		info.relativeToWorldPath = info.relativeToRootPath:sub(#world_root+1, -1);
+		info.isInWorldDirectory = true;
 	end
+
+	
+
 	info.filename = filename:match("([^/]+)$");
 	return info;
 end

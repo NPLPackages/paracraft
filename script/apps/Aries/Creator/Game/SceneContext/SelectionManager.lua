@@ -24,8 +24,11 @@ SelectionManager:Property("Name", "SelectionManager");
 SelectionManager:Property({"m_picking_dist", 50,})
 
 SelectionManager:Signal("selectedActorChanged");
+-- when user changed the current selected variable, please note the actor may not be selected actor.
+SelectionManager:Signal("selectedActorVariableChanged", function(name, actor) end);
 -- variable name is changed
 SelectionManager:Signal("varNameChanged", function(name) end);
+
 
 local default_picking_dist = 50;
 local result = nil;

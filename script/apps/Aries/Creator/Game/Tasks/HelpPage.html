@@ -360,31 +360,31 @@ function GetCmdStr()
 
     local command = HelpPage.cur_gridview_ds[HelpPage.select_task_index];
     if(command) then
-        local title = string.format("<div style='font-weight:bold;'>%s</div><div>%s</div>",L"命令格式:",command.quick_ref);
+         local title = (command.quick_ref or "").."\n";
 
-        local param_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令参数:");
+        local param_words = string.format("%s\n",L"命令参数");
         local params = command.params;
-        if(params and next(params)) then
+        if(next(params)) then
             for i = 1,#params do
                 local param = params[i];
                 param_words = string.format("%s%s:%s",param_words,param.name,param.desc);
                 if(i < #params) then
-                    param_words = string.format("%s<br/>",param_words);
+                    param_words = string.format("%s\n",param_words);
                 end
             end
         else
             param_words = "";
         end
-        local command_desc = string.format("<div style='font-weight:bold;'>%s</div><div>%s</div>",L"命令描述:",command.desc);
+        local command_desc = string.format("%s\n%s\n",L"命令描述",command.desc);
         
-        local instance_words = string.format("<div style='font-weight:bold;'>%s</div>",L"命令实例:");
+        local instance_words = string.format("%s\n",L"命令实例");
         local instances = command.instances;
-        if(instances and next(instances)) then
+        if(next(instances)) then
             for i = 1,#instances do
                 local instance = instances[i];
-                instance_words = string.format("%s%s<br/>%s",instance_words,instance.content,instance.desc);
+                instance_words = string.format("%s%s\n%s",instance_words,instance.content,instance.desc);
                 if(i < #instances) then
-                    instance_words = string.format("%s<br/>",instance_words);
+                    instance_words = string.format("%s\n",instance_words);
                 end
             end
         else
@@ -511,11 +511,7 @@ end
             </pe:treeview>
         </pe:if>
         <pe:if condition='<%= IsCommandCategory()%>'>
-            <pe:treeview name="cmdStr" VerticalScrollBarStep="21" style="margin-top:12px;margin-bottom:12px;height:400px;background:;" VerticalScrollBarOffsetX="10">
-                <div style="margin-left:5px;width:320px;color:#ffffff;text-align:left;">
-                    <%=GetCmdStr() %>
-                </div>
-            </pe:treeview>
+            <textarea ReadOnly="false" rows="13" UseSystemControl="true" style="textcolor:#ffffff;margin-top:12px;margin-left:5px;margin-right:5px;margin-bottom:12px;height:400px;" value="<%= GetCmdStr()%>"></textarea>
         </pe:if>
         <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
             <div style="margin-left:10px;margin-top:10px;width:320px;height:250px;color:#ffffff;text-align:left;">

@@ -39,6 +39,11 @@ function LocalLoadWorld.ShowPage()
 	LocalLoadWorld.ShowPage_imp();
 end
 
+-- return a list of additional world directories, where load world is searched.
+function LocalLoadWorld.GetAdditionWorldFolders()
+	
+end
+
 function LocalLoadWorld.ShowPage_imp()
 	-- force refreshing world dir
 	LocalLoadWorld.IsWorldListLoaded = nil;
@@ -71,10 +76,21 @@ function LocalLoadWorld.ShowOpenWorldPage()
 	LocalLoadWorld.ShowPage_imp();
 end
 
--- return world folder such as "worlds/MyWorlds"
+-- return world folder such as "[writablepath]/worlds/MyWorlds"
 function LocalLoadWorld.GetWorldFolder()
 	return LocalLoadWorld.OpenWorld_Folder;
 end
+
+function LocalLoadWorld.GetWorldFolderFullPath()
+	if(not LocalLoadWorld.OpenWorldFolderFullPath) then
+		LocalLoadWorld.OpenWorldFolderFullPath = LocalLoadWorld.GetWorldFolder();
+		if(not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
+			LocalLoadWorld.OpenWorldFolderFullPath = ParaIO.GetWritablePath() .. LocalLoadWorld.OpenWorldFolderFullPath;
+		end
+	end
+	return LocalLoadWorld.OpenWorldFolderFullPath;
+end
+
 
 -- refresh all causing world list to be refreshed. 
 -- @param refresh_delay: usually nil or 0
@@ -94,7 +110,7 @@ function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 		LocalLoadWorld.SelectedWorld_Index = nil;
 		
 		-- add folders in myworlds/DesignHouse
-		local folderPath = LocalLoadWorld.GetWorldFolder();
+		local folderPath = LocalLoadWorld.GetWorldFolderFullPath();
 		
 		local output = LocalLoadWorld.SearchFiles(nil, folderPath, LocalLoadWorld.MaxItemPerFolder);
 		if(output and #output>0) then
@@ -263,7 +279,13 @@ function LocalLoadWorld.SearchFiles(output, rootfolder,nMaxFilesNum, filter)
 	if(filter == nil) then filter = "*." end
 	
 	output = output or {};
-	local sInitDir = ParaIO.GetCurDirectory(0)..rootfolder.."/";
+	local sInitDir;
+	if(commonlib.Files.IsAbsolutePath(rootfolder)) then
+		sInitDir = rootfolder.."/";
+	else
+		sInitDir = ParaIO.GetCurDirectory(0)..rootfolder.."/";
+	end
+
 	local search_result = ParaIO.SearchFiles(sInitDir,filter, "", 0, nMaxFilesNum or 5000, 0);
 	local nCount = search_result:GetNumOfResult();		
 	local nextIndex = #output+1;

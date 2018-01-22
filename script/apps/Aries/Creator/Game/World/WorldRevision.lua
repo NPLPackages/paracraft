@@ -97,8 +97,16 @@ function WorldRevision:Commit(bForceCommit)
 	end
 end
 
+function WorldRevision:GetBackupFolderFullPath()
+	if(not commonlib.Files.IsAbsolutePath(backup_folder)) then
+		return ParaIO.GetWritablePath()..backup_folder;
+	else
+		return backup_folder;
+	end
+end
+
 function WorldRevision:GetBackupFileName()
-	return string.format("%s%s_%s_%d.zip", backup_folder,self.worldname, ParaGlobal.GetDateFormat("yyyyMMdd"), self:GetRevision());
+	return string.format("%s%s_%s_%d.zip", self:GetBackupFolderFullPath(),self.worldname, ParaGlobal.GetDateFormat("yyyyMMdd"), self:GetRevision());
 end
 
 -- backup current revision to zip file if the zip file does not exist. 
@@ -132,7 +140,7 @@ end
 function WorldRevision:AutoCleanupBackup()
 	local filename = self:GetBackupFileName();
 	
-	local result = commonlib.Files.Find({}, backup_folder, 0, 10000, self.worldname.."*.*");
+	local result = commonlib.Files.Find({}, self:GetBackupFolderFullPath(), 0, 10000, self.worldname.."*.*");
 	table.sort(result, function(a, b)
 		return (a.filename > b.filename)
 	end)
@@ -168,7 +176,7 @@ function WorldRevision:AutoCleanupBackup()
 				end
 			end
 			if(bDeleteFile) then
-				local filename = backup_folder..file.filename;
+				local filename = self:GetBackupFolderFullPath()..file.filename;
 				ParaIO.DeleteFile(filename);
 				LOG.std(nil, "info", "WorldRevision", "auto delete backup %s", filename);
 			end

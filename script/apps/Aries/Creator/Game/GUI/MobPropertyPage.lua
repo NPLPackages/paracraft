@@ -240,7 +240,7 @@ function MobPropertyPage.OnOpenAssetFile()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.GetFilters("model"),
-		L"选择模型文件", ParaIO.GetCurDirectory(0)..GameLogic.GetWorldDirectory());
+		L"选择模型文件", GameLogic.GetWorldDirectory());
 	if(filename and page) then
 		local fileItem = Files.ResolveFilePath(filename);
 		if(fileItem and fileItem.relativeToWorldPath) then
