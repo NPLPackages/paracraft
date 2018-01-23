@@ -67,11 +67,11 @@ function CheckpointEditPage.OnClose()
 end
 
 function CheckpointEditPage.snapshot()
-	if cur_checkpoint then
+--	if cur_checkpoint then
 		ShareWorldPage.TakeSharePageImage();
 		CheckpointEditPage.previewImagePath = ShareWorldPage.GetPreviewImagePath();
 		page:SetUIValue("previewimg", CheckpointEditPage.previewImagePath);
-	end
+--	end
 end
 
 function CheckpointEditPage.OnSelectImage()
@@ -136,19 +136,17 @@ function CheckpointEditPage.SetCurCheckpoint(index)
 	cur_checkpoint = CheckPointIO.world_points[index];
 	
 	if cur_checkpoint then		
-		if cur_checkpoint[1] and cur_checkpoint[1].name == "cmpBag" then
-			if cur_entity then
-				cur_entity.cmpBag:Clear();
-				cur_entity.cmpBag:LoadFromXMLNode(cur_checkpoint[1]);
-				
-				CheckpointEditPage.RefreshPreviewImagePath();
-				
-				if page then
-					page:Refresh(0.01);
-				end
-			end
+		if cur_checkpoint[1] and cur_checkpoint[1].name == "cmpBag" and cur_entity then
+			cur_entity.cmpBag:Clear();
+			cur_entity.cmpBag:LoadFromXMLNode(cur_checkpoint[1]);
 		end
 	end
+	
+	if page then
+		CheckpointEditPage.RefreshPreviewImagePath();
+		page:SetUIValue("previewimg", CheckpointEditPage.GetPreviewImagePath());
+		page:Refresh(0.01);
+	end	
 end	
 
 function CheckpointEditPage.GetRulebagView()
