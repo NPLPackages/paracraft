@@ -1516,7 +1516,7 @@ end
 function block:GetBlockColor(x,y,z)
 	local color; 
 	if(self.color_data) then
-		color = Color.convert16_32(BlockEngine:GetBlockData(x,y,z));
+		color = Color.convert16_32(BlockEngine:GetBlockData(x,y,z) or 0);
 	elseif(self.mapcolor) then
 		color = self.mapcolor;
 	end
@@ -1528,7 +1528,7 @@ end
 function block:GetBlockColorByData(blockData)
 	local color; 
 	if(self.color_data) then
-		color = Color.convert16_32(blockData);
+		color = Color.convert16_32(blockData or 0);
 	elseif(self.mapcolor) then
 		color = self.mapcolor;
 	end
