@@ -456,7 +456,7 @@ function CommandManager:LoadCmdHelpFile()
 							-- prepend source version
 							local src_desc = Encoding.EncodeHTMLInnerText(cmd_class.desc);
 							
-							if(attr.desc and string.byte(attr.desc, 1) > 128) then
+							if(attr.desc and (string.byte(attr.desc, 1) or 0) > 128) then
 								cmd.desc = (src_desc or "").."\n"..attr.desc;
 							else
 								cmd.desc = src_desc;

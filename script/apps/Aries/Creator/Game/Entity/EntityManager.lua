@@ -447,7 +447,7 @@ end
 
 -- get all entities in block. 
 function EntityManager.GetEntitiesInBlock(bx, by, bz)
-	local sparse_index = by*30000*30000+bx*30000+bz;
+	local sparse_index = by*900000000+bx*30000+bz;
 	local block_container = block_containers[sparse_index];
 	if(block_container) then
 		return block_container:GetEntities();
@@ -560,7 +560,7 @@ end
 
 -- private: 
 function EntityManager.GetBlockContainer(bx,by,bz)
-	local sparse_index = by*30000*30000+bx*30000+bz;
+	local sparse_index = by*900000000+bx*30000+bz;
 	local block_container = block_containers[sparse_index];
 	if(block_container) then
 		return block_container;
@@ -572,7 +572,7 @@ function EntityManager.GetBlockContainer(bx,by,bz)
 end
 
 function EntityManager.SetBlockContainer(bx,by,bz, block_container)
-	local sparse_index = by*30000*30000+bx*30000+bz;
+	local sparse_index = by*900000000+bx*30000+bz;
 	block_containers[sparse_index] = block_container; 
 end
 

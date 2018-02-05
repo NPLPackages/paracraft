@@ -68,7 +68,7 @@ end
 
 
 local function getSparseIndex(bx, by, bz)
-	return by*30000*30000+bx*30000+bz;
+	return by*900000000+bx*30000+bz;
 end
 
 -- update block set in block time series variable as well as the given new_blocks 

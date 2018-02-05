@@ -283,7 +283,7 @@ end
 
 -- create/get block at given world position. 
 function BlockEngine:GetBlockInCacheIdx(bx, by, bz, bCreateIfNotExist)
-	local sparse_index = by*30000*30000+bx*30000+bz;
+	local sparse_index = by*900000000+bx*30000+bz;
 	local block = self.block_cache[sparse_index];
 	if(block) then
 		return block;
@@ -398,7 +398,7 @@ function BlockEngine:ConvertToBlockIndex_float(x,y,z)
 	idx_y = math_floor((y-offset_y)/blocksize)
 	idx_z = idx_z*region_size + bz
 
-	local sparse_index = idx_y*30000*30000+idx_x*30000+bz;
+	local sparse_index = idx_y*900000000+idx_x*30000+bz;
 	return idx_x, idx_y, idx_z, sparse_index;
 end
 
@@ -427,15 +427,15 @@ BlockEngine.center = BlockEngine.GetBlockCenter;
 
 -- get sparse index
 function BlockEngine:GetSparseIndex(x, y, z)
-	return y*30000*30000+x*30000+z;
+	return y*900000000+x*30000+z;
 end
 
 -- convert from sparse index to block x,y,z
 -- @return x,y,z
 function BlockEngine:FromSparseIndex(index)
 	local x, y, z;
-	y = math.floor(index / (30000*30000));
-	index = index - y*30000*30000;
+	y = math.floor(index / (900000000));
+	index = index - y*900000000;
 	x = math.floor(index / (30000));
 	z = index - x*30000;
 	return x,y,z;
