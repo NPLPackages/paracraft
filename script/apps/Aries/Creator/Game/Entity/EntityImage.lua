@@ -106,7 +106,7 @@ function Entity:ScheduleRefresh(x,y,z)
 		x,y,z = self:GetBlockPos();
 		self.bNeedUpdate = true;
 	else
-		local image_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+		local image_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 		if(image_entity) then
 			image_entity.bNeedUpdate = true;
 		else
@@ -171,7 +171,7 @@ function Entity:ResetDerivedPaintings()
 		local row_index,column_index;
 		for row_index = 1,rows do
 			for column_index = 1,columns do
-				local image_entity = EntityManager.GetEntityInBlock(block_x,block_y,block_z,"EntityImage");
+				local image_entity = EntityManager.GetEntityInBlock(block_x,block_y,block_z,self.class_name);
 
 				if(image_entity) then
 					image_entity.root_entity_coord = nil; 
@@ -284,7 +284,7 @@ function Entity:CalculateLengths()
 				if(root_block_id ~= neighbor_id) then
 					bIsBoundary = true;
 				else
-					local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+					local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 					if(neighbor_entity) then
 						neighbor_facing = neighbor_entity:GetImageFacing();
 						if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
@@ -362,7 +362,7 @@ function Entity:CaculateImageExpansionData()
 		if(root_block_id ~= neighbor_id) then
 			break;
 		end
-		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 		if(neighbor_entity) then
 			neighbor_facing = neighbor_entity:GetImageFacing();
 			if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
@@ -381,7 +381,7 @@ function Entity:CaculateImageExpansionData()
 		if(root_block_id ~= neighbor_id) then
 			break;
 		end
-		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 		if(neighbor_entity) then
 			neighbor_facing = neighbor_entity:GetImageFacing();
 			if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
@@ -421,7 +421,7 @@ function Entity:CaculateImageExpansionData()
 			if(root_block_id ~= neighbor_id) then
 				break;
 			end
-			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 			if(neighbor_entity) then
 				neighbor_facing = neighbor_entity:GetImageFacing();
 				if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
@@ -452,7 +452,7 @@ function Entity:CaculateImageExpansionData()
 			if(root_block_id ~= neighbor_id) then
 				break;
 			end
-			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 			if(neighbor_entity) then
 				neighbor_facing = neighbor_entity:GetImageFacing();
 				if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
@@ -559,7 +559,7 @@ function Entity:ApplyExpansionData()
 	if(rows ~= 1 or columns ~= 1) then
 		for row_index = 1,rows do
 			for column_index = 1,columns do
-				local image_entity = EntityManager.GetEntityInBlock(x,y,z,"EntityImage");
+				local image_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 				if(image_entity) then
 					-- set target image, and save a reference to the root block's coordinate.  
 					image_entity.root_entity_coord = root_entity_coord; 
@@ -625,7 +625,7 @@ function Entity:Refresh(bForceRefresh)
 				self:LoadImageFile();
 				return;
 			elseif(self.imagefile_loaded_timeout) then
-				LOG.std(nil, "warn", "EntityImage", "failed to load image file %s", self.image_filename or "");
+				LOG.std(nil, "warn", self.class_name, "failed to load image file %s", self.image_filename or "");
 			elseif(self.imagefile_loaded) then
 				if(self:CaculateImageExpansionData()) then
 					self:ApplyExpansionData();
@@ -635,7 +635,7 @@ function Entity:Refresh(bForceRefresh)
 						self:ScheduleRefresh();
 					else
 						local x, y, z = self:GetBlockPos();
-						LOG.std(nil, "warn", "EntityImage", "invalid block entity at pos: %d %d %d", x, y, z);
+						LOG.std(nil, "warn", self.class_name, "invalid block entity at pos: %d %d %d", x, y, z);
 					end
 				end
 			end			
