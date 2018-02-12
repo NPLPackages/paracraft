@@ -289,6 +289,17 @@ function BonesVariable:CopyKeyFrame(key_time, from_keytime)
 	end
 end
 
+-- Update or insert (Upsert) a key frame at given time.
+-- @param data: data is cloned before updating. 
+function BonesVariable:UpsertKeyFrame(key_time, data)
+	local var = self:GetSelectedBone();
+	if(var) then
+		var:UpsertKeyFrame(key_time, data);
+	else
+		return BonesVariable._super.UpsertKeyFrame(self, key_time, data);
+	end
+end
+
 function BonesVariable:RemoveKeyFrame(key_time)
 	local var = self:GetSelectedBone();
 	if(var) then

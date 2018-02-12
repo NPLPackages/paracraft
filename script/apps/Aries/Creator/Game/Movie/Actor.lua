@@ -522,6 +522,15 @@ function Actor:CopyKeyFrame(keytime, from_keytime)
 	self:EndModify();
 end
 
+-- Update or insert (Upsert) a key frame at given time.
+-- @param data: data is cloned before updating. 
+function Actor:UpsertKeyFrame(key_time, data)
+	self:BeginModify();
+	self.TimeSeries:UpsertKeyFrame(key_time, data);
+	self:SetModified();
+	self:EndModify();
+end
+
 -- move keyframe from from_keytime to keytime
 function Actor:MoveKeyFrame(keytime, from_keytime)
 	self:BeginModify();

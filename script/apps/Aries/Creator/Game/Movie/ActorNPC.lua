@@ -602,75 +602,23 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end
 	elseif(keyname == "parent") then
-		local title = format(L"起始时间%s, 请输入: 骨骼名字[,x,y,z,roll,pitch,yaw]", strTime);
-		local lastSelectionName = self:GetMovieClipEntity():GetLastSelectionName();
-		title = title.."<br/>"..L"最近选择的骨骼名字: "..(lastSelectionName or L"请先选骨骼");
-		local oldStr = "";
-		if(old_value) then
-			oldStr = old_value.target or "";
-			
-			if(old_value.pos and old_value.pos[1]) then
-				oldStr = string.format("%s,%f,%f,%f", oldStr, old_value.pos[1], old_value.pos[2], old_value.pos[3]);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.lua");
+		local EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");
+		EditParentLinkPage.ShowPage(strTime, self, function(values)
+			if(values.target=="") then
+				-- this will automatically add a key frame, when link is removed. 
+				self:KeyTransform();
 			end
-			if(old_value.rot and old_value.rot[1]) then
-				oldStr = string.format("%s,%f,%f,%f", oldStr, old_value.rot[1], old_value.rot[2], old_value.rot[3]);
+			self:AddKeyFrameByName(keyname, nil, values);
+			self:FrameMovePlaying(0);
+			if(target~="") then
+				-- this will automatically add a key frame at the position. 
+				self:KeyTransform();
 			end
-		else
-			oldStr = lastSelectionName or oldStr;
-		end
-		
-		-- TODO: use a dedicated UI 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
-		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-		EnterTextDialog.ShowPage(title, function(result)
-			if(result and not (result == oldStr and oldStr=="")) then
-				local v = {};
-				local target, trans = result:match("^([^,]+)[,%s]*(.*)");
-				target = target or "";
-				v.target = target;
-				local old_x,old_y,old_z, old_roll, old_pitch, old_yaw;
-				if(trans) then
-					local vars = CmdParser.ParseNumberList(trans, nil, "|,%s");
-					if(vars and vars[1] and vars[2] and vars[3]) then
-						v.pos = {vars[1], vars[2], vars[3]}
-						if(vars[4] and vars[5] and vars[6]) then
-							v.rot = {vars[4], vars[5], vars[6]}	
-						end
-					end
-				end
-				if(not v.pos and target~="") then
-					old_x,old_y,old_z = self:GetPosition();
-					old_roll, old_pitch, old_yaw = self:GetRollPitchYaw();
-				end
-				if(target=="") then
-					-- this will automatically add a key frame, when link is removed. 
-					self:KeyTransform();
-				else
-					v.pos = v.pos or {0,0,0};
-					v.rot = v.rot or {0,0,0};
-				end
-				self:AddKeyFrameByName(keyname, nil, v);
-				self:FrameMovePlaying(0);
-				
-				-- automatically set initial local transform according to old world transform.
-				-- following method is wrong, so I comment it out. 
-				--if(not v.pos and old_x and target~="")  then
-					--local new_x, new_y, new_z = self:GetPosition();
-					--v.pos = {old_x - new_x, old_y - new_y, old_z - new_z};
-					--local new_roll, new_pitch, new_yaw = self:GetRollPitchYaw();
-					--v.rot = {old_roll - new_roll, old_pitch - new_pitch, old_yaw - new_yaw};
-					--self:AddKeyFrameByName(keyname, nil, v);
-					--self:FrameMovePlaying(0);
-				--end
-				if(target~="") then
-					-- this will automatically add a key frame at the position. 
-					self:KeyTransform();
-				end
-				if(callbackFunc) then
-					callbackFunc(true);
-				end
+			if(callbackFunc) then
+				callbackFunc(true);
 			end
-		end,oldStr)
+		end, old_value);
 	end
 end
 
@@ -834,7 +782,7 @@ end
 
 -- return the parent link and parent actor if found.
 -- @return parent, curTime, parentActor, keypath: where parent contains local transform relative to target:
---  in the form {target="fullname", pos={}, rot={}}
+--  in the form {target="fullname", pos={}, rot={}, use_rot=true}
 function Actor:GetParentLink(curTime)
 	curTime = curTime or self:GetTime();
 	local parent = self:GetValue("parent", curTime);
@@ -869,9 +817,10 @@ end
 -- @param keypath: subpart of this actor of which we are computing, such as "bones::R_Hand", if nil it is current actor.
 -- @param localPos: if not nil, this is the local offset
 -- @param localRow: if not nil, this is the local rotation {roll, pitch yaw}
+-- @param bUseParentRotation: use the parent rotation
 -- @return x,y,z, roll, pitch yaw, scale: in world space.  
 -- return nil, if such information is not available, such as during async loading.
-function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot)
+function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot, bUseParentRotation)
 	local link_x = self:GetValue("x", curTime);
 	local link_y = self:GetValue("y", curTime);
 	local link_z = self:GetValue("z", curTime);
@@ -883,6 +832,7 @@ function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot)
 		self.parentPivot = self.parentPivot or mathlib.vector3d:new();
 						
 		local bonename = keypath:match("^bones::(.+)");
+		local parentBoneRotMat;
 		if(bonename) then
 			local bones = self:GetBonesVariable();
 			local boneVar = bones:GetChild(bonename);
@@ -890,6 +840,9 @@ function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot)
 				self:UpdateAnimInstance();
 				local pivot = boneVar:GetPivot(true);
 				self.parentPivot:set(pivot);
+				if(bUseParentRotation) then
+					parentBoneRotMat = boneVar:GetPivotRotation(true);
+				end
 				bFoundTarget = true;
 			end
 		else
@@ -899,33 +852,92 @@ function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot)
 		if(bFoundTarget) then
 			local parentObj = self:GetEntity():GetInnerObject();
 			local parentScale = parentObj:GetScale() or 1;
-
-			if(localPos) then
-				-- local invertScale = 1/parentScale;
-				-- self.parentPivot:add((localPos[1] or 0)*invertScale, (localPos[2] or 0)*invertScale, (localPos[3] or 0)*invertScale);
+			local dx,dy,dz = 0,0,0;
+			if(not bUseParentRotation and localPos) then
 				self.parentPivot:add((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
 			end
 
 			self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
 			self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
-			self.parentPivot = self.parentPivot * self.parentTrans;
+			self.parentPivot:multiplyInPlace(self.parentTrans);
 			self.parentQuat = self.parentQuat or mathlib.Quaternion:new();
 			if(parentScale~=1) then
 				self.parentTrans:RemoveScaling();
 			end
 			self.parentQuat:FromRotationMatrix(self.parentTrans);
-			local p_yaw, p_roll, p_pitch = self.parentQuat:ToEulerAngles();
-			if(localRot) then
+			if(bUseParentRotation and parentBoneRotMat) then
+				self.parentPivotRot = self.parentPivotRot or Quaternion:new();
+				self.parentPivotRot:FromRotationMatrix(parentBoneRotMat);
+				self.parentQuat:multiplyInplace(self.parentPivotRot);
+
+				if(localRot) then
+					self.localRotQuat = self.localRotQuat or Quaternion:new();
+					self.localRotQuat:FromEulerAngles((localRot[3] or 0), (localRot[1] or 0), (localRot[2] or 0));
+					self.parentQuat:multiplyInplace(self.localRotQuat);
+				end
+
+				--local az,ax,ay = self.parentQuat:ToEulerAnglesSequence("zxy");
+				--local q = Quaternion:new():FromEulerAnglesSequence(az,ax,ay,"zxy");
+				--echo({self.parentQuat, self.parentQuat:tostringAngleAxis(),"zxy--->", az,ax,ay, "angle, axis-->",q:tostringAngleAxis(), "-->", q})
+				
+				if(localPos) then
+					self.localPos = self.localPos or mathlib.vector3d:new();
+					self.localPos:set((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+					self.localPos:rotateByQuatInplace(self.parentQuat);
+					dx, dy, dz = self.localPos[1], self.localPos[2], self.localPos[3];
+				end
+			end
+			
+			local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
+			
+			if(not bUseParentRotation and localRot) then
+				-- just for backward compatibility, bUseParentRotation should be enabled in most cases
 				p_roll = (localRot[1] or 0) + p_roll;
 				p_pitch = (localRot[2] or 0) + p_pitch;
 				p_yaw = (localRot[3] or 0) + p_yaw;
 			end
-			return link_x + self.parentPivot[1], link_y + self.parentPivot[2], link_z + self.parentPivot[3],
+			
+			return link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz,
 				 p_roll, p_pitch, p_yaw, parentScale;
 		end
 	else
 		return link_x, link_y, link_z;
 	end
+end
+
+function Actor:ComputePosAndRotation(curTime)
+	local new_x = self:GetValue("x", curTime);
+	local new_y = self:GetValue("y", curTime);
+	local new_z = self:GetValue("z", curTime);
+	local yaw = self:GetValue("facing", curTime);
+	local roll = self:GetValue("roll", curTime);
+	local pitch = self:GetValue("pitch", curTime);
+
+	-- animate linking to another actor's bone animation. 
+	local parent, _, parentActor, keypath = self:GetParentLink(curTime);
+	if(keypath and parentActor and parentActor.ComputeWorldTransform)then
+		local p_x, p_y, p_z, p_roll, p_pitch, p_yaw, p_scale = parentActor:ComputeWorldTransform(keypath, curTime, parent.pos, parent.rot, parent.use_rot); 
+		if(p_x) then
+			new_x, new_y, new_z = p_x, p_y, p_z;
+			if(p_roll) then
+				roll, pitch, yaw = p_roll, p_pitch, p_yaw;
+			end
+			if(p_scale) then
+				-- scale = p_scale * (scale or 1);
+			end
+		else
+			if(self.last_unknown_keypath~=keypath and keypath and keypath~="") then
+				-- here we just wait 500 and try again only once for a given bone keypath.
+				self.last_unknown_keypath = keypath;
+				self.loader_timer = self.loader_timer or commonlib.Timer:new({callbackFunc = function(timer)
+					self:FrameMovePlaying(0);
+				end})
+				LOG.std(nil, "info", "ActorNPC", "parent bone may be async loading, wait 500ms");
+				self.loader_timer:Change(500, nil);
+			end
+		end
+	end
+	return new_x, new_y, new_z, yaw, roll, pitch;
 end
 
 function Actor:FrameMovePlaying(deltaTime)
@@ -950,18 +962,12 @@ function Actor:FrameMovePlaying(deltaTime)
 		end
 	end
 	local obj = entity:GetInnerObject();
-	local new_x = self:GetValue("x", curTime);
-	local new_y = self:GetValue("y", curTime);
-	local new_z = self:GetValue("z", curTime);
-
+	local new_x, new_y, new_z, yaw, roll, pitch = self:ComputePosAndRotation(curTime);
 	
-	local HeadUpdownAngle, HeadTurningAngle, anim, yaw, roll, pitch, skin, speedscale, scaling, gravity, opacity, blockinhand, assetfile;
+	local HeadUpdownAngle, HeadTurningAngle, anim, skin, speedscale, scaling, gravity, opacity, blockinhand, assetfile;
 	HeadUpdownAngle = self:GetValue("HeadUpdownAngle", curTime);
 	HeadTurningAngle = self:GetValue("HeadTurningAngle", curTime);
 	anim = self:GetValue("anim", curTime);
-	yaw = self:GetValue("facing", curTime);
-	roll = self:GetValue("roll", curTime);
-	pitch = self:GetValue("pitch", curTime);
 	skin = self:GetValue("skin", curTime);
 	speedscale = self:GetValue("speedscale", curTime);
 	scaling = self:GetValue("scaling", curTime);
@@ -970,40 +976,10 @@ function Actor:FrameMovePlaying(deltaTime)
 	assetfile = self:GetValue("assetfile", curTime);
 	blockinhand = self:GetValue("blockinhand", curTime);
 
-	--if(not new_x) then
-		--self:BeginUpdate();
-		--new_x, new_y, new_z = self:CheckSetDefaultPosition(true);
-		--self:EndUpdate();
-	--end
-
-	-- animate linking to another actor's bone animation. 
-	local parent, _, parentActor, keypath = self:GetParentLink(curTime);
-	if(keypath and parentActor and parentActor.ComputeWorldTransform)then
-		local p_x, p_y, p_z, p_roll, p_pitch, p_yaw, p_scale = parentActor:ComputeWorldTransform(keypath, curTime, parent.pos, parent.rot);
-		if(p_x) then
-			new_x, new_y, new_z = p_x, p_y, p_z;
-			if(p_roll) then
-				roll, pitch, yaw = p_roll, p_pitch, p_yaw;
-			end
-			if(p_scale) then
-				-- scale = p_scale * (scale or 1);
-			end
-		else
-			if(self.last_unknown_keypath~=keypath and keypath and keypath~="") then
-				-- here we just wait 500 and try again only once for a given bone keypath.
-				self.last_unknown_keypath = keypath;
-				self.loader_timer = self.loader_timer or commonlib.Timer:new({callbackFunc = function(timer)
-					self:FrameMovePlaying(0);
-				end})
-				LOG.std(nil, "info", "ActorNPC", "parent bone may be async loading, wait 500ms");
-				self.loader_timer:Change(500, nil);
-			end
-		end
-	end
 	if(new_x) then
 		entity:SetPosition(new_x, new_y, new_z);
 	end
-	
+
 	if(obj) then
 		-- in case of explicit animation
 		obj:SetField("Time", curTime); 

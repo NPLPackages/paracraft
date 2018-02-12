@@ -11,7 +11,10 @@ local BoneVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BoneVariable
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/MultiAnimBlock.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BoneAttributeVariable.lua");
+NPL.load("(gl)script/ide/math/Quaternion.lua");
 local vector3d = commonlib.gettable("mathlib.vector3d");
+local Quaternion = commonlib.gettable("mathlib.Quaternion");
+local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local BoneAttributeVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BoneAttributeVariable");
 local ATTRIBUTE_FIELDTYPE = commonlib.gettable("System.Core.ATTRIBUTE_FIELDTYPE");
 
@@ -57,6 +60,14 @@ function BoneVariable:GetRotation(bRefresh)
 		self.rot = self.attr:GetField("FinalRot", self.rot);
 	end
 	return self.rot;
+end
+
+function BoneVariable:GetPivotRotation(bRefresh)
+	self.pivot_rot = self.pivot_rot or Matrix4:new()
+	if(bRefresh) then
+		self.pivot_rot = self.attr:GetField("PivotRotMatrix", self.pivot_rot);
+	end
+	return self.pivot_rot;
 end
 
 -- save from C++'s current anim instance to actor's timeseries

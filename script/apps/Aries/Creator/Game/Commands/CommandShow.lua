@@ -76,6 +76,8 @@ Other show filters:
 			if(memoryContext) then
 				memoryContext:SetVisible(true);
 			end
+		elseif(name == "ui" or name == "UI") then
+			System.App.Commands.Call("ScreenShot.HideAllUI");
 		end
 	end,
 };
@@ -84,7 +86,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|touch|vision]", 
+	quick_ref="/hide [desktop|player|boundingbox|touch|vision|ui]", 
 	desc="hide different type of things" , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
@@ -110,6 +112,8 @@ Commands["hide"] = {
 			if(memoryContext) then
 				memoryContext:SetVisible(false);
 			end
+		elseif(name == "ui" or name == "UI") then
+			System.App.Commands.Call("ScreenShot.HideAllUI");
 		end
 	end,
 };
