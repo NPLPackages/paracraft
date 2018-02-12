@@ -143,6 +143,13 @@ function BoneAttributeVariable:CopyKeyFrame(key_time, from_keytime)
 	end
 end
 
+-- Update or insert (Upsert) a key frame at given time.
+-- @param data: data is cloned before updating. 
+function BoneAttributeVariable:UpsertKeyFrame(key_time, data)
+	self:CreateGetTimeVar():UpsertKeyFrame(key_time, data);
+	self:LoadFromTimeVar();
+end
+
 function BoneAttributeVariable:RemoveKeyFrame(key_time)
 	if(self:GetKeyNum()>0) then
 		self:CreateGetTimeVar():RemoveKeyFrame(key_time);

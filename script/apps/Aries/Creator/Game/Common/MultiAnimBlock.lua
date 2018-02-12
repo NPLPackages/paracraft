@@ -42,7 +42,7 @@ end
 function MultiAnimBlock:getValue(anim, time)
 	local o = {};
 	for i=1, #(self.variables) do
-		o[#o+1] = self.variables[i]:getValue(anim, time);
+		o[i] = self.variables[i]:getValue(anim, time);
 	end
 	return o;
 end
@@ -75,6 +75,16 @@ end
 function MultiAnimBlock:CopyKeyFrame(key_time, from_keytime)
 	for i=1, #(self.variables) do
 		self.variables[i]:CopyKeyFrame(key_time, from_keytime);
+	end
+end
+
+-- Update or insert (Upsert) a key frame at given time.
+-- @param data: data is cloned before updating. 
+function MultiAnimBlock:UpsertKeyFrame(key_time, data)
+	for i=1, #(self.variables) do
+		if(data[i]) then
+			self.variables[i]:UpsertKeyFrame(key_time, data[i]);
+		end
 	end
 end
 
