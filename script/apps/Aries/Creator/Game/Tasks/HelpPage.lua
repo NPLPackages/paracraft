@@ -183,8 +183,8 @@ local function GetAnimDS()
 				local content = "";
 				for itemnode in commonlib.XPath.eachNode(node, "/anim") do
 					if(itemnode.attr and itemnode.attr.id and itemnode.attr.desc) then
-						local text = string.format("<font style=';color:#FF0000;'>%s:</font>%s",L(itemnode.attr.id),L(itemnode.attr.desc));
-						content = content..text.."<br/>";
+						local text = string.format("%s:%s",L(itemnode.attr.id),L(itemnode.attr.desc));
+						content = content..text.."\n";
 					end
 				end
 				type_ds.content = content;
