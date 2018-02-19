@@ -518,10 +518,10 @@ function CommandManager:LoadCmdHelpFile()
 	end
 
 	-- add any missing command names to help.
-	local cmd_type = CommandManager.cmd_types["new"];
+	local cmd_type = CommandManager.cmd_types[L"命令列表"];
 	if(not cmd_type) then
 		cmd_type = {};
-		CommandManager.cmd_types["new"] = cmd_type;
+		CommandManager.cmd_types[L"命令列表"] = cmd_type;
 	end
 	for name, cmd in pairs(SlashCommand.slash_command_maps) do
 		if(not cmd_helps[name]) then
