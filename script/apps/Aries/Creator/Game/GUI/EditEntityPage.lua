@@ -164,7 +164,7 @@ end
 function EditEntityPage.OnClickEmptyBagSlot(slotNumber)
 	local entity = EditEntityPage.GetEntity()
 	if(entity) then
-		local contView = entity.inventoryView;
+		local contView = entity:GetInventoryView();
 		if(contView and slotNumber) then
 			local slot = contView:GetSlot(slotNumber);
 			entity:OnClickEmptySlot(slot);

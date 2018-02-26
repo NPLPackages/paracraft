@@ -67,7 +67,7 @@ end
                 <input type="button" zorder="1" name="godview" tooltip='<%=L"主角"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="MovieClipController.OnClickGodMode()"/>
             </div>
         </div>
-        <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="30">
+        <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="256">
             <Columns>
                 <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
                     <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">

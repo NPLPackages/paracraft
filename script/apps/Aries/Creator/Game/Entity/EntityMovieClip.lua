@@ -53,7 +53,8 @@ function Entity:ctor()
 	self.inventory:SetOnChangedCallback(function()
 		self:OnInventoryChanged();
 	end);
-	--self.inventory:SetSlotCount(81);
+	-- make it bigger than 27(default), so we can have more actors in it. 
+	self.inventory:SetSlotCount(48); 
 end
 
 function Entity:OnInventoryChanged()

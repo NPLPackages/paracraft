@@ -55,7 +55,7 @@ end
 
 function MobPropertyPage.GetContainerView()
 	if(cur_entity) then
-		return cur_entity.inventoryView;
+		return cur_entity:GetInventoryView();
 	end
 end
 
