@@ -188,6 +188,12 @@ function block:GetTexture(texture_index)
 	end
 end
 
+-- get the current texture
+function block:GetCurrentTexture()
+	return self.new_texture or self:GetTexture();
+end
+
+
 -- @param texture_index: nil to default to 1
 -- @return nil, false or the texture asset object. 
 function block:GetTextureObj(texture_index)
@@ -231,7 +237,8 @@ local exclusive_block_tex = {
 };
 
 -- @param texture_index: nil to default to 1
-function block:ReplaceTexture(filename, texture_index)
+-- @param bNoRestore: if true, we will not save the new texture to self.new_texture for automatic restore. 
+function block:ReplaceTexture(filename, texture_index, bNoRestore)
 	if(texture_index and texture_index>1) then
 		local texture = self:GetTexture(texture_index);
 		if(texture and texture~="") then
@@ -244,7 +251,9 @@ function block:ReplaceTexture(filename, texture_index)
 	elseif(self.texture and self.texture~="") then
 		if(self.texture~=filename) then
 			if(filename and ((self.singleSideTex and filename:match("_three")) or filename:match("_a%d%d%d%.png$") or exclusive_block_tex[self.id]) ) then
-				self.new_texture = filename;
+				if(not bNoRestore) then
+					self.new_texture = filename;
+				end
 				ParaTerrain.SetTemplateTexture(self.id, filename);
 			-- @Note: following code is to replace one by one
 			--elseif(filename:match("_a%d%d%d%.png$")) then
@@ -258,6 +267,9 @@ function block:ReplaceTexture(filename, texture_index)
 					--end
 				--end
 			else
+				if(not bNoRestore) then
+					self.new_texture = filename;
+				end
 				ParaIO.LoadReplaceFile(self.texture..","..filename, false);
 			end
 		else
@@ -268,7 +280,9 @@ function block:ReplaceTexture(filename, texture_index)
 			end
 		end
 	elseif(self.cubeMode) then
-		self.default_texture = self.default_texture or self.texture; -- just for restore
+		if(not bNoRestore) then
+			self.default_texture = self.default_texture or self.texture; -- just for restore
+		end
 		self.texture = filename;
 		--self.icon = filename;
 		ParaTerrain.SetTemplateTexture(self.id, filename);
