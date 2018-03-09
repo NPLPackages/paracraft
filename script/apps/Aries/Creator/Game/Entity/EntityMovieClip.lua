@@ -99,6 +99,50 @@ function Entity:GetCameraItemStack()
 	return self.inventory:FindItem(block_types.names.TimeSeriesCamera);
 end
 
+function Entity:GetItemStack(blockTypesName)
+	return self.inventory:FindItem(blockTypesName);
+end
+
+-- get all child movie entity of movie sequence
+function Entity:GetEntitysOfMovieSequence()
+	local function _getEntitysOfMovieSequence(entity)
+		local cmdActor = entity:GetMovieClip():GetActorFromBlockTypesName(block_types.names.TimeSeriesCommands);
+		return cmdActor:GetChildActor("actor_movie_sequence"):GetChildMovieEntitys();
+	end
+	
+	local function addRet(entList, retEntitys)
+		if entList ~= nil then
+			for _, ent in pairs(entList) do
+				retEntitys[#retEntitys + 1] = ent;
+				local vlist = _getEntitysOfMovieSequence(ent);
+				addRet(vlist, retEntitys);
+			end
+		end
+	end
+	
+	local retEntitys = {};
+	
+	addRet(_getEntitysOfMovieSequence(self), retEntitys);
+	
+	return retEntitys;
+end
+
+-- visit the data of movie's timeseries
+-- @param timeseriesKey:the name of timeseries:"assets","anim",etc...
+-- @param visitFunc:visit function 
+function Entity:VisitTimeseriesSlots(timeseriesKey, visitFunc)
+	for _, solt in pairs(self.inventory:GetSlots()) do	
+		local timeseries = solt.serverdata.timeseries;
+		if timeseries[timeseriesKey] then
+			for _, var in pairs(timeseries[timeseriesKey].data) do
+				visitFunc(var);
+			end
+		end	
+	end	
+end	
+
+
+
 local function offset_time_variable(var, offset)
 	if(var and var.data) then
 		local data = var.data;

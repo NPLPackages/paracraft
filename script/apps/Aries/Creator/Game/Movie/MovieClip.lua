@@ -84,6 +84,10 @@ function MovieClip:HasCamera()
 	return self.entity:HasCamera();
 end
 
+function MovieClip:GetActorFromBlockTypesName(blockTypesName)
+	return self:GetActorFromItemStack(self.entity:GetItemStack(blockTypesName), true);	
+end	
+
 
 -- get the first command actor 
 function MovieClip:GetCommand(bCreateIfNotExist)

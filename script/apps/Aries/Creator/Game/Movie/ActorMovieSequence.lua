@@ -40,6 +40,26 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
+function Actor:GetChildMovieEntitys()
+	local ret;
+	local timeSeriesData = self.TimeSeries:GetData();
+	if timeSeriesData.movieblock then
+		local md = timeSeriesData.movieblock.data or {};	
+		for _, v in pairs (md) do
+			if v[1] and v[2] and v[3] then
+				local entity = BlockEngine:GetBlockEntity(v[1], v[2], v[3]);
+				if entity then
+					if not ret then
+						ret = {};
+					end
+					ret[#ret + 1] = entity;
+				end
+			end
+		end
+	end
+	return ret;
+end	
+
 function Actor:IsKeyFrameOnly()
 	return true;
 end
