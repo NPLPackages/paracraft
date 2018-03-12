@@ -80,5 +80,6 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
 - movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
+  - "movie_restore_camera", movieCameraEntity:the camera entity in the movie being played, return true if you want to control the camera at the end of the movie instead of the default
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

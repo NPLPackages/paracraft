@@ -313,6 +313,10 @@ function Entity:GetVariables()
 	return self.variables;
 end
 
+function Entity:GetItemStack(blockTypesName)
+	return self.inventory:FindItem(blockTypesName);
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = node or {name='entity', attr={}};
 	local attr = node.attr;

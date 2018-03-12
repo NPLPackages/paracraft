@@ -40,7 +40,7 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
-function Actor:GetChildMovieEntitys()
+function Actor:GetChildMovieEntities()
 	local ret;
 	local timeSeriesData = self.TimeSeries:GetData();
 	if timeSeriesData.movieblock then
