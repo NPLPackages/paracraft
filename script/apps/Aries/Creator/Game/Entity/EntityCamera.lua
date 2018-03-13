@@ -165,7 +165,7 @@ function Entity:SaveCurrentCameraSetting()
 end
 
 function Entity:RestoreCameraSetting()
-	if not (GameLogic.GetFilters():apply_filters("movie_restore_camera", self)) then
+	if GameLogic.GetFilters():apply_filters("movie_restore_camera", self) == self then
 		local settings = self:GetRestoreCamSettings();
 		if(settings.eye_dist) then
 			if(CameraController.IsFPSView()~=settings.is_fps) then
