@@ -303,6 +303,7 @@ function CreateNewWorld.OnClickCreateWorld()
 			_guihelper.MessageBox(error_msg);
 		end
 	else
+		LOG.std(nil, "info", "CreateNewWorld", "new world created at %s", worldpath);
 		CreateNewWorld.page:CloseWindow();
 		WorldCommon.OpenWorld(worldpath, true);
 		GameLogic:UserAction("introduction");

@@ -52,17 +52,17 @@ function EnterGamePage.OnOpenPkgFile(filename)
 	local filename_utf8 = commonlib.Encoding.DefaultToUtf8(filename);
 	local file_name_utf8 = commonlib.Encoding.DefaultToUtf8(file_name);
 
-	_guihelper.MessageBox(format("确定要安装创意空间文件:%s?", filename_utf8), function()
+	_guihelper.MessageBox(format(L"确定要安装创意空间文件:%s?", filename_utf8), function()
 		LOG.std(nil, "info", "OnOpenPkgFile", "install file: %s", filename_utf8);
 		local function CopyFile_()
 			if(ParaIO.CopyFile(filename, dest_path, true)) then
-				_guihelper.MessageBox(format("世界[%s]安装成功！您可以从创意空间中加载这个世界了", file_name_utf8));
+				_guihelper.MessageBox(format(L"世界[%s]安装成功！您可以从创意空间中加载这个世界了", file_name_utf8));
 			else
-				_guihelper.MessageBox(format("无法复制文件到%s", dest_path));
+				_guihelper.MessageBox(format(L"无法复制文件到%s", dest_path));
 			end
 		end
 		if(ParaIO.DoesFileExist(dest_path, true)) then
-			_guihelper.MessageBox(format("世界[%s]已经安装过， 是否覆盖之前的世界?", file_name_utf8), function()
+			_guihelper.MessageBox(format(L"世界[%s]已经安装过， 是否覆盖之前的世界?", file_name_utf8), function()
 				CopyFile_();
 			end);
 		else
