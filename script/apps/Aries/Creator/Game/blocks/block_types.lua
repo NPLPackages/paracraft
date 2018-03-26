@@ -480,13 +480,16 @@ function block_types.LoadFromFile(filename)
 					end
 				end
 
+				--translator wrapper
+				local translator = GameLogic.GetFilters():apply_filters("block_types_translator", L);
+				
 				attr.id = block_id;
-				attr.text = L(attr.text);
-				attr.searchkey = L(attr.searchkey);
+				attr.text = translator(attr.text);
+				attr.searchkey = translator(attr.searchkey);
 				if(attr.searchkey) then
 					attr.searchkey = string.lower(attr.searchkey);
 				end
-				attr.tooltip = L(attr.tooltip);
+				attr.tooltip = translator(attr.tooltip);
 				attr.obstruction = attr.obstruction == "true";
 				attr.solid = attr.solid == "true";
 				attr.cubeMode = attr.cubeMode == "true";

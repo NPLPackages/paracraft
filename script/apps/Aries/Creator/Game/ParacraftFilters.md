@@ -37,6 +37,7 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "block_type", xmlRoot: for registering new item type
   - "block_list", xmlRoot: for registering new item type in builder GUI
   - "block_types_template", xmlRoot: for registering or modify block type's template
+  - "block_types_translator", L: for customizing block types localization
   - "register_item": for registering new item type in client
   - "block_entity_base_on_block_added", self, x, y, z: called after new entity based block added into world
   - "block_entity_base_on_block_loaded", self, x, y, z: called after new entity based block loaded into world
