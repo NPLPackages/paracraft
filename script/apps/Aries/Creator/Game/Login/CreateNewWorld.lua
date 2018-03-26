@@ -307,7 +307,8 @@ function CreateNewWorld.OnClickCreateWorld()
 		CreateNewWorld.page:CloseWindow();
 		WorldCommon.OpenWorld(worldpath, true);
 		GameLogic:UserAction("introduction");
-		GameLogic.options:SetShowTutorial(true);
+		-- this is annoying, we will not show tutorial in this intrusive way. we will use external lesson mod to do this job in near future.
+		-- GameLogic.options:SetShowTutorial(true);
 	end
 end
 

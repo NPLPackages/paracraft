@@ -130,8 +130,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	auto_disable_fly_when_on_ground = false,
 	-- stereo mode value. 
 	stereoMode = 0,
-	-- 960*640 which is the minimum UI size allowed. 
-	min_ui_height = 640,
+	-- 960*560 which is the minimum UI size allowed. 
+	min_ui_height = 560,
 });
 
 -- load default setting on application start. 
@@ -401,16 +401,22 @@ end
 
 -- @param bShow: if nil, it will automatically show if on mobile platform.
 function options:ShowTouchPad(bShow)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
-	local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
-	if(bShow == nil) then
-		TouchController.SetAutoShowHide(true);
-		if(System.options.IsMobilePlatform) then
-			TouchController.ShowPage();
-		end
-	else
-		TouchController.ShowPage(bShow);
+	if(System.options.IsTouchDevice) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+		local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+		TouchMiniKeyboard.CheckShow(true);
 	end
+-- following is old and intrusive touch system 
+--	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
+--	local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
+--	if(bShow == nil) then
+--		TouchController.SetAutoShowHide(true);
+--		if(System.options.IsMobilePlatform) then
+--			TouchController.ShowPage();
+--		end
+--	else
+--		TouchController.ShowPage(bShow);
+--	end
 end
 
 function options:SetLoginPosition(x, y, z)
@@ -872,7 +878,7 @@ function options:IsStereoControllerEnabled()
 end
 
 -- @param value: if 0, the original unscaled scaling is used. If nil, it will load from setting file. 
--- value is usually [1,2].  where 1 means the 960*640, which is the smallest UI size allowed. 
+-- value is usually [1,2].  where 1 means the 960*560, which is the smallest UI size allowed. 
 function options:SetUIScaling(value)
 	local scaling = 1;
 	local key = "Paracraft_System_SetUIScaling";
@@ -884,7 +890,7 @@ function options:SetUIScaling(value)
 	if(value) then
 		if(value >= 1 and value <= 10) then
 			local ui_height = value*self.min_ui_height;
-			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {960,640});
+			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {960,560});
 			local frame_height = frame_size[2];
 			scaling = frame_height / ui_height;
 		else

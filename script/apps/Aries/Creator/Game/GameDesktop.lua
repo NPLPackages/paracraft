@@ -253,7 +253,7 @@ local last_width, last_height = nil;
 
 -- adjust ui according to size
 function Desktop.DoAutoAdjustUIScaling(bForceUpdate)
-	if(not GameLogic.options.EnableAutoUIScaling and not bForceUpdate) then
+	if(System.options.IsTouchDevice or (not GameLogic.options.EnableAutoUIScaling and not bForceUpdate)) then
 		return;
 	end
 
