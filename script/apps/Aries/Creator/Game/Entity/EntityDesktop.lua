@@ -37,7 +37,6 @@ Entity.name = "desktop";
 
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
-	self.inventoryView = ContainerView:new():Init(self.inventory);
 	self.inventory:SetClient();
 end
 

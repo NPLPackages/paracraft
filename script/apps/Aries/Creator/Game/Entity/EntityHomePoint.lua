@@ -41,7 +41,6 @@ EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
-	self.inventoryView = ContainerView:new():Init(self.inventory);
 	self.inventory:SetClient();
 
 	self:SetRuleBagSize(16);

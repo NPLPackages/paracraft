@@ -67,7 +67,7 @@ function EditMovieTextPage.ShowPage(title, OnClose, last_values)
 end
 
 function EditMovieTextPage.GetTitle()
-	return EditMovieTextPage.title or "添加/编辑字幕";
+	return EditMovieTextPage.title or L"添加/编辑字幕";
 end
 
 function EditMovieTextPage.OnOK()

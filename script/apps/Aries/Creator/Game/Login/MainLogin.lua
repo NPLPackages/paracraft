@@ -531,7 +531,48 @@ function MainLogin:LoadPackages()
 	self:next_step({IsPackagesLoaded = true});
 end
 
+function MainLogin:CheckShowTouchVirtualKeyboard()
+	if(System.options.IsTouchDevice) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+		local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+		TouchVirtualKeyboardIcon.ShowSingleton(true);
+	end
+end
+
+-- call this before any UI is drawn
+function MainLogin:AutoAdjustUIScalingForTouchDevice()
+	if(System.options.IsTouchDevice) then
+		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+		local Screen = commonlib.gettable("System.Windows.Screen");
+
+		NPL.load("(gl)script/ide/timer.lua");
+		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+			if(Screen:GetWidth() > 0) then
+				timer:Change();
+				
+				local touch_ui_height = 560;
+				local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {960,560});
+				local frame_height = frame_size[2];
+				if(frame_height == 0) then
+					frame_height = Screen:GetHeight();
+					LOG.std(nil, "error", "TouchDevice", "ScreenResolution not implemented");
+				end
+				LOG.std(nil, "error", "TouchDevice", {frame_size, ui_height = Screen:GetHeight()});
+				scaling = frame_height / touch_ui_height;
+				if(scaling ~= 1) then	
+					LOG.std(nil, "info", "TouchDevice", "set UIScale to %s for TouchDevice", scaling);
+					ParaUI.GetUIObject("root"):SetField("UIScale", {scaling, scaling});
+				end
+			end
+		end})
+		mytimer:Change(0,300);
+	end
+end
+
 function MainLogin:ShowLoginModePage()
+	self:AutoAdjustUIScalingForTouchDevice();
+	self:CheckShowTouchVirtualKeyboard();
+	
 
 	if(System.options.cmdline_world and System.options.cmdline_world~="") then
 		System.options.loginmode = "local";

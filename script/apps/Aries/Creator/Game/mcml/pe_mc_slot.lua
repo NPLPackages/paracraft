@@ -9,7 +9,7 @@ use the lib:
 ---++ pe:mc_slot
 | *name* | *desc* |
 | bagpos | slot_index in containerView |
-| ContainerView | the ContainerView object. if not specified, it will be EntityManager.GetPlayer().inventoryView. which is curent player's inventory view. |
+| ContainerView | the ContainerView object. if not specified, it will be EntityManager.GetPlayer():GetInventoryView(). which is curent player's inventory view. |
 | DestInventory | the default dest inventory when shift+left key is pressed. we will automatically send all items in this slot to the dest inventory.  |
 | onclick | onclick event |
 | onclick_empty | when clicking on empty slot |
@@ -41,7 +41,7 @@ local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 pe_mc_slot.block_icon_instances = {};
 
 function pe_mc_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
-	local contView = mcmlNode:GetAttributeWithCode("ContainerView", nil, true) or EntityManager.GetPlayer().inventoryView;
+	local contView = mcmlNode:GetAttributeWithCode("ContainerView", nil, true) or EntityManager.GetPlayer():GetInventoryView();
 	local bagpos = mcmlNode:GetAttributeWithCode("bagpos", nil, true);
 
 	if(bagpos and contView) then

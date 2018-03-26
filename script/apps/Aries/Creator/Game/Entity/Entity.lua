@@ -200,6 +200,21 @@ function Entity:GetEditModel()
 	end
 end
 
+-- get the inventory object if any
+function Entity:GetInventory()
+	return self.inventory;
+end
+
+-- get the inventory view object if any. It will create one if inventory exist but view not exist. 
+function Entity:GetInventoryView()
+	if(self.inventoryView) then
+		return self.inventoryView;
+	elseif(self.inventory) then
+		self.inventoryView = ContainerView:new():Init(self.inventory);
+		return self.inventoryView;
+	end
+end
+
 -- whether the entity should be serialized to disk. 
 function Entity:SetPersistent(bIsPersistent)
 	self.is_persistent = bIsPersistent;

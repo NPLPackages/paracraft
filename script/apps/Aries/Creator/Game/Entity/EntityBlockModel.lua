@@ -43,7 +43,6 @@ Entity.bIsForceLoadPhysics = true;
 
 function Entity:ctor()
 	self.inventory = self.inventory or InventoryBase:new():Init();
-	self.inventoryView = ContainerView:new():Init(self.inventory);
 	self.inventory:SetClient();
 end
 

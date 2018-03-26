@@ -29,8 +29,43 @@ end
 
 -- map default view (full view)
 function ContainerView:Init(inventory)
-	for i=1, inventory:GetSlotCount() do
-		self:AddSlotToContainer(ItemSlot:new():Init(inventory, i));
+	self:UpdateFromInventory(inventory);
+	return self;
+end
+
+-- @param inventory: a new inventory. If nil, it will update slot count if existing inventory's slot count changed. 
+function ContainerView:UpdateFromInventory(inventory)
+	if(not inventory) then
+		if(self.slots[1]) then
+			inventory = self.slots[1].inventory;
+		end
+		if(not inventory) then
+			return self;
+		end
+	end
+	local nCount = #self.slots;
+	if( nCount == 0) then
+		for i=1, inventory:GetSlotCount() do
+			self:AddSlotToContainer(ItemSlot:new():Init(inventory, i));
+		end
+	else
+		local nNewCount = inventory:GetSlotCount();
+		if(nCount < nNewCount) then 
+			for i=1, nCount do
+				self:GetSlot(i):Init(inventory, i);
+			end
+			for i=nCount+1, nNewCount do
+				self:AddSlotToContainer(ItemSlot:new():Init(inventory, i));
+			end
+		elseif(nCount > nNewCount) then
+			for i=1, nNewCount do
+				self:GetSlot(i):Init(inventory, i);
+			end
+			for i=nCount, nNewCount+1, -1 do
+				self.slots[i] = nil;
+				self.slots_ds[i] = nil;
+			end
+		end
 	end
 	return self;
 end

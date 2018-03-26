@@ -26,7 +26,7 @@ Commands["replacetexture"] = {
 	desc=[[replace a block texture to another texture or 0
 /replacetexture 62 0
 /replacetexture 62 61
-/replacetexture 62 62
+/replacetexture 62 62     -- this will restore texture
 /replacetexture 62 preview.jpg
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
@@ -41,7 +41,6 @@ Commands["replacetexture"] = {
 				to_id = from_id;
 			end
 		end
-		
 		if(from_id and (to_id or to_filename)) then
 			local from_block = block_types.get(from_id);
 			if(from_block) then
@@ -49,12 +48,12 @@ Commands["replacetexture"] = {
 					if(to_id~=0) then
 						local to_block = block_types.get(to_id);
 						if(to_block) then
-							to_filename = to_block:GetTexture();
+							to_filename = to_block:GetCurrentTexture();
 						end
 					end
 					to_filename = to_filename or "Texture/Transparent.png";
 				end
-				from_block:ReplaceTexture(to_filename);
+				from_block:ReplaceTexture(to_filename, nil, true);
 			end
 		end
 	end,

@@ -456,7 +456,7 @@ function CommandManager:LoadCmdHelpFile()
 							-- prepend source version
 							local src_desc = Encoding.EncodeHTMLInnerText(cmd_class.desc);
 							
-							if(attr.desc and string.byte(attr.desc, 1) > 128) then
+							if(attr.desc and (string.byte(attr.desc, 1) or 0) > 128) then
 								cmd.desc = (src_desc or "").."\n"..attr.desc;
 							else
 								cmd.desc = src_desc;
@@ -518,10 +518,10 @@ function CommandManager:LoadCmdHelpFile()
 	end
 
 	-- add any missing command names to help.
-	local cmd_type = CommandManager.cmd_types["new"];
+	local cmd_type = CommandManager.cmd_types[L"命令列表"];
 	if(not cmd_type) then
 		cmd_type = {};
-		CommandManager.cmd_types["new"] = cmd_type;
+		CommandManager.cmd_types[L"命令列表"] = cmd_type;
 	end
 	for name, cmd in pairs(SlashCommand.slash_command_maps) do
 		if(not cmd_helps[name]) then

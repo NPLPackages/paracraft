@@ -35,12 +35,23 @@ end
 
 -- add select manip if ctrl key is pressed. and exit select manip when ctrl key is not pressed. 
 function EditContext:UpdateManipulators()
+	self:UpdateSelectManipulators();
+end
+
+-- is select mode
+function EditContext:IsInSelectMode()
+	if(self.select_timer and self.select_timer:IsEnabled()) then
+		return true;
+	end
+end
+
+function EditContext:UpdateSelectManipulators()
 	if(Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
 		if(not self.select_timer) then
 			self.select_timer = commonlib.Timer:new({callbackFunc = function(timer)
 				if(not Keyboard:IsCtrlKeyPressed() and not Keyboard:IsShiftKeyPressed()) then
 					self.select_timer:Change();
-					self:UpdateManipulators();
+					self:UpdateSelectManipulators();
 					self:EnableAutoCamera(true);
 				end
 			end})
@@ -320,6 +331,6 @@ function EditContext:keyPressEvent(event)
 		end
 	elseif(event.ctrl_pressed or event.shift_pressed) then
 		-- when ctrl is pressed, enter select block manipulator
-		self:UpdateManipulators();
+		self:UpdateSelectManipulators();
 	end
 end

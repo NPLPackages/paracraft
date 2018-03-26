@@ -335,6 +335,7 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 							node.originalActor:SetCurrentEditVariableIndex(node.originalIndex);
 						end
 						node.actor:SetCurrentEditVariableIndex(tonumber(node.Name));
+						Game.SelectionManager:selectedActorVariableChanged(node.actor:GetEditableVariable(), node.actor);
 					end
 				end
 			};
@@ -580,12 +581,13 @@ function MovieClipTimeLine:UpdateSubKeyFrames(curTime, bForceUpdate)
 			end
 		end
 
-		local curSubFrameVar = self:GetCurrentSubFrameVariable();
+		local curSubFrameVar, subVarActor = self:GetCurrentSubFrameVariable();
 		if(ctl:GetVariable() ~= curSubFrameVar) then
 			ctl:SetVariable(curSubFrameVar);
 			if(page) then
 				page:SetValue("varname", self:GetCurrentSubFrameVariableDisplayText() or L"文字");
 			end
+			Game.SelectionManager:selectedActorVariableChanged(curSubFrameVar, subVarActor);
 
 			need_update = true;
 		elseif(curSubFrameVar) then

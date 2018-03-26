@@ -66,6 +66,58 @@ function Direction.GetOffsetBySide(side)
 	end
 	return dx, dy, dz;
 end
+
+-- @param view_direction: default to 3, which is viewing to positive z axis
+function Direction.GetOffsetBySideAndView(side, view_direction)
+	local dx, dy, dz = 0,0,0;
+	if(side == 0) then
+		if(view_direction == 0) then
+			dz = -1;
+		elseif(view_direction == 1) then
+			dz = 1;
+		elseif(view_direction == 2) then
+			dx = 1;
+		else
+			dx = -1;	
+		end
+	elseif(side == 1) then
+		if(view_direction == 0) then
+			dz = 1;
+		elseif(view_direction == 1) then
+			dz = -1;
+		elseif(view_direction == 2) then
+			dx = -1;
+		else
+			dx = 1;	
+		end
+	elseif(side == 2) then
+		if(view_direction == 0) then
+			dx = 1;
+		elseif(view_direction == 1) then
+			dx = -1;
+		elseif(view_direction == 2) then
+			dz = 1;
+		else
+			dz = -1;	
+		end
+	elseif(side == 3) then
+		if(view_direction == 0) then
+			dx = -1;
+		elseif(view_direction == 1) then
+			dx = 1;
+		elseif(view_direction == 2) then
+			dz = -1;
+		else
+			dz = 1;	
+		end
+	elseif(side == 4) then
+		dy = -1;
+	elseif(side == 5) then
+		dy = 1;
+	end
+	return dx, dy, dz;
+end
+
 -- convert from facing to closest direction id. 
 -- such that 0 to 0, 3.14 to 1, -1.57 to 2, 1.57 to 3
 function Direction.GetDirectionFromFacing(facing)

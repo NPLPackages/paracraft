@@ -107,7 +107,7 @@ end
 function MovieClipController.GetActorInventoryView()
 	local movieClip = MovieClipController.GetMovieClip()
 	if(movieClip) then
-		return movieClip:GetEntity().inventoryView;
+		return movieClip:GetEntity():GetInventoryView();
 	end
 end
 
@@ -226,7 +226,7 @@ function MovieClipController.OnClickEmptySlot(slotNumber)
 	if(movieClip) then
 		local entity = movieClip:GetEntity();
 		if(entity) then
-			local contView = entity.inventoryView;
+			local contView = entity:GetInventoryView();
 			if(contView and slotNumber) then
 				local slot = contView:GetSlot(slotNumber);
 				entity:OnClickEmptySlot(slot);

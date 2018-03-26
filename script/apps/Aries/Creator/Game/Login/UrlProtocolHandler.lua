@@ -28,11 +28,18 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 		NPL.load("(gl)script/ide/Encoding.lua");
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);
-		LOG.std(nil, "info", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
+		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
 		-- paracraft://cmd/loadworld/[url_filename]
-		local world_url = urlProtocol:match("^cmd/loadworld[%s/]+([%S]*)");
+		local world_url = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
 		if(world_url and world_url:match("^https?://")) then
 			System.options.cmdline_world = world_url;
+		end
+
+		local usertoken = urlProtocol:match("usertoken=\"([%S]+)\"");
+		if(usertoken) then
+			LOG.std(nil, "debug", "UrlProtocolHandler", "usertoken found: %s", usertoken);
+			-- TODO: signin with user token
+			
 		end
 	end
 end
@@ -74,7 +81,7 @@ function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 			if(cmd) then
 				local filename = cmd:gsub("/", "\\"):match("\"([^\"]+)");
 				if(ParaIO.DoesFileExist(filename, false)) then
-					LOG.std(nil, "info", "Url protocol", "%s:// is %s", protocol_name, cmd);
+					LOG.std(nil, "info", "Url protocol", "%s:// found in registry as %s", protocol_name, cmd);
 					return true;
 				else
 					LOG.std(nil, "warn", "Url protocol", "%s:// file not found at %s", protocol_name, filename);

@@ -41,7 +41,7 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.rendermethod = node.attr.rendermethod;
 		self.renderdist = node.attr.renderdist;
 		self.texture_pack_type = node.attr.texture_pack_type;
-		self.texture_pack_path = commonlib.Encoding.Utf8ToDefault(node.attr.texture_pack_path or node.attr.texture_pack);
+		self.texture_pack_path = commonlib.Encoding.Utf8ToDefault(node.attr.texture_pack_path or node.attr.texture_pack or "");
 		self.texture_pack_url  = node.attr.texture_pack_url;
 		self.texture_pack_text = node.attr.texture_pack_text;
 		self.weather_type = node.attr.weather_type;

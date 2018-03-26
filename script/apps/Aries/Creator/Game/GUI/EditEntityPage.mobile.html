@@ -13,7 +13,7 @@ EditEntityPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditEntityPage");
 EditEntityPage.OnInit()
 
 function GetInventoryView()
-    return EditEntityPage.GetEntity().inventoryView;
+    return EditEntityPage.GetEntity():GetInventoryView();
 end
 
 function DS_Func_Inventory(index)

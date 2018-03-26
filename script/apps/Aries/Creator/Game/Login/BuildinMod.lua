@@ -78,6 +78,8 @@ function BuildinMod.AddBuildinMods()
 			end
 			if(loaded_packages[mod.package_path]) then
 				pluginloader:AddSystemModule(mod.name or mod.package_path, mod);
+			else
+				LOG.std(nil, "error", "BuildinMod", "failed to open package %s", mod.package_path);
 			end
 		end
 	end

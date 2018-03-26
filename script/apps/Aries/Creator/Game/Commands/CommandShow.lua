@@ -32,6 +32,7 @@ Other show filters:
 /show movie.controller
 /show desktop.builder.movie
 /show vision   : AI memory vision
+/show keyboard   show keyboard for touch device
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name, bIsShow;
@@ -76,6 +77,12 @@ Other show filters:
 			if(memoryContext) then
 				memoryContext:SetVisible(true);
 			end
+		elseif(name == "ui" or name == "UI") then
+			System.App.Commands.Call("ScreenShot.HideAllUI");
+		elseif(name == "keyboard") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+			TouchVirtualKeyboardIcon.ShowSingleton(true);
 		end
 	end,
 };
@@ -84,7 +91,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|touch|vision]", 
+	quick_ref="/hide [desktop|player|boundingbox|touch|vision|ui|keyboard]", 
 	desc="hide different type of things" , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
@@ -110,6 +117,12 @@ Commands["hide"] = {
 			if(memoryContext) then
 				memoryContext:SetVisible(false);
 			end
+		elseif(name == "ui" or name == "UI") then
+			System.App.Commands.Call("ScreenShot.HideAllUI");
+		elseif(name == "keyboard") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+			TouchVirtualKeyboardIcon.ShowSingleton(false);
 		end
 	end,
 };

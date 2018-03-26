@@ -83,6 +83,7 @@ function WorldCommon.OpenWorld(worldpath, isNewVersion, force_nid)
 	if(isNewVersion) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
 		local Game = commonlib.gettable("MyCompany.Aries.Game")
+		LOG.std(nil, "info", "WorldCommon.OpenWorld", worldpath);
 		Game.Start(worldpath, nil, force_nid);
 	else
 		-- load scene

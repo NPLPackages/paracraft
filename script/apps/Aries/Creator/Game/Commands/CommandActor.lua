@@ -22,15 +22,14 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
 
---[[ add a new actor to the current active scene
-/addactor			add a default npc entity to the current scene
-/addactor npc		add a default npc entity to the current scene
-/addactor camera	add a default camera entity to the current scene
-]]
 Commands["addactor"] = {
 	name="addactor", 
 	quick_ref="/addactor [npc|camera]", 
-	desc="add a new actor to the current active scene" , 
+	desc=[[ add a new actor to the current active scene
+/addactor			add a default npc entity to the current scene
+/addactor npc		add a default npc entity to the current scene
+/addactor camera	add a default camera entity to the current scene
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
@@ -50,14 +49,14 @@ Commands["addactor"] = {
 };
 
 
---[[ focus on a given player. if no player, the current player is used. 
-/focus			: default to current player. 
-/focus  @man	: focus on a player called man
-]]
+
 Commands["focus"] = {
 	name="focus", 
 	quick_ref="/focus [@playername]", 
-	desc="focus on a given player. if no player, the current player is used. " , 
+	desc=[[ focus on a given player. if no player, the current player is used. 
+/focus			: default to current player. 
+/focus  @man	: focus on a player called man
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity, x, y, z, hasInputName;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
@@ -92,15 +91,15 @@ usually used in a movieclip to end the current movie and fire a redstone output.
 	end,
 };
 
---[[ add a command based movieclip key to the current active movie clip
-/addkey text this is movie subscript text
-/addkey time			: use current time
-/addkey time 1			: dark night
-]]
+
 Commands["addkey"] = {
 	name="addkey", 
 	quick_ref="/addkey [text|time|tip|fadein|fadeout] [value]", 
-	desc="" , 
+	desc=[[ add a command based movieclip key to the current active movie clip
+/addkey text this is movie subscript text
+/addkey time			: use current time
+/addkey time 1			: dark night
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);

@@ -25,7 +25,7 @@ end
             <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Stop%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
             <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Question%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/Help.png);width:24px;height:24px;" /></pe:if>
         </pe:if>    
-        <div style="float:left;padding:16px;">
+        <div style="float:left;padding:16px;max-height:140px;">
             <!-- tricky: always reference content like below. It allows MCML code that needs page:Refresh to work inside content.-->
             <script refresh="false" IsInitialized='<%=_guihelper.values.IsInitialized%>'>
                 document.write(_guihelper.values.content);

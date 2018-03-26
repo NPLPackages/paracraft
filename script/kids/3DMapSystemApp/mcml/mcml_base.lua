@@ -26,8 +26,8 @@ end
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
-NPL.load("(gl)script/ide/System/Windows/mcml/StyleItem.lua");
-local StyleItem = commonlib.gettable("System.Windows.mcml.StyleItem");
+NPL.load("(gl)script/kids/3DMapSystemApp/mcml/StyleItem.lua");
+local StyleItem = commonlib.gettable("Map3DSystem.mcml_controls.StyleItem");
 local pe_css = commonlib.gettable("Map3DSystem.mcml_controls.pe_css");
 
 if(not Map3DSystem.mcml) then Map3DSystem.mcml = {} end

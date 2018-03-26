@@ -282,6 +282,14 @@ function Actor:FrameMovePlaying(deltaTime)
 	local allow_user_control;
 	if(entity:HasFocus()) then
 		local isBehindLastFrame = ((self:GetMultiVariable():GetLastTime()+1) <= curTime);
+		if(isBehindLastFrame) then
+			if(not self.isBehindLastFrame) then
+				self.isBehindLastFrame = true;
+				isBehindLastFrame = false;
+			end
+		else
+			self.isBehindLastFrame = isBehindLastFrame;
+		end
 		allow_user_control = not self:IsPlayingMode() and isBehindLastFrame;
 		if( not allow_user_control ) then
 			ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
@@ -291,7 +299,10 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(isBehindLastFrame) then
 			return;
 		end
+	else
+		self.isBehindLastFrame = nil;
 	end
+	
 	local obj = entity:GetInnerObject();
 	if(obj) then
 		obj:SetFacing(eye_rot_y or 0);

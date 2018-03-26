@@ -124,6 +124,14 @@ function TimeSeries:CopyKeyFrame(keytime, from_keytime)
 	end
 end
 
+-- Update or insert (Upsert) a key frame at given time.
+-- @param data: data is cloned before updating. 
+function TimeSeries:UpsertKeyFrame(key_time, data)
+	for k,v in pairs(self.data) do
+		v:UpsertKeyFrame(keytime, data);
+	end
+end
+
 -- move keyframe from from_keytime to keytime
 function TimeSeries:MoveKeyFrame(keytime, from_keytime)
 	for k,v in pairs(self.data) do

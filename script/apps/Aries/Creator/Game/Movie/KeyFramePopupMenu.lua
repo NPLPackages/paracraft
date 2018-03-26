@@ -27,6 +27,8 @@ local standard_keylist = {
 	{name="DeleteAllKeysToTheRight", text=L"删除右侧全部关键帧"},
 	{name="DeleteAllKeys", text=L"删除全部关键帧"},
 	{name="ShiftKeyTime", text=L"平移右侧所有帧的时间..."}, 
+	{name="CopyKey", text=L"复制"},
+	{name="PasteKey", text=L"粘贴"},
 	{name="MoveKeyTime", text=L"设置时间..."}, 
 };
 
@@ -61,7 +63,13 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 		if(node) then
 			node:ClearAllChildren();
 			for index, item in ipairs(itemList) do
-				node:AddChild(CommonCtrl.TreeNode:new({Text = item.text or item.name, Name = item.name, Type = "Menuitem", onclick = nil, }));
+				local text = item.text or item.name;
+				if(item.name == "PasteKey") then
+					if(KeyFramePopupMenu.last_key_name) then
+						text = format("%s %s:%s", text, KeyFramePopupMenu.last_key_name, commonlib.serialize_in_length(KeyFramePopupMenu.last_key_data, 10));
+					end
+				end
+				node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }));
 			end
 			ctl.height = (#itemList) * 26 + 4;
 		end
@@ -121,6 +129,18 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 		if(time and var and actor) then
 			actor:BeginModify();
 			var:TrimEnd(time);
+			actor:EndModify();
+			MovieUISound.PlayAddKey();
+		end
+	elseif(node.Name == "CopyKey") then	
+		if(var and actor) then
+			KeyFramePopupMenu.last_key_data = var:getValue(time);
+			KeyFramePopupMenu.last_key_name = var.name;
+		end
+	elseif(node.Name == "PasteKey") then	
+		if(var and actor and KeyFramePopupMenu.last_key_name == var.name) then
+			actor:BeginModify();
+			var:UpsertKeyFrame(time, KeyFramePopupMenu.last_key_data);
 			actor:EndModify();
 			MovieUISound.PlayAddKey();
 		end

@@ -74,7 +74,6 @@ function Entity:ctor()
 	self.dist_walked = 0;
 	self.inventory = InventoryPlayer:new():Init();
 	self.inventory:SetParentEntity(self);
-	self.inventoryView = ContainerView:new():Init(self.inventory);
 	self.capabilities = PlayerCapabilities:new():Init();
 	self.capabilities.allowEdit = true;
 	self.can_push_block = true;

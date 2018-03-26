@@ -303,10 +303,12 @@ function CreateNewWorld.OnClickCreateWorld()
 			_guihelper.MessageBox(error_msg);
 		end
 	else
+		LOG.std(nil, "info", "CreateNewWorld", "new world created at %s", worldpath);
 		CreateNewWorld.page:CloseWindow();
 		WorldCommon.OpenWorld(worldpath, true);
 		GameLogic:UserAction("introduction");
-		GameLogic.options:SetShowTutorial(true);
+		-- this is annoying, we will not show tutorial in this intrusive way. we will use external lesson mod to do this job in near future.
+		-- GameLogic.options:SetShowTutorial(true);
 	end
 end
 
@@ -331,6 +333,11 @@ function CreateNewWorld.CreateWorld(values)
 		if(not string.match(worldfolder, "/$")) then
 			worldfolder = worldfolder.."/"
 		end
+
+		if(not commonlib.Files.IsAbsolutePath(worldfolder)) then
+			worldfolder = ParaIO.GetWritablePath()..worldfolder;
+		end
+
 		local worldpath = (worldfolder..worldname);
 		
 		-- create a new world

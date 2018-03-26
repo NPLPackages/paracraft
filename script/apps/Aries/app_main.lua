@@ -2107,15 +2107,18 @@ function MyCompany.Aries.Handle_ConnectWorld_Command(params, isReconnecting)
 	LOG.std("", "system", "aries", "File.ConnectAriesWorld is called for %s", worldpath);
 		
 	-- never connect for initial empty world or worlds outside "worlds/" directory. 
-	if(not string.match(worldpath, "^worlds")) then
+	if(not string.match(worldpath, "worlds/")) then
+		LOG.std("", "error", "aries", "File.ConnectAriesWorld is not possible for worlds outside worlds/ directory");
+		-- make it ready anyway
+		System.User.is_ready = true;
 		return;
 	end
 	local SwfLoadingBarPage =  commonlib.gettable("Map3DSystem.App.MiniGames.SwfLoadingBarPage");
 	-- LXZ: 2010.2.10 in case there is a design house, we will secretly change world path on the server side. 
-	if(string.match(worldpath, "^worlds/DesignHouse/")) then
+	if(string.match(worldpath, "worlds/DesignHouse/")) then
 		-- ensure there is always nid
-		if(string.match(worldpath, "^worlds/DesignHouse/userworlds/")) then
-			local nid, slot_id, revision = (params.worldpath or worldpath):match("^worlds/DesignHouse/userworlds/(%d+)_(%d+)_(%d+)%.zip$")
+		if(string.match(worldpath, "worlds/DesignHouse/userworlds/")) then
+			local nid, slot_id, revision = (params.worldpath or worldpath):match("worlds/DesignHouse/userworlds/(%d+)_(%d+)_(%d+)%.zip$")
 			if(nid) then
 				params.nid = tonumber(nid);
 				worldpath = format("worlds/DesignHouse/Local/%s/", slot_id);
