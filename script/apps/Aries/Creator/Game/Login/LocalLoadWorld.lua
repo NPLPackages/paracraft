@@ -100,6 +100,19 @@ function LocalLoadWorld.RefreshAll(refresh_delay)
 	page:Refresh(refresh_delay);
 end
 
+local saveWorldPath;
+function LocalLoadWorld.GetDefaultSaveWorldPath()
+	if(not saveWorldPath) then
+		if(System.os.GetExternalStoragePath()~="") then
+			saveWorldPath = System.os.GetExternalStoragePath().."paracraft/worlds/DesignHouse";
+		else
+			saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
+		end
+		LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
+	end
+	return saveWorldPath;
+end
+
 function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 	-- update the file path
 	if(bForceRefresh or not LocalLoadWorld.IsWorldListLoaded) then
@@ -109,9 +122,9 @@ function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 		LocalLoadWorld.dsWorlds = {};
 		LocalLoadWorld.SelectedWorld_Index = nil;
 		
+		local folderPath = LocalLoadWorld.GetDefaultSaveWorldPath();
+
 		-- add folders in myworlds/DesignHouse
-		local folderPath = LocalLoadWorld.GetWorldFolderFullPath();
-		
 		local output = LocalLoadWorld.SearchFiles(nil, folderPath, LocalLoadWorld.MaxItemPerFolder);
 		if(output and #output>0) then
 			
@@ -398,7 +411,7 @@ function LocalLoadWorld.OnClickLoadWorld()
 			LocalLoadWorld.page:CloseWindow();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
-			_guihelper.MessageBox("无效的世界文件");
+			_guihelper.MessageBox(L"无效的世界文件");
 		end
 	end
 end

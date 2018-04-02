@@ -159,7 +159,7 @@ e.g.
 				-- prevent recursive calls.
 				mytimer:Change(1,nil);
 			else
-				_guihelper.MessageBox("无效的世界文件");
+				_guihelper.MessageBox(L"无效的世界文件");
 			end
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");

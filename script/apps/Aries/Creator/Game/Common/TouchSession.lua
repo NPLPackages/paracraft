@@ -110,6 +110,10 @@ function TouchSession:GetMaxDragDistance()
 	return self.max_delta or 0;
 end
 
+function TouchSession:IsDragging()
+	return self:GetMaxDragDistance() > self:GetFingerSize();
+end
+
 function TouchSession:GetBlocks()
 	return self.blocks;
 end

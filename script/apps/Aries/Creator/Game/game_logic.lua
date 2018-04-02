@@ -617,7 +617,7 @@ end
 -- @param bSaveToLastSaveFolder: whether to save block to "blockworld.lastsave" folder
 function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	if(System.World.readonly or GameLogic.isRemote) then
-		_guihelper.MessageBox("您打开的是只读世界. 请将zip文件解压缩后, 重新加载解压缩后的世界才能保存");
+		_guihelper.MessageBox(L"您打开的是只读世界. 请将zip文件解压缩后, 重新加载解压缩后的世界才能保存");
 		return false;
 	end
 	if(not EnterGamePage.CheckRight("savegame")) then
@@ -914,7 +914,7 @@ end
 -- return true if read only and display a message box. 
 function GameLogic.CheckReadOnly()
 	if(GameLogic.IsReadOnly()) then
-		_guihelper.MessageBox("只读世界不能进行这个操作");
+		_guihelper.MessageBox(L"只读世界不能进行这个操作");
 		return true;
 	end
 end

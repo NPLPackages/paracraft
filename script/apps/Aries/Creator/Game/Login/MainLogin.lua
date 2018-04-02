@@ -254,7 +254,7 @@ function MainLogin:AutoAdjustGraphicsSettings()
 		function(bChanged) 
 			if(ParaEngine.GetAttributeObject():GetField("HasNewConfig", false)) then
 				ParaEngine.GetAttributeObject():SetField("HasNewConfig", false);
-				_guihelper.MessageBox("您上次运行时更改了图形设置. 是否保存目前的显示设置.", function(res)	
+				_guihelper.MessageBox(L"您上次运行时更改了图形设置. 是否保存目前的显示设置.", function(res)	
 					if(res and res == _guihelper.DialogResult.Yes) then
 						-- pressed YES
 						ParaEngine.WriteConfigFile("config/config.txt");
@@ -540,7 +540,7 @@ function MainLogin:CheckShowTouchVirtualKeyboard()
 end
 
 -- call this before any UI is drawn
-function MainLogin:AutoAdjustUIScalingForTouchDevice()
+function MainLogin:AutoAdjustUIScalingForTouchDevice(callbackFunc)
 	if(System.options.IsTouchDevice) then
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
@@ -563,6 +563,9 @@ function MainLogin:AutoAdjustUIScalingForTouchDevice()
 					LOG.std(nil, "info", "TouchDevice", "set UIScale to %s for TouchDevice", scaling);
 					ParaUI.GetUIObject("root"):SetField("UIScale", {scaling, scaling});
 				end
+				if(callbackFunc) then
+					callbackFunc();
+				end
 			end
 		end})
 		mytimer:Change(0,300);
@@ -570,8 +573,9 @@ function MainLogin:AutoAdjustUIScalingForTouchDevice()
 end
 
 function MainLogin:ShowLoginModePage()
-	self:AutoAdjustUIScalingForTouchDevice();
-	self:CheckShowTouchVirtualKeyboard();
+	self:AutoAdjustUIScalingForTouchDevice(function()
+		self:CheckShowTouchVirtualKeyboard();
+	end);
 	
 
 	if(System.options.cmdline_world and System.options.cmdline_world~="") then

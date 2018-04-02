@@ -1326,8 +1326,8 @@ function pe_sliderbar.create(rootName, mcmlNode, bindingContext, _parent, left, 
 	ctl.step_left_button_bg = mcmlNode:GetString("step_left_button_bg");
 	ctl.step_right_button_bg = mcmlNode:GetString("step_right_button_bg");
 	ctl.background = mcmlNode:GetString("background") or css.background; 
-	ctl.button_width = mcmlNode:GetNumber("button_width");
-	ctl.button_height = mcmlNode:GetNumber("button_height");
+	ctl.button_width = tonumber(mcmlNode:GetAttributeWithCode("button_width"));
+	ctl.button_height = tonumber(mcmlNode:GetAttributeWithCode("button_height"));
 	
 	ctl.editor_width = mcmlNode:GetNumber("EditorWidth");
 	ctl.editor_format = mcmlNode:GetString("EditorFormat");

@@ -91,7 +91,7 @@ Commands["menu"] = {
 				GameLogic.world_revision:Backup();
 				GameLogic.world_revision:OnOpenRevisionDir();
 			else
-				_guihelper.MessageBox("世界是只读的，无需备份");
+				_guihelper.MessageBox(L"涓栫晫鏄彧璇荤殑锛屾棤闇�澶囦唤");
 			end
 		elseif(name == "file.openbackupfolder") then
 			GameLogic.world_revision:OnOpenRevisionDir();

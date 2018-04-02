@@ -67,7 +67,7 @@ function CameraController.OnInit()
 	attr:SetField("MaxAllowedYShift", GameLogic.options.MaxAllowedYShift or 0);
 	attr:SetField("CameraRollbackSpeed", GameLogic.options.CameraRollbackSpeed or 6);
 	-- "EnableMouseLeftDrag" boolean attribute is added to ParaCamera.
-	attr:SetField("EnableMouseLeftDrag", false);
+	attr:SetField("EnableMouseLeftDrag", GameLogic.options.isMouseLeftDragEnabled == true);
 end
 
 function CameraController.OnExit()
@@ -82,6 +82,7 @@ function CameraController.OnExit()
 		CameraController.FPS_MouseTimer:Change();
 	end
 end
+
 
 function CameraController.ToggleFly(isFlying)
 	if(isFlying) then

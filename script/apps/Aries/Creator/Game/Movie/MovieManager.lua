@@ -104,7 +104,7 @@ function MovieManager:EndCapture()
 	VideoRecorder.EndCapture();
 
 	if(ParaIO.DoesFileExist(VideoRecorder.GetCurrentVideoFileName())) then
-		_guihelper.MessageBox("录制完成, 是否现在打开文件目录？", function(res)
+		_guihelper.MessageBox(L"录制完成, 是否现在打开文件目录？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				VideoRecorder.OpenOutputDirectory();
 			end

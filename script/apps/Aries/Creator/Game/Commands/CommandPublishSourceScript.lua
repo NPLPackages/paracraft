@@ -372,7 +372,7 @@ Commands["generatecmdfile"] = {
 	handler = function (cmd_name, cmd_text, cmd_params)
 		
 		GenerateCommandXmlFile();
-		_guihelper.MessageBox("命令文件处理完成,具体请查看:config/Aries/creator/Commands.xml.");
+		_guihelper.MessageBox(L"命令文件处理完成,具体请查看:config/Aries/creator/Commands.xml.");
 	end
 
 };

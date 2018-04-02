@@ -251,7 +251,7 @@ function CreateNewWorld.OnClickLoadWorld()
 			CreateNewWorld.page:CloseWindow();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
-			_guihelper.MessageBox("无效的世界文件");
+			_guihelper.MessageBox(L"无效的世界文件");
 		end
 	end
 end

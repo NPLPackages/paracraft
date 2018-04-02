@@ -89,14 +89,6 @@ end
 
 function GetStyle()
     local height = CommandHelpPage.height + 10;
-
-    --[[
-    if(System.options.mc) then
-        height = 295;
-    else
-        height = 150;
-    end
-    ]]
     local style = string.format("width:%dpx;height:%dpx;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:5 5 5 5);",width,height);
     return style;
 end
@@ -154,7 +146,7 @@ end
     <pe:if condition ='<%= CommandHelpPage.HasGotCommandName%>'>
         <div style="margin-left:7px;margin-top:5px;margin-right:0px;">
             <div style='font-weight:bold;'><%=L"命令格式"%><input type='button' value='<%=L"帮助"%>' style='float:left;margin-left:10px;' onclick='OnShowCmdHelp' class='mc_button_blue' /></div>
-            <textarea ReadOnly="false" rows="13" UseSystemControl="true" style="textcolor:#ffffff;height:268px;" value="<%= GetCommandStr()%>"></textarea>
+            <textarea ReadOnly="false" UseSystemControl="true" style='<%=format("textcolor:#ffffff;height:%dpx", CommandHelpPage.height-20)%>' value="<%= GetCommandStr()%>"></textarea>
         </div>
     </pe:if>
 </div>

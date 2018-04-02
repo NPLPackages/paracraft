@@ -132,6 +132,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	stereoMode = 0,
 	-- 960*560 which is the minimum UI size allowed. 
 	min_ui_height = 560,
+	-- usually the left drag is enabled only in touch mode.
+	isMouseLeftDragEnabled = false,
 });
 
 -- load default setting on application start. 
@@ -168,6 +170,14 @@ function options:LoadDefaultTransientOptions()
 	self.CanJumpInAir = true;
 	self.CanJumpInWater = true;
 	self.AllowRunning = true;
+end
+
+-- usually the left drag is enabled only in touch mode.
+function options:SetEnableMouseLeftDrag(bEnabled)
+	if(self.isMouseLeftDragEnabled~=bEnabled) then
+		self.isMouseLeftDragEnabled = bEnabled;
+		ParaCamera.GetAttributeObject():SetField("EnableMouseLeftDrag", bEnabled==true);
+	end
 end
 
 function options:SetIsCheating(bIsCheatingOn)
@@ -405,7 +415,11 @@ function options:ShowTouchPad(bShow)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 		local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 		TouchMiniKeyboard.CheckShow(true);
+
+		-- enable touch mode
+		self:SetEnableMouseLeftDrag(true);
 	end
+
 -- following is old and intrusive touch system 
 --	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
 --	local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");

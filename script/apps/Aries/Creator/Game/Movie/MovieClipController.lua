@@ -128,9 +128,18 @@ function MovieClipController.SetCode(code)
 	curItemStack:SetData(code);
 end
 
+function MovieClipController.GetMarginBottom()
+	if(System.options.IsTouchDevice) then
+		return 270;
+	else
+		return 40+12;
+	end
+end
+
 -- @param bShow:true to refresh or show
 function MovieClipController.ShowPage(bShow, OnClose)
 	if(not page) then
+		local width,height = 200, 235;
 		local params = {
 				url = "script/apps/Aries/Creator/Game/Movie/MovieClipController.html", 
 				name = "MovieClipController.ShowPage", 
@@ -146,10 +155,10 @@ function MovieClipController.ShowPage(bShow, OnClose)
 				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 				directPosition = true,
 					align = "_rb",
-					x = -220,
-					y = -222-34*2,
+					x = -width-20,
+					y = -height - MovieClipController.GetMarginBottom(),
 					width = 200,
-					height = 180+34*2,
+					height = height,
 			};
 		System.App.Commands.Call("File.MCMLWindowFrame", params);
 		if(params._page) then

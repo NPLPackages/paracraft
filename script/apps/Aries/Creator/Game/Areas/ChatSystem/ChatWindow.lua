@@ -44,9 +44,9 @@ local max_broadcast_msg_show_time = 60000;
 -- the default show positions.
 ChatWindow.DefaultUIPos = {
 	RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
-	LogWnd = {alignment = "_lb", left = 2, top = -330, width = 320, height = 300},
+	LogWnd = {alignment = "_lb", left = 2, top = -280, width = 320, height = 250},
 	EditWnd = {alignment = "_lb", left = 2, top = -30, width = 700, height = 30},
-	ParentWnd = {alignment = "_lb", left = 2, top = -335, width = 700, height = 330},
+	ParentWnd = {alignment = "_lb", left = 2, top = -285, width = 700, height = 280},
 }
 
 -- public: call this once at init time. 

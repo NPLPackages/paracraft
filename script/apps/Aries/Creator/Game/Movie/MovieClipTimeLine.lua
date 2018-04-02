@@ -12,6 +12,8 @@ local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieCl
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/KeyFrameCtrl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local KeyFrameCtrl = commonlib.gettable("MyCompany.Aries.Game.Movie.KeyFrameCtrl");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
@@ -70,6 +72,10 @@ local var_longname_to_text = {
 	scaling = L"大小 (4键)",
 }
 
+MovieClipTimeLine.timelineHeight = 12;
+MovieClipTimeLine.timeSliderHeight = 16;
+MovieClipTimeLine.height = MovieClipTimeLine.timelineHeight*2 + MovieClipTimeLine.timeSliderHeight;
+
 function MovieClipTimeLine.OnInit()
 	local self = MovieClipTimeLine;
 	self.inited = true;
@@ -88,6 +94,16 @@ function MovieClipTimeLine.OnClosePage()
 	Game.SelectionManager:Disconnect("varNameChanged", self, self.OnVariableNameChange);
 	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
 	self.inited = false;
+	ViewportManager:GetSceneViewport():SetMarginBottom(0);
+end
+
+-- set UI height. only valid during startup
+function MovieClipTimeLine:SetControlSize(timelineHeight, timeSliderHeight)
+	timelineHeight = timelineHeight or 12;
+	timeSliderHeight = timeSliderHeight or timelineHeight;
+	self.timelineHeight = timelineHeight;
+	self.timeSliderHeight = timeSliderHeight;
+	self.height = self.timelineHeight*2 + self.timeSliderHeight;
 end
 
 function MovieClipTimeLine:OnActiveMovieClipChange(clip)
@@ -205,6 +221,7 @@ function MovieClipTimeLine.GetKeyFrameCtrl()
 			onremove_keyframe = MovieClipTimeLine.OnRemoveKeyFrame,
 			oncopy_keyframe = MovieClipTimeLine.OnCopyKeyFrame,
 			onmove_keyframe = MovieClipTimeLine.OnMoveKeyFrame,
+			height = MovieClipTimeLine.timelineHeight,
 		});
 	end	
 	return MovieClipTimeLine.ctlKeyFrame;
@@ -237,6 +254,7 @@ function MovieClipTimeLine.GetSubFrameCtrl()
 			oncopy_keyframe = MovieClipTimeLine.OnCopyKeySubFrame,
 			onmove_keyframe = MovieClipTimeLine.OnMoveKeySubFrame,
 			isShowDataOnTooltip = true,
+			height = MovieClipTimeLine.timelineHeight,
 		});
 	end	
 	return MovieClipTimeLine.ctlSubFrame;
@@ -255,7 +273,12 @@ function MovieClipTimeLine:ShowTimeline(state)
 	else
 		local _this = ParaUI.GetUIObject(movie_clip_timeline_name)
 		if(not _this:IsValid()) then
-			_this = ParaUI.CreateUIObject("container", movie_clip_timeline_name, "_mb", 0, 0, 0, 40);
+			if(System.options.IsTouchDevice) then
+				-- make it bigger on touch device
+				self:SetControlSize(24, 32);
+			end
+
+			_this = ParaUI.CreateUIObject("container", movie_clip_timeline_name, "_mb", 0, 0, 0, self.height);
 			_this:SetScript("onclick", MovieClipTimeLine.OnClickTimeLine);
 			_this.zorder = -2;
 			_this.background = "Texture/whitedot.png";
@@ -272,6 +295,10 @@ function MovieClipTimeLine:ShowTimeline(state)
 		end
 		_guihelper.SetUIColor(_this, timeline_color_map[state]);
 		_this.visible = true;
+
+		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+		local Screen = commonlib.gettable("System.Windows.Screen");
+		ViewportManager:GetSceneViewport():SetMarginBottom(math.floor(self.height * (Screen:GetUIScaling()[2])));
 		if(not self.inited) then
 			MovieClipTimeLine.OnInit();
 		end

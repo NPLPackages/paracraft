@@ -416,7 +416,7 @@ function ChatEdit.OnKeyUp(name, mcmlNode)
 			end,
 		}
 		local x,y = _editbox:GetAbsPosition();
-		CommandHelpPage.HandlerKeyUp({x = x,y = y,rows = 10,offset_x = -5,offset_y = 9},virtual_key,callbacks,sentText);
+		CommandHelpPage.HandlerKeyUp({x = x,y = y,rows = System.options.IsTouchDevice and 8 or 10, offset_x = -5,offset_y = 9},virtual_key,callbacks,sentText);
 		--CommandHelpPage.HandlerKeyUp(virtual_key,callbacks,sentText);
 
 

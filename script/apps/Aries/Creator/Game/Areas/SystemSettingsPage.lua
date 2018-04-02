@@ -632,11 +632,11 @@ function SystemSettingsPage.AutoAdjustGraphicsSettings(bShowUI, callbackFunc, On
 		if(bShowUI) then
 			local text;
 			if(new_effect_level == 1024) then
-				_guihelper.MessageBox("为了更好的运行程序, 我们建议您购买新的3D显卡。我们即将自动为您调整为最低的3D画面质量", function(res)
+				_guihelper.MessageBox(L"为了更好的运行程序, 我们建议您购买新的3D显卡。我们即将自动为您调整为最低的3D画面质量", function(res)
 					ApplyChanges();
 				end, _guihelper.MessageBoxButtons.OK)
 			else
-				_guihelper.MessageBox("我们发现您的计算机显卡比较旧, 为了更好的运行程序, 您是否希望我们自动为您调整为较低的画面质量？", function(res)
+				_guihelper.MessageBox(L"我们发现您的计算机显卡比较旧, 为了更好的运行程序, 您是否希望我们自动为您调整为较低的画面质量？", function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						ApplyChanges();
 					else
@@ -953,7 +953,7 @@ function SystemSettingsPage.OnOK()
 	end
 
 	if(bNeedUpdateScreen) then
-		_guihelper.MessageBox("您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?", function ()
+		_guihelper.MessageBox(L"您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?", function ()
 			ParaEngine.GetAttributeObject():CallField("UpdateScreenMode");
 			-- we will save to "config.new.txt", so the next time the game engine is started, it will ask the user to preserve or not. 
 			ParaEngine.WriteConfigFile("config/config.new.txt");
@@ -1110,7 +1110,7 @@ function SystemSettingsPage.OnOK()
 	page:CloseWindow();
 	
 	if(bNeedUpdateScreen) then
-		_guihelper.MessageBox("您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?", function ()
+		_guihelper.MessageBox(L"您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?", function ()
 			ParaEngine.GetAttributeObject():CallField("UpdateScreenMode");
 			-- we will save to "config.new.txt", so the next time the game engine is started, it will ask the user to preserve or not. 
 			ParaEngine.WriteConfigFile("config/config.new.txt");
@@ -1125,8 +1125,8 @@ function SystemSettingsPage.OnOK()
 	end
 		
 	if(bNeedRestart) then
-		_guihelper.MessageBox("保存成功, 某些设置需要重启才能生效, 请重新启动客户端");
-		--_guihelper.MessageBox("保存成功, 某些设置需要重启才能生效, 是否现在重新启动客户端", function()
+		_guihelper.MessageBox(L"保存成功, 某些设置需要重启才能生效, 请重新启动客户端");
+		--_guihelper.MessageBox(L"保存成功, 某些设置需要重启才能生效, 是否现在重新启动客户端", function()
 			--MyCompany.Aries.Desktop.Dock.PostLogoutTime(function()
 				--Map3DSystem.App.Commands.Call("Profile.Aries.Restart", {method="hard"});
 			--end);

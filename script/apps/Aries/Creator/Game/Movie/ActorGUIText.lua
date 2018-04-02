@@ -184,13 +184,22 @@ function Actor:GetTextObj(bCreateIfNotExist)
 	if(bCreateIfNotExist) then
 		local _parent = ParaUI.GetUIObject("MovieGUIRoot");
 		if(not _parent:IsValid()) then
-			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,0,0);
+			NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+			local viewport = ViewportManager:GetSceneViewport();
+
+			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,0,viewport:GetMarginBottom());
 			_parent.background = ""
 			_parent.enabled = false;
 			_parent.zorder = -3;
 			_parent:AttachToRoot();
+			
+			viewport:Connect("sizeChanged", nil, function()
+				local _parent = ParaUI.GetUIObject("MovieGUIRoot");
+				_parent.bottom = viewport:GetMarginBottom();
+			end)
 
-			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 50);
+			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 24);
 			_this.background = "";
 			_this.font = "System;20;bold";
 			_guihelper.SetFontColor(_this, "#ffffffff");
@@ -236,7 +245,7 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, bgalpha, textalp
 	if(textpos == "center") then
 		obj:Reposition("_ct", -480, -100, 960, 200);
 	else
-		obj:Reposition("_mb", 0, 45, 0, 64);
+		obj:Reposition("_mb", 0, 45, 0, 24);
 	end
 
 	if(fontsize and fontsize~=default_values.fontsize) then

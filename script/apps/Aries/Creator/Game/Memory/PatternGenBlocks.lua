@@ -51,7 +51,7 @@ local function ComputeBlockEdge(block, blocks, view_direction)
 	block.edges = block.edges or {};
 	local edges = block.edges;
 	
-	local dx, dy, dz, block;
+	local dx, dy, dz;
 	local x,y,z = block.bx, block.by, block.bz;
 	for side = 0, 5 do
 		local dx, dy, dz = GetOffsetBySideAndView(view_direction, side);

@@ -14,6 +14,8 @@ QuickSelectBar.ShowPage(true)
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ObtainItemEffect.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchButton.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local TouchButton = commonlib.gettable("MyCompany.Aries.Game.Common.TouchButton");
 local ObtainItemEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.ObtainItemEffect");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -235,6 +237,28 @@ function QuickSelectBar.ShowPage(bShow)
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html";
 	end
 
+	local viewport = ViewportManager:GetSceneViewport();
+	local viewport_margin_bottom = viewport:GetMarginBottom();
+	if(not QuickSelectBar.viewportConnected) then
+		QuickSelectBar.viewportConnected = true;
+		viewport:Connect("sizeChanged", nil, function()
+			if(page) then
+				local win = page:GetWindow()
+				if(win) then
+					win = win:GetWindowFrame();
+					if(win) then
+						local obj = win:GetWindowUIObject()
+						if(obj) then
+							NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+							local Screen = commonlib.gettable("System.Windows.Screen");
+							obj.y = -math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+						end
+					end
+				end
+			end
+		end)
+	end
+
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 			--url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html", 
 			url = url,
@@ -249,10 +273,11 @@ function QuickSelectBar.ShowPage(bShow)
 			directPosition = true,
 				align = "_ctb",
 				x = 0,
-				y = 0,
+				y = -viewport_margin_bottom,
 				width = width,
 				height = height,
 		});
+
 end
 
 function QuickSelectBar.Refresh(nDelayTime)

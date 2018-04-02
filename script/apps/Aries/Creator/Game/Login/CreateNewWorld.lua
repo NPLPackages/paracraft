@@ -11,6 +11,8 @@ CreateNewWorld.ShowPage()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 
 local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -252,13 +254,13 @@ function CreateNewWorld.OnClickLoadWorld()
 			CreateNewWorld.page:CloseWindow();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
-			_guihelper.MessageBox("无效的世界文件");
+			_guihelper.MessageBox(L"无效的世界文件");
 		end
 	end
 end
 
 function CreateNewWorld.GetWorldFolder()
-	return CreateNewWorld.OpenWorld_Folder;
+	return LocalLoadWorld.GetDefaultSaveWorldPath();
 end
 
 function CreateNewWorld.OnClickCreateWorld()

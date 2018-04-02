@@ -53,9 +53,6 @@ KeyFrameCtrl.isShowDataOnTooltip = false;
 -- @param o: {name="my_texture_grid"}
 function KeyFrameCtrl:new(o)
 	o = o or {}   -- create object if user does not provide one
-	setmetatable(o, self)
-	self.__index = self;
-
 	-- instance of TimeSeries/AnimBlock.lua
 	o.variable = nil; 
 	-- the center of the viewpoint. 
@@ -63,7 +60,12 @@ function KeyFrameCtrl:new(o)
 	o.y = o.y or 0;
 	o.name = o.name or "KeyFrameCtrl";
 	o.width = o.width or 512;
-	o.height = o.height or 16;
+	o.height = o.height or 12;
+	o.key_button_height = o.key_button_height or o.height;
+	o.key_button_width = o.key_button_width or math.floor(o.key_button_height*2/3);
+
+	self.__index = self;
+	setmetatable(o, self)
 	return o
 end
 

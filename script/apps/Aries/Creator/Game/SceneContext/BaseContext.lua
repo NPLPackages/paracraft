@@ -73,6 +73,9 @@ function BaseContext:ctor()
 		-- leak events to hook chain for old haqi interfaces, such as terrain painting. 
 		self:SetAcceptAllEvents(false);
 	end
+	if(System.options.IsTouchDevice) then
+		self.pickingPointSize = 16;
+	end
 end
 
 function BaseContext:OnSelect()
