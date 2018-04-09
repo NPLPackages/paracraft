@@ -71,12 +71,12 @@ end
             <Columns>
                 <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
                     <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
-                        <pe:mc_slot ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot switchTouchButton="true" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
                 <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
                     <div class="mc_item">
-                        <pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot switchTouchButton="true" class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
 			</Columns>

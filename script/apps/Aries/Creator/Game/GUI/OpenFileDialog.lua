@@ -2,7 +2,7 @@
 Title: Open File Dialog
 Author(s): LiXizhi
 Date: 2015/9/20
-Desc: Display a dialog with text that let user to enter filename. 
+Desc: Display a dialog with text that let user to enter filename in current world directory. 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
@@ -84,6 +84,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 	OpenFileDialog.filters = filters;
 	OpenFileDialog.editButton = editButton;
 	OpenFileDialog.IsSaveMode = IsSaveMode == true;
+	OpenFileDialog.UpdateExistingFiles();
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html", 
@@ -100,8 +101,8 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
-				x = -200,
-				y = -150,
+				x = -230,
+				y = -220,
 				width = 460,
 				height = 400,
 		};
@@ -140,6 +141,55 @@ function OpenFileDialog.OnOK()
 	if(page) then
 		OpenFileDialog.result = page:GetValue("text");
 		page:CloseWindow();
+	end
+end
+
+function OpenFileDialog.GetExistingFiles()
+	return OpenFileDialog.dsExistingFiles or {};
+end
+
+function OpenFileDialog.UpdateExistingFiles()
+	NPL.load("(gl)script/ide/Files.lua");
+	local rootPath = ParaWorld.GetWorldDirectory();
+
+	local filter, filterFunc;
+	if(OpenFileDialog.filters) then
+		filter = OpenFileDialog.filters[OpenFileDialog.curFilterIndex or 1];
+		if(filter) then
+			filter = filter[2];
+			if(filter) then
+				-- "*.fbx;*.x;*.bmax;*.xml"
+				local exts = {};
+				for ext in filter:gmatch("%*%.([^;]+)") do
+					exts[#exts + 1] = "%."..ext.."$";
+				end
+				
+				-- skip these system files and all files under blockWorld.lastsave/
+				local skippedFiles = {
+					["LocalNPC.xml"] = true,
+					["entity.xml"] = true,
+					["players/0.entity.xml"] = true,
+					["revision.xml"] = true,
+					["tag.xml"] = true,
+				}
+
+				filterFunc = function(item)
+					if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld%.lastsave")) then
+						for i=1, #exts do
+							if(item.filename:match(exts[i])) then
+								return true;
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	local files = {};
+	OpenFileDialog.dsExistingFiles = files;
+	local result = commonlib.Files.Find({}, rootPath, 2, 500, filterFunc);
+	for i = 1, #result do
+		files[#files+1] = {name="file", attr=result[i]};
 	end
 end
 

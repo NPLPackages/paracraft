@@ -21,6 +21,7 @@ local region = texture_atlas:GetRegion("block3"); region:Print();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/ide/mathlib.lua");
+NPL.load("(gl)script/ide/EventDispatcher.lua");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -29,6 +30,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
+local gEventSystem = commonlib.EventSystem.getInstance();
 ---------------------------
 -- TextureRegion
 ---------------------------
@@ -139,6 +141,8 @@ function TextureRegion:GetTop()
 	end
 end
 
+
+
 -- call this to release
 function TextureRegion:AutoRelease()
 	if(self.rectangle and self.texture_packer) then
@@ -146,6 +150,8 @@ function TextureRegion:AutoRelease()
 		self.rectangle = nil;
 		self.texture_packer = nil;
 	end
+	
+	--gEventSystem:RemoveEventListener("RendererRecreated", self.onRendererRecreated, self);
 end
 
 function TextureRegion:ComputeTexturePath()
@@ -189,6 +195,7 @@ function TexturePacker:GetTextureFilename()
 	if(not self.textureFilename) then
 		self.textureFilename = self:GetScene():GetAttributeObject():GetField("assetfile", self:GetFileName());
 	end
+	
 	return self.textureFilename;
 end
 
@@ -259,6 +266,9 @@ end
 
 -- rebuild the scene. 
 function TexturePacker:RebuildScene(bClearAll)
+
+	--LOG.std(nil, "info", "system", "######## TexturePacker:RebuildScene");
+
 	self:SetDirty(false);
 	local scene = self:GetScene();
 	if(bClearAll) then
@@ -398,6 +408,9 @@ function TextureAtlas:ctor()
 end
 
 function TextureAtlas:init(filename, width, height, unit_size)
+	
+	gEventSystem:AddEventListener("RendererRecreated", self.onRendererRecreated, self);
+
 	self:SetFileName(filename);
 	self:SetWidth(width);
 	self:SetHeight(height);
@@ -405,6 +418,11 @@ function TextureAtlas:init(filename, width, height, unit_size)
 		self:SetUnitSize(unit_size);
 	end
 	return self;
+end
+
+function TextureAtlas:onRendererRecreated()
+	LOG.std(nil, "info", "TextureAtlas", "%s onRendererRecreated", self:GetFileName());
+	self:RefreshAllBlocks();
 end
 
 function TextureAtlas:GetRegion(name)
@@ -554,13 +572,12 @@ function TextureAtlas:OnTick()
 		if(texture_packer and texture_packer:IsDirty()) then
 			texture_packer:RebuildScene();
 			texture_packer:Draw();
+			LOG.std(nil, "info", "TextureAtlas","%s redrawn", self:GetFileName())
 			if(self:IsRenderToFile()) then
 				-- for async loading reason, we will render it twice. 
 				texture_packer:ScheduleFunctionCall(200, texture_packer, texture_packer.Draw);
 				-- then save to file
 				texture_packer:ScheduleFunctionCall(1000, texture_packer, texture_packer.SaveToFile);
-			else
-				LOG.std(nil, "debug", "TextureAtlas","%s redrawn", self:GetFileName())
 			end
 		end
 	end

@@ -13,6 +13,7 @@ use the lib:
 | DestInventory | the default dest inventory when shift+left key is pressed. we will automatically send all items in this slot to the dest inventory.  |
 | onclick | onclick event |
 | onclick_empty | when clicking on empty slot |
+| switchTouchButton | switch left, right mouse button logic in touch device |
 | edit_mode | if "editor_only", drag operation is only possible in editor mode. |
 | css.background2 | mouse over bg |
 
@@ -369,6 +370,15 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 	local bIsDragClick, count;
 
 	local can_edit = pe_mc_slot.CanDragOrEditNode(mcmlNode);
+	local mouse_button = mouse_button;
+	local switchTouchButton = mcmlNode:GetBool("switchTouchButton", false);
+	if(switchTouchButton and System.options.IsTouchDevice) then
+		if(mouse_button=="left") then
+			mouse_button= "right";
+		elseif(mouse_button=="right") then
+			mouse_button= "left";
+		end
+	end
 
 	if(can_edit) then
 		if(mouse_button=="left") then

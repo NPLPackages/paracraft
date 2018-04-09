@@ -731,7 +731,7 @@ function SelectBlocks.ShowPage(bShow)
 			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			zorder = 1,
-			allowDrag = false,
+			allowDrag = true,
 			click_through = true,
 			directPosition = true,
 				align = "_lt",
