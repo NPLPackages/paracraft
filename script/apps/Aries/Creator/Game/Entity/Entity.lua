@@ -982,9 +982,6 @@ function Entity:Detach()
 	
 end
 
-function Entity:OnAddEntity()
-end
-
 function Entity:GetWorldServer()
     return GameLogic.GetWorld();
 end

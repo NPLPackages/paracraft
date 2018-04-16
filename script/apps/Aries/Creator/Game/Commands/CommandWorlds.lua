@@ -111,10 +111,14 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [worldname|url|filepath]", 
+	quick_ref="/loadworld [-i|e] [worldname|url|filepath]", 
 	desc=[[load a world by worldname or url or filepath relative to parent directory
+@param -i: interactive mode, which will ask the user whether to use existing world or not. 
+@param -e: always use existing world if it exist without checking if it is up to date.  
 e.g.
 /loadworld https://github.com/xxx/xxx.zip
+/loadworld -i https://github.com/xxx/xxx.zip
+/loadworld -e https://github.com/xxx/xxx.zip
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
@@ -126,13 +130,54 @@ e.g.
 		cmd_text = cmd_text:gsub("\\", "/");
 		local filename = cmd_text;
 
+		
 		if(filename) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
+			local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
 			local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld");
 				
 			local world;
+			local isHttp;
+
+			local function LoadWorld_(world, refreshMode)
+				if(world) then
+					local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+
+						local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+						InternetLoadWorld.LoadWorld(world, nil, refreshMode or "auto", function(bSucceed, localWorldPath)
+							DownloadWorld.Close();
+						end);
+					end});
+					-- prevent recursive calls.
+					mytimer:Change(1,nil);
+				else
+					_guihelper.MessageBox(L"无效的世界文件");
+				end
+			end
+
 			if(filename:match("^https?://")) then
+				isHttp = true;
 				world = RemoteWorld.LoadFromHref(filename, "self");
+				DownloadWorld.ShowPage(filename);
+				if(options.i) then
+					-- interactive mode, which will ask the user whether to use existing world or not. 
+					if(isHttp) then
+						local filename = world:GetLocalFileName();
+						if(ParaIO.DoesFileExist(filename)) then
+							_guihelper.MessageBox(L"世界已经存在，是否重新下载?", function()
+								if(res and res == _guihelper.DialogResult.Yes) then
+									LoadWorld_(world, "auto");
+								else
+									LoadWorld_(world, "never");
+								end
+							end, _guihelper.MessageBoxButtons.YesNo);
+						end
+					end
+					return;
+				end
+				LoadWorld_(world, options.e and "never" or "auto");
 			else
 				-- local worldpath = filename:gsub("%.zip$", "");
 				local worldpath = commonlib.Encoding.Utf8ToDefault(filename);
@@ -149,18 +194,9 @@ e.g.
 						end
 					end
 				end
+				LoadWorld_(world);
 			end
-			if(world) then
-				local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
-					local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
-					InternetLoadWorld.LoadWorld(world, nil, "auto");
-				end});
-				-- prevent recursive calls.
-				mytimer:Change(1,nil);
-			else
-				_guihelper.MessageBox(L"无效的世界文件");
-			end
+			
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 			local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");

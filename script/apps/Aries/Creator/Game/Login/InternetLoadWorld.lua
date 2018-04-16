@@ -185,7 +185,8 @@ end
 -- @param world: this is table containing {remotefile, url, etc}
 -- @param homeserver_nid: nil or nid, we will run the instance in the home server of this nid.
 -- @param refreshMode: nil|"auto"|"never"|"force".  
-function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode)
+-- @param onDownloadCompleted: function(bSucceed, localWorldPath) end, if return true, it will not continue to load the world.
+function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode, onDownloadCompleted)
 	if( world.remotefile and world.remotefile:match("^local://")) then
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -214,11 +215,15 @@ function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode)
 		return;
 	end
 	world:DownloadRemoteFile(function(bSucceed, msg)
+		if(onDownloadCompleted) then
+			if(onDownloadCompleted(bSucceed, world.worldpath)) then
+				return;
+			end
+		end
 		if(bSucceed and world.worldpath) then
 			if(page) then
 				page:CloseWindow();
 			end
-
 			if(not gs_nid or not ws_id or System.User.nid == 0) then
 				Game.Start(world.worldpath);
 			else

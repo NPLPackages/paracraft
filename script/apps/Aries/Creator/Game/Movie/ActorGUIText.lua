@@ -10,6 +10,10 @@ local actor = commonlib.gettable("MyCompany.Aries.Game.Movie.ActorGUIText");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -184,11 +188,8 @@ function Actor:GetTextObj(bCreateIfNotExist)
 	if(bCreateIfNotExist) then
 		local _parent = ParaUI.GetUIObject("MovieGUIRoot");
 		if(not _parent:IsValid()) then
-			NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 			local viewport = ViewportManager:GetSceneViewport();
-
-			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,0,viewport:GetMarginBottom());
+			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,0, math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]));
 			_parent.background = ""
 			_parent.enabled = false;
 			_parent.zorder = -3;
@@ -196,10 +197,11 @@ function Actor:GetTextObj(bCreateIfNotExist)
 			
 			viewport:Connect("sizeChanged", nil, function()
 				local _parent = ParaUI.GetUIObject("MovieGUIRoot");
-				_parent.bottom = viewport:GetMarginBottom();
+				local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
+				_parent.height = margin_bottom;
 			end)
 
-			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 24);
+			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 50);
 			_this.background = "";
 			_this.font = "System;20;bold";
 			_guihelper.SetFontColor(_this, "#ffffffff");
@@ -245,7 +247,7 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, bgalpha, textalp
 	if(textpos == "center") then
 		obj:Reposition("_ct", -480, -100, 960, 200);
 	else
-		obj:Reposition("_mb", 0, 45, 0, 24);
+		obj:Reposition("_mb", 0, 45, 0, 50);
 	end
 
 	if(fontsize and fontsize~=default_values.fontsize) then

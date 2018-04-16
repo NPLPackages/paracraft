@@ -65,8 +65,9 @@ function GetModCountAsString()
 end
     
 ]]></script>
-<pe:container alignment="_ct" style="position:relative;background:;margin-left:-260px;margin-top:-200px;width:520px;height:500px;">
-    <div style='<%=L"position:relative;margin-left:0px;margin-top:-10px;width:512px;height:177px;background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"%>'>
+<pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:" onclick="OnSelect"></pe:container>
+<pe:container alignment="_ct" ClickThrough="true" style="position:relative;background:;margin-left:-260px;margin-top:-200px;width:520px;height:500px;">
+    <div style='<%="position:relative;margin-left:0px;margin-top:-10px;width:512px;height:177px;background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 550 512 175);"%>'>
     </div>
     <pe:if condition='<%=Rebranding:GetValue("companylogo")~=nil%>'>
         <div style='<%=format("position:relative;margin-top:15px;margin-left:-220px;width:256px;height:64px;background:url(%s)", Rebranding:GetValue("companylogo"))%>'></div>
@@ -74,34 +75,38 @@ end
     <pe:if condition='<%=Rebranding:GetValue("company")~=nil and not Rebranding:GetValue("companylogo")%>'>
         <div style="position:relative;margin-top:15px;margin-left:-220px;color:#572712"><%=Rebranding:GetValue("company")%></div>
     </pe:if>
-    <div style="position:relative;margin-left:0px;width:480px;margin-top:150px;color:#572712;font-size:14px;text-align:center">
+    <div style="position:relative;margin-left:0px;width:520px;margin-top:150px;font-size:18px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-align:center">
         <%=Rebranding:GetValue("titleaddon") or L"免费的电影创作工具"%>
     </div>
-    <div style="margin-top:178px;margin-left:120px;">
+    <!--<div style="margin-top:178px;margin-left:120px;">
         <input type="button" value='<%=L"开启创意世界" %>' class="mc_big_button" style="font-size:18px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-offset-y:-8;width:240px;height:120px;" name="internet" onclick="OnSelect" />
-    </div>
-    <div style="margin-top:16px;margin-left:110px;">
-        <pe:if condition='<%= System.options.isDevEnv == false %>'>
-            <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
-            <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />
-        </pe:if>
-        <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
-        <pe:if condition='<%= System.options.isDevEnv == true %>'>
-            <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
-                <%=L"开发者模式" %><br/>
-                <%= GetModDes()%>
-            </div>
-            <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:70px" onclick="OnChangeLanguagePage" />
-        </pe:if>
-        
+    </div>-->
+    <div style="margin-top:300px;margin-left:120px;">
     </div>
 </pe:container>
 <!--persistent setting button-->
+<pe:container alignment="_ctb" style="position:relative;background:;margin-left:70px;width:400px;height:105px;">
+    <pe:if condition='<%= System.options.isDevEnv == false %>'>
+        <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
+        <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />
+    </pe:if>
+    <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
+    <pe:if condition='<%= System.options.isDevEnv == true %>'>
+        <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
+            <%=L"开发者模式" %><br/>
+            <%= GetModDes()%>
+        </div>
+        <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:70px" onclick="OnChangeLanguagePage" />
+    </pe:if>
+</pe:container>
 <pe:container alignment="_rb" style="position:relative;background:;width:300px;height:50px;">
-    <input type="button" value='<%="Credits"%>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="position:relative;font-size:14px;height:36px;margin-right:160px" onclick="OnClickCredits" />
+    <!--<input type="button" value='<%="Credits"%>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="position:relative;font-size:14px;height:36px;margin-right:160px" onclick="OnClickCredits" />
     <pe:if condition='<%=Rebranding:GetValue("donation")~="false"%>'>
         <input type="button" value='<%=L"捐赠" %>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="font-size:14px;height:36px;margin-right:20px" onclick="OnClickDonate" />
-    </pe:if>
+    </pe:if>-->
+    <div style="position:relative;margin-left:0px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080">
+        <%=L"点击任意位置继续"%>
+    </div>
 </pe:container>
 </pe:mcml>
 </body>

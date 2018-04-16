@@ -74,7 +74,7 @@ function BaseContext:ctor()
 		self:SetAcceptAllEvents(false);
 	end
 	if(System.options.IsTouchDevice) then
-		self.pickingPointSize = 16;
+		self.pickingPointSize = 24;
 	end
 end
 

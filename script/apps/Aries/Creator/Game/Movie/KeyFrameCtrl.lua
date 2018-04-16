@@ -186,6 +186,7 @@ function KeyFrameCtrl:OnBeginShiftFrame(time, ui_x)
 				if(mouse_button == "right") then
 					self:OnEndShiftFrame();
 				else
+					self:OnFrameMoveShifting();
 					self:OnEndShiftFrame(true);
 				end
 			end)

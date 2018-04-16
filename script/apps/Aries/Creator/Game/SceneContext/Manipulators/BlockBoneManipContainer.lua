@@ -184,10 +184,12 @@ function BlockBoneManipContainer:paintEvent(painter)
 		
 		if(not isDrawingPickable or self.boneEntity ~= boneEntity) then
 			-- draw the pickable pivot point;
-			ShapesDrawer.DrawCircle(painter, x-cx, y-cy, z-cz, pivot_radius, "x", false);
-			ShapesDrawer.DrawCircle(painter, x-cx, y-cy, z-cz, pivot_radius, "y", false);
-			ShapesDrawer.DrawCircle(painter, x-cx, y-cy, z-cz, pivot_radius, "z", false);
-		
+			painter:PushMatrix();
+			painter:TranslateMatrix(x-cx, y-cy, z-cz);
+			painter:LoadBillboardMatrix();
+			ShapesDrawer.DrawCircle(painter, 0, 0, 0, pivot_radius, "z", false);
+			painter:PopMatrix();
+
 			if(parent and not isDrawingPickable) then
 				local px,py,pz = unpack(parent:GetPivotPosition());
 				-- draw a line to parent bone

@@ -146,7 +146,7 @@ function RemoteWorld:ComputeLocalFileName()
 				filename = filename:gsub("[%W%s]+", "_");
 			end
 		end
-		return format("worlds/DesignHouse/userworlds/%s_r%s.zip", filename, self.revision);
+		return ParaIO.GetWritablePath()..format("worlds/DesignHouse/userworlds/%s_r%s.zip", filename, self.revision);
 	end
 end
 
