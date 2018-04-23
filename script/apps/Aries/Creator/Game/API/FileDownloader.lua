@@ -61,6 +61,28 @@ function FileDownloader:DeleteCacheFile()
 	end
 end
 
+-- it will return 0 if not found, or file size in bytes
+function FileDownloader:GetLastDownloadedFileSize(url)
+	local ls = System.localserver.CreateStore(nil, 1);
+	if(ls) then
+		local entry = ls:GetItem(url);
+		if(entry and entry.payload and entry.payload.data) then
+			local data = NPL.LoadTableFromString(entry.payload.data)
+			if(data and data.totalFileSize) then
+				return data.totalFileSize;
+			end
+		end
+	end
+	return 0;
+end
+
+function FileDownloader:Flush()
+	local ls = System.localserver.CreateStore(nil, 1);
+	if(ls) then
+		ls:Flush();
+	end
+end
+
 -- start file downloading. 
 function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 	local function OnSucceeded(filename)

@@ -399,8 +399,15 @@ end
 
 -- exit the process 
 function Desktop.ForceExit(bRestart)
-	if(System.options.IsMobilePlatform) then
+	local platform = System.os.GetPlatform();
+	if(platform == "android" or platform == "ios" ) then
+		-- disable close on these platform. 
 		MyCompany.Aries.Game.Exit();
+		-- soft restart the NPL runtime state to login screen. 
+		System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
+	elseif(System.options.IsMobilePlatform) then
+		MyCompany.Aries.Game.Exit();
+		-- soft restart the NPL runtime state to login screen. 
 		Map3DSystem.App.Commands.Call("Profile.Aries.MobileRestart");
 	else
 		ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);

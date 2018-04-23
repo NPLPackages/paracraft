@@ -190,10 +190,11 @@ end
 
 -- @param world: a table containing infor about the remote world. 
 -- @param callbackFunc: function (bSucceed) end
--- @param refreshMode: nil|"auto"|"never"|"force".  
+-- @param refreshMode: nil|"auto"|"check"|"never"|"force".  
 -- if nil or "never", we will never download again if there is already a local cached file. 
 -- if "auto", we will compare Last-Modified or Content-Length in http headers, before download full file. 
 -- if "force", we will always download the file. 
+-- if "check", we will always check with remote server to compare file size before downloading. 
 function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 	refreshMode = refreshMode or "never";
 
@@ -219,8 +220,25 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 	local src = self.remotefile;
 	local dest = self:ComputeLocalFileName();
 
+	self.FileDownloader = self.FileDownloader or FileDownloader:new();
+
 	if(refreshMode ~= "force" and ParaIO.DoesFileExist(dest)) then
 		if(refreshMode == "auto") then
+			local local_filesize = ParaIO.GetFileSize(dest);
+			local last_filesize = self.FileDownloader:GetLastDownloadedFileSize(src);
+			if(local_filesize == last_filesize) then
+				LOG.std(nil, "info", "RemoteWorld", "world %s already exist locally with correct file size %d", dest, last_filesize);
+				OnCallbackFunc(true, dest);
+			else
+				GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
+				LOG.std(nil, "info", "RemoteWorld", "remote(%d) and local(%d) file size differs, we will download again", last_filesize, local_filesize);
+				self.FileDownloader:Init(L"世界", src, dest, function(bSuccess, dest)
+					self.FileDownloader:Flush();
+					OnCallbackFunc(bSuccess, dest);
+				end, "access plus 5 mins", true);
+			end
+		elseif(refreshMode == "check") then
+			
 			GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
 			
 			-- get http headers only (take care of 302 http redirect)
@@ -247,18 +265,16 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 					end
 					LOG.std(nil, "info", "RemoteWorld", "remote file size can not be determined. download again.");
 				end
-				self.FileDownloader = self.FileDownloader or FileDownloader:new();
+				
 				self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);
 			end, "-I");
-			return;
 		else
 			LOG.std(nil, "info", "RemoteWorld", "world %s already exist locally", dest);
 			OnCallbackFunc(true, dest);
-			return;
 		end
+	else
+		self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);	
 	end
-	self.FileDownloader = self.FileDownloader or FileDownloader:new();
-	self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);
 end
 
 function RemoteWorld:IsDownloaded()

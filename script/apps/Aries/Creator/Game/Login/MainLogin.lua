@@ -519,6 +519,18 @@ function MainLogin:CheckCommandLine()
 			LOG.std(nil, "warn", "serverworld", "no server world specified, we will use %s", System.options.cmdline_world);
 		end
 	end
+
+	-- in case, a request comes when application is already running. 
+	commonlib.EventSystem.getInstance():AddEventListener("CommandLine", function(self, msg)
+		local curWorldpath = System.options.cmdline_world;
+		UrlProtocolHandler:ParseCommand(msg.msg);
+		if(System.options.cmdline_world) then
+			-- TODO: shall we ask the user to confirm before automatically download and login. 
+			self:CheckLoadWorldFromCmdLine(true);
+		end
+		return true;
+	end, self);
+
 	self:next_step({IsCommandLineChecked = true});	
 end
 
@@ -619,9 +631,9 @@ function MainLogin:LoadPlugins()
 end
 
 -- return true if loaded
-function MainLogin:CheckLoadWorldFromCmdLine()
+function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 	local worldpath = System.options.cmdline_world;
-	if(worldpath and worldpath~="" and not self.cmdWorldLoaded) then
+	if(worldpath and worldpath~="" and (not self.cmdWorldLoaded or bForceLoad)) then
 		self.cmdWorldLoaded = true;
 
 		if(System.options.servermode) then

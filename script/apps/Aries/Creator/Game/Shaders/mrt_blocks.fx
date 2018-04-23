@@ -176,7 +176,7 @@ BasicBlockVSOut TransparentEntityVS(	float4 position	: POSITION,
 	int category_id = (int)(color.z * 255.0 + 0.4);
 
 	// convert to 60FPS ticks
-	float worldTime = g_parameter0.x / 60;
+	float worldTime = g_parameter0.x / 60.0 * 3.14159265358979323846264;
 	// usually 0
 	float rainStrength = g_parameter0.y;
 
@@ -188,25 +188,25 @@ BasicBlockVSOut TransparentEntityVS(	float4 position	: POSITION,
 	{
 		float speed = 8.0;
 		
-		float magnitude = sin((worldTime * 3.14159265358979323846264 / (28.0)) + world_pos.x + world_pos.z) * 0.1 + 0.1;
-		float d0 = sin(worldTime * 3.14159265358979323846264 / (122.0 * speed)) * 3.0 - 1.5 + world_pos.z;
-		float d1 = sin(worldTime * 3.14159265358979323846264 / (152.0 * speed)) * 3.0 - 1.5 + world_pos.x;
-		float d2 = sin(worldTime * 3.14159265358979323846264 / (122.0 * speed)) * 3.0 - 1.5 + world_pos.x;
-		float d3 = sin(worldTime * 3.14159265358979323846264 / (152.0 * speed)) * 3.0 - 1.5 + world_pos.z;
-		position.x += sin((worldTime * 3.14159265358979323846264 / (28.0 * speed)) + (world_pos.x + d0) * 0.1 + (world_pos.z + d1) * 0.1) * magnitude * (1.0f + rainStrength * 1.4f);
-		position.z += sin((worldTime * 3.14159265358979323846264 / (28.0 * speed)) + (world_pos.z + d2) * 0.1 + (world_pos.x + d3) * 0.1) * magnitude * (1.0f + rainStrength * 1.4f);
+		float magnitude = sin((worldTime / (28.0)) + world_pos.x + world_pos.z) * 0.1 + 0.1;
+		float d0 = sin(worldTime / (122.0 * speed)) * 3.0 - 1.5 + world_pos.z;
+		float d1 = sin(worldTime / (152.0 * speed)) * 3.0 - 1.5 + world_pos.x;
+		float d2 = sin(worldTime / (122.0 * speed)) * 3.0 - 1.5 + world_pos.x;
+		float d3 = sin(worldTime / (152.0 * speed)) * 3.0 - 1.5 + world_pos.z;
+		position.x += sin((worldTime / (28.0 * speed)) + (world_pos.x + d0) * 0.1 + (world_pos.z + d1) * 0.1) * magnitude * (1.0f + rainStrength * 1.4f);
+		position.z += sin((worldTime / (28.0 * speed)) + (world_pos.z + d2) * 0.1 + (world_pos.x + d3) * 0.1) * magnitude * (1.0f + rainStrength * 1.4f);
 
 		//small leaf movement//
 		speed = 0.8;
 		
-		magnitude = (sin(((world_pos.y + world_pos.x)/2.0 + worldTime * 3.14159265358979323846264 / ((28.0)))) * 0.05 + 0.15) * 0.4;
-		d0 = sin(worldTime * 3.14159265358979323846264 / (112.0 * speed)) * 3.0 - 1.5;
-		d1 = sin(worldTime * 3.14159265358979323846264 / (142.0 * speed)) * 3.0 - 1.5;
-		d2 = sin(worldTime * 3.14159265358979323846264 / (112.0 * speed)) * 3.0 - 1.5;
-		d3 = sin(worldTime * 3.14159265358979323846264 / (142.0 * speed)) * 3.0 - 1.5;
-		position.x += sin((worldTime * 3.14159265358979323846264 / (18.0 * speed)) + (-world_pos.x + d0)*1.6 + (world_pos.z + d1)*1.6) * magnitude * (1.0f + rainStrength * 1.7f);
-		position.z += sin((worldTime * 3.14159265358979323846264 / (18.0 * speed)) + (world_pos.z + d2)*1.6 + (-world_pos.x + d3)*1.6) * magnitude * (1.0f + rainStrength * 1.7f);
-		position.y += sin((worldTime * 3.14159265358979323846264 / (11.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * (magnitude/3.0) * (1.0f + rainStrength * 1.7f);
+		magnitude = (sin(((world_pos.y + world_pos.x)/2.0 + worldTime / ((28.0)))) * 0.05 + 0.15) * 0.4;
+		d0 = sin(worldTime / (112.0 * speed)) * 3.0 - 1.5;
+		d1 = sin(worldTime / (142.0 * speed)) * 3.0 - 1.5;
+		d2 = sin(worldTime / (112.0 * speed)) * 3.0 - 1.5;
+		d3 = sin(worldTime / (142.0 * speed)) * 3.0 - 1.5;
+		position.x += sin((worldTime / (18.0 * speed)) + (-world_pos.x + d0)*1.6 + (world_pos.z + d1)*1.6) * magnitude * (1.0f + rainStrength * 1.7f);
+		position.z += sin((worldTime / (18.0 * speed)) + (world_pos.z + d2)*1.6 + (-world_pos.x + d3)*1.6) * magnitude * (1.0f + rainStrength * 1.7f);
+		position.y += sin((worldTime / (11.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * (magnitude/3.0) * (1.0f + rainStrength * 1.7f);
 	}
 #endif
 
@@ -214,14 +214,14 @@ BasicBlockVSOut TransparentEntityVS(	float4 position	: POSITION,
 	//Leaves//
 	if (category_id == 18) {
 		float speed = 1.0;
-		float magnitude = (sin((world_pos.y + world_pos.x + worldTime * 3.14159265358979323846264 / ((28.0) * speed))) * 0.15 + 0.15) * 0.20;
-		float d0 = sin(worldTime * 3.14159265358979323846264 / (112.0 * speed)) * 3.0 - 1.5;
-		float d1 = sin(worldTime * 3.14159265358979323846264 / (142.0 * speed)) * 3.0 - 1.5;
-		float d2 = sin(worldTime * 3.14159265358979323846264 / (132.0 * speed)) * 3.0 - 1.5;
-		float d3 = sin(worldTime * 3.14159265358979323846264 / (122.0 * speed)) * 3.0 - 1.5;
-		position.x += sin((worldTime * 3.14159265358979323846264 / (18.0 * speed)) + (-world_pos.x + d0)*1.6 + (world_pos.z + d1)*1.6) * magnitude * (1.0f + rainStrength * 1.0f);
-		position.z += sin((worldTime * 3.14159265358979323846264 / (17.0 * speed)) + (world_pos.z + d2)*1.6 + (-world_pos.x + d3)*1.6) * magnitude * (1.0f + rainStrength * 1.0f);
-		position.y += sin((worldTime * 3.14159265358979323846264 / (11.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * (magnitude/2.0) * (1.0f + rainStrength * 1.0f);
+		float magnitude = (sin((world_pos.y + world_pos.x + worldTime / ((28.0) * speed))) * 0.15 + 0.15) * 0.20;
+		float d0 = sin(worldTime / (112.0 * speed)) * 3.0 - 1.5;
+		float d1 = sin(worldTime / (142.0 * speed)) * 3.0 - 1.5;
+		float d2 = sin(worldTime / (132.0 * speed)) * 3.0 - 1.5;
+		float d3 = sin(worldTime / (122.0 * speed)) * 3.0 - 1.5;
+		position.x += sin((worldTime / (18.0 * speed)) + (-world_pos.x + d0)*1.6 + (world_pos.z + d1)*1.6) * magnitude * (1.0f + rainStrength * 1.0f);
+		position.z += sin((worldTime / (17.0 * speed)) + (world_pos.z + d2)*1.6 + (-world_pos.x + d3)*1.6) * magnitude * (1.0f + rainStrength * 1.0f);
+		position.y += sin((worldTime / (11.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * (magnitude/2.0) * (1.0f + rainStrength * 1.0f);
 	}
 #endif	
 
@@ -348,10 +348,10 @@ WaterBlockVSOut WaterVS(	float4 position	: POSITION,
 
 #ifdef WAVING_WATER
 	float speed = 1.0;
-    float magnitude = (sin((worldTime * 3.14159265358979323846264 / ((28.0) * speed))) * 0.05 + 0.15) * 0.27;
-    float d2 = sin(worldTime * 3.14159265358979323846264 / (162.0 * speed)) * 3.0 - 1.5;
-    float d3 = sin(worldTime * 3.14159265358979323846264 / (112.0 * speed)) * 3.0 - 1.5;
-    position.y += sin((worldTime * 3.14159265358979323846264 / (15.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * magnitude;
+    float magnitude = (sin((worldTime / ((28.0) * speed))) * 0.05 + 0.15) * 0.27;
+    float d2 = sin(worldTime / (162.0 * speed)) * 3.0 - 1.5;
+    float d3 = sin(worldTime / (112.0 * speed)) * 3.0 - 1.5;
+    position.y += sin((worldTime / (15.0 * speed)) + (world_pos.z + d2) + (world_pos.x + d3)) * magnitude;
 #endif
 
 	output.pos = mul(position, mWorldViewProj);
