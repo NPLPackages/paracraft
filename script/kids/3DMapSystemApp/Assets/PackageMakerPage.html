@@ -1,0 +1,116 @@
+﻿<!-- "script/kids/3DMapSystemApp/Assets/PackageMakerPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Package Marker Page by LiXizhi, 2008.5.6</title>
+</head>
+<body>
+PackageMakerPage.html?tab=new
+PackageMakerPage.html?tab=open
+<pe:mcml>
+<script type="text/npl" src="script/kids/3DMapSystemApp/Assets/PackageMakerPage.lua">
+    Map3DSystem.App.Assets.PackageMakerPage.OnInit();
+</script>
+<pe:tabs name="PackageMakerTabs">
+  <pe:tab-item text="新建或打开" name="new" selected="true">
+    <div style="margin:5px"><form name="newPkgForm"><div style="font-weight:bold">新建安装包</div>
+        <div style="color:#808080;">安装包是一个Zip压缩包, 通常包括了脚本文件, 美术模型和贴图文件等</div>
+        <hr />
+        名称: <input type="text" name="newPackageName" style="width:140px;margin-right:5px"/>
+        版本: <select name="newPackageVersion">
+              <option selected="true" value="1.0">1.0</option>
+              <option value="2.0">2.0</option>
+              <option value="3.0">3.0</option>
+              <option value="4.0">4.0</option>
+          </select><br />
+        目录: <select name="newPackageFolder">
+              <option selected="true" value="packages/redist">缺省发行包目录(packages/redist)</option>
+              <option value="packages">发行包目录(packages)</option>
+              <option value="packages/installer">安装包目录(packages/installer)</option>
+              <option value="packages/startup">启动自动加载目录(packages/startup)</option>
+          </select>
+          <input type="button" name="SelectNewFolder" value="浏览..." onclick="Map3DSystem.App.Assets.PackageMakerPage.NewPkgSelectFolder"/>  
+           <hr />
+          <input type="submit" class="defaultbutton" name="createPackage" value="新建发行包" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnCreatePackage"/><label name="new_result" style="margin:5px;height:16px;color:#006600"></label>
+          <div style="color:#808080;margin-top:5px">您的安装包项目文件将被创建在[目录]/[名称]-[版本].txt <br />您可以<a href="open://packages/">手工编辑</a>这个文件</div>
+    </form></div>
+    <hr />
+    <div style="margin:5px">
+    <div style="font-weight:bold">打开安装包</div>  
+    <input type="file" name="currentPackageFile" dir="packages"/>
+    <br />
+    <input type="button" class="defaultbutton" name="loadTxtPathList_btn" value="加载" onclick="Map3DSystem.App.Assets.PackageMakerPage.LoadTxtPathList"/> 
+    <label name="loadTxtPath_result" style="margin:5px;height:16px;color:#006600"></label>
+    <hr />
+    <div style="font-weight:bold">清空所有数据</div> 
+    <br />
+    <input type="button" class="defaultbutton" name="loadTxtPathList_btn" value="清空" onclick="Map3DSystem.App.Assets.PackageMakerPage.ClearAll()"/> 
+    </div>
+  </pe:tab-item>
+  <pe:tab-item text="导入安装包" name="import" onclick="Map3DSystem.App.Assets.PackageMakerPage.ImportFileTabitemOnclick()"> 
+    <div style="margin:10px">
+    <input type="file"  dir="packages" name="import_currentPackageFile"  style="float:left;width:580px" />
+    <input type="button" style="float:left" class="defaultbutton" name="import_loadTxtPathList_btn" value="加载" onclick="Map3DSystem.App.Assets.PackageMakerPage.import_LoadTxtPathList"/> 
+    <br />
+   <textarea   name="import_print_txt" ReadOnly="true" rows="17" ></textarea>  
+    </div>
+  </pe:tab-item>
+  <pe:tab-item text="步骤1:选择文件" name="file" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnCreate()">
+    <div style="float:left;width:300px;margin:5px">
+     目录: 
+      <select name="CurFolder" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnSelectFolder()">
+          <option selected="true" value="/">根目录(/)</option>
+          <option value="model">静态模型(model)</option>
+          <option value="character">人物模型(character)</option>
+          <option value="model">建筑(model)</option>
+      </select><br/>
+      类型:
+      <select name="CurFilter" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnSelectFilter()">
+        <option selected="true" value="*.*">全部文件(*.*)</option>
+        <option value="*.x">ParaX模型文件(*.x)</option>
+        <option value="*.x;*.png;*.dds">模型发行文件(*.x;*.png;*.dds)</option>
+        <option value="*.lua">脚本文件(*.lua)</option>
+      </select><br/>
+      <pe:filebrowser name="FileBrowser" filter="*.*" rootfolder="/" AllowFolderSelection="true" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnSelectFile()"
+            CheckBoxes="true" oncheck="Map3DSystem.App.Assets.PackageMakerPage.OnCheckFile" oncreatenode="Map3DSystem.App.Assets.PackageMakerPage.OnCreateFileNode"
+             />
+    </div>
+    <div style="float:left;margin:5px;">
+        路径：<label name="selectedFolderName" style="margin:5px;height:16px;color:#006600" />
+        <hr />
+         <form >
+        预览：
+        <input type="radio" name="folderType" value="current_folder" checked="checked" id="id_current_folder" />当前目录
+		<input type="radio" name="folderType" value="all_folder" id="id_all_folder" />当前目录并包含子目录
+		<input type="submit" value="刷新"  class="defaultbutton" name="btnRefreshFileInUse" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnClickRefreshFileInUse()"/>
+		</form>
+		<br />
+        <textarea name="previewFolderMembers" rows="14" ReadOnly="true" />
+        <br />  
+        <input type="button" style="float:right;" value="选中"  onclick="Map3DSystem.App.Assets.PackageMakerPage.CheckedUseFile()"/><font style="color:#808080;">在左边选中这些文件</font>
+    </div>
+  </pe:tab-item>  
+  <pe:tab-item text="步骤2:文件预览" name="preview">
+    <div style="margin:10px">
+    <input type="button" value="打印" name="btnPrint" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnPrint"/>
+    <input type="button" value="只生成文本文件" name="btnPrint" style="margin:15px" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnlySaveTextFile()"/>
+    <label name="onlySaveText_result" style="margin:5px;height:16px;color:#006600"></label>
+    <br />
+    <textarea name="print_txt" rows="16" ReadOnly="true" ></textarea>
+    </div>
+  </pe:tab-item>
+  <pe:tab-item text="步骤3:生成发行包" name="save">
+    <div style="margin:10px">
+     <input type="button" value="打包" name="btnPrint" onclick="Map3DSystem.App.Assets.PackageMakerPage.OnPackage"/>
+    <label name="package_result" style="margin:5px;height:16px;color:#006600"></label>
+    <br />
+    <pe:progressbar name="progressbar" onstep="Map3DSystem.App.Assets.PackageMakerPage.OnPackageStep"/>
+    <br />
+    <textarea name="package_txt" rows="16" ReadOnly="true"></textarea>
+    </div>
+  </pe:tab-item>
+</pe:tabs>
+
+</pe:mcml>
+</body>
+</html>

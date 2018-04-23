@@ -1,0 +1,77 @@
+<!-- "script/kids/3DMapSystemApp/Assets/coreManifestPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Spring, 2009.9.15</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="coreManifestPage.lua">
+    Map3DSystem.Test.coreManifestPage.OnInit();
+</script>
+<pe:tabs name="coreManifestTabs">
+  <pe:tab-item text="1.编译"  selected="true">
+    <form name="compCoreManifestForm"><div style="margin:10px" >
+        <textarea name="compileSrcCode" rows="7" endofline=";">
+            NPL.load("(gl)script/installer/BuildParaWorld.lua");
+            commonlib.BuildParaWorld.CompileNPLFiles();
+	        commonlib.BuildParaWorld.MakeZipPackage({"main"});
+	        commonlib.BuildParaWorld.EncryptZipFiles({"main"});
+        </textarea>
+        <input type="submit" name="btnCompile" value="Compile!" onclick="Map3DSystem.Test.coreManifestPage.OnClickCompile();"/>
+        <div style="width:100px;height:30px;"></div>
+        <input type="button" value="MakeAriesComplete" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeCompleteFile();"/>
+        <input type="button" value="MakeSrcComplete" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeSrcComplete();"/>
+        <br/>
+        <input type="button" value="MakeMobileScript" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeMobileScript();"/>
+        <input type="button" value="Cleanup Build" onclick="Map3DSystem.Test.coreManifestPage.OnClickCleanupBuild();"/>
+        <input type="button" value="MakeMobileRes" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeMobileRes();"/>
+        <br/>
+        Publish Client PKG Process:
+        <br/>
+        Step 1: confirm the publish filelist is deleted or NOT read only: 
+        <br/><div style="float:left;width:40px;height:10px;"></div> packages/redist/Aries/main_pkg_append_publish.txt
+        <br/>
+        Step 2: make sure the binary directory is cleared:
+        <br/><div style="float:left;width:40px;height:10px;"></div> bin/script/
+        <br/>
+        Step 3: make pkg files: (init main.pkg date mark: 2009-11-26)
+        <br/><div style="float:left;width:40px;height:10px;"></div>
+        <input type="button" value="MakeAriesFile!" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeAriesFile();"/>
+        <div style="float:left;width:10px;height:10px;"></div> or 
+        <input type="button" value="MakeSDKFile!" onclick="Map3DSystem.Test.coreManifestPage.OnClickMakeSDKFile();"/>
+        <br/>
+        Step 4: compiled pkg files are located in:
+        <br/><div style="float:left;width:40px;height:10px;"></div><div style="float:left;width:40px;height:10px;">Aries:</div>installer/main_Aries.pkg
+        <br/><div style="float:left;width:40px;height:10px;"></div><div style="float:left;width:40px;height:10px;"></div>installer/main_Aries_pipeline.pkg
+        <br/><div style="float:left;width:40px;height:10px;"></div><div style="float:left;width:40px;height:10px;">SDK:</div>installer/main_Taurus.pkg
+        
+        </div></form>
+  </pe:tab-item>
+  <pe:tab-item text="2.生成">
+    <form name="genCoreManifestForm"><div style="margin:10px" >
+        <b>we will generate core file list for ftp uploading. </b><br />
+        Source file: <input name="srcfile" value="Aries_installer_v1.txt" /><br />
+        Destination file: ftp manifest file: _coremanifest.ftp.uploader.txt <br />
+        版本: <input type="text" name="vercore0" value="0.0.0" style="width:50px;margin-right:5px"/> must begin with x.x.0. <br />
+        <label name="getlist" values=""/><br />
+        <input type="submit" name="btnGenerate" value="Generate!" onclick="Map3DSystem.Test.coreManifestPage.OnClickGenerate();"/>
+        </div></form>
+  </pe:tab-item>  
+  <pe:tab-item text="3.发布">
+    <form name="pubCoreManifestForm"><div style="margin:10px" >
+        <b>we will according this list to upload files to FTP Server. </b><br />
+                Current Corefile Version: <label name="vercore" values=""/><br />
+                The list (one per line): <br />
+        <textarea name="coreflist" rows="20">                   
+        </textarea><br />
+        <input type="submit" name="btnSaveFile" value="Save this File!" onclick="Map3DSystem.Test.coreManifestPage.OnClickSaveFile();"/>
+
+        <input type="submit" name="btnGenerateFtp" value="FTP these File!" onclick="Map3DSystem.Test.coreManifestPage.OnClickGenerateFtp();"/>
+    </div></form>
+  </pe:tab-item>
+</pe:tabs>
+
+</pe:mcml>
+</body>
+</html>

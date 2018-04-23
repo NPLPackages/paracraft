@@ -1,0 +1,47 @@
+﻿<!-- "script/kids/3DMapSystemApp/Assets/AssetManifestPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>LiXizhi, 2009.9.4</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="AssetManifestPage.lua">
+    Map3DSystem.App.Assets.AssetManifestPage.OnInit();
+</script>
+<pe:tabs name="AssetManifestTabs">
+  <pe:tab-item text=" 生成" selected="true">
+    <form name="genManifestForm"><div style="margin:10px" >
+        <b>we will append new files in "asset.log" to the end of output file. </b><br />
+        ftp manifest file: _assetmanifest.ftp.uploader.txt <br />
+        skip regular expressions (one per line): <br />
+        <textarea name="skipRegEx" rows="5"></textarea><br />
+        <input type="checkbox" name="checkAssetLoaded" checked="true"/>Select AssetRequested<br />
+        <input type="checkbox" name="checkOpenAssetFile" checked="true"/>Select ParaFile.OpenAssetFile<br />
+        <input type="checkbox" name="checkTerrainOnLoad" checked="true"/>Select Terrain.OnLoad<br />
+        <input type="checkbox" name="checkDBEntity" checked="true"/>Select DBEntity.PrepareDatabaseFile<br />
+        <input type="submit" name="btnGenerate" value="Generate!" onclick="Map3DSystem.App.Assets.AssetManifestPage.OnClickGenerate();"/>
+     
+    </div></form>
+     <hr />
+     <div>生成Background Loader预加载模块. 请先从asset.log中删除不要的文件
+    </div>
+    <input type="text" name="bgloader_output_file" style="width:400px" value="config/Aries/Preloaders/Aries_background_loader_61haqitown.txt"/><br />
+    <input type="button" name="btnGenerateBGLoader" value="Generate bg loader!" onclick="Map3DSystem.App.Assets.AssetManifestPage.OnClickGenBackgroundLoaderFile()"/>
+  </pe:tab-item>  
+  <pe:tab-item text="发布">
+    <form name="genManifestForm"><div style="margin:10px" >
+        <b>we will according this list to upload files to FTP Server. </b><br />
+                The list (one per line): <br />
+        <textarea name="flist" rows="20">                   
+        </textarea><br />
+        <input type="submit" name="btnSaveFile" value="Save this File!" onclick="Map3DSystem.App.Assets.AssetManifestPage.OnClickSaveFile();"/>
+
+        <input type="submit" name="btnGenerateFtp" value="FTP these File!" onclick="Map3DSystem.App.Assets.AssetManifestPage.OnClickGenerateFtp();"/>
+    </div></form>
+  </pe:tab-item>
+</pe:tabs>
+
+</pe:mcml>
+</body>
+</html>

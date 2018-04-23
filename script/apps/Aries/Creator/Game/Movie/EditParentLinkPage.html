@@ -1,0 +1,47 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditParentLinkPage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");
+EditParentLinkPage.OnInit();
+]]></script>
+<aries:window mode="thin" style="width:512px;" title='<%=EditParentLinkPage.GetTitle()%>' onclose="EditParentLinkPage.OnClose">
+<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+    <div>
+        <%=L"请输入骨骼名字:"%><%=EditParentLinkPage:GetLastSelectedBoneName()%>
+    </div>
+    <div>
+        <input type="text" name="target" style="height:25px;" EmptyText='<%=L"输入骨骼名字"%>' />
+    </div>
+    <div style="margin-top:5px">
+        <%=L"位置: x,y,z"%>
+    </div>
+    <div>
+        <input type="text" name="pos" style="height:25px;" EmptyText="0,0,0" />
+    </div>
+    <div style="margin-top:5px">
+        <%=L"旋转: roll,pitch,yaw"%>
+    </div>
+    <div>
+        <input type="text" name="rot" style="height:25px;" EmptyText="0,0,0"/>
+    </div>
+    <div style="margin-top:5px">
+        <input type="checkbox" name="use_rot" style="margin-top:2px;" checked="checked" /><div style="float:left;margin-left:5px;" for="use_rot"><%=L"跟随父节点旋转"%> </div>
+    </div>
+    <div style="margin-top:10px;">
+        <input type="button" name="OK" DefaultButton="true" style="margin-left:200px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditParentLinkPage.OnOK" value='<%=L"确定"%>' />
+        <input type="button" name="Break" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditParentLinkPage.OnDetach" value='<%=L"断开"%>' tooltip='<%=L"断开父连接"%>'/>
+        <input type="button" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditParentLinkPage.OnClose" value='<%=L"取消"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

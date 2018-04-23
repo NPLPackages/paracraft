@@ -1,0 +1,52 @@
+<!-- "script/apps/Aries/Creator/Game/Login/DownloadWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2018.4.9</title>
+</head>
+<body> 
+<pe:mcml>
+    <script type="text/npl" refresh="true" src="DownloadWorld.lua">
+<![CDATA[
+local page = document:GetPageCtrl();
+local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+DownloadWorld.OnInit();
+
+local objParams = {
+    name = "model",
+    IsCharacter = false,
+    AssetFile = "model/blockworld/BlockModel/block_model_four.x",
+    ReplaceableTextures = {[3]="Texture/blocks/movie_three.png"},
+    x = 0,
+    y = 0,
+    z = 0,
+}
+function GetModelParams()
+    return objParams;
+end
+]]>
+    </script>
+    <div style="background:url(Texture/whitedot.png);background-color:#000000cc;width:512px;height:300px;color:#ffffff">
+        <!--<div>
+            <pe:progressbar name="progress_bar" Minimum="0" Value="10" Maximum="100" Step="1" style="width:512px;height:16px;" 
+                            background = "Texture/Aries/Login/Login/teen/loading_gray_32bits.png:7 7 8 8" 
+                            blockimage = "Texture/Aries/Login/Login/teen/loading_green_32bits.png:7 7 8 8" 
+                            block_overlay_bg="Texture/Aries/Login/Login/teen/progressbar_green_tile.png"
+                            />
+        </div>-->
+        <div style="margin:10px;">
+             <%=L"来自:"%><label name="url"></label>
+        </div>
+        <div style="margin-left:192px;margin:10px;">
+            <pe:canvas3d miniscenegraphname="DownloadWorld128" autoRotateSpeed="1.5" DefaultCameraObjectDist="3.4" IsInteractive="false" RenderTargetSize="128" style="width:128px;height:128px;" value='<%=GetModelParams()%>' />
+        </div>
+        <div style="margin-top:10px">
+            <label name="url" style="font-size:14px;width:512px;text-align:center" value='<%=L"正在下载世界, 请稍后..."%>'></label>
+            
+            <!--<input type="button" value='<%=L"重新下载" %>' spacing="20" class="mc_big_button" style="color:#572712;font-size:16px;height:45px;margin-left:100px;min-width:150px;" onclick="" />
+            <input type="button" value='<%=L"进入世界" %>' spacing="20" class="mc_big_button" style="color:#572712;font-size:16px;height:45px;margin-left:20px;min-width:150px;" onclick="" />-->
+        </div>
+    </div>
+</pe:mcml>
+</body>
+</html>

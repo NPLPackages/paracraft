@@ -1,0 +1,68 @@
+﻿<!-- "script/kids/3DMapSystemApp/Assets/ModelBrowserPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Model Browser Page by LiXizhi, 2008.4.25</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="script/kids/3DMapSystemApp/Assets/ModelBrowserPage.lua">
+    Map3DSystem.App.Assets.ModelBrowserPage.OnInit();
+</script>
+<pe:tabs name="ModelTabs">
+  <pe:tab-item text="模型浏览器" selected="true">
+    <div style="float:left;width:480px;margin:5px">
+     类别: 
+      <select name="CurFolder" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnSelectFolder()">
+          <option selected="true" value="model">静态模型(model)</option>
+          <option value="character">人物模型(character)</option>
+          <option value="character/v3">帕拉巫人物(character/v3)</option>
+          <option value="character/v1">KidsMovie人物(character/v1)</option>
+          <option value="character/particles">粒子(character/particles)</option>
+          <option value="model/01building">建筑(model/01building)</option>
+          <option value="model/02furniture">家具(model/02furniture)</option>
+          <option value="model/03tools">工具(model/03tools)</option>
+          <option value="model/04deco">装饰(model/04deco)</option>
+          <option value="model/05plants">植物(model/05plants)</option>
+          <option value="model/06props">小物品(model/06props)</option>
+          <option value="model/common">通用(model/common)</option>
+          <option value="model/map3D">3D地图(model/map3D)</option>
+          <option value="model/scripts">模型脚本(model/scripts)</option>
+          <option value="model/Skybox">天空盒(model/Skybox)</option>
+          <option value="model/others/terrain">地形高度图(model/others/terrain)</option>
+          <option value="model/test">测试(model/test)</option>
+          <option value="/">根目录(/)</option>
+      </select><br/>
+      类型:
+      <select name="CurFilter" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnSelectFilter()">
+        <option value="*.*">全部文件(*.*)</option>
+        <option value="*.x;*.xml" selected="true">ParaX模型文件(*.x;*.xml)</option>
+        <option value="*.x;*.png;*.dds">模型发行文件(*.x;*.png;*.dds)</option>
+        <option value="*.lua">脚本文件(*.lua)</option>
+        <option value="*.raw">地型高度图(*.raw)</option>
+      </select><br/>
+      <pe:filebrowser name="FileBrowser" filter="*.x;*.xml" rootfolder="model" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnSelectFile()" ondoubleclick="Map3DSystem.App.Assets.ModelBrowserPage.OnDoubleClickFile()" />
+    </div>
+    <div style="float:left;margin:5px;">
+        <div><font style="color:#808080;">提示: 请从左侧选择模型文件, 或者直接在下面文本框中输入. 点击添加到场景或双击文件名创建模型</font></div>
+        当前文件: <select name="filepath" style="width:230px"><option value="" selected="true">无</option></select><br/>
+       <div><font style="font-weight:bold">3D 预览:</font><font style="color:#808080;">用鼠标拖拽可以改变视角</font></div>
+       <pe:canvas3d name="modelCanvas" autoRotateSpeed="0.12" style="width:256px;height:256px"></pe:canvas3d>
+       <hr />
+        <input type="button" name="AddToScene" class="defaultbutton" value="添加到场景" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnClickAddToScene()"/>
+        <input style="margin-left:10px" type="button" name="RefreshPreview" value="预览" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnClickRefreshPreview()"/>
+        <input style="margin-left:10px" type="button" name="TakeSnapShot" value="快照" onclick="Map3DSystem.App.Assets.ModelBrowserPage.OnClickTakeSnapShot()"/>
+        <img name="ThumbnailImg" style="width:64px;height:64px;margin-left:10px"/>
+    </div>
+  </pe:tab-item>  
+  <pe:tab-item text="制作资源包">
+    <iframe src="PackageMakerPage.html"></iframe>
+  </pe:tab-item>
+  <pe:tab-item text="高级设置">
+    <div style="margin:10px">暂时没有内容</div>
+  </pe:tab-item>
+</pe:tabs>
+
+</pe:mcml>
+</body>
+</html>

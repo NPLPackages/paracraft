@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Aries application integration point XML file -->
+<mcml:mcml xmlns:mcml="http://www.paraengine.com/mcml/10.xsd">
+  <!--package list: this is optional if we already downloaded the module files. -->
+  <mcml:packageList>
+    <mcml:package>
+      <mcml:URL>www.paraengine.com/apps/Aries_models.zip</mcml:URL>
+      <mcml:InstallPath>model/apps/</mcml:InstallPath>
+      <mcml:AuthorName>ParaEngine</mcml:AuthorName>
+    </mcml:package>
+    <mcml:package>
+      <mcml:URL>www.paraengine.com/apps/Aries_script.zip</mcml:URL>
+      <mcml:InstallPath>scripts/apps/</mcml:InstallPath>
+      <mcml:AuthorName>ParaEngine</mcml:AuthorName>
+    </mcml:package>
+  </mcml:packageList>
+
+
+  <!-- TODO: file list -->
+
+  <!-- TODO: ID for application description -->
+
+  <!--application description: 
+  version: must be 1
+  name: it should be a unique application, so that we can send messages with it.
+  lang: the file may contain multiple language versions of this application block 
+  -->
+  <mcml:app version="1" name="Aries" lang="enUS" onloadscript="script/apps/Aries/app_main.lua" callbackfunction="MyCompany.Aries.MSGProc" >
+  </mcml:app>
+
+</mcml:mcml>
