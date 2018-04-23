@@ -41,7 +41,6 @@ Map3DSystem.App.MiniGames.SwfLoadingBarPage.ShowPage(
 Map3DSystem.App.MiniGames.SwfLoadingBarPage.ClosePage();
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/GameScorePage.lua");
 NPL.load("(gl)script/ide/FlashPlayerWindow.lua");
 NPL.load("(gl)script/ide/FlashExternalInterface.lua");
 
@@ -681,6 +680,7 @@ function SwfLoadingBarPage.ClosePage_Manual()
 end
 function SwfLoadingBarPage.PutBean(bean)
 	if(bean and bean > 0)then
+		NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/GameScorePage.lua");
 		bean = math.min(bean,Map3DSystem.App.MiniGames.GameScorePage.maxBean);
 		-- hard code the AddMoney here, move to the game server in the next release candidate
 		local AddMoneyFunc = commonlib.getfield("MyCompany.Aries.Player.AddMoney");

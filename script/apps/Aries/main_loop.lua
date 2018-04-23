@@ -237,7 +237,7 @@ local function Aries_load_config(filename)
 
             NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 		    local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
-            if(region_id == Platforms.PLATS.KEEPWORK)then
+            if(Platforms.PLATS and region_id == Platforms.PLATS.KEEPWORK)then
 		        System.options.platform_id = region_id;
             end
 		end
