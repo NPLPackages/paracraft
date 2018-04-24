@@ -31,7 +31,7 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
 		-- paracraft://cmd/loadworld/[url_filename]
 		local world_url = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
-		if(world_url and world_url:match("^https?://")) then
+		if(world_url) then
 			System.options.cmdline_world = world_url;
 		end
 
