@@ -159,6 +159,7 @@ function GameLogic:InitAPIPath()
 	DOM.AddDOM("EntityManager", function() return TableAttribute:create(GameLogic.EntityManager) end);
 	DOM.AddDOM("System", function() return TableAttribute:create(System) end);
 	DOM.AddDOM("commonlib", function() return TableAttribute:create(commonlib) end);
+	GameLogic.gameFRC = DOM.GetDOM("gameFRC");
 end
 
 -- static method called at the very beginning when paracraft start
@@ -831,12 +832,25 @@ function GameLogic.FrameMove(timer)
 	end
 	-- deltaTime at most 5 FPS, on some mobile device, the movie at least animated at 5FPS. 
 	local deltaTime = timer:GetDelta(200);
+
+	if(GameLogic.gameFRC:GetField("Paused", false)) then
+		local curTime = GameLogic.gameFRC:GetField("Time", 0);
+		if(curTime > (GameLogic.lastGameTime or 0)) then
+			deltaTime = math.min(200, curTime - (GameLogic.lastGameTime or 0));
+		else
+			return
+		end
+	end
+
+	GameLogic.lastGameTime = GameLogic.gameFRC:GetField("Time", 0);
+
 	local simDeltaTime = math.min(100,deltaTime);
 	-- 20FPS simulation tick
 	local bIsTick = GameLogic:IsTick(deltaTime);
 	npl_profiler.perf_begin("GameLogic.FrameMove")
 	
 	TaskManager.FrameMove();
+
 	PhysicsWorld.FrameMove(simDeltaTime);
 	EntityManager.FrameMove(deltaTime);
 	MovieManager:FrameMove(deltaTime);
