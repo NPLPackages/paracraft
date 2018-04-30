@@ -38,7 +38,8 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 Entity:Property({"scaling", 1.0, "GetScaling", "SetScaling"});
 Entity:Property({"facing", 0, "GetFacing", "SetFacing", auto=true});
 Entity:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true});
-Entity:Property({"opacity", 1, "GetOpacity", "SetOpacity", auto=true});
+Entity:Property({"opacity", 1, "GetOpacity", "SetOpacity"});
+Entity:Property({"isSolid", 1, "IsSolid", "SetSolid"});
 Entity:Property({"roll", 0, "GetRoll", "SetRoll", auto=true});
 Entity:Property({"color", "#ffffff", "GetColor", "SetColor", auto=true});
 
@@ -112,6 +113,33 @@ function Entity:CreateOverlay()
 	self.overlay:SetPosition(x, y, z);
 	return self.overlay;
 end
+
+-- default to false. solid object is rendered before all transparent ones in the scene. 
+function Entity:SetSolid(bIsSolid)
+	if(self.overlay) then
+		self.overlay:SetSolid(bIsSolid)
+	end
+end
+
+function Entity:IsSolid()
+	if(self.overlay) then
+		return self.overlay:SetSolid(bIsSolid)
+	end
+end
+
+function Entity:GetOpacity()
+	return self.opacity or 1;
+end
+
+function Entity:SetOpacity(opacity)
+	self.opacity = opacity or 1;
+	if(self.opacity < 1) then
+		self:SetSolid(false);
+	else
+		self:SetSolid(true);
+	end
+end
+
 
 function Entity:SetBoundingRadius(radius)
 	if(self.overlay) then

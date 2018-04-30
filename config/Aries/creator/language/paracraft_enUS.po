@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-04-09 19:13+0800\n"
+"POT-Creation-Date: 2018-04-27 19:25+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -158,11 +158,11 @@ msgstr "Please enter file name:"
 msgid "文件成功保存在%s,现在打开吗?"
 msgstr "successfully saved file to %s, open it now?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/main.lua:216
+#: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/main.lua:217
 msgid "上传中,请稍等......"
 msgstr "Uploading, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/main.lua:227
+#: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/main.lua:228
 msgid "上传stl文件失败."
 msgstr "Failed to upload stl file."
 
@@ -331,36 +331,37 @@ msgid "keepwork正在维护中，我们马上回来"
 msgstr "keepwork.com is under maintaining, we will be back soon."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:82
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:82
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:104
 msgid "本地数据失败"
 msgstr "local data failed"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:87
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:87
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:109
 msgid "还在下载中..."
 msgstr "downloading..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:96
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:95
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:117
 #, lua-format
 msgid "%s: 正在下载中,请耐心等待"
 msgstr "world %s: downloading, please stand by"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:112
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:111
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:133
 msgid "无法复制文件到指定目录"
 msgstr "can not copy file to destination folder"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:124
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:123
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:145
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:681
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:224
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:233
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:242
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:619
 msgid "下载中..."
 msgstr "downloading..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:128
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:127
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:149
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:683
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:621
 #, lua-format
@@ -368,7 +369,7 @@ msgid "下载中: %d/%dKB"
 msgstr "downloading: %d/%dKB"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:131
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:130
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:152
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:686
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:624
 msgid "下载完毕"
@@ -376,21 +377,21 @@ msgstr "download complete"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:133
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:134
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:132
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:133
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:154
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:155
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:688
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:626
 msgid "下载终止了"
 msgstr "download terminated"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:137
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:136
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:158
 #, lua-format
 msgid "文件%s: %s"
 msgstr "File %s: %s"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader.lua:142
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:141
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:163
 msgid "重复下载"
 msgstr "repeated download"
 
@@ -743,7 +744,7 @@ msgstr "bag"
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:60
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:45
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:755
-#: script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua:159
+#: script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua:175
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/SyncGUI.html:68
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:322
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:37
@@ -790,8 +791,9 @@ msgid "环境"
 msgstr "env"
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:34
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:251
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:261
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:235
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:269
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:276
 msgid "世界"
 msgstr "World"
 
@@ -1497,7 +1499,7 @@ msgstr "Auto save mode turned off"
 msgid "自动保存模式开启"
 msgstr "Auto save mode turned on"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:170
+#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:156
 #: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:254
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:257
 #: script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua:414
@@ -1505,6 +1507,10 @@ msgstr "Auto save mode turned on"
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:386
 msgid "无效的世界文件"
 msgstr "Invalid world filename"
+
+#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:169
+msgid "世界已经存在，是否重新下载?"
+msgstr "World already exist, do you want to download again?"
 
 #: script/apps/Aries/Creator/Game/Common/Translation.lua:237
 msgid "点击这里继续"
@@ -4155,7 +4161,7 @@ msgstr ""
 msgid "输入初始化命令"
 msgstr "Enter initialization commands"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:176
+#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:204
 msgid "输入HTML/MCML代码"
 msgstr "Please enter HTML/MCML code"
 
@@ -4707,7 +4713,7 @@ msgstr "Start time:%s, enter time [-1,1]"
 msgid "起始时间%s, 请输入命令行(/)"
 msgstr "Start time %s, please enter command line (/)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorGUIText.lua:137
+#: script/apps/Aries/Creator/Game/Movie/ActorGUIText.lua:141
 #, lua-format
 msgid "起始时间%s, 请输入字幕文字:"
 msgstr "start time %s, please enter the subtitle text:"
@@ -4759,7 +4765,6 @@ msgid "贴图文件"
 msgstr "Texture file"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:432
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:207
 #, lua-format
 msgid "起始时间%s, 请输入透明度[0,1](默认1)"
 msgstr "Start time %s, please enter opacity [0,1] (default to 1)"
@@ -4797,6 +4802,11 @@ msgstr "Start time %s, please enter gravity (default to 18.36)"
 msgid "起始时间%s, 请输入运动速度系数(默认1)"
 msgstr "Start time %s, please enter speed factor (default to 1)"
 
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:207
+#, lua-format
+msgid "起始时间%s, 请输入透明度[0,1](默认0.99)"
+msgstr "Start time %s, please enter opacity [0,1] (default to 0.99)"
+
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:223
 #, lua-format
 msgid "起始时间%s, 请输入文字:"
@@ -4829,7 +4839,7 @@ msgstr "Last selected bone:"
 msgid "请先选骨骼"
 msgstr "Please select a bone first"
 
-#: script/apps/Aries/Creator/Game/Movie/KeyFrameCtrl.lua:263
+#: script/apps/Aries/Creator/Game/Movie/KeyFrameCtrl.lua:264
 msgid "右键选;左键移;Shift左:删;Alt左:单移;Ctrl左:复制"
 msgstr ""
 "Right click to select; left click to move; shift+left to delete;Alt + left "
@@ -5285,26 +5295,26 @@ msgstr "version %d has already been backed up before"
 msgid "返回上个世界"
 msgstr "Return to last world"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:581
+#: script/apps/Aries/Creator/Game/game_logic.lua:582
 msgid "编辑模式被锁定"
 msgstr "edit mode is locked"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:620
+#: script/apps/Aries/Creator/Game/game_logic.lua:621
 msgid "您打开的是只读世界. 请将zip文件解压缩后, 重新加载解压缩后的世界才能保存"
 msgstr ""
 "You have opened a read-only world. Please unzip the zip file to a folder and "
 "load from there in order to save. "
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:648
+#: script/apps/Aries/Creator/Game/game_logic.lua:649
 #, lua-format
 msgid "保存成功 [版本:%d]"
 msgstr "succesfully saved [version:%d]"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:870
+#: script/apps/Aries/Creator/Game/game_logic.lua:884
 msgid "你挂了, 将被传送到出生点"
 msgstr "You died, and will be teleported to spawn pos."
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:917
+#: script/apps/Aries/Creator/Game/game_logic.lua:931
 msgid "只读世界不能进行这个操作"
 msgstr "Read-only world does not support this operation."
 

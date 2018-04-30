@@ -204,7 +204,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end,old_value)
 	elseif(keyname == "opacity") then
-		local title = format(L"起始时间%s, 请输入透明度[0,1](默认1)", strTime);
+		local title = format(L"起始时间%s, 请输入透明度[0,1](默认0.99)", strTime);
 
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
@@ -390,7 +390,8 @@ function Actor:FrameMovePlaying(deltaTime)
 	entity:SetScaling(scaling or 1);
 	entity:SetPitch(pitch or 0);
 	entity:SetRoll(roll or 0);
-	entity:SetOpacity(opacity or 1);
+	entity:SetOpacity(opacity or 0.99);
+	
 	entity:SetColor(color or "#ffffff");
 	-- set render code
 	self.codeItem:SetCode(self:GetValue("code", curTime));
@@ -536,6 +537,7 @@ function Actor:DoRender(painter)
 
 	painter:Save();
 	local text = self:GetText();
+	
 	if(self.codeItem:HasScript()) then
 		self.codeItem:RunCode();	
 	elseif(not text or text=="") then
