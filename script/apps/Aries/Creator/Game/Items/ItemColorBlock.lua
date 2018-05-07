@@ -167,8 +167,8 @@ function ItemColorBlock:PickPenColorAtMouse(result)
 		NPL.load("(gl)script/ide/System/Scene/BufferPicking.lua");
 		local BufferPicking = commonlib.gettable("System.Scene.BufferPicking");
 		local result = BufferPicking:Pick();
-		if(result and result[1]) then
-			local color = result[1];
+		if(result and result[0]) then
+			local color = result[0];
 			local r,g,b,a = Color.DWORD_TO_RGBA(color);
 			color = Color.RGBA_TO_DWORD(r, g, b, 0);
 			self:SetPickColor(color);

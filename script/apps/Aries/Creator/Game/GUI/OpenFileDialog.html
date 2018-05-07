@@ -25,7 +25,7 @@ end
 <aries:window mode="thin" title='<%=L"输入窗"%>' style="width:460px;" onclose="OnClose">
 <div style="margin:10px;">
     <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px">
-        <pe:treeview ShowIcon="false" name="tvwExistingFiles" DataSource='<%=OpenFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
+        <pe:treeview ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
             <NodeTemplates>
                 <NodeTemplate DataType="file">
                     <pe:treenode style="height:20px;" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", XPath("this|filename"), XPath("this|filesize")/1000, XPath("this|writedate"))%>'></pe:treenode>
