@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-04-27 19:25+0800\n"
+"POT-Creation-Date: 2018-05-09 02:46+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -182,151 +182,152 @@ msgstr "Login with KeepWorkDev"
 msgid "使用本地服务登录"
 msgstr "Login with localhost"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:216
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:237
 msgid "数据源不存在，请联系管理员"
 msgstr "Data source does not exist, please contact administrator"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:279
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:289
 msgid "数据源配置文件不存在"
 msgstr "Data source configuration file does not exist"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:308
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:318
 msgid "检查站点失败"
 msgstr "Failed to check website"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:357
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:367
 msgid "用户名或者密码错误"
 msgstr "User name or password is incorrect"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:361
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:371
 msgid "服务器连接失败"
 msgstr "Failed to connect to server"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:373
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:383
 msgid "账号不能为空"
 msgstr "Account name can not be empty"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:378
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:388
 msgid "密码不能为空"
 msgstr "Password can not be empty"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:382
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1403
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:392
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:862
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1479
 msgid "正在登陆，请稍后..."
 msgstr "Signing in, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:445
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:455
 msgid "仅本地"
 msgstr "Local only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:447
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:457
 msgid "仅网络"
 msgstr "Remote only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:449
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:459
 msgid "本地版本与远程数据源一致"
 msgstr "Local and remote data source are identical"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:451
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:461
 msgid "本地版本更加新"
 msgstr "Local version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:453
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:463
 msgid "远程版本更加新"
 msgstr "Remote version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:455
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:465
 msgid "获取状态中"
 msgstr "Fetching status..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:545
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:555
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:138
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:57
 msgid "创作"
 msgstr "Creation"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:547
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:557
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:59
 msgid "参观"
 msgstr "visit"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:611
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:621
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:91
 msgid "输入服务器地址"
 msgstr "enter server address"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:613
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:623
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:93
 msgid "输入服务器地址或者米米号"
 msgstr "Please enter server address or user id"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:658
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:691
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:135
 msgid "你的状态:"
 msgstr "you status:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:661
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:694
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:137
 msgid "已登录"
 msgstr "signed in"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:663
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:696
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:139
 msgid "未登录"
 msgstr "not signed in"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:694
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:734
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:164
 msgid "此功能暂未开放"
 msgstr "Function not available in current version"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:696
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:736
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:166
 msgid "你尚未开启这个存档槽. 每购买一个会员物品, 可永久获得一个存档槽."
 msgstr ""
 "You have not unlock the save slot. Purchase one VIP item to get one save "
 "slot permanantly"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:750
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:790
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:221
 msgid "匿名"
 msgstr "anonymous"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1027
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1103
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:521
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:458
 msgid "无法下载服务器列表, 请检查网络连接"
 msgstr "can not download server list, please check your network connection. "
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1113
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1189
 msgid "获取服务器世界列表错误"
 msgstr "Failed to fetch world server list"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1293
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1369
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/ShareWorld.lua:34
 msgid ""
 "您需要到keepwork官网进行实名认证，认证成功后需重启paracraft即可正常操作，是否"
 "现在认证？"
 msgstr "Please go to keepwork to authenticate, do you want to do it now?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1309
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1385
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/ShareWorld.lua:102
 msgid "不能同步ZIP文件"
 msgstr "Can not sync zip file"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1324
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1400
 msgid "登陆后才能同步"
 msgstr "Please login first before syncing"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1335
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1411
 msgid "不能刪除正在编辑的世界"
 msgstr "Can not delete world that is being edited"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1354
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1430
 msgid "链接超时"
 msgstr "Connection timeout"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1367
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.lua:1443
 msgid "keepwork正在维护中，我们马上回来"
 msgstr "keepwork.com is under maintaining, we will be back soon."
 
@@ -933,6 +934,7 @@ msgid "操作提示(F1)"
 msgstr "user action tip (F1)"
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:80
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:422
 msgid "教学视频"
 msgstr "Video tutorials"
 
@@ -4419,6 +4421,8 @@ msgid "未知错误"
 msgstr "unknown error"
 
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:80
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:407
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:415
 msgid "我的世界"
 msgstr "My world"
 
@@ -4487,7 +4491,7 @@ msgstr "please enter correct HTTP address or user ID"
 
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:497
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:434
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:362
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:300
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:410
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:103
 msgid "下载中"
@@ -5346,6 +5350,7 @@ msgid "是否观看在线教程(快捷键F1)?"
 msgstr "Do you want to watch online tutorial (hotkey F1)?"
 
 #: script/apps/Aries/app_main.lua:113
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:199
 #: script/apps/Aries/Creator/Game/Areas/ServerLogin.html:101
 msgid "登录"
 msgstr "Login"
@@ -5547,166 +5552,78 @@ msgstr "save"
 msgid "登陆"
 msgstr "Signin"
 
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:166
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:153
+#: script/mobile/paracraft/Areas/SettingPage.html:50
+#: script/mobile/paracraft/GUI/HelpPage.html:418
+#: script/mobile/paracraft/Login/BaiduTestPage.html:181
+#: script/mobile/paracraft/Login/CreateNewWorld.html:78
+#: script/mobile/paracraft/Login/InternetLoadWorld.html:36
+#: script/mobile/paracraft/Login/LocalLoadWorld.html:35
+msgid "返回"
+msgstr "back"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:167
+msgid "前进"
+msgstr "Forward"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:168
+msgid "刷新本地目录或远程网址"
+msgstr "Rerfresh local directory or remote url"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:172
+msgid "输入课程ID或服务器地址"
+msgstr "Enter class id or server address"
+
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:173
-msgid "修改名称"
-msgstr "Modify name"
+msgid "管理访问历史"
+msgstr "manage history"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:181
-#: script/apps/Aries/Creator/Game/Areas/SkinPage.html:107
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:321
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:38
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:42
-#: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html:37
-#: script/apps/Aries/Creator/Game/GUI/MirrorWnd.html:24
-#: script/apps/Aries/Creator/Game/GUI/MobPropertyPage.html:55
-#: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html:48
-#: script/apps/Aries/Creator/Game/Login/DonatePage.html:34
-#: script/apps/Aries/Creator/Game/Login/DonatePage.html:48
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:161
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:89
-#: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html:108
-#: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:39
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:101
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:199
-#: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:50
-#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:74
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:22
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:26
-#: script/mobile/paracraft/Login/CreateNewWorld.html:102
-msgid "确定"
-msgstr "OK"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:182
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/WorldExitDialog.html:79
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/BeyondVolume.html:32
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/StartSyncUseDataSource.html:31
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/StartSyncUseLocal.html:34
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/SyncGUI.html:63
-#: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html:129
-#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:43
-#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:51
-#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:52
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:39
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:51
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:60
-#: script/apps/Aries/Creator/Game/Login/DonatePage.html:49
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:162
-#: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:41
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:102
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:200
-#: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:51
-#: script/apps/Aries/Creator/Game/Tasks/ExportTask.html:34
-#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:75
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:23
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:35
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:44
-msgid "取消"
-msgstr "cancel"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:203
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:293
-msgid "服务器列表"
-msgstr "server list"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:224
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:49
-msgid "服务器："
-msgstr "Server:"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:228
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:53
-msgid "账号："
-msgstr "Account:"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:228
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:53
-msgid "账户名/邮箱/手机号"
-msgstr "username/email/phone number"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:231
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:56
-msgid "密码："
-msgstr "Password:"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:234
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:59
-msgid "记住密码?"
-msgstr "Remember password?"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:235
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:60
-msgid "自动登录"
-msgstr "Auto signin"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:238
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:63
-msgid "登   录"
-msgstr "Signin"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:241
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:66
-msgid "还没有帐号？"
-msgstr "No account?"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:242
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:67
-msgid "点击注册"
-msgstr "Click to register"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:249
-msgid "欢迎:"
-msgstr "Welcome:"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:252
-msgid "我的作品网站"
-msgstr "My works website"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:253
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:256
-#, lua-format
-msgid "点击打开:%s"
-msgstr "Click to open: %s"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:261
-msgid "退出登录"
-msgstr "Signout"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:266
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:451
-msgid "导入/导出..."
-msgstr "import/export..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:267
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:449
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:156
-#: script/apps/Aries/Creator/Game/Areas/ChangeTexturePage.html:158
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:434
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:452
-#: script/mobile/paracraft/Login/InternetLoadWorld.html:35
-#: script/mobile/paracraft/Login/InternetLoadWorld.html:116
-msgid "刷新"
-msgstr "refresh"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:276
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:175
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/SyncGUI.html:53
 msgid "打开"
 msgstr "Open"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:280
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:183
+msgid "输入角色名字"
+msgstr "Enter player name"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:192
+msgid "上一个"
+msgstr "previous"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:193
+msgid "下一个"
+msgstr "next"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:197
+msgid "目前为离线模式"
+msgstr "Offline Mode"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:204
+#, lua-format
+msgid "点击打开:%s"
+msgstr "Click to open: %s"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:208
+msgid "退出登录"
+msgstr "Signout"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:218
 msgid "正在刷新, 请稍候 ... "
 msgstr "Refreshing, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:309
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:344
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:407
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:427
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:247
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:282
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:345
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:365
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:373
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:394
 msgid ".zip"
 msgstr ".zip"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:332
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:356
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:270
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:294
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:273
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:326
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:128
@@ -5716,29 +5633,39 @@ msgstr ".zip"
 msgid "删除"
 msgstr "delete"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:334
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:272
 msgid "同步"
 msgstr "Sync"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:336
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:357
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:274
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:295
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:406
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:99
 #: script/mobile/paracraft/Login/LocalLoadWorld.html:72
 msgid "进入"
 msgstr "enter"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:365
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:303
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:413
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:106
 msgid "下载"
 msgstr "download"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:447
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:385
 msgid "暂无存档，请创建"
 msgstr "No record, please create one"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:453
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:387
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:156
+#: script/apps/Aries/Creator/Game/Areas/ChangeTexturePage.html:158
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:434
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:452
+#: script/mobile/paracraft/Login/InternetLoadWorld.html:35
+#: script/mobile/paracraft/Login/InternetLoadWorld.html:116
+msgid "刷新"
+msgstr "refresh"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:391
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:359
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:438
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:120
@@ -5746,18 +5673,78 @@ msgstr "No record, please create one"
 msgid "正在搜索, 请稍候 ... "
 msgstr "Searching, please wait ..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:458
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:396
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:122
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:454
 #: script/mobile/paracraft/Login/CreateNewWorld.html:76
 msgid "创建世界"
 msgstr "Create World"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:459
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:131
-#: script/mobile/paracraft/Login/SelectLoginModePage.html:209
-msgid "官网"
-msgstr "Official Site"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:397
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:451
+msgid "导入/导出..."
+msgstr "import/export..."
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:405
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:413
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:93
+#: script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html:13
+msgid "点击切换"
+msgstr "click to toggle"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:408
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:416
+msgid "官方推荐用户作品欣赏"
+msgstr "Recommended User Worlds"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:427
+msgid "创作大赛报名中"
+msgstr "International Intellectual Creation Contest"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:431
+msgid "NPL编程课程6月开启报名"
+msgstr "Computer Science Lessons (Open In June)"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:434
+msgid "资源库7月开启"
+msgstr "Online Store (Open In July)"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:49
+msgid "服务器："
+msgstr "Server:"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:53
+msgid "账号："
+msgstr "Account:"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:53
+msgid "账户名/邮箱/手机号"
+msgstr "username/email/phone number"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:56
+msgid "密码："
+msgstr "Password:"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:60
+msgid "记住密码?"
+msgstr "Remember password?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:63
+msgid "自动登录"
+msgstr "Auto signin"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:67
+msgid "登   录"
+msgstr "Signin"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:70
+msgid "还没有帐号？"
+msgstr "No account?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginModal.html:71
+msgid "点击注册"
+msgstr "Click to register"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/WorldExitDialog.html:52
 #: script/apps/Aries/Creator/Game/Areas/EscFramePage.html:188
@@ -5811,6 +5798,32 @@ msgstr "Save and exit"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/WorldExitDialog.html:78
 msgid "直接退出"
 msgstr "Exit now"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/WorldExitDialog.html:79
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/BeyondVolume.html:32
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/StartSyncUseDataSource.html:31
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/StartSyncUseLocal.html:34
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/SyncGUI.html:63
+#: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html:129
+#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:43
+#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:51
+#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:52
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:39
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:51
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:60
+#: script/apps/Aries/Creator/Game/Login/DonatePage.html:49
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:162
+#: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:41
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:102
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:200
+#: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:51
+#: script/apps/Aries/Creator/Game/Tasks/ExportTask.html:34
+#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:75
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:23
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:35
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:44
+msgid "取消"
+msgstr "cancel"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/sync/BeyondVolume.html:21
 msgid "购买VIP"
@@ -6448,6 +6461,30 @@ msgstr "Avatar skin"
 msgid "描述"
 msgstr "description"
 
+#: script/apps/Aries/Creator/Game/Areas/SkinPage.html:107
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:321
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:38
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:42
+#: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html:37
+#: script/apps/Aries/Creator/Game/GUI/MirrorWnd.html:24
+#: script/apps/Aries/Creator/Game/GUI/MobPropertyPage.html:55
+#: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html:48
+#: script/apps/Aries/Creator/Game/Login/DonatePage.html:34
+#: script/apps/Aries/Creator/Game/Login/DonatePage.html:48
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:161
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:89
+#: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html:108
+#: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:39
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:101
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:199
+#: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:50
+#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:74
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:22
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:26
+#: script/mobile/paracraft/Login/CreateNewWorld.html:102
+msgid "确定"
+msgstr "OK"
+
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:104
 #: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:53
 msgid "立体输出"
@@ -6716,16 +6753,6 @@ msgstr "Empty"
 msgid "创建新世界"
 msgstr "create world"
 
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:153
-#: script/mobile/paracraft/Areas/SettingPage.html:50
-#: script/mobile/paracraft/GUI/HelpPage.html:418
-#: script/mobile/paracraft/Login/BaiduTestPage.html:181
-#: script/mobile/paracraft/Login/CreateNewWorld.html:78
-#: script/mobile/paracraft/Login/InternetLoadWorld.html:36
-#: script/mobile/paracraft/Login/LocalLoadWorld.html:35
-msgid "返回"
-msgstr "back"
-
 #: script/apps/Aries/Creator/Game/Login/DonatePage.html:20
 msgid "无效的Key"
 msgstr "Key is invalid"
@@ -6757,6 +6784,10 @@ msgstr "Downloading world, please wait..."
 #: script/apps/Aries/Creator/Game/Login/DownloadWorld.html:47
 msgid "进入世界"
 msgstr "enter world"
+
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:293
+msgid "服务器列表"
+msgstr "server list"
 
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:309
 msgid "添加"
@@ -6869,6 +6900,11 @@ msgstr "disabled"
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:122
 msgid "系统"
 msgstr "system"
+
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:131
+#: script/mobile/paracraft/Login/SelectLoginModePage.html:209
+msgid "官网"
+msgstr "Official Site"
 
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:131
 msgid "更新"
@@ -7063,12 +7099,6 @@ msgstr "begin recording MPEG (R)"
 #: script/apps/Aries/Creator/Game/Movie/MovieClipController.html:98
 msgid "到结束"
 msgstr "to end"
-
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:93
-#: script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html:13
-msgid "点击切换"
-msgstr "click to toggle"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:37
 msgid "添加/修改关键帧"
@@ -7753,6 +7783,15 @@ msgid ""
 msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
+
+#~ msgid "修改名称"
+#~ msgstr "Modify name"
+
+#~ msgid "欢迎:"
+#~ msgstr "Welcome:"
+
+#~ msgid "我的作品网站"
+#~ msgstr "My works website"
 
 #~ msgid "世界名字中含有敏感词汇，请重新输入"
 #~ msgstr "Sensitive words detected in world names, please enter again"

@@ -95,6 +95,18 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	pe_mc_player.OnFrameMove(ctl, mcmlNode);
 end
 
+
+function pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
+	if(mcmlNode.Canvas3D_ctl and filename and filename~="") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+		PlayerAssetFile:Init();
+
+		mcmlNode.obj_params.AssetFile = PlayerAssetFile:GetValidAssetByString(filename)
+		mcmlNode.Canvas3D_ctl:ShowModel(mcmlNode.obj_params);
+	end
+end
+
 -- on frame move: facing the mouse cursor
 function pe_mc_player.OnFrameMove(ctl, mcmlNode)
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();
