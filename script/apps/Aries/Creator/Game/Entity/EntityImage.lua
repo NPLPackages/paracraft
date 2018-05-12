@@ -101,6 +101,7 @@ function Entity:OnBlockLoaded(x,y,z, data)
 	self:ScheduleRefresh(x,y,z);
 end
 
+
 function Entity:ScheduleRefresh(x,y,z)
 	if(not x) then
 		x,y,z = self:GetBlockPos();
@@ -287,7 +288,7 @@ function Entity:CalculateLengths()
 					local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 					if(neighbor_entity) then
 						neighbor_facing = neighbor_entity:GetImageFacing();
-						if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+						if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
 							bIsBoundary = true;
 						end
 					else
@@ -365,7 +366,7 @@ function Entity:CaculateImageExpansionData()
 		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 		if(neighbor_entity) then
 			neighbor_facing = neighbor_entity:GetImageFacing();
-			if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+			if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
 				break;
 			end
 			top_blocks_number = top_blocks_number + 1;
@@ -384,7 +385,7 @@ function Entity:CaculateImageExpansionData()
 		local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 		if(neighbor_entity) then
 			neighbor_facing = neighbor_entity:GetImageFacing();
-			if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+			if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
 				break;
 			end
 			bottom_blocks_number = bottom_blocks_number + 1;
@@ -424,7 +425,7 @@ function Entity:CaculateImageExpansionData()
 			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 			if(neighbor_entity) then
 				neighbor_facing = neighbor_entity:GetImageFacing();
-				if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+				if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
 					break;
 				end
 				left_number = left_number + 1;
@@ -455,7 +456,7 @@ function Entity:CaculateImageExpansionData()
 			local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
 			if(neighbor_entity) then
 				neighbor_facing = neighbor_entity:GetImageFacing();
-				if(neighbor_facing ~= root_block_facing or neighbor_entity.image_filename) then
+				if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
 					break;
 				end
 				right_number = right_number + 1;
@@ -597,6 +598,12 @@ function Entity:SetImageFileName(filename)
 		self.imagefile_loaded_times = nil;
 		self.imagefile_loaded_timeout = nil;
 		self.texture = nil;
+	end
+end
+
+function Entity:HasImage()
+	if(self.image_filename or (self.cmd and self.cmd~="")) then
+		return true;
 	end
 end
 

@@ -131,11 +131,13 @@ function Entity:GetOpacity()
 	return self.opacity or 1;
 end
 
+-- @param opacity: [0-1] means transparent. greater than 1 means solid, which allows us to use opacity to set whether object is solid. 
 function Entity:SetOpacity(opacity)
 	self.opacity = opacity or 1;
-	if(self.opacity < 1) then
+	if(self.opacity <= 1) then
 		self:SetSolid(false);
 	else
+		self.opacity = 1;
 		self:SetSolid(true);
 	end
 end

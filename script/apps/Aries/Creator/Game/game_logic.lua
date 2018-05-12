@@ -184,7 +184,6 @@ function GameLogic.InitCommon()
 	end
 	GameLogic.theParticleManager:Clear();
 	GameLogic.GetShaderManager():RemoveAllPostProcessingEffects();
-	GameLogic.playerController = GameLogic.playerController or MyCompany.Aries.Game.PlayerController:new();
 	GameLogic.Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/StereoVisionController.lua");
@@ -290,6 +289,9 @@ function GameLogic.GetWorld()
 end
 
 function GameLogic.GetPlayerController()
+	if(not GameLogic.playerController) then
+		GameLogic.playerController = MyCompany.Aries.Game.PlayerController:new();
+	end
 	return GameLogic.playerController;
 end
 

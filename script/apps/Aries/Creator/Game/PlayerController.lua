@@ -16,7 +16,6 @@ PlayerController:SetHandToolIndex(nIndex);
 ]]
 NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
@@ -51,11 +50,16 @@ function PlayerController:GetMainAssetPath()
 	if(player) then
 		return player:GetMainAssetPath();
 	else
-		-- this function may be called before world is loaded, so check load block_types
-		block_types.init();
-		local item = ItemClient.GetItem(block_types.names.player);
-		if(item) then
-			return item:GetAssetFile();
+		local filename = GameLogic.options:GetMainPlayerAssetName();
+		if(filename) then
+			return filename;
+		else
+			-- this function may be called before world is loaded, so check load block_types
+			block_types.init();
+			local item = ItemClient.GetItem(block_types.names.player);
+			if(item) then
+				return item:GetAssetFile();
+			end
 		end
 	end
 end

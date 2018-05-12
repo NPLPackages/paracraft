@@ -134,6 +134,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	min_ui_height = 560,
 	-- usually the left drag is enabled only in touch mode.
 	isMouseLeftDragEnabled = false,
+	-- the player asset path
+	mainPlayerAssetPath = nil,
 });
 
 -- load default setting on application start. 
@@ -311,6 +313,10 @@ function options:OnLoadWorld()
 	GameLogic.GetSkyEntity():Refresh();
 
 	if(System.options.mc) then
+		self:SetMainPlayerAssetName();
+		if(self.mainPlayerAssetPath) then
+			EntityManager.GetPlayer():SetMainAssetPath(self.mainPlayerAssetPath)
+		end
 		player:SetScale(1);
 		self.jump_up_speed = 5*1.3;
 		local att = ParaTerrain.GetBlockAttributeObject();
@@ -645,6 +651,23 @@ end
 function options:GetViewBobbing()
 	return self.ViewBobbing;
 end
+
+function options:SetMainPlayerAssetName(value)
+	local key = "Paracraft_System_MainPlayer_AssetName";
+	if(value == nil) then
+		if(self.mainPlayerAssetPath == nil) then
+			self.mainPlayerAssetPath = GameLogic.GetPlayerController():LoadLocalData(key,nil, true);
+		end
+	elseif(self.mainPlayerAssetPath ~= value) then
+		self.mainPlayerAssetPath = value;
+		GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
+	end
+end
+
+function options:GetMainPlayerAssetName()
+	return self.mainPlayerAssetPath;
+end
+
 
 -- obsoleted: set view bobbing and save to disk
 function options:ToggleViewBobbing(viewBobbing)
