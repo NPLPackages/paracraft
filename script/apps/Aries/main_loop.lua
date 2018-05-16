@@ -178,6 +178,11 @@ local function Aries_load_config(filename)
 		ParaEngine.GetAttributeObject():GetChild("AssetManager"):SetField("UseLocalFileFirst", true);
 	end
 
+	if(System.options.mc)then
+		-- use paracraft icon file, it can also be any *.ico file on disk
+		ParaEngine.GetAttributeObject():SetField("Icon", ":IDR_PARAWORLD_ICO");
+	end
+
 	System.options.is_client = true;
 
 	filename = filename or System.options.clientconfig_file or "config/GameClient.config.xml"

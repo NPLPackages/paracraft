@@ -88,7 +88,17 @@ function InternetLoadWorld.OnStaticInit()
 	InternetLoadWorld.ds_collection = RemoteServerList.LoadAllServerListForUser();
 	InternetLoadWorld.ServerPage_ds = InternetLoadWorld.ds_collection[InternetLoadWorld.type_index];
 
+	
+
 	--TextureModPage.DownloadOfficialTexturePack();
+end
+
+function InternetLoadWorld.GetEvents()
+	if(not InternetLoadWorld.events) then
+		NPL.load("(gl)script/ide/EventDispatcher.lua");
+		InternetLoadWorld.events = commonlib.EventSystem:new();
+	end
+	return InternetLoadWorld.events;
 end
 
 function InternetLoadWorld.ShowPage(bShow)
@@ -352,6 +362,8 @@ function InternetLoadWorld.OnChangeServerPage(index)
 	InternetLoadWorld.selected_world_index = 1;
 	local cur_svr = InternetLoadWorld.GetCurrentServerPage();
 	cur_svr["addmark"] = false;
+
+	InternetLoadWorld.GetEvents():DispatchEvent({type = "dataChanged", type_index = InternetLoadWorld.type_index });
 	if(page) then
 		page:Refresh(0.01);
 	end

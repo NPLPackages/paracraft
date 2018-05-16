@@ -3,7 +3,7 @@ Title: Memory Block Entity
 Author(s): LiXizhi
 Date: 2016/5/19
 Desc: Memory block is a stateful block, which will trigger memories(time series) stored in connected 
-movie clips according to similarity between the current virtual world and intial state of time series in movie clips. 
+movie clips according to similarity between the current virtual world and initial state of time series in movie clips. 
 
 Memory block stores whether the memory is getting attention, and how strict is the initial state matching. 
 Left click to increase IncreaseAttention to the block

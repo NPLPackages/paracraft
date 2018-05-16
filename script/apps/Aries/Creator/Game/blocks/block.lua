@@ -71,6 +71,8 @@ local block_attribute_map = {
 	tick_random		= 0x0020000, -- whether to tick randomly, framemove or tick_random are the same
 	onload			= 0x0040000, -- whether has onBlockLoaded
 	color_data		= 0x0080000, -- whether the block contains color in its block data.
+	invisible		= 0x0100000, -- whether the block is invisible.
+	tiling			= 0x0200000, -- whether tiling is used
 }
 
 block.attributes = block_attribute_map;
@@ -236,9 +238,24 @@ local exclusive_block_tex = {
 	[102] = true,
 };
 
+function block:SetTileFromFilename(filename)
+	local nTile = tonumber(filename:match("_x(%d)%.") or 1);
+	if(self:GetTileSize() ~= nTile) then
+		self.tile = nTile;
+		self:UpdateAttribute("tile", nTile)
+	end
+end
+
+-- default to 1
+function block:GetTileSize()
+	return self.tile or 1;
+end
+
 -- @param texture_index: nil to default to 1
 -- @param bNoRestore: if true, we will not save the new texture to self.new_texture for automatic restore. 
 function block:ReplaceTexture(filename, texture_index, bNoRestore)
+	self:SetTileFromFilename(filename);
+
 	if(texture_index and texture_index>1) then
 		local texture = self:GetTexture(texture_index);
 		if(texture and texture~="") then
@@ -309,8 +326,10 @@ function block:RestoreTexture()
 			ParaTerrain.SetTemplateTexture(self.id, self.texture);
 			self.new_texture = nil;
 		end
+		self:SetTileFromFilename(self.texture);
 	elseif(self.cubeMode and self.default_texture and self.default_texture~=self.texture) then
 		self:ReplaceTexture(self.default_texture);
+		self:SetTileFromFilename(self.default_texture);
 	end
 	if(self.textures) then
 		for i, texture in pairs(self.textures) do
