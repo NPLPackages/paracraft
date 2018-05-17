@@ -982,6 +982,11 @@ function Entity:Detach()
 	
 end
 
+-- virtual, called when this entity is removed from EntityManager, either detached or during world exit.
+-- this function is also called when entity is destroyed if it is attached to EntityManager.
+function Entity:OnRemoved()
+end
+
 function Entity:GetWorldServer()
     return GameLogic.GetWorld();
 end

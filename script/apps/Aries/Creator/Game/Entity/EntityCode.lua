@@ -31,10 +31,14 @@ function Entity:ctor()
 end
 
 function Entity:Destroy()
+	Entity._super.Destroy(self);
+end
+
+function Entity:OnRemoved()
 	if(self.codeBlock) then
 		self.codeBlock:Destroy();
+		self.codeBlock = nil;
 	end
-	Entity._super.Destroy(self);
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)

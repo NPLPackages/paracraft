@@ -167,7 +167,12 @@ end
 
 function EntityManager.Clear()
 	dynamic_objects:clear();
+
+	for entity, _ in pairs(static_objects) do
+		entity:OnRemoved();
+	end
 	static_objects = {};
+
 	block_cache = {};
 	block_containers = {};
 	chunk_column_entities = {};
@@ -243,6 +248,7 @@ function EntityManager.RemoveObject(entity)
 		entity_id_maps[entity.entityId] = nil;
 	end
 	EntityManager.AddEntityCount(entity.item_id, -1);
+	entity:OnRemoved();
 end
 
 function EntityManager.GetAllEntities()

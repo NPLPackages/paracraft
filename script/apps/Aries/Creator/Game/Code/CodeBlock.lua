@@ -75,7 +75,7 @@ end
 
 -- unload code and related entities
 function CodeBlock:Unload()
-	if(self.isLoaded) then
+	if(not self.isLoaded) then
 		return;
 	end
 	self.isLoaded = nil;
