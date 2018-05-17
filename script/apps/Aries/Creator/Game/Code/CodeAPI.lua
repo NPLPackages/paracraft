@@ -14,6 +14,7 @@ local api = CodeAPI:new(codeBlock, codeActor);
 local s_env_methods = {
 	"resume", 
 	"yield", 
+	"checkyield",
 	"exit",
 	"print",
 	"log",
@@ -106,6 +107,11 @@ function env_imp:resume(err, msg)
 	end
 end
 
+-- calling this function 100 times will automatically yield and resume until next tick (1/30 seconds)
+-- we will automatically insert this function into while and for loop. One can also call this manually
+function env_imp:checkyield()
+end
+
 -- Output a message and terminate the current script
 -- @param msg: output this message. usually nil. 
 function env_imp:exit(msg)
@@ -164,3 +170,4 @@ function env_imp:say(text, duration)
 		GameLogic.AddBBS("codeblock", text, 10000);
 	end
 end
+

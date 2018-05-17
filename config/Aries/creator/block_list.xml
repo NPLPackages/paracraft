@@ -232,10 +232,6 @@ to_id： 可以是一组连续的ID
     <block name="pig"/>
     <block name="sheep"/>
     <block name="chicken"/>
-    <!--<block name="enderman"/>
-    <block name="skeleton"/>
-    <block name="creeper"/>
-    <block name="zombie"/>-->
 	</category>
 	
   <category name="gear" text="机关">
@@ -285,7 +281,8 @@ to_id： 可以是一组连续的ID
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
-    
+    <block name="CodeBlock"/>
+
   </category>
 
   <category name="tool" text="工具">
@@ -323,5 +320,6 @@ to_id： 可以是一组连续的ID
     <block name="PhysicsModel"/>
     <block name="villager"/>
     <block name="MemoryBlock"/>
+    <block name="CodeBlock"/>
   </category>
 </blocklist>

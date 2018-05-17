@@ -112,3 +112,11 @@ function block:OnBlockEvent(x,y,z, event_id, event_param)
 		return entity:OnBlockEvent(x,y,z, event_id, event_param);
 	end
 end
+
+-- Ticks the block if it's been scheduled
+function block:updateTick(x,y,z)
+	local entity = self:GetBlockEntity(x,y,z);
+	if(entity and entity.updateTick) then
+		entity:updateTick(x,y,z);
+	end
+end

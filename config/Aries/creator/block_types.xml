@@ -249,10 +249,12 @@ Sound related:
   <block name="Sign_Post" text="告示牌" searchkey="告示牌" mc_id="63" id="211" class="BlockSign" item_class="ItemSign" entity_class="EntitySign" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/textframe.png" customModel="true" texture="Texture/blocks/ItemFrame.png" template="image?filename=model/blockworld/TextFrame/TextFrame"/>
   <!--Added Xizhi 2013.12.21 name="Command_Block" text="命令方块" searchkey="" mc_id="137"-->
   <block singleSideTex="true" name="Command_Block" text="命令方块" searchkey="命令方块" mc_id="137" id="212" mapcolor="#656043" class="BlockCommandBlock" entity_class="EntityCommandBlock" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/Command_Block.png" cubeMode="true" obstruction="true" solid="true" />
-  <!--Added Xizhi 2014.3.28 added movie clip-->
+  <!--Added Xizhi 2014.3.28 added movie block-->
   <block threeSideTex="true" name="MovieClip" text="电影方块" searchkey="电影" id="228" mapcolor="#8f8f8f" class="BlockCommandBlock" entity_class="EntityMovieClip" toggle_sound="click" hasAction="true" disable_gen_icon="true" icon="Texture/blocks/items/movie.png" texture="Texture/blocks/movie_three.png" cubeMode="true" obstruction="true" solid="true"/>
   <!--Added Xizhi 2017.6.4 added memory block-->
   <block singleSideTex="true" name="MemoryBlock" id="9" text="记忆方块" searchkey="记忆方块" class="BlockMemory" entity_class="EntityMemory" texture="Texture/blocks/command_block_on.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
+  <!--Added Xizhi 2018.5.19 added code block-->
+  <block singleSideTex="true" name="CodeBlock" id="219" text="代码方块" searchkey="代码方块" class="BlockEntityBase" entity_class="EntityCode" texture="Texture/blocks/command_block_on.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--Added Xizhi 2014.2.12-->
   <block singleSideTex="true" name="CmdTextureReplacer" text="材质转换器" searchkey="材质转换器" id="223" class="BlockEntityBase" entity_class="EntityCmdTextureReplacer" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/stonebrick_chiseled.png" cubeMode="true" obstruction="true" solid="true" />
@@ -499,7 +501,6 @@ Sound related:
   <!--teleport to this block when toggled-->
   <block threeSideTex="true" name="TeleportStone" text="传送石" searchkey="传送石" class="BlockTeleportStone" id="110" icon="Texture/blocks/items/TeleportStone.png" texture="Texture/blocks/TeleportStone.png"  obstruction="true" solid="true" cubeMode="true"  />
   <block name="WaterDrop" text="水滴" searchkey="水滴" id="163" disable_gen_icon="true" icon="Texture/blocks/items/waterdrop.png" texture="Texture/blocks/items/waterdrop.png" singleSideTex="true"  modelName="cross" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
-  <block singleSideTex="true" name="WhiteButter" text="奶油块" searchkey="奶油块" class="BlockTeleportStone" id="219" icon="Texture/blocks/items/snow.png" texture="Texture/tileset/blocks/snow_single.dds"  obstruction="true" solid="true" cubeMode="true"  />
 
   <!--Added Xizhi 2014.3.28 added movie clip-->
   <block name="Apple" text="苹果" searchkey="苹果" id="229" disable_gen_icon="true" icon="Texture/blocks/items/apple.png"  obstruction="true" template="model?filename=model/blockworld/Apple/Apple"/>
