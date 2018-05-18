@@ -223,6 +223,11 @@ local function Aries_load_config(filename)
 	else
 		System.options.IsTouchDevice = ParaEngine.GetAttributeObject():GetField("IsTouchInputting", false);	
 	end
+
+	if(System.options.IsTouchDevice) then
+		-- NOTE: for now we will disable all system IME and use buildin virtual keyboard where possible. 
+		System.options.auto_virtual_keyboard = true
+	end
 	
 
 	-- always use compression. The current compression method is super light-weighted and is mostly for data encrption purposes. 

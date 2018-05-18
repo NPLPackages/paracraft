@@ -9,6 +9,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
 TouchVirtualKeyboardIcon.ShowSingleton(true);
 
+TouchVirtualKeyboardIcon.GetSingleton():ShowKeyboard(true)
+
+
 local btn = TouchVirtualKeyboardIcon:new():Init("TouchVirtualKeyboardIcon")
 btn:SetTransparency(0.5);
 btn:Show(true);
@@ -163,35 +166,50 @@ function TouchVirtualKeyboardIcon:OnMouseMove()
 	self:OnTouch(touch);
 end
 
+function TouchVirtualKeyboardIcon:ShowKeyboard(bShow)
+	local keyboard = self:GetKeyBoard();
+	self.isShowing = bShow;
+	if(self.isShowing) then
+		if(not self:isVisible()) then
+			self.hideIconWhenClosed = true;
+			self:Show(true);
+		end
+		keyboard:SetTransparency(1);
+		self:SetTransparency(1);
+		self:SetText(L"关闭");
+		keyboard:Show(true);
+		local obj = Keyboard:GetKeyFocus();
+		if(obj) then
+			local x, y, width, height = obj:GetAbsPosition()
+			if( (y + height/2) < Screen:GetHeight()/2) then
+				keyboard:SetTop(math.min(y + height + 10, math.floor(Screen:GetHeight()/2)));
+			else
+				keyboard:SetTop(keyboard.button_height);
+			end
+			keyboard:SetFocusedMode(true);
+		else
+			keyboard:SetTop(keyboard.button_height);
+			keyboard:SetFocusedMode(false);
+		end
+	else
+		self:SetText(self.text);
+		self:SetTransparency(self.default_transparency);
+		keyboard:Show(false);
+
+		if(self.hideIconWhenClosed) then
+			self:Show(false);
+		end
+	end
+end
+
 function TouchVirtualKeyboardIcon:OnTouch(touch)
 	-- handle the touch
 	local touch_session = TouchSession.GetTouchSession(touch);
 	if(touch.type == "WM_POINTERDOWN") then
 		local keyboard = self:GetKeyBoard();
-		self.isShowing = not keyboard:IsVisible();
-		if(self.isShowing) then
-			keyboard:SetTransparency(1);
-			self:SetTransparency(1);
-			self:SetText(L"关闭");
-			keyboard:Show(true);
-			local obj = Keyboard:GetKeyFocus();
-			if(obj) then
-				local x, y, width, height = obj:GetAbsPosition()
-				if( (y + height/2) < Screen:GetHeight()/2) then
-					keyboard:SetTop(math.min(y + height + 10, math.floor(Screen:GetHeight()/2)));
-				else
-					keyboard:SetTop(keyboard.button_height);
-				end
-				keyboard:SetFocusedMode(true);
-			else
-				keyboard:SetTop(keyboard.button_height);
-				keyboard:SetFocusedMode(false);
-			end
-		else
-			self:SetText(self.text);
-			self:SetTransparency(self.default_transparency);
-			keyboard:Show(false);
-		end
+		-- toggle show
+		self:ShowKeyboard(not keyboard:IsVisible());
+
 	elseif(touch.type == "WM_POINTERUPDATE") then
 		
 	elseif(touch.type == "WM_POINTERUP") then
