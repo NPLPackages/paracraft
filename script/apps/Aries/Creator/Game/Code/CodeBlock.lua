@@ -13,6 +13,8 @@ codeBlock:Run();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
+local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -24,6 +26,8 @@ CodeBlock:Property("Name", "CodeBlock");
 
 function CodeBlock:ctor()
 	self.timers = nil;
+	self.timers_pool = nil;
+	self.actors = {};
 end
 
 function CodeBlock:Init(entityCode)
@@ -36,16 +40,40 @@ function CodeBlock:Destroy()
 	CodeBlock._super.Destroy(self);
 end
 
+-- return the timer object
+function CodeBlock:SetTimer(callbackFunc, dueTime, period)
+	local timer;
+	if(self.timers_pool and #self.timers_pool > 0) then
+		timer = self.timers_pool[#self.timers_pool];
+		self.timers_pool[#self.timers_pool] = nil;
+		timer.callbackFunc = callbackFunc;
+	else
+		self.timers = self.timers or {};
+		timer = commonlib.Timer:new({callbackFunc = callbackFunc})
+	end
+	self.timers[timer] = true;
+	timer:Change(dueTime, period);
+	return timer;
+end
+
+function CodeBlock:KillTimer(timer)
+	timer:Change();
+	if(self.timers[timer]) then
+		self.timers[timer] = nil;
+		self.timers_pool = self.timers_pool or {};
+		if(#self.timers_pool < 10) then
+			self.timers_pool[#self.timers_pool+1] = timer;
+		end
+	end
+end
+
 function CodeBlock:SetTimeout(duration, callbackFunc)
-	self.timers = self.timers or {};
-	local timer = commonlib.Timer:new({callbackFunc = function(timer)
+	self:SetTimer(function(timer)
 		if(callbackFunc) then
 			callbackFunc();
 		end
-		self.timers[timer] = nil;
-	end})
-	timer:Change(duration);
-	self.timers[timer] = true;
+		self:KillTimer(timer);
+	end, duration, nil)
 end
 
 -- compile code
@@ -85,15 +113,63 @@ function CodeBlock:Unload()
 		end
 		self.timers = nil;
 	end
+	if(self.timers_pool) then
+		for _, timer in ipairs(self.timers_pool) do
+			timer:Change();
+		end
+		self.timers_pool = nil;
+	end
+
 	self.code_env = nil;
-	-- TODO: remove entities, etc
+
+	self:RemoveAllActors();
 end
 
--- TODO: create or get the default actor
-function CodeBlock:GetActor()
-	
+-- usually called when movie finished playing. 
+function CodeBlock:RemoveAllActors()
+	for i, actor in pairs(self.actors) do
+		actor:OnRemove();
+		actor:Destroy();
+	end
+	self.actors = {};
 end
 
+-- private function: do not call this function. 
+function CodeBlock:AddActor(actor)
+	self.actors[#(self.actors)+1] = actor;
+end
+
+function CodeBlock:GetMovieEntity()
+	return self.entityCode:FindNearByMovieEntity();
+end
+
+-- create a new actor from the nearby movie block. 
+-- Please note one may create multiple actors from the same block.
+-- return nil if no actor is found.
+function CodeBlock:CreateActor()
+	local actor;
+	local movie_entity = self:GetMovieEntity();
+	if(movie_entity) then
+		if movie_entity and movie_entity.inventory then
+			for i = 1, movie_entity.inventory:GetSlotCount() do
+				local itemStack = movie_entity.inventory:GetItem(i)
+				if (itemStack and itemStack.count > 0 and itemStack.serverdata) then
+					if (itemStack.id == block_types.names.TimeSeriesNPC) then
+						actor = CodeActor:new():Init(itemStack, movie_entity);
+						break;
+					end
+				end
+			end
+		end
+	end
+	if(actor) then
+		self:AddActor(actor);
+		-- use time 0
+		actor:SetTime(0);
+		actor:FrameMove(0, false);
+		return actor;
+	end
+end
 
 -- run code again 
 function CodeBlock:Run()
@@ -101,7 +177,7 @@ function CodeBlock:Run()
 
 	if(self.code_func) then
 		self.isLoaded = true;
-		local code_env = CodeAPI:new(self, self:GetActor());
+		local code_env = CodeAPI:new(self, self:CreateActor());
 		local co = coroutine.create(function()
 			self:RunImp(code_env);
 			return nil, "finished";

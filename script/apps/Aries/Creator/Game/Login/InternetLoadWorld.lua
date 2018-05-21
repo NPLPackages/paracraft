@@ -257,7 +257,9 @@ function InternetLoadWorld.OnClickSelectedWorld()
 	end
 end
 
+-- called when data is changed.
 function InternetLoadWorld.RefreshAll()
+	InternetLoadWorld.GetEvents():DispatchEvent({type = "dataChanged", type_index = InternetLoadWorld.type_index });
 	if(page) then
 		page:Refresh(0.01);
 	end
@@ -363,10 +365,7 @@ function InternetLoadWorld.OnChangeServerPage(index)
 	local cur_svr = InternetLoadWorld.GetCurrentServerPage();
 	cur_svr["addmark"] = false;
 
-	InternetLoadWorld.GetEvents():DispatchEvent({type = "dataChanged", type_index = InternetLoadWorld.type_index });
-	if(page) then
-		page:Refresh(0.01);
-	end
+	InternetLoadWorld.RefreshAll()
 end
 
 function InternetLoadWorld.GetCurrentServerPage()
@@ -510,9 +509,7 @@ function InternetLoadWorld.DownLoadWorld(name, mcmlNode)
 	end
 	world:DownloadRemoteFile(function(bSucceed, msg)
 		if(bSucceed and world.worldpath) then
-			if(page) then
-				page:Refresh(0.01);
-			end		
+			InternetLoadWorld.RefreshAll()
 		else
 			_guihelper.MessageBox(msg);
 		end

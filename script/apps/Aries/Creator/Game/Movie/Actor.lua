@@ -200,6 +200,14 @@ function Actor:GetTime()
 	end
 end
 
+function Actor:SetTime(time)
+	local movieClip = self:GetMovieClip();
+	if(movieClip) then
+		return movieClip:SetTime(time);
+	end
+end
+
+
 function Actor:GetEntity()
 	return self.entity;
 end
