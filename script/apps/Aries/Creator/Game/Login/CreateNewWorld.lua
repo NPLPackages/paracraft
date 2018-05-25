@@ -82,22 +82,25 @@ end
 
 -- show page
 function CreateNewWorld.ShowPage()
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-		url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
-		name = "CreateMCNewWorld", 
-		isShowTitleBar = false,
-		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		zorder = 0,
-		allowDrag = false,
-		directPosition = true,
-			align = "_ct",
-			x = -700/2,
-			y = -450/2,
-			width = 700,
-			height = 450,
-		cancelShowAnimation = true,
-	});
+	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
+	if(not isCustomShow) then
+		System.App.Commands.Call("File.MCMLWindowFrame", {
+			url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
+			name = "CreateMCNewWorld", 
+			isShowTitleBar = false,
+			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			zorder = 0,
+			allowDrag = false,
+			directPosition = true,
+				align = "_ct",
+				x = -700/2,
+				y = -450/2,
+				width = 700,
+				height = 450,
+			cancelShowAnimation = true,
+		});
+	end
 end
 
 -- template db table
@@ -240,7 +243,8 @@ function CreateNewWorld.OnSelectWorldTemplate(index)
 end
 
 function CreateNewWorld.ClosePage()
-	if(page) then
+	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "close");
+	if(not isCustomShow) then
 		page:CloseWindow();
 	end
 end
@@ -251,7 +255,7 @@ function CreateNewWorld.OnClickLoadWorld()
 	if(world and world.worldpath) then
 		local worldpath = world.worldpath:gsub("%.zip$", "");
 		if(System.world:DoesWorldExist(worldpath, true)) then
-			CreateNewWorld.page:CloseWindow();
+			CreateNewWorld.ClosePage();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
 			_guihelper.MessageBox(L"无效的世界文件");
@@ -306,7 +310,7 @@ function CreateNewWorld.OnClickCreateWorld()
 		end
 	else
 		LOG.std(nil, "info", "CreateNewWorld", "new world created at %s", worldpath);
-		CreateNewWorld.page:CloseWindow();
+		CreateNewWorld.ClosePage();
 		WorldCommon.OpenWorld(worldpath, true);
 		GameLogic:UserAction("introduction");
 		-- this is annoying, we will not show tutorial in this intrusive way. we will use external lesson mod to do this job in near future.
