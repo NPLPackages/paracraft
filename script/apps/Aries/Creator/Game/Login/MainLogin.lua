@@ -218,18 +218,14 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("LoadPlugins");
 	elseif(not state.HasInitedTexture) then
 		self:Invoke_handler("HasInitedTexture");
-	else		
-		--logitow hard code
-		local BlockFileMonitor = commonlib.gettable("Mod.BlockFileMonitor");
-		BlockFileMonitor.openLogitowUrl();
-		
+	else
 		-- already signed in 
-		--if(not state.IsLoadMainWorldRequested) then	
-		--	self:Invoke_handler("LoadMainWorld");
+		if(not state.IsLoadMainWorldRequested) then	
+			self:Invoke_handler("LoadMainWorld");
 		-- don't load the exsiting world ,can call   [[self:Invoke_handler("ShowCreateWorldPage")]]    enter the create new world page
-		--elseif(not state.IsCreateNewWorldRequested) then	
-		--	self:Invoke_handler("ShowCreateWorldPage");
-		--end
+		elseif(not state.IsCreateNewWorldRequested) then	
+			self:Invoke_handler("ShowCreateWorldPage");
+		end
 	end
 end
 
@@ -551,7 +547,7 @@ function MainLogin:CheckShowTouchVirtualKeyboard()
 	if(System.options.IsTouchDevice) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 		local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
-		TouchVirtualKeyboardIcon.ShowSingleton(false);
+		TouchVirtualKeyboardIcon.ShowSingleton(true);
 	end
 end
 
