@@ -15,6 +15,7 @@ local s_env_methods = {
 	"resume", 
 	"yield", 
 	"checkyield",
+	"GetEntity",
 	"exit",
 	"print",
 	"log",
@@ -24,6 +25,14 @@ local s_env_methods = {
 	"inherit",
 	"say",
 	"wait",
+	"move",
+	"walk",
+	"goto",
+	"teleport",
+	"anim",
+	"play",
+	"playLoop",
+	"stop",
 }
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/MemoryActor.lua");
@@ -53,6 +62,7 @@ function CodeAPI:new(codeBlock, actor)
 	local o = {
 		actor = actor,
 		codeblock = codeBlock,
+		check_count = 0,
 	};
 	CodeAPI.InstallMethods(o);
 	setmetatable(o, self);
@@ -83,6 +93,7 @@ function env_imp:yield(bExitOnError)
 			self.fake_resume_res = nil;
 			return err, msg;
 		else
+			self.check_count = 0;
 			err, msg = coroutine.yield(self);
 			if(err and bExitOnError) then
 				env_imp.exit(self);
@@ -110,6 +121,10 @@ end
 -- calling this function 100 times will automatically yield and resume until next tick (1/30 seconds)
 -- we will automatically insert this function into while and for loop. One can also call this manually
 function env_imp:checkyield()
+	self.check_count = self.check_count + 1;
+	if(self.check_count > 100) then
+		env_imp.wait(self, env_imp.GetDefaultTick(self));
+	end
 end
 
 -- Output a message and terminate the current script
@@ -128,6 +143,17 @@ end
 
 function env_imp:echo(...)
 	commonlib.echo(...);
+end
+
+-- get the entity associated with the actor.
+function env_imp:GetEntity()
+	if(self.actor) then
+		return self.actor:GetEntity();
+	end		
+end
+
+function env_imp:GetActor()
+	return self.actor;
 end
 
 -- similar to commonlib.gettable(tabNames) but in page scope.
@@ -167,7 +193,177 @@ function env_imp:say(text, duration)
 		env_imp.wait(self, duration);
 		env_imp.say(self, nil);
 	else
-		GameLogic.AddBBS("codeblock", text, 10000);
+		local entity = env_imp.GetEntity(self);
+		if(entity) then
+			if(text~=nil) then
+				text = tostring(text);
+			end
+			entity:Say(text, duration or -1)
+		else
+			GameLogic.AddBBS("codeblock", text, 10000);
+		end
 	end
 end
 
+-- walk relative to current block position and make it not dummy(has physics simulations)
+-- the entity maybe blocked if target unreachable. 
+-- it will move at the default speed. 
+-- @param dx,dy,dz: if z is nil, y is z
+-- @param duration: default to walkdist / walkspeed()
+function env_imp:walk(dx,dy,dz, duration)
+	if(not dz) then
+		dz = dy;
+		dy = nil;
+	end
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		local x,y,z = entity:GetBlockPos();
+		x = x + (dx or 0);
+		y = y + (dy or 0);
+		z = z + (dz or 0);
+		if(entity.MoveTo) then
+			entity:EnableAnimation(true);
+			entity:SetDummy(false);
+			entity:WalkTo(x,y,z);
+			if(not duration) then
+				duration = math.sqrt(dx*dx + dz*dz) * BlockEngine.blocksize / entity:GetWalkSpeed();
+			end
+			env_imp.wait(self, duration);
+		end
+	end
+end
+
+-- private: 
+function env_imp:GetDefaultTick()
+	if(not self.default_tick) then
+		self.default_tick = self.codeBlock and self.codeBlock:GetDefaultTick() or 0.02;
+	end
+	return self.default_tick;
+end
+
+-- move delta position and wait a tick. unlike walk, it will ignore physics and always move there. 
+-- @param dx,dy,dz: if z is nil, y is z
+-- @param duration: default to 1 tick
+function env_imp:move(dx,dy,dz, duration)
+	if(not dz) then
+		dz = dy;
+		dy = nil;
+	end
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		local x,y,z = entity:GetPosition();
+		x = x + (dx or 0)*BlockEngine.blocksize;
+		y = y + (dy or 0)*BlockEngine.blocksize;
+		z = z + (dz or 0)*BlockEngine.blocksize;
+		if(entity.MoveTo) then
+			entity:SetDummy(true);
+			entity:SetPosition(x,y,z);
+			env_imp.wait(self, duration or env_imp.GetDefaultTick(self));
+		end
+	end
+end
+
+-- goto absolute position in real coordinates
+-- Use teleport for block position
+-- @param x,y,z: if z is nil, y is z
+function env_imp:setPosition(x, y, z)
+	local entity = env_imp.GetEntity(self);
+	if(entity and x and y) then
+		env_imp.stop(self);
+		local ox,oy,oz = entity:GetPosition();
+		if(not z) then
+			y,z = oy, y;
+		end
+		entity:SetDummy(true);
+		entity:SetPosition(x,y,z);
+		env_imp.checkyield(self);
+	end
+end
+env_imp["goto"] = env_imp.setPosition;
+
+-- goto block position
+-- @param x,y,z: if z is nil, y is z
+function env_imp:teleport(x, y, z)
+	local entity = env_imp.GetEntity(self);
+	if(entity and x and y) then
+		env_imp.stop(self);
+		local ox,oy,oz = entity:GetBlockPos();
+		if(not z) then
+			y,z = oy, y;
+		end
+		entity:SetDummy(true);
+		entity:SetBlockPos(x,y,z);
+		env_imp.checkyield(self);
+	end
+end
+
+
+-- set animation id
+-- @param anim_id: 0 for standing (default), 4 for walk. 
+-- @param duration: default to 1 tick
+function env_imp:anim(anim_id, duration)
+	anim_id = anim_id or 0;
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		entity:EnableAnimation(true);
+		entity:SetAnimation(anim_id);
+		env_imp.wait(self, duration or env_imp.GetDefaultTick(self));
+	end
+end
+
+
+-- play a time series animation in the movie block.
+-- this function will return immediately.
+-- @param timeFrom: time in milliseconds, default to 0.
+-- @param timeTo: if nil, default to timeFrom
+-- @param isLooping: default to false.
+function env_imp:play(timeFrom, timeTo, isLooping)
+	timeFrom = timeFrom or 0;
+	local time = timeFrom;
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		entity:SetDummy(true);
+		entity:EnableAnimation(false);
+		local actor = env_imp.GetActor(self);
+		if(actor) then
+			actor:SetTime(time);
+			actor:ResetOffsetPosAndRotation();
+			actor:FrameMove(0, false);
+		end
+
+		if(timeTo and timeTo>timeFrom) then
+			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
+			local function frameMove_(timer)
+				time = time + timer:GetDelta();
+				if(time >= timeTo) then
+					if(isLooping) then
+						if((time - timer:GetDelta()) == timeTo) then
+							time = timeFrom;
+						else
+							time = timeTo;
+						end
+					else
+						time = timeTo;
+						self.codeblock:KillTimer(self.playTimer);
+					end
+				end
+				actor:SetTime(time);
+				actor:FrameMove(0, false);
+			end
+			self.playTimer = self.playTimer or self.codeblock:SetTimer(frameMove_, 0, deltaTime);
+			self.playTimer.callbackFunc = frameMove_;
+			self.playTimer:Change(0, deltaTime);
+		end
+	end
+end
+
+-- same as play(), but looping
+function env_imp:playLoop(timeFrom, timeTo)
+	env_imp.play(self, timeFrom, timeTo, true);
+end
+
+function env_imp:stop()
+	if(self.playTimer) then
+		self.codeblock:KillTimer(self.playTimer);
+	end
+end

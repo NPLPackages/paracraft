@@ -5,6 +5,7 @@ Company: ParaEngine
 Date: 2013.10.14
 Desc: 
 | name  | desc |
+| block_id | name or id |
 | tooltip2 | second line of the tooltip |
 use the lib:
 ------------------------------------------------------------
@@ -63,6 +64,14 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 		mcmlNode.item_stack = inventory:GetItem(bagpos);
 	else
 		block_id = mcmlNode:GetAttributeWithCode("block_id", nil, true);
+		if(type(block_id) == "string") then
+			if(block_id:match("^%d+$")) then
+				block_id = tonumber(block_id);
+			else
+				local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
+				block_id = names[block_id];
+			end
+		end
 		mcmlNode.item_stack = ItemStack:new():Init(block_id);
 	end
 	

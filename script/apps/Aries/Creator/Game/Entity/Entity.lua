@@ -1007,6 +1007,11 @@ function Entity:Say(text, duration, bAbove3D)
 			headon_speech.Speek(obj, text, duration or 4, bAbove3D);
 			return true;
 		end
+	else
+		local obj = self:GetInnerObject();
+		if(obj) then
+			headon_speech.SpeakClear(obj);
+		end
 	end
 end
 

@@ -166,8 +166,8 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	return Entity._super.OpenEditor(self, editor_name, entity);
-    -- NPL.load("(gl)Mod/BlocklyProgramMod/CodeBlockWindow.lua")
-    -- local CodeBlockWindow = commonlib.gettable("Mod.BlocklyProgramMod.CodeBlockWindow")
-    -- CodeBlockWindow.ShowPage(self);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    CodeBlockWindow.Show(true);
+	CodeBlockWindow.SetCodeEntity(self);
 end

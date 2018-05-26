@@ -89,7 +89,7 @@ function AutoSaver:DoAutoSave()
 			GameLogic.QuickSave();
 		else
 			-- tip mode
-			if(not GameLogic.IsRemoteWorld()) then
+			if(not GameLogic.IsRemoteWorld() and not ParaMovie.IsRecording()) then
 				if(System.options.IsMobilePlatform) then
 					GameLogic.AddBBS("UndoManager", L"记得保存你的世界～", 5000, "0 255 0");
 				else

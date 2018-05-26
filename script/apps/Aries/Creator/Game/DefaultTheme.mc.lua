@@ -276,7 +276,7 @@ function DefaultTheme:Load()
 		["mc_inner_panel"] = {background = "Texture/Aries/Creator/Theme/CommonControl_32bits.png;32 202 16 16:6 6 6 6",},
 		["mc_inner_panel_selected"] = {background = "Texture/Aries/Creator/Theme/CommonControl_32bits.png;52 202 16 16:6 6 6 6",},
 		["mc_panel"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;267 89 34 34:8 8 8 8",},
-		["mc_paper_panel"] = {background = "Texture/blocks/ItemFrame.png:5 5 5 5", color="#000000"},
+		["mc_paper_panel"] = {background = "Texture/whitedot.png", ["background-color"] = "#cec8a8", color="#000000"},
 		["mc_scroll_bar"] = {background = "Texture/Aries/Creator/Theme/CommonControl_32bits.png;72 202 24 22",},
 		["mc_border"] = {background = "Texture/Aries/Creator/Desktop/Inventory_32bits.png;99 365 29 29:3 5 4 5",},
 		["mc_button_grey"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",color="#ffffff"},

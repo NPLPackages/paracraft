@@ -1,65 +1,27 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html-->
 <pe:mcml>
 <script type="text/npl" src="CodeBlockWindow.lua">
 <![CDATA[
-local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-CodeBlockWindow:Init();
-
-function OnClose()
-    CodeBlockWindow:Close()
-end
-
-function onClick_EditWithBlockly()
-    CodeBlockWindow.onClick_EditWithBlockly();
-end
-
+CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 ]]></script>
-<div width="80%" height="90%" style="margin-left:100px;margin-top:100px;background-color:#C0C0C0;" >
-    <div align="left" width="100%" height="50" style="position:relative;margin-left:0px;margin-top:0px;background-color:#696969;">
-        <!-- 标题 -->
-        <div align="left" style="position:relative;margin-left:10px;margin-top:5px;width:100px;height:32px;">
-                <pe:label name="tittle" style="position:relative;base-font-size:15px;font-size:15px;text-align:left;margin-top:10px;margin-left:0px;font-family:SimHei;font-weight:lighter;color:#ffffff;">Code block</pe:label>
+<div width="100%" height="100%" style="background-color:#292929;" class="default">
+    <div style="margin:5px;">
+        <div style="float:left;margin-left:0px;margin-top:3px">
+            <input type="button" name="start" tooltip='<%=L"开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/auto_off.png); " onclick="CodeBlockWindow.OnClickStart" />
+            <input type="button" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="CodeBlockWindow.OnClickCompileAndRun" />
+            <input type="button" name="pause" tooltip='<%=L"暂停"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickPause" />
         </div>
-        <!-- 关闭 -->
-        <div align="right" style="width:34px;height:35px;position:relative;margin-right:10px;margin-top:10px;">
-            <button type="button" value="X" name="close" onclick="OnClose" style="width:34px;height:35px;position:relative;margin-left:0px;margin-top:0px;"/>
-        </div> 
-    </div> 
-    <!-- 文件名 -->
-    <div align="left" width="200" height="50" style="position:relative;margin-left:0px;margin-top:60px;background-color:#000000;">
-        <pe:label name="filename" style="position:relative;base-font-size:15px;font-size:15px;text-align:left;margin-top:10px;margin-left:10px;font-family:SimHei;font-weight:lighter;color:#ffffff;">virtual filename here</pe:label>
+        <div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
+            <pe:mc_block block_id='MovieClip' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickOpenMovieBlock"/>
+        </div>
+        <input align="right" class="mc_close_button" type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close" style="margin-top:8px;margin-right:10px;"/>
     </div>
-    <!-- 保存 -->
-    <div align="left" style="width:70px;height:50px;position:relative;margin-left:220px;margin-top:60px;">
-        <button type="button" value="Save" name="save" onclick="" style="width:70px;height:50px;position:relative;margin-left:0px;margin-top:0px;background-color:#FFA500;" />
-    </div> 
-    <!-- 用blockly编辑 -->
-    <div align="left" style="width:70px;height:50px;position:relative;margin-left:310px;margin-top:60px;">
-        <button type="button" value="Edit with Blockly..." name="edit" onclick="onClick_EditWithBlockly" style="width:150px;height:50px;position:relative;margin-left:0px;margin-top:0px;background-color:#FFA500;" />
-    </div> 
-    <!-- 勾选框 -->
-    <div align="left" style="width:250px;height:50px;position:relative;margin-left:400px;margin-top:60px;">
-        <input type="checkbox" name="checkbox" onclick="" style="width:150px;height:50px;position:relative;margin-left:0px;margin-top:0px;background-color:#FFA500;" />
-        <pe:label name="words" style="position:relative;base-font-size:15px;font-size:15px;text-align:left;margin-top:10px;margin-left:100px;font-family:SimHei;font-weight:lighter;color:#ffffff;">Allow editing in game mode</pe:label>
-    </div> 
-<!-- 左边 -->
-   <div align="left" width="30%" height="70%" style="position:relative;margin-left:0px;margin-top:120px;background-color:#000000;">
-        <div align="left" width="100%" height="50" style="position:relative;margin-left:0px;margin-top:0px;background-color:#696969;">
-            <pe:label name="words1" style="position:relative;base-font-size:13px;font-size:13px;text-align:left;margin-top:13px;margin-left:10px;font-family:SimHei;font-weight:lighter;color:#ffffff;">basic example dropdownlist</pe:label>
-        </div>
-        <pe:label name="words1" style="position:relative;base-font-size:13px;font-size:13px;text-align:left;margin-top:60px;margin-left:10px;font-family:SimHei;font-weight:lighter;color:#ffffff;">--basic code examples: --move to a new position move(0,10,8)</pe:label>
-   </div> 
-<!-- 右边 -->
-   <div align="right" width="70%" height="70%" style="position:relative;margin-right:0px;margin-top:120px;background-color:#000000;">
-        <pe:label name="words2" style="position:relative;base-font-size:13px;font-size:13px;text-align:left;margin-top:10px;margin-left:10px;font-family:SimHei;font-weight:lighter;color:#ffffff;">function onInit() end  function MyFunction() move(0,1); end</pe:label>
-       
-   </div> 
-<!-- 底边 -->
-   <div align="center" valign="bottom" width="100%" height="20%" style="position:relative;margin-left:0px;margin-bottom:0px;background-color:#000000;">
-       <pe:label name="words2" style="position:relative;base-font-size:13px;font-size:13px;text-align:left;margin-top:10px;margin-left:10px;font-family:SimHei;font-weight:lighter;color:#ffffff;">Console Output:  syntax errors, etc. When your press save, it will check and compile the code, if there are errors, it will be reported here.</pe:label>
-
-   </div>
-
-</div> 
-    
+    <pe:container alignment="_fi" class="mc_paper_panel" style="position:relative;margin-bottom:60px;margin-left:3px;">
+        <input name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity()%>' ShowLineNumber="true" UseSystemControl="true" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:25" />
+    </pe:container>
+    <pe:container style="position:relative;vertical-align:bottom;height:60px;background:;">
+        <input name="console" rows="2" height="100%" value='<%=CodeBlockWindow.GetConsoleText()%>' UseSystemControl="true" style="textcolor:#ffffff;line-height:25" />
+    </pe:container>
+</div>
 </pe:mcml>
 

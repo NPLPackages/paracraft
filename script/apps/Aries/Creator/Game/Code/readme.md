@@ -1,10 +1,16 @@
 ﻿# Design of Code Block
 Author:LiXizhi, 2018.5.16
 
+## Introduction: 
+In addition to object-oriented programming(OOP), paracraft code block features an memory-oriented-programming(MOP) model. 
+The smallest memory unit is an animation clip over time. So we can also call it animation-oriented programming model. 
+In MOP, A program is made up of code blocks, where each code block is associated with one movie block, which contains a short animation
+clip for an actor. Code block exposes a `CodeAPI` that can programmatically control the actor inside the movie block. 
+
+
 > Core Algorithm： Use code block to control actors inside movie blocks. 
 Movie block is a memory unit which is used like a template file to art asset. 
 
-## Introduction: 
 Every CodeBlock can control or clone the character in its adjacent movie block. 
 We can use a wire signal to turn on and off CodeBlock logics, so that we can debug logics inside each CodeBlock. 
 When Code Block is not powered, all related actor entities will be erased, this will allow us to easily reboot 
@@ -104,3 +110,44 @@ This is different from codeitem, which uses a real filename on disk. The advanta
 
 ### On Timer
 Do not use system timer, they are not deleted when world exits. Instead we use a local timer that belongs to the code block itself.
+
+## Tests
+
+### Animation Tests
+```
+teleport(19257,5,19174);
+play(10, 2000); -- play animation between 10-2000
+wait(3)
+walk(1, 0);
+say("hi", 3); -- say hi for 3 seconds
+anim(4, 2); -- set animtion to 4(walk) and wait 2 seconds
+playLoop(10, 2000);
+```
+
+### Loop Tests
+```
+walk(-3, 0); -- to 3 blocks along negative x.
+wait(2); -- wait 2 seconds before our next command
+for i=1, 200 do
+	move(0.02, 0); -- move 0.02 meters per tick
+end
+```
+
+Automatic yielding tests with looping
+```
+local function test()
+	local count = 0;
+	for i=1, 100 do
+		count = count + i;
+	end
+	say(count);
+	local times = 0;
+	while(true) do
+		times = times + 1;
+		if((times % 1000) == 0) then
+			log(times)
+		end
+	end
+end
+test()
+```

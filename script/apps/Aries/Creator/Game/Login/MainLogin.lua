@@ -611,7 +611,7 @@ function MainLogin:ShowLoginModePage()
 		isShowTitleBar = false,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		zorder = 0,
+		zorder = -1,
 		allowDrag = false,
 		directPosition = true,
 			align = "_fi",
