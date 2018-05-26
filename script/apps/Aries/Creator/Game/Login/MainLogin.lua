@@ -635,7 +635,11 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 	local worldpath = System.options.cmdline_world;
 	if(worldpath and worldpath~="" and (not self.cmdWorldLoaded or bForceLoad)) then
 		self.cmdWorldLoaded = true;
-
+		local customPath = GameLogic.GetFilters():apply_filters("load_world_from_cmd_precheck", worldpath);
+		if customPath then
+			worldpath = customPath;
+		end
+	
 		if(System.options.servermode) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
 			local Game = commonlib.gettable("MyCompany.Aries.Game")

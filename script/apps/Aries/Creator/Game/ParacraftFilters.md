@@ -48,6 +48,9 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "InternetLoadWorld.ShowPage", bEnable, bShow: whether to show the default load world window. We can use this filter to replace the default load world window.
   - "SaveWorldPage.ShowSharePage", bEnable: We can use this filter to replace the default share world window.
   - "ShowExitDialog", {text, callback}: use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
+  - "show_custom_create_new_world", behavior("show" or "close"):use this filter to custom your CreateNewWorld page.
+  - "show_custom_download_world", behavior("show" or "close"), url:use this filter to custom your DownloadWorld page.
+  
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
   - "BeforeSetSpawnPoint", {x,y,z}: before player spawn point is set
@@ -80,5 +83,11 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
 - movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
+- downloadFile: 
+  - "downloadFile_notify", downloadState(0:downloading, 1:complete, 2:terminated),text(downloadFile text tips),currentFileSize, totalFileSize
+- urlprotocol:  
+  - "load_world_from_cmd_precheck",  hijacking cmdline_world, return a custom path
+
+  
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

@@ -26,29 +26,35 @@ function DownloadWorld.OnInit()
 end
 
 -- show page
-function DownloadWorld.ShowPage(url)
-	DownloadWorld.url = url;
-	local width, height=512, 300;
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-		url = "script/apps/Aries/Creator/Game/Login/DownloadWorld.html", 
-		name = "paracraft.DownloadWorld", 
-		isShowTitleBar = false,
-		DestroyOnClose = true, 
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		zorder = 10,
-		allowDrag = true,
-		directPosition = true,
-			align = "_ct",
-			x = -width/2,
-			y = -height/2,
-			width = width,
-			height = height,
-		cancelShowAnimation = true,
-	});
+function DownloadWorld.ShowPage(url)	
+	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "show", url);
+	if(not isCustomShow) then
+		DownloadWorld.url = url;
+		local width, height=512, 300;
+		System.App.Commands.Call("File.MCMLWindowFrame", {
+			url = "script/apps/Aries/Creator/Game/Login/DownloadWorld.html", 
+			name = "paracraft.DownloadWorld", 
+			isShowTitleBar = false,
+			DestroyOnClose = true, 
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			zorder = 10,
+			allowDrag = true,
+			directPosition = true,
+				align = "_ct",
+				x = -width/2,
+				y = -height/2,
+				width = width,
+				height = height,
+			cancelShowAnimation = true,
+		});
+	end
 end
 
 function DownloadWorld.Close()
-	if(page) then
-		page:CloseWindow();
+	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "close");
+	if(not isCustomShow) then
+		if(page) then
+			page:CloseWindow();
+		end
 	end
 end

@@ -148,11 +148,15 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 					self.currentFileSize = msg.currentFileSize;
 					text = string.format(L"下载中: %d/%dKB", math.floor(msg.currentFileSize/1024), math.floor(msg.totalFileSize/1024));
 				end
+				
+				GameLogic.GetFilters():apply_filters("downloadFile_notify", 0, text, math.floor(msg.currentFileSize/1024), math.floor(msg.totalFileSize/1024));
 			elseif(msg.DownloadState == "complete") then
-				text = L"下载完毕";
+				text = L"下载完毕";				
+				GameLogic.GetFilters():apply_filters("downloadFile_notify", 1, text);
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
-				OnFail(L"下载终止了");
+				OnFail(L"下载终止了");				
+				GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);
 			end
 			if(text and self.text ~= "official_texture_package") then
 				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
