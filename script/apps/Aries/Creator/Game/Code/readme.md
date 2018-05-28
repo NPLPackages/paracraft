@@ -151,3 +151,22 @@ local function test()
 end
 test()
 ```
+
+```
+local a = {1, 2}
+for i, k in ipairs(a) do
+   echo(i)
+end
+```
+
+### test world Globals
+One can get globals via `_G.a`, `a` or `get("a")`, but one must set globals using `_G.a` or `set`.
+```
+_G.a = _G.a or 1;
+for i=1, 10 do
+  _G.a = a + 1;
+  set("a", get("a") + 1)
+end
+say(a)
+```
+

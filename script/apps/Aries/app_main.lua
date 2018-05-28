@@ -1669,7 +1669,7 @@ function MyCompany.Aries.OnWorldLoad()
 	--att:SetField("FogEnd", FogEnd_range.from + (FogEnd_range.to - FogEnd_range.from) * value);
 	--att:SetField("FogStart", FogStart_range.from + (FogStart_range.to - FogStart_range.from) * value);
 	--ParaCamera.GetAttributeObject():SetField("FarPlane", FarPlane);
-	if(not System.options.mc and System.options.IsMobilePlatform) then
+	if(not System.options.mc and System.options.IsTouchDevice) then
 		att:SetField("FogEnd", 52);
 		att:SetField("FogStart", 42);
 		ParaCamera.GetAttributeObject():SetField("FarPlane", 56);
@@ -2265,7 +2265,7 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 	if(type(params) ~= "table") then return end
 		
 	-- close all battle related timers. 
-	if(not System.options.mc and not System.options.IsMobilePlatform) then
+	if(not System.options.mc and not System.options.IsTouchDevice) then
 		-- we shall log out silently. 
 		Map3DSystem.GSL_client:EnableReceive(false);
 	

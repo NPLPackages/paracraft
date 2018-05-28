@@ -2,7 +2,7 @@
 Title: CodeAPI
 Author(s): LiXizhi
 Date: 2018/5/16
-Desc: sandbox API environment 
+Desc: sandbox API environment, see also CodeGlobals for shared API and globals.
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
@@ -45,17 +45,6 @@ local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 CodeAPI.__index = CodeAPI;
 
--- SECURITY: expose global _G to server env, this can be useful and dangourous.
-setmetatable(CodeAPI, {__index = function(tab, name)
-	if(name == "__LINE__") then
-		local info = debug.getinfo(2, "l")
-		if(info) then
-			return info.currentline;
-		end
-	end
-	return _G[name];
-end});
-
 
 -- @param actor: CodeActor that this code API is controlling. 
 function CodeAPI:new(codeBlock, actor)
@@ -64,8 +53,10 @@ function CodeAPI:new(codeBlock, actor)
 		codeblock = codeBlock,
 		check_count = 0,
 	};
+	o._G = GameLogic.GetCodeGlobal():GetCurrentGlobals();
+
 	CodeAPI.InstallMethods(o);
-	setmetatable(o, self);
+	setmetatable(o, GameLogic.GetCodeGlobal():GetCurrentMetaTable());
 	return o;
 end
 
@@ -73,10 +64,8 @@ end
 function CodeAPI.InstallMethods(o)
 	for _, func_name in ipairs(s_env_methods) do
 		local f = function(...)
-			local self = getfenv(1);
-			return env_imp[func_name](self, ...);
+			return env_imp[func_name](o, ...);
 		end
-		setfenv(f, o);
 		o[func_name] = f;
 	end
 end
@@ -209,7 +198,7 @@ end
 -- the entity maybe blocked if target unreachable. 
 -- it will move at the default speed. 
 -- @param dx,dy,dz: if z is nil, y is z
--- @param duration: default to walkdist / walkspeed()
+-- @param duration: default to none
 function env_imp:walk(dx,dy,dz, duration)
 	if(not dz) then
 		dz = dy;
@@ -344,7 +333,7 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 						end
 					else
 						time = timeTo;
-						self.codeblock:KillTimer(self.playTimer);
+						self.playTimer:Change();
 					end
 				end
 				actor:SetTime(time);

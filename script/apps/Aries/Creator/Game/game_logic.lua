@@ -728,9 +728,22 @@ function GameLogic.Exit()
 
 	ModManager:OnLeaveWorld();
 	GameLogic:WorldUnloaded();
+	
+	GameLogic.codeGlobal = nil;
 end
 
 local slow_timer_tick = 1;
+
+-- global sandbox user defined variables in the world. It is recreated on each world load on demand.
+-- @return CodeGlobals object associated with the current world.
+function GameLogic.GetCodeGlobal()
+	if(not GameLogic.codeGlobal) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeGlobals.lua");
+		local CodeGlobals = commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals");
+		GameLogic.codeGlobal = CodeGlobals:new();
+	end
+	return GameLogic.codeGlobal;
+end
 
 function GameLogic.CheckTickShiftWalkingMode()
 	local focused_entity = EntityManager.GetFocus();
