@@ -20,7 +20,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 
-local max_resolution = {1280, 720};
+local max_resolution = {4906, 2160};
 local default_resolution = {640, 480};
 local before_capture_resolution;
 function VideoRecorder.ToggleRecording()
@@ -111,6 +111,10 @@ function VideoRecorder.AdjustWindowResolution(callbackFunc)
 	local att = ParaEngine.GetAttributeObject();
 	local cur_resolution = att:GetField("WindowResolution", {400, 300}); 
 	local preferred_resolution = VideoRecorderSettings.GetResolution();
+	-- reserve place for render borders which indicates whether the screen is being recorded or not
+	local margin = VideoRecorderSettings.GetMargin();
+	preferred_resolution[1] = preferred_resolution[1] + margin*2;
+	preferred_resolution[2] = preferred_resolution[2] + margin*2;
 	if(cur_resolution[1] > max_resolution[1] or cur_resolution[2] > max_resolution[2]) then
 		if(not preferred_resolution or not preferred_resolution[1]) then
 			preferred_resolution = max_resolution;
