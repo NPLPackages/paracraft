@@ -35,7 +35,7 @@ function block:updateTick(x,y,z)
 end
 
 -- Do not emit weak power to nearby movie blocks, otherwise it behaves same as normal cube block.
--- Returns 0 if the block is emitting indirect/weak redstone power on the specified side. 
+-- Returns 0 if the block is emitting indirect/weak electric power on the specified side. 
 function block:isProvidingWeakPower(x,y,z, side)
 	local blockId = BlockEngine:GetBlockId(BlockEngine:GetBlockIndexBySide(x,y,z,side));
 	if(blockId == names.MovieClip) then

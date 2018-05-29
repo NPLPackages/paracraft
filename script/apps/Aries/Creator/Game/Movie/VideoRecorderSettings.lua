@@ -55,7 +55,7 @@ local presets = {
 		margin = 16,
 		stereo = 0,
 	},
-		-- there must be a space after mp4, since codec extension is deduced from key name. 
+	-- there must be a space after mp4, since codec extension is deduced from key name. 
 	["mp4 1080p"] = {
 		Codec="mp4",
 		VideoResolution={1920, 1080},
@@ -101,6 +101,14 @@ local presets = {
 		VideoResolution={640, 480},
 		VideoBitRate = 800000, 
 		FPS = 25, 
+		margin = 16,
+		stereo = 0,
+	},
+	["mp3"]	= {
+		Codec="mp3",
+		VideoResolution={640, 480},
+		VideoBitRate = 0, 
+		FPS = 60, 
 		margin = 16,
 		stereo = 0,
 	},

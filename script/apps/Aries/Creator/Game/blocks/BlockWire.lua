@@ -1,12 +1,12 @@
 --[[
-Title: RedstoneWire Based Block
+Title: Wire Based Block
 Author(s): LiXizhi
 Date: 2013/1/23
-Desc: Such as a character or mob that can walk and attack. 
+Desc: 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneWire.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneWire")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockWire.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockWire")
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
@@ -18,12 +18,12 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneWire"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockWire"));
 
 local band = mathlib.bit.band;
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneWire", block);
+block_types.RegisterBlockClass("BlockWire", block);
 
 -- intermediary helper data structure
 local blocksNeedingUpdate = {};
@@ -57,7 +57,7 @@ function block:canPlaceBlockAt(x,y,z)
 end
 
 -- Sets the strength of the wire current (0-15) for this block based on neighboring blocks and propagates to
--- neighboring redstone wires
+-- neighboring wires
 function block:updateAndPropagateCurrentStrength(x,y,z)
     self:calculateCurrentChanges(x,y,z, x,y,z);
 	if(#blocksNeedingUpdate > 0) then
@@ -151,7 +151,7 @@ function block:calculateCurrentChanges(x, y, z, x1, y1, z1)
     end
 end
 
--- Calls World.NotifyNeighborBlocksChange() for all neighboring blocks, but only if the given block is a redstone wire
+-- Calls World.NotifyNeighborBlocksChange() for all neighboring blocks, but only if the given block is a wire
 function block:notifyWireNeighborsOfNeighborChange(x,y,z)
     if (ParaTerrain.GetBlockTemplateByIdx(x, y, z) == self.id) then
         BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);
@@ -212,7 +212,7 @@ function block:OnBlockAdded(x, y, z)
 	end
 end
 
--- Returns true if the block is emitting direct/strong redstone power on the specified side. 
+-- Returns true if the block is emitting direct/strong power on the specified side. 
 function block:isProvidingStrongPower(x,y,z, side)
 	if(not wiresProvidePower) then
 		return 0;
@@ -221,18 +221,18 @@ function block:isProvidingStrongPower(x,y,z, side)
 	end
 end
 
--- Returns true if redstone wire can connect to the specified block.
+-- Returns true if wire can connect to the specified block.
 local function isPowerProviderOrWire(x,y,z, side)
     local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 
-    if (block_id == names.Redstone_Wire) then
+    if (block_id == names.Wire) then
         return true;
     elseif (block_id == 0) then
         return false;
     elseif(side ~= -1) then
 		local block = block_types.get(block_id);
 		if(block) then
-			if( not block_types.blocks.Redstone_Repeater:IsAssociatedOnOffBlock(block_id)) then
+			if( not block_types.blocks.Repeater:IsAssociatedOnOffBlock(block_id)) then
 				return block:canProvidePower();
 			else
 				-- red stone repeater
@@ -243,13 +243,13 @@ local function isPowerProviderOrWire(x,y,z, side)
 	end
 end
 
--- Returns true if the block coordinate passed can provide power, or is a redstone wire, or if its a repeater that is powered.
+-- Returns true if the block coordinate passed can provide power, or is a wire, or if its a repeater that is powered.
 local function isPoweredOrRepeater(x,y,z, side)
     if (isPowerProviderOrWire(x,y,z, side)) then
         return true;
     else
         --local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
-        --if (block_id and block_id == names.Redstone_Repeater_On) then
+        --if (block_id and block_id == names.Repeater_On) then
             --local data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
             --return side == band(data,3);
         --else
@@ -258,7 +258,7 @@ local function isPoweredOrRepeater(x,y,z, side)
     end
 end
 
--- Returns true if the block is emitting indirect/weak redstone power on the specified side. 
+-- Returns true if the block is emitting indirect/weak power on the specified side. 
 function block:isProvidingWeakPower(x,y,z, side)
     if (not wiresProvidePower) then
         return 0;

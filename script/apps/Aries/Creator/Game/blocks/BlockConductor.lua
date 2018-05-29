@@ -1,13 +1,13 @@
 --[[
-Title: BlockRedstoneConductor
+Title: BlockConductor
 Author(s): LiXizhi
 Date: 2014/2/18
-Desc: this is the inverse of redstone torch. and it has only one direction. 
+Desc: this is the inverse of electric torch. and it has only one direction. 
 conductor is suitable for conducting current upward. 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneConductor.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneConductor")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockConductor.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockConductor")
 -------------------------------------------------------
 ]]
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -18,10 +18,10 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
 
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneConductor"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockConductor"));
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneConductor", block);
+block_types.RegisterBlockClass("BlockConductor", block);
 
 
 function block:ctor()
@@ -135,12 +135,12 @@ function block:updateTick(x,y,z)
 		if (self.torchActive) then
 			if(not is_indirectly_powered) then
 				-- turn it off
-				BlockEngine:SetBlock(x,y,z,names.Redstone_Conductor, data, 3);
+				BlockEngine:SetBlock(x,y,z,names.Conductor, data, 3);
 			end
 		else
 			if(is_indirectly_powered) then
 				-- turn it on
-				BlockEngine:SetBlock(x,y,z,names.Redstone_Conductor_On, data, 3);
+				BlockEngine:SetBlock(x,y,z,names.Conductor_On, data, 3);
 			end
 		end
 	end

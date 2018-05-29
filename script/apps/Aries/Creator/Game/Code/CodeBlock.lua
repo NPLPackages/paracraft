@@ -103,7 +103,7 @@ function CodeBlock:CompileCode(code)
 		if(not self.code_func and self.errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
-			msg = format(L"<编译错误>: %s\n在%s", msg, self:GetFilename());
+			msg = format(L"编译错误: %s\n在%s", msg, self:GetFilename());
 			self:send_message(msg);
 		else
 			self:send_message(L"编译成功!");
@@ -267,7 +267,7 @@ function CodeBlock:RunImp(code_env)
 		if(not ok) then
 			LOG.std(nil, "error", "CodeBlock", result);
 			if(not code_env.is_exit_call) then
-				local msg = format(L"<运行时错误>: %s\n在%s", tostring(result), self:GetFilename());
+				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetFilename());
 				self:send_message(msg);
 			else
 				if(code_env.exit_msg) then

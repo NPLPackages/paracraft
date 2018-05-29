@@ -73,7 +73,7 @@ Commands["end"] = {
 	name="end", 
 	quick_ref="/end [output_number]", 
 	desc=[[same as SetLastCommandResult to 15 and /return 15
-usually used in a movieclip to end the current movie and fire a redstone output.  usually used with /t like
+usually used in a movieclip to end the current movie and fire an electric output.  usually used with /t like
 /t 10 /end     end the movie block 2 seconds after it stops
 /t 10 /end 1   end the movie block immediately after it stops
 @param output_number: default to 15. if 1, it means immediate output. 

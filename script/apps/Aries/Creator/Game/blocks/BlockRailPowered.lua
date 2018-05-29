@@ -2,8 +2,8 @@
 Title: powered block rail
 Author(s): LiXizhi
 Date: 2014/6/12
-Desc: powered rail blocks. No redstone to decelerate. redstone powered to accelerate. 
-It behaves similar to redstone wires. However, it only has on/off states(instead of 16 power level as wires),
+Desc: powered rail blocks. No electricity to decelerate. electric powered to accelerate. 
+It behaves similar to electric wires. However, it only has on/off states(instead of 16 power level as wires),
 hence it will check for neighbor power source for as much as 16 blocks in both directions when neighbor changes. 
 (Each powered rail is responsible to propogate on/off state to at most 16 blocks in both directions.)
 use the lib:
@@ -61,7 +61,7 @@ function block:IsRailGettingPowered2(x, y, z, bInverseDir, nStepCount, lastShape
     return false;
 end
 
--- it is much like a redstone wire and will at most transmit 8 double blocks
+-- it is much like a electric wire and will at most transmit 8 double blocks
 -- @param nStepCount:
 function block:IsRailGettingPowered1(x, y, z, blockData, bInverseDir, nStepCount)
 	-- check if max rail power transmit distance is reached. 

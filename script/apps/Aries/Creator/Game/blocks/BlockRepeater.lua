@@ -1,15 +1,15 @@
 --[[
-Title: RedstoneRepeater Based Block
+Title: Repeater Based Block
 Author(s): LiXizhi
 Date: 2013/1/23
 Desc: recharge and forward red stone energy in fixed direction only if the input end block is powered. 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneRepeater.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneRepeater")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRepeater.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRepeater")
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneLogic.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLogic.lua");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
@@ -22,12 +22,12 @@ local lshift = mathlib.bit.lshift;
 local band = mathlib.bit.band;
 local bor = mathlib.bit.bor;
 
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneLogic"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneRepeater"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.blocks.BlockLogic"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRepeater"));
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneRepeater", block);
+block_types.RegisterBlockClass("BlockRepeater", block);
 
--- The states in which the redstone repeater blocks can be. 
+-- The states in which the repeater blocks can be. 
 local repeaterState = {[0]=1, 2, 3, 4};
 
 function block:ctor()
@@ -49,11 +49,11 @@ function block:getTickRateByData(data)
 end
 
 function block:GetOnBlockID()
-	return block_types.names.Redstone_Repeater_On;
+	return block_types.names.Repeater_On;
 end
 
 function block:GetOffBlockID()
-    return block_types.names.Redstone_Repeater;
+    return block_types.names.Repeater;
 end
 
 function block:OnBlockRemoved(x,y,z, last_id, last_data)
@@ -90,7 +90,7 @@ function block:getBlockPowerLevelToDirection(x,y,z,side)
     local block_id = BlockEngine:GetBlockId(x, y, z);
 	
     if (self:canBlockProvidePower(block_id)) then
-		if(block_id == block_types.names.Redstone_Wire) then
+		if(block_id == block_types.names.Wire) then
 			-- return BlockEngine:GetBlockData(x, y, z);
 			return 0; -- disable wire for repeater
 		else

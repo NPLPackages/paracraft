@@ -987,14 +987,14 @@ function block:UpdateModel(blockX, blockY, blockZ, blockData)
 	end
 end
 
--- Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
--- returns true, standard redstone propagation rules will apply instead and this will not be called. 
+-- Returns true if the block is emitting indirect/weak power on the specified side. If isBlockNormalCube
+-- returns true, standard electric power propagation rules will apply instead and this will not be called. 
 -- @param direction: Note that the side is reversed.  eg 4 (up) when checking the bottom of the block.
 function block:isProvidingWeakPower(x, y, z, direction)
 	return 0;
 end
 
--- Returns true if the block is emitting direct/strong redstone power on the specified side.
+-- Returns true if the block is emitting direct/strong power on the specified side.
 -- @param direction: Note that the side is reversed.  eg 4 (up) when checking the bottom of the block.
 function block:isProvidingStrongPower(x, y, z, direction)
 	return 0;
@@ -1315,7 +1315,7 @@ function block:AddToSelection(blockX, blockY, blockZ, index)
 end
 
 -- some block like command blocks, may has an internal state number(like its last output result)
--- and some block may use its nearby blocks' state number to generate redstone output or other behaviors.
+-- and some block may use its nearby blocks' state number to generate electric output or other behaviors.
 -- @return nil or a number between [0-15]
 function block:GetInternalStateNumber(x,y,z)
 end

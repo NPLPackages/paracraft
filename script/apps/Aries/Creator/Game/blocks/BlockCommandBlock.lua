@@ -29,7 +29,7 @@ function block:ctor()
 end
 
 -- some block like command blocks, may has an internal state number(like its last output result)
--- and some block may use its nearby blocks' state number to generate redstone output or other behaviors.
+-- and some block may use its nearby blocks' state number to generate electric output or other behaviors.
 -- @return nil or a number between [0-15]
 function block:GetInternalStateNumber(x,y,z)
 	local entity = self:GetBlockEntity(x,y,z)

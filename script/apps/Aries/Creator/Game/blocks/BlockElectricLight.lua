@@ -1,12 +1,12 @@
 --[[
-Title: RedstoneLightBlock
+Title: Electric LightBlock
 Author(s): LiXizhi
 Date: 2013/12/8
 Desc: 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneLight.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneLight")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockElectricLight.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockElectricLight")
 -------------------------------------------------------
 ]]
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -16,10 +16,10 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneLight"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockElectricLight"));
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneLight", block);
+block_types.RegisterBlockClass("BlockElectricLight", block);
 
 function block:ctor()
 end

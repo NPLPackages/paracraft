@@ -628,7 +628,7 @@ function BuildQuest:GetLandBlocks()
 		[names.Diamond_Ore] = true,
 		[names.Lapis_Lazuli_Ore] = true,
 		[names.Gold_Ore] = true,
-		[names.Redstone_Ore_Glowing] = true,
+		[names.Ore] = true,
 		[names.Iron_Ore] = true,
 		[names.Coal_Ore] = true,
 		[names.Sand] = true,

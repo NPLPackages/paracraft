@@ -99,7 +99,7 @@ function block:isProvidingWeakPower(x, y, z, direction)
 	
 end
 
--- Returns true if the block is emitting direct/strong redstone power on the specified side. 
+-- Returns true if the block is emitting direct/strong electric power on the specified side. 
 function block:isProvidingStrongPower(x, y, z, direction)
 	if(direction == 4) then
 		return self:getPowerSupply(BlockEngine:GetBlockData(x,y,z));

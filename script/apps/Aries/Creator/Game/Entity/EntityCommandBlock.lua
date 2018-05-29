@@ -85,13 +85,13 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 		local itemStack = self.inventory:GetItem(i);
 		if(itemStack) then
 			if(bIsInsideBracket) then
-				if(itemStack.id == block_types.names.Redstone_Wire)then
+				if(itemStack.id == block_types.names.Wire)then
 					-- this is a logical OR
 					bIsInsideBracket = false;
 					bIsNegatingSign = false;
 				end
 			else
-				if(itemStack.id == block_types.names.Redstone_Torch_On)then
+				if(itemStack.id == block_types.names.Electric_Torch_On)then
 					bIsNegatingSign = not bIsNegatingSign;
 				else
 					-- if script return false, we will stop loading slots behind
@@ -125,7 +125,7 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 	end
 end
 
--- get the last redstone output result. 
+-- get the last electric output result. 
 function Entity:GetLastOutput()
 	return self.last_output;
 end
@@ -133,7 +133,7 @@ end
 -- get output from result. if result is a value larger than 1. 
 -- value larger than 15 is clipped. 
 -- @return nil or a value between [1,15]
-function Entity:ComputeRedstoneOutput(last_result)
+function Entity:ComputeElectricOutput(last_result)
 	if(type(last_result) == "number" and last_result>=1) then
 		return math.min(15, math.floor(last_result));
 	end
@@ -141,7 +141,7 @@ end
 
 -- set the last result. 
 function Entity:SetLastCommandResult(last_result)
-	local output = self:ComputeRedstoneOutput(last_result)
+	local output = self:ComputeElectricOutput(last_result)
 	if(self.last_output ~= output) then
 		self.last_output = output;
 		local x, y, z = self:GetBlockPos();
@@ -204,7 +204,7 @@ function Entity:GetNewItemsList()
 	local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.CommandLine,1);
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.Code,1);
-	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.Redstone_Wire,1);
+	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.Wire,1);
 	return itemStackArray;
 end
 

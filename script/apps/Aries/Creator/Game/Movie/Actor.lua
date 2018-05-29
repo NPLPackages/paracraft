@@ -148,7 +148,7 @@ function Actor:GetMovieClipEntity()
 	return self.movieclipEntity;
 end
 
--- it is only in playing mode when activated by a redstone circuit. 
+-- it is only in playing mode when activated by a circuit. 
 -- any other way of triggering the movieclip is not playing mode(that is edit mode)
 function Actor:IsPlayingMode()
 	if(self.movieclipEntity) then

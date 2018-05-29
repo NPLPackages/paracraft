@@ -94,7 +94,7 @@ function MovieClip:GetCommand(bCreateIfNotExist)
 	end
 end
 
--- it is only in playing mode when activated by a redstone circuit. 
+-- it is only in playing mode when activated by a circuit. 
 -- any other way of triggering the movieclip is not playing mode(that is edit mode)
 function MovieClip:IsPlayingMode()
 	if(self.entity) then

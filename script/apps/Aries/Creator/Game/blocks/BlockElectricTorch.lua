@@ -1,12 +1,12 @@
 --[[
-Title: RedstoneTorch
+Title: Electric Torch
 Author(s): LiXizhi
 Date: 2013/12/3
-Desc: Block RedstoneTorch
+Desc: Block Electric Torch
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneTorch.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneTorch")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockElectricTorch.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockElectricTorch")
 -------------------------------------------------------
 ]]
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -16,11 +16,11 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneTorch"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockElectricTorch"));
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneTorch", block);
+block_types.RegisterBlockClass("BlockElectricTorch", block);
 
 
 function block:ctor()
@@ -168,12 +168,12 @@ function block:updateTick(x,y,z)
 		if (self.torchActive) then
 			if(is_indirectly_powered) then
 				-- turn it off
-				BlockEngine:SetBlock(x,y,z,names.Redstone_Torch, data, 3);
+				BlockEngine:SetBlock(x,y,z,names.Electric_Torch, data, 3);
 			end
 		else
 			if(not is_indirectly_powered) then
 				-- turn it on
-				BlockEngine:SetBlock(x,y,z,names.Redstone_Torch_On, data, 3);
+				BlockEngine:SetBlock(x,y,z,names.Electric_Torch_On, data, 3);
 			end
 		end
 	end

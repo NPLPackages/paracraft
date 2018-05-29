@@ -39,7 +39,7 @@ local anim_ds = {};
 local page;
 
 -- @param category_name: can be nil, or "tutorial", "shortcutkey", etc
--- @param subfolder_name: can be nil or sub folder name, such as "MovieMaking", "newusertutorial", "programming", "redstone","smallstructure"
+-- @param subfolder_name: can be nil or sub folder name, such as "MovieMaking", "newusertutorial", "programming", "circuit","smallstructure"
 function HelpPage.ShowPage(category_name, subfolder_name)
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Tasks/HelpPage.html", 

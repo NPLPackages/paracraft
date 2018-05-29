@@ -3,7 +3,7 @@ Title: MovieClip Entity
 Author(s): LiXizhi
 Date: 2014/3/28
 Desc: movie clip entity. the block should use command
-/t 30 /end to control how long the movie clip is. when ending, the block will fire an redstone output of value 15, 
+/t 30 /end to control how long the movie clip is. when ending, the block will fire an output of value 15, 
 which is detectable via repeater or another movie clip block. 
 Put two movie block next to the other will cause the next block to play without delay.  
 use the lib:
@@ -271,7 +271,7 @@ end
 
 -- set the last result. 
 function Entity:SetLastCommandResult(last_result)
-	local output = self:ComputeRedstoneOutput(last_result)
+	local output = self:ComputeElectricOutput(last_result)
 	if(self.last_output ~= output) then
 		self.last_output = output;
 		local x, y, z = self:GetBlockPos();
@@ -493,7 +493,7 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 	return Entity._super.ExecuteCommand(self, entityPlayer, bIgnoreNeuronActivation, bIgnoreOutput);
 end
 
--- it is only in playing mode when activated by a redstone circuit. 
+-- it is only in playing mode when activated by a circuit. 
 -- any other way of triggering the movieclip is not playing mode(that is edit mode)
 function Entity:IsPlayingMode()
 	return self.is_playing_mode;

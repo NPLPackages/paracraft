@@ -133,7 +133,7 @@ Commands["menu"] = {
 		elseif(name:match("^help%.help")) then
 			-- name can be "help.help", "help.help.tutorial", "help.help.shortcutkey"
 			-- "help.help.tutorial.newusertutorial", "help.help.tutorial.MovieMaking", 
-			-- "help.help.tutorial.redstone", "help.help.tutorial.programming"
+			-- "help.help.tutorial.circuit", "help.help.tutorial.programming"
 			local category, subfolder;
 			category = name:match("^help%.help%.(.+)$");
 			if(category) then

@@ -411,7 +411,7 @@ function NatureV1ChunkGenerator:GenerateResource(x, y, z, c)
     elseif (self._FastRandom:random(1, 40 * y) == 0) then
         c:SetType(x, y, z, names.Gold_Ore, false);
     elseif (self._FastRandom:random(1, 10 * y) == 0) then
-        c:SetType(x, y, z, names.Redstone_Ore_Glowing, false);
+        c:SetType(x, y, z, names.Ore, false);
     elseif (self._FastRandom:random(1, 4 * y) == 0) then
         c:SetType(x, y, z, names.Iron_Ore, false);
     elseif (self._FastRandom:random(1, 2 * y) == 0) then

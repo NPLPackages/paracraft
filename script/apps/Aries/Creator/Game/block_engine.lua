@@ -1085,7 +1085,7 @@ function BlockEngine:getWeakPowerOutputTo(x,y,z,dir)
 end
 
 -- Used to see if one of the blocks next to you or your block is getting power from a neighboring block. Used by
--- items like TNT or Doors so they don't have redstone going straight into them.  
+-- items like TNT or Doors so they don't have going straight into them.  
 function BlockEngine:isBlockIndirectlyGettingPowered(x, y, z)
 	if( self:getWeakPowerOutputTo(x, y - 1, z, 5) > 0 or self:getWeakPowerOutputTo(x, y + 1, z, 4) > 0 or 
 		self:getWeakPowerOutputTo(x, y, z - 1, 3) > 0 or self:getWeakPowerOutputTo(x, y, z + 1, 2) > 0 or 

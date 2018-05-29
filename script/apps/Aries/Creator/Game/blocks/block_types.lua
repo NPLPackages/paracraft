@@ -38,8 +38,6 @@ local names = commonlib.createtable("MyCompany.Aries.Game.block_types.names", {
 	Still_Water = 76,  -- this is used by terrain generator
 	Bedrock = 123,
 	Diamond_Ore = 96,
-	Lapis_Lazuli_Ore = 93,
-	Redstone_Ore_Glowing = 87,
 	Rose = 115,
 	Cactus = 26,
 	Wood = 98,
@@ -99,11 +97,11 @@ function block_types.PreloadBlockClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLiquidFlow.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockGrass.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLever.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneWire.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneRepeater.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneLogic.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneLight.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneTorch.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockWire.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRepeater.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLogic.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockElectricLight.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockElectricTorch.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockButton.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockTrapDoor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockTNT.lua");
@@ -124,7 +122,7 @@ function block_types.PreloadBlockClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockNote.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockMusicBox.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockCollisionSensor.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneConductor.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockConductor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockDynamic.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockCommandBlock.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockBlockUpdateDetector.lua");

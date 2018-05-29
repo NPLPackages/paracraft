@@ -1,12 +1,12 @@
 --[[
-Title: RedstoneLogic Based Block
+Title: Electric Logic Based Block
 Author(s): LiXizhi
 Date: 2013/1/23
-Desc: Such as a character or mob that can walk and attack. 
+Desc: 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockRedstoneLogic.lua");
-local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneLogic")
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLogic.lua");
+local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockLogic")
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
@@ -24,11 +24,11 @@ local lshift = mathlib.bit.lshift;
 local band = mathlib.bit.band;
 local bor = mathlib.bit.bor;
 
-local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRedstoneLogic"));
+local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockLogic"));
 
 
 -- register
-block_types.RegisterBlockClass("BlockRedstoneLogic", block);
+block_types.RegisterBlockClass("BlockLogic", block);
 
 function block:ctor()
 	self.ProvidePower = true;
@@ -96,7 +96,7 @@ function block:getInputPowerLevel(x,y,z,data)
 				return input_power;
 			else
 				-- wire power does not degrade when input to this block. 
-				if(BlockEngine:GetBlockId(x1, y, z1) == block_types.names.Redstone_Wire) then
+				if(BlockEngine:GetBlockId(x1, y, z1) == block_types.names.Wire) then
 					return math.max(input_power, BlockEngine:GetBlockData(x1, y, z1))
 				else
 					return input_power;
@@ -107,7 +107,7 @@ function block:getInputPowerLevel(x,y,z,data)
 	return 0;
 end
 
--- Returns true if the block is emitting direct/strong redstone power to the specified side. 
+-- Returns true if the block is emitting direct/strong power to the specified side. 
 function block:isProvidingStrongPower(x,y,z,side)
     return self:isProvidingWeakPower(x,y,z,side);
 end
@@ -152,7 +152,7 @@ function block:getBlockPowerLevelToDirection(x,y,z,side)
     local block_id = BlockEngine:GetBlockId(x, y, z);
 	
     if (self:canBlockProvidePower(block_id)) then
-		if(block_id == block_types.names.Redstone_Wire) then
+		if(block_id == block_types.names.Wire) then
 			return BlockEngine:GetBlockData(x, y, z);
 		else
 			return BlockEngine:isBlockProvidingStrongPowerTo(x, y, z, side);
@@ -225,8 +225,8 @@ function block:OnLogicBlockNeighborChange(x, y, z, from_block_id)
     end
 end
 
-function block:isRedstoneLogicBlockID(block_id)
-    return block_types.blocks.Redstone_Repeater:IsAssociatedOnOffBlock(block_id); --  or block_types.blocks.Redstone_Comparator:IsAssociatedOnOffBlock(block_id);
+function block:isElectricLogicBlockID(block_id)
+    return block_types.blocks.Repeater:IsAssociatedOnOffBlock(block_id); 
 end
 
 function block:IsAssociatedOnOffBlock(block_id)
@@ -236,7 +236,7 @@ end
 function block:IsConnectedToLogicBlock(x,y,z,data)
     local dir = self:getDirection(data);
 
-    if (self:isRedstoneLogicBlockID(BlockEngine:GetBlockId(x + Direction.offsetX[dir], y, z + Direction.offsetZ[dir]))) then
+    if (self:isElectricLogicBlockID(BlockEngine:GetBlockId(x + Direction.offsetX[dir], y, z + Direction.offsetZ[dir]))) then
         local data1 = BlockEngine:GetBlockData(x + Direction.offsetX[dir], y, z + Direction.offsetZ[dir]);
 		local dir1 = self:getDirection(data1);
         return  dir1 ~= dir;

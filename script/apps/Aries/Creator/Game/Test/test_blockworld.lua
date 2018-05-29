@@ -27,7 +27,7 @@ function Test.GetBlockWorld()
 	local world1 = ParaBlockWorld.GetWorld("test1");
 
 	block_types.update_registered_templates(world1);
-	ParaBlockWorld.EnterWorld(world1, "worlds/DesignHouse/redstone/redstone.worldconfig.txt");
+	ParaBlockWorld.EnterWorld(world1, "worlds/DesignHouse/circuit/circuit.worldconfig.txt");
 
 	local attr = ParaBlockWorld.GetBlockAttributeObject(world1);
 	attr:SetField("OnLoadBlockRegion", ";MyCompany.Aries.Game.Test.OnLoadBlockRegion();");

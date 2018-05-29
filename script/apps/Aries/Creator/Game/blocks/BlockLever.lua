@@ -148,7 +148,7 @@ function block:isProvidingWeakPower(x, y, z, direction)
 	end
 end
 
--- Returns true if the block is emitting direct/strong redstone power on the specified side. Args: World, X, Y, Z,
+-- Returns true if the block is emitting direct/strong electric power on the specified side. Args: World, X, Y, Z,
 -- side. Note that the side is reversed - eg it is 1 (up) when checking the bottom of the block.
 function block:isProvidingStrongPower(x, y, z, direction)
 	local data = ParaTerrain.GetBlockUserDataByIdx(x,y,z)

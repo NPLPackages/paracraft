@@ -183,6 +183,8 @@ function CodeBlockWindow.OnClickOpenMovieBlock()
 	local movieEntity = CodeBlockWindow.GetMovieEntity();
 	if(movieEntity) then
 		movieEntity:OpenEditor("entity");
+	else
+		_guihelper.MessageBox(L"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码控制演员了!")
 	end
 end
 

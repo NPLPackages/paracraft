@@ -202,7 +202,7 @@ function ContainerView:ClickSlot(slot_index, transfer_mode, count, entityPlayer)
 end
 
 -- static function: average inventory item fullness rounded to value between [0,15]
-function ContainerView.CalcRedstoneFromInventory(entity)
+function ContainerView.CalcElectricPowerFromInventory(entity)
     if (not entity or not entity.inventory) then
         return 0;
     else

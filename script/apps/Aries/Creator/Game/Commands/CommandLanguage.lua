@@ -34,7 +34,7 @@ xgettext.default_filelist = {
 	"config/Aries/creator/blocktemplates/buildingtask/newusertutorial/info.xml",
 	-- "config/Aries/creator/blocktemplates/buildingtask/logic/info.xml",
 	"config/Aries/creator/blocktemplates/buildingtask/newyearbuilding/info.xml",
-	"config/Aries/creator/blocktemplates/buildingtask/redstone/info.xml",
+	"config/Aries/creator/blocktemplates/buildingtask/circuit/info.xml",
 	"config/Aries/creator/blocktemplates/buildingtask/smallstructure/info.xml",
 }
 xgettext.output_file = "script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua"
