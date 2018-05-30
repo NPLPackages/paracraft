@@ -83,7 +83,7 @@ end
 -- show page
 function CreateNewWorld.ShowPage()
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
-	if(not isCustomShow) then
+	if(isCustomShow == "show") then
 		System.App.Commands.Call("File.MCMLWindowFrame", {
 			url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
 			name = "CreateMCNewWorld", 

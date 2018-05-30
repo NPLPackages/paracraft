@@ -17,6 +17,10 @@ codeBlock:Run();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCompiler.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
+local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
+local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -92,14 +96,14 @@ function CodeBlock:SetTimeout(duration, callbackFunc)
 	end, duration, nil)
 end
 
--- compile code
+-- compile code and reload if code is changed. 
 -- @param code: string
 -- return error message if any
 function CodeBlock:CompileCode(code)
 	if(self.last_code ~= code) then
 		self:Unload();
 		self.last_code = code;
-		self.code_func, self.errormsg = loadstring(self:InjectCheckYieldToCode(code), self:GetFilename());
+		self.code_func, self.errormsg = CodeCompiler:new():SetFilename(self:GetFilename()):Compile(code);
 		if(not self.code_func and self.errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
@@ -110,32 +114,6 @@ function CodeBlock:CompileCode(code)
 		end
 	end
 	return self.errormsg;
-end
-
-local inject_map = {
-	{"^(%s*function%W+[^%)]+%)%s*)$", "%1 checkyield();"},
-	{"^(%s*local%s+function%W+[^%)]+%)%s*)$", "%1 checkyield();"},
-	{"^(%s*for%s.*%s+do%s*)$", "%1 checkyield();"},
-	{"^(%s*while%W.*%s+do%s*)$", "%1 checkyield();"},
-}
-
-local function injectLine_(line)
-	for i,v in ipairs(inject_map) do
-		line = string.gsub(line, v[1], v[2]);
-	end
-	return line;
-end
-
--- we will inject checkyield() such as in: `for do end, while do end, function end`, etc
-function CodeBlock:InjectCheckYieldToCode(code)
-	if(code) then
-		local lines = {};
-		for line in string.gmatch(code or "", "([^\r\n]*)\r?\n?") do
-			lines[#lines+1] = injectLine_(line);
-		end
-		code = table.concat(lines, "\n");
-		return code;
-	end
 end
 
 -- get default virtual code block filename. 
@@ -160,6 +138,8 @@ function CodeBlock:Unload()
 	
 	self:RemoveTimers();
 	self:RemoveAllActors();
+
+	self.code_env = nil;
 end
 
 -- remove all timers without clearing actors.
@@ -231,19 +211,24 @@ function CodeBlock:CreateFirstActorInMovieBlock()
 	end
 end
 
+function CodeBlock:GetCodeEnv()
+	if(not self.code_env) then
+		self.code_env = CodeAPI:new(self);
+	end
+	return self.code_env;
+end
+
 -- run code again 
 function CodeBlock:Run()
 	self:Unload();
 
 	if(self.code_func) then
 		self.isLoaded = true;
-		local code_env = CodeAPI:new(self, self:CreateActor());
-		local co = coroutine.create(function()
-			self:RunImp(code_env);
-			return nil, "finished";
-		end)
-		code_env.co = co;
-		coroutine.resume(co);
+
+		local co = CodeCoroutine:new():Init(self);
+		co:SetFunction(self.code_func);
+		co:SetActor(self:CreateActor());
+		return co:Run();
 	end
 end
 
@@ -256,26 +241,31 @@ function CodeBlock:GetLastMessage()
 	return self.lastMessage;
 end
 
--- this function may be nest-called such as inside the code_env.include() function. 
--- @param code_env: the code enviroment. echo and print method should be overridden to send. 
--- @return the result of the function call. 
-function CodeBlock:RunImp(code_env)
-	if(self.code_func) then
-		setfenv(self.code_func, code_env);
-		local ok, result = pcall(self.code_func);
+function CodeBlock:OnTextEvent(text)
+end
 
-		if(not ok) then
-			LOG.std(nil, "error", "CodeBlock", result);
-			if(not code_env.is_exit_call) then
-				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetFilename());
-				self:send_message(msg);
-			else
-				if(code_env.exit_msg) then
-					self:send_message(tostring(code_env.exit_msg));
-				end
-				code_env.is_exit_call = nil;
-			end
-		end		
-		return result;
-	end
+-- when the actor played through the given animation time (milliseconds)
+function CodeBlock:RegisterTimeEvent(time, callbackFunc)
+end
+
+
+-- actor is clicked
+function CodeBlock:RegisterClickEvent(callbackFunc)
+end
+
+
+function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
+end
+
+
+function CodeBlock:RegisterTextEvent(text, callbackFunc)
+end
+
+
+function CodeBlock:BroadcastTextEvent(text)
+end
+
+
+function CodeBlock:BroadcastAndWaitTextEvent(text, callbackFunc, ...)
+	
 end

@@ -33,6 +33,8 @@ local s_env_methods = {
 	"play",
 	"playLoop",
 	"stop",
+	"onEvent",
+	"sendEvent",
 }
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/MemoryActor.lua");
@@ -83,7 +85,7 @@ function env_imp:yield(bExitOnError)
 			return err, msg;
 		else
 			self.check_count = 0;
-			err, msg = coroutine.yield(self);
+			err, msg = self.co:Yield();
 			if(err and bExitOnError) then
 				env_imp.exit(self);
 			end
@@ -97,13 +99,13 @@ end
 -- @param msg: error message in case err=true
 function env_imp:resume(err, msg)
 	if(self.co) then
-		if(coroutine.status(self.co) == "running") then
+		if(self.co:GetStatus() == "running") then
 			self.fake_resume_res = {err, msg};
 			return;
 		else
 			self.fake_resume_res = nil;
 		end
-		local res, err, msg = coroutine.resume(self.co, err, msg);
+		local res, err, msg = self.co:Resume(err, msg);
 	end
 end
 
@@ -355,4 +357,7 @@ function env_imp:stop()
 	if(self.playTimer) then
 		self.codeblock:KillTimer(self.playTimer);
 	end
+end
+
+function env_imp:registerTextEvent(text, callbackFunc)
 end

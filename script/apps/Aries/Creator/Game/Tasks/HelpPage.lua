@@ -26,9 +26,9 @@ local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 
 local type_ds = {
 	{name = "type",attr = {text=L"新手教程",index = 1,category="tutorial", expanded = true}},
-	{name = "type",attr = {text=L"方块百科",index = 2,category="blockwiki"}},
-	{name = "type",attr = {text=L"命令帮助",index = 3,category="command"}},
-	{name = "type",attr = {text=L"快捷操作",index = 4,category="shortcutkey"}},
+	--{name = "type",attr = {text=L"方块百科",index = 2,category="blockwiki"}},
+	{name = "type",attr = {text=L"命令帮助",index = 2,category="command"}},
+	{name = "type",attr = {text=L"快捷操作",index = 3,category="shortcutkey"}},
 }
 -- default to category="tutorial"
 HelpPage.select_type_index = nil; -- can be nil 
@@ -197,17 +197,20 @@ end
 function HelpPage.OnInitDS()
 	for i = 1,#type_ds do
 		local typ = type_ds[i];
+		local category;
 		if(typ["attr"]) then
 			typ["attr"]["select_item_index"] = 1;
+			category = typ["attr"].category;
 		end
-		if(i == 1 or i == 2) then
+		
+		if(category == "tutorial" or category == "blockwiki") then
 			local ds = BuildQuestProvider.GetThemes_DS(typ["attr"].category);
 			for j = 1,#ds do
 				local theme = ds[j];
 				local item = {name="item",attr={name=theme.foldername, text=theme.name,item_index=j,type_index = i,category=typ["attr"]["category"]}}
 				typ[#typ + 1] = item;
 			end
-		elseif(i == 3) then
+		elseif(category == "command") then
 			local ds = CommandManager:GetCmdTypeDS();
 			local j = 1;
 			for k,v in pairs(ds) do
@@ -217,7 +220,7 @@ function HelpPage.OnInitDS()
 			end
 			-- add the model anim info;
 			typ[#typ + 1] = {name="item",attr={name="actions", text=L"动作编号",item_index=j,type_index = i,category=typ["attr"]["category"],}};
-		elseif(i == 4) then
+		elseif(category == "shortcutkey") then
 			typ[1] = {name="item",attr={name="shortcutkey", text=L"全部",item_index=1,type_index = i,category=typ["attr"]["category"],}}
 		end
 	end
@@ -233,11 +236,28 @@ function HelpPage.GetHelpDS()
 	return type_ds;
 end
 
+function HelpPage.IsTutorialCategory()
+    return (HelpPage.GetCurrentCategory() == "tutorial")
+end
+
+function HelpPage.IsBlockWikiCategory()
+    return (HelpPage.GetCurrentCategory() == "blockwiki")
+end
+
+function HelpPage.IsCommandCategory()
+    return (HelpPage.GetCurrentCategory() == "command")
+end
+
+function HelpPage.IsShortCutKeyCategory()
+    return (HelpPage.GetCurrentCategory() == "shortcutkey")
+end
+
+
 function HelpPage.GetCurGridviewDS(name)
 	local ds;
-	if(HelpPage.select_type_index == 3) then
+	if(HelpPage.IsCommandCategory()) then
 		if(not name) then
-			name = type_ds[3][1]["attr"]["text"];
+			name = type_ds[HelpPage.select_type_index][1]["attr"]["text"];
 		end
 		local cmd_types = CommandManager:GetCmdTypeDS();
 		ds = cmd_types[name] or {};
@@ -258,9 +278,9 @@ end
 
 function HelpPage.GetGridview_DS(index)
 	local ds;
-	if(HelpPage.select_type_index == 1 or HelpPage.select_type_index == 2) then
+	if(HelpPage.IsTutorialCategory() or HelpPage.IsBlockWikiCategory()) then
 		ds = BuildQuestProvider.GetTasks_DS(HelpPage.select_item_index,HelpPage.cur_category);
-	elseif(HelpPage.select_type_index == 3) then
+	elseif(HelpPage.IsCommandCategory()) then
 		if(HelpPage.IsAnimItem()) then
 			if(not next(anim_ds)) then
 				anim_ds = GetAnimDS(); 
@@ -272,7 +292,7 @@ function HelpPage.GetGridview_DS(index)
 			end
 			ds = HelpPage.cur_gridview_ds;
 		end
-	elseif(HelpPage.select_type_index == 4) then
+	elseif(HelpPage.IsShortCutKeyCategory()) then
 		if(not next(shortcurkey_ds)) then
 			shortcurkey_ds = GetShortCutKeyDS(); 
 		end

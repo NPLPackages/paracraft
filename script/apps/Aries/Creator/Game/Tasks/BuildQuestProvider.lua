@@ -22,7 +22,7 @@ local BuildQuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQ
 local categoryPaths = {
 	["template"]  = "worlds/DesignHouse/blocktemplates/",
 	["tutorial"]  = "config/Aries/creator/blocktemplates/buildingtask/",
-	["blockwiki"] = "config/Aries/creator/blocktemplates/blockwiki/",
+	-- ["blockwiki"] = "config/Aries/creator/blocktemplates/blockwiki/",
 }
 
 -- themesType: 记录本地模板文件夹，在保持模板时供选择
@@ -33,9 +33,7 @@ local categoryDS = {
 	["tutorial"] = {
 		themes = {},themesDS = {},themesType = {},beOfficial = true,
 	},
-	["blockwiki"] = {
-		themes = {},themesDS = {},themesType = {},beOfficial = true,
-	},
+	-- ["blockwiki"] = {themes = {},themesDS = {},themesType = {},beOfficial = true,},
 };
 local block_wiki_tasks = {};
 local themes = {};

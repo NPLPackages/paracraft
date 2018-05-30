@@ -228,31 +228,28 @@ to_id： 可以是一组连续的ID
     <block name="bird"/>
     <block name="pigeon"/>
     <block name="dog"/>
-    <block name="cow"/>
-    <block name="pig"/>
-    <block name="sheep"/>
     <block name="chicken"/>
 	</category>
 	
   <category name="gear" text="机关">
     <block name="Command_Block"/>
-    <block name="Redstone_Wire" />
+    <block name="Wire" />
     <block name="Lever" />
     <block name="Stone_Button" />
-    <block name="Redstone_Torch_On" />
+    <block name="Electric_Torch_On" />
     <block name="Trapdoor" />
     <block name="Wooden_Door" />
     <block name="IronTrapdoor" />
     <block name="Iron_Door" />
-    <block name="Redstone_Conductor" />
-    <block name="Redstone_Repeater" />
-    <block name="Redstone_Lamp"/>
+    <block name="Conductor" />
+    <block name="Repeater" />
+    <block name="Lamp"/>
     <block name="Wooden_Pressure_Plate"/>
     <block name="Stone_Pressure_Plate"/>
     <block name="StickyPiston"/>
     <block name="Piston"/>
     <block name="TNT" />
-    <block name="Block_Of_Redstone"/>
+    <block name="PowerBlock"/>
     <block name="CornerGrass" />
     <block name="BlockUpdateDetector" />
     <block name="Chest"/>
@@ -309,8 +306,8 @@ to_id： 可以是一组连续的ID
   </category>
   <category name="movie" text="电影">
     <block name="MovieClip"/>
-    <block name="Redstone_Repeater" />
-    <block name="Redstone_Wire" />
+    <block name="Repeater" />
+    <block name="Wire" />
     <block name="Stone_Button" />
     <block name="Sign_Post"/>
     <block name="player_spawn_point"/>

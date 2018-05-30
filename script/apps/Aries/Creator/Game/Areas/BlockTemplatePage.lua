@@ -318,7 +318,7 @@ function BlockTemplatePage.GetCategoryDS()
 		category_ds = {
 			{value = "1",template_save_dir = "worlds/DesignHouse/blocktemplates/",tag="template",text = L"世界模板",selected = true,},
 			{value = "2",template_save_dir = "config/Aries/creator/blocktemplates/buildingtask/",tag="tutorial",text = L"新手教程",},
-			{value = "3",template_save_dir = "config/Aries/creator/blocktemplates/blockwiki/",tag="blockwiki",text = L"建筑百科"},
+			-- {value = "3",template_save_dir = "config/Aries/creator/blocktemplates/blockwiki/",tag="blockwiki",text = L"建筑百科"},
 			
 		}
 	end

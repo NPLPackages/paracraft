@@ -272,48 +272,32 @@ function GetCurItemIndex()
     return HelpPage.select_item_index;
 end
 
+function IsTutorialCategory()
+    return (HelpPage.GetCurrentCategory() == "tutorial")
+end
+
+function IsBlockWikiCategory()
+    return (HelpPage.GetCurrentCategory() == "blockwiki")
+end
+
+function IsCommandCategory()
+    return (HelpPage.GetCurrentCategory() == "command")
+end
+
+function IsShortCutKeyCategory()
+    return (HelpPage.GetCurrentCategory() == "shortcutkey")
+end
+
 function ChangeItem(name,mcmlNode)
     HelpPage.select_type_index = tonumber(mcmlNode:GetAttribute("param1"));
     HelpPage.select_item_index = tonumber(mcmlNode:GetAttribute("param2"));
     HelpPage.cur_category = HelpPage.GetCurrentCategory();
     HelpPage.select_task_index = 1;
-    if(HelpPage.select_type_index == 3) then
+    if(IsCommandCategory()) then
         HelpPage.cur_gridview_ds = HelpPage.GetCurGridviewDS(name);
     end
     HelpPage.OnTypeItemChanged();
     Page:Refresh(0.1);
-end
-
-function IsTutorialCategory()
-    if(HelpPage.select_type_index == 1) then
-        return true;
-    else
-        return false;
-    end
-end
-
-function IsBlockWikiCategory()
-    if(HelpPage.select_type_index == 2) then
-        return true;
-    else
-        return false;
-    end
-end
-
-function IsCommandCategory()
-    if(HelpPage.select_type_index == 3) then
-        return true;
-    else
-        return false;
-    end
-end
-
-function IsShortCutKeyCategory()
-    if(HelpPage.select_type_index == 4) then
-        return true;
-    else
-        return false;
-    end
 end
 
 function Return()
@@ -522,7 +506,7 @@ end
             </pe:if>
             <div style="margin-left:25px;margin-top:5px;height:110px;">
                 <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
-                    <div style="margin-left:35px;margin-top:2px;color:#ffffff;">
+                    <div style="margin-left:25px;margin-top:2px;color:#ffffff;">
                         <%=L"所需资源"%>
                     </div> 
                     <div style="margin-left:16px;margin-top:-8px;">
@@ -530,7 +514,7 @@ end
                             <Columns>
                                 <div style="height:44px;width:52px;">
                                     <div style="margin-top:10px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
-                                        <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:1px;margin-top:1px;width:32px;height:32px;" isclickable = "false"/>
+                                        <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:1px;margin-top:1px;width:32px;height:32px;"/>
                                     </div>
                                 </div>    
                             </Columns>
