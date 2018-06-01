@@ -27,11 +27,11 @@ local exclusive_task_list = commonlib.List:new();
 local top_level_task = nil;
 
 -- called in the framemove. 
-function TaskManager.FrameMove()
+function TaskManager.FrameMove(deltaTime)
 	-- top level task
 	if(top_level_task) then
 		if(not top_level_task.finished) then
-			top_level_task:FrameMove();
+			top_level_task:FrameMove(deltaTime);
 		end
 		if(top_level_task.finished) then
 			if(top_level_task.OnExit) then
@@ -45,7 +45,7 @@ function TaskManager.FrameMove()
 	-- for exclusive tasks
 	local task = exclusive_task_list:first();
 	while (task) do
-		task:FrameMove();
+		task:FrameMove(deltaTime);
 		if(task.finished) then
 			task = exclusive_task_list:remove(task);
 		else
@@ -57,7 +57,7 @@ function TaskManager.FrameMove()
 	if(exclusive_task_list:size() == 0) then
 		local task = task_list:first();
 		while (task) do
-			task:FrameMove();
+			task:FrameMove(deltaTime);
 
 			if(task.finished) then
 				task = task_list:remove(task);
