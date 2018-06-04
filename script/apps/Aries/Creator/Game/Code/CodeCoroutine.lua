@@ -4,6 +4,7 @@ Author(s): LiXizhi
 Date: 2018/5/30
 Desc: call back functions or the main function that must be executed in a separate coroutine. 
 All coroutines share the same CodeAPI environment, except for current actor. 
+MakeCallbackFunc will restore last actor and coroutine context.
 Run the same coroutine multiple times will cause the previous one to stop forever.
 use the lib:
 -------------------------------------------------------
@@ -29,13 +30,22 @@ function CodeCoroutine:Init(codeBlock)
 end
 
 function CodeCoroutine:Destroy()
-	self:KillAllTimers();
 	CodeCoroutine._super.Destroy(self);
+end
+
+function CodeCoroutine:SetFunction(code_func)
+	self.code_func = code_func;
 end
 
 function CodeCoroutine:AddTimer(timer)
 	self.timers = self.timers or {}
 	self.timers[timer] = true;
+end
+
+function CodeCoroutine:RemoveTimer(timer)
+	if(self.timers) then
+		self.timers[timer] = nil;
+	end
 end
 
 function CodeCoroutine:KillAllTimers()
@@ -47,8 +57,36 @@ function CodeCoroutine:KillAllTimers()
 	end
 end
 
-function CodeCoroutine:SetFunction(code_func)
-	self.code_func = code_func;
+function CodeCoroutine:KillTimer(timer)
+	self:RemoveTimer(timer);
+	self:GetCodeBlock():KillTimer(timer);
+end
+
+function CodeCoroutine:MakeCallbackFunc(callbackFunc)
+	return function(...)
+		self:PrepareCodeContext();
+		if(callbackFunc) then
+			callbackFunc(...);
+		end
+	end
+end
+
+function CodeCoroutine:SetTimer(callbackFunc, dueTime, period)
+	local timer = self:GetCodeBlock():SetTimer(self:MakeCallbackFunc(callbackFunc), dueTime, period);
+	self:AddTimer(timer);
+	return timer;
+end
+
+function CodeCoroutine:SetTimeout(duration, callbackFunc)
+	local timer = self:GetCodeBlock():SetTimeout(duration, function(timer)
+		self:PrepareCodeContext();
+		self:RemoveTimer(timer);
+		if(callbackFunc) then
+			callbackFunc(timer);
+		end
+	end);
+	self:AddTimer(timer);
+	return timer;
 end
 
 function CodeCoroutine:SetActor(actor)
@@ -68,25 +106,45 @@ function CodeCoroutine:GetStatus()
 	return self.co and coroutine.status(self.co);
 end
 
+function CodeCoroutine:Stop()
+	-- we need to stop the last coroutine timers, before starting a new one. 
+	self:KillAllTimers();
+end
+
+-- @return saved context {co, actor};
+function CodeCoroutine:SaveCurrentContext()
+	local code_env = self:GetCodeBlock():GetCodeEnv();
+	return {co = code_env.co, actor = code_env.actor};
+end
+
+-- restore context
+function CodeCoroutine:RestoreContext(context)
+	local code_env = self:GetCodeBlock():GetCodeEnv();
+	code_env.co = context.co;
+	code_env.actor = context.actor;
+end
+
 -- Run the same coroutine multiple times will cause the previous one to stop forever.
-function CodeCoroutine:Run()
-	if(self:GetStatus() == "dead") then
-		-- TODO: we need to stop the last coroutine, before starting a new one. 
-		return;
-	end
+function CodeCoroutine:Run(msg)
+	self:Stop();
+	
 	if(self.code_func) then
 		self.co = coroutine.create(function()
-			self:RunImp();
+			self:RunImp(msg);
 			return nil, "finished";
 		end)
+		local last_context = self:SaveCurrentContext();
+		self:PrepareCodeContext();
 		self:Resume();
+		self:RestoreContext(last_context);
 	end
 end
 
-function CodeCoroutine:RunImp()
-	if(self.code_func) then
-		setfenv(self.code_func, self:GetCodeBlock():GetCodeEnv());
-		local ok, result = pcall(self.code_func);
+function CodeCoroutine:RunImp(msg)
+	local code_func = self.code_func;
+	if(code_func) then
+		setfenv(code_func, self:GetCodeBlock():GetCodeEnv());
+		local ok, result = pcall(code_func, msg);
 
 		if(not ok) then
 			LOG.std(nil, "error", "CodeCoroutine", result);
@@ -106,7 +164,6 @@ end
 
 function CodeCoroutine:Resume(err, msg)
 	if(self.co) then
-		self:PrepareCodeContext();
 		return coroutine.resume(self.co, err, msg);
 	end
 end

@@ -1,0 +1,18 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html-->
+<pe:mcml>
+<script type="text/npl" src="CodeHelpWindow.lua">
+<![CDATA[
+CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+]]></script>
+<div width="100%" height="100%" style="background-color:#292929;" class="default">
+    <div style="margin:5px;">
+        <div style="float:left;margin-left:0px;margin-top:3px">
+        </div>
+        <input align="right" class="mc_close_button" type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeHelpWindow.Close" style="margin-top:8px;margin-right:10px;"/>
+    </div>
+    <pe:container alignment="_fi" class="mc_paper_panel" style="position:relative;margin-bottom:60px;margin-left:3px;">
+        <input name="code" rows="20" language="npl" height="100%" value='<%=CodeHelpWindow.GetCodeFromEntity() or ""%>' ShowLineNumber="true" UseSystemControl="true" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:25" />
+    </pe:container>
+</div>
+</pe:mcml>
+

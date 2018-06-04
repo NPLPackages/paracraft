@@ -34,6 +34,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorNPC"));
 
 Actor.class_name = "ActorNPC";
+Actor:Property({"entityClass", "EntityNPC"});
 -- asset file is changed
 Actor:Signal("assetfileChanged");
 
@@ -206,7 +207,7 @@ function Actor:Init(itemStack, movieclipEntity)
 		opacity = self:GetValue("opacity", nil);
 		name = self:GetValue("name", 0);
 
-		self.entity = EntityNPC:Create({x=x,y=y,z=z, facing=facing, 
+		self.entity = EntityManager[self.entityClass]:Create({x=x,y=y,z=z, facing=facing, 
 			opacity = opacity, item_id = block_types.names.TimeSeriesNPC, 
 			});
 		if(self.entity) then

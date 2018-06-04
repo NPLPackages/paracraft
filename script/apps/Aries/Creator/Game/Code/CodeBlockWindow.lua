@@ -18,6 +18,7 @@ local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBa
 
 local code_block_window_name = "code_block_window_";
 local page;
+local groupindex_hint = 3; 
 -- this is singleton class
 local self = CodeBlockWindow;
 
@@ -58,21 +59,46 @@ function CodeBlockWindow.Show(bShow)
 	end
 end
 
+function CodeBlockWindow.HighlightCodeEntity(entity)
+	if(self.entity) then
+		local x, y, z = self.entity:GetBlockPos();
+		ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
+	end
+	if(entity) then
+		local x, y, z = entity:GetBlockPos();
+		ParaTerrain.SelectBlock(x,y,z, true, groupindex_hint);
+	end
+end
+
+function CodeBlockWindow:OnEntityRemoved()
+	CodeBlockWindow.SetCodeEntity(nil);
+end
+
 function CodeBlockWindow.SetCodeEntity(entity)
-	self.entity = entity;
+	CodeBlockWindow.HighlightCodeEntity(entity);
+	if(self.entity ~= entity) then
+		if(entity) then
+			entity:Connect("beforeRemoved", self, self.OnEntityRemoved, "UniqueConnection");
+		end
+		if(self.entity) then
+			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
+		end
+		self.entity = entity;
+	end
+
 	local codeBlock = self.GetCodeBlock();
 	if(codeBlock) then
-		self.SetConsoleText(codeBlock:GetLastMessage());
+		self.SetConsoleText(codeBlock:GetLastMessage() or "");
 		codeBlock:Connect("message", self, self.OnMessage, "UniqueConnection");
 	end
 	
 	if(page) then
-		page:SetValue("code", self.GetCodeFromEntity());
+		page:SetValue("code", self.GetCodeFromEntity() or "");
 	end
 end
 
 function CodeBlockWindow:OnMessage(msg)
-	self.SetConsoleText(msg);
+	self.SetConsoleText(msg or "");
 end
 
 function CodeBlockWindow.GetCodeFromEntity()
@@ -111,6 +137,7 @@ end
 function CodeBlockWindow.Close()
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
+	CodeBlockWindow.HighlightCodeEntity(nil);
 end
 
 function CodeBlockWindow.RestoreWindowLayout()
@@ -146,7 +173,7 @@ function CodeBlockWindow.SetConsoleText(text)
 	if(self.console_text ~= text) then
 		self.console_text = text;
 		if(page) then
-			page:SetValue("console", CodeBlockWindow.DoTextLineWrap(self.console_text));
+			page:SetValue("console", CodeBlockWindow.DoTextLineWrap(self.console_text) or "");
 		end
 	end
 end
@@ -156,9 +183,7 @@ function CodeBlockWindow.GetConsoleText()
 end
 
 function CodeBlockWindow.OnClickStart()
-	local codeBlock = CodeBlockWindow.GetCodeBlock();
-	if(codeBlock) then
-	end
+	GameLogic.RunCommand("/sendevent start");
 end
 
 function CodeBlockWindow.OnClickPause()
@@ -182,7 +207,14 @@ end
 function CodeBlockWindow.OnClickOpenMovieBlock()
 	local movieEntity = CodeBlockWindow.GetMovieEntity();
 	if(movieEntity) then
-		movieEntity:OpenEditor("entity");
+		if(mouse_button=="left") then
+			local codeBlock = CodeBlockWindow.GetCodeBlock();
+			if(codeBlock) then
+				codeBlock:HighlightActors();
+			end
+		else
+			movieEntity:OpenEditor("entity");
+		end
 	else
 		_guihelper.MessageBox(L"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码控制演员了!")
 	end

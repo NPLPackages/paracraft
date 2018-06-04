@@ -18,7 +18,7 @@ end
 ]]></script>
 <aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" onclose="OnClose">
     <div style="height: 320px; margin-right: 4px; margin-left: -4px; padding: 5px;" class="mc_paper_panel" width="100%" >
-        <textarea name="content" ReadOnly="true" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
+        <textarea language="npl" name="content" ReadOnly="true" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
     </div>
    <div style="margin-top:5px;padding-bottom:10px;">
         <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>

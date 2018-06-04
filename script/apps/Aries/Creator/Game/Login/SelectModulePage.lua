@@ -48,7 +48,7 @@ end
 
 -- select the module to decide the module whether loaded
 function SelectModulePage.OnSwitchModStatus(bChecked,modName,index)
-	SelectModulePage.GetPluginLoader():EnablePlugin(modName, bChecked);
+	return SelectModulePage.GetPluginLoader():EnablePlugin(modName, bChecked);
 end
 
 -- save config to file

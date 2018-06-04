@@ -8,19 +8,12 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeGlobals.lua");
 local CodeGlobals = commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals");
-local _G = CodeGlobals:GetWorldGlobals();
-CodeGlobals:GetCurrentMetaTable();
+local _G = GameLogic.GetCodeGlobal():GetWorldGlobals();
+GameLogic.GetCodeGlobal():GetCurrentMetaTable();
+GameLogic.GetCodeGlobal():CreateGetTextEvent("msgname");
+GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/ide/AudioEngine/AudioEngine.lua");
-local AudioEngine = commonlib.gettable("AudioEngine");
-local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
-local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
-local block = commonlib.gettable("MyCompany.Aries.Game.block")
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
 
 function CodeGlobals:ctor()
@@ -49,8 +42,8 @@ function CodeGlobals:ctor()
 			sort = table.sort },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 
-		cmd = function(cmd_name, cmd_text, ...)
-			return CommandManager:RunCommand(cmd_name, cmd_text, ...)
+		cmd = function(...)
+			return GameLogic.RunCommand(...);
 		end,
 		real = function(bx,by,bz)
 			return BlockEngine:real(bx,by,bz);
@@ -66,6 +59,9 @@ function CodeGlobals:ctor()
 		end,
 		get = function(name)
 			return self:GetGlobal(name);
+		end,
+		tip = function(text, duration, color)
+			return GameLogic.AddBBS("CodeGlobals", text and tostring(text), duration, color);
 		end,
 	};
 
@@ -92,11 +88,71 @@ function CodeGlobals:Reset()
 		return value;
 	end}
 	self.curMetaTable = meta_table;
+
+	self.text_events = {};
 end
 
 -- all user defined variables that is shared by all blocks in the current world
 function CodeGlobals:GetCurrentGlobals()
 	return self.curGlobals;
+end
+
+-- @return mapping of {text, event_object}
+function CodeGlobals:GetAllTextEvents()
+	return self.text_events;
+end
+
+function CodeGlobals:GetTextEvent(text)
+	return self.text_events[text];
+end
+
+function CodeGlobals:CreateGetTextEvent(text)
+	local event = self.text_events[text];
+	if(not event) then
+		event = commonlib.EventSystem:new();
+		self.text_events[text] = event;
+	end
+	return event;
+end
+
+function CodeGlobals:BroadcastStartEvent()
+	self:BroadcastTextEvent("start");
+end
+
+function CodeGlobals:RegisterKeyPressedEvent(callbackFunc)
+	self:CreateGetTextEvent("keyPressedEvent"):AddEventListener("msg", callbackFunc);
+end
+
+function CodeGlobals:BroadcastKeyPressedEvent(keyname)
+	local event = self:GetTextEvent("keyPressedEvent");
+	if(event) then
+		event:DispatchEvent({type="msg", keyname = keyname});
+	end
+end
+
+function CodeGlobals:BroadcastTextEvent(text)
+	local event = self:GetTextEvent(text);
+	if(event) then
+		event:DispatchEvent({type="msg"});
+	end
+end
+
+function CodeGlobals:RegisterTextEvent(text, callbackFunc)
+	self:CreateGetTextEvent(text):AddEventListener("msg", callbackFunc);
+end
+
+function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
+	local event = self:GetTextEvent(text);
+	if(event) then
+		event:RemoveEventListener("msg", callbackFunc);
+	end
+end
+
+function CodeGlobals:UnregisterKeyPressedEvent(callbackFunc)
+	local event = self:GetTextEvent("keyPressedEvent");
+	if(event) then
+		event:RemoveEventListener("msg", callbackFunc);
+	end
 end
 
 function CodeGlobals:GetCurrentMetaTable()

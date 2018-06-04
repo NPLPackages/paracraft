@@ -48,8 +48,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "InternetLoadWorld.ShowPage", bEnable, bShow: whether to show the default load world window. We can use this filter to replace the default load world window.
   - "SaveWorldPage.ShowSharePage", bEnable: We can use this filter to replace the default share world window.
   - "ShowExitDialog", {text, callback}: use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
-  - "show_custom_create_new_world", behavior("show" or "close"):use this filter to custom your CreateNewWorld page.
-  - "show_custom_download_world", behavior("show" or "close"), url:use this filter to custom your DownloadWorld page.
+  - "show_custom_create_new_world", behavior("show" or "close"):use this filter to customize your CreateNewWorld page.
+  - "show_custom_download_world", behavior("show" or "close"), url:use this filter to customize your DownloadWorld page.
   
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.

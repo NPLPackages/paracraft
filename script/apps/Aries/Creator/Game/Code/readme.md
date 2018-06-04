@@ -122,6 +122,8 @@ walk(1, 0);
 say("hi", 3); -- say hi for 3 seconds
 anim(4, 2); -- set animtion to 4(walk) and wait 2 seconds
 playLoop(10, 2000);
+wait(4)
+stop();
 ```
 
 ### Loop Tests
@@ -170,3 +172,155 @@ end
 say(a)
 ```
 
+### test Clone Event
+```
+move(1,0);
+local a=1;
+registerCloneEvent(function()
+   a = a + 1;
+   move(-a,0);
+   say(a);
+   for i=1, 100 do
+      move(0, 0.02)
+   end
+end)
+clone();
+clone();
+say("hi", 2);
+say("bye");
+```
+
+### test Broadcast Event
+```
+move(1,0);
+clone();
+msg = "hi";
+registerBroadcastEvent("hi", function()
+	say(msg)
+end)
+
+for i=1, 100 do
+	broadcast("hi")
+	wait(2)
+	msg = "hi"..i;
+end
+```
+
+Receive it in another block 
+```
+local a=0
+registerBroadcastEvent("hi", function()
+    say("hello "..a)
+    a = a + 1
+end)
+```
+
+### test start Event
+
+One can start by calling `/sendevent start`
+```
+registerStartEvent(function()
+    for i=1, 100 do
+        say(tostring(i), 1)
+    end
+end)
+```
+
+### test actor click Event
+One can have multiple click event per actor.
+```
+registerCloneEvent(function()
+   say("click me!")
+   move(-a,0);
+end)
+
+say("click me!")
+for i=1, 2 do 
+    a = i
+    clone();
+end
+
+registerClickEvent(function()
+    say("move on!", 0.8);
+end)
+
+registerClickEvent(function()
+    for i=1, 100 do
+        move(0.01, 0)
+    end
+end)
+```
+
+### test delete actor
+```
+move(1,0)
+say("Default actor will be deleted!", 1)
+delete();
+
+registerCloneEvent(function()
+   say("This clone will be deleted!", 1)
+   delete();
+end)
+
+for i=1, 100 do
+	clone();
+	wait(2);
+end
+```
+
+### test show/hide actor
+```
+playLoop(10, 2000)
+say("blink")
+for i=1, 100 do
+    show();
+    wait(0.1);
+    hide();
+    wait(0.1);
+end
+```
+
+### test turning
+```
+turnTo(30);
+for i=1, 100 do
+	turn(2)
+end
+```
+
+### test key pressed event
+```
+registerKeyPressedEvent("z", function(keyname)
+    say("you pressed Z key");
+    wait(3);
+    say("pressed any key!");
+end)
+
+registerKeyPressedEvent("any", function(keyname)
+    wait(1)
+    say("you pressed some key!");
+    wait(1)
+    say("");
+end)
+
+say("press Z key!")
+```
+
+### test Animation Time event
+```
+registerAnimationEvent(10, function()
+	say("anim started", 3)
+	say("click me!")
+end)
+
+registerAnimationEvent(1000, function()
+	say("anim stopped", 1)
+end)
+
+registerClickEvent(function()
+	play(10, 1000)
+end);
+say("click me!")
+walk(1,0);
+clone();
+```

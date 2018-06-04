@@ -1513,10 +1513,11 @@ function GameLogic:GetText(text)
 end
 
 
--- custom user or game event
+-- global custom user or game event
 function GameLogic:event(event)
 	local homeEntity = GameLogic.GetHomeEntity();
 	if(homeEntity) then
 		homeEntity:event(event);
 	end
+	GameLogic.GetCodeGlobal():BroadcastTextEvent(event:GetType());
 end

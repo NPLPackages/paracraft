@@ -28,6 +28,10 @@ local s_env_methods = {
 	"move",
 	"walk",
 	"goto",
+	"turn",
+	"turnTo",
+	"show",
+	"hide",
 	"teleport",
 	"anim",
 	"play",
@@ -35,6 +39,18 @@ local s_env_methods = {
 	"stop",
 	"onEvent",
 	"sendEvent",
+	
+	"registerClickEvent",
+	"registerKeyPressedEvent",
+	"registerAnimationEvent",
+
+	"registerCloneEvent",
+	"clone",
+	"delete",
+
+	"registerStartEvent",
+	"registerBroadcastEvent",
+	"broadcast",
 }
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Memory/MemoryActor.lua");
@@ -168,7 +184,7 @@ end
 -- @param seconds: in seconds
 function env_imp:wait(seconds)
 	if(seconds and seconds>0) then
-		self.codeblock:SetTimeout(math.floor(seconds*1000), function()
+		self.co:SetTimeout(math.floor(seconds*1000), function()
 			env_imp.resume(self);
 		end) 
 		env_imp.yield(self);
@@ -189,7 +205,7 @@ function env_imp:say(text, duration)
 			if(text~=nil) then
 				text = tostring(text);
 			end
-			entity:Say(text, duration or -1)
+			entity:Say(text, -1)
 		else
 			GameLogic.AddBBS("codeblock", text, 10000);
 		end
@@ -254,6 +270,22 @@ function env_imp:move(dx,dy,dz, duration)
 	end
 end
 
+function env_imp:turn(degree)
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		entity:SetFacingDelta(degree*math.pi/180);
+	end
+	env_imp.wait(self, env_imp.GetDefaultTick(self));
+end
+
+function env_imp:turnTo(degree)
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		entity:SetFacing(degree*math.pi/180);
+	end
+	env_imp.checkyield(self);
+end
+
 -- goto absolute position in real coordinates
 -- Use teleport for block position
 -- @param x,y,z: if z is nil, y is z
@@ -288,7 +320,6 @@ function env_imp:teleport(x, y, z)
 	end
 end
 
-
 -- set animation id
 -- @param anim_id: 0 for standing (default), 4 for walk. 
 -- @param duration: default to 1 tick
@@ -316,11 +347,13 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 		entity:SetDummy(true);
 		entity:EnableAnimation(false);
 		local actor = env_imp.GetActor(self);
-		if(actor) then
-			actor:SetTime(time);
-			actor:ResetOffsetPosAndRotation();
-			actor:FrameMove(0, false);
+		if(not actor) then
+			return
 		end
+		actor:SetTime(time);
+		actor:ResetOffsetPosAndRotation();
+		actor:FrameMove(0, false);
+		self.codeblock:OnAnimateActor(actor, time);
 
 		if(timeTo and timeTo>timeFrom) then
 			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
@@ -335,15 +368,27 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 						end
 					else
 						time = timeTo;
-						self.playTimer:Change();
+						timer:Change();
 					end
 				end
 				actor:SetTime(time);
 				actor:FrameMove(0, false);
+				if(timeTo == time) then
+					self.codeblock:OnAnimateActor(actor, time);
+				end
 			end
-			self.playTimer = self.playTimer or self.codeblock:SetTimer(frameMove_, 0, deltaTime);
-			self.playTimer.callbackFunc = frameMove_;
-			self.playTimer:Change(0, deltaTime);
+			if(not self.actor.playTimer) then
+				self.actor.playTimer = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
+				self.actor:Connect("beforeRemoved", function(actor)
+					if(actor.playTimer) then
+						self.codeblock:KillTimer(actor.playTimer);
+						actor.playTimer = nil;
+					end
+				end)
+			else
+				self.actor.playTimer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+			end
+			self.actor.playTimer:Change(0, deltaTime);
 		end
 	end
 end
@@ -351,13 +396,76 @@ end
 -- same as play(), but looping
 function env_imp:playLoop(timeFrom, timeTo)
 	env_imp.play(self, timeFrom, timeTo, true);
+	env_imp.checkyield(self);
 end
 
 function env_imp:stop()
-	if(self.playTimer) then
-		self.codeblock:KillTimer(self.playTimer);
+	if(self.actor and self.actor.playTimer) then
+		self.codeblock:KillTimer(self.actor.playTimer);
+		self.actor.playTimer = nil;
 	end
+	env_imp.checkyield(self);
 end
 
-function env_imp:registerTextEvent(text, callbackFunc)
+function env_imp:show()
+	if(self.actor) then
+		self.actor:SetVisible(true);
+	end
+	env_imp.checkyield(self);
 end
+
+function env_imp:hide()
+	if(self.actor) then
+		self.actor:SetVisible(false);
+	end
+	env_imp.checkyield(self);
+end
+
+-- create a clone of some code block's actor
+-- @param name: if nil or "myself", it means clone myself
+function env_imp:clone(name)
+	self.codeblock:CreateClone(name)
+	env_imp.checkyield(self);
+end
+
+-- delete current cloned actor
+function env_imp:delete()
+	if(self.actor) then
+		self.codeblock:DeleteActor(self.actor);
+	end
+	env_imp.checkyield(self);
+end
+
+function env_imp:registerCloneEvent(callbackFunc)
+	self.codeblock:RegisterCloneActorEvent(callbackFunc);
+	env_imp.checkyield(self);
+end
+
+function env_imp:registerBroadcastEvent(text, callbackFunc)
+	self.codeblock:RegisterTextEvent(text, callbackFunc);
+	env_imp.checkyield(self);
+end
+
+-- broadcast a global message.
+function env_imp:broadcast(text)
+	self.codeblock:BroadcastTextEvent(text);
+	env_imp.checkyield(self);
+end
+
+function env_imp:registerStartEvent(callbackFunc)
+	self.codeblock:RegisterTextEvent("start", callbackFunc);
+end
+
+function env_imp:registerClickEvent(callbackFunc)
+	self.codeblock:RegisterClickEvent(callbackFunc);
+end
+
+function env_imp:registerKeyPressedEvent(keyname, callbackFunc)
+	self.codeblock:RegisterKeyPressedEvent(keyname, callbackFunc);
+end
+
+function env_imp:registerAnimationEvent(time, callbackFunc)
+	self.codeblock:RegisterAnimationEvent(time, callbackFunc);
+end
+
+

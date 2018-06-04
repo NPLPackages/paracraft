@@ -531,6 +531,8 @@ function BaseContext:handleHookedKeyEvent(event)
 	if(hotkey_manager.handle_key_event(event.virtual_key)) then
 		return true;
 	end
+
+	GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent(event.keyname);
 end
 
 function BaseContext:handleItemKeyEvent(event)

@@ -19,9 +19,13 @@ end
 
 function OnSwitchModStatus(name,mcmlNode)
     local item = mcmlNode:GetPreValue("this",true);
-    item.checked = not item.checked;
-    SelectModulePage.OnSwitchModStatus(item.checked,item.name);
-    Page:CallMethod("gvwModTable", "DataBind");
+    local checked = SelectModulePage.OnSwitchModStatus(not item.checked,item.name);
+    if(item.checked ~= checked) then
+        item.checked = checked;
+        Page:CallMethod("gvwModTable", "DataBind");
+    elseif(not checked) then
+        _guihelper.MessageBox(L"已存在更高版本或系统版本");
+    end
 end
 
 function ClosePage()

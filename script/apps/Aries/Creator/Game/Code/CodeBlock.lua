@@ -19,6 +19,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCompiler.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
+local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
@@ -35,9 +37,10 @@ CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", aut
 CodeBlock:Signal("message", function(errMsg) end);
 
 function CodeBlock:ctor()
-	self.timers = nil;
-	self.timers_pool = nil;
-	self.actors = {};
+	self.timers = {};
+	self.timers_pool = {};
+	self.actors = commonlib.UnorderedArraySet:new();
+	self.events = {};
 end
 
 function CodeBlock:Init(entityCode)
@@ -68,7 +71,6 @@ function CodeBlock:SetTimer(callbackFunc, dueTime, period)
 		self.timers_pool[#self.timers_pool] = nil;
 		timer.callbackFunc = callbackFunc;
 	else
-		self.timers = self.timers or {};
 		timer = commonlib.Timer:new({callbackFunc = callbackFunc})
 	end
 	self.timers[timer] = true;
@@ -80,7 +82,6 @@ function CodeBlock:KillTimer(timer)
 	timer:Change();
 	if(self.timers[timer]) then
 		self.timers[timer] = nil;
-		self.timers_pool = self.timers_pool or {};
 		if(#self.timers_pool < 10) then
 			self.timers_pool[#self.timers_pool+1] = timer;
 		end
@@ -88,11 +89,11 @@ function CodeBlock:KillTimer(timer)
 end
 
 function CodeBlock:SetTimeout(duration, callbackFunc)
-	self:SetTimer(function(timer)
-		if(callbackFunc) then
-			callbackFunc();
-		end
+	return self:SetTimer(function(timer)
 		self:KillTimer(timer);
+		if(callbackFunc) then
+			callbackFunc(timer);
+		end
 	end, duration, nil)
 end
 
@@ -138,6 +139,7 @@ function CodeBlock:Unload()
 	
 	self:RemoveTimers();
 	self:RemoveAllActors();
+	self:RemoveAllEvents();
 
 	self.code_env = nil;
 end
@@ -145,6 +147,16 @@ end
 -- remove all timers without clearing actors.
 function CodeBlock:Stop()
 	self:RemoveTimers();
+	self:RemoveAllEvents();
+end
+
+function CodeBlock:RemoveAllEvents()
+	for name, events in pairs(self.events) do
+		for _, event in ipairs(events) do
+			event:Destroy();
+		end
+	end
+	self.events = {};
 end
 
 function CodeBlock:RemoveTimers()
@@ -152,28 +164,32 @@ function CodeBlock:RemoveTimers()
 		for timer, _ in pairs(self.timers) do
 			timer:Change();
 		end
-		self.timers = nil;
+		self.timers = {};
 	end
 	if(self.timers_pool) then
 		for _, timer in ipairs(self.timers_pool) do
 			timer:Change();
 		end
-		self.timers_pool = nil;
+		self.timers_pool = {};
 	end
 end
 
 -- usually called when movie finished playing. 
 function CodeBlock:RemoveAllActors()
-	for i, actor in pairs(self.actors) do
+	for i, actor in ipairs(self.actors) do
 		actor:OnRemove();
 		actor:Destroy();
 	end
-	self.actors = {};
+	self.actors:clear();
+end
+
+function CodeBlock:GetActors()
+	return self.actors;
 end
 
 -- private function: do not call this function. 
 function CodeBlock:AddActor(actor)
-	self.actors[#(self.actors)+1] = actor;
+	self.actors:add(actor);
 end
 
 function CodeBlock:GetMovieEntity()
@@ -190,6 +206,7 @@ function CodeBlock:CreateActor()
 		-- use time 0
 		actor:SetTime(0);
 		actor:FrameMove(0, false);
+		actor:Connect("clicked", self, self.OnClickActor);
 		return actor;
 	end
 end
@@ -218,13 +235,16 @@ function CodeBlock:GetCodeEnv()
 	return self.code_env;
 end
 
+function CodeBlock:IsLoaded()
+	return self.isLoaded;
+end
+
 -- run code again 
 function CodeBlock:Run()
 	self:Unload();
 
 	if(self.code_func) then
 		self.isLoaded = true;
-
 		local co = CodeCoroutine:new():Init(self);
 		co:SetFunction(self.code_func);
 		co:SetActor(self:CreateActor());
@@ -241,31 +261,172 @@ function CodeBlock:GetLastMessage()
 	return self.lastMessage;
 end
 
-function CodeBlock:OnTextEvent(text)
+-- @param msg: optional message to be passed to event callback
+function CodeBlock:FireEvent(event_name, actor, msg)
+	event_name = event_name or "";
+	local events = self.events[event_name];
+	if(events) then
+		for _, event in ipairs(events) do
+			if(actor) then
+				event:SetActor(actor);
+			end
+			event:Fire(msg);
+		end
+	end
 end
 
--- when the actor played through the given animation time (milliseconds)
-function CodeBlock:RegisterTimeEvent(time, callbackFunc)
+function CodeBlock:CreateEvent(event_name)
+	event_name = event_name or "";
+	local event = CodeEvent:new():Init(self, event_name);
+	
+	local events = self.events[event_name];
+	if(not self.events[event_name]) then
+		events = {};
+		self.events[event_name] = events;
+	end
+	events[#events + 1] = event;
+	return event;
 end
 
+-- when the actor start/end playing at the given time (milliseconds)
+-- Only the start and end of an animation is fired. 
+function CodeBlock:RegisterAnimationEvent(time, callbackFunc)
+	if(callbackFunc and time) then
+		local event = self:CreateEvent("onAnimateActor");
+		event:SetIsFireForAllActors(false);
+		event:SetCanFireCallback(function(actor, curTime)
+			return (time == curTime);
+		end);
+		event:SetFunction(callbackFunc);
+	end
+end
+
+function CodeBlock:OnAnimateActor(actor, time)
+	self:FireEvent("onAnimateActor", actor, time)
+end
 
 -- actor is clicked
 function CodeBlock:RegisterClickEvent(callbackFunc)
+	local event = self:CreateEvent("onClickActor");
+	event:SetIsFireForAllActors(false);
+	event:SetFunction(callbackFunc);
 end
 
+function CodeBlock:OnClickActor(actor, mouse_button)
+	self:FireEvent("onClickActor", actor)
+end
 
+function CodeBlock:GetKeyNameFromString(name)
+	if(name and DIK_SCANCODE["DIK_"..string.upper(name)]) then
+		return "DIK_"..string.upper(name);
+	end
+	return name;
+end
+
+function CodeBlock:GetStringFromKeyName(name)
+	if(name) then
+		return string.lower(name:gsub("^(DIK_)" ,""));
+	end
+end
+
+-- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
+-- case incensitive
 function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
+	local event = self:CreateEvent("onKeyPressed");
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+	keyname = self:GetKeyNameFromString(keyname);
+	
+	local function onEvent_(_, msg)
+		if(not msg) then
+			return 
+		end
+		local bFire;
+		if(not keyname or keyname == "any") then
+			bFire = true;
+		elseif(keyname == msg.keyname) then
+			bFire = true;
+		end
+		if(bFire) then
+			event:Fire();
+		end
+	end
+	event:Connect("beforeDestroyed", function()
+		GameLogic.GetCodeGlobal():UnregisterKeyPressedEvent(onEvent_);
+	end)
+	GameLogic.GetCodeGlobal():RegisterKeyPressedEvent(onEvent_);
 end
 
 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
+	local event = self:CreateEvent("onText"..text);
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+	local function onEvent_()
+		event:Fire();
+	end
+	event:Connect("beforeDestroyed", function()
+		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
+	end)
+	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
 end
-
 
 function CodeBlock:BroadcastTextEvent(text)
+	if(type(text) == "string") then
+		GameLogic.GetCodeGlobal():BroadcastTextEvent(text);
+	end
 end
 
+function CodeBlock:RegisterCloneActorEvent(callbackFunc)
+	local event = self:CreateEvent("onCloneActor");
+	event:SetFunction(callbackFunc);
+end
 
 function CodeBlock:BroadcastAndWaitTextEvent(text, callbackFunc, ...)
 	
+end
+
+-- create a clone of some code block's actor
+-- @param name: if nil or "myself", it means clone myself
+function CodeBlock:CreateClone(name)
+	if(not name or name == "myself") then
+		self:CloneMyself();
+	else
+		local codeBlock = self:GetCodeBlockByName(name);
+		if(codeBlock) then
+			codeBlock:CloneMyself();
+		end
+	end
+end
+
+function CodeBlock:GetCodeBlockByName(name)
+	-- TODO
+end
+
+function CodeBlock:CloneMyself()
+	local actor = self:CreateActor();
+	if(actor) then
+		self:FireEvent("onCloneActor", actor);
+	end
+end
+
+function CodeBlock:DeleteActor(actor)
+	if(actor and self.actors:contains(actor)) then
+		actor:OnRemove();
+		actor:Destroy();
+		self.actors:remove(actor);
+	end
+end
+
+-- blink the created actor 
+function CodeBlock:HighlightActors()
+	if(self.actors:last()) then
+		for i = 1, math.min(10, #self.actors) do
+			local actor = self.actors[i];
+			actor:SetHighlight(true);
+			commonlib.TimerManager.SetTimeout(function()  
+				actor:SetHighlight(false);
+			end, 1000 + i*100);
+		end
+	end
 end

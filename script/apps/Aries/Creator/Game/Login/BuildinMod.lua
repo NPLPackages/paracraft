@@ -28,9 +28,9 @@ BuildinMod.buildin_mods = {
 		name = "NPLCAD", 
 		--package_path = "npl_packages/NPLCAD/", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 
-		displayName = L"NPL CAD编程建模", 
+		displayName = L"NPL CAD", 
 		text=L"系统内置插件",
-		version = "4.6",
+		version = "1.4.6",
 		homepage = "https://github.com/tatfook/NPLCAD",
 	},
 	{

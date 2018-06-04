@@ -20,6 +20,7 @@ Commands["sendevent"] = {
 @param entityname: if not specified, it means a global event, which is handled by home point entity. 
 @param cmd_text: additional parameter saved to event.cmd_text. 
 Examples:
+/sendevent start 
 /sendevent HelloEvent 
 /sendevent @test HelloEvent {data=1}
 ]], 

@@ -1073,6 +1073,15 @@ function Entity:GetFacing()
 	return self.facing or 0;
 end
 
+function Entity:SetHighlight(bHighlight)
+	local obj = self:GetInnerObject();
+	if(bHighlight) then
+		ParaSelection.SetMaxItemNumberInGroup(2,10);
+		ParaSelection.AddObject(obj, 2);
+	else
+		ParaSelection.RemoveObject(obj);
+	end
+end
 
 function Entity:PlaySound(sound_name)
 end
