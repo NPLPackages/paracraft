@@ -84,8 +84,11 @@ function CodeEvent:SetCanFireCallback(callbackFunc)
 end
 
 
-function CodeEvent:FireForActor(actor, msg)
+function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
 	if(not self:CanFire(actor, msg)) then
+		if(onFinishedCallback) then
+			onFinishedCallback();
+		end
 		return
 	end
 	self:StopLastEvent(actor);
@@ -93,20 +96,34 @@ function CodeEvent:FireForActor(actor, msg)
 	co:SetActor(actor);
 	co:SetFunction(self.callbackFunc);
 	self:SetCodeEvent(actor, co);
-	co:Run(msg);	
+	co:Run(msg, onFinishedCallback);	
 end
 
-function CodeEvent:Fire(msg)
+function CodeEvent:Fire(msg, onFinishedCallback)
 	if(not self.isFireForAll) then
-		self:FireForActor(self.actor, msg);
+		self:FireForActor(self.actor, msg, onFinishedCallback);
 	else
 		local actors = self:GetCodeBlock():GetActors();
 		if(actors and #actors>0) then
-			for i, actor in ipairs(self:GetCodeBlock():GetActors()) do
-				self:FireForActor(actor, msg);
+			if(onFinishedCallback) then
+				local finishedCount = 0;
+				local oldFinishedCallback = onFinishedCallback;
+				onFinishedCallback = function()
+					finishedCount = finishedCount + 1;
+					if(finishedCount == #actors) then
+						oldFinishedCallback();
+					end
+				end
+			end				
+			
+			for i=1, #actors do
+				local actor = actors[i];
+				if(actor) then
+					self:FireForActor(actor, msg, onFinishedCallback);
+				end
 			end
 		else
-			self:FireForActor(self.actor, msg);
+			self:FireForActor(self.actor, msg, onFinishedCallback);
 		end
 	end
 end

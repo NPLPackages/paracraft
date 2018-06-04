@@ -362,8 +362,8 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	local event = self:CreateEvent("onText"..text);
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
-	local function onEvent_()
-		event:Fire();
+	local function onEvent_(_, msg)
+		event:Fire(nil, msg and msg.onFinishedCallback);
 	end
 	event:Connect("beforeDestroyed", function()
 		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
@@ -371,19 +371,16 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
 end
 
-function CodeBlock:BroadcastTextEvent(text)
+-- @param onFinishedCallback: can be nil
+function CodeBlock:BroadcastTextEvent(text, onFinishedCallback)
 	if(type(text) == "string") then
-		GameLogic.GetCodeGlobal():BroadcastTextEvent(text);
+		GameLogic.GetCodeGlobal():BroadcastTextEvent(text, onFinishedCallback);
 	end
 end
 
 function CodeBlock:RegisterCloneActorEvent(callbackFunc)
 	local event = self:CreateEvent("onCloneActor");
 	event:SetFunction(callbackFunc);
-end
-
-function CodeBlock:BroadcastAndWaitTextEvent(text, callbackFunc, ...)
-	
 end
 
 -- create a clone of some code block's actor

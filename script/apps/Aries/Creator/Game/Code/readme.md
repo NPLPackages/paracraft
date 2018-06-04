@@ -324,3 +324,41 @@ say("click me!")
 walk(1,0);
 clone();
 ```
+
+### test Broadcast And Wait Event
+```
+registerBroadcastEvent("jump", function()
+	move(0,1,0)
+	wait(1)
+	move(0,-1,0)
+end)
+
+registerClickEvent(function()
+	broadcastAndWait("jump")
+	say("That was fun!", 2);
+end)
+
+say("click to jump!")
+```
+Another actor
+```
+registerBroadcastEvent("jump", function()
+	move(0,2,0)
+	wait(1.5)
+	move(0,-2,0)
+end)
+```
+
+### test scaling Event
+```
+registerClickEvent(function()
+	for i=1, 20 do
+		scale(10);
+	end
+	for i=1, 20 do
+		scale(-10);
+	end
+end)
+say("click me to scale!")
+scaleTo(200);
+```

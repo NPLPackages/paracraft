@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-05-29 15:43+0800\n"
+"POT-Creation-Date: 2018-06-04 11:59+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -657,7 +657,7 @@ msgstr ""
 "of this template"
 
 #: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.lua:246
-#: script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua:754
+#: script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua:752
 msgid "全局模板"
 msgstr "Global template"
 
@@ -679,11 +679,6 @@ msgstr "World templates"
 #: script/mobile/paracraft/GUI/HelpPage.lua:28
 msgid "新手教程"
 msgstr "Tutorials"
-
-#: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.lua:321
-#: script/mobile/paracraft/GUI/HelpPage.lua:29
-msgid "建筑百科"
-msgstr "Block wiki"
 
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:32
 #: script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua:153
@@ -754,6 +749,7 @@ msgstr "bag"
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:322
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:37
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:17
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html:11
 #: script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html:34
 #: script/apps/Aries/Creator/Game/GUI/CheckpointListPage.html:34
 #: script/apps/Aries/Creator/Game/GUI/CreateNewItem.html:33
@@ -929,7 +925,7 @@ msgstr "MOD/plugin  ..."
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:148
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:299
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:36
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:408
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:392
 #: script/mobile/paracraft/GUI/HelpPage.html:416
 msgid "帮助"
 msgstr "Help"
@@ -1056,7 +1052,7 @@ msgstr ""
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:39
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:84
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:46
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:47
 msgid "分辨率"
 msgstr "resolution"
 
@@ -1102,7 +1098,7 @@ msgstr "hide player"
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:49
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.html:158
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:156
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:93
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:94
 msgid "真实光影"
 msgstr "shader effect"
 
@@ -1236,6 +1232,7 @@ msgid "视频"
 msgstr "video"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:96
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:23
 msgid "控制"
 msgstr "control"
 
@@ -1373,7 +1370,7 @@ msgstr "%s mins"
 msgid "命令 /%s"
 msgstr "Command /%s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:106
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:111
 #, lua-format
 msgid ""
 "编译错误: %s\n"
@@ -1382,11 +1379,19 @@ msgstr ""
 "Compile error: %s \n"
 "in %s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:109
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:114
 msgid "编译成功!"
 msgstr "Compile succeed!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:270
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:219
+msgid ""
+"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码"
+"控制演员了!"
+msgstr ""
+"No movie block found! Please put a movie block containing actors next to the "
+"Code block, you can then control the actor with code!"
+
+#: script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua:157
 #, lua-format
 msgid ""
 "运行时错误: %s\n"
@@ -1395,13 +1400,41 @@ msgstr ""
 "Runtime Error:%s\n"
 "in %s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:187
-msgid ""
-"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码"
-"控制演员了!"
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:20
+msgid "运动"
+msgstr "Motion"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:21
+msgid "事件"
+msgstr "Events"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:22
+msgid "外观"
+msgstr "Looks"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:24
+msgid "声音"
+msgstr "Sound"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:25
+msgid "感知"
+msgstr "Sensing"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:26
+msgid "运算"
+msgstr "Operators"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:27
+msgid "数据"
+msgstr "Data"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:33
+msgid "say %1 for %2 secs"
 msgstr ""
-"No movie block found! Please put a movie block containing actors next to the "
-"Code block, you can then control the actor with code!"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:38
+msgid "hello!"
+msgstr ""
 
 #: script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua:595
 msgid "只能给特殊的ColorBlock上色"
@@ -3965,7 +3998,7 @@ msgstr "Ctrl+Right click on bone block to edit"
 msgid "输入摄影机的名字"
 msgstr "Enter camera name"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:135
+#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:140
 msgid "输入代码"
 msgstr "Enter your code"
 
@@ -4049,7 +4082,7 @@ msgstr "Name can not be more than 16 characters, please re-enter"
 #: script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua:263
 #: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:150
 #: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:174
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:374
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:375
 msgid "选择模型文件"
 msgstr "Select the model file"
 
@@ -4225,8 +4258,8 @@ msgid "系统内置插件"
 msgstr "system internal plugin"
 
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:31
-msgid "NPL CAD编程建模"
-msgstr "NPL CAD programming"
+msgid "NPL CAD"
+msgstr "NPL CAD"
 
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:40
 msgid "STL 3D打印模型导出"
@@ -4541,22 +4574,22 @@ msgstr ""
 "eye_rot_y"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:429
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:514
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:515
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:312
 #, lua-format
 msgid "起始时间%s, 请输入位置x,y,z:"
 msgstr "Start time %s, please enter x,y,z:"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:451
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:492
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:577
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:493
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:578
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:290
 #, lua-format
 msgid "起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>"
 msgstr "Start time %s,  please enter roll, pitch, yaw (-1.57, 1.57)<br/>"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:473
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:416
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:417
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:191
 #, lua-format
 msgid "起始时间%s, 请输入放大系数(默认1)"
@@ -4604,65 +4637,65 @@ msgstr "no file found in current world directory: %s"
 msgid "声音文件"
 msgstr "Audio file"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:340
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:341
 #, lua-format
 msgid "起始时间%s, 请输入动画ID或名称:"
 msgstr "Start time %s, please enter animation ID or name:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:358
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:359
 #, lua-format
 msgid "起始时间%s, 请输入模型路经或名称(默认default)"
 msgstr ""
 "Start time %s, please enter model path or name (default name is default)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:377
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:378
 #, lua-format
 msgid "起始时间%s, 请输入手持物品ID(空为0)"
 msgstr "Start time %s, please enter handheld item ID (0 for empty)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:393
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:394
 #, lua-format
 msgid "起始时间%s, 请输入皮肤ID或名称"
 msgstr "Start time %s, please enter skin ID or name"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:413
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:414
 msgid "贴图文件"
 msgstr "Texture file"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:432
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:433
 #, lua-format
 msgid "起始时间%s, 请输入透明度[0,1](默认1)"
 msgstr "Start time %s, please enter opacity [0,1] (default to 1)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:450
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:451
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:259
 #, lua-format
 msgid "起始时间%s, 请输入转身的角度(-3.14, 3.14)"
 msgstr "Start time %s, please enter body facing angle between (-3.14, 3.14)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:452
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:453
 #, lua-format
 msgid "起始时间%s, 请输入头部上下运动的角度(-1.57, 1.57)"
 msgstr "Start time %s, please enter head up/down angle (-1.57, 1.57)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:454
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:455
 #, lua-format
 msgid "起始时间%s, 请输入头部左右运动的角度(-1.57, 1.57)"
 msgstr "Start time %s, please enter head left/right turning angle(-1.57, 1.57)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:471
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:472
 #, lua-format
 msgid "起始时间%s, 请输入头部角度(-1.57, 1.57)<br/>左右角度, 上下角度:"
 msgstr ""
 "Start time %s, please enter head angle (-1.57, 1.57)<br/>left/right angle, "
 "up/down angle:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:536
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:537
 #, lua-format
 msgid "起始时间%s, 请输入重力加速度(默认18.36)"
 msgstr "Start time %s, please enter gravity (default to 18.36)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:552
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:553
 #, lua-format
 msgid "起始时间%s, 请输入运动速度系数(默认1)"
 msgstr "Start time %s, please enter speed factor (default to 1)"
@@ -5058,10 +5091,6 @@ msgstr "Please select blocks first,  Ctrl+left-clicks to select"
 msgid "请输入bmax文件名称"
 msgstr "Please enter bmax file name"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:29
-msgid "方块百科"
-msgstr "block wiki"
-
 #: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:30
 #: script/mobile/paracraft/GUI/HelpPage.lua:30
 msgid "命令帮助"
@@ -5071,11 +5100,11 @@ msgstr "Command Help"
 msgid "快捷操作"
 msgstr "Shortcut key"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:219
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:222
 msgid "动作编号"
 msgstr "Action Number"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:221
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:224
 msgid "全部"
 msgstr "All"
 
@@ -5424,7 +5453,7 @@ msgstr "back"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/LoginMain.html:266
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:273
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:326
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:128
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:132
 #: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html:39
 #: script/apps/Aries/Creator/Game/Tasks/SelectModelTask.html:41
 #: script/mobile/paracraft/Login/LocalLoadWorld.html:86
@@ -5612,7 +5641,7 @@ msgstr "take snapshort again"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/login/WorldExitDialog.html:59
 #: script/apps/Aries/Creator/Game/Areas/EscFramePage.html:158
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:98
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:99
 msgid "点击打开所在目录"
 msgstr "Click to open containing directory..."
 
@@ -5664,9 +5693,9 @@ msgstr "Exit now"
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:51
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:60
 #: script/apps/Aries/Creator/Game/Login/DonatePage.html:49
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:162
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:166
 #: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:41
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:106
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:107
 #: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:200
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:51
 #: script/apps/Aries/Creator/Game/Tasks/ExportTask.html:34
@@ -5964,22 +5993,22 @@ msgid "发送"
 msgstr "send"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:49
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:365
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:349
 msgid "命令参数"
 msgstr "Cmd params"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:62
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:378
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:362
 msgid "命令描述"
 msgstr "Cmd description"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:64
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:380
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:364
 msgid "命令实例"
 msgstr "Cmd example"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:80
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:396
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:380
 #: script/mobile/paracraft/GUI/HelpPage.html:404
 msgid "没有相应的命令存在"
 msgstr "No commands exist"
@@ -6268,7 +6297,7 @@ msgstr "no users"
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:301
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:348
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:470
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:500
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:484
 #: script/mobile/paracraft/GUI/HelpPage.html:503
 msgid "请稍等 ... "
 msgstr "please wait..."
@@ -6323,11 +6352,11 @@ msgstr "description"
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html:48
 #: script/apps/Aries/Creator/Game/Login/DonatePage.html:34
 #: script/apps/Aries/Creator/Game/Login/DonatePage.html:48
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:161
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:165
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:89
 #: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html:108
 #: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:39
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:105
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:106
 #: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:199
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:50
 #: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:74
@@ -6338,7 +6367,7 @@ msgid "确定"
 msgstr "OK"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:104
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:55
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:56
 msgid "立体输出"
 msgstr "stereo output"
 
@@ -6361,7 +6390,7 @@ msgstr "UI scaling"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:182
 #: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html:106
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:103
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:104
 #: script/apps/Aries/Creator/Game/Neuron/EditNeuronBlockPage.html:30
 #: script/mobile/paracraft/Areas/GameSettingPage.html:56
 msgid "重置"
@@ -6391,7 +6420,13 @@ msgstr "Compile and run"
 msgid "暂停"
 msgstr "Pause"
 
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:15
+msgid "左键高亮角色, 右键编辑电影方块"
+msgstr ""
+"Left-click to highlight the character, right-click to edit the movie block"
+
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:20
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html:14
 #: script/apps/Aries/Creator/Game/GUI/EditEntityPage.html:81
 msgid "点击这里输入..."
 msgstr "Click here to input..."
@@ -6602,9 +6637,9 @@ msgstr "random terrain"
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:147
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:356
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:432
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:349
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:404
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:496
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:333
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:388
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:480
 #: script/mobile/paracraft/GUI/HelpPage.html:499
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:59
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:114
@@ -6718,65 +6753,69 @@ msgstr "Donate Us !"
 msgid "点击任意位置继续"
 msgstr "Click anywhere to continue"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:72
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:27
+msgid "已存在更高版本或系统版本"
+msgstr "There is already a system or higher version"
+
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:76
 #, lua-format
 msgid "你确定要删除:%s?"
 msgstr "are you sure to delete:%s?"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:82
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:86
 msgid "MOD加载"
 msgstr "load mod/plugins ..."
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:86
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:90
 msgid "开发者版本"
 msgstr "developer version"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:90
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:94
 msgid "安装新插件"
 msgstr "install new plugin"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:91
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:95
 msgid "下载SDK"
 msgstr "Get SDK"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:93
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:97
 msgid "打开目录"
 msgstr "Open folder"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:93
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:97
 msgid "点击打开Mod所在文件夹"
 msgstr "click to open mod/plugin directory"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:97
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:101
 msgid "请确保mod文件中包含正确编写脚本,否则可能会导致不可预期结果"
 msgstr ""
 "Please make sure mod/plugin files contain correct script, or it may lead to "
 "unexpected result"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:109
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:113
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:59
 msgid "加载"
 msgstr "load"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:114
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:118
 msgid "禁用"
 msgstr "disabled"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:122
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:126
 msgid "系统"
 msgstr "system"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:131
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:135
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:209
 msgid "官网"
 msgstr "Official Site"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:131
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:135
 msgid "更新"
 msgstr "update"
 
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:153
-#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:156
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:157
+#: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:160
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:104
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:107
 msgid "无Mod"
@@ -6885,7 +6924,7 @@ msgid "在这里输入字幕"
 msgstr "Enter subtitle here"
 
 #: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html:106
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:103
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:104
 msgid "使用默认值"
 msgstr "use default value"
 
@@ -6966,7 +7005,7 @@ msgid "到结束"
 msgstr "to end"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:97
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:98
 #: script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html:13
 msgid "点击切换"
 msgstr "click to toggle"
@@ -6983,39 +7022,39 @@ msgstr "record video"
 msgid "输出格式"
 msgstr "output format"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:58
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:59
 msgid "码率(清晰度)"
 msgstr "bitrate (video quality)"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:70
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:71
 msgid "帧率(FPS)"
 msgstr "framerate (FPS)"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:81
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:82
 msgid "录制区域边界"
 msgstr "recording boarder"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:91
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:92
 msgid "录制声音"
 msgstr "record sound"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:92
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:93
 msgid "显示水印"
 msgstr "show watermark"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:97
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:98
 msgid "材质包: "
 msgstr "texture pack:"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:98
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:99
 msgid "输出文件名: "
 msgstr "output filename:"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:99
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:100
 msgid "修改输出目录"
 msgstr "change output directory"
 
-#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:104
+#: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:105
 msgid "3秒后开始"
 msgstr "begins in 3 seconds"
 
@@ -7142,12 +7181,12 @@ msgid "点击创建新模板种类"
 msgstr "Click to create a new template category"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:319
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:546
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:530
 msgid "上一页"
 msgstr "Previous page"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:320
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:547
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:531
 msgid "下一页"
 msgstr "Next page"
 
@@ -7166,12 +7205,12 @@ msgid "修改描述"
 msgstr "Change description"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:455
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:526
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:510
 msgid "所需资源"
 msgstr "Resource requirements"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:467
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:538
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:522
 msgid "该主题当前没有任务"
 msgstr "no task for current topic"
 
@@ -7226,7 +7265,7 @@ msgstr "Select the file type you want to export"
 msgid "当前选项无模板"
 msgstr "No template for current category"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:541
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:525
 msgid "请稍等 ..."
 msgstr "Please wait..."
 
@@ -7655,3 +7694,11 @@ msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
 
+#~ msgid "建筑百科"
+#~ msgstr "Block wiki"
+
+#~ msgid "NPL CAD编程建模"
+#~ msgstr "NPL CAD programming"
+
+#~ msgid "方块百科"
+#~ msgstr "block wiki"

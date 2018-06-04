@@ -130,10 +130,24 @@ function CodeGlobals:BroadcastKeyPressedEvent(keyname)
 	end
 end
 
-function CodeGlobals:BroadcastTextEvent(text)
+function CodeGlobals:BroadcastTextEvent(text, onFinishedCallback)
 	local event = self:GetTextEvent(text);
 	if(event) then
-		event:DispatchEvent({type="msg"});
+		if(onFinishedCallback) then
+			local nHandlerCount = event:GetEventHandlerCount("msg");
+			if(nHandlerCount > 1) then
+				local oldCallback = onFinishedCallback;
+			
+				local nCount = 0;
+				onFinishedCallback = function()
+					nCount = nCount + 1;
+					if(nHandlerCount == nCount) then
+						oldCallback();
+					end
+				end;
+			end
+		end
+		event:DispatchEvent({type="msg", onFinishedCallback=onFinishedCallback});
 	end
 end
 

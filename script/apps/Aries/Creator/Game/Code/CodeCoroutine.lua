@@ -106,7 +106,9 @@ function CodeCoroutine:GetStatus()
 	return self.co and coroutine.status(self.co);
 end
 
+-- when stopped, it can no longer be resumed
 function CodeCoroutine:Stop()
+	self.isStopped = true;
 	-- we need to stop the last coroutine timers, before starting a new one. 
 	self:KillAllTimers();
 end
@@ -125,12 +127,15 @@ function CodeCoroutine:RestoreContext(context)
 end
 
 -- Run the same coroutine multiple times will cause the previous one to stop forever.
-function CodeCoroutine:Run(msg)
+function CodeCoroutine:Run(msg, onFinishedCallback)
 	self:Stop();
-	
+	self.isStopped = false;
 	if(self.code_func) then
 		self.co = coroutine.create(function()
 			self:RunImp(msg);
+			if(onFinishedCallback) then
+				onFinishedCallback();
+			end
 			return nil, "finished";
 		end)
 		local last_context = self:SaveCurrentContext();
@@ -148,22 +153,15 @@ function CodeCoroutine:RunImp(msg)
 
 		if(not ok) then
 			LOG.std(nil, "error", "CodeCoroutine", result);
-			if(not code_env.is_exit_call) then
-				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
-				self:GetCodeBlock():send_message(msg);
-			else
-				if(code_env.exit_msg) then
-					self:GetCodeBlock():send_message(tostring(code_env.exit_msg));
-				end
-				code_env.is_exit_call = nil;
-			end
+			local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
+			self:GetCodeBlock():send_message(msg);
 		end		
 		return result;
 	end
 end
 
 function CodeCoroutine:Resume(err, msg)
-	if(self.co) then
+	if(self.co and not self.isStopped) then
 		return coroutine.resume(self.co, err, msg);
 	end
 end

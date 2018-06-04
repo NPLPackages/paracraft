@@ -20,6 +20,8 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
+Entity:Signal("beforeRemoved")
+
 -- class name
 Entity.class_name = "EntityCode";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
@@ -31,10 +33,12 @@ function Entity:ctor()
 end
 
 function Entity:Destroy()
+	self:OnRemoved();
 	Entity._super.Destroy(self);
 end
 
 function Entity:OnRemoved()
+	self:beforeRemoved();
 	if(self.codeBlock) then
 		self.codeBlock:Destroy();
 		self.codeBlock = nil;
@@ -51,6 +55,7 @@ function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
+	return node;
 end
 
 function Entity:LoadFromXMLNode(node)
