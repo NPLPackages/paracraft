@@ -29,6 +29,9 @@ Entity.is_persistent = true;
 -- always serialize to 512*512 regional entity file
 Entity.is_regional = true;
 
+-- we will only allow this number of connected code block to share the same movie entity
+local maxConnectedCodeBlockCount = 255;
+
 function Entity:ctor()
 end
 
@@ -76,8 +79,12 @@ end
 
 -- Ticks the block if it's been scheduled
 function Entity:updateTick(x,y,z)
-	local isPowered = BlockEngine:isBlockIndirectlyGettingPowered(x,y,z);
+	local isPowered = BlockEngine:GetBlockData(x,y,z) > 0;
 	self:SetPowered(isPowered);	
+end
+
+function Entity:IsPowered()
+	return self.isPowered;
 end
 
 -- turn code on and off
@@ -85,15 +92,14 @@ function Entity:SetPowered(isPowered)
 	if(self.isPowered and not isPowered) then
 		self.isPowered = isPowered;
 		local codeBlock = self:GetCodeBlock()
-		if(codeBlock) then
-			codeBlock:Unload();
+		if(codeBlock and codeBlock:IsLoaded()) then
+			self:Stop();
 		end
 	elseif(not self.isPowered and isPowered) then
 		self.isPowered = isPowered;
 		local codeBlock = self:GetCodeBlock(true)
-		if(codeBlock) then
-			codeBlock:CompileCode(self:GetCommand());
-			codeBlock:Run();
+		if(codeBlock and not codeBlock:IsLoaded()) then
+			self:Restart();
 		end
 	end
 end
@@ -101,21 +107,83 @@ end
 function Entity:Refresh()
 	local codeBlock = self:GetCodeBlock()
 	if(codeBlock) then
-		codeBlock:CompileCode(self:GetCommand());
-		if(self.isPowered) then
-			codeBlock:Run();
+		if(self.isPowered and not codeBlock:IsLoaded()) then
+			self:Restart();
+		elseif(not self.isPowered and codeBlock:IsLoaded()) then
+			self:Stop();
 		end
 	end
 end
 
-function Entity:FindMovieBlockEntity()
-	BlockEngine:GetBlockId(self.bx, self.by, self.bz)
+-- only search in 4 horizontal directions for a maximum distance of 16
+-- find nearby movie entity, multiple code block next to each other can share the same movie block.
+function Entity:FindNearByMovieEntity()
+	local movieEntity = self:GetNearByMovieEntity();
+	if(not movieEntity) then
+		local cx, cy, cz = self.bx, self.by, self.bz;
+		local id = self:GetBlockId();
+		local blocks;
+		local totalCodeBlockCount = 0;
+		for side = 0, 3 do
+			local dx, dy, dz = Direction.GetOffsetBySide(side);
+			local x,y,z = cx+dx, cy+dy, cz+dz;
+			local blockTemplate = BlockEngine:GetBlock(x,y,z);
+			if(blockTemplate and blockTemplate.id == id) then
+				local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+				if(codeEntity) then
+					local idx = BlockEngine:GetSparseIndex(x,y,z);
+					blocks = blocks or {};
+					blocks[#blocks+1] = idx;
+					totalCodeBlockCount = totalCodeBlockCount + 1;
+				end
+			end
+		end
+		if(blocks) then
+			local entity_map = {};
+			entity_map[BlockEngine:GetSparseIndex(cx,cy,cz)] = true;
+			movieEntity = self:FindNearByMovieEntityImp(blocks, 1, entity_map, totalCodeBlockCount);
+		end
+	end
+	return movieEntity;
 end
 
+-- return movieEntity, distance
+function Entity:FindNearByMovieEntityImp(blocks, distance, entity_map, totalCodeBlockCount)
+	local id = self:GetBlockId();
+	local new_blocks;
+	for _, idx in ipairs(blocks) do
+		local cx, cy, cz = BlockEngine:FromSparseIndex(idx);
+		local movieEntity = self:GetNearByMovieEntity(cx, cy, cz);
+		if(movieEntity) then
+			return movieEntity, distance;
+		end
+		if(distance < 16) then
+			for side = 0, 3 do
+				local dx, dy, dz = Direction.GetOffsetBySide(side);
+				local x,y,z = cx+dx, cy+dy, cz+dz;
 
-function Entity:FindNearByMovieEntity()
-	local cx, cy, cz = self.bx, self.by, self.bz;
-	for side = 0, 5 do
+				local blockTemplate = BlockEngine:GetBlock(x,y,z);
+				if(blockTemplate and blockTemplate.id == id) then
+					local idx = BlockEngine:GetSparseIndex(x,y,z);
+					if(not entity_map[idx] and totalCodeBlockCount<maxConnectedCodeBlockCount) then
+						entity_map[idx] = true;
+						new_blocks = new_blocks or {};
+						new_blocks[#new_blocks+1] = idx;
+						totalCodeBlockCount = totalCodeBlockCount + 1;
+					end
+				end
+			end
+		end
+	end
+	if(new_blocks) then
+		return self:FindNearByMovieEntityImp(new_blocks, distance+1, entity_map, totalCodeBlockCount);
+	end
+end
+
+-- only search in 4 horizontal directions
+function Entity:GetNearByMovieEntity(cx, cy, cz)
+	cx, cy, cz = cx or self.bx, cy or self.by, cz or self.bz;
+	for side = 0, 3 do
 		local dx, dy, dz = Direction.GetOffsetBySide(side);
 		local x,y,z = cx+dx, cy+dy, cz+dz;
 		local blockTemplate = BlockEngine:GetBlock(x,y,z);
@@ -175,4 +243,141 @@ function Entity:OpenEditor(editor_name, entity)
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
     CodeBlockWindow.Show(true);
 	CodeBlockWindow.SetCodeEntity(self);
+end
+
+-- get all nearby code entities that should be started as a group, include current one.
+-- @return {idx to true} map
+function Entity:GetAllNearbyCodeEntities()
+	local id = self:GetBlockId();
+	local x, y, z = self.bx, self.by, self.bz;
+	local blockTemplate = BlockEngine:GetBlock(x,y,z);
+	if(blockTemplate and blockTemplate.id == id) then
+		local blocks = {};
+		local entity_map = {};
+		local idx = BlockEngine:GetSparseIndex(x,y,z);
+		blocks[#blocks+1] = idx;
+		entity_map[idx] = true;
+		local all_blocks = {idx};
+		return self:GetAllNearbyCodeEntitiesImp(blocks, entity_map, all_blocks, 1, 1)
+	end
+end
+
+-- get all nearby code entities that should be started as a group, include current one.
+-- @return array of idx from close to far
+function Entity:GetAllNearbyCodeEntitiesImp(blocks, entity_map, all_blocks, distance, totalCodeBlockCount)
+	local id = self:GetBlockId();
+	if(distance>=16) then
+		return entity_map;
+	end
+	local new_blocks;
+	for _, idx in pairs(blocks) do
+		local cx, cy, cz = BlockEngine:FromSparseIndex(idx);
+		for side = 0, 3 do
+			local dx, dy, dz = Direction.GetOffsetBySide(side);
+			local x,y,z = cx+dx, cy+dy, cz+dz;
+
+			local blockTemplate = BlockEngine:GetBlock(x,y,z);
+			if(blockTemplate and blockTemplate.id == id) then
+				local idx = BlockEngine:GetSparseIndex(x,y,z);
+				if(not entity_map[idx] and totalCodeBlockCount<maxConnectedCodeBlockCount) then
+					new_blocks = new_blocks or {};
+					new_blocks[#new_blocks+1] = idx;
+					entity_map[idx] = true;
+					all_blocks[#all_blocks+1] = idx;
+					totalCodeBlockCount = totalCodeBlockCount + 1;
+				end
+			end
+		end
+	end
+	if(new_blocks) then
+		self:GetAllNearbyCodeEntitiesImp(new_blocks, entity_map, all_blocks, distance+1, totalCodeBlockCount);
+	end
+	return all_blocks;
+end
+
+-- breadth first traversing.
+-- @param callbackFunc: function if return true, it will stop iteration.
+function Entity:ForEachNearbyCodeEntity(callbackFunc)
+	local blocks = self:GetAllNearbyCodeEntities()
+	if(blocks) then
+		local id = self:GetBlockId();
+		for _, idx in ipairs(blocks) do
+			local x, y, z = BlockEngine:FromSparseIndex(idx);
+			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+			if(codeEntity and codeEntity:GetBlockId() == id) then
+				if(callbackFunc(codeEntity)) then
+					break;
+				end
+			end
+		end
+	end
+end
+
+-- run regardless of whether it is powered. 
+function Entity:Restart()
+	self:Stop();
+
+	local blocks = self:GetAllNearbyCodeEntities()
+	if(blocks) then
+		function restartCodeEntity_(codeEntity)
+			local codeBlock = codeEntity:GetCodeBlock(true)
+			if(codeBlock) then
+				codeBlock:Run();
+			end
+		end
+		local id = self:GetBlockId();
+		local blocks2;
+		for _, idx in ipairs(blocks) do
+			local x, y, z = BlockEngine:FromSparseIndex(idx);
+			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+			if(codeEntity and codeEntity:GetBlockId() == id) then
+				-- blocks that are directly connected to a movie entity are restarted first.
+				if(codeEntity:GetNearByMovieEntity(x, y, z)) then
+					restartCodeEntity_(codeEntity);
+				else
+					blocks2 = blocks2 or {};
+					blocks2[#blocks2+1] = idx;
+				end
+			end
+		end
+		if(blocks2) then
+			for _, idx in ipairs(blocks2) do
+				local x, y, z = BlockEngine:FromSparseIndex(idx);
+				local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+				if(codeEntity and codeEntity:GetBlockId() == id) then
+					restartCodeEntity_(codeEntity);
+				end
+			end
+		end
+	end
+end
+
+-- stop regardless of whether it is powered. 
+function Entity:Stop()
+	self:ForEachNearbyCodeEntity(function(codeEntity)
+		local codeBlock = codeEntity:GetCodeBlock()
+		if(codeBlock) then
+			codeBlock:Stop();
+		end
+	end);
+end
+
+function Entity:AutoCreateMovieEntity()
+	local movieEntity = self:FindNearByMovieEntity();
+	if(not movieEntity) then
+		local cx, cy, cz = self:GetBlockPos();
+		for side = 3, 0, -1 do
+			local dx, dy, dz = Direction.GetOffsetBySide(side);
+			local x,y,z = cx+dx, cy+dy, cz+dz;
+			local blockTemplate = BlockEngine:GetBlock(x,y,z);
+			if(not blockTemplate) then
+				BlockEngine:SetBlock(x,y,z, names.MovieClip, 0, 3, nil);
+				local movieEntity = BlockEngine:GetBlockEntity(x,y,z);
+				if(movieEntity) then
+					movieEntity:CreateNPC();
+				end
+				return true;
+			end
+		end
+	end
 end

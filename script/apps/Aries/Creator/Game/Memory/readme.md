@@ -39,7 +39,8 @@
 
 
 ## Code Architecture
-MemoryContext can be assigned to a player entity to provide memory based actions.
+MemoryContext is the entry point for an AI brain. It can be assigned to a player entity to provide memory based actions.
+
 This is like the AI brain of the player entity. 
 All long term Memory is stored in memory clips inside memory context. 
 Memory clips can be played in parallel but always in one direction.
@@ -55,6 +56,9 @@ PlayerContext manages major sensor input origin of the current player entity tha
 One major component of player context is the VisionContext of the player entity. 
 The vision context generates Attention Objects for nearby observed objects in the virtual world. 
 Attention Objects are automatically created and expired according to eye position of the player entity.
+Two points of attentions are honored, one is the mouse cursor, the other is the block close to the player.
 
 MemoryContext uses Attention Objects to activate the proper memory clip plus a number of other complex rules. 
+
+## The Theory 
 

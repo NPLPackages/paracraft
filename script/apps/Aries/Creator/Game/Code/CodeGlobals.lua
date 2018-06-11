@@ -14,6 +14,8 @@ GameLogic.GetCodeGlobal():CreateGetTextEvent("msgname");
 GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
 
 function CodeGlobals:ctor()
@@ -90,6 +92,34 @@ function CodeGlobals:Reset()
 	self.curMetaTable = meta_table;
 
 	self.text_events = {};
+
+	self.actors = {};
+end
+
+function CodeGlobals:AddActor(actor)
+	self.actors[actor:GetName() or ""] = actor;
+	actor:Connect("beforeRemoved", self, self.RemoveActor);
+end
+
+function CodeGlobals:RemoveActor(actor)
+	if(self.actors[actor:GetName() or ""] == actor) then
+		self.actors[actor:GetName() or ""] = nil;
+	end
+end
+
+-- return the last added actor by name
+function CodeGlobals:GetActorByName(name)
+	return self.actors[name];
+end
+
+-- @param name: actor name or "@p" for current player
+function CodeGlobals:FindEntityByName(name)
+	local actor2 = self:GetActorByName(name);
+	if(actor2) then
+		return actor2:GetEntity();
+	elseif(name=="@p") then
+		return EntityManager.GetPlayer();
+	end
 end
 
 -- all user defined variables that is shared by all blocks in the current world
@@ -185,4 +215,21 @@ end
 
 function CodeGlobals:GetGlobal(name)
 	return name and self:GetCurrentGlobals()[name];
+end
+
+-- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
+-- @return "DIK_A" or nil
+function CodeGlobals:GetKeyNameFromString(name)
+	if(name) then
+		local name2 = "DIK_"..string.upper(name);
+		if(name and DIK_SCANCODE[name2]) then
+			return name2;
+		end
+	end
+end
+
+function CodeGlobals:GetStringFromKeyName(name)
+	if(name) then
+		return string.lower(name:gsub("^(DIK_)" ,""));
+	end
 end

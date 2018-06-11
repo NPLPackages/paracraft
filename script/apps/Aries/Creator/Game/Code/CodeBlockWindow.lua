@@ -52,7 +52,7 @@ function CodeBlockWindow.Show(bShow)
 		-- TODO: use a scene/ui layout manager here
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
-		self.width = math.floor(Screen:GetWidth() * 1/3);
+		self.width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
 		_this.width = self.width;
 		_this.visible = true;
 		ViewportManager:GetSceneViewport():SetMarginRight(math.floor(self.width * (Screen:GetUIScaling()[2])));
@@ -82,18 +82,31 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		end
 		if(self.entity) then
 			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
+			CodeBlockWindow.UpdateCodeToEntity();
 		end
 		self.entity = entity;
 	end
 
 	local codeBlock = self.GetCodeBlock();
 	if(codeBlock) then
-		self.SetConsoleText(codeBlock:GetLastMessage() or "");
+		local text = codeBlock:GetLastMessage() or "";
+		if(text == "" and not CodeBlockWindow.GetMovieEntity()) then
+			if(self.entity) then
+				if(self.entity:AutoCreateMovieEntity()) then
+					text = L"我们在代码方块旁边自动创建了一个电影方块! 你现在可以用代码控制电影方块中的演员了!";
+				else
+					text = L"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码控制演员了!";
+				end
+			end
+		end
+		self.SetConsoleText(text);
+
 		codeBlock:Connect("message", self, self.OnMessage, "UniqueConnection");
 	end
 	
 	if(page) then
 		page:SetValue("code", self.GetCodeFromEntity() or "");
+		page:SetValue("filename", self.GetFilenameFromEntity() or "");
 	end
 end
 
@@ -104,6 +117,12 @@ end
 function CodeBlockWindow.GetCodeFromEntity()
 	if(self.entity) then
 		return self.entity:GetCommand();
+	end
+end
+
+function CodeBlockWindow.GetFilenameFromEntity()
+	if(self.entity) then
+		return self.entity:GetDisplayName();
 	end
 end
 
@@ -138,6 +157,16 @@ function CodeBlockWindow.Close()
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
 	CodeBlockWindow.HighlightCodeEntity(nil);
+
+	local codeBlock = CodeBlockWindow.GetCodeBlock();
+	if(codeBlock and codeBlock:GetEntity()) then
+		local entity = codeBlock:GetEntity();
+		if(entity:IsPowered() and (not codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
+			entity:Restart();
+		elseif(not entity:IsPowered() and (codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
+			entity:Stop();
+		end
+	end
 end
 
 function CodeBlockWindow.RestoreWindowLayout()
@@ -161,7 +190,7 @@ function CodeBlockWindow.DoTextLineWrap(text)
 	for line in string.gmatch(text or "", "([^\r\n]*)\r?\n?") do
 		while (line) do
 			local remaining_text;
-			line, remaining_text = _guihelper.TrimUtf8TextByWidth(line, self.width or 300);
+			line, remaining_text = _guihelper.TrimUtf8TextByWidth(line, self.width or 300, "System;12;norm");
 			lines[#lines+1] = line;
 			line = remaining_text
 		end
@@ -172,14 +201,15 @@ end
 function CodeBlockWindow.SetConsoleText(text)
 	if(self.console_text ~= text) then
 		self.console_text = text;
+		self.console_text_linewrapped = CodeBlockWindow.DoTextLineWrap(self.console_text) or "";
 		if(page) then
-			page:SetValue("console", CodeBlockWindow.DoTextLineWrap(self.console_text) or "");
+			page:SetValue("console", self.console_text_linewrapped);
 		end
 	end
 end
 
 function CodeBlockWindow.GetConsoleText()
-	return self.console_text;
+	return self.console_text_linewrapped or self.console_text;
 end
 
 function CodeBlockWindow.OnClickStart()
@@ -189,18 +219,23 @@ end
 function CodeBlockWindow.OnClickPause()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then
-		codeBlock:Stop();
+		codeBlock:Pause();
+	end
+end
+
+function CodeBlockWindow.OnClickStop()
+	local codeBlock = CodeBlockWindow.GetCodeBlock();
+	if(codeBlock and codeBlock:GetEntity()) then
+		codeBlock:GetEntity():Stop();
 	end
 end
 
 function CodeBlockWindow.OnClickCompileAndRun()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
-	if(codeBlock) then
+	if(codeBlock and codeBlock:GetEntity()) then
 		CodeBlockWindow.UpdateCodeToEntity();
-
-		codeBlock:CompileCode(codeEntity:GetCommand());
-		codeBlock:Run();
+		codeBlock:GetEntity():Restart();
 	end
 end
 
@@ -217,6 +252,80 @@ function CodeBlockWindow.OnClickOpenMovieBlock()
 		end
 	else
 		_guihelper.MessageBox(L"没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码控制演员了!")
+	end
+end
+
+function CodeBlockWindow.OnChangeFilename()
+	if(self.entity) then
+		if(page) then
+			local filename = page:GetValue("filename");
+			self.entity:SetDisplayName(filename);
+		end
+	end
+end
+
+function CodeBlockWindow.GetFilename()
+	if(self.entity) then
+		return self.entity:GetDisplayName();
+	end
+end
+
+function CodeBlockWindow.RunTempCode(code, filename)
+	local codeBlock = CodeBlockWindow.GetCodeBlock();
+	if(codeBlock) then
+		codeBlock:RunTempCode(code, filename);
+	end
+end
+
+function CodeBlockWindow.ShowHelpWndForCodeName(name)
+	CodeBlockWindow.ShowHelpWnd("script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html?showclose=true&name="..name);
+end
+
+function CodeBlockWindow.ShowHelpWnd(url)
+	if(url and url~="") then
+		self.helpWndUrl = url;
+		self.isShowHelpWnd = true;
+		if(page) then
+			page:SetValue("helpWnd", url);
+			CodeBlockWindow.UpdateCodeToEntity()
+			page:Refresh(0.01);
+		end
+	else
+		self.isShowHelpWnd = false;
+		if(page) then
+			CodeBlockWindow.UpdateCodeToEntity()
+			page:Refresh(0.01);
+		end
+	end
+end
+
+function CodeBlockWindow.GetHelpWndUrl()
+	return self.helpWndUrl;
+end
+
+function CodeBlockWindow.IsShowHelpWnd()
+	return self.isShowHelpWnd;
+end
+
+
+function CodeBlockWindow.OnChangeModel()
+	local codeBlock = CodeBlockWindow.GetCodeBlock()
+	if(codeBlock) then
+		local actor = codeBlock:CreateGetActor();
+		if(not actor) then
+			if(self.entity and self.entity:AutoCreateMovieEntity()) then
+				actor = codeBlock:CreateGetActor();
+			end
+		end
+		if(actor) then
+			actor:SetTime(0);
+			actor:CreateKeyFromUI("assetfile", function(bIsAdded)
+				if(bIsAdded) then
+					-- do something?					
+				end
+				CodeBlockWindow.OnClickCompileAndRun();
+			end);
+		end
 	end
 end
 

@@ -13,6 +13,7 @@ local api = CodeAPI:new(codeBlock, codeActor);
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Events.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
 
 -- all public environment methods. 
 local s_env_methods = {
@@ -21,6 +22,7 @@ local s_env_methods = {
 	"checkyield",
 	"GetEntity",
 	"exit",
+	-- Data
 	"print",
 	"log",
 	"echo",
@@ -29,11 +31,17 @@ local s_env_methods = {
 	"inherit",
 	-- Motion
 	"move",
+	"moveTo",
+	"moveForward",
 	"walk",
-	"goto",
+	"walkForward",
 	"turn",
 	"turnTo",
-	"teleport",
+	"bounce",
+	"getX",
+	"getY",
+	"getZ",
+	"getFacing",
 	-- Looks
 	"say",
 	"show",
@@ -41,24 +49,39 @@ local s_env_methods = {
 	"anim",
 	"play",
 	"playLoop",
+	"stop",
 	"scale",
 	"scaleTo",
+	"getPlayTime",
+	"getScale",
+
 	-- Events
 	"registerClickEvent",
 	"registerKeyPressedEvent",
 	"registerAnimationEvent",
 	
-	"registerStartEvent",
 	"registerBroadcastEvent",
 	"broadcast",
 	"broadcastAndWait",
-
+	
 	-- Control
 	"wait",
-	"stop",
 	"registerCloneEvent",
 	"clone",
 	"delete",
+	"run",
+
+	-- Sensing
+	"isTouching",
+	"distanceTo",
+	"isKeyPressed",
+	"isMouseDown",
+	"ask",
+
+	-- Sound
+	"playNote",
+	"playSound",
+	"playMusic",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
@@ -190,6 +213,3 @@ function env_imp:GetDefaultTick()
 	end
 	return self.default_tick;
 end
-
-
-

@@ -8,6 +8,8 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Events.lua");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
+local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
@@ -21,7 +23,8 @@ end
 -- delete current cloned actor
 function env_imp:delete()
 	if(self.actor) then
-		self.codeblock:DeleteActor(self.actor);
+		self.actor:DeleteThisActor();
+		self.actor = nil;
 	end
 	env_imp.checkyield(self);
 end
@@ -69,5 +72,17 @@ end
 function env_imp:registerAnimationEvent(time, callbackFunc)
 	self.codeblock:RegisterAnimationEvent(time, callbackFunc);
 end
+
+-- run function in a new coroutine
+function env_imp:run(mainFunc)
+	if(type(mainFunc) == "function") then
+		local co = CodeCoroutine:new():Init(self.codeblock);
+		co:SetActor(self.actor);
+		co:SetFunction(mainFunc);
+		co:Run();	
+	end
+end
+
+
 
 

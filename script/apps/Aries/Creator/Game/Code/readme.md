@@ -12,6 +12,8 @@ clip for an actor. Code block exposes a `CodeAPI` that can programmatically cont
 Movie block is a memory unit which is used like a template file to art asset. 
 
 Every CodeBlock can control or clone the character in its adjacent movie block. 
+Multiple code block next to each other can share the same movie block(actor) within 16 blocks.
+
 We can use a wire signal to turn on and off CodeBlock logics, so that we can debug logics inside each CodeBlock. 
 When Code Block is not powered, all related actor entities will be erased, this will allow us to easily reboot 
 Code Block. 
@@ -44,35 +46,20 @@ the actor will be recreated using the actor state at time=0 inside the movie blo
 When the block is not powered or deleted, all actors will be automatically erased. 
 This will allow us to clone and move, turn on and off, or share those code blocks at will. 
 
-When Code block is not connected to a movie block, it will by default control the current player. 
+When Code block is not connected to a movie block, it will control no one. 
 
 Because of the modular nature of Code Block, we can focus working on one code block at a time, and then 
 put all of them together to form a game. 
 
-Basic sandbox functions we will support in v1.0:
-
-- Motion: move, turn , point towards, goto, glide, changePos, setPos,
-- Events: activate, onKeyPressed, onClick, OnEvent, sendEvent, callEvent
-- Looks: say, think, show, shide, setTime, setAnim, setColor, setSize,
-- Control: wait, repeat, forever, if then else, stop, onInit(a clone), delete(this clone), create(clone of something)
-- Sound: play
-- Sensing: touching, distanceTo, askAndWait, answer, isMouseDown, isKeyPressed, getMousePos, timer, resetTimer
-- Operators: + - / * < > = ,and, or, random, not, join, letter of, length of, mod, round, math.XXX
-- Data: setValue, changeValue, showVariable, hideVariable
-- Private Custom Functions: user defined private functions
-
-
 ### About callback and delayed functions 
-Some function has callbacks like onKeyPressed, and some function's execution takes some time before it can return, 
-such as `wait`. To write synchronous code in async environment, we will use run all function and callbacks inside a 
+Some function has callbacks like registerClickEvent, and some function's execution takes some time before it can return, 
+such as `wait`. To write synchronous code in async environment, we will run all function and callbacks inside a 
 coroutine, which belongs to the code block. So it is legal to write any code like below 
 without going into an infinite loop.
 ```
-onKeyPressed("DIK_SPACE", function()
-   for i=1, 10 do
-     self:goto(10,0,10);
-     self:wait(2);
-     self:goto(1,0,0);
+registerClickEvent("space", function()
+   while(true) do
+     move(0.01);
    end
 end)
 
@@ -81,6 +68,8 @@ while(true) do
    wait(2);
 end
 ```
+We will inject checkyield() to all looping and recursive function calls during the compile phase. When a certain instruction count is reached, we will force 
+the coroutine to yield for 1 tick. 
 
 ### Data storage. 
 Each code block has an entity, which has its unique private ENV object for its sandbox API. 
@@ -88,18 +77,6 @@ When code block is deleted, this ENV object is also deleted. When codeblock cont
 the ENV is also recreated. All registered global event, local functions will also be deleted along side the ENV
 Code block communicate with each other only via global event and variables
 
-The actual data stored inside the code block's entity object may looks like:
-
-```
-{ 
-  storage = "[entity|file]",
-  body = [[
-function activate()
-   self:move(0, 0, 10)
-end
-]]
-}
-```
 The code inside code block is saved in Entity XML, not an external file. 
 This is different from codeitem, which uses a real filename on disk. The advantage of saving to EntityXML is:
 
@@ -110,12 +87,13 @@ This is different from codeitem, which uses a real filename on disk. The advanta
 
 ### On Timer
 Do not use system timer, they are not deleted when world exits. Instead we use a local timer that belongs to the code block itself.
+Most actions taken by actors like move() are ticked by at least 1 tick. 
 
 ## Tests
 
 ### Animation Tests
 ```
-teleport(19257,5,19174);
+moveTo(19257,5,19174);
 play(10, 2000); -- play animation between 10-2000
 wait(3)
 walk(1, 0);
@@ -219,7 +197,7 @@ end)
 
 One can start by calling `/sendevent start`
 ```
-registerStartEvent(function()
+registerBroadcastEvent("start", function()
     for i=1, 100 do
         say(tostring(i), 1)
     end
@@ -288,6 +266,17 @@ for i=1, 100 do
 end
 ```
 
+### test move with time
+```
+say("jump and shift")
+while(true) do
+    move(0, 1,0, 0.5);
+	move(0,-1,0, 0.5);
+	move(1,0,0, 0.5);
+	move(-1,0,0, 0.5);
+end
+```
+
 ### test key pressed event
 ```
 registerKeyPressedEvent("z", function(keyname)
@@ -349,7 +338,7 @@ registerBroadcastEvent("jump", function()
 end)
 ```
 
-### test scaling Event
+### test scaling 
 ```
 registerClickEvent(function()
 	for i=1, 20 do
@@ -361,4 +350,129 @@ registerClickEvent(function()
 end)
 say("click me to scale!")
 scaleTo(200);
+```
+
+### test isTouching Event
+a frog that moves back and forth
+```
+local i=0;
+local dist = 20*2
+while(true) do
+    i=i+1
+    if(i<=dist) then
+        move(0.05, 0)
+    elseif(i<=dist*2) then
+        move(-0.05, 0)
+    else
+        i = 0;
+    end
+   if(isTouching("@a")) then
+      say("oops!")
+   else
+      say("")
+   end
+end
+```
+A dog that meet the frog
+```
+while(true) do
+   if(isTouching("frog")) then
+      say("A Frog!");
+   else
+	  say("");
+   end
+   if(isTouching("block")) then
+      turn(180);
+   end
+   moveForward(0.05);
+end
+```
+
+### test getX
+```
+say("click me to run");
+registerClickEvent(function()
+	turn(90);
+	while(true) do
+		moveForward(0.03);
+		say(string.format("%d %d %d", getX(), getY(), getZ()))
+	end
+end)
+```
+
+### test follow mouse or player
+```
+registerBroadcastEvent("trackMouse", function()
+	while(true) do
+		if(isMouseDown()) then
+			moveTo("mouse-pointer");
+			wait(0.3);
+		end
+	end
+end)
+broadcast("trackMouse");
+tip("click anywhere to teleport");
+
+while(true) do
+	if(distanceTo("mouse-pointer") < 3) then
+		say("follow mouse-pointer")
+		turnTo("mouse-pointer");
+		walkForward(1);
+		wait(0.5);
+	elseif(distanceTo("@p") < 10) then
+		say("follow player")
+		turnTo("@p");
+		walkForward(1);
+		wait(0.5);
+	elseif(distanceTo("@p") > 10) then
+		moveTo("@p");
+	end
+end
+```
+
+### test run threads
+follow mouse cursor
+```
+run(function()
+	say("follow mouse pointer!")
+	while(true) do
+		if(distanceTo("mouse-pointer") < 7) then
+			turnTo("mouse-pointer");
+			say("OK!", 1);
+		end
+	end
+end)
+
+run(function()
+	while(true) do
+		moveForward(0.02);
+	end
+end)
+```
+
+### test Bounce With Pong Game
+```
+turnTo(45);
+while(true) do
+	moveForward(0.1);
+	if(isTouching("block")) then
+		bounce();
+	elseif(isTouching("box")) then
+		bounce();
+	end
+end
+```
+
+create a box, use LEFT/RIGHT key to move
+```
+say("press left/right key to move me!")
+while(true) do
+    if(isKeyPressed("left")) then
+        move(0, 0.1);
+        say("")
+    elseif(isKeyPressed("right")) then
+        move(0, -0.1);
+        say("")
+    end
+end
 ```

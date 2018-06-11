@@ -13,6 +13,10 @@ local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/ActorNPC.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/EntityCodeActor.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
+local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -46,8 +50,119 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
+function Actor:SetName(name)
+	self.name = name;
+end
+
+function Actor:GetName()
+	return self.name;
+end
+
 function Actor:OnClick(mouse_button)
 	self:clicked(self, mouse_button);
+end
+
+-- @param block_id: if nil, it means any obstruction block.
+-- @return true
+function Actor:IsTouchingBlock(block_id)
+	if(not self.entity) then
+		return;
+	end
+	local aabb = self.entity:GetCollisionAABB();
+	local blockMinX,  blockMinY, blockMinZ = BlockEngine:block(aabb:GetMinValues());
+	local blockMaxX,  blockMaxY, blockMaxZ = BlockEngine:block(aabb:GetMaxValues());
+
+    for bx = blockMinX, blockMaxX do
+        for bz = blockMinZ, blockMaxZ do
+            for by = blockMinY, blockMaxY do
+                local block_template = BlockEngine:GetBlock(bx, by, bz);
+                if (block_template) then
+					if(block_template.id == block_id) then
+						return true;
+					elseif(not block_id and block_template.obstruction) then
+						return true;
+					end
+                end
+            end
+		end
+	end
+end
+
+-- @return false;
+function Actor:IsTouchingEntity(entity2)
+	if(not entity2) then
+		return false;
+	end
+	local entity = self:GetEntity();
+	if(entity and entity:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+		return true;
+	end
+end
+
+-- only bounce in horizontal XZ plain, it just changes the direction/facing of the actor, so that the actor moves aways from the collision. 
+function Actor:Bounce()
+	if(not self.entity) then
+		return;
+	end
+	local aabb = self.entity:GetCollisionAABB();
+	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self.entity);
+
+	local facing = self.entity:GetFacing();
+	local dx, dz;
+	dx = math.cos(facing) * 0.1;
+	dz = -math.sin(facing) * 0.1;
+	local offsetX, offsetZ = dx, dz;
+	for i= 1, listCollisions:size() do
+		offsetX = listCollisions:get(i):CalculateXOffset(aabb, offsetX, 0.3);
+	end
+	for i= 1, listCollisions:size() do
+		offsetZ = listCollisions:get(i):CalculateZOffset(aabb, offsetZ, 0.3);
+	end
+	if(offsetX~=dx and offsetX*dx<0) then
+		dx = -dx
+	end
+	if(offsetZ~=dz and offsetZ*dz<0) then
+		dz = -dz
+	end
+	local newFacing = Direction.GetFacingFromOffset(dx, 0, dz);
+	self.entity:SetFacing(newFacing);
+end
+
+function Actor:IsTouchingPlayers()
+	if(not self.entity) then
+		return;
+	end
+	local distExpand = 0.25;
+	local aabb = self.entity:GetCollisionAABB();
+    local listEntities = EntityManager.GetEntitiesByAABBExcept(aabb:clone():Expand(distExpand, distExpand, distExpand), self.entity);
+	if(listEntities) then
+		for _, entityCollided in ipairs(listEntities) do
+			if(entityCollided:IsPlayer()) then
+				return true;
+			end
+		end
+	end
+end
+
+function Actor:DistanceTo(actor2)
+	local entity = self:GetEntity();
+	if(entity) then
+		local entity2 = actor2:GetEntity();
+		if(entity2) then
+			local x, y, z = entity2:GetPosition();
+			local dist = entity:GetDistanceSq(x,y,z);
+			if(dist > 0.0001) then
+				return math.sqrt(dist);
+			else
+				return dist;
+			end
+		end
+	end
+end
+
+function Actor:DeleteThisActor()
+	self:OnRemove();
+	self:Destroy();
 end
 
 function Actor:OnRemove()

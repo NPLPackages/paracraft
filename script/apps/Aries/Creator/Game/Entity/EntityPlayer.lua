@@ -109,6 +109,10 @@ function Entity:SetMainAssetPath(name)
 	end
 end
 
+function Entity:IsPlayer()
+	return true;
+end
+
 -- get the item stack in right hand
 function Entity:GetItemInRightHand()
 	return self.inventory:GetItemInRightHand();

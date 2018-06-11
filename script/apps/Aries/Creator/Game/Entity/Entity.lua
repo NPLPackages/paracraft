@@ -1043,10 +1043,10 @@ function Entity:SetScaling(v)
 	end
 end
 
-function Entity:GetScaling(v)
+function Entity:GetScaling()
 	local obj = self:GetInnerObject();
 	if(obj) then
-		self.scaling = obj:GetScale(v);
+		self.scaling = obj:GetScale();
 	end
 	return self.scaling or 1;
 end
@@ -1381,6 +1381,10 @@ end
 
 function Entity:GetPhysicsHeight()
 	return 1;
+end
+
+function Entity:IsPlayer()
+	return false;
 end
 
 -- in real world coordinates

@@ -369,8 +369,12 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
 						callbackFunc(true);
+						return
 					end
 				end
+			end
+			if(callbackFunc) then
+				callbackFunc(false);
 			end
 		end,old_value, L"选择模型文件", "model");
 

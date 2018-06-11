@@ -132,20 +132,26 @@ end
 
 -- unload code and related entities
 function CodeBlock:Unload()
+	self:StopLastTempCode();
 	if(not self.isLoaded) then
 		return;
 	end
 	self.isLoaded = nil;
-	
+	self:Stop();
+end
+
+-- remove everything to unloaded state. 
+function CodeBlock:Stop()
 	self:RemoveTimers();
 	self:RemoveAllActors();
 	self:RemoveAllEvents();
-
+	self:StopLastTempCode();
 	self.code_env = nil;
+	self.isLoaded = nil;
 end
 
 -- remove all timers without clearing actors.
-function CodeBlock:Stop()
+function CodeBlock:Pause()
 	self:RemoveTimers();
 	self:RemoveAllEvents();
 end
@@ -176,24 +182,61 @@ end
 
 -- usually called when movie finished playing. 
 function CodeBlock:RemoveAllActors()
+	self.isRemovingActors = true;
 	for i, actor in ipairs(self.actors) do
 		actor:OnRemove();
 		actor:Destroy();
 	end
 	self.actors:clear();
+	self.isRemovingActors = false;
+end
+
+function CodeBlock:OnRemoveActor(actor)
+	if(not self.isRemovingActors) then
+		self.actors:removeByValue(actor);
+	end
+end
+
+-- private function: do not call this function. 
+function CodeBlock:AddActor(actor)
+	self.actors:add(actor);
+	actor:Connect("beforeRemoved", self, self.OnRemoveActor);
+	GameLogic.GetCodeGlobal():AddActor(actor);
 end
 
 function CodeBlock:GetActors()
 	return self.actors;
 end
 
--- private function: do not call this function. 
-function CodeBlock:AddActor(actor)
-	self.actors:add(actor);
+function CodeBlock:GetLastActor()
+	return self.actors[#self.actors];
+end
+
+-- get the last actor in all nearby connected code block. 
+function CodeBlock:FindNearbyActor()
+	local actor = self:GetLastActor();
+	if(not actor and self:GetEntity()) then
+		local function getLastActor_(codeEntity)
+			local x,y,z = codeEntity:GetBlockPos();
+			if(codeEntity:GetNearByMovieEntity(x,y,z)) then
+				local codeblock = codeEntity:GetCodeBlock();
+				if(codeblock) then
+					actor = codeblock:GetLastActor();
+				end
+				return true;
+			end
+		end
+		self:GetEntity():ForEachNearbyCodeEntity(getLastActor_);
+	end
+	return actor;
 end
 
 function CodeBlock:GetMovieEntity()
 	return self.entityCode:FindNearByMovieEntity();
+end
+
+function CodeBlock:GetEntity()
+	return self.entityCode;
 end
 
 -- create a new actor from the nearby movie block. 
@@ -202,6 +245,7 @@ end
 function CodeBlock:CreateActor()
 	local actor = self:CreateFirstActorInMovieBlock();
 	if(actor) then
+		actor:SetName(self.entityCode:GetDisplayName());
 		self:AddActor(actor);
 		-- use time 0
 		actor:SetTime(0);
@@ -218,7 +262,7 @@ function CodeBlock:CreateFirstActorInMovieBlock()
 		if movie_entity and movie_entity.inventory then
 			for i = 1, movie_entity.inventory:GetSlotCount() do
 				local itemStack = movie_entity.inventory:GetItem(i)
-				if (itemStack and itemStack.count > 0 and itemStack.serverdata) then
+				if (itemStack and itemStack.count > 0) then
 					if (itemStack.id == block_types.names.TimeSeriesNPC) then
 						return CodeActor:new():Init(itemStack, movie_entity);
 					end
@@ -239,15 +283,24 @@ function CodeBlock:IsLoaded()
 	return self.isLoaded;
 end
 
+-- recompile and run
+function CodeBlock:Restart()
+	if(self:GetEntity()) then
+		self:Unload();
+		return self:Run();
+	end
+end
+
 -- run code again 
 function CodeBlock:Run()
-	self:Unload();
+	self:CompileCode(self:GetEntity():GetCommand());
 
 	if(self.code_func) then
 		self.isLoaded = true;
 		local co = CodeCoroutine:new():Init(self);
 		co:SetFunction(self.code_func);
-		co:SetActor(self:CreateActor());
+		local actor = self:FindNearbyActor() or self:CreateActor();
+		co:SetActor(actor);
 		return co:Run();
 	end
 end
@@ -316,26 +369,13 @@ function CodeBlock:OnClickActor(actor, mouse_button)
 	self:FireEvent("onClickActor", actor)
 end
 
-function CodeBlock:GetKeyNameFromString(name)
-	if(name and DIK_SCANCODE["DIK_"..string.upper(name)]) then
-		return "DIK_"..string.upper(name);
-	end
-	return name;
-end
-
-function CodeBlock:GetStringFromKeyName(name)
-	if(name) then
-		return string.lower(name:gsub("^(DIK_)" ,""));
-	end
-end
-
 -- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
 -- case incensitive
 function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 	local event = self:CreateEvent("onKeyPressed");
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
-	keyname = self:GetKeyNameFromString(keyname);
+	keyname = GameLogic.GetCodeGlobal():GetKeyNameFromString(keyname) or keyname;
 	
 	local function onEvent_(_, msg)
 		if(not msg) then
@@ -407,14 +447,6 @@ function CodeBlock:CloneMyself()
 	end
 end
 
-function CodeBlock:DeleteActor(actor)
-	if(actor and self.actors:contains(actor)) then
-		actor:OnRemove();
-		actor:Destroy();
-		self.actors:remove(actor);
-	end
-end
-
 -- blink the created actor 
 function CodeBlock:HighlightActors()
 	if(self.actors:last()) then
@@ -425,5 +457,48 @@ function CodeBlock:HighlightActors()
 				actor:SetHighlight(false);
 			end, 1000 + i*100);
 		end
+	end
+end
+
+function CodeBlock:CreateGetActor()
+	local env = self:GetCodeEnv();
+	if(env) then
+		return env.actor or self:FindNearbyActor() or self:CreateActor();
+	end
+end
+
+-- usually from help window. There can only be one temp code running. 
+-- @param code: string
+function CodeBlock:RunTempCode(code, filename)
+	local code_func, errormsg = CodeCompiler:new():SetFilename(filename or "tempcode"):Compile(code);
+	if(not code_func and errormsg) then
+		LOG.std(nil, "error", "CodeBlock", errormsg);
+		local msg = errormsg;
+		msg = format(L"编译错误: %s\n在%s", msg, filename);
+		self:send_message(msg);
+	else
+		local env = self:GetCodeEnv();
+		if(env) then
+			self:StopLastTempCode();
+			local co = CodeCoroutine:new():Init(self);
+			self.lastTempCodeCoroutine = co;
+			local actor = env.actor or self:FindNearbyActor() or self:CreateActor();
+			co:SetActor(actor);
+			co:SetFunction(code_func);
+			co:Run()
+		end
+	end
+end
+
+function CodeBlock:HasRunningTempCode()
+	if(self.lastTempCodeCoroutine) then
+		return true;
+	end
+end
+
+function CodeBlock:StopLastTempCode()
+	if(self.lastTempCodeCoroutine) then
+		self.lastTempCodeCoroutine:Stop();
+		self.lastTempCodeCoroutine = nil;
 	end
 end
