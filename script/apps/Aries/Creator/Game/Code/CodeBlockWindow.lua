@@ -329,4 +329,27 @@ function CodeBlockWindow.OnChangeModel()
 	end
 end
 
+-- not used 
+function CodeBlockWindow.InsertCodeAtCurrentLine(code)
+	if(code and page) then
+		local textAreaCtrl = page:FindControl("code");
+		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
+		if(textCtrl) then
+			textCtrl = textCtrl:ViewPort();
+			if(textCtrl) then
+				local text = textCtrl:GetLineText(textCtrl.cursorLine);
+				if(text) then
+					text = tostring(text);
+					local newText = "";
+					if(text:match("%S")) then
+						textCtrl:InsertTextInCursorPos(code);
+					else
+						textCtrl:InsertTextInCursorPos(code);
+					end
+				end
+			end
+		end
+	end
+end
+
 CodeBlockWindow:InitSingleton();

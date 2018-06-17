@@ -396,6 +396,13 @@ function Entity:OnFocusIn()
 	self:focusIn();
 end
 
+function Entity:SetSkipPicking(bSkipPicking)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("SkipPicking", bSkipPicking ~= false);
+	end
+end
+
 -- called before focus is lost
 function Entity:OnFocusOut()
 	self.has_focus = nil;

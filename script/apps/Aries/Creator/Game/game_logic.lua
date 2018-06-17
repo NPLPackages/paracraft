@@ -1519,5 +1519,5 @@ function GameLogic:event(event)
 	if(homeEntity) then
 		homeEntity:event(event);
 	end
-	GameLogic.GetCodeGlobal():BroadcastTextEvent(event:GetType());
+	GameLogic.GetCodeGlobal():BroadcastTextEvent(event:GetType(), event.msg);
 end

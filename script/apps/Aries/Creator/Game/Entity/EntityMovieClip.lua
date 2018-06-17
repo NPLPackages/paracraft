@@ -320,7 +320,7 @@ function Entity:GetNearbyActivatedMovieBlocks(x,y,z, from_block_id)
 	if(self:IsActivatedMovieBlocks(x,y,z-1, block_id, 3)) then
 		return 2;
 	end
-	if(self:IsActivatedMovieBlocks(x,y,z-1, block_id, 2)) then
+	if(self:IsActivatedMovieBlocks(x,y,z+1, block_id, 2)) then
 		return 3;
 	end
 end

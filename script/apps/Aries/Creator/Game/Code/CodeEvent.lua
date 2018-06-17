@@ -96,7 +96,9 @@ function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
 	co:SetActor(actor);
 	co:SetFunction(self.callbackFunc);
 	self:SetCodeEvent(actor, co);
-	co:Run(msg, onFinishedCallback);	
+	co:SetTimeout(self:GetCodeBlock():GetDefaultTick(), function()
+		co:Run(msg, onFinishedCallback);
+	end)
 end
 
 function CodeEvent:Fire(msg, onFinishedCallback)
@@ -116,7 +118,7 @@ function CodeEvent:Fire(msg, onFinishedCallback)
 				end
 			end				
 			
-			for i=1, #actors do
+			for i=#actors, 1, -1  do
 				local actor = actors[i];
 				if(actor) then
 					self:FireForActor(actor, msg, onFinishedCallback);

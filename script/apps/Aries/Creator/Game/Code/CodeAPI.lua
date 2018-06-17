@@ -29,6 +29,9 @@ local s_env_methods = {
 	"gettable",
 	"createtable",
 	"inherit",
+	"setActorValue",
+	"getActorValue",
+
 	-- Motion
 	"move",
 	"moveTo",
@@ -76,6 +79,8 @@ local s_env_methods = {
 	"distanceTo",
 	"isKeyPressed",
 	"isMouseDown",
+	"getTimer",
+	"resetTimer",
 	"ask",
 
 	-- Sound
@@ -212,4 +217,16 @@ function env_imp:GetDefaultTick()
 		self.default_tick = self.codeBlock and self.codeBlock:GetDefaultTick() or 0.02;
 	end
 	return self.default_tick;
+end
+
+function env_imp:getActorValue(name)
+	if(self.actor and name) then
+		return self.actor:GetActorValue(name);
+	end
+end
+
+function env_imp:setActorValue(name, value)
+	if(self.actor and name) then
+		return self.actor:SetActorValue(name, value);
+	end
 end

@@ -35,12 +35,15 @@ CodeBlock:Property("Name", "CodeBlock");
 CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", auto=true,});
 
 CodeBlock:Signal("message", function(errMsg) end);
+CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
+CodeBlock:Signal("actorCloned", function(actor, msg) end);
 
 function CodeBlock:ctor()
 	self.timers = {};
 	self.timers_pool = {};
 	self.actors = commonlib.UnorderedArraySet:new();
 	self.events = {};
+	self.startTime = 0;
 end
 
 function CodeBlock:Init(entityCode)
@@ -49,11 +52,18 @@ function CodeBlock:Init(entityCode)
 	return self;
 end
 
+function CodeBlock:GetBlockName()
+	if(not self.codename) then
+		self.codename = self.entityCode and self.entityCode:GetDisplayName() or "";
+	end
+	return self.codename;
+end
+
 function CodeBlock:AutoSetFilename()
 	if(self.entityCode) then
 		local x,y,z = self.entityCode:GetBlockPos();
 		if(x) then
-			self:SetFilename(format("block(%d, %d, %d)", x,y,z));
+			self:SetFilename(format("%s_block(%d, %d, %d)", self:GetBlockName(), x,y,z));
 		end
 	end
 end
@@ -142,12 +152,16 @@ end
 
 -- remove everything to unloaded state. 
 function CodeBlock:Stop()
+	self:Disconnect("actorClicked");
+	self:Disconnect("actorCloned");
 	self:RemoveTimers();
 	self:RemoveAllActors();
 	self:RemoveAllEvents();
 	self:StopLastTempCode();
 	self.code_env = nil;
 	self.isLoaded = nil;
+	GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
+	self.codename = nil;
 end
 
 -- remove all timers without clearing actors.
@@ -182,45 +196,67 @@ end
 
 -- usually called when movie finished playing. 
 function CodeBlock:RemoveAllActors()
+	self.refActors = nil;
+	
 	self.isRemovingActors = true;
-	for i, actor in ipairs(self.actors) do
+	for i, actor in ipairs(self:GetActors()) do
 		actor:OnRemove();
 		actor:Destroy();
 	end
-	self.actors:clear();
+	self:GetActors():clear();
 	self.isRemovingActors = false;
 end
 
 function CodeBlock:OnRemoveActor(actor)
 	if(not self.isRemovingActors) then
-		self.actors:removeByValue(actor);
+		self:GetActors():removeByValue(actor);
 	end
 end
 
 -- private function: do not call this function. 
 function CodeBlock:AddActor(actor)
-	self.actors:add(actor);
+	self:GetActors():add(actor);
 	actor:Connect("beforeRemoved", self, self.OnRemoveActor);
 	GameLogic.GetCodeGlobal():AddActor(actor);
 end
 
 function CodeBlock:GetActors()
-	return self.actors;
+	return self.refActors or self.actors;
 end
 
 function CodeBlock:GetLastActor()
-	return self.actors[#self.actors];
+	return self:GetActors()[#self:GetActors()];
+end
+
+-- referencing codeblock. It will share actors in the referenced code blocks. 
+function CodeBlock:SetReferencedCodeBlock(codeBlock)
+	if(self ~= codeBlock) then
+		if(codeBlock) then
+			if(self.refActors ~= codeBlock:GetActors()) then
+				self.refActors = codeBlock:GetActors();
+				codeBlock:Connect("actorClicked", self, self.OnClickActor, "UniqueConnection");
+				codeBlock:Connect("actorCloned", self, self.OnCloneActor, "UniqueConnection");
+			end
+		elseif(self.refActors) then
+			self.refActors = nil;
+		end
+	end
+end
+
+function CodeBlock:HasReferencedCodeBlock()
+	return self.refActors ~= nil;
 end
 
 -- get the last actor in all nearby connected code block. 
 function CodeBlock:FindNearbyActor()
 	local actor = self:GetLastActor();
-	if(not actor and self:GetEntity()) then
+	if(not actor and self:GetEntity() and not self:HasReferencedCodeBlock()) then
 		local function getLastActor_(codeEntity)
 			local x,y,z = codeEntity:GetBlockPos();
 			if(codeEntity:GetNearByMovieEntity(x,y,z)) then
 				local codeblock = codeEntity:GetCodeBlock();
 				if(codeblock) then
+					self:SetReferencedCodeBlock(codeblock);
 					actor = codeblock:GetLastActor();
 				end
 				return true;
@@ -250,9 +286,32 @@ function CodeBlock:CreateActor()
 		-- use time 0
 		actor:SetTime(0);
 		actor:FrameMove(0, false);
-		actor:Connect("clicked", self, self.OnClickActor);
+		if(self:IsActorPickingEnabled()) then
+			actor:EnableActorPicking(true);
+			actor:Connect("clicked", self, self.OnClickActor);
+		else
+			actor:EnableActorPicking(false);
+		end
 		return actor;
 	end
+end
+
+function CodeBlock:EnableActorPicking(bEnabled)
+	if(self:GetActors().enableActorPicking ~= bEnabled) then
+		self:GetActors().enableActorPicking	= bEnabled;
+		if(bEnabled) then
+			for i, actor in ipairs(self:GetActors()) do
+				if(not actor:IsActorPickingEnabled()) then
+					actor:EnableActorPicking(true);
+					actor:Connect("clicked", self, self.OnClickActor);
+				end
+			end
+		end
+	end
+end
+
+function CodeBlock:IsActorPickingEnabled()
+	return self:GetActors().enableActorPicking;
 end
 
 -- private: 
@@ -294,13 +353,14 @@ end
 -- run code again 
 function CodeBlock:Run()
 	self:CompileCode(self:GetEntity():GetCommand());
-
 	if(self.code_func) then
+		self:ResetTime();
 		self.isLoaded = true;
 		local co = CodeCoroutine:new():Init(self);
 		co:SetFunction(self.code_func);
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		co:SetActor(actor);
+		GameLogic.GetCodeGlobal():AddCodeBlock(self);
 		return co:Run();
 	end
 end
@@ -360,13 +420,15 @@ end
 
 -- actor is clicked
 function CodeBlock:RegisterClickEvent(callbackFunc)
+	self:EnableActorPicking(true);
 	local event = self:CreateEvent("onClickActor");
 	event:SetIsFireForAllActors(false);
 	event:SetFunction(callbackFunc);
 end
 
 function CodeBlock:OnClickActor(actor, mouse_button)
-	self:FireEvent("onClickActor", actor)
+	self:FireEvent("onClickActor", actor);
+	self:actorClicked(actor, mouse_button);
 end
 
 -- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
@@ -403,7 +465,7 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 	local function onEvent_(_, msg)
-		event:Fire(nil, msg and msg.onFinishedCallback);
+		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
 	end
 	event:Connect("beforeDestroyed", function()
 		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
@@ -412,9 +474,9 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 end
 
 -- @param onFinishedCallback: can be nil
-function CodeBlock:BroadcastTextEvent(text, onFinishedCallback)
+function CodeBlock:BroadcastTextEvent(text, msg, onFinishedCallback)
 	if(type(text) == "string") then
-		GameLogic.GetCodeGlobal():BroadcastTextEvent(text, onFinishedCallback);
+		GameLogic.GetCodeGlobal():BroadcastTextEvent(text, msg, onFinishedCallback);
 	end
 end
 
@@ -425,33 +487,40 @@ end
 
 -- create a clone of some code block's actor
 -- @param name: if nil or "myself", it means clone myself
-function CodeBlock:CreateClone(name)
+-- @param msg: any mesage that is forwared to clone event
+function CodeBlock:CreateClone(name, msg)
 	if(not name or name == "myself") then
-		self:CloneMyself();
+		self:CloneMyself(msg);
 	else
 		local codeBlock = self:GetCodeBlockByName(name);
 		if(codeBlock) then
-			codeBlock:CloneMyself();
+			codeBlock:CloneMyself(msg);
 		end
 	end
 end
 
 function CodeBlock:GetCodeBlockByName(name)
-	-- TODO
+	return GameLogic.GetCodeGlobal():GetCodeBlockByName(name);
 end
 
-function CodeBlock:CloneMyself()
+function CodeBlock:CloneMyself(msg)
 	local actor = self:CreateActor();
 	if(actor) then
-		self:FireEvent("onCloneActor", actor);
+		self:OnCloneActor(actor, msg);
 	end
+end
+
+function CodeBlock:OnCloneActor(actor, msg)
+	self:FireEvent("onCloneActor", actor, msg);
+	self:actorCloned(actor, msg);
 end
 
 -- blink the created actor 
 function CodeBlock:HighlightActors()
-	if(self.actors:last()) then
-		for i = 1, math.min(10, #self.actors) do
-			local actor = self.actors[i];
+	local actors = self:GetActors();
+	if(actors:last()) then
+		for i = 1, math.min(10, #actors) do
+			local actor = actors[i];
 			actor:SetHighlight(true);
 			commonlib.TimerManager.SetTimeout(function()  
 				actor:SetHighlight(false);
@@ -501,4 +570,13 @@ function CodeBlock:StopLastTempCode()
 		self.lastTempCodeCoroutine:Stop();
 		self.lastTempCodeCoroutine = nil;
 	end
+end
+
+-- in seconds
+function CodeBlock:GetTime()
+	return (commonlib.TimerManager.GetCurrentTime() - self.startTime)/1000;
+end
+
+function CodeBlock:ResetTime()
+	self.startTime = commonlib.TimerManager.GetCurrentTime()
 end

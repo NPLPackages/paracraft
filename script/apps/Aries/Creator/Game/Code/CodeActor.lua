@@ -29,6 +29,7 @@ Actor:Property({"entityClass", "EntityCodeActor"});
 -- frame move interval in milliseconds
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
+Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- the itemstack(TimeSeries) is changed
 Actor:Signal("dataSourceChanged");
 Actor:Signal("clicked", function(actor, mouseButton) end);
@@ -38,7 +39,9 @@ function Actor:ctor()
 	self.offsetPos = vector3d:new(0,0,0);
 	self.offsetYaw = 0;
 	self.codeEvents = {};
+	self.values = {};
 end
+
 
 -- @param itemStack: movie block actor's item stack where time series data source of this entity is stored. 
 function Actor:Init(itemStack, movieclipEntity)
@@ -48,6 +51,25 @@ function Actor:Init(itemStack, movieclipEntity)
 	local entity = self.entity;
 	entity:Connect("clicked", self, self.OnClick);
 	return self;
+end
+
+function Actor:GetActorValue(name)
+	return self.values[name];
+end
+
+function Actor:SetActorValue(name, value)
+	self.values[name] = value;
+end
+
+function Actor:IsActorPickingEnabled()
+	return self.enableActorPicking;
+end
+
+function Actor:EnableActorPicking(bEnabled)
+	self.enableActorPicking = bEnabled;
+	if(self.entity) then
+		self.entity:SetSkipPicking(not bEnabled);
+	end
 end
 
 function Actor:SetName(name)

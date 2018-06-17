@@ -153,19 +153,32 @@ say(a)
 ### test Clone Event
 ```
 move(1,0);
-local a=1;
-registerCloneEvent(function()
-   a = a + 1;
+registerCloneEvent(function(a)
    move(-a,0);
    say(a);
    for i=1, 100 do
       move(0, 0.02)
    end
 end)
-clone();
-clone();
+clone("myself", 1);
+clone("myself", 2);
 say("hi", 2);
 say("bye");
+```
+
+### test Clone two blocks Event
+this is box
+```
+registerCloneEvent(function(msg)
+    move(0, msg.y, 0)
+end)
+```
+this is from another code block
+```
+wait(0.1)
+for i=1, 10 do
+	clone("box", {y=i})
+end
 ```
 
 ### test Broadcast Event

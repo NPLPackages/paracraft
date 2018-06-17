@@ -15,8 +15,9 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
 -- create a clone of some code block's actor
 -- @param name: if nil or "myself", it means clone myself
-function env_imp:clone(name)
-	self.codeblock:CreateClone(name)
+-- @param msg: any mesage that is forwared to clone event
+function env_imp:clone(name, msg)
+	self.codeblock:CreateClone(name, msg)
 	env_imp.checkyield(self);
 end
 
@@ -40,15 +41,15 @@ function env_imp:registerBroadcastEvent(text, callbackFunc)
 end
 
 -- broadcast a global message.
-function env_imp:broadcast(text)
-	self.codeblock:BroadcastTextEvent(text);
+function env_imp:broadcast(text, msg)
+	self.codeblock:BroadcastTextEvent(text, msg);
 	env_imp.checkyield(self);
 end
 
 -- broadcast a global message and wait for all its handlers are finished
-function env_imp:broadcastAndWait(text)
+function env_imp:broadcastAndWait(text, msg)
 	local isFinished = false;
-	self.codeblock:BroadcastTextEvent(text, self.co:MakeCallbackFunc(function()
+	self.codeblock:BroadcastTextEvent(text, msg, self.co:MakeCallbackFunc(function()
 		isFinished = true;
 		env_imp.resume(self);
 	end));

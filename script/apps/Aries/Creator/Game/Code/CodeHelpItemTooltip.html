@@ -1,0 +1,90 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeHelpWindow.lua">
+<![CDATA[
+    local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+    CodeHelpWindow.InitCmds();
+    name = Page:GetRequestParam("name") or "";
+    local item = CodeHelpWindow.GetCodeItemByName(name);
+    function GetExamples()
+        return item and item:GetNPLCodeExamples();
+    end
+    function CanRun()
+        return item and item:CanRun()
+    end
+    function CanRunExample()
+        return item and item:CanRunExample()
+    end
+    function GetColor()
+        return item and item:GetColor();
+    end
+    function GetHtml()
+        return item and item:GetHtml();
+    end
+    
+    function GetNPLCode()
+        return item and item:GetNPLCode();
+    end
+
+    function GetNPLCodeLineCount()
+        return item and item:GetNPLCodeLineCount();
+    end
+
+    function OnClickRun()
+        if(mouse_button == "left") then
+            CodeHelpWindow.RunSampleCodeByName(name);
+        elseif(mouse_button == "right") then
+            local item = CodeHelpWindow.GetCodeItemByName(name);
+            if(item) then
+                item:CopyNPLCodeToClipboard()
+            end
+        end
+    end
+
+    function OnClickRunExample()
+        CodeHelpWindow.RunSampleCodeExampleByName(name);
+    end
+    function IsShowCloseBtn()
+        return Page:GetRequestParam("showclose");
+    end
+    function OnClickClose()
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+        local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+        CodeBlockWindow.ShowHelpWnd();
+    end
+    function OnClickPinToHelpWnd()
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+        local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+        CodeBlockWindow.ShowHelpWndForCodeName(name);
+    end
+]]></script>
+<div style="font-size:12px;padding:3px;background-color:#292929;" class="default">
+    <pe:if condition="<%=IsShowCloseBtn()%>">
+        <input class="mc_close_button" type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="OnClickClose" style="margin-top:3px;margin-left:0px;" />
+    </pe:if>
+    <pe:if condition="<%=not IsShowCloseBtn()%>">
+        <div align="right" onclick="OnClickPinToHelpWnd" style="float:left;position:relative;width:24px;height:24px;" tooltip='<%=L"一直显示"%>'>
+            <div style="margin-top:8px;margin-left:10px;width:8px;height:8px;background-color:#dddede"></div>
+        </div>
+    </pe:if>
+    <div style="float:left" onclick="OnClickRun" tooltip='<%=CanRun() and (L("左键运行, 右键复制代码").."\n"..GetNPLCode()) or L"右键复制代码"%>'>
+        <div style='<%=CanRun() and "background-color:#ff0000;padding:2px;" or ""%>'>
+            <div style='<%=format("background-color:%s;color:#ffffff;padding:1px;padding-left:5px;padding-right:5px;", GetColor())%>'>
+                <%=GetHtml()%>
+            </div>
+        </div>
+    </div>
+    <pe:if condition='<%=CanRunExample()%>'>
+        <div onclick="OnClickRunExample" style="float:left;width:32px;height:24px;" tooltip='<%=L"点击运行例子1"%>'>
+            <div style="margin-top:8px;margin-left:10px;width:8px;height:8px;background-color:#00ff00"></div>
+        </div>
+    </pe:if><br />
+    <div style="background-color:#cec8a8">
+        <textarea name="code" rows='<%=GetNPLCodeLineCount() or 1%>' AlwaysShowCurLineBackground="false" language="npl" value='<%=GetNPLCode()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:16;padding-top:2px;padding-bottom:2px" fontsize="12" />
+    </div>
+    <div style="background-color:#dddede">
+        <input name="exampleCode" rows="20" AlwaysShowCurLineBackground="false" language="npl" height="100%" value='<%=GetExamples()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:16;" fontsize="12"/>
+    </div>
+</div>
+</pe:mcml>
+

@@ -180,3 +180,12 @@ function env_imp:ask(text, callbackFunc)
 	local actor = self.actor;
 	-- TODO: 
 end
+
+-- local block time since this block is loaded.
+function env_imp:getTimer()
+	return self.codeblock:GetTime()
+end
+
+function env_imp:resetTimer()
+	self.codeblock:ResetTime()
+end

@@ -46,7 +46,6 @@ function env_imp:say(text, duration)
 		else
 			GameLogic.AddBBS("codeblock", text, 10000);
 		end
-		env_imp.wait(self, env_imp.GetDefaultTick(self));
 	end
 end
 

@@ -14,6 +14,7 @@ GameLogic.GetCodeGlobal():CreateGetTextEvent("msgname");
 GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
+local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
@@ -40,6 +41,7 @@ function CodeGlobals:ctor()
 			  len = string.len, lower = string.lower, match = string.match, 
 			  rep = string.rep, reverse = string.reverse, sub = string.sub, 
 			  upper = string.upper },
+		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
 			sort = table.sort },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
@@ -65,6 +67,11 @@ function CodeGlobals:ctor()
 		tip = function(text, duration, color)
 			return GameLogic.AddBBS("CodeGlobals", text and tostring(text), duration, color);
 		end,
+		-- return blockX, blockY, blockZ, block_id, side
+		mousePickBlock = function(picking_dist)
+			local result = SelectionManager:MousePickBlock(true, false, false, picking_dist);
+			return result.blockX, result.blockY, result.blockZ, result.block_id, result.side;
+		end
 	};
 
 	self:Reset();
@@ -94,6 +101,23 @@ function CodeGlobals:Reset()
 	self.text_events = {};
 
 	self.actors = {};
+
+	-- active code blocks
+	self.codeblocks= {};
+end
+
+function CodeGlobals:AddCodeBlock(codeblock)
+	self.codeblocks[codeblock:GetBlockName()] = codeblock;
+end
+
+function CodeGlobals:RemoveCodeBlock(codeblock)
+	if(self.codeblocks[codeblock:GetBlockName()] == codeblock) then
+		self.codeblocks[codeblock:GetBlockName()] = nil;
+	end
+end
+
+function CodeGlobals:GetCodeBlockByName(name)
+	return self.codeblocks[name];
 end
 
 function CodeGlobals:AddActor(actor)
@@ -160,7 +184,7 @@ function CodeGlobals:BroadcastKeyPressedEvent(keyname)
 	end
 end
 
-function CodeGlobals:BroadcastTextEvent(text, onFinishedCallback)
+function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 	local event = self:GetTextEvent(text);
 	if(event) then
 		if(onFinishedCallback) then
@@ -177,7 +201,7 @@ function CodeGlobals:BroadcastTextEvent(text, onFinishedCallback)
 				end;
 			end
 		end
-		event:DispatchEvent({type="msg", onFinishedCallback=onFinishedCallback});
+		event:DispatchEvent({type="msg", msg=msg, onFinishedCallback=onFinishedCallback});
 	end
 end
 
