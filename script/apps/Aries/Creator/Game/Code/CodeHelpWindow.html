@@ -38,14 +38,17 @@ function GetExampleCode(name)
     return item and item:GetNPLCodeExample();
 end
 
+function OnClickPinToHelpWnd(name)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+    local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    CodeBlockWindow.ShowHelpWndForCodeName(name);
+end
+
 function OnClickItem(name)
     if(mouse_button == "left") then
         CodeHelpWindow.RunSampleCodeByName(name)
     elseif(mouse_button == "right") then
-        local item = CodeHelpWindow.GetCodeItemByName(name);
-        if(item) then
-            item:CopyNPLCodeToClipboard()
-        end
+        OnClickPinToHelpWnd(name)
     end
 end
 
@@ -56,6 +59,7 @@ end
 function OnClickDataItem(name)
     CodeHelpWindow.OnClickDataItem(name)
 end
+
 ]]></script>
 <div height="100%" style="width:200px;background-color:#292929;" class="default">
     <div style="margin-left:5px;">
@@ -91,11 +95,16 @@ end
         <pe:gridview style="margin:0px;margin-left:4px;" name="gvwFunctions" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="28" RememberScrollPos="true"
                         DataSource='<%=DS_CodeItems%>'>
             <Columns>
-                <div style="font-size:12px;margin-top:3px;margin-bottom:2px;" tooltip='<%=Eval("tooltip")%>' name='<%=Eval("name")%>' onclick="OnClickItem" use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250">
-                    <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
-                        <%=Eval("html")%>
+                <pe:container style="background:url();margin-top:3px;margin-bottom:2px;padding-right:5px;" 
+                              name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd" 
+                              tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
+                              onclick="OnClickItem" >
+                    <div style="float:left;font-size:12px;" name='<%=Eval("name")%>' >
+                        <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
+                            <%=Eval("html")%>
+                        </div>
                     </div>
-                </div>
+                </pe:container>
             </Columns>
             <EmptyDataTemplate>
             </EmptyDataTemplate>

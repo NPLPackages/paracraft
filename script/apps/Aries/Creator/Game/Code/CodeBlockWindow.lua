@@ -13,6 +13,8 @@ CodeBlockWindow.SetCodeEntity(entityCode);
 ]]
 NPL.load("(gl)script/ide/System/Windows/Window.lua")
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
+local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"));
 
@@ -56,7 +58,13 @@ function CodeBlockWindow.Show(bShow)
 		_this.width = self.width;
 		_this.visible = true;
 		ViewportManager:GetSceneViewport():SetMarginRight(math.floor(self.width * (Screen:GetUIScaling()[2])));
+
+		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
 	end
+end
+
+function CodeBlockWindow.OnWorldSave()
+	CodeBlockWindow.UpdateCodeToEntity();
 end
 
 function CodeBlockWindow.HighlightCodeEntity(entity)
@@ -85,6 +93,9 @@ function CodeBlockWindow.SetCodeEntity(entity)
 			CodeBlockWindow.UpdateCodeToEntity();
 		end
 		self.entity = entity;
+		if(page) then
+			page:Refresh(0.01);
+		end
 	end
 
 	local codeBlock = self.GetCodeBlock();
@@ -103,11 +114,6 @@ function CodeBlockWindow.SetCodeEntity(entity)
 
 		codeBlock:Connect("message", self, self.OnMessage, "UniqueConnection");
 	end
-	
-	if(page) then
-		page:SetValue("code", self.GetCodeFromEntity() or "");
-		page:SetValue("filename", self.GetFilenameFromEntity() or "");
-	end
 end
 
 function CodeBlockWindow:OnMessage(msg)
@@ -117,12 +123,6 @@ end
 function CodeBlockWindow.GetCodeFromEntity()
 	if(self.entity) then
 		return self.entity:GetCommand();
-	end
-end
-
-function CodeBlockWindow.GetFilenameFromEntity()
-	if(self.entity) then
-		return self.entity:GetDisplayName();
 	end
 end
 
@@ -145,12 +145,6 @@ end
 
 function CodeBlockWindow.IsVisible()
 	return page and page:IsVisible();
-end
-
-function CodeBlockWindow.Refresh()
-	if(page) then
-		page:Refresh();
-	end
 end
 
 function CodeBlockWindow.Close()
@@ -281,21 +275,24 @@ function CodeBlockWindow.ShowHelpWndForCodeName(name)
 	CodeBlockWindow.ShowHelpWnd("script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html?showclose=true&name="..name);
 end
 
+function CodeBlockWindow.RefreshPage(time)
+	CodeBlockWindow.UpdateCodeToEntity()
+	if(page) then
+		page:Refresh(time or 0.01);
+	end
+end
+
 function CodeBlockWindow.ShowHelpWnd(url)
 	if(url and url~="") then
 		self.helpWndUrl = url;
 		self.isShowHelpWnd = true;
 		if(page) then
 			page:SetValue("helpWnd", url);
-			CodeBlockWindow.UpdateCodeToEntity()
-			page:Refresh(0.01);
+			CodeBlockWindow.RefreshPage();
 		end
 	else
 		self.isShowHelpWnd = false;
-		if(page) then
-			CodeBlockWindow.UpdateCodeToEntity()
-			page:Refresh(0.01);
-		end
+		CodeBlockWindow.RefreshPage();
 	end
 end
 
@@ -329,10 +326,28 @@ function CodeBlockWindow.OnChangeModel()
 	end
 end
 
--- not used 
-function CodeBlockWindow.InsertCodeAtCurrentLine(code)
+function CodeBlockWindow.OnDragEnd(name)
+end
+
+
+function CodeBlockWindow.IsMousePointerInCodeEditor()
+	if(page) then
+		local x, y = Mouse:GetMousePosition()
+		local textAreaCtrl = page:FindControl("code");
+		if(textAreaCtrl.window) then
+			local ctrlX, ctrlY = textAreaCtrl.window:GetScreenPos();
+			if(ctrlX and x > ctrlX and y>ctrlY) then
+				return true;
+			end
+		end
+	end
+end
+
+
+function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 	if(code and page) then
 		local textAreaCtrl = page:FindControl("code");
+		
 		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
 		if(textCtrl) then
 			textCtrl = textCtrl:ViewPort();
@@ -340,16 +355,28 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code)
 				local text = textCtrl:GetLineText(textCtrl.cursorLine);
 				if(text) then
 					text = tostring(text);
-					local newText = "";
-					if(text:match("%S")) then
-						textCtrl:InsertTextInCursorPos(code);
+					if(forceOnNewLine) then
+						local newText = "";
+						if(text:match("%S")) then
+							-- always start a new line if current line is not empty
+							textCtrl:moveCursor(textCtrl:CursorPos().line, 0, false, true);
+							textCtrl:InsertTextInCursorPos(code);
+						else
+							textCtrl:InsertTextInCursorPos(code);
+						end
 					else
 						textCtrl:InsertTextInCursorPos(code);
+					end
+					-- set focus to control. 
+					if(textAreaCtrl and textAreaCtrl.window) then
+						textAreaCtrl.window:SetFocus_sys();
+						textAreaCtrl.window:handleActivateEvent(true)
 					end
 				end
 			end
 		end
 	end
 end
+
 
 CodeBlockWindow:InitSingleton();

@@ -10,6 +10,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
+local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -104,15 +106,14 @@ function env_imp:move(dx,dy,dz, duration)
 		dz = dy;
 		dy = nil;
 	end
-	local entity = env_imp.GetEntity(self);
-	if(entity and entity.MoveTo) then
-		local x,y,z = entity:GetPosition();
+	local actor = self.actor;
+	if(actor) then
+		local x,y,z = actor:GetPosition();
 		local targetX = x + (dx or 0)*BlockEngine.blocksize;
 		local targetY = y + (dy or 0)*BlockEngine.blocksize;
 		local targetZ = z + (dz or 0)*BlockEngine.blocksize;
 		if(not duration) then
-			entity:SetDummy(true);
-			entity:SetPosition(targetX,targetY,targetZ);
+			actor:SetPosition(targetX,targetY,targetZ);
 			env_imp.wait(self, env_imp.GetDefaultTick(self));
 		else
 			local endTime = commonlib.TimerManager.GetCurrentTime()/1000 + duration;
@@ -120,7 +121,7 @@ function env_imp:move(dx,dy,dz, duration)
 			for i=0, math.floor(duration / stepTime) do
 				local timeLeft = endTime - commonlib.TimerManager.GetCurrentTime()/1000;
 				local stepCount = math.floor(timeLeft/stepTime);
-				local x,y,z = entity:GetPosition();
+				local x,y,z = actor:GetPosition();
 				local dx, dy, dz = targetX - x, targetY - y, targetZ - z;
 				if(stepCount>=2) then
 					local inverseStep = 1/stepCount;
@@ -185,9 +186,8 @@ function env_imp:moveForward(dist, duration)
 end
 
 function env_imp:turn(degree)
-	local entity = env_imp.GetEntity(self);
-	if(entity) then
-		entity:SetFacingDelta(degree*math.pi/180);
+	if(self.actor) then
+		self.actor:SetFacingDelta(degree*math.pi/180);
 	end
 	env_imp.wait(self, env_imp.GetDefaultTick(self));
 end
@@ -204,7 +204,7 @@ function env_imp:turnTo(degree)
 				local x, y, z = entity:GetBlockPos();
 				if(result.blockX ~= x or result.blockZ ~= z) then
 					local facing = Direction.GetFacingFromOffset(result.blockX - x, result.blockY - y, result.blockZ - z);
-					entity:SetFacing(facing);
+					self.actor:SetFacing(facing);
 				end
 			end
 		elseif(type(degree) == "string") then
@@ -214,7 +214,7 @@ function env_imp:turnTo(degree)
 				local x, y, z = entity:GetBlockPos();
 				if(x2 ~= x or z2 ~= z) then
 					local facing = Direction.GetFacingFromOffset(x2 - x, y2 - y, z2 - z);
-					entity:SetFacing(facing);
+					self.actor:SetFacing(facing);
 				end
 			end
 		end
@@ -345,4 +345,53 @@ function env_imp:bounce()
 		self.actor:Bounce();
 	end
 	env_imp.checkyield(self);
+end
+
+-- set focus to current actor or the main player 
+-- @param : nil or "myself" means current actor, "player" means the main player
+function env_imp:focus(name)
+	if(not name or name == "myself") then
+		if(self.actor) then
+			self.actor:SetFocus();
+		end
+	elseif(name == "player") then
+		EntityManager.GetPlayer():SetFocus();
+	end
+	env_imp.checkyield(self);
+end
+
+-- same as the /velocity command
+-- "1,~,~"   :set current player's speed
+-- "set 1,1,1"   :set speed of the test entity
+-- "add 1,~,~"   :use ~ to retain last speed.
+function env_imp:velocity(cmd_text)
+	env_imp.checkyield(self);
+	local list, bIsAdd;
+	local playerEntity = env_imp.GetEntity(self);
+	if(not playerEntity) then
+		return;
+	end
+	-- default to set velocity
+	bIsAdd, cmd_text = CmdParser.ParseText(cmd_text, "add");
+	if(not bIsAdd) then
+		bIsAdd, cmd_text = CmdParser.ParseText(cmd_text, "set");
+		bIsAdd = nil;
+	end
+	list, cmd_text = CmdParser.ParseNumberList(cmd_text, nil, "|,%s")
+	if(list) then
+		local x, y, z;
+		if(#list == 1) then
+			x,y,z = nil,list[1],nil;
+		elseif(#list == 2) then
+			x,y,z = list[1],nil,list[2];
+		else
+			x,y,z = list[1],list[2],list[3];
+		end
+		if(bIsAdd) then
+			playerEntity:AddVelocity(x or 0,y or 0,z or 0);
+		else
+			playerEntity:SetVelocity(x,y,z);
+		end
+		playerEntity:SetDummy(false);
+	end
 end

@@ -14,6 +14,8 @@ GameLogic.GetCodeGlobal():CreateGetTextEvent("msgname");
 GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
+local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
@@ -64,6 +66,9 @@ function CodeGlobals:ctor()
 		get = function(name)
 			return self:GetGlobal(name);
 		end,
+		hideVariable = function(name, title)
+			CodeUI:HideGlobalData(name, title);
+		end,
 		tip = function(text, duration, color)
 			return GameLogic.AddBBS("CodeGlobals", text and tostring(text), duration, color);
 		end,
@@ -104,6 +109,9 @@ function CodeGlobals:Reset()
 
 	-- active code blocks
 	self.codeblocks= {};
+
+	-- clear UI if any
+	CodeUI:Clear();
 end
 
 function CodeGlobals:AddCodeBlock(codeblock)

@@ -39,10 +39,62 @@ local all_cmds = {
 	examples = {{desc = L"也可以用_G.a", canRun = true, code = [[
 _G.a = _G.a or 1
 while(true) do
-  _G.a = a + 1
-  set("a", get("a") + 1)
-  say(a)
+    _G.a = a + 1
+    set("a", get("a") + 1)
+    say(a)
 end
+]]}},
+},
+
+{
+	type = "showVariable", 
+	message0 = L"显示全局变量%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "score", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	ToNPL = function(self)
+		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+_G.score = 1
+_G.msg = "hello"
+showVariable("score", "Your Score")
+showVariable("msg", "", "#ff0000")
+while(true) do
+   _G.score = _G.score + 1
+   wait(0.01)
+end
+]]}},
+},
+
+{
+	type = "hideVariable", 
+	message0 = L"隐藏全局变量%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "score", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	ToNPL = function(self)
+		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+_G.score = 1
+showVariable("score")
+wait(1);
+hideVariable("score")
 ]]}},
 },
 
@@ -390,6 +442,29 @@ scaleTo(100)
 ]]}},
 },
 {
+	type = "focus", 
+	message0 = L"观看此角色%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "myself", 
+		},
+	},
+	category = "Looks", 
+	color = "#cc0000",
+	helpUrl = "", 
+	canRun = true,
+	ToNPL = function(self)
+		return string.format('focus("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+focus()
+moveForward(2,2)
+focus("player")
+]]}},
+},
+{
 	type = "getScale", 
 	message0 = L"放缩尺寸",
 	arg0 = {},
@@ -572,7 +647,7 @@ say("jump!", 1)
 },
 {
 	type = "moveTo", 
-	message0 = L"瞬移到%1 %2 %3",
+	message0 = L"瞬移到%1 %2 %3 %4",
 	arg0 = {
 		{
 			name = "x",
@@ -707,6 +782,31 @@ turnTo(0)
 walkForward(1)
 turn(180)
 walkForward(1, 0.5)
+]]}},
+},
+
+{
+	type = "velocity", 
+	message0 = L"速度%1",
+	arg0 = {
+		{
+			name = "cmd_text",
+			type = "field_input",
+			text = "~ 5 ~", 
+		},
+	},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = true,
+	ToNPL = function(self)
+		return string.format('velocity("%s")\n', self:getFieldAsString('cmd_text'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+velocity("~ 10 ~")
+wait(0.3)
+velocity("add 2 ~ 2")
+wait(2)
+velocity("0 0 0")
 ]]}},
 },
 
@@ -1495,7 +1595,7 @@ say("hi", 2)
 
 {
 	type = "modeGame", 
-	message0 = L"设置为游戏模式",
+	message0 = L"设置为游戏模式 %1",
 	arg0 = {
 		{
 			name = "mode",
@@ -1513,7 +1613,7 @@ say("hi", 2)
 
 {
 	type = "modeEdit", 
-	message0 = L"设置为编辑模式",
+	message0 = L"设置为编辑模式 %1",
 	arg0 = {
 		{
 			name = "mode",
@@ -1965,4 +2065,7 @@ function CodeHelpData.LoadParacraftCodeFunctions()
 	local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 	CodeHelpWindow.AddCodeHelpItems(all_cmds);
 	CodeHelpWindow.AddCodeExamples(all_examples);
+end
+function CodeHelpData.GetAllCmds()
+	return all_cmds;
 end

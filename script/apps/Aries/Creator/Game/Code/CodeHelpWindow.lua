@@ -20,14 +20,14 @@ local self = CodeHelpWindow;
 
 CodeHelpWindow.category_index = 1;
 CodeHelpWindow.categories = {
-{name = "Motion", text = L"运动"},
-{name = "Looks", text = L"外观"},
-{name = "Events", text = L"事件"},
-{name = "Control", text = L"控制"},
-{name = "Sound", text = L"声音"},
-{name = "Sensing", text = L"感知"},
-{name = "Operators", text = L"运算"},
-{name = "Data", text = L"数据"},
+{name = "Motion", text = L"运动", colour="#0078d7", },
+{name = "Looks", text = L"外观" , colour="#7abb55", },
+{name = "Events", text = L"事件", colour="#764bcc", },
+{name = "Control", text = L"控制", colour="#d83b01", },
+{name = "Sound", text = L"声音", colour="#8f6d40", },
+{name = "Sensing", text = L"感知", colour="#69b090", },
+{name = "Operators", text = L"运算", colour="#569138", },
+{name = "Data", text = L"数据", colour="#459197", },
 };
 
 ---------------------
@@ -194,6 +194,17 @@ function CodeHelpWindow.OnCreateVariable()
 	elseif(mouse_button == "right") then
 		CodeHelpWindow.RefreshGlobalDataDs();
 		CodeHelpWindow.RefreshPage();
+	end
+end
+
+function CodeHelpWindow.OnDragEnd(name)
+	local item = CodeHelpWindow.GetCodeItemByName(name);
+	if(item) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+		if(CodeBlockWindow.IsMousePointerInCodeEditor()) then
+			CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), item:CanRun());
+		end
 	end
 end
 

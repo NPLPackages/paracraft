@@ -37,6 +37,7 @@ CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", aut
 CodeBlock:Signal("message", function(errMsg) end);
 CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
 CodeBlock:Signal("actorCloned", function(actor, msg) end);
+CodeBlock:Signal("codeUnloaded", function() end);
 
 function CodeBlock:ctor()
 	self.timers = {};
@@ -162,6 +163,7 @@ function CodeBlock:Stop()
 	self.isLoaded = nil;
 	GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
 	self.codename = nil;
+	self:codeUnloaded();
 end
 
 -- remove all timers without clearing actors.

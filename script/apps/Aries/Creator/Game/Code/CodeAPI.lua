@@ -14,6 +14,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Events.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
 
 -- all public environment methods. 
 local s_env_methods = {
@@ -31,6 +32,7 @@ local s_env_methods = {
 	"inherit",
 	"setActorValue",
 	"getActorValue",
+	"showVariable",
 
 	-- Motion
 	"move",
@@ -41,6 +43,7 @@ local s_env_methods = {
 	"turn",
 	"turnTo",
 	"bounce",
+	"velocity",
 	"getX",
 	"getY",
 	"getZ",
@@ -57,6 +60,7 @@ local s_env_methods = {
 	"scaleTo",
 	"getPlayTime",
 	"getScale",
+	"focus",
 
 	-- Events
 	"registerClickEvent",
@@ -174,43 +178,6 @@ function env_imp:exit(msg)
 	error("exit_call");
 end
 
--- simple log any object, same as echo. 
-function env_imp:log(...)
-	commonlib.echo(...);
-end
-
-function env_imp:echo(...)
-	commonlib.echo(...);
-end
-
--- get the entity associated with the actor.
-function env_imp:GetEntity()
-	if(self.actor) then
-		return self.actor:GetEntity();
-	end		
-end
-
-function env_imp:GetActor()
-	return self.actor;
-end
-
--- similar to commonlib.gettable(tabNames) but in page scope.
--- @param tabNames: table names like "models.users"
-function env_imp:gettable(tabNames)
-	return commonlib.gettable(tabNames, self);
-end
-
--- similar to commonlib.createtable(tabNames) but in page scope.
--- @param tabNames: table names like "models.users"
-function env_imp:createtable(tabNames, init_params)
-	return commonlib.createtable(tabNames, self);
-end
-
--- same as commonlib.inherit()
-function env_imp:inherit(baseClass, new_class, ctor)
-	return commonlib.inherit(baseClass, new_class, ctor);
-end
-
 -- private: 
 function env_imp:GetDefaultTick()
 	if(not self.default_tick) then
@@ -219,14 +186,3 @@ function env_imp:GetDefaultTick()
 	return self.default_tick;
 end
 
-function env_imp:getActorValue(name)
-	if(self.actor and name) then
-		return self.actor:GetActorValue(name);
-	end
-end
-
-function env_imp:setActorValue(name, value)
-	if(self.actor and name) then
-		return self.actor:SetActorValue(name, value);
-	end
-end

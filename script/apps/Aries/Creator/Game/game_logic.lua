@@ -97,6 +97,7 @@ _G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
 local GameLogic = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.GameLogic"));
 GameLogic:Signal("WorldLoaded");
 GameLogic:Signal("WorldUnloaded");
+GameLogic:Signal("beforeWorldSaved");
 GameLogic:Signal("WorldSaved");
 GameLogic:Signal("ModeChanged", function(mode) end);
 -- user has performed a given action, such as open an GUI or clicked somewhere. 
@@ -626,6 +627,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	if(not EnterGamePage.CheckRight("savegame")) then
 		return false;
 	end
+	GameLogic:beforeWorldSaved();
 	if(not GameLogic.world_revision:Commit()) then
 		GameLogic.world_revision:Backup();
 		GameLogic.world_revision:Commit(true);

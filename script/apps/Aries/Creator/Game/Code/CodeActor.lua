@@ -15,6 +15,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/EntityCodeActor.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
+local math3d = commonlib.gettable("mathlib.math3d");
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local vector3d = commonlib.gettable("mathlib.vector3d");
@@ -37,6 +38,7 @@ Actor:Signal("beforeRemoved", function(self) end);
 
 function Actor:ctor()
 	self.offsetPos = vector3d:new(0,0,0);
+	self.fromPos = vector3d:new(0,0,0);
 	self.offsetYaw = 0;
 	self.codeEvents = {};
 	self.values = {};
@@ -188,6 +190,9 @@ function Actor:DeleteThisActor()
 end
 
 function Actor:OnRemove()
+	if(self:HasFocus()) then
+		self:RestoreFocus();
+	end
 	self:beforeRemoved(self);
 	Actor._super.OnRemove(self);
 end
@@ -206,6 +211,50 @@ function Actor:SetHighlight(bHighlight)
 	end
 end
 
+function Actor:GetPosition()
+	local entity = self:GetEntity();
+	if(entity) then
+		return self.entity:GetPosition();
+	end
+end
+
+function Actor:SetPosition(targetX,targetY,targetZ)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetDummy(true);
+		entity:SetPosition(targetX,targetY,targetZ);
+		if(self:IsPlaying()) then
+			self:ResetOffsetPosAndRotation();
+		end
+	end
+end
+
+function Actor:SetFacingDelta(v)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetFacingDelta(v);
+		if(self:IsPlaying()) then
+			self:ResetOffsetPosAndRotation();
+		end
+	end
+end
+
+function Actor:SetFacing(facing)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetFacing(facing);
+		if(self:IsPlaying()) then
+			self:ResetOffsetPosAndRotation();
+		end
+	end
+end
+
+function Actor:IsPlaying()
+	if(self.playTimer and self.playTimer:IsEnabled()) then
+		return true;
+	end
+end
+
 -- this allows us to play animation in movie block from current movie time to be relative to current entity's position
 -- @param time: if nil, it means the current time. 
 function Actor:ResetOffsetPosAndRotation()
@@ -221,8 +270,8 @@ function Actor:ResetOffsetPosAndRotation()
 		new_x, new_y, new_z = eX, eY, eZ;
 	end;
 	local obj = entity:GetInnerObject();
-	self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z);
-	self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0));
+	self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
+	self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0), yaw);
 end
 
 function Actor:SetOffsetYaw(yaw)
@@ -233,8 +282,9 @@ function Actor:GetOffsetYaw()
 	return self.offsetYaw;
 end
 
-function Actor:SetOffsetPos(dx,dy,dz)
+function Actor:SetOffsetPos(dx,dy,dz, fromX, fromY, fromZ)
 	self.offsetPos:set(dx,dy,dz);
+	self.fromPos:set(fromX, fromY, fromZ);
 end
 
 function Actor:GetOffsetPos()
@@ -245,8 +295,14 @@ function Actor:ComputePosAndRotation(curTime)
 	local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
 	
 	if(new_x) then
-		local dx, dy, dz = self:GetOffsetPos();
-		return new_x+dx, new_y+dy, new_z+dz, (yaw or 0)+self:GetOffsetYaw(), roll, pitch;
+		yaw = yaw or 0;
+		local dx,dy,dz = new_x - self.fromPos[1], new_y - self.fromPos[2],  new_z - self.fromPos[3];
+		if((dx~=0 or dy~=0 or dz~=0) and self.offsetYaw ~=0) then
+			dx, dy, dz = math3d.vec3Rotate(dx,dy,dz, 0, self.offsetYaw, 0);
+			new_x, new_y, new_z = self.fromPos[1] + dx, self.fromPos[2] + dy, self.fromPos[3] + dz;
+		end
+		dx, dy, dz = self:GetOffsetPos();
+		return new_x+dx, new_y+dy, new_z+dz, self:GetOffsetYaw() + yaw, roll, pitch;
 	end
 end
 
@@ -266,4 +322,23 @@ function Actor:StopLastCodeEvent(event)
 		last_coroutine:Stop();
 		self.codeEvents[event] = nil;
 	end
+end
+
+-- let the camera focus on this player and take control of it. 
+function Actor:SetFocus()
+	local entity = self:GetEntity();
+	if(entity) then
+		entity:SetFocus();
+	end
+end
+
+function Actor:HasFocus()
+	local entity = self:GetEntity();
+	if(entity) then
+		return entity:HasFocus();
+	end
+end
+
+function Actor:RestoreFocus()
+	EntityManager.GetPlayer():SetFocus();
 end

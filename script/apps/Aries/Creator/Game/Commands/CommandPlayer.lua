@@ -191,7 +191,7 @@ Examples:
 /velocity add @test 1,~,~   :use ~ to retain last speed.
 /velocity 1,~,~   :set current player's speed
 ]], 
-	handler = function(cmd_name, cmd_text, cmd_params)
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(not System.options.is_mcworld) then
 			return;
 		end

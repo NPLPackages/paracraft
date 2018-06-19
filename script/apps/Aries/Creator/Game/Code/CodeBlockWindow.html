@@ -27,7 +27,7 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
         <input name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' ShowLineNumber="true" UseSystemControl="true" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
     </pe:container>
     <pe:container style="position:relative;vertical-align:bottom;height:48px;background:;">
-        <input name="console" AlwaysShowCurLineBackground="false" rows="2" height="100%" value='<%=CodeBlockWindow.GetConsoleText()%>' UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
+        <input name="console" AlwaysShowCurLineBackground="false" rows="2" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
     </pe:container>
 </div>
 </pe:mcml>

@@ -47,5 +47,23 @@ end
 
 -- called every frame
 function Entity:FrameMove(deltaTime)
-	Entity._super.FrameMove(self, deltaTime);
+	EntityManager.EntityMovable.FrameMove(self, deltaTime);
+end
+
+-- called after focus is set
+function Entity:OnFocusIn()
+	self.has_focus = true;
+	local obj = self:GetInnerObject();
+	if(obj) then
+		if(obj.ToCharacter) then
+			obj:ToCharacter():SetFocus();
+		end
+	end
+	self:focusIn();
+end
+
+-- called before focus is lost
+function Entity:OnFocusOut()
+	self.has_focus = nil;
+	self:focusOut();
 end
