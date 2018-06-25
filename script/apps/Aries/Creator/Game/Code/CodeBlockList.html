@@ -1,0 +1,44 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeBlockList.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+<![CDATA[
+local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+local blockList = CodeBlockWindow.GetBlockList();
+function ListDs(index)
+    if(not index) then
+        return #blockList;
+    else
+        local item = blockList[index]
+        return item and {filename = item.filename, selected = CodeBlockWindow.entity == item.entity}
+    end
+end
+function OnSelectCodeBlock(index)
+    local item = blockList[index]
+    if(item and CodeBlockWindow.entity~=item.entity) then
+        CodeBlockWindow.SetCodeEntity(item.entity);
+    end
+end
+]]></script>
+<div style="font-size:12px;padding:3px;background-color:#292929;" class="default">
+    <div style="background-color:#dddede;">
+        <pe:gridview style="margin:0px;" name="gvwBlockList" CellPadding="0" VerticalScrollBarStep="24" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"
+                     DataSource='<%=ListDs%>'>
+            <Columns>
+                <div style="height:24px;" name="<%=Eval('index')%>" onclick="OnSelectCodeBlock">
+                    <pe:if condition='<%=Eval("selected")%>'>
+                        <div width="100%" style="padding-left:5px;padding-right:5px;background-color:#4a6cd4;color:#ffffff">
+                            <%=Eval('filename')%>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=not Eval("selected")%>'>
+                        <div width="100%" style="padding-left:5px;padding-right:5px;background-color:#ccccdd;color:#303030">
+                            <%=Eval('filename')%>
+                        </div>
+                    </pe:if>
+                </div>
+            </Columns>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+
