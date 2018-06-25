@@ -211,10 +211,21 @@ function Actor:SetHighlight(bHighlight)
 	end
 end
 
+function Actor:SetBlockPos(bx, by, bz)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetDummy(true);
+		entity:SetBlockPos(bx, by, bz);
+		if(self:IsPlaying()) then
+			self:ResetOffsetPosAndRotation();
+		end
+	end
+end
+
 function Actor:GetPosition()
 	local entity = self:GetEntity();
-	if(entity) then
-		return self.entity:GetPosition();
+	if(entity) then	
+		return entity:GetPosition();
 	end
 end
 

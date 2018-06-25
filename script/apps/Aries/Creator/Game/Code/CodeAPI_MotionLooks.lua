@@ -136,6 +136,27 @@ function env_imp:move(dx,dy,dz, duration)
 	end
 end
 
+-- same as moveTo, except that we use real coordinate in block unit
+function env_imp:setPos(x, y, z)
+	local actor = self.actor;
+	if(actor) then
+		x,y,z = BlockEngine:real_min(x, y, z);
+		actor:SetPosition(x, y, z);
+	end
+end
+
+-- same as getX(), getY(), getZ(), except that we return real coordinate in block unit
+function env_imp:getPos()
+	local actor = self.actor;
+	if(actor) then
+		local x, y, z = actor:GetPosition();
+		if(x) then
+			return BlockEngine:block_float(x, y, z);
+		end
+	end
+end
+
+
 -- moveTo to a given block position
 -- @param x,y,z: if z is nil, y is z. x can also be "mouse-pointer" or "@p" for current player or other actor name, while y and z are nil.
 function env_imp:moveTo(x, y, z)
@@ -156,13 +177,11 @@ function env_imp:moveTo(x, y, z)
 				end
 			end
 		elseif(x and y) then
-			env_imp.stop(self);
 			local ox,oy,oz = entity:GetBlockPos();
 			if(not z) then
 				y,z = oy, y;
 			end
-			entity:SetDummy(true);
-			entity:SetBlockPos(x,y,z);
+			self.actor:SetBlockPos(x,y,z);
 			env_imp.checkyield(self);
 		end
 	end

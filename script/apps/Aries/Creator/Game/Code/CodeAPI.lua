@@ -22,6 +22,7 @@ local s_env_methods = {
 	"yield", 
 	"checkyield",
 	"GetEntity",
+	"restart",
 	"exit",
 	-- Data
 	"print",
@@ -48,6 +49,8 @@ local s_env_methods = {
 	"getY",
 	"getZ",
 	"getFacing",
+	"getPos",
+	"setPos",
 	-- Looks
 	"say",
 	"show",
@@ -169,13 +172,17 @@ function env_imp:checkyield()
 	end
 end
 
--- Output a message and terminate the current script
+-- Output a message and terminate all connected code block.
 -- @param msg: output this message. usually nil. 
 function env_imp:exit(msg)
 	-- the caller use xpcall with custom error function, so caller will catch it gracefully and end the request
 	self.is_exit_call = true;
 	self.exit_msg = msg;
-	error("exit_call");
+	error("_stop_all_");
+end
+
+function env_imp:restart(msg)
+	error("_restart_all_");
 end
 
 -- private: 

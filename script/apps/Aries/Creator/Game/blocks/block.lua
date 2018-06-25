@@ -909,7 +909,7 @@ function block:canPlaceBlockAt(x,y,z)
 	local entities = EntityManager.GetEntitiesInBlock(x,y,z);
 	if(entities) then
 		for entity, _ in pairs(entities) do
-			if(not entity:canPlaceBlockAt(x,y,z, self)) then
+			if(entity:IsVisible() and not entity:canPlaceBlockAt(x,y,z, self)) then
 				return false;
 			end
 		end

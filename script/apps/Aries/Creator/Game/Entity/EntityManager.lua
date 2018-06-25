@@ -309,7 +309,7 @@ function EntityManager.CheckNoEntityCollision(x,y,z, excludingEntity)
 	local entities = EntityManager.GetEntitiesInBlock(x,y,z);
 	if(entities) then
 		for entity, _ in pairs(entities) do
-			if(not entity.isDead and (not excludingEntity or entity~=excludingEntity)) then
+			if(not entity.isDead and entity:IsVisible() and (not excludingEntity or entity~=excludingEntity)) then
 				return false;
 			end
 		end

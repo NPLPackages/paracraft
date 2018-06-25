@@ -28,6 +28,7 @@ function Entity:ctor()
 	self:SetDummy(true);
 	self:SetCanRandomMove(false);
 	self:SetStaticBlocker(true);
+	self:SetSurfaceDecay(1.0);
 end
 
 function Entity:LoadFromXMLNode(node)

@@ -203,6 +203,10 @@ function Entity:GetCodeBlock(bCreateIfNotExist)
 	return self.codeBlock;
 end
 
+function Entity:GetFilename()
+	return self:GetDisplayName();
+end
+
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
 	return L"输入代码"

@@ -152,9 +152,15 @@ function CodeCoroutine:RunImp(msg)
 		local ok, result = pcall(code_func, msg);
 
 		if(not ok) then
-			LOG.std(nil, "error", "CodeCoroutine", result);
-			local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
-			self:GetCodeBlock():send_message(msg);
+			if(result:match("_stop_all_")) then
+				self:GetCodeBlock():StopAll();
+			elseif(result:match("_restart_all_")) then
+				self:GetCodeBlock():RestartAll();
+			else
+				LOG.std(nil, "error", "CodeCoroutine", result);
+				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
+				self:GetCodeBlock():send_message(msg);
+			end
 		end		
 		return result;
 	end

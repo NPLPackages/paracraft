@@ -219,8 +219,8 @@ end
 
 function CodeBlockWindow.OnClickStop()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
-	if(codeBlock and codeBlock:GetEntity()) then
-		codeBlock:GetEntity():Stop();
+	if(codeBlock) then
+		codeBlock:StopAll();
 	end
 end
 
@@ -343,6 +343,22 @@ function CodeBlockWindow.IsMousePointerInCodeEditor()
 	end
 end
 
+function CodeBlockWindow.GetTextControl()
+	if(page) then
+		local textAreaCtrl = page:FindControl("code");
+		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
+		if(textCtrl) then
+			return textCtrl:ViewPort();
+		end
+	end
+end
+
+function CodeBlockWindow.ReplaceCode(code)
+	local textCtrl = CodeBlockWindow.GetTextControl();
+	if(textCtrl) then
+		textCtrl:SetText(code or "");
+	end
+end
 
 function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 	if(code and page) then
@@ -378,5 +394,35 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 	end
 end
 
+function CodeBlockWindow.OpenBlocklyEditor()
+	GameLogic.RunCommand("/open npl://blockeditor");
+end
+
+function CodeBlockWindow.OnOpenBlocklyEditor()
+	local code = CodeBlockWindow.GetCodeFromEntity();
+	if(code and code ~= "") then
+		_guihelper.MessageBox(L"图块编辑器还在测试阶段是否仍要使用?", function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				CodeBlockWindow.OpenBlocklyEditor()
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	else
+		CodeBlockWindow.OpenBlocklyEditor()
+	end
+end
+
+function CodeBlockWindow.GetBlockList()
+	local blockList = {};
+	local entity = self.entity;
+	if(entity) then
+		entity:ForEachNearbyCodeEntity(function(codeEntity)
+			blockList[#blockList+1] = {filename = codeEntity:GetFilename() or L"未命名", entity = codeEntity}
+		end);
+		table.sort(blockList, function(a, b)
+			return a.filename < b.filename;
+		end)
+	end
+	return blockList;
+end
 
 CodeBlockWindow:InitSingleton();

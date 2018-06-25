@@ -151,6 +151,20 @@ function CodeBlock:Unload()
 	self:Stop();
 end
 
+-- stop all nearby code entity
+function CodeBlock:StopAll()
+	if(self:GetEntity()) then
+		self:GetEntity():Stop();
+	end
+end
+
+-- restart all nearby code entity
+function CodeBlock:RestartAll()
+	if(self:GetEntity()) then
+		self:GetEntity():Restart();
+	end
+end
+
 -- remove everything to unloaded state. 
 function CodeBlock:Stop()
 	self:Disconnect("actorClicked");

@@ -13,8 +13,13 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
         <div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
             <pe:mc_block block_id='MovieClip' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickOpenMovieBlock" tooltip='<%=L"左键高亮角色, 右键编辑电影方块"%>' />
         </div>
-        <input type="text" name="filename" EmptyText='<%=L"名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:5px;margin-top:7px;textcolor:#ffffff;width:120px;height:25px;" class="mc_item"/>
-        <input type="button" value='<%=L"角色模型"%>' tooltip='<%=L"也可以通过电影方块编辑"%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+        <input type="button" value='<%=L"角色模型"%>' tooltip='<%=L"也可以通过电影方块编辑"%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+        <input type="text" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:120px;height:25px;" class="mc_item"/>
+        <div style="float:left;margin-left:0px;margin-top:7px;" 
+               tooltip='page://script/apps/Aries/Creator/Game/Code/CodeBlockList.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
+            <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">...</div>
+        </div>
+        <input type="button" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用"%>' onclick="CodeBlockWindow.OnOpenBlocklyEditor" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
         <input type="button" align="right" name="saveAndClose" value='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_big_button" style="margin-top:5px;min-width:80px;margin-right:10px;" />
     </div>
     <pe:container alignment="_fi" style="position:relative;margin-bottom:48px;margin-left:3px;width:200px;background:url();">

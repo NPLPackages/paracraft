@@ -58,7 +58,16 @@ BuildinMod.buildin_mods = {
 		displayName = L"3D地图GIS", 
 		text=L"系统内置插件",
 		version = "0.1",
-		homepage = "https://github.com/tatfook/WorldShare",
+		homepage = "https://github.com/tatfook/EMapMod",
+	},
+	{
+		name = "CodeBlockEditor", 
+		-- package_path = "npl_packages/CodeBlockEditor/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"代码方块Web编辑器", 
+		text=L"系统内置插件",
+		version = "0.1",
+		homepage = "https://github.com/tatfook/CodeBlockEditor",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
 };

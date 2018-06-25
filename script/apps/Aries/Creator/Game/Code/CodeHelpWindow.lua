@@ -203,7 +203,7 @@ function CodeHelpWindow.OnDragEnd(name)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 		if(CodeBlockWindow.IsMousePointerInCodeEditor()) then
-			CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), item:CanRun());
+			CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), not item:HasOutput());
 		end
 	end
 end

@@ -7,9 +7,9 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-CodeBlocklySerializer.WriteBlocklyMenuToXml("test_blockly_menu.xml");
-CodeBlocklySerializer.WriteToBlocklyConfig("test_blockly_config.json");
-CodeBlocklySerializer.WriteToBlocklyCode("test_blockly_execution.js");
+CodeBlocklySerializer.WriteBlocklyMenuToXml("BlocklyMenu.xml");
+CodeBlocklySerializer.WriteToBlocklyConfig("BlocklyConfigSource.json");
+CodeBlocklySerializer.WriteToBlocklyCode("BlocklyExecution.js");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/Json.lua");
@@ -24,11 +24,9 @@ local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem"
 
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
 
--- create a xml menu
-function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
+function CodeBlocklySerializer.GetBlocklyMenuXml()
 	local categories = CodeHelpWindow.GetCategoryButtons()
 	local all_cmds = CodeHelpData.GetAllCmds();
-	if(not filename or not categories or not all_cmds)then return end
 	local s = [[<xml id="toolbox" style="display: none">]];
 	local k,v;
 	for k,v in ipairs(categories) do
@@ -36,6 +34,11 @@ function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
 		s = string.format("%s\n%s",s,c_s);
 	end
 	s = string.format("%s\n</xml>",s);
+	return s;
+end
+-- create a xml menu
+function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
+	local s = CodeBlocklySerializer.GetBlocklyMenuXml();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
 		file:WriteString(s);
@@ -56,12 +59,8 @@ function CodeBlocklySerializer.GetCategoryStr(category)
 	s = string.format("%s</category>",s);
 	return s;
 end
--- write a json file to config all of blocks
--- how to define-blocks:https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
-function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
+function CodeBlocklySerializer.GetBlocklyConfig()
 	local all_cmds = CodeHelpData.GetAllCmds();
-	if(not filename or not all_cmds)then return end
-
 	local categories = CodeHelpWindow.GetCategoryButtons()
 	local c_map = {};
 	local k,v;
@@ -78,17 +77,21 @@ function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
 			v.colour = c_node.colour;
 		end
 	end
-
+	local s = NPL.ToJson(all_cmds,true);
+	return s;
+end
+-- write a json file to config all of blocks
+-- how to define-blocks:https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
+function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
+	if(not filename or not all_cmds)then return end
+	local s = CodeBlocklySerializer.GetBlocklyConfig();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
-		file:WriteString(NPL.ToJson(all_cmds,true));
+		file:WriteString(s);
 		file:close();
 	end
 end
--- create a js file for execution
--- generating-code: https://developers.google.com/blockly/guides/create-custom-blocks/generating-code
-function CodeBlocklySerializer.WriteToBlocklyCode(filename)
-	if(not filename)then return end
+function CodeBlocklySerializer.GetBlocklyCode()
 	local all_cmds = CodeHelpData.GetAllCmds();
 	local s = "";
 	local cmd
@@ -100,6 +103,13 @@ function CodeBlocklySerializer.WriteToBlocklyCode(filename)
 			s = s .. "\n" .. execution_str;
 		end
 	end
+	return s;
+end
+-- create a js file for execution
+-- generating-code: https://developers.google.com/blockly/guides/create-custom-blocks/generating-code
+function CodeBlocklySerializer.WriteToBlocklyCode(filename)
+	if(not filename)then return end
+	local s = CodeBlocklySerializer.GetBlocklyCode();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
 		file:WriteString(s);
@@ -126,23 +136,32 @@ supported input:
 function CodeBlocklySerializer.ArgsToStr(cmd)
 	local type = cmd.type
 	local arg0 = cmd.arg0
-	local var_lines = nil;
-	local arg_lines = nil;
+	local var_lines = "";
+	local arg_lines = "";
 	local k,v;
+	local prefix = type;
+	prefix = string.gsub(prefix,"%.","_")
 	for k,v in ipairs(arg0) do
-		local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(type,v)
-		local arg_str = CodeBlocklySerializer.ArgToJsStr_ArgName(type,v);
+		local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
+		local arg_str = CodeBlocklySerializer.ArgToJsStr_ArgName(prefix,v);
 		if(k == 1)then
 			var_lines = var_str;
 			arg_lines = arg_str;
 		else
 			var_lines = var_lines .. "\n" .. var_str;
-			arg_lines = arg_lines .. " + ',' + " .. arg_str;
+			arg_lines = arg_lines .. "," .. arg_str;
 		end
 	end
-	local s = string.format([[%s
-return '%s(' + %s + ');\n';
-]],var_lines,type,arg_lines);
+	local func_description = cmd.func_description;
+	local s;
+	
+	if(func_description)then
+	s = string.format([[%s
+return '%s\n'.format(%s);
+]],var_lines,func_description,arg_lines);
+	else
+		s = 'return ""';
+	end
 	return s;
 end
 function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
@@ -165,13 +184,12 @@ function CodeBlocklySerializer.ArgToJsStr_ArgName(prefix,arg)
 	local name = arg.name
 	local s;
 	if(type == "input_statement")then
-		s = string.format([[
-'function()\n' + 
-	%s_statement
-+ 'end'
-		]],prefix)
+		--s = string.format([['function()\n' + %s_statement + 'end\n']],prefix)
+		s = string.format([[%s_statement]],prefix);
 	else
 		s = string.format([[%s_%s_value]],prefix,name);
 	end
 	return s;
 end
+
+

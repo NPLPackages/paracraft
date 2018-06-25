@@ -33,6 +33,7 @@ local all_cmds = {
 	category = "Data", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'set("%s", "%s")',
 	ToNPL = function(self)
 		return string.format('set("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -59,6 +60,7 @@ end
 	category = "Data", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'showVariable("%s")',
 	ToNPL = function(self)
 		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
 	end,
@@ -87,6 +89,7 @@ end
 	category = "Data", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'hideVariable("%s")',
 	ToNPL = function(self)
 		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
 	end,
@@ -111,6 +114,7 @@ hideVariable("score")
 	category = "Data", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'log("%s")',
 	ToNPL = function(self)
 		return string.format('log("%s")\n', self:getFieldAsString('obj'));
 	end,
@@ -141,6 +145,7 @@ log(something)
 	color = "#cc0000",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'setActorValue("%s", "%s")',
 	ToNPL = function(self)
 		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -173,6 +178,7 @@ say("click us!")
 	output = {type = "field_number",},
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getActorValue("%s")',
 	ToNPL = function(self)
 		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
 	end,
@@ -211,6 +217,7 @@ say("click us!")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'say("%s", %s)',
 	ToNPL = function(self)
 		return string.format('say("%s", %s)\n', self:getFieldValue('text'), self:getFieldAsString('duration'));
 	end,
@@ -232,6 +239,7 @@ move(0,1,0)
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'say("%s")',
 	ToNPL = function(self)
 		return string.format('say("%s")\n', self:getFieldValue('text'));
 	end,
@@ -254,6 +262,7 @@ say("")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'tip("%s")',
 	ToNPL = function(self)
 		return string.format('tip("%s")\n', self:getFieldValue('text'));
 	end,
@@ -275,6 +284,7 @@ tip("")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'show()',
 	ToNPL = function(self)
 		return string.format('show()\n');
 	end,
@@ -287,6 +297,7 @@ tip("")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'hide()',
 	ToNPL = function(self)
 		return string.format('hide()\n');
 	end,
@@ -309,6 +320,7 @@ tip("")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'anim(%d, %d)',
 	ToNPL = function(self)
 		return string.format('anim(%d, %d)\n', self:getFieldValue('animId'), self:getFieldAsString('duration'));
 	end,
@@ -336,6 +348,7 @@ anim(0)
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'play(%d, %d)',
 	ToNPL = function(self)
 		return string.format('play(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
 	end,
@@ -362,6 +375,7 @@ say("No looping", 1)
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'playLoop(%d, %d)',
 	ToNPL = function(self)
 		return string.format('playLoop(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
 	end,
@@ -379,6 +393,7 @@ stop()
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'stop()',
 	ToNPL = function(self)
 		return 'stop()\n';
 	end,
@@ -405,6 +420,7 @@ stop()
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'scale(%d)',
 	ToNPL = function(self)
 		return string.format('scale(%d)\n', self:getFieldValue('scaleDelta'));
 	end,
@@ -427,6 +443,7 @@ scale(-50)
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'scaleTo(%d)',
 	ToNPL = function(self)
 		return string.format('scaleTo(%d)\n', self:getFieldValue('scale'));
 	end,
@@ -455,6 +472,7 @@ scaleTo(100)
 	color = "#cc0000",
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'focus("%s")',
 	ToNPL = function(self)
 		return string.format('focus("%s")\n', self:getFieldAsString('name'));
 	end,
@@ -472,6 +490,7 @@ focus("player")
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getScale()',
 	ToNPL = function(self)
 		return 'getScale()';
 	end,
@@ -493,6 +512,7 @@ end
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getPlayTime()',
 	ToNPL = function(self)
 		return 'getPlayTime()';
 	end,
@@ -516,7 +536,7 @@ end
 		{
 			name = "dist",
 			type = "field_number",
-			text = "1", 
+			text = 1, 
 		},
 		{
 			name = "duration",
@@ -527,6 +547,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'moveForward(%d, %d)',
 	ToNPL = function(self)
 		return string.format('moveForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
@@ -550,6 +571,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'turn(%d)',
 	ToNPL = function(self)
 		return string.format('turn(%s)\n', self:getFieldAsString('degree'));
 	end,
@@ -573,6 +595,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'turnTo(%d)',
 	ToNPL = function(self)
 		return string.format('turnTo(%s)\n', self:getFieldAsString('degree'));
 	end,
@@ -583,7 +606,7 @@ turnTo(0)
 ]]}},
 },
 {
-	type = "turnTo", 
+	type = "turnToTarget", 
 	message0 = L"转向%1",
 	arg0 = {
 		{
@@ -595,6 +618,7 @@ turnTo(0)
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'turnTo("%s")',
 	ToNPL = function(self)
 		return string.format('turnTo("%s")\n', self:getFieldAsString('targetName'));
 	end,
@@ -635,6 +659,7 @@ moveForward(1, 1)
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'move(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('move(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
 	end,
@@ -647,7 +672,7 @@ say("jump!", 1)
 },
 {
 	type = "moveTo", 
-	message0 = L"瞬移到%1 %2 %3 %4",
+	message0 = L"瞬移到%1 %2 %3",
 	arg0 = {
 		{
 			name = "x",
@@ -673,16 +698,12 @@ say("jump!", 1)
 				return z;
 			end, 
 		},
-		{
-			name = "duration",
-			type = "field_number",
-			text = 0.5, 
-		},
 	},
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
 	isDynamicNPLCode = true,
+	func_description = 'moveTo(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('moveTo(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
@@ -706,6 +727,7 @@ moveTo("frog")
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'moveTo("%s")',
 	ToNPL = function(self)
 		return string.format('moveTo("%s")\n', self:getFieldValue('targetName'));
 	end,
@@ -746,6 +768,7 @@ moveTo("frog")
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'walk(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('walk(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
 	end,
@@ -774,6 +797,7 @@ walk(-1,0,-1) -- x,y,z
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'walkForward(%s, %s)',
 	ToNPL = function(self)
 		return string.format('walkForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
@@ -798,6 +822,7 @@ walkForward(1, 0.5)
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'velocity("%s")',
 	ToNPL = function(self)
 		return string.format('velocity("%s")\n', self:getFieldAsString('cmd_text'));
 	end,
@@ -817,6 +842,7 @@ velocity("0 0 0")
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'bounce()',
 	ToNPL = function(self)
 		return 'bounce()';
 	end,
@@ -839,6 +865,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getX()',
 	ToNPL = function(self)
 		return 'getX()';
 	end,
@@ -856,6 +883,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getY()',
 	ToNPL = function(self)
 		return 'getY()';
 	end,
@@ -876,6 +904,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getZ()',
 	ToNPL = function(self)
 		return 'getZ()';
 	end,
@@ -886,6 +915,64 @@ end
 ]]}},
 },
 {
+	type = "getPos", 
+	message0 = L"角色xyz位置",
+	arg0 = {},
+	output = {type = "field_number",},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getPos()',
+	ToNPL = function(self)
+		return 'getPos()';
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local x, y, z = getPos()
+setPos(x, y+0.5, z)
+]]}},
+},
+{
+	type = "setPos", 
+	message0 = L"设置角色位置",
+	arg0 = {
+		{
+			name = "x",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return x;
+			end, 
+		},
+		{
+			name = "y",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return y;
+			end, 
+		},
+		{
+			name = "z",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return z;
+			end, 
+		},
+	},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'setPos(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('setPos(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local x, y, z = getPos()
+setPos(x, y+0.5, z)
+]]}},
+},
+{
 	type = "getFacing", 
 	message0 = L"方向",
 	arg0 = {},
@@ -893,6 +980,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getFacing()',
 	ToNPL = function(self)
 		return 'getFacing()';
 	end,
@@ -917,6 +1005,7 @@ end
 	category = "Events", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'registerClickEvent(function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n%send)\n', self:getFieldAsString('input'));
 	end,
@@ -950,6 +1039,7 @@ end)
 	category = "Events", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'registerKeyPressedEvent("%s", function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function()\n%send)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,
@@ -981,6 +1071,7 @@ end)
 	category = "Events", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'registerAnimationEvent(%d, function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerAnimationEvent(%d, function()\n%send)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
 	end,
@@ -1017,6 +1108,7 @@ say("click me!")
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'registerBroadcastEvent("%s", function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function()\n%send)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
@@ -1048,6 +1140,7 @@ say("click to jump!")
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'broadcast("%s")',
 	ToNPL = function(self)
 		return string.format('broadcast("%s")\n', self:getFieldAsString('msg'));
 	end,
@@ -1079,6 +1172,7 @@ end
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'broadcastAndWait("%s")',
 	ToNPL = function(self)
 		return string.format('broadcastAndWait("%s")\n', self:getFieldAsString('msg'));
 	end,
@@ -1092,6 +1186,32 @@ end)
 for i=1, 2 do
     broadcastAndWait("hi")
 end
+]]}},
+},
+
+{
+	type = "cmd", 
+	message0 = L"执行命令%1",
+	arg0 = {
+		{
+			name = "msg",
+			type = "field_input",
+			text = "/tip hello", 
+		},
+	},
+	category = "Events", 
+	color="#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'cmd("%s")',
+	ToNPL = function(self)
+		return string.format('cmd("%s")\n', self:getFieldAsString('msg'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+cmd("/setblock ~0 ~0 ~1 62")
+cmd("/cameradist 12")
+cmd("/camerayaw 0")
+cmd("/camerapitch 0.5")
 ]]}},
 },
 
@@ -1109,6 +1229,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'wait(%s)',
 	ToNPL = function(self)
 		return string.format('wait(%s)\n', self:getFieldAsString('msg'));
 	end,
@@ -1137,6 +1258,7 @@ say("bye", 1)
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'for i=1, %d do\\n%send',
 	ToNPL = function(self)
 		return string.format('for i=1, %d do\n%send\n', self:getFieldValue('times'), self:getFieldAsString('input'));
 	end,
@@ -1160,6 +1282,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'while(true) do\\n%send',
 	ToNPL = function(self)
 		return string.format('while(true) do\n%send\n', self:getFieldAsString('input'));
 	end,
@@ -1193,6 +1316,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'if(%s) then\\n%selse\\n%send',
 	ToNPL = function(self)
 		return string.format('if(%s) then\n%selse\n%send\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
 	end,
@@ -1237,6 +1361,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'for %s, %s in pairs(%s) do\\n%send',
 	ToNPL = function(self)
 		return string.format('for %s, %s in pairs(%s) do\n%send\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
@@ -1253,7 +1378,7 @@ end
 },
 
 {
-	type = "forKeyValue", 
+	type = "forIndexValue", 
 	message0 = L"每个%1,%2在数组%3%4",
 	arg0 = {
 		{
@@ -1280,6 +1405,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
 	ToNPL = function(self)
 		return string.format('for %s, %s in ipairs(%s) do\n%send\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
@@ -1308,6 +1434,7 @@ end
 	category = "Control", color="#cc0000",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'registerCloneEvent(function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
 	end,
@@ -1336,6 +1463,7 @@ clone("myself", 3)
 	category = "Control", color="#cc0000",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'clone("%s")',
 	ToNPL = function(self)
 		return string.format('clone("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -1357,6 +1485,7 @@ say("click")
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = "delete()",
 	ToNPL = function(self)
 		return string.format('delete()\n');
 	end,
@@ -1389,6 +1518,7 @@ end
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'run(function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('run(function()\n%send)\n', self:getFieldAsString('input'));
 	end,
@@ -1411,6 +1541,46 @@ end)
 ]]}},
 },
 
+{
+	type = "exit", 
+	message0 = L"结束程序",
+	arg0 = {
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'exit()',
+	ToNPL = function(self)
+		return string.format('exit()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("Press X key to exit")
+registerKeyPressedEvent("x", function()
+    exit()
+end)
+]]}},
+},
+
+{
+	type = "restart", 
+	message0 = L"重新开始",
+	arg0 = {
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'restart()',
+	ToNPL = function(self)
+		return string.format('restart()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("Press X key to restart")
+registerKeyPressedEvent("x", function()
+    restart()
+end)
+]]}},
+},
+
 -- Sensing
 {
 	type = "isTouching", 
@@ -1426,6 +1596,7 @@ end)
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'isTouching("%s")',
 	ToNPL = function(self)
 		return string.format('isTouching("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -1458,6 +1629,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'distanceTo("%s")',
 	ToNPL = function(self)
 		return string.format('distanceTo("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -1489,6 +1661,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'isKeyPressed("%s")',
 	ToNPL = function(self)
 		return string.format('isKeyPressed("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -1515,6 +1688,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'isMouseDown()',
 	ToNPL = function(self)
 		return string.format('isMouseDown()\n');
 	end,
@@ -1538,6 +1712,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'mousePickBlock()',
 	ToNPL = function(self)
 		return string.format('mousePickBlock()\n');
 	end,
@@ -1550,8 +1725,99 @@ while(true) do
 end
 ]]}},
 },
+{
+	type = "getBlock", 
+	message0 = L"获取方块id",
+	arg0 = {
+		{
+			name = "x",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return x;
+			end, 
+		},
+		{
+			name = "y",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return y;
+			end, 
+		},
+		{
+			name = "z",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return z;
+			end, 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getBlock(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('getBlock(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local x,y,z = getPos();
+local id = getBlock(x,y-1,z)
+say("block below is "..id, 2)
+]]}},
+},
 
-
+{
+	type = "setBlock", 
+	message0 = L"放置方块",
+	arg0 = {
+		{
+			name = "x",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return x;
+			end, 
+		},
+		{
+			name = "y",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return y;
+			end, 
+		},
+		{
+			name = "z",
+			type = "field_number",
+			text = function()
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+				return z;
+			end, 
+		},
+		{
+			name = "blockId",
+			type = "field_number",
+			text = "62", 
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'setBlock(%s, %s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('setBlock(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('blockId'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local x,y,z = getPos()
+local id = getBlock(x,y+2,z)
+setBlock(x,y+2,z, 62)
+wait(1)
+setBlock(x,y+2,z, id)
+]]}},
+},
 
 {
 	type = "timer", 
@@ -1562,6 +1828,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'getTimer()',
 	ToNPL = function(self)
 		return string.format('getTimer()');
 	end,
@@ -1581,6 +1848,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'resetTimer()',
 	ToNPL = function(self)
 		return string.format('resetTimer()');
 	end,
@@ -1594,18 +1862,14 @@ say("hi", 2)
 },
 
 {
-	type = "modeGame", 
-	message0 = L"设置为游戏模式 %1",
+	type = "mode", 
+	message0 = L"设置为游戏模式",
 	arg0 = {
-		{
-			name = "mode",
-			type = "field_input",
-			text = "game",
-		},
 	},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'cmd("/mode game")',
 	ToNPL = function(self)
 		return string.format('cmd("/mode game")\n');
 	end,
@@ -1613,17 +1877,13 @@ say("hi", 2)
 
 {
 	type = "modeEdit", 
-	message0 = L"设置为编辑模式 %1",
+	message0 = L"设置为编辑模式",
 	arg0 = {
-		{
-			name = "mode",
-			type = "field_input",
-			text = "edit",
-		},
 	},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'cmd("/mode edit")',
 	ToNPL = function(self)
 		return string.format('cmd("/mode edit")\n');
 	end,
@@ -1648,6 +1908,7 @@ say("hi", 2)
 	category = "Sound", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'playNote("%s", %s)',
 	ToNPL = function(self)
 		return string.format('playNote("%s", %s)\n', self:getFieldAsString('note'), self:getFieldAsString('beat'));
 	end,
@@ -1673,6 +1934,7 @@ end
 	category = "Sound", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'playMusic("%s")',
 	ToNPL = function(self)
 		return string.format('playMusic("%s")\n', self:getFieldAsString('filename'));
 	end,
@@ -1696,6 +1958,7 @@ playMusic()
 	category = "Sound", 
 	helpUrl = "", 
 	canRun = true,
+	func_description = 'playSound("%s")',
 	ToNPL = function(self)
 		return string.format('playSound("%s")\n', self:getFieldAsString('filename'));
 	end,
@@ -1726,6 +1989,7 @@ playSound("click")
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(%s) + (%s)',
 	ToNPL = function(self)
 		return string.format('(%s) + (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1755,6 +2019,7 @@ say(1+1)
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'math.random(%s,%s)',
 	ToNPL = function(self)
 		return string.format('math.random(%s,%s)', self:getFieldAsString('from'), self:getFieldAsString('to'));
 	end,
@@ -1785,6 +2050,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(%s) == (%s)',
 	ToNPL = function(self)
 		return string.format('(%s) == (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1824,6 +2090,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(%s) and (%s)',
 	ToNPL = function(self)
 		return string.format('(%s) and (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1859,6 +2126,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(%s) or (%s)',
 	ToNPL = function(self)
 		return string.format('(%s) or (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1889,6 +2157,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(not %s)',
 	ToNPL = function(self)
 		return string.format('(not %s)', self:getFieldAsString('left'));
 	end,
@@ -1924,6 +2193,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '("%s".."%s")',
 	ToNPL = function(self)
 		return string.format('("%s".."%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1946,6 +2216,7 @@ say("hello ".."world".."!!!")
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(#"%s")',
 	ToNPL = function(self)
 		return string.format('(#"%s")', self:getFieldAsString('left'));
 	end,
@@ -1973,6 +2244,7 @@ say("length of hello is "..(#"hello"));
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = '(%s%%s)',
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -1995,6 +2267,7 @@ say("66%10=="..(66%10))
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'math.floor(%s+0.5)',
 	ToNPL = function(self)
 		return string.format('math.floor(%s+0.5)', self:getFieldAsString('left'));
 	end,
@@ -2022,6 +2295,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	func_description = 'math.sqrt(%s)',
 	ToNPL = function(self)
 		return string.format('math.sqrt(%s)', self:getFieldAsString('left'));
 	end,

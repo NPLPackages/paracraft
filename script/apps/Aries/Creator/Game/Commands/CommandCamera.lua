@@ -51,7 +51,7 @@ Example:
 				end
 			end
 			if(lookat_x and lookat_y and lookat_z) then
-				local player = EntityManager.GetPlayer();
+				local player = EntityManager.GetFocus() or EntityManager.GetPlayer();
 				if(player) then
 					local camx,camy,camz = player:GetPosition();
 					camy = camy + player:GetPhysicsHeight();
@@ -103,7 +103,9 @@ Commands["fov"] = {
 Commands["cameradist"] = {
 	name="cameradist", 
 	quick_ref="/cameradist [1-20]", 
-	desc="change the camera to player distance", 
+	desc=[[change the camera to player distance
+/cameradist 10   set eye distance to 10
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(cmd_text) then
 			local dist;
@@ -115,4 +117,39 @@ Commands["cameradist"] = {
 	end,
 };
 
+Commands["camerapitch"] = {
+	name="camerapitch", 
+	quick_ref="/camerapitch [-1.57, 1.57]", 
+	desc=[[change the camera lift up angle between [-1.57, 1.57]
+/camerapitch 0.5
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if(cmd_text) then
+			local value;
+			value, cmd_text  = CmdParser.ParseInt(cmd_text);
+			if(value) then
+				local att = ParaCamera.GetAttributeObject();
+				att:SetField("CameraLiftupAngle", value);
+			end
+		end
+	end,
+};
+
+Commands["camerayaw"] = {
+	name="camerayaw", 
+	quick_ref="/camerayaw [-3.14, 3.14] ", 
+	desc=[[change the camera yaw facing between [-3.14, 3.14]
+/camerayaw 0
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if(cmd_text) then
+			local value;
+			value, cmd_text  = CmdParser.ParseInt(cmd_text);
+			if(value) then
+				local att = ParaCamera.GetAttributeObject();
+				att:SetField("CameraRotY", value);
+			end
+		end
+	end,
+};
 

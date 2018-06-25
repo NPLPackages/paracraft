@@ -135,8 +135,8 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 	if(bPickObjects~=false) then
 		local obj_filter;
 		local obj = ParaScene.MousePick(result.length or picking_dist, "anyobject"); 
-		if(not obj:IsValid() or obj.name == "_bm_") then
-			-- ignore block custom model
+		if(not obj:GetField("visible", false) or obj.name == "_bm_") then
+			-- ignore block custom model or invisible ones
 			obj = nil;
 		else
 			result.obj = obj;

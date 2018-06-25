@@ -18,7 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
 
 function CodeGlobals:ctor()
@@ -76,7 +76,15 @@ function CodeGlobals:ctor()
 		mousePickBlock = function(picking_dist)
 			local result = SelectionManager:MousePickBlock(true, false, false, picking_dist);
 			return result.blockX, result.blockY, result.blockZ, result.block_id, result.side;
-		end
+		end,
+		-- get block id at given position
+		getBlock = function(x,y,z)
+			return BlockEngine:GetBlockId(math.floor(x), math.floor(y), math.floor(z));
+		end,
+		-- set block id at given position
+		setBlock = function(x,y,z, blockId, blockData)
+			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData);
+		end,
 	};
 
 	self:Reset();
@@ -210,6 +218,10 @@ function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 			end
 		end
 		event:DispatchEvent({type="msg", msg=msg, onFinishedCallback=onFinishedCallback});
+	else
+		if(onFinishedCallback) then
+			onFinishedCallback();
+		end
 	end
 end
 

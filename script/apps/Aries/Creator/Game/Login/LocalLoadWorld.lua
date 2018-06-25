@@ -85,12 +85,25 @@ function LocalLoadWorld.GetWorldFolderFullPath()
 	if(not LocalLoadWorld.OpenWorldFolderFullPath) then
 		LocalLoadWorld.OpenWorldFolderFullPath = LocalLoadWorld.GetWorldFolder();
 		if(not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
-			LocalLoadWorld.OpenWorldFolderFullPath = ParaIO.GetWritablePath() .. LocalLoadWorld.OpenWorldFolderFullPath;
+			if(System.os.GetExternalStoragePath()~="") then
+				LocalLoadWorld.OpenWorldFolderFullPath = System.os.GetExternalStoragePath().."paracraft/worlds/DesignHouse";
+			else
+				LocalLoadWorld.OpenWorldFolderFullPath = ParaIO.GetWritablePath() .. LocalLoadWorld.OpenWorldFolderFullPath;
+			end
 		end
 	end
 	return LocalLoadWorld.OpenWorldFolderFullPath;
 end
 
+local saveWorldPath;
+-- same as LocalLoadWorld.GetWorldFolderFullPath() by default
+function LocalLoadWorld.GetDefaultSaveWorldPath()
+	if(not saveWorldPath) then
+		saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
+		LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
+	end
+	return saveWorldPath;
+end
 
 -- refresh all causing world list to be refreshed. 
 -- @param refresh_delay: usually nil or 0
@@ -100,18 +113,6 @@ function LocalLoadWorld.RefreshAll(refresh_delay)
 	page:Refresh(refresh_delay);
 end
 
-local saveWorldPath;
-function LocalLoadWorld.GetDefaultSaveWorldPath()
-	if(not saveWorldPath) then
-		if(System.os.GetExternalStoragePath()~="") then
-			saveWorldPath = System.os.GetExternalStoragePath().."paracraft/worlds/DesignHouse";
-		else
-			saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
-		end
-		LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
-	end
-	return saveWorldPath;
-end
 
 function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 	-- update the file path
