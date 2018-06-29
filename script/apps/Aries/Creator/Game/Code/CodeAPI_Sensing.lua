@@ -10,6 +10,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
 ]]
 NPL.load("(gl)script/ide/System/Windows/MouseEvent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
@@ -176,9 +178,28 @@ function env_imp:getScale(objName)
 	return entity and (entity:GetScaling() or 1) * 100;
 end
 
-function env_imp:ask(text, callbackFunc)
+-- @param buttons: nil or {"button1", "button2"}
+function env_imp:ask(text, buttons)
 	local actor = self.actor;
-	-- TODO: 
+	if(actor) then
+		local type_;
+		if(type(buttons) == "table") then
+			type_ = "buttons";
+		end
+
+		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+		local Screen = commonlib.gettable("System.Windows.Screen");
+		local viewport = ViewportManager:GetSceneViewport();
+		local offsetX = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
+			GameLogic.GetCodeGlobal():SetGlobal("answer", result);
+			env_imp.resume(self);
+		end), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=200})
+		env_imp.yield(self)
+	end
 end
 
 -- local block time since this block is loaded.

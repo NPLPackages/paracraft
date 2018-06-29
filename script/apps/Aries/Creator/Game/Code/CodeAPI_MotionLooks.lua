@@ -271,6 +271,17 @@ function env_imp:anim(anim_id, duration)
 	end
 end
 
+-- how fast we will play() the animation in movie block
+-- @param speed: default to 1. if nil, it will return current speed.
+function env_imp:playSpeed(speed)
+	if(self.actor) then
+		if(speed) then
+			self.actor:SetPlaySpeed(speed);
+		else
+			return self.actor:GetPlaySpeed();
+		end
+	end
+end
 
 -- play a time series animation in the movie block.
 -- this function will return immediately.
@@ -296,10 +307,11 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 		if(timeTo and timeTo>timeFrom) then
 			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
 			local function frameMove_(timer)
-				time = time + timer:GetDelta();
+				local delta = timer:GetDelta() * actor:GetPlaySpeed();
+				time = time + delta;
 				if(time >= timeTo) then
 					if(isLooping) then
-						if((time - timer:GetDelta()) == timeTo) then
+						if((time - delta) == timeTo) then
 							time = timeFrom;
 						else
 							time = timeTo;

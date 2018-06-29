@@ -45,6 +45,7 @@ function CodeGlobals:ctor()
 			  upper = string.upper },
 		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
+			getn = table.getn,
 			sort = table.sort },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 

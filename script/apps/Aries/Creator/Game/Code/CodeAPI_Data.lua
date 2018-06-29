@@ -52,14 +52,22 @@ function env_imp:inherit(baseClass, new_class, ctor)
 end
 
 function env_imp:getActorValue(name)
-	if(self.actor and name) then
-		return self.actor:GetActorValue(name);
+	local entity = env_imp.GetEntity(self)
+	if(entity and name) then
+		local variables = entity:GetVariables();
+		if(variables) then
+			return variables:GetVariable(name);
+		end
 	end
 end
 
 function env_imp:setActorValue(name, value)
-	if(self.actor and name) then
-		return self.actor:SetActorValue(name, value);
+	local entity = env_imp.GetEntity(self)
+	if(entity and name) then
+		local variables = entity:GetVariables();
+		if(variables) then
+			variables:SetVariable(name, value);
+		end
 	end
 end
 

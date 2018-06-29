@@ -32,10 +32,19 @@ end
             <select name="text_select" AllowUserEdit="true" style="width:220px;height:24px;" DataSource='<%=EnterTextDialog.options%>'>
             </select>
         </pe:if>
+        <pe:if condition='<%=EnterTextDialog.IsButtons()%>'>
+            <pe:repeat DataSource="<%=EnterTextDialog.GetButtonsDS()%>">
+                <pe:repeatitem>
+                    <input type="button" style="margin-bottom:5px;width:360px;color:#ffffff;font-size:14px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" name='<%=Eval("index")%>' value='<%=Eval("text")%>' onclick="EnterTextDialog.OnClickButton"/>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:if>
     </div>
-    <div>
-        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-right:20px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="EnterTextDialog.OnOK" value='<%=L"确定"%>' />
-    </div>
+    <pe:if condition='<%=not EnterTextDialog.IsButtons()%>'>
+        <div>
+            <input type="button" name="OK" DefaultButton="true" align="right" style="margin-right:20px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="EnterTextDialog.OnOK" value='<%=L"确定"%>' />
+        </div>
+    </pe:if>
 </div>
 <%
     function SetFocus()

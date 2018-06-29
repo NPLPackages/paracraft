@@ -21,7 +21,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["blockimage"] = {
 	name="blockimage", 
-	quick_ref="/blockimage [-xy|-yz|-xz] [colors:1|2|3|16] filename [x y z]", 
+	quick_ref="/blockimage [-xy|-yz|-xz] [colors:1|2|3|16|65535] filename [x y z]", 
 	desc=[[load image as blocks at given position. Image width better be multiple of 2.
 @param [-xy|-yz|-xz]: default to xy plane
 @param colors: how many colors to use. default to 65535. For fewer colors, use [1|2|3|16|65535]

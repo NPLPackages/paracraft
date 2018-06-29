@@ -75,6 +75,7 @@ local var_longname_to_text = {
 MovieClipTimeLine.timelineHeight = 12;
 MovieClipTimeLine.timeSliderHeight = 16;
 MovieClipTimeLine.height = MovieClipTimeLine.timelineHeight*2 + MovieClipTimeLine.timeSliderHeight;
+MovieClipTimeLine.maintainAspectRatio = true;
 
 function MovieClipTimeLine.OnInit()
 	local self = MovieClipTimeLine;
@@ -94,7 +95,15 @@ function MovieClipTimeLine.OnClosePage()
 	Game.SelectionManager:Disconnect("varNameChanged", self, self.OnVariableNameChange);
 	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
 	self.inited = false;
-	ViewportManager:GetSceneViewport():SetMarginBottom(0);
+	local viewport = ViewportManager:GetSceneViewport();
+	if(viewport:GetMarginBottomHandler() == self) then
+		viewport:SetMarginBottomHandler(nil);
+		viewport:SetMarginBottom(0);
+	end
+	if(viewport:GetMarginRightHandler() == self) then
+		viewport:SetMarginRightHandler(nil);
+		viewport:SetMarginRight(0);	
+	end
 end
 
 -- set UI height. only valid during startup
@@ -298,7 +307,14 @@ function MovieClipTimeLine:ShowTimeline(state)
 
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
-		ViewportManager:GetSceneViewport():SetMarginBottom(math.floor(self.height * (Screen:GetUIScaling()[2])));
+		local viewport = ViewportManager:GetSceneViewport();
+		viewport:SetMarginBottom(math.floor(self.height * (Screen:GetUIScaling()[2])));
+		viewport:SetMarginBottomHandler(self);
+		if(MovieClipTimeLine.maintainAspectRatio and not viewport:GetMarginRightHandler()) then
+			-- let us maintain aspect ratio
+			viewport:SetMarginRight(math.floor(self.height/Screen:GetHeight()*Screen:GetWidth() * (Screen:GetUIScaling()[1])));
+			viewport:SetMarginRightHandler(self);
+		end
 		if(not self.inited) then
 			MovieClipTimeLine.OnInit();
 		end

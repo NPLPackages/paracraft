@@ -386,6 +386,31 @@ stop()
 ]]}},
 },
 {
+	type = "playSpeed", 
+	message0 = L"播放速度%1",
+	arg0 = {
+		{
+			name = "speed",
+			type = "field_number",
+			text = 1, 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'playSpeed(%d)',
+	ToNPL = function(self)
+		return string.format('playSpeed(%d)\n', self:getFieldValue('speed'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+playSpeed(4)
+playLoop(0, 1000)
+say("Looping", 3)
+playSpeed(1)
+stop()
+]]}},
+},
+{
 	type = "stop", 
 	message0 = L"停止播放",
 	arg0 = {
@@ -933,7 +958,7 @@ setPos(x, y+0.5, z)
 },
 {
 	type = "setPos", 
-	message0 = L"设置角色位置",
+	message0 = L"设置角色位置%1 %2 %3",
 	arg0 = {
 		{
 			name = "x",
@@ -1648,6 +1673,61 @@ end
 },
 
 {
+	type = "askAndWait", 
+	message0 = L"提问%1并等待回答",
+	arg0 = {
+		{
+			name = "input",
+			type = "field_input",
+			text = L"你叫什么名字?",
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'ask("%s")',
+	ToNPL = function(self)
+		return string.format('ask("%s")\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+ask("what is your name")
+say("hello "..tostring(answer), 2)
+
+ask("select your choice", {"choice A", "choice B"})
+if(answer == 1) then
+    say("you choose A")
+elseif(answer == 2) then
+    say("you choose B")
+end
+]]}},
+},
+
+{
+	type = "answer", 
+	message0 = L"提问的结果",
+	arg0 = {},
+	output = {type = "field_number",},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'get("answer")',
+	ToNPL = function(self)
+		return 'get("answer")';
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("<div style='color:#ff0000'>Like A or B?</div>html are supported")
+ask("type A or B")
+if(answer == "A") then
+   say("A is good", 2)
+elseif(answer == "B") then
+   say("B is fine", 2)
+else
+   say("i do not understand you", 2)
+end
+]]}},
+},
+
+{
 	type = "isKeyPressed", 
 	message0 = L"%1键是否按下",
 	arg0 = {
@@ -1727,7 +1807,7 @@ end
 },
 {
 	type = "getBlock", 
-	message0 = L"获取方块id",
+	message0 = L"获取方块id%1 %2 %3",
 	arg0 = {
 		{
 			name = "x",
@@ -1771,7 +1851,7 @@ say("block below is "..id, 2)
 
 {
 	type = "setBlock", 
-	message0 = L"放置方块",
+	message0 = L"放置方块%1 %2 %3 %4",
 	arg0 = {
 		{
 			name = "x",

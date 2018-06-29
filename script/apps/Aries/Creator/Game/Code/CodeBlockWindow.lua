@@ -32,18 +32,21 @@ function CodeBlockWindow.Show(bShow)
 	else
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
-			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, 0, 200, 0);
+			self.width, self.height, self.margin_right, self.bottom = self:CalculateMargins();
+			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, 0, self.width, self.bottom);
 			_this.zorder = -2;
 			_this.background="";
 			local refreshTimer = commonlib.Timer:new({callbackFunc = function(timer)
 				CodeBlockWindow.Show(true)
 			end})
 			_this:SetScript("onsize", function()
-				if(CodeBlockWindow.IsVisible()) then
-					CodeBlockWindow.Show(true);
-					page:Rebuild();
-				end
+				CodeBlockWindow:OnViewportChange();
 			end)
+			local viewport = ViewportManager:GetSceneViewport();
+			viewport:SetMarginRight(self.margin_right);
+			viewport:SetMarginRightHandler(self);
+			viewport:Connect("sizeChanged", CodeBlockWindow, CodeBlockWindow.OnViewportChange, "UniqueConnection");
+
 			_this:SetScript("onclick", function() end); -- just disable click through 
 			_guihelper.SetFontColor(_this, "#ffffff");
 			_this:AttachToRoot();
@@ -51,15 +54,45 @@ function CodeBlockWindow.Show(bShow)
 			page:Create(code_block_window_name.."page", _this, "_fi", 0, 0, 0, 0);
 		end
 
-		-- TODO: use a scene/ui layout manager here
-		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-		local Screen = commonlib.gettable("System.Windows.Screen");
-		self.width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
-		_this.width = self.width;
 		_this.visible = true;
-		ViewportManager:GetSceneViewport():SetMarginRight(math.floor(self.width * (Screen:GetUIScaling()[2])));
+		CodeBlockWindow:OnViewportChange();
+		local viewport = ViewportManager:GetSceneViewport();
+		viewport:SetMarginRight(self.margin_right);
+		viewport:SetMarginRightHandler(self);
 
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
+	end
+end
+
+-- @return margin_right and bottom
+function CodeBlockWindow:CalculateMargins()
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local viewport = ViewportManager:GetSceneViewport();
+	local width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
+	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+	local margin_right = math.floor(width * Screen:GetUIScaling()[1]);
+	return width, Screen:GetHeight()-bottom, margin_right, bottom;
+end
+
+function CodeBlockWindow:OnViewportChange()
+	if(CodeBlockWindow.IsVisible()) then
+		-- TODO: use a scene/ui layout manager here
+		local width, height, margin_right, bottom = self:CalculateMargins();
+		if(self.width ~= width or self.height ~= height) then
+			self.width = width;
+			self.height = height;
+			self.margin_right = margin_right;
+			self.bottom = bottom;
+			local viewport = ViewportManager:GetSceneViewport();
+			viewport:SetMarginRight(self.margin_right);
+			viewport:SetMarginRightHandler(self);
+			local _this = ParaUI.GetUIObject(code_block_window_name);
+			_this:Reposition("_mr", 0, 0, self.width, self.bottom);
+			if(page) then
+				page:Rebuild();
+			end
+		end
 	end
 end
 
@@ -168,7 +201,11 @@ function CodeBlockWindow.RestoreWindowLayout()
 	if(_this:IsValid()) then
 		_this.visible = false;
 	end
-	ViewportManager:GetSceneViewport():SetMarginRight(0);
+	local viewport = ViewportManager:GetSceneViewport();
+	if(viewport:GetMarginRightHandler() == self) then
+		viewport:SetMarginRightHandler(nil);
+		viewport:SetMarginRight(0);
+	end
 end
 
 function CodeBlockWindow.UpdateCodeToEntity()

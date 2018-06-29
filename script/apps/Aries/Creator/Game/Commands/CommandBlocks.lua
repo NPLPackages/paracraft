@@ -294,6 +294,32 @@ Examples:
 	end,
 };
 
+Commands["blockpieces"] = {
+	name="blockpieces", 
+	quick_ref="/blockpieces blockid x y z (dx dy dz)", 
+	desc=[[create block pieces at given position
+Examples:
+/blockpieces 62 ~-1 ~1 ~-2   
+/blockpieces 62 19210 4 19185
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local blockid, dx, dy, dz;
+		blockid, cmd_text = CmdParser.ParseBlockId(cmd_text);
+		local block_template = block_types.get(blockid or 62);
+		local x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
+		if(x and block_template) then
+			local pieces_granularity = 1;
+			dx, dy, dz, cmd_text = CmdParser.ParsePosInBrackets(cmd_text);
+			for i=0, math.abs(dx or 0) do
+				for j=0, math.abs(dy or 0) do
+					for k=0, math.abs(dz or 0) do
+						block_template:CreateBlockPieces(x+i,y+j,z+k, pieces_granularity);
+					end
+				end
+			end
+		end
+	end,
+};
 
 Commands["clone"] = {
 	name="clone", 

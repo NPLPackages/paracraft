@@ -30,6 +30,7 @@ Actor:Property({"entityClass", "EntityCodeActor"});
 -- frame move interval in milliseconds
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
+Actor:Property({"playSpeed", 1, "GetPlaySpeed", "SetPlaySpeed", auto=true});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- the itemstack(TimeSeries) is changed
 Actor:Signal("dataSourceChanged");
@@ -41,7 +42,6 @@ function Actor:ctor()
 	self.fromPos = vector3d:new(0,0,0);
 	self.offsetYaw = 0;
 	self.codeEvents = {};
-	self.values = {};
 end
 
 
@@ -55,13 +55,6 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
-function Actor:GetActorValue(name)
-	return self.values[name];
-end
-
-function Actor:SetActorValue(name, value)
-	self.values[name] = value;
-end
 
 function Actor:IsActorPickingEnabled()
 	return self.enableActorPicking;

@@ -11,6 +11,9 @@ local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDi
 EnterTextDialog.ShowPage("Please enter text", function(result)
 	echo(result);
 end)
+EnterTextDialog.ShowPage("select buttons", function(result)
+	echo(result);
+end, nil, "buttons", {"button1", "button2", "button3", "button4"})
 -------------------------------------------------------
 ]]
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -40,14 +43,20 @@ function EnterTextDialog.IsSelectText()
 end
 
 function EnterTextDialog.IsSingleLine()
-	return not EnterTextDialog.IsMultiLine() and not EnterTextDialog.IsSelectText();
+	return not EnterTextDialog.IsMultiLine() and not EnterTextDialog.IsSelectText() and not EnterTextDialog.IsButtons();
 end
 
+function EnterTextDialog.IsButtons()
+	return EnterTextDialog.GetType() == "buttons";
+end
 
 -- @param default_text: default text to be displayed. 
--- @param type_: if true, it is multi-line text. otherwise it is nil|text|multiline|select.
--- @param options: only used when type is "select". such as {{value="0", text="zero"},{value="1"}}
-function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
+-- @param type_: if true, it is multi-line text. otherwise it is nil|text|multiline|select|buttons.
+-- @param options: only used when type is "select" or "buttons". 
+-- when type_ is "select": it is {{value="0", text="zero"},{value="1"}}
+-- when type_ is "buttons": it is {"text1", "text2", "text3"}, result is button Index 
+-- @param showParams: nil or {align="_ct", x, y, width, height}
+function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, showParams)
 	EnterTextDialog.result = nil;
 	EnterTextDialog.text = text;
 	if(type_ == true) then
@@ -55,13 +64,13 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
 	else
 		EnterTextDialog.SetType(type_);
 	end
-	if(options) then
+	if(options and EnterTextDialog.IsSelectText()) then
 		for _, option in pairs(options) do
 			option.selected = option.value == default_text;
 		end
 	end
 	EnterTextDialog.options = options;
-
+	showParams = showParams or {};
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
 			name = "EnterTextDialog.ShowPage", 
@@ -76,11 +85,11 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options)
 			isTopLevel = true,
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
-				align = "_ct",
-				x = -200,
-				y = -150,
-				width = 400,
-				height = 400,
+				align = showParams.align or "_ct",
+				x = showParams.x or -200,
+				y = showParams.y or -150,
+				width = showParams.width or 400,
+				height = showParams.height or 400,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -115,4 +124,21 @@ end
 
 function EnterTextDialog.GetText()
 	return EnterTextDialog.text or L"请输入:";
+end
+
+function EnterTextDialog.GetButtonsDS()
+	local ds = {};
+	if(EnterTextDialog.options) then
+		for _, text in ipairs(EnterTextDialog.options) do
+			ds[#ds+1] = {text = text};
+		end
+	end
+	return ds;
+end
+
+function EnterTextDialog.OnClickButton(index)
+	if(page) then
+		EnterTextDialog.result = index;
+		page:CloseWindow();
+	end
 end

@@ -19,10 +19,10 @@ end
 ]]></script>
 <style type="text/mcss">
 {
-    btn_add ={
+    btn_sub ={
         float="left", width = 8, height=10, ["margin-top"] = 3, ["margin-left"] = 3, background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#484 203 8 10"
     },
-    btn_sub = {
+    btn_add = {
         float ="left", width = 10, height=10, ["margin-top"] = 3, ["margin-left"] = 3, background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10"
     },
     text_field = {
@@ -66,9 +66,9 @@ end
             <option selected="selected" value="y">Y</option>
             <option value="z">Z</option>
         </select><br/>
-        <input type="button" class="btn_add" style="margin-left:20px;" name="btn_sub_axis" onclick="TransformWnd.ChangeRotation" />
+        <input type="button" class="btn_sub" style="margin-left:20px;" name="btn_sub_axis" onclick="TransformWnd.ChangeRotation" />
         <input type="text" text="0" spacing="0" onchange="TransformWnd.OnUIValueChanged" name="text_rot" class="mc_text text_field" />
-        <input type="button" class="btn_sub" name="btn_add_axis" onclick="TransformWnd.ChangeRotation" />
+        <input type="button" class="btn_add" name="btn_add_axis" onclick="TransformWnd.ChangeRotation" />
     </div>
     <div style="margin-top:5px;">
         <input type="button" style="" value='<%=L"确定"%>' tooltip='<%=L"Ctrl+C复制,Ctrl+X剪切,Ctrl+V粘贴"%>' onclick="TransformWnd.TransformSelection" class="mc_light_grey_button_with_fillet"/>

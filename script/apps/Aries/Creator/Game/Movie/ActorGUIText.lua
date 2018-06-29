@@ -189,7 +189,9 @@ function Actor:GetTextObj(bCreateIfNotExist)
 		local _parent = ParaUI.GetUIObject("MovieGUIRoot");
 		if(not _parent:IsValid()) then
 			local viewport = ViewportManager:GetSceneViewport();
-			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,0, math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]));
+			local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+			local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
+			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,margin_right, margin_bottom);
 			_parent.background = ""
 			_parent.enabled = false;
 			_parent.zorder = -3;
@@ -197,8 +199,10 @@ function Actor:GetTextObj(bCreateIfNotExist)
 			
 			viewport:Connect("sizeChanged", nil, function()
 				local _parent = ParaUI.GetUIObject("MovieGUIRoot");
+				local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
 				local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
 				_parent.height = margin_bottom;
+				_parent.width = margin_right;
 			end)
 
 			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 50);

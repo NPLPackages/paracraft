@@ -58,6 +58,7 @@ local s_env_methods = {
 	"anim",
 	"play",
 	"playLoop",
+	"playSpeed",
 	"stop",
 	"scale",
 	"scaleTo",

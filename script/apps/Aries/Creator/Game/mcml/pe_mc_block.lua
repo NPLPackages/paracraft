@@ -47,16 +47,15 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 
 	mcmlNode.uiobject_id = _this.id;
 
-	local inventory = mcmlNode:GetAttributeWithCode("inventory", nil, true);
-	if(not inventory) then
-		inventory = EntityManager.GetPlayer().inventory;
-	end
-	mcmlNode.inventory = inventory;
-
 	local block_id;
 	local block_count;
 	local bagpos = mcmlNode:GetAttributeWithCode("bagpos", nil, true);
 	if(bagpos) then
+		local inventory = mcmlNode:GetAttributeWithCode("inventory", nil, true);
+		if(not inventory) then
+			inventory = EntityManager.GetPlayer().inventory;
+		end
+		mcmlNode.inventory = inventory;
 		bagpos = tonumber(bagpos);
 		mcmlNode.bag_pos_ = bagpos;
 		

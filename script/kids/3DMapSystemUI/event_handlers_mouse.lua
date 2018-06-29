@@ -146,9 +146,9 @@ function Map3DSystem.OnMouseMove()
 	-- update input message
 	local dragDist=0;
 	if(InputMsg.IsMouseDown) then
-		InputMsg.MouseDragDist.x = InputMsg.MouseDragDist.x + (mouse_dx or 0);
-		InputMsg.MouseDragDist.y = InputMsg.MouseDragDist.y + (mouse_dy or 0);
-		dragDist = (math.abs(InputMsg.MouseDragDist.x) + math.abs(InputMsg.MouseDragDist.y));
+		InputMsg.MouseDragDist.x = InputMsg.MouseDragDist.x + math.abs(mouse_dx or 0);
+		InputMsg.MouseDragDist.y = InputMsg.MouseDragDist.y + math.abs(mouse_dy or 0);
+		dragDist = math.abs(InputMsg.MouseDragDist.x) + math.abs(InputMsg.MouseDragDist.y);
 	end
 	InputMsg.mouse_x, InputMsg.mouse_y = ParaUI.GetMousePosition();
 	InputMsg.mouse_button = mouse_button;

@@ -251,6 +251,7 @@ function QuickSelectBar.ShowPage(bShow)
 						if(obj) then
 							NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 							local Screen = commonlib.gettable("System.Windows.Screen");
+							obj.x = -math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
 							obj.y = -math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
 						end
 					end
