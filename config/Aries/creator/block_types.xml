@@ -157,6 +157,9 @@ Sound related:
   <block singleSideTex="true" name="BlockLight" text="聚光灯" searchkey="" class="BlockLight" entity_clasCmdTextureReplacers="EntityLight" item_class="ItemLight"  light="true" torchLightValue="5"  id="264" texture="Texture/blocks/wool_colored_white.png" obstruction="false" cubeMode="true" template="carpet" />
   <block threeSideTex="true" name="Checkpoint" text="存盘点" searchkey="" class="BlockEntityBase" entity_class="EntityCheckpoint" id="265" hasAction="true" texture="Texture/blocks/doortop_three.png" mapcolor="#fdcc49" obstruction="true" solid="true" cubeMode="true" />
   
+  <!--Added Xizhi 2018.7.2 added animation block-->
+  <block singleSideTex="true" name="AnimModelBlock" id="266" modelName="codeblock" text="动画模型方块" searchkey="动画模型方块" class="BlockAnimModel" entity_class="EntityAnimModel" texture="Texture/blocks/CmdTextureReplacer.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
+  
   <!--added by Jingqi 2013.11.3: -->
   <block singleSideTex="true" name="White_Wool" text="白色方块" searchkey="白色方块" mc_id="35" id="133" mapcolor="#f8f7db" step_sound="cloth" icon="Texture/blocks/items/wool_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" name="Orange_Wool" text="橙色方块" searchkey="橙色方块" mc_id="35:1" id="94" mapcolor="#fdcc49" step_sound="cloth" icon="Texture/blocks/items/wool_orange.png" texture="Texture/blocks/wool_colored_orange.png" obstruction="true" solid="true" cubeMode="true"  />

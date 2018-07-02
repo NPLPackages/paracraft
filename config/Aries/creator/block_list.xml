@@ -279,7 +279,6 @@ to_id： 可以是一组连续的ID
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
     <block name="CodeBlock"/>
-
   </category>
 
   <category name="tool" text="工具">
@@ -313,10 +312,12 @@ to_id： 可以是一组连续的ID
     <block name="player_spawn_point"/>
     <block name="ColorBlock" />
     <block name="Bone"/>
+    <block name="AnimModelBlock" />
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="villager"/>
     <block name="MemoryBlock"/>
     <block name="CodeBlock"/>
+    <block name="Lever" />
   </category>
 </blocklist>
