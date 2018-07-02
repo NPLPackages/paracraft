@@ -19,8 +19,9 @@ function env_imp:log(...)
 	commonlib.echo(...);
 end
 
-function env_imp:echo(...)
-	commonlib.echo(...);
+function env_imp:echo(obj, ...)
+	commonlib.echo(obj, ...);
+	GameLogic.RunCommand("/echo "..commonlib.serialize_in_length(obj, 100))
 end
 
 -- get the entity associated with the actor.

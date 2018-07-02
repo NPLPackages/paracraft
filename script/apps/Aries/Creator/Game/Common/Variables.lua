@@ -70,6 +70,7 @@ function Variable:SetValue(value)
 		self.get_func = value;
 	else
 		self.value = value;
+		self.get_func = nil;
 		self.str_value = ConvertToString(value);
 	end
 end

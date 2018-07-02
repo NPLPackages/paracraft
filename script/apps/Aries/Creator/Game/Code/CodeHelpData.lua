@@ -127,6 +127,115 @@ log(something)
 },
 
 {
+	type = "echo", 
+	message0 = L"输出到聊天框%1",
+	arg0 = {
+		{
+			name = "obj",
+			type = "field_input",
+			text = "hello", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'echo("%s")',
+	ToNPL = function(self)
+		return string.format('echo("%s")\n', self:getFieldAsString('obj'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+echo(123)
+echo("hello")
+something = {any="object"}
+echo(something)
+]]}},
+},
+
+
+{
+	type = "registerCloneEvent", 
+	message0 = L"当演员被复制时%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Data", color="#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'registerCloneEvent(function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerCloneEvent(function(msg)
+    move(msg or 1, 0, 0, 0.5)
+    wait(1)
+    delete()
+end)
+clone()
+clone("myself", 2)
+clone("myself", 3)
+]]}},
+},
+
+{
+	type = "clone", 
+	message0 = L"复制角色%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "field_input",
+			text = "myself",
+		},
+	},
+	category = "Data", color="#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'clone("%s")',
+	ToNPL = function(self)
+		return string.format('clone("%s")\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerClickEvent(function()
+    move(1,0,0, 0.5)
+end)
+clone()
+clone()
+say("click")
+]]}},
+},
+
+{
+	type = "delete", 
+	message0 = L"删除角色", color="#cc0000",
+	arg0 = {
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = "delete()",
+	ToNPL = function(self)
+		return string.format('delete()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+move(1,0)
+say("Default actor will be deleted!", 1)
+delete()
+registerCloneEvent(function()
+    say("This clone will be deleted!", 1)
+    delete()
+end)
+for i=1, 100 do
+    clone()
+    wait(2)
+end
+]]}},
+},
+
+{
 	type = "setActorValue", 
 	message0 = L"设置角色属性%1为%2",
 	arg0 = {
@@ -304,31 +413,33 @@ tip("")
 },
 {
 	type = "anim", 
-	message0 = L"播放动作 %1 等待 %2 秒",
+	message0 = L"播放动作编号 %1",
 	arg0 = {
 		{
 			name = "animId",
 			type = "field_number",
 			text = 4, 
 		},
-		{
-			name = "duration",
-			type = "field_number",
-			text = 2, 
-		},
 	},
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = true,
-	func_description = 'anim(%d, %d)',
+	func_description = 'anim(%d)',
 	ToNPL = function(self)
-		return string.format('anim(%d, %d)\n', self:getFieldValue('animId'), self:getFieldAsString('duration'));
+		return string.format('anim(%d)\n', self:getFieldValue('animId'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 anim(4)
-move(3, 0, 0, 2)
+move(-2,0,0,1)
 anim(0)
-]]}},
+]]},
+{desc = L"常用动作编号", canRun = true, code = [[
+-- 0: standing
+-- 4: walking 
+-- 5: running
+-- check movie block for more ids
+]]}
+},
 },
 {
 	type = "play", 
@@ -507,6 +618,43 @@ moveForward(2,2)
 focus("player")
 ]]}},
 },
+
+{
+	type = "camera", 
+	message0 = L"摄影机距离%1角度%2朝向%3",
+	arg0 = {
+		{
+			name = "dist",
+			type = "field_input",
+			text = "12", 
+		},
+		{
+			name = "pitch",
+			type = "field_input",
+			text = "45", 
+		},
+		{
+			name = "facing",
+			type = "field_input",
+			text = "90", 
+		},
+	},
+	category = "Looks", 
+	color = "#cc0000",
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'camera(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('camera(%s, %s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('pitch'), self:getFieldAsString('facing'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+for i=1, 100 do
+    camera(10+i*0.1, nil, nil)
+    wait(0.05)
+end
+]]}},
+},
+
 {
 	type = "getScale", 
 	message0 = L"放缩尺寸",
@@ -1256,13 +1404,22 @@ cmd("/camerapitch 0.5")
 	canRun = false,
 	func_description = 'wait(%s)',
 	ToNPL = function(self)
-		return string.format('wait(%s)\n', self:getFieldAsString('msg'));
+		return string.format('wait(%s)\n', self:getFieldAsString('time'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 say("hi")
 wait(1)
 say("bye", 1)
-]]}},
+]]},
+{desc = L"等待下一个时钟周期", canRun = true, code = [[
+while(true) do
+    if(isKeyPressed("space")) then
+        say("space is pressed", 1)
+    end
+    wait()
+end
+]]}
+},
 },
 
 {
@@ -1447,89 +1604,6 @@ end
 },
 
 {
-	type = "registerCloneEvent", 
-	message0 = L"当演员被复制时%1",
-	arg0 = {
-		{
-			name = "input",
-			type = "input_statement",
-			text = "",
-		},
-	},
-	category = "Control", color="#cc0000",
-	helpUrl = "", 
-	canRun = false,
-	func_description = 'registerCloneEvent(function()\\n%send)',
-	ToNPL = function(self)
-		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerCloneEvent(function(msg)
-    move(msg or 1, 0, 0, 0.5)
-    wait(1)
-    delete()
-end)
-clone()
-clone("myself", 2)
-clone("myself", 3)
-]]}},
-},
-
-{
-	type = "clone", 
-	message0 = L"复制角色%1",
-	arg0 = {
-		{
-			name = "input",
-			type = "field_input",
-			text = "myself",
-		},
-	},
-	category = "Control", color="#cc0000",
-	helpUrl = "", 
-	canRun = false,
-	func_description = 'clone("%s")',
-	ToNPL = function(self)
-		return string.format('clone("%s")\n', self:getFieldAsString('input'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerClickEvent(function()
-    move(1,0,0, 0.5)
-end)
-clone()
-clone()
-say("click")
-]]}},
-},
-
-{
-	type = "delete", 
-	message0 = L"删除角色", color="#cc0000",
-	arg0 = {
-	},
-	category = "Control", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = "delete()",
-	ToNPL = function(self)
-		return string.format('delete()\n');
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-move(1,0)
-say("Default actor will be deleted!", 1)
-delete()
-registerCloneEvent(function()
-    say("This clone will be deleted!", 1)
-    delete()
-end)
-for i=1, 100 do
-    clone()
-    wait(2)
-end
-]]}},
-},
-
-{
 	type = "run", 
 	message0 = L"并行执行%1",
 	arg0 = {
@@ -1699,7 +1773,16 @@ if(answer == 1) then
 elseif(answer == 2) then
     say("you choose B")
 end
-]]}},
+]]},
+{desc = L"关闭对话框", canRun = true, code = [[
+run(function()
+   wait(3)
+   ask()
+end)
+ask("Please answer in 3 seconds")
+say("hello "..tostring(answer), 2)
+]]}
+},
 },
 
 {
@@ -1755,8 +1838,28 @@ while(true) do
         move(0, -0.1)
         say("")
     end
+    wait()
 end
-]]}},
+]]},
+{desc = L"", canRun = true, code = [[
+say("press any key to continue!")
+while(true) do
+    if(isKeyPressed("any")) then
+        say("you pressed a key!", 2)
+    end
+    wait()
+end
+]]},
+{desc = L"按键列表", canRun = true, code = [[
+-- a,b,c,...z
+-- 1,2,3,...9,0
+-- f1,f2,...,f12,escape
+-- space,left,right,up,down
+-- numpad0,numpad1,...,numpad9
+-- return,minus,equals,back,tab,
+-- lcontrol,lshift,lmenu
+]]}
+},
 },
 
 {
@@ -1895,6 +1998,8 @@ local x,y,z = getPos()
 local id = getBlock(x,y+2,z)
 setBlock(x,y+2,z, 62)
 wait(1)
+-- 0 to delete block
+setBlock(x,y+2,z, 0)
 setBlock(x,y+2,z, id)
 ]]}},
 },

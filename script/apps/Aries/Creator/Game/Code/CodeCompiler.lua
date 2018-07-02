@@ -15,10 +15,11 @@ local CodeCompiler = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"
 
 
 local inject_map = {
-	{"^(%s*function%W+[^%)]+%)%s*)$", "%1 checkyield();"},
+	{"^(%s*function%A+[^%)]+%)%s*)$", "%1 checkyield();"},
 	{"^(%s*local%s+function%W+[^%)]+%)%s*)$", "%1 checkyield();"},
 	{"^(%s*for%s.*%s+do%s*)$", "%1 checkyield();"},
-	{"^(%s*while%W.*%s+do%s*)$", "%1 checkyield();"},
+	{"^(%s*while%A.*%Ado%s*)$", "%1 checkyield();"},
+	{"^(%s*repeat%s*)$", "%1 checkyield();"},
 }
 
 local function injectLine_(line)

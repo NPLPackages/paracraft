@@ -20,14 +20,13 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
 -- wait some time
--- @param seconds: in seconds
+-- @param seconds: in seconds, if nil, it is one tick or env_imp.GetDefaultTick(self)
 function env_imp:wait(seconds)
-	if(seconds and seconds>0) then
-		self.co:SetTimeout(math.floor(seconds*1000), function()
-			env_imp.resume(self);
-		end) 
-		env_imp.yield(self);
-	end
+	seconds = seconds or env_imp.GetDefaultTick(self);
+	self.co:SetTimeout(math.floor(seconds*1000), function()
+		env_imp.resume(self);
+	end) 
+	env_imp.yield(self);
 end
 
 -- say some text and wait for some time. 
@@ -216,7 +215,7 @@ function env_imp:turnTo(degree)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		if(type(degree) == "number") then
-			entity:SetFacing(degree*math.pi/180);
+			self.actor:SetFacing(degree*math.pi/180);
 		elseif(degree == "mouse-pointer") then
 			local result = SelectionManager:MousePickBlock(true, false, false); 
 			if(result and result.blockX) then
@@ -267,7 +266,10 @@ function env_imp:anim(anim_id, duration)
 	if(entity) then
 		entity:EnableAnimation(true);
 		entity:SetAnimation(anim_id);
-		env_imp.wait(self, duration or env_imp.GetDefaultTick(self));
+
+		if(duration) then
+			env_imp.wait(self, duration);
+		end
 	end
 end
 
@@ -424,5 +426,21 @@ function env_imp:velocity(cmd_text)
 			playerEntity:SetVelocity(x,y,z);
 		end
 		playerEntity:SetDummy(false);
+	end
+end
+
+function env_imp:camera(dist, pitch, facing)
+	if(dist) then
+		GameLogic.options:SetCameraObjectDistance(dist)
+	end
+	if(pitch) then
+		pitch = pitch*math.pi/180;
+		local att = ParaCamera.GetAttributeObject();
+		att:SetField("CameraLiftupAngle", pitch);
+	end
+	if(facing) then
+		facing = facing*math.pi/180;
+		local att = ParaCamera.GetAttributeObject();
+		att:SetField("CameraRotY", facing);
 	end
 end

@@ -29,6 +29,7 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
+		type = type,
 		unpack = unpack,
 		math = { abs = math.abs, acos = math.acos, asin = math.asin, 
 			  atan = math.atan, atan2 = math.atan2, ceil = math.ceil, cos = math.cos, 

@@ -945,6 +945,10 @@ function Actor:ComputePosAndRotation(curTime)
 	return new_x, new_y, new_z, yaw, roll, pitch;
 end
 
+function Actor:ComputeScaling(curTime)
+	return self:GetValue("scaling", curTime) or 1;
+end
+
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
 	self.lastPlayTime = curTime;
@@ -975,7 +979,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	anim = self:GetValue("anim", curTime);
 	skin = self:GetValue("skin", curTime);
 	speedscale = self:GetValue("speedscale", curTime);
-	scaling = self:GetValue("scaling", curTime);
+	scaling = self:ComputeScaling(curTime);
 	gravity = self:GetValue("gravity", curTime);
 	opacity = self:GetValue("opacity", curTime);
 	assetfile = self:GetValue("assetfile", curTime);

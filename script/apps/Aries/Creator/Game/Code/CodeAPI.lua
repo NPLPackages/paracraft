@@ -65,6 +65,7 @@ local s_env_methods = {
 	"getPlayTime",
 	"getScale",
 	"focus",
+	"camera",
 
 	-- Events
 	"registerClickEvent",
@@ -183,6 +184,7 @@ function env_imp:exit(msg)
 end
 
 function env_imp:restart(msg)
+	env_imp.wait(self, 1);
 	error("_restart_all_");
 end
 

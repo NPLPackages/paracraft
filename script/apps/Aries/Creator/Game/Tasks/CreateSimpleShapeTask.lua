@@ -325,42 +325,29 @@ function CreateSimpleShape:CreateEllipsoid(cx,cy,cz,diameterX,diameterY,diameter
     local diameterOffsetY = diameterY - 1;
     local diameterOffsetZ = diameterZ - 1;
 
-	--for (var x = 0; x < radiusCeilingX; ++x)
-        --for (var y = 0; y < radiusCeilingY; ++y)
-            --for (var z = 0; z < radiusCeilingZ; ++z)
+	local blockMap = {};
+
+	local function AddBlock(block_template, x,y,z)
+		local idx = BlockEngine:GetSparseIndex(x,y,z);
+		if(not blockMap[idx]) then
+			self:AddBlock(block_template, x, y, z);
+			blockMap[idx] = true;
+		end
+	end
 	for x = 0, radiusCeilingX do
         for y = 0, radiusCeilingY do
             for z = 0, radiusCeilingZ do
                 --if (ellipsoidLocusCheck(x - midX, y - midY, z - midZ, radiusX, radiusY, radiusZ) and onSurfaceEdgeCheck(x, y, z, radiusX, radiusY, radiusZ)) then
 				if (ellipsoidLocusCheck(x, y, z, radiusX, radiusY, radiusZ) and onSurfaceEdgeCheck(x, y, z, radiusX, radiusY, radiusZ, beSolid)) then
-					self:AddBlock(block_template, cx + x, cy + y, cz + z);
-					self:AddBlock(block_template, cx - x, cy + y, cz + z);
-					self:AddBlock(block_template, cx + x, cy + y, cz - z);
-					self:AddBlock(block_template, cx - x, cy + y, cz - z);
+					AddBlock(block_template, cx + x, cy + y, cz + z);
+					AddBlock(block_template, cx - x, cy + y, cz + z);
+					AddBlock(block_template, cx + x, cy + y, cz - z);
+					AddBlock(block_template, cx - x, cy + y, cz - z);
 
-					self:AddBlock(block_template, cx + x, cy - y, cz + z);
-					self:AddBlock(block_template, cx - x, cy - y, cz + z);
-					self:AddBlock(block_template, cx + x, cy - y, cz - z);
-					self:AddBlock(block_template, cx - x, cy - y, cz - z);
-					
-
-					--self:AddBlock(block_template, cx + x, cy + y, cz + z);
-					--self:AddBlock(block_template, cx + diameterOffsetX - x, cy + y, cz + z);
-					--self:AddBlock(block_template, cx + x, cy + diameterOffsetY - y, cz + z);
-					--self:AddBlock(block_template, x, cy + y, cz + diameterOffsetZ - z);
-					--self:AddBlock(block_template, cx + diameterOffsetX - x, cy + diameterOffsetY - y, cz + z);
-					--self:AddBlock(block_template, cx + x, cy + diameterOffsetY - y, cz + diameterOffsetZ - z);
-					--self:AddBlock(block_template, cx + diameterOffsetX - x, cy + y, cz + diameterOffsetZ - z);
-					--self:AddBlock(block_template, cx + diameterOffsetX - x, cy + diameterOffsetY - y, cz + diameterOffsetZ - z);
-
-					--Block(x, y, z);
-					--Block(diameterOffsetX - x, y, z);
-					--Block(x, diameterOffsetY - y, z);
-					--Block(x, y, diameterOffsetZ - z);
-					--Block(diameterOffsetX - x, diameterOffsetY - y, z);
-					--Block(x, diameterOffsetY - y, diameterOffsetZ - z);
-					--Block(diameterOffsetX - x, y, diameterOffsetZ - z);
-					--Block(diameterOffsetX - x, diameterOffsetY - y, diameterOffsetZ - z);
+					AddBlock(block_template, cx + x, cy - y, cz + z);
+					AddBlock(block_template, cx - x, cy - y, cz + z);
+					AddBlock(block_template, cx + x, cy - y, cz - z);
+					AddBlock(block_template, cx - x, cy - y, cz - z);
 				end
 			end
 		end

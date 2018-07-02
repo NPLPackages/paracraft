@@ -178,6 +178,8 @@ function env_imp:getScale(objName)
 	return entity and (entity:GetScaling() or 1) * 100;
 end
 
+-- @param text: string support basic html.  
+-- if nil, it will close the dialog
 -- @param buttons: nil or {"button1", "button2"}
 function env_imp:ask(text, buttons)
 	local actor = self.actor;
@@ -192,13 +194,28 @@ function env_imp:ask(text, buttons)
 		local viewport = ViewportManager:GetSceneViewport();
 		local offsetX = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
 
+		height = 200;
+		if(buttons) then
+			height = math.max(height, 120 + (#buttons)*30);
+		end
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-		EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
-			GameLogic.GetCodeGlobal():SetGlobal("answer", result);
-			env_imp.resume(self);
-		end), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=200})
-		env_imp.yield(self)
+
+		if(text or buttons) then
+			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
+				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
+				env_imp.resume(self);
+			end), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
+			env_imp.yield(self)
+		else
+			self.co:SetTimeout(0.02, function()
+				EnterTextDialog.OnClose();
+				env_imp.resume(self);
+			end) 
+			env_imp.yield(self);
+		end
+		env_imp.wait(self, env_imp.GetDefaultTick(self));
 	end
 end
 

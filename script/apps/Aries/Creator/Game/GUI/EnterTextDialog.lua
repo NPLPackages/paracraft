@@ -106,6 +106,7 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 		if(OnClose) then
 			OnClose(EnterTextDialog.result);
 		end
+		page = nil;
 	end
 end
 
@@ -134,6 +135,12 @@ function EnterTextDialog.GetButtonsDS()
 		end
 	end
 	return ds;
+end
+
+function EnterTextDialog.OnClose()
+	if(page) then
+		page:CloseWindow();
+	end
 end
 
 function EnterTextDialog.OnClickButton(index)

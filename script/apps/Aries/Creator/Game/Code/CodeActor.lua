@@ -278,6 +278,17 @@ function Actor:ResetOffsetPosAndRotation()
 	self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0), yaw);
 end
 
+function Actor:ComputeScaling(curTime)
+	local scale = self:GetValue("scaling", curTime)
+	if(not scale) then
+		local entity = self:GetEntity();
+		if(entity) then
+			scale = entity:GetScaling();
+		end
+	end
+	return scale or 1;
+end
+
 function Actor:SetOffsetYaw(yaw)
 	self.offsetYaw = yaw;
 end

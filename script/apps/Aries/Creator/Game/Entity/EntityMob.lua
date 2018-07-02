@@ -68,14 +68,15 @@ function Entity:ctor()
 	self.dataFieldAnim = dataWatcher:AddField(nil, nil);
 	-- skin data. 
 	self.dataFieldSkin = dataWatcher:AddField(nil, nil);
+	
+	self.variables = self.variables or Variables:new();
+	self.variables:CreateVariable("name", self.GetDisplayName, self);
 end
 
 function Entity:init()
 	if(not Entity._super.init(self)) then
 		return;
 	end
-	self.variables = Variables:new();
-	self.variables:CreateVariable("name", self.GetDisplayName, self);
 
 	local obj = self:GetInnerObject();
 	local item = self:GetItemClass();

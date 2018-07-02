@@ -90,6 +90,7 @@ function CodeBlockWindow:OnViewportChange()
 			local _this = ParaUI.GetUIObject(code_block_window_name);
 			_this:Reposition("_mr", 0, 0, self.width, self.bottom);
 			if(page) then
+				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
 			end
 		end
