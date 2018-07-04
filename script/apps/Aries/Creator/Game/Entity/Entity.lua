@@ -1383,11 +1383,33 @@ function Entity:CollideWithEntity(fromEntity)
 end
 
 function Entity:GetPhysicsRadius()
-	return 0.25;
+	return self.physicsRadius or 0.25;
+end
+
+function Entity:SetPhysicsRadius(radius)
+	if(self.physicsRadius ~= radius) then
+		self.physicsRadius = radius;
+		self.aabb = nil;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("Physics Radius", radius);
+		end
+	end
 end
 
 function Entity:GetPhysicsHeight()
-	return 1;
+	return self.physicsHeight or 1;
+end
+
+function Entity:SetPhysicsHeight(height)
+	if(self.physicsHeight~=height) then
+		self.physicsHeight = height;
+		self.aabb = nil;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("PhysicsHeight", height);
+		end
+	end
 end
 
 function Entity:IsPlayer()

@@ -23,7 +23,7 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
-local ItemColorBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorBlock"));
+local ItemColorBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorBlock"));
 
 block_types.RegisterItemClass("ItemColorBlock", ItemColorBlock);
 
@@ -184,10 +184,12 @@ end
 
 -- virtual function: when selected in right hand
 function ItemColorBlock:OnSelect()
+	ItemColorBlock._super.OnSelect(self);
 	GameLogic.SetStatus(L"Alt+鼠标左键可拾取颜色. Shift+滚轮调节亮度. +/-饱和度");
 end
 
 function ItemColorBlock:OnDeSelect()
+	ItemColorBlock._super.OnDeSelect(self);
 	GameLogic.SetStatus(nil);
 end
 
@@ -307,3 +309,13 @@ function ItemColorBlock:DrawIcon(painter, width, height, itemStack)
 	painter:DrawRect(0,0,width, height);
 	ItemColorBlock._super.DrawIcon(self, painter, width, height, itemStack);
 end
+
+-- virtual function: 
+function ItemColorBlock:CreateTask(itemStack)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua");
+	local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
+	local task = SelectColor:new();
+	task:Connect("colorPicked", self, self.SetPickColor);
+	return task;
+end
+

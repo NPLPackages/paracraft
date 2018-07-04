@@ -37,6 +37,7 @@ CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", aut
 CodeBlock:Signal("message", function(errMsg) end);
 CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
 CodeBlock:Signal("actorCloned", function(actor, msg) end);
+CodeBlock:Signal("actorCollided", function(actor, fromActor) end);
 CodeBlock:Signal("codeUnloaded", function() end);
 
 function CodeBlock:ctor()
@@ -169,6 +170,7 @@ end
 function CodeBlock:Stop()
 	self:Disconnect("actorClicked");
 	self:Disconnect("actorCloned");
+	self:Disconnect("actorCollided");
 	self:RemoveTimers();
 	self:RemoveAllActors();
 	self:RemoveAllEvents();
@@ -252,6 +254,7 @@ function CodeBlock:SetReferencedCodeBlock(codeBlock)
 				self.refActors = codeBlock:GetActors();
 				codeBlock:Connect("actorClicked", self, self.OnClickActor, "UniqueConnection");
 				codeBlock:Connect("actorCloned", self, self.OnCloneActor, "UniqueConnection");
+				codeBlock:Connect("actorCollided", self, self.OnCollideActor, "UniqueConnection");
 			end
 		elseif(self.refActors) then
 			self.refActors = nil;
@@ -308,6 +311,7 @@ function CodeBlock:CreateActor()
 		else
 			actor:EnableActorPicking(false);
 		end
+		actor:Connect("collided", self, self.OnCollideActor);
 		return actor;
 	end
 end
@@ -595,4 +599,22 @@ end
 
 function CodeBlock:ResetTime()
 	self.startTime = commonlib.TimerManager.GetCurrentTime()
+end
+
+-- collision event is special that it will not overwrite the last event.
+function CodeBlock:RegisterCollisionEvent(name, callbackFunc)
+	local event = self:CreateEvent("onCollideActor");
+	event:SetIsFireForAllActors(false);
+	event:SetStopLastEvent(false);
+	event:SetCanFireCallback(function(actor, fromActor)
+		if(fromActor and fromActor:GetName() == name) then
+			return true;
+		end
+	end);
+	event:SetFunction(callbackFunc);
+end
+
+function CodeBlock:OnCollideActor(actor, fromActor)
+	self:FireEvent("onCollideActor", actor, fromActor);
+	self:actorCollided(actor, fromActor);
 end

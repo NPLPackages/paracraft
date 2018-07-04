@@ -413,7 +413,8 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 						local newText = "";
 						if(text:match("%S")) then
 							-- always start a new line if current line is not empty
-							textCtrl:moveCursor(textCtrl:CursorPos().line, 0, false, true);
+							textCtrl:LineEnd(false);
+							textCtrl:InsertTextInCursorPos("\n");
 							textCtrl:InsertTextInCursorPos(code);
 						else
 							textCtrl:InsertTextInCursorPos(code);

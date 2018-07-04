@@ -53,22 +53,14 @@ function env_imp:inherit(baseClass, new_class, ctor)
 end
 
 function env_imp:getActorValue(name)
-	local entity = env_imp.GetEntity(self)
-	if(entity and name) then
-		local variables = entity:GetVariables();
-		if(variables) then
-			return variables:GetVariable(name);
-		end
+	if(self.actor) then
+		return self.actor:GetActorValue(name)
 	end
 end
 
 function env_imp:setActorValue(name, value)
-	local entity = env_imp.GetEntity(self)
-	if(entity and name) then
-		local variables = entity:GetVariables();
-		if(variables) then
-			variables:SetVariable(name, value);
-		end
+	if(self.actor) then
+		self.actor:SetActorValue(name, value)
 	end
 end
 

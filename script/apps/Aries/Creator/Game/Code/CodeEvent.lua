@@ -15,6 +15,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 
 local CodeEvent = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent"));
+CodeEvent:Property({"stopLastEvent", true, "IsStopLastEvent", "SetStopLastEvent", auto=true});
 CodeEvent:Signal("beforeDestroyed");
 
 function CodeEvent:ctor()
@@ -84,6 +85,16 @@ function CodeEvent:SetCanFireCallback(callbackFunc)
 end
 
 
+function CodeEvent:IsRunningForActor(actor)
+	if(actor) then
+		return actor:InRunningEvent(self);
+	else
+		if(self.last_coroutine) then
+			return self.last_coroutine:IsRunning();
+		end
+	end
+end
+
 function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
 	if(not self:CanFire(actor, msg)) then
 		if(onFinishedCallback) then
@@ -91,7 +102,14 @@ function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
 		end
 		return
 	end
-	self:StopLastEvent(actor);
+	if(self:IsStopLastEvent()) then
+		self:StopLastEvent(actor);
+	elseif(self:IsRunningForActor(actor)) then
+		if(onFinishedCallback) then
+			onFinishedCallback();
+		end
+		return
+	end
 	local co = CodeCoroutine:new():Init(self:GetCodeBlock());
 	co:SetActor(actor);
 	co:SetFunction(self.callbackFunc);

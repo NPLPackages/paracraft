@@ -35,7 +35,9 @@ Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableAct
 -- the itemstack(TimeSeries) is changed
 Actor:Signal("dataSourceChanged");
 Actor:Signal("clicked", function(actor, mouseButton) end);
+Actor:Signal("collided", function(actor, fromActor) end);
 Actor:Signal("beforeRemoved", function(self) end);
+Actor:Signal("nameChanged", function(actor, oldName, newName) end);
 
 function Actor:ctor()
 	self.offsetPos = vector3d:new(0,0,0);
@@ -52,6 +54,8 @@ function Actor:Init(itemStack, movieclipEntity)
 	end
 	local entity = self.entity;
 	entity:Connect("clicked", self, self.OnClick);
+	entity:Connect("collided", self, self.OnCollideWithEntity);
+	
 	return self;
 end
 
@@ -68,7 +72,11 @@ function Actor:EnableActorPicking(bEnabled)
 end
 
 function Actor:SetName(name)
-	self.name = name;
+	if(self.name ~= name) then
+		local oldName = self.name;
+		self.name = name;
+		self:nameChanged(self, oldName, name);
+	end
 end
 
 function Actor:GetName()
@@ -77,6 +85,10 @@ end
 
 function Actor:OnClick(mouse_button)
 	self:clicked(self, mouse_button);
+end
+
+function Actor:OnCollideWithEntity(fromEntity)
+	self:collided(self, fromEntity:GetActor());
 end
 
 -- @param block_id: if nil, it means any obstruction block.
@@ -102,6 +114,22 @@ function Actor:IsTouchingBlock(block_id)
                 end
             end
 		end
+	end
+end
+
+function Actor:IsTouchingActorByName(actorname)
+	local entity = self:GetEntity();
+	if(entity) then
+		local entities = EntityManager.GetEntitiesByAABBOfType(EntityManager[self.entityClass], entity:GetCollisionAABB())
+		if (entities and #entities > 1) then
+			for i=1, #entities do
+				local entity2 = entities[i];
+				if(entity2 ~= entity and entity2:GetActor():GetName() == actorname and entity:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+					return true
+				end
+			end
+		end
+		return false;
 	end
 end
 
@@ -339,6 +367,13 @@ function Actor:StopLastCodeEvent(event)
 	end
 end
 
+function Actor:InRunningEvent(event)
+	local last_coroutine = self.codeEvents[event];
+	if(last_coroutine) then
+		return last_coroutine:InRunning();
+	end
+end
+
 -- let the camera focus on this player and take control of it. 
 function Actor:SetFocus()
 	local entity = self:GetEntity();
@@ -356,4 +391,64 @@ end
 
 function Actor:RestoreFocus()
 	EntityManager.GetPlayer():SetFocus();
+end
+
+function Actor:GetPhysicsRadius()
+	local entity = self:GetEntity();
+	return entity and (entity:GetPhysicsRadius() * BlockEngine.blocksize_inverse) or 0.25;
+end
+
+function Actor:SetPhysicsRadius(radius)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetPhysicsRadius(radius * BlockEngine.blocksize);
+	end
+end
+
+function Actor:GetPhysicsHeight()
+	local entity = self:GetEntity();
+	return entity and (entity:GetPhysicsHeight() * BlockEngine.blocksize_inverse) or 1;
+end
+
+function Actor:SetPhysicsHeight(height)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetPhysicsHeight(height * BlockEngine.blocksize);
+	end
+end
+
+local internalValues = {
+	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
+	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
+	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+}
+
+function Actor:GetActorValue(name)
+	local entity = self:GetEntity()
+	if(entity and name) then
+		if(internalValues[name]) then
+			return internalValues[name].getter(self)
+		end
+		local variables = entity:GetVariables();
+		if(variables) then
+			return variables:GetVariable(name);
+		end
+	end
+end
+
+
+function Actor:SetActorValue(name, value)
+	local entity = self:GetEntity()
+	if(entity and name) then
+		if(internalValues[name]) then
+			internalValues[name].setter(self, value)
+			if(not internalValues[name].isVariable) then
+				return
+			end
+		end
+		local variables = entity:GetVariables();
+		if(variables) then
+			variables:SetVariable(name, value);
+		end
+	end
 end

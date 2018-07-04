@@ -90,6 +90,8 @@ function Entity:ctor()
 	self.dataFieldSkin = dataWatcher:AddField(nil, nil);
 	-- block in hand. only used in network mode.  
 	self.dataBlockInHand = dataWatcher:AddField(nil, nil);
+	self:SetPhysicsRadius(0.5);
+	self:SetPhysicsHeight(1.765);
 end
 
 -- @param Entity: the half radius of the object. 
@@ -307,10 +309,6 @@ function Entity:CanPlayerEdit(x,y,z,data, itemStack)
 	end
 end
 
-function Entity:GetPhysicsHeight()
-	return 1.7;
-end
-
 -- when picked up an entity. 
 function Entity:OnItemPickup(entityItem, count)
 end
@@ -418,14 +416,6 @@ function Entity:CanBePushedBy(fromEntity)
 	else
 		return false;
 	end
-end
-
-function Entity:GetPhysicsRadius()
-	return 0.5;
-end
-
-function Entity:GetPhysicsHeight()
-	return 1.765;
 end
 
 -- check collisiton with nearby entities

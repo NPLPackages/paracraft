@@ -19,6 +19,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 -- class name
 Entity.class_name = "CodeActor";
 Entity:Signal("clicked", function(mouse_button) end)
+Entity:Signal("collided", function(fromEntity) end)
 
 -- register class
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
@@ -30,6 +31,19 @@ function Entity:ctor()
 	self:SetStaticBlocker(true);
 	self:SetSurfaceDecay(1.0);
 end
+
+function Entity:init()
+	if(not Entity._super.init(self)) then
+		return;
+	end
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("Physics Radius", self:GetPhysicsRadius());
+		obj:SetField("PhysicsHeight", self:GetPhysicsHeight());
+	end
+	return self;
+end
+		
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
@@ -67,4 +81,18 @@ end
 function Entity:OnFocusOut()
 	self.has_focus = nil;
 	self:focusOut();
+end
+
+-- check collision with nearby entities and broadcast collision event
+function Entity:BroadcastCollision()
+	local entities = EntityManager.GetEntitiesByAABBOfType(Entity, self:GetCollisionAABB())
+	if (entities and #entities > 1) then
+		for i=1, #entities do
+			local entity2 = entities[i];
+			if(entity2 ~= self and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+				entity2:collided(self);
+				self:collided(entity2);
+			end
+		end
+	end
 end

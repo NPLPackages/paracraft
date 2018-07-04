@@ -106,6 +106,10 @@ function CodeCoroutine:GetStatus()
 	return self.co and coroutine.status(self.co);
 end
 
+function CodeCoroutine:InRunning()
+	return not self.isStopped;
+end
+
 -- when stopped, it can no longer be resumed
 function CodeCoroutine:Stop()
 	self.isStopped = true;
@@ -133,6 +137,7 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 	if(self.code_func) then
 		self.co = coroutine.create(function()
 			self:RunImp(msg);
+			self.isStopped = true;
 			if(onFinishedCallback) then
 				onFinishedCallback();
 			end
@@ -161,7 +166,7 @@ function CodeCoroutine:RunImp(msg)
 				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
 				self:GetCodeBlock():send_message(msg);
 			end
-		end		
+		end
 		return result;
 	end
 end

@@ -16,18 +16,68 @@ local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData"
 local all_cmds = {
 -- Data
 {
+	type = "setLocalVariable", 
+	message0 = L"设置局部变量%1为%2",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = "item",
+			variableTypes = {""},
+		},
+		{
+			name = "value",
+			type = "input_value",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'local %s = "%s"',
+	ToNPL = function(self)
+		return "";
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local item = ""
+]]}},
+},
+{
+	type = "getLocalVariable", 
+	message0 = L"获取局部变量%1",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = "item",
+			variableTypes = {""},
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = '%s',
+	ToNPL = function(self)
+		return "";
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+local _ = item
+]]}},
+},
+
+{
 	type = "set", 
 	message0 = L"设置全局变量%1为%2",
 	arg0 = {
 		{
 			name = "key",
 			type = "field_input",
-			text = "test", 
+			text = "score", 
 		},
 		{
 			name = "value",
 			type = "field_input",
-			text = "hello", 
+			text = "1", 
 		},
 	},
 	category = "Data", 
@@ -242,12 +292,12 @@ end
 		{
 			name = "key",
 			type = "field_input",
-			text = "test", 
+			text = "name", 
 		},
 		{
 			name = "value",
 			type = "field_input",
-			text = "hello", 
+			text = "actor1", 
 		},
 	},
 	category = "Data", 
@@ -280,7 +330,7 @@ say("click us!")
 		{
 			name = "key",
 			type = "field_input",
-			text = "test", 
+			text = "name", 
 		},
 	},
 	category = "Data", 
@@ -1711,6 +1761,151 @@ while(true) do
         bounce()
     end
 end
+]]}},
+},
+
+{
+	type = "setName", 
+	message0 = L"设置名字为%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "frog",
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'setActorValue("name", "%s")',
+	ToNPL = function(self)
+		return string.format('setActorValue("name", "%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"复制的对象也可有不同的名字", canRun = true, code = [[
+registerCloneEvent(function(name)
+    setActorValue("name", name)
+    moveForward(1);
+end)
+registerClickEvent(function()
+    local myname = getActorValue("name")
+    say("my name is "..myname)
+end)
+setActorValue("name", "Default")
+clone("myself", "Cloned")
+say("click us!")
+]]}},
+},
+
+{
+	type = "setPhysicsRaidus", 
+	message0 = L"设置物理半径%1",
+	arg0 = {
+		{
+			name = "radius",
+			type = "field_number",
+			text = 0.25,
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'setActorValue("physicsRadius", %s)',
+	ToNPL = function(self)
+		return string.format('setActorValue("physicsRadius", %s)\n', self:getFieldAsString('radius'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+cmd("/show boundingbox")
+setBlock(getX(), getY()+2, getZ(), 62)
+setActorValue("physicsRadius", 0.5)
+setActorValue("physicsHeight", 2)
+move(0, 0.2, 0)
+if(isTouching("block")) then
+    say("touched!", 1)
+end
+setBlock(getX(), getY()+2, getZ(), 0)
+wait(2)
+move(0, -0.2, 0)
+cmd("/hide boundingbox")
+]]}},
+},
+
+{
+	type = "setPhysicsHeight", 
+	message0 = L"设置物理高度%1",
+	arg0 = {
+		{
+			name = "height",
+			type = "field_number",
+			text = 1,
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'setActorValue("physicsHeight", %s)',
+	ToNPL = function(self)
+		return string.format('setActorValue("physicsHeight", %s)\n', self:getFieldAsString('height'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+cmd("/show boundingbox")
+setBlock(getX(), getY()+2, getZ(), 62)
+setActorValue("physicsRadius", 0.5)
+setActorValue("physicsHeight", 2)
+move(0, 0.2, 0)
+if(isTouching("block")) then
+    say("touched!", 1)
+end
+setBlock(getX(), getY()+2, getZ(), 0)
+wait(2)
+move(0, -0.2, 0)
+cmd("/hide boundingbox")
+]]}},
+},
+
+{
+	type = "registerCollisionEvent", 
+	message0 = L"当碰到%1时%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "name",
+		},
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'registerCollisionEvent(%s, function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerCollisionEvent("%s", function()\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+broadcastCollision()
+registerCollisionEvent("frog", function()
+end)
+]]}},
+},
+
+{
+	type = "broadcastCollision", 
+	message0 = L"广播碰撞消息",
+	arg0 = {},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = 'broadcastCollision()',
+	ToNPL = function(self)
+		return 'broadcastCollision()\n';
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+broadcastCollision()
+registerCollisionEvent("frog", function()
+end)
 ]]}},
 },
 

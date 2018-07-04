@@ -140,12 +140,20 @@ end
 
 function CodeGlobals:AddActor(actor)
 	self.actors[actor:GetName() or ""] = actor;
+	actor:Connect("nameChanged", self, self.OnActorNameChange);
 	actor:Connect("beforeRemoved", self, self.RemoveActor);
 end
 
 function CodeGlobals:RemoveActor(actor)
 	if(self.actors[actor:GetName() or ""] == actor) then
 		self.actors[actor:GetName() or ""] = nil;
+	end
+end
+
+function CodeGlobals:OnActorNameChange(actor, oldName, newName)
+	if(self.actors[oldName] == actor) then
+		self.actors[oldName] = nil;
+		self.actors[newName] = actor;
 	end
 end
 

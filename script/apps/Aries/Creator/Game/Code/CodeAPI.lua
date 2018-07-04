@@ -71,7 +71,6 @@ local s_env_methods = {
 	"registerClickEvent",
 	"registerKeyPressedEvent",
 	"registerAnimationEvent",
-	
 	"registerBroadcastEvent",
 	"broadcast",
 	"broadcastAndWait",
@@ -85,6 +84,8 @@ local s_env_methods = {
 
 	-- Sensing
 	"isTouching",
+	"registerCollisionEvent",
+	"broadcastCollision",
 	"distanceTo",
 	"isKeyPressed",
 	"isMouseDown",

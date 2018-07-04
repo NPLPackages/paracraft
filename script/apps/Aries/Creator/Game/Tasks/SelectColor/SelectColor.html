@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="SelectColor.lua" refresh="false">
+<![CDATA[
+SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
+]]>
+</script>
+<div style="background-color:#00000080;width:300px;height:64px">
+    <pe:gridview style="" name="gvwColorTable" CellPadding="5" DefaultNodeHeight="24" pagesize="20" ItemsPerLine="10"
+                 DataSource='<%=SelectColor.GetColorList()%>'>
+        <Columns>
+            <div name='<%=Eval("index")%>' style='<%=string.format("color:#ffffff;width:24px;height:24px;background-color:%s", Eval("color"))%>' onclick="SelectColor.OnClickColor"></div>
+        </Columns>
+    </pe:gridview>
+</div>
+</pe:mcml>
+</html>
+

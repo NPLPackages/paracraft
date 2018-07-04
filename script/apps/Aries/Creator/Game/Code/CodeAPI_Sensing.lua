@@ -36,7 +36,7 @@ local function getActorEntity_(actor, objName)
 end
 
 
--- @param objName: another actor name
+-- @param objName: another actor name, if there are multiple instances of the same actor, any collision will return true
 --  "@a" means nearby players. 
 --  "block" or nil means scene blocks. if number string like "62", it means given block id. 
 -- @return false if actor is not touching another object. Or return the side on which the actor is touching
@@ -45,14 +45,16 @@ function env_imp:isTouching(objName)
 	if(not actor) then
 		return;
 	end
-	local actor2 = GameLogic.GetCodeGlobal():GetActorByName(objName);
-	if(actor2) then
-		return actor:IsTouchingEntity(actor2:GetEntity());
-	end
+
+--	local actor2 = GameLogic.GetCodeGlobal():GetActorByName(objName);
+--	if(actor2) then
+--		if(actor:IsTouchingEntity(actor2:GetEntity())) then
+--			return true;
+--		end
+--	end
 
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		local boundingBox = entity:GetCollisionAABB();
 		if(objName==nil or objName == "block") then
 			return actor:IsTouchingBlock();
 		elseif(objName == "@a") then
@@ -60,6 +62,8 @@ function env_imp:isTouching(objName)
 		elseif(type(objName)=="number" or objName:match("^%d+$")) then
 			local blockId = tonumber(objName);
 			return actor:IsTouchingBlock(blockId);
+		else
+			return actor:IsTouchingActorByName(objName);	
 		end
 	end
 end
@@ -226,4 +230,16 @@ end
 
 function env_imp:resetTimer()
 	self.codeblock:ResetTime()
+end
+
+-- check and broadcast collision event
+function env_imp:broadcastCollision(callbackFunc)
+	local entity = env_imp.GetEntity(self);
+	if(entity) then	
+		entity:BroadcastCollision();
+	end
+end
+
+function env_imp:registerCollisionEvent(name, callbackFunc)
+	self.codeblock:RegisterCollisionEvent(name, callbackFunc);
 end

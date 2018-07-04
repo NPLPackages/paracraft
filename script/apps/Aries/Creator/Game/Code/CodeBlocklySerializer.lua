@@ -83,7 +83,7 @@ end
 -- write a json file to config all of blocks
 -- how to define-blocks:https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
 function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
-	if(not filename or not all_cmds)then return end
+	if(not filename)then return end
 	local s = CodeBlocklySerializer.GetBlocklyConfig();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
@@ -126,13 +126,7 @@ Blockly.Lua['%s'] = function (block) {
 	]],type,body)
 	return s;
 end
---[[
-supported filed:
-	field_input
-	field_number
-supported input:
-	input_statement
---]]
+
 function CodeBlocklySerializer.ArgsToStr(cmd)
 	local type = cmd.type
 	local arg0 = cmd.arg0
@@ -143,7 +137,7 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 	prefix = string.gsub(prefix,"%.","_")
 	for k,v in ipairs(arg0) do
 		local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
-		local arg_str = CodeBlocklySerializer.ArgToJsStr_ArgName(prefix,v);
+		local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
 		if(k == 1)then
 			var_lines = var_str;
 			arg_lines = arg_str;
@@ -164,32 +158,49 @@ return '%s\n'.format(%s);
 	end
 	return s;
 end
+--[[
+supported filed:
+	field_input
+	field_number
+	field_variable
+
+	todo:
+		field_dropdown
+
+supported input:
+	input_statement
+	input_value
+--]]
 function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	local type = arg.type
 	local name = arg.name
 	local s;
+	local var_name = CodeBlocklySerializer.Create_VariableName(prefix,arg);
 	if(type == "input_statement")then
 		s = string.format([[
-var %s_statement = Blockly.Lua.statementToCode(block, '%s') || '';
-		]],prefix,name)
+var %s = Blockly.Lua.statementToCode(block, '%s') || '';
+		]],var_name,name)
+	elseif(type == "input_value")then
+	s = string.format([[
+var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '';
+		]],var_name,name)
+	elseif(type == "field_variable")then
+		s = string.format([[
+var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '';
+		]],var_name,name)
 	else
 		s = string.format([[
-var %s_%s_value = block.getFieldValue('%s');
-		]],prefix,name,name);
+var %s = block.getFieldValue('%s');
+		]],var_name,name);
 	end
 	return s;
 end
-function CodeBlocklySerializer.ArgToJsStr_ArgName(prefix,arg)
+function CodeBlocklySerializer.Create_VariableName(prefix,arg)
 	local type = arg.type
 	local name = arg.name
-	local s;
-	if(type == "input_statement")then
-		--s = string.format([['function()\n' + %s_statement + 'end\n']],prefix)
-		s = string.format([[%s_statement]],prefix);
-	else
-		s = string.format([[%s_%s_value]],prefix,name);
-	end
+	local s = string.format("%s_%s_%s_var",prefix,type,name);
 	return s;
 end
+
 
 
