@@ -62,11 +62,16 @@ function CodeCoroutine:KillTimer(timer)
 	self:GetCodeBlock():KillTimer(timer);
 end
 
-function CodeCoroutine:MakeCallbackFunc(callbackFunc)
+-- @param bRestoreContext: true to restore context. default to nil. One must set to true if the callbackFunc may invoke other coroutines
+function CodeCoroutine:MakeCallbackFunc(callbackFunc, bRestoreContext)
 	return function(...)
+		local last_context = bRestoreContext and self:SaveCurrentContext();
 		self:PrepareCodeContext();
 		if(callbackFunc) then
 			callbackFunc(...);
+		end
+		if(last_context) then
+			self:RestoreContext(last_context);
 		end
 	end
 end

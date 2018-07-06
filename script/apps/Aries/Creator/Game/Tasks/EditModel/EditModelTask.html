@@ -8,18 +8,19 @@ EditModelTask.InitPage(Page);
 task = EditModelTask.GetInstance();
 ]]>
 </script>
-<div style='<%=format("padding:5px;background-color:%s;color:#ffffff", task:IsTransformMode() and "#8080ff" or "#808080") %>' >
-    <%=L"当前模式:"%>
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:256px;height:64px", task:IsTransformMode() and "#8080ff80" or "#80808080") %>' >
     <input name="toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" onclick="EditModelTask.OnClickToggleMode" />
     <pe:if condition='<%=task:IsTransformMode()%>'>
-        <div>
-            <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
-                <%=task:GetSelectedModel():GetModelFile()%>
-            </pe:if>
-            <pe:if condition='<%=not task:GetSelectedModel()%>'>
-                <%=L"左键点击场景选择模型"%>
-            </pe:if>
-        </div>
+        <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
+            <input name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnResetModel" />
+            <div><%=task:GetSelectedModel():GetModelFile()%></div>
+        </pe:if>
+        <pe:if condition='<%=not task:GetSelectedModel()%>'>
+            <div><%=L"左键点击场景选择模型"%></div>
+        </pe:if>
+    </pe:if>
+    <pe:if condition='<%=not task:IsTransformMode()%>'>
+        <div><%=task:GetModelFileInHand()%></div>
     </pe:if>
 </div>
 </pe:mcml>

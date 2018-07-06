@@ -28,21 +28,23 @@ EditModelManipContainer:Property({"mainColor", "#ffff00"});
 EditModelManipContainer:Property({"PositionPlugName", "position", auto=true});
 EditModelManipContainer:Property({"ScalePlugName", "scale", auto=true});
 EditModelManipContainer:Property({"YawPlugName", "yaw", auto=true});
+EditModelManipContainer:Property({"OffsetPosPlugName", "offsetPos", auto=true});
 
 function EditModelManipContainer:ctor()
 	self:AddValue("position", {0,0,0});
 end
 
 function EditModelManipContainer:createChildren()
+	self.translateManip = self:AddTranslateManip();
+	self.translateManip:SetFixOrigin(true);
 	self.scaleManip = self:AddScaleManip();
+	self.scaleManip.radius = 0.5;
 	self.scaleManip:SetUniformScaling(true);
 	self.rotateManip = self:AddRotateManip();
 	self.rotateManip:SetYawPitchRollMode(true);
 	self.rotateManip:SetYawEnabled(true);
 	self.rotateManip:SetPitchEnabled(false);
 	self.rotateManip:SetRollEnabled(false);
-	-- TODO: support translate?
-	--self.translateManip = self:AddTranslateManip();
 end
 
 function EditModelManipContainer:paintEvent(painter)
@@ -61,6 +63,7 @@ function EditModelManipContainer:connectToDependNode(node)
 	local plugPos = node:findPlug(self.PositionPlugName);
 	local plugScale = node:findPlug(self.ScalePlugName);
 	local plugYaw = node:findPlug(self.YawPlugName);
+	local plugOffsetPos = node:findPlug(self.OffsetPosPlugName);
 
 	self.node = node;
 
@@ -70,6 +73,18 @@ function EditModelManipContainer:connectToDependNode(node)
 		self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
 			return plugPos:GetValue():clone();
 		end);
+
+		-- two-way binding for offset position conversion:
+		if(plugOffsetPos) then
+			local manipTranslatePlug = self.translateManip:findPlug("position");
+			self:addManipToPlugConversionCallback(plugOffsetPos, function(self, plug)
+				return manipTranslatePlug:GetValue() - plugPos:GetValue();
+			end);
+			self:addPlugToManipConversionCallback(manipTranslatePlug, function(self, manipPlug)
+				local pos = plugOffsetPos:GetValue();
+				return pos + plugPos:GetValue();
+			end);
+		end
 
 		-- two-way binding for scaling conversion:
 		if(plugScale) then

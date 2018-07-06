@@ -116,6 +116,20 @@ function CodeBlockWindow:OnEntityRemoved()
 	CodeBlockWindow.SetCodeEntity(nil);
 end
 
+function CodeBlockWindow.RestoreCursorPosition()
+	if(self.entity and self.entity.cursorPos) then
+		commonlib.TimerManager.SetTimeout(function()  
+			local ctrl = CodeBlockWindow.GetTextControl();
+			if(ctrl) then
+				if(self.entity and self.entity.cursorPos) then
+					local cursorPos = self.entity.cursorPos;
+					ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
+				end
+			end
+		end, 200);
+	end
+end
+
 function CodeBlockWindow.SetCodeEntity(entity)
 	CodeBlockWindow.HighlightCodeEntity(entity);
 	if(self.entity ~= entity) then
@@ -130,6 +144,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		if(page) then
 			page:Refresh(0.01);
 		end
+		CodeBlockWindow.RestoreCursorPosition();
 	end
 
 	local codeBlock = self.GetCodeBlock();
@@ -214,6 +229,10 @@ function CodeBlockWindow.UpdateCodeToEntity()
 	if(page and entity) then
 		local code = page:GetUIValue("code");
 		entity:SetCommand(code);
+		local ctl = CodeBlockWindow.GetTextControl();
+		if(ctl) then
+			entity.cursorPos = ctl:CursorPos();
+		end
 	end
 end
 

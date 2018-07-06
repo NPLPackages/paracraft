@@ -210,7 +210,7 @@ function env_imp:ask(text, buttons)
 			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
 				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
 				env_imp.resume(self);
-			end), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
+			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
 			env_imp.yield(self)
 		else
 			self.co:SetTimeout(0.02, function()

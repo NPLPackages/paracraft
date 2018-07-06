@@ -70,12 +70,24 @@ function CodeHelpItem:GetHtml()
 					local arg_text = "";
 					if(arg_item.type == "field_input") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+					elseif(arg_item.type == "input_value") then
+						if(not item_text or item_text=="") then
+							arg_text = '<div style="float:left;margin:3px;background-color:#ffffff;color:#000000;width:5px;height:12px"></div>';
+						else
+							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+						end
+					elseif(arg_item.type == "field_variable") then
+						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+					elseif(arg_item.type == "field_dropdown") then
+						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or tostring(arg_item.options[1][1]));
 					elseif(arg_item.type == "field_number") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text) or "");
 					elseif(arg_item.type == "input_statement") then
 						arg_text = format('<div style="margin:5px;background-color:#cec8a8;width:80px;height:10px;padding-left:5px;">%s</div>', tostring(item_text) or "");
-					elseif(arg_item.type == "input_expression") then
+					elseif(arg_item.type == "input_expression"  or arg_item.type == "expression") then
 						arg_text = format('<div style="float:left;min-width:25px;height:14px;margin:3px;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text) or "");
+					elseif(arg_item.type == "input_dummy") then
+						arg_text = "";
 					else
 						arg_text = format('<span style="font-weight:bold">arg%d<span>', arg_index);
 					end

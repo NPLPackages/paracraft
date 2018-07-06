@@ -69,6 +69,7 @@ function EditModelTask:SetTransformMode(bEnable)
 			else
 				self:UnloadSceneContext();
 			end
+			self:RefreshPage();
 		end
 	end
 end
@@ -77,7 +78,6 @@ end
 function EditModelTask.OnClickToggleMode()
 	local self = EditModelTask.GetInstance();
 	self:SetTransformMode(not self:IsTransformMode());
-	self:RefreshPage();
 end
 
 function EditModelTask:RefreshPage()
@@ -113,6 +113,18 @@ end
 
 function EditModelTask:GetSelectedModel()
 	return self.entityModel;
+end
+
+function EditModelTask.OnResetModel()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local entity = self:GetSelectedModel();
+		if(entity) then
+			entity:setYaw(0);
+			entity:setScale(1);
+			entity:SetOffsetPos({0,0,0});
+		end
+	end
 end
 
 function EditModelTask:UpdateManipulators()
@@ -161,13 +173,23 @@ function EditModelTask:handleLeftClickScene(event, result)
 	local modelEntity = self:PickModelAtMouse();
 	if(modelEntity) then
 		self:SelectModel(modelEntity);
+		self:SetTransformMode(true);
+	else
+		self:SetTransformMode(false);
 	end
 end
 
 function EditModelTask:handleRightClickScene(event, result)
 	local modelEntity = self:PickModelAtMouse();
 	if(modelEntity) then
-		modelEntity:OpenEditor("entity", modelEntity);
+		local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+		if(ctrl_pressed) then
+			modelEntity:OpenEditor("entity", modelEntity);
+		else
+			self:SetTransformMode(true);
+		end
+	else
+		self:SetTransformMode(false);
 	end
 end
 
@@ -193,4 +215,14 @@ function EditModelTask:keyPressEvent(event)
 		UndoManager.Redo();
 	end
 	self:GetSceneContext():keyPressEvent(event);
+end
+
+function EditModelTask:SetItemInHand(itemStack)
+	self.itemInHand = itemStack;
+end
+
+function EditModelTask:GetModelFileInHand()
+	if(self.itemInHand) then
+		return self.itemInHand:GetDataField("tooltip");
+	end
 end

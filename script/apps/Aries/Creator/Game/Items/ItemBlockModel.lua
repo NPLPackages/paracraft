@@ -145,7 +145,7 @@ function ItemBlockModel:OpenChangeFileDialog(itemStack)
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
 			if(result and result~="" and result~=local_filename) then
-				itemStack:SetDataField("tooltip", result);
+				self:SetModelFileName(itemStack, result);
 			end
 		end, local_filename, L"选择模型文件", "model", nil, function(filename)
 			self:UnpackIntoWorld(itemStack, filename);
@@ -168,7 +168,7 @@ function ItemBlockModel:OnClickInHand(itemStack, entityPlayer)
 					local filename = result;
 					local bSucceed, filename = GameLogic.RunCommand("/savemodel "..filename);
 					if(filename) then
-						itemStack:SetDataField("tooltip", filename);
+						self:SetModelFileName(itemStack, filename);
 					end
 				end
 			end, last_filename, L"选择模型文件", "model");
@@ -194,6 +194,17 @@ function ItemBlockModel:GetModelFileName(itemStack)
 	return itemStack and itemStack:GetDataField("tooltip");
 end
 
+function ItemBlockModel:SetModelFileName(itemStack, filename)
+	if(itemStack) then
+		itemStack:SetDataField("tooltip", filename);
+		local task = self:GetTask();
+		if(task) then
+			task:SetItemInHand(itemStack);
+			task:RefreshPage();
+		end
+	end
+end
+
 -- virtual: draw icon with given size at current position (0,0)
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
@@ -212,9 +223,8 @@ end
 
 -- virtual function: 
 function ItemBlockModel:CreateTask(itemStack)
-	if(self:HasRealPhysics()) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
-		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-		return EditModelTask:new();
-	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+	local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+	EditModelTask:SetItemInHand(itemStack)
+	return EditModelTask:new();
 end

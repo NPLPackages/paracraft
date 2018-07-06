@@ -15,6 +15,8 @@ local EntityBlockModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
+NPL.load("(gl)script/ide/math/vector.lua");
+local vector3d = commonlib.gettable("mathlib.vector3d");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -29,6 +31,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 
 Entity:Property({"scale", 1, "getScale", "setScale"});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
+Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
 
 -- class name
 Entity.class_name = "EntityBlockModel";
@@ -44,6 +47,7 @@ Entity.bIsForceLoadPhysics = true;
 function Entity:ctor()
 	self.inventory = self.inventory or InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.offsetPos = vector3d:new(0,0,0);
 end
 
 function Entity:init()
@@ -246,11 +250,8 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		end
 	else
 		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
-			if(ctrl_pressed or self:HasRealPhysics()) then
-				self:OpenEditor("entity", entity);
-				return true;
-			end
+			self:OpenEditor("entity", entity);
+			return true;
 		elseif(mouse_button=="left") then
 			self:OnActivated(entity);
 		end
@@ -277,6 +278,20 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	end
 end
 
+function Entity:OpenEditor(editor_name, entity)
+	local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+	if(ctrl_pressed) then
+		Entity._super.OpenEditor(self, editor_name, entity);
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+		if(EditModelTask.GetInstance()) then
+			EditModelTask.GetInstance():SetTransformMode(true)
+			EditModelTask.GetInstance():SelectModel(self);
+		end
+	end
+end
+
 -- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 
 -- @return nil or array of item stack.
 function Entity:GetNewItemsList()
@@ -300,3 +315,14 @@ function Entity:OnActivated(triggerEntity)
 	EntityCommandBlock.ExecuteCommand(self, triggerEntity, true, true);
 end
 
+
+function Entity:GetOffsetPos()
+	return self.offsetPos;
+end
+
+function Entity:SetOffsetPos(v)
+	if(self.offsetPos:equals(v)) then
+		self.offsetPos:set(v);
+		self:valueChanged();
+	end
+end

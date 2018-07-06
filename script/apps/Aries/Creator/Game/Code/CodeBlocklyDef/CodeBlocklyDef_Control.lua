@@ -1,0 +1,327 @@
+--[[
+Title: CodeBlocklyDef_Control
+Author(s): leio
+Date: 2018/7/5
+Desc: define blocks in category of Control
+use the lib:
+-------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua");
+local CodeBlocklyDef_Control= commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Control");
+-------------------------------------------------------
+]]
+local CodeBlocklyDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Control");
+local cmds = {
+-- Control
+{
+	type = "wait", 
+	message0 = L"等待%1秒",
+	arg0 = {
+		{
+			name = "time",
+			type = "field_number",
+			text = 1, 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'wait(%s)',
+	ToNPL = function(self)
+		return string.format('wait(%s)\n', self:getFieldAsString('time'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("hi")
+wait(1)
+say("bye", 1)
+]]},
+{desc = L"等待下一个时钟周期", canRun = true, code = [[
+while(true) do
+    if(isKeyPressed("space")) then
+        say("space is pressed", 1)
+    end
+    wait()
+end
+]]}
+},
+},
+
+{
+	type = "repeat", 
+	message0 = L"重复%1次%2",
+	arg0 = {
+		{
+			name = "times",
+			type = "field_number",
+			text = 10, 
+		},
+		{
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'for i=1, %d do\\n%send',
+	ToNPL = function(self)
+		return string.format('for i=1, %d do\n%send\n', self:getFieldValue('times'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+for i=1, 10 do
+    moveForward(0.1)
+end
+]]}},
+},
+
+{
+	type = "forever", 
+	message0 = L"永远重复%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'while(true) do\\n%send',
+	ToNPL = function(self)
+		return string.format('while(true) do\n%send\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+while(true) do
+    moveForward(0.01)
+end
+]]}},
+},
+
+{
+	type = "if_else", 
+	message0 = L"如果%1那么%2否则%3",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+			text = "", 
+		},
+		{
+			name = "input_true",
+			type = "input_statement",
+			text = "", 
+		},
+		{
+			name = "input_else",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'if(%s) then\\n%selse\\n%send',
+	ToNPL = function(self)
+		return string.format('if(%s) then\n%selse\n%send\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+while(true) do
+    if(distanceTo("mouse-pointer")<3) then
+        say("mouse-pointer")
+    else
+        say("")
+    end
+    wait(0.01)
+end
+]]}},
+},
+
+
+{
+	type = "forKeyValue", 
+	message0 = L"每个%1,%2在%3%4",
+	arg0 = {
+		{
+			name = "key",
+			type = "field_input",
+			text = "key", 
+		},
+		{
+			name = "value",
+			type = "field_input",
+			text = "value", 
+		},
+		{
+			name = "data",
+			type = "field_input",
+			text = "data", 
+		},
+		{
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'for %s, %s in pairs(%s) do\\n%send',
+	ToNPL = function(self)
+		return string.format('for %s, %s in pairs(%s) do\n%send\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+myData = {
+    key1="value1", 
+    key2="value2",
+    key2="value2",
+}
+for k, v in pairs(myData) do
+    say(v, 1);
+end
+]]}},
+},
+
+{
+	type = "forIndexValue", 
+	message0 = L"每个%1,%2在数组%3%4",
+	arg0 = {
+		{
+			name = "i",
+			type = "field_input",
+			text = "index", 
+		},
+		{
+			name = "item",
+			type = "field_input",
+			text = "item", 
+		},
+		{
+			name = "data",
+			type = "field_input",
+			text = "data", 
+		},
+		{
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
+	ToNPL = function(self)
+		return string.format('for %s, %s in ipairs(%s) do\n%send\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+myData = {
+    {x=1, y=0, z=0, duration=0.5},
+    {x=0, y=0, z=1, duration=0.5},
+    {x=-1, y=0, z=-1, duration=1},
+}
+for i, item in ipairs(myData) do
+    move(item.x, item.y, item.z, item.duration)
+end
+]]}},
+},
+
+{
+	type = "run", 
+	message0 = L"并行执行%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Control", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'run(function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('run(function()\n%send)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+run(function()
+    say("follow mouse pointer!")
+    while(true) do
+        if(distanceTo("mouse-pointer") < 7) then
+            turnTo("mouse-pointer");
+        elseif(distanceTo("@p") > 14) then
+            moveTo("@p")
+        end
+    end
+end)
+run(function()
+    while(true) do
+        moveForward(0.02)
+    end
+end)
+]]}},
+},
+
+{
+	type = "exit", 
+	message0 = L"结束程序",
+	arg0 = {
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'exit()',
+	ToNPL = function(self)
+		return string.format('exit()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("Press X key to exit")
+registerKeyPressedEvent("x", function()
+    exit()
+end)
+]]}},
+},
+
+{
+	type = "restart", 
+	message0 = L"重新开始",
+	arg0 = {
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'restart()',
+	ToNPL = function(self)
+		return string.format('restart()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+say("Press X key to restart")
+registerKeyPressedEvent("x", function()
+    restart()
+end)
+]]}},
+},
+
+};
+function CodeBlocklyDef_Control.GetCmds()
+	return cmds;
+end

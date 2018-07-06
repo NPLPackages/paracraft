@@ -2,7 +2,7 @@
 Title: CodeBlocklySerializer
 Author(s): leio
 Date: 2018/6/17
-Desc: the help functions for reading/writing blockly informaion 
+Desc: the help functions for reading/writing blockly information 
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
@@ -10,6 +10,13 @@ local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.Code
 CodeBlocklySerializer.WriteBlocklyMenuToXml("BlocklyMenu.xml");
 CodeBlocklySerializer.WriteToBlocklyConfig("BlocklyConfigSource.json");
 CodeBlocklySerializer.WriteToBlocklyCode("BlocklyExecution.js");
+
+
+links:
+blockfactory: https://blockly-demo.appspot.com/static/demos/blockfactory/index.html
+define-blocks: https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
+generating-code: https://developers.google.com/blockly/guides/create-custom-blocks/generating-code
+operator-precedence: https://developers.google.com/blockly/guides/create-custom-blocks/operator-precedence
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/Json.lua");
@@ -121,9 +128,8 @@ function CodeBlocklySerializer.GetBlockExecutionStr(cmd)
 	local body = CodeBlocklySerializer.ArgsToStr(cmd);
 	local s = string.format([[
 Blockly.Lua['%s'] = function (block) {
-  %s
-};
-	]],type,body)
+%s
+};]],type,body)
 	return s;
 end
 
@@ -136,23 +142,31 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 	local prefix = type;
 	prefix = string.gsub(prefix,"%.","_")
 	for k,v in ipairs(arg0) do
-		local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
-		local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
-		if(k == 1)then
-			var_lines = var_str;
-			arg_lines = arg_str;
-		else
-			var_lines = var_lines .. "\n" .. var_str;
-			arg_lines = arg_lines .. "," .. arg_str;
+		local _type = v.type;
+		if(_type and _type ~= "input_dummy")then
+			local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
+			local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
+			if(k == 1)then
+				var_lines = var_str;
+				arg_lines = arg_str;
+			else
+				var_lines = var_lines .. "\n" .. var_str;
+				arg_lines = arg_lines .. "," .. arg_str;
+			end
 		end
 	end
 	local func_description = cmd.func_description;
 	local s;
 	
 	if(func_description)then
-	s = string.format([[%s
-return '%s\n'.format(%s);
-]],var_lines,func_description,arg_lines);
+		local output = cmd.output;
+		if(output and output.type)then
+		s = string.format([[%s
+	return ['%s'.format(%s),Blockly.Lua.ORDER_ATOMIC];]],var_lines,func_description,arg_lines);
+		else
+		s = string.format([[%s
+	return '%s\n'.format(%s);]],var_lines,func_description,arg_lines);
+		end
 	else
 		s = 'return ""';
 	end
@@ -177,21 +191,13 @@ function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	local s;
 	local var_name = CodeBlocklySerializer.Create_VariableName(prefix,arg);
 	if(type == "input_statement")then
-		s = string.format([[
-var %s = Blockly.Lua.statementToCode(block, '%s') || '';
-		]],var_name,name)
+		s = string.format([[	var %s = Blockly.Lua.statementToCode(block, '%s') || '';]],var_name,name)
 	elseif(type == "input_value")then
-	s = string.format([[
-var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '';
-		]],var_name,name)
+	s = string.format([[	var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '""';]],var_name,name)
 	elseif(type == "field_variable")then
-		s = string.format([[
-var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '';
-		]],var_name,name)
+		s = string.format([[	var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,name)
 	else
-		s = string.format([[
-var %s = block.getFieldValue('%s');
-		]],var_name,name);
+		s = string.format([[	var %s = block.getFieldValue('%s');]],var_name,name);
 	end
 	return s;
 end
