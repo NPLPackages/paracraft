@@ -159,6 +159,9 @@ function CodeHelpWindow.RefreshGlobalDataDs()
 	for name, value in pairs(globals) do
 		global_data[#global_data+1] = {name=name, datatype = type(value)};
 	end
+	table.sort(global_data, function(a, b)
+		return a.name < b.name;
+	end)
 	return CodeHelpWindow.GetGlobalDataDs();
 end
 

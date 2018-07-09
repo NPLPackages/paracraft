@@ -31,6 +31,8 @@ local item = CodeHelpItem:new({
 }):Init();
 -------------------------------------------------------
 ]]
+local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
+
 local CodeHelpItem = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem"));
 function CodeHelpItem:ctor()
 	self.all_fields = self.all_fields or {};
@@ -45,6 +47,12 @@ function CodeHelpItem:Init()
 		end
 	end
 	return self;
+end
+
+function CodeHelpItem:ResetCache()
+	self.html = nil;
+	self.npl_code = nil;
+	self.dsItem = nil;
 end
 
 -- get an html presentation of the code item 
@@ -79,7 +87,10 @@ function CodeHelpItem:GetHtml()
 					elseif(arg_item.type == "field_variable") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
 					elseif(arg_item.type == "field_dropdown") then
-						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or tostring(arg_item.options[1][1]));
+						arg_item.selectedIndex = arg_item.selectedIndex or 1;
+						item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
+						arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
+						arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
 					elseif(arg_item.type == "field_number") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text) or "");
 					elseif(arg_item.type == "input_statement") then
@@ -231,4 +242,82 @@ function CodeHelpItem:GetDSItem()
 		self.dsItem = {name=self:GetName(), html = self:GetHtml(), color = self:GetColor(), nplcode = self:GetNPLCode(), tooltip=self:GetTooltip()};
 	end
 	return self.dsItem;
+end
+
+function CodeHelpItem.OnClickDropDown(name, mcmlNode)
+	local itemType, argIndex = name:match("^(.*)_(%d)$");
+	if(itemType and argIndex) then
+		argIndex = tonumber(argIndex);
+		local self = CodeHelpData.GetItemByType(itemType)
+		if(self) then
+			local arg_item = self.arg0[argIndex];
+			if(arg_item) then
+				if(arg_item.options) then
+					CodeHelpItem.curDropDownDS = arg_item.options;
+					CodeHelpItem.curDropDownSelectedIndex = arg_item.selectedIndex;
+					local x, y, width, height = mcmlNode:GetControl():GetAbsPosition();
+					self:ShowArgumentDropDownWnd(x+width, y, function(result)
+						if(result and result~=arg_item.selectedIndex) then
+							arg_item.selectedIndex = result;
+							self:SetArgumentText(argIndex, arg_item.options[arg_item.selectedIndex][1], mcmlNode);
+						end
+					end)
+				end
+			end
+		end
+	end
+end
+
+function CodeHelpItem:SetArgumentText(argIndex, text, mcmlNode)
+	local arg_item = self.arg0[argIndex];
+	if(arg_item) then
+		arg_item.text = text;
+		self:ResetCache();
+		if(mcmlNode) then
+			mcmlNode:GetPageCtrl():Refresh(0.01);
+		end
+	end
+end
+
+function CodeHelpItem:ShowArgumentDropDownWnd(x, y, callbackFunc)
+	local params = {
+			url = "script/apps/Aries/Creator/Game/Code/CodeArgumentDropDown.html", 
+			name = "CodeHelpItem.DropDown.ShowPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			bToggleShowHide=false, 
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = true,
+			click_through = false, 
+			enable_esc_key = true,
+			bShow = true,
+			isTopLevel = true,
+			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			directPosition = true,
+				align = "_lt",
+				x = x,
+				y = y,
+				width = 400,
+				height = 200,
+		};
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		if(callbackFunc) then
+			callbackFunc(CodeHelpItem.curDropDownSelectedIndex);
+		end
+	end
+	local used_width, used_height = params._page:GetUsedSize();
+	params._page:GetWindow():MoveWindow(x, y, used_width, used_height);
+end
+
+function CodeHelpItem.GetCurrentDropDownIndex()
+	return CodeHelpItem.curDropDownSelectedIndex;
+end
+
+function CodeHelpItem.GetCurrentDropDownDS()
+	return CodeHelpItem.curDropDownDS;
+end
+
+function CodeHelpItem.OnClickSelectDropDown(index)
+	CodeHelpItem.curDropDownSelectedIndex = index;
 end

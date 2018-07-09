@@ -20,8 +20,13 @@ local cmds = {
 	arg0 = {
 		{
 			name = "input",
-			type = "field_input",
-			text = "block",
+			type = "field_dropdown",
+			options = {
+				{ L"方块", "block" },
+				{ L"附近玩家", "@a" },
+				{ L"某个方块id", "62" },
+				{ L"某个角色名", "" },
+			},
 		},
 	},
 	output = {type = "field_number",},
@@ -208,8 +213,12 @@ end)
 	arg0 = {
 		{
 			name = "input",
-			type = "field_input",
-			text = "mouse-pointer",
+			type = "field_dropdown",
+			options = {
+				{ L"鼠标", "mouse-pointer" },
+				{ L"最近的玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
 		},
 	},
 	output = {type = "field_number",},
@@ -306,8 +315,20 @@ end
 	arg0 = {
 		{
 			name = "input",
-			type = "field_input",
+			type = "field_dropdown",
 			text = "space",
+			options = {
+				{ L"空格", "space" },{ L"左", "left" },{ L"右", "right" },{ L"上", "up" },{ L"下", "down" },
+				{"a","a"},{"b","b"},{"c","c"},{"d","d"},{"e","e"},{"f","f"},{"g","g"},{"h","h"},
+				{"i","i"},{"j","j"},{"k","k"},{"l","l"},{"m","m"},{"n","n"},{"o","o"},{"p","p"},
+				{"q","q"},{"r","r"},{"s","s"},{"t","t"},{"u","u"},{"v","v"},{"w","w"},{"x","x"},
+				{"y","y"},{"z","z"},
+				{"1","1"},{"2","2"},{"3","3"},{"4","4"},{"5","5"},{"6","6"},{"7","7"},{"8","8"},{"9","9"},{"0","0"},
+				{"f1","f1"},{"f2","f2"},{"f3","f3"},{"f4","f4"},{"f5","f5"},{"f6","f6"},{"f7","f7"},{"f8","f8"},{"f9","f9"},{"f10","f10"},{"f11","f11"},{"f12","f12"},
+				{ L"回车", "return" },{ "-", "minus" },{ "+", "equal" },{ "back", "back" },{ "tab", "tab" },
+				{ "lctrl", "lcontrol" },{ "lshift", "lshift" },{ "lalt", "lmenu" },
+				{"num0","numpad0"},{"num1","numpad1"},{"num2","numpad2"},{"num3","numpad3"},{"num4","numpad4"},{"num5","numpad5"},{"num6","numpad6"},{"num7","numpad7"},{"num8","numpad8"},{"num9","numpad9"},
+			},
 		},
 	},
 	output = {type = "field_number",},
@@ -341,13 +362,9 @@ while(true) do
 end
 ]]},
 {desc = L"按键列表", canRun = true, code = [[
--- a,b,c,...z
--- 1,2,3,...9,0
--- f1,f2,...,f12,escape
--- space,left,right,up,down
+
 -- numpad0,numpad1,...,numpad9
--- return,minus,equals,back,tab,
--- lcontrol,lshift,lmenu
+
 ]]}
 },
 },
@@ -387,7 +404,7 @@ end
 	canRun = false,
 	func_description = 'mousePickBlock()',
 	ToNPL = function(self)
-		return string.format('mousePickBlock()\n');
+		return string.format('local x, y, z, blockid = mousePickBlock()\n');
 	end,
 	examples = {{desc = L"点击任意位置传送", canRun = true, code = [[
 while(true) do

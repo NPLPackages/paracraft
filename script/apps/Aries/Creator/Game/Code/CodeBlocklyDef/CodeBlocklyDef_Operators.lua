@@ -38,7 +38,7 @@ local cmds = {
 	message0 = L"%1",
 	arg0 = {
 		{
-			name = "left",
+			name = "value",
 			type = "field_dropdown",
 			options = {
 				{ "true", "true" },
@@ -52,7 +52,7 @@ local cmds = {
 	canRun = false,
 	func_description = '%s',
 	ToNPL = function(self)
-		return 'true';
+		return self:getFieldAsString("value");
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 ]]}},
@@ -403,8 +403,27 @@ end
 
 {
 	type = "math.sqrt", 
-	message0 = L"开根号%1",
+	message0 = L"%1%2",
 	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"开根号", "sqrt" },
+				{ "sin", "sin"},
+				{ "cos", "cos"},
+				{ L"绝对值", "abs"},
+				{ "asin", "asin"},
+				{ "acos", "acos"},
+				{ L"向上取整", "ceil"},
+				{ L"向下取整", "floor"},
+				{ "tab", "tan"},
+				{ "atan", "atan"},
+				{ "sin", "exp"},
+				{ "log10", "log10"},
+				{ "exp", "exp"},
+			},
+		},
 		{
 			name = "left",
 			type = "field_number",
@@ -415,9 +434,9 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'math.sqrt(%s)',
+	func_description = 'math.%s(%s)',
 	ToNPL = function(self)
-		return string.format('math.sqrt(%s)', self:getFieldAsString('left'));
+		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 say("math.sqrt(9)=="..math.sqrt(9), 1)

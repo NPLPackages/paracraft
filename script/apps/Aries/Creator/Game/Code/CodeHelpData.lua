@@ -13,7 +13,9 @@ CodeHelpData.LoadParacraftCodeFunctions()
 local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
 
 local all_cmds = {}
+local all_cmds_map = {}
 
+local is_installed = false;
 function CodeHelpData.AppendAll()
 	if(is_installed)then
 		return
@@ -78,14 +80,17 @@ show()
 ]]},
 }
 
-local is_installed = false;
 function CodeHelpData.AppendDefinitions(source)
 	if(source)then
-		local k,v;
 		for k,v in ipairs(source) do
 			table.insert(all_cmds,v);
+			all_cmds_map[v.type] = v;
 		end
 	end
+end
+
+function CodeHelpData.GetItemByType(typeName)
+	return all_cmds_map[typeName];
 end
 
 function CodeHelpData.LoadParacraftCodeFunctions()

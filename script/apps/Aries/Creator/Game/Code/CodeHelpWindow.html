@@ -79,7 +79,7 @@ end
             <div style="margin-bottom:5px;margin-left:10px;">
                 <input type="button" value='<%=L"创建全局变量"%>' tooltip='<%=L"左键创建全局变量,右键刷新"%>' onclick="CodeHelpWindow.OnCreateVariable" style="color:#ffffff;font-size:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
             </div>
-            <pe:gridview style="margin:0px;height:200px;" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"
+            <pe:gridview style="margin:0px;height:137px;" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="24" RememberScrollPos="true"
                          DataSource='<%=DS_GlobalData%>'>
                 <Columns>
                     <div tooltip='<%=Eval("datatype")%>' name='<%=Eval("name")%>' onclick="OnClickDataItem">
@@ -95,16 +95,18 @@ end
         <pe:gridview style="margin:0px;margin-left:4px;" name="gvwFunctions" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="28" RememberScrollPos="true"
                         DataSource='<%=DS_CodeItems%>'>
             <Columns>
-                <pe:container style="background:url();margin-top:3px;margin-bottom:2px;padding-right:5px;" 
-                              name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd" 
-                              tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
-                              onclick="OnClickItem" >
-                    <div style="float:left;font-size:12px;" name='<%=Eval("name")%>' >
-                        <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
-                            <%=Eval("html")%>
+                <div style="width:300px">
+                    <pe:container style="background:url();margin-top:3px;margin-bottom:2px;padding-right:5px;"
+                                  name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd"
+                                  tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
+                                  onclick="OnClickItem">
+                        <div style="float:left;font-size:12px;" name='<%=Eval("name")%>'>
+                            <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
+                                <%=Eval("html")%>
+                            </div>
                         </div>
-                    </div>
-                </pe:container>
+                    </pe:container>
+                </div>
             </Columns>
             <EmptyDataTemplate>
             </EmptyDataTemplate>

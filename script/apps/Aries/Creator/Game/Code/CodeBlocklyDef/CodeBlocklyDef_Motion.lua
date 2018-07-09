@@ -103,7 +103,12 @@ turnTo(0)
 		{
 			name = "targetName",
 			type = "field_input",
-			text = "mouse-pointer", 
+			type = "field_dropdown",
+			options = {
+				{ L"鼠标", "mouse-pointer" },
+				{ L"最近的玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
 		},
 	},
 	category = "Motion", 
@@ -217,8 +222,12 @@ moveTo("frog")
 	arg0 = {
 		{
 			name = "targetName",
-			type = "field_input",
-			text = "mouse-pointer", 
+			type = "field_dropdown",
+			options = {
+				{ L"鼠标", "mouse-pointer" },
+				{ L"最近的玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
 		},
 	},
 	category = "Motion", 

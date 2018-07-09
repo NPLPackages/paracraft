@@ -99,7 +99,7 @@ function Entity:CreateInnerObject(filename, scale)
 		end
 	end
 
-	local model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x,y,z);
+	local model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3]);
 	model:SetField("assetfile", filename);
 	if(self.scale) then
 		model:SetScaling(self.scale);
@@ -181,6 +181,15 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.scale) then
 			self:setScale(tonumber(attr.scale));
 		end
+		if(attr.offsetX) then
+			self.offsetPos[1] = tonumber(attr.offsetX);
+		end
+		if(attr.offsetY) then
+			self.offsetPos[2] = tonumber(attr.offsetY);
+		end
+		if(attr.offsetZ) then
+			self.offsetPos[3] = tonumber(attr.offsetZ);
+		end
 	end
 end
 
@@ -197,6 +206,15 @@ function Entity:SaveToXMLNode(node, bSort)
 	node.attr.filename = self:GetModelFile();
 	if(self:getScale()~= 1) then
 		node.attr.scale = self:getScale();
+	end
+	if(self.offsetPos[1]~=0) then
+		node.attr.offsetX = self.offsetPos[1];
+	end
+	if(self.offsetPos[2]~=0) then
+		node.attr.offsetY = self.offsetPos[2];
+	end
+	if(self.offsetPos[3]~=0) then
+		node.attr.offsetZ = self.offsetPos[3];
 	end
 	return node;
 end
@@ -315,14 +333,22 @@ function Entity:OnActivated(triggerEntity)
 	EntityCommandBlock.ExecuteCommand(self, triggerEntity, true, true);
 end
 
-
 function Entity:GetOffsetPos()
 	return self.offsetPos;
 end
 
 function Entity:SetOffsetPos(v)
-	if(self.offsetPos:equals(v)) then
+	if(not self.offsetPos:equals(v)) then
+		local x, y, z = self:GetPosition();
+		v[1] = math.min(math.max(-BlockEngine.half_blocksize, v[1]), BlockEngine.half_blocksize);
+		v[2] = math.min(math.max(0, v[2]), BlockEngine.blocksize);
+		v[3] = math.min(math.max(-BlockEngine.half_blocksize, v[3]), BlockEngine.half_blocksize);
 		self.offsetPos:set(v);
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetPosition(x + v[1], y + v[2], z + v[3]);
+			obj:UpdateTileContainer();
+		end
 		self:valueChanged();
 	end
 end

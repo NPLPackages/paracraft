@@ -18,8 +18,10 @@ local cmds = {
 	arg0 = {
 		{
 			name = "note",
-			type = "field_input",
-			text = "7",
+			type = "field_dropdown",
+			options = {
+				{ "7", 7 },{ "6", 6 },{ "5", 5 },{ "4", 4 },{ "3", 3 },{ "2", 2 },{ "1", 1 },
+			},
 		},
 		{
 			name = "beat",
@@ -51,8 +53,17 @@ end
 	arg0 = {
 		{
 			name = "filename",
-			type = "field_input",
-			text = "1",
+			type = "field_dropdown",
+			options = {
+				{ "1", "1" },
+				{ "2", "2" },
+				{ "3", "3" },
+				{ "4", "4" },
+				{ "5", "5" },
+				{ L"ogg文件", "filename.ogg" },
+				{ L"wav文件", "filename.wav" },
+				{ L"mp3文件", "filename.mp3" },
+			},
 		},
 	},
 	category = "Sound", 
@@ -78,7 +89,13 @@ playMusic()
 		{
 			name = "filename",
 			type = "field_input",
-			text = "break",
+			type = "field_dropdown",
+			options = {
+				{ "击碎", "break" },
+				{ L"ogg文件", "filename.ogg" },
+				{ L"wav文件", "filename.wav" },
+				{ L"mp3文件", "filename.mp3" },
+			},
 		},
 	},
 	category = "Sound", 

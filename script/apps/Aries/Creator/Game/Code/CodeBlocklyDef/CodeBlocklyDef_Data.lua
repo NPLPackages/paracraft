@@ -160,6 +160,182 @@ wait(1);
 hideVariable("score")
 ]]}},
 },
+{
+	type = "registerCloneEvent", 
+	message0 = L"当角色被复制时%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Data", color="#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'registerCloneEvent(function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerCloneEvent(function(msg)
+    move(msg or 1, 0, 0, 0.5)
+    wait(1)
+    delete()
+end)
+clone()
+clone("myself", 2)
+clone("myself", 3)
+]]}},
+},
+
+{
+	type = "clone", 
+	message0 = L"复制%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "field_dropdown",
+			options = {
+				{ L"此角色", "myself" },
+				{ L"某个角色", "" },
+			},
+		},
+	},
+	category = "Data", color="#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'clone("%s")',
+	ToNPL = function(self)
+		return string.format('clone("%s")\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerClickEvent(function()
+    move(1,0,0, 0.5)
+end)
+clone()
+clone()
+say("click")
+]]}},
+},
+
+{
+	type = "delete", 
+	message0 = L"删除角色", color="#cc0000",
+	arg0 = {
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = "delete()",
+	ToNPL = function(self)
+		return string.format('delete()\n');
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+move(1,0)
+say("Default actor will be deleted!", 1)
+delete()
+registerCloneEvent(function()
+    say("This clone will be deleted!", 1)
+    delete()
+end)
+for i=1, 100 do
+    clone()
+    wait(2)
+end
+]]}},
+},
+
+{
+	type = "setActorValue", 
+	message0 = L"设置角色的%1为%2",
+	arg0 = {
+		{
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ L"名字", "name" },
+				{ L"物理半径", "physicsRadius" },
+				{ L"物理高度", "physicsHeight" },
+				{ L"任意变量", "" },
+			},
+		},
+		{
+			name = "value",
+			type = "field_input",
+			text = "actor1", 
+		},
+	},
+	category = "Data", 
+	color = "#cc0000",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setActorValue("%s", "%s")',
+	ToNPL = function(self)
+		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerCloneEvent(function(name)
+    setActorValue("name", name)
+    moveForward(1);
+end)
+registerClickEvent(function()
+    local myname = getActorValue("name")
+    say("my name is "..myname)
+end)
+setActorValue("name", "Default")
+clone("myself", "Cloned")
+say("click us!")
+]]}},
+},
+
+{
+	type = "getActorValue", 
+	message0 = L"获取角色的%1",
+	arg0 = {
+		{
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ L"名字", "name" },
+				{ L"物理半径", "physicsRadius" },
+				{ L"物理高度", "physicsHeight" },
+				{ L"任意变量", "" },
+			},
+		},
+	},
+	category = "Data", 
+	output = {type = "field_number",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getActorValue("%s")',
+	ToNPL = function(self)
+		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+registerCloneEvent(function(msg)
+    setActorValue("name", msg.name)
+    moveForward(msg.dist);
+end)
+registerClickEvent(function()
+    local myname = getActorValue("name")
+    say("my name is "..myname)
+end)
+setActorValue("name", "Default")
+clone("myself", {name = "clone1", dist=1})
+clone(nil, {name = "clone2", dist=2})
+say("click us!")
+]]}},
+},
+
 
 {
 	type = "log", 
@@ -215,169 +391,6 @@ echo(something)
 ]]}},
 },
 
-
-{
-	type = "registerCloneEvent", 
-	message0 = L"当演员被复制时%1",
-	arg0 = {
-		{
-			name = "input",
-			type = "input_statement",
-			text = "",
-		},
-	},
-	category = "Data", color="#cc0000",
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'registerCloneEvent(function()\\n%send)',
-	ToNPL = function(self)
-		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerCloneEvent(function(msg)
-    move(msg or 1, 0, 0, 0.5)
-    wait(1)
-    delete()
-end)
-clone()
-clone("myself", 2)
-clone("myself", 3)
-]]}},
-},
-
-{
-	type = "clone", 
-	message0 = L"复制角色%1",
-	arg0 = {
-		{
-			name = "input",
-			type = "field_input",
-			text = "myself",
-		},
-	},
-	category = "Data", color="#cc0000",
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'clone("%s")',
-	ToNPL = function(self)
-		return string.format('clone("%s")\n', self:getFieldAsString('input'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerClickEvent(function()
-    move(1,0,0, 0.5)
-end)
-clone()
-clone()
-say("click")
-]]}},
-},
-
-{
-	type = "delete", 
-	message0 = L"删除角色", color="#cc0000",
-	arg0 = {
-	},
-	category = "Data", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = "delete()",
-	ToNPL = function(self)
-		return string.format('delete()\n');
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-move(1,0)
-say("Default actor will be deleted!", 1)
-delete()
-registerCloneEvent(function()
-    say("This clone will be deleted!", 1)
-    delete()
-end)
-for i=1, 100 do
-    clone()
-    wait(2)
-end
-]]}},
-},
-
-{
-	type = "setActorValue", 
-	message0 = L"设置角色属性%1为%2",
-	arg0 = {
-		{
-			name = "key",
-			type = "field_input",
-			text = "name", 
-		},
-		{
-			name = "value",
-			type = "field_input",
-			text = "actor1", 
-		},
-	},
-	category = "Data", 
-	color = "#cc0000",
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'setActorValue("%s", "%s")',
-	ToNPL = function(self)
-		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerCloneEvent(function(name)
-    setActorValue("name", name)
-    moveForward(1);
-end)
-registerClickEvent(function()
-    local myname = getActorValue("name")
-    say("my name is "..myname)
-end)
-setActorValue("name", "Default")
-clone("myself", "Cloned")
-say("click us!")
-]]}},
-},
-
-{
-	type = "getActorValue", 
-	message0 = L"获取角色属性%1",
-	arg0 = {
-		{
-			name = "key",
-			type = "field_input",
-			text = "name", 
-		},
-	},
-	category = "Data", 
-	output = {type = "field_number",},
-	helpUrl = "", 
-	canRun = false,
-	func_description = 'getActorValue("%s")',
-	ToNPL = function(self)
-		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
-	end,
-	examples = {{desc = L"", canRun = true, code = [[
-registerCloneEvent(function(msg)
-    setActorValue("name", msg.name)
-    moveForward(msg.dist);
-end)
-registerClickEvent(function()
-    local myname = getActorValue("name")
-    say("my name is "..myname)
-end)
-setActorValue("name", "Default")
-clone("myself", {name = "clone1", dist=1})
-clone(nil, {name = "clone2", dist=2})
-say("click us!")
-]]}},
-},
 };
 function CodeBlocklyDef_Data.GetCmds()
 	return cmds;

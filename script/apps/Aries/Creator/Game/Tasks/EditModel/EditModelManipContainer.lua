@@ -71,7 +71,7 @@ function EditModelManipContainer:connectToDependNode(node)
 		-- one way binding 
 		local manipPosPlug = self:findPlug("position");
 		self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
-			return plugPos:GetValue():clone();
+			return plugPos:GetValue() + plugOffsetPos:GetValue();
 		end);
 
 		-- two-way binding for offset position conversion:

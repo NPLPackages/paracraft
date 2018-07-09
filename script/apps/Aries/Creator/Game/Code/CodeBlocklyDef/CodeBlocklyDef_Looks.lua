@@ -324,12 +324,15 @@ scaleTo(100)
 },
 {
 	type = "focus", 
-	message0 = L"观看此角色%1",
+	message0 = L"观看%1",
 	arg0 = {
 		{
 			name = "name",
-			type = "field_input",
-			text = "myself", 
+			type = "field_dropdown",
+			options = {
+				{ L"此角色", "myself" },
+				{ L"某个角色名", "" },
+			},
 		},
 	},
 	category = "Looks", 
@@ -355,18 +358,18 @@ focus("player")
 	arg0 = {
 		{
 			name = "dist",
-			type = "field_input",
-			text = "12", 
+			type = "field_number",
+			text = 12, 
 		},
 		{
 			name = "pitch",
-			type = "field_input",
-			text = "45", 
+			type = "field_number",
+			text = 45, 
 		},
 		{
 			name = "facing",
-			type = "field_input",
-			text = "90", 
+			type = "field_number",
+			text = 90, 
 		},
 	},
 	category = "Looks", 
