@@ -22,6 +22,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/ide/EventDispatcher.lua");
+NPL.load("(gl)script/ide/System/Core/Color.lua");
+local Color = commonlib.gettable("System.Core.Color");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -47,12 +49,17 @@ function TextureRegion:ctor()
 end
 
 -- init a region
-function TextureRegion:init(rectangle, texture_packer)
+function TextureRegion:init(name, rectangle, texture_packer)
+	self.name = name;
 	self.rectangle = rectangle;
 	self.texture_packer = texture_packer;
 	self:ComputeTexturePath();
 	self.Connect(self, "Changed", self.texture_packer, "MakeDirty");
 	return self;
+end
+
+function TextureRegion:GetName()
+	return self.name;
 end
 
 function TextureRegion:GetBlockId()
@@ -64,6 +71,22 @@ function TextureRegion:SetBlockId(block_id)
 		self.block_id = block_id; 
 		self:RefreshBlock();
 	end
+end
+
+function TextureRegion:GetDiffuseColor()
+	return self.diffuseColor;
+end
+
+function TextureRegion:SetDiffuseColor(color)
+	self.diffuseColor = color;
+end
+
+function TextureRegion:GetAmbientColor()
+	return self.ambientColor;
+end
+
+function TextureRegion:SetAmbientColor(color)
+	self.ambientColor = color;
 end
 
 function TextureRegion:RefreshBlock()
@@ -303,7 +326,7 @@ function TexturePacker:RebuildScene(bClearAll)
 				local model_filename = block_template:GetItemModel();	
 				if(model_filename and model_filename ~= "icon") then
 					local model_offset_y = block_template:GetOffsetY();
-					local obj_name = tostring(block_id);
+					local obj_name = region:GetName();
 					local obj = scene:GetObject(obj_name);
 					if(not obj or not obj:IsValid()) then
 						obj = ObjEditor.CreateObjectByParams({
@@ -318,6 +341,15 @@ function TexturePacker:RebuildScene(bClearAll)
 						});
 						obj:SetField("progress", 1);
 						obj:SetRotation(q);
+
+						-- diffuse color
+						local colorDiffuse = region:GetDiffuseColor();
+						if(colorDiffuse) then
+							obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorDiffuse", colorDiffuse);
+							if(region:GetAmbientColor()) then
+								obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorAmbient", region:GetAmbientColor());
+							end
+						end
 						scene:AddChild(obj);
 					end
 					
@@ -485,7 +517,7 @@ end
 -- private: 
 function TextureAtlas:AddRegion(name, rectangle, texture_packer)
 	if(rectangle) then
-		local region = TextureRegion:new():init(rectangle, texture_packer);
+		local region = TextureRegion:new():init(name, rectangle, texture_packer);
 		self.regions[name] = region;
 		self:RegionAdded(region);
 		return region;
@@ -511,8 +543,11 @@ function TextureAtlas:Clear()
 end
 
 -- block related, shall we move this to a new class? 
-function TextureAtlas:AddRegionByBlockId(block_id)
+function TextureAtlas:AddRegionByBlockId(block_id, block_data)
 	local region_name = format("block_%d", block_id);
+	if(block_data and block_data~=0) then
+		region_name = format("%s:%d",region_name, block_data);
+	end
 	local region = self:GetRegion(region_name);
 	if(not region) then
 		local block_template = block_types.get(block_id);
@@ -524,6 +559,18 @@ function TextureAtlas:AddRegionByBlockId(block_id)
 				region = self:CreateGetRegion(region_name, nil, nil);
 				if(region) then
 					region:SetBlockId(block_id);
+
+					if(block_data and block_data~=0) then
+						local item = ItemClient.GetItem(block_id);
+						if(item and item:HasColorData()) then
+							local color = item:DataToColor(block_data);
+							local r,g,b = Color.DWORD_TO_RGBA(color)
+							local e1 = 0.3;
+							local e2 = 1-e1;
+							region:SetDiffuseColor(Color.RGBA_TO_DWORD(math.floor(r*e1), math.floor(g*e1), math.floor(b*e1), 255));
+							region:SetAmbientColor(Color.RGBA_TO_DWORD(math.floor(r*e2), math.floor(g*e2), math.floor(b*e2), 255));
+						end
+					end
 				end	
 			end
 		end

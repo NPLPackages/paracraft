@@ -1,7 +1,11 @@
 <!--config/Aries/creator/block_list.xml
 Defines order of blocks in category
-version: 没有是所有版本都有的块。 "mc"只有创意空间才有的块, "haqi" 只有哈奇才有的
-to_id： 可以是一组连续的ID
+version: default to all version. "mc"只有创意空间才有的块, "haqi" 只有哈奇才有的
+to_id： optional, from id to to_id. 
+is_sdk: only shown in sdk mode
+test_sdk: only shown in sdk mode
+block_data: optional, preferred block data when created, such as those with colors
+entity_data: optional, preferred entity data when created. 
 -->
 <blocklist>
   <category name="static" text="方块">    
@@ -72,8 +76,10 @@ to_id： 可以是一组连续的ID
     <block id="183"/>
     <block id="187"/>
     <block id="182"/>
-    <block id="104"/>
-    <block id="177"/>
+    <block id="104" block_data="0" tip="白色"/>
+    <block id="104" block_data="3840" tip="红色"/>
+    <block id="177" block_data="0" tip="白色"/>
+    <block id="177" block_data="3840" tip="红色"/>
     <block id="175"/>
     <block id="178"/>
     <block id="168"/>
@@ -91,7 +97,8 @@ to_id： 可以是一组连续的ID
     <block id="110"/>
     <block id="144"/>
     <block id="80"/>
-    <block id="133" />
+    <block id="133" block_data="0" tip="白色"/>
+    <block id="133" block_data="3840" tip="红色"/>
     <block id="135" />
     <block id="23" />
     <block id="96" />
@@ -119,7 +126,8 @@ to_id： 可以是一组连续的ID
     <block id="6"/>
     <block id="220"/>
     <block id="153"/>
-    <block name="White_Carpet"/>
+    <block name="White_Carpet" block_data="0" tip="白色"/>
+    <block name="White_Carpet" block_data="3840" tip="红色"/>
     <block name="Orange_Carpet"/>
     <block name="Magenta_Carpet"/>
     <block name="Light_Blue_Carpet"/>
@@ -137,7 +145,8 @@ to_id： 可以是一组连续的ID
     <block name="Black_Carpet"/>
     <block name="Glass_Carpet"/>
     <block name="Stone_Slope"/>
-    <block name="Sand_Slope"/>
+    <block name="Sand_Slope" block_data="0" tip="白色"/>
+    <block name="Sand_Slope" block_data="3840" tip="红色"/>
     <block name="Oak_Wood_Slope"/>
     <block name="Cobblestone_Slope"/>
     <block name="Brick_Slope"/>
@@ -202,7 +211,18 @@ to_id： 可以是一组连续的ID
     <block id="187"/>
     <block id="182"/>
     <block id="104"/>
-    <block id="177"/>
+    <block id="177" block_data="0" tip="白色"/>
+    <block id="177" block_data="3840" tip="红色"/>
+    <block id="177" block_data="2816" tip="橙色"/>
+    <block id="177" block_data="768" tip="黄色"/>
+    <block id="177" block_data="256" tip="淡黄色"/>
+    <block id="177" block_data="13824" tip="绿色"/>
+    <block id="177" block_data="4864" tip="淡绿色"/>
+    <block id="177" block_data="13312" tip="淡蓝色"/>
+    <block id="177" block_data="4096" tip="青色"/>
+    <block id="177" block_data="14336" tip="蓝色"/>
+    <block id="177" block_data="1024" tip="粉色"/>
+    <block id="177" block_data="6400" tip="紫色"/>
     <block id="175"/>
     <block id="178"/>
     <block id="168"/>
@@ -219,6 +239,8 @@ to_id： 可以是一组连续的ID
     <block id="120"/>
     <block id="121"/>
     <block id="122"/>
+    
+  
     <block name="Mirror" />
     <block name="BlockLight" />
   </category>

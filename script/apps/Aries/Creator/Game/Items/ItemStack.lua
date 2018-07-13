@@ -67,6 +67,14 @@ function ItemStack:SetData(data)
 	end
 end
 
+function ItemStack:SetPreferredBlockData(data)
+	self.blockData = data;
+end
+
+function ItemStack:GetPreferredBlockData()
+	return self.blockData;
+end
+
 -- create or get script scope
 function ItemStack:GetScriptScope()
 	if(not self._PAGESCRIPT) then
@@ -277,7 +285,7 @@ function ItemStack:SplitStack(count)
     if (self.serverdata) then
         item_stack.serverdata = commonlib.copy(self.serverdata);
     end
-
+	item_stack.blockData = self.blockData;
     self.count = self.count - count;
     return item_stack;
 end
@@ -298,7 +306,8 @@ end
 
 -- return true if item is same, both id and serverdata mathes
 function ItemStack:IsSameItem(itemStack)
-	if(self.id == itemStack.id) then
+	if(self.id == itemStack.id and (self.blockData==itemStack.blockData)) then
+		
 		if(self.serverdata == itemStack.serverdata) then
 			return true;
 		elseif(self.serverdata and itemStack.serverdata) then
@@ -313,6 +322,7 @@ function ItemStack:Copy()
 	local o = {
 		id = self.id,
 		count = self.count,
+		blockData = self.blockData, -- preferred block data
 	}
 	if(self.serverdata) then
 		o.serverdata = commonlib.copy(self.serverdata);
@@ -326,6 +336,7 @@ function ItemStack:Swap(itemStack)
 		self.id, itemStack.id = itemStack.id, self.id;
 		self.count, itemStack.count = itemStack.count, self.count;
 		self.serverdata, itemStack.serverdata = itemStack.serverdata, self.serverdata;
+		self.blockData, itemStack.blockData = itemStack.blockData, self.blockData;
 	end
 end
 

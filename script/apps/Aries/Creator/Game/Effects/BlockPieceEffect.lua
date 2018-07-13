@@ -32,7 +32,9 @@ function BlockPieceEffect:GetContainer()
 end
 
 local tmp_vector = {};
-function BlockPieceEffect:CreateBlockPiece(x,y,z, radius, lifetime, speed_x, speed_y, speed_z, texture_filename)
+
+-- @param color: nil or such as 0xffff0000
+function BlockPieceEffect:CreateBlockPiece(x,y,z, radius, lifetime, speed_x, speed_y, speed_z, texture_filename, color)
 	if(self.use_cpp_impl) then
 		local particle = ParaScene.CreateObject("BlockPieceParticle", "",x,y,z);
 		tmp_vector[1], tmp_vector[2], tmp_vector[3] = speed_x, speed_y, speed_z;
@@ -40,6 +42,9 @@ function BlockPieceEffect:CreateBlockPiece(x,y,z, radius, lifetime, speed_x, spe
 		particle:SetField("lifetime", lifetime);
 		particle:SetField("radius", radius);
 		particle:SetField("TextureFilename", texture_filename);
+		if(color) then
+			particle:SetDynamicField("colorDiffuse", color)
+		end
 		ParaScene.Attach(particle);
 	else
 		local entity = EntityManager.EntityBlockPiece:new({
@@ -47,6 +52,7 @@ function BlockPieceEffect:CreateBlockPiece(x,y,z, radius, lifetime, speed_x, spe
 			speed_x = speed_x, speed_y = speed_y, speed_z = speed_z,
 			texture = texture_filename, 
 			AnimFrame = math.random(1,2400),-- 80(frame)*30
+			color = color,
 		});
 		EntityManager.AddObject(entity);
 	end

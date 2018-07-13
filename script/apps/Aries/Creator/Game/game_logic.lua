@@ -1001,8 +1001,8 @@ function GameLogic.GetBlockInRightHand()
 	return GameLogic.GetPlayerController():GetBlockInRightHand();
 end
 
-function GameLogic.SetBlockInRightHand(block_id)
-	GameLogic.GetPlayerController():SetBlockInRightHand(block_id);
+function GameLogic.SetBlockInRightHand(blockid_or_item_stack)
+	GameLogic.GetPlayerController():SetBlockInRightHand(blockid_or_item_stack);
 end
 
 -- create a game object at the given position. 

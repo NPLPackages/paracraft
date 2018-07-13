@@ -16,12 +16,17 @@ local ItemColorBlock = commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorB
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
 local Color = commonlib.gettable("System.Core.Color");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local rshift = mathlib.bit.rshift;
+local lshift = mathlib.bit.lshift;
+local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local ItemColorBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorBlock"));
 
@@ -57,6 +62,7 @@ function ItemColorBlock:GetRandomColor()
 	return random_colors[last_random_index];
 end
 
+
 -- get current selected pen color
 function ItemColorBlock:GetPenColor(itemStack)
 	itemStack = itemStack or self:GetSelectedItemStack();
@@ -87,17 +93,12 @@ end
 function ItemColorBlock:PaintBlock(x,y,z, color)
 	color = self:ColorToData(color);
 	if(color) then
+		if(self:IsColorData8Bits()) then
+			local data = BlockEngine:GetBlockData(x,y,z) or 0;	
+			color = bor(color, band(data, 0x00FF));
+		end
 		BlockEngine:SetBlockData(x,y,z, color);
 	end
-end
-
--- static function: from color to data
-function ItemColorBlock:ColorToData(color)
-	return Color.convert32_16(color);
-end
-
-function ItemColorBlock:DataToColor(data)
-	return Color.convert16_32(data);
 end
 
 -- Right clicking in 3d world with the block in hand will trigger this function. 
@@ -157,7 +158,11 @@ function ItemColorBlock:PickPenColorAtMouse(result)
 			local block_template = BlockEngine:GetBlock(x,y,z);
 			if(block_template) then
 				if(block_template.color_data) then
-					local color = self:DataToColor(BlockEngine:GetBlockData(x,y,z));
+					local color = self:DataToColor(BlockEngine:GetBlockData(x,y,z), 16);
+					self:SetPickColor(color);
+					return 
+				elseif(block_template.color8_data) then
+					local color = self:DataToColor(BlockEngine:GetBlockData(x,y,z), 8);
 					self:SetPickColor(color);
 					return 
 				end
@@ -307,7 +312,8 @@ end
 function ItemColorBlock:DrawIcon(painter, width, height, itemStack)
 	painter:SetPen(Color.ChangeOpacity(self:GetPenColor(itemStack)));
 	painter:DrawRect(0,0,width, height);
-	ItemColorBlock._super.DrawIcon(self, painter, width, height, itemStack);
+	painter:SetPen("#ffffff");	
+	painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
 end
 
 -- virtual function: 

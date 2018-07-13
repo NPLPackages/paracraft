@@ -10,12 +10,14 @@ local ItemSlab = commonlib.gettable("MyCompany.Aries.Game.Items.ItemSlab");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
 local Player = commonlib.gettable("MyCompany.Aries.Player");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local band = mathlib.bit.band;
 
 local ItemSlab = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemSlab"));
 
@@ -67,18 +69,20 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 		local isReplacing;
 		if(last_block_id == block_id) then
 			local last_block_data = ParaTerrain.GetBlockUserDataByIdx(x_, y_, z_);
+			local color_data = band(last_block_data, 0xff00);
+			last_block_data = band(last_block_data, 0x00ff);
 			
 			if(last_block_data == 0) then
 				if(side == 5 or data == 1) then
 					-- replace last block id
-					if(BlockEngine:SetBlock(x_, y_, z_, GetBoxBlockBySlabID(last_block_id) or block_id, 0, 3)) then
+					if(BlockEngine:SetBlock(x_, y_, z_, GetBoxBlockBySlabID(last_block_id) or block_id, color_data, 3)) then
 						isReplacing = true;
 					end
 				end
 			else
 				if(side == 4 or data == 0) then
 					-- replace last block id
-					if(BlockEngine:SetBlock(x_, y_, z_, GetBoxBlockBySlabID(last_block_id) or block_id, 0, 3)) then
+					if(BlockEngine:SetBlock(x_, y_, z_, GetBoxBlockBySlabID(last_block_id) or block_id, color_data, 3)) then
 						isReplacing = true;
 					end
 				end	
@@ -100,7 +104,10 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 			local block_template = block_types.get(block_id);
 
 			if(block_template) then
-				data = data or block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+				if(not data) then
+					data = block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+					data = block_template:CalculatePreferredData(data, itemStack:GetPreferredBlockData());
+				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then
 					block_template:play_create_sound();

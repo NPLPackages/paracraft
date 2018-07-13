@@ -131,36 +131,18 @@ function ItemClient.LoadGlobalBlockList()
 						end
 					end
 					if(from_id) then
-						ItemClient.AddBlock(from_id, nil, category_name);
+						local itemDS = ItemClient.AddBlock(from_id, nil, category_name);
+						if(attr.block_data) then
+							itemDS.block_data = tonumber(attr.block_data);
+						end
+						if(attr.entity_data) then
+							itemDS.entity_data = NPL.LoadTableFromString(attr.entity_data);
+						end
 						if(attr.to_id) then
 							local to_id = tonumber(attr.to_id);
 							local id;
 							for id = from_id+1, to_id do
 								ItemClient.AddBlock(id, nil, category_name);
-							end
-						end
-					end
-				end
-			end
-			-- add obsoleted blocks only for "haqi" version
-			if(version == "haqi") then
-				for node in commonlib.XPath.eachNode(category_node, "/block") do
-					local attr = node.attr;
-					if((attr.version == "obsoleted") and (not attr.test_sdk or is_sdk) ) then
-						local from_id = tonumber(attr.id);
-						if(not from_id) then
-							if(attr.name) then
-								from_id = block_types.names[attr.name];
-							end
-						end
-						if(from_id) then
-							ItemClient.AddBlock(from_id, nil, category_name);
-							if(attr.to_id) then
-								local to_id = tonumber(attr.to_id);
-								local id;
-								for id = from_id+1, to_id do
-									ItemClient.AddBlock(id, nil, category_name);
-								end
 							end
 						end
 					end
@@ -177,16 +159,17 @@ end
 -- add a block at the given index. 
 -- @param index: if nil, it will be added to last block. 
 -- @param category_name: default to "static"
+-- @return blockDsItem
 function ItemClient.AddBlock(block_id, index, category_name)
-	local block = ItemClient.CreateGetByBlockID(block_id);
+	local item = ItemClient.CreateGetByBlockID(block_id);
 
-	local res = ItemClient.SearchBlocks(block_id, category_name);
-	if(not res or #res == 0)then
-		-- only add if not exist. 
-		local ds_blocks = ItemClient.GetBlockDS(category_name);
-		index = index or (#ds_blocks+1);
-		ds_blocks[index] = block;	
-	end
+	local blockDSItem = { __index = item, block_id = block_id };
+	setmetatable(blockDSItem, blockDSItem);
+
+	local ds_blocks = ItemClient.GetBlockDS(category_name);
+	index = index or (#ds_blocks+1);
+	ds_blocks[index] = blockDSItem;	
+	return blockDSItem
 end
 
 -- search a given block

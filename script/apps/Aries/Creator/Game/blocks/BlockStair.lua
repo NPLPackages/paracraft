@@ -10,6 +10,7 @@ local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockStair")
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -17,6 +18,10 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local rshift = mathlib.bit.rshift;
+local lshift = mathlib.bit.lshift;
+local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockStair"));
 
@@ -44,7 +49,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			data = 1;
 			local blockBack = BlockEngine:GetBlock(blockX+1, blockY, blockZ);
 			if(blockBack and blockBack.modelName == "stairs") then
-				local userData = BlockEngine:GetBlockData(blockX+1, blockY, blockZ);
+				local userData = band(BlockEngine:GetBlockData(blockX+1, blockY, blockZ), 0xff);
 				if(userData == 3) then
 					data = 5;	
 				elseif(userData == 4) then
@@ -58,7 +63,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			if(data == 1) then
 				local blockBack = BlockEngine:GetBlock(blockX-1, blockY, blockZ);
 				if(blockBack and blockBack.modelName == "stairs") then
-					local userData = BlockEngine:GetBlockData(blockX-1, blockY, blockZ);
+					local userData = band(BlockEngine:GetBlockData(blockX-1, blockY, blockZ), 0xff);
 					if(userData == 3) then
 						data = 18;	
 					elseif(userData == 4) then
@@ -74,7 +79,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			data = 3;
 			local blockBack = BlockEngine:GetBlock(blockX, blockY, blockZ+1);
 			if(blockBack and blockBack.modelName == "stairs") then
-				local userData = BlockEngine:GetBlockData(blockX, blockY, blockZ+1);
+				local userData = band(BlockEngine:GetBlockData(blockX, blockY, blockZ+1), 0xff);
 				if(userData == 1) then
 					data = 5;	
 				elseif(userData == 2) then
@@ -88,7 +93,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			if(data == 3) then
 				local blockBack = BlockEngine:GetBlock(blockX, blockY, blockZ-1);
 				if(blockBack and blockBack.modelName == "stairs") then
-					local userData = BlockEngine:GetBlockData(blockX, blockY, blockZ-1);
+					local userData = band(BlockEngine:GetBlockData(blockX, blockY, blockZ-1), 0xff);
 					if(userData == 1) then
 						data = 18;	
 					elseif(userData == 2) then
@@ -104,7 +109,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			data = 4;
 			local blockBack = BlockEngine:GetBlock(blockX, blockY, blockZ-1);
 			if(blockBack and blockBack.modelName == "stairs") then
-				local userData = BlockEngine:GetBlockData(blockX, blockY, blockZ-1);
+				local userData = band(BlockEngine:GetBlockData(blockX, blockY, blockZ-1), 0xff);
 				if(userData == 1) then
 					data = 8;	
 				elseif(userData == 2) then
@@ -118,7 +123,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			if(data == 4) then
 				local blockBack = BlockEngine:GetBlock(blockX, blockY, blockZ+1);
 				if(blockBack and blockBack.modelName == "stairs") then
-					local userData = BlockEngine:GetBlockData(blockX, blockY, blockZ+1);
+					local userData = band(BlockEngine:GetBlockData(blockX, blockY, blockZ+1), 0xff);
 					if(userData == 1) then
 						data = 21;	
 					elseif(userData == 2) then
@@ -134,7 +139,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			data = 2;
 			local blockBack = BlockEngine:GetBlock(blockX-1, blockY, blockZ);
 			if(blockBack and blockBack.modelName == "stairs") then
-				local userData = BlockEngine:GetBlockData(blockX-1, blockY, blockZ);
+				local userData = band(BlockEngine:GetBlockData(blockX-1, blockY, blockZ), 0xff);
 				if(userData == 3) then
 					data = 6;	
 				elseif(userData == 4) then
@@ -148,7 +153,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			if(data == 2) then
 				local blockBack = BlockEngine:GetBlock(blockX+1, blockY, blockZ);
 				if(blockBack and blockBack.modelName == "stairs") then
-					local userData = BlockEngine:GetBlockData(blockX+1, blockY, blockZ);
+					local userData = band(BlockEngine:GetBlockData(blockX+1, blockY, blockZ), 0xff);
 					if(userData == 3) then
 						data = 19;	
 					elseif(userData == 4) then
@@ -164,36 +169,6 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 		if(side_region == "upper") then
 			data = to_upper_data[data] or data;
 		end
-
-		--[[ -- old code using condition
-		local direction = Direction.GetDirectionFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
-		if(direction) then
-			direction = direction*2;
-			
-			local block_id;
-			if(direction == 2) then
-				block_id = ParaTerrain.GetBlockTemplateByIdx(blockX+1, blockY, blockZ);
-			elseif(direction == 4) then
-				block_id = ParaTerrain.GetBlockTemplateByIdx(blockX, blockY, blockZ+1);
-			elseif(direction == 6) then
-				block_id = ParaTerrain.GetBlockTemplateByIdx(blockX, blockY, blockZ-1);
-			elseif(direction == 8) then
-				block_id = ParaTerrain.GetBlockTemplateByIdx(blockX-1, blockY, blockZ);
-			end
-			if(block_id == 0) then
-				force_condition = force_condition or {};
-				force_condition[direction] = 'solid';
-			end
-		end
-
-		if(side_region == "upper") then
-			force_condition = force_condition or {};
-			force_condition[0] = 'solid';
-		elseif(side_region == "lower") then
-			force_condition = force_condition or {};
-			force_condition[5] = 'solid';
-		end
-		]]
 	end
 	if(self.customModel) then
 		local best_model = self:GetBestModel(blockX, blockY, blockZ, data, side, force_condition);
@@ -215,7 +190,7 @@ local maxZ_data = {[4] = 0.5, [7]=0.5, [8] = 0.5, }
 -- @param aabb: only add if collide with this aabb. 
 -- @param entity: 
 function block:AddCollisionBoxesToList(x,y,z, aabb, list, entity)
-	local data = BlockEngine:GetBlockData(x,y,z);
+	local data = band(BlockEngine:GetBlockData(x,y,z), 0xff);
 	if (data <= 8) then
 	    -- lower half
 		self:SetBlockBounds(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
@@ -238,7 +213,9 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the rotated block data. 
 function block:RotateBlockData(blockData, angle, axis)
-	return self:RotateBlockDataUsingModelFacing(blockData, angle, axis);
+	local highColorData = band(blockData, 0xff00)
+	blockData = band(blockData, 0xff);
+	return self:RotateBlockDataUsingModelFacing(blockData, angle, axis) + highColorData;
 end
 
 -- mirror the block data along the given axis. This is mosted reimplemented in blocks with orientations stored in block data, such as stairs, bones, etc. 
@@ -246,6 +223,8 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the mirrored block data. 
 function block:MirrorBlockData(blockData, axis)
+	local highColorData = band(blockData, 0xff00)
+	blockData = band(blockData, 0xff);
 	if(axis == "x") then
 		if(blockData == 10) then
 			blockData = 12;
@@ -333,5 +312,5 @@ function block:MirrorBlockData(blockData, axis)
 			blockData = 6;
 		end
 	end
-	return blockData;
+	return blockData + highColorData;
 end

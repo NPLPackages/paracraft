@@ -40,6 +40,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/ide/headon_speech.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/DataWatcher.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketEntityEffect.lua");
+NPL.load("(gl)script/ide/System/Core/Color.lua");
+local Color = commonlib.gettable("System.Core.Color");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local DataWatcher = commonlib.gettable("MyCompany.Aries.Game.Common.DataWatcher");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
@@ -2591,4 +2593,25 @@ function Entity:GetMemoryContext()
 		self.memoryContext = MemoryContext:new():Init(self);
 	end
 	return self.memoryContext;
+end
+
+-- change entity global color
+-- @param color: 0xff0000 or "#ff00ff"
+function Entity:SetColor(color)
+	color = Color.ToValue(color)
+	if(self.color ~= color) then
+		self.color = color;
+		local obj = self:GetInnerObject()
+		if(obj) then
+			local r,g,b = Color.DWORD_TO_RGBA(color);
+			local e1 = 0.3;
+			local e2 = 1-e1;
+			obj:SetDynamicField("colorDiffuse", Color.RGBA_TO_DWORD(math.floor(r*e1), math.floor(g*e1), math.floor(b*e1), 255));
+			obj:SetDynamicField("colorAmbient", Color.RGBA_TO_DWORD(math.floor(r*e2), math.floor(g*e2), math.floor(b*e2), 255));
+		end
+	end
+end
+
+function Entity:GetColor()
+	return self.color or 0xffffff;
 end

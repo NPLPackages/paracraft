@@ -417,10 +417,23 @@ function Actor:SetPhysicsHeight(height)
 	end
 end
 
+function Actor:GetColor()
+	local entity = self:GetEntity();
+	return entity and entity:GetColor();
+end
+
+function Actor:SetColor(color)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetColor(color);
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 }
 
 function Actor:GetActorValue(name)

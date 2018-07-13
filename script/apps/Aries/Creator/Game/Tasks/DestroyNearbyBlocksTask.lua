@@ -104,6 +104,8 @@ function DestroyNearbyBlocks:FrameMove()
 				-- keep block_id for redo. 
 				local block_template = block_types.get(block_id);
 				if(block_template) then
+					local color = block_template:GetDiffuseColor(b[1],b[2],b[3])
+					
 					local block_modified = block_template:Remove(b[1],b[2],b[3]);
 					if(block_modified and block_modified>=1) then
 						b.block_id = block_id;
@@ -111,7 +113,7 @@ function DestroyNearbyBlocks:FrameMove()
 						b.last_entity_data = last_entity_data;
 						count = count + 1;
 							
-						block_template:CreateBlockPieces(b[1],b[2],b[3], pieces_granularity);
+						block_template:CreateBlockPieces(b[1],b[2],b[3], pieces_granularity, nil, nil, nil, nil, color);
 
 						if(not is_sound_played) then
 							is_sound_played = true;

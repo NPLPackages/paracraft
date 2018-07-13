@@ -263,6 +263,7 @@ end
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
+				{ L"颜色", "color" },
 				{ L"任意变量", "" },
 			},
 		},
@@ -292,6 +293,7 @@ registerClickEvent(function()
     say("my name is "..myname)
 end)
 setActorValue("name", "Default")
+setActorValue("color", "#ff0000")
 clone("myself", "Cloned")
 say("click us!")
 ]]}},
@@ -308,6 +310,7 @@ say("click us!")
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
+				{ L"颜色", "color" },
 				{ L"任意变量", "" },
 			},
 		},

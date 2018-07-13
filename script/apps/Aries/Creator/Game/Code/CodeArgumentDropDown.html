@@ -1,0 +1,30 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeArgumentDropDown.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeHelpItem.lua">
+<![CDATA[
+CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
+
+function OnClose()
+    Page:CloseWindow();
+end
+function OnClick(name)
+    CodeHelpItem.OnClickSelectDropDown(name)
+    OnClose()
+end
+
+]]></script>
+<div style="font-size:12px;padding:3px;background-color:#292929c0;" class="default">
+    <!--<input style="margin:2px;margin-right:10px;" onclick="OnClose" class="mc_button_orange" type="button" value='<%=L"关闭"%>' />-->
+    <pe:repeat DataSource="<%=CodeHelpItem.GetCurrentDropDownDS()%>">
+        <pe:repeatitem style="float:left;">
+            <pe:if condition='<%=Eval("index")==CodeHelpItem.GetCurrentDropDownIndex()%>'>
+                <input class="mc_button_blue" type="button" name="<%=Eval('index')%>" onclick="OnClose" style="margin:2px;min-width:10px;" value="<%=Eval(1)%>" />
+            </pe:if>
+            <pe:if condition='<%=Eval("index")~=CodeHelpItem.GetCurrentDropDownIndex()%>'>
+                <input class="mc_button_grey" type="button" name="<%=Eval('index')%>" onclick="OnClick" style="margin:2px;min-width:10px;" value="<%=Eval(1)%>" />
+            </pe:if>
+        </pe:repeatitem>
+    </pe:repeat>
+</div>
+</pe:mcml>
+

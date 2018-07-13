@@ -29,6 +29,9 @@ local item_ = Item:new({icon,});
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameMode.lua");
+NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
+local Color = commonlib.gettable("System.Core.Color");
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local ObjEditor = commonlib.gettable("ObjEditor");
 local Image3DDisplay = commonlib.gettable("MyCompany.Aries.Game.Effects.Image3DDisplay");
@@ -39,6 +42,10 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
+local rshift = mathlib.bit.rshift;
+local lshift = mathlib.bit.lshift;
+local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local Item = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.Item"));
 
@@ -60,6 +67,9 @@ function Item:ctor()
 	self.max_count = tonumber(self.max_count);
 	self.id = self.id or self.block_id;
 	self.block_id = self.block_id or self.id;
+	if(self:HasColorData()) then
+		self:SetOwnerDrawIcon(true);
+	end
 end
 
 function Item:GetMaxCount()
@@ -129,7 +139,13 @@ function Item:OnClick()
 		end
 		-- normal block
 		if(GameMode:IsUseCreatorBag()) then
-			GameLogic.SetBlockInRightHand(block_id);
+			if(self.block_data or self.block_entity) then
+				local item = ItemStack:new():Init(block_id, 1, self.block_entity);
+				item:SetPreferredBlockData(self.block_data)
+				GameLogic.SetBlockInRightHand(item);
+			else
+				GameLogic.SetBlockInRightHand(block_id);
+			end
 		else
 			EntityManager.GetPlayer().inventory:PickBlock(block_id);
 		end
@@ -253,7 +269,10 @@ function Item:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 			local block_template = block_types.get(block_id);
 
 			if(block_template) then
-				data = data or block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+				if(not data) then
+					data = block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+					data = block_template:CalculatePreferredData(data, itemStack:GetPreferredBlockData());
+				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then
 					block_template:play_create_sound();
@@ -290,8 +309,18 @@ function Item:GetIconAtlas()
 	return Item.icon_atlas;
 end
 
-function Item:GetIcon()
-	if(not self.icon_generated) then
+-- @param block_data: default to nil
+function Item:GetIcon(block_data)
+	local needGenerate = not self.icon_generated;
+	if(block_data and block_data~=0) then
+		self.icons_generated = self.icons_generated or {};
+		if(not self.icons_generated[block_data]) then
+			self.icons_generated[block_data] = true;
+			needGenerate = true;
+		end
+	end
+
+	if(needGenerate) then
 		self.icon_generated = true;
 		if(not self.disable_gen_icon) then
 			local model_filename = self:GetItemModel();	
@@ -299,15 +328,25 @@ function Item:GetIcon()
 				-- only add block with real models. 
 				local atlas = self:GetIconAtlas();
 				if(self.block_id and self.block_id>0 and self.block_id < 4096) then
-					local region = atlas:AddRegionByBlockId(self.block_id);
+					local region = atlas:AddRegionByBlockId(self.block_id, block_data);
 					if(region) then
-						self.icon = region:GetTexturePath();
+						if(block_data and block_data~=0) then
+							self.icons_generated[block_data] = region:GetTexturePath();
+						else
+							self.icon = region:GetTexturePath();
+						end
 					end
 				end
 			end
 		end
 	end
 	
+	if(block_data and block_data~=0) then
+		local icon = self.icons_generated[block_data];
+		if(type(icon) == "string") then
+			return icon;
+		end
+	end
 	if(self.icon) then
 		return self.icon;
 	else
@@ -364,7 +403,14 @@ function Item:GetSkinFile()
 end
 
 function Item:GetTooltipFromItemStack(itemStack)
-	return self:GetTooltip();
+	local text = self:GetTooltip();
+	if(self:HasColorData()) then
+		local data = itemStack:GetPreferredBlockData();
+		if(data) then
+			return string.format("%s Color:#%06x", text or "", self:DataToColor(data));
+		end
+	end
+	return text;
 end
 
 function Item:GetOffsetY()
@@ -562,7 +608,22 @@ end
 -- virtual:
 -- when alt key is pressed to pick a block in edit mode. 
 function Item:PickItemFromPosition(x,y,z)
-	return ItemStack:new():Init(self.id, 1)
+	itemStack = ItemStack:new():Init(self.id, 1)
+	if(self:HasColorData()) then
+		local block_data = BlockEngine:GetBlockData(x,y,z);
+		if(block_data and block_data~=0) then
+			local block_template = BlockEngine:GetBlock(x,y,z);
+			if(block_template) then
+				if(block_template.color8_data) then
+					block_data = band(block_data, 0xff00);
+				end
+			end
+			if(block_data ~= 0) then
+				itemStack:SetPreferredBlockData(block_data);
+			end
+		end
+	end
+	return itemStack;
 end
 
 -- virtual: convert entity to item stack. 
@@ -579,7 +640,54 @@ function Item:CompareItems(left, right)
 	if(left == right) then
 		return true;
 	elseif(left and right) then
-		return left.id == right.id;
+		return left.id == right.id and left.blockData==right.blockData;
+	end
+end
+
+function Item:HasColorData()
+	if(self.hasColorData == nil) then
+		local block_template = self:GetBlock();
+		if(block_template and (block_template.color8_data or block_template.color_data)) then
+			self.hasColorData = true;
+		else
+			self.hasColorData = false;
+		end
+	end
+	return self.hasColorData;
+end
+
+-- whether we use 8 bits color data 
+function Item:IsColorData8Bits()
+	if(self.colorData8Bit == nil) then
+		local block_template = self:GetBlock();
+		if(block_template and block_template.color8_data) then
+			self.colorData8Bit = true;
+		else
+			self.colorData8Bit = false;
+		end
+	end
+	return self.colorData8Bit;
+end
+
+
+-- static function: from color to data
+-- @param bitCount: 8 or 16, default to current item setting
+function Item:ColorToData(color, bitCount)
+	if(bitCount~=16 and self:IsColorData8Bits()) then
+		return lshift((0xFF - Color.convert32_8(bor(color, 0xff000000))), 8);
+	else
+		return Color.convert32_16(color);
+	end
+end
+
+-- @param bitCount: 8 or 16, default to current item setting
+-- @return without alpha, 0xff0000
+function Item:DataToColor(data, bitCount)
+	if(bitCount~=16 and self:IsColorData8Bits()) then
+		data = 0xFF - rshift(data, 8);
+		return band(Color.convert8_32(data), 0x00ffffff);
+	else
+		return Color.convert16_32(data);
 	end
 end
 
@@ -588,11 +696,22 @@ end
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function Item:DrawIcon(painter, width, height, itemStack)
-	painter:SetPen("#ffffff");
+	if(self:HasColorData()) then
+		local data = itemStack:GetPreferredBlockData() or 0;
+		local color = self:DataToColor(data);
+		painter:SetPen(Color.ChangeOpacity(color));
+	else
+		painter:SetPen("#ffffff");	
+	end
 	painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
+
 	if(itemStack) then
 		if(itemStack.count>1) then
-			-- TODO: draw count at the corner?
+			-- draw count at the corner: no clipping, right aligned, single line
+			painter:SetPen("#000000");	
+			painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
+			painter:SetPen("#ffffff");	
+			painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
 		end
 	end
 end

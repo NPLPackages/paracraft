@@ -10,10 +10,12 @@ local ItemCarpet = commonlib.gettable("MyCompany.Aries.Game.Items.ItemCarpet");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local band = mathlib.bit.band;
 
 local ItemCarpet = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemCarpet"));
 
@@ -45,7 +47,9 @@ function ItemCarpet:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_r
 		local newBlockData;
 		if(last_block_id == block_id and side) then
 			local last_block_data = ParaTerrain.GetBlockUserDataByIdx(x, y, z);
-			
+			local color_data = band(last_block_data, 0xff00);
+			last_block_data = band(last_block_data, 0x00ff);
+
 			if(last_block_data>=0 and last_block_data<6) then
 				local last_side = data_to_side[last_block_data];
 				if(last_side>=4 and side<4) then
@@ -94,6 +98,10 @@ function ItemCarpet:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_r
 					end
 				end
 			end
+
+			if(newBlockData) then
+				newBlockData = newBlockData + color_data;
+			end
 		end
 		if(newBlockData) then
 			local block_template = block_types.get(block_id);
@@ -112,7 +120,10 @@ function ItemCarpet:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_r
 			local block_template = block_types.get(block_id);
 
 			if(block_template) then
-				data = data or block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+				if(not data) then
+					data = block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
+					data = block_template:CalculatePreferredData(data, itemStack:GetPreferredBlockData());
+				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then
 					block_template:play_create_sound();

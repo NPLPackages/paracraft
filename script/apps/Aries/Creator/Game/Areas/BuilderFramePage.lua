@@ -97,14 +97,19 @@ function BuilderFramePage.GetCategoryButtons()
 	return BuilderFramePage.category_ds;
 end
 
--- clicked a block
-function BuilderFramePage.OnClickBlock(block_id)
+-- clicked a block item
+function BuilderFramePage.OnClickBlock(block_id_or_item)
 	local search_text_obj = ParaUI.GetUIObject("block_search_text_obj");
 	if(search_text_obj:IsValid())then
 		search_text_obj:LostFocus();
 	end	
-    if(block_id) then
-		local item = ItemClient.GetItem(block_id)
+    if(block_id_or_item) then
+		local item;
+		if(type(block_id_or_item) ~= "table") then
+			item = ItemClient.GetItem(block_id_or_item)
+		else
+			item = block_id_or_item;
+		end
 		if(item) then
 			item:OnClick();
 		end

@@ -30,16 +30,16 @@ function DS_Items(index)
     if(index == nil) then
         return #BuilderFramePage.Current_Item_DS;
     else
-        local item = BuilderFramePage.Current_Item_DS[index];
-        if(item) then
-            return {block_id = item.block_id};
-        end
+        return BuilderFramePage.Current_Item_DS[index];
     end
 end
 
-function OnClickBlock(block_id)
+function OnClickBlock(block_id, mcmlNode)
     if(mouse_button == "left") then
-        BuilderFramePage.OnClickBlock(block_id);
+        local item = mcmlNode:GetPreValue("this", true);
+        if(item) then
+            BuilderFramePage.OnClickBlock(item);
+        end
     elseif(mouse_button == "right") then
         -- show block wiki page
         GameLogic.RunCommand("/wiki "..tostring(block_id));
@@ -125,7 +125,7 @@ end
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block block_id='<%=Eval("block_id")%>' style="width:32px;height:32px;" tooltip2='<%=L"右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' style="width:32px;height:32px;" tooltip2='<%=L"右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

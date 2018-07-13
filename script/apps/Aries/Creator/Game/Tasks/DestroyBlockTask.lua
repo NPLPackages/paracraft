@@ -48,7 +48,7 @@ function DestroyBlock:Run()
 			if(blocks_modified) then
 				-- invoke callback. 
 				local entityPlayer = EntityManager.GetPlayer();
-				block_template:OnUserBreakItem(self.blockX,self.blockY,self.blockZ, entityPlayer);
+				block_template:OnUserBreakItem(self.blockX,self.blockY,self.blockZ, entityPlayer, self.last_block_data);
 
 				GameLogic.events:DispatchEvent({type = "DestroyBlockTask" , block_id = block_id, x = self.blockX, y = self.blockY, z = self.blockZ,
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data,

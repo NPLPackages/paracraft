@@ -10,6 +10,7 @@ local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.Code
 CodeBlocklySerializer.WriteBlocklyMenuToXml("BlocklyMenu.xml");
 CodeBlocklySerializer.WriteToBlocklyConfig("BlocklyConfigSource.json");
 CodeBlocklySerializer.WriteToBlocklyCode("BlocklyExecution.js");
+CodeBlocklySerializer.WriteKeywordsToJson("LanguageKeywords.json");
 
 
 links:
@@ -31,6 +32,26 @@ local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem"
 
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
 
+function CodeBlocklySerializer.WriteKeywordsToJson(filename)
+	local s = CodeBlocklySerializer.GetKeywords();
+	local file = ParaIO.open(filename, "w");
+	if(file:IsValid()) then
+		file:WriteString(s);
+		file:close();
+	end
+end
+function CodeBlocklySerializer.GetKeywords()
+	local all_cmds = CodeHelpData.GetAllCmds();
+	local result = {};
+	local k,v;
+	for k,v in ipairs(all_cmds) do
+		if(v.type)then
+			table.insert(result,v.type);
+		end
+	end
+	local s = NPL.ToJson(result,true);
+	return s;
+end
 function CodeBlocklySerializer.GetBlocklyMenuXml()
 	local categories = CodeHelpWindow.GetCategoryButtons()
 	local all_cmds = CodeHelpData.GetAllCmds();
@@ -55,7 +76,6 @@ end
 function CodeBlocklySerializer.GetCategoryStr(category)
 	local all_cmds = CodeHelpData.GetAllCmds();
 	if(not category or not all_cmds)then return end
-	commonlib.echo(category);
 	local s = string.format("<category name='%s' colour='%s'>\n",category.text or category.name,category.colour or "#000000");
 	local cmd
 	for __,cmd in ipairs(all_cmds) do
@@ -162,10 +182,10 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 		local output = cmd.output;
 		if(output and output.type)then
 		s = string.format([[%s
-	return ['%s'.format(%s),Blockly.Lua.ORDER_ATOMIC];]],var_lines,func_description,arg_lines);
+    return ['%s'.format(%s),Blockly.Lua.ORDER_ATOMIC];]],var_lines,func_description,arg_lines);
 		else
 		s = string.format([[%s
-	return '%s\n'.format(%s);]],var_lines,func_description,arg_lines);
+    return '%s\n'.format(%s);]],var_lines,func_description,arg_lines);
 		end
 	else
 		s = 'return ""';
@@ -191,13 +211,13 @@ function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	local s;
 	local var_name = CodeBlocklySerializer.Create_VariableName(prefix,arg);
 	if(type == "input_statement")then
-		s = string.format([[	var %s = Blockly.Lua.statementToCode(block, '%s') || '';]],var_name,name)
+		s = string.format([[    var %s = Blockly.Lua.statementToCode(block, '%s') || '';]],var_name,name)
 	elseif(type == "input_value")then
-	s = string.format([[	var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '""';]],var_name,name)
+	s = string.format([[    var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '""';]],var_name,name)
 	elseif(type == "field_variable")then
-		s = string.format([[	var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,name)
+		s = string.format([[    var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,name)
 	else
-		s = string.format([[	var %s = block.getFieldValue('%s');]],var_name,name);
+		s = string.format([[    var %s = block.getFieldValue('%s');]],var_name,name);
 	end
 	return s;
 end

@@ -408,9 +408,9 @@ end
 
 -- @param granularity: (0-1), 1 will generate 27 pieces, 0 will generate 0 pieces, default to 1. 
 -- @param cx, cy, cz: center of break point. 
-function World:CreateBlockPieces(block_template, blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz)
+function World:CreateBlockPieces(block_template, blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz, color)
 	if(block_template) then
-		block_template:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz);
+		block_template:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz, color);
 	end
 end
 

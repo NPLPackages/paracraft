@@ -39,6 +39,7 @@ Sound related:
 @param slipperiness:distance to slide on surface of the block before an entity stops moving. 
 @param mapcolor: color to be shown on the mini map. usually top surface color. 
 @param color_data: whether block can be painted with colors. 
+@param color8_data: whether block uses the high 8 bits of block data for colors, instead of all 16 bits 
 @param opacity: [1,15] 1 for air. 2 for water and ice, 15 for solid block. value is automatically set, unless you want to explicitly adjust the default.
 -->
 <blocks>
@@ -105,7 +106,7 @@ Sound related:
   <!--关键字更新到这里-->
   
   
-  <block singleSideTex="true" name="Sandstone" text="沙石" searchkey="沙石" mc_id="24" id="4" mapcolor="#e4d4a9" material="sand" step_sound="stone" icon="Texture/blocks/items/sandstone.png" texture="Texture/blocks/sandstone_top.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="Sandstone" text="沙石" searchkey="沙石" mc_id="24" id="4" color8_data="true" mapcolor="#e4d4a9" material="sand" step_sound="stone" icon="Texture/blocks/items/sandstone.png" texture="Texture/blocks/sandstone_top.png" obstruction="true" solid="true" cubeMode="true"  />
   <!--added by Jingqi 2013.11.22-->
   <block threeSideTex="true" name="Chiseled_Sandstone" text="錾制沙石" searchkey="錾制沙石" mc_id="24:1" id="170" mapcolor="#beb491" step_sound="stone" material="sand" icon="Texture/blocks/items/sandstone_carved.png" texture="Texture/blocks/sandstone_carved_three.png" obstruction="true" solid="true" cubeMode="true"  />
   <!--added by Jingqi 2013.11.22-->
@@ -120,7 +121,7 @@ Sound related:
   <!--added by Jingqi 2013.11.3: -->
   <block name="DeadBush" text="枯灌木" searchkey="枯灌木" mc_id="32" id="132" singleSideTex="true" material="grass" texture="Texture/blocks/deadbush.png" disable_gen_icon="true" class="BlockGrass" modelName="grass" customModel="true" transparent="true" alphaTestTexture="true" cubeMode="true" />
   <!--added by Xizhi 2014.5.4: -->
-  <block singleSideTex="true" name="White_Carpet" text="白色地毯" mc_id="171" id="234" mapcolor="#f8f7db" step_sound="grass" icon="Texture/blocks/items/carpet_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="false" cubeMode="true" template="carpet"  />
+  <block singleSideTex="true" name="White_Carpet" text="白色地毯" mc_id="171" id="234" color8_data="true" mapcolor="#f8f7db" step_sound="grass" icon="Texture/blocks/items/carpet_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="false" cubeMode="true" template="carpet"  />
   <block singleSideTex="true" name="Orange_Carpet" text="橙色地毯" mc_id="171:1" id="235" mapcolor="#fdcc49" step_sound="grass" icon="Texture/blocks/items/carpet_orange.png" texture="Texture/blocks/wool_colored_orange.png" obstruction="false" cubeMode="true" template="carpet"  />
   <block singleSideTex="true" name="Magenta_Carpet" text="品红色地毯" mc_id="171:2" id="236" mapcolor="#e4adcc" step_sound="grass" icon="Texture/blocks/items/carpet_magenta.png" texture="Texture/blocks/wool_colored_magenta.png" obstruction="false" cubeMode="true" template="carpet"  />
   <block singleSideTex="true" name="Light_Blue_Carpet" text="淡蓝色地毯" mc_id="171:3" id="237" mapcolor="#90b5c8" step_sound="grass" icon="Texture/blocks/items/carpet_lightblue.png" texture="Texture/blocks/wool_colored_light_blue.png" obstruction="false" cubeMode="true" template="carpet"  />
@@ -145,7 +146,7 @@ Sound related:
   <block singleSideTex="true" name="BlockArrow" text="箭头" searchkey="" class="BlockArrow" id="255" texture="Texture/blocks/arrow.png" transparent="true" alphaTestTexture="true"  template="DataOnly" shape="vine" modelName="vine" cubeMode="true" customModel="true"/>
   
   <block singleSideTex="true" name="Stone_Slope" text="石斜面" searchkey="" class="BlockSlope" id="256" mapcolor="#aaa484" step_sound="stone" texture="Texture/blocks/stone_slab_three.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
-  <block singleSideTex="true" name="Sand_Slope" text="沙石斜面" searchkey="" class="BlockSlope" id="257" mapcolor="#d9c7a3" step_sound="sand" material="sand" texture="Texture/blocks/sandstone_three.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
+  <block singleSideTex="true" name="Sand_Slope" text="沙石斜面" searchkey="" class="BlockSlope" id="257" color8_data="true" mapcolor="#d9c7a3" step_sound="sand" material="sand" texture="Texture/blocks/sandstone_three.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
   <block singleSideTex="true" name="Oak_Wood_Slope" text="橡木斜面" searchkey="" class="BlockSlope" id="258" mapcolor="#715c2f" step_sound="wood" texture="Texture/blocks/planks_oak.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
   <block singleSideTex="true" name="Cobblestone_Slope" text="圆石斜面" searchkey="" class="BlockSlope" id="259" mapcolor="#7e7761" step_sound="stone" texture="Texture/blocks/cobblestone.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
   <block singleSideTex="true" name="Brick_Slope" text="砖斜面" searchkey="" class="BlockSlope" id="260" mapcolor="#a17342" step_sound="stone" texture="Texture/blocks/brick.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
@@ -161,7 +162,7 @@ Sound related:
   <block singleSideTex="true" name="AnimModelBlock" id="266" modelName="codeblock" text="动画模型方块" searchkey="动画模型方块" class="BlockAnimModel" entity_class="EntityAnimModel" texture="Texture/blocks/CmdTextureReplacer.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--added by Jingqi 2013.11.3: -->
-  <block singleSideTex="true" name="White_Wool" text="白色方块" searchkey="白色方块" mc_id="35" id="133" mapcolor="#f8f7db" step_sound="cloth" icon="Texture/blocks/items/wool_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="White_Wool" text="白色方块" searchkey="白色方块" mc_id="35" id="133" item_class="ItemColorBlock" color8_data="true" mapcolor="#f8f7db" step_sound="cloth" icon="Texture/blocks/items/wool_white.png" texture="Texture/blocks/wool_colored_white.png" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" name="Orange_Wool" text="橙色方块" searchkey="橙色方块" mc_id="35:1" id="94" mapcolor="#fdcc49" step_sound="cloth" icon="Texture/blocks/items/wool_orange.png" texture="Texture/blocks/wool_colored_orange.png" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" name="Magenta_Wool" text="品红色方块" searchkey="品红色方块" mc_id="35:2" id="25" mapcolor="#e4adcc" step_sound="cloth" icon="Texture/blocks/items/wool_magenta.png" texture="Texture/blocks/wool_colored_magenta.png" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" name="Light_Blue_Wool" text="淡蓝色方块" searchkey="淡蓝色方块" mc_id="35:3" id="21" mapcolor="#90b5c8" step_sound="cloth" icon="Texture/blocks/items/wool_lightblue.png" texture="Texture/blocks/wool_colored_light_blue.png" obstruction="true" solid="true" cubeMode="true"  />
@@ -195,7 +196,7 @@ Sound related:
   <!--added by Jingqi 2013.11.22: name="Stone_Slab" text="石台阶" searchkey="" mc_id="44"-->
   <block threeSideTex="true" name="Stone_Slab" text="石台阶" searchkey="石台阶" mc_id="44" id="176" mapcolor="#aaa484" step_sound="stone" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_stone.png" texture="Texture/blocks/stone_slab_three.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
   <!--name="Sandstone_Slab" text="沙石台阶" searchkey="" mc_id="44:1"-->
-  <block threeSideTex="true" name="Sandstone_Slab" text="沙石台阶" searchkey="沙石台阶" mc_id="44:1" id="177" mapcolor="#d9c7a3" step_sound="sand" material="sand" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_sandstone.png" texture="Texture/blocks/sandstone_three.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
+  <block threeSideTex="true" name="Sandstone_Slab" text="沙石台阶" searchkey="沙石台阶" mc_id="44:1" id="177" color8_data="true" mapcolor="#d9c7a3" step_sound="sand" material="sand" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_sandstone.png" texture="Texture/blocks/sandstone_three.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
   <!--Added Xizhi 2013.11.6：name="Oak_Wood_Slab" text="橡木台阶" searchkey="" mc_id="44:2"-->
   <block singleSideTex="true" name="Oak_Wood_Slab" text="橡木台阶" searchkey="橡木台阶" mc_id="44:2" id="160" mapcolor="#715c2f" step_sound="wood" class="BlockSlab" item_class="ItemSlab" modelName="slab" shape="slab" icon="Texture/blocks/items/slab_oak.png" texture="Texture/blocks/planks_oak.png" obstruction="true" blockcamera="true" cubeMode="true" customModel="true" template="DataOnlyTwo" />
   <!--added by Jingqi 2013.11.22: name="Cobblestone_Slab" text="圆石台阶" searchkey="" mc_id="44:3"-->
@@ -368,7 +369,7 @@ Sound related:
   <!--name="Cocoa" text="可可果" searchkey="" mc_id="127" 先不做-->
   <!--Stairs: -->
   <!--added by Jingqi 2013.11.22-->
-  <block threeSideTex="true" name="Sandstone_Stairs" text="沙石楼梯" searchkey="沙石楼梯" mc_id="128" id="104" mapcolor="#dfd0a5" step_sound="sand" material="sand" icon="Texture/blocks/items/stairs_sandstone.png" texture="Texture/blocks/sandstone_three.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
+  <block threeSideTex="true" name="Sandstone_Stairs" text="沙石楼梯" searchkey="沙石楼梯" mc_id="128" id="104" color8_data="true" mapcolor="#dfd0a5" step_sound="sand" material="sand" icon="Texture/blocks/items/stairs_sandstone.png" texture="Texture/blocks/sandstone_three.png" template="Stairs?filename=model/blockworld/StairsWood/StairsWood"  />
   <block singleSideTex="true" name="Emerald_Ore" text="绿宝石矿石" searchkey="绿宝石矿石" mc_id="129" id="2" mapcolor="#867f55" step_sound="stone" icon="Texture/blocks/items/ore_emerald.png" texture="Texture/blocks/emerald_ore.png" obstruction="true" solid="true" cubeMode="true"  />
   <!--name="Ender_Chest" text="末影箱" searchkey="" mc_id="130" 先不做-->
   <!--name="Tripwire_Hook" text="绊线钩" searchkey="" mc_id="131" 先不做-->

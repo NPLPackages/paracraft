@@ -22,6 +22,8 @@ NPL.load("(gl)script/ide/math/AABBPool.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/BlockPieceEffect.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local Color = commonlib.gettable("System.Core.Color");
 local BlockPieceEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.BlockPieceEffect");
@@ -40,6 +42,10 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local blocks = commonlib.gettable("MyCompany.Aries.Game.blocks");
+local rshift = mathlib.bit.rshift;
+local lshift = mathlib.bit.lshift;
+local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local block = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.block"));
 
@@ -73,6 +79,7 @@ local block_attribute_map = {
 	color_data		= 0x0080000, -- whether the block contains color in its block data.
 	invisible		= 0x0100000, -- whether the block is invisible.
 	tiling			= 0x0200000, -- whether tiling is used
+	color8_data		= 0x0400000, -- whether the block uses only the high 8 bits as color in its block data.
 }
 
 block.attributes = block_attribute_map;
@@ -844,8 +851,9 @@ function block:GetDroppedItemStack(x,y,z, bForceDrop)
 end
 
 -- only called when user clicks to break an item 
-function block:OnUserBreakItem(x,y,z, entityPlayer)
-	GameLogic.GetWorld():CreateBlockPieces(self, x, y, z);
+function block:OnUserBreakItem(x,y,z, entityPlayer, lastBlockData)
+	local color = self:GetDiffuseColorByData(lastBlockData or 0);
+	GameLogic.GetWorld():CreateBlockPieces(self, x, y, z, nil, nil, nil, nil, nil, color);
 	local tx, ty, tz = BlockEngine:real(x,y,z);
 	GameLogic.PlayAnimation({animationName = "Break",facingTarget = {x=tx, y=ty, z=tz},});
 end
@@ -1236,9 +1244,34 @@ function block:play_toggle_sound(x,y,z)
 	end
 end
 
+function block:GetItem()
+	return ItemClient.GetItem(self.id);
+end
+
+-- it may return nil or number like 0xffff0000
+function block:GetDiffuseColor(blockX, blockY, blockZ)
+	if(self.color8_data or self.color_data) then
+		local item = self:GetItem();
+		if(item) then
+			return item:DataToColor(BlockEngine:GetBlockData(blockX, blockY, blockZ) or 0) + 0xff000000;
+		end
+	end
+end
+
+-- it may return nil or number like 0xffff0000
+function block:GetDiffuseColorByData(block_data)
+	if(self.color8_data or self.color_data) then
+		local item = self:GetItem();
+		if(item) then
+			return item:DataToColor(block_data or 0) + 0xff000000;
+		end
+	end
+end
+
 -- @param granularity: (0-1), 1 will generate 27 pieces, 0 will generate 0 pieces, default to 1. 
 -- @param cx, cy, cz: center of break point. 
-function block:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz)
+-- @param color: nil or such as 0xffff0000
+function block:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_filename, cx, cy, cz, color)
 	granularity = granularity or 1;
 	if(granularity < 0.05) then
 		return;
@@ -1282,7 +1315,8 @@ function block:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_fi
 						(i)*speed_step*0.5, --speed_x
 						(k)*speed_step*2,
 						(j)*speed_step*0.5,
-						texture_filename
+						texture_filename,
+						color
 					);
 				end
 			end
@@ -1550,6 +1584,9 @@ function block:GetBlockColor(x,y,z)
 	local color; 
 	if(self.color_data) then
 		color = Color.convert16_32(BlockEngine:GetBlockData(x,y,z) or 0);
+	elseif(self.color8_data) then
+		local data = BlockEngine:GetBlockData(x,y,z) or 0;	
+		color = Color.convert8_32(0xff - rshift(data, 8));
 	elseif(self.mapcolor) then
 		color = self.mapcolor;
 	end
@@ -1562,9 +1599,27 @@ function block:GetBlockColorByData(blockData)
 	local color; 
 	if(self.color_data) then
 		color = Color.convert16_32(blockData or 0);
+	elseif(self.color8_data) then
+		local data = blockData or 0;	
+		color = Color.convert8_32(0xff - rshift(data, 8));
 	elseif(self.mapcolor) then
 		color = self.mapcolor;
 	end
 	color = Color.ToValue(color);
 	return color;
+end
+
+-- @param data: current data
+-- @param preferredData: data containning preferred colors
+-- return new data based on preferredData. In most cases, preferredData are just color data
+function block:CalculatePreferredData(data, preferredData)
+	if(preferredData) then
+		data = band(data, 0xff);
+		if(self.color_data) then
+			data = data + preferredData;
+		elseif(self.color8_data) then
+			data = data + preferredData;
+		end
+	end
+	return data;
 end
