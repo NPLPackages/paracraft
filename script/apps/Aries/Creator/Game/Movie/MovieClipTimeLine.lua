@@ -59,6 +59,7 @@ local var_name_to_text = {
 	music = L"背景音乐",
 	opacity = L"透明度",
 	pos = L"位置",
+	screen_pos = L"屏幕坐标",
 	parent = L"父链接",
 	color = L"颜色",
 	code = L"代码",

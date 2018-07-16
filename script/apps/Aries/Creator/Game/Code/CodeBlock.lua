@@ -20,6 +20,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCompiler.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
+local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
 local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
@@ -344,6 +346,8 @@ function CodeBlock:CreateFirstActorInMovieBlock()
 				if (itemStack and itemStack.count > 0) then
 					if (itemStack.id == block_types.names.TimeSeriesNPC) then
 						return CodeActor:new():Init(itemStack, movie_entity);
+					elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
+						return CodeUIActor:new():Init(itemStack, movie_entity);
 					end
 				end
 			end

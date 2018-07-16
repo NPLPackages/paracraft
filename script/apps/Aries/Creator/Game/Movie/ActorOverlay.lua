@@ -16,6 +16,15 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/ide/math/ShapeBox.lua");
 NPL.load("(gl)script/ide/System/Scene/Overlays/ShapesDrawer.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/ide/System/Scene/Cameras/Cameras.lua");
+NPL.load("(gl)script/ide/math/Matrix4.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+local Screen = commonlib.gettable("System.Windows.Screen");
+local Matrix4 = commonlib.gettable("mathlib.Matrix4");
+local vector3d = commonlib.gettable("mathlib.vector3d");
+local Cameras = commonlib.gettable("System.Scene.Cameras");
 local Color = commonlib.gettable("System.Core.Color");
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
 local ShapeBox = commonlib.gettable("mathlib.ShapeBox");
@@ -48,6 +57,7 @@ local selectable_var_list = {
 	"text",
 	"code",
 	"pos", -- multiple of x,y,z
+ 	"screen_pos", -- multiple of ui_x, ui_y
 	"facing", 
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling", 
@@ -109,6 +119,20 @@ function Actor:GetRotateVariable()
 	end
 end
 
+-- get position multi variable
+function Actor:GetScreenPosVariable()
+	local var = self:GetCustomVariable("screen_pos_variable");
+	if(var) then
+		return var;
+	else
+		var = MultiAnimBlock:new({name="screen_pos"});
+		var:AddVariable(self:GetVariable("ui_x"));
+		var:AddVariable(self:GetVariable("ui_y"));
+		self:SetCustomVariable("screen_pos_variable", var);
+		return var;
+	end
+end
+
 function Actor:Init(itemStack, movieclipEntity)
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
 	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
@@ -119,6 +143,8 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("x", "Linear");
 	timeseries:CreateVariableIfNotExist("y", "Linear");
 	timeseries:CreateVariableIfNotExist("z", "Linear");
+	timeseries:CreateVariableIfNotExist("ui_x", "Linear");
+	timeseries:CreateVariableIfNotExist("ui_y", "Linear");
 	timeseries:CreateVariableIfNotExist("facing", "LinearAngle");
 	timeseries:CreateVariableIfNotExist("pitch", "LinearAngle");
 	timeseries:CreateVariableIfNotExist("roll", "LinearAngle");
@@ -128,7 +154,9 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("text", "Discrete");
 	timeseries:CreateVariableIfNotExist("color", "Discrete");
 	
+	
 	self:AddValue("position", self.GetPosVariable);
+	self:AddValue("screen_pos", self.GetScreenPosVariable);
 
 	-- get initial position from itemStack, if not exist, we will use movie clip entity's block position. 
 	local movieClip = self:GetMovieClip();
@@ -175,6 +203,8 @@ function Actor:GetEditableVariable(selected_index)
 		var = self:GetPosVariable();
 	elseif(name == "rot") then
 		var = self:GetRotateVariable();
+	elseif(name == "screen_pos") then
+		var = self:GetScreenPosVariable();
 	else
 		var = self.TimeSeries:GetVariable(name);
 	end
@@ -330,6 +360,27 @@ color("#ff0000");<br/>
 				end
 			end
 		end, old_value)
+	elseif(keyname == "screen_pos") then
+		local title = format(L"起始时间%s, 请输入位置x,y", strTime);
+		title = title.."<br/>x=[-500,500],y=[-500,500]";
+		old_value = string.format("%d, %d", self:GetValue("ui_x", curTime) or 0,self:GetValue("ui_y", curTime) or 0);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			if(result and result~="") then
+				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
+				if(result and vars[1] and vars[2]) then
+					self:BeginUpdate();
+					self:AddKeyFrameByName("ui_x", nil, vars[1]);
+					self:AddKeyFrameByName("ui_y", nil, vars[2]);
+					self:EndUpdate();
+					self:FrameMovePlaying(0);
+					if(callbackFunc) then
+						callbackFunc(true);
+					end
+				end
+			end
+		end, old_value)
 	end
 end
 
@@ -352,6 +403,23 @@ function Actor:FrameMoveRecording(deltaTime)
 	self:EndUpdate();
 end
 
+function Actor:ScreenToWorldPosition(ui_x, ui_y)
+	ui_x = ui_x or 0;
+	ui_y = ui_y or 0;
+	
+	local matView = Cameras:GetCurrent():GetViewMatrix();
+	local matInverseView = matView:inverse();
+
+	local viewport = ViewportManager:GetSceneViewport();
+	mouse_x, mouse_y = mouse_x-viewport:GetLeft(), mouse_y-viewport:GetTop();
+	local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+	local ui_z = 5;
+	local vScreen = mathlib.vector3d:new(ui_x/100, ui_y/100, ui_z);
+	local vWorld = vScreen * matInverseView + Cameras:GetCurrent():GetRenderOrigin();
+	return vWorld[1], vWorld[2], vWorld[3];
+end
+
+
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
 	local entity = self.entity;
@@ -365,6 +433,12 @@ function Actor:FrameMovePlaying(deltaTime)
 	local new_x = self:GetValue("x", curTime);
 	local new_y = self:GetValue("y", curTime);
 	local new_z = self:GetValue("z", curTime);
+
+	local ui_x = self:GetValue("ui_x", curTime);
+	local ui_y = self:GetValue("ui_z", curTime);
+	if(ui_x or ui_y) then
+		new_x, new_y, new_z = self:ScreenToWorldPosition(ui_x, ui_y);
+	end
 
 	if(new_x) then
 		entity:SetPosition(new_x, new_y, new_z);		
