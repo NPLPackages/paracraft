@@ -147,12 +147,12 @@ say("click me!")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerBroadcastEvent("%s", function()\\n%send)',
+	func_description = 'registerBroadcastEvent("%s", function(fromName)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerBroadcastEvent("%s", function()\n%send)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
+		return string.format('registerBroadcastEvent("%s", function(fromName)\n%send)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
-registerBroadcastEvent("jump", function()
+registerBroadcastEvent("jump", function(fromName)
     move(0,1,0)
     wait(1)
     move(0,-1,0)
@@ -220,8 +220,8 @@ end
 		return string.format('broadcastAndWait("%s")\n', self:getFieldAsString('msg'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
-registerBroadcastEvent("hi", function()
-    say("hi")
+registerBroadcastEvent("hi", function(fromName)
+    say("hi,"..tostring(fromName))
     wait(1)
     say("bye")
     wait(1)

@@ -41,14 +41,22 @@ function env_imp:registerBroadcastEvent(text, callbackFunc)
 end
 
 -- broadcast a global message.
+-- @param msg: if nil, default to current actor's name
 function env_imp:broadcast(text, msg)
+	if(msg==nil and self.actor) then
+		msg = self.actor:GetName();
+	end
 	self.codeblock:BroadcastTextEvent(text, msg);
 	env_imp.checkyield(self);
 end
 
 -- broadcast a global message and wait for all its handlers are finished
+-- @param msg: if nil, default to current actor's name
 function env_imp:broadcastAndWait(text, msg)
 	local isFinished = false;
+	if(msg==nil and self.actor) then
+		msg = self.actor:GetName();
+	end
 	self.codeblock:BroadcastTextEvent(text, msg, self.co:MakeCallbackFunc(function()
 		isFinished = true;
 		env_imp.resume(self);

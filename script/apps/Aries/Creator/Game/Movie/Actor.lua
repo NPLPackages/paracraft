@@ -27,6 +27,7 @@ local type = type;
 local Actor = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"));
 Actor.class_name = "Actor";
 Actor:Property("Name", "Actor");
+Actor:Property({"isAgent", false, "IsAgent"});
 -- whenever the current time is changed or any key is modified. 
 Actor:Signal("valueChanged");
 -- whenever any of the actor's key data is modified. 
@@ -657,15 +658,20 @@ function Actor:HasFocus()
 	end
 end
 
--- remove the scene entity that representing this actor. 
-function Actor:OnRemove()
+function Actor:DestroyEntity()
 	local entity = self:GetEntity()
-	if(entity) then
+	if(entity and not self:IsAgent()) then
 		if(entity:HasFocus()) then
 			EntityManager.SetFocus(EntityManager.GetPlayer());
 		end
 		entity:Destroy();
+		self.entity = nil;
 	end
+end
+
+-- remove the scene entity that representing this actor. 
+function Actor:OnRemove()
+	self:DestroyEntity();
 end
 
 function Actor:FrameMoveRecording(deltaTime)
@@ -813,5 +819,25 @@ function Actor:SaveFreeCameraPosition(bForceSave)
 		end
 	else
 		self.lastFreeCameraPos = nil;
+	end
+end
+
+function Actor:CanShowSelectManip()
+	return false
+end
+
+function Actor:IsAgent()
+	return self.isAgent;
+end
+
+-- taking control of the give entity. But it will not delete the entity when actor is removed.
+function Actor:BecomeAgent(entity)
+	if(entity and entity:isa(EntityManager.EntityMovable)) then
+		local lastEntity = self:GetEntity();
+		if(lastEntity) then	
+			self:DestroyEntity();
+		end
+		self.entity = entity;
+		self.isAgent = true;
 	end
 end

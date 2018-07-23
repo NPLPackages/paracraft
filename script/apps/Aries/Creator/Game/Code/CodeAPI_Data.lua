@@ -9,6 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
@@ -70,5 +71,20 @@ function env_imp:showVariable(name, title, color)
 		if(item) then
 			item:TrackCodeBlock(self.codeblock)
 		end
+	end
+end
+
+-- make the current actor an agent of input entity. 
+-- The entity could be current player or a network player on server.
+-- @param entityName: "@p" means current player, or any valid player name or entity name. 
+function env_imp:becomeAgent(entityName)
+	if(self.actor) then
+		local entity;
+		if(entityName == "@p") then
+			entity = EntityManager.GetPlayer();
+		else
+			entity = EntityManager.GetEntity(entityName);
+		end
+		self.actor:BecomeAgent(entity);
 	end
 end

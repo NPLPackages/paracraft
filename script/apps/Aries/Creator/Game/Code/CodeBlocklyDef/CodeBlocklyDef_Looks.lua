@@ -331,6 +331,7 @@ scaleTo(100)
 			type = "field_dropdown",
 			options = {
 				{ L"此角色", "myself" },
+				{ L"主角", "player" },
 				{ L"某个角色名", "" },
 			},
 		},

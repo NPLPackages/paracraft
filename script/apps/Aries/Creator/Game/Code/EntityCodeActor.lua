@@ -54,7 +54,6 @@ function Entity:SaveToXMLNode(node, bSort)
 	return node;
 end
 
--- right click to show item
 function Entity:OnClick(x, y, z, mouse_button)
 	self:clicked(mouse_button);
 	return true;

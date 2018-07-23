@@ -321,6 +321,31 @@ end)
 ]]}},
 },
 
+{
+	type = "becomeAgent", 
+	message0 = L"成为%1的化身",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "@p", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	color = "#cc0000",
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'becomeAgent("%s")',
+	ToNPL = function(self)
+		return string.format('becomeAgent("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"成为当前角色的化身", canRun = true, code = [[
+becomeAgent("@p")
+]]}},
+},
+
 };
 function CodeBlocklyDef_Control.GetCmds()
 	return cmds;

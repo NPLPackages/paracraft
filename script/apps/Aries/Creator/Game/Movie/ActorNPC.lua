@@ -991,19 +991,21 @@ function Actor:FrameMovePlaying(deltaTime)
 
 	if(obj) then
 		-- in case of explicit animation
-		obj:SetField("Time", curTime); 
-		obj:SetField("IsControlledExternally", true);
-		obj:SetField("EnableAnim", not animate_by_script);
-
 		obj:SetField("yaw", yaw or 0);
 		obj:SetField("roll", roll or 0);
 		obj:SetField("pitch", pitch or 0);
 		
+		-- this may cause animation instance to lose all custom bones, Time and EnableAnim properties. 
 		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then
 			self:assetfileChanged();
 		end
 		entity:SetSkin(skin);
 		entity:SetBlockInRightHand(blockinhand);
+
+		obj:SetField("Time", curTime); 
+		obj:SetField("IsControlledExternally", true);
+		obj:SetField("EnableAnim", not animate_by_script);
+
 
 		if(anim) then
 			if(anim~=obj:GetField("AnimID", 0)) then
@@ -1125,4 +1127,27 @@ function Actor:OnChangeBone(bone_name)
 		-- signal
 		self:keyChanged();
 	end
+end
+
+function Actor:DestroyEntity()
+	Actor._super.DestroyEntity(self)
+	if(self.bones_variable) then
+		self:Disconnect("dataSourceChanged", self.bones_variable, self.bones_variable.LoadFromActor)
+		self:Disconnect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
+		self.bones_variable = nil;
+	end
+end
+
+function Actor:UnbindAnimInstance()
+	if(self.bones_variable) then
+		self:Disconnect("dataSourceChanged", self.bones_variable, self.bones_variable.LoadFromActor)
+		self:Disconnect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
+		self.bones_variable:UnbindAnimInstance();
+		self.bones_variable = nil;
+	end
+end
+
+function Actor:BecomeAgent(entity)
+	Actor._super.BecomeAgent(self, entity);
+	self:CheckLoadBonesAnims();
 end

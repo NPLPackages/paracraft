@@ -43,7 +43,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorOverlay"));
 
 Actor:Property({"Font", "System;14;norm", auto=true})
-Actor:Property({"text", "", "GetText", "SetText", auto=true})
+Actor:Property({"text", nil, "GetText", "SetText", auto=true})
 -- line height in pixels
 Actor:Property({"lineheight", 16,})
 
@@ -99,6 +99,17 @@ function Actor:GetPosVariable()
 		var:AddVariable(self:GetVariable("x"));
 		var:AddVariable(self:GetVariable("y"));
 		var:AddVariable(self:GetVariable("z"));
+		var.getValue = function(var, anim, time)
+			if(self:HasScreenPos()) then
+				local x, y, z = self:GetPosition();
+				var.screenWorldPos = var.screenWorldPos or {};
+				var.screenWorldPos[1], var.screenWorldPos[2], var.screenWorldPos[3] = x or 0, y or 0, z or 0;
+				return var.screenWorldPos;
+			else
+				return MultiAnimBlock.getValue(var, anim, time);
+			end
+		end
+
 		self:SetCustomVariable("pos_variable", var);
 		return var;
 	end
@@ -254,7 +265,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
-			if(result and result~="") then
+			if(result) then
 				self:AddKeyFrameByName(keyname, nil, result);
 				self:FrameMovePlaying(0);
 				if(callbackFunc) then
@@ -274,7 +285,7 @@ color("#ff0000");<br/>
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
-			if(result and result~="") then
+			if(result) then
 				self:AddKeyFrameByName(keyname, nil, result);
 				self:FrameMovePlaying(0);
 				if(callbackFunc) then
@@ -403,6 +414,7 @@ function Actor:FrameMoveRecording(deltaTime)
 	self:EndUpdate();
 end
 
+-- absoleted function, logics is moved to EntityOverlay with a faster implementation.
 function Actor:ScreenToWorldPosition(ui_x, ui_y)
 	ui_x = ui_x or 0;
 	ui_y = ui_y or 0;
@@ -411,14 +423,49 @@ function Actor:ScreenToWorldPosition(ui_x, ui_y)
 	local matInverseView = matView:inverse();
 
 	local viewport = ViewportManager:GetSceneViewport();
-	mouse_x, mouse_y = mouse_x-viewport:GetLeft(), mouse_y-viewport:GetTop();
 	local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
-	local ui_z = 5;
-	local vScreen = mathlib.vector3d:new(ui_x/100, ui_y/100, ui_z);
+	
+	-- x range is in [-500, 500] pixels
+	local screenHalfWidth = 500;
+	local aspect = Cameras:GetCurrent():GetAspectRatio();
+	local ui_z = screenHalfWidth / aspect / math.tan(Cameras:GetCurrent():GetFieldOfView()*0.5);
+
+	local vScreen = mathlib.vector3d:new(ui_x/100, ui_y/100, ui_z/100);
 	local vWorld = vScreen * matInverseView + Cameras:GetCurrent():GetRenderOrigin();
-	return vWorld[1], vWorld[2], vWorld[3];
+
+	-- solving: V*M(-90)*M(rpy)*M(view) = V*M(E)
+	-- M(rpy) = M(90)*M(InverseView)
+	local matRollPitchYaw = Matrix4.rotationY(90)*matInverseView;
+	
+	local quat = mathlib.Quaternion:new();
+	quat:FromRotationMatrix(matRollPitchYaw);
+	local roll, pitch, yaw = quat:ToEulerAnglesSequence("zxy");
+	return vWorld[1], vWorld[2], vWorld[3], roll, pitch, yaw;
 end
 
+function Actor:HasScreenPos()
+	local ui_x = self:GetValue("ui_x", 0);
+	local ui_y = self:GetValue("ui_y", 0);
+	return ui_x or ui_y;
+end
+
+
+function Actor:ComputeRoll(curTime)
+	local entity = self.entity;
+	if(entity and entity:IsScreenMode())  then
+		return (self:GetValue("roll", curTime) or 0) + entity:GetRoll();	
+	else
+		return self:GetValue("roll", curTime);	
+	end
+end
+
+function Actor:ComputeColor(curTime)
+	return self:GetValue("color", curTime);
+end
+
+function Actor:ComputeText(curTime)
+	return self:GetValue("text", curTime);
+end
 
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
@@ -435,31 +482,35 @@ function Actor:FrameMovePlaying(deltaTime)
 	local new_z = self:GetValue("z", curTime);
 
 	local ui_x = self:GetValue("ui_x", curTime);
-	local ui_y = self:GetValue("ui_z", curTime);
-	if(ui_x or ui_y) then
-		new_x, new_y, new_z = self:ScreenToWorldPosition(ui_x, ui_y);
-	end
-
-	if(new_x) then
-		entity:SetPosition(new_x, new_y, new_z);		
-	else
-		local movieClip = self:GetMovieClip();
-		if(movieClip) then
-			new_x, new_y, new_z = movieClip:GetOrigin();
-			new_y = new_y + BlockEngine.blocksize;
-			entity:SetPosition(new_x, new_y, new_z);
-		end
-	end
+	local ui_y = self:GetValue("ui_y", curTime);
 
 	local yaw, roll, pitch, scaling, opacity, color;
 	yaw = self:GetValue("facing", curTime);
-	roll = self:GetValue("roll", curTime);
+	roll = self:ComputeRoll(curTime);
 	pitch = self:GetValue("pitch", curTime);
-	scaling = self:GetValue("scaling", curTime);
+	scaling = self:ComputeScaling(curTime);
 	opacity = self:GetValue("opacity", curTime);
-	color = self:GetValue("color", curTime);
+	color = self:ComputeColor(curTime);
 
-	self:SetText(self:GetValue("text", curTime));
+	if(ui_x or ui_y) then
+		entity:SetScreenPos(ui_x or 0, ui_y or 0);
+		entity:SetScreenMode(true);
+	else
+		entity:SetScreenMode(false);
+
+		if(new_x) then
+			entity:SetPosition(new_x, new_y, new_z);		
+		else
+			local movieClip = self:GetMovieClip();
+			if(movieClip) then
+				new_x, new_y, new_z = movieClip:GetOrigin();
+				new_y = new_y + BlockEngine.blocksize;
+				entity:SetPosition(new_x, new_y, new_z);
+			end
+		end
+	end
+
+	self:SetText(self:ComputeText(curTime));
 	entity:SetFacing(yaw or 0);
 	entity:SetScaling(scaling or 1);
 	entity:SetPitch(pitch or 0);
@@ -476,23 +527,37 @@ end
 -- color("#ff0000")
 -- text("hello", 0, 0)
 -- rect(-10,-10, 250,64, "1.png;0 0 32 32:8 8 8 8")
-function Actor:CheckInstallCodeEnv(painter)
+function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 	local env = self.codeItem:GetScriptScope();
 	env.painter = painter;
+	env.isPickingPass = isPickingPass;
+
 	if(not env.text) then
 
 		-- draw text
 		-- @param text: text to render with current font 
 		-- @param x,y: default to 0,0
 		env.text = function(text, x, y)
-			if(text and text~="") then
+			if(text and text~="" ) then
 				x = x or 0;
 				y = y or 0;
-				self:ExtendAABB(x, y);
-				for line in text:gmatch("[^\n]+") do
-					env.painter:DrawText(x, y, line);
-					y = y + self.lineheight;
-					self:ExtendAABB(x + _guihelper.GetTextWidth(line, self:GetFont()), y);
+									
+				if(not env.isPickingPass) then
+					self:ExtendAABB(x, y);
+					for line in text:gmatch("[^\n]+") do
+						env.painter:DrawText(x, y, line);
+						y = y + self.lineheight;
+						self:ExtendAABB(x + _guihelper.GetTextWidth(line, self:GetFont()), y);
+					end
+				else
+					local width, height = 0,0;
+					for line in text:gmatch("[^\n]+") do
+						height = height + self.lineheight;
+						width = math.max(width, _guihelper.GetTextWidth(line, self:GetFont()))
+					end
+					if(width~=0 and height~=0) then
+						env.painter:DrawRect(x,y, width, height);
+					end
 				end
 			end
 		end
@@ -501,24 +566,30 @@ function Actor:CheckInstallCodeEnv(painter)
 		-- @param filename: if nil, it will render with current pen color. 
 		env.rect = function(x, y, width, height, filename)
 			if(x and y and width and height) then
-				if(filename and filename~="") then
-					local filepath, params = filename:match("^([^:;]+)(.*)$");
-					-- repeated calls are cached
-					filename = Files.FindFile(filepath);
-					if(params and params~="") then
-						filename = filename..params;
+				if(not env.isPickingPass) then
+					if(filename and filename~="") then
+						local filepath, params = filename:match("^([^:;]+)(.*)$");
+						-- repeated calls are cached
+						filename = Files.FindFile(filepath);
+						if(params and params~="") then
+							filename = filename..params;
+						end
 					end
+					self:ExtendAABB(x, y);
+					self:ExtendAABB(x+width, y+height);
+					env.painter:DrawRectTexture(x, y, width, height, filename);
+				else
+					env.painter:DrawRect(x,y, width, height);
 				end
-				self:ExtendAABB(x, y);
-				self:ExtendAABB(x+width, y+height);
-				env.painter:DrawRectTexture(x, y, width, height, filename);
 			end
 		end
 
 		-- set pen color
 		-- @param color: such as "#ff0000"
 		env.color = function(color)
-			env.painter:SetPen(color);
+			if(not env.isPickingPass) then
+				env.painter:SetPen(color);
+			end
 		end
 
 		-- draw image
@@ -567,12 +638,16 @@ function Actor:CheckInstallCodeEnv(painter)
 						height = hackLength(height or texture:GetHeight());
 					end
 					x,y,width, height = x or 0, y or 0, width or 64, height or 64;
-					self:ExtendAABB(x, y);
-					self:ExtendAABB(x+width, y+height);
-					env.painter:DrawRectTexture(x, y, width, height, filename);
+
+					if(not env.isPickingPass) then
+						self:ExtendAABB(x, y);
+						self:ExtendAABB(x+width, y+height);
+						env.painter:DrawRectTexture(x, y, width, height, filename);
+					else
+						env.painter:DrawRect(x,y, width, height);
+					end
 				end
 			end
-			 
 		end
 	end
 	return env;
@@ -600,7 +675,10 @@ function Actor:EndRender()
 end
 
 function Actor:DoRender(painter)
-	local env = self:CheckInstallCodeEnv(painter);
+	local isPickingPass = self.entity.overlay:IsPickingPass();
+
+
+	local env = self:CheckInstallCodeEnv(painter, isPickingPass);
 	
 	-- scale 100 times, match 1 pixel to 1 centimeter in the scene. 
 	painter:ScaleMatrix(0.01, 0.01, 0.01);
@@ -614,7 +692,7 @@ function Actor:DoRender(painter)
 	
 	if(self.codeItem:HasScript()) then
 		self.codeItem:RunCode();	
-	elseif(not text or text=="") then
+	elseif(not text and not isPickingPass) then
 		-- draw something, when empty code is used. 
 		env.color("#80808080");
 		env.rect(-10, -26, 250, 48);
@@ -631,7 +709,7 @@ function Actor:DoRender(painter)
 
 	self:EndRender();
 	
-	if(self:IsSelected()) then
+	if(self:IsSelected() and not isPickingPass) then
 		-- draw selection border in yellow
 		local radius = self.bounding_radius;
 		if(radius > 0) then
@@ -657,6 +735,10 @@ function Actor:SelectMe()
 	end
 end
 
+function Actor:CanShowSelectManip()
+	return false
+end
+
 function Actor:OnEndEdit()
 	local entity = self:GetEntity();
 	if(entity) then
@@ -666,4 +748,23 @@ function Actor:OnEndEdit()
 			self:GetItemStack():SetTooltip(displayname);
 		end
 	end
+end
+
+function Actor:ComputePosAndRotation(curTime)
+	local new_x = self:GetValue("x", curTime);
+	local new_y = self:GetValue("y", curTime);
+	local new_z = self:GetValue("z", curTime);
+	local yaw = self:GetValue("facing", curTime);
+	local roll = self:GetValue("roll", curTime);
+	local pitch = self:GetValue("pitch", curTime);
+
+	return new_x, new_y, new_z, yaw, roll, pitch;
+end
+
+function Actor:GetPlaySpeed()
+	return 1;
+end
+
+function Actor:ComputeScaling(curTime)
+	return self:GetValue("scaling", curTime) or 1;
 end

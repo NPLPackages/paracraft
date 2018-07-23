@@ -20,6 +20,15 @@ entity:Attach();
 NPL.load("(gl)script/ide/math/math3d.lua");
 NPL.load("(gl)script/ide/System/Scene/Overlays/Overlay.lua");
 NPL.load("(gl)script/ide/System/Scene/Overlays/ShapesDrawer.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+NPL.load("(gl)script/ide/System/Scene/Cameras/Cameras.lua");
+NPL.load("(gl)script/ide/math/Matrix4.lua");
+local Matrix4 = commonlib.gettable("mathlib.Matrix4");
+local vector3d = commonlib.gettable("mathlib.vector3d");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+local Cameras = commonlib.gettable("System.Scene.Cameras");
+local Screen = commonlib.gettable("System.Windows.Screen");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
@@ -28,6 +37,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 
 local math_abs = math.abs;
 local math_random = math.random;
@@ -40,12 +50,18 @@ Entity:Property({"facing", 0, "GetFacing", "SetFacing", auto=true});
 Entity:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true});
 Entity:Property({"opacity", 1, "GetOpacity", "SetOpacity"});
 Entity:Property({"isSolid", 1, "IsSolid", "SetSolid"});
+Entity:Property({"isScreenMode", false, "IsScreenMode", "SetScreenMode"});
+Entity:Property({"ui_x", 0, "GetScreenX", "SetScreenX", auto=true});
+Entity:Property({"ui_y", 0, "GetScreenY", "SetScreenY", auto=true});
+Entity:Property({"screen_half_width", 500, "GetScreenHalfWidth", "SetScreenHalfWidth", auto=true});
 Entity:Property({"roll", 0, "GetRoll", "SetRoll", auto=true});
 Entity:Property({"color", "#ffffff", "GetColor", "SetColor", auto=true});
+Entity:Property({"isPickingEnabled", false, "IsPickingEnabled", "SetSkipPicking"});
 
 Entity:Signal("cameraHidden");
 Entity:Signal("cameraShown");
 Entity:Signal("targetChanged", function(newTarget, oldTarget) end);
+Entity:Signal("clicked", function(mouse_button) end)
 
 -- non-persistent object by default. 
 Entity.is_persistent = false;
@@ -86,10 +102,10 @@ function Entity:GetInnerObject()
 end
 
 function Entity:Destroy()
-	if(self.overlay) then
-		self.overlay:Destroy();
-		self.overlay = nil;
+	if(self:IsPickingEnabled()) then
+		CodeUI:RemoveEntityOverlay(self);
 	end
+	self:DestroyOverlay()
 	Entity._super.Destroy(self);
 end
 
@@ -101,16 +117,35 @@ function Entity:GetScaling(v)
 	return self.scaling or 1;
 end
 
-function Entity:CreateOverlay()
+function Entity:SetScalingDelta(v)
+	self:SetScaling(self:GetScaling() + v);
+end
+
+--virtual function:
+function Entity:SetFacingDelta(v)
+	self:SetFacing(self:GetFacing() + v);
+end
+
+function Entity:DestroyOverlay()
+	if(self.overlay) then
+		self.overlay:Destroy();
+		self.overlay = nil;
+	end
+end
+
+function Entity:CreateOverlay(parent)
+	self:DestroyOverlay();
 	if(not self.overlay) then
-		self.overlay = Overlay:new():init();
+		self.overlay = Overlay:new():init(parent);
 		self.overlay.EnableZPass = false;
 		self.overlay.paintEvent = function(overlay, painter)
 			return self:paintEvent(painter);
 		end
 	end
-	local x, y, z = self:GetPosition();
-	self.overlay:SetPosition(x, y, z);
+	if(not parent) then
+		local x, y, z = self:GetPosition();
+		self.overlay:SetPosition(x, y, z);
+	end
 	return self.overlay;
 end
 
@@ -149,13 +184,35 @@ function Entity:SetBoundingRadius(radius)
 	end
 end
 
+-- overlay pixel picking
+function Entity:HasPickingName(pickingName)
+	return self.pickingName == pickingName and self:IsPickingEnabled();
+end
+
+-- NOT USED. find a way to update world position when screen pos and camera changes. 
+function Entity:UpdateWorldPositionFromScreenPos()
+	local overlay = Entity.rootScreenOverlay;
+	if(overlay and overlay.matInverseView and overlay.vWorld) then
+		self.screenPos = self.screenPos or mathlib.vector3d:new();
+		self.screenPos[1] = self.ui_x/100;
+		self.screenPos[2] = self.ui_y/100;
+		self.screenPos[3] = 0;
+		local offsetPos = self.screenPos * overlay.matInverseView;
+		self:SetPosition(offsetPos[1] + overlay.vWorld[1], offsetPos[2] + overlay.vWorld[2], offsetPos[3] + overlay.vWorld[3]);
+	end
+end
+
 -- virtual function. 
 function Entity:paintEvent(painter)
-	if(self.overlay:IsPickingPass()) then
+	if(self.overlay:IsPickingPass() and not self:IsPickingEnabled()) then
 		return;
 	end
 	painter:Save()
 	painter:PushMatrix();
+	if(self:IsScreenMode()) then
+		painter:TranslateMatrix(self.ui_x/100, self.ui_y/100, 0);
+	end
+
 	painter:SetOpacity(self:GetOpacity());
 	if(self:GetFacing()~=0) then
 		painter:RotateMatrix(self:GetFacing(), 0,1,0);	
@@ -169,8 +226,10 @@ function Entity:paintEvent(painter)
 		painter:RotateMatrix(self:GetRoll(), 0,0,1);	
 	end
 
-	-- facing positive X
-	painter:RotateMatrix(-1.57, 0,1,0);
+	if(not self:IsScreenMode()) then
+		-- facing positive X
+		painter:RotateMatrix(-1.57, 0,1,0);
+	end
 
 	-- scaling
 	if(self:GetScaling()~=1) then
@@ -179,8 +238,13 @@ function Entity:paintEvent(painter)
 	end
 
 	-- pen color	
-	painter:SetPen(self:GetColor() or "#ffffff");
-
+	if(self.overlay:IsPickingPass()) then
+		self.pickingName = self.overlay:GetNextPickingName();
+		self.overlay:SetColorAndName(painter, self.pickingName, self.pickingName)
+	else
+		painter:SetPen(self:GetColor() or "#ffffff");	
+	end
+	
 	-- do the actual local rendering
 	self:DoPaint(painter);
 
@@ -226,11 +290,6 @@ function Entity:HasBag()
 	return false;
 end
 
--- right click to show editor?
-function Entity:OnClick(x, y, z, mouse_button)
-	return Entity._super.OnClick(self, x, y, z, mouse_button);
-end
-
 -- disable facing target
 function Entity:FaceTarget(x,y,z)
 end
@@ -243,4 +302,167 @@ end
 -- @param actor: the parent ActorNPC
 function Entity:GetActor()
 	return self.m_actor;
+end
+
+function Entity:SetScreenPos(ui_x, ui_y)
+	self.ui_x = ui_x;
+	self.ui_y = ui_y;
+end
+
+function Entity:GetScreenPos()
+	return self.ui_x, self.ui_y;
+end
+
+function Entity:SetPosition(x,y,z)
+	if(self:IsScreenMode()) then
+		if(self.x~=x or self.y~=y or self.z~=z ) then
+			self.x, self.y, self.z = x, y, z;
+
+			local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+			if(self.bx~=bx or self.by~=by or self.bz~=bz ) then
+				self.bx, self.by, self.bz = bx, by, bz;
+			end
+			self:valueChanged();
+		end
+	else
+		Entity._super.SetPosition(self, x,y,z);
+	end
+end
+
+-- static function 
+function Entity:CreateGetRootScreenOverlay()
+	if(not Entity.rootScreenOverlay) then
+		Entity:EnableScreenTimer(true);
+
+		Entity.rootScreenOverlay = Overlay:new():init();
+
+		-- TODO: can we setup a simple view model transform, instead of using billboarding
+--		Entity.rootScreenOverlay.BeginPaint = function(self, painter)
+--			painter:SetMatrixMode(0)
+--			painter:PushMatrix();
+--			painter:LoadIdentityMatrix();
+--			painter:TranslateMatrix(0,0,10);
+--	
+--			painter:SetMatrixMode(1);
+--			painter:PushMatrix();
+--			painter:LoadIdentityMatrix();
+--		end
+--
+--		Entity.rootScreenOverlay.EndPaint = function(self, painter)
+--			painter:SetMatrixMode(0)
+--			painter:PopMatrix();
+--			painter:SetMatrixMode(1)
+--			painter:PopMatrix();
+--		end
+		
+	end
+	return Entity.rootScreenOverlay;
+end
+
+-- static function 
+function Entity:EnableScreenTimer(bEnable)
+	if(bEnable) then
+		if(not Entity.rootScreenOverlayTick) then
+			Entity.rootScreenOverlayTick = Overlay:new():init();
+			Entity.rootScreenOverlayTick.EnableZPass = true;
+			Entity.rootScreenOverlayTick:SetUseCameraPos(true);
+			Entity.rootScreenOverlayTick.paintZPassEvent = function(self, painter)
+				-- we will just make sure that ticking is called before rootScreenOverlay
+				Entity.OnScreenTimer();
+			end
+		end
+	else
+		if(Entity.rootScreenOverlayTick) then
+			Entity.rootScreenOverlayTick:Destroy()
+			Entity.rootScreenOverlayTick = nil;
+		end
+	end
+end
+
+-- static function. Only one instance is used.
+function Entity.OnScreenTimer(timer)
+	local overlay = Entity.rootScreenOverlay;
+
+	local matView = Cameras:GetCurrent():GetViewMatrix();
+	local matInverseView = matView:inverse();
+	overlay.matInverseView = matInverseView;
+
+	local viewport = ViewportManager:GetSceneViewport();
+	local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+	
+	-- x range is in [-500, 500] pixels
+	local screenHalfWidth = 500;
+	local aspect = Cameras:GetCurrent():GetAspectRatio();
+	local ui_x, ui_y = 0, 0;
+	local ui_z = screenHalfWidth / aspect / math.tan(Cameras:GetCurrent():GetFieldOfView()*0.5);
+
+	local vScreen = mathlib.vector3d:new(ui_x/100, ui_y/100, ui_z/100);
+	local vRenderOrigin = Cameras:GetCurrent():GetRenderOrigin();
+	local vWorld = vScreen * matInverseView + vRenderOrigin;
+	
+	local eyePos = Cameras:GetCurrent():GetEyePosition();
+	vWorld[1] = vWorld[1] + vRenderOrigin[1] - eyePos[1];
+	vWorld[2] = vWorld[2] + vRenderOrigin[2] - eyePos[2];
+	vWorld[3] = vWorld[3] + vRenderOrigin[3] - eyePos[3];
+
+	overlay.vWorld = vWorld;
+	overlay:SetPosition(vWorld[1], vWorld[2], vWorld[3]);
+	overlay:SetLocalTransform(matInverseView);
+end
+
+function Entity:IsScreenMode()
+	return self.isScreenMode;
+end
+
+function Entity:SetScreenMode(isScreenMode)
+	if(self.isScreenMode ~= isScreenMode) then
+		self.isScreenMode = isScreenMode;
+
+		if(isScreenMode) then
+			local parent = self:CreateGetRootScreenOverlay();
+			local overlay = self:CreateOverlay(parent);
+			overlay:SetZPassOpacity(1);
+			overlay.EnableZPass = true;
+		else
+			local overlay = self:CreateOverlay(nil)
+			overlay.EnableZPass = false;
+		end
+	end
+end
+
+-- right click to show editor?
+function Entity:OnClick(x, y, z, mouse_button)
+	self:clicked(mouse_button);
+	return true;
+end
+
+function Entity:SetSkipPicking(bSkipPicking)
+	if(self.isPickingEnabled ~= not bSkipPicking) then
+		self.isPickingEnabled = not bSkipPicking;
+		if(self.isPickingEnabled) then
+			CodeUI:AddEntityOverlay(self);
+		else
+			CodeUI:RemoveEntityOverlay(self);
+		end
+	end
+end
+
+function Entity:IsPickingEnabled()
+	return self.isPickingEnabled;
+end
+
+function Entity:mousePressEvent(mouse_event)
+	mouse_event:accept();
+end
+
+function Entity:mouseMoveEvent(event)
+end
+
+function Entity:mouseReleaseEvent(mouse_event)
+	mouse_event:accept();
+	self:OnClick(nil, nil, nil, mouse_event:button())
+end
+
+function Entity:Say(text, duration, bAbove3D)
+	
 end

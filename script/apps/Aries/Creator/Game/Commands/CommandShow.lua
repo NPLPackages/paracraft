@@ -33,6 +33,7 @@ Other show filters:
 /show desktop.builder.movie
 /show vision   : AI memory vision
 /show keyboard   show keyboard for touch device
+/show overlaybuffer    show overlay picking buffer on left top corner
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name, bIsShow;
@@ -83,6 +84,10 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
 			TouchVirtualKeyboardIcon.ShowSingleton(true);
+		elseif(name == "overlaybuffer") then
+			NPL.load("(gl)script/ide/System/Scene/Overlays/OverlayPicking.lua");
+			local OverlayPicking = commonlib.gettable("System.Scene.Overlays.OverlayPicking");
+			OverlayPicking:DebugShow("_lt", 10, 10, 256, 256);
 		end
 	end,
 };

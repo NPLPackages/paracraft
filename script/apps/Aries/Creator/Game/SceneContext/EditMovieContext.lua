@@ -249,7 +249,7 @@ function EditMovieContext:updateManipulators()
 		end
 		-- add selected actor's entity AABB display in all cases
 		local entity = actor:GetEntity();
-		if(entity) then
+		if(entity and actor:CanShowSelectManip()) then
 			if(bUseFreeCamera and entity:isa(EntityManager.EntityCamera)) then
 				bUseFreeCamera = false;
 			end

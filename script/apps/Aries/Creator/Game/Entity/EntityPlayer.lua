@@ -672,17 +672,8 @@ end
 -- refresh the client's model according to current inventory settings, such as 
 -- armor and hand tool. 
 function Entity:RefreshClientModel(bForceRefresh, playerObj)
-	local playerObj = playerObj or self:GetInnerObject();
-	if(playerObj) then
-		if(bForceRefresh or GameLogic.isRemote or System.options.mc) then
-			-- refresh skin and base model.
-			self.isBiped = true;
-			if(playerObj:GetPrimaryAsset():GetKeyName() ~= self:GetMainAssetPath()) then
-				playerObj:ToCharacter():ResetBaseModel(ParaAsset.LoadParaX("", self:GetMainAssetPath()));
-			end
-			self:RefreshSkin(playerObj);
-			self:RefreshRightHand(playerObj);
-		end
+	if(bForceRefresh or GameLogic.isRemote or System.options.mc) then
+		Entity._super.RefreshClientModel(self, bForceRefresh, playerObj)
 	end
 end
 

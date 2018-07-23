@@ -210,6 +210,21 @@ function CodeGlobals:BroadcastKeyPressedEvent(keyname)
 	end
 end
 
+function CodeGlobals:HandleGameEvent(event)
+	local textEvent = self:GetTextEvent(event:GetType());
+	if(textEvent) then
+		if(not event.msg) then
+			local trigger_entity = EntityManager.GetLastTriggerEntity();
+			if(trigger_entity) then
+				-- if no message body is provided, we will send the triggering entity name
+				-- this is useful to get the source entity's name, such as a network player
+				event.msg = trigger_entity:GetName();
+			end
+		end
+		textEvent:DispatchEvent({type="msg", msg = event.msg,});
+	end
+end
+
 function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 	local event = self:GetTextEvent(text);
 	if(event) then

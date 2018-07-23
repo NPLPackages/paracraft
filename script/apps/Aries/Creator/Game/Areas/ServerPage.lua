@@ -208,6 +208,18 @@ function ServerPage.GetInternetIP()
 	end
 end
 
+function ServerPage.GetAllIPAddress()
+	local self = ServerPage;
+	if(not self.ips) then
+		local port = NPL.GetAttributeObject():GetField("HostPort", "");
+		local ips = {};
+		self.ips = ips;
+		ips[#ips+1] = {text=format("%s:%s", NPL.GetExternalIP(), port)};
+		ips[#ips+1] = {text=format("%s:%s", NPL.GetAttributeObject():GetField("HostIP", ""), port)};
+	end
+	return self.ips;
+end
+
 function ServerPage.GetIP()
 	NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
 	local get_ip_urls = {"http://pv.sohu.com/cityjson","http://20140507.ip138.com/ic.asp"};

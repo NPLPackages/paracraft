@@ -225,6 +225,7 @@ function CodeBlock:RemoveAllActors()
 	end
 	self:GetActors():clear();
 	self.isRemovingActors = false;
+	self:EnableActorPicking(false);
 end
 
 function CodeBlock:OnRemoveActor(actor)

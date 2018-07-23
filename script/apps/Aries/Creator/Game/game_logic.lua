@@ -167,6 +167,11 @@ end
 function GameLogic.InitMod()
 	ModManager:Init();
 	ModManager:GetLoader():LoadAllPlugins();
+
+	-- internal mod
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
+	local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
+	CodeUI.InstallMod();
 end
 
 -- called by both Init() and StaticInit()
@@ -1521,5 +1526,5 @@ function GameLogic:event(event)
 	if(homeEntity) then
 		homeEntity:event(event);
 	end
-	GameLogic.GetCodeGlobal():BroadcastTextEvent(event:GetType(), event.msg);
+	GameLogic.GetCodeGlobal():HandleGameEvent(event);
 end

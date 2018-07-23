@@ -38,12 +38,12 @@ function env_imp:say(text, duration)
 		env_imp.wait(self, duration);
 		env_imp.say(self, nil);
 	else
-		local entity = env_imp.GetEntity(self);
-		if(entity) then
+		local actor = env_imp.GetActor(self);
+		if(actor) then
 			if(text~=nil) then
 				text = tostring(text);
 			end
-			entity:Say(text, -1)
+			actor:Say(text, -1)
 		else
 			GameLogic.AddBBS("codeblock", text, 10000);
 		end
@@ -190,14 +190,14 @@ end
 -- @param dist: 1 block unit, can be real number 
 -- @param duration: default to 1 tick
 function env_imp:moveForward(dist, duration)
-	local entity = env_imp.GetEntity(self);
-	if(entity) then
+	local actor = env_imp.GetActor(self);
+	if(actor) then
 		if(useFourDirectionRotationStyle) then
-			local dir = Direction.GetDirectionFromFacing(entity:GetFacing());
+			local dir = Direction.GetDirectionFromFacing(actor:GetFacing());
 			local dx, dy, dz = Direction.GetOffsetBySide(dir);
 			env_imp.move(self, -dx*dist, -dy*dist, -dz*dist, duration);
 		else
-			local facing = entity:GetFacing()
+			local facing = actor:GetFacing()
 			env_imp.move(self, math.cos(facing)*dist, 0, -math.sin(facing)*dist, duration);
 		end
 	end

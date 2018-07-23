@@ -210,11 +210,30 @@ function Actor:DeleteThisActor()
 	self:Destroy();
 end
 
+function Actor:RestoreEntityControl()
+	local entity = self:GetEntity();
+	if(entity) then
+		entity:SetDummy(false);
+		local obj = entity:GetInnerObject();
+		if(obj) then
+			obj:SetField("IsControlledExternally", false);
+			obj:SetField("EnableAnim", true);
+			
+		end
+		self:UnbindAnimInstance()
+	end
+end
+
 function Actor:OnRemove()
+	if(self:IsAgent() and self:GetEntity() == EntityManager.GetPlayer()) then
+		self:RestoreEntityControl();
+	end
+
 	if(self:HasFocus()) then
 		self:RestoreFocus();
 	end
 	self:beforeRemoved(self);
+
 	Actor._super.OnRemove(self);
 end
 
@@ -278,6 +297,13 @@ function Actor:SetFacing(facing)
 		if(self:IsPlaying()) then
 			self:ResetOffsetPosAndRotation();
 		end
+	end
+end
+
+function Actor:GetFacing()
+	local entity = self:GetEntity()
+	if(entity) then
+		return entity:GetFacing();
 	end
 end
 
@@ -429,11 +455,19 @@ function Actor:SetColor(color)
 	end
 end
 
+function Actor:Say(text, duration)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:Say(text, duration)
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
+	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
 }
 
 function Actor:GetActorValue(name)
@@ -464,4 +498,8 @@ function Actor:SetActorValue(name, value)
 			variables:SetVariable(name, value);
 		end
 	end
+end
+
+function Actor:BecomeAgent(entity)
+	Actor._super.BecomeAgent(self, entity);
 end

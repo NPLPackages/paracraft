@@ -504,7 +504,7 @@ Sound related:
   </block>
   <block id="10063" name="TimeSeriesCommands" text="命令序列" searchkey="命令序列" item_class="ItemTimeSeriesCommands" tooltip="命令序列" icon="Texture/blocks/items/ts_block.png"></block>
   <block id="10064" name="Minimap" text="小地图" searchkey="小地图" item_class="ItemMinimap" tooltip="小地图" icon="Texture/blocks/items/map_empty.png"></block>
-  <block id="10065" name="TimeSeriesOverlay" text="图层" searchkey="" item_class="ItemTimeSeriesOverlay" tooltip="图层" icon="Texture/blocks/items/ts_block.png"></block>
+  <block id="10065" name="TimeSeriesOverlay" text="图层" searchkey="" item_class="ItemTimeSeriesOverlay" tooltip="图层" icon="Texture/blocks/items/textframe.png"></block>
   <block id="10066" name="QuestLog" text="任务日志" searchkey="任务日志" item_class="ItemBook" tooltip="" icon="Texture/blocks/items/book_writable.png"></block>
   <block id="10067" name="TerrainBrush" text="地形笔刷" item_class="ItemTerrainBrush" tooltip="" icon="Texture/blocks/items/raise.png"></block>
   <block id="10068" name="PaintBrush" text="画笔" item_class="ItemPaintBrush" tooltip="" icon="Texture/blocks/items/brush.png"></block>

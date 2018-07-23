@@ -81,6 +81,7 @@ local s_env_methods = {
 	"clone",
 	"delete",
 	"run",
+	"becomeAgent",
 
 	-- Sensing
 	"isTouching",

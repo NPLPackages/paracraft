@@ -98,9 +98,8 @@ function ChangeUser(name,mcmlNode)
     Page:Refresh(0.01);
 end
 
-function CopyIPToClipboard()
-    local ip = GetIP();
-    ParaMisc.CopyTextToClipboard(ip.."");
+function CopyIPToClipboard(ip)
+    ParaMisc.CopyTextToClipboard(ip);
     NPL.load("(gl)script/ide/TooltipHelper.lua");
     local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
     BroadcastHelper.PushLabel({id="treasuretip", label = format(L"IP地址 %s 复制到剪切板", ip), max_duration=1000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
@@ -324,23 +323,17 @@ end
             <div style="float:left;color:#ffffff;margin-right:5px;">
             <%=L"服务器地址"%>
             </div>
-            <pe:if condition='<%= GetIP() == nil %>'>
-                <div style="float:left;color:#ffffff;">
-                    <%=L"无法正常获得外网IP,请自行查找"%>
-                </div>
-            </pe:if>
-
-            <pe:if condition='<%= GetIP() ~= nil %>'>
-                <div style="float:left;color:#ffffff;" onclick="CopyIPToClipboard" class="linkbutton" tooltip='<%=L"复制服务器地址"%>'>
-                    <%= GetIP() %>
-                </div>
-            </pe:if>
-            
+            <pe:repeat DataSource = "<%=ServerPage.GetAllIPAddress()%>">
+                <pe:repeatitem>
+                    <div name="<%=Eval('text') %>" style="float:left;margin-right:10px;color:#ffffff;" onclick="CopyIPToClipboard" class="linkbutton" tooltip='<%=L"复制服务器地址"%>'>
+                        <%=Eval("text") %>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
         </pe:if>
         <pe:if condition='<%=not IsInServer() %>'>
             <input type="button" onclick="CreateServer"  value='<%=L"创建服务器"%>' style="margin-left:240px;color:#ffffff" class="mc_light_grey_button_with_fillet" />
         </pe:if>
-        
     </div>
 </aries:window>
 </pe:mcml>

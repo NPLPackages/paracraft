@@ -333,7 +333,7 @@ end
 function Entity:RefreshClientModel(bForceRefresh, playerObj)
 	local playerObj = playerObj or self:GetInnerObject();
 	if(playerObj) then
-		-- refresh skin and base model.
+		-- refresh skin and base model, preserving all custom bone info
 		if(playerObj:GetField("assetfile", "") ~= self:GetMainAssetPath()) then
 			playerObj:SetField("assetfile", self:GetMainAssetPath());
 		end
