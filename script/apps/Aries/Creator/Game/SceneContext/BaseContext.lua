@@ -532,7 +532,9 @@ function BaseContext:handleHookedKeyEvent(event)
 		return true;
 	end
 
-	GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent(event.keyname);
+	if(GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent(event.keyname)) then
+		return true;
+	end
 end
 
 function BaseContext:handleItemKeyEvent(event)

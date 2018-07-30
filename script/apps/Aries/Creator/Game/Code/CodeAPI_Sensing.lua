@@ -115,10 +115,7 @@ end
 -- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
 -- return true or false or nil
 function env_imp:isKeyPressed(keyname)
-	keyname = GameLogic.GetCodeGlobal():GetKeyNameFromString(keyname);
-	if(keyname) then
-		return ParaUI.IsKeyPressed(DIK_SCANCODE[keyname]);
-	end
+	return GameLogic.GetCodeGlobal():IsKeyPressed(keyname);
 end
 
 -- if left mouse button is down

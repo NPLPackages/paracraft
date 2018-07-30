@@ -476,6 +476,7 @@ function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 		end
 		if(bFire) then
 			event:Fire();
+			return true;
 		end
 	end
 	event:Connect("beforeDestroyed", function()

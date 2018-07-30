@@ -489,3 +489,15 @@ while(true) do
     end
 end
 ```
+
+## On Networking
+`BecomeAgent` is the only API required to support networking. Because everything runs on the server side, 
+all we need to do is three things
+- make all keyboard and mouse input from the agent's client computer available to the agent actor on server side
+- broadcast all actors' dynamic states from server to connected clients
+- copy static data like movie blocks and bmax models to connected clients
+
+All user interface items are also actors, so everything 3d and 2d are shared among clients. 
+
+`focus()` API will cause all agent to focus on a given actor. 
+

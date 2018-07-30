@@ -15,6 +15,8 @@ GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
+NPL.load("(gl)script/ide/System/Windows/Application.lua");
+local Application = commonlib.gettable("System.Windows.Application");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -204,9 +206,10 @@ function CodeGlobals:RegisterKeyPressedEvent(callbackFunc)
 end
 
 function CodeGlobals:BroadcastKeyPressedEvent(keyname)
+	self:SetAnyKeyDown(true);
 	local event = self:GetTextEvent("keyPressedEvent");
 	if(event) then
-		event:DispatchEvent({type="msg", keyname = keyname});
+		return event:DispatchEvent({type="msg", keyname = keyname});
 	end
 end
 
@@ -301,4 +304,27 @@ function CodeGlobals:GetStringFromKeyName(name)
 	if(name) then
 		return string.lower(name:gsub("^(DIK_)" ,""));
 	end
+end
+
+function CodeGlobals:IsAnyKeyDown()
+	return self.isAnyKeyDown;
+end
+
+function CodeGlobals:SetAnyKeyDown(bKeyDown)
+	self.isAnyKeyDown = bKeyDown;
+end
+
+-- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
+function CodeGlobals:IsKeyPressed(keyname)
+	-- ignore key press when UI has focus
+	-- TODO: use GetGUI()->IsKeyboardProcessed() in C++, instead of just MCML v2 control
+	if(self:IsAnyKeyDown() and not Application:focusWidget()) then
+		keyname = self:GetKeyNameFromString(keyname);
+		if(keyname) then
+			if(ParaUI.IsKeyPressed(DIK_SCANCODE[keyname])) then
+				return true;
+			end
+		end
+	end
+	return false;
 end

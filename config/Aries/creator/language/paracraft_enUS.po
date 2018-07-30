@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-07-13 12:37+0800\n"
+"POT-Creation-Date: 2018-07-17 15:36+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -1281,8 +1281,8 @@ msgstr "%s mins"
 msgid "命令 /%s"
 msgstr "Command /%s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:123
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:566
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:125
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:570
 #, lua-format
 msgid ""
 "编译错误: %s\n"
@@ -1291,7 +1291,7 @@ msgstr ""
 "Compile error: %s \n"
 "in %s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:126
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:128
 msgid "编译成功!"
 msgstr "Compile succeed!"
 
@@ -1426,7 +1426,7 @@ msgstr "physics height"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:266
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:313
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:63
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:64
 msgid "颜色"
 msgstr "Color"
 
@@ -1441,7 +1441,7 @@ msgstr "get actor data %1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:345
 msgid "输出日志%1"
-msgstr "Output log %1"
+msgstr "output log %1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:362
 msgid "查看log.txt或F11看日志"
@@ -1515,7 +1515,7 @@ msgstr "run command %1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:17
 msgid "说 %1 持续 %2 秒"
-msgstr "Say%1 for  %2 seconds"
+msgstr "say%1 for  %2 seconds"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:22
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:51
@@ -1917,13 +1917,83 @@ msgid "mp3文件"
 msgstr "mp3 file"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:78
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:110
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:126
 msgid "播放音乐后停止"
 msgstr "Stop after playing music"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:87
 msgid "播放MP3音乐%1"
 msgstr "play MP3 music file%1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:94
+msgid "击碎"
+msgstr "break"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:98
+msgid "开箱"
+msgstr "open chest"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:99
+msgid "关箱"
+msgstr "close chest"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:100
+msgid "开门"
+msgstr "door open"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:101
+msgid "关门"
+msgstr "door closed"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:102
+msgid "点击"
+msgstr "click"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:103
+msgid "激活"
+msgstr "trigger"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:104
+msgid "溅射"
+msgstr "splash"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:105
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:127
+msgid "水"
+msgstr "Water"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:106
+msgid "吃"
+msgstr "eat"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:107
+msgid "爆炸"
+msgstr "explode"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:108
+msgid "升级"
+msgstr "leveup"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:109
+msgid "弹出"
+msgstr "pop"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:110
+msgid "掉下"
+msgstr "falldown"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:111
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:74
+msgid "火"
+msgstr "fire"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:112
+msgid "弓箭"
+msgstr "bow"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:113
+msgid "呼吸"
+msgstr "breath"
 
 #: script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua:171
 #, lua-format
@@ -2404,10 +2474,6 @@ msgstr "Falling Petals"
 msgid "飘落树叶"
 msgstr "Falling leaves"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:74
-msgid "火"
-msgstr "fire"
-
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:75
 msgid "能量体"
 msgstr "Energy body"
@@ -2611,10 +2677,6 @@ msgstr "Bedrock"
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:126
 msgid "基岩石深黑条纹砖"
 msgstr "Base rock black stripes brick"
-
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:127
-msgid "水"
-msgstr "Water"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:128
 msgid "水流动蓝兰"
@@ -3630,7 +3692,7 @@ msgid "木锄头"
 msgstr "Wooden hoe"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:381
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:64
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:65
 msgid "代码"
 msgstr "program code"
 
@@ -4615,7 +4677,7 @@ msgstr ""
 msgid "输入初始化命令"
 msgstr "Enter initialization commands"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:206
+#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:236
 msgid "输入HTML/MCML代码"
 msgstr "Please enter HTML/MCML code"
 
@@ -5136,7 +5198,7 @@ msgstr ""
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:429
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:519
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:312
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:353
 #, lua-format
 msgid "起始时间%s, 请输入位置x,y,z:"
 msgstr "Start time %s, please enter x,y,z:"
@@ -5144,20 +5206,20 @@ msgstr "Start time %s, please enter x,y,z:"
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:451
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:497
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:582
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:290
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:331
 #, lua-format
 msgid "起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>"
 msgstr "Start time %s,  please enter roll, pitch, yaw (-1.57, 1.57)<br/>"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:473
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:421
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:191
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:232
 #, lua-format
 msgid "起始时间%s, 请输入放大系数(默认1)"
 msgstr "Start time %s, please enter scaling factor (default to 1)"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCommands.lua:93
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:622
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:623
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:31
 msgid "全局"
 msgstr "global"
@@ -5229,7 +5291,7 @@ msgid "起始时间%s, 请输入透明度[0,1](默认1)"
 msgstr "Start time %s, please enter opacity [0,1] (default to 1)"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:455
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:259
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:300
 #, lua-format
 msgid "起始时间%s, 请输入转身的角度(-3.14, 3.14)"
 msgstr "Start time %s, please enter body facing angle between (-3.14, 3.14)"
@@ -5261,25 +5323,30 @@ msgstr "Start time %s, please enter gravity (default to 18.36)"
 msgid "起始时间%s, 请输入运动速度系数(默认1)"
 msgstr "Start time %s, please enter speed factor (default to 1)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:207
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:248
 #, lua-format
 msgid "起始时间%s, 请输入透明度[0,1](大于1不透明)"
 msgstr "Starting time%s, enter transparency [0,1] (greater than 1 is opaque)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:223
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:264
 #, lua-format
 msgid "起始时间%s, 请输入文字:"
 msgstr "start time %s, please enter text:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:237
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:278
 #, lua-format
 msgid "起始时间%s, 请输入绘图代码. 例如:"
 msgstr "start time %s, please enter render code, such as:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:276
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:317
 #, lua-format
 msgid "起始时间%s, 请输入颜色RGB. 例如:#ffffff"
 msgstr "start time %s, please enter RGB code, such as :#ffffff"
+
+#: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:375
+#, lua-format
+msgid "起始时间%s, 请输入位置x,y"
+msgstr "Start time %s, please enter x,y:"
 
 #: script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.lua:70
 msgid "添加/编辑字幕"
@@ -5347,7 +5414,7 @@ msgid "请选择演员或摄影机"
 msgstr "Select an actor or camera"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:41
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:631
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:632
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
 msgid "文字"
 msgstr "text"
@@ -5422,34 +5489,38 @@ msgid "位置"
 msgstr "position"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:62
+msgid "屏幕坐标"
+msgstr "screen position"
+
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:63
 msgid "父链接"
 msgstr "Parent link"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:67
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:68
 msgid "动作 (1键)"
 msgstr "action (hotkey 1)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:68
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:69
 msgid "骨骼 (1,1键)"
 msgstr "bones (1, 1)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:69
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:70
 msgid "位置 (2键)"
 msgstr "position (2)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:70
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:71
 msgid "转身 (3键)"
 msgstr "body facing (3) "
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:71
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:72
 msgid "三轴旋转 (3,3键)"
 msgstr "3d rotation(3,3)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:72
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:73
 msgid "大小 (4键)"
 msgstr "scaling (4)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:493
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:494
 msgid "无法添加关键帧。可能电影方块中的角色已经满了, 删除一个再试试看"
 msgstr ""
 "can not add key frame. may be actors in movie block is full, try delete one "
