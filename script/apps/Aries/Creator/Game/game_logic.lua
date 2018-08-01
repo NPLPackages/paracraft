@@ -123,6 +123,8 @@ SentientGroupIDs.NPC = 7;
 SentientGroupIDs.Mob = 7;
 SentientGroupIDs.OPC = 4;
 
+GameLogic.current_worlddir = "temp/emptyworld/";
+
 -- one time singleton init
 function GameLogic:ctor()
 	self:InitAPIPath();
