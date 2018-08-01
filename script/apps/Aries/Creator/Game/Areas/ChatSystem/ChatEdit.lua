@@ -31,7 +31,7 @@ local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 
 
 ChatEdit.selected_channel = ChatEdit.selected_channel or 1;
-
+ChatEdit.isIMEEnabled = true;
 local bg_timer;
 
 -- show the page
@@ -69,6 +69,7 @@ function ChatEdit.ShowPage(bForceRefreshPage, alignment, left, top, width, heigh
 			ChatEdit.OnClickChannel(ChatEdit.selected_channel, L"附近");
 
 			ChatEdit.is_fade_out = nil;
+			ChatEdit.isIMEEnabled = true;
 		end
 		_parent.visible = true;
 	end
@@ -146,9 +147,27 @@ function ChatEdit.SetText(text)
 			_editbox.text = text;
 	        _editbox:Focus();
 			_editbox:SetCaretPosition(-1);
+			ChatEdit.AutoSetInputMethod(text);
 		end
 	end
 end
+
+function ChatEdit.AutoSetInputMethod(text)
+	if(ChatEdit.is_shown) then
+		local bEnable = true;
+		if(text and text:match("^/")) then
+			bEnable = false;
+		end
+		if(ChatEdit.isIMEEnabled ~= bEnable) then
+			local _editbox = ChatEdit.GetInputControl();
+			if(_editbox) then
+				ChatEdit.isIMEEnabled = bEnable;
+				_editbox:SetField("InputMethodEnabled", ChatEdit.isIMEEnabled);
+			end
+		end
+	end
+end
+	
 
 function ChatEdit.GetText()
 	local _editbox = ChatEdit.GetInputControl();
@@ -396,7 +415,8 @@ function ChatEdit.OnKeyUp(name, mcmlNode)
 			_editbox.text = string.sub(sentText, 1, 120);
 			_editbox:SetCaretPosition(-1);
 		end
-		
+		ChatEdit.AutoSetInputMethod(sentText);
+
 		local callbacks = {
 			[Event_Mapping.EM_KEY_RETURN] = ChatEdit.OnClickSend,
 			[Event_Mapping.EM_KEY_NUMPADENTER] = ChatEdit.OnClickSend,
