@@ -26,6 +26,7 @@ script/ide
 !/script/apps/Aries/BBSChat/
 /script/apps/Aries/BBSChat/*
 !/script/apps/Aries/BBSChat/SentenceHistory.lua
+!/script/apps/Aries/BBSChat/ChatSystem/
 /script/apps/Aries/BBSChat/ChatSystem/*
 !/script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua
 
