@@ -873,7 +873,7 @@ function GameLogic.FrameMove(timer)
 	local bIsTick = GameLogic:IsTick(deltaTime);
 	npl_profiler.perf_begin("GameLogic.FrameMove")
 	
-	TaskManager.FrameMove();
+	TaskManager.FrameMove(deltaTime);
 
 	PhysicsWorld.FrameMove(simDeltaTime);
 	EntityManager.FrameMove(deltaTime);
