@@ -268,15 +268,18 @@ function CreateNewWorld.GetWorldFolder()
 end
 
 function CreateNewWorld.OnClickCreateWorld()
+	local status = GameLogic.GetFilters():apply_filters("OnClickCreateWorld");
+
+	if(status) then
+		return
+	end
+
 	-- _guihelper.MessageBox("OnClickCreateWorld"..CreateNewWorld.SelectedWorldTemplate_Index)	
 	--local templ_world = worlds_template[CreateNewWorld.SelectedWorldTemplate_Index];
 	local templ_world = worlds_template[CreateNewWorld.SelectedWorldTemplate_Index or 1];
 	if(not templ_world) then return end
 	
 	--local world_name = page:GetValue("NewWorldName") or "积木世界";
-	
-	--echo("22222222222");
-	--echo(CreateNewWorld.page:GetValue("new_world_name"));
 	local world_name = CreateNewWorld.page:GetValue("new_world_name") or CreateNewWorld.default_worldname;
 	world_name = world_name:gsub("[%s/\\]", "");
 
@@ -301,6 +304,7 @@ function CreateNewWorld.OnClickCreateWorld()
 		inherit_scene = true,
 		inherit_char = true,
 	}
+
 	LOG.std(nil, "info", "CreateNewWorld", params);
 
 	local worldpath, error_msg = CreateNewWorld.CreateWorld(params);

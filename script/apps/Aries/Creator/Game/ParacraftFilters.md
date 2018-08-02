@@ -65,6 +65,7 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "OnUnLoadBlockRegion", true, x, y:
   - "worldFileChanged", msg:
   - "GetWorldGeneratorClass", generator, name: get world generator by name filter. Use this to add custom world generators
+  - "OnClickCreateWorld"
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:
