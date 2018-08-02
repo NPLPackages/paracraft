@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- tip:最多75个汉字(包括标点) -->
+<tipwords>
+	<!-- 以下提示词，循环提醒 --> 
+  <tipword tip="鼠标右键创建方块，鼠标左键消除方块"  minlevel="0" maxlevel="0"/>
+  
+</tipwords>

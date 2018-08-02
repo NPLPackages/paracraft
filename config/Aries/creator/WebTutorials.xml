@@ -1,0 +1,44 @@
+<!--config/Aries/creator/WebTutorials.xml
+每个视频包含关键字, 标题, 难易程度0-5(默认为0), 时长(分钟).  以及至少一个视频连接地址
+keywords parameter can be commar separated strings of following user actions:
+take [item_name]: player switched an item in hand.
+select blocks: player selected some blocks
+loadworld: player opened the load world UI
+cmd [cmd_name]: player just entered a valid command manually.
+-->
+<WebTutorials>
+  <!--the first one is the default tutorial-->
+  <tutorial keywords="introduction" title="新手教学视频" difficulty="0" length="5-10">
+    <url>http://www.paracraft.cn/archives/1051</url>
+  </tutorial>
+  <tutorial keywords="take MovieClip" title="电影方块" difficulty="3" length="30">
+    <url>http://www.paracraft.cn/archives/1053/</url>
+  </tutorial>
+  <tutorial keywords="take Bone" title="骨骼" difficulty="3" length="30">
+    <url>http://www.paracraft.cn/archives/1055/</url>
+  </tutorial>
+  <tutorial keywords="take ColorBlock,take MetalBlock" title="彩色方块" difficulty="1" length="5">
+    <url>http://www.paracraft.cn/archives/1057/</url>
+  </tutorial>
+  <tutorial keywords="select blocks" title="选择方块" difficulty="1" length="10">
+    <url>http://www.paracraft.cn/archives/1059/</url>
+  </tutorial>
+  <tutorial keywords="take player_spawn_point" title="出生点" difficulty="2" length="10">
+    <url>http://www.paracraft.cn/archives/1061/</url>
+  </tutorial>
+  <tutorial keywords="take Code" title="代码" difficulty="2" length="10">
+    <url>http://www.paracraft.cn/archives/1063/</url>
+  </tutorial>
+  <tutorial keywords="take BlockModel" title="模型方块" difficulty="2" length="30">
+    <url>http://www.paracraft.cn/archives/1065/</url>
+  </tutorial>
+  <tutorial keywords="take CommandLine" title="命令行" difficulty="2" length="10">
+    <url>http://www.paracraft.cn/archives/1067/</url>
+  </tutorial>
+  <tutorial keywords="take villager" title="通用人物" difficulty="2" length="10">
+    <url>http://www.paracraft.cn/archives/1069/</url>
+  </tutorial>
+  <tutorial keywords="edit neuron" title="记忆学习" difficulty="1" length="10">
+    <url>http://www.paracraft.cn/archives/1071/</url>
+  </tutorial>
+</WebTutorials>

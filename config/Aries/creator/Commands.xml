@@ -1,0 +1,69 @@
+
+<Commands>
+	<Type name="命令列表">
+		<Command quick_ref="/circle [plane] [radius]" name="circle" desc="以人物所在坐标为原点,在[plane]对应的平面上，以[radius]值为半径做一个圆形方块。">
+			<Param name="plane" desc="填入x、y、z其中一个字母，表示在那个平面上用手上的方块生成圆形。"/>
+			<Param name="radius" desc="填入一个数字，表示圆形的半径。"/>
+			<Instance content="/circle 2" desc="以2为半径，在角色脚底做一个圆形方块。"/>
+			<Instance content="/circle x 2" desc="以人物所在坐标为原点，在x轴垂直平面上，以2为半径做一个圆形方块"/>
+		</Command>
+		<Command quick_ref="/fill [block_id]" name="fill" desc="使用手中的方块或者[block_id]填充选中范围(包括空气)的所有空间。">
+			<Param name="block_id" desc="填入特定的方块ID。"/>
+			<Instance content="/fill" desc="使用手中的方块填充选中范围(包括空气)的所有空间。"/>
+			<Instance content="/fill 62" desc="使用ID为62的草方块填充选中范围(包括空气)的所有空间。"/>
+		</Command>
+		<Command quick_ref="/focus [@playername]" name="focus" desc="附身在当前世界某个角色[@playname]身上，若角色名字不存在或为空，则附身回主角身上。">
+			<Param name="@playername" desc="填入当前世界某个角色的名字，表示在附身到那个角色身上。"/>
+			<Instance content="/focus Jack" desc="附身在当前世界名为Jack的角色身上，附身期间可随意控制Jack的行为。"/>
+			<Instance content="/focus" desc="附身回主角身上。"/>
+		</Command>
+		<Command quick_ref="/fps [true|false|1|0]" name="fps" desc="进入/取消第一人称模式。">
+			<Param name="true|1" desc="填入[true]或者[1]进入第一人称模式。"/>
+			<Param name="false|0" desc="填入[false]或者[0]取消第一人称模式。"/>
+			<Instance content="/fps true" desc="进入第一人称模式。"/>
+			<Instance content="/fps 1" desc="进入第一人称模式。"/>
+			<Instance content="/fps false" desc="取消第一人称模式。"/>
+			<Instance content="/fps 0" desc="取消第一人称模式。"/>
+		</Command>
+		<Command quick_ref="/replace [from_id] [to_id]" name="replace" desc="把当前选中方块中的[from_id]替换为[to_id]。">
+			<Param name="from_id" desc="填入准备替换的方块ID。"/>
+			<Param name="SolidMode" desc="填入要换成的方块ID。"/>
+			<Instance content="/replace 62 5" desc="把当前选中方块中的ID为62的草方块替换为ID为5的雪方块。"/>
+		</Command>
+		<Command quick_ref="/selectobj" name="selectobj" desc="选中主角视野画面中的特殊机关方块，比如拉杆，踏板等。">
+			<Instance content="/selectobj" desc="选中主角视野画面中的特殊机关方块。"/>
+		</Command>
+		<Command quick_ref="/sphere radius [SolidMode]" name="sphere" desc="以人物所在坐标为原点,以[radius]值为半径做一个圆球形立体方块。">
+			<Param name="radius" desc="填入数字作为圆球形立体方块的半径。"/>
+			<Param name="SolidMode" desc="填入[true]或者不填，则新建一个实心的圆球形立体方块，反之填入[false]则新建一个空心的圆球形立体方块。"/>
+			<Instance content="/sphere 5" desc="以人物所在坐标为原点,做一个半径为5的实心圆球形立体方块。"/>
+			<Instance content="/sphere 5 false" desc="以人物所在坐标为原点,做一个半径为5的空心圆球形立体方块。"/>
+		</Command>
+		<Command quick_ref="/t [~][seconds] /othercmd" name="t" desc="使得已编写的代码延迟[seconds]时间后启动。">
+			<Param name="seconds" desc="填入数字，使得代码在规定好的第几秒启动。"/>
+			<Param name="~seconds" desc="填入数字，使得代码在距离上一个/t代码几秒后启动。"/>
+			<Instance content="/t 10" desc="此行后的代码将会在10秒后启动。"/>
+			<Instance content="/t 20" desc="此行后的代码将会在第20秒后启动。"/>
+			<Instance content="/t ~10" desc="此行后的代码将会在10秒后启动。"/>
+			<Instance content="/t ~10" desc="此行后的代码将会在第20秒后启动。"/>
+		</Command>
+		<Command quick_ref="/tp [x] [y] [z]" name="tp" desc="将主角传送到一个指定坐标点。">
+			<Param name="[x] [y] [z]" desc="填入X、Y、Z的坐标数字。"/>
+			<Instance content="/tp 19242 11 19178" desc="将主角传送到一个坐标 19242 11 19178 处。"/>
+		</Command>
+		<Command quick_ref="/translate from_x from_y from_z (dx dy dz) to offset_x offset_y offset_z" name="translate" desc="translate blocks">
+			<Param name="from_x from_y from_z" desc="填入原方块X、Y、Z的坐标数字。"/>
+			<Param name="[(dx dy dz)]" desc="填入以上一个坐标为原点的相对X、Y、Z的坐标数字。"/>
+			<Param name="offset_x offset_y offset_z" desc="填入要复制到的位置X、Y、Z的相对坐标数字。"/>
+			<Instance content="/translate 19242 11 19178 to 0 5 0" desc="将坐标19242 11 19178处的方块移动到原坐标的上方5格处。"/>
+			<Instance content="/translate 19242 11 19178 to 5 0 0" desc="将坐标19242 11 19178处的方块移动到原坐标的X轴正方向5格处。"/>
+			<Instance content="/translate 19242 11 19178 to -5 0 0" desc="将坐标19242 11 19178处的方块移动到原坐标的X轴负方向5格处。"/>
+			<Instance content="/translate 19242 11 19178 (5 5 5) to 0 5 0" desc="将坐标19242 11 19178处，体积为5x5x5的方块群移动到原坐标的上方5格处。"/>
+		</Command>
+		<Command quick_ref="/where [offset_y]" name="where" desc="获取当前角色的坐标，若填入参数则获取当前角色头顶[offset_y]的坐标。">
+			<Param name="offset_y" desc="填入Y坐标轴的位移，获取当前角色头顶坐标。"/>
+			<Instance content="/where" desc="获取当前角色的坐标。"/>
+			<Instance content="/where 5" desc="获取当前角色头顶位移5的坐标。"/>
+		</Command>
+	</Type>
+</Commands>

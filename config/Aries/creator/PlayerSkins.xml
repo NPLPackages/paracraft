@@ -1,0 +1,46 @@
+<!--config/Aries/creator/PlayerSkins.xml
+只能在后面添加， 否则id不兼容. 
+-->
+<PlayerSkins>
+  <skin name="棕色头发的女孩01" filename="Texture/blocks/human/girl_brown_hairs01.png" alias="Texture/blocks/human/char_female01.png"/>
+  <skin name="红色头发的女孩01" filename="Texture/blocks/human/girl_red_eyes01.png" alias="Texture/blocks/human/char_female02.png"/>
+  <skin name="黑色T恤的女孩01" filename="Texture/blocks/human/girl_black_shirt01.png" alias="Texture/blocks/human/char_female03.png"/>
+  <skin name="黑色头发的女孩01" filename="Texture/blocks/human/girl_black_hairs01.png" alias="Texture/blocks/human/char_female04.png"/>
+  <skin name="粉色头发的女孩01" filename="Texture/blocks/human/girl_pink_hairs01.png" alias="Texture/blocks/human/char_female05.png"/>
+  <skin name="金色头发的女孩01" filename="Texture/blocks/human/girl_gold_hairs01.png" alias="Texture/blocks/human/char_female06.png"/>
+  <skin name="金色头发的女孩02" filename="Texture/blocks/human/girl_gold_hairs02.png" alias="Texture/blocks/human/char_female07.png"/>
+  <skin name="金色头发的女孩03" filename="Texture/blocks/human/girl_gold_hairs03.png" alias="Texture/blocks/human/char_female08.png"/>
+  <skin name="蓝色头发的女孩01" filename="Texture/blocks/human/girl_blue_hairs01.png" alias="Texture/blocks/human/char_female09.png"/>
+  <skin name="棕色头发的女孩02" filename="Texture/blocks/human/girl_brown_hairs02.png" alias="Texture/blocks/human/char_female10.png"/>
+  <skin name="蓝色T恤的男孩01" filename="Texture/blocks/human/boy_blue_shirt01.png" alias="Texture/blocks/human/char_male.png"/>
+  <skin name="黑色西装的男孩01" filename="Texture/blocks/human/boy_black_skin01.png" alias="Texture/blocks/human/char_male03.png"/>
+  <skin name="建筑工人01" filename="Texture/blocks/human/boy_worker01.png" alias="Texture/blocks/human/char_male04.png"/>
+  <skin name="波点T恤的男孩01" filename="Texture/blocks/human/boy_spots_shirt01.png" alias="Texture/blocks/human/char_male05.png"/>
+  <skin name="憨豆先生" filename="Texture/blocks/human/boy_MrBean.png" alias="Texture/blocks/human/char_male06.png"/>
+  <skin name="黑色眼镜的男孩01" filename="Texture/blocks/human/boy_black_glass01.png" alias="Texture/blocks/human/char_male07.png"/>
+  <skin name="建筑工人02" filename="Texture/blocks/human/boy_worker02.png" alias="Texture/blocks/human/char_male08.png"/>
+  <skin name="地狱火男" filename="Texture/blocks/human/boy_HellFireMan.png" alias="Texture/blocks/human/char_male09.png"/>
+  <skin name="黑色头发的男孩01" filename="Texture/blocks/human/boy_black_hairs01.png" alias="Texture/blocks/human/char_male02.png"/>
+  <skin name="黑色头发的男孩02" filename="Texture/blocks/human/boy_black_hairs02.png" alias="Texture/blocks/human/char_male10.png"/>
+  <skin name="黑色头发的男孩03" filename="Texture/blocks/human/boy_black_hairs03.png" alias="Texture/blocks/human/char_male11.png"/>
+  <skin name="黑色头发的男孩04" filename="Texture/blocks/human/boy_black_hairs04.png" alias="Texture/blocks/human/char_male12.png"/>
+  <skin name="红色项链的男孩01" filename="Texture/blocks/human/boy_red_necklace01.png" alias="Texture/blocks/human/char_male13.png"/>
+  <skin name="蓝色西装的男孩01" filename="Texture/blocks/human/boy_silver_clothes01.png" alias="Texture/blocks/human/char_male14.png"/>
+  <skin name="黑色外套的男人01" filename="Texture/blocks/human/man_black_clothes01.png" alias="Texture/blocks/human/char_male15.png"/>
+  <skin name="黑色外套的男人02" filename="Texture/blocks/human/man_black_clothes02.png" alias="Texture/blocks/human/char_male16.png"/>
+  <skin name="老爷爷" filename="Texture/blocks/human/man_gray_clothes01.png" alias="Texture/blocks/human/char_male17.png"/>
+  
+  <skin name="卡通黑熊外套" filename="Texture/blocks/human/cartoon_black_bearman.png" alias=""/>
+  <skin name="卡通粽熊外套" filename="Texture/blocks/human/cartoon_brown_bearman.png" alias=""/>
+  <skin name="卡通熊猫外套" filename="Texture/blocks/human/cartoon_pandaman.png" alias=""/>
+  <skin name="卡通北极熊外套" filename="Texture/blocks/human/cartoon_polarbearman.png" alias=""/>
+
+  <skin name="动物棕熊" filename="Texture/blocks/human/animal_brown_bear.png" alias=""/>
+  <skin name="动物熊猫" filename="Texture/blocks/human/animal_panda.png" alias=""/>
+  <skin name="动物泰迪熊" filename="Texture/blocks/human/animal_teddybear.png" alias=""/>
+
+  <skin name="白色礼服的女孩" filename="Texture/blocks/human/girl_black_hairs02.png" alias=""/>
+  <skin name="老奶奶" filename="Texture/blocks/human/boy_black_hairs06.png" alias=""/>
+  <skin name="棕色外套的导演" filename="Texture/blocks/human/actor_brown.png" alias=""/>
+  <skin name="黄色外套的导演" filename="Texture/blocks/human/actor_yellow.png" alias=""/>
+</PlayerSkins>

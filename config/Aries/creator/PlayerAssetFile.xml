@@ -1,0 +1,61 @@
+<!--config/Aries/creator/PlayerAssetFile.xml
+-->
+<PlayerAssets>
+  <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员">
+	<anims>
+		<anim id="0" text="默认动作"/>
+		<anim id="82" text="跪着说话"/>
+	</anims>
+  </asset>
+  <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
+  <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
+  <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
+  <asset filename="character/CC/03animals/pig/pig.x" name="pig" displayname="小猪"/>
+  <asset filename="character/CC/03animals/sheep/sheep.x" name="sheep" displayname="棉羊"/>
+  <asset filename="character/CC/03animals/chicken/chicken.x" name="chicken" displayname="小鸡"/>
+  <asset filename="character/CC/03animals/bird/bird.x" name="bird" displayname="鸟"/>
+  <asset filename="character/CC/03animals/pigeon/pigeon.x" name="pigeon" displayname="鸽子"/>
+  <asset filename="character/CC/03animals/frog/frog.x" name="frog" displayname="青蛙"/>
+  <asset filename="character/CC/03animals/dog/dog.x" name="dog" displayname="狗"/>
+  <asset filename="character/CC/01char/MainChar/MainChar.x" name="ccs" displayname="可换装人物"/>
+  <asset filename="character/CC/02human/Camera/Camera.x" name="camera" displayname="摄影机"/>
+  <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
+  <asset filename="character/CC/05effect/whitecloud.x" name="whitecloud" displayname="白云" physics="false"/>
+  <asset filename="character/CC/05effect/blackcloudrotate.x" name="blackcloudrotate" displayname="乌云" physics="false"/>
+  <asset filename="character/CC/05effect/blackcloud.x" name="blackcloud" displayname="旋转乌云" physics="false"/>
+  <asset filename="character/CC/05effect/focusedblackdust.x" name="focusedblackdust" displayname="聚集黑雾" physics="false"/>
+  <asset filename="character/CC/05effect/rainflower.x" name="rainflower" displayname="飘落花瓣" physics="false"/>
+  <asset filename="character/CC/05effect/fallingleaves.x" name="fallingleaves" displayname="飘落树叶" physics="false"/>
+  <asset filename="character/CC/05effect/fire.x" name="fire" displayname="火" physics="false"/>
+  <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false"/>
+  <asset filename="character/CC/05effect/ray.x" name="ray" displayname="放射光" physics="false"/>
+  <asset filename="character/CC/05effect/flyingparticle.x" name="flyingparticle" displayname="星光环绕" physics="false"/>
+  <asset filename="character/CC/05effect/star.x" name="star" displayname="星光升起" physics="false"/>
+  <asset filename="character/CC/05effect/risingparticle.x" name="risingparticle" displayname="光斑升起" physics="false"/>
+  <asset filename="character/CC/05effect/fallingparticle1.x" name="fallingparticle1" displayname="星光洒落" physics="false"/>
+  <asset filename="character/CC/05effect/fallingparticle2.x" name="fallingparticle2" displayname="光斑洒落" physics="false"/>
+  <asset filename="character/CC/05effect/risingline.x" name="risingline" displayname="垂直光线" physics="false"/>
+  <asset filename="character/CC/05effect/dazycircle.x" name="dazycircle" displayname="眩晕圈" physics="false"/>
+  <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false"/>
+  <asset filename="character/CC/05effect/thunder.x" name="thunder" displayname="雷电" physics="false"/>
+  <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false"/>
+  <asset filename="character/CC/05effect/waterbubble.x" name="waterbubble" displayname="水泡" physics="false"/>
+  <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false"/>
+  <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false"/>
+  <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false"/>
+  <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false"/>
+  <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false"/>
+  <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false"/>
+  <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false"/>
+  <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false"/>
+  <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false"/>
+  <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false"/>
+  <asset filename="model/blockworld/BlockModel/block_model_one.x" name="cube" displayname="可换装立方体"/>
+  <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
+  <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
+  <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
+  <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
+  <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
+  <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
+  <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
+</PlayerAssets>
