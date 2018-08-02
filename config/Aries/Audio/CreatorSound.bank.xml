@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--config/Aries/Audio/CreatorSound.bank.xml-->
+<pe_mcml>
+  <SoundBank name="AmbMusics" stream="true" loop="true" inmemory="false" delayload="true">
+  </SoundBank>
+  <SoundBank name="CreatorInMemoryUI" stream="false" loop="false" inmemory="true" delayload="true">
+  </SoundBank>
+  
+  <SoundBank name="Blocks" stream="false" loop="false" inmemory="true" delayload="true">
+    <!--damage-->
+	  <AudioSource name="fallbig1" file="Audio/Haqi/creator/damage/fallbig1.ogg" />
+    <AudioSource name="fallbig2" file="Audio/Haqi/creator/damage/fallbig1.ogg" />
+    <AudioSource name="hurtflesh1" file="Audio/Haqi/creator/damage/hurtflesh1.ogg" />
+    <AudioSource name="hurtflesh2" file="Audio/Haqi/creator/damage/hurtflesh2.ogg" />
+    <AudioSource name="hurtflesh3" file="Audio/Haqi/creator/damage/hurtflesh3.ogg" />
+    <!--fire-->
+    <AudioSource name="fire" file="Audio/Haqi/creator/fire/fire.ogg" />
+    <AudioSource name="ignite" file="Audio/Haqi/creator/fire/ignite.ogg" />
+    <!--liquid-->
+    <AudioSource name="lava" file="Audio/Haqi/creator/liquid/lava.ogg" />
+    <AudioSource name="lavapop" file="Audio/Haqi/creator/liquid/lavapop.ogg" />
+    <AudioSource name="splash" file="Audio/Haqi/creator/liquid/splash.ogg" />
+    <AudioSource name="water" file="Audio/Haqi/creator/liquid/water.ogg" />
+    <!--portal-->
+    <AudioSource name="portal" file="Audio/Haqi/creator/portal/portal.ogg" />
+    <AudioSource name="travel" file="Audio/Haqi/creator/portal/travel.ogg" />
+    <AudioSource name="trigger" file="Audio/Haqi/creator/portal/trigger.ogg" />
+    <!--random-->
+    <AudioSource name="bow" file="Audio/Haqi/creator/random/bow.ogg" />
+    <AudioSource name="bowhit1" file="Audio/Haqi/creator/random/bowhit1.ogg" />
+    <AudioSource name="bowhit2" file="Audio/Haqi/creator/random/bowhit2.ogg" />
+    <AudioSource name="bowhit3" file="Audio/Haqi/creator/random/bowhit3.ogg" />
+    <AudioSource name="bowhit4" file="Audio/Haqi/creator/random/bowhit4.ogg" />
+    <AudioSource name="break" file="Audio/Haqi/creator/random/break.ogg" />
+    <AudioSource name="break1" file="Audio/Haqi/creator/random/break1.ogg" />
+    <AudioSource name="break2" file="Audio/Haqi/creator/random/break2.ogg" />
+    <AudioSource name="break3" file="Audio/Haqi/creator/random/break3.ogg" />
+    <AudioSource name="break4" file="Audio/Haqi/creator/random/break4.ogg" />
+    <AudioSource name="breath" file="Audio/Haqi/creator/random/breath.ogg" />
+    <AudioSource name="burp" file="Audio/Haqi/creator/random/burp.ogg" />
+    <AudioSource name="chestclosed" file="Audio/Haqi/creator/random/chestclosed.ogg" />
+    <AudioSource name="chestopen" file="Audio/Haqi/creator/random/chestopen.ogg" />
+    <AudioSource name="door_open" file="Audio/Haqi/creator/random/door_open.ogg" />
+    <AudioSource name="door_close" file="Audio/Haqi/creator/random/door_close.ogg" />
+    <AudioSource name="click" file="Audio/Haqi/creator/random/click.ogg" />
+    <AudioSource name="dir" file="Audio/Haqi/creator/random/dir.ogg" />
+    <AudioSource name="eat1" file="Audio/Haqi/creator/random/eat1.ogg" />
+    <AudioSource name="eat2" file="Audio/Haqi/creator/random/eat2.ogg" />
+    <AudioSource name="eat3" file="Audio/Haqi/creator/random/eat3.ogg" />
+    <AudioSource name="explode1" file="Audio/Haqi/creator/random/explode1.ogg" />
+    <AudioSource name="explode2" file="Audio/Haqi/creator/random/explode2.ogg" />
+    <AudioSource name="explode3" file="Audio/Haqi/creator/random/explode3.ogg" />
+    <AudioSource name="explode4" file="Audio/Haqi/creator/random/explode4.ogg" />
+    <AudioSource name="fizz" file="Audio/Haqi/creator/random/fizz.ogg" />
+    <AudioSource name="fuse" file="Audio/Haqi/creator/random/fuse.ogg" />
+    <AudioSource name="glass1" file="Audio/Haqi/creator/random/glass1.ogg" />
+    <AudioSource name="glass2" file="Audio/Haqi/creator/random/glass2.ogg" />
+    <AudioSource name="glass3" file="Audio/Haqi/creator/random/glass3.ogg" />
+    <AudioSource name="levelup" file="Audio/Haqi/creator/random/levelup.ogg" />
+    <AudioSource name="hurt" file="Audio/Haqi/creator/random/hurt.ogg" />
+    <AudioSource name="old_explode" file="Audio/Haqi/creator/random/old_explode.ogg" />
+    <AudioSource name="orb" file="Audio/Haqi/creator/random/orb.ogg" />
+    <AudioSource name="pop" file="Audio/Haqi/creator/random/pop.ogg" />
+    <AudioSource name="splash" file="Audio/Haqi/creator/random/splash.ogg" />
+    <AudioSource name="wood_click" file="Audio/Haqi/creator/random/wood_click.ogg" />
+ 
+    <!--step-->
+    <AudioSource name="cloth1" file="Audio/Haqi/creator/step/cloth1.ogg" />
+    <AudioSource name="cloth2" file="Audio/Haqi/creator/step/cloth2.ogg" />
+    <AudioSource name="cloth3" file="Audio/Haqi/creator/step/cloth3.ogg" />
+    <AudioSource name="cloth4" file="Audio/Haqi/creator/step/cloth4.ogg" />
+    <AudioSource name="grass1" file="Audio/Haqi/creator/step/grass1.ogg" />
+    <AudioSource name="grass2" file="Audio/Haqi/creator/step/grass2.ogg" />
+    <AudioSource name="grass3" file="Audio/Haqi/creator/step/grass3.ogg" />
+    <AudioSource name="grass4" file="Audio/Haqi/creator/step/grass4.ogg" />
+    <AudioSource name="gravel1" file="Audio/Haqi/creator/step/gravel1.ogg" />
+    <AudioSource name="gravel2" file="Audio/Haqi/creator/step/gravel2.ogg" />
+    <AudioSource name="gravel3" file="Audio/Haqi/creator/step/gravel3.ogg" />
+    <AudioSource name="gravel4" file="Audio/Haqi/creator/step/gravel4.ogg" />
+    <AudioSource name="sand1" file="Audio/Haqi/creator/step/sand1.ogg" />
+    <AudioSource name="sand2" file="Audio/Haqi/creator/step/sand2.ogg" />
+    <AudioSource name="sand3" file="Audio/Haqi/creator/step/sand3.ogg" />
+    <AudioSource name="sand4" file="Audio/Haqi/creator/step/sand4.ogg" />
+    <AudioSource name="snow1" file="Audio/Haqi/creator/step/snow1.ogg" />
+    <AudioSource name="snow2" file="Audio/Haqi/creator/step/snow2.ogg" />
+    <AudioSource name="snow3" file="Audio/Haqi/creator/step/snow3.ogg" />
+    <AudioSource name="snow4" file="Audio/Haqi/creator/step/snow4.ogg" />
+    <AudioSource name="stone1" file="Audio/Haqi/creator/step/stone1.ogg" />
+    <AudioSource name="stone2" file="Audio/Haqi/creator/step/stone2.ogg" />
+    <AudioSource name="stone3" file="Audio/Haqi/creator/step/stone3.ogg" />
+    <AudioSource name="stone4" file="Audio/Haqi/creator/step/stone4.ogg" />
+    <AudioSource name="wood1" file="Audio/Haqi/creator/step/wood1.ogg" />
+    <AudioSource name="wood2" file="Audio/Haqi/creator/step/wood2.ogg" />
+    <AudioSource name="wood3" file="Audio/Haqi/creator/step/wood3.ogg" />
+    <AudioSource name="wood4" file="Audio/Haqi/creator/step/wood4.ogg" />
+    <!--piston-->
+    <AudioSource name="piston_in" file="Audio/Haqi/creator/tile/piston/in.ogg" />
+    <AudioSource name="piston_out" file="Audio/Haqi/creator/tile/piston/out.ogg" />
+    <AudioSource name="railcar_inside" file="Audio/Haqi/creator/step/railcar_inside.ogg" />
+    <AudioSource name="railcar_base" file="Audio/Haqi/creator/step/railcar_base.ogg" />
+  </SoundBank>
+</pe_mcml>
