@@ -124,7 +124,10 @@ function EditMovieContext:GetActorAt(channel_name)
 end
 
 function EditMovieContext:GetActor()
-	return self:GetActorAt("cur_actor");
+	local actor = self:GetActorAt("cur_actor");
+	if(actor and not actor.wasDeleted) then
+		return actor;
+	end
 end
 
 -- set actor that is being watched (edited). 
