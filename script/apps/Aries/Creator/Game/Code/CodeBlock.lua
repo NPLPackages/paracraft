@@ -390,7 +390,7 @@ function CodeBlock:Run()
 	end
 end
 
-function CodeBlock:send_message(msg, code_env)
+function CodeBlock:send_message(msg)
 	self.lastMessage = msg;
 	self:message(msg);
 end
