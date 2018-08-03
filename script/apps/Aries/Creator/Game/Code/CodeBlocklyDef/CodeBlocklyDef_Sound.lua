@@ -20,7 +20,7 @@ local cmds = {
 			name = "note",
 			type = "field_dropdown",
 			options = {
-				{ "7", 7 },{ "6", 6 },{ "5", 5 },{ "4", 4 },{ "3", 3 },{ "2", 2 },{ "1", 1 },
+				{ "7", "7" },{ "6", "6" },{ "5", "5" },{ "4", "4" },{ "3", "3" },{ "2", "2" },{ "1", "1" },
 			},
 		},
 		{
@@ -88,7 +88,6 @@ playMusic()
 	arg0 = {
 		{
 			name = "filename",
-			type = "field_input",
 			type = "field_dropdown",
 			options = {
 				{ L"击碎", "break" },
