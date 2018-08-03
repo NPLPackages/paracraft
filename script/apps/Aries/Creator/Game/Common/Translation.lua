@@ -87,6 +87,7 @@ function Translation.SetCustomLanguage(locale, bChangeLanguage)
 	if(Translation.customLang~=locale) then
 		Translation.IsCustomLangChanged = true;
 		Translation.customLang = locale;
+		ParaIO.CreateDirectory("config/language.txt");
 		local file = ParaIO.open("config/language.txt", "w");
 		if(file:IsValid()) then
 			file:WriteString(locale or "");
