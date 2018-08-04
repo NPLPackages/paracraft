@@ -823,7 +823,7 @@ function Actor:SaveFreeCameraPosition(bForceSave)
 end
 
 function Actor:CanShowSelectManip()
-	return false
+	return true
 end
 
 function Actor:IsAgent()
