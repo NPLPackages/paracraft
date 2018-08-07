@@ -166,6 +166,10 @@ function VideoRecorderSettings.GetResolution()
 	return settings.VideoResolution;
 end
 
+function VideoRecorderSettings.SetResolution(resolution)
+	settings.VideoResolution = resolution;
+end
+
 function VideoRecorderSettings.GetVideoBitRate()
 	return settings.VideoBitRate;
 end
