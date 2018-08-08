@@ -60,7 +60,7 @@ local presets = {
 		Codec="mp4",
 		VideoResolution={1920, 1080},
 		VideoBitRate = 7776000, 
-		FPS = 60, 
+		FPS = 30, 
 		margin = 16,
 		stereo = 0,
 	},
