@@ -49,6 +49,7 @@ function VideoRecorder.BeginCapture(callbackFunc)
 	if(VideoRecorder.HasFFmpegPlugin()) then
 		VideoRecorderSettings.ShowPage(function(res)
 			if(res == "ok") then
+				AudioEngine.SetGarbageCollectThreshold(64);
 				VideoRecorder.AdjustWindowResolution(function()
 					local start_after_seconds = VideoRecorderSettings.start_after_seconds or 0;
 					local elapsed_seconds = 0;
@@ -161,6 +162,7 @@ function VideoRecorder.RestoreWindowResolution()
 end
 
 function VideoRecorder.EndCapture()
+	AudioEngine.SetGarbageCollectThreshold(10);
 	ParaMovie.EndCapture();
 	VideoRecorder.ShowRecordingArea(false);
 	GameLogic.options:SetClickToContinue(true);
