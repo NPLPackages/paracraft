@@ -1533,6 +1533,14 @@ function block:RotateBlockData(blockData, angle, axis)
 	return blockData;
 end
 
+-- rotate the block entity data by the given angle and axis. This is mosted reimplemented in blocks with orientations stored in entity data, such as BMAX blockmodel, etc. 
+-- @param entityData: current block data
+-- @param angle: usually 1.57, -1.57, 3.14, -3.14, 0.
+-- @param axis: "x|y|z", if nil, it should default to "y" axis
+-- @return the rotated block data. 
+function block:RotateBlockEnityData(entityData, angle, axis)
+	return entityData;
+end
 
 -- helper function: can be used by RotateBlockData() to automatically calculate rotated block facing. 
 -- please note, it will cache last search result to accelerate subsequent calls.

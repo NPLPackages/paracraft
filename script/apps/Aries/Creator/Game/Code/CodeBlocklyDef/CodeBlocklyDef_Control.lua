@@ -49,17 +49,19 @@ end
 
 {
 	type = "repeat", 
-	message0 = L"重复%1次%2",
+	message0 = L"重复%1次",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "times",
 			type = "field_number",
 			text = 10, 
 		},
+	},
+    arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
-			text = "", 
 		},
 	},
 	category = "Control", 
@@ -69,7 +71,7 @@ end
 	nextStatement = true,
 	func_description = 'for i=1, %d do\\n%send',
 	ToNPL = function(self)
-		return string.format('for i=1, %d do\n%send\n', self:getFieldValue('times'), self:getFieldAsString('input'));
+		return string.format('for i=1, %d do\n    %s\nend\n', self:getFieldValue('times'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 for i=1, 10 do
@@ -79,13 +81,53 @@ end
 },
 
 {
-	type = "forever", 
-	message0 = L"永远重复%1",
-	arg0 = {
+	type = "repeat_until", 
+	message0 = L"重复执行",
+	message1 = L"%1",
+	message2 = L"一直到%1",
+	arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
-			text = "", 
+		},
+	},
+    arg2 = {
+		{
+			name = "expression",
+			type = "input_value",
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = "repeat\\n%suntil(%s)",
+	ToNPL = function(self)
+		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+repeat
+    moveForward(0.01)
+until(false)
+]]}},
+},
+
+
+{
+	type = "forever", 
+	message0 = L"永远重复%1",
+	message1 = L"%1",
+    arg0 = {
+		{
+			name = "label_dummy",
+			type = "input_dummy",
+		},
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
 		},
 	},
 	category = "Control", 
@@ -95,7 +137,7 @@ end
 	nextStatement = true,
 	func_description = 'while(true) do\\n%send',
 	ToNPL = function(self)
-		return string.format('while(true) do\n%send\n', self:getFieldAsString('input'));
+		return string.format('while(true) do\n    %s\nend\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 while(true) do
@@ -103,21 +145,57 @@ while(true) do
 end
 ]]}},
 },
-
 {
-	type = "if_else", 
-	message0 = L"如果%1那么%2否则%3",
+	type = "control_if", 
+	message0 = L"如果%1那么",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "expression",
 			type = "input_value",
-			text = "", 
 		},
+    },
+    arg1 = {
 		{
 			name = "input_true",
 			type = "input_statement",
 			text = "", 
 		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'if(%s) then\\n%send',
+	ToNPL = function(self)
+		return string.format('if(%s) then\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+
+]]}},
+},
+
+{
+	type = "if_else", 
+	message0 = L"如果%1那么",
+	message1 = L"%1",
+	message2 = L"否则",
+	message3 = L"%1",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+		},
+    },
+    arg1 = {
+		{
+			name = "input_true",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+    arg3 = {
 		{
 			name = "input_else",
 			type = "input_statement",
@@ -131,7 +209,7 @@ end
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%selse\\n%send',
 	ToNPL = function(self)
-		return string.format('if(%s) then\n%selse\n%send\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
+		return string.format('if(%s) then\n    %s\nelse\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 while(true) do
@@ -148,7 +226,8 @@ end
 
 {
 	type = "forKeyValue", 
-	message0 = L"每个%1,%2在%3%4",
+	message0 = L"每个%1,%2在%3",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "key",
@@ -165,12 +244,15 @@ end
 			type = "field_input",
 			text = "data", 
 		},
-		{
+		
+	},
+    arg1 = {
+    {
 			name = "input",
 			type = "input_statement",
 			text = "", 
 		},
-	},
+    },
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
@@ -178,7 +260,7 @@ end
 	nextStatement = true,
 	func_description = 'for %s, %s in pairs(%s) do\\n%send',
 	ToNPL = function(self)
-		return string.format('for %s, %s in pairs(%s) do\n%send\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
+		return string.format('for %s, %s in pairs(%s) do\n    %s\nend\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 myData = {
@@ -194,7 +276,8 @@ end
 
 {
 	type = "forIndexValue", 
-	message0 = L"每个%1,%2在数组%3%4",
+	message0 = L"每个%1,%2在数组%3",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "i",
@@ -211,12 +294,15 @@ end
 			type = "field_input",
 			text = "data", 
 		},
-		{
+		
+	},
+    arg1 = {
+        {
 			name = "input",
 			type = "input_statement",
 			text = "", 
 		},
-	},
+    },
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
@@ -224,7 +310,7 @@ end
 	nextStatement = true,
 	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
 	ToNPL = function(self)
-		return string.format('for %s, %s in ipairs(%s) do\n%send\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
+		return string.format('for %s, %s in ipairs(%s) do\n    %s\nend\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 myData = {
@@ -240,8 +326,9 @@ end
 
 {
 	type = "run", 
-	message0 = L"并行执行%1",
-	arg0 = {
+	message0 = L"并行执行",
+	message1 = L"%1",
+	arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
@@ -256,7 +343,7 @@ end
 	nextStatement = true,
 	func_description = 'run(function()\\n%send)',
 	ToNPL = function(self)
-		return string.format('run(function()\n%send)\n', self:getFieldAsString('input'));
+		return string.format('run(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 run(function()
@@ -327,8 +414,10 @@ end)
 	arg0 = {
 		{
 			name = "name",
-			type = "field_input",
+			type = "field_variable",
 			text = "@p", 
+			variable = "@p",
+			variableTypes = {"actorNames"},
 		},
 	},
 	category = "Control", 

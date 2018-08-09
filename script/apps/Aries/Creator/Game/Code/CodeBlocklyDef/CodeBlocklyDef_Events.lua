@@ -14,8 +14,9 @@ local cmds = {
 -- Events
 {
 	type = "registerClickEvent", 
-	message0 = L"当演员被点击时%1",
-	arg0 = {
+	message0 = L"当演员被点击时",
+	message1 = L"%1",
+	arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
@@ -29,7 +30,7 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'registerClickEvent(function()\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerClickEvent(function()\n%send)\n', self:getFieldAsString('input'));
+		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 registerClickEvent(function()
@@ -45,7 +46,8 @@ end)
 
 {
 	type = "registerKeyPressedEvent", 
-	message0 = L"当%1键按下时%2",
+	message0 = L"当%1键按下时",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "keyname",
@@ -63,12 +65,15 @@ end)
 				{"num0","numpad0"},{"num1","numpad1"},{"num2","numpad2"},{"num3","numpad3"},{"num4","numpad4"},{"num5","numpad5"},{"num6","numpad6"},{"num7","numpad7"},{"num8","numpad8"},{"num9","numpad9"},
 			},
 		},
-		{
+		
+	},
+    arg1 = {
+        {
 			name = "input",
 			type = "input_statement",
 			text = "",
 		},
-	},
+    },
 	category = "Events", 
 	helpUrl = "", 
 	canRun = false,
@@ -76,7 +81,7 @@ end)
 	nextStatement = true,
 	func_description = 'registerKeyPressedEvent("%s", function()\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerKeyPressedEvent("%s", function()\n%send)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
+		return string.format('registerKeyPressedEvent("%s", function()\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"空格跳跃", canRun = true, code = [[
 registerKeyPressedEvent("space",function()
@@ -90,19 +95,23 @@ end)
 
 {
 	type = "registerAnimationEvent", 
-	message0 = L"当动画在%1帧时%2",
+	message0 = L"当动画在%1帧时",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "time",
 			type = "field_number",
 			text = 1000, 
 		},
-		{
+		
+	},
+    arg1 = {
+        {
 			name = "input",
 			type = "input_statement",
 			text = "",
 		},
-	},
+    },
 	category = "Events", 
 	helpUrl = "", 
 	canRun = false,
@@ -110,7 +119,7 @@ end)
 	nextStatement = true,
 	func_description = 'registerAnimationEvent(%d, function()\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerAnimationEvent(%d, function()\n%send)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
+		return string.format('registerAnimationEvent(%d, function()\n    %s\nend)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 registerAnimationEvent(10, function()
@@ -128,19 +137,24 @@ say("click me!")
 
 {
 	type = "registerBroadcastEvent", 
-	message0 = L"当收到%1消息时%2",
+	message0 = L"当收到%1消息时",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_input",
-			text = "message0", 
+			type = "field_variable",
+			variableTypes = {"broadcast_msg"}, 
+			variable = "msg1",
 		},
-		{
+		
+	},
+    arg1 = {
+        {
 			name = "input",
 			type = "input_statement",
 			text = "",
 		},
-	},
+    },
 	category = "Events", 
 	color="#00cc00",
 	helpUrl = "", 
@@ -149,7 +163,7 @@ say("click me!")
 	nextStatement = true,
 	func_description = 'registerBroadcastEvent("%s", function(fromName)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerBroadcastEvent("%s", function(fromName)\n%send)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
+		return string.format('registerBroadcastEvent("%s", function(fromName)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 registerBroadcastEvent("jump", function(fromName)
@@ -171,8 +185,9 @@ say("click to jump!")
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_input",
-			text = "message0", 
+			type = "field_variable",
+			variableTypes = {"broadcast_msg"}, 
+			variable = "msg1",
 		},
 	},
 	category = "Events", 
@@ -205,8 +220,9 @@ end
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_input",
-			text = "message0", 
+			type = "field_variable",
+			variableTypes = {"broadcast_msg"}, 
+			variable = "msg1",
 		},
 	},
 	category = "Events", 

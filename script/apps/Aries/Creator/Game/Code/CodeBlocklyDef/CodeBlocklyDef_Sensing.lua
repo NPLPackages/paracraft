@@ -158,19 +158,23 @@ cmd("/hide boundingbox")
 
 {
 	type = "registerCollisionEvent", 
-	message0 = L"当碰到%1时%2",
+	message0 = L"当碰到%1时",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "name",
 			type = "field_input",
 			text = "name",
 		},
-		{
+		
+	},
+    arg1 = {
+        {
 			name = "input",
 			type = "input_statement",
 			text = "",
 		},
-	},
+    },
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,

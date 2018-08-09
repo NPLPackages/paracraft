@@ -157,24 +157,28 @@ end
 function ItemBlockModel:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
-		local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
-		if(selected_blocks and itemStack) then
-			-- Save template:
-			local last_filename = itemStack:GetDataField("tooltip");
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-			local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-			OpenFileDialog.ShowPage(L"将当前选择的方块保存为bmax文件. 请输入文件名:<br/> 例如: test", function(result)
-				if(result and result~="") then
-					local filename = result;
-					local bSucceed, filename = GameLogic.RunCommand("/savemodel "..filename);
-					if(filename) then
-						self:SetModelFileName(itemStack, filename);
-					end
+		self:SelectModelFile(itemStack);
+	end
+end
+
+function ItemBlockModel:SelectModelFile(itemStack)
+	local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
+	if(selected_blocks and itemStack) then
+		-- Save template:
+		local last_filename = itemStack:GetDataField("tooltip");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+		OpenFileDialog.ShowPage(L"将当前选择的方块保存为bmax文件. 请输入文件名:<br/> 例如: test", function(result)
+			if(result and result~="") then
+				local filename = result;
+				local bSucceed, filename = GameLogic.RunCommand("/savemodel "..filename);
+				if(filename) then
+					self:SetModelFileName(itemStack, filename);
 				end
-			end, last_filename, L"选择模型文件", "model");
-		else
-			self:OpenChangeFileDialog(itemStack);
-		end
+			end
+		end, last_filename, L"选择模型文件", "model");
+	else
+		self:OpenChangeFileDialog(itemStack);
 	end
 end
 

@@ -23,11 +23,22 @@
     end
     
     function GetNPLCode()
-        return item and item:GetNPLCode();
+        local code = item and item:GetNPLCode();
+        if(code) then
+            code = code:gsub("\r?\n%s*\r?\n", "\n")
+        end
+        return code;
     end
 
     function GetNPLCodeLineCount()
-        return item and item:GetNPLCodeLineCount();
+        local nLineCount = 0;
+        local code = GetNPLCode();
+        if(code) then
+		    for _ in string.gfind(code, "[^\n]+") do
+			    nLineCount = nLineCount + 1;
+		    end
+        end
+        return nLineCount;
     end
 
     function OnClickRun()

@@ -47,7 +47,7 @@ end
 },
 {
 	type = "turn", 
-	message0 = L"旋转%1度",
+	message0 = L"旋转%1度", 
 	arg0 = {
 		{
 			name = "degree",

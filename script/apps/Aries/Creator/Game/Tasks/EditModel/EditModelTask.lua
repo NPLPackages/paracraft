@@ -226,3 +226,53 @@ function EditModelTask:GetModelFileInHand()
 		return self.itemInHand:GetDataField("tooltip");
 	end
 end
+
+function EditModelTask.OnClickChangeModelFile()
+	local self = EditModelTask.GetInstance();
+	if(self and self.itemInHand) then
+		local item = self.itemInHand:GetItem();
+		if(item and item.SelectModelFile) then
+			item:SelectModelFile(self.itemInHand);
+		end
+	end
+end
+
+function EditModelTask:UpdateValueToPage()
+	self:RefreshPage()
+end
+
+function EditModelTask:GetFacingDegree()
+	local facing = 0;
+	local modelEntity = self:GetSelectedModel()
+	if(modelEntity) then
+		facing = modelEntity:GetFacing();
+	end
+	return math.floor(mathlib.WrapAngleTo180(facing/math.pi*180)+0.5);
+end
+
+function EditModelTask:SetFacingDegree(degree)
+	local modelEntity = self:GetSelectedModel()
+	if(modelEntity and degree) then
+		modelEntity:SetFacing(mathlib.ToStandardAngle(degree/180*math.pi));
+	end
+end
+
+function EditModelTask.OnFacingDegreeChanged(text)
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		self:SetFacingDegree(tonumber(text));
+	end
+end
+
+function EditModelTask.OnScalingChanged(text)
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and text) then
+			local scaling = tonumber(text);
+			if(scaling and scaling >= 0.1 and scaling<=10) then
+				modelEntity:SetScaling(scaling);
+			end
+		end
+	end
+end

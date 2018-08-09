@@ -76,7 +76,9 @@ end
 function CodeBlocklySerializer.GetCategoryStr(category)
 	local all_cmds = CodeHelpData.GetAllCmds();
 	if(not category or not all_cmds)then return end
-	local s = string.format("<category name='%s' colour='%s'>\n",category.text or category.name,category.colour or "#000000");
+    local name = category.text or category.name;
+    local colour = category.colour or "#000000";
+	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' >\n",name,name,colour,colour);
 	local cmd
 	for __,cmd in ipairs(all_cmds) do
 		if(category.name == cmd.category)then
@@ -143,6 +145,7 @@ function CodeBlocklySerializer.WriteToBlocklyCode(filename)
 		file:close();
 	end
 end
+-- translate a cmd to a full block function
 function CodeBlocklySerializer.GetBlockExecutionStr(cmd)
 	local type = cmd.type;
 	local body = CodeBlocklySerializer.ArgsToStr(cmd);
@@ -153,28 +156,37 @@ Blockly.Lua['%s'] = function (block) {
 	return s;
 end
 
+-- translate a cmd to a return value of block function
 function CodeBlocklySerializer.ArgsToStr(cmd)
 	local type = cmd.type
-	local arg0 = cmd.arg0
 	local var_lines = "";
 	local arg_lines = "";
 	local k,v;
 	local prefix = type;
 	prefix = string.gsub(prefix,"%.","_")
-	for k,v in ipairs(arg0) do
-		local _type = v.type;
-		if(_type and _type ~= "input_dummy")then
-			local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
-			local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
-			if(k == 1)then
-				var_lines = var_str;
-				arg_lines = arg_str;
-			else
-				var_lines = var_lines .. "\n" .. var_str;
-				arg_lines = arg_lines .. "," .. arg_str;
-			end
-		end
-	end
+
+
+    -- read 10 args 
+    for k = 0,9 do
+        local input_arg = cmd["arg".. k];
+        if(input_arg)then
+            for k,v in ipairs(input_arg) do
+		        local _type = v.type;
+		        if(_type and _type ~= "input_dummy")then
+			        local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
+			        local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
+			        if(var_lines == "")then
+				        var_lines = var_str;
+				        arg_lines = arg_str;
+			        else
+				        var_lines = var_lines .. "\n" .. var_str;
+				        arg_lines = arg_lines .. "," .. arg_str;
+			        end
+		        end
+	        end
+        end
+	    
+    end
 	local func_description = cmd.func_description;
 	local s;
 	
@@ -192,19 +204,7 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 	end
 	return s;
 end
---[[
-supported filed:
-	field_input
-	field_number
-	field_variable
-
-	todo:
-		field_dropdown
-
-supported input:
-	input_statement
-	input_value
---]]
+-- translate a child item of arg[0-9] to a javascript execution
 function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	local type = arg.type
 	local name = arg.name
@@ -221,6 +221,7 @@ function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	end
 	return s;
 end
+-- create a unique name of variable
 function CodeBlocklySerializer.Create_VariableName(prefix,arg)
 	local type = arg.type
 	local name = arg.name

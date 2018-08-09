@@ -209,10 +209,17 @@ function CreatorDesktop.StaticInit()
 	BuilderFramePage.OneTimeInit(1);
 end
 
+function CreatorDesktop.IsVisible()
+	if(CreatorDesktop.new_page and CreatorDesktop.new_page:IsVisible()) then
+		return true;
+	end
+end
+
 -- @param IsExpanded: nil to toggle. true or false to show expanded or not. false by default. 
 function CreatorDesktop.ShowNewPage(IsExpanded)
 	if(IsExpanded == nil) then
-		if(CreatorDesktop.new_page and CreatorDesktop.new_page:IsVisible()) then
+		local isVisible = CreatorDesktop.IsVisible()
+		if(isVisible) then
 			IsExpanded = not CreatorDesktop.IsExpanded;
 			if(IsExpanded) then
 				-- do a full collection here
@@ -235,6 +242,10 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 		end	
 	end
 	CreatorDesktop.IsExpanded = IsExpanded;
+
+	if(CreatorDesktop.IsExpanded) then
+		GameLogic:desktopLayoutRequested("CreatorDesktop");
+	end
 
 	CreatorDesktop.new_page_params = CreatorDesktop.new_page_params  or {
 			url = "script/apps/Aries/Creator/Game/Areas/NewDesktopPage.html", 
@@ -260,10 +271,22 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	CreatorDesktop.new_page_params.bShow = IsExpanded;
 	System.App.Commands.Call("File.MCMLWindowFrame", CreatorDesktop.new_page_params);
 
+	if(IsExpanded) then
+		GameLogic:Connect("desktopLayoutRequested", CreatorDesktop, CreatorDesktop.OnLayoutRequested, "UniqueConnection");
+	end
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
 	local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
 	CreatorDesktop.new_page_params._page.OnClose = function()
 		DesktopMenuPage.ActivateMenu(false);
 	end;
 	DesktopMenuPage.ActivateMenu(IsExpanded);
+end
+
+function CreatorDesktop:OnLayoutRequested(requesterName)
+	if(requesterName ~= "CreatorDesktop") then
+		if(CreatorDesktop.IsExpanded) then
+			CreatorDesktop.ShowNewPage(false);
+		end
+	end
 end

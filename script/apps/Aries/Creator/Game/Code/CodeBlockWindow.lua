@@ -30,6 +30,8 @@ function CodeBlockWindow.Show(bShow)
 	if(not bShow) then
 		CodeBlockWindow.Close();
 	else
+		GameLogic:desktopLayoutRequested("CodeBlockWindow");
+	
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
 			self.width, self.height, self.margin_right, self.bottom = self:CalculateMargins();

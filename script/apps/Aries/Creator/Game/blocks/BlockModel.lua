@@ -39,4 +39,24 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 	return 0;
 end
 
+function block:RotateBlockEnityData(entityData, angle, axis)
+	if(not axis or axis == "y") then
+		if(entityData and entityData.attr) then
+			local lastFacing = entityData.attr.facing or 0;
+			if(lastFacing) then
+				facing = lastFacing + angle;
+				if(facing < 0) then
+					facing = facing + 6.28;
+				end
+				facing = (math.floor(facing/1.57+0.5) % 4) * 1.57;
 
+				entityData = commonlib.copy(entityData);
+				entityData.attr.facing = facing;
+			end
+		end
+	else
+		-- TODO: other axis
+	end
+	
+	return entityData;
+end

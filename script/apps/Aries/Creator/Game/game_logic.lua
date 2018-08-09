@@ -106,6 +106,8 @@ GameLogic:Signal("texturePackChanged", function() end);
 -- whenever a file in the current directory changed. 
 GameLogic:Signal("worldFileChanged");
 GameLogic:Signal("frameMoved");
+-- when some UI wants to change the desktop layout significantly. 
+GameLogic:Signal("desktopLayoutRequested", function(requesterName) end);
 
 -- current game mode. 
 GameLogic.mode = "editor";

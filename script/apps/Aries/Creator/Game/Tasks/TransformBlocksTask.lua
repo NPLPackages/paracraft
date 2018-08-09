@@ -323,10 +323,16 @@ function TransformBlocks:RotateBlocksWithFillingGap(blocks, final_blocks, rot_an
 			if(count >= 4 and b) then
 				local blockTemplate = block_types.get(b[4]);
 				local blockData = b[5];
-				if(blockTemplate and blockData) then
-					blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+				local entityData = b[6];
+				if(blockTemplate) then
+					if(blockData) then
+						blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+					end
+					if(entityData) then
+						entityData = blockTemplate:RotateBlockEnityData(entityData, -rot_angle, axis);
+					end
 				end
-				final_blocks[#final_blocks+1] = {x0+cx, y0+cy, z0+cz, b[4], blockData, b[6],}
+				final_blocks[#final_blocks+1] = {x0+cx, y0+cy, z0+cz, b[4], blockData, entityData,}
 			end
 		end
 	end
@@ -342,8 +348,14 @@ function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle,
 		local b = blocks[i];
 		local blockTemplate = block_types.get(b[4]);
 		local blockData = b[5];
-		if(blockTemplate and blockData) then
-			blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+		local entityData = b[6];
+		if(blockTemplate) then
+			if(blockData) then
+				blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
+			end
+			if(entityData) then
+				entityData = blockTemplate:RotateBlockEnityData(entityData, -rot_angle, axis);
+			end
 		end
 		if(axis== "x") then
 			local x, y = b[2] - cy, b[3] - cz;
@@ -353,7 +365,7 @@ function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle,
 				x*sin_t + y*cos_t + cz,
 				b[4],
 				blockData,
-				b[6],
+				entityData,
 			};
 		elseif(axis== "z") then
 			local x, y = b[1] - cx, b[2] - cy;
@@ -363,7 +375,7 @@ function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle,
 				b[3],
 				b[4],
 				blockData,
-				b[6],
+				entityData,
 			};
 		else -- if(axis== "y") then
 			local x, y = b[1] - cx, b[3] - cz;
@@ -373,7 +385,7 @@ function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle,
 				x*sin_t + y*cos_t + cz,
 				b[4],
 				blockData,
-				b[6],
+				entityData,
 			};
 		end
 	end

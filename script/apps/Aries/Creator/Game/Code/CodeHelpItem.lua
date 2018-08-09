@@ -39,12 +39,19 @@ function CodeHelpItem:ctor()
 end
 
 function CodeHelpItem:Init()
-	if(self.arg0) then
-		local all_fields = self.all_fields;
-		for argIndex, arg in ipairs(self.arg0) do
-			all_fields[arg.name] = arg;
-			arg.argIndex = argIndex;
+	local lineNumber = 0;
+	local message = self["message"..lineNumber];
+	while(message) do
+		local arguments = self["arg"..lineNumber];
+		if(arguments) then
+			local all_fields = self.all_fields;
+			for argIndex, arg in ipairs(arguments) do
+				all_fields[arg.name] = arg;
+				arg.argIndex = argIndex;
+			end
 		end
+		lineNumber = lineNumber + 1;
+		message = self["message"..lineNumber];
 	end
 	return self;
 end
@@ -60,16 +67,19 @@ function CodeHelpItem:GetHtml()
 	if(self.html) then
 		return self.html;
 	end
-	local html = "";
-	if(self.message0) then
-		html = self.message0;
+	local lineNumber = 0;
+	local message = self["message"..lineNumber];
+	local lines = "";
+	while(message) do
+		local line = message;
 		
 		local bContinue = true;
 		while(bContinue) do
 			bContinue = false;
-			local arg_index = string.match(html, "^[^%%]*%%(%d)");
+			local arg_index = string.match(line, "^[^%%]*%%(%d)");
 			if(arg_index) then
-				local arg_item = self.arg0[tonumber(arg_index)];
+				local arguments = self["arg"..lineNumber];
+				local arg_item = arguments[tonumber(arg_index)];
 				if(arg_item) then
 					local item_text = arg_item.text;
 					if(type(item_text) == "function") then
@@ -85,32 +95,37 @@ function CodeHelpItem:GetHtml()
 							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
 						end
 					elseif(arg_item.type == "field_variable") then
-						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', arg_item.variable or item_text or "");
 					elseif(arg_item.type == "field_dropdown") then
 						arg_item.selectedIndex = arg_item.selectedIndex or 1;
 						item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
 						arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
 						arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
 					elseif(arg_item.type == "field_number") then
-						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text) or "");
+						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text or 0));
 					elseif(arg_item.type == "input_statement") then
-						arg_text = format('<div style="margin:5px;background-color:#cec8a8;width:80px;height:10px;padding-left:5px;">%s</div>', tostring(item_text) or "");
+						arg_text = format('<div style="margin:5px;background-color:#cec8a8;width:80px;height:10px;padding-left:5px;">%s</div>', tostring(item_text or ""));
 					elseif(arg_item.type == "input_expression"  or arg_item.type == "expression") then
-						arg_text = format('<div style="float:left;min-width:25px;height:14px;margin:3px;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text) or "");
+						arg_text = format('<div style="float:left;min-width:25px;height:14px;margin:3px;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text or ""));
 					elseif(arg_item.type == "input_dummy") then
 						arg_text = "";
 					else
 						arg_text = format('<span style="font-weight:bold">arg%d<span>', arg_index);
 					end
-					html = string.gsub(html, "^([^%%]*)(%%%d)", "%1"..arg_text);
+					line = string.gsub(line, "^([^%%]*)(%%%d)", "%1"..arg_text);
 					bContinue = true;
 				end
 			end
 		end
-	else
-		html = self.type;
+		lines = lines..line;
+		lineNumber = lineNumber + 1;
+		message = self["message"..lineNumber];
 	end
-	self.html = html;
+	if(lines == "") then
+		lines = self.type;
+	end
+
+	self.html = lines;
 	return self.html;
 end
 
@@ -133,7 +148,7 @@ function CodeHelpItem:getFieldValue(name)
 end
 
 function CodeHelpItem:getFieldAsString(name)
-	return tostring(self:getFieldValue(name));
+	return tostring(self:getFieldValue(name) or "");
 end
 
 -- @return "" if no code is generated
@@ -143,7 +158,7 @@ function CodeHelpItem:GetNPLCode()
 	end
 	local npl_code = ""
 	if(self.ToNPL) then
-		npl_code = self:ToNPL() or "";
+		npl_code = (self:ToNPL() or "");
 	end
 	self.npl_code = npl_code;
 	return npl_code;

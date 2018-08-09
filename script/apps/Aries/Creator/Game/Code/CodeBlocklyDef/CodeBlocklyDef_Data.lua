@@ -162,8 +162,9 @@ hideVariable("score")
 },
 {
 	type = "registerCloneEvent", 
-	message0 = L"当角色被复制时%1",
-	arg0 = {
+	message0 = L"当角色被复制时",
+	message1 = L"%1",
+	arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
@@ -177,7 +178,7 @@ hideVariable("score")
 	nextStatement = true,
 	func_description = 'registerCloneEvent(function()\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerCloneEvent(function()\n%send)\n', self:getFieldAsString('input'));
+		return string.format('registerCloneEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 registerCloneEvent(function(msg)
@@ -197,11 +198,13 @@ clone("myself", 3)
 	arg0 = {
 		{
 			name = "input",
-			type = "field_dropdown",
+			type = "field_variable",
 			options = {
 				{ L"此角色", "myself" },
 				{ L"某个角色", "" },
 			},
+			variable = "myself",
+			variableTypes = {"actorNames"},
 		},
 	},
 	category = "Data", color="#cc0000",
