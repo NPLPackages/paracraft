@@ -31,7 +31,7 @@ local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWin
 local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
 
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-
+local arg_len = 9; -- assumed total number of arg, start index from 0
 function CodeBlocklySerializer.WriteKeywordsToJson(filename)
 	local s = CodeBlocklySerializer.GetKeywords();
 	local file = ParaIO.open(filename, "w");
@@ -82,11 +82,52 @@ function CodeBlocklySerializer.GetCategoryStr(category)
 	local cmd
 	for __,cmd in ipairs(all_cmds) do
 		if(category.name == cmd.category)then
-			s = string.format("%s<block type='%s'></block>\n",s,cmd.type);
+            local shadow = CodeBlocklySerializer.GetShadowStr(cmd);
+			s = string.format("%s<block type='%s'>%s</block>\n",s,cmd.type,shadow);
 		end
 	end
 	s = string.format("%s</category>",s);
 	return s;
+end
+-- check shadow table in arg0 -- arg9 from cmd
+-- see definition here https://github.com/LLK/scratch-blocks/tree/develop/blocks_common
+function CodeBlocklySerializer.GetShadowStr(cmd)
+    if(not cmd)then
+        return "";
+    end
+    local shadow_configs = {
+        ["math_number"] = "NUM",
+        ["math_integer"] = "NUM",
+        ["math_whole_number"] = "NUM",
+        ["math_positive_number"] = "NUM",
+        ["math_angle"] = "NUM",
+        ["colour_picker"] = "COLOUR",
+        ["matrix"] = "MATRIX",
+        ["text"] = "TEXT",
+    }
+    local result = "";
+    for k = 0,arg_len do
+        local input_arg = cmd["arg".. k];
+        if(input_arg)then
+            for k,v in ipairs(input_arg) do
+                local shadow = v.shadow;
+                if(shadow and shadow.type)then
+                    local shadow_type = shadow.type;
+                    local value = shadow.value or "";
+                    local field_type = shadow_configs[shadow_type];
+                    if(field_type)then
+                        local s = string.format("<value name='%s'><shadow type='%s'><field name='%s'>%s</field></shadow></value>",v.name,shadow_type,field_type,value);
+                        if(result == "")then
+                            result = s;
+                        else
+                            result = result .. s;
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return result;
 end
 function CodeBlocklySerializer.GetBlocklyConfig()
 	local all_cmds = CodeHelpData.GetAllCmds();
@@ -167,7 +208,7 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 
 
     -- read 10 args 
-    for k = 0,9 do
+    for k = 0,arg_len do
         local input_arg = cmd["arg".. k];
         if(input_arg)then
             for k,v in ipairs(input_arg) do

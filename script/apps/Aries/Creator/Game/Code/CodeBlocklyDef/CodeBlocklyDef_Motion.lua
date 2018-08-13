@@ -20,13 +20,15 @@ local cmds = {
 	arg0 = {
 		{
 			name = "dist",
-			type = "field_number",
-			text = 1, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+            text = 1, 
 		},
 		{
 			name = "duration",
-			type = "field_number",
-			text = 0.5, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.5,},
+            text = 0.5, 
 		},
 	},
 	category = "Motion", 
@@ -51,8 +53,9 @@ end
 	arg0 = {
 		{
 			name = "degree",
-			type = "field_number",
-			text = 15, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 15,},
+            text = 15, 
 		},
 	},
 	category = "Motion", 
@@ -77,8 +80,9 @@ end
 	arg0 = {
 		{
 			name = "degree",
-			type = "field_number",
-			text = 90, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 90,},
+            text = 90, 
 		},
 	},
 	category = "Motion", 
@@ -135,23 +139,27 @@ moveForward(1, 1)
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
-			text = 1, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+            text = 1, 
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
 		{
 			name = "z",
-			type = "field_number",
-			text = 0, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+            text = 0, 
 		},
 		{
 			name = "duration",
-			type = "field_number",
-			text = 0.5, 
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.5,},
+            text = 0.5, 
 		},
 	},
 	category = "Motion", 
@@ -176,7 +184,8 @@ say("jump!", 1)
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return x;
@@ -184,7 +193,8 @@ say("jump!", 1)
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return y;
@@ -192,7 +202,8 @@ say("jump!", 1)
 		},
 		{
 			name = "z",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return z;
@@ -254,22 +265,26 @@ moveTo("frog")
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = 0,
 		},
 		{
 			name = "z",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
 		{
 			name = "duration",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.5,},
 			text = 0.5, 
 		},
 	},
@@ -295,12 +310,14 @@ walk(-1,0,-1) -- x,y,z
 	arg0 = {
 		{
 			name = "dist",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 		{
 			name = "duration",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.5,},
 			text = 0.5, 
 		},
 	},
@@ -327,7 +344,8 @@ walkForward(1, 0.5)
 	arg0 = {
 		{
 			name = "cmd_text",
-			type = "field_input",
+            type = "input_value",
+            shadow = { type = "text", value = "~ 5 ~",},
 			text = "~ 5 ~", 
 		},
 	},
@@ -336,7 +354,7 @@ walkForward(1, 0.5)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'velocity("%s")',
+	func_description = 'velocity(%s)',
 	ToNPL = function(self)
 		return string.format('velocity("%s")\n', self:getFieldAsString('cmd_text'));
 	end,
@@ -453,7 +471,8 @@ setPos(x, y+0.5, z)
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return x;
@@ -461,7 +480,8 @@ setPos(x, y+0.5, z)
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return y;
@@ -469,7 +489,8 @@ setPos(x, y+0.5, z)
 		},
 		{
 			name = "z",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return z;

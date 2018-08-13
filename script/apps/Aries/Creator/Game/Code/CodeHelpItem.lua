@@ -95,7 +95,14 @@ function CodeHelpItem:GetHtml()
 							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
 						end
 					elseif(arg_item.type == "field_variable") then
-						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', arg_item.variable or item_text or "");
+						if(arg_item.options) then
+							arg_item.selectedIndex = arg_item.selectedIndex or 1;
+							item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
+							arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
+							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
+						else
+							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', arg_item.variable or item_text or "");	
+						end
 					elseif(arg_item.type == "field_dropdown") then
 						arg_item.selectedIndex = arg_item.selectedIndex or 1;
 						item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);

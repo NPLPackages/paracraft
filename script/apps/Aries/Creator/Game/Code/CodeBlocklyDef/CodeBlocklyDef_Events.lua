@@ -100,7 +100,8 @@ end)
 	arg0 = {
 		{
 			name = "time",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1000,},
 			text = 1000, 
 		},
 		
@@ -254,7 +255,8 @@ end
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "/tip hello",},
 			text = "/tip hello", 
 		},
 	},
@@ -264,7 +266,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'cmd("%s")',
+	func_description = 'cmd(%s)',
 	ToNPL = function(self)
 		return string.format('cmd("%s")\n', self:getFieldAsString('msg'));
 	end,

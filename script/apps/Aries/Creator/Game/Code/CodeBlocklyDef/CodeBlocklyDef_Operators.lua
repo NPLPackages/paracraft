@@ -86,6 +86,7 @@ local cmds = {
 		{
 			name = "left",
 			type = "input_value",
+            shadow = { type = "math_number", },
 		},
 		{
 			name = "dummy",
@@ -94,6 +95,7 @@ local cmds = {
 		{
 			name = "right",
 			type = "input_value",
+            shadow = { type = "math_number", },
 		},
 	},
 	output = {type = "field_number",},
@@ -117,12 +119,14 @@ say(1+1)
 	arg0 = {
 		{
 			name = "from",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = "1",
 		},
 		{
 			name = "to",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = "10",
 		},
 	},
@@ -300,12 +304,14 @@ end
 	arg0 = {
 		{
 			name = "left",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "hello",},
 			text = "hello",
 		},
 		{
 			name = "right",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "world",},
 			text = "world",
 		},
 	},
@@ -313,7 +319,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '("%s".."%s")',
+	func_description = '(%s..%s)',
 	ToNPL = function(self)
 		return string.format('("%s".."%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -328,7 +334,8 @@ say("hello ".."world".."!!!")
 	arg0 = {
 		{
 			name = "left",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "hello",},
 			text = "hello",
 		},
 	},
@@ -336,7 +343,7 @@ say("hello ".."world".."!!!")
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '(#"%s")',
+	func_description = '(#%s)',
 	ToNPL = function(self)
 		return string.format('(#"%s")', self:getFieldAsString('left'));
 	end,
@@ -351,12 +358,14 @@ say("length of hello is "..(#"hello"));
 	arg0 = {
 		{
 			name = "left",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 66,},
 			text = "66",
 		},
 		{
 			name = "right",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = "10",
 		},
 	},
@@ -379,7 +388,8 @@ say("66%10=="..(66%10))
 	arg0 = {
 		{
 			name = "left",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 5.5,},
 			text = 5.5,
 		},
 	},
@@ -426,7 +436,8 @@ end
 		},
 		{
 			name = "left",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 9,},
 			text = 9,
 		},
 	},

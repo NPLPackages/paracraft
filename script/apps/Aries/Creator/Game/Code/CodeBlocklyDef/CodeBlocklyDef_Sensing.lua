@@ -58,7 +58,8 @@ end
 	arg0 = {
 		{
 			name = "name",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "frog",},
 			text = "frog",
 		},
 	},
@@ -67,7 +68,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'setActorValue("name", "%s")',
+	func_description = 'setActorValue("name", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("name", "%s")\n', self:getFieldAsString('name'));
 	end,
@@ -92,7 +93,8 @@ say("click us!")
 	arg0 = {
 		{
 			name = "radius",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.25,},
 			text = 0.25,
 		},
 	},
@@ -127,7 +129,8 @@ cmd("/hide boundingbox")
 	arg0 = {
 		{
 			name = "height",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = 1,
 		},
 	},
@@ -253,7 +256,8 @@ end
 	arg0 = {
 		{
 			name = "input",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = L"你叫什么名字?",},
 			text = L"你叫什么名字?",
 		},
 	},
@@ -425,7 +429,8 @@ end
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return x;
@@ -433,7 +438,8 @@ end
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return y;
@@ -441,7 +447,8 @@ end
 		},
 		{
 			name = "z",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return z;
@@ -469,7 +476,8 @@ say("block below is "..id, 2)
 	arg0 = {
 		{
 			name = "x",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return x;
@@ -477,7 +485,8 @@ say("block below is "..id, 2)
 		},
 		{
 			name = "y",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return y;
@@ -485,7 +494,8 @@ say("block below is "..id, 2)
 		},
 		{
 			name = "z",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
 			text = function()
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos();
 				return z;
@@ -493,7 +503,8 @@ say("block below is "..id, 2)
 		},
 		{
 			name = "blockId",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 62,},
 			text = "62", 
 		},
 	},

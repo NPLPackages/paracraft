@@ -18,7 +18,8 @@ local cmds = {
 	arg0 = {
 		{
 			name = "time",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 	},
@@ -54,7 +55,8 @@ end
 	arg0 = {
 		{
 			name = "times",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = 10, 
 		},
 	},

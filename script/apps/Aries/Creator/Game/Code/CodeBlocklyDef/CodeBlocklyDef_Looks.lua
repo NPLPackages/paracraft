@@ -18,12 +18,14 @@ local cmds = {
 	arg0 = {
 		{
 			name = "text",
-			type = "field_input",
+            type = "input_value",
+            shadow = { type = "text", value = L"hello!",},
 			text = L"hello!", 
 		},
 		{
 			name = "duration",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
 			text = 2, 
 		},
 	},
@@ -32,7 +34,7 @@ local cmds = {
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'say("%s", %s)',
+	func_description = 'say(%s, %s)',
 	ToNPL = function(self)
 		return string.format('say("%s", %s)\n', self:getFieldValue('text'), self:getFieldAsString('duration'));
 	end,
@@ -47,7 +49,8 @@ move(0,1,0)
 	arg0 = {
 		{
 			name = "text",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = L"hello!",},
 			text = L"hello!", 
 		},
 	},
@@ -56,7 +59,7 @@ move(0,1,0)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'say("%s")',
+	func_description = 'say(%s)',
 	ToNPL = function(self)
 		return string.format('say("%s")\n', self:getFieldValue('text'));
 	end,
@@ -72,7 +75,8 @@ say("")
 	arg0 = {
 		{
 			name = "text",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = L"Start Game!",},
 			text = L"Start Game!", 
 		},
 	},
@@ -81,7 +85,7 @@ say("")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'tip("%s")',
+	func_description = 'tip(%s)',
 	ToNPL = function(self)
 		return string.format('tip("%s")\n', self:getFieldValue('text'));
 	end,
@@ -131,7 +135,8 @@ tip("")
 	arg0 = {
 		{
 			name = "animId",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 4,},
 			text = 4, 
 		},
 	},
@@ -163,12 +168,14 @@ anim(0)
 	arg0 = {
 		{
 			name = "timeFrom",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = 10, 
 		},
 		{
 			name = "timeTo",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1000,},
 			text = 1000, 
 		},
 	},
@@ -192,12 +199,14 @@ say("No looping", 1)
 	arg0 = {
 		{
 			name = "timeFrom",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = 10, 
 		},
 		{
 			name = "timeTo",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1000,},
 			text = 1000, 
 		},
 	},
@@ -222,7 +231,8 @@ stop()
 	arg0 = {
 		{
 			name = "speed",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 	},
@@ -273,7 +283,8 @@ stop()
 	arg0 = {
 		{
 			name = "scaleDelta",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
 			text = 10, 
 		},
 	},
@@ -298,7 +309,8 @@ scale(-50)
 	arg0 = {
 		{
 			name = "scale",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 100,},
 			text = 100, 
 		},
 	},
@@ -359,17 +371,20 @@ focus("player")
 	arg0 = {
 		{
 			name = "dist",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 12,},
 			text = 12, 
 		},
 		{
 			name = "pitch",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 45,},
 			text = 45, 
 		},
 		{
 			name = "facing",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 90,},
 			text = 90, 
 		},
 	},

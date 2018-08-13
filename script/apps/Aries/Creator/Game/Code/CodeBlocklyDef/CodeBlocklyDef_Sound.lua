@@ -25,7 +25,8 @@ local cmds = {
 		},
 		{
 			name = "beat",
-			type = "field_number",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.25,},
 			text = 0.25,
 		},
 	},

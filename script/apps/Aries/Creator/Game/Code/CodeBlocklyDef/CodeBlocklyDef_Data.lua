@@ -204,7 +204,6 @@ clone("myself", 3)
 				{ L"某个角色", "" },
 			},
 			variable = "myself",
-			variableTypes = {"actorNames"},
 		},
 	},
 	category = "Data", color="#cc0000",
@@ -273,7 +272,8 @@ end
 		},
 		{
 			name = "value",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "actor1",},
 			text = "actor1", 
 		},
 	},
@@ -283,7 +283,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'setActorValue("%s", "%s")',
+	func_description = 'setActorValue("%s", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -321,7 +321,7 @@ say("click us!")
 		},
 	},
 	category = "Data", 
-	output = {type = "field_number",},
+	output = {type = "field_variable",},
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'getActorValue("%s")',
@@ -351,7 +351,8 @@ say("click us!")
 	arg0 = {
 		{
 			name = "obj",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "hello",},
 			text = "hello", 
 		},
 	},
@@ -360,7 +361,7 @@ say("click us!")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'log("%s")',
+	func_description = 'log(%s)',
 	ToNPL = function(self)
 		return string.format('log("%s")\n', self:getFieldAsString('obj'));
 	end,
@@ -378,7 +379,8 @@ log(something)
 	arg0 = {
 		{
 			name = "obj",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "hello",},
 			text = "hello", 
 		},
 	},
@@ -387,7 +389,7 @@ log(something)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'echo("%s")',
+	func_description = 'echo(%s)',
 	ToNPL = function(self)
 		return string.format('echo("%s")\n', self:getFieldAsString('obj'));
 	end,
