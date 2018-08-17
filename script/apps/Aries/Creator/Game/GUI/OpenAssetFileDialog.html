@@ -29,7 +29,7 @@ function OnSelectAnim(treenode)
 end
 ]]></script>
 <aries:window mode="thin" title='<%=L"选择一个模型"%>' style="width:680px;" onclose="OnClose">
-    <div style="margin-left:200px;margin-top:5px;">
+    <div style="margin-left:0px;margin-top:5px;">
         <pe:repeat DataSource="<%=OpenAssetFileDialog.GetCategoryButtons()%>">
             <pe:repeatitem style="float:left;">
                 <pe:if condition='<%=OpenAssetFileDialog.category_index == Eval("index") %>'>

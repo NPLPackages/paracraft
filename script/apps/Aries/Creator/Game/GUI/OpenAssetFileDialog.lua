@@ -36,7 +36,9 @@ OpenAssetFileDialog.categories = {
 	{name = "fantasy", text = L"科幻", colour="#8f6d40", },
 	{name = "vehicles", text = L"交通", colour="#69b090", },
 	{name = "props", text = L"物品", colour="#69b090", },
+	{name = "equipment", text = L"装备", colour="#69b090", },
 	{name = "effects", text = L"特效", colour="#69b090", },
+	
 };
 
 OpenAssetFileDialog.IndexLocal = 1;
@@ -462,7 +464,7 @@ function OpenAssetFileDialog.OnTextChange(name, mcmlNode)
 	end
 end
 
--- only used temporarily to parse for effie's translation file
+-- only used temporarily to parse for haqi asset files
 -- @param prefixPath: such as "model/", "character/"
 -- @param outputFilename: if nil, default to filename.csv
 -- e.g.
@@ -519,6 +521,62 @@ function OpenAssetFileDialog.ParseFile(filename, prefixPath, outputFilename)
 				LOG.std(nil, "info", "OpenAssetFileDialog", "%d items written to %s", #output, outputFilename);
 				file:close();
 			end
+		end
+	end
+end
+
+-- only used temporarily to parse for haqi asset files
+-- @param xmlFilename: default to [csvFilename].xml
+-- e.g. OpenAssetFileDialog.ConvertCSVToXML("temp/assets/PlayerAssets.csv");
+function OpenAssetFileDialog.ConvertCSVToXML(csvFilename, xmlFilename)
+	NPL.load("(gl)script/ide/Document/CSVDocReader.lua");
+	local CSVDocReader = commonlib.gettable("commonlib.io.CSVDocReader");
+	local reader = CSVDocReader:new();
+
+	-- schema is optional, which can change the row's keyname to the defined value. 
+	reader:SetSchema({
+		[1] = {name="filename"},
+		[2] = {name="displayname"},
+		[3] = {name="category"},
+	})
+
+	if(reader:LoadFile(csvFilename)) then 
+		local rows = reader:GetRows();
+		local categories = {name="PlayerAssets"};
+		local names_ = {};
+		local category_names = {
+			["怪物"] = "fantasy",
+			["动物"] = "animals",
+			["交通工具"] = "vehicles",
+			["特效"] = "effects",
+			["装备"] = "equipment",
+			["道具模型"] = "props",
+		}
+
+		local function GetCategory(name)
+			local category = names_[name]
+			if(not category) then
+				category = {name="category", attr={name=category_names[name] or name}};
+				names_[name] = category
+				categories[#categories+1] = category
+			end
+			return category;
+		end
+
+		for i, row in ipairs(rows) do
+			local name = row.filename:match("([^/]+)%.x$")
+			local category = GetCategory(row.category or "common");
+			category[#category+1] = {name="asset", attr={filename=row.filename, name = name, displayname = row.displayname}}
+		end
+
+		local text = commonlib.Lua2XmlString(categories, true)
+
+		xmlFilename = xmlFilename or (csvFilename..".xml" )
+		local file = ParaIO.open(xmlFilename, "w")
+		if(file:IsValid()) then
+			file:WriteString(text);
+			LOG.std(nil, "info", "OpenAssetFileDialog", "successfully written to %s", xmlFilename);
+			file:close();
 		end
 	end
 end
