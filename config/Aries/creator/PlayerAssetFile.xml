@@ -1,12 +1,13 @@
 <!--config/Aries/creator/PlayerAssetFile.xml
+@param name: short name
+@param filename:
+@param displayname: optional, if not provided, name is used. 
+@param hidden: boolean.
+@param physics: boolean. 
 -->
 <PlayerAssets>
-  <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员">
-	<anims>
-		<anim id="0" text="默认动作"/>
-		<anim id="82" text="跪着说话"/>
-	</anims>
-  </asset>
+<asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
+<category name="common">
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
   <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
@@ -17,8 +18,8 @@
   <asset filename="character/CC/03animals/pigeon/pigeon.x" name="pigeon" displayname="鸽子"/>
   <asset filename="character/CC/03animals/frog/frog.x" name="frog" displayname="青蛙"/>
   <asset filename="character/CC/03animals/dog/dog.x" name="dog" displayname="狗"/>
-  <asset filename="character/CC/01char/MainChar/MainChar.x" name="ccs" displayname="可换装人物"/>
-  <asset filename="character/CC/02human/Camera/Camera.x" name="camera" displayname="摄影机"/>
+  <asset filename="character/CC/01char/MainChar/MainChar.x" name="ccs" displayname="可换装人物" hidden="true"/>
+  <asset filename="character/CC/02human/Camera/Camera.x" name="camera" displayname="摄影机" />
   <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
   <asset filename="character/CC/05effect/whitecloud.x" name="whitecloud" displayname="白云" physics="false"/>
   <asset filename="character/CC/05effect/blackcloudrotate.x" name="blackcloudrotate" displayname="乌云" physics="false"/>
@@ -58,4 +59,631 @@
   <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
   <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
+</category>
+<category name="people">
+  <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />  
+  <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
+  <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
+  <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
+  <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
+  <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
+  <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
+  <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
+  <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
+
+  <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="ABML" name="ABML"/>
+	<asset filename="character/v3/GameNpc/AD/AD.x" displayname="AD" name="AD"/>
+	<asset filename="character/v3/GameNpc/BIANZANG/BIANZANG.x" displayname="BIANZANG" name="BIANZANG"/>
+	<asset filename="character/v3/GameNpc/FCSQ2/FCSQ2.x" displayname="FCSQ2" name="FCSQ2"/>
+	<asset filename="character/v3/GameNpc/GTCK/GTCK.x" displayname="GTCK" name="GTCK"/>
+	<asset filename="character/v3/GameNpc/HHD/HHD.x" displayname="HHD" name="HHD"/>
+	<asset filename="character/v3/GameNpc/HJJH/HJJH.x" displayname="HJJH" name="HJJH"/>
+	<asset filename="character/v3/GameNpc/MJS/MJS.x" displayname="MJS" name="MJS"/>
+	<asset filename="character/v3/GameNpc/NHW/NHW.x" displayname="NHW" name="NHW"/>
+	<asset filename="character/v3/GameNpc/SDYN/SDYN.x" displayname="SDYN" name="SDYN"/>
+	<asset filename="character/v3/GameNpc/YAOSHI/YAOSHI.x" displayname="药师" name="YAOSHI"/>
+	<asset filename="character/v3/GameNpc/YHNQS/yhnqs.x" displayname="yhnqs" name="yhnqs"/>
+	<asset filename="character/v3/GameNpc/YYFS/YYFS.x" displayname="YYFS" name="YYFS"/>
+	<asset filename="character/v3/GameNpc/ZRXZ/ZRXZ.x" displayname="ZRXZ" name="ZRXZ"/>
+	<asset filename="character/v5/01human/Ambassador/AmbassadorBlue.x" displayname="蓝衣大使" name="AmbassadorBlue"/>
+	<asset filename="character/v5/01human/Ambassador/AmbassadorRad.x" displayname="红衣大使" name="AmbassadorRad"/>
+	<asset filename="character/v5/01human/AuntAngel/AuntAngel.x" displayname="天使阿姨" name="AuntAngel"/>
+	<asset filename="character/v5/01human/Boulder/Boulder.x" displayname="Boulder" name="Boulder"/>
+	<asset filename="character/v5/01human/BusinessMan/BusinessMan.x" displayname="红衣商人" name="BusinessMan"/>
+	<asset filename="character/v5/01human/CaptainFoster/CaptainFoster.x" displayname="船长福斯特" name="CaptainFoster"/>
+	<asset filename="character/v5/01human/Castellan/Castellan.x" displayname="卡斯特兰" name="Castellan"/>
+	<asset filename="character/v5/01human/ChuanZhangFuRen/ChuanZhangFuRen.x" displayname="船长夫人" name="ChuanZhangFuRen"/>
+	<asset filename="character/v5/01human/Clown/Clown.x" displayname="小丑" name="Clown"/>
+	<asset filename="character/v5/01human/ClownBoy/Clown.x" displayname="小丑男孩" name="Clown"/>
+	<asset filename="character/v5/01human/Dalmond/Dalmond.x" displayname="蓝衣商人" name="Dalmond"/>
+	<asset filename="character/v5/01human/Dancer/Dancer.x" displayname="舞蹈家" name="Dancer"/>
+	<asset filename="character/v5/01human/Dongdong/Dongdong.x" displayname="东东" name="Dongdong"/>
+	<asset filename="character/v5/01human/DrDoctor/DrDoctor.x" displayname="博士" name="DrDoctor"/>
+	<asset filename="character/v5/01human/DrDoctor/DrDoctor.x" displayname="博士1" name="DrDoctor"/>
+	<asset filename="character/v5/01human/Fatty/Fatty.x" displayname="胖子" name="Fatty"/>
+	<asset filename="character/v5/01human/Fisherman/Fisherman.x" displayname="渔夫" name="Fisherman"/>
+	<asset filename="character/v5/01human/GruntNuncle/GruntNuncle.x" displayname="顽皮叔叔" name="GruntNuncle"/>
+	<asset filename="character/v5/01human/Guard/Guard.x" displayname="近卫" name="Guard"/>
+	<asset filename="character/v5/01human/Gucci/Gucci.x" displayname="古琦" name="Gucci"/>
+	<asset filename="character/v5/01human/GuGe/GuGe.x" displayname="古格" name="GuGe"/>
+	<asset filename="character/v5/01human/HaqiAmbassador/HaqiAmbassador.x" displayname="哈奇大使" name="HaqiAmbassador"/>
+	<asset filename="character/v5/01human/JianDingShi/JianDingShi.x" displayname="鉴定师" name="JianDingShi"/>
+	<asset filename="character/v5/01human/Lala/lala.x" displayname="拉拉" name="lala"/>
+	<asset filename="character/v5/01human/LingShouLiieRen/LingShouLiieRen.x" displayname="灵兽猎人" name="LingShouLiieRen"/>
+	<asset filename="character/v5/01human/LordMohan/LordMohan.x" displayname="莫汉勋爵" name="LordMohan"/>
+	<asset filename="character/v5/01human/MiNa/MiNa.x" displayname="米娜" name="MiNa"/>
+	<asset filename="character/v5/01human/MiNi/MiNi.x" displayname="米妮" name="MiNi"/>
+	<asset filename="character/v5/01human/Moca/Moca.x" displayname="莫卡" name="Moca"/>
+	<asset filename="character/v5/01human/mofagongjiang/mofagongjiang.x" displayname="魔法工匠" name="mofagongjiang"/>
+	<asset filename="character/v5/01human/MoLiYa/MoLiYa.x" displayname="莫利亚" name="MoLiYa"/>
+	<asset filename="character/v5/01human/Mona/Mona.x" displayname="莫纳" name="Mona"/>
+	<asset filename="character/v5/01human/PaPa/PaPa.x" displayname="葩葩" name="PaPa"/>
+	<asset filename="character/v5/01human/PoliceHill/PoliceHill.x" displayname="警察Hill" name="PoliceHill"/>
+	<asset filename="character/v5/01human/QianXianHuWei/QianXianHuWei.x" displayname="前线护卫" name="QianXianHuWei"/>
+	<asset filename="character/v5/01human/Sophie/Sophie.x" displayname="索菲" name="Sophie"/>
+	<asset filename="character/v5/01human/Sosue/Sosue.x" displayname="索苏尔" name="Sosue"/>
+	<asset filename="character/v5/01human/TownChiefRodd/TownChiefRodd.x" displayname="Rodd镇长" name="TownChiefRodd"/>
+	<asset filename="character/v5/01human/tutu/tutu.x" displayname="兔兔" name="tutu"/>
+	<asset filename="character/v5/01human/Wudi/Wudi.x" displayname="吴迪" name="Wudi"/>
+	<asset filename="character/v5/01human/XianDou/XianDou.x" displayname="仙兜" name="XianDou"/>
+	<asset filename="character/v5/01human/ZhiHuiXing/ZhiHuiXing.x" displayname="指挥性" name="ZhiHuiXing"/>
+	<asset filename="character/v5/01human/ZRXZ/ZRXZ.x" displayname="ZRXZ" name="ZRXZ"/>
+</category>
+<category name="animals">  
+  <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
+  <asset filename="character/CC/03animals/pig/pig.x" name="pig" displayname="小猪"/>
+  <asset filename="character/CC/03animals/sheep/sheep.x" name="sheep" displayname="棉羊"/>
+  <asset filename="character/CC/03animals/chicken/chicken.x" name="chicken" displayname="小鸡"/>
+  <asset filename="character/CC/03animals/bird/bird.x" name="bird" displayname="鸟"/>
+  <asset filename="character/CC/03animals/pigeon/pigeon.x" name="pigeon" displayname="鸽子"/>
+  <asset filename="character/CC/03animals/frog/frog.x" name="frog" displayname="青蛙"/>
+  <asset filename="character/CC/03animals/dog/dog.x" name="dog" displayname="狗"/>
+
+  <asset filename="character/v3/GameNpc/FCSQ1/FCSQ1.x" displayname="FCSQ1" name="FCSQ1"/>
+	<asset filename="character/v3/Npc/dapangxie/dapangxie.x" displayname="大螃蟹" name="dapangxie"/>
+	<asset filename="character/v3/Npc/dapangxie/xiaopangxie.x" displayname="小螃蟹" name="xiaopangxie"/>
+	<asset filename="character/v3/Npc/dapangxie/xiaopangxie2.x" displayname="小螃蟹2" name="xiaopangxie2"/>
+	<asset filename="character/v3/Npc/Hashiqi/Hashiqi.x" displayname="哈士奇" name="Hashiqi"/>
+	<asset filename="character/v3/Npc/Hashiqi/xueqiao.x" displayname="雪橇" name="xueqiao"/>
+	<asset filename="character/v3/Npc/laoying/laoying.x" displayname="老鹰" name="laoying"/>
+	<asset filename="character/v3/Npc/qie/qie.x" displayname="企鹅" name="qie"/>
+	<asset filename="character/v3/Npc/shayu/shayu.x" displayname="鲨鱼" name="shayu"/>
+	<asset filename="character/v3/Npc/wuzei/wuzei.x" displayname="乌贼" name="wuzei"/>
+	<asset filename="character/v5/02animals/Cock/Cock.x" displayname="鸡" name="Cock"/>
+	<asset filename="character/v5/02animals/Cow/Cow.x" displayname="牛" name="Cow"/>
+	<asset filename="character/v5/02animals/Deer/Deer.x" displayname="小鹿" name="Deer"/>
+	<asset filename="character/v5/02animals/Elk/Elk.x" displayname="圣诞驯鹿" name="Elk"/>
+	<asset filename="character/v5/02animals/GrilRabbit/GrilRabbit.x" displayname="母兔子" name="GrilRabbit"/>
+	<asset filename="character/v5/02animals/HaiTun/HaiTun.x" displayname="海豚" name="HaiTun"/>
+	<asset filename="character/v5/02animals/HalloweenBat/HalloweenBat.x" displayname="万圣节蝙蝠" name="HalloweenBat"/>
+	<asset filename="character/v5/02animals/JingYu/JingYu.x" displayname="鲸鱼" name="JingYu"/>
+	<asset filename="character/v5/02animals/JuXiangLv1/JuXiangLv1.x" displayname="巨象Lv1" name="JuXiangLv1"/>
+	<asset filename="character/v5/02animals/JuXiangLv2/JuXiangLv2.x" displayname="巨象Lv2" name="JuXiangLv2"/>
+	<asset filename="character/v5/02animals/JuXiangLv3/JuXiangLv3.x" displayname="巨象Lv3" name="JuXiangLv3"/>
+	<asset filename="character/v5/02animals/Lizard/Lizard.x" displayname="蜥蜴" name="Lizard"/>
+	<asset filename="character/v5/02animals/Monkey/Monkey.x" displayname="猴子" name="Monkey"/>
+	<asset filename="character/v5/02animals/Mouse/Mouse.x" displayname="老鼠" name="Mouse"/>
+	<asset filename="character/v5/02animals/Octopus/Octopus.x" displayname="章鱼" name="Octopus"/>
+	<asset filename="character/v5/02animals/Ostrich/Ostrich.x" displayname="鸵鸟" name="Ostrich"/>
+	<asset filename="character/v5/02animals/Panda/Panda.x" displayname="熊猫" name="Panda"/>
+	<asset filename="character/v5/02animals/Pegasus/Pegasus.x" displayname="飞马" name="Pegasus"/>
+	<asset filename="character/v5/02animals/Pig/Pig.x" displayname="猪" name="Pig"/>
+	<asset filename="character/v5/02animals/Rabbit/Rabbit.x" displayname="兔子" name="Rabbit"/>
+	<asset filename="character/v5/02animals/Sheep/Sheep.x" displayname="黑羊" name="Sheep"/>
+	<asset filename="character/v5/02animals/Smilodon/Smilodon.x" displayname="剑齿虎" name="Smilodon"/>
+	<asset filename="character/v5/02animals/Squirrel/Squirrel.x" displayname="松鼠" name="Squirrel"/>
+	<asset filename="character/v5/02animals/Swallow/Swallow.x" displayname="燕子" name="Swallow"/>
+	<asset filename="character/v5/02animals/Swallow/Swallow_mouther.x" displayname="燕子妈妈" name="Swallow_mouther"/>
+	<asset filename="character/v5/02animals/Swan/Swan.x" displayname="天鹅" name="Swan"/>
+	<asset filename="character/v5/02animals/Text01/lineagemonsters53.x" displayname="text01" name="lineagemonsters53"/>
+	<asset filename="character/v5/02animals/Tiger/Tiger.x" displayname="老虎" name="Tiger"/>
+	<asset filename="character/v5/02animals/Tortoise/Tortoise.x" displayname="乌龟" name="Tortoise"/>
+	<asset filename="character/v5/02animals/Tortoise/Tortoise01.x" displayname="乌龟01" name="Tortoise01"/>
+	<asset filename="character/v5/02animals/Tortoise/Tortoise02.x" displayname="乌龟02" name="Tortoise02"/>
+	<asset filename="character/v5/02animals/Tortoise/Tortoise03.x" displayname="乌龟03" name="Tortoise03"/>
+	<asset filename="character/v5/02animals/Tortoise/Tortoise04.x" displayname="乌龟04" name="Tortoise04"/>
+	<asset filename="character/v5/02animals/UglyDuckling/UglyDuckling.x" displayname="丑小鸭" name="UglyDuckling"/>
+	<asset filename="character/v5/02animals/YinYangLingHu/YinYangLingHu.x" displayname="阴阳灵狐" name="YinYangLingHu"/>
+	<asset filename="character/v5/CG/CreatePlayer3DUI/Mew3DUI/haiou.x" displayname="几只海鸥在飞" name="haiou"/>
+</category>
+<category name="fantasy">  
+  <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
+  
+  <asset filename="character/v3/GameNpc/BZL/BZL.x" displayname="BZL" name="BZL"/>
+	<asset filename="character/v3/GameNpc/CLLWZ/CLLWZ.x" displayname="CLLWZ" name="CLLWZ"/>
+	<asset filename="character/v3/GameNpc/DINA/DINA.x" displayname="DINA" name="DINA"/>
+	<asset filename="character/v3/GameNpc/EMSS/EMSS.x" displayname="EMSS" name="EMSS"/>
+	<asset filename="character/v3/GameNpc/FCSQ/FCSQ.x" displayname="FCSQ" name="FCSQ"/>
+	<asset filename="character/v3/GameNpc/FEILONG/FEILONG.x" displayname="飞龙" name="FEILONG"/>
+	<asset filename="character/v3/GameNpc/HUAYAO/HUAYAO.x" displayname="花妖1" name="HUAYAO"/>
+	<asset filename="character/v3/GameNpc/HUOSHEN/HUOSHEN.x" displayname="火神" name="HUOSHEN"/>
+	<asset filename="character/v3/GameNpc/JXRXLG/JXRXLG.x" displayname="机械人xlg" name="JXRXLG"/>
+	<asset filename="character/v3/GameNpc/SLKCJL/SLKCJL.x" displayname="SLKCJL" name="SLKCJL"/>
+	<asset filename="character/v3/GameNpc/SWZS/SWZS.x" displayname="SWZS" name="SWZS"/>
+	<asset filename="character/v3/GameNpc/TZMYS/TZMYS.x" displayname="兔子MYS" name="TZMYS"/>
+	<asset filename="character/v3/GameNpc/XIEMO/XIEMO.x" displayname="邪魔" name="XIEMO"/>
+	<asset filename="character/v3/GameNpc/XRKZS/XRKZS.x" displayname="熊人KZS" name="XRKZS"/>
+	<asset filename="character/v3/GameNpc/XXG/XXG.x" displayname="吸血鬼" name="XXG"/>
+	<asset filename="character/v3/GameNpc/YYWZ/YYWZ.x" displayname="YYWZ" name="YYWZ"/>
+	<asset filename="character/v3/GameNpc/ZZYH/ZZYH.x" displayname="ZZYH" name="ZZYH"/>
+	<asset filename="character/v3/Npc/aladinghuaishendeng/aladinghuaishendeng.x" displayname="阿拉丁神灯" name="aladinghuaishendeng"/>
+	<asset filename="character/v3/Npc/beijixiong/beijixiong.x" displayname="北极熊" name="beijixiong"/>
+	<asset filename="character/v3/Npc/hongpidijing/hongpidijing.x" displayname="红皮地精" name="hongpidijing"/>
+	<asset filename="character/v3/Npc/huaxianzi/huaxianzi.x" displayname="花仙子" name="huaxianzi"/>
+	<asset filename="character/v3/Npc/jiqiren/jiqiren.x" displayname="机器人" name="jiqiren"/>
+	<asset filename="character/v3/Npc/Robot01/Robot.x" displayname="机器人01" name="Robot"/>
+	<asset filename="character/v3/Npc/shitouren/shitouren.x" displayname="石头人" name="shitouren"/>
+	<asset filename="character/v3/Npc/tanglangguai/tanglangguai.x" displayname="螳螂怪" name="tanglangguai"/>
+	<asset filename="character/v3/Npc/Turtletank/Turtletank.x" displayname="乌龟" name="Turtletank"/>
+	<asset filename="character/v3/Npc/xiongguai/xiongguai.x" displayname="熊怪" name="xiongguai"/>
+	<asset filename="character/v3/Npc/yidongchengbao/yidongchengbao.x" displayname="移动城堡" name="yidongchengbao"/>
+	<asset filename="character/v3/Pet/CAITOUBB/CAITOUbb.x" displayname="雄性菜头宝宝" name="CAITOUbb"/>
+	<asset filename="character/v3/Pet/CTBB/ctbb_LOD15.x" displayname="雌性菜头宝宝" name="ctbb_LOD15"/>
+	<asset filename="character/v3/Pet/HDL/HDL_LOD15.x" displayname="花朵兰" name="HDL_LOD15"/>
+	<asset filename="character/v3/Pet/HGS/HGS_LOD15.x" displayname="皇冠蛇" name="HGS_LOD15"/>
+	<asset filename="character/v3/Pet/MFBB/MFBB_LOD15.x" displayname="蜜蜂宝宝" name="MFBB_LOD15"/>
+	<asset filename="character/v3/Pet/MGBB/mgbb_LOD15.x" displayname="蘑菇宝宝" name="mgbb_LOD15"/>
+	<asset filename="character/v3/Pet/PP/PP_LOD5.x" displayname="PP" name="PP_LOD5"/>
+	<asset filename="character/v3/Pet/SJTZ/SJTZ_LOD05.x" displayname="SJTZ" name="SJTZ_LOD05"/>
+	<asset filename="character/v3/Pet/TTC/TTC_LOD15.x" displayname="跳跳床" name="TTC_LOD15"/>
+	<asset filename="character/v3/Pet/XG/XG_LOD15.x" displayname="小狗" name="XG_LOD15"/>
+	<asset filename="character/v3/Pet/XGBB/XGBB_LOD5.x" displayname="西瓜宝宝" name="XGBB_LOD5"/>
+	<asset filename="character/v3/Pet/XHM/XHM_LOD15.x" displayname="小花猫" name="XHM_LOD15"/>
+	<asset filename="character/v3/Pet/XJBB/XJBB_LOD05.x" displayname="小鸡宝宝" name="XJBB_LOD05"/>
+	<asset filename="character/v3/Pet/XM/XM_LOD5.x" displayname="小马" name="XM_LOD5"/>
+	<asset filename="character/v3/Pet/YYCZ/yycz_LOD5.x" displayname="yycz" name="yycz_LOD5"/>
+	<asset filename="character/v5/01human/BluePenguin/BluePenguin.x" displayname="蓝企鹅" name="BluePenguin"/>
+	<asset filename="character/v5/01human/Dragon/Dragon.x" displayname="龙" name="Dragon"/>
+	<asset filename="character/v5/01human/Messenger/Messenger.x" displayname="梅辛杰" name="Messenger"/>
+	<asset filename="character/v5/01human/SmallWindEagle/SmallWindEagle.x" displayname="小风鹰" name="SmallWindEagle"/>
+	<asset filename="character/v5/01human/SunTanningGuy/SunTanningGuy.x" displayname="熊怪" name="SunTanningGuy"/>
+	<asset filename="character/v5/01human/TZMYS/TZMYS.x" displayname="兔子mys" name="TZMYS"/>
+	<asset filename="character/v5/01human/WhiteDragon/WhiteDragon.x" displayname="白龙" name="WhiteDragon"/>
+	<asset filename="character/v5/02animals/beijixiong/beijixiong.x" displayname="北极熊" name="beijixiong"/>
+	<asset filename="character/v5/02animals/BlueDragon/BlueDragon.x" displayname="蓝龙" name="BlueDragon"/>
+	<asset filename="character/v5/02animals/ChasingWindEagle/ChasingWindEagle.x" displayname="风鹰1" name="ChasingWindEagle"/>
+	<asset filename="character/v5/02animals/ChristmasPenguin/ChristmasPenguin.x" displayname="圣诞企鹅" name="ChristmasPenguin"/>
+	<asset filename="character/v5/02animals/CyanDragon/CyanDragon.x" displayname="青龙" name="CyanDragon"/>
+	<asset filename="character/v5/02animals/DragonBaby/DragonBabyGreen/DragonBabyGreen.x" displayname="绿龙宝宝" name="DragonBabyGreen"/>
+	<asset filename="character/v5/02animals/DragonBaby/DragonBabyOrange/DragonBabyOrange.x" displayname="橙龙宝宝" name="DragonBabyOrange"/>
+	<asset filename="character/v5/02animals/DragonBaby/DragonBabyYellow/DragonBabyYellow.x" displayname="黄龙宝宝" name="DragonBabyYellow"/>
+	<asset filename="character/v5/02animals/EpicDragonDeath/EpicDragonDeath.x" displayname="死亡系龙2" name="EpicDragonDeath"/>
+	<asset filename="character/v5/02animals/EpicDragonFire/EpicDragonFire.x" displayname="生命系龙2" name="EpicDragonFire"/>
+	<asset filename="character/v5/02animals/EpicDragonIce/EpicDragonIce.x" displayname="冰系龙2" name="EpicDragonIce"/>
+	<asset filename="character/v5/02animals/EpicDragonLife/EpicDragonLife.x" displayname="生命系龙" name="EpicDragonLife"/>
+	<asset filename="character/v5/02animals/EpicDragonStorm/EpicDragonStorm.x" displayname="雷系龙" name="EpicDragonStorm"/>
+	<asset filename="character/v5/02animals/FireBon/FireBon.x" displayname="火魔1" name="FireBon"/>
+	<asset filename="character/v5/02animals/FlyPig/FlyPig.x" displayname="飞猪" name="FlyPig"/>
+	<asset filename="character/v5/02animals/glede/Glede.x" displayname="老鹰" name="Glede"/>
+	<asset filename="character/v5/02animals/GoldFish/GoldFish.x" displayname="金鱼" name="GoldFish"/>
+	<asset filename="character/v5/02animals/GreenDragon/GreenDragon_02.x" displayname="绿龙" name="GreenDragon_02"/>
+	<asset filename="character/v5/02animals/HKBS/HKBS.x" displayname="HKBS" name="HKBS"/>
+	<asset filename="character/v5/02animals/JXRXLG/JXRXLG.x" displayname="机器人XLG" name="JXRXLG"/>
+	<asset filename="character/v5/02animals/Nymphora/Nymphora_bb.x" displayname="蝴蝶仙子" name="Nymphora_bb"/>
+	<asset filename="character/v5/02animals/Pig/Pig.x" displayname="猪" name="Pig"/>
+	<asset filename="character/v5/02animals/Pig/Pig_V1.x" displayname="猪V1" name="Pig_V1"/>
+	<asset filename="character/v5/02animals/Pig/Pig_V2.x" displayname="猪V2" name="Pig_V2"/>
+	<asset filename="character/v5/02animals/Robot01/Robot.x" displayname="机器人" name="Robot"/>
+	<asset filename="character/v5/02animals/SophieDragon/SophieDragon.x" displayname="索菲龙" name="SophieDragon"/>
+	<asset filename="character/v5/02animals/TZMYS/TZMYS.x" displayname="兔子mys" name="TZMYS"/>
+	<asset filename="character/v5/02animals/WhiteDragon/WhiteDragon.x" displayname="白龙" name="WhiteDragon"/>
+	<asset filename="character/v5/02animals/XiYiJinJiaoLong/XiYiJinJiaoLong.x" displayname="蜥蜴金蛟龙" name="XiYiJinJiaoLong"/>
+	<asset filename="character/v5/02animals/YuanxiaoBaby/YuanxiaoBaby.x" displayname="元宵宝宝" name="YuanxiaoBaby"/>
+	<asset filename="character/v5/06quest/DisorderRobot/DisorderRobot.x" displayname="无序机器人" name="DisorderRobot"/>
+</category>
+<category name="vehicles">  
+  <asset filename="character/v5/02animals/XueDiChe/XueDiChe.x" displayname="雪地车" name="XueDiChe"/>
+  <asset filename="character/v5/08functional/BlueBoat/BlueBoat.x" displayname="蓝船" name="BlueBoat"/>
+  <asset filename="character/v5/02animals/NanGuaChe/NanGuaChe.x" displayname="南瓜车" name="NanGuaChe"/>
+	<asset filename="character/v5/02animals/ShuangRenFeiTing/ShuangRenFeiTing.x" displayname="双人飞艇" name="ShuangRenFeiTing"/>
+  <asset filename="character/v5/02animals/MagicAwingCarpet/MagicAwingCarpet.x" displayname="魔法飞毯" name="MagicAwingCarpet"/>
+	<asset filename="character/v5/02animals/MagicBesom/MagicBesom.x" displayname="魔法扫帚" name="MagicBesom"/>
+	<asset filename="character/v5/02animals/Elephant/Elephant.x" displayname="大象" name="Elephant"/>
+	<asset filename="character/v5/02animals/GoldenDragon/GoldenDragon_02.x" displayname="金属系龙" name="GoldenDragon_02"/>
+	<asset filename="character/v5/02animals/HorsePhoenix/HorsePhoenix.x" displayname="凤凰x01" name="HorsePhoenix"/>
+	<asset filename="character/v5/02animals/HorseSilverWolf/HorseSilverWolf.x" displayname="银狼坐骑" name="HorseSilverWolf"/>
+</category>
+<category name="props">  
+  <asset filename="model/blockworld/BlockModel/block_model_one.x" name="cube" displayname="可换装立方体"/>
+  
+  <asset filename="character/v3/Item/ObjectComponents/WEAPON/2133_SugarFree_PorkMeat_Max.anim.x" displayname="无糖猪肉" name="2133_SugarFree_PorkMeat_Max.anim"/>
+	<asset filename="character/v5/06quest/MysteryAcinusTree/MysteryAcinusTree.x" displayname="神秘浆果树" name="MysteryAcinusTree"/>
+	<asset filename="character/v5/06quest/ZodiacAnimalFlower/ZodiacAnimalFlower.x" displayname="动物花" name="ZodiacAnimalFlower"/>
+	<asset filename="character/v5/08functional/BreadTree/BreadTree.x" displayname="面包树" name="BreadTree"/>
+	<asset filename="character/v5/08functional/BreadTree/BreadTree_tremble.x" displayname="面包树" name="BreadTree_tremble"/>
+	<asset filename="character/v5/08functional/ChristmasGiftTree/ChristmasGiftTree.x" displayname="圣诞树" name="ChristmasGiftTree"/>
+	<asset filename="character/v5/08functional/LuckTree/LuckTree.x" displayname="幸运树" name="LuckTree"/>
+	<asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi01.x" displayname="精灵羽翼01" name="Jinglingyuyi01"/>
+	<asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi02.x" displayname="精灵羽翼02" name="Jinglingyuyi02"/>
+	<asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi03.x" displayname="精灵羽翼03" name="Jinglingyuyi03"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXing_Efx.x" displayname="魔法星" name="MoFaXing_Efx"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXingBlue.x" displayname="蓝色魔法星" name="MoFaXingBlue"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXingGreen.x" displayname="绿色魔法星" name="MoFaXingGreen"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXingPurle.x" displayname="紫色魔法星" name="MoFaXingPurle"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXingRed.x" displayname="红色魔法星" name="MoFaXingRed"/>
+	<asset filename="character/v5/06quest/MoFaXing/MoFaXingYellow.x" displayname="黄色魔法星" name="MoFaXingYellow"/>
+	<asset filename="character/v5/06quest/PolicePatrolFootStep/PolicePatrolFootStep.x" displayname="警犬巡逻脚印" name="PolicePatrolFootStep"/>
+	<asset filename="character/v5/01human/FuYinJiTan/FuYinJiTan.x" displayname="符印祭坛" name="FuYinJiTan"/>
+	<asset filename="character/v5/01human/LongTuTeng/LongTuTeng.x" displayname="龙图腾" name="LongTuTeng"/>
+	<asset filename="character/v5/06quest/EnvironmentalProtectionLamp/EnvironmentalProtectionLamp.x" displayname="环保灯" name="EnvironmentalProtectionLamp"/>
+	<asset filename="character/v5/06quest/Fishnet/Fishnet.x" displayname="渔网" name="Fishnet"/>
+	<asset filename="character/v5/06quest/GiftBox/GiftBox_Blue.x" displayname="蓝色礼盒" name="GiftBox_Blue"/>
+	<asset filename="character/v5/06quest/GiftBox/GiftBox_Orange.x" displayname="橙色礼盒" name="GiftBox_Orange"/>
+	<asset filename="character/v5/06quest/GiftBox/GiftBox_Pink.x" displayname="粉色礼盒" name="GiftBox_Pink"/>
+	<asset filename="character/v5/06quest/HouseGift/HouseGift.x" displayname="礼物盒" name="HouseGift"/>
+	<asset filename="character/v5/06quest/JinBi/JinBi_Efx.x" displayname="金币" name="JinBi_Efx"/>
+	<asset filename="character/v5/06quest/JinBi/JinBiWhite.x" displayname="白色金币" name="JinBiWhite"/>
+	<asset filename="character/v5/06quest/JinBi/JinBiYellow.x" displayname="黄色金币" name="JinBiYellow"/>
+	<asset filename="character/v5/06quest/MusicBox/MusicBox_anim.x" displayname="音乐盒" name="MusicBox_anim"/>
+	<asset filename="character/v5/06quest/MusicBox/MusicBox_stop.x" displayname="音乐盒" name="MusicBox_stop"/>
+	<asset filename="character/v5/06quest/MysteryAcinusFruit/BlueAcinus/BlueAcinus.x" displayname="蓝色浆果" name="BlueAcinus"/>
+	<asset filename="character/v5/06quest/MysteryAcinusFruit/GreenAcinus/GreenAcinus.x" displayname="绿色浆果" name="GreenAcinus"/>
+	<asset filename="character/v5/06quest/MysteryAcinusFruit/RedAcinus/RedAcinus.x" displayname="红色浆果" name="RedAcinus"/>
+	<asset filename="character/v5/06quest/MysteryAcinusFruit/YellowAcinus/YellowAcinus.x" displayname="黄色浆果" name="YellowAcinus"/>
+	<asset filename="character/v5/08functional/IceStone/IceStone.x" displayname="冰石" name="IceStone"/>
+	<asset filename="character/v5/08functional/JoyBean/JoyBean.x" displayname="欢乐豆" name="JoyBean"/>
+	<asset filename="character/v5/08functional/JumpJumpBed/JumpJumpBed_anim.x" displayname="跳跳床" name="JumpJumpBed_anim"/>
+	<asset filename="character/v5/09effect/InstanceDoor/InstanceDoor_model.x" displayname="实例门_模型" name="InstanceDoor_model"/>
+	<asset filename="model/01building/v5/01house/FishingGearShop/FishingGearShop_an.x" displayname="白紫色的泳圈" name="FishingGearShop_an"/>
+	<asset filename="model/01building/v5/01house/Lighthouse/Lighthouse_an.x" displayname="旋转的黄色光束的双面的灯" name="Lighthouse_an"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/MagicTree/MagicTreeEfx_anim.x" displayname="不是很亮的星星" name="MagicTreeEfx_anim"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/MagicTree/MagicTree_Star01.x" displayname="蓝色五角星中间黄色笑脸" name="MagicTree_Star01"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/MagicTree/MagicTree_StarLizi.x" displayname="闪闪的星星呈圆圈状" name="MagicTree_StarLizi"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/MetallicityTotem/MetallicityTotem_an.x" displayname="六个盾牌呈圆圈状旋转" name="MetallicityTotem_an"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/WaterAttributeTotem/WaterAttributeTotem_an.x" displayname="很多蓝色水泡呈圆圈状" name="WaterAttributeTotem_an"/>
+	<asset filename="model/01building/v5/01house/MagicCamp/WaterAttributeTotem/WaterAttributeTotem_an01.x" displayname="蓝色球飘在空中球里有光线照出" name="WaterAttributeTotem_an01"/>
+	<asset filename="model/01building/v5/01house/MagicSchool/MagicScool_EFC.x" displayname="彩色泡泡呈圆圈状包围旋转" name="MagicScool_EFC"/>
+	<asset filename="model/01building/v5/01house/PleasureGround/ClownClothingStore/ClownClothingStore_an.x" displayname="小丑模样的气球底部有弹簧" name="ClownClothingStore_an"/>
+	<asset filename="model/01building/v5/01house/rongyaodating/rongyaodating_an.x" displayname="十面旗帜成两排排列" name="rongyaodating_an"/>
+	<asset filename="model/01building/v5/01house/rongyaodating/zhutai_an.x" displayname="五团火焰飘在空中移动会变形" name="zhutai_an"/>
+	<asset filename="model/01building/v5/01house/SailingBoat/SailingBoat_an.x" displayname="两面大旗帜旗帜上面两把剑交叉的标记" name="SailingBoat_an"/>
+	<asset filename="model/05plants/v5/01tree/ChristmasTree/ChristmasGiftTree_anim.x" displayname="圣诞树" name="ChristmasGiftTree_anim"/>
+	<asset filename="model/05plants/v5/01tree/LuckTree/LuckTree_ainm.x" displayname="幸运树" name="LuckTree_ainm"/>
+	<asset filename="model/05plants/v5/01tree/MysteryAcinusTree/MysteryAcinusTree.x" displayname="快要枯萎的树" name="MysteryAcinusTree"/>
+	<asset filename="model/05plants/v5/01tree/SuccessTree/SuccessTree_an.x" displayname="巨大的椰子树叶" name="SuccessTree_an"/>
+	<asset filename="model/06props/v5/02street/FieldBannerPVP/FieldBannerPVP_blueAnim.x" displayname="一杆蓝色的旗帜" name="FieldBannerPVP_blueAnim"/>
+	<asset filename="model/06props/v5/02street/FieldBannerPVP/FieldBannerPVP_redAnim.x" displayname="一杆红色的旗帜" name="FieldBannerPVP_redAnim"/>
+	<asset filename="model/06props/v5/02street/KempBanner/KempBanner01_an.x" displayname="红色的旗子挂在柱子上" name="KempBanner01_an"/>
+	<asset filename="model/06props/v5/02street/KempBanner/KempBanner02_an.x" displayname="黄色的旗子挂在柱子上" name="KempBanner02_an"/>
+	<asset filename="model/06props/v5/02street/KempBanner/KempBanner03_an.x" displayname="蓝色的旗子挂在柱子上" name="KempBanner03_an"/>
+	<asset filename="model/06props/v5/03quest/BirdClock/BirdClock_an.x" displayname="有一只鸟的摆钟" name="BirdClock_an"/>
+	<asset filename="model/06props/v5/03quest/Cockhorse/Cockhorse_animation.x" displayname="玩具木马" name="Cockhorse_animation"/>
+	<asset filename="model/06props/v5/03quest/FearfulBox/FearfulBox_an.x" displayname="大盒子里面装个小丑玩具" name="FearfulBox_an"/>
+	<asset filename="model/06props/v5/03quest/FighterFlag/FighterFlag_animation.x" displayname="一面黄色的旗帜" name="FighterFlag_animation"/>
+	<asset filename="model/06props/v5/03quest/FindingGameMachine/FindingGameMachine_an.x" displayname="一台游戏机器" name="FindingGameMachine_an"/>
+	<asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_01_an.x" displayname="一个黄绿颜色相间的蛋" name="FunnyEgg_01_an"/>
+	<asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_02_an.x" displayname="一个红色的蛋" name="FunnyEgg_02_an"/>
+	<asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_03_an.x" displayname="一个粉红色和白色相间的蛋" name="FunnyEgg_03_an"/>
+	<asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_04_an.x" displayname="一个粉红色和红色相间的蛋" name="FunnyEgg_04_an"/>
+	<asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_05_an.x" displayname="一个棕色的蛋" name="FunnyEgg_05_an"/>
+	<asset filename="model/06props/v5/03quest/GramaryBox/GramaryBox_animation.x" displayname="一个巨大的九格魔方" name="GramaryBox_animation"/>
+	<asset filename="model/06props/v5/03quest/IceRiver/IceRiver1_an.x" displayname="一块很大的冰块" name="IceRiver1_an"/>
+	<asset filename="model/06props/v5/03quest/IceRiver/IceRiver2_an.x" displayname="一块大冰块" name="IceRiver2_an"/>
+	<asset filename="model/06props/v5/03quest/IceRiver/IceRiver3_an.x" displayname="一块大的冰块" name="IceRiver3_an"/>
+	<asset filename="model/06props/v5/03quest/IceRiver/IceRiver4_an.x" displayname="一块很小的冰块" name="IceRiver4_an"/>
+	<asset filename="model/06props/v5/03quest/IceRiver/IceRiver5_an.x" displayname="一块不大不小的冰块" name="IceRiver5_an"/>
+	<asset filename="model/06props/v5/03quest/JackStraw/JackStraw_anim.x" displayname="一个穿着衣服的稻草人" name="JackStraw_anim"/>
+	<asset filename="model/06props/v5/03quest/KursaalGate/KursaalGate_animation.x" displayname="三面红色的旗子" name="KursaalGate_animation"/>
+	<asset filename="model/06props/v5/03quest/MagicMirror/magicmirror_02_an.x" displayname="一面粉红色的镜子" name="magicmirror_02_an"/>
+	<asset filename="model/06props/v5/03quest/MorningGlory/item_1H_Balloon_animation.x" displayname="一串气球" name="item_1H_Balloon_animation"/>
+	<asset filename="model/06props/v5/03quest/MusicBox/MusicBox_anima.x" displayname="一张在转动的碟片" name="MusicBox_anima"/>
+	<asset filename="model/06props/v5/03quest/Pinwheel/Pinwheel_an.x" displayname="一个粉红色的小风车玩具" name="Pinwheel_an"/>
+	<asset filename="model/06props/v5/03quest/Tumbler/Tumbler_animation.x" displayname="熊猫样子的不倒翁" name="Tumbler_animation"/>
+	<asset filename="model/06props/v5/05other/SeaStar/SeaStar_anim.x" displayname="褐色的海星" name="SeaStar_anim"/>
+	<asset filename="model/06props/v5/05other/SeaStar/SeaStar_anim01.x" displayname="粉色的海星" name="SeaStar_anim01"/>
+	<asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Gray_an.x" displayname="一面灰色的旗帜" name="WarBanner_Gray_an"/>
+	<asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Green_an.x" displayname="一面绿色的旗帜" name="WarBanner_Green_an"/>
+	<asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Red_an.x" displayname="一面红色的旗帜" name="WarBanner_Red_an"/>
+	<asset filename="model/06props/v5/07GameRobot/Irrigator/Irrigator_anim.x" displayname="一个棕色的水车" name="Irrigator_anim"/>
+	<asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_blueAnim.x" displayname="蓝色的糖果气球" name="CandyBeanBalloon_blueAnim"/>
+	<asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_greenAnim.x" displayname="绿色的糖果气球" name="CandyBeanBalloon_greenAnim"/>
+	<asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_purpleAnim.x" displayname="粉色的糖果气球" name="CandyBeanBalloon_purpleAnim"/>
+	<asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_redAnim.x" displayname="红色的糖果气球" name="CandyBeanBalloon_redAnim"/>
+	<asset filename="model/07effect/v5/Jelly/Jelly1_anim.x" displayname="上下跳动的果冻" name="Jelly1_anim"/>
+	<asset filename="model/07effect/v5/Jelly/Jelly_anim.x" displayname="果冻" name="Jelly_anim"/>
+	<asset filename="model/07effect/v5/SnowBalloon/SnowBalloon_ball_anim.x" displayname="一个雪球" name="SnowBalloon_ball_anim"/>
+	<asset filename="model/07effect/v5/SnowBlast/SnowBlast_Ball_Anim.x" displayname="蓝色的雪球向远处扔去" name="SnowBlast_Ball_Anim"/>
+	<asset filename="model/common/Arrowhead/Arrowhead_anim.x" displayname="方向标" name="Arrowhead_anim"/>
+	<asset filename="model/common/star/star01_an.x" displayname="地球自转" name="star01_an"/>
+	<asset filename="model/common/star/star02_an.x" displayname="棕色球体" name="star02_an"/>
+	<asset filename="model/common/star/star03_an.x" displayname="褐色球体" name="star03_an"/>
+	<asset filename="model/common/star/star04_an.x" displayname="表面凹凸不平的棕色球体" name="star04_an"/>
+	<asset filename="model/05plants/v5/01tree/SuccessTree/SuccessTree_efx.x" displayname="从地面往空中冒金色的泡泡" name="SuccessTree_efx"/>
+	<asset filename="model/06props/v5/03quest/TreasureBox/TreasureBox_01_an.x" displayname="一只红色金色的箱子" name="TreasureBox_01_an"/>
+	<asset filename="model/06props/v5/03quest/TreasureBox/TreasureBox_02_an.x" displayname="一只紫色金色的箱子" name="TreasureBox_02_an"/>
+	<asset filename="model/06props/v5/03quest/TreasureBox/TreasureBox_03_an.x" displayname="一只青色金色的箱子" name="TreasureBox_03_an"/>
+	<asset filename="model/06props/v5/03quest/TreasureBox/TreasureBox_04_an.x" displayname="一只绿色金色的箱子" name="TreasureBox_04_an"/>
+</category>
+<category name="equipment">  
+  <asset filename="character/v3/Item/ObjectComponents/WEAPON/1290_VIPStaff1.anim.x" displayname="权杖1" name="1290_VIPStaff1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1291_VIPStaff2.anim.x" displayname="权杖2" name="1291_VIPStaff2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1292_VIPStaff3.anim.x" displayname="权杖3" name="1292_VIPStaff3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1293_VIPStaff4.anim.x" displayname="权杖4" name="1293_VIPStaff4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1294_VIPStaff5.anim.x" displayname="权杖5" name="1294_VIPStaff5.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1295_VIPStaff6.anim.x" displayname="权杖6" name="1295_VIPStaff6.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1296_VIPStaff7.anim.x" displayname="权杖7" name="1296_VIPStaff7.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1297_VIPStaff8.anim.x" displayname="权杖8" name="1297_VIPStaff8.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1298_VIPStaff9.anim.x" displayname="权杖9" name="1298_VIPStaff9.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1299_VIPStaff10.anim.x" displayname="权杖10" name="1299_VIPStaff10.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1300_VIPStaff11.anim.x" displayname="权杖11" name="1300_VIPStaff11.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1685_ShopIceWand04.anim.x" displayname="冰魔杖04" name="1685_ShopIceWand04.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1686_ShopStormWand04.anim.x" displayname="雷魔杖04" name="1686_ShopStormWand04.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1687_ShopDeathWand04.anim.x" displayname="死亡魔杖04" name="1687_ShopDeathWand04.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1688_ShopLifeWand04.anim.x" displayname="生命魔杖04" name="1688_ShopLifeWand04.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1747_ColiseumFireWandS1.anim.x" displayname="火魔杖S1" name="1747_ColiseumFireWandS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1748_ColiseumIceWandS1.anim.x" displayname="冰魔杖S1" name="1748_ColiseumIceWandS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1749_ColiseumStormWandS1.anim.x" displayname="雷魔杖S1" name="1749_ColiseumStormWandS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1750_ColiseumDeathWandS1.anim.x" displayname="死亡魔杖S1" name="1750_ColiseumDeathWandS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1751_ColiseumLifeWandS1.anim.x" displayname="生命魔杖S1" name="1751_ColiseumLifeWandS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1788_MagicCrystalWand.anim.x" displayname="魔幻水晶棒" name="1788_MagicCrystalWand.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1823_IceRightHandS2.anim.x" displayname="冰法杖S2" name="1823_IceRightHandS2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1831_FireRightHandS2.anim.x" displayname="火法杖S2" name="1831_FireRightHandS2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1841_StormRightHandS2.anim.x" displayname="雷法杖S2" name="1841_StormRightHandS2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1849_LifeRightHandS2.anim.x" displayname="生命法杖S2" name="1849_LifeRightHandS2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1858_DeathRightHandS2.anim.x" displayname="死亡法杖S2" name="1858_DeathRightHandS2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1912_RightHand_Legend_Level10.anim.x" displayname="右手法杖Level10" name="1912_RightHand_Legend_Level10.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1917_RightHand_Legend_Level15.anim.x" displayname="右手法杖 Level15" name="1917_RightHand_Legend_Level15.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1922_RightHand_Legend_Level25.anim.x" displayname="右手法杖 Level25" name="1922_RightHand_Legend_Level25.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1927_RightHand_Legend_Level35.anim.x" displayname="右手法杖 Level35" name="1927_RightHand_Legend_Level35.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1934_RightHand_Legend_Level45.anim.x" displayname="右手法杖 Level45" name="1934_RightHand_Legend_Level45.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1944_RightHand_Legend_LifeLevel50.anim.x" displayname="右手法杖1Level50" name="1944_RightHand_Legend_LifeLevel50.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1954_RightHand_Legend_IceLevel50.anim.x" displayname="右手法杖2Level50" name="1954_RightHand_Legend_IceLevel50.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1964_RightHand_Legend_FireLevel50.anim.x" displayname="右手法杖3Level50" name="1964_RightHand_Legend_FireLevel50.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1974_RightHand_Legend_StormLevel50.anim.x" displayname="右手法杖4Level50" name="1974_RightHand_Legend_StormLevel50.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1984_RightHand_Legend_DeathLevel50.anim.x" displayname="右手法杖5Level50" name="1984_RightHand_Legend_DeathLevel50.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2051_GoldAcinus.anim.x" displayname="金浆果" name="2051_GoldAcinus.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2052_SilveryAcinus.anim.x" displayname="银浆果" name="2052_SilveryAcinus.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2053_StrawberryAcinus.anim.x" displayname="草莓浆果" name="2053_StrawberryAcinus.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2054_SeawaterAcinus.anim.x" displayname="海水浆果" name="2054_SeawaterAcinus.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2117_ChristmasLolipop.anim.x" displayname="圣诞棒棒糖" name="2117_ChristmasLolipop.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2119_TheStrongest_FireLevel55.anim.x" displayname="最强火法杖Level55" name="2119_TheStrongest_FireLevel55.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2120_TheStrongest_IceLevel55.anim.x" displayname="最强冰法杖Level55" name="2120_TheStrongest_IceLevel55.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2121_TheStrongest_StormLevel55.anim.x" displayname="最强雷法杖Level55" name="2121_TheStrongest_StormLevel55.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2122_TheStrongest_LifeLevel55.anim.x" displayname="最强生命法杖Level55" name="2122_TheStrongest_LifeLevel55.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2123_TheStrongest_DeathLevel55.anim.x" displayname="最强死亡法杖Level55" name="2123_TheStrongest_DeathLevel55.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2132_FinedayPig_Shield_Max.anim.x" displayname="末日猪盾" name="2132_FinedayPig_Shield_Max.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2134_AngryDemon_Hammer_Max.anim.x" displayname="愤怒恶魔武器" name="2134_AngryDemon_Hammer_Max.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2202_TheStrongest_FireLevel55_Left.anim.x" displayname="最强火盾Level55" name="2202_TheStrongest_FireLevel55_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2203_TheStrongest_IceLevel55_Left.anim.x" displayname="最强冰盾Level55" name="2203_TheStrongest_IceLevel55_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2204_TheStrongest_StormLevel55_Left.anim.x" displayname="最强雷盾Level55" name="2204_TheStrongest_StormLevel55_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2205_TheStrongest_LifeLevel55_Left.anim.x" displayname="最强生命盾Level55" name="2205_TheStrongest_LifeLevel55_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2206_TheStrongest_DeathLevel55_Left.anim.x" displayname="最强死亡盾Level55" name="2206_TheStrongest_DeathLevel55_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2304_FireMagicWandS4.anim.x" displayname="火药魔杖S4" name="2304_FireMagicWandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2305_IceMagicWandS4.anim.x" displayname="冰冻魔杖S4" name="2305_IceMagicWandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2306_StormMagicWandS4.anim.x" displayname="雷电魔杖S4" name="2306_StormMagicWandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2307_LifeMagicWandS4.anim.x" displayname="生命魔杖S4" name="2307_LifeMagicWandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2308_DeathMagicWandS4.anim.x" displayname="死亡魔杖S4" name="2308_DeathMagicWandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2309_FireLeftHandS4.anim.x" displayname="火魔法书S4" name="2309_FireLeftHandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2310_IceLeftHandS4.anim.x" displayname="冰魔法书S4" name="2310_IceLeftHandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2311_StormLeftHandS4.anim.x" displayname="雷魔法书S4" name="2311_StormLeftHandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2312_LifeLeftHandS4.anim.x" displayname="生命魔法书S4" name="2312_LifeLeftHandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2313_DeathLeftHandS4.anim.x" displayname="死亡魔法书S4" name="2313_DeathLeftHandS4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2326_TheStrongest_Harpoon_Left.anim.x" displayname="最强鱼叉" name="2326_TheStrongest_Harpoon_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2329_TheChristmas_Cane_Left.anim.x" displayname="圣诞手杖" name="2329_TheChristmas_Cane_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2330_TheChristmas_Cane_GreenLeft.anim.x" displayname="圣诞绿手杖" name="2330_TheChristmas_Cane_GreenLeft.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2383_FireMagicWandS4_VIP.anim.x" displayname="VIP火魔杖S4" name="2383_FireMagicWandS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2384_IceMagicWandS4_VIP.anim.x" displayname="VIP冰魔杖S4" name="2384_IceMagicWandS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2385_StormMagicWandS4_VIP.anim.x" displayname="VIP雷魔杖S4" name="2385_StormMagicWandS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2386_LifeMagicWandS4_VIP.anim.x" displayname="VIP生命魔杖S4" name="2386_LifeMagicWandS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2387_DeathMagicWandS4_VIP.anim.x" displayname="VIP死亡魔杖S4" name="2387_DeathMagicWandS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2406_Umbrella01_Left.anim.x" displayname="雨伞01" name="2406_Umbrella01_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2407_Umbrella02_Left.anim.x" displayname="雨伞02" name="2407_Umbrella02_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2412_Dream_Flower_Left.anim.x" displayname="梦之花" name="2412_Dream_Flower_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2422_icecreram_green_Left.x" displayname="绿色冰淇淋" name="2422_icecreram_green_Left"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2423_icecreram_write_Left.x" displayname="白色冰淇淋" name="2423_icecreram_write_Left"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2424_icecreram_brown_Left.x" displayname="棕色冰淇淋" name="2424_icecreram_brown_Left"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2429_Dream2_Flower_Left.anim.x" displayname="梦之花2" name="2429_Dream2_Flower_Left.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1684_ShopFireWand04.anim.x" displayname="火魔杖04" name="1684_ShopFireWand04.anim"/>
+</category>
+<category name="effects">  
+  <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
+  <asset filename="character/CC/05effect/whitecloud.x" name="whitecloud" displayname="白云" physics="false"/>
+  <asset filename="character/CC/05effect/blackcloudrotate.x" name="blackcloudrotate" displayname="乌云" physics="false"/>
+  <asset filename="character/CC/05effect/blackcloud.x" name="blackcloud" displayname="旋转乌云" physics="false"/>
+  <asset filename="character/CC/05effect/focusedblackdust.x" name="focusedblackdust" displayname="聚集黑雾" physics="false"/>
+  <asset filename="character/CC/05effect/rainflower.x" name="rainflower" displayname="飘落花瓣" physics="false"/>
+  <asset filename="character/CC/05effect/fallingleaves.x" name="fallingleaves" displayname="飘落树叶" physics="false"/>
+  <asset filename="character/CC/05effect/fire.x" name="fire" displayname="火" physics="false"/>
+  <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false"/>
+  <asset filename="character/CC/05effect/ray.x" name="ray" displayname="放射光" physics="false"/>
+  <asset filename="character/CC/05effect/flyingparticle.x" name="flyingparticle" displayname="星光环绕" physics="false"/>
+  <asset filename="character/CC/05effect/star.x" name="star" displayname="星光升起" physics="false"/>
+  <asset filename="character/CC/05effect/risingparticle.x" name="risingparticle" displayname="光斑升起" physics="false"/>
+  <asset filename="character/CC/05effect/fallingparticle1.x" name="fallingparticle1" displayname="星光洒落" physics="false"/>
+  <asset filename="character/CC/05effect/fallingparticle2.x" name="fallingparticle2" displayname="光斑洒落" physics="false"/>
+  <asset filename="character/CC/05effect/risingline.x" name="risingline" displayname="垂直光线" physics="false"/>
+  <asset filename="character/CC/05effect/dazycircle.x" name="dazycircle" displayname="眩晕圈" physics="false"/>
+  <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false"/>
+  <asset filename="character/CC/05effect/thunder.x" name="thunder" displayname="雷电" physics="false"/>
+  <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false"/>
+  <asset filename="character/CC/05effect/waterbubble.x" name="waterbubble" displayname="水泡" physics="false"/>
+  <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false"/>
+  <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false"/>
+  <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false"/>
+  <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false"/>
+  <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false"/>
+  <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false"/>
+  <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false"/>
+  <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false"/>
+  <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false"/>
+  <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false"/>
+
+  <asset filename="character/common/headarrow/headarrow.x" displayname="箭头" name="headarrow"/>
+	<asset filename="character/common/headexclaimed/headexclaimed.x" displayname="感叹号" name="headexclaimed"/>
+	<asset filename="character/common/headexclaimed/headexclaimed2.x" displayname="感叹号2" name="headexclaimed2"/>
+	<asset filename="character/common/headexclaimed/headexclaimed3.x" displayname="感叹号3" name="headexclaimed3"/>
+	<asset filename="character/common/headquest/headquest.x" displayname="问号" name="headquest"/>
+	<asset filename="character/common/headquest/headquest2.x" displayname="问号2" name="headquest2"/>
+	<asset filename="character/common/headquest/headquest3.x" displayname="问号3" name="headquest3"/>
+	<asset filename="character/common/pointer/pointer.x" displayname="指针" name="pointer"/>
+	<asset filename="character/common/portal/chuansongmen.x" displayname="入口" name="chuansongmen"/>
+	<asset filename="character/common/select/select.x" displayname="选择" name="select"/>
+	<asset filename="character/common/tag/tag.x" displayname="标签" name="tag"/>
+	<asset filename="character/particles/fire5/fire5.x" displayname="火" name="fire5"/>
+	<asset filename="character/particles/fountain/fountain.x" displayname="喷泉" name="fountain"/>
+	<asset filename="character/particles/fountain2/fountain2.x" displayname="喷泉2" name="fountain2"/>
+	<asset filename="character/particles/ring.x" displayname="铃声" name="ring"/>
+	<asset filename="character/particles/ring_head.x" displayname="铃声" name="ring_head"/>
+	<asset filename="character/particles/smoke/smoke.x" displayname="烟" name="smoke"/>
+	<asset filename="character/v5/06quest/Cartridge/Cartridge01_BaoZha.x" displayname="爆炸" name="Cartridge01_BaoZha"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragon_Efx.x" displayname="Efx飞龙之心" name="HeartOfFlyingDragon_Efx"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonBlue.x" displayname="蓝色飞龙之心" name="HeartOfFlyingDragonBlue"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonGreen.x" displayname="绿色飞龙之心" name="HeartOfFlyingDragonGreen"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonPurle.x" displayname="紫色飞龙之心" name="HeartOfFlyingDragonPurle"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonRed.x" displayname="红色飞龙之心" name="HeartOfFlyingDragonRed"/>
+	<asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonYellow.x" displayname="黄色飞龙之心" name="HeartOfFlyingDragonYellow"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12811_kids_addon_buff_effect_fire_level1.anim.x" displayname="火焰效应level1" name="12811_kids_addon_buff_effect_fire_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12812_kids_addon_buff_effect_ice_level1.anim.x" displayname="冰效应level1" name="12812_kids_addon_buff_effect_ice_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12813_kids_addon_buff_effect_storm_level1.anim.x" displayname="雷效应level1" name="12813_kids_addon_buff_effect_storm_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12814_kids_addon_buff_effect_life_level1.anim.x" displayname="生命效应level1" name="12814_kids_addon_buff_effect_life_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12815_kids_addon_buff_effect_death_level1.anim.x" displayname="死亡效应level1" name="12815_kids_addon_buff_effect_death_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12816_kids_addon_buff_effect_fire_level2.anim.x" displayname="火焰效应level2" name="12816_kids_addon_buff_effect_fire_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12817_kids_addon_buff_effect_ice_level2.anim.x" displayname="冰效应level2" name="12817_kids_addon_buff_effect_ice_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12818_kids_addon_buff_effect_storm_level2.anim.x" displayname="雷效应level2" name="12818_kids_addon_buff_effect_storm_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12819_kids_addon_buff_effect_life_level2.anim.x" displayname="生命效应level2" name="12819_kids_addon_buff_effect_life_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12820_kids_addon_buff_effect_death_level2.anim.x" displayname="死亡效应level2" name="12820_kids_addon_buff_effect_death_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12821_kids_addon_buff_effect_fire_level3.anim.x" displayname="火焰效应level3" name="12821_kids_addon_buff_effect_fire_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12822_kids_addon_buff_effect_ice_level3.anim.x" displayname="冰效应level3" name="12822_kids_addon_buff_effect_ice_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12823_kids_addon_buff_effect_storm_level3.anim.x" displayname="雷效应level3" name="12823_kids_addon_buff_effect_storm_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12824_kids_addon_buff_effect_life_level3.anim.x" displayname="生命效应level3" name="12824_kids_addon_buff_effect_life_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12825_kids_addon_buff_effect_death_level3.anim.x" displayname="死亡效应level3" name="12825_kids_addon_buff_effect_death_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12826_kids_addon_buff_effect_fire_level4.anim.x" displayname="火焰效应level4" name="12826_kids_addon_buff_effect_fire_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12827_kids_addon_buff_effect_ice_level4.anim.x" displayname="冰效应level4" name="12827_kids_addon_buff_effect_ice_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12828_kids_addon_buff_effect_storm_level4.anim.x" displayname="雷效应level4" name="12828_kids_addon_buff_effect_storm_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12829_kids_addon_buff_effect_life_level4.anim.x" displayname="生命效应level4" name="12829_kids_addon_buff_effect_life_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12830_kids_addon_buff_effect_death_level4.anim.x" displayname="死亡效应level4" name="12830_kids_addon_buff_effect_death_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12881_teen_gem_buff_effect_level1.anim.x" displayname="宝石抛光效果level1" name="12881_teen_gem_buff_effect_level1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12882_teen_gem_buff_effect_level2.anim.x" displayname="宝石抛光效果level2" name="12882_teen_gem_buff_effect_level2.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12883_teen_gem_buff_effect_level3.anim.x" displayname="宝石抛光效果level3" name="12883_teen_gem_buff_effect_level3.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12884_teen_gem_buff_effect_level4.anim.x" displayname="宝石抛光效果level4" name="12884_teen_gem_buff_effect_level4.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12885_teen_gem_buff_effect_level5.anim.x" displayname="宝石抛光效果level5" name="12885_teen_gem_buff_effect_level5.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12886_2110_FallInLoveRing_Man.anim.x" displayname="男式爱情戒指" name="12886_2110_FallInLoveRing_Man.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12887_2111_FallInLoveRing_Girl.anim.x" displayname="女式爱情戒指" name="12887_2111_FallInLoveRing_Girl.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12888_2393_FallInLoveRing_Man.anim.x" displayname="男式爱情" name="12888_2393_FallInLoveRing_Man.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/12889_2394_FallInLoveRing_Girl.anim.x" displayname="女式爱情" name="12889_2394_FallInLoveRing_Girl.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/2420_TheValentinesDayRing_Man.anim.x" displayname="男式情人节戒指" name="2420_TheValentinesDayRing_Man.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GemBuffEffect/2421_TheValentinesDayRing_Woman.anim.x" displayname="女式情人节戒指" name="2421_TheValentinesDayRing_Woman.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/12414_AncientRoyalArmor.anim.x" displayname="古代皇家铠甲" name="12414_AncientRoyalArmor.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/12418_KnightCaptainArmor_VIP.anim.x" displayname="骑士队长盔甲" name="12418_KnightCaptainArmor_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/12850_MagicStarEffect.anim.x" displayname="魔星效应" name="12850_MagicStarEffect.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1721_ColiseumFireShirtS1.anim.x" displayname="火效应S1" name="1721_ColiseumFireShirtS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1722_ColiseumIceShirtS1.anim.x" displayname="冰效应S1" name="1722_ColiseumIceShirtS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1723_ColiseumStormShirtS1.anim.x" displayname="雷效应S1" name="1723_ColiseumStormShirtS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1724_ColiseumDeathShirtS1.anim.x" displayname="死亡效应S1" name="1724_ColiseumDeathShirtS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1725_ColiseumLifeShirtS1.anim.x" displayname="生命效应S1" name="1725_ColiseumLifeShirtS1.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1726_Shop201161ShirtBoy.anim.x" displayname="男201161" name="1726_Shop201161ShirtBoy.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1727_Shop201161ShirtGirl.anim.x" displayname="女201161" name="1727_Shop201161ShirtGirl.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1904_DeathKnightPut.anim.x" displayname="1904火" name="1904_DeathKnightPut.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/2344_FireBackS4_VIP.anim.x" displayname="火法阵" name="2344_FireBackS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/2351_IceBackS4_VIP.anim.x" displayname="冰法阵" name="2351_IceBackS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/2358_StormBackS4_VIP.anim.x" displayname="雷法阵" name="2358_StormBackS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/2365_LifeBackS4_VIP.anim.x" displayname="生命法阵" name="2365_LifeBackS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/2372_DeathBackS4_VIP.anim.x" displayname="死亡法阵" name="2372_DeathBackS4_VIP.anim"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/Wisp.anim.x" displayname="小红束" name="Wisp.anim"/>
+	<asset filename="character/v5/09effect/AddBlue/AddBlue.x" displayname="加蓝" name="AddBlue"/>
+	<asset filename="character/v5/09effect/baoza/baoza.x" displayname="爆炸1" name="baoza"/>
+	<asset filename="character/v5/09effect/baoza/baoza2.x" displayname="爆炸2" name="baoza2"/>
+	<asset filename="character/v5/09effect/baoza/baoza3.x" displayname="爆炸3" name="baoza3"/>
+	<asset filename="character/v5/09effect/baoza/baoza4.x" displayname="爆炸4" name="baoza4"/>
+	<asset filename="character/v5/09effect/Bee/Bee.x" displayname="蜜蜂" name="Bee"/>
+	<asset filename="character/v5/09effect/CatchingFishGameSplash/CatchingFishGameSplash.x" displayname="捕鱼游戏冒泡" name="CatchingFishGameSplash"/>
+	<asset filename="character/v5/09effect/ceshi/diaoyu/diaoyu.x" displayname="钓鱼" name="diaoyu"/>
+	<asset filename="character/v5/09effect/ceshi/dirt/3/Purify_Base.x" displayname="净化" name="Purify_Base"/>
+	<asset filename="character/v5/09effect/ceshi/dirt/dilie/dilie.x" displayname="地雷" name="dilie"/>
+	<asset filename="character/v5/09effect/ceshi/dirt/jidianshu/jidianshu.x" displayname="集电术" name="jidianshu"/>
+	<asset filename="character/v5/09effect/ceshi/dirt/luanshichuankong/luanshichuankong.x" displayname="乱石穿空" name="luanshichuankong"/>
+	<asset filename="character/v5/09effect/ceshi/fire/2/OnHit.x" displayname="击中" name="OnHit"/>
+	<asset filename="character/v5/09effect/ceshi/fire/xinghuo/xinghuo.x" displayname="星火" name="xinghuo"/>
+	<asset filename="character/v5/09effect/ceshi/shuijingqiu/shuijingqiu.x" displayname="水晶球" name="shuijingqiu"/>
+	<asset filename="character/v5/09effect/ChangeColor/ChangeColor.x" displayname="变色" name="ChangeColor"/>
+	<asset filename="character/v5/09effect/Common/Fazhen02_Xuanzhuan_Green.x" displayname="绿色旋转法阵02" name="Fazhen02_Xuanzhuan_Green"/>
+	<asset filename="character/v5/09effect/Common/GemMergeProcess_effect.x" displayname="宝石合并过程效果" name="GemMergeProcess_effect"/>
+	<asset filename="character/v5/09effect/Common/Grow01_Xiajiang_Green.x" displayname="红色光球下降" name="Grow01_Xiajiang_Green"/>
+	<asset filename="character/v5/09effect/Common/Huoyan01_Shankai_Red.x" displayname="红色火烟散开01" name="Huoyan01_Shankai_Red"/>
+	<asset filename="character/v5/09effect/Common/JiaHao01_Shangsheng_Green.x" displayname="绿色上升加号01" name="JiaHao01_Shangsheng_Green"/>
+	<asset filename="character/v5/09effect/Common/Quan01_Huoda_Yellow.x" displayname="黄色圈扩大01" name="Quan01_Huoda_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Quan01_Suoxiao_Yellow.x" displayname="黄色圈缩小01" name="Quan01_Suoxiao_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Quan01_Yellow.x" displayname="黄色圈01" name="Quan01_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Shexian01_Shangsheng_Yellow.x" displayname="黄色射线01上升" name="Shexian01_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Shexian01_Xiajiang_Yellow.x" displayname="黄色射线01下降" name="Shexian01_Xiajiang_Yellow"/>
+	<asset filename="character/v5/09effect/Common/SheXianGuang01_Xuanzhuan_Green.x" displayname="黄色射线光01上升" name="SheXianGuang01_Xuanzhuan_Green"/>
+	<asset filename="character/v5/09effect/Common/SheXianGuang02_Shangsheng_Yellow.x" displayname="黄色射线光02上升" name="SheXianGuang02_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/SheXianGuang03_Shangsheng_Yellow.x" displayname="黄色射线光03上升" name="SheXianGuang03_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Shexianquan01_Xuanzhuan_Purple.x" displayname="紫色射线圈旋转01" name="Shexianquan01_Xuanzhuan_Purple"/>
+	<asset filename="character/v5/09effect/Common/Shexianquan01_Xuanzhuan_Yellow.x" displayname="黄色射线圈旋转01" name="Shexianquan01_Xuanzhuan_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Shuguang01_Shangsheng_Yellow.x" displayname="黄色束光上升01" name="Shuguang01_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star01_Shangsheng_Yellow.x" displayname="黄色星上升01" name="Star01_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star01_Shankai_Yellow.x" displayname="黄色星散开01" name="Star01_Shankai_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star01_Xiajiang_Yellow.x" displayname="黄色星旋转01" name="Star01_Xiajiang_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star01_Yellow.x" displayname="黄色星" name="Star01_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star02_Shangsheng_Yellow.x" displayname="黄色星上升03" name="Star02_Shangsheng_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Star03_Xuanzhuan_White.x" displayname="白色星旋转02" name="Star03_Xuanzhuan_White"/>
+	<asset filename="character/v5/09effect/Common/Xian_BaiSeShangSheng.x" displayname="线白色上升" name="Xian_BaiSeShangSheng"/>
+	<asset filename="character/v5/09effect/Common/Xian_ShangShengGuang_White.x" displayname="白色线上升光" name="Xian_ShangShengGuang_White"/>
+	<asset filename="character/v5/09effect/Common/Xian01_Shangsheng_White.x" displayname="白色线柱上升" name="Xian01_Shangsheng_White"/>
+	<asset filename="character/v5/09effect/Common/Xian01_White.x" displayname="白色线01" name="Xian01_White"/>
+	<asset filename="character/v5/09effect/Common/Xian01_Yellow.x" displayname="黄色线01" name="Xian01_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Xuanfeng01_Xuanzhuan_Yellow.x" displayname="黄色旋风旋转01" name="Xuanfeng01_Xuanzhuan_Yellow"/>
+	<asset filename="character/v5/09effect/Common/Xuanwo01_Huoda_Blue.x" displayname="蓝色旋涡扩大01" name="Xuanwo01_Huoda_Blue"/>
+	<asset filename="character/v5/09effect/Common/Xuanwo01_Suoxiao_Blue.x" displayname="蓝色旋涡缩小01" name="Xuanwo01_Suoxiao_Blue"/>
+	<asset filename="character/v5/09effect/Common/Xuanwo02_Xuanzhuan_Blue.x" displayname="蓝色旋涡旋转02" name="Xuanwo02_Xuanzhuan_Blue"/>
+	<asset filename="character/v5/09effect/Common/Yan_XuanZhuan_White.x" displayname="白色烟旋转" name="Yan_XuanZhuan_White"/>
+	<asset filename="character/v5/09effect/Common/Yan01_Shankai_White.x" displayname="白色烟散开01" name="Yan01_Shankai_White"/>
+	<asset filename="character/v5/09effect/DampenMagic_Impact_Base.x" displayname="抑制光环" name="DampenMagic_Impact_Base"/>
+	<asset filename="character/v5/09effect/DeliverDoorEfc/DeliverDoorEfc.x" displayname="传送门" name="DeliverDoorEfc"/>
+	<asset filename="character/v5/09effect/Disappear/Disappear.x" displayname="消失" name="Disappear"/>
+	<asset filename="character/v5/09effect/Dizzy/Dizzy.x" displayname="眩晕" name="Dizzy"/>
+	<asset filename="character/v5/09effect/Dizzy/Dizzy_star.x" displayname="头晕的星" name="Dizzy_star"/>
+	<asset filename="character/v5/09effect/DustNova_Cast_Base.x" displayname="尘埃新星" name="DustNova_Cast_Base"/>
+	<asset filename="character/v5/09effect/Exit/Exit.x" displayname="出口" name="Exit"/>
+	<asset filename="character/v5/09effect/firewater/firewater.x" displayname="火系泡泡" name="firewater"/>
+	<asset filename="character/v5/09effect/Fly/Fly.x" displayname="云飞" name="Fly"/>
+	<asset filename="character/v5/09effect/Fly/FlyStar.x" displayname="飞星" name="FlyStar"/>
+	<asset filename="character/v5/09effect/FlyingHeart/FlyingHeart.x" displayname="飞翔的心" name="FlyingHeart"/>
+	<asset filename="character/v5/09effect/GreaterHeal_Low_Base.x" displayname="大治愈术" name="GreaterHeal_Low_Base"/>
+	<asset filename="character/v5/09effect/Holy_Precast_Uber_Base.x" displayname="预知" name="Holy_Precast_Uber_Base"/>
+	<asset filename="character/v5/09effect/InstanceDoor/InstanceDoor_Entrance.x" displayname="实例门_入口" name="InstanceDoor_Entrance"/>
+	<asset filename="character/v5/09effect/InstanceDoor/InstanceDoor_Exit.x" displayname="实例门_出口" name="InstanceDoor_Exit"/>
+	<asset filename="character/v5/09effect/KidneyShot_Base_Cast.x" displayname="腰斩" name="KidneyShot_Base_Cast"/>
+	<asset filename="character/v5/09effect/LifeWater/LifeWater.x" displayname="生命之水小喷泉" name="LifeWater"/>
+	<asset filename="character/v5/09effect/LoyaltyDown_Impact_Base.x" displayname="忠诚度下降" name="LoyaltyDown_Impact_Base"/>
+	<asset filename="character/v5/09effect/LoyaltyUp_Impact_Base.x" displayname="忠诚度上升" name="LoyaltyUp_Impact_Base"/>
+	<asset filename="character/v5/09effect/MightAura_Impact_Base.x" displayname="力量光环" name="MightAura_Impact_Base"/>
+	<asset filename="character/v5/09effect/Move/MoveEnd.x" displayname="行动接受" name="MoveEnd"/>
+	<asset filename="character/v5/09effect/Move/MoveStart.x" displayname="行动开始" name="MoveStart"/>
+	<asset filename="character/v5/09effect/naissance/naissance.x" displayname="产生_向下降" name="naissance"/>
+	<asset filename="character/v5/09effect/Rag_FireNova_Area.x" displayname="火焰新星" name="Rag_FireNova_Area"/>
+	<asset filename="character/v5/09effect/renmingbi.x" displayname="人民币" name="renmingbi"/>
+	<asset filename="character/v5/09effect/TransmittalDoor/TransmittalDoor.x" displayname="传送门" name="TransmittalDoor"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_blue.x" displayname="紫色底盘" name="Chassis_blue"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_green.x" displayname="绿色底盘" name="Chassis_green"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_huoquan.x" displayname="火圈底盘" name="Chassis_huoquan"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_red.x" displayname="红色底盘" name="Chassis_red"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_xuanwo.x" displayname="旋涡底盘" name="Chassis_xuanwo"/>
+	<asset filename="character/v5/09effect/Upgrade/Chassis_yellow.x" displayname="黄色底盘" name="Chassis_yellow"/>
+	<asset filename="character/v5/09effect/Upgrade/Star.x" displayname="星" name="Star"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade.x" displayname="升级" name="Upgrade"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_ChassisPurple.x" displayname="升级_紫色底盘" name="Upgrade_ChassisPurple"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_CirqueGlowRed.x" displayname="升级_环状" name="Upgrade_CirqueGlowRed"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_Cylinder.x" displayname="升级_圆环" name="Upgrade_Cylinder"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_light1.x" displayname="升级_光1" name="Upgrade_light1"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_light2.x" displayname="升级_光2" name="Upgrade_light2"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_Star.x" displayname="升级_星" name="Upgrade_Star"/>
+	<asset filename="character/v5/09effect/Upgrade/Upgrade_StarUp.x" displayname="升级_星上升" name="Upgrade_StarUp"/>
+	<asset filename="character/v5/09effect/Wisp/Wisp.x" displayname="小束红" name="Wisp"/>
+	<asset filename="character/v5/09effect/Wisp/Wisp_hit.x" displayname="小束红和红加号" name="Wisp_hit"/>
+	<asset filename="character/v5/09effect/xingxing/xingxing01.x" displayname="星星01" name="xingxing01"/>
+	<asset filename="character/v5/09effect/xingxing/xingxing02.x" displayname="星星02" name="xingxing02"/>
+	<asset filename="character/v5/09effect/xingxing/xingxing03.x" displayname="星星03" name="xingxing03"/>
+	<asset filename="character/v5/CG/haimian/haimian.x" displayname="海绵" name="haimian"/>
+	<asset filename="character/v5/CG/haimian/haimian1.x" displayname="海绵1" name="haimian1"/>
+	<asset filename="character/v5/CG/haimian/haimian2.x" displayname="海绵2" name="haimian2"/>
+	<asset filename="character/v5/CG/haimian/haimian3.x" displayname="海绵3" name="haimian3"/>
+	<asset filename="character/v5/CG/haimian/haimian4.x" displayname="海绵4" name="haimian4"/>
+	<asset filename="character/v5/CG/haimian/haimian5.x" displayname="海绵5" name="haimian5"/>
+	<asset filename="character/v5/CG/haimian/haimian6.x" displayname="海绵6" name="haimian6"/>
+	<asset filename="character/v3/Item/ObjectComponents/GroundEffect/1903_GoldenKnightPut.anim.x" displayname="1903黄金" name="1903_GoldenKnightPut.anim"/>
+	<asset filename="character/v5/02animals/ChiBang01/ChiBang01.x" displayname="翅膀01" name="ChiBang01"/>
+	<asset filename="character/v5/02animals/ChiBang02/ChiBang02.x" displayname="翅膀02" name="ChiBang02"/>
+</category>
 </PlayerAssets>
