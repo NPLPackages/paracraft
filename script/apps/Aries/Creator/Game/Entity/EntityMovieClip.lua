@@ -217,6 +217,53 @@ function Entity:GetMovieClip()
 	return self.movieClip;
 end
 
+-- only search in 4 horizontal directions
+function Entity:GetNearByCodeEntity(cx, cy, cz)
+	cx, cy, cz = cx or self.bx, cy or self.by, cz or self.bz;
+	for side = 0, 3 do
+		local dx, dy, dz = Direction.GetOffsetBySide(side);
+		local x,y,z = cx+dx, cy+dy, cz+dz;
+		local blockTemplate = BlockEngine:GetBlock(x,y,z);
+		if(blockTemplate and blockTemplate.id == block_types.names.CodeBlock) then
+			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+			if(codeEntity) then
+				return codeEntity;
+			end
+		end
+	end
+end
+
+function Entity:GetFirstActorStack()
+	local firstActor;
+	for i = 1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i)
+		if (itemStack and itemStack.count > 0) then
+			if (itemStack.id == block_types.names.TimeSeriesNPC or itemStack.id == block_types.names.TimeSeriesOverlay) then
+				firstActor = itemStack;
+				break
+			end
+		end
+	end
+	return firstActor;
+end
+
+-- we will select the first actor in the movie block if there is a code block nearby 
+-- otherwise, we will select the default camera object in the movie block. 
+function Entity:AutoSelectActorInEditor()
+	local codeEntity = self:GetNearByCodeEntity();
+	if(codeEntity) then
+		local firstActor = self:GetFirstActorStack();
+		if(firstActor) then
+			MovieClipController.SetFocusToItemStack(firstActor);
+		end
+	else
+		local cameraItem = self:GetCameraItemStack();
+		if(cameraItem) then
+			MovieClipController.SetFocusToItemStack(cameraItem);
+		end
+	end
+end
+
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	local movieClip = self:GetMovieClip();
@@ -225,6 +272,7 @@ function Entity:OpenEditor(editor_name, entity)
 	end
 	self.is_playing_mode = false;
 	MovieManager:SetActiveMovieClip(movieClip);
+	self:AutoSelectActorInEditor();
 	return true;
 end
 

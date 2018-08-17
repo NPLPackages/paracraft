@@ -358,9 +358,9 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	elseif(keyname == "assetfile") then
 		local title = format(L"起始时间%s, 请输入模型路经或名称(默认default)", strTime);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(title, function(result)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+		OpenAssetFileDialog.ShowPage(title, function(result)
 			if(result) then
 				local filepath = PlayerAssetFile:GetValidAssetByString(result);
 				if(filepath or result=="0" or result=="") then
@@ -376,7 +376,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(callbackFunc) then
 				callbackFunc(false);
 			end
-		end,old_value, L"选择模型文件", "model");
+		end, old_value, L"选择模型文件", "model");
 
 	elseif(keyname == "blockinhand") then
 		local title = format(L"起始时间%s, 请输入手持物品ID(空为0)", strTime);

@@ -31,6 +31,7 @@ function CodeBlockWindow.Show(bShow)
 		CodeBlockWindow.Close();
 	else
 		GameLogic:desktopLayoutRequested("CodeBlockWindow");
+		GameLogic:Connect("desktopLayoutRequested", CodeBlockWindow, CodeBlockWindow.OnLayoutRequested, "UniqueConnection");
 	
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
@@ -63,6 +64,14 @@ function CodeBlockWindow.Show(bShow)
 		viewport:SetMarginRightHandler(self);
 
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
+	end
+end
+
+function CodeBlockWindow:OnLayoutRequested(requesterName)
+	if(requesterName ~= "CodeBlockWindow") then
+		if(CodeBlockWindow.IsVisible()) then
+			CodeBlockWindow.Show(false);
+		end
 	end
 end
 
@@ -483,6 +492,10 @@ function CodeBlockWindow.GetBlockList()
 		end)
 	end
 	return blockList;
+end
+
+function CodeBlockWindow.OnOpenTutorials()
+	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/codeblock", "", "", 1);
 end
 
 CodeBlockWindow:InitSingleton();

@@ -89,7 +89,12 @@ function CodeHelpItem:GetHtml()
 					if(arg_item.type == "field_input") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
 					elseif(arg_item.type == "input_value") then
-						if(not item_text or item_text=="") then
+						if(arg_item.options) then
+							arg_item.selectedIndex = arg_item.selectedIndex or 1;
+							item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
+							arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
+							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
+						elseif(not item_text or item_text=="") then
 							arg_text = '<div style="float:left;margin:3px;background-color:#ffffff;color:#000000;width:5px;height:12px"></div>';
 						else
 							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");

@@ -138,6 +138,12 @@ end
 
 -- @param bShow:true to refresh or show
 function MovieClipController.ShowPage(bShow, OnClose)
+
+	if(bShow) then
+		GameLogic:desktopLayoutRequested("MovieClipController");
+		GameLogic:Connect("desktopLayoutRequested", MovieClipController, MovieClipController.OnLayoutRequested, "UniqueConnection");
+	end
+
 	if(not page) then
 		local width,height = 200, 235;
 		local params = {
@@ -190,6 +196,21 @@ function MovieClipController.ShowPage(bShow, OnClose)
 	end
 
 	MovieClipController.SetFocusToActor();
+end
+
+
+function MovieClipController.IsVisible()
+	if(page) then
+		return page:IsVisible();
+	end
+end
+
+function MovieClipController:OnLayoutRequested(requesterName)
+	if(requesterName ~= "MovieClipController") then
+		if(MovieClipController.IsVisible()) then
+			MovieClipController.OnClose();
+		end
+	end
 end
 
 function MovieClipController.RegisterSceneEvent()

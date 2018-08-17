@@ -20,7 +20,8 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">...</div>
         </div>
         <input type="button" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用"%>' onclick="CodeBlockWindow.OnOpenBlocklyEditor" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
-        <input type="button" align="right" name="saveAndClose" value='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_big_button" style="margin-top:5px;min-width:80px;margin-right:10px;" />
+        <input type="button" value='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+        <input type="button" align="right" name="saveAndClose" value='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_big_button" style="margin-top:5px;min-width:60px;" />
     </div>
     <pe:container alignment="_fi" style="position:relative;margin-bottom:48px;margin-left:3px;width:200px;background:url();">
         <iframe src= "script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html" width="200"/>

@@ -31,6 +31,7 @@ local MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobProperty
 local cur_entity;
 local page;
 local curAssetFile;
+
 function MobPropertyPage.OnInit()
 	page = document:GetPageCtrl();
 
@@ -147,9 +148,8 @@ local asset_file_ds;
 
 function MobPropertyPage.GetAssetFileDS()
 	if(not asset_file_ds) then
-		
 		asset_file_ds = {};
-		local ds = PlayerAssetFile:GetAllAssetFiles();
+		local ds = PlayerAssetFile:GetCategoryItems("common");
 		for i, item in ipairs(ds) do
 			local assetfile = item.filename;
 			if(assetfile and assetfile~="") then
@@ -172,6 +172,7 @@ function MobPropertyPage.GetAssetFileDS()
 	end
 	return asset_file_ds;
 end
+
 
 function MobPropertyPage.OnChangeAssetFile()
 	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"));
@@ -236,29 +237,21 @@ function MobPropertyPage.OnClickOK()
 end
 
 function MobPropertyPage.OnOpenAssetFile()
---	NPL.load("(gl)script/ide/OpenFileDialog.lua");
---	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
---	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
---	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.GetFilters("model"),
---		L"选择模型文件", GameLogic.GetWorldDirectory());
---	if(filename and page) then
---		local fileItem = Files.ResolveFilePath(filename);
---		if(fileItem and fileItem.relativeToWorldPath) then
---			local assetfile = fileItem.relativeToWorldPath;
---			page:SetValue("assetfile", assetfile);
---		end
---	end
-	
-	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-	OpenFileDialog.ShowPage("", function(filename)
+	local lastFilename = "";
+	if(page) then
+		lastFilename = page:GetValue("assetfile")
+	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+	OpenAssetFileDialog.ShowPage("", function(filename)
 		if(filename and page) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
 			if(filepath or filename=="actor") then
 				page:SetValue("assetfile", filename);
+				MobPropertyPage.OnChangeAssetFile();
 			end
 		end
-	end, old_value, L"选择模型文件", "model");
+	end, lastFilename, L"选择模型文件", "model");
 end

@@ -141,9 +141,9 @@ end
 function ItemBlockModel:OpenChangeFileDialog(itemStack)
 	if(itemStack) then
 		local local_filename = itemStack:GetDataField("tooltip");
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+		OpenAssetFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
 			if(result and result~="" and result~=local_filename) then
 				self:SetModelFileName(itemStack, result);
 			end

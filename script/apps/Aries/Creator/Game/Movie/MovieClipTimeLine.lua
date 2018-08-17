@@ -322,7 +322,6 @@ function MovieClipTimeLine:ShowTimeline(state)
 	end
 end
 
-
 function MovieClipTimeLine.OnClickTimeLine()
 	local movieClip = MovieManager:GetActiveMovieClip();
 	if(movieClip) then
