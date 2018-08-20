@@ -130,6 +130,7 @@ function SelectBlocks:UpdateManipulators()
 
 	NPL.load("(gl)script/ide/System/Scene/Manipulators/BlockPivotManipContainer.lua");
 	local BlockPivotManipContainer = commonlib.gettable("System.Scene.Manipulators.BlockPivotManipContainer");
+
 	local manipCont = BlockPivotManipContainer:new()
 	manipCont.radius = 0.5;
 
@@ -141,31 +142,33 @@ function SelectBlocks:UpdateManipulators()
 	manipCont:SetPivotPointPlugName("PivotPoint");
 	self:AddManipulator(manipCont);
 	manipCont:connectToDependNode(self);
+	
 
-	local BlockPivotManipContainer = commonlib.gettable("System.Scene.Manipulators.BlockPivotManipContainer");
-	local manipCont = BlockPivotManipContainer:new():init();
-	manipCont:SetPivotPointPlugName("position");
-	self:AddManipulator(manipCont);
-	-- Use first block as position.
-	local b = self.blocks[1];
-	if(b) then
-		self:SetManipulatorPosition({b[1], b[2], b[3]});
-	elseif(self.blockX) then
-		self:SetManipulatorPosition({self.blockX, self.blockY, self.blockZ});
+	if(not self:IsMirrorMode()) then
+		local manipCont = BlockPivotManipContainer:new():init();
+		manipCont:SetPivotPointPlugName("position");
+		self:AddManipulator(manipCont);
+		-- Use first block as position.
+		local b = self.blocks[1];
+		if(b) then
+			self:SetManipulatorPosition({b[1], b[2], b[3]});
+		elseif(self.blockX) then
+			self:SetManipulatorPosition({self.blockX, self.blockY, self.blockZ});
+		end
+		manipCont:connectToDependNode(self);
+	
+		-- For rotation of blocks
+		NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
+		local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
+		local manipCont = RotateManipContainer:new():init();
+		manipCont:SetPositionPlugName("PivotPointReal");
+		manipCont:SetRealTimeUpdate(false);
+		manipCont:SetYawInverted(true);
+		-- manipCont:SetRollInverted(true);
+		-- manipCont:SetPitchInverted(true);
+		self:AddManipulator(manipCont);
+		manipCont:connectToDependNode(self);
 	end
-	manipCont:connectToDependNode(self);
-
-	-- For rotation of blocks
-	NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
-	local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
-	local manipCont = RotateManipContainer:new():init();
-	manipCont:SetPositionPlugName("PivotPointReal");
-	manipCont:SetRealTimeUpdate(false);
-	manipCont:SetYawInverted(true);
-	-- manipCont:SetRollInverted(true);
-	-- manipCont:SetPitchInverted(true);
-	self:AddManipulator(manipCont);
-	manipCont:connectToDependNode(self);
 end
 
 -- change manipulator position, but does not translate the blocks
@@ -836,7 +839,7 @@ function SelectBlocks.DoClick(name)
 		SelectBlocks.TransformSelection({dz=1})
 	elseif(name == "dz_negative" or name == "btn_moveto_right")then
 		SelectBlocks.TransformSelection({dz=-1})
-	elseif(name == "dz_negative" or name == "btn_mirror")then
+	elseif(name == "btn_mirror")then
 		SelectBlocks.MirrorSelection()
 	end
 end
@@ -1121,6 +1124,17 @@ local function OnMirrorSelectionChanged()
 	end
 end
 
+function SelectBlocks:SetMirrorMode(bEnable)
+	if(self.isMirrorMode ~= bEnable) then
+		self.isMirrorMode = bEnable;
+		self:UpdateManipulators();
+	end
+end
+
+function SelectBlocks:IsMirrorMode()
+	return self.isMirrorMode;
+end
+
 function SelectBlocks.MirrorSelection()
 	local self = cur_instance;
 	if(self) then
@@ -1130,8 +1144,11 @@ function SelectBlocks.MirrorSelection()
 		
 		SelectBlocks.GetEventSystem():AddEventListener("OnSelectionChanged", OnMirrorSelectionChanged, nil, "MirrorWnd");
 
+		self:SetMirrorMode(true);
+
 		MirrorWnd.ShowPage(cur_selection, pivot_x,pivot_y,pivot_z, function(settings, result)
 			SelectBlocks.GetEventSystem():RemoveEventListener("OnSelectionChanged", OnMirrorSelectionChanged);
+			self:SetMirrorMode(false);
 			if(result) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MirrorBlocksTask.lua");
 				local task = MyCompany.Aries.Game.Tasks.MirrorBlocks:new({method=settings.method, from_blocks=MirrorWnd.blocks, pivot_x=MirrorWnd.pivot_x,pivot_y=MirrorWnd.pivot_y,pivot_z=MirrorWnd.pivot_z, mirror_axis=settings.xyz, })
