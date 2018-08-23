@@ -36,7 +36,7 @@ function TransformWnd.ShowPage(blocks, trans, callbackFunc)
 
 	old_transform = commonlib.clone(trans);
 	
-	local x, y, width, height = 124, 160, 115, 290;
+	local x, y, width, height = 124, 160, 115, 300;
 	local align = "_lt";
 	
 	local params = {

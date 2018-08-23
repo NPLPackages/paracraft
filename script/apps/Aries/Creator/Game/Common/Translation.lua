@@ -5,6 +5,9 @@ Date: 2014/11/21
 Desc: utf8 encoded zhCN is used as the source language. enUS is the target language.
 zhCN is chosen mostly because it can be easily spotted in source and XML file by both machine and human. 
 
+IMPORTANT NOTE: In order to extract MCML file, one needs to compile and replace xgettext tools here in poedit's bin folder
+- https://github.com/LiXizhi/NPLgettext
+
 PoEdit command line:
 	cmd:	xgettext --language=Lua --force-po -o %o %C %K %F
 	extensions: *.lua,*.xml,*.html

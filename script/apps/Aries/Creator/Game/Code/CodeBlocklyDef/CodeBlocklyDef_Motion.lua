@@ -40,7 +40,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('moveForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 turn(30);
 for i=1, 20 do
     moveForward(0.05)
@@ -67,7 +67,7 @@ end
 	ToNPL = function(self)
 		return string.format('turn(%s)\n', self:getFieldAsString('degree'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 turnTo(-60)
 for i=1, 100 do
     turn(-3)
@@ -94,7 +94,7 @@ end
 	ToNPL = function(self)
 		return string.format('turnTo(%s)\n', self:getFieldAsString('degree'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 turnTo(-60)
 wait(1)
 turnTo(0)
@@ -171,7 +171,7 @@ moveForward(1, 1)
 	ToNPL = function(self)
 		return string.format('move(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 turnTo(0)
 move(0.5,1,0, 0.5)
 move(1,-1,0, 0.5)
@@ -220,7 +220,7 @@ say("jump!", 1)
 	ToNPL = function(self)
 		return string.format('moveTo(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
-	examples = {{desc = L"", canRun = false, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 moveTo(19257,5,19174)
 moveTo("mouse-pointer")
 moveTo("@p")
@@ -297,7 +297,7 @@ moveTo("frog")
 	ToNPL = function(self)
 		return string.format('walk(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 walk(1,0) -- x,z
 walk(0,1) -- x,z
 walk(-1,0,-1) -- x,y,z
@@ -330,7 +330,7 @@ walk(-1,0,-1) -- x,y,z
 	ToNPL = function(self)
 		return string.format('walkForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 turnTo(0)
 walkForward(1)
 turn(180)
@@ -358,7 +358,7 @@ walkForward(1, 0.5)
 	ToNPL = function(self)
 		return string.format('velocity("%s")\n', self:getFieldAsString('cmd_text'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 velocity("~ 10 ~")
 wait(0.3)
 velocity("add 2 ~ 2")
@@ -403,7 +403,7 @@ end
 	ToNPL = function(self)
 		return 'getX()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     say(getX())
 end
@@ -421,7 +421,7 @@ end
 	ToNPL = function(self)
 		return 'getY()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     say(getY())
     if(getY()<3) then
@@ -442,7 +442,7 @@ end
 	ToNPL = function(self)
 		return 'getZ()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     say(getZ())
 end
@@ -460,7 +460,7 @@ end
 	ToNPL = function(self)
 		return 'getPos()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local x, y, z = getPos()
 setPos(x, y+0.5, z)
 ]]}},
@@ -506,7 +506,7 @@ setPos(x, y+0.5, z)
 	ToNPL = function(self)
 		return string.format('setPos(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local x, y, z = getPos()
 setPos(x, y+0.5, z)
 ]]}},
@@ -523,7 +523,7 @@ setPos(x, y+0.5, z)
 	ToNPL = function(self)
 		return 'getFacing()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     say(getFacing())
 end

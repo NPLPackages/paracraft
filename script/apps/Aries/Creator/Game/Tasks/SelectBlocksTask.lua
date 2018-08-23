@@ -124,6 +124,12 @@ function SelectBlocks.UnregisterHooks()
 	GameLogic.AddBBS("SelectBlocks", nil);
 end
 
+-- static method
+function SelectBlocks:OnMirrorAxisChange(axis)
+	local self = cur_instance;
+	self:UpdateManipulators();
+end
+
 -- virtual function: 
 function SelectBlocks:UpdateManipulators()
 	self:DeleteManipulators();
@@ -142,9 +148,21 @@ function SelectBlocks:UpdateManipulators()
 	manipCont:SetPivotPointPlugName("PivotPoint");
 	self:AddManipulator(manipCont);
 	manipCont:connectToDependNode(self);
-	
 
-	if(not self:IsMirrorMode()) then
+	if(self:IsMirrorMode()) then
+		local MirrorWnd = commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd");
+		local axis = MirrorWnd.GetMirrorAxis();
+		if(not axis or axis == "x") then
+			manipCont.translateManip:SetShowXPlane(true)
+			manipCont.translateManip.xColor = "#ff0000";
+		elseif(axis == "y") then
+			manipCont.translateManip:SetShowYPlane(true)
+			manipCont.translateManip.yColor = "#0000ff";
+		elseif(axis == "z") then
+			manipCont.translateManip:SetShowZPlane(true)
+			manipCont.translateManip.zColor = "#00ff00";
+		end
+	else
 		local manipCont = BlockPivotManipContainer:new():init();
 		manipCont:SetPivotPointPlugName("position");
 		self:AddManipulator(manipCont);
@@ -1127,7 +1145,9 @@ end
 function SelectBlocks:SetMirrorMode(bEnable)
 	if(self.isMirrorMode ~= bEnable) then
 		self.isMirrorMode = bEnable;
-		self:UpdateManipulators();
+		if(self:GetSceneContext() and self:GetSceneContext():HasManipulators()) then
+			self:UpdateManipulators();
+		end
 	end
 end
 
@@ -1155,6 +1175,8 @@ function SelectBlocks.MirrorSelection()
 				task:Run();
 			end
 		end);
+
+		MirrorWnd:Connect("axisChanged", SelectBlocks, SelectBlocks.OnMirrorAxisChange, "UniqueConnection");
 	end
 end
 
@@ -1181,23 +1203,23 @@ function SelectBlocks.ShowTransformWnd()
 end
 
 -- @param trans: {dx,dy,dz, pivot, rot_axis, rot_angle, scalingX, scalingY, scalingZ, method}
--- @param method: nil or "clone"
+-- @param method: nil or "clone" or "extrude"
 function SelectBlocks.TransformSelection(trans)
 	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
 		local self = cur_instance;
 		local mExtents = cur_instance.aabb.mExtents;
 
 		local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
-		if(not shift_pressed) then
+		if(trans.method == "extrude" or shift_pressed) then
+			-- if shift is pressed, we will extrude	
+			SelectBlocks.ExtrudeSelection(trans.dx, trans.dy, trans.dz);
+		else
 			self:UpdateSelectionEntityData();
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = trans.dx, dy=trans.dy, dz=trans.dz, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, scalingX=trans.scalingX, scalingY=trans.scalingY, scalingZ=trans.scalingZ, blocks=cur_selection, aabb=cur_instance.aabb, operation = trans.method})
 			task:Run();
 
 			self:ReplaceSelection(commonlib.clone(task.final_blocks));
-		else
-			-- if shift is pressed, we will extrude
-			SelectBlocks.ExtrudeSelection(trans.dx, trans.dy, trans.dz);
 		end
 	end
 end

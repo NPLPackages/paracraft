@@ -15,11 +15,12 @@ end);
 MirrorWnd.UpdateHintLocation(blocks, pivot_x, pivot_y, pivot_z, mirror_axis)
 ------------------------------------------------------------
 ]]
-NPL.load("(gl)script/ide/Display3D/SceneCanvas.lua");
-NPL.load("(gl)script/ide/Display3D/SceneManager.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local MirrorWnd = commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd");
+
+local MirrorWnd = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd"));
+
+MirrorWnd:Signal("axisChanged", function(axis) end)
 
 local settings = {};
 
@@ -38,7 +39,8 @@ end
 -- @param blocks: block list 
 function MirrorWnd.ShowPage(blocks, pivot_x, pivot_y, pivot_z, callbackFunc)
 	MirrorWnd.LoadBlocks(blocks, pivot_x, pivot_y, pivot_z);
-	
+	MirrorWnd.axis_xyz = "x"
+
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/MirrorWnd.html", 
 			text = "Object Instances Editor",
@@ -67,6 +69,7 @@ function MirrorWnd.ShowPage(blocks, pivot_x, pivot_y, pivot_z, callbackFunc)
 end
 
 function MirrorWnd.ClosePage()
+	MirrorWnd:Disconnect();
 	if(page) then
 		page:CloseWindow();
 	end
@@ -118,8 +121,13 @@ function MirrorWnd.UpdateHintLocation(blocks, pivot_x, pivot_y, pivot_z, mirror_
 end
 
 function MirrorWnd.OnChangeAxis()
-	local axis_xyz = page:GetUIValue("xyz");
-	MirrorWnd.UpdateHintLocation(nil, nil, nil, nil, axis_xyz);
+	MirrorWnd.axis_xyz = page:GetUIValue("xyz");
+	MirrorWnd.UpdateHintLocation(nil, nil, nil, nil, MirrorWnd.axis_xyz);
+	MirrorWnd:axisChanged(MirrorWnd.axis_xyz);
+end
+
+function MirrorWnd.GetMirrorAxis()
+	return MirrorWnd.axis_xyz;
 end
 
 function MirrorWnd.OnOK()
@@ -130,3 +138,5 @@ function MirrorWnd.OnOK()
 	settings.method = method;
 	page:CloseWindow();
 end
+
+MirrorWnd:InitSingleton()

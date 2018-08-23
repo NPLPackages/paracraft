@@ -108,7 +108,8 @@ BlockPSOut pixelShader(Interpolants i)
 	}
 
 	o = normalColor;
-	
+	o.rgb = o.rgb * colorDiffuse;
+
 	o.rgb += colorEmissive;
 	o.w *= g_opacity;
 	

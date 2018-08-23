@@ -38,7 +38,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('say("%s", %s)\n', self:getFieldValue('text'), self:getFieldAsString('duration'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("Jump!", 2)
 move(0,1,0)
 ]]}},
@@ -89,7 +89,7 @@ say("")
 	ToNPL = function(self)
 		return string.format('tip("%s")\n', self:getFieldValue('text'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 tip("Start Game in 3!")
 wait(1)
 tip("Start Game in 2!")
@@ -149,7 +149,7 @@ tip("")
 	ToNPL = function(self)
 		return string.format('anim(%d)\n', self:getFieldValue('animId'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 anim(4)
 move(-2,0,0,1)
 anim(0)
@@ -245,7 +245,7 @@ stop()
 	ToNPL = function(self)
 		return string.format('playSpeed(%d)\n', self:getFieldValue('speed'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 playSpeed(4)
 playLoop(0, 1000)
 say("Looping", 3)
@@ -297,7 +297,7 @@ stop()
 	ToNPL = function(self)
 		return string.format('scale(%d)\n', self:getFieldValue('scaleDelta'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 scale(50)
 wait(1)
 scale(-50)
@@ -323,7 +323,7 @@ scale(-50)
 	ToNPL = function(self)
 		return string.format('scaleTo(%d)\n', self:getFieldValue('scale'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 for i=1, 20 do
     scale(10)
 end
@@ -340,12 +340,14 @@ scaleTo(100)
 	arg0 = {
 		{
 			name = "name",
-			type = "field_dropdown",
+			type = "field_variable",
 			options = {
 				{ L"此角色", "myself" },
 				{ L"主角", "player" },
 				{ L"某个角色名", "" },
 			},
+			variableTypes = {"actorNames"},
+			variable = "myself",
 		},
 	},
 	category = "Looks", 
@@ -358,7 +360,7 @@ scaleTo(100)
 	ToNPL = function(self)
 		return string.format('focus("%s")\n', self:getFieldAsString('name'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 focus()
 moveForward(2,2)
 focus("player")
@@ -398,7 +400,7 @@ focus("player")
 	ToNPL = function(self)
 		return string.format('camera(%s, %s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('pitch'), self:getFieldAsString('facing'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 for i=1, 100 do
     camera(10+i*0.1, nil, nil)
     wait(0.05)
@@ -418,7 +420,7 @@ end
 	ToNPL = function(self)
 		return 'getScale()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     if(getScale() >= 200) then
         scaleTo(100)
@@ -440,7 +442,7 @@ end
 	ToNPL = function(self)
 		return 'getPlayTime()';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 playLoop(10, 2000)
 while(true) do
     if(getPlayTime() > 1000) then

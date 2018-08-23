@@ -14,6 +14,8 @@ CodeBlockWindow.SetCodeEntity(entityCode);
 NPL.load("(gl)script/ide/System/Windows/Window.lua")
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"));
@@ -64,6 +66,8 @@ function CodeBlockWindow.Show(bShow)
 		viewport:SetMarginRightHandler(self);
 
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
+
+		CodeBlockWindow:LoadSceneContext();
 	end
 end
 
@@ -208,6 +212,7 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
+	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
 	CodeBlockWindow.HighlightCodeEntity(nil);
@@ -496,6 +501,25 @@ end
 
 function CodeBlockWindow.OnOpenTutorials()
 	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/codeblock", "", "", 1);
+end
+
+-- Redirect this object as a scene context, so that it will receive all key/mouse events from the scene. 
+-- as if this task object is a scene context derived class. One can then overwrite
+-- `UpdateManipulators` function to add any manipulators. 
+function CodeBlockWindow:LoadSceneContext()
+	local sceneContext = self:GetSceneContext();
+	if(not sceneContext:IsSelected()) then
+		sceneContext:activate();
+		sceneContext:UpdateManipulators();
+	end
+end
+
+function CodeBlockWindow:UnloadSceneContext()
+	GameLogic.ActivateDefaultContext();
+end
+
+function CodeBlockWindow:GetSceneContext()
+	return AllContext:GetContext("code");
 end
 
 CodeBlockWindow:InitSingleton();

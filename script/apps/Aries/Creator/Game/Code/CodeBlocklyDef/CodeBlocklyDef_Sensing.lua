@@ -107,7 +107,7 @@ say("click us!")
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsRadius", %s)\n', self:getFieldAsString('radius'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 cmd("/show boundingbox")
 setBlock(getX(), getY()+2, getZ(), 62)
 setActorValue("physicsRadius", 0.5)
@@ -143,7 +143,7 @@ cmd("/hide boundingbox")
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsHeight", %s)\n', self:getFieldAsString('height'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 cmd("/show boundingbox")
 setBlock(getX(), getY()+2, getZ(), 62)
 setActorValue("physicsRadius", 0.5)
@@ -166,7 +166,8 @@ cmd("/hide boundingbox")
 	arg0 = {
 		{
 			name = "name",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "name",},
 			text = "name",
 		},
 		
@@ -187,7 +188,7 @@ cmd("/hide boundingbox")
 	ToNPL = function(self)
 		return string.format('registerCollisionEvent("%s", function()\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 broadcastCollision()
 registerCollisionEvent("frog", function()
 end)
@@ -207,7 +208,7 @@ end)
 	ToNPL = function(self)
 		return 'broadcastCollision()\n';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 broadcastCollision()
 registerCollisionEvent("frog", function()
 end)
@@ -236,7 +237,7 @@ end)
 	ToNPL = function(self)
 		return string.format('distanceTo("%s")\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     if(distanceTo("mouse-pointer") < 3) then
         say("mouse-pointer")
@@ -270,7 +271,7 @@ end
 	ToNPL = function(self)
 		return string.format('ask("%s")\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ask("what is your name")
 say("hello "..tostring(answer), 2)
 
@@ -304,7 +305,7 @@ say("hello "..tostring(answer), 2)
 	ToNPL = function(self)
 		return 'get("answer")';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("<div style='color:#ff0000'>Like A or B?</div>html are supported")
 ask("type A or B")
 if(answer == "A") then
@@ -347,7 +348,7 @@ end
 	ToNPL = function(self)
 		return string.format('isKeyPressed("%s")\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("press left/right key to move me!")
 while(true) do
     if(isKeyPressed("left")) then
@@ -360,7 +361,7 @@ while(true) do
     wait()
 end
 ]]},
-{desc = L"", canRun = true, code = [[
+{desc = "", canRun = true, code = [[
 say("press any key to continue!")
 while(true) do
     if(isKeyPressed("any")) then
@@ -463,7 +464,7 @@ end
 	ToNPL = function(self)
 		return string.format('getBlock(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local x,y,z = getPos();
 local id = getBlock(x,y-1,z)
 say("block below is "..id, 2)
@@ -517,7 +518,7 @@ say("block below is "..id, 2)
 	ToNPL = function(self)
 		return string.format('setBlock(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('blockId'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local x,y,z = getPos()
 local id = getBlock(x,y+2,z)
 setBlock(x,y+2,z, 62)
@@ -541,7 +542,7 @@ setBlock(x,y+2,z, id)
 	ToNPL = function(self)
 		return string.format('getTimer()');
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 resetTimer()
 while(getTimer()<5) do
     moveForward(0.02)
@@ -563,7 +564,7 @@ end
 	ToNPL = function(self)
 		return string.format('resetTimer()');
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 resetTimer()
 while(getTimer()<2) do
     wait(0.5);

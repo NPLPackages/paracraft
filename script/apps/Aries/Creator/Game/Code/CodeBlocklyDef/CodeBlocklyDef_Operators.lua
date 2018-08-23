@@ -30,7 +30,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('"%s"', self:getFieldAsString('left'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 {
@@ -54,7 +54,7 @@ local cmds = {
 	ToNPL = function(self)
 		return self:getFieldAsString("value");
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 {
@@ -75,13 +75,13 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('%s', self:getFieldAsString('left'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
 {
-	type = "addition", 
-	message0 = L"%1 + %2 %3",
+	type = "math_op", 
+	message0 = L"%1 %2 %3",
 	arg0 = {
 		{
 			name = "left",
@@ -89,8 +89,11 @@ local cmds = {
             shadow = { type = "math_number", },
 		},
 		{
-			name = "dummy",
-			type = "input_dummy",
+			name = "op",
+			type = "field_dropdown",
+			options = {
+				{ "+", "+" },{ "-", "-" },{ "*", "*" },{ "/", "/" },{ ">", ">" },{ "<", "<" },{ "==", "==" },{ ">=", ">=" },{ "<=", "<=" }
+			},
 		},
 		{
 			name = "right",
@@ -102,9 +105,9 @@ local cmds = {
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '((%s) + (%s))',
+	func_description = '((%s) %s (%s))',
 	ToNPL = function(self)
-		return string.format('(%s) + (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
 	end,
 	examples = {{desc = L"数字的加减乘除", canRun = true, code = [[
 say("1+1=?")
@@ -138,7 +141,7 @@ say(1+1)
 	ToNPL = function(self)
 		return string.format('math.random(%s,%s)', self:getFieldAsString('from'), self:getFieldAsString('to'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     say(math.random(1,100))
     wait(0.5)
@@ -146,59 +149,22 @@ end
 ]]}},
 },
 
-{
-	type = "equal", 
-	message0 = L"%1 == %2 %3",
-	arg0 = {
-		{
-			name = "left",
-			type = "input_value",
-		},
-		{
-			name = "dummy",
-			type = "input_dummy",
-		},
-		{
-			name = "right",
-			type = "input_value",
-		},
-	},
-	output = {type = "field_number",},
-	category = "Operators", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '((%s) == (%s))',
-	ToNPL = function(self)
-		return string.format('(%s) == (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
-	end,
-	examples = {{desc = L"比较两个数值", canRun = true, code = [[
-while(true) do
-    a = math.random(0,10)
-    if(a==0) then
-        say(a)
-    elseif(a<=3) then
-        say(a.."<=3")
-    elseif(a>6) then
-        say(a..">6")
-    else
-        say("3<"..a.."<=6")
-    end
-    wait(2)
-end
-]]}},
-},
+
 
 {
-	type = "and", 
-	message0 = L"%1 与 %2 %3",
+	type = "math_compared", 
+	message0 = L"%1 %2 %3",
 	arg0 = {
 		{
 			name = "left",
 			type = "input_value",
 		},
 		{
-			name = "dummy",
-			type = "input_dummy",
+			name = "op",
+			type = "field_dropdown",
+			options = {
+				{ L"并且", "and" },{ L"或", "or" },
+			},
 		},
 		{
 			name = "right",
@@ -209,9 +175,9 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '((%s) and (%s))',
+	func_description = '((%s) %s (%s))',
 	ToNPL = function(self)
-		return string.format('(%s) and (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'),self:getFieldAsString('right'));
 	end,
 	examples = {{desc = L"同时满足条件", canRun = true, code = [[
 while(true) do
@@ -226,43 +192,7 @@ end
 ]]}},
 },
 
-{
-	type = "or", 
-	message0 = L"%1 或 %2 %3",
-	arg0 = {
-		{
-			name = "left",
-			type = "input_value",
-		},
-		{
-			name = "dummy",
-			type = "input_dummy",
-		},
-		{
-			name = "right",
-			type = "input_value",
-		},
-	},
-	output = {type = "field_number",},
-	category = "Operators", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '((%s) or (%s))',
-	ToNPL = function(self)
-		return string.format('(%s) or (%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
-	end,
-	examples = {{desc = L"左边或右边满足条件", canRun = true, code = [[
-while(true) do
-    a = math.random(0,10)
-    if(a<=3 or a>6) then
-        say(a)
-    else
-        say("3<"..a.."<=6")
-    end
-    wait(2)
-end
-]]}},
-},
+
 
 {
 	type = "not", 
@@ -323,7 +253,7 @@ end
 	ToNPL = function(self)
 		return string.format('("%s".."%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("hello ".."world".."!!!")
 ]]}},
 },
@@ -347,7 +277,7 @@ say("hello ".."world".."!!!")
 	ToNPL = function(self)
 		return string.format('(#"%s")', self:getFieldAsString('left'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("length of hello is "..(#"hello"));
 ]]}},
 },
@@ -377,7 +307,7 @@ say("length of hello is "..(#"hello"));
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("66%10=="..(66%10))
 ]]}},
 },
@@ -401,7 +331,7 @@ say("66%10=="..(66%10))
 	ToNPL = function(self)
 		return string.format('math.floor(%s+0.5)', self:getFieldAsString('left'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while(true) do
     a = math.random(0,10) / 10
     b = math.floor(a+0.5)
@@ -412,7 +342,7 @@ end
 },
 
 {
-	type = "math.sqrt", 
+	type = "math_oneop", 
 	message0 = L"%1%2",
 	arg0 = {
 		{
@@ -449,7 +379,7 @@ end
 	ToNPL = function(self)
 		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 say("math.sqrt(9)=="..math.sqrt(9), 1)
 say("math.cos(1)=="..math.cos(1), 1)
 say("math.abs(-1)=="..math.abs(1), 1)

@@ -35,7 +35,7 @@ VSOut MainVS(float4 pos		: POSITION,
 	float3 worldNormal = normalize(mul(Norm, (float3x3)mWorld));
 	output.normal = worldNormal*0.5 + 0.5;
 
-	output.color.xyz = color.rgb;
+	output.color.xyz = color.rgb * colorDiffuse;
 
 	// calculate the fog factor
 	output.color.w = cameraPos.z;

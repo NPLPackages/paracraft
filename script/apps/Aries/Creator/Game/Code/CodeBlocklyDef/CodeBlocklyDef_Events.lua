@@ -32,7 +32,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerClickEvent(function()
     for i=1, 20 do
         scale(10)
@@ -122,7 +122,7 @@ end)
 	ToNPL = function(self)
 		return string.format('registerAnimationEvent(%d, function()\n    %s\nend)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerAnimationEvent(10, function()
     say("anim started", 3)
 end)
@@ -166,7 +166,7 @@ say("click me!")
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(fromName)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerBroadcastEvent("jump", function(fromName)
     move(0,1,0)
     wait(1)
@@ -201,7 +201,7 @@ say("click to jump!")
 	ToNPL = function(self)
 		return string.format('broadcast("%s")\n', self:getFieldAsString('msg'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerBroadcastEvent("hello", function(msg)
     say("hello"..msg)
     move(0,1,0, 0.5)
@@ -236,7 +236,7 @@ end
 	ToNPL = function(self)
 		return string.format('broadcastAndWait("%s")\n', self:getFieldAsString('msg'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerBroadcastEvent("hi", function(fromName)
     say("hi,"..tostring(fromName))
     wait(1)
@@ -270,7 +270,7 @@ end
 	ToNPL = function(self)
 		return string.format('cmd("%s")\n', self:getFieldAsString('msg'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 cmd("/setblock ~0 ~0 ~1 62")
 cmd("/cameradist 12")
 cmd("/camerayaw 0")

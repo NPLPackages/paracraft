@@ -26,6 +26,7 @@ local cmds = {
 		{
 			name = "value",
 			type = "input_value",
+			shadow = { type = "text", value = "value",},
 			text = "value",
 		},
 	},
@@ -38,14 +39,14 @@ local cmds = {
 	ToNPL = function(self)
 		return 'local key = "value"\n';
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local key = "value"
 say(key, 1)
 ]]}},
 },
 {
 	type = "getLocalVariable", 
-	message0 = L"获取局部变量%1",
+	message0 = L"获取变量%1",
 	arg0 = {
 		{
 			name = "var",
@@ -63,7 +64,7 @@ say(key, 1)
 	ToNPL = function(self)
 		return "key";
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 local key = "value"
 say(key, 1)
 ]]}},
@@ -80,7 +81,8 @@ say(key, 1)
 		},
 		{
 			name = "value",
-			type = "field_input",
+			type = "input_value",
+            shadow = { type = "text", value = "1",},
 			text = "1", 
 		},
 	},
@@ -122,7 +124,7 @@ end
 	ToNPL = function(self)
 		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 _G.score = 1
 _G.msg = "hello"
 showVariable("score", "Your Score")
@@ -153,7 +155,7 @@ end
 	ToNPL = function(self)
 		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 _G.score = 1
 showVariable("score")
 wait(1);
@@ -180,7 +182,7 @@ hideVariable("score")
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerCloneEvent(function(msg)
     move(msg or 1, 0, 0, 0.5)
     wait(1)
@@ -215,7 +217,7 @@ clone("myself", 3)
 	ToNPL = function(self)
 		return string.format('clone("%s")\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerClickEvent(function()
     move(1,0,0, 0.5)
 end)
@@ -239,7 +241,7 @@ say("click")
 	ToNPL = function(self)
 		return string.format('delete()\n');
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 move(1,0)
 say("Default actor will be deleted!", 1)
 delete()
@@ -287,7 +289,7 @@ end
 	ToNPL = function(self)
 		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerCloneEvent(function(name)
     setActorValue("name", name)
     moveForward(1);
@@ -328,7 +330,7 @@ say("click us!")
 	ToNPL = function(self)
 		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 registerCloneEvent(function(msg)
     setActorValue("name", msg.name)
     moveForward(msg.dist);
@@ -393,7 +395,7 @@ log(something)
 	ToNPL = function(self)
 		return string.format('echo("%s")\n', self:getFieldAsString('obj'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 echo(123)
 echo("hello")
 something = {any="object"}

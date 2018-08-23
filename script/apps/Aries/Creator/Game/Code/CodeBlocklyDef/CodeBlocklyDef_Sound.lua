@@ -39,7 +39,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('playNote("%s", %s)\n', self:getFieldAsString('note'), self:getFieldAsString('beat'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 while (true) do
     playNote("1", 0.5)
     playNote("2", 0.5)

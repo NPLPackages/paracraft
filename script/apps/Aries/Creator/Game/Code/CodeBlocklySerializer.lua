@@ -80,8 +80,15 @@ function CodeBlocklySerializer.GetCategoryStr(category)
     local colour = category.colour or "#000000";
 	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' >\n",name,name,colour,colour);
 	local cmd
+    local bCreateVarBtn = false;
 	for __,cmd in ipairs(all_cmds) do
 		if(category.name == cmd.category)then
+            if(category.name == "Data")then
+                if(not bCreateVarBtn)then
+			    s = string.format("%s<button text='%s' callbackKey='%s'></button>\n",s,L"创建变量","CREATE_VARIABLE");
+                bCreateVarBtn = true;
+                end
+            end
             local shadow = CodeBlocklySerializer.GetShadowStr(cmd);
 			s = string.format("%s<block type='%s'>%s</block>\n",s,cmd.type,shadow);
 		end
