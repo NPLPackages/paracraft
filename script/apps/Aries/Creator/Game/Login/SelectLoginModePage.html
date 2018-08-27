@@ -87,7 +87,9 @@ end
 <!--persistent setting button-->
 <pe:container alignment="_ctb" style="position:relative;background:;margin-left:70px;width:400px;height:105px;">
     <pe:if condition='<%= System.options.isDevEnv == false %>'>
-        <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
+        <pe:if  condition='<%= System.os.GetPlatform() ~= "ios" %>'>
+            <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
+        </pe:if>        
         <input type="button" value='<%=L"语言..." %>' spacing="20" class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;height:36px;margin-left:20px" onclick="OnChangeLanguagePage" />
     </pe:if>
     <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
