@@ -20,20 +20,22 @@ local cmds = {
 	arg0 = {
 		{
 			name = "input",
-			type = "field_dropdown",
+			type = "input_value",
 			options = {
 				{ L"方块", "block" },
 				{ L"附近玩家", "@a" },
 				{ L"某个方块id", "62" },
 				{ L"某个角色名", "" },
 			},
+			shadow = { type = "text", value = "block",},
+			text = "block",
 		},
 	},
 	output = {type = "field_number",},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'isTouching("%s")',
+	func_description = 'isTouching(%s)',
 	ToNPL = function(self)
 		return string.format('isTouching("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -221,19 +223,21 @@ end)
 	arg0 = {
 		{
 			name = "input",
-			type = "field_dropdown",
+			type = "input_value",
 			options = {
 				{ L"鼠标", "mouse-pointer" },
 				{ L"最近的玩家", "@p" },
 				{ L"某个角色名", "" },
 			},
+			shadow = { type = "targetNameType", value = "mouse-pointer",},
+			text = "mouse-pointer",
 		},
 	},
 	output = {type = "field_number",},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'distanceTo("%s")',
+	func_description = 'distanceTo(%s)',
 	ToNPL = function(self)
 		return string.format('distanceTo("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -267,7 +271,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'ask("%s")',
+	func_description = 'ask(%s)',
 	ToNPL = function(self)
 		return string.format('ask("%s")\n', self:getFieldAsString('input'));
 	end,

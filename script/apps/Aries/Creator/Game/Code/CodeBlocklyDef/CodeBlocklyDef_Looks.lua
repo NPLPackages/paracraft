@@ -335,19 +335,46 @@ scaleTo(100)
 ]]}},
 },
 {
+	type = "focus_list", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "to",
+			type = "field_dropdown",
+			options = {
+				{ L"此角色", "myself" },
+				{ L"主角", "player" },
+			},
+		},
+		
+	},
+    hide_in_toolbox = true,
+    output = {type = "null",},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return 'local key = "value"\n';
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
 	type = "focus", 
 	message0 = L"观看%1",
 	arg0 = {
 		{
 			name = "name",
-			type = "field_variable",
+			type = "input_value",
+            shadow = { type = "focus_list" },
 			options = {
 				{ L"此角色", "myself" },
 				{ L"主角", "player" },
 				{ L"某个角色名", "" },
 			},
-			variableTypes = {"actorNames"},
-			variable = "myself",
+			text = "myself",
 		},
 	},
 	category = "Looks", 
@@ -356,7 +383,7 @@ scaleTo(100)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'focus("%s")',
+	func_description = 'focus(%s)',
 	ToNPL = function(self)
 		return string.format('focus("%s")\n', self:getFieldAsString('name'));
 	end,

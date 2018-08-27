@@ -59,7 +59,9 @@ function CodeHelpWindow.AddCodeHelpItem(codeHelpItem)
 		category_items[codeHelpItem.category] = items;
 	end
 	local item = CodeHelpItem:new(codeHelpItem):Init();
-	items[#items+1] = item;
+	if(not item.hide_in_toolbox) then
+		items[#items+1] = item;
+	end
 	all_command_names[item:GetName()] = item;
 end
 

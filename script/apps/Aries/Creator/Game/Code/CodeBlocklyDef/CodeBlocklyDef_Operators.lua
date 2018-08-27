@@ -13,73 +13,6 @@ local CodeBlocklyDef_Operators = commonlib.gettable("MyCompany.Aries.Game.Code.C
 local cmds = {
 -- Operators
 {
-	type = "getString", 
-	message0 = "\"%1\"",
-	arg0 = {
-		{
-			name = "left",
-			type = "field_input",
-			text = "string",
-		},
-	},
-	output = {type = "field_number",},
-	category = "Operators", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '"%s"',
-	ToNPL = function(self)
-		return string.format('"%s"', self:getFieldAsString('left'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-{
-	type = "getBoolean", 
-	message0 = L"%1",
-	arg0 = {
-		{
-			name = "value",
-			type = "field_dropdown",
-			options = {
-				{ "true", "true" },
-				{ "false", "false" }
-			  }
-		},
-	},
-	output = {type = "field_number",},
-	category = "Operators", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '%s',
-	ToNPL = function(self)
-		return self:getFieldAsString("value");
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-{
-	type = "getNumber", 
-	message0 = L"%1",
-	arg0 = {
-		{
-			name = "left",
-			type = "field_number",
-			text = "0",
-		},
-	},
-	output = {type = "field_number",},
-	category = "Operators", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '%s',
-	ToNPL = function(self)
-		return string.format('%s', self:getFieldAsString('left'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
 	type = "math_op", 
 	message0 = L"%1 %2 %3",
 	arg0 = {
@@ -92,7 +25,7 @@ local cmds = {
 			name = "op",
 			type = "field_dropdown",
 			options = {
-				{ "+", "+" },{ "-", "-" },{ "*", "*" },{ "/", "/" },{ ">", ">" },{ "<", "<" },{ "==", "==" },{ ">=", ">=" },{ "<=", "<=" }
+				{ "+", "+" },{ "-", "-" },{ "*", "*" },{ "/", "/" },
 			},
 		},
 		{
@@ -113,6 +46,80 @@ local cmds = {
 say("1+1=?")
 wait(1)
 say(1+1)
+]]}},
+},
+
+{
+	type = "math_op_compare_number", 
+	message0 = L"%1 %2 %3",
+	arg0 = {
+		{
+			name = "left",
+			type = "input_value",
+            shadow = { type = "math_number", },
+		},
+		{
+			name = "op",
+			type = "field_dropdown",
+			options = {
+				{ ">", ">" },{ "<", "<" },{ ">=", ">=" },{ "<=", "<=" },{ "==", "==" },{ "!=", "!=" },
+			},
+		},
+		{
+			name = "right",
+			type = "input_value",
+            shadow = { type = "math_number", },
+		},
+	},
+	output = {type = "field_number",},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '((%s) %s (%s))',
+	ToNPL = function(self)
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(3>1) then
+   say("3>1 == true")
+end
+]]}},
+},
+
+{
+	type = "math_op_compare", 
+	message0 = L"%1 %2 %3",
+	arg0 = {
+		{
+			name = "left",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+		},
+		{
+			name = "op",
+			type = "field_dropdown",
+			options = {
+				{ "==", "==" },{ "!=", "!=" },
+			},
+		},
+		{
+			name = "right",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+		},
+	},
+	output = {type = "field_number",},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '((%s) %s (%s))',
+	ToNPL = function(self)
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if("1" == "1") then
+   say("equal")
+end
 ]]}},
 },
 
@@ -196,15 +203,11 @@ end
 
 {
 	type = "not", 
-	message0 = L"不满足%1 %2",
+	message0 = L"不满足%1",
 	arg0 = {
 		{
 			name = "left",
 			type = "input_value",
-		},
-		{
-			name = "dummy",
-			type = "input_dummy",
 		},
 	},
 	output = {type = "field_number",},
@@ -284,7 +287,7 @@ say("length of hello is "..(#"hello"));
 
 {
 	type = "mod", 
-	message0 = L"%1模%2",
+	message0 = L"%1除以%2的余数",
 	arg0 = {
 		{
 			name = "left",

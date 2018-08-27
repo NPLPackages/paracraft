@@ -100,13 +100,13 @@ wait(1)
 turnTo(0)
 ]]}},
 },
+
 {
-	type = "turnToTarget", 
-	message0 = L"转向%1",
+	type = "targetNameType", 
+	message0 = "%1",
 	arg0 = {
 		{
-			name = "targetName",
-			type = "field_input",
+			name = "value",
 			type = "field_dropdown",
 			options = {
 				{ L"鼠标", "mouse-pointer" },
@@ -115,12 +115,42 @@ turnTo(0)
 			},
 		},
 	},
+	hide_in_toolbox = true,
+	category = "Motion", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
+	type = "turnToTarget", 
+	message0 = L"转向%1",
+	arg0 = {
+		{
+			name = "targetName",
+			type = "input_value",
+			options = {
+				{ L"鼠标", "mouse-pointer" },
+				{ L"最近的玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
+			shadow = { type = "targetNameType", value = "mouse-pointer",},
+			text = "mouse-pointer",
+		},
+	},
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'turnTo("%s")',
+	func_description = 'turnTo(%s)',
 	ToNPL = function(self)
 		return string.format('turnTo("%s")\n', self:getFieldAsString('targetName'));
 	end,
@@ -233,12 +263,14 @@ moveTo("frog")
 	arg0 = {
 		{
 			name = "targetName",
-			type = "field_dropdown",
+			type = "input_value",
 			options = {
 				{ L"鼠标", "mouse-pointer" },
 				{ L"最近的玩家", "@p" },
 				{ L"某个角色名", "" },
 			},
+			shadow = { type = "targetNameType", value = "mouse-pointer",},
+			text = "mouse-pointer",
 		},
 	},
 	category = "Motion", 
@@ -246,7 +278,7 @@ moveTo("frog")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'moveTo("%s")',
+	func_description = 'moveTo(%s)',
 	ToNPL = function(self)
 		return string.format('moveTo("%s")\n', self:getFieldValue('targetName'));
 	end,
@@ -346,6 +378,7 @@ walkForward(1, 0.5)
 			name = "cmd_text",
             type = "input_value",
             shadow = { type = "text", value = "~ 5 ~",},
+
 			text = "~ 5 ~", 
 		},
 	},

@@ -20,6 +20,9 @@ local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"));
 
+-- when entity being edited is changed. 
+CodeBlockWindow:Signal("entityChanged", function(entity) end)
+
 local code_block_window_name = "code_block_window_";
 local page;
 local groupindex_hint = 3; 
@@ -147,6 +150,7 @@ end
 
 function CodeBlockWindow.SetCodeEntity(entity)
 	CodeBlockWindow.HighlightCodeEntity(entity);
+	local isEntityChanged = false;
 	if(self.entity ~= entity) then
 		if(entity) then
 			entity:Connect("beforeRemoved", self, self.OnEntityRemoved, "UniqueConnection");
@@ -160,6 +164,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 			page:Refresh(0.01);
 		end
 		CodeBlockWindow.RestoreCursorPosition();
+		isEntityChanged = true;
 	end
 
 	local codeBlock = self.GetCodeBlock();
@@ -177,6 +182,9 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		self.SetConsoleText(text);
 
 		codeBlock:Connect("message", self, self.OnMessage, "UniqueConnection");
+	end
+	if(isEntityChanged) then
+		self:entityChanged(self.entity);
 	end
 end
 
@@ -393,7 +401,11 @@ function CodeBlockWindow.OnChangeModel()
 				if(bIsAdded) then
 					-- do something?					
 				end
-				CodeBlockWindow.OnClickCompileAndRun();
+				if(codeBlock:IsLoaded()) then
+					CodeBlockWindow.OnClickCompileAndRun();
+				else
+					CodeBlockWindow:GetSceneContext():UpdateCodeBlock();
+				end
 			end);
 		end
 	end
@@ -510,16 +522,24 @@ function CodeBlockWindow:LoadSceneContext()
 	local sceneContext = self:GetSceneContext();
 	if(not sceneContext:IsSelected()) then
 		sceneContext:activate();
-		sceneContext:UpdateManipulators();
+		sceneContext:SetCodeEntity(CodeBlockWindow.GetCodeEntity());
 	end
 end
 
 function CodeBlockWindow:UnloadSceneContext()
+	local sceneContext = self:GetSceneContext();
+	if(sceneContext) then
+		sceneContext:SetCodeEntity(nil);
+	end
 	GameLogic.ActivateDefaultContext();
 end
 
 function CodeBlockWindow:GetSceneContext()
-	return AllContext:GetContext("code");
+	if(not self.sceneContext) then
+		self.sceneContext = AllContext:GetContext("code");
+		CodeBlockWindow:Connect("entityChanged", self.sceneContext, "SetCodeEntity")
+	end
+	return self.sceneContext;
 end
 
 CodeBlockWindow:InitSingleton();

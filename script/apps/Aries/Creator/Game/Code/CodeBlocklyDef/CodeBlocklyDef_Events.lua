@@ -137,17 +137,41 @@ say("click me!")
 },
 
 {
-	type = "registerBroadcastEvent", 
-	message0 = L"当收到%1消息时",
-	message1 = L"%1",
+	type = "msgTypes", 
+	message0 = "%1",
 	arg0 = {
 		{
-			name = "msg",
+			name = "value",
 			type = "field_variable",
 			variableTypes = {"broadcast_msg"}, 
 			variable = "msg1",
 		},
-		
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
+	type = "registerBroadcastEvent", 
+	message0 = L"当收到%1消息时",
+	message1 = "%1",
+	arg0 = {
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "msgTypes", value = "msg1",},
+			text = "msg1", 
+		},
 	},
     arg1 = {
         {
@@ -162,7 +186,7 @@ say("click me!")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerBroadcastEvent("%s", function(fromName)\\n%send)',
+	func_description = 'registerBroadcastEvent(%s, function(fromName)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(fromName)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
@@ -186,9 +210,9 @@ say("click to jump!")
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_variable",
-			variableTypes = {"broadcast_msg"}, 
-			variable = "msg1",
+			type = "input_value",
+			shadow = { type = "msgTypes", value = "msg1",},
+			text = "msg1", 
 		},
 	},
 	category = "Events", 
@@ -197,7 +221,7 @@ say("click to jump!")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'broadcast("%s")',
+	func_description = 'broadcast(%s)',
 	ToNPL = function(self)
 		return string.format('broadcast("%s")\n', self:getFieldAsString('msg'));
 	end,
@@ -221,9 +245,9 @@ end
 	arg0 = {
 		{
 			name = "msg",
-			type = "field_variable",
-			variableTypes = {"broadcast_msg"}, 
-			variable = "msg1",
+			type = "input_value",
+			shadow = { type = "msgTypes", value = "msg1",},
+			text = "msg1", 
 		},
 	},
 	category = "Events", 
@@ -232,7 +256,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'broadcastAndWait("%s")',
+	func_description = 'broadcastAndWait(%s)',
 	ToNPL = function(self)
 		return string.format('broadcastAndWait("%s")\n', self:getFieldAsString('msg'));
 	end,

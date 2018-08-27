@@ -9,6 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockCarpet.lua");
 local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockCarpet");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/math/bit.lua");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
@@ -16,7 +17,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
-
+local band = mathlib.bit.band;
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockCarpet"));
 
 -- register

@@ -73,20 +73,55 @@ function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
 		file:close();
 	end
 end
+function CodeBlocklySerializer.GetAllVariableTypes()
+	local all_cmds = CodeHelpData.GetAllCmds();
+    local variable_type_maps = {};
+    for __,cmd in ipairs(all_cmds) do
+        for k = 0,arg_len do
+            local input_arg = cmd["arg".. k];
+            if(input_arg)then
+                for __,arg in ipairs(input_arg) do
+                    if(arg.type == "field_variable")then
+                        local variableTypes = arg.variableTypes;
+                        if(variableTypes)then
+                            local type;
+                            for __, type in ipairs(variableTypes) do
+                                variable_type_maps[type] = type;                  
+                            end  
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return variable_type_maps;
+end
 function CodeBlocklySerializer.GetCategoryStr(category)
 	local all_cmds = CodeHelpData.GetAllCmds();
 	if(not category or not all_cmds)then return end
-    local name = category.text or category.name;
+    local text = category.text;
+    local name = category.name;
     local colour = category.colour or "#000000";
-	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' >\n",name,name,colour,colour);
+	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' >\n",text,name,colour,colour);
 	local cmd
     local bCreateVarBtn = false;
 	for __,cmd in ipairs(all_cmds) do
-		if(category.name == cmd.category)then
+		if(category.name == cmd.category and not cmd.hide_in_toolbox)then
             if(category.name == "Data")then
                 if(not bCreateVarBtn)then
-			    s = string.format("%s<button text='%s' callbackKey='%s'></button>\n",s,L"创建变量","CREATE_VARIABLE");
-                bCreateVarBtn = true;
+                    local variable_type_maps = CodeBlocklySerializer.GetAllVariableTypes();
+                    local type;
+                    for __,type in pairs(variable_type_maps) do
+                        local callbackKey;
+                        if(type == "")then
+                            callbackKey = "create_variable"
+			                s = string.format("%s<button text='%s %s' type='%s' callbackKey='%s'></button>\n",s,L"创建变量", type, type, callbackKey);
+                        else
+                            callbackKey = "create_variable_" .. type
+			                s = string.format("%s<button text='%s %s' type='%s' callbackKey='%s'></button>\n",s,L"创建变量 类型为:", type, type, callbackKey);
+                        end
+                    end
+                    bCreateVarBtn = true;
                 end
             end
             local shadow = CodeBlocklySerializer.GetShadowStr(cmd);
@@ -121,14 +156,17 @@ function CodeBlocklySerializer.GetShadowStr(cmd)
                 if(shadow and shadow.type)then
                     local shadow_type = shadow.type;
                     local value = shadow.value or "";
-                    local field_type = shadow_configs[shadow_type];
-                    if(field_type)then
-                        local s = string.format("<value name='%s'><shadow type='%s'><field name='%s'>%s</field></shadow></value>",v.name,shadow_type,field_type,value);
-                        if(result == "")then
-                            result = s;
-                        else
-                            result = result .. s;
-                        end
+                    local filed_name = shadow_configs[shadow_type];
+                    local s;
+                    if(filed_name)then
+                        s = string.format("<value name='%s'><shadow type='%s'><field name='%s'>%s</field></shadow></value>",v.name,shadow_type,filed_name,value);
+                    else
+                        s = string.format("<value name='%s'><shadow type='%s'></shadow></value>",v.name,shadow_type);
+                    end
+                    if(result == "")then
+                        result = s;
+                    else
+                        result = result .. s;
                     end
                 end
             end

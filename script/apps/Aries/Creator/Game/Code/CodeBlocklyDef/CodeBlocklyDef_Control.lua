@@ -515,7 +515,11 @@ end)
 		{
 			name = "name",
 			type = "input_value",
-            shadow = { type = "text", value = "@p",},
+			options = {
+				{ L"当前玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
+			shadow = { type = "text", value = "@p",},
 			text = "@p",
 		},
 	},
@@ -525,7 +529,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'becomeAgent("%s")',
+	func_description = 'becomeAgent(%s)',
 	ToNPL = function(self)
 		return string.format('becomeAgent("%s")\n', self:getFieldAsString('name'));
 	end,

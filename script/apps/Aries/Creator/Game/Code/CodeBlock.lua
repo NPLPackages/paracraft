@@ -41,6 +41,7 @@ CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
 CodeBlock:Signal("actorCloned", function(actor, msg) end);
 CodeBlock:Signal("actorCollided", function(actor, fromActor) end);
 CodeBlock:Signal("codeUnloaded", function() end);
+CodeBlock:Signal("stateChanged", function() end);
 
 function CodeBlock:ctor()
 	self.timers = {};
@@ -182,6 +183,7 @@ function CodeBlock:Stop()
 	GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
 	self.codename = nil;
 	self:codeUnloaded();
+	self:stateChanged();
 end
 
 -- remove all timers without clearing actors.
@@ -381,6 +383,7 @@ function CodeBlock:Run()
 	if(self.code_func) then
 		self:ResetTime();
 		self.isLoaded = true;
+		self:stateChanged();
 		local co = CodeCoroutine:new():Init(self);
 		co:SetFunction(self.code_func);
 		local actor = self:FindNearbyActor() or self:CreateActor();
@@ -577,6 +580,7 @@ function CodeBlock:RunTempCode(code, filename)
 			self:StopLastTempCode();
 			local co = CodeCoroutine:new():Init(self);
 			self.lastTempCodeCoroutine = co;
+			self:stateChanged();
 			local actor = env.actor or self:FindNearbyActor() or self:CreateActor();
 			co:SetActor(actor);
 			co:SetFunction(code_func);

@@ -13,15 +13,41 @@ local CodeBlocklyDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBl
 local cmds = {
 -- Data
 {
-	type = "setLocalVariable", 
-	message0 = L"设置局部变量%1为%2",
+	type = "getLocalVariable", 
+	message0 = L"获取变量%1",
 	arg0 = {
 		{
 			name = "var",
 			type = "field_variable",
-			variable = "item",
+			variable = "score",
 			variableTypes = {""},
-			text = "key",
+			text = "score",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString('var');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local key = "value"
+say(key, 1)
+]]}},
+},
+
+{
+	type = "createLocalVariable", 
+	message0 = L"新建本地变量%1为%2",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = "score",
+			variableTypes = {""},
+			text = "score",
 		},
 		{
 			name = "value",
@@ -44,32 +70,38 @@ local key = "value"
 say(key, 1)
 ]]}},
 },
+
 {
-	type = "getLocalVariable", 
-	message0 = L"获取变量%1",
+	type = "assign", 
+	message0 = L"%1赋值为%2",
 	arg0 = {
 		{
-			name = "var",
-			type = "field_variable",
-			variable = "item",
-			variableTypes = {""},
-			text = "key",
+			name = "left",
+			type = "input_value",
+			shadow = { type = "text", value = "score",},
+			text = "score",
+		},
+		{
+			name = "right",
+			type = "input_value",
+			shadow = { type = "text", value = "1",},
+			text = "1",
 		},
 	},
-	output = {type = "null",},
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '%s',
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '%s = %s',
 	ToNPL = function(self)
-		return "key";
+		return 'local key = "value"\n';
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-local key = "value"
-say(key, 1)
+text = "hello"
+say(text, 1)
 ]]}},
 },
-
 {
 	type = "set", 
 	message0 = L"设置全局变量%1为%2",
@@ -91,7 +123,7 @@ say(key, 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'set("%s", "%s")',
+	func_description = 'set("%s", %s)',
 	ToNPL = function(self)
 		return string.format('set("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -105,63 +137,6 @@ end
 ]]}},
 },
 
-{
-	type = "showVariable", 
-	message0 = L"显示全局变量%1",
-	arg0 = {
-		{
-			name = "name",
-			type = "field_input",
-			text = "score", 
-		},
-	},
-	category = "Data", 
-	helpUrl = "", 
-	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'showVariable("%s")',
-	ToNPL = function(self)
-		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-_G.score = 1
-_G.msg = "hello"
-showVariable("score", "Your Score")
-showVariable("msg", "", "#ff0000")
-while(true) do
-   _G.score = _G.score + 1
-   wait(0.01)
-end
-]]}},
-},
-
-{
-	type = "hideVariable", 
-	message0 = L"隐藏全局变量%1",
-	arg0 = {
-		{
-			name = "name",
-			type = "field_input",
-			text = "score", 
-		},
-	},
-	category = "Data", 
-	helpUrl = "", 
-	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'hideVariable("%s")',
-	ToNPL = function(self)
-		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-_G.score = 1
-showVariable("score")
-wait(1);
-hideVariable("score")
-]]}},
-},
 {
 	type = "registerCloneEvent", 
 	message0 = L"当角色被复制时",
@@ -257,12 +232,43 @@ end
 },
 
 {
+	type = "actorProperties", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"名字", "name" },
+				{ L"物理半径", "physicsRadius" },
+				{ L"物理高度", "physicsHeight" },
+				{ L"颜色", "color" },
+				{ L"文字", "text" },
+				{ L"是否为化身", "isAgent" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Data", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
 	type = "setActorValue", 
 	message0 = L"设置角色的%1为%2",
 	arg0 = {
 		{
 			name = "key",
-			type = "field_dropdown",
+			type = "input_value",
 			options = {
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
@@ -271,6 +277,8 @@ end
 				{ L"文字", "text" },
 				{ L"任意变量", "" },
 			},
+			shadow = { type = "actorProperties", value = "name",},
+			text = "name", 
 		},
 		{
 			name = "value",
@@ -285,7 +293,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'setActorValue("%s", %s)',
+	func_description = 'setActorValue(%s, %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -311,7 +319,7 @@ say("click us!")
 	arg0 = {
 		{
 			name = "key",
-			type = "field_dropdown",
+			type = "input_value",
 			options = {
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
@@ -320,13 +328,15 @@ say("click us!")
 				{ L"是否为化身", "isAgent" },
 				{ L"任意变量", "" },
 			},
+			shadow = { type = "actorProperties", value = "name",},
+			text = "name", 
 		},
 	},
 	category = "Data", 
 	output = {type = "field_variable",},
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'getActorValue("%s")',
+	func_description = 'getActorValue(%s)',
 	ToNPL = function(self)
 		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
 	end,
@@ -343,6 +353,253 @@ setActorValue("name", "Default")
 clone("myself", {name = "clone1", dist=1})
 clone(nil, {name = "clone2", dist=2})
 say("click us!")
+]]}},
+},
+
+{
+	type = "getString", 
+	message0 = "\"%1\"",
+	arg0 = {
+		{
+			name = "left",
+			type = "field_input",
+			text = "string",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return string.format('"%s"', self:getFieldAsString('left'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "getBoolean", 
+	message0 = L"%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ "true", "true" },
+				{ "false", "false" },
+				{ "nil", "nil" },
+			  }
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString("value");
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "getNumber", 
+	message0 = L"%1",
+	arg0 = {
+		{
+			name = "left",
+			type = "field_number",
+			text = "0",
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('%s', self:getFieldAsString('left'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "getTableValue", 
+	message0 = L"获取表%1中的%2",
+	arg0 = {
+		{
+			name = "table",
+			type = "field_variable",
+			variable = "_G",
+			text = "_G",
+		},
+		{
+			name = "key",
+			type = "input_value",
+			variable = "_G",
+			shadow = { type = "text", value = "key",},
+			text = "key", 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s[%s]',
+	ToNPL = function(self)
+		return string.format('%s["%s"]', self:getFieldAsString('table'), self:getFieldAsString('key'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
+]]}},
+},
+
+{
+	type = "newEmptyTable", 
+	message0 = L"空的表{}",
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '{}',
+	ToNPL = function(self)
+		return "{}";
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
+]]}},
+},
+
+{
+	type = "newFunction", 
+	message0 = L"新函数(%1)",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "param",
+			type = "field_input",
+			text = "param", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+    },
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'function(%s)\\n%send',
+	ToNPL = function(self)
+		return string.format('function(%s)\n    %s\nend\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local thinkText = function(text)
+	say(text.."...")
+end
+thinkText("Let me think");
+]]}},
+},
+
+{
+	type = "callFunction", 
+	message0 = L"调用函数%1(%2)",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_variable",
+			variable = "log",
+		},
+		{
+			name = "param",
+			type = "input_value",
+			shadow = { type = "text", value = "param",},
+			text = "param",
+		},
+	},
+	previousStatement = true,
+	nextStatement = true,
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s(%s)',
+	ToNPL = function(self)
+		return string.format('%s("%s")\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local thinkText = function(text)
+	say(text.."...")
+end
+thinkText("Let me think");
+]]}},
+},
+
+
+{
+	type = "showVariable", 
+	message0 = L"显示全局变量%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "score", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'showVariable("%s")',
+	ToNPL = function(self)
+		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+_G.score = 1
+_G.msg = "hello"
+showVariable("score", "Your Score")
+showVariable("msg", "", "#ff0000")
+while(true) do
+   _G.score = _G.score + 1
+   wait(0.01)
+end
+]]}},
+},
+
+{
+	type = "hideVariable", 
+	message0 = L"隐藏全局变量%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "score", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'hideVariable("%s")',
+	ToNPL = function(self)
+		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+_G.score = 1
+showVariable("score")
+wait(1);
+hideVariable("score")
 ]]}},
 },
 
