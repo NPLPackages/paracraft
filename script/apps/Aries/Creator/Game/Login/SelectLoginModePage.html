@@ -49,7 +49,7 @@ function OnClickDonate()
 end
 
 function OnClickCredits()
-    ParaGlobal.ShellExecute("open", L"https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits", "", "", 1);
+    ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/worlds/credits", "", "", 1);
 end
     
 function GetModCountAsString()
@@ -76,11 +76,11 @@ end
         <div style="position:relative;margin-top:15px;margin-left:-220px;color:#572712"><%=Rebranding:GetValue("company")%></div>
     </pe:if>
     <div style="position:relative;margin-left:0px;width:520px;margin-top:150px;font-size:18px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-align:center">
-        <%=Rebranding:GetValue("titleaddon") or L"免费的电影创作工具"%>
+        <%=Rebranding:GetValue("titleaddon") or L"学会编程, 学会学习"%>
     </div>
-    <!--<div style="margin-top:178px;margin-left:120px;">
-        <input type="button" value='<%=L"开启创意世界" %>' class="mc_big_button" style="font-size:18px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-offset-y:-8;width:240px;height:120px;" name="internet" onclick="OnSelect" />
-    </div>-->
+    <div style="position:relative;margin-left:0px;width:520px;text-align:center;margin-top:230px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;">
+        <%=L"点击任意位置继续"%>
+    </div>
     <div style="margin-top:300px;margin-left:120px;">
     </div>
 </pe:container>
@@ -100,13 +100,13 @@ end
     </pe:if>
 </pe:container>
 <pe:container alignment="_rb" style="position:relative;background:;width:300px;height:50px;">
-    <input type="button" value='<%="Credits"%>' align="right" style="position:relative;margin-left:0px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCredits" />
+    <input type="button" value='<%=L"致谢"%>' align="right" style="position:relative;margin-left:0px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCredits" />
     <!--<pe:if condition='<%=Rebranding:GetValue("donation")~="false"%>'>
         <input type="button" value='<%=L"捐赠" %>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="font-size:14px;height:36px;margin-right:20px" onclick="OnClickDonate" />
     </pe:if>-->
-    <div style="position:relative;margin-left:0px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080">
+    <!--<div style="position:relative;margin-left:0px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080">
         <%=L"点击任意位置继续"%>
-    </div>
+    </div>-->
 </pe:container>
 </pe:mcml>
 </body>

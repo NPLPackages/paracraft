@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-08-24 23:59+0800\n"
+"POT-Creation-Date: 2018-08-27 14:18+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -2473,7 +2473,6 @@ msgstr "repeat %1 times"
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:18
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:50
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:99
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:142
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:167
 msgid "%1"
 msgstr "%1"
@@ -2724,19 +2723,19 @@ msgstr "Space key to jump"
 msgid "当动画在%1帧时"
 msgstr "when animation time is %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:141
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:166
 msgid "当收到%1消息时"
 msgstr "when receive%1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:185
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:209
 msgid "广播%1消息"
 msgstr "broadcast %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:220
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:244
 msgid "广播%1消息并等待返回"
 msgstr "broadcast %1 and wait"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:254
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:278
 msgid "执行命令%1"
 msgstr "run command %1"
 
@@ -8762,6 +8761,10 @@ msgstr ""
 msgid "创意空间 ParaCraft"
 msgstr "Paracraft"
 
+#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:292
+msgid "免费的动画游戏创作工具"
+msgstr "Free Animation & Game Authoring Tool"
+
 #: script/apps/Aries/Creator/Game/Login/RemoteServerList.lua:358
 #: script/mobile/paracraft/Login/LocalLoadWorld.html:33
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:140
@@ -8818,19 +8821,17 @@ msgid "当前Mod:%s"
 msgstr "Current Mod:%s"
 
 #: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:52
-#: script/apps/Aries/Creator/Game/game_options.lua:124
-#: script/mobile/paracraft/Login/SelectLoginModePage.html:129
-msgid "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
+msgid "https://keepwork.com/official/paracraft/worlds/credits"
 msgstr "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 
 #: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:79
-#: script/mobile/paracraft/Login/SelectLoginModePage.html:136
-msgid "免费的电影创作工具"
-msgstr "animation and game maker for everyone"
+msgid "学会编程, 学会学习"
+msgstr "World of Coders and Self-learners!"
 
 #: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:82
-msgid "开启创意世界"
-msgstr "open paracraft"
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:108
+msgid "点击任意位置继续"
+msgstr "Click anywhere to continue"
 
 #: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:90
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:143
@@ -8847,14 +8848,14 @@ msgstr "Language..."
 msgid "开发者模式"
 msgstr "developer mode"
 
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:103
+msgid "致谢"
+msgstr "Credits"
+
 #: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:105
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:190
 msgid "捐赠"
 msgstr "Donate Us !"
-
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:108
-msgid "点击任意位置继续"
-msgstr "Click anywhere to continue"
 
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:27
 msgid "已存在更高版本或系统版本"
@@ -10171,9 +10172,18 @@ msgstr "http://www.paracraft.cn/"
 msgid "http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=50"
 msgstr "http://www.paracraft.cn/"
 
+#: script/apps/Aries/Creator/Game/game_options.lua:124
+#: script/mobile/paracraft/Login/SelectLoginModePage.html:129
+msgid "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
+msgstr "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
+
 #: script/apps/Aries/Creator/Game/game_options.lua:361
 msgid "是否观看在线教程(快捷键F1)?"
 msgstr "Do you want to watch online tutorial (hotkey F1)?"
+
+#: script/apps/Aries/Creator/Game/game_options.lua:407
+msgid "只读"
+msgstr "Read-only"
 
 #: script/apps/Aries/app_main.lua:2314
 msgid "加载当中,请稍等(首次需要3-5分钟)"
@@ -10589,6 +10599,10 @@ msgstr ""
 "background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 "
 "175);"
 
+#: script/mobile/paracraft/Login/SelectLoginModePage.html:136
+msgid "免费的电影创作工具"
+msgstr "animation and game maker for everyone"
+
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:150
 msgid ""
 "position:relative;margin-left:24px;margin-top:32px;width:164px;height:36px;"
@@ -10641,6 +10655,9 @@ msgid ""
 msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
+
+#~ msgid "开启创意世界"
+#~ msgstr "open paracraft"
 
 #~ msgid "设置局部变量%1为%2"
 #~ msgstr "set local variable%1 to%2"

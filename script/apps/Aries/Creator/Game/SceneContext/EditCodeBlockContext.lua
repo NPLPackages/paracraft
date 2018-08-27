@@ -30,6 +30,7 @@ end
 -- or false, if we can not unselect the scene tool context at the moment. 
 function EditCodeBlockContext:OnUnselect()
 	self:SetCodeEntity(nil);
+	self:RemoveActor();
 	EditCodeBlockContext._super.OnUnselect(self);
 	return true;
 end

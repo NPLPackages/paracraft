@@ -390,11 +390,25 @@ function options:OnLoadWorld()
 	self:ShowMenuPage();
 	self:ShowTouchPad();
 	self:ShowSkyBox();
+	self:ResetWindowTitle();
 
 	-- try pop world
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
 	local WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
 	WorldStacks:PopWorld();
+end
+
+function options:ResetWindowTitle()
+	if(System.options.WindowTitle) then
+		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+		local worldName = WorldCommon.GetWorldTag("name");
+		if(worldName) then
+			if(GameLogic.IsReadOnly()) then
+				worldName = format("%s (%s)", worldName, L"只读")
+			end
+			ParaEngine.SetWindowText(format("%s  %s", worldName, System.options.WindowTitle));	
+		end
+	end
 end
 
 -- in mobile version, force using single sky box. 
