@@ -255,7 +255,7 @@ end
 
 function Game.StartServer(worldpath)
 	System.options.mc = true;
-	System.options.cmdline_world = ParaEngine.GetAppCommandLineByParam("world","");
+	System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 	worldpath = worldpath or System.options.cmdline_world;
 
 	Game.Start(worldpath, nil, 0, nil, nil, function()

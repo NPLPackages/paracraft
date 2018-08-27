@@ -1301,14 +1301,9 @@ function MyCompany.Aries.OnExec(app, commandName, params)
 			end	
 		else
 			if(System.options.mc) then
-				System.reset();
-				-- flush all local server 
-				if(System.localserver) then
-					System.localserver.FlushAll();
-				end	
-				ParaScene.UnregisterAllEvent();
-				local restart_code = [[ParaUI.ResetUI();ParaScene.Reset();NPL.load("(gl)script/apps/Aries/main_loop.lua");NPL.activate("(gl)script/apps/Aries/main_loop.lua");]];
-				__rts__:Reset(restart_code);
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
+				local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+				Desktop.Restart();
 				return;
 			end
 			MyCompany.Aries.Desktop.Dock.LeaveTown(function() 
@@ -1436,7 +1431,7 @@ function MyCompany.Aries.OnExec(app, commandName, params)
 			if(System.options.mc) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 				local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
-				Desktop.OnExit();
+				Desktop.OnExit(nil, true);
 			else
 				MyCompany.Aries.Desktop.Dock.OnExit();
 			end
@@ -2476,17 +2471,15 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 		-- close any existing message box.
 		_guihelper.CloseMessageBox(true);
 
+		local enableTerrain = true;
 		if(params.tag == "MCWorld") then
 			System.options.is_mcworld = true;
 			if(System.options.mc) then
 				LOG.std(nil, "info", "LoadWorld", "real terrain is totally disabled for block world");
-				ParaTerrain.GetAttributeObject():SetField("EnableTerrain", false);
-			end
-		else
-			if(System.options.mc) then
-				ParaTerrain.GetAttributeObject():SetField("EnableTerrain", true);
+				enableTerrain = false;
 			end
 		end
+		ParaTerrain.GetAttributeObject():SetField("EnableTerrain", enableTerrain);
 
 		-- pop any previous world effect 
 		WorldManager:PopWorldEffectStates();

@@ -371,7 +371,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 			if(Desktop.is_exiting) then
 				GameLogic.QuickSave();
 			end
-			Desktop.ForceExit(bRestart);
+			Desktop.ForceExit();
 		else
 			Desktop.is_exiting = true;
 			local dialog = {
@@ -380,7 +380,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
-						Desktop.ForceExit();
+						Desktop.ForceExit(bRestart);
 					elseif(res and res == _guihelper.DialogResult.No) then
 						Desktop.ForceExit(bRestart);
 					end
@@ -432,4 +432,43 @@ function Desktop.ShowMobileDesktop(bShow)
 	NPL.load("(gl)script/mobile/paracraft/Areas/SystemMenuPage.lua");
 	local SystemMenuPage = commonlib.gettable("ParaCraft.Mobile.Desktop.SystemMenuPage");
 	SystemMenuPage.ShowPage(bShow);
+end
+
+-- @param appName: nil default to "paracraft", it can also be "haqi"
+function Desktop.Restart(appName)
+	local commandLine = ParaEngine.GetAppCommandLine();
+	if(not appName or appName == "paracraft") then
+		ParaEngine.SetAppCommandLine('mc="true" bootstrapper="script/apps/Aries/main_loop.lua" debug="main"');
+	elseif(appName == "haqi") then
+		ParaEngine.SetAppCommandLine('mc="false" bootstrapper="script/apps/Aries/main_loop.lua" partner="keepwork" config="config/GameClient.config.tatfook.xml" debug="main"');
+	end
+	
+	System.reset();
+	-- flush all local server 
+	if(System.localserver) then
+		System.localserver.FlushAll();
+	end	
+	ParaScene.UnregisterAllEvent();
+	-- reset to default value
+	ParaTerrain.LeaveBlockWorld();
+	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
+
+	local restart_code = [[
+	ParaUI.ResetUI();
+	ParaScene.Reset();
+	NPL.load("(gl)script/apps/Aries/main_loop.lua");
+	System.options.cmdline_world="";
+	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
+]];
+
+	-- clear pending messages before reset
+	while(true) do
+		local nSize = __rts__:GetCurrentQueueSize();
+		if(nSize>0) then
+			__rts__:PopMessageAt(0, {process = true});
+		else
+			break;
+		end
+	end
+	__rts__:Reset(restart_code);
 end

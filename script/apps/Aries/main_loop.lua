@@ -65,7 +65,7 @@ System.options.isDevEnv = (ParaEngine.GetAppCommandLineByParam("isDevEnv","false
 
 System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution",nil);
 
-System.options.cmdline_world = ParaEngine.GetAppCommandLineByParam("world","");
+System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 
 --System.options.isDevEnv = true;
 -- load from config file

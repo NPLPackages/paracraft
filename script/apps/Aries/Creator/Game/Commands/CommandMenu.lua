@@ -107,7 +107,7 @@ Commands["menu"] = {
 				EditorModeSwitchPage.OnClickUpload();
 			end
 		elseif(name == "file.exit") then
-			MyCompany.Aries.Creator.Game.Desktop.OnLeaveWorld();
+			MyCompany.Aries.Creator.Game.Desktop.OnLeaveWorld(nil, true);
 		elseif(name == "window.texturepack") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 			local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
