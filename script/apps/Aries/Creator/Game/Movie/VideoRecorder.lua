@@ -20,6 +20,9 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 
+-- this is the minimum version 
+VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 1;
+
 local max_resolution = {4906, 2160};
 local default_resolution = {640, 480};
 local before_capture_resolution;
@@ -40,8 +43,13 @@ function VideoRecorder.GetCurrentVideoFileName()
 end
 
 function VideoRecorder.HasFFmpegPlugin()
-	local attr = ParaMovie.GetAttributeObject();
-	return attr:GetField("HasMoviePlugin",false);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+	local ModManager = commonlib.gettable("Mod.ModManager");
+	local plugin = ModManager:GetMod("MovieCodecPlugin");
+	if(plugin and plugin:GetVersion() >= VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION) then
+		local attr = ParaMovie.GetAttributeObject();
+		return attr:GetField("HasMoviePlugin",false);
+	end
 end
 
 -- @param callbackFunc: called when started. function(bSucceed) end
@@ -49,7 +57,7 @@ function VideoRecorder.BeginCapture(callbackFunc)
 	if(VideoRecorder.HasFFmpegPlugin()) then
 		VideoRecorderSettings.ShowPage(function(res)
 			if(res == "ok") then
-				AudioEngine.SetGarbageCollectThreshold(64);
+				AudioEngine.SetGarbageCollectThreshold(99999);
 				VideoRecorder.AdjustWindowResolution(function()
 					local start_after_seconds = VideoRecorderSettings.start_after_seconds or 0;
 					local elapsed_seconds = 0;

@@ -31,6 +31,10 @@ function ModBase:IsMod()
 	return true;
 end
 
+function ModBase:GetVersion()
+	return 0;
+end
+
 -- get mod manager.
 function ModBase:GetManager()
 	return ModManager;

@@ -247,9 +247,11 @@ function VideoRecorderSettings.UpdateUIToSettings()
 				settings.VideoResolution[1] = tonumber(width);
 				settings.VideoResolution[2] = tonumber(height);
 			else
-				-- use current resolution
-				settings.VideoResolution[1] = nil;
-				settings.VideoResolution[2] = nil;
+				-- use current resolution, round to multiple of 4
+				NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+				local Screen = commonlib.gettable("System.Windows.Screen");
+				settings.VideoResolution[1] = math.floor(Screen:GetWidth()/4)*4;
+				settings.VideoResolution[2] = math.floor(Screen:GetHeight()/4)*4;
 			end
 		end
 		

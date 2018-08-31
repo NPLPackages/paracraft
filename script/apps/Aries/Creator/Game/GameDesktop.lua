@@ -434,6 +434,9 @@ function Desktop.ShowMobileDesktop(bShow)
 	SystemMenuPage.ShowPage(bShow);
 end
 
+-- Restart the entire NPLRuntime to a different application. e.g.
+-- Desktop.Restart("haqi")
+-- Desktop.Restart("paracraft")
 -- @param appName: nil default to "paracraft", it can also be "haqi"
 function Desktop.Restart(appName)
 	local commandLine = ParaEngine.GetAppCommandLine();
