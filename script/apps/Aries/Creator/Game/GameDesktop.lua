@@ -464,6 +464,8 @@ function Desktop.Restart(appName)
 	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
 ]];
 
+	-- TODO: close world archives, packages and search paths
+
 	-- clear pending messages before reset
 	while(true) do
 		local nSize = __rts__:GetCurrentQueueSize();

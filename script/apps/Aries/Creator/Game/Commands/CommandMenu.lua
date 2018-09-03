@@ -149,14 +149,16 @@ Commands["menu"] = {
 			local WebTutorials = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WebTutorials");
 			WebTutorials:Show();
 		elseif(name == "help.videotutorials") then
-			GameLogic.RunCommand("/open http://www.paracraft.cn/learn/movieblockcourses?lang=zh");
+			GameLogic.RunCommand("/open https://keepwork.com/official/paracraft/animation-tutorials");
+		elseif(name == "help.lessons") then
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/kecheng/cs/all");
 		elseif(name == "help.npl_code_wiki") then
 			-- open the npl code wiki site in external browser. 
 			GameLogic.CommandManager:RunCommand("/open npl://");
 		elseif(name == "help.about") then
 			GameLogic.RunCommand("/open "..L"http://www.paracraft.cn/home/about-us");
 		elseif(name == "help.Credits") then
-			GameLogic.RunCommand("/open https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits");
+			GameLogic.RunCommand("/open "..L"https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits");
 		elseif(name == "help.ParacraftSDK") then
 			GameLogic.RunCommand("/open https://github.com/LiXizhi/ParaCraftSDK/wiki");
 		elseif(name == "help.bug") then

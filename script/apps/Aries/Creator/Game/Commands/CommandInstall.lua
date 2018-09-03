@@ -14,14 +14,27 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 
 Commands["install"] = {
 	name="install", 
-	quick_ref="/install [url]", 
-	desc=[[install a texture package from url
+	quick_ref="/install [-mod] [url]", 
+	desc=[[install a texture package or mod from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
+/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		if(cmd_text) then
-			local url = cmd_text:gsub("^%s*", ""):gsub("%s*$", "");
-			if(url:match("^http://")) then
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		if(not cmd_text) then
+			return 
+		end
+		local url = cmd_text:gsub("^%s*", ""):gsub("%s*$", "");
+		
+		if(options["mod"]) then
+			if(url:match("^https?://")) then
+				GameLogic.RunCommand("/show mod")
+				ParaGlobal.ShellExecute("open", url, "", "", 1);
+			end
+		else
+			if(url:match("^https?://")) then
 				-- if it is a texture package mod, download and install
 				if(url:match("/blocktexture_")) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");

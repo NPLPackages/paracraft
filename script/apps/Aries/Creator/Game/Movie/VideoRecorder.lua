@@ -21,7 +21,7 @@ local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 
 -- this is the minimum version 
-VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 1;
+VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 4;
 
 local max_resolution = {4906, 2160};
 local default_resolution = {640, 480};
@@ -104,7 +104,11 @@ function VideoRecorder.BeginCapture(callbackFunc)
 			end
 		end);
 	else
-		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 请到官方网站下载安装");
+		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 请到官方网站下载安装", function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				GameLogic.RunCommand("/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12")
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
 		if(callbackFunc) then
 			callbackFunc(false);
 		end

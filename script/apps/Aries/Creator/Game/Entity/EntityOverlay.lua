@@ -359,11 +359,20 @@ function Entity:CreateGetRootScreenOverlay()
 	return Entity.rootScreenOverlay;
 end
 
+function Entity:WorldUnloaded()
+	Entity:EnableScreenTimer(false);
+	if(Entity.rootScreenOverlay) then
+		Entity.rootScreenOverlay:Destroy()
+		Entity.rootScreenOverlay = nil;
+	end
+end
+
 -- static function 
 function Entity:EnableScreenTimer(bEnable)
 	if(bEnable) then
 		if(not Entity.rootScreenOverlayTick) then
 			Entity.rootScreenOverlayTick = Overlay:new():init();
+			GameLogic:Connect("WorldUnloaded", Entity, Entity.WorldUnloaded, "UniqueConnection")
 			Entity.rootScreenOverlayTick.EnableZPass = true;
 			Entity.rootScreenOverlayTick:SetUseCameraPos(true);
 			Entity.rootScreenOverlayTick.paintZPassEvent = function(self, painter)

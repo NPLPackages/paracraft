@@ -24,7 +24,7 @@ local WebTutorials = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"
 WebTutorials:Property("Name", "WebTutorials");
 WebTutorials:Property({"filename", "config/Aries/creator/WebTutorials.xml"});
 WebTutorials:Property({"CurrentTutorial", nil, auto=true});
-WebTutorials:Property({"wiki_root", "https://github.com/LiXizhi/ParaCraft/wiki/"});
+WebTutorials:Property({"wiki_root", L"https://keepwork.com/official/paracraft/docs/"});
 WebTutorials:Property({"isDirty", true, "IsDirty", "SetDirty"});
 
 -- whenever the current tutorial is changed

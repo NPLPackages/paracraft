@@ -76,15 +76,18 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		},
 		{text = L"帮助", order=6, name = "help",children = 
 			{
-				{text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
+				{text = L"在线课程",name = "help.lessons", onclick=nil},
+				{Type = "Separator"},
+				{text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...(Ctrl+F1)",name = "help.help", onclick=nil},
 				{text = L"快捷键",name = "help.help.shortcutkey", onclick=nil},
+				{Type = "Separator"},
 				{text = L"提交Bug",name = "help.bug", onclick=nil},
 				{text = L"NPL Code Wiki...(F11)",name = "help.npl_code_wiki", autoclose=true, onclick=nil},
 				{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},
 				{text = L"关于Paracraft...",name = "help.about", onclick=nil},
-				{text = L"Credits",name = "help.Credits", onclick=nil},
+				{text = L"致谢",name = "help.Credits", onclick=nil},
 			},
 		},
 	};
@@ -153,8 +156,12 @@ function DesktopMenu.RebuildMenuItem(menuItem)
 		if(node) then
 			node:ClearAllChildren();
 			for index, item in ipairs(menuItem.children) do
-				node:AddChild(CommonCtrl.TreeNode:new({Text = item.text, Name = item.name, Type = "Menuitem", onclick = item.onclick, }));
-				menu_name_map[item.name] = item;
+				if(item.Type == "Separator") then
+					node:AddChild(CommonCtrl.TreeNode:new({Type = item.Type, }));
+				else
+					node:AddChild(CommonCtrl.TreeNode:new({Text = item.text, Name = item.name, Type = "Menuitem", onclick = item.onclick, }));
+					menu_name_map[item.name] = item;
+				end
 			end
 			ctl.height = #(menuItem.children) * 26 + 4;
 		end

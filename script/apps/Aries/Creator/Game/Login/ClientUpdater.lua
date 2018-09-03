@@ -32,6 +32,9 @@ end
 -- @param callbackFunc: function(bNeedUpdate, latestVersion)
 function ClientUpdater:Check(callbackFunc)
 	if(not self.autoUpdater) then
+		if(callbackFunc) then
+			callbackFunc(false);
+		end
 		return
 	end
 	
