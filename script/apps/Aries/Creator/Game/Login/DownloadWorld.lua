@@ -28,7 +28,8 @@ end
 -- show page
 function DownloadWorld.ShowPage(url)	
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "show", url);
-	if(not isCustomShow) then
+	if(isCustomShow == "show") then
+		LOG.std(nil, "debug", "DownloadWorld", "show for url: %s", url);
 		DownloadWorld.url = url;
 		local width, height=512, 300;
 		System.App.Commands.Call("File.MCMLWindowFrame", {
@@ -52,7 +53,7 @@ end
 
 function DownloadWorld.Close()
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "close");
-	if(not isCustomShow) then
+	if(isCustomShow == "show") then
 		if(page) then
 			page:CloseWindow();
 		end
