@@ -219,6 +219,7 @@ end
 -- usually called when movie finished playing. 
 function CodeBlock:RemoveAllActors()
 	self.refActors = nil;
+	self.refCodeBlock = nil;
 	
 	self.isRemovingActors = true;
 	for i, actor in ipairs(self:GetActors()) do
@@ -239,7 +240,7 @@ end
 -- private function: do not call this function. 
 function CodeBlock:AddActor(actor)
 	self:GetActors():add(actor);
-	actor:Connect("beforeRemoved", self, self.OnRemoveActor);
+	actor:Connect("beforeRemoved", self:GetReferencedCodeBlock(), self:GetReferencedCodeBlock().OnRemoveActor);
 	GameLogic.GetCodeGlobal():AddActor(actor);
 end
 
@@ -260,15 +261,21 @@ function CodeBlock:SetReferencedCodeBlock(codeBlock)
 				codeBlock:Connect("actorClicked", self, self.OnClickActor, "UniqueConnection");
 				codeBlock:Connect("actorCloned", self, self.OnCloneActor, "UniqueConnection");
 				codeBlock:Connect("actorCollided", self, self.OnCollideActor, "UniqueConnection");
+				self.refCodeBlock = codeBlock;
 			end
 		elseif(self.refActors) then
 			self.refActors = nil;
+			self.refCodeBlock = nil;
 		end
 	end
 end
 
 function CodeBlock:HasReferencedCodeBlock()
 	return self.refActors ~= nil;
+end
+
+function CodeBlock:GetReferencedCodeBlock()
+	return self.refCodeBlock or self;
 end
 
 -- get the last actor in all nearby connected code block. 
@@ -299,6 +306,7 @@ function CodeBlock:GetEntity()
 	return self.entityCode;
 end
 
+
 -- create a new actor from the nearby movie block. 
 -- Please note one may create multiple actors from the same block.
 -- return nil if no actor is found.
@@ -310,13 +318,14 @@ function CodeBlock:CreateActor()
 		-- use time 0
 		actor:SetTime(0);
 		actor:FrameMove(0, false);
+		local parentCodeBlock = self:GetReferencedCodeBlock();
 		if(self:IsActorPickingEnabled()) then
 			actor:EnableActorPicking(true);
-			actor:Connect("clicked", self, self.OnClickActor);
+			actor:Connect("clicked", parentCodeBlock, parentCodeBlock.OnClickActor);
 		else
 			actor:EnableActorPicking(false);
 		end
-		actor:Connect("collided", self, self.OnCollideActor);
+		actor:Connect("collided", parentCodeBlock, parentCodeBlock.OnCollideActor);
 		return actor;
 	end
 end
@@ -325,10 +334,11 @@ function CodeBlock:EnableActorPicking(bEnabled)
 	if(self:GetActors().enableActorPicking ~= bEnabled) then
 		self:GetActors().enableActorPicking	= bEnabled;
 		if(bEnabled) then
+			local parentCodeBlock = self:GetReferencedCodeBlock();
 			for i, actor in ipairs(self:GetActors()) do
 				if(not actor:IsActorPickingEnabled()) then
 					actor:EnableActorPicking(true);
-					actor:Connect("clicked", self, self.OnClickActor);
+					actor:Connect("clicked", parentCodeBlock, parentCodeBlock.OnClickActor);
 				end
 			end
 		end
@@ -535,7 +545,7 @@ end
 function CodeBlock:CloneMyself(msg)
 	local actor = self:CreateActor();
 	if(actor) then
-		self:OnCloneActor(actor, msg);
+		self:GetReferencedCodeBlock():OnCloneActor(actor, msg);
 	end
 end
 
