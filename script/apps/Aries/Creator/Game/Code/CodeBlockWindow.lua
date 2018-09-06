@@ -111,6 +111,8 @@ function CodeBlockWindow:OnViewportChange()
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
 			end
+
+			CodeBlockWindow.UpdateBlocklyWindowSize();
 		end
 	end
 end
@@ -484,12 +486,24 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 end
 
 local blocklyWndName = "blocklyWindow";
+
+function CodeBlockWindow.GetChromeBrowserManager()
+	if(self.chromeBrowserManager == nil) then
+		self.chromeBrowserManager = false;
+		NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
+		local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");	
+		if(NplCefBrowserManager.HasCefPlugin and NplCefBrowserManager:HasCefPlugin()) then
+			self.chromeBrowserManager = NplCefBrowserManager;
+		end
+	end
+	return self.chromeBrowserManager;
+end
+
 -- @param bDestroy: true to destroy window
 function CodeBlockWindow.CloseBlocklyWindow(bDestroy)
 	CodeBlockWindow.isBlocklyOpened = false;
-	NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
-	local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");	
-	if(NplCefBrowserManager.Open) then
+	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+	if(NplCefBrowserManager) then
 		local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
 		if(config) then
 			if(not bDestroy) then
@@ -502,11 +516,22 @@ function CodeBlockWindow.CloseBlocklyWindow(bDestroy)
 	end
 end
 
+function CodeBlockWindow.UpdateBlocklyWindowSize()
+	if(CodeBlockWindow.isBlocklyOpened) then
+		local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+		if(NplCefBrowserManager) then
+			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+			if(config) then
+				NplCefBrowserManager:ChangePosSize({id = blocklyWndName, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
+			end
+		end
+	end
+end
+
 function CodeBlockWindow.OpenBlocklyEditor()
-	NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
-	local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");
-	 -- Open a new window
-	if(NplCefBrowserManager.Open) then
+	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+	if(NplCefBrowserManager) then
+		 -- Open a new window
 		if(not CodeBlockWindow.isBlocklyOpened) then
 			CodeBlockWindow.isBlocklyOpened = true;
 			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
@@ -519,6 +544,7 @@ function CodeBlockWindow.OpenBlocklyEditor()
 				local url = DefaultFilters.cmd_open_url("npl://blockeditor")
 				NplCefBrowserManager:Open({id = blocklyWndName, url = url, showTitleBar=false, withControl = false, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
 			end
+			CodeBlockWindow.UpdateBlocklyWindowSize();
 		else
 			CodeBlockWindow.CloseBlocklyWindow();
 		end
