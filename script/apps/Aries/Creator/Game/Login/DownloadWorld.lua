@@ -26,7 +26,9 @@ function DownloadWorld.OnInit()
 end
 
 -- show page
-function DownloadWorld.ShowPage(url)	
+function DownloadWorld.ShowPage(url)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "show", url);
 	if(isCustomShow == "show") then
 		LOG.std(nil, "debug", "DownloadWorld", "show for url: %s", url);
@@ -40,6 +42,7 @@ function DownloadWorld.ShowPage(url)
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			zorder = 10,
 			allowDrag = true,
+			isTopLevel = true,
 			directPosition = true,
 				align = "_ct",
 				x = -width/2,
@@ -51,11 +54,19 @@ function DownloadWorld.ShowPage(url)
 	end
 end
 
+function DownloadWorld.UpdateProgressText(text)
+	if(page) then
+		page:SetValue("progressText", text)
+	end
+end
+
+
 function DownloadWorld.Close()
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "close");
-	if(isCustomShow == "show") then
+	if(isCustomShow == "close") then
 		if(page) then
 			page:CloseWindow();
+			page = nil;
 		end
 	end
 end

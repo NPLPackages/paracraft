@@ -15,6 +15,8 @@ NPL.load("(gl)script/ide/System/Windows/Window.lua")
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -84,8 +86,6 @@ end
 
 -- @return margin_right and bottom
 function CodeBlockWindow:CalculateMargins()
-	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-	local Screen = commonlib.gettable("System.Windows.Screen");
 	local viewport = ViewportManager:GetSceneViewport();
 	local width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
 	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
@@ -220,6 +220,9 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
+	if(CodeBlockWindow.isBlocklyOpened) then
+		CodeBlockWindow.CloseBlocklyWindow();
+	end
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
@@ -480,21 +483,53 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 	end
 end
 
+local blocklyWndName = "blocklyWindow";
+-- @param bDestroy: true to destroy window
+function CodeBlockWindow.CloseBlocklyWindow(bDestroy)
+	CodeBlockWindow.isBlocklyOpened = false;
+	NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
+	local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");	
+	if(NplCefBrowserManager.Open) then
+		local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+		if(config) then
+			if(not bDestroy) then
+				config.visible = false;
+				NplCefBrowserManager:Show(config);
+			else
+				NplCefBrowserManager:Delete({id = blocklyWndName, });
+			end
+		end
+	end
+end
+
 function CodeBlockWindow.OpenBlocklyEditor()
-	GameLogic.RunCommand("/open npl://blockeditor");
+	NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
+	local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");
+	 -- Open a new window
+	if(NplCefBrowserManager.Open) then
+		if(not CodeBlockWindow.isBlocklyOpened) then
+			CodeBlockWindow.isBlocklyOpened = true;
+			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+			if(config and not config.visible) then
+				config.visible = true;
+				NplCefBrowserManager:Show(config);
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
+				local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+				local url = DefaultFilters.cmd_open_url("npl://blockeditor")
+				NplCefBrowserManager:Open({id = blocklyWndName, url = url, showTitleBar=false, withControl = false, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
+			end
+		else
+			CodeBlockWindow.CloseBlocklyWindow();
+		end
+	else
+		GameLogic.RunCommand("/open npl://blockeditor");
+	end
 end
 
 function CodeBlockWindow.OnOpenBlocklyEditor()
 	local code = CodeBlockWindow.GetCodeFromEntity();
-	if(code and code ~= "") then
-		_guihelper.MessageBox(L"图块编辑器还在测试阶段是否仍要使用?", function(res)
-			if(res and res == _guihelper.DialogResult.Yes) then
-				CodeBlockWindow.OpenBlocklyEditor()
-			end
-		end, _guihelper.MessageBoxButtons.YesNo);
-	else
-		CodeBlockWindow.OpenBlocklyEditor()
-	end
+	CodeBlockWindow.OpenBlocklyEditor()
 end
 
 function CodeBlockWindow.GetBlockList()

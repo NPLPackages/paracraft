@@ -2,7 +2,10 @@
 Title: ParaWorldLoginDocker
 Author(s): LiXizhi
 Date: 2018/9/1
-Desc: 
+Desc: Login Docker is a docker UI that is used in all ParaWorld applications. 
+Usually displayed on top when application is first loaded. 
+This is a standalone file that is shared among multiple applications to download and switch to other applications.
+To add more applications, simply add to `app_install_details` table and modify GetSourceAppName and IsLoadedApp method.
 
 use the lib:
 -------------------------------------------------------
@@ -11,14 +14,96 @@ local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.
 ParaWorldLoginDocker.Show()
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
+NPL.load("(gl)script/ide/Files.lua");
+local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+local AutoUpdater = NPL.load("AutoUpdater");
 local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 
 ParaWorldLoginDocker.page = nil;
 
 System.options.paraworldapp = ParaEngine.GetAppCommandLineByParam("paraworldapp", "");
 
+-- @param hasParacraft: whether it contains the latest version of paracraft inside the app.
+local app_install_details = {
+	["paracraft"] = {
+		title=L"paracraft创意空间", hasParacraft = true, 
+		cmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true"',
+		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml"
+	},
+	["haqi"] = {
+		title=L"魔法哈奇", hasParacraft = true, 
+		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="kids" partner="keepwork" config="config/GameClient.config.xml"',
+		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml"
+	},
+	["haqi2"] = {
+		title=L"魔法哈奇-青年版", hasParacraft = false, 
+		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" partner="keepwork" config="config/GameClient.config.xml"',
+		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
+	},
+}
+
+-- get the application name on the working directory. 
+function ParaWorldLoginDocker.GetSourceAppName()
+	local name = ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "");
+	if(name=="" and commonlib.Files.GetDevDirectory()=="") then
+		if(System.options.mc) then
+			name = "paracraft";
+		elseif(System.options.version == "kids") then
+			name = "haqi";
+		elseif(System.options.version == "teen") then
+			name = "haqi2";
+		end
+	end
+	return name or "";
+end
+
+-- whether the given application is already loaded. 
+function ParaWorldLoginDocker.IsLoadedApp(name)
+	if(System.options.mc) then
+		if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
+			return true;
+		end
+	elseif(System.options.version == "kids") then
+		if(name == "haqi") then
+			return true;
+		end
+	elseif(System.options.version == "teen") then
+		if(name == "haqi2") then
+			return true;
+		end
+	elseif(System.options.version == "paraworld") then
+		-- TODO: our social platform
+	end
+end
+
+function ParaWorldLoginDocker.StaticInit()
+	if(ParaWorldLoginDocker.inited) then
+		return;
+	end
+	ParaWorldLoginDocker.inited = true;
+
+	-- always skip updating the current source app
+	local appName = ParaWorldLoginDocker.GetSourceAppName()
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
+	if(app) then
+		app.noUpdate = true;
+		app.redistFolder = nil;
+
+		-- also skip paracraft if the working directory also contains paracraft files, like haqi. 
+		if(app.hasParacraft) then
+			local app = ParaWorldLoginDocker.GetAppInstallDetails("paracraft");
+			if(app) then
+				app.noUpdate = true;
+				app.redistFolder = nil;
+			end	
+		end
+	end
+end
+
 -- init function. page script fresh is set to false.
 function ParaWorldLoginDocker.OnInit()
+	ParaWorldLoginDocker.StaticInit();
 	ParaWorldLoginDocker.page = document:GetPageCtrl();
 	
 	if(System.options.paraworldapp == "user_worlds") then
@@ -28,6 +113,7 @@ end
 
 -- show page
 function ParaWorldLoginDocker.ShowPage()
+	
 	local params;
 	params = {
 		url = "script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.html", 
@@ -56,28 +142,17 @@ function ParaWorldLoginDocker.AutoMarkLoadedApp(appButtons)
 	return appButtons;
 end
 
-function ParaWorldLoginDocker.IsLoadedApp(name)
-	if(System.options.mc) then
-		if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
-			return true;
-		end
-	elseif(System.options.version == "kids") then
-		if(name == "haqi") then
-			return true;
-		end
-	elseif(System.options.version == "teen") then
-		if(name == "haqi2") then
-			return true;
-		end
-	elseif(System.options.version == "paraworld") then
-		-- TODO: our social platform
-	end
-end
 
 function ParaWorldLoginDocker.OnClickApp(name)
 	if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
-			ParaWorldLoginDocker.Restart("paracraft", format('paraworldapp="%s"', name))
+			if(not ParaWorldLoginDocker.IsLoadedApp(name))then
+				ParaWorldLoginDocker.InstallApp("paracraft", function(bInstalled)
+					if(bInstalled) then
+						ParaWorldLoginDocker.Restart("paracraft", format('paraworldapp="%s"', name))
+					end
+				end)
+			end
 		else
 			if(name == "user_worlds") then
 				System.options.showUserWorldsOnce = true
@@ -95,9 +170,21 @@ function ParaWorldLoginDocker.OnClickApp(name)
 		end
 	elseif(name == "haqi") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
-			ParaWorldLoginDocker.Restart("haqi", 'paraworldapp="haqi"')
+			ParaWorldLoginDocker.InstallApp("haqi", function(bInstalled)
+				if(bInstalled) then
+					ParaWorldLoginDocker.Restart("haqi", 'paraworldapp="haqi"')
+				end
+			end)
 		end
 	end
+end
+
+function ParaWorldLoginDocker.GetCurrentRedistFolder()
+	local dev = commonlib.Files.GetDevDirectory()
+	if(dev == "") then
+		dev = ParaIO.GetWritablePath();
+	end
+	return dev;
 end
 
 -- Restart the entire NPLRuntime to a different application. e.g.
@@ -107,15 +194,52 @@ end
 function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	local oldCmdLine = ParaEngine.GetAppCommandLine();
 	local newCmdLine = oldCmdLine;
-	if(not appName or appName == "paracraft") then
-		newCmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua"'
-	elseif(appName == "haqi") then
-		newCmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" version="kids" partner="keepwork" config="config/GameClient.config.xml"'
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	if(app and app.cmdLine) then
+		newCmdLine = app.cmdLine;
+	end
+
+	local srcAppName = ParaWorldLoginDocker.GetSourceAppName()
+	newCmdLine = format("%s src_paraworldapp=\"%s\"", newCmdLine, srcAppName);
+
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
+	if(app) then
+		local redistFolder = ParaWorldLoginDocker.GetAppFolder(appName);
+		redistFolder = redistFolder:gsub("\\", "/");
+		if(ParaWorldLoginDocker.GetCurrentRedistFolder() ~= redistFolder) then
+			additional_commandline_params = format("dev=\"%s\" %s", redistFolder, additional_commandline_params or "");
+			LOG.std(nil, "info", "ParaWorldLoginDocker", "dev folder changed to %s", redistFolder);
+
+			-- unload all pkg files
+			local fileManager = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager");
+			local loadedPkgFiles = {};
+			for i=0, fileManager:GetChildCount(0) -1 do
+				local archiveAttr = fileManager:GetChildAt(i, 0);
+				loadedPkgFiles[#loadedPkgFiles+1] = archiveAttr:GetField("name", "");
+			end
+			for _, name in ipairs(loadedPkgFiles) do
+				ParaAsset.CloseArchive(name);
+				LOG.std(nil, "info", "ParaWorldLoginDocker", "unload archive: %s", name);
+			end
+			-- load all pkg files in redist folder
+			local result = commonlib.Files.Find({}, redistFolder, 0, 500, "main*.pkg")
+			table.sort(result, function(a, b)
+				return a.filename > b.filename
+			end)
+			for i, item in ipairs(result) do
+				filename = redistFolder..item.filename;
+				ParaAsset.OpenArchive(filename)
+				LOG.std(nil, "info", "ParaWorldLoginDocker", "load archive: %s", filename);
+			end
+		end
+		--local assetManifest = System.Core.DOM.GetDOM("AssetManager"):GetChild("CAssetManifest")
+		--assetManifest:CallField("Clear")
 	end
 
 	if(additional_commandline_params) then
 		newCmdLine = newCmdLine.." "..additional_commandline_params;
 	end
+
 	ParaEngine.SetAppCommandLine(newCmdLine);
 	
 	System.reset();
@@ -149,3 +273,221 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	end
 	__rts__:Reset(restart_code);
 end
+
+ParaWorldLoginDocker.appsRootFolder = ParaIO.GetWritablePath().."apps/";
+
+function ParaWorldLoginDocker.GetAppFolder(appName)
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	if(app and app.redistFolder) then
+		return ParaWorldLoginDocker.appsRootFolder..app.redistFolder;
+	else
+		return ParaIO.GetWritablePath();
+	end
+end
+
+function ParaWorldLoginDocker.IsInstalling()
+	return ParaWorldLoginDocker.isInstalling;
+end
+
+function ParaWorldLoginDocker.SetInstalling(bInstalling, appName)
+	ParaWorldLoginDocker.isInstalling = bInstalling;
+	if(bInstalling) then
+		DownloadWorld.ShowPage(appName);
+	else
+		DownloadWorld.Close();
+	end
+end
+
+function ParaWorldLoginDocker.GetAppConfigByName(appName)
+	local assetConfigPath;
+	if(appName=="haqi" or appName=="paracraft") then
+		assetConfigPath = "config/autoupdater/paracraft_win32.xml";
+	end
+	return assetConfigPath;
+end
+
+
+function ParaWorldLoginDocker.GetAppTitle(appName)
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	return app and app.title or L"官方应用";
+end
+
+local appsVersions = {};
+function ParaWorldLoginDocker.AddAppVersionInfo(appName, needUpdate, curVersion, latestVersion)
+	appsVersions[appName] = appsVersions[appName] or {};
+	local app = appsVersions[appName];
+	app.needUpdate = needUpdate;
+	app.curVersion = curVersion;
+	app.latestVersion = latestVersion;
+	return app;
+end
+
+function ParaWorldLoginDocker.GetAppVersionInfo(appName)
+	return appsVersions[appName];
+end
+
+-- @param callbackFunc: function(bNeedUpdate, curVersion, latestVersion) end
+function ParaWorldLoginDocker.CheckInstalledAppVersion(appName, callbackFunc)
+	ParaWorldLoginDocker.StaticInit();
+
+	local app = ParaWorldLoginDocker.GetAppVersionInfo(appName);
+	if(app) then
+		if(callbackFunc) then
+			callbackFunc(app.needUpdate, app.curVersion, app.latestVersion);
+		end
+		return
+	end
+
+	local redist_root = ParaWorldLoginDocker.GetAppFolder(appName);
+	ParaIO.CreateDirectory(redist_root);
+	local autoUpdater = AutoUpdater:new();
+	autoUpdater:onInit(redist_root, ParaWorldLoginDocker.GetAppConfigByName(appName),function(state)
+	end);
+	autoUpdater:check(nil,function()
+        local cur_version = autoUpdater:getCurVersion();
+        local latest_version = autoUpdater:getLatestVersion();
+		local bNeedUpdate = autoUpdater:isNeedUpdate();
+        LOG.std(nil, "info", "ParaWorldLoginDocker", "check version for %s", appName);
+		echo({name=appName, cur_version = cur_version, latest_version = latest_version});
+		ParaWorldLoginDocker.AddAppVersionInfo(appName, bNeedUpdate, cur_version, latest_version)
+		if(callbackFunc) then
+			callbackFunc(bNeedUpdate, cur_version, latest_version);
+		end
+    end);
+end
+
+-- apps that must be installed with latest version. 
+-- @param appName: default to source app Name
+function ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	return app_install_details[appName or ParaWorldLoginDocker.GetSourceAppName()];
+end
+
+-- @param callbackFunc: function(bInstalled) end
+function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	if(not app or app.noUpdate) then
+		if(callbackFunc) then
+			callbackFunc(true);
+		end
+		return
+	end
+
+	if(ParaWorldLoginDocker.IsInstalling()) then
+		_guihelper.MessageBox(L"应用在安装中, 请等待");
+		return true;
+	end
+	local appVersion = ParaWorldLoginDocker.GetAppVersionInfo(appName);
+	if(appVersion) then
+		if(not appVersion.needUpdate) then
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+			return
+		end
+	end
+
+	local redist_root = ParaWorldLoginDocker.GetAppFolder(appName);
+	ParaIO.CreateDirectory(redist_root);
+
+	local autoUpdater = AutoUpdater:new();
+
+	-- let us skip all dll and exe files
+	autoUpdater.FilterFile = function(self, filename)
+		if(filename:match("%.exe") or filename:match("%.dll")) then
+			return true;
+		end
+	end
+
+	local timer;
+	autoUpdater:onInit(redist_root, ParaWorldLoginDocker.GetAppConfigByName(appName),function(state)
+        if(state)then
+			local State = AutoUpdater.State;
+            if(state == State.PREDOWNLOAD_VERSION)then
+                DownloadWorld.UpdateProgressText(L"预下载版本号");
+            elseif(state == State.DOWNLOADING_VERSION)then
+                DownloadWorld.UpdateProgressText(L"正在下载版本信息");
+            elseif(state == State.VERSION_CHECKED)then
+                DownloadWorld.UpdateProgressText(L"版本验证完毕");
+            elseif(state == State.VERSION_ERROR)then
+                ParaWorldLoginDocker.SetInstalling(false);
+				_guihelper.MessageBox(L"无法获取版本信息");
+            elseif(state == State.PREDOWNLOAD_MANIFEST)then
+                DownloadWorld.UpdateProgressText(L"资源列表预下载");
+            elseif(state == State.DOWNLOADING_MANIFEST)then
+                DownloadWorld.UpdateProgressText(L"资源列表下载中");
+            elseif(state == State.MANIFEST_DOWNLOADED)then
+				DownloadWorld.UpdateProgressText(L"已经获取资源列表");
+            elseif(state == State.MANIFEST_ERROR)then
+                ParaWorldLoginDocker.SetInstalling(false);
+				_guihelper.MessageBox(L"无法获取资源列表");
+            elseif(state == State.PREDOWNLOAD_ASSETS)then
+				DownloadWorld.UpdateProgressText(L"准备下载资源文件");
+				local nowTime = 0
+                local lastTime = 0
+                local interval = 100
+                local lastDownloadedSize = 0
+                timer = commonlib.Timer:new({callbackFunc = function(timer)
+					local totalSize = autoUpdater:getTotalSize()
+                    local downloadedSize = autoUpdater:getDownloadedSize()
+					nowTime = nowTime + interval;
+
+					if downloadedSize > lastDownloadedSize then
+                        local downloadSpeed = (downloadedSize - lastDownloadedSize) / ((nowTime - lastTime) / 1000)
+                        lastDownloadedSize = downloadedSize
+                        lastTime = nowTime
+                        local tips = string.format("%.1f/%.1fMB(%.1fKB/S)", downloadedSize / 1024 / 1024, totalSize / 1024 / 1024, downloadSpeed / 1024)
+						DownloadWorld.UpdateProgressText(tips);
+                    end
+					
+					if(not ParaWorldLoginDocker.IsInstalling()) then
+						timer:Change();
+					end
+                end})
+                timer:Change(0, 100)
+            elseif(state == State.DOWNLOADING_ASSETS)then
+                -- DownloadWorld.UpdateProgressText(L"正在下载资源");
+            elseif(state == State.ASSETS_DOWNLOADED)then
+                DownloadWorld.UpdateProgressText(L"全部资源下载完成");
+				if(timer) then
+					timer:Change();
+				end
+                autoUpdater:apply();
+            elseif(state == State.ASSETS_ERROR)then
+                ParaWorldLoginDocker.SetInstalling(false);
+				_guihelper.MessageBox(L"无法获取资源");
+            elseif(state == State.PREUPDATE)then
+                
+            elseif(state == State.UPDATING)then
+                DownloadWorld.UpdateProgressText(L"正在安装更新");
+            elseif(state == State.UPDATED)then
+                DownloadWorld.UpdateProgressText(L"安装完成");
+				ParaWorldLoginDocker.SetInstalling(false);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+            elseif(state == State.FAIL_TO_UPDATED)then
+				ParaWorldLoginDocker.SetInstalling(false);
+				_guihelper.MessageBox(L"无法应用更新");
+            end    
+        end
+    end);
+
+	ParaWorldLoginDocker.SetInstalling(true, ParaWorldLoginDocker.GetAppTitle(appName));
+
+    autoUpdater:check(nil,function()
+        local cur_version = autoUpdater:getCurVersion();
+        local latest_version = autoUpdater:getLatestVersion();
+        LOG.std(nil, "info", "ParaWorldLoginDocker.InstallApp", "check version for %s", appName);
+		echo({name=appName, cur_version = cur_version, latest_version = latest_version});
+        if(autoUpdater:isNeedUpdate())then
+            autoUpdater:download();
+        else
+            LOG.std(nil, "info", "ParaWorldLoginDocker.InstallApp", "%s is already at latest version", appName);
+			ParaWorldLoginDocker.SetInstalling(false);
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+        end
+    end);
+end
+
