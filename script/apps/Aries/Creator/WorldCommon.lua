@@ -29,7 +29,7 @@ function WorldCommon.IsModified()
 	if(not is_modified) then
 		return WorldCommon.CheckIfBlockWorldIsModified();
 	end
-	return 
+	return is_modified;
 end
 
 -- return true if block world is modified since last load or save 
