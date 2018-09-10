@@ -161,6 +161,14 @@ function WorldCommon.GetWorldTag(field_name)
 	end
 end
 
+function WorldCommon.SetWorldTag(field_name, value)
+	if(WorldCommon.world_info) then
+		if(field_name ~= "size") then
+			WorldCommon.world_info[field_name or "name"] = value;
+		end	
+	end
+end
+
 function WorldCommon.GetWorldInfo()
 	return WorldCommon.world_info;
 end
@@ -195,5 +203,122 @@ function WorldCommon.LeaveWorld(callbackFunc)
 	Player.EnterEnvEditMode(false);
 	if(type(callbackFunc) == "function") then
 		callbackFunc(_guihelper.DialogResult.No);
+	end
+end
+
+-- save the current world (could be a zip file) to another folder
+function WorldCommon.SaveWorldAs()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+			
+	local lastWorldName = WorldCommon.GetWorldTag("name")
+	local defaultWorldName = lastWorldName;
+	for i=1, 10 do
+		local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
+		if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+			defaultWorldName = lastWorldName..L"_副本"..tostring(i);
+		else
+			break;
+		end	
+	end
+	
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
+		if(result and result~="") then
+			local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(result) .. "/";
+			if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+				_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?", result), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						WorldCommon.SaveWorldAsImp(targetFolder);
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+			else
+				WorldCommon.SaveWorldAsImp(targetFolder);
+			end
+		end
+	end, defaultWorldName, L"世界另存为", "localworlds", true)
+end
+
+function WorldCommon.SaveWorldAsImp(folderName)
+	if(WorldCommon.CopyWorldTo(folderName)) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
+		local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
+		local save_world_handler = SaveWorldHandler:new():Init(folderName);
+		local world_info = save_world_handler:LoadWorldInfo();
+		if(world_info) then
+			-- change world name in tag. 
+			local worldname = folderName:match("([^/]+)/?$")
+			world_info.name = commonlib.Encoding.DefaultToUtf8(worldname);
+			-- TODO: change Tag.xml to merge the original authors
+			save_world_handler:SaveWorldInfo(world_info);
+		end
+
+		
+		_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				WorldCommon.OpenWorld(folderName, true)
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	end
+end
+
+-- @return true if succeed
+function WorldCommon.CopyWorldTo(destinationFolder)
+	ParaIO.CreateDirectory(destinationFolder);
+
+	local worldzipfile = System.World.worldzipfile;
+	if(worldzipfile) then
+		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(worldzipfile);
+		zipParentDir = zip_archive:GetField("RootDirectory", "");
+
+		-- search just in a given zip archive file
+		local filesOut = {};
+		-- ":.", any regular expression after : is supported. `.` match to all strings. 
+		commonlib.Files.Find(filesOut, "", 0, 10000, ":.", worldzipfile);
+
+		local fileCount = 0;
+		-- print all files in zip file
+		for i = 1,#filesOut do
+			local item = filesOut[i];
+			local filename = item.filename
+			filename = filename:gsub("^[^/]+/?", "");
+			if(item.filesize > 0) then
+				local source_path = zipParentDir..item.filename;
+				
+				local dest_path = destinationFolder..commonlib.Encoding.Utf8ToDefault(filename);
+				local re = ParaIO.CopyFile(source_path, dest_path, true);
+				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
+			else
+				-- this is a folder
+				ParaIO.CreateDirectory(destinationFolder..filename.."/");
+			end
+		end
+		LOG.std(nil, "info", "CopyWorldTo", "%s is unziped to %s ( %d files)", worldzipfile, destinationFolder, fileCount); 
+		return true;
+	else
+		-- search just in a given zip archive file
+		local filesOut = {};
+		local parentDir = GameLogic.GetWorldDirectory();
+		commonlib.Files.Find(filesOut, parentDir, 10, 10000, "*");
+
+		local fileCount = 0;
+		-- print all files in zip file
+		for i = 1,#filesOut do
+			local item = filesOut[i];
+			local filename = item.filename
+			if(item.filesize > 0) then
+				local source_path = parentDir..filename;
+				local dest_path = destinationFolder..filename;
+				local re = ParaIO.CopyFile(source_path, dest_path, true);
+				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
+			else
+				-- this is a folder
+				ParaIO.CreateDirectory(destinationFolder..filename.."/");
+			end
+		end
+		LOG.std(nil, "info", "CopyWorldTo", "%s is copied to %s ( %d files)", parentDir, destinationFolder, fileCount); 
+		return true;
 	end
 end

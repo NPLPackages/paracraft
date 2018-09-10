@@ -587,6 +587,7 @@ function InternetLoadWorld.SvrChangePosition(fromindex,toindex)
 end
 
 function InternetLoadWorld.OnChangeType(type_index,ServerPage_index,bRefreshPage)
+	InternetLoadWorld.OnStaticInit();
 	if(type_index and (type_index == 3 or type_index == 4) and System.options.loginmode == "local") then
 		_guihelper.MessageBox(L"暂未开放敬请期待");
 		return;

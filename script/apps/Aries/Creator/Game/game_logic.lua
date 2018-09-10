@@ -630,7 +630,11 @@ end
 -- @param bSaveToLastSaveFolder: whether to save block to "blockworld.lastsave" folder
 function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	if(System.World.readonly or GameLogic.isRemote) then
-		_guihelper.MessageBox(L"您打开的是只读世界. 请将zip文件解压缩后, 重新加载解压缩后的世界才能保存");
+		_guihelper.MessageBox(format(L"您打开的是只读世界，无法保存。是否另存为本地世界?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				WorldCommon.SaveWorldAs()
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
 		return false;
 	end
 	if(not EnterGamePage.CheckRight("savegame")) then

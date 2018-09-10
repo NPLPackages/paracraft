@@ -1,0 +1,49 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" src="ParaWorldLoginDocker.lua"><![CDATA[
+ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+ParaWorldLoginDocker.OnInit()
+
+local AppButtons = {
+{name="paracraft", isLoaded = true, icon="Texture/blocks/items/movie.png", },
+{name="haqi", icon="Texture/Aries/Dock/Web/dragon_bg_blue_light_32bits.png#0 0 74 74", },
+--{name="haqi2", icon="Texture/Aries/brand/haqi2_icon.png", onclick=""},
+{name="user_worlds", icon="Texture/3DMapSystem/AppIcons/png/Tasks_64.png", },
+{name="tutorial_worlds", icon="Texture/3DMapSystem/AppIcons/png/Intro_64.png", },
+};
+ParaWorldLoginDocker.AutoMarkLoadedApp(AppButtons);
+
+function ds_AppButtons(index)
+    if(not index) then
+        return #AppButtons;
+    else
+        return AppButtons[index];
+    end
+end
+]]></script>
+<pe:if condition='<%=System.os.GetPlatform() == "win32"%>'>
+    <pe:container alignment="_ctt" style="background-color:#80808080;padding-top:5px;padding:5px;height:64x;width:200px">
+        <pe:gridview name="AppBar" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="48" pagesize="12" DataSource='<%=ds_AppButtons%>'>
+            <Columns>
+                <div style="width:47px;">
+                    <div align="center" style="width:45px;position:relative;">
+                        <input type="button" name='<%=Eval("name")%>' tooltip='<%="page://script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html?name="..Eval("name")%>' use_mouse_offset="false" is_lock_position="true"  tooltip_offset_y="64" tooltip_offset_x="-10"
+                                onclick="ParaWorldLoginDocker.OnClickApp" background='<%=Eval("icon") or ""%>' style="position:relative;width:45px;height:45px;" />
+                    </div>
+                    <pe:if condition='<%=Eval("isLoaded")%>'>
+                        <div style="width:4px;height:4px;margin-left:21px;margin-top:48px;position:relative;background-color:#000000"></div>
+                    </pe:if>
+                </div>
+            </Columns>
+        </pe:gridview>
+    </pe:container>
+</pe:if>
+</pe:mcml>
+</body>
+</html>

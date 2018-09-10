@@ -103,6 +103,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	hide_in_toolbox = true,
 	func_description = "repeat\\n%suntil(%s)",
 	ToNPL = function(self)
 		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
@@ -535,6 +536,33 @@ end)
 	end,
 	examples = {{desc = L"成为当前角色的化身", canRun = true, code = [[
 becomeAgent("@p")
+]]}},
+},
+
+{
+	type = "setOutput", 
+	message0 = L"设置方块输出%1",
+	arg0 = {
+		{
+			name = "result",
+			type = "input_value",
+            shadow = { type = "math_number", value = 15,},
+			text = 15, 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setOutput(%s)',
+	ToNPL = function(self)
+		return string.format('setOutput(%s)\n', self:getFieldAsString('result'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+setOutput(15)
+wait(2)
+setOutput(0)
 ]]}},
 },
 

@@ -82,6 +82,7 @@ local s_env_methods = {
 	"delete",
 	"run",
 	"becomeAgent",
+	"setOutput",
 
 	-- Sensing
 	"isTouching",

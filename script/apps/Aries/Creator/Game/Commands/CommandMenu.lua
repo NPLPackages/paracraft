@@ -76,6 +76,10 @@ Commands["menu"] = {
 				local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SaveWorldPage");
 				SaveWorldPage.ShowPage()
 			end
+		elseif(name == "file.saveworldas") then
+			NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+			WorldCommon.SaveWorldAs()
 		elseif(name == "file.createworld") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
 			local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")

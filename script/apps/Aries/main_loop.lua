@@ -95,7 +95,12 @@ local function Aries_load_config(filename)
 		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
 		System.options.platform_id = Platforms.PLATS.QQ;
 		System.options.is_official = true;
+	elseif(System.options.partner == "keepwork") then
+		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
+		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
+		System.options.platform_id = Platforms.PLATS.KEEPWORK;
 	end
+	
     
 	-- we will enter this world first 
 	-- format: "nid@homeland" or "nid@save_slot_id"

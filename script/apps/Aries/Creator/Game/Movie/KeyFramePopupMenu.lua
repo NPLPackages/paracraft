@@ -24,6 +24,7 @@ local KeyFramePopupMenu = commonlib.gettable("MyCompany.Aries.Game.Movie.KeyFram
 -- menu items
 local standard_keylist = {
 	{name="EditKey", text=L"编辑..."}, 
+	{name="DeleteCurrentKey", text=L"删除关键帧"},
 	{name="DeleteAllKeysToTheRight", text=L"删除右侧全部关键帧"},
 	{name="DeleteAllKeys", text=L"删除全部关键帧"},
 	{name="ShiftKeyTime", text=L"平移右侧所有帧的时间..."}, 
@@ -117,6 +118,13 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 					end
 				end
 			end,tostring(time));
+		end
+	elseif(node.Name == "DeleteCurrentKey") then
+		if(var and actor) then
+			actor:BeginModify();
+			MovieUISound.PlayRemoveKey();
+			var:RemoveKeyFrame(time);
+			actor:EndModify();
 		end
 	elseif(node.Name == "DeleteAllKeys") then
 		if(var and actor) then

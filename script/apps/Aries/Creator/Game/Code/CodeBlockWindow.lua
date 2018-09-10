@@ -15,6 +15,9 @@ NPL.load("(gl)script/ide/System/Windows/Window.lua")
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -84,8 +87,6 @@ end
 
 -- @return margin_right and bottom
 function CodeBlockWindow:CalculateMargins()
-	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-	local Screen = commonlib.gettable("System.Windows.Screen");
 	local viewport = ViewportManager:GetSceneViewport();
 	local width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
 	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
@@ -111,6 +112,8 @@ function CodeBlockWindow:OnViewportChange()
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
 			end
+
+			CodeBlockWindow.UpdateBlocklyWindowSize();
 		end
 	end
 end
@@ -220,6 +223,9 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
+	if(CodeBlockWindow.isBlocklyOpened) then
+		CodeBlockWindow.CloseBlocklyWindow();
+	end
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
@@ -438,14 +444,50 @@ function CodeBlockWindow.GetTextControl()
 	end
 end
 
-function CodeBlockWindow.ReplaceCode(code)
-	local textCtrl = CodeBlockWindow.GetTextControl();
-	if(textCtrl) then
-		textCtrl:SetText(code or "");
+	
+-- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
+function CodeBlockWindow.ReplaceCode(code, bx, by, bz)
+	if(CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+		local textCtrl = CodeBlockWindow.GetTextControl();
+		if(textCtrl) then
+			textCtrl:SetText(code or "");
+			return true;
+		end
+	else
+		if(bx and by and bz) then
+			local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
+			if(codeEntity and codeEntity.class_name == "EntityCode") then
+				codeEntity:SetCommand(code);
+				return true;
+			end
+		end
+		return false;
 	end
 end
 
-function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
+-- @param bx, by, bz: we will return false if they do not match the current block. 
+-- @return  it will also return true if input are nil
+function CodeBlockWindow.IsSameBlock(bx, by, bz)
+	if(bx and by and bz) then
+		local entity = CodeBlockWindow.GetCodeEntity();
+		if(entity) then
+			local cur_bx, cur_by, cur_bz = entity:GetBlockPos();
+			if(cur_bx==bx and cur_by == by and cur_bz==bz) then
+				-- same block ready to go
+			else
+				return false;
+			end
+		end
+	end
+	return true;
+end
+
+-- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
+function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine, bx, by, bz)
+	if(not CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+		return false;
+	end
+
 	if(code and page) then
 		local textAreaCtrl = page:FindControl("code");
 		
@@ -474,27 +516,98 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 						textAreaCtrl.window:SetFocus_sys();
 						textAreaCtrl.window:handleActivateEvent(true)
 					end
+					return true;
 				end
 			end
 		end
 	end
 end
 
+local blocklyWndName = "blocklyWindow";
+
+function CodeBlockWindow.GetChromeBrowserManager()
+	if(self.chromeBrowserManager == nil) then
+		self.chromeBrowserManager = false;
+		NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
+		local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");	
+		if(NplCefBrowserManager.HasCefPlugin and NplCefBrowserManager:HasCefPlugin()) then
+			self.chromeBrowserManager = NplCefBrowserManager;
+		end
+	end
+	return self.chromeBrowserManager;
+end
+
+-- @param bDestroy: true to destroy window
+function CodeBlockWindow.CloseBlocklyWindow(bDestroy)
+	CodeBlockWindow.isBlocklyOpened = false;
+	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+	if(NplCefBrowserManager) then
+		local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+		if(config) then
+			if(not bDestroy) then
+				config.visible = false;
+				NplCefBrowserManager:Show(config);
+			else
+				NplCefBrowserManager:Delete({id = blocklyWndName, });
+			end
+		end
+	end
+end
+
+function CodeBlockWindow.UpdateBlocklyWindowSize()
+	if(CodeBlockWindow.isBlocklyOpened) then
+		local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+		if(NplCefBrowserManager) then
+			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+			if(config) then
+				NplCefBrowserManager:ChangePosSize({id = blocklyWndName, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
+			end
+		end
+	end
+end
+
+
 function CodeBlockWindow.OpenBlocklyEditor()
-	GameLogic.RunCommand("/open npl://blockeditor");
+	local blockpos;
+	local entity = CodeBlockWindow.GetCodeEntity();
+	if(entity) then
+		local bx, by, bz = entity:GetBlockPos();
+		if(bz) then
+			blockpos = format("%d,%d,%d", bx, by, bz);
+		end
+	end
+
+	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
+	if(NplCefBrowserManager) then
+		 -- Open a new window
+		if(not CodeBlockWindow.isBlocklyOpened) then
+			CodeBlockWindow.isBlocklyOpened = true;
+			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
+			if(config and not config.visible) then
+				config.visible = true;
+				NplCefBrowserManager:Show(config);
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
+				local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+				local url = DefaultFilters.cmd_open_url("npl://blockeditor")
+				NplCefBrowserManager:Open({id = blocklyWndName, url = url, showTitleBar=false, withControl = false, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
+			end
+			CodeBlockWindow.UpdateBlocklyWindowSize();
+		else
+			CodeBlockWindow.CloseBlocklyWindow();
+		end
+	else
+		local requestParams = ""
+		if(blockpos) then
+			requestParams = format("?blockpos=%s", blockpos);
+		end
+		GameLogic.RunCommand("/open npl://blockeditor"..requestParams);
+	end
 end
 
 function CodeBlockWindow.OnOpenBlocklyEditor()
 	local code = CodeBlockWindow.GetCodeFromEntity();
-	if(code and code ~= "") then
-		_guihelper.MessageBox(L"图块编辑器还在测试阶段是否仍要使用?", function(res)
-			if(res and res == _guihelper.DialogResult.Yes) then
-				CodeBlockWindow.OpenBlocklyEditor()
-			end
-		end, _guihelper.MessageBoxButtons.YesNo);
-	else
-		CodeBlockWindow.OpenBlocklyEditor()
-	end
+	CodeBlockWindow.OpenBlocklyEditor()
 end
 
 function CodeBlockWindow.GetBlockList()

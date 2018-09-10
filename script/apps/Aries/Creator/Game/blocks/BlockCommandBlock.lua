@@ -25,7 +25,17 @@ block_types.RegisterBlockClass("BlockCommandBlock", block);
 
 
 function block:ctor()
-	-- self.ProvidePower = true;
+	self.ProvidePower = true;
+end
+
+-- Do not emit weak power to nearby movie blocks, otherwise it behaves same as normal cube block.
+-- Returns 0 if the block is emitting indirect/weak electric power on the specified side. 
+function block:isProvidingWeakPower(x,y,z, side)
+	return 0;
+end
+
+function block:isProvidingStrongPower(x,y,z, side)
+	return 0;
 end
 
 -- some block like command blocks, may has an internal state number(like its last output result)
