@@ -17,6 +17,7 @@ NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 local Screen = commonlib.gettable("System.Windows.Screen");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -443,14 +444,50 @@ function CodeBlockWindow.GetTextControl()
 	end
 end
 
-function CodeBlockWindow.ReplaceCode(code)
-	local textCtrl = CodeBlockWindow.GetTextControl();
-	if(textCtrl) then
-		textCtrl:SetText(code or "");
+	
+-- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
+function CodeBlockWindow.ReplaceCode(code, bx, by, bz)
+	if(CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+		local textCtrl = CodeBlockWindow.GetTextControl();
+		if(textCtrl) then
+			textCtrl:SetText(code or "");
+			return true;
+		end
+	else
+		if(bx and by and bz) then
+			local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
+			if(codeEntity and codeEntity.class_name == "EntityCode") then
+				codeEntity:SetCommand(code);
+				return true;
+			end
+		end
+		return false;
 	end
 end
 
-function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
+-- @param bx, by, bz: we will return false if they do not match the current block. 
+-- @return  it will also return true if input are nil
+function CodeBlockWindow.IsSameBlock(bx, by, bz)
+	if(bx and by and bz) then
+		local entity = CodeBlockWindow.GetCodeEntity();
+		if(entity) then
+			local cur_bx, cur_by, cur_bz = entity:GetBlockPos();
+			if(cur_bx==bx and cur_by == by and cur_bz==bz) then
+				-- same block ready to go
+			else
+				return false;
+			end
+		end
+	end
+	return true;
+end
+
+-- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
+function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine, bx, by, bz)
+	if(not CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+		return false;
+	end
+
 	if(code and page) then
 		local textAreaCtrl = page:FindControl("code");
 		
@@ -479,6 +516,7 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine)
 						textAreaCtrl.window:SetFocus_sys();
 						textAreaCtrl.window:handleActivateEvent(true)
 					end
+					return true;
 				end
 			end
 		end
@@ -528,7 +566,17 @@ function CodeBlockWindow.UpdateBlocklyWindowSize()
 	end
 end
 
+
 function CodeBlockWindow.OpenBlocklyEditor()
+	local blockpos;
+	local entity = CodeBlockWindow.GetCodeEntity();
+	if(entity) then
+		local bx, by, bz = entity:GetBlockPos();
+		if(bz) then
+			blockpos = format("%d,%d,%d", bx, by, bz);
+		end
+	end
+
 	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
 	if(NplCefBrowserManager) then
 		 -- Open a new window
@@ -549,7 +597,11 @@ function CodeBlockWindow.OpenBlocklyEditor()
 			CodeBlockWindow.CloseBlocklyWindow();
 		end
 	else
-		GameLogic.RunCommand("/open npl://blockeditor");
+		local requestParams = ""
+		if(blockpos) then
+			requestParams = format("?blockpos=%s", blockpos);
+		end
+		GameLogic.RunCommand("/open npl://blockeditor"..requestParams);
 	end
 end
 

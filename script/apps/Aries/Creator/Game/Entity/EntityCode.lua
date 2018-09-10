@@ -385,3 +385,27 @@ function Entity:AutoCreateMovieEntity()
 		end
 	end
 end
+
+-- get the last electric output result. 
+function Entity:GetLastOutput()
+	return self.last_output;
+end
+
+-- get output from result. if result is a value larger than 1. 
+-- value larger than 15 is clipped. 
+-- @return nil or a value between [1,15]
+function Entity:ComputeElectricOutput(last_result)
+	if(type(last_result) == "number" and last_result>=1) then
+		return math.min(15, math.floor(last_result));
+	end
+end
+
+-- set the last result. 
+function Entity:SetLastCommandResult(last_result)
+	local output = self:ComputeElectricOutput(last_result)
+	if(self.last_output ~= output) then
+		self.last_output = output;
+		local x, y, z = self:GetBlockPos();
+		BlockEngine:NotifyNeighborBlocksChange(x, y, z, BlockEngine:GetBlockId(x, y, z));
+	end
+end

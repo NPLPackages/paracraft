@@ -67,6 +67,12 @@ function OpenFileDialog.GetFilters(filterName)
 		return {
 			{L"全部文件(*.xml)",  "*.xml"},
 		};
+	elseif(filterName == "localworlds") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+		local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+		return {
+			{L"Paracraft世界",  "*", searchPath = LocalLoadWorld.GetDefaultSaveWorldPath().."/", searchLevel=0, filterFunc = "*."},
+		};
 	end
 end
 
@@ -148,36 +154,53 @@ function OpenFileDialog.GetExistingFiles()
 	return OpenFileDialog.dsExistingFiles or {};
 end
 
+function OpenFileDialog.GetSearchDirectory()
+	local rootPath;
+	if(OpenFileDialog.filters) then
+		local filter = OpenFileDialog.filters[OpenFileDialog.curFilterIndex or 1];
+		if(filter) then
+			rootPath = filter.searchPath	
+		end
+	end
+	return rootPath or ParaWorld.GetWorldDirectory()
+end
+
 function OpenFileDialog.UpdateExistingFiles()
 	NPL.load("(gl)script/ide/Files.lua");
-	local rootPath = ParaWorld.GetWorldDirectory();
+	local rootPath = OpenFileDialog.GetSearchDirectory();
 
 	local filter, filterFunc;
+	local searchLevel = 2;
 	if(OpenFileDialog.filters) then
 		filter = OpenFileDialog.filters[OpenFileDialog.curFilterIndex or 1];
 		if(filter) then
-			filter = filter[2];
-			if(filter) then
-				-- "*.fbx;*.x;*.bmax;*.xml"
-				local exts = {};
-				for ext in filter:gmatch("%*%.([^;]+)") do
-					exts[#exts + 1] = "%."..ext.."$";
-				end
+			searchLevel = filter.searchLevel or searchLevel
+			if(filter.filterFunc) then
+				filterFunc = filter.filterFunc;
+			else
+				local filterText = filter[2];
+				if(filterText) then
+					-- "*.fbx;*.x;*.bmax;*.xml"
+					local exts = {};
+					for ext in filterText:gmatch("%*%.([^;]+)") do
+						exts[#exts + 1] = "%."..ext.."$";
+					end
 				
-				-- skip these system files and all files under blockWorld.lastsave/
-				local skippedFiles = {
-					["LocalNPC.xml"] = true,
-					["entity.xml"] = true,
-					["players/0.entity.xml"] = true,
-					["revision.xml"] = true,
-					["tag.xml"] = true,
-				}
+					-- skip these system files and all files under blockWorld.lastsave/
+					local skippedFiles = {
+						["LocalNPC.xml"] = true,
+						["entity.xml"] = true,
+						["players/0.entity.xml"] = true,
+						["revision.xml"] = true,
+						["tag.xml"] = true,
+					}
 
-				filterFunc = function(item)
-					if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld%.lastsave")) then
-						for i=1, #exts do
-							if(item.filename:match(exts[i])) then
-								return true;
+					filterFunc = function(item)
+						if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld%.lastsave")) then
+							for i=1, #exts do
+								if(item.filename:match(exts[i])) then
+									return true;
+								end
 							end
 						end
 					end
@@ -187,10 +210,13 @@ function OpenFileDialog.UpdateExistingFiles()
 	end
 	local files = {};
 	OpenFileDialog.dsExistingFiles = files;
-	local result = commonlib.Files.Find({}, rootPath, 2, 500, filterFunc);
+	local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, filterFunc);
 	for i = 1, #result do
 		files[#files+1] = {name="file", attr=result[i]};
 	end
+	table.sort(files, function(a, b)
+		return (a.attr.writedate or 0) > (b.attr.writedate or 0);
+	end);
 end
 
 function OpenFileDialog.OnOpenFileDialog()
@@ -198,14 +224,19 @@ function OpenFileDialog.OnOpenFileDialog()
 
 	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
 		OpenFileDialog.title,
-		GameLogic.GetWorldDirectory() or "", 
+		OpenFileDialog.GetSearchDirectory(), 
 		OpenFileDialog.IsSaveMode);
 		
 	if(filename and page) then
 		local fileItem = Files.ResolveFilePath(filename);
-		if(fileItem and fileItem.relativeToWorldPath) then
-			local filename = fileItem.relativeToWorldPath;
-			page:SetValue("text", filename);
+		if(fileItem) then
+			if(fileItem.relativeToWorldPath) then
+				local filename = fileItem.relativeToWorldPath;
+				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+			else
+				filename = filename:match("[^/\\]+$")
+				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+			end
 		end
 	end
 end

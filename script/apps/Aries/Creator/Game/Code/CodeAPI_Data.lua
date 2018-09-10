@@ -88,3 +88,11 @@ function env_imp:becomeAgent(entityName)
 		self.actor:BecomeAgent(entity);
 	end
 end
+
+-- set the code block output value, this is the wire signal that this code block will emit, 
+-- the signal can be tracked by a block repeater. 
+function env_imp:setOutput(result)
+	if(self.codeblock) then
+		self.codeblock:SetOutput(tonumber(result))
+	end
+end

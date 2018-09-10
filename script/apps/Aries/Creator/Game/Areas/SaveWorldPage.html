@@ -22,7 +22,7 @@ end
 function ConvertStatus()
     if(do_modify) then
         local name = Page:GetUIValue("worldname");
-        WorldCommon.world_tag.name = name;
+        WorldCommon.SetWorldTag("name", name);
         SaveWorldPage.worldname = name;
     end
     do_modify = not do_modify;
@@ -41,6 +41,12 @@ function OnSaveWorld()
     SaveWorldPage.OnSaveWorld(worldname);
 end
 
+function OnSaveWorldAs()
+    local worldname = Page:GetUIValue("worldname")
+    ClosePage();
+    GameLogic.RunCommand("/menu file.saveworldas");
+end
+
 function OnUploadWorld()
     ClosePage();
     GameLogic.RunCommand("/menu file.uploadworld");
@@ -56,26 +62,28 @@ end
 
 
 ]]></script>
-<aries:window style="width:310px;" title='<%=L"保存世界"%>' onclose="ClosePage" mode="thin">
-    <div style="margin-left:40px;">
-        <pe:if condition='<%=not ISModifying()%>'>
-            <div style="float:left;margin-top:4px;height:24px;color:#ffffff;width:160px;">
-                <%=GetWorldName() %>
-            </div>  
-            <input type="button" style="float:left;margin-left:10px;margin-top:4px;" value='<%=L"修改"%>' onclick="ConvertStatus" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%=ISModifying()%>'>
-            <input type="text" name="worldname" value='' style="float:left;margin-top:4px;width:160px;height:22px;" class="mc_text"/>    
-            <input type="button" value='<%=L"保存"%>' style="float:left;margin-top:4px;margin-left:10px;" onclick="ConvertStatus" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-    </div>
-    
-    <div style="margin-top:1px;margin-left:35px;padding:2px;background:" tooltip='<%=L"点击重新截图"%>' onclick="OnClickTakeImage">
-        <img name="WorldImage" width="230" height="145"/>
-    </div>
-    <div style="margin-top:7px;margin-bottom:15px;">
-        <input type="button" style="float:left;margin-left:40px;color:#ffffff" value='<%=L"上传大厅"%>' tooltip='<%=L"上传到服务器, 其他玩家可访问"%>' class="mc_light_grey_button_with_fillet" onclick="OnUploadWorld"/>
-        <input type="button" style="margin-left:20px;color:#ffffff" value='<%=L"本地保存"%>' tooltip='<%=L"世界只保存在了您的个人电脑上"%>' class="mc_light_grey_button_with_fillet" onclick="OnSaveWorld"/>
+<aries:window style="min-width:310px;" title='<%=L"保存世界"%>' onclose="ClosePage" mode="thin">
+    <div style="margin-left:10px;margin-right:10px;">
+        <div style="">
+            <pe:if condition='<%=not ISModifying()%>'>
+                <div style="float:left;margin-top:4px;height:24px;color:#ffffff;">
+                    <%=GetWorldName() %>
+                </div>
+                <input type="button" style="float:left;margin-left:10px;margin-top:4px;" value='<%=L"修改"%>' onclick="ConvertStatus" class="mc_light_grey_button_with_fillet" />
+            </pe:if>
+            <pe:if condition='<%=ISModifying()%>'>
+                <input type="text" name="worldname" value='' style="float:left;margin-top:4px;width:160px;height:22px;" class="mc_text" />
+                <input type="button" value='<%=L"保存"%>' style="float:left;margin-top:4px;margin-left:10px;" onclick="ConvertStatus" class="mc_light_grey_button_with_fillet" />
+            </pe:if>
+        </div>
+        <div style="margin-top:1px;padding:2px;background:" tooltip='<%=L"点击重新截图"%>' onclick="OnClickTakeImage">
+            <img name="WorldImage" width="230" height="145" />
+        </div>
+        <div style="margin-top:7px;margin-bottom:15px;">
+            <input type="button" style="float:left;color:#ffffff" value='<%=L"上传大厅"%>' tooltip='<%=L"上传到服务器, 其他玩家可访问"%>' class="mc_light_grey_button_with_fillet" onclick="OnUploadWorld" />
+            <input type="button" style="margin-left:20px;color:#ffffff" value='<%=L"本地保存"%>' tooltip='<%=L"世界只保存在了您的个人电脑上"%>' class="mc_light_grey_button_with_fillet" onclick="OnSaveWorld" />
+            <input type="button" style="margin-left:20px;color:#ffffff" value='<%=L"另存为..."%>' tooltip='<%=L"世界只保存在了您的个人电脑上"%>' class="mc_light_grey_button_with_fillet" onclick="OnSaveWorldAs" />
+        </div>
     </div>
 </aries:window>
 </pe:mcml>

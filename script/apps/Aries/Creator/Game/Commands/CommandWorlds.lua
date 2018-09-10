@@ -337,3 +337,16 @@ examples:
 	end,
 };
 
+Commands["saveas"] = {
+	name="saveas", 
+	quick_ref="/saveas", 
+	desc="save the world to another directory", 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		if(not GameLogic.is_started) then
+			return 
+		end
+		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+		WorldCommon.SaveWorldAs()
+	end,
+};

@@ -178,6 +178,8 @@ function CodeBlock:Stop()
 	self:RemoveAllActors();
 	self:RemoveAllEvents();
 	self:StopLastTempCode();
+	self:SetOutput(0);
+
 	self.code_env = nil;
 	self.isLoaded = nil;
 	GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
@@ -637,4 +639,11 @@ end
 function CodeBlock:OnCollideActor(actor, fromActor)
 	self:FireEvent("onCollideActor", actor, fromActor);
 	self:actorCollided(actor, fromActor);
+end
+
+-- set code block entity's output value. default to nil.
+function CodeBlock:SetOutput(result)
+	if(self:GetEntity()) then
+		self:GetEntity():SetLastCommandResult(result);
+	end
 end

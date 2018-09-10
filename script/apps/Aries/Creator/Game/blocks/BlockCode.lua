@@ -160,3 +160,15 @@ function block:getMaxCodeStrength(x, y, z, strength)
 		end
     end
 end
+
+-- some block like command blocks, may has an internal state number(like its last output result)
+-- and some block may use its nearby blocks' state number to generate electric output or other behaviors.
+-- @return nil or a number between [0-15]
+function block:GetInternalStateNumber(x,y,z)
+	local entity = self:GetBlockEntity(x,y,z)
+	if(entity and entity.GetLastOutput) then
+		return entity:GetLastOutput() or 0;
+	else
+		return 0;
+	end
+end

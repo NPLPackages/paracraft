@@ -252,6 +252,14 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	ParaTerrain.LeaveBlockWorld();
 	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
 
+	-- NOT WORKING: 
+	-- NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	-- local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	-- ViewportManager:GetGUIViewport():SetPosition("_fi", 0,0,0,0);
+	-- ViewportManager:GetGUIViewport():Apply();
+	-- ViewportManager:GetSceneViewport():SetPosition("_fi", 0,0,0,0);
+	-- ViewportManager:GetSceneViewport():Apply();
+
 	local restart_code = [[
 	ParaUI.ResetUI();
 	ParaScene.Reset();
