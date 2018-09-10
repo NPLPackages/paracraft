@@ -445,8 +445,8 @@ e.g.
 			cmd_text = "game";
 		end
 
+		GameLogic.options:SetLockedGameMode(cmd_text);
 		if( GameLogic.GameMode:GetMode() ~= cmd_text ) then
-			GameLogic.options:SetLockedGameMode(cmd_text);
 			MyCompany.Aries.Creator.Game.Desktop.OnActivateDesktop(cmd_text);
 		end
 	end,
