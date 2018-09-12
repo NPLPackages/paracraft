@@ -28,6 +28,7 @@ CodeHelpWindow.categories = {
 {name = "Sensing", text = L"感知", colour="#69b090", },
 {name = "Operators", text = L"运算", colour="#569138", },
 {name = "Data", text = L"数据", colour="#459197", },
+
 };
 
 ---------------------

@@ -7,11 +7,7 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-CodeBlocklySerializer.WriteBlocklyMenuToXml("BlocklyMenu.xml");
-CodeBlocklySerializer.WriteToBlocklyConfig("BlocklyConfigSource.json");
-CodeBlocklySerializer.WriteToBlocklyCode("BlocklyExecution.js");
-CodeBlocklySerializer.WriteKeywordsToJson("LanguageKeywords.json");
-
+CodeBlocklySerializer.SaveFilesToDebug();
 
 links:
 blockfactory: https://blockly-demo.appspot.com/static/demos/blockfactory/index.html
@@ -32,7 +28,38 @@ local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem"
 
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
 local arg_len = 9; -- assumed total number of arg, start index from 0
+
+function CodeBlocklySerializer.OnInit(categories,all_cmds)
+    CodeBlocklySerializer.categories = categories;
+    CodeBlocklySerializer.all_cmds = all_cmds;
+end
+function CodeBlocklySerializer.GetCategoryButtons()
+    return CodeBlocklySerializer.categories or CodeHelpWindow.GetCategoryButtons()
+end
+function CodeBlocklySerializer.GetAllCmds()
+	return CodeBlocklySerializer.all_cmds or CodeHelpData.GetAllCmds();
+end
+function CodeBlocklySerializer.SaveFilesToDebug(folder_name)
+    folder_name = folder_name or "block_configs"
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Translation.lua");
+    local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
+    local lang = Translation.GetCurrentLanguage();
+    if(lang == "enUS")then
+        CodeBlocklySerializer.WriteBlocklyMenuToXml(folder_name .. "/BlocklyMenu.xml");
+        CodeBlocklySerializer.WriteToBlocklyConfig(folder_name .. "/BlocklyConfigSource.json");
+    else
+        CodeBlocklySerializer.WriteBlocklyMenuToXml(folder_name .. "/BlocklyMenu-zh-cn.xml");
+        CodeBlocklySerializer.WriteToBlocklyConfig(folder_name .. "/BlocklyConfigSource-zh-cn.json");
+    end
+    CodeBlocklySerializer.WriteToBlocklyCode(folder_name .. "/BlocklyExecution.js");
+    CodeBlocklySerializer.WriteKeywordsToJson(folder_name .. "/LanguageKeywords.json");
+    
+
+
+end
 function CodeBlocklySerializer.WriteKeywordsToJson(filename)
+	ParaIO.CreateDirectory(filename);
+
 	local s = CodeBlocklySerializer.GetKeywords();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
@@ -41,7 +68,7 @@ function CodeBlocklySerializer.WriteKeywordsToJson(filename)
 	end
 end
 function CodeBlocklySerializer.GetKeywords()
-	local all_cmds = CodeHelpData.GetAllCmds();
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
 	local result = {};
 	local k,v;
 	for k,v in ipairs(all_cmds) do
@@ -53,8 +80,8 @@ function CodeBlocklySerializer.GetKeywords()
 	return s;
 end
 function CodeBlocklySerializer.GetBlocklyMenuXml()
-	local categories = CodeHelpWindow.GetCategoryButtons()
-	local all_cmds = CodeHelpData.GetAllCmds();
+	local categories = CodeBlocklySerializer.GetCategoryButtons()
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
 	local s = [[<xml id="toolbox" style="display: none">]];
 	local k,v;
 	for k,v in ipairs(categories) do
@@ -65,8 +92,9 @@ function CodeBlocklySerializer.GetBlocklyMenuXml()
 	return s;
 end
 -- create a xml menu
-function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
-	local s = CodeBlocklySerializer.GetBlocklyMenuXml();
+function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename,categories,all_cmds)
+	ParaIO.CreateDirectory(filename);
+	local s = CodeBlocklySerializer.GetBlocklyMenuXml(categories,all_cmds);
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
 		file:WriteString(s);
@@ -74,7 +102,7 @@ function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename)
 	end
 end
 function CodeBlocklySerializer.GetAllVariableTypes()
-	local all_cmds = CodeHelpData.GetAllCmds();
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
     local variable_type_maps = {};
     for __,cmd in ipairs(all_cmds) do
         for k = 0,arg_len do
@@ -97,7 +125,7 @@ function CodeBlocklySerializer.GetAllVariableTypes()
     return variable_type_maps;
 end
 function CodeBlocklySerializer.GetCategoryStr(category)
-	local all_cmds = CodeHelpData.GetAllCmds();
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
 	if(not category or not all_cmds)then return end
     local text = category.text;
     local name = category.name;
@@ -175,8 +203,8 @@ function CodeBlocklySerializer.GetShadowStr(cmd)
     return result;
 end
 function CodeBlocklySerializer.GetBlocklyConfig()
-	local all_cmds = CodeHelpData.GetAllCmds();
-	local categories = CodeHelpWindow.GetCategoryButtons()
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+	local categories = CodeBlocklySerializer.GetCategoryButtons()
 	local c_map = {};
 	local k,v;
 	for k,v in ipairs(categories) do
@@ -199,6 +227,8 @@ end
 -- how to define-blocks:https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
 function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
 	if(not filename)then return end
+	ParaIO.CreateDirectory(filename);
+
 	local s = CodeBlocklySerializer.GetBlocklyConfig();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
@@ -207,7 +237,7 @@ function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
 	end
 end
 function CodeBlocklySerializer.GetBlocklyCode()
-	local all_cmds = CodeHelpData.GetAllCmds();
+	local all_cmds = CodeBlocklySerializer.GetAllCmds();
 	local s = "";
 	local cmd
 	for __,cmd in ipairs(all_cmds) do
@@ -224,6 +254,8 @@ end
 -- generating-code: https://developers.google.com/blockly/guides/create-custom-blocks/generating-code
 function CodeBlocklySerializer.WriteToBlocklyCode(filename)
 	if(not filename)then return end
+	ParaIO.CreateDirectory(filename);
+
 	local s = CodeBlocklySerializer.GetBlocklyCode();
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
