@@ -25,13 +25,35 @@ WorldCommon.world_info = nil;
 
 -- get whether the game world is modified or not
 function WorldCommon.IsModified()
-	return WorldCommon.is_modified;
+	local is_modified = WorldCommon.is_modified;
+	if(not is_modified) then
+		return WorldCommon.CheckIfBlockWorldIsModified();
+	end
+	return is_modified;
+end
+
+-- return true if block world is modified since last load or save 
+function WorldCommon.CheckIfBlockWorldIsModified()
+	local blockWorld = GameLogic.GetBlockWorld()
+	local worldAtt = ParaBlockWorld.GetBlockAttributeObject(blockWorld);
+	local count = worldAtt:GetChildCount();
+
+	local is_modified = false;
+	for i = 0, count - 1 do
+		local regionAtt = worldAtt:GetChildAt(i);
+		is_modified = is_modified or regionAtt:GetField("IsModified", false);
+		if(is_modified) then
+			break
+		end
+	end
+	return is_modified;
 end
 
 -- set whether the game world is modified or not
 function WorldCommon.SetModified(bModified)
 	WorldCommon.is_modified = bModified;
 end
+
 
 -- load world info from tag.xml under the world_path
 -- @param world_path: if nil, ParaWorld.GetWorldDirectory() is used. 

@@ -38,7 +38,9 @@ local app_install_details = {
 	},
 	["haqi2"] = {
 		title=L"魔法哈奇-青年版", hasParacraft = false, 
+		mergeParacraftPKGFiles = true, -- we will always apply the latest version of paracraft pkg on top of this one. 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" partner="keepwork" config="config/GameClient.config.xml"',
+		-- cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" config="config/GameClient.config.xml"',
 		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
 	},
 }
@@ -168,11 +170,11 @@ function ParaWorldLoginDocker.OnClickApp(name)
 				MainLogin:next_step({IsLoginModeSelected = true});
 			end
 		end
-	elseif(name == "haqi") then
+	elseif(name == "haqi" or name=="haqi2") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
-			ParaWorldLoginDocker.InstallApp("haqi", function(bInstalled)
+			ParaWorldLoginDocker.InstallApp(name, function(bInstalled)
 				if(bInstalled) then
-					ParaWorldLoginDocker.Restart("haqi", 'paraworldapp="haqi"')
+					ParaWorldLoginDocker.Restart(name, format('paraworldapp="%s"', name))
 				end
 			end)
 		end
@@ -187,11 +189,51 @@ function ParaWorldLoginDocker.GetCurrentRedistFolder()
 	return dev;
 end
 
+function ParaWorldLoginDocker.LoadAllMainPackagesInFolder(redistFolder)
+	local result = commonlib.Files.Find({}, redistFolder, 0, 500, "main*.pkg")
+	table.sort(result, function(a, b)
+		return a.filename > b.filename
+	end)
+	for i, item in ipairs(result) do
+		filename = redistFolder..item.filename;
+		ParaAsset.OpenArchive(filename)
+		LOG.std(nil, "info", "ParaWorldLoginDocker", "load archive: %s", filename);
+	end
+end
+
+function ParaWorldLoginDocker.RestoreDefaultGUITemplate()
+	local _this;
+
+	_this=ParaUI.GetDefaultObject("button");
+	_guihelper.SetButtonFontColor(_this, "#000000");
+
+	_this=ParaUI.GetDefaultObject("listbox");
+	_guihelper.SetFontColor(_this, "#000000");
+
+	_this=ParaUI.GetDefaultObject("editbox");
+	_this:GetAttributeObject():SetField("CaretColor", _guihelper.ColorStr_TO_DWORD("#ff808080"));
+	_guihelper.SetFontColor(_this, "#000000");
+
+	_this=ParaUI.GetDefaultObject("imeeditbox");
+	_guihelper.SetFontColor(_this, "#000000");
+
+	_this=ParaUI.GetDefaultObject("tooltip");
+	_guihelper.SetFontColor(_this, "#000000");
+end
+	
+
 -- Restart the entire NPLRuntime to a different application. e.g.
 -- Desktop.Restart("haqi")
 -- Desktop.Restart("paracraft")
--- @param appName: nil default to "paracraft", it can also be "haqi"
+-- @param appName: nil default to application at working directory. 
 function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
+	if(not appName) then
+		appName = ParaWorldLoginDocker.GetSourceAppName()
+		if(not additional_commandline_params) then
+			additional_commandline_params = format('paraworldapp="%s"', appName)
+		end
+	end
+
 	local oldCmdLine = ParaEngine.GetAppCommandLine();
 	local newCmdLine = oldCmdLine;
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
@@ -221,16 +263,18 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 				ParaAsset.CloseArchive(name);
 				LOG.std(nil, "info", "ParaWorldLoginDocker", "unload archive: %s", name);
 			end
-			-- load all pkg files in redist folder
-			local result = commonlib.Files.Find({}, redistFolder, 0, 500, "main*.pkg")
-			table.sort(result, function(a, b)
-				return a.filename > b.filename
-			end)
-			for i, item in ipairs(result) do
-				filename = redistFolder..item.filename;
-				ParaAsset.OpenArchive(filename)
-				LOG.std(nil, "info", "ParaWorldLoginDocker", "load archive: %s", filename);
+			-- prepend all paracraft pkg files
+			if(app.mergeParacraftPKGFiles) then
+				local app_src = ParaWorldLoginDocker.GetAppInstallDetails(srcAppName)
+				if(app_src.hasParacraft) then
+					local folder = ParaWorldLoginDocker.GetAppFolder(srcAppName)
+					if(redistFolder~=folder) then
+						ParaWorldLoginDocker.LoadAllMainPackagesInFolder(folder);
+					end
+				end
 			end
+			-- load all pkg files in redist folder
+			ParaWorldLoginDocker.LoadAllMainPackagesInFolder(redistFolder);
 		end
 		--local assetManifest = System.Core.DOM.GetDOM("AssetManager"):GetChild("CAssetManifest")
 		--assetManifest:CallField("Clear")
@@ -241,7 +285,6 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	end
 
 	ParaEngine.SetAppCommandLine(newCmdLine);
-	
 	System.reset();
 	-- flush all local server 
 	if(System.localserver) then
@@ -251,7 +294,10 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	-- reset to default value
 	ParaTerrain.LeaveBlockWorld();
 	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
-
+	ParaWorldLoginDocker.RestoreDefaultGUITemplate()
+	NPL.ClearPublicFiles();
+	NPL.StopNetServer(); -- stopping net server does not work at the moment. 
+	
 	-- NOT WORKING: 
 	-- NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 	-- local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -307,13 +353,11 @@ function ParaWorldLoginDocker.SetInstalling(bInstalling, appName)
 end
 
 function ParaWorldLoginDocker.GetAppConfigByName(appName)
-	local assetConfigPath;
-	if(appName=="haqi" or appName=="paracraft") then
-		assetConfigPath = "config/autoupdater/paracraft_win32.xml";
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	if(app and app.updaterConfigPath) then
+		return app.updaterConfigPath;
 	end
-	return assetConfigPath;
 end
-
 
 function ParaWorldLoginDocker.GetAppTitle(appName)
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)

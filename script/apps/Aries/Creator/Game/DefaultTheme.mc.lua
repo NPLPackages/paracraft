@@ -129,6 +129,8 @@ function DefaultTheme:Load()
 	_this.font = fontStr;
 	_this.background = "Texture/Aries/Common/ThemeKid/editbox_32bits.png: 5 5 5 5";
 	_this.spacing = 2;
+	_this:GetAttributeObject():SetField("CaretColor", _guihelper.ColorStr_TO_DWORD("#ff808080"));
+	_guihelper.SetFontColor(_this, "#000000");
 	
 	_this=ParaUI.GetDefaultObject("imeeditbox");
 	_this.font = fontStr;
@@ -138,6 +140,7 @@ function DefaultTheme:Load()
 	_font.font = fontStr;
 	_font = _this:GetFont(6); -- "composition_text"
 	_font.font = fontStr;
+	_guihelper.SetFontColor(_this, "#000000");
 	
 	_this=ParaUI.GetDefaultObject("text");
 	_this.font = fontStr;

@@ -391,6 +391,7 @@ function options:OnLoadWorld()
 	self:ShowTouchPad();
 	self:ShowSkyBox();
 	self:ResetWindowTitle();
+	WorldCommon.SetModified(false);
 
 	-- try pop world
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
@@ -517,7 +518,11 @@ end
 
 -- @param mode: "editor" or "game" or nil
 function options:SetLockedGameMode(mode)
-	self.LockedGameMode = mode;
+	if(GameLogic.IsReadOnly()) then
+		self.LockedGameMode = mode;	
+	else
+		self.LockedGameMode = nil;
+	end
 end
 
 

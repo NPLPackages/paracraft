@@ -21,7 +21,7 @@ local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 
 -- this is the minimum version 
-VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 4;
+VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 5;
 
 local max_resolution = {4906, 2160};
 local default_resolution = {640, 480};
