@@ -36,6 +36,7 @@ Entity.is_regional = true;
 local maxConnectedCodeBlockCount = 255;
 
 local output_file_name = "";
+local num_outputs = 0;
 
 function Entity:ctor()
 end
@@ -96,8 +97,10 @@ function Entity:OnBlockAdded(x,y,z)
 	local blocks = self:SellectAllConnectedColorBlocks();
 	self:RotateBlocks(blocks);
 
+	local worldDir = ParaWorld.GetWorldDirectory();
+
 	-- create target bmax model from color blocks that connected with current anim block
-	local target_file_name = "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/target.bmax"
+	local target_file_name = format("%s%s", worldDir, "target.bmax");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = target_file_name, blocks = blocks});
@@ -106,15 +109,16 @@ function Entity:OnBlockAdded(x,y,z)
 	end
 
 	-- matching and rigging
-	output_file_name = "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/morph_result2.x";
+	output_file_name = format("%smorph_result%d.x", worldDir, num_outputs);
+	num_outputs = num_outputs + 1;
 	local AutoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
 	local attr = AutoRigger:GetAttributeObject();
 	if( attr ~= nil ) then
-		attr:SetField("AddModelTemplate", "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/Q_maoniu01.x");
-		attr:SetField("AddModelTemplate", "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/Q_huoji01.x");
-		attr:SetField("AddModelTemplate", "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/Q_xiaohuangren01.x");
-		attr:SetField("AddModelTemplate", "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/Q_nvhai01.x");
-		attr:SetField("AddModelTemplate", "D:/Projects/npl_dev_checkout3/Client/build/lib/Release/worlds/DesignHouse/demo/Q_changjinglu01.x");
+		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_maoniu01.x");
+		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_huoji01.x");
+		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_xiaohuangren01.x");
+		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_nvhai01.x");
+		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_changjinglu01.x");
 		attr:SetField("On_AddRiggedFile", ";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile();");
 		attr:SetField("SetTargetModel", target_file_name);
 		attr:SetField("SetOutputFilePath", output_file_name);
