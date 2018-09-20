@@ -49,6 +49,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Ticks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
+local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local ModManager = commonlib.gettable("Mod.ModManager");
@@ -379,21 +381,22 @@ function GameLogic.SetBlockWorld(world)
 	GameLogic.blockworld = world;
 end
 
+function GameLogic.GetTeacherAgent()
+	return TeacherAgent;
+end
+
 -- set cody's text
 -- @param text: any HTML text
 -- @param target: nil or "<player>"
--- @return true if text changed. 
 function GameLogic.SetTipText(text, target, duration)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GoalTracker.lua");
-	local GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GoalTracker");
-	return GoalTracker.SetText(text,target, duration);
+	GameLogic.GetTeacherAgent():ShowTipText(text, duration);
+	GameLogic.GetTeacherAgent():ShowTipOnTarget(target, text, duration)
 end
 
 -- hide cody's text
 function GameLogic.HideTipText(target)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GoalTracker.lua");
-	local GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GoalTracker");
-	return GoalTracker.HideTipText(target);
+	GameLogic.GetTeacherAgent():ShowTipText(nil);
+	GameLogic.GetTeacherAgent():ShowTipOnTarget(target, "")
 end
 
 -- login a given server

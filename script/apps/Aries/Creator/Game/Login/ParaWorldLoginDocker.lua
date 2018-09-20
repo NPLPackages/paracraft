@@ -124,7 +124,7 @@ function ParaWorldLoginDocker.ShowPage()
 		DestroyOnClose = true,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		allowDrag = false,
-		bShow = bShow,
+		bShow = true,
 		zorder = 5,
 		click_through = true, 
 		directPosition = true,
@@ -296,7 +296,7 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
 	ParaWorldLoginDocker.RestoreDefaultGUITemplate()
 	NPL.ClearPublicFiles();
-	NPL.StopNetServer(); -- stopping net server does not work at the moment. 
+	NPL.StopNetServer();
 	
 	-- NOT WORKING: 
 	-- NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");

@@ -367,9 +367,9 @@ function Desktop.OnExit(bForceExit, bRestart)
 		end
 	else
 		if(bForceExit or Desktop.is_exiting) then
-			-- double click to save and exit. 
+			-- double click to exit without saving. 
 			if(Desktop.is_exiting) then
-				GameLogic.QuickSave();
+				-- GameLogic.QuickSave();
 			end
 			Desktop.ForceExit();
 		else

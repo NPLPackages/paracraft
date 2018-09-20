@@ -201,20 +201,24 @@ end
 function GoalTracker:OnBuildProgressChanged(event)
 	if(page) then
 		if(event.status == "start" or event.status == "end") then
-			page:Refresh();
+			if(event.status == "start") then
+				GameLogic.GetTeacherAgent():AddTaskButton("buildTask", nil, GoalTracker.OnClickCody, 1);
+			else
+				GameLogic.GetTeacherAgent():RemoveTaskButton("buildTask");
+			end
 
 		elseif(event.value) then
-			local btn = page:FindControl("cody");
-			if(btn) then
+			local x, y = GameLogic.GetTeacherAgent():GetIconPosition();
+			if(x and y) then
 				local max_count = 8;
 				-- at most 
 				for count = 1, max_count do
 					ObtainItemEffect:new({background="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;464 43 18 18", duration=1800, color="#ffffffff", width=18,height=18, 
-						from_3d={}, to_2d={x=btn.x+48,y=btn.y+24},}):Play((count-1)*100);
+						from_3d={}, to_2d={x=x+48,y=y+24},}):Play((count-1)*100);
 				end
 
 				ObtainItemEffect:new({background="", text=L"教学完成", duration=3000, color="#33ff33", width=150,height=25, 
-						from_2d={x=btn.x+128,y=btn.y+64}, to_2d={x=btn.x+48,y=btn.y+24}, fadeOut=300, fadeIn=300}):Play(max_count*100+1200);
+						from_2d={x=x+128,y=y+64}, to_2d={x=x+48,y=y+24}, fadeOut=300, fadeIn=300}):Play(max_count*100+1200);
 				GameLogic.SetTipText(nil);
 			end
 		end

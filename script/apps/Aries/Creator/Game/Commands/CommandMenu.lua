@@ -149,9 +149,9 @@ Commands["menu"] = {
 			local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 			HelpPage.ShowPage(category, subfolder);
 		elseif(name == "help.actiontutorial") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WebTutorials.lua");
-			local WebTutorials = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WebTutorials");
-			WebTutorials:Show();
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
+			local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
+			TeacherAgent:SetEnabled(not TeacherAgent:IsEnabled())
 		elseif(name == "help.videotutorials") then
 			GameLogic.RunCommand("/open https://keepwork.com/official/paracraft/animation-tutorials");
 		elseif(name == "help.lessons") then

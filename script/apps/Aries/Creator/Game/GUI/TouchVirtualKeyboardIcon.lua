@@ -45,6 +45,15 @@ function TouchVirtualKeyboardIcon.GetSingleton()
 	return s_instance;
 end
 
+-- static function: this useful for checking if keyboard is loaded or not
+function TouchVirtualKeyboardIcon.IsSingletonVisible()
+	if(s_instance) then
+		return s_instance:isVisible()
+	else
+		return false;
+	end
+end
+
 -- try show the singleton
 function TouchVirtualKeyboardIcon.ShowSingleton(bSHow)
 	NPL.load("(gl)script/ide/timer.lua");
