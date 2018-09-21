@@ -1,0 +1,26 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" src="ParaWorldLessons.lua"><![CDATA[
+ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+ParaWorldLessons.OnInit()
+
+function ds_LessonWorlds()
+end
+]]></script>
+<pe:container>
+    <pe:gridview name="lessonWorlds" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="48" pagesize="48" DataSource='<%=ds_LessonWorlds%>'>
+        <Columns>
+            <input type="button" name='<%=Eval("name")%>' tooltip='<%="page://script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html?name="..Eval("name")%>' use_mouse_offset="false" is_lock_position="true"  tooltip_offset_y="64" tooltip_offset_x="-10"
+                onclick="ParaWorldLessons.OnClickWorld" background='<%=Eval("icon") or ""%>' style="position:relative;width:45px;height:45px;" />
+        </Columns>
+    </pe:gridview>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

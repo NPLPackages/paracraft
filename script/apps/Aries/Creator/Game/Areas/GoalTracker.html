@@ -39,17 +39,6 @@ end
         </div>
     </div>
 </pe:container>
-<pe:container name="editor" visible='<%=GameLogic.GameMode:IsEditor() and GoalTracker.IsTaskActive()%>' style="position:relative;margin-left:5px;margin-top:68px;background:;">
-    <div style="float:left;margin-left:-6px;width:40px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#270 89 31 34:15 16 15 16);">
-        <input name="cody" type="button" onclick="GoalTracker.OnClickCody" tooltip='<%=L"创作百科"%>' style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#216 203 30 32);margin-left:5px;margin-top:5px;width:30px;height:32px;"/>
-    </div>
-    <pe:container name="tip" visible='<%=GoalTracker.tip_text ~= nil %>' style="float:left;margin-left:10px;margin-top:-5px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);padding:5px;padding-bottom:8px;">
-        <input type="button" name="text" onclick="GoalTracker.OnClickCody" style="height:49px;width:240px;text-singleline:false;text-wordbreak:true;background:;font-size:14px;color:#ffffff;" value='<%=GoalTracker.tip_text %>' />
-    </pe:container>
-    <!--<div style="margin-left:-6px;margin-top:-10px;width:40px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#270 89 31 34:15 16 15 16);">
-        <input name="paidashi" type="button" onclick="" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#245 202 34 36);margin-left:3px;margin-top:4px;width:34px;height:36px;"/>
-    </div>-->
-</pe:container>
 </pe:mcml>
 </body>
 </html>

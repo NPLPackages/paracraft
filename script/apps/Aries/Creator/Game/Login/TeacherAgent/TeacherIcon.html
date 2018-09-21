@@ -1,0 +1,39 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherIcon.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="TeacherIcon.lua"><![CDATA[
+TeacherIcon = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherIcon");
+TeacherIcon.Init();
+]]></script>
+    <div style="min-width:42px;height:42px;">
+        <pe:gridview name="taskButtons" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight="42" pagesize="8" DataSource='<%=TeacherIcon.GetButtonDs%>'>
+            <Columns>
+                <input type="button" name='<%=Eval("name")%>' tooltip='<%="Eval("tooltip") or ""%>' onclick='<%=Eval("onclick") or ""%>' background='<%=Eval("icon") or ""%>' style="width:42px;height:42px;margin-right:3px;" />
+            </Columns>
+        </pe:gridview>
+    </div>
+    <div style="margin-top:2px;width:64px;height:64px;">
+        <div style="position:relative;width:64px;height:64px;background:">
+            <img uiname="teacher_animator_" src='<%=TeacherIcon.animator_bg%>' zorder="1" enabled="false" class="" width="64" height="64" />
+        </div>
+        <pe:if condition='<%=TeacherIcon.GetTipText()~=""%>'>
+            <div style="position:relative;margin-left:70px;width:500px;">
+                <div style="min-height:64px;min-width:200px;max-width:400px;font-size:14px;color:#000000;padding:10px;background:url(Texture/Aries/Creator/Desktop/agent_32bits.png#73 13 40 40:6 6 6 6)">
+                    <%=TeacherIcon.GetTipText()%>
+                </div>
+            </div>
+        </pe:if>
+        <pe:if condition='<%=TeacherIcon.GetMainCount()>0%>'>
+            <input name="mainCount" zorder="1" enabled="false" type="button" value='<%=tostring(TeacherIcon.GetMainCount())%>' style="position:relative;color:#000000ff;margin-left:40px;margin-top:43px;width:24px;height:24px;background-color:#ffffff;background:url(Texture/Aries/Dock/UnreadNum_32bits.png#0 0 32 32)" />
+        </pe:if>
+        <input type="button" name="btnMain" onclick="TeacherIcon.OnClick" style='<%=format("margin-top:0px;background:url(%s);background-color:#ffffffff;width:64px;height:64px", TeacherIcon.GetMainButton() and TeacherIcon.GetMainButton().icon or "Texture/Aries/Creator/Desktop/agent_32bits.png#0 0 64 64")%>' />
+    </div>
+</pe:mcml>
+</body>
+</html>
