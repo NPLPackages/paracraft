@@ -12,13 +12,14 @@ local EntityAnimModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.E
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 NPL.load("(gl)Mod/ParaXExporter/BMaxModel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+NPL.load("(gl)script/ide/Files.lua");
 
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
-local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
-local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
-local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
@@ -98,7 +99,7 @@ function Entity:OnBlockAdded(x,y,z)
 	self:RotateBlocks(blocks);
 
 	local worldDir = ParaWorld.GetWorldDirectory();
-
+	
 	-- create target bmax model from color blocks that connected with current anim block
 	local target_file_name = format("%s%s", worldDir, "target.bmax");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
@@ -113,15 +114,24 @@ function Entity:OnBlockAdded(x,y,z)
 	num_outputs = num_outputs + 1;
 	local AutoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
 	local attr = AutoRigger:GetAttributeObject();
-	if( attr ~= nil ) then
-		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_maoniu01.x");
-		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_huoji01.x");
-		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_xiaohuangren01.x");
-		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_nvhai01.x");
-		attr:SetField("AddModelTemplate", "charactor/AutoAnims/Q_changjinglu01.x");
-		attr:SetField("On_AddRiggedFile", ";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile();");
+
+	-- get templates model file(s) name list
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
+	local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
+	ModelTemplatesFile:Init();
+	local models = ModelTemplatesFile:GetTemplates();
+	if( attr ~= nil and next(models) ~= nil) then
+		-- add template models to the AutoRigger if not added yet
+		for i = 1,#models do
+			attr:SetField("AddModelTemplate", models[i]);
+		end
+		-- set target file name, the target file is a bmax file that stores the cubes created by user as an input file to auto-rigger
 		attr:SetField("SetTargetModel", target_file_name);
+		-- set the rigged file name or the output file name
 		attr:SetField("SetOutputFilePath", output_file_name);
+		-- set callback to add the rigged target x file to the world 
+		attr:SetField("On_AddRiggedFile", ";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile();");
+		-- start rigging
 		attr:SetField("AutoRigModel", "");
 	end	
 end
@@ -184,7 +194,6 @@ end
 
 -- script callback function
 function Entity:OnAddRiggedFile()
-	LOG.std(nil, "info", "Animation Block", "OnAddRiggedFile!");
 	local main_actor = ParaScene.GetPlayer();
 	local asset = ParaAsset.LoadParaX("",output_file_name);
 	local player = ParaScene.CreateCharacter ("MyFBX", asset, "", true, 0.35, 0, 5.0);
@@ -202,7 +211,7 @@ end
 function Entity:SellectAllConnectedColorBlocks()
 	local x0,y0,z0 = self:GetBlockPos();
 	local num_selected = 0;
-	local max_selected = 128;
+	local max_selected = 65535;
 	local blocks = {};
 	local block_indices = {};
 	local block_queue = commonlib.Queue:new();
