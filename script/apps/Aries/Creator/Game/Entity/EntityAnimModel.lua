@@ -114,16 +114,16 @@ function Entity:OnBlockAdded(x,y,z)
 	num_outputs = num_outputs + 1;
 	local AutoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
 	local attr = AutoRigger:GetAttributeObject();
+
 	-- get templates model file(s) name list
-	local appCharaDir = ParaIO.GetCurDirectory(12)..'AutoAnims';
-	local models = {};
-	commonlib.Files.SearchFiles(models, appCharaDir, "*.x", 0, 100, true, true);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
+	local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
+	ModelTemplatesFile:Init();
+	local models = ModelTemplatesFile:GetTemplates();
 	if( attr ~= nil and next(models) ~= nil) then
-		-- add to the AutoRigger if not added yet
-		local model;
+		-- add template models to the AutoRigger if not added yet
 		for i = 1,#models do
-			model = appCharaDir..models[i];
-			attr:SetField("AddModelTemplate", model);
+			attr:SetField("AddModelTemplate", models[i]);
 		end
 		-- set target file name, the target file is a bmax file that stores the cubes created by user as an input file to auto-rigger
 		attr:SetField("SetTargetModel", target_file_name);

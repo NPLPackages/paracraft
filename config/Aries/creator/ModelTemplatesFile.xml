@@ -1,0 +1,13 @@
+<!--config/Aries/creator/ModeltemplatesFile.xml
+@param name: short name
+@param filename:
+@param displayname: optional, if not provided, name is used. 
+@param hidden: boolean.
+@param physics: boolean. 
+-->
+<ModelTemplates>
+    <model filename="character/AutoAnims/Q_changjinglu_zoulu.x"/>
+    <model filename="character/AutoAnims/Q_huoji01.x"/>
+	<model filename="character/AutoAnims/Q_maoniu01.x"/>
+	<model filename="character/AutoAnims/Q_nvhai01.x"/>
+</ModelTemplates>
