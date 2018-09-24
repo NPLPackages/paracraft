@@ -95,7 +95,7 @@ end
 
 function Entity:OnBlockAdded(x,y,z)
 	self._super.OnBlockAdded(x,y,z);
-	local blocks = self:SellectAllConnectedColorBlocks();
+	local blocks = self:SelectAllConnectedColorBlocks();
 	self:RotateBlocks(blocks);
 
 	local worldDir = ParaWorld.GetWorldDirectory();
@@ -130,7 +130,7 @@ function Entity:OnBlockAdded(x,y,z)
 		-- set the rigged file name or the output file name
 		attr:SetField("SetOutputFilePath", output_file_name);
 		-- set callback to add the rigged target x file to the world 
-		attr:SetField("On_AddRiggedFile", ";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile();");
+		attr:SetField("On_AddRiggedFile", format(";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile_s(%d);", self.entityId));
 		-- start rigging
 		attr:SetField("AutoRigModel", "");
 	end	
@@ -192,23 +192,33 @@ function Entity:RotateBlocks(blocks)
 	
 end
 
--- script callback function
-function Entity:OnAddRiggedFile()
-	local main_actor = ParaScene.GetPlayer();
-	local asset = ParaAsset.LoadParaX("",output_file_name);
-	local player = ParaScene.CreateCharacter ("MyFBX", asset, "", true, 0.35, 0, 5.0);
-	local x, y, z = ParaScene.GetPlayer():GetPosition();
-	x = x - 2;
-	--y = y + 10;
-	--x, y, z = BlockEngine:ConvertToRealPosition(x,y,z)
-	player:SetPosition(x, y, z);
-	--player:FallDown(1.0);
-	ParaScene.Attach(player);
-	local playerChar = player:ToCharacter();
-	
+function Entity:GetOutputFilename()
+	return output_file_name or "";
 end
 
-function Entity:SellectAllConnectedColorBlocks()
+-- static script callback function
+function Entity.OnAddRiggedFile_s(entityId)
+	local entity = EntityManager.GetEntityById(entityId)
+	if(entity) then
+		entity:OnAddRiggedFile();
+	end
+end
+
+function Entity:OnAddRiggedFile()
+	local x, y, z = EntityManager.GetPlayer():GetPosition()
+	local entity = EntityManager.EntityNPC:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesNPC});
+	entity:SetMainAssetPath(self:GetOutputFilename());
+	entity:SetPersistent(false);
+	entity:SetCanRandomMove(false);
+	entity:SetDummy(true);
+	entity:Attach();
+
+	GameLogic.AddBBS(nil, format(L"人物模型已经保存到%s", self:GetOutputFilename()));
+	LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetOutputFilename());
+end
+
+
+function Entity:SelectAllConnectedColorBlocks()
 	local x0,y0,z0 = self:GetBlockPos();
 	local num_selected = 0;
 	local max_selected = 65535;

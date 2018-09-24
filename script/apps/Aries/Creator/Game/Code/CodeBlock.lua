@@ -577,6 +577,13 @@ function CodeBlock:CreateGetActor()
 	end
 end
 
+function CodeBlock:GetActor()
+	local env = self:GetCodeEnv();
+	if(env) then
+		return env.actor or self:FindNearbyActor();
+	end
+end
+
 -- usually from help window. There can only be one temp code running. 
 -- @param code: string
 function CodeBlock:RunTempCode(code, filename)

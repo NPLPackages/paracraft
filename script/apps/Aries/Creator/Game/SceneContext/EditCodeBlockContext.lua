@@ -136,14 +136,16 @@ function EditCodeBlockContext:CreateGetActor()
 		local movieEntity = self:GetMovieEntity();
 		if(movieEntity) then
 			local itemStack = movieEntity:GetFirstActorStack();
-			local item = itemStack:GetItem();
-			if(item and item.CreateActorFromItemStack) then
-				local actor = item:CreateActorFromItemStack(itemStack, movieEntity);
-				if(actor) then
-					self.actor = actor;
-					self.actor:Connect("keyChanged", self, EditCodeBlockContext.UpdateActor);
-					self.actor:SetTime(0);
-					self.actor:FrameMove(0);
+			if(itemStack) then
+				local item = itemStack:GetItem();
+				if(item and item.CreateActorFromItemStack) then
+					local actor = item:CreateActorFromItemStack(itemStack, movieEntity);
+					if(actor) then
+						self.actor = actor;
+						self.actor:Connect("keyChanged", self, EditCodeBlockContext.UpdateActor);
+						self.actor:SetTime(0);
+						self.actor:FrameMove(0);
+					end
 				end
 			end
 		end
@@ -155,6 +157,10 @@ function EditCodeBlockContext:UpdateActor()
 	if(self.actor) then
 		self.actor:FrameMovePlaying(0);
 	end
+end
+
+function EditCodeBlockContext:GetActor()
+	return self.actor;
 end
 
 function EditCodeBlockContext:updateManipulators()

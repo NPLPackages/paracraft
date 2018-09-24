@@ -7,7 +7,7 @@
 -->
 <ModelTemplates>
     <model filename="character/AutoAnims/Q_changjinglu_zoulu.x"/>
-    <model filename="character/AutoAnims/Q_huoji01.x"/>
+    <!--<model filename="character/AutoAnims/Q_huoji01.x"/>-->
 	<model filename="character/AutoAnims/Q_maoniu01.x"/>
 	<model filename="character/AutoAnims/Q_nvhai01.x"/>
 </ModelTemplates>

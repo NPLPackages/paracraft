@@ -391,14 +391,28 @@ function CodeBlockWindow.IsShowHelpWnd()
 	return self.isShowHelpWnd;
 end
 
-
 function CodeBlockWindow.OnChangeModel()
 	local codeBlock = CodeBlockWindow.GetCodeBlock()
 	if(codeBlock) then
-		local actor = codeBlock:CreateGetActor();
+		local actor;
+		local sceneContext = CodeBlockWindow:GetSceneContext();
+		if(sceneContext) then
+			actor = sceneContext:GetActor()
+		end
+		actor = actor or codeBlock:GetActor();
 		if(not actor) then
-			if(self.entity and self.entity:AutoCreateMovieEntity()) then
-				actor = codeBlock:CreateGetActor();
+			-- auto create movie block and an NPC entity if no movie actor is found
+			if(self.entity) then
+				local movieEntity = self.entity:FindNearByMovieEntity()	
+				if(not movieEntity) then
+					self.entity:AutoCreateMovieEntity()
+					movieEntity = self.entity:FindNearByMovieEntity()	
+				end
+				if(movieEntity and not movieEntity:GetFirstActorStack()) then
+					movieEntity:CreateNPC();
+					CodeBlockWindow:GetSceneContext():UpdateCodeBlock();
+					actor = sceneContext:GetActor();
+				end
 			end
 		end
 		if(actor) then
