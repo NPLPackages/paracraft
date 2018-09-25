@@ -1,8 +1,8 @@
 --[[
 Title: Entity Animation Model Generator
-Author(s): LiXizhi
-Date: 2018/5/16
-Desc: Code block 
+Author(s): Cheng Yuanchu, LiXizhi
+Date: 2018/9/10
+Desc: When this block is placed next to a group of connected color blocks, we will convert the blocks into an animated model
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua");
@@ -36,10 +36,12 @@ Entity.is_regional = true;
 -- we will only allow this number of connected code block to share the same movie entity
 local maxConnectedCodeBlockCount = 255;
 
-local output_file_name = "";
-local num_outputs = 0;
-
 function Entity:ctor()
+end
+
+function Entity:OnRemoved()
+	Entity._super.OnRemoved(self);
+	self:DeleteOutputCharacter();
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
@@ -67,11 +69,6 @@ function Entity:ScheduleRefresh(x,y,z)
 	GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self:GetBlockId(), 1);
 end
 
-
-function Entity:GetFilename()
-	return self.filename;
-end
-
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
@@ -86,7 +83,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	_guihelper.MessageBox(L"TODO");
+	self:TryRebuild();
 end
 
 -- Ticks the block if it's been scheduled
@@ -95,48 +92,129 @@ end
 
 function Entity:OnBlockAdded(x,y,z)
 	self._super.OnBlockAdded(x,y,z);
+	self:TryRebuild();
+end
+
+-- static function
+function Entity:GetTempBMaxFilepath()
+	if(not Entity.tempTargetFilepath) then
+		Entity.tempTargetFilepath = ParaIO.GetWritablePath().."temp/auto_anim_target.bmax";
+		ParaIO.CreateDirectory(Entity.tempTargetFilepath);
+	end
+	return Entity.tempTargetFilepath;
+end
+
+function Entity:GetTempOutputFilename()
+	if(not self.outputFilename) then
+		self.outputFilename = format("%stemp/auto_anim_output.x", ParaIO.GetWritablePath());
+		ParaIO.CreateDirectory(self.outputFilename);
+	end
+	return self.outputFilename;
+end
+
+
+-- by default each entity has a unique name according to its position
+function Entity:GetFilename()
+	if(self.filename == "") then
+		self.filename = nil;
+	end
+	if(not self.filename and not self.defaultFilename) then
+		local bx,by,bz = self:GetBlockPos();
+		self.defaultFilename = format("%sblocktemplates/auto_anim%d_%d_%d.x", GameLogic.GetWorldDirectory(), bx,by,bz);
+		ParaIO.CreateDirectory(self.defaultFilename);
+	end
+	return self.filename or self.defaultFilename;
+end
+
+-- set user defined filename
+function Entity:SetFilename(filename)
+	self.filename = filename;
+end
+
+function Entity:IsBuilding()
+	return Entity.isBuilding;
+end
+
+function Entity:SetBuilding(bBuilding)
+	Entity.isBuilding = bBuilding;
+end
+
+-- since there can be only one thread that is building, we will ignore concurrent calls.
+function Entity:TryRebuild()
+	if(not self:IsBuilding()) then
+		return self:Rebuild();
+	end
+end
+
+-- static function:
+-- get and initialize the auto rigger in C++ game engine for model generation
+function Entity:CreateGetAutoRigger()
+	-- matching and rigging
+	if(not Entity.autoAigger or not Entity.autoAigger:IsValid()) then
+		local autoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
+		self.autoRigger = autoRigger;
+		-- get templates model file(s) name list
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
+		local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
+		ModelTemplatesFile:Init();
+		local models = ModelTemplatesFile:GetTemplates() or {};
+		if( next(models) ~= nil) then
+			-- add template models to the AutoRigger if not added yet
+			for i = 1, #models do
+				autoRigger:SetField("AddModelTemplate", models[i]);
+			end
+		end
+		LOG.std(nil, "info", "AnimModel", "a new auto rigger created and initialized with %d models", #models);
+	end
+	return self.autoRigger;
+end
+
+function Entity:LoadAsset(callback)
+
+end
+
+-- rebuild all connected blocks into a model
+function Entity:Rebuild()
 	local blocks = self:SelectAllConnectedColorBlocks();
-	self:RotateBlocks(blocks);
+	if(blocks and #blocks == 0) then
+		GameLogic.AddBBS("AnimModel", L"需要放在一组彩色方块的旁边才能生成模型", 20);
+		return;
+	end
+	self:AutoOrientBlocks(blocks);
 
 	local worldDir = ParaWorld.GetWorldDirectory();
 	
 	-- create target bmax model from color blocks that connected with current anim block
-	local target_file_name = format("%s%s", worldDir, "target.bmax");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = target_file_name, blocks = blocks});
-	if( not task:Run() ) then
-		LOG.std(nil, "info", "Animation Block", "Failed to save target bmax model!");
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = self:GetTempBMaxFilepath(), blocks = blocks});
+	if( task:Run() ) then
+		LOG.std(nil, "info", "AnimBlock", "successfully saved %d blocks to bmax file %s", #blocks, self:GetTempBMaxFilepath());
+	else
+		LOG.std(nil, "info", "AnimBlock", "Failed to save target bmax model!");
+		return;
 	end
 
 	-- matching and rigging
-	output_file_name = format("%smorph_result%d.x", worldDir, num_outputs);
-	num_outputs = num_outputs + 1;
-	local AutoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
-	local attr = AutoRigger:GetAttributeObject();
-
-	-- get templates model file(s) name list
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
-	local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
-	ModelTemplatesFile:Init();
-	local models = ModelTemplatesFile:GetTemplates();
-	if( attr ~= nil and next(models) ~= nil) then
-		-- add template models to the AutoRigger if not added yet
-		for i = 1,#models do
-			attr:SetField("AddModelTemplate", models[i]);
-		end
+	local autoRigger = self:CreateGetAutoRigger();
+	if(autoRigger) then
 		-- set target file name, the target file is a bmax file that stores the cubes created by user as an input file to auto-rigger
-		attr:SetField("SetTargetModel", target_file_name);
+		autoRigger:SetField("SetTargetModel", self:GetTempBMaxFilepath());
 		-- set the rigged file name or the output file name
-		attr:SetField("SetOutputFilePath", output_file_name);
+		autoRigger:SetField("SetOutputFilePath", self:GetTempOutputFilename());
 		-- set callback to add the rigged target x file to the world 
-		attr:SetField("On_AddRiggedFile", format(";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile_s(%d);", self.entityId));
+		autoRigger:SetField("On_AddRiggedFile", format(";MyCompany.Aries.Game.EntityManager.EntityAnimModel.OnAddRiggedFile_s(%d);", self.entityId));
 		-- start rigging
-		attr:SetField("AutoRigModel", "");
-	end	
+		autoRigger:SetField("AutoRigModel", "");
+		self:SetBuilding(true);
+		GameLogic.AddBBS("AnimModel", format(L"正在为%d个方块生产动画模型，可能需要10-20秒, 请耐心等待", #blocks), 20000);
+
+		return true;
+	end
 end
 
-function Entity:RotateBlocks(blocks)
+-- auto rotate blocks around y axis so that the model is facing positive x 
+function Entity:AutoOrientBlocks(blocks)
 	-- rotate the blocks
 	local x0,y0,z0 = self:GetBlockPos();
 	local x1,y1,z1;
@@ -189,11 +267,7 @@ function Entity:RotateBlocks(blocks)
 		block[2] = p[2];
 		block[3] = p[3];
 	end
-	
-end
 
-function Entity:GetOutputFilename()
-	return output_file_name or "";
 end
 
 -- static script callback function
@@ -205,16 +279,36 @@ function Entity.OnAddRiggedFile_s(entityId)
 end
 
 function Entity:OnAddRiggedFile()
+	self:SetBuilding(false);
+	if(ParaIO.CopyFile(self:GetTempOutputFilename(), self:GetFilename(), true)) then
+		GameLogic.AddBBS("AnimModel", format(L"人物模型已经保存到%s", self:GetFilename()));
+		LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetFilename());
+		self:CreateOutputCharacter();
+	else
+		GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", self:GetFilename()));
+	end
+end
+
+function Entity:CreateOutputCharacter()
+	if(self.outputEntity and self.outputEntity:GetInnerObject()) then
+		-- already created, the engine will auto refresh or we will refresh it here
+		return;
+	end
 	local x, y, z = EntityManager.GetPlayer():GetPosition()
 	local entity = EntityManager.EntityNPC:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesNPC});
-	entity:SetMainAssetPath(self:GetOutputFilename());
+	entity:SetMainAssetPath(self:GetFilename());
 	entity:SetPersistent(false);
 	entity:SetCanRandomMove(false);
 	entity:SetDummy(true);
 	entity:Attach();
+	self.outputEntity = entity;
+end
 
-	GameLogic.AddBBS(nil, format(L"人物模型已经保存到%s", self:GetOutputFilename()));
-	LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetOutputFilename());
+function Entity:DeleteOutputCharacter()
+	if(self.outputEntity) then
+		self.outputEntity:Destroy();
+		self.outputEntity = nil;
+	end
 end
 
 
