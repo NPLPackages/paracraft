@@ -13,6 +13,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 NPL.load("(gl)Mod/ParaXExporter/BMaxModel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 NPL.load("(gl)script/ide/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
+local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
 
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
@@ -42,6 +44,7 @@ end
 function Entity:OnRemoved()
 	Entity._super.OnRemoved(self);
 	self:DeleteOutputCharacter();
+	self:DeleteThinkerEntity();
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
@@ -58,7 +61,6 @@ end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
-	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true");
 	self.filename = node.attr.filename;
 end
 
@@ -112,7 +114,6 @@ function Entity:GetTempOutputFilename()
 	return self.outputFilename;
 end
 
-
 -- by default each entity has a unique name according to its position
 function Entity:GetFilename()
 	if(self.filename == "") then
@@ -146,23 +147,18 @@ function Entity:TryRebuild()
 	end
 end
 
--- static function:
+-- static function: this is mostly a singleton object
 -- get and initialize the auto rigger in C++ game engine for model generation
 function Entity:CreateGetAutoRigger()
 	-- matching and rigging
 	if(not Entity.autoAigger or not Entity.autoAigger:IsValid()) then
-		local autoRigger = ParaScene.CreateObject("CAutoRigger", "CAutoRigger",0,0,0);
+		local autoRigger = ParaScene.CreateObject("CAutoRigger", "MyAutoRigger",0,0,0);
+		ParaScene.Attach(autoRigger);
 		self.autoRigger = autoRigger;
-		-- get templates model file(s) name list
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
-		local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
-		ModelTemplatesFile:Init();
+		-- add template models to the AutoRigger if not added yet
 		local models = ModelTemplatesFile:GetTemplates() or {};
-		if( next(models) ~= nil) then
-			-- add template models to the AutoRigger if not added yet
-			for i = 1, #models do
-				autoRigger:SetField("AddModelTemplate", models[i]);
-			end
+		for _, template in ipairs(ModelTemplatesFile:GetTemplates()) do
+			autoRigger:SetField("AddModelTemplate", template.filename);
 		end
 		LOG.std(nil, "info", "AnimModel", "a new auto rigger created and initialized with %d models", #models);
 	end
@@ -178,6 +174,7 @@ function Entity:Rebuild()
 	local blocks = self:SelectAllConnectedColorBlocks();
 	if(blocks and #blocks == 0) then
 		GameLogic.AddBBS("AnimModel", L"需要放在一组彩色方块的旁边才能生成模型", 20);
+		self:ShowThinkerText(L"我的附近没有发现像模型的彩色方块")
 		return;
 	end
 	self:AutoOrientBlocks(blocks);
@@ -208,7 +205,7 @@ function Entity:Rebuild()
 		autoRigger:SetField("AutoRigModel", "");
 		self:SetBuilding(true);
 		GameLogic.AddBBS("AnimModel", format(L"正在为%d个方块生产动画模型，可能需要10-20秒, 请耐心等待", #blocks), 20000);
-
+		self:ShowThinkerText(L"我在思考中,需要10-20秒");
 		return true;
 	end
 end
@@ -274,19 +271,49 @@ end
 function Entity.OnAddRiggedFile_s(entityId)
 	local entity = EntityManager.GetEntityById(entityId)
 	if(entity) then
-		entity:OnAddRiggedFile();
+		entity:OnAddRiggedFile(msg.count, msg.filenames, msg.msg);
 	end
 end
 
-function Entity:OnAddRiggedFile()
+-- @param count: number of output, could be 0 or 1. if 0, msg is error message. 
+-- @param filenames: output filenames separated by ;
+-- @param msg: error message or the template's model filename
+function Entity:OnAddRiggedFile(count, filenames, msg)
 	self:SetBuilding(false);
-	if(ParaIO.CopyFile(self:GetTempOutputFilename(), self:GetFilename(), true)) then
-		GameLogic.AddBBS("AnimModel", format(L"人物模型已经保存到%s", self:GetFilename()));
-		LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetFilename());
-		self:CreateOutputCharacter();
+	LOG.std(nil, "info", "AutoAnim", "Auto Rigging done: Count:%d filenames:%s msg: %s" , count or 0, filenames or "", msg or "");
+	if(count>0) then
+		if(ParaIO.CopyFile(self:GetTempOutputFilename(), self:GetFilename(), true)) then
+			LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetFilename());
+
+			local modelTemplateFilename = msg;
+			-- show what it looks like 
+			local displayName = self:GetTemplateModelNameByFilename(modelTemplateFilename)
+			if(displayName) then
+				GameLogic.AddBBS(nil, format(L"它看起来有点像 %s", displayName));
+				self:ShowThinkerText(format(L"它看起来有点像 %s", displayName));
+				self:SetThinkerModel(modelTemplateFilename);
+			end
+
+			-- show saved world path
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			local result = Files.ResolveFilePath(self:GetFilename())
+			GameLogic.AddBBS("AnimModel", format(L"人物模型已经保存到%s", commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath) or ""));
+
+			-- create temporary character for further interaction
+			self:CreateOutputCharacter();
+		else
+			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", self:GetFilename()));
+		end
 	else
-		GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", self:GetFilename()));
+		GameLogic.AddBBS("AnimModel", L"没有找到匹配的模型");
 	end
+end
+
+-- return display name or nil
+function Entity:GetTemplateModelNameByFilename(filename)
+	local template = ModelTemplatesFile:GetTemplateByFilename(filename);
+	return template and template.name;
 end
 
 function Entity:CreateOutputCharacter()
@@ -345,4 +372,53 @@ function Entity:SelectAllConnectedColorBlocks()
 	end
 	ParaTerrain.DeselectAllBlock();
 	return blocks;
+end
+
+-- a thinker entity is a dummy entity showing some tips to the user
+function Entity:CreateGetThinkerEntity()
+	if(not self.thinkerEntity or not self.thinkerEntity:GetInnerObject()) then
+		local x, y, z = self:GetPosition();
+		local entity = EntityManager.EntityNPC:Create({x=x,y = y + BlockEngine.blocksize,z=z, item_id = block_types.names.TimeSeriesNPC});
+		entity:SetPersistent(false);
+		entity:SetCanRandomMove(false);
+		entity:SetDummy(true);
+		entity:Attach();
+		self.thinkerEntity = entity;	
+
+		self:ShowNextThinkerModel();
+	end
+	return self.thinkerEntity;
+end
+
+function Entity:DeleteThinkerEntity()
+	if(self.thinkerEntity) then
+		self.thinkerEntity:Destroy();
+		self.thinkerEntity = nil;
+	end
+end
+
+function Entity:ShowThinkerText(text, duration)
+	local entity = self:CreateGetThinkerEntity()
+	if(entity) then
+		entity:Say(text, duration or 10, true);
+	end
+end
+
+function Entity:SetThinkerModel(filename)
+	local entity = self:CreateGetThinkerEntity()
+	if(entity) then
+		entity:SetMainAssetPath(filename);
+	end
+end
+
+function Entity:ShowNextThinkerModel()
+	local entity = self:CreateGetThinkerEntity()
+	if(entity) then
+		local templates = ModelTemplatesFile:GetTemplates()
+		self.modelIndex = ((self.modelIndex or -1) +1) % (#templates);
+		local template = templates[self.modelIndex+1];
+		if(template) then
+			entity:SetMainAssetPath(template.filename);	
+		end
+	end
 end
