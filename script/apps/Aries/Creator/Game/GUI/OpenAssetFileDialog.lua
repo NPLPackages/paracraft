@@ -191,6 +191,9 @@ function OpenAssetFileDialog.OnOK()
 				filepath = fileItem.relativeToWorldPath;
 			end
 		end
+		if(not filepath and OpenAssetFileDialog.IsSaveMode) then
+			filepath = text;
+		end
 		OpenAssetFileDialog.result = filepath;
 		page:CloseWindow();
 	end

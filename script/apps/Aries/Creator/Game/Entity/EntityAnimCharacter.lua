@@ -12,6 +12,8 @@ local EntityAnimCharacter = commonlib.gettable("MyCompany.Aries.Game.EntityManag
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNPC.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityNPC"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityAnimCharacter"));
 
@@ -38,8 +40,49 @@ end
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
-	_guihelper.MessageBox("TODO")
+	local filename = self:GetAnimModelEntity():GetFilename();
+	local result = Files.ResolveFilePath(filename)
+	local old_value = result.relativeToWorldPath or filename;
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage(L"输入新的文件名", function(result)
+		if(result and result~="") then
+			result = commonlib.Encoding.Utf8ToDefault(result);
+			if(result~=old_value) then
+				local filename = result;
+				if(not filename:match("%.x$")) then
+					filename = filename..".x";
+				end
+				self:SaveModelAs(filename)
+			end
+		end
+	end, old_value, L"模型另存为", "model", true);
+
 	return true;
+end
+
+-- @param filename: file relative to world directory
+function Entity:SaveModelAs(filename, bForceOverwrite)
+	local dest = GameLogic.GetWorldDirectory()..filename;
+	if(ParaIO.DoesFileExist(dest, false) and not bForceOverwrite) then
+		_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", filename), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				self:SaveModelAs(filename, true)
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	else
+		ParaIO.CreateDirectory(dest);
+		local src = self:GetAnimModelEntity():GetFilename();
+		src = Files.GetWorldFilePath(src)
+		if(src and ParaIO.CopyFile(src, dest, true)) then
+			self:GetAnimModelEntity():SetFilename(filename);
+			self:Say(L"保存成功", nil, true);
+			GameLogic.AddBBS(nil, format(L"动画模型成功保存到%s", filename));
+		else
+			GameLogic.AddBBS(nil, L"无法复制文件");
+		end
+	end
 end
 
 -- this will cause framemove to skip for this amount of time

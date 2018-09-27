@@ -11,8 +11,9 @@ local EntityAnimModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.E
 ]]
 NPL.load("(gl)Mod/ParaXExporter/BMaxModel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
-NPL.load("(gl)script/ide/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
@@ -53,7 +54,9 @@ end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	node.attr.filename = self.filename;
+	if(self.filename and self.filename~="") then
+		node.attr.filename = self.filename;
+	end
 	return node;
 end
 
@@ -83,7 +86,20 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	self:TryRebuild();
+	if(Files.FileExists(self:GetFilename())) then
+		self:CreateOutputCharacter();
+		local charEntity = self:GetOutputCharacter();
+		if(charEntity) then
+			charEntity:Say(self:GetFilename(), nil, true);
+		end
+		_guihelper.MessageBox(format(L"是否重新生成 %s?", self:GetFilename()), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				self:TryRebuild();
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	else
+		self:TryRebuild();
+	end
 end
 
 -- Ticks the block if it's been scheduled
@@ -128,6 +144,11 @@ end
 -- set user defined filename
 function Entity:SetFilename(filename)
 	self.filename = filename;
+	local entity = self:GetOutputCharacter();
+	if(entity) then
+		filename = Files.GetWorldFilePath(filename);
+		entity:SetMainAssetPath(filename);
+	end
 end
 
 function Entity:IsBuilding()
@@ -327,8 +348,6 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 			end
 
 			-- show saved world path
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
-			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 			local result = Files.ResolveFilePath(self:GetFilename())
 			GameLogic.AddBBS("AnimModel", format(L"人物模型已经保存到%s", commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath) or ""));
 
@@ -336,7 +355,7 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 			self:CreateOutputCharacter();
 			local entity = self:GetOutputCharacter();
 			if(entity) then
-				entity:Say(L"点击我", nil, true);
+				entity:Say(L"点击我", 10, true);
 				local x, y, z = EntityManager.GetPlayer():GetPosition()
 				entity:SetPosition(x, y, z);
 			end
@@ -367,7 +386,8 @@ function Entity:CreateOutputCharacter()
 	end
 	local x, y, z = EntityManager.GetPlayer():GetPosition()
 	local entity = EntityManager.EntityAnimCharacter:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesNPC});
-	entity:SetMainAssetPath(self:GetFilename());
+	
+	entity:SetMainAssetPath(Files.GetWorldFilePath(self:GetFilename()));
 	entity:SetFacing(self:ComputeModelFacing()[2]);
 	entity:SetAnimModelEntity(self);
 	entity:Attach();
