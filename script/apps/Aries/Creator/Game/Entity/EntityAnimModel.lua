@@ -9,14 +9,11 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua");
 local EntityAnimModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityAnimModel")
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 NPL.load("(gl)Mod/ParaXExporter/BMaxModel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 NPL.load("(gl)script/ide/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/ModelTemplatesFile.lua");
 local ModelTemplatesFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.ModelTemplatesFile")
-
-local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
@@ -34,6 +31,7 @@ EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 Entity.is_persistent = true;
 -- always serialize to 512*512 regional entity file
 Entity.is_regional = true;
+Entity.thinkTickInterval = 1000;
 
 -- we will only allow this number of connected code block to share the same movie entity
 local maxConnectedCodeBlockCount = 255;
@@ -137,7 +135,12 @@ function Entity:IsBuilding()
 end
 
 function Entity:SetBuilding(bBuilding)
-	Entity.isBuilding = bBuilding;
+	if(Entity.isBuilding ~= bBuilding) then
+		Entity.isBuilding = bBuilding;
+		if(Entity.isBuilding) then
+			self.startTime = commonlib.TimerManager.GetCurrentTime();
+		end
+	end
 end
 
 -- since there can be only one thread that is building, we will ignore concurrent calls.
@@ -206,13 +209,34 @@ function Entity:Rebuild()
 		self:SetBuilding(true);
 		GameLogic.AddBBS("AnimModel", format(L"正在为%d个方块生产动画模型，可能需要10-20秒, 请耐心等待", #blocks), 20000);
 		self:ShowThinkerText(L"我在思考中,需要10-20秒");
+		self:TickThinking();
 		return true;
 	end
 end
 
--- auto rotate blocks around y axis so that the model is facing positive x 
-function Entity:AutoOrientBlocks(blocks)
-	-- rotate the blocks
+function Entity:GetElapsedTime()
+	return commonlib.TimerManager.GetCurrentTime() - self:GetBuildStartTime();
+end
+
+function Entity:GetBuildStartTime()
+	return self.startTime or commonlib.TimerManager.GetCurrentTime();
+end
+
+function Entity:TickThinking()
+	if(self:IsBuilding()) then
+		self:ShowThinkerText(format(L"我在思考中: %d秒", math.floor(self:GetElapsedTime()/1000)));
+		commonlib.TimerManager.SetTimeout(function()  
+			if(self:IsBuilding()) then
+				self:ShowNextThinkerModel()
+				self:TickThinking();
+			end
+		end, self.thinkTickInterval)
+	end
+end
+
+-- we will get nearby color block to compute the model facing
+--@return {0, angleY, angleZ}
+function Entity:ComputeModelFacing()
 	local x0,y0,z0 = self:GetBlockPos();
 	local x1,y1,z1;
 	for side=0,5 do
@@ -220,14 +244,35 @@ function Entity:AutoOrientBlocks(blocks)
 		local x, y, z = x0+dx, y0+dy, z0+dz;
 		local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 		local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
-		if( y >= y0 and block_id == 10 ) then
+		if( y >= y0 and block_id == block_types.names.ColorBlock ) then
 			x1 = x;
 			y1 = y;
 			z1 = z;
 			break;
 		end
 	end
-	
+	local dir = vector3d:new({x0-x1,y0-y1,z0-z1});
+	dir:normalize();
+
+	local x_positive = vector3d:new(1,0,0);
+	local angle = dir:angleAbsolute(x_positive);
+	local around_y_axis = false;
+	if( math.abs(dir:dot(vector3d:new(0,1,0))) < 0.00001 ) then
+		around_y_axis = true;
+	end
+
+	local angles;
+	if(around_y_axis) then
+		angles = {0, angle, 0};
+	else
+		angles = {0, 0, angle};
+	end
+
+	return angles;
+end
+
+-- auto rotate blocks around y axis so that the model is facing positive x 
+function Entity:AutoOrientBlocks(blocks)
 	local aabb = ShapeAABB:new();
 	for i,block in ipairs(blocks) do
 		aabb:Extend(block[1], block[2], block[3]);
@@ -239,21 +284,7 @@ function Entity:AutoOrientBlocks(blocks)
 		block[3] = block[3] - center[3];
 	end
 
-	local dir = vector3d:new({x0-x1,y0-y1,z0-z1});
-	dir:normalize();
-	local x_positive = vector3d:new(1,0,0);
-	local angle = dir:angleAbsolute(x_positive);
-	local around_y_axis = false;
-	if( math.abs(dir:dot(vector3d:new(0,1,0))) < 0.00001 ) then
-		around_y_axis = true;
-	end
-	
-	local angles;
-	if(around_y_axis) then
-		angles = {0, angle, 0};
-	else
-		angles = {0, 0, angle};
-	end
+	local angles = self:ComputeModelFacing();
 
 	--LOG.std(nil, "info", "Morph", "angle: %f!", angle);
 
@@ -264,7 +295,6 @@ function Entity:AutoOrientBlocks(blocks)
 		block[2] = p[2];
 		block[3] = p[3];
 	end
-
 end
 
 -- static script callback function
@@ -292,6 +322,8 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 				GameLogic.AddBBS(nil, format(L"它看起来有点像 %s", displayName));
 				self:ShowThinkerText(format(L"它看起来有点像 %s", displayName));
 				self:SetThinkerModel(modelTemplateFilename);
+			else
+				self:ShowThinkerText(nil);
 			end
 
 			-- show saved world path
@@ -302,11 +334,19 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 
 			-- create temporary character for further interaction
 			self:CreateOutputCharacter();
+			local entity = self:GetOutputCharacter();
+			if(entity) then
+				entity:Say(L"点击我", nil, true);
+				local x, y, z = EntityManager.GetPlayer():GetPosition()
+				entity:SetPosition(x, y, z);
+			end
 		else
 			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", self:GetFilename()));
+			self:ShowThinkerText(L"出错了");
 		end
 	else
 		GameLogic.AddBBS("AnimModel", L"没有找到匹配的模型");
+		self:ShowThinkerText(L"没有找到匹配的模型");
 	end
 end
 
@@ -316,17 +356,20 @@ function Entity:GetTemplateModelNameByFilename(filename)
 	return template and template.name;
 end
 
+function Entity:GetOutputCharacter()
+	return self.outputEntity;
+end
+
 function Entity:CreateOutputCharacter()
 	if(self.outputEntity and self.outputEntity:GetInnerObject()) then
 		-- already created, the engine will auto refresh or we will refresh it here
 		return;
 	end
 	local x, y, z = EntityManager.GetPlayer():GetPosition()
-	local entity = EntityManager.EntityNPC:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesNPC});
+	local entity = EntityManager.EntityAnimCharacter:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesNPC});
 	entity:SetMainAssetPath(self:GetFilename());
-	entity:SetPersistent(false);
-	entity:SetCanRandomMove(false);
-	entity:SetDummy(true);
+	entity:SetFacing(self:ComputeModelFacing()[2]);
+	entity:SetAnimModelEntity(self);
 	entity:Attach();
 	self.outputEntity = entity;
 end
@@ -382,6 +425,7 @@ function Entity:CreateGetThinkerEntity()
 		entity:SetPersistent(false);
 		entity:SetCanRandomMove(false);
 		entity:SetDummy(true);
+		entity:SetFacing(self:ComputeModelFacing()[2]);
 		entity:Attach();
 		self.thinkerEntity = entity;	
 

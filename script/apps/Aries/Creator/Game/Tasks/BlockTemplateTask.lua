@@ -228,6 +228,7 @@ function BlockTemplate:SaveTemplate()
 		if(filename:match("%.bmax$")) then
 			-- refresh it if it is a bmax model.
 			ParaAsset.LoadParaX("", filename):UnloadAsset();
+			LOG.std(nil, "info", "BlockTemplate", "unload to refresh %s", filename);
 		end
 		return true;
 	end
