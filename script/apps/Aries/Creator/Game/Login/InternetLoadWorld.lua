@@ -392,20 +392,26 @@ end
 
 local last_url;
 
+-- @param url: class id or lesson id or url or server address
 function InternetLoadWorld.GotoUrl(url)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteUrl.lua");
-	local RemoteUrl = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteUrl");
-	local urlObj = RemoteUrl:new():Init(url);
-	if(urlObj and urlObj:IsRemoteServer()) then
-		LOG.std(nil, "debug", "OnAddSearchPage", {urlObj:GetHost(), urlObj:GetPort()});
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-		CommandManager:Init()
-		CommandManager:RunCommand("connect", urlObj:GetHost().." "..(urlObj:GetPort() or ""));
-		return true;
-	elseif(not url or url == "") then
-		_guihelper.MessageBox(L"请输入服务器IP地址, 例如: <br/>127.0.0.1 8099")
-		return true;
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua");
+	local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+	local bIsLessonWorld = ParaWorldLessons.EnterWorldById(url)
+	if(not bIsLessonWorld) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteUrl.lua");
+		local RemoteUrl = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteUrl");
+		local urlObj = RemoteUrl:new():Init(url);
+		if(urlObj and urlObj:IsRemoteServer()) then
+			LOG.std(nil, "debug", "OnAddSearchPage", {urlObj:GetHost(), urlObj:GetPort()});
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+			CommandManager:Init()
+			CommandManager:RunCommand("connect", urlObj:GetHost().." "..(urlObj:GetPort() or ""));
+			return true;
+		elseif(not url or url == "") then
+			_guihelper.MessageBox(L"请输入服务器IP地址, 例如: <br/>127.0.0.1 8099")
+			return true;
+		end
 	end
 end
 

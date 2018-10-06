@@ -92,11 +92,11 @@ function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 end
 
 function UrlProtocolHandler:CheckInstallUrlProtocol()
-	if(System.options.mc and System.os.GetPlatform() == "win32") then
+	if(System.os.GetPlatform() == "win32") then
 		if(self:HasUrlProtocol()) then
 			return true;
 		else
-			_guihelper.MessageBox(L"安装URL Protocol, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理员权限)", function(res)
+			_guihelper.MessageBox(L"安装paracraft://URL协议后, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理员权限)", function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
 					self:RegisterUrlProtocol();
 				end

@@ -98,10 +98,10 @@ e.g.
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		if(not System.options.mc) then
+		--if(not System.options.mc) then
 --			GameLogic.AddBBS(nil, L"此命令只有在Paracraft中可用");
 --			return 
-		end
+		--end
 		local doc_root_dir, host, port;
 		doc_root_dir, cmd_text = CmdParser.ParseString(cmd_text);
 		host, cmd_text = CmdParser.ParseString(cmd_text);

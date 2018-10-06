@@ -14,9 +14,15 @@ Rebranding = commonlib.gettable("MyCompany.Aries.Creator.Game.Rebranding");
 
 -- @param name: "local", "internet"
 function OnSelect()
-    System.options.loginmode = "local";
-    page:CloseWindow();
-    MainLogin:next_step({IsLoginModeSelected = true});
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua");
+    local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+    ParaWorldLessons.CheckShowOnStartup(function(bBeginLessons)
+        if(not bBeginLessons) then
+            System.options.loginmode = "local";
+            page:CloseWindow();
+            MainLogin:next_step({IsLoginModeSelected = true});    
+        end
+    end)
 end
 
 function OnOpenModulePage()

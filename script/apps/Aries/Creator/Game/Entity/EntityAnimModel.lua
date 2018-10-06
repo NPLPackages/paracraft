@@ -90,7 +90,10 @@ function Entity:OpenEditor(editor_name, entity)
 		self:CreateOutputCharacter();
 		local charEntity = self:GetOutputCharacter();
 		if(charEntity) then
-			charEntity:Say(self:GetFilename(), nil, true);
+			local filename = self:GetFilename();
+			local result = Files.ResolveFilePath(filename);
+			filename = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
+			charEntity:Say(filename, nil, true);
 		end
 		_guihelper.MessageBox(format(L"是否重新生成 %s?", self:GetFilename()), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
@@ -272,14 +275,18 @@ function Entity:ComputeModelFacing()
 			break;
 		end
 	end
-	local dir = vector3d:new({x0-x1,y0-y1,z0-z1});
-	dir:normalize();
-
-	local x_positive = vector3d:new(1,0,0);
-	local angle = dir:angleAbsolute(x_positive);
+	local angle = 0
 	local around_y_axis = false;
-	if( math.abs(dir:dot(vector3d:new(0,1,0))) < 0.00001 ) then
-		around_y_axis = true;
+	if(x1) then
+		local dir = vector3d:new({x0-x1,y0-y1,z0-z1});
+		dir:normalize();
+
+		local x_positive = vector3d:new(1,0,0);
+		angle = dir:angleAbsolute(x_positive);
+		
+		if( math.abs(dir:dot(vector3d:new(0,1,0))) < 0.00001 ) then
+			around_y_axis = true;
+		end
 	end
 
 	local angles;
@@ -447,11 +454,19 @@ function Entity:CreateGetThinkerEntity()
 		entity:SetDummy(true);
 		entity:SetFacing(self:ComputeModelFacing()[2]);
 		entity:Attach();
+		entity.OnClick = function(entity, x,y,z, mouse_button)
+			self:OnClickThinker();
+			return true;
+		end
 		self.thinkerEntity = entity;	
 
 		self:ShowNextThinkerModel();
 	end
 	return self.thinkerEntity;
+end
+
+function Entity:OnClickThinker(entity)
+	self:OpenEditor();
 end
 
 function Entity:DeleteThinkerEntity()

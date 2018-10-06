@@ -87,7 +87,7 @@ function BlockMinimap.ShowPage(bShow, bForceShow)
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
 			bShow = bShow,
-			zorder = -2,
+			zorder = -5,
 			click_through = true,
 			directPosition = true,
 				align = "_rt",

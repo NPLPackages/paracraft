@@ -9,17 +9,49 @@
 <script type="text/npl" src="ParaWorldLessons.lua"><![CDATA[
 ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
 ParaWorldLessons.OnInit()
-
-function ds_LessonWorlds()
-end
 ]]></script>
-<pe:container>
-    <pe:gridview name="lessonWorlds" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="48" pagesize="48" DataSource='<%=ds_LessonWorlds%>'>
+<style type="text/mcss">
+{
+    flat_button = {
+        color = "#cccccc",
+        ["margin-top"] = 0,
+        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",
+    }
+    ,
+    link_button = {
+        color = "#cccccc", ["margin-top"] = 0, background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",
+    }
+    ,
+    nav_button = {
+        color = "#cccccc", background = "", ["margin-top"] = 0, height=28, background2 = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",
+    }
+    ,
+}
+</style>
+<pe:container alignment="_ct" style="background-color:#ffffff;margin-left:-300px;margin-top:-210px;width:600px;height:430px;">
+    <div style="background-color:#00000080;width:600px;height:38px;">
+        <div style="position:relative;margin-left:5px;margin-top:-4px;width:40px;height:40px;background:url(Texture/3DMapSystem/AppIcons/png/Intro_64.png)"></div>
+        <div style="position:relative;float:left;margin-left:50px;margin-top:6px;"><%=L"动画与编程导引课"%></div>
+        <div style="margin-top:2px;margin-left:200px;float:left;background-color:#ffffff;padding:2px;">
+            <div style="float:left;background-color:#000000;">
+                <input type="text" name="txtLessonId" style="margin-bottom:0px;width:160px;height:30px;background:url();textcolor:#ffffff" spacing="4" EmptyText='<%=L"输入课程ID"%>' CaretColor="#FFFFFFFF" />
+            </div>
+            <input type="button" value='<%=L"打开" %>' class="flat_button" style="height:30px" onclick="ParaWorldLessons.OnClickEnterWorld" />
+        </div>
+        <input type="button" align="right" tooltip='<%=L"Paracraft动画与编程教学"%>' style="margin-right:10px;margin-left:10px;height:36px;" class="link_button" value="更多网课" onclick="ParaWorldLessons.OnClickMoreLessons"/>
+    </div>
+    <pe:gridview style="margin-left:20px;margin-top:10px;height:300px" name="lessonWorlds" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="95" pagesize="1500" DataSource='<%=ParaWorldLessons.LessonWorldsDs%>'>
         <Columns>
-            <input type="button" name='<%=Eval("name")%>' tooltip='<%="page://script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html?name="..Eval("name")%>' use_mouse_offset="false" is_lock_position="true"  tooltip_offset_y="64" tooltip_offset_x="-10"
-                onclick="ParaWorldLessons.OnClickWorld" background='<%=Eval("icon") or ""%>' style="position:relative;width:45px;height:45px;" />
+            <div style="width:110px;height:95px;" name='<%=Eval("index")%>' onclick="ParaWorldLessons.OnClickWorld" tooltip='<%=ParaWorldLessons.GetTootipByIndex(Eval("index"))%>' use_mouse_offset="false" is_lock_position="true"  tooltip_offset_y="70" tooltip_offset_x="-10"> 
+                <img src='<%=Eval("icon")%>' style="margin-left:23px;width:64px;height:64px" />
+                <div style="margin-top:3px;font-size:12px;color:#000000;text-align:center;width:110px"><%=Eval("displayname") or Eval("title")%></div>
+            </div>
         </Columns>
     </pe:gridview>
+    <div style="margin-left:200px;margin:10px;margin-top:20px;">
+        <input type="checkbox" onclick="ParaWorldLessons.OnChangeShowOnStartup" style="margin-top:3px" name="showOnStart" checked='<%=ParaWorldLessons.IsShowOnStartup()%>'/><div style="float:left" for="showOnStart"><%=L"启动时显示"%></div>
+        <input type="button" style="margin-left:10px;min-width:100px;" class="flat_button" value="关闭" onclick="ParaWorldLessons.OnClickClose"/>
+    </div>
 </pe:container>
 </pe:mcml>
 </body>

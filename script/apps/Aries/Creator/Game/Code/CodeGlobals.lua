@@ -216,15 +216,21 @@ end
 function CodeGlobals:HandleGameEvent(event)
 	local textEvent = self:GetTextEvent(event:GetType());
 	if(textEvent) then
-		if(not event.msg) then
+		local msg = event.msg;
+		if(not msg) then
 			local trigger_entity = EntityManager.GetLastTriggerEntity();
 			if(trigger_entity) then
 				-- if no message body is provided, we will send the triggering entity name
 				-- this is useful to get the source entity's name, such as a network player
-				event.msg = trigger_entity:GetName();
+				msg = trigger_entity:GetName();
 			end
 		end
-		textEvent:DispatchEvent({type="msg", msg = event.msg,});
+		
+		if(event.cmd_text and event.cmd_text~="") then
+			msg = event.cmd_text;
+		end
+
+		textEvent:DispatchEvent({type="msg", msg = msg,});
 	end
 end
 

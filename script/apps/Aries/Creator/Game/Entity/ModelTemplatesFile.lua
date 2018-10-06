@@ -45,6 +45,8 @@ function ModelTemplatesFile:LoadFromXMLFile(filename)
 			end
 		end	
 		ProcessNode(root);
+	else
+		LOG.std(nil, "warn", "ModelTemplatesFile", "failed to open %s", filename);
 	end
 end
 

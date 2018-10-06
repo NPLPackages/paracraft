@@ -159,7 +159,10 @@ function ParaWorldLoginDocker.OnClickApp(name)
 			if(name == "user_worlds") then
 				System.options.showUserWorldsOnce = true
 			elseif(name == "tutorial_worlds") then
-				ParaGlobal.ShellExecute("open", "https://keepwork.com/official/paracraft/animation-tutorials", "", "", 1)
+				--ParaGlobal.ShellExecute("open", "https://keepwork.com/official/paracraft/animation-tutorials", "", "", 1)
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua");
+				local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+				ParaWorldLessons.ShowPage()
 				return
 			end
 
@@ -221,6 +224,14 @@ function ParaWorldLoginDocker.RestoreDefaultGUITemplate()
 	_guihelper.SetFontColor(_this, "#000000");
 end
 	
+function ParaWorldLoginDocker.GetRedirectableCmdLineParams()
+	local cmds = "";
+	if(ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true") then
+		cmds = cmds.." httpdebug=\"true\"";
+	end
+	-- TODO: keepwork token forward here?
+	return cmds;
+end
 
 -- Restart the entire NPLRuntime to a different application. e.g.
 -- Desktop.Restart("haqi")
@@ -243,6 +254,7 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 
 	local srcAppName = ParaWorldLoginDocker.GetSourceAppName()
 	newCmdLine = format("%s src_paraworldapp=\"%s\"", newCmdLine, srcAppName);
+	newCmdLine = newCmdLine.." "..(ParaWorldLoginDocker.GetRedirectableCmdLineParams() or "");
 
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
 	if(app) then

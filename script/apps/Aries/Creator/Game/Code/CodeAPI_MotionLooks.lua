@@ -23,10 +23,12 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 -- @param seconds: in seconds, if nil, it is one tick or env_imp.GetDefaultTick(self)
 function env_imp:wait(seconds)
 	seconds = seconds or env_imp.GetDefaultTick(self);
-	self.co:SetTimeout(math.floor(seconds*1000), function()
-		env_imp.resume(self);
-	end) 
-	env_imp.yield(self);
+	if(self.co) then
+		self.co:SetTimeout(math.floor(seconds*1000), function()
+			env_imp.resume(self);
+		end) 
+		env_imp.yield(self);
+	end
 end
 
 -- say some text and wait for some time. 

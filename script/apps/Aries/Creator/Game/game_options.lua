@@ -119,7 +119,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	-- whether to enable left click to move in game mode. 
 	leftClickToMove = false,
 	ask_for_help_url = L"http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=51",
-	bbs_home_url = L"http://www.paracraft.cn/",
+	--bbs_home_url = L"https://keepwork.com/official/creativeTimes/latest",
+	bbs_home_url = L"http://paracraft.keepwork.com/",
 	bbs_upload_url = L"http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=50",
 	credits_url = L"https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits",
 	-- whether we are cheating on some of the functions

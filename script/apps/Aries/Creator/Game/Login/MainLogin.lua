@@ -98,7 +98,7 @@ function MainLogin:start(init_callback)
 		LoadBackground3DScene = self.LoadBackground3DScene,
 		-- check command line
 		CheckCommandLine = self.CheckCommandLine,
-		-- select local or internet game
+		-- Load buildin packages and mod
 		LoadPackages = self.LoadPackages,
 		-- select local or internet game
 		ShowLoginModePage = self.ShowLoginModePage,

@@ -955,15 +955,6 @@ paraworld.CreateRESTJsonWrapper("paraworld.users.Find", "%MAIN%/Users/Find.ashx"
 	/// }
 	/// </returns>
 ]] 
-paraworld.create_wrapper("paraworld.users.GetNIDByOtherAccountID", "%MAIN%/API/Users/GetNIDByOtherAccountID",
-	function (self, msg, id, callbackFunc, callbackParams, postMsgTranslator)
-		LOG.std(nil, "debug", "GetNIDByOtherAccountID.begin", msg);
-	end,
-	function (self, msg, id, callbackFunc, callbackParams, postMsgTranslator, raw_msg, inputMsg)
-		LOG.std(nil, "debug", "GetNIDByOtherAccountID.end", msg);
-	end
-);
-
 paraworld.create_wrapper("paraworld.users.Registration", "%MAIN%/API/Users/Registration",
 	-- pre validation function
 	function (self, msg, id, callbackFunc, callbackParams, postMsgTranslator)
