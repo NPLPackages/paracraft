@@ -124,19 +124,21 @@ function CodeEvent:Fire(msg, onFinishedCallback)
 		self:FireForActor(self.actor, msg, onFinishedCallback);
 	else
 		local actors = self:GetCodeBlock():GetActors();
-		if(actors and #actors>0) then
+		local nAgentCount = actors and (#actors) or 0;
+		if(nAgentCount > 0) then
+			
 			if(onFinishedCallback) then
 				local finishedCount = 0;
 				local oldFinishedCallback = onFinishedCallback;
 				onFinishedCallback = function()
 					finishedCount = finishedCount + 1;
-					if(finishedCount == #actors) then
+					if(finishedCount == nAgentCount) then
 						oldFinishedCallback();
 					end
 				end
 			end				
 			
-			for i=#actors, 1, -1  do
+			for i=nAgentCount, 1, -1  do
 				local actor = actors[i];
 				if(actor) then
 					self:FireForActor(actor, msg, onFinishedCallback);

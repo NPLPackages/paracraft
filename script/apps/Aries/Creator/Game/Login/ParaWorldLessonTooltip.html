@@ -1,0 +1,26 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ParaWorldLessonTooltip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2018.9.3</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"src="ParaWorldLessons.lua"><![CDATA[
+ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+app = ParaWorldLessons.GetLessonByIndex(tonumber(Page:GetRequestParam("index")));
+]]></script>
+<div style="font-size:12px;padding:10px;background-color:#292929;color:#ffffff;max-width:400px;">
+    <div>
+        <div style='<%=format("float:left;background:url(%s);width:64px;height:64px;", app.icon)%>'></div>
+        <div style="float:left;margin-left:10px;margin-top:5px;font-size:14px;">
+            <div><%=app.title or app.displayname%></div>
+            <div style="color:#8d8888;margin-top:5px;">
+                <div style="float:left;font-size:12px"><%=app.tooltip%></div>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
