@@ -98,6 +98,7 @@ end
 function CodeGlobals:Reset()
 	local curGlobals = {};
 	self.curGlobals = curGlobals;
+	self.cur_co = nil;
 
 	-- look in global table first, and then in shared API. 
 	local meta_table = {__index = function(tab, name)
@@ -106,6 +107,10 @@ function CodeGlobals:Reset()
 			if(info) then
 				return info.currentline;
 			end
+		elseif(name == "co") then
+			return self.cur_co;
+		elseif(name == "actor") then
+			return self.cur_co and self.cur_co:GetActor();
 		end
 		local value = curGlobals[name];
 		if(value==nil) then
@@ -124,6 +129,10 @@ function CodeGlobals:Reset()
 
 	-- clear UI if any
 	CodeUI:Clear();
+end
+
+function CodeGlobals:SetCurrentCoroutine(co)
+	self.cur_co = co;
 end
 
 function CodeGlobals:AddCodeBlock(codeblock)

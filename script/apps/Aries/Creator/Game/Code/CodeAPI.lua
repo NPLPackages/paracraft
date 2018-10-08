@@ -7,7 +7,7 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
-local api = CodeAPI:new(codeBlock, codeActor);
+local api = CodeAPI:new(codeBlock);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Events.lua");
@@ -108,9 +108,8 @@ CodeAPI.__index = CodeAPI;
 
 
 -- @param actor: CodeActor that this code API is controlling. 
-function CodeAPI:new(codeBlock, actor)
+function CodeAPI:new(codeBlock)
 	local o = {
-		actor = actor,
 		codeblock = codeBlock,
 		check_count = 0,
 	};

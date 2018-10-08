@@ -62,16 +62,11 @@ function CodeCoroutine:KillTimer(timer)
 	self:GetCodeBlock():KillTimer(timer);
 end
 
--- @param bRestoreContext: true to restore context. default to nil. One must set to true if the callbackFunc may invoke other coroutines
-function CodeCoroutine:MakeCallbackFunc(callbackFunc, bRestoreContext)
+function CodeCoroutine:MakeCallbackFunc(callbackFunc)
 	return function(...)
-		local last_context = bRestoreContext and self:SaveCurrentContext();
-		self:PrepareCodeContext();
+		self:SetCurrentCodeContext();
 		if(callbackFunc) then
 			callbackFunc(...);
-		end
-		if(last_context) then
-			self:RestoreContext(last_context);
 		end
 	end
 end
@@ -84,7 +79,7 @@ end
 
 function CodeCoroutine:SetTimeout(duration, callbackFunc)
 	local timer = self:GetCodeBlock():SetTimeout(duration, function(timer)
-		self:PrepareCodeContext();
+		self:SetCurrentCodeContext()
 		self:RemoveTimer(timer);
 		if(callbackFunc) then
 			callbackFunc(timer);
@@ -122,17 +117,8 @@ function CodeCoroutine:Stop()
 	self:KillAllTimers();
 end
 
--- @return saved context {co, actor};
-function CodeCoroutine:SaveCurrentContext()
-	local code_env = self:GetCodeBlock():GetCodeEnv();
-	return {co = code_env.co, actor = code_env.actor};
-end
-
--- restore context
-function CodeCoroutine:RestoreContext(context)
-	local code_env = self:GetCodeBlock():GetCodeEnv();
-	code_env.co = context.co;
-	code_env.actor = context.actor;
+function CodeCoroutine:SetCurrentCodeContext()
+	GameLogic.GetCodeGlobal():SetCurrentCoroutine(self);
 end
 
 -- Run the same coroutine multiple times will cause the previous one to stop forever.
@@ -148,10 +134,7 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 			end
 			return nil, "finished";
 		end)
-		local last_context = self:SaveCurrentContext();
-		self:PrepareCodeContext();
 		self:Resume();
-		self:RestoreContext(last_context);
 	end
 end
 
@@ -178,6 +161,7 @@ end
 
 function CodeCoroutine:Resume(err, msg)
 	if(self.co and not self.isStopped) then
+		self:SetCurrentCodeContext();
 		return coroutine.resume(self.co, err, msg);
 	end
 end
@@ -187,10 +171,4 @@ function CodeCoroutine:Yield()
 	if(self.co) then
 		return coroutine.yield();
 	end
-end
-
-function CodeCoroutine:PrepareCodeContext()
-	local code_env = self:GetCodeBlock():GetCodeEnv();
-	code_env.co = self;
-	code_env.actor = self:GetActor();
 end
