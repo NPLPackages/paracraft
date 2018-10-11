@@ -3,8 +3,8 @@
 @param filename:
 -->
 <ModelTemplates>
-  <model name="äººç±»" filename="character/AutoAnims/Q_nvhai01.x"/>
-  <model name="é•¿é¢ˆé¹¿" filename="character/AutoAnims/Q_changjinglu_zoulu.x"/>
-  <model name="ç‰¦ç‰›" filename="character/AutoAnims/Q_maoniu01.x"/>
+  <model name="ÈËÀà" filename="character/AutoAnims/Q_nvhai01.x"/>
+  <model name="³¤¾±Â¹" filename="character/AutoAnims/Q_changjinglu_zoulu.x"/>
+  <model name="êóÅ£" filename="character/AutoAnims/Q_maoniu01.x"/>
   <!--<model filename="character/AutoAnims/Q_huoji01.x"/>-->
 </ModelTemplates>
