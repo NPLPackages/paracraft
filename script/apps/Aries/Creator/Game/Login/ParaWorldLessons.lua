@@ -307,35 +307,18 @@ function ParaWorldLessons.OnClickEnterWorld()
 	end
 end
 
-function ParaWorldLessons.GetFirstWorldFromMarkdownContent(content)
-	local paracraftMod = content:match("\n(```@[pP]aracraft[^`]+)");
-	if(paracraftMod) then
-		local url;
-		local bInsideDownload;
-		local bSearchNextLine;
-		for line in paracraftMod:gmatch("([^\r\n]+)\r?\n") do
-			if(not bInsideDownload and line:match("^download")) then
-				bInsideDownload = true;
-			elseif(bInsideDownload and line:match("^%s*link:")) then
-				url = line:match("(https?://[^\r\n]+)");
-				if(url) then
-					break
-				else
-					bSearchNextLine = true
-				end
-			elseif(bSearchNextLine) then
-				url = line:match("(https?://[^\r\n]+)");
-				break;
-			end
-		end
-		return url;
+function ParaWorldLessons.OpenCurrentLessonUrl()
+	if(ParaWorldLessons.GetCurrentLesson()) then
+		ParaWorldLessons.GetCurrentLesson():OpenLessonUrl()
 	end
 end
 
-function ParaWorldLessons.OpenCurrentLessonUrl()
-	if(ParaWorldLessons.lessonUrl) then
-		ParaGlobal.ShellExecute("open", ParaWorldLessons.lessonUrl, "", "", 1)
-	end
+function ParaWorldLessons.SetCurrentLesson(lesson)
+	ParaWorldLessons.curLesson = lesson
+end
+
+function ParaWorldLessons.GetCurrentLesson()
+	return ParaWorldLessons.curLesson;
 end
 
 -- @param id: a string of class id or lesson id. 
@@ -358,8 +341,12 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 			ParaWorldLessons.isFetching = true;
 			System.os.GetUrl(contentAPIUrl, function(err, msg, data)
 				if(data and data.content) then
-					ParaWorldLessons.lessonUrl = lessonUrl;
-					local worldUrl = ParaWorldLessons.GetFirstWorldFromMarkdownContent(data.content)
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
+					local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
+					local lesson = ParaWorldLesson:new():Init(lessonId, lessonUrl, data.content)
+					ParaWorldLessons.SetCurrentLesson(lesson);
+
+					local worldUrl = lesson:GetFirstWorldUrl()
 					if(worldUrl) then
 						LOG.std(nil, "info", "ParaWorldLessons", "try entering world %s", worldUrl);
 
