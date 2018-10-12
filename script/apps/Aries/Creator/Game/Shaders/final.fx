@@ -39,7 +39,7 @@ static const float3 offsets[16] = {
 };
 
 
-texture sourceTexture0;
+texture sourceTexture0: TEXTURE0;
 sampler colorSampler:register(s0) = sampler_state
 {
 	Texture = < sourceTexture0 > ;
@@ -49,7 +49,7 @@ sampler colorSampler:register(s0) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture1;
+texture sourceTexture1: TEXTURE1;
 sampler matInfoSampler:register(s1) = sampler_state
 {
 	Texture = < sourceTexture1 > ;
@@ -59,7 +59,7 @@ sampler matInfoSampler:register(s1) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture2 : TEXTURE;
+texture sourceTexture2 : TEXTURE2;
 sampler ShadowMapSampler: register(s2) = sampler_state
 {
 	texture = < sourceTexture2 > ;
@@ -71,7 +71,7 @@ sampler ShadowMapSampler: register(s2) = sampler_state
 	BorderColor = 0x0;
 };
 
-texture sourceTexture3;
+texture sourceTexture3: TEXTURE3;
 sampler depthSampler:register(s3) = sampler_state
 {
 	Texture = < sourceTexture3 > ;
@@ -81,7 +81,7 @@ sampler depthSampler:register(s3) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture4;
+texture sourceTexture4: TEXTURE4;
 sampler normalSampler:register(s4) = sampler_state
 {
 	Texture = < sourceTexture4 > ;

@@ -27,7 +27,8 @@ float4x4 mShadowMapTex;
 float4x4 mShadowMapViewProj;
 float2	viewportOffset;
 float2	viewportScale;
-
+// fov,near,far,aspect
+float4 ProjectionParams : ProjectionParams;
 float3   g_FogColor;
 
 // x is shadow map size(such as 2048), y = 1/x
@@ -60,6 +61,7 @@ float DepthOfViewFactor = 0.15;	//aperture - bigger values for shallower depth o
 float FogStart = 100.0;
 float FogEnd = 140.0;
 float CloudThickness = 0.0;
+float2 GaussianBlurOffset;
 
 static const float bloom_threshold = 0.7;
 // offset_x, offset_y, scale_factor
@@ -70,8 +72,8 @@ static const float3 offsets[16] = {
 	-float3(0.0, 0.008, 1.0), -float3(0.0, 0.006, 1.2), -float3(0.0, 0.004, 1.3), -float3(0.0, 0.002, 1.5)
 };
 
-texture sourceTexture0;
-sampler colorSampler:register(s0) = sampler_state
+texture sourceTexture0: TEXTURE0;
+sampler2D colorSampler:register(s0) = sampler_state
 {
 	Texture = <sourceTexture0>;
 	MinFilter = Linear;
@@ -80,8 +82,8 @@ sampler colorSampler:register(s0) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture1;
-sampler matInfoSampler:register(s1) = sampler_state
+texture sourceTexture1: TEXTURE1;
+sampler2D matInfoSampler:register(s1) = sampler_state
 {
 	Texture = <sourceTexture1>;
 	MinFilter = Linear;
@@ -90,8 +92,8 @@ sampler matInfoSampler:register(s1) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture2 : TEXTURE;
-sampler ShadowMapSampler: register(s2) = sampler_state
+texture sourceTexture2 : TEXTURE2;
+sampler2D ShadowMapSampler: register(s2) = sampler_state
 {
 	texture = <sourceTexture2>;
 	MinFilter = Linear;
@@ -102,8 +104,8 @@ sampler ShadowMapSampler: register(s2) = sampler_state
 	BorderColor = 0x0;
 };
 
-texture sourceTexture3;
-sampler depthSampler:register(s3) = sampler_state
+texture sourceTexture3: TEXTURE3;
+sampler2D depthSampler:register(s3) = sampler_state
 {
 	Texture = <sourceTexture3>;
 	MinFilter = Linear;
@@ -112,8 +114,8 @@ sampler depthSampler:register(s3) = sampler_state
 	AddressV = clamp;
 };
 
-texture sourceTexture4;
-sampler normalSampler:register(s4) = sampler_state
+texture sourceTexture4: TEXTURE4;
+sampler2D normalSampler:register(s4) = sampler_state
 {
 	Texture = <sourceTexture4>;
 	MinFilter = Linear;
@@ -121,8 +123,8 @@ sampler normalSampler:register(s4) = sampler_state
 	AddressU = clamp;
 	AddressV = clamp;
 };
-texture sourceTexture5;
-sampler compositeSampler:register(s5) = sampler_state
+texture sourceTexture5: TEXTURE5;
+sampler2D compositeSampler:register(s5) = sampler_state
 {
 	Texture = <sourceTexture5>;
 	MinFilter = Linear;
@@ -201,6 +203,14 @@ struct LightmapStruct
 	float3 sky;					//Color and brightness of the sky itself
 };
 
+/* the final composition step to tonemap to monitor resolution.
+*/
+struct VSOutputFinal
+{
+	float4 pos			: POSITION;         // Screen space position
+	float2 texCoord		: TEXCOORD0;        // texture coordinates
+};
+
 // Result of shading calculation variables
 struct ShadingStruct
 {
@@ -234,11 +244,11 @@ VSOutput CompositeQuadVS(float3 iPosition:POSITION,
 {
 	VSOutput o;
 	o.pos = float4(iPosition, 1);
-	o.texCoord = texCoord + 0.5 / screenParam;
-
+	o.texCoord = texCoord;
 	// for reconstructing world position from depth value
-	float3 outCameraEye = float3(iPosition.x*TanHalfFOV*ViewAspect, iPosition.y*TanHalfFOV, 1);
-	o.CameraEye = outCameraEye;
+	float YF = TanHalfFOV;
+	float XF = YF * ViewAspect;
+	o.CameraEye = float3(o.pos.x*XF,o.pos.y*YF, 1);
 
 	return o;
 }
@@ -486,21 +496,39 @@ void ApplyDistanceFog(inout float3 color, in SurfaceStruct surface)
 	color = lerp(color, fogColor, fogFactor);
 }
 
+float3 CalculateViewPosFromDepth(float linearDepth,float3 cameraRay)
+{
+	float farClipDist = ProjectionParams.z;
+	float3 viewspacePos = cameraRay * linearDepth * farClipDist;
+	return viewspacePos.xyz;
+}
+
+
 // do basic surface color calculation here (without reflection)
 PSOut CompositePS0(VSOutput input)
 {
 	//Initialize surface properties required for lighting calculation for any surface that is not part of the sky
-	SurfaceStruct surface = (SurfaceStruct)0;
+
+	SurfaceStruct surface;
 	float2 texCoord = input.texCoord;
 	surface.texCoord = texCoord;
 	surface.albedo = GetAlbedoLinear(texCoord);
 	surface.sky.albedo = surface.albedo;
+	surface.sky.sunSpot = float3(0,0,0);
+	surface.sky.sunProximity = 0;
+	surface.NdotL = 0;
+	surface.shadow = 0;
+	surface.mask_sky = false;
+	surface.mask_water = false;
+	surface.mask_torch = false;
+
 	surface.albedo = pow(surface.albedo, 1.4f);
 	surface.albedo = lerp(surface.albedo, dot(surface.albedo, float1(0.3333f).xxx), 0.035f);
 	surface.normal = GetNormal(texCoord);
 	surface.depth = GetDepth(texCoord);
 	surface.CameraEye = input.CameraEye;
-	surface.cameraSpacePos = input.CameraEye * surface.depth;
+	surface.cameraSpacePos = CalculateViewPosFromDepth(surface.depth,input.CameraEye);
+
 	// r:category id,  g: sun light value, b: torch light value
 	float4 block_info = tex2D(matInfoSampler, texCoord);
 	surface.category_id = (int)(block_info.r * 255.0 + 0.4);
@@ -660,87 +688,66 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 // do water reflection here
 float4 CompositePS1(VSOutput input) :COLOR
 {
-	SurfaceStruct2 surface = (SurfaceStruct2)0;
-float2 texCoord = input.texCoord;
-surface.texCoord = texCoord;
-surface.color = GetAlbedoLinear(texCoord);
-surface.sunlightVisibility = GetSunlightVisibility(texCoord);
-// get world space normal
-float4 normal_ = GetNormal(texCoord);
-surface.normal = normal_.xyz;
-surface.specularity = 1.0 - normal_.w;
-surface.depth = GetDepth(texCoord);
-surface.CameraEye = input.CameraEye;
-surface.cameraSpacePos = input.CameraEye * surface.depth;
-// r:category id,  g: sun light value, b: torch light value
-float4 block_info = tex2D(matInfoSampler, texCoord);
-surface.category_id = (int)(block_info.r * 255.0 + 0.4);
-// float sun_light_strength = block_info.g;
-surface.torch_light_strength = block_info.b;
+	SurfaceStruct2 surface;
+	float2 texCoord = input.texCoord;
+	surface.texCoord = texCoord;
+	surface.color = GetAlbedoLinear(texCoord);
+	surface.sunlightVisibility = GetSunlightVisibility(texCoord);
+	// get world space normal
+	float4 normal_ = GetNormal(texCoord);
+	surface.normal = normal_.xyz;
+	surface.specularity = 1.0 - normal_.w;
+	surface.depth = GetDepth(texCoord);
+	surface.CameraEye = input.CameraEye;
+	surface.cameraSpacePos = CalculateViewPosFromDepth(surface.depth,input.CameraEye);
+	// r:category id,  g: sun light value, b: torch light value
+	float4 block_info = tex2D(matInfoSampler, texCoord);
+	surface.category_id = (int)(block_info.r * 255.0 + 0.4);
+	// float sun_light_strength = block_info.g;
+	surface.torch_light_strength = block_info.b;
 
-CalculateSpecularReflections(surface);
-CalculateSpecularHighlight(surface);
+	CalculateSpecularReflections(surface);
+	CalculateSpecularHighlight(surface);
 
-return float4(surface.color.rgb, 1.0);
+	return float4(surface.color.rgb, 1.0);
 }
 
 // calculate bloom at given level of detail and write it to a given offset position
-float3 CalculateBloom(float2 texcoord, int LOD, float2 offset)
+float3 CalculateBloom(float2 texcoord)
 {
-	float scale = pow(2.0f, float(LOD));
-
-	float padding = 0.02f;
-
-	if (texcoord.x - offset.x + padding < 1.0f / scale + (padding * 2.0f)
-		&& texcoord.y - offset.y + padding < 1.0f / scale + (padding * 2.0f)
-		&& texcoord.x - offset.x + padding > 0.0f
-		&&  texcoord.y - offset.y + padding > 0.0f) {
-
-		float3 bloom = float1(0.0f).xxx;
-		float allWeights = 0.0f;
-		const float3 glowThreshold = float3(1.0, 1.0, 1.0);
-		for (int i = 0; i < 6; i++) {
-			for (int j = 0; j < 6; j++) {
-				float weight = 1.0f - distance(float2(i, j), float2(2.5f, 2.5f)) / 3.5; // 3.5 = 0.25*1.414
-				weight = 1.0f - cos(weight * 3.1416f / 2.0f);
-				weight = pow(weight, 2.0f);
-				float2 coord = float2(i - 2.5, j - 2.5);
-				coord /= screenParam;
-
-				float2 finalCoord = (texcoord.xy + coord.xy - offset.xy) * scale;
-				// glow threshold is set to 
-				bloom += max(float3(0, 0, 0), tex2D(colorSampler, finalCoord).rgb - glowThreshold) * weight;
-				allWeights += weight;
-			}
-		}
-		bloom /= allWeights;
-		return bloom;
-	}
-	else {
-		return float1(0.0f).xxx;
-	}
-
+	float3 color = tex2D(colorSampler, texcoord).rgb;
+	float brightness = dot(color.rgb, float3(0.2126, 0.7152, 0.0722));
+    if(brightness > 2.5)
+        return color;
+	return float3(0,0,0);
 }
 
 // calculate bloom texture (several bloom texture resolutions are calculated in one pass in different locations of the texture) 
 float4 CompositePS2(VSOutput input) :COLOR
 {
 	float2 texCoord = input.texCoord;
-
-	float3 bloom = CalculateBloom(texCoord, 2, float2(0.0f, 0.0f) + float2(0.000f, 0.000f));
-	bloom += CalculateBloom(texCoord, 3, float2(0.0f, 0.25f) + float2(0.000f, 0.025f));
-	bloom += CalculateBloom(texCoord, 4, float2(0.125f, 0.25f) + float2(0.025f, 0.025f));
-	bloom += CalculateBloom(texCoord, 5, float2(0.1875f, 0.25f) + float2(0.050f, 0.025f));
-	bloom += CalculateBloom(texCoord, 6, float2(0.21875f, 0.25f) + float2(0.075f, 0.025f));
-	bloom += CalculateBloom(texCoord, 7, float2(0.25f, 0.25f) + float2(0.100f, 0.025f));
-	bloom += CalculateBloom(texCoord, 8, float2(0.28f, 0.25f) + float2(0.125f, 0.025f));
-
+	float3 bloom = CalculateBloom(texCoord);
 	return float4(bloom.rgb, 1.0f);
 }
 
+float4 CompositGaussianblurPS(VSOutput input) :COLOR
+{
+	float2 uv = input.texCoord;
+	float2 texelSize = 1.0 / screenParam;
+	float3 color = float3(0,0,0);
+	float2 offset = GaussianBlurOffset*texelSize;
+	color += 0.0205 * tex2D(colorSampler, uv - offset*3).rgb;
+	color += 0.0855 * tex2D(colorSampler, uv - offset*2).rgb;
+	color += 0.232  * tex2D(colorSampler, uv - offset*1).rgb;
+	color += 0.324  * tex2D(colorSampler, uv).rgb;
+	color += 0.232  * tex2D(colorSampler, uv + offset*1).rgb;
+	color += 0.0855 * tex2D(colorSampler, uv + offset*2).rgb;
+	color += 0.0205 * tex2D(colorSampler, uv + offset*3).rgb;
+	return float4(color, 1.0);
+}
 
 // down size to 1/4 of original size. Calculate average color.
-float4 GlowDownsizePS(VSOutput input) :COLOR
+float4 GlowDownsizePS(VSOutputFinal input) :COLOR
 {
 	float2 texcoord = input.texCoord;
 	float2 texStep = float2(1.0, 1.0) / screenParam;
@@ -756,13 +763,7 @@ float4 GlowDownsizePS(VSOutput input) :COLOR
 }
 
 
-/* the final composition step to tonemap to monitor resolution.
-*/
-struct VSOutputFinal
-{
-	float4 pos			: POSITION;         // Screen space position
-	float2 texCoord		: TEXCOORD0;        // texture coordinates
-};
+
 
 VSOutputFinal FinalQuadVS(float3 iPosition:POSITION,
 	float2 texCoord : TEXCOORD0)
@@ -850,90 +851,6 @@ float3 DepthOfField(float2 pos)
 	return color;
 }
 
-struct BloomDataStruct
-{
-	float3 blur0;
-	float3 blur1;
-	float3 blur2;
-	float3 blur3;
-	float3 blur4;
-	float3 blur5;
-	float3 blur6;
-	float3 bloom;
-};
-
-// Retrieve previously calculated bloom textures
-void GetBloom(float2 texcoord, inout BloomDataStruct bloomData) {
-	//constants for bloom bloomSlant
-	const float    bloomSlant = 0.25f;
-	const float bloomWeight[7] = { pow(7.0f, bloomSlant),
-		pow(6.0f, bloomSlant),
-		pow(5.0f, bloomSlant),
-		pow(4.0f, bloomSlant),
-		pow(3.0f, bloomSlant),
-		pow(2.0f, bloomSlant),
-		1.0f
-	};
-
-	float2 recipres = float2(1.0, 1.0) / screenParam;
-	texcoord -= recipres;
-
-	bloomData.blur0 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 2.0f)) + float2(0.0f, 0.0f) + float2(0.000f, 0.000f)).rgb;
-	bloomData.blur1 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 3.0f)) + float2(0.0f, 0.25f) + float2(0.000f, 0.025f)).rgb;
-	bloomData.blur2 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 4.0f)) + float2(0.125f, 0.25f) + float2(0.025f, 0.025f)).rgb;
-	bloomData.blur3 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 5.0f)) + float2(0.1875f, 0.25f) + float2(0.050f, 0.025f)).rgb;
-	bloomData.blur4 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 6.0f)) + float2(0.21875f, 0.25f) + float2(0.075f, 0.025f)).rgb;
-	bloomData.blur5 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 7.0f)) + float2(0.25f, 0.25f) + float2(0.100f, 0.025f)).rgb;
-	bloomData.blur6 = tex2D(colorSampler, (texcoord.xy) * (1.0f / pow(2.0f, 8.0f)) + float2(0.28f, 0.25f) + float2(0.125f, 0.025f)).rgb;
-
-	bloomData.bloom = bloomData.blur0 * bloomWeight[0];
-	bloomData.bloom += bloomData.blur1 * bloomWeight[1];
-	bloomData.bloom += bloomData.blur2 * bloomWeight[2];
-	bloomData.bloom += bloomData.blur3 * bloomWeight[3];
-	bloomData.bloom += bloomData.blur4 * bloomWeight[4];
-	bloomData.bloom += bloomData.blur5 * bloomWeight[5];
-	bloomData.bloom += bloomData.blur6 * bloomWeight[6];
-}
-
-/** blur distance scene if raining. */
-void AddRainFogScatter(float2 texcoord, inout float3 color, in BloomDataStruct bloomData)
-{
-	const float    bloomSlant = 0.0f;
-	const float bloomWeight[7] = { pow(7.0f, bloomSlant),
-		pow(6.0f, bloomSlant),
-		pow(5.0f, bloomSlant),
-		pow(4.0f, bloomSlant),
-		pow(3.0f, bloomSlant),
-		pow(2.0f, bloomSlant),
-		1.0f
-	};
-
-	float3 fogBlur = bloomData.blur0 * bloomWeight[6] +
-		bloomData.blur1 * bloomWeight[5] +
-		bloomData.blur2 * bloomWeight[4] +
-		bloomData.blur3 * bloomWeight[3] +
-		bloomData.blur4 * bloomWeight[2] +
-		bloomData.blur5 * bloomWeight[1] +
-		bloomData.blur6 * bloomWeight[0];
-
-	float fogTotalWeight = 1.0f * bloomWeight[0] +
-		1.0f * bloomWeight[1] +
-		1.0f * bloomWeight[2] +
-		1.0f * bloomWeight[3] +
-		1.0f * bloomWeight[4] +
-		1.0f * bloomWeight[5] +
-		1.0f * bloomWeight[6];
-
-	fogBlur /= fogTotalWeight;
-
-	float linearDepth = GetDepth(texcoord);
-
-	float fogDensity = 0.023f * (rainStrength);
-	float visibility = 1.0f / exp(linearDepth * fogDensity);
-	float fogFactor = 1.0f - visibility;
-	fogFactor = clamp(fogFactor, 0.0f, 1.0f);
-	color = lerp(color, fogBlur, fogFactor);
-}
 
 float3 TonemapReinhard_Good(float3 color)
 {
@@ -961,25 +878,18 @@ float4 FinalPS(VSOutput input) :COLOR
 	else
 		color = GetColorTexture(texCoord);
 
-	// add bloom 
-	BloomDataStruct bloomData;
-	GetBloom(texCoord, bloomData);			//Gather bloom textures
-	color += bloomData.bloom*0.006f;
 
-	if (rainStrength > 0.01f)
-		AddRainFogScatter(texCoord, color, bloomData);
+ 	float3 bloom =	tex2D(colorSampler,texCoord);
+	color +=bloom;
 
 	// apply user defined fog
-	float eyeDist = length(input.CameraEye * GetDepth(texCoord));
-	if (FogStart < FogEnd)
-		color.xyz = lerp(color.xyz, pow(g_FogColor.xyz, 2.2f), 1.0 - clamp((FogEnd - eyeDist) / (FogEnd - FogStart), 0.0, 1.0));
+	//float3 viewspacePos = CalculateViewPosFromDepth(GetDepth(texCoord),input.CameraEye);
+	//float eyeDist = length(viewspacePos);
+	//if (FogStart < FogEnd)
+	//	color.xyz = lerp(color.xyz, pow(g_FogColor.xyz, 2.2f), 1.0 - clamp((FogEnd - eyeDist) / (FogEnd - FogStart), 0.0, 1.0));
 
 	// vignette effect: darken edges
 	Vignette(color, texCoord);
-
-#ifdef SHOW_DEBUG_VIEW
-	color = lerp(lerp(bloomData.bloom.rgb, color, float(texCoord.y<0.5)), lerp(tex2D(compositeSampler, texCoord).rgb, tex2D(colorSampler, texCoord).rgb, float(texCoord.y<0.5)), float(texCoord.x<0.5)); // DEBUG: show bloom texture and result
-#endif
 
 	color = TonemapReinhard_Good(color);
 	//Put color back into gamma space for correct display
@@ -1012,6 +922,7 @@ float4 CompositeFXAA(VSOutput input) :COLOR
 
 technique Default_Normal
 {
+	// -- composite 0: calculate real color to HDR
 	pass P0
 	{
 		cullmode = none;
@@ -1021,6 +932,7 @@ technique Default_Normal
 		VertexShader = compile vs_3_0 CompositeQuadVS();
 		PixelShader = compile ps_3_0 CompositePS0();
 	}
+	// -- composite 1: do surface reflection
 	pass P1
 	{
 		cullmode = none;
@@ -1030,6 +942,7 @@ technique Default_Normal
 		VertexShader = compile vs_3_0 CompositeQuadVS();
 		PixelShader = compile ps_3_0 CompositePS1();
 	}
+	// -- composite 2: calculate bloom
 	pass P2
 	{
 		cullmode = none;
@@ -1039,6 +952,7 @@ technique Default_Normal
 		VertexShader = compile vs_3_0 CompositeQuadVS();
 		PixelShader = compile ps_3_0 CompositePS2();
 	}
+	// -- composite 3: final render back to render target. 
 	pass P3
 	{
 		cullmode = none;
@@ -1048,6 +962,7 @@ technique Default_Normal
 		VertexShader = compile vs_3_0 CompositeQuadVS();
 		PixelShader = compile ps_3_0 FinalPS();
 	}
+	// -- composite 2(pre): downsize and prepare glow texture. 1/4 of original size (unused)
 	pass P4
 	{
 		cullmode = none;
@@ -1057,8 +972,9 @@ technique Default_Normal
 		VertexShader = compile vs_3_0 FinalQuadVS();
 		PixelShader = compile ps_3_0 GlowDownsizePS();
 	}
+	// FXAA
 	pass P5
-	{
+	{		
 		cullmode = none;
 		ZEnable = false;
 		ZWriteEnable = false;
@@ -1066,5 +982,17 @@ technique Default_Normal
 		AlphaBlendEnable = false;
 		VertexShader = compile vs_3_0 CompositeQuadVS();
 		PixelShader = compile ps_3_0 CompositeFXAA();
+	}
+
+	// Gaussianblur
+	pass P6
+	{		
+		cullmode = none;
+		ZEnable = false;
+		ZWriteEnable = false;
+		FogEnable = False;
+		AlphaBlendEnable = false;
+		VertexShader = compile vs_3_0 CompositeQuadVS();
+		PixelShader = compile ps_3_0 CompositGaussianblurPS();
 	}
 }

@@ -52,7 +52,7 @@ function finalEffect:OnRenderPostProcessing(ps_scene)
 		ParaEngine.StretchRect(old_rt, _ColorRT);
 
 		local params = effect:GetParamBlock();
-		params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
+
 		params:SetParam("screenParam", "vec2ScreenSize");
 			
 		params:SetParam("matView", "mat4View");
@@ -72,7 +72,6 @@ function finalEffect:OnRenderPostProcessing(ps_scene)
 			params:SetFloat("centerDepthSmooth", attr:GetField("CameraObjectDistance", 10));
 		end
 
-		params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
 		params:SetParam("cameraPosition", "vec3cameraPosition");
 		params:SetParam("sunDirection", "vec3SunDirection");
 		params:SetVector3("RenderOptions", 
@@ -85,7 +84,7 @@ function finalEffect:OnRenderPostProcessing(ps_scene)
 			-- entity and lighting texture
 			params:SetTextureObj(1, ParaAsset.LoadTexture("_BlockInfoRT", "_BlockInfoRT", 0));
 			-- shadow map
-			params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture_R32F", "_SMColorTexture_R32F", 0));
+			params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture", "_SMColorTexture", 0));
 			-- depth texture 
 			params:SetTextureObj(3, ParaAsset.LoadTexture("_DepthTexRT_R32F", "_DepthTexRT_R32F", 0));
 			-- normal texture 

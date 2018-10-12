@@ -76,7 +76,7 @@ function FancyV1:SetEnabled(bEnable)
 			ParaEngine.GetAttributeObject():SetField("MultiSampleType", 0);
 			ParaEngine.WriteConfigFile("config/config.txt");
 			LOG.std(nil, "info", "FancyV1", "MultiSampleType must be 0 in order to use deferred shading. We have set it for you. you must restart. ");
-			_guihelper.MessageBox("抗锯齿已经关闭, 请重启客户端");
+			_guihelper.MessageBox("抗锯齿已经关�??, 请重�??客户�??");
 		end
 	else
 		ParaTerrain.GetBlockAttributeObject():SetField("PostProcessingScript", "");
@@ -167,12 +167,10 @@ function FancyV1:OnRenderLite(ps_scene, nPass)
 			
 			local attr = ParaTerrain.GetBlockAttributeObject();
 			self:ComputeShaderUniforms();
-			params:SetParam("mShadowMapTex", "mat4ShadowMapTex");
 			params:SetParam("mShadowMapViewProj", "mat4ShadowMapViewProj");
 			params:SetParam("ShadowMapSize", "vec2ShadowMapSize");
 			params:SetParam("ShadowRadius", "floatShadowRadius");
 		
-			params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
 			params:SetParam("screenParam", "vec2ScreenSize");
 			params:SetParam("viewportOffset", "vec2ViewportOffset");
 			params:SetParam("viewportScale", "vec2ViewportScale");
@@ -192,10 +190,10 @@ function FancyV1:OnRenderLite(ps_scene, nPass)
 			local sunIntensity = attr:GetField("SunIntensity", 1);
 			params:SetFloat("sunIntensity", sunIntensity);
 		
-			params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
+
 			params:SetParam("cameraPosition", "vec3cameraPosition");
 			params:SetParam("sunDirection", "vec3SunDirection");
-			params:SetParam("sunAmbient", "vec3SunAmbient");
+
 
 			params:SetVector3("RenderOptions", 
 				if_else(attr:GetField("UseSunlightShadowMap", false),1,0), 
@@ -213,7 +211,7 @@ function FancyV1:OnRenderLite(ps_scene, nPass)
 				-- entity and lighting texture
 				params:SetTextureObj(1, ParaAsset.LoadTexture("_BlockInfoRT", "_BlockInfoRT", 0));
 				-- shadow map
-				params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture_R32F", "_SMColorTexture_R32F", 0));
+				params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture", "_SMColorTexture", 0));
 				-- depth texture 
 				params:SetTextureObj(3, ParaAsset.LoadTexture("_DepthTexRT_R32F", "_DepthTexRT_R32F", 0));
 				-- normal texture 
@@ -267,7 +265,8 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		local _ColorRT2 = ParaAsset.LoadTexture("_ColorRT2", "_ColorRT2", 0); 
 		local _HDRColorRT = ParaAsset.LoadTexture("_ColorRT_HDR", "_ColorRT_HDR", 0); 
 		local _HDRColorRT2 = ParaAsset.LoadTexture("_ColorRT2_HDR", "_ColorRT2_HDR", 0);
-		
+		local _HDRGaussianBlurRT = ParaAsset.LoadTexture("_GaussianBlur_HDR", "_GaussianBlur_HDR", 0);
+
 		local attr = ParaTerrain.GetBlockAttributeObject();
 		local params = effect:GetParamBlock();
 		self:ComputeShaderUniforms(true);
@@ -275,12 +274,10 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetFloat("timeMidnight", timeMidnight);
 		params:SetFloat("timeNoon", timeNoon);
 
-		params:SetParam("mShadowMapTex", "mat4ShadowMapTex");
 		params:SetParam("mShadowMapViewProj", "mat4ShadowMapViewProj");
 		params:SetParam("ShadowMapSize", "vec2ShadowMapSize");
 		params:SetParam("ShadowRadius", "floatShadowRadius");
 		
-		params:SetParam("gbufferProjectionInverse", "mat4ProjectionInverse");
 		params:SetParam("screenParam", "vec2ScreenSize");
 		params:SetParam("viewportOffset", "vec2ViewportOffset");
 		params:SetParam("viewportScale", "vec2ViewportScale");
@@ -288,17 +285,15 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetParam("matView", "mat4View");
 		params:SetParam("matViewInverse", "mat4ViewInverse");
 		params:SetParam("matProjection", "mat4Projection");
+		params:SetParam("matProjectionInverse", "mat4ProjectionInverse");
 		
 		params:SetParam("ViewAspect", "floatViewAspect");
 		params:SetParam("TanHalfFOV", "floatTanHalfFOV");
 		params:SetParam("cameraFarPlane", "floatCameraFarPlane");
 		
-		params:SetFloat("TimeOfDaySTD", timeOfDaySTD);
-
-		params:SetParam("gbufferWorldViewProjectionInverse", "mat4WorldViewProjectionInverse");
 		params:SetParam("cameraPosition", "vec3cameraPosition");
 		params:SetParam("sunDirection", "vec3SunDirection");
-		params:SetParam("sunAmbient", "vec3SunAmbient");
+
 		params:SetParam("g_FogColor", "vec3FogColor");
 
 		params:SetFloat("rainStrength", math.min(1, GameLogic.options:GetRainStrength()/10));
@@ -350,7 +345,7 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 				-- entity and lighting texture
 				params:SetTextureObj(1, ParaAsset.LoadTexture("_BlockInfoRT", "_BlockInfoRT", 0));
 				-- shadow map
-				params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture_R32F", "_SMColorTexture_R32F", 0));
+				params:SetTextureObj(2, ParaAsset.LoadTexture("_SMColorTexture", "_SMColorTexture", 0));
 				-- depth texture 
 				params:SetTextureObj(3, ParaAsset.LoadTexture("_DepthTexRT_R32F", "_DepthTexRT_R32F", 0));
 				-- normal texture 
@@ -381,20 +376,7 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 				-- Make sure the render target isn't still set as a source texture. this will prevent d3d warning in debug mode
 				effect:SetTexture(0, "");
 		
-				--[[
-				-- composite 2(pre): downsize and prepare glow texture. 1/4 of original size
-				local _GlowRT = ParaAsset.LoadTexture("_GlowRT_HDR", "_GlowRT_HDR", 0); 
-				_GlowRT:SetSize(_HDRColorRT:GetWidth()/4, _HDRColorRT:GetHeight()/4);
-				ParaEngine.SetRenderTarget(_GlowRT);
-				effect:BeginPass(4);
-					params:SetTextureObj(0, _HDRColorRT2);
-					effect:CommitChanges();
-					ParaEngine.DrawQuad();
-				effect:EndPass();
-				effect:SetTexture(0, "");
-				]]
-
-				-- composite 2: calculate bloom
+				-- composite 2.0: calculate bloom
 				ParaEngine.SetRenderTarget(_HDRColorRT);
 				effect:BeginPass(2);
 					-- params:SetTextureObj(0, _GlowRT);
@@ -402,6 +384,27 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 					effect:CommitChanges();
 					ParaEngine.DrawQuad();
 				effect:EndPass();
+
+				-- composite 2.1: bloom gaussian blur horizon
+				params:SetVector2("GaussianBlurOffset",1.3,0);
+				ParaEngine.SetRenderTarget(_HDRGaussianBlurRT);
+				effect:BeginPass(6);
+					params:SetTextureObj(0, _HDRColorRT);
+					effect:CommitChanges();
+					ParaEngine.DrawQuad();
+				effect:EndPass();
+
+				-- composite 2.2: bloom gaussian blur vertical
+				params:SetVector2("GaussianBlurOffset",0,1.5);
+
+				ParaEngine.SetRenderTarget(_HDRColorRT);
+				effect:BeginPass(6);
+					params:SetTextureObj(0, _HDRGaussianBlurRT);
+					effect:CommitChanges();
+					ParaEngine.DrawQuad();
+				effect:EndPass();
+
+
 			
 				-- Make sure the render target isn't still set as a source texture. this will prevent d3d warning in debug mode
 				effect:SetTexture(0, "");

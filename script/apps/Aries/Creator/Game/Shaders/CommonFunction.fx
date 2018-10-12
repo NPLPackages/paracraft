@@ -3,6 +3,10 @@
 
 #define SHADOW_BIAS 0.0025f
 
+float DecodeFloatRGBA( float4 rgba ) {
+  return dot( rgba, float4(1.0, 1/255.0, 1/65025.0, 1/16581375.0) );
+}
+
 float3 decodeNormal(float3 normal)
 {
 	return normal*2.0-1.0;
@@ -18,7 +22,7 @@ float calculateLightDiffuseFactor(float3 lightDirection,float3 normal)
 float getShadowFactor(sampler2D s,float2 uv,float testDepth,float shadowMapSize,float invShadowMapSize)
 {
 #ifdef HARDWARE_SHADOW_ENABLE
-	return tex2D(s,float3(uv,testDepth));
+	return DecodeFloatRGBA(tex2D(s,float3(uv,testDepth)));
 #else
 #ifdef PCF_SHADOW_ENABLE
 	// linear filtering the shadow map using 2*2 nearby texels to remove some aliasing
@@ -27,17 +31,17 @@ float getShadowFactor(sampler2D s,float2 uv,float testDepth,float shadowMapSize,
 	const float2 scalar=frac(uv_in_texel_f);
 	float2 uv0=uv_in_texel_i*invShadowMapSize;
 	float2 uv1=(uv_in_texel_i+float2(1,0))*invShadowMapSize;
-	float shadow0=tex2D(s,uv0).r>=testDepth?1:0;
-	float shadow1=tex2D(s,uv1).r>=testDepth?1:0;
+	float shadow0=DecodeFloatRGBA(tex2D(s,uv0))>=testDepth?1:0;
+	float shadow1=DecodeFloatRGBA(tex2D(s,uv1))>=testDepth?1:0;
 	float shadow_up=lerp(shadow0,shadow1,scalar.x);
 	uv0=(uv_in_texel_i+float2(0,1))*invShadowMapSize;
 	uv1=(uv_in_texel_i+1)*invShadowMapSize;
-	shadow0=tex2D(s,uv0).r>=testDepth?1:0;
-	shadow1=tex2D(s,uv1).r>=testDepth?1:0;
+	shadow0=DecodeFloatRGBA(tex2D(s,uv0))>=testDepth?1:0;
+	shadow1=DecodeFloatRGBA(tex2D(s,uv1))>=testDepth?1:0;
 	float shadow_down=lerp(shadow0,shadow1,scalar.x);
 	return lerp(shadow_up,shadow_down,scalar.y);
 #else
-	float shadow_depth=tex2D(s,uv).r;
+	float shadow_depth=DecodeFloatRGBA(tex2D(s,uv));
 	float shadow=shadow_depth>=testDepth?1:0;;
 	return shadow;
 #endif
@@ -54,7 +58,7 @@ float calculatefadeShadowFactor(float viewDepth,float shadowRadius)
 float calculateShadowFactor(sampler2D s,float4 worldPosition,float viewDepth,float4x4 shadowMatrix, float4x4 shadowViewProjMatrix,float shadowMapSize,float invShadowMapSize,float shadowRadius)
 {
 	const float4 vPosShadowSpace = mul(worldPosition, shadowViewProjMatrix);
-	const float4 vShadowMapCoord = mul(worldPosition, shadowMatrix);
+	const float4 vShadowMapCoord =  vPosShadowSpace/vPosShadowSpace.w * 0.5 + 0.5;
 
 	if (viewDepth < shadowRadius && vPosShadowSpace.z > 0
 		//Avoid computing shadows past the shadow map projection
@@ -64,7 +68,7 @@ float calculateShadowFactor(sampler2D s,float4 worldPosition,float viewDepth,flo
 		*/)
 	{
 		const float shadow_test_depth = vShadowMapCoord.z - SHADOW_BIAS;
-		const float2 uv = vShadowMapCoord.xy / vShadowMapCoord.w;
+		const float2 uv = float2(vShadowMapCoord.x,1-vShadowMapCoord.y);
 #ifdef SOFT_SHADOW_ENABLE
 		float ret = 0;
 		for (float i = -1.0f; i <= 1.0f; i += 1.0f)
@@ -209,4 +213,13 @@ float3 gammaCorrectRead(float3 rgb)
 float3 gammaCorrectWrite(float3 rgb)
 {
 	return pow(rgb,1.0/2.2);
+}
+
+
+float3 DepthToPosition(float iDepth,float4 iPosProj,float4x4 mProjInv)
+{
+    float3 vPosView = mul(iPosProj, mProjInv).xyz;
+    float3 vViewRay = float3(vPosView.xy, 1);
+    float3 vPosition = vViewRay * iDepth;
+    return vPosition;
 }

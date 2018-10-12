@@ -1,0 +1,10 @@
+fxc /Tfx_2_0 /Fo composite.fxo composite.fx
+fxc /Tfx_2_0 /Fo compositeLite.fxo compositeLite.fx
+fxc /Tfx_2_0 /Fo final.fxo final.fx
+fxc /Tfx_2_0 /Fo Grey.fxo Grey.fx
+fxc /Tfx_2_0 /Fo GreyBlur.fxo GreyBlur.fx
+fxc /Tfx_2_0 /Fo mrt_blocks.fxo mrt_blocks.fx
+fxc /Tfx_2_0 /Fo mrt_bmax_model.fxo mrt_bmax_model.fx
+fxc /Tfx_2_0 /Fo mrt_mesh_normal.fxo mrt_mesh_normal.fx
+fxc /Tfx_2_0 /Fo mrt_terrain_normal.fxo mrt_terrain_normal.fx
+fxc /Tfx_2_0 /Fo RedBlueStereo.fxo RedBlueStereo.fx

@@ -5,7 +5,7 @@ Date: 2016.8.18
 Desc: convert from left/right eye image to red/blue stereo image 
 */
 
-texture sourceTexture0;
+texture sourceTexture0: TEXTURE0;
 sampler leftSampler:register(s0) = sampler_state
 {
     Texture = <sourceTexture0>;
@@ -15,7 +15,7 @@ sampler leftSampler:register(s0) = sampler_state
     AddressV = clamp;
 };
 
-texture sourceTexture1;
+texture sourceTexture1: TEXTURE1;
 sampler rightSampler:register(s1) = sampler_state
 {
 	Texture = <sourceTexture1>;

@@ -15,6 +15,8 @@ float3 sun_vec: sunvector;
 float3	colorDiffuse:materialdiffuse;
 float3	colorAmbient:ambientlight;
 float3	colorEmissive:materialemissive = float3(0,0,0);
+// fov,near,far,aspect
+float4 ProjectionParams : ProjectionParams;
 
 ////////////////////////////////////////////////////////////////////////////////
 // per technique parameters
@@ -33,7 +35,7 @@ float2 g_CategoryID		:ConstVector1;
 float g_opacity			:opacity = 1.0; 
 
 // texture 0
-texture tex0 : TEXTURE; 
+texture tex0 : TEXTURE0; 
 sampler tex0Sampler : register(s0) = sampler_state 
 {
     texture = <tex0>;
@@ -58,6 +60,16 @@ struct BlockPSOut
 	float4 Normal : COLOR3; 
 };
 
+
+
+float4 EncodeFloatRGBA( float v ) {
+  float4 enc = float4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = frac(enc);
+  enc -= enc.yzww * float4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //                              Vertex Shader
@@ -71,14 +83,13 @@ Interpolants vertexShader(	float4	Pos			: POSITION,
 	Interpolants o = (Interpolants)0;
 	// screen space position
 	o.positionSS = 	mul(Pos, mWorldViewProj);
-	// camera space position
-	float4 cameraPos = mul( Pos, mWorldView ); 
 	// world space normal
 	float3 worldNormal = normalize( mul( Norm, (float3x3)mWorld ) ); 
 	o.normal.xyz = worldNormal*0.5+0.5;
 	
 	// depth value
-	o.normal.a = cameraPos.z;
+	float4 cameraPos = mul( Pos, mWorldView ); 
+	o.normal.w = cameraPos.z / ProjectionParams.z;
 
 	o.tex.xy = Tex+g_TexAnim.xy;
 	o.tex.zw = Tex;
@@ -108,8 +119,7 @@ BlockPSOut pixelShader(Interpolants i)
 	}
 
 	o = normalColor;
-	o.rgb = o.rgb * colorDiffuse;
-
+	
 	o.rgb += colorEmissive;
 	o.w *= g_opacity;
 	
@@ -118,7 +128,7 @@ BlockPSOut pixelShader(Interpolants i)
 	if (g_CategoryID.x > 0)
 		category = g_CategoryID.x / 256.0;
 	output.BlockInfo = float4(category, BlockLightStrength.x, BlockLightStrength.y, 1);
-	output.Depth = float4(i.normal.a, 0, 0, 1);
+	output.Depth = float4(i.normal.w, 0, 0, 1);
 	output.Normal = float4(i.normal.xyz, 1);
 	return output;
 }
@@ -149,8 +159,7 @@ float4 PixShadow( float4	inTex		: TEXCOORD0) : COLOR
 		// alpha testing
 		clip(alpha - ALPHA_TESTING_REF);
 	}
-	// return float4(inTex.z/inTex.w, 0, 0, 1);
-	return float4(inTex.z, 0, 0, 1); // inTex.w is 1 anyway
+	return EncodeFloatRGBA(inTex.z/inTex.w*0.5+0.5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

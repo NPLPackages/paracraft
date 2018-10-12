@@ -27,6 +27,8 @@ float3	colorDiffuse:materialdiffuse;
 float3	colorAmbient:ambientlight;
 
 float3 g_EyePositionW	:worldcamerapos;
+// fov,near,far,aspect
+float4 ProjectionParams : ProjectionParams;
 
 //int		g_nLights		:	locallightnum;
 //float4	g_lightcolor0	:	LightColor0;
@@ -45,7 +47,7 @@ float2	g_shadwoFactor :shadowfactor = float2(0.35,0.65);
 
 
 // texture 0
-texture AlphaTex0 : TEXTURE; 
+texture AlphaTex0 : TEXTURE0; 
 sampler AlphaTex0Sampler : register(s0) = sampler_state 
 {
     texture = <AlphaTex0>;
@@ -57,7 +59,7 @@ sampler AlphaTex0Sampler : register(s0) = sampler_state
 };
 
 // texture 1
-texture DetailTex1 : TEXTURE; 
+texture DetailTex1 : TEXTURE1; 
 sampler DetailTex1Sampler: register(s1) = sampler_state 
 {
     texture = <DetailTex1>;
@@ -69,7 +71,7 @@ sampler DetailTex1Sampler: register(s1) = sampler_state
 };
 
 // texture 2
-texture ShadowMap2 : TEXTURE; 
+texture ShadowMap2 : TEXTURE2; 
 sampler ShadowMapSampler: register(s2) = sampler_state 
 {
     texture = <ShadowMap2>;
@@ -82,7 +84,7 @@ sampler ShadowMapSampler: register(s2) = sampler_state
 };
 
 // texture 3
-texture AlphaTex3 : TEXTURE; 
+texture AlphaTex3 : TEXTURE3; 
 sampler AlphaTex3Sampler : register(s3)= sampler_state 
 {
     texture = <AlphaTex3>;
@@ -94,7 +96,7 @@ sampler AlphaTex3Sampler : register(s3)= sampler_state
 };
 
 // texture 4
-texture DetailTex4 : TEXTURE; 
+texture DetailTex4 : TEXTURE4; 
 sampler DetailTex4Sampler : register(s4)= sampler_state 
 {
     texture = <DetailTex4>;
@@ -106,7 +108,7 @@ sampler DetailTex4Sampler : register(s4)= sampler_state
 };
 
 // texture 5
-texture AlphaTex5 : TEXTURE; 
+texture AlphaTex5 : TEXTURE5; 
 sampler AlphaTex5Sampler : register(s5)= sampler_state 
 {
     texture = <AlphaTex5>;
@@ -118,7 +120,7 @@ sampler AlphaTex5Sampler : register(s5)= sampler_state
 };
 
 // texture 6
-texture DetailTex6 : TEXTURE; 
+texture DetailTex6 : TEXTURE6; 
 sampler DetailTex6Sampler : register(s6)= sampler_state 
 {
     texture = <DetailTex6>;
@@ -129,7 +131,7 @@ sampler DetailTex6Sampler : register(s6)= sampler_state
     AddressV  = wrap;
 };
 // texture 7
-texture BaseTex7 : TEXTURE; 
+texture BaseTex7 : TEXTURE7; 
 sampler BaseTex7Sampler : register(s7)= sampler_state 
 {
 	texture = <BaseTex7>;
@@ -146,7 +148,7 @@ struct Interpolants
   float2 tex0				: TEXCOORD0;        // texture coordinates
   float3 tex1				: TEXCOORD1;        // texture coordinates
   float4 colorDiffuse		: TEXCOORD2;				// diffuse color
-  float3 normal   : TEXCOORD3;
+  float3 normal   			: TEXCOORD3;
 };
 
 struct BlockPSOut
@@ -160,6 +162,15 @@ struct BlockPSOut
 	// xyz is normal. can be (0,0,0) if no normal is used. 
 	float4 Normal : COLOR3; 
 };
+
+
+
+float4 EncodeFloatRGBA( float v ) {
+  float4 enc = float4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = frac(enc);
+  enc -= enc.yzww * float4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,8 +187,6 @@ Interpolants vertexShader(	float4	Pos			: POSITION,
 	Pos.xyz += g_vertexOffset;
 	// screen space position
 	o.positionSS = 	mul(Pos, mWorldViewProj);
-	// camera space position
-	float4 cameraPos = mul( Pos, mWorldView ); 
 	// world space normal
 	//float3 worldNormal = normalize( mul( Norm, (float3x3)mWorld ) ); 
 	float3 worldNormal = normalize( Norm);
@@ -204,7 +213,9 @@ Interpolants vertexShader(	float4	Pos			: POSITION,
 	
 	o.tex0.xy = Tex0;
     o.tex1.xy = Tex1;
-	o.tex1.z = cameraPos.z;
+	// depth value
+	float4 cameraPos = mul( Pos, mWorldView ); 
+	o.tex1.z = cameraPos.z / ProjectionParams.z;
 	return o;
 }
 
@@ -216,9 +227,7 @@ Interpolants vertexShader_NoNormal(	float4	Pos			: POSITION,
 	Pos.xyz += g_vertexOffset;
 	// screen space position
 	o.positionSS = 	mul(Pos, mWorldViewProj);
-	// camera space position
-	float4 cameraPos = mul( Pos, mWorldView ); 
-	
+
 	// calculate light of the sun
 	if(g_bEnableSunLight)
 	{
@@ -233,7 +242,9 @@ Interpolants vertexShader_NoNormal(	float4	Pos			: POSITION,
 
 	o.tex0.xy = Tex0;
     o.tex1.xy = Tex1;
-	o.tex1.z = cameraPos.z;
+	// depth value
+	float4 cameraPos = mul( Pos, mWorldView ); 
+	o.tex1.z = cameraPos.z / ProjectionParams.z;
 	o.normal = float3(0,0,0);
    
 	return o;
@@ -301,7 +312,7 @@ BlockPSOut pixelShader(Interpolants i)
 	output.Color = normalColor;
 	
 	output.BlockInfo = float4(1, 1, 0, 1);
-	output.Depth = float4(i.tex1.z, 0, 0, 1);
+	output.Depth = float4( i.tex1.z, 0, 0, 1);
 	output.Normal = float4(i.normal.xyz, 1);
 	return output;
 }
@@ -349,7 +360,7 @@ void VertShadow( float4	Pos			: POSITION,
 
 float4 PixShadow( float4	inTex	: TEXCOORD0) : COLOR
 {
-	return float4(inTex.z/inTex.w, 0, 0, 1);
+	return EncodeFloatRGBA(inTex.z/inTex.w*0.5+0.5);
 	// forcing 1 to disable terrain to cast shadows
 	// return float4(1, 0, 0, 1);
 }

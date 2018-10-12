@@ -7,7 +7,7 @@ Desc: for blurring the background 3d scene to focus on front end UI.
 float2 screenParam = float2(512, 512);
 float4x4 colorMatrix;
 
-texture sourceTexture0;
+texture sourceTexture0: TEXTURE0;
 sampler sourceSpl:register(s0) = sampler_state
 {
     Texture = <sourceTexture0>;

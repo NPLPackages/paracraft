@@ -9,7 +9,7 @@ float3 colorHSVAdd = float3(0,0,0);
 //float3 colorHSVMultiply = float3(1, 1, 1);
 float3 colorMultiply = float3(1, 1, 1);
 
-texture sourceTexture0;
+texture sourceTexture0 : TEXTURE0;
 sampler sourceSpl:register(s0) = sampler_state
 {
     Texture = <sourceTexture0>;

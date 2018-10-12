@@ -35,6 +35,7 @@
 //  Per frame parameters
 float4x4 mWorldViewProj : worldviewprojection;
 float4x4 mWorldView : worldview;
+float4x4 mViewProj : viewprojection;
 
 // for selection effect: light_params.x: sun_lightIntensity, light_params.y: damageDegree
 // for block effect: light_params.xyz: light color, light_params.w light intensity
@@ -45,8 +46,11 @@ float4 vWorldPos		: worldpos;
 // x for world time, y for rainStrength,
 float4 g_parameter0		: ConstVector1; 
 
+// fov,near,far,aspect
+float4 ProjectionParams : ProjectionParams;
+
 // texture 0
-texture tex0 : TEXTURE; 
+texture tex0 : TEXTURE0; 
 sampler tex0Sampler: register(s0) = sampler_state 
 {
 	Texture = <tex0>;
@@ -56,14 +60,14 @@ sampler tex0Sampler: register(s0) = sampler_state
 };
 
 // texture 1
-texture tex1 : TEXTURE; 
+texture tex1 : TEXTURE1; 
 sampler tex1Sampler: register(s1) = sampler_state 
 {
 	Texture = <tex1>;
 };
 
 // normal map
-texture tex2 : TEXTURE; 
+texture tex2 : TEXTURE2; 
 sampler normalSampler = sampler_state 
 {
     texture = <tex2>;
@@ -80,7 +84,7 @@ struct BasicBlockVSOut
 	float2 texcoord : TEXCOORD0;
 	float3 normal   : TEXCOORD1;
 	float4 color : COLOR0;
-	float4 depth : COLOR1;
+	float4 block : COLOR1;
 };
 
 struct SelectBlockVertexLayout
@@ -106,6 +110,13 @@ struct BlockPSOut
 	// xyz is normal. can be (0,0,0) if no normal is used. 
 	float4 Normal : COLOR3; 
 };
+
+float4 EncodeFloatRGBA( float v ) {
+  float4 enc = float4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = frac(enc);
+  enc -= enc.yzww * float4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,14 +148,16 @@ BasicBlockVSOut BasicBlockVS(	float4 position	: POSITION,
 	output.color.w = 1;
 
 	// block category id
-	output.depth.r = color.z;
+	output.block.r = color.z;
 	// torch light value
-	output.depth.g = sun_light_strength;
+	output.block.g = sun_light_strength;
 	// sun light value
-	output.depth.b = torch_light_strength;
+	output.block.b = torch_light_strength;
+
 	// view space linear depth value
 	float4 viewPos = mul(position, mWorldView);
-	output.depth.a = viewPos.z;
+	output.block.a = viewPos.z / ProjectionParams.z;
+
 	return output;
 }
 
@@ -153,8 +166,8 @@ BlockPSOut BasicBlockPS(BasicBlockVSOut input)
 	BlockPSOut o;
 	float4 albedoColor = tex2D(tex0Sampler,input.texcoord);
 	o.Color = albedoColor * input.color;
-	o.BlockInfo = float4(input.depth.rgb, 1);
-	o.Depth = float4(input.depth.a,0,0,1);
+	o.BlockInfo = float4(input.block.rgb, 1);
+	o.Depth = float4(input.block.a,0,0,1);
 	o.Normal = float4(input.normal.xyz, 1.0);
 	return o;
 }
@@ -240,16 +253,14 @@ BasicBlockVSOut TransparentEntityVS(	float4 position	: POSITION,
 	output.color.w = 1;
 
 	// block id
-	output.depth.r = color.z; 
+	output.block.r = color.z; 
 	// torch light value
-	output.depth.g = sun_light_strength;
+	output.block.g = sun_light_strength;
 	// sun light value
-	output.depth.b = torch_light_strength;
-	// depth value
-	// output.depth.a = output.pos.z / output.pos.w;
+	output.block.b = torch_light_strength;
+	// view space linear depth value
 	float4 viewPos = mul(position, mWorldView);
-	output.depth.a = viewPos.z;
-
+	output.block.a = viewPos.z / ProjectionParams.z;
 	return output;
 }
 
@@ -259,8 +270,8 @@ BlockPSOut TransparentEntityPS(BasicBlockVSOut input)
 	float4 albedoColor = tex2D(tex0Sampler,input.texcoord);
 	clip(albedoColor.w-ALPHA_TESTING_REF);
 	o.Color = albedoColor * input.color;
-	o.BlockInfo = float4(input.depth.rgb, 1);
-	o.Depth = float4(input.depth.a,0,0,1);
+	o.BlockInfo = float4(input.block.rgb, 1);
+	o.Depth = float4(input.block.a,0,0,1);
 	o.Normal = float4(input.normal.xyz, 1);
 	return o;
 }
@@ -310,7 +321,7 @@ struct WaterBlockVSOut
 	float4 pos		: POSITION;
 	float4 texcoord : TEXCOORD0;
 	float4 color : COLOR0;
-	float4 depth : COLOR1;
+	float4 block : COLOR1;
 	float4 position : COLOR2;
 	float3 normal:COLOR3;
 };
@@ -370,16 +381,14 @@ WaterBlockVSOut WaterVS(	float4 position	: POSITION,
 	output.color.w = 1;
 
 	// block id
-	output.depth.r = color.z; 
+	output.block.r = color.z; 
 	// torch light value
-	output.depth.g = sun_light_strength;
+	output.block.g = sun_light_strength;
 	// sun light value
-	output.depth.b = torch_light_strength;
-	// depth value
-	// output.depth.a = output.pos.z / output.pos.w;
+	output.block.b = torch_light_strength;
+	// view space linear depth value
 	float4 viewPos = mul(position, mWorldView);
-	output.depth.a = viewPos.z;
-
+	output.block.a = viewPos.z / ProjectionParams.z;
 	return output;
 }
 
@@ -388,8 +397,8 @@ BlockPSOut WaterPS(WaterBlockVSOut input)
 	BlockPSOut o;
 	float4 albedoColor = tex2D(tex0Sampler,input.texcoord.xy);
 	o.Color = albedoColor * input.color;
-	o.BlockInfo = float4(input.depth.rgb, 1);
-	o.Depth = float4(input.depth.a,0,0,1);
+	o.BlockInfo = float4(input.block.rgb, 1);
+	o.Depth = float4(input.block.a,0,0,1);
 
 #ifdef WATER_USEBUMPMAP
 	float3 normal = input.normal.xyz*2-1;
@@ -416,7 +425,7 @@ struct BumpBlockVSOut
 	float3 tangent  : TEXCOORD2;
 	float3 binormal : TEXCOORD3;
 	float4 color : COLOR0;
-	float4 depth : COLOR1;
+	float4 block : COLOR1;
 };
 
 BumpBlockVSOut BumpBlockVS(float4 position	: POSITION,
@@ -445,14 +454,15 @@ BumpBlockVSOut BumpBlockVS(float4 position	: POSITION,
 	output.color.w = 1;
 
 	// block category id
-	output.depth.r = color.z;
+	output.block.r = color.z;
 	// torch light value
-	output.depth.g = sun_light_strength;
+	output.block.g = sun_light_strength;
 	// sun light value
-	output.depth.b = torch_light_strength;
+	output.block.b = torch_light_strength;
+	
 	// view space linear depth value
 	float4 viewPos = mul(position, mWorldView);
-	output.depth.a = viewPos.z;
+	output.block.a = viewPos.z / ProjectionParams.z;
 
 	float3 binormal;
 	float3 tangent;
@@ -497,8 +507,8 @@ BlockPSOut BumpBlockPS(BumpBlockVSOut input)
 	BlockPSOut o;
 	float4 albedoColor = tex2D(tex0Sampler, input.texcoord);
 	o.Color = albedoColor * input.color;
-	o.BlockInfo = float4(input.depth.rgb, 1);
-	o.Depth = float4(input.depth.a, 0, 0, 1);
+	o.BlockInfo = float4(input.block.rgb, 1);
+	o.Depth = float4(input.block.a, 0, 0, 1);
 
 	float3 normal = input.normal.xyz;
 	// tagent to world space row major matrix
@@ -538,10 +548,8 @@ float4 PixShadow( float4	inTex		: TEXCOORD0) : COLOR
 	half alpha = tex2D(tex0Sampler, inTex.xy).w;
 	// alpha testing
 	clip(alpha-ALPHA_TESTING_REF);
-	
-    //return float4(inTex.z/inTex.w, 0, 0, 1);
-	return float4(inTex.z, 0, 0, 1); // inTex.w is 1 anyway
-	// return float4(0.5, 0, 0, 1);
+	float d = (inTex.z / inTex.w) * 0.5 + 0.5;
+	return EncodeFloatRGBA(d);
 }
 
 technique SimpleMesh_vs30_ps30

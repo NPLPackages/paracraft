@@ -13,12 +13,14 @@ float3	colorAmbient:ambientlight;
 /** x is sun light strength, y is block light strength. */
 float3	BlockLightStrength: LightStrength;
 float g_opacity : opacity = 1.0;
+// fov,near,far,aspect
+float4 ProjectionParams : ProjectionParams;
 
 struct VSOut
 {
-	float4 pos	:POSITION;
-	float4 color			: TEXCOORD0;		// diffuse color
-	float3 normal				: TEXCOORD1;		// diffuse color
+	float4 pos		: POSITION;
+	float4 color	: TEXCOORD0;
+	float3 normal	: TEXCOORD1;
 };
 
 VSOut MainVS(float4 pos		: POSITION,
@@ -28,17 +30,16 @@ VSOut MainVS(float4 pos		: POSITION,
 {
 	VSOut output;
 	output.pos = mul(pos, mWorldViewProj);
-	// camera space position
-	float4 cameraPos = mul(pos, mWorldView);
 
 	// world space normal
 	float3 worldNormal = normalize(mul(Norm, (float3x3)mWorld));
 	output.normal = worldNormal*0.5 + 0.5;
 
-	output.color.xyz = color.rgb * colorDiffuse;
-
-	// calculate the fog factor
-	output.color.w = cameraPos.z;
+	output.color.xyz = color.rgb;
+	
+	// camera space position
+	float4 cameraPos = mul(pos, mWorldView);
+	output.color.w = cameraPos.z / ProjectionParams.z;
 	return output;
 }
 
@@ -58,10 +59,21 @@ BlockPSOut MainPS(VSOut input)
 	BlockPSOut output;
 	output.Color = float4(input.color.rgb, g_opacity);
 	output.BlockInfo = float4(1, BlockLightStrength.x, BlockLightStrength.y, 1);
-	output.Depth = float4(input.color.w, 0, 0, 1);
+	output.Depth = float4(input.color.a, 0, 0, 1);
 	output.Normal = float4(input.normal.xyz, 1);
 	return output;
 }
+
+
+
+float4 EncodeFloatRGBA( float v ) {
+  float4 enc = float4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = frac(enc);
+  enc -= enc.yzww * float4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -81,7 +93,7 @@ out float2 Depth : TEXCOORD1)
 
 float4 PixShadow(float2 Depth : TEXCOORD1) : COLOR
 {
-	return float4(Depth.x, 0.0, 0.0, 1.0);
+	return EncodeFloatRGBA((Depth.x/Depth.y) *0.5+0.5);
 }
 
 technique SimpleMesh_vs20_ps20
