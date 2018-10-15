@@ -111,7 +111,9 @@ function AutoSaver:OnLeaveWorld()
 	if(self:IsSaveMode()) then
 		-- TODO: shall we save on leave, currently this is done manually by external logics. 
 	end
-	self.timer:Change();
+	if(self.timer) then
+		self.timer:Change();
+	end
 	-- always revert to tip mode, this is safer
 	self:SetTipMode(); 
 end

@@ -14,6 +14,7 @@ local lesson = ParaWorldLesson:new():Init(id, url, content)
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
 
 function ParaWorldLesson:ctor()
+	self.finishedQuizCount = 0;
 end
 
 -- @param id: class or lesson id
@@ -23,6 +24,7 @@ function ParaWorldLesson:Init(id, lessonUrl, content)
 	self.id = id;
 	self.lessonUrl = lessonUrl;
 	self.content = content;
+	self.startTime = commonlib.TimerManager.GetCurrentTime();
 	return self;
 end
 
@@ -58,4 +60,42 @@ function ParaWorldLesson:OpenLessonUrl()
 	if(self.lessonUrl) then
 		ParaGlobal.ShellExecute("open", self.lessonUrl, "", "", 1)
 	end
+end
+
+function ParaWorldLesson:GetElapsedTime()
+	return commonlib.TimerManager.GetCurrentTime() - self.startTime;
+end
+
+function ParaWorldLesson:GetAllQuizes()
+	if(not self.quizes) then
+		self.quizes = {};
+		NPL.load("(gl)script/ide/System/Util/tinyyaml.lua");
+		local tinyyaml = commonlib.gettable("System.Util.tinyyaml");
+		for quiz in self.content:gmatch("\n```@[Qq]uiz([^`]+)") do
+			local docs = tinyyaml.parse(quiz);
+			if(docs and docs.quiz) then
+				self.quizes[#self.quizes+1] = docs.quiz;
+			end
+		end
+		-- echo(self.quizes)
+	end
+	return self.quizes;
+end
+
+function ParaWorldLesson:GetQuizCount()
+	return #(self:GetAllQuizes());
+end
+
+-- @param index: if nil, it will be the next quiz
+function ParaWorldLesson:ShowQuiz(index)
+end
+
+function ParaWorldLesson:SubmitAnswers()
+end
+
+function ParaWorldLesson:IsFinished()
+end
+
+function ParaWorldLesson:GetFinishedQuizCount()
+	return self.finishedCount;
 end

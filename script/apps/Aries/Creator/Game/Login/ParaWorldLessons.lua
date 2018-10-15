@@ -12,10 +12,13 @@ ParaWorldLessons.CheckShowOnStartup(callbackFunc)
 ParaWorldLessons.ShowPage()
 ParaWorldLessons.EnterWorldById("2x27")
 ParaWorldLessons.EnterWorldById("12345678")
+local lesson = ParaWorldLessons.GetCurrentLesson()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
 NPL.load("(gl)script/ide/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
+local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
 
@@ -178,6 +181,9 @@ function ParaWorldLessons.StaticInit()
 		return;
 	end
 	ParaWorldLessons.inited = true;
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	GameLogic.GetFilters():add_filter("OnWorldLoaded", ParaWorldLessons.OnWorldLoaded);
 end
 
 -- init function. page script fresh is set to false.
@@ -310,6 +316,7 @@ end
 function ParaWorldLessons.OpenCurrentLessonUrl()
 	if(ParaWorldLessons.GetCurrentLesson()) then
 		ParaWorldLessons.GetCurrentLesson():OpenLessonUrl()
+		TeacherAgent:ShowTipText();
 	end
 end
 
@@ -321,74 +328,138 @@ function ParaWorldLessons.GetCurrentLesson()
 	return ParaWorldLessons.curLesson;
 end
 
+-- @param callback: function(err, msg, data)
+function ParaWorldLessons.UrlRequest(url, method, params, callback)
+	if(not ParaWorldLessons.isFetching) then
+		ParaWorldLessons.isFetching = true;
+		local Store = NPL.load('(gl)Mod/WorldShare/store/Store.lua')
+		local token = Store:get('user/token')
+		local params_ = {
+			url = url,
+			method = method or 'GET',
+			json = true,
+			form = params
+		}
+		if(token) then
+			params_.headers= { Authorization = format("Bearer %s", token) }
+		end
+	
+		System.os.GetUrl(params_, function(...)
+			ParaWorldLessons.isFetching = false;
+			callback(...)
+		end)
+	end
+end
+
+function ParaWorldLessons.EnterClassImp(classId)
+	local url = "https://api.keepwork.com/lesson/v0/classrooms/join"
+	ParaWorldLessons.UrlRequest(url, "POST", {key=tostring(classId)}, function(err, msg, data)
+		if(err ~= 200) then
+			LOG.std(nil, "info", "ParaWorldLessons", "failed to join class %d: err: %d", classId, err);
+			echo(msg)
+			_guihelper.MessageBox(format(L"无法加入课堂. 错误码: %d", err))
+			return
+		end
+		if(data and data.lessonId) then
+			-- {lessonId=27,id=850,extra={},state=0,createdAt="2018-10-13T15:23:38.000Z",updatedAt="2018-10-13T15:23:38.000Z",classroomId=38,userId=1,packageId=8,}
+			LOG.std(nil, "info", "ParaWorldLessons JoinClass", data);
+			ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId);
+		end
+	end)	
+end
+
+function ParaWorldLessons.EnterLessonImp(packageId, lessonId)
+	local lessonUrl = format("https://keepwork.com/l/#/student/package/%d/lesson/%d", packageId, lessonId)
+	local contentAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d/contents", lessonId)
+
+	ParaWorldLessons.UrlRequest(contentAPIUrl, "GET", nil, function(err, msg, data)
+		if(data and data.content) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
+			local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
+			local lesson = ParaWorldLesson:new():Init(lessonId, lessonUrl, data.content)
+			ParaWorldLessons.SetCurrentLesson(lesson);
+
+			local worldUrl = lesson:GetFirstWorldUrl()
+			if(worldUrl) then
+				LOG.std(nil, "info", "ParaWorldLessons", "try entering world %s", worldUrl);
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
+				local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+				DownloadWorld.ShowPage(worldUrl);
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
+				local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld");
+				local world =RemoteWorld.LoadFromHref(worldUrl, "self");
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+				local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+				InternetLoadWorld.LoadWorld(world, nil, nil, function(bSucceed, localWorldPath)
+					DownloadWorld.Close();
+					if(bSucceed) then
+						if(ParaWorldLessons.page) then
+							ParaWorldLessons.page:CloseWindow();
+							if(ParaWorldLessons.onCloseCallback) then
+								ParaWorldLessons.onCloseCallback(true);
+							end
+						end
+						if(callbackFunc) then
+							callbackFunc(true);
+						end
+					end
+				end)
+			else
+				-- there is no associated world, we will just open the web url
+				LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with %s", lessonUrl);
+				ParaWorldLessons.OpenCurrentLessonUrl()
+			end
+		else
+			_guihelper.MessageBox(format(L"没有找到课程%d", lessonId));
+			LOG.std(nil, "warn", "ParaWorldLessons", "failed to fetch lesson from %s", contentAPIUrl);
+			echo(msg);
+		end
+	end);
+end
+
 -- @param id: a string of class id or lesson id. 
 -- @param callbackFunc: function(bBeginLesson) end
 -- @return true if we have processed the world id
 function ParaWorldLessons.EnterWorldById(id, callbackFunc)
+	ParaWorldLessons.StaticInit()
 	id = tostring(id);
+	id = id:gsub("%s", "");
 	local classId = id:match("^(%d+)$");
 	local packageId, lessonId = id:match("^(%d+)[%D](%d+)$");
 	if(classId) then
 		classId = tonumber(classId);
+
+		local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
+		if(LoginMain.IsSignedIn()) then
+			ParaWorldLessons.EnterClassImp(classId);
+		else
+			LoginMain.ShowLoginModal(function()
+				ParaWorldLessons.EnterClassImp(classId);
+			end);
+		end
 		return true;
 	elseif(packageId and lessonId) then
 		packageId = tonumber(packageId);
 		lessonId = tonumber(lessonId);
-		local lessonUrl = format("https://keepwork.com/l/#/student/package/%d/lesson/%d", packageId, lessonId)
-		local contentAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d/contents", lessonId)
-
-		if(not ParaWorldLessons.isFetching) then
-			ParaWorldLessons.isFetching = true;
-			System.os.GetUrl(contentAPIUrl, function(err, msg, data)
-				if(data and data.content) then
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
-					local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
-					local lesson = ParaWorldLesson:new():Init(lessonId, lessonUrl, data.content)
-					ParaWorldLessons.SetCurrentLesson(lesson);
-
-					local worldUrl = lesson:GetFirstWorldUrl()
-					if(worldUrl) then
-						LOG.std(nil, "info", "ParaWorldLessons", "try entering world %s", worldUrl);
-
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
-						local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
-						DownloadWorld.ShowPage(worldUrl);
-
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
-						local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld");
-						local world =RemoteWorld.LoadFromHref(worldUrl, "self");
-
-						ParaWorldLessons.OpenCurrentLessonUrl()
-
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
-						local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
-						InternetLoadWorld.LoadWorld(world, nil, nil, function(bSucceed, localWorldPath)
-							DownloadWorld.Close();
-							if(bSucceed) then
-								if(ParaWorldLessons.page) then
-									ParaWorldLessons.page:CloseWindow();
-									if(ParaWorldLessons.onCloseCallback) then
-										ParaWorldLessons.onCloseCallback(true);
-									end
-								end
-								if(callbackFunc) then
-									callbackFunc(true);
-								end
-							end
-						end)
-					else
-						-- there is no associated world, we will just open the web url
-						LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with %s", lessonUrl);
-						ParaWorldLessons.OpenCurrentLessonUrl()
-					end
-				else
-					_guihelper.MessageBox(format(L"没有找到课程%d", lessonId));
-					LOG.std(nil, "warn", "ParaWorldLessons", "failed to fetch lesson from %s", contentAPIUrl);
-					echo(msg);
-				end
-				ParaWorldLessons.isFetching = false;
-			end);
-		end
+		ParaWorldLessons.EnterLessonImp(packageId, lessonId);
 		return true;
+	end
+end
+
+function ParaWorldLessons.OnWorldLoaded()
+	local lesson = ParaWorldLessons.GetCurrentLesson()
+	if(lesson) then
+		local nQuizCount = lesson:GetQuizCount();
+		TeacherAgent:AddTaskButton("OpenLesson", "Texture/3DMapSystem/AppIcons/png/Intro_64.png", ParaWorldLessons.OpenCurrentLessonUrl, nQuizCount, 100)
+		TeacherAgent:SetEnabled(true);
+		local text = L"点击图标打开课程学习页面";
+		if(nQuizCount>0) then
+			text = text.."<br/>"..format(L"课程包含%d个问题", nQuizCount);
+		end
+		text = text.."<br/><div style='color:#cc3300'>"..(L"学习完毕可领取奖励~").."</div>";
+		TeacherAgent:ShowTipText(text);
 	end
 end
