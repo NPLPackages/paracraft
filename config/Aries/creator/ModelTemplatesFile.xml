@@ -3,8 +3,16 @@
 @param filename:
 -->
 <ModelTemplates>
-  <model name="人类" filename="character/AutoAnims/Q_nvhai01.x"/>
+  <model name="男孩" filename="character/AutoAnims/Q_nanhai.x"/>
+  <model name="女孩" filename="character/AutoAnims/Q_nvhai01.x"/>
   <model name="长颈鹿" filename="character/AutoAnims/Q_changjinglu_zoulu.x"/>
   <model name="牦牛" filename="character/AutoAnims/Q_maoniu01.x"/>
-  <!--<model filename="character/AutoAnims/Q_huoji01.x"/>-->
+  <model name="蜜蜂" filename="character/AutoAnims/Q_mifeng.x"/>
+  <model name="小鸡" filename="character/AutoAnims/Q_xiaoji.x"/>
+  <model name="蜘蛛" filename="character/AutoAnims/Q_zhizhu.x"/>
+  <model name="虫子" filename="character/AutoAnims/Q_chong.x"/>
+  <model name="章鱼" filename="character/AutoAnims/Q_zhangyu.x"/>
+  <model name="鹦鹉" filename="character/AutoAnims/Q_yingwu.x"/>
+  <model name="山羊" filename="character/AutoAnims/Q_yang.x"/>
+  <model name="蝴蝶" filename="character/AutoAnims/Q_hudie.x"/>
 </ModelTemplates>
