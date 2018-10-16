@@ -152,8 +152,11 @@ function ChatEdit.SetText(text)
 	end
 end
 
+-- one can set to true, but it fails very strangely on one computer. 
+ChatEdit.IsDisableIMEInCommandMode = false;
+
 function ChatEdit.AutoSetInputMethod(text)
-	if(ChatEdit.is_shown) then
+	if(ChatEdit.IsDisableIMEInCommandMode and ChatEdit.is_shown) then
 		local bEnable = true;
 		if(text and text:match("^/")) then
 			bEnable = false;

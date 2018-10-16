@@ -25,6 +25,11 @@ function DownloadWorld.OnInit()
 	page:SetValue("url", DownloadWorld.url);
 end
 
+function DownloadWorld.OnDownloadFileNotify(state, text, currentFileSize, totalFileSize)
+	echo({state, text, currentFileSize, totalFileSize})
+	DownloadWorld.UpdateProgressText2(text)
+end
+
 -- show page
 function DownloadWorld.ShowPage(url)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
@@ -51,6 +56,7 @@ function DownloadWorld.ShowPage(url)
 				height = height,
 			cancelShowAnimation = true,
 		});
+		GameLogic.GetFilters():add_filter("downloadFile_notify", DownloadWorld.OnDownloadFileNotify);
 	end
 end
 
@@ -60,10 +66,17 @@ function DownloadWorld.UpdateProgressText(text)
 	end
 end
 
+-- on line 2
+function DownloadWorld.UpdateProgressText2(text)
+	if(page) then
+		page:SetValue("progressText2", text)
+	end
+end
 
 function DownloadWorld.Close()
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "close");
 	if(isCustomShow == "close") then
+		GameLogic.GetFilters():remove_filter("downloadFile_notify", DownloadWorld.OnDownloadFileNotify);
 		if(page) then
 			page:CloseWindow();
 			page = nil;

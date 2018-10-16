@@ -535,7 +535,7 @@ function GameLogic.LoadGame()
 	end
 	
 	ModManager:OnWorldLoad();
-	GameLogic:WorldLoaded();
+	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
 end
 
 function GameLogic.Pause()
@@ -746,6 +746,7 @@ function GameLogic.Exit()
 
 	ModManager:OnLeaveWorld();
 	GameLogic:WorldUnloaded();
+	GameLogic.GetFilters():apply_filters("OnWorldUnloaded");
 	
 	GameLogic.codeGlobal = nil;
 end
