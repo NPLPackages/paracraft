@@ -363,12 +363,13 @@ function ParaWorldLessons.EnterClassImp(classId)
 		if(data and data.lessonId) then
 			-- {lessonId=27,id=850,extra={},state=0,createdAt="2018-10-13T15:23:38.000Z",updatedAt="2018-10-13T15:23:38.000Z",classroomId=38,userId=1,packageId=8,}
 			LOG.std(nil, "info", "ParaWorldLessons JoinClass", data);
-			ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId);
+			ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId, classId);
 		end
 	end)	
 end
 
-function ParaWorldLessons.EnterLessonImp(packageId, lessonId)
+-- @param classId: if nil, it will be 
+function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId)
 	local lessonUrl = format("https://keepwork.com/l/#/student/package/%d/lesson/%d", packageId, lessonId)
 	local contentAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d/contents", lessonId)
 

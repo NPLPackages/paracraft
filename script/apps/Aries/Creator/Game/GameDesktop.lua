@@ -439,41 +439,7 @@ end
 -- Desktop.Restart("paracraft")
 -- @param appName: nil default to "paracraft", it can also be "haqi"
 function Desktop.Restart(appName)
-	local commandLine = ParaEngine.GetAppCommandLine();
-	if(not appName or appName == "paracraft") then
-		ParaEngine.SetAppCommandLine('mc="true" bootstrapper="script/apps/Aries/main_loop.lua" debug="main"');
-	elseif(appName == "haqi") then
-		ParaEngine.SetAppCommandLine('mc="false" bootstrapper="script/apps/Aries/main_loop.lua" partner="keepwork" config="config/GameClient.config.tatfook.xml" debug="main"');
-	end
-	
-	System.reset();
-	-- flush all local server 
-	if(System.localserver) then
-		System.localserver.FlushAll();
-	end	
-	ParaScene.UnregisterAllEvent();
-	-- reset to default value
-	ParaTerrain.LeaveBlockWorld();
-	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
-
-	local restart_code = [[
-	ParaUI.ResetUI();
-	ParaScene.Reset();
-	NPL.load("(gl)script/apps/Aries/main_loop.lua");
-	System.options.cmdline_world="";
-	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
-]];
-
-	-- TODO: close world archives, packages and search paths
-
-	-- clear pending messages before reset
-	while(true) do
-		local nSize = __rts__:GetCurrentQueueSize();
-		if(nSize>0) then
-			__rts__:PopMessageAt(0, {process = true});
-		else
-			break;
-		end
-	end
-	__rts__:Reset(restart_code);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+	ParaWorldLoginDocker.Restart(appName)
 end

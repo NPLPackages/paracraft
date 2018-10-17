@@ -44,6 +44,9 @@ function Entity:OnRemoved()
 	Entity._super.OnRemoved(self);
 	self:DeleteOutputCharacter();
 	self:DeleteThinkerEntity();
+	if(self:IsBuilding())then
+		self:SetBuilding(false);
+	end
 end
 
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
@@ -95,7 +98,7 @@ function Entity:OpenEditor(editor_name, entity)
 			filename = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
 			charEntity:Say(filename, nil, true);
 		end
-		_guihelper.MessageBox(format(L"是否重新生成 %s?", self:GetFilename()), function(res)
+		_guihelper.MessageBox(format(L"是否重新生成 %s?", commonlib.Encoding.DefaultToUtf8(self:GetFilename())), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				self:TryRebuild();
 			end
@@ -160,6 +163,9 @@ end
 
 function Entity:SetBuilding(bBuilding)
 	if(Entity.isBuilding ~= bBuilding) then
+		if(not bBuilding) then
+			GameLogic.AddBBS("AnimModel", nil);
+		end
 		Entity.isBuilding = bBuilding;
 		if(Entity.isBuilding) then
 			self.startTime = commonlib.TimerManager.GetCurrentTime();
@@ -178,10 +184,10 @@ end
 -- get and initialize the auto rigger in C++ game engine for model generation
 function Entity:CreateGetAutoRigger()
 	-- matching and rigging
-	if(not Entity.autoAigger or not Entity.autoAigger:IsValid()) then
+	if(not Entity.autoRigger or not Entity.autoRigger:IsValid()) then
 		local autoRigger = ParaScene.CreateObject("CAutoRigger", "MyAutoRigger",0,0,0);
 		ParaScene.Attach(autoRigger);
-		self.autoRigger = autoRigger;
+		Entity.autoRigger = autoRigger;
 		-- add template models to the AutoRigger if not added yet
 		local models = ModelTemplatesFile:GetTemplates() or {};
 		for _, template in ipairs(ModelTemplatesFile:GetTemplates()) do
@@ -189,7 +195,7 @@ function Entity:CreateGetAutoRigger()
 		end
 		LOG.std(nil, "info", "AnimModel", "a new auto rigger created and initialized with %d models", #models);
 	end
-	return self.autoRigger;
+	return Entity.autoRigger;
 end
 
 function Entity:LoadAsset(callback)
