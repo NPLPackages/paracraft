@@ -229,7 +229,10 @@ function ParaWorldLoginDocker.GetRedirectableCmdLineParams()
 	if(ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true") then
 		cmds = cmds.." httpdebug=\"true\"";
 	end
-	-- TODO: keepwork token forward here?
+	-- keepwork token forward here
+	if(System.User and System.User.keepworktoken) then
+		cmds = cmds..format(" keepworktoken=\"%s\"", System.User.keepworktoken);
+	end
 	return cmds;
 end
 
@@ -237,7 +240,7 @@ end
 -- Desktop.Restart("haqi")
 -- Desktop.Restart("paracraft")
 -- @param appName: nil default to application at working directory. 
-function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
+function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, additional_restart_code)
 	if(not appName) then
 		appName = ParaWorldLoginDocker.GetSourceAppName()
 		if(not additional_commandline_params) then
@@ -325,6 +328,9 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params)
 	System.options.cmdline_world="";
 	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
 ]];
+	if(additional_restart_code) then
+		restart_code = restart_code .. additional_restart_code;
+	end
 
 	-- TODO: close world archives, packages and search paths
 

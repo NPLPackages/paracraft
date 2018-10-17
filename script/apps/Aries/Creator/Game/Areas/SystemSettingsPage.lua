@@ -238,6 +238,12 @@ function SystemSettingsPage.InitPageParams()
 	local render_dist_text = GetRenderDistText(render_dist);
 	page:SetNodeValue("btn_RenderDist", render_dist_text);
 	ds["render_dist"] = render_dist_text;
+
+
+	-- movie block aspect ratio 
+	local bAspectRatio = GameLogic.options:IsMaintainMovieBlockAspectRatio();
+	UpdateCheckBox("btn_MovieAspectRatio", bAspectRatio);
+	ds["maintainMovieAspectRatio"] = bAspectRatio;
 end
 
 function SystemSettingsPage.OnClose()
@@ -1196,5 +1202,13 @@ function SystemSettingsPage.OnClickResetUIScaling()
 	GameLogic.options:SetUIScaling(0);
 	if(page) then
 		page:SetValue("UI_Scaling", GameLogic.options:GetUIScaling());
+	end
+end
+
+function SystemSettingsPage.OnClickMaintainMovieAspectRatio()
+	local value = not GameLogic.options:IsMaintainMovieBlockAspectRatio();
+	GameLogic.options:SetMaintainMovieBlockAspectRatio(value);
+	if(page) then
+		UpdateCheckBox("btn_MovieAspectRatio", value);
 	end
 end

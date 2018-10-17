@@ -166,6 +166,8 @@ function options:OneTimeInit()
 			GameLogic.GetPlayerController():SaveLocalData(key, false, true);
 		end
 	end
+
+	self:SetMaintainMovieBlockAspectRatio();
 end
 
 -- transient options can be modified by game rule and reset when loading a new world.
@@ -1082,4 +1084,20 @@ end
 -- another way to set: `/property set -camera IgnoreEyeBlockCollisionInSunlight false`
 function options:SetIgnoreEyeBlockCollisionInSunlight(bIgnored)
 	ParaCamera.GetAttributeObject():GetField("IgnoreEyeBlockCollisionInSunlight", bIgnored == true);
+end
+
+function options:IsMaintainMovieBlockAspectRatio()
+	return self.maintainMovieBlockAspectRatio;
+end
+
+function options:SetMaintainMovieBlockAspectRatio(value)
+	local key = "Paracraft_maintainMovieBlockAspectRatio";
+	if(value == nil) then
+		if(self.maintainMovieBlockAspectRatio == nil) then
+			self.maintainMovieBlockAspectRatio = GameLogic.GetPlayerController():LoadLocalData(key,self:IsMaintainMovieBlockAspectRatio(), true);
+		end
+	elseif(self.maintainMovieBlockAspectRatio ~= value) then
+		self.maintainMovieBlockAspectRatio = value;
+		GameLogic.GetPlayerController():SaveLocalData(key, value, true, false);
+	end
 end

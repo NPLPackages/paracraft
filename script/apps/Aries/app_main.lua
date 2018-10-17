@@ -1344,9 +1344,10 @@ function MyCompany.Aries.OnExec(app, commandName, params)
 					-- ParaAsset.UnloadAll();
 					-- ParaAsset.UnloadDatabase();
 					JabberClientManager.CloseJabberClient("");
-					ParaScene.UnregisterAllEvent();
-					local restart_code = [[ParaUI.ResetUI();ParaScene.Reset();NPL.load("(gl)script/apps/Aries/main_loop.lua");NPL.activate("(gl)script/apps/Aries/main_loop.lua");]];
-				
+
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+					local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+					local restart_code;
 					if(type(params)=="table" and params.startup_msg) then
 						if(type(params.startup_msg) == "table") then
 							params.startup_msg = commonlib.serialize_compact(params.startup_msg);
@@ -1355,9 +1356,24 @@ function MyCompany.Aries.OnExec(app, commandName, params)
 						else
 							params.startup_msg = tostring(params.startup_msg);
 						end
-						restart_code = string.format([[%s commonlib.setfield("MyCompany.Aries.MainLogin.startup_msg", %s);]], restart_code, params.startup_msg);
+						restart_code = string.format([[commonlib.setfield("MyCompany.Aries.MainLogin.startup_msg", %s);]], params.startup_msg);
 					end
-					__rts__:Reset(restart_code);
+					ParaWorldLoginDocker.Restart(nil, nil, restart_code);
+
+--					ParaScene.UnregisterAllEvent();
+--					local restart_code = [[ParaUI.ResetUI();ParaScene.Reset();NPL.load("(gl)script/apps/Aries/main_loop.lua");NPL.activate("(gl)script/apps/Aries/main_loop.lua");]];
+--				
+--					if(type(params)=="table" and params.startup_msg) then
+--						if(type(params.startup_msg) == "table") then
+--							params.startup_msg = commonlib.serialize_compact(params.startup_msg);
+--						elseif(type(params.startup_msg) == "string") then
+--							params.startup_msg = string.format("%q", params.startup_msg);
+--						else
+--							params.startup_msg = tostring(params.startup_msg);
+--						end
+--						restart_code = string.format([[%s commonlib.setfield("MyCompany.Aries.MainLogin.startup_msg", %s);]], restart_code, params.startup_msg);
+--					end
+--					__rts__:Reset(restart_code);
 				else
 					commonlib.echo(MyCompany.Aries.MainLogin.startup_msg)
 					-- start login procedure

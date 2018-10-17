@@ -313,6 +313,12 @@ end
                         <input type="button" name="clearCache" value='<%=L"清空缓存" %>' class="mc_light_grey_button_with_fillet" onclick="SystemSettingsPage.OnClearCache()" />
                         <span style="margin-left:5px;">temp/webcache/*</span>
                     </div>
+                    <div style="height:25px;margin-top:4px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"保持电影方块窗口比例" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_MovieAspectRatio' value='' type="button" onclick='SystemSettingsPage.OnClickMaintainMovieAspectRatio' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
                 </pe:if>
                 </div>
             </pe:treeview>
