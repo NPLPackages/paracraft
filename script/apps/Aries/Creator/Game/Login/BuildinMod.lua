@@ -69,6 +69,24 @@ BuildinMod.buildin_mods = {
 		version = "0.1",
 		homepage = "https://github.com/tatfook/CodeBlockEditor",
 	},
+	{
+		name = "LogitowMonitor", 
+		-- package_path = "npl_packages/LogitowMonitor/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"蓝牙智能积木监控", 
+		text=L"系统内置插件",
+		version = "0.1",
+		homepage = "https://github.com/NPLPackages/PluginBlueTooth",
+	},
+	{
+		name = "PluginBlueTooth", 
+		-- package_path = "npl_packages/PluginBlueTooth/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"蓝牙模块", 
+		text=L"系统内置插件",
+		version = "0.1",
+		homepage = "https://github.com/NPLPackages/PluginBlueTooth",
+	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
 
