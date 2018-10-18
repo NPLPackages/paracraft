@@ -42,7 +42,7 @@ end
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	local filename = self:GetAnimModelEntity():GetFilename();
 	local result = Files.ResolveFilePath(filename)
-	local old_value = result.relativeToWorldPath or filename;
+	local old_value = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
@@ -66,7 +66,7 @@ end
 function Entity:SaveModelAs(filename, bForceOverwrite)
 	local dest = GameLogic.GetWorldDirectory()..filename;
 	if(ParaIO.DoesFileExist(dest, false) and not bForceOverwrite) then
-		_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", filename), function(res)
+		_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				self:SaveModelAs(filename, true)
 			end
@@ -78,7 +78,7 @@ function Entity:SaveModelAs(filename, bForceOverwrite)
 		if(src and ParaIO.CopyFile(src, dest, true)) then
 			self:GetAnimModelEntity():SetFilename(filename);
 			self:Say(L"保存成功", nil, true);
-			GameLogic.AddBBS(nil, format(L"动画模型成功保存到%s", filename));
+			GameLogic.AddBBS(nil, format(L"动画模型成功保存到%s", commonlib.Encoding.DefaultToUtf8(filename)));
 		else
 			GameLogic.AddBBS(nil, L"无法复制文件");
 		end

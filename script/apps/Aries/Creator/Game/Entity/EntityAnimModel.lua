@@ -346,8 +346,9 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 	self:SetBuilding(false);
 	LOG.std(nil, "info", "AutoAnim", "Auto Rigging done: Count:%d filenames:%s msg: %s" , count or 0, filenames or "", msg or "");
 	if(count>0) then
-		if(ParaIO.CopyFile(self:GetTempOutputFilename(), self:GetFilename(), true)) then
-			LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", self:GetFilename());
+		local outputFile = Files.GetWorldFilePath(self:GetFilename()) or self:GetFilename();
+		if(ParaIO.CopyFile(self:GetTempOutputFilename(), outputFile, true)) then
+			LOG.std(nil, "info", "Morph", "auto rigged file generated to %s", commonlib.Encoding.DefaultToUtf8(outputFile));
 
 			local modelTemplateFilename = msg;
 			-- show what it looks like 
@@ -361,7 +362,7 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 			end
 
 			-- show saved world path
-			local result = Files.ResolveFilePath(self:GetFilename())
+			local result = Files.ResolveFilePath(self:GetFilename());
 			GameLogic.AddBBS("AnimModel", format(L"人物模型已经保存到%s", commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath) or ""));
 
 			-- create temporary character for further interaction
@@ -373,7 +374,7 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 				entity:SetPosition(x, y, z);
 			end
 		else
-			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", self:GetFilename()));
+			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", commonlib.Encoding.DefaultToUtf8(self:GetFilename())));
 			self:ShowThinkerText(L"出错了");
 		end
 	else

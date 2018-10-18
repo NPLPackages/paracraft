@@ -8,6 +8,11 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 TeacherAgent:SetEnabled(true)
+TeacherAgent:AddKnowledgeFromFile("script/apps/Aries/Creator/Game/Login/TeacherAgent/test/test.knowledgedomain.xml")
+TeacherAgent:BeginTeach()
+TeacherAgent:NewExperience("action", "setblock CodeBlock")
+TeacherAgent:EndTeach()
+-- TeacherAgent:AddTaskButton("btnLesson", "Texture/Aries/AppIcons/summerswim.png", function()  end, 3)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/headon_speech.lua");
