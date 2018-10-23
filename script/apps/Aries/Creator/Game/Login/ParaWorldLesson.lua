@@ -58,6 +58,19 @@ end
 
 function ParaWorldLesson:OpenLessonUrl()
 	if(self.lessonUrl) then
+		local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
+		if(LoginMain.IsSignedIn()) then
+			self:OpenLessonUrlDirect();	
+		else
+			LoginMain.ShowLoginModal(function()
+				self:OpenLessonUrlDirect();	
+			end, L"登陆后才能访问课程系统, 请先登录");
+		end
+	end
+end
+
+function ParaWorldLesson:OpenLessonUrlDirect()
+	if(self.lessonUrl) then
 		ParaGlobal.ShellExecute("open", self.lessonUrl, "", "", 1)
 	end
 end

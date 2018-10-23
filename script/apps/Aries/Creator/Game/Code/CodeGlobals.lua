@@ -81,9 +81,9 @@ function CodeGlobals:ctor()
 			local result = SelectionManager:MousePickBlock(true, false, false, picking_dist);
 			return result.blockX, result.blockY, result.blockZ, result.block_id, result.side;
 		end,
-		-- get block id at given position
+		-- get block id and data at given position
 		getBlock = function(x,y,z)
-			return BlockEngine:GetBlockId(math.floor(x), math.floor(y), math.floor(z));
+			return BlockEngine:GetBlockIdAndData(math.floor(x), math.floor(y), math.floor(z));
 		end,
 		-- set block id at given position
 		setBlock = function(x,y,z, blockId, blockData)
