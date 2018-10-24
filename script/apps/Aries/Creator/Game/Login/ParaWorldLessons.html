@@ -36,9 +36,9 @@ ParaWorldLessons.OnInit()
             <div style="float:left;background-color:#000000;">
                 <input type="text" name="txtLessonId" style="margin-bottom:0px;width:160px;height:30px;background:url();textcolor:#ffffff" spacing="4" EmptyText='<%=L"输入课程ID"%>' CaretColor="#FFFFFFFF" />
             </div>
-            <input type="button" value='<%=L"打开" %>' class="flat_button" style="height:30px" onclick="ParaWorldLessons.OnClickEnterWorld" />
+            <input type="button" DefaultButton="true" value='<%=L"打开" %>' class="flat_button" style="height:30px" onclick="ParaWorldLessons.OnClickEnterWorld" />
         </div>
-        <input type="button" align="right" tooltip='<%=L"Paracraft动画与编程教学"%>' style="margin-right:10px;margin-left:10px;height:36px;" class="link_button" value="更多网课" onclick="ParaWorldLessons.OnClickMoreLessons"/>
+        <input type="button" align="right" tooltip='<%=L"Paracraft动画与编程教学"%>' style="margin-right:10px;margin-left:10px;height:36px;" class="link_button" value='<%=L"更多网课"%>' onclick="ParaWorldLessons.OnClickMoreLessons"/>
     </div>
     <pe:gridview style="margin-left:20px;margin-top:10px;height:300px" name="lessonWorlds" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="95" pagesize="1500" DataSource='<%=ParaWorldLessons.LessonWorldsDs%>'>
         <Columns>
@@ -50,7 +50,7 @@ ParaWorldLessons.OnInit()
     </pe:gridview>
     <div style="margin-left:200px;margin:10px;margin-top:20px;">
         <input type="checkbox" onclick="ParaWorldLessons.OnChangeShowOnStartup" style="margin-top:3px" name="showOnStart" checked='<%=ParaWorldLessons.IsShowOnStartup()%>'/><div style="float:left" for="showOnStart"><%=L"启动时显示"%></div>
-        <input type="button" style="margin-left:10px;min-width:100px;" class="flat_button" value="关闭" onclick="ParaWorldLessons.OnClickClose"/>
+        <input type="button" style="margin-left:10px;min-width:100px;" class="flat_button" value='<%=L"关闭"%>' onclick="ParaWorldLessons.OnClickClose"/>
     </div>
 </pe:container>
 </pe:mcml>

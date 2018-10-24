@@ -11,21 +11,99 @@ local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaW
 local lesson = ParaWorldLesson:new():Init(id, url, content)
 -------------------------------------------------------
 ]]
+local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
+
+-- set this to true when keepwork `?token=` signin is fully supported. 
+ParaWorldLesson.autoSigninWebUrl = false;
 
 function ParaWorldLesson:ctor()
 	self.finishedQuizCount = 0;
+	self.clientData = {};
 end
 
 -- @param id: class or lesson id
 -- @param lessonUrl: lesson url address
--- @param content: markdown text
-function ParaWorldLesson:Init(id, lessonUrl, content)
+function ParaWorldLesson:Init(id, lessonUrl)
 	self.id = id;
 	self.lessonUrl = lessonUrl;
-	self.content = content;
 	self.startTime = commonlib.TimerManager.GetCurrentTime();
 	return self;
+end
+
+function ParaWorldLesson:SetClassId(classId)
+	self.classId = classId;
+end
+
+-- @param goals: text
+function ParaWorldLesson:SetGoals(goals)
+	self.goals = goals;
+end
+
+function ParaWorldLesson:GetGoals()
+	return self.goals or "";
+end
+
+function ParaWorldLesson:SetContent(txtMarkdown)
+	self.content = txtMarkdown;
+end
+
+function ParaWorldLesson:SetName(name)
+	self.name = name;
+end
+
+function ParaWorldLesson:GetName()
+	return self.name or "";
+end
+
+function ParaWorldLesson:SetUserName(username)
+	if(username) then
+		self.clientData.username = username;
+		self.clientData.name = username;
+	end
+end
+
+function ParaWorldLesson:GetUserName()
+	return self.clientData.username;
+end
+
+function ParaWorldLesson:SetRecordId(recordId)
+	self.recordId = recordId;
+end
+
+function ParaWorldLesson:GetRecordId()
+	return self.recordId;
+end
+
+function ParaWorldLesson:GetClassId()
+	return self.classId;
+end
+
+function ParaWorldLesson:SetUserId(userId)
+	self.userId = userId;
+end
+
+function ParaWorldLesson:GetUserId()
+	return self.userId;
+end
+
+function ParaWorldLesson:SetUserToken(userToken)
+	self.userToken = userToken;
+end
+
+function ParaWorldLesson:GetUserToken()
+	return self.userToken;
+end
+
+function ParaWorldLesson:SetClientData(data)
+	if(data) then
+		self.clientData = data;
+	end
+end
+
+function ParaWorldLesson:GetClientData()
+	return self.clientData;
 end
 
 function ParaWorldLesson:GetFirstWorldUrl()
@@ -56,22 +134,43 @@ function ParaWorldLesson:GetFirstWorldUrl()
 	return self.worldUrl
 end
 
+function ParaWorldLesson:GetLessonUrl()
+	return self.lessonUrl;
+end
+
 function ParaWorldLesson:OpenLessonUrl()
-	if(self.lessonUrl) then
-		local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
-		if(LoginMain.IsSignedIn()) then
+	local url = self:GetLessonUrl()
+	if(url) then
+		if(self:GetClassId()) then
 			self:OpenLessonUrlDirect();	
 		else
-			LoginMain.ShowLoginModal(function()
+			local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
+			if(LoginMain.IsSignedIn()) then
 				self:OpenLessonUrlDirect();	
-			end, L"登陆后才能访问课程系统, 请先登录");
+			else
+				LoginMain.ShowLoginModal(function()
+					self:OpenLessonUrlDirect();	
+				end, L"登陆后才能访问课程系统, 请先登录");
+			end
 		end
 	end
 end
 
+function ParaWorldLesson:BuildUrlWithToken(url)
+	if(self:GetClassId() or self.autoSigninWebUrl) then
+		local token = self:GetUserToken() or (self.autoSigninWebUrl and System.User.keepworktoken);
+		if(token) then
+			url = format("%s?id=%d&key=%d&token=%s", url, self:GetUserId() or 0, self:GetClassId() or 0, token);
+		end
+	end
+	return url;
+end
+
 function ParaWorldLesson:OpenLessonUrlDirect()
-	if(self.lessonUrl) then
-		ParaGlobal.ShellExecute("open", self.lessonUrl, "", "", 1)
+	local url = self:GetLessonUrl()
+	if(url) then
+		url = self:BuildUrlWithToken(url)
+		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end
 end
 
@@ -111,4 +210,58 @@ end
 
 function ParaWorldLesson:GetFinishedQuizCount()
 	return self.finishedCount;
+end
+
+-- @param callbackFunc: function(bSucceed, localWorldPath)
+function ParaWorldLesson:EnterWorld(callbackFunc)
+	local worldUrl = self:GetFirstWorldUrl()
+	if(worldUrl) then
+		LOG.std(nil, "info", "ParaWorldLessons", "try entering world %s", worldUrl);
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
+		local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+		DownloadWorld.ShowPage(worldUrl);
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
+		local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld");
+		local world =RemoteWorld.LoadFromHref(worldUrl, "self");
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+		local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+		InternetLoadWorld.LoadWorld(world, nil, nil, function(bSucceed, localWorldPath)
+			DownloadWorld.Close();
+			if(callbackFunc) then
+				callbackFunc(bSucceed, localWorldPath);
+			end
+		end)
+	end
+end
+
+function ParaWorldLesson:GetSummaryMCML()
+	if(not self.summary_mcml) then
+		local text = format("<div style='color:#cc3300'>%s</div>", self:GetName()) 
+		if(self:GetGoals()~="")then
+			text = text..format("目标:%s<br/>", self:GetGoals());
+		end
+		local nQuizCount = self:GetQuizCount();
+		if(nQuizCount>0) then
+			text = text.."<br/>"..format(L"课程包含%d个问题", nQuizCount);
+		end
+		self.summary_mcml = text;
+	end
+	return self.summary_mcml;
+end
+
+-- update learning record from client to server
+function ParaWorldLesson:SendRecord()
+	local userId = self:GetUserId() or 0;
+	local learnAPIUrl;
+	if(self:GetRecordId()) then
+		learnAPIUrl = format("https://api.keepwork.com/lesson/v0/learnRecords/%d", self:GetRecordId());
+		learnAPIUrl = self:BuildUrlWithToken(learnAPIUrl)
+		echo({"1111111111111111", learnAPIUrl, {id=self:GetRecordId(), state=0, extra = self:GetClientData()}})
+		return ParaWorldLessons.UrlRequest(learnAPIUrl , "PUT", {id=userId, extra = self:GetClientData()}, function(err, msg, data)
+			LOG.std(nil, "debug", "ParaWorldLessons", "send record returned:", err);
+		end)
+	end
 end

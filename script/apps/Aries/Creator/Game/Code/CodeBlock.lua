@@ -364,7 +364,7 @@ function CodeBlock:CreateFirstActorInMovieBlock()
 					elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
 						return CodeUIActor:new():Init(itemStack, movie_entity);
 					end
-				end
+				end 
 			end
 		end
 	end

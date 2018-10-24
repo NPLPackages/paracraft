@@ -15,6 +15,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/EntityCodeActor.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local math3d = commonlib.gettable("mathlib.math3d");
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -443,6 +445,19 @@ function Actor:SetPhysicsHeight(height)
 	end
 end
 
+function Actor:GetAssetFile()
+	local entity = self:GetEntity();
+	return entity and entity:GetMainAssetPath();
+end
+
+function Actor:SetAssetFile(filename)
+	local entity = self:GetEntity();
+	if(entity) then	
+		filename = PlayerAssetFile:GetFilenameByName(filename)
+		entity:SetMainAssetPath(filename);
+	end
+end
+
 function Actor:GetColor()
 	local entity = self:GetEntity();
 	return entity and entity:GetColor();
@@ -468,6 +483,7 @@ local internalValues = {
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
+	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 }
 
 function Actor:GetActorValue(name)
