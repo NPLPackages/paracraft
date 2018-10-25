@@ -277,6 +277,7 @@ end
 				{ L"颜色", "color" },
 				{ L"文字", "text" },
 				{ L"模型文件", "assetfile" },
+				{ L"绘图代码", "rendercode" },
 				{ L"任意变量", "" },
 			},
 			shadow = { type = "actorProperties", value = "name",},

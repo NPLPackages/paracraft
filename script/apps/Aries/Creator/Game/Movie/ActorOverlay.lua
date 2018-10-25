@@ -519,7 +519,12 @@ function Actor:FrameMovePlaying(deltaTime)
 	
 	entity:SetColor(color or "#ffffff");
 	-- set render code
-	self.codeItem:SetCode(self:GetValue("code", curTime));
+	self:SetRenderCode(self:GetValue("code", curTime))
+end
+
+-- set rendering code
+function Actor:SetRenderCode(code)
+	self.codeItem:SetCode(code);
 end
 
 -- example codes:
