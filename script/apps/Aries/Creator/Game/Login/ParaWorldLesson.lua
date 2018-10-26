@@ -16,7 +16,7 @@ local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.Para
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
 
 -- set this to true when keepwork `?token=` signin is fully supported. 
-ParaWorldLesson.autoSigninWebUrl = false;
+ParaWorldLesson.autoSigninWebUrl = true;
 
 function ParaWorldLesson:ctor()
 	self.finishedQuizCount = 0;
@@ -160,7 +160,7 @@ function ParaWorldLesson:BuildUrlWithToken(url)
 	if(self:GetClassId() or self.autoSigninWebUrl) then
 		local token = self:GetUserToken() or (self.autoSigninWebUrl and System.User.keepworktoken);
 		if(token) then
-			url = format("%s?id=%d&key=%d&token=%s", url, self:GetUserId() or 0, self:GetClassId() or 0, token);
+			url = format("%s?id=%d&key=%d&token=%s&device=paracraft", url, self:GetUserId() or 0, self:GetClassId() or 0, token);
 		end
 	end
 	return url;
@@ -259,7 +259,7 @@ function ParaWorldLesson:SendRecord()
 	if(self:GetRecordId()) then
 		learnAPIUrl = format("https://api.keepwork.com/lesson/v0/learnRecords/%d", self:GetRecordId());
 		learnAPIUrl = self:BuildUrlWithToken(learnAPIUrl)
-		echo({"1111111111111111", learnAPIUrl, {id=self:GetRecordId(), state=0, extra = self:GetClientData()}})
+		-- echo({"1111111111111111", learnAPIUrl, {id=self:GetRecordId(), state=0, extra = self:GetClientData()}})
 		return ParaWorldLessons.UrlRequest(learnAPIUrl , "PUT", {id=userId, extra = self:GetClientData()}, function(err, msg, data)
 			LOG.std(nil, "debug", "ParaWorldLessons", "send record returned:", err);
 		end)
