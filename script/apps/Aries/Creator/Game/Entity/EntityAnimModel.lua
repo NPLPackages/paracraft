@@ -373,6 +373,11 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 				local x, y, z = EntityManager.GetPlayer():GetPosition()
 				entity:SetPosition(x, y, z);
 			end
+			
+			local Event = commonlib.gettable("System.Core.Event");
+			local event = Event:new():init("SaveAnimModel");
+			event.cmd_text = {name = self:GetFilename()};
+			GameLogic:event(event);			
 		else
 			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", commonlib.Encoding.DefaultToUtf8(self:GetFilename())));
 			self:ShowThinkerText(L"出错了");
