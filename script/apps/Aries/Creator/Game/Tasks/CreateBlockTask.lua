@@ -96,6 +96,7 @@ function CreateBlock:Run()
 				GameLogic.PlayAnimation({facingTarget = {x=tx, y=ty, z=tz},});
 				GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data});
+				GameLogic.GetFilters():apply_filters("user_event_stat", "user/create/block/"..tostring(self.block_id));
 			end
 
 			if(GameLogic.GameMode:CanAddToHistory()) then
