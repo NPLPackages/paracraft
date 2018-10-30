@@ -274,13 +274,49 @@ end
 },
 
 {
-	type = "cmd", 
-	message0 = L"执行命令%1",
+	type = "cmdExamples", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"/tip hello", "/tip hello" },
+				{ L"添加规则:发送事件HelloEvent", "/sendevent HelloEvent {data=1}" },
+				{ L"添加规则:Lever可放在Glowstone上", "/addrule Block CanPlace Lever Glowstone" },
+				{ L"添加规则:Glowstone可被删除", "/addrule Block CanDestroy Glowstone true" },
+				{ L"添加规则:人物自动爬坡", "/addrule Player AutoWalkupBlock false" },
+				{ L"添加规则:人物可跳跃", "/addrule Player CanJump true" },
+				{ L"添加规则:人物摄取距离为5米", "/addrule Player PickingDist 5" },
+				{ L"添加规则:人物可在空中继续跳跃", "/addrule Player CanJumpInAir true" },
+				{ L"添加规则:人物可飞行", "/addrule Player CanFly true" },
+				{ L"添加规则:人物在水中可跳跃", "/addrule Player CanJumpInWater true" },
+				{ L"添加规则:人物跳起的速度", "/addrule Player JumpUpSpeed 5" },
+				{ L"添加规则:人物可跑步", "/addrule Player AllowRunning false" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
+	type = "cmd", 	message0 = L"执行命令%1",
 	arg0 = {
 		{
 			name = "msg",
 			type = "input_value",
-            shadow = { type = "text", value = "/tip hello",},
+            shadow = { type = "cmdExamples", value = "/tip hello",},
 			text = "/tip hello", 
 		},
 	},

@@ -8,7 +8,7 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
 local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
-local lesson = ParaWorldLesson:new():Init(id, url, content)
+local lesson = ParaWorldLesson:new():Init(lessonId, packageId)
 -------------------------------------------------------
 ]]
 local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
@@ -23,11 +23,10 @@ function ParaWorldLesson:ctor()
 	self.clientData = {};
 end
 
--- @param id: class or lesson id
--- @param lessonUrl: lesson url address
-function ParaWorldLesson:Init(id, lessonUrl)
-	self.id = id;
-	self.lessonUrl = lessonUrl;
+-- @param id: lesson id
+function ParaWorldLesson:Init(lessonId, packageId)
+	self.id = lessonId;
+	self.packageId = packageId;
 	self.startTime = commonlib.TimerManager.GetCurrentTime();
 	return self;
 end
@@ -134,7 +133,18 @@ function ParaWorldLesson:GetFirstWorldUrl()
 	return self.worldUrl
 end
 
+function ParaWorldLesson:GetPackageId()
+	return self.packageId or 0;
+end
+
+function ParaWorldLesson:GetLessonId()
+	return self.id or 0;
+end
+
 function ParaWorldLesson:GetLessonUrl()
+	if(not self.lessonUrl) then
+		self.lessonUrl = format("https://keepwork.com/l/#/visitor/package/%d/lesson/%d", self:GetPackageId(), self:GetLessonId())
+	end
 	return self.lessonUrl;
 end
 
@@ -160,7 +170,7 @@ function ParaWorldLesson:BuildUrlWithToken(url)
 	if(self:GetClassId() or self.autoSigninWebUrl) then
 		local token = self:GetUserToken() or (self.autoSigninWebUrl and System.User.keepworktoken);
 		if(token) then
-			url = format("%s?id=%d&key=%d&token=%s&device=paracraft", url, self:GetUserId() or 0, self:GetClassId() or 0, token);
+			url = format("%s?id=%d&key=%d&token=%s&device=paracraft", url, self:GetRecordId() or 0, self:GetClassId() or 0, token);
 		end
 	end
 	return url;
@@ -252,14 +262,13 @@ function ParaWorldLesson:GetSummaryMCML()
 	return self.summary_mcml;
 end
 
--- update learning record from client to server
+-- obsoleted: update learning record from client to server
 function ParaWorldLesson:SendRecord()
 	local userId = self:GetUserId() or 0;
 	local learnAPIUrl;
 	if(self:GetRecordId()) then
 		learnAPIUrl = format("https://api.keepwork.com/lesson/v0/learnRecords/%d", self:GetRecordId());
 		learnAPIUrl = self:BuildUrlWithToken(learnAPIUrl)
-		-- echo({"1111111111111111", learnAPIUrl, {id=self:GetRecordId(), state=0, extra = self:GetClientData()}})
 		return ParaWorldLessons.UrlRequest(learnAPIUrl , "PUT", {id=userId, extra = self:GetClientData()}, function(err, msg, data)
 			LOG.std(nil, "debug", "ParaWorldLessons", "send record returned:", err);
 		end)

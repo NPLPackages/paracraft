@@ -86,6 +86,13 @@ function CodeHelpItem:GetHtml()
 						item_text = item_text();
 					end
 					local arg_text = "";
+					if(arg_item.shadow and arg_item.shadow.type and not arg_item.options) then
+						local item = CodeHelpData.GetItemByType(arg_item.shadow.type)
+						if(item and item.arg0 and item.arg0[1]) then
+							arg_item.options = item.arg0[1].options;
+						end
+					end
+
 					if(arg_item.type == "field_input") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
 					elseif(arg_item.type == "input_value") then

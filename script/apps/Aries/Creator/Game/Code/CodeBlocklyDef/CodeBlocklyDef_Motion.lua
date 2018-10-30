@@ -136,11 +136,6 @@ turnTo(0)
 		{
 			name = "targetName",
 			type = "input_value",
-			options = {
-				{ L"鼠标", "mouse-pointer" },
-				{ L"最近的玩家", "@p" },
-				{ L"某个角色名", "" },
-			},
 			shadow = { type = "targetNameType", value = "mouse-pointer",},
 			text = "mouse-pointer",
 		},
@@ -264,11 +259,6 @@ moveTo("frog")
 		{
 			name = "targetName",
 			type = "input_value",
-			options = {
-				{ L"鼠标", "mouse-pointer" },
-				{ L"最近的玩家", "@p" },
-				{ L"某个角色名", "" },
-			},
 			shadow = { type = "targetNameType", value = "mouse-pointer",},
 			text = "mouse-pointer",
 		},

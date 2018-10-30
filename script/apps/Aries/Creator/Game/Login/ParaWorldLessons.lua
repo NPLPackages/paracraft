@@ -351,7 +351,7 @@ end
 -- @param username: custom username 
 function ParaWorldLessons.EnterClassImp(classId, username)
 	local url = "https://api.keepwork.com/lesson/v0/classrooms/join"
-	ParaWorldLessons.UrlRequest(url, "POST", {key=tostring(classId)}, function(err, msg, data)
+	ParaWorldLessons.UrlRequest(url, "POST", {key=tostring(classId), username = username}, function(err, msg, data)
 		if(err ~= 200) then
 			LOG.std(nil, "info", "ParaWorldLessons", "failed to join class %d: err: %d", classId, err);
 			echo(msg)
@@ -378,14 +378,13 @@ end
 
 -- @param classId: if nil, it will be 
 function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId, userId, userToken, username)
-	local lessonUrl = format("https://keepwork.com/l/#/student/package/%d/lesson/%d", packageId, lessonId)
 	local contentAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d/contents", lessonId)
 	local lessonAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d", lessonId)
 	
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
 	local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
-	local lesson = ParaWorldLesson:new():Init(lessonId, lessonUrl);
+	local lesson = ParaWorldLesson:new():Init(lessonId, packageId);
 	if(classId) then
 		lesson:SetClassId(classId);
 	end
@@ -413,10 +412,6 @@ function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId,
 					lesson:SetContent(data.content);
 					ParaWorldLessons.SetCurrentLesson(lesson);
 
-					if(classId or (lesson:GetUserName() or "") ~= "") then
-						lesson:SendRecord();
-					end
-
 					local worldUrl = lesson:GetFirstWorldUrl()
 					if(worldUrl) then
 						lesson:EnterWorld(function(bSucceed, localWorldPath)
@@ -426,7 +421,7 @@ function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId,
 						end)
 					else
 						-- there is no associated world, we will just open the web url
-						LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with %s", lessonUrl);
+						LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with lession %s", tostring(lessonId));
 						ParaWorldLessons.OpenCurrentLessonUrl()
 					end
 				else
