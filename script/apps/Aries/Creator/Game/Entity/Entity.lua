@@ -325,8 +325,11 @@ function Entity:LoadFromXMLNode(node)
 	end
 end
 
--- get the variable class. 
+-- get the variables object for custom user values. 
 function Entity:GetVariables()
+	if(not self.variables) then
+		self.variables = Variables:new();
+	end
 	return self.variables;
 end
 
