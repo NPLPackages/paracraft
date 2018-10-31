@@ -1,79 +1,100 @@
 --[[
-Title: ParaWorldAnalytics
-Author(s): LiXizhi
-Date: 2018/10/29
-Desc: send user event every 30 seconds to google analytics in batch. 
+	Title: ParaWorldAnalytics
+	Author(s): LiXizhi
+	Date: 2018/10/29
+	Desc: send user event every 30 seconds to google analytics in batch.
 
-use the lib:
--------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
-local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
-ParaWorldAnalytics:new():Init()
--------------------------------------------------------
+	use the lib:
+	-------------------------------------------------------
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
+	ParaWorldAnalytics:new():Init()
+	-------------------------------------------------------
 ]]
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
-local ParaWorldAnalyticss = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalyticss")
-
 local ParaWorldAnalytics = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics"))
 
--- send events in batch every 10 seconds if queue is not empty. 
-ParaWorldAnalytics.SendInterval= 10000;
+-- send events in batch every 5 seconds if pool is not empty.
+ParaWorldAnalytics.SendInterval= 5000;
 
 function ParaWorldAnalytics:ctor()
-	self.finishedQuizCount = 0;
-	self.clientData = {};
 	self.event_pool = {};
-
-	
 end
 
--- @param UA: 
+
 function ParaWorldAnalytics:Init(UA)
-	self.UA = UA or "UA-127983943-1" -- your ua number
+	-- FIXME UA-93899485-3 is a test account
+	self.UA = UA or "UA-93899485-3"
+	-- TODO user_id, fetch the login username, such as keepwork username
+	self.user_id = nil
+	self.client_id = self.GetClientId()
+	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id);
 
-	self.googleAnalitics = GoogleAnalytics:new():init(UA);
+	-- category: which category that the event belongs
+	-- action: which kind of action that the event do
+	-- value: what exactly the action does
+	GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, ...)
+										  self:GatherEvent({
+												  category = category,
+												  action = action,
+												  value = value,
+												  label = 'paracraft',
+										  });
+										  return catetory;
+									 end)
 
-	self.mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-		self:OnTimer();
-	end})
-	self.mytimer:Change(self.SendInterval, self.SendInterval);
+	self.timer = commonlib.Timer:new({callbackFunc = function(timer)
+										  self:SendBatchEvents()
+									end})
+	self.timer:Change(self.SendInterval, self.SendInterval);
 
-	GameLogic.GetFilters():add_filter("user_event_stat", function(key, ...) 
-		self:SendEvent({
-			location = key, 
-			language = 'zh-CN',
-			category = 'test',
-			action = 'create',
-			label = 'keepwork',
-			value = 123
-		});
-		return key;
-	end)
-
-	LOG.std(nil, "info", "ParaWorldAnalytics", "google analytics initialized with user agent: %s", self.UA);
+	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id: %s %s %s", self.UA, self.user_id, self.client_id);
 	return self;
 end
 
-function ParaWorldAnalytics:GetGoogleClient()
-	return self.googleAnalitics
+function ParaWorldAnalytics:GetClientId()
+	-- try UUID first, then cpu id
+	if (System.os.GetPlatform()=="win32") then
+		-- FIXME os.run(cmd) brings a flashing terminal window before launching
+		-- it's better substitude with a npl method
+		uuid = System.os.run('wmic csproduct get UUID'):gsub("^UUID%s*(.-)%s*$", "%1")
+		if not uuid:match("^[F-]*$") then
+			return uuid
+		end
+
+		cpu_id = System.os.run('wmic cpu get ProcessorId'):gsub("^ProcessorId%s*(.-)%s*$", "%1")
+		return cpu_id
+	end
+	-- TODO support other os
+	return nil
 end
 
-function ParaWorldAnalytics:OnTimer()
-	-- TODO :  self.event_pool;
+
+function ParaWorldAnalytics:GatherEvent(event)
+	self.event_pool[#self.event_pool+1] = event;
 end
 
---local options = {
---    location = 'www.keepwork.com/lesson',
---    language = 'zh-CN',
---    category = 'test',
---    action = 'create',
---    label = 'keepwork',
---    value = 123
---}
-function ParaWorldAnalytics:SendEvent(options)
-	-- TODO add to pool and send in batch. 
-	-- self.event_pool[#self.event_pool+1] = options;
+function ParaWorldAnalytics:SendBatchEvents()
+	if next(self.event_pool) == nil then
+		return
+	end
 
-	LOG.std(nil, "debug", "ParaWorldAnalytics_sendEvent", options);
-	self:GetGoogleClient():send_event(options);
+	-- WARNING
+	-- event gathering and sending are async,
+	-- that will cause inconsistency unless running in single thread mode.
+
+	-- TODO maybe we need an api rate limiter in future
+	for i, event in pairs(self.event_pool) do
+		self:SendEvent(event);
+	end
+
+	self.event_pool = {};
+end
+
+function ParaWorldAnalytics:GetAnalyticsClient()
+	return self.analyticsClient;
+end
+
+function ParaWorldAnalytics:SendEvent(event)
+	self:GetAnalyticsClient():SendEvent(event);
 end

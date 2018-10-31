@@ -73,7 +73,7 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "desktop_menu", menu_items:
   - "new_item", itemStackArray, self:
   - "item_client_new_item_type_added", block_id, item:
-  - "user_event_stat", name, value:
+  - "user_event_stat", category, action, value:
 - file exporters:
   - "file_exported", id, filename:
   - "GetExporters", exporters: file exporters
