@@ -2,7 +2,8 @@
 Title: Entity Animation Model Generator
 Author(s): Cheng Yuanchu, LiXizhi
 Date: 2018/9/10
-Desc: When this block is placed next to a group of connected color blocks, we will convert the blocks into an animated model
+Desc: When this block is placed next to a group of connected blocks, we will convert the blocks into an animated model.
+we will extract all connected color blocks, but only extract ordinary solid blocks that is higher than current block
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua");
@@ -275,7 +276,7 @@ function Entity:ComputeModelFacing()
 		local x, y, z = x0+dx, y0+dy, z0+dz;
 		local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 		local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
-		if( y >= y0 and block_id == block_types.names.ColorBlock ) then
+		if( block_id~=0 and y >= y0) then
 			x1 = x;
 			y1 = y;
 			z1 = z;
@@ -430,14 +431,16 @@ function Entity:DeleteOutputCharacter()
 	end
 end
 
-
+-- it will return all connected color blocks or any connected solid blocks higher than the anim block.
 function Entity:GetAllConnectedColorBlocks()
 	local x0,y0,z0 = self:GetBlockPos();
 	local num_selected = 0;
-	local max_selected = 65535;
+	local max_selected = 1000; -- 65535
 	local blocks = {};
 	local block_indices = {};
 	local block_queue = commonlib.Queue:new();
+	local colorItem = block_types.get(block_types.names.ColorBlock):GetItem();
+
 	local function AddConnectedBlockRecursive(cx,cy,cz)
 		if( num_selected <= max_selected ) then
 			for side=0,5 do
@@ -446,19 +449,32 @@ function Entity:GetAllConnectedColorBlocks()
 				local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 				local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
 				local index = BlockEngine:GetSparseIndex(x,y,z)
-				if( not block_indices[index] and y >= y0 and block_id == 10 ) then
-					blocks[#(blocks)+1] = {x,y,z, block_id, block_data};
+				if( not block_indices[index] and block_id~=0 and (block_id == block_types.names.ColorBlock or y >= y0) ) then
+					local block_template = block_types.get(block_id);
+					if(block_template and block_template:isNormalCube()) then
+						-- convert solid block to color block
+						if(block_id ~= block_types.names.ColorBlock) then
+							block_id = block_types.names.ColorBlock;
+							block_data = colorItem:ColorToData(block_template:GetBlockColorByData(block_data));
+						end
+						blocks[#(blocks)+1] = {x,y,z, block_id, block_data};
+					end
+
 					block_indices[index] = true;
 					block_queue:pushright({x,y,z});
 					num_selected = num_selected + 1;
 				end
 			end
+			return true
 		end
 	end
 	AddConnectedBlockRecursive(x0,y0,z0);
 	while (not block_queue:empty()) do
 		local block = block_queue:popleft();
-		AddConnectedBlockRecursive(block[1], block[2], block[3]);
+		if(not AddConnectedBlockRecursive(block[1], block[2], block[3])) then
+			GameLogic.AddBBS("error", format(L"你最多可以用%d个方块创建人物", max_selected));
+			break;
+		end
 	end
 	return blocks;
 end
