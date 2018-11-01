@@ -46,15 +46,26 @@ function OnEnterKeepWorkUser()
 end
 ]]></script>
 <aries:window mode="thin" width="400" title='<%=format(L"课堂ID: %s", tostring(GetClassId()))%>' onclose="OnClose()">
-    <div class="default" style="margin-left:10px;margin-bottom:10px">
+    <div class="default" style="margin-left:10px;margin-bottom:20px">
+        <div style="margin-top:10px;"><%=L"请选择进入课堂的方式"%></div>
         <div style="margin-top:10px">
-            <div><div style="float:left;min-width:100px;"><%=L"你的真实姓名:"%></div><input name="username" style="width:200px;height:26px" /></div>
-            <div style="margin-top:5px;color:#ff6a00"><%=L"(只有老师可见)"%></div>
-        </div>
-        <div style="margin-left:0px;margin:20px;">
-            <div style="margin-bottom:15px;"><%=L"请选择进入课堂的方式"%></div>
-            <input type="button" style="margin-left:0px;min-width:120px;height:26px;" class="button" value='<%=L"临时进入"%>' onclick="OnEnterTempUser"/>
-            <input type="button" style="margin-left:60px;min-width:120px;height:26px;" class="button" value='<%=L"登陆并进入"%>' onclick="OnEnterKeepWorkUser"/>
+            <div style="float:left;width:180px;">
+                <div style="height:90px;">
+                    <div style="min-width:100px;"><%=L"你的真实姓名:"%></div>
+                    <div><input name="username" style="width:120px;height:26px" /></div>
+                    <div style="margin-top:5px;color:#ff6a00"><%=L"(只有老师可见)"%></div>
+                </div>
+                <input type="button" style="margin-top:5px;margin-left:0px;min-width:120px;height:26px;" class="button" value='<%=L"临时进入"%>' onclick="OnEnterTempUser"/>
+            </div>
+            <div style="float:left;width:1px;height:120px;margin-top:0px;background-color:#808080">
+            </div>
+            <div style="float:left;width:180px;margin-left:20px;">
+                <div style="height:90px;">
+                    <div><%=L"登陆后可记录学习历程"%></div>
+                    <div style="margin-top:5px;color:#ff6a00"><%=L"(推荐使用)"%></div>
+                </div>
+                <input type="button" style="margin-top:5px;min-width:120px;height:26px;" class="button" value='<%=L"登陆并进入"%>' onclick="OnEnterKeepWorkUser"/>
+            </div>
         </div>
     </div>
 </aries:window>
