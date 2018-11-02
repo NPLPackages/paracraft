@@ -67,7 +67,7 @@ end
 function ItemColorBlock:GetPenColor(itemStack)
 	itemStack = itemStack or self:GetSelectedItemStack();
 	if(itemStack) then
-		return itemStack:GetDataField("color") or self.pen_color;
+		return Color.ToValue(itemStack:GetDataField("color") or self.pen_color);
 	else
 		return self.pen_color;
 	end

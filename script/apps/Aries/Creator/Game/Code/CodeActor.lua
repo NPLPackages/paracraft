@@ -429,6 +429,7 @@ end
 function Actor:SetPhysicsRadius(radius)
 	local entity = self:GetEntity();
 	if(entity) then	
+		radius = tonumber(radius);
 		entity:SetPhysicsRadius(radius * BlockEngine.blocksize);
 	end
 end
@@ -441,7 +442,10 @@ end
 function Actor:SetPhysicsHeight(height)
 	local entity = self:GetEntity();
 	if(entity) then	
-		entity:SetPhysicsHeight(height * BlockEngine.blocksize);
+		height = tonumber(height);
+		if(height) then
+			entity:SetPhysicsHeight(height * BlockEngine.blocksize);
+		end
 	end
 end
 
