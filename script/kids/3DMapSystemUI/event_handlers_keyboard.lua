@@ -140,6 +140,21 @@ function KeyBoard.SetKeyPassFilter(filter)
 	key_pass_filter = filter;
 end
 
+function Map3DSystem.OnKeyUpEvent()
+	-- apply key filter
+	if(key_pass_filter and not key_pass_filter[virtual_key]) then
+		return;
+	end
+	-- update input message
+	local input = Map3DSystem.InputMsg;
+	input.virtual_key = virtual_key;
+	input.wndName = "key_up";
+	-- call hook for "input" application
+	if(CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROC, 0, "input", input) ==nil) then
+		return
+	end
+end
+
 function Map3DSystem_OnKeyDownEvent()
 	-- apply key filter
 	if(key_pass_filter and not key_pass_filter[virtual_key]) then

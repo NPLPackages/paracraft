@@ -36,6 +36,7 @@ function Map3DSystem.ReBindEventHandlers(params)
 	ParaScene.RegisterEvent("_mwheel_map3d", ";Map3DSystem.OnMouseWheel();");
 	-- register key event handler
 	ParaScene.RegisterEvent("_k_map3d_keydown", ";Map3DSystem_OnKeyDownEvent();");
+	ParaScene.RegisterEvent("_ku_map3d_keyup", ";Map3DSystem.OnKeyUpEvent();");
 	-- register network event handler
 	ParaScene.RegisterEvent("_n_map3d_network", ";Map3DSystem.OnNetworkEvent();");
 	-- register system event handler
