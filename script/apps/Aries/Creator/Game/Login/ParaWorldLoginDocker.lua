@@ -62,6 +62,9 @@ end
 
 -- whether the given application is already loaded. 
 function ParaWorldLoginDocker.IsLoadedApp(name)
+	if(name == "exit_paraworld") then
+		return true;
+	end
 	if(System.options.mc) then
 		if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 			return true;
@@ -180,6 +183,16 @@ function ParaWorldLoginDocker.OnClickApp(name)
 					ParaWorldLoginDocker.Restart(name, format('paraworldapp="%s"', name))
 				end
 			end)
+		end
+	elseif(name == "paracraft_games") then
+		-- TODO: for Effie, community edition
+
+	elseif(name == "exit_paraworld") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+		local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+		if(GameLogic.GetFilters():apply_filters("exit_paraworld", true)) then
+			ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);
+			ParaGlobal.ExitApp();
 		end
 	end
 end

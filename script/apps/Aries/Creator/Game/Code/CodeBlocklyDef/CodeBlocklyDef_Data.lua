@@ -245,6 +245,8 @@ end
 				{ L"颜色", "color" },
 				{ L"文字", "text" },
 				{ L"是否为化身", "isAgent" },
+				{ L"模型文件", "assetfile" },
+				{ L"绘图代码", "rendercode" },
 			},
 		},
 	},
@@ -269,14 +271,6 @@ end
 		{
 			name = "key",
 			type = "input_value",
-			options = {
-				{ L"名字", "name" },
-				{ L"物理半径", "physicsRadius" },
-				{ L"物理高度", "physicsHeight" },
-				{ L"颜色", "color" },
-				{ L"文字", "text" },
-				{ L"任意变量", "" },
-			},
 			shadow = { type = "actorProperties", value = "name",},
 			text = "name", 
 		},
@@ -320,14 +314,6 @@ say("click us!")
 		{
 			name = "key",
 			type = "input_value",
-			options = {
-				{ L"名字", "name" },
-				{ L"物理半径", "physicsRadius" },
-				{ L"物理高度", "physicsHeight" },
-				{ L"颜色", "color" },
-				{ L"是否为化身", "isAgent" },
-				{ L"任意变量", "" },
-			},
 			shadow = { type = "actorProperties", value = "name",},
 			text = "name", 
 		},

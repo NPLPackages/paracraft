@@ -344,6 +344,7 @@ scaleTo(100)
 			options = {
 				{ L"此角色", "myself" },
 				{ L"主角", "player" },
+				{ L"某个角色名", "" },
 			},
 		},
 		
@@ -369,11 +370,6 @@ scaleTo(100)
 			name = "name",
 			type = "input_value",
             shadow = { type = "focus_list" },
-			options = {
-				{ L"此角色", "myself" },
-				{ L"主角", "player" },
-				{ L"某个角色名", "" },
-			},
 			text = "myself",
 		},
 	},

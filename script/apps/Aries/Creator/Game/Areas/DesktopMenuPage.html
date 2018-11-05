@@ -43,18 +43,6 @@ end
         </div>
     </pe:container>
 </pe:container>
-<pe:if condition='<%=GameLogic.GameMode:IsEditor()%>' >
-    <pe:container ClickThrough="true" alignment="_lt" style="background:;position:relative;margin-top:34px;width:128px;">
-       <div style="float:left;" >
-        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);background-color:#ffffff80">
-            <pe:mc_slot bagpos ='1' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity():GetInventoryView()%>"/>
-        </div>
-        <div style="float: left; margin-left: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12); background-color: #ffffff80;">
-            <pe:mc_slot bagpos ='2' edit_mode="editor_only" style="width:32px;height:32px;" ContainerView="<%=GameLogic.GetDesktopEntity():GetInventoryView()%>"/>
-        </div>
-       </div>
-    </pe:container>
-</pe:if>
 </pe:mcml>
 </body>
 </html>

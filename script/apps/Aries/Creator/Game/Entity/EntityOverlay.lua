@@ -177,7 +177,6 @@ function Entity:SetOpacity(opacity)
 	end
 end
 
-
 function Entity:SetBoundingRadius(radius)
 	if(self.overlay) then
 		self.overlay:SetBoundRadius(radius*self:GetScaling())
@@ -186,7 +185,7 @@ end
 
 -- overlay pixel picking
 function Entity:HasPickingName(pickingName)
-	return self.pickingName == pickingName and self:IsPickingEnabled();
+	return self.pickingName == pickingName and self:IsPickingEnabled() and self.overlay and (self:GetPickingFrameNumber() == self.overlay:GetPickingFrameNumber());
 end
 
 -- NOT USED. find a way to update world position when screen pos and camera changes. 
@@ -200,6 +199,10 @@ function Entity:UpdateWorldPositionFromScreenPos()
 		local offsetPos = self.screenPos * overlay.matInverseView;
 		self:SetPosition(offsetPos[1] + overlay.vWorld[1], offsetPos[2] + overlay.vWorld[2], offsetPos[3] + overlay.vWorld[3]);
 	end
+end
+
+function Entity:GetPickingFrameNumber()
+	return self.pickingFrameNumber;
 end
 
 -- virtual function. 
@@ -239,6 +242,7 @@ function Entity:paintEvent(painter)
 
 	-- pen color	
 	if(self.overlay:IsPickingPass()) then
+		self.pickingFrameNumber = self.overlay:GetPickingFrameNumber();
 		self.pickingName = self.overlay:GetNextPickingName();
 		self.overlay:SetColorAndName(painter, self.pickingName, self.pickingName)
 	else

@@ -10,10 +10,12 @@
 name = Page:GetRequestParam("name") or "";
 local apps = {
     ["paracraft"] = {title=L"Paracraft创意空间", subtitle=L"创作属于你的游戏世界", text=L"Paracraft创意空间是一款免费的动画和游戏创作工具。Paracraft使用NPL语言开发，适合任意年龄用户。我们探索了基于方块的动画创作，和一种基于动画和记忆的编程模式。NPL语言全称Neural Parallel Language是我们自主研发的开源编程语言，Paracraft是它的编辑工具，我们用它编写了魔法哈奇，创意空间，KeepWork，NPL CAD等众多大型3D客户端和服务器端应用软件，并开源了100多万行NPL代码。", image="", icon="Texture/blocks/items/movie.png", },
+    -- ["paracraft_games"] = {title=L"游戏大厅", subtitle=L"发布你的游戏世界", text=L"游戏大厅包含海量玩家创作的多人在线游戏, 在这里你可以结交朋友，用自己的电脑当服务器邀请好友一起创造或游戏。", image="", icon="Texture/Aries/AppIcons/games_32bits.png", },
     ["haqi"] = {title=L"魔法哈奇", subtitle=L"结交朋友，分享作品", text=L"魔法哈奇是使用Paracraft和NPL语言开发的3D儿童社区。它包含了3D卡牌战斗和众多社区玩法，同时内置了Paracraft创作工具。 用户可以在这里结交新朋友，一起玩游戏，分享自己的作品。", image="", icon="Texture/Aries/Dock/Web/dragon_bg_blue_light_32bits.png#0 0 74 74", },
     ["haqi2"] = {title=L"魔法哈奇2", subtitle=L"结交朋友，分享作品", text=L"魔法哈奇2是使用Paracraft和NPL语言开发的3D青年社区。它是魔法哈奇在2012-2014年发布的资料篇，内置了Paracraft创作工具。", image="", icon="Texture/Aries/brand/haqi2_icon.png", },
     ["user_worlds"] = {title=L"获奖用户作品", subtitle=L"作品是最好的老师", text=L"Paracraft创意空间获奖用户作品。分享你的作品，和同伴一起学习。作品可直接提交参加NPL大赛和国际智能创意大赛。", icon="Texture/3DMapSystem/AppIcons/png/Tasks_64.png", },
     ["tutorial_worlds"] = {title=L"Paracraft动画与编程教学视频", subtitle=L"学会编程, 学会自学", text=L"Paracraft是一个有15年历史的经历了大量工业实践检验的工业级别的软件生态系统。Paracraft作为编程学习的生态系统，从底层的科学理论到顶层的应用实践（游戏，动画，CAD 3D制图）有着完整的链条和良好的分层。从适合7-10岁的儿童积木式编程和动画及游戏制作，到更进阶的NPL CAD学习，到最底层的NPL人工智能语言和C语言，您将拥有一个全生态的由浅入深的编程学习系统。", icon="Texture/3DMapSystem/AppIcons/png/Intro_64.png", },
+    ["exit_paraworld"] = {title=L"退出程序", subtitle="", text="", icon="Texture/Aries/AppIcons/exit.png", },
 }
 app = apps[name] or apps["paracraft"];
 ]]></script>

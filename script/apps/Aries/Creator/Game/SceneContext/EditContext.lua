@@ -334,3 +334,10 @@ function EditContext:keyPressEvent(event)
 		self:UpdateSelectManipulators();
 	end
 end
+
+function EditContext:keyReleaseEvent(event)
+	EditContext._super.keyReleaseEvent(self, event);
+	if(event:isAccepted()) then
+		return
+	end
+end

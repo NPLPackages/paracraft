@@ -66,6 +66,7 @@ Commands["give"] = {
 e.g.
 /give 61
 /give BlockModel {tooltip="blocktemplates/1.bmax"}
+/give ColorBlock 100 {color="#ff0000"}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity, blockid, count, data, method, serverdata, hasInputName;
@@ -92,6 +93,7 @@ Commands["take"] = {
 e.g.
 /take 61
 /take BlockModel {tooltip="blocktemplates/1.bmax"}
+/take ColorBlock 100 {color="#ff0000"}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local playerEntity, blockid, count, data, method, serverdata, hasInputName;

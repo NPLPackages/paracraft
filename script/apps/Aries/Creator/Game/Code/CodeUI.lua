@@ -178,7 +178,7 @@ function CodeUI:handleMouseEvent(event)
 				return
 			end
 		end
-		if(entity:HasPickingName(pickingName)) then
+		if(entity:IsVisible() and entity:HasPickingName(pickingName)) then
 			entity:event(event);
 			if(event:isAccepted()) then
 				return true;

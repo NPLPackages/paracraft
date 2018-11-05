@@ -348,6 +348,7 @@ local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
+	["rendercode"] = {setter = Actor.SetRenderCode, isVariable = false}, 
 }
 
 function Actor:GetActorValue(name)

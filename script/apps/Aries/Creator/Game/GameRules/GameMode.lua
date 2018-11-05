@@ -124,8 +124,10 @@ function GameMode:IsUseCreatorBag()
 	return self.bIsEditor or self.mode == "movie";
 end
 
+-- obsoleted: we disabled it once and for all.
 function GameMode:IsShowGoalTracker()
-	return not (self.mode=="movie");
+	-- return not (self.mode=="movie");
+	return false;
 end
 
 function GameMode:IsMovieMode()

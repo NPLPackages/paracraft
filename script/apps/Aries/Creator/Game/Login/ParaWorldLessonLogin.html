@@ -1,0 +1,74 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" src="ParaWorldLessons.lua"><![CDATA[
+ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
+lesson = ParaWorldLessons.GetCurrentLesson();
+classId = tonumber(Page:GetRequestParam("classId") or 0)
+function GetClassId()
+    return classId;
+end
+
+function OnClose()
+    Page:CloseWindow()
+end
+
+function EnterClass()
+    local username = Page:GetValue("username", "")
+    ParaWorldLessons.EnterClassImp(classId, username);
+end
+
+function OnEnterTempUser()
+    local username = Page:GetValue("username", "")
+    if(username == "") then
+        _guihelper.MessageBox(L"请输入你的名字");
+        return
+    end
+    EnterClass()
+    OnClose()
+end
+
+function OnEnterKeepWorkUser()
+    local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
+	if(LoginMain.IsSignedIn()) then
+		EnterClass()
+	else
+		LoginMain.ShowLoginModal(function()
+			EnterClass()
+		end, L"登陆后才能访问课程系统, 请先登录");
+	end
+    OnClose()
+end
+]]></script>
+<aries:window mode="thin" width="400" title='<%=format(L"课堂ID: %s", tostring(GetClassId()))%>' onclose="OnClose()">
+    <div class="default" style="margin-left:10px;margin-bottom:20px">
+        <div style="margin-top:10px;"><%=L"请选择进入课堂的方式"%></div>
+        <div style="margin-top:10px">
+            <div style="float:left;width:180px;">
+                <div style="height:90px;">
+                    <div style="min-width:100px;"><%=L"你的真实姓名:"%></div>
+                    <div><input name="username" style="width:120px;height:26px" /></div>
+                    <div style="margin-top:5px;color:#ff6a00"><%=L"(只有老师可见)"%></div>
+                </div>
+                <input type="button" style="margin-top:5px;margin-left:0px;min-width:120px;height:26px;" class="button" value='<%=L"临时进入"%>' onclick="OnEnterTempUser"/>
+            </div>
+            <div style="float:left;width:1px;height:120px;margin-top:0px;background-color:#808080">
+            </div>
+            <div style="float:left;width:180px;margin-left:20px;">
+                <div style="height:90px;">
+                    <div><%=L"登陆后可记录学习历程"%></div>
+                    <div style="margin-top:5px;color:#ff6a00"><%=L"(推荐使用)"%></div>
+                </div>
+                <input type="button" style="margin-top:5px;min-width:120px;height:26px;" class="button" value='<%=L"登陆并进入"%>' onclick="OnEnterKeepWorkUser"/>
+            </div>
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

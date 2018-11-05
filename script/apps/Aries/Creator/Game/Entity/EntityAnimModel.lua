@@ -2,7 +2,8 @@
 Title: Entity Animation Model Generator
 Author(s): Cheng Yuanchu, LiXizhi
 Date: 2018/9/10
-Desc: When this block is placed next to a group of connected color blocks, we will convert the blocks into an animated model
+Desc: When this block is placed next to a group of connected blocks, we will convert the blocks into an animated model.
+we will extract all connected color blocks, but only extract ordinary solid blocks that is higher than current block
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua");
@@ -204,7 +205,7 @@ end
 
 -- rebuild all connected blocks into a model
 function Entity:Rebuild()
-	local blocks = self:SelectAllConnectedColorBlocks();
+	local blocks = self:GetAllConnectedColorBlocks();
 	if(blocks and #blocks == 0) then
 		GameLogic.AddBBS("AnimModel", L"需要放在一组彩色方块的旁边才能生成模型", 20);
 		self:ShowThinkerText(L"我的附近没有发现像模型的彩色方块")
@@ -265,70 +266,80 @@ function Entity:TickThinking()
 end
 
 -- we will get nearby color block to compute the model facing
---@return {0, angleY, angleZ}
+--@return {0, angleY, 0} of vector3d
 function Entity:ComputeModelFacing()
 	local x0,y0,z0 = self:GetBlockPos();
 	local x1,y1,z1;
+	local angle;
 	for side=0,5 do
 		local dx, dy, dz = Direction.GetOffsetBySide(side);
 		local x, y, z = x0+dx, y0+dy, z0+dz;
 		local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 		local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
-		if( y >= y0 and block_id == block_types.names.ColorBlock ) then
+		if( block_id~=0 and y >= y0) then
 			x1 = x;
 			y1 = y;
 			z1 = z;
+			angle = Direction.directionTo3DFacing[side]
 			break;
 		end
 	end
-	local angle = 0
-	local around_y_axis = false;
-	if(x1) then
-		local dir = vector3d:new({x0-x1,y0-y1,z0-z1});
-		dir:normalize();
-
-		local x_positive = vector3d:new(1,0,0);
-		angle = dir:angleAbsolute(x_positive);
-		
-		if( math.abs(dir:dot(vector3d:new(0,1,0))) < 0.00001 ) then
-			around_y_axis = true;
-		end
-	end
-
-	local angles;
-	if(around_y_axis) then
-		angles = {0, angle, 0};
-	else
-		angles = {0, 0, angle};
-	end
-
+	angle = angle or 0;
+	local angles = vector3d:new(0, angle, 0);
 	return angles;
 end
 
--- auto rotate blocks around y axis so that the model is facing positive x 
-function Entity:AutoOrientBlocks(blocks)
+function Entity:OffsetBlocks(blocks, dx, dy, dz)
+	for i,block in ipairs(blocks) do
+		block[1] = block[1] + dx;
+		block[2] = block[2] + dy;
+		block[3] = block[3] + dz;
+	end
+end
+
+function Entity:CenterBlocks(blocks)
 	local aabb = ShapeAABB:new();
 	for i,block in ipairs(blocks) do
 		aabb:Extend(block[1], block[2], block[3]);
 	end
 	local center = aabb:GetCenter();
-	for i,block in ipairs(blocks) do
-		block[1] = block[1] - center[1];
-		block[2] = block[2] - center[2];
-		block[3] = block[3] - center[3];
-	end
+	--local cx,cy,cz = math.floor(center[1]+0.5), math.floor(center[2]+0.5), math.floor(center[3]+0.5)
+	local cx,cy,cz = center[1], center[2], center[3]
+	self:OffsetBlocks(blocks, -cx, -cy, -cz)
+end
 
+function Entity:RotateBlocksByYAxis(blocks, rot_angle)
+	if(rot_angle~=0) then
+		local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
+		-- snap to right angle
+		sin_t, cos_t = math.floor(sin_t+0.5), math.floor(cos_t+0.5);
+
+		local p = vector3d:new();
+		for _, block in ipairs(blocks) do
+			p:set(block[1], block[2], block[3]);
+			-- p:rotate(angles[1],angles[2],angles[3]);
+			p[1] = block[1]*cos_t - block[3]*sin_t
+			p[3] = block[1]*sin_t + block[3]*cos_t
+
+			block[1] = p[1];
+			block[2] = p[2];
+			block[3] = p[3];
+		end
+	end
+end
+
+-- auto rotate blocks around y axis so that the model is facing positive x 
+-- also offset around the center
+function Entity:AutoOrientBlocks(blocks)
+	local x0,y0,z0 = self:GetBlockPos();
+	self:OffsetBlocks(blocks, -x0, -y0, -z0);
+
+	-- need to align to positive X axis
 	local angles = self:ComputeModelFacing();
+	self:RotateBlocksByYAxis(blocks, angles[2]);
 
-	--LOG.std(nil, "info", "Morph", "angle: %f!", angle);
-
-	for i,block in ipairs(blocks) do
-		local p = vector3d:new({block[1], block[2], block[3]});
-		p:rotate(angles[1],angles[2],angles[3]);
-		block[1] = p[1];
-		block[2] = p[2];
-		block[3] = p[3];
-	end
+	-- center blocks, block pos be 0.5, not standard blocks
+	self:CenterBlocks(blocks);
 end
 
 -- static script callback function
@@ -373,6 +384,11 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 				local x, y, z = EntityManager.GetPlayer():GetPosition()
 				entity:SetPosition(x, y, z);
 			end
+			
+			local Event = commonlib.gettable("System.Core.Event");
+			local event = Event:new():init("SaveAnimModel");
+			event.cmd_text = {name = self:GetFilename()};
+			GameLogic:event(event);			
 		else
 			GameLogic.AddBBS("AnimModel", format(L"无法覆盖文件%s", commonlib.Encoding.DefaultToUtf8(self:GetFilename())));
 			self:ShowThinkerText(L"出错了");
@@ -415,14 +431,16 @@ function Entity:DeleteOutputCharacter()
 	end
 end
 
-
-function Entity:SelectAllConnectedColorBlocks()
+-- it will return all connected color blocks or any connected solid blocks higher than the anim block.
+function Entity:GetAllConnectedColorBlocks()
 	local x0,y0,z0 = self:GetBlockPos();
 	local num_selected = 0;
-	local max_selected = 65535;
+	local max_selected = 1000; -- 65535
 	local blocks = {};
 	local block_indices = {};
 	local block_queue = commonlib.Queue:new();
+	local colorItem = block_types.get(block_types.names.ColorBlock):GetItem();
+
 	local function AddConnectedBlockRecursive(cx,cy,cz)
 		if( num_selected <= max_selected ) then
 			for side=0,5 do
@@ -431,23 +449,33 @@ function Entity:SelectAllConnectedColorBlocks()
 				local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 				local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
 				local index = BlockEngine:GetSparseIndex(x,y,z)
-				if( not block_indices[index] and y >= y0 and block_id == 10 ) then
-					blocks[#(blocks)+1] = {x,y,z, block_id, block_data};
+				if( not block_indices[index] and block_id~=0 and (block_id == block_types.names.ColorBlock or y >= y0) ) then
+					local block_template = block_types.get(block_id);
+					if(block_template and block_template:isNormalCube()) then
+						-- convert solid block to color block
+						if(block_id ~= block_types.names.ColorBlock) then
+							block_id = block_types.names.ColorBlock;
+							block_data = colorItem:ColorToData(block_template:GetBlockColorByData(block_data));
+						end
+						blocks[#(blocks)+1] = {x,y,z, block_id, block_data};
+					end
+
 					block_indices[index] = true;
-					ParaTerrain.SelectBlock(x,y,z,true); -- debug use
 					block_queue:pushright({x,y,z});
 					num_selected = num_selected + 1;
 				end
 			end
+			return true
 		end
 	end
 	AddConnectedBlockRecursive(x0,y0,z0);
 	while (not block_queue:empty()) do
 		local block = block_queue:popleft();
-		ParaTerrain.SelectBlock(block[1], block[2], block[3],true);
-		AddConnectedBlockRecursive(block[1], block[2], block[3]);
+		if(not AddConnectedBlockRecursive(block[1], block[2], block[3])) then
+			GameLogic.AddBBS("error", format(L"你最多可以用%d个方块创建人物", max_selected));
+			break;
+		end
 	end
-	ParaTerrain.DeselectAllBlock();
 	return blocks;
 end
 

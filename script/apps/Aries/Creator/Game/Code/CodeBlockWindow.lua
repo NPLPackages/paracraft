@@ -87,8 +87,17 @@ end
 
 -- @return margin_right and bottom
 function CodeBlockWindow:CalculateMargins()
+	local MAX_3DCANVAS_WIDTH = 800;
+	local MIN_CODEWINDOW_WIDTH = 200+350;
 	local viewport = ViewportManager:GetSceneViewport();
-	local width = math.max(math.floor(Screen:GetWidth() * 1/3), 200+350);
+	local width = math.max(math.floor(Screen:GetWidth() * 1/3), MIN_CODEWINDOW_WIDTH);
+	local halfScreenWidth = math.floor(Screen:GetWidth()/2);
+	if(halfScreenWidth > MAX_3DCANVAS_WIDTH) then
+		width = halfScreenWidth;
+	elseif((Screen:GetWidth() - width) > MAX_3DCANVAS_WIDTH) then
+		width = Screen:GetWidth() - MAX_3DCANVAS_WIDTH;
+	end
+
 	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
 	local margin_right = math.floor(width * Screen:GetUIScaling()[1]);
 	return width, Screen:GetHeight()-bottom, margin_right, bottom;
