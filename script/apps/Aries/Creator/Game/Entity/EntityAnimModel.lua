@@ -269,7 +269,6 @@ end
 --@return {0, angleY, 0} of vector3d
 function Entity:ComputeModelFacing()
 	local x0,y0,z0 = self:GetBlockPos();
-	local x1,y1,z1;
 	local angle;
 	for side=0,5 do
 		local dx, dy, dz = Direction.GetOffsetBySide(side);
@@ -277,9 +276,6 @@ function Entity:ComputeModelFacing()
 		local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 		local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
 		if( block_id~=0 and y >= y0) then
-			x1 = x;
-			y1 = y;
-			z1 = z;
 			angle = Direction.directionTo3DFacing[side]
 			break;
 		end
@@ -295,17 +291,6 @@ function Entity:OffsetBlocks(blocks, dx, dy, dz)
 		block[2] = block[2] + dy;
 		block[3] = block[3] + dz;
 	end
-end
-
-function Entity:CenterBlocks(blocks)
-	local aabb = ShapeAABB:new();
-	for i,block in ipairs(blocks) do
-		aabb:Extend(block[1], block[2], block[3]);
-	end
-	local center = aabb:GetCenter();
-	--local cx,cy,cz = math.floor(center[1]+0.5), math.floor(center[2]+0.5), math.floor(center[3]+0.5)
-	local cx,cy,cz = center[1], center[2], center[3]
-	self:OffsetBlocks(blocks, -cx, -cy, -cz)
 end
 
 function Entity:RotateBlocksByYAxis(blocks, rot_angle)
@@ -331,15 +316,23 @@ end
 -- auto rotate blocks around y axis so that the model is facing positive x 
 -- also offset around the center
 function Entity:AutoOrientBlocks(blocks)
-	local x0,y0,z0 = self:GetBlockPos();
-	self:OffsetBlocks(blocks, -x0, -y0, -z0);
-
 	-- need to align to positive X axis
 	local angles = self:ComputeModelFacing();
+
+	-- transfer the blocks center to the origin
+	local aabb = ShapeAABB:new();
+	for i,block in ipairs(blocks) do
+		aabb:Extend(block[1], block[2], block[3]);
+	end
+	local center = aabb:GetCenter();
+	local cx,cy,cz = center[1], center[2], center[3]
+	self:OffsetBlocks(blocks, -cx, -cy, -cz)
+
+	-- rotating around y axis
 	self:RotateBlocksByYAxis(blocks, angles[2]);
 
-	-- center blocks, block pos be 0.5, not standard blocks
-	self:CenterBlocks(blocks);
+	-- transfer the blocks center back to the original center
+	self:OffsetBlocks(blocks, cx, cy, cz)
 end
 
 -- static script callback function
