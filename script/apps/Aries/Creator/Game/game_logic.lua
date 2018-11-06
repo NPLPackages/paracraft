@@ -143,6 +143,10 @@ function GameLogic:ctor()
 		-- do not leak events to hook chain. 
 		SceneContextManager:SetAcceptAllEvents(true);
 	end
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
+	ParaWorldAnalytics:new():Init()
 end
 
 
