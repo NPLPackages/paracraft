@@ -82,10 +82,12 @@ Commands["goto"] = {
 	quick_ref="/goto [@playername] [home] [x y z]", 
 	isLocal=false,
 	desc=[[teleport current player to a given block position relative to given player. Similar to /tp except that it uses block position. 
-format: /goto x y z  abs position
-format: /goto ~ ~1 ~  relative position
-format: /goto home -- teleport to home   
-format: /goto [@playername] [x y z]
+Examples:
+/goto x y z  current focused entity
+/goto @a x y z  teleport nearby player to absolute pos
+/goto ~ ~1 ~  relative position
+/goto home -- teleport to home   
+/goto [@playername] [x y z]
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(GameLogic.IsServerWorld()) then

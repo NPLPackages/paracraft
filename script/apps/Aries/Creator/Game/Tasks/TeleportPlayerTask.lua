@@ -37,6 +37,12 @@ function TeleportPlayer:Run()
 	if(not entityPlayer) then
 		return;
 	end
+
+	if(entityPlayer:IsBlockEntity()) then
+		LOG.std(nil, "warn", "TeleportPlayer", "can not move block entity");
+		return
+	end
+
 	local oldPosX, oldPosY, oldPosZ = entityPlayer:GetPosition();
 	self.oldPosX, self.oldPosY, self.oldPosZ = oldPosX, oldPosY, oldPosZ;
 	

@@ -293,6 +293,17 @@ function Entity:OffsetBlocks(blocks, dx, dy, dz)
 	end
 end
 
+function Entity:CenterBlocks(blocks)
+	local aabb = ShapeAABB:new();
+	for i,block in ipairs(blocks) do
+		aabb:Extend(block[1], block[2], block[3]);
+	end
+	local center = aabb:GetCenter();
+	--local cx,cy,cz = math.floor(center[1]+0.5), math.floor(center[2]+0.5), math.floor(center[3]+0.5)
+	local cx,cy,cz = center[1], center[2], center[3]
+	self:OffsetBlocks(blocks, -cx, -cy, -cz)
+end
+
 function Entity:RotateBlocksByYAxis(blocks, rot_angle)
 	if(rot_angle~=0) then
 		local sin_t, cos_t = math.sin(rot_angle), math.cos(rot_angle);
@@ -316,23 +327,15 @@ end
 -- auto rotate blocks around y axis so that the model is facing positive x 
 -- also offset around the center
 function Entity:AutoOrientBlocks(blocks)
+	local x0,y0,z0 = self:GetBlockPos();
+	self:OffsetBlocks(blocks, -x0, -y0, -z0);
+
 	-- need to align to positive X axis
 	local angles = self:ComputeModelFacing();
-
-	-- transfer the blocks center to the origin
-	local aabb = ShapeAABB:new();
-	for i,block in ipairs(blocks) do
-		aabb:Extend(block[1], block[2], block[3]);
-	end
-	local center = aabb:GetCenter();
-	local cx,cy,cz = center[1], center[2], center[3]
-	self:OffsetBlocks(blocks, -cx, -cy, -cz)
-
-	-- rotating around y axis
 	self:RotateBlocksByYAxis(blocks, angles[2]);
 
-	-- transfer the blocks center back to the original center
-	self:OffsetBlocks(blocks, cx, cy, cz)
+	--self:OffsetBlocks(blocks, x0, y0, z0);
+	--self:CenterBlocks(blocks)
 end
 
 -- static script callback function
