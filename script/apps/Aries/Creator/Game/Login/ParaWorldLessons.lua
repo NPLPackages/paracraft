@@ -329,7 +329,7 @@ function ParaWorldLessons.UrlRequest(url, method, params, callback)
 		_guihelper.MessageBox(L"请求中，请稍等...", nil, _guihelper.MessageBoxButtons.Nothing)
 		ParaWorldLessons.isFetching = true;
 		local Store = NPL.load('(gl)Mod/WorldShare/store/Store.lua')
-		local token = Store:get('user/token')
+		local token = Store:Get('user/token')
 		local params_ = {
 			url = url,
 			method = method or 'GET',
@@ -449,8 +449,8 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	if(classId) then
 		classId = tonumber(classId);
 
-		local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
-		if(LoginMain.IsSignedIn()) then
+		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+		if(UserConsole.IsSignedIn()) then
 			ParaWorldLessons.EnterClassImp(classId);
 		else
 			local params = {
