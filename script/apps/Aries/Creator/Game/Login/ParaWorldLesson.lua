@@ -154,13 +154,18 @@ function ParaWorldLesson:OpenLessonUrl()
 		if(self:GetClassId()) then
 			self:OpenLessonUrlDirect();	
 		else
-			local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
-			if(LoginMain.IsSignedIn()) then
+			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+			if(UserConsole.IsSignedIn()) then
 				self:OpenLessonUrlDirect();	
 			else
-				LoginMain.ShowLoginModal(function()
-					self:OpenLessonUrlDirect();	
-				end, L"登陆后才能访问课程系统, 请先登录");
+				local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal")
+				local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+
+				Store:Set("user/loginText", L"登陆后才能访问课程系统, 请先登录")
+
+				LoginMain:Init(function()
+					self:OpenLessonUrlDirect();
+				end);
 			end
 		end
 	end
