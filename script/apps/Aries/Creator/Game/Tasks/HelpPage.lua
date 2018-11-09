@@ -41,6 +41,8 @@ local page;
 -- @param category_name: can be nil, or "tutorial", "shortcutkey", etc
 -- @param subfolder_name: can be nil or sub folder name, such as "MovieMaking", "newusertutorial", "programming", "circuit","smallstructure"
 function HelpPage.ShowPage(category_name, subfolder_name)
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", nil, "global");
+
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Tasks/HelpPage.html", 
 		name = "HelpPage.ShowPage", 
@@ -74,6 +76,8 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name)
 		return
 	end
 	if(type(index_or_name) == "string") then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", nil, index_or_name);
+
 		local ds = HelpPage.GetHelpDS();
 		if(ds) then
 			for index, item in ipairs(ds) do
@@ -113,6 +117,9 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name)
 		end
 		HelpPage.OnTypeItemChanged();
 		HelpPage.cur_category = HelpPage.GetCurrentCategory();
+
+		GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", nil, HelpPage.cur_category);
+
 		if(page) then
 			page:Refresh(0.1);
 		end

@@ -41,8 +41,7 @@ function OnClickBlock(block_id, mcmlNode)
             BuilderFramePage.OnClickBlock(item);
         end
     elseif(mouse_button == "right") then
-        -- show block wiki page
-        GameLogic.RunCommand("/wiki "..tostring(block_id));
+        BuilderFramePage.OnHelpBlock(block_id);
     end
 end
 

@@ -141,6 +141,7 @@ function Export.ExportAsTemplate(id)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 	local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 	SelectBlocks.SaveToTemplate();
+	GameLogic.GetFilters():apply_filters("user_event_stat", "model", "export", nil, "template");
 end
 
 function Export.ExportAsBMax()
@@ -152,6 +153,7 @@ function Export.ExportAsBMax()
 			local bSuccess, filename = GameLogic.RunCommand("savemodel", filename);
 			if(bSuccess and filename) then
 				GameLogic.GetFilters():apply_filters("file_exported", "bmax", filename);
+				GameLogic.GetFilters():apply_filters("user_event_stat", "model", "export", nil, "bmax");
 			end
 		end
 	end, nil, nil, "bmax");

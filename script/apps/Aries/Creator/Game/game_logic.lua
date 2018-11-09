@@ -540,6 +540,8 @@ function GameLogic.LoadGame()
 	
 	ModManager:OnWorldLoad();
 	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
+
+	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter", GameLogic.world.seed, nil);
 end
 
 function GameLogic.Pause()
@@ -1435,7 +1437,6 @@ function GameLogic.ToggleDesktop(name)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
 		local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
 		EscFramePage.ShowPage();
-		
 	elseif(name == "builder") then
 		if(GameMode:IsUseCreatorBag()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");

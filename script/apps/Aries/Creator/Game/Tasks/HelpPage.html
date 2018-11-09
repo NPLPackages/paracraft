@@ -163,6 +163,9 @@ function StartBuild()
         BuildQuest.EndEditing();
         return;
     end
+
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "use", nil, "tutorial");
+
     local task = BuildQuest:new({theme_id=HelpPage.select_item_index, task_id=HelpPage.select_task_index, step_id=1,category = HelpPage.cur_category})
     task:Run();
     HelpPage.ClosePage();

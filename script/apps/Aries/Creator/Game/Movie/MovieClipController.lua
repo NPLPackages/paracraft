@@ -196,6 +196,10 @@ function MovieClipController.ShowPage(bShow, OnClose)
 	end
 
 	MovieClipController.SetFocusToActor();
+
+	if MovieClipController.IsPlayingMode() then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "movie", "play", nil, nil);
+	end
 end
 
 
@@ -268,6 +272,8 @@ end
 function MovieClipController.OnClickAddNPC()
 	local movieClip = MovieClipController.GetMovieClip();
 	if(movieClip) then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "add", nil, nil);
+
 		local itemStack = movieClip:CreateNPC();
 		if(itemStack) then
 			MovieClipController.SetFocusToItemStack(itemStack);

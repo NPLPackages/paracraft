@@ -25,20 +25,24 @@ end
 function ParaWorldAnalytics:Init(UA)
 	-- FIXME UA-93899485-3 is a test account
 	self.UA = UA or "UA-93899485-3"
-	-- TODO user_id, fetch the login username, such as keepwork username
-	self.user_id = nil
+
+	self.user_id = self._user_id()
 	self.client_id = self.GetClientId()
-	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id);
+	self.app_name = self._app_name()
+	self.app_version = System.options.ClientVersion
+
+	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
 
 	-- category: which category that the event belongs
 	-- action: which kind of action that the event do
 	-- value: what exactly the action does
-	GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, ...)
+	-- label: more details about action
+	GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
 										  self:GatherEvent({
 												  category = category,
 												  action = action,
 												  value = value,
-												  label = 'paracraft',
+												  label = label,
 										  });
 										  return catetory;
 									 end)
@@ -48,8 +52,54 @@ function ParaWorldAnalytics:Init(UA)
 									end})
 	self.timer:Change(self.SendInterval, self.SendInterval);
 
-	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id: %s %s %s", self.UA, self.user_id, self.client_id);
+	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version: %s %s %s %s %s",
+			self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
 	return self;
+end
+
+function ParaWorldAnalytics:_user_id()
+	token = System.User.keepworktoken
+	if not token then
+		return nil
+	end
+
+	-- token format, xxxxxxxxx.xxxxxxxxxx.xxxxxxxxxx
+	-- the middle part(seperated by .) is user info in base64 format
+	base64_info = string.gsub(token, '[^.]*.([^.]*).[^.]*', '%1')
+
+	-- padding '=' until info len reaches multiple of 4
+	mod = string.len(base64_info) % 4
+	if mod ~= 0 then
+		mod = 4 - mod
+	end
+	base64_info = base64_info .. string.rep('=', mod)
+
+	NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+	local Encoding = commonlib.gettable("System.Encoding");
+	-- user_json content like below
+	-- "{\"username\":\"dreamanddead\",\"userId\":1234,\"exp\":1542093124}"
+	json_info = Encoding.unbase64(base64_info)
+
+	NPL.load("(gl)script/ide/Json.lua");
+	user = commonlib.Json.Decode(json_info)
+
+	if user and user.username then
+		return user.username
+	end
+end
+
+function ParaWorldAnalytics:_app_name()
+	if System.options.mc then
+		return "paracraft"
+	end
+
+	if System.options.version == 'kids' then
+		return "haqi"
+	end
+
+	if System.options.version == 'teen' then
+		return "haqi2"
+	end
 end
 
 function ParaWorldAnalytics:GetClientId()

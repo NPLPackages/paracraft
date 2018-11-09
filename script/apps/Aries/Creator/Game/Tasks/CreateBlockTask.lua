@@ -96,7 +96,8 @@ function CreateBlock:Run()
 				GameLogic.PlayAnimation({facingTarget = {x=tx, y=ty, z=tz},});
 				GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data});
-				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create", tostring(self.block_id));
+
+				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create", tostring(self.block_id), "single");
 			end
 
 			if(GameLogic.GameMode:CanAddToHistory()) then
@@ -122,6 +123,8 @@ function CreateBlock:Run()
 		for _, b in ipairs(self.blocks) do
 			local x, y, z = b[1]+dx, b[2]+dy, b[3]+dz;
 			if(b[4]) then
+				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create", tonumber(b[4]), "single");
+
 				local block_template = block_types.get(b[4]);
 				if(block_template) then
 					blocks[#blocks+1] = {x, y, z};
