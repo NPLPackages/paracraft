@@ -1631,3 +1631,21 @@ function block:CalculatePreferredData(data, preferredData)
 	end
 	return data;
 end
+
+-- NOT SUPPORTED in C++ YET: whether the block is obstructed
+function block:SetObstruction(bEnabled)
+	self.obstruction = bEnabled;
+	self:UpdateAttribute("attrFlag", self:RecomputeAttribute());
+end
+
+-- NOT SUPPORTED in C++ YET: 
+function block:SetBlockCamera(bEnabled)
+	self.blockcamera = bEnabled;
+	self:UpdateAttribute("attrFlag", self:RecomputeAttribute());
+end
+
+-- NOT SUPPORTED in C++ YET: 
+function block:SetClimbable(climbable)
+	self.climbable = climbable;
+	self:UpdateAttribute("attrFlag", self:RecomputeAttribute());
+end

@@ -473,7 +473,9 @@ end
 
 function Entity:mouseReleaseEvent(mouse_event)
 	mouse_event:accept();
-	self:OnClick(nil, nil, nil, mouse_event:button())
+	if(mouse_event:GetDragDist() < 10) then
+		self:OnClick(nil, nil, nil, mouse_event:button())
+	end
 end
 
 function Entity:Say(text, duration, bAbove3D)

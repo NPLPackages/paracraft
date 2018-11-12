@@ -21,6 +21,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
 Entity:Signal("beforeRemoved")
+Entity:Signal("editModeChanged")
 
 -- class name
 Entity.class_name = "EntityCode";
@@ -54,19 +55,110 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 	end
 end
 
+
+function Entity:SetBlocklyXMLCode(blockly_xmlcode)
+	self.blockly_xmlcode = blockly_xmlcode;
+end
+
+function Entity:GetBlocklyXMLCode()
+	return self.blockly_xmlcode;
+end
+
+
+function Entity:SetBlocklyNPLCode(blockly_nplcode)
+	self.blockly_nplcode = blockly_nplcode;
+	self:SetCommand(blockly_nplcode);
+end
+
+function Entity:GetBlocklyNPLCode()
+	return self.blockly_nplcode;
+end
+
+function Entity:SetNPLCode(nplcode)
+	self.nplcode = nplcode;
+	self:SetCommand(nplcode);
+end
+
+function Entity:GetNPLCode()
+	return self.nplcode or self:GetCommand();
+end
+
+function Entity:TextToXmlInnerNode(text)
+	if(commonlib.Encoding.HasXMLEscapeChar(text)) then
+		return {name="![CDATA[", [1] = text};
+	else
+		return text;
+	end
+end
+	
+function Entity:IsBlocklyEditMode()
+	return self.isBlocklyEditMode;
+end
+
+function Entity:SetBlocklyEditMode(bEnabled)
+	if(self.isBlocklyEditMode~=bEnabled) then
+		self.isBlocklyEditMode = bEnabled;
+		if(bEnabled)  then
+			self:SetCommand(self:GetBlocklyNPLCode());
+		else
+			self:SetCommand(self:GetNPLCode());
+		end
+		self:editModeChanged();
+	end
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
+	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	
+	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
+		local blocklyNode = {name="blockly", };
+		node[#node+1] = blocklyNode;
+		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
+		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
+		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
+			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
+		end
+	end
 	return node;
 end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true");
+	self.isBlocklyEditMode = node.attr.isBlocklyEditMode == "true";
 	local isPowered = node.attr.isPowered == "true";
 	if(isPowered) then
 		self:ScheduleRefresh();
+	end
+	for i=1, #node do
+		if(node[i].name == "blockly") then
+			for j=1, #(node[i]) do
+				local sub_node = node[i][j];
+				local code = sub_node[1]
+				if(code) then
+					if(type(code) == "table" and type(code[1]) == "string") then
+						-- just in case cmd.name == "![CDATA["
+						code = code[1];
+					end
+				end
+				if(type(code) == "string") then
+					if(sub_node.name == "xmlcode") then
+						self:SetBlocklyXMLCode(code);
+					elseif(sub_node.name == "nplcode") then
+						self:SetBlocklyNPLCode(code);
+					elseif(sub_node.name == "code") then
+						self:SetNPLCode(code);
+					end
+				end
+			end
+			break;
+		end
+	end
+	if(not self.isBlocklyEditMode) then
+		self.nplcode = self:GetCommand();
 	end
 end
 

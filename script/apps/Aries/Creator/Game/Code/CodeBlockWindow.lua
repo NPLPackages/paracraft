@@ -166,15 +166,18 @@ function CodeBlockWindow.SetCodeEntity(entity)
 	if(self.entity ~= entity) then
 		if(entity) then
 			entity:Connect("beforeRemoved", self, self.OnEntityRemoved, "UniqueConnection");
+			entity:Connect("editModeChanged", self, self.UpdateEditModeUI, "UniqueConnection");
 		end
 		if(self.entity) then
 			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
+			self.entity:Disconnect("editModeChanged", self, self.UpdateEditModeUI);
 			CodeBlockWindow.UpdateCodeToEntity();
 		end
 		self.entity = entity;
 		if(page) then
 			page:Refresh(0.01);
 		end
+		CodeBlockWindow.UpdateEditModeUI();
 		CodeBlockWindow.RestoreCursorPosition();
 		isEntityChanged = true;
 	end
@@ -210,8 +213,15 @@ function CodeBlockWindow.GetCodeFromEntity()
 	end
 end
 
-function CodeBlockWindow.GetCodeEntity()
-	return CodeBlockWindow.entity;
+function CodeBlockWindow.GetCodeEntity(bx, by, bz)
+	if(bx) then
+		local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
+		if(codeEntity and codeEntity.class_name == "EntityCode") then
+			return codeEntity;
+		end
+	else
+		return CodeBlockWindow.entity;
+	end
 end
 
 function CodeBlockWindow.GetCodeBlock()
@@ -267,7 +277,10 @@ function CodeBlockWindow.UpdateCodeToEntity()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(page and entity) then
 		local code = page:GetUIValue("code");
-		entity:SetCommand(code);
+		if(not entity:IsBlocklyEditMode()) then
+			entity:SetNPLCode(code);
+		end
+		
 		local ctl = CodeBlockWindow.GetTextControl();
 		if(ctl) then
 			entity.cursorPos = ctl:CursorPos();
@@ -478,9 +491,11 @@ function CodeBlockWindow.ReplaceCode(code, bx, by, bz)
 		end
 	else
 		if(bx and by and bz) then
-			local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
-			if(codeEntity and codeEntity.class_name == "EntityCode") then
-				codeEntity:SetCommand(code);
+			local codeEntity = CodeBlockWindow.GetCodeEntity(bx, by, bz)
+			if(codeEntity) then
+				if(not codeEntity:IsBlocklyEditMode()) then
+					codeEntity:SetNPLCode(code);
+				end
 				return true;
 			end
 		end
@@ -503,6 +518,22 @@ function CodeBlockWindow.IsSameBlock(bx, by, bz)
 		end
 	end
 	return true;
+end
+
+-- @param blockly_xmlcode: xml text for blockly
+-- @param code: this is the generated NPL code, should be readonly until we have two way binding. 
+-- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
+function CodeBlockWindow.UpdateBlocklyCode(blockly_xmlcode, code, bx, by, bz)
+	local codeEntity = CodeBlockWindow.GetCodeEntity(bx, by, bz);
+	if(codeEntity) then
+		codeEntity:SetBlocklyEditMode(true);
+		codeEntity:SetBlocklyXMLCode(blockly_xmlcode);
+		codeEntity:SetBlocklyNPLCode(code);
+
+		if(CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+			CodeBlockWindow.ReplaceCode(code, bx, by, bz)
+		end
+	end
 end
 
 -- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
@@ -589,6 +620,45 @@ function CodeBlockWindow.UpdateBlocklyWindowSize()
 	end
 end
 
+function CodeBlockWindow.IsBlocklyEditMode()
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		return entity:IsBlocklyEditMode()
+	end
+end
+
+function CodeBlockWindow.OnClickEditMode(name)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(not entity) then
+		return
+	end
+	if(CodeBlockWindow.IsBlocklyEditMode()) then
+		if(name == "codeMode") then
+			entity:SetBlocklyEditMode(false);
+		end
+	else
+		if(name == "blockMode") then
+			CodeBlockWindow.OpenBlocklyEditor()
+			entity:SetBlocklyEditMode(true);
+		end
+	end
+end
+
+function CodeBlockWindow.UpdateEditModeUI()
+	if(page) then
+		if(CodeBlockWindow.IsBlocklyEditMode()) then
+			_guihelper.SetUIColor(page:FindControl("blockMode"), "#0b9b3a")
+			_guihelper.SetUIColor(page:FindControl("codeMode"), "#ffffff")
+		else
+			_guihelper.SetUIColor(page:FindControl("blockMode"), "#ffffff")
+			_guihelper.SetUIColor(page:FindControl("codeMode"), "#0b9b3a")
+		end
+		local textCtrl = CodeBlockWindow.GetTextControl();
+		if(textCtrl) then
+			textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
+		end
+	end
+end
 
 function CodeBlockWindow.OpenBlocklyEditor()
 	local blockpos;
