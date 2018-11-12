@@ -123,7 +123,7 @@ function ShareWorldPage.StartUpload()
 		
 		ShareWorldPage.IsUploading = true;
 		ShareWorldPage.progress = 0;
-		
+
 		-- start the first stage
 		ShareWorldPage.CompressWorld();
 	else

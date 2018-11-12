@@ -337,6 +337,8 @@ function CodeBlockWindow.OnClickCompileAndRun()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if(codeBlock and codeBlock:GetEntity()) then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
+
 		CodeBlockWindow.UpdateCodeToEntity();
 		codeBlock:GetEntity():Restart();
 	end
@@ -719,6 +721,8 @@ end
 
 function CodeBlockWindow.OnOpenTutorials()
 	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/codeblock", "", "", 1);
+
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", nil, "code");
 end
 
 -- Redirect this object as a scene context, so that it will receive all key/mouse events from the scene. 

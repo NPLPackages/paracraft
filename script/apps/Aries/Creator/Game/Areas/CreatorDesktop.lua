@@ -226,6 +226,8 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 				collectgarbage("collect");
 			end
 		else
+			GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "browse", nil, nil);
+
 			IsExpanded = true;
 		end
 	end

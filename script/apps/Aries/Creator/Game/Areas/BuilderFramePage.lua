@@ -99,6 +99,12 @@ end
 
 -- clicked a block item
 function BuilderFramePage.OnClickBlock(block_id_or_item)
+	if type(block_id_or_item) == "table" then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id_or_item.block_id, "block");
+	else
+		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id_or_item, "block");
+	end
+
 	local search_text_obj = ParaUI.GetUIObject("block_search_text_obj");
 	if(search_text_obj:IsValid())then
 		search_text_obj:LostFocus();
@@ -114,6 +120,13 @@ function BuilderFramePage.OnClickBlock(block_id_or_item)
 			item:OnClick();
 		end
 	end
+end
+
+-- right click a block item, show help
+function BuilderFramePage.OnHelpBlock(block_id)
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", block_id, "block");
+
+	GameLogic.RunCommand("/wiki "..tostring(block_id));
 end
 
 -- @param bRefreshPage: false to stop refreshing the page

@@ -89,6 +89,7 @@ function CommandManager:RunCommand(cmd_name, cmd_text, ...)
 	if(not cmd_text) then
 		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
 	end
+
 	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand(cmd_name);
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
@@ -183,6 +184,9 @@ end
 -- after command is run, it will set back to previous value. 
 function CommandManager:RunFromConsole(cmd, player)
 	local cmd_class, cmd_name, cmd_text = self:GetCmdByString(cmd);
+
+	GameLogic.GetFilters():apply_filters("user_event_stat", "cmd", "execute", nil, cmd_name);
+
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(cmd));

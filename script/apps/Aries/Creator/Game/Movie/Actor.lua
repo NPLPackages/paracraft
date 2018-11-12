@@ -747,6 +747,8 @@ function Actor:SetField(name, value)
 		return;
 	end
 
+	GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "edit", value, name);
+
 	local field = self.valueFields:get(name);
 	if(field) then
 		if(field.getVar(self):AddKey(self:GetTime(), value)) then
