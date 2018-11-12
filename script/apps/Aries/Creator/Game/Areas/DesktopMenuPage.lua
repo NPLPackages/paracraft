@@ -61,6 +61,8 @@ function DesktopMenuPage.ActivateMenu(bActivate)
 	end
 	DesktopMenuPage.IsActivated = bActivate;
 	if(bActivate) then
+		GameLogic.GetFilters():apply_filters("user_event_stat", "inventory", "browse", nil, nil);
+
 		if(not page or not page:IsVisible()) then
 			DesktopMenuPage.ShowPage(true);
 		end

@@ -154,6 +154,8 @@ end
 
 -- auto save the current world. It will save regardless of whether the world is modified or not.
 function WorldCommon.SaveWorld()
+	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "save", GameLogic.world.seed, nil);
+
 	NPL.load("(gl)script/apps/Aries/Creator/AI/LocalNPC.lua");
 	local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
 	LocalNPC:SaveToFile();
@@ -259,6 +261,9 @@ function WorldCommon.SaveWorldAs()
 			else
 				WorldCommon.SaveWorldAsImp(targetFolder);
 			end
+
+			GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas", GameLogic.world.seed, nil);
+
 		end
 	end, defaultWorldName, L"世界另存为", "localworlds", true)
 end

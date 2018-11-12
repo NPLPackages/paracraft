@@ -149,6 +149,8 @@ end
 
 
 function ParaWorldLoginDocker.OnClickApp(name)
+	GameLogic.GetFilters():apply_filters("user_event_stat", "app", "enter", nil, name);
+
 	if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
 			if(not ParaWorldLoginDocker.IsLoadedApp(name))then

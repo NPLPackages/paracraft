@@ -1,79 +1,132 @@
 --[[
-Title: ParaWorldAnalytics
-Author(s): LiXizhi
-Date: 2018/10/29
-Desc: send user event every 30 seconds to google analytics in batch. 
+	Title: ParaWorldAnalytics
+	Author(s): LiXizhi
+	Date: 2018/10/29
+	Desc: send user event every 30 seconds to google analytics in batch.
 
-use the lib:
--------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
-local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
-ParaWorldAnalytics:new():Init()
--------------------------------------------------------
+	use the lib:
+	-------------------------------------------------------
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
+	ParaWorldAnalytics:new():Init()
+	-------------------------------------------------------
 ]]
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
-local ParaWorldAnalyticss = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalyticss")
-
 local ParaWorldAnalytics = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics"))
 
--- send events in batch every 10 seconds if queue is not empty. 
-ParaWorldAnalytics.SendInterval= 10000;
+-- send events in batch every 5 seconds if pool is not empty.
+ParaWorldAnalytics.SendInterval= 5000;
 
 function ParaWorldAnalytics:ctor()
-	self.finishedQuizCount = 0;
-	self.clientData = {};
 	self.event_pool = {};
-
-	
 end
 
--- @param UA: 
+
 function ParaWorldAnalytics:Init(UA)
-	self.UA = UA or "UA-127983943-1" -- your ua number
+	-- official ua number
+	self.UA = UA or "UA-129101625-1"
 
-	self.googleAnalitics = GoogleAnalytics:new():init(UA);
+	self.user_id = self._user_id()
+	self.client_id = self._client_id()
+	self.app_name = self._app_name()
+	self.app_version = System.options.ClientVersion
 
-	self.mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-		self:OnTimer();
-	end})
-	self.mytimer:Change(self.SendInterval, self.SendInterval);
+	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
 
-	GameLogic.GetFilters():add_filter("user_event_stat", function(key, ...) 
-		self:SendEvent({
-			location = key, 
-			language = 'zh-CN',
-			category = 'test',
-			action = 'create',
-			label = 'keepwork',
-			value = 123
-		});
-		return key;
-	end)
+	-- category: which category that the event belongs
+	-- action: which kind of action that the event do
+	-- value: what exactly the action does
+	-- label: more details about action
+	GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
+										  self:GatherEvent({
+												  category = category,
+												  action = action,
+												  value = value,
+												  label = label,
+										  });
+										  return catetory;
+									 end)
 
-	LOG.std(nil, "info", "ParaWorldAnalytics", "google analytics initialized with user agent: %s", self.UA);
+	self.timer = commonlib.Timer:new({callbackFunc = function(timer)
+										  self:SendBatchEvents()
+									end})
+	self.timer:Change(self.SendInterval, self.SendInterval);
+
+	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version: %s %s %s %s %s",
+			self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
 	return self;
 end
 
-function ParaWorldAnalytics:GetGoogleClient()
-	return self.googleAnalitics
+function ParaWorldAnalytics:_user_id()
+	token = System.User.keepworktoken
+	if not token then
+		return nil
+	end
+
+	-- token format, xxxxxxxxx.xxxxxxxxxx.xxxxxxxxxx
+	-- the middle part(seperated by .) is user info in base64 format
+	base64_info = string.gsub(token, '[^.]*.([^.]*).[^.]*', '%1')
+
+	-- padding '=' until info len reaches multiple of 4
+	mod = string.len(base64_info) % 4
+	if mod ~= 0 then
+		mod = 4 - mod
+	end
+	base64_info = base64_info .. string.rep('=', mod)
+
+	NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+	local Encoding = commonlib.gettable("System.Encoding");
+	-- user_json content like below
+	-- "{\"username\":\"dreamanddead\",\"userId\":1234,\"exp\":1542093124}"
+	json_info = Encoding.unbase64(base64_info)
+
+	NPL.load("(gl)script/ide/Json.lua");
+	user = commonlib.Json.Decode(json_info)
+
+	if user and user.username then
+		return user.username
+	end
 end
 
-function ParaWorldAnalytics:OnTimer()
-	-- TODO :  self.event_pool;
+function ParaWorldAnalytics:_app_name()
+	if System.options.mc then
+		return "paracraft"
+	end
+
+	if System.options.version == 'kids' then
+		return "haqi"
+	end
+
+	if System.options.version == 'teen' then
+		return "haqi2"
+	end
 end
 
---local options = {
---    location = 'www.keepwork.com/lesson',
---    language = 'zh-CN',
---    category = 'test',
---    action = 'create',
---    label = 'keepwork',
---    value = 123
---}
-function ParaWorldAnalytics:SendEvent(options)
-	-- TODO add to pool and send in batch. 
-	-- self.event_pool[#self.event_pool+1] = options;
+function ParaWorldAnalytics:_client_id()
+	return commonlib.Encoding.PasswordEncodeWithMac("uid")
+end
 
-	LOG.std(nil, "debug", "ParaWorldAnalytics_sendEvent", options);
-	self:GetGoogleClient():send_event(options);
+
+function ParaWorldAnalytics:GatherEvent(event)
+	self.event_pool[#self.event_pool+1] = event;
+end
+
+function ParaWorldAnalytics:SendBatchEvents()
+	if next(self.event_pool) == nil then
+		return
+	end
+
+	for i, event in pairs(self.event_pool) do
+		self:SendEvent(event);
+	end
+
+	self.event_pool = {};
+end
+
+function ParaWorldAnalytics:GetAnalyticsClient()
+	return self.analyticsClient;
+end
+
+function ParaWorldAnalytics:SendEvent(event)
+	self:GetAnalyticsClient():SendEvent(event);
 end
