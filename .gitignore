@@ -37,6 +37,7 @@ script/ide
 !/script/apps/Aries/Partners/
 /script/apps/Aries/Partners/*
 !/script/apps/Aries/Partners/PartnerPlatforms.lua
+!/script/apps/Aries/Partners/keepwork/
 
 !/script/kids/
 /script/kids/*
@@ -87,3 +88,9 @@ test*.*
 test/
 _obsoleted/
 obsoleted/
+
+!script/apps/Aries/VIP/PurChaseMagicBean.teen.lua
+!script/apps/Aries/Login/AccountUserSelectPage.teen.html
+!script/apps/Aries/Login/LocalUserSelectPage.teen.html
+!script/apps/Aries/Login/UserLoginPage.teen.html
+!script/apps/Aries/Desktop/Functions/RechargeGuide.teen.html

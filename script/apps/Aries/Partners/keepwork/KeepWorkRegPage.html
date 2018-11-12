@@ -1,0 +1,234 @@
+<!-- "script/apps/Aries/Partners/keepwork/KeepWorkRegPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Server Select Page. 2017.8.8</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkRegPage.lua"><![CDATA[
+CommonCtrl.OneTimeAsset.Unload("temp/last_reg_validation_image.png");
+local pageCtrl = document:GetPageCtrl();
+
+realname_reg = pageCtrl:GetRequestParam("realname_reg") or false;
+
+NPL.load("(gl)script/ide/timer.lua");
+
+local thisYear=ParaGlobal.GetDateFormat("yyyy");
+sYear= sYear or (thisYear - 11);
+smonth= smonth or 1;
+OptionYear={};
+
+for i=0,26 do
+    local oYear=thisYear-i;    
+    local tmpYear={};
+    tmpYear["value"]=tostring(oYear);    
+    tmpYear["text"]=tostring(oYear);  
+    if (oYear==sYear) then
+        tmpYear["selected"]="true";
+    end
+    table.insert(OptionYear,tmpYear);
+end
+
+OptionMonth={};
+for i=1,12 do
+        local tmpMonth={};
+        tmpMonth["value"]=tostring(i);    
+        tmpMonth["text"]=tostring(i);  
+        if (i==smonth) then
+            tmpMonth["selected"]="true";
+        end
+        table.insert(OptionMonth,tmpMonth);
+end
+
+OptionDay={};
+maxday = maxday or 31;
+commonlib.echo("maxday:"..maxday);
+for i=1,maxday do
+        local tmpDay={};
+        tmpDay["value"]=tostring(i);    
+        tmpDay["text"]=tostring(i); 
+        if (i==1) then
+            tmpDay["selected"]="true";
+        end 
+        table.insert(OptionDay,tmpDay);
+end
+
+function vBirth() 
+    OptionDay={};
+
+    sYear=tonumber(pageCtrl:GetValue("birth_year"));
+    smonth=tonumber(pageCtrl:GetValue("birth_month"));
+
+    local leapyear=false;
+   	if(math.mod(sYear,100)==0)then
+		if(math.mod(sYear,400)==0) then
+			leapyear = true;
+		end
+	else		
+		if(math.mod(sYear,4)==0) then
+			leapyear = true;
+		end
+	end
+
+
+    if(smonth==1 or smonth==3 or smonth==5 or smonth==7 or smonth==8 or smonth==10 or smonth==12)then
+        maxday=31;
+    end
+    if (smonth==4 or smonth==6 or smonth==9 or smonth==11) then
+        maxday=30;
+    end
+    if (smonth==2 and (not leapyear)) then
+        maxday=28;
+    end
+    if (smonth==2 and leapyear) then
+        maxday=29;
+    end
+    for i=1,maxday do
+        local tmpDay={};
+        tmpDay["value"]=tostring(i);    
+        tmpDay["text"]=tostring(i);  
+        table.insert(OptionDay,tmpDay);
+    end
+    
+    pageCtrl:Refresh(0.01);
+end
+
+MyCompany.Aries.keepwork.KeepWorkRegPage.OnInit();
+
+function sampleEmail()
+    local thisDay=ParaGlobal.GetDateFormat("yMMdd");
+    local thisTime=ParaGlobal.GetTimeFormat("HHmmss");
+    local vmail="sample"..thisDay..thisTime.."@163.com";
+    return vmail;
+end
+
+function UpdateButtonStatus(params)
+    local _this = ParaUI.CreateUIObject("container", "UpdateButtonStatus_NewAvatar", 
+        params.alignment, params.left, params.top, params.width, params.height);
+	_this.background = "";
+	params.parent:AddChild(_this);
+	
+	_this.onframemove = ";MyCompany.Aries.keepwork.KeepWorkRegPage.IsOK();";
+end
+
+function OnClose()
+    MyCompany.Aries.keepwork.KeepWorkRegPage.OnClose();
+end
+
+]]></script>
+<div width="660px" height="450px" style="margin-left:150px;margin-top:50px;background:url(Texture/Aries/Common/Notification_bg_32bits.png: 30 30 30 30)">
+        <input style="position:relative;margin-left:600px;margin-top:-15px;width:54px;height:54px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" 
+            zorder="2" onclick="OnClose();" value=""/>
+<form name="AriesUserReg">
+    
+    <div style="margin-left:260px;margin-top:40px;font-weight:bold;font-size:14px;">
+        注册KeepWork账号
+    </div>
+    
+    <div style="margin-top:16px;margin-left:48px;margin-right:60px">
+
+    <pe:if condition='<%=not Eval("realname_reg")%>'> 
+
+<!--        <div style="margin-left:10px;margin-top:30px;height:30px;">
+            <div>* 性别：
+            <input type="radio" name="sex" value="4" style="float:left;" checked="true"/><div style="float:left;margin-left:8px;">保密</div>
+            <input type="radio" name="sex" value="2" style="float:left;" /><div style="float:left;margin-left:8px;">男孩</div>
+            <input type="radio" name="sex" value="0" style="float:left;" /><div style="float:left;margin-left:8px;">女孩</div>
+            </div>
+        </div>
+
+        <div style="margin-left:10px;">* 生日：
+            <input type="checkbox" name="bir_bm" value="1" style="float:left;" /><div style="float:left;margin-left:8px;">保密</div>
+            <div style="width:220px;float:left;">
+                <select name="birth_year" onselect="vBirth()" DataSource='<%=OptionYear%>'></select>年 
+                <select name="birth_month" onselect="vBirth()" DataSource='<%=OptionMonth%>'></select>月
+                <select name="birth_day" DataSource='<%=OptionDay%>'></select>日
+            </div>
+        </div>-->
+    </pe:if>
+
+    <pe:if condition='<%=Eval("realname_reg")%>'> 
+        <div style="margin-left:10px;margin-top:10px;height:30px;">
+            * 真实姓名：
+            <div style="margin-left:80px;margin-top:-20px;width:280px;height:32px;background:url(Texture/Aries/Login/reg_option_bg.png#0 0 256 32:10 10 81 20);">
+                <input type="text" name="realname" style="margin-left:15px;margin-top:5px;margin-right:15px;width:200px;height:24px;background:;"/>
+            </div>
+        </div>
+
+        <div style="margin-left:10px;">* 身份证号：
+            <div style="margin-left:80px;margin-top:-20px;width:280px;height:32px;background:url(Texture/Aries/Login/reg_option_bg.png#0 0 256 32:10 10 81 20);">
+                <input type="text" name="idno" style="margin-left:15px;margin-top:5px;margin-right:15px;width:200px;height:24px;background:;"/>
+            </div>
+            <pe:label name="idno_label" style="height:20px;margin-left:85px;margin-top:2px;color:#e06618">身份证号由15或18位组成，如果不知道，可以向爸爸妈妈借看一下户口本！</pe:label>
+        </div>
+
+        <div style="margin-left:10px;margin-top:6px">
+            <!--<div style="float:left;margin-top:10px;font-weight:bold;font-size:14px">电子邮箱:</div>-->
+            <div style="float:left">* 电子邮箱：
+                <div style="margin-left:80px;margin-top:-25px;width:290px;height:32px;background:url(Texture/Aries/Login/reg_required_bg.png#0 0 256 32:10 10 81 20);">
+                    <input type="text" name="email" value="<%=sampleEmail() %>" style="margin-left:5px;margin-top:5px;margin-right:15px;width:210px;height:24px;background:;"/>
+                </div>
+                <pe:label name="email_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#e06618">请输入自己的邮箱地址，这是你取回密码最重要的途径！</pe:label>
+                <pe:label name="email_attent" style="height:20px;margin-left:-465px;margin-top:22px;color:#ee0000">【哈奇提醒】你的一个邮箱地址只能注册一个账号哦！</pe:label>
+            </div>
+        </div>
+    </pe:if>
+        <div style="margin-left:10px;margin-top:6px">
+            <div style="float:left;">* 用户名：
+                <div style="margin-left:80px;margin-top:-25px;width:280px;height:32px;background:url(Texture/Aries/Login/reg_required_bg.png#0 0 256 32:10 10 81 20);">
+                    <input type="text" name="username" style="margin-left:15px;margin-top:5px;margin-right:15px;width:200px;height:24px;background:;"/>
+                </div>
+                <pe:label name="username_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#656565">用户名由6-16个字节组成(大小写字母、数字、下划线)</pe:label>
+            </div>
+        </div>
+        <div style="margin-left:10px;margin-top:6px">
+            <!--<div style="float:left;margin-top:10px;font-weight:bold;font-size:14px">设置您的密码:</div>-->
+            <div style="float:left;">* 登录密码：
+                <div style="margin-left:80px;margin-top:-25px;width:280px;height:32px;background:url(Texture/Aries/Login/reg_required_bg.png#0 0 256 32:10 10 81 20);">
+                    <input type="text" name="password" PasswordChar="*" style="margin-left:15px;margin-top:5px;margin-right:15px;width:200px;height:24px;background:;"/>
+                </div>
+                <pe:label name="password_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#656565">密码由6-16个字节组成(大小写字母、数字、下划线)</pe:label>
+            </div>
+        </div>
+        
+        <div style="margin-left:10px;margin-top:6px">
+            <!--<div style="float:left;margin-top:10px;font-weight:bold;font-size:14px">重复输入密码:</div>-->
+            <div style="float:left">* 确认密码：
+                <div style="margin-left:80px;margin-top:-25px;width:280px;height:32px;background:url(Texture/Aries/Login/reg_option_bg.png#0 0 256 32:10 10 81 20);">
+                    <input type="text" name="password_confirm" PasswordChar="*" style="margin-left:15px;margin-top:5px;margin-right:15px;width:200px;height:24px;background:;"/>
+                </div>
+                <pe:label name="password_confirm_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#656565">请一定记住密码，不要告诉其他任何人！</pe:label>
+            </div>
+        </div>
+
+        <!--<div style="margin-left:10px;margin-top:18px;height:30px;">
+                <div style="float:left">* 验证码：
+                <img src="temp/last_reg_validation_image.png" style="width:52px;height:20px;margin-right:10px;"/>
+                <div style="margin-left:130px;margin-top:-20px;width:90px;height:32px;background:url(Texture/Aries/Login/regvfy_required_bg.png#0 0 90 32:10 10 65 20);">
+                <input type="text" name="txtVeriCode" style="width:60px;height:25px;margin-left:15px;margin-right:5px;background:"/>
+                </div>
+                </div>
+                <pe:label name="vfy_label" style="height:20px;margin-left:5px;margin-top:4px;color:#e06618">请输入左边显示的4位验证码！</pe:label>
+        </div>-->
+        <div style="margin-left:10px;margin-top:6px;height:30px;">
+            <input type="checkbox" name="agree_rule" value="1" style="float:left;" checked="true"/><div style="float:left;margin-left:8px;">我已阅读并同意
+            <a style="font-size:12px" onclick="MyCompany.Aries.keepwork.KeepWorkRegPage.VisitTaoMeeService">《Keepwork服务条款》</a></div>
+            <pe:label name="agreerule_label" style="height:20px;margin-top:4px;color:#e06618"></pe:label>
+        </div>
+    </div>
+
+    <div style="margin-top:-116px">
+        <div style="float:left;margin-top:-20px;margin-left:620px">
+            <input type="button" style="width:84px;height:84px;background:url()" tooltip="请先填写正确的密码和验证码"/>
+            <input type="submit" name="confirm_btn" 
+                style="margin-left:-114px;width:84px;height:84px;background:url(Texture/Aries/Login/RegisterBtn_32bits.png# 0 0 112 112)" onclick="MyCompany.Aries.keepwork.KeepWorkRegPage.RegisterEmailChk"/>
+            <pe:custom oncreate="UpdateButtonStatus" style="width:16px;height:16px"/>
+        </div>
+    </div>
+  
+</form>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!-- "script/apps/Aries/Partners/keepwork/KeepWorkLogin.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2017.7.20</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false" src="KeepWorkLogin.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Login/LocalUserSelectPage.lua");
+
+local pageCtrl = document:GetPageCtrl();
+local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
+KeepWorkLogin = commonlib.gettable("MyCompany.Aries.Partners.keepwork.KeepWorkLogin");
+KeepWorkLogin.OnInit();
+
+function OnInitUserName()
+    local username,password = KeepWorkLogin.LoadLocalData();
+    if(username)then
+        pageCtrl:SetValue("user_name",username);
+        pageCtrl:SetValue("checkbox_remember_username",true);
+    end
+    if(password)then
+        pageCtrl:SetValue("password",password);
+        pageCtrl:SetValue("checkbox_remember_password",true);
+    end
+end
+OnInitUserName();
+function OnClickLogin(btnName, forms)
+    KeepWorkLogin.OnClickLogin(btnName, forms);
+end
+function News_DS_Func(index)
+    return MyCompany.Aries.LocalUserSelectPage.News_DS_Func(index, pageCtrl)
+end
+
+function GetOfficialWebSiteUrl()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local officialurl = MyCompany.Aries.ExternalUserModule:GetConfig().official_site_url;
+    echo("=======getRegion_id()");
+    echo(MyCompany.Aries.ExternalUserModule:GetConfig());
+    return officialurl;
+end
+
+function VisitOperatorWebSite()
+    ParaGlobal.ShellExecute("open", MyCompany.Aries.ExternalUserModule:GetConfig().operator_company_url, "", "", 1);
+end
+
+function VisitOfficialWebSite()
+	ParaGlobal.ShellExecute("open", GetOfficialWebSiteUrl(), "", "", 1);
+end
+
+function VisitOfficialBlog()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local blogurl=MyCompany.Aries.ExternalUserModule:GetConfig().official_blog_url;
+	ParaGlobal.ShellExecute("open", blogurl, "", "", 1);
+end
+
+function getRegion_id()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local region_id=ExternalUserModule:GetRegionID();
+    return region_id;
+end
+
+function VisitParaEngineWebSite()
+    ParaGlobal.ShellExecute("open", "http://www.paraengine.com/", "", "", 1);
+end
+
+function LeaveTown()
+    ParaGlobal.ExitApp();
+end
+
+function getAccountName()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local s;
+    local region_id=ExternalUserModule:GetRegionID();
+    if (region_id==0) then
+        s = string.format("%s", MyCompany.Aries.ExternalUserModule:GetConfig().account_name);
+    else
+        s = string.format("%s", MyCompany.Aries.ExternalUserModule:GetConfig().account_name);
+    end
+
+    return "KeepWork账号";    
+end
+
+function accountTips()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local s;
+    local region_id=ExternalUserModule:GetRegionID();
+    local cfg=ExternalUserModule:GetConfig();
+
+    local nm= getAccountName();
+    if (region_id==0 or region_id==7) then
+        s = string.format('<div>%s:</div>',nm);
+    else
+        local logo;
+        if (cfg.logoicon) then
+            logo=string.format('<img style="width:18px;height:18px;margin-top:2px;" src="%s" />',cfg.logoicon);
+        end        
+        s = string.format('<div>%s <div style="margin-left:22px;margin-top:-20px;">%s:</div></div>',logo,nm);
+    end
+
+    return s;    
+end
+
+function passwdTips()
+    NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
+    local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
+    local s,nm;
+    local region_id=ExternalUserModule:GetRegionID();
+    local cfg=ExternalUserModule:GetConfig();
+
+    if (region_id==0 or region_id==7) then
+        nm = string.format("%s", MyCompany.Aries.ExternalUserModule:GetConfig().passwd_name);
+        s = string.format('<div>%s:</div>',nm);
+    else
+        nm = string.format("%s", MyCompany.Aries.ExternalUserModule:GetConfig().passwd_name);
+        local logo;
+        if (cfg.logoicon) then
+            logo=string.format('<img style="width:18px;height:18px;margin-top:5px;" src="%s" />',cfg.logoicon);
+        end        
+        s = string.format('<div>%s <div style="margin-left:22px;margin-top:-20px;">%s:</div></div>',logo,nm);
+    end
+
+    return s;    
+end
+function OnClickRegister()
+    --ParaGlobal.ShellExecute("open", "http://keepwork.com/wiki/join", "", "", 1);
+    NPL.load("(gl)script/apps/Aries/Partners/keepwork/KeepWorkRegPage.lua");
+    local KeepWorkRegPage = commonlib.gettable("MyCompany.Aries.keepwork.KeepWorkRegPage")
+    KeepWorkRegPage.ShowPage()
+end
+function OnClickChangePassword()
+    KeepWorkLogin.OnClickChangePassword();
+end
+function OnClickForgetPassword()
+    KeepWorkLogin.OnClickForgetPassword();
+end
+function OnCheckRememberUsername(bChecked)
+    KeepWorkLogin.OnCheckRememberUsername(bChecked);
+end
+function OnCheckRememberPassword(bChecked)
+    KeepWorkLogin.OnCheckRememberPassword(bChecked);
+end
+]]></script>
+<pe:container alignment="_ctt" ClickThrough="true" zorder="10" style="position:relative;width:960px;height:64px;background:url()">
+    <iframe ClickThrough="true" src="script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.html"></iframe>
+</pe:container>
+<pe:container alignment="_ct" style="position:relative;width:960px;height:400px;margin-left:-480px;margin-top:-200px;background:" >
+    <div style="margin-left:349px;padding-left:20px;padding-top:5px;margin-top:100px;font-size:12px;color:#dbfafc;width:265px;height:184px;background:url(Texture/Aries/Login/Login/login_bg.png:14 14 14 14)">
+    <form name="AriesUserLogin">
+    <pe:if condition='<%=System.options.login_tokens==nil%>'>
+        <pe:if condition='<%=MyCompany.Aries.MainLogin.state.IsLocalUserSelected%>'>
+            <div style="position:relative;margin-left:140px;margin-top:5px;">
+                <!--<a style="font-size:12px" onclick="MyCompany.Aries.UserLoginPage.OnClickBackToLocalUserSelect"><%=format("其他%s登录",MyCompany.Aries.ExternalUserModule:GetConfig().account_name)%></a>-->
+            </div>
+        </pe:if>
+        <div style="position:relative;float:left;margin-left:145px;margin-top:55px;font-size:12px;">
+            <div style="margin-top:2px">
+                <input type="button" value="修改密码" tooltip="修改密码" onclick="OnClickChangePassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
+            </div>
+            <div style="margin-top:-3px">
+                <input type="button" value="找回密码" tooltip="找回密码" onclick="OnClickForgetPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
+            </div>
+            <div style="margin-top:-3px">
+                <!--<input type="button" value="密码保护" tooltip="密码保护" onclick="MyCompany.Aries.UserLoginPage.OnClickProtectPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>-->
+            </div>
+        </div>
+            <div style="margin-top:5px;font-weight:bold;font-size:14px"><%=accountTips()%></div>
+            <div>
+                <input type="text" name="user_name" style="height:24px;width:200px;margin-top:3px;padding-left:5px;padding-top:2px;padding-right:5px;" EmptyText="帐户名/邮箱/手机号"/>
+            </div>
+            <div style="font-weight:bold;font-size:14px"><%=passwdTips()%></div>
+            <div>
+                <input type="text" name="password" PasswordChar="*" style="width:120px;height:24px;margin-top:3px;padding-left:5px;padding-top:2px;padding-right:5px;"/>
+            </div>
+            <div style="font-size:12px;">
+                <div style="margin-top:2px;">
+                    <input type="checkbox" style="margin-top:2px;" checked="true" onclick="OnCheckRememberUsername" 
+                        iconsize = "20"
+                        CheckedBG = "Texture/Aries/Login/checked_32bits.png;0 0 20 20" 
+                        UncheckedBG = "Texture/Aries/Login/unchecked_32bits.png;0 0 20 20" 
+                        name="checkbox_remember_username"/>
+                    <div style="float:left" for="checkbox_remember_username"><%=format("记住%s",getAccountName()) %></div>
+                </div>
+                <div style="margin-top:2px;">
+                    <input type="checkbox" style="margin-top:2px;" checked="false" onclick="OnCheckRememberPassword" 
+                        iconsize = "20"
+                        CheckedBG = "Texture/Aries/Login/checked_32bits.png;0 0 20 20" 
+                        UncheckedBG = "Texture/Aries/Login/unchecked_32bits.png;0 0 20 20" 
+                        name="checkbox_remember_password"/>
+                    <div style="float:left" for="checkbox_remember_password">记住密码</div>
+                </div>
+            </div>
+            <div style="float:left;position:relative;margin-left:0px;margin-top:2px;height:29px;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)">
+                <input type="button" name="btnRegister" value="注册账号"
+                    style="margin-top:-1px;font-size:12px;color:#701401;font-weight:bold;width:100px;height:28px;background:" onclick="OnClickRegister"/>
+            </div>
+            <div style="float:left;position:relative;margin-left:128px;margin-top:-17px;background:">
+                <input type="submit" name="btnLogin" value="登录"
+                    style="width:100px;height:48px;font-size:14px;text-shadow:true;shadow-quality:8;shadow-color:#80ffffff;color:#701401;font-weight:bold;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)" onclick="OnClickLogin"/>
+            </div>
+    </pe:if>
+    <pe:if condition='<%=System.options.login_tokens~=nil%>'>
+        <div style="margin-left:5px;">
+            <div style="margin-top:40px;font-size:13px;font-weight:bold;text-align:center;">检测到您已经登录</div>
+            <div style="float:left;margin-left:64px;margin-top:10px;background:">
+                <input type="submit" name="btnLogin" value="进入游戏"
+                    style="width:100px;height:48px;font-size:14px;text-shadow:true;shadow-quality:8;shadow-color:#80ffffff;color:#701401;font-weight:bold;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)" onclick="OnClickLogin"/>
+            </div>
+            <div style="margin-top:10px;text-align:center;">如果验证失败请退出游戏重新登录</div>
+        </div>
+    </pe:if>
+    </form>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+
+

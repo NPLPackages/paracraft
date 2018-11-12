@@ -1,0 +1,119 @@
+<!-- "script/apps/Aries/Partners/keepwork/KeepWorkBindingPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" >
+<![CDATA[
+NPL.load("(gl)script/apps/Aries/Login/MainLogin.lua");
+NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
+NPL.load("(gl)script/apps/Aries/Login/AccountUserSelectPage.lua");
+local MainLogin = commonlib.gettable("MyCompany.Aries.MainLogin");
+local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
+local AccountUserSelectPage = commonlib.gettable("MyCompany.Aries.AccountUserSelectPage");
+
+NPL.load("(gl)script/apps/Aries/Partners/keepwork/KeepWorkBindingPage.lua");
+local KeepWorkBindingPage = commonlib.gettable("MyCompany.Aries.Partners.keepwork.KeepWorkBindingPage");
+local pageCtrl = document:GetPageCtrl();
+
+function OnInit()
+    if(KeepWorkBindingPage.user_id)then
+        pageCtrl:SetValue("user_id",KeepWorkBindingPage.user_id);
+    end
+end
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+function DoSubmit()
+    local user_id = pageCtrl:GetValue("user_id");
+    local password = pageCtrl:GetValue("password");
+    local exchange_password = pageCtrl:GetValue("exchange_password");
+
+    if(not user_id or user_id == "")then
+        _guihelper.MessageBox("绑定号码不能为空！");
+        return
+    end
+    if(user_id ~= string.match(user_id, "[0-9]+")) then
+        _guihelper.MessageBox("绑定号码只能为数字！");
+        return
+    end
+    if(AccountUserSelectPage:IsBinding(user_id))then
+        _guihelper.MessageBox("这个号码已经绑定！");
+        return
+    end
+    ClosePage();
+
+	local values = MainLogin.state.auth_user;
+    values = values or {};
+    echo("========values");
+    echo(values);
+    local msg = {
+		account_id = tonumber(user_id),
+		username = user_id,
+		password = password,
+		exchange_password = exchange_password,
+		plat = Platforms.PLATS.KEEPWORK,
+		oid = values.oid,
+        loginplat = 1,
+        from = 0,
+        partner = "taomee_to_keepwork",
+        newsession = false,
+    }
+    paraworld.auth.AuthUser(msg, "binding", function (msg)
+        echo("============msg");
+        echo(msg);
+        msg = msg or {};
+        if(msg.issuccess == true and msg.isreg == true)then
+            AccountUserSelectPage:Insert(user_id);
+            _guihelper.MessageBox("账号绑定成功！");
+        else
+            local info = msg.info or "账号绑定失败，请重试！";
+            local errorcode = msg.errorcode or "";
+            if(errorcode == 417 or errorcode == 433 )then
+                _guihelper.MessageBox("该账号已经被绑定！");
+            elseif(errorcode == 407)then
+                _guihelper.MessageBox("输入的用户名或密码错误！");
+            else
+                _guihelper.MessageBox(info);
+            end
+        end
+    end);
+end
+OnInit();
+]]>
+
+</script>
+<div style="width:500;height:350px;background:Texture/Aries/Friends/addfriend_bg_32bits.png#0 0 322 216:40 40 40 40">
+    <div style="color:#1b2534;font-size:14px;padding-left:35px;padding-right:35px;margin-top:35px;font-weight:bold;">
+        原淘米账号，需要将米米号绑定到KeepWork的账号才可以继续游戏。
+    </div>
+    <div style="margin-top:20px;">
+            <div style="float:left;width:100px;text-align:right;">
+                米米号:
+            </div>
+            <input type="text" name="user_id" style="float:left;width:330px;height:32px;background:url(Texture/Aries/Friends/addfriend_input_32bits.png:10 10 10 10)" />
+    </div>
+    <div style="margin-top:20px;">
+            <div style="float:left;width:100px;text-align:right;">
+                密码:
+            </div>
+            <input type="text" name="password" PasswordChar="*" style="float:left;width:330px;height:32px;background:url(Texture/Aries/Friends/addfriend_input_32bits.png:10 10 10 10)" />
+    </div>
+    <div style="margin-top:20px;">
+            <div style="float:left;width:100px;text-align:right;">
+                交易密码:
+            </div>
+            <input type="text" name="exchange_password" PasswordChar="*" style="float:left;width:330px;height:32px;background:url(Texture/Aries/Friends/addfriend_input_32bits.png:10 10 10 10)" />
+    </div>
+    <div style="margin-left:220px;margin-top:15px;">
+        <input type="button" value="绑定" name="confirm_btn" onclick="DoSubmit()" style="width:100px;height:30px;margin-left:10px;background:url(Texture/Aries/Common/ThemeKid/button_highlight_32bits.png#0 0 32 20:10 8 10 8)"/>
+        <input type="button" value="返回" style="width:100px;height:30px;margin-left:5px;" onclick="ClosePage()"/>
+    </div> 
+</div>
+</pe:mcml>
+</body>
+</html>
+
