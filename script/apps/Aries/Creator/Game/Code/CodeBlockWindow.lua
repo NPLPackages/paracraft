@@ -177,7 +177,6 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		if(page) then
 			page:Refresh(0.01);
 		end
-		CodeBlockWindow.UpdateEditModeUI();
 		CodeBlockWindow.RestoreCursorPosition();
 		isEntityChanged = true;
 	end
@@ -279,11 +278,11 @@ function CodeBlockWindow.UpdateCodeToEntity()
 		local code = page:GetUIValue("code");
 		if(not entity:IsBlocklyEditMode()) then
 			entity:SetNPLCode(code);
-		end
-		
-		local ctl = CodeBlockWindow.GetTextControl();
-		if(ctl) then
-			entity.cursorPos = ctl:CursorPos();
+
+			local ctl = CodeBlockWindow.GetTextControl();
+			if(ctl) then
+				entity.cursorPos = ctl:CursorPos();
+			end
 		end
 	end
 end
@@ -638,9 +637,12 @@ function CodeBlockWindow.OnClickEditMode(name)
 		end
 	else
 		if(name == "blockMode") then
-			CodeBlockWindow.OpenBlocklyEditor()
+			CodeBlockWindow.UpdateCodeToEntity();
 			entity:SetBlocklyEditMode(true);
 		end
+	end
+	if(name == "blockMode") then
+		CodeBlockWindow.OpenBlocklyEditor()
 	end
 end
 
@@ -648,9 +650,9 @@ function CodeBlockWindow.UpdateEditModeUI()
 	if(page) then
 		if(CodeBlockWindow.IsBlocklyEditMode()) then
 			_guihelper.SetUIColor(page:FindControl("blockMode"), "#0b9b3a")
-			_guihelper.SetUIColor(page:FindControl("codeMode"), "#ffffff")
+			_guihelper.SetUIColor(page:FindControl("codeMode"), "#808080")
 		else
-			_guihelper.SetUIColor(page:FindControl("blockMode"), "#ffffff")
+			_guihelper.SetUIColor(page:FindControl("blockMode"), "#808080")
 			_guihelper.SetUIColor(page:FindControl("codeMode"), "#0b9b3a")
 		end
 		local textCtrl = CodeBlockWindow.GetTextControl();

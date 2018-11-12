@@ -157,8 +157,13 @@ function Entity:LoadFromXMLNode(node)
 			break;
 		end
 	end
-	if(not self.isBlocklyEditMode) then
+	if(not self.isBlocklyEditMode and not self.nplcode) then
 		self.nplcode = self:GetCommand();
+	end
+	if(self.isBlocklyEditMode) then
+		self:SetCommand(self:GetBlocklyNPLCode());
+	else
+		self:SetCommand(self:GetNPLCode());
 	end
 end
 
