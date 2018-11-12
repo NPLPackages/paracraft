@@ -38,7 +38,7 @@ local app_install_details = {
 	},
 	["haqi2"] = {
 		title=L"魔法哈奇-青年版", hasParacraft = false, 
-		mergeParacraftPKGFiles = true, -- we will always apply the latest version of paracraft pkg on top of this one. 
+		mergeHaqiPKGFiles = true, -- we will always apply the latest version of haqi pkg on top of this one. 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" partner="keepwork" config="config/GameClient.config.xml"',
 		-- cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" config="config/GameClient.config.xml"',
 		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
@@ -293,14 +293,12 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 				ParaAsset.CloseArchive(name);
 				LOG.std(nil, "info", "ParaWorldLoginDocker", "unload archive: %s", name);
 			end
-			-- prepend all paracraft pkg files
-			if(app.mergeParacraftPKGFiles) then
-				local app_src = ParaWorldLoginDocker.GetAppInstallDetails(srcAppName)
-				if(app_src.hasParacraft) then
-					local folder = ParaWorldLoginDocker.GetAppFolder(srcAppName)
-					if(redistFolder~=folder) then
-						ParaWorldLoginDocker.LoadAllMainPackagesInFolder(folder);
-					end
+			-- prepend all haqi pkg files
+			if(app.mergeHaqiPKGFiles) then
+				local app_src = ParaWorldLoginDocker.GetAppInstallDetails("haqi")
+				local folder = ParaWorldLoginDocker.GetAppFolder("haqi")
+				if(redistFolder~=folder) then
+					ParaWorldLoginDocker.LoadAllMainPackagesInFolder(folder);
 				end
 			end
 			-- load all pkg files in redist folder
@@ -469,6 +467,22 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 			end
 			return
 		end
+	end
+
+	-- install haqi first, before installing the current app
+	if(app.mergeHaqiPKGFiles and ParaWorldLoginDocker.haqiInstalled == nil) then
+		ParaWorldLoginDocker.haqiInstalled = false;
+		ParaWorldLoginDocker.InstallApp("haqi", function(bSucceed)
+			if(bSucceed) then
+				app.installingParacraft = true;
+				ParaWorldLoginDocker.InstallApp(appName, callbackFunc);
+			else
+				if(callbackFunc) then
+					callbackFunc(false);
+				end
+			end
+		end)
+		return
 	end
 
 	local redist_root = ParaWorldLoginDocker.GetAppFolder(appName);

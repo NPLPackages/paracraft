@@ -539,6 +539,7 @@ function GameLogic.LoadGame()
 	end
 	
 	ModManager:OnWorldLoad();
+	GameLogic:WorldLoaded()
 	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
 
 	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter", GameLogic.world.seed, nil);
