@@ -14,11 +14,7 @@
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
 local ParaWorldAnalytics = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics"))
 
--- send events in batch every 5 seconds if pool is not empty.
-ParaWorldAnalytics.SendInterval= 5000;
-
 function ParaWorldAnalytics:ctor()
-	self.event_pool = {};
 end
 
 
@@ -30,15 +26,17 @@ function ParaWorldAnalytics:Init(UA)
 	self.client_id = self._client_id()
 	self.app_name = self._app_name()
 	self.app_version = System.options.ClientVersion
+	self.api_rate = 4
 
-	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
+	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id,
+													  self.app_name, self.app_version, self.api_rate);
 
 	-- category: which category that the event belongs
 	-- action: which kind of action that the event do
 	-- value: what exactly the action does
 	-- label: more details about action
 	GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
-										  self:GatherEvent({
+										  self:SendEvent({
 												  category = category,
 												  action = action,
 												  value = value,
@@ -47,13 +45,9 @@ function ParaWorldAnalytics:Init(UA)
 										  return catetory;
 									 end)
 
-	self.timer = commonlib.Timer:new({callbackFunc = function(timer)
-										  self:SendBatchEvents()
-									end})
-	self.timer:Change(self.SendInterval, self.SendInterval);
+	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: %s %s %s %s %s %s",
+			self.UA, self.user_id, self.client_id, self.app_name, self.app_version, self.api_rate);
 
-	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version: %s %s %s %s %s",
-			self.UA, self.user_id, self.client_id, self.app_name, self.app_version);
 	return self;
 end
 
@@ -106,22 +100,6 @@ function ParaWorldAnalytics:_client_id()
 	return commonlib.Encoding.PasswordEncodeWithMac("uid")
 end
 
-
-function ParaWorldAnalytics:GatherEvent(event)
-	self.event_pool[#self.event_pool+1] = event;
-end
-
-function ParaWorldAnalytics:SendBatchEvents()
-	if next(self.event_pool) == nil then
-		return
-	end
-
-	for i, event in pairs(self.event_pool) do
-		self:SendEvent(event);
-	end
-
-	self.event_pool = {};
-end
 
 function ParaWorldAnalytics:GetAnalyticsClient()
 	return self.analyticsClient;
