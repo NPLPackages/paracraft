@@ -146,7 +146,7 @@ function GameLogic:ctor()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
 	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
-	ParaWorldAnalytics:new():Init()
+	GameLogic.paraworldAnalytics = ParaWorldAnalytics:new():Init()
 end
 
 

@@ -23,11 +23,11 @@ end
 
 
 function ParaWorldAnalytics:Init(UA)
-	-- FIXME UA-93899485-3 is a test account
-	self.UA = UA or "UA-93899485-3"
+	-- official ua number
+	self.UA = UA or "UA-129101625-1"
 
 	self.user_id = self._user_id()
-	self.client_id = self.GetClientId()
+	self.client_id = self._client_id()
 	self.app_name = self._app_name()
 	self.app_version = System.options.ClientVersion
 
@@ -102,21 +102,8 @@ function ParaWorldAnalytics:_app_name()
 	end
 end
 
-function ParaWorldAnalytics:GetClientId()
-	-- try UUID first, then cpu id
-	if (System.os.GetPlatform()=="win32") then
-		-- FIXME os.run(cmd) brings a flashing terminal window before launching
-		-- it's better substitude with a npl method
-		uuid = System.os.run('wmic csproduct get UUID'):gsub("^UUID%s*(.-)%s*$", "%1")
-		if not uuid:match("^[F-]*$") then
-			return uuid
-		end
-
-		cpu_id = System.os.run('wmic cpu get ProcessorId'):gsub("^ProcessorId%s*(.-)%s*$", "%1")
-		return cpu_id
-	end
-	-- TODO support other os
-	return nil
+function ParaWorldAnalytics:_client_id()
+	return commonlib.Encoding.PasswordEncodeWithMac("uid")
 end
 
 
@@ -129,11 +116,6 @@ function ParaWorldAnalytics:SendBatchEvents()
 		return
 	end
 
-	-- WARNING
-	-- event gathering and sending are async,
-	-- that will cause inconsistency unless running in single thread mode.
-
-	-- TODO maybe we need an api rate limiter in future
 	for i, event in pairs(self.event_pool) do
 		self:SendEvent(event);
 	end
