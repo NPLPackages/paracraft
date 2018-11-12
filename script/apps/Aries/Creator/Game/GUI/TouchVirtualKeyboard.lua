@@ -468,6 +468,7 @@ function TouchVirtualKeyboard:CreateWindow()
 				keyBtn.background = "Texture/whitedot.png";
 				keyBtn.enabled = false;
 				keyBtn.text = self:GetItemDisplayText(item);
+				_guihelper.SetButtonFontColor(keyBtn, "#000000");
 				_guihelper.SetUIColor(keyBtn, self.colors[item.colorid or 1].normal);
 				_parent:AddChild(keyBtn);
 			end

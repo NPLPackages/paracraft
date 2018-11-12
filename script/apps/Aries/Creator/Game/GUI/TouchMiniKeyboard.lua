@@ -429,6 +429,7 @@ function TouchMiniKeyboard:CreateWindow()
 				keyBtn.enabled = false;
 				keyBtn.text = self:GetItemDisplayText(item);
 				_guihelper.SetUIColor(keyBtn, self.colors[item.colorid or 1].normal);
+				_guihelper.SetButtonFontColor(keyBtn, "#000000");
 				_parent:AddChild(keyBtn);
 			end
 			left_col = left_col + item.col;

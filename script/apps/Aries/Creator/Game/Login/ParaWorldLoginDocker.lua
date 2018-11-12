@@ -483,6 +483,21 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 		end
 	end
 
+	local storageFilters = {
+		["database/globalstore.db.mem.p"] = "Database/globalstore.db.mem.p",
+		["database/globalstore.teen.db.mem.p"] = "Database/globalstore.teen.db.mem.p",
+		["database/characters.db.p"] = "Database/characters.db.p",
+		["database/extendedcost.db.mem.p"] = "Database/extendedcost.db.mem.p",
+		["database/extendedcost.teen.db.mem.p"] = "Database/extendedcost.teen.db.mem.p",
+		["npl_packages/paracraftbuildinmod.zip.p"] = "npl_packages/ParacraftBuildinMod.zip.p",
+		["config/gameclient.config.xml.p"] = "config/GameClient.config.xml.p",
+		
+	}
+	-- fix lower case issues on linux system
+	autoUpdater.FilterStoragePath = function(self, filename)
+		return storageFilters[filename] or filename
+	end
+
 	local timer;
 	autoUpdater:onInit(redist_root, ParaWorldLoginDocker.GetAppConfigByName(appName),function(state)
         if(state)then
