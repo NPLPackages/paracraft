@@ -343,12 +343,12 @@ function Entity:PlayStepSound()
 		local step_block = BlockEngine:GetBlock(x,y, z);
 		if(step_block and step_block.step_sound) then
 			-- in case of slab block
-			step_block:play_step_sound(0.15);
+			step_block:play_step_sound(0.5);
 		else
 			-- solid block
 			step_block = BlockEngine:GetBlock(x,y-1, z);
 			if(step_block) then
-				step_block:play_step_sound(0.15);
+				step_block:play_step_sound(0.5);
 			end	
 		end
 	end

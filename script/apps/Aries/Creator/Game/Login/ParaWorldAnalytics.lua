@@ -28,6 +28,11 @@ function ParaWorldAnalytics:Init(UA)
 	self.app_version = System.options.ClientVersion
 	self.api_rate = 4
 
+	if(not GoogleAnalytics) then
+		LOG.std(nil, "error", "ParaWorldAnalytics", "GoogleAnalytics npl_mod not found");
+		return self;
+	end
+
 	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id,
 													  self.app_name, self.app_version, self.api_rate);
 

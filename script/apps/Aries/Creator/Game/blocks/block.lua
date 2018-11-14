@@ -1377,7 +1377,7 @@ end
 -- call when use press mouse down button over the block
 function block:OnMouseDown(x,y,z, mouse_button)
 	if(mouse_button == "left") then
-		self:play_step_sound();
+		-- self:play_step_sound();
 	end
 end
 
