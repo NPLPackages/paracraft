@@ -243,6 +243,7 @@ end
 function CodeBlockWindow.Close()
 	if(CodeBlockWindow.isBlocklyOpened) then
 		CodeBlockWindow.CloseBlocklyWindow();
+		return
 	end
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.RestoreWindowLayout()
@@ -674,19 +675,26 @@ function CodeBlockWindow.OpenBlocklyEditor()
 		end
 	end
 
+	local request_url = "npl://blockeditor"
+	if(blockpos) then
+		request_url = request_url..format("?blockpos=%s", blockpos);
+	end
+
 	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
 	if(NplCefBrowserManager) then
 		 -- Open a new window
 		if(not CodeBlockWindow.isBlocklyOpened) then
 			CodeBlockWindow.isBlocklyOpened = true;
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
+			local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+			local url = DefaultFilters.cmd_open_url(request_url)
+
 			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
-			if(config and not config.visible) then
+			if(false and config and not config.visible) then
 				config.visible = true;
+				config.url = url;
 				NplCefBrowserManager:Show(config);
 			else
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
-				local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
-				local url = DefaultFilters.cmd_open_url("npl://blockeditor")
 				NplCefBrowserManager:Open({id = blocklyWndName, url = url, showTitleBar=false, withControl = false, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
 			end
 			CodeBlockWindow.UpdateBlocklyWindowSize();
@@ -694,11 +702,7 @@ function CodeBlockWindow.OpenBlocklyEditor()
 			CodeBlockWindow.CloseBlocklyWindow();
 		end
 	else
-		local requestParams = ""
-		if(blockpos) then
-			requestParams = format("?blockpos=%s", blockpos);
-		end
-		GameLogic.RunCommand("/open npl://blockeditor"..requestParams);
+		GameLogic.RunCommand("/open "..request_url);
 	end
 end
 

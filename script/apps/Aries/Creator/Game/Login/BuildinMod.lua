@@ -86,6 +86,8 @@ BuildinMod.buildin_mods = {
 		text=L"系统内置插件",
 		version = "0.1",
 		homepage = "https://github.com/NPLPackages/PluginBlueTooth",
+		-- load this module when the package is loaded
+		loadOnStartup = true, 
 	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
@@ -105,6 +107,9 @@ function BuildinMod.AddBuildinMods()
 			end
 			if(loaded_packages[mod.package_path]) then
 				pluginloader:AddSystemModule(mod.name or mod.package_path, mod);
+				if(mod.loadOnStartup) then
+					pluginloader:LoadPlugin(mod.name);
+				end
 			else
 				LOG.std(nil, "error", "BuildinMod", "failed to open package %s", mod.package_path);
 			end
