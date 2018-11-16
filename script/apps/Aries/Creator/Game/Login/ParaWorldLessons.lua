@@ -22,6 +22,8 @@ local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.Te
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
 
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
+
 ParaWorldLessons.page = nil;
 
 local lesson_worlds = {
@@ -293,9 +295,9 @@ function ParaWorldLessons.OnClickWorld(index)
 end
 
 function ParaWorldLessons.OnClickMoreLessons()
-	ParaGlobal.ShellExecute("open", "https://keepwork.com/official/paracraft/index", "", "", 1)
+	local url = format("%s/official/paracraft/index", KeepworkService:GetKeepworkUrl())
+	ParaGlobal.ShellExecute("open", url, "", "", 1)
 end
-
 
 function ParaWorldLessons.OnClickEnterWorld()
 	if(ParaWorldLessons.page) then
@@ -328,8 +330,8 @@ function ParaWorldLessons.UrlRequest(url, method, params, callback)
 	if(not ParaWorldLessons.isFetching) then
 		_guihelper.MessageBox(L"请求中，请稍等...", nil, _guihelper.MessageBoxButtons.Nothing)
 		ParaWorldLessons.isFetching = true;
-		local Store = NPL.load('(gl)Mod/WorldShare/store/Store.lua')
-		local token = Store:get('user/token')
+
+		local token = KeepworkService:GetToken()
 		local params_ = {
 			url = url,
 			method = method or 'GET',
@@ -350,7 +352,7 @@ end
 
 -- @param username: custom username 
 function ParaWorldLessons.EnterClassImp(classId, username)
-	local url = "https://api.keepwork.com/lesson/v0/classrooms/join"
+	local url = format("%s/classrooms/join", KeepworkService:GetLessonApi())
 	ParaWorldLessons.UrlRequest(url, "POST", {key=tostring(classId), username = username}, function(err, msg, data)
 		if(err ~= 200) then
 			LOG.std(nil, "info", "ParaWorldLessons", "failed to join class %d: err: %d", classId, err);
@@ -378,13 +380,18 @@ end
 
 -- @param classId: if nil, it will be 
 function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId, userId, userToken, username)
-	local contentAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d/contents", lessonId)
-	local lessonAPIUrl = format("https://api.keepwork.com/lesson/v0/lessons/%d", lessonId)
+	local contentAPIUrl = format("%s/lessons/%d/contents", KeepworkService:GetLessonApi(), lessonId)
+	local lessonAPIUrl = format("%s/lessons/%d", KeepworkService:GetLessonApi(), lessonId)
 	
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
 	local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
 	local lesson = ParaWorldLesson:new():Init(lessonId, packageId);
+
+	local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+	local SetCurLesson = Store:Action("lesson/SetCurLesson")
+	SetCurLesson(lesson)
+
 	if(classId) then
 		lesson:SetClassId(classId);
 	end
@@ -449,8 +456,7 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	if(classId) then
 		classId = tonumber(classId);
 
-		local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
-		if(LoginMain.IsSignedIn()) then
+		if(KeepworkService:IsSignedIn()) then
 			ParaWorldLessons.EnterClassImp(classId);
 		else
 			local params = {
@@ -484,6 +490,7 @@ end
 
 function ParaWorldLessons.OnWorldLoaded()
 	local lesson = ParaWorldLessons.GetCurrentLesson()
+
 	if(lesson) then
 		local nQuizCount = lesson:GetQuizCount();
 		TeacherAgent:AddTaskButton("OpenLesson", "Texture/3DMapSystem/AppIcons/png/Intro_64.png", ParaWorldLessons.OpenCurrentLessonUrl, nQuizCount, 100)

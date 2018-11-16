@@ -15,6 +15,8 @@ local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.Para
 
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
 
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
+
 -- set this to true when keepwork `?token=` signin is fully supported. 
 ParaWorldLesson.autoSigninWebUrl = true;
 
@@ -143,7 +145,7 @@ end
 
 function ParaWorldLesson:GetLessonUrl()
 	if(not self.lessonUrl) then
-		self.lessonUrl = format("https://keepwork.com/l/#/visitor/package/%d/lesson/%d", self:GetPackageId(), self:GetLessonId())
+		self.lessonUrl = format("%s/l/#/visitor/package/%d/lesson/%d", KeepworkService:GetKeepworkUrl(), self:GetPackageId(), self:GetLessonId())
 	end
 	return self.lessonUrl;
 end
@@ -154,13 +156,17 @@ function ParaWorldLesson:OpenLessonUrl()
 		if(self:GetClassId()) then
 			self:OpenLessonUrlDirect();	
 		else
-			local LoginMain = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginMain.lua")
-			if(LoginMain.IsSignedIn()) then
+			if(KeepworkService:IsSignedIn()) then
 				self:OpenLessonUrlDirect();	
 			else
-				LoginMain.ShowLoginModal(function()
-					self:OpenLessonUrlDirect();	
-				end, L"登陆后才能访问课程系统, 请先登录");
+				local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal")
+				local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+
+				Store:Set("user/loginText", L"登陆后才能访问课程系统, 请先登录")
+
+				LoginModal:Init(function()
+					self:OpenLessonUrlDirect();
+				end);
 			end
 		end
 	end
@@ -267,7 +273,7 @@ function ParaWorldLesson:SendRecord()
 	local userId = self:GetUserId() or 0;
 	local learnAPIUrl;
 	if(self:GetRecordId()) then
-		learnAPIUrl = format("https://api.keepwork.com/lesson/v0/learnRecords/%d", self:GetRecordId());
+		learnAPIUrl = format("%s/lesson/v0/learnRecords/%d", KeepworkService:GetKeepworkUrl(), self:GetRecordId());
 		learnAPIUrl = self:BuildUrlWithToken(learnAPIUrl)
 		return ParaWorldLessons.UrlRequest(learnAPIUrl , "PUT", {id=userId, extra = self:GetClientData()}, function(err, msg, data)
 			LOG.std(nil, "debug", "ParaWorldLessons", "send record returned:", err);

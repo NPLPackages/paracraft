@@ -287,7 +287,7 @@ function CreateNewWorld.OnClickCreateWorld()
 	if(world_name == "") then
 		_guihelper.MessageBox(L"世界名字不能为空, 请输入世界名称");
 		return
-	elseif(string.len(world_name) > 20) then	
+	elseif(string.len(world_name) > 40) then	
 		_guihelper.MessageBox(L"世界名字太长了, 请重新输入");
 		return
 	end
