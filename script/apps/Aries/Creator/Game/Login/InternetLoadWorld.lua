@@ -713,6 +713,8 @@ function InternetLoadWorld.GenerateWorldFileAccordingOnlineRecord(world)
 				text = L"下载完毕";
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
+				LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", url);
+				LOG.std(nil, "warn", "FileDownloader", msg);
 			end
 			if(text) then
 				BroadcastHelper.PushLabel({id="userworlddownload", label = format(L"世界%s: %s", world.worldname, text), max_duration=10000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});

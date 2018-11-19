@@ -200,6 +200,9 @@ function CodeBlockWindow.SetCodeEntity(entity)
 	if(isEntityChanged) then
 		self:entityChanged(self.entity);
 	end
+	if(not entity) then
+		CodeBlockWindow.CloseEditorWindow()
+	end
 end
 
 function CodeBlockWindow:OnMessage(msg)
@@ -246,6 +249,10 @@ function CodeBlockWindow.Close()
 		return
 	end
 	CodeBlockWindow:UnloadSceneContext();
+	CodeBlockWindow.CloseEditorWindow();
+end
+
+function CodeBlockWindow.CloseEditorWindow()
 	CodeBlockWindow.RestoreWindowLayout()
 	CodeBlockWindow.UpdateCodeToEntity();
 	CodeBlockWindow.HighlightCodeEntity(nil);

@@ -190,7 +190,7 @@ end
 
 function Direction.GetFacingFromOffset(dx, dy, dz)
 	local len = dx^2+dz^2;
-	if(len>0.01) then
+	if(len>0.0000001) then
 		len = math.sqrt(len)
 		local facing = math.acos(dx/len);
 		if(dz>0) then	

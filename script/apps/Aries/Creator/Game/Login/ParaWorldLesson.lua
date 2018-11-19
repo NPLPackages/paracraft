@@ -118,11 +118,15 @@ function ParaWorldLesson:GetFirstWorldUrl()
 				if(not bInsideDownload and line:match("^download")) then
 					bInsideDownload = true;
 				elseif(bInsideDownload and line:match("^%s*link:")) then
-					url = line:match("(https?://[^\r\n]+)");
-					if(url) then
-						break
-					else
-						bSearchNextLine = true
+					line = line:match("^%s*link:%s*(.+)%s*$")
+					if(line) then
+						line = line:gsub("^['\"](.+)['\"]$", "%1");
+						url = line:match("(https?://[^\r\n]+)");
+						if(url) then
+							break
+						else
+							bSearchNextLine = true
+						end
 					end
 				elseif(bSearchNextLine) then
 					url = line:match("(https?://[^\r\n]+)");
@@ -145,7 +149,7 @@ end
 
 function ParaWorldLesson:GetLessonUrl()
 	if(not self.lessonUrl) then
-		self.lessonUrl = format("%s/l/#/visitor/package/%d/lesson/%d", KeepworkService:GetKeepworkUrl(), self:GetPackageId(), self:GetLessonId())
+		self.lessonUrl = format("%s/l/visitor/package/%d/lesson/%d", KeepworkService:GetKeepworkUrl(), self:GetPackageId(), self:GetLessonId())
 	end
 	return self.lessonUrl;
 end
@@ -159,7 +163,7 @@ function ParaWorldLesson:OpenLessonUrl()
 			if(KeepworkService:IsSignedIn()) then
 				self:OpenLessonUrlDirect();	
 			else
-				local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal")
+				local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 				local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 
 				Store:Set("user/loginText", L"登陆后才能访问课程系统, 请先登录")

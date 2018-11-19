@@ -155,7 +155,9 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 				GameLogic.GetFilters():apply_filters("downloadFile_notify", 1, text);
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
-				OnFail(L"下载终止了");				
+				OnFail(L"下载终止了");
+				LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", url);
+				LOG.std(nil, "warn", "FileDownloader", msg);
 				GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);
 			end
 			if(text and self.text ~= "official_texture_package") then

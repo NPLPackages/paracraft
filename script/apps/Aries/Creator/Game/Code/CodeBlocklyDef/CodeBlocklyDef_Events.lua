@@ -163,7 +163,7 @@ say("click me!")
 
 {
 	type = "registerBroadcastEvent", 
-	message0 = L"当收到%1消息时",
+	message0 = L"当收到%1消息时(%2)",
 	message1 = "%1",
 	arg0 = {
 		{
@@ -171,6 +171,11 @@ say("click me!")
 			type = "input_value",
 			shadow = { type = "msgTypes", value = "msg1",},
 			text = "msg1", 
+		},
+		{
+			name = "param1",
+			type = "field_input",
+			text = "msg", 
 		},
 	},
     arg1 = {
@@ -186,7 +191,7 @@ say("click me!")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerBroadcastEvent(%s, function(fromName)\\n%send)',
+	func_description = 'registerBroadcastEvent(%s, function(%s)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(fromName)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
@@ -224,6 +229,46 @@ say("click to jump!")
 	func_description = 'broadcast(%s)',
 	ToNPL = function(self)
 		return string.format('broadcast("%s")\n', self:getFieldAsString('msg'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+registerBroadcastEvent("hello", function(msg)
+    say("hello"..msg)
+    move(0,1,0, 0.5)
+    move(0,-1,0, 0.5)
+    say("bye")
+end)
+for i=1, 2 do
+    broadcast("hello", i)
+    wait(0.5)
+end
+]]}},
+},
+
+{
+	type = "broadcast2", 
+	message0 = L"广播消息%1(%2)",
+	arg0 = {
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "msgTypes", value = "msg1",},
+			text = "msg1", 
+		},
+		{
+			name = "params",
+			type = "input_value",
+			text = "", 
+		},
+	},
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'broadcast(%s, %s)',
+	ToNPL = function(self)
+		return string.format('broadcast("%s", "%s")\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 registerBroadcastEvent("hello", function(msg)

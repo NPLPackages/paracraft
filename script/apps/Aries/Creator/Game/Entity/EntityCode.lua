@@ -127,9 +127,9 @@ end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
-	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true");
-	self.isBlocklyEditMode = node.attr.isBlocklyEditMode == "true";
-	local isPowered = node.attr.isPowered == "true";
+	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
+	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
+	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
 		self:ScheduleRefresh();
 	end

@@ -481,10 +481,64 @@ function Actor:Say(text, duration)
 	end
 end
 
+function Actor:SetFacingDegree(degree)
+	self:SetFacing(degree/180*math.pi)
+end
+
+function Actor:GetFacingDegree()
+	return self:GetFacing()*180/math.pi
+end
+
+-- floating point block position
+function Actor:SetPosX(x)
+	local x_, y_, z_ = self:GetPosition();
+	self:SetPosition(BlockEngine:real_min(x), y_, z_);
+end
+
+function Actor:GetPosX()
+	local x, y, z = self:GetPosition();
+	if(x) then
+		x,y,z = BlockEngine:block_float(x, y, z);
+	end
+	return x;
+end
+
+-- floating point block position
+function Actor:SetPosZ(z)
+	local x_, y_, z_ = self:GetPosition();
+	self:SetPosition(x_, y_, BlockEngine:real_min(z));
+end
+
+function Actor:GetPosZ()
+	local x, y, z = self:GetPosition();
+	if(x) then
+		x,y,z = BlockEngine:block_float(x, y, z);
+	end
+	return z;
+end
+
+-- floating point block position
+function Actor:SetPosY(y)
+	local x_, y_, z_ = self:GetPosition();
+	self:SetPosition(x_, BlockEngine:realY(y), z_);
+end
+
+function Actor:GetPosY()
+	local x, y, z = self:GetPosition();
+	if(x) then
+		x,y,z = BlockEngine:block_float(x, y, z);
+	end
+	return y;
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
+	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
+	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
+	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 

@@ -95,7 +95,7 @@ say(key, 1)
 	nextStatement = true,
 	func_description = '%s = %s',
 	ToNPL = function(self)
-		return 'local key = "value"\n';
+		return 'key = "value"\n';
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 text = "hello"
@@ -139,23 +139,32 @@ end
 
 {
 	type = "registerCloneEvent", 
-	message0 = L"当角色被复制时",
+	message0 = L"当角色被复制时(%1)",
 	message1 = L"%1",
+	arg0 = {
+		{
+			name = "param",
+			type = "field_input",
+			shadow = { type = "text", value = "name",},
+			text = "name", 
+		},
+	},
 	arg1 = {
 		{
 			name = "input",
 			type = "input_statement",
 			text = "",
 		},
+		
 	},
 	category = "Data", color="#cc0000",
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerCloneEvent(function()\\n%send)',
+	func_description = 'registerCloneEvent(function(%s)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerCloneEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
+		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 registerCloneEvent(function(msg)
@@ -170,17 +179,46 @@ clone("myself", 3)
 },
 
 {
-	type = "clone", 
-	message0 = L"复制%1",
+	type = "actorNames", 
+	message0 = "%1",
 	arg0 = {
 		{
-			name = "input",
-			type = "field_variable",
+			name = "value",
+			type = "field_dropdown",
 			options = {
 				{ L"此角色", "myself" },
 				{ L"某个角色", "" },
 			},
-			variable = "myself",
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Data", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "clone", 
+	message0 = L"复制%1(%2)",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_value",
+			shadow = { type = "actorNames", value = "myself",},
+			text = "myself",
+		},
+		{
+			name = "params",
+			type = "input_value",
+			shadow = { type = "text", value = "",},
+			text = "", 
 		},
 	},
 	category = "Data", color="#cc0000",
@@ -188,7 +226,7 @@ clone("myself", 3)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'clone("%s")',
+	func_description = 'clone(%s, %s)',
 	ToNPL = function(self)
 		return string.format('clone("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -242,6 +280,10 @@ end
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
+				{ "x", "x" },
+				{ "y", "y" },
+				{ "z", "z" },
+				{ L"朝向", "facing" },
 				{ L"颜色", "color" },
 				{ L"文字", "text" },
 				{ L"是否为化身", "isAgent" },
