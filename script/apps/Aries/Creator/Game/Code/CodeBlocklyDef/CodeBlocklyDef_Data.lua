@@ -688,6 +688,33 @@ echo(something)
 ]]}},
 },
 
+{
+	type = "include", 
+	message0 = L"引用文件%1",
+	arg0 = {
+		{
+			name = "filename",
+			type = "input_value",
+            shadow = { type = "text", value = "hello.npl",},
+			text = "hello.npl", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'include(%s)',
+	ToNPL = function(self)
+		return string.format('include("%s")\n', self:getFieldAsString('filename'));
+	end,
+	examples = {{desc = L"文件需要放到当前世界目录下", canRun = true, code = [[
+-- _G.hello = function say("hello") end
+include("hello.npl")
+hello()
+]]}},
+},
+
 };
 function CodeBlocklyDef_Data.GetCmds()
 	return cmds;

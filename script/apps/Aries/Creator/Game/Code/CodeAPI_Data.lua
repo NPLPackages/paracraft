@@ -96,3 +96,10 @@ function env_imp:setOutput(result)
 		self.codeblock:SetOutput(tonumber(result))
 	end
 end
+
+-- @param filename: include a file relative to current world directory
+function env_imp:include(filename)
+	if(self.codeblock) then
+		return self.codeblock:IncludeFile(filename)
+	end
+end

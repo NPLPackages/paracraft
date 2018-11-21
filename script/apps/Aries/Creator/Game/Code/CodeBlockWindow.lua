@@ -426,6 +426,14 @@ function CodeBlockWindow.OnChangeModel()
 	local codeBlock = CodeBlockWindow.GetCodeBlock()
 	if(codeBlock) then
 		local actor;
+
+		local movieEntity = self.entity:FindNearByMovieEntity()	
+		if(movieEntity and not movieEntity:GetFirstActorStack()) then
+			movieEntity:CreateNPC();
+			CodeBlockWindow:GetSceneContext():UpdateCodeBlock();
+			actor = sceneContext:GetActor();
+		end
+
 		local sceneContext = CodeBlockWindow:GetSceneContext();
 		if(sceneContext) then
 			actor = sceneContext:GetActor()

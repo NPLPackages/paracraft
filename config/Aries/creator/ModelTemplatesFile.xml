@@ -11,7 +11,7 @@
   <model name="小鸡" filename="character/AutoAnims/Q_xiaoji.x"/>
   <model name="蜘蛛" filename="character/AutoAnims/Q_zhizhu.x"/>
   <model name="虫子" filename="character/AutoAnims/Q_chong.x"/>
-  <model name="章鱼" filename="character/AutoAnims/Q_zhangyu.x"/>
+  <!-- <model name="章鱼" filename="character/AutoAnims/Q_zhangyu.x"/> -->
   <model name="鹦鹉" filename="character/AutoAnims/Q_yingwu.x"/>
   <model name="山羊" filename="character/AutoAnims/Q_yang.x"/>
   <model name="蝴蝶" filename="character/AutoAnims/Q_hudie.x"/>

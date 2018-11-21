@@ -21,6 +21,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCompiler.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
 local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
@@ -652,5 +654,35 @@ end
 function CodeBlock:SetOutput(result)
 	if(self:GetEntity()) then
 		self:GetEntity():SetLastCommandResult(result);
+	end
+end
+
+-- @param filename: include a file relative to current world directory
+function CodeBlock:IncludeFile(filename)
+	local filepath = Files.WorldPathToFullPath(filename);
+	local file = ParaIO.open(filepath, "r")
+	if(file:IsValid()) then
+		local code = file:GetText();
+		file:close();
+		if(code and code~="") then
+			local code_func, errormsg = CodeCompiler:new():SetFilename(filename):Compile(code);
+			setfenv(code_func, self:GetCodeEnv());
+			local ok, result = pcall(code_func, msg);
+			if(not ok) then
+				if(result:match("_stop_all_")) then
+					self:StopAll();
+				elseif(result:match("_restart_all_")) then
+					self:RestartAll();
+				else
+					LOG.std(nil, "error", "CodeBlock", result);
+					local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
+					self:send_message(msg);
+				end
+			end
+		end
+	else
+		LOG.std(nil, "warn", "CodeBlock", "include can not file world file %s", filename);
+		local msg = format(L"没有找到文件: %s", filename);
+		self:send_message(msg);
 	end
 end

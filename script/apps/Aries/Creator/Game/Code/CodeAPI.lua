@@ -34,6 +34,7 @@ local s_env_methods = {
 	"setActorValue",
 	"getActorValue",
 	"showVariable",
+	"include",
 
 	-- Motion
 	"move",
