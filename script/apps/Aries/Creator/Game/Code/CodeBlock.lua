@@ -666,17 +666,24 @@ function CodeBlock:IncludeFile(filename)
 		file:close();
 		if(code and code~="") then
 			local code_func, errormsg = CodeCompiler:new():SetFilename(filename):Compile(code);
-			setfenv(code_func, self:GetCodeEnv());
-			local ok, result = pcall(code_func, msg);
-			if(not ok) then
-				if(result:match("_stop_all_")) then
-					self:StopAll();
-				elseif(result:match("_restart_all_")) then
-					self:RestartAll();
-				else
-					LOG.std(nil, "error", "CodeBlock", result);
-					local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
-					self:send_message(msg);
+			if(not code_func and errormsg) then
+				LOG.std(nil, "error", "CodeBlock", errormsg);
+				local msg = errormsg;
+				msg = format(L"编译错误: %s\n在%s", msg, filename);
+				self:send_message(msg);
+			else
+				setfenv(code_func, self:GetCodeEnv());
+				local ok, result = pcall(code_func, msg);
+				if(not ok) then
+					if(result:match("_stop_all_")) then
+						self:StopAll();
+					elseif(result:match("_restart_all_")) then
+						self:RestartAll();
+					else
+						LOG.std(nil, "error", "CodeBlock", result);
+						local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
+						self:send_message(msg);
+					end
 				end
 			end
 		end

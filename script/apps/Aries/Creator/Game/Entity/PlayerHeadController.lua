@@ -140,8 +140,8 @@ function PlayerHeadController.GetTurningAngleFromPos(entity, src_x, src_y, src_z
 	diff_x = diff_x/dist;
 	diff_z = diff_z/dist;
 
-	if(diff_z>1) then	diff_z=1; end
-	if(diff_z<-1) then	diff_z=-1; end
+	if(diff_z > 1) then	diff_z = 1; end
+	if(diff_z < -1) then	diff_z = -1; end
 
 	if (diff_x>0) then
 		turning_angle = math.asin(diff_z);

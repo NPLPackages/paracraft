@@ -58,7 +58,7 @@ function ExtrudeBlocks:Run()
 				for i=1, dx-1 do 
 					copyBlockToEmptySpace_(x-i,y,z, b);
 				end
-			elseif(dx<-1) then
+			elseif(dx < -1) then
 				for i=1, -dx-1 do 
 					copyBlockToEmptySpace_(x+i,y,z, b);
 				end
@@ -67,7 +67,7 @@ function ExtrudeBlocks:Run()
 				for i=1, dy-1 do 
 					copyBlockToEmptySpace_(x,y-i,z, b);
 				end
-			elseif(dy<-1) then
+			elseif(dy < -1) then
 				for i=1, -dy-1 do 
 					copyBlockToEmptySpace_(x,y+i,z, b);
 				end
@@ -76,7 +76,7 @@ function ExtrudeBlocks:Run()
 				for i=1, dz-1 do 
 					copyBlockToEmptySpace_(x,y,z-i, b);
 				end
-			elseif(dz<-1) then
+			elseif(dz < -1) then
 				for i=1, -dz-1 do 
 					copyBlockToEmptySpace_(x,y,z+i, b);
 				end

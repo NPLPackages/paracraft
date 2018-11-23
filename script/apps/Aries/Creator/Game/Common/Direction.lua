@@ -207,7 +207,7 @@ function Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lo
 	local dx, dy, dz = math3d.CameraToWorldSpace(0, 0 ,1, camx,camy,camz, lookat_x,lookat_y,lookat_z);
 	if(dy>0.4) then
 		return 5;
-	elseif(dy<-0.8) then
+	elseif(dy < -0.8) then
 		return 4;
 	elseif(math.abs(dz) > math.abs(dx)) then
 		if(dz>0) then

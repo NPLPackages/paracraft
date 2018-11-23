@@ -269,7 +269,7 @@ function Tool:handleTouchUpGesture(touch_session, touch)
 				if(dy > self.default_finger_size) then
 					-- gesture: single swipe downward to delete selection. 
 					TouchSelection:DeleteAllBlocks();
-				elseif(dy<-self.default_finger_size) then
+				elseif(dy < -self.default_finger_size) then
 					-- gesture: single swipe upward to extrude selection upward. 
 					TouchSelection:ExtrudeSelection(0, 1, 0);
 				end
