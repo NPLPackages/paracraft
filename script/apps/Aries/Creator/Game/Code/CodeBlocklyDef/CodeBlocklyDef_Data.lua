@@ -715,6 +715,37 @@ hello()
 ]]}},
 },
 
+{
+	type = "code_block", 
+	message0 = L"代码%1",
+	message1 = L"%1",
+    arg0 = {
+		{
+			name = "label_dummy",
+			type = "input_dummy",
+			text = "",
+		},
+	},
+	arg1 = {
+		{
+			name = "codes",
+			type = "field_input",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('%s\n', self:getFieldAsString('codes'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+]]}},
+},
+
 };
 function CodeBlocklyDef_Data.GetCmds()
 	return cmds;
