@@ -466,6 +466,52 @@ end)
 },
 
 {
+	type = "runForActor", 
+	message0 = L"执行角色%1代码",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "actor",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Control", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'runForActor(%s, function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('runForActor("%s", function()\n    %s\nend)\n', self:getFieldAsString('actor'), self:getFieldAsString('input'));
+	end,
+	examples = {
+	{desc = "", canRun = true, code = [[
+runForActor("myself", function()
+	say("hello", 1)
+end)
+say("world", 1)
+]]},
+{desc = "", canRun = true, code = [[
+local actor = getActor("myself")
+runForActor(actor, function()
+	say("hello", 1)
+end)
+say("world", 1)
+]]},
+},
+},
+
+{
 	type = "exit", 
 	message0 = L"结束程序",
 	arg0 = {

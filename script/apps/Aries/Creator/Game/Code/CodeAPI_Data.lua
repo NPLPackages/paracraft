@@ -103,3 +103,13 @@ function env_imp:include(filename)
 		return self.codeblock:IncludeFile(filename)
 	end
 end
+
+-- get actor by name
+-- @param name: nil or "myself" means current actor, or any actor name
+function env_imp:getActor(name)
+	if(name == "myself" or not name) then
+		return self.actor;
+	else
+		return GameLogic.GetCodeGlobal():GetActorByName(name);
+	end
+end

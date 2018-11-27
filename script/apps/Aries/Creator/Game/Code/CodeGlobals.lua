@@ -214,12 +214,37 @@ function CodeGlobals:RegisterKeyPressedEvent(callbackFunc)
 	self:CreateGetTextEvent("keyPressedEvent"):AddEventListener("msg", callbackFunc);
 end
 
-function CodeGlobals:BroadcastKeyPressedEvent(keyname)
+function CodeGlobals:BroadcastKeyPressedEvent(keyname, param1)
 	self:SetAnyKeyDown(true);
 	local event = self:GetTextEvent("keyPressedEvent");
 	if(event) then
-		return event:DispatchEvent({type="msg", keyname = keyname});
+		return event:DispatchEvent({type="msg", keyname = keyname, param1 = param1});
 	end
+end
+
+function CodeGlobals:UnregisterKeyPressedEvent(callbackFunc)
+	self:UnregisterTextEvent("keyPressedEvent", callbackFunc)
+end
+
+function CodeGlobals:RegisterBlockClickEvent(callbackFunc)
+	self:CreateGetTextEvent("onBlockClicked"):AddEventListener("msg", callbackFunc);
+end
+
+function CodeGlobals:BroadcastBlockClickEvent(blockid)
+	local event = self:GetTextEvent("onBlockClicked");
+	if(event) then
+		local result = SelectionManager:MousePickBlock();
+		if(result and result.block_id and result.block_id>0 and result.blockX) then
+			return event:DispatchEvent({type="msg", blockid = result.block_id, param1 = {
+				blockid = result.block_id,
+				x = result.blockX, y = result.blockY, z = result.blockZ, side = result.side
+			}});
+		end
+	end
+end
+
+function CodeGlobals:UnregisterBlockClickEvent(callbackFunc)
+	self:UnregisterTextEvent("onBlockClicked", callbackFunc)
 end
 
 function CodeGlobals:HandleGameEvent(event)
@@ -274,13 +299,6 @@ end
 
 function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 	local event = self:GetTextEvent(text);
-	if(event) then
-		event:RemoveEventListener("msg", callbackFunc);
-	end
-end
-
-function CodeGlobals:UnregisterKeyPressedEvent(callbackFunc)
-	local event = self:GetTextEvent("keyPressedEvent");
 	if(event) then
 		event:RemoveEventListener("msg", callbackFunc);
 	end

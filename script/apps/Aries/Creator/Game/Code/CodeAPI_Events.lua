@@ -74,6 +74,10 @@ function env_imp:registerClickEvent(callbackFunc)
 	self.codeblock:RegisterClickEvent(callbackFunc);
 end
 
+function env_imp:registerBlockClickEvent(blockid, callbackFunc)
+	self.codeblock:RegisterBlockClickEvent(blockid, callbackFunc);
+end
+
 function env_imp:registerKeyPressedEvent(keyname, callbackFunc)
 	self.codeblock:RegisterKeyPressedEvent(keyname, callbackFunc);
 end
@@ -92,6 +96,28 @@ function env_imp:run(mainFunc)
 	end
 end
 
+-- run function under the context of a given actor and wait for its return value
+-- @param actor: actor name or the actor object
+function env_imp:runForActor(actor, mainFunc)
+	if(actor == "myself" or not actor) then
+		actor = self.actor;
+	elseif(type(actor) == "string") then
+		actor = GameLogic.GetCodeGlobal():GetActorByName(actor);
+	end
+	if(type(actor) == "table" and type(mainFunc) == "function") then
+		local isFinished = false;
+		local co = CodeCoroutine:new():Init(self.codeblock);
+		co:SetActor(actor);
+		co:SetFunction(mainFunc);
+		co:Run(nil, self.co:MakeCallbackFunc(function()
+			isFinished = true;
+			env_imp.resume(self);
+		end));	
+		if(not isFinished) then
+			env_imp.yield(self);
+		end
+	end
+end
 
 
 

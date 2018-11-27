@@ -279,7 +279,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 text("hello"); text("line2",0,16);<br/>
 image("1.png", 300, 200);<br/>
 rect(-10,-10,250,64,"1.png;0 0 32 32:8 8 8 8");<br/>
-color("#ff0000");<br/>
+color("#ff0000"); font(14);<br/>
 ]];
 		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
@@ -542,23 +542,32 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 		-- draw text
 		-- @param text: text to render with current font 
 		-- @param x,y: default to 0,0
-		env.text = function(text, x, y)
+		-- @param width, height: can be nil, unless you want to center the text
+		-- @param alignment: only used when width is not nil
+		env.text = function(text, x, y, width, height, alignment)
 			if(text and text~="" ) then
 				x = x or 0;
 				y = y or 0;
 									
 				if(not env.isPickingPass) then
 					self:ExtendAABB(x, y);
-					for line in text:gmatch("[^\n]+") do
-						env.painter:DrawText(x, y, line);
-						y = y + self.lineheight;
-						self:ExtendAABB(x + _guihelper.GetTextWidth(line, self:GetFont()), y);
+					if(not width or not height) then
+						for line in text:gmatch("[^\n]+") do
+							env.painter:DrawText(x, y, line);
+							y = y + self.lineheight;
+							self:ExtendAABB(x + _guihelper.GetTextWidth(line, self:GetFont()), y);
+						end
+					else
+						alignment = alignment or 0x00000105; 
+						env.painter:DrawText(x, y, width, height, text, alignment);
 					end
 				else
-					local width, height = 0,0;
-					for line in text:gmatch("[^\n]+") do
-						height = height + self.lineheight;
-						width = math.max(width, _guihelper.GetTextWidth(line, self:GetFont()))
+					if(not width) then
+						width, height = 0,0;
+						for line in text:gmatch("[^\n]+") do
+							height = height + self.lineheight;
+							width = math.max(width, _guihelper.GetTextWidth(line, self:GetFont()))
+						end
 					end
 					if(width~=0 and height~=0) then
 						env.painter:DrawRect(x,y, width, height);
@@ -594,6 +603,19 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 		env.color = function(color)
 			if(not env.isPickingPass) then
 				env.painter:SetPen(color);
+			end
+		end
+
+		-- set font 
+		-- @param font: font_size
+		-- or {family="System", size=10, bold=true}
+		-- or it can be string "System;14;" or "System;14;bold"
+		env.font = function(font)
+			if(not env.isPickingPass) then
+				if(type(font) == "number") then
+					font = "System;"..font;
+				end
+				env.painter:SetFont(font);
 			end
 		end
 

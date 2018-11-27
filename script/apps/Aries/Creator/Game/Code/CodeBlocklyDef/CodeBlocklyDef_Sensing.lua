@@ -186,15 +186,28 @@ cmd("/hide boundingbox")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerCollisionEvent(%s, function()\\n%send)',
+	func_description = 'registerCollisionEvent(%s, function(actor)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerCollisionEvent("%s", function()\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
+		return string.format('registerCollisionEvent("%s", function(actor)\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {
+	{desc = L"某个角色", canRun = true, code = [[
 broadcastCollision()
-registerCollisionEvent("frog", function()
+registerCollisionEvent("frog", function(actor)
+	local data = actor:GetActorValue("some_data")
 end)
-]]}},
+]]},
+
+{desc = L"任意角色", canRun = true, code = [[
+broadcastCollision()
+registerCollisionEvent("", function(actor)
+	local data = actor:GetActorValue("some_data")
+	if(data == 1) then
+		say("collide with 1")
+	end
+end)
+]]},
+},
 },
 
 {
@@ -416,7 +429,7 @@ end
 	end,
 	examples = {{desc = L"点击任意位置传送", canRun = true, code = [[
 while(true) do
-    local x, y, z, blockid = mousePickBlock();
+    local x, y, z, blockid, side = mousePickBlock();
     if(x) then
         say(format("%s %s %s :%d", x, y, z, blockid))
     end

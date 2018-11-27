@@ -240,6 +240,7 @@ say("click")
 ]]}},
 },
 
+
 {
 	type = "delete", 
 	message0 = L"删除角色", color="#cc0000",
@@ -382,6 +383,40 @@ clone("myself", {name = "clone1", dist=1})
 clone(nil, {name = "clone2", dist=2})
 say("click us!")
 ]]}},
+},
+
+
+{
+	type = "getActor", 
+	message0 = L"获取角色对象%1", 
+	arg0 = {
+		{
+			name = "actorName",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+	},
+	output = {type = "field_variable",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getActor(%s)',
+	ToNPL = function(self)
+		return string.format('getActor("%s")\n', self:getFieldAsString('actorName'));
+	end,
+	examples = {
+	{desc = L"", canRun = true, code = [[
+local actor = getActor("myself")
+runForActor(actor, function()
+	say("hello", 1)
+end)
+]]},
+	{desc = L"", canRun = true, code = [[
+local actor = getActor("name1")
+local data = actor:GetActorValue("some_data")
+]]},
+},
 },
 
 {
@@ -690,7 +725,7 @@ echo(something)
 
 {
 	type = "include", 
-	message0 = L"引用文件%1",
+	message0 = L"引用文件%1", color="#cc0000",
 	arg0 = {
 		{
 			name = "filename",

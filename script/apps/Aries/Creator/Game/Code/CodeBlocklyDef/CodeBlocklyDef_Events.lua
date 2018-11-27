@@ -63,6 +63,7 @@ end)
 				{ L"回车", "return" },{ "-", "minus" },{ "+", "equal" },{ "back", "back" },{ "tab", "tab" },
 				{ "lctrl", "lcontrol" },{ "lshift", "lshift" },{ "lalt", "lmenu" },
 				{"num0","numpad0"},{"num1","numpad1"},{"num2","numpad2"},{"num3","numpad3"},{"num4","numpad4"},{"num5","numpad5"},{"num6","numpad6"},{"num7","numpad7"},{"num8","numpad8"},{"num9","numpad9"},
+				{L"鼠标滚轮","mouse_wheel"},{L"鼠标按钮","mouse_buttons"}
 			},
 		},
 		
@@ -79,18 +80,76 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'registerKeyPressedEvent("%s", function()\\n%send)',
+	func_description = 'registerKeyPressedEvent("%s", function(msg)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerKeyPressedEvent("%s", function()\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
+		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"空格跳跃", canRun = true, code = [[
+	examples = {
+{desc = L"空格跳跃", canRun = true, code = [[
 registerKeyPressedEvent("space",function()
     say("Jump!", 1)
     move(0,1,0, 0.5)
     move(0,-1,0, 0.5)
     walkForward(0)
 end)
-]]}},
+]]},
+{desc = L"鼠标按钮", canRun = true, code = [[
+registerKeyPressedEvent("mouse_buttons",function(event)
+    say("button:"..event:buttons())
+end)
+]]},
+{desc = L"鼠标滚轮", canRun = true, code = [[
+registerKeyPressedEvent("mouse_wheel",function(mouse_wheel)
+    say("delta:"..mouse_wheel)
+end)
+]]},
+},
+},
+
+{
+	type = "registerBlockClickEvent", 
+	message0 = L"当方块%1被点击时",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "blockid",
+			type = "input_value",
+			shadow = { type = "text", value = "10",},
+			text = "10", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+    },
+	category = "Events", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'registerBlockClickEvent(%s, function(msg)\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerBlockClickEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('blockid'), self:getFieldAsString('input'));
+	end,
+	examples = {
+{desc = L"任意方块被点击", canRun = true, code = [[
+registerBlockClickEvent("any",function(msg)
+	local blockid = msg.blockid;
+	x, y, z, side = msg.x, msg.y, msg.z, msg.side
+    say(blockid..":"..x..","..y..","..z..":"..side)
+end)
+]]},
+{desc = L"某个方块被点击", canRun = true, code = [[
+registerBlockClickEvent("10",function(msg)
+	local blockid = msg.blockid;
+	x, y, z, side = msg.x, msg.y, msg.z, msg.side
+    tip("colorblock10:"..x..","..y..","..z..":"..side)
+end)
+]]},
+},
 },
 
 {

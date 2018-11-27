@@ -35,6 +35,7 @@ local s_env_methods = {
 	"getActorValue",
 	"showVariable",
 	"include",
+	"getActor",
 
 	-- Motion
 	"move",
@@ -73,6 +74,7 @@ local s_env_methods = {
 	"registerKeyPressedEvent",
 	"registerAnimationEvent",
 	"registerBroadcastEvent",
+	"registerBlockClickEvent",
 	"broadcast",
 	"broadcastAndWait",
 	
@@ -82,6 +84,7 @@ local s_env_methods = {
 	"clone",
 	"delete",
 	"run",
+	"runForActor",
 	"becomeAgent",
 	"setOutput",
 

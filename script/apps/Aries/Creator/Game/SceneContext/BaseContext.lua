@@ -161,6 +161,19 @@ function BaseContext:handleHookedMouseEvent(event)
 	if(self:handleItemMouseEvent(event)) then
 		return true;
 	end
+
+	if(event:GetType() == "mousePressEvent") then
+		if(GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent("mouse_buttons", event)) then
+			-- we need to leak event to global scene, even we processed it
+			-- return true;
+		end
+	elseif(event:GetType() == "mouseReleaseEvent") then
+		if(GameLogic.GetCodeGlobal():BroadcastBlockClickEvent("BroadcastBlockClickEvent", event)) then
+			-- we need to leak event to global scene, even we processed it
+			-- return true;
+		end
+	end
+
 	return event:isAccepted();
 end
 
@@ -506,6 +519,7 @@ function BaseContext:mouseWheelEvent(event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
+
 	if(not ParaCamera.GetAttributeObject():GetField("EnableMouseWheel", false)) then
 		if(GameLogic.IsFPSView or (GameLogic.options.lock_mouse_wheel and not event.ctrl_pressed) or (not GameLogic.options.lock_mouse_wheel and event.ctrl_pressed)) then
 			-- mouse wheel to toggle item in hand
@@ -514,6 +528,10 @@ function BaseContext:mouseWheelEvent(event)
 			-- control + mouse wheel to zoom camera
 			self:handleCameraWheelEvent(event);
 		end
+	end
+
+	if(GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent("mouse_wheel", mouse_wheel)) then
+		return true;
 	end
 end
 

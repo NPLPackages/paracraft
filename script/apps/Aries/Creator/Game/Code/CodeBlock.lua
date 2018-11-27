@@ -33,6 +33,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 
 local CodeBlock = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"));
 CodeBlock:Property("Name", "CodeBlock");
@@ -404,6 +405,13 @@ function CodeBlock:Run()
 		co:SetActor(actor);
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
 		return co:Run();
+	else
+		self:ResetTime();
+		self.isLoaded = true;
+		self:stateChanged();
+		local actor = self:FindNearbyActor() or self:CreateActor();
+		GameLogic.GetCodeGlobal():AddCodeBlock(self);
+		return false;
 	end
 end
 
@@ -468,6 +476,40 @@ function CodeBlock:RegisterClickEvent(callbackFunc)
 	event:SetFunction(callbackFunc);
 end
 
+-- @param blockname: block id or name, if nil or "any", it matches all blocks
+function CodeBlock:RegisterBlockClickEvent(blockname, callbackFunc)
+	local event = self:CreateEvent("onBlockClicked");
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+
+	local blockid, _;
+	if(type(blockname) == "string" and blockname ~= "any") then
+		blockid, _ = CmdParser.ParseBlockId(blockname);
+	elseif(type(blockname) == "number") then
+		blockid = blockname
+	end
+	
+	local function onEvent_(_, msg)
+		if(not msg) then
+			return 
+		end
+		local bFire;
+		if(not blockid) then
+			bFire = true;
+		elseif(blockid == msg.blockid) then
+			bFire = true;
+		end
+		if(bFire) then
+			event:Fire(msg.param1 or msg);
+			return true;
+		end
+	end
+	event:Connect("beforeDestroyed", function()
+		GameLogic.GetCodeGlobal():UnregisterBlockClickEvent(onEvent_);
+	end)
+	GameLogic.GetCodeGlobal():RegisterBlockClickEvent(onEvent_);
+end
+
 function CodeBlock:OnClickActor(actor, mouse_button)
 	self:FireEvent("onClickActor", actor);
 	self:actorClicked(actor, mouse_button);
@@ -492,7 +534,7 @@ function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 			bFire = true;
 		end
 		if(bFire) then
-			event:Fire();
+			event:Fire(msg.param1 or msg);
 			return true;
 		end
 	end
@@ -633,12 +675,13 @@ function CodeBlock:ResetTime()
 end
 
 -- collision event is special that it will not overwrite the last event.
+-- @param name: if nil or "", it matches all actors
 function CodeBlock:RegisterCollisionEvent(name, callbackFunc)
 	local event = self:CreateEvent("onCollideActor");
 	event:SetIsFireForAllActors(false);
 	event:SetStopLastEvent(false);
 	event:SetCanFireCallback(function(actor, fromActor)
-		if(fromActor and fromActor:GetName() == name) then
+		if(fromActor and (not name or name=="" or fromActor:GetName() == name)) then
 			return true;
 		end
 	end);
