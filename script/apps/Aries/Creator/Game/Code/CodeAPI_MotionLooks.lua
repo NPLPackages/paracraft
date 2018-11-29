@@ -450,7 +450,7 @@ function env_imp:bounce()
 end
 
 -- set focus to current actor or the main player 
--- @param : nil or "myself" means current actor, "player" means the main player
+-- @param : nil or "myself" means current actor, "player" means the main player, or it can also be actor object
 function env_imp:focus(name)
 	if(not name or name == "myself") then
 		if(self.actor) then
@@ -458,6 +458,14 @@ function env_imp:focus(name)
 		end
 	elseif(name == "player") then
 		EntityManager.GetPlayer():SetFocus();
+	elseif(type(name) == "string") then
+		local actor = GameLogic.GetCodeGlobal():GetActorByName(name);
+		if(actor) then
+			actor:SetFocus();
+		end
+	elseif(type(name) == "table" and name.SetFocus) then
+		-- actor object is also supported
+		name:SetFocus()
 	end
 	env_imp.checkyield(self);
 end

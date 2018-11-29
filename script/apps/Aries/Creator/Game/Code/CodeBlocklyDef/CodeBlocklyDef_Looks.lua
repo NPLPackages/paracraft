@@ -438,7 +438,12 @@ scaleTo(100)
 focus()
 moveForward(2,2)
 focus("player")
-]]}},
+]]},
+{desc = "", canRun = true, code = [[
+focus("someName")
+focus(getActor("someName2"))
+]]}
+},
 },
 
 {
