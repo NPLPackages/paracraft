@@ -1129,6 +1129,25 @@ function Actor:OnChangeBone(bone_name)
 	end
 end
 
+-- set the local bone time
+-- @param boneName: a precise bone name or regular expression, like "hand" or ".*hand"
+-- @param time: if nil or -1, it will remove bone time. 
+function Actor:SetBoneTime(boneName, time)
+	local var = self:GetBonesVariable();
+	if(var) then
+		local variables = var:GetVariables();
+		if(variables[boneName]) then
+			variables[boneName]:SetTime(time);
+		else
+			for name, bone in pairs(variables) do
+				if(name:match(boneName)) then
+					bone:SetTime(time);
+				end
+			end
+		end
+	end
+end
+
 function Actor:DestroyEntity()
 	Actor._super.DestroyEntity(self)
 	if(self.bones_variable) then

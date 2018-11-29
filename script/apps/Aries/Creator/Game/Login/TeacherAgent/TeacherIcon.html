@@ -14,7 +14,7 @@ TeacherIcon.Init();
     <div style="min-width:42px;height:42px;">
         <pe:gridview name="taskButtons" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight="42" pagesize="8" DataSource='<%=TeacherIcon.GetButtonDs%>'>
             <Columns>
-                <input type="button" name='<%=Eval("name")%>' tooltip='<%="Eval("tooltip") or ""%>' onclick='<%=Eval("onclick") or ""%>' background='<%=Eval("icon") or ""%>' style="width:42px;height:42px;margin-right:3px;" />
+                <input type="button" name='<%=Eval("name")%>' tooltip='<%="page://script/apps/Aries/Creator/Game/Login/TeacherAgent/ButtonTooltip.html?index="..Eval("index")%>' onclick='<%=Eval("onclick") or ""%>' background='<%=Eval("icon") or ""%>' style="width:42px;height:42px;margin-right:3px;" />
             </Columns>
         </pe:gridview>
     </div>
@@ -32,7 +32,7 @@ TeacherIcon.Init();
         <pe:if condition='<%=TeacherIcon.GetMainCount()>0%>'>
             <input name="mainCount" zorder="1" enabled="false" type="button" value='<%=tostring(TeacherIcon.GetMainCount())%>' style="position:relative;color:#000000ff;margin-left:40px;margin-top:43px;width:24px;height:24px;background-color:#ffffff;background:url(Texture/Aries/Dock/UnreadNum_32bits.png#0 0 32 32)" />
         </pe:if>
-        <input type="button" name="btnMain" onclick="TeacherIcon.OnClick" style='<%=format("margin-top:0px;background:url(%s);background-color:#ffffffff;width:64px;height:64px", TeacherIcon.GetMainButton() and TeacherIcon.GetMainButton().icon or "Texture/Aries/Creator/Desktop/agent_32bits.png#0 0 64 64")%>' />
+        <input type="button" name="btnMain" tooltip='page://script/apps/Aries/Creator/Game/Login/TeacherAgent/ButtonTooltip.html' onclick="TeacherIcon.OnClick" style='<%=format("margin-top:0px;background:url(%s);background-color:#ffffffff;width:64px;height:64px", TeacherIcon.GetMainButton() and TeacherIcon.GetMainButton().icon or "Texture/Aries/Creator/Desktop/agent_32bits.png#0 0 64 64")%>' />
     </div>
 </pe:mcml>
 </body>

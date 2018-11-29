@@ -31,6 +31,7 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
+		commonlib = commonlib,
 		type = type,
 		unpack = unpack,
 		math = { abs = math.abs, acos = math.acos, asin = math.asin, 
@@ -162,8 +163,10 @@ function CodeGlobals:RemoveActor(actor)
 end
 
 function CodeGlobals:OnActorNameChange(actor, oldName, newName)
-	if(self.actors[oldName] == actor) then
+	if(oldName and self.actors[oldName] == actor) then
 		self.actors[oldName] = nil;
+	end
+	if(newName) then
 		self.actors[newName] = actor;
 	end
 end

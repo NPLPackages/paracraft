@@ -154,7 +154,12 @@ function ParaWorldLesson:GetLessonUrl()
 	return self.lessonUrl;
 end
 
+function ParaWorldLesson:HasOpenedUrl()
+	return self.hasOpenedUrl;
+end
+
 function ParaWorldLesson:OpenLessonUrl()
+	self.hasOpenedUrl = true;
 	local url = self:GetLessonUrl()
 	if(url) then
 		if(self:GetClassId()) then

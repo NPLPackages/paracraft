@@ -119,7 +119,7 @@ end
 -- @param code: string
 -- return error message if any
 function CodeBlock:CompileCode(code)
-	if(self.last_code ~= code) then
+	if(self.last_code ~= code or not self.code_func) then
 		self:Unload();
 		self.last_code = code;
 		self.code_func, self.errormsg = CodeCompiler:new():SetFilename(self:GetFilename()):Compile(code);
@@ -131,6 +131,8 @@ function CodeBlock:CompileCode(code)
 		else
 			self:send_message(L"编译成功!");
 		end
+	else
+		self:send_message(L"编译成功!");
 	end
 	return self.errormsg;
 end

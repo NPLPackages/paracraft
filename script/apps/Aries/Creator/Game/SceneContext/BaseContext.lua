@@ -168,9 +168,11 @@ function BaseContext:handleHookedMouseEvent(event)
 			-- return true;
 		end
 	elseif(event:GetType() == "mouseReleaseEvent") then
-		if(GameLogic.GetCodeGlobal():BroadcastBlockClickEvent("BroadcastBlockClickEvent", event)) then
-			-- we need to leak event to global scene, even we processed it
-			-- return true;
+		if(event:button() == "left" and event:GetDragDist() < 10) then
+			if(GameLogic.GetCodeGlobal():BroadcastBlockClickEvent("BroadcastBlockClickEvent", event)) then
+				-- we need to leak event to global scene, even we processed it
+				-- return true;
+			end
 		end
 	end
 

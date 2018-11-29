@@ -115,10 +115,10 @@ function TeacherAgent:GetIconPosition()
 	return TeacherIcon.GetIconPosition();
 end
 
-function TeacherAgent:AddTaskButton(btnName, iconFilename, onclickCallbackFunc, count, priority)
+function TeacherAgent:AddTaskButton(btnName, iconFilename, onclickCallbackFunc, count, priority, tooltip)
 	local btn = self.buttons:contains(btnName)
 	if(not btn) then
-		self.buttons:add(btnName, {name=btnName, icon=iconFilename, onclick=onclickCallbackFunc, count = count, priority = priority or 0})
+		self.buttons:add(btnName, {name=btnName, icon=iconFilename, onclick=onclickCallbackFunc, count = count, priority = priority or 0, tooltip = tooltip})
 	end
 	TeacherIcon.UpdateTaskButtons(self.buttons)
 end

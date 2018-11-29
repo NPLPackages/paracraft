@@ -353,6 +353,61 @@ function env_imp:playLoop(timeFrom, timeTo)
 	env_imp.checkyield(self);
 end
 
+-- play a bone's time series animation in the movie block.
+-- this function will return immediately.
+-- @param boneName: bone name
+-- @param timeFrom: time in milliseconds, default to 0.
+-- @param timeTo: if nil, default to timeFrom
+-- @param isLooping: default to false.
+function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
+	timeFrom = timeFrom or 0;
+	local time = timeFrom;
+	local entity = env_imp.GetEntity(self);
+	if(entity) then
+		entity:SetDummy(true);
+		entity:EnableAnimation(false);
+		local actor = env_imp.GetActor(self);
+		if(not actor) then
+			return
+		end
+		actor:SetBoneTime(boneName, time);
+
+		if(timeTo and timeTo>timeFrom) then
+			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
+			local function frameMove_(timer)
+				local delta = timer:GetDelta() * actor:GetPlaySpeed();
+				time = time + delta;
+				if(time >= timeTo) then
+					if(isLooping) then
+						if((time - delta) == timeTo) then
+							time = timeFrom;
+						else
+							time = timeTo;
+						end
+					else
+						time = timeTo;
+						timer:Change();
+					end
+				end
+				actor:SetBoneTime(boneName, time);
+			end
+			self.actor.playTimers = self.actor.playTimers or {};
+			if(not self.actor.playTimers[boneName]) then
+				self.actor.playTimers[boneName] = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
+				self.actor:Connect("beforeRemoved", function(actor)
+					if(self.actor.playTimers[boneName]) then
+						self.codeblock:KillTimer(self.actor.playTimers[boneName]);
+						self.actor.playTimers[boneName] = nil;
+					end
+				end)
+			else
+				self.actor.playTimers[boneName].callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+			end
+			self.actor.playTimers[boneName]:Change(0, deltaTime);
+		end
+	end
+end
+
 function env_imp:stop()
 	if(self.actor and self.actor.playTimer) then
 		self.codeblock:KillTimer(self.actor.playTimer);

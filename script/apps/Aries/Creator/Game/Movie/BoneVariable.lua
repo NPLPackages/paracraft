@@ -52,6 +52,15 @@ function BoneVariable:GetPivot(bRefresh)
 	return self.pivot;
 end
 
+-- force local time of bone variable
+-- @param time: if nil or -1, the bone will use character animation instance's time
+-- otherwise it will force using the given time from the time series, such allowing 
+-- users to control each bone's play time in time series. 
+function BoneVariable:SetTime(time)
+	self.time_name = self.time_name or self.attr:GetField("TimeName", "");
+	self.animInstance:SetDynamicField(self.time_name, time or -1);
+end
+
 -- get current rotation
 -- @return the rotation quaternion
 function BoneVariable:GetRotation(bRefresh)

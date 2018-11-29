@@ -1,0 +1,32 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Login/TeacherAgent/ButtonTooltip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="">
+<![CDATA[
+TeacherIcon = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherIcon");
+index = Page:GetRequestParam("index")
+text = "";
+if(index) then
+    index = tonumber(index);
+    local btn = TeacherIcon.GetButtonDs(index);
+    text = btn and btn.tooltip;
+else
+    text = TeacherIcon.GetMainButton().tooltip
+end
+if(not text or text == "") then
+    text = L"点击打开";
+end
+]]>
+</script>
+<div style="max-width:400px;font-size:14px;color:#000000;padding:10px;background:url(Texture/Aries/Creator/Desktop/agent_32bits.png#73 13 40 40:6 6 6 6)">
+    <%=text%>
+</div>
+</pe:mcml>
+</body>
+</html>

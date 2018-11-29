@@ -184,7 +184,7 @@ anim(0)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'play(%d, %d)',
+	func_description = 'play(%s, %s)',
 	ToNPL = function(self)
 		return string.format('play(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
 	end,
@@ -215,7 +215,7 @@ say("No looping", 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'playLoop(%d, %d)',
+	func_description = 'playLoop(%s, %s)',
 	ToNPL = function(self)
 		return string.format('playLoop(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
 	end,
@@ -225,6 +225,57 @@ say("Looping", 3)
 stop()
 ]]}},
 },
+
+{
+	type = "playBone", 
+	message0 = L"骨骼%1从%2到%3并循环%4",
+	arg0 = {
+		{
+			name = "boneName",
+			type = "input_value",
+            shadow = { type = "text", value = "Root",},
+			text = "Root", 
+		},
+		{
+			name = "timeFrom",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+		{
+			name = "timeTo",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1000,},
+			text = 1000, 
+		},
+		{
+			name = "isLooping",
+			type = "field_dropdown",
+			options = {
+				{ "true", "true" },
+				{ "false", "false" },
+			},
+			text = "true", 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'playBone(%s, %s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('playBone("%s", %d, %d, %s)\n', self:getFieldValue('boneName'),  self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'), self:getFieldValue('isLooping'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+playBone("Neck", 2000)
+-- regular expression supported
+playBone(".*UpperArm", 5000, 7000)
+playBone(".*Forearm", 5000, 7000)
+play(0, 4000)
+]]}},
+},
+
 {
 	type = "playSpeed", 
 	message0 = L"播放速度%1",
