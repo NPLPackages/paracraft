@@ -58,6 +58,7 @@ function GoalTracker.OnInit()
 	profile:GetEvents():AddEventListener("BuildProgressChanged", GoalTracker.OnBuildProgressChanged, GoalTracker, "GoalTracker");
 	GameLogic.GetEvents():AddEventListener("CreateBlockTask", GoalTracker.OnCreateBlock, GoalTracker, "GoalTracker");
 	GameLogic.GetEvents():AddEventListener("game_mode_change", GoalTracker.OnGameModeChanged, GoalTracker, "GoalTracker");
+	GameLogic:Connect("WorldUnloaded", GoalTracker, GoalTracker.OnWorldUnload, "UniqueConnection");
 end
 
 function GoalTracker.ShowPage(bShow)
@@ -195,6 +196,12 @@ function GoalTracker:OnExpChanged(event)
 						from_2d={x=btn.x+48,y=btn.y+96}, to_2d={x=btn.x+8,y=btn.y+16}, fadeOut=200, fadeIn=200}):Play(max_count*100+1200);
 			end
 		end
+	end
+end
+
+function GoalTracker:OnWorldUnload()
+	if(GameLogic.GetTeacherAgent():RemoveTaskButton("buildTask")) then
+		GameLogic.SetTipText(nil);
 	end
 end
 

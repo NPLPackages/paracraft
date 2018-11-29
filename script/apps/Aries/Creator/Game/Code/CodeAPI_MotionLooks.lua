@@ -391,15 +391,19 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 				end
 				actor:SetBoneTime(boneName, time);
 			end
-			self.actor.playTimers = self.actor.playTimers or {};
-			if(not self.actor.playTimers[boneName]) then
-				self.actor.playTimers[boneName] = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
+			if(not self.actor.playTimers) then
+				self.actor.playTimers = {};
 				self.actor:Connect("beforeRemoved", function(actor)
-					if(self.actor.playTimers[boneName]) then
-						self.codeblock:KillTimer(self.actor.playTimers[boneName]);
-						self.actor.playTimers[boneName] = nil;
+					if(actor.playTimers) then
+						for _, timer in pairs(actor.playTimers) do
+							self.codeblock:KillTimer(timer);
+						end
+						actor.playTimers = nil;
 					end
 				end)
+			end
+			if(not self.actor.playTimers[boneName]) then
+				self.actor.playTimers[boneName] = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
 			else
 				self.actor.playTimers[boneName].callbackFunc = self.co:MakeCallbackFunc(frameMove_);
 			end
@@ -409,9 +413,17 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 end
 
 function env_imp:stop()
-	if(self.actor and self.actor.playTimer) then
-		self.codeblock:KillTimer(self.actor.playTimer);
-		self.actor.playTimer = nil;
+	if(self.actor) then
+		if(self.actor.playTimer) then
+			self.codeblock:KillTimer(self.actor.playTimer);
+			self.actor.playTimer = nil;
+		end
+		if(self.actor.playTimers) then
+			for _, timer in pairs(self.actor.playTimers) do
+				self.codeblock:KillTimer(timer);
+			end
+			self.actor.playTimers = nil;
+		end
 	end
 	env_imp.checkyield(self);
 end

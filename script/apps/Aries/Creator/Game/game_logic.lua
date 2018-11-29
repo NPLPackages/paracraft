@@ -696,6 +696,7 @@ end
 
 function GameLogic.Exit()
 	GameLogic.IsStarted = false;
+	GameLogic.SetTipText(nil);
 	local playerController = GameLogic.GetPlayerController();
 	if(playerController) then
 		playerController:DeselectMainPlayerHandTool();
