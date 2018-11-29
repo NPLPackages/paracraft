@@ -392,6 +392,7 @@ end
 -- set cody's text
 -- @param text: any HTML text
 -- @param target: nil or "<player>"
+-- @param duration: in seconds
 function GameLogic.SetTipText(text, target, duration)
 	GameLogic.GetTeacherAgent():ShowTipText(text, duration);
 	GameLogic.GetTeacherAgent():ShowTipOnTarget(target, text, duration)

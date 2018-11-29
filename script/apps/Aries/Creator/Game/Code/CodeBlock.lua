@@ -127,7 +127,7 @@ function CodeBlock:CompileCode(code)
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
 			msg = format(L"编译错误: %s\n在%s", msg, self:GetFilename());
-			self:send_message(msg);
+			self:send_message(msg, "error");
 		else
 			self:send_message(L"编译成功!");
 		end
@@ -417,9 +417,18 @@ function CodeBlock:Run()
 	end
 end
 
-function CodeBlock:send_message(msg)
+-- @param msg: string
+-- @param msgType: if nil, it is a normal message. 
+-- it can also be "error", if it is error, we will show to user via game console. 
+function CodeBlock:send_message(msg, msgType)
 	self.lastMessage = msg;
 	self:message(msg);
+	if(msgType == "error") then
+		LOG.std(nil, "error", "CodeBlock", msg);
+		local date_str, time_str = commonlib.log.GetLogTimeString();
+		local html_text = format("<div style='color:#ff0000'><span style='color:#808080'>%s %s: </span>%s%s<div>", date_str, time_str, commonlib.Encoding.EncodeHTMLInnerText(msg:sub(1, 1024)), ((#msg)>1024) and "..." or "");
+		GameLogic.SetTipText(html_text, nil, 10)
+	end
 end
 
 function CodeBlock:GetLastMessage()
@@ -638,7 +647,7 @@ function CodeBlock:RunTempCode(code, filename)
 		LOG.std(nil, "error", "CodeBlock", errormsg);
 		local msg = errormsg;
 		msg = format(L"编译错误: %s\n在%s", msg, filename);
-		self:send_message(msg);
+		self:send_message(msg, "error");
 	else
 		local env = self:GetCodeEnv();
 		if(env) then
@@ -715,7 +724,7 @@ function CodeBlock:IncludeFile(filename)
 				LOG.std(nil, "error", "CodeBlock", errormsg);
 				local msg = errormsg;
 				msg = format(L"编译错误: %s\n在%s", msg, filename);
-				self:send_message(msg);
+				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
 				local ok, result = pcall(code_func, msg);
@@ -727,7 +736,7 @@ function CodeBlock:IncludeFile(filename)
 					else
 						LOG.std(nil, "error", "CodeBlock", result);
 						local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
-						self:send_message(msg);
+						self:send_message(msg, "error");
 					end
 				end
 			end
@@ -735,6 +744,6 @@ function CodeBlock:IncludeFile(filename)
 	else
 		LOG.std(nil, "warn", "CodeBlock", "include can not file world file %s", filename);
 		local msg = format(L"没有找到文件: %s", filename);
-		self:send_message(msg);
+		self:send_message(msg, "error");
 	end
 end

@@ -279,7 +279,16 @@ say("mouse-pointer", 1)
 moveTo("mouse-pointer")
 say("the frog actor if any", 1)
 moveTo("frog")
-]]}},
+]]},
+{desc = L"瞬移到角色的某个骨骼", canRun = false, code = [[
+-- block position
+moveTo("myActorName")
+-- float position
+moveTo("myActorName::")
+-- bone position
+moveTo("myActorName::bone_name")
+]]}
+},
 },
 {
 	type = "walk", 

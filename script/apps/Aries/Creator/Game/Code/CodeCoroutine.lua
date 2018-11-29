@@ -152,7 +152,7 @@ function CodeCoroutine:RunImp(msg)
 			else
 				LOG.std(nil, "error", "CodeCoroutine", result);
 				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
-				self:GetCodeBlock():send_message(msg);
+				self:GetCodeBlock():send_message(msg, "error");
 			end
 		end
 		return result;

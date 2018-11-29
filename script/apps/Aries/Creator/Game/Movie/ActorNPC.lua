@@ -818,6 +818,58 @@ function Actor:UpdateAnimInstance()
 	end
 end
 
+-- in world coordinate system
+-- @param boneName: name of the bone. if nil or "", it is the current actor's root position
+-- @return x,y,z, roll, pitch yaw, scale: in world space.  
+function Actor:ComputeBoneWorldTransform(bonename, bUseParentRotation)
+	local link_x, link_y, link_z = self:GetEntity():GetPosition();
+	if(bonename and bonename~="") then
+		local bFoundTarget;
+		self.parentPivot = self.parentPivot or mathlib.vector3d:new();
+						
+		local parentBoneRotMat;
+		local bones = self:GetBonesVariable();
+		local boneVar = bones:GetChild(bonename);
+		if(boneVar) then
+			self:UpdateAnimInstance();
+			local pivot = boneVar:GetPivot(true);
+			self.parentPivot:set(pivot);
+			if(bUseParentRotation) then
+				parentBoneRotMat = boneVar:GetPivotRotation(true);
+			end
+			bFoundTarget = true;
+		end
+		if(bFoundTarget) then
+			local parentObj = self:GetEntity():GetInnerObject();
+			local parentScale = parentObj:GetScale() or 1;
+			local dx,dy,dz = 0,0,0;
+			if(not bUseParentRotation and localPos) then
+				self.parentPivot:add((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+			end
+
+			self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
+			self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
+			self.parentPivot:multiplyInPlace(self.parentTrans);
+			self.parentQuat = self.parentQuat or mathlib.Quaternion:new();
+			if(parentScale~=1) then
+				self.parentTrans:RemoveScaling();
+			end
+			self.parentQuat:FromRotationMatrix(self.parentTrans);
+			if(bUseParentRotation and parentBoneRotMat) then
+				self.parentPivotRot = self.parentPivotRot or Quaternion:new();
+				self.parentPivotRot:FromRotationMatrix(parentBoneRotMat);
+				self.parentQuat:multiplyInplace(self.parentPivotRot);
+			end
+			
+			local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
+			
+			return link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz,
+				 p_roll, p_pitch, p_yaw, parentScale;
+		end
+	end
+	return link_x, link_y, link_z;
+end
+
 -- get world transform of a given sub part (bone).
 -- @param keypath: subpart of this actor of which we are computing, such as "bones::R_Hand", if nil it is current actor.
 -- @param localPos: if not nil, this is the local offset

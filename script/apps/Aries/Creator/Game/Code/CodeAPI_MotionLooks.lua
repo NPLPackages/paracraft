@@ -158,8 +158,13 @@ function env_imp:getPos()
 end
 
 
--- moveTo to a given block position
--- @param x,y,z: if z is nil, y is z. x can also be "mouse-pointer" or "@p" for current player or other actor name, while y and z are nil.
+-- moveTo to a given block position or a actor position
+-- @param x,y,z: if z is nil, y is z. 
+-- x can also be "mouse-pointer" or "@p" for current player or other actor name, while y and z are nil.
+-- x can also be player name + bone name like "myActorName::R_hand" or "myActorName::"
+-- if name is "myActorName", we will move the block position of the given player
+-- if name is "myActorName::", we will move the float position of the given player
+-- if name is "myActorName::bonename", we will move the float position of the given actor's given bone
 function env_imp:moveTo(x, y, z)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
@@ -175,6 +180,17 @@ function env_imp:moveTo(x, y, z)
 				if(entity2) then
 					local x2, y2, z2 = entity2:GetBlockPos();
 					env_imp.moveTo(self, x2, y2, z2);
+				else
+					local actorName, boneName = x:match("^([^:]+)::(.*)$");
+					if(actorName) then
+						local actor = GameLogic.GetCodeGlobal():GetActorByName(actorName);
+						if(actor and actor.ComputeBoneWorldTransform) then
+							local wx, wy, wz = actor:ComputeBoneWorldTransform(boneName)
+							if(wx) then
+								entity:SetPosition(wx, wy, wz);
+							end
+						end
+					end
 				end
 			end
 		elseif(x and y) then
