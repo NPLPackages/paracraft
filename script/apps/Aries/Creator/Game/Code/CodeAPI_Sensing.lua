@@ -36,7 +36,7 @@ local function getActorEntity_(actor, objName)
 end
 
 
--- @param objName: another actor name, if there are multiple instances of the same actor, any collision will return true
+-- @param objName: another actor name or actor object, if there are multiple instances of the same actor, any collision will return true
 --  "@a" means nearby players. 
 --  "block" or nil means scene blocks. if number string like "62", it means given block id. 
 -- @return false if actor is not touching another object. Or return the side on which the actor is touching
@@ -52,39 +52,47 @@ function env_imp:isTouching(objName)
 --			return true;
 --		end
 --	end
-
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		if(objName==nil or objName == "block") then
+		if(objName==nil) then
 			return actor:IsTouchingBlock();
-		elseif(objName == "@a") then
-			return actor:IsTouchingPlayers();
-		elseif(type(objName)=="number" or objName:match("^%d+$")) then
-			local blockId = tonumber(objName);
-			return actor:IsTouchingBlock(blockId);
-		else
-			return actor:IsTouchingActorByName(objName);	
+		elseif(type(objName) == "string") then
+			if(objName == "@a") then
+				return actor:IsTouchingPlayers();
+			elseif(objName == "block") then
+				return actor:IsTouchingBlock();
+			elseif(objName:match("^%d+$")) then
+				local blockId = tonumber(objName);
+				return actor:IsTouchingBlock(blockId);
+			else
+				return actor:IsTouchingActorByName(objName);	
+			end
+		elseif(type(objName) == "number") then
+			return actor:IsTouchingBlock(objName);
+		elseif(type(objName) == "table" and objName.GetEntity) then
+			return actor:IsTouchingEntity(objName:GetEntity());
 		end
 	end
 end
 
+
 -- @param objName: another actor name, or "mouse-pointer", or "@p" for current player
+-- @return in block coordinate
 function env_imp:distanceTo(actorName)
 	local actor = self.actor;
 	if(not actor) then
 		return maxDist
 	end
+	local dist = maxDist;
 	if(actorName == "mouse-pointer") then
 		local entity = env_imp.GetEntity(self);
 		if(entity) then
 			local result = SelectionManager:MousePickBlock(true, false, false); 
 			if(result and result.blockX) then
 				local x, y, z = BlockEngine:real(result.blockX, result.blockY, result.blockZ);
-				local dist = entity:GetDistanceSq(x,y,z);
-				if(dist > 0.0001) then
-					return math.sqrt(dist);
-				else
-					return dist;
+				dist = entity:GetDistanceSq(x,y,z);
+				if(dist > 0.0000001) then
+					dist = math.sqrt(dist);
 				end
 			end
 		end
@@ -95,21 +103,28 @@ function env_imp:distanceTo(actorName)
 			local entity2 = EntityManager.GetPlayer();
 			if(entity2) then
 				local x, y, z = entity2:GetPosition();
-				local dist = entity:GetDistanceSq(x,y,z);
-				if(dist > 0.0001) then
-					return math.sqrt(dist);
-				else
-					return dist;
+				dist = entity:GetDistanceSq(x,y,z);
+				if(dist > 0.0000001) then
+					dist = math.sqrt(dist);
 				end
 			end
 		end
 	else
-		local actor2 = GameLogic.GetCodeGlobal():GetActorByName(actorName);
+		local actor2;
+		if(type(actorName) == "string") then
+			actor2 = GameLogic.GetCodeGlobal():GetActorByName(actorName);
+		elseif(type(actorName) == "table") then
+			actor2 = actorName;
+		end
+		
 		if(actor2) then
-			return actor:DistanceTo(actor2) or maxDist;
+			dist = actor:DistanceTo(actor2) or maxDist;
 		end
 	end
-	return maxDist;
+	if(dist < maxDist) then
+		dist = BlockEngine:block_float(dist)
+	end
+	return dist;
 end
 
 -- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
@@ -123,7 +138,7 @@ function env_imp:isMouseDown()
 	return MouseEvent:buttons() == 1;
 end
 
--- get block position X
+-- get block position X (always integer)
 -- @param objName: if nil or "self", it means the calling actor
 function env_imp:getX(objName)
 	local actor = self.actor;
@@ -134,6 +149,7 @@ function env_imp:getX(objName)
 	end
 end
 
+-- get block position Y (always integer)
 function env_imp:getY(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);
@@ -143,6 +159,7 @@ function env_imp:getY(objName)
 	end
 end
 
+-- get block position Z (always integer)
 function env_imp:getZ(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);

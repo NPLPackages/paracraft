@@ -51,7 +51,14 @@ while(true) do
         bounce()
     end
 end
-]]}},
+]]},
+{desc = "", canRun = true, code = [[
+local boxActor = getActor("box")
+if(isTouching(boxActor)) then
+    say("touched")
+end
+]]}
+},
 },
 
 {
@@ -194,17 +201,17 @@ cmd("/hide boundingbox")
 	{desc = L"某个角色", canRun = true, code = [[
 broadcastCollision()
 registerCollisionEvent("frog", function(actor)
-	local data = actor:GetActorValue("some_data")
+    local data = actor:GetActorValue("some_data")
 end)
 ]]},
 
 {desc = L"任意角色", canRun = true, code = [[
 broadcastCollision()
 registerCollisionEvent("", function(actor)
-	local data = actor:GetActorValue("some_data")
-	if(data == 1) then
-		say("collide with 1")
-	end
+    local data = actor:GetActorValue("some_data")
+    if(data == 1) then
+        say("collide with 1")
+    end
 end)
 ]]},
 },
@@ -260,7 +267,13 @@ while(true) do
     end
     wait(0.01)
 end
-]]}},
+]]},
+{desc = "", canRun = true, code = [[
+if(distanceTo(getActor("box")) < 3) then
+    say("box")
+end
+]]}
+},
 },
 
 {
