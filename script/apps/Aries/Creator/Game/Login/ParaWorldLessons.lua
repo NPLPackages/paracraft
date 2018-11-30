@@ -451,7 +451,7 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	ParaWorldLessons.StaticInit()
 	id = tostring(id);
 	id = id:gsub("%s", "");
-	local classId = id:match("^(%d+)$");
+	local classId = id:match("^[cC](%d+)$") or id:match("^(%d+)$");
 	local packageId, lessonId = id:match("^(%d+)[%D](%d+)$");
 	if(classId) then
 		classId = tonumber(classId);

@@ -83,13 +83,26 @@ function TeacherAgent:RefreshUI(delayTime)
 	end
 end
 
+-- @param max_duration: in seconds. if nil or -1 means always show
 function TeacherAgent:ShowTipText(htmlText, max_duration)
 	if(htmlText and htmlText~="") then
 		TeacherIcon.Show(true)
 		TeacherIcon.SetTipText(htmlText);
+
+		if(max_duration and max_duration > 0) then
+			self.mytimer = self.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+				self:ShowTipText(nil);
+			end})
+			self.mytimer:Change(math.floor(max_duration*1000));
+		elseif(self.mytimer) then
+			self.mytimer:Change();
+		end
 	else
 		TeacherIcon.SetTipText();
 		self:RefreshUI(2000);
+		if(self.mytimer) then
+			self.mytimer:Change();
+		end
 	end
 end
 
@@ -127,9 +140,13 @@ function TeacherAgent:UpdateTaskButtonCount(btnName, count)
 	TeacherIcon.UpdateTaskButtons(self.buttons)
 end
 
+-- return true if btnName is found and removed
 function TeacherAgent:RemoveTaskButton(btnName)
-	self.buttons:remove(btnName)
-	TeacherIcon.UpdateTaskButtons(self.buttons)
+	if(self.buttons:contains(btnName)) then
+		self.buttons:remove(btnName)
+		TeacherIcon.UpdateTaskButtons(self.buttons)
+		return true;
+	end
 end
 
 function TeacherAgent:OnClickTeacherIcon()

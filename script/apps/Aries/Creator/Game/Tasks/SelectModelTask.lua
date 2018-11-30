@@ -78,8 +78,8 @@ function SelectModel:GetInnerObject()
 end
 
 function SelectModel:SetInnerObject(obj)
-	if(obj) then
-		self.obj_id = self.obj:GetID();
+	if(obj and type(obj) == "userdata") then
+		self.obj_id = obj:GetID();
 	else
 		self.obj_id = nil;
 	end
@@ -91,12 +91,14 @@ function SelectModel:Run()
 		-- ignore the task if there is other top-level tasks.
 		return;
 	end
+	self:SetInnerObject(obj)
+	obj = self:GetInnerObject();
 	if(not obj) then
 		return;
 	end
 
 	cur_instance = self;
-	self:SetInnerObject(obj)
+	
 	ParaSelection.AddObject(obj, 2);
 	
 	self.entity = EntityManager.GetEntityByObjectID(self.obj_id);

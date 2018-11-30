@@ -493,7 +493,12 @@ end
 local x,y,z = getPos();
 local id = getBlock(x,y-1,z)
 say("block below is "..id, 2)
-]]}},
+]]},
+{desc = L"获取方块的Data数据", canRun = true, code = [[
+local x,y,z = getPos();
+local id, data = getBlock(x,y-1,z)
+]]}
+},
 },
 
 {

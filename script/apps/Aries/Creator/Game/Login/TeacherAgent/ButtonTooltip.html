@@ -17,7 +17,8 @@ if(index) then
     local btn = TeacherIcon.GetButtonDs(index);
     text = btn and btn.tooltip;
 else
-    text = TeacherIcon.GetMainButton().tooltip
+    local btn = TeacherIcon.GetMainButton()
+    text = btn and btn.tooltip;
 end
 if(not text or text == "") then
     text = L"点击打开";
