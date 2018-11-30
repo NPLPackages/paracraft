@@ -110,6 +110,7 @@ turnTo(0)
 			type = "field_dropdown",
 			options = {
 				{ L"鼠标", "mouse-pointer" },
+				{ L"摄影机", "camera" },
 				{ L"最近的玩家", "@p" },
 				{ L"某个角色名", "" },
 			},
@@ -156,7 +157,13 @@ turnTo("@p")
 moveForward(1, 1)
 turnTo("frog")
 moveForward(1, 1)
-]]}},
+]]},
+{desc = L"面向摄影机", canRun = true, code = [[
+while(true) do
+    turnTo("camera")
+end
+]]}
+},
 },
 {
 	type = "move", 
