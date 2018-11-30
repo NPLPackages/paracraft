@@ -531,10 +531,21 @@ function Actor:GetPosY()
 	return y;
 end
 
+-- set (physics) group id
+function Actor:SetGroupId(id)
+	self.groupId = id and tonumber(id);
+end
+
+-- get group id, default to nil
+function Actor:GetGroupId()
+	return self.groupId;
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 

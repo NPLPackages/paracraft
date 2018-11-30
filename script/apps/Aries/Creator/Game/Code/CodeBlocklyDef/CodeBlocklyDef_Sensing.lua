@@ -214,6 +214,14 @@ registerCollisionEvent("", function(actor)
     end
 end)
 ]]},
+
+{desc = L"某个组Id", canRun = true, code = [[
+broadcastCollision()
+setActorValue("groupId", 3);
+registerCollisionEvent(3, function(actor)
+    say("collide with group 3")
+end)
+]]},
 },
 },
 

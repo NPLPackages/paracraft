@@ -687,15 +687,24 @@ end
 
 -- collision event is special that it will not overwrite the last event.
 -- @param name: if nil or "", it matches all actors
+-- if name is a number, it means a physics_group_id
 function CodeBlock:RegisterCollisionEvent(name, callbackFunc)
 	local event = self:CreateEvent("onCollideActor");
 	event:SetIsFireForAllActors(false);
 	event:SetStopLastEvent(false);
-	event:SetCanFireCallback(function(actor, fromActor)
-		if(fromActor and (not name or name=="" or fromActor:GetName() == name)) then
-			return true;
-		end
-	end);
+	if(type(name) == "number") then
+		event:SetCanFireCallback(function(actor, fromActor)
+			if(fromActor and (fromActor:GetGroupId() == name)) then
+				return true;
+			end
+		end);
+	else
+		event:SetCanFireCallback(function(actor, fromActor)
+			if(fromActor and (not name or name=="" or fromActor:GetName() == name)) then
+				return true;
+			end
+		end);
+	end
 	event:SetFunction(callbackFunc);
 end
 
