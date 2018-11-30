@@ -22,7 +22,7 @@ local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.
 
 ParaWorldLoginDocker.page = nil;
 
-System.options.paraworldapp = ParaEngine.GetAppCommandLineByParam("paraworldapp", "");
+commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineByParam("paraworldapp", ""));
 
 -- @param hasParacraft: whether it contains the latest version of paracraft inside the app.
 local app_install_details = {

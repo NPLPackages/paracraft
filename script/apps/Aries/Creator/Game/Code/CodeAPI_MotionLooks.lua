@@ -11,6 +11,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
+NPL.load("(gl)script/ide/System/Scene/Cameras/AutoCamera.lua");
+local Cameras = commonlib.gettable("System.Scene.Cameras");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -229,6 +231,7 @@ function env_imp:turn(degree)
 end
 
 -- @param degree: [-180, 180] or "mouse-pointer" or "@p" for current player, or any actor name
+-- or "camera" for current camera
 function env_imp:turnTo(degree)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
@@ -242,6 +245,14 @@ function env_imp:turnTo(degree)
 					local facing = Direction.GetFacingFromOffset(result.blockX - x, result.blockY - y, result.blockZ - z);
 					self.actor:SetFacing(facing);
 				end
+			end
+		elseif(degree == "camera") then
+			local pos = Cameras:GetCurrent():GetEyePosition()
+			local x, y, z = entity:GetPosition();
+			local x2, y2, z2 = pos[1], pos[2], pos[3]
+			if(x2 ~= x or z2 ~= z) then
+				local facing = Direction.GetFacingFromOffset(x2 - x, y2 - y, z2 - z);
+				self.actor:SetFacing(facing);
 			end
 		elseif(type(degree) == "string") then
 			local entity2 = GameLogic.GetCodeGlobal():FindEntityByName(degree);
