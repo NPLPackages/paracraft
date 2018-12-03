@@ -161,6 +161,7 @@ moveForward(1, 1)
 {desc = L"面向摄影机", canRun = true, code = [[
 while(true) do
     turnTo("camera")
+    wait(0.01)
 end
 ]]}
 },
