@@ -434,12 +434,27 @@ end
 	ToNPL = function(self)
 		return string.format('cmd("%s")\n', self:getFieldAsString('msg'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {
+	{desc = "", canRun = true, code = [[
 cmd("/setblock ~0 ~0 ~1 62")
 cmd("/cameradist 12")
 cmd("/camerayaw 0")
 cmd("/camerapitch 0.5")
-]]}},
+]]},
+{desc = L"关闭自动等待", canRun = true, code = [[
+set("count", 1)
+showVariable("count")
+cmd("/autowait true")
+for i=1, 10000 do
+    _G.count = count +1
+end
+cmd("/autowait fasle")
+ for i=1, 10000 do
+    _G.count = count +1
+end
+say("it finished instantly with autowait false")
+]]}
+},
 },
 
 };

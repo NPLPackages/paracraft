@@ -138,11 +138,17 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 	end
 end
 
+local lastErrorCallstack = "";
+function CodeCoroutine.handleError(x)
+	lastErrorCallstack = commonlib.debugstack(1, 5, 1);
+	return x;
+end
+
 function CodeCoroutine:RunImp(msg)
 	local code_func = self.code_func;
 	if(code_func) then
 		setfenv(code_func, self:GetCodeBlock():GetCodeEnv());
-		local ok, result = pcall(code_func, msg);
+		local ok, result = xpcall(code_func, CodeCoroutine.handleError, msg);
 
 		if(not ok) then
 			if(result:match("_stop_all_")) then
@@ -150,7 +156,7 @@ function CodeCoroutine:RunImp(msg)
 			elseif(result:match("_restart_all_")) then
 				self:GetCodeBlock():RestartAll();
 			else
-				LOG.std(nil, "error", "CodeCoroutine", result);
+				LOG.std(nil, "error", "CodeCoroutine", "%s\n%s", result, lastErrorCallstack);
 				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
 				self:GetCodeBlock():send_message(msg, "error");
 			end

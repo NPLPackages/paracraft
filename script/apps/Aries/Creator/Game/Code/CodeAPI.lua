@@ -36,6 +36,7 @@ local s_env_methods = {
 	"showVariable",
 	"include",
 	"getActor",
+	"cmd",
 
 	-- Motion
 	"move",
@@ -177,7 +178,11 @@ end
 function env_imp:checkyield()
 	self.check_count = self.check_count + 1;
 	if(self.check_count > 100) then
-		env_imp.wait(self, env_imp.GetDefaultTick(self));
+		if(self.codeblock:IsAutoWait()) then
+			env_imp.wait(self, env_imp.GetDefaultTick(self));
+		else
+			self.check_count = 0;
+		end
 	end
 end
 
@@ -203,3 +208,8 @@ function env_imp:GetDefaultTick()
 	return self.default_tick;
 end
 
+-- @param cmd: full commands or just command name
+-- @param params: parameters or nil. 
+function env_imp:cmd(cmd, params)
+	self.codeblock:RunCommand(cmd, params)
+end

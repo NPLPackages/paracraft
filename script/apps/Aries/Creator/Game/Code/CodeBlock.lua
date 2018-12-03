@@ -22,6 +22,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
 local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
@@ -38,6 +39,7 @@ local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local CodeBlock = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"));
 CodeBlock:Property("Name", "CodeBlock");
 CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", auto=true,});
+CodeBlock:Property({"AutoWait", true, "IsAutoWait", "SetAutoWait", });
 
 CodeBlock:Signal("message", function(errMsg) end);
 CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
@@ -52,6 +54,7 @@ function CodeBlock:ctor()
 	self.actors = commonlib.UnorderedArraySet:new();
 	self.events = {};
 	self.startTime = 0;
+	self.bAutoWait = true
 end
 
 function CodeBlock:Init(entityCode)
@@ -424,7 +427,7 @@ function CodeBlock:send_message(msg, msgType)
 	self.lastMessage = msg;
 	self:message(msg);
 	if(msgType == "error") then
-		LOG.std(nil, "error", "CodeBlock", msg);
+		-- LOG.std(nil, "error", "CodeBlock", msg);
 		local date_str, time_str = commonlib.log.GetLogTimeString();
 		local html_text = format("<div style='color:#ff0000'><span style='color:#808080'>%s %s: </span>%s%s<div>", date_str, time_str, commonlib.Encoding.EncodeHTMLInnerText(msg:sub(1, 1024)), ((#msg)>1024) and "..." or "");
 		GameLogic.SetTipText(html_text, nil, 10)
@@ -720,6 +723,12 @@ function CodeBlock:SetOutput(result)
 	end
 end
 
+local lastErrorCallstack = "";
+function CodeBlock.handleError(x)
+	lastErrorCallstack = commonlib.debugstack(1, 5, 1);
+	return x;
+end
+
 -- @param filename: include a file relative to current world directory
 function CodeBlock:IncludeFile(filename)
 	local filepath = Files.WorldPathToFullPath(filename);
@@ -736,14 +745,14 @@ function CodeBlock:IncludeFile(filename)
 				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
-				local ok, result = pcall(code_func, msg);
+				local ok, result = xpcall(code_func, CodeBlock.handleError, msg);
 				if(not ok) then
 					if(result:match("_stop_all_")) then
 						self:StopAll();
 					elseif(result:match("_restart_all_")) then
 						self:RestartAll();
 					else
-						LOG.std(nil, "error", "CodeBlock", result);
+						LOG.std(nil, "error", "CodeBlock", "%s\n%s", result, lastErrorCallstack);
 						local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
 						self:send_message(msg, "error");
 					end
@@ -754,5 +763,40 @@ function CodeBlock:IncludeFile(filename)
 		LOG.std(nil, "warn", "CodeBlock", "include can not file world file %s", filename);
 		local msg = format(L"没有找到文件: %s", filename);
 		self:send_message(msg, "error");
+	end
+end
+
+function CodeBlock:SetAutoWait(bAutoWait)
+	self.bAutoWait = bAutoWait;
+end
+
+-- whether to automatically wait when a given number of instructions are executed. 
+function CodeBlock:IsAutoWait()
+	return self.bAutoWait;
+end
+
+function CodeBlock:handleAutoWaitCmd(params)
+	local isAutowait = true;
+	if(type(params) == "string") then
+		isAutowait  = CmdParser.ParseBool(params)
+	elseif(type(params) == "boolean") then
+		isAutowait = params
+	end
+	self:SetAutoWait(isAutowait);
+end
+
+local codeBlockCmds = {
+	["autowait"] = CodeBlock.handleAutoWaitCmd
+}
+
+function CodeBlock:RunCommand(cmd_name, cmd_text)
+	if(cmd_text == nil) then
+		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
+	end
+	local handlerFunc = codeBlockCmds[cmd_name or ""];
+	if(handlerFunc) then
+		handlerFunc(self, cmd_text);
+	else
+		return GameLogic.RunCommand(cmd_name, cmd_text);
 	end
 end

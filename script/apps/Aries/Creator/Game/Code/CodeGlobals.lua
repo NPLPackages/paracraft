@@ -53,9 +53,6 @@ function CodeGlobals:ctor()
 			sort = table.sort },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 
-		cmd = function(...)
-			return GameLogic.RunCommand(...);
-		end,
 		real = function(bx,by,bz)
 			return BlockEngine:real(bx,by,bz);
 		end,
