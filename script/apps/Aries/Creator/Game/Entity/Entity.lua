@@ -71,6 +71,7 @@ Entity:Property({"position", nil, "getPosition", "setPosition"});
 
 Entity:Signal("focusIn");
 Entity:Signal("focusOut");
+-- position changed
 Entity:Signal("valueChanged");
 
 

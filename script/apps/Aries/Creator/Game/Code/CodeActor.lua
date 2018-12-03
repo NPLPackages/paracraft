@@ -57,6 +57,7 @@ function Actor:Init(itemStack, movieclipEntity)
 	local entity = self.entity;
 	entity:Connect("clicked", self, self.OnClick);
 	entity:Connect("collided", self, self.OnCollideWithEntity);
+	entity:Connect("valueChanged", self, self.OnEntityPositionChange);
 	
 	return self;
 end
@@ -258,9 +259,6 @@ function Actor:SetBlockPos(bx, by, bz)
 	if(entity) then	
 		entity:SetDummy(true);
 		entity:SetBlockPos(bx, by, bz);
-		if(self:IsPlaying()) then
-			self:ResetOffsetPosAndRotation();
-		end
 	end
 end
 
@@ -276,9 +274,6 @@ function Actor:SetPosition(targetX,targetY,targetZ)
 	if(entity) then	
 		entity:SetDummy(true);
 		entity:SetPosition(targetX,targetY,targetZ);
-		if(self:IsPlaying()) then
-			self:ResetOffsetPosAndRotation();
-		end
 	end
 end
 
@@ -312,6 +307,12 @@ end
 function Actor:IsPlaying()
 	if(self.playTimer and self.playTimer:IsEnabled()) then
 		return true;
+	end
+end
+
+function Actor:OnEntityPositionChange()
+	if(self:IsPlaying()) then
+		self:ResetOffsetPosAndRotation();
 	end
 end
 

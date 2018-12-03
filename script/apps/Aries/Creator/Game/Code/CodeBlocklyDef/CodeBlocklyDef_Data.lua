@@ -78,7 +78,7 @@ say(key, 1)
 		{
 			name = "left",
 			type = "input_value",
-			shadow = { type = "text", value = "score",},
+			shadow = { type = "getLocalVariable", value = "score",},
 			text = "score",
 		},
 		{
@@ -108,7 +108,8 @@ say(text, 1)
 	arg0 = {
 		{
 			name = "key",
-			type = "field_input",
+			type = "input_value",
+			shadow = { type = "text", value = "score",},
 			text = "score", 
 		},
 		{
@@ -123,7 +124,7 @@ say(text, 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'set("%s", %s)',
+	func_description = 'set(%s, %s)',
 	ToNPL = function(self)
 		return string.format('set("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
@@ -801,7 +802,7 @@ say(some_data.b)
 	output = {type = "field_variable",},
 	func_description = 'inherit(%s, %s)',
 	ToNPL = function(self)
-		return string.format('gettable("%s", "%s")\n', self:getFieldAsString('baseClass'), self:getFieldAsString('newClass'));
+		return string.format('inherit("%s", "%s")\n', self:getFieldAsString('baseClass'), self:getFieldAsString('newClass'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 MyClassA = inherit(nil, "MyClassA");

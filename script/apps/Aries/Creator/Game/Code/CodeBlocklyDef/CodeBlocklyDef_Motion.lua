@@ -374,6 +374,11 @@ turnTo(0)
 walkForward(1)
 turn(180)
 walkForward(1, 0.5)
+]]},
+{desc = L"恢复默认物理仿真", canRun = true, code = [[
+play(0,1000, true)
+moveForward(1, 0.5)
+walkForward(0)
 ]]}},
 },
 

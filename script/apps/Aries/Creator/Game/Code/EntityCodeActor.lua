@@ -61,7 +61,17 @@ end
 
 -- called every frame
 function Entity:FrameMove(deltaTime)
-	EntityManager.EntityMovable.FrameMove(self, deltaTime);
+	if(GameLogic.isRemote) then
+		EntityManager.EntityMovable.FrameMove(self, deltaTime);		
+	else
+		local mob = self:UpdatePosition();
+		if(not mob) then
+			return;
+		end
+		if(not self:IsDummy()) then
+			self:MoveEntity(deltaTime);
+		end
+	end
 end
 
 -- called after focus is set
