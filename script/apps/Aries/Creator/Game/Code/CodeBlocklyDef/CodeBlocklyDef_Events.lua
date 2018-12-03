@@ -444,15 +444,15 @@ cmd("/camerapitch 0.5")
 {desc = L"关闭自动等待", canRun = true, code = [[
 set("count", 1)
 showVariable("count")
+cmd("/autowait false")
+for i=1, 10000 do
+    _G.count = count +1
+end
+say("it finished instantly with autowait false", 3)
 cmd("/autowait true")
 for i=1, 10000 do
     _G.count = count +1
 end
-cmd("/autowait fasle")
- for i=1, 10000 do
-    _G.count = count +1
-end
-say("it finished instantly with autowait false")
 ]]}
 },
 },

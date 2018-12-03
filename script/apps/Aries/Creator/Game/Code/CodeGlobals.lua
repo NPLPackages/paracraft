@@ -87,6 +87,28 @@ function CodeGlobals:ctor()
 		setBlock = function(x,y,z, blockId, blockData)
 			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData);
 		end,
+		-- similar to commonlib.gettable(tabNames) but in page scope.
+		-- @param tabNames: table names like "models.users"
+		gettable = function(tabNames)
+			return commonlib.gettable(tabNames, self:GetCurrentGlobals());
+		end,
+		-- similar to commonlib.createtable(tabNames) but in page scope.
+		-- @param tabNames: table names like "models.users"
+		createtable = function (tabNames, init_params)
+			return commonlib.createtable(tabNames, init_params, self:GetCurrentGlobals());
+		end,
+		-- same as commonlib.inherit()
+		-- @param baseClass: string or table or nil
+		-- @param new_class: string or table or nil
+		inherit = function(baseClass, new_class, ctor)
+			if(type(baseClass) == "string") then
+				baseClass = commonlib.gettable(baseClass, self:GetCurrentGlobals());
+			end
+			if(type(new_class) == "string") then
+				new_class = commonlib.gettable(new_class, self:GetCurrentGlobals());
+			end
+			return commonlib.inherit(baseClass, new_class, ctor);
+		end
 	};
 
 	self:Reset();

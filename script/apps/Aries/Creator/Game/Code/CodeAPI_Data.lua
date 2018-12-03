@@ -9,6 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeGlobals.lua");
+local CodeGlobals = commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
@@ -36,22 +38,6 @@ function env_imp:GetActor()
 	return self.actor;
 end
 
--- similar to commonlib.gettable(tabNames) but in page scope.
--- @param tabNames: table names like "models.users"
-function env_imp:gettable(tabNames)
-	return commonlib.gettable(tabNames, self);
-end
-
--- similar to commonlib.createtable(tabNames) but in page scope.
--- @param tabNames: table names like "models.users"
-function env_imp:createtable(tabNames, init_params)
-	return commonlib.createtable(tabNames, self);
-end
-
--- same as commonlib.inherit()
-function env_imp:inherit(baseClass, new_class, ctor)
-	return commonlib.inherit(baseClass, new_class, ctor);
-end
 
 function env_imp:getActorValue(name)
 	if(self.actor) then

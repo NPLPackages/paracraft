@@ -751,6 +751,92 @@ hello()
 ]]}},
 },
 
+
+{
+	type = "gettable", 
+	message0 = L"获取全局表%1", 
+	arg0 = {
+		{
+			name = "tableName",
+			type = "input_value",
+            shadow = { type = "text", value = "scores",},
+			text = "scores", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_variable",},
+	func_description = 'gettable(%s)',
+	ToNPL = function(self)
+		return string.format('gettable("%s")\n', self:getFieldAsString('tableName'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+some_data = gettable("some_data")
+some_data.b = "b"
+say(some_data.b)
+]]}},
+},
+
+{
+	type = "inherit", 
+	message0 = L"继承表%1,新表%2",
+	arg0 = {
+		{
+			name = "baseClass",
+			type = "input_value",
+            shadow = { type = "text", value = "baseTable",},
+			text = "baseTable", 
+		},
+		{
+			name = "newClass",
+			type = "input_value",
+            shadow = { type = "text", value = "newTable",},
+			text = "newTable", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_variable",},
+	func_description = 'inherit(%s, %s)',
+	ToNPL = function(self)
+		return string.format('gettable("%s", "%s")\n', self:getFieldAsString('baseClass'), self:getFieldAsString('newClass'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+MyClassA = inherit(nil, "MyClassA");
+function MyClassA:ctor()
+end
+function MyClassA:print(text)
+    say("ClassA", 2)
+end
+
+MyClassB = inherit("MyClassA", "MyClassB");
+function MyClassB:ctor()
+end
+function MyClassB:print()
+    say("ClassB", 2)
+end
+
+-- class B inherits class A
+MyClassB = gettable("MyClassB")
+local b = MyClassB:new()
+b:print()
+b._super.print(b)
+]]},
+{desc = "", canRun = true, code = [[
+MyClassA = inherit(nil, gettable("MyClassA"));
+function MyClassA:ctor()
+end
+function MyClassA:print(text)
+    say("ClassA", 2)
+end
+local a = MyClassA:new()
+a:print()
+]]}
+},
+},
+
 {
 	type = "code_block", 
 	message0 = L"代码%1",

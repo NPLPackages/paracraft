@@ -725,7 +725,7 @@ end
 
 local lastErrorCallstack = "";
 function CodeBlock.handleError(x)
-	lastErrorCallstack = commonlib.debugstack(1, 5, 1);
+	lastErrorCallstack = commonlib.debugstack(2, 5, 1);
 	return x;
 end
 
