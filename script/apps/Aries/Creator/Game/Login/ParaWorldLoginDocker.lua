@@ -7,10 +7,14 @@ Usually displayed on top when application is first loaded.
 This is a standalone file that is shared among multiple applications to download and switch to other applications.
 To add more applications, simply add to `app_install_details` table and modify GetSourceAppName and IsLoadedApp method.
 
+## QQ Hall Command Line
+platform_token="1132076926" user_id="100000566" version="kids" partner="keepwork" isFromQQHall="true" mc="false" httpdebug="true" bootstrapper="script/apps/Aries/main_loop.lua"  loadpackage=""
+
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+ParaWorldLoginDocker.InitParaWorldClient()
 ParaWorldLoginDocker.Show()
 -------------------------------------------------------
 ]]
@@ -22,6 +26,102 @@ local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.
 
 ParaWorldLoginDocker.page = nil;
 
+-- disable http(s) with non-local access
+function ParaWorldLoginDocker.IsExternalUrlAllowed(url)
+	if(url and url~="") then
+		local protocolName = url:match("^(%w+)://");
+		if(protocolName == "http" or protocolName == "https") then
+			if(url:match("^https?://127.0.0.1") or url:match("^https?://localhost")) then
+				return true;
+			else
+				return false;
+			end		
+		end
+	end
+	return true;
+end
+
+function ParaWorldLoginDocker.DisableExternalUrlLinks()
+	local old_shell_execute_ = ParaGlobal.ShellExecute;
+	ParaGlobal.ShellExecute = function(cmd, url1, url2, p1, p2)
+		if(ParaWorldLoginDocker.IsExternalUrlAllowed(url1) and ParaWorldLoginDocker.IsExternalUrlAllowed(url2)) then
+			old_shell_execute_(cmd, url1, url2, p1, p2)
+		else
+			LOG.std(nil, "info", "ParaGlobal.ShellExecute", "external link %s is disabled", url1 or "");
+			_guihelper.MessageBox(L"外部连接被禁用了");
+		end
+	end
+end
+
+-- call this once
+function ParaWorldLoginDocker.InitParaWorldClient()
+	if(ParaWorldLoginDocker.isInited) then
+		return true;
+	end
+	ParaWorldLoginDocker.isInited = true;
+	NPL.load("npl_packages/ParacraftBuildinMod/");
+	commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
+
+	if(System.options.isFromQQHall) then
+		ParaWorldLoginDocker.DisableExternalUrlLinks();
+
+		if(not System.options.clientconfig_file) then
+			System.options.clientconfig_file = "config/GameClient.config.QQ.xml";
+		end
+
+		commonlib.TimerManager.SetTimeout(function()
+			local ParaWorldClient = NPL.load("ParaWorldClient")
+			ParaWorldClient:Init();
+		end, 0)
+		
+		local user_id = ParaEngine.GetAppCommandLineByParam("user_id", "")
+		local platform_token = ParaEngine.GetAppCommandLineByParam("platform_token", "")
+
+		if(not System.User or not System.User.keepworktoken) then
+			commonlib.setfield("System.User.keepworktoken", "waiting");
+
+			local retryCount = 1;
+			local function GetKeepworkToken_()
+				System.os.GetUrl({url = "https://api.keepwork.com/core/v0/users/platform_login", 
+					json = true, form = {uid = user_id, token = platform_token, platform="qqHall" } }, 
+					function(err, msg, data)
+						-- echo({err, msg, data})
+						if(err == 200) then
+							if(data and data.kp and data.kp.token) then
+								_guihelper.MessageBox(nil);
+								if(data.kp.user and data.kp.user.nickname) then
+									System.User.nickname = data.kp.user.nickname;
+								end
+								commonlib.setfield("System.User.keepworktoken", data.kp.token);
+								LOG.std(nil, "info", "paraworldclient", "successfully logged in with QQ account %s  nickname: %s", user_id, System.User.nickname or "");
+								return
+							else
+								_guihelper.MessageBox(L"登陆信息过期了，请重新启动", function()
+									ParaGlobal.Exit(0);
+								end, _guihelper.MessageBoxButtons.OK)
+							end
+						elseif(msg and msg.code == 28) then
+							-- timeout, we will try again
+							retryCount = retryCount + 1
+							_guihelper.MessageBox(format("访问超时, 第%d次尝试", retryCount), function()
+							end)
+							if(retryCount <= 4) then
+								GetKeepworkToken_()
+							end
+							return
+						end
+						System.User.keepworktoken = "error"
+						_guihelper.MessageBox(L"暂时无法登陆，请稍后再试.", function()
+							ParaGlobal.Exit(0);
+						end, _guihelper.MessageBoxButtons.OK)
+				end);
+			end
+			GetKeepworkToken_();
+		end
+	end
+end
+ParaWorldLoginDocker.InitParaWorldClient();
+
 commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineByParam("paraworldapp", ""));
 
 -- @param hasParacraft: whether it contains the latest version of paracraft inside the app.
@@ -29,12 +129,14 @@ local app_install_details = {
 	["paracraft"] = {
 		title=L"paracraft创意空间", hasParacraft = true, 
 		cmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true"',
-		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml"
+		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
+		allowQQHall = true,
 	},
 	["haqi"] = {
 		title=L"魔法哈奇", hasParacraft = true, 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="kids" partner="keepwork" config="config/GameClient.config.xml"',
-		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml"
+		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
+		allowQQHall = true,
 	},
 	["haqi2"] = {
 		title=L"魔法哈奇-青年版", hasParacraft = false, 
@@ -140,10 +242,32 @@ function ParaWorldLoginDocker.ShowPage()
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
+
+function ParaWorldLoginDocker.FilterQQHallApps(appButtons)
+	if(System.options and System.options.isFromQQHall) then
+		while(true) do
+			local allPassed = true
+			for i, app in ipairs(appButtons) do
+				local info = ParaWorldLoginDocker.GetAppInstallDetails(app.name)
+				if(info and not info.allowQQHall) then
+					table.remove(appButtons, i);
+					allPassed = false;
+					break;
+				end
+			end
+			if(allPassed) then
+				break;
+			end
+		end
+	end	
+	return appButtons;
+end
+
 function ParaWorldLoginDocker.AutoMarkLoadedApp(appButtons)
 	for i, app in pairs(appButtons) do
 		app.isLoaded = ParaWorldLoginDocker.IsLoadedApp(app.name);
 	end
+	appButtons = ParaWorldLoginDocker.FilterQQHallApps(appButtons);
 	return appButtons;
 end
 
@@ -247,6 +371,9 @@ function ParaWorldLoginDocker.GetRedirectableCmdLineParams()
 	-- keepwork token forward here
 	if(System.User and System.User.keepworktoken) then
 		cmds = cmds..format(" keepworktoken=\"%s\"", System.User.keepworktoken);
+	end
+	if(System.options and System.options.isFromQQHall) then
+		cmds = cmds.." isFromQQHall=\"true\"";
 	end
 	return cmds;
 end
@@ -445,8 +572,18 @@ function ParaWorldLoginDocker.GetAppInstallDetails(appName)
 	return app_install_details[appName or ParaWorldLoginDocker.GetSourceAppName()];
 end
 
+function ParaWorldLoginDocker.ForceExitApp()
+	ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);
+	ParaGlobal.ExitApp();
+end
+
 -- @param callbackFunc: function(bInstalled) end
 function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
+	if(System.options.isFromQQHall) then
+		ParaWorldLoginDocker.ForceExitApp()
+		return;
+	end
+
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
 	if(not app or app.noUpdate) then
 		if(callbackFunc) then

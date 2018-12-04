@@ -92,7 +92,7 @@ function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 end
 
 function UrlProtocolHandler:CheckInstallUrlProtocol()
-	if(System.os.GetPlatform() == "win32") then
+	if(System.os.GetPlatform() == "win32" and not (System.options and System.options.isFromQQHall)) then
 		if(self:HasUrlProtocol()) then
 			return true;
 		else

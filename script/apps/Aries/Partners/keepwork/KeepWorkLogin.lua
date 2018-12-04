@@ -43,9 +43,28 @@ function KeepWorkLogin.ClosePage()
 end
 
 function KeepWorkLogin.ShowPage()
-	KeepWorkLogin.ShowLoginPage()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+	ParaWorldLoginDocker.InitParaWorldClient();
+
 	if(System.User and System.User.keepworktoken) then
-		KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+		if(System.User.keepworktoken == "waiting") then
+			KeepWorkLogin.mytimer = KeepWorkLogin.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+				if(System.User.keepworktoken == "error") then
+					timer:Change();
+				elseif(System.User.keepworktoken ~= "waiting") then
+					KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+					timer:Change();
+				end
+			end})
+			KeepWorkLogin.mytimer:Change(300, 300);
+		elseif(System.User.keepworktoken == "error") then
+			return 
+		else
+			KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+		end
+	else
+		KeepWorkLogin.ShowLoginPage()
 	end
 end
 

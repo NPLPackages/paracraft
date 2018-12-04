@@ -12,6 +12,10 @@ KeepWorkBindingPage.ShowPage()
 ]]
 local KeepWorkBindingPage = commonlib.gettable("MyCompany.Aries.Partners.keepwork.KeepWorkBindingPage");
 function KeepWorkBindingPage.ShowPage(user_id)
+	if(System.options and System.options.isFromQQHall) then
+		_guihelper.MessageBox("请先创建角色")
+		return 
+	end
     KeepWorkBindingPage.user_id = user_id;
 	local width, height = 500, 350;
 	local params = {

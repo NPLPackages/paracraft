@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2018-09-13 14:51+0800\n"
+"POT-Creation-Date: 2018-12-03 17:35+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -190,7 +190,7 @@ msgstr "jpg(*.jpg)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:162
 #: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua:127
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:267
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:270
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:245
 msgid "请输入:"
 msgstr "Please enter:"
@@ -221,7 +221,7 @@ msgid "上传stl文件失败."
 msgstr "Failed to upload stl file."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:82
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:285
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:364
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:153
 #: script/mobile/paracraft/Areas/SettingPage.html:50
 #: script/mobile/paracraft/GUI/HelpPage.html:418
@@ -233,7 +233,8 @@ msgid "返回"
 msgstr "back"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:103
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:422
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:226
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:485
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:272
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:326
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:132
@@ -244,7 +245,7 @@ msgid "删除"
 msgstr "delete"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:104
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:438
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:493
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:406
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:99
 #: script/mobile/paracraft/Login/LocalLoadWorld.html:72
@@ -253,7 +254,7 @@ msgstr "enter"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:108
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:410
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:517
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:525
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:103
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:434
 msgid "下载中"
@@ -266,7 +267,7 @@ msgid "下载"
 msgstr "download"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:120
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:504
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:559
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:359
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:438
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:120
@@ -275,14 +276,14 @@ msgid "正在搜索, 请稍候 ... "
 msgstr "Searching, please wait ..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua:96
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:49
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:42
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:138
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:57
 msgid "创作"
 msgstr "Creation"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua:98
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:51
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:44
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:59
 msgid "参观"
 msgstr "visit"
@@ -295,6 +296,10 @@ msgstr "Can not delete world that is being edited"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Common/MsgBox.html:20
 msgid "提示"
 msgstr "tip"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua:46
+msgid "正在初始化世界..."
+msgstr "Initializing the world ..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.html:47
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorldGithub.html:26
@@ -325,25 +330,30 @@ msgstr "Delete all"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:68
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:277
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:315
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:638
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:317
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:646
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:557
 msgid "请先选择世界"
 msgstr "please select world first"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:83
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:95
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:296
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:84
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:99
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:298
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:360
 msgid "无法删除可能您没有足够的权限"
 msgstr "Unable to delete. You may not have sufficient privileges"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:105
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:106
 #, lua-format
 msgid "确定删除本地世界:%s?"
 msgstr "Are you sure to delete local world: %s?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:153
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:126
+#, lua-format
+msgid "确定删除远程世界:%s?"
+msgstr "Are you sure to delete remote world:%s?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:164
 #, lua-format
 msgid "确定删除Gitlab远程世界:%s?"
 msgstr "Are you sure to delete gitlab remote world: %s?"
@@ -352,18 +362,53 @@ msgstr "Are you sure to delete gitlab remote world: %s?"
 msgid "Github密码："
 msgstr "GitHub Password:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:84
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:53
+msgid "服务器"
+msgstr "Server"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:57
+msgid "课程"
+msgstr "Lessons"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:61
+#: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:34
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:235
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:269
+#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:276
+msgid "世界"
+msgstr "World"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:64
+#: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:42
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:97
+msgid "其他"
+msgstr "others"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:71
+msgid "已收藏"
+msgstr "Bookmarked"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:73
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:145
+msgid "收藏"
+msgstr "bookmark"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:170
 msgid "历史记录"
 msgstr "Historical records"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:85
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:108
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:171
+msgid "清除历史"
+msgstr "Clear History"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:172
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:119
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:60
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:45
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:322
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:755
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:328
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:761
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:37
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:24
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:27
 #: script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html:74
 #: script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html:34
 #: script/apps/Aries/Creator/Game/GUI/CheckpointListPage.html:34
@@ -375,399 +420,204 @@ msgstr "Historical records"
 #: script/apps/Aries/Creator/Game/GUI/EditEntityPage.html:73
 #: script/apps/Aries/Creator/Game/GUI/MirrorWnd.html:25
 #: script/apps/Aries/Creator/Game/GUI/NPCDialogPage.html:33
-#: script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua:179
+#: script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua:188
 #: script/apps/Aries/Creator/Game/Login/ChangeLanguagePage.html:56
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:53
 #: script/apps/Aries/Creator/Game/Tasks/SelectCharacterTask.html:47
 msgid "关闭"
 msgstr "close"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:100
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:127
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:192
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:244
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:319
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:530
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:533
 msgid "上一页"
 msgstr "Previous page"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:101
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:128
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:193
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:245
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:320
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:531
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:534
 msgid "下一页"
 msgstr "Next page"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:135
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:252
 msgid "暂时没有历史数据"
 msgstr "No historical data at the moment"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:21
-msgid "未分类"
-msgstr "Uncategorized"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:394
+msgid "是否删除此记录？"
+msgstr "Do you want to delete this record?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:24
-msgid "我的收藏"
-msgstr "My favorites"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:448
+msgid "今天"
+msgstr "Today"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:27
-msgid "教学世界"
-msgstr "Tutorial world"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:452
+msgid "昨天"
+msgstr "Yesterday"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/CreateWorld.lua:38
-msgid "正在初始化世界..."
-msgstr "Initializing the world ..."
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:459
+msgid "年"
+msgstr "year"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:286
-msgid "前进"
-msgstr "Forward"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:459
+msgid "月"
+msgstr "month"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:287
-msgid "刷新本地目录或远程网址"
-msgstr "Rerfresh local directory or remote url"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua:459
+msgid "日"
+msgstr "day"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:292
-msgid "输入课程ID或服务器地址"
-msgstr "Enter class id or server address"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:294
-msgid "管理访问历史"
-msgstr "manage history"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:297
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:90
-msgid "打开"
-msgstr "Open"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:311
-msgid "输入角色名字"
-msgstr "Enter player name"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:327
-msgid "上一个"
-msgstr "previous"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:329
-msgid "下一个"
-msgstr "next"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:334
-msgid "目前为离线模式"
-msgstr "Offline Mode"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:337
-#: script/apps/Aries/Creator/Game/Areas/ServerLogin.html:101
-#: script/apps/Aries/app_main.lua:113
-msgid "登录"
-msgstr "Login"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:343
-#, lua-format
-msgid "点击打开:%s"
-msgstr "Click to open: %s"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:347
-msgid "退出登录"
-msgstr "Signout"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:357
-msgid "正在刷新, 请稍候 ... "
-msgstr "Refreshing, please wait..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:390
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:470
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:373
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:394
-msgid ".zip"
-msgstr ".zip"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:430
-msgid "同步"
-msgstr "Sync"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:499
-msgid "暂无存档，请创建"
-msgstr "No record, please create one"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:510
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:122
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:454
-#: script/mobile/paracraft/Login/CreateNewWorld.html:76
-msgid "创建世界"
-msgstr "Create World"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:513
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:451
-msgid "导入/导出..."
-msgstr "import/export..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:523
-msgid "官方推荐作品"
-msgstr "Official Recommended Works"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:530
-#: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:87
-msgid "教学视频"
-msgstr "Video tutorials"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:537
-msgid "创作大赛报名中"
-msgstr "International Intellectual Creation Contest"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:544
-msgid "代码方块上线了~"
-msgstr "Code Block Is Online~"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.html:550
-msgid "自主动画系统即将上线"
-msgstr "Autonomous Animation System Is Coming"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginMain.lua:247
-msgid "历史记录功能即将到来"
-msgstr "The history feature is coming soon"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:36
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:57
 msgid "登陆"
 msgstr "Signin"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:39
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:63
 msgid "服务器："
 msgstr "Server:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:43
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:67
 msgid "账号："
 msgstr "Account:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:43
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:67
 msgid "账户名/邮箱/手机号"
 msgstr "username/email/phone number"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:46
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:70
 msgid "密码："
 msgstr "Password:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:50
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:74
 msgid "记住密码?"
 msgstr "Remember password?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:53
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:77
 msgid "自动登录"
 msgstr "Auto signin"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:57
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:81
 msgid "登   录"
 msgstr "Signin"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:60
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:84
 msgid "还没有帐号？"
 msgstr "No account?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginModal.html:61
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.html:85
 msgid "点击注册"
 msgstr "Click to register"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:32
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:39
-msgid "使用KEEPWORK登录"
-msgstr "Login with KeepWork"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:33
-msgid "使用STAGE登录"
-msgstr "Use stage login"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:34
-msgid "使用RELEASE登录"
-msgstr "Use release login"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:35
-msgid "使用本地服务登录"
-msgstr "Login with localhost"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:63
-msgid "链接超时"
-msgstr "Connection timeout"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:80
-msgid "keepwork正在维护中，我们马上回来"
-msgstr "keepwork.com is under maintaining, we will be back soon"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:100
-msgid "服务器连接失败"
-msgstr "Failed to connect to server"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:111
-msgid "用户名或者密码错误"
-msgstr "User name or password is incorrect"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:139
-msgid "数据源不存在，请联系管理员"
-msgstr "Data source does not exist, please contact administrator"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:179
-msgid "数据源配置文件不存在"
-msgstr "Data source configuration file does not exist"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:241
-msgid "检查站点失败"
-msgstr "Failed to check website"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:334
-msgid ""
-"您需要到keepwork官网进行实名认证，认证成功后需重启paracraft即可正常操作，是否"
-"现在认证？"
-msgstr "Please go to keepwork to authenticate, do you want to do it now?"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:382
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.lua:119
 msgid "账号不能为空"
 msgstr "Account name can not be empty"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:387
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.lua:124
 msgid "密码不能为空"
 msgstr "Password can not be empty"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:392
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.lua:129
 msgid "登陆站点不能为空"
 msgstr "Login site cannot be empty"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:398
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:550
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:615
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/LoginModal/LoginModal.lua:135
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserInfo.lua:125
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:513
 msgid "正在登陆，请稍后..."
 msgstr "Signing in, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginUserInfo.lua:465
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:221
-msgid "匿名"
-msgstr "anonymous"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:52
+msgid "此世界暂未分享"
+msgstr "The world has not been shared"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:99
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:539
-#: script/mobile/paracraft/Login/InternetLoadWorld.lua:458
-msgid "无法下载服务器列表, 请检查网络连接"
-msgstr "can not download server list, please check your network connection. "
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:219
-msgid "此世界仅在本地，无法切换版本"
-msgstr "This world is only local and cannot switch versions"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:243
-msgid "获取服务器世界列表错误"
-msgstr "Failed to fetch world server list"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:529
-msgid "仅本地"
-msgstr "Local only"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:531
-msgid "仅网络"
-msgstr "Remote only"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:533
-msgid "本地版本与远程数据源一致"
-msgstr "Local and remote data source are identical"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:535
-msgid "本地版本更加新"
-msgstr "Local version is newer"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:537
-msgid "远程版本更加新"
-msgstr "Remote version is newer"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Login/LoginWorldList.lua:539
-msgid "获取状态中"
-msgstr "Fetching status..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:65
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:75
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:69
 #: script/apps/Aries/Creator/Game/Areas/EscFramePage.html:165
 #: script/apps/Aries/Creator/Game/Areas/ShareWorldPage.html:27
 msgid "分享世界"
 msgstr "Share World"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:78
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:88
 msgid "大小："
 msgstr "Size:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:79
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:65
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:89
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:65
 msgid "远程版本号："
 msgstr "Remote revision:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:80
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:72
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:90
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:72
 msgid "本地版本号："
 msgstr "Local revision:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:82
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:92
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:56
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:64
 #: script/apps/Aries/Creator/Game/Areas/ShareWorldPage.html:32
 msgid "重新截图"
 msgstr "take snapshort again"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:88
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:98
 msgid "浏览"
 msgstr "Browser"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:93
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:103
 msgid "上传并分享"
 msgstr "Upload and share"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua:35
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua:37
 msgid "此世界不支持分享"
 msgstr "This world does not support sharing"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua:131
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua:146
+msgid "当前世界未保存，是否继续上传世界？"
+msgstr ""
+"The current world is not saved, do you want to continue uploading the world?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua:151
 msgid "当前本地版本小于远程版本，是否继续上传？"
 msgstr ""
 "Local version is smaller(older) than remote version, do you want to continue "
 "uploading?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:17
-#, lua-format
-msgid ""
-"世界%s文件总大小超过了%dMB，是否清理文件？(请使用MP3、OGG格式音频，避免使用"
-"FBX格式)"
-msgstr ""
-"World file %s exceeded %dMB, do you want to clear it? (please use mp3,ogg "
-"audio file and avoid using FBX file)"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:83
+msgid "同步中"
+msgstr "Syncing"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:19
-#, lua-format
-msgid ""
-"世界%s文件总大小超过了%dMB，是否清理文件？(请使用MP3、OGG格式音频，避免使用"
-"FBX格式，VIP用户最大可上传%dMB)"
-msgstr ""
-"Total file size in world dir %s exceeded %d MB, do you want to clean up? "
-"(please use MP3,ogg audio files, avoid using FBX file, VIP users can upload "
-"at most %dMB)"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:87
+msgid "同步进度："
+msgstr "Sync progress:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:40
-msgid "购买VIP"
-msgstr "Buy VIP"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:94
+msgid "恭喜！世界已经同步完毕！"
+msgstr "Congratulations! World synced!"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:45
-msgid "是否现在清理？"
-msgstr "Clean now?"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:96
+msgid "你可以通过下面页面分享给他人"
+msgstr "You can use following web page to share with others"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:49
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:45
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:49
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:29
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:33
-msgid "是"
-msgstr "Yes"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:100
+#: script/apps/Aries/Creator/Game/GUI/EditBookPage.html:101
+#: script/apps/Aries/Creator/Game/GUI/EditBookPage.mobile.html:101
+#: script/apps/Aries/Creator/Game/GUI/EditCommandPage.html:116
+#: script/apps/Aries/Creator/Game/GUI/MirrorWnd.html:21
+#: script/apps/Aries/Creator/Game/Movie/KeyFramePopupMenu.lua:31
+#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:36
+msgid "复制"
+msgstr "copy"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:50
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:46
-#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:50
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:30
-#: script/mobile/paracraft/GUI/DefaultMessageBox.html:34
-msgid "否"
-msgstr "No"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:101
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:375
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:39
+msgid "打开"
+msgstr "Open"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/BeyondVolume.html:51
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:49
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:52
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:103
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:114
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:51
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:49
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:52
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:79
 #: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html:129
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html:43
@@ -791,98 +641,7 @@ msgstr "No"
 msgid "取消"
 msgstr "cancel"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:24
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:35
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:19
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:20
-msgid "正在处理中，请勿操作..."
-msgstr "In process, do not operate ..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:62
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:44
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:47
-msgid "与数据源同步"
-msgstr "Syncing with data source"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:68
-msgid "使用远程版本"
-msgstr "Use remote version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:74
-msgid "使用本地离线版本"
-msgstr "Use local offline version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSync.html:77
-msgid "使用本地版本"
-msgstr "Use local version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:46
-msgid "你是否确定用远程的更低的版本"
-msgstr "Are you sure to use remote lower (older) version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:46
-msgid ", 替换本地更高的版本"
-msgstr ", to replace local higher(newer) version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:46
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:49
-msgid "？"
-msgstr "?"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseDataSource.html:48
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:51
-msgid "替换"
-msgstr "Replace"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:49
-msgid "你是否确定用本地的更低的版本"
-msgstr "Are you sure to use local lower(older) version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/StartSyncUseLocal.html:49
-msgid ", 替换服务器上更高的版本"
-msgstr "to replace remote higher(newer) version"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncCompare.lua:46
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:43
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:182
-msgid "请稍后..."
-msgstr "Please Wait..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncCompare.lua:147
-msgid "网络错误"
-msgstr "Network error"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncCompare.lua:184
-msgid "本地世界沒有版本信息"
-msgstr "Local world does not have revision info"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:72
-msgid "同步中"
-msgstr "Syncing"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:76
-msgid "同步进度："
-msgstr "Sync progress:"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:83
-msgid "恭喜！世界已经同步完毕！"
-msgstr "Congratulations! World synced!"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:85
-msgid "你可以通过下面页面分享给他人"
-msgstr "You can use following web page to share with others"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:89
-#: script/apps/Aries/Creator/Game/GUI/EditBookPage.html:101
-#: script/apps/Aries/Creator/Game/GUI/EditBookPage.mobile.html:101
-#: script/apps/Aries/Creator/Game/GUI/EditCommandPage.html:116
-#: script/apps/Aries/Creator/Game/GUI/MirrorWnd.html:21
-#: script/apps/Aries/Creator/Game/Movie/KeyFramePopupMenu.lua:31
-#: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:36
-msgid "复制"
-msgstr "copy"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.html:104
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:115
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:55
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:59
 #: script/mobile/paracraft/GUI/DefaultMessageBox.html:39
@@ -890,101 +649,275 @@ msgstr "copy"
 msgid "重试"
 msgstr "Retry"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.lua:36
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.lua:134
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.lua:36
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.lua:141
 msgid "同步中，请稍后..."
 msgstr "Syncing, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncGUI.lua:81
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.lua:88
 msgid "正在等待上次同步完成，请稍后..."
 msgstr "Waiting for last syncing to complete, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncMain.lua:253
-msgid "获取Commit列表失败"
-msgstr "Failed to fetch commit list"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncMain.lua:262
-msgid "上一次同步到数据源同步失败，请重新同步世界到数据源"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:17
+#, lua-format
+msgid ""
+"世界%s文件总大小超过了%dMB，是否清理文件？(请使用MP3、OGG格式音频，避免使用"
+"FBX格式)"
 msgstr ""
-"Failed to sync to data source last time, please sync world to data source "
-"again."
+"World file %s exceeded %dMB, do you want to clear it? (please use mp3,ogg "
+"audio file and avoid using FBX file)"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncMain.lua:323
-msgid "更新服务器列表失败"
-msgstr "Failed to update server list"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:37
-msgid "上传失败，将使用离线模式，原因：上传目录为空"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:19
+#, lua-format
+msgid ""
+"世界%s文件总大小超过了%dMB，是否清理文件？(请使用MP3、OGG格式音频，避免使用"
+"FBX格式，VIP用户最大可上传%dMB)"
 msgstr ""
-"Failed to upload, we will use offline mode. Reason: upload directory is empty"
+"Total file size in world dir %s exceeded %d MB, do you want to clean up? "
+"(please use MP3,ogg audio files, avoid using FBX file, VIP users can upload "
+"at most %dMB)"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:51
-msgid "数据源创建失败"
-msgstr "failed to create data source"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:40
+msgid "购买VIP"
+msgstr "Buy VIP"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:71
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:75
-msgid "正在对比文件列表..."
-msgstr "Comparing file list..."
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:45
+msgid "是否现在清理？"
+msgstr "Clean now?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:230
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:178
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:49
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:45
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:49
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:29
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:33
+msgid "是"
+msgstr "Yes"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/BeyondVolume.html:50
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:46
+#: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:50
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:30
+#: script/mobile/paracraft/GUI/DefaultMessageBox.html:34
+msgid "否"
+msgstr "No"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:24
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:35
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:19
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:20
+msgid "正在处理中，请勿操作..."
+msgstr "In process, do not operate ..."
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:62
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:44
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:47
+msgid "与数据源同步"
+msgstr "Syncing with data source"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:68
+msgid "使用远程版本"
+msgstr "Use remote version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:74
+msgid "使用本地离线版本"
+msgstr "Use local offline version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:77
+msgid "使用本地版本"
+msgstr "Use local version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:46
+msgid "你是否确定用远程的更低的版本"
+msgstr "Are you sure to use remote lower (older) version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:46
+msgid ", 替换本地更高的版本"
+msgstr ", to replace local higher(newer) version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:46
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:49
+msgid "？"
+msgstr "?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:48
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:51
+msgid "替换"
+msgstr "Replace"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:49
+msgid "你是否确定用本地的更低的版本"
+msgstr "Are you sure to use local lower(older) version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:49
+msgid ", 替换服务器上更高的版本"
+msgstr "to replace remote higher(newer) version"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:218
+#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:156
+#: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:254
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:261
+#: script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua:415
+#: script/mobile/paracraft/Login/CreateNewWorld.lua:254
+#: script/mobile/paracraft/Login/LocalLoadWorld.lua:386
+msgid "无效的世界文件"
+msgstr "Invalid world filename"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:229
+#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:169
+msgid "世界已经存在，是否重新下载?"
+msgstr "World already exist, do you want to download again?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:248
+msgid "世界不存在"
+msgstr "The world doesn't exist."
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:365
+msgid "前进"
+msgstr "Forward"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:366
+msgid "刷新本地目录或远程网址"
+msgstr "Rerfresh local directory or remote url"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:371
+msgid "输入项目ID或课程ID或服务器地址"
+msgstr "enter a project id or class id or server address"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:373
+msgid "管理访问历史"
+msgstr "manage history"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:384
+msgid "输入角色名字"
+msgstr "Enter player name"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:396
+msgid "上一个"
+msgstr "previous"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:398
+msgid "下一个"
+msgstr "next"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:403
+msgid "目前为离线模式"
+msgstr "Offline Mode"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:406
+#: script/apps/Aries/Creator/Game/Areas/ServerLogin.html:101
+#: script/apps/Aries/app_main.lua:113
+msgid "登录"
+msgstr "Login"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:412
 #, lua-format
-msgid "%s 处理完成"
-msgstr "%s processing completed"
+msgid "点击打开:%s"
+msgstr "Click to open: %s"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:282
-#, lua-format
-msgid "%s （%s） 上传中"
-msgstr "Uploading %s ( %s )"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:417
+msgid "退出登录"
+msgstr "Signout"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:302
-#, lua-format
-msgid "%s 上传失败"
-msgstr "%s upload failed"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:427
+msgid "正在刷新, 请稍候 ... "
+msgstr "Refreshing, please wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:317
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:235
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:264
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:284
-#, lua-format
-msgid "%s （%s） 更新中"
-msgstr "%s (%s) Updating"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:456
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:525
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:373
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:394
+msgid ".zip"
+msgstr ".zip"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:340
-msgid "更新失败"
-msgstr "Update failed"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:489
+msgid "同步"
+msgstr "Sync"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:346
-#, lua-format
-msgid "%s 更新失败"
-msgstr "%s update failed"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:554
+msgid "暂无存档，请创建"
+msgstr "No record, please create one"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:360
-#, lua-format
-msgid "%s 删除中"
-msgstr "%s being deleted"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:565
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:122
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:454
+#: script/mobile/paracraft/Login/CreateNewWorld.html:76
+msgid "创建世界"
+msgstr "Create World"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:374
-msgid "删除失败"
-msgstr "Failed to delete"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:568
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:451
+msgid "导入/导出..."
+msgstr "import/export..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToDataSource.lua:380
-#, lua-format
-msgid "%s 删除失败"
-msgstr "%s delete failed"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:579
+msgid "官方推荐作品"
+msgstr "Official Recommended Works"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:38
-msgid "下载失败，原因：下载目录为空"
-msgstr "Download failed. reason: download directory is empty"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:587
+msgid "哈奇时报"
+msgstr "ParaWorld News Paper"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:46
-msgid "数据源异常"
-msgstr "Data source exception"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:595
+msgid "动画与编程在线课程"
+msgstr "Animation and Programming Online Courses"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/SyncToLocal.lua:307
-msgid "本地数据错误"
-msgstr "Local database error"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:602
+#: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:87
+msgid "教学视频"
+msgstr "Video tutorials"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:609
+msgid "创作大赛报名中"
+msgstr "International Intellectual Creation Contest"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserInfo.lua:52
+msgid ""
+"您需要到keepwork官网进行实名认证，认证成功后需重启paracraft即可正常操作，是否"
+"现在认证？"
+msgstr "Please go to keepwork to authenticate, do you want to do it now?"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserInfo.lua:109
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:221
+msgid "匿名"
+msgstr "anonymous"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:95
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:547
+#: script/mobile/paracraft/Login/InternetLoadWorld.lua:458
+msgid "无法下载服务器列表, 请检查网络连接"
+msgstr "can not download server list, please check your network connection. "
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:217
+msgid "此世界仅在本地，无法切换版本"
+msgstr "This world is only local and cannot switch versions"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:235
+msgid "获取服务器世界列表错误"
+msgstr "Failed to fetch world server list"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:505
+msgid "仅本地"
+msgstr "Local only"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:507
+msgid "仅网络"
+msgstr "Remote only"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:509
+msgid "本地版本与远程数据源一致"
+msgstr "Local and remote data source are identical"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:511
+msgid "本地版本更加新"
+msgstr "Local version is newer"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:513
+msgid "远程版本更加新"
+msgstr "Remote version is newer"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:515
+msgid "获取状态中"
+msgstr "Fetching status..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.html:33
 msgid "日期"
@@ -998,13 +931,19 @@ msgstr "version"
 msgid "版本切换"
 msgstr "change version"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:25
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:24
 msgid "登录后才能继续"
 msgstr "You need to login first."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:38
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:37
 msgid "不能切换当前编辑的世界"
 msgstr "Cannot toggle to currently opened world"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:42
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:167
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:48
+msgid "请稍后..."
+msgstr "Please Wait..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:52
 #: script/apps/Aries/Creator/Game/Areas/EscFramePage.html:188
@@ -1072,7 +1011,7 @@ msgstr "can not copy file to destination folder"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:138
 #: script/apps/Aries/Creator/Game/API/FileDownloader.lua:145
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:700
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:708
 #: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:233
 #: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:242
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:619
@@ -1081,7 +1020,7 @@ msgstr "downloading..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:144
 #: script/apps/Aries/Creator/Game/API/FileDownloader.lua:149
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:702
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:710
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:621
 #, lua-format
 msgid "下载中: %d/%dKB"
@@ -1089,7 +1028,7 @@ msgstr "downloading: %d/%dKB"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:150
 #: script/apps/Aries/Creator/Game/API/FileDownloader.lua:154
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:705
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:713
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:624
 msgid "下载完毕"
 msgstr "download complete"
@@ -1098,32 +1037,152 @@ msgstr "download complete"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:153
 #: script/apps/Aries/Creator/Game/API/FileDownloader.lua:157
 #: script/apps/Aries/Creator/Game/API/FileDownloader.lua:158
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:707
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:715
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:626
 msgid "下载终止了"
 msgstr "download terminated"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:163
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:162
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:164
 #, lua-format
 msgid "文件%s: %s"
 msgstr "File %s: %s"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/FileDownloader/FileDownloader.lua:175
-#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:167
+#: script/apps/Aries/Creator/Game/API/FileDownloader.lua:169
 msgid "重复下载"
 msgstr "repeated download"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/GitlabService.lua:73
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/GitlabService.lua:62
 #, lua-format
 msgid "%s文件包含了特殊字符或空格，请重命名文件，否则无法上传。"
 msgstr ""
 "File %s  contains special characters like or space, please rename the file "
 "before uploading can proceed. "
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/GitlabService.lua:289
-msgid "获取sha文件失败"
-msgstr "failed to fetch file sha"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:58
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:65
+msgid "使用KEEPWORK登录"
+msgstr "Login with KeepWork"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:59
+msgid "使用STAGE登录"
+msgstr "Use stage login"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:60
+msgid "使用RELEASE登录"
+msgstr "Use release login"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:61
+msgid "使用本地服务登录"
+msgstr "Login with localhost"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:109
+msgid "用户名或者密码错误"
+msgstr "User name or password is incorrect"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:115
+msgid "服务器连接失败"
+msgstr "Failed to connect to server"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:136
+msgid "Token过期了，请重新登陆"
+msgstr "Token is out of date, please login again"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:197
+msgid "链接超时"
+msgstr "Connection timeout"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:217
+msgid "keepwork正在维护中，我们马上回来"
+msgstr "keepwork.com is under maintaining, we will be back soon"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:546
+msgid "获取Commit列表失败"
+msgstr "Failed to fetch commit list"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:555
+msgid "上一次同步到数据源同步失败，请重新同步世界到数据源"
+msgstr ""
+"Failed to sync to data source last time, please sync world to data source "
+"again."
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/KeepworkService.lua:604
+msgid "更新服务器列表失败"
+msgstr "Failed to update server list"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:142
+msgid "网络错误"
+msgstr "Network error"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:179
+msgid "本地世界沒有版本信息"
+msgstr "Local world does not have revision info"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:34
+msgid "上传失败，将使用离线模式，原因：上传目录为空"
+msgstr ""
+"Failed to upload, we will use offline mode. Reason: upload directory is empty"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:54
+msgid "数据源创建失败"
+msgstr "failed to create data source"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:92
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:69
+msgid "正在对比文件列表..."
+msgstr "Comparing file list..."
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:256
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:176
+#, lua-format
+msgid "%s 处理完成"
+msgstr "%s processing completed"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:308
+#, lua-format
+msgid "%s （%s） 上传中"
+msgstr "Uploading %s ( %s )"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:327
+#, lua-format
+msgid "%s 上传失败"
+msgstr "%s upload failed"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:342
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:233
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:262
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:282
+#, lua-format
+msgid "%s （%s） 更新中"
+msgstr "%s (%s) Updating"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:364
+msgid "更新失败"
+msgstr "Update failed"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:370
+#, lua-format
+msgid "%s 更新失败"
+msgstr "%s update failed"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:384
+#, lua-format
+msgid "%s 删除中"
+msgstr "%s being deleted"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:397
+msgid "删除失败"
+msgstr "Failed to delete"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToDataSource.lua:403
+#, lua-format
+msgid "%s 删除失败"
+msgstr "%s delete failed"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/SyncToLocal.lua:37
+msgid "下载失败，原因：下载目录为空"
+msgstr "Download failed. reason: download directory is empty"
 
 #: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html:34
 msgid "当前世界"
@@ -1252,27 +1311,27 @@ msgstr "World templates"
 msgid "新手教程"
 msgstr "Tutorials"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:54
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:53
 msgid "测试期间, 模板商城暂未开放~"
 msgstr "alpha version does not support template store"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:107
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:106
 msgid "搜索: 输入ID或名字"
 msgstr "search: enter id or name"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:128
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:127
 msgid "右键帮助"
 msgstr "right click for help"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:147
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:146
 msgid "预览"
 msgstr "preview"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:152
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:151
 msgid "Ctrl+左键点击场景可保存模版"
 msgstr "Ctrl+left click scene blocks to save templates"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:156
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:155
 #: script/apps/Aries/Creator/Game/Areas/ChangeTexturePage.html:158
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:434
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:452
@@ -1281,20 +1340,20 @@ msgstr "Ctrl+left click scene blocks to save templates"
 msgid "刷新"
 msgstr "refresh"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:157
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:156
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.mobile.html:88
 msgid "目录"
 msgstr "directory"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:157
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:156
 msgid "打开模板文件目录"
 msgstr "open containing directory of the template file"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:158
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:157
 msgid "管理"
 msgstr "manage"
 
-#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:158
+#: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html:157
 msgid "打开模板管理窗口"
 msgstr "open template manager window"
 
@@ -1404,11 +1463,11 @@ msgstr "send"
 msgid "附近"
 msgstr "Nearby"
 
-#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua:296
+#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua:299
 msgid "你输入的文字太多了"
 msgstr "Text too long"
 
-#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua:334
+#: script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua:337
 msgid "不能连续发送相同内容"
 msgstr "Can not send same text repeatedly"
 
@@ -1423,22 +1482,22 @@ msgid "系统消息"
 msgstr "System message"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:49
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:349
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:352
 msgid "命令参数"
 msgstr "Cmd params"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:62
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:362
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:365
 msgid "命令描述"
 msgstr "Cmd description"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:64
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:364
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:367
 msgid "命令实例"
 msgstr "Cmd example"
 
 #: script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.html:80
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:380
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:383
 #: script/mobile/paracraft/GUI/HelpPage.html:404
 msgid "没有相应的命令存在"
 msgstr "No commands exist"
@@ -1458,7 +1517,7 @@ msgstr "Cmd format"
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:84
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:36
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:946
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:392
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:395
 #: script/mobile/paracraft/GUI/HelpPage.html:416
 msgid "帮助"
 msgstr "Help"
@@ -1467,13 +1526,6 @@ msgstr "Help"
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:40
 msgid "环境"
 msgstr "env"
-
-#: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:34
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:235
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:269
-#: script/apps/Aries/Creator/Game/Login/RemoteWorld.lua:276
-msgid "世界"
-msgstr "World"
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:36
 msgid "创建世界..."
@@ -1621,11 +1673,12 @@ msgid "关于Paracraft..."
 msgstr "About Paracraft..."
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:98
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:109
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:115
 msgid "致谢"
 msgstr "Credits"
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.html:23
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:31
 msgid "编辑模式"
 msgstr "Edit mode"
 
@@ -1646,13 +1699,13 @@ msgid "自动隐藏"
 msgstr "auto hide"
 
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.html:42
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:774
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:780
 #: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:21
 msgid "您的显卡不支持这个效果, 请升级您的显卡"
 msgstr "your graphic card does not support this effect. "
 
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.html:45
-#: script/apps/Aries/Creator/Game/game_options.lua:336
+#: script/apps/Aries/Creator/Game/game_options.lua:340
 msgid "/shader命令被禁止, 请在设置中解禁"
 msgstr "/shader command is disabled, please enable it in settings"
 
@@ -1763,13 +1816,8 @@ msgstr "terrain"
 msgid "游戏"
 msgstr "game"
 
-#: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:42
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:97
-msgid "其他"
-msgstr "others"
-
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:46
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:751
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:757
 msgid "开启"
 msgstr "on"
 
@@ -1825,24 +1873,20 @@ msgstr "Invite Friend"
 msgid "继续创作"
 msgstr "Continue"
 
-#: script/apps/Aries/Creator/Game/Areas/GoalTracker.html:44
-msgid "创作百科"
-msgstr "Creation Wiki"
-
 #: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:33
 msgid "点击我,开始你的创造之旅"
 msgstr "Click me to learn"
 
-#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:178
+#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:179
 #, lua-format
 msgid "还需%d xp 到达%d级"
 msgstr "%d XP needed to reach level %d"
 
-#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:216
+#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:227
 msgid "教学完成"
 msgstr "Tutorial completed"
 
-#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:282
+#: script/apps/Aries/Creator/Game/Areas/GoalTracker.lua:293
 #, lua-format
 msgid "【%s】正在建造中,是否放弃?"
 msgstr "[ %s] is under construction, are you sure to cancel it?"
@@ -1995,7 +2039,7 @@ msgstr "no users"
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:300
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:348
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:470
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:484
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:487
 #: script/mobile/paracraft/GUI/HelpPage.html:503
 msgid "请稍等 ... "
 msgstr "please wait..."
@@ -2064,7 +2108,7 @@ msgid "描述"
 msgstr "description"
 
 #: script/apps/Aries/Creator/Game/Areas/SkinPage.html:107
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:321
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:327
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:38
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:42
 #: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html:45
@@ -2258,6 +2302,10 @@ msgstr "redo"
 msgid "清空缓存"
 msgstr "Clear cache"
 
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:317
+msgid "保持电影方块窗口比例"
+msgstr "Keep movie block window proportional"
+
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:40
 msgid "图像品质"
 msgstr "graphics quality"
@@ -2334,7 +2382,7 @@ msgstr "On"
 msgid "关"
 msgstr "off"
 
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:635
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:641
 msgid ""
 "为了更好的运行程序, 我们建议您购买新的3D显卡。我们即将自动为您调整为最低的3D"
 "画面质量"
@@ -2343,7 +2391,7 @@ msgstr ""
 "card. We are about to automatically adjust for you to the lowest 3D screen "
 "quality"
 
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:639
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:645
 msgid ""
 "我们发现您的计算机显卡比较旧, 为了更好的运行程序, 您是否希望我们自动为您调整"
 "为较低的画面质量？"
@@ -2352,7 +2400,7 @@ msgstr ""
 "performance, do you want us to automatically adjust to lower graphical "
 "quality?"
 
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:956
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:962
 msgid "您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?"
 msgstr ""
 "Your display device is about to change: If your video card is not supported, "
@@ -2428,8 +2476,9 @@ msgstr "%s mins"
 msgid "命令 /%s"
 msgstr "Command /%s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:126
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:587
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:132
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:652
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:744
 #, lua-format
 msgid ""
 "编译错误: %s\n"
@@ -2438,9 +2487,25 @@ msgstr ""
 "Compile error: %s \n"
 "in %s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:129
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:135
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:138
 msgid "编译成功!"
 msgstr "Compile succeed!"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:756
+#: script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua:160
+#, lua-format
+msgid ""
+"运行时错误: %s\n"
+"在%s"
+msgstr ""
+"Runtime Error:%s\n"
+"in %s"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:764
+#, lua-format
+msgid "没有找到文件: %s"
+msgstr "File not found:%s"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:10
 msgid "编译并运行"
@@ -2467,26 +2532,36 @@ msgstr "You can also edit through the movie block"
 msgid "角色名称"
 msgstr "actor name"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:22
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:23
 msgid "图块"
-msgstr "blockly"
+msgstr "blocks"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:22
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:23
 msgid "用图块编辑NPL代码, 建议8岁以下用户使用"
 msgstr ""
 "Use graphical blocks to write NPL code, recommended for users under 8 years "
 "old"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:23
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:24
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:889
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:65
+msgid "代码"
+msgstr "code"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:24
+msgid "NPL代码编辑模式(推荐使用)"
+msgstr "NPL code editing mode (recommended)"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:26
 msgid "教程"
 msgstr "Tutorial"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:34
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:37
 #: script/apps/Aries/Creator/Game/GUI/EditEntityPage.html:81
 msgid "点击这里输入..."
 msgstr "Click here to input..."
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:179
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:190
 msgid ""
 "我们在代码方块旁边自动创建了一个电影方块! 你现在可以用代码控制电影方块中的演"
 "员了!"
@@ -2494,8 +2569,8 @@ msgstr ""
 "We have automatically created a movie block next to the code block! You can "
 "now use the code to control the actors in the movie block!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:181
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:335
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:192
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:366
 msgid ""
 "没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码"
 "控制演员了!"
@@ -2503,11 +2578,11 @@ msgstr ""
 "No movie block found! Please put a movie block containing actors next to the "
 "Code block, you can then control the actor with code!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:618
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:732
 msgid "未命名"
 msgstr "Unnamed"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:628
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:742
 msgid "https://keepwork.com/official/paracraft/codeblock"
 msgstr "https://keepwork.com/official/paracraft/codeblock"
 
@@ -2535,14 +2610,17 @@ msgstr "repeat %1 times"
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:331
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:381
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:431
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:143
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:382
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:407
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:483
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:471
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:144
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:447
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:472
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:548
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:844
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:18
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:50
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:99
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:167
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:112
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:158
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:174
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Control.lua:18
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Control.lua:52
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Control.lua:86
@@ -2611,36 +2689,37 @@ msgid "并行执行"
 msgstr "parallel run"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:470
+msgid "执行角色%1代码"
+msgstr "run actor %1 code"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:516
 msgid "结束程序"
 msgstr "exit"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:492
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:538
 msgid "重新开始"
 msgstr "restart"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:514
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:560
 msgid "成为%1的化身"
 msgstr "become %1's agent"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:520
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:566
 msgid "当前玩家"
 msgstr "Current player"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:521
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:375
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:114
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:142
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:270
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:567
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:398
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:115
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:28
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:230
 msgid "某个角色名"
 msgstr "a given actor name"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:537
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:583
 msgid "成为当前角色的化身"
 msgstr "become agent of current player"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:544
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:590
 msgid "设置方块输出%1"
 msgstr "set block output %1"
 
@@ -2660,120 +2739,145 @@ msgstr "%1 = %2"
 msgid "设置全局变量%1为%2"
 msgstr "Set variable %1 to %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:130
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:131
 msgid "也可以用_G.a"
 msgstr "Can also use _G.a"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:142
-msgid "当角色被复制时"
-msgstr "when this actor is cloned"
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:143
+msgid "当角色被复制时(%1)"
+msgstr "when actor is cloned(%1)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:174
-msgid "复制%1"
-msgstr "clone %1"
-
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:180
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:345
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:373
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:190
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:396
 msgid "此角色"
 msgstr "this actor"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:181
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:191
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:201
 msgid "某个角色"
 msgstr "a given actor"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:207
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:210
+msgid "复制%1(%2)"
+msgstr "clone%1(%2)"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:247
 msgid "删除角色"
 msgstr "delete this clone"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:242
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:273
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:324
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:282
 msgid "名字"
 msgstr "name"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:243
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:274
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:325
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:283
 msgid "物理半径"
 msgstr "physics radius"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:244
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:275
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:326
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:284
 msgid "物理高度"
 msgstr "physics height"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:245
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:276
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:327
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:285
+msgid "组Id"
+msgstr "group id"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:289
+msgid "朝向"
+msgstr "facing"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:290
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:64
 msgid "颜色"
 msgstr "Color"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:246
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:277
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:291
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:41
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:631
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:634
 msgid "文字"
 msgstr "text"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:247
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:328
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:292
 msgid "是否为化身"
 msgstr "is agent"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:267
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:293
+msgid "模型文件"
+msgstr "Model file"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:294
+msgid "绘图代码"
+msgstr "Render code"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:314
 msgid "设置角色的%1为%2"
 msgstr "set actor data %1 to %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:278
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:329
-msgid "任意变量"
-msgstr "any variable"
-
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:318
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:357
 msgid "获取角色的%1"
 msgstr "get actor data %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:429
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:393
+msgid "获取角色对象%1"
+msgstr "get actor %1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:494
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Data.lua:86
 msgid "获取表%1中的%2"
 msgstr "table%1's %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:463
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:528
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Data.lua:120
 msgid "空的表{}"
 msgstr "empty table {}"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:482
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:547
 msgid "新函数(%1)"
 msgstr "new function (%1)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:516
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:581
 msgid "调用函数%1(%2)"
 msgstr "call function%1 (%2)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:550
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:615
 msgid "显示全局变量%1"
 msgstr "show global variable %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:581
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:646
 msgid "隐藏全局变量%1"
 msgstr "hide global variable %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:609
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:674
 msgid "输出日志%1"
 msgstr "output log %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:627
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:692
 msgid "查看log.txt或F11看日志"
 msgstr "Check log.txt or F11 to see the log"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:637
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:702
 msgid "输出到聊天框%1"
 msgstr "echo to chat window%1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:730
+msgid "引用文件%1"
+msgstr "include file %1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:748
+msgid "文件需要放到当前世界目录下"
+msgstr "Files need to be placed in the current world directory"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:758
+msgid "获取全局表%1"
+msgstr "get global table %1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:784
+msgid "继承表%1,新表%2"
+msgstr "inherit from %1, new %2"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:843
+msgid "代码%1"
+msgstr "code %1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:17
 msgid "当演员被点击时"
@@ -2784,58 +2888,136 @@ msgid "当%1键按下时"
 msgstr "when %1 key is pressed"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:56
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:334
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:363
 msgid "空格"
 msgstr "space"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:56
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:334
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:363
 msgid "左"
 msgstr "left"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:56
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:334
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:363
 msgid "右"
 msgstr "right"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:56
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:334
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:363
 msgid "上"
 msgstr "up"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:56
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:334
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:363
 msgid "下"
 msgstr "down"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:63
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:341
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:370
 msgid "回车"
 msgstr "enter"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:86
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:66
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:101
+msgid "鼠标滚轮"
+msgstr "mouse wheel"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:66
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:96
+msgid "鼠标按钮"
+msgstr "mouse button"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:88
 msgid "空格跳跃"
 msgstr "Space key to jump"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:98
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:111
+msgid "当方块%1被点击时"
+msgstr "when block%1 is clicked"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:138
+msgid "任意方块被点击"
+msgstr "when any block is clicked"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:145
+msgid "某个方块被点击"
+msgstr "a given block is clicked"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:157
 msgid "当动画在%1帧时"
 msgstr "when animation time is %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:166
-msgid "当收到%1消息时"
-msgstr "when receive%1"
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:225
+msgid "当收到%1消息时(%2)"
+msgstr "when received %1 (%2)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:209
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:273
 msgid "广播%1消息"
 msgstr "broadcast %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:244
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:308
+msgid "广播消息%1(%2)"
+msgstr "broadcast %1(%2)"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:348
 msgid "广播%1消息并等待返回"
 msgstr "broadcast %1 and wait"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:278
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:388
+msgid "/tip hello"
+msgstr "/tip Hello"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:389
+msgid "添加规则:发送事件HelloEvent"
+msgstr "Add rule: Send event helloevent"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:390
+msgid "添加规则:Lever可放在Glowstone上"
+msgstr "Add rule: lever can be placed on Glowstone"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:391
+msgid "添加规则:Glowstone可被删除"
+msgstr "Add rule: Glowstone can be deleted"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:392
+msgid "添加规则:人物自动爬坡"
+msgstr "Add rule: player auto climb"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:393
+msgid "添加规则:人物可跳跃"
+msgstr "Add rule: player can jump"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:394
+msgid "添加规则:人物摄取距离为5米"
+msgstr "Add a rule: player picking  distance at 5 meters"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:395
+msgid "添加规则:人物可在空中继续跳跃"
+msgstr "Add rule: player can jump in the air"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:396
+msgid "添加规则:人物可飞行"
+msgstr "Add rule: player can fly"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:397
+msgid "添加规则:人物在水中可跳跃"
+msgstr "Add rule: player can jump in the water"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:398
+msgid "添加规则:人物跳起的速度"
+msgstr "Add a rule: player jump up speed"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:399
+msgid "添加规则:人物可跑步"
+msgstr "Add rule: player can run"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:418
 msgid "执行命令%1"
 msgstr "run command %1"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:444
+msgid "关闭自动等待"
+msgstr "turn off auto_wait"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:17
 msgid "说 %1 持续 %2 秒"
@@ -2894,46 +3076,49 @@ msgstr "play animation in movie block"
 msgid "循环播放从%1到%2毫秒"
 msgstr "play looped from %1 to %2 ms"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:230
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:231
+msgid "骨骼%1从%2到%3并循环%4"
+msgstr "bone%1 from%2 to%3 looping%4"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:281
 msgid "播放速度%1"
 msgstr "play speed %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:258
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:309
 msgid "停止播放"
 msgstr "stop playing"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:270
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:321
 msgid "播放/暂停角色动画"
 msgstr "play/pause actor animation"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:282
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:333
 msgid "放缩百分之%1"
 msgstr "scale %1 percent"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:308
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:359
 msgid "放缩到百分之%1"
 msgstr "scale to %1 percent"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:346
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:374
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:397
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:913
 #: script/apps/Aries/Creator/Game/Movie/MovieClipController.html:67
 msgid "主角"
 msgstr "main player"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:366
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:418
 msgid "观看%1"
 msgstr "lookat %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:399
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:451
 msgid "摄影机距离%1角度%2朝向%3"
 msgstr "camera dist %1 pitch %2 yaw %3"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:440
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:492
 msgid "放缩尺寸"
 msgstr "scale"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:462
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:514
 msgid "动画时间"
 msgstr "animation time"
 
@@ -2950,84 +3135,95 @@ msgid "旋转到%1方向"
 msgstr "turn to %1 degree direction"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:112
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:140
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:268
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:228
 msgid "鼠标"
 msgstr "mouse"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:113
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:141
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:269
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:229
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:64
+msgid "摄影机"
+msgstr "Camera"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:114
 msgid "最近的玩家"
 msgstr "the closest player"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:134
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:135
 msgid "转向%1"
 msgstr "turn to %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:157
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:153
 msgid "转向鼠标,主角,指定角色"
 msgstr "turn to mouse pointer or given player"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:168
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:161
+msgid "面向摄影机"
+msgstr "face to camera"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:171
 msgid "位移%1 %2 %3 在%4秒内"
 msgstr "move %1 %2 %3 in %4 secs"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:213
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:216
 msgid "瞬移到%1 %2 %3"
 msgstr "move to %1 %2 %3"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:262
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:265
 msgid "瞬移到%1"
 msgstr "move to %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:285
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:283
 msgid "瞬移到主角，鼠标，指定角色"
 msgstr "teleport to main player, mouse pointer, given actor"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:296
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:291
+msgid "瞬移到角色的某个骨骼"
+msgstr "move to an actor's bone"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:303
 msgid "行走%1 %2 %3持续%4秒"
 msgstr "walk %1 %2 %3 for %4 seconds"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:341
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:348
 msgid "向前走%1持续%2秒"
 msgstr "Walk forward%1 for %2 secs"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:375
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:378
+msgid "恢复默认物理仿真"
+msgstr "restore default physics emulation"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:387
 msgid "速度%1"
 msgstr "set velocity %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:405
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:417
 msgid "反弹"
 msgstr "bounce"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:416
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:428
 msgid "遇到方块反弹"
 msgstr "bounce when touching blocks"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:429
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:441
 msgid "X坐标"
 msgstr "get X coordinate"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:447
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:459
 msgid "Y坐标"
 msgstr "get Y coordinate"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:468
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:480
 msgid "Z坐标"
 msgstr "get Z coordinate"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:486
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:498
 msgid "角色xyz位置"
 msgstr "actor xyz position"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:503
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:515
 msgid "设置角色位置%1 %2 %3"
 msgstr "set actor position %1 %2 %3"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:549
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Motion.lua:561
 #: script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html:16
 msgid "方向"
 msgstr "facing"
@@ -3139,93 +3335,105 @@ msgstr "a given block id"
 msgid "是否和方块与人物有接触"
 msgstr "touching blocks or actors?"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:59
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:66
 msgid "设置名字为%1"
 msgstr "set name to %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:77
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:84
 msgid "复制的对象也可有不同的名字"
 msgstr "cloned actor can have different names"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:94
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:101
 msgid "设置物理半径%1"
 msgstr "set physics radius %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:130
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:137
 msgid "设置物理高度%1"
 msgstr "set physics height %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:166
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:173
 msgid "当碰到%1时"
 msgstr "when touching%1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:202
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:208
+msgid "任意角色"
+msgstr "any actor"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:218
+msgid "某个组Id"
+msgstr "a given group id"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:230
 msgid "广播碰撞消息"
 msgstr "broadcast touch message"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:222
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:250
 msgid "到%1的距离"
 msgstr "distance to %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:260
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:289
 msgid "提问%1并等待回答"
 msgstr "ask %1 and wait "
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:265
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:266
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:294
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:295
 msgid "你叫什么名字?"
 msgstr "what is your name?"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:289
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:318
 msgid "关闭对话框"
 msgstr "close dialog"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:302
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:331
 msgid "提问的结果"
 msgstr "answer"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:327
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:356
 msgid "%1键是否按下"
 msgstr "is %1 key pressed?"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:377
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:406
 msgid "按键列表"
 msgstr "key list"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:387
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:416
 msgid "鼠标是否按下"
 msgstr "mouse down?"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:398
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:422
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:427
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:451
 msgid "点击任意位置传送"
 msgstr "Click anywhere to teleport"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:411
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:440
 msgid "鼠标选取"
 msgstr "mouse pick"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:433
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:462
 msgid "获取方块id%1 %2 %3"
 msgstr "get block id %1 %2 %3"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:480
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:505
+msgid "获取方块的Data数据"
+msgstr "get block data"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:514
 msgid "放置方块%1 %2 %3 %4"
 msgstr "set block %1 %2 %3 to %4"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:538
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:572
 msgid "计时器"
 msgstr "timer"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:559
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:593
 msgid "重置计时器"
 msgstr "reset timer"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:582
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:616
 msgid "设置为游戏模式"
 msgstr "set to game mode"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:598
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:632
 msgid "设置为编辑模式"
 msgstr "set to edit mode"
 
@@ -3233,126 +3441,103 @@ msgstr "set to edit mode"
 msgid "播放音符%1持续%2节拍"
 msgstr "play note %1 for %2 beats"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:93
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:125
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:159
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:203
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:90
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:146
 msgid "ogg文件"
 msgstr "ogg file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:94
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:126
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:160
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:204
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:91
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:147
 msgid "wav文件"
 msgstr "wav file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:95
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:127
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:161
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:205
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:92
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:148
 msgid "mp3文件"
 msgstr "mp3 file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:114
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:111
 msgid "播放背景音乐%1"
 msgstr "play background music %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:142
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:236
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:129
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:201
 msgid "播放音乐后停止"
 msgstr "Stop after playing music"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:158
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:202
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:145
 msgid "击碎"
 msgstr "break"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:162
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:206
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:149
 msgid "开箱"
 msgstr "open chest"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:163
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:207
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:150
 msgid "关箱"
 msgstr "close chest"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:164
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:208
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:151
 msgid "开门"
 msgstr "door open"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:165
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:209
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:152
 msgid "关门"
 msgstr "door closed"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:166
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:210
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:153
 msgid "点击"
 msgstr "click"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:167
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:211
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:154
 msgid "激活"
 msgstr "trigger"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:168
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:212
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:155
 msgid "溅射"
 msgstr "splash"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:169
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:213
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:156
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:637
 msgid "水"
 msgstr "Water"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:170
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:214
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:157
 msgid "吃"
 msgstr "eat"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:171
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:215
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:158
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:460
 msgid "爆炸"
 msgstr "explode"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:172
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:216
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:159
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:594
 msgid "升级"
 msgstr "leveup"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:173
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:217
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:160
 msgid "弹出"
 msgstr "pop"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:174
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:218
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:161
 msgid "掉下"
 msgstr "falldown"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:175
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:219
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:162
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:72
 msgid "火"
 msgstr "fire"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:176
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:220
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:163
 msgid "弓箭"
 msgstr "bow"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:177
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:221
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:164
 msgid "呼吸"
 msgstr "breath"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:196
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua:183
 msgid "播放MP3音乐%1"
 msgstr "play MP3 music file%1"
 
@@ -3378,7 +3563,7 @@ msgstr "Transform"
 
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCad.lua:29
 msgid "Set Ops"
-msgstr ""
+msgstr "Set Ops"
 
 #: script/apps/Aries/Creator/Game/Code/CodeCad/CodeCad.lua:31
 #: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:29
@@ -3524,15 +3709,6 @@ msgstr ""
 msgid "rotate extrude circle   offset %1 fn %2 r %3 "
 msgstr ""
 
-#: script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua:171
-#, lua-format
-msgid ""
-"运行时错误: %s\n"
-"在%s"
-msgstr ""
-"Runtime Error:%s\n"
-"in %s"
-
 #: script/apps/Aries/Creator/Game/Code/CodeHelpData.lua:63
 msgid "点击我打招呼"
 msgstr "Click me to say hello"
@@ -3541,7 +3717,7 @@ msgstr "Click me to say hello"
 msgid "显示/隐藏角色"
 msgstr "Show/hide characters"
 
-#: script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua:247
+#: script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua:254
 #, lua-format
 msgid "例子%d:"
 msgstr "Example %d:"
@@ -3655,12 +3831,12 @@ msgstr "visible chunk limit changed: %d mb"
 msgid "memory limit changed: %d mb"
 msgstr "memory limit changed: %d mb"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:433
+#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:437
 msgid "config/Aries/creator/Commands.xml"
 msgstr "config/Aries/creator/Commands.enUS.xml"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:521
-#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:524
+#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:525
+#: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:528
 msgid "命令列表"
 msgstr "Command list"
 
@@ -3677,13 +3853,13 @@ msgid "http://www.paracraft.cn/home/about-us"
 msgstr "http://www.paracraft.cn/home/about-us"
 
 #: script/apps/Aries/Creator/Game/Commands/CommandMenu.lua:165
-#: script/apps/Aries/Creator/Game/game_options.lua:124
+#: script/apps/Aries/Creator/Game/game_options.lua:126
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:129
 msgid "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 msgstr "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 
 #: script/apps/Aries/Creator/Game/Commands/CommandMenu.lua:171
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:48
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:54
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:126
 msgid "http://www.nplproject.com/paracraft-donation"
 msgstr "http://www.nplproject.com/paracraft-donation"
@@ -3729,19 +3905,6 @@ msgstr "Auto save mode turned off"
 #: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:65
 msgid "自动保存模式开启"
 msgstr "Auto save mode turned on"
-
-#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:156
-#: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:254
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:261
-#: script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua:415
-#: script/mobile/paracraft/Login/CreateNewWorld.lua:254
-#: script/mobile/paracraft/Login/LocalLoadWorld.lua:386
-msgid "无效的世界文件"
-msgstr "Invalid world filename"
-
-#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:169
-msgid "世界已经存在，是否重新下载?"
-msgstr "World already exist, do you want to download again?"
 
 #: script/apps/Aries/Creator/Game/Common/Translation.lua:241
 msgid "点击这里继续"
@@ -3980,10 +4143,6 @@ msgstr "Dog"
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:63
 msgid "可换装人物"
 msgstr "custom character"
-
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:64
-msgid "摄影机"
-msgstr "Camera"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:65
 msgid "雾气"
@@ -6800,6 +6959,7 @@ msgid "命令方块"
 msgstr "Command block"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:772
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:127
 msgid "电影方块"
 msgstr "Movie block"
 
@@ -7262,11 +7422,6 @@ msgstr "Book: Right Click to Read"
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:888
 msgid "木锄头"
 msgstr "Wooden hoe"
-
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:889
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:65
-msgid "代码"
-msgstr "program code"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:890
 msgid "程序代码:右键阅读"
@@ -8167,9 +8322,95 @@ msgstr "lie down"
 msgid "坐下"
 msgstr "sit down"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:80
-msgid "TODO"
-msgstr "TODO"
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:49
+msgid "输入新的文件名"
+msgstr "Enter a new file name"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:60
+msgid "模型另存为"
+msgstr "Save Model as"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:69
+#, lua-format
+msgid "文件 %s 已经存在, 是否覆盖?"
+msgstr ""
+"Template file %s already exists, do you want to overwrite existing file?"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:80
+msgid "保存成功"
+msgstr "Save Success"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:81
+#, lua-format
+msgid "动画模型成功保存到%s"
+msgstr "Animation model successfully saved to%s"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua:83
+msgid "无法复制文件"
+msgstr "Unable to copy file"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:102
+#, lua-format
+msgid "是否重新生成 %s?"
+msgstr "Do you want to regenerate%s?"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:210
+msgid "需要放在一组彩色方块的旁边才能生成模型"
+msgstr "Need to be placed next to a set of color block to generate a model"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:211
+msgid "我的附近没有发现像模型的彩色方块"
+msgstr "I don't find any color blocks that looks like a model."
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:241
+#, lua-format
+msgid "正在为%d个方块生产动画模型，可能需要10-20秒, 请耐心等待"
+msgstr ""
+"Animation model is being generated for %d blocks, it may take 10-20 seconds, "
+"please wait patiently"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:242
+msgid "我在思考中,需要10-20秒"
+msgstr "I'm thinking, it may take 10-20 seconds."
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:258
+#, lua-format
+msgid "我在思考中: %d秒"
+msgstr "I was thinking: %d seconds"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:364
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:365
+#, lua-format
+msgid "它看起来有点像 %s"
+msgstr "It looks a bit like%s"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:373
+#, lua-format
+msgid "人物模型已经保存到%s"
+msgstr "The character model has been saved to%s"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:379
+msgid "点击我"
+msgstr "Click me"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:389
+#, lua-format
+msgid "无法覆盖文件%s"
+msgstr "Unable to overwrite file%s"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:390
+msgid "出错了"
+msgstr "Something went wrong"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:393
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:394
+msgid "没有找到匹配的模型"
+msgstr "No matching model found"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityAnimModel.lua:471
+#, lua-format
+msgid "你最多可以用%d个方块创建人物"
+msgstr "you can create characters with up to %d blocks"
 
 #: script/apps/Aries/Creator/Game/Entity/EntityBlockBone.lua:55
 msgid "输入骨骼名称: 例如wheel, mount, right hand, etc"
@@ -8183,7 +8424,7 @@ msgstr "Ctrl+Right click on bone block to edit"
 msgid "输入摄影机的名字"
 msgstr "Enter camera name"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:212
+#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:309
 msgid "输入代码"
 msgstr "Enter your code"
 
@@ -8244,7 +8485,7 @@ msgstr ""
 msgid "输入初始化命令"
 msgstr "Enter initialization commands"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:270
+#: script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua:274
 msgid "输入HTML/MCML代码"
 msgstr "Please enter HTML/MCML code"
 
@@ -8406,7 +8647,7 @@ msgid "选择一个模型"
 msgstr "select a model"
 
 #: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:31
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:224
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:231
 msgid "全部"
 msgstr "All"
 
@@ -8650,6 +8891,8 @@ msgstr "ParaX 3D model exporter"
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:50
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:59
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:68
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:77
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:86
 msgid "系统内置插件"
 msgstr "system internal plugin"
 
@@ -8673,6 +8916,14 @@ msgstr "3D map with GIS"
 msgid "代码方块Web编辑器"
 msgstr "blockly web editor"
 
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:76
+msgid "蓝牙智能积木监控"
+msgstr "Bluetooth Intelligent building block monitoring"
+
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:85
+msgid "蓝牙模块"
+msgstr "Bluetooth module"
+
 #: script/apps/Aries/Creator/Game/Login/ChangeLanguagePage.html:23
 msgid "系统默认:"
 msgstr "System default:"
@@ -8690,14 +8941,14 @@ msgid "http://paracraft.keepwork.com/download?lang=zh"
 msgstr "http://paracraft.keepwork.com/download?lang=en"
 
 #: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:324
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:339
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:341
 #: script/mobile/paracraft/Login/CreateNewWorld.lua:324
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:410
 msgid "世界名字不能为空"
 msgstr "World name can not be empty"
 
 #: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:326
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:341
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:343
 #: script/mobile/paracraft/Login/CreateNewWorld.lua:326
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:412
 msgid "您不能使用这个名字, 请换个名字"
@@ -8738,9 +8989,9 @@ msgstr "random terrain"
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:147
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:356
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:432
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:333
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:388
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:480
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:336
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:391
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:483
 #: script/mobile/paracraft/GUI/HelpPage.html:499
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:59
 #: script/mobile/paracraft/Login/InternetLoadWorld.html:114
@@ -8764,20 +9015,20 @@ msgstr "World name can not be empty, enter the name of the world"
 msgid "世界名字太长了, 请重新输入"
 msgstr "World name is too long, please re-enter"
 
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:381
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:383
 #: script/mobile/paracraft/Login/CreateNewWorld.lua:361
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:442
 #, lua-format
 msgid "世界[%s]创建成功! 开始你的创造吧"
 msgstr "World [%s] created successfully! "
 
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:383
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:385
 #: script/mobile/paracraft/Login/CreateNewWorld.lua:363
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:444
 msgid "创建tag.xml出错了"
 msgstr "failed to create tag.xml"
 
-#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:390
+#: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:392
 #: script/mobile/paracraft/Login/CreateNewWorld.lua:370
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:451
 msgid "未知错误"
@@ -8904,50 +9155,50 @@ msgstr ""
 msgid "确定删除世界:%s?"
 msgstr "Are you sure to delete the world:%s?"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:358
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:360
 msgid "只有登录后才能查看自己在线世界和他人世界。"
 msgstr "You can only view online and other people's world after login. "
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:407
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:414
 msgid "请输入服务器IP地址, 例如: <br/>127.0.0.1 8099"
 msgstr "Please enter the server IP address, for example: <br/> 127.0.0.1 8099"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:422
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:430
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:339
 msgid "服务器地址不能为空"
 msgstr "Server address can not be empty"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:425
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:433
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:342
 msgid "服务器列表中已存在该服务器"
 msgstr "The server already exists in server list"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:436
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:444
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:353
 msgid "无法打开服务器页面"
 msgstr "can not open server list page"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:440
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:448
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:357
 msgid "请输入合法的HTTP地址或用户ID"
 msgstr "please enter correct HTTP address or user ID"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:592
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:600
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:511
 msgid "暂未开放敬请期待"
 msgstr "function not available yet"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:609
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:617
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:528
 msgid "你还没有登录世界 不能进行上传"
 msgstr "You have not signed in, and can not upload. "
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:646
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:654
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:565
 msgid "不能把别人的世界备份到本地。"
 msgstr "Cloning other people's world to local drive is not permitted"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:654
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:662
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:573
 #, lua-format
 msgid ""
@@ -8957,53 +9208,53 @@ msgstr ""
 "Local world already exist. Are you sure to use the server version: %s (last "
 "save time:%s) to overwrite local version: %s (last save time:%s)?"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:683
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:691
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:602
 #, lua-format
 msgid "世界%s: 正在下载中,请耐心等待"
 msgstr "world %s: downloading, please stand by"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:710
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:720
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:629
 #, lua-format
 msgid "世界%s: %s"
 msgstr "world %s: %s"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:804
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:814
 #: script/mobile/paracraft/Login/InternetLoadWorld.lua:723
 msgid "下载完成"
 msgstr "download complete"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:845
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:855
 msgid "名字不能全部为空"
 msgstr "name can not be all empty!"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:853
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:863
 #, lua-format
 msgid "你的昵称中包含非法语言:%s"
 msgstr "your name contains illegal letters: %s"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:856
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:866
 msgid "你还没有名字呢 不能保存！"
 msgstr "You do not have a name yet and can not save!"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:859
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:869
 msgid "你的昵称太长了 请挑选一个短点的吧。"
 msgstr "Your name is too long, please choose a shorter one. "
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:887
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:897
 msgid "改名成功"
 msgstr "Successfully renamed"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:890
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:900
 msgid "这个名称已经存在 换一个其他的吧。"
 msgstr "Name already exist, please try another one"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:892
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:902
 msgid "金币不足 修改名称失败"
 msgstr "Not enough gold, renaming failed"
 
-#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:894
+#: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:904
 #, lua-format
 msgid "暂时无法改名. 错误码%s"
 msgstr "Can not change name. Error code: %s"
@@ -9069,17 +9320,17 @@ msgstr ""
 "magic haqi, paracraft, keepwork, NPL CAD and many 3D client and server-side "
 "applications, and open sourced more than 1 million lines of NPL code."
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:13
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:35
 msgid "魔法哈奇"
 msgstr "Haqi"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:13
 #: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
 msgid "结交朋友，分享作品"
 msgstr "Make friends, share works"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:13
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
 msgid ""
 "魔法哈奇是使用Paracraft和NPL语言开发的3D儿童社区。它包含了3D卡牌战斗和众多社"
 "区玩法，同时内置了Paracraft创作工具。 用户可以在这里结交新朋友，一起玩游戏，"
@@ -9089,11 +9340,11 @@ msgstr ""
 "It includes 3D card battles, social gameplays, as well as built-in Paracraft "
 "authoring tools. Users can make new friends, play games and share their work."
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
 msgid "魔法哈奇2"
 msgstr "Haqi2"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
 msgid ""
 "魔法哈奇2是使用Paracraft和NPL语言开发的3D青年社区。它是魔法哈奇在2012-2014年"
 "发布的资料篇，内置了Paracraft创作工具。"
@@ -9102,15 +9353,15 @@ msgstr ""
 "language. It is a sequel to Haqi published in 2012-2014 with the built-in "
 "Paracraft authoring tool."
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
 msgid "获奖用户作品"
 msgstr "Recommended user works"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
 msgid "作品是最好的老师"
 msgstr "User work is the best teacher"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:15
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
 msgid ""
 "Paracraft创意空间获奖用户作品。分享你的作品，和同伴一起学习。作品可直接提交参"
 "加NPL大赛和国际智能创意大赛。"
@@ -9118,15 +9369,15 @@ msgstr ""
 "Paracraft user works. Share your work and learn with your peers. Works can "
 "be submitted directly to the online game and animation contest."
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:17
 msgid "Paracraft动画与编程教学视频"
 msgstr "Animation and Programming Tutorial Videos for Paracraft"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:17
 msgid "学会编程, 学会自学"
 msgstr "World of Coders and Self-learners!"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:16
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:17
 msgid ""
 "Paracraft是一个有15年历史的经历了大量工业实践检验的工业级别的软件生态系统。"
 "Paracraft作为编程学习的生态系统，从底层的科学理论到顶层的应用实践（游戏，动"
@@ -9143,6 +9394,400 @@ msgstr ""
 "underlying NPL AI language and C language, you will have an all-in-one "
 "programming learning system that is completely eco-friendly."
 
+#: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:18
+msgid "退出程序"
+msgstr "Exit application"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua:174
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:44
+msgid "登陆后才能访问课程系统, 请先登录"
+msgstr "Please login first to access the lesson system"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua:273
+#, lua-format
+msgid "课程包含%d个问题"
+msgstr "Lesson contains %d questions"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:29
+msgid "请输入你的名字"
+msgstr "Please enter your name."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:55
+#, lua-format
+msgid "课堂ID: %s"
+msgstr "Class ID:%s"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:57
+msgid "请选择进入课堂的方式"
+msgstr "Please choose the way to enter the classroom"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:61
+msgid "你的真实姓名:"
+msgstr "Your real name:"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:63
+msgid "(只有老师可见)"
+msgstr "(Only teacher can see it)"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:65
+msgid "临时进入"
+msgstr "Temporary enter"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:71
+msgid "登陆后可记录学习历程"
+msgstr "you can record learning history after signed in"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:72
+msgid "(推荐使用)"
+msgstr "(recommended)"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html:74
+msgid "登陆并进入"
+msgstr "Login and enter"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:34
+msgid "动画与编程导引课"
+msgstr "Animation and Programming Guide Lessons"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:37
+msgid "输入课程ID或项目ID"
+msgstr "enter class id or project id"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:41
+msgid "Paracraft动画与编程教学"
+msgstr "Paracraft Animation and Programming Tutorial Videos"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:41
+msgid "更多网课"
+msgstr "More lessons"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:52
+msgid "启动时显示"
+msgstr "Display at startup"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:32
+msgid "动画1教程：安装，活动和编辑模式"
+msgstr "Animation 1 Tutorial: Installation, activity, and editing modes"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:34
+msgid "告知用户如何安装软件，以及基本的一些操作快捷键和命令。"
+msgstr ""
+"Tell the user how to install the software, as well as some basic operating "
+"shortcuts and commands."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:38
+msgid "夏天游泳"
+msgstr "Summer Swimming"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:39
+msgid "动画6教程：课堂实例夏天游泳"
+msgstr "Animation 6 Tutorial: Classroom example swimming in summer"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:41
+msgid ""
+"运用之前所学的知识点，实例做出属于自己的短片：建造一个场景，在场景中加入演员"
+"角色以及动作编号，并完成拍摄。"
+msgstr ""
+"Using the previously learned points of knowledge, examples make their own "
+"short films: Build a scene, add actors and action numbers to the scene, and "
+"finish shooting."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:45
+msgid "简易动画开头"
+msgstr "Simple animation start"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:46
+msgid "动画7教程：进阶实例制作简易动画开头"
+msgstr "Animation 7 Tutorial: Advanced instance making simple animation start"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:48
+msgid ""
+"运用之前所学的知识点，实例做出属于自己的短片：调整演员的骨骼动作，和学习新的"
+"拍摄技巧，最后做出动画开头。"
+msgstr ""
+"Using the previously learned points of knowledge, examples to make their own "
+"short film: Adjust the actor's skeletal movements, and learn new shooting "
+"skills, and finally make the beginning of the animation."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:52
+msgid "简易bmax小吉他"
+msgstr "Simple Bmax Small Guitar"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:53
+msgid "动画9教程：课堂实例简易bmax小吉他"
+msgstr "Animation 9 Tutorial: Classroom Example Simple Bmax small guitar"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:55
+msgid ""
+"运用之前所学的知识点，实例做出属于自己的短片：做出bmax静态模型，将其保存后变"
+"成演员，利用人物动作+bmax道具拍摄出更多元化的小片段。"
+msgstr ""
+"Using the previously learned points of knowledge, examples make their own "
+"short film: Make Bmax static model, save it to become an actor, use the "
+"character action +bmax props to shoot a more diversified small fragments."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:59
+msgid "简易bmax小动画"
+msgstr "Simple Bmax Small Animation"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:60
+msgid "动画10教程：进阶实例简易bmax小动画"
+msgstr "Animation 10 Tutorial: Advanced instance simple Bmax small animation"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:62
+msgid ""
+"运用之前所学的知识点，实例做出属于自己的短片：将bmax变成演员，让它成为主角，"
+"并有属于自己的动作。"
+msgstr ""
+"Using the previously learned points of knowledge, examples to make their own "
+"short film: The Bmax into an actor, let it become the protagonist, and have "
+"their own actions."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:67
+msgid "编程基础"
+msgstr "Programming Basics"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:68
+msgid "编程教学：编程基础"
+msgstr "Animation and Programming Tutorial Videos for Paracraft"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:70
+msgid "学会使用代码方块，并学习使用代码控制演员。"
+msgstr "Learn to use code blocks and learn to control actors using code."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:75
+msgid "乒乓球游戏"
+msgstr "PingPong"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:76
+msgid "编程教学：乒乓球游戏"
+msgstr "Programming Teaching: Table tennis Games"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:78
+msgid ""
+"大概1960年，人类最早的一款计算机游戏就是乒乓游戏，我们来学习制作一下。本节课"
+"我们学习多个代码方块控制不同角色完成一个小游戏以及掌握paracraft里多个函数和控"
+"制语句。"
+msgstr ""
+"About 1960 years, the earliest human computer game is a ping-pong game, we "
+"come to learn to make. In this lesson we learn multiple code blocks to "
+"control different roles to complete a small game and master multiple "
+"functions and control statements in Paracraft."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:83
+msgid "迷宫游戏"
+msgstr "Maze Game"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:84
+msgid "编程教学：迷宫游戏"
+msgstr "Programming Teaching: Maze Games"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:86
+msgid ""
+"制作迷宫场景。本节课学习让角色上下左右的移动，检测是否接触以及如何控制摄影机"
+"视角。"
+msgstr ""
+"Create a maze scene. This lesson learns to move the characters up and down, "
+"detecting contact and how to control the camera's perspective."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:91
+msgid "钢琴"
+msgstr "Piano"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:92
+msgid "编程教学：钢琴"
+msgstr "Programming Teaching: Piano"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:94
+msgid ""
+"制作一个可以演奏的钢琴。本节课学习使用clone函数来克隆角色实现有多个重复角色的"
+"游戏。"
+msgstr ""
+"Make a piano that you can play. This lesson learns to use the Clone function "
+"to clone a role to implement a game with multiple repeating roles."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:98
+msgid "双重机关与事件"
+msgstr "Double keys and events"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:99
+msgid "编程教学：双重机关与事件"
+msgstr "Programming Teaching: Dual Institutions and events"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:101
+msgid ""
+"实现一个密码锁和双重机关。本节课学习如何使用全局变量和如何发布广播消息和接收"
+"广播消息。"
+msgstr ""
+"Implement a password lock and dual organ. This lesson learns how to use "
+"global variables and how to publish broadcast messages and receive broadcast "
+"messages."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:105
+msgid "全局变量"
+msgstr "Global variables"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:106
+msgid "编程教学：全局变量"
+msgstr "Programming Teaching: Global variables"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:108
+msgid "本节课学习如何使用全局变量，学习如何获取用户输入。"
+msgstr "Learn how to use global variables and handle user input"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:113
+msgid "创建方块"
+msgstr "Create blocks"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:114
+msgid "动画2教程：创建方块"
+msgstr "Animation 2 Tutorial: Creating blocks"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:116
+msgid "熟悉掌握更多的基础操作和命令，认识方块以及如何搭建方块。"
+msgstr ""
+"Be familiar with more basic operations and commands, know blocks and how to "
+"build blocks."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:120
+msgid "批量操作"
+msgstr "Bulk operations"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:121
+msgid "动画3教程：批量操作"
+msgstr "Animation 3 Tutorial: Bulk Operations"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:123
+msgid ""
+"掌握更多有用的热键和操作，和一些在搭建中所用到的工具等，让你开始像专业人士一"
+"样创建3D世界。"
+msgstr ""
+"Learn more useful hotkeys and operations, and some of the tools used in the "
+"build, so you can start creating 3D worlds like professionals."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:128
+msgid "动画4教程：电影方块"
+msgstr "Animation 4 Tutorial: Movie Blocks"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:130
+msgid ""
+"介绍电影方块，学习如何在时间轴上用关键帧移动相机来进行拍摄、加入字幕、添加演"
+"员角色等知识。"
+msgstr ""
+"Introduce movie blocks and learn how to move your camera with keyframes on "
+"the timeline to shoot, add captions, and get cast characters."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:134
+msgid "演员和动画"
+msgstr "Actors and animations"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:135
+msgid "动画5教程：演员和动画"
+msgstr "Animation 5 Tutorial: Actors and animations"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:137
+msgid ""
+"重点介绍角色演员骨骼的使用方法，以及如何给予人物动作，让他在我们的电影片段中"
+"做出想要的动作。"
+msgstr ""
+"This article focuses on the use of the character's skeleton, and how to give "
+"the character action, so that he can make the desired action in our film "
+"section."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:142
+msgid "BMAX模型"
+msgstr "Bmax model"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:143
+msgid "动画8教程：BMAX模型"
+msgstr "Animation 8 Tutorial: Bmax model"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:145
+msgid "认识BMAX模型并去学习它如何搭建、保存以及使用。"
+msgstr "Recognize the Bmax model and learn how it is built, saved, and used."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:150
+msgid "制作图形界面"
+msgstr "Create a graphical interface"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:151
+msgid "编程教学：制作图形界面"
+msgstr "Programming Teaching: Making graphical interfaces"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:153
+msgid "本节课学习制作图形界面动画和响应事件。"
+msgstr ""
+"This lesson learns to make graphical interface animations and respond to "
+"events."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:158
+msgid "代码方块的输出"
+msgstr "Output of code blocks"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:159
+msgid "编程教学：代码方块的输出"
+msgstr "Programming Teaching: Output of code blocks"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:161
+msgid ""
+"本节课学习如何实现代码方块的输出和实现不用点击开关激活方块就可以开始游戏。"
+msgstr ""
+"This lesson learns how to implement the output and implementation of code "
+"blocks to start the game without clicking on the switch to activate the "
+"block."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:165
+msgid "跳一跳"
+msgstr "jump and jump"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:166
+msgid "编程教学：跳一跳"
+msgstr "Programming Teaching: Jumping"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:168
+msgid ""
+"制作跳一跳游戏，随机出现方块,并跳跃过去。 本节课学习使用多个代码方块和电影方"
+"块编写复杂点的小游戏和学习广播消息的大量运用。"
+msgstr ""
+"Make a jump game, randomly appear squares, and jump past. This lesson learns "
+"to use multiple code blocks and movie blocks to write complex points of "
+"small games and learn a lot about the use of broadcast messages."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:173
+msgid "编程基础2"
+msgstr "Programming Fundamentals 2"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:174
+msgid "编程教学：编程基础2"
+msgstr "Programming Teaching: Fundamentals of Programming 2"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:176
+msgid "这节课里我们学习如何创建和控制多个角色"
+msgstr "In this lesson we learn how to create and control multiple roles"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:336
+msgid "请求中，请稍等..."
+msgstr "Requesting, please wait a moment ..."
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:365
+#, lua-format
+msgid "无法加入课堂. 错误码: %d"
+msgstr "Unable to join the classroom. Error code:%d"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:440
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:446
+#, lua-format
+msgid "没有找到课程%d"
+msgstr "Lesson %d not found"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:501
+msgid "点击图标打开课程学习页面"
+msgstr "Click on the icon to open the learning page"
+
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:505
+msgid "学习完毕可领取奖励~"
+msgstr "Finish learning to get reward"
+
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:30
 msgid "paracraft创意空间"
 msgstr "Paracraft"
@@ -9151,67 +9796,67 @@ msgstr "Paracraft"
 msgid "魔法哈奇-青年版"
 msgstr "Haqi2"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:364
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:395
 msgid "官方应用"
 msgstr "Official application"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:428
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:459
 msgid "应用在安装中, 请等待"
 msgstr "Application is in the installation, please wait"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:458
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:520
 msgid "预下载版本号"
 msgstr "Pre-download version number"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:460
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:522
 msgid "正在下载版本信息"
 msgstr "Downloading version information"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:462
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:524
 msgid "版本验证完毕"
 msgstr "Version Verification complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:465
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:527
 msgid "无法获取版本信息"
 msgstr "Unable to get version information"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:467
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:529
 msgid "资源列表预下载"
 msgstr "Resource list pre-download"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:469
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:531
 msgid "资源列表下载中"
 msgstr "Resources List in download"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:471
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:533
 msgid "已经获取资源列表"
 msgstr "A list of resources has been obtained"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:474
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:536
 msgid "无法获取资源列表"
 msgstr "Unable to get list of resources"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:476
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:538
 msgid "准备下载资源文件"
 msgstr "Preparing to download the resource file"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:502
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:564
 msgid "全部资源下载完成"
 msgstr "All Resources Download complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:509
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:571
 msgid "无法获取资源"
 msgstr "Unable to get resource"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:513
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:575
 msgid "正在安装更新"
 msgstr "Installing updates"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:515
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:577
 msgid "安装完成"
 msgstr "Installation Complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:522
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:584
 msgid "无法应用更新"
 msgstr "Cannot apply update"
 
@@ -9265,39 +9910,39 @@ msgstr ""
 "%s\n"
 "version:%s"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:38
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:44
 #, lua-format
 msgid "当前Mod:%s"
 msgstr "Current Mod:%s"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:52
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:58
 msgid "https://keepwork.com/official/paracraft/credits"
 msgstr "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:83
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:89
 msgid "学会编程, 学会学习"
 msgstr "World of Coders and Self-learners!"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:86
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:114
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:92
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:120
 msgid "点击任意位置继续"
 msgstr "Click anywhere to continue"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:95
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:101
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:143
 msgid "MOD加载..."
 msgstr "mod/plugins ..."
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:101
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:107
 msgid "开发者模式"
 msgstr "developer mode"
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:108
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:114
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:144
 msgid "语言..."
 msgstr "Language..."
 
-#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:111
+#: script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html:117
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:190
 msgid "捐赠"
 msgstr "Donate Us !"
@@ -9408,12 +10053,18 @@ msgstr "loading world %s, please stand by"
 msgid "Loading ..."
 msgstr "Loading ..."
 
+#: script/apps/Aries/Creator/Game/Login/TeacherAgent/ButtonTooltip.html:24
+msgid "点击打开"
+msgstr "click to open"
+
 #: script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua:99
 msgid ""
-"安装URL Protocol, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理员权限)"
+"安装paracraft://URL协议后, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理"
+"员权限)"
 msgstr ""
-"URL Protocol allows opening 3D worlds from web browser, would like to "
-"install it now? (You may need administrator right)"
+"After installing the paracraft://url protocol, we can open 3D world from any "
+"web browsers. Do you want to install it now? (administrator privileges may "
+"be required)"
 
 #: script/apps/Aries/Creator/Game/Materials/TexturePackage.lua:254
 msgid "材质包"
@@ -9458,7 +10109,7 @@ msgstr "Start time %s, please enter scaling factor (default to 1)"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCommands.lua:93
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:31
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:622
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:625
 msgid "全局"
 msgstr "global"
 
@@ -9916,7 +10567,7 @@ msgstr "3d rotation(3,3)"
 msgid "大小 (4键)"
 msgstr "scaling (4)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:493
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:496
 msgid "无法添加关键帧。可能电影方块中的角色已经满了, 删除一个再试试看"
 msgstr ""
 "can not add key frame. may be actors in movie block is full, try delete one "
@@ -10209,7 +10860,7 @@ msgid "人物在锁定模式不可运动(L键可解锁)"
 msgstr "Can not move actor in lock mode (Press L key to unlock)"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:190
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:175
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:178
 msgid "放弃建造"
 msgstr "Abandon construction"
 
@@ -10218,7 +10869,7 @@ msgid "一键完成"
 msgstr "Click once deploy"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:196
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:177
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:180
 #: script/mobile/paracraft/GUI/HelpPage.html:212
 msgid "开始建造"
 msgstr "Begin construction"
@@ -10246,12 +10897,12 @@ msgid "修改描述"
 msgstr "Change description"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:455
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:510
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:513
 msgid "所需资源"
 msgstr "Resource requirements"
 
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.html:467
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:522
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:525
 msgid "该主题当前没有任务"
 msgstr "no task for current topic"
 
@@ -10351,16 +11002,16 @@ msgstr ""
 msgid "请先选择物体, Ctrl+左键多次点击场景可选择"
 msgstr "Please select blocks first,  Ctrl+left-clicks to select"
 
-#: script/apps/Aries/Creator/Game/Tasks/ExportTask.lua:149
+#: script/apps/Aries/Creator/Game/Tasks/ExportTask.lua:150
 msgid "请输入bmax文件名称"
 msgstr "Please enter bmax file name"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:254
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:257
 #: script/mobile/paracraft/GUI/HelpPage.html:289
 msgid "当前选项无模板"
 msgstr "No template for current category"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:525
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.html:528
 msgid "请稍等 ..."
 msgstr "Please wait..."
 
@@ -10373,7 +11024,7 @@ msgstr "Command Help"
 msgid "快捷操作"
 msgstr "Shortcut key"
 
-#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:222
+#: script/apps/Aries/Creator/Game/Tasks/HelpPage.lua:229
 msgid "动作编号"
 msgstr "Action Number"
 
@@ -10459,7 +11110,7 @@ msgstr "turn selected blocks to real terrain"
 msgid "回车键确认操作"
 msgstr "Press Enter key to confirm the operation"
 
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:1081
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:1084
 msgid "保存成功! Ctrl+V在鼠标所在位置粘贴！"
 msgstr "Successfully saved! Ctrl+V to paste to mouse position."
 
@@ -10576,25 +11227,25 @@ msgstr "version %d has already been backed up before"
 msgid "返回上个世界"
 msgstr "Return to last world"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:594
+#: script/apps/Aries/Creator/Game/game_logic.lua:605
 msgid "编辑模式被锁定"
 msgstr "edit mode is locked"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:633
+#: script/apps/Aries/Creator/Game/game_logic.lua:644
 msgid "您打开的是只读世界，无法保存。是否另存为本地世界?"
 msgstr ""
 "You are opening a read-only world and cannot be saved. Save as a local world?"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:666
+#: script/apps/Aries/Creator/Game/game_logic.lua:677
 #, lua-format
 msgid "保存成功 [版本:%d]"
 msgstr "succesfully saved [version:%d]"
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:914
+#: script/apps/Aries/Creator/Game/game_logic.lua:927
 msgid "你挂了, 将被传送到出生点"
 msgstr "You died, and will be teleported to spawn pos."
 
-#: script/apps/Aries/Creator/Game/game_logic.lua:961
+#: script/apps/Aries/Creator/Game/game_logic.lua:974
 msgid "只读世界不能进行这个操作"
 msgstr "Read-only world does not support this operation."
 
@@ -10603,30 +11254,30 @@ msgid "http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=51"
 msgstr "http://www.paracraft.cn/"
 
 #: script/apps/Aries/Creator/Game/game_options.lua:122
-msgid "http://www.paracraft.cn/"
-msgstr "http://www.paracraft.cn/"
+msgid "https://keepwork.com/official/creativeTimes/latest"
+msgstr ""
 
-#: script/apps/Aries/Creator/Game/game_options.lua:123
-msgid "http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=50"
-msgstr "http://www.paracraft.cn/"
+#: script/apps/Aries/Creator/Game/game_options.lua:125
+msgid "https://tieba.baidu.com/f?kw=%E9%AD%94%E6%B3%95%E5%93%88%E5%A5%87"
+msgstr ""
 
-#: script/apps/Aries/Creator/Game/game_options.lua:361
+#: script/apps/Aries/Creator/Game/game_options.lua:365
 msgid "是否观看在线教程(快捷键F1)?"
 msgstr "Do you want to watch online tutorial (hotkey F1)?"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:408
+#: script/apps/Aries/Creator/Game/game_options.lua:412
 msgid "只读"
 msgstr "Read-only"
 
-#: script/apps/Aries/app_main.lua:2309
+#: script/apps/Aries/app_main.lua:2325
 msgid "加载当中,请稍等(首次需要3-5分钟)"
 msgstr "Loading, please wait (first time load needs 1-2 minutes)"
 
-#: script/apps/Aries/app_main.lua:2375
+#: script/apps/Aries/app_main.lua:2391
 msgid "正在加载请耐心等待"
 msgstr "Loading, Please wait"
 
-#: script/apps/Aries/app_main.lua:2390
+#: script/apps/Aries/app_main.lua:2406
 msgid "下载世界资源，请稍等(首次需要3-5分钟)"
 msgstr ""
 "Downloading world asset, please wait (first time load may take 1-5 minutes)"
@@ -11088,6 +11739,81 @@ msgid ""
 msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
+
+#~ msgid "输入课程ID"
+#~ msgstr "Enter Lesson ID"
+
+#~ msgid "输入课程ID或服务器地址"
+#~ msgstr "Enter class id or server address"
+
+#~ msgid "数据源不存在，请联系管理员"
+#~ msgstr "Data source does not exist, please contact administrator"
+
+#~ msgid "数据源配置文件不存在"
+#~ msgstr "Data source configuration file does not exist"
+
+#~ msgid "检查站点失败"
+#~ msgstr "Failed to check website"
+
+#~ msgid "数据源异常"
+#~ msgstr "Data source exception"
+
+#~ msgid "本地数据错误"
+#~ msgstr "Local database error"
+
+#~ msgid "获取sha文件失败"
+#~ msgstr "failed to fetch file sha"
+
+#~ msgid "当角色被复制时"
+#~ msgstr "when this actor is cloned"
+
+#~ msgid "复制%1"
+#~ msgstr "clone %1"
+
+#~ msgid "当收到%1消息时"
+#~ msgstr "when receive%1"
+
+#~ msgid "任意变量"
+#~ msgstr "any variable"
+
+#~ msgid "未分类"
+#~ msgstr "Uncategorized"
+
+#~ msgid "我的收藏"
+#~ msgstr "My favorites"
+
+#~ msgid "教学世界"
+#~ msgstr "Tutorial world"
+
+#~ msgid "历史记录功能即将到来"
+#~ msgstr "The history feature is coming soon"
+
+#~ msgid "http://paracraft.keepwork.com/"
+#~ msgstr "http://paracraft.keepwork.com/"
+
+#~ msgid "http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=50"
+#~ msgstr "http://www.paracraft.cn/"
+
+#~ msgid "代码方块上线了~"
+#~ msgstr "Code Block Is Online~"
+
+#~ msgid "自主动画系统即将上线"
+#~ msgstr "Autonomous Animation System Is Coming"
+
+#~ msgid "创作百科"
+#~ msgstr "Creation Wiki"
+
+#~ msgid "TODO"
+#~ msgstr "TODO"
+
+#~ msgid ""
+#~ "安装URL Protocol, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理员权限)"
+#~ msgstr ""
+#~ "URL Protocol allows opening 3D worlds from web browser, would like to "
+#~ "install it now? (You may need administrator right)"
+
+#~ msgid "http://www.paracraft.cn/"
+#~ msgstr "http://www.paracraft.cn/"
 
 #~ msgid "使用KeepWork登录"
 #~ msgstr "Login with KeepWork"
