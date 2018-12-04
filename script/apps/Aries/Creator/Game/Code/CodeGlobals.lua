@@ -34,6 +34,8 @@ function CodeGlobals:ctor()
 		commonlib = commonlib,
 		type = type,
 		unpack = unpack,
+		setmetatable = setmetatable,
+		getmetatable = getmetatable,
 		math = { abs = math.abs, acos = math.acos, asin = math.asin, 
 			  atan = math.atan, atan2 = math.atan2, ceil = math.ceil, cos = math.cos, 
 			  cosh = math.cosh, deg = math.deg, exp = math.exp, floor = math.floor, 

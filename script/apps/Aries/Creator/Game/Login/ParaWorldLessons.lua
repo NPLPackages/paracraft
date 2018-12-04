@@ -302,10 +302,15 @@ end
 function ParaWorldLessons.OnClickEnterWorld()
 	if(ParaWorldLessons.page) then
 		local txtLessonId = ParaWorldLessons.page:GetValue("txtLessonId", "");
+
 		if(txtLessonId and txtLessonId~="") then
-			ParaWorldLessons.EnterWorldById(txtLessonId);
-		else
-			-- TODO: 
+			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+			local pid = UserConsole:GetProjectId(txtLessonId)
+			if pid then
+				UserConsole:HandleWorldId(pid)
+			else
+				ParaWorldLessons.EnterWorldById(txtLessonId);
+			end
 		end
 	end
 end
