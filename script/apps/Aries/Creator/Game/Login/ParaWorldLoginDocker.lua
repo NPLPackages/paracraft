@@ -213,8 +213,8 @@ function ParaWorldLoginDocker.OnInit()
 	ParaWorldLoginDocker.StaticInit();
 	ParaWorldLoginDocker.page = document:GetPageCtrl();
 	
-	if(System.options.paraworldapp == "user_worlds") then
-		ParaWorldLoginDocker.OnClickApp("user_worlds");
+	if(System.options.paraworldapp == "user_worlds" or System.options.paraworldapp == "tutorial_worlds") then
+		ParaWorldLoginDocker.OnClickApp(System.options.paraworldapp);
 	end
 end
 

@@ -1,14 +1,16 @@
 --[[
-	Title: ParaWorldAnalytics
-	Author(s): LiXizhi
-	Date: 2018/10/29
-	Desc: send user event every 30 seconds to google analytics in batch.
+Title: ParaWorldAnalytics
+Author(s): DavidZhang, LiXizhi
+Date: 2018/10/29
+Desc: send user event every 30 seconds to google analytics in batch.
+visit: https://analytics.google.com/ to see the result, using `dafuwangluo@gmail.com`
 
-	use the lib:
-	-------------------------------------------------------
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
-	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
-	ParaWorldAnalytics:new():Init()
+use the lib:
+-------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
+ParaWorldAnalytics:new():Init()
+ParaWorldAnalytics:Send("category", "action", "value", "moreInfo")
 	-------------------------------------------------------
 ]]
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
@@ -19,12 +21,17 @@ end
 
 
 function ParaWorldAnalytics:Init(UA)
+	if(self.inited) then
+		return
+	end
+	self.inited = true;
+
 	-- official ua number
 	self.UA = UA or "UA-129101625-1"
 
-	self.user_id = self._user_id()
-	self.client_id = self._client_id()
-	self.app_name = self._app_name()
+	self.user_id = self:_user_id()
+	self.client_id = self:_client_id()
+	self.app_name = self:_app_name()
 	self.app_version = System.options.ClientVersion
 	self.api_rate = 4
 
@@ -112,4 +119,18 @@ end
 
 function ParaWorldAnalytics:SendEvent(event)
 	self:GetAnalyticsClient():SendEvent(event);
+end
+
+-- @param category: which category that the event belongs
+-- @param action: which kind of action that the event do
+-- @param value: what exactly the action does
+-- @param label: more details about action
+function ParaWorldAnalytics:Send(category, action, value, label)
+	self:Init()
+	return self:SendEvent({
+		category = category,
+		action = action,
+		value = value,
+		label = label,
+	});
 end
