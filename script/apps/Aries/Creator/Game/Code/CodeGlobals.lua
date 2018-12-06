@@ -54,8 +54,7 @@ function CodeGlobals:ctor()
 			  upper = string.upper },
 		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
-			getn = table.getn,
-			sort = table.sort },
+			getn = table.getn, sort = table.sort, concat = table.concat },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 
 		real = function(bx,by,bz)
@@ -113,7 +112,13 @@ function CodeGlobals:ctor()
 				new_class = commonlib.gettable(new_class, self:GetCurrentGlobals());
 			end
 			return commonlib.inherit(baseClass, new_class, ctor);
-		end
+		end,
+		saveUserData = function(name, value, bIsGlobal, bDeferSave)
+			return GameLogic.GetPlayerController():SaveLocalUserWorldData(name, value, bIsGlobal, bDeferSave)
+		end,
+		loadUserData = function(name, default_value, bIsGlobal)
+			return GameLogic.GetPlayerController():LoadLocalUserWorldData(name, default_value, bIsGlobal)
+		end,
 	};
 
 	self:Reset();

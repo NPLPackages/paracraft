@@ -101,6 +101,7 @@ local s_env_methods = {
 	-- Sound
 	"playNote",
 	"playSound",
+	"stopSound",
 	"playMusic",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")

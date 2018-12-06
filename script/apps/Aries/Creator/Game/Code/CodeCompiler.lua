@@ -55,9 +55,11 @@ function CodeCompiler:InjectCheckYieldToCode(code)
 end
 
 function CodeCompiler:Compile(code)
-	local code_func, errormsg = loadstring(self:InjectCheckYieldToCode(code), self:GetFilename());
-	if(not code_func and errormsg) then
-		LOG.std(nil, "error", "CodeBlock", self.errormsg);
+	if(code and code~="") then
+		local code_func, errormsg = loadstring(self:InjectCheckYieldToCode(code), self:GetFilename());
+		if(not code_func and errormsg) then
+			LOG.std(nil, "error", "CodeBlock", self.errormsg);
+		end
+		return code_func, errormsg;
 	end
-	return code_func, errormsg;
 end

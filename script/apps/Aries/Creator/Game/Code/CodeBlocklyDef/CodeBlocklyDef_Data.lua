@@ -838,6 +838,74 @@ a:print()
 },
 },
 
+
+{
+	type = "saveUserData", 
+	message0 = L"保存用户数据%1为%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "text", value = "name",},
+			text = "name", 
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "text", value = "value",},
+			text = "value", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'saveUserData(%s, %s)',
+	ToNPL = function(self)
+		return string.format('saveUserData("%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"存储本地世界的用户数据", canRun = true, code = [[
+saveUserData("score", 1)
+saveUserData("user", {a=1})
+local score = loadUserData("score", 0)
+assert(score == 1)
+]]}},
+},
+
+{
+	type = "loadUserData", 
+	message0 = L"加载用户数据%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "actorProperties", value = "name",},
+			text = "name", 
+		},
+		{
+			name = "defaultvalue",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "", 
+		},
+	},
+	category = "Data", 
+	output = {type = "field_variable",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'loadUserData(%s, %s)',
+	ToNPL = function(self)
+		return string.format('loadUserData("%s", "%s")', self:getFieldAsString('name'), self:getFieldAsString('defaultvalue'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+saveUserData("score", 1)
+local score = loadUserData("score", 0)
+assert(score == 1)
+]]}},
+},
+
+
 {
 	type = "code_block", 
 	message0 = L"代码%1",

@@ -76,10 +76,20 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
     local sound_name = channel_name;
 	local sound = self.playingSounds[sound_name];
 	if(filename) then
-		filename = Files.GetWorldFilePath(filename);
+		local filename_ = Files.GetWorldFilePath(filename);
+		if(filename_) then
+			filename = filename_;
+		else
+			local soundTemplate = AudioEngine.Get(filename)
+			if(soundTemplate) then
+				filename = soundTemplate.file;
+			else
+				filename = nil;
+			end
+		end
 	end
     if (sound) then
-        if(filename and self.file ~= filename) then
+        if(filename and sound.file ~= filename) then
 			sound:SetFileName(filename);
 		end
 		if(from_time) then
@@ -93,7 +103,7 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
             AudioEngine.Stop(sound_name);
         end
 		local new_sound = AudioEngine.CreateGet(sound_name);
-		new_sound.file = filename or if_else(new_sound.file~="",  new_sound.file, Files.GetWorldFilePath(sound_name));
+		new_sound.file = filename or (new_sound.file~="" and new_sound.file or Files.GetWorldFilePath(sound_name));
 		if(not new_sound.file) then
 			LOG.std(nil, "warn", "SoundManager", "sound: %s does not exist. \n", sound_name);
 			return 

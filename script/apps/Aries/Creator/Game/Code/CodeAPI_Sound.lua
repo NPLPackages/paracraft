@@ -8,6 +8,8 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
@@ -19,14 +21,22 @@ function env_imp:playNote(note, beat)
 	env_imp.wait(self, beat);
 end
 
+-- play a sound 
+-- @param channel_name: channelname or filename, where filename can be relative to current world or a predefined name
+function env_imp:playSound(channel_name, filename, from_time, volume, pitch)
+	filename = filename or channel_name;
+	SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
+	env_imp.checkyield(self);
+end
+
 -- same as /sound [filename]
-function env_imp:playSound(filename)
-	GameLogic.RunCommand("/sound "..(filename or ""));
-	env_imp.wait(self, env_imp.GetDefaultTick(self));
+function env_imp:stopSound(filename)
+	SoundManager:StopSound(filename)
+	env_imp.checkyield(self);
 end
 
 -- same as /music [filename]
 function env_imp:playMusic(filename)
 	GameLogic.RunCommand("/music "..(filename or ""));
-	env_imp.wait(self, env_imp.GetDefaultTick(self));
+	env_imp.checkyield(self);
 end

@@ -232,36 +232,50 @@ end
 
 -- @param degree: [-180, 180] or "mouse-pointer" or "@p" for current player, or any actor name
 -- or "camera" for current camera
-function env_imp:turnTo(degree)
+-- @param roll, pitch: can be nil. or degree can be yaw
+function env_imp:turnTo(degree, roll, pitch)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		if(type(degree) == "number") then
-			self.actor:SetFacing(degree*math.pi/180);
-		elseif(degree == "mouse-pointer") then
-			local result = SelectionManager:MousePickBlock(true, false, false); 
-			if(result and result.blockX) then
-				local x, y, z = entity:GetBlockPos();
-				if(result.blockX ~= x or result.blockZ ~= z) then
-					local facing = Direction.GetFacingFromOffset(result.blockX - x, result.blockY - y, result.blockZ - z);
-					self.actor:SetFacing(facing);
+		if(roll or pitch) then
+			local obj = entity:GetInnerObject();
+			if(obj) then
+				if(type(roll) == "number") then
+					obj:SetField("roll", roll*math.pi/180);
+				end
+				if(type(pitch) == "number") then
+					obj:SetField("pitch", pitch*math.pi/180);
 				end
 			end
-		elseif(degree == "camera") then
-			local pos = Cameras:GetCurrent():GetEyePosition()
-			local x, y, z = entity:GetPosition();
-			local x2, y2, z2 = pos[1], pos[2], pos[3]
-			if(x2 ~= x or z2 ~= z) then
-				local facing = Direction.GetFacingFromOffset(x2 - x, y2 - y, z2 - z);
-				self.actor:SetFacing(facing);
-			end
-		elseif(type(degree) == "string") then
-			local entity2 = GameLogic.GetCodeGlobal():FindEntityByName(degree);
-			if(entity2) then
-				local x2, y2, z2 = entity2:GetBlockPos();
-				local x, y, z = entity:GetBlockPos();
+		end
+		if(degree) then
+			if(type(degree) == "number") then
+				self.actor:SetFacing(degree*math.pi/180);
+			elseif(degree == "mouse-pointer") then
+				local result = SelectionManager:MousePickBlock(true, false, false); 
+				if(result and result.blockX) then
+					local x, y, z = entity:GetBlockPos();
+					if(result.blockX ~= x or result.blockZ ~= z) then
+						local facing = Direction.GetFacingFromOffset(result.blockX - x, result.blockY - y, result.blockZ - z);
+						self.actor:SetFacing(facing);
+					end
+				end
+			elseif(degree == "camera") then
+				local pos = Cameras:GetCurrent():GetEyePosition()
+				local x, y, z = entity:GetPosition();
+				local x2, y2, z2 = pos[1], pos[2], pos[3]
 				if(x2 ~= x or z2 ~= z) then
 					local facing = Direction.GetFacingFromOffset(x2 - x, y2 - y, z2 - z);
 					self.actor:SetFacing(facing);
+				end
+			elseif(type(degree) == "string") then
+				local entity2 = GameLogic.GetCodeGlobal():FindEntityByName(degree);
+				if(entity2) then
+					local x2, y2, z2 = entity2:GetBlockPos();
+					local x, y, z = entity:GetBlockPos();
+					if(x2 ~= x or z2 ~= z) then
+						local facing = Direction.GetFacingFromOffset(x2 - x, y2 - y, z2 - z);
+						self.actor:SetFacing(facing);
+					end
 				end
 			end
 		end

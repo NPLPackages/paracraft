@@ -98,7 +98,15 @@ end
 turnTo(-60)
 wait(1)
 turnTo(0)
-]]}},
+]]},
+{desc = L"三轴旋转", canRun = true, code = [[
+turnTo(0, 0, 45)
+wait(1)
+turnTo(0, 45, 0)
+wait(1)
+turnTo(0, nil, 45)
+]]}
+},
 },
 
 {

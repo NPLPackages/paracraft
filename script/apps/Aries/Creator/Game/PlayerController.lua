@@ -331,6 +331,12 @@ function PlayerController:OnPlayerRightClick(player, x,y,z, mouse_button)
 	player = player or EntityManager.GetPlayer();
 end
 
+-- save local user data for a given world
+function PlayerController:SaveLocalUserWorldData(name, value, bIsGlobal, bDeferSave)
+	name = GameLogic.GetWorldDirectory()..(name or "")
+	return self:SaveLocalData(name, value, bIsGlobal, bDeferSave)
+end
+
 function PlayerController:SaveLocalData(name, value, bIsGlobal, bDeferSave)
 	local ls = System.localserver.CreateStore(nil, 3, if_else(System.options.version == "teen", "userdata.teen", "userdata"));
 	if(not ls) then
@@ -362,6 +368,12 @@ function PlayerController:SaveLocalData(name, value, bIsGlobal, bDeferSave)
 	else	
 		LOG.std("", "warn","Player", "failed saving local user data %s to local server", tostring(url))
 	end
+end
+
+-- load local user data for a given world
+function PlayerController:LoadLocalUserWorldData(name, default_value, bIsGlobal)
+	name = GameLogic.GetWorldDirectory()..(name or "")
+	return self:LoadLocalData(name, default_value, bIsGlobal)
 end
 
 function PlayerController:LoadLocalData(name, default_value, bIsGlobal)
