@@ -315,7 +315,7 @@ end
 
 function CodeHelpItem:ShowArgumentDropDownWnd(x, y, callbackFunc)
 	local params = {
-			url = "script/apps/Aries/Creator/Game/Code/CodeArgumentDropDown.html", 
+			url = format("script/apps/Aries/Creator/Game/Code/CodeArgumentDropDown.html?x=%d&y=%d", x or mouse_x or 0, y or mouse_y or 0), 
 			name = "CodeHelpItem.DropDown.ShowPage", 
 			isShowTitleBar = false,
 			DestroyOnClose = true,
@@ -328,11 +328,11 @@ function CodeHelpItem:ShowArgumentDropDownWnd(x, y, callbackFunc)
 			isTopLevel = true,
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
-				align = "_lt",
-				x = x,
-				y = y,
-				width = 400,
-				height = 200,
+				align = "_fi",
+				x = 0,
+				y = 0,
+				width = 0,
+				height = 0,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
@@ -340,8 +340,6 @@ function CodeHelpItem:ShowArgumentDropDownWnd(x, y, callbackFunc)
 			callbackFunc(CodeHelpItem.curDropDownSelectedIndex);
 		end
 	end
-	local used_width, used_height = params._page:GetUsedSize();
-	params._page:GetWindow():MoveWindow(x, y, used_width, used_height);
 end
 
 function CodeHelpItem.GetCurrentDropDownIndex()

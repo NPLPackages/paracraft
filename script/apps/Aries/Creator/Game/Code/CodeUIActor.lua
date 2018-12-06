@@ -435,8 +435,9 @@ local internalValues = {
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
-	["roll"] = {setter = Actor.SetRollDegree, getter = Actor.GetRollDegree, isVariable = false}, 
-	["pitch"] = {setter = Actor.SetPitchDegree, getter = Actor.GetPitchDegree, isVariable = false}, 
+	-- tricky: pitch and roll are reversed
+	["pitch"] = {setter = Actor.SetRollDegree, getter = Actor.GetRollDegree, isVariable = false}, 
+	["roll"] = {setter = Actor.SetPitchDegree, getter = Actor.GetPitchDegree, isVariable = false}, 
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 

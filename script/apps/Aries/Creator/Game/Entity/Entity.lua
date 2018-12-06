@@ -1214,33 +1214,32 @@ function Entity:SetRotation(facing, pitch)
 	end
 end
 
+-- rotation around Z axis
 function Entity:SetRoll(roll)
 	local obj = self:GetInnerObject();
 	if(obj) then
-		-- tricky: because actor is facing positive X, roll is actually pitch in C++
-		obj:SetField("pitch", roll or 0);
+		obj:SetField("roll", roll or 0);
 	end
 end
 
+-- rotation around Z axis
 function Entity:GetRoll(roll)
 	local obj = self:GetInnerObject();
-	-- tricky: because actor is facing positive X, roll is actually pitch in C++
-	return obj and obj:GetField("pitch", 0) or 0;
+	return obj and obj:GetField("roll", 0) or 0;
 end
 
-
+-- rotation around X axis
 function Entity:SetPitch(pitch)
 	local obj = self:GetInnerObject();
 	if(obj) then
-		-- tricky: because actor is facing positive X, pitch is actually roll in C++
-		obj:SetField("roll", pitch or 0);
+		obj:SetField("pitch", pitch or 0);
 	end
 end
 
+-- rotation around X axis
 function Entity:GetPitch()
 	local obj = self:GetInnerObject();
-	-- tricky: because actor is facing positive X, pitch is actually roll in C++
-	return obj and obj:GetField("roll", 0) or 0;
+	return obj and obj:GetField("pitch", 0) or 0;
 end
 
 -- Sets the entity's position and rotation. it will correct y so it will snap to ground. 

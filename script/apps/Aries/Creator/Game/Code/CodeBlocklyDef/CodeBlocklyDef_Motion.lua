@@ -184,6 +184,13 @@ while(true) do
     turnTo("camera")
     wait(0.01)
 end
+]]},
+{desc = L"面向摄影机", canRun = true, code = [[
+-- camera yaw and pitch
+while(true) do
+    turnTo("camera", "camera")
+    wait(0.01)
+end
 ]]}
 },
 },

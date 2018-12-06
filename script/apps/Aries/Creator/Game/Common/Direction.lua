@@ -202,6 +202,17 @@ function Direction.GetFacingFromOffset(dx, dy, dz)
 	end
 end
 
+function Direction.GetPitchFromOffset(dx, dy, dz)
+	local len = dx^2+dy^2+dz^2;
+	if(len>0.0000001) then
+		len = math.sqrt(len)
+		local pitch = math.asin(dy/len);
+		return pitch;
+	else
+		return 0;
+	end
+end
+
 -- @return [0,5] based on camera position
 function Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z)
 	local dx, dy, dz = math3d.CameraToWorldSpace(0, 0 ,1, camx,camy,camz, lookat_x,lookat_y,lookat_z);

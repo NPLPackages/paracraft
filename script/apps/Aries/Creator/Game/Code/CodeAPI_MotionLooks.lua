@@ -232,16 +232,27 @@ end
 
 -- @param degree: [-180, 180] or "mouse-pointer" or "@p" for current player, or any actor name
 -- or "camera" for current camera
--- @param pitch, roll: can be nil. or degree can be yaw
+-- @param pitch, roll: can be nil. or degree can be yaw. pitch can also be "camera"
 function env_imp:turnTo(degree, pitch, roll)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		if(roll or pitch) then
+			-- tricky: pitch and roll are reversed
 			if(type(roll) == "number") then
-				entity:SetRoll(roll*math.pi/180)
+				entity:SetPitch(roll*math.pi/180)
 			end
-			if(type(pitch) == "number") then
-				entity:SetPitch(pitch*math.pi/180);
+			if(pitch) then
+				if(type(pitch) == "number") then
+					entity:SetRoll(pitch*math.pi/180);
+				elseif(pitch == "camera") then
+					local pos = Cameras:GetCurrent():GetEyePosition()
+					local x, y, z = entity:GetPosition();
+					local x2, y2, z2 = pos[1], pos[2], pos[3]
+					if(x2 ~= x or z2 ~= z) then
+						pitch = Direction.GetPitchFromOffset(x2 - x, y2 - y, z2 - z);
+						entity:SetRoll(pitch);
+					end
+				end
 			end
 		end
 		if(degree) then
