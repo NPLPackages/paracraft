@@ -232,19 +232,16 @@ end
 
 -- @param degree: [-180, 180] or "mouse-pointer" or "@p" for current player, or any actor name
 -- or "camera" for current camera
--- @param roll, pitch: can be nil. or degree can be yaw
-function env_imp:turnTo(degree, roll, pitch)
+-- @param pitch, roll: can be nil. or degree can be yaw
+function env_imp:turnTo(degree, pitch, roll)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		if(roll or pitch) then
-			local obj = entity:GetInnerObject();
-			if(obj) then
-				if(type(roll) == "number") then
-					obj:SetField("roll", roll*math.pi/180);
-				end
-				if(type(pitch) == "number") then
-					obj:SetField("pitch", pitch*math.pi/180);
-				end
+			if(type(roll) == "number") then
+				entity:SetRoll(roll*math.pi/180)
+			end
+			if(type(pitch) == "number") then
+				entity:SetPitch(pitch*math.pi/180);
 			end
 		end
 		if(degree) then

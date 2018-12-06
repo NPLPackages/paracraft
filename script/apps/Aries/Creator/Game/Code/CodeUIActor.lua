@@ -405,12 +405,38 @@ function Actor:GetGroupId()
 	return self.groupId;
 end
 
+function Actor:SetRollDegree(degree)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetRoll(degree/180*math.pi);
+	end
+end
+
+function Actor:GetRollDegree()
+	local entity = self:GetEntity();
+	return entity and (entity:GetRoll()*180/math.pi) or 0;
+end
+
+function Actor:SetPitchDegree(degree)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetPitch(degree/180*math.pi);
+	end
+end
+
+function Actor:GetPitchDegree()
+	local entity = self:GetEntity();
+	return entity and (entity:GetPitch()*180/math.pi) or 0;
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
+	["roll"] = {setter = Actor.SetRollDegree, getter = Actor.GetRollDegree, isVariable = false}, 
+	["pitch"] = {setter = Actor.SetPitchDegree, getter = Actor.GetPitchDegree, isVariable = false}, 
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 

@@ -287,6 +287,8 @@ end
 				{ "y", "y" },
 				{ "z", "z" },
 				{ L"朝向", "facing" },
+				{ L"俯仰角度", "pitch" },
+				{ L"翻滾角度", "roll" },
 				{ L"颜色", "color" },
 				{ L"文字", "text" },
 				{ L"是否为化身", "isAgent" },

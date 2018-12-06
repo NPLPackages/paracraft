@@ -105,7 +105,20 @@ wait(1)
 turnTo(0, 45, 0)
 wait(1)
 turnTo(0, nil, 45)
-]]}
+]]},
+{desc = "", canRun = true, code = [[
+while(true) do
+    setActorValue("pitch", getActorValue("pitch")+2)
+    say(getActorValue("pitch"))
+    wait()
+end
+]]},
+{desc = "", canRun = true, code = [[
+while(true) do
+    turnTo(nil, nil, getActorValue("roll")+2)
+    wait()
+end
+]]},
 },
 },
 
