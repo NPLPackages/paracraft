@@ -10,8 +10,11 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
 local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
 ParaWorldAnalytics:new():Init()
+-- send directly
 ParaWorldAnalytics:Send("category", "action", "value", "moreInfo")
-	-------------------------------------------------------
+-- send via user event filter
+GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id, "block");
+-------------------------------------------------------
 ]]
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
 local ParaWorldAnalytics = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics"))

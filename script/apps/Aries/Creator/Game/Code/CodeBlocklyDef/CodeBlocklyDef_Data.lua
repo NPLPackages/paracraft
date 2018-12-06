@@ -875,12 +875,12 @@ assert(score == 1)
 
 {
 	type = "loadUserData", 
-	message0 = L"加载用户数据%1",
+	message0 = L"加载用户数据%1默认值%2",
 	arg0 = {
 		{
 			name = "name",
 			type = "input_value",
-			shadow = { type = "actorProperties", value = "name",},
+			shadow = { type = "text", value = "name",},
 			text = "name", 
 		},
 		{
