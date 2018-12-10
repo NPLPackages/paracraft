@@ -54,8 +54,6 @@ function DestroyBlock:Run()
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data,
 				});
 
-				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy", block_id, "single");
-
 				if(dropped_itemStack) then
 					-- automatically pick the block when deleted. 
 					if(entityPlayer) then

@@ -20,7 +20,7 @@ end
 
 function ShareWorldPage.ShowPage()
 	-- FIXME World share mod take control of the share actions
-	-- GameLogic.GetFilters():apply_filters("user_event_stat", "world", "share", GameLogic.world.seed, nil);
+	-- GameLogic.GetFilters():apply_filters("user_event_stat", "world", "share."..tostring(GameLogic.world.seed), 10, nil);
 
 	if(not GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true)) then
 		return false;

@@ -543,7 +543,8 @@ function GameLogic.LoadGame()
 	GameLogic:WorldLoaded()
 	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
 
-	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter", GameLogic.world.seed, nil);
+	local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
+	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter:"..tostring(worldname), 3, "world");
 end
 
 function GameLogic.Pause()

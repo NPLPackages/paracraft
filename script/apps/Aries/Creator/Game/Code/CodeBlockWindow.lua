@@ -344,8 +344,7 @@ function CodeBlockWindow.OnClickCompileAndRun()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if(codeBlock and codeBlock:GetEntity()) then
-		GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
-
+		-- GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
 		CodeBlockWindow.UpdateCodeToEntity();
 		codeBlock:GetEntity():Restart();
 	end

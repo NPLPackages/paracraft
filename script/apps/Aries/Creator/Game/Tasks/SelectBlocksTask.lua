@@ -1040,12 +1040,10 @@ end
 -- global function to delete a group of blocks. 
 -- @param bFastDelete: if true, we will delete blocks without generating new undergound blocks. 
 function SelectBlocks.DeleteSelection(bFastDelete)
-	GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy", nil, "chunk");
+	GameLogic.GetFilters():apply_filters("user_event_stat", "block", "DeleteSelection", 1, nil);
 
 	if(bFastDelete) then
 		SelectBlocks.FillSelection(0);
-
-		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "delete", nil, "chunk");
 	elseif(cur_selection and #cur_selection > 0) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DestroyNearbyBlocksTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.DestroyNearbyBlocks:new({

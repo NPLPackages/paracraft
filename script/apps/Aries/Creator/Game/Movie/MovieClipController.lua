@@ -272,7 +272,7 @@ end
 function MovieClipController.OnClickAddNPC()
 	local movieClip = MovieClipController.GetMovieClip();
 	if(movieClip) then
-		GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "add", nil, nil);
+		GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "addNPC", 2, nil);
 
 		local itemStack = movieClip:CreateNPC();
 		if(itemStack) then

@@ -280,7 +280,7 @@ function InternetLoadWorld.DeleteSelectedWorld()
 	_guihelper.MessageBox(format(L"确定删除世界:%s?", world.text or ""), function(res)
 		LOG.std(nil, "info", "InternetLoadWorld", "ask to delete world %s", world.text or "");
 		if(res and res == _guihelper.DialogResult.Yes) then
-			GameLogic.GetFilters():apply_filters("user_event_stat", "world", "delete", nil, nil);
+			GameLogic.GetFilters():apply_filters("user_event_stat", "world", "delete:"..tostring(world.text), nil, nil);
 
 			if(world.RemoveLocalFile and world:RemoveLocalFile()) then
 				InternetLoadWorld.RefreshAll();

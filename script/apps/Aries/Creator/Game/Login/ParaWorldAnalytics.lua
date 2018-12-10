@@ -11,9 +11,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
 local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
 ParaWorldAnalytics:new():Init()
 -- send directly
-ParaWorldAnalytics:Send("category", "action", "value", "labelTag")
+ParaWorldAnalytics:Send("category", "action", 0, "labelTag")
 -- send via user event filter
-GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id, "block");
+GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick.62", 1, "block");
 -------------------------------------------------------
 ]]
 local GoogleAnalytics = NPL.load("GoogleAnalytics")
@@ -120,10 +120,10 @@ function ParaWorldAnalytics:SendEvent(event)
 	self:GetAnalyticsClient():SendEvent(event);
 end
 
--- @param category: which category that the event belongs
--- @param action: which kind of action that the event do
--- @param value: what exactly the action does
--- @param label: tag or label of the action
+-- @param category: string, which category that the event belongs
+-- @param action: string, details about the event
+-- @param value: nil or a number, how important this action is. 
+-- @param label: string, additional tag or label of the action.
 function ParaWorldAnalytics:Send(category, action, value, label)
 	self:Init()
 	return self:SendEvent({

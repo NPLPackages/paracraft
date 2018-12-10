@@ -246,6 +246,76 @@ for i=1, 10, 1 do
 end
 ]]}},
 },
+
+
+{
+	type = "expression_compare", 
+	message0 = L"%1 %2 %3",
+	arg0 = {
+		{
+			name = "left",
+-- TODO: nested shadow blocks are not supported
+--			type = "input_value",
+--          shadow = { type = "getLocalVariable", value = "status",},
+			type = "field_input",
+			text = "status",
+		},
+		{
+			name = "op",
+			type = "field_dropdown",
+			options = {
+				{ "==", "==" },{ "!=", "!=" },
+			},
+		},
+		{
+			name = "right",
+-- TODO: nested shadow blocks are not supported
+--			type = "input_value",
+--          shadow = { type = "text", value = "start",},
+			type = "field_input",
+			text = "\"start\"",
+		},
+	},
+	hide_in_toolbox = true,
+	output = {type = "field_number",},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '((%s) %s (%s))',
+	ToNPL = function(self)
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "wait_until", 
+	message0 = L"等待直到%1为真",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+			shadow = { type = "expression_compare", },
+			text = "status == \"start\""
+		},
+    },
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'repeat wait() until(%s)',
+	ToNPL = function(self)
+		return string.format('repeat wait() until(%s)\n', self:getFieldAsString('expression'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+status = "gameStarted"
+repeat wait() until(status == "gameStarted")
+say("game started")
+]]}},
+},
+
 {
 	type = "control_if", 
 	message0 = L"如果%1那么",

@@ -379,7 +379,7 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 
 						node.actor:SetCurrentEditVariableIndex(tonumber(node.Name));
 
-						GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "edit", nil, node.actor:GetEditableVariable().name);
+						GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "edit:"..tostring(node.actor:GetEditableVariable().name), 1, nil);
 
 						Game.SelectionManager:selectedActorVariableChanged(node.actor:GetEditableVariable(), node.actor);
 					end

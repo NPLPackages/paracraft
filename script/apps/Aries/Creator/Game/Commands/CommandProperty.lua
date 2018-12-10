@@ -58,6 +58,7 @@ Examples:
 /property MaxCacheRegionCount 16
 /property set -camera IgnoreEyeBlockCollisionInSunlight false
 /property -scene MaxCharTriangles 50000
+/property -scene MinPopUpDistance 100
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local set_get, objPath, name, value;

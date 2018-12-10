@@ -100,9 +100,9 @@ end
 -- clicked a block item
 function BuilderFramePage.OnClickBlock(block_id_or_item)
 	if type(block_id_or_item) == "table" then
-		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id_or_item.block_id, "block");
+		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick:"..tostring(block_id_or_item.block_id), 1, "block");
 	else
-		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick", block_id_or_item, "block");
+		GameLogic.GetFilters():apply_filters("user_event_stat", "tool", "pick:"..tostring(block_id_or_item), 1, "block");
 	end
 
 	local search_text_obj = ParaUI.GetUIObject("block_search_text_obj");
@@ -124,7 +124,7 @@ end
 
 -- right click a block item, show help
 function BuilderFramePage.OnHelpBlock(block_id)
-	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", block_id, "block");
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse:"..tostring(block_id), 2, "block");
 
 	GameLogic.RunCommand("/wiki "..tostring(block_id));
 end

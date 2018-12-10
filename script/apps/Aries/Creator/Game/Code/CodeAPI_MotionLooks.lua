@@ -196,11 +196,17 @@ function env_imp:moveTo(x, y, z)
 				end
 			end
 		elseif(x and y) then
-			local ox,oy,oz = entity:GetBlockPos();
 			if(not z) then
+				local ox,oy,oz = entity:GetBlockPos();
 				y,z = oy, y;
 			end
-			self.actor:SetBlockPos(x,y,z);
+			
+			-- we will move using real position which fixed a bug that moveTo() does not work 
+			-- when we are already inside the target block
+			x,y,z = BlockEngine:real_min(x+0.5, y, z+0.5);
+			self.actor:SetPosition(x, y, z);
+			-- self.actor:SetBlockPos(x,y,z);
+
 			env_imp.checkyield(self);
 		end
 	end

@@ -399,7 +399,7 @@ end
 
 -- exit the process 
 function Desktop.ForceExit(bRestart)
-	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "exit", GameLogic.world.seed, nil);
+	GameLogic.GetFilters():apply_filters("user_event_stat", "desktop", "ForceExit", nil, nil);
 
 	local platform = System.os.GetPlatform();
 	if(platform == "android" or platform == "ios" ) then

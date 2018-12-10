@@ -307,7 +307,7 @@ function CreateNewWorld.OnClickCreateWorld()
 
 	LOG.std(nil, "info", "CreateNewWorld", params);
 
-	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "create", nil, nil);
+	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "create:"..tostring(world_name), 10, nil);
 
 	local worldpath, error_msg = CreateNewWorld.CreateWorld(params);
 	if(not worldpath) then
