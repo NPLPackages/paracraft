@@ -54,7 +54,6 @@ function Map3DSystem.ReBindEventHandlers(params)
 	
 	-- start UI animation framework.
 	NPL.load("(gl)script/ide/UIAnim/UIAnimManager.lua");
-	UIAnimManager.Init();
 	
 	-- so that we can generate the onsize event in input application. 
 	ParaUI.GetUIObject("root").onsize=";Map3DSystem.OnScreenSize();"

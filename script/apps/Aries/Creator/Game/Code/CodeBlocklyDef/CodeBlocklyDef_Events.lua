@@ -401,6 +401,8 @@ end
 				{ L"设置最大人物多边形数目", "/property -scene MaxCharTriangles 500000"},
 				{ L"禁用自动人物细节", "/lod off"},
 				{ L"关闭自动等待", "/autowait false"},
+				{ L"隐藏物品栏", "/hide desktop"},
+				{ L"显示物品栏", "/show desktop"},
 			},
 		},
 	},

@@ -185,7 +185,7 @@ end
 function CommandManager:RunFromConsole(cmd, player)
 	local cmd_class, cmd_name, cmd_text = self:GetCmdByString(cmd);
 
-	GameLogic.GetFilters():apply_filters("user_event_stat", "cmd", "execute:"..tostring(cmd_name), 2, cmd_name);
+	GameLogic.GetFilters():apply_filters("user_event_stat", "cmd", "execute:"..tostring(cmd_name), 2, nil);
 
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then

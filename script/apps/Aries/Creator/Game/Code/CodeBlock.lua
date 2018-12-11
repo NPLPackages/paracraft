@@ -360,20 +360,19 @@ function CodeBlock:IsActorPickingEnabled()
 end
 
 -- private: 
-function CodeBlock:CreateFirstActorInMovieBlock()
-	local movie_entity = self:GetMovieEntity();
-	if(movie_entity) then
-		if movie_entity and movie_entity.inventory then
-			for i = 1, movie_entity.inventory:GetSlotCount() do
-				local itemStack = movie_entity.inventory:GetItem(i)
-				if (itemStack and itemStack.count > 0) then
-					if (itemStack.id == block_types.names.TimeSeriesNPC) then
-						return CodeActor:new():Init(itemStack, movie_entity);
-					elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
-						return CodeUIActor:new():Init(itemStack, movie_entity);
-					end
-				end 
-			end
+-- @param movie_entity: can be nil
+function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
+	movie_entity = movie_entity or self:GetMovieEntity();
+	if movie_entity and movie_entity.inventory then
+		for i = 1, movie_entity.inventory:GetSlotCount() do
+			local itemStack = movie_entity.inventory:GetItem(i)
+			if (itemStack and itemStack.count > 0) then
+				if (itemStack.id == block_types.names.TimeSeriesNPC) then
+					return CodeActor:new():Init(itemStack, movie_entity);
+				elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
+					return CodeUIActor:new():Init(itemStack, movie_entity);
+				end
+			end 
 		end
 	end
 end

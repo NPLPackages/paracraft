@@ -53,12 +53,44 @@ function ParaWorldLoginDocker.DisableExternalUrlLinks()
 	end
 end
 
+-- get the application name on the working directory. 
+function ParaWorldLoginDocker.GetSourceAppName()
+	local name = ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "");
+	if(name=="" and commonlib.Files.GetDevDirectory()=="") then
+		if(System.options.mc) then
+			name = "paracraft";
+		elseif(System.options.version == "kids") then
+			name = "haqi";
+		elseif(System.options.version == "teen") then
+			name = "haqi2";
+		end
+	end
+	return name or "";
+end
+
+function ParaWorldLoginDocker.GetCurrentAppName()
+	if(System.options.mc) then
+		name = "paracraft";
+	elseif(System.options.version == "kids") then
+		name = "haqi";
+	elseif(System.options.version == "teen") then
+		name = "haqi2";
+	end
+	return name or "paracraft";
+end
+
 -- call this once
 function ParaWorldLoginDocker.InitParaWorldClient()
 	if(ParaWorldLoginDocker.isInited) then
 		return true;
 	end
 	ParaWorldLoginDocker.isInited = true;
+
+	-- start paraworld analytics
+	ParaWorldAnalytics = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	ParaWorldAnalytics:Send("start."..(ParaWorldLoginDocker.GetCurrentAppName() or ""), ParaWorldAnalytics:AppendDateToTag("user"), 0, nil);
+	
+	
 	NPL.load("npl_packages/ParacraftBuildinMod/");
 	commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
 
@@ -140,27 +172,13 @@ local app_install_details = {
 	},
 	["haqi2"] = {
 		title=L"魔法哈奇-青年版", hasParacraft = false, 
+		allowQQHall = true,
 		mergeHaqiPKGFiles = true, -- we will always apply the latest version of haqi pkg on top of this one. 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" partner="keepwork" config="config/GameClient.config.xml"',
 		-- cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" config="config/GameClient.config.xml"',
 		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
 	},
 }
-
--- get the application name on the working directory. 
-function ParaWorldLoginDocker.GetSourceAppName()
-	local name = ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "");
-	if(name=="" and commonlib.Files.GetDevDirectory()=="") then
-		if(System.options.mc) then
-			name = "paracraft";
-		elseif(System.options.version == "kids") then
-			name = "haqi";
-		elseif(System.options.version == "teen") then
-			name = "haqi2";
-		end
-	end
-	return name or "";
-end
 
 -- whether the given application is already loaded. 
 function ParaWorldLoginDocker.IsLoadedApp(name)
@@ -212,8 +230,8 @@ end
 function ParaWorldLoginDocker.OnInit()
 	ParaWorldLoginDocker.StaticInit();
 	ParaWorldLoginDocker.page = document:GetPageCtrl();
-	
-	if(System.options.paraworldapp == "user_worlds" or System.options.paraworldapp == "tutorial_worlds") then
+
+	if(System.options.paraworldapp == "user_worlds" or System.options.paraworldapp == "tutorial_worlds" or System.options.paraworldapp == "haqi2") then
 		ParaWorldLoginDocker.OnClickApp(System.options.paraworldapp);
 	end
 end
@@ -273,7 +291,7 @@ end
 
 
 function ParaWorldLoginDocker.OnClickApp(name)
-	GameLogic.GetFilters():apply_filters("user_event_stat", "paraworld", "DockerClick:"..tostring(name), 5, name);
+	GameLogic.GetFilters():apply_filters("user_event_stat", "paraworld", "DockerClick:"..tostring(name), 5, nil);
 
 	if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
@@ -580,8 +598,17 @@ end
 -- @param callbackFunc: function(bInstalled) end
 function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 	if(System.options.isFromQQHall) then
-		ParaWorldLoginDocker.ForceExitApp()
-		return;
+		if(appName=="haqi2") then
+			-- tricky: QQ hall always has haqi installed, so skip it and proceed to haqi2
+			ParaWorldLoginDocker.haqiInstalled = true;
+		elseif(appName=="paracraft_games") then
+			ParaWorldLoginDocker.ForceExitApp()
+		else
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+			return;
+		end
 	end
 
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
@@ -594,6 +621,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 
 	if(ParaWorldLoginDocker.IsInstalling()) then
 		_guihelper.MessageBox(L"应用在安装中, 请等待");
+		if(callbackFunc) then
+			callbackFunc(false)
+		end
 		return true;
 	end
 	local appVersion = ParaWorldLoginDocker.GetAppVersionInfo(appName);
@@ -662,6 +692,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
             elseif(state == State.VERSION_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取版本信息");
+				if(callbackFunc) then
+					callbackFunc(false)
+				end
             elseif(state == State.PREDOWNLOAD_MANIFEST)then
                 DownloadWorld.UpdateProgressText(L"资源列表预下载");
             elseif(state == State.DOWNLOADING_MANIFEST)then
@@ -671,6 +704,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
             elseif(state == State.MANIFEST_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取资源列表");
+				if(callbackFunc) then
+					callbackFunc(false)
+				end
             elseif(state == State.PREDOWNLOAD_ASSETS)then
 				DownloadWorld.UpdateProgressText(L"准备下载资源文件");
 				local nowTime = 0
@@ -706,6 +742,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
             elseif(state == State.ASSETS_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取资源");
+				if(callbackFunc) then
+					callbackFunc(false)
+				end
             elseif(state == State.PREUPDATE)then
                 
             elseif(state == State.UPDATING)then
@@ -719,6 +758,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
             elseif(state == State.FAIL_TO_UPDATED)then
 				ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法应用更新");
+				if(callbackFunc) then
+					callbackFunc(false)
+				end
             end    
         end
     end);

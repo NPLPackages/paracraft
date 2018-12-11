@@ -614,7 +614,7 @@ function BaseContext:TryDestroyBlock(result, is_allow_delete_terrain)
 			if(EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
 				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, is_allow_delete_terrain=is_allow_delete_terrain})
 				task:Run();
-				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy:"..tostring(block_template.id), 1, "single");
+				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy:"..tostring(block_template.id), 1, nil);
 			end
 		elseif(result.entity) then
 			local bx, by, bz = result.entity:GetBlockPos();
@@ -622,7 +622,7 @@ function BaseContext:TryDestroyBlock(result, is_allow_delete_terrain)
 			if(block_template and block_template:CanDestroyBlockAt(bx, by, bz)) then
 				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = bx,blockY = by, blockZ = bz, })
 				task:Run();
-				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy:"..tostring(block_template.id), 1, "single");
+				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy:"..tostring(block_template.id), 1, nil);
 			end
 		else
 			-- if there is no block, we may have hit the terrain. 
@@ -682,13 +682,13 @@ function BaseContext:OnCreateBlock(result)
 		-- for special blocks. 
 		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = block_id, side = result.side, entityPlayer = EntityManager.GetPlayer()})
 		task:Run();
-		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id), 1, "single");
+		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id), 1, nil);
 	else
 		local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
 		local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
 		local alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
 		
-		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id or result.block_id), 1, "single");
+		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id or result.block_id), 1, nil);
 
 		if(GameLogic.GameMode:IsEditor()) then
 			if(alt_pressed and shift_pressed) then

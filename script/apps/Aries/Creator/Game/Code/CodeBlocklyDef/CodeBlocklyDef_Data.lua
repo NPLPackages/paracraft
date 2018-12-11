@@ -286,6 +286,7 @@ end
 				{ "x", "x" },
 				{ "y", "y" },
 				{ "z", "z" },
+				{ L"时间", "time" },
 				{ L"朝向", "facing" },
 				{ L"俯仰角度", "pitch" },
 				{ L"翻滾角度", "roll" },
@@ -294,6 +295,8 @@ end
 				{ L"是否为化身", "isAgent" },
 				{ L"模型文件", "assetfile" },
 				{ L"绘图代码", "rendercode" },
+				{ L"电影方块的位置", "movieblockpos" },
+				{ L"电影角色", "movieactor" },
 			},
 		},
 	},
@@ -351,7 +354,17 @@ setActorValue("name", "Default")
 setActorValue("color", "#ff0000")
 clone("myself", "Cloned")
 say("click us!")
-]]}},
+]]},
+{desc = L"改变角色的电影方块", canRun = true, code = [[
+local pos = getActorValue("movieblockpos")
+pos[3] = pos[3] + 1
+setActorValue("movieblockpos", pos)
+]]},
+{desc = L"改变电影角色", canRun = true, code = [[
+setActorValue("movieactor", 1)
+setActorValue("movieactor", "name1")
+]]},
+},
 },
 
 {

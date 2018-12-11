@@ -740,7 +740,7 @@ end
 function CodeBlockWindow.OnOpenTutorials()
 	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/codeblock", "", "", 1);
 
-	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse", nil, "code");
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse.codeblock", nil, nil);
 end
 
 -- Redirect this object as a scene context, so that it will receive all key/mouse events from the scene. 

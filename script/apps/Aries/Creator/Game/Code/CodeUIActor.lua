@@ -133,7 +133,10 @@ function Actor:SetBlockPos(bx, by, bz)
 				entity:SetScreenPos(bx, by, bz);
 			end
 		else
-			entity:SetBlockPos(bx, by, bz);
+			-- we will move using real position which fixed a bug that moveTo() does not work 
+			-- when we are already inside the target block
+			bx, by, bz = BlockEngine:real_min(bx+0.5, by, bz+0.5);
+			entity:SetPosition(bx, by, bz);
 		end
 	end
 end
@@ -429,8 +432,117 @@ function Actor:GetPitchDegree()
 	return entity and (entity:GetPitch()*180/math.pi) or 0;
 end
 
+-- @param actorName: if nil or 1, it is the first one in movie block
+-- if number it is the actor index in movie block, if string, it is its actor name
+function Actor:SetMovieActor(actorName)
+	actorName = actorName or 1;
+	local movie_entity = self:GetMovieClipEntity();
+	if(not movie_entity) then
+		return
+	end
+	if(type(actorName) == "number") then
+		local index = 0;
+		for i = 1, movie_entity.inventory:GetSlotCount() do
+			local itemStack = movie_entity.inventory:GetItem(i)
+			if (itemStack and itemStack.count > 0) then
+				if (itemStack.id == block_types.names.TimeSeriesOverlay) then
+					index = index + 1;
+					if(index == actorName) then
+						local entity = self:GetEntity()
+						if(entity) then
+							local x, y, z = entity:GetPosition()
+							local facing = entity:GetFacing()
+							self:DestroyEntity();
+							self:Init(itemStack, movie_entity);
+							self:FrameMove(self:GetTime(), false);
+							entity = self:GetEntity();
+							if(not entity:IsScreenMode()) then
+								entity:SetPosition(x,y,z);
+								entity:SetFacing(facing);
+							end
+						end
+					end
+				end
+			end 
+		end
+	elseif(type(actorName) == "string" and actorName~="") then
+		for i = 1, movie_entity.inventory:GetSlotCount() do
+			local itemStack = movie_entity.inventory:GetItem(i)
+			if (itemStack and itemStack.count > 0) then
+				if (itemStack.id == block_types.names.TimeSeriesOverlay) then
+					if(itemStack:GetDisplayName() == actorName) then
+						local entity = self:GetEntity()
+						if(entity) then
+							local x, y, z = entity:GetPosition()
+							local facing = entity:GetFacing()
+							self:DestroyEntity();
+							self:Init(itemStack, movie_entity);
+							self:FrameMove(self:GetTime(), false);
+							entity = self:GetEntity();
+							if(not entity:IsScreenMode()) then
+								entity:SetPosition(x,y,z);
+								entity:SetFacing(facing);
+							end
+						end
+					end
+				end
+			end 
+		end
+	end
+end
+
+function Actor:SetMovieBlockPosition(pos)
+	if(type(pos) == "table" and pos[1] and pos[2] and pos[3]) then
+		local x, y, z = unpack(pos);
+		local movie_entity = BlockEngine:GetBlockEntity(x,y,z)
+		
+		if (movie_entity and movie_entity.class_name == "EntityMovieClip" and  movie_entity.inventory 
+			and movie_entity ~= self:GetMovieClipEntity()) then
+			for i = 1, movie_entity.inventory:GetSlotCount() do
+				local itemStack = movie_entity.inventory:GetItem(i)
+				if (itemStack and itemStack.count > 0) then
+					if (itemStack.id == block_types.names.TimeSeriesOverlay) then
+						local entity = self:GetEntity()
+						if(entity) then
+							local x, y, z = entity:GetPosition()
+							local facing = entity:GetFacing()
+							self:DestroyEntity();
+							self:Init(itemStack, movie_entity);
+							self:FrameMove(self:GetTime(), false);
+							entity = self:GetEntity();
+							if(not entity:IsScreenMode()) then
+								entity:SetPosition(x,y,z);
+								entity:SetFacing(facing);
+							end
+						end
+					end
+				end 
+			end
+		end
+	end
+end
+
+-- @return {x,y,z} array
+function Actor:GetMovieBlockPosition()
+	local movie_entity = self:GetMovieClipEntity()
+	if(movie_entity) then
+		local x, y, z = movie_entity:GetBlockPos()
+		return {x, y, z}
+	end
+end
+
+function Actor:GetTime()
+	return self.time or 0;
+end
+
+function Actor:SetTime(time)
+	self.time = time;
+end
+
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
+	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
@@ -442,6 +554,8 @@ local internalValues = {
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
 	["rendercode"] = {setter = Actor.SetRenderCode, isVariable = false}, 
+	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
+	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
 }
 
 function Actor:GetActorValue(name)

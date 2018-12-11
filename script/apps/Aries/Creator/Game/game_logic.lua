@@ -144,9 +144,13 @@ function GameLogic:ctor()
 		SceneContextManager:SetAcceptAllEvents(true);
 	end
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
-	local ParaWorldAnalytics = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldAnalytics")
-	GameLogic.paraworldAnalytics = ParaWorldAnalytics:new():Init()
+	ParaWorldAnalytics = ParaWorldAnalytics or NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	if(ParaWorldAnalytics) then
+		GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
+			ParaWorldAnalytics:Send(category, action, value, label);
+			return catetory;
+		end)
+	end
 end
 
 
@@ -544,7 +548,7 @@ function GameLogic.LoadGame()
 	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
 
 	local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
-	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter:"..tostring(worldname), 3, "world");
+	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter:"..tostring(worldname), 3, nil);
 end
 
 function GameLogic.Pause()
