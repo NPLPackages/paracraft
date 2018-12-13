@@ -79,6 +79,9 @@ function ParaWorldLoginDocker.GetCurrentAppName()
 	return name or "paracraft";
 end
 
+
+commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineByParam("paraworldapp", ""));
+
 -- call this once
 function ParaWorldLoginDocker.InitParaWorldClient()
 	if(ParaWorldLoginDocker.isInited) then
@@ -97,7 +100,7 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 	if(System.options.isFromQQHall) then
 		ParaWorldLoginDocker.DisableExternalUrlLinks();
 
-		if(not System.options.clientconfig_file) then
+		if(not System.options.clientconfig_file and System.options.paraworldapp == "haqi") then
 			System.options.clientconfig_file = "config/GameClient.config.QQ.xml";
 		end
 
@@ -153,8 +156,6 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 	end
 end
 ParaWorldLoginDocker.InitParaWorldClient();
-
-commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineByParam("paraworldapp", ""));
 
 -- @param hasParacraft: whether it contains the latest version of paracraft inside the app.
 local app_install_details = {

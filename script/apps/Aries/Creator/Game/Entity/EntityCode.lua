@@ -17,9 +17,11 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
+Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 
@@ -112,6 +114,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	if(self:GetLanguageConfigFile()~="") then
+		node.attr.languageConfigFile = self:GetLanguageConfigFile();
+	end
 	
 	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
 		local blocklyNode = {name="blockly", };
@@ -129,6 +134,8 @@ function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
+	self.languageConfigFile = node.attr.languageConfigFile;
+
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
 		self:ScheduleRefresh();
@@ -504,5 +511,26 @@ function Entity:SetLastCommandResult(last_result)
 		self.last_output = output;
 		local x, y, z = self:GetBlockPos();
 		BlockEngine:NotifyNeighborBlocksChange(x, y, z, BlockEngine:GetBlockId(x, y, z));
+	end
+end
+
+function Entity:GetLanguageConfigFile()
+	return self.languageConfigFile or "";
+end
+
+function Entity:SetLanguageConfigFile(filename)
+	if(self:GetLanguageConfigFile() ~= filename) then
+		self.languageConfigFile = filename;
+		if(filename == "") then
+			-- default NPL code block 
+		elseif(filename == "npl_cad") then
+			-- NPL cad v1
+		else
+			-- custom user defined under world directory
+			filename = Files.GetWorldFilePath(filename)
+			if(filename) then
+				-- TODO
+			end
+		end
 	end
 end

@@ -49,6 +49,11 @@ function OpenFileDialog.GetFilters(filterName)
 	elseif(filterName == "script" or filterName == "lua") then
 		return {
 			{L"(*.lua)",  "*.lua"},
+			{"(*.npl)",  "*.npl"},
+		};
+	elseif(filterName == "npl") then
+		return {
+			{"(*.npl)",  "*.npl"},
 		};
 	elseif(filterName == "audio") then
 		return {

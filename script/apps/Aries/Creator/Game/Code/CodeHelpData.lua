@@ -15,6 +15,17 @@ local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData"
 local all_cmds = {}
 local all_cmds_map = {}
 
+local default_categories = {
+{name = "Motion", text = L"运动", colour="#0078d7", },
+{name = "Looks", text = L"外观" , colour="#7abb55", },
+{name = "Events", text = L"事件", colour="#764bcc", },
+{name = "Control", text = L"控制", colour="#d83b01", },
+{name = "Sound", text = L"声音", colour="#8f6d40", },
+{name = "Sensing", text = L"感知", colour="#69b090", },
+{name = "Operators", text = L"运算", colour="#569138", },
+{name = "Data", text = L"数据", colour="#459197", },
+};
+
 local is_installed = false;
 function CodeHelpData.AppendAll()
 	if(is_installed)then
@@ -96,11 +107,16 @@ function CodeHelpData.GetItemByType(typeName)
 end
 
 function CodeHelpData.LoadParacraftCodeFunctions()
-	CodeHelpData.AppendAll();
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 	local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
-	CodeHelpWindow.AddCodeHelpItems(all_cmds);
+	CodeHelpWindow.AddCodeHelpItems(CodeHelpData.GetAllCmds());
+	CodeHelpWindow.SetCategories(CodeHelpData.GetCategoryButtons());
+	
 	CodeHelpWindow.AddCodeExamples(all_examples);
+end
+
+function CodeHelpData.GetCategoryButtons()
+	return default_categories;
 end
 
 function CodeHelpData.GetAllCmds()

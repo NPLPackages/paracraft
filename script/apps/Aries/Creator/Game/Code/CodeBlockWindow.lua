@@ -16,6 +16,9 @@ NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
+local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
@@ -198,6 +201,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		codeBlock:Connect("message", self, self.OnMessage, "UniqueConnection");
 	end
 	if(isEntityChanged) then
+		CodeBlockWindow.UpdateCodeEditorStatus()
 		self:entityChanged(self.entity);
 	end
 	if(not entity) then
@@ -641,6 +645,42 @@ function CodeBlockWindow.IsBlocklyEditMode()
 	end
 end
 
+function CodeBlockWindow.UpdateCodeEditorStatus()
+	local textCtrl = CodeBlockWindow.GetTextControl();
+	if(textCtrl) then
+		local bReadOnly = CodeBlockWindow.IsBlocklyEditMode();
+		textCtrl:setReadOnly(bReadOnly)
+	end
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
+	end
+end
+
+-- default to standard NPL language. One can create domain specific language configuration files. 
+function CodeBlockWindow.OnClickSelectLanguageSettings()
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(not entity) then
+		return
+	end
+	local old_value = entity:GetLanguageConfigFile();
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage('<a class="linkbutton_yellow" href="https://github.com/nplpackages/paracraft/wiki/languageConfigFile">'..L"点击查看帮助"..'</a>', function(result)
+		if(result) then
+			if(result ~="" and result ~="npl") then
+				local filename = Files.GetWorldFilePath(result)
+				if(not filename) then
+					_guihelper.MessageBox(L"文件不存在");
+					return;
+				end
+			end
+			entity:SetLanguageConfigFile(result);
+			CodeBlockWindow.UpdateCodeEditorStatus()
+		end
+	end, old_value or "", L"选择语言配置文件", "npl");
+end
+
 function CodeBlockWindow.OnClickEditMode(name)
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(not entity) then
@@ -649,12 +689,17 @@ function CodeBlockWindow.OnClickEditMode(name)
 	if(CodeBlockWindow.IsBlocklyEditMode()) then
 		if(name == "codeMode") then
 			entity:SetBlocklyEditMode(false);
+			CodeBlockWindow.UpdateCodeEditorStatus()
 		end
 	else
 		if(name == "blockMode") then
 			CodeBlockWindow.UpdateCodeToEntity();
 			entity:SetBlocklyEditMode(true);
+			CodeBlockWindow.UpdateCodeEditorStatus()
 		end
+	end
+	if(mouse_button == "right") then
+		CodeBlockWindow.OnClickSelectLanguageSettings()
 	end
 	if(name == "blockMode") then
 		CodeBlockWindow.OpenBlocklyEditor()
