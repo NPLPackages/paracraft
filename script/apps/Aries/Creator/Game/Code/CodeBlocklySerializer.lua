@@ -37,7 +37,7 @@ function CodeBlocklySerializer.GetCategoryButtons()
     return CodeBlocklySerializer.categories or CodeHelpWindow.GetCategoryButtons()
 end
 function CodeBlocklySerializer.GetAllCmds()
-	return CodeBlocklySerializer.all_cmds or CodeHelpData.GetAllCmds();
+	return CodeBlocklySerializer.all_cmds or CodeHelpWindow.GetAllCmds() or CodeHelpData.GetAllCmds();
 end
 function CodeBlocklySerializer.SaveFilesToDebug(folder_name)
     folder_name = folder_name or "block_configs"
@@ -53,9 +53,6 @@ function CodeBlocklySerializer.SaveFilesToDebug(folder_name)
     end
     CodeBlocklySerializer.WriteToBlocklyCode(folder_name .. "/BlocklyExecution.js");
     CodeBlocklySerializer.WriteKeywordsToJson(folder_name .. "/LanguageKeywords.json");
-    
-
-
 end
 function CodeBlocklySerializer.WriteKeywordsToJson(filename)
 	ParaIO.CreateDirectory(filename);

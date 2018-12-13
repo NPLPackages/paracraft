@@ -8,6 +8,12 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 CodeHelpWindow.Show(true)
+CodeHelpWindow.SetLanguageConfigFile(filename)
+-- or use following
+CodeHelpWindow.ClearAll()
+CodeHelpWindow.SetCategories(langConfig.GetCategoryButtons())
+CodeHelpWindow.SetAllCmds(langConfig.GetAllCmds());
+CodeHelpWindow.AddCodeExamples()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua");
@@ -32,6 +38,8 @@ local category_items = {};
 local all_command_names = {};
 local languageConfigFile = "";
 
+-- public:
+-- see also: https://github.com/NPLPackages/paracraft/wiki/languageConfigFile
 function CodeHelpWindow.SetLanguageConfigFile(filename)
 	if(languageConfigFile ~= (filename or "")) then
 		languageConfigFile = filename;
@@ -54,6 +62,7 @@ function CodeHelpWindow.ClearAll()
 	CodeHelpWindow.selected_code_name = nil;
 end
 
+-- public:
 function CodeHelpWindow.SetCategories(categories)
 	CodeHelpWindow.categories = categories;
 end
@@ -74,11 +83,17 @@ function CodeHelpWindow.InitCmds()
 				local langConfig = NPL.load(filename);
 				if(type(langConfig) == "table" and langConfig.GetCategoryButtons and langConfig.GetAllCmds) then
 					CodeHelpWindow.SetCategories(langConfig.GetCategoryButtons())
-					CodeHelpWindow.AddCodeHelpItems(langConfig.GetAllCmds());
+					CodeHelpWindow.SetAllCmds(langConfig.GetAllCmds());
 				end
 			end
 		end
 	end
+end
+
+-- public: 
+function CodeHelpWindow.SetAllCmds(all_cmds)
+	CodeHelpWindow.all_cmds = all_cmds;
+	CodeHelpWindow.AddCodeHelpItems(all_cmds);
 end
 
 function CodeHelpWindow.AddCodeHelpItems(all_cmds)
@@ -138,6 +153,10 @@ end
 
 function CodeHelpWindow.GetCategoryButtons()
 	return CodeHelpWindow.categories;
+end
+
+function CodeHelpWindow.GetAllCmds()
+	return CodeHelpWindow.all_cmds
 end
 
 function CodeHelpWindow.GetCurrentItems()

@@ -109,7 +109,7 @@ end
 function CodeHelpData.LoadParacraftCodeFunctions()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 	local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
-	CodeHelpWindow.AddCodeHelpItems(CodeHelpData.GetAllCmds());
+	CodeHelpWindow.SetAllCmds(CodeHelpData.GetAllCmds());
 	CodeHelpWindow.SetCategories(CodeHelpData.GetCategoryButtons());
 	
 	CodeHelpWindow.AddCodeExamples(all_examples);
