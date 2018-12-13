@@ -4,18 +4,36 @@
 <![CDATA[
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local blockList = CodeBlockWindow.GetBlockList();
-function ListDs(index)
-    if(not index) then
-        return #blockList;
-    else
-        local item = blockList[index]
-        return item and {filename = item.filename, selected = CodeBlockWindow.entity == item.entity}
+
+local items = {};
+for index = 1, #blockList do
+    local item = blockList[index]
+    if(item) then
+        items[#items+1] = {filename = item.filename, listIndex = index, selected = CodeBlockWindow.entity == item.entity, isExternal=false}
+        if(item.entity and item.entity:GetAllIncludedFiles()) then
+            local filenames = item.entity:GetAllIncludedFiles()
+            for i = 1, #filenames do
+                items[#items+1] = {filename = filenames[i], listIndex = index, selected = false, isExternal=true}
+            end
+        end
     end
 end
+
+function ListDs(index)
+    if(not index) then
+        return #items;
+    else
+        return items[index]
+    end
+end
+
 function OnSelectCodeBlock(index)
-    local item = blockList[index]
-    if(item and CodeBlockWindow.entity~=item.entity) then
+    local item = blockList[items[index].listIndex]
+    if(item and CodeBlockWindow.entity~=item.entity and not items[index].isExternal) then
         CodeBlockWindow.SetCodeEntity(item.entity);
+    end
+    if(items[index].isExternal) then
+        CodeBlockWindow.OpenExternalFile(items[index].filename)
     end
 end
 ]]></script>
@@ -31,9 +49,16 @@ end
                         </div>
                     </pe:if>
                     <pe:if condition='<%=not Eval("selected")%>'>
-                        <div width="100%" style="padding-left:5px;padding-right:5px;background-color:#ccccdd;color:#303030">
-                            <%=Eval('filename')%>
-                        </div>
+                        <pe:if condition='<%=not Eval("isExternal")%>'>
+                            <div width="100%" style="padding-left:5px;padding-right:5px;background-color:#ccccdd;color:#303030">
+                                <%=Eval('filename')%>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=Eval("isExternal")%>'>
+                            <div width="100%" style="margin-left:8px;padding-left:5px;padding-right:5px;background-color:#a0a0a0;color:#303030">
+                                <%=Eval('filename')%>
+                            </div>
+                        </pe:if>
                     </pe:if>
                 </div>
             </Columns>

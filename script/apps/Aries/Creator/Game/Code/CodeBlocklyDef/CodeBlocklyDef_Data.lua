@@ -921,6 +921,86 @@ assert(score == 1)
 },
 
 
+
+{
+	type = "saveWorldData", 
+	message0 = L"保存世界数据%1为%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "text", value = "name",},
+			text = "name", 
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "text", value = "value",},
+			text = "value", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'saveWorldData(%s, %s)',
+	ToNPL = function(self)
+		return string.format('saveWorldData("%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"常用于开发关卡编辑器", canRun = true, code = [[
+saveWorldData("maxLevel", 1)
+local maxLevel = loadWorldData("maxLevel")
+assert(maxLevel == 1)
+]]},
+{desc = L"从指定的文件加载", canRun = true, code = [[
+saveWorldData("monsterCount", 1, "level1")
+local monsterCount = loadWorldData("monsterCount", 0, "level1")
+assert(monsterCount == 1)
+]]},
+},
+
+},
+
+{
+	type = "loadWorldData", 
+	message0 = L"加载世界数据%1默认值%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "text", value = "name",},
+			text = "name", 
+		},
+		{
+			name = "defaultvalue",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "", 
+		},
+	},
+	category = "Data", 
+	output = {type = "field_variable",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'loadWorldData(%s, %s)',
+	ToNPL = function(self)
+		return string.format('loadWorldData("%s", "%s")', self:getFieldAsString('name'), self:getFieldAsString('defaultvalue'));
+	end,
+	examples = {{desc = L"常用于开发关卡编辑器", canRun = true, code = [[
+saveWorldData("maxLevel", 1)
+local maxLevel = loadWorldData("maxLevel")
+assert(maxLevel == 1)
+]]},
+{desc = L"从指定的文件加载", canRun = true, code = [[
+saveWorldData("monsterCount", 1, "level1")
+local monsterCount = loadWorldData("monsterCount", 0, "level1")
+assert(monsterCount == 1)
+]]},
+},
+},
+
+
 {
 	type = "code_block", 
 	message0 = L"代码%1",

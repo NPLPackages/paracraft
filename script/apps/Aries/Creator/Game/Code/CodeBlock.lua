@@ -398,6 +398,8 @@ end
 
 -- run code again 
 function CodeBlock:Run()
+	self:GetEntity():ClearIncludedFiles();
+
 	self:CompileCode(self:GetEntity():GetCommand());
 	if(self.code_func) then
 		self:ResetTime();
@@ -731,6 +733,10 @@ end
 -- @param filename: include a file relative to current world directory
 function CodeBlock:IncludeFile(filename)
 	local filepath = Files.WorldPathToFullPath(filename);
+	if(self:GetEntity()) then
+		self:GetEntity():AddIncludedFile(filename);
+	end
+
 	local file = ParaIO.open(filepath, "r")
 	if(file:IsValid()) then
 		local code = file:GetText();

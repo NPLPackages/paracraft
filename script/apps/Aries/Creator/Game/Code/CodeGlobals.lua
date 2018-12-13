@@ -119,9 +119,17 @@ function CodeGlobals:ctor()
 		loadUserData = function(name, default_value, bIsGlobal)
 			return GameLogic.GetPlayerController():LoadLocalUserWorldData(name, default_value, bIsGlobal)
 		end,
+		saveWorldData = function(name, value, filename)
+			return self:SaveWorldData(name, value, filename)
+		end,
+		loadWorldData = function(name, default_value, filename)
+			return self:LoadWorldData(name, default_value, filename)
+		end,
 	};
 
 	self:Reset();
+
+	GameLogic:Connect("beforeWorldSaved", self, self.OnWorldSave, "UniqueConnection");
 end
 
 -- call this to clear all globals to reuse this class for future use. 
@@ -157,8 +165,71 @@ function CodeGlobals:Reset()
 	-- active code blocks
 	self.codeblocks= {};
 
+	-- world data
+	self.worldData = nil;
+
 	-- clear UI if any
 	CodeUI:Clear();
+end
+
+function CodeGlobals:OnWorldSave()
+	if(self.worldData) then
+		for filename, data in pairs(self.worldData) do
+			if(data.isDirty_) then
+				local filepath = GameLogic.GetWorldDirectory().."codeblockdata/"..filename;
+				ParaIO.CreateDirectory(filepath);
+				local file = ParaIO.open(filepath, "w");
+				if(file:IsValid()) then
+					data.isDirty_ = nil;
+					local text = commonlib.serialize(data, true)
+					if(text) then
+						file:write(text,#text);
+					end
+					file:close();
+					LOG.std(nil, "info", "CodeGlobals", "save world data to %s", filepath);
+				else
+					LOG.std(nil, "warn", "CodeGlobals", "failed to save world data to %s", filepath);
+				end
+			end
+		end
+	end
+end
+
+-- save data to world directory, usually used in level editor code
+-- the actual saving happens when user saved the whole world
+-- @param filename: if nil, it defaults to "worlddata"
+function CodeGlobals:SaveWorldData(name, value, filename)
+	filename = filename or "worlddata"
+	if(not self.worldData) then
+		self.worldData = {};
+	end
+	local data = self.worldData[filename];
+	if(not data) then
+		data = {};
+		self.worldData[filename] = data;
+	end
+	data.isDirty_ = true;
+	data[name] = value;
+end
+
+function CodeGlobals:LoadWorldData(name, value, filename)
+	filename = filename or "worlddata"
+	local data = self.worldData and self.worldData[filename]
+	if(not data) then
+		local filepath = GameLogic.GetWorldDirectory().."codeblockdata/"..filename;
+		local file = ParaIO.open(filepath, "w");
+		if(file:IsValid()) then
+			data = NPL.LoadTableFromString(file:GetText())
+			if(type(data) == "table") then
+				data.isDirty_ = false;
+			end
+			file:close();
+		end
+		self.worldData = self.worldData or {};
+		data = {};
+		self.worldData[filename] = data;
+	end
+	return data[name or ""];
 end
 
 function CodeGlobals:SetCurrentCoroutine(co)

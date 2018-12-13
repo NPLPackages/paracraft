@@ -762,7 +762,10 @@ function GameLogic.Exit()
 	GameLogic:WorldUnloaded();
 	GameLogic.GetFilters():apply_filters("OnWorldUnloaded");
 	
-	GameLogic.codeGlobal = nil;
+	if(GameLogic.codeGlobal) then
+		GameLogic.codeGlobal:Destroy();
+		GameLogic.codeGlobal = nil;
+	end
 end
 
 local slow_timer_tick = 1;

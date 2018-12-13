@@ -788,6 +788,13 @@ function CodeBlockWindow.OnOpenTutorials()
 	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse.codeblock", nil, nil);
 end
 
+function CodeBlockWindow.OpenExternalFile(filename)
+	local filepath = Files.WorldPathToFullPath(filename);
+	if(filepath) then
+		GameLogic.RunCommand("/open npl://editcode?src="..filepath);
+	end
+end
+
 -- Redirect this object as a scene context, so that it will receive all key/mouse events from the scene. 
 -- as if this task object is a scene context derived class. One can then overwrite
 -- `UpdateManipulators` function to add any manipulators. 

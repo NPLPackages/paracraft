@@ -127,6 +127,13 @@ function Entity:SaveToXMLNode(node, bSort)
 			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
 		end
 	end
+	if(self.includedFiles) then
+		local includedFilesNode = {name="includedFiles", };
+		node[#node+1] = includedFilesNode;
+		for i, name in ipairs(self.includedFiles) do
+			includedFilesNode[i] = {name="filename", name}
+		end
+	end
 	return node;
 end
 
@@ -161,7 +168,13 @@ function Entity:LoadFromXMLNode(node)
 					end
 				end
 			end
-			break;
+		elseif(node[i].name == "includedFiles") then
+			self.includedFiles = {};
+			for j=1, #(node[i]) do
+				local sub_node = node[i][j];
+				local filename = sub_node[1]
+				self.includedFiles[j] = filename;
+			end
 		end
 	end
 	if(not self.isBlocklyEditMode and not self.nplcode) then
@@ -533,4 +546,22 @@ function Entity:SetLanguageConfigFile(filename)
 			end
 		end
 	end
+end
+
+function Entity:ClearIncludedFiles()
+	self.includedFiles = nil;
+end
+
+function Entity:AddIncludedFile(filename)
+	self.includedFiles = self.includedFiles or {};
+	for _, name in ipairs(self.includedFiles) do
+		if(name == filename) then
+			return
+		end
+	end
+	self.includedFiles[#(self.includedFiles)+1] = filename;
+end
+
+function Entity:GetAllIncludedFiles()
+	return self.includedFiles;
 end

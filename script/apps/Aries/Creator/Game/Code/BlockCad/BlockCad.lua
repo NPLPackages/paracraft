@@ -23,7 +23,8 @@ local is_installed = false;
 local all_cmds = {};
 local all_cmds_map = {};
 BlockCad.categories = {
-    {name = "Shapes", text = L"图形", colour = "#0078d7", },
+    {name = "ShapeOperators", text = L"操作", colour = "#0078d7", },
+    {name = "Shapes", text = L"图形", colour = "#764bcc", },
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
@@ -36,8 +37,10 @@ function BlockCad.AppendAll()
 		return
 	end
 	is_installed = true;
-	
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCadDef/BlockCadDef_ShapeOperators.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCadDef/BlockCadDef_Shapes.lua");
+    local BlockCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.BlockCad.BlockCadDef_ShapeOperators");
     local BlockCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.BlockCad.BlockCadDef_Shapes");
 
     -- Using CodeCad definitions temporarily
@@ -51,6 +54,7 @@ function BlockCad.AppendAll()
 	
 
 	local all_source_cmds = {
+		BlockCadDef_ShapeOperators.GetCmds(),
 		BlockCadDef_Shapes.GetCmds(),
 		CodeCadDef_Control.GetCmds(),
 		CodeCadDef_Data.GetCmds(),

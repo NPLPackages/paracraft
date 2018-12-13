@@ -12,6 +12,131 @@ local CodeCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.Co
 local CodeCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Data");
 local cmds = {
 
+{
+	type = "getLocalVariable", 
+	message0 = L"获取变量%1",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = "score",
+			variableTypes = {""},
+			text = "score",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString('var');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local key = "value"
+say(key, 1)
+]]}},
+},
+
+{
+	type = "createLocalVariable", 
+	message0 = L"新建本地变量%1为%2",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = "score",
+			variableTypes = {""},
+			text = "score",
+		},
+		{
+			name = "value",
+			type = "input_value",
+			shadow = { type = "text", value = "value",},
+			text = "value",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'local %s = %s',
+	ToNPL = function(self)
+		return 'local key = "value"\n';
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local key = "value"
+say(key, 1)
+]]}},
+},
+
+{
+	type = "assign", 
+	message0 = L"%1赋值为%2",
+	arg0 = {
+		{
+			name = "left",
+			type = "input_value",
+			shadow = { type = "getLocalVariable", value = "score",},
+			text = "score",
+		},
+		{
+			name = "right",
+			type = "input_value",
+			shadow = { type = "text", value = "1",},
+			text = "1",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '%s = %s',
+	ToNPL = function(self)
+		return 'key = "value"\n';
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+text = "hello"
+say(text, 1)
+]]}},
+},
+{
+	type = "set", 
+	message0 = L"设置全局变量%1为%2",
+	arg0 = {
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "text", value = "score",},
+			text = "score", 
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "text", value = "1",},
+			text = "1", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'set(%s, %s)',
+	ToNPL = function(self)
+		return string.format('set("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"也可以用_G.a", canRun = true, code = [[
+_G.a = _G.a or 1
+while(true) do
+    _G.a = a + 1
+    set("a", get("a") + 1)
+    say(a)
+end
+]]}},
+},
 
 {
 	type = "getString", 
