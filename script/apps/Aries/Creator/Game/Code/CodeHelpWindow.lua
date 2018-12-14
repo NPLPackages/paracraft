@@ -80,6 +80,8 @@ function CodeHelpWindow.InitCmds()
 		else
 			filename = Files.GetWorldFilePath(filename)
 			if(filename) then
+				-- used forward slash for absolute file path, otherwise NPL.load will inteprete : wrongly.  
+				filename = filename:gsub("^(%S):/", "%1:\\");
 				local langConfig = NPL.load(filename);
 				if(type(langConfig) == "table" and langConfig.GetCategoryButtons and langConfig.GetAllCmds) then
 					CodeHelpWindow.SetCategories(langConfig.GetCategoryButtons())
