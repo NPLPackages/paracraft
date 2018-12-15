@@ -53,6 +53,7 @@ Entity:Property({"isSolid", 1, "IsSolid", "SetSolid"});
 Entity:Property({"isScreenMode", false, "IsScreenMode", "SetScreenMode"});
 Entity:Property({"ui_x", 0, "GetScreenX", "SetScreenX", auto=true});
 Entity:Property({"ui_y", 0, "GetScreenY", "SetScreenY", auto=true});
+Entity:Property({"ui_align", "center", "GetAlignment", "SetAlignment", auto=true});
 Entity:Property({"screen_half_width", 500, "GetScreenHalfWidth", "SetScreenHalfWidth", auto=true});
 Entity:Property({"roll", 0, "GetRoll", "SetRoll", auto=true});
 Entity:Property({"color", "#ffffff", "GetColor", "SetColor", auto=true});
@@ -75,6 +76,11 @@ Entity.framemove_interval = nil;
 
 -- disable F key for toggle flying. 
 Entity.disable_toggle_fly = true;
+
+-- half screen width is alway 500
+local screenHalfWidth = 500;
+-- screenHalfHeight is based on screenHalfWidth and aspect ratio
+local screenHalfHeight = 300;
 
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
@@ -194,7 +200,14 @@ function Entity:UpdateWorldPositionFromScreenPos()
 	if(overlay and overlay.matInverseView and overlay.vWorld) then
 		self.screenPos = self.screenPos or mathlib.vector3d:new();
 		self.screenPos[1] = self.ui_x/100;
-		self.screenPos[2] = self.ui_y/100;
+		
+		if(self.ui_align == "top") then
+			self.screenPos[2] = (self.ui_y + screenHalfHeight) /100;
+		elseif(self.ui_align == "bottom") then
+			self.screenPos[2] = (self.ui_y - screenHalfHeight) /100;
+		else -- if(self.ui_align == "center") then
+			self.screenPos[2] = self.ui_y/100;
+		end
 		self.screenPos[3] = 0;
 		local offsetPos = self.screenPos * overlay.matInverseView;
 		self:SetPosition(offsetPos[1] + overlay.vWorld[1], offsetPos[2] + overlay.vWorld[2], offsetPos[3] + overlay.vWorld[3]);
@@ -213,7 +226,13 @@ function Entity:paintEvent(painter)
 	painter:Save()
 	painter:PushMatrix();
 	if(self:IsScreenMode()) then
-		painter:TranslateMatrix(self.ui_x/100, self.ui_y/100, 0);
+		if(self.ui_align == "top") then
+			painter:TranslateMatrix(self.ui_x/100, (self.ui_y + screenHalfHeight)/100, 0);
+		elseif(self.ui_align == "bottom") then
+			painter:TranslateMatrix(self.ui_x/100, (self.ui_y - screenHalfHeight)/100, 0);
+		else -- if(self.ui_align == "center") then
+			painter:TranslateMatrix(self.ui_x/100, self.ui_y/100, 0);
+		end
 	end
 
 	painter:SetOpacity(self:GetOpacity());
@@ -400,12 +419,14 @@ function Entity.OnScreenTimer(timer)
 	local matInverseView = matView:inverse();
 	overlay.matInverseView = matInverseView;
 
-	local viewport = ViewportManager:GetSceneViewport();
-	local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+	--local viewport = ViewportManager:GetSceneViewport();
+	--local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
 	
 	-- x range is in [-500, 500] pixels
-	local screenHalfWidth = 500;
+	
 	local aspect = Cameras:GetCurrent():GetAspectRatio();
+	screenHalfHeight = screenHalfWidth / aspect;
+
 	local ui_x, ui_y = 0, 0;
 	local ui_z = screenHalfWidth / aspect / math.tan(Cameras:GetCurrent():GetFieldOfView()*0.5);
 

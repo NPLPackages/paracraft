@@ -608,14 +608,11 @@ Example:
 		end
 		if(x) then
 			local block_template = BlockEngine:GetBlockTemplateByIdx(x, y, z);
-			if(block_template and block_template.color_data) then
+			if(block_template and block_template:HasColorData()) then
 				color, cmd_text = CmdParser.ParseColor(cmd_text, "#ffffff");
 				if(color) then
-					local item = block_types.GetItemClass("ItemColorBlock");
-					if(item and item.PaintBlock) then
-						color = Color.ToValue(color);
-						item:PaintBlock(x,y,z, color);
-					end
+					color = Color.ToValue(color);
+					block_template:SetBlockColor(x,y,z, color)
 				end
 			else
 				GameLogic.AddBBS(nil, L"只能给特殊的ColorBlock上色");

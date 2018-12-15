@@ -57,7 +57,8 @@ local selectable_var_list = {
 	"text",
 	"code",
 	"pos", -- multiple of x,y,z
- 	"screen_pos", -- multiple of ui_x, ui_y
+ 	"screen_pos", -- multiple of ui_x, ui_y, ui_align
+	"ui_align", -- "center", "top", "bottom"
 	"facing", 
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling", 
@@ -156,6 +157,7 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("z", "Linear");
 	timeseries:CreateVariableIfNotExist("ui_x", "Linear");
 	timeseries:CreateVariableIfNotExist("ui_y", "Linear");
+	timeseries:CreateVariableIfNotExist("ui_align", "Discrete");
 	timeseries:CreateVariableIfNotExist("facing", "LinearAngle");
 	timeseries:CreateVariableIfNotExist("pitch", "LinearAngle");
 	timeseries:CreateVariableIfNotExist("roll", "LinearAngle");
@@ -371,10 +373,32 @@ color("#ff0000"); font(14);<br/>
 				end
 			end
 		end, old_value)
+	elseif(keyname == "ui_align") then
+		local title = format(L"起始时间%s, 请输入UI对齐方式", strTime);
+		title = title.."<br/>center|top|bottom";
+		old_value = self:GetValue("ui_align", curTime) or "center";
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			if(result and result~="") then
+				local align = result:match("%w+");
+				if(align == "center" or align == "top"  or align == "bottom") then
+					self:BeginUpdate();
+					self:AddKeyFrameByName("ui_align", nil, align);
+					self:EndUpdate();
+					self:FrameMovePlaying(0);
+					if(callbackFunc) then
+						callbackFunc(true);
+					end
+				end
+			end
+		end, old_value)
 	elseif(keyname == "screen_pos") then
 		local title = format(L"起始时间%s, 请输入位置x,y", strTime);
 		title = title.."<br/>x=[-500,500],y=[-500,500]";
 		old_value = string.format("%d, %d", self:GetValue("ui_x", curTime) or 0,self:GetValue("ui_y", curTime) or 0);
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
@@ -483,6 +507,7 @@ function Actor:FrameMovePlaying(deltaTime)
 
 	local ui_x = self:GetValue("ui_x", curTime);
 	local ui_y = self:GetValue("ui_y", curTime);
+	local ui_align = self:GetValue("ui_align", curTime);
 
 	local yaw, roll, pitch, scaling, opacity, color;
 	yaw = self:GetValue("facing", curTime);
@@ -493,6 +518,10 @@ function Actor:FrameMovePlaying(deltaTime)
 	color = self:ComputeColor(curTime);
 
 	if(ui_x or ui_y) then
+		if(ui_align) then
+			entity:SetAlignment(ui_align);
+		end			
+
 		entity:SetScreenPos(ui_x or 0, ui_y or 0);
 		entity:SetScreenMode(true);
 	else

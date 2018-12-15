@@ -60,6 +60,7 @@ local var_name_to_text = {
 	opacity = L"透明度",
 	pos = L"位置",
 	screen_pos = L"屏幕坐标",
+	ui_align = L"屏幕坐标对齐方式",
 	parent = L"父链接",
 	color = L"颜色",
 	code = L"代码",

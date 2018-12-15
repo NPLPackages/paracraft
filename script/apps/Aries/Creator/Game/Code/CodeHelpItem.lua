@@ -31,7 +31,7 @@ local item = CodeHelpItem:new({
 }):Init();
 -------------------------------------------------------
 ]]
-local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
+local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 
 local CodeHelpItem = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem"));
 function CodeHelpItem:ctor()
@@ -87,7 +87,7 @@ function CodeHelpItem:GetHtml()
 					end
 					local arg_text = "";
 					if(arg_item.shadow and arg_item.shadow.type and not arg_item.options) then
-						local item = CodeHelpData.GetItemByType(arg_item.shadow.type)
+						local item = CodeHelpWindow.GetCodeItemByName(arg_item.shadow.type)
 						if(item and item.arg0 and item.arg0[1]) then
 							arg_item.options = item.arg0[1].options;
 						end
@@ -282,7 +282,7 @@ function CodeHelpItem.OnClickDropDown(name, mcmlNode)
 	local itemType, argIndex = name:match("^(.*)_(%d)$");
 	if(itemType and argIndex) then
 		argIndex = tonumber(argIndex);
-		local self = CodeHelpData.GetItemByType(itemType)
+		local self = CodeHelpWindow.GetCodeItemByName(itemType)
 		if(self) then
 			local arg_item = self.arg0[argIndex];
 			if(arg_item) then

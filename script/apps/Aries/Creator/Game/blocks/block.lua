@@ -1248,26 +1248,6 @@ function block:GetItem()
 	return ItemClient.GetItem(self.id);
 end
 
--- it may return nil or number like 0xffff0000
-function block:GetDiffuseColor(blockX, blockY, blockZ)
-	if(self.color8_data or self.color_data) then
-		local item = self:GetItem();
-		if(item) then
-			return item:DataToColor(BlockEngine:GetBlockData(blockX, blockY, blockZ) or 0) + 0xff000000;
-		end
-	end
-end
-
--- it may return nil or number like 0xffff0000
-function block:GetDiffuseColorByData(block_data)
-	if(self.color8_data or self.color_data) then
-		local item = self:GetItem();
-		if(item) then
-			return item:DataToColor(block_data or 0) + 0xff000000;
-		end
-	end
-end
-
 -- @param granularity: (0-1), 1 will generate 27 pieces, 0 will generate 0 pieces, default to 1. 
 -- @param cx, cy, cz: center of break point. 
 -- @param color: nil or such as 0xffff0000
@@ -1587,6 +1567,32 @@ function block:MirrorBlockData(blockData, axis)
 	return blockData;
 end
 
+function block:HasColorData()
+	if (self.color8_data or self.color_data) then
+		return true;
+	end
+end
+
+-- it may return nil or number like 0xffff0000
+function block:GetDiffuseColor(blockX, blockY, blockZ)
+	if(self.color8_data or self.color_data) then
+		local item = self:GetItem();
+		if(item) then
+			return item:DataToColor(BlockEngine:GetBlockData(blockX, blockY, blockZ) or 0) + 0xff000000;
+		end
+	end
+end
+
+-- it may return nil or number like 0xffff0000
+function block:GetDiffuseColorByData(block_data)
+	if(self.color8_data or self.color_data) then
+		local item = self:GetItem();
+		if(item) then
+			return item:DataToColor(block_data or 0) + 0xff000000;
+		end
+	end
+end
+
 -- return color in RGB, without alpha
 function block:GetBlockColor(x,y,z)
 	local color; 
@@ -1600,6 +1606,16 @@ function block:GetBlockColor(x,y,z)
 	end
 	color = Color.ToValue(color);
 	return color;
+end
+
+-- @param color: like 0xff0000
+function block:SetBlockColor(x,y,z, color)
+	if(self:HasColorData()) then
+		local item = self:GetItem();
+		if(item and item.PaintBlock) then
+			return item:PaintBlock(x,y,z, color)
+		end
+	end
 end
 
 -- return color in RGB, without alpha
