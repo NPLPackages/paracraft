@@ -47,6 +47,7 @@ CodeBlock:Signal("actorCloned", function(actor, msg) end);
 CodeBlock:Signal("actorCollided", function(actor, fromActor) end);
 CodeBlock:Signal("codeUnloaded", function() end);
 CodeBlock:Signal("stateChanged", function() end);
+CodeBlock:Signal("beforeStopped", function() end);
 
 function CodeBlock:ctor()
 	self.timers = {};
@@ -177,8 +178,16 @@ function CodeBlock:RestartAll()
 	end
 end
 
+
 -- remove everything to unloaded state. 
 function CodeBlock:Stop()
+	self:beforeStopped();
+
+	self:SetAutoWait(false);
+	self:FireEvent("onCodeBlockStopped", nil, nil, true)
+	self:SetAutoWait(true);
+
+	self:Disconnect("beforeStopped");
 	self:Disconnect("actorClicked");
 	self:Disconnect("actorCloned");
 	self:Disconnect("actorCollided");
@@ -440,7 +449,7 @@ function CodeBlock:GetLastMessage()
 end
 
 -- @param msg: optional message to be passed to event callback
-function CodeBlock:FireEvent(event_name, actor, msg)
+function CodeBlock:FireEvent(event_name, actor, msg, bIsImmediate)
 	event_name = event_name or "";
 	local events = self.events[event_name];
 	if(events) then
@@ -448,10 +457,11 @@ function CodeBlock:FireEvent(event_name, actor, msg)
 			if(actor) then
 				event:SetActor(actor);
 			end
-			event:Fire(msg);
+			event:Fire(msg, nil, bIsImmediate);
 		end
 	end
 end
+
 
 function CodeBlock:CreateEvent(event_name)
 	event_name = event_name or "";
@@ -488,6 +498,13 @@ function CodeBlock:RegisterClickEvent(callbackFunc)
 	self:EnableActorPicking(true);
 	local event = self:CreateEvent("onClickActor");
 	event:SetIsFireForAllActors(false);
+	event:SetFunction(callbackFunc);
+end
+
+-- use this sparingly, because we will disable auto yield in this mode. 
+function CodeBlock:RegisterStopEvent(callbackFunc)
+	local event = self:CreateEvent("onCodeBlockStopped");
+	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 end
 

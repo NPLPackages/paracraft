@@ -378,6 +378,33 @@ end
 },
 
 {
+	type = "registerStopEvent", 
+	message0 = L"当代码方块停止时",
+	message1 = L"%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Events", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'registerStopEvent(function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerStopEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+registerStopEvent(function()
+    tip("stopped")
+end)
+]]}},
+},
+
+{
 	type = "cmdExamples", 
 	message0 = "%1",
 	arg0 = {

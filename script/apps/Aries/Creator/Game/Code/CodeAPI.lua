@@ -74,6 +74,7 @@ local s_env_methods = {
 	"registerAnimationEvent",
 	"registerBroadcastEvent",
 	"registerBlockClickEvent",
+	"registerStopEvent",
 	"broadcast",
 	"broadcastAndWait",
 	

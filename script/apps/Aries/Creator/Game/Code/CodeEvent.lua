@@ -95,7 +95,7 @@ function CodeEvent:IsRunningForActor(actor)
 	end
 end
 
-function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
+function CodeEvent:FireForActor(actor, msg, onFinishedCallback, bIsImmediate)
 	if(not self:CanFire(actor, msg)) then
 		if(onFinishedCallback) then
 			onFinishedCallback();
@@ -114,14 +114,18 @@ function CodeEvent:FireForActor(actor, msg, onFinishedCallback)
 	co:SetActor(actor);
 	co:SetFunction(self.callbackFunc);
 	self:SetCodeEvent(actor, co);
-	co:SetTimeout(self:GetCodeBlock():GetDefaultTick(), function()
+	if(not bIsImmediate) then
+		co:SetTimeout(self:GetCodeBlock():GetDefaultTick(), function()
+			co:Run(msg, onFinishedCallback);
+		end)
+	else
 		co:Run(msg, onFinishedCallback);
-	end)
+	end
 end
 
-function CodeEvent:Fire(msg, onFinishedCallback)
+function CodeEvent:Fire(msg, onFinishedCallback, bIsImmediate)
 	if(not self.isFireForAll) then
-		self:FireForActor(self.actor, msg, onFinishedCallback);
+		self:FireForActor(self.actor, msg, onFinishedCallback, bIsImmediate);
 	else
 		local actors = self:GetCodeBlock():GetActors();
 		local nAgentCount = actors and (#actors) or 0;
@@ -141,11 +145,11 @@ function CodeEvent:Fire(msg, onFinishedCallback)
 			for i=nAgentCount, 1, -1  do
 				local actor = actors[i];
 				if(actor) then
-					self:FireForActor(actor, msg, onFinishedCallback);
+					self:FireForActor(actor, msg, onFinishedCallback, bIsImmediate);
 				end
 			end
 		else
-			self:FireForActor(self.actor, msg, onFinishedCallback);
+			self:FireForActor(self.actor, msg, onFinishedCallback, bIsImmediate);
 		end
 	end
 end

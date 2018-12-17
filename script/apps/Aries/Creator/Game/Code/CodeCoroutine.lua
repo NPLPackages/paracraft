@@ -64,9 +64,11 @@ end
 
 function CodeCoroutine:MakeCallbackFunc(callbackFunc)
 	return function(...)
-		self:SetCurrentCodeContext();
-		if(callbackFunc) then
-			callbackFunc(...);
+		if(not self.isStopped) then
+			self:SetCurrentCodeContext();
+			if(callbackFunc) then
+				callbackFunc(...);
+			end
 		end
 	end
 end
@@ -81,7 +83,7 @@ function CodeCoroutine:SetTimeout(duration, callbackFunc)
 	local timer = self:GetCodeBlock():SetTimeout(duration, function(timer)
 		self:SetCurrentCodeContext()
 		self:RemoveTimer(timer);
-		if(callbackFunc) then
+		if(callbackFunc and not self.isStopped) then
 			callbackFunc(timer);
 		end
 	end);
@@ -125,10 +127,12 @@ end
 function CodeCoroutine:Run(msg, onFinishedCallback)
 	self:Stop();
 	self.isStopped = false;
+	self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
 	if(self.code_func) then
 		self.co = coroutine.create(function()
 			self:RunImp(msg);
 			self.isStopped = true;
+			self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
 			if(onFinishedCallback) then
 				onFinishedCallback();
 			end

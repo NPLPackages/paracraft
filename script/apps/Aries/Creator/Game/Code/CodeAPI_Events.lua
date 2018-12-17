@@ -35,6 +35,7 @@ function env_imp:registerCloneEvent(callbackFunc)
 	env_imp.checkyield(self);
 end
 
+-- @param text: any text, there is some predefined values, like "onCodeBlockStopped"
 function env_imp:registerBroadcastEvent(text, callbackFunc)
 	self.codeblock:RegisterTextEvent(text, callbackFunc);
 	env_imp.checkyield(self);
@@ -68,6 +69,10 @@ end
 
 function env_imp:registerStartEvent(callbackFunc)
 	self.codeblock:RegisterTextEvent("start", callbackFunc);
+end
+
+function env_imp:registerStopEvent(callbackFunc)
+	self.codeblock:RegisterStopEvent(callbackFunc);
 end
 
 function env_imp:registerClickEvent(callbackFunc)

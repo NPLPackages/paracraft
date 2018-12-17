@@ -260,28 +260,36 @@ log(t)
 },
 
 {
-	type = "log", 
-	message0 = "log   \"%1\"",
-	arg0 = {
+	type = "code_block", 
+	message0 = L"代码%1",
+	message1 = L"%1",
+    arg0 = {
 		{
-			name = "left",
-			type = "field_input",
-			text = "string",
+			name = "label_dummy",
+			type = "input_dummy",
+			text = "",
 		},
 	},
+	arg1 = {
+		{
+			name = "codes",
+			type = "field_input",
+			text = "",
+		},
+	},
+	output = {type = "null",},
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'log("%s")',
+	func_description = '%s',
 	ToNPL = function(self)
-		
+		return string.format('%s\n', self:getFieldAsString('codes'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = L"", canRun = true, code = [[
 ]]}},
 },
-
 };
 function CodeCadDef_Data.GetCmds()
 	return cmds;

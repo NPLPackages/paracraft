@@ -13,29 +13,6 @@ local BlockCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code
 local cmds = {
 
 {
-	type = "NPL.load", 
-	message0 = L"NPL.load(%1)",
-    arg0 = {
-		{
-			name = "value",
-			type = "field_dropdown",
-			options = {
-				{ L"ShapeBuilder", 'local ShapeBuilder = NPL.load("Mod/NplOceScript/Blocks/ShapeBuilder.lua");' },
-			},
-		},
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = '%s',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
 	type = "ShapeBuilder.createShape", 
 	message0 = L"createShape %1",
     arg0 = {
