@@ -17,12 +17,9 @@ operator-precedence: https://developers.google.com/blockly/guides/create-custom-
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/Json.lua");
-
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpData.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua");
 
-local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
 
@@ -37,7 +34,7 @@ function CodeBlocklySerializer.GetCategoryButtons()
     return CodeBlocklySerializer.categories or CodeHelpWindow.GetCategoryButtons()
 end
 function CodeBlocklySerializer.GetAllCmds()
-	return CodeBlocklySerializer.all_cmds or CodeHelpWindow.GetAllCmds() or CodeHelpData.GetAllCmds();
+	return CodeBlocklySerializer.all_cmds or CodeHelpWindow.GetAllCmds();
 end
 function CodeBlocklySerializer.SaveFilesToDebug(folder_name)
     folder_name = folder_name or "block_configs"

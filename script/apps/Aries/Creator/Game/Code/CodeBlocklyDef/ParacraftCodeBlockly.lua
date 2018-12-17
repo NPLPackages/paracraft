@@ -1,16 +1,14 @@
 --[[
-Title: CodeHelpData
+Title: ParacraftCodeBlockly
 Author(s): LiXizhi
 Date: 2018/6/7
-Desc: add help data here
+Desc: language configuration file for ParacraftCodeBlockly
 use the lib:
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpData.lua");
-local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
-CodeHelpData.LoadParacraftCodeFunctions()
+local langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
 -------------------------------------------------------
 ]]
-local CodeHelpData = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpData");
+local ParacraftCodeBlockly = NPL.export();
 
 local all_cmds = {}
 local all_cmds_map = {}
@@ -27,7 +25,7 @@ local default_categories = {
 };
 
 local is_installed = false;
-function CodeHelpData.AppendAll()
+function ParacraftCodeBlockly.AppendAll()
 	if(is_installed)then
 		return
 	end
@@ -64,7 +62,7 @@ function CodeHelpData.AppendAll()
 		CodeBlocklyDef_Sound.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
-		CodeHelpData.AppendDefinitions(v);
+		ParacraftCodeBlockly.AppendDefinitions(v);
 	end
 end
 
@@ -93,7 +91,7 @@ show()
 ]]},
 }
 
-function CodeHelpData.AppendDefinitions(source)
+function ParacraftCodeBlockly.AppendDefinitions(source)
 	if(source)then
 		for k,v in ipairs(source) do
 			table.insert(all_cmds,v);
@@ -102,24 +100,22 @@ function CodeHelpData.AppendDefinitions(source)
 	end
 end
 
-function CodeHelpData.GetItemByType(typeName)
+function ParacraftCodeBlockly.GetItemByType(typeName)
 	return all_cmds_map[typeName];
 end
 
-function CodeHelpData.LoadParacraftCodeFunctions()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
-	local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
-	CodeHelpWindow.SetAllCmds(CodeHelpData.GetAllCmds());
-	CodeHelpWindow.SetCategories(CodeHelpData.GetCategoryButtons());
-	
-	CodeHelpWindow.AddCodeExamples(all_examples);
-end
-
-function CodeHelpData.GetCategoryButtons()
+-- public:
+function ParacraftCodeBlockly.GetCategoryButtons()
 	return default_categories;
 end
 
-function CodeHelpData.GetAllCmds()
-	CodeHelpData.AppendAll();
+-- public:
+function ParacraftCodeBlockly.GetAllCmds()
+	ParacraftCodeBlockly.AppendAll();
 	return all_cmds;
+end
+
+-- public: optional
+function ParacraftCodeBlockly.GetCodeExamples()
+	return all_examples;
 end

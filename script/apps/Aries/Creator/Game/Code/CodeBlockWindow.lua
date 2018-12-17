@@ -671,6 +671,17 @@ function CodeBlockWindow.OnClickSelectLanguageSettings()
 			if(result ~="" and result ~="npl") then
 				local filename = Files.GetWorldFilePath(result)
 				if(not filename) then
+					filename = result:gsub("%.npl$", "");
+					filename = filename..".npl";
+
+					_guihelper.MessageBox(format("是否要新建语言配置文件:%s", filename), function(res)
+						if(res and res == _guihelper.DialogResult.Yes) then
+							local fullPath = Files.WorldPathToFullPath(filename);
+							ParaIO.CopyFile("script/apps/Aries/Creator/Game/Code/Examples/HelloLanguage.npl", fullPath, false);
+							entity:SetLanguageConfigFile(filename);
+							CodeBlockWindow.UpdateCodeEditorStatus()
+						end
+					end, _guihelper.MessageBoxButtons.YesNo);
 					_guihelper.MessageBox(L"文件不存在");
 					return;
 				end
