@@ -79,7 +79,7 @@ end
             <div style="margin-bottom:5px;margin-left:10px;">
                 <input type="button" value='<%=L"创建全局变量"%>' tooltip='<%=L"左键创建全局变量,右键刷新"%>' onclick="CodeHelpWindow.OnCreateVariable" style="color:#ffffff;font-size:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
             </div>
-            <pe:gridview style="margin:0px;height:137px;" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="24" RememberScrollPos="true"
+            <pe:gridview style="margin:0px;height:137px;" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"
                          DataSource='<%=DS_GlobalData%>'>
                 <Columns>
                     <div tooltip='<%=Eval("datatype")%>' name='<%=Eval("name")%>' onclick="OnClickDataItem">

@@ -14,13 +14,11 @@ local cmds = {
 -- Data
 {
 	type = "getLocalVariable", 
-	message0 = L"获取变量%1",
+	message0 = L"变量%1",
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "score",
-			variableTypes = {""},
+			type = "field_input",
 			text = "score",
 		},
 	},
@@ -44,9 +42,7 @@ say(key, 1)
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "score",
-			variableTypes = {""},
+			type = "field_input",
 			text = "score",
 		},
 		{
@@ -95,7 +91,7 @@ say(key, 1)
 	nextStatement = true,
 	func_description = '%s = %s',
 	ToNPL = function(self)
-		return 'key = "value"\n';
+		return string.format('%s = %s\n', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 text = "hello"
@@ -597,8 +593,8 @@ thinkText("Let me think");
 	arg0 = {
 		{
 			name = "name",
-			type = "field_variable",
-			variable = "log",
+			type = "field_input",
+			text = "log",
 		},
 		{
 			name = "param",

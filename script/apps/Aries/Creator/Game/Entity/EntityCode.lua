@@ -86,7 +86,7 @@ function Entity:GetNPLCode()
 end
 
 function Entity:TextToXmlInnerNode(text)
-	if(commonlib.Encoding.HasXMLEscapeChar(text)) then
+	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
 		return {name="![CDATA[", [1] = text};
 	else
 		return text;

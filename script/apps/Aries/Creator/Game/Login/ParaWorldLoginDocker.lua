@@ -296,13 +296,11 @@ function ParaWorldLoginDocker.OnClickApp(name)
 
 	if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
-			if(not ParaWorldLoginDocker.IsLoadedApp(name))then
-				ParaWorldLoginDocker.InstallApp("paracraft", function(bInstalled)
-					if(bInstalled) then
-						ParaWorldLoginDocker.Restart("paracraft", format('paraworldapp="%s"', name))
-					end
-				end)
-			end
+			ParaWorldLoginDocker.InstallApp("paracraft", function(bInstalled)
+				if(bInstalled) then
+					ParaWorldLoginDocker.Restart("paracraft", format('paraworldapp="%s"', name))
+				end
+			end)
 		else
 			if(name == "user_worlds") then
 				System.options.showUserWorldsOnce = true
@@ -408,7 +406,7 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 			additional_commandline_params = format('paraworldapp="%s"', appName)
 		end
 	end
-
+	
 	local oldCmdLine = ParaEngine.GetAppCommandLine();
 	local newCmdLine = oldCmdLine;
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
@@ -421,9 +419,10 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 	newCmdLine = newCmdLine.." "..(ParaWorldLoginDocker.GetRedirectableCmdLineParams() or "");
 
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
-	if(app) then
+	if(app and not ParaWorldLoginDocker.IsLoadedApp(appName)) then
 		local redistFolder = ParaWorldLoginDocker.GetAppFolder(appName);
 		redistFolder = redistFolder:gsub("\\", "/");
+
 		if(ParaWorldLoginDocker.GetCurrentRedistFolder() ~= redistFolder) then
 			additional_commandline_params = format("dev=\"%s\" %s", redistFolder, additional_commandline_params or "");
 			LOG.std(nil, "info", "ParaWorldLoginDocker", "dev folder changed to %s", redistFolder);

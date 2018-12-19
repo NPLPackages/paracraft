@@ -154,10 +154,8 @@ end
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "i",
-			variableTypes = {""},
-			text = "key",
+			type = "field_input",
+			text = "i",
 		},
         {
 			name = "start_index",
@@ -201,10 +199,8 @@ end
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "i",
-			variableTypes = {""},
-			text = "key",
+			type = "field_input",
+			text = "i",
 		},
         {
 			name = "start_index",
