@@ -767,7 +767,7 @@ function CodeBlock:IncludeFile(filename)
 				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
-				local ok, result = xpcall(code_func, CodeBlock.handleError, msg);
+				local ok, result = xpcall(code_func, CodeBlock.handleError);
 				if(not ok) then
 					if(result:match("_stop_all_")) then
 						self:StopAll();

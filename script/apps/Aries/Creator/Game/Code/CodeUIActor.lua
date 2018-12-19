@@ -539,12 +539,25 @@ function Actor:SetTime(time)
 	self.time = time;
 end
 
+function Actor:GetOpacity()
+	return self:GetEntity() and self:GetEntity():GetOpacity() or 1;
+end
+
+function Actor:SetOpacity(opacity)
+	local entity = self:GetEntity();
+	if(entity) then	
+		if(type(opacity) == "number") then
+			entity:SetOpacity(opacity);
+		end
+	end
+end
 
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
+	["opacity"] = {setter = Actor.SetOpacity, getter = Actor.GetOpacity, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
 	-- tricky: pitch and roll are reversed

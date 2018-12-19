@@ -287,6 +287,7 @@ end
 				{ L"俯仰角度", "pitch" },
 				{ L"翻滾角度", "roll" },
 				{ L"颜色", "color" },
+				{ L"透明度", "opacity" },
 				{ L"文字", "text" },
 				{ L"是否为化身", "isAgent" },
 				{ L"模型文件", "assetfile" },

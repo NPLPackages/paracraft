@@ -24,6 +24,7 @@ local s_env_methods = {
 	"GetEntity",
 	"restart",
 	"exit",
+	"xpcall",
 	-- Data
 	"print",
 	"log",
@@ -197,6 +198,11 @@ end
 function env_imp:restart(msg)
 	env_imp.wait(self, 1);
 	error("_restart_all_");
+end
+
+-- return ok, result
+function env_imp:xpcall(code_func, handleError, ...)
+	return xpcall(code_func, handleError, ...);
 end
 
 -- private: 

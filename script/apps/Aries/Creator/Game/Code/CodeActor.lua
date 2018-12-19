@@ -673,6 +673,18 @@ function Actor:SetTime(time)
 	self.time = time;
 end
 
+function Actor:GetOpacity()
+	return self:GetEntity() and self:GetEntity():GetOpacity() or 1;
+end
+
+function Actor:SetOpacity(opacity)
+	local entity = self:GetEntity();
+	if(entity) then	
+		if(type(opacity) == "number") then
+			entity:SetOpacity(opacity);
+		end
+	end
+end
 
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
@@ -688,6 +700,7 @@ local internalValues = {
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
+	["opacity"] = {setter = Actor.SetOpacity, getter = Actor.GetOpacity, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 

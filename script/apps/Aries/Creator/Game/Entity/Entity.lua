@@ -2647,3 +2647,21 @@ end
 function Entity:GetColor()
 	return self.color or 0xffffff;
 end
+
+-- @param opacity: [0,1]
+function Entity:SetOpacity(opacity)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("opacity", opacity or 1);
+	end
+end
+
+-- @return [0,1]
+function Entity:GetOpacity()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("opacity", 1);
+	else
+		return 1
+	end
+end
