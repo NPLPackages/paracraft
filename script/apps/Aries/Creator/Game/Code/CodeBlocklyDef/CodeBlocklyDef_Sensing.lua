@@ -379,7 +379,7 @@ end
 	canRun = false,
 	func_description = 'isKeyPressed("%s")',
 	ToNPL = function(self)
-		return string.format('isKeyPressed("%s")\n', self:getFieldAsString('input'));
+		return string.format('isKeyPressed("%s")', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 say("press left/right key to move me!")
@@ -422,7 +422,7 @@ end
 	canRun = false,
 	func_description = 'isMouseDown()',
 	ToNPL = function(self)
-		return string.format('isMouseDown()\n');
+		return string.format('isMouseDown()');
 	end,
 	examples = {{desc = L"点击任意位置传送", canRun = true, code = [[
 say("click anywhere")

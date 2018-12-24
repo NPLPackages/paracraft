@@ -93,6 +93,16 @@ registerKeyPressedEvent("space",function()
     walkForward(0)
 end)
 ]]},
+{desc = L"任意按键", canRun = true, code = [[
+registerKeyPressedEvent("any", function(msg)
+    run(function()
+        say(msg.keyname)
+    end)
+    if(isKeyPressed("e")) then
+        return true
+    end
+end)
+]]},
 {desc = L"鼠标按钮", canRun = true, code = [[
 registerKeyPressedEvent("mouse_buttons",function(event)
     say("button:"..event:buttons())

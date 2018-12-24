@@ -547,11 +547,23 @@ function CodeBlock:OnClickActor(actor, mouse_button)
 	self:actorClicked(actor, mouse_button);
 end
 
--- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"
--- case incensitive
+-- we will accept these keys, so that base context does not process them. 
+local nonAcceptingKeys = {
+	["mouse_buttons"] = true, ["mouse_wheel"] = true, ["escape"] = true,
+}
+
+local mouseKeys = {
+	["mouse_buttons"] = true, ["mouse_wheel"] = true
+}
+
+
+-- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape", "mouse_wheel", "mouse_buttons"
+-- @param callbackFunc: if keyname is "any", this function will block key if it returns true. 
+-- case insensitive
 function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 	local event = self:CreateEvent("onKeyPressed");
 	event:SetIsFireForAllActors(true);
+	event:SetStopLastEvent(false);
 	event:SetFunction(callbackFunc);
 	keyname = GameLogic.GetCodeGlobal():GetKeyNameFromString(keyname) or keyname;
 	
@@ -560,14 +572,21 @@ function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 			return 
 		end
 		local bFire;
+		local bImmediateMode;
+		local result;
 		if(not keyname or keyname == "any") then
-			bFire = true;
+			if(not mouseKeys[msg.keyname or ""]) then
+				bFire = true;
+				bImmediateMode = true;
+			end
 		elseif(keyname == msg.keyname) then
+			if(not nonAcceptingKeys[keyname]) then
+				result = true;
+			end
 			bFire = true;
 		end
 		if(bFire) then
-			event:Fire(msg.param1 or msg);
-			return true;
+			return event:Fire(msg.param1 or msg, nil, bImmediateMode) or result;
 		end
 	end
 	event:Connect("beforeDestroyed", function()

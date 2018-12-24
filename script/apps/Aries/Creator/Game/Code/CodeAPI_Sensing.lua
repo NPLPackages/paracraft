@@ -138,33 +138,62 @@ function env_imp:isMouseDown()
 	return MouseEvent:buttons() == 1;
 end
 
--- get block position X (always integer)
+-- get block position X (prefer integer, unless not in the center of block)
 -- @param objName: if nil or "self", it means the calling actor
 function env_imp:getX(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
+		local x, y, z = entity:GetPosition();
+		if(x) then
+			x, y, z = BlockEngine:block_float(x, y, z);
+			x = x - 0.5;
+			if(math.abs(x-bx) < 0.0001) then
+				return bx
+			else
+				return x;
+			end
+		end
 		return bx;
 	end
 end
 
--- get block position Y (always integer)
+-- get block position Y (prefer integer, unless not in the center of block)
 function env_imp:getY(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
+		local x, y, z = entity:GetPosition();
+		if(x) then
+			x, y, z = BlockEngine:block_float(x, y, z);
+			if(math.abs(y-by) < 0.0001) then
+				return by
+			else
+				return y;
+			end
+		end
 		return by;
 	end
 end
 
--- get block position Z (always integer)
+-- get block position Z (prefer integer, unless not in the center of block)
 function env_imp:getZ(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
+		local x, y, z = entity:GetPosition();
+		if(x) then
+			x, y, z = BlockEngine:block_float(x, y, z);
+			z = z - 0.5;
+			if(math.abs(z-bz) < 0.0001) then
+				return bz
+			else
+				return z;
+			end
+		end
 		return bz;
 	end
 end

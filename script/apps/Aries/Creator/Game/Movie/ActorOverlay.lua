@@ -491,6 +491,15 @@ function Actor:ComputeText(curTime)
 	return self:GetValue("text", curTime);
 end
 
+function Actor:ComputeRenderCode(curTime)
+	return self:GetValue("code", curTime);
+end
+
+-- set rendering code
+function Actor:SetRenderCode(code)
+	self.codeItem:SetCode(code);
+end
+
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
 	local entity = self.entity;
@@ -501,18 +510,14 @@ function Actor:FrameMovePlaying(deltaTime)
 	local allow_user_control = self:IsAllowUserControl() and
 		((self:GetMultiVariable():GetLastTime()+1) <= curTime);
 
-	local new_x = self:GetValue("x", curTime);
-	local new_y = self:GetValue("y", curTime);
-	local new_z = self:GetValue("z", curTime);
-
+	local new_x, new_y, new_z, yaw, roll, pitch = self:ComputePosAndRotation(curTime);
+	
 	local ui_x = self:GetValue("ui_x", curTime);
 	local ui_y = self:GetValue("ui_y", curTime);
 	local ui_align = self:GetValue("ui_align", curTime);
 
-	local yaw, roll, pitch, scaling, opacity, color;
-	yaw = self:GetValue("facing", curTime);
-	roll = self:ComputeRoll(curTime);
-	pitch = self:GetValue("pitch", curTime);
+	local scaling, opacity, color;
+	
 	scaling = self:ComputeScaling(curTime);
 	opacity = self:GetValue("opacity", curTime);
 	color = self:ComputeColor(curTime);
@@ -548,12 +553,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	
 	entity:SetColor(color or "#ffffff");
 	-- set render code
-	self:SetRenderCode(self:GetValue("code", curTime))
-end
-
--- set rendering code
-function Actor:SetRenderCode(code)
-	self.codeItem:SetCode(code);
+	self:SetRenderCode(self:ComputeRenderCode(curTime))
 end
 
 -- example codes:
@@ -811,7 +811,7 @@ function Actor:ComputePosAndRotation(curTime)
 	local new_y = self:GetValue("y", curTime);
 	local new_z = self:GetValue("z", curTime);
 	local yaw = self:GetValue("facing", curTime);
-	local roll = self:GetValue("roll", curTime);
+	local roll = self:ComputeRoll(curTime);
 	local pitch = self:GetValue("pitch", curTime);
 
 	return new_x, new_y, new_z, yaw, roll, pitch;

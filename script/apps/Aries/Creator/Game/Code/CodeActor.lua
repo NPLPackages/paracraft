@@ -261,7 +261,6 @@ function Actor:SetBlockPos(bx, by, bz)
 		-- when we are already inside the target block
 		bx, by, bz = BlockEngine:real_min(bx+0.5, by, bz+0.5);
 		entity:SetPosition(bx, by, bz);
-		-- entity:SetBlockPos(bx, by, bz);
 	end
 end
 
@@ -399,10 +398,10 @@ function Actor:StopLastCodeEvent(event)
 	end
 end
 
-function Actor:InRunningEvent(event)
+function Actor:IsRunningEvent(event)
 	local last_coroutine = self.codeEvents[event];
 	if(last_coroutine) then
-		return last_coroutine:InRunning();
+		return not last_coroutine:IsFinished();
 	end
 end
 

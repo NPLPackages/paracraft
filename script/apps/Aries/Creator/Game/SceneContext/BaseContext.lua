@@ -553,6 +553,7 @@ function BaseContext:handleHookedKeyEvent(event)
 	end
 
 	if(GameLogic.GetCodeGlobal():BroadcastKeyPressedEvent(event.keyname)) then
+		event:accept();
 		return true;
 	end
 end

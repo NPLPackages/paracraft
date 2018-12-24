@@ -302,10 +302,10 @@ function Actor:StopLastCodeEvent(event)
 	end
 end
 
-function Actor:InRunningEvent(event)
+function Actor:IsRunningEvent(event)
 	local last_coroutine = self.codeEvents[event];
 	if(last_coroutine) then
-		return last_coroutine:InRunning();
+		return not last_coroutine:IsFinished();
 	end
 end
 
@@ -552,6 +552,19 @@ function Actor:SetOpacity(opacity)
 	end
 end
 
+function Actor:SetUserRenderCode(code)
+	self.renderCode = code;
+	self:SetRenderCode(code);
+end
+
+function Actor:GetUserRenderCode(code)
+	return self.renderCode;
+end
+
+function Actor:ComputeRenderCode(curTime)
+	return self.renderCode or self:GetValue("code", curTime);
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -566,7 +579,7 @@ local internalValues = {
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
-	["rendercode"] = {setter = Actor.SetRenderCode, isVariable = false}, 
+	["rendercode"] = {setter = Actor.SetUserRenderCode, getter = Actor.GetUserRenderCode,  isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
 }

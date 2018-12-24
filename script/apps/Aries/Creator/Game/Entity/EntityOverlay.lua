@@ -358,6 +358,8 @@ function Entity:CreateGetRootScreenOverlay()
 		Entity:EnableScreenTimer(true);
 
 		Entity.rootScreenOverlay = Overlay:new():init();
+		-- renders last after all other 3d transparent overlays
+		Entity.rootScreenOverlay:SetRenderOrder(1000);
 
 		-- TODO: can we setup a simple view model transform, instead of using billboarding
 --		Entity.rootScreenOverlay.BeginPaint = function(self, painter)

@@ -108,13 +108,19 @@ function CodeCoroutine:GetStatus()
 	return self.co and coroutine.status(self.co);
 end
 
-function CodeCoroutine:InRunning()
+function CodeCoroutine:IsRunning()
 	return not self.isStopped;
+end
+
+-- the coroutine has finished the last line of its code, but it may not be stopped, since it may still contain valid timers such as playing animations. 
+function CodeCoroutine:IsFinished()
+	return self.isFinished;
 end
 
 -- when stopped, it can no longer be resumed
 function CodeCoroutine:Stop()
 	self.isStopped = true;
+	self.isFinished = true;
 	-- we need to stop the last coroutine timers, before starting a new one. 
 	self:KillAllTimers();
 end
@@ -127,18 +133,22 @@ end
 function CodeCoroutine:Run(msg, onFinishedCallback)
 	self:Stop();
 	self.isStopped = false;
+	self.isFinished = false;
 	self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
 	if(self.code_func) then
 		self.co = coroutine.create(function()
-			self:RunImp(msg);
-			self.isStopped = true;
+			local result = self:RunImp(msg);
+			self.isFinished = true;
 			self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
 			if(onFinishedCallback) then
 				onFinishedCallback();
 			end
-			return nil, "finished";
+			return result, "finished";
 		end)
-		self:Resume();
+		local ok, result, status = self:Resume();
+		if(ok and status == "finished") then
+			return result;
+		end
 	end
 end
 
