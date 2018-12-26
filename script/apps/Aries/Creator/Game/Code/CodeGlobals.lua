@@ -87,6 +87,10 @@ function CodeGlobals:ctor()
 		getBlock = function(x,y,z)
 			return BlockEngine:GetBlockIdAndData(math.floor(x), math.floor(y), math.floor(z));
 		end,
+		-- get the block entity: advanced function
+		getBlockEntity = function(x, y, z)
+			return EntityManager.GetBlockEntity(math.floor(x), math.floor(y), math.floor(z));
+		end,
 		-- set block id at given position
 		setBlock = function(x,y,z, blockId, blockData)
 			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData);

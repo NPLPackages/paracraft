@@ -94,6 +94,7 @@ local s_env_methods = {
 	"registerCollisionEvent",
 	"broadcastCollision",
 	"distanceTo",
+	"calculatePushOut",
 	"isKeyPressed",
 	"isMouseDown",
 	"getTimer",
@@ -141,7 +142,7 @@ end
 -- @param bExitOnError: if true, this function will handle error 
 -- @return err, msg: err is true if there is error. 
 function env_imp:yield(bExitOnError)
-	local err, msg;
+	local err, msg, p3, p4;
 	if(self.co) then
 		if(self.fake_resume_res) then
 			err, msg = unpack(self.fake_resume_res);
@@ -149,27 +150,27 @@ function env_imp:yield(bExitOnError)
 			return err, msg;
 		else
 			self.check_count = 0;
-			err, msg = self.co:Yield();
+			err, msg, p3, p4 = self.co:Yield();
 			if(err and bExitOnError) then
 				env_imp.exit(self);
 			end
 		end
 	end
-	return err, msg;
+	return err, msg, p3, p4;
 end
 
 -- resume from where jobs are paused last. 
 -- @param err: if there is error, this is true, otherwise it is nil.
 -- @param msg: error message in case err=true
-function env_imp:resume(err, msg)
+function env_imp:resume(err, msg, p3, p4)
 	if(self.co) then
 		if(self.co:GetStatus() == "running") then
-			self.fake_resume_res = {err, msg};
+			self.fake_resume_res = {err, msg, p3, p4};
 			return;
 		else
 			self.fake_resume_res = nil;
 		end
-		local res, err, msg = self.co:Resume(err, msg);
+		local res, err, msg = self.co:Resume(err, msg, p3, p4);
 	end
 end
 

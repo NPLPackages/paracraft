@@ -285,6 +285,59 @@ end
 },
 
 {
+	type = "calculatePushOut", 
+	message0 = L"计算物理碰撞距离%1,%2,%3",
+	arg0 = {
+		{
+			name = "dx",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+		{
+			name = "dy",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+		{
+			name = "dz",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+	},
+	output = {type = "field_number",},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'calculatePushOut(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('calculatePushOut(%s, %s, %s)\n', self:getFieldAsString('dx'), self:getFieldAsString('dy'), self:getFieldAsString('dz'));
+	end,
+	examples = {{desc = L"保证不与刚体重叠", canRun = false, code = [[
+while(true) do
+   local dx, dy, dz = calculatePushOut()
+   if(dx~=0 or dy~=0 or dz~=0) then
+      move(dx, dy, dz, 0.1);
+   end
+   wait()
+end
+]]},
+{desc = L"尝试移动一段距离", canRun = false, code = [[
+for i=1, 100 do
+   local dx, dy, dz = calculatePushOut(0.1, 0, 0)
+   if(dx~=0 or dy~=0 or dz~=0) then
+      move(dx, dy, dz, 0.1);
+   end
+   wait()
+end
+]]}
+},
+},
+
+
+{
 	type = "askAndWait", 
 	message0 = L"提问%1并等待回答",
 	arg0 = {
@@ -459,7 +512,7 @@ end
 },
 {
 	type = "getBlock", 
-	message0 = L"获取方块id%1 %2 %3",
+	message0 = L"获取方块%1 %2 %3",
 	arg0 = {
 		{
 			name = "x",
@@ -505,7 +558,17 @@ say("block below is "..id, 2)
 {desc = L"获取方块的Data数据", canRun = true, code = [[
 local x,y,z = getPos();
 local id, data = getBlock(x,y-1,z)
-]]}
+]]},
+{desc = L"获取方块的Entity数据", canRun = true, code = [[
+local x,y,z = getPos();
+local entity = getBlockEntity(x,y,z)
+if(entity) then
+    say(entity.class_name, 1)
+    if(entity.class_name == "EntityBlockModel") then
+        say(entity:GetModelFile())
+    end
+end
+]]},
 },
 },
 

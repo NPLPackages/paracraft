@@ -569,10 +569,10 @@ say("world", 1)
 ]]},
 {desc = "", canRun = true, code = [[
 local actor = getActor("myself")
-runForActor(actor, function()
-	say("hello", 1)
+local x, y, z = runForActor(actor, function()
+    return getPos();
 end)
-say("world", 1)
+say(x..y..z, 1)
 ]]},
 },
 },

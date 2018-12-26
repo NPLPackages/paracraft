@@ -74,8 +74,11 @@ end
 
 -- Returns a list of bounding boxes that collide with aabb including the passed in entity's collision. 
 -- @param aabb: 
+-- @param entity: 
+-- @param filterEntityFunc: nil or a function(destEntity, entity) end, this function should return true for destEntity's collision to be considered.
+-- Entity.CanBeCollidedWith and Entity.IsVisible are good choices for this function. 
 -- return array list of bounding box (all bounding box is read-only), modifications will lead to unexpected result. 
-function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity)
+function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc)
     self.collidingBoundingBoxes:clear();
 	
     local blockMinX,  blockMinY, blockMinZ = BlockEngine:block(aabb:GetMinValues());
@@ -98,16 +101,17 @@ function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity)
 
 	if(listEntities) then
 		for _, entityCollided in ipairs(listEntities) do
-			local collisionAABB = entityCollided:GetCollisionAABB();
-			if(collisionAABB and collisionAABB:Intersect(aabb)) then
-				self.collidingBoundingBoxes:add(collisionAABB);
-			end
-			collisionAABB = entity:CheckGetCollisionBox(entityCollided);
-			if(collisionAABB and collisionAABB:Intersect(aabb)) then
-				self.collidingBoundingBoxes:add(collisionAABB);
+			if(not filterEntityFunc or filterEntityFunc(entityCollided, entity)) then
+				local collisionAABB = entityCollided:GetCollisionAABB();
+				if(collisionAABB and collisionAABB:Intersect(aabb)) then
+					self.collidingBoundingBoxes:add(collisionAABB);
+				end
+				collisionAABB = entity:CheckGetCollisionBox(entityCollided);
+				if(collisionAABB and collisionAABB:Intersect(aabb)) then
+					self.collidingBoundingBoxes:add(collisionAABB);
+				end
 			end
 		end
 	end
-
     return self.collidingBoundingBoxes;
 end

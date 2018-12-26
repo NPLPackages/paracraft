@@ -137,17 +137,17 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 	self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
 	if(self.code_func) then
 		self.co = coroutine.create(function()
-			local result = self:RunImp(msg);
+			local result, r2, r3, r4 = self:RunImp(msg);
 			self.isFinished = true;
 			self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
 			if(onFinishedCallback) then
-				onFinishedCallback();
+				onFinishedCallback(result, r2, r3, r4);
 			end
-			return result, "finished";
+			return result, r2, r3, r4;
 		end)
-		local ok, result, status = self:Resume();
-		if(ok and status == "finished") then
-			return result;
+		local ok, result, r2, r3, r4 = self:Resume();
+		if(ok and self.isFinished) then
+			return result, r2, r3, r4;
 		end
 	end
 end
@@ -162,7 +162,7 @@ function CodeCoroutine:RunImp(msg)
 	local code_func = self.code_func;
 	if(code_func) then
 		setfenv(code_func, self:GetCodeBlock():GetCodeEnv());
-		local ok, result = xpcall(code_func, CodeCoroutine.handleError, msg);
+		local ok, result, r2, r3, r4 = xpcall(code_func, CodeCoroutine.handleError, msg);
 
 		if(not ok) then
 			if(result:match("_stop_all_")) then
@@ -175,14 +175,14 @@ function CodeCoroutine:RunImp(msg)
 				self:GetCodeBlock():send_message(msg, "error");
 			end
 		end
-		return result;
+		return result, r2, r3, r4;
 	end
 end
 
-function CodeCoroutine:Resume(err, msg)
+function CodeCoroutine:Resume(err, msg, p3, p4)
 	if(self.co and not self.isStopped) then
 		self:SetCurrentCodeContext();
-		return coroutine.resume(self.co, err, msg);
+		return coroutine.resume(self.co, err, msg, p3, p4);
 	end
 end
 

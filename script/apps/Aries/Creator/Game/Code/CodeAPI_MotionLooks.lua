@@ -149,8 +149,11 @@ function env_imp:setPos(x, y, z)
 end
 
 -- same as getX(), getY(), getZ(), except that we return real coordinate in block unit
-function env_imp:getPos()
+function env_imp:getPos(objName)
 	local actor = self.actor;
+	if(objName and objName ~= "self") then
+		actor = GameLogic.GetCodeGlobal():GetActorByName(objName);
+	end
 	if(actor) then
 		local x, y, z = actor:GetPosition();
 		if(x) then

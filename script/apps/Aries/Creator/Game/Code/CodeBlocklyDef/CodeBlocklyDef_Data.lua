@@ -278,6 +278,7 @@ end
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
+				{ L"是否有物理", "isBlocker" },
 				{ L"组Id", "groupId" },
 				{ "x", "x" },
 				{ "y", "y" },

@@ -119,12 +119,14 @@ function env_imp:runForActor(actor, mainFunc)
 		local co = CodeCoroutine:new():Init(self.codeblock);
 		co:SetActor(actor);
 		co:SetFunction(mainFunc);
-		co:Run(nil, self.co:MakeCallbackFunc(function()
+		local result, r2, r3, r4 = co:Run(nil, self.co:MakeCallbackFunc(function(...)
 			isFinished = true;
-			env_imp.resume(self);
+			env_imp.resume(self, ...);
 		end));	
 		if(not isFinished) then
-			env_imp.yield(self);
+			return env_imp.yield(self);
+		else
+			return result, r2, r3, r4;
 		end
 	end
 end

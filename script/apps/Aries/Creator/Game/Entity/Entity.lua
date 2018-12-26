@@ -1403,7 +1403,7 @@ function Entity:CanBePushedBy(fromEntity)
 end
 
 -- Returns true if other Entities should be prevented from moving through this Entity.
-function Entity:CanBeCollidedWith()
+function Entity:CanBeCollidedWith(entity)
     return false;
 end
 
@@ -2226,6 +2226,59 @@ end
 
 function Entity:SetSneaking(bSneaking)
     self.bSneaking = bSneaking;
+end
+
+-- if true, this entity can not be pushed by other movable entities
+function Entity:SetStaticBlocker(bIsBlocker)
+end
+
+-- return true if this entity can not be pushed by other movable entities
+function Entity:IsStaticBlocker()
+end
+
+--@param dx,dy,dz: if nil, they default to 0. 
+-- @param filterEntityFunc: nil or a function(destEntity, entity) end, this function should return true for destEntity's collision to be considered.
+-- Entity.CanBeCollidedWith and Entity.IsVisible are good choices for this function. 
+-- @return dx,dy,dz: return the smallest push out according to current overlapping status 
+function Entity:CalculatePushOut(dx,dy,dz, entityFileterFunc)
+	dx = dx or 0;
+	dy = dy or 0;
+	dz = dz or 0;
+	if (self.noClip) then
+		return dx,dy,dz;
+	end
+	local boundingBox = self:GetCollisionAABB();
+	local aabb = boundingBox:clone_from_pool():AddCoord(dx, dy, dz)
+	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self, entityFileterFunc);
+
+	local deltaX, deltaY, deltaZ = 0, 0, 0;
+	for i= 1, listCollisions:size() do
+		local dx_, dy_, dz_, bCollided = listCollisions:get(i):CalculateOffset(aabb);
+		if(bCollided) then
+			if(math.abs(dx_) < math.abs(dy_)) then
+				if(math.abs(dx_) < math.abs(dz_)) then
+					if((deltaX <= 0 and dx_<deltaX) or (deltaX>=0 and dx_ > deltaX)) then
+						deltaX = dx_;
+					end
+				else
+					if((deltaZ <= 0 and dz_<deltaZ) or (deltaZ>=0 and dz_ > deltaZ)) then
+						deltaZ = dz_;
+					end
+				end
+			else
+				if(math.abs(dy_) < math.abs(dz_)) then
+					if((deltaY <= 0 and dy_<deltaY) or (deltaY>=0 and dy_ > deltaY)) then
+						deltaY = dy_;
+					end
+				else
+					if((deltaZ <= 0 and dz_<deltaZ) or (deltaZ>=0 and dz_ > deltaZ)) then
+						deltaZ = dz_;
+					end
+				end
+			end
+		end
+	end
+	return dx+deltaX, dy+deltaY, dz+deltaZ;
 end
 
 -- Tries to moves the entity by the passed in displacement. 

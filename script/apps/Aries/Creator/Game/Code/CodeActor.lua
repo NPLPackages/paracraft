@@ -58,7 +58,7 @@ function Actor:Init(itemStack, movieclipEntity)
 	entity:Connect("clicked", self, self.OnClick);
 	entity:Connect("collided", self, self.OnCollideWithEntity);
 	entity:Connect("valueChanged", self, self.OnEntityPositionChange);
-	
+	entity:SetStaticBlocker(true);
 	return self;
 end
 
@@ -146,13 +146,27 @@ function Actor:IsTouchingEntity(entity2)
 	end
 end
 
+-- static function
+local function CanBeCollidedWith_(destEntity, entity)
+	if(destEntity:IsVisible() and destEntity:IsStaticBlocker()) then
+		return true;
+	end
+end
+
+function Actor:CalculatePushOut(dx, dy, dz)
+	local entity = self:GetEntity();
+	if(entity) then
+		return entity:CalculatePushOut(dx, dy, dz, CanBeCollidedWith_)
+	end
+end
+
 -- only bounce in horizontal XZ plain, it just changes the direction/facing of the actor, so that the actor moves aways from the collision. 
 function Actor:Bounce()
 	if(not self.entity) then
 		return;
 	end
 	local aabb = self.entity:GetCollisionAABB();
-	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self.entity);
+	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self.entity, CanBeCollidedWith_);
 
 	local facing = self.entity:GetFacing();
 	local dx, dz;
@@ -685,11 +699,23 @@ function Actor:SetOpacity(opacity)
 	end
 end
 
+function Actor:GetIsBlocker()
+	return self:GetEntity() and self:GetEntity():IsStaticBlocker();
+end
+
+function Actor:SetIsBlocker(bBlocker)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetStaticBlocker(bBlocker == true);
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+	["isBlocker"] = {setter = Actor.SetIsBlocker, getter = Actor.GetIsBlocker, isVariable = false}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
 	-- tricky: pitch and roll are reversed

@@ -286,3 +286,17 @@ end
 function env_imp:registerCollisionEvent(name, callbackFunc)
 	self.codeblock:RegisterCollisionEvent(name, callbackFunc);
 end
+
+--@param dx,dy,dz: if nil, they default to 0. 
+-- @return dx,dy,dz: return the smallest push out according to current overlapping status 
+function env_imp:calculatePushOut(dx,dy,dz)
+	local actor = self.actor;
+	if(actor) then
+		dx = dx and BlockEngine:block_float(dx);
+		dy = dy and BlockEngine:block_float(dy);
+		dz = dz and BlockEngine:block_float(dz);
+		
+		dx, dy, dz = actor:CalculatePushOut(dx,dy,dz)
+		return BlockEngine:real_min(dx), BlockEngine:real_min(dy), BlockEngine:real_min(dz)
+	end
+end

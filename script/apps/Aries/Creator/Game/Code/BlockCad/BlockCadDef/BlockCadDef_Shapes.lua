@@ -241,6 +241,106 @@ local cmds = {
     ]]}},
 },
 
+{
+	type = "ShapeBuilder.point", 
+	message0 = L"point x %1 y %2 z %3 color %4",
+    arg0 = {
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ffffff",},
+			text = "#ffffff", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.point(%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.line", 
+	message0 = L"line x1 %1 y1 %2 z1 %3 x2 %4 y2 %5 z2 %6 color %7",
+    arg0 = {
+        {
+			name = "x1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "x2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ffffff",},
+			text = "#ffffff", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.line(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
 
 }
 function BlockCadDef_Shapes.GetCmds()
