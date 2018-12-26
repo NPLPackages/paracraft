@@ -58,7 +58,6 @@ function Actor:Init(itemStack, movieclipEntity)
 	entity:Connect("clicked", self, self.OnClick);
 	entity:Connect("collided", self, self.OnCollideWithEntity);
 	entity:Connect("valueChanged", self, self.OnEntityPositionChange);
-	entity:SetStaticBlocker(true);
 	return self;
 end
 

@@ -98,7 +98,7 @@ function Entity:BroadcastCollision()
 	if (entities and #entities > 1) then
 		for i=1, #entities do
 			local entity2 = entities[i];
-			if(entity2 ~= self and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+			if(entity2 ~= self and entity2:IsStaticBlocker() and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
 				entity2:collided(self);
 				self:collided(entity2);
 			end

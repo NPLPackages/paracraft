@@ -31,7 +31,8 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
-		commonlib = commonlib,
+		System = System, -- @Note: Is it secure here?  
+		commonlib = commonlib, -- @Note: Is it secure here?
 		type = type,
 		unpack = unpack,
 		setmetatable = setmetatable,
@@ -221,7 +222,7 @@ function CodeGlobals:LoadWorldData(name, value, filename)
 	local data = self.worldData and self.worldData[filename]
 	if(not data) then
 		local filepath = GameLogic.GetWorldDirectory().."codeblockdata/"..filename;
-		local file = ParaIO.open(filepath, "w");
+		local file = ParaIO.open(filepath, "r");
 		if(file:IsValid()) then
 			data = NPL.LoadTableFromString(file:GetText())
 			if(type(data) == "table") then
@@ -230,7 +231,7 @@ function CodeGlobals:LoadWorldData(name, value, filename)
 			file:close();
 		end
 		self.worldData = self.worldData or {};
-		data = {};
+		data = data or {};
 		self.worldData[filename] = data;
 	end
 	return data[name or ""];

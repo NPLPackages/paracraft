@@ -947,6 +947,7 @@ assert(score == 1)
 		return string.format('saveWorldData("%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('value'));
 	end,
 	examples = {{desc = L"常用于开发关卡编辑器", canRun = true, code = [[
+-- only saved to disk when Ctrl+S, otherwise memory only
 saveWorldData("maxLevel", 1)
 local maxLevel = loadWorldData("maxLevel")
 assert(maxLevel == 1)
@@ -986,6 +987,7 @@ assert(monsterCount == 1)
 		return string.format('loadWorldData("%s", "%s")', self:getFieldAsString('name'), self:getFieldAsString('defaultvalue'));
 	end,
 	examples = {{desc = L"常用于开发关卡编辑器", canRun = true, code = [[
+-- only saved to disk when Ctrl+S, otherwise memory only
 saveWorldData("maxLevel", 1)
 local maxLevel = loadWorldData("maxLevel")
 assert(maxLevel == 1)
