@@ -28,7 +28,8 @@ For example to create a simple score ranking system, one can write following cod
 
 ```lua
 registerNetworkEvent("updateScore", function(msg)
-     showVariable(msg.nid, msg.score)
+	_G[msg.nid] = msg.score;
+     showVariable(msg.nid)
 end)
 
 registerNetworkEvent("connect", function(msg)
@@ -65,7 +66,7 @@ registerNetworkEvent("disconnect", function(msg)
 end)
 
 while(true) do
-	broadcastNetworkEvent("updatePlayerPos", {x = 1, y=2, z=3})
+	broadcastNetworkEvent("updatePlayerPos", {x = getX(), y=getY(), z=getZ()})
 	wait(1);
 end
 ```

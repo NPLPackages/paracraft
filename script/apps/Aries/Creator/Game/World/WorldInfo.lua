@@ -28,25 +28,11 @@ end
 
 function WorldInfo:LoadFromXMLNode(node)
 	if(node and node.attr) then
-		self.name = node.attr.name;
-		self.create_date = node.attr.create_date;
-		self.desc = node.attr.desc;
-		self.size = node.attr.size;
-		self.nid = node.attr.nid;
-		-- could be "flat" or none
-		self.world_generator = node.attr.world_generator;
-		self.seed = node.attr.seed;
-		self.shadow = node.attr.shadow;
-		self.waterreflection = node.attr.waterreflection;
-		self.rendermethod = node.attr.rendermethod;
-		self.renderdist = node.attr.renderdist;
-		self.texture_pack_type = node.attr.texture_pack_type;
-		self.texture_pack_path = commonlib.Encoding.Utf8ToDefault(node.attr.texture_pack_path or node.attr.texture_pack or "");
-		self.texture_pack_url  = node.attr.texture_pack_url;
-		self.texture_pack_text = node.attr.texture_pack_text;
-		self.weather_type = node.attr.weather_type;
-		self.weather_strength = tonumber(node.attr.weather_strength);
-		self:SetTotalWorldTime(tonumber(self.totaltime) or 0);
+		commonlib.partialcopy(self, node.attr);
+		self.texture_pack_path = commonlib.Encoding.Utf8ToDefault(self.texture_pack_path or self.texture_pack or "");
+		self.weather_strength = tonumber(self.weather_strength);
+		self.totaltime = tonumber(self.totaltime);
+		self:SetTotalWorldTime(self.totaltime or 0);
 
 		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
 	end

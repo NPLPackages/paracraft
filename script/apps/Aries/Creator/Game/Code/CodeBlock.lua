@@ -621,6 +621,23 @@ function CodeBlock:RegisterCloneActorEvent(callbackFunc)
 	event:SetFunction(callbackFunc);
 end
 
+function CodeBlock:RegisterNetworkEvent(event_name, callbackFunc)
+	local event = self:CreateEvent(event_name);
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+	local function onEvent_(_, msg)
+		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+	end
+	event:Connect("beforeDestroyed", function()
+		GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_);
+	end)
+	GameLogic.GetCodeGlobal():RegisterNetworkEvent(event_name, onEvent_);
+end
+
+function CodeBlock:BroadcastNetworkEvent(event_name, msg)
+	GameLogic.GetCodeGlobal():BroadcastNetworkEvent(event_name, msg);
+end
+
 -- create a clone of some code block's actor
 -- @param name: if nil or "myself", it means clone myself
 -- @param msg: any mesage that is forwared to clone event

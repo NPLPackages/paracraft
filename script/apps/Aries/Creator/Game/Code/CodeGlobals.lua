@@ -175,6 +175,9 @@ function CodeGlobals:Reset()
 
 	-- clear UI if any
 	CodeUI:Clear();
+
+	-- TODO: 
+	-- GetLobby():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
 function CodeGlobals:OnWorldSave()
@@ -411,6 +414,36 @@ function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 		event:RemoveEventListener("msg", callbackFunc);
 	end
 end
+
+function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
+	self:CreateGetTextEvent(event_name):AddEventListener("net", callbackFunc);
+end
+
+function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc)
+	local event = self:GetTextEvent(text);
+	if(event) then
+		event:RemoveEventListener("net", callbackFunc);
+	end
+end
+
+-- send a named message to all computers in the network
+function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
+	-- TODO: 
+	-- GetLobby():BroadcastMessage(event_name, msg)
+	LOG.std(nil, "debug", event_name, msg);
+end
+
+-- when this computer received a message from the network.
+-- test code: GameLogic.GetCodeGlobal():handleNetworkEvent("updateScore", {nid="aaa", score=1121})
+-- @param event_name: "disconnect", "connect" are two predefined events alongside other user events
+-- @param onFinishedCallback: can be nil
+function CodeGlobals:handleNetworkEvent(event_name, msg, onFinishedCallback)
+	local event = self:GetTextEvent(event_name);
+	if(event) then
+		event:DispatchEvent({type="net", msg=msg, onFinishedCallback=onFinishedCallback});
+	end
+end
+
 
 function CodeGlobals:GetCurrentMetaTable()
 	return self.curMetaTable;

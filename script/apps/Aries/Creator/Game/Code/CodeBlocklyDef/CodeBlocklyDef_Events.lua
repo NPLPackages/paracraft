@@ -326,6 +326,7 @@ end
 		{
 			name = "params",
 			type = "input_value",
+			shadow = { type = "text", value = "",},
 			text = "", 
 		},
 	},
@@ -411,6 +412,135 @@ end
 registerStopEvent(function()
     tip("stopped")
 end)
+]]}},
+},
+
+{
+	type = "registerNetworkEvent", 
+	message0 = L"当收到网络消息%1(%2)时",
+	message1 = "%1",
+	arg0 = {
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "text", value = "connect",},
+			text = "connect", 
+		},
+		{
+			name = "param1",
+			type = "field_input",
+			text = "msg", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+    },
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'registerNetworkEvent(%s, function(%s)\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerNetworkEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+registerNetworkEvent("updateScore", function(msg)
+   _G[msg.nid] = msg.score;
+   showVariable(msg.nid)
+end)
+
+registerNetworkEvent("connect", function(msg)
+   broadcastNetworkEvent("updateScore", {score = 100})
+end)
+
+registerNetworkEvent("disconnect", function(msg)
+   hideVariable(msg.nid)
+end)
+
+while(true) do
+   broadcastNetworkEvent("updateScore", {score = 100})
+   wait(1);
+end
+]]}},
+},
+
+{
+	type = "msgTable", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "{}"
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "broadcastNetworkEvent", 
+	message0 = L"广播网络消息%1(%2)",
+	arg0 = {
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "text", value = "score",},
+			text = "score", 
+		},
+		{
+			name = "params",
+			type = "input_value",
+			shadow = { type = "msgTable", value = "{}",},
+			text = "{}", 
+		},
+	},
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'broadcastNetworkEvent(%s, %s)',
+	ToNPL = function(self)
+		return string.format('broadcastNetworkEvent("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+registerNetworkEvent("updatePlayerPos", function(msg)
+   runForActor(msg.nid, function()
+      moveTo(msg.x, msg.y, msg.z)
+   end)
+end)
+
+registerNetworkEvent("connect", function(msg)
+   clone(nil, msg.nid)
+end)
+
+registerNetworkEvent("disconnect", function(msg)
+   runForActor(msg.nid, function()
+      delete();
+   end)
+end)
+
+while(true) do
+   broadcastNetworkEvent("updatePlayerPos", {x = getX(), y=getY(), z=getZ()})
+   wait(1);
+end
 ]]}},
 },
 
