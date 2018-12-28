@@ -107,6 +107,8 @@ e.g
 			return;
 		end
 		
+		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 		if not WorldCommon.GetWorldTag("kpProjectId") then
 			GameLogic.AddBBS(nil, L"必须是分享的世界才可以进入大厅");
 			return;
