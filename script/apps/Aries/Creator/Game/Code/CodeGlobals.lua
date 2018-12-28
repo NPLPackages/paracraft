@@ -16,6 +16,8 @@ GameLogic.GetCodeGlobal():BroadcastStartEvent();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
 NPL.load("(gl)script/ide/System/Windows/Application.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 local Application = commonlib.gettable("System.Windows.Application");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -177,7 +179,7 @@ function CodeGlobals:Reset()
 	CodeUI:Clear();
 
 	-- TODO: 
-	-- GetLobby():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
+	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
 function CodeGlobals:OnWorldSave()
@@ -416,7 +418,15 @@ function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 end
 
 function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
-	self:CreateGetTextEvent(event_name):AddEventListener("net", callbackFunc);
+	local event = self:CreateGetTextEvent(event_name);
+	event:AddEventListener("net", callbackFunc);
+	
+	if event_name == "connect" then
+		local clientren = LobbyServer.GetSingleton():GetClientren();
+		for k, v in pairs(clientren) do
+			event:DispatchEvent({type="net", msg={userinfo = v}});
+		end
+	end
 end
 
 function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc)
@@ -429,7 +439,7 @@ end
 -- send a named message to all computers in the network
 function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
 	-- TODO: 
-	-- GetLobby():BroadcastMessage(event_name, msg)
+	LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
 	LOG.std(nil, "debug", event_name, msg);
 end
 

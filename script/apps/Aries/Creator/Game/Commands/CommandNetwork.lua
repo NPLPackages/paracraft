@@ -19,6 +19,9 @@ local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
+
 Commands["tunnelserver"] = {
 	name="tunnelserver", 
 	quick_ref="/tunnelserver [-start|stop] [ip_host] [port]", 
@@ -63,7 +66,8 @@ Commands["startserver"] = {
 		else
 			NetworkMain:StartServer(host, port);
 		end
-
+		
+		
 		-- turn off for debugging
 		GameLogic.options:SetClickToContinue(false);
 	end,
@@ -79,6 +83,132 @@ Commands["stopserver"] = {
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
 		local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 		NetworkMain:Stop();
+	end,
+};
+
+Commands["startLobbyServer"] = {
+	name="startLobbyServer", 
+	quick_ref="/startLobbyServer [bAutoDiscovery] [broadcast_address_list]", 
+	desc=[[start lobby server :
+@param AutoDiscovery: start auto discoverty, default is true. 
+@param broadcast_address_list : default is 255.255.255.255
+e.g
+	/startLobbyServer
+	/startLobbyServer false
+	/startLobbyServer true 10.27.3.255
+	/startLobbyServer true 10.27.3.255|255.255.255.255
+	]],
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		
+		if not System.User.keepworkUsername then
+			GameLogic.AddBBS(nil, L"必须先登录keepwork");
+			return;
+		end
+		
+		if not WorldCommon.GetWorldTag("kpProjectId") then
+			GameLogic.AddBBS(nil, L"必须是分享的世界才可以进入大厅");
+			return;
+		end
+	
+		
+		local att = NPL.GetAttributeObject();
+		
+		local bAutoDiscovery;
+		local broadcast_address_list ;
+		bAutoDiscovery, cmd_text = CmdParser.ParseBool(cmd_text);
+		broadcast_address_list, cmd_text = CmdParser.ParseStringList(cmd_text)
+		
+		if bAutoDiscovery == nil then bAutoDiscovery = true; end
+		
+		local function _startlobbyserver()
+			-- start udp server
+			local port = 8099;
+			local i = 0;
+			while not att:GetField("IsUDPServerStarted") and i <= 20 do
+				att:SetField("EnableUDPServer", port + i);
+				i = i + 1;
+			end
+
+		
+			LobbyServer.GetSingleton():Start();
+			if bAutoDiscovery then
+				if broadcast_address_list and #broadcast_address_list > 0 then
+					LobbyServer.GetSingleton():AutoDiscovery(broadcast_address_list);
+				else
+					LobbyServer.GetSingleton():AutoDiscovery();
+				end
+			end
+		end
+		
+		-- start tcp server
+		if not att:GetField("IsServerStarted") then
+			local doc_root_dir = "script/apps/WebServer/admin";
+			local host;
+			local port = 8099;
+			
+			-- start server
+			local function startserver_()
+				if(WebServer:Start(doc_root_dir, host, port)) then
+					CommandManager:RunCommand("/clicktocontinue off");
+					local addr = WebServer:site_url();
+					if(addr) then
+						-- change windows title
+						NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+						local wnd_title = ParaEngine.GetAttributeObject():GetField("WindowText", "")
+						wnd_title = wnd_title:gsub("%sport:%d+", "");
+						wnd_title = wnd_title .. format(" port:%d", port);
+						ParaEngine.GetAttributeObject():SetField("WindowText", wnd_title);
+
+						-- show tips
+						GameLogic.SetStatus(format(L"Web Server启动成功: %s", addr));
+						GameLogic.AddBBS(nil, format("www_root: %s", doc_root_dir));
+					end
+					
+					_startlobbyserver();
+				else
+					GameLogic.AddBBS(nil, L"只能同时启动一个Server");
+				end
+			end
+			
+			local function TestOpenNPLPort_()
+					System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
+						if(data and data.pid) then
+							if(System.os.GetCurrentProcessId() ~= data.pid) then
+								-- already started by another application, 
+								-- try 
+								port = port + 1;
+								TestOpenNPLPort_();
+								return;
+							else
+								-- already opened by the same process
+							end
+						else
+							startserver_();
+						end
+					end);
+				end
+			TestOpenNPLPort_();
+		else
+			_startlobbyserver();
+		end
+		
+		
+		
+	
+		
+	end,
+};
+
+Commands["stopLobbyServer"] = {
+	name="stopLobbyServer", 
+	quick_ref="/stopLobbyServer ", 
+	desc="stop lobby server ",
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		LobbyServer.GetSingleton():StopAll();
 	end,
 };
 
