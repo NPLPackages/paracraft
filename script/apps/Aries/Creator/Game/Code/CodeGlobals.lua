@@ -417,13 +417,19 @@ function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 	end
 end
 
+function CodeGlobals:CheckLobbyServer()
+	
+end
+
 function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
+	self:CheckLobbyServer();
+
 	local event = self:CreateGetTextEvent(event_name);
 	event:AddEventListener("net", callbackFunc);
 	
 	if event_name == "connect" then
-		local clientren = LobbyServer.GetSingleton():GetClientren();
-		for k, v in pairs(clientren) do
+		local clients = LobbyServer.GetSingleton():GetClients();
+		for k, v in pairs(clients) do
 			event:DispatchEvent({type="net", msg={userinfo = v}});
 		end
 	end
@@ -436,11 +442,25 @@ function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc)
 	end
 end
 
+-- send a named message to one computer in the network
+function CodeGlobals:SendNetworkEvent(keepworkUsername, event_name, msg)
+	self:CheckLobbyServer();
+
+	-- TODO: 
+	LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg)
+end
+
+-- send an binary stream to nid/ip:port (*8099, \\\\10.27.3.5 8099)
+function CodeGlobals:SendOriginalMessage(addr, msgStr)
+	LobbyServer.GetSingleton():SendOriginalMessage(addr, msgStr);
+end
+
 -- send a named message to all computers in the network
 function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
+	self:CheckLobbyServer();
+
 	-- TODO: 
 	LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
-	LOG.std(nil, "debug", event_name, msg);
 end
 
 -- when this computer received a message from the network.
