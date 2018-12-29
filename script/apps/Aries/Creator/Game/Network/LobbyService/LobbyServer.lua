@@ -142,12 +142,16 @@ end
 function LobbyServer:AutoDiscovery(broadcast_address_list)
 	local server_addr_list = {};
 	
-	if broadcast_address_list then
-		for k, v in pairs(broadcast_address_list) do
-			table.insert(server_addr_list, string.format("(gl)\\\\%s 8099:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua", v));
-		end
-	else
+	if not broadcast_address_list then
 		table.insert(server_addr_list, "(gl)*8099:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+		
+		local att = NPL.GetAttributeObject();
+		broadcast_address_list = att:GetField("BroadcastAddressList");
+		broadcast_address_list = commonlib.split(broadcast_address_list, ",");
+	end
+	
+	for k, v in pairs(broadcast_address_list) do
+		table.insert(server_addr_list, string.format("(gl)\\\\%s 8099:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua", v));
 	end
 	
 	local data = {type = LobbyMessageType.REQUEST_ECHO
@@ -199,12 +203,21 @@ function LobbyServer:BroadcastMessage(title, data)
 	end
 end
 
+function LobbyServer:SendOriginalMessage(addr, msgStr)
+	addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);
+	NPL.activate(addr, "\0" .. msgStr, 1, 2, 0);
+end
+
 function LobbyServer:onMsg(msg)
 	if not msg.type then
-		return;
+		if msg.isUDP then
+			self:handleMessage("__original", msg);
+		end
+
+		return 
 	end
 	
-	local cb = callbacks[msg.type];;
+	local cb = callbacks[msg.type];
 
 	if cb then
 		cb(self, msg);
@@ -233,7 +246,7 @@ function LobbyServer:onUserData(msg)
 	self:handleMessage(msg.title or "unname", data);	
 end
 
-function LobbyServer:GetClientren()
+function LobbyServer:GetClients()
 	return self._clients;
 end
 
