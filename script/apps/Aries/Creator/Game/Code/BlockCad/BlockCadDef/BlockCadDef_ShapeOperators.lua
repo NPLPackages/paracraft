@@ -194,6 +194,8 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
+
 {
 	type = "ShapeBuilder.beginScale", 
 	message0 = L"beginScale(%1,%2,%3)",
@@ -308,6 +310,71 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
+{
+	type = "ShapeBuilder.mirror", 
+	message0 = L"mirror shape %1 x %2 y %3 z %4 dir_x %5 dir_y %6 dir_z %7 color %8",
+    arg0 = {
+		{
+			name = "node",
+			type = "input_value",
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "dir_x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "dir_y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "dir_z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'ShapeBuilder.mirror(%s,%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+
 }
 function BlockCadDef_ShapeOperators.GetCmds()
 	return cmds;

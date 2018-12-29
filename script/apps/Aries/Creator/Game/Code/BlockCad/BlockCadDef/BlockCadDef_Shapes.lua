@@ -37,8 +37,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
          
 	},
@@ -78,8 +78,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -125,8 +125,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -172,8 +172,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -225,8 +225,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -266,8 +266,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -325,8 +325,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
 		},
         
 	},
@@ -341,6 +341,447 @@ local cmds = {
     ]]}},
 },
 
+{
+	type = "ShapeBuilder.plane", 
+	message0 = L"plane l %1 w %2 color %3",
+    arg0 = {
+        {
+			name = "l",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "w",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.plane(%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.circle", 
+	message0 = L"circle r %1 a0 %2 a1 %3 color %4",
+    arg0 = {
+        {
+			name = "r",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a0",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.circle(%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.ellipse", 
+	message0 = L"ellipse r1 %1 r2 %2 a0 %3 a1 %4 color %5",
+    arg0 = {
+        {
+			name = "r1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "r2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a0",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.ellipse(%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.helix", 
+	message0 = L"helix p %1 h %2 r %3 a %4 l %5 s %6 color %7",
+    arg0 = {
+        {
+			name = "p",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "h",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "r",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "l",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "s",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.helix(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.spiral", 
+	message0 = L"spiral g %1 c %2 r %3 color %4",
+    arg0 = {
+        {
+			name = "g",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "c",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "r",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.spiral(%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.polygon", 
+	message0 = L"polygon p %1 c %2 color %3",
+    arg0 = {
+        {
+			name = "p",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "c",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.polygon(%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+
+{
+	type = "ShapeBuilder.prism", 
+	message0 = L"prism p %1 c %2 h %3 color %4",
+    arg0 = {
+        {
+			name = "p",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "c",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "h",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.prism(%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.wedge", 
+	message0 = L"wedge x1 %1 y1 %2 z1 %3 x3 %4 z3 %5 x2 %6 y2 %7 z2 %8 x4 %9 z4 %10 color %11",
+    arg0 = {
+        {
+			name = "x1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "x3",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z3",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "x2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "x4",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z4",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.wedge(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "ShapeBuilder.ellipsoid", 
+	message0 = L"ellipsoid r1 %1 r2 %2 r3 %3 a1 %4 a2 %5 a3 %6 color %7",
+    arg0 = {
+        {
+			name = "r1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "r2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "r3",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a3",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    output = {type = "null",},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ShapeBuilder.ellipsoid(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 
 }
 function BlockCadDef_Shapes.GetCmds()

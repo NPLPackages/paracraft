@@ -417,8 +417,22 @@ function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 	end
 end
 
+-- try to start lobby server if not started. 
 function CodeGlobals:CheckLobbyServer()
-	
+	self.isLobbyStarted = LobbyServer.GetSingleton():IsStarted();
+
+	if(not self.isLobbyStarted) then
+		if(not self.hasAskedSignin) then
+			self.hasAskedSignin = true;
+			GameLogic.SignIn(L"", function(bSucceed)
+				if(bSucceed) then
+					GameLogic.RunCommand("/startLobbyServer")
+				end
+				self.hasAskedSignin = false;
+			end)
+		end
+	end
+	return self.isLobbyStarted;
 end
 
 function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
@@ -435,31 +449,38 @@ function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
 	end
 end
 
-function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc)
+function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
 	local event = self:GetTextEvent(text);
 	if(event) then
 		event:RemoveEventListener("net", callbackFunc);
+		if(text == "connect" and event:GetEventListenerCount("net") == 0) then
+			LobbyServer.GetSingleton():StopAll()
+			self.isLobbyStarted = false;
+		end
 	end
 end
 
 -- send a named message to one computer in the network
+-- @param event_name: if nil, we will send an binary stream (msg) to keepworkUsername, 
+-- which needs to be nid/ip:port (*8099, \\\\10.27.3.5 8099)
 function CodeGlobals:SendNetworkEvent(keepworkUsername, event_name, msg)
-	self:CheckLobbyServer();
+	if(not self:CheckLobbyServer()) then
+		return
+	end
 
-	-- TODO: 
-	LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg)
-end
-
--- send an binary stream to nid/ip:port (*8099, \\\\10.27.3.5 8099)
-function CodeGlobals:SendOriginalMessage(addr, msgStr)
-	LobbyServer.GetSingleton():SendOriginalMessage(addr, msgStr);
+	if(event_name) then
+		LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg)
+	else
+		LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msgStr);
+	end
 end
 
 -- send a named message to all computers in the network
 function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
-	self:CheckLobbyServer();
+	if(not self:CheckLobbyServer()) then
+		return
+	end
 
-	-- TODO: 
 	LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
 end
 

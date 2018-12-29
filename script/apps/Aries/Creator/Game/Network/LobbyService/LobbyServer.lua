@@ -58,6 +58,7 @@ LobbyMessageType.CUSTOM					= 6;
 local LobbyServer = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer"));
 
 LobbyServer:Signal("handleMessage");
+LobbyServer:Signal("started");
 
 local s_search_time = 5 * 1000;
 local callbacks = {};
@@ -94,6 +95,10 @@ function LobbyServer:ctor()
 	self._bStart = false;
 end
 
+function LobbyServer:IsStarted()
+	return self._bStart;
+end
+
 function LobbyServer:Start()
 	if self._bStart then
 		return
@@ -109,13 +114,14 @@ function LobbyServer:Start()
 	ParaScene.RegisterEvent("_n_paracraft_lobby", ";_OnLobbyServerNetworkEvent();");
 	
 	self._bStart = true;
+	self:started();
 end
 
 function LobbyServer:StopAll()
 	if not self._bStart then
 		return;
 	end
-
+	LOG.std(nil, "info", "LobbyServer", "stopped");
 	self:StopDiscovery();
 	
 	ParaScene.UnregisterEvent("_n_paracraft_lobby");
@@ -140,6 +146,7 @@ end
 
 
 function LobbyServer:AutoDiscovery(broadcast_address_list)
+	self:StopDiscovery();
 	local server_addr_list = {};
 	
 	if not broadcast_address_list then
@@ -166,10 +173,13 @@ function LobbyServer:AutoDiscovery(broadcast_address_list)
 		for k, server_addr in pairs(server_addr_list) do
 			NPL.activate(server_addr, data, 1, 2, 0);
 		end
+		timer:Change(s_search_time);
 	end})
 	
-	mytimer:Change(0, s_search_time);
+	mytimer:Change(0);
 	self.m_discoveryTimer = mytimer;
+
+	LOG.std(nil, "info", "LobbyServer", "auto discovery started with %s", table.concat(broadcast_address_list or {}, ","));
 end
 
 

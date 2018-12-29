@@ -99,6 +99,11 @@ function env_imp:registerNetworkEvent(event_name, callbackFunc)
 	self.codeblock:RegisterNetworkEvent(event_name, callbackFunc);
 end
 
+function env_imp:sendNetworkEvent(username, event_name, msg)
+	self.codeblock:SendNetworkEvent(username, event_name, msg);
+end
+
+
 -- run function in a new coroutine
 function env_imp:run(mainFunc)
 	if(type(mainFunc) == "function") then

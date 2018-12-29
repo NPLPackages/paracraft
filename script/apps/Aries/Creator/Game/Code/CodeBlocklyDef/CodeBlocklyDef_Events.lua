@@ -451,8 +451,8 @@ end)
 	end,
 	examples = {{desc = "", canRun = false, code = [[
 registerNetworkEvent("updateScore", function(msg)
-   _G[msg.nid] = msg.score;
-   showVariable(msg.nid)
+   _G[msg.userinfo.keepworkUsername] = msg.score;
+   showVariable(msg.userinfo.keepworkUsername)
 end)
 
 registerNetworkEvent("connect", function(msg)
@@ -460,7 +460,7 @@ registerNetworkEvent("connect", function(msg)
 end)
 
 registerNetworkEvent("disconnect", function(msg)
-   hideVariable(msg.nid)
+   hideVariable(msg.userinfo.keepworkUsername)
 end)
 
 while(true) do
@@ -521,28 +521,99 @@ end
 		return string.format('broadcastNetworkEvent("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
 	end,
 	examples = {{desc = "", canRun = false, code = [[
+hide()
+becomeAgent("@p")
+
 registerNetworkEvent("updatePlayerPos", function(msg)
-   runForActor(msg.nid, function()
+   runForActor(msg.userinfo.keepworkUsername, function()
       moveTo(msg.x, msg.y, msg.z)
    end)
 end)
 
+registerCloneEvent(function(name)
+    setActorValue("name", name)
+end)
+
 registerNetworkEvent("connect", function(msg)
-   clone(nil, msg.nid)
+    clone(nil, msg.userinfo.keepworkUsername)
 end)
 
 registerNetworkEvent("disconnect", function(msg)
-   runForActor(msg.nid, function()
+   runForActor(msg.userinfo.keepworkUsername, function()
       delete();
    end)
 end)
 
 while(true) do
    broadcastNetworkEvent("updatePlayerPos", {x = getX(), y=getY(), z=getZ()})
-   wait(1);
+   wait(0.2);
 end
 ]]}},
 },
+
+
+{
+	type = "sendNetworkEvent", 
+	message0 = L"发送网络消息给%1,%2,%3",
+	arg0 = {
+		{
+			name = "username",
+			type = "input_value",
+			shadow = { type = "text", value = "username",},
+			text = "username", 
+		},
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "text", value = "title",},
+			text = "title", 
+		},
+		{
+			name = "params",
+			type = "input_value",
+			shadow = { type = "msgTable", value = "{}",},
+			text = "{}", 
+		},
+	},
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'sendNetworkEvent(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('sendNetworkEvent("%s", "%s", %s)\n', self:getFieldAsString('usernames'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
+	end,
+	examples = {{desc = L"发送消息给指定用户", canRun = false, code = [[
+registerNetworkEvent("title", function(msg)
+   tip(msg.userinfo.keepworkUsername)
+   wait(1)
+   tip(msg.a)
+end)
+
+sendNetworkEvent("username", "title", {a=1})
+]]},
+
+{desc = L"发送原始消息给指定地址(无需登录)", canRun = false, code = [[
+-- __orignal is predefined name
+registerNetworkEvent("__orignal", function(msg)
+   log(msg.isUDP)
+   log(msg.nid or msg.tid)
+   log(msg.data)
+end)
+
+sendNetworkEvent(nid, nil, "binary \0 string")
+-- given ip and port
+sendNetworkEvent("\\\\192.168.0.1 8099", nil, "binary \0 string")
+-- broadcast with subnet
+sendNetworkEvent("\\\\192.168.0.255 8099", nil, "binary \0 string")
+-- UDP broadcast
+sendNetworkEvent("*8099", nil, "binary \0 string")
+]]},
+},
+},
+
 
 {
 	type = "cmdExamples", 

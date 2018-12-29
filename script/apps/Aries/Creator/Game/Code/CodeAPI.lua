@@ -80,6 +80,7 @@ local s_env_methods = {
 	"broadcastAndWait",
 	"registerNetworkEvent",
 	"broadcastNetworkEvent",
+	"sendNetworkEvent",
 
 	-- Control
 	"wait",

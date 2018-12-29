@@ -165,18 +165,13 @@ function ParaWorldLesson:OpenLessonUrl()
 		if(self:GetClassId()) then
 			self:OpenLessonUrlDirect();	
 		else
-			if(KeepworkService:IsSignedIn()) then
-				self:OpenLessonUrlDirect();	
-			else
-				local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-				local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-
-				Store:Set("user/loginText", L"登陆后才能访问课程系统, 请先登录")
-
-				LoginModal:Init(function()
-					self:OpenLessonUrlDirect();
-				end);
-			end
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+			local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+			ParaWorldLoginDocker.SignIn(L"登陆后才能访问课程系统, 请先登录", function(bSucceed)
+				if(bSucceed) then
+					self:OpenLessonUrlDirect();	
+				end
+			end)
 		end
 	end
 end

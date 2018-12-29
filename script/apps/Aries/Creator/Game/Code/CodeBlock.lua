@@ -631,11 +631,20 @@ function CodeBlock:RegisterNetworkEvent(event_name, callbackFunc)
 	event:Connect("beforeDestroyed", function()
 		GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_);
 	end)
+	if(event_name == "connect") then
+		self:Connect("beforeStopped", function()
+			GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_, self);
+		end)
+	end
 	GameLogic.GetCodeGlobal():RegisterNetworkEvent(event_name, onEvent_);
 end
 
 function CodeBlock:BroadcastNetworkEvent(event_name, msg)
 	GameLogic.GetCodeGlobal():BroadcastNetworkEvent(event_name, msg);
+end
+
+function CodeBlock:SendNetworkEvent(username, event_name, msg)
+	GameLogic.GetCodeGlobal():SendNetworkEvent(username, event_name, msg);
 end
 
 -- create a clone of some code block's actor

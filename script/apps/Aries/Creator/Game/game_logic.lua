@@ -1547,6 +1547,19 @@ function GameLogic:GetText(text)
 	return options:GetText(text);
 end
 
+-- @param title: additional text to show to the user in the login box
+-- @param callbackFunc: optional callback function when user actually signed in
+function GameLogic.SignIn(title, callbackFunc)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+	if(ParaWorldLoginDocker) then
+		ParaWorldLoginDocker.SignIn(title, callbackFunc)
+	else
+		if(callbackFunc) then
+			callbackFunc(false);
+		end
+	end
+end
 
 -- global custom user or game event
 function GameLogic:event(event)
