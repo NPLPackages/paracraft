@@ -596,8 +596,8 @@ sendNetworkEvent("username", "title", {a=1})
 ]]},
 
 {desc = L"发送原始消息给指定地址(无需登录)", canRun = false, code = [[
--- __orignal is predefined name
-registerNetworkEvent("__orignal", function(msg)
+-- __original is predefined name
+registerNetworkEvent("__original", function(msg)
    log(msg.isUDP)
    log(msg.nid or msg.tid)
    log(msg.data)
