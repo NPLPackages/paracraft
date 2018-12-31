@@ -19,9 +19,6 @@ local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
-NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
-local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
-
 Commands["tunnelserver"] = {
 	name="tunnelserver", 
 	quick_ref="/tunnelserver [-start|stop] [ip_host] [port]", 
@@ -106,6 +103,9 @@ e.g
 			GameLogic.AddBBS(nil, L"必须先登录keepwork");
 			return;
 		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 		
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -210,6 +210,8 @@ Commands["stopLobbyServer"] = {
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 		LobbyServer.GetSingleton():StopAll();
 	end,
 };

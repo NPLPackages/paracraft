@@ -1,6 +1,6 @@
 --[[
 Title: LobbyServer
-Author(s): LiXizhi
+Author(s): LanZhihong, LiXizhi
 Date: 2018/12/19
 Desc: all LobbyServer
 use the lib:
@@ -9,133 +9,96 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lu
 local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 -------------------------------------------------------
 ]]
-local bTest = true;
-
 NPL.load("(gl)script/ide/event_mapping.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyMessageType.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyUserInfo.lua");
+local LobbyUserInfo = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyUserInfo");
+local LobbyMessageType = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyMessageType");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local NPLReturnCode = commonlib.gettable("NPLReturnCode");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
-local LobbyMessageType = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyMessageType");
-
-
-
---[[
-	udp 
-	{name = keepworkUsername, projectId = 900, version = 1001, editMode = true/false}
---]]
-LobbyMessageType.REQUEST_ECHO			= 1;  
-
---[[
-	udp
-	{port = 8099, name = keepworkUsername}
-]]
-LobbyMessageType.RESPONSE_ECHO			= 2;
-
---[[
-	tcp
-	{name = keepworkUsername, nickname = nickname}
-]]
-LobbyMessageType.REQUEST_CONNECT		= 3;
---[[
-	tcp
-	{name = keepworkUsername, nickname = nickname}
-]]
-LobbyMessageType.RESPONSE_CONNECT		= 4;
-
---[[
-	tcp
-	{title = "custom title", data = anytype}
-]]
-LobbyMessageType.USER_DATA				= 5;
---[[
-	udp
-]]
-LobbyMessageType.CUSTOM					= 6;
-
-
 local LobbyServer = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer"));
 
+-- in milliseconds
+LobbyServer:Property({"BroadcastInterval", 5000, "GetBroadcastInterval", "SetBroadcastInterval", auto=true});
+-- default to System.User.keepworkUsername
+LobbyServer:Property({"Username", nil, "GetUsername", "SetUsername", auto=true});
+LobbyServer:Property({"Nickname", nil, "GetNickname", "SetNickname", auto=true});
+LobbyServer:Property({"bIsStarted", false, "IsStarted", "SetStarted", auto=true});
 LobbyServer:Signal("handleMessage");
 LobbyServer:Signal("started");
 
-local s_search_time = 5 * 1000;
-local callbacks = {};
-
-function LobbyServer.InitCallback()
-	callbacks[LobbyMessageType.REQUEST_ECHO] = LobbyServer.onRequestEcho;
-	callbacks[LobbyMessageType.RESPONSE_ECHO] = LobbyServer.onResponseEcho;
-	callbacks[LobbyMessageType.REQUEST_CONNECT] = LobbyServer.onRequestConnect;
-	callbacks[LobbyMessageType.RESPONSE_CONNECT] = LobbyServer.onResponseConnect;
-	callbacks[LobbyMessageType.USER_DATA] = LobbyServer.onUserData;
-	callbacks[LobbyMessageType.CUSTOM] = LobbyServer.onCustom;
-end
+local callbacks;
 
 local g_instance;
 function LobbyServer.GetSingleton()
 	if(g_instance) then
 		return g_instance;
 	else
-		LobbyServer.InitCallback();
 		g_instance = LobbyServer:new();
 		return g_instance;
 	end
 end
 
-
 function LobbyServer:ctor()
-	if bTest then
-		NPL.AddPublicFile("script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua", 301);
-	end
+	NPL.AddPublicFile("script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua", 301);
 	
 	self.m_discoveryTimer = nil;
 	self._clients = {};
 	self._ExternalIPList = nil;
-	self._bStart = false;
+	self:InitCallback()
 end
 
-function LobbyServer:IsStarted()
-	return self._bStart;
+function LobbyServer:InitCallback()
+	if(not callbacks) then
+		callbacks = {};
+		callbacks[LobbyMessageType.REQUEST_ECHO] = LobbyServer.onRequestEcho;
+		callbacks[LobbyMessageType.RESPONSE_ECHO] = LobbyServer.onResponseEcho;
+		callbacks[LobbyMessageType.REQUEST_CONNECT] = LobbyServer.onRequestConnect;
+		callbacks[LobbyMessageType.RESPONSE_CONNECT] = LobbyServer.onResponseConnect;
+		callbacks[LobbyMessageType.USER_DATA] = LobbyServer.onUserData;
+		callbacks[LobbyMessageType.CUSTOM] = LobbyServer.onCustom;
+	end
 end
 
-function LobbyServer:Start()
-	if self._bStart then
+-- @param username: default to System.User.keepworkUsername;
+-- @param nickname: default to System.User.NickName
+function LobbyServer:Start(username, nickname)
+	if self:IsStarted() then
 		return
 	end
 
-	do
-		local att = NPL.GetAttributeObject();
-		local ipList = att:GetField("ExternalIPList");
-		ipList = commonlib.split(ipList, ",");
-		self._ExternalIPList = ipList;
-	end
+	local att = NPL.GetAttributeObject();
+	local ipList = att:GetField("ExternalIPList");
+	ipList = commonlib.split(ipList, ",");
+	self._ExternalIPList = ipList;
 	
 	ParaScene.RegisterEvent("_n_paracraft_lobby", ";_OnLobbyServerNetworkEvent();");
 	
-	self._bStart = true;
+	self:SetUsername(username or System.User.keepworkUsername)
+	self:SetNickname(nickname or System.User.NickName)
+	
+	self:SetStarted(true);
 	self:started();
 end
 
 function LobbyServer:StopAll()
-	if not self._bStart then
+	if not self:IsStarted() then
 		return;
 	end
 	LOG.std(nil, "info", "LobbyServer", "stopped");
 	self:StopDiscovery();
 	
-	ParaScene.UnregisterEvent("_n_paracraft_lobby");
-	
-	for keepworkUsername, v in pairs(self._clients) do
+	for keepworkUsername, v in pairs(self:GetClients()) do
 		NPL.reject(v.nid);
 	end
 	
 	self._clients = {};
 	
-	self._bStart = false;
+	self:SetStarted(false);
 end
-
-
 
 function LobbyServer:StopDiscovery()
 	if self.m_discoveryTimer then
@@ -143,7 +106,6 @@ function LobbyServer:StopDiscovery()
 		self.m_discoveryTimer = nil;
 	end
 end
-
 
 function LobbyServer:AutoDiscovery(broadcast_address_list)
 	self:StopDiscovery();
@@ -162,7 +124,7 @@ function LobbyServer:AutoDiscovery(broadcast_address_list)
 	end
 	
 	local data = {type = LobbyMessageType.REQUEST_ECHO
-		, name = System.User.keepworkUsername
+		, name = self:GetUsername()
 		, editMode = not GameLogic.IsReadOnly()
 		, projectId = WorldCommon.GetWorldTag("kpProjectId")
 		, version = GameLogic.options:GetRevision()
@@ -173,10 +135,9 @@ function LobbyServer:AutoDiscovery(broadcast_address_list)
 		for k, server_addr in pairs(server_addr_list) do
 			NPL.activate(server_addr, data, 1, 2, 0);
 		end
-		timer:Change(s_search_time);
 	end})
 	
-	mytimer:Change(0);
+	mytimer:Change(0, self:GetBroadcastInterval());
 	self.m_discoveryTimer = mytimer;
 
 	LOG.std(nil, "info", "LobbyServer", "auto discovery started with %s", table.concat(broadcast_address_list or {}, ","));
@@ -188,7 +149,7 @@ end
 -- @param title: msg title
 -- @param data: the raw message table {id=packet_id, .. }. 
 function LobbyServer:SendTo(keepworkUsername, title, data)
-	local client = self._clients[keepworkUsername];
+	local client = self:GetClient(keepworkUsername);
 	if not client then
 		return;
 	end
@@ -207,12 +168,13 @@ function LobbyServer:BroadcastMessage(title, data)
 			, data = data
 			};
 			
-	for k, v in pairs(self._clients) do
+	for k, v in pairs(self:GetClients()) do
 		user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  v.nid);
 		NPL.activate(user_addr, msg);
 	end
 end
 
+-- send raw UDP unicast or broadcast message.  No connection is required. 
 function LobbyServer:SendOriginalMessage(addr, msgStr)
 	addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);
 	NPL.activate(addr, "\0" .. msgStr, 1, 2, 0);
@@ -223,15 +185,16 @@ function LobbyServer:onMsg(msg)
 		if msg.isUDP then
 			self:handleMessage("__original", msg);
 		end
-
-		return 
+	else
+		local callback = callbacks[msg.type];
+		if callback then
+			callback(self, msg);
+		end	
 	end
-	
-	local cb = callbacks[msg.type];
+end
 
-	if cb then
-		cb(self, msg);
-	end
+function LobbyServer:Log(text, ...)
+	LOG.std(nil, "info", "LobbyServer_"..self:GetUsername(), text, ...);
 end
 
 function LobbyServer:onCustom(msg)
@@ -245,7 +208,7 @@ function LobbyServer:onUserData(msg)
 		return;
 	end
 	
-	local client = self._clients[keepworkUsername];
+	local client = self:GetClient(keepworkUsername);
 	if not client then
 		return;
 	end
@@ -256,8 +219,21 @@ function LobbyServer:onUserData(msg)
 	self:handleMessage(msg.title or "unname", data);	
 end
 
+
 function LobbyServer:GetClients()
 	return self._clients;
+end
+
+function LobbyServer:GetClient(keepworkUserName)
+	return self._clients[keepworkUserName];
+end
+
+function LobbyServer:AddClient(client)
+	self._clients[client:GetUserName()] = client;
+end
+
+function LobbyServer:RemoveClient(keepworkUsername)
+	self._clients[keepworkUsername] = nil;
 end
 
 function LobbyServer:onRequestConnect(msg)
@@ -267,24 +243,24 @@ function LobbyServer:onRequestConnect(msg)
 		return;
 	end
 	
-	if self._clients[keepworkUsername] then
+	if self:GetClient(keepworkUsername) then
 		-- already connect
 		return;
 	end
 
-	local nid = "LobbyServer_" .. keepworkUsername;
-	NPL.accept(msg.tid, nid);
+	local client = LobbyUserInfo:new():Init(keepworkUsername, msg.nickname);
+	self:AddClient(client);
+	self:Log("new user connect request: %s nid:%s", client:GetUserName(), client:GetNid());
+	NPL.accept(msg.tid, client:GetNid());
 	
-	self._clients[keepworkUsername] = {nid = nid, nickname = msg.nickname, keepworkUsername = keepworkUsername};
-	
-	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
+	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  client:GetNid());
 	
 	NPL.activate(user_addr, {type = LobbyMessageType.RESPONSE_CONNECT
-		, name = System.User.keepworkUsername
-		, nickname = System.User.NickName
+		, name = self:GetUsername()
+		, nickname = self:GetNickname()
 		});
 	
-	self:handleMessage("connect", {userinfo = self._clients[keepworkUsername]});	
+	self:handleMessage("connect", {userinfo = client});	
 end
 
 function LobbyServer:onResponseConnect(msg)
@@ -294,27 +270,24 @@ function LobbyServer:onResponseConnect(msg)
 		return;
 	end
 	
-	if self._clients[keepworkUsername] then
-		-- already connect
+	if self:GetClient(keepworkUsername) then
+		-- already connected
 		return;
 	end
-	
-	local nid = "LobbyServer_" .. keepworkUsername;
-	self._clients[keepworkUsername] = {nid = nid, nickname = msg.nickname, keepworkUsername = keepworkUsername};
-	
-	self:handleMessage("connect", {userinfo = self._clients[keepworkUsername]});
+	local client = LobbyUserInfo:new():Init(keepworkUsername, msg.nickname)
+	self:AddClient(client);
+	self:Log("new user connect reponse: %s nid:%s", client:GetUserName(), client:GetNid());
+	self:handleMessage("connect", {userinfo = client});
 end
 
 function LobbyServer:onResponseEcho(msg)
-	
 	local keepworkUsername = msg.name;
-	
 	if not keepworkUsername then
 		return;
 	end
 	
-	if self._clients[keepworkUsername] then
-		-- already connect
+	if self:GetClient(keepworkUsername) then
+		-- already connected
 		return;
 	end
 	
@@ -326,17 +299,25 @@ function LobbyServer:onResponseEcho(msg)
 	NPL.AddNPLRuntimeAddress({host = ip, port = tostring(port), nid = nid});
 	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
 	
-	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = System.User.keepworkUsername, nickname = System.User.NickName});
+	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()});
+end
+
+-- Both worlds should be signed in with different users and same project id and world revision. 
+-- please note, we allow joining if both worlds are in edit mode even if their revisions are different. 
+function LobbyServer:CanJoin(username, projectId, worldRevision, isEditMode)
+	if (username and username ~= self:GetUsername())  
+		and (projectId and projectId == WorldCommon.GetWorldTag("kpProjectId")) 
+		and ((worldRevision == GameLogic.options:GetRevision()) or (isEditMode and not GameLogic.IsReadOnly()))then
+		return true;
+	end
 end
 
 function LobbyServer:onRequestEcho(msg)
-	if (not msg.name or msg.name == System.User.keepworkUsername)  
-		or (not msg.projectId or msg.projectId ~= WorldCommon.GetWorldTag("kpProjectId")) 
-		or ((msg.version ~= GameLogic.options:GetRevision()) and not (msg.editMode and not GameLogic.IsReadOnly()))then
+	if(not self:CanJoin(msg.name, msg.projectId, msg.version, msg.editMode)) then
 		return;
 	end
 
-	if self._clients[msg.name] then
+	if self:GetClient(msg.name) then
 		return 
 	end
 
@@ -345,7 +326,7 @@ function LobbyServer:onRequestEcho(msg)
 	local user_id = msg.tid or msg.nid;
 	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  user_id);
 	
-	NPL.activate(user_addr, {type = LobbyMessageType.RESPONSE_ECHO, port = port, name = System.User.keepworkUsername}, 1, 2, 0);
+	NPL.activate(user_addr, {type = LobbyMessageType.RESPONSE_ECHO, port = port, name = self:GetUsername()}, 1, 2, 0);
 end
 
 function LobbyServer:onDisconnected(nid)
@@ -359,9 +340,9 @@ function LobbyServer:onDisconnected(nid)
 		return;
 	end
 	
-	if self._clients[keepworkUsername] then
-		self:handleMessage("disconnect", {userinfo = self._clients[keepworkUsername]});
-		self._clients[keepworkUsername] = nil;
+	if self:GetClient(keepworkUsername) then
+		self:handleMessage("disconnect", {userinfo = self:GetClient(keepworkUsername)});
+		self:RemoveClient(keepworkUsername)
 	end
 end
 
@@ -372,13 +353,11 @@ function LobbyServer:onNetworkEvent(msg)
 end
 
 function _OnLobbyServerNetworkEvent()
-	local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 	LobbyServer.GetSingleton():onNetworkEvent(msg);
 end
 
 local function activate()
-	local msg = msg;
-	if g_instance and g_instance._bStart then
+	if g_instance and g_instance:IsStarted() then
 		g_instance:onMsg(msg);
 	end
 end
