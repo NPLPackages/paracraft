@@ -29,7 +29,6 @@ SelectionManager:Signal("selectedActorVariableChanged", function(name, actor) en
 -- variable name is changed
 SelectionManager:Signal("varNameChanged", function(name) end);
 
-
 local default_picking_dist = 50;
 local result = nil;
 local eye_pos = {0,0,0};
@@ -47,11 +46,11 @@ function SelectionManager:GetPickingResult()
 end
 
 function SelectionManager:SetPickingDist(dist)
-	GameLogic.picking_dist = picking_dist or default_picking_dist;
+	GameLogic.options:SetPickingDist(dist or default_picking_dist)
 end
 
 function SelectionManager:GetPickingDist()
-	return GameLogic.picking_dist;
+	return GameLogic.options:GetPickingDist();
 end
 
 function SelectionManager:Clear()

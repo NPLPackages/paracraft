@@ -1,6 +1,6 @@
 --[[
 Title: LobbyServer
-Author(s): LanZhihong
+Author(s): LiXizhi
 Date: 2018/12/19
 Desc: all LobbyServer
 use the lib:

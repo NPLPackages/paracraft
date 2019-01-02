@@ -2,7 +2,7 @@
 Title: LobbyServer
 Author(s): LanZhihong, LiXizhi
 Date: 2018/12/19
-Desc: all LobbyServer
+Desc: LobbyServer communicates with each other in peer to peer mode. 
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");

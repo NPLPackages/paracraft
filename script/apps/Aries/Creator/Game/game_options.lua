@@ -113,7 +113,7 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	fps_cursor = {file="Texture/blocks/Cursor/fps.png", hot_x=16, hot_y=16,},
 	hand_cursor = {file="Texture/blocks/Cursor/interaction.tga", hot_x=16, hot_y=16,},
 	-- picking distance
-	PickingDist = 6,
+	PickingDist = 50,
 	-- locking game mode
 	LockedGameMode = nil,
 	-- whether to enable left click to move in game mode. 
@@ -222,13 +222,17 @@ function options:SetClickToContinue(bEnabled)
 	att:SetField("ToggleSoundWhenNotFocused", bEnabled);
 end
 
--- @param value: if nil, it will set back to 6. 
+-- @param value: if nil, it will set back to 50. 
 function options:SetPickingDist(value)
 	if(type(value) == "number") then
 		self.PickingDist = value;
 	else
-		self.PickingDist = 6;
+		self.PickingDist = 50;
 	end
+end
+
+function options:GetPickingDist()
+	return self.PickingDist or 50;
 end
 
 -- get current revision number
@@ -308,6 +312,7 @@ function options:OnLoadWorld()
 	self.LockedGameMode = nil;
 	self.NormalDensity = self.DefaultDensity;
 	self.AllowRunning = true;
+	self.PickingDist = 50;
 	self:SetViewBobbing(nil);
 	self:SetEnableVibration(nil);
 	self:SetDisableShaderCommand(nil);
