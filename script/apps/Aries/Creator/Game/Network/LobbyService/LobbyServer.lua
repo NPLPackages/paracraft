@@ -92,7 +92,7 @@ function LobbyServer:StopAll()
 	self:StopDiscovery();
 	
 	for keepworkUsername, v in pairs(self:GetClients()) do
-		NPL.reject(v.nid);
+		NPL.reject(v:GetNid());
 	end
 	
 	self._clients = {};
@@ -154,7 +154,7 @@ function LobbyServer:SendTo(keepworkUsername, title, data)
 		return;
 	end
 	
-	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  client.nid);
+	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  client:GetNid());
 	NPL.activate(user_addr, {type = LobbyMessageType.USER_DATA
 		, title = title
 		, data = data
@@ -169,7 +169,7 @@ function LobbyServer:BroadcastMessage(title, data)
 			};
 			
 	for k, v in pairs(self:GetClients()) do
-		user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  v.nid);
+		user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  v:GetNid());
 		NPL.activate(user_addr, msg);
 	end
 end
@@ -179,6 +179,17 @@ function LobbyServer:SendOriginalMessage(addr, msgStr)
 	addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);
 	NPL.activate(addr, "\0" .. msgStr, 1, 2, 0);
 end
+
+-- direct connect a lobby client
+function LobbyServer:ConnectLobbyClient(ip, port)
+	local nid = "_LobbyServer_tmp_" .. tostring(ip)..tostring(port);
+	NPL.AddNPLRuntimeAddress({host = ip, port = tostring(port), nid = nid});
+	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
+	
+	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()});
+end
+
+
 
 function LobbyServer:onMsg(msg)
 	if not msg.type then
@@ -276,6 +287,7 @@ function LobbyServer:onResponseConnect(msg)
 	end
 	local client = LobbyUserInfo:new():Init(keepworkUsername, msg.nickname)
 	self:AddClient(client);
+	NPL.accept(msg.nid or msg.tid, client:GetNid());
 	self:Log("new user connect reponse: %s nid:%s", client:GetUserName(), client:GetNid());
 	self:handleMessage("connect", {userinfo = client});
 end
@@ -295,11 +307,14 @@ function LobbyServer:onResponseEcho(msg)
 	local ip, _ = string.match(user_id, "~udp(%d+.%d+.%d+.%d+)_(%d+)");
 	local port = msg.port;
 	
-	local nid = "LobbyServer_" .. keepworkUsername;
+	--[[
+	local nid = "_LobbyServer_tmp_" .. ip;
 	NPL.AddNPLRuntimeAddress({host = ip, port = tostring(port), nid = nid});
 	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
 	
 	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()});
+	]]
+	self:ConnectLobbyClient(ip, port);
 end
 
 -- Both worlds should be signed in with different users and same project id and world revision. 

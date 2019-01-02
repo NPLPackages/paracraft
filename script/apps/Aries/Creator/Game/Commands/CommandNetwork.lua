@@ -206,7 +206,7 @@ e.g
 Commands["stopLobbyServer"] = {
 	name="stopLobbyServer", 
 	quick_ref="/stopLobbyServer ", 
-	desc="stop lobby server ",
+	desc="stop lobby server",
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
@@ -215,6 +215,38 @@ Commands["stopLobbyServer"] = {
 		LobbyServer.GetSingleton():StopAll();
 	end,
 };
+
+Commands["ConnectLobbyClient"] = {
+	name="ConnectLobbyClient", 
+	quick_ref="/ConnectLobbyClient ip port", 
+	desc=[[try to connect a lobby client :
+@param ip: client ip. 
+@param port : client port, default is 8099.
+e.g
+	/ConnectLobbyClient 10.27.3.255 
+	/ConnectLobbyClient 10.27.3.255 8099
+	]],
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
+		local ip, port;
+		ip, cmd_text = CmdParser.ParseString(cmd_text);
+		port, cmd_text = CmdParser.ParseInt(cmd_text) or 8099;
+		
+		if not ip then
+			GameLogic.AddBBS(nil, L"ConnectLobbyClient需要有效的ip参数");
+		end
+		
+		if LobbyServer.GetSingleton():IsStarted() then
+			LobbyServer.GetSingleton().ConnectLobbyClient(ip, port);
+		else
+			GameLogic.AddBBS(nil, L"lobby server尚未启动");
+		end
+	end,
+};
+
 
 
 Commands["webserver"] = {
