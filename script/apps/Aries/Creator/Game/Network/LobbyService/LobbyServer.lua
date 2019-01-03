@@ -189,6 +189,18 @@ function LobbyServer:ConnectLobbyClient(ip, port)
 	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()});
 end
 
+function LobbyServer:DisconnectLobbyClient(keepworkUsername)
+	if not keepworkUsername then
+		return;
+	end
+	
+	local client = self:GetClient(keepworkUsername);
+	if client then
+		self:handleMessage("disconnect", {userinfo = client});
+		self:RemoveClient(keepworkUsername)
+	end
+end
+
 
 
 function LobbyServer:onMsg(msg)
@@ -350,15 +362,7 @@ function LobbyServer:onDisconnected(nid)
 	end
 	
 	local keepworkUsername = string.match(nid, "LobbyServer_(%w+)");
-	
-	if not keepworkUsername then
-		return;
-	end
-	
-	if self:GetClient(keepworkUsername) then
-		self:handleMessage("disconnect", {userinfo = self:GetClient(keepworkUsername)});
-		self:RemoveClient(keepworkUsername)
-	end
+	self:DisconnectLobbyClient(keepworkUsername);
 end
 
 function LobbyServer:onNetworkEvent(msg)
