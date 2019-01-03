@@ -132,6 +132,7 @@ function CodeGlobals:ctor()
 		loadWorldData = function(name, default_value, filename)
 			return self:LoadWorldData(name, default_value, filename)
 		end,
+		ParaIO = ParaIO,
 	};
 
 	self:Reset();
