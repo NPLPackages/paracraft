@@ -17,6 +17,7 @@ GameLogic.GetCodeGlobal():BroadcastStartEvent();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
 NPL.load("(gl)script/ide/System/Windows/Application.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
 local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 local Application = commonlib.gettable("System.Windows.Application");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
@@ -24,6 +25,8 @@ local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManag
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
+
+
 
 function CodeGlobals:ctor()
 	-- exposing these API to globals
@@ -133,6 +136,29 @@ function CodeGlobals:ctor()
 			return self:LoadWorldData(name, default_value, filename)
 		end,
 		ParaIO = ParaIO,
+		
+		getKeepwordName = function()
+			return System.User.keepworkUsername;
+		end,
+		
+		getNickName = function()
+			return System.User.NickName;
+		end,
+		
+		bit = mathlib.bit,
+		
+		getProjectId = function()
+			return WorldCommon.GetWorldTag("kpProjectId");
+		end,
+		
+		getProjectVersion = function()
+			return GameLogic.options:GetRevision();
+		end,
+		
+		getNetWorkInfo = function()
+			local att = NPL.GetAttributeObject();
+			return {TCP_HOST = att:GetField("HostIP"), TCP_PORT = att:GetField("HostPort"), UDP_HOST = att:GetField("UDPHostIP"), UDP_PORT = att:GetField("UDPHostPort")}
+		end,
 	};
 
 	self:Reset();
