@@ -482,7 +482,7 @@ function CodeGlobals:SendNetworkEvent(keepworkUsername, event_name, msg)
 	if(event_name) then
 		LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg)
 	else
-		LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msgStr);
+		LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
 	end
 end
 

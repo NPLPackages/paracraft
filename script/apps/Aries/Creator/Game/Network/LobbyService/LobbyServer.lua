@@ -175,9 +175,27 @@ function LobbyServer:BroadcastMessage(title, data)
 end
 
 -- send raw UDP unicast or broadcast message.  No connection is required. 
+-- @param addr : if is nil, we well broadcast message
 function LobbyServer:SendOriginalMessage(addr, msgStr)
-	addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);
-	NPL.activate(addr, "\0" .. msgStr, 1, 2, 0);
+	if not msgStr then return; end;
+	if addr then
+		addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);
+		NPL.activate(addr, "\0" .. msgStr, 1, 2, 0);
+	else
+		local server_addr_list = {"(gl)*8099:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua"};
+		local att = NPL.GetAttributeObject();
+		local broadcast_address_list = att:GetField("BroadcastAddressList");
+		broadcast_address_list = commonlib.split(broadcast_address_list, ",");
+		
+		for k, v in pairs(broadcast_address_list) do
+			table.insert(server_addr_list, string.format("(gl)\\\\%s 8099:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua", v));
+		end
+
+		msgStr = "\0" .. msgStr;
+		for k, server_addr in pairs(server_addr_list) do
+			NPL.activate(server_addr, msgStr, 1, 2, 0);
+		end
+	end
 end
 
 -- direct connect a lobby client
