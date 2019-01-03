@@ -36,8 +36,15 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
+
+		----------------------
+		-- @NOTE: the following may not be safe to expose to users
+		----------------------
 		System = System, -- @Note: Is it secure here?  
 		commonlib = commonlib, -- @Note: Is it secure here?
+		ParaIO = ParaIO,
+		GameLogic = GameLogic,
+
 		type = type,
 		unpack = unpack,
 		setmetatable = setmetatable,
@@ -53,6 +60,7 @@ function CodeGlobals:ctor()
 			  min = math.min, modf = math.modf, pi = math.pi, pow = math.pow, 
 			  rad = math.rad, random = math.random, sin = math.sin, sinh = math.sinh, 
 			  sqrt = math.sqrt, tan = math.tan, tanh = math.tanh },
+		bit = mathlib.bit,
 		string = { byte = string.byte, char = string.char, find = string.find, 
 			  format = string.format, gmatch = string.gmatch, gsub = string.gsub, 
 			  len = string.len, lower = string.lower, match = string.match, 
@@ -134,30 +142,6 @@ function CodeGlobals:ctor()
 		end,
 		loadWorldData = function(name, default_value, filename)
 			return self:LoadWorldData(name, default_value, filename)
-		end,
-		ParaIO = ParaIO,
-		
-		getKeepwordName = function()
-			return System.User.keepworkUsername;
-		end,
-		
-		getNickName = function()
-			return System.User.NickName;
-		end,
-		
-		bit = mathlib.bit,
-		
-		getProjectId = function()
-			return WorldCommon.GetWorldTag("kpProjectId");
-		end,
-		
-		getProjectVersion = function()
-			return GameLogic.options:GetRevision();
-		end,
-		
-		getNetWorkInfo = function()
-			local att = NPL.GetAttributeObject();
-			return {TCP_HOST = att:GetField("HostIP"), TCP_PORT = att:GetField("HostPort"), UDP_HOST = att:GetField("UDPHostIP"), UDP_PORT = att:GetField("UDPHostPort")}
 		end,
 	};
 
@@ -445,10 +429,11 @@ function CodeGlobals:UnregisterTextEvent(text, callbackFunc)
 end
 
 -- try to start lobby server if not started. 
-function CodeGlobals:CheckLobbyServer()
+-- @param bSigninIfNot: whether to force signin
+function CodeGlobals:CheckLobbyServer(bSigninIfNot)
 	self.isLobbyStarted = LobbyServer.GetSingleton():IsStarted();
 
-	if(not self.isLobbyStarted) then
+	if(not self.isLobbyStarted and bSigninIfNot) then
 		if(not self.hasAskedSignin) then
 			self.hasAskedSignin = true;
 			GameLogic.SignIn(L"", function(bSucceed)
@@ -463,8 +448,7 @@ function CodeGlobals:CheckLobbyServer()
 end
 
 function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
-	self:CheckLobbyServer();
-
+	self:CheckLobbyServer(true);
 	local event = self:CreateGetTextEvent(event_name);
 	event:AddEventListener("net", callbackFunc);
 	

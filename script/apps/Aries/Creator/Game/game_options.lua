@@ -244,6 +244,16 @@ function options:GetRevision()
 	end
 end
 
+-- keepwork project id
+function options:GetProjectId()
+	return WorldCommon.GetWorldTag("kpProjectId");
+end
+
+function options:GetNetworkInfo()
+	local att = NPL.GetAttributeObject();
+	return {TCP_HOST = att:GetField("HostIP"), TCP_PORT = att:GetField("HostPort"), UDP_HOST = att:GetField("UDPHostIP"), UDP_PORT = att:GetField("UDPHostPort")}
+end
+
 -- @param r,g,b: in [0,2] range
 function options:SetTorchColor(r,g,b)
 	if(r and g and b) then

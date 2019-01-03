@@ -83,7 +83,7 @@ end
 commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineByParam("paraworldapp", ""));
 
 -- @param title: additional text to show to the user in the login box
--- @param callbackFunc: optional callback function when user actually signed in
+-- @param callbackFunc: optional callback function(bSucceed) end when user actually signed in
 function ParaWorldLoginDocker.SignIn(title, callbackFunc)
 	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
 	if(KeepworkService and KeepworkService:IsSignedIn()) then
@@ -95,9 +95,9 @@ function ParaWorldLoginDocker.SignIn(title, callbackFunc)
 		local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 		Store:Set("user/loginText", title or L"请先登录")
 
-		LoginModal:Init(function()
+		LoginModal:Init(function(bSucceed)
 			if(callbackFunc) then
-				callbackFunc(true)
+				callbackFunc(bSucceed~=false)
 			end
 		end);
 	end
