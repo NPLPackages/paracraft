@@ -270,7 +270,7 @@ e.g
 		end
 		
 		if LobbyServer.GetSingleton():IsStarted() then
-			LobbyServer.GetSingleton():DisconnectLobbyClient(keepworkUsername, true);
+			LobbyServer.GetSingleton():DisconnectLobbyClient(keepworkUsername);
 		else
 			GameLogic.AddBBS(nil, L"lobby server尚未启动");
 		end
