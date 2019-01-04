@@ -27,6 +27,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+    colourSecondary = "#b1ad4e",
 	ToNPL = function(self)
 		return self:getFieldAsString('var');
 	end,
@@ -605,6 +606,7 @@ thinkText("Let me think");
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+    colourSecondary = "#ffffff",
 	ToNPL = function(self)
 		return self:getFieldAsString('value');
 	end,

@@ -483,6 +483,7 @@ end
 	hide_in_toolbox = true,
 	category = "Events", 
 	output = {type = "null",},
+	colourSecondary = "#ffffff",
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',

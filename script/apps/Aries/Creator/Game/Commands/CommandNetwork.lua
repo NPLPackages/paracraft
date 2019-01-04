@@ -85,45 +85,65 @@ Commands["stopserver"] = {
 
 Commands["startLobbyServer"] = {
 	name="startLobbyServer", 
-	quick_ref="/startLobbyServer [bAutoDiscovery] [broadcast_address_list]", 
-	desc=[[start lobby server :
+	quick_ref="/startLobbyServer [-callback eventName] [bAutoDiscovery] [broadcast_address_list]", 
+	desc=[[start lobby server
 @param AutoDiscovery: start auto discoverty, default is true. 
 @param broadcast_address_list : default is 255.255.255.255
+@param -callback eventName: one can optionally specify a callback event name
 e.g
-	/startLobbyServer
-	/startLobbyServer false
-	/startLobbyServer true 10.27.3.255
-	/startLobbyServer true 10.27.3.255|255.255.255.255
-	]],
+/startLobbyServer
+/startLobbyServer false
+/startLobbyServer true 10.27.3.255
+/startLobbyServer true 10.27.3.255|255.255.255.255
+/startLobbyServer -callback OnLobbyStarted
+]],
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		
-		if not System.User.keepworkUsername then
-			GameLogic.AddBBS(nil, L"必须先登录keepwork");
-			return;
-		end
-
+		local result = true;
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
 		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 		
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+
+		if not System.User.keepworkUsername then
+			GameLogic.AddBBS(nil, L"必须先登录keepwork");
+			result = false;
+		end
+
 		if not WorldCommon.GetWorldTag("kpProjectId") then
 			GameLogic.AddBBS(nil, L"必须是分享的世界才可以进入大厅");
-			return;
+			result = false;
 		end
-	
-		
-		local att = NPL.GetAttributeObject();
+
+		local eventName;
+		local option = true
+		while(option) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option == "callback") then
+				eventName, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
+			end
+		end	
 		
 		local bAutoDiscovery;
 		local broadcast_address_list ;
 		bAutoDiscovery, cmd_text = CmdParser.ParseBool(cmd_text);
 		broadcast_address_list, cmd_text = CmdParser.ParseStringList(cmd_text)
-		
+
+		if(result == false) then
+			if eventName then
+ 				local event = System.Core.Event:new():init(eventName)
+  				event.cmd_text = 'false'
+  				GameLogic:event(event)
+ 			end
+			return;
+		end
+
 		if bAutoDiscovery == nil then bAutoDiscovery = true; end
 		
+		local att = NPL.GetAttributeObject();
+
 		local function _startlobbyserver()
 			-- start udp server
 			local port = 8099;
@@ -142,6 +162,12 @@ e.g
 					LobbyServer.GetSingleton():AutoDiscovery();
 				end
 			end
+
+			if eventName then
+ 				local event = System.Core.Event:new():init(eventName)
+  				event.cmd_text = 'true'
+  				GameLogic:event(event)
+ 			end
 		end
 		
 		-- start tcp server
