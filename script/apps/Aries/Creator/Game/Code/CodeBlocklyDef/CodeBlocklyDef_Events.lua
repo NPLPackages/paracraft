@@ -408,7 +408,7 @@ end
 	ToNPL = function(self)
 		return string.format('registerStopEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = L"只能执行马上可返回的代码", canRun = true, code = [[
 registerStopEvent(function()
     tip("stopped")
 end)

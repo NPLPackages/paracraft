@@ -590,6 +590,29 @@ thinkText("Let me think");
 },
 
 {
+	type = "functionParams", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "params"
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Data", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
 	type = "callFunction", 
 	message0 = L"调用函数%1(%2)",
 	arg0 = {
@@ -601,7 +624,7 @@ thinkText("Let me think");
 		{
 			name = "param",
 			type = "input_value",
-			shadow = { type = "text", value = "param",},
+			shadow = { type = "functionParams", value = "param",},
 			text = "param",
 		},
 	},
@@ -612,7 +635,7 @@ thinkText("Let me think");
 	canRun = false,
 	func_description = '%s(%s)',
 	ToNPL = function(self)
-		return string.format('%s("%s")\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
+		return string.format('%s(%s)\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 local thinkText = function(text)

@@ -558,3 +558,38 @@ Examples:
 		end
 	end,
 };
+
+Commands["signin"] = {
+ 	name="signin", 
+ 	quick_ref= format("/signin [-t title] [-callback eventName]"), 
+ 	isLocal=false,
+ 	desc=[[asking user to signin if not. One can optionally display some text and provide a text event callback.
+/signin -t please signin -callback OnSignedIn
+
+-- in code block, one can use: 
+registerBroadcastEvent("OnSignedIn", function(result)
+    if(result == "true") then
+	end
+end)
+]], 
+     handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local title, eventName;
+		local option = true
+		while(option) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option == "t") then
+				title, cmd_text = CmdParser.ParseFormated(cmd_text, "[^%-]+")
+			elseif(option == "callback") then
+				eventName, cmd_text = CmdParser.ParseFormated(cmd_text, "[^%-]+")
+			end
+		end
+ 		
+		GameLogic.SignIn(title, function(result)
+ 			if eventName then
+ 				local event = System.Core.Event:new():init(eventName)
+  				event.cmd_text = (result==nil or result) and 'true' or 'false'
+  				GameLogic:event(event)
+ 			end
+ 		end)
+     end,
+ };

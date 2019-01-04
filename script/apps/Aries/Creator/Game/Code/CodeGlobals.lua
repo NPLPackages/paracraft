@@ -114,7 +114,7 @@ function CodeGlobals:ctor()
 		gettable = function(tabNames)
 			return commonlib.gettable(tabNames, self:GetCurrentGlobals());
 		end,
-		-- similar to commonlib.createtable(tabNames) but in page scope.
+		-- similar to commonlib.createtable(tabNames) but in world scope.
 		-- @param tabNames: table names like "models.users"
 		createtable = function (tabNames, init_params)
 			return commonlib.createtable(tabNames, init_params, self:GetCurrentGlobals());
