@@ -24,6 +24,35 @@ function DesktopMenuPage.OnInit()
 	page = document:GetPageCtrl();
 	DesktopMenu.Init();
 	GameLogic.GetEvents():AddEventListener("game_mode_change", DesktopMenuPage.OnGameModeChanged, DesktopMenuPage, "DesktopMenuPage");
+	GameLogic:Connect("WorldLoaded", DesktopMenuPage, DesktopMenuPage.OnWorldLoaded, "UniqueConnection");
+end
+
+function DesktopMenuPage.GetProjectText()
+    if(GameLogic.options:GetProjectId()) then
+        return format(L"项目ID:%s", tostring(GameLogic.options:GetProjectId()));
+    else
+        return L"上传世界";
+    end
+end
+
+function DesktopMenuPage.OnClickProjectId()
+	if(GameLogic.options:GetProjectId()) then
+		local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
+		if(KeepworkService) then
+			local url = KeepworkService:GetShareUrl()
+			if(url) then
+				ParaGlobal.ShellExecute("open", url, "", "", 1)
+			end
+		end
+	else
+		GameLogic.RunCommand("/file.uploadworld")
+	end
+end
+
+function DesktopMenuPage.OnWorldLoaded()
+	if(page) then
+		page:SetValue("projectId", DesktopMenuPage.GetProjectText())
+	end
 end
 
 function DesktopMenuPage.OnGameModeChanged()

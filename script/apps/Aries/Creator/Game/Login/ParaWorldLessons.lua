@@ -365,6 +365,9 @@ function ParaWorldLessons.EnterClassImp(classId, username)
 			_guihelper.MessageBox(format(L"无法加入课堂. 错误码: %d", err))
 			return
 		end
+		if(data and data.code == 2) then
+			_guihelper.MessageBox(L"课堂人数已满")
+		end
 		if(data and data.lessonId) then
 			-- {lessonId=27,id=850,extra={},state=0,createdAt="2018-10-13T15:23:38.000Z",updatedAt="2018-10-13T15:23:38.000Z",classroomId=38,userId=1,packageId=8,}
 			LOG.std(nil, "info", "ParaWorldLessons JoinClass", data);

@@ -193,11 +193,10 @@ e.g
 						GameLogic.SetStatus(format(L"Web Server启动成功: %s", addr));
 						GameLogic.AddBBS(nil, format("www_root: %s", doc_root_dir));
 					end
-					
-					_startlobbyserver();
 				else
 					GameLogic.AddBBS(nil, L"只能同时启动一个Server");
 				end
+				_startlobbyserver();
 			end
 			
 			local function TestOpenNPLPort_()
