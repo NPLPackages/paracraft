@@ -39,7 +39,8 @@ function DesktopMenuPage.OnClickProjectId()
 	if(GameLogic.options:GetProjectId()) then
 		local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
 		if(KeepworkService) then
-			local url = KeepworkService:GetShareUrl()
+			-- local url = KeepworkService:GetShareUrl()
+			local url = format("https://keepwork.com/pbl/project/%s", tostring(GameLogic.options:GetProjectId()))
 			if(url) then
 				ParaGlobal.ShellExecute("open", url, "", "", 1)
 			end
