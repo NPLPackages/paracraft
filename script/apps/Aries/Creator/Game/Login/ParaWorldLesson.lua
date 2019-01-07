@@ -235,7 +235,7 @@ end
 -- @param callbackFunc: function(bSucceed, localWorldPath)
 function ParaWorldLesson:EnterWorld(callbackFunc)
 	local worldUrl = self:GetFirstWorldUrl()
-	if(worldUrl) then
+	if(worldUrl and worldUrl~="") then
 		LOG.std(nil, "info", "ParaWorldLessons", "try entering world %s", worldUrl);
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");

@@ -1116,3 +1116,8 @@ function options:SetMaintainMovieBlockAspectRatio(value)
 		GameLogic.GetPlayerController():SaveLocalData(key, value, true, false);
 	end
 end
+
+function options:SetFullScreenMode(bFullScreen)
+	ParaEngine.GetAttributeObject():SetField("IsFullScreenMode", bFullScreen == true);
+	ParaEngine.GetAttributeObject():CallField("UpdateScreenMode");
+end

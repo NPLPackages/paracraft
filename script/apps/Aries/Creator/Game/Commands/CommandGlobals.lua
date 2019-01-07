@@ -582,3 +582,21 @@ Commands["lod"] = {
 		GameLogic.options:EnableLOD(bLOD);
 	end,
 };
+
+Commands["fullscreen"] = {
+	name="fullscreen", 
+	quick_ref="/fullscreen [on|off]", 
+	desc=[[full screen mode on or off, only used in windows platform
+/fullscreen off     
+/fullscreen
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local bFullScreen;
+		bFullScreen, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(bFullScreen == nil) then
+			bFullScreen = true;
+		end
+		GameLogic.options:SetFullScreenMode(bFullScreen);
+	end,
+};
+

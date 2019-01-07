@@ -428,7 +428,7 @@ function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId,
 					ParaWorldLessons.SetCurrentLesson(lesson);
 
 					local worldUrl = lesson:GetFirstWorldUrl()
-					if(worldUrl) then
+					if(worldUrl and worldUrl~="") then
 						lesson:EnterWorld(function(bSucceed, localWorldPath)
 							if(bSucceed) then
 								ParaWorldLessons.CloseWindow(true);
