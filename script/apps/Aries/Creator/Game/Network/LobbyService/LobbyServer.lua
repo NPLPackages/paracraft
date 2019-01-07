@@ -10,6 +10,7 @@ local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/event_mapping.lua");
+NPL.load("(gl)script/ide/commonlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyMessageType.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyUserInfo.lua");
@@ -23,6 +24,8 @@ local LobbyServer = commonlib.inherit(commonlib.gettable("System.Core.ToolBase")
 
 -- in milliseconds
 LobbyServer:Property({"BroadcastInterval", 5000, "GetBroadcastInterval", "SetBroadcastInterval", auto=true});
+-- in seconds
+LobbyServer:Property({"ConnectTimeout", 3, "GetConnectTimeout", "SetConnectTimeout", auto=true});
 -- default to System.User.keepworkUsername
 LobbyServer:Property({"Username", nil, "GetUsername", "SetUsername", auto=true});
 LobbyServer:Property({"Nickname", nil, "GetNickname", "SetNickname", auto=true});
@@ -47,6 +50,7 @@ function LobbyServer:ctor()
 	
 	self.m_discoveryTimer = nil;
 	self._clients = {};
+	self._pending = {};
 	self._ExternalIPList = nil;
 	self:InitCallback()
 end
@@ -90,6 +94,11 @@ function LobbyServer:StopAll()
 	end
 	LOG.std(nil, "info", "LobbyServer", "stopped");
 	self:StopDiscovery();
+	
+	for nid, stopFunc in pairs(self._pending) do
+		stopFunc();
+	end
+	self._pending = {};
 	
 	for keepworkUsername, v in pairs(self:GetClients()) do
 		NPL.reject(v:GetNid());
@@ -198,13 +207,70 @@ function LobbyServer:SendOriginalMessage(addr, msgStr)
 	end
 end
 
+-- @param timeout_seconds: the number of seconds to wait. if 0, it will only try once.
+-- @return the last NPL.activate call result and the stop function
+local function activate_async_with_timeout(timeout_seconds, filename, msg, callback)
+	local res = NPL.activate(filename, msg);
+
+	if(res ~= 0 and timeout_seconds > 0) then
+		local stopFunc;
+		
+		local time_left = timeout_seconds;
+		local time_interval = 100;
+		
+		local timer = commonlib.Timer:new({callbackFunc = function(timer)
+			local res = NPL.activate(filename, msg);
+			if(res ~= 0) then
+				if(time_left > 0) then
+					time_left = time_left - time_interval*0.001;
+					time_interval = time_interval * 2;
+					timer:Change(time_interval, nil);
+					
+					if callback then
+						callback(true);
+					end
+				else
+					if callback then
+						callback(false);
+					end
+				end
+			end
+		end})
+		timer:Change(time_interval, nil);
+		
+		stopFunc = function()
+			timer:Change();
+		end
+		
+		return res, stopFunc;
+	else
+		return res, nil;
+	end
+
+end
+
 -- direct connect a lobby client
 function LobbyServer:ConnectLobbyClient(ip, port)
 	local nid = "_LobbyServer_tmp_" .. tostring(ip)..tostring(port);
+	
+	if self._pending[nid] then
+		return;
+	end
+
+	local function onEnd(bSuccessed)
+		self._pending[nid] = nil;
+	end
+	
+	
 	NPL.AddNPLRuntimeAddress({host = ip, port = tostring(port), nid = nid});
 	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
 	
-	NPL.activate(user_addr, {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()});
+	local res, stopFunc;
+	res, stopFunc = activate_async_with_timeout(self:GetConnectTimeout(), user_addr,  {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()}, onEnd);
+	
+	if res ~= 0 then
+		self._pending[nid] = stopFunc;
+	end
 end
 
 function LobbyServer:DisconnectLobbyClient(keepworkUsername)
