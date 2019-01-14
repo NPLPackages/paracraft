@@ -296,6 +296,7 @@ end
 				{ L"绘图代码", "rendercode" },
 				{ L"电影方块的位置", "movieblockpos" },
 				{ L"电影角色", "movieactor" },
+				{ L"广告牌效果", "billboarded" },
 			},
 		},
 	},
