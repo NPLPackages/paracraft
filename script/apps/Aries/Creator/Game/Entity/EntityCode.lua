@@ -434,6 +434,16 @@ function Entity:ForEachNearbyCodeEntity(callbackFunc)
 	end
 end
 
+-- virtual function:
+function Entity:OnBeforeRunThisBlock()
+	
+end
+
+-- virtual function:
+function Entity:OnAfterRunThisBlock()
+	
+end
+
 -- run regardless of whether it is powered. 
 function Entity:Restart()
 	self:Stop();
@@ -443,7 +453,10 @@ function Entity:Restart()
 		function restartCodeEntity_(codeEntity)
 			local codeBlock = codeEntity:GetCodeBlock(true)
 			if(codeBlock) then
-				codeBlock:Run();
+				codeEntity:OnBeforeRunThisBlock()
+				codeBlock:Run(function()
+					codeEntity:OnAfterRunThisBlock();
+				end);
 			end
 		end
 		local id = self:GetBlockId();
@@ -534,17 +547,6 @@ end
 function Entity:SetLanguageConfigFile(filename)
 	if(self:GetLanguageConfigFile() ~= filename) then
 		self.languageConfigFile = filename;
-		if(filename == "") then
-			-- default NPL code block 
-		elseif(filename == "npl_cad") then
-			-- NPL cad v1
-		else
-			-- custom user defined under world directory
-			filename = Files.GetWorldFilePath(filename)
-			if(filename) then
-				-- TODO
-			end
-		end
 	end
 end
 

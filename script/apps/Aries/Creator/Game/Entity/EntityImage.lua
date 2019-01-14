@@ -694,7 +694,16 @@ end
 -- right click to show item
 function Entity:OnClick(x, y, z, mouse_button)
 	if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-		self:OpenEditor("entity", entity);
+		local old_value = self:GetCommand();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
+			if(result) then
+				result = result:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
+				self:SetCommand(result);
+				self:Refresh(true);
+			end
+		end, old_value, L"贴图文件", "texture");
 	end
 	return true;
 end

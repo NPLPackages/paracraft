@@ -74,18 +74,11 @@ function CodeHelpWindow.InitCmds()
 		local filename = CodeHelpWindow.GetLanguageConfigFile()
 		LOG.std(nil, "info", "CodeHelpWindow", "code block language configuration file changed to %s", filename == "" and "default" or filename);
 
-		local langConfig;
-		if(filename == "") then
-			langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
-		else
-			filename = Files.GetWorldFilePath(filename)
-			if(filename) then
-				-- used forward slash for absolute file path, otherwise NPL.load will inteprete : wrongly.  
-				filename = filename:gsub("^(%S):/", "%1:\\");
-				langConfig = NPL.load(filename, true);
-			end
-		end
-		if(type(langConfig) == "table") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
+
+		local langConfig = LanguageConfigurations:LoadConfigByFilename(filename)
+		if(langConfig) then
 			if (langConfig.GetCategoryButtons) then
 				CodeHelpWindow.SetCategories(langConfig.GetCategoryButtons())
 			end

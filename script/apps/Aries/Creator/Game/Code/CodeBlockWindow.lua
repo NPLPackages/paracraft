@@ -668,7 +668,9 @@ function CodeBlockWindow.OnClickSelectLanguageSettings()
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage('<a class="linkbutton_yellow" href="https://github.com/nplpackages/paracraft/wiki/languageConfigFile">'..L"点击查看帮助"..'</a>', function(result)
 		if(result) then
-			if(result ~="" and result ~="npl") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+			local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
+			if(not LanguageConfigurations:IsBuildinFilename(result)) then
 				local filename = Files.GetWorldFilePath(result)
 				if(not filename) then
 					filename = result:gsub("%.npl$", "");

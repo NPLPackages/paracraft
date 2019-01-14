@@ -22,6 +22,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
@@ -119,6 +121,20 @@ function CodeBlock:SetTimeout(duration, callbackFunc)
 	end, duration, nil)
 end
 
+--@param code: the actual code
+--@param filename: virtual filename, if nil, default to GetFilename()
+--@return code_func, errormsg
+function CodeBlock:CompileCodeImp(code, filename)
+	filename = filename or self:GetFilename();
+	local configFile = self:GetEntity():GetLanguageConfigFile()
+	local compileCodeFunc = LanguageConfigurations:GetCompiler(configFile);
+	if(compileCodeFunc) then
+		return compileCodeFunc(code, filename, self)
+	else
+		return CodeCompiler:new():SetFilename(filename):Compile(code);
+	end
+end
+
 -- compile code and reload if code is changed. 
 -- @param code: string
 -- return error message if any
@@ -126,7 +142,7 @@ function CodeBlock:CompileCode(code)
 	if(self.last_code ~= code or not self.code_func) then
 		self:Unload();
 		self.last_code = code;
-		self.code_func, self.errormsg = CodeCompiler:new():SetFilename(self:GetFilename()):Compile(code);
+		self.code_func, self.errormsg = self:CompileCodeImp(code);
 		if(not self.code_func and self.errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
@@ -398,15 +414,15 @@ function CodeBlock:IsLoaded()
 end
 
 -- recompile and run
-function CodeBlock:Restart()
+function CodeBlock:Restart(onFinishedCallback)
 	if(self:GetEntity()) then
 		self:Unload();
-		return self:Run();
+		return self:Run(onFinishedCallback);
 	end
 end
 
 -- run code again 
-function CodeBlock:Run()
+function CodeBlock:Run(onFinishedCallback)
 	self:GetEntity():ClearIncludedFiles();
 
 	self:CompileCode(self:GetEntity():GetCommand());
@@ -419,7 +435,7 @@ function CodeBlock:Run()
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		co:SetActor(actor);
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
-		return co:Run();
+		return co:Run(nil, onFinishedCallback);
 	else
 		self:ResetTime();
 		self.isLoaded = true;
@@ -708,7 +724,7 @@ end
 -- usually from help window. There can only be one temp code running. 
 -- @param code: string
 function CodeBlock:RunTempCode(code, filename)
-	local code_func, errormsg = CodeCompiler:new():SetFilename(filename or "tempcode"):Compile(code);
+	local code_func, errormsg = self:CompileCodeImp(code, filename or "tempcode");
 	if(not code_func and errormsg) then
 		LOG.std(nil, "error", "CodeBlock", errormsg);
 		local msg = errormsg;
@@ -804,7 +820,7 @@ function CodeBlock:IncludeFile(filename)
 		local code = file:GetText();
 		file:close();
 		if(code and code~="") then
-			local code_func, errormsg = CodeCompiler:new():SetFilename(filename):Compile(code);
+			local code_func, errormsg = self:CompileCodeImp(code, filename);
 			if(not code_func and errormsg) then
 				LOG.std(nil, "error", "CodeBlock", errormsg);
 				local msg = errormsg;
