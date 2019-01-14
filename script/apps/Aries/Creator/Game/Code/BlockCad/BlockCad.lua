@@ -15,6 +15,7 @@ CodeBlocklySerializer.OnInit(categories,all_cmds)
 CodeBlocklySerializer.SaveFilesToDebug("block_configs_blockcad");
 -------------------------------------------------------
 ]]
+local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local BlockCad = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.BlockCad.BlockCad", BlockCad);
 
@@ -73,8 +74,18 @@ function BlockCad.AppendDefinitions(source)
 		end
 	end
 end
+
 function BlockCad.GetAllCmds()
 	BlockCad.AppendAll();
 	return all_cmds;
+end
+
+-- custom compiler here: 
+-- @param codeblock: code block object here
+function BlockCad.CompileCode(code, filename, codeblock)
+	local precode = format("log('NPL CAD begin code:%s')\n", codeblock:GetBlockName())
+	local endcode = "\nlog('NPL CAD end code')\n"
+	code = precode..(code or "")..endcode;
+	return CodeCompiler:new():SetFilename(filename):Compile(code);
 end
 
