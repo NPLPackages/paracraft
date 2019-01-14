@@ -5,8 +5,7 @@ Date: 2018/12/12
 Desc: BlockCad is a blockly program to create shapes with nploce on web browser
 use the lib:
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCad.lua");
-local BlockCad = commonlib.gettable("MyCompany.Aries.Game.Code.BlockCad.BlockCad");
+local BlockCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCad.lua");
 local categories = BlockCad.GetCategoryButtons();
 local all_cmds = BlockCad.GetAllCmds()
 
@@ -14,10 +13,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
 local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
 CodeBlocklySerializer.OnInit(categories,all_cmds)
 CodeBlocklySerializer.SaveFilesToDebug("block_configs_blockcad");
-
 -------------------------------------------------------
 ]]
-local BlockCad = commonlib.gettable("MyCompany.Aries.Game.Code.BlockCad.BlockCad");
+local BlockCad = NPL.export();
+commonlib.setfield("MyCompany.Aries.Game.Code.BlockCad.BlockCad", BlockCad);
 
 local is_installed = false;
 local all_cmds = {};
@@ -29,6 +28,7 @@ BlockCad.categories = {
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
 };
+
 function BlockCad.GetCategoryButtons()
     return BlockCad.categories;
 end

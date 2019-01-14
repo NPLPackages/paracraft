@@ -77,6 +77,8 @@ function CodeHelpWindow.InitCmds()
 		local langConfig;
 		if(filename == "") then
 			langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
+		elseif(filename == "npl_cad") then
+			langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCad.lua");
 		else
 			filename = Files.GetWorldFilePath(filename)
 			if(filename) then
