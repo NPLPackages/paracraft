@@ -17,8 +17,11 @@ GameLogic.GetCodeGlobal():BroadcastStartEvent();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
 NPL.load("(gl)script/ide/System/Windows/Application.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
+
 local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
+local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
 local Application = commonlib.gettable("System.Windows.Application");
 local CodeUI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -191,6 +194,7 @@ function CodeGlobals:Reset()
 
 	-- TODO: 
 	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
+	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
 function CodeGlobals:OnWorldSave()
@@ -431,19 +435,54 @@ end
 -- try to start lobby server if not started. 
 -- @param bSigninIfNot: whether to force signin
 function CodeGlobals:CheckLobbyServer(bSigninIfNot)
-	self.isLobbyStarted = LobbyServer.GetSingleton():IsStarted();
 
-	if(not self.isLobbyStarted and bSigninIfNot) then
-		if(not self.hasAskedSignin) then
-			self.hasAskedSignin = true;
-			GameLogic.SignIn(L"", function(bSucceed)
-				if(bSucceed) then
-					GameLogic.RunCommand("/startLobbyServer")
-				end
+
+	--self.isLobbyStarted = LobbyServer.GetSingleton():IsStarted() and LobbyServerViaTunnel.GetSingleton():IsStarted();
+	
+	local lobbyServerStarted = LobbyServer.GetSingleton():IsStarted();
+	local LobbyServerViaTunnelStarted = LobbyServerViaTunnel.GetSingleton():IsStarted();
+	
+	local function OnLobbyViaTunnelStartedGlobal(_, msg)
+		self:UnregisterTextEvent("OnLobbyViaTunnelStartedGlobal", OnLobbyViaTunnelStartedGlobal);
+		self.hasAskedSignin = false;
+	end
+	
+	local function OnLobbyStartedGlobal(_, msg)
+
+		self:UnregisterTextEvent("OnLobbyStartedGlobal", OnLobbyStartedGlobal);
+		if msg.msg == "true" then
+			if not LobbyServerViaTunnelStarted then
+				self:RegisterTextEvent("OnLobbyViaTunnelStartedGlobal", OnLobbyViaTunnelStartedGlobal);
+				GameLogic.RunCommand("/startLobbyServer -callback OnLobbyViaTunnelStartedGlobal -tunnelhost 1.tunnel.keepwork.com -tunnelport 8099");
+			else
 				self.hasAskedSignin = false;
-			end)
+			end
+		else
+			self.hasAskedSignin = false;
 		end
 	end
+	
+	local function onSignIn(bSucceed)
+		if bSucceed then
+			if not lobbyServerStarted then
+				self:RegisterTextEvent("OnLobbyStartedGlobal", OnLobbyStartedGlobal);
+				GameLogic.RunCommand("/startLobbyServer -callback OnLobbyStartedGlobal");
+			else
+				OnLobbyStartedGlobal(nil, {msg="true"})
+			end
+		else
+			self.hasAskedSignin = false;
+		end
+	end
+	
+	if((not lobbyServerStarted or not LobbyServerViaTunnelStarted) and bSigninIfNot) then
+		if(not self.hasAskedSignin) then
+			self.hasAskedSignin = true;
+			GameLogic.SignIn(L"", onSignIn);
+		end
+	end
+	
+	self.isLobbyStarted = lobbyServerStarted or LobbyServerViaTunnelStarted;
 	return self.isLobbyStarted;
 end
 
@@ -457,6 +496,11 @@ function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
 		for k, v in pairs(clients) do
 			event:DispatchEvent({type="net", msg={userinfo = v}});
 		end
+		
+		clients = LobbyServerViaTunnel.GetSingleton():GetClients();
+		for k, v in pairs(clients) do
+			event:DispatchEvent({type="net", msg={userinfo = v}});
+		end
 	end
 end
 
@@ -465,7 +509,8 @@ function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
 	if(event) then
 		event:RemoveEventListener("net", callbackFunc);
 		if(text == "connect" and event:GetEventListenerCount("net") == 0) then
-			LobbyServer.GetSingleton():StopAll()
+			LobbyServer.GetSingleton():StopAll();
+			LobbyServerViaTunnel.GetSingleton():StopAll()
 			self.isLobbyStarted = false;
 		end
 	end
@@ -480,9 +525,21 @@ function CodeGlobals:SendNetworkEvent(keepworkUsername, event_name, msg)
 	end
 
 	if(event_name) then
-		LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg)
+		if LobbyServer.GetSingleton():IsStarted() then
+			LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg);
+		end
+		
+		if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+			LobbyServerViaTunnel.GetSingleton():SendTo(keepworkUsername, event_name, msg);
+		end
 	else
-		LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
+		if LobbyServer.GetSingleton():IsStarted() then
+			LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
+		end
+		
+		if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+			LobbyServerViaTunnel.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
+		end
 	end
 end
 
@@ -491,8 +548,14 @@ function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
 	if(not self:CheckLobbyServer()) then
 		return
 	end
-
-	LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
+	
+	if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+		LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
+	end
+	
+	if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+		LobbyServerViaTunnel.GetSingleton():BroadcastMessage(event_name, msg)
+	end
 end
 
 -- when this computer received a message from the network.

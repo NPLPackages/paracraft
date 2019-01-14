@@ -14,10 +14,10 @@ local LobbyUserInfo = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries
 function LobbyUserInfo:ctor()
 end
 
-function LobbyUserInfo:Init(keepworkUsername, nickname)
+function LobbyUserInfo:Init(keepworkUsername, nickname, nid)
 	self.keepworkUsername = keepworkUsername;
 	self.nickname = nickname;
-	self.nid = "LobbyServer_" .. keepworkUsername;
+	self.nid = nid or "LobbyServer_" .. keepworkUsername;
 	return self;
 end
 

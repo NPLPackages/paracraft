@@ -11,6 +11,7 @@ local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer
 ]]
 NPL.load("(gl)script/ide/event_mapping.lua");
 NPL.load("(gl)script/ide/commonlib.lua");
+NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyMessageType.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyUserInfo.lua");
@@ -139,7 +140,7 @@ function LobbyServer:AutoDiscovery(broadcast_address_list)
 		, version = GameLogic.options:GetRevision()
 		};
 
-	NPL.load("(gl)script/ide/timer.lua");
+	
 	local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 		for k, server_addr in pairs(server_addr_list) do
 			NPL.activate(server_addr, data, 1, 2, 0);
@@ -209,7 +210,7 @@ end
 
 -- @param timeout_seconds: the number of seconds to wait. if 0, it will only try once.
 -- @return the last NPL.activate call result and the stop function
-local function activate_async_with_timeout(timeout_seconds, filename, msg, callback)
+function LobbyServer.activate_async_with_timeout(timeout_seconds, filename, msg, callback)
 	local res = NPL.activate(filename, msg);
 
 	if(res ~= 0 and timeout_seconds > 0) then
@@ -225,14 +226,14 @@ local function activate_async_with_timeout(timeout_seconds, filename, msg, callb
 					time_left = time_left - time_interval*0.001;
 					time_interval = time_interval * 2;
 					timer:Change(time_interval, nil);
-					
-					if callback then
-						callback(true);
-					end
 				else
 					if callback then
 						callback(false);
 					end
+				end
+			else
+				if callback then
+					callback(true);
 				end
 			end
 		end})
@@ -266,7 +267,7 @@ function LobbyServer:ConnectLobbyClient(ip, port)
 	local user_addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  nid);
 	
 	local res, stopFunc;
-	res, stopFunc = activate_async_with_timeout(self:GetConnectTimeout(), user_addr,  {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()}, onEnd);
+	res, stopFunc = self.activate_async_with_timeout(self:GetConnectTimeout(), user_addr,  {type = LobbyMessageType.REQUEST_CONNECT, name = self:GetUsername(), nickname = self:GetNickname()}, onEnd);
 	
 	if res ~= 0 then
 		self._pending[nid] = stopFunc;

@@ -85,14 +85,24 @@ function ServerManager:CreateWorldServer(worldpath)
 end
 
 function ServerManager:Init(host, port, username, tunnelClient)
+
 	self:CreateWorldServer();
 
     if(not tunnelClient) then
-        host = tostring(host or "0.0.0.0");
-        port = tostring(port or 8099);
-        
-        self:LoadNetworkSettings();
-        NPL.StartNetServer(host, port);
+		port = port or 8099;
+	    host = tostring(host or "0.0.0.0");
+		
+		self:LoadNetworkSettings();
+		local att = NPL.GetAttributeObject();
+		
+		local i = 0;
+		while NPL.Ping("127.0.0.1", tostring(port + i), 1000, true) ~= -1 and i <= 20 do
+			i = i + 1;
+		end
+
+        NPL.StartNetServer(host, tostring(port + i));
+
+		LOG.std(nil, "Network", "ServerManager", "TCP listening on %s:%s", att:GetField("HostIP"), att:GetField("HostPort"));
     end
 	local Connections = commonlib.gettable("MyCompany.Aries.Game.Network.Connections");
 	Connections:Init();
@@ -114,6 +124,10 @@ function ServerManager:LoadNetworkSettings()
 	NPL.SetUseCompression(true, true);
 	att:SetField("CompressionLevel", -1);
 	att:SetField("CompressionThreshold", 1024*16);
+	
+	att:SetField("UDPIdleTimeoutPeriod", 1200000);
+	att:SetField("UDPCompressionLevel", -1);
+	att:SetField("UDPCompressionThreshold", 1024*16);
 	-- npl message queue size is set to really large
 	__rts__:SetMsgQueueSize(5000);
 end

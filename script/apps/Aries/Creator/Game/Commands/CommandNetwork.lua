@@ -85,17 +85,20 @@ Commands["stopserver"] = {
 
 Commands["startLobbyServer"] = {
 	name="startLobbyServer", 
-	quick_ref="/startLobbyServer [-callback eventName] [bAutoDiscovery] [broadcast_address_list]", 
+	quick_ref="/startLobbyServer [-callback eventName] [-tunnelhost ip] [-tunnelport port] [-tunnelusername username] [-tunnelroom room_key] [-tunnelpassword room_psw] [bAutoDiscovery] [broadcast_address_list]", 
 	desc=[[start lobby server
 @param AutoDiscovery: start auto discoverty, default is true. 
 @param broadcast_address_list : default is 255.255.255.255
 @param -callback eventName: one can optionally specify a callback event name
+@param -tunnelusername username: default is System.User.keepworkUsername
 e.g
 /startLobbyServer
 /startLobbyServer false
 /startLobbyServer true 10.27.3.255
 /startLobbyServer true 10.27.3.255|255.255.255.255
 /startLobbyServer -callback OnLobbyStarted
+/startLobbyServer -tunnelhost 10.27.3.8 -tunnelport 8099
+/startLobbyServer -tunnelhost 10.27.3.8 -tunnelport 8099 -tunnelroom myroom -tunnelpassword 123456
 ]],
 	mode_deny = "",
 	mode_allow = "",
@@ -103,6 +106,12 @@ e.g
 		local result = true;
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
 		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
+		
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
+		local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
+		
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyTunnelClient.lua");
+		local LobbyTunnelClient = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelClient");
 		
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -118,11 +127,36 @@ e.g
 		end
 
 		local eventName;
+		local tunnelhost;
+		local tunnelport;
+		local tunnelroom;
+		local tunnelpassword;
+		local tunnelusername;
 		local option = true
 		while(option) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option == "callback") then
 				eventName, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
+			end
+			
+			if (option == "tunnelhost") then
+				tunnelhost, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
+			end
+			
+			if (option == "tunnelport") then
+				tunnelport, cmd_text = CmdParser.ParseFormated(cmd_text, "%d+")
+			end
+			
+			if (option == "tunnelroom") then
+				tunnelroom, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
+			end
+			
+			if (option == "tunnelpassword") then
+				tunnelpassword, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
+			end
+			
+			if (option == "tunnelusername") then
+				tunnelusername, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+")
 			end
 		end	
 		
@@ -152,22 +186,48 @@ e.g
 				att:SetField("EnableUDPServer", port + i);
 				i = i + 1;
 			end
+			
+			if tunnelhost then
+				tunnelport = tunnelport or "8099";
+				tunnelusername = tunnelusername or System.User.keepworkUsername;
+				local function onEnd(bSuccess)
+				
+					if bSuccess then
+						LobbyServerViaTunnel.GetSingleton():Start(nil, nil, LobbyTunnelClient.GetSingleton());
+						if bAutoDiscovery then
+							LobbyServerViaTunnel.GetSingleton():AutoDiscovery();
+						end
+						
+						if eventName then
+							local event = System.Core.Event:new():init(eventName)
+							event.cmd_text = 'true'
+							GameLogic:event(event)
+						end
+					else
+						if eventName then
+							local event = System.Core.Event:new():init(eventName)
+							event.cmd_text = 'false'
+							GameLogic:event(event)
+						end
+					end
+				end
+				LobbyTunnelClient.GetSingleton():ConnectServer(tunnelhost, tunnelport, tunnelusername, tunnelroom, tunnelpassword, onEnd);				
+			else
+				LobbyServer.GetSingleton():Start();
+				if bAutoDiscovery then
+					if broadcast_address_list and #broadcast_address_list > 0 then
+						LobbyServer.GetSingleton():AutoDiscovery(broadcast_address_list);
+					else
+						LobbyServer.GetSingleton():AutoDiscovery();
+					end
+				end
 
-		
-			LobbyServer.GetSingleton():Start();
-			if bAutoDiscovery then
-				if broadcast_address_list and #broadcast_address_list > 0 then
-					LobbyServer.GetSingleton():AutoDiscovery(broadcast_address_list);
-				else
-					LobbyServer.GetSingleton():AutoDiscovery();
+				if eventName then
+					local event = System.Core.Event:new():init(eventName)
+					event.cmd_text = 'true'
+					GameLogic:event(event)
 				end
 			end
-
-			if eventName then
- 				local event = System.Core.Event:new():init(eventName)
-  				event.cmd_text = 'true'
-  				GameLogic:event(event)
- 			end
 		end
 		
 		-- start tcp server
@@ -230,22 +290,33 @@ e.g
 
 Commands["stopLobbyServer"] = {
 	name="stopLobbyServer", 
-	quick_ref="/stopLobbyServer ", 
-	desc="stop lobby server",
+	quick_ref="/stopLobbyServer [bTunnel]", 
+	desc="stop lobby server, ",
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
-		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
-		LobbyServer.GetSingleton():StopAll();
+		
+		
+		local bTunnel;
+		bTunnel, cmd_text = CmdParser.ParseBool(cmd_text);
+		
+		if bTunnel then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
+			local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
+			LobbyServerViaTunnel.GetSingleton():StopAll();
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
+			local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
+			LobbyServer.GetSingleton():StopAll();
+		end
 	end,
 };
 
 Commands["connectLobbyClient"] = {
 	name="connectLobbyClient", 
-	quick_ref="/connectLobbyClient ip port", 
+	quick_ref="/connectLobbyClient ip port [bTunnel]", 
 	desc=[[try to connect a lobby client :
-@param ip: client ip. 
+@param ip: client ip, if bTunnel is ture, it is user. 
 @param port : client port, default is 8099.
 e.g
 	/connectLobbyClient 10.27.3.255 
@@ -256,26 +327,39 @@ e.g
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
 		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
-		local ip, port;
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
+		local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
+		
+		local ip, port, bTunnel;
 		ip, cmd_text = CmdParser.ParseString(cmd_text);
 		port, cmd_text = CmdParser.ParseInt(cmd_text) or 8099;
+		bTunnel, cmd_text = CmdParser.ParseBool(cmd_text);
 		
 		if not ip then
 			GameLogic.AddBBS(nil, L"connectLobbyClient需要有效的ip参数");
 			return;
 		end
-		
-		if LobbyServer.GetSingleton():IsStarted() then
-			LobbyServer.GetSingleton():ConnectLobbyClient(ip, port);
+
+		if bTunnel then
+			if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+				LobbyServerViaTunnel.GetSingleton():ConnectLobbyClient(ip);
+			else
+				GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			end
 		else
-			GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			if LobbyServer.GetSingleton():IsStarted() then
+				LobbyServer.GetSingleton():ConnectLobbyClient(ip, port);
+			else
+				GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			end
 		end
+		
 	end,
 };
 
 Commands["disconnectLobbyClient"] = {
 	name="disconnectLobbyClient", 
-	quick_ref="/disconnectLobbyClient keepworkUsername", 
+	quick_ref="/disconnectLobbyClient keepworkUsername [bTunnel]", 
 	desc=[[try to disconnect a lobby client :
 @param keepworkUsername: client keepworkUsername. 
 e.g
@@ -286,18 +370,29 @@ e.g
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
 		local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
-		local keepworkUsername;
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
+		local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
+		local keepworkUsername, bTunnel;
 		keepworkUsername, cmd_text = CmdParser.ParseString(cmd_text);
+		bTunnel, cmd_text = CmdParser.ParseBool(cmd_text);
 		
 		if not keepworkUsername then
 			GameLogic.AddBBS(nil, L"disdonnectLobbyClient需要有效的keepworkUsername参数");
 			return;
 		end
 		
-		if LobbyServer.GetSingleton():IsStarted() then
-			LobbyServer.GetSingleton():DisconnectLobbyClient(keepworkUsername);
+		if bTunnel then
+			if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+				LobbyServerViaTunnel.GetSingleton():DisconnectLobbyClient(keepworkUsername);
+			else
+				GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			end
 		else
-			GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			if LobbyServer.GetSingleton():IsStarted() then
+				LobbyServer.GetSingleton():DisconnectLobbyClient(keepworkUsername);
+			else
+				GameLogic.AddBBS(nil, L"lobby server尚未启动");
+			end
 		end
 	end,
 };
