@@ -709,12 +709,14 @@ function Actor:SetIsBlocker(bBlocker)
 	end
 end
 
-function Actor:SetBillboarded(bBillboarded)
+function Actor:SetBillboarded(att)
 	local entity = self:GetEntity();
 	if entity then
 		local obj = entity:GetInnerObject();
 		if obj then
-			obj:SetField("billboarded", bBillboarded);
+			obj:SetField("billboarded", att.yaw == true);
+			obj:SetField("billboardedRoll", att.roll == true);
+			obj:SetField("billboardedPitch", att.pitch == true);
 		end
 	end
 end
@@ -724,11 +726,11 @@ function Actor:IsBillboarded()
 	if entity then
 		local obj = entity:GetInnerObject();
 		if obj then
-			return obj:GetField("billboarded");
+			return obj:GetField("billboarded"), obj:GetField("billboardedRoll"), obj:GetField("billboardedPitch");
 		end
 	end
 	
-	return false;
+	return false, false, false;
 end
 
 local internalValues = {

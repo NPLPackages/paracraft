@@ -360,10 +360,20 @@ local pos = getActorValue("movieblockpos")
 pos[3] = pos[3] + 1
 setActorValue("movieblockpos", pos)
 ]]},
+
+
+
 {desc = L"改变电影角色", canRun = true, code = [[
 setActorValue("movieactor", 1)
 setActorValue("movieactor", "name1")
 ]]},
+
+{desc = L"电影方块广告牌效果", canRun = true, code = [[
+local yaw, roll, pitch = getActorValue("billboarded")
+setActorValue("billboarded", {yaw = true, roll = true, pitch = pitch});
+setActorValue("billboarded", {yaw = true});
+]]},
+
 },
 },
 
