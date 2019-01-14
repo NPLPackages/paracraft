@@ -709,6 +709,28 @@ function Actor:SetIsBlocker(bBlocker)
 	end
 end
 
+function Actor:SetBillboarded(bBillboarded)
+	local entity = self:GetEntity();
+	if entity then
+		local obj = entity:GetInnerObject();
+		if obj then
+			obj:SetField("billboarded", bBillboarded);
+		end
+	end
+end
+
+function Actor:IsBillboarded()
+	local entity = self:GetEntity();
+	if entity then
+		local obj = entity:GetInnerObject();
+		if obj then
+			return obj:GetField("billboarded");
+		end
+	end
+	
+	return false;
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -729,6 +751,7 @@ local internalValues = {
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
+	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
 }
 
 function Actor:GetActorValue(name)
