@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- web server configuration file: this node can be child node, thus embedded in shared xml -->
+<WebServer>
+  <!--which HTTP ip and port this server listens to. -->
+  <servers>
+    <!-- @param host, port: which ip port to listen to. if * it means all. -->
+    <server host="*" port="8099" host_state_name="">
+      <defaultHost rules_id="simple_rule"></defaultHost>
+      <virtualhosts>
+        <!-- force "http://127.0.0.1/" to match to iternal npl_code_wiki site for debugging  -->
+        <host name="127.0.0.1:8099" rules_id="npl_code_wiki" allow='{"127.0.0.1"}'></host>
+      </virtualhosts>
+    </server>
+  </servers>
+  <!--rules used when starting a web server. Multiple rules with different id can be defined. --> 
+  <rules id="simple_rule">
+    <!--URI remapping example-->
+    <rule match='{"^[^%.]+$", "robots.txt"}' with="WebServer.redirecthandler" params='{"/index.lua"}'></rule>
+    <!--<rule match='{"^[^%.]+$", "robots.txt"}' with="WebServer.redirecthandler" params='{"/helloworld.lua"}'></rule>-->
+    <!--npl script example-->
+    <!--<rule match="%.lua$" with="WebServer.makeGenericHandler" params='{docroot="script/apps/WebServer/test", params={}, extra_vars=nil}'></rule>-->
+    <rule match='{"thread_worker%.lua"}' with="WebServer.npl_thread_handler" params='%CD%'></rule>
+    <rule match='{"%.lua$", "%.npl$"}' with="WebServer.npl_script_handler" params='%CD%'></rule>
+    <!--npl server page example-->
+    <rule match="%.page$" with="WebServer.npl_page_handler" params="{docroot='%CD%', enable_file_monitor=true}"></rule>
+    <!--filehandler example, base dir is where the root file directory is. %CD% means current file's directory-->
+    <rule match="." with="WebServer.filehandler" params='{baseDir = "%CD%"}'></rule>
+  </rules>
+  <config>
+    <number name='max_worker_thread_count'>0</number>
+  </config>
+</WebServer>

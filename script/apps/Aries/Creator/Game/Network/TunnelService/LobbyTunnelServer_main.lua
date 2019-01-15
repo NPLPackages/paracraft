@@ -15,6 +15,8 @@ LobbyTunnelServerMain:StartServer();
 ]]
 NPL.load("(gl)script/ide/System/System.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyTunnelServer.lua");
+NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+	
 
 local LobbyTunnelServerMain = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelServerMain");
 local LobbyTunnelServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelServer");
@@ -30,7 +32,8 @@ end
 
 function LobbyTunnelServerMain:StartServer()
 	-- TODO: start listen on ip and port
-	NPL.StartNetServer("0.0.0.0", "8099");
+	--NPL.StartNetServer("0.0.0.0", "8099");
+	WebServer:Start("script/apps/Aries/Creator/Game/Network/TunnelService/Website", "0.0.0.0", 8099);
 
 	local att = NPL.GetAttributeObject();
 	att:SetField("EnableUDPServer", 8099);

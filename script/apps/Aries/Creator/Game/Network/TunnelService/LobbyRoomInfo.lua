@@ -38,6 +38,10 @@ function LobbyRoomInfo:isFull()
 	return self._clients_count >= self:GetMaxClients();
 end
 
+function LobbyRoomInfo:GetClientCount()
+	return self._clients_count;
+end
+
 function LobbyRoomInfo:hasPassword()
 	return self._password ~= nil;
 end

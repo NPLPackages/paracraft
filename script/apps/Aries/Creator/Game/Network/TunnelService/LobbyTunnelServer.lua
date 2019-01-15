@@ -58,6 +58,18 @@ function LobbyTunnelServer:Start()
 	ParaScene.RegisterEvent("_n_paracraft_lobby_tunnel_server", ";_OnLobbyTunnelServerNetworkEvent();");
 end
 
+function LobbyTunnelServer:GetRooms()
+	return self._rooms;
+end
+
+function LobbyTunnelServer:GetLockRooms()
+	return self._lock_rooms;
+end
+
+function LobbyTunnelServer:GetFullRooms()
+	return self._fullrooms;
+end
+
 function LobbyTunnelServer:onNetworkEvent(msg)
 	if msg.code == NPLReturnCode.NPL_ConnectionDisconnected then
 		self:onDisconnected(msg.nid or msg.tid);
