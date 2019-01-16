@@ -187,6 +187,8 @@ end
 -- send raw UDP unicast or broadcast message.  No connection is required. 
 -- @param addr : if is nil, we well broadcast message
 function LobbyServer:SendOriginalMessage(addr, msgStr)
+
+
 	if not msgStr then return; end;
 	if addr then
 		addr = string.format("(gl)%s:script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua",  addr);

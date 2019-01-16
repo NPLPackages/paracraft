@@ -8,6 +8,8 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandNetwork.lua");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -15,6 +17,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -113,8 +116,7 @@ e.g
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyTunnelClient.lua");
 		local LobbyTunnelClient = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelClient");
 		
-		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+
 
 		if not System.User.keepworkUsername then
 			GameLogic.AddBBS(nil, L"必须先登录keepwork");
@@ -211,7 +213,13 @@ e.g
 						end
 					end
 				end
-				LobbyTunnelClient.GetSingleton():ConnectServer(tunnelhost, tunnelport, tunnelusername, tunnelroom, tunnelpassword, onEnd);				
+				LobbyTunnelClient.GetSingleton():ConnectServer(tunnelhost
+					, tunnelport
+					, tunnelusername
+					, WorldCommon.GetWorldTag("kpProjectId")
+					, tunnelroom
+					, tunnelpassword
+					, onEnd);				
 			else
 				LobbyServer.GetSingleton():Start();
 				if bAutoDiscovery then
