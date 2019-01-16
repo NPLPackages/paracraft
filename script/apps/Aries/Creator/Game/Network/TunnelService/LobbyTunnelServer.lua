@@ -11,10 +11,13 @@ local LobbyTunnelServer = commonlib.gettable("MyCompany.Aries.Game.Network.Lobby
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyRoomInfo.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyTunnelMessageType.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyClientInfo.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/LobbyRoomGroup.lua");
+
 
 local LobbyRoomInfo = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyRoomInfo");
 local LobbyTunnelMessageType = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelMessageType");
-local LobbyClientInfo = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyClientInfo")
+local LobbyClientInfo = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyClientInfo");
+local LobbyRoomGroup = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyRoomGroup");
 
 local LobbyTunnelServer = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Network.LobbyTunnelServer"));
 
@@ -32,12 +35,7 @@ function LobbyTunnelServer.GetSingleton()
 end
 
 function LobbyTunnelServer:ctor()
-	-- non full and unlock rooms 
-	self._rooms = {};
-	-- non full and lock rooms
-	self._lock_rooms = {};
-	-- full rooms
-	self._fullrooms = {};
+	self._room_groups = {};
 	--
 	self._clients = {};
 	--
@@ -46,6 +44,10 @@ function LobbyTunnelServer:ctor()
 	self._udp_nid_to_name = {};
 	
 	self.InitCallback()
+end
+
+function LobbyTunnelServer:GetRoomGroups()
+	return self._room_groups;
 end
 
 
@@ -58,17 +60,6 @@ function LobbyTunnelServer:Start()
 	ParaScene.RegisterEvent("_n_paracraft_lobby_tunnel_server", ";_OnLobbyTunnelServerNetworkEvent();");
 end
 
-function LobbyTunnelServer:GetRooms()
-	return self._rooms;
-end
-
-function LobbyTunnelServer:GetLockRooms()
-	return self._lock_rooms;
-end
-
-function LobbyTunnelServer:GetFullRooms()
-	return self._fullrooms;
-end
 
 function LobbyTunnelServer:onNetworkEvent(msg)
 	if msg.code == NPLReturnCode.NPL_ConnectionDisconnected then
@@ -83,60 +74,6 @@ end
 
 function LobbyTunnelServer:Log(text, ...)
 	LOG.std(nil, "info", "LobbyTunnelServer", text, ...);
-end
-
-function LobbyTunnelServer:GetNotFullRoom(room_key)
-	return self._rooms[room_key];
-end
-
-function LobbyTunnelServer.GetLockRoom(room_key)
-	return self._lock_rooms[room_key];
-end
-
-function LobbyTunnelServer:GetFullRoom(room_key)
-	return self._fullrooms[room_key];
-end
-
-function LobbyTunnelServer:SetRoomFull(room_key, bFull)
-	if bFull then
-		local room = self._rooms[room_key];
-		if room then
-			self._rooms[room_key] = nil;
-			self._fullrooms[room_key] = room;
-			return ;
-		end
-		
-		room = self._lock_rooms[room_key];
-		if room then
-			self._lock_rooms[room_key] = nil;
-			self._fullrooms[room_key] = room;
-		end
-	else
-		local room = self._fullrooms[room_key];
-		if room then
-			self._fullrooms[room_key] = nil;
-			if room:hasPassword() then
-				self._lock_rooms[room_key] = room;
-			else
-				self._rooms[room_key] = room;
-			end
-		end
-	end
-end
-
-function LobbyTunnelServer:_CreateRoom(room_key, password)
-	self:Log("create a new room key = %s, password = %s", tostring(room_key), tostring(password));
-
-	local room = LobbyRoomInfo:new():Init(room_key, password);
-	
-	room_key = room_key or room:GetRoomKey();
-	
-	if room:hasPassword() then
-		self._lock_rooms[room_key] = room;
-	else
-		self._rooms[room_key] = room;
-	end
-	return room;
 end
 
 function LobbyTunnelServer.GetClientAddress(nid)
@@ -220,7 +157,7 @@ function LobbyTunnelServer:RemoveClient(tcp_nid)
 			NPL.activate(dest_addr, data);
 		end
 		
-		self:SetRoomFull(room:GetRoomKey(), room:isFull());
+		room:UpdateState();
 	end
 end
 
@@ -242,6 +179,45 @@ function LobbyTunnelServer.AddUDPAddress(ip, port)
 	return nid;
 end
 
+function LobbyTunnelServer:onRequestUDPLogin(msg)
+	local keepworkUsername = msg.name;
+	local udp_nid = msg.nid or msg.tid;
+	
+	if not keepworkUsername then
+		return;
+	end
+	
+	local client = self._clients[keepworkUsername];
+	if not client then
+		return;
+	end
+	
+	local dest_addr = self.GetClientAddress(udp_nid);
+	if client:getToken() == msg.token then
+		client:setUDPNid(udp_nid);
+		self._udp_nid_to_name[udp_nid] = keepworkUsername;
+		
+		NPL.activate(dest_addr, {
+				type = LobbyTunnelMessageType.ResponseUDPLogin;
+				success = true;
+			}, 1, 2, 0);
+	else
+		NPL.activate(dest_addr, {
+				type = LobbyTunnelMessageType.ResponseUDPLogin;
+				success = false;
+			}, 1, 2, 0);
+	end
+end
+
+function LobbyTunnelServer:CreateGetRoomGroup(projectId)
+	if not self._room_groups[projectId] then
+		self:Log("create a new room_group projectId = %s", tostring(projectId));
+		self._room_groups[projectId] = LobbyRoomGroup:new():init(projectId);
+	end
+	
+	return self._room_groups[projectId];
+end
+
 function LobbyTunnelServer:onRequestLogin(msg)
 
 	local room_key = msg.room;
@@ -249,8 +225,9 @@ function LobbyTunnelServer:onRequestLogin(msg)
 	local keepworkUsername = msg.name;
 	local password = msg.psw;
 	local udpport = msg.udpport;
-	local room;
 	
+	
+	local room;
 	
 	if not keepworkUsername then
 		NPL.reject(nid);
@@ -263,6 +240,8 @@ function LobbyTunnelServer:onRequestLogin(msg)
 		return;
 	end
 	
+	local projectId = msg.pId or "default";
+	local roomGroup = self:CreateGetRoomGroup(projectId);
 	local dest_addr = self.GetClientAddress(nid);
 	
 	local function jionRoom()
@@ -273,12 +252,6 @@ function LobbyTunnelServer:onRequestLogin(msg)
 		self._clients[keepworkUsername] = client;
 		self._tcp_nid_to_name[nid] = keepworkUsername;
 		
-		local ip = NPL.GetIP(nid);
-		local udp_nid = self.AddUDPAddress(ip, tostring(udpport));
-		client:setUDPNid(udp_nid);
-		self._udp_nid_to_name[udp_nid] = keepworkUsername;
-		
-		
 		NPL.activate(dest_addr, {
 				type = LobbyTunnelMessageType.ResponseLogin;
 				success = true;
@@ -286,10 +259,8 @@ function LobbyTunnelServer:onRequestLogin(msg)
 				token = client:getToken();
 				udpport = self._udp_port;
 			});
-				
-		if room:isFull() then
-			self:SetRoomFull(room_key, true);
-		end
+		
+		room:UpdateState();
 	end
 	
 	local function jionFaild(desc)
@@ -303,7 +274,7 @@ function LobbyTunnelServer:onRequestLogin(msg)
 	end
 
 	if room_key then
-		room = self:GetNotFullRoom(room_key);
+		room = roomGroup:GetNotFullRoom(room_key);
 		
 		if room then
 			-- jion unlock room
@@ -314,7 +285,7 @@ function LobbyTunnelServer:onRequestLogin(msg)
 				-- room is full
 				jionFaild("room is full");
 			else
-				room = self:GetLockRoom(room_key);
+				room = roomGroup:GetLockRoom(room_key);
 				if room then
 					-- jion lock room
 					if room:canJoin(password) then
@@ -325,19 +296,19 @@ function LobbyTunnelServer:onRequestLogin(msg)
 					end
 				else
 					-- create a new room and jion
-					room = self:_CreateRoom(room_key, password);
+					room = roomGroup:CreateRoom(room_key, password);
 					jionRoom();
 				end
 			end
 		end
 	else
 		-- join any not full room
-		room_key, room = next(self._rooms);
+		room_key, room = roomGroup:GetAnyNoneFull();
 		if room and room_key then
 			jionRoom();
 		else
 			-- create new room and jion
-			room = self:_CreateRoom();
+			room = roomGroup:CreateRoom();
 			room_key = room:GetRoomKey();
 			jionRoom();
 		end
@@ -425,13 +396,16 @@ function LobbyTunnelServer:onSendUDPMessage()
 	end
 	
 	local dest_nid = dest_client:getUDPNid();
-	local dest_addr = self.GetClientAddress(dest_nid);
 	
-	NPL.activate(dest_addr, {
-			type = LobbyTunnelMessageType.ResponseUDPMessage;
-			src = src_client:getName();
-			data = msg.data;
-		}, 1, 2, 0);
+	if dest_nid then
+		local dest_addr = self.GetClientAddress(dest_nid);
+		
+		NPL.activate(dest_addr, {
+				type = LobbyTunnelMessageType.ResponseUDPMessage;
+				src = src_client:getName();
+				data = msg.data;
+			}, 1, 2, 0);
+	end
 end
 
 function LobbyTunnelServer:onBroadcastUDPMessage()
@@ -459,9 +433,10 @@ function LobbyTunnelServer:onBroadcastUDPMessage()
 	for k, dest_client in pairs(clients) do
 		if dest_client ~= src_client then
 			dest_nid = dest_client:getUDPNid();
-			
-			dest_addr = self.GetClientAddress(dest_nid);
-			NPL.activate(dest_addr, data, 1, 2, 0);
+			if dest_nid then
+				dest_addr = self.GetClientAddress(dest_nid);
+				NPL.activate(dest_addr, data, 1, 2, 0);
+			end
 		end
 	end
 end
@@ -482,7 +457,7 @@ function LobbyTunnelServer.InitCallback()
 		callbacks[LobbyTunnelMessageType.SendMessage] = LobbyTunnelServer.onSendMessage;
 		callbacks[LobbyTunnelMessageType.SendUDPMessage] = LobbyTunnelServer.onSendUDPMessage;
 		callbacks[LobbyTunnelMessageType.BroadcastUDPMessage] = LobbyTunnelServer.onBroadcastUDPMessage;
-		--callbacks[LobbyTunnelMessageType.RequestUDPLogin] = LobbyTunnelServer.onRequestUDPLogin;
+		callbacks[LobbyTunnelMessageType.RequestUDPLogin] = LobbyTunnelServer.onRequestUDPLogin;
 	end
 end
 

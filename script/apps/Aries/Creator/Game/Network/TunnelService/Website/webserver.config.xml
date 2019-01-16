@@ -14,17 +14,8 @@
   </servers>
   <!--rules used when starting a web server. Multiple rules with different id can be defined. --> 
   <rules id="simple_rule">
-    <!--URI remapping example-->
-    <rule match='{"^[^%.]+$", "robots.txt"}' with="WebServer.redirecthandler" params='{"/index.lua"}'></rule>
-    <!--<rule match='{"^[^%.]+$", "robots.txt"}' with="WebServer.redirecthandler" params='{"/helloworld.lua"}'></rule>-->
-    <!--npl script example-->
-    <!--<rule match="%.lua$" with="WebServer.makeGenericHandler" params='{docroot="script/apps/WebServer/test", params={}, extra_vars=nil}'></rule>-->
-    <rule match='{"thread_worker%.lua"}' with="WebServer.npl_thread_handler" params='%CD%'></rule>
+	<rule match='{"^[^%.]+$", "robots.txt"}' with="WebServer.redirecthandler" params='{"/index.page"}'></rule>
     <rule match='{"%.lua$", "%.npl$"}' with="WebServer.npl_script_handler" params='%CD%'></rule>
-    <!--npl server page example-->
-    <rule match="%.page$" with="WebServer.npl_page_handler" params="{docroot='%CD%', enable_file_monitor=true}"></rule>
-    <!--filehandler example, base dir is where the root file directory is. %CD% means current file's directory-->
-    <rule match="." with="WebServer.filehandler" params='{baseDir = "%CD%"}'></rule>
   </rules>
   <config>
     <number name='max_worker_thread_count'>0</number>

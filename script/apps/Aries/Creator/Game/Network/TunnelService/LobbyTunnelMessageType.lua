@@ -4,6 +4,7 @@ local LobbyTunnelMessageType = commonlib.gettable("MyCompany.Aries.Game.Network.
 	{
 		type = LobbyTunnelMessageType.RequestLogin;
 		name = "keepworkUsername";
+		pId = projectId;
 		room = "room_key" or nil;
 		psw = "123456" or nil;
 		udpport = 8099;
@@ -100,4 +101,21 @@ LobbyTunnelMessageType.ResponseUDPMessage		= 10;
 	}
 ]]
 LobbyTunnelMessageType.ClientDisconnect			= 11;
+
+--[[
+	{
+		type = LobbyTunnelMessageType.RequestUDPLogin;
+		name = "keepworkUsername";
+		token = "token";
+	}
+]]
+LobbyTunnelMessageType.RequestUDPLogin			= 12;
+
+--[[
+	{
+		type = LobbyTunnelMessageType.ResponseUDPLogin;
+		success = true/false;
+	}
+]]
+LobbyTunnelMessageType.ResponseUDPLogin 		= 13;
 

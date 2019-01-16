@@ -17,21 +17,37 @@ function LobbyRoomInfo:ctor()
 	self._password = nil;
 	self._clients_count = 0;
 	self._users = {};
+	self._projectId = nil;
+	self._room_group = nil;
 end
 
 local next_room_key = 0;
 
 -- static function
-function LobbyRoomInfo.GenerateRoomKey()
+function LobbyRoomInfo:GenerateRoomKey()
 	next_room_key = next_room_key + 1;
-	return "room" .. next_room_key;
+	return "room_" .. self._projectId .. "_" .. next_room_key;
 end
 
 -- @param room_key: if nil, we will dynamically generate a room key
-function LobbyRoomInfo:Init(room_key, password)
-	self._room_key = room_key or LobbyRoomInfo.GenerateRoomKey();
+function LobbyRoomInfo:Init(projectId, room_group, room_key, password)
+	self._projectId = projectId;
+	self._room_group = room_group;
+	self._room_key = room_key or self:GenerateRoomKey();
 	self._password = password;
 	return self;
+end
+
+function LobbyRoomInfo:UpdateState()
+	self:getRoomGroup():SetRoomFull(self:GetRoomKey(), self:isFull());
+end
+
+function LobbyRoomInfo:getRoomGroup()
+	return self._room_group;
+end
+
+function LobbyRoomInfo:getProjectId()
+	return self._projectId;
 end
 
 function LobbyRoomInfo:isFull()
@@ -71,8 +87,6 @@ function LobbyRoomInfo:RemoveClient(keepworkUsername)
 	self._users[keepworkUsername] = nil;
 	self._clients_count = self._clients_count - 1;
 end
-
-
 
 function LobbyRoomInfo:GetRoomKey()
 	return self._room_key;
