@@ -332,7 +332,8 @@ e.g
 		
 		local ip, port, bTunnel;
 		ip, cmd_text = CmdParser.ParseString(cmd_text);
-		port, cmd_text = CmdParser.ParseInt(cmd_text) or 8099;
+		port, cmd_text = CmdParser.ParseInt(cmd_text);
+		port = port or 8099;
 		bTunnel, cmd_text = CmdParser.ParseBool(cmd_text);
 		
 		if not ip then
