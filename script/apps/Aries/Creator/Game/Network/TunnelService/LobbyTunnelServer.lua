@@ -224,7 +224,6 @@ function LobbyTunnelServer:onRequestLogin(msg)
 	local nid = msg.nid or msg.tid;
 	local keepworkUsername = msg.name;
 	local password = msg.psw;
-	local udpport = msg.udpport;
 	
 	
 	local room;
@@ -240,7 +239,7 @@ function LobbyTunnelServer:onRequestLogin(msg)
 		return;
 	end
 	
-	local projectId = msg.pId or "default";
+	local projectId = tostring(msg.pId or "default");
 	local roomGroup = self:CreateGetRoomGroup(projectId);
 	local dest_addr = self.GetClientAddress(nid);
 	

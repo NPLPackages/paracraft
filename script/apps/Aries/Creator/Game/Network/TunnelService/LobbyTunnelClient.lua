@@ -241,7 +241,6 @@ function LobbyTunnelClient:__ConnectServer(ip, port, username, projectId, room_k
 		pId = projectId;
 		room = room_key;
 		psw = password;
-		udpport = NPL.GetAttributeObject():GetField("UDPHostPort");
 	};
 
 	local function onEnd(bSuccessed)

@@ -7,7 +7,6 @@ local LobbyTunnelMessageType = commonlib.gettable("MyCompany.Aries.Game.Network.
 		pId = projectId;
 		room = "room_key" or nil;
 		psw = "123456" or nil;
-		udpport = 8099;
 	}
 ]]
 LobbyTunnelMessageType.RequestLogin 			= 1;
