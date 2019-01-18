@@ -12,6 +12,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/ide/System/Scene/Cameras/AutoCamera.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local Cameras = commonlib.gettable("System.Scene.Cameras");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -573,3 +575,69 @@ function env_imp:camera(dist, pitch, facing)
 		att:SetField("CameraRotY", facing);
 	end
 end
+
+local function GetMovieChannelName_(name, codeblock)
+	if(not name or name == "myself") then
+		name = codeblock:GetFilename();
+	end
+	return name;
+end
+
+-- @param name: movie channel name. 
+-- @param x, y, z: if nil or 0, it means the closest movie block
+function env_imp:setMovie(name, x, y, z)
+	name = GetMovieChannelName_(name, self.codeblock)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+	if(channel) then
+		if(not z or (z==0) ) then
+			local movieEntity = self.codeblock:GetMovieEntity();
+			if(movieEntity) then
+				x, y, z = movieEntity:GetBlockPos();
+			end
+		end
+		channel:SetStartBlockPosition(math.floor(x),math.floor(y),math.floor(z));
+	end
+end
+
+-- @param key: propertyName. "ReuseActor:bool"
+function env_imp:setMovieProperty(name, key, value)
+	name = GetMovieChannelName_(name, self.codeblock)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+	if(channel) then
+		if(key == "ReuseActor") then
+			channel:SetReuseActor(value==true or value==1);
+		elseif(key == "Speed") then
+			if(type(value) == "number") then
+				channel:SetSpeed(value);
+			end
+		elseif(key == "UseCamera") then
+			channel:SetUseCamera(value==true or value==1);
+		end
+	end
+end
+
+function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
+	name = GetMovieChannelName_(name, self.codeblock)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+
+	if(not channel:GetStartBlockPosition()) then
+		local movieEntity = self.codeblock:GetMovieEntity();
+		if(movieEntity) then
+			local x, y, z = movieEntity:GetBlockPos();
+			channel:SetStartBlockPosition(x, y, z);
+		end
+	end
+
+	if(bLoop) then
+		channel:PlayLooped(timeFrom, timeTo);
+	else
+		channel:Play(timeFrom, timeTo);
+	end
+end
+
+function env_imp:stopMovie(name)
+	name = GetMovieChannelName_(name, self.codeblock)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+	channel:Stop();
+end
+

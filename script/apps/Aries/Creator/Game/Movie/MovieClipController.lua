@@ -576,10 +576,10 @@ end
 function MovieClipController.OnSettings()
 	local movieClip = MovieClipController.GetMovieClip();
 	if(movieClip) then
-		local focus = movieClip:GetFocus();
-		if(focus) then
+		local selectedActor = movieClip:GetSelectedActor();
+		if(selectedActor) then
 			-- select me to edit. 
-			focus:SelectMe();
+			selectedActor:SelectMe();
 		else
 			local entity = movieClip:GetEntity();
 			if(entity and entity.OpenBagEditor) then

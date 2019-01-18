@@ -87,6 +87,12 @@ function CodeBlock:Destroy()
 	CodeBlock._super.Destroy(self);
 end
 
+function CodeBlock:GetBlockPos()
+	if(self.entityCode) then
+		return self.entityCode:GetBlockPos();
+	end
+end
+
 -- return the timer object
 function CodeBlock:SetTimer(callbackFunc, dueTime, period)
 	local timer;

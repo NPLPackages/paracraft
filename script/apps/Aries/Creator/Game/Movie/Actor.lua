@@ -50,6 +50,7 @@ end
 function Actor:Init(itemStack, movieclipEntity)
 	self:SetItemStack(itemStack)
 	self.movieclipEntity = movieclipEntity;
+	self:SetMovieClip(self.movieclipEntity:GetMovieClip())
 	return self;
 end
 
@@ -140,9 +141,11 @@ end
 
 -- get the movie clip that contains this actor. 
 function Actor:GetMovieClip()
-	if(self.movieclipEntity) then
-		return self.movieclipEntity:GetMovieClip();
-	end
+	return self.movieclip;
+end
+
+function Actor:SetMovieClip(movieClip)
+	self.movieclip = movieClip;
 end
 
 function Actor:GetMovieClipEntity()
@@ -152,8 +155,8 @@ end
 -- it is only in playing mode when activated by a circuit. 
 -- any other way of triggering the movieclip is not playing mode(that is edit mode)
 function Actor:IsPlayingMode()
-	if(self.movieclipEntity) then
-		return self.movieclipEntity:IsPlayingMode();
+	if(self.movieclip) then
+		return self.movieclip:IsPlayingMode();
 	end
 end
 

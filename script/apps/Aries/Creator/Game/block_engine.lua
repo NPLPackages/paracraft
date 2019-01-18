@@ -671,10 +671,6 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 
 		if(block_id ~= last_block_id) then
 			ParaTerrain.SetBlockTemplateByIdx(x,y,z,block_id);
-
-			if(last_block_data>0 and block_id > 0) then
-				ParaTerrain.SetBlockUserDataByIdx(x,y,z,last_block_data); -- retain the last data
-			end
 		end
 		
 		if(last_block_id > 0) then

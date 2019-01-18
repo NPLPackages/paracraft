@@ -68,6 +68,10 @@ local s_env_methods = {
 	"getScale",
 	"focus",
 	"camera",
+	"setMovie",
+	"setMovieProperty",
+	"playMovie",
+	"stopMovie",
 
 	-- Events
 	"registerClickEvent",

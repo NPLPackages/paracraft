@@ -427,18 +427,19 @@ function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId,
 					lesson:SetContent(data.content);
 					ParaWorldLessons.SetCurrentLesson(lesson);
 
-					local worldUrl = lesson:GetFirstWorldUrl()
-					if(worldUrl and worldUrl~="") then
-						lesson:EnterWorld(function(bSucceed, localWorldPath)
-							if(bSucceed) then
-								ParaWorldLessons.CloseWindow(true);
-							end
-						end)
-					else
-						-- there is no associated world, we will just open the web url
-						LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with lession %s", tostring(lessonId));
-						ParaWorldLessons.OpenCurrentLessonUrl()
-					end
+					lesson:GetFirstWorldUrl(function(worldUrl) 
+						if(worldUrl and worldUrl~="") then
+							lesson:EnterWorld(function(bSucceed, localWorldPath)
+								if(bSucceed) then
+									ParaWorldLessons.CloseWindow(true);
+								end
+							end)
+						else
+							-- there is no associated world, we will just open the web url
+							LOG.std(nil, "info", "ParaWorldLessons", "there is no associated 3d world with lession %s", tostring(lessonId));
+							ParaWorldLessons.OpenCurrentLessonUrl()
+						end
+					end)
 				else
 					_guihelper.MessageBox(format(L"没有找到课程%d", lessonId));
 					LOG.std(nil, "warn", "ParaWorldLessons", "failed to fetch lesson content from %s", contentAPIUrl);

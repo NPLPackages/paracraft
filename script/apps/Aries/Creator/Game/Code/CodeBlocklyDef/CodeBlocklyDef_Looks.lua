@@ -533,6 +533,172 @@ while(true) do
 end
 ]]}},
 },
+
+{
+	type = "setMovie", 
+	message0 = L"频道%1的电影方块为:%2,%3,%4",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+		{
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setMovie(%s, %s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('setMovie("%s", %s, %s, %s)\n', self:getFieldAsString('name'), self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {{desc = "每个频道只能同时播放一个电影", canRun = true, code = [[
+hide()
+setMovie("main")
+playMovie("main", 0, -1);
+]]},
+
+{desc = "myself代表当前代码方块的名字", canRun = true, code = [[
+setMovie("myself")
+playMovie("myself", 0, -1);
+]]},
+
+{desc = L"指定电影方块的坐标", canRun = true, code = [[
+local x, y, z = codeblock:GetBlockPos();
+setMovie("main", x, y, z+1)
+playMovie("main", 0, -1);
+]]},
+
+},
+},
+
+{
+	type = "playMovie", 
+	message0 = L"在%1频道播放电影%1从%2到%3毫秒",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+		{
+			name = "timeFrom",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "timeTo",
+			type = "input_value",
+            shadow = { type = "math_number", value = -1,},
+			text = -1, 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'playMovie(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('playMovie("%s", %d, %d)\n', self:getFieldAsString('name'), self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
+	end,
+	examples = {{desc = L"播放与代码方块相邻的电影方块", canRun = true, code = [[
+playMovie("myself", 0, -1);
+]]}},
+},
+
+{
+	type = "stopMovie", 
+	message0 = L"停止播放电影%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'stopMovie(%s)',
+	ToNPL = function(self)
+		return string.format('stopMovie("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+playMovie("myself", 0, -1);
+wait(2)
+stopMovie();
+]]}},
+},
+
+{
+	type = "setMovieProperty", 
+	message0 = L"设置电影%1的属性%2为%3",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+		{
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ L"重用角色", "ReuseActor" },
+				{ L"使用摄影机", "UseCamera" },
+				{ L"播放速度", "Speed" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1,
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setMovieProperty(%s, "%s", %s)',
+	ToNPL = function(self)
+		return string.format('setMovieProperty("%s", "%s", %s)\n', self:getFieldAsString('name'), self:getFieldAsString('key'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+setMovieProperty("myself", "Speed", 2);
+playMovie("myself", 0, -1);
+wait(2)
+stopMovie();
+]]}},
+},
+
 };
 function CodeBlocklyDef_Looks.GetCmds()
 	return cmds;
