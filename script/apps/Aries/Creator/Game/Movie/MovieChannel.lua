@@ -102,9 +102,15 @@ function MovieChannel:Pause()
 	end
 end
 
+function MovieChannel:DisableLooping()
+	self.loopFromTime = nil;
+	self.loopToTime = nil;
+end
+
 -- @param timeFrom: time in milliseconds, default to 0.
 -- @param timeTo: if nil, default to timeFrom. if -1, it means total movie block length. 
-function MovieChannel:Play(fromTime, toTime)
+function MovieChannel:Play(fromTime, toTime, bLooping)
+	
 	local movieClip = self:CreateGetStartMovieClip()
 	if(movieClip) then
 		if(not fromTime) then
@@ -124,15 +130,42 @@ function MovieChannel:Play(fromTime, toTime)
 		if(toTime>fromTime) then
 			movieClip:Resume();	
 		end
+		self:started(); -- signal
+
+		if(bLooping and fromTime < toTime) then
+			self.loopFromTime = fromTime;
+			self.loopToTime = toTime;
+			movieClip:Connect("timeChanged", self, self.OnMovieTimeChange, "UniqueConnection")
+		else
+			self:DisableLooping();
+		end
 	end
 end
 
 function MovieChannel:PlayLooped(fromTime, toTime)
+	self:Play(fromTime, toTime, true)
+end
+
+function MovieChannel:OnMovieTimeChange()
+	local movieClip = self:GetCurrentMovieClip();
+	if(movieClip) then
+		if(self.loopToTime) then
+			local delta = movieClip:GetTime()-self.loopToTime;
+			if(delta > 0) then
+				movieClip:SetTime(self.loopFromTime + ((self.loopFromTime + delta) % (self.loopToTime - self.loopFromTime)))
+				movieClip:Resume();	
+			end
+		else
+			movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+		end
+	end
 end
 
 -- stop and remove all actors
 function MovieChannel:Stop()
+	self:DisableLooping();
 	if(self:GetCurrentMovieClip()) then
 		self:GetCurrentMovieClip():Stop();
 	end
+	self:stopped(); -- signal
 end

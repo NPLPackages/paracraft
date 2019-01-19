@@ -275,7 +275,4 @@ function MovieClipRaw:FrameMove(deltaTime)
 	else
 		self:UpdateActors(deltaTime);
 	end
-	if(deltaTime~=0) then
-		self:timeChanged();
-	end
 end

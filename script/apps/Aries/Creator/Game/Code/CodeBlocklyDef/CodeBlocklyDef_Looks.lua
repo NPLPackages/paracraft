@@ -536,7 +536,7 @@ end
 
 {
 	type = "setMovie", 
-	message0 = L"频道%1的电影方块为:%2,%3,%4",
+	message0 = L"设置电影频道%1为:%2,%3,%4",
 	arg0 = {
 		{
 			name = "name",
@@ -594,7 +594,7 @@ playMovie("main", 0, -1);
 
 {
 	type = "playMovie", 
-	message0 = L"在%1频道播放电影%1从%2到%3毫秒",
+	message0 = L"播放电影频道%1从%2到%3毫秒",
 	arg0 = {
 		{
 			name = "name",
@@ -625,13 +625,52 @@ playMovie("main", 0, -1);
 		return string.format('playMovie("%s", %d, %d)\n', self:getFieldAsString('name'), self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
 	end,
 	examples = {{desc = L"播放与代码方块相邻的电影方块", canRun = true, code = [[
+hide()
 playMovie("myself", 0, -1);
 ]]}},
 },
 
 {
+	type = "playMovieLoop", 
+	message0 = L"循环播放电影频道%1从%2到%3毫秒",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+		{
+			name = "timeFrom",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "timeTo",
+			type = "input_value",
+            shadow = { type = "math_number", value = -1,},
+			text = -1, 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'playMovie(%s, %s, %s, true)',
+	ToNPL = function(self)
+		return string.format('playMovie("%s", %d, %d, true)\n', self:getFieldAsString('name'), self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
+	end,
+	examples = {{desc = L"播放与代码方块相邻的电影方块", canRun = true, code = [[
+hide()
+playMovie("myself", 0, -1, true);
+]]}},
+},
+
+{
 	type = "stopMovie", 
-	message0 = L"停止播放电影%1",
+	message0 = L"停止播放电影频道%1",
 	arg0 = {
 		{
 			name = "name",
@@ -658,7 +697,7 @@ stopMovie();
 
 {
 	type = "setMovieProperty", 
-	message0 = L"设置电影%1的属性%2为%3",
+	message0 = L"设置电影频道%1的属性%2为%3",
 	arg0 = {
 		{
 			name = "name",

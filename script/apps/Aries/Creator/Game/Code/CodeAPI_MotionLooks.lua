@@ -633,6 +633,23 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 	else
 		channel:Play(timeFrom, timeTo);
 	end
+
+	-- tricky: we shall stop the movie channel when code blocks playing it are all unloaded.
+	local playingCodeblocks = channel.playingCodeblocks;
+	if(not playingCodeblocks) then
+		playingCodeblocks = {};
+		channel.playingCodeblocks = playingCodeblocks;
+	end
+	if(not playingCodeblocks[self.codeblock]) then
+		playingCodeblocks[self.codeblock] = true;
+		self.codeblock:Connect("codeUnloaded", function()
+			channel.playingCodeblocks[self.codeblock] = nil;
+			if(not next(channel.playingCodeblocks)) then
+				-- only stop when the last code block stopped. 
+				channel:Stop();	
+			end
+		end)
+	end
 end
 
 function env_imp:stopMovie(name)
