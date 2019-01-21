@@ -572,13 +572,13 @@ end
 	ToNPL = function(self)
 		return string.format('setMovie("%s", %s, %s, %s)\n', self:getFieldAsString('name'), self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
-	examples = {{desc = "每个频道只能同时播放一个电影", canRun = true, code = [[
+	examples = {{desc = L"不传参数代表与代码方块相邻的电影方块", canRun = true, code = [[
 hide()
 setMovie("main")
 playMovie("main", 0, -1);
 ]]},
 
-{desc = "myself代表当前代码方块的名字", canRun = true, code = [[
+{desc = L"myself代表当前代码方块的名字", canRun = true, code = [[
 setMovie("myself")
 playMovie("myself", 0, -1);
 ]]},

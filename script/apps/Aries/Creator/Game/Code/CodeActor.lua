@@ -51,8 +51,9 @@ end
 
 -- @param itemStack: movie block actor's item stack where time series data source of this entity is stored. 
 -- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
-function Actor:Init(itemStack, movieclipEntity, isReuseActor)
-	if(not Actor._super.Init(self, itemStack, movieclipEntity, isReuseActor)) then
+-- @param name: if not provided, it will use the name in itemStack
+function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, isReuseActor, name)) then
 		return;
 	end
 	local entity = self.entity;

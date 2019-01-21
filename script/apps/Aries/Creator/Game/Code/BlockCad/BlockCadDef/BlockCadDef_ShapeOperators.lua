@@ -12,148 +12,10 @@ local BlockCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code
 local BlockCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.BlockCad.BlockCadDef_ShapeOperators");
 local cmds = {
 
-{
-	type = "ShapeBuilder.createShape", 
-	message0 = L"createShape %1",
-    arg0 = {
-		{
-			name = "node",
-			type = "input_value",
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.createShape(%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
 
 {
-	type = "ShapeBuilder.setTranslation", 
-	message0 = L"setTranslation(%1,%2,%3,%4)",
-    arg0 = {
-		{
-			name = "node",
-			type = "input_value",
-		},
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.setTranslation(%s,%s,%s,%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "ShapeBuilder.translate", 
-	message0 = L"translate(%1,%2,%3,%4)",
-    arg0 = {
-		{
-			name = "node",
-			type = "input_value",
-		},
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.translate(%s,%s,%s,%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "ShapeBuilder.scale", 
-	message0 = L"scale(%1,%2,%3,%4)",
-    arg0 = {
-		{
-			name = "node",
-			type = "input_value",
-		},
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.scale(%s,%s,%s,%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "ShapeBuilder.beginTranslation", 
-	message0 = L"beginTranslation(%1,%2,%3)",
+	type = "_ShapeBuilder.beginTranslation", 
+	message0 = L"beginTranslation( x %1 y %2 z %3)",
     message1 = L"%1",
 	message2 = L"endTranslation()",
     arg0 = {
@@ -190,6 +52,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'ShapeBuilder.beginTranslation(%s,%s,%s)\\n%sShapeBuilder.endTranslation()',
 	ToNPL = function(self)
+		return string.format('ShapeBuilder.beginTranslation(%s,%s,%s)\n    %s\nShapeBuilder.endTranslation()\n', 
+            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -197,8 +61,8 @@ local cmds = {
 
 
 {
-	type = "ShapeBuilder.beginScale", 
-	message0 = L"beginScale(%1,%2,%3)",
+	type = "_ShapeBuilder.beginScale", 
+	message0 = L"beginScale( x %1 y %2 z %3)",
     message1 = L"%1",
 	message2 = L"endScale()",
     arg0 = {
@@ -235,90 +99,19 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'ShapeBuilder.beginScale(%s,%s,%s)\\n%sShapeBuilder.endScale()',
 	ToNPL = function(self)
+    return string.format('ShapeBuilder.beginScale(%s,%s,%s)\n    %s\nShapeBuilder.endScale()\n', 
+            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
 
 {
-	type = "ShapeBuilder.setColor", 
-	message0 = L"color %1 %2",
+	type = "_ShapeBuilder.beginRotation", 
+	message0 = L"beginRotation( x %1 y %2 z %3 angle %4)",
+    message1 = L"%1",
+	message2 = L"endRotation()",
     arg0 = {
-        {
-			name = "node",
-			type = "input_value",
-		},
-		{
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.setColor(%s,%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-
-{
-	type = "ShapeBuilder.boolean", 
-	message0 = L"boolean %1 %2 %3 %4",
-    arg0 = {
-        {
-			name = "node_1",
-			type = "input_value",
-		},
-        {
-			name = "value",
-			type = "field_dropdown",
-			options = {
-				{ L"union", "union" },
-				{ L"difference", "difference" },
-				{ L"intersection", "intersection" },
-				--{ L"section", "section" }, -- runtime error
-			},
-		},
-        {
-			name = "node_2",
-			type = "input_value",
-		},
-        
-		{
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffffff",},
-			text = "#ffffff", 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'ShapeBuilder.boolean(%s,"%s",%s,%s)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-
-{
-	type = "ShapeBuilder.mirror", 
-	message0 = L"mirror shape %1 x %2 y %3 z %4 dir_x %5 dir_y %6 dir_z %7 color %8",
-    arg0 = {
-		{
-			name = "node",
-			type = "input_value",
-		},
         {
 			name = "x",
 			type = "input_value",
@@ -338,22 +131,47 @@ local cmds = {
 			text = 0, 
 		},
         {
-			name = "dir_x",
+			name = "angle",
 			type = "input_value",
             shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
-			name = "dir_y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
+	},
+    arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
 		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'ShapeBuilder.beginRotation(%s,%s,%s,%s)\\n%sShapeBuilder.endRotation()',
+	ToNPL = function(self)
+    return string.format('ShapeBuilder.beginRotation(%s,%s,%s,%s)\n    %s\nShapeBuilder.endRotation()\n', 
+            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('angle'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "_ShapeBuilder.beginBoolean", 
+	message0 = L"beginBoolean %1 %2",
+    message1 = L"%1",
+	message2 = L"endBoolean()",
+    arg0 = {
+        
         {
-			name = "dir_z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"union", "union" },
+				{ L"difference", "difference" },
+				{ L"intersection", "intersection" },
+			},
 		},
         {
 			name = "color",
@@ -362,18 +180,25 @@ local cmds = {
 			text = "#ff0000", 
 		},
 	},
+    arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-	previousStatement = true,
+    previousStatement = true,
 	nextStatement = true,
-	func_description = 'ShapeBuilder.mirror(%s,%s,%s,%s,%s,%s,%s,%s)',
+	func_description = 'ShapeBuilder.beginBoolean("%s","%s")\\n%sShapeBuilder.endBoolean()',
 	ToNPL = function(self)
+    return string.format('ShapeBuilder.beginBoolean("%s","%s")\n    %s\nShapeBuilder.endBoolean()\n', 
+            self:getFieldValue('value'), self:getFieldValue('color'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-
 
 }
 function BlockCadDef_ShapeOperators.GetCmds()

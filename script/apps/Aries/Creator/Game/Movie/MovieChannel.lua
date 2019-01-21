@@ -23,9 +23,10 @@ local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
 
 local MovieChannel = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.MovieChannel"));
 MovieChannel:Property("Name", "MovieChannel");
-MovieChannel:Property({"ReuseActor", false, "IsReuseActor", "SetReuseActor", auto=true});
-MovieChannel:Property({"Speed", 1.0, "GetSpeed", "SetSpeed", auto=true});
+MovieChannel:Property({"ReuseActor", nil, "IsReuseActor", "SetReuseActor", auto=true});
+MovieChannel:Property({"Speed", 1.0, "GetSpeed", "SetSpeed"});
 MovieChannel:Property({"bUseCamera", true, "IsUseCamera", "SetUseCamera", auto=true});
+MovieChannel:Property({"bLoop", false, "IsLooping", "SetLooping"});
 
 MovieChannel:Signal("started");
 MovieChannel:Signal("stopped");
@@ -50,7 +51,7 @@ end
 function MovieChannel:Reset()
 	if(self.clips) then
 		for i, clip in ipairs(self.clips) do
-			self:Destroy();
+			clip:Destroy();
 		end
 		self.clips = nil;
 		self.curClipIndex = nil;
@@ -102,9 +103,12 @@ function MovieChannel:Pause()
 	end
 end
 
-function MovieChannel:DisableLooping()
-	self.loopFromTime = nil;
-	self.loopToTime = nil;
+function MovieChannel:SetLooping(bLooping)
+	self.bLooping = bLooping;
+end
+
+function MovieChannel:IsLooping()
+	return self.bLooping;
 end
 
 -- @param timeFrom: time in milliseconds, default to 0.
@@ -130,15 +134,17 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 		end
 		if(toTime>fromTime) then
 			movieClip:Resume();	
+			movieClip:SetSpeed(self:GetSpeed())
+		else
+			movieClip:Pause();
 		end
 		self:started(); -- signal
 
-		if(bLooping and fromTime < toTime) then
-			self.loopFromTime = fromTime;
-			self.loopToTime = toTime;
+		self.playFromTime = fromTime;
+		self.playToTime = toTime;
+		self:SetLooping(bLooping == true);
+		if(fromTime < toTime) then
 			movieClip:Connect("timeChanged", self, self.OnMovieTimeChange, "UniqueConnection")
-		else
-			self:DisableLooping();
 		end
 	end
 end
@@ -147,24 +153,41 @@ function MovieChannel:PlayLooped(fromTime, toTime)
 	self:Play(fromTime, toTime, true)
 end
 
+function MovieChannel:SetSpeed(speed)
+	if(self.Speed ~= speed) then
+		self.Speed = speed;
+		if(self:GetCurrentMovieClip()) then
+			self:GetCurrentMovieClip():SetSpeed(speed);
+		end
+	end
+end
+
+function MovieChannel:GetSpeed()
+	return self.Speed or 1;
+end
+
 function MovieChannel:OnMovieTimeChange()
 	local movieClip = self:GetCurrentMovieClip();
 	if(movieClip) then
-		if(self.loopToTime) then
-			local delta = movieClip:GetTime()-self.loopToTime;
+		if(self:IsLooping()) then
+			local delta = movieClip:GetTime()-self.playToTime;
 			if(delta > 0) then
-				movieClip:SetTime(self.loopFromTime + ((self.loopFromTime + delta) % (self.loopToTime - self.loopFromTime)))
+				movieClip:SetTime(self.playFromTime + ((self.playFromTime + delta) % (self.playToTime - self.playFromTime)))
 				movieClip:Resume();	
 			end
 		else
-			movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+			if(movieClip:GetTime() >= self.playToTime) then
+				movieClip:Pause();
+				movieClip:SetTime(self.playToTime);
+				movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+			end
 		end
 	end
 end
 
 -- stop and remove all actors
 function MovieChannel:Stop()
-	self:DisableLooping();
+	self:SetLooping(false);
 	if(self:GetCurrentMovieClip()) then
 		self:GetCurrentMovieClip():Stop();
 	end

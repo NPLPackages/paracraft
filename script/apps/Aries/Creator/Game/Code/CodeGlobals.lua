@@ -39,15 +39,7 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
-
-		----------------------
-		-- @NOTE: the following may not be safe to expose to users
-		----------------------
-		System = System, -- @Note: Is it secure here?  
-		commonlib = commonlib, -- @Note: Is it secure here?
-		ParaIO = ParaIO,
-		GameLogic = GameLogic,
-
+	
 		type = type,
 		unpack = unpack,
 		setmetatable = setmetatable,
@@ -146,6 +138,16 @@ function CodeGlobals:ctor()
 		loadWorldData = function(name, default_value, filename)
 			return self:LoadWorldData(name, default_value, filename)
 		end,
+
+		----------------------
+		-- @NOTE: the following may not be safe to expose to users
+		----------------------
+		NPL = { load = NPL.load },
+		System = System, -- @Note: Is it secure here?  
+		commonlib = commonlib, -- @Note: Is it secure here?
+		ParaIO = ParaIO,
+		GameLogic = GameLogic,
+        NplOce = NplOce,
 	};
 
 	self:Reset();

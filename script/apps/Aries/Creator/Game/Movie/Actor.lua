@@ -837,7 +837,7 @@ end
 function Actor:BecomeAgent(entity)
 	if(entity and entity:isa(EntityManager.EntityMovable)) then
 		local lastEntity = self:GetEntity();
-		if(lastEntity) then	
+		if(lastEntity ~= entity) then	
 			self:DestroyEntity();
 		end
 		self.entity = entity;

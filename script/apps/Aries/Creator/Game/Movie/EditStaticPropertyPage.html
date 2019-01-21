@@ -1,0 +1,35 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditStaticPropertyPage.lua"><![CDATA[
+EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
+EditStaticPropertyPage.OnInit();
+]]></script>
+<aries:window mode="thin" style="width:512px;" title='<%=L"演员的静态属性"%>' onclose="EditStaticPropertyPage.OnClose">
+<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+    <div>
+        <%=L"演员的名字:"%><input type="text" name="name" style="height:25px;width:200px" />
+    </div>
+    <div>
+        <input type="checkbox" name="isAgent" style="margin-top:2px;"/><div for="isAgent" style="float:left;padding-left:5px;">
+            <%=L"是否为全局角色"%>
+        </div>
+    </div>
+    <div style="color:#808080">
+        <%=L"不同电影方块之间可以共享同名的全局角色,全局角色不会被删除或重复创建"%>
+    </div>
+    <div style="margin-top:10px;">
+        <input type="button" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnOK" value='<%=L"确定"%>' />
+        <input type="button" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnClose" value='<%=L"取消"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

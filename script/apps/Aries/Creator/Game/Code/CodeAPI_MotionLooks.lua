@@ -605,7 +605,7 @@ function env_imp:setMovieProperty(name, key, value)
 	local channel = MovieManager:CreateGetMovieChannel(name);
 	if(channel) then
 		if(key == "ReuseActor") then
-			channel:SetReuseActor(value==true or value==1);
+			channel:SetReuseActor(value==1 and true or value);
 		elseif(key == "Speed") then
 			if(type(value) == "number") then
 				channel:SetSpeed(value);

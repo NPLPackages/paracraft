@@ -18,7 +18,8 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClipRaw = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipRaw"));
 MovieClipRaw:Property("Name", "MovieClipRaw");
-MovieClipRaw:Property({"bReuseActor", false, "IsReuseActor", "SetReuseActor", auto=true});
+MovieClipRaw:Property({"bReuseActor", nil, "IsReuseActor", "SetReuseActor", auto=true});
+MovieClipRaw:Property({"Speed", 1.0, "GetSpeed", "SetSpeed", auto=true});
 MovieClipRaw:Signal("timeChanged");
 
 
@@ -262,13 +263,13 @@ function MovieClipRaw:FrameMove(deltaTime)
 		return
 	end
 
-	local cur_time = self:GetTime() + deltaTime;
+	local cur_time = self:GetTime() + deltaTime*self:GetSpeed();
 	self:SetTime(cur_time);
 
 	if(self:GetTime() >= self:GetLength()) then
 		-- just in case there is still /t xx /end event, due to lua number precision error. 
-		self:SetTime(self:GetLength());
 		self:Pause();
+		self:SetTime(self:GetLength());
 		-- call UpdateActors to render the last frame. 
 		if(deltaTime > 0) then
 			self:UpdateActors(deltaTime);

@@ -399,7 +399,7 @@ function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
 			local itemStack = movie_entity.inventory:GetItem(i)
 			if (itemStack and itemStack.count > 0) then
 				if (itemStack.id == block_types.names.TimeSeriesNPC) then
-					return CodeActor:new():Init(itemStack, movie_entity);
+					return CodeActor:new():Init(itemStack, movie_entity, false, "codeblock");
 				elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
 					return CodeUIActor:new():Init(itemStack, movie_entity);
 				end

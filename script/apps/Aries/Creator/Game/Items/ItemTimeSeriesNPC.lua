@@ -30,8 +30,9 @@ end
 
 -- create actor from item stack. 
 -- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
-function ItemTimeSeriesNPC:CreateActorFromItemStack(itemStack, movieclipEntity, isReuseActor)
-	local actor = ActorNPC:new():Init(itemStack, movieclipEntity, isReuseActor);
+-- @param name: if not provided, it will use the name in itemStack
+function ItemTimeSeriesNPC:CreateActorFromItemStack(itemStack, movieclipEntity, isReuseActor, name)
+	local actor = ActorNPC:new():Init(itemStack, movieclipEntity, isReuseActor, name);
 	return actor;
 end
 

@@ -49,7 +49,8 @@ local selectable_var_list = {
 	"facing", 
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"head", -- multiple of "HeadUpdownAngle", "HeadTurningAngle"
-	"scaling", "speedscale", "gravity", "opacity", "blocks", "parent",
+	"scaling", "speedscale", "gravity", "opacity", "blocks", "parent", 
+	"static", -- multiple of "name" and "isAgent"
 };
 
 
@@ -75,6 +76,20 @@ function Actor:GetMultiVariable()
 		var:AddVariable(self:GetVariable("assetfile"));
 		var:AddVariable(self:GetVariable("scaling"));
 		self:SetCustomVariable("multi_variable", var);
+		return var;
+	end
+end
+
+-- get rotate multi variable
+function Actor:GetStaticVariable()
+	local var = self:GetCustomVariable("static_variable");
+	if(var) then
+		return var;
+	else
+		var = MultiAnimBlock:new({name="static"});
+		var:AddVariable(self:GetVariable("name"));
+		var:AddVariable(self:GetVariable("isAgent"));
+		self:SetCustomVariable("static_variable", var);
 		return var;
 	end
 end
@@ -165,7 +180,8 @@ function Actor:GetBonesVariable()
 end
 
 -- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
-function Actor:Init(itemStack, movieclipEntity, isReuseActor)
+-- @param name: if not provided, it will use the name in itemStack
+function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 	self.actor_block:Init(itemStack, movieclipEntity);
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
 	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
@@ -187,6 +203,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor)
 	timeseries:CreateVariableIfNotExist("gravity", "Discrete");
 	timeseries:CreateVariableIfNotExist("scaling", "Linear");
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
+	timeseries:CreateVariableIfNotExist("isAgent", "Discrete");
 	timeseries:CreateVariableIfNotExist("skin", "Discrete");
 	timeseries:CreateVariableIfNotExist("blockinhand", "Discrete");
 	timeseries:CreateVariableIfNotExist("opacity", "Linear");
@@ -199,14 +216,18 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor)
 	if(movieClip) then
 		local x, y, z = self:CheckSetDefaultPosition();
 
-		local HeadUpdownAngle, HeadTurningAngle, anim, facing,skin, opacity, name;
+		local HeadUpdownAngle, HeadTurningAngle, anim, facing,skin, opacity;
 		HeadUpdownAngle = self:GetValue("HeadUpdownAngle", 0);
 		HeadTurningAngle = self:GetValue("HeadTurningAngle", 0);
 		anim = self:GetValue("anim", 0);
 		facing = self:GetValue("facing", 0);
 		skin = self:GetValue("skin", 0);
 		opacity = self:GetValue("opacity", 0);
-		name = self:GetValue("name", 0);
+		name = name or self:GetValue("name", 0);
+		local isAgent = self:GetValue("isAgent", 0);
+		if(isReuseActor == nil) then
+			isReuseActor = isAgent
+		end
 
 		if(isReuseActor and name and name~="") then
 			local entity;
@@ -241,6 +262,11 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor)
 			-- self.entity:EnableLOD(false);
 			self.entity:Attach();
 			self:CheckLoadBonesAnims();
+
+			if(isReuseActor) then
+				-- just incase the reused actor is not found, we will create a new one and become an agent of it. 
+				self:BecomeAgent(self.entity);
+			end
 		end
 		return self;
 	end
@@ -306,6 +332,8 @@ function Actor:GetEditableVariable(selected_index)
 		var = self:GetBonesVariable();
 	elseif(name == "blocks") then
 		var = self:GetBlocksVariable();
+	elseif(name == "static") then
+		var = self:GetStaticVariable();
 	else
 		var = self.TimeSeries:GetVariable(name);
 	end
@@ -637,6 +665,22 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(target~="") then
 				-- this will automatically add a key frame at the position. 
 				self:KeyTransform();
+			end
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+		end, old_value);
+	elseif(keyname == "static") then
+		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0)}
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
+		local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
+		EditStaticPropertyPage.ShowPage(function(values)
+			if(values.name ~= old_value.name) then
+				self:AddKeyFrameByName("name", 0, values.name);
+				self:SetDisplayName(values.name)
+			end
+			if(values.isAgent ~= old_value.isAgent) then
+				self:AddKeyFrameByName("isAgent", 0, values.isAgent==true);
 			end
 			if(callbackFunc) then
 				callbackFunc(true);

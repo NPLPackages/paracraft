@@ -83,9 +83,46 @@ end
 -- custom compiler here: 
 -- @param codeblock: code block object here
 function BlockCad.CompileCode(code, filename, codeblock)
-	local precode = format("log('NPL CAD begin code:%s')\n", codeblock:GetBlockName())
-	local endcode = "\nlog('NPL CAD end code')\n"
-	code = precode..(code or "")..endcode;
+    local NplOceConnection = NPL.load("Mod/NplCad2/NplOceConnection.lua");
+    if(not NplOceConnection or not NplOceConnection.is_loaded)then
+        return
+    end
+
+    local block_name = codeblock:GetBlockName();
+    if(not block_name or block_name == "")then
+        block_name = "default"
+    end
+	local worldpath = ParaWorld.GetWorldDirectory();
+    local name = format("%sblocktemplates/blockcad/%s.x",worldpath,block_name);
+    code = BlockCad.GetCode(code, name);
 	return CodeCompiler:new():SetFilename(filename):Compile(code);
 end
+
+-- create short cut in code API, so that we can write cube() instead of ShapeBuilder.cube()
+function BlockCad.InstallMethods(codeAPI, shape)
+	codeAPI.cube = function(...)
+		shape.cube(...) 
+	end
+	-- Remove this: extract all methods like below
+	for func_name, func in pairs(shape) do
+		if(type(func_name) == "string" and type(func) == "function") then
+			codeAPI[func_name] = function(...)
+				return func(...);
+			end
+		end
+	end
+end
+
+function BlockCad.GetCode(code, filename)
+    return format([[
+        local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
+        local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
+        ShapeBuilder.create();
+		local BlockCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCad.lua");
+		BlockCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
+        %s
+        NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
+    ]],code, filename)
+end
+
 

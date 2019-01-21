@@ -139,7 +139,7 @@ function EditCodeBlockContext:CreateGetActor()
 			if(itemStack) then
 				local item = itemStack:GetItem();
 				if(item and item.CreateActorFromItemStack) then
-					local actor = item:CreateActorFromItemStack(itemStack, movieEntity);
+					local actor = item:CreateActorFromItemStack(itemStack, movieEntity, false, "ActorForEditor_");
 					if(actor) then
 						self.actor = actor;
 						self.actor:Connect("keyChanged", self, EditCodeBlockContext.UpdateActor);
