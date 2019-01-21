@@ -29,8 +29,9 @@ function ItemTimeSeriesNPC:ctor()
 end
 
 -- create actor from item stack. 
-function ItemTimeSeriesNPC:CreateActorFromItemStack(itemStack, movieclipEntity)
-	local actor = ActorNPC:new():Init(itemStack, movieclipEntity);
+-- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
+function ItemTimeSeriesNPC:CreateActorFromItemStack(itemStack, movieclipEntity, isReuseActor)
+	local actor = ActorNPC:new():Init(itemStack, movieclipEntity, isReuseActor);
 	return actor;
 end
 

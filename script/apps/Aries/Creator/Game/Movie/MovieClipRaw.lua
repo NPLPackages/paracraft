@@ -18,6 +18,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClipRaw = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipRaw"));
 MovieClipRaw:Property("Name", "MovieClipRaw");
+MovieClipRaw:Property({"bReuseActor", false, "IsReuseActor", "SetReuseActor", auto=true});
 MovieClipRaw:Signal("timeChanged");
 
 
@@ -184,7 +185,7 @@ function MovieClipRaw:GetActorFromItemStack(itemStack, bCreateIfNotExist)
 		if(bCreateIfNotExist) then
 			local item = itemStack:GetItem();
 			if(item and item.CreateActorFromItemStack) then
-				local actor = item:CreateActorFromItemStack(itemStack, self.entity);
+				local actor = item:CreateActorFromItemStack(itemStack, self.entity, self:IsReuseActor());
 				if(actor) then
 					self:AddActor(actor);
 					return actor;

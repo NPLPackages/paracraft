@@ -948,6 +948,7 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_ESCAPE") then
 		-- handle escape key
 		self:HandleEscapeKey();
+		event:accept();
 	elseif(dik_key == "DIK_LWIN") then
 		-- the menu key on andriod. 
 		if(System.options.IsMobilePlatform and ParaScene.IsSceneEnabled()) then
@@ -955,6 +956,7 @@ function BaseContext:HandleGlobalKey(event)
 		end
 	elseif(dik_key == "DIK_S" and ctrl_pressed) then
 		GameLogic.QuickSave();
+		event:accept();
 	elseif(dik_key == "DIK_F12" and ctrl_pressed) then
 		System.App.Commands.Call("ScreenShot.HideAllUI");
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then

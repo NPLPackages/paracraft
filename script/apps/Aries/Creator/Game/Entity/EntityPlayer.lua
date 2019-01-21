@@ -884,3 +884,18 @@ function Entity:SetGravity(value)
 		obj:SetField("Gravity", self:GetGravity()*2);
 	end
 end
+
+-- @param actor: the parent ActorNPC
+function Entity:SetActor(actor)
+	self.m_actor = actor;
+end
+
+-- @param actor: the parent ActorNPC
+function Entity:GetActor()
+	return self.m_actor;
+end
+
+function Entity:SetCanRandomMove(bEnable)
+ -- empty implementation just to be compatible with EntityNPC as used in ActorNPC
+end
+

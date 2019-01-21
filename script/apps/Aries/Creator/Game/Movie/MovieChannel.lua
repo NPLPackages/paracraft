@@ -23,9 +23,9 @@ local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
 
 local MovieChannel = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.MovieChannel"));
 MovieChannel:Property("Name", "MovieChannel");
-MovieChannel:Property({"ReuseActor", true, "IsReuseActor", "SetReuseActor", auto=true});
+MovieChannel:Property({"ReuseActor", false, "IsReuseActor", "SetReuseActor", auto=true});
 MovieChannel:Property({"Speed", 1.0, "GetSpeed", "SetSpeed", auto=true});
-MovieChannel:Property({"UseCamera", true, "IsUseCamera", "SetUseCamera", auto=true});
+MovieChannel:Property({"bUseCamera", true, "IsUseCamera", "SetUseCamera", auto=true});
 
 MovieChannel:Signal("started");
 MovieChannel:Signal("stopped");
@@ -113,6 +113,7 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 	
 	local movieClip = self:CreateGetStartMovieClip()
 	if(movieClip) then
+		movieClip:SetReuseActor(self:IsReuseActor());
 		if(not fromTime) then
 			movieClip:GotoBeginFrame();
 			fromTime = movieClip:GetTime();

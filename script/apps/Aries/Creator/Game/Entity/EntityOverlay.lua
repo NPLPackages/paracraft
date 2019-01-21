@@ -502,5 +502,15 @@ function Entity:mouseReleaseEvent(mouse_event)
 end
 
 function Entity:Say(text, duration, bAbove3D)
-	
 end
+
+-- @param actor: the parent ActorNPC
+function Entity:SetActor(actor)
+	self.m_actor = actor;
+end
+
+-- @param actor: the parent ActorNPC
+function Entity:GetActor()
+	return self.m_actor;
+end
+

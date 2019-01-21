@@ -276,6 +276,13 @@ function GameLogic.Init(worldObj)
 
 	GameLogic.Pause();
 
+	local bEnableGlobalTerrain = WorldCommon.GetWorldTag("global_terrain") == "true";
+	local attr = ParaTerrain.GetAttributeObject()
+	if(attr:GetField("EnableTerrain", true) ~= bEnableGlobalTerrain) then
+		attr:SetField("EnableTerrain", bEnableGlobalTerrain)
+		attr:SetField("RenderTerrain", bEnableGlobalTerrain)
+	end
+
 	BlockEngine:Connect();
 	BlockEngine:SetGameLogic(GameLogic);
 	GameLogic.SetBlockWorld(ParaBlockWorld.GetWorld(""));
@@ -667,7 +674,17 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder)
 		GameLogic.profile:SaveToDB();
 	end
 	ParaTerrain.SaveBlockWorld(bSaveToLastSaveFolder==true);
-	
+	if( System.options.mc ) then
+		if(ParaTerrain.GetAttributeObject():GetField("EnableTerrain", true)) then
+			WorldCommon.SetWorldTag("global_terrain", true);
+			if(ParaTerrain.IsModified()) then
+				ParaTerrain.SaveTerrain(true,true);
+			end
+		else
+			WorldCommon.SetWorldTag("global_terrain", nil);
+		end
+	end
+
 	autotips.Show(false);
 	WorldCommon.SaveWorld();
 	autotips.Show(true);

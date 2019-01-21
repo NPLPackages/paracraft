@@ -66,7 +66,10 @@ end
 -- return to edit mode, this function is usually called by sub page onclose event. 
 -- @param bHideGameUI: true to hide game UI if any
 function MainToolBar.ReturnToEditMode(bHideGameUI)
-	if(not System.options.mc) then
+	if(System.options.mc) then
+		MainToolBar.ShowSubPages(false);
+		MainToolBar.ShowPage(false);
+	else
 		MainToolBar.ShowSubPages(false);
 		MainToolBar.ShowPage(true);
 		ToolTipsPage.ShowPage("getting_started");

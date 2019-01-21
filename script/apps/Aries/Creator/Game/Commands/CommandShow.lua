@@ -39,6 +39,9 @@ Other show filters:
 		local name, bIsShow;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		bIsShow, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(bIsShow == nil) then
+			bIsShow = true;
+		end
 		name = name or "";
 
 		-- apply the show filter
@@ -62,11 +65,15 @@ Other show filters:
 		elseif(name == "touch") then
 			GameLogic.options:ShowTouchPad(true);
 		elseif(name == "terrain") then
-			ParaTerrain.GetAttributeObject():SetField("RenderTerrain", if_else(bIsShow==nil, true, bIsShow));
+			if(bIsShow) then
+				GameLogic.RunCommand("/terrain -show")
+			else
+				GameLogic.RunCommand("/terrain -hide")
+			end
 		elseif(name == "player") then
 			EntityManager.GetPlayer():SetVisible(true);
 		elseif(name == "physics") then
-			ParaScene.GetAttributeObject():SetField("PhysicsDebugDrawMode", (bIsShow or bIsShow==nil) and -1 or 0);
+			ParaScene.GetAttributeObject():SetField("PhysicsDebugDrawMode", bIsShow and -1 or 0);
 		elseif(name == "mod" or name=="plugin") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");
 			local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
@@ -96,7 +103,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|touch|vision|ui|keyboard]", 
+	quick_ref="/hide [desktop|player|boundingbox|touch|terrain|vision|ui|keyboard]", 
 	desc="hide different type of things" , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
@@ -128,6 +135,8 @@ Commands["hide"] = {
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
 			TouchVirtualKeyboardIcon.ShowSingleton(false);
+		elseif(name == "terrain") then
+			GameLogic.RunCommand("/terrain -hide")
 		end
 	end,
 };

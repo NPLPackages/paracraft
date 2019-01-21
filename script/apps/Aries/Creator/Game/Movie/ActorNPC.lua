@@ -164,7 +164,8 @@ function Actor:GetBonesVariable()
 	return self.bones_variable;
 end
 
-function Actor:Init(itemStack, movieclipEntity)
+-- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
+function Actor:Init(itemStack, movieclipEntity, isReuseActor)
 	self.actor_block:Init(itemStack, movieclipEntity);
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
 	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
@@ -204,13 +205,30 @@ function Actor:Init(itemStack, movieclipEntity)
 		anim = self:GetValue("anim", 0);
 		facing = self:GetValue("facing", 0);
 		skin = self:GetValue("skin", 0);
-		opacity = self:GetValue("opacity", nil);
+		opacity = self:GetValue("opacity", 0);
 		name = self:GetValue("name", 0);
 
-		self.entity = EntityManager[self.entityClass]:Create({x=x,y=y,z=z, facing=facing, 
-			opacity = opacity, item_id = block_types.names.TimeSeriesNPC, 
-			});
-		if(self.entity) then
+		if(isReuseActor and name and name~="") then
+			local entity;
+			if(name == "player") then
+				entity = EntityManager.GetPlayer();
+			else
+				entity = EntityManager.GetEntity(name);
+				if(entity and not entity.SetActor) then
+					entity = nil;
+				end
+			end
+			if(entity) then
+				self:BecomeAgent(entity);
+			end
+		end
+		if(not self.entity) then
+			self.entity = EntityManager[self.entityClass]:Create({name=name, x=x,y=y,z=z, facing=facing, 
+				opacity = opacity, item_id = block_types.names.TimeSeriesNPC, 
+			});	
+		end
+		
+		if(self.entity and not self:IsAgent()) then
 			self.entity:SetActor(self);
 			self.entity:SetPersistent(false);
 			self.entity:SetDummy(true);
@@ -1221,4 +1239,17 @@ end
 function Actor:BecomeAgent(entity)
 	Actor._super.BecomeAgent(self, entity);
 	self:CheckLoadBonesAnims();
+end
+
+-- when deactivated we will release the control to human player with this function.
+function Actor:ReleaseEntityControl()
+	self:SetControllable(true);
+	self:UnbindAnimInstance();
+end
+
+function Actor:DestroyEntity()
+	if(self:IsAgent() and self.entity) then
+		self:ReleaseEntityControl();
+	end
+	Actor._super.DestroyEntity(self);
 end

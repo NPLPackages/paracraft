@@ -208,18 +208,13 @@ e.g.
 
 Commands["terrain"] = {
 	name="terrain", 
-	quick_ref="/terrain -remove", 
-	desc=[[making a terrain whole around a block radius of the current player position
-format: /terrain -(r|remove|hole) [block_radius]  
-@param block_radius:  default to 256
-e.g.: /terrain -r 256
-
-repair terrain hole around a block radius of the current player position
-format: /terrain -repair [block_radius]  
-@param block_radius:  default to 256
-
-query information about the terrain tile 
-format: /terrain [-info]
+	quick_ref="/terrain -[r|remove|hole|repair|info|show|hide] [block_radius]", 
+	desc=[[make or repair a terrain hole around a block radius (default to 256) of the current player position
+/terrain -[remove|hole|r] 256
+/terrain -repair 256    repair terrain hole
+/terrain -show  show global terrain 
+/terrain -hide  hide global terrain 
+/terrain -info  query information about the terrain tile 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options = {};
@@ -230,8 +225,37 @@ format: /terrain [-info]
 
 		local value = cmd_text:match("%s+(%S*)$");
 
-		-- remove all terrain where the player stand
-		if(options.r or options.remove or options.hole or options.repair) then
+		if(options.show or options.hide) then
+			local attr = ParaTerrain.GetAttributeObject()
+			local bIsTerrainVisible = attr:GetField("EnableTerrain", true) and attr:GetField("RenderTerrain", true);
+			if(options.show and not bIsTerrainVisible) then
+				attr:SetField("EnableTerrain", true)
+				attr:SetField("RenderTerrain", true)
+
+				local x, y, z = ParaScene.GetPlayer():GetPosition()
+				-- we can flatten at the current height if needed
+				-- ParaTerrain.Flatten(x,z, 30, 2, y, 1);
+				local newY = ParaTerrain.GetElevation(x, z);
+				if(newY > y) then
+					ParaScene.GetPlayer():SetPosition(x, newY, z)
+				end
+			elseif(options.hide and bIsTerrainVisible) then
+				attr:SetField("EnableTerrain", false)
+				attr:SetField("RenderTerrain", false)
+			end
+
+			if(options.show) then
+				if(System.options.mc and GameLogic.GetSceneContext()) then
+					-- leak events to hook chain for old haqi interfaces, such as terrain painting. 
+					GameLogic.GetSceneContext():SetAcceptAllEvents(false);
+					System.Core.SceneContextManager:SetAcceptAllEvents(false);
+				end
+				NPL.load("(gl)script/apps/Aries/Creator/MainToolBar.lua");
+				local MainToolBar = commonlib.gettable("MyCompany.Aries.Creator.MainToolBar")
+				MainToolBar.OnClickTerrainBtn()
+			end
+		elseif(options.r or options.remove or options.hole or options.repair) then
+			-- remove all terrain where the player stand
 			local cx, cy, cz = ParaScene.GetPlayer():GetPosition();
 			if(value) then
 				value = tonumber(value);
@@ -245,7 +269,7 @@ format: /terrain [-info]
 				for j = -radius, radius do 
 					local xx = cx + i * step - 1;
 					local zz = cz + j * step - 1;
-					if(not ParaTerrain.IsHole(xx,zz)) then
+					if(ParaTerrain.IsHole(xx,zz) ~= is_making_hole) then
 						ParaTerrain.SetHole(xx,zz, is_making_hole);
 						ParaTerrain.UpdateHoles(xx,zz);
 					end

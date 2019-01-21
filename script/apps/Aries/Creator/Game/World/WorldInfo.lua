@@ -58,6 +58,7 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		texture_pack_url = self.texture_pack_url or "",
 		texture_pack_text = self.texture_pack_text or "",
 		totaltime = self:GetWorldTotalTime(),
+		global_terrain = self.global_terrain,
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);
