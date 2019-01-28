@@ -13,9 +13,25 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Task.lua");
 -- define a new task class
 local MyTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.MyTask"));
 
--- invoke task
+-- Example1: invoke task
 local task = MyTask:new();
 task:Run();
+
+-- Example1: handling key/mouse event
+-- one must turn this on to use scene context or call LoadSceneContext() manually
+MyTask:Property({"bUseSceneContext", true, "IsUseSceneContext", "SetUseSceneContext", auto=true});
+
+-- see: RedirectContext.lua for all key/mouse overridable events
+function MyTask:keyPressEvent(event)
+	if(event:isAccepted()) then
+		return
+	end
+	event:accept(); -- this line disables all events
+end
+
+local task = MyTask:new();
+task:Run();
+-- task:SetFinished(); -- call this to quit task
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TaskManager.lua");
@@ -24,6 +40,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 local Task = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Command"), commonlib.gettable("MyCompany.Aries.Game.Task"));
+Task:Property({"bUseSceneContext", false, "IsUseSceneContext", "SetUseSceneContext", auto=true});
 
 -- @param id: uint16 type. need to be larger than 1024 if not system type. 
 function Task:ctor()
@@ -42,7 +59,9 @@ end
 -- virtual function: this is the main body of the task command
 function Task:Run()
 	-- call this to use current object as scene context. 
-	-- self:LoadSceneContext();
+	if(self:IsUseSceneContext()) then
+		self:LoadSceneContext();
+	end
 	
 	TaskManager.AddTask(self);
 end
