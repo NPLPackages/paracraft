@@ -28,8 +28,8 @@ local groupindex_select = 3;
 function Actor:ctor()
 end
 
-function Actor:Init(itemStack, movieclipEntity)
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+function Actor:Init(itemStack, movieclipEntity, movieclip)
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 	

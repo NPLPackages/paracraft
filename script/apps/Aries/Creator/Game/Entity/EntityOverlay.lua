@@ -47,6 +47,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 
 Entity:Property({"scaling", 1.0, "GetScaling", "SetScaling"});
 Entity:Property({"facing", 0, "GetFacing", "SetFacing", auto=true});
+Entity:Property({"yaw", 0, "GetYaw", "SetYaw"});
 Entity:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true});
 Entity:Property({"opacity", 1, "GetOpacity", "SetOpacity"});
 Entity:Property({"isSolid", 1, "IsSolid", "SetSolid"});
@@ -121,6 +122,14 @@ end
 
 function Entity:GetScaling(v)
 	return self.scaling or 1;
+end
+
+function Entity:GetYaw()
+	return self:GetFacing();
+end
+
+function Entity:SetYaw(value)
+	self:SetFacing(value);
 end
 
 function Entity:SetScalingDelta(v)

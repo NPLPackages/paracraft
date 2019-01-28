@@ -18,6 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 NPL.load("(gl)script/ide/math/Quaternion.lua");
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
+local math3d = commonlib.gettable("mathlib.math3d");
 local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local MultiAnimBlock = commonlib.gettable("MyCompany.Aries.Game.Common.MultiAnimBlock");
@@ -28,6 +29,7 @@ local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashComma
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 
@@ -35,6 +37,7 @@ local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.A
 
 Actor.class_name = "ActorNPC";
 Actor:Property({"entityClass", "EntityNPC"});
+Actor:Property({"offset_facing", nil, "GetOffsetFacing", "SetOffsetFacing", auto=true});
 -- asset file is changed
 Actor:Signal("assetfileChanged");
 
@@ -180,11 +183,11 @@ function Actor:GetBonesVariable()
 end
 
 -- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
--- @param name: if not provided, it will use the name in itemStack
-function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
+-- @param newName: if not provided, it will use the name in itemStack
+function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip)
 	self.actor_block:Init(itemStack, movieclipEntity);
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 
@@ -203,7 +206,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 	timeseries:CreateVariableIfNotExist("gravity", "Discrete");
 	timeseries:CreateVariableIfNotExist("scaling", "Linear");
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
-	timeseries:CreateVariableIfNotExist("isAgent", "Discrete");
+	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
 	timeseries:CreateVariableIfNotExist("skin", "Discrete");
 	timeseries:CreateVariableIfNotExist("blockinhand", "Discrete");
 	timeseries:CreateVariableIfNotExist("opacity", "Linear");
@@ -216,31 +219,83 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 	if(movieClip) then
 		local x, y, z = self:CheckSetDefaultPosition();
 
-		local HeadUpdownAngle, HeadTurningAngle, anim, facing,skin, opacity;
+		local HeadUpdownAngle, HeadTurningAngle, anim, facing,skin, opacity, name;
 		HeadUpdownAngle = self:GetValue("HeadUpdownAngle", 0);
 		HeadTurningAngle = self:GetValue("HeadTurningAngle", 0);
 		anim = self:GetValue("anim", 0);
 		facing = self:GetValue("facing", 0);
 		skin = self:GetValue("skin", 0);
 		opacity = self:GetValue("opacity", 0);
-		name = name or self:GetValue("name", 0);
+		name = newName or self:GetValue("name", 0);
 		local isAgent = self:GetValue("isAgent", 0);
 		if(isReuseActor == nil) then
 			isReuseActor = isAgent
 		end
 
-		if(isReuseActor and name and name~="") then
+		if((isReuseActor or isAgent) and name and name~="") then
 			local entity;
+			local offsetFacing;
 			if(name == "player") then
 				entity = EntityManager.GetPlayer();
 			else
-				entity = EntityManager.GetEntity(name);
-				if(entity and not entity.SetActor) then
-					entity = nil;
+				if(isReuseActor == "searchNearPlayer") then
+					local playerActor = movieClip:FindActor("player");
+					if(playerActor) then	
+						-- if the movie clip already contains a player, we will use it to locate the entity
+						local x, y, z = playerActor:TransformToEntityPosition(x, y, z)
+						local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+						local r = 1;
+						local entities = EntityManager.GetEntitiesByMinMax(bx-r, by-r, bz-r, bx+r, by+r, bz+r)
+						if(entities and #entities>0) then
+							-- tricky: we will match either name or assetfile 
+							local assetfile = self:GetValue("assetfile", 0);
+							for i, entity_ in ipairs(entities) do
+								if(entity_:GetName() == name) then
+									entity = entity_;
+									break;
+								elseif(entity_.GetModelFile and entity_:GetModelFile() == assetfile) then
+									entity = entity_;
+									break;
+								end
+							end
+						end
+						if (entity) then
+							-- tricky: always use relative facing of the nearby player actor
+							offsetFacing = playerActor:GetOffsetFacing()
+						end
+					else
+						-- search near the current player
+						local x, y, z = EntityManager.GetPlayer():GetBlockPos()
+						local r = 5;
+						local entities = EntityManager.FindEntities({name = name, x=x,  y=y, z=z, r=r})
+						if(entities and #entities>0) then
+							entity = entities[1];
+							if(entity and not entity.SetActor) then
+								entity = nil;
+							end
+						end
+					end
+				end
+				if(not entity) then
+					entity = EntityManager.GetEntity(name);
+					if(entity and not entity.SetActor) then
+						entity = nil;
+					end
 				end
 			end
-			if(entity) then
+			if(isAgent and isReuseActor==false and (not newName) and entity) then
+				-- tricky: we still need to reuse actor, even if isReuseActor == false under above conditions
+				isReuseActor = true;
+			end
+
+			if(isReuseActor and entity) then
 				self:BecomeAgent(entity);
+				if(isReuseActor == "relative" or isReuseActor == "searchNearPlayer") then
+					self:CalculateRelativeParams();
+					if(offsetFacing) then
+						self:SetOffsetFacing(offsetFacing);
+					end
+				end
 			end
 		end
 		if(not self.entity) then
@@ -269,6 +324,63 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 			end
 		end
 		return self;
+	end
+end
+
+-- from data source coordinate to entity coordinate according to CalculateRelativeParams()
+function Actor:TransformToEntityPosition(x, y, z)
+	x = x + (self.offset_x or 0);
+	y = y + (self.offset_y or 0);
+	z = z + (self.offset_z or 0);
+	
+	if((self.offset_facing or 0) ~= 0) then
+		local dx, _, dz = math3d.vec3Rotate(x - self.origin_x, 0, z - self.origin_z, 0, self.offset_facing, 0);
+		x = dx + self.origin_x;
+		z = dz + self.origin_z;
+	end
+	return x,y,z;
+end
+
+-- from data source coordinate to entity coordinate according to CalculateRelativeParams()
+function Actor:TransformToEntityFacing(facing)
+	return facing + (self.offset_facing or 0);
+end
+
+function Actor:IsAgentRelative()
+	return self.origin_x~=nil;
+end
+
+-- calculate relative params at time 0 according to the current entity's parameters
+-- so that all time series values are relative to time 0, instead of absolute values in data source. 
+-- currently, only entity position and facing are taking in to account and snapped to block position and 4 direction. 
+-- calculated values in self.offset_x, self.offset_y, self.offset_z, self.offset_facing
+function Actor:CalculateRelativeParams()
+	local entity = self:GetEntity();
+	if(entity) then
+		local obj = entity:GetInnerObject();
+		if(not obj) then
+			return
+		end	
+		-- relative position
+		local entity_bx, entity_by, entity_bz = entity:GetBlockPos();
+		local entity_x, entity_y, entity_z = entity:GetPosition();
+		local entity_facing = entity:GetFacing() or 0;
+		
+		local memory_x, memory_y, memory_z = self:GetValue("x", 0), self:GetValue("y", 0), self:GetValue("z", 0);
+		local memory_bx, memory_by, memory_bz = BlockEngine:block(memory_x, memory_y+0.1, memory_z);
+		local memory_facing = self:GetValue("facing", 0) or 0;
+		
+		self.offset_x = (entity_bx - memory_bx)*BlockEngine.blocksize;
+		self.offset_y = (entity_by - memory_by)*BlockEngine.blocksize;
+		self.offset_z = (entity_bz - memory_bz)*BlockEngine.blocksize;
+		self.origin_x, self.origin_y, self.origin_z = BlockEngine:real(entity_bx, entity_by, entity_bz);
+
+		-- relative facing
+		local memory_dir_facing = Direction.NormalizeFacing(memory_facing)
+		local entity_dir_facing = Direction.NormalizeFacing(entity_facing)
+		self.offset_facing = mathlib.ToStandardAngle(entity_dir_facing - memory_dir_facing);
+
+		-- echo({self.offset_x, self.offset_y, self.offset_z, self.offset_facing})
 	end
 end
 
@@ -680,7 +792,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				self:SetDisplayName(values.name)
 			end
 			if(values.isAgent ~= old_value.isAgent) then
-				self:AddKeyFrameByName("isAgent", 0, values.isAgent==true);
+				self:AddKeyFrameByName("isAgent", 0, values.isAgent);
 			end
 			if(callbackFunc) then
 				callbackFunc(true);
@@ -1056,6 +1168,10 @@ function Actor:ComputePosAndRotation(curTime)
 			end
 		end
 	end
+	if(self:IsAgentRelative()) then
+		new_x, new_y, new_z = self:TransformToEntityPosition(new_x, new_y, new_z);
+	end
+	yaw = self:TransformToEntityFacing(yaw or 0);
 	return new_x, new_y, new_z, yaw, roll, pitch;
 end
 

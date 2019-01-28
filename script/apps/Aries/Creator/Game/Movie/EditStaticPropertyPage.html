@@ -10,16 +10,30 @@
 <script refresh="false" type="text/npl" src="EditStaticPropertyPage.lua"><![CDATA[
 EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
 EditStaticPropertyPage.OnInit();
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local names = {};
+for _, name in ipairs(MovieManager:GetActorNames()) do
+    if(name == "player") then
+        names[#names+1] = {value=name, text=L"主角"}
+    else
+        names[#names+1] = {value=name}
+    end
+end
+function GetNames()
+    return names;
+end
+
 ]]></script>
 <aries:window mode="thin" style="width:512px;" title='<%=L"演员的静态属性"%>' onclose="EditStaticPropertyPage.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
     <div>
-        <%=L"演员的名字:"%><input type="text" name="name" style="height:25px;width:200px" />
+        <%=L"演员的名字:"%>
+        <select name="name" AllowUserEdit="true" style="height:25px;width:200px" DataSource="<%=GetNames()%>"></select>
     </div>
     <div>
-        <input type="checkbox" name="isAgent" style="margin-top:2px;"/><div for="isAgent" style="float:left;padding-left:5px;">
-            <%=L"是否为全局角色"%>
-        </div>
+        <%=L"是否为全局角色:"%>
+        <select name="isAgent" AllowUserEdit="false" style="height:25px;" DataSource="<%=EditStaticPropertyPage.agentStyles%>"></select>
     </div>
     <div style="color:#808080">
         <%=L"不同电影方块之间可以共享同名的全局角色,全局角色不会被删除或重复创建"%>

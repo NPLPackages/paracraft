@@ -37,6 +37,7 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 
 local math_abs = math.abs;
@@ -445,6 +446,9 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self.skin = node.attr.skin;
+	if(self.skin) then
+		Files.FindFile(self.skin);
+	end
 	for _, subnode in ipairs(node) do 
 		if(subnode.name == "teleport_list") then
 			self.tp_list = NPL.LoadTableFromString(subnode[1] or "");

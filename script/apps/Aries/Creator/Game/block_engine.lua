@@ -669,8 +669,10 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 	else
 		self:MarkBlockForUpdate(x, y, z);
 
+		local cur_block_data = last_block_id;
 		if(block_id ~= last_block_id) then
 			ParaTerrain.SetBlockTemplateByIdx(x,y,z,block_id);
+			cur_block_data = 0;
 		end
 		
 		if(last_block_id > 0) then
@@ -688,7 +690,7 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 		if(block_id > 0) then
 			local block = block_types.get(block_id);
 			if(block) then
-				if(block_data ~= last_block_data) then
+				if(block_data ~= cur_block_data) then
 					ParaTerrain.SetBlockUserDataByIdx(x,y,z, block_data);
 				end
 				if(not block.cubeMode and block.customModel) then

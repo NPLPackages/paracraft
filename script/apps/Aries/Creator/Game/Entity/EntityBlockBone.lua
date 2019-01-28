@@ -52,7 +52,7 @@ end
 
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
-	return L"输入骨骼名称: 例如wheel, mount, right hand, etc";
+	return L"输入骨骼名称: 例如wheel, mount, tail_IK. <br/>如果名字包含_IK代表支持反向动力学";
 end
 
 function Entity:HasCommand()

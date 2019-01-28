@@ -236,9 +236,8 @@ function Actor:ResetOffsetPosAndRotation()
 	if(not new_x) then
 		new_x, new_y, new_z = eX, eY, eZ;
 	end;
-	local obj = entity:GetInnerObject();
 	self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
-	self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0), yaw);
+	self:SetOffsetYaw(entity:GetFacing() - (yaw or 0), yaw);
 end
 
 function Actor:ComputeScaling(curTime)

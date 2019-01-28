@@ -50,9 +50,9 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'ShapeBuilder.beginTranslation(%s,%s,%s)\\n%sShapeBuilder.endTranslation()',
+	func_description = 'beginTranslation(%s,%s,%s)\\n%sendTranslation()',
 	ToNPL = function(self)
-		return string.format('ShapeBuilder.beginTranslation(%s,%s,%s)\n    %s\nShapeBuilder.endTranslation()\n', 
+		return string.format('beginTranslation(%s,%s,%s)\n    %s\nendTranslation()\n', 
             self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -97,9 +97,9 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'ShapeBuilder.beginScale(%s,%s,%s)\\n%sShapeBuilder.endScale()',
+	func_description = 'beginScale(%s,%s,%s)\\n%sendScale()',
 	ToNPL = function(self)
-    return string.format('ShapeBuilder.beginScale(%s,%s,%s)\n    %s\nShapeBuilder.endScale()\n', 
+    return string.format('beginScale(%s,%s,%s)\n    %s\nendScale()\n', 
             self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -148,9 +148,9 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'ShapeBuilder.beginRotation(%s,%s,%s,%s)\\n%sShapeBuilder.endRotation()',
+	func_description = 'beginRotation(%s,%s,%s,%s)\\n%sendRotation()',
 	ToNPL = function(self)
-    return string.format('ShapeBuilder.beginRotation(%s,%s,%s,%s)\n    %s\nShapeBuilder.endRotation()\n', 
+    return string.format('beginRotation(%s,%s,%s,%s)\n    %s\nendRotation()\n', 
             self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('angle'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -191,9 +191,9 @@ local cmds = {
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,
-	func_description = 'ShapeBuilder.beginBoolean("%s","%s")\\n%sShapeBuilder.endBoolean()',
+	func_description = 'beginBoolean("%s","%s")\\n%sendBoolean()',
 	ToNPL = function(self)
-    return string.format('ShapeBuilder.beginBoolean("%s","%s")\n    %s\nShapeBuilder.endBoolean()\n', 
+    return string.format('beginBoolean("%s","%s")\n    %s\nendBoolean()\n', 
             self:getFieldValue('value'), self:getFieldValue('color'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[

@@ -15,6 +15,13 @@ end, {name="string", isAgent=true})
 
 local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
 
+local DefaultAgentStyles = {
+    {value="true", text=L"全局"},
+    {value="false", text=L"本地"},
+    {value="relative", text=L"相对位置的全局"},
+    {value="searchNearPlayer", text=L"在主角附近搜索"},
+}
+
 local page;
 function EditStaticPropertyPage.OnInit()
 	page = document:GetPageCtrl();
@@ -22,9 +29,11 @@ end
 
 -- @param OnOK: function(values) end 
 -- @param old_value: {name="ximi", isAgent=true}
-function EditStaticPropertyPage.ShowPage(OnOK, old_value)
+function EditStaticPropertyPage.ShowPage(OnOK, old_value, agentStyles)
 	EditStaticPropertyPage.result = nil;
 	EditStaticPropertyPage.last_values = old_value;
+	EditStaticPropertyPage.agentStyles = agentStyles or DefaultAgentStyles;
+	
 	
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.html", 
@@ -63,18 +72,26 @@ end
 function EditStaticPropertyPage.UpdateUIFromValue(values)
 	if(page and values) then
 		page:SetValue("name", values.name or "");
-		page:SetValue("isAgent", values.isAgent);
+		page:SetValue("isAgent", values.isAgent and tostring(values.isAgent) or "false");
 	end
 end
 
 function EditStaticPropertyPage.OnOK()
 	if(page) then
 		local v = {};
-		local name = page:GetUIValue("name") or "";
+		local name = page:GetValue("name") or "";
 		v.name = name;
-		local isAgent = page:GetUIValue("isAgent");
+		local isAgent = page:GetValue("isAgent");
 		if(isAgent) then
-			v.isAgent = true;
+			if(isAgent == true or isAgent == "true") then
+				v.isAgent = true;
+			elseif(isAgent == "relative") then
+				v.isAgent = "relative";
+			elseif(isAgent == "searchNearPlayer") then
+				v.isAgent = "searchNearPlayer";
+			else
+				v.isAgent = false;
+			end
 		end
 		EditStaticPropertyPage.last_values = v;
 		EditStaticPropertyPage.result = "OK";

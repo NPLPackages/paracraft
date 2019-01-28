@@ -38,6 +38,7 @@ local selectable_var_list = {
 	"pos", -- multiple of x,y,z
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling",
+	"static", -- multiple of "name" and "isAgent"
 };
 
 
@@ -59,6 +60,20 @@ function Actor:GetMultiVariable()
 		var:AddVariable(self:GetVariable("eye_rot_y"));
 		var:AddVariable(self:GetVariable("eye_roll"));
 		self:SetCustomVariable("multi_variable", var);
+		return var;
+	end
+end
+
+-- get rotate multi variable
+function Actor:GetStaticVariable()
+	local var = self:GetCustomVariable("static_variable");
+	if(var) then
+		return var;
+	else
+		var = MultiAnimBlock:new({name="static"});
+		var:AddVariable(self:GetVariable("name"));
+		var:AddVariable(self:GetVariable("isAgent"));
+		self:SetCustomVariable("static_variable", var);
 		return var;
 	end
 end
@@ -110,8 +125,8 @@ function Actor:GetScalingVariable()
 	return self:GetVariable("eye_dist");
 end
 
-function Actor:Init(itemStack, movieclipEntity)
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip)
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 
@@ -126,6 +141,8 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("eye_roll", "LinearAngle");
 	timeseries:CreateVariableIfNotExist("is_fps", "Discrete");
 	timeseries:CreateVariableIfNotExist("has_collision", "Discrete");
+	timeseries:CreateVariableIfNotExist("name", "Discrete");
+	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
 	
 	self:AddValue("position", self.GetPosVariable);
 	self:AddValue("roll", self.GetRollVariable);
@@ -148,8 +165,38 @@ function Actor:Init(itemStack, movieclipEntity)
 		self.entity = EntityCamera:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesCamera});
 		self.entity:SetPersistent(false);
 		self.entity:Attach();
-
 		return self;
+	end
+end
+
+-- this is called right after all actors in movie clips have been created. 
+function Actor:OnCreate()
+	local movieClip = self:GetMovieClip();
+	if(movieClip:IsPlayingMode()) then
+		local isAgent = self:GetValue("isAgent", 0);
+		local offsetFacing;
+		if(isAgent) then
+			if(isAgent == "searchNearPlayer") then
+				-- relative to player actor in the  movie clip
+				local playerActor = movieClip:FindActor("player");
+				if(playerActor) then
+					self.offset_x, self.offset_y, self.offset_z =  playerActor.offset_x, playerActor.offset_y, playerActor.offset_z;
+					self.offset_facing = playerActor:GetOffsetFacing();
+				end
+			elseif(isAgent == "relative") then
+				-- relative to current camera position
+				local x = self:GetValue("lookat_x", 0);
+				local y = self:GetValue("lookat_y", 0);
+				local z = self:GetValue("lookat_z", 0);
+				if(x and y and z) then
+					local cx, cy, cz = ParaCamera.GetLookAtPos()
+					self.offset_x, self.offset_y, self.offset_z =  cx-x, cy-y, cz-z;
+					local facing = self:GetValue("eye_rot_y", 0);
+					local camobjDist, LifeupAngle, CameraRotY = ParaCamera.GetEyePos();
+					self.offset_facing = CameraRotY - (facing or 0)
+				end
+			end
+		end
 	end
 end
 
@@ -181,6 +228,8 @@ function Actor:GetEditableVariable(selected_index)
 		var = self:GetRotateVariable();
 	elseif(name == "scaling") then
 		var = self:GetScalingVariable();
+	elseif(name == "static") then
+		var = self:GetStaticVariable();
 	elseif(name) then
 		var = self.TimeSeries:GetVariable(name);
 	end
@@ -279,6 +328,10 @@ function Actor:FrameMovePlaying(deltaTime)
 	local eye_rot_y = self:GetValue("eye_rot_y", curTime);
 	local eye_roll = self:GetValue("eye_roll", curTime);
 
+	if(self.offset_facing and eye_rot_y) then
+		eye_rot_y = eye_rot_y + self.offset_facing;
+	end
+
 	local allow_user_control;
 	if(entity:HasFocus()) then
 		local isBehindLastFrame = ((self:GetMultiVariable():GetLastTime()+1) <= curTime);
@@ -320,6 +373,12 @@ function Actor:FrameMovePlaying(deltaTime)
 		local new_z = self:GetValue("lookat_z", curTime);
 
 		if(new_x and new_y and new_z) then
+			if(self.offset_x) then
+				new_x = self.offset_x + new_x;
+				new_y = self.offset_y + new_y;
+				new_z = self.offset_z + new_z;
+			end
+			
 			entity:SetPosition(new_x, new_y, new_z);
 			-- due to floating point precision of the view matrix, slowly moved camera may jerk.
 			--LOG.std(nil, "debug", "ActorCamera", "x,y,z: %f %f %f", new_x, new_y, new_z);
@@ -485,5 +544,25 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end
 		end,old_value)
+	elseif(keyname == "static") then
+		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0)}
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
+		local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
+		EditStaticPropertyPage.ShowPage(function(values)
+			if(values.name ~= old_value.name) then
+				self:AddKeyFrameByName("name", 0, values.name);
+				self:SetDisplayName(values.name)
+			end
+			if(values.isAgent ~= old_value.isAgent) then
+				self:AddKeyFrameByName("isAgent", 0, values.isAgent);
+			end
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+		end, old_value, {
+			{value="false", text=L"默认"},
+			{value="relative", text=L"相对摄影机"},
+			{value="searchNearPlayer", text=L"相对主角"},
+		});
 	end
 end

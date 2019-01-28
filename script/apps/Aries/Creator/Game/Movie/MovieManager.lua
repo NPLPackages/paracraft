@@ -34,6 +34,7 @@ MovieManager:Signal("activeMovieClipChanged", function(clip) end);
 
 function MovieManager:ctor()
 	self.active_clips = commonlib.UnorderedArraySet:new();
+	self.actor_names = commonlib.OrderedArraySet:new();
 	GameLogic.GetFilters():add_filter("show", MovieManager.ShowFilter);
 end
 
@@ -48,6 +49,8 @@ function MovieManager:Reset()
 	self.active_clips:clear();
 	self:activeMovieClipChanged(self.current_movieclip);
 	self.movieChannels = {};
+	self.actor_names:clear();
+	self.actor_names:add("player");
 end
 
 -- get the currently active movie clip
@@ -222,4 +225,13 @@ function MovieManager:FrameMove(deltaTime)
 			movie_clip:FrameMove(deltaTime);	
 		end
 	end
+end
+
+-- return array of actor names
+function MovieManager:GetActorNames()
+	return self.actor_names;
+end
+
+function MovieManager:AddActorName(name)
+	self.actor_names:add(name);
 end

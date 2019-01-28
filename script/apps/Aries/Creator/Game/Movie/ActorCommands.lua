@@ -69,15 +69,15 @@ function Actor:GetChildActor(name)
 	return self[name];
 end
 
-function Actor:Init(itemStack, movieclipEntity)
+function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip)
 	local timeseries = self.TimeSeries;
-	self.actor_text:Init(itemStack, movieclipEntity);
-	self.actor_blocks:Init(itemStack, movieclipEntity);
-	self.actor_movie_sequence:Init(itemStack, movieclipEntity);
+	self.actor_text:Init(itemStack, movieclipEntity, movieclip);
+	self.actor_blocks:Init(itemStack, movieclipEntity, movieclip);
+	self.actor_movie_sequence:Init(itemStack, movieclipEntity, movieclip);
 	-- background music track1
-	self.actor_music:Init(itemStack, movieclipEntity);
+	self.actor_music:Init(itemStack, movieclipEntity, movieclip);
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 

@@ -32,6 +32,8 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 		-- paracraft://cmd/loadworld/[url_filename]
 		local world_url = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
 		if(world_url) then
+			-- remote duplicated ? in url, just a quick client fix to keepwork url bug. 
+			world_url = world_url:gsub("^([^%?]*%?[^%?]*)(%?.*)$", "%1")
 			System.options.cmdline_world = world_url;
 		end
 

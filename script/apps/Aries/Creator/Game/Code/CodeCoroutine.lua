@@ -20,6 +20,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local CodeCoroutine = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine"));
+CodeCoroutine:Signal("finished");
 
 function CodeCoroutine:ctor()
 end
@@ -117,10 +118,17 @@ function CodeCoroutine:IsFinished()
 	return self.isFinished;
 end
 
+function CodeCoroutine:SetFinished()
+	if(not self.isFinished) then
+		self.isFinished = true;
+		self:finished();
+	end
+end
+
 -- when stopped, it can no longer be resumed
 function CodeCoroutine:Stop()
 	self.isStopped = true;
-	self.isFinished = true;
+	self:SetFinished();
 	-- we need to stop the last coroutine timers, before starting a new one. 
 	self:KillAllTimers();
 end
@@ -138,7 +146,7 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 	if(self.code_func) then
 		self.co = coroutine.create(function()
 			local result, r2, r3, r4 = self:RunImp(msg);
-			self.isFinished = true;
+			self:SetFinished();
 			self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
 			if(onFinishedCallback) then
 				onFinishedCallback(result, r2, r3, r4);

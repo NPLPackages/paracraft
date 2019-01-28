@@ -626,7 +626,9 @@ playMovie("main", 0, -1);
 	end,
 	examples = {{desc = L"播放与代码方块相邻的电影方块", canRun = true, code = [[
 hide()
+-- -1 means end of movie
 playMovie("myself", 0, -1);
+stopMovie("myself");
 ]]}},
 },
 
@@ -664,7 +666,7 @@ playMovie("myself", 0, -1);
 	end,
 	examples = {{desc = L"播放与代码方块相邻的电影方块", canRun = true, code = [[
 hide()
-playMovie("myself", 0, -1, true);
+playMovie("myself", 0, 1000, true);
 ]]}},
 },
 
@@ -690,7 +692,6 @@ playMovie("myself", 0, -1, true);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 playMovie("myself", 0, -1);
-wait(2)
 stopMovie();
 ]]}},
 },
@@ -709,9 +710,9 @@ stopMovie();
 			name = "key",
 			type = "field_dropdown",
 			options = {
+				{ L"播放速度", "Speed" },
 				{ L"重用角色", "ReuseActor" },
 				{ L"使用摄影机", "UseCamera" },
-				{ L"播放速度", "Speed" },
 			},
 		},
 		{
@@ -733,7 +734,6 @@ stopMovie();
 	examples = {{desc = "", canRun = true, code = [[
 setMovieProperty("myself", "Speed", 2);
 playMovie("myself", 0, -1);
-wait(2)
 stopMovie();
 ]]}},
 },

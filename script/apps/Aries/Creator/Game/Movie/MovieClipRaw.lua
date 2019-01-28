@@ -186,7 +186,7 @@ function MovieClipRaw:GetActorFromItemStack(itemStack, bCreateIfNotExist)
 		if(bCreateIfNotExist) then
 			local item = itemStack:GetItem();
 			if(item and item.CreateActorFromItemStack) then
-				local actor = item:CreateActorFromItemStack(itemStack, self.entity, self:IsReuseActor());
+				local actor = item:CreateActorFromItemStack(itemStack, self.entity, self:IsReuseActor(), nil, self);
 				if(actor) then
 					self:AddActor(actor);
 					return actor;
@@ -237,14 +237,15 @@ function MovieClipRaw:RefreshActors()
 		end
 	end
 
-	self:UpdateActors();
-
 	for i, actor in pairs(self.actors) do
+		actor:OnCreate();
 		local entity = actor:GetEntity()
 		if(entity) then
 			entity:SetSkipPicking(true);
 		end
 	end
+
+	self:UpdateActors();
 end
 
 -- @param deltaTime: default to 0

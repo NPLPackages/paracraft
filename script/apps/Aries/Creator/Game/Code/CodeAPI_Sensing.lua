@@ -29,6 +29,9 @@ local function getActor_(actor, objName)
 end
 
 local function getActorEntity_(actor, objName)
+	if(objName == "@p") then
+		return EntityManager.GetPlayer();
+	end
 	actor = getActor_(actor, objName);
 	if(actor) then
 		return actor:GetEntity();

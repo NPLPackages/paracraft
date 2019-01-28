@@ -150,11 +150,17 @@ function env_imp:setPos(x, y, z)
 	end
 end
 
+-- @param objName: nil or "self" or any actor name. if "@p" it means current player
 -- same as getX(), getY(), getZ(), except that we return real coordinate in block unit
 function env_imp:getPos(objName)
 	local actor = self.actor;
-	if(objName and objName ~= "self") then
-		actor = GameLogic.GetCodeGlobal():GetActorByName(objName);
+	if(objName) then
+		if( objName == "@p" ) then
+			local x, y, z = EntityManager.GetPlayer():GetPosition()
+			return BlockEngine:block_float(x, y, z);
+		elseif( objName ~= "self" ) then
+			actor = GameLogic.GetCodeGlobal():GetActorByName(objName);
+		end
 	end
 	if(actor) then
 		local x, y, z = actor:GetPosition();
@@ -649,6 +655,21 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 				channel:Stop();	
 			end
 		end)
+	end
+
+	if(not bLoop and channel:IsPlaying()) then
+		local bFinished;
+		local callbackFunc;
+		callbackFunc = self.co:MakeCallbackFunc(function()
+			channel:Disconnect("finished", callbackFunc)
+			if(not bFinished) then
+				bFinished = true;
+				env_imp.resume(self);
+			end
+		end)
+		channel:Connect("finished", callbackFunc);
+		env_imp.yield(self);
+		bFinished = true;
 	end
 end
 

@@ -337,9 +337,13 @@ function MovieClip:GetActorFromItemStack(itemStack, bCreateIfNotExist)
 			end
 		end
 		if(bCreateIfNotExist) then
+			local reuseActor;
+			if(not self:IsPlayingMode()) then
+				reuseActor = false
+			end
 			local item = itemStack:GetItem();
 			if(item and item.CreateActorFromItemStack) then
-				local actor = item:CreateActorFromItemStack(itemStack, self.entity);
+				local actor = item:CreateActorFromItemStack(itemStack, self.entity, reuseActor);
 				if(actor) then
 					self:AddActor(actor);
 					return actor;
@@ -402,6 +406,10 @@ function MovieClip:RefreshActors()
 			-- create get actor
 			self:GetActorFromItemStack(itemStack, true)
 		end
+	end
+
+	for i, actor in pairs(self.actors) do
+		actor:OnCreate();
 	end
 
 	self:UpdateActors();

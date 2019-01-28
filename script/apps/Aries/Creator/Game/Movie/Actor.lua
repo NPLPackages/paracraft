@@ -13,6 +13,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TimeSeries.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MovieTimeSeriesEditingTask.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 local MovieTimeSeriesEditing = commonlib.gettable("MyCompany.Aries.Game.Tasks.MovieTimeSeriesEditing");
@@ -47,10 +49,10 @@ function Actor:ctor()
 	self.custom_vars = {};
 end
 
-function Actor:Init(itemStack, movieclipEntity)
+function Actor:Init(itemStack, movieclipEntity, movieclip)
 	self:SetItemStack(itemStack)
 	self.movieclipEntity = movieclipEntity;
-	self:SetMovieClip(self.movieclipEntity:GetMovieClip())
+	self:SetMovieClip(movieclip or self.movieclipEntity:GetMovieClip())
 	return self;
 end
 
@@ -61,6 +63,10 @@ end
 
 function Actor:GetTimeSeries()
 	return self.TimeSeries;
+end
+
+-- this is called right after all actors in movie clips have been created. 
+function Actor:OnCreate()
 end
 
 -- find actor by its display name in containing movie entity
@@ -835,12 +841,13 @@ end
 
 -- taking control of the give entity. But it will not delete the entity when actor is removed.
 function Actor:BecomeAgent(entity)
-	if(entity and entity:isa(EntityManager.EntityMovable)) then
+	if(entity) then --  and entity:isa(EntityManager.EntityMovable)
 		local lastEntity = self:GetEntity();
 		if(lastEntity ~= entity) then	
 			self:DestroyEntity();
 		end
 		self.entity = entity;
 		self.isAgent = true;
+		MovieManager:AddActorName(entity.name or "");
 	end
 end

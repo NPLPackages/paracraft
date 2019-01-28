@@ -30,6 +30,9 @@ MovieChannel:Property({"bLoop", false, "IsLooping", "SetLooping"});
 
 MovieChannel:Signal("started");
 MovieChannel:Signal("stopped");
+-- finished playing in non-looped play, this should be used as One-time callback after playMovie.
+-- since it will automatically remove all receivers once fired. 
+MovieChannel:Signal("finished"); 
 
 function MovieChannel:ctor()
 	-- array of movie clips
@@ -103,6 +106,12 @@ function MovieChannel:Pause()
 	end
 end
 
+function MovieChannel:IsPlaying()
+	if(self:GetCurrentMovieClip()) then
+		return self:GetCurrentMovieClip():IsPlaying();
+	end
+end
+
 function MovieChannel:SetLooping(bLooping)
 	self.bLooping = bLooping;
 end
@@ -117,6 +126,7 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 	
 	local movieClip = self:CreateGetStartMovieClip()
 	if(movieClip) then
+		self:FireFinished();
 		movieClip:SetReuseActor(self:IsReuseActor());
 		if(not fromTime) then
 			movieClip:GotoBeginFrame();
@@ -132,6 +142,7 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 		if(self:IsUseCamera()) then
 			self:UseCamera();
 		end
+		
 		if(toTime>fromTime) then
 			movieClip:Resume();	
 			movieClip:SetSpeed(self:GetSpeed())
@@ -178,11 +189,17 @@ function MovieChannel:OnMovieTimeChange()
 		else
 			if(movieClip:GetTime() >= self.playToTime) then
 				movieClip:Pause();
-				movieClip:SetTime(self.playToTime);
 				movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+				movieClip:SetTime(self.playToTime);
+				self:FireFinished();
 			end
 		end
 	end
+end
+
+function MovieChannel:FireFinished()
+	self:finished(); -- signal
+	self:Disconnect("finished")
 end
 
 -- stop and remove all actors
@@ -191,5 +208,7 @@ function MovieChannel:Stop()
 	if(self:GetCurrentMovieClip()) then
 		self:GetCurrentMovieClip():Stop();
 	end
+	self:FireFinished();
 	self:stopped(); -- signal
+	
 end

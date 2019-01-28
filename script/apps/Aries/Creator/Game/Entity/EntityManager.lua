@@ -484,6 +484,26 @@ function EntityManager.GetEntityInBlock(bx, by, bz, class_name)
 	end
 end
 
+-- @param min_x, min_y, min_z: block position
+-- @param max_x, max_y, max_z: block position
+function EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z)
+	local output;
+	for x = min_x, max_x do
+		for y = min_y, max_y do
+			for z = min_z, max_z do
+				local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+				if(entities) then
+					for entity,_ in pairs(entities) do
+						output = output or {};
+						output[#output+1] = entity;
+					end
+				end
+			end
+		end
+	end
+	return output;
+end
+
 -- @param entity_class: nil to match any entity. 
 function EntityManager.GetEntitiesByAABBOfType(entity_class, aabb)
 	local output;

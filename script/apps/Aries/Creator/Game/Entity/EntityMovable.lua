@@ -244,6 +244,9 @@ function Entity:LoadFromXMLNode(node)
 	local attr = node.attr;
 	if(attr) then
 		self.skin = node.attr.skin;
+		if(self.skin) then
+			Files.FindFile(self.skin);
+		end
 		if(attr.scaling) then
 			self.scaling = tonumber(attr.scaling);
 		end
@@ -313,7 +316,6 @@ end
 -- set new skin texture by filename. 
 -- @param skin: if nil, it will use the default skin. 
 function Entity:SetSkin(skin)
-	skin = skin;
 	if(self.skin ~= skin) then
 		self.skin = skin;
 		if(skin) then

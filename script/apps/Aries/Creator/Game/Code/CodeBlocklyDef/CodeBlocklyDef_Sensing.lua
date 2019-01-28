@@ -548,7 +548,7 @@ end
 	canRun = false,
 	func_description = 'getBlock(%s, %s, %s)',
 	ToNPL = function(self)
-		return string.format('getBlock(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+		return string.format('getBlock(%s, %s, %s)', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 local x,y,z = getPos();

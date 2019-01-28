@@ -26,8 +26,8 @@ local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.A
 function Actor:ctor()
 end
 
-function Actor:Init(itemStack, movieclipEntity)
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+function Actor:Init(itemStack, movieclipEntity, movieclip)
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 	

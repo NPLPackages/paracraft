@@ -23,8 +23,8 @@ local is_installed = false;
 local all_cmds = {};
 local all_cmds_map = {};
 BlockCad.categories = {
-    {name = "ShapeOperators", text = L"操作", colour = "#0078d7", },
     {name = "Shapes", text = L"图形", colour = "#764bcc", },
+    {name = "ShapeOperators", text = L"图形操作", colour = "#0078d7", },
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
@@ -100,10 +100,7 @@ end
 
 -- create short cut in code API, so that we can write cube() instead of ShapeBuilder.cube()
 function BlockCad.InstallMethods(codeAPI, shape)
-	codeAPI.cube = function(...)
-		shape.cube(...) 
-	end
-	-- Remove this: extract all methods like below
+	
 	for func_name, func in pairs(shape) do
 		if(type(func_name) == "string" and type(func) == "function") then
 			codeAPI[func_name] = function(...)
