@@ -56,6 +56,14 @@ function Actor:Init(itemStack, movieclipEntity, movieclip)
 	return self;
 end
 
+function Actor:SetCodeBlock(codeblock)
+	self.codeblock = codeblock;
+end
+
+function Actor:GetCodeBlock()
+	return self.codeblock;
+end
+
 function Actor:SetItemStack(itemStack)
 	self.itemStack = itemStack;
 	self:BindItemStackToTimeSeries();

@@ -264,6 +264,7 @@ function CodeBlock:RemoveAllActors()
 	
 	self.isRemovingActors = true;
 	for i, actor in ipairs(self:GetActors()) do
+		actor:SetCodeBlock(nil);
 		actor:OnRemove();
 		actor:Destroy();
 	end
@@ -281,6 +282,7 @@ end
 -- private function: do not call this function. 
 function CodeBlock:AddActor(actor)
 	self:GetActors():add(actor);
+	actor:SetCodeBlock(self);
 	actor:Connect("beforeRemoved", self:GetReferencedCodeBlock(), self:GetReferencedCodeBlock().OnRemoveActor);
 	GameLogic.GetCodeGlobal():AddActor(actor);
 end
@@ -691,6 +693,7 @@ function CodeBlock:CloneMyself(msg)
 	local actor = self:CreateActor();
 	if(actor) then
 		self:GetReferencedCodeBlock():OnCloneActor(actor, msg);
+		return actor;
 	end
 end
 

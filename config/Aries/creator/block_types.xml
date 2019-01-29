@@ -508,6 +508,7 @@ Sound related:
   <block id="10066" name="QuestLog" text="任务日志" searchkey="任务日志" item_class="ItemBook" tooltip="" icon="Texture/blocks/items/book_writable.png"></block>
   <block id="10067" name="TerrainBrush" text="地形笔刷" item_class="ItemTerrainBrush" tooltip="" icon="Texture/blocks/items/raise.png"></block>
   <block id="10068" name="PaintBrush" text="画笔" item_class="ItemPaintBrush" tooltip="" icon="Texture/blocks/items/brush.png"></block>
+  <block id="10069" name="CodeActor" text="代码演员" searchkey="代码演员" item_class="ItemCodeActor" tooltip="代码演员" icon="Texture/blocks/items/ts_npc.png"></block>
   
   <!--怪物和动物： id: 20000-20999-->
   <block id="20001" name="simple_mob" text="怪物" searchkey="怪物" tooltip="" item_class="ItemMob" icon="character/CC/03animals/treemonster/treemonster.x.png" gold_count="5" hp="100" respawn_time="300000">

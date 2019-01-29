@@ -339,6 +339,7 @@ entity_data: optional, preferred entity data when created.
     <block name="PhysicsModel"/>
     <block name="villager"/>
     <block name="MemoryBlock"/>
+    <block name="CodeActor"/>
     <block name="CodeBlock"/>
     <block name="Lever" />
   </category>

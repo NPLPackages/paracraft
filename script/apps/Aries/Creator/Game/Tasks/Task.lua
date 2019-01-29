@@ -17,7 +17,7 @@ local MyTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task")
 local task = MyTask:new();
 task:Run();
 
--- Example1: handling key/mouse event
+-- Example2: handling key/mouse event
 -- one must turn this on to use scene context or call LoadSceneContext() manually
 MyTask:Property({"bUseSceneContext", true, "IsUseSceneContext", "SetUseSceneContext", auto=true});
 
@@ -31,6 +31,7 @@ end
 
 local task = MyTask:new();
 task:Run();
+task:GetSceneContext():EnableAutoCamera(false); -- disable WASD keys
 -- task:SetFinished(); -- call this to quit task
 -------------------------------------------------------
 ]]
