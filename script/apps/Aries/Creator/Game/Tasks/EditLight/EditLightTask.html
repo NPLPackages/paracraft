@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EditLightTask.lua" refresh="true">
+<![CDATA[
+EditLightTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditLightTask");
+EditLightTask.InitPage(Page);
+task = EditLightTask.GetInstance();
+]]>
+</script>
+<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:600px" title='<%=L"调整光源"%>' onclose="EditLightTask.CancelSelection">
+    <div style="float:left;margin-left:3px;margin-bottom:10px;margin-right:10px;" class="default">
+        <div>
+            <div style="float:left;min-width:60px;"><%=L"模型"%></div>
+            <input class="mc_input" name="modelFilepath" type="text" style="width:100px;height:22px;" value=''/>
+            <input value='<%=L"..."%>' type="button" style="width:20px;" onclick="EditLightTask.ChangeLightModel"/>
+        </div>
+
+        <div>
+            <div style="float:left;min-width:60px;"><%=L"类型"%></div>
+            <input type="radio" style="margin:2px" name="LightType" id="1" value="1" onclick="EditLightTask.ChangeLightType"/><div style="float:left;" for="1"><%=L"点光源"%></div>
+        </div>
+        <div>
+            <div style="float:left;min-width:60px;"></div>
+            <input type="radio" style="margin:2px" name="LightType" id="2" value="2" onclick="EditLightTask.ChangeLightType"/><div style="float:left;" for="2"><%=L"聚光灯"%></div>
+        </div>
+        <div>
+            <div style="float:left;min-width:60px;"></div>
+            <input type="radio" style="margin:2px" name="LightType" id="3" value="3" onclick="EditLightTask.ChangeLightType"/><div style="float:left;" for="3"><%=L"平行光"%></div>
+        </div>
+
+        <div>
+            <div style="float:left;min-width:60px;"><%=L"漫反射"%></div>
+            <pe:colorpicker name="Diffuse" onchange="EditLightTask.ChangeDiffuseColor"/>
+        </div>
+        <div>
+            <div style="float:left;min-width:60px;"><%=L"镜面光"%></div>
+            <pe:colorpicker name="Specular" onchange="EditLightTask.ChangeSpecularColor"/>
+        </div>
+        <div>
+            <div style="float:left;min-width:60px;"><%=L"环境光"%></div>
+            <pe:colorpicker name="Ambient" onchange="EditLightTask.ChangeAmbientColor"/>
+        </div>
+
+        <div><div style="float:left;min-width:60px;"><%=L"位置"%></div><input class="mc_input" name="Position" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+
+        <pe:if condition='<%=task:GetSelectedLight() ~= nil and (task:GetSelectedLight():isSpotLight() or task:GetSelectedLight():isDirectionalLight())%>'>
+            <div><div style="float:left;min-width:60px;"><%=L"旋转"%></div><input class="mc_input" name="Rotation" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+        </pe:if>
+
+        <pe:if condition='<%=task:GetSelectedLight() ~= nil and (task:GetSelectedLight():isPointLight() or task:GetSelectedLight():isSpotLight())%>'>
+            <div><div style="float:left;min-width:60px;"><%=L"范围"%></div><input class="mc_input" name="Range" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+            <div><div style="float:left;min-width:60px;"><%=L"距离衰减系数0"%></div><input class="mc_input" name="Attenuation0" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+            <div><div style="float:left;min-width:60px;"><%=L"距离衰减系数1"%></div><input class="mc_input" name="Attenuation1" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+            <div><div style="float:left;min-width:60px;"><%=L"距离衰减系数2"%></div><input class="mc_input" name="Attenuation2" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+        </pe:if>
+        
+        <pe:if condition='<%=task:GetSelectedLight() ~= nil and (task:GetSelectedLight():isSpotLight())%>'>
+            <div><div style="float:left;min-width:60px;"><%=L"聚光内角"%></div><input class="mc_input" name="Theta" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+            <div><div style="float:left;min-width:60px;"><%=L"聚光外角"%></div><input class="mc_input" name="Phi" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+            <div><div style="float:left;min-width:60px;"><%=L"内外角衰减系数"%></div><input class="mc_input" name="Falloff" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
+        </pe:if>
+</aries:window>
+</pe:mcml>
+</html>
+

@@ -7351,6 +7351,7 @@ msgstr "bones"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:708
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:46
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:12
 msgid "模型"
 msgstr "model"
 
@@ -7389,10 +7390,6 @@ msgstr "dark slope"
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:717
 msgid "石英斜面"
 msgstr "Quartz slope"
-
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:718
-msgid "聚光灯"
-msgstr "Spotlight"
 
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:719
 #: script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html:26
@@ -11265,6 +11262,7 @@ msgstr "body facing"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:54
 #: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:64
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:27
 msgid "旋转"
 msgstr "rotation"
 
@@ -11289,7 +11287,8 @@ msgid "背景音乐"
 msgstr "music"
 
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:61
-#: script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.html:56
+#: script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.html:45
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:24
 msgid "位置"
 msgstr "position"
 
@@ -12959,3 +12958,63 @@ msgstr ""
 
 #~ msgid "方块百科"
 #~ msgstr "block wiki"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:11
+msgid "调整光源"
+msgstr "Tune Light Parameters"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:14
+msgid "类型"
+msgstr "type"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:15
+msgid "点光源"
+msgstr "point light"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:16
+msgid "聚光灯"
+msgstr "spot light"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:17
+msgid "平行光"
+msgstr "directional light"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:20
+msgid "漫反射"
+msgstr "diffuse"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:21
+msgid "镜面光"
+msgstr "specular"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:22
+msgid "环境光"
+msgstr "ambient"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:31
+msgid "范围"
+msgstr "range"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:32
+msgid "距离衰减系数0"
+msgstr "attenuation0"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:33
+msgid "距离衰减系数1"
+msgstr "attenuation1"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:34
+msgid "距离衰减系数2"
+msgstr "attenuation2"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:38
+msgid "聚光内角"
+msgstr "theta"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:39
+msgid "聚光外角"
+msgstr "phi"
+
+#: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html:40
+msgid "内外角衰减系数"
+msgstr "falloff"

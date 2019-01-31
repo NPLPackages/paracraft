@@ -155,7 +155,7 @@ Sound related:
   <block singleSideTex="true" name="Quartz_Slope" text="石英斜面" searchkey="" class="BlockSlope" id="263" mapcolor="#f3f2d3" step_sound="stone" texture="Texture/blocks/quartz_block_top.png" template="DataOnly" shape="slope" modelName="slope" cubeMode="true" obstruction="true" customModel="true" blockcamera="true" customBlockModel="true"/>
   
   <!--spot light, directional light, etc-->
-  <block singleSideTex="true" name="BlockLight" text="聚光灯" searchkey="" class="BlockLight" entity_class="EntityLight" item_class="ItemLight"  icon="Texture/blocks/items/blaze_powder.png" id="264" texture="Texture/blocks/wool_colored_white.png" obstruction="false" />
+  <block singleSideTex="true" name="BlockLight" text="光源" searchkey="" class="BlockLight" entity_class="EntityLight" item_class="ItemLight"  icon="Texture/blocks/items/blaze_powder.png" id="264" texture="Texture/blocks/wool_colored_white.png" obstruction="false" />
   <block threeSideTex="true" name="Checkpoint" text="存盘点" searchkey="" class="BlockEntityBase" entity_class="EntityCheckpoint" id="265" hasAction="true" texture="Texture/blocks/doortop_three.png" mapcolor="#fdcc49" obstruction="true" solid="true" cubeMode="true" />
   
   <!--Added Xizhi 2018.7.2 added animation block-->
