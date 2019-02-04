@@ -60,6 +60,15 @@ BuildinMod.buildin_mods = {
 		homepage = "https://github.com/tatfook/WorldShare",
 	},
 	{
+		name = "ExplorerApp", 
+		-- package_path = "tatfook/ExplorerApp/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"探索APP", 
+		text=L"系统内置插件",
+		version = "0.9",
+		homepage = "https://github.com/tatfook/ExplorerApp",
+	},
+	{
 		name = "EMapMod", 
 		-- package_path = "npl_packages/EMapMod/", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 
@@ -74,7 +83,7 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"代码方块Web编辑器", 
 		text=L"系统内置插件",
-		version = "0.1",
+		version = "1.0",
 		homepage = "https://github.com/tatfook/CodeBlockEditor",
 	},
 	{

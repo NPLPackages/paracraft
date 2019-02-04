@@ -38,6 +38,7 @@ local math_random = math.random;
 local math_floor = math.floor;
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovable"));
+Entity:Signal("clicked", function(mouse_button) end)
 
 -- class name
 Entity.class_name = "Movable";
@@ -623,6 +624,9 @@ function Entity:OnClick(x, y, z, mouse_button)
 		local event = Event:new():init("onclick");	
 		event.button = mouse_button;
 		self:event(event);
+
+		-- signal
+		self:clicked(mouse_button);
 	end
 	return true;
 end

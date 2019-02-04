@@ -34,6 +34,8 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 		if(world_url) then
 			-- remote duplicated ? in url, just a quick client fix to keepwork url bug. 
 			world_url = world_url:gsub("^([^%?]*%?[^%?]*)(%?.*)$", "%1")
+			-- remove the trailing /, just a quick fix to keepwork url bug. 
+			world_url = world_url:gsub("/$", "")
 			System.options.cmdline_world = world_url;
 		end
 

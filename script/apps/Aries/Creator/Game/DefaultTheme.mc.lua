@@ -300,6 +300,7 @@ function DefaultTheme:Load()
 		-- a dot is 1 px, which is used to draw a line
 		["mc_line"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;344 60 1 1", },
 		["mc_text"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;430 177 20 14:8 6 8 6",},
+		["mc_input"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;308 89 34 34:8 8 8 8",textcolor="#ffffff"},
 		["mc_alphadot"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;3 3 3 3:1 1 1 1",},
 		["mc_questbutton"] = {
 			["Normal_BG"] = "",

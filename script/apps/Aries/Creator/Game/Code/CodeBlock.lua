@@ -66,6 +66,25 @@ function CodeBlock:Init(entityCode)
 	return self;
 end
 
+function CodeBlock:SetBlockName(name)
+	if(self.entityCode and self.entityCode:GetDisplayName()~=name) then
+		self.entityCode:SetDisplayName(name);
+	end
+
+	if(self.codename and self.codename~=name) then
+		if(self:IsLoaded()) then
+			-- it is better to reload the code block.
+			GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
+			self.codename = nil;
+			self:AutoSetFilename();
+			GameLogic.GetCodeGlobal():AddCodeBlock(self);
+		else
+			self.codename = nil;
+			self:AutoSetFilename();
+		end
+	end
+end
+
 function CodeBlock:GetBlockName()
 	if(not self.codename) then
 		self.codename = self.entityCode and self.entityCode:GetDisplayName() or "";
@@ -397,16 +416,20 @@ end
 function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
 	movie_entity = movie_entity or self:GetMovieEntity();
 	if movie_entity and movie_entity.inventory then
+		local actor;
 		for i = 1, movie_entity.inventory:GetSlotCount() do
 			local itemStack = movie_entity.inventory:GetItem(i)
 			if (itemStack and itemStack.count > 0) then
 				if (itemStack.id == block_types.names.TimeSeriesNPC) then
-					return CodeActor:new():Init(itemStack, movie_entity, false, "codeblock");
+					actor = CodeActor:new():Init(itemStack, movie_entity, false, "codeblock");
+					break;
 				elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
-					return CodeUIActor:new():Init(itemStack, movie_entity);
+					actor = CodeUIActor:new():Init(itemStack, movie_entity);
+					break;
 				end
 			end 
 		end
+		return actor;
 	end
 end
 
@@ -443,7 +466,24 @@ function CodeBlock:Run(onFinishedCallback)
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		co:SetActor(actor);
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
-		return co:Run(nil, onFinishedCallback);
+		local instances = self:GetEntity():GetActorInstances()
+		if(instances and #instances>0) then
+			return co:Run(nil, function(...)
+				for i, actorParams in ipairs(instances) do
+					local actor = self:CloneMyself();
+					if(actor) then
+						actor:SetInitParams(actorParams)
+						actor:ApplyInitParams()
+					end
+				end
+				if(onFinishedCallback) then
+					onFinishedCallback(...)
+				end
+			end);
+		else
+			return co:Run(nil, onFinishedCallback);
+		end
+		
 	else
 		self:ResetTime();
 		self.isLoaded = true;
@@ -689,6 +729,7 @@ function CodeBlock:GetCodeBlockByName(name)
 	return GameLogic.GetCodeGlobal():GetCodeBlockByName(name);
 end
 
+-- @return the actor created
 function CodeBlock:CloneMyself(msg)
 	local actor = self:CreateActor();
 	if(actor) then

@@ -551,7 +551,7 @@ function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
 		return
 	end
 	
-	if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+	if LobbyServer.GetSingleton():IsStarted() then
 		LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
 	end
 	

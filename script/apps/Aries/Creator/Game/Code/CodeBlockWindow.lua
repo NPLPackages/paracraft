@@ -354,13 +354,15 @@ function CodeBlockWindow.OnClickCompileAndRun()
 	end
 end
 
-function CodeBlockWindow.OnClickOpenMovieBlock()
+function CodeBlockWindow.OnClickCodeActor()
 	local movieEntity = CodeBlockWindow.GetMovieEntity();
 	if(movieEntity) then
 		if(mouse_button=="left") then
 			local codeBlock = CodeBlockWindow.GetCodeBlock();
 			if(codeBlock) then
 				codeBlock:HighlightActors();
+				local x, y, z = codeBlock:GetBlockPos();
+				GameLogic.RunCommand(string.format("/take CodeActor {codeblock={%d,%d,%d}, tooltip=%q}", x, y, z, codeBlock:GetBlockName() or ""));
 			end
 		else
 			movieEntity:OpenEditor("entity");

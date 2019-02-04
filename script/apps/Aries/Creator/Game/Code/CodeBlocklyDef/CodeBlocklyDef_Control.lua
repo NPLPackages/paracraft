@@ -47,6 +47,39 @@ end
 ]]}
 },
 },
+
+{
+	type = "waitUntil", 
+	message0 = L"等待直到%1",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+            shadow = { type = "boolean"},
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	hide_in_toolbox = false,
+	func_description = "repeat wait(0.01) until(%s)",
+	ToNPL = function(self)
+		return string.format('repeat wait(0.01) until(%s)\n', self:getFieldAsString('expression'));
+	end,
+	examples = {{desc = L"每帧检测一次", canRun = true, code = [[
+say("press space key to continue")
+repeat wait(0.01) until(isKeyPressed("space"))
+say("started")
+]]},
+{desc = L"输入为某个变量或表达式", canRun = false, code = [[
+repeat wait(0.01) until(gamestate == "gameStarted")
+repeat wait(0.01) until(current_level == 1)
+]]},
+},
+},
+
 {
 	type = "repeat", 
 	message0 = L"重复%1次",

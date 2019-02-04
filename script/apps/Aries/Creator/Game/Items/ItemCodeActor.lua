@@ -17,9 +17,10 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
-local ItemCodeActor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemCodeActor"));
+local ItemCodeActor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemCodeActor"));
 
 block_types.RegisterItemClass("ItemCodeActor", ItemCodeActor);
 
@@ -30,30 +31,107 @@ function ItemCodeActor:ctor()
 end
 
 function ItemCodeActor:GetActorName(itemStack)
-	return itemStack:GetDataField("tooltip");
+	return itemStack and itemStack:GetDataField("tooltip");
 end
 
 function ItemCodeActor:SetActorName(itemStack, name)
 	itemStack:SetDataField("tooltip", name);
 end
 
-function ItemCodeActor:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
+function ItemCodeActor:GetDisplayName(itemStack)
+	return self:GetTooltipFromItemStack(itemStack);
+end
+
+function ItemCodeActor:SetCodeBlock(itemStack, codeblock)
+	if(codeblock) then
+		local x, y, z = codeblock:GetBlockPos()
+		itemStack:SetDataField("codeblock", {x, y, z});
+		local codeblock = self:GetCodeBlock(itemStack);
+		if(codeblock) then
+			self:SetActorName(itemStack, codeblock:GetBlockName() or "");
+		end
+	else
+		itemStack:SetDataField("codeblock", nil);
+	end
+end
+
+function ItemCodeActor:GetTooltipFromItemStack(itemStack)
+	local tooltip = self:GetTooltip();
+	if(tooltip) then
+		local name = self:GetActorName(itemStack)
+		if(name) then
+			tooltip = tooltip.."\n"..name;
+		end
+	end
+	return tooltip;
+end
+
+function ItemCodeActor:GetCodeBlock(itemStack)
+	local pos = itemStack:GetDataField("codeblock");
+	if(pos and pos[1] and pos[2] and pos[3]) then
+		local blockEntity = EntityManager.GetBlockEntity(pos[1], pos[2], pos[3]);
+		if(blockEntity and blockEntity.GetCodeBlock) then
+			return blockEntity:GetCodeBlock(true);
+		end
+	end
+end
+
+function ItemCodeActor:FindCodeBlock(itemStack)
+	local codeblock = self:GetCodeBlock(itemStack)
+	if(codeblock) then
+		return codeblock;
+	end
+
 	local actorName = self:GetActorName(itemStack);
 	if(not actorName) then
-		self:SelectActor(itemStack)
 		return
 	end
 	local actor = GameLogic.GetCodeGlobal():GetActorByName(actorName)
 	if(actor) then
 		local codeblock = actor:GetCodeBlock()
 		if(codeblock) then
-			local newActor = codeblock:CloneMyself();
-			if(newActor) then
-				newActor:SetBlockPos(x, y, z);
-			end
+			return codeblock;
 		end
 	else
 		LOG.std(nil, "info", "ItemCodeActor", "code actor %s can not be found in the scene", actorName);
+	end
+end
+
+function ItemCodeActor:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
+	local codeblock = self:FindCodeBlock(itemStack)
+	if(codeblock) then
+		if(codeblock:IsLoaded()) then
+			local newActor = codeblock:CloneMyself();
+			if(newActor) then
+				newActor:SetPersistent(true);
+				newActor:SetBlockPos(x, y, z);
+				local facing = Direction.directionTo3DFacing[Direction.GetDirection2DFromCamera()]-3.14;
+				newActor:SetFacing(facing);
+				newActor:SetInitParam("x", x);
+				newActor:SetInitParam("y", y);
+				newActor:SetInitParam("z", z);
+				newActor:SetInitParam("yaw", facing);
+				codeblock:GetEntity():AddActorInstance(newActor:GetInitParams());
+			end
+		else
+			_guihelper.MessageBox(format(L"代码方块%s没有加载, 是否瞬移到代码方块的位置?", codeblock:GetBlockName() or ""), function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+					self:TeleportPlayerToCodeBlock(itemStack);
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		end
+	else
+		self:SelectActor(itemStack)
+	end
+end
+
+function ItemCodeActor:TeleportPlayerToCodeBlock(itemStack)
+	local codeblock = self:GetCodeBlock(itemStack)
+	if(codeblock) then
+		local x, y, z = codeblock:GetBlockPos()
+		if(x and y and z) then
+			GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z));
+		end
 	end
 end
 
@@ -75,7 +153,10 @@ end
 function ItemCodeActor:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
-		self:SelectActor(itemStack);
+		local codeblock = self:GetCodeBlock(itemStack)
+		if(not codeblock) then
+			self:SelectActor(itemStack);
+		end
 	end
 end
 
@@ -94,6 +175,48 @@ function ItemCodeActor:SelectActor(itemStack)
 	EnterTextDialog.ShowPage(L"演员名字", function(result)
 		if(result and result ~= "" and result~=old_value) then
 			self:SetActorName(itemStack, result);
+			self:SetCodeBlock(itemStack, nil)
 		end
 	end,old_value, "select", options);
+end
+
+-- both codeblock and tooltip should match
+function ItemCodeActor:CompareItems(left, right)
+	if(ItemCodeActor._super.CompareItems(self, left, right)) then
+		if(left and right) then
+			local name1 = left:GetDataField("tooltip");
+			local name2 = right:GetDataField("tooltip");
+			if(name1 == name2) then
+				local pos1 = left:GetDataField("codeblock");
+				local pos2 = right:GetDataField("codeblock");
+				if(pos1 and pos2) then
+					if(pos1[1] == pos2[1] and pos1[2] == pos2[2] and pos1[3] == pos2[3]) then
+						return true;
+					end
+				elseif(not pos1 and not pos2) then
+					return true;
+				end
+			end
+		end
+	end
+end
+
+function ItemCodeActor:OnSelect(itemStack)
+	ItemCodeActor._super.OnSelect(self, itemStack);
+end
+
+function ItemCodeActor:OnDeSelect()
+	ItemCodeActor._super.OnDeSelect(self);
+end
+
+-- virtual function: 
+function ItemCodeActor:CreateTask(itemStack)
+	local codeblock = self:GetCodeBlock(itemStack)
+	if(codeblock) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+		local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+		EditCodeActor:SetCodeBlock(codeblock)
+		EditCodeActor:SetItemStack(itemStack)
+		return EditCodeActor:new();
+	end
 end

@@ -56,6 +56,31 @@ function Actor:Init(itemStack, movieclipEntity, movieclip)
 	return self;
 end
 
+function Actor:SetInitParams(params)
+	if(not self.initParams) then
+		self.initParams = params;
+	else
+		commonlib.partialcompare(self.initParams, params);
+	end
+end
+
+function Actor:GetInitParams()
+	return self.initParams;
+end
+
+function Actor:SetInitParam(name, value)
+	self.initParams = self.initParams or {};
+	self.initParams[name] = value;
+end
+
+function Actor:GetInitParam(name)
+	return self.initParams and self.initParams[name];
+end
+
+-- virtual:
+function Actor:ApplyInitParams()
+end
+
 function Actor:SetCodeBlock(codeblock)
 	self.codeblock = codeblock;
 end
@@ -165,6 +190,17 @@ end
 function Actor:GetMovieClipEntity()
 	return self.movieclipEntity;
 end
+
+-- whether its persistent. 
+function Actor:IsPersistent()
+	return self.is_persistent;
+end
+
+-- whether the entity should be serialized to disk. 
+function Actor:SetPersistent(bIsPersistent)
+	self.is_persistent = bIsPersistent;
+end
+
 
 -- it is only in playing mode when activated by a circuit. 
 -- any other way of triggering the movieclip is not playing mode(that is edit mode)

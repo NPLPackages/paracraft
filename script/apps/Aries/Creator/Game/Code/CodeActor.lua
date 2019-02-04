@@ -63,6 +63,38 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 	return self;
 end
 
+function Actor:ApplyInitParams()
+	local x = self:GetInitParam("x")
+	if(x) then
+		local entity = self:GetEntity();
+		if(entity) then
+			local y = self:GetInitParam("y")
+			local z = self:GetInitParam("z")
+			if(y and z) then
+				self:SetBlockPos(x, y, z);
+			end
+
+			local yaw = self:GetInitParam("yaw")
+			if(yaw) then
+				entity:SetFacing(yaw);
+			end
+			local pitch = self:GetInitParam("pitch")
+			if(pitch) then
+				entity:SetPitch(pitch);
+			end
+			local roll = self:GetInitParam("roll")
+			if(roll) then
+				entity:SetRoll(roll);
+			end
+
+			local scaling = self:GetInitParam("scaling")
+			if(scaling) then
+				entity:SetScaling(scaling);
+			end
+		end
+	end
+end
+
 function Actor:IsActorPickingEnabled()
 	return self.enableActorPicking;
 end
@@ -792,4 +824,11 @@ end
 
 function Actor:BecomeAgent(entity)
 	Actor._super.BecomeAgent(self, entity);
+
+	if(self:IsActorPickingEnabled()) then
+		entity:Connect("clicked", self, self.OnClick, "UniqueConnection");
+		self:EnableActorPicking(true)
+	end
+	entity:Connect("collided", self, self.OnCollideWithEntity, "UniqueConnection");
+	entity:Connect("valueChanged", self, self.OnEntityPositionChange, "UniqueConnection");
 end

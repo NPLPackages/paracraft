@@ -23,18 +23,6 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
--- wait some time
--- @param seconds: in seconds, if nil, it is one tick or env_imp.GetDefaultTick(self)
-function env_imp:wait(seconds)
-	seconds = seconds or env_imp.GetDefaultTick(self);
-	if(self.co) then
-		self.co:SetTimeout(math.floor(seconds*1000), function()
-			env_imp.resume(self);
-		end) 
-		env_imp.yield(self);
-	end
-end
-
 -- say some text and wait for some time. 
 -- @param text: if nil, it will remove text
 -- @param duration: in seconds. if nil, it means forever

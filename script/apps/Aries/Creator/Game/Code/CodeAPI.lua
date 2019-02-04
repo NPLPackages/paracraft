@@ -15,6 +15,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Control.lua");
 
 -- all public environment methods. 
 local s_env_methods = {
@@ -88,6 +89,7 @@ local s_env_methods = {
 
 	-- Control
 	"wait",
+	"waitUntil",
 	"registerCloneEvent",
 	"clone",
 	"delete",
@@ -194,35 +196,10 @@ function env_imp:checkyield()
 	end
 end
 
--- Output a message and terminate all connected code block.
--- @param msg: output this message. usually nil. 
-function env_imp:exit(msg)
-	-- the caller use xpcall with custom error function, so caller will catch it gracefully and end the request
-	self.is_exit_call = true;
-	self.exit_msg = msg;
-	error("_stop_all_");
-end
-
-function env_imp:restart(msg)
-	env_imp.wait(self, 1);
-	error("_restart_all_");
-end
-
--- return ok, result
-function env_imp:xpcall(code_func, handleError, ...)
-	return xpcall(code_func, handleError, ...);
-end
-
 -- private: 
 function env_imp:GetDefaultTick()
 	if(not self.default_tick) then
 		self.default_tick = self.codeBlock and self.codeBlock:GetDefaultTick() or 0.02;
 	end
 	return self.default_tick;
-end
-
--- @param cmd: full commands or just command name
--- @param params: parameters or nil. 
-function env_imp:cmd(cmd, params)
-	self.codeblock:RunCommand(cmd, params)
 end

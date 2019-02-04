@@ -36,6 +36,8 @@ Entity.is_regional = true;
 local maxConnectedCodeBlockCount = 255;
 
 function Entity:ctor()
+	-- persistent actor instances
+	self.actorInstances = commonlib.UnorderedArraySet:new();
 end
 
 function Entity:Destroy()
@@ -134,6 +136,20 @@ function Entity:SaveToXMLNode(node, bSort)
 			includedFilesNode[i] = {name="filename", name}
 		end
 	end
+
+	
+	local actors = self:GetActorInstances()
+	if(actors and #actors > 0) then
+		local actorInstancesNode = {name="actorInstances", };
+		node[#node+1] = actorInstancesNode;
+		for i=1, #actors do
+			local actor = actors[i];
+			if(actor) then
+				actorInstancesNode[#actorInstancesNode+1] = {name="actorInstance", attr = actor};
+			end
+		end
+	end
+
 	return node;
 end
 
@@ -175,6 +191,18 @@ function Entity:LoadFromXMLNode(node)
 				local filename = sub_node[1]
 				self.includedFiles[j] = filename;
 			end
+		elseif(node[i].name == "actorInstances") then
+			for j=1, #(node[i]) do
+				local initParams = node[i][j].attr;
+				if(initParams) then
+					initParams.x = initParams.x and tonumber(initParams.x);
+					initParams.y = initParams.y and tonumber(initParams.y);
+					initParams.z = initParams.z and tonumber(initParams.z);
+					initParams.yaw = initParams.yaw and tonumber(initParams.yaw);
+					initParams.scaling = initParams.scaling and tonumber(initParams.scaling);
+					self.actorInstances:add(initParams);
+				end
+			end
 		end
 	end
 	if(not self.isBlocklyEditMode and not self.nplcode) then
@@ -185,6 +213,19 @@ function Entity:LoadFromXMLNode(node)
 	else
 		self:SetCommand(self:GetNPLCode());
 	end
+end
+
+-- array of actor's init params
+function Entity:GetActorInstances()
+	return self.actorInstances;
+end
+
+function Entity:AddActorInstance(actorInitParams)
+	self.actorInstances:add(actorInitParams);
+end
+
+function Entity:RemoveActorInstance(actorInitParams)
+	self.actorInstances:removeByValue(actorInitParams);
 end
 
 function Entity:ScheduleRefresh(x,y,z)
@@ -228,6 +269,17 @@ function Entity:Refresh()
 			self:Restart();
 		elseif(not self.isPowered and codeBlock:IsLoaded()) then
 			self:Stop();
+		end
+	end
+end
+
+-- virtual function:
+function Entity:SetDisplayName(v)
+	if(self:GetDisplayName()~= v) then
+		Entity._super.SetDisplayName(self, v);
+		local codeBlock = self:GetCodeBlock()
+		if(codeBlock) then
+			codeBlock:SetBlockName(v);
 		end
 	end
 end

@@ -25,7 +25,9 @@ end
 function env_imp:delete()
 	if(self.actor) then
 		self.actor:DeleteThisActor();
-		self.actor = nil;
+		if(self.co) then
+			self.co:SetActor(nil);
+		end
 	end
 	env_imp.checkyield(self);
 end
@@ -103,46 +105,10 @@ function env_imp:sendNetworkEvent(username, event_name, msg)
 	self.codeblock:SendNetworkEvent(username, event_name, msg);
 end
 
-
--- run function in a new coroutine
-function env_imp:run(mainFunc)
-	if(type(mainFunc) == "function") then
-		local last_co = self.co;
-		local co = CodeCoroutine:new():Init(self.codeblock);
-		co:SetActor(self.actor);
-		co:SetFunction(mainFunc);
-		co:Run();
-		if(last_co) then
-			last_co:SetCurrentCodeContext();
-		end
-	end
+-- @param cmd: full commands or just command name
+-- @param params: parameters or nil. 
+function env_imp:cmd(cmd, params)
+	self.codeblock:RunCommand(cmd, params)
 end
-
--- run function under the context of a given actor and wait for its return value
--- @param actor: actor name or the actor object
-function env_imp:runForActor(actor, mainFunc)
-	if(actor == "myself" or not actor) then
-		actor = self.actor;
-	elseif(type(actor) == "string") then
-		actor = GameLogic.GetCodeGlobal():GetActorByName(actor);
-	end
-	if(type(actor) == "table" and type(mainFunc) == "function") then
-		local isFinished = false;
-		local last_co = self.co;
-		local co = CodeCoroutine:new():Init(self.codeblock);
-		co:SetActor(actor);
-		co:SetFunction(mainFunc);
-		local result, r2, r3, r4 = co:Run(nil, self.co:MakeCallbackFunc(function(...)
-			isFinished = true;
-			env_imp.resume(self, ...);
-		end));	
-		if(not isFinished) then
-			return env_imp.yield(self);
-		else
-			return result, r2, r3, r4;
-		end
-	end
-end
-
 
 
