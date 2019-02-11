@@ -23,7 +23,7 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 	if(filename == "" or filename == "npl") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
 	elseif(filename == "npl_cad") then
-		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockCad/BlockCad.lua");
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then

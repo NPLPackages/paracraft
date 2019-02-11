@@ -231,6 +231,7 @@ end
 -- @param text: string support basic html.  
 -- if nil, it will close the dialog
 -- @param buttons: nil or {"button1", "button2"}
+-- @return result
 function env_imp:ask(text, buttons)
 	local actor = self.actor;
 	if(actor) then
@@ -266,6 +267,7 @@ function env_imp:ask(text, buttons)
 			env_imp.yield(self);
 		end
 		env_imp.wait(self, env_imp.GetDefaultTick(self));
+		return GameLogic.GetCodeGlobal():GetGlobal("answer");
 	end
 end
 

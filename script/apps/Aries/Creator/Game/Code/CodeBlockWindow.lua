@@ -43,6 +43,7 @@ function CodeBlockWindow.Show(bShow)
 	else
 		GameLogic:desktopLayoutRequested("CodeBlockWindow");
 		GameLogic:Connect("desktopLayoutRequested", CodeBlockWindow, CodeBlockWindow.OnLayoutRequested, "UniqueConnection");
+		GameLogic.GetCodeGlobal():Connect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText, "UniqueConnection");
 	
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
@@ -248,6 +249,7 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
+	GameLogic.GetCodeGlobal():Disconnect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText);
 	if(CodeBlockWindow.isBlocklyOpened) then
 		CodeBlockWindow.CloseBlocklyWindow();
 		return
@@ -318,6 +320,22 @@ function CodeBlockWindow.SetConsoleText(text)
 		self.console_text_linewrapped = CodeBlockWindow.DoTextLineWrap(self.console_text) or "";
 		if(page) then
 			page:SetValue("console", self.console_text_linewrapped);
+		end
+	end
+end
+
+function CodeBlockWindow:AddConsoleText(text)
+	if(page) then
+		local textAreaCtrl = page:FindControl("console");
+		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
+		if(textCtrl) then
+			textCtrl = textCtrl:ViewPort();
+			if(textCtrl) then
+				for line in text:gmatch("[^\r\n]+") do
+					textCtrl:AddItem(line)
+				end
+				textCtrl:DocEnd();
+			end
 		end
 	end
 end

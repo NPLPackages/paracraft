@@ -29,7 +29,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals"));
 
-
+CodeGlobals:Signal("logAdded", function(text) end)
 
 function CodeGlobals:ctor()
 	-- exposing these API to globals
@@ -197,6 +197,15 @@ function CodeGlobals:Reset()
 	-- TODO: 
 	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
+end
+
+function CodeGlobals:log(obj, ...)
+	commonlib.echo(obj, ...);
+	if(type(obj) == "string") then
+		self:logAdded(string.format(obj, ...));
+	else
+		self:logAdded(commonlib.serialize_in_length(obj, 100));
+	end
 end
 
 function CodeGlobals:OnWorldSave()
@@ -629,3 +638,4 @@ function CodeGlobals:IsKeyPressed(keyname)
 	end
 	return false;
 end
+

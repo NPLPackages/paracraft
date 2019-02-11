@@ -355,7 +355,7 @@ end
 	nextStatement = true,
 	func_description = 'ask(%s)',
 	ToNPL = function(self)
-		return string.format('ask("%s")\n', self:getFieldAsString('input'));
+		return string.format('local result = ask("%s")\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ask("what is your name")
@@ -367,6 +367,10 @@ if(answer == 1) then
 elseif(answer == 2) then
     say("you choose B")
 end
+]]},
+{desc = "", canRun = true, code = [[
+local name = ask("what is your name?")
+say("hello "..tostring(name), 2)
 ]]},
 {desc = L"关闭对话框", canRun = true, code = [[
 run(function()

@@ -19,12 +19,17 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
 -- simple log any object, same as echo. 
 function env_imp:log(...)
-	commonlib.echo(...);
+	GameLogic.GetCodeGlobal():log(...);
 end
 
 function env_imp:echo(obj, ...)
 	commonlib.echo(obj, ...);
-	GameLogic.RunCommand("/echo "..commonlib.serialize_in_length(obj, 100))
+	if(type(obj) == "string") then
+		GameLogic.RunCommand("/echo "..obj:sub(1, 100))
+	else
+		GameLogic.RunCommand("/echo "..commonlib.serialize_in_length(obj, 100))
+	end
+	
 end
 
 -- get the entity associated with the actor.

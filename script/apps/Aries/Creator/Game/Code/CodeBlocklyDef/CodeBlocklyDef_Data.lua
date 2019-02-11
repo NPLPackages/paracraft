@@ -741,8 +741,8 @@ hideVariable("score")
 	examples = {{desc = L"查看log.txt或F11看日志", canRun = true, code = [[
 log(123)
 log("hello")
-something = {any="object"}
-log(something)
+log({any="object"})
+log("hello %s %d", "world", 1)
 ]]}},
 },
 
