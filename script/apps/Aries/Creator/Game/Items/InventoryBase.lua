@@ -150,6 +150,17 @@ function InventoryBase:GetCurrentItemIndex()
 	return 1;
 end
 
+function InventoryBase:IsFull()
+	local slots = self.slots;
+	for i=1, self:GetSlotCount() do
+		local item = slots[i];
+		if(not item or item.count == 0) then
+			return false
+		end
+	end
+	return true;
+end
+
 -- auto add item_stack to a free slot or merge with existing stack.
 -- @param from_slot_id: start from a given slot. if nil, it will search from beginning. 
 -- @return bAllAdded, slot_index: true if placed, false if impossible or only part of the item_stack is placed. 
@@ -333,10 +344,15 @@ function InventoryBase:Close()
 end
 
 function InventoryBase:LoadFromXMLNode(node)
+	local count = 0;
 	for slot_index, subnode in ipairs(node) do
 		if(subnode.attr and subnode.attr.count) then
 			self.slots[slot_index] = ItemStack:new():LoadFromXMLNode(subnode);
+			count = slot_index;
 		end
+	end
+	if(self:GetSlotCount() < count) then
+		self:SetSlotCount(count)
 	end
 end
 

@@ -190,6 +190,9 @@ end
 
 function Entity:CreateNPC()
 	local item = ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1);
+	if(self.inventory:IsFull()) then
+		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
+	end
 	local bAdded, slot_index = self.inventory:AddItem(item);
 	if(slot_index) then
 		return self.inventory:GetItem(slot_index);

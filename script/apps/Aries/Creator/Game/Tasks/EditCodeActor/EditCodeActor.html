@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EditCodeActor.lua" refresh="true">
+<![CDATA[
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+EditCodeActor.InitPage(Page);
+task = EditCodeActor.GetInstance();
+function OnClickEmptySlot()
+end
+
+function IsSelectedActor(slotNumber)
+    local view = task.GetActorInventoryView();
+    if(view) then
+        local itemStack = view:GetSlotItemStack(slotNumber)
+        if(itemStack) then
+            return task.GetSelectedItemStack() == itemStack;
+        end
+    end
+    return false;
+end
+
+]]>
+</script>
+<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:300px" title='<%=L"代码方块中的角色"%>'>
+    <div>
+        <div class="mc_item" style="float:left;width: 34px; height: 34px;">
+            <input type="button" name="AddActor" value="+" tooltip='<%=L"添加演员"%>' style="margin-left:4px;margin-top:4px;width:26px;height:26px;" class="mc_light_grey_button_with_fillet" onclick="EditCodeActor.OnClickAddActor()" />
+        </div>
+        <div class="mc_item" style="float: left; width: 34px; height: 34px;">
+            <input type="button" tooltip='<%=L"默认演员"%>'  name="defaultActor" style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="EditCodeActor.OnClickDefaultActor()" />
+        </div>
+        <div class="mc_item" style="float: left; width: 34px; height: 34px;">
+            <pe:mc_block block_id='CodeBlock' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="EditCodeActor.OnClickCodeBlock" tooltip='<%=L"左键点击传送,右键编辑代码方块"%>' />
+        </div>
+        <div style="float:left;margin-left:5px;margin-top:5px;color:#ffffffff"><%=task:GetActorName()%></div>
+    </div>
+    <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=EditCodeActor.DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight="34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="256">
+        <Columns>
+            <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
+                <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
+                    <pe:mc_slot switchTouchButton="true" ContainerView='<%=EditCodeActor.GetActorInventoryView()%>' bagpos='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </pe:if>
+            <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
+                <div class="mc_item">
+                    <pe:mc_slot switchTouchButton="true" class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=EditCodeActor.GetActorInventoryView()%>' bagpos='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                </div>
+            </pe:if>
+        </Columns>
+    </pe:gridview>
+    <div style="float:left;margin-left:3px;margin-bottom:10px;margin-right:10px;" class="default">
+        <div><div style="float:left;min-width:60px;"><%=L"名字"%></div><input class="mc_input" name="name" type="text" style="margin-left:2px;height:22px;" value='default' onchange="" width="100%"/></div>
+        <div><div style="float:left;min-width:60px;"><%=L"位置"%></div><input class="mc_input" name="position" type="text" style="margin-left:2px;height:22px;" value='0, 0, 0 ' onchange="" width="100%"/></div>
+        <div><div style="float:left;min-width:60px;"><%=L"朝向"%></div><input class="mc_input" name="facing" type="text" style="margin-left:2px;height:22px;" value='0' onchange="" width="100%"/></div>
+        <div><div style="float:left;min-width:60px;"><%=L"时间起点"%></div><input class="mc_input" name="startTime" type="text" style="margin-left:2px;height:22px;" value='0' onchange="" width="100%"/></div>
+        <div><div style="float:left;min-width:60px;"><%=L"用户数据"%></div><input class="mc_input" name="userdata" type="text" style="margin-left:2px;height:22px;" value='{}' onchange="" width="100%"/></div>
+    </div>
+</aries:window>
+</pe:mcml>
+</html>
+

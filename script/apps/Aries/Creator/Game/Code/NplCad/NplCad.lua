@@ -1,0 +1,133 @@
+--[[
+Title: NplCad
+Author(s): leio
+Date: 2018/12/12
+Desc: NplCad is a blockly program to create shapes with nploce on web browser
+use the lib:
+-------------------------------------------------------
+local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+NplCad.MakeBlocklyFiles();
+-------------------------------------------------------
+]]
+local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
+local NplCad = NPL.export();
+commonlib.setfield("MyCompany.Aries.Game.Code.NplCad.NplCad", NplCad);
+
+local is_installed = false;
+local all_cmds = {};
+local all_cmds_map = {};
+NplCad.categories = {
+    {name = "Shapes", text = L"图形", colour = "#764bcc", },
+    {name = "ShapeOperators", text = L"图形操作", colour = "#0078d7", },
+    {name = "Control", text = L"控制", colour = "#d83b01", },
+    {name = "Math", text = L"运算", colour = "#569138", },
+    {name = "Data", text = L"数据", colour = "#459197", },
+};
+
+-- make files for blockly 
+function NplCad.MakeBlocklyFiles()
+    local categories = NplCad.GetCategoryButtons();
+    local all_cmds = NplCad.GetAllCmds()
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
+    local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
+    CodeBlocklySerializer.OnInit(categories,all_cmds)
+    CodeBlocklySerializer.SaveFilesToDebug("block_configs_nplcad");
+
+    _guihelper.MessageBox("making blockly files finished");
+	ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0).."block_configs_nplcad", "", "", 1); 
+end
+function NplCad.GetCategoryButtons()
+    return NplCad.categories;
+end
+function NplCad.AppendAll()
+	if(is_installed)then
+		return
+	end
+	is_installed = true;
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_ShapeOperators.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Shapes.lua");
+    local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
+    local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
+
+    -- Using CodeCad definitions temporarily
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Control.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Data.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Math.lua");
+
+    local CodeCadDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Control");
+    local CodeCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Data");
+    local CodeCadDef_Math = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Math");
+	
+
+	local all_source_cmds = {
+		NplCadDef_ShapeOperators.GetCmds(),
+		NplCadDef_Shapes.GetCmds(),
+		CodeCadDef_Control.GetCmds(),
+		CodeCadDef_Data.GetCmds(),
+		CodeCadDef_Math.GetCmds(),
+	}
+	for k,v in ipairs(all_source_cmds) do
+		NplCad.AppendDefinitions(v);
+	end
+end
+
+function NplCad.AppendDefinitions(source)
+	if(source)then
+		for k,v in ipairs(source) do
+			table.insert(all_cmds,v);
+			all_cmds_map[v.type] = v;
+		end
+	end
+end
+
+function NplCad.GetAllCmds()
+	NplCad.AppendAll();
+	return all_cmds;
+end
+
+-- custom compiler here: 
+-- @param codeblock: code block object here
+function NplCad.CompileCode(code, filename, codeblock)
+    local NplOceConnection = NPL.load("Mod/NplCad2/NplOceConnection.lua");
+    if(not NplOceConnection or not NplOceConnection.is_loaded)then
+	    LOG.std(nil, "info", "NplCad", "load nploce failed");
+        return
+    end
+
+    local block_name = codeblock:GetBlockName();
+    if(not block_name or block_name == "")then
+        block_name = "default"
+    end
+	local worldpath = ParaWorld.GetWorldDirectory();
+    local name = format("%sblocktemplates/nplcad/%s.x",worldpath,block_name);
+    code = NplCad.GetCode(code, name);
+	return CodeCompiler:new():SetFilename(filename):Compile(code);
+end
+
+-- create short cut in code API, so that we can write cube() instead of ShapeBuilder.cube()
+function NplCad.InstallMethods(codeAPI, shape)
+	
+	for func_name, func in pairs(shape) do
+		if(type(func_name) == "string" and type(func) == "function") then
+			codeAPI[func_name] = function(...)
+				return func(...);
+			end
+		end
+	end
+end
+
+function NplCad.GetCode(code, filename)
+    return format([[
+        local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
+        local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
+        ShapeBuilder.create();
+		local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+		NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
+        %s
+        NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
+    ]],code, filename)
+end
+
+

@@ -10,6 +10,8 @@ local EntityCode = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
+local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -17,6 +19,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
@@ -38,6 +41,9 @@ local maxConnectedCodeBlockCount = 255;
 function Entity:ctor()
 	-- persistent actor instances
 	self.actorInstances = commonlib.UnorderedArraySet:new();
+	self.inventory = InventoryBase:new():Init();
+	self.inventory:SetClient();
+	self.inventory:SetSlotCount(1); 
 end
 
 function Entity:Destroy()
@@ -618,4 +624,16 @@ end
 
 function Entity:GetAllIncludedFiles()
 	return self.includedFiles;
+end
+
+function Entity:CreateActorItemStack()
+	local item = ItemStack:new():Init(block_types.names.CodeActorInstance, 1);
+	if(self.inventory:IsFull()) then
+		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
+		self.GetInventoryView():UpdateFromInventory();
+	end
+	local bAdded, slot_index = self.inventory:AddItem(item);
+	if(slot_index) then
+		return self.inventory:GetItem(slot_index);
+	end
 end
