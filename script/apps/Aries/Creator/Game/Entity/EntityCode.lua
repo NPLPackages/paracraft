@@ -630,7 +630,7 @@ function Entity:CreateActorItemStack()
 	local item = ItemStack:new():Init(block_types.names.CodeActorInstance, 1);
 	if(self.inventory:IsFull()) then
 		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
-		self.GetInventoryView():UpdateFromInventory();
+		self:GetInventoryView():UpdateFromInventory();
 	end
 	local bAdded, slot_index = self.inventory:AddItem(item);
 	if(slot_index) then

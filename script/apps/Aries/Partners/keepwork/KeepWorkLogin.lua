@@ -105,7 +105,6 @@ function KeepWorkLogin.ShowLoginPage()
 		isShowTitleBar = false,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		enable_esc_key = true,
 		zorder = 1,
 		directPosition = true,
 			align = "_fi",
