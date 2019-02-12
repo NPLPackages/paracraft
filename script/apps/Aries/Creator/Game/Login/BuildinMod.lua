@@ -33,14 +33,14 @@ BuildinMod.buildin_mods = {
 		version = "1.4.6",
 		homepage = "https://github.com/tatfook/NPLCAD",
 	},
---    {
---		name = "NplCad2", 
---		package_path = "npl_packages/ParacraftBuildinMod/", 
---		displayName = L"NplCad 2", 
---		text=L"系统内置插件",
---		version = "1.0.0",
---		homepage = "https://github.com/tatfook/NplCad2",
---	},
+    {
+		name = "NplCad2", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"NplCad 2", 
+		text=L"系统内置插件",
+		version = "1.0.0",
+		homepage = "https://github.com/tatfook/NplCad2",
+	},
 	{
 		name = "STLExporter", 
 		-- package_path = "npl_packages/STLExporter/", 

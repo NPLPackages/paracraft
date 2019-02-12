@@ -20,10 +20,10 @@ end
 <pe:container ClickThrough="true" alignment="_mt" width="0" height="32px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#497 342 2 32)">
     <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:32px;">
         <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
-            <input type="button" value='<%=L"编辑模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到播放模式(shortcut Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_blue"/>
+            <input type="button" value='<%=L"编辑模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到播放模式(快捷键 Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_blue"/>
         </pe:if>
         <pe:if condition='<%=not GameLogic.GameMode:IsEditor()%>'>
-            <input type="button" value='<%=L"播放模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到编辑模式(shortcut Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_grey"/>
+            <input type="button" value='<%=L"播放模式"%>' onclick="DesktopMenuPage.OnClickToggleGameMode" tooltip='<%=L"切换到编辑模式(快捷键 Ctrl+G)"%>' spacing="5" style="float:left;min-width:70px;height:32px;margin-top:0px" class="mc_button_grey"/>
         </pe:if>
         <pe:repeat DataSource="<%=DesktopMenuPage.GetCurrentMenu()%>">
             <pe:repeatitem style="float:left;">
