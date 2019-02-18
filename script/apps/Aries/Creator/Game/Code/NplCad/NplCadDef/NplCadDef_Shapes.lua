@@ -14,7 +14,7 @@ local cmds = {
 
 {
 	type = "cube", 
-	message0 = L"cube x %1 y %2 z %3 color %4",
+	message0 = L"cube x %1 y %2 z %3 color %4 %5",
     arg0 = {
         {
 			name = "x",
@@ -40,6 +40,12 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
          
 	},
     previousStatement = true,
@@ -47,9 +53,9 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'cube(%s,%s,%s,%s)',
+	func_description = 'cube(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cube(%s,%s,%s,"%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'));
+		return string.format('cube(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -57,7 +63,7 @@ local cmds = {
 
 {
 	type = "sphere", 
-	message0 = L"sphere radius %1 color %2",
+	message0 = L"sphere radius %1 color %2 %3",
     arg0 = {
         {
 			name = "radius",
@@ -71,6 +77,12 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         
 	},
     previousStatement = true,
@@ -78,16 +90,16 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'sphere(%s,%s)',
+	func_description = 'sphere(%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('sphere(%s,"%s")\n', self:getFieldValue('radius'), self:getFieldValue('color'));
+		return string.format('sphere(%s,"%s","%s")\n', self:getFieldValue('radius'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
 {
 	type = "cylinder", 
-	message0 = L"cylinder radius %1 height %2 color %3",
+	message0 = L"cylinder radius %1 height %2 color %3 %4",
     arg0 = {
         {
 			name = "radius",
@@ -107,6 +119,12 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         
 	},
     previousStatement = true,
@@ -114,7 +132,7 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'cylinder(%s,%s,%s)',
+	func_description = 'cylinder(%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cylinder(%s,%s,"%s")\n', self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,

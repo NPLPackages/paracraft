@@ -13,180 +13,23 @@ local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.N
 local cmds = {
 
 
+
 {
-	type = "beginTranslation_full", 
-	message0 = L"beginTranslation( x %1 y %2 z %3)",
-    message1 = L"%1",
-	message2 = L"endTranslation()",
+	type = "createNode", 
+	message0 = L"createNode %1",
     arg0 = {
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-    arg1 = {
-		{
-			name = "input",
-			type = "input_statement",
+       {
+			name = "left",
+			type = "field_input",
+			text = "object1",
 		},
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-	previousStatement = true,
+    previousStatement = true,
 	nextStatement = true,
-	func_description = 'beginTranslation(%s,%s,%s)\\n%sendTranslation()',
-	ToNPL = function(self)
-		return string.format('beginTranslation(%s,%s,%s)\n    %s\nendTranslation()\n', 
-            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "beginTranslation", 
-	message0 = L"beginTranslation( x %1 y %2 z %3)",
-    arg0 = {
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-	hide_in_toolbox = true,
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'beginTranslation(%s,%s,%s)',
-	ToNPL = function(self)
-		return ""
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "endTranslation", 
-	message0 = L"endTranslation()",
-	hide_in_toolbox = true,
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'endTranslation()',
-	ToNPL = function(self)
-		return ""
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "beginScale_full", 
-	message0 = L"beginScale( x %1 y %2 z %3)",
-    message1 = L"%1",
-	message2 = L"endScale()",
-    arg0 = {
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        
-	},
-    arg1 = {
-		{
-			name = "input",
-			type = "input_statement",
-		},
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'beginScale(%s,%s,%s)\\n%sendScale()',
-	ToNPL = function(self)
-    return string.format('beginScale(%s,%s,%s)\n    %s\nendScale()\n', 
-            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldAsString('input'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "beginScale", 
-	message0 = L"beginScale( x %1 y %2 z %3)",
-    arg0 = {
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        
-	},
-	hide_in_toolbox = true,
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'beginScale(%s,%s,%s)',
+	func_description = 'createNode("%s")',
 	ToNPL = function(self)
     return ""
 	end,
@@ -194,15 +37,137 @@ local cmds = {
     ]]}},
 },
 {
-	type = "endScale", 
-	message0 = L"endScale()",
-	hide_in_toolbox = true,
+	type = "cloneNodeByName", 
+	message0 = L"cloneNodeByName %1 %2 %3",
+    arg0 = {
+        {
+			name = "left",
+			type = "field_input",
+			text = "object1",
+		},
+         {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'cloneNodeByName("%s",%s,%s)',
+	ToNPL = function(self)
+    return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "cloneNode", 
+	message0 = L"cloneNode %1",
+    arg0 = {
+         {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'cloneNode(%s)',
+	ToNPL = function(self)
+    return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "deleteNode", 
+	message0 = L"deleteNode %1",
+    arg0 = {
+        {
+			name = "left",
+			type = "field_input",
+			text = "object1",
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'deleteNode("%s")',
+	ToNPL = function(self)
+    return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "group", 
+	message0 = L"group %1",
+    arg0 = {
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'group(%s)',
+	ToNPL = function(self)
+    return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "move", 
+	message0 = L"move( x %1 y %2 z %3)",
+    arg0 = {
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'endScale()',
+	func_description = 'move(%s,%s,%s)',
 	ToNPL = function(self)
 		return ""
 	end,
@@ -211,28 +176,51 @@ local cmds = {
 },
 
 {
-	type = "beginRotation", 
-	message0 = L"beginRotation( x %1 y %2 z %3 angle %4)",
-    message1 = L"%1",
-	message2 = L"endRotation()",
+	type = "scale", 
+	message0 = L"scale( x %1 y %2 z %3)",
     arg0 = {
         {
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
 		},
         {
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
 		},
         {
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'scale(%s,%s,%s)',
+	ToNPL = function(self)
+		return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "rotate", 
+	message0 = L"rotate around %1 by %2 degrees from pivot x %3 y %4 z %5",
+    arg0 = {
+        {
+			name = "axis",
+			type = "input_value",
+            shadow = { type = "axis", value = "x",},
+			text = "x", 
 		},
         {
 			name = "angle",
@@ -240,31 +228,42 @@ local cmds = {
             shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-	},
-    arg1 = {
-		{
-			name = "input",
-			type = "input_statement",
+        {
+			name = "tx",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
 		},
+        {
+			name = "ty",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "tz",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'beginRotation(%s,%s,%s,%s)\\n%sendRotation()',
+	func_description = 'rotate(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-    return string.format('beginRotation(%s,%s,%s,%s)\n    %s\nendRotation()\n', 
-            self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('angle'), self:getFieldAsString('input'));
+		return ""
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
 {
-	type = "beginBoolean2", 
-	message0 = L"beginBoolean %1 %2",
-    message1 = L"%1",
-	message2 = L"endBoolean()",
+	type = "boolean_op", 
+	message0 = L"%1",
     arg0 = {
         
         {
@@ -276,84 +275,46 @@ local cmds = {
 				{ L"intersection", "intersection" },
 			},
 		},
-        {
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
 	},
-    arg1 = {
-		{
-			name = "input",
-			type = "input_statement",
-		},
-	},
+	--hide_in_toolbox = true,
+    output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'beginBoolean("%s",%s)\\n%sendBoolean()',
+	func_description = '"%s"',
 	ToNPL = function(self)
-    return string.format('beginBoolean("%s","%s")\n    %s\nendBoolean()\n', 
-            self:getFieldValue('value'), self:getFieldValue('color'), self:getFieldAsString('input'));
+    return ""
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
 {
-	type = "beginBoolean", 
-	message0 = L"beginBoolean %1 %2",
+	type = "axis", 
+	message0 = L"%1",
     arg0 = {
         
         {
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ L"union", "union" },
-				{ L"difference", "difference" },
-				{ L"intersection", "intersection" },
+				{ L"axis x", "x" },
+				{ L"axis y", "y" },
+				{ L"axis z", "z" },
 			},
 		},
-        {
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
 	},
-	hide_in_toolbox = true,
+	--hide_in_toolbox = true,
+    output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'beginBoolean("%s",%s)',
+	func_description = '"%s"',
 	ToNPL = function(self)
     return ""
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-{
-	hide_in_toolbox = true,
-	type = "endBoolean", 
-	message0 = L"endBoolean()",
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'endBoolean()',
-	ToNPL = function(self)
-    return ""
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-
-
 }
 function NplCadDef_ShapeOperators.GetCmds()
 	return cmds;

@@ -72,6 +72,11 @@ function Actor:ctor()
 	self.m_aabb = ShapeBox:new():SetPointBox(0,0,0);
 end
 
+function Actor:DeleteThisActor()
+	self:OnRemove();
+	self:Destroy();
+end
+
 function Actor:GetMultiVariable()
 	local var = self:GetCustomVariable("multi_variable");
 	if(var) then

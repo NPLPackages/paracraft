@@ -61,6 +61,11 @@ function Actor:ctor()
 	self.actor_block = ActorBlock:new();
 end
 
+function Actor:DeleteThisActor()
+	self:OnRemove();
+	self:Destroy();
+end
+
 function Actor:GetMultiVariable()
 	local var = self:GetCustomVariable("multi_variable");
 	if(var) then

@@ -189,6 +189,15 @@ function InventoryBase:AddItem(item_stack, from_slot_id, to_slot_id)
 	return false;
 end
 
+-- @return slotIndex, please note it has to be a perfect match by reference (NOT by value)
+function InventoryBase:GetItemStackIndex(itemStack)
+	local slots = self.slots;
+	for i=1, self:GetSlotCount() do
+		if(slots[i] == itemStack) then
+			return i;
+		end
+	end
+end
 
 -- find a given item in slots. return the first one matched. 
 -- @param item_id:
@@ -322,11 +331,12 @@ function InventoryBase:OnInventoryChanged(slot_index)
 		pe_mc_slot.RefreshBlockIcons(self);
 	end
 	if(self.OnChangedCallback) then
-		self.OnChangedCallback(self);
+		self.OnChangedCallback(self, slot_index);
 	end
 end
 
--- a custom user defined function for OnInventoryChanged(self)
+-- a custom user defined function for OnInventoryChanged(self, slot_index)
+-- slot_index: if only one slot is changed, this is the index. it could be nil, if index can not be determined. 
 function InventoryBase:SetOnChangedCallback(callbackfunc)
 	self.OnChangedCallback = callbackfunc;
 end

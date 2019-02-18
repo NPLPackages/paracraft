@@ -383,6 +383,10 @@ function ItemStack:SetDataField(fieldname, value)
 	end
 end
 
+function ItemStack:GetDataTable()
+	return self.serverdata;
+end
+
 -- this is the text shown at the right bottom of the icon in pe:slot control. 
 -- by default, this is count if bigger than 1, and "" if count is 1
 -- if the displayname contains [XXX], text in square brackets will also be displayed. 

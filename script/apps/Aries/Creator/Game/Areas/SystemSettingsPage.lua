@@ -482,6 +482,14 @@ end
 -- @param OnChangeCallback: nil or a callback function that is invoked before changes are applied. 
 -- It gives the caller a chance to drop any changes made by returning false. e.g. in web edition, we can not modified changes directly,instead we need to invoke via IPC to change. 
 function SystemSettingsPage.AutoAdjustGraphicsSettings(bShowUI, callbackFunc, OnChangeCallback)
+	if(System.os.GetPlatform()~="win32") then
+		-- skip this for non-win32 device
+		if(type(callbackFunc) == "function") then
+			callbackFunc(false);
+		end
+		return;
+	end
+
 	local att = ParaEngine.GetAttributeObject();
 	local shader_version = GetShaderVersion();
 	

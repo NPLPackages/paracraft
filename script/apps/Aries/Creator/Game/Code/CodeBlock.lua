@@ -6,6 +6,9 @@ Desc: In addition to object oriented programming(oop), paracraft code block feat
 The smallest memory unit is an animation clip over time. So we can also call it animation-oriented programming model. 
 A program is made up of code block, where each code block is associated with one movie block, which contains a short animation
 clip for an actor. Code block exposes a `CodeAPI` that can programmatically control the actor inside the movie block. 
+
+CodeBlock can has unlimited inventory code actors, in addition to the default actor.
+
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
@@ -234,6 +237,7 @@ function CodeBlock:Stop()
 	self:Disconnect("actorCollided");
 	self:RemoveTimers();
 	self:RemoveAllActors();
+	self.inventoryActors = nil;
 	self:RemoveAllEvents();
 	self:StopLastTempCode();
 	self:SetOutput(0);
@@ -452,10 +456,154 @@ function CodeBlock:Restart(onFinishedCallback)
 	end
 end
 
+function CodeBlock:GetInventoryActor(slotIndex)
+	return self.inventoryActors and self.inventoryActors[slotIndex];
+end
+
+-- holding a weak reference to the actor
+function CodeBlock:SetInventoryActor(slotIndex, actor)
+	self.inventoryActors = self.inventoryActors or {};
+	self.inventoryActors[slotIndex] = actor;
+end
+
+function CodeBlock:RemoveAllInventoryActors()
+	if(self.inventoryActors) then
+		for slotIndex, actor in pairs(self.inventoryActors) do
+			actor:DeleteThisActor();
+		end
+		self.inventoryActors = nil;
+	end
+end
+
+-- it will refresh real inventory code actors if code block is loaded
+-- otherwise it will refresh inventory movie actors if code block is NOT loaded. 
+-- this function is called automatically when the code block inventory is changed. 
+-- @param slotIndex: if nil, it will refresh all 
+function CodeBlock:RefreshInventoryActor(slotIndex)
+	if(not slotIndex) then
+		if(self:IsLoaded()) then
+			self:RefreshAllInventoryActors()
+		else
+			self:RefreshAllInventoryAsMovieActors()
+		end
+		return 
+	end
+	if(self:IsLoaded()) then
+		local inventory = self:GetEntity():GetInventory()
+		local itemStack = inventory:GetItem(slotIndex);
+		if(itemStack and not self:GetInventoryActor(slotIndex)) then
+			local actor = self:CloneMyself();
+			if(actor) then
+				actor:SetInitParams(itemStack:GetDataTable())
+				actor:ApplyInitParams()
+				self:SetInventoryActor(slotIndex, actor);
+			end
+		elseif(not itemStack) then
+			local actor = self:GetInventoryActor(slotIndex);
+			if(actor) then
+				actor:DeleteThisActor();
+				self:SetInventoryActor(slotIndex, nil);
+			end
+		else
+			local actor = self:GetInventoryActor(slotIndex)
+			actor:ApplyInitParams();
+		end
+	else
+		local inventory = self:GetEntity():GetInventory()
+		local itemStack = inventory:GetItem(slotIndex);
+		if(itemStack and not self:GetInventoryMovieActor(slotIndex)) then
+			local codeActorItem = self:GetEntity():GetCodeActorItemStack(slotIndex);
+			if(codeActorItem) then
+				local actor = codeActorItem:CreateMovieActor();
+				if(actor) then
+					self:SetInventoryMovieActor(slotIndex, actor);
+				end
+			end
+		elseif(not itemStack) then
+			local actor = self:GetInventoryMovieActor(slotIndex);
+			if(actor) then
+				actor:DeleteThisActor();
+				self:GetInventoryMovieActor(slotIndex, nil);
+			end
+		else
+			local actor = self:GetInventoryMovieActor(slotIndex)
+			local codeActorItem = self:GetEntity():GetCodeActorItemStack(slotIndex);
+			if(codeActorItem) then
+				codeActorItem:ApplyInitParams(actor);
+			end
+		end
+	end
+end
+
+function CodeBlock:RefreshAllInventoryActors()
+	if(self:IsLoaded()) then
+		self:RemoveAllInventoryActors();
+		local inventory = self:GetEntity():GetInventory()
+		for slotIndex = 1, inventory:GetSlotCount() do
+			local itemStack = inventory:GetItem(slotIndex)
+			if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+				local actor = self:CloneMyself();
+				if(actor) then
+					actor:SetInitParams(itemStack:GetDataTable())
+					actor:ApplyInitParams()
+					self:SetInventoryActor(slotIndex, actor);
+				end
+			end
+		end
+	end
+end
+
+function CodeBlock:GetInventoryMovieActor(slotIndex)
+	return self.inventoryMovieActors and self.inventoryMovieActors[slotIndex];
+end
+
+-- holding a weak reference to the actor
+function CodeBlock:SetInventoryMovieActor(slotIndex, actor)
+	self.inventoryMovieActors = self.inventoryMovieActors or {};
+	self.inventoryMovieActors[slotIndex] = actor;
+end
+
+function CodeBlock:RemoveAllInventoryMovieActors()
+	if(self.inventoryMovieActors) then
+		for slotIndex, actor in pairs(self.inventoryMovieActors) do
+			actor:DeleteThisActor();
+		end
+		self.inventoryMovieActors = nil;
+	end
+end
+
+-- this function is used for rendering all instanced inventory actors in editor mode. 
+-- only call this when code block is not loaded, it will show all inventory actors belonging to this code block
+-- this could be inaccurate in turns of rendering, since they are not using any code block logics, but just
+-- using data from movie block and initial params from the inventory's item stack. 
+-- when code block is loaded,  these movie actors will be removed automatically
+function CodeBlock:RefreshAllInventoryAsMovieActors()
+	if(not self:IsLoaded()) then
+		self:RemoveAllInventoryMovieActors();
+		local movieEntity = self:GetMovieEntity();
+		if(movieEntity) then
+			local itemStack = movieEntity:GetFirstActorStack();
+			local item = itemStack:GetItem();
+			if(item and item.CreateActorFromItemStack) then
+				local inventory = self:GetEntity():GetInventory()
+				for slotIndex = 1, inventory:GetSlotCount() do
+					local codeActorItem = self:GetEntity():GetCodeActorItemStack(slotIndex);
+					if(codeActorItem) then
+						local actor = codeActorItem:CreateMovieActor();
+						if(actor) then
+							self:SetInventoryMovieActor(slotIndex, actor);
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 -- run code again 
 function CodeBlock:Run(onFinishedCallback)
 	self:GetEntity():ClearIncludedFiles();
-
+	self:RemoveAllInventoryMovieActors();
 	self:CompileCode(self:GetEntity():GetCommand());
 	if(self.code_func) then
 		self:ResetTime();
@@ -466,16 +614,10 @@ function CodeBlock:Run(onFinishedCallback)
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		co:SetActor(actor);
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
-		local instances = self:GetEntity():GetActorInstances()
-		if(instances and #instances>0) then
+		local inventory = self:GetEntity():GetInventory()
+		if(inventory and not inventory:IsEmpty()) then
 			return co:Run(nil, function(...)
-				for i, actorParams in ipairs(instances) do
-					local actor = self:CloneMyself();
-					if(actor) then
-						actor:SetInitParams(actorParams)
-						actor:ApplyInitParams()
-					end
-				end
+				self:RefreshAllInventoryActors();
 				if(onFinishedCallback) then
 					onFinishedCallback(...)
 				end

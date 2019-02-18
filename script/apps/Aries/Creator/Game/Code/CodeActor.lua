@@ -64,32 +64,30 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 end
 
 function Actor:ApplyInitParams()
-	local x = self:GetInitParam("x")
-	if(x) then
+	local pos = self:GetInitParam("pos")
+	if(pos) then
 		local entity = self:GetEntity();
 		if(entity) then
-			local y = self:GetInitParam("y")
-			local z = self:GetInitParam("z")
-			if(y and z) then
-				self:SetBlockPos(x, y, z);
+			if(pos[1] and pos[2] and pos[3]) then
+				self:SetBlockPos(pos[1], pos[2], pos[3]);
 			end
 
 			local yaw = self:GetInitParam("yaw")
 			if(yaw) then
-				entity:SetFacing(yaw);
+				entity:SetFacing(yaw*3.14/180);
 			end
 			local pitch = self:GetInitParam("pitch")
 			if(pitch) then
-				entity:SetPitch(pitch);
+				entity:SetPitch(pitch*3.14/180);
 			end
 			local roll = self:GetInitParam("roll")
 			if(roll) then
-				entity:SetRoll(roll);
+				entity:SetRoll(roll*3.14/180);
 			end
 
 			local scaling = self:GetInitParam("scaling")
 			if(scaling) then
-				entity:SetScaling(scaling);
+				entity:SetScaling(scaling/100);
 			end
 		end
 	end

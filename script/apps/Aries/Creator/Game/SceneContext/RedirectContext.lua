@@ -24,6 +24,9 @@ virtual or redirected functions:
 	OnRightMouseHold(fDelta)
 	OnLeftLongHoldBreakBlock()
 	UpdateManipulators()
+	DeleteManipulators()
+	OnUnselect()
+	OnSelect()
 
 use the lib:
 ------------------------------------------------------------
@@ -68,6 +71,7 @@ end
 function RedirectContext:OnSelect(lastContext)
 	RedirectContext._super.OnSelect(self);
 	self:EnableMousePickTimer(true);
+	self:RedirectEvent("OnSelect");
 end
 
 -- the command object should use close() to deactivate. 
@@ -94,6 +98,7 @@ end
 -- return true if we are not in the middle of any operation and fire unselected signal. 
 -- or false, if we can not unselect the scene tool context at the moment. 
 function RedirectContext:OnUnselect()
+	self:RedirectEvent("OnUnselect");
 	RedirectContext._super.OnUnselect(self);
 	return true;
 end
@@ -113,6 +118,13 @@ end
 function RedirectContext:UpdateManipulators()
 	return self:RedirectEvent("UpdateManipulators");
 end
+
+--virtual:
+function RedirectContext:DeleteManipulators()
+	self:RedirectEvent("DeleteManipulators");
+	RedirectContext._super.DeleteManipulators(self);
+end
+
 
 -- virtual: 
 function RedirectContext:mousePressEvent(event)

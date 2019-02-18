@@ -99,29 +99,36 @@ end
 
 function ItemCodeActor:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 	local codeblock = self:FindCodeBlock(itemStack)
-	if(codeblock) then
-		if(codeblock:IsLoaded()) then
-			local newActor = codeblock:CloneMyself();
-			if(newActor) then
-				newActor:SetPersistent(true);
-				newActor:SetBlockPos(x, y, z);
-				local facing = Direction.directionTo3DFacing[Direction.GetDirection2DFromCamera()]-3.14;
-				newActor:SetFacing(facing);
-				newActor:SetInitParam("x", x);
-				newActor:SetInitParam("y", y);
-				newActor:SetInitParam("z", z);
-				newActor:SetInitParam("yaw", facing);
-				codeblock:GetEntity():AddActorInstance(newActor:GetInitParams());
-			end
-		else
-			_guihelper.MessageBox(format(L"代码方块%s没有加载, 是否瞬移到代码方块的位置?", codeblock:GetBlockName() or ""), function(res)
-				if(res and res == _guihelper.DialogResult.Yes) then
-					self:TeleportPlayerToCodeBlock(itemStack);
-				end
-			end, _guihelper.MessageBoxButtons.YesNo);
-		end
+	if(codeblock and codeblock:GetEntity()) then
+		local entityCode = codeblock:GetEntity();
+		self:CreateActorInstance(entityCode, x, y, z)
 	else
 		self:SelectActor(itemStack)
+	end
+end
+
+-- @param entityCode: the parent code entity 
+-- @param x,y,z,facing: can all be nil.  in real coordinate system. 
+function ItemCodeActor:CreateActorInstance(entityCode, x, y, z, facing)
+	if(not entityCode) then
+		return
+	end
+	local item = entityCode:CreateActorItemStack();
+	if(item) then
+		if(not x) then
+			x, y, z = EntityManager.GetPlayer():GetPosition();
+		end
+		x, y, z = BlockEngine:block_float(x-0.5, y, z-0.5);
+		item:SetField("pos", {x, y, z});
+
+		if(not facing) then
+			facing = Direction.directionTo3DFacing[Direction.GetDirection2DFromCamera()]-3.14;
+		end
+		item:SetField("yaw", math.floor(facing*180/3.14 + 0.5));
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+		local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+		EditCodeActor.SetFocusToItemStack(item:GetItemStack())
 	end
 end
 
@@ -215,9 +222,10 @@ function ItemCodeActor:CreateTask(itemStack)
 	if(codeblock) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
 		local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
-		EditCodeActor:SetCodeBlock(codeblock)
-		EditCodeActor:SetItemStack(itemStack)
-		return EditCodeActor:new();
+		if(EditCodeActor.GetInstance() and EditCodeActor.GetInstance():GetEntityCode()==codeblock:GetEntity()) then
+			return;
+		end
+		return EditCodeActor:new():Init(codeblock:GetEntity());
 	end
 end
 

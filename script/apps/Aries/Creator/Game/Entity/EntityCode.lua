@@ -11,6 +11,8 @@ local EntityCode = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActorItemStack.lua");
+local CodeActorItemStack = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActorItemStack");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -27,6 +29,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
+Entity:Signal("inventoryChanged", function(slotIndex) end)
 
 -- class name
 Entity.class_name = "EntityCode";
@@ -39,11 +42,46 @@ Entity.is_regional = true;
 local maxConnectedCodeBlockCount = 255;
 
 function Entity:ctor()
-	-- persistent actor instances
-	self.actorInstances = commonlib.UnorderedArraySet:new();
+	-- persistent actor instances as inventory items
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
-	self.inventory:SetSlotCount(1); 
+	self.inventory:SetSlotCount(10); 
+	self.inventory:SetOnChangedCallback(function(inventory, slot_index)
+		self:OnInventoryChanged(slot_index);
+	end);
+end
+
+-- this should be called when inventory itemstack or its values are changed
+-- this function can be called many times per frame, but only one merged inventoryChanged signal is fired.
+function Entity:OnInventoryChanged(slot_index)
+	local codeblock = self:GetCodeBlock()
+	if(codeblock) then
+		if(self.slot_index_to_refresh == nil) then
+			self.slot_index_to_refresh = slot_index;
+		else
+			self.slot_index_to_refresh = "all";
+		end
+		-- we will delay refresh to next frame, just incase lots of the same event fired in the same frame. 
+		self.refreshInventoryTimer =  self.refreshInventoryTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			local slotIndex;
+			if(self.slot_index_to_refresh ~= "all") then
+				slotIndex = self.slot_index_to_refresh;
+			end
+			self:RefreshInventoryActors(slotIndex);
+			self.slot_index_to_refresh = nil;
+		end})
+		self.refreshInventoryTimer:Change(0.01);
+	end
+	
+end
+
+-- @param slotIndex: if nil, it means all
+function Entity:RefreshInventoryActors(slotIndex)
+	local codeblock = self:GetCodeBlock()
+	if(codeblock) then
+		codeblock:RefreshInventoryActor(slotIndex);
+		self:inventoryChanged(slotIndex);
+	end
 end
 
 function Entity:Destroy()
@@ -142,20 +180,6 @@ function Entity:SaveToXMLNode(node, bSort)
 			includedFilesNode[i] = {name="filename", name}
 		end
 	end
-
-	
-	local actors = self:GetActorInstances()
-	if(actors and #actors > 0) then
-		local actorInstancesNode = {name="actorInstances", };
-		node[#node+1] = actorInstancesNode;
-		for i=1, #actors do
-			local actor = actors[i];
-			if(actor) then
-				actorInstancesNode[#actorInstancesNode+1] = {name="actorInstance", attr = actor};
-			end
-		end
-	end
-
 	return node;
 end
 
@@ -197,18 +221,6 @@ function Entity:LoadFromXMLNode(node)
 				local filename = sub_node[1]
 				self.includedFiles[j] = filename;
 			end
-		elseif(node[i].name == "actorInstances") then
-			for j=1, #(node[i]) do
-				local initParams = node[i][j].attr;
-				if(initParams) then
-					initParams.x = initParams.x and tonumber(initParams.x);
-					initParams.y = initParams.y and tonumber(initParams.y);
-					initParams.z = initParams.z and tonumber(initParams.z);
-					initParams.yaw = initParams.yaw and tonumber(initParams.yaw);
-					initParams.scaling = initParams.scaling and tonumber(initParams.scaling);
-					self.actorInstances:add(initParams);
-				end
-			end
 		end
 	end
 	if(not self.isBlocklyEditMode and not self.nplcode) then
@@ -219,19 +231,6 @@ function Entity:LoadFromXMLNode(node)
 	else
 		self:SetCommand(self:GetNPLCode());
 	end
-end
-
--- array of actor's init params
-function Entity:GetActorInstances()
-	return self.actorInstances;
-end
-
-function Entity:AddActorInstance(actorInitParams)
-	self.actorInstances:add(actorInitParams);
-end
-
-function Entity:RemoveActorInstance(actorInitParams)
-	self.actorInstances:removeByValue(actorInitParams);
 end
 
 function Entity:ScheduleRefresh(x,y,z)
@@ -626,6 +625,7 @@ function Entity:GetAllIncludedFiles()
 	return self.includedFiles;
 end
 
+-- return CodeActorItemStack object or nil
 function Entity:CreateActorItemStack()
 	local item = ItemStack:new():Init(block_types.names.CodeActorInstance, 1);
 	if(self.inventory:IsFull()) then
@@ -634,6 +634,18 @@ function Entity:CreateActorItemStack()
 	end
 	local bAdded, slot_index = self.inventory:AddItem(item);
 	if(slot_index) then
-		return self.inventory:GetItem(slot_index);
+		return self:GetCodeActorItemStack(slot_index);
 	end
+end
+
+function Entity:GetCodeActorItemStack(slot_index)
+	local item = self.inventory:GetItem(slot_index);
+	if(item) then
+		return CodeActorItemStack:new():Init(self, item, slot_index);
+	end
+end
+
+-- create a wrapper of item stack 
+function Entity:GetItemStackIndex(itemStack)
+	return self.inventory:GetItemStackIndex(itemStack)
 end

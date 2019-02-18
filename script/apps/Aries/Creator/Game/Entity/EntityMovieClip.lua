@@ -50,14 +50,14 @@ Entity.disable_auto_stop_time = true;
 
 function Entity:ctor()
 	self.movieClip = MovieClip:new():Init(self);
-	self.inventory:SetOnChangedCallback(function()
-		self:OnInventoryChanged();
+	self.inventory:SetOnChangedCallback(function(inventory, slot_index)
+		self:OnInventoryChanged(slot_index);
 	end);
 	-- make it bigger than 27(default), so we can have more actors in it. 
 	self.inventory:SetSlotCount(48); 
 end
 
-function Entity:OnInventoryChanged()
+function Entity:OnInventoryChanged(slot_index)
 	local movieClip = self:GetMovieClip()
 	if(movieClip and movieClip == MovieManager:GetActiveMovieClip()) then
 		movieClip:RemoveAllActors();
@@ -192,6 +192,7 @@ function Entity:CreateNPC()
 	local item = ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1);
 	if(self.inventory:IsFull()) then
 		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
+		self:GetInventoryView():UpdateFromInventory();
 	end
 	local bAdded, slot_index = self.inventory:AddItem(item);
 	if(slot_index) then

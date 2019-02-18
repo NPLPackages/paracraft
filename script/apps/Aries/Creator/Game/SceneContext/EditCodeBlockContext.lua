@@ -19,6 +19,7 @@ EditCodeBlockContext:Property({"Name", "EditCodeBlockContext"});
 function EditCodeBlockContext:ctor()
 end
 
+
 -- virtual function: 
 -- try to select this context. 
 function EditCodeBlockContext:OnSelect()
@@ -100,6 +101,7 @@ function EditCodeBlockContext:SetCodeEntity(entity)
 		local codeblock = self:GetCodeBlock();
 		if(codeblock) then
 			codeblock:Disconnect("stateChanged", self, self.UpdateCodeBlock);
+			codeblock:RemoveAllInventoryMovieActors();
 		end
 		self.entity = entity;
 
@@ -193,5 +195,9 @@ function EditCodeBlockContext:updateManipulators()
 		manipCont:SetRollEnabled(false);
 		self:AddManipulator(manipCont);
 		manipCont:connectToDependNode(actor);
+	end
+	local codeblock = self:GetCodeBlock();
+	if(codeblock) then
+		codeblock:RefreshAllInventoryAsMovieActors()
 	end
 end

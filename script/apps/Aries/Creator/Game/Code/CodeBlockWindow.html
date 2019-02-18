@@ -11,7 +11,7 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
             <input type="button" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickStop" />
         </div>
         <div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
-            <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%=L"左键复制角色, 右键打开电影方块"%>' />
+            <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%=L"左键查看代码方块中的角色, 右键打开电影方块"%>' />
         </div>
         <input type="button" value='<%=L"角色模型"%>' tooltip='<%=L"也可以通过电影方块编辑"%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
         <input type="text" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:120px;height:25px;" class="mc_item" />

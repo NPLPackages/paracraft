@@ -103,6 +103,7 @@ end
 function Task:UnloadSceneContext()
 	if(self.sceneContext) then
 		self.sceneContext:close();
+		self.sceneContext = nil;
 	end
 end
 

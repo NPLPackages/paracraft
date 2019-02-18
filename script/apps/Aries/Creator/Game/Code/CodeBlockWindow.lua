@@ -379,8 +379,11 @@ function CodeBlockWindow.OnClickCodeActor()
 			local codeBlock = CodeBlockWindow.GetCodeBlock();
 			if(codeBlock) then
 				codeBlock:HighlightActors();
-				local x, y, z = codeBlock:GetBlockPos();
-				GameLogic.RunCommand(string.format("/take CodeActor {codeblock={%d,%d,%d}, tooltip=%q}", x, y, z, codeBlock:GetBlockName() or ""));
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+				local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+				local task = EditCodeActor:new():Init(CodeBlockWindow.GetCodeEntity());
+				task:Run();
 			end
 		else
 			movieEntity:OpenEditor("entity");

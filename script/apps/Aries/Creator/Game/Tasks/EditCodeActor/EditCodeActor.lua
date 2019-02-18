@@ -10,7 +10,7 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
 local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
-local task = EditCodeActor:new();
+local task = EditCodeActor:new():Init(entityCode);
 task:Run();
 -------------------------------------------------------
 ]]
@@ -38,6 +38,11 @@ EditCodeActor.is_top_level = true;
 function EditCodeActor:ctor()
 end
 
+function EditCodeActor:Init(entityCode)
+	self.entityCode = entityCode;
+	return self;
+end
+
 local page;
 function EditCodeActor.InitPage(Page)
 	page = Page;
@@ -54,16 +59,11 @@ function EditCodeActor:RefreshPage()
 	end
 end
 
-function EditCodeActor:SetItemStack(itemStack)
-	self.itemStack = itemStack;
-end
-
-function EditCodeActor:GetItemStack()
-	return self.itemStack;
-end
-
-
 function EditCodeActor:Run()
+	if(curInstance) then
+		-- always close the previous one
+		curInstance:OnExit();
+	end
 	curInstance = self;
 	self.finished = false;
 	
@@ -72,13 +72,37 @@ function EditCodeActor:Run()
 	self:GetSceneContext():setCaptureMouse(true);
 	
 	self:ShowPage(true);
+	local entityCode = self:GetEntityCode()
+	if(entityCode) then
+		entityCode:RefreshInventoryActors();
+		entityCode:Connect("inventoryChanged", self, self.OnInventoryChanged, "UniqueConnection");
+	end
+
+	EditCodeActor.SetFocusToActor()
+end
+
+function EditCodeActor:OnUnselect()
+	if(not self.isExiting) then
+		self:OnExit();
+	end
 end
 
 function EditCodeActor:OnExit()
+	self.isExiting = true
+	local entityCode = self:GetEntityCode()
+	if(entityCode) then
+		entityCode:Disconnect("inventoryChanged", self, self.OnInventoryChanged);
+	end
 	self:SetFinished();
 	self:UnloadSceneContext();
 	self:ClosePage();
+	local codeblock = self:GetCodeBlock()
+	if(codeblock) then
+		codeblock:RemoveAllInventoryMovieActors();
+	end
+
 	curInstance = nil;
+	self.isExiting = nil;
 end
 
 function EditCodeActor:GetCodeActorItem()
@@ -168,7 +192,8 @@ function EditCodeActor:handleRightClickScene(event, result)
 		local result = SelectionManager:MousePickBlock(true, false, false); 
 		if(result and result.blockX) then
 			local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-			item:TryCreate(self:GetItemStack(), EntityManager.GetPlayer(), x, y, z);
+			x, y, z = BlockEngine:real_min(x+0.5, y, z+0.5)
+			item:CreateActorInstance(self:GetEntityCode(), x, y, z);
 		end
 	end
 end
@@ -195,14 +220,6 @@ function EditCodeActor:keyPressEvent(event)
 		UndoManager.Redo();
 	end
 	self:GetSceneContext():keyPressEvent(event);
-end
-
-function EditCodeActor:SetCodeBlock(codeblock)
-	self.codeblock = codeblock;
-end
-
-function EditCodeActor:GetCodeBlock()
-	return self.codeblock;
 end
 
 function EditCodeActor:GetActorName()
@@ -282,15 +299,29 @@ end
 function EditCodeActor.SetFocusToItemStack(itemStack)
 	if(curItemStack~=itemStack) then
 		curItemStack = itemStack;
-		if(page) then
-			page:Refresh(0.1);
+		local self = EditCodeActor.GetInstance();
+		if(self) then
+			self:RefreshPage()
 		end
+		EditCodeActor.SetFocusToActor();
 	end
-	EditCodeActor.SetFocusToActor();
 end
 
 function EditCodeActor.SetFocusToActor()
-	-- TODO
+	local self = EditCodeActor.GetInstance();
+	if(curItemStack and self) then
+		local entityCode = self:GetEntityCode();
+		if(entityCode) then
+			local slotIndex = entityCode:GetItemStackIndex(curItemStack);
+			if(slotIndex) then
+				local actorItemStackProxy = entityCode:GetCodeActorItemStack(slotIndex)
+				if(actorItemStackProxy) then
+					self.actor = actorItemStackProxy;
+					self:UpdateManipulators()
+				end
+			end
+		end
+	end
 end
 
 function EditCodeActor.GetSelectedItemStack()
@@ -299,9 +330,12 @@ end
 
 
 function EditCodeActor.GetActorInventoryView()
-	local entityCode = EditCodeActor.GetEntityCode()
-	if(entityCode) then
-		return entityCode:GetInventoryView();
+	local self = EditCodeActor.GetInstance();
+	if(self) then
+		local entityCode = self:GetEntityCode()
+		if(entityCode) then
+			return entityCode:GetInventoryView();
+		end
 	end
 end
 
@@ -316,20 +350,47 @@ function EditCodeActor.DS_Actor_Inventory(index)
 	end	
 end
 
-function EditCodeActor.GetEntityCode()
-	local self = EditCodeActor.GetInstance();
-	local codeblock = self:GetCodeBlock()
-	if(codeblock) then
-		return codeblock:GetEntity()
+function EditCodeActor:GetEntityCode()
+	return self.entityCode;
+end
+
+function EditCodeActor:GetCodeBlock()
+	return self:GetEntityCode() and self:GetEntityCode():GetCodeBlock(true);
+end
+
+
+-- whenever the inventory is changed. 
+function EditCodeActor:OnInventoryChanged(slotIndex)
+	if(slotIndex) then
+		-- TODO: refresh page if it is the selected index
 	end
 end
 
+-- create at player position
 function EditCodeActor.OnClickAddActor()
-	local entityCode = EditCodeActor.GetEntityCode()
-	if(entityCode) then
-		local itemStack = entityCode:CreateActorItemStack();
-		if(itemStack) then
-			EditCodeActor.SetFocusToItemStack(itemStack);
+	local self = EditCodeActor.GetInstance();
+	if(self) then
+		local item = self:GetCodeActorItem();
+		if(item) then
+			item:CreateActorInstance(self:GetEntityCode());
+		end
+	end
+end
+
+function EditCodeActor.OnClose()
+	local self = EditCodeActor.GetInstance();
+	if(self) then
+		self:OnExit()
+	end
+end
+
+function EditCodeActor.OnClickTakeActor()
+	local self = EditCodeActor.GetInstance();
+	if(self) then
+		local codeblock = self:GetCodeBlock()
+		if(codeblock) then
+			local x, y, z = codeblock:GetBlockPos();
+			GameLogic.RunCommand(string.format("/take CodeActor {codeblock={%d,%d,%d}, tooltip=%q}", x, y, z, codeblock:GetBlockName() or ""));
 		end
 	end
 end
