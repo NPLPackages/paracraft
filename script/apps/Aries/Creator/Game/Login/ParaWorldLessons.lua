@@ -197,14 +197,18 @@ end
 ParaWorldLessons.settingsFilename = "temp/settings/bShowParaWorldLessons";
 function ParaWorldLessons.IsShowOnStartup()
 	if(ParaWorldLessons.bShowParaWorldLessons == nil) then
-		ParaWorldLessons.bShowParaWorldLessons = true;
-		local file = ParaIO.open(ParaWorldLessons.settingsFilename, "r")
-		if(file:IsValid()) then
-			local text = file:GetText();
-			if(text and text:match("false")) then
-				ParaWorldLessons.bShowParaWorldLessons = false;
+		if(true) then
+			ParaWorldLessons.bShowParaWorldLessons = false;
+		else
+			ParaWorldLessons.bShowParaWorldLessons = true;
+			local file = ParaIO.open(ParaWorldLessons.settingsFilename, "r")
+			if(file:IsValid()) then
+				local text = file:GetText();
+				if(text and text:match("false")) then
+					ParaWorldLessons.bShowParaWorldLessons = false;
+				end
+				file:close();
 			end
-			file:close();
 		end
 	end
 	return ParaWorldLessons.bShowParaWorldLessons;

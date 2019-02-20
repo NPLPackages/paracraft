@@ -25,10 +25,6 @@ block_types.RegisterItemClass("ItemCodeActorInstance", ItemCodeActorInstance);
 function ItemCodeActorInstance:ctor()
 end
 
-function ItemCodeActorInstance:GetMaxCount()
-	return 1;
-end
-
 -- Called whenever this item is equipped and the right mouse button is pressed.
 -- @return the new item stack to put in the position.
 function ItemCodeActorInstance:OnItemRightClick(itemStack, entityPlayer)

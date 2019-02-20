@@ -17,6 +17,8 @@ NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Screen = commonlib.gettable("System.Windows.Screen");
@@ -203,6 +205,12 @@ function CodeBlockWindow.SetCodeEntity(entity)
 	end
 	if(isEntityChanged) then
 		CodeBlockWindow.UpdateCodeEditorStatus()
+
+		if(EditCodeActor.GetInstance() and EditCodeActor.GetInstance():GetEntityCode() ~= entity and entity) then
+			local task = EditCodeActor:new():Init(CodeBlockWindow.GetCodeEntity());
+			task:Run();
+		end
+
 		self:entityChanged(self.entity);
 	end
 	if(not entity) then
@@ -380,8 +388,6 @@ function CodeBlockWindow.OnClickCodeActor()
 			if(codeBlock) then
 				codeBlock:HighlightActors();
 
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
-				local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 				local task = EditCodeActor:new():Init(CodeBlockWindow.GetCodeEntity());
 				task:Run();
 			end

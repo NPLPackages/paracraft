@@ -161,7 +161,15 @@ function ItemCodeActor:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
 		local codeblock = self:GetCodeBlock(itemStack)
-		if(not codeblock) then
+		if(codeblock) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+			local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+			if(EditCodeActor.GetInstance() and EditCodeActor.GetInstance():GetEntityCode()==codeblock:GetEntity()) then
+				return;
+			end
+			local task = EditCodeActor:new():Init(codeblock:GetEntity());
+			task:Run();
+		else
 			self:SelectActor(itemStack);
 		end
 	end

@@ -70,7 +70,7 @@ function EditCodeActor:Run()
 	self:LoadSceneContext();
 	self:GetSceneContext():setMouseTracking(true);
 	self:GetSceneContext():setCaptureMouse(true);
-	
+	curInstance = self;
 	self:ShowPage(true);
 	local entityCode = self:GetEntityCode()
 	if(entityCode) then
@@ -187,6 +187,22 @@ function EditCodeActor:handleLeftClickScene(event, result)
 end
 
 function EditCodeActor:handleRightClickScene(event, result)
+	local result = Game.SelectionManager:MousePickBlock();
+	if(result.blockX) then
+		local blockTemplate = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);
+		if(blockTemplate and blockTemplate.id == block_types.names.CodeBlock) then
+			local codeEntity = BlockEngine:GetBlockEntity(result.blockX,result.blockY,result.blockZ);
+			if(codeEntity) then
+				codeEntity:OpenEditor();
+				return
+			end
+		end
+	end
+
+	-- self:CreateActorInstanceAtMousePos();
+end
+
+function EditCodeActor:CreateActorInstanceAtMousePos()
 	local item = self:GetCodeActorItem();
 	if(item) then
 		local result = SelectionManager:MousePickBlock(true, false, false); 
@@ -316,11 +332,80 @@ function EditCodeActor.SetFocusToActor()
 			if(slotIndex) then
 				local actorItemStackProxy = entityCode:GetCodeActorItemStack(slotIndex)
 				if(actorItemStackProxy) then
+					if(self.actor) then
+						self.actor:Disconnect("valueChanged", EditCodeActor, EditCodeActor.OnActorValueChange, "UniqueConnection");
+					end
 					self.actor = actorItemStackProxy;
+					self.actor:Connect("valueChanged", EditCodeActor, EditCodeActor.OnActorValueChange, "UniqueConnection");
 					self:UpdateManipulators()
+					self:UpdatePageFromActor();
 				end
 			end
 		end
+	end
+end
+
+
+function EditCodeActor:UpdatePageFromActor()
+	local self = EditCodeActor.GetInstance();
+	if(self and page) then
+		if(self.actor) then
+			page:SetValue("name", self.actor:GetField("name"))
+			page:SetValue("startTime", tostring(self.actor:GetField("startTime") or 0))
+			page:SetValue("scaling", tostring(self.actor:GetField("scaling") or 100))
+			local pos = self.actor:GetField("pos")
+			if(pos and pos[1]) then
+				page:SetValue("pos", format("%f,%f,%f", pos[1], pos[2], pos[3]));
+			end
+			page:SetValue("rot", format("%d,%d,%d", self.actor:GetField("yaw") or 0, self.actor:GetField("pitch") or 0, self.actor:GetField("roll") or 0));
+			page:SetValue("userData", self.actor:GetField("userData") or "")
+		else
+			page:SetValue("name", "")
+			page:SetValue("startTime", "")
+			page:SetValue("pos", "")
+			page:SetValue("rot", "")
+			page:SetValue("userData", "")
+			page:SetValue("scaling", "")
+		end
+	end
+end
+
+function EditCodeActor.UpdateActorFromPage()
+	local self = EditCodeActor.GetInstance();
+	if(self and page and self.actor) then
+		self.actor:SetField("name", page:GetValue("name"))
+		local startTime = page:GetValue("startTime") or "";
+		startTime = startTime:match("^%d+");
+		if(startTime) then
+			self.actor:SetField("startTime", tonumber(startTime));
+		end
+		local scaling = page:GetValue("scaling") or "";
+		scaling = scaling:match("^%d+");
+		if(scaling) then
+			self.actor:SetField("scaling", tonumber(scaling));
+		end
+
+		local pos = page:GetValue("pos") or "";
+		local x, y, z = pos:match("^([%d%.]+)[,%s]+([%d%.]+)[,%s]+([%d%.]+)$");
+		if(x and y and z) then
+			self.actor:SetField("pos", {x, y, z});
+		end
+		local rot = page:GetValue("rot") or "";
+		local yaw, pitch, roll = rot:match("^([%d%.]+)[,%s]+([%d%.]+)[,%s]+([%d%.]+)$");
+		if(yaw and pitch and roll) then
+			self.actor:SetField("yaw", tonumber(yaw) or 0);
+			self.actor:SetField("pitch", tonumber(pitch) or 0);
+			self.actor:SetField("roll", tonumber(roll) or 0);
+		end
+
+		self.actor:SetField("userData", page:GetValue("userData")) 
+	end
+end
+
+function EditCodeActor:OnActorValueChange()
+	local self = EditCodeActor.GetInstance();
+	if(self and self.actor and page) then
+		self:UpdatePageFromActor();
 	end
 end
 
@@ -381,6 +466,8 @@ function EditCodeActor.OnClose()
 	local self = EditCodeActor.GetInstance();
 	if(self) then
 		self:OnExit()
+	elseif(page) then
+		page:CloseWindow();
 	end
 end
 
