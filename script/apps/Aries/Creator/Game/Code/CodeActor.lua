@@ -66,6 +66,12 @@ end
 function Actor:ApplyInitParams()
 	local pos = self:GetInitParam("pos")
 	if(pos) then
+		local time = self:GetInitParam("startTime") or 0;
+		if(self:GetTime() ~= time) then
+			self:SetTime(time);
+			self:FrameMove(0);
+		end
+
 		local entity = self:GetEntity();
 		if(entity) then
 			if(pos[1] and pos[2] and pos[3]) then

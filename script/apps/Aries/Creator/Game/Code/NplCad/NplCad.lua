@@ -18,7 +18,8 @@ local all_cmds = {};
 local all_cmds_map = {};
 NplCad.categories = {
     {name = "Shapes", text = L"图形", colour = "#764bcc", },
-    {name = "ShapeOperators", text = L"图形操作", colour = "#0078d7", },
+    {name = "ShapeOperators", text = L"修改", colour = "#0078d7", },
+    {name = "ObjectName", text = L"对象名称", colour = "#ff8c1a", custom="VARIABLE", },
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
@@ -51,22 +52,21 @@ function NplCad.AppendAll()
     local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
     local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
 
-    -- Using CodeCad definitions temporarily
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Control.lua");
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Data.lua");
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCad/CodeCadDef/CodeCadDef_Math.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Control.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Data.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Math.lua");
 
-    local CodeCadDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Control");
-    local CodeCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Data");
-    local CodeCadDef_Math = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCad.CodeCadDef_Math");
+    local NplCadDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Control");
+    local NplCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Data");
+    local NplCadDef_Math = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Math");
 	
 
 	local all_source_cmds = {
 		NplCadDef_ShapeOperators.GetCmds(),
 		NplCadDef_Shapes.GetCmds(),
-		CodeCadDef_Control.GetCmds(),
-		CodeCadDef_Data.GetCmds(),
-		CodeCadDef_Math.GetCmds(),
+		NplCadDef_Control.GetCmds(),
+		NplCadDef_Data.GetCmds(),
+		NplCadDef_Math.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);

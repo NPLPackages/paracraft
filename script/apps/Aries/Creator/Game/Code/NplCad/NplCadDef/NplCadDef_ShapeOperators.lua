@@ -16,20 +16,41 @@ local cmds = {
 
 {
 	type = "createNode", 
-	message0 = L"createNode %1",
+	message0 = L"创建 %1 %2 %3",
     arg0 = {
-       {
-			name = "left",
-			type = "field_input",
-			text = "object1",
+        {
+			name = "var_name",
+			type = "field_variable",
+			variable = "object0",
+			variableTypes = {""},
+			text = "object0",
+		},
+--        {
+--			name = "name",
+--			type = "input_value",
+--            shadow = { type = "object_label", value = "object1",},
+--			text = "object1", 
+--		},
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"合并", "true" },
+				{ L"不合并", "false" },
+			},
 		},
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
 	nextStatement = true,
-	func_description = 'createNode("%s")',
+	func_description = 'createNode("%s",%s,"%s")',
 	ToNPL = function(self)
     return ""
 	end,
@@ -38,12 +59,18 @@ local cmds = {
 },
 {
 	type = "cloneNodeByName", 
-	message0 = L"cloneNodeByName %1 %2 %3",
+	message0 = L"%1 复制 %2 %3",
     arg0 = {
         {
-			name = "left",
-			type = "field_input",
-			text = "object1",
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
 		},
          {
 			name = "color",
@@ -51,19 +78,14 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
-		},
+        
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,
-	func_description = 'cloneNodeByName("%s",%s,%s)',
+	func_description = 'cloneNodeByName(%s,%s,%s)',
 	ToNPL = function(self)
     return ""
 	end,
@@ -72,21 +94,28 @@ local cmds = {
 },
 {
 	type = "cloneNode", 
-	message0 = L"cloneNode %1",
+	message0 = L"%1 复制 %2",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
          {
 			name = "color",
 			type = "input_value",
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,
-	func_description = 'cloneNode(%s)',
+	func_description = 'cloneNode(%s,%s)',
 	ToNPL = function(self)
     return ""
 	end,
@@ -95,35 +124,12 @@ local cmds = {
 },
 {
 	type = "deleteNode", 
-	message0 = L"deleteNode %1",
+	message0 = L"删除 %1",
     arg0 = {
-        {
-			name = "left",
-			type = "field_input",
-			text = "object1",
-		},
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	func_description = 'deleteNode("%s")',
-	ToNPL = function(self)
-    return ""
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "group", 
-	message0 = L"group %1",
-    arg0 = {
-        {
-			name = "color",
+       {
+			name = "name",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+			text = "", 
 		},
 	},
 	category = "ShapeOperators", 
@@ -131,7 +137,7 @@ local cmds = {
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,
-	func_description = 'group(%s)',
+	func_description = 'deleteNode(%s)',
 	ToNPL = function(self)
     return ""
 	end,
@@ -140,7 +146,7 @@ local cmds = {
 },
 {
 	type = "move", 
-	message0 = L"move( x %1 y %2 z %3)",
+	message0 = L"移动 x %1 y %2 z %3",
     arg0 = {
         {
 			name = "x",
@@ -176,35 +182,28 @@ local cmds = {
 },
 
 {
-	type = "scale", 
-	message0 = L"scale( x %1 y %2 z %3)",
+	type = "rotate", 
+	message0 = L"旋转 %1 %2 度",
     arg0 = {
         {
-			name = "x",
+			name = "axis",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
+            shadow = { type = "axis", value = "x",},
+			text = "x", 
 		},
         {
-			name = "y",
+			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
 		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
-		},
-        
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'scale(%s,%s,%s)',
+	func_description = 'rotate(%s,%s)',
 	ToNPL = function(self)
 		return ""
 	end,
@@ -213,8 +212,8 @@ local cmds = {
 },
 
 {
-	type = "rotate", 
-	message0 = L"rotate around %1 by %2 degrees from pivot x %3 y %4 z %5",
+	type = "rotateFromPivot", 
+	message0 = L"旋转 %1 %2 度 中心点 x %3 y %4 z %5",
     arg0 = {
         {
 			name = "axis",
@@ -253,14 +252,13 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'rotate(%s,%s,%s,%s,%s)',
+	func_description = 'rotateFromPivot(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return ""
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-
 {
 	type = "boolean_op", 
 	message0 = L"%1",
@@ -270,13 +268,13 @@ local cmds = {
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ L"union", "union" },
-				{ L"difference", "difference" },
-				{ L"intersection", "intersection" },
+                { L"+", "union" },
+				{ L"-", "difference" },
+				{ L"x", "intersection" },
 			},
 		},
 	},
-	--hide_in_toolbox = true,
+	hide_in_toolbox = true,
     output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -303,7 +301,7 @@ local cmds = {
 			},
 		},
 	},
-	--hide_in_toolbox = true,
+	hide_in_toolbox = true,
     output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 

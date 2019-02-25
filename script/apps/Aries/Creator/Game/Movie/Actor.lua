@@ -593,6 +593,14 @@ function Actor:UpsertKeyFrame(key_time, data)
 	self:EndModify();
 end
 
+-- paste all key frames between [fromTime, toTime] to time
+function Actor:PasteKeyFramesInRange(time, fromTime, toTime)
+	self:BeginModify();
+	self.TimeSeries:PasteKeyFramesInRange(time, fromTime, toTime);
+	self:SetModified();
+	self:EndModify();
+end
+
 -- move keyframe from from_keytime to keytime
 function Actor:MoveKeyFrame(keytime, from_keytime)
 	self:BeginModify();

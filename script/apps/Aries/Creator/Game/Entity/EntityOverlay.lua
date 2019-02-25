@@ -116,6 +116,9 @@ function Entity:Destroy()
 	Entity._super.Destroy(self);
 end
 
+function Entity:SetHighlight(bHighlight)
+end
+
 function Entity:SetScaling(v)
 	self.scaling = v;
 end

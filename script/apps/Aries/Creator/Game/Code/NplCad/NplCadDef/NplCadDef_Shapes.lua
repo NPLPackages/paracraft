@@ -11,11 +11,54 @@ local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Np
 ]]
 local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
 local cmds = {
-
 {
 	type = "cube", 
-	message0 = L"cube x %1 y %2 z %3 color %4 %5",
+	message0 = L" %1 正方体 %2 %3",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "size",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+         
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'cube(%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('cube(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "box", 
+	message0 = L" %1 立方体 长 %2 宽 %3 高 %4 %5",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "x",
 			type = "input_value",
@@ -40,12 +83,7 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
-		},
+        
          
 	},
     previousStatement = true,
@@ -53,9 +91,9 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'cube(%s,%s,%s,%s,%s)',
+	func_description = 'box(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cube(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('box(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -63,8 +101,14 @@ local cmds = {
 
 {
 	type = "sphere", 
-	message0 = L"sphere radius %1 color %2 %3",
+	message0 = L"%1 球体 半径 %2 %3",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "radius",
 			type = "input_value",
@@ -76,12 +120,6 @@ local cmds = {
 			type = "input_value",
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
-		},
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
 		},
         
 	},
@@ -99,8 +137,14 @@ local cmds = {
 },
 {
 	type = "cylinder", 
-	message0 = L"cylinder radius %1 height %2 color %3 %4",
+	message0 = L"%1 柱体 半径 %2 高 %3 %4",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "radius",
 			type = "input_value",
@@ -119,12 +163,7 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
-		},
+        
         
 	},
     previousStatement = true,
@@ -134,7 +173,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'cylinder(%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cylinder(%s,%s,"%s")\n', self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
+		return string.format('cylinder(%s,%s,"%s","%s")\n', self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -144,8 +183,14 @@ local cmds = {
 
 {
 	type = "cone", 
-	message0 = L"cone radius1 %1 radius2 %2 height %3 color %4",
+	message0 = L"%1 圆锥体 顶部半径 %2 底部半径 %3 高 %4 %5",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "radius1",
 			type = "input_value",
@@ -171,15 +216,16 @@ local cmds = {
 			text = "#ff0000", 
 		},
         
+        
 	},
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'cone(%s,%s,%s,%s)',
+	func_description = 'cone(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cone(%s,%s,%s,"%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'));
+		return string.format('cone(%s,%s,%s,"%s","%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -187,8 +233,14 @@ local cmds = {
 
 {
 	type = "torus", 
-	message0 = L"torus radius1 %1 radius2 %2 color %3",
+	message0 = L"%1 圆环 半径 %2 管道半径 %3 %4",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "radius1",
 			type = "input_value",
@@ -214,9 +266,9 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'torus(%s,%s,%s)',
+	func_description = 'torus(%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('torus(%s,%s,"%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'));
+		return string.format('torus(%s,%s,"%s","%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'), self:getFieldValue('op'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -224,8 +276,14 @@ local cmds = {
 
 {
 	type = "prism", 
-	message0 = L"prism p %1 c %2 h %3 color %4",
+	message0 = L"%1 棱柱 边 %2 半径 %3 高 %4 %5",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "p",
 			type = "input_value",
@@ -251,90 +309,6 @@ local cmds = {
 			text = "#ff0000", 
 		},
         
-	},
-    previousStatement = true,
-	nextStatement = true,
-	category = "Shapes", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = 'prism(%s,%s,%s,%s)',
-	ToNPL = function(self)
-		return string.format('prism(%s,%s,%s,"%s")\n', self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-
-{
-	type = "wedge", 
-	message0 = L"wedge xmin %1 ymin %2 zmin %3 x2min %4 z2min %5 xmax %6 ymax %7 zmax %8 x2max %9 z2max %10 color %11",
-    arg0 = {
-        {
-			name = "x1",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y1",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z1",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "x3",
-			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
-			text = 2, 
-		},
-        {
-			name = "z3",
-			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
-			text = 2, 
-		},
-        {
-			name = "x2",
-			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
-		},
-        {
-			name = "y2",
-			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
-		},
-        {
-			name = "z2",
-			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
-		},
-        {
-			name = "x4",
-			type = "input_value",
-            shadow = { type = "math_number", value = 8,},
-			text = 8, 
-		},
-        {
-			name = "z4",
-			type = "input_value",
-            shadow = { type = "math_number", value = 8,},
-			text = 8, 
-		},
-		{
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
         
 	},
     previousStatement = true,
@@ -342,13 +316,115 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = 'wedge(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+	func_description = 'prism(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('wedge(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s")\n', 
+		return string.format('prism(%s,%s,%s,"%s","%s")\n', self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'), self:getFieldValue('op'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+
+{
+	type = "ellipsoid", 
+	message0 = L"%1 椭圆体 高半径 %2 宽半径 %3 长半径 %4 %5",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "r_z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "r_x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 4,},
+			text = 4, 
+		},
+        {
+			name = "r_y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+       
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'ellipsoid(%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('ellipsoid(%s,%s,%s,"%s","%s")\n', 
+            self:getFieldValue('r1'), self:getFieldValue('r2'), self:getFieldValue('r3'),
+            self:getFieldValue('op'),
+            self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "wedge", 
+	message0 = L"%1 楔体 长 %2 宽 %3 深度 %4 %5",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "h",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+       
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'wedge(%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('wedge(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s","%s")\n', 
             self:getFieldValue('x1'), self:getFieldValue('y1'), self:getFieldValue('z1'),
             self:getFieldValue('x3'),self:getFieldValue('z3'),self:getFieldValue('x2'), 
             self:getFieldValue('y2'),self:getFieldValue('z2'),self:getFieldValue('x4'), 
             self:getFieldValue('z4'), 
+            self:getFieldValue('op'), 
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -356,50 +432,6 @@ local cmds = {
     ]]}},
 },
 
-{
-	type = "ellipsoid", 
-	message0 = L"ellipsoid r1 %1 r2 %2 r3 %3 color %4",
-    arg0 = {
-        {
-			name = "r1",
-			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
-			text = 2, 
-		},
-        {
-			name = "r2",
-			type = "input_value",
-            shadow = { type = "math_number", value = 4,},
-			text = 4, 
-		},
-        {
-			name = "r3",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-		{
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
-        
-	},
-    previousStatement = true,
-	nextStatement = true,
-	category = "Shapes", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = 'ellipsoid(%s,%s,%s,%s)',
-	ToNPL = function(self)
-		return string.format('ellipsoid(%s,%s,%s,"%s")\n', 
-            self:getFieldValue('r1'), self:getFieldValue('r2'), self:getFieldValue('r3'),
-            self:getFieldValue('color'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
 
 {
 	type = "point", 
@@ -431,6 +463,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -494,6 +527,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -534,6 +568,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -567,6 +602,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -606,6 +642,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -669,6 +706,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -714,6 +752,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -753,6 +792,7 @@ local cmds = {
 		},
         
 	},
+	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 

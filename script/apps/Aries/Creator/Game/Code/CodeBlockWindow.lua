@@ -49,8 +49,8 @@ function CodeBlockWindow.Show(bShow)
 	
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
-			self.width, self.height, self.margin_right, self.bottom = self:CalculateMargins();
-			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, 0, self.width, self.bottom);
+			self.width, self.height, self.margin_right, self.bottom, self.top = self:CalculateMargins();
+			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, self.top, self.width, self.bottom);
 			_this.zorder = -2;
 			_this.background="";
 			local refreshTimer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -91,7 +91,7 @@ function CodeBlockWindow:OnLayoutRequested(requesterName)
 	end
 end
 
--- @return margin_right and bottom
+-- @return width, height, margin_right, margin_bottom, margin_top
 function CodeBlockWindow:CalculateMargins()
 	local MAX_3DCANVAS_WIDTH = 800;
 	local MIN_CODEWINDOW_WIDTH = 200+350;
@@ -106,23 +106,25 @@ function CodeBlockWindow:CalculateMargins()
 
 	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
 	local margin_right = math.floor(width * Screen:GetUIScaling()[1]);
-	return width, Screen:GetHeight()-bottom, margin_right, bottom;
+	local margin_top = math.floor(viewport:GetTop() / Screen:GetUIScaling()[2]);
+	return width, Screen:GetHeight()-bottom-margin_top, margin_right, bottom, margin_top;
 end
 
 function CodeBlockWindow:OnViewportChange()
 	if(CodeBlockWindow.IsVisible()) then
 		-- TODO: use a scene/ui layout manager here
-		local width, height, margin_right, bottom = self:CalculateMargins();
+		local width, height, margin_right, bottom, top = self:CalculateMargins();
 		if(self.width ~= width or self.height ~= height) then
 			self.width = width;
 			self.height = height;
 			self.margin_right = margin_right;
 			self.bottom = bottom;
+			self.top = top;
 			local viewport = ViewportManager:GetSceneViewport();
 			viewport:SetMarginRight(self.margin_right);
 			viewport:SetMarginRightHandler(self);
 			local _this = ParaUI.GetUIObject(code_block_window_name);
-			_this:Reposition("_mr", 0, 0, self.width, self.bottom);
+			_this:Reposition("_mr", 0, self.top, self.width, self.bottom);
 			if(page) then
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();

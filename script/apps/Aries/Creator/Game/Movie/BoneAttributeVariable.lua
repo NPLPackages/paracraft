@@ -204,3 +204,12 @@ function BoneAttributeVariable:GetKeys_Iter(anim, TimeFrom, TimeTo)
 		return function() end;	
 	end
 end
+
+
+-- paste all key frames between [fromTime, toTime] to time
+function BoneAttributeVariable:PasteKeyFramesInRange(time, fromTime, toTime)
+	if(self:GetKeyNum()>0) then
+		self:CreateGetTimeVar():PasteKeyFramesInRange(time, fromTime, toTime);
+		self:LoadFromTimeVar();
+	end
+end

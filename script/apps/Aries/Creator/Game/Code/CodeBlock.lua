@@ -631,6 +631,7 @@ function CodeBlock:Run(onFinishedCallback)
 		self.isLoaded = true;
 		self:stateChanged();
 		local actor = self:FindNearbyActor() or self:CreateActor();
+		self:RefreshAllInventoryActors();
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
 		return false;
 	end

@@ -124,7 +124,11 @@ function CodeBlocklySerializer.GetCategoryStr(category)
     local text = category.text;
     local name = category.name;
     local colour = category.colour or "#000000";
-	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' >\n",text,name,colour,colour);
+    local custom = category.custom or "";
+    if(custom and custom ~= "")then
+        custom = string.format("custom='%s'",custom);
+    end
+	local s = string.format("<category name='%s' id='%s' colour='%s' secondaryColour='%s' %s >\n",text,name,colour,colour,custom);
 	local cmd
     local bCreateVarBtn = false;
 	for __,cmd in ipairs(all_cmds) do
@@ -328,6 +332,8 @@ function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
 	s = string.format([[    var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '""';]],var_name,name)
 	elseif(type == "field_variable")then
 		s = string.format([[    var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,name)
+    elseif(type == "field_variable_getter")then
+		s = string.format([[    var %s = block.getField('%s').getText();]],var_name,name);
 	else
 		s = string.format([[    var %s = block.getFieldValue('%s');]],var_name,name);
 	end

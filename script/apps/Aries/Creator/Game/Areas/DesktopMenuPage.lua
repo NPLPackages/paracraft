@@ -79,6 +79,25 @@ end
 function DesktopMenuPage.TogglePinned()
 	DesktopMenuPage.IsPinned = not DesktopMenuPage.IsPinned;
 	DesktopMenuPage.Refresh();
+
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local viewport = ViewportManager:GetSceneViewport();
+	if(DesktopMenuPage.IsPinned) then
+		local height = 32;
+		if(viewport:GetMarginTopHandler() == nil) then
+			viewport:SetTop(math.floor(32 * (Screen:GetUIScaling()[2])));
+			viewport:SetMarginTopHandler(DesktopMenuPage);
+		end
+	else
+		viewport:SetTop(0);
+		if(viewport:GetMarginTopHandler() == DesktopMenuPage) then
+			viewport:SetMarginTopHandler(nil);
+		end
+	end
+
 	if(not DesktopMenuPage.IsPinned) then
 		DesktopMenuPage.ActivateMenu(false);
 	end

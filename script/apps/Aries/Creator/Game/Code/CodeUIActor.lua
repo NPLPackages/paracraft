@@ -46,6 +46,41 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
+function Actor:ApplyInitParams()
+	local pos = self:GetInitParam("pos")
+	if(pos) then
+		local time = self:GetInitParam("startTime") or 0;
+		if(self:GetTime() ~= time) then
+			self:SetTime(time);
+			self:FrameMove(0);
+		end
+
+		local entity = self:GetEntity();
+		if(entity) then
+			if(pos[1] and pos[2] and pos[3]) then
+				self:SetBlockPos(pos[1], pos[2], pos[3]);
+			end
+
+			local yaw = self:GetInitParam("yaw")
+			if(yaw) then
+				entity:SetFacing(yaw*3.14/180);
+			end
+			local pitch = self:GetInitParam("pitch")
+			if(pitch) then
+				entity:SetPitch(pitch*3.14/180);
+			end
+			local roll = self:GetInitParam("roll")
+			if(roll) then
+				entity:SetRoll(roll*3.14/180);
+			end
+
+			local scaling = self:GetInitParam("scaling")
+			if(scaling) then
+				entity:SetScaling(scaling/100);
+			end
+		end
+	end
+end
 
 function Actor:IsActorPickingEnabled()
 	return self.enableActorPicking;

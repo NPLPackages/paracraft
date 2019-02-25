@@ -39,9 +39,6 @@ Other show filters:
 		local name, bIsShow;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		bIsShow, cmd_text = CmdParser.ParseBool(cmd_text);
-		if(bIsShow == nil) then
-			bIsShow = true;
-		end
 		name = name or "";
 
 		-- apply the show filter
@@ -65,6 +62,9 @@ Other show filters:
 		elseif(name == "touch") then
 			GameLogic.options:ShowTouchPad(true);
 		elseif(name == "terrain") then
+			if(bIsShow == nil) then
+				bIsShow = true;
+			end
 			if(bIsShow) then
 				GameLogic.RunCommand("/terrain -show")
 			else
@@ -73,6 +73,9 @@ Other show filters:
 		elseif(name == "player") then
 			EntityManager.GetPlayer():SetVisible(true);
 		elseif(name == "physics") then
+			if(bIsShow == nil) then
+				bIsShow = true;
+			end
 			ParaScene.GetAttributeObject():SetField("PhysicsDebugDrawMode", bIsShow and -1 or 0);
 		elseif(name == "mod" or name=="plugin") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");

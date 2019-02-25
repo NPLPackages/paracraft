@@ -245,3 +245,10 @@ function TimeSeries:GetLastTime()
 	end
 	return lastTime;
 end
+
+-- paste all key frames between [fromTime, toTime] to time
+function TimeSeries:PasteKeyFramesInRange(time, fromTime, toTime)
+	for k,v in pairs(self.data) do
+		v:PasteKeyFramesInRange(time, fromTime, toTime);
+	end
+end

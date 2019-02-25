@@ -106,6 +106,12 @@ function MultiAnimBlock:RemoveKeysInTimeRange(fromTime, toTime)
 	end
 end
 
+-- paste all key frames between [fromTime, toTime] to time
+function MultiAnimBlock:PasteKeyFramesInRange(time, fromTime, toTime)
+	for i=1, #(self.variables) do
+		self.variables[i]:PasteKeyFramesInRange(time, fromTime, toTime)
+	end
+end
 
 function MultiAnimBlock:TrimEnd(time)
 	for i=1, #(self.variables) do

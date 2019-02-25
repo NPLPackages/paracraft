@@ -29,6 +29,7 @@ local standard_keylist = {
 	{name="DeleteAllKeys", text=L"删除全部关键帧"},
 	{name="ShiftKeyTime", text=L"平移右侧所有帧的时间..."}, 
 	{name="CopyKey", text=L"复制"},
+	{name="CopyInRange", text=L"复制区间"},
 	{name="PasteKey", text=L"粘贴"},
 	{name="MoveKeyTime", text=L"设置时间..."}, 
 };
@@ -36,7 +37,14 @@ local standard_keylist = {
 function KeyFramePopupMenu.SetCurrentVar(time, var, actor)
 	KeyFramePopupMenu.time = time;
 	KeyFramePopupMenu.var = var;
-	KeyFramePopupMenu.actor = actor;
+	if(KeyFramePopupMenu.actor~=actor) then
+		KeyFramePopupMenu.actor = actor;
+		KeyFramePopupMenu.last_key_name = nil
+		KeyFramePopupMenu.copyInRangeStarted = nil
+		KeyFramePopupMenu.copy_from_time = nil
+		KeyFramePopupMenu.copy_to_time = nil
+		KeyFramePopupMenu.last_key_data = nil
+	end
 end
 
 -- show the popup menu
@@ -67,10 +75,26 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 				local text = item.text or item.name;
 				if(item.name == "PasteKey") then
 					if(KeyFramePopupMenu.last_key_name) then
-						text = format("%s %s:%s", text, KeyFramePopupMenu.last_key_name, commonlib.serialize_in_length(KeyFramePopupMenu.last_key_data, 10));
+						if(KeyFramePopupMenu.copy_from_time and KeyFramePopupMenu.copy_to_time) then
+							text = format(L"粘贴区间: %d-%d", KeyFramePopupMenu.copy_from_time,KeyFramePopupMenu.copy_to_time);
+						elseif(KeyFramePopupMenu.last_key_data) then
+							text = format("%s %s:%s", text, KeyFramePopupMenu.last_key_name, commonlib.serialize_in_length(KeyFramePopupMenu.last_key_data, 10));
+						else
+							text = nil;
+						end
+					else
+						text = nil;
+					end
+				elseif(item.name == "CopyInRange") then
+					if(not KeyFramePopupMenu.copyInRangeStarted) then
+						text = format("%s: 开始时间%d", text, time);
+					elseif(KeyFramePopupMenu.copyInRangeStarted and KeyFramePopupMenu.copy_from_time) then
+						text = format("%s: %d-%d", text, KeyFramePopupMenu.copy_from_time, time);
 					end
 				end
-				node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }));
+				if(text) then
+					node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }))
+				end
 			end
 			ctl.height = (#itemList) * 26 + 4;
 		end
@@ -144,11 +168,32 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 		if(var and actor) then
 			KeyFramePopupMenu.last_key_data = var:getValue(time);
 			KeyFramePopupMenu.last_key_name = var.name;
+			KeyFramePopupMenu.copyInRangeStarted = nil;
+			KeyFramePopupMenu.copy_from_time = nil;
+			KeyFramePopupMenu.copy_to_time = nil;
+		end
+	elseif(node.Name == "CopyInRange") then	
+		if(var and actor) then
+			KeyFramePopupMenu.last_key_name = var.name;
+			KeyFramePopupMenu.last_key_data = nil;
+			if(not KeyFramePopupMenu.copyInRangeStarted) then
+				KeyFramePopupMenu.copy_from_time = time;
+				KeyFramePopupMenu.copyInRangeStarted = true;
+			else
+				KeyFramePopupMenu.copy_to_time = time;
+				KeyFramePopupMenu.copyInRangeStarted = false;
+			end
 		end
 	elseif(node.Name == "PasteKey") then	
 		if(var and actor and KeyFramePopupMenu.last_key_name == var.name) then
 			actor:BeginModify();
-			var:UpsertKeyFrame(time, KeyFramePopupMenu.last_key_data);
+			if(KeyFramePopupMenu.last_key_data) then
+				-- copy single key
+				var:UpsertKeyFrame(time, KeyFramePopupMenu.last_key_data);
+			elseif(KeyFramePopupMenu.copy_from_time and KeyFramePopupMenu.copy_to_time) then
+				-- a range of all key frames
+				var:PasteKeyFramesInRange(time, KeyFramePopupMenu.copy_from_time, KeyFramePopupMenu.copy_to_time);
+			end
 			actor:EndModify();
 			MovieUISound.PlayAddKey();
 		end

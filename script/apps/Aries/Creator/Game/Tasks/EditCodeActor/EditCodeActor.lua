@@ -17,6 +17,8 @@ task:Run();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
+NPL.load("(gl)script/ide/System/Util/Binding/Bindings.lua");
+local Binding = commonlib.gettable("System.Util.Binding");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
@@ -143,7 +145,7 @@ end
 
 function EditCodeActor:ShowPage(bShow)
 	if(not page) then
-		local width,height = 200, 300;
+		local width,height = 200, 330;
 		local params = {
 				url = "script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.html", 
 				name = "EditCodeActor.ShowPage", 
@@ -188,6 +190,18 @@ end
 
 function EditCodeActor:handleRightClickScene(event, result)
 	local result = Game.SelectionManager:MousePickBlock();
+	if(result.entity) then
+		if(result.entity.GetActor) then
+			local actor = result.entity:GetActor()
+			if(actor and actor.codeActorItemStack) then
+				local item = actor.codeActorItemStack;
+				if(item.entityCode == self:GetEntityCode()) then
+					EditCodeActor.SetFocusToItemStack(item:GetItemStack())
+					return	
+				end
+			end
+		end
+	end
 	if(result.blockX) then
 		local blockTemplate = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);
 		if(blockTemplate and blockTemplate.id == block_types.names.CodeBlock) then
@@ -350,15 +364,12 @@ function EditCodeActor:UpdatePageFromActor()
 	local self = EditCodeActor.GetInstance();
 	if(self and page) then
 		if(self.actor) then
-			page:SetValue("name", self.actor:GetField("name"))
-			page:SetValue("startTime", tostring(self.actor:GetField("startTime") or 0))
-			page:SetValue("scaling", tostring(self.actor:GetField("scaling") or 100))
-			local pos = self.actor:GetField("pos")
-			if(pos and pos[1]) then
-				page:SetValue("pos", format("%f,%f,%f", pos[1], pos[2], pos[3]));
-			end
-			page:SetValue("rot", format("%d,%d,%d", self.actor:GetField("yaw") or 0, self.actor:GetField("pitch") or 0, self.actor:GetField("roll") or 0));
-			page:SetValue("userData", self.actor:GetField("userData") or "")
+			Binding.StringToString(self.actor, "name", nil, page, "name", "");
+			Binding.StringToString(self.actor, "userData", nil, page, "userData", "");
+			Binding.NumberToString(self.actor, "startTime", nil, page, "startTime", "0", nil, "int", 0);
+			Binding.NumberToString(self.actor, "scaling", nil, page, "scaling", "100", 0.001, nil, 0);
+			Binding.PosVec3ToString(self.actor, "pos", nil, page, "pos", nil, 0.01);
+			Binding.XYZToString(self.actor, "yaw", "pitch", "roll", nil, page, "rot", "0,0,0", 0.01, "int");
 		else
 			page:SetValue("name", "")
 			page:SetValue("startTime", "")
@@ -373,32 +384,12 @@ end
 function EditCodeActor.UpdateActorFromPage()
 	local self = EditCodeActor.GetInstance();
 	if(self and page and self.actor) then
-		self.actor:SetField("name", page:GetValue("name"))
-		local startTime = page:GetValue("startTime") or "";
-		startTime = startTime:match("^%d+");
-		if(startTime) then
-			self.actor:SetField("startTime", tonumber(startTime));
-		end
-		local scaling = page:GetValue("scaling") or "";
-		scaling = scaling:match("^%d+");
-		if(scaling) then
-			self.actor:SetField("scaling", tonumber(scaling));
-		end
-
-		local pos = page:GetValue("pos") or "";
-		local x, y, z = pos:match("^([%d%.]+)[,%s]+([%d%.]+)[,%s]+([%d%.]+)$");
-		if(x and y and z) then
-			self.actor:SetField("pos", {x, y, z});
-		end
-		local rot = page:GetValue("rot") or "";
-		local yaw, pitch, roll = rot:match("^([%d%.]+)[,%s]+([%d%.]+)[,%s]+([%d%.]+)$");
-		if(yaw and pitch and roll) then
-			self.actor:SetField("yaw", tonumber(yaw) or 0);
-			self.actor:SetField("pitch", tonumber(pitch) or 0);
-			self.actor:SetField("roll", tonumber(roll) or 0);
-		end
-
-		self.actor:SetField("userData", page:GetValue("userData")) 
+		Binding.StringToString(page, "name", "", self.actor, "name", nil);
+		Binding.StringToString(page, "userData", "", self.actor, "userData", nil);
+		Binding.StringToNumber(page, "startTime", "0", self.actor, "startTime", nil, nil, "int", 0);
+		Binding.StringToNumber(page, "scaling", "100", self.actor, "scaling", nil, 0.01, nil, 0);
+		Binding.StringToPosVec3(page, "pos", nil, self.actor, "pos", nil, 0.01);
+		Binding.StringToXYZ(page, "rot", "0,0,0", self.actor, "yaw", "pitch", "roll", nil, 0.01, "int");
 	end
 end
 

@@ -109,6 +109,8 @@ function CodeActorItemStack:CreateMovieActor()
 		if(item and item.CreateActorFromItemStack) then
 			local actor = item:CreateActorFromItemStack(itemStack, movieEntity, false, "ActorForEditor_");
 			if(actor) then
+				-- keep a week reference here for EditCodeActor's right click scene picking
+				actor.codeActorItemStack = self;
 				self:ApplyInitParams(actor);
 				return actor;
 			end
