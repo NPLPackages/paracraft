@@ -118,16 +118,38 @@ function NplCad.InstallMethods(codeAPI, shape)
 	end
 end
 
+function NplCad.RefreshFile(filename)
+	if(filename and ParaIO.DoesFileExist(filename)) then
+		local function filterFunc(shouldRefresh, fullname)
+			if(shouldRefresh and filename:match("[^\\/]+$")==fullname:match("[^\\/]+$")) then
+				LOG.std(nil, "debug", "NplCAD", "skip refresh disk file %s", fullname);
+				return false
+			else
+				return shouldRefresh;
+			end
+		end
+		GameLogic.GetFilters():add_filter("shouldRefreshWorldFile", filterFunc);
+		ParaAsset.LoadParaX("", filename):UnloadAsset()
+		commonlib.TimerManager.SetTimeout(function()  
+			GameLogic.GetFilters():remove_filter("shouldRefreshWorldFile", filterFunc);	
+		end, 5000)
+	end
+end
+
+
+
 function NplCad.GetCode(code, filename)
-    return format([[
-        local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
-        local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
-        ShapeBuilder.create();
-		local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
-		NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
-        %s
-        NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
-    ]],code, filename)
+    return string.format([[
+setActorValue("assetfile", %q)
+local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
+local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
+ShapeBuilder.create();
+local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
+%s
+NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
+NplCad.RefreshFile(%q)
+]], filename, code, filename, filename)
 end
 
 

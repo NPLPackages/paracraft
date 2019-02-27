@@ -43,7 +43,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'cube(%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cube(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('cube("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('size'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -93,7 +93,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'box(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('box(%s,%s,%s,"%s","%s")\n', self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('box("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -130,7 +130,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'sphere(%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('sphere(%s,"%s","%s")\n', self:getFieldValue('radius'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('sphere("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -173,7 +173,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'cylinder(%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cylinder(%s,%s,"%s","%s")\n', self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('cylinder("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -225,7 +225,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'cone(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('cone(%s,%s,%s,"%s","%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('cone("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -268,7 +268,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'torus(%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('torus(%s,%s,"%s","%s")\n', self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('torus("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -318,7 +318,7 @@ local cmds = {
 	canRun = false,
 	func_description = 'prism(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('prism(%s,%s,%s,"%s","%s")\n', self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'), self:getFieldValue('op'));
+		return string.format('prism("%s",%s,%s,%s,"%s")\n',self:getFieldValue('op'), self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -368,9 +368,9 @@ local cmds = {
 	canRun = false,
 	func_description = 'ellipsoid(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('ellipsoid(%s,%s,%s,"%s","%s")\n', 
-            self:getFieldValue('r1'), self:getFieldValue('r2'), self:getFieldValue('r3'),
+		return string.format('ellipsoid("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'),
+            self:getFieldValue('r1'), self:getFieldValue('r2'), self:getFieldValue('r3'),
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -419,12 +419,9 @@ local cmds = {
 	canRun = false,
 	func_description = 'wedge(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('wedge(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s","%s")\n', 
-            self:getFieldValue('x1'), self:getFieldValue('y1'), self:getFieldValue('z1'),
-            self:getFieldValue('x3'),self:getFieldValue('z3'),self:getFieldValue('x2'), 
-            self:getFieldValue('y2'),self:getFieldValue('z2'),self:getFieldValue('x4'), 
-            self:getFieldValue('z4'), 
+        return string.format('wedge("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'), 
+            self:getFieldValue('x'), self:getFieldValue('z'), self:getFieldValue('h'),
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[

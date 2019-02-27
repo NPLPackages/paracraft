@@ -87,7 +87,7 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 					end
 				elseif(item.name == "CopyInRange") then
 					if(not KeyFramePopupMenu.copyInRangeStarted) then
-						text = format("%s: 开始时间%d", text, time);
+						text = format(L"%s: 开始时间%d", text, time);
 					elseif(KeyFramePopupMenu.copyInRangeStarted and KeyFramePopupMenu.copy_from_time) then
 						text = format("%s: %d-%d", text, KeyFramePopupMenu.copy_from_time, time);
 					end

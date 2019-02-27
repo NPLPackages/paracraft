@@ -25,12 +25,6 @@ local cmds = {
 			variableTypes = {""},
 			text = "object0",
 		},
---        {
---			name = "name",
---			type = "input_value",
---            shadow = { type = "object_label", value = "object1",},
---			text = "object1", 
---		},
         {
 			name = "color",
 			type = "input_value",
@@ -52,7 +46,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'createNode("%s",%s,"%s")',
 	ToNPL = function(self)
-    return ""
+		return string.format('createNode("%s","%s","%s")\n', 
+        self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -87,7 +82,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'cloneNodeByName(%s,%s,%s)',
 	ToNPL = function(self)
-    return ""
+        return string.format('cloneNodeByName("%s","%s","%s")\n', 
+            self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -117,7 +113,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'cloneNode(%s,%s)',
 	ToNPL = function(self)
-    return ""
+        return string.format('cloneNode("%s","%s")\n', 
+            self:getFieldValue('op'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -139,14 +136,15 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'deleteNode(%s)',
 	ToNPL = function(self)
-    return ""
+        return string.format('deleteNode("%s")\n', 
+            self:getFieldValue('name'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
 {
 	type = "move", 
-	message0 = L"移动 x %1 y %2 z %3",
+	message0 = L"移动 %1 %2 %3",
     arg0 = {
         {
 			name = "x",
@@ -175,7 +173,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'move(%s,%s,%s)',
 	ToNPL = function(self)
-		return ""
+        return string.format('move(%s,%s,%s)\n', 
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -205,7 +204,8 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'rotate(%s,%s)',
 	ToNPL = function(self)
-		return ""
+        return string.format('rotate(%s,%s)\n', 
+            self:getFieldValue('axis'),self:getFieldValue('angle'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -213,7 +213,7 @@ local cmds = {
 
 {
 	type = "rotateFromPivot", 
-	message0 = L"旋转 %1 %2 度 中心点 x %3 y %4 z %5",
+	message0 = L"旋转 %1 %2 度 中心点 %3 %4 %5",
     arg0 = {
         {
 			name = "axis",
@@ -254,7 +254,10 @@ local cmds = {
 	nextStatement = true,
 	func_description = 'rotateFromPivot(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-		return ""
+        return string.format('rotateFromPivot(%s,%s,%s,%s,%s)\n', 
+            self:getFieldValue('axis'),self:getFieldValue('angle'),
+            self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
+            );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -281,7 +284,9 @@ local cmds = {
 	canRun = false,
 	func_description = '"%s"',
 	ToNPL = function(self)
-    return ""
+        return string.format('"%s"', 
+            self:getFieldValue('value')
+            );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -295,9 +300,9 @@ local cmds = {
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ L"axis x", "x" },
-				{ L"axis y", "y" },
-				{ L"axis z", "z" },
+				{ L"x轴", "x" },
+				{ L"y轴", "y" },
+				{ L"z轴", "z" },
 			},
 		},
 	},
@@ -308,7 +313,9 @@ local cmds = {
 	canRun = false,
 	func_description = '"%s"',
 	ToNPL = function(self)
-    return ""
+        return string.format('"%s"', 
+            self:getFieldValue('value')
+            );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

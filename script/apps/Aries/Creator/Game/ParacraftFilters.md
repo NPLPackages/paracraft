@@ -31,7 +31,7 @@ end)
 ```
 
 ## List of Paracraft Filters
-This givens an overview of filters in paracraft. Please search the source code of paracraft for how to use these filters. 
+This gives an overview of filters in paracraft. Please search the source code of paracraft for how to use these filters. 
 
 - block related:
   - "block_type", xmlRoot: for registering new item type
@@ -68,6 +68,8 @@ This givens an overview of filters in paracraft. Please search the source code o
   - "OnClickCreateWorld"
   - "OnWorldLoaded" when world is successfully loaded
   - "OnWorldUnloaded" when world is unloaded
+  - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 
+
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:

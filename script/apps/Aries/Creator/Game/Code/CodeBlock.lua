@@ -45,6 +45,7 @@ local CodeBlock = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), 
 CodeBlock:Property("Name", "CodeBlock");
 CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", auto=true,});
 CodeBlock:Property({"AutoWait", true, "IsAutoWait", "SetAutoWait", });
+CodeBlock:Property({"modified", false, "IsModified", "SetModified", auto=true});
 
 CodeBlock:Signal("message", function(errMsg) end);
 CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
@@ -77,6 +78,7 @@ function CodeBlock:SetBlockName(name)
 	if(self.codename and self.codename~=name) then
 		if(self:IsLoaded()) then
 			-- it is better to reload the code block.
+			self:SetModified(true);
 			GameLogic.GetCodeGlobal():RemoveCodeBlock(self);
 			self.codename = nil;
 			self:AutoSetFilename();
@@ -167,8 +169,9 @@ end
 -- @param code: string
 -- return error message if any
 function CodeBlock:CompileCode(code)
-	if(self.last_code ~= code or not self.code_func) then
+	if(self:IsModified() or (self.last_code ~= code or not self.code_func)) then
 		self:Unload();
+		self:SetModified(false);
 		self.last_code = code;
 		self.code_func, self.errormsg = self:CompileCodeImp(code);
 		if(not self.code_func and self.errormsg) then
