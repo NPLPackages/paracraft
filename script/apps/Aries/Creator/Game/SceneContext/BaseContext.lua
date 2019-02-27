@@ -577,7 +577,7 @@ end
 
 -- virtual function handle escape key
 function BaseContext:HandleEscapeKey()
-	if GameLogic.GetFilters():apply_filters("HanldeEscapeKey") then
+	if GameLogic.GetFilters():apply_filters("HandleEscapeKey") then
 		return false
 	end
 
@@ -966,7 +966,7 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then
 		GameLogic.RunCommand("/open npl://debugger");
 	elseif(dik_key == "DIK_F1") then
-			GameLogic.RunCommand("/menu help.help");
+		GameLogic.RunCommand("/menu help.help");
 	end
 	return event:isAccepted();
 end
