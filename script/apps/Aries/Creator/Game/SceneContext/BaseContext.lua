@@ -577,6 +577,10 @@ end
 
 -- virtual function handle escape key
 function BaseContext:HandleEscapeKey()
+	if GameLogic.GetFilters():apply_filters("HandleEscapeKey") then
+		return false
+	end
+
 	local state = System.GetState();
 	if(type(state) == "table" and state.OnEscKey~=nil) then
 		if(state.name ~= "MessageBox") then
@@ -962,11 +966,7 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then
 		GameLogic.RunCommand("/open npl://debugger");
 	elseif(dik_key == "DIK_F1") then
-		if(ctrl_pressed) then
-			GameLogic.RunCommand("/menu help.help");
-		else
-			GameLogic.RunCommand("/menu help.actiontutorial");
-		end
+		GameLogic.RunCommand("/menu help.help");
 	end
 	return event:isAccepted();
 end
