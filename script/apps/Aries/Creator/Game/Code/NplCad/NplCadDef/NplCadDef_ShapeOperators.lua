@@ -44,9 +44,9 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
-	func_description = 'createNode("%s",%s,"%s")',
+	func_description = 'createNode("%s",%s,%s)',
 	ToNPL = function(self)
-		return string.format('createNode("%s","%s","%s")\n', 
+		return string.format('createNode("%s","%s",%s)\n', 
         self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[

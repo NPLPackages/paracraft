@@ -224,7 +224,7 @@ clone("myself", 3)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'clone(%s, %s)',
+	func_description = 'clone("%s", %s)',
 	ToNPL = function(self)
 		return string.format('clone("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -655,6 +655,38 @@ local thinkText = function(text)
 	say(text.."...")
 end
 thinkText("Let me think");
+]]}},
+},
+
+{
+	type = "callFunctionWithReturn", 
+	message0 = L"调用函数并返回%1(%2)",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "log",
+		},
+		{
+			name = "param",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "param",},
+			text = "param",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s(%s)',
+	ToNPL = function(self)
+		return string.format('%s(%s)\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local getHello = function()
+	return "hello world"
+end
+say(getHello())
 ]]}},
 },
 

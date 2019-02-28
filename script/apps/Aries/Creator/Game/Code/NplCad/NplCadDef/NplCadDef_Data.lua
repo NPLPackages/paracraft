@@ -183,6 +183,35 @@ say(text, 1)
 	examples = {{desc = L"", canRun = true, code = [[
 ]]}},
 },
+
+{
+	type = "print3d", 
+	message0 = L"打印 %1",
+    arg0 = {
+        
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"需要", "true" },
+				{ L"不需要", "false" },
+			},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'print3d(%s)',
+	ToNPL = function(self)
+        return string.format('print3d(%s)', 
+            self:getFieldValue('value')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 };
 function NplCadDef_Data.GetCmds()
 	return cmds;

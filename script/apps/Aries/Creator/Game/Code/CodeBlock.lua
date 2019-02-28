@@ -586,15 +586,17 @@ function CodeBlock:RefreshAllInventoryAsMovieActors()
 		local movieEntity = self:GetMovieEntity();
 		if(movieEntity) then
 			local itemStack = movieEntity:GetFirstActorStack();
-			local item = itemStack:GetItem();
-			if(item and item.CreateActorFromItemStack) then
-				local inventory = self:GetEntity():GetInventory()
-				for slotIndex = 1, inventory:GetSlotCount() do
-					local codeActorItem = self:GetEntity():GetCodeActorItemStack(slotIndex);
-					if(codeActorItem) then
-						local actor = codeActorItem:CreateMovieActor();
-						if(actor) then
-							self:SetInventoryMovieActor(slotIndex, actor);
+			if(itemStack) then
+				local item = itemStack:GetItem();
+				if(item and item.CreateActorFromItemStack) then
+					local inventory = self:GetEntity():GetInventory()
+					for slotIndex = 1, inventory:GetSlotCount() do
+						local codeActorItem = self:GetEntity():GetCodeActorItemStack(slotIndex);
+						if(codeActorItem) then
+							local actor = codeActorItem:CreateMovieActor();
+							if(actor) then
+								self:SetInventoryMovieActor(slotIndex, actor);
+							end
 						end
 					end
 				end

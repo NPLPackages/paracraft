@@ -370,7 +370,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('ellipsoid("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'),
-            self:getFieldValue('r1'), self:getFieldValue('r2'), self:getFieldValue('r3'),
+            self:getFieldValue('r_z'), self:getFieldValue('r_x'), self:getFieldValue('r_y'),
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[

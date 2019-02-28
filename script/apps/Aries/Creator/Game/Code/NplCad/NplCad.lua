@@ -138,6 +138,9 @@ end
 
 
 
+function NplCad.OpenDialog(filename)
+    _guihelper.MessageBox(filename);
+end
 function NplCad.GetCode(code, filename)
     return string.format([[
 setActorValue("assetfile", %q)
@@ -149,7 +152,10 @@ NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 %s
 NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
 NplCad.RefreshFile(%q)
-]], filename, code, filename, filename)
+if(ShapeBuilder.getPrint3d())then
+    NplCad.OpenDialog(%q)
+end
+]], filename, code, filename, filename, filename)
 end
 
 
