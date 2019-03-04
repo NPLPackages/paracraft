@@ -101,13 +101,13 @@ function GetOneDayTimeBtnValue()
     return CreateNewWorld.cur_oneday_time.show_value or "";
 end
 
-CreateNewWorld.LastWorldName = CreateNewWorld.LastWorldName or L"默认名字2";
+LastWorldName = LastWorldName or CreateNewWorld.GetAvailableNewWorldName()
 function GetWorldName()
-    return CreateNewWorld.LastWorldName;
+    return LastWorldName;
 end
 
 function OnWorldNameChange()
-    CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
+    LastWorldName = Page:GetUIValue("new_world_name", "");
 end
 
 function BtnBeSelected(item_name,index)

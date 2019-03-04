@@ -230,7 +230,6 @@ end
 
 -- user selected a world template. 
 function CreateNewWorld.OnSelectWorldTemplate(index)
-	local i, world
 	for i, world in ipairs(worlds_template)  do
 		if(i == index) then
 			world.selected = true;
@@ -239,13 +238,13 @@ function CreateNewWorld.OnSelectWorldTemplate(index)
 			world.selected = nil;
 		end
 	end
-	page:Refresh(0);
+	CreateNewWorld.page:Refresh(0);
 end
 
 function CreateNewWorld.ClosePage()
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "close");
-	if(not isCustomShow) then
-		page:CloseWindow();
+	if(isCustomShow == "close" and CreateNewWorld.page) then
+		CreateNewWorld.page:CloseWindow();
 	end
 end
 
@@ -432,4 +431,31 @@ function CreateNewWorld.OnSelectWorld_imp(world)
 		end	
 	end
 	--page:SetValue("WorldImage", world.preview or "");
+end
+
+
+
+function CreateNewWorld.GetAvailableNewWorldName()
+	local worldname = L"默认名字2"
+	
+	local worldfolder = CreateNewWorld.GetWorldFolder()
+	
+	if(not string.match(worldfolder, "/$")) then
+		worldfolder = worldfolder.."/"
+	end
+
+	if(not commonlib.Files.IsAbsolutePath(worldfolder)) then
+		worldfolder = ParaIO.GetWritablePath()..worldfolder;
+	end
+
+	for i=1, 20 do
+		local world_name_locale = commonlib.Encoding.Utf8ToDefault(worldname);
+		local worldpath = (worldfolder..world_name_locale).."/tag.xml";	
+		if(not ParaIO.DoesFileExist(worldpath, false)) then
+			return worldname;
+		else
+			worldname = (L"默认名字2")..tostring(i);
+		end
+	end
+	return worldname;
 end

@@ -543,6 +543,19 @@ function Entity:Restart()
 	end
 end
 
+-- whether the given code entity is in the same group of code entities of the current one, that should be activated as a group. 
+-- return true if they are in the same group. 
+function Entity:IsEntitySameGroup(entity)
+	local bIsSame;
+	self:ForEachNearbyCodeEntity(function(codeEntity)
+		if(codeEntity == entity) then
+			bIsSame = true;
+		end
+	end);
+	return bIsSame;
+end
+
+
 -- stop regardless of whether it is powered. 
 function Entity:Stop()
 	self:ForEachNearbyCodeEntity(function(codeEntity)

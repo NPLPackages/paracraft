@@ -261,7 +261,11 @@ function CodeHelpWindow.OnDragEnd(name)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 		if(CodeBlockWindow.IsMousePointerInCodeEditor()) then
-			CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), not item:HasOutput());
+			if(CodeBlockWindow.IsBlocklyEditMode()) then
+				_guihelper.MessageBox(L"图块模式下不能直接编辑代码, 请用图块编辑器");
+			else
+				CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), not item:HasOutput());
+			end
 		end
 	end
 end

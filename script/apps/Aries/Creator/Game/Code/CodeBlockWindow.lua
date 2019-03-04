@@ -177,6 +177,13 @@ function CodeBlockWindow.SetCodeEntity(entity)
 			entity:Connect("editModeChanged", self, self.UpdateEditModeUI, "UniqueConnection");
 		end
 		if(self.entity) then
+			local codeBlock = self.entity:GetCodeBlock();
+			if(not self.entity:IsPowered() and (codeBlock and codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
+				if(not self.entity:IsEntitySameGroup(entity)) then
+					self.entity:Stop();
+				end
+			end
+
 			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
 			self.entity:Disconnect("editModeChanged", self, self.UpdateEditModeUI);
 			CodeBlockWindow.UpdateCodeToEntity();
@@ -587,7 +594,7 @@ end
 
 -- @param bx, by, bz: if not nil, we will only insert when they match the current code block.
 function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine, bx, by, bz)
-	if(not CodeBlockWindow.IsSameBlock(bx, by, bz)) then
+	if(not CodeBlockWindow.IsSameBlock(bx, by, bz) or CodeBlockWindow.IsBlocklyEditMode()) then
 		return false;
 	end
 

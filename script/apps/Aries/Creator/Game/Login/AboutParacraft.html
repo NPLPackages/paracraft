@@ -1,0 +1,81 @@
+<!-- "script/apps/Aries/Creator/Game/Login/AboutParacraft.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/Rebranding.lua");
+Rebranding = commonlib.gettable("MyCompany.Aries.Creator.Game.Rebranding");
+
+function OnClose()
+    Page:CloseWindow();
+end
+function OnClickOfficialSite()
+    ParaGlobal.ShellExecute("open", L"http://paracraft.cn/", "", "", 1);
+end
+function OnClickDonate()
+    GameLogic.RunCommand("/menu help.donate")
+end
+
+function OnClickCredits()
+    GameLogic.RunCommand("/menu help.Credits")
+end
+    
+function GetModCountAsString()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+    local ModManager = commonlib.gettable("Mod.ModManager");
+    local pluginloader = ModManager:GetLoader();
+    local nCount = pluginloader:GetActiveModCount();
+    if(nCount>0) then
+        return format("(%d)", nCount);
+    else
+        return "";
+    end
+end
+
+function OnOpenModulePage()
+    GameLogic.RunCommand("/show mod")
+end
+
+local objParams = {
+    name = "model",
+    IsCharacter = false,
+    AssetFile = "model/blockworld/BlockModel/block_model_four.x",
+    ReplaceableTextures = {[3]="Texture/blocks/movie_three.png"},
+    x = 0,
+    y = 0,
+    z = 0,
+}
+function GetModelParams()
+    return objParams;
+end
+
+ClientVersion = string.format(L"Paracraft创意空间 v%s", GameLogic.options.GetClientVersion());
+]]></script>
+<aries:window mode="thin" width="600" title='<%=L"关于Paracraft" %>' onclose="OnClose">
+    <div class="default">
+        <div style="float:left;">
+            <pe:canvas3d miniscenegraphname="DownloadWorld128" autoRotateSpeed="1.5" DefaultCameraObjectDist="3.4" IsInteractive="false" RenderTargetSize="128" style="width:128px;height:128px;" value='<%=GetModelParams()%>' />
+        </div>
+        <div style="float:left;min-height:150px;">
+            <div style="margin:10px;">
+                <div style="margin-top:5px"><%=Eval("ClientVersion")%></div>
+                <div style="margin-top:5px;"><%=L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"%></div>
+                <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=L"http://paracraft.cn/"%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div style="margin-top:30px;margin-bottom:30px;" class="default">
+        <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnOpenModulePage" />    
+        <input type="button" value='<%=L"捐赠" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickDonate" />
+        <input type="button" value='<%=L"致谢"%>'  class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickCredits" />
+        <input type="button" value='<%=L"确定" %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:120px;height:28px;" onclick="OnClose"/>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

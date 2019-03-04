@@ -109,7 +109,7 @@ function Export:Run()
 		if(SelectionManager:GetSelectedBlocks()) then
 			self:ShowPage(true);
 		else
-			GameLogic.AddBBS(nil, L"请先选择物体, Ctrl+左键多次点击场景可选择");
+			_guihelper.MessageBox(L"请先选择物体, Ctrl+左键多次点击场景可选择")
 		end
 	end
 end

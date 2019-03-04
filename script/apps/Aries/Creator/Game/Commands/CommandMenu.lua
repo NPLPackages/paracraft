@@ -160,9 +160,25 @@ Commands["menu"] = {
 			-- open the npl code wiki site in external browser. 
 			GameLogic.CommandManager:RunCommand("/open npl://");
 		elseif(name == "help.about") then
-			GameLogic.RunCommand("/open "..L"http://www.paracraft.cn/home/about-us");
+			-- GameLogic.RunCommand("/open "..L"http://www.paracraft.cn/home/about-us");
+			System.App.Commands.Call("File.MCMLWindowFrame", {
+				url = "script/apps/Aries/Creator/Game/Login/AboutParacraft.html", 
+				name = "aboutparacraft", 
+				isShowTitleBar = false,
+				DestroyOnClose = true,
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				zorder = 0,
+				allowDrag = false,
+				directPosition = true,
+					align = "_ct",
+					x = -600/2,
+					y = -400/2,
+					width = 600,
+					height = 400,
+				cancelShowAnimation = true,
+			});
 		elseif(name == "help.Credits") then
-			GameLogic.RunCommand("/open "..L"https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits");
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/paracraft/credits");
 		elseif(name == "help.ParacraftSDK") then
 			GameLogic.RunCommand("/open https://github.com/LiXizhi/ParaCraftSDK/wiki");
 		elseif(name == "help.bug") then
