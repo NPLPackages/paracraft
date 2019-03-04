@@ -19,7 +19,7 @@ local all_cmds_map = {};
 NplCad.categories = {
     {name = "Shapes", text = L"图形", colour = "#764bcc", },
     {name = "ShapeOperators", text = L"修改", colour = "#0078d7", },
-    {name = "ObjectName", text = L"对象名称", colour = "#ff8c1a", custom="VARIABLE", },
+    {name = "ObjectName", text = L"名称", colour = "#ff8c1a", custom="VARIABLE", },
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
@@ -143,19 +143,21 @@ function NplCad.OpenDialog(filename)
 end
 function NplCad.GetCode(code, filename)
     return string.format([[
-setActorValue("assetfile", %q)
 local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
 local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
 ShapeBuilder.create();
 local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
 NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 %s
-NplOceScene.saveSceneToParaX("%s",ShapeBuilder.getScene());
-NplCad.RefreshFile(%q)
+local result = NplOceScene.saveSceneToParaX(%q,ShapeBuilder.getScene());
+if(result)then
+	setActorValue("assetfile", %q)
+    NplCad.RefreshFile(%q)
+end
 if(ShapeBuilder.getPrint3d())then
     NplCad.OpenDialog(%q)
 end
-]], filename, code, filename, filename, filename)
+]], code, filename, filename, filename, filename)
 end
 
 
