@@ -78,8 +78,9 @@ local block_attribute_map = {
 	onload			= 0x0040000, -- whether has onBlockLoaded
 	color_data		= 0x0080000, -- whether the block contains color in its block data.
 	invisible		= 0x0100000, -- whether the block is invisible.
-	tiling			= 0x0200000, -- whether tiling is used
+	random_tiling		= 0x0200000, -- whether the block's texture is randomly fetched from its tiled texture
 	color8_data		= 0x0400000, -- whether the block uses only the high 8 bits as color in its block data.
+	pos_tiling		= 0x0800000, -- whether the block's texture is fetched from its tiled texture according to its coords
 }
 
 block.attributes = block_attribute_map;
