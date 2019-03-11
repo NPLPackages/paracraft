@@ -104,6 +104,73 @@ say(text, 1)
 },
 
 {
+	type = "getString", 
+	message0 = "\"%1\"",
+	arg0 = {
+		{
+			name = "left",
+			type = "field_input",
+			text = "string",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return string.format('"%s"', self:getFieldAsString('left'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "getBoolean", 
+	message0 = L"%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ "true", "true" },
+				{ "false", "false" },
+				{ "nil", "nil" },
+			  }
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return self:getFieldAsString("value");
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "getNumber", 
+	message0 = L"%1",
+	arg0 = {
+		{
+			name = "left",
+			type = "field_number",
+			text = "0",
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('%s', self:getFieldAsString('left'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
 	type = "code_block", 
 	message0 = L"代码%1",
 	message1 = L"%1",
@@ -198,6 +265,7 @@ say(text, 1)
 			},
 		},
 	},
+	hide_in_toolbox = true,
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,

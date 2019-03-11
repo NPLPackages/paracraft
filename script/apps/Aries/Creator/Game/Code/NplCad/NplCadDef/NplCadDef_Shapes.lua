@@ -68,8 +68,8 @@ local cmds = {
         {
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
-			text = 1, 
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
 		},
         {
 			name = "z",

@@ -29,6 +29,7 @@ Commands["docgen"] = {
 e.g.
 /docgen script/apps/Aries/Creator/Game/block_engine.lua		:parse only this given file
 /docgen     :rebuild all files in paracraft.docgen.txt
+/docgen -codeblock    :generate code block docs
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local outputname;
@@ -37,6 +38,10 @@ e.g.
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option == "o") then
 				outputname, cmd_text = CmdParser.ParseString(cmd_text);
+			elseif(option == "codeblock") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
+				local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+				CodeHelpWindow.GenerateWikiDocs()
 			end
 		end
 		if(not cmd_text or cmd_text=="") then

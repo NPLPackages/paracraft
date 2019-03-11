@@ -536,7 +536,12 @@ end
 	examples = {{desc = "", canRun = true, code = [[
 local x, y, z = getPos()
 setPos(x, y+0.5, z)
-]]}},
+]]},
+{desc = "", canRun = true, code = [[
+local x, y, z = getPos("actorName")
+setPos(x, y+0.5, z)
+]]}
+},
 },
 {
 	type = "setPos", 
@@ -600,7 +605,11 @@ setPos(x, y+0.5, z)
 while(true) do
     say(getFacing())
 end
-]]}},
+]]},
+{desc = "", canRun = true, code = [[
+say(getFacing("someActorName"))
+]]}
+},
 },
 
 };

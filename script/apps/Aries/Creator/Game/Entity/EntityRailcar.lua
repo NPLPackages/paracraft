@@ -230,13 +230,13 @@ end
 
 -- Returns true if the entity takes up space in its containing block, such as animals,mob and players. 
 function Entity:CanBeCollidedWith(entity)
-    return true;
+	return not entity:IsDummy();
 end
 
 -- Returns true if this entity should push and be pushed by other entities when colliding.
 -- such as mob and players.
 function Entity:CanBePushedBy(fromEntity)
-    return true;
+    return not fromEntity:IsDummy();
 end
 
 function Entity:Destroy()

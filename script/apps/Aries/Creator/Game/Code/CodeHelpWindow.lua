@@ -270,4 +270,56 @@ function CodeHelpWindow.OnDragEnd(name)
 	end
 end
 
+-- only used for paracraft book. 
+function CodeHelpWindow.GenerateWikiDocs(bSilent)
+	CodeHelpWindow.InitCmds()
+	local docs = {};
+	local categories = CodeHelpWindow.GetCategoryButtons()
+	for i=1, #categories do
+		local category = categories[i];
+		if(category) then
+			docs[#docs+1] = "### "..category.text;
+			docs[#docs+1] = "\n"
+
+			local items = category_items[category.name];
+			if(items) then
+				for i=1, #items do
+					local item = items[i];
+					local dsItem = item:GetDSItem();
+					if(dsItem) then
+						local code = item and item:GetNPLCode();
+						if(code) then
+							code = code:gsub("\r?\n%s*\r?\n", "\n")
+							local html = item:GetHtml() or ""
+							html = html:gsub("<div [^>]*>", "`"):gsub("</div>", "`")
+							html = html:gsub("<input .*value=\"([^\"]+)\"[^/]*/>", "`%1`")
+							docs[#docs+1] = "> "..html..": "..code;
+							if(not code:match("\n%s*$")) then
+								docs[#docs+1] = "\n"
+							end
+							docs[#docs+1] = "```lua\n"
+							local examples = item:GetNPLCodeExamples();
+							docs[#docs+1] = examples;
+							if(not examples:match("\n%s*$")) then
+								docs[#docs+1] = "\n"
+							end
+							docs[#docs+1] = "```\n"
+						end
+					end
+				end
+			end
+		end
+	end
+	local filename = "temp/codeblock_docs.txt"
+	local file = ParaIO.open(filename, "w");
+	if(file:IsValid()) then
+		LOG.std(nil, "info", "CodeHelpWindow", "wiki doc written to %s", filename);
+		local text = table.concat(docs, "");
+		file:WriteString(text, #text);
+		file:close();
+		if(not bSilent) then
+			_guihelper.MessageBox(format("wiki doc written to %s", filename))
+		end
+	end
+end
 CodeHelpWindow:InitSingleton();

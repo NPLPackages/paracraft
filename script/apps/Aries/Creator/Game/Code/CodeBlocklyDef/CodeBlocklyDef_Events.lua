@@ -211,9 +211,8 @@ say("click me!")
 	arg0 = {
 		{
 			name = "value",
-			type = "field_variable",
-			variableTypes = {"broadcast_msg"}, 
-			variable = "msg1",
+			type = "field_input",
+			text = "msg1",
 		},
 	},
 	hide_in_toolbox = true,
@@ -222,8 +221,9 @@ say("click me!")
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
+	colourSecondary = "#ffffff",
 	ToNPL = function(self)
-		return self:getFieldAsString('value');
+		return string.format("%q", self:getFieldAsString('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
