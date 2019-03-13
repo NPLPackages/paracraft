@@ -774,6 +774,24 @@ function Actor:IsBillboarded()
 	return false, false, false;
 end
 
+-- @param speed: default to 4 m/s
+function Actor:SetWalkSpeed(speed)
+	local entity = self:GetEntity();
+	if entity then
+		if(type(speed) == "string") then
+			speed = tonumber(speed)
+		end
+		if(type(speed) == "number") then
+			entity:SetWalkSpeed(speed)
+		end
+	end
+end
+
+function Actor:GetWalkSpeed()
+	local entity = self:GetEntity();
+	return entity and entity:GetWalkSpeed()
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -794,6 +812,7 @@ local internalValues = {
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
+	["walkSpeed"] = {setter = Actor.SetWalkSpeed, getter = Actor.GetWalkSpeed, isVariable = false}, 
 	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
 }
 

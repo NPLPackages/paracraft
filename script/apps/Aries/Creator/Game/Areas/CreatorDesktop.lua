@@ -267,7 +267,7 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 				align = "_ctr",
 				x = 0,
 				y = 0,
-				width = 257,
+				width = 240,
 				height = 480,
 		};
 	CreatorDesktop.new_page_params.bShow = IsExpanded;

@@ -286,6 +286,7 @@ end
 				{ "z", "z" },
 				{ L"时间", "time" },
 				{ L"朝向", "facing" },
+				{ L"行走速度", "walkSpeed" },
 				{ L"俯仰角度", "pitch" },
 				{ L"翻滾角度", "roll" },
 				{ L"颜色", "color" },

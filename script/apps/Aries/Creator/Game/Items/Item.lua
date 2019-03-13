@@ -51,6 +51,7 @@ local Item = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commo
 
 -- whether to draw the icon with DrawIcon virtual function. 
 Item:Property({"m_bIsOwnerDrawIcon", false, "IsOwnerDrawIcon", "SetOwnerDrawIcon", auto=true})
+Item:Property({"IconColor", "#ffffff", auto=true})
 
 Item.mouseTracking = false;
 -- texture altas size of item/block icons
@@ -701,7 +702,7 @@ function Item:DrawIcon(painter, width, height, itemStack)
 		local color = self:DataToColor(data);
 		painter:SetPen(Color.ChangeOpacity(color));
 	else
-		painter:SetPen("#ffffff");	
+		painter:SetPen(self:GetIconColor());
 	end
 	painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
 

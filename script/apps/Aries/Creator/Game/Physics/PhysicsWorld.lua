@@ -72,6 +72,13 @@ function PhysicsWorld.AddDynamicObject(obj)
 	active_dynamic_obj:push_back({obj=obj})
 end
 
+
+-- static function: default filterEntityFunc
+local function CanBeCollidedWith_(destEntity, entity)
+	return destEntity:CanBeCollidedWith(entity);
+end
+
+
 -- Returns a list of bounding boxes that collide with aabb including the passed in entity's collision. 
 -- @param aabb: 
 -- @param entity: 
@@ -100,8 +107,9 @@ function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc)
     local listEntities = EntityManager.GetEntitiesByAABBExcept(aabb:clone():Expand(distExpand, distExpand, distExpand), entity);
 
 	if(listEntities) then
+		filterEntityFunc = filterEntityFunc or CanBeCollidedWith_;
 		for _, entityCollided in ipairs(listEntities) do
-			if(not filterEntityFunc or filterEntityFunc(entityCollided, entity)) then
+			if(filterEntityFunc(entityCollided, entity)) then
 				local collisionAABB = entityCollided:GetCollisionAABB();
 				if(collisionAABB and collisionAABB:Intersect(aabb)) then
 					self.collidingBoundingBoxes:add(collisionAABB);

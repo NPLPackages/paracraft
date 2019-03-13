@@ -38,10 +38,9 @@ BuilderFramePage.category_ds_old = {
 }
 
 BuilderFramePage.category_ds_new = {
-    {text=L"方块", name="static",     enabled=true},
-    -- {text=L"自然", name="nature",     enabled=true},
-	{text=L"电影", name="movie",     enabled=true},
-    {text=L"人物", name="character",  enabled=true},
+    {text=L"建造", name="static",     enabled=true},
+    {text=L"电影", name="movie",     enabled=true},
+    {text=L"代码", name="character",  enabled=true},
     {text=L"背包", name="playerbag",     enabled=true},
     {text=L"机关", name="gear",	     enabled=true},
     {text=L"装饰", name="deco",       enabled=true},
