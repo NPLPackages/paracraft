@@ -143,11 +143,12 @@ function CodeGlobals:ctor()
 		-- @NOTE: the following may not be safe to expose to users
 		----------------------
 		NPL = { load = NPL.load },
-		System = System, -- @Note: Is it secure here?  
-		commonlib = commonlib, -- @Note: Is it secure here?
+		System = System, 
+		commonlib = commonlib, 
 		ParaIO = ParaIO,
 		GameLogic = GameLogic,
         NplOce = NplOce,
+		Game = MyCompany.Aries.Game,
 	};
 
 	self:Reset();

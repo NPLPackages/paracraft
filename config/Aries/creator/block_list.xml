@@ -239,13 +239,17 @@ entity_data: optional, preferred entity data when created.
     <block id="120"/>
     <block id="121"/>
     <block id="122"/>
-    
-  
     <block name="Mirror" />
     <block name="BlockLight" />
   </category>
   
-	<category name="character" text="生物">
+	<category name="character" text="编程">
+    <block name="CodeBlock"/>
+    <block name="Wire" />
+    <block name="Lever" />
+    <block name="Repeater" />
+    <block name="Sign_Post"/>
+    <block name="CodeActor"/>
     <block name="villager"/>
     <block name="bird"/>
     <block name="pigeon"/>
@@ -255,6 +259,7 @@ entity_data: optional, preferred entity data when created.
 	
   <category name="gear" text="机关">
     <block name="Command_Block"/>
+    <block name="CodeBlock"/>
     <block name="Wire" />
     <block name="Lever" />
     <block name="Stone_Button" />
@@ -300,7 +305,6 @@ entity_data: optional, preferred entity data when created.
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
-    <block name="CodeBlock"/>
   </category>
 
   <category name="tool" text="工具">
