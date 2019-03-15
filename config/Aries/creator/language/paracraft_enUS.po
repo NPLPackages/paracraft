@@ -220,6 +220,42 @@ msgstr "Uploading, please wait..."
 msgid "上传stl文件失败."
 msgstr "Failed to upload stl file."
 
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:437
+msgid "探索"
+msgstr "Explore"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:442
+msgid "投币"
+msgstr "Insert Coin"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:488
+msgid "全部游戏"
+msgstr "All Games"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:490
+msgid "本地游戏"
+msgstr "Local Games"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:494
+msgid "请输入项目ID"
+msgstr "Please input project ID"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.html:496
+msgid "搜索"
+msgstr "Search"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.lua:58
+msgid "综合"
+msgstr "General"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.lua:58
+msgid "最新"
+msgstr "Latest"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/MainPage.lua:58
+msgid "热门"
+msgstr "Hot"
+
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html:82
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:401
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.html:153
