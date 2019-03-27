@@ -101,8 +101,9 @@ function NplCad.CompileCode(code, filename, codeblock)
         block_name = "default"
     end
 	local worldpath = ParaWorld.GetWorldDirectory();
-    local name = format("%sblocktemplates/nplcad/%s.x",worldpath,block_name);
-    code = NplCad.GetCode(code, name);
+	
+    local filepath = format("%sblocktemplates/nplcad/%s.x",worldpath, commonlib.Encoding.Utf8ToDefault(block_name));
+	code = NplCad.GetCode(code, filepath);
 	return CodeCompiler:new():SetFilename(filename):Compile(code);
 end
 

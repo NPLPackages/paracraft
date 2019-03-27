@@ -326,6 +326,7 @@ entity_data: optional, preferred entity data when created.
     <block name="ColorBlock" />
     <block name="MetalBlock" />
     <block name="TransparentColorBlock" />
+    <block name="BlockLight" />
   </category>
   <category name="others" text="其他">
   </category>

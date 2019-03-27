@@ -41,10 +41,18 @@ BuildinMod.buildin_mods = {
 		version = "1.0.0",
 		homepage = "https://github.com/tatfook/NplCad2",
 	},
+    {
+		name = "NplBrowser", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"NplBrowser", 
+		text=L"系统内置插件",
+		version = "1.0.0",
+		homepage = "https://github.com/tatfook/NplBrowserScript",
+	},
 	{
 		name = "STLExporter", 
 		-- package_path = "npl_packages/STLExporter/", 
-		package_path = "npl_packages/ParacraftBuildinMod/", 
+		package_path = "npl_packages/ParacraftBuildinMod/",  
 		displayName = L"STL 3D打印模型导出", 
 		text=L"系统内置插件",
 		version = "1.1",
@@ -132,4 +140,14 @@ function BuildinMod.AddBuildinMods()
 			end
 		end
 	end
+end
+function BuildinMod.GetModByName(name)
+    if(not name)then
+        return
+    end
+    for __,mod in ipairs(BuildinMod.buildin_mods) do
+        if(mod.name == name)then
+            return mod;
+        end
+    end
 end

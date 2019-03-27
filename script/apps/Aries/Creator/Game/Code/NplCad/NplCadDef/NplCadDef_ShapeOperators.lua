@@ -188,7 +188,7 @@ local cmds = {
 			name = "axis",
 			type = "input_value",
             shadow = { type = "axis", value = "x",},
-			text = "x", 
+			text = "'x'", 
 		},
         {
 			name = "angle",
@@ -219,7 +219,7 @@ local cmds = {
 			name = "axis",
 			type = "input_value",
             shadow = { type = "axis", value = "x",},
-			text = "x", 
+			text = "'x'", 
 		},
         {
 			name = "angle",
@@ -300,9 +300,9 @@ local cmds = {
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ L"x轴", "x" },
-				{ L"y轴", "y" },
-				{ L"z轴", "z" },
+				{ L"x轴", "'x'" },
+				{ L"y轴", "'y'" },
+				{ L"z轴", "'z'" },
 			},
 		},
 	},
@@ -311,11 +311,9 @@ local cmds = {
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '"%s"',
+	func_description = '%s',
 	ToNPL = function(self)
-        return string.format('"%s"', 
-            self:getFieldValue('value')
-            );
+        return string.format('%s', self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
