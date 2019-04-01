@@ -22,8 +22,9 @@ local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlP
 --@param cmdline: if nil we will read from current cmd line
 function UrlProtocolHandler:ParseCommand(cmdline)
 	local cmdline = cmdline or ParaEngine.GetAppCommandLine();
-	local urlProtocol = string.match(cmdline or "", "paracraft://(.*)$");
 
+	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
+	local urlProtocol = string.match(cmdline or "", "paracraft%W?//(.*)$");
 	if(urlProtocol) then
 
 		NPL.load("(gl)script/ide/Encoding.lua");

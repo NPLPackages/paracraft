@@ -289,6 +289,7 @@ function CodeBlockWindow.CloseEditorWindow()
 			entity:Stop();
 		end
 	end
+    CodeBlockWindow.SetNplBrowserVisible(false);
 end
 
 function CodeBlockWindow.RestoreWindowLayout()
@@ -693,6 +694,7 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	if(entity) then
 		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
 	end
+    CodeBlockWindow.SetNplBrowserVisible(CodeBlockWindow.IsBlocklyEditMode());
 end
 
 -- default to standard NPL language. One can create domain specific language configuration files. 
@@ -771,8 +773,32 @@ function CodeBlockWindow.UpdateEditModeUI()
 			textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
 		end
 	end
+    CodeBlockWindow.SetNplBrowserVisible(CodeBlockWindow.IsBlocklyEditMode())
 end
+function CodeBlockWindow.SetNplBrowserVisible(b)
+    if(page)then
+        page:CallMethod("nplbrowser_instance","SetVisible",b)
+    end
+end
+function CodeBlockWindow.GetBlockEditorUrl()
+    local blockpos;
+	local entity = CodeBlockWindow.GetCodeEntity();
+	if(entity) then
+		local bx, by, bz = entity:GetBlockPos();
+		if(bz) then
+			blockpos = format("%d,%d,%d", bx, by, bz);
+		end
+	end
 
+	local request_url = "npl://blockeditor"
+	if(blockpos) then
+		request_url = request_url..format("?blockpos=%s", blockpos);
+	end
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
+	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+	local url = DefaultFilters.cmd_open_url(request_url)
+    return url;
+end
 function CodeBlockWindow.OpenBlocklyEditor()
 	local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
