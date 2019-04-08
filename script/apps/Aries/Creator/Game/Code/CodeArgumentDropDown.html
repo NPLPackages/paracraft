@@ -4,7 +4,8 @@
 <![CDATA[
 CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
 x = Page:GetRequestParam("x");
-y = Page:GetRequestParam("y");
+y = math.max(math.min(Page:GetRequestParam("y"), System.Windows.Screen:GetHeight()-350), 0);
+
 function OnClose()
     Page:CloseWindow();
 end

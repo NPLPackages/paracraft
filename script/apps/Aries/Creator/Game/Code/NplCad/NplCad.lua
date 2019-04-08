@@ -144,19 +144,16 @@ function NplCad.OpenDialog(filename)
 end
 function NplCad.GetCode(code, filename)
     return string.format([[
-local NplOceScene = NPL.load("Mod/NplCad2/NplOceScene.lua");
+local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
 local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
 ShapeBuilder.create();
 local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
 NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 %s
-local result = NplOceScene.saveSceneToParaX(%q,ShapeBuilder.getScene());
+local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
 if(result)then
 	setActorValue("assetfile", %q)
     NplCad.RefreshFile(%q)
-end
-if(ShapeBuilder.getPrint3d())then
-    NplCad.OpenDialog(%q)
 end
 ]], code, filename, filename, filename, filename)
 end

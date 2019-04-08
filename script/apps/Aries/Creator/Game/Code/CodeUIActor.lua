@@ -466,6 +466,28 @@ function Actor:GetPitchDegree()
 	return entity and (entity:GetPitch()*180/math.pi) or 0;
 end
 
+function Actor:SetMovieActorImp(itemStack, movie_entity)
+	movie_entity = movie_entity or self:GetMovieClipEntity();
+	local entity = self:GetEntity()
+	if(entity) then
+		local x, y, z = entity:GetPosition()
+		local facing = entity:GetFacing()
+		local wasVisible = entity:IsVisible()
+		self:DestroyEntity();
+		self:Init(itemStack, movie_entity);
+		self:FrameMove(self:GetTime(), false);
+		entity = self:GetEntity();
+		if(not entity:IsScreenMode()) then
+			entity:SetPosition(x,y,z);
+			entity:SetFacing(facing);
+		end
+		if(not wasVisible) then
+			entity:SetVisible(wasVisible);
+		end
+	end
+end
+
+
 -- @param actorName: if nil or 1, it is the first one in movie block
 -- if number it is the actor index in movie block, if string, it is its actor name
 function Actor:SetMovieActor(actorName)
@@ -482,19 +504,7 @@ function Actor:SetMovieActor(actorName)
 				if (itemStack.id == block_types.names.TimeSeriesOverlay) then
 					index = index + 1;
 					if(index == actorName) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime(), false);
-							entity = self:GetEntity();
-							if(not entity:IsScreenMode()) then
-								entity:SetPosition(x,y,z);
-								entity:SetFacing(facing);
-							end
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end
 			end 
@@ -505,19 +515,7 @@ function Actor:SetMovieActor(actorName)
 			if (itemStack and itemStack.count > 0) then
 				if (itemStack.id == block_types.names.TimeSeriesOverlay) then
 					if(itemStack:GetDisplayName() == actorName) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime(), false);
-							entity = self:GetEntity();
-							if(not entity:IsScreenMode()) then
-								entity:SetPosition(x,y,z);
-								entity:SetFacing(facing);
-							end
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end
 			end 
@@ -536,19 +534,7 @@ function Actor:SetMovieBlockPosition(pos)
 				local itemStack = movie_entity.inventory:GetItem(i)
 				if (itemStack and itemStack.count > 0) then
 					if (itemStack.id == block_types.names.TimeSeriesOverlay) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime(), false);
-							entity = self:GetEntity();
-							if(not entity:IsScreenMode()) then
-								entity:SetPosition(x,y,z);
-								entity:SetFacing(facing);
-							end
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end 
 			end

@@ -622,6 +622,27 @@ function Actor:GetPitchDegree()
 	return entity and (entity:GetPitch()*180/math.pi) or 0;
 end
 
+function Actor:SetMovieActorImp(itemStack, movie_entity)
+	movie_entity = movie_entity or self:GetMovieClipEntity();
+	local entity = self:GetEntity()
+	if(entity) then
+		local x, y, z = entity:GetPosition()
+		local facing = entity:GetFacing()
+		local wasVisible = entity:IsVisible()
+		self:DestroyEntity();
+		self:Init(itemStack, movie_entity);
+		self:FrameMove(self:GetTime() or 0, false);
+		entity = self:GetEntity();
+		if(entity) then
+			entity:SetPosition(x,y,z);
+			entity:SetFacing(facing);
+			if(not wasVisible) then
+				entity:SetVisible(wasVisible);
+			end
+		end
+	end
+end
+
 -- @param actorName: if nil or 1, it is the first one in movie block
 -- if number it is the actor index in movie block, if string, it is its actor name
 function Actor:SetMovieActor(actorName)
@@ -638,17 +659,7 @@ function Actor:SetMovieActor(actorName)
 				if (itemStack.id == block_types.names.TimeSeriesNPC) then
 					index = index + 1;
 					if(index == actorName) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime() or 0, false);
-							entity = self:GetEntity();
-							entity:SetPosition(x,y,z);
-							entity:SetFacing(facing);
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end
 			end 
@@ -659,17 +670,7 @@ function Actor:SetMovieActor(actorName)
 			if (itemStack and itemStack.count > 0) then
 				if (itemStack.id == block_types.names.TimeSeriesNPC) then
 					if(itemStack:GetDisplayName() == actorName) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime() or 0, false);
-							entity = self:GetEntity();
-							entity:SetPosition(x,y,z);
-							entity:SetFacing(facing);
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end
 			end 
@@ -688,19 +689,7 @@ function Actor:SetMovieBlockPosition(pos)
 				local itemStack = movie_entity.inventory:GetItem(i)
 				if (itemStack and itemStack.count > 0) then
 					if (itemStack.id == block_types.names.TimeSeriesNPC) then
-						local entity = self:GetEntity()
-						if(entity) then
-							local x, y, z = entity:GetPosition()
-							local facing = entity:GetFacing()
-							self:DestroyEntity();
-							self:Init(itemStack, movie_entity);
-							self:FrameMove(self:GetTime(), false);
-							entity = self:GetEntity();
-							if(entity) then
-								entity:SetPosition(x,y,z);
-								entity:SetFacing(facing);
-							end
-						end
+						self:SetMovieActorImp(itemStack, movie_entity);
 					end
 				end 
 			end
@@ -792,6 +781,24 @@ function Actor:GetWalkSpeed()
 	return entity and entity:GetWalkSpeed()
 end
 
+-- @param effectId: 0 will use unlit biped selection effect. 1 will use yellow border style. -1 to disable it.
+function Actor:SetSelectionEffect(effectId)
+	local entity = self:GetEntity();
+	if entity then
+		if(type(effectId) == "string") then
+			effectId = tonumber(effectId)
+		end
+		if(type(effectId) == "number") then
+			entity:SetSelectionEffect(effectId)
+		end
+	end
+end
+
+function Actor:GetSelectionEffect()
+	local entity = self:GetEntity();
+	return entity and entity:GetSelectionEffect()
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -808,12 +815,14 @@ local internalValues = {
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["opacity"] = {setter = Actor.SetOpacity, getter = Actor.GetOpacity, isVariable = false}, 
+	["selectionEffect"] = {setter = Actor.SetSelectionEffect, getter = Actor.GetSelectionEffect, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
 	["walkSpeed"] = {setter = Actor.SetWalkSpeed, getter = Actor.GetWalkSpeed, isVariable = false}, 
 	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
+	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
 }
 
 function Actor:GetActorValue(name)

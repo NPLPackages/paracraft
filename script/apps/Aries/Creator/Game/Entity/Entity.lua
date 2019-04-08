@@ -2718,3 +2718,21 @@ function Entity:GetOpacity()
 		return 1
 	end
 end
+
+-- @param effectId: 0 will use unlit biped selection effect. 1 will use yellow border style. -1 to disable it.
+function Entity:SetSelectionEffect(effectId)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("SelectionEffect", effectId or 1);
+	end
+end
+
+-- @return effectId: 0 will use unlit biped selection effect. 1 will use yellow border style. -1 means disable
+function Entity:GetSelectionEffect()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("SelectionEffect", 1);
+	else
+		return 1
+	end
+end

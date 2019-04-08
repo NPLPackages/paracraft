@@ -291,6 +291,7 @@ end
 				{ L"翻滾角度", "roll" },
 				{ L"颜色", "color" },
 				{ L"透明度", "opacity" },
+				{ L"选中特效", "selectionEffect" },
 				{ L"文字", "text" },
 				{ L"是否为化身", "isAgent" },
 				{ L"模型文件", "assetfile" },
@@ -298,6 +299,7 @@ end
 				{ L"电影方块的位置", "movieblockpos" },
 				{ L"电影角色", "movieactor" },
 				{ L"广告牌效果", "billboarded" },
+				{ L"初始化参数", "initParams" },
 			},
 		},
 	},
@@ -374,6 +376,21 @@ local yaw, roll, pitch = getActorValue("billboarded")
 setActorValue("billboarded", {yaw = true, roll = true, pitch = pitch});
 setActorValue("billboarded", {yaw = true});
 ]]},
+
+{desc = L"选中特效", canRun = true, code = [[
+-- -1 disable. 0 unlit, 1 yellow border
+setActorValue("selectionEffect", -1)
+]]},
+
+
+{desc = L"多角色初始化参数", canRun = true, code = [[
+registerCloneEvent(function(name)
+    local params = getActorValue("initParams")
+    echo(params)
+    say(params.userData)
+end)
+]]},
+
 
 },
 },
