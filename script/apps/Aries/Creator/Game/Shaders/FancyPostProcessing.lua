@@ -69,7 +69,6 @@ function FancyV1:SetEnabled(bEnable)
 			ParaTerrain.GetBlockAttributeObject():SetField("PostProcessingAlphaScript", "MyCompany.Aries.Game.Shaders.FancyV1.OnRender(1)")
 			ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", true);
 			ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", true);
-			-- ParaScene.GetAttributeObject():SetField("ShadowMapSize", {4096,4096});
 			self:SetBlockRenderMethod(self.BlockRenderMethod.Fancy);
 			return true;
 		elseif(reason == "AA_IS_ON") then
@@ -86,7 +85,7 @@ function FancyV1:SetEnabled(bEnable)
 end
 
 function FancyV1:IsEnabled()
-	return ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) == 2;
+	return ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) == self.BlockRenderMethod.Fancy;
 end
 
 -- @param shader_method: type of BlockRenderMethod: 0 fixed function; 1 standard; 2 fancy graphics.
@@ -142,11 +141,6 @@ end
 
 -- @param nPass: 0 for opache pass, 1 for alpha blended pass. 
 function FancyV1:OnRenderLite(ps_scene, nPass)
-	--if(nPass and nPass >= 1) then
-		---- no need to alpha pass.
-		--return;
-	--end
-
 	local effect = ParaAsset.LoadEffectFile("compositeLite","script/apps/Aries/Creator/Game/Shaders/compositeLite.fxo");
 	effect = ParaAsset.GetEffectFile("compositeLite");
 		
