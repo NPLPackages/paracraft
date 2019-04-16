@@ -60,7 +60,7 @@ end
                 <pe:treeview ShowIcon="false" name="tvwFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetAllFiles()%>' DefaultNodeHeight="20" style="height:300px;background:;">
                     <NodeTemplates>
                         <NodeTemplate DataType="file">
-                            <pe:treenode style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", XPath("this|filename"), XPath("this|filesize")/1000, XPath("this|writedate"))%>'></pe:treenode>
+                            <pe:treenode style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), XPath("this|filesize")/1000, XPath("this|writedate"))%>'></pe:treenode>
                         </NodeTemplate>
                         <NodeTemplate DataType="commonfile">
                             <pe:treenode style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=XPath("this|text")%>'></pe:treenode>

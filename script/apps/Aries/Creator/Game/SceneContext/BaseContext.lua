@@ -872,14 +872,6 @@ function BaseContext:HandleGlobalKey(event)
 		
 	
 	if(GameMode:IsAllowGlobalEditorKey()) then
-		if(System.options.IsMobilePlatform) then
-			local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
-			if(TouchController.OnKeyDown) then
-				if(TouchController:OnKeyDown(dik_key)) then
-					return;
-				end
-			end
-		end
 		if(dik_key == "DIK_TAB") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({mode="vertical", isUpward = not event.shift_pressed, add_to_history=false});

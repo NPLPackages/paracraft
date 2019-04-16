@@ -262,6 +262,145 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
+{
+	type = "moveNode", 
+	message0 = L"移动对象 %1 %2 %3 %4",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'moveNode(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('moveNode("%s",%s,%s,%s)\n', 
+            self:getFieldValue('name'),
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "rotateNode", 
+	message0 = L"旋转对象 %1 %2 %3 度",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "axis",
+			type = "input_value",
+            shadow = { type = "axis", value = "x",},
+			text = "'x'", 
+		},
+        {
+			name = "angle",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'rotateNode(%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('rotateNode("%s",%s,%s)\n', 
+            self:getFieldValue('name'),
+            self:getFieldValue('axis'),self:getFieldValue('angle'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "rotateNodeFromPivot", 
+	message0 = L"旋转对象 %1 %2 %3 度 中心点 %4 %5 %6",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "axis",
+			type = "input_value",
+            shadow = { type = "axis", value = "x",},
+			text = "'x'", 
+		},
+        {
+			name = "angle",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "tx",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "ty",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "tz",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'rotateNodeFromPivot(%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('rotateNodeFromPivot("%s",%s,%s,%s,%s,%s)\n', 
+            self:getFieldValue('name'),
+            self:getFieldValue('axis'),self:getFieldValue('angle'),
+            self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
 {
 	type = "boolean_op", 
 	message0 = L"%1",

@@ -29,7 +29,6 @@ local TouchSession = commonlib.gettable("MyCompany.Aries.Game.Common.TouchSessio
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
 
 local Tool = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tools.ToolTouchBase"));
 Tool:Property("Name", "ToolTouchBase");

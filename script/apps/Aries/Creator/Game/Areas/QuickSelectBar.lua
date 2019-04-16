@@ -376,9 +376,6 @@ function QuickSelectBar.ShowInventoryPage(beShow)
 		local InventoryPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InventoryPage");
 		InventoryPage.ShowPage(beShow);
 	end
-    NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
-    local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
-    TouchController.ShowPage(not beShow);
 	NPL.load("(gl)script/mobile/paracraft/Areas/SystemMenuPage.lua");
 	local SystemMenuPage = commonlib.gettable("ParaCraft.Mobile.Desktop.SystemMenuPage");
 	SystemMenuPage.ShowPage(not beShow);

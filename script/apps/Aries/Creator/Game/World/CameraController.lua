@@ -14,10 +14,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Desktop/GUIHelper/ClickToContinue.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/StereoVisionController.lua");
 local StereoVisionController = commonlib.gettable("MyCompany.Aries.Game.StereoVisionController")
-local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
 local vector3d = commonlib.gettable("mathlib.vector3d");
@@ -302,7 +300,7 @@ end
 
 -- when shift key is pressed while standing, we will enter the mode. 
 function CameraController.CheckSetShiftKeyStandingMode(player)
-	local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT) or TouchController.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT);
+	local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
 	if(shift_pressed) then
 		-- bent down if no speed and shift key is pressed. 
 		CameraController.is_shift_pressed = true;

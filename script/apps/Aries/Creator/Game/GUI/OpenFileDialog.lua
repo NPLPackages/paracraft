@@ -36,7 +36,7 @@ end
 function OpenFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
 		return {
-			{L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml"},
+			{L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml", exclude="*.blocks.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
@@ -120,7 +120,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
 	if(default_text) then
-		params._page:SetUIValue("text", default_text);
+		params._page:SetUIValue("text", commonlib.Encoding.DefaultToUtf8(default_text));
 	end
 	params._page.OnClose = function()
 		if(OnClose) then
@@ -136,7 +136,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 				local fileItem = Files.ResolveFilePath(firstFile);
 				if(fileItem and fileItem.relativeToWorldPath) then
 					local filename = fileItem.relativeToWorldPath;
-					params._page:SetValue("text", filename);
+					params._page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
 				end
 			end
 			
@@ -150,7 +150,7 @@ end
 
 function OpenFileDialog.OnOK()
 	if(page) then
-		OpenFileDialog.result = page:GetValue("text");
+		OpenFileDialog.result = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"));
 		page:CloseWindow();
 	end
 end
@@ -187,8 +187,15 @@ function OpenFileDialog.UpdateExistingFiles()
 				if(filterText) then
 					-- "*.fbx;*.x;*.bmax;*.xml"
 					local exts = {};
+					local excludes;
 					for ext in filterText:gmatch("%*%.([^;]+)") do
 						exts[#exts + 1] = "%."..ext.."$";
+					end
+					if(filter.exclude) then
+						excludes = excludes or {};
+						for ext in filter.exclude:gmatch("%*%.([^;]+)") do
+							excludes[#excludes + 1] = "%."..ext.."$";
+						end
 					end
 				
 					-- skip these system files and all files under blockWorld.lastsave/
@@ -202,6 +209,13 @@ function OpenFileDialog.UpdateExistingFiles()
 
 					filterFunc = function(item)
 						if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld%.lastsave")) then
+							if(excludes) then
+								for i=1, #excludes do
+									if(item.filename:match(excludes[i])) then
+										return;
+									end
+								end
+							end
 							for i=1, #exts do
 								if(item.filename:match(exts[i])) then
 									return true;
@@ -251,7 +265,7 @@ function OpenFileDialog.GetText()
 end
 
 function OpenFileDialog.OnClickEdit()
-	local filename = page:GetValue("text");
+	local filename = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"));
 	local callback;
 	if(type(OpenFileDialog.editButton) == "function") then
 		callback = OpenFileDialog.editButton;
@@ -261,7 +275,7 @@ function OpenFileDialog.OnClickEdit()
 	if(callback) then
 		local new_filename = callback(filename);
 		if(new_filename and new_filename~=filename) then
-			page:SetValue("text", new_filename);
+			page:SetValue("text", commonlib.Encoding.DefaultToUtf8(new_filename));
 		end
 	end
 end

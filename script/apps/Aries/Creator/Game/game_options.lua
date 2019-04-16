@@ -447,7 +447,9 @@ end
 
 -- @param bShow: if nil, it will automatically show if on mobile platform.
 function options:ShowTouchPad(bShow)
-	if(System.options.IsTouchDevice) then
+	-- on windows touch device, if the user has clicked with touch device before it enters a 3d world, we will show the touch controller. 
+	local IsTouchDevice = self:HasTouchDevice()
+	if(System.options.IsTouchDevice or IsTouchDevice) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 		local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 		TouchMiniKeyboard.CheckShow(true);
@@ -455,18 +457,6 @@ function options:ShowTouchPad(bShow)
 		-- enable touch mode
 		self:SetEnableMouseLeftDrag(true);
 	end
-
--- following is old and intrusive touch system 
---	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
---	local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
---	if(bShow == nil) then
---		TouchController.SetAutoShowHide(true);
---		if(System.options.IsMobilePlatform) then
---			TouchController.ShowPage();
---		end
---	else
---		TouchController.ShowPage(bShow);
---	end
 end
 
 function options:SetLoginPosition(x, y, z)

@@ -51,7 +51,7 @@ local cmds = {
 
 {
 	type = "box", 
-	message0 = L" %1 立方体 长 %2 宽 %3 高 %4 %5",
+	message0 = L" %1 长方体 长 %2 宽 %3 高 %4 %5",
     arg0 = {
         {
 			name = "op",

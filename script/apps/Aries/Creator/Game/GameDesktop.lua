@@ -20,7 +20,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GoalTracker.lua");
 NPL.load("(gl)script/apps/Aries/Creator/ToolTipsPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 
@@ -35,7 +34,6 @@ local GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Goa
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
 local ModManager = commonlib.gettable("Mod.ModManager");
-local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 	
@@ -428,9 +426,9 @@ function Desktop.GetChatGUI()
 	return Desktop.GUI.chat;
 end
 
+-- obsoleted: now mobile and desktop are the same.
 function Desktop.ShowMobileDesktop(bShow)
 	QuickSelectBar.ShowPage(bShow);
-	TouchController.ShowPage(bShow);
 	NPL.load("(gl)script/mobile/paracraft/Areas/SystemMenuPage.lua");
 	local SystemMenuPage = commonlib.gettable("ParaCraft.Mobile.Desktop.SystemMenuPage");
 	SystemMenuPage.ShowPage(bShow);

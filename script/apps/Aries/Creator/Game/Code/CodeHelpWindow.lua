@@ -293,10 +293,12 @@ function CodeHelpWindow.GenerateWikiDocs(bSilent)
 							local html = item:GetHtml() or ""
 							html = html:gsub("<div [^>]*>", "`"):gsub("</div>", "`")
 							html = html:gsub("<input .*value=\"([^\"]+)\"[^/]*/>", "`%1`")
-							docs[#docs+1] = "> "..html..": "..code;
+							docs[#docs+1] = '<div style="float:left;margin-right:10px;">\n\n'
+							docs[#docs+1] = "> "..html.."\n"..code;
 							if(not code:match("\n%s*$")) then
 								docs[#docs+1] = "\n"
 							end
+							docs[#docs+1] = '\n</div>\n<div style="float:left;">\n\n'
 							docs[#docs+1] = "```lua\n"
 							local examples = item:GetNPLCodeExamples();
 							docs[#docs+1] = examples;
@@ -304,6 +306,7 @@ function CodeHelpWindow.GenerateWikiDocs(bSilent)
 								docs[#docs+1] = "\n"
 							end
 							docs[#docs+1] = "```\n"
+							docs[#docs+1] = '\n</div>\n<div style="clear:both"/>\n\n'
 						end
 					end
 				end

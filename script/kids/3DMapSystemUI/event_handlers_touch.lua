@@ -1,5 +1,5 @@
 --[[
-Title: DEPRECATED: multi-touch event handler (use TouchController.lua)
+Title: DEPRECATED: multi-touch event handler
 Author(s): Andy, LiXizhi
 Date: 2014/4/24.  
 Revised: 2014/11/10 this file is DEPRECATED. 

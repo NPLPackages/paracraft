@@ -17,7 +17,6 @@ local vector3d = commonlib.gettable("mathlib.vector3d");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
-local TouchController = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchController");
 local TouchSelection = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tools.TouchSelection"));
 TouchSelection:Property("Name", "TouchSelection");
 

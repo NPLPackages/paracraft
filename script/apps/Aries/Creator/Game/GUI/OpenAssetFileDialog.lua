@@ -59,10 +59,10 @@ end
 function OpenAssetFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
 		return {
-			{L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml"},
+			{L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml", exclude="*.blocks.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
-			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
+			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml", exclude="*.blocks.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
 		};
 	elseif(filterName == "bmax") then
@@ -183,7 +183,7 @@ end
 
 function OpenAssetFileDialog.OnOK()
 	if(page) then
-		local text = page:GetValue("text")
+		local text = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"))
 		local filepath = PlayerAssetFile:GetValidAssetByString(text);
 		if(filepath) then
 			local fileItem = Files.ResolveFilePath(filepath);
@@ -212,14 +212,19 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 	if(OpenAssetFileDialog.filters) then
 		filter = OpenAssetFileDialog.filters[OpenAssetFileDialog.curFilterIndex or 1];
 		if(filter) then
-			filter = filter[2];
-			if(filter) then
+			if(filter[2]) then
 				-- "*.fbx;*.x;*.bmax;*.xml"
 				local exts = {};
-				for ext in filter:gmatch("%*%.([^;]+)") do
+				local excludes;
+				for ext in filter[2]:gmatch("%*%.([^;]+)") do
 					exts[#exts + 1] = "%."..ext.."$";
 				end
-				
+				if(filter.exclude) then
+					excludes = excludes or {};
+					for ext in filter.exclude:gmatch("%*%.([^;]+)") do
+						excludes[#excludes + 1] = "%."..ext.."$";
+					end
+				end
 				-- skip these system files and all files under blockWorld.lastsave/
 				local skippedFiles = {
 					["LocalNPC.xml"] = true,
@@ -231,6 +236,13 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 
 				filterFunc = function(item)
 					if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld%.lastsave")) then
+						if(excludes) then
+							for i=1, #excludes do
+								if(item.filename:match(excludes[i])) then
+									return;
+								end
+							end
+						end
 						for i=1, #exts do
 							if(item.filename:match(exts[i])) then
 								return true;
@@ -271,7 +283,7 @@ function OpenAssetFileDialog.GetText()
 end
 
 function OpenAssetFileDialog.OnClickEdit()
-	local filename = page:GetValue("text");
+	local filename = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"))
 	local callback;
 	if(type(OpenAssetFileDialog.editButton) == "function") then
 		callback = OpenAssetFileDialog.editButton;
@@ -318,7 +330,7 @@ end
 
 function OpenAssetFileDialog.SetText(text)
 	if(page and text) then
-		page:SetValue("text", text);
+		page:SetValue("text", commonlib.Encoding.DefaultToUtf8(text));
 		local filepath = PlayerAssetFile:GetValidAssetByString(text);
 		if(filepath) then
 			local ctl = page:FindControl("AssetPreview");
