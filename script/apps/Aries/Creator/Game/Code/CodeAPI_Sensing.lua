@@ -233,42 +233,39 @@ end
 -- @param buttons: nil or {"button1", "button2"}
 -- @return result
 function env_imp:ask(text, buttons)
-	local actor = self.actor;
-	if(actor) then
-		local type_;
-		if(type(buttons) == "table") then
-			type_ = "buttons";
-		end
-
-		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-		local Screen = commonlib.gettable("System.Windows.Screen");
-		local viewport = ViewportManager:GetSceneViewport();
-		local offsetX = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
-
-		height = 200;
-		if(buttons) then
-			height = math.max(height, 120 + (#buttons)*30);
-		end
-
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
-		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-
-		if(text or buttons) then
-			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
-				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
-				env_imp.resume(self);
-			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
-			env_imp.yield(self)
-		else
-			self.co:SetTimeout(0.02, function()
-				EnterTextDialog.OnClose();
-				env_imp.resume(self);
-			end) 
-			env_imp.yield(self);
-		end
-		env_imp.wait(self, env_imp.GetDefaultTick(self));
-		return GameLogic.GetCodeGlobal():GetGlobal("answer");
+	local type_;
+	if(type(buttons) == "table") then
+		type_ = "buttons";
 	end
+
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local viewport = ViewportManager:GetSceneViewport();
+	local offsetX = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
+
+	height = 200;
+	if(buttons) then
+		height = math.max(height, 120 + (#buttons)*30);
+	end
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+	local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+
+	if(text or buttons) then
+		EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
+			GameLogic.GetCodeGlobal():SetGlobal("answer", result);
+			env_imp.resume(self);
+		end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
+		env_imp.yield(self)
+	else
+		self.co:SetTimeout(0.02, function()
+			EnterTextDialog.OnClose();
+			env_imp.resume(self);
+		end) 
+		env_imp.yield(self);
+	end
+	env_imp.wait(self, env_imp.GetDefaultTick(self));
+	return GameLogic.GetCodeGlobal():GetGlobal("answer");
 end
 
 -- local block time since this block is loaded.

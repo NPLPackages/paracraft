@@ -586,6 +586,17 @@ function Actor:ComputeRenderCode(curTime)
 	return self.renderCode or self:GetValue("code", curTime);
 end
 
+function Actor:GetZOrder()
+	return self:GetEntity() and self:GetEntity():GetZOrder() or 0;
+end
+
+function Actor:SetZOrder(zorder)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:SetZOrder(tonumber(zorder));
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -600,6 +611,7 @@ local internalValues = {
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
+	["zorder"] = {setter = Actor.SetZOrder, getter = Actor.GetZOrder, isVariable = false}, 
 	["rendercode"] = {setter = Actor.SetUserRenderCode, getter = Actor.GetUserRenderCode,  isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
