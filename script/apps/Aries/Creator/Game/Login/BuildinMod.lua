@@ -47,7 +47,7 @@ BuildinMod.buildin_mods = {
 		displayName = L"NplBrowser", 
 		text=L"系统内置插件",
 		version = "1.0.0",
-		homepage = "https://github.com/tatfook/NplBrowserScript",
+		homepage = "https://github.com/NPLPackages/NplBrowserScript",
 	},
 	{
 		name = "STLExporter", 

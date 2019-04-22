@@ -428,7 +428,163 @@ local cmds = {
 		
     ]]}},
 },
+{
+	type = "trapezoid", 
+	message0 = L"%1 梯形 顶宽 %2 底宽 %3 高 %4 厚 %5 %6",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "top_w",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "bottom_w",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "hight",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "depth",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.5,},
+			text = 0.5, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+       
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'trapezoid(%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('trapezoid(("%s",%s,%s,%s,%s,"%s")\n', 
+            self:getFieldValue('op'), 
+            self:getFieldValue('top_w'), self:getFieldValue('bottom_w'), self:getFieldValue('hight'),self:getFieldValue('depth'), 
+            self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+		
+    ]]}},
+},
 
+{
+	type = "wedge_full", 
+	message0 = L"%1 楔体X xmin %2 ymin %3 zmin %4 x2min %5 z2min %6 xmax %7 ymax %8 zmax %9 x2max %10 z2max %11 %12",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "xmin",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "ymin",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "zmin",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "x2min",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "z2min",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "xmax",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "ymax",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "zmax",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "x2max",
+			type = "input_value",
+            shadow = { type = "math_number", value = 8,},
+			text = 8, 
+		},
+        {
+			name = "z2max",
+			type = "input_value",
+            shadow = { type = "math_number", value = 8,},
+			text = 8, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+       
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'wedge_full(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('wedge_full(("%s",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s")\n', 
+            self:getFieldValue('op'), 
+            self:getFieldValue('xmin'), self:getFieldValue('ymin'), self:getFieldValue('zmin'),
+            self:getFieldValue('x2min'), self:getFieldValue('z2min'), 
+            self:getFieldValue('xmax'), self:getFieldValue('ymax'), self:getFieldValue('zmax'),
+            self:getFieldValue('x2max'), self:getFieldValue('z2max'), 
+            self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+		
+    ]]}},
+},
 
 {
 	type = "point", 

@@ -179,7 +179,44 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-
+{
+	type = "scale", 
+	message0 = L"缩放 %1 %2 %3",
+    arg0 = {
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+	},
+	hide_in_toolbox = true,
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'scale(%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('scale(%s,%,%s)\n', 
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 {
 	type = "rotate", 
 	message0 = L"旋转 %1 %2 度",
@@ -262,7 +299,51 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-
+{
+	type = "mirror", 
+	message0 = L"镜像 %1 中心点 %2 %3 %4",
+    arg0 = {
+        {
+			name = "axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_plane", value = "xy",},
+			text = "'xy'", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'mirror(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('mirror(%s,%s,%s,%s)\n', 
+            self:getFieldValue('axis_plane'),
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 {
 	type = "moveNode", 
 	message0 = L"移动对象 %1 %2 %3 %4",
@@ -300,6 +381,50 @@ local cmds = {
 	func_description = 'moveNode(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('moveNode("%s",%s,%s,%s)\n', 
+            self:getFieldValue('name'),
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "scaleNode", 
+	message0 = L"缩放对象 %1 %2 %3 %4",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        
+	},
+	hide_in_toolbox = true,
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'scaleNode(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('scaleNode("%s",%s,%s,%s)\n', 
             self:getFieldValue('name'),
             self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
@@ -400,6 +525,57 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+{
+	type = "mirrorNode", 
+	message0 = L"镜像对象 %1 %2 中心点 %3 %4 %5",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_plane", value = "xy",},
+			text = "'xy'", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'mirrorNode(%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('mirrorNode("%s",%s,%s,%s,%s)\n', 
+            self:getFieldValue('name'),
+            self:getFieldValue('axis_plane'),
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 
 {
 	type = "boolean_op", 
@@ -442,6 +618,33 @@ local cmds = {
 				{ L"x轴", "'x'" },
 				{ L"y轴", "'y'" },
 				{ L"z轴", "'z'" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+    output = {type = "null",},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+        return string.format('%s', self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "axis_plane", 
+	message0 = L"%1",
+    arg0 = {
+        
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"xy平面", "'xy'" },
+				{ L"xz平面", "'xz'" },
+				{ L"yz平面", "'yz'" },
 			},
 		},
 	},
