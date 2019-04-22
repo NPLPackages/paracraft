@@ -640,6 +640,7 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 				entity:SetVisible(wasVisible);
 			end
 		end
+		self:EnableActorPicking(self:IsActorPickingEnabled());
 	end
 end
 
