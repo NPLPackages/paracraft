@@ -493,6 +493,25 @@ end
 },
 
 {
+	type = "getMousePoint", 
+	message0 = L"鼠标XY",
+	arg0 = {
+	},
+	output = {type = "field_number",},
+	category = "Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getMousePoint()',
+	ToNPL = function(self)
+		return string.format('local x, y = getMousePoint()\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+-- x in [-500, 500]
+local x, y = getMousePoint()
+]]}},
+},
+
+{
 	type = "mousePickBlock", 
 	message0 = L"鼠标选取",
 	arg0 = {

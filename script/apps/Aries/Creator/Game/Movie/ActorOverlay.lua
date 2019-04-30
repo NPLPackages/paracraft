@@ -46,6 +46,7 @@ Actor:Property({"Font", "System;14;norm", auto=true})
 Actor:Property({"text", nil, "GetText", "SetText", auto=true})
 -- line height in pixels
 Actor:Property({"lineheight", 16,})
+Actor:Property({"enablePicking", true, "IsPickingEnabled", "EnablePicking", auto=true})
 
 Actor:Property({"bounding_radius", 0, "GetBoundingRadius", "SetBoundingRadius", auto=true})
 Actor:Property({"m_aabb", nil,})
@@ -766,6 +767,10 @@ end
 
 function Actor:DoRender(painter)
 	local isPickingPass = self.entity.overlay:IsPickingPass();
+
+	if(not self:IsPickingEnabled() and isPickingPass) then
+		return
+	end
 
 
 	local env = self:CheckInstallCodeEnv(painter, isPickingPass);

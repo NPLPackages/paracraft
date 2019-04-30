@@ -93,7 +93,8 @@ end
 		{
 			name = "left",
 			type = "input_value",
-            shadow = { type = "text", value = "",},
+            --shadow = { type = "text", value = "",},
+			shadow = { type = "functionParams", value = "1",},
 		},
 		{
 			name = "op",
@@ -105,7 +106,8 @@ end
 		{
 			name = "right",
 			type = "input_value",
-            shadow = { type = "text", value = "",},
+            -- shadow = { type = "text", value = "",},
+			shadow = { type = "functionParams", value = "1",},
 		},
 	},
 	output = {type = "field_number",},

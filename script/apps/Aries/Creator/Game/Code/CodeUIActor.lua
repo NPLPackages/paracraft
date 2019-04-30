@@ -33,6 +33,7 @@ function Actor:ctor()
 	self.fromPos = vector3d:new(0,0,0);
 	self.offsetYaw = 0;
 	self.codeEvents = {};
+	self:EnablePicking(false);
 end
 
 -- @param itemStack: movie block actor's item stack where time series data source of this entity is stored. 
@@ -88,6 +89,7 @@ end
 
 function Actor:EnableActorPicking(bEnabled)
 	self.enableActorPicking = bEnabled;
+	self:EnablePicking(bEnabled);
 	if(self.entity) then
 		self.entity:SetSkipPicking(not bEnabled);
 	end

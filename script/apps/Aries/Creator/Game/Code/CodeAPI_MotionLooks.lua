@@ -108,6 +108,8 @@ function env_imp:move(dx,dy,dz, duration)
 		if(not duration) then
 			actor:SetPosition(targetX,targetY,targetZ);
 			env_imp.wait(self, env_imp.GetDefaultTick(self));
+		elseif(duration == 0) then
+			actor:SetPosition(targetX,targetY,targetZ);
 		else
 			local endTime = commonlib.TimerManager.GetCurrentTime()/1000 + duration;
 			local stepTime = env_imp.GetDefaultTick(self);

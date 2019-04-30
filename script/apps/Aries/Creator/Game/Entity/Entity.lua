@@ -2736,3 +2736,19 @@ function Entity:GetSelectionEffect()
 		return 1
 	end
 end
+
+function Entity:SetShaderCaster(enabled)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("ShadowCaster", enabled==true);
+	end
+end
+
+function Entity:IsShaderCaster()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("ShadowCaster", true);
+	else
+		return true;
+	end
+end

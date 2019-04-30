@@ -14,12 +14,17 @@ GameLogic.GetCodeGlobal():CreateGetTextEvent("msgname");
 GameLogic.GetCodeGlobal():BroadcastStartEvent();
 -------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUI.lua");
 NPL.load("(gl)script/ide/System/Windows/Application.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerViaTunnel.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
-
+NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+local Screen = commonlib.gettable("System.Windows.Screen");
+local Mouse = commonlib.gettable("System.Windows.Mouse");
 local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer");
 local LobbyServerViaTunnel = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServerViaTunnel");
 local Application = commonlib.gettable("System.Windows.Application");
@@ -138,7 +143,10 @@ function CodeGlobals:ctor()
 		loadWorldData = function(name, default_value, filename)
 			return self:LoadWorldData(name, default_value, filename)
 		end,
-
+		-- @return x,y: x in [-500, 500] range
+		getMousePoint = function()
+			return self:GetMousePoint();
+		end,
 		----------------------
 		-- @NOTE: the following may not be safe to expose to users
 		----------------------
@@ -207,6 +215,19 @@ function CodeGlobals:log(obj, ...)
 	else
 		self:logAdded(commonlib.serialize_in_length(obj, 100));
 	end
+end
+
+-- @return x,y: x in [-500, 500] range
+function CodeGlobals:GetMousePoint()
+	local x, y = Mouse:GetMousePosition();
+
+	local viewport = ViewportManager:GetSceneViewport();
+	local screenWidth, screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+
+	x = x * 1000 / screenWidth - 500;
+	local ry = 1000 * screenHeight / screenWidth
+	y = -(y * ry / screenHeight - ry * 0.5);
+	return math.floor(x+0.5), math.floor(y+0.5);
 end
 
 function CodeGlobals:OnWorldSave()

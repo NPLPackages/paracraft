@@ -27,6 +27,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local EditCodeActor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor"));
@@ -442,13 +443,16 @@ function EditCodeActor:OnInventoryChanged(slotIndex)
 	end
 end
 
--- create at player position
+-- create at player block center position
 function EditCodeActor.OnClickAddActor()
 	local self = EditCodeActor.GetInstance();
 	if(self) then
 		local item = self:GetCodeActorItem();
 		if(item) then
-			item:CreateActorInstance(self:GetEntityCode());
+			local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+			x, y, z = BlockEngine:real_bottom(x, y, z);
+			local facing = Direction.directionTo3DFacing[Direction.GetDirection2DFromCamera()]-3.14;
+			item:CreateActorInstance(self:GetEntityCode(), x, y, z, facing);
 		end
 	end
 end
