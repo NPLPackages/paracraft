@@ -275,9 +275,19 @@ function ParaWorldLessons.ShowLoginModal()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 	ParaWorldLoginDocker.SignIn(L"登陆后才能访问课程系统, 请先登录", function(bSucceed)
-			if(bSucceed) then
-				ParaWorldLessons.JoinClass()
-			end
+		if not ParaWorldLessons.classId then
+			return false
+		end
+
+		local lesson = ParaWorldLessons.GetCurrentLesson()
+
+		if (not lesson) then
+			ParaWorldLessons.EnterClassImp(ParaWorldLessons.classId)
+			ParaWorldLessons.JoinClass()
+		else
+			ParaWorldLessons.JoinClass()
+		end
+
 	end)
 end
 
@@ -512,7 +522,15 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	if(classId) then
 		classId = tonumber(classId);
 		ParaWorldLessons.classId = classId
-		ParaWorldLessons.EnterClassImp(classId)
+
+		if KeepworkService:IsSignedIn() then
+			ParaWorldLessons.EnterClassImp(classId)
+			ParaWorldLessons.JoinClass()
+		end
+
+		if not KeepworkService:IsSignedIn() then
+			ParaWorldLessons.ShowLoginModal()
+		end
 
 		return true;
 	elseif(packageId and lessonId) then
@@ -524,12 +542,6 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 end
 
 function ParaWorldLessons.OnWorldLoaded()
-	if not KeepworkService:IsSignedIn() then
-		ParaWorldLessons.ShowLoginModal()
-	else
-		ParaWorldLessons.JoinClass()
-	end
-
 	local lesson = ParaWorldLessons.GetCurrentLesson()
 
 	if(lesson) then
