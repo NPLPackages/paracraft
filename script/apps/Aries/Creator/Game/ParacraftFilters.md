@@ -50,7 +50,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "ShowExitDialog", {text, callback}: use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
   - "show_custom_create_new_world", behavior("show" or "close"):use this filter to customize your CreateNewWorld page.
   - "show_custom_download_world", behavior("show" or "close"), url:use this filter to customize your DownloadWorld page.
-  
+  - "OnShowEscFrame", bShow: whenever the esc key frame window is shown or hide
+
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
   - "BeforeSetSpawnPoint", {x,y,z}: before player spawn point is set

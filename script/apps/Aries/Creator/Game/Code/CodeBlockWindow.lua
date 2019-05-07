@@ -18,6 +18,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -26,6 +28,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"));
 
 -- when entity being edited is changed. 
@@ -43,6 +46,9 @@ function CodeBlockWindow.Show(bShow)
 	if(not bShow) then
 		CodeBlockWindow.Close();
 	else
+        GameLogic.GetFilters():add_filter("OnShowEscFrame", CodeBlockWindow.OnShowEscFrame);
+		GameLogic.GetFilters():add_filter("ShowExitDialog", CodeBlockWindow.OnShowExitDialog);
+		
 		GameLogic:desktopLayoutRequested("CodeBlockWindow");
 		GameLogic:Connect("desktopLayoutRequested", CodeBlockWindow, CodeBlockWindow.OnLayoutRequested, "UniqueConnection");
 		GameLogic.GetCodeGlobal():Connect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText, "UniqueConnection");
@@ -55,9 +61,11 @@ function CodeBlockWindow.Show(bShow)
 			_this.background="";
 			local refreshTimer = commonlib.Timer:new({callbackFunc = function(timer)
 				CodeBlockWindow.Show(true)
+               
 			end})
 			_this:SetScript("onsize", function()
 				CodeBlockWindow:OnViewportChange();
+               
 			end)
 			local viewport = ViewportManager:GetSceneViewport();
 			viewport:SetMarginRight(self.margin_right);
@@ -80,7 +88,21 @@ function CodeBlockWindow.Show(bShow)
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
 
 		CodeBlockWindow:LoadSceneContext();
+
+        NplBrowserLoaderPage.Check(function() 		end);
 	end
+end
+
+function CodeBlockWindow.OnShowEscFrame(bShow)
+	if(bShow or bShow == nil) then
+		CodeBlockWindow.Show(false)
+	end
+	return bShow;
+end
+
+function CodeBlockWindow.OnShowExitDialog(p1)
+	CodeBlockWindow.Show(false);
+	return p1;
 end
 
 function CodeBlockWindow:OnLayoutRequested(requesterName)
@@ -129,9 +151,8 @@ function CodeBlockWindow:OnViewportChange()
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
 			end
-
-			CodeBlockWindow.UpdateBlocklyWindowSize();
 		end
+
 	end
 end
 
@@ -267,12 +288,9 @@ end
 
 function CodeBlockWindow.Close()
 	GameLogic.GetCodeGlobal():Disconnect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText);
-	if(CodeBlockWindow.isBlocklyOpened) then
-		CodeBlockWindow.CloseBlocklyWindow();
-		return
-	end
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.CloseEditorWindow();
+	CodeBlockWindow.lastBlocklyUrl = nil;
 end
 
 function CodeBlockWindow.CloseEditorWindow()
@@ -507,6 +525,7 @@ function CodeBlockWindow.OnChangeModel()
 				end
 			end);
 		end
+		CodeBlockWindow.SetNplBrowserVisible(false)
 	end
 end
 
@@ -634,49 +653,6 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine, bx, by, b
 	end
 end
 
-local blocklyWndName = "blocklyWindow";
-
-function CodeBlockWindow.GetChromeBrowserManager()
-	if(self.chromeBrowserManager == nil) then
-		self.chromeBrowserManager = false;
-		NPL.load("(gl)Mod/NplCefBrowser/NplCefBrowserManager.lua");
-		local NplCefBrowserManager = commonlib.gettable("Mod.NplCefBrowserManager");	
-		if(NplCefBrowserManager.HasCefPlugin and NplCefBrowserManager:HasCefPlugin()) then
-			self.chromeBrowserManager = NplCefBrowserManager;
-		end
-	end
-	return self.chromeBrowserManager;
-end
-
--- @param bDestroy: true to destroy window
-function CodeBlockWindow.CloseBlocklyWindow(bDestroy)
-	CodeBlockWindow.isBlocklyOpened = false;
-	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
-	if(NplCefBrowserManager) then
-		local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
-		if(config) then
-			if(not bDestroy) then
-				config.visible = false;
-				NplCefBrowserManager:Show(config);
-			else
-				NplCefBrowserManager:Delete({id = blocklyWndName, });
-			end
-		end
-	end
-end
-
-function CodeBlockWindow.UpdateBlocklyWindowSize()
-	if(CodeBlockWindow.isBlocklyOpened) then
-		local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
-		if(NplCefBrowserManager) then
-			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
-			if(config) then
-				NplCefBrowserManager:ChangePosSize({id = blocklyWndName, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
-			end
-		end
-	end
-end
-
 function CodeBlockWindow.IsBlocklyEditMode()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
@@ -694,7 +670,6 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	if(entity) then
 		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
 	end
-    CodeBlockWindow.SetNplBrowserVisible(CodeBlockWindow.IsBlocklyEditMode());
 end
 
 -- default to standard NPL language. One can create domain specific language configuration files. 
@@ -748,14 +723,14 @@ function CodeBlockWindow.OnClickEditMode(name)
 		if(name == "blockMode") then
 			CodeBlockWindow.UpdateCodeToEntity();
 			entity:SetBlocklyEditMode(true);
-			CodeBlockWindow.UpdateCodeEditorStatus()
+			CodeBlockWindow.UpdateCodeEditorStatus();
 		end
 	end
 	if(mouse_button == "right") then
 		CodeBlockWindow.OnClickSelectLanguageSettings()
 	end
 	if(name == "blockMode") then
-		CodeBlockWindow.OpenBlocklyEditor()
+		CodeBlockWindow.OpenBlocklyEditor();
 	end
 end
 
@@ -764,22 +739,57 @@ function CodeBlockWindow.UpdateEditModeUI()
 		if(CodeBlockWindow.IsBlocklyEditMode()) then
 			_guihelper.SetUIColor(page:FindControl("blockMode"), "#0b9b3a")
 			_guihelper.SetUIColor(page:FindControl("codeMode"), "#808080")
+			if(CodeBlockWindow.IsNPLBrowserVisible()) then
+				CodeBlockWindow.SetNplBrowserVisible(true);
+			end
 		else
 			_guihelper.SetUIColor(page:FindControl("blockMode"), "#808080")
 			_guihelper.SetUIColor(page:FindControl("codeMode"), "#0b9b3a")
+			CodeBlockWindow.SetNplBrowserVisible(false);
 		end
 		local textCtrl = CodeBlockWindow.GetTextControl();
 		if(textCtrl) then
 			textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
 		end
 	end
-    CodeBlockWindow.SetNplBrowserVisible(CodeBlockWindow.IsBlocklyEditMode())
 end
-function CodeBlockWindow.SetNplBrowserVisible(b)
+
+-- @param bForceRefresh: whether to refresh the content of the browser according to current blockly code. If nil, it will refresh if url has changed. 
+function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
     if(page)then
-        page:CallMethod("nplbrowser_instance","SetVisible",b)
+		-- block NPL.activate "cef3/NplCefPlugin.dll" if npl browser isn't loaded
+        -- so that we can running auto updater normally
+        if(not CodeBlockWindow.NplBrowserIsLoaded())then
+            return
+        end
+		page.isNPLBrowserVisible = bVisible;
+
+		if(bVisible and not CodeBlockWindow.temp_nplbrowser_reload)then
+			-- tricky: this will create the pe:npl_browser control on first use. 
+            CodeBlockWindow.temp_nplbrowser_reload = true;
+            page:Rebuild();
+        end
+
+		page:CallMethod("nplbrowser_instance","SetVisible",bVisible)
+        if(bVisible) then
+			if(bForceRefresh == nil) then
+				if(self.lastBlocklyUrl ~= CodeBlockWindow.GetBlockEditorUrl()) then
+					self.lastBlocklyUrl = CodeBlockWindow.GetBlockEditorUrl();
+					bForceRefresh = true;
+				end
+			end
+			if(bForceRefresh) then
+				page:CallMethod("nplbrowser_instance","Reload",CodeBlockWindow.GetBlockEditorUrl());
+			end
+        end
+        
     end
 end
+
+function CodeBlockWindow.IsNPLBrowserVisible()
+	return page and page.isNPLBrowserVisible;
+end
+
 function CodeBlockWindow.GetBlockEditorUrl()
     local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
@@ -813,31 +823,11 @@ function CodeBlockWindow.OpenBlocklyEditor()
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s", blockpos);
 	end
-
-	local NplCefBrowserManager = CodeBlockWindow.GetChromeBrowserManager();
-	if(NplCefBrowserManager) then
-		 -- Open a new window
-		if(not CodeBlockWindow.isBlocklyOpened) then
-			CodeBlockWindow.isBlocklyOpened = true;
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
-			local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
-			local url = DefaultFilters.cmd_open_url(request_url)
-
-			local config = NplCefBrowserManager:GetWindowConfig(blocklyWndName);
-			if(false and config and not config.visible) then
-				config.visible = true;
-				config.url = url;
-				NplCefBrowserManager:Show(config);
-			else
-				NplCefBrowserManager:Open({id = blocklyWndName, url = url, showTitleBar=false, withControl = false, x = 0, y = 0, width = math.max(400, Screen:GetWidth()-self.width+205), height = Screen:GetHeight(), });
-			end
-			CodeBlockWindow.UpdateBlocklyWindowSize();
-		else
-			CodeBlockWindow.CloseBlocklyWindow();
-		end
+    if(CodeBlockWindow.NplBrowserIsLoaded())then
+		CodeBlockWindow.SetNplBrowserVisible(not CodeBlockWindow.IsNPLBrowserVisible())
 	else
 		GameLogic.RunCommand("/open "..request_url);
-	end
+    end
 end
 
 function CodeBlockWindow.OnOpenBlocklyEditor()
@@ -898,5 +888,7 @@ function CodeBlockWindow:GetSceneContext()
 	end
 	return self.sceneContext;
 end
-
+function CodeBlockWindow.NplBrowserIsLoaded()
+    return NplBrowserLoaderPage.IsLoaded() and WebServer:IsStarted();
+end
 CodeBlockWindow:InitSingleton();

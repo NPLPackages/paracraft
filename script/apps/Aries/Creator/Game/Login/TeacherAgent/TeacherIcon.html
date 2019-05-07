@@ -12,7 +12,7 @@ TeacherIcon = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherIc
 TeacherIcon.Init();
 ]]></script>
     <div style="min-width:42px;height:42px;">
-        <pe:gridview name="taskButtons" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight="42" pagesize="8" DataSource='<%=TeacherIcon.GetButtonDs%>'>
+        <pe:gridview name="taskButtons" ClickThrough="true" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight="42" pagesize="8" DataSource='<%=TeacherIcon.GetButtonDs%>'>
             <Columns>
                 <input type="button" name='<%=Eval("name")%>' tooltip='<%="page://script/apps/Aries/Creator/Game/Login/TeacherAgent/ButtonTooltip.html?index="..Eval("index")%>' onclick='<%=Eval("onclick") or ""%>' background='<%=Eval("icon") or ""%>' style="width:42px;height:42px;margin-right:3px;" />
             </Columns>

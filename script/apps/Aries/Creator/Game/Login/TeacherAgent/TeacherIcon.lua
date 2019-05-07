@@ -41,7 +41,7 @@ function TeacherIcon.Show(bShow)
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		allowDrag = false,
 		bShow = bShow,
-		zorder = 12,
+		zorder = -1,
 		ClickThrough = true,
 		cancelShowAnimation = true,
 		directPosition = true,

@@ -76,6 +76,7 @@ function EscFramePage.ShowPage_Mobile()
 end
 
 function EscFramePage.ShowPage(bShow)
+	GameLogic.GetFilters():apply_filters("OnShowEscFrame", bShow);
 	if(System.options.IsMobilePlatform) then
 		EscFramePage.ShowPage_Mobile()
 	else

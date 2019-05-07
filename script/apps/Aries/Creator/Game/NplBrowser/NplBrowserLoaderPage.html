@@ -1,0 +1,26 @@
+<!-- "Mod/NplBrowser/NplBrowserUpdaterPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2019.3.26</title>
+</head>
+<body> 
+<pe:mcml>
+    <script type="text/npl" refresh="true" src="NplBrowserUpdaterPage.lua">
+<![CDATA[
+local page = document:GetPageCtrl();
+NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+NplBrowserLoaderPage.OnInit();
+]]>
+    </script>
+    <div style="background:url(Texture/whitedot.png);background-color:#000000cc;width:400px;height:30px;color:#ffffff">
+        <div style="float:left;margin:5px;width:20px;height:20px;background:url(Texture/3DMapSystem/AppIcons/png/WebBrowser_64.png);">
+        </div>
+        <div style="float:left;margin:5px;width:340px;">
+            <label name="progressText" style="width:400px;height:25px;" value='<%=L"请稍后..."%>'></input><br />
+        </div>
+    </div>
+</pe:mcml>
+</body>
+</html>

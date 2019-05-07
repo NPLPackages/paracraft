@@ -1,0 +1,6 @@
+<configs>
+  <version>http://paracdn.keepwork.com/nplbrowser/version</version>
+  <hosts>
+    <host>http://paracdn.keepwork.com/nplbrowser/</host>
+  </hosts>
+</configs>
