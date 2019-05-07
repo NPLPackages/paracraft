@@ -271,6 +271,26 @@ function ParaWorldLessons.ShowPage(callbackFunc)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
+function ParaWorldLessons.ShowLoginModal()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+	ParaWorldLoginDocker.SignIn(L"登陆后才能访问课程系统, 请先登录", function(bSucceed)
+		if not ParaWorldLessons.classId then
+			return false
+		end
+
+		local lesson = ParaWorldLessons.GetCurrentLesson()
+
+		if (not lesson) then
+			ParaWorldLessons.EnterClassImp(ParaWorldLessons.classId)
+			ParaWorldLessons.JoinClass()
+		else
+			ParaWorldLessons.JoinClass()
+		end
+
+	end)
+end
+
 function ParaWorldLessons.OnClickClose()
 	ParaWorldLessons.CloseWindow()
 end
@@ -320,6 +340,11 @@ function ParaWorldLessons.OnClickEnterWorld()
 end
 
 function ParaWorldLessons.OpenCurrentLessonUrl()
+	if not KeepworkService:IsSignedIn() then
+		ParaWorldLessons.ShowLoginModal()
+		return false
+	end
+
 	if(ParaWorldLessons.GetCurrentLesson()) then
 		ParaWorldLessons.GetCurrentLesson():OpenLessonUrl()
 		TeacherAgent:ShowTipText();
@@ -361,23 +386,52 @@ end
 
 -- @param username: custom username 
 function ParaWorldLessons.EnterClassImp(classId, username)
+	if not classId then
+		return false
+	end
+
+	local url = format("%s/classrooms/getByKey?key=%s", KeepworkService:GetLessonApi(), classId)
+
+	ParaWorldLessons.UrlRequest(url, "GET", nil, function(err, msg, data)
+		if err ~= 200 then
+			LOG.std(nil, 'info', 'ParaWorldLessons', 'failed to fetch class %d: err: %d', classId, err)
+			_guihelper.MessageBox(format(L'获取课堂信息失败。错误码: %d', err))
+		end
+
+		if not data or not data.packageId or not data.lessonId then
+			return false
+		end
+
+		ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId, classId)
+	end)
+end
+
+function ParaWorldLessons.JoinClass()
+	local classId = ParaWorldLessons.classId
+
+	if not classId then
+		return false
+	end
+
 	local url = format("%s/classrooms/join", KeepworkService:GetLessonApi())
+
 	ParaWorldLessons.UrlRequest(url, "POST", {key=tostring(classId), username = username}, function(err, msg, data)
 		if(err ~= 200) then
 			LOG.std(nil, "info", "ParaWorldLessons", "failed to join class %d: err: %d", classId, err);
-			echo(msg)
-			_guihelper.MessageBox(format(L"无法加入课堂. 错误码: %d", err))
+			-- _guihelper.MessageBox(format(L"无法加入课堂. 错误码: %d", err))
 			return
 		end
+	
 		if(data and data.code == 2) then
 			_guihelper.MessageBox(L"课堂人数已满")
 		end
+
 		if(data and data.lessonId) then
 			-- {lessonId=27,id=850,extra={},state=0,createdAt="2018-10-13T15:23:38.000Z",updatedAt="2018-10-13T15:23:38.000Z",classroomId=38,userId=1,packageId=8,}
 			LOG.std(nil, "info", "ParaWorldLessons JoinClass", data);
-			ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId, classId, data.id, data.userId, data.token, username);
+			-- ParaWorldLessons.EnterLessonImp(data.packageId, data.lessonId, classId, data.id, data.userId, data.token, username);
 		end
-	end)	
+	end)
 end
 
 function ParaWorldLessons.CloseWindow(bEntered)
@@ -394,11 +448,10 @@ end
 function ParaWorldLessons.EnterLessonImp(packageId, lessonId, classId, recordId, userId, userToken, username)
 	local contentAPIUrl = format("%s/lessons/%d/contents", KeepworkService:GetLessonApi(), lessonId)
 	local lessonAPIUrl = format("%s/lessons/%d", KeepworkService:GetLessonApi(), lessonId)
-	
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLesson.lua")
 	local ParaWorldLesson = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson")
-	local lesson = ParaWorldLesson:new():Init(lessonId, packageId);
+	local lesson = ParaWorldLesson:new():Init(lessonId, packageId)
 
 	local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 	local SetCurLesson = Store:Action("lesson/SetCurLesson")
@@ -468,28 +521,15 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	local packageId, lessonId = id:match("^(%d+)[%D](%d+)$");
 	if(classId) then
 		classId = tonumber(classId);
+		ParaWorldLessons.classId = classId
 
-		if(KeepworkService:IsSignedIn()) then
-			ParaWorldLessons.EnterClassImp(classId);
-		else
-			local params = {
-				url = "script/apps/Aries/Creator/Game/Login/ParaWorldLessonLogin.html?classId="..tostring(classId), 
-				name = "ParaWorldLessonLogin.ShowPage", 
-				isShowTitleBar = false,
-				DestroyOnClose = true,
-				style = CommonCtrl.WindowFrame.ContainerStyle,
-				allowDrag = true,
-				bShow = true,
-				isTopLevel = true,
-				zorder = 3,
-				directPosition = true,
-					align = "_ct",
-					x = -200,
-					y = -100,
-					width = 400,
-					height = 260,
-			};
-			System.App.Commands.Call("File.MCMLWindowFrame", params);
+		if KeepworkService:IsSignedIn() then
+			ParaWorldLessons.EnterClassImp(classId)
+			ParaWorldLessons.JoinClass()
+		end
+
+		if not KeepworkService:IsSignedIn() then
+			ParaWorldLessons.ShowLoginModal()
 		end
 
 		return true;
