@@ -199,9 +199,12 @@ function NplBrowserLoaderPage.OnCheck(id,folder,config_file)
     if(NplBrowserLoaderPage.buildin_version)then
         a:loadLocalVersion()
         local cur_version = a:getCurVersion();
-        if(cur_version == NplBrowserLoaderPage.buildin_version)then
+        local buildin_version = NplBrowserLoaderPage.buildin_version;
+        local cur_version_value = AssetsManager.getVersionNumberValue(cur_version);
+        local buildin_version_value = AssetsManager.getVersionNumberValue(buildin_version);
+        if(cur_version_value >= buildin_version_value)then
             NplBrowserLoaderPage.SetChecked(true);
-	        LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser built in version %s is found, remote version check skipped",cur_version);
+	        LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "local version is:%s, buildin version is %s, because of %s >= %s ,remote version check skipped",cur_version,buildin_version,cur_version,buildin_version);
             return
         end
     end

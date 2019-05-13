@@ -59,33 +59,19 @@ function DefaultFilters.cmd_open_url(url)
 			-- return;
 		end
 
-		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
-		local addr = WebServer:site_url();
-		if(not addr) then
-			GameLogic.CommandManager:RunCommand("/webserver");
-			addr = WebServer:site_url();
-			if(not addr) then
-				local count = 0;
-				local function CheckServerStarted()
-					commonlib.TimerManager.SetTimeout(function()  
-						local addr = WebServer:site_url();
-						if(addr) then
-							GameLogic.CommandManager:RunCommand("/open "..url);
-						else
-							count = count + 1;
-							-- try 5 times in 5 seconds
-							if(count < 5)  then
-								CheckServerStarted();
-							end
-						end
-					end, 1000);
-				end
-				CheckServerStarted();
-				return;
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+		local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+		local isReturned;
+		local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
+			if(bStarted and isReturned) then
+				GameLogic.CommandManager:RunCommand("/open "..url);
 			end
-		end
-		if(addr) then
-			url = url:gsub("^npl:?/*", addr);
+		end)
+		isReturned = true;
+		if(bStarted) then
+			url = url:gsub("^npl:?/*", site_url);
+		else
+			return;
 		end
 	end
 	return url;

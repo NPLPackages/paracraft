@@ -831,7 +831,17 @@ function CodeBlockWindow.OpenBlocklyEditor()
 		request_url = request_url..format("?blockpos=%s", blockpos);
 	end
     if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
-		CodeBlockWindow.SetNplBrowserVisible(not CodeBlockWindow.IsNPLBrowserVisible())
+		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+			local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
+				if(bStarted) then
+					CodeBlockWindow.SetNplBrowserVisible(true)
+				end
+			end)
+		else
+			CodeBlockWindow.SetNplBrowserVisible(false)
+		end
 	else
 		GameLogic.RunCommand("/open "..request_url);
     end
@@ -896,6 +906,6 @@ function CodeBlockWindow:GetSceneContext()
 	return self.sceneContext;
 end
 function CodeBlockWindow.NplBrowserIsLoaded()
-    return NplBrowserLoaderPage.IsLoaded() and WebServer:IsStarted();
+    return NplBrowserLoaderPage.IsLoaded();
 end
 CodeBlockWindow:InitSingleton();
