@@ -66,5 +66,11 @@ function pe_nplbrowser.SetVisible(mcmlNode,name,visible)
 	if(config)then
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
+		
+		if(not visible) then
+			commonlib.TimerManager.SetTimeout(function()  
+				ParaUI.GetUIObject("root"):Focus();
+			end, 200)
+		end
 	end
 end

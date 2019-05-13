@@ -20,6 +20,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -59,13 +61,8 @@ function CodeBlockWindow.Show(bShow)
 			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, self.top, self.width, self.bottom);
 			_this.zorder = -2;
 			_this.background="";
-			local refreshTimer = commonlib.Timer:new({callbackFunc = function(timer)
-				CodeBlockWindow.Show(true)
-               
-			end})
 			_this:SetScript("onsize", function()
 				CodeBlockWindow:OnViewportChange();
-               
 			end)
 			local viewport = ViewportManager:GetSceneViewport();
 			viewport:SetMarginRight(self.margin_right);
@@ -95,13 +92,13 @@ end
 
 function CodeBlockWindow.OnShowEscFrame(bShow)
 	if(bShow or bShow == nil) then
-		CodeBlockWindow.Show(false)
+		CodeBlockWindow.SetNplBrowserVisible(false)
 	end
 	return bShow;
 end
 
 function CodeBlockWindow.OnShowExitDialog(p1)
-	CodeBlockWindow.Show(false);
+	CodeBlockWindow.SetNplBrowserVisible(false);
 	return p1;
 end
 
@@ -546,12 +543,13 @@ function CodeBlockWindow.IsMousePointerInCodeEditor()
 	end
 end
 
+-- @return textcontrol, multilineEditBox control.
 function CodeBlockWindow.GetTextControl()
 	if(page) then
 		local textAreaCtrl = page:FindControl("code");
 		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
 		if(textCtrl) then
-			return textCtrl:ViewPort();
+			return textCtrl:ViewPort(), textCtrl;
 		end
 	end
 end
@@ -735,22 +733,31 @@ function CodeBlockWindow.OnClickEditMode(name)
 end
 
 function CodeBlockWindow.UpdateEditModeUI()
-	if(page) then
+	local textCtrl, multiLineCtrl = CodeBlockWindow.GetTextControl();
+	if(page and textCtrl) then
 		if(CodeBlockWindow.IsBlocklyEditMode()) then
 			_guihelper.SetUIColor(page:FindControl("blockMode"), "#0b9b3a")
 			_guihelper.SetUIColor(page:FindControl("codeMode"), "#808080")
 			if(CodeBlockWindow.IsNPLBrowserVisible()) then
 				CodeBlockWindow.SetNplBrowserVisible(true);
 			end
+			multiLineCtrl:SetBackgroundColor("#cccccc")
+			local tipCtrl = page:FindControl("blocklyTip");
+			if(tipCtrl) then
+				tipCtrl.visible = true;
+			end
 		else
 			_guihelper.SetUIColor(page:FindControl("blockMode"), "#808080")
 			_guihelper.SetUIColor(page:FindControl("codeMode"), "#0b9b3a")
 			CodeBlockWindow.SetNplBrowserVisible(false);
+			multiLineCtrl:SetBackgroundColor("#00000000")
+			local tipCtrl = page:FindControl("blocklyTip");
+			if(tipCtrl) then
+				tipCtrl.visible = false;
+			end
 		end
-		local textCtrl = CodeBlockWindow.GetTextControl();
-		if(textCtrl) then
-			textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
-		end
+		
+		textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
 	end
 end
 
@@ -823,7 +830,7 @@ function CodeBlockWindow.OpenBlocklyEditor()
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s", blockpos);
 	end
-    if(CodeBlockWindow.NplBrowserIsLoaded())then
+    if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
 		CodeBlockWindow.SetNplBrowserVisible(not CodeBlockWindow.IsNPLBrowserVisible())
 	else
 		GameLogic.RunCommand("/open "..request_url);

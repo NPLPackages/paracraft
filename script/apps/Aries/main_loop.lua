@@ -411,12 +411,34 @@ local function Aries_load_config(filename)
 
 	-- force debugger interface at startup
 	if(ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true") then
-		local host = "127.0.0.1";
-		local port = "8099"; -- if port is "0", we will not listen for incoming connection
-		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
-		WebServer:Start("script/apps/WebServer/admin", host, port);
 		LOG.SetLogLevel("DEBUG");
-		LOG.std(nil, "debug", "main_loop", "NPL Network Layer is started  %s:%s", host, port);
+		local host = "127.0.0.1";
+		local port = 8099; -- if port is "0", we will not listen for incoming connection
+		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
+		-- WebServer:Start("script/apps/WebServer/admin", host, port);
+		
+		local att = NPL.GetAttributeObject();
+		if(not att:GetField("IsServerStarted", false)) then
+			local function TestOpenNPLPort_()
+				System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
+					if(data and data.pid) then
+						if(System.os.GetCurrentProcessId() ~= data.pid) then
+							-- already started by another application, 
+							-- try 
+							port = port + 1;
+							TestOpenNPLPort_();
+							return;
+						else
+							-- already opened by the same process
+						end
+					else
+						WebServer:Start("script/apps/WebServer/admin", host, port);	
+						LOG.std(nil, "debug", "main_loop", "NPL Network Layer is started  %s:%d", host, port);
+					end
+				end);
+			end
+			TestOpenNPLPort_();
+		end
 	end
 
 	if (System.options.isAB_SDK) then

@@ -16,6 +16,11 @@ end
 function OnClickOfficialSite()
     ParaGlobal.ShellExecute("open", L"http://paracraft.cn/", "", "", 1);
 end
+
+function OnClickLicenseSite()
+    ParaGlobal.ShellExecute("open", "https://github.com/LiXizhi/ParaCraftSDK/wiki/License", "", "", 1);
+end
+
 function OnClickDonate()
     GameLogic.RunCommand("/menu help.donate")
 end
@@ -65,6 +70,8 @@ ClientVersion = string.format(L"Paracraft创意空间 v%s", GameLogic.options.Ge
                 <div style="margin-top:5px"><%=Eval("ClientVersion")%></div>
                 <div style="margin-top:5px;"><%=L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"%></div>
                 <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=L"http://paracraft.cn/"%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
+                <div style="margin-top:5px;"><%=L"协议:"%><input type="button" value='<%="License"%>' class="linkbutton_yellow" style="" onclick="OnClickLicenseSite" /></div>
+                
             </div>
         </div>
     </div>
