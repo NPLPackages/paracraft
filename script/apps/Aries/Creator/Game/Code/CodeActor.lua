@@ -629,6 +629,8 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 		local x, y, z = entity:GetPosition()
 		local facing = entity:GetFacing()
 		local wasVisible = entity:IsVisible()
+		local variables = entity:GetVariables();
+		
 		self:DestroyEntity();
 		self:Init(itemStack, movie_entity);
 		self:FrameMove(self:GetTime() or 0, false);
@@ -639,6 +641,7 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 			if(not wasVisible) then
 				entity:SetVisible(wasVisible);
 			end
+			variables:copyTo(entity:GetVariables());
 		end
 		self:EnableActorPicking(self:IsActorPickingEnabled());
 	end
@@ -842,6 +845,7 @@ local internalValues = {
 	["shadowCaster"] = {setter = Actor.SetShaderCaster, getter = Actor.IsShaderCaster, isVariable = false},
 	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
 }
+
 
 function Actor:GetActorValue(name)
 	local entity = self:GetEntity()

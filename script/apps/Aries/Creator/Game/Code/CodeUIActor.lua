@@ -475,6 +475,8 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 		local x, y, z = entity:GetPosition()
 		local facing = entity:GetFacing()
 		local wasVisible = entity:IsVisible()
+		local variables = entity:GetVariables();
+		
 		self:DestroyEntity();
 		self:Init(itemStack, movie_entity);
 		self:FrameMove(self:GetTime(), false);
@@ -486,6 +488,8 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 		if(not wasVisible) then
 			entity:SetVisible(wasVisible);
 		end
+		variables:copyTo(entity:GetVariables());
+		
 		self:EnableActorPicking(self:IsActorPickingEnabled());
 	end
 end
@@ -618,6 +622,7 @@ local internalValues = {
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
 }
+
 
 function Actor:GetActorValue(name)
 	local entity = self:GetEntity()

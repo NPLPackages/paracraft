@@ -84,6 +84,12 @@ function Variables:ctor()
 	self.variables = {};
 end
 
+function Variables:copyTo(other)
+	for k, v in pairs(self.variables) do
+		other:SetVariable(k, v:GetValue());
+	end
+end
+
 function Variables:CreateVariable(name, value, parent)
 	if(type(name) == "string") then
 		local v = Variable:new():Init(name, value, parent);
