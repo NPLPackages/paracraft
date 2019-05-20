@@ -232,11 +232,13 @@ end
 -- if nil, it will close the dialog
 -- @param buttons: nil or {"button1", "button2"}
 -- @return result
-function env_imp:ask(text, buttons)
+function env_imp:ask(text, buttons, cb)
 	local type_;
 	if(type(buttons) == "table") then
 		type_ = "buttons";
 	end
+	
+	local bAsyn = type(cb) == "function";
 
 	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 	local Screen = commonlib.gettable("System.Windows.Screen");
@@ -247,25 +249,78 @@ function env_imp:ask(text, buttons)
 	if(buttons) then
 		height = math.max(height, 120 + (#buttons)*30);
 	end
+	--[[
+	function CodeBlock:RegisterTextEvent(text, callbackFunc)
+	local event = self:CreateEvent("onText"..text);
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+	local function onEvent_(_, msg)
+		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+	end
+	event:Connect("beforeDestroyed", function()
+		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
+	end)
+	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
+end]]
+
+	
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 	local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 
-	if(text or buttons) then
-		EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
-			GameLogic.GetCodeGlobal():SetGlobal("answer", result);
-			env_imp.resume(self);
-		end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
-		env_imp.yield(self)
-	else
-		self.co:SetTimeout(0.02, function()
+	if bAsyn then
+	
+		if(text or buttons) then
+			
+			local function onClose(result)
+				self.codeblock:UnRegisterTextEvent("__EnterTextDialog_Close", onClose);
+				-- 下一帧调用 不然的话在回调函数里立即再次打开EnterTextDialog时会有bug
+				self.co:SetTimeout(0.02, function() cb(result); end);
+			end
+			
+			local event = self.codeblock:CreateEvent("onText__EnterTextDialog_Close");
+			event:SetIsFireForAllActors(false);
+			event:SetFunction(onClose);
+			local function onEvent_(_, msg)
+				event:Fire(msg and msg.msg);
+			end
+			
+			event.UnRegisterTextEvent = function()
+				GameLogic.GetCodeGlobal():UnregisterTextEvent("onText__EnterTextDialog_Close", onEvent_);
+			end
+			
+			event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
+			GameLogic.GetCodeGlobal():RegisterTextEvent("onText__EnterTextDialog_Close", onEvent_);
+
+			local function onDialogClose(result)
+				local event = System.Core.Event:new():init("onText__EnterTextDialog_Close");
+				event.cmd_text = result;
+				GameLogic:event(event);
+			end
+		
+			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height});
+		else
 			EnterTextDialog.OnClose();
-			env_imp.resume(self);
-		end) 
-		env_imp.yield(self);
+			cb();
+		end
+	else
+	
+		if(text or buttons) then
+			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
+				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
+				env_imp.resume(self);
+			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
+			env_imp.yield(self)
+		else
+			self.co:SetTimeout(0.02, function()
+				EnterTextDialog.OnClose();
+				env_imp.resume(self);
+			end) 
+			env_imp.yield(self);
+		end
+		env_imp.wait(self, env_imp.GetDefaultTick(self));
+		return GameLogic.GetCodeGlobal():GetGlobal("answer");
 	end
-	env_imp.wait(self, env_imp.GetDefaultTick(self));
-	return GameLogic.GetCodeGlobal():GetGlobal("answer");
 end
 
 -- local block time since this block is loaded.

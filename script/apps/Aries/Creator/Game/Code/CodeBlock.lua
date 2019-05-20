@@ -815,10 +815,33 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	local function onEvent_(_, msg)
 		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
 	end
-	event:Connect("beforeDestroyed", function()
+	
+	event.UnRegisterTextEvent = function()
 		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
-	end)
+	end
+	
+	event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
 	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
+	
+	return event;
+end
+
+function CodeBlock:UnRegisterTextEvent(text, callbackFunc)
+	local eventname = "onText"..text;
+	local events = self.events[eventname];
+	
+	for i, event in ipairs(events) do
+		if event.callbackFunc == callbackFunc then
+			event.UnRegisterTextEvent();
+			event:Destroy();
+			table.remove(events, i);
+			break;
+		end
+	end
+	
+	if #events == 0 then
+		self.events[eventname] = nil;
+	end
 end
 
 -- @param onFinishedCallback: can be nil
