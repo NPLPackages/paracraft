@@ -275,7 +275,13 @@ end]]
 			local function onClose(result)
 				self.codeblock:UnRegisterTextEvent("__EnterTextDialog_Close", onClose);
 				-- 下一帧调用 不然的话在回调函数里立即再次打开EnterTextDialog时会有bug
-				self.co:SetTimeout(0.02, function() cb(result); end);
+				self.co:SetTimeout(0.02, function() 
+					if "__nil" == result then
+						cb(nil);
+					else
+						cb(result); 
+					end
+				end);
 			end
 			
 			local event = self.codeblock:CreateEvent("onText__EnterTextDialog_Close");
@@ -294,7 +300,7 @@ end]]
 
 			local function onDialogClose(result)
 				local event = System.Core.Event:new():init("onText__EnterTextDialog_Close");
-				event.cmd_text = result;
+				event.cmd_text = result or "__nil";
 				GameLogic:event(event);
 			end
 		
