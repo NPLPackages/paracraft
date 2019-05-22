@@ -356,12 +356,28 @@ function Desktop.OnExit(bForceExit, bRestart)
 		return
 	end
 	if(GameLogic.IsReadOnly()) then
-		if(not bForceExit and System.options.IsMobilePlatform) then
-			_guihelper.MessageBox(L"确定要退出当前世界么？", function()
-				Desktop.ForceExit(bRestart);
-			end);
+		if(bForceExit or Desktop.is_exiting) then
+			-- double click to exit without saving. 
+			Desktop.ForceExit();
 		else
-			Desktop.ForceExit(bRestart);
+			Desktop.is_exiting = true;
+
+			local dialog = {
+				text = L"确定要退出当前世界么？", 
+				callback = function(res)
+					Desktop.is_exiting = false;
+					if(res and res == _guihelper.DialogResult.Yes) then
+						Desktop.ForceExit(bRestart);
+					elseif(res and res == _guihelper.DialogResult.No) then
+						Desktop.ForceExit(bRestart);
+					end
+				end
+			};
+			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+			if(dialog and dialog.callback and dialog.text) then
+				_guihelper.MessageBox(dialog.text, 
+					dialog.callback, _guihelper.MessageBoxButtons.YesNoCancel);
+			end
 		end
 	else
 		if(bForceExit or Desktop.is_exiting) then

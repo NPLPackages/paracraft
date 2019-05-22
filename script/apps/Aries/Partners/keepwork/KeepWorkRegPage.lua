@@ -74,14 +74,14 @@ function KeepWorkRegPage.IsOK()
 	reg_values.username = page:GetValue("username");
 	reg_values.password = page:GetValue("password");
 	reg_values.password_confirm = page:GetValue("password_confirm");	
-
+	
 	--commonlib.echo("=================reg_values.password");
 	--commonlib.echo(reg_values.password);
 
 	local sbirthday="";
 
 	if (realnm_reg) then
-		reg_values.email = page:GetValue("email");
+		
 		reg_values.realname = page:GetValue("realname");
 		local idno = page:GetValue("idno") or "";
 		reg_values.idno = idno;
@@ -139,7 +139,8 @@ function KeepWorkRegPage.IsOK()
 		reg_values.birthday = 20000101;
 		reg_values.idno = "0";
 		reg_values.realname = "";
-		reg_values.email = "";
+		-- reg_values.email = "";
+		reg_values.email = page:GetValue("email") or "";
 	end
 	
 --	reg_values.txtVeriCode = string.lower(page:GetValue("txtVeriCode"));
@@ -245,7 +246,7 @@ function KeepWorkRegPage.IsOK()
 		end
 	end
 
-	if (realnm_reg) then
+	if (realnm_reg or true) then
 		local chkEmail,chkEmail_len = string.find(reg_values.email, "[A-Za-z0-9%.%%%+%-%_]+@[A-Za-z0-9%.%%%+%-%_]+%.%w%w%w?%w?");
 		local Email_len = string.len(reg_values.email);
 	--	if(not string.find(reg_values.email, "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?")) then	
@@ -275,7 +276,7 @@ function KeepWorkRegPage.RegisterEmailChk()
 	
 	local bIsOK=true;
 
-	if (realnm_reg) then
+	if (realnm_reg or true) then
 		local chkEmail,chkEmail_len = string.find(reg_values.email, "[A-Za-z0-9%.%%%+%-%_]+@[A-Za-z0-9%.%%%+%-%_]+%.%w%w%w?%w?");
 		local Email_len = string.len(reg_values.email);
 
@@ -319,13 +320,20 @@ function KeepWorkRegPage.OnRegister()
 		--MainLogin.state.reg_user = {username = reg_values.email, password = reg_values.password, session=reg_values.session, vericode=reg_values.txtVeriCode, no = reg_values.idno, gender = reg_values.sex, birthday=reg_values.birthday , realname=reg_values.realname};
         local username = reg_values.username;
         local password = reg_values.password;
-        local url = "http://keepwork.com/api/wiki/models/user/register";
+		local email = string.lower(reg_values.email);
+        -- local url = "http://keepwork.com/api/wiki/models/user/register"; 
+		local url = "https://api.keepwork.com/core/v0/users/register";
+		
+
+		_guihelper.MessageBox("注册中，请稍后...");
+
         System.os.GetUrl({
             url = url,
             json = true,
             form = {
                 username = username,
 		        password = password,
+				email = email,
             }
 		}, function(err, msg, data)
 			LOG.std(nil, "debug", "keepwork register err", err);
@@ -341,12 +349,17 @@ function KeepWorkRegPage.OnRegister()
 				end
 			end
 			if(err == 200)then
-                if(data.data and data.data.token)then
-                    token = data.data.token;
+				_guihelper.CloseMessageBox();
+				-- data = data.data;
+                if(data and data.token)then
+                    token = data.token;
 					LOG.std(nil, "debug", "keepwork register token", token);
 					if(token)then
-						if(data.data.userinfo and data.data.userinfo.username)then
-							username = data.data.userinfo.username; -- use username in the callback info
+						if(data.userinfo and data.userinfo.username)then
+							username = data.userinfo.username; -- use username in the callback info
+						end
+						if(data.username) then
+							username = data.username;
 						end
 						LOG.std(nil, "debug", "keepwork register username", username);
 

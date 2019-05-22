@@ -40,10 +40,10 @@ end
             </div>
             <div style="background:url(Texture/whitedot.png);background-color:#000000cc">
                 <div style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #9af6aa; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="text" name="starttime" enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
+                    <input type="text" name="starttime" tooltip='<%=L"开始时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
                 </div>
                 <div align="right" style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #9af6aa; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="text" name="endtime" enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
+                    <input type="text" name="endtime" tooltip='<%=L"结束时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
                 </div>
                 <pe:custom name="keyframes" width="100%" oncreate="OnCreateKeyFrameCtrl" style='<%=format("margin-left:64px;margin-right:64px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>
             </div>

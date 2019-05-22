@@ -162,17 +162,6 @@ end
             </div>
             <pe:label name="idno_label" style="height:20px;margin-left:85px;margin-top:2px;color:#e06618">身份证号由15或18位组成，如果不知道，可以向爸爸妈妈借看一下户口本！</pe:label>
         </div>
-
-        <div style="margin-left:10px;margin-top:6px">
-            <!--<div style="float:left;margin-top:10px;font-weight:bold;font-size:14px">电子邮箱:</div>-->
-            <div style="float:left">* 电子邮箱：
-                <div style="margin-left:80px;margin-top:-25px;width:290px;height:32px;background:url(Texture/Aries/Login/reg_required_bg.png#0 0 256 32:10 10 81 20);">
-                    <input type="text" name="email" value="<%=sampleEmail() %>" style="margin-left:5px;margin-top:5px;margin-right:15px;width:210px;height:24px;background:;"/>
-                </div>
-                <pe:label name="email_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#e06618">请输入自己的邮箱地址，这是你取回密码最重要的途径！</pe:label>
-                <pe:label name="email_attent" style="height:20px;margin-left:-465px;margin-top:22px;color:#ee0000">【哈奇提醒】你的一个邮箱地址只能注册一个账号哦！</pe:label>
-            </div>
-        </div>
     </pe:if>
         <div style="margin-left:10px;margin-top:6px">
             <div style="float:left;">* 用户名：
@@ -211,6 +200,17 @@ end
                 </div>
                 <pe:label name="vfy_label" style="height:20px;margin-left:5px;margin-top:4px;color:#e06618">请输入左边显示的4位验证码！</pe:label>
         </div>-->
+
+        <div style="margin-left:10px;margin-top:6px">
+            <!--<div style="float:left;margin-top:10px;font-weight:bold;font-size:14px">电子邮箱:</div>-->
+            <div style="float:left">* 电子邮箱：
+                <div style="margin-left:80px;margin-top:-25px;width:290px;height:32px;background:url(Texture/Aries/Login/reg_required_bg.png#0 0 256 32:10 10 81 20);">
+                    <input type="text" name="email" value="<%=sampleEmail() %>" style="margin-left:5px;margin-top:5px;margin-right:15px;width:210px;height:24px;background:;"/>
+                </div>
+                <pe:label name="email_label" style="height:20px;margin-left:85px;margin-top:-2px;color:#e06618">请输入自己的邮箱地址，这是你取回密码最重要的途径！</pe:label>
+                <pe:label name="email_attent" style="height:20px;margin-left:-465px;margin-top:22px;color:#ee0000">【哈奇提醒】你的一个邮箱地址只能注册一个账号哦！</pe:label>
+            </div>
+        </div>
         <div style="margin-left:10px;margin-top:6px;height:30px;">
             <input type="checkbox" name="agree_rule" value="1" style="float:left;" checked="true"/><div style="float:left;margin-left:8px;">我已阅读并同意
             <a style="font-size:12px" onclick="MyCompany.Aries.keepwork.KeepWorkRegPage.VisitTaoMeeService">《Keepwork服务条款》</a></div>

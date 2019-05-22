@@ -65,7 +65,9 @@ function pe_nplbrowser.SetVisible(mcmlNode,name,visible)
 	local config = NplBrowserPlugin.GetCache(id);
 	if(config)then
 		config.visible = visible;
+		--config.zoom = -1;
 		NplBrowserPlugin.Show(config);
+		--NplBrowserPlugin.Zoom(config);
 		
 		if(not visible) then
 			commonlib.TimerManager.SetTimeout(function()  

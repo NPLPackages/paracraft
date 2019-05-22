@@ -47,12 +47,21 @@ local animate_by_script = true;
 
 -- keyframes that can be edited from UI keyframe. 
 local selectable_var_list = {
-	"anim", "bones", "assetfile", "skin", "blockinhand",
+	"anim", "bones", 
 	"pos", -- multiple of x,y,z
 	"facing", 
 	"rot", -- multiple of "roll", "pitch", "facing"
+	"scaling",
 	"head", -- multiple of "HeadUpdownAngle", "HeadTurningAngle"
-	"scaling", "speedscale", "gravity", "opacity", "blocks", "parent", 
+	"---", -- separator
+	"speedscale", 
+	"gravity", 
+	"---", -- separator
+	"assetfile", "skin", "opacity", 
+	"blockinhand",
+	"blocks",
+	"---", -- separator
+	"parent", 
 	"static", -- multiple of "name" and "isAgent"
 };
 

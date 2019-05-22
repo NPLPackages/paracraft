@@ -443,13 +443,21 @@ function MovieClipTimeLine:GetVariableList()
 			local cmdActor = self:GetCmdActor(true);
 			if(cmdActor) then
 				for index, name in ipairs(cmdActor:GetEditableVariableList()) do
-					varList[#varList+1] = {name=name, index=index, actor=cmdActor, originalActor = actor, originalIndex = -1};
+					if(name == "---") then
+						varList[#varList+1] = {type="seperator"};
+					else
+						varList[#varList+1] = {name=name, index=index, actor=cmdActor, originalActor = actor, originalIndex = -1};
+					end
 				end
 				varList[#varList+1] = {type="seperator"};
 			end
 		end
 		for index, name in ipairs(actor:GetEditableVariableList()) do
-			varList[#varList+1] = {name=name, index=index, actor=actor};
+			if(name == "---") then
+				varList[#varList+1] = {type="seperator"};
+			else
+				varList[#varList+1] = {name=name, index=index, actor=actor};
+			end
 		end
 	end
 	return varList

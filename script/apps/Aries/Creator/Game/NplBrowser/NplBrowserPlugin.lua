@@ -11,10 +11,10 @@ local id = "nplbrowser_wnd";
 NplBrowserPlugin.Start({id = id, url = "http://www.keepwork.com", withControl = true, x = 0, y = 0, width = 800, height = 600, });
 NplBrowserPlugin.Open({id = id, url = "http://www.keepwork.com", resize = true, x = 100, y = 100, width = 1024, height = 768, });
 NplBrowserPlugin.Show({id = id, visible = false});
+NplBrowserPlugin.Zoom({id = id, zoom = 1}); --200%
 NplBrowserPlugin.EnableWindow({id = id, enabled = false});
 NplBrowserPlugin.ChangePosSize({id = id, x = 100, y = 100, width = 400, height = 400, });
 NplBrowserPlugin.Quit({id = id,});
-
 
 -- start with cmdline directly
 local parent_handle = ParaEngine.GetAttributeObject():GetField("AppHWND", 0);
@@ -217,6 +217,35 @@ function NplBrowserPlugin.Show(p)
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
 end
+-- p.zoom = 0 scale: 1
+-- p.zoom = 1 scale: 1 * (1+1)
+-- p.zoom = -1 scale: 1 / (1+1)
+function NplBrowserPlugin.Zoom(p)
+	local id = p.id or default_id;
+    local dll_name =  p.dll_name or default_dll_name;
+    if(not NplBrowserPlugin.OsSupported())then
+	    LOG.std(nil, "info", "NplBrowserPlugin.Zoom", "npl browser isn't supported on %s",System.os.GetPlatform());
+        return
+    end
+    if(not NplBrowserPlugin.CheckCefClientExist())then
+		LOG.std(nil, "warn", "NplBrowserPlugin.Zoom", "the client [%s] isn't existed, can't start npl browser", default_client_name);
+        return
+    end
+    if(not NplBrowserPlugin.HasWindow(id))then
+		LOG.std(nil, "warn", "NplBrowserPlugin.Zoom", "the window [%s] isn't existed", id);
+        return
+    end
+    local parent_handle =NplBrowserPlugin.GetParentHandle();
+    local input = { 
+        cmd = "Zoom", 
+        id = id, 
+        parent_handle = parent_handle, 
+        zoom = p.zoom,
+    }
+    NPL.activate(dll_name,input); 
+    NplBrowserPlugin.UpdateCache(id,input)
+end
+
 function NplBrowserPlugin.EnableWindow(p)
 	local id = p.id or default_id;
     local dll_name =  p.dll_name or default_dll_name;
