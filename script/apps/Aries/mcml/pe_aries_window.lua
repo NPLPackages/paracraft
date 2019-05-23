@@ -249,7 +249,11 @@ function pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _par
 	_this.text = title;
 	_this.background = "";
 	if(title_height >= 32) then
-		_this.font = "System;20;bold";
+		if (mcmlNode:GetNumber("close_height")) then
+			_this.font = "System;14;bold";
+		else
+			_this.font = "System;20;bold";
+		end
 	else
 		_this.font = "System;14;bold";
 	end
@@ -260,11 +264,16 @@ function pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _par
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
-		local btn_size = title_height-2;
-		if(title_height>=32) then
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 1, btn_size, btn_size);	
+		if (mcmlNode:GetNumber("close_height")) then
+			local btn_size = mcmlNode:GetNumber("close_height")
+			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
 		else
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+			local btn_size = title_height - 2
+			if(title_height>=32) then
+				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 1, btn_size, btn_size);	
+			else
+				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+			end
 		end
 		
 		_this.background = mc_close_btn_bg;
