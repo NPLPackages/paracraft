@@ -63,6 +63,8 @@ function CodeCoroutine:KillTimer(timer)
 	self:GetCodeBlock():KillTimer(timer);
 end
 
+-- @important: this function should be called inside coroutine, the caller must ensure that when callbackFunc called, 
+-- it should NOT be inside any coroutine. Otherwise one should use MakeCallbackFuncAsync instead. 
 function CodeCoroutine:MakeCallbackFunc(callbackFunc)
 	return function(...)
 		if(not self.isStopped) then
@@ -71,6 +73,21 @@ function CodeCoroutine:MakeCallbackFunc(callbackFunc)
 				callbackFunc(...);
 			end
 		end
+	end
+end
+
+-- @important: this function should be called inside coroutine, the callbackFunc is gauranteed NOT to be inside any coroutine, because we use a timer for it. 
+-- so it is always safe to call resume inside callbackFunc
+function CodeCoroutine:MakeCallbackFuncAsync(callbackFunc)
+	return function(p1, p2, p3, p4)
+		commonlib.TimerManager.SetTimeout(function()
+			if(not self.isStopped) then
+				self:SetCurrentCodeContext();
+				if(callbackFunc) then
+					callbackFunc(p1, p2, p3, p4);
+				end
+			end	
+		end, 0)
 	end
 end
 

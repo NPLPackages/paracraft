@@ -23,6 +23,7 @@ NplCad.categories = {
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
+    {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
 };
 
 -- make files for blockly 
@@ -49,16 +50,17 @@ function NplCad.AppendAll()
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_ShapeOperators.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Shapes.lua");
-    local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
-    local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
-
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Control.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Data.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Math.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Skeleton.lua");
 
+    local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
+    local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
     local NplCadDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Control");
     local NplCadDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Data");
     local NplCadDef_Math = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Math");
+    local NplCadDef_Skeleton = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Skeleton");
 	
 
 	local all_source_cmds = {
@@ -67,6 +69,7 @@ function NplCad.AppendAll()
 		NplCadDef_Control.GetCmds(),
 		NplCadDef_Data.GetCmds(),
 		NplCadDef_Math.GetCmds(),
+		NplCadDef_Skeleton.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);

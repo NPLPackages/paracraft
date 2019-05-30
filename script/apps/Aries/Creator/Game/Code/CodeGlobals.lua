@@ -162,6 +162,7 @@ function CodeGlobals:ctor()
 	self:Reset();
 
 	GameLogic:Connect("beforeWorldSaved", self, self.OnWorldSave, "UniqueConnection");
+	GameLogic:Connect("frameMoved", self, self.OnFrameMove, "UniqueConnection");
 end
 
 -- call this to clear all globals to reuse this class for future use. 
@@ -228,6 +229,10 @@ function CodeGlobals:GetMousePoint()
 	local ry = 1000 * screenHeight / screenWidth
 	y = -(y * ry / screenHeight - ry * 0.5);
 	return math.floor(x+0.5), math.floor(y+0.5);
+end
+
+function CodeGlobals:OnFrameMove()	
+	self:BroadcastTextEvent("onTick");
 end
 
 function CodeGlobals:OnWorldSave()

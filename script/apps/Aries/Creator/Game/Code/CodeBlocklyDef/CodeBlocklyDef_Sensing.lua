@@ -408,46 +408,6 @@ else
 end
 ]]}},
 },
-
-{
-	type = "askAndNoWait", 
-	message0 = L"提问%1不等待回答",
-	arg0 = {
-		{
-			name = "input",
-			type = "input_value",
-            shadow = { type = "text", value = L"你叫什么名字?",},
-			text = L"你叫什么名字?",
-		},
-	},
-	category = "Sensing", 
-	helpUrl = "", 
-	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'ask(%s)',
-	ToNPL = function(self)
-		return string.format('ask("%s", nil, function(result) end)\n', self:getFieldAsString('input'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-ask("what is your name", nil, function(result)
-	say("hello "..tostring(result), 2)
-end)
-
-
-ask("select your choice", {"choice A", "choice B"}, function(result)
-	if(answer == 1) then
-		say("you choose A")
-	elseif(answer == 2) then
-		say("you choose B")
-	end
-end)
-
-]]},
-},
-},
-
-
 {
 	type = "isKeyPressed", 
 	message0 = L"%1键是否按下",

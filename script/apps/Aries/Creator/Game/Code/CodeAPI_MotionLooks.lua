@@ -648,18 +648,15 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 	end
 
 	if(not bLoop and channel:IsPlaying()) then
-		local bFinished;
 		local callbackFunc;
-		callbackFunc = self.co:MakeCallbackFunc(function()
+
+		callbackFunc = self.co:MakeCallbackFuncAsync(function()
 			channel:Disconnect("finished", callbackFunc)
-			if(not bFinished) then
-				bFinished = true;
-				env_imp.resume(self);
-			end
-		end)
+			env_imp.resume(self);
+		end);
 		channel:Connect("finished", callbackFunc);
+
 		env_imp.yield(self);
-		bFinished = true;
 	end
 end
 

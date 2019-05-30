@@ -28,7 +28,7 @@ end
 -- write player data to disk
 function SavePlayerHandler:WritePlayerData(entity)
 	local name = entity:GetUserName() or "default";
-	local filename = format("%s/players/%s.entity.xml", self:GetWorldPath(), name);
+	local filename = format("%splayers/%s.entity.xml", self:GetWorldPath(), name);
 	ParaIO.CreateDirectory(filename);
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
@@ -44,7 +44,7 @@ end
 -- read player data from disk
 function SavePlayerHandler:ReadPlayerData(entity)
 	local name = entity:GetUserName() or "default";
-	local filename = format("%s/players/%s.entity.xml", self:GetWorldPath(), name);
+	local filename = format("%splayers/%s.entity.xml", self:GetWorldPath(), name);
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot and xmlRoot[1]) then
 		local node = xmlRoot[1]

@@ -190,6 +190,8 @@ end
 
 -- called by both Init() and StaticInit()
 function GameLogic.InitCommon()
+	math.randomseed(ParaGlobal.GetGameTime());
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/APISandbox/CreatorAPISandbox.lua");
 	local CreatorAPISandbox = commonlib.gettable("MyCompany.Aries.Game.APISandbox.CreatorAPISandbox");
 	CreatorAPISandbox.Cleanup();

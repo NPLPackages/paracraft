@@ -80,6 +80,7 @@ local s_env_methods = {
 	"registerAnimationEvent",
 	"registerBroadcastEvent",
 	"registerBlockClickEvent",
+	"registerTickEvent",
 	"registerStopEvent",
 	"broadcast",
 	"broadcastAndWait",

@@ -57,13 +57,16 @@ Actor.class_name = "ActorOverlay";
 local selectable_var_list = {
 	"text",
 	"code",
+	"---", -- separator
 	"pos", -- multiple of x,y,z
- 	"screen_pos", -- multiple of ui_x, ui_y
-	"ui_zorder", -- 2d ui zorder
-	"ui_align", -- "center", "top", "bottom"
 	"facing", 
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling", 
+	"---", -- separator
+ 	"screen_pos", -- multiple of ui_x, ui_y
+	"ui_align", -- "center", "top", "bottom"
+	"ui_zorder", -- 2d ui zorder
+	"---", -- separator
 	"opacity",
 	"color",
 };

@@ -163,6 +163,45 @@ end)
 },
 
 {
+	type = "registerTickEvent", 
+	message0 = L"每%1帧执行",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "ticks",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+            text = 1, 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+    },
+	category = "Events", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'registerTickEvent(%d, function(msg)\\n%send)',
+	ToNPL = function(self)
+		return string.format('registerTickEvent(%d, function()\n    %s\nend)\n',  self:getFieldValue('ticks'), self:getFieldAsString('input'));
+	end,
+	examples = {
+{desc = "", canRun = true, code = [[
+i=1
+registerTickEvent(1, function(msg)
+    i = i + 1
+    say(i)
+end)
+]]},
+},
+},
+
+{
 	type = "registerAnimationEvent", 
 	message0 = L"当动画在%1帧时",
 	message1 = L"%1",

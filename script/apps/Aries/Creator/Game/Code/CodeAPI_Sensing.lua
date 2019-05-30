@@ -231,6 +231,7 @@ end
 -- @param text: string support basic html.  
 -- if nil, it will close the dialog
 -- @param buttons: nil or {"button1", "button2"}
+-- @param cb: additional callback function. use Sync mode with run(function()   end) is preferred over cb. 
 -- @return result
 function env_imp:ask(text, buttons, cb)
 	local type_;
@@ -249,32 +250,17 @@ function env_imp:ask(text, buttons, cb)
 	if(buttons) then
 		height = math.max(height, 120 + (#buttons)*30);
 	end
-	--[[
-	function CodeBlock:RegisterTextEvent(text, callbackFunc)
-	local event = self:CreateEvent("onText"..text);
-	event:SetIsFireForAllActors(true);
-	event:SetFunction(callbackFunc);
-	local function onEvent_(_, msg)
-		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
-	end
-	event:Connect("beforeDestroyed", function()
-		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
-	end)
-	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
-end]]
-
-	
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 	local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 
 	if bAsyn then
-	
+		-- deprecated: use run() in parallel instead. 
 		if(text or buttons) then
 			
 			local function onClose(result)
 				self.codeblock:UnRegisterTextEvent("__EnterTextDialog_Close", onClose);
-				-- 下一帧调用 不然的话在回调函数里立即再次打开EnterTextDialog时会有bug
+				-- prevent the next frame
 				self.co:SetTimeout(0.02, function() 
 					if "__nil" == result then
 						cb(nil);
@@ -312,7 +298,7 @@ end]]
 	else
 	
 		if(text or buttons) then
-			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFunc(function(result)
+			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFuncAsync(function(result)
 				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
 				env_imp.resume(self);
 			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})

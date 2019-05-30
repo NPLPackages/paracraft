@@ -807,6 +807,32 @@ function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 	GameLogic.GetCodeGlobal():RegisterKeyPressedEvent(onEvent_);
 end
 
+-- if last tick event is not finished, the tick is ignored. 
+-- @param ticks: default to 1 tick
+function CodeBlock:RegisterTickEvent(ticks, callbackFunc)
+	ticks = tonumber(ticks or 1);
+	local event = self:CreateEvent("onTick");
+	event:SetIsFireForAllActors(true);
+	event:SetFunction(callbackFunc);
+	event:SetStopLastEvent(false);
+	local tick = 1;
+	local function onEvent_(_, msg)
+		tick = tick + 1;
+		if((tick % ticks) == 0) then
+			event:Fire(msg and msg.msg, msg and msg.onFinishedCallback, true);
+		end
+	end
+	
+	event.UnRegisterTextEvent = function()
+		GameLogic.GetCodeGlobal():UnregisterTextEvent("onTick", onEvent_);
+	end
+	
+	event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
+	GameLogic.GetCodeGlobal():RegisterTextEvent("onTick", onEvent_);
+	
+	return event;
+end
+
 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	local event = self:CreateEvent("onText"..text);
@@ -832,7 +858,9 @@ function CodeBlock:UnRegisterTextEvent(text, callbackFunc)
 	
 	for i, event in ipairs(events) do
 		if event.callbackFunc == callbackFunc then
-			event.UnRegisterTextEvent();
+			if(event.UnRegisterTextEvent) then
+				event.UnRegisterTextEvent();
+			end
 			event:Destroy();
 			table.remove(events, i);
 			break;

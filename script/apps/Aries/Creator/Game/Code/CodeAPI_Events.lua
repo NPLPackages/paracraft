@@ -60,7 +60,7 @@ function env_imp:broadcastAndWait(text, msg)
 	if(msg==nil and self.actor) then
 		msg = self.actor:GetName();
 	end
-	self.codeblock:BroadcastTextEvent(text, msg, self.co:MakeCallbackFunc(function()
+	self.codeblock:BroadcastTextEvent(text, msg, self.co:MakeCallbackFuncAsync(function()
 		isFinished = true;
 		env_imp.resume(self);
 	end));
@@ -75,6 +75,10 @@ end
 
 function env_imp:registerStopEvent(callbackFunc)
 	self.codeblock:RegisterStopEvent(callbackFunc);
+end
+
+function env_imp:registerTickEvent(ticks, callbackFunc)
+	self.codeblock:RegisterTickEvent(ticks, callbackFunc);
 end
 
 function env_imp:registerClickEvent(callbackFunc)

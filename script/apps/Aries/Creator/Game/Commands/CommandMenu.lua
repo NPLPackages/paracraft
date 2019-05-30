@@ -68,9 +68,13 @@ Commands["menu"] = {
 			end
 		elseif(name == "file.saveworld") then
 			if(System.options.mc) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SaveWorldPage.lua");
-				local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.SaveWorldPage");
-				SaveWorldPage.ShowPage()
+				if(GameLogic.IsReadOnly()) then
+					GameLogic.RunCommand("/menu file.saveworldas");
+				else
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SaveWorldPage.lua");
+					local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.SaveWorldPage");
+					SaveWorldPage.ShowPage()
+				end
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/SaveWorldPage.lua");
 				local SaveWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SaveWorldPage");

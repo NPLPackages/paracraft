@@ -266,7 +266,7 @@ function WorldCommon.SaveWorldAs()
 			local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
 			GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
 		end
-	end, defaultWorldName, L"世界另存为", "localworlds", true)
+	end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
 end
 
 function WorldCommon.SaveWorldAsImp(folderName)
