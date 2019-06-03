@@ -15,6 +15,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EditCodeBlockContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.EditContext"), commonlib.gettable("MyCompany.Aries.Game.SceneContext.EditCodeBlockContext"));
 
 EditCodeBlockContext:Property({"Name", "EditCodeBlockContext"});
+EditCodeBlockContext:Property({"showBones", false, "IsShowBones", "SetShowBones"});
 
 function EditCodeBlockContext:ctor()
 end
@@ -74,6 +75,8 @@ function EditCodeBlockContext:HandleGlobalKey(event)
 	if(dik_key == "DIK_ESCAPE") then
 		-- event:accept();
 		-- GameLogic.AddBBS(nil, "code context");
+	elseif(dik_key == "DIK_1") then
+		self:SetShowBones(not self:IsShowBones())
 	end
 	return EditCodeBlockContext._super.HandleGlobalKey(self, event);
 end
@@ -195,9 +198,29 @@ function EditCodeBlockContext:updateManipulators()
 		manipCont:SetRollEnabled(false);
 		self:AddManipulator(manipCont);
 		manipCont:connectToDependNode(actor);
+
+		if(self:IsShowBones()) then
+			NPL.load("(gl)script/ide/System/Scene/Manipulators/BonesManipContainer.lua");
+			local BonesManipContainer = commonlib.gettable("System.Scene.Manipulators.BonesManipContainer");
+			local manipCont = BonesManipContainer:new();
+			manipCont:init();
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(actor);
+		end
 	end
 	local codeblock = self:GetCodeBlock();
 	if(codeblock) then
 		codeblock:RefreshAllInventoryAsMovieActors()
 	end
+end
+
+function EditCodeBlockContext:SetShowBones(bShowBones)
+	if(self.showBones ~= bShowBones) then
+		self.showBones = bShowBones;
+		self:updateManipulators();
+	end
+end
+
+function EditCodeBlockContext:IsShowBones()
+	return self.showBones;
 end

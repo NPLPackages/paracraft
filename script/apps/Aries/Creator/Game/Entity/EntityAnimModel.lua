@@ -89,24 +89,122 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	return true;
 end
 
-function Entity:OpenEditor(editor_name, entity)
-	if(Files.FileExists(self:GetFilename())) then
+-- @param bForceOverwrite: true to force regenerate even if the file already exist
+function Entity:EditCharacter(bForceOverwrite)
+	local filename = self:GetFilename(false);
+	self:SetFilename(filename);
+	if(not bForceOverwrite and Files.FileExists(filename)) then
+		self:TakeCurrentModel();
+		self:SetThinkerModel(filename)
 		self:CreateOutputCharacter();
 		local charEntity = self:GetOutputCharacter();
 		if(charEntity) then
-			local filename = self:GetFilename();
 			local result = Files.ResolveFilePath(filename);
 			filename = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
 			charEntity:Say(filename, nil, true);
 		end
-		_guihelper.MessageBox(format(L"是否重新生成 %s?", commonlib.Encoding.DefaultToUtf8(self:GetFilename())), function(res)
+		_guihelper.MessageBox(format(L"是否重新生成 %s?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				self:TryRebuild();
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
 	else
 		self:TryRebuild();
+		self:TakeCurrentModel();
 	end
+end
+
+-- @param bForceOverwrite: true to force regenerate even if the file already exist
+function Entity:EditModel(bForceOverwrite)
+	self:DeleteOutputCharacter();
+
+	local filename = self:GetFilename(true);
+	self:SetFilename(filename);
+	if(not bForceOverwrite and Files.FileExists(filename)) then
+		self:TakeCurrentModel();
+		self:SetThinkerModel(filename)
+		_guihelper.MessageBox(format(L"是否重新生成 %s?", commonlib.Encoding.DefaultToUtf8(self:GetFilename(true))), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				self:Rebuild(true);
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	else
+		self:Rebuild(true);
+		self:SetThinkerModel(filename)
+		self:TakeCurrentModel();
+	end
+end
+
+function Entity:TakeCurrentModel()
+	if(self:IsBMaxFile()) then
+		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", self:GetFilename(true)));
+	else
+		GameLogic.RunCommand(string.format("/take villager {attr={model_filename=%q}}", self:GetFilename()));
+	end
+end
+
+-- save model as a new filename
+function Entity:SaveModelAs()
+	local filename = self:GetFilename();
+	local result = Files.ResolveFilePath(filename)
+	local old_value = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
+
+	self:TakeCurrentModel();
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage(L"输入新的文件名", function(result)
+		if(result and result~="") then
+			result = commonlib.Encoding.Utf8ToDefault(result);
+			if(result~=old_value) then
+				local filename = result;
+				if(self:IsXFile() and not filename:match("%.x$")) then
+					filename = filename..".x";
+				elseif(self:IsBMaxFile() and not filename:match("%.bmax$")) then
+					filename = filename..".bmax";
+				end
+				self:SaveModelAs_Imp(filename)
+				self:TakeCurrentModel();
+			end
+		end
+	end, old_value, L"模型另存为", "model", true);
+end
+
+-- @param filename: file relative to world directory
+function Entity:SaveModelAs_Imp(filename, bForceOverwrite)
+	local dest = GameLogic.GetWorldDirectory()..filename;
+	if(ParaIO.DoesFileExist(dest, false) and not bForceOverwrite) then
+		_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				self:SaveModelAs_Imp(filename, true)
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+	else
+		ParaIO.CreateDirectory(dest);
+		local src = self:GetFilename();
+		src = Files.GetWorldFilePath(src)
+		if(src and ParaIO.CopyFile(src, dest, true)) then
+			self:SetFilename(filename);
+			self:Say(L"保存成功", nil, true);
+			GameLogic.AddBBS(nil, format(L"动画模型成功保存到%s", commonlib.Encoding.DefaultToUtf8(filename)));
+		else
+			GameLogic.AddBBS(nil, L"无法复制文件");
+		end
+	end
+end
+
+function Entity:OpenEditor(editor_name, entity)
+	self:Generate();
+end
+
+function Entity:Generate()
+	_guihelper.MessageBox(L"是否自动添加人物骨骼?", function(res)
+		if(res and res == _guihelper.DialogResult.Yes) then
+			self:EditCharacter(true)
+		elseif(res == _guihelper.DialogResult.No) then
+			self:EditModel(true)
+		end
+	end, _guihelper.MessageBoxButtons.YesNoCancel);
 end
 
 -- Ticks the block if it's been scheduled
@@ -115,7 +213,7 @@ end
 
 function Entity:OnBlockAdded(x,y,z)
 	self._super.OnBlockAdded(x,y,z);
-	self:TryRebuild();
+	self:Generate();
 end
 
 -- static function
@@ -136,16 +234,32 @@ function Entity:GetTempOutputFilename()
 end
 
 -- by default each entity has a unique name according to its position
-function Entity:GetFilename()
+function Entity:GetFilename(isBMaxFile)
 	if(self.filename == "") then
 		self.filename = nil;
 	end
+	if(isBMaxFile~=nil and self.filename and isBMaxFile ~= self:IsBMaxFile()) then
+		self.filename = nil;
+		self.defaultFilename = nil;
+	end
 	if(not self.filename and not self.defaultFilename) then
 		local bx,by,bz = self:GetBlockPos();
-		self.defaultFilename = format("%sblocktemplates/auto_anim%d_%d_%d.x", GameLogic.GetWorldDirectory(), bx,by,bz);
-		ParaIO.CreateDirectory(self.defaultFilename);
+		self.defaultFilename = format("blocktemplates/auto_anim%d_%d_%d.%s", bx,by,bz, isBMaxFile and "bmax" or "x");
+		ParaIO.CreateDirectory(ParaWorld.GetWorldDirectory()..self.defaultFilename);
 	end
 	return self.filename or self.defaultFilename;
+end
+
+function Entity:IsBMaxFile()
+	if((self.filename or ""):match("%.bmax$")) then
+		return true;
+	end
+end
+
+function Entity:IsXFile()
+	if((self.filename or ""):match("%.x")) then
+		return true;
+	end
 end
 
 -- set user defined filename
@@ -204,7 +318,8 @@ function Entity:LoadAsset(callback)
 end
 
 -- rebuild all connected blocks into a model
-function Entity:Rebuild()
+-- @param bIsBMaxOnly: if true, we will only generate bmax file, without using auto rigging to generate x file
+function Entity:Rebuild(bIsBMaxOnly)
 	local blocks = self:GetAllConnectedColorBlocks();
 	if(blocks and #blocks == 0) then
 		GameLogic.AddBBS("AnimModel", L"需要放在一组彩色方块的旁边才能生成模型", 20);
@@ -218,12 +333,22 @@ function Entity:Rebuild()
 	-- create target bmax model from color blocks that connected with current anim block
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = self:GetTempBMaxFilepath(), blocks = blocks});
+
+	local bmaxFilename = self:GetTempBMaxFilepath()
+	if(bIsBMaxOnly) then
+		bmaxFilename = worldDir..self:GetFilename(true);
+	end
+
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = bmaxFilename, blocks = blocks});
 	if( task:Run() ) then
-		LOG.std(nil, "info", "AnimBlock", "successfully saved %d blocks to bmax file %s", #blocks, self:GetTempBMaxFilepath());
+		LOG.std(nil, "info", "AnimBlock", "successfully saved %d blocks to bmax file %s", #blocks, bmaxFilename);
 	else
 		LOG.std(nil, "info", "AnimBlock", "Failed to save target bmax model!");
 		return;
+	end
+
+	if(bIsBMaxOnly) then
+		return
 	end
 
 	-- matching and rigging
@@ -376,9 +501,9 @@ function Entity:OnAddRiggedFile(count, filenames, msg)
 			self:CreateOutputCharacter();
 			local entity = self:GetOutputCharacter();
 			if(entity) then
-				entity:Say(L"点击我", 10, true);
 				local x, y, z = EntityManager.GetPlayer():GetPosition()
 				entity:SetPosition(x, y, z);
+				entity:Say(L"点击我", 10, true);
 			end
 			
 			local Event = commonlib.gettable("System.Core.Event");
@@ -491,13 +616,17 @@ function Entity:CreateGetThinkerEntity()
 		end
 		self.thinkerEntity = entity;	
 
-		self:ShowNextThinkerModel();
+		-- self:ShowNextThinkerModel();
 	end
 	return self.thinkerEntity;
 end
 
 function Entity:OnClickThinker(entity)
-	self:OpenEditor();
+	if(Files.FileExists(self:GetFilename())) then
+		self:SaveModelAs()
+	else
+		self:OpenEditor();
+	end
 end
 
 function Entity:DeleteThinkerEntity()
@@ -517,7 +646,7 @@ end
 function Entity:SetThinkerModel(filename)
 	local entity = self:CreateGetThinkerEntity()
 	if(entity) then
-		entity:SetMainAssetPath(filename);
+		entity:SetMainAssetPath(Files.GetWorldFilePath(filename) or filename);
 	end
 end
 

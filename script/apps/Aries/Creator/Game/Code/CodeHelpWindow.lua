@@ -77,8 +77,15 @@ function CodeHelpWindow.InitCmds()
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
 		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 
+		
 		local langConfig = LanguageConfigurations:LoadConfigByFilename(filename)
 		if(langConfig) then
+			if(CodeHelpWindow.lastLangConfig and CodeHelpWindow.lastLangConfig~=langConfig) then
+				if(CodeHelpWindow.lastLangConfig.OnDeselect) then
+					CodeHelpWindow.lastLangConfig.OnDeselect();
+				end
+			end
+
 			if (langConfig.GetCategoryButtons) then
 				CodeHelpWindow.SetCategories(langConfig.GetCategoryButtons())
 			end
@@ -87,6 +94,11 @@ function CodeHelpWindow.InitCmds()
 			end
 			if (langConfig.GetCodeExamples) then
 				CodeHelpWindow.AddCodeExamples(langConfig.GetCodeExamples());
+			end
+			
+			CodeHelpWindow.lastLangConfig = langConfig;
+			if(langConfig.OnSelect) then
+				langConfig.OnSelect();
 			end
 		end
 	end

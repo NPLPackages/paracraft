@@ -9,6 +9,7 @@ local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.l
 NplCad.MakeBlocklyFiles();
 -------------------------------------------------------
 ]]
+local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local NplCad = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.NplCad.NplCad", NplCad);
@@ -74,6 +75,14 @@ function NplCad.AppendAll()
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);
 	end
+end
+
+function NplCad.OnSelect()
+	CodeBlockWindow:GetSceneContext():SetShowBones(true);
+end
+
+function NplCad.OnDeselect()
+	CodeBlockWindow:GetSceneContext():SetShowBones(false);
 end
 
 function NplCad.AppendDefinitions(source)
@@ -156,6 +165,7 @@ NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
 if(result)then
 	setActorValue("assetfile", %q)
+	setActorValue("showBones", true)
     NplCad.RefreshFile(%q)
 end
 ]], code, filename, filename, filename, filename)

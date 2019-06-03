@@ -68,9 +68,9 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'createJoint("%s",%s,%s,%s)\\n%s',
+	func_description = 'createJoint("%s",%s,%s,%s)\\n%sendJoint()',
 	ToNPL = function(self)
-		return string.format('createJoint("%s",%s,%s,%s)\n    %s\n', 
+		return string.format('createJoint("%s",%s,%s,%s)\n    %s\nendJoint()\n', 
             self:getFieldValue('name'),
             self:getFieldValue('x'),
             self:getFieldValue('y'),
