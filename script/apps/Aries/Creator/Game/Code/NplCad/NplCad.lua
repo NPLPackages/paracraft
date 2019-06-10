@@ -78,11 +78,15 @@ function NplCad.AppendAll()
 end
 
 function NplCad.OnSelect()
-	CodeBlockWindow:GetSceneContext():SetShowBones(true);
+    if(CodeBlockWindow:GetSceneContext())then
+        CodeBlockWindow:GetSceneContext():SetShowBones(true);
+    end
 end
 
 function NplCad.OnDeselect()
-	CodeBlockWindow:GetSceneContext():SetShowBones(false);
+    if(CodeBlockWindow:GetSceneContext())then
+        CodeBlockWindow:GetSceneContext():SetShowBones(false);
+    end
 end
 
 function NplCad.AppendDefinitions(source)

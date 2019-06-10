@@ -60,6 +60,8 @@ function AllContext:Init()
 end
 
 function AllContext:GetContext(name)
-	return contexts[name];
+    if(contexts)then
+	    return contexts[name];
+    end
 end
 

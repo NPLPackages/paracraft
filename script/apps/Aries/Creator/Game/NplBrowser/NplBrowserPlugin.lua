@@ -300,6 +300,18 @@ function NplBrowserPlugin.CheckCefClientExist()
     return v;
 end
 function NplBrowserPlugin.OsSupported()
-    local is_supported = (System.os.GetPlatform()=="win32" and not System.os.Is64BitsSystem());
-    return is_supported;
+	if(NplBrowserPlugin.isSupported == nil) then
+		NplBrowserPlugin.isSupported = (System.os.GetPlatform()=="win32" and not System.os.Is64BitsSystem());
+
+		-- disable for windows XP
+		if(NplBrowserPlugin.isSupported) then
+			local stats = System.os.GetPCStats();
+			if(stats and stats.os) then
+				if(stats.os:lower():match("windows xp")) then
+					NplBrowserPlugin.isSupported = false;
+				end
+			end
+		end
+	end
+    return NplBrowserPlugin.isSupported;
 end
