@@ -949,6 +949,10 @@ function Entity:GetItemClass()
 	end
 end		
 
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+end
+
 -- get the associated block template class. 
 function Entity:GetBlock()
 	if(self.block) then

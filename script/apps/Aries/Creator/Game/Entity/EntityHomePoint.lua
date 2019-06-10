@@ -116,6 +116,14 @@ function Entity:GetCollisionAABB()
 	return self.aabb;
 end
 
+function Entity:IsSearchable()
+	return true;
+end
+
+function Entity:GetDisplayName()
+	return "home";
+end
+
 
 -- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 
 -- @return nil or array of item stack.

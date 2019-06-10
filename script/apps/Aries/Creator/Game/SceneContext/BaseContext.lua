@@ -805,35 +805,37 @@ function BaseContext:handlePlayerKeyEvent(event)
 			ParaCamera.GetAttributeObject():SetField("LookAtShiftY", last_value-0.03);
 		end
 		event:accept();
-	elseif(dik_key == "DIK_SPACE") then
-		GameLogic.DoJump();
-		event:accept();
-	elseif(dik_key == "DIK_F") then
-		-- fly mode
-		if(GameMode:CanFly()) then
-			GameLogic.ToggleFly();
-		end
-		event:accept();
-	elseif(dik_key == "DIK_B") then
-		if(System.options.mc) then
-			GameLogic.ToggleDesktop("bag");
+	elseif(not event.ctrl_pressed and not event.alt_pressed) then
+		if(dik_key == "DIK_SPACE") then
+			GameLogic.DoJump();
+			event:accept();
+		elseif(dik_key == "DIK_F") then
+			-- fly mode
+			if(GameMode:CanFly()) then
+				GameLogic.ToggleFly();
+			end
+			event:accept();
+		elseif(dik_key == "DIK_B") then
+			if(System.options.mc) then
+				GameLogic.ToggleDesktop("bag");
+				event:accept();
+			end
+		elseif(dik_key == "DIK_W") then
+			GameLogic.WalkForward();
+			event:accept();
+		elseif(dik_key == "DIK_E") then
+			GameLogic.ToggleDesktop("builder");
+			event:accept();
+		elseif(dik_key == "DIK_Q") then
+			GameLogic.GetPlayerController():ThrowBlockInHand();
+			event:accept();
+		elseif(dik_key == "DIK_F5") then
+			GameLogic.ToggleCamera();
+			event:accept();
+		elseif(dik_key == "DIK_X") then
+			GameLogic.TalkToNearestNPC();
 			event:accept();
 		end
-	elseif(dik_key == "DIK_W") then
-		GameLogic.WalkForward();
-		event:accept();
-	elseif(dik_key == "DIK_E") then
-		GameLogic.ToggleDesktop("builder");
-		event:accept();
-	elseif(dik_key == "DIK_Q") then
-		GameLogic.GetPlayerController():ThrowBlockInHand();
-		event:accept();
-	elseif(dik_key == "DIK_F5") then
-		GameLogic.ToggleCamera();
-		event:accept();
-	elseif(dik_key == "DIK_X") then
-		GameLogic.TalkToNearestNPC();
-		event:accept();
 	elseif(self:HandleQuickSelectKey(event)) then
 		-- quick select key
 	end
@@ -915,6 +917,9 @@ function BaseContext:HandleGlobalKey(event)
 				elseif(dik_key == "DIK_O") then
 					-- show module manager
 					GameLogic.RunCommand("/menu file.loadworld");
+				elseif(dik_key == "DIK_F") then
+					-- find block 
+					GameLogic.RunCommand("/menu window.find");
 				end
 			end
 		end

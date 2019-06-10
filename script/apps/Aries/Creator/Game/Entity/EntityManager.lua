@@ -959,9 +959,12 @@ function EntityManager.FilterEntity(entity, params, entities)
 	end
 end
 
--- find entities by a number of matching parameters. block entities are always escaped
+-- find entities by a number of matching parameters
 -- @param params: {category, type, nontype, name, x,y,z,dz,dy,dz,r,rm, count}
--- category: "e" all entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
+-- category: "e" all entities except block entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
+-- "all" for block entities
+-- "b" for block entities
+-- "searchable" for all searchable entities including block entities 
 -- name: only entities with given name.
 -- type: only entities of given type. 
 -- nontype: only entities not of the given type
@@ -1062,6 +1065,39 @@ function EntityManager.FindEntities(params)
 			if(EntityManager.FilterEntity(player, params, output)) then
 				output = output or {};
 				output[#output+1] = player;
+			end
+		end
+	elseif(params.category == "all") then
+		-- "all" for all entities including block entities 
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and EntityManager.FilterEntity(entity, params)) then
+					output = output or {};
+					output[#output+1] = entity;
+				end
+			end
+		end
+	elseif(params.category == "b") then
+		-- "all" for all entities including block entities 
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and entity:IsBlockEntity() and EntityManager.FilterEntity(entity, params)) then
+					output = output or {};
+					output[#output+1] = entity;
+				end
+			end
+		end
+	elseif(params.category == "searchable") then
+		-- "searchable" for all searchable entities including block entities 
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and entity:IsSearchable() and EntityManager.FilterEntity(entity, params)) then
+					output = output or {};
+					output[#output+1] = entity;
+				end
 			end
 		end
 	end

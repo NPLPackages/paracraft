@@ -289,6 +289,10 @@ function Entity:SetDisplayName(v)
 	end
 end
 
+function Entity:IsSearchable()
+	return true;
+end
+
 -- only search in 4 horizontal directions for a maximum distance of 16
 -- find nearby movie entity, multiple code block next to each other can share the same movie block.
 function Entity:FindNearByMovieEntity()

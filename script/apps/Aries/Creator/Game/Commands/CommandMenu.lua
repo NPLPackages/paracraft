@@ -130,6 +130,11 @@ Commands["menu"] = {
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");
 			local TeleportListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.TeleportListPage");
 			TeleportListPage.ShowPage(nil, true);
+		elseif(name == "window.find") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
+			local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
+			local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
+			task:Run();
 		elseif(name == "window.changeskin") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");
 			local SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPage");

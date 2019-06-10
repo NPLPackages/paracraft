@@ -61,6 +61,10 @@ function Entity:UpdateBlockDataByFacing()
 	BlockEngine:SetBlockData(x,y,z, dir_id);	
 end
 
+function Entity:GetDisplayName()
+	return self.cmd or "";
+end
+
 function Entity:Refresh()
 	local hasText = self.cmd and self.cmd~=""
 	if(hasText) then
@@ -99,6 +103,12 @@ end
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
 	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data);
+end
+
+
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+	return true;
 end
 
 -- update from packet. 

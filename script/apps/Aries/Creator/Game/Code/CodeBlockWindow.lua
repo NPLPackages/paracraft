@@ -85,8 +85,6 @@ function CodeBlockWindow.Show(bShow)
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
 
 		CodeBlockWindow:LoadSceneContext();
-
-        NplBrowserLoaderPage.Check(function() 		end);
 	end
 end
 
@@ -830,6 +828,8 @@ function CodeBlockWindow.OpenBlocklyEditor()
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s", blockpos);
 	end
+	NplBrowserLoaderPage.Check(function() 		end);
+
     if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
 		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");

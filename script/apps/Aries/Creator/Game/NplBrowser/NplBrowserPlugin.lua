@@ -160,6 +160,7 @@ function NplBrowserPlugin.Open(p)
         y = p.y,
         width = p.width,
         height = p.height,
+        zoom = p.zoom,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
