@@ -130,6 +130,7 @@ function NplBrowserPlugin.Start(p)
         y = y,
         width = width,
         height = height,
+        callback = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua",
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -316,3 +317,12 @@ function NplBrowserPlugin.OsSupported()
 	end
     return NplBrowserPlugin.isSupported;
 end
+function NplBrowserPlugin.SetOpenedCallback(callback)
+    NplBrowserPlugin.opened_callback = callback;
+end
+local function activate()
+    if(NplBrowserPlugin.opened_callback)then
+        NplBrowserPlugin.opened_callback(msg);
+    end
+end
+NPL.this(activate);

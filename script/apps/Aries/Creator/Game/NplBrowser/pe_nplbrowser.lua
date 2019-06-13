@@ -32,6 +32,18 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
     else
         input.zoom = 0;
     end
+
+    NplBrowserPlugin.SetOpenedCallback(function(msg)
+        if(msg and msg.opened)then
+            local id = msg.id;
+	        local config = NplBrowserPlugin.GetCache(id);
+            if(config)then
+                commonlib.TimerManager.SetTimeout(function()  
+                    NplBrowserPlugin.Open(config);
+			    end, 500)
+            end
+        end
+    end)
 	NplBrowserPlugin.StartOrOpen(input);
     -- save the size of npl browser
     NplBrowserPlugin.UpdateCache(id,input);

@@ -245,7 +245,27 @@ function Entity:IsDummy()
 	return self.is_dummy;
 end
 
+-- @param group_id: we can have at most 0-31 groups. if group_id>=64, no one will sense it.
+function Entity:SetGroupId(group_id)
+	self.group_id = group_id or 0;
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("GroupID", group_id);
+	end
+end
 
+function Entity:GetGroupId()
+	return self.group_id;
+end
+
+-- @param field: if 0, it will perceive no one. 
+-- @param bEnable: default to true. turn on and off one or more sentient fields
+function Entity:SetSentientField(field, bEnable)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetSentientField(field, bEnable ~= nil); 
+	end
+end
 
 function Entity:FaceTarget(x,y,z)
 end

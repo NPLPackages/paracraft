@@ -139,7 +139,8 @@ function Entity:TakeCurrentModel()
 	if(self:IsBMaxFile()) then
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", self:GetFilename(true)));
 	else
-		GameLogic.RunCommand(string.format("/take villager {attr={model_filename=%q}}", self:GetFilename()));
+		-- scaling to 2
+		GameLogic.RunCommand(string.format("/take villager {attr={model_filename=%q, scaling=2, can_random_move=true}}", self:GetFilename()));
 	end
 end
 
