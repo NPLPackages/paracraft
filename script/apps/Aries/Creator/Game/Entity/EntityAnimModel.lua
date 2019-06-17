@@ -140,7 +140,7 @@ function Entity:TakeCurrentModel()
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", self:GetFilename(true)));
 	else
 		-- scaling to 2
-		GameLogic.RunCommand(string.format("/take villager {attr={model_filename=%q, scaling=2, can_random_move=true}}", self:GetFilename()));
+		GameLogic.RunCommand(string.format("/take villager {attr={model_filename=%q, scaling=2, can_random_move=true, random_walk_steps=5}}", self:GetFilename()));
 	end
 end
 

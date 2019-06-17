@@ -67,7 +67,7 @@ end
 
 function Entity:Refresh()
 	local hasText = self.cmd and self.cmd~=""
-	if(hasText) then
+	if(hasText and not self.wasDeleted) then
 		-- only create C++ object when cmd is not empty
 		if(not self.obj) then
 			-- Node: we do not draw the model, it is only used for drawing UI overlay. 

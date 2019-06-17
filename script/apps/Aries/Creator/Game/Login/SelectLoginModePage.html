@@ -86,12 +86,15 @@ end
         <div style="position:relative;margin-top:15px;margin-left:-220px;color:#572712"><%=Rebranding:GetValue("company")%></div>
     </pe:if>
     <div style="position:relative;margin-left:0px;width:520px;margin-top:150px;font-size:14px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-align:center">
-        <%=Rebranding:GetValue("titleaddon") or L"学会编程, 学会学习"%>
+        <%=Rebranding:GetValue("titleaddon")%>
     </div>
+    <!--
     <div style="position:relative;margin-left:0px;width:520px;text-align:center;margin-top:230px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;">
         <%=L"点击任意位置继续"%>
     </div>
-    <div style="margin-top:300px;margin-left:120px;">
+    -->
+    <div style="margin-top:230px;margin-left:120px;">
+        <input type="button" value='<%=L"点击任意位置继续"%>' class="mc_big_button" style="color:#572712;font-size:14px;width:280px;height:52px;" onclick="OnSelect" />    
     </div>
 </pe:container>
 <!--persistent setting button-->

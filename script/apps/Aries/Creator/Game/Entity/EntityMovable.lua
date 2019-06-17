@@ -38,6 +38,7 @@ local math_random = math.random;
 local math_floor = math.floor;
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovable"));
+Entity:Property({"randomWalkSteps", 1, "GetRandomWalkSteps", "SetRandomWalkSteps", auto=true});
 Entity:Signal("clicked", function(mouse_button) end)
 
 -- class name
@@ -248,6 +249,11 @@ function Entity:LoadFromXMLNode(node)
 		if(self.skin) then
 			Files.FindFile(self.skin);
 		end
+
+		if(attr.random_walk_steps) then
+			self:SetRandomWalkSteps(tonumber(attr.random_walk_steps));
+		end
+
 		if(attr.scaling) then
 			self.scaling = tonumber(attr.scaling);
 		end
@@ -288,6 +294,10 @@ function Entity:SaveToXMLNode(node, bSort)
 		attr.showHeadOn = self.showHeadOn;
 	end
 
+	if(self:GetRandomWalkSteps()~=1) then
+		attr.random_walk_steps =  self:GetRandomWalkSteps();
+	end
+	
 	if(self.motionX) then
 		attr.motionX = self.motionX
 	end
@@ -546,6 +556,10 @@ end
 -- @return x,y,z where the entity may walk to. may return nil
 function Entity:GetRandomMovePos()
 	local x,y,z = self:GetBlockPos();
+	local steps = self:GetRandomWalkSteps()
+	if(steps>1) then
+		steps = math.random(1, steps);
+	end
 	local w0 = self:GetBlockPathWeight(x-1, y, z);
 	local w1 = self:GetBlockPathWeight(x+1, y, z);
 	local w2 = self:GetBlockPathWeight(x, y, z-1);
@@ -555,17 +569,17 @@ function Entity:GetRandomMovePos()
 		local w = math_random(0, w_all);
 		w = w - w3;
 		if(w <=0 and w3~=0) then
-			return x, y, z+1;
+			return x, y, z+steps;
 		else
 			w = w - w2;	
 			if(w <=0 and w2~=0) then
-				return x, y, z-1;
+				return x, y, z-steps;
 			else
 				w = w - w1;	
 				if(w <=0 and w1~=0) then
-					return x+1, y, z;
+					return x+steps, y, z;
 				elseif(w0~=0) then
-					return x-1, y, z;
+					return x-steps, y, z;
 				end
 			end
 		end

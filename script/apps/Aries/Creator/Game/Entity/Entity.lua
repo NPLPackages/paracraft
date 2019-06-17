@@ -245,9 +245,10 @@ function Entity:IsDummy()
 	return self.is_dummy;
 end
 
--- @param group_id: we can have at most 0-31 groups. if group_id>=64, no one will sense it.
+-- @param group_id: we can have at most 0-31 groups. if group_id>=32, no one will sense it.
+-- if nil, it will be a group id that cannot be detected. 
 function Entity:SetGroupId(group_id)
-	self.group_id = group_id or 0;
+	self.group_id = group_id or 64;
 	local obj = self:GetInnerObject();
 	if(obj) then
 		obj:SetField("GroupID", group_id);
@@ -1000,6 +1001,8 @@ function Entity:Destroy()
 	self:Detach();
 	if(self.pool_manager) then
 		self.pool_manager:RecollectEntity(self);
+	else
+		Entity._super.Destroy(self);
 	end
 end
 
@@ -1829,7 +1832,7 @@ end
 -- true to run the framemove and increase the local time. 
 -- @return nil or deltaTimeReal in seconds.
 function Entity:CheckFrameMove(deltaTime, curTime, bForceFrameMove)
-	if(self.framemove_interval and (bForceFrameMove or self:IsTick("FrameMove", deltaTime, self.framemove_interval))) then
+	if(not self:IsDummy() and self.framemove_interval and (bForceFrameMove or self:IsTick("FrameMove", deltaTime, self.framemove_interval))) then
 		local deltaTimeReal;
 		if(self.last_frametime) then
 			deltaTimeReal = curTime - (self.last_frametime or curTime);

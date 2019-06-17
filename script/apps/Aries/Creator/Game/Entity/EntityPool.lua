@@ -83,6 +83,7 @@ function EntityPool:CreateEntity()
 		self.totalCount = self.totalCount + 1;
     else
         entity = self.listEntities:pop_back();
+		entity.wasDeleted = nil;
     end
     return entity;
 end
