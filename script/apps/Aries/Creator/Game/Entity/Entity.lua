@@ -235,12 +235,12 @@ end
 function Entity:IsBiped()
 end
 
--- whether it will check for collision detection 
+-- whether it will check for collision detection and run FrameMove 
 function Entity:SetDummy(bIsDummy)
 	self.is_dummy = bIsDummy;
 end
 
--- whether it will check for collision detection 
+-- whether it will check for collision detection and run FrameMove 
 function Entity:IsDummy()
 	return self.is_dummy;
 end
