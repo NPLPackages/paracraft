@@ -33,7 +33,6 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 
 -- persistent object by default. 
 Entity.is_persistent = true;
-Entity.is_dummy = true;
 Entity.framemove_interval = 0.2;
 -- class name
 Entity.class_name = "EntityHomePoint";
