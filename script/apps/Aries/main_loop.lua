@@ -9,6 +9,10 @@ command line params
 | gateway | force the gateway to use, usually for debugging purposes. such as "1100" |
 | url  | from which url, this application is started |
 | httpdebug | true for npl http debugger|
+| isSchool | true to disable games and url protocol install |
+| keepworktoken | |
+| resolution | |
+
 e.g. 
 <verbatim>
 	paraworld.exe username="1100@paraengine.com" password="1100@paraengine.com" servermode="true" d3d="false" chatdomain="192.168.0.233" domain="test.pala5.cn"
@@ -72,6 +76,8 @@ if(not System.User.keepworktoken) then
 	System.User.keepworktoken = ParaEngine.GetAppCommandLineByParam("keepworktoken",nil);
 end
 
+commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
+commonlib.setfield("System.options.isSchool", ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true");
 
 --System.options.isDevEnv = true;
 -- load from config file

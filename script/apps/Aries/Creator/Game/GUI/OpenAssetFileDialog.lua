@@ -209,6 +209,7 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 	local rootPath = ParaWorld.GetWorldDirectory();
 
 	local filter, filterFunc;
+	local searchLevel = 2;
 	if(OpenAssetFileDialog.filters) then
 		filter = OpenAssetFileDialog.filters[OpenAssetFileDialog.curFilterIndex or 1];
 		if(filter) then
@@ -255,9 +256,24 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 	end
 	local files = OpenAssetFileDialog.dsExistingFiles;
 	table.resize(OpenAssetFileDialog.dsExistingFiles, 0);
-	local result = commonlib.Files.Find({}, rootPath, 2, 500, filterFunc);
+	local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, filterFunc);
 	for i = 1, #result do
 		files[#files+1] = {name="file", attr=result[i]};
+	end
+	if(System.World.worldzipfile) then
+		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(System.World.worldzipfile);
+		local zipParentDir = zip_archive:GetField("RootDirectory", "");
+		if(zipParentDir~="") then
+			if(rootPath:sub(1, #zipParentDir) == zipParentDir) then
+				rootPath = rootPath:sub(#zipParentDir+1, -1)
+				local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, ":.", System.World.worldzipfile);
+				for i = 1, #result do
+					if(filterFunc(result[i])) then
+						files[#files+1] = {name="file", attr=result[i]};
+					end
+				end
+			end
+		end
 	end
 end
 

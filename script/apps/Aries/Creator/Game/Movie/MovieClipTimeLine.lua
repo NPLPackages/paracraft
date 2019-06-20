@@ -859,3 +859,21 @@ function MovieClipTimeLine.OnChangeEndTime()
 		end
 	end
 end
+
+function MovieClipTimeLine.OnClickTimeButton(value)
+	if(mouse_button == "right") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(L"设置当前时间（毫秒）", function(result)
+			if(result and result~="") then
+				local newTime = result:match("^(%d+)");
+				if(newTime) then
+					if(page) then
+						page:SetValue("timeline", newTime)
+						MovieClipTimeLine.OnTimeChanged(page:GetValue("timeline", 0))
+					end
+				end
+			end
+		end,tostring(value));
+	end
+end

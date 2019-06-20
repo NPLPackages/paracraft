@@ -20,7 +20,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 
 local BuildQuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
 local categoryPaths = {
-	["template"]  = "worlds/DesignHouse/blocktemplates/",
+	-- ["template"]  = "worlds/DesignHouse/blocktemplates/",
 	["tutorial"]  = "config/Aries/creator/blocktemplates/buildingtask/",
 	-- ["blockwiki"] = "config/Aries/creator/blocktemplates/blockwiki/",
 }
@@ -691,7 +691,6 @@ end
 local localthemesDS = {};
 local myThemePath = "worlds/DesignHouse/blocktemplates/";
 local myThemeIndex;
-local myTaskMap = {};
 
 local string_byte = string.byte;
 BuildQuestProvider.NeedRefreshDS = true;
@@ -830,6 +829,11 @@ function BuildQuestProvider.LoadFromTemplate(themeKey,themePath)
 	if(hasOldGlobalFiles and themeKey == "template") then
 		BuildQuestProvider.TranslateGlobalTemplateToBuildingTask();
 	end
+	for i = 1,#output do
+		if(output[i]:match("[/\\]")) then
+			output[i] = output[i]:match("[^/\\]+$");
+		end
+	end
 
 	for i = 1,#output do
 		local theme_name = string.match(output[i],"^(.*).zip$");
@@ -872,7 +876,7 @@ function BuildQuestProvider.LoadFromTemplate(themeKey,themePath)
 		end
 		cur_themesDS[#cur_themesDS+1] = {name = theme_name_utf8, foldername=theme_name, order = order, unlock_coins = "0",image = "",icon = "",official = false,};
 		local theme_index =  #cur_themes+1;
-		cur_themes[theme_index] = theme_class:new({name = theme_name_utf8, foldername=theme_name, unlock_coins = "0",image = "",icon = "",official = false, themeKey = themeKey});
+		cur_themes[theme_index] = theme_class:new({name = theme_name_utf8, isThemeZipFile=isThemeZipFile, theme_path=theme_path, foldername=theme_name, unlock_coins = "0",image = "",icon = "",official = false, themeKey = themeKey});
 
 		localthemesDS[#localthemesDS + 1] = {value = theme_name_utf8};
 		if(not isThemeZipFile) then
@@ -886,59 +890,6 @@ function BuildQuestProvider.LoadFromTemplate(themeKey,themePath)
 			theme_index = insert_index;
 		end
 
-		--local theme_path = themePath..theme_name.."/";
-		local tasks_output;
-		if(isThemeZipFile) then
-			tasks_output = GetFiles(theme_path,"*.","*.zip");
-		else
-			-- echo({"11111111111111", commonlib.Encoding.DefaultToUtf8(theme_path)})
-			tasks_output = GetFiles(theme_path,function (msg)
-				-- folder or zip
-				return msg.filesize == 0 or string.match(msg.filename,".zip");
-			end, "*.*");
-			-- echo({"2222222222", #tasks_output});
-		end
-
-		local theme = cur_themes[theme_index];
-		local tasksDS = theme.tasksDS;
-		local tasks = theme.tasks;
-		for j = 1,#tasks_output do
-			local taskname;
-			if(isThemeZipFile) then
-				taskname = string.match(tasks_output[j],"^(.*)/$")
-			else
-				taskname = string.match(tasks_output[j],"^(.*).zip$")
-				if(taskname) then
-					local filename = theme_path..tasks_output[j];
-					ParaAsset.OpenArchive(filename, true);
-				else
-					taskname = tasks_output[j];
-				end
-			end
-			
-			local taskpath = theme_path..taskname.."/"..taskname..".xml";
-			local task_dir = theme_path..taskname.."/";
-			local taskXmlRoot = ParaXML.LuaXML_ParseFile(taskpath);
-			for node in commonlib.XPath.eachNode(taskXmlRoot, "/Task") do
-				node.attr.filepath = taskpath;
-				node.attr.dir = task_dir;
-				tasksDS[#tasksDS+1] = {};
-				
-				commonlib.partialcopy(tasksDS[#tasksDS],node.attr);
-				tasksDS[#tasksDS].task_index = #tasksDS;
-				local task_index = #tasks+1;
-				local task = task_class:new(node.attr):Init(node, theme, task_index, themeKey);
-				tasks[task_index] = task;
-				
-				if(themeKey == "blockwiki") then
-					local block_id,task_name = string.match(tasksDS[#tasksDS].name,"(%d*)_(.*)");
-					tasksDS[#tasksDS].block_id = tonumber(block_id);
-					--tasksDS[#tasksDS].name = task_name;
-				end
-
-				--myTaskMap[node.attr.name] = {task_index = task_index, task_ds_index = #myTasksDS};
-			end
-		end
 	end
 	for i=1, #cur_themes do
 		cur_themes[i].id = i;
@@ -1099,6 +1050,59 @@ function BuildQuestProvider.GetTasks_DS(theme_id,category)
 	local theme = BuildQuestProvider.GetTheme(theme_id,category);
 	if(not theme) then
 		return;
+	end
+	if(not theme.isLoaded) then
+		theme.isLoaded = true;
+		-- load all files from theme_path
+		local theme_path = theme.theme_path;
+		local tasks_output;
+		if(theme.isThemeZipFile) then
+			tasks_output = GetFiles(theme_path,"*.","*.zip");
+		else
+			-- echo({"11111111111111", commonlib.Encoding.DefaultToUtf8(theme_path)})
+			tasks_output = GetFiles(theme_path,function (msg)
+				-- folder or zip
+				return msg.filesize == 0 or string.match(msg.filename,".zip");
+			end, "*.*");
+			-- echo({"2222222222", #tasks_output});
+		end
+
+		local tasksDS = theme.tasksDS;
+		local tasks = theme.tasks;
+		for j = 1,#tasks_output do
+			local taskname;
+			if(theme.isThemeZipFile) then
+				taskname = string.match(tasks_output[j],"^(.*)/$")
+			else
+				taskname = string.match(tasks_output[j],"^(.*).zip$")
+				if(taskname) then
+					local filename = theme_path..tasks_output[j];
+					ParaAsset.OpenArchive(filename, true);
+				else
+					taskname = tasks_output[j];
+				end
+			end
+			
+			local taskpath = theme_path..taskname.."/"..taskname..".xml";
+			local task_dir = theme_path..taskname.."/";
+			local taskXmlRoot = ParaXML.LuaXML_ParseFile(taskpath);
+			for node in commonlib.XPath.eachNode(taskXmlRoot, "/Task") do
+				node.attr.filepath = taskpath;
+				node.attr.dir = task_dir;
+				tasksDS[#tasksDS+1] = {};
+				
+				commonlib.partialcopy(tasksDS[#tasksDS],node.attr);
+				tasksDS[#tasksDS].task_index = #tasksDS;
+				local task_index = #tasks+1;
+				local task = task_class:new(node.attr):Init(node, theme, task_index, themeKey);
+				tasks[task_index] = task;
+				
+				if(themeKey == "blockwiki") then
+					local block_id,task_name = string.match(tasksDS[#tasksDS].name,"(%d*)_(.*)");
+					tasksDS[#tasksDS].block_id = tonumber(block_id);
+				end
+			end
+		end
 	end
 	return theme.tasksDS;
 end

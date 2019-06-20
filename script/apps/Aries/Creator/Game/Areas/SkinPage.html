@@ -49,7 +49,6 @@ function OnOK()
     SkinPage.OnOK();
     ClosePage();
 end
-
 ]]></script>
 <aries:window mode="thin" style="width:500px;height:400px;" title='<%=L"角色外貌"%>' onclose="ClosePage">
     <div style="float:left;width:180px;margin-left:13px;margin-top:3px;">
@@ -57,8 +56,8 @@ end
             <div >
                 <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" isinteractive="false" />
             </div>
-            <!--<input type="button" enabled="false" value="更改造型" style="position:relative;margin-top:210px;margin-left:15px;width:130px;height:34px;" class="mc_big_button"/>-->
         </div>
+        <input type="button" onclick="SkinPage.OnChangeAvatarModel"  value='<%=L"更改造型..."%>' style="position:relative;margin-top:280px;margin-left:20px;min-width:130px;" class="mc_light_grey_button_with_fillet"/>
     </div>
     <div style="float:left;margin-left:8px;margin-top:10px;width:270px;height:335px;color:#cccccc">
         <div class="mc_border" style="margin-top:5px;padding:10px;">
@@ -68,9 +67,6 @@ end
             <div style="float:left;margin-left:80px;color:#ffffff;">
                 <%=L"描述"%>
             </div>
-    <!--        <div>
-        
-            </div>-->
             <pe:gridview style="margin-top:5px;height:260px;" name="gvwSkins" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>

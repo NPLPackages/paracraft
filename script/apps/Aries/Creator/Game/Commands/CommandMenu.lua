@@ -162,7 +162,11 @@ Commands["menu"] = {
 			local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 			TeacherAgent:SetEnabled(not TeacherAgent:IsEnabled())
 		elseif(name == "help.videotutorials") then
-			GameLogic.RunCommand("/open https://keepwork.com/official/paracraft/animation-tutorials");
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/videoguide");
+		elseif(name == "help.learn") then
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/s");
+		elseif(name == "help.ask") then
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/kecheng/cs/all");
 		elseif(name == "help.npl_code_wiki") then

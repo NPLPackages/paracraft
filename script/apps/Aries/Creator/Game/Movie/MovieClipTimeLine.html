@@ -49,7 +49,7 @@ end
             </div>
             <div>
                 <pe:sliderbar name="timeline" show_step_button="true" step_left_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;299 401 10 11:2 2 2 2" step_right_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;337 401 10 11:2 2 2 2"
-                              onchange="MovieClipTimeLine.OnTimeChanged()" min="0" max="30000" min_step="1" value="0" style='<%=format("background:;height:%dpx;", MovieClipTimeLine.timeSliderHeight)%>' button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;310 401 26 11:3 3 3 3"
+                              onchange="MovieClipTimeLine.OnTimeChanged()" onclick="MovieClipTimeLine.OnClickTimeButton()" min="0" max="30000" min_step="1" value="0" style='<%=format("background:;height:%dpx;", MovieClipTimeLine.timeSliderHeight)%>' button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;310 401 26 11:3 3 3 3"
                               buttontext_color="#cccccc" buttontext_format="%d / %d" button_width="128" button_height='<%=MovieClipTimeLine.timeSliderHeight%>' EditorWidth="90" EditorFormat="%d" IsShowEditor="false" direction="horizontal" />
             </div>
         </div>

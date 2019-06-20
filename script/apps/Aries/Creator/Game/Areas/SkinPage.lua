@@ -12,6 +12,8 @@ SkinPage.ShowPage();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
@@ -80,6 +82,30 @@ function SkinPage.ShowPage(entity)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
+function SkinPage.OnChangeAvatarModel()
+    local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+	
+	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+    local lastFilename = EntityManager.GetPlayer():GetMainAssetPath();
+	lastFilename = PlayerAssetFile:GetNameByFilename(lastFilename)
+
+	if(page) then
+		page:CloseWindow();
+	end
+
+	OpenAssetFileDialog.ShowPage("", function(filename)
+		if(filename) then
+			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
+			if(filepath and lastFilename~=filename) then
+				if(SkinPage.GetEntity() == EntityManager.GetPlayer()) then
+					GameLogic.RunCommand("/avatar "..filename);
+				end
+			end
+		end
+	end, lastFilename, L"选择模型文件", "model");
+end
+
 -- clicked a block
 function SkinPage.ChangeSkin(index)
 	local filename = PlayerSkins:GetSkinByID(index-1);
@@ -89,6 +115,9 @@ function SkinPage.ChangeSkin(index)
 	obj_params.ReplaceableTextures = {[2] = filename};
 	local canvasCtl = player_node.Canvas3D_ctl;
 	if(canvasCtl) then
+		if(obj_params.AssetFile ~= PlayerAssetFile:GetFilenameByName("default") or obj_params.AssetFile~=PlayerAssetFile:GetFilenameByName("actor")) then
+			obj_params.AssetFile = PlayerAssetFile:GetFilenameByName("default");
+		end
 		canvasCtl:ShowModel(obj_params);
 	end
 
@@ -97,13 +126,17 @@ function SkinPage.ChangeSkin(index)
 end
 
 function SkinPage.GetEntity()
-	return cur_entity or EntityManager.GetFocus();
+	return cur_entity or EntityManager.GetPlayer();
 end
 
 function SkinPage.OnOK()
 	if(cur_skin) then
 		local player = SkinPage.GetEntity();
 		if(player and player.SetSkin) then
+			local filename = player:GetMainAssetPath();
+			if(filename ~= PlayerAssetFile:GetFilenameByName("default") or filename~=PlayerAssetFile:GetFilenameByName("actor")) then
+				player:SetMainAssetPath(PlayerAssetFile:GetFilenameByName("default"))
+			end
 			player:SetSkin(cur_skin);
 		end
 	end

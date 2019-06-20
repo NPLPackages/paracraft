@@ -319,7 +319,7 @@ function ParaWorldLessons.OnClickWorld(index)
 end
 
 function ParaWorldLessons.OnClickMoreLessons()
-	local url = format("%s/official/paracraft/index", KeepworkService:GetKeepworkUrl())
+	local url = format("%s/official/docs/index", KeepworkService:GetKeepworkUrl())
 	ParaGlobal.ShellExecute("open", url, "", "", 1)
 end
 

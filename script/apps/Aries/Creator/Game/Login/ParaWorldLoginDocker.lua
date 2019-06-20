@@ -118,7 +118,6 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 	
 	
 	NPL.load("npl_packages/ParacraftBuildinMod/");
-	commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
 
 	if(System.options.isFromQQHall) then
 		ParaWorldLoginDocker.DisableExternalUrlLinks();
@@ -163,7 +162,7 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 							retryCount = retryCount + 1
 							_guihelper.MessageBox(format("访问超时, 第%d次尝试", retryCount), function()
 							end)
-							if(retryCount <= 4) then
+							if(retryCount < 3) then
 								GetKeepworkToken_()
 							end
 							return
@@ -193,10 +192,12 @@ local app_install_details = {
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="kids" partner="keepwork" config="config/GameClient.config.xml"',
 		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
 		allowQQHall = true,
+		isGame = true,
 	},
 	["haqi2"] = {
 		title=L"魔法哈奇-青年版", hasParacraft = false, 
 		allowQQHall = true,
+		isGame = true,
 		mergeHaqiPKGFiles = true, -- we will always apply the latest version of haqi pkg on top of this one. 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" partner="keepwork" config="config/GameClient.config.xml"',
 		-- cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" config="config/GameClient.config.xml"',
@@ -285,13 +286,13 @@ function ParaWorldLoginDocker.ShowPage()
 end
 
 
-function ParaWorldLoginDocker.FilterQQHallApps(appButtons)
-	if(System.options and System.options.isFromQQHall) then
+function ParaWorldLoginDocker.FilterApps(appButtons)
+	if(System.options) then
 		while(true) do
 			local allPassed = true
 			for i, app in ipairs(appButtons) do
 				local info = ParaWorldLoginDocker.GetAppInstallDetails(app.name)
-				if(info and not info.allowQQHall) then
+				if(info and ((not info.allowQQHall and System.options.isFromQQHall) or (info.isGame and System.options.isSchool))) then
 					table.remove(appButtons, i);
 					allPassed = false;
 					break;
@@ -309,7 +310,7 @@ function ParaWorldLoginDocker.AutoMarkLoadedApp(appButtons)
 	for i, app in pairs(appButtons) do
 		app.isLoaded = ParaWorldLoginDocker.IsLoadedApp(app.name);
 	end
-	appButtons = ParaWorldLoginDocker.FilterQQHallApps(appButtons);
+	appButtons = ParaWorldLoginDocker.FilterApps(appButtons);
 	return appButtons;
 end
 

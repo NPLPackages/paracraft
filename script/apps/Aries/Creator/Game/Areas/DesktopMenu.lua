@@ -85,7 +85,8 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"帮助", order=6, name = "help",children = 
 			{
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
-				{text = L"在线课程",name = "help.lessons", onclick=nil},
+				{text = L"学习",name = "help.learn", onclick=nil},
+				{text = L"提问",name = "help.ask", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...(F1)",name = "help.help", onclick=nil},
