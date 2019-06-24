@@ -241,7 +241,7 @@ function OpenFileDialog.UpdateExistingFiles()
 				rootPath = rootPath:sub(#zipParentDir+1, -1)
 				local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, ":.", System.World.worldzipfile);
 				for i = 1, #result do
-					if(filterFunc(result[i])) then
+					if(type(filterFunc) == "function" and filterFunc(result[i])) then
 						files[#files+1] = {name="file", attr=result[i]};
 					end
 				end

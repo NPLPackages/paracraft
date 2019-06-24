@@ -24,6 +24,7 @@ local cmds = {
         );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+createJointRoot()
     ]]}},
 },
 
@@ -79,6 +80,9 @@ local cmds = {
         );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+createJoint("body",0,0,0)
+  bindNodeByName("object1")
+endJoint()
     ]]}},
 },
 
@@ -104,6 +108,7 @@ local cmds = {
             self:getFieldValue('name'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+bindNodeByName("object1")
     ]]}},
 },
 
