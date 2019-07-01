@@ -650,6 +650,9 @@ wait(1)
 -- 0 to delete block
 setBlock(x,y+2,z, 0)
 setBlock(x,y+2,z, id)
+-- with additional block data
+local data = 0
+setBlock(x,y+2,z, id, data)
 ]]}},
 },
 

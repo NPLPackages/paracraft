@@ -97,10 +97,14 @@ end
 MyCompany.Aries.keepwork.KeepWorkRegPage.OnInit();
 
 function sampleEmail()
-    local thisDay=ParaGlobal.GetDateFormat("yMMdd");
-    local thisTime=ParaGlobal.GetTimeFormat("HHmmss");
-    local vmail="sample"..thisDay..thisTime.."@163.com";
-    return vmail;
+    if(false) then
+        local thisDay=ParaGlobal.GetDateFormat("yMMdd");
+        local thisTime=ParaGlobal.GetTimeFormat("HHmmss");
+        local vmail="sample"..thisDay..thisTime.."@163.com";
+        return vmail;
+    else
+        return "";
+    end
 end
 
 function UpdateButtonStatus(params)

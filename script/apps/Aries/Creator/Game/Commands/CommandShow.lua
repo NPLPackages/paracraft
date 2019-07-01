@@ -25,7 +25,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|perf|info|touch|terrain|mod|physics|vision] [on|off]", 
+	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision] [on|off]", 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -50,6 +50,8 @@ Other show filters:
 			Desktop.ShowAllAreas();
 		elseif(name == "boundingbox") then
 			GameLogic.options:ShowBoundingBox(true);
+		elseif(name == "wireframe") then
+			GameLogic.options:ShowWireframe(true);
 		elseif(name == "perf") then
 			NPL.load("(gl)script/ide/Debugger/NPLProfiler.lua");
 			local npl_profiler = commonlib.gettable("commonlib.npl_profiler");
@@ -106,7 +108,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|touch|terrain|vision|ui|keyboard]", 
+	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard]", 
 	desc="hide different type of things" , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
@@ -121,6 +123,8 @@ Commands["hide"] = {
 			Desktop.HideAllAreas();
 		elseif(name == "boundingbox") then
 			GameLogic.options:ShowBoundingBox(false);
+		elseif(name == "wireframe") then
+			GameLogic.options:ShowWireframe(false);
 		elseif(name == "touch") then
 			GameLogic.options:ShowTouchPad(false);
 		elseif(name == "player") then

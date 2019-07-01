@@ -242,7 +242,7 @@ end
 
 -- Ticks the block if it's been scheduled
 function Entity:updateTick(x,y,z)
-	local isPowered = BlockEngine:GetBlockData(x,y,z) > 0;
+	local isPowered = mathlib.bit.band(BlockEngine:GetBlockData(x,y,z), 0xff) > 0;
 	self:SetPowered(isPowered);	
 end
 

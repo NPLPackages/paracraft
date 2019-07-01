@@ -249,7 +249,7 @@ Sound related:
   <!--Added Xizhi 2017.6.4 added memory block-->
   <block singleSideTex="true" name="MemoryBlock" id="9" text="记忆方块" searchkey="记忆方块" class="BlockMemory" entity_class="EntityMemory" texture="Texture/blocks/command_block_on.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
   <!--Added Xizhi 2018.5.19 added code block-->
-  <block singleSideTex="true" name="CodeBlock" id="219" modelName="codeblock" text="代码方块" searchkey="代码方块" class="BlockCode" item_class="ItemCodeBlock" entity_class="EntityCode" texture="Texture/blocks/codeblock_on.png" texture2="Texture/blocks/codeblock_off.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
+  <block singleSideTex="true" name="CodeBlock" id="219" color8_data="true" modelName="codeblock" text="代码方块" searchkey="代码方块" class="BlockCode" item_class="ItemCodeBlock" entity_class="EntityCode" texture="Texture/blocks/codeblock_on.png" texture2="Texture/blocks/codeblock_off.png" hasAction="true" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--Added Xizhi 2014.2.12-->
   <block singleSideTex="true" name="CmdTextureReplacer" text="材质转换器" searchkey="材质转换器" id="223" class="BlockEntityBase" entity_class="EntityCmdTextureReplacer" hasAction="true" texture="Texture/blocks/command_block.png" icon="Texture/blocks/items/stonebrick_chiseled.png" cubeMode="true" obstruction="true" solid="true" />

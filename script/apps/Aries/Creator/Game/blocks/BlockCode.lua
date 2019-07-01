@@ -117,7 +117,9 @@ end
 
 -- calculate comparing to block (x1, y1, z1). usually same as x,y,z
 function block:calculateCurrentChanges(x, y, z)
-    local last_code_power = ParaTerrain.GetBlockUserDataByIdx(x, y, z);
+	local last_data = ParaTerrain.GetBlockUserDataByIdx(x, y, z)
+	-- remove color8 data in high bits
+    local last_code_power = mathlib.bit.band(last_data, 0xff);
     local max_code_power = last_code_power;
 	if(BlockEngine:isBlockIndirectlyGettingPowered(x,y,z)) then
 		if (ParaTerrain.GetBlockTemplateByIdx(x, y, z) == self.id) then
@@ -137,6 +139,9 @@ function block:calculateCurrentChanges(x, y, z)
 		end
 	end
     if (last_code_power ~= max_code_power) then
+		if(last_data > 0xff) then
+			max_code_power = last_data - last_code_power + max_code_power;
+		end
         BlockEngine:SetBlockDataForced(x, y, z, max_code_power);
         blocksNeedingUpdate[#blocksNeedingUpdate+1] = {x, y, z};
         blocksNeedingUpdate[#blocksNeedingUpdate+1] = {x - 1, y, z};
@@ -152,7 +157,9 @@ function block:getMaxCodeStrength(x, y, z, strength)
     if (ParaTerrain.GetBlockTemplateByIdx(x, y, z) ~= self.id) then
         return strength;
     else
-        local my_strength = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
+		local my_strength = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
+		-- remove color8 data in high bits
+		my_strength = mathlib.bit.band(my_strength, 0xff);
 		if(my_strength > strength) then
 			return my_strength;
 		else

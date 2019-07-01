@@ -103,7 +103,7 @@ function SkinPage.OnChangeAvatarModel()
 				end
 			end
 		end
-	end, lastFilename, L"选择模型文件", "model");
+	end, lastFilename, L"閫夋嫨妯″瀷鏂囦欢", "model");
 end
 
 -- clicked a block

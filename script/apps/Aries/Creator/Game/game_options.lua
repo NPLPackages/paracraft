@@ -491,6 +491,9 @@ function options:ShowBoundingBox(bShow)
 	ParaScene.GetAttributeObject():SetField("ShowBoundingBox", bShow==true);
 end
 
+function options:ShowWireframe(bShow)
+	ParaScene.GetAttributeObject():SetField("UseWireFrame", bShow==true);
+end
 
 -- get the number of ms seconds, that user is not saving. 
 function options:GetElapsedUnSavedTime()
