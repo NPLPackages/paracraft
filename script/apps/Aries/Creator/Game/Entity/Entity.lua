@@ -674,7 +674,10 @@ function Entity:DestroyInnerObject()
 	if(obj) then
 		ParaScene.Delete(obj);
 		self.obj = nil;
-		self.obj_id = nil;
+		if(self.obj_id) then
+			EntityManager.SetEntityByObjectID(self.obj_id, nil);
+			self.obj_id = nil;
+		end
 	end
 end
 
@@ -934,6 +937,7 @@ function Entity:GetInnerObject()
 			return obj;
 		else
 			self.obj = nil;
+			EntityManager.SetEntityByObjectID(self.obj_id, nil);
 			self.obj_id = nil;
 		end
 	end

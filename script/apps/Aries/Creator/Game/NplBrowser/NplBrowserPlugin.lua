@@ -43,6 +43,7 @@ end
 local default_client_name = "cef3\\cefclient.exe";
 local windows = {};
 local windows_caches = {};
+local callback_file = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua";
 
 function NplBrowserPlugin.HasWindow(id)
     if(not id)then
@@ -130,7 +131,7 @@ function NplBrowserPlugin.Start(p)
         y = y,
         width = width,
         height = height,
-        callback = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua",
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -162,6 +163,7 @@ function NplBrowserPlugin.Open(p)
         width = p.width,
         height = p.height,
         zoom = p.zoom,
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -190,6 +192,7 @@ function NplBrowserPlugin.ChangePosSize(p)
         y = p.y,
         width = p.width,
         height = p.height,
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -215,6 +218,7 @@ function NplBrowserPlugin.Show(p)
         id = id, 
         parent_handle = parent_handle, 
         visible = p.visible,
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -243,6 +247,7 @@ function NplBrowserPlugin.Zoom(p)
         id = id, 
         parent_handle = parent_handle, 
         zoom = p.zoom,
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -269,6 +274,7 @@ function NplBrowserPlugin.EnableWindow(p)
         id = id, 
         parent_handle = parent_handle, 
         enabled = p.enabled,
+        callback_file = callback_file,
     }
     NPL.activate(dll_name,input); 
     NplBrowserPlugin.UpdateCache(id,input)
@@ -293,6 +299,7 @@ function NplBrowserPlugin.Quit(p)
         cmd = "Quit", 
         id = id, 
         parent_handle = parent_handle, 
+        callback_file = callback_file,
     }); 
     windows[id] = nil;
     NplBrowserPlugin.UpdateCache(id,{})
