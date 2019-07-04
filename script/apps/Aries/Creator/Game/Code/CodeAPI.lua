@@ -59,6 +59,7 @@ local s_env_methods = {
 	"hide",
 	"anim",
 	"play",
+	"playAndWait",
 	"playLoop",
 	"playSpeed",
 	"playBone",

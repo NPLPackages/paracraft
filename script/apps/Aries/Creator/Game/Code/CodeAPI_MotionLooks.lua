@@ -317,6 +317,10 @@ function env_imp:anim(anim_id, duration)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		entity:EnableAnimation(true);
+		if(self.actor.UnbindAnimInstance) then
+			-- this ensures that actor are not bound to current bone position in the movie block
+			self.actor:UnbindAnimInstance();
+		end
 		entity:SetAnimation(anim_id);
 
 		if(duration) then
@@ -337,12 +341,29 @@ function env_imp:playSpeed(speed)
 	end
 end
 
+-- same as play() except that it does not return until it is finished. 
+function env_imp:playAndWait(timeFrom, timeTo)
+	local finished = false;
+	local playReturned = false;
+	env_imp.play(self, timeFrom, timeTo, nil, function()
+		finished = true;
+		if(playReturned) then
+			env_imp.resume(self);
+		end
+	end)
+	playReturned = true;
+	if(not finished) then
+		env_imp.yield(self);
+	end
+end
+
 -- play a time series animation in the movie block.
 -- this function will return immediately.
 -- @param timeFrom: time in milliseconds, default to 0.
 -- @param timeTo: if nil, default to timeFrom
 -- @param isLooping: default to false.
-function env_imp:play(timeFrom, timeTo, isLooping)
+-- @param onFinishedCallback: only used internally, must be nil.
+function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
 	timeFrom = timeFrom or 0;
 	local time = timeFrom;
 	local entity = env_imp.GetEntity(self);
@@ -354,6 +375,7 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 			return
 		end
 		actor:SetTime(time);
+		actor:CheckLoadBonesAnims();
 		actor:ResetOffsetPosAndRotation();
 		actor:FrameMove(0, false);
 		self.codeblock:OnAnimateActor(actor, time);
@@ -379,6 +401,9 @@ function env_imp:play(timeFrom, timeTo, isLooping)
 				actor:FrameMove(0, false);
 				if(timeTo == time) then
 					self.codeblock:OnAnimateActor(actor, time);
+					if(onFinishedCallback) then
+						onFinishedCallback();
+					end
 				end
 			end
 			if(not self.actor.playTimer) then

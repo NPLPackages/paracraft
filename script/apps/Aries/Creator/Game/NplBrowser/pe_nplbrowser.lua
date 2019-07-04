@@ -19,34 +19,36 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
     local page_ctrl = mcmlNode:GetPageCtrl();
 	local id = mcmlNode:GetInstanceName(rootName);
     local url = mcmlNode:GetAttributeWithCode("url");
-	local withControl = mcmlNode:GetBool("withControl");
+	local withControl = mcmlNode:GetAttributeWithCode("withControl",false);
 	local enabledResize = mcmlNode:GetBool("enabledResize");
 	local min_width = mcmlNode:GetNumber("min_width");
 	local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
     local x = screen_x + left;
 	local y = screen_y + top;
     local input = {id = id, url = url, withControl = withControl, x = x, y = y, width = screen_width, height = screen_height, resize = true, };
-
     if(min_width and min_width > 0 and screen_width < min_width)then
         input.zoom = -1;
     else
         input.zoom = 0;
     end
-
-    NplBrowserPlugin.SetOpenedCallback(function(msg)
-        if(msg and msg.opened)then
-            local id = msg.id;
-	        local config = NplBrowserPlugin.GetCache(id);
-            if(config)then
-                commonlib.TimerManager.SetTimeout(function()  
+    NplBrowserPlugin.OnCreatedCallback(function(msg)
+        if(msg)then
+            local cmd = msg["cmd"];
+            if(cmd == "CheckCefWindow")then
+                local config = NplBrowserPlugin.GetCache(id);
+                if(config)then
                     NplBrowserPlugin.Open(config);
-			    end, 500)
+                end
             end
         end
     end)
-	NplBrowserPlugin.StartOrOpen(input);
-    -- save the size of npl browser
-    NplBrowserPlugin.UpdateCache(id,input);
+    if(NplBrowserPlugin.WindowIsExisted(id))then
+        NplBrowserPlugin.Open(input);
+    else
+	    NplBrowserPlugin.Start(input);
+    end
+    -- force save cache for zooming 
+    NplBrowserPlugin.UpdateCache(id,input)
 	CommonCtrl.AddControl(id, id);
 
     local function resize(id,_parent)
@@ -58,7 +60,7 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
 			    local y = screen_y + top;
 			    local width = screen_width;
 			    local height = screen_height;
-			    NplBrowserPlugin.ChangePosSize({id = id, x = x, y = y, width = width, height = height, });
+			    NplBrowserPlugin.ChangePosSize({id = id, x = x, y = y, width = width, height = height, },true);
 		    end
         end
     end
@@ -83,9 +85,10 @@ function pe_nplbrowser.SetVisible(mcmlNode,name,visible)
 	local config = NplBrowserPlugin.GetCache(id);
 	if(config)then
 		config.visible = visible;
-		--config.zoom = -1;
 		NplBrowserPlugin.Show(config);
-		NplBrowserPlugin.Zoom(config);
+        if(visible)then
+            NplBrowserPlugin.Zoom(config)
+        end
 		if(not visible) then
 			commonlib.TimerManager.SetTimeout(function()  
 				ParaUI.GetUIObject("root"):Focus();

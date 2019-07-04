@@ -31,6 +31,7 @@ Commands["open"] = {
 @param -d: url is a directory
 Examples: 
 /open http://www.paraengine.com
+/open -name test_wnd_1 -title 窗口 -width 800 -height 600 -alignment _ct https://keepwork.com
 /open -p http://www.paraengine.com
 /open npl://learn	open NPL code wiki pages
 /open -d temp/
@@ -42,7 +43,6 @@ Examples:
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
-
 		local url = cmd_text;
 		url = GameLogic.GetFilters():apply_filters("cmd_open_url", url, options);
 
@@ -118,7 +118,21 @@ Examples:
 						ParaGlobal.ShellExecute("open", url, "", "", 1);
 					end)
 				else
-					ParaGlobal.ShellExecute("open", url, "", "", 1);
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
+                    local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
+                    local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+                    NplBrowserLoaderPage.Check()
+                    if(not NplBrowserLoaderPage.IsLoaded())then
+					    ParaGlobal.ShellExecute("open", url, "", "", 1);
+                    else
+                        local name = options.name;
+                        local title = options.title;
+                        local alignment = options.alignment;
+                        local width = options.width;
+                        local height = options.height;
+                        NplBrowserPage.Open(name,url,title,nil,alignment,nil,nil,width, height);    
+                    end
 				end
 			else
 				if(url and url~="")then

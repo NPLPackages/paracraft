@@ -1,32 +1,45 @@
-<!-- "Mod/NplBrowser/test_pe_nplbrowser.html" -->
+<!-- "Mod/NplBrowser/pe_nplbrowser_template.html" -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>pe_nplbrowser</title>
 </head>
 <pe:mcml>
-<script type="text/npl" refresh="false">
+<script type="text/npl" refresh="true">
 <![CDATA[
     NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
     local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
-    NplBrowserPage.Init();
     local pageCtrl = document:GetPageCtrl();
+    local npl_browser_page = pageCtrl.npl_browser_page;
     function DoClose()
-		NplBrowserPage.SetVisible(false)
-		pageCtrl:CloseWindow(); 
+        if(npl_browser_page)then
+		    npl_browser_page:Close()
+        end
     end
     function GetUrl()
-        return NplBrowserPage.url;
+        if(npl_browser_page)then
+            return npl_browser_page.url;
+        end
+    end
+    function IsShowControl()
+        if(npl_browser_page)then
+            return npl_browser_page.withControl;
+        end
+    end
+    function GetTitle()
+        if(npl_browser_page)then
+            return npl_browser_page.title or L"NPL浏览器";
+        end
     end
 ]]>
 </script>
     <div width="100%" height="100%" style="background-color:#000000;">
             <div style="width:800px;height:30px;" >
-                <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=L"NPL浏览器"%></div>
+                <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=GetTitle()%></div>
                 <input type="button" value="X" style="margin-left:750px;width:50px;height:30px;" onclick="DoClose()" class="mc_light_grey_button_with_fillet"/>
             </div>
             <pe:container style="height:530px;" width="100%">
-                <pe:nplbrowser name="nplbrowser_instance" withControl="true" enabledResize="true" url="<%=GetUrl()%>"/>
+                <pe:nplbrowser name="nplbrowser_instance" withControl="<%=IsShowControl()%>" enabledResize="true" url="<%=GetUrl()%>"/>
             </pe:container>
     </div>
 </html>

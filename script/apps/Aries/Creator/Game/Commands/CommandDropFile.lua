@@ -103,7 +103,7 @@ function DragDropHandlers.handleZipFile(filename)
 	local beWorld;
 	local name = filename:match("[/\\]([^/\\]+%.zip)$");
 	local file_dir = string.gsub(filename,name,"");
-	local temp_dir = "temp/dropfiles/";
+	local temp_dir = ParaIO.GetWritablePath().."temp/dropfiles/";
 	local temp_path = temp_dir..name;
 	local zipType;
 	if(ParaIO.CopyFile(filename, temp_path, true)) then

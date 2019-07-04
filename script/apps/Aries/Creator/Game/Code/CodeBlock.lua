@@ -698,6 +698,7 @@ function CodeBlock:RegisterAnimationEvent(time, callbackFunc)
 			return (time == curTime);
 		end);
 		event:SetFunction(callbackFunc);
+		return event;
 	end
 end
 
@@ -986,7 +987,7 @@ function CodeBlock:RunTempCode(code, filename)
 			local co = CodeCoroutine:new():Init(self);
 			self.lastTempCodeCoroutine = co;
 			self:stateChanged();
-			local actor = env.actor or self:FindNearbyActor() or self:CreateActor();
+			local actor = self:FindNearbyActor() or self:CreateActor();
 			co:SetActor(actor);
 			co:SetFunction(code_func);
 			co:Run()

@@ -194,6 +194,37 @@ say("No looping", 1)
 ]]}},
 },
 {
+	type = "playAndWait", 
+	message0 = L"播放并等待从%1到%2毫秒",
+	arg0 = {
+		{
+			name = "timeFrom",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+		{
+			name = "timeTo",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1000,},
+			text = 1000, 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'playAndWait(%s, %s)',
+	ToNPL = function(self)
+		return string.format('playAndWait(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
+	end,
+	examples = {{desc = L"播放电影方块中的角色动画", canRun = true, code = [[
+playAndWait(10, 1000)
+say("finished")
+]]}},
+},
+{
 	type = "playLoop", 
 	message0 = L"循环播放从%1到%2毫秒",
 	arg0 = {
