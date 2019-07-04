@@ -375,7 +375,9 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
 			return
 		end
 		actor:SetTime(time);
-		actor:CheckLoadBonesAnims();
+		if(actor.CheckLoadBonesAnims) then
+			actor:CheckLoadBonesAnims();
+		end
 		actor:ResetOffsetPosAndRotation();
 		actor:FrameMove(0, false);
 		self.codeblock:OnAnimateActor(actor, time);
