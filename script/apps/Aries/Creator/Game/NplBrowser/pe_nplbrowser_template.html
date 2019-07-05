@@ -34,11 +34,11 @@
 ]]>
 </script>
     <div width="100%" height="100%" style="background-color:#000000;">
-            <div style="width:800px;height:30px;" >
+            <div style="height:30px;" >
                 <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=GetTitle()%></div>
-                <input type="button" value="X" style="margin-left:750px;width:50px;height:30px;" onclick="DoClose()" class="mc_light_grey_button_with_fillet"/>
+                <input type="button" value="X" align="right" style="width:50px;height:30px;" onclick="DoClose()" class="mc_light_grey_button_with_fillet"/>
             </div>
-            <pe:container style="height:530px;" width="100%">
+            <pe:container width="100%" height="100%" >
                 <pe:nplbrowser name="nplbrowser_instance" withControl="<%=IsShowControl()%>" enabledResize="true" url="<%=GetUrl()%>"/>
             </pe:container>
     </div>

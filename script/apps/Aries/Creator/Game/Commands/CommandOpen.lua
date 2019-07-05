@@ -41,8 +41,23 @@ Examples:
 /open mcml2://hello.html    open with mcml v2
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local options;
-		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		local options = {};
+		local option, value;
+		while(true) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text);	
+			if(not option) then
+				break;
+			elseif(option == "width" or option == "height"  or option == "x"  or option == "y") then
+				value, cmd_text = CmdParser.ParseNumber(cmd_text);
+				options[option] = value;
+			elseif(option == "name" or option == "alignment" or option == "title") then
+				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
+				options[option] = value;
+			else
+				options[option] = true;
+			end
+		end
+
 		local url = cmd_text;
 		url = GameLogic.GetFilters():apply_filters("cmd_open_url", url, options);
 
@@ -117,7 +132,10 @@ Examples:
 					_guihelper.MessageBox(L"你确定要打开:"..url, function()
 						ParaGlobal.ShellExecute("open", url, "", "", 1);
 					end)
+				elseif(not options.width and not options.height) then
+					ParaGlobal.ShellExecute("open", url, "", "", 1);
 				else
+					-- only when width or height is specified, we will use NPL cef browser
                     NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
                     NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
                     local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
