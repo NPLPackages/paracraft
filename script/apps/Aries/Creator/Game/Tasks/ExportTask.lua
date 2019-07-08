@@ -150,7 +150,8 @@ function Export.ExportAsBMax()
 	SaveFileDialog.ShowPage(L"请输入bmax文件名称", function(result)
 		if(result and result~="") then
 			local filename = result;
-			local bSuccess, filename = GameLogic.RunCommand("savemodel", filename);
+			local filenameUtf8 = commonlib.Encoding.DefaultToUtf8(filename);
+			local bSuccess, filename = GameLogic.RunCommand("savemodel", filenameUtf8);
 			if(bSuccess and filename) then
 				GameLogic.GetFilters():apply_filters("file_exported", "bmax", filename);
 				GameLogic.GetFilters():apply_filters("user_event_stat", "model", "export.bmax", 10, nil);

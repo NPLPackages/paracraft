@@ -188,10 +188,10 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
 			assetfile = assetfile:gsub("%s", "");
 		end
 		local old_filename = assetfile;
-		assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
+		assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(commonlib.Encoding.Utf8ToDefault(assetfile));
 		if(assetfile and assetfile~=entity:GetMainAssetPath()) then
 			if(entity.SetModelFile) then
-				entity:SetModelFile(old_filename);
+				entity:SetModelFile(commonlib.Encoding.Utf8ToDefault(old_filename));
 			else
 				entity:SetMainAssetPath(assetfile);
 			end
@@ -249,9 +249,9 @@ function MobPropertyPage.OnOpenAssetFile()
 			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
 			if(filepath or filename=="actor") then
-				page:SetValue("assetfile", filename);
+				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
 				MobPropertyPage.OnChangeAssetFile();
 			end
 		end
-	end, lastFilename, L"选择模型文件", "model");
+	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");
 end

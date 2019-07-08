@@ -157,6 +157,7 @@ Commands["savemodel"] = {
 			templatename = "default";
 		end
 		templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
+		templatename = commonlib.Encoding.Utf8ToDefault(templatename);
 		local relative_path = format("blocktemplates/%s.bmax", templatename);
 		local filename = GameLogic.current_worlddir..relative_path;
 
@@ -164,7 +165,7 @@ Commands["savemodel"] = {
 		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, auto_scale = auto_scale, bSelect=nil})
 		if(task:Run()) then
-			BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", relative_path), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 			return true, relative_path;
 		end
 	end,
@@ -195,6 +196,7 @@ Example:
 			end
 		end
 		if(cmd_text and cmd_text~="") then
+			cmd_text = commonlib.Encoding.Utf8ToDefault(cmd_text);
 			task:SetFileName(cmd_text);
 		end
 		task:SetSilentMode(bSilentMode);
@@ -216,7 +218,7 @@ Commands["generatemodel"] = {
 		end
 		--modelname = templatename:gsub("^blocktemplates/", ""):gsub("%.blocks%.xml$", "");
 		local filename = modelname;
-
+		filename = commonlib.Encoding.Utf8ToDefault(filename);
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/GenerateModelTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.GenerateModel:new({filename = filename});
 		task:Run()

@@ -209,8 +209,8 @@ clone("myself", 3)
 		{
 			name = "input",
 			type = "input_value",
-			shadow = { type = "actorNames", value = "myself",},
-			text = "myself",
+			shadow = { type = "text", value = "myself",},
+			text = "\"myself\"",
 		},
 		{
 			name = "params",
@@ -224,9 +224,9 @@ clone("myself", 3)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'clone("%s", %s)',
+	func_description = 'clone(%s, %s)',
 	ToNPL = function(self)
-		return string.format('clone("%s")\n', self:getFieldAsString('input'));
+		return string.format('clone(%s)\n', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 registerClickEvent(function()
