@@ -26,6 +26,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local rshift = mathlib.bit.rshift;
 local lshift = mathlib.bit.lshift;
@@ -615,6 +616,23 @@ function NetClientHandler:handleClientCommand(packet_ClientCommand)
 		-- only local command is callable by server. 
 		if(cmd_class and cmd_class:IsLocal()) then
 			CommandManager:RunFromConsole(cmd, self.playerEntity);
+		end
+	end
+end
+
+-- server replied with a file
+function NetClientHandler:handleGetFile(packet_GetFile)
+	if(packet_GetFile.filename and packet_GetFile.data) then
+		if(packet_GetFile.data ~= "") then
+			local filename = Files.GetWorldFilePath(packet_GetFile.filename)
+			if(filename) then
+				local file = ParaIO.open(filename, "w")
+				if(file:IsValid()) then
+					file:WriteString(packet_GetFile.data, #(packet_GetFile.data));
+					file:close();
+					LOG.std(nil, "info", "NetClientHandler", "world file received and saved to %s", filename)
+				end
+			end
 		end
 	end
 end

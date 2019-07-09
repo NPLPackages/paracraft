@@ -20,6 +20,8 @@ echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketGetFile.lua");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -51,8 +53,28 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 					any_filename = nil;
 				end
 			else
-				-- LOG.std(nil, "debug", "Files", "can not file world file %s", filename)
-				any_filename = nil;
+				if(GameLogic.isRemote) then
+					-- if it is the remote world, we will create an empty file locally, and send a get file request to the server world.
+					local filepath = Files:GetFileFromCache(any_filename);
+					if(filepath) then
+						any_filename = filepath;	
+					elseif(filepath == false) then
+						any_filename = nil;	
+					else
+						Files:AddFileToCache(any_filename, filename);
+						ParaIO.CreateDirectory(filename);
+						local file = ParaIO.open(filename, "w");
+						if(file:IsValid()) then
+							file:close();
+							GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
+							LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+						end	
+						any_filename = filename;
+					end
+				else
+					-- LOG.std(nil, "debug", "Files", "can not file world file %s", filename)
+					any_filename = nil;
+				end
 			end
 		end
 		return any_filename;

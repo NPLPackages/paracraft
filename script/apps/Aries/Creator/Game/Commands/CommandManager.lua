@@ -86,7 +86,7 @@ end
 -- run one text command
 -- @param cmd_name: this can be command name or full command text that begin with "/" or nothing. 
 function CommandManager:RunCommand(cmd_name, cmd_text, ...)
-	if(not cmd_text) then
+	if(not cmd_text or cmd_text == "") then
 		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
 	end
 

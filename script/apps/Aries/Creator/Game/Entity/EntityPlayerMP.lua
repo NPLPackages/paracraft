@@ -145,7 +145,7 @@ function Entity:WakeUpPlayer(bResetSleepTime, bUpdateSleepFlag, bSpawnInChunk)
     end
 end
 
--- on recieving this message the client (if permission is given) will download the requested textures
+-- on receiving this message the client (if permission is given) will download the requested textures
 function Entity:RequestTexturePackLoad(texture_pack)
 	self:SendPacketToPlayer(Packets.PacketCustomPayload:new():Init("PC|TexturePack", texture_pack));
 end

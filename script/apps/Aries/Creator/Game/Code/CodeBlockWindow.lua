@@ -83,6 +83,7 @@ function CodeBlockWindow.Show(bShow)
 		viewport:SetMarginRightHandler(self);
 
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
+		GameLogic:Connect("WorldUnloaded", CodeBlockWindow, CodeBlockWindow.OnWorldUnload, "UniqueConnection")
 
 		CodeBlockWindow:LoadSceneContext();
 	end
@@ -149,6 +150,10 @@ function CodeBlockWindow:OnViewportChange()
 		end
 
 	end
+end
+
+function CodeBlockWindow.OnWorldUnload()
+	self.lastBlocklyUrl = nil;
 end
 
 function CodeBlockWindow.OnWorldSave()

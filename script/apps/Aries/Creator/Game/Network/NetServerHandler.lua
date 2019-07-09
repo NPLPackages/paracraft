@@ -20,6 +20,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local rshift = mathlib.bit.rshift;
 local lshift = mathlib.bit.lshift;
@@ -377,4 +378,22 @@ end
 
 function NetServerHandler:handleEntityTeleport(packet_EntityTeleport)
 	self:SetTeleporting(false);
+end
+
+-- handles a get file request from client
+function NetServerHandler:handleGetFile(packet_GetFile)
+	if(packet_GetFile.filename) then
+		if(not packet_GetFile.data) then
+			local data;
+			local filename = Files.GetWorldFilePath(packet_GetFile.filename)
+			if(filename) then
+				local file = ParaIO.open(filename, "r")
+				if(file:IsValid()) then
+					data = file:GetText(0, -1);
+					file:close();
+				end
+			end
+			self:SendPacketToPlayer(Packets.PacketGetFile:new():Init(packet_GetFile.filename, data or ""));
+		end
+	end
 end

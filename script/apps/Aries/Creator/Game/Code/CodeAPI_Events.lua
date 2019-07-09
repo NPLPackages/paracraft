@@ -112,7 +112,10 @@ end
 -- @param cmd: full commands or just command name
 -- @param params: parameters or nil. 
 function env_imp:cmd(cmd, params)
-	self.codeblock:RunCommand(cmd, params)
+	if(params ~= nil and params~="") then
+		cmd = cmd.." "..tostring(params);
+	end
+	self.codeblock:RunCommand(cmd)
 end
 
 

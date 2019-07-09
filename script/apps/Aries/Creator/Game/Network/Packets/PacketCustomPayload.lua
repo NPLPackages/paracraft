@@ -23,7 +23,6 @@ end
 
 -- Passes this Packet on to the NetHandler for processing.
 function PacketCustomPayload:ProcessPacket(net_handler)
-	
 end
 
 

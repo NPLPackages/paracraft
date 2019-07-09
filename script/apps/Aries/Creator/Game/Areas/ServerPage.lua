@@ -214,8 +214,13 @@ function ServerPage.GetAllIPAddress()
 		local port = NPL.GetAttributeObject():GetField("HostPort", "");
 		local ips = {};
 		self.ips = ips;
-		ips[#ips+1] = {text=format("%s:%s", NPL.GetExternalIP(), port)};
-		ips[#ips+1] = {text=format("%s:%s", NPL.GetAttributeObject():GetField("HostIP", ""), port)};
+		local function addIP_(ip)
+			if(ip and ip~="" and ip~="127.0.0.1"  and ip~="localhost") then
+				ips[#ips+1] = {text=format("%s:%s", ip, port)};	
+			end
+		end
+		addIP_(NPL.GetExternalIP())
+		addIP_(NPL.GetAttributeObject():GetField("HostIP", ""))
 	end
 	return self.ips;
 end
