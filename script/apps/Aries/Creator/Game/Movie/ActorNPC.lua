@@ -324,6 +324,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 			self.entity:SetDummy(true);
 			self.entity:SetGroupId(nil);
 			self.entity:SetSentientField(0);
+			self.entity:SetServerEntity(false);
 
 			if(skin) then
 				self.entity:SetSkin(skin);

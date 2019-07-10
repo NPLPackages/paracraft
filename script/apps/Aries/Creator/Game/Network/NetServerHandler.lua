@@ -333,6 +333,13 @@ function NetServerHandler:handleUpdateEntitySign(packet_UpdateEntitySign)
 	end
 end
 
+function NetServerHandler:handleUpdateEntityBlock(packet_UpdateEntityBlock)
+	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z)
+	if(blockEntity) then
+		blockEntity:OnUpdateFromPacket(packet_UpdateEntityBlock);
+	end
+end
+
 function NetServerHandler:handleClientCommand(packet_ClientCommand)
 	local cmd = packet_ClientCommand.cmd;
 	if(cmd) then

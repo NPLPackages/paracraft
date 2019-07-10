@@ -161,6 +161,15 @@ end
 function EditCodeBlockContext:UpdateActor()
 	if(self.actor) then
 		self.actor:FrameMovePlaying(0);
+
+		-- tricky: this is the another place to modify movie block content, so we will send updates every 1 seconds on network.
+		self.refreshInventoryTimer = self.refreshInventoryTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			local movieEntity = self:GetMovieEntity();
+			if(movieEntity) then
+				movieEntity:MarkForUpdate();
+			end
+		end})
+		self.refreshInventoryTimer:Change(200);
 	end
 end
 

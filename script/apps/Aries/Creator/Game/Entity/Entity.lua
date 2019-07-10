@@ -1134,6 +1134,10 @@ function Entity:IsServerEntity()
 	return self.isServerEntity;
 end
 
+function Entity:SetServerEntity(isServerEntity)
+	self.isServerEntity = isServerEntity~=false;
+end
+
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	-- TODO: move this to a separate file to handle editors for all kinds of object. 

@@ -14,6 +14,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/Image3DDisplay.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -132,8 +134,8 @@ function Entity:GetFullFilePath(filename)
 		else
 			filename = filename:gsub("[;:].*$", "")
 			if(not ParaIO.DoesAssetFileExist(filename, true)) then
-				filename = ParaWorld.GetWorldDirectory()..filename;
-				if(ParaIO.DoesAssetFileExist(filename, true)) then
+				local filename = Files.GetWorldFilePath(filename);
+				if(filename) then
 					return ParaWorld.GetWorldDirectory()..old_filename, true;
 				end
 			else

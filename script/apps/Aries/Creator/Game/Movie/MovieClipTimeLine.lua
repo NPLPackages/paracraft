@@ -97,6 +97,7 @@ function MovieClipTimeLine.OnClosePage()
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
 	Game.SelectionManager:Disconnect("varNameChanged", self, self.OnVariableNameChange);
 	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
+
 	self.inited = false;
 	local viewport = ViewportManager:GetSceneViewport();
 	if(viewport:GetMarginBottomHandler() == self) then
@@ -122,9 +123,11 @@ function MovieClipTimeLine:OnActiveMovieClipChange(clip)
 	if(self.activeClip~=clip) then
 		if(self.activeClip) then
 			self.activeClip:Disconnect("timeChanged", self, self.OnMovieClipTimeChange);
+			self.activeClip:Disconnect("remotelyUpdated", self, self.OnMovieClipRemotelyUpdated);
 		end
 		if(clip) then
-			clip:Connect("timeChanged", self, self.OnMovieClipTimeChange);
+			clip:Connect("timeChanged", self, self.OnMovieClipTimeChange, "UniqueConnection");
+			clip:Connect("remotelyUpdated", self, self.OnMovieClipRemotelyUpdated, "UniqueConnection");
 		end
 		self.activeClip = clip;
 	end
@@ -137,6 +140,12 @@ function MovieClipTimeLine:UpdateUI()
 		self:UpdateSubKeyFrames(time, true);
 		self:UpdateKeyFrames(time, true);
 		self:UpdateTimeSlider(time);
+	end
+end
+
+function MovieClipTimeLine:OnMovieClipRemotelyUpdated()
+	if(page and page:IsVisible()) then
+		self:UpdateUI()
 	end
 end
 

@@ -61,15 +61,22 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 					elseif(filepath == false) then
 						any_filename = nil;	
 					else
-						Files:AddFileToCache(any_filename, filename);
-						ParaIO.CreateDirectory(filename);
-						local file = ParaIO.open(filename, "w");
-						if(file:IsValid()) then
-							file:close();
-							GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
-							LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
-						end	
-						any_filename = filename;
+						local ext = commonlib.Files.GetFileExtension(any_filename);
+						if(ext == "bmax" or ext == "x"  or ext == "fbx"  or ext == "png"  or ext == "jpg") then
+							Files:AddFileToCache(any_filename, filename);
+							ParaIO.CreateDirectory(filename);
+							local file = ParaIO.open(filename, "w");
+							if(file:IsValid()) then
+								file:close();
+								GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
+								LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+							end	
+							any_filename = filename;
+						else
+							Files:AddFileToCache(any_filename, false);
+							any_filename = nil;		
+						end
+						
 					end
 				else
 					-- LOG.std(nil, "debug", "Files", "can not file world file %s", filename)

@@ -584,7 +584,7 @@ function GameLogic.RemoveWorldFileWatcher()
 end
 
 function GameLogic.CheckCreateFileWatcher()
-	if(not GameLogic.IsReadOnly()) then
+	if(not GameLogic.IsReadOnly() or GameLogic.isRemote) then
 		NPL.load("(gl)script/ide/FileSystemWatcher.lua");
 
 		GameLogic.RemoveWorldFileWatcher();

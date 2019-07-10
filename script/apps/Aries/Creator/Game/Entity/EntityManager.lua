@@ -351,7 +351,11 @@ end
 -- @param playerEntity: this could be EntityPlayerMP for server player, or EntityPlayer for standalone player, or EntityPlayerMPClient for client side main player
 -- @return: the previous player if any. 
 function EntityManager.SetMainPlayer(playerEntity)
-	if(cur_player~=playerEntity) then
+	if(cur_player ~= playerEntity) then
+		if(cur_player and cur_player.inventory) then
+			-- this fixed a bug where quick select bar task is still selected. 
+			cur_player.inventory:Clear();
+		end
 		local last_player = cur_player;
 		cur_player = playerEntity;
 		GameLogic.events:DispatchEvent({type = "OnPlayerReplaced" , });

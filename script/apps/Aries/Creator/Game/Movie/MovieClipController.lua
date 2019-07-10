@@ -40,13 +40,40 @@ function MovieClipController.OnInit()
 	self.mytimer = self.mytimer or commonlib.Timer:new({callbackFunc = self.OnTimer})
 	self.mytimer:Change(200, 200);
 	Game.SelectionManager:Connect("selectedActorChanged", self, self.OnSelectedActorChange, "UniqueConnection");
+	MovieManager:Connect("activeMovieClipChanged", self, self.OnActiveMovieClipChange, "UniqueConnection");
+end
+
+function MovieClipController:OnActiveMovieClipChange(clip)
+	if(self.activeClip~=clip) then
+		if(self.activeClip) then
+			self.activeClip:Disconnect("remotelyUpdated", self, self.OnMovieClipChange);
+		end
+		if(clip) then
+			clip:Connect("remotelyUpdated", self, self.OnMovieClipRemotelyUpdated, "UniqueConnection");
+		end
+		self.activeClip = clip;
+	end
+end
+
+function MovieClipController:OnMovieClipRemotelyUpdated()
+	if(page and page:IsVisible()) then
+		page:Refresh(0.1);
+	end
 end
 
 function MovieClipController.OnClosePage()
 	local self = MovieClipController;
+	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
 	-- focus back to current player. 
 	self.RestoreFocusToCurrentPlayer();
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
+	
+	if(GameLogic.IsServerWorld() or GameLogic.IsRemoteWorld()) then
+		if(self.activeClip and self.activeClip:GetEntity()) then
+			self.activeClip:GetEntity():MarkForUpdate();
+		end
+	end
+	MovieClipController:OnActiveMovieClipChange(nil);
 end
 
 function MovieClipController:OnSelectedActorChange(actor)

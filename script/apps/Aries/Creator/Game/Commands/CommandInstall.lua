@@ -18,10 +18,24 @@ Commands["install"] = {
 	desc=[[install a texture package or mod from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
 /install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
+/install -bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options;
-		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		
+		local options = {};
+		local option, value;
+		while(true) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text);	
+			if(not option) then
+				break;
+			elseif(option == "filename" or option == "md5" or option == "crc32") then
+				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
+				options[option] = value;
+			else
+				options[option] = true;
+			end
+		end
 
 		if(not cmd_text) then
 			return 
@@ -32,6 +46,43 @@ Commands["install"] = {
 			if(url:match("^https?://")) then
 				GameLogic.RunCommand("/show mod")
 				ParaGlobal.ShellExecute("open", url, "", "", 1);
+			end
+		elseif(options["bmax"] and options["filename"]) then
+			if(url:match("^https?://")) then
+				local filename = options["filename"];
+				if(not filename:match("%.bmax$")) then
+					filename = filename..".bmax";
+				end
+				filename = "blocktemplates/"..filename;
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				local dest = Files.WorldPathToFullPath(filename)
+				local function TakeBlockModel_(filename)
+					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 5000, "0 255 0");
+					GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+				end
+				if(ParaIO.DoesFileExist(dest, true)) then
+					TakeBlockModel_(filename)
+				else
+					NPL.load("(gl)script/ide/System/localserver/factory.lua");
+					local cache_policy = System.localserver.CachePolicy:new("access plus 1 year");
+					local ls = System.localserver.CreateStore();
+					if(not ls) then
+						log("error: failed creating local server resource store \n")
+						return
+					end
+					GameLogic.AddBBS("install", L"正在下载请稍后", 5000, "0 255 0");
+					ls:GetFile(cache_policy, url, function(entry)
+						if(entry and entry.entry and entry.entry.url and entry.payload and entry.payload.cached_filepath) then
+							ParaIO.CreateDirectory(dest);
+							if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
+								TakeBlockModel_(filename)
+							else
+								LOG.std(nil, "warn", "CommandInstall", "failed to copy from %s to %s", entry.payload.cached_filepath, dest);
+							end
+						end
+					end);	
+				end
 			end
 		else
 			if(url:match("^https?://")) then
