@@ -404,3 +404,22 @@ function NetServerHandler:handleGetFile(packet_GetFile)
 		end
 	end
 end
+
+function NetServerHandler:handlePutFile(packet_PutFile)
+	if(packet_PutFile.filename) then
+		if(packet_PutFile.data and packet_PutFile.data ~= "") then
+			local filename = Files.WorldPathToFullPath(packet_PutFile.filename)
+			if(filename) then
+				ParaIO.CreateDirectory(filename);
+				local file = ParaIO.open(filename, "w")
+				if(file:IsValid()) then
+					file:WriteString(packet_PutFile.data, #(packet_PutFile.data));
+					file:close();
+					LOG.std(nil, "info", "NetServerHandler", "world file received and saved to %s", filename)
+					-- broadcast to all clients without file data, so the client can decide whether to request the file.
+					self:GetServerManager():SendPacketToAllPlayers(Packets.PacketPutFile:new():Init(packet_PutFile.filename));
+				end
+			end
+		end
+	end
+end

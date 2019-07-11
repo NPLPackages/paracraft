@@ -636,3 +636,13 @@ function NetClientHandler:handleGetFile(packet_GetFile)
 		end
 	end
 end
+
+function NetClientHandler:handlePutFile(packet_PutFile)
+	if(packet_PutFile.filename and not packet_PutFile.data) then
+		local filename = Files.WorldPathToFullPath(packet_PutFile.filename)
+		if(ParaIO.DoesFileExist(filename, true)) then
+			-- only request from server if file is already used. 
+			self:AddToSendQueue(Packets.PacketGetFile:new():Init(packet_PutFile.filename));		
+		end
+	end
+end
