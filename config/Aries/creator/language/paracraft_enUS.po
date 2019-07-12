@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2019-07-05 15:36+0800\n"
+"POT-Creation-Date: 2019-07-10 19:33+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -622,7 +622,7 @@ msgid "参观"
 msgstr "visit"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua:170
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:61
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:60
 msgid "不能刪除正在编辑的世界"
 msgstr "Can not delete world that is being edited"
 
@@ -661,7 +661,7 @@ msgstr "Delete remote version only"
 msgid "全部删除"
 msgstr "Delete all"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:74
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:72
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:277
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:317
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:646
@@ -669,24 +669,24 @@ msgstr "Delete all"
 msgid "请先选择世界"
 msgstr "please select world first"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:92
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:107
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:90
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:105
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua:298
 #: script/mobile/paracraft/Login/LocalLoadWorld.lua:360
 msgid "无法删除可能您没有足够的权限"
 msgstr "Unable to delete. You may not have sufficient privileges"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:114
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:112
 #, lua-format
 msgid "确定删除本地世界:%s?"
 msgstr "Are you sure to delete local world: %s?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:134
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:132
 #, lua-format
 msgid "确定删除远程世界:%s?"
 msgstr "Are you sure to delete remote world:%s?"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:162
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua:160
 msgid "服务器返回错误状态码"
 msgstr "Server returns error status code"
 
@@ -1266,27 +1266,27 @@ msgstr "This world is local and does not need to switch versions"
 msgid "获取服务器世界列表错误"
 msgstr "Failed to fetch world server list"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:550
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:557
 msgid "仅本地"
 msgstr "Local only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:552
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:559
 msgid "仅网络"
 msgstr "Remote only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:554
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:561
 msgid "本地版本与远程数据源一致"
 msgstr "Local and remote data source are identical"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:556
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:563
 msgid "本地版本更加新"
 msgstr "Local version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:558
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:565
 msgid "远程版本更加新"
 msgstr "Remote version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:560
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:567
 msgid "获取状态中"
 msgstr "Fetching status..."
 
@@ -2517,7 +2517,7 @@ msgstr "Server creator can not be empty"
 msgid "服务器创建成功"
 msgstr "Successfully created server"
 
-#: script/apps/Aries/Creator/Game/Areas/ServerPage.lua:306
+#: script/apps/Aries/Creator/Game/Areas/ServerPage.lua:311
 #, lua-format
 msgid "确定删除用户：【%s】吗<br/>删除后不能在使用该用户登录服务器。"
 msgstr ""
@@ -2546,9 +2546,9 @@ msgstr "description"
 
 #: script/apps/Aries/Creator/Game/Areas/SkinPage.lua:106
 #: script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua:256
-#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:150
-#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:179
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:554
+#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:152
+#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:182
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:555
 #: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.lua:300
 msgid "选择模型文件"
 msgstr "Select the model file"
@@ -2988,7 +2988,7 @@ msgstr "Click 'blocks' button above to open the block editor"
 msgid "点击这里输入..."
 msgstr "Click here to input..."
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:221
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:237
 msgid ""
 "我们在代码方块旁边自动创建了一个电影方块! 你现在可以用代码控制电影方块中的演"
 "员了!"
@@ -2996,8 +2996,8 @@ msgstr ""
 "We have automatically created a movie block next to the code block! You can "
 "now use the code to control the actors in the movie block!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:223
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:421
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:239
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:439
 msgid ""
 "没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码"
 "控制演员了!"
@@ -3005,23 +3005,23 @@ msgstr ""
 "No movie block found! Please put a movie block containing actors next to the "
 "Code block, you can then control the actor with code!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:680
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:700
 msgid "点击查看帮助"
 msgstr "Click to view Help"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:698
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:718
 msgid "文件不存在"
 msgstr "File does not exist"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:705
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:725
 msgid "选择语言配置文件"
 msgstr "Select a language configuration file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:860
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:880
 msgid "未命名"
 msgstr "Unnamed"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:870
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:890
 msgid "https://keepwork.com/official/paracraft/codeblock"
 msgstr "https://keepwork.com/official/paracraft/codeblock"
 
@@ -3280,7 +3280,7 @@ msgstr "selection effect"
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:295
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:34
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:41
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:645
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:654
 msgid "文字"
 msgstr "text"
 
@@ -3621,7 +3621,7 @@ msgid "禁用自动人物细节"
 msgstr "disable auto level of detail"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:681
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:728
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:735
 msgid "关闭自动等待"
 msgstr "turn off auto_wait"
 
@@ -3634,8 +3634,8 @@ msgid "显示物品栏"
 msgstr "show desktop"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:702
-msgid "执行命令%1"
-msgstr "run command %1"
+msgid "执行命令%1,%2"
+msgstr "run command %1,%2"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:17
 msgid "说 %1 持续 %2 秒"
@@ -4616,6 +4616,15 @@ msgstr "visible chunk limit changed: %d mb"
 msgid "memory limit changed: %d mb"
 msgstr "memory limit changed: %d mb"
 
+#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:61
+#, lua-format
+msgid "模型已经安装到 %s"
+msgstr "model has been saved to%s"
+
+#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:74
+msgid "正在下载请稍后"
+msgstr "Downloading, please wait ..."
+
 #: script/apps/Aries/Creator/Game/Commands/CommandManager.lua:437
 msgid "config/Aries/creator/Commands.xml"
 msgstr "config/Aries/creator/Commands.enUS.xml"
@@ -4710,7 +4719,7 @@ msgstr ""
 msgid "文件不存在:%s"
 msgstr "File does not exist: %s"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandTemplate.lua:167
+#: script/apps/Aries/Creator/Game/Commands/CommandTemplate.lua:168
 #, lua-format
 msgid "BMax模型成功保存到:%s"
 msgstr "BMax model successfully saved to: %s"
@@ -9255,7 +9264,7 @@ msgstr "Ctrl+Right click on bone block to edit"
 msgid "输入摄影机的名字"
 msgstr "Enter camera name"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:390
+#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:392
 msgid "输入代码"
 msgstr "Enter your code"
 
@@ -9286,13 +9295,13 @@ msgstr "Leave a message to the author [BBS]"
 msgid "世界加载时会执行的命令"
 msgstr "commands to execute on world loading"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:619
+#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:621
 #, lua-format
 msgid "图片文件:%s 不存在,请检查路径是否正确"
 msgstr ""
 "Image file:%s does not exist, please check that the file path is correct"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:691
+#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:693
 msgid ""
 "输入图片的名字或路径<div>格式: 相对路径[;l t w h][:l t r b]</div><div>例如: "
 "preview.jpg;0 0 100 64</div>"
@@ -9300,12 +9309,12 @@ msgstr ""
 "Enter the name of the image or file path<div>Format: relative path [; t w h]"
 "[:l t r b l]</div><div>For example: Preview.jpg;0 0 100 64</div>"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:706
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:593
+#: script/apps/Aries/Creator/Game/Entity/EntityImage.lua:708
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:594
 msgid "贴图文件"
 msgstr "Texture file"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua:213
+#: script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua:215
 msgid "命令 /t [秒] /end 设置结束时间"
 msgstr "Command /t [second] /end set end time"
 
@@ -9636,19 +9645,19 @@ msgstr ""
 msgid "Alt+右键点击骨骼可改变方向"
 msgstr "Alt + right-click on the bone to change its direction"
 
-#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:146
+#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:147
 #: script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.lua:293
 msgid "请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中"
 msgstr ""
 "Please enter relative file path of bmax, x, or FBX file.  <br/>You can also "
 "drag external file to this window."
 
-#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:171
+#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:173
 msgid "将当前选择的方块保存为bmax文件. 请输入文件名:<br/> 例如: test"
 msgstr ""
 "Save selected blocks to Bmax file. Please enter filename: <br/>such as: test"
 
-#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:188
+#: script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua:191
 msgid "Ctrl+左键选择方块与骨骼, 左键点击物品图标保存模型"
 msgstr ""
 "Ctrl+ left click to select blocks and bones, then left click the model icon "
@@ -10967,22 +10976,22 @@ msgstr ""
 "eye_rot_y"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:488
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:694
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:695
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:366
 #, lua-format
 msgid "起始时间%s, 请输入位置x,y,z:"
 msgstr "Start time %s, please enter x,y,z:"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:510
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:672
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:757
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:673
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:758
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:344
 #, lua-format
 msgid "起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>"
 msgstr "Start time %s,  please enter roll, pitch, yaw (-1.57, 1.57)<br/>"
 
 #: script/apps/Aries/Creator/Game/Movie/ActorCamera.lua:532
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:596
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:597
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:245
 #, lua-format
 msgid "起始时间%s, 请输入放大系数(默认1)"
@@ -10999,7 +11008,7 @@ msgstr "relative to player"
 #: script/apps/Aries/Creator/Game/Movie/ActorCommands.lua:93
 #: script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua:19
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html:31
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:636
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:645
 msgid "全局"
 msgstr "global"
 
@@ -11039,61 +11048,61 @@ msgstr "no file found in current world directory: %s"
 msgid "声音文件"
 msgstr "Audio file"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:516
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:517
 #, lua-format
 msgid "起始时间%s, 请输入动画ID或名称:"
 msgstr "Start time %s, please enter animation ID or name:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:534
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:535
 #, lua-format
 msgid "起始时间%s, 请输入模型路经或名称(默认default)"
 msgstr ""
 "Start time %s, please enter model path or name (default name is default)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:557
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:558
 #, lua-format
 msgid "起始时间%s, 请输入手持物品ID(空为0)"
 msgstr "Start time %s, please enter handheld item ID (0 for empty)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:573
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:574
 #, lua-format
 msgid "起始时间%s, 请输入皮肤ID或名称"
 msgstr "Start time %s, please enter skin ID or name"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:612
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:613
 #, lua-format
 msgid "起始时间%s, 请输入透明度[0,1](默认1)"
 msgstr "Start time %s, please enter opacity [0,1] (default to 1)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:630
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:631
 #: script/apps/Aries/Creator/Game/Movie/ActorOverlay.lua:313
 #, lua-format
 msgid "起始时间%s, 请输入转身的角度(-3.14, 3.14)"
 msgstr "Start time %s, please enter body facing angle between (-3.14, 3.14)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:632
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:633
 #, lua-format
 msgid "起始时间%s, 请输入头部上下运动的角度(-1.57, 1.57)"
 msgstr "Start time %s, please enter head up/down angle (-1.57, 1.57)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:634
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:635
 #, lua-format
 msgid "起始时间%s, 请输入头部左右运动的角度(-1.57, 1.57)"
 msgstr "Start time %s, please enter head left/right turning angle(-1.57, 1.57)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:651
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:652
 #, lua-format
 msgid "起始时间%s, 请输入头部角度(-1.57, 1.57)<br/>左右角度, 上下角度:"
 msgstr ""
 "Start time %s, please enter head angle (-1.57, 1.57)<br/>left/right angle, "
 "up/down angle:"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:716
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:717
 #, lua-format
 msgid "起始时间%s, 请输入重力加速度(默认18.36)"
 msgstr "Start time %s, please enter gravity (default to 18.36)"
 
-#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:732
+#: script/apps/Aries/Creator/Game/Movie/ActorNPC.lua:733
 #, lua-format
 msgid "起始时间%s, 请输入运动速度系数(默认1)"
 msgstr "Start time %s, please enter speed factor (default to 1)"
@@ -11380,7 +11389,7 @@ msgstr "begin recording MPEG (R)"
 msgid "到结束"
 msgstr "to end"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipController.lua:103
+#: script/apps/Aries/Creator/Game/Movie/MovieClipController.lua:130
 msgid "请选择演员或摄影机"
 msgstr "Select an actor or camera"
 
@@ -11508,13 +11517,13 @@ msgstr "3d rotation(3,3)"
 msgid "大小 (4键)"
 msgstr "scaling (4)"
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:507
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:516
 msgid "无法添加关键帧。可能电影方块中的角色已经满了, 删除一个再试试看"
 msgstr ""
 "can not add key frame. may be actors in movie block is full, try delete one "
 "and try again."
 
-#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:867
+#: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:876
 msgid "设置当前时间（毫秒）"
 msgstr "Set current time (ms)"
 
@@ -11590,32 +11599,32 @@ msgstr "change output directory"
 msgid "3秒后开始"
 msgstr "begins in 3 seconds"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:52
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:53
 #, lua-format
 msgid "正在建立链接:%s:%s"
 msgstr "establishing connection: %s:%s"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:57
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:58
 #, lua-format
 msgid "成功建立链接:%s:%s"
 msgstr "Successfully established connection: %s:%s"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:99
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:100
 msgid "无法链接到这个服务器"
 msgstr "can not connect to this server"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:100
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:101
 msgid ""
 "无法链接到这个服务器,可能该服务器未开启或已关闭.详情请联系该服务器管理员."
 msgstr ""
 "Unable to connect to the server, the server may not open or has been closed. "
 "Please contact the server administrator."
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:103
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:104
 msgid "与服务器的连接断开了"
 msgstr "Connection with the server is broken"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:108
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:109
 msgid ""
 "已与服务器断开连接,可能服务器已关闭或有其他用户使用该帐号登录.点击\"确定\"返"
 "回本地世界"
@@ -11623,11 +11632,11 @@ msgstr ""
 "Disconnected from the server, the server may be down or someone else has "
 "signed in with your accout. Click \"OK\" to return to the login screen."
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:159
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:160
 msgid "连接成功：此服务器需要认证"
 msgstr "Successfully connected: This server requires authentication"
 
-#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:161
+#: script/apps/Aries/Creator/Game/Network/NetClientHandler.lua:162
 msgid "用户名密码不正确"
 msgstr "Username Password Incorrect"
 
@@ -12142,7 +12151,7 @@ msgid "属性"
 msgstr "property"
 
 #: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html:35
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:803
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:804
 #, lua-format
 msgid "选中了%d块"
 msgstr "%d blocks selected"
@@ -12203,14 +12212,14 @@ msgstr "terrain"
 msgid "将选中的块变成实数地表"
 msgstr "turn selected blocks to real terrain"
 
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:212
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:227
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:238
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:249
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:213
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:228
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:239
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:250
 msgid "回车键确认操作"
 msgstr "Press Enter key to confirm the operation"
 
-#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:1082
+#: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua:1083
 msgid "保存成功! Ctrl+V在鼠标所在位置粘贴！"
 msgstr "Successfully saved! Ctrl+V to paste to mouse position."
 
@@ -12850,6 +12859,9 @@ msgid ""
 msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
+
+#~ msgid "执行命令%1"
+#~ msgstr "run command %1"
 
 #~ msgid "本地世界沒有版本信息"
 #~ msgstr "Local world does not have revision info"

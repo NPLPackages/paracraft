@@ -264,7 +264,9 @@ function Entity:SetPowered(isPowered)
 		self.isPowered = isPowered;
 		local codeBlock = self:GetCodeBlock(true)
 		if(codeBlock and not codeBlock:IsLoaded()) then
-			self:Restart();
+			if(not GameLogic.isRemote) then
+				self:Restart();
+			end
 		end
 	end
 end
@@ -273,7 +275,9 @@ function Entity:Refresh()
 	local codeBlock = self:GetCodeBlock()
 	if(codeBlock) then
 		if(self.isPowered and not codeBlock:IsLoaded()) then
-			self:Restart();
+			if(not GameLogic.isRemote) then
+				self:Restart();
+			end
 		elseif(not self.isPowered and codeBlock:IsLoaded()) then
 			self:Stop();
 		end

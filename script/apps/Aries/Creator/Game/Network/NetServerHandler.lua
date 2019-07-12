@@ -330,6 +330,8 @@ function NetServerHandler:handleUpdateEntitySign(packet_UpdateEntitySign)
 	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntitySign.x, packet_UpdateEntitySign.y, packet_UpdateEntitySign.z)
 	if(blockEntity) then
 		blockEntity:OnUpdateFromPacket(packet_UpdateEntitySign);
+
+		self:GetServerManager():SendPacketToAllPlayersExcept(Packets.PacketUpdateEntitySign:new():Init(packet_UpdateEntitySign.x, packet_UpdateEntitySign.y, packet_UpdateEntitySign.z, packet_UpdateEntitySign.text, packet_UpdateEntitySign.data, packet_UpdateEntitySign.text2), self.playerEntity);
 	end
 end
 
@@ -337,6 +339,8 @@ function NetServerHandler:handleUpdateEntityBlock(packet_UpdateEntityBlock)
 	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z)
 	if(blockEntity) then
 		blockEntity:OnUpdateFromPacket(packet_UpdateEntityBlock);
+
+		self:GetServerManager():SendPacketToAllPlayersExcept(Packets.PacketUpdateEntityBlock:new():Init(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z, packet_UpdateEntityBlock.data1, packet_UpdateEntityBlock.data2, packet_UpdateEntityBlock.data3), self.playerEntity);
 	end
 end
 

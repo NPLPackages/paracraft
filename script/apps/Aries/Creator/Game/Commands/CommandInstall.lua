@@ -14,11 +14,14 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 
 Commands["install"] = {
 	name="install", 
-	quick_ref="/install [-mod] [url]", 
-	desc=[[install a texture package or mod from url
+	quick_ref="/install [-mod|bmax] [-filename str] [-ext str] [url]", 
+	desc=[[install a texture package, mod or bmax file from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
 /install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
 /install -bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
+/install -ext bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
+/install -ext fbx -filename car https://cdn.keepwork.com/paracraft/officialassets/car.fbx
+/install -ext x -filename car https://cdn.keepwork.com/paracraft/officialassets/car.x
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options;
@@ -29,7 +32,7 @@ Commands["install"] = {
 			option, cmd_text = CmdParser.ParseOption(cmd_text);	
 			if(not option) then
 				break;
-			elseif(option == "filename" or option == "md5" or option == "crc32") then
+			elseif(option == "filename" or option == "md5" or option == "crc32"  or option == "ext" ) then
 				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
 				options[option] = value;
 			else
@@ -47,11 +50,16 @@ Commands["install"] = {
 				GameLogic.RunCommand("/show mod")
 				ParaGlobal.ShellExecute("open", url, "", "", 1);
 			end
-		elseif(options["bmax"] and options["filename"]) then
+		elseif((options["bmax"] or options["ext"]) and options["filename"]) then
 			if(url:match("^https?://")) then
 				local filename = options["filename"];
-				if(not filename:match("%.bmax$")) then
-					filename = filename..".bmax";
+				local ext = options["ext"] or "bmax";
+				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx") then
+					LOG.std(nil, "warn", "CommandInstall", "unknown file extension %s for %s", ext, filename);
+					return;
+				end
+				if(not filename:match("%."..ext.."$")) then
+					filename = filename.."."..ext;
 				end
 				filename = "blocktemplates/"..filename;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
