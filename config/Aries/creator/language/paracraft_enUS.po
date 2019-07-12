@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2019-07-10 19:33+0800\n"
+"POT-Creation-Date: 2019-07-12 12:11+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -14,24 +14,24 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: L\n"
 "X-Poedit-Basepath: ../../../..\n"
-"X-Poedit-SearchPath-0: script/apps/Aries/Creator/Game\n"
-"X-Poedit-SearchPath-1: script/mobile/paracraft\n"
-"X-Poedit-SearchPath-2: script/kids/3DMapSystemApp/WebBrowser/app_main.lua\n"
-"X-Poedit-SearchPath-3: script/apps/Aries/app_main.lua\n"
-"X-Poedit-SearchPath-4: script/kids/ParaWorldCore.lua\n"
-"X-Poedit-SearchPath-5: script/kids/3DMapSystemApp/Assets/"
+"X-Poedit-SearchPath-0: script/mobile/paracraft\n"
+"X-Poedit-SearchPath-1: script/kids/3DMapSystemApp/WebBrowser/app_main.lua\n"
+"X-Poedit-SearchPath-2: script/apps/Aries/app_main.lua\n"
+"X-Poedit-SearchPath-3: script/kids/ParaWorldCore.lua\n"
+"X-Poedit-SearchPath-4: script/kids/3DMapSystemApp/Assets/"
 "AsyncLoaderProgressBar.lua\n"
-"X-Poedit-SearchPath-6: npl_packages/ParacraftBuildinMod/npl_packages/"
+"X-Poedit-SearchPath-5: npl_packages/ParacraftBuildinMod/npl_packages/"
 "WorldShare/Mod\n"
-"X-Poedit-SearchPath-7: npl_packages/ParacraftBuildinMod/npl_packages/"
+"X-Poedit-SearchPath-6: npl_packages/ParacraftBuildinMod/npl_packages/"
 "BMaxToParaXExporter\n"
-"X-Poedit-SearchPath-8: npl_packages/ParacraftBuildinMod/npl_packages/"
+"X-Poedit-SearchPath-7: npl_packages/ParacraftBuildinMod/npl_packages/"
 "STLExporter/Mod\n"
-"X-Poedit-SearchPath-9: npl_packages/ParacraftBuildinMod/npl_packages/NPLCAD\n"
-"X-Poedit-SearchPath-10: npl_packages/ParacraftBuildinMod/npl_packages/"
+"X-Poedit-SearchPath-8: npl_packages/ParacraftBuildinMod/npl_packages/NPLCAD\n"
+"X-Poedit-SearchPath-9: npl_packages/ParacraftBuildinMod/npl_packages/"
 "ExplorerApp/Mod/ExplorerApp\n"
-"X-Poedit-SearchPath-11: npl_packages/ParacraftBuildinMod/npl_packages/"
+"X-Poedit-SearchPath-10: npl_packages/ParacraftBuildinMod/npl_packages/"
 "NplCad2/Mod/NplCad2\n"
+"X-Poedit-SearchPath-11: script/apps/Aries/Creator\n"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/BMaxToParaXExporter/Mod/ParaXExporter/main.lua:63
 msgid "ParaX 动画模型导出"
@@ -2764,6 +2764,7 @@ msgstr "video"
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:96
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:20
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:24
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua:22
 msgid "控制"
 msgstr "Control"
 
@@ -3082,6 +3083,7 @@ msgstr "repeat %1 times"
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_ShapeOperators.lua:611
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_ShapeOperators.lua:638
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Skeleton.lua:34
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua:17
 msgid "%1"
 msgstr "%1"
 
@@ -4552,6 +4554,38 @@ msgstr "bone%1%2 %3 %4"
 msgid "绑定对象 %1"
 msgstr "bind object %1"
 
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua:21
+msgid "躯干"
+msgstr "Spine"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua:16
+msgid "旋转左臂 %1 度"
+msgstr "rotate left arm %1 degree"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua:42
+msgid "旋转右臂 %1 度"
+msgstr "rotate right arm %1 degree"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua:69
+msgid "旋转左腿 %1 度"
+msgstr "rotate left leg %1 degree"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua:95
+msgid "旋转右腿 %1 度"
+msgstr "rotate right leg %1 degree"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua:121
+msgid "旋转身体 %1 度"
+msgstr "rotate spine %1 degrees"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua:16
+msgid "永远执行"
+msgstr "always run"
+
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua:38
+msgid "暂停 %1 毫秒"
+msgstr "pause %1 ms"
+
 #: script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua:618
 msgid "只能给特殊的ColorBlock上色"
 msgstr "Can only set color to given ColorBlock"
@@ -4616,12 +4650,12 @@ msgstr "visible chunk limit changed: %d mb"
 msgid "memory limit changed: %d mb"
 msgstr "memory limit changed: %d mb"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:61
+#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:69
 #, lua-format
 msgid "模型已经安装到 %s"
 msgstr "model has been saved to%s"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:74
+#: script/apps/Aries/Creator/Game/Commands/CommandInstall.lua:82
 msgid "正在下载请稍后"
 msgstr "Downloading, please wait ..."
 
@@ -9264,11 +9298,11 @@ msgstr "Ctrl+Right click on bone block to edit"
 msgid "输入摄影机的名字"
 msgstr "Enter camera name"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:392
+#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:396
 msgid "输入代码"
 msgstr "Enter your code"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua:192
+#: script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua:194
 msgid "输入命令行(可以多行): <div>例如:/echo Hello</div>"
 msgstr ""
 "Enter command line (support multiple lines): <div> For example: / echo Hello "
@@ -12382,6 +12416,34 @@ msgstr "Do you want to watch online tutorial (hotkey F1)?"
 #: script/apps/Aries/Creator/Game/game_options.lua:423
 msgid "只读"
 msgstr "Read-only"
+
+#: script/apps/Aries/Creator/WorldCommon.lua:244
+msgid "_副本"
+msgstr "_copy"
+
+#: script/apps/Aries/Creator/WorldCommon.lua:253
+msgid "输入新的世界名字"
+msgstr "enter a new world name"
+
+#: script/apps/Aries/Creator/WorldCommon.lua:253
+msgid "如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意"
+msgstr ""
+"If you're cloning other people's world, please include the original author "
+"and get his or her consent."
+
+#: script/apps/Aries/Creator/WorldCommon.lua:257
+#, lua-format
+msgid "世界%s已经存在, 是否覆盖?"
+msgstr "world %s already exists, overwrite it?"
+
+#: script/apps/Aries/Creator/WorldCommon.lua:269
+msgid "世界另存为"
+msgstr "World save as"
+
+#: script/apps/Aries/Creator/WorldCommon.lua:287
+#, lua-format
+msgid "世界已经成功保存到: %s, 是否现在打开?"
+msgstr "The world has been successfully saved to: %s, open now?"
 
 #: script/apps/Aries/app_main.lua:2325
 msgid "加载当中,请稍等(首次需要3-5分钟)"
