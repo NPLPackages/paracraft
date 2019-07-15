@@ -427,3 +427,35 @@ function NetServerHandler:handlePutFile(packet_PutFile)
 		end
 	end
 end
+
+function NetServerHandler:handleMobSpawn(packet_MobSpawn)
+	if(not packet_MobSpawn.x) then
+		return 
+	end
+	local x = packet_MobSpawn.x / 32;
+    local y = packet_MobSpawn.y / 32;
+    local z = packet_MobSpawn.z / 32;
+   
+	local spawnedEntity;
+    local entity_type = packet_MobSpawn.type;
+	if(entity_type == 11) then
+		spawnedEntity = EntityManager.EntityMob:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["player_spawn_point"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "mob");
+	elseif(entity_type == 12) then
+		spawnedEntity = EntityManager.EntityNPC:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["villager"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "NPC");
+	elseif(entity_type == 13) then
+		spawnedEntity = EntityManager.EntityItem:new():Init(x,y,z, ItemStack:new():Init(packet_MobSpawn.item_id,1));
+		LOG.std(nil, "debug", "server::handleMobSpawn", "item: %d", packet_MobSpawn.item_id or -1);
+	elseif(entity_type == 14) then
+		spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
+	else
+		-- TODO: add other types
+	end
+	
+	-- add to world
+	if(spawnedEntity) then
+		spawnedEntity:Attach();
+	end
+end

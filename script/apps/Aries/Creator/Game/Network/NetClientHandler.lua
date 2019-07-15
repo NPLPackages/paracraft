@@ -516,6 +516,9 @@ function NetClientHandler:handleMobSpawn(packet_MobSpawn)
 	elseif(entity_type == 13) then
 		spawnedEntity = EntityManager.EntityItem:new():Init(x,y,z, ItemStack:new():Init(packet_MobSpawn.item_id,1));
 		LOG.std(nil, "debug", "client::handleMobSpawn", "item: %d", packet_MobSpawn.item_id or -1);
+	elseif(entity_type == 14) then
+		spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"]});
+		LOG.std(nil, "debug", "client::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
 	else
 		-- TODO: add other types
 	end

@@ -64,7 +64,7 @@ Commands["install"] = {
 				filename = "blocktemplates/"..filename;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-				local dest = Files.WorldPathToFullPath(filename)
+				local dest = Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename))
 				local function TakeBlockModel_(filename)
 					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 5000, "0 255 0");
 					GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));

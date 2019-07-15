@@ -45,12 +45,14 @@ function WorldRevision:init(worlddir)
 	self.revision_filename = self.worlddir.."revision.xml";
 	self.current_revision = self.current_revision or 1;
 	self.isModified = false;
+	self.isModifiedAndNotBackedup = false;
 	return self;
 end
 
 -- checkout revision. 
 function WorldRevision:Checkout()
 	self.current_revision = self:GetDiskRevision();
+	self.checkoutTime = commonlib.TimerManager.GetCurrentTime();
 	return self.current_revision;
 end
 
@@ -79,10 +81,15 @@ end
 
 function WorldRevision:SetModified()
 	self.isModified = true;
+	self.isModifiedAndNotBackedup = true;
 end
 
 function WorldRevision:IsModified()
 	return self.isModified;
+end
+
+function WorldRevision:IsModifiedAndNotBackedup()
+	return self.isModifiedAndNotBackedup;
 end
 
 -- @param bForceCommit: if true, it will commit using current version regardless of conflict. 
@@ -117,11 +124,19 @@ function WorldRevision:Backup()
 		ParaIO.CreateDirectory(filename);
 		self:GeneratePackage(filename);
 		LOG.std(nil, "info", "WorldRevision", "save world backup to %s", filename);
+		self.lastBackupTime = commonlib.TimerManager.GetCurrentTime();
+		self.isModifiedAndNotBackedup = false;
 		BroadcastHelper.PushLabel({id="backup", label = format(L"版本%d 备份完毕", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	else
 		LOG.std(nil, "error", "WorldRevision", "backup file already exist %s", filename);
 		BroadcastHelper.PushLabel({id="backup", label = format(L"版本%d 之前备份过了", self:GetRevision()), max_duration=3000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	end
+end
+
+function WorldRevision:GetNonBackupTime()
+	local curTime = commonlib.TimerManager.GetCurrentTime();
+	local lastBackupTime = self.lastBackupTime or self.checkoutTime or curTime;
+	return curTime - lastBackupTime;
 end
 
 -- get world directory 

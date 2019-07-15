@@ -1326,8 +1326,7 @@ function Entity:GetPosition()
 	if(self.x) then
 		return self.x, self.y, self.z;
 	elseif(self.bx) then
-		local x,y,z = BlockEngine:real(self.bx, self.by, self.bz);
-		y = y - BlockEngine.half_blocksize;
+		local x,y,z = BlockEngine:real_bottom(self.bx, self.by, self.bz);
 		return x,y,z;
 	else
 		return 0,0,0;

@@ -191,7 +191,7 @@ function Entity:FrameMoveRidding(deltaTime)
 end
 
 -- update the entity's position and logic per tick.
--- the actually framemove is in NetServerHandler:handleMove, so here we just send cached changes to client. 
+-- the actual framemove is in NetServerHandler:handleMove, so here we just send cached changes to client. 
 function Entity:OnUpdate()
 	if(not self.playerNetServerHandler) then
 		self:OnUpdateServerPlayer();
