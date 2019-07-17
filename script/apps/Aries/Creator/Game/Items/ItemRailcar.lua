@@ -63,11 +63,15 @@ function ItemRailcar:OnCreate(result)
 		end
 
 		if(not EntityManager.HasNonPlayerEntityInBlock(bx,by,bz)) then 
+			local x, y, z = BlockEngine:real(bx,by,bz);
 			if(GameLogic.isRemote) then
-				-- TODO: send creation request packet to server?
-				GameLogic.AddBBS("warn", L"目前只有Server可以创建此类物品", 4000, "255 0 0")
+				local clientMP = EntityManager.GetPlayer();
+				if(clientMP and clientMP.AddToSendQueue) then
+					clientMP:AddToSendQueue(Packets.PacketEntityMobSpawn:new():Init({x=x,y=y,z=z, item_id = self.block_id}, 10));
+					return true;
+				end
+				
 			else
-				local x, y, z = BlockEngine:real(bx,by,bz);
 				local entity = MyCompany.Aries.Game.EntityManager.EntityRailcar:Create({x=x,y=y,z=z, item_id = self.block_id});
 				EntityManager.AddObject(entity);
 				return true;

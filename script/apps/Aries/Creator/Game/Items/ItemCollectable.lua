@@ -59,12 +59,11 @@ function ItemCollectable:OnCreate(result)
 		local bx,by,bz = result.blockX,result.blockY,result.blockZ;
 		if(not EntityManager.HasNonPlayerEntityInBlock(bx,by,bz)) then 
 			if(GameLogic.isRemote) then
-				-- GameLogic.AddBBS("warn", L"目前只有Server可以创建此类物品", 4000, "255 0 0")
-				
 				local clientMP = EntityManager.GetPlayer();
 				if(clientMP and clientMP.AddToSendQueue) then
 					local x, y, z = BlockEngine:real_bottom(bx,by,bz);
 					clientMP:AddToSendQueue(Packets.PacketEntityMobSpawn:new():Init({x=x,y=y,z=z, item_id = self.block_id}, 14));
+					return true;
 				end
 			else
 				-- ignore it if there is already an entity there. 
@@ -72,6 +71,7 @@ function ItemCollectable:OnCreate(result)
 				if(entity_class) then
 					local entity = entity_class:Create({bx=bx,by=by,bz=bz, item_id = self.block_id, name = self.name});
 					EntityManager.AddObject(entity)
+					return true;
 				end
 			end
 		end

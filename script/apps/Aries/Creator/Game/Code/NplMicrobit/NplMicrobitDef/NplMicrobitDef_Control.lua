@@ -25,7 +25,8 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
-	func_description = 'basic.forever(function(){\\n%s\\n})',
+	func_description = 'forever(function(){\\n%s\\n})',
+	func_description_js = 'basic.forever(function(){\\n%s\\n})',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -49,7 +50,8 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'basic.pause(%s)',
+	func_description = 'pause(%s)',
+	func_description_js = 'basic.pause(%s)',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[

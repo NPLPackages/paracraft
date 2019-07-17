@@ -44,6 +44,7 @@ function TouchMiniKeyboard:ctor()
 	self.zorder = -10;
 
 	-- @param allow_hover_press: this will simulate pressing the multiple buttons at the same time. 
+	-- @param auto_mouseup: if the touch is no longer over a button, it will automatically fire the mouse up event. 
 	self.keylayout = {
 		{
 			{name="F", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F, flyUpDown = true, click_only = true},
@@ -52,17 +53,17 @@ function TouchMiniKeyboard:ctor()
 		},
 		{
 			{name="Shift", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true},
-			{name="W", col=1, vKey = DIK_SCANCODE.DIK_W},
+			{name="W", col=1, vKey = DIK_SCANCODE.DIK_W, auto_mouseup = true},
 			{name="E", col=1, colorid=3, vKey = DIK_SCANCODE.DIK_E},
 		},
 		{
-			{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A},
-			{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S},
-			{name="D", col=1, vKey = DIK_SCANCODE.DIK_D},
+			{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A, auto_mouseup = true},
+			{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S, auto_mouseup = true},
+			{name="D", col=1, vKey = DIK_SCANCODE.DIK_D, auto_mouseup = true},
 		},
 		{
 			{name="Ctrl", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true},
-			{name="Space", col=1, ctrl_name="Z", vKey = DIK_SCANCODE.DIK_SPACE},
+			{name="Space", col=1, ctrl_name="Z", vKey = DIK_SCANCODE.DIK_SPACE, auto_mouseup = true},
 			{name="Alt", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, allow_hover_press = true},
 		},
 	}
@@ -250,18 +251,27 @@ function TouchMiniKeyboard:OnTouch(touch)
 				end
 			end
 			keydownBtn.hover_testing_btn = btnItem;
-			if(btnItem and btnItem~=keydownBtn and btnItem.allow_hover_press and not btnItem.isKeyDown) then
-				if(not btnItem.hover_press_start) then
-					btnItem.hover_press_start = true;
-					if (not btnItem.timer) then
-						btnItem.timer = commonlib.Timer:new({callbackFunc = function(timer)
-							if(keydownBtn.isKeyDown and  keydownBtn.hover_testing_btn == btnItem) then
-								keydownBtn.hover_press_btns = keydownBtn.hover_press_btns or {};
-								keydownBtn.hover_press_btns[btnItem] = true;
-								self:SetKeyState(btnItem, true);
-							end
-						end})
-						btnItem.timer:Change(self.hover_press_hold_time);
+			-- finger is hovering another button instead of the initial button. 
+			if(btnItem and btnItem~=keydownBtn) then
+				if(not keydownBtn.auto_mouseup and btnItem.allow_hover_press and not btnItem.isKeyDown) then
+					if(not btnItem.hover_press_start) then
+						btnItem.hover_press_start = true;
+						if (not btnItem.timer) then
+							btnItem.timer = commonlib.Timer:new({callbackFunc = function(timer)
+								if(keydownBtn.isKeyDown and  keydownBtn.hover_testing_btn == btnItem) then
+									keydownBtn.hover_press_btns = keydownBtn.hover_press_btns or {};
+									keydownBtn.hover_press_btns[btnItem] = true;
+									self:SetKeyState(btnItem, true);
+								end
+							end})
+							btnItem.timer:Change(self.hover_press_hold_time);
+						end
+					end
+				elseif(btnItem.auto_mouseup)then
+					if(keydownBtn.isKeyDown) then
+						self:SetKeyState(keydownBtn, false);
+						touch_session:SetField("keydownBtn", btnItem);
+						self:SetKeyState(btnItem, true);
 					end
 				end
 			end

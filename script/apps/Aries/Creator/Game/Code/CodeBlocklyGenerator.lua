@@ -1,13 +1,12 @@
 --[[
-Title: CodeBlocklySerializer
+Title: CodeBlocklyGenerator
 Author(s): leio
 Date: 2018/6/17
 Desc: the help functions for reading/writing blockly information 
 use the lib:
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
-local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-CodeBlocklySerializer.SaveFilesToDebug();
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyGenerator.lua");
+local CodeBlocklyGenerator = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyGenerator");
 
 links:
 blockfactory: https://blockly-demo.appspot.com/static/demos/blockfactory/index.html
@@ -16,53 +15,51 @@ generating-code: https://developers.google.com/blockly/guides/create-custom-bloc
 operator-precedence: https://developers.google.com/blockly/guides/create-custom-blocks/operator-precedence
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/ide/Json.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua");
 
-local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
-local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
+local CodeBlocklyGenerator = commonlib.inherit(nil,commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyGenerator"));
 
-local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-local arg_len = 9; -- assumed total number of arg, start index from 0
+function CodeBlocklyGenerator:ctor()
+    self.arg_len = 9; -- the max number of argument, start index is from 0
 
-function CodeBlocklySerializer.OnInit(categories,all_cmds)
-    CodeBlocklySerializer.categories = categories;
-    CodeBlocklySerializer.all_cmds = all_cmds;
+    self.language_names = {
+        ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", },
+        ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", },
+    }
 end
-function CodeBlocklySerializer.GetCategoryButtons()
-    return CodeBlocklySerializer.categories or CodeHelpWindow.GetCategoryButtons()
+
+function CodeBlocklyGenerator:OnInit(categories,all_cmds)
+    self.categories = categories;
+    self.all_cmds = all_cmds;
+    return self;
 end
-function CodeBlocklySerializer.GetAllCmds()
-	return CodeBlocklySerializer.all_cmds or CodeHelpWindow.GetAllCmds();
-end
-function CodeBlocklySerializer.SaveFilesToDebug(folder_name)
-    folder_name = folder_name or "block_configs"
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Translation.lua");
-    local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
-    local lang = Translation.GetCurrentLanguage();
-    if(lang == "enUS")then
-        CodeBlocklySerializer.WriteBlocklyMenuToXml(folder_name .. "/BlocklyMenu.xml");
-        CodeBlocklySerializer.WriteToBlocklyConfig(folder_name .. "/BlocklyConfigSource.json");
-    else
-        CodeBlocklySerializer.WriteBlocklyMenuToXml(folder_name .. "/BlocklyMenu-zh-cn.xml");
-        CodeBlocklySerializer.WriteToBlocklyConfig(folder_name .. "/BlocklyConfigSource-zh-cn.json");
+
+function CodeBlocklyGenerator:GetLanguageName(language)
+    local config = self:GetLanguageConfig(language);
+    if(config)then
+        return config.blockly_namesapce;
     end
-    CodeBlocklySerializer.WriteToBlocklyCode(folder_name .. "/BlocklyExecution.js");
-    CodeBlocklySerializer.WriteKeywordsToJson(folder_name .. "/LanguageKeywords.json");
 end
-function CodeBlocklySerializer.WriteKeywordsToJson(filename)
-	ParaIO.CreateDirectory(filename);
+function CodeBlocklyGenerator:GetFunctionName(language)
+    local config = self:GetLanguageConfig(language);
+    if(config)then
+        return config.function_name;
+    end
+end
+function CodeBlocklyGenerator:GetLanguageConfig(language)
+    if(not language)then
+        return
+    end
+    return self.language_names[language];
+end
+function CodeBlocklyGenerator:GetCategoryButtons()
+    return self.categories;
+end
+function CodeBlocklyGenerator:GetAllCmds()
+	return self.all_cmds;
+end
 
-	local s = CodeBlocklySerializer.GetKeywords();
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		file:WriteString(s);
-		file:close();
-	end
-end
-function CodeBlocklySerializer.GetKeywords()
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+function CodeBlocklyGenerator:GetKeywords()
+	local all_cmds = self:GetAllCmds();
 	local result = {};
 	local k,v;
 	for k,v in ipairs(all_cmds) do
@@ -73,33 +70,27 @@ function CodeBlocklySerializer.GetKeywords()
 	local s = NPL.ToJson(result,true);
 	return s;
 end
-function CodeBlocklySerializer.GetBlocklyMenuXml()
-	local categories = CodeBlocklySerializer.GetCategoryButtons()
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+function CodeBlocklyGenerator:GetBlocklyMenuXml()
+	local categories = self:GetCategoryButtons()
+	local all_cmds = self:GetAllCmds();
 	local s = [[<xml id="toolbox" style="display: none">]];
 	local k,v;
 	for k,v in ipairs(categories) do
-		local c_s = CodeBlocklySerializer.GetCategoryStr(v);
+		local c_s = self:GetCategoryStr(v);
 		s = string.format("%s\n%s",s,c_s);
 	end
 	s = string.format("%s\n</xml>",s);
 	return s;
 end
 -- create a xml menu
-function CodeBlocklySerializer.WriteBlocklyMenuToXml(filename,categories,all_cmds)
-	ParaIO.CreateDirectory(filename);
-	local s = CodeBlocklySerializer.GetBlocklyMenuXml(categories,all_cmds);
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		file:WriteString(s);
-		file:close();
-	end
+function CodeBlocklyGenerator.WriteBlocklyMenuToXml(filename,categories,all_cmds)
+	
 end
-function CodeBlocklySerializer.GetAllVariableTypes()
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+function CodeBlocklyGenerator:GetAllVariableTypes()
+	local all_cmds = self:GetAllCmds();
     local variable_type_maps = {};
     for __,cmd in ipairs(all_cmds) do
-        for k = 0,arg_len do
+        for k = 0,self.arg_len do
             local input_arg = cmd["arg".. k];
             if(input_arg)then
                 for __,arg in ipairs(input_arg) do
@@ -118,8 +109,8 @@ function CodeBlocklySerializer.GetAllVariableTypes()
     end
     return variable_type_maps;
 end
-function CodeBlocklySerializer.GetCategoryStr(category)
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+function CodeBlocklyGenerator:GetCategoryStr(category)
+	local all_cmds = self:GetAllCmds();
 	if(not category or not all_cmds)then return end
     local text = category.text;
     local name = category.name;
@@ -135,7 +126,7 @@ function CodeBlocklySerializer.GetCategoryStr(category)
 		if(category.name == cmd.category and not cmd.hide_in_toolbox)then
             if(category.name == "Data")then
                 if(not bCreateVarBtn)then
-                    local variable_type_maps = CodeBlocklySerializer.GetAllVariableTypes();
+                    local variable_type_maps = self:GetAllVariableTypes();
                     local type;
                     for __,type in pairs(variable_type_maps) do
                         local callbackKey;
@@ -150,7 +141,7 @@ function CodeBlocklySerializer.GetCategoryStr(category)
                     bCreateVarBtn = true;
                 end
             end
-            local shadow = CodeBlocklySerializer.GetShadowStr(cmd);
+            local shadow = self:GetShadowStr(cmd);
 			s = string.format("%s<block type='%s'>%s</block>\n",s,cmd.type,shadow);
 		end
 	end
@@ -159,7 +150,7 @@ function CodeBlocklySerializer.GetCategoryStr(category)
 end
 -- check shadow table in arg0 -- arg9 from cmd
 -- see definition here https://github.com/LLK/scratch-blocks/tree/develop/blocks_common
-function CodeBlocklySerializer.GetShadowStr(cmd)
+function CodeBlocklyGenerator:GetShadowStr(cmd)
     if(not cmd)then
         return "";
     end
@@ -174,7 +165,7 @@ function CodeBlocklySerializer.GetShadowStr(cmd)
         ["text"] = "TEXT",
     }
     local result = "";
-    for k = 0,arg_len do
+    for k = 0,self.arg_len do
         local input_arg = cmd["arg".. k];
         if(input_arg)then
             for k,v in ipairs(input_arg) do
@@ -200,9 +191,9 @@ function CodeBlocklySerializer.GetShadowStr(cmd)
     end
     return result;
 end
-function CodeBlocklySerializer.GetBlocklyConfig()
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
-	local categories = CodeBlocklySerializer.GetCategoryButtons()
+function CodeBlocklyGenerator:GetBlocklyConfig()
+	local all_cmds = self:GetAllCmds();
+	local categories = self:GetCategoryButtons()
 	local c_map = {};
 	local k,v;
 	for k,v in ipairs(categories) do
@@ -221,60 +212,44 @@ function CodeBlocklySerializer.GetBlocklyConfig()
 	local s = NPL.ToJson(all_cmds,true);
 	return s;
 end
--- write a json file to config all of blocks
--- how to define-blocks:https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
-function CodeBlocklySerializer.WriteToBlocklyConfig(filename)
-	if(not filename)then return end
-	ParaIO.CreateDirectory(filename);
-
-	local s = CodeBlocklySerializer.GetBlocklyConfig();
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		file:WriteString(s);
-		file:close();
-	end
-end
-function CodeBlocklySerializer.GetBlocklyCode()
-	local all_cmds = CodeBlocklySerializer.GetAllCmds();
+function CodeBlocklyGenerator:GetBlocklyCode()
+    local all_cmds = self:GetAllCmds();
 	local s = "";
 	local cmd
 	for __,cmd in ipairs(all_cmds) do
-		local execution_str = CodeBlocklySerializer.GetBlockExecutionStr(cmd)
-		if(s == "")then
-			s = execution_str;
-		else
-			s = s .. "\n" .. execution_str;
-		end
+        local language;
+        for language,__ in pairs(self.language_names) do
+            local execution_str = self:GetBlockExecutionStr(cmd,language)
+		    if(s == "")then
+			    s = execution_str;
+		    else
+			    s = s .. "\n" .. execution_str;
+		    end
+        end
+		
 	end
 	return s;
-end
--- create a js file for execution
--- generating-code: https://developers.google.com/blockly/guides/create-custom-blocks/generating-code
-function CodeBlocklySerializer.WriteToBlocklyCode(filename)
-	if(not filename)then return end
-	ParaIO.CreateDirectory(filename);
-
-	local s = CodeBlocklySerializer.GetBlocklyCode();
-	local file = ParaIO.open(filename, "w");
-	if(file:IsValid()) then
-		file:WriteString(s);
-		file:close();
-	end
 end
 -- translate a cmd to a full block function
-function CodeBlocklySerializer.GetBlockExecutionStr(cmd)
+function CodeBlocklyGenerator:GetBlockExecutionStr(cmd,language)
 	local type = cmd.type;
-	local body = CodeBlocklySerializer.ArgsToStr(cmd);
-	local s = string.format([[
-Blockly.Lua['%s'] = function (block) {
+    language = language or "lua";
+	local body = self:ArgsToStr(cmd,language);
+
+    local language_name = self:GetLanguageName(language);
+    if(language_name)then
+    local s = string.format([[
+Blockly.%s['%s'] = function (block) {
 %s
-};]],type,body)
-	return s;
+};]],language_name,type,body);
+	    return s;
+    end
 end
 
 -- translate a cmd to a return value of block function
-function CodeBlocklySerializer.ArgsToStr(cmd)
+function CodeBlocklyGenerator:ArgsToStr(cmd,language)
 	local type = cmd.type
+    language = language or "lua";
 	local var_lines = "";
 	local arg_lines = "";
 	local k,v;
@@ -283,14 +258,14 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 
 
     -- read 10 args 
-    for k = 0,arg_len do
+    for k = 0,self.arg_len do
         local input_arg = cmd["arg".. k];
         if(input_arg)then
             for k,v in ipairs(input_arg) do
 		        local _type = v.type;
 		        if(_type and _type ~= "input_dummy")then
-			        local var_str = CodeBlocklySerializer.ArgToJsStr_Variable(prefix,v)
-			        local arg_str = CodeBlocklySerializer.Create_VariableName(prefix,v);
+			        local var_str = self:ArgToJsStr_Variable(prefix,v,language)
+			        local arg_str = self:Create_VariableName(prefix,v);
 			        if(var_lines == "")then
 				        var_lines = var_str;
 				        arg_lines = arg_str;
@@ -303,14 +278,16 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
         end
 	    
     end
-	local func_description = cmd.func_description;
+    local language_name = self:GetLanguageName(language);
+    local func_name = self:GetFunctionName(language);
+	local func_description = cmd[func_name];
 	local s;
 	
 	if(func_description)then
 		local output = cmd.output;
 		if(output and output.type)then
 		s = string.format([[%s
-    return ['%s'.format(%s),Blockly.Lua.ORDER_ATOMIC];]],var_lines,func_description,arg_lines);
+    return ['%s'.format(%s),Blockly.%s.ORDER_ATOMIC];]],var_lines,func_description,arg_lines,language_name);
 		else
 		s = string.format([[%s
     return '%s\n'.format(%s);]],var_lines,func_description,arg_lines);
@@ -321,26 +298,30 @@ function CodeBlocklySerializer.ArgsToStr(cmd)
 	return s;
 end
 -- translate a child item of arg[0-9] to a javascript execution
-function CodeBlocklySerializer.ArgToJsStr_Variable(prefix,arg)
+function CodeBlocklyGenerator:ArgToJsStr_Variable(prefix,arg,language)
 	local type = arg.type
 	local name = arg.name
 	local s;
-	local var_name = CodeBlocklySerializer.Create_VariableName(prefix,arg);
-	if(type == "input_statement")then
-		s = string.format([[    var %s = Blockly.Lua.statementToCode(block, '%s') || '';]],var_name,name)
-	elseif(type == "input_value")then
-	s = string.format([[    var %s = Blockly.Lua.valueToCode(block,'%s', Blockly.Lua.ORDER_ATOMIC) || '""';]],var_name,name)
-	elseif(type == "field_variable")then
-		s = string.format([[    var %s = Blockly.Lua.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,name)
-    elseif(type == "field_variable_getter")then
-		s = string.format([[    var %s = block.getField('%s').getText();]],var_name,name);
-	else
-		s = string.format([[    var %s = block.getFieldValue('%s');]],var_name,name);
-	end
-	return s;
+    local language_name = self:GetLanguageName(language);
+    if(language_name)then
+        local var_name = self:Create_VariableName(prefix,arg);
+	    if(type == "input_statement")then
+		    s = string.format([[    var %s = Blockly.%s.statementToCode(block, '%s') || '';]],var_name,language_name,name)
+	    elseif(type == "input_value")then
+	    s = string.format([[    var %s = Blockly.%s.valueToCode(block,'%s', Blockly.%s.ORDER_ATOMIC) || '""';]],var_name,language_name,name,language_name)
+	    elseif(type == "field_variable")then
+		    s = string.format([[    var %s = Blockly.%s.variableDB_.getName(block.getFieldValue('%s'), Blockly.Variables.NAME_TYPE) || '""';]],var_name,language_name,name)
+        elseif(type == "field_variable_getter")then
+		    s = string.format([[    var %s = block.getField('%s').getText();]],var_name,name);
+	    else
+		    s = string.format([[    var %s = block.getFieldValue('%s');]],var_name,name);
+	    end
+	    return s;
+    end
+	
 end
 -- create a unique name of variable
-function CodeBlocklySerializer.Create_VariableName(prefix,arg)
+function CodeBlocklyGenerator:Create_VariableName(prefix,arg)
 	local type = arg.type
 	local name = arg.name
 	local s = string.format("%s_%s_%s_var",prefix,type,name);

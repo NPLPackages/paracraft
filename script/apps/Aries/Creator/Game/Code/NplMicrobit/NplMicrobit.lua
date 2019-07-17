@@ -27,10 +27,9 @@ function NplMicrobit.MakeBlocklyFiles()
     local categories = NplMicrobit.GetCategoryButtons();
     local all_cmds = NplMicrobit.GetAllCmds()
 
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklySerializer.lua");
-    local CodeBlocklySerializer = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklySerializer");
-    CodeBlocklySerializer.OnInit(categories,all_cmds)
-    CodeBlocklySerializer.SaveFilesToDebug("block_configs_nplmicrobit");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyHelper.lua");
+    local CodeBlocklyHelper = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyHelper");
+    CodeBlocklyHelper.SaveFiles("block_configs_nplmicrobit",categories,all_cmds);
 
     _guihelper.MessageBox("making blockly files finished");
 	ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0).."block_configs_nplmicrobit", "", "", 1); 
