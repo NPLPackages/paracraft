@@ -120,11 +120,7 @@ local s_env_methods = {
 	"playMusic",
 
     -- Microbit
-	"robotRotateLeftArm",
-	"robotRotateRightArm",
-	"robotRotateLeftLeg",
-	"robotRotateRightLeg",
-	"robotRotateBody",
+	"rotateBone",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 

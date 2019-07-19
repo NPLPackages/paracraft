@@ -455,6 +455,7 @@ end
 -- Desktop.Restart("paracraft")
 -- @param appName: nil default to "paracraft", it can also be "haqi"
 function Desktop.Restart(appName)
+	GameLogic.BeforeRestart(appName);
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 	ParaWorldLoginDocker.Restart(appName)

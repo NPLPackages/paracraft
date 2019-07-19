@@ -228,11 +228,11 @@ function Entity:LoadImageFile()
 			self.imagefile_loaded_times = self.imagefile_loaded_times + 1;
 			self.need_add_imagefile_loaded_time = true;
 		end
-		--self.imagefile_loaded_times = self.imagefile_loaded_times + 1;
+		
 		if(self.imagefile_loaded_times >= 4) then
-			if(self.image_filename and self.image_filename:match("^https?://")) then
+			if(self:IsRemote() or (self.image_filename and self.image_filename:match("^https?://"))) then
 				self.texture:LoadAsset();
-				-- http textures will have a much longer timeout.
+				-- http or remote textures will have a much longer timeout.
 				self.imagefile_loaded_times=2*self.imagefile_loaded_times;
 				if(self.imagefile_loaded_times > 100) then
 					self.imagefile_loaded_timeout = true;
@@ -241,7 +241,6 @@ function Entity:LoadImageFile()
 				self.imagefile_loaded_timeout = true;
 			end
 		end
-
 		GameLogic.GetSim():ScheduleBlockUpdate(self.bx, self.by, self.bz, self:GetBlockId(), 5*self.imagefile_loaded_times);
 	end
 end
@@ -697,6 +696,7 @@ end
 function Entity:OnClick(x, y, z, mouse_button)
 	if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 		local old_value = self:GetCommand();
+		self:BeginEdit();
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
@@ -705,6 +705,7 @@ function Entity:OnClick(x, y, z, mouse_button)
 				self:SetCommand(result);
 				self:Refresh(true);
 			end
+			self:EndEdit();
 		end, old_value, L"贴图文件", "texture");
 	end
 	return true;

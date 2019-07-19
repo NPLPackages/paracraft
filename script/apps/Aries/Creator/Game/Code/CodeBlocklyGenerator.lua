@@ -24,6 +24,7 @@ function CodeBlocklyGenerator:ctor()
     self.language_names = {
         ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", },
         ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", },
+        ["python"] = { blockly_namesapce = "Python", function_name = "func_description_py", },
     }
 end
 

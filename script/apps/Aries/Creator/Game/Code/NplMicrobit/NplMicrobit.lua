@@ -18,8 +18,7 @@ local is_installed = false;
 local all_cmds = {};
 local all_cmds_map = {};
 NplMicrobit.categories = {
-    {name = "Body", text = L"躯干", colour = "#764bcc", },
-    {name = "Control", text = L"控制", colour = "#d83b01", },
+    {name = "NplMicrobit.Control", text = L"控制", colour = "#6c6ea0", },
 };
 
 -- make files for blockly 
@@ -43,15 +42,12 @@ function NplMicrobit.AppendAll()
 	end
 	is_installed = true;
 
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Body.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua");
 
-    local NplMicrobitDef_Body = commonlib.gettable("MyCompany.Aries.Game.Code.NplMicrobit.NplMicrobitDef_Body");
     local NplMicrobitDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.NplMicrobit.NplMicrobitDef_Control");
 	
 
 	local all_source_cmds = {
-		NplMicrobitDef_Body.GetCmds(),
 		NplMicrobitDef_Control.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do

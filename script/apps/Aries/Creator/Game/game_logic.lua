@@ -725,6 +725,11 @@ function GameLogic.PlayAnimation(params)
 	end
 end
 
+-- called before the entire NPLRuntime is restarted to a different application. 
+function GameLogic.BeforeRestart(appName)
+	GameLogic.GetFilters():apply_filters("OnBeforeRestart");
+end
+
 function GameLogic.Exit()
 	GameLogic.IsStarted = false;
 	GameLogic.SetTipText(nil);
