@@ -29,6 +29,7 @@ end
 
 function ReturnLastStep()
     page:CloseWindow();
+    CreateNewWorld.LastWorldName = nil
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
     if(not WorldCommon.GetWorldInfo()) then
@@ -92,7 +93,7 @@ end
 function GetCurWorldGrade() 
     return CreateNewWorld.cur_difficulty.show_value or "";
 end
-    
+
 function GetTerrainBtnValue()
     return CreateNewWorld.cur_terrain.show_value or "";
 end
@@ -101,13 +102,13 @@ function GetOneDayTimeBtnValue()
     return CreateNewWorld.cur_oneday_time.show_value or "";
 end
 
-LastWorldName = LastWorldName or CreateNewWorld.GetAvailableNewWorldName()
+CreateNewWorld.LastWorldName = CreateNewWorld.LastWorldName or CreateNewWorld.GetAvailableNewWorldName()
 function GetWorldName()
-    return LastWorldName;
+    return CreateNewWorld.LastWorldName;
 end
 
 function OnWorldNameChange()
-    LastWorldName = Page:GetUIValue("new_world_name", "");
+    CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
 end
 
 function BtnBeSelected(item_name,index)
