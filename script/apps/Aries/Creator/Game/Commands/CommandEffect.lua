@@ -195,9 +195,9 @@ Commands["hsv"] = {
 	name="hsv", 
 	quick_ref="/hsv [h s v] [multiply_r multiply_g multiply_b]", 
 	desc=[[hsv effect on and off
-/hsv 0 -1 0			offset hsv of the image
-/hsv 0 0 0	1 1 2   multiply and then offset hsv of the image
-/hsv				turn it off
+/hsv 0 -1 0    offset hsv of the image
+/hsv 0 0 0 1 1 2    multiply and then offset hsv of the image
+/hsv    turn it off
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local effect = GameLogic.GetShaderManager():GetEffect("ColorEffect");
