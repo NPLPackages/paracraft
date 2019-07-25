@@ -171,7 +171,7 @@ function EditMovieContext:updateManipulators()
 				manipCont:init();
 				self:AddManipulator(manipCont);
 				manipCont:connectToDependNode(actor);
-				GameLogic.AddBBS("EditMovieContext", L"移动: 拖动箭头移动位置, 中建可瞬移", 10000);
+				GameLogic.AddBBS("EditMovieContext", L"移动: 拖动箭头移动位置, 中键可瞬移", 10000);
 				bUseFreeCamera = true;
 			elseif(var.name == "facing") then
 				NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");

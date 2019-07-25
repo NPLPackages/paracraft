@@ -23,7 +23,7 @@ local default_categories = {
 {name = "Sensing", text = L"感知", colour="#69b090", },
 {name = "Operators", text = L"运算", colour="#569138", },
 {name = "Data", text = L"数据", colour="#459197", },
-{name = "NplMicrobit.Control", text = L"Microbit", colour="#6c6ea0", },
+--{name = "NplMicrobit.Control", text = L"Microbit", colour="#6c6ea0", },
 };
 
 -- make files for blockly 
@@ -75,7 +75,7 @@ function ParacraftCodeBlockly.AppendAll()
 		CodeBlocklyDef_Operators.GetCmds(),
 		CodeBlocklyDef_Sensing.GetCmds(),
 		CodeBlocklyDef_Sound.GetCmds(),
-		NplMicrobitDef_Control.GetCmds(),
+		--NplMicrobitDef_Control.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		ParacraftCodeBlockly.AppendDefinitions(v);
