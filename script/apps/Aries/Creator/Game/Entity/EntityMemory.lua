@@ -123,22 +123,20 @@ end
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
-		if(mouse_button == "left") then
-			-- GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
-		end
-		return true;
-	else
-		if(mouse_button=="left") then
-			GameLogic.AddBBS("memory", "new attention added to working memory");
-			self:AddToWorkingMemory();
-		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
-			if(ctrl_pressed) then
-				-- ctrl+right click to activate the entity in editor mode, such as for CommandEntity. 
-				self:OnActivated(entity);
-			else
-				self:OpenEditor("entity", entity);
-			end
+		-- TODO?
+	end
+
+	if(mouse_button=="left") then
+		GameLogic.AddBBS("memory", "new attention added to working memory");
+		self:AddToWorkingMemory();
+
+	elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+		local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+		if(ctrl_pressed) then
+			-- ctrl+right click to activate the entity in editor mode, such as for CommandEntity. 
+			self:OnActivated(entity);
+		else
+			self:OpenEditor("entity", entity);
 		end
 	end
 	return true;

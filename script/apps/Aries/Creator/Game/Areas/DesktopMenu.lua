@@ -73,11 +73,13 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"窗口", order=5, mode="edit", name = "window",children = 
 			{
 				{text = L"换装...",name = "window.changeskin", onclick=nil},
+				{text = L"材质包...",name = "window.texturepack",onclick=nil},
+				{text = L"视频录制... (F9)",name = "window.videorecoder", cmd="/record"},
 				{Type = "Separator"},
 				{text = L"信息(F3)",name = "window.info",onclick=nil},
-				{text = L"位置坐标...",name = "window.pos",onclick=nil},
+				-- {text = L"位置坐标...",name = "window.pos",onclick=nil},
 				{Type = "Separator"},
-				{text = L"材质包...",name = "window.texturepack",onclick=nil},
+				{text = "NPL控制面板... (F11)",name = "window.console", cmd="/open npl://console"},
 				{text = "NPL Debugger... (Ctrl+Alt+I)",name = "window.debugger", cmd="/open npl://debugger"},
 				{text = L"MOD插件加载...".."(Ctrl+M)",name = "window.mod",cmd="/show mod"},
 			},

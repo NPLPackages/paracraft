@@ -115,7 +115,7 @@ function SkinPage.ChangeSkin(index)
 	obj_params.ReplaceableTextures = {[2] = filename};
 	local canvasCtl = player_node.Canvas3D_ctl;
 	if(canvasCtl) then
-		if(obj_params.AssetFile ~= PlayerAssetFile:GetFilenameByName("default") or obj_params.AssetFile~=PlayerAssetFile:GetFilenameByName("actor")) then
+		if(obj_params.AssetFile ~= PlayerAssetFile:GetFilenameByName("default") and obj_params.AssetFile~=PlayerAssetFile:GetFilenameByName("actor")) then
 			obj_params.AssetFile = PlayerAssetFile:GetFilenameByName("default");
 		end
 		canvasCtl:ShowModel(obj_params);
