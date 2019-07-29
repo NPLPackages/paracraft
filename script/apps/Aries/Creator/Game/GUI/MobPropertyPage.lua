@@ -199,7 +199,7 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
 			-- this ensure that at least one shirt is displayed if it contains geosets.
 			entity:SetCharacterSlot(CharGeosets["shirt"], 1);
 			-- this ensure that at least one default skin is selected
-			if(entity.ToggleNextSkin) then
+			if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
 				entity:ToggleNextSkin();
 			end
 		end

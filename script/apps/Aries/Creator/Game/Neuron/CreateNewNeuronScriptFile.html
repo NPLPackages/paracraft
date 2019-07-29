@@ -168,7 +168,7 @@ end
             <div>
                 <div style="float:left;" width="40%">
                     <pe:tabs name="fileTabs" class="tabs" style="background:;">
-                        <pe:tab-item name="tabTemplate" class="mc_paper_panel" text='<%=L"模板"%>' selected="true" style="padding-top:5px">    
+                        <pe:tab-item name="tabTemplate" class="mc_inner_panel" text='<%=L"模板"%>' selected="true" style="padding-top:5px;">    
                             <pe:treeview style="background:;" name="templateFiles" DataSourceID='MyTemplateDS' DefaultNodeHeight="26">
 	                            <NodeTemplates>
 		                            <NodeTemplate DataType="file">
@@ -178,7 +178,7 @@ end
                                 <DataNodePlaceholder xpath="*"/>
                             </pe:treeview>
                         </pe:tab-item>
-                        <pe:tab-item name="tabLocalFile" class="mc_paper_panel" text='<%=L"已有文件"%>' style="padding-top:5px">
+                        <pe:tab-item name="tabLocalFile" class="mc_inner_panel" text='<%=L"已有文件"%>' style="padding-top:5px">
                             <pe:filebrowser style="background:;" name="scriptFileBrowser" rootfolder='<%=GetScriptRootFolder() %>' filter="*.lua;*.npl" onclick="OnSelectFile"/>
                         </pe:tab-item>
                     </pe:tabs>
@@ -186,14 +186,13 @@ end
                 <div style="float:left;padding:5px;padding-top:3px;height:305px;" width="60%" class="mc_paper_panel" >
                     <div style="height:20px;margin-left:8px;"><%=L"文件预览:"%></div>
                     <hr />
-                    <textarea name="filecontent" rows="13" UseSystemControl="true" syntax_map="NPL">
-                    </textarea>
+                    <input name="filecontent" rows="13" UseSystemControl="true" language="npl" ShowLineNumber="true"/>
                 </div>
             </div>
         </div>
     </div>
     </div>    
-    <div style="margin-left:80px;margin-bottom:5px;">
+    <div style="margin-left:80px;margin-top:5px; margin-bottom:10px;">
         <%=L"文件名:"%>
         <input name="filename" class="mc_text" value="test" style="width:400px;height:22px;" />
         <input type="button" name="btnOK" value='<%=L"确定"%>' onclick="OnClickOK" style="margin-left:5px;min-width:60px;margin-top:0px;" class="button"/>

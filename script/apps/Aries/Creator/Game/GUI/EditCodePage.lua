@@ -20,8 +20,9 @@ local page;
 function EditCodePage.OnInit()
 	page = document:GetPageCtrl();
 
-	local code = EditCodePage.GetCode();			
-	page:SetValue("content", code or "空");
+	EditCodePage.lastCode = EditCodePage.GetCode();			
+	
+	page:SetValue("content", EditCodePage.lastCode or "空");
 end
 
 function EditCodePage.GetItemID()
@@ -46,6 +47,12 @@ function EditCodePage.GetCode()
     end
 end
 
+function EditCodePage.OnClose()
+	if(page) then
+		page:CloseWindow();
+	end
+end
+
 function EditCodePage.SetCode(code)
 	-- TODO: 
 end
@@ -58,6 +65,36 @@ function EditCodePage.GetFullPath()
 	end
 end
 
+
+function EditCodePage.OnClickSave()
+	-- open the script using a text editor
+	local filename = EditCodePage.GetScriptFileName();
+
+	local newCode; 
+	if(page) then
+		newCode = page:GetValue("content");
+	end
+
+	if(EditCodePage.lastCode ~= newCode) then
+		local filenameDisk = EditCodePage.GetFullPath();
+		if(filenameDisk) then
+			-- instead of open file, just open the containing directory. 
+			local file = ParaIO.open(filenameDisk, "w")
+			if(file and file:IsValid()) then
+				if(newCode and newCode~="") then
+					file:WriteString(newCode, #newCode);
+				end
+				file:close();
+				GameLogic.AddBBS(nil, format(L"成功保存到:%s", filename));
+			else
+				GameLogic.AddBBS(nil, format(L"无法保存到:%s", filename));
+			end
+		end
+	end
+	EditCodePage.OnClose();
+end
+
+-- edit in npl code wiki editor
 function EditCodePage.OnClickEdit()
     local filename = EditCodePage.GetFullPath();
     if(filename) then
