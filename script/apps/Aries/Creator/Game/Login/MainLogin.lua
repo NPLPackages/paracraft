@@ -559,8 +559,8 @@ function MainLogin:AutoAdjustUIScalingForTouchDevice(callbackFunc)
 		local Screen = commonlib.gettable("System.Windows.Screen");
 
 		local function AutoAdjustUIScaling_()
-			local touch_ui_height = 560;
-			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {960,560});
+			local touch_ui_height = 680;
+			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {1020,680});
 			local frame_height = frame_size[2];
 			if(frame_height == 0) then
 				frame_height = Screen:GetHeight();
