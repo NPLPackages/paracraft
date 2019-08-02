@@ -324,6 +324,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 			self.entity:SetDummy(true);
 			self.entity:SetGroupId(nil);
 			self.entity:SetSentientField(0);
+			self.entity:SetServerEntity(false);
 
 			if(skin) then
 				self.entity:SetSkin(skin);
@@ -1396,6 +1397,9 @@ function Actor:SetBoneTime(boneName, time)
 end
 
 function Actor:DestroyEntity()
+	if(self:IsAgent() and self.entity) then
+		self:ReleaseEntityControl();
+	end
 	Actor._super.DestroyEntity(self)
 	if(self.bones_variable) then
 		self:Disconnect("dataSourceChanged", self.bones_variable, self.bones_variable.LoadFromActor)
@@ -1424,9 +1428,3 @@ function Actor:ReleaseEntityControl()
 	self:UnbindAnimInstance();
 end
 
-function Actor:DestroyEntity()
-	if(self:IsAgent() and self.entity) then
-		self:ReleaseEntityControl();
-	end
-	Actor._super.DestroyEntity(self);
-end

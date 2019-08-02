@@ -24,6 +24,7 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityChest"));
 
@@ -129,6 +130,29 @@ function Entity:OnClick(x, y, z, mouse_button)
 		self:CloseChest();
 	end
 	return true;
+end
+
+
+-- Overriden to provide the network packet for this entity.
+function Entity:GetDescriptionPacket()
+	local x,y,z = self:GetBlockPos();
+	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:SaveToXMLNode());
+end
+
+-- update from packet. 
+function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
+	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
+		local node = packet_UpdateEntityBlock.data1;
+		if(node) then
+			self:LoadFromXMLNode(node)
+			self:remotelyUpdated();
+		end
+	end
+end
+
+function Entity:EndEdit()
+	Entity._super.EndEdit(self);
+	self:MarkForUpdate();
 end
 
 function Entity:OnBlockAdded(x,y,z)

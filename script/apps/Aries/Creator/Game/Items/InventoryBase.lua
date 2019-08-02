@@ -41,8 +41,12 @@ function InventoryBase:SetClient()
 end
 
 -- @param slotCount: slot count
-function InventoryBase:Init(slotCount)
+-- @param slots: could be nil. 
+function InventoryBase:Init(slotCount, slots)
 	self.slotCount = slotCount or 27;
+	if(slots) then
+		self.slots = slots;
+	end
 	return self;
 end
 
@@ -353,7 +357,15 @@ end
 function InventoryBase:Close()
 end
 
+-- load from xml node without firing any on change event
 function InventoryBase:LoadFromXMLNode(node)
+	-- clear all 
+	local slot_index, subnode = next(self.slots);
+    while (slot_index) do
+        self.slots[slot_index] = nil;
+		slot_index, subnode = next(self.slots);
+    end
+	-- load from xml
 	local count = 0;
 	for slot_index, subnode in ipairs(node) do
 		if(subnode.attr and subnode.attr.count) then

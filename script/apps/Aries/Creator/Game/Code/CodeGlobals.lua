@@ -61,6 +61,7 @@ function CodeGlobals:ctor()
 			  rad = math.rad, random = math.random, sin = math.sin, sinh = math.sinh, 
 			  sqrt = math.sqrt, tan = math.tan, tanh = math.tanh },
 		bit = mathlib.bit,
+		mathlib = mathlib,
 		string = { byte = string.byte, char = string.char, find = string.find, 
 			  format = string.format, gmatch = string.gmatch, gsub = string.gsub, 
 			  len = string.len, lower = string.lower, match = string.match, 

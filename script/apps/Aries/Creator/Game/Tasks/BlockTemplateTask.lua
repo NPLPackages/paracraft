@@ -26,7 +26,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
-
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local BlockTemplate = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate"));
 
 -- operations enumerations
@@ -229,6 +230,29 @@ function BlockTemplate:SaveTemplate()
 			-- refresh it if it is a bmax model.
 			ParaAsset.LoadParaX("", filename):UnloadAsset();
 			LOG.std(nil, "info", "BlockTemplate", "unload to refresh %s", filename);
+
+			if(GameLogic.isRemote) then
+				-- uploading file
+				local relativeFilename = Files.GetRelativePath(filename);
+				if(relativeFilename ~= filename) then
+					local file = ParaIO.open(filename, "r")
+					if(file:IsValid()) then
+						local data = file:GetText(0, -1);
+						file:close();
+						GameLogic.GetPlayer():AddToSendQueue(Packets.PacketPutFile:new():Init(relativeFilename, data));
+						LOG.std(nil, "info", "Files", "upload file: %s", relativeFilename)	
+					end
+				end
+			elseif(GameLogic.isServer) then
+				local relativeFilename = Files.GetRelativePath(filename);
+				if(relativeFilename ~= filename) then
+					local servermanager = GameLogic.GetWorld():GetServerManager();
+					if(servermanager) then
+						LOG.std(nil, "info", "Files", "notify all clients about changed file: %s", relativeFilename)
+						servermanager:SendPacketToAllPlayers(Packets.PacketPutFile:new():Init(relativeFilename));
+					end
+				end
+			end
 		end
 		return true;
 	end

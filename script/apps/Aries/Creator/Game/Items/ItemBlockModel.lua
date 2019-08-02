@@ -141,10 +141,12 @@ end
 function ItemBlockModel:OpenChangeFileDialog(itemStack)
 	if(itemStack) then
 		local local_filename = itemStack:GetDataField("tooltip");
+		local_filename = commonlib.Encoding.Utf8ToDefault(local_filename)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
 		OpenAssetFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
 			if(result and result~="" and result~=local_filename) then
+				result = commonlib.Encoding.DefaultToUtf8(result)
 				self:SetModelFileName(itemStack, result);
 			end
 		end, local_filename, L"选择模型文件", "model", nil, function(filename)
@@ -170,6 +172,7 @@ function ItemBlockModel:SelectModelFile(itemStack)
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(L"将当前选择的方块保存为bmax文件. 请输入文件名:<br/> 例如: test", function(result)
 			if(result and result~="") then
+				result = commonlib.Encoding.DefaultToUtf8(result)
 				local filename = result;
 				local bSucceed, filename = GameLogic.RunCommand("/savemodel "..filename);
 				if(filename) then

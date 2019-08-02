@@ -698,6 +698,7 @@ function CodeBlock:RegisterAnimationEvent(time, callbackFunc)
 			return (time == curTime);
 		end);
 		event:SetFunction(callbackFunc);
+		return event;
 	end
 end
 
@@ -986,7 +987,7 @@ function CodeBlock:RunTempCode(code, filename)
 			local co = CodeCoroutine:new():Init(self);
 			self.lastTempCodeCoroutine = co;
 			self:stateChanged();
-			local actor = env.actor or self:FindNearbyActor() or self:CreateActor();
+			local actor = self:FindNearbyActor() or self:CreateActor();
 			co:SetActor(actor);
 			co:SetFunction(code_func);
 			co:Run()
@@ -1077,8 +1078,13 @@ function CodeBlock:IncludeFile(filename)
 				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
-				local ok, result = xpcall(code_func, CodeBlock.handleError);
+				--local ok, result = xpcall(code_func, CodeBlock.handleError);
+				local arg = {xpcall(code_func, CodeBlock.handleError)};
+				local ok = arg[1];
+				
 				if(not ok) then
+					local result = arg[2];
+					
 					if(result:match("_stop_all_")) then
 						self:StopAll();
 					elseif(result:match("_restart_all_")) then
@@ -1089,6 +1095,8 @@ function CodeBlock:IncludeFile(filename)
 						self:send_message(msg, "error");
 					end
 				end
+				
+				return unpack(arg, 2);
 			end
 		end
 	else

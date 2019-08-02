@@ -83,6 +83,7 @@ function CodeBlockWindow.Show(bShow)
 		viewport:SetMarginRightHandler(self);
 
 		GameLogic:Connect("beforeWorldSaved", CodeBlockWindow, CodeBlockWindow.OnWorldSave, "UniqueConnection");
+		GameLogic:Connect("WorldUnloaded", CodeBlockWindow, CodeBlockWindow.OnWorldUnload, "UniqueConnection")
 
 		CodeBlockWindow:LoadSceneContext();
 	end
@@ -151,6 +152,10 @@ function CodeBlockWindow:OnViewportChange()
 	end
 end
 
+function CodeBlockWindow.OnWorldUnload()
+	self.lastBlocklyUrl = nil;
+end
+
 function CodeBlockWindow.OnWorldSave()
 	CodeBlockWindow.UpdateCodeToEntity();
 end
@@ -168,6 +173,15 @@ end
 
 function CodeBlockWindow:OnEntityRemoved()
 	CodeBlockWindow.SetCodeEntity(nil);
+end
+
+function CodeBlockWindow:OnCodeChange()
+	if(not CodeBlockWindow.IsVisible()) then
+		CodeBlockWindow.SetCodeEntity(nil);
+	end
+	if(page) then
+		page:Refresh(0.01);
+	end
 end
 
 function CodeBlockWindow.RestoreCursorPosition()
@@ -191,6 +205,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 		if(entity) then
 			entity:Connect("beforeRemoved", self, self.OnEntityRemoved, "UniqueConnection");
 			entity:Connect("editModeChanged", self, self.UpdateEditModeUI, "UniqueConnection");
+			entity:Connect("remotelyUpdated", self, self.OnCodeChange, "UniqueConnection");
 		end
 		if(self.entity) then
 			local codeBlock = self.entity:GetCodeBlock();
@@ -202,6 +217,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 
 			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
 			self.entity:Disconnect("editModeChanged", self, self.UpdateEditModeUI);
+			self.entity:Disconnect("remotelyUpdated", self, self.OnCodeChange);
 			CodeBlockWindow.UpdateCodeToEntity();
 		end
 		self.entity = entity;
@@ -322,7 +338,9 @@ function CodeBlockWindow.UpdateCodeToEntity()
 	if(page and entity) then
 		local code = page:GetUIValue("code");
 		if(not entity:IsBlocklyEditMode()) then
+			entity:BeginEdit()
 			entity:SetNPLCode(code);
+			entity:EndEdit()
 
 			local ctl = CodeBlockWindow.GetTextControl();
 			if(ctl) then
@@ -598,9 +616,11 @@ end
 function CodeBlockWindow.UpdateBlocklyCode(blockly_xmlcode, code, bx, by, bz)
 	local codeEntity = CodeBlockWindow.GetCodeEntity(bx, by, bz);
 	if(codeEntity) then
+		codeEntity:BeginEdit()
 		codeEntity:SetBlocklyEditMode(true);
 		codeEntity:SetBlocklyXMLCode(blockly_xmlcode);
 		codeEntity:SetBlocklyNPLCode(code);
+		codeEntity:EndEdit()
 
 		if(CodeBlockWindow.IsSameBlock(bx, by, bz)) then
 			CodeBlockWindow.ReplaceCode(code, bx, by, bz)

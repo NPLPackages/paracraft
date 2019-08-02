@@ -28,7 +28,7 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
         <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">
-            <pe:nplbrowser name="nplbrowser_instance" min_width="600" withControl="false" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();"/>
+            <pe:nplbrowser name="nplbrowser_instance" min_width="600" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();"/>
         </pe:container>
     </pe:if>
     <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">

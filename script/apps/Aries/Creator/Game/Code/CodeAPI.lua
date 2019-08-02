@@ -16,6 +16,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Control.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Microbit.lua");
 
 -- all public environment methods. 
 local s_env_methods = {
@@ -59,6 +60,7 @@ local s_env_methods = {
 	"hide",
 	"anim",
 	"play",
+	"playAndWait",
 	"playLoop",
 	"playSpeed",
 	"playBone",
@@ -116,6 +118,9 @@ local s_env_methods = {
 	"playSound",
 	"stopSound",
 	"playMusic",
+
+    -- Microbit
+	"rotateBone",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 

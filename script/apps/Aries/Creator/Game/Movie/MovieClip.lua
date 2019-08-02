@@ -353,6 +353,10 @@ function MovieClip:GetActorFromItemStack(itemStack, bCreateIfNotExist)
 	end
 end
 
+function MovieClip:HasCreatedActors()
+	return next(self.actors) ~= nil;
+end
+
 -- usually called when movie finished playing. 
 function MovieClip:RemoveAllActors()
 	for i, actor in pairs(self.actors) do

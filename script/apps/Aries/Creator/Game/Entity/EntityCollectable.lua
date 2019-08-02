@@ -29,6 +29,8 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 
 -- persistent object by default. 
 Entity.is_persistent = true;
+-- whether this entity can be synchronized on the network by EntityTrackerEntry. 
+Entity.isServerEntity = true;
 -- class name
 Entity.class_name = "collectable";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
@@ -57,7 +59,9 @@ function Entity:init()
 	end
 	if(item) then
 		local x, y, z = self:GetPosition();
-
+		if(not self.x) then
+			self.x, self.y, self.z = x, y, z;
+		end
 		local obj = ObjEditor.CreateObjectByParams({
 			name = self.name or self.class_name,
 			IsCharacter = true,
@@ -94,9 +98,12 @@ function Entity:init()
 	end
 end
 
+
 -- when the body of the player hit this entity. 
 function Entity:OnCollideWithPlayer(entity, bx,by,bz)
-	if(GameLogic.CanCollectItem()) then
+	if(GameLogic.isRemote) then
+		
+	elseif(GameLogic.CanCollectItem()) then
 		local item;
 		if(self.item_id and self.item_id>0) then
 			item = ItemClient.GetItem(self.item_id);

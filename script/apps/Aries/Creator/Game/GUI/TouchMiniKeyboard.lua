@@ -20,6 +20,7 @@ kb:Show(true);
 
 -- static singleton to show at default left bottom position
 TouchMiniKeyboard.CheckShow(true);
+TouchMiniKeyboard.GetSingleton():LoadKeyboardLayout({{{name="A", vKey = DIK_SCANCODE.DIK_A}, {name="C", vKey = DIK_SCANCODE.DIK_C}}, {{name="B", vKey = DIK_SCANCODE.DIK_B}}})
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
@@ -39,33 +40,41 @@ TouchMiniKeyboard.name = "default_TouchMiniKeyboard";
 -- default to 0.5 second. 
 TouchMiniKeyboard.hover_press_hold_time = 500;
 
+-- @param name: displayname
+-- @param vKey: virtual key scan code. 
+-- @param allow_hover_press: this will simulate pressing the multiple buttons at the same time. 
+-- @param auto_mouseup: if the touch is no longer over a button, it will automatically fire the mouse up event. 
+-- @param col: column span, default to 1. 
+-- @param colorid: default to 1. we have 1,2,3,4 color themes for normalBtn, comboBtn, frequentBtn, mouseRight. 
+-- @param ctrl_name: when ctrl key is pressed, this button may be transformed to another button. 
+-- @param toggleRightMouseButton: whether to toggle right mouse button when this button is pressed. 
+-- @param click_only: we will only send up and down event together when button is up. 
+TouchMiniKeyboard.DefaultKeyLayout = {
+	{
+		{name="F", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F, flyUpDown = true, click_only = true},
+		-- left mouse button when pressed. otherwise it default to right. drag to scroll the camera
+		{name="RMB", col=2, toggleRightMouseButton=true, colorid=4, camera_zoom = true, allow_hover_press = true}, 
+	},
+	{
+		{name="Shift", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true},
+		{name="W", col=1, vKey = DIK_SCANCODE.DIK_W, auto_mouseup = true},
+		{name="E", col=1, colorid=3, vKey = DIK_SCANCODE.DIK_E},
+	},
+	{
+		{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A, auto_mouseup = true},
+		{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S, auto_mouseup = true},
+		{name="D", col=1, vKey = DIK_SCANCODE.DIK_D, auto_mouseup = true},
+	},
+	{
+		{name="Ctrl", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true},
+		{name="Space", col=1, ctrl_name="Z", vKey = DIK_SCANCODE.DIK_SPACE, auto_mouseup = true},
+		{name="Alt", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, allow_hover_press = true},
+	},
+};
+
 function TouchMiniKeyboard:ctor()
 	self.alignment = "_lt";
 	self.zorder = -10;
-
-	-- @param allow_hover_press: this will simulate pressing the multiple buttons at the same time. 
-	self.keylayout = {
-		{
-			{name="F", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F, flyUpDown = true, click_only = true},
-			-- left mouse button when pressed. otherwise it default to right. drag to scroll the camera
-			{name="RMB", col=2, toggleRightMouseButton=true, colorid=4, camera_zoom = true, allow_hover_press = true}, 
-		},
-		{
-			{name="Shift", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true},
-			{name="W", col=1, vKey = DIK_SCANCODE.DIK_W},
-			{name="E", col=1, colorid=3, vKey = DIK_SCANCODE.DIK_E},
-		},
-		{
-			{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A},
-			{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S},
-			{name="D", col=1, vKey = DIK_SCANCODE.DIK_D},
-		},
-		{
-			{name="Ctrl", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true},
-			{name="Space", col=1, ctrl_name="Z", vKey = DIK_SCANCODE.DIK_SPACE},
-			{name="Alt", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, allow_hover_press = true},
-		},
-	}
 
 	-- normalBtn, comboBtn, frequentBtn, mouseRight
 	self.colors = { 
@@ -77,6 +86,34 @@ function TouchMiniKeyboard:ctor()
 
 	self.finger_size = 10;
 	self.transparency = 1;
+
+	self.keylayout = TouchMiniKeyboard.DefaultKeyLayout;
+end
+
+-- @param keyLayout: if nil, it will load the default layout. 
+-- otherwise, it should be a table of M*N, each item can be {name="E", vKey = DIK_SCANCODE.DIK_E}, with some options. 
+-- for options and examples, see TouchMiniKeyboard.DefaultKeyLayout
+--[[ e.g.
+TouchMiniKeyboard.GetSingleton():LoadKeyboardLayout({ 
+ { {name="A", vKey = DIK_SCANCODE.DIK_A}, {name="B", vKey = DIK_SCANCODE.DIK_B}, {name="C", vKey = DIK_SCANCODE.DIK_C} }, 
+ { {name="C", vKey = DIK_SCANCODE.DIK_C}, {name="D", vKey = DIK_SCANCODE.DIK_D}, {name="C", vKey = DIK_SCANCODE.DIK_E} }, 
+ { {name="F", vKey = DIK_SCANCODE.DIK_F}, {name="G", vKey = DIK_SCANCODE.DIK_G}, {name="H", vKey = DIK_SCANCODE.DIK_H} }, 
+})
+]]
+function TouchMiniKeyboard:LoadKeyboardLayout(keyLayout)
+	local oldLayout = self.keylayout;
+	self.keylayout = keyLayout or TouchMiniKeyboard.DefaultKeyLayout;
+	if(self.keylayout ~= oldLayout) then
+		local _parent = ParaUI.GetUIObject(self.id or self.name);
+		if(_parent:IsValid()) then
+			local visible = _parent.visible;
+			self:CreateWindow();
+			if(visible) then
+				_parent.visible = true;
+				_parent:ApplyAnim();
+			end
+		end
+	end
 end
 
 local s_instance;
@@ -250,18 +287,27 @@ function TouchMiniKeyboard:OnTouch(touch)
 				end
 			end
 			keydownBtn.hover_testing_btn = btnItem;
-			if(btnItem and btnItem~=keydownBtn and btnItem.allow_hover_press and not btnItem.isKeyDown) then
-				if(not btnItem.hover_press_start) then
-					btnItem.hover_press_start = true;
-					if (not btnItem.timer) then
-						btnItem.timer = commonlib.Timer:new({callbackFunc = function(timer)
-							if(keydownBtn.isKeyDown and  keydownBtn.hover_testing_btn == btnItem) then
-								keydownBtn.hover_press_btns = keydownBtn.hover_press_btns or {};
-								keydownBtn.hover_press_btns[btnItem] = true;
-								self:SetKeyState(btnItem, true);
-							end
-						end})
-						btnItem.timer:Change(self.hover_press_hold_time);
+			-- finger is hovering another button instead of the initial button. 
+			if(btnItem and btnItem~=keydownBtn) then
+				if(not keydownBtn.auto_mouseup and btnItem.allow_hover_press and not btnItem.isKeyDown) then
+					if(not btnItem.hover_press_start) then
+						btnItem.hover_press_start = true;
+						if (not btnItem.timer) then
+							btnItem.timer = commonlib.Timer:new({callbackFunc = function(timer)
+								if(keydownBtn.isKeyDown and  keydownBtn.hover_testing_btn == btnItem) then
+									keydownBtn.hover_press_btns = keydownBtn.hover_press_btns or {};
+									keydownBtn.hover_press_btns[btnItem] = true;
+									self:SetKeyState(btnItem, true);
+								end
+							end})
+							btnItem.timer:Change(self.hover_press_hold_time);
+						end
+					end
+				elseif(btnItem.auto_mouseup)then
+					if(keydownBtn.isKeyDown) then
+						self:SetKeyState(keydownBtn, false);
+						touch_session:SetField("keydownBtn", btnItem);
+						self:SetKeyState(btnItem, true);
 					end
 				end
 			end
@@ -421,10 +467,10 @@ function TouchMiniKeyboard:CreateWindow()
 				-- get global screen position
 				item.left = left_col*self.button_width;
 				item.top = (row-1)*self.button_height;
-				item.right = item.left + item.col*self.button_width;
+				item.right = item.left + (item.col or 1)*self.button_width;
 				item.bottom = item.top + self.button_height;
 
-				local keyBtn = ParaUI.CreateUIObject("button",item.name, "_lt", left_col*self.button_width + btn_margin, (row-1)*self.button_height+btn_margin, item.col*self.button_width-btn_margin*2, self.button_height-btn_margin*2);
+				local keyBtn = ParaUI.CreateUIObject("button",item.name, "_lt", left_col*self.button_width + btn_margin, (row-1)*self.button_height+btn_margin, (item.col or 1)*self.button_width-btn_margin*2, self.button_height-btn_margin*2);
 				keyBtn.background = "Texture/whitedot.png";
 				keyBtn.enabled = false;
 				keyBtn.text = self:GetItemDisplayText(item);
@@ -432,7 +478,7 @@ function TouchMiniKeyboard:CreateWindow()
 				_guihelper.SetButtonFontColor(keyBtn, "#000000");
 				_parent:AddChild(keyBtn);
 			end
-			left_col = left_col + item.col;
+			left_col = left_col + (item.col or 1);
 		end
 	end
 end

@@ -699,13 +699,19 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 
 
 {
-	type = "cmd", 	message0 = L"执行命令%1",
+	type = "cmd", 	message0 = L"执行命令%1,%2",
 	arg0 = {
 		{
 			name = "msg",
 			type = "input_value",
             shadow = { type = "cmdExamples", value = "/tip hello",},
 			text = "/tip hello", 
+		},
+		{
+			name = "params",
+			type = "input_value",
+			shadow = { type = "text", value = "",},
+			text = "\"\"",
 		},
 	},
 	category = "Events", 
@@ -714,9 +720,9 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'cmd(%s)',
+	func_description = 'cmd(%s, %s)',
 	ToNPL = function(self)
-		return string.format('cmd("%s")\n', self:getFieldAsString('msg'));
+		return string.format('cmd("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
 	end,
 	examples = {
 	{desc = "", canRun = true, code = [[
@@ -724,6 +730,7 @@ cmd("/setblock ~0 ~0 ~1 62")
 cmd("/cameradist 12")
 cmd("/camerayaw 0")
 cmd("/camerapitch 0.5")
+cmd("/time", "0")
 ]]},
 {desc = L"关闭自动等待", canRun = true, code = [[
 set("count", 1)

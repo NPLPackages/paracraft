@@ -352,6 +352,17 @@ function ServerManager:SendPacketToAllPlayers(packet)
     end
 end
 
+-- sends a packet to all players except the given one
+function ServerManager:SendPacketToAllPlayersExcept(packet, excludedPlayer)
+	for i =1, #(self.playerEntityList) do
+		local entityPlayer = self.playerEntityList[i];
+		if(entityPlayer ~= excludedPlayer) then
+			entityPlayer:SendPacketToPlayer(packet);
+		end
+    end
+end
+
+
 -- Called when a player successfully logs in. Reads player data from disk and inserts the player into the world.
 function ServerManager:PlayerLoggedIn(entityMP)
 	-- send new player info to all other players

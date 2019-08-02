@@ -6,6 +6,7 @@ Desc: language configuration file for ParacraftCodeBlockly
 use the lib:
 -------------------------------------------------------
 local langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
+langConfig.MakeBlocklyFiles()
 -------------------------------------------------------
 ]]
 local ParacraftCodeBlockly = NPL.export();
@@ -22,7 +23,21 @@ local default_categories = {
 {name = "Sensing", text = L"感知", colour="#69b090", },
 {name = "Operators", text = L"运算", colour="#569138", },
 {name = "Data", text = L"数据", colour="#459197", },
+--{name = "NplMicrobit.Control", text = L"Microbit", colour="#6c6ea0", },
 };
+
+-- make files for blockly 
+function ParacraftCodeBlockly.MakeBlocklyFiles()
+    local categories = ParacraftCodeBlockly.GetCategoryButtons();
+    local all_cmds = ParacraftCodeBlockly.GetAllCmds()
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyHelper.lua");
+    local CodeBlocklyHelper = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyHelper");
+    CodeBlocklyHelper.SaveFiles("block_configs_paracraft",categories,all_cmds);
+
+    _guihelper.MessageBox("making blockly files finished");
+	ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0).."block_configs_paracraft", "", "", 1); 
+end
 
 local is_installed = false;
 function ParacraftCodeBlockly.AppendAll()
@@ -39,8 +54,7 @@ function ParacraftCodeBlockly.AppendAll()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Operators.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua");
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Cad.lua");
-
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua");
 
 	local CodeBlocklyDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Control");
 	local CodeBlocklyDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Data");
@@ -50,6 +64,7 @@ function ParacraftCodeBlockly.AppendAll()
 	local CodeBlocklyDef_Operators = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Operators");
 	local CodeBlocklyDef_Sensing = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Sensing");
 	local CodeBlocklyDef_Sound = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Sound");
+    local NplMicrobitDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.NplMicrobit.NplMicrobitDef_Control");
 
 	local all_source_cmds = {
 		CodeBlocklyDef_Control.GetCmds(),
@@ -60,6 +75,7 @@ function ParacraftCodeBlockly.AppendAll()
 		CodeBlocklyDef_Operators.GetCmds(),
 		CodeBlocklyDef_Sensing.GetCmds(),
 		CodeBlocklyDef_Sound.GetCmds(),
+		--NplMicrobitDef_Control.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		ParacraftCodeBlockly.AppendDefinitions(v);

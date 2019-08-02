@@ -80,6 +80,7 @@ function SelectBlocks.filter_file_exported(id, filename)
 		return id;
 	end
 	if(id == "bmax" and filename) then
+		filename = commonlib.Encoding.DefaultToUtf8(filename)
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
 	end
 	SelectBlocks.CancelSelection();

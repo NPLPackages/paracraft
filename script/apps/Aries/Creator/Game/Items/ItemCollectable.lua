@@ -15,6 +15,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local ItemCollectable = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemCollectable"));
 
@@ -57,11 +58,21 @@ function ItemCollectable:OnCreate(result)
 	if(result.blockX) then
 		local bx,by,bz = result.blockX,result.blockY,result.blockZ;
 		if(not EntityManager.HasNonPlayerEntityInBlock(bx,by,bz)) then 
-			-- ignore it if there is already an entity there. 
-			local entity_class = EntityManager.GetEntityClass(self.entity_class or "collectable")
-			if(entity_class) then
-				local entity = entity_class:Create({bx=bx,by=by,bz=bz, item_id = self.block_id, name = self.name});
-				EntityManager.AddObject(entity)
+			if(GameLogic.isRemote) then
+				local clientMP = EntityManager.GetPlayer();
+				if(clientMP and clientMP.AddToSendQueue) then
+					local x, y, z = BlockEngine:real_bottom(bx,by,bz);
+					clientMP:AddToSendQueue(Packets.PacketEntityMobSpawn:new():Init({x=x,y=y,z=z, item_id = self.block_id}, 14));
+					return true;
+				end
+			else
+				-- ignore it if there is already an entity there. 
+				local entity_class = EntityManager.GetEntityClass(self.entity_class or "collectable")
+				if(entity_class) then
+					local entity = entity_class:Create({bx=bx,by=by,bz=bz, item_id = self.block_id, name = self.name});
+					EntityManager.AddObject(entity)
+					return true;
+				end
 			end
 		end
 	end

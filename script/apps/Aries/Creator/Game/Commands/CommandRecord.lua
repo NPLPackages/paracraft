@@ -19,18 +19,6 @@ local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
---[[ showvideo recorder
-/recorder
-]]
-Commands["recorder"] = {
-	name="recorder", 
-	quick_ref="/recorder", 
-	desc="show video recorder" , 
-	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		NPL.load("(gl)script/apps/Aries/Movie/VideoRecorder.lua");
-		MyCompany.Aries.Movie.VideoRecorder.Show();	
-	end,
-};
 
 --[[ begin recording
 ]]

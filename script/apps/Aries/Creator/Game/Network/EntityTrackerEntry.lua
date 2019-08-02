@@ -299,6 +299,8 @@ function EntityTrackerEntry:GetPacketForThisEntity()
 		return Packets.PacketEntityMobSpawn:new():Init(self.entity, 11);
 	elseif (self.entity:isa(EntityManager.EntityItem)) then
 		return Packets.PacketEntityMobSpawn:new():Init(self.entity, 13);
+	elseif (self.entity:isa(EntityManager.EntityCollectable)) then
+		return Packets.PacketEntityMobSpawn:new():Init(self.entity, 14);
     else
 		-- default to mob packet for all other entity types
         return Packets.PacketEntityMobSpawn:new():Init(self.entity);

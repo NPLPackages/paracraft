@@ -12,13 +12,10 @@ GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 EditCodePage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditCodePage");
 EditCodePage.OnInit();
 
-function OnClose()
-    Page:CloseWindow();
-end
 ]]></script>
-<aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" onclose="OnClose">
+<aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" onclose="EditCodePage.OnClose()">
     <div style="height: 320px; margin-right: 4px; margin-left: -4px; padding: 5px;" class="mc_paper_panel" width="100%" >
-        <textarea language="npl" name="content" ReadOnly="true" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
+        <textarea language="npl" name="content" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
     </div>
    <div style="margin-top:5px;padding-bottom:10px;">
         <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
@@ -26,7 +23,8 @@ end
                 <div style="float:left" class="linkbutton_yellow" onclick="EditCodePage.OnEditScript" tooltip='<%=L"左键:打开文件\n右键:打开所在文件夹"%>'>
                     <%=EditCodePage.GetScriptFileName()%>
                 </div>
-                <input type="button" name="edit" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickEdit" value='<%=L"编辑"%>' />
+                <!--<input type="button" name="edit" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickEdit" value='<%=L"编辑"%>' />-->
+                <input type="button" name="save" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickSave" value='<%=L"保存并关闭"%>' />
             </div>
             <input type="button" name="changefile" style="margin-left:5px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnCreateNewFile" value='<%=L"新建/更改"%>' />
         </pe:if>

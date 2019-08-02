@@ -1134,6 +1134,10 @@ function Entity:IsServerEntity()
 	return self.isServerEntity;
 end
 
+function Entity:SetServerEntity(isServerEntity)
+	self.isServerEntity = isServerEntity~=false;
+end
+
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	-- TODO: move this to a separate file to handle editors for all kinds of object. 
@@ -1322,8 +1326,7 @@ function Entity:GetPosition()
 	if(self.x) then
 		return self.x, self.y, self.z;
 	elseif(self.bx) then
-		local x,y,z = BlockEngine:real(self.bx, self.by, self.bz);
-		y = y - BlockEngine.half_blocksize;
+		local x,y,z = BlockEngine:real_bottom(self.bx, self.by, self.bz);
 		return x,y,z;
 	else
 		return 0,0,0;

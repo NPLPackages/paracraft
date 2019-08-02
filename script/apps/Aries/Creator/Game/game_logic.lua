@@ -117,7 +117,7 @@ local game_level;
 
 -- right hand block template id. 
 GameLogic.right_hand_block_id = 1;
-
+GameLogic.autoBackupInterval = 1000*60*10; -- 10 minutes
 GameLogic.picking_dist = options.picking_dist_walkmode;
 
 local SentientGroupIDs = commonlib.gettable("MyCompany.Aries.Game.GameLogic.SentientGroupIDs");
@@ -584,7 +584,7 @@ function GameLogic.RemoveWorldFileWatcher()
 end
 
 function GameLogic.CheckCreateFileWatcher()
-	if(not GameLogic.IsReadOnly()) then
+	if(not GameLogic.IsReadOnly() or GameLogic.isRemote) then
 		NPL.load("(gl)script/ide/FileSystemWatcher.lua");
 
 		GameLogic.RemoveWorldFileWatcher();
@@ -673,6 +673,8 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder)
 	if(not GameLogic.world_revision:Commit()) then
 		GameLogic.world_revision:Backup();
 		GameLogic.world_revision:Commit(true);
+	elseif(GameLogic.world_revision:GetNonBackupTime() > GameLogic.autoBackupInterval) then
+		GameLogic.world_revision:Backup();
 	end
 
 	GameLogic.options:SetLastSaveTime();
@@ -723,6 +725,11 @@ function GameLogic.PlayAnimation(params)
 	end
 end
 
+-- called before the entire NPLRuntime is restarted to a different application. 
+function GameLogic.BeforeRestart(appName)
+	GameLogic.GetFilters():apply_filters("OnBeforeRestart");
+end
+
 function GameLogic.Exit()
 	GameLogic.IsStarted = false;
 	GameLogic.SetTipText(nil);
@@ -735,8 +742,8 @@ function GameLogic.Exit()
 	MovieManager:Exit();
 	
 	if(GameLogic.world_revision) then
-		if(GameLogic.world_revision:IsModified()) then
-			-- always backup on exit when modified. 
+		if(GameLogic.world_revision:IsModifiedAndNotBackedup()) then
+			-- always backup on exit when modified
 			GameLogic.world_revision:Backup();
 		end
 	end
@@ -989,7 +996,7 @@ end
 
 -- whether we can collect items when player hit it. 
 function GameLogic.CanCollectItem()
-	if(GameLogic.IsReadOnly() or GameMode:CanCollectItem()) then
+	if(GameMode:CanCollectItem()) then
 		return true;
 	end
 end

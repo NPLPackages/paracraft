@@ -630,12 +630,15 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 		local facing = entity:GetFacing()
 		local wasVisible = entity:IsVisible()
 		local variables = entity:GetVariables();
-		
+		local hasFocus = entity:HasFocus();
 		self:DestroyEntity();
 		self:Init(itemStack, movie_entity);
 		self:FrameMove(self:GetTime() or 0, false);
 		entity = self:GetEntity();
 		if(entity) then
+			if(hasFocus) then
+				entity:SetFocus();
+			end
 			entity:SetPosition(x,y,z);
 			entity:SetFacing(facing);
 			if(not wasVisible) then

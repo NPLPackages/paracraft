@@ -127,6 +127,10 @@ function FindBlockTask.OnClickItem(treenode)
 
 	FindBlockTask.SetSelectedResultIndex(index)
 	FindBlockTask.OpenItemAtIndex(index);
+
+	if(mouse_button == "left") then
+		FindBlockTask.OnClose()
+	end
 end
 
 function FindBlockTask.OpenItemAtIndex(index)

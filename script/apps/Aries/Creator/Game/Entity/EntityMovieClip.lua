@@ -34,8 +34,10 @@ local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip"));
+Entity:Signal("remotelyUpdated")
 
 -- class name
 Entity.class_name = "EntityMovieClip";
@@ -266,6 +268,19 @@ function Entity:AutoSelectActorInEditor()
 			MovieClipController.SetFocusToItemStack(cameraItem);
 		end
 	end
+end
+
+-- called when the user clicks on the block
+-- @return: return true if it is an action block and processed . 
+function Entity:OnClick(x, y, z, mouse_button, entity, side)
+	if(GameLogic.isRemote) then
+		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+			self:OpenEditor("entity", entity);	
+		end
+	else
+		return Entity._super.OnClick(self, x, y, z, mouse_button, entity, side);
+	end
+	return true;
 end
 
 -- virtual function: right click to edit. 
@@ -601,6 +616,34 @@ end
 -- @param slot: type of ItemSlot in Container View, such as self.rulebagView
 function Entity:OnClickEmptySlot(slot)
 	self:CreateItemOnSlot(slot);
+end
+
+-- Overriden to provide the network packet for this entity.
+function Entity:GetDescriptionPacket()
+	local x,y,z = self:GetBlockPos();
+	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:SaveToXMLNode());
+end
+
+-- update from packet. 
+function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
+	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
+		local node = packet_UpdateEntityBlock.data1;
+		if(node) then
+			self.length = nil;
+			self:LoadFromXMLNode(node)
+			local movieClip = self:GetMovieClip()
+			if(movieClip and movieClip:HasCreatedActors()) then
+				movieClip:RemoveAllActors();
+				movieClip:RefreshActors();
+			end
+			self:remotelyUpdated();
+		end
+	end
+end
+
+function Entity:EndEdit()
+	Entity._super.EndEdit(self);
+	self:MarkForUpdate();
 end
 
 -- called every frame

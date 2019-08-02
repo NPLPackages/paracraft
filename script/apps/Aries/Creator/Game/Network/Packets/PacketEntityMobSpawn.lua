@@ -18,20 +18,32 @@ local PacketEntityMobSpawn = commonlib.inherit(commonlib.gettable("MyCompany.Ari
 function PacketEntityMobSpawn:ctor()
 end
 
+-- @param entity: in case of client to server packet, it is a pure table containing {x,y,z,item_id, }. 
+-- in case of server to client, it is the real server entity. 
 function PacketEntityMobSpawn:Init(entity, entity_type)
-	self.entityId = entity.entityId;
-	self.x = math.floor(entity.x * 32);
-    self.y = math.floor(entity.y * 32);
-    self.z = math.floor(entity.z * 32);
-	self.pitch = math.floor((entity.rotationPitch or 0) * 32);
-	self.yaw = math.floor((entity.rotationYaw or entity.facing or 0) * 32);
 	self.type = entity_type;
-	self.item_id = entity:GetItemId();
+	if(entity.GetItemId) then
+		self.entityId = entity.entityId;
+		self.x = math.floor(entity.x * 32);
+		self.y = math.floor(entity.y * 32);
+		self.z = math.floor(entity.z * 32);
+		self.pitch = math.floor((entity.rotationPitch or 0) * 32);
+		self.yaw = math.floor((entity.rotationYaw or entity.facing or 0) * 32);
+		self.item_id = entity:GetItemId();
 
-	-- for watched data fields
-	local dataWatcher  = entity:GetDataWatcher();
-	if(dataWatcher) then
-		self.metadata = dataWatcher:GetAllObjectList();
+		-- for watched data fields
+		local dataWatcher  = entity:GetDataWatcher();
+		if(dataWatcher) then
+			self.metadata = dataWatcher:GetAllObjectList();
+		end
+	else
+		self.x = math.floor(entity.x * 32);
+		self.y = math.floor(entity.y * 32);
+		self.z = math.floor(entity.z * 32);
+		self.pitch = math.floor((entity.rotationPitch or 0) * 32);
+		self.yaw = math.floor((entity.rotationYaw or entity.facing or 0) * 32);
+		self.item_id = entity.item_id;
+		self.metadata = entity.metadata;
 	end
 	return self;
 end

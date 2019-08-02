@@ -106,8 +106,8 @@ function ParaWorldAnalytics:Init(UA)
 	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id,
 													  self.app_name, self.app_version, self.api_rate);
 
-	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: %s %s %s %s %s %s",
-			self.UA, self.user_id, self.client_id, self.app_name, self.app_version, self.api_rate);
+	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: %s %s %s %s %s %d",
+			self.UA, self.user_id or "", self.client_id or "", self.app_name, self.app_version, self.api_rate);
 	return self;
 end
 

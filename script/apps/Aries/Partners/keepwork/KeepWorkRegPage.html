@@ -120,17 +120,27 @@ function OnClose()
     MyCompany.Aries.keepwork.KeepWorkRegPage.OnClose();
 end
 
+function OnClickRegisterExternally()
+    ParaGlobal.ShellExecute("open", "https://keepwork.com/u/r/register", "", "", 1);
+    MyCompany.Aries.keepwork.KeepWorkRegPage.OnClose();
+end
+
 ]]></script>
 <div width="660px" height="450px" style="margin-left:150px;margin-top:50px;background:url(Texture/Aries/Common/Notification_bg_32bits.png: 30 30 30 30)">
         <input style="position:relative;margin-left:600px;margin-top:-15px;width:54px;height:54px;background:url(Texture/Aries/Common/Close_Big_54_32bits.png#0 0 54 54);" type="button" name="close" 
             zorder="2" onclick="OnClose();" value=""/>
 <form name="AriesUserReg">
     
-    <div style="margin-left:260px;margin-top:40px;font-weight:bold;font-size:14px;">
+    <div style="margin-left:260px;margin-top:30px;font-weight:bold;font-size:14px;">
         注册KeepWork账号
+        
     </div>
-    
-    <div style="margin-top:16px;margin-left:48px;margin-right:60px">
+    <div style="margin-left:58px;margin:10px;">
+        到Keepwork官网注册<span style="color:#ee0000">(强烈推荐)</span>
+        <input type="button" value="打开注册网页" tooltip="点击打开 https://keepwork.com/" style="margin-left:10px;margin-top:-4px;min-width:150px;height:30px" onclick="OnClickRegisterExternally"/> 
+    </div>
+
+    <div style="margin-top:10px;margin-left:48px;margin-right:60px">
 
     <pe:if condition='<%=not Eval("realname_reg")%>'> 
 

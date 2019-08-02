@@ -145,7 +145,7 @@ function Entity:WakeUpPlayer(bResetSleepTime, bUpdateSleepFlag, bSpawnInChunk)
     end
 end
 
--- on recieving this message the client (if permission is given) will download the requested textures
+-- on receiving this message the client (if permission is given) will download the requested textures
 function Entity:RequestTexturePackLoad(texture_pack)
 	self:SendPacketToPlayer(Packets.PacketCustomPayload:new():Init("PC|TexturePack", texture_pack));
 end
@@ -191,7 +191,7 @@ function Entity:FrameMoveRidding(deltaTime)
 end
 
 -- update the entity's position and logic per tick.
--- the actually framemove is in NetServerHandler:handleMove, so here we just send cached changes to client. 
+-- the actual framemove is in NetServerHandler:handleMove, so here we just send cached changes to client. 
 function Entity:OnUpdate()
 	if(not self.playerNetServerHandler) then
 		self:OnUpdateServerPlayer();

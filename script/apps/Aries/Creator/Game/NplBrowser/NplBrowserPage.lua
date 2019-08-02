@@ -8,35 +8,37 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
 local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
 NplBrowserPage.Open();
+NplBrowserPage.Open("test","www.keepwork.com","title",nil,"_ct",100,100,400,600);
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
-local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
+
+local NplBrowserPage = commonlib.inherit(nil,commonlib.gettable("NplBrowser.NplBrowserPage"));
 
 NplBrowserPage.width = 800;
 NplBrowserPage.height = 560;
 NplBrowserPage.default_window_name = "NplBrowserWindow_Instance";
 NplBrowserPage.default_template_url = "script/apps/Aries/Creator/Game/NplBrowser/pe_nplbrowser_template.html";
 NplBrowserPage.default_url = "www.keepwork.com";
-NplBrowserPage.url = nil;
-NplBrowserPage.is_show = false;
-function NplBrowserPage.Init()
-    NplBrowserPage.pageCtrl= document:GetPageCtrl();
-end
 
-function NplBrowserPage.Open(name, url, alignment, x, y, width, height, window_template_url, zorder)
-    NplBrowserLoaderPage.Check(function(result)
-        if(result)then
-            NplBrowserPage._Open(name, url, alignment, x, y, width, height, window_template_url, zorder)
-        end
-    end)
+NplBrowserPage.pages_map= {}; -- hold window's name and NplBrowserPage instance
+function NplBrowserPage.CheckNumber(v)
+    if(v == nil)then
+        return
+    end
+    if(type(v) == "string")then
+        v = tonumber(v);
+    end
+    return v;
 end
--- Create or open a cef window.
+-- Create a cef window.
 -- @param name:an unique window's name, default value is "NplBrowserWindow_Instance".
 -- @param url:a web address which will be opened by cef window.
+-- @param title: the title of window
+-- @param withControl: true show control bar
 -- @param alignment:window's alignment,default value is "_ct" which means center top alignment. "_lt" may be a common choice, it means left top alignment.
 -- @param x:window's x coordinates. the original point locate at left top corner.
 -- @param x:window's y coordinates. the original point locate at left top corner.
@@ -44,18 +46,23 @@ end
 -- @param height:window's height.
 -- @param window_template_url:a mcml page which rendering the style of cef window, default value is "Mod/NplBrowser/pe_nplbrowser_template.html"
 -- @param zorder:the show level of Window,default value is 10001.
-function NplBrowserPage._Open(name, url, alignment, x, y, width, height, window_template_url, zorder)
-    NplBrowserPage.url = url or NplBrowserPage.default_url;
+function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
+    url = url or NplBrowserPage.default_url;
 	name = name or NplBrowserPage.default_window_name;
 	zorder = zorder or 10001;
 	alignment = alignment or "_ct";
-	width = width or NplBrowserPage.width;
-	height = height or NplBrowserPage.height
+	width = NplBrowserPage.CheckNumber(width) or NplBrowserPage.width;
+	height = NplBrowserPage.CheckNumber(height) or NplBrowserPage.height
 
-	x = x or -width/2;
-	y = y or -height/2;
+	x = NplBrowserPage.CheckNumber(x) or -width/2;
+	y = NplBrowserPage.CheckNumber(y) or -height/2;
 		
 	window_template_url = window_template_url or NplBrowserPage.default_template_url;
+
+    self.name = name;
+    self.url = url;
+    self.title = title;
+    self.withControl = withControl;
     local params = {
 		url = window_template_url, 
 		name = name, 
@@ -75,19 +82,64 @@ function NplBrowserPage._Open(name, url, alignment, x, y, width, height, window_
 			height = height,
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	
+    self.params = params;
 
-    params._page.OnClose = function()
-        NplBrowserPage.SetVisible(false)
+    local pageCtrl = params._page;
+    if(pageCtrl)then
+        self.pageCtrl = pageCtrl;
+        NplBrowserPage.pages_map[name] = self;
+        pageCtrl.npl_browser_page = self;
+        pageCtrl.OnClose = function()
+            self:SetVisible(false)
+        end
+
+        -- make pe_nplbrowser_template.html can find himself
+        pageCtrl:Refresh(0);
+        self:Reload();
     end
-    local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-        NplBrowserPage.SetVisible(NplBrowserPage.pageCtrl:IsVisible())
-	end})
-	mytimer:Change(500)
+    return self;
 end
-function NplBrowserPage.SetVisible(b)
-    if(NplBrowserPage.pageCtrl)then
-        NplBrowserPage.pageCtrl:CallMethod("nplbrowser_instance", "SetVisible", b); 
+
+-- Create or open a cef window after download resources
+function NplBrowserPage.Open(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
+    NplBrowserLoaderPage.Check(function(result)
+        if(result)then
+	        name = name or NplBrowserPage.default_window_name;
+            local npl_browser_page = NplBrowserPage.GetPage(name);
+            if(not npl_browser_page)then
+                NplBrowserPage:new():Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
+            else
+                npl_browser_page:Close()
+                local params = npl_browser_page.params;
+                System.App.Commands.Call("File.MCMLWindowFrame", params);	
+                npl_browser_page:SetVisible(true);
+                npl_browser_page:Reload();
+            end
+        end
+    end)
+end
+function NplBrowserPage:Reload()
+    if(self.pageCtrl)then
+        self.pageCtrl:CallMethod("nplbrowser_instance", "Reload", self.url); 
     end
+end
+function NplBrowserPage:SetVisible(b)
+    if(self.pageCtrl)then
+        self.pageCtrl:CallMethod("nplbrowser_instance", "SetVisible", b); 
+    end
+end
+function NplBrowserPage:Close()
+	self:SetVisible(false)
+    if(self.pageCtrl)then
+		self.pageCtrl:CloseWindow(); 
+    end
+end
+-- get the instance of NplBrowserPage
+function NplBrowserPage.GetPage(name)
+    if(not name)then
+        return
+    end
+    return NplBrowserPage.pages_map[name];
 end
 
 

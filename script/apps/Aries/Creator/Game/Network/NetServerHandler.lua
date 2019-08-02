@@ -20,6 +20,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local rshift = mathlib.bit.rshift;
 local lshift = mathlib.bit.lshift;
@@ -329,6 +330,17 @@ function NetServerHandler:handleUpdateEntitySign(packet_UpdateEntitySign)
 	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntitySign.x, packet_UpdateEntitySign.y, packet_UpdateEntitySign.z)
 	if(blockEntity) then
 		blockEntity:OnUpdateFromPacket(packet_UpdateEntitySign);
+
+		self:GetServerManager():SendPacketToAllPlayersExcept(Packets.PacketUpdateEntitySign:new():Init(packet_UpdateEntitySign.x, packet_UpdateEntitySign.y, packet_UpdateEntitySign.z, packet_UpdateEntitySign.text, packet_UpdateEntitySign.data, packet_UpdateEntitySign.text2), self.playerEntity);
+	end
+end
+
+function NetServerHandler:handleUpdateEntityBlock(packet_UpdateEntityBlock)
+	local blockEntity = EntityManager.GetBlockEntity(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z)
+	if(blockEntity) then
+		blockEntity:OnUpdateFromPacket(packet_UpdateEntityBlock);
+
+		self:GetServerManager():SendPacketToAllPlayersExcept(Packets.PacketUpdateEntityBlock:new():Init(packet_UpdateEntityBlock.x, packet_UpdateEntityBlock.y, packet_UpdateEntityBlock.z, packet_UpdateEntityBlock.data1, packet_UpdateEntityBlock.data2, packet_UpdateEntityBlock.data3), self.playerEntity);
 	end
 end
 
@@ -377,4 +389,73 @@ end
 
 function NetServerHandler:handleEntityTeleport(packet_EntityTeleport)
 	self:SetTeleporting(false);
+end
+
+-- handles a get file request from client
+function NetServerHandler:handleGetFile(packet_GetFile)
+	if(packet_GetFile.filename) then
+		if(not packet_GetFile.data) then
+			local data;
+			local filename = Files.GetWorldFilePath(packet_GetFile.filename)
+			if(filename) then
+				local file = ParaIO.open(filename, "r")
+				if(file:IsValid()) then
+					data = file:GetText(0, -1);
+					file:close();
+				end
+			end
+			self:SendPacketToPlayer(Packets.PacketGetFile:new():Init(packet_GetFile.filename, data or ""));
+		end
+	end
+end
+
+function NetServerHandler:handlePutFile(packet_PutFile)
+	if(packet_PutFile.filename) then
+		if(packet_PutFile.data and packet_PutFile.data ~= "") then
+			local filename = Files.WorldPathToFullPath(packet_PutFile.filename)
+			if(filename) then
+				ParaIO.CreateDirectory(filename);
+				local file = ParaIO.open(filename, "w")
+				if(file:IsValid()) then
+					file:WriteString(packet_PutFile.data, #(packet_PutFile.data));
+					file:close();
+					LOG.std(nil, "info", "NetServerHandler", "world file received and saved to %s", filename)
+					-- broadcast to all clients without file data, so the client can decide whether to request the file.
+					self:GetServerManager():SendPacketToAllPlayers(Packets.PacketPutFile:new():Init(packet_PutFile.filename));
+				end
+			end
+		end
+	end
+end
+
+function NetServerHandler:handleMobSpawn(packet_MobSpawn)
+	if(not packet_MobSpawn.x) then
+		return 
+	end
+	local x = packet_MobSpawn.x / 32;
+    local y = packet_MobSpawn.y / 32;
+    local z = packet_MobSpawn.z / 32;
+   
+	local spawnedEntity;
+    local entity_type = packet_MobSpawn.type;
+	if(entity_type == 11) then
+		spawnedEntity = EntityManager.EntityMob:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["player_spawn_point"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "mob");
+	elseif(entity_type == 12) then
+		spawnedEntity = EntityManager.EntityNPC:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["villager"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "NPC");
+	elseif(entity_type == 13) then
+		spawnedEntity = EntityManager.EntityItem:new():Init(x,y,z, ItemStack:new():Init(packet_MobSpawn.item_id,1));
+		LOG.std(nil, "debug", "server::handleMobSpawn", "item: %d", packet_MobSpawn.item_id or -1);
+	elseif(entity_type == 14) then
+		spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"]});
+		LOG.std(nil, "debug", "server::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
+	else
+		-- TODO: add other types
+	end
+	
+	-- add to world
+	if(spawnedEntity) then
+		spawnedEntity:Attach();
+	end
 end

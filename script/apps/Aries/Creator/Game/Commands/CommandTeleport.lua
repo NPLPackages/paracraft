@@ -80,7 +80,6 @@ format: /tp home -- teleport to home
 Commands["goto"] = {
 	name="goto", 
 	quick_ref="/goto [@playername] [home] [x y z]", 
-	isLocal=false,
 	desc=[[teleport current player to a given block position relative to given player. Similar to /tp except that it uses block position. 
 Examples:
 /goto x y z  current focused entity
