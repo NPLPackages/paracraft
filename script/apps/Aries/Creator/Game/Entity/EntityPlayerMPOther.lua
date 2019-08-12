@@ -110,6 +110,10 @@ function Entity:UpdateEntityActionState()
 		self:SetBlockInRightHand(curBlockIdInHand);
 		self:RefreshRightHand();
 	end
+	local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
+	if(curMainAsset~=self:GetMainAssetPath()) then
+		self:SetMainAssetPath(curMainAsset);
+	end
 	GameLogic.GetFilters():apply_filters("entity_player_mp_other_entity_action_state_updated", self);
 end
 

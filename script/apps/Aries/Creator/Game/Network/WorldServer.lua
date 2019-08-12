@@ -88,16 +88,32 @@ function WorldServer:OnPreloadWorld()
 	GameLogic.SetIsRemoteWorld(false, true);
 end
 
+function WorldServer:GetAdminUserName()
+	local admin_name = System.User.username; -- or System.User.NickName
+	if(not admin_name or admin_name == "") then
+		admin_name = "admin"
+	else
+		admin_name = admin_name.."_admin";
+	end
+	return admin_name;
+end
+
 -- the server world will spawn a admin MP player on behalf of itself and assign it to PlayerController. 
 -- this is the case, where the server process is a on private server with 3D rendering.  
 function WorldServer:CreateAdminPlayer()
 	if(self.isIntegratedServer) then
-		local entityMP = self:GetServerManager():CreatePlayerForUser("admin");
+		
+		local entityMP = self:GetServerManager():CreatePlayerForUser(self:GetAdminUserName());
 		local oldPlayer = EntityManager.GetPlayer();
 		if(oldPlayer) then
+			entityMP:SetAdmin(true);
+			entityMP:SetMainAssetPath(oldPlayer:GetMainAssetPath());
 			entityMP:SetSkin(oldPlayer:GetSkin());
 			entityMP:SetGravity(oldPlayer:GetGravity());
 			entityMP:SetPosition(oldPlayer:GetPosition());
+			if(entityMP:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
+				System.ShowHeadOnDisplay(true, entityMP:GetInnerObject(), entityMP:GetDisplayName(), GameLogic.options.PlayerHeadOnTextColor);	
+			end
 		end
 		entityMP:Attach();
 		GameLogic.GetPlayerController():SetMainPlayer(entityMP);

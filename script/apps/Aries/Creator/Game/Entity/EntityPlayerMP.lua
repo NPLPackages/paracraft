@@ -26,6 +26,8 @@ local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayerMP"));
 -- class name
 Entity.class_name = "PlayerMP";
+Entity:Property({"isAdmin", nil, "IsAdmin", "SetAdmin", auto=true});
+
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 
 -- player is always framemoved as fast as possible
@@ -298,6 +300,10 @@ function Entity:UpdateEntityActionState()
 	local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);
 	if(curBlockIdInHand~=self:GetBlockInRightHand()) then
 		self:SetBlockInRightHand(curBlockIdInHand);
+	end
+	local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
+	if(curMainAsset~=self:GetMainAssetPath()) then
+		self:SetMainAssetPath(curMainAsset);
 	end
 
 	GameLogic.GetFilters():apply_filters("entity_player_mp_entity_action_state_updated", self);

@@ -36,6 +36,7 @@ end
 function Entity:init(world, netHandler, entityId)
 	self:SetEntityId(entityId);
 	self:SetUserName(netHandler:GetUserName());
+	self:SetDisplayName(netHandler:GetUserName());
 	self.worldObj = world; -- Entity._super.init(self, world);
 	self.netHandler = netHandler;
 	self.oldPosX = 0;
@@ -69,7 +70,7 @@ function Entity:CreateInnerObject(...)
 	local obj = Entity._super.CreateInnerObject(self, self:GetMainAssetPath(), true, 0, 1);
 
 	if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
-		System.ShowHeadOnDisplay(true, obj, "me" or self:GetDisplayName(), GameLogic.options.NPCHeadOnTextColor);	
+		System.ShowHeadOnDisplay(true, obj, self:GetDisplayName(), GameLogic.options.PlayerHeadOnTextColor);	
 	end
 	return obj;
 end

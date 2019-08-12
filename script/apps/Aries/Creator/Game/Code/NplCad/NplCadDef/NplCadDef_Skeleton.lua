@@ -70,7 +70,7 @@ createJointRoot()
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'createJoint("%s",%s,%s,%s)\\n%sendJoint()',
+	func_description = 'createJoint(%s,%s,%s,%s)\\n%sendJoint()',
 	ToNPL = function(self)
 		return string.format('createJoint("%s",%s,%s,%s)\n    %s\nendJoint()\n', 
             self:getFieldValue('name'),
@@ -99,7 +99,6 @@ endJoint()
 	},
 	category = "Skeleton", 
 	helpUrl = "", 
-    colour = "#1567a9",
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,

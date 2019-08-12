@@ -99,7 +99,7 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	default_render_dist = 96,
 	-- headon display text color
 	NPCHeadOnTextColor = "12 245 5",
-	PlayerHeadOnTextColor = "250 250 250",
+	PlayerHeadOnTextColor = "255 255 255",
 	-- whether to save light map to disk. default to false. 
 	-- TODO: currently compression is not enabled, and there are lots of zero. Remove those zeros and only save light around the player. 
 	-- this is usually not necessary since light is calculated in a separate thread and is usually very fast. 

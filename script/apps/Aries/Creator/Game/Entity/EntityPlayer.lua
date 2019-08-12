@@ -91,6 +91,8 @@ function Entity:ctor()
 	self.dataFieldSkin = dataWatcher:AddField(nil, nil);
 	-- block in hand. only used in network mode.  
 	self.dataBlockInHand = dataWatcher:AddField(nil, nil);
+	-- main asset path. only used in network mode.  
+	self.dataMainAsset = dataWatcher:AddField(nil, nil);
 	self:SetPhysicsRadius(0.5);
 	self:SetPhysicsHeight(1.765);
 end
@@ -108,6 +110,7 @@ function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
 		self:RefreshClientModel(true);
+		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 		return true;
 	end
 end

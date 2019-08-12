@@ -162,11 +162,20 @@ end
 function Actor:IsTouchingActorByName(actorname)
 	local entity = self:GetEntity();
 	if(entity) then
-		local entities = EntityManager.GetEntitiesByAABBOfType(EntityManager[self.entityClass], entity:GetCollisionAABB())
+		local aabb = entity:GetCollisionAABB();
+		local min_x, min_y, min_z = aabb:GetMinValues();
+		local max_x, max_y, max_z = aabb:GetMaxValues();
+	
+		min_x, min_y, min_z = BlockEngine:block(min_x, min_y, min_z);
+		max_x, max_y, max_z = BlockEngine:block(max_x, max_y, max_z);
+
+		-- tricky: we will assume, the size of actorname is smaller than 1 block. 
+		local actorSize = 1;
+		local entities = EntityManager.GetEntitiesByMinMax(min_x-actorSize, min_y-actorSize, min_z-actorSize, max_x+actorSize, max_y+actorSize, max_z+actorSize, EntityManager[self.entityClass])
 		if (entities and #entities > 1) then
 			for i=1, #entities do
 				local entity2 = entities[i];
-				if(entity2 ~= entity and entity2:GetActor():GetName() == actorname and entity:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+				if(entity2 ~= entity and entity2:GetActor():GetName() == actorname and aabb:Intersect(entity2:GetCollisionAABB())) then
 					return true
 				end
 			end
@@ -200,7 +209,7 @@ function Actor:CalculatePushOut(dx, dy, dz)
 	end
 end
 
--- only bounce in horizontal XZ plain, it just changes the direction/facing of the actor, so that the actor moves aways from the collision. 
+-- only bounce in horizontal XZ plain, it just changes the direction/facing of the actor, so that the actor moves away from the collision. 
 function Actor:Bounce()
 	if(not self.entity) then
 		return;

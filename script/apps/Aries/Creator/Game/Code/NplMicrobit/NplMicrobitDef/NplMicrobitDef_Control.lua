@@ -12,50 +12,73 @@ local NplMicrobitDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.Npl
 local NplMicrobitDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.NplMicrobit.NplMicrobitDef_Control");
 local cmds = {
 {
-	type = "rotateBone", 
-	message0 = L"舵机 %1 %2 旋转骨骼 %3 %4 %5",
-	arg0 = {
-        {
-			name = "channel",
-			type = "field_dropdown",
-			options = {
-				{ L"S1", "0" },
-				{ L"S2", "1" },
-				{ L"S3", "2" },
-				{ L"S4", "3" },
-				{ L"S5", "4" },
-				{ L"S6", "5" },
-				{ L"S7", "6" },
-				{ L"S8", "7" },
-			},
-		},
-        {
-			name = "angle",
-			type = "input_value",
-            shadow = { type = "math_number", value = 150,},
-			text = 150, 
-		},
+	type = "microbit.start", 
+	message0 = L"启动%1",
+	message1 = L"%1",
+    arg0 = {
 		{
-			name = "name",
-			type = "input_value",
-            shadow = { type = "text", value = "L_UpperArm",},
-			text = "L_UpperArm", 
+			name = "label_dummy",
+			type = "input_dummy",
 		},
-        
-        {
-			name = "axis",
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	category = "NplMicrobit.Control", 
+	helpUrl = "", 
+	canRun = false,
+	nextStatement = true,
+	func_description_py = 'while True:\\n%s',
+	ToNPL = function(self)
+		return "";
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit.button.is_pressed", 
+	message0 = L"当 %1 按钮按下",
+	message1 = L"%1",
+    arg0 = {
+		{
+			name = "buttons",
 			type = "field_dropdown",
 			options = {
-				{ "x", "'x'" },
-				{ "y", "'y'" },
-				{ "z", "'z'" },
+				{ L"A", "button_a" },
+				{ L"B", "button_b" },
 			},
 		},
-         {
-			name = "duration",
-			type = "input_value",
-            shadow = { type = "math_number", value = 1000,},
-			text = 1000, 
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	category = "NplMicrobit.Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_py = 'if microbit.%s.is_pressed():\\n%s',
+	ToNPL = function(self)
+		return "";
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit.display.show", 
+	message0 = L"显示 %1",
+	arg0 = {
+        {
+			name = "text",
+            type = "field_matrix",
 		},
 	},
     
@@ -64,86 +87,23 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description_py = 'pwm.set_pwm(%d, 0, %d)',
+	func_description_py = 'microbit.display.show(GetImage("%s"))',
 	ToNPL = function(self)
-		return string.format('rotateBone("%s",%s,"%s",%s)\n', 
-            self:getFieldAsString('name'), 
-            self:getFieldAsString('angle'),
-            self:getFieldAsString('axis'), 
-            self:getFieldAsString('duration')
-            );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
 {
-	type = "boneNames", 
-	message0 = L"%1",
+	type = "microbit.display.scroll", 
+	message0 = L"显示 %1",
 	arg0 = {
         {
-			name = "name",
-			type = "field_dropdown",
-			options = {
-				{ L"头", "'Head'" },
-				{ L"脖子", "'Neck'" },
-				{ L"左大臂", "'L_UpperArm'" },
-				{ L"右大臂", "'R_UpperArm'" },
-				{ L"左前臂", "'L_Forearm'" },
-				{ L"右前臂", "'R_Forearm'" },
-				{ L"左手", "'L_Hand'" },
-				{ L"右手", "'R_Hand'" },
-				{ L"脊柱", "'Spine'" },
-				{ L"骨盆", "'Pelvis'" },
-				{ L"左大腿", "'L_Thigh'" },
-				{ L"右大腿", "'R_Thigh'" },
-				{ L"左小腿", "'L_Calf'" },
-				{ L"右小腿", "'R_Calf'" },
-                { L"左脚", "'L_Foot'" },
-				{ L"右脚", "'R_Foot'" },
-			},
+			name = "text",
+            type = "input_value",
+            shadow = { type = "text", value = L"hello",},
+			text = L"hello", 
 		},
-	},
-    
-	category = "NplMicrobit.Control", 
-	helpUrl = "", 
-	canRun = false,
-    output = {type = "null",},
-	func_description = '%s',
-	ToNPL = function(self)
-		return string.format('%s', 
-            self:getFieldAsString('name')
-            );
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "rotateServo", 
-	message0 = L"旋转舵机 %1 %2",
-	arg0 = {
-        {
-			name = "channel",
-			type = "field_dropdown",
-			options = {
-				{ L"S1", "0" },
-				{ L"S2", "1" },
-				{ L"S3", "2" },
-				{ L"S4", "3" },
-				{ L"S5", "4" },
-				{ L"S6", "5" },
-				{ L"S7", "6" },
-				{ L"S8", "7" },
-			},
-		},
-        {
-			name = "angle",
-			type = "input_value",
-            shadow = { type = "math_number", value = 150,},
-			text = 150, 
-		},
-        
 	},
     
 	category = "NplMicrobit.Control", 
@@ -151,7 +111,25 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description_py = 'pwm.set_pwm(%d, 0, %d)',
+	func_description_py = 'microbit.display.scroll(%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit.display.clear", 
+	message0 = L"清除显示",
+	arg0 = {
+	},
+    
+	category = "NplMicrobit.Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_py = 'microbit.display.clear()',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -177,85 +155,7 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description_py = 'sleep(%d)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "microbit.display.show", 
-	message0 = L"显示 %1 %2",
-	arg0 = {
-        {
-			name = "text",
-            type = "input_value",
-            shadow = { type = "text", value = L"hello!",},
-			text = L"hello!", 
-		},
-         {
-			name = "time",
-			type = "input_value",
-            shadow = { type = "math_number", value = 400,},
-			text = 400, 
-		},
-	},
-    
-	category = "NplMicrobit.Control", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_py = 'display.show(%s,%d)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "microbit.display.scroll", 
-	message0 = L"滚动显示 %1 %2",
-	arg0 = {
-        {
-			name = "text",
-            type = "input_value",
-            shadow = { type = "text", value = L"hello!",},
-			text = L"hello!", 
-		},
-        {
-			name = "time",
-			type = "input_value",
-            shadow = { type = "math_number", value = 400,},
-			text = 400, 
-		},
-	},
-    
-	category = "NplMicrobit.Control", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_py = 'display.scroll(%s,%d)',
-	ToNPL = function(self)
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "microbit.display.clear", 
-	message0 = L"清除显示",
-	arg0 = {
-	},
-    
-	category = "NplMicrobit.Control", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_py = 'display.clear()',
+	func_description_py = 'microbit.sleep(%d)',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[

@@ -25,15 +25,16 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
 	local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
     local x = screen_x + left;
 	local y = screen_y + top;
-    local input = {id = id, url = url, withControl = withControl, x = x, y = y, width = screen_width, height = screen_height, resize = true, };
+    local input = {id = id, url = url, withControl = withControl, x = x, y = y, width = screen_width, height = screen_height, resize = true, visible = true, };
     if(min_width and min_width > 0 and screen_width < min_width)then
         input.zoom = -1;
     else
         input.zoom = 0;
     end
-    NplBrowserPlugin.OnCreatedCallback(function(msg)
+    NplBrowserPlugin.OnCreatedCallback(id,function(msg)
         if(msg)then
             local cmd = msg["cmd"];
+            local id = msg["id"];
             if(cmd == "CheckCefWindow")then
                 local config = NplBrowserPlugin.GetCache(id);
                 if(config)then
@@ -46,9 +47,11 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
         NplBrowserPlugin.Open(input);
     else
 	    NplBrowserPlugin.Start(input);
+        
     end
-    -- force save cache for zooming 
+    -- force save cache for zooming when run pe_nplbrowser.SetVisible after opened cef browser
     NplBrowserPlugin.UpdateCache(id,input)
+
 	CommonCtrl.AddControl(id, id);
 
     local function resize(id,_parent)
@@ -86,9 +89,6 @@ function pe_nplbrowser.SetVisible(mcmlNode,name,visible)
 	if(config)then
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
-        if(visible)then
-            NplBrowserPlugin.Zoom(config)
-        end
 		if(not visible) then
 			commonlib.TimerManager.SetTimeout(function()  
 				ParaUI.GetUIObject("root"):Focus();
