@@ -46,8 +46,8 @@ BuildinMod.buildin_mods = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"NplBrowser", 
 		text=L"系统内置插件",
-		version = "0.0.12",
-		homepage = "https://github.com/NPLPackages/NplBrowserScript",
+		version = "0.0.14",
+		homepage = "https://github.com/tatfook/NplBrowser",
 	},
 	{
 		name = "STLExporter", 

@@ -315,7 +315,21 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 			if(item.filesize > 0) then
 				local source_path = zipParentDir..item.filename;
 				
-				local dest_path = destinationFolder..commonlib.Encoding.Utf8ToDefault(filename);
+				-- tricky: we do not know which encoding the filename in the zip archive is,
+				-- so we will assume it is utf8, we will convert it to default and then back to utf8.
+				-- if the file does not change, it might be utf8. 
+				local dest_path;
+				local defaultEncodingFilename = commonlib.Encoding.Utf8ToDefault(filename)
+				if(defaultEncodingFilename == filename) then
+					dest_path = destinationFolder..filename;
+				else
+					if(commonlib.Encoding.DefaultToUtf8(defaultEncodingFilename) == filename) then
+						dest_path = destinationFolder..defaultEncodingFilename;
+					else
+						dest_path = destinationFolder..filename;
+					end
+				end
+
 				local re = ParaIO.CopyFile(source_path, dest_path, true);
 				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
 			else
@@ -326,7 +340,7 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 		LOG.std(nil, "info", "CopyWorldTo", "%s is unziped to %s ( %d files)", worldzipfile, destinationFolder, fileCount); 
 		return true;
 	else
-		-- search just in a given zip archive file
+		-- search just in disk file
 		local filesOut = {};
 		local parentDir = GameLogic.GetWorldDirectory();
 		commonlib.Files.Find(filesOut, parentDir, 10, 10000, "*");
