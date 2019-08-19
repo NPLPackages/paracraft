@@ -232,7 +232,7 @@ function QuickSelectBar.ShowPage(bShow)
 		height = 78;
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.mobile.html"; 
 	else
-		width = 412;
+		width = 455;
 		height = 96;
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html";
 	end
@@ -415,4 +415,8 @@ end
 -- user clicks the inventory button. 
 function QuickSelectBar.OnClickInventory()
 	GameLogic.ToggleDesktop("builder");
+end
+
+function QuickSelectBar.OnClickOnlineStore()
+	GameLogic.RunCommand("/open store");
 end

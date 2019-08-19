@@ -22,6 +22,7 @@ Commands["install"] = {
 /install -ext bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
 /install -ext fbx -filename car https://cdn.keepwork.com/paracraft/officialassets/car.fbx
 /install -ext x -filename car https://cdn.keepwork.com/paracraft/officialassets/car.x
+/install -ext blocks -filename car https://cdn.keepwork.com/paracraft/officialassets/car.blocks.xml
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options;
@@ -54,11 +55,13 @@ Commands["install"] = {
 			if(url:match("^https?://")) then
 				local filename = options["filename"];
 				local ext = options["ext"] or "bmax";
-				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx") then
+				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx" and ext ~= "blocks") then
 					LOG.std(nil, "warn", "CommandInstall", "unknown file extension %s for %s", ext, filename);
 					return;
 				end
-				if(not filename:match("%."..ext.."$")) then
+				if((ext == "blocks" or ext == "blocks.xml" or ext == "template") and not filename:match("%.blocks%.xml$")) then
+					filename = filename..".blocks.xml";
+				elseif(not filename:match("%."..ext.."$")) then
 					filename = filename.."."..ext;
 				end
 				filename = "blocktemplates/"..filename;
@@ -69,6 +72,10 @@ Commands["install"] = {
 					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 5000, "0 255 0");
 					GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
 				end
+
+				GameLogic.GetFilters():apply_filters("OnInstallModel", filename, url);
+
+
 				if(ParaIO.DoesFileExist(dest, true)) then
 					TakeBlockModel_(filename)
 				else

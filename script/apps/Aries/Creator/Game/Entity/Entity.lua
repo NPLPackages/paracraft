@@ -376,11 +376,7 @@ function Entity:SaveToXMLNode(node, bSort)
 		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory, bSort)};
 	end
 	if(self.cmd and self.cmd~="") then
-		if(commonlib.Encoding.HasXMLEscapeChar(self.cmd)) then
-			node[#node+1] = {name="cmd", [1]={name="![CDATA[", [1] = self.cmd}};
-		else
-			node[#node+1] = {name="cmd", [1] = self.cmd};
-		end
+		node[#node+1] = {name="cmd", [1] = self.cmd};
 	end
 
 	if(self.inventory and not self.inventory:IsEmpty()) then

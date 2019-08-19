@@ -8,9 +8,9 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local id = "nplbrowser_wnd";
-NplBrowserPlugin.Start({id = id, url = "http://www.keepwork.com", withControl = true, x = 0, y = 0, width = 800, height = 600, });
+NplBrowserPlugin.Start({id = id, url = "http://www.keepwork.com", withControl = true, x = 200, y = 200, width = 800, height = 600, });
 NplBrowserPlugin.OnCreatedCallback(id,function()
-    NplBrowserPlugin.Open({id = id, url = "http://www.baidu.com", resize = true, x = 100, y = 100, width = 300, height = 300, });
+    NplBrowserPlugin.Open({id = id, url = "http://www.keepwork.com", resize = true, x = 100, y = 100, width = 300, height = 300, });
     NplBrowserPlugin.Show({id = id, visible = false});
     NplBrowserPlugin.Show({id = id, visible = true});
     NplBrowserPlugin.Zoom({id = id, zoom = 1}); --200%

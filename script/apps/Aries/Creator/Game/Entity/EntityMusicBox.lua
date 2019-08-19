@@ -121,3 +121,29 @@ function Entity:OnClick(x, y, z, mouse_button)
 		return Entity._super.OnClick(self, x, y, z, mouse_button);
 	end
 end
+
+-- virtual function: right click to edit. 
+function Entity:OpenEditor(editor_name, entity)
+	if(self:IsServerEntity() and self:IsRemote()) then
+		LOG.std(nil, "info", "Entity:OpenEditor", "access denied, entity is only editable on server");
+		return;
+	end
+	if(editor_name == "entity") then
+		local old_value = self.cmd;
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
+			if(result and result ~= old_value) then
+				local filename = result;
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				if(filename~="" and not Files.GetWorldFilePath(filename)) then
+					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
+				else
+					self.cmd = filename;
+				end
+			end
+		end,old_value, L"声音文件", "audio")
+	end
+end

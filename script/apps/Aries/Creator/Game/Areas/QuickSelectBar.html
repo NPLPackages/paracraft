@@ -46,7 +46,7 @@ function OnCreateExpBar(params,node)
 	params.parent:AddChild(_this);
 end
 ]]></script>
-<div style="width:412px;height:96px;" >
+<div style="width:455px;height:96px;" >
     <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
         <div style="position:relative;height:12px;margin-left:5px;margin-top:27px;">
             <pe:container name="progress_wnd" visible='<%=QuickSelectBar.IProgressBar~=nil %>' style="background:;width:390px;">
@@ -61,7 +61,7 @@ end
     </pe:if>
     <!-- 自定义按钮 -->
     <div style="height:36px;margin-top:6px;width:412px;"></div>
-    <pe:container style="margin-top:5px;background:;width:412px;height:42px;">
+    <pe:container style="margin-top:5px;background:;width:455px;height:42px;">
         <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:-1px;margin-left:3px;width:42px;height:42px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)">
         </pe:container>
         <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" style="color:#cccccc;position:relative;font-weight:bold;font-size:14px;margin-top:-36px;background-color:#ffffffff;margin-left:3px;width:100px;height:28px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)" />
@@ -91,6 +91,9 @@ end
         <div style="position:relative;margin-left:373px;margin-top:0px;">
             <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
                 <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#350 342 36 36)"/>
+                <pe:if condition='<%=false%>'>
+                    <div style="float:left;position:relative;margin-top:0px;margin-left:6px;" ><input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickOnlineStore" tooltip='<%=L"元件库"%>' style="width:36px;height:36px;background:url(Texture/blocks/items/ts_char_on.png)"/></div>
+                </pe:if>
             </pe:if>
             <pe:if condition='<%=not GameLogic.GameMode:IsEditor()%>'>
                 <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#389 342 36 36)"/>

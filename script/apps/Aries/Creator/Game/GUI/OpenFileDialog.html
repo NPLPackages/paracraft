@@ -38,7 +38,7 @@ end
         <%=OpenFileDialog.GetText()%>
     </div>
     <div>
-        <input type="text" name="text" style="height:24px;width:320px"/>
+        <input type="text" name="text" enable_ime="false" style="height:24px;width:320px"/>
         <input type="button" class="mc_light_grey_button_with_fillet" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenFileDialog.OnOpenFileDialog"/>
         <pe:if condition='<%=OpenFileDialog.editButton~=nil%>'>
             <input type="button" class="mc_light_grey_button_with_fillet" name="btnEdit" value='<%=type(OpenFileDialog.editButton)=="table" and OpenFileDialog.editButton.text or L"编辑" %>' onclick="OpenFileDialog.OnClickEdit()" style="height:24px;margin-left:3px;min-width:30px;" />
