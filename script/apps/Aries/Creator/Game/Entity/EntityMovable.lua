@@ -79,7 +79,9 @@ function Entity:init()
 	local item = self:GetItemClass();
 	if(item) then
 		local x, y, z = self:GetPosition();
-
+		if(not self.x) then
+			self:SetPosition(x, y, z);
+		end
 		local ReplaceableTextures;
 		if(not self.skin) then
 			local skin = item:GetSkinFile();

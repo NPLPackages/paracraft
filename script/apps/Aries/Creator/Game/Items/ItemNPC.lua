@@ -104,7 +104,6 @@ function ItemNPC:OnCreate(result)
 			local entity = MyCompany.Aries.Game.EntityManager.EntityNPC:Create({bx=bx,by=by,bz=bz, 
 				item_id = self.block_id, facing=result.facing, can_random_move = false}, 
 				xmlSavedNode);
-			
 			EntityManager.AddObject(entity);
 			return true, entity;
 		end
