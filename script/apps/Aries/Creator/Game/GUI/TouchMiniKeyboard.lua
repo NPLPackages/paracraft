@@ -303,7 +303,7 @@ function TouchMiniKeyboard:OnTouch(touch)
 							btnItem.timer:Change(self.hover_press_hold_time);
 						end
 					end
-				elseif(btnItem.auto_mouseup)then
+				elseif(keydownBtn.auto_mouseup and btnItem.auto_mouseup)then
 					if(keydownBtn.isKeyDown) then
 						self:SetKeyState(keydownBtn, false);
 						touch_session:SetField("keydownBtn", btnItem);
