@@ -322,6 +322,18 @@ function Entity:SyncDataWatcher()
 	end
 end
 
+--virtual function:
+function Entity:SetScaling(v)
+	Entity._super.SetScaling(self, v);
+	if(GameLogic.isServer) then
+		local dataWatcher = self:GetDataWatcher();
+		local watchedScale = dataWatcher:GetField(self.dataFieldScale);
+		if(watchedScale ~= v) then
+			dataWatcher:SetField(self.dataFieldScale, v);
+		end
+	end
+end
+
 -- called every frame
 function Entity:FrameMove(deltaTime)
 	Entity._super.FrameMove(self, deltaTime);

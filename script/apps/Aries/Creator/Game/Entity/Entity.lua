@@ -1093,11 +1093,12 @@ end
 
 --virtual function:
 function Entity:SetScalingDelta(v)
-	
+	self:SetScaling(self:GetScaling() + v)
 end
 
 --virtual function:
 function Entity:SetFacingDelta(v)
+	self:SetFacing(self:GetFacing() + v)
 end
 
 -- set facing of the lower object. 

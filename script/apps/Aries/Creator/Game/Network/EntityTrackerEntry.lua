@@ -256,7 +256,7 @@ end
 
 function EntityTrackerEntry:SendWatchedData()
     local data = self.entity:GetDataWatcher();
-
+	
     if (data and data:HasChanges()) then
         self:SendPacketToAllAssociatedPlayers(Packets.PacketEntityMetadata:new():Init(self.entity.entityId, data, false));
     end

@@ -383,24 +383,6 @@ function Entity:RefreshSkin(player)
 	end
 end
 
---virtual function:
-function Entity:SetScalingDelta(v)
-	local obj = self:GetInnerObject();
-	if(obj) then
-		self.scaling = obj:GetScale() + v;
-		obj:SetScale(self.scaling);
-	end
-end
-
---virtual function:
-function Entity:SetFacingDelta(v)
-	local obj = self:GetInnerObject();
-	if(obj) then
-		self.facing = obj:GetFacing() + v;
-		obj:SetFacing(self.facing);
-	end
-end
-
 function Entity:doesEntityTriggerPressurePlate()
 	return true;
 end

@@ -106,6 +106,7 @@ function ItemNPC:OnCreate(result)
 				xmlSavedNode);
 			-- can not be pushed by other NPC
 			-- entity:SetStaticBlocker(true);
+			-- entity:SetDummy(true);
 			EntityManager.AddObject(entity);
 			return true, entity;
 		end
