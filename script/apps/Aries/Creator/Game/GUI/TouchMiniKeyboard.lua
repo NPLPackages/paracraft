@@ -57,13 +57,14 @@ TouchMiniKeyboard.DefaultKeyLayout = {
 	},
 	{
 		{name="Shift", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true},
-		{name="W", col=1, vKey = DIK_SCANCODE.DIK_W, auto_mouseup = true},
+		-- tricky: when W key is pressed, we will assume right mouse button is down, so that the user can simultaneously control player facing
+		{name="W", col=1, vKey = DIK_SCANCODE.DIK_W, auto_mouseup = true, toggleRightMouseButton=true},
 		{name="E", col=1, colorid=3, vKey = DIK_SCANCODE.DIK_E},
 	},
 	{
-		{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A, auto_mouseup = true},
-		{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S, auto_mouseup = true},
-		{name="D", col=1, vKey = DIK_SCANCODE.DIK_D, auto_mouseup = true},
+		{name="A", col=1, ctrl_name="Y", vKey = DIK_SCANCODE.DIK_A, auto_mouseup = true, toggleRightMouseButton=true},
+		{name="S", col=1, ctrl_name="S", vKey = DIK_SCANCODE.DIK_S, auto_mouseup = true, toggleRightMouseButton=true},
+		{name="D", col=1, vKey = DIK_SCANCODE.DIK_D, auto_mouseup = true, toggleRightMouseButton=true},
 	},
 	{
 		{name="Ctrl", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true},
