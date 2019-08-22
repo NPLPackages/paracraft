@@ -180,10 +180,10 @@ function NetServerHandler:handleMove(packet_move)
 		if (mDistSq > 100) then
 			LOG.std(nil, "warn", "NetServerHandler", "%s moved too fast", self.playerEntity:GetUserName());
 			-- server rule1: revert to old position
-			self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
+			--self:SetPlayerLocation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
 
 			-- server rule2: teleport to the given position. 
-			--self.playerEntity:SetPositionAndRotation(posX, posY+collision_offset, posZ, rotYaw, rotPitch);
+			self.playerEntity:SetPositionAndRotation(posX, posY+collision_offset, posZ, rotYaw, rotPitch);
 		else
 			local bNoCollision = worldserver:GetCollidingBoundingBoxes(self.playerEntity:GetCollisionAABB():clone_from_pool():Expand(-collision_offset, -collision_offset, -collision_offset), self.playerEntity) == nil;
 

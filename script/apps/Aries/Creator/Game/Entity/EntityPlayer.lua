@@ -87,6 +87,8 @@ function Entity:ctor()
 	local dataWatcher = self:GetDataWatcher(true);
 	-- animation data. 
 	self.dataFieldAnim = dataWatcher:AddField(nil, nil);
+	-- scale data. 
+	self.dataFieldScale = dataWatcher:AddField(nil, nil);
 	-- skin data. 
 	self.dataFieldSkin = dataWatcher:AddField(nil, nil);
 	-- block in hand. only used in network mode.  
@@ -204,6 +206,17 @@ end
 function Entity:GetAnimId()
 	return self.dataWatcher:GetField(self.dataFieldAnim);
 end
+
+--virtual function:
+function Entity:SetScaling(v)
+	Entity._super.SetScaling(self, v);
+	local dataWatcher = self:GetDataWatcher();
+	local watchedScale = dataWatcher:GetField(self.dataFieldScale);
+	if(watchedScale ~= v) then
+		dataWatcher:SetField(self.dataFieldScale, v);
+	end
+end
+
 
 function Entity:Destroy()
 	if(not self:HasFocus()) then

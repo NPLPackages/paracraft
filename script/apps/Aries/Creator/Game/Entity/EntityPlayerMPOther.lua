@@ -114,6 +114,10 @@ function Entity:UpdateEntityActionState()
 	if(curMainAsset~=self:GetMainAssetPath()) then
 		self:SetMainAssetPath(curMainAsset);
 	end
+	local curScale = dataWatcher:GetField(self.dataFieldScale);
+	if(curScale and curScale ~= self:GetScaling()) then
+		self:SetScaling(curScale)
+	end
 	GameLogic.GetFilters():apply_filters("entity_player_mp_other_entity_action_state_updated", self);
 end
 

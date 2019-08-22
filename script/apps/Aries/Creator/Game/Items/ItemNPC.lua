@@ -107,6 +107,7 @@ function ItemNPC:OnCreate(result)
 			-- can not be pushed by other NPC
 			-- entity:SetStaticBlocker(true);
 			-- entity:SetDummy(true);
+			-- entity:SetFacing(-1.5);
 			EntityManager.AddObject(entity);
 			return true, entity;
 		end
