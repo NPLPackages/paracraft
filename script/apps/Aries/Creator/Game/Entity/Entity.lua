@@ -1106,6 +1106,9 @@ function Entity:SetFacing(facing)
 	local obj = self:GetInnerObject();
 	if(obj) then
 		self.facing = facing;
+		if(self.rotationYaw) then
+			self.rotationYaw = facing;
+		end
 		obj:SetFacing(facing);
 	end
 end
