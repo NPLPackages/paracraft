@@ -693,3 +693,51 @@ function env_imp:stopMovie(name)
 	channel:Stop();
 end
 
+function env_imp:window(mcmlCode, alignment, left, top, width, height)
+	if(mcmlCode) then
+		local filename = ParaIO.GetWritablePath().."temp/codeblock_mcml.html";
+		local file = ParaIO.open(filename, "w");
+		if(file:IsValid()) then
+			if(not mcmlCode:match("<pe:mcml")) then
+				-- tricky: we will force creating page scope by inserting a script element. 
+				file:WriteString("<pe:mcml>\n");
+				file:WriteString(mcmlCode, #mcmlCode);
+				file:WriteString("\n</pe:mcml>");
+			else
+				file:WriteString(mcmlCode, #mcmlCode);
+			end
+			
+			file:close();
+
+			NPL.load("(gl)script/ide/System/Windows/Window.lua");
+			local Window = commonlib.gettable("System.Windows.Window")
+			local my_window = Window:new();
+			
+			local globalTable = self;
+			local pageIndex = function(tab, name)
+				if(name == "document") then
+					return document;
+				end
+				local value = globalTable[name];
+--				if(type(value) == "function") then
+--					-- coroutine wrapper here
+--					return function(...)
+--						env_imp.run(self, value)
+--					end
+--				end
+				return value;
+			end
+			self.codeblock:SetAutoWait(false)
+			my_window:Show({url=filename, 
+				alignment = alignment or "_lt", 
+				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
+				zorder=2, 
+				allowDrag=false,
+				pageGlobalTable = pageIndex,
+			});
+			self.codeblock:Connect("codeUnloaded", function()
+				my_window:CloseWindow(true)
+			end)
+		end
+	end
+end

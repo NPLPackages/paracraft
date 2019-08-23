@@ -183,6 +183,8 @@ function CodeGlobals:Reset()
 			return self.cur_co;
 		elseif(name == "actor") then
 			return self.cur_co and self.cur_co:GetActor();
+		elseif(name == "document") then
+			return document;
 		end
 		local value = curGlobals[name];
 		if(value==nil) then
