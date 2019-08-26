@@ -92,8 +92,8 @@ function OnlineStore:ShowPage(bShow)
 						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html", 
 						name = "OnlineStore.ShowPage", 
 						isShowTitleBar = false,
-						DestroyOnClose = true,
-						bToggleShowHide=false, 
+						DestroyOnClose = false,
+						bToggleShowHide = true, 
 						style = CommonCtrl.WindowFrame.ContainerStyle,
 						allowDrag = true,
 						enable_esc_key = true,
@@ -109,10 +109,12 @@ function OnlineStore:ShowPage(bShow)
 							height = height,
 					};
 				System.App.Commands.Call("File.MCMLWindowFrame", params);
+				page = params._page;
 				if(params._page) then
+					params._page:CallMethod("nplbrowser_instance", "SetVisible", bShow~=false); 
 					params._page.OnClose = function()
-						if(page) then
-							page:CallMethod("nplbrowser_instance", "SetVisible", false); 
+						if(params._page) then
+							params._page:CallMethod("nplbrowser_instance", "SetVisible", false); 
 						end
 						page = nil;
 					end

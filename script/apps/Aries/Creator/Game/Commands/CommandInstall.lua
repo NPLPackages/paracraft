@@ -33,7 +33,15 @@ Commands["install"] = {
 			option, cmd_text = CmdParser.ParseOption(cmd_text);	
 			if(not option) then
 				break;
-			elseif(option == "filename" or option == "md5" or option == "crc32"  or option == "ext" ) then
+			elseif(option == "filename") then
+				-- supporting spaces in filename
+				value, cmd_text = cmd_text:match("^%s*(.+)%s+(https?://.*)$");
+				if(value and value ~= "") then
+					value = value:gsub("[& ]+", "_");
+				end
+				options[option] = value;
+
+			elseif(option == "md5" or option == "crc32"  or option == "ext" ) then
 				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
 				options[option] = value;
 			else

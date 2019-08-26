@@ -682,7 +682,7 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			self.rotationPitch = self.targetPitch or self.rotationPitch;
             self:SetPosition(newX, newY, newZ);
         end
-		if(self.prevRotationPitch~=self.rotationPitch or self.prevRotationYaw~=self.prevRotationYaw) then
+		if(self.prevRotationPitch~=self.rotationPitch or self.prevRotationYaw~=self.RotationYaw) then
 			self.prevRotationPitch = self.rotationPitch;
 			self.prevRotationYaw = self.rotationYaw;
 			self:SetRotation(self.rotationYaw, self.rotationPitch);

@@ -728,11 +728,16 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 				return value;
 			end
 			self.codeblock:SetAutoWait(false)
+			NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+			local viewport = ViewportManager:GetSceneViewport();
+
 			my_window:Show({url=filename, 
 				alignment = alignment or "_lt", 
 				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
 				zorder=2, 
 				allowDrag=false,
+				parent = viewport:GetUIObject(true),
 				pageGlobalTable = pageIndex,
 			});
 			self.codeblock:Connect("codeUnloaded", function()
