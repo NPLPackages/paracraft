@@ -104,11 +104,13 @@ function ItemNPC:OnCreate(result)
 			local entity = MyCompany.Aries.Game.EntityManager.EntityNPC:Create({bx=bx,by=by,bz=bz, 
 				item_id = self.block_id, facing=result.facing, can_random_move = false}, 
 				xmlSavedNode);
+
 			-- can not be pushed by other NPC
 			-- entity:SetStaticBlocker(true);
 			-- entity:SetDummy(true);
-			-- entity:SetFacing(-1.5);
+			-- entity:SetFacing(1.5);
 			EntityManager.AddObject(entity);
+
 			return true, entity;
 		end
 	end
