@@ -136,14 +136,6 @@ function Entity:SetYaw(value)
 	self:SetFacing(value);
 end
 
-function Entity:SetScalingDelta(v)
-	self:SetScaling(self:GetScaling() + v);
-end
-
---virtual function:
-function Entity:SetFacingDelta(v)
-	self:SetFacing(self:GetFacing() + v);
-end
 
 function Entity:DestroyOverlay()
 	if(self.overlay) then

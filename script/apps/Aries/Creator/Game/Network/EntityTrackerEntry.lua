@@ -86,6 +86,7 @@ function EntityTrackerEntry:SendLocationToAllClients(playerEntityList)
 		local bRotHasChanges = math.abs(facing - self.lastYaw) >= 4 or math.abs(pitch - self.lastPitch) >= 4;
 
 		local packet;
+		-- skip the first frame to prevent smooth moving on first creation. 
 		if (self.ticks > 0) then
 			if (dx >= -128 and dx < 128 and dy >= -128 and dy < 128 and dz >= -128 and dz < 128 
 				and self.ticksSinceLastForcedTeleport <= 400) then
@@ -131,17 +132,19 @@ function EntityTrackerEntry:SendLocationToAllClients(playerEntityList)
 
 		self:SendWatchedData();
 		
+		if (packet) then
+			if (bPosHasChanges) then
+				self.lastScaledXPosition = scaledX;
+				self.lastScaledYPosition = scaledY;
+				self.lastScaledZPosition = scaledZ;
+			end
 
-		if (bPosHasChanges) then
-			self.lastScaledXPosition = scaledX;
-			self.lastScaledYPosition = scaledY;
-			self.lastScaledZPosition = scaledZ;
+			if (bRotHasChanges) then
+				self.lastYaw = facing;
+				self.lastPitch = pitch;
+			end
 		end
-
-		if (bRotHasChanges) then
-			self.lastYaw = facing;
-			self.lastPitch = pitch;
-		end
+		
 		
 		local headYaw = math.floor(entity:GetRotationYawHead() * 32);
 		local headPitch = math.floor((entity.rotationHeadPitch or 0) * 32);
@@ -256,7 +259,7 @@ end
 
 function EntityTrackerEntry:SendWatchedData()
     local data = self.entity:GetDataWatcher();
-
+	
     if (data and data:HasChanges()) then
         self:SendPacketToAllAssociatedPlayers(Packets.PacketEntityMetadata:new():Init(self.entity.entityId, data, false));
     end

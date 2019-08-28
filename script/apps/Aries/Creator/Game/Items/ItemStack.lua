@@ -248,12 +248,7 @@ function ItemStack:LoadFromXMLNode(node)
 end
 
 function ItemStack:SerializeXMLData(sData)
-	if(type(sData) == "string" and sData:match("  ")) then
-		-- for two spaces in the text, we will use cdata to prevent xml to remove extra space.
-		return {name="![CDATA[", [1] = sData};
-	else
-		return sData;
-	end
+	return sData;
 end
 
 function ItemStack:SaveToXMLNode(node, bSort)

@@ -62,6 +62,7 @@ local selectable_var_list = {
 	"blocks",
 	"---", -- separator
 	"parent", 
+	"cam_dist", -- object to camera distance
 	"static", -- multiple of "name" and "isAgent"
 };
 
@@ -225,6 +226,8 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	timeseries:CreateVariableIfNotExist("blockinhand", "Discrete");
 	timeseries:CreateVariableIfNotExist("opacity", "Linear");
 	timeseries:CreateVariableIfNotExist("parent", "LinearTable");
+	timeseries:CreateVariableIfNotExist("cam_dist", "Discrete");
+	
 	
 	self:AddValue("position", self.GetPosVariable);
 
@@ -553,7 +556,21 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				callbackFunc(false);
 			end
 		end, old_value, L"选择模型文件", "model");
+	elseif(keyname == "cam_dist") then
+		local title = format(L"起始时间%s, 请输入到摄影机的距离(0-10000)", strTime);
 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			result = tonumber(result);
+			if(result) then
+				self:AddKeyFrameByName(keyname, nil, result);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
+		end,old_value)
 	elseif(keyname == "blockinhand") then
 		local title = format(L"起始时间%s, 请输入手持物品ID(空为0)", strTime);
 
@@ -1221,7 +1238,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	local obj = entity:GetInnerObject();
 	local new_x, new_y, new_z, yaw, roll, pitch = self:ComputePosAndRotation(curTime);
 	
-	local HeadUpdownAngle, HeadTurningAngle, anim, skin, speedscale, scaling, gravity, opacity, blockinhand, assetfile;
+	local HeadUpdownAngle, HeadTurningAngle, anim, skin, speedscale, scaling, gravity, opacity, blockinhand, assetfile, cam_dist;
 	HeadUpdownAngle = self:GetValue("HeadUpdownAngle", curTime);
 	HeadTurningAngle = self:GetValue("HeadTurningAngle", curTime);
 	anim = self:GetValue("anim", curTime);
@@ -1232,12 +1249,17 @@ function Actor:FrameMovePlaying(deltaTime)
 	opacity = self:GetValue("opacity", curTime);
 	assetfile = self:GetValue("assetfile", curTime);
 	blockinhand = self:GetValue("blockinhand", curTime);
+	cam_dist = self:GetValue("cam_dist", curTime);
 
 	if(new_x) then
 		entity:SetPosition(new_x, new_y, new_z);
 	end
 
 	if(obj) then
+		if(cam_dist) then
+			obj:SetField("ObjectToCameraDistance", cam_dist);
+		end
+
 		-- in case of explicit animation
 		obj:SetField("yaw", yaw or 0);
 		obj:SetField("roll", roll or 0);

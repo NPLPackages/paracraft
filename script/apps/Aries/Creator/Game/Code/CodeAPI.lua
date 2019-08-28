@@ -75,6 +75,7 @@ local s_env_methods = {
 	"setMovieProperty",
 	"playMovie",
 	"stopMovie",
+	"window",
 
 	-- Events
 	"registerClickEvent",

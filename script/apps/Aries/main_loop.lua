@@ -243,7 +243,7 @@ local function Aries_load_config(filename)
 
 	if(System.options.IsTouchDevice) then
 		-- NOTE: for now we will disable all system IME and use buildin virtual keyboard where possible. 
-		System.options.auto_virtual_keyboard = true
+		-- System.options.auto_virtual_keyboard = true
 	end
 	
 

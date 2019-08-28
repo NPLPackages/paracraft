@@ -149,7 +149,7 @@ function TouchVirtualKeyboard:Show(bShow)
 	if(bShow) then
 		Keyboard:EnableIME(false)
 	else
-		Keyboard:EnableIME(false)
+		Keyboard:EnableIME(true)
 		self:hidden(); -- signal
 		self:ClearAllKeyDown();
 	end

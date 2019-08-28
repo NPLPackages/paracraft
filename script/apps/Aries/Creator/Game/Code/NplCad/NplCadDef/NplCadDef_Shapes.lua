@@ -51,7 +51,7 @@ local cmds = {
 
 {
 	type = "box", 
-	message0 = L" %1 长方体 长 %2 宽 %3 高 %4 %5",
+	message0 = L" %1 长方体 X %2 Y %3 Z %4 %5",
     arg0 = {
         {
 			name = "op",
@@ -68,13 +68,13 @@ local cmds = {
         {
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
+            shadow = { type = "math_number", value = 1,},
 			text = 2, 
 		},
         {
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+            shadow = { type = "math_number", value = 2,},
 			text = 1, 
 		},
 		{
@@ -250,8 +250,8 @@ local cmds = {
         {
 			name = "radius2",
 			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
-			text = 2, 
+            shadow = { type = "math_number", value = 0.5,},
+			text = 0.5, 
 		},
 		{
 			name = "color",
@@ -327,7 +327,7 @@ local cmds = {
 
 {
 	type = "ellipsoid", 
-	message0 = L"%1 椭圆体 高半径 %2 宽半径 %3 长半径 %4 %5",
+	message0 = L"%1 椭圆体 X半径 %2 Z半径 %3 Y半径 %4 %5",
     arg0 = {
         {
 			name = "op",
@@ -336,13 +336,13 @@ local cmds = {
 			text = "union", 
 		},
         {
-			name = "r_z",
+			name = "r_x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 2,},
+            shadow = { type = "math_number", value = 4,},
 			text = 2, 
 		},
         {
-			name = "r_x",
+			name = "r_z",
 			type = "input_value",
             shadow = { type = "math_number", value = 4,},
 			text = 4, 
@@ -350,7 +350,7 @@ local cmds = {
         {
 			name = "r_y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+            shadow = { type = "math_number", value = 1,},
 			text = 0, 
 		},
 		{
@@ -370,7 +370,7 @@ local cmds = {
 	ToNPL = function(self)
 		return string.format('ellipsoid("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'),
-            self:getFieldValue('r_z'), self:getFieldValue('r_x'), self:getFieldValue('r_y'),
+            self:getFieldValue('r_x'), self:getFieldValue('r_z'), self:getFieldValue('r_y'),
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -378,7 +378,7 @@ local cmds = {
 },
 {
 	type = "wedge", 
-	message0 = L"%1 楔体 长 %2 宽 %3 深度 %4 %5",
+	message0 = L"%1 楔体 X %2 Z %3 Y %4 %5",
     arg0 = {
         {
 			name = "op",

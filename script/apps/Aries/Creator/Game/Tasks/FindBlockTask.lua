@@ -77,7 +77,7 @@ function FindBlockTask.SetResults(entities)
 			local item = entity:GetItemClass()
 			local name = entity:GetDisplayName();
 			if(item and name and name~="") then
-				resultDS[#resultDS+1] = {name="block", attr={index=i,name=name, icon = item:GetIcon()}};
+				resultDS[#resultDS+1] = {name="block", attr={index=i,name=name, lowerText = string.lower(name), icon = item:GetIcon()}};
 			end
 		end
 		FindBlockTask.resultDS = resultDS;
@@ -94,9 +94,10 @@ end
 function FindBlockTask.FilterResult(text)
 	
 	if(text and text~="") then
+		text = string.lower(text);
 		local resultFiltered = {};
 		for i, result in ipairs(FindBlockTask.resultDS) do
-			if(result.attr.name:match(text)) then
+			if(result.attr.lowerText:match(text)) then
 				resultFiltered[#resultFiltered+1] = result;
 			end
 		end

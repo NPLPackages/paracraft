@@ -83,8 +83,11 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "GetExporters", exporters: file exporters
   - "export_to_file", filename:
   - "select_exporter", id:
+  - "OnInstallModel": filename, url: called when /install -ext bmax commands are executed. 
+
 - command:
   - "register_command": register additional commands
+
 - networking:
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
   - "entity_player_mp_other_entity_action_state_updated", entity_player_mp_other: after every time entity action state get updated for EntityPlayerMPOther

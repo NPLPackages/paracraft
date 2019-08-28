@@ -146,6 +146,15 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 		nid = force_nid,
 		gs_nid = gs_nid, ws_id = ws_id,
 		on_finish = function()
+			if(System.World.worldzipfile) then
+				NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
+				local ZipFile = commonlib.gettable("System.Util.ZipFile");
+				local zipFile = ZipFile:new();
+				if(zipFile:open(System.World.worldzipfile)) then
+					zipFile:addUtf8ToDefaultAlias();
+					-- zipFile:close();
+				end
+			end
 			GameLogic.Login(nil, function(msg)
 				Game.OnLogin(worldObj);
 				if(callbackFunc) then

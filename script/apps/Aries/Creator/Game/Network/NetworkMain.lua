@@ -150,7 +150,10 @@ function NetworkMain:CheckLoadClient()
 end
 
 function NetworkMain:SanitizeUsername(username)
-	username = username or tostring(ParaGlobal.timeGetTime());
+	if(not username) then
+		username = System.User.username or tostring(ParaGlobal.timeGetTime()) -- System.User.NickName
+	end
+	username = tostring(username);
 	return username;
 end
 

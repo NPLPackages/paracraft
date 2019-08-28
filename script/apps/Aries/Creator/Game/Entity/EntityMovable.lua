@@ -79,7 +79,9 @@ function Entity:init()
 	local item = self:GetItemClass();
 	if(item) then
 		local x, y, z = self:GetPosition();
-
+		if(not self.x) then
+			self:SetPosition(x, y, z);
+		end
 		local ReplaceableTextures;
 		if(not self.skin) then
 			local skin = item:GetSkinFile();
@@ -378,24 +380,6 @@ function Entity:RefreshSkin(player)
 				player:SetReplaceableTexture(2, player:GetDefaultReplaceableTexture(2));	
 			end
 		end
-	end
-end
-
---virtual function:
-function Entity:SetScalingDelta(v)
-	local obj = self:GetInnerObject();
-	if(obj) then
-		self.scaling = obj:GetScale() + v;
-		obj:SetScale(self.scaling);
-	end
-end
-
---virtual function:
-function Entity:SetFacingDelta(v)
-	local obj = self:GetInnerObject();
-	if(obj) then
-		self.facing = obj:GetFacing() + v;
-		obj:SetFacing(self.facing);
 	end
 end
 
@@ -698,7 +682,7 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			self.rotationPitch = self.targetPitch or self.rotationPitch;
             self:SetPosition(newX, newY, newZ);
         end
-		if(self.prevRotationPitch~=self.rotationPitch or self.prevRotationYaw~=self.prevRotationYaw) then
+		if(self.prevRotationPitch~=self.rotationPitch or self.prevRotationYaw~=self.RotationYaw) then
 			self.prevRotationPitch = self.rotationPitch;
 			self.prevRotationYaw = self.rotationYaw;
 			self:SetRotation(self.rotationYaw, self.rotationPitch);

@@ -412,7 +412,9 @@ function PlayerController:CreateNewClientPlayerMP(world, entityId, netClientHand
 	self:Init(netClientHandler);
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayerMPClient.lua");
 	local entityPlayer = EntityManager.EntityPlayerMPClient:new();
-	return entityPlayer:init(world, netClientHandler, entityId);
+	entityPlayer:init(world, netClientHandler, entityId);
+	entityPlayer:SetMainAssetPath(GameLogic.options:GetMainPlayerAssetName())
+	return entityPlayer;
 end
 
 -- set the player that is being controlled. 

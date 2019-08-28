@@ -66,6 +66,7 @@ local var_name_to_text = {
 	color = L"颜色",
 	code = L"代码",
 	static = L"静态属性",
+	cam_dist = L"到镜头的距离",
 }
 local var_longname_to_text = {
 	anim = L"动作 (1键)",

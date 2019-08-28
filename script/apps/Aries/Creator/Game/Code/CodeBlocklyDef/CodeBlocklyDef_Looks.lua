@@ -769,6 +769,105 @@ stopMovie();
 ]]}},
 },
 
+{
+	type = "window", 
+	message0 = L"窗口%1,%2,%3,%4,%5,%6",
+	arg0 = {
+		{
+			name = "mcmlCode",
+			type = "input_value",
+            shadow = { type = "text", value = "html",},
+			text = "html", 
+		},
+		{
+			name = "alignment",
+			type = "field_dropdown",
+			options = {
+				{ "左上", "_lt" },
+				{ "左下", "_lb" },
+				{ "居中", "_ct" },
+				{ "居中上", "_ctt" },
+				{ "居中下", "_ctb" },
+				{ "居中左", "_ctl" },
+				{ "居中右", "_ctr" },
+				{ "右上", "_rt" },
+				{ "右下", "_rb" },
+				{ "中间上", "_mt" },
+				{ "中间左", "_ml" },
+				{ "中间右", "_mr" },
+				{ "中间下", "_mb" },
+				{ "全屏", "_fi" },
+			},
+			text = "_lt", 
+		},
+		{
+			name = "left",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+		{
+			name = "top",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+		{
+			name = "width",
+			type = "input_value",
+            shadow = { type = "math_number", value = 300,},
+			text = 300,
+		},
+		{
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 100,},
+			text = 100,
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'window(%s, "%s", %s, %s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('window([[%s]],"%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
+			self:getFieldAsString('alignment'), self:getFieldAsString('left'), self:getFieldAsString('top'), self:getFieldAsString('width'), self:getFieldAsString('height'));
+	end,
+	examples = {{desc = "", canRun = false, code = [=[
+window([[<div>hello</div>]], "_lt",0,0,300,100);
+]=]},
+{desc = "", canRun = false, code = [=[
+test = {key="hello world"}
+
+function OnClickTest2()
+    test.key = document:GetPageCtrl():GetValue("myName")
+    cmd("/tip clicked2!"..test.key)
+end
+
+function GetTitle()
+    return "Enter text:"
+end
+
+window([[ 
+<script>
+function OnClose()
+    cmd("/tip clicked!"..Page:GetValue("myName"))
+    Page:CloseWindow()
+end
+</script>
+<div style="margin:10px"> 
+    <%=GetTitle()%> 
+    <input name="myName"  type="text" style="width:90px" value='<%=test.key%>'/> 
+    <input type="button" onclick="OnClickTest2" value="click me"/> 
+    <input type="button" onclick="OnClose" value="close" style="margin-left:5px"/> 
+</div> 
+]], "_lt", 10, 10, 300, 100)
+]=]}
+},
+},
+
 };
 function CodeBlocklyDef_Looks.GetCmds()
 	return cmds;

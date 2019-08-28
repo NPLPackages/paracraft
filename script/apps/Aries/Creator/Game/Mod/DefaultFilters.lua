@@ -73,6 +73,12 @@ function DefaultFilters.cmd_open_url(url)
 		else
 			return;
 		end
+	elseif(url == "store") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.lua");
+		local OnlineStore = commonlib.gettable("MyCompany.Aries.Game.Tasks.OnlineStore");
+		local task = OnlineStore:new():Init();
+		task:Run();
+		return;
 	end
 	return url;
 end

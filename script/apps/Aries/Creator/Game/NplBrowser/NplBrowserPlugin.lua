@@ -8,9 +8,9 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local id = "nplbrowser_wnd";
-NplBrowserPlugin.Start({id = id, url = "http://www.keepwork.com", withControl = true, x = 0, y = 0, width = 800, height = 600, });
-NplBrowserPlugin.OnCreatedCallback(function()
-    NplBrowserPlugin.Open({id = id, url = "http://www.baidu.com", resize = true, x = 100, y = 100, width = 300, height = 300, });
+NplBrowserPlugin.Start({id = id, url = "http://www.keepwork.com", withControl = true, x = 200, y = 200, width = 800, height = 600, });
+NplBrowserPlugin.OnCreatedCallback(id,function()
+    NplBrowserPlugin.Open({id = id, url = "http://www.keepwork.com", resize = true, x = 100, y = 100, width = 300, height = 300, });
     NplBrowserPlugin.Show({id = id, visible = false});
     NplBrowserPlugin.Show({id = id, visible = true});
     NplBrowserPlugin.Zoom({id = id, zoom = 1}); --200%
@@ -34,12 +34,14 @@ if(debug == true or debug =="true" or debug == "True")then
 end
 local default_client_name = "cef3\\cefclient.exe";
 local callback_file = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua";
-
+local cefclient_config_filename = "cefclient_config.json"; -- same value in NplCefPlugin
 NplBrowserPlugin.cmds_queue = nil; --commands queue
 NplBrowserPlugin.cef_connection_pending_windows = {};  -- the array list to save the pending state of each new cef window
 NplBrowserPlugin.windows = {}; -- save existing windows
 NplBrowserPlugin.windows_caches = {}; -- the configs of window
 NplBrowserPlugin.interval = 0.2 * 1000;
+
+NplBrowserPlugin.on_created_callback_map = {};
 
 -- create or get the commands queue
 function NplBrowserPlugin.CreateOrGetCmdsQueue()
@@ -71,6 +73,7 @@ end
 function NplBrowserPlugin.PushBack(cmd)
     if(not cmd)then return end
     local cmds_queue = NplBrowserPlugin.CreateOrGetCmdsQueue();
+    LOG.std(nil, "info", "NplBrowserPlugin.PushBack", "cmd:%s %s", cmd.cmd, cmd.id);
     cmds_queue:pushright(cmd);
 end
 -- pop a command from the first
@@ -91,12 +94,17 @@ function NplBrowserPlugin.RunNextCmd()
         return
     end
     local cmd = NplBrowserPlugin.GetFront();
+    cmd = cmd or {};
+	LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd", "before running:%s %s", cmd.cmd,cmd.id);
     if(NplBrowserPlugin.CanRunCmd(cmd))then
         cmd = NplBrowserPlugin.PopFront();
+	    LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd", "running:%s %s", cmd.cmd,cmd.id);
+	    LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd activate", cmd);
         local dll_name =  cmd.dll_name or default_dll_name;
         NPL.activate(dll_name,cmd); 
         NplBrowserPlugin.UpdateCache(id,cmd)
     else
+	    LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd", "found an invalid cmd:%s %s", cmd.cmd,cmd.id);
         NplBrowserPlugin.PopFront();
     end
 end
@@ -191,6 +199,7 @@ function NplBrowserPlugin.Start(p)
     else
         tag_hide_controls = "-hide-controls"
     end
+    local pid = tostring(System.os.GetCurrentProcessId());
      
     local x = p.x or 0;
     local y = p.y or 0;
@@ -198,6 +207,7 @@ function NplBrowserPlugin.Start(p)
     local height = p.height or 100;
     local url = p.url or "";
     local bounds = string.format("%d,%d,%d,%d,",x,y,width,height);
+    local zoom = p.zoom or 0.0;
     local cmdline = string.format([[
         -window_title="%s" 
         -window_name="%s" 
@@ -206,7 +216,9 @@ function NplBrowserPlugin.Start(p)
         -url="%s" 
         -bounds="%s"
         -parent_handle="%s"
-    ]],window_title,id,tag_hide_controls,url,bounds,parent_handle);
+        -cefclient_config_filename="%s"
+        -pid="%s"
+    ]],window_title,id,tag_hide_controls,url,bounds,parent_handle,cefclient_config_filename,pid);
     local input = { 
         cmd = "Start", 
         id = id, 
@@ -219,8 +231,11 @@ function NplBrowserPlugin.Start(p)
         width = width,
         height = height,
         callback_file = callback_file,
+        cefclient_config_filename = cefclient_config_filename,
+        pid = pid,
     }
     -- waiting for create 
+    LOG.std(nil, "info", "NplBrowserPlugin.Start", "the window [%s] requests to launch", id);
     NplBrowserPlugin.PushPendingWindow(id);
 
     NPL.activate(dll_name,input); 
@@ -241,6 +256,7 @@ function NplBrowserPlugin.Open(p)
         width = p.width,
         height = p.height,
         zoom = p.zoom,
+        visible = p.visible,
         callback_file = callback_file,
     }
     NplBrowserPlugin.PushBack(input);
@@ -275,6 +291,7 @@ function NplBrowserPlugin.Show(p)
         cmd = "Show", 
         id = id, 
         parent_handle = parent_handle, 
+        zoom = p.zoom,
         visible = p.visible,
         callback_file = callback_file,
     }
@@ -325,12 +342,17 @@ end
 function NplBrowserPlugin.CheckCefWindow(p)
     local id = p.id or default_id;
     local dll_name =  p.dll_name or default_dll_name;
+    local client_name =  p.client_name or default_client_name;
+
     local parent_handle = NplBrowserPlugin.GetParentHandle();
     local input = { 
         cmd = "CheckCefWindow", 
         id = id, 
         parent_handle = parent_handle, 
         callback_file = callback_file,
+        client_name = client_name,
+        cefclient_config_filename = cefclient_config_filename,
+        pid = tostring(System.os.GetCurrentProcessId()),
     }
     NPL.activate(dll_name,input); 
 end
@@ -354,23 +376,52 @@ function NplBrowserPlugin.OsSupported()
 	end
     return NplBrowserPlugin.isSupported;
 end
-function NplBrowserPlugin.OnCreatedCallback(callback)
-    NplBrowserPlugin.on_created_callback = callback;
+function NplBrowserPlugin.OnCreatedCallback(id,callback)
+    if(not id)then
+        return
+    end
+    NplBrowserPlugin.on_created_callback_map[id] = callback;
+end
+function NplBrowserPlugin.ReadCefClientJsonConfg(filename)
+   
+    local file = ParaIO.open(filename,"r");
+    if(file:IsValid())then
+        local content = file:GetText();
+		file:close();
+
+        local out={};
+        if(NPL.FromJson(content, out)) then
+            local pid = tostring(System.os.GetCurrentProcessId());
+            pid = tostring(pid);
+            return out[pid];
+        end
+    else
+	    LOG.std(nil, "info", "NplBrowserPlugin", "can't open cefclient config:%s",filename);
+    end
 end
 local function activate()
     if(msg)then
         local cmd = msg["cmd"];
-        local id = msg["id"];
+        local id = msg["id"] or "";
+        local parent_handle = msg["parent_handle"] or "";
         if(cmd == "CheckCefWindow")then
-            local value = msg["value"];
-            if(value == true)then
-                NplBrowserPlugin.ClearPendingWindow(id);
-                NplBrowserPlugin.SetWindowExisted(id,true);
-                -- send a message of create window finished
-                if(NplBrowserPlugin.on_created_callback)then
-                    NplBrowserPlugin.on_created_callback(msg);
+            local json_config = NplBrowserPlugin.ReadCefClientJsonConfg(cefclient_config_filename);
+            if(json_config)then
+                local key = string.format("%s_%s",id,parent_handle);
+                local value = json_config[key];
+                if(value == true)then
+                    NplBrowserPlugin.ClearPendingWindow(id);
+                    NplBrowserPlugin.SetWindowExisted(id,true);
+	                LOG.std(nil, "info", "NplBrowserPlugin", "================ the window is created:%s ================",id);
+                    -- send a message after created window
+                    local callback = NplBrowserPlugin.on_created_callback_map[id];
+                    if(callback)then
+                        callback(msg);
+                    end
+                    NplBrowserPlugin.on_created_callback_map[id] = nil;
                 end
             end
+            
         elseif(cmd == "Quit")then
             -- clear window
             NplBrowserPlugin.SetWindowExisted(id,nil);

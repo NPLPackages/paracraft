@@ -387,6 +387,11 @@ function NetClientHandler:handleEntityMetadata(packet_EntityMetadata)
 			local watcher = entity:GetDataWatcher();
 			if(watcher) then
 				watcher:UpdateWatchedObjectsFromList(packet_EntityMetadata:GetMetadata());
+
+				-- tricky: for dummy object, framemove is not called, we will call it now to force entity.SyncDataWatcher to be called. 
+				if (entity:IsDummy()) then
+					entity:FrameMove(0);
+				end
 			end
 		end
 	end
