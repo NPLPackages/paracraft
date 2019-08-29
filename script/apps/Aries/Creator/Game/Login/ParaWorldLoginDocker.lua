@@ -203,6 +203,13 @@ local app_install_details = {
 		-- cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="teen" config="config/GameClient.config.xml"',
 		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
 	},
+	["truckstar"] = {
+		title=L"创意空间社区版", hasParacraft = false, 
+		cmdLine = 'noupdate="true" debug="main" mc="true" loadpackage="npl_packages/paracraft/" bootstrapper="script/apps/Aries/main_loop.lua" mod="Truck" isDevEnv="true" disable-parent-package-lookup="true"',
+		redistFolder="truck/", updaterConfigPath = "config/autoupdater/truckstar_win32.xml",
+		additional_manifest = "assets_manifest_truckload.txt",
+		allowQQHall = true,
+	},
 }
 
 -- whether the given application is already loaded. 
@@ -351,8 +358,8 @@ function ParaWorldLoginDocker.OnClickApp(name)
 				end
 			end)
 		end
-	elseif(name == "paracraft_games") then
-		-- TODO: for Effie, community edition
+	elseif(name == "truckstar") then
+		ParaWorldLoginDocker.Restart(name, format('paraworldapp="%s"', name))
 
 	elseif(name == "exit_paraworld") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
@@ -417,6 +424,26 @@ function ParaWorldLoginDocker.GetRedirectableCmdLineParams()
 		cmds = cmds.." isFromQQHall=\"true\"";
 	end
 	return cmds;
+end
+
+-- Load additional manifest file list for the game to be launched
+-- @param appName: app name to be launched
+function ParaWorldLoginDocker.loadAdditionalManifestList(appName)
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	if(app and app.additional_manifest) then
+		local app_folder = ParaWorldLoginDocker.GetAppFolder(appName);
+		local manifest_path = app_folder..app.additional_manifest;
+		if ParaIO.DoesFileExist(manifest_path) then
+			local asset_manager = ParaEngine.GetAttributeObject():GetChild("AssetManager");
+			local asset_manifest = asset_manager:GetChild("CAssetManifest");
+			asset_manifest:SetField("LoadManifestFile", manifest_path);
+			LOG.std(nil, "info", "ParaWorldLoginDocker", "additional manifest file for current app loaded: %s", manifest_path);
+		else
+			LOG.std(nil, "info", "ParaWorldLoginDocker", "additional manifest file for current app cannot be found: %s", manifest_path);
+		end
+	else
+		LOG.std(nil, "info", "ParaWorldLoginDocker", "current app does not have an additional manifest list");
+	end
 end
 
 -- Restart the entire NPLRuntime to a different application. e.g.
@@ -494,7 +521,14 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 	ParaWorldLoginDocker.RestoreDefaultGUITemplate()
 	NPL.ClearPublicFiles();
 	NPL.StopNetServer();
-	
+
+	if ParaIO.DoesFileExist("npl_packages/paracraft") then
+		LOG.std(nil, "info", "ParaWorldLoginDocker", "npl_packages/paracraft exists, renaming it ...");
+		ParaIO.MoveFile("npl_packages/paracraft", "npl_packages/paracraft_bak");
+	end
+
+	ParaWorldLoginDocker.loadAdditionalManifestList(appName);
+
 	-- NOT WORKING: 
 	-- NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 	-- local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
