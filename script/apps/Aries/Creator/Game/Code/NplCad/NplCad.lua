@@ -25,6 +25,7 @@ NplCad.categories = {
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
     {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
+    {name = "Export", text = L"导出", colour = "#235789", },
 --    {name = "Animation", text = L"动画", colour = "#717171", },
     
 };
@@ -57,6 +58,7 @@ function NplCad.AppendAll()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Math.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Skeleton.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Export.lua");
 
     local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
     local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
@@ -65,6 +67,7 @@ function NplCad.AppendAll()
     local NplCadDef_Math = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Math");
     local NplCadDef_Skeleton = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Skeleton");
     local NplCadDef_Animation = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Animation");
+    local NplCadDef_Export = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Export");
 	
 
 	local all_source_cmds = {
@@ -75,6 +78,7 @@ function NplCad.AppendAll()
 		NplCadDef_Math.GetCmds(),
 		NplCadDef_Skeleton.GetCmds(),
 --		NplCadDef_Animation.GetCmds(),
+		NplCadDef_Export.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);
@@ -158,10 +162,6 @@ function NplCad.RefreshFile(filename)
 end
 
 
-
-function NplCad.OpenDialog(filename)
-    _guihelper.MessageBox(filename);
-end
 function NplCad.GetCode(code, filename)
     return string.format([[
 local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
@@ -171,12 +171,13 @@ local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.l
 NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 %s
 local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
+ShapeBuilder.runExportFiles(%q);
 if(result)then
 	setActorValue("assetfile", %q)
 	setActorValue("showBones", true)
     NplCad.RefreshFile(%q)
 end
-]], code, filename, filename, filename, filename)
+]], code, filename, filename, filename, filename, filename)
 end
 
 
