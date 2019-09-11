@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Login/UserIntroduction.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2019/8/15</title>
+</head>
+<body>
+    <pe:mcml>
+        <script type="text/npl" refresh="false" src="UserIntroduction.lua">
+            <![CDATA[
+            UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
+            UserIntroduction.OnInit();
+            ]]>
+        </script>
+        <aries:window mode="thin" width="750" height="500" title='<%=L"欢迎来到Paracraft" %>' onclose="UserIntroduction.CloseWindow()">
+            <div style="margin-top:16px;margin-left:14px;height:190px;width:730px">
+                <div style="margin-left:4px;margin-top:0px;height:174px;width:346px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)" tooltip='<%=L"Paracraft动画与编程教学"%>' onclick="UserIntroduction.OnClick1"></div>
+                <div style="margin-left:4px;margin-top:-100px;width:346px;text-align:center;color:#ffffff"><%=L"方块建模" %></div>
+                <div style="margin-left:360px;margin-top:-174px;height:174px;width:346px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)"></div>
+                <div style="margin-left:360px;margin-top:-100px;width:346px;text-align:center;color:#ffffff"><%=L"骨骼动画" %></div>
+            </div>
+            <div style="margin-top:0px;margin-left:14px;height:190px;width:730px">
+                <div style="margin-left:4px;margin-top:0px;height:174px;width:346px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)"></div>
+                <div style="margin-left:4px;margin-top:-100px;width:346px;text-align:center;color:#ffffff"><%=L"电影动画" %></div>
+                <div style="margin-left:360px;margin-top:-174px;height:174px;width:346px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)"></div>
+                <div style="margin-left:360px;margin-top:-100px;width:346px;text-align:center;color:#ffffff"><%=L"程序设计" %></div>
+            </div>
+            <div style="margin-top:12px;margin-left:14px;height:45px;width:730px;">
+                <input type="checkbox" onclick="UserIntroduction.OnChangeShowOnStartup" style="margin-top:12px;margin-left:2px" name="showOnStart" checked='<%=UserIntroduction.IsShowOnStartup()%>' />
+                <div style="float:left;margin-left:4px;margin-top:12px;font-size:12px;color:#b9b0b0" for="showOnStart"><%=L"进入世界时显示"%></div>
+                <input type="button" value='<%=L"进入新手引导" %>' style="spacing:20px;margin-left:190px;height:40px;min-width:120px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" class="mc_light_orange_button_with_fillet" onclick="UserIntroduction.ShowUserGuide" />
+                <input type="button" value='<%=L"关闭" %>' spacing="10" align="right" style="margin-right:23px;margin-top:6px;height:32px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="UserIntroduction.CloseWindow" />
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>

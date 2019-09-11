@@ -54,7 +54,7 @@ function ServerManager:ctor()
 	-- index into playerEntities of player to ping, updated every tick;
     self.playerPingIndex = 1;
 	-- The maximum number of players that can be connected at a time.
-	self.max_players = 8;
+	self.max_players = 40;
 	self.view_distance = 200;
 end
 

@@ -2,7 +2,10 @@
 Title: TunnelServerMain shell loop file
 Author(s): LiXizhi
 Date: 2016/3/4
-Desc: use this to start a stand alone tunnel server.
+Desc: use this to start a stand alone tunnel server (better in a docker).
+```
+npl bootstrapper="script/apps/Aries/Creator/Game/Network/TunnelService/TunnelServer_main.lua" loadpackage="npl_packages/paracraft/"
+```
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/TunnelService/TunnelServer_main.lua");
@@ -29,12 +32,16 @@ function TunnelServerMain:Init(configFile)
 		configFile = configFile or "TunnelServer.config.xml"
 		-- TODO: load params from file
 	end
-
+	
 	self:LoadNetworkSettings();
 
+	local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
+	local port = ParaEngine.GetAppCommandLineByParam("port", "8099");
+
+	-- start listen on ip and port
+	NPL.StartNetServer(ip, port);
+
 	-- TODO: start tunner server in multiple threads as defined in xml file. 
-	-- TODO: start listen on ip and port
-	NPL.StartNetServer("0.0.0.0", "8099");
 
 	-- REMOVE this: start a test server. 
 	self:StartServer();

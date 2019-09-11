@@ -255,6 +255,8 @@ function BaseContext:HighlightPickBlock(result)
 		if(click_data.last_select_block.blockX) then
 				
 			ParaTerrain.SelectBlock(click_data.last_select_block.blockX,click_data.last_select_block.blockY, click_data.last_select_block.blockZ,false,GameLogic.options.wire_frame_group_id);
+			GameLogic.events:DispatchEvent({type = "HighlightPickBlock",
+				x = click_data.last_select_block.blockX, y = click_data.last_select_block.blockY, z = click_data.last_select_block.blockZ, select = false});
 		end
 		if(click_data.last_select_block.group_index) then
 			ParaSelection.ClearGroup(click_data.last_select_block.group_index);
@@ -277,6 +279,7 @@ function BaseContext:HighlightPickBlock(result)
 			
 		if(not selection_effect) then
 			ParaTerrain.SelectBlock(result.blockX,result.blockY, result.blockZ,true, GameLogic.options.wire_frame_group_id);	
+			GameLogic.events:DispatchEvent({type = "HighlightPickBlock" , x = result.blockX, y = result.blockY, z = result.blockZ, select = true});
 		elseif(selection_effect == "none") then
 			--  do nothing
 		else
@@ -301,6 +304,7 @@ end
 function BaseContext:ClearBlockPickDisplay()
 	ParaTerrain.DeselectAllBlock(GameLogic.options.wire_frame_group_id);
 	click_data.last_select_block.blockX, click_data.last_select_block.blockY, click_data.last_select_block.blockZ = nil, nil,nil;
+	GameLogic.events:DispatchEvent({type = "ClearPickDisplay"});
 end
 
 function BaseContext:ClearPickDisplay()
@@ -597,7 +601,9 @@ function BaseContext:HandleEscapeKey()
 	if(ParaScene.IsSceneEnabled()) then
 		local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 		if(ChatEdit.HasFocus and ChatEdit.HasFocus()) then
-			ChatEdit.handleEscKey();
+			if(ChatEdit.handleEscKey) then
+				ChatEdit.handleEscKey();
+			end
 		else
 			GameLogic.ToggleDesktop("esc");
 		end

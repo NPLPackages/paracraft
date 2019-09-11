@@ -25,6 +25,51 @@ function TunnelServer:ctor()
 	self.userToNid = {};
 	self.nidToUser = {};
 	LOG.std(nil, "info", "TunnelServer", "tunnel server is started");
+	NPL.RegisterEvent(0, "_n_TunnelServer_network", ";MyCompany.Aries.Game.Network.TunnelServer.OnNetworkEvent();");
+end
+
+-- c++ callback function. 
+function TunnelServer.OnNetworkEvent()
+	local self = s_singletonServer;
+	local msg = msg;
+	local code = msg.code;
+	local msg_msg = msg.msg;
+	if(code == NPLReturnCode.NPL_ConnectionDisconnected) then
+		local nid = msg.nid or msg.tid;
+		self:RemoveUserByNid(nid, "connection lost");
+	end
+end
+
+--@param reason: nil or a string to notify other clients
+function TunnelServer:RemoveUserByNid(nid, reason)
+	local username = self:GetUserNameFromNid(nid);
+	if(username) then
+		for room_key, room in pairs(self.rooms) do
+			if(room:GetUser(username)) then
+				room:RemoveUser(username);
+				for key, _ in room:GetUsers():pairs() do
+					local dest_addr = self:GetClientAddress(key);
+					if(dest_addr) then
+						NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = username, reason=reason});
+					end
+				end
+			end
+		end
+		self.userToNid[username] = nil;
+		self.nidToUser[nid] = nil;
+		LOG.std(nil, "info", "TunnelServer", "user %s (%s) removed", username or "", nid or "");
+	end
+end
+
+function TunnelServer:AddUser(username, nid)
+	local old_nid = self:GetNidFromUsername(username);
+	if(old_nid and old_nid ~= nid) then
+		-- dulipcated connection, we will kick off the last one 
+		self:RemoveUserByNid(old_nid, "duplicated connection");
+		NPL.reject(old_nid);
+	end
+	self.userToNid[username] = nid;
+	self.nidToUser[nid] = username;
 end
 
 -- update and insert room. this function is usually asked by lobbyserver to dynamically allocate a room. 
@@ -42,6 +87,11 @@ end
 function TunnelServer:GetUserNameFromNid(nid)
 	return self.nidToUser[nid];
 end
+
+function TunnelServer:GetNidFromUsername(username)
+	return self.userToNid[username];
+end
+
 
 function TunnelServer:GetClientAddress(username)
 	local nid = self.userToNid[username];
@@ -67,11 +117,13 @@ function TunnelServer:handleReceive(msg)
 			local user = room:GetUser(dest_username);
 			local dest_addr = self:GetClientAddress(dest_username);
 			if(not dest_addr) then
-				-- TODO: no connection for user,...
-				LOG.std(nil, "info", "TunnelServer", "no connection for user %s in room %s", dest_username, room_key);
+				-- no connection for user, notify the source
+				LOG.std(nil, "debug", "TunnelServer", "no connection for user %s in room %s", dest_username, room_key);
+				NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
 			elseif(not user) then
-				-- TODO: no valid user found,...
-				LOG.std(nil, "info", "TunnelServer", "no valid dest (target) user %s in room %s", dest_username, room_key);
+				-- no valid user found, assume it is disconnected
+				LOG.std(nil, "debug", "TunnelServer", "no valid dest (target) user %s in room %s", dest_username, room_key);
+				NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
 			else
 				-- relay the message
 				NPL.activate(dest_addr, {room_key = room_key, from = src_username, msg=msg.msg, });
@@ -86,8 +138,8 @@ function TunnelServer:handleReceive(msg)
 		if(room and msg.username) then
 			local username = msg.username;
 			-- TODO make unique and verify username with the one in the room
-			self.userToNid[username] = nid;
-			self.nidToUser[nid] = username;
+			self:AddUser(username, nid)
+
 			-- Remove this, since by logic, user should already exist when handling "update_room" message. 
 			-- or should we allow any authenticated client to add users in the room?
 			room:AddUser(username);

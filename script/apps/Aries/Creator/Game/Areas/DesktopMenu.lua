@@ -87,6 +87,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		},
 		{text = L"帮助", order=6, name = "help",children = 
 			{
+				{text = L"欢迎页面与新手引导",name = "help.userintroduction", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"学习",name = "help.learn", onclick=nil},
 				{text = L"提问",name = "help.ask", onclick=nil},
@@ -203,6 +204,9 @@ function DesktopMenu.OnClickMenuItem(name)
 			local x, y, width, height = _guihelper.GetLastUIObjectPos();
 			if(x and y)then
 				ctl:Show(x, y + height);
+				if (name == "help") then
+					GameLogic.events:DispatchEvent({type = "ShowHelpMenu"});	
+				end
 			end
 		else
 			if(type(menuItem.onclick) == "function") then

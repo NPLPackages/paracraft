@@ -61,6 +61,7 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 	});
 
 	HelpPage.SelectCategory(category_name, subfolder_name);
+	GameLogic.events:DispatchEvent({type = "ShowHelpPage"});
 end
 
 function HelpPage.ClosePage()

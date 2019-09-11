@@ -1,0 +1,136 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Login/UserGuide.html?name=step1" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2019/8/15</title>
+</head>
+<body>
+    <pe:mcml>
+        <script type="text/npl" src="UsrGuide.lua">
+            <![CDATA[
+            UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
+            UserGuide.OnInit();
+            name = Page:GetRequestParam("name") or "step1"
+            ]]>
+        </script>
+        <pe:if condition='<%=(name=="step1")%>'>
+            <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:-500px;margin-top:-200px;width:600px;height:300px;background:">
+                <div style="float:left">
+                    <div class="helptip" style="position:relative;color:#B9AB73;margin-top:0px;margin-left:0px;padding:4px;padding-left:10px;padding-right:10px;">使用键盘【W/A/S/D】控制角色移动</div>
+                    <div style="float:left;margin-top:40px;margin-left:20px;font-weight:bold;font-size:16px;text-align:center;color:#000000;">
+                        <div name="key_w" style="margin-left:52px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">W</div><br />
+                        <div name="key_a" style="margin-left:0px;margin-top:4px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">A</div>
+                        <div name="key_s" style="margin-left:4px;margin-top:4px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">S</div>
+                        <div name="key_d" style="margin-left:4px;margin-top:4px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">D</div><br />
+                    </div>
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step2")%>'>
+            <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:200px;margin-top:0px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"按住【鼠标右键】，同时移动鼠标可以改变视角"%>
+                </div>
+                <div style="margin-left:60px;margin-top:40px;">
+                    <div style="position:relative;margin-left:32px;margin-top:-32px;width:64px;height:32px;background:url(Texture/Aries/Quest/TutorialMouse_LeftRight_32bits.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeLR)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_RightClick_32bits.png)" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step3")%>'>
+            <pe:container alignment="_ctb" ClickThrough="true" style="font-size:12px;margin-left:450px;margin-top:110px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"鼠标左键单击【E】键打开【建造与环境】窗口"%>
+                </div>
+                <div style="margin-left:50px;margin-top:20px;">
+                    <div style="position:relative;margin-left:-50px;margin-top:40px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="position:relative;margin-left:-54px;margin-top:100px;width:40px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step4")%>'>
+            <pe:container alignment="_ctr" ClickThrough="true" style="font-size:12px;margin-left:0px;margin-top:0px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:180px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"单击鼠标左键选择建造材料"%>
+                </div>
+                <div style="margin-left:220px;margin-top:25px;">
+                    <div style="position:relative;margin-left:153px;margin-top:-50px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="position:relative;margin-left:150px;margin-top:6px;width:40px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step5")%>'>
+            <pe:container alignment="_ctb" ClickThrough="true" style="font-size:12px;margin-left:450px;margin-top:110px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"鼠标左键専再次单击【E】键关闭【建造与环境】窗口"%>
+                </div>
+                <div style="margin-left:50px;margin-top:20px;">
+                    <div style="position:relative;margin-left:-50px;margin-top:40px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="position:relative;margin-left:-54px;margin-top:100px;width:40px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step6")%>'>
+            <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:200px;margin-top:0px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"点击鼠标右键，在指定位置放置【方块】"%>
+                </div>
+                <div style="margin-left:50px;margin-top:40px;">
+                    <div name="down_arrow" style="position:relative;margin-left:-50px;margin-top:20px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_RightClick_32bits.png)" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step7")%>'>
+            <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:200px;margin-top:0px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"点击鼠标左键删除指定方块"%>
+                </div>
+                <div style="margin-left:50px;margin-top:40px;">
+                    <div name="down_arrow2" style="position:relative;margin-left:-50px;margin-top:20px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png)" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step8")%>'>
+            <pe:container alignment="_ctb" ClickThrough="true" style="font-size:12px;margin-left:450px;margin-top:110px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"鼠标左键再次单击【E】键打开【建造与环境】窗口"%>
+                </div>
+                <div style="margin-left:50px;margin-top:20px;">
+                    <div style="position:relative;margin-left:-50px;margin-top:40px;width:32px;height:34px;background:url(Texture/3DMapSystem/common/downarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="position:relative;margin-left:-54px;margin-top:100px;width:40px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step9")%>'>
+            <pe:container alignment="_lt" ClickThrough="true" style="font-size:12px;margin-left:340px;margin-top:40px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"鼠标左键单击【帮助】，打开帮助菜单栏选项"%>
+                </div>
+                <div style="margin-left:50px;margin-top:20px;">
+                    <div style="position:relative;margin-left:-91px;margin-top:-20px;width:32px;height:32px;background:url(Texture/3DMapSystem/common/uparrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
+                    <div style="position:relative;margin-left:-96px;margin-top:-80px;width:40px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition='<%=(name=="step10")%>'>
+            <pe:container alignment="_lt" ClickThrough="true" style="font-size:12px;margin-left:530px;margin-top:50px;width:600px;height:300px;background:">
+                <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
+                    <%=L"鼠标左键单击【帮助...(F1)】选项，打开帮助窗口"%>
+                </div>
+                <div style="margin-left:50px;margin-top:20px;">
+                    <div style="position:relative;margin-left:-50px;margin-top:34px;width:32px;height:32px;background:url(Texture/3DMapSystem/common/leftarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeLR)" />
+                    <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
+                </div>
+            </pe:container>
+        </pe:if>
+    </pe:mcml>
+</body>
+</html>

@@ -283,6 +283,8 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 		DesktopMenuPage.ActivateMenu(false);
 	end;
 	DesktopMenuPage.ActivateMenu(IsExpanded);
+
+	GameLogic.events:DispatchEvent({type = "ShowCreatorDesktop" , bShow = IsExpanded});	
 end
 
 function CreatorDesktop:OnLayoutRequested(requesterName)

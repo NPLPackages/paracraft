@@ -27,6 +27,23 @@ local clients = {};
 
 function TunnelClient:ctor()
 	self.virtualConns = {};
+	NPL.RegisterEvent(0, "_n_TunnelClient_network", ";MyCompany.Aries.Game.Network.TunnelClient.OnNetworkEvent();");
+end
+
+-- c++ callback function. 
+function TunnelClient.OnNetworkEvent()
+	local self = s_singletonServer;
+	local msg = msg;
+	local code = msg.code;
+	local msg_msg = msg.msg;
+	if(code == NPLReturnCode.NPL_ConnectionDisconnected) then
+		local tunnelClient = clients[msg.tid or msg.nid];
+		if(tunnelClient) then
+			LOG.std(nil, "info", "TunnelClient", "lost connection");
+			-- TODO: find a way to inform the user
+			tunnelClient:Disconnect();
+		end
+	end
 end
 
 -- @param ip, port: IP address of tunnel server
@@ -69,7 +86,11 @@ function TunnelClient:GetVirtualNid(username)
 end
 
 function TunnelClient:Disconnect()
-	-- TODO:
+	for nid, connection in pairs(self.virtualConns) do
+		connection:OnConnectionLost();
+		connection:OnError("OnConnectionLost with reason = server actively disconnect");
+	end
+	self.virtualConns = {};
 end
 
 -- manage virtual connections
@@ -122,6 +143,16 @@ function TunnelClient:handleCmdMsg(msg)
 		LOG.std(nil, "info", "TunnelClient", "tunnel client `%s` is authenticated by the room_key: %s", self.username or "", self.room_key or "");
 		if(self.login_callback) then
 			self.login_callback(self:IsAuthenticated());
+		end
+	elseif(msg.type == "tunnel_user_disconnect") then
+		local connection = self.virtualConns[msg.username or ""];
+		if(connection) then
+			connection:OnConnectionLost();
+			-- inform the netServerHandler about it.
+			local reason = msg.reason or "unknown";
+			connection:OnError("OnConnectionLost with reason = "..reason);
+			self.virtualConns[msg.username] = nil
+			LOG.std(nil, "info", "TunnelClient", "user `%s` is disconnected from room: %s", msg.username or "", self.room_key or "");
 		end
 	else
 		-- other commands

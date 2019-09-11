@@ -32,14 +32,15 @@ function RoomInfo:Init(room_key)
 	return self;
 end
 
+-- it will overwrite existing user of the same name
 function RoomInfo:AddUser(username)
 	self.users:add(username, {username = username, last_tick=0});
 end
 
 function RoomInfo:GetUser(username)
-	if(username == "_admin") then
-		return self.users:at(1);
-	end
+--	if(username == "_admin") then
+--		return self.users:at(1);
+--	end
 	return self.users:get(username);
 end
 
@@ -47,6 +48,12 @@ end
 function RoomInfo:RemoveUser(username)
 	self.users:remove(username);
 end
+
+-- return ArrayMap. 
+function RoomInfo:GetUsers()
+	return self.users;
+end
+
 
 -- if a user does not send any message in certain time, we will need to time out and remove the user. 
 function RoomInfo:CheckTimeout()
