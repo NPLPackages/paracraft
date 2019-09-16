@@ -661,8 +661,9 @@ function GameLogic.GetUnSavedTime()
 end
 
 -- @param bSaveToLastSaveFolder: whether to save block to "blockworld.lastsave" folder
-function GameLogic.SaveAll(bSaveToLastSaveFolder)
-	if(System.World.readonly or GameLogic.isRemote) then
+-- @param bForceSave: default to nil, if true, we will save regardless the world is readonly or remote. 
+function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
+	if(not bForceSave and (System.World.readonly or GameLogic.isRemote)) then
 		_guihelper.MessageBox(format(L"您打开的是只读世界，无法保存。是否另存为本地世界?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				WorldCommon.SaveWorldAs()

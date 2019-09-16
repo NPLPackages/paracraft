@@ -258,7 +258,7 @@ local maxZ_data = {[4] = 0.5,[7] = 0.5,[8] = 0.5, }
 -- @param entity: 
 function block:AddCollisionBoxesToList(x, y, z, aabb, list, entity)
 	local data = BlockEngine:GetBlockData(x, y, z);
-	blockData = band(blockData, 0xff);
+	data = band(data, 0xff);
 	if(data <= 8) then
 	    -- lower half
 		self:SetBlockBounds(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);

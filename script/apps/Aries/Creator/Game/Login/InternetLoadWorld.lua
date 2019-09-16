@@ -400,6 +400,15 @@ function InternetLoadWorld.GotoUrl(url)
 	local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
 	local bIsLessonWorld = ParaWorldLessons.EnterWorldById(url)
 	if(not bIsLessonWorld) then
+		local cmdName = url:match("^/(%w+)%s");
+		if(cmdName) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+			CommandManager:Init()
+			CommandManager:RunCommand(url);
+			return true;
+		end
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteUrl.lua");
 		local RemoteUrl = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteUrl");
 		local urlObj = RemoteUrl:new():Init(url);

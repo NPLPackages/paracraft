@@ -61,7 +61,7 @@ Commands["menu"] = {
 			local SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage");
 			SystemSettingsPage.ShowPage()
 		elseif(name == "file.openworlddir") then
-			if(not GameLogic.IsReadOnly()) then
+			if(not GameLogic.IsReadOnly() or GameLogic.IsRemoteWorld()) then
 				Map3DSystem.App.Commands.Call("File.WinExplorer", ParaWorld.GetWorldDirectory());
 			else
 				Map3DSystem.App.Commands.Call("File.WinExplorer", ParaWorld.GetWorldDirectory():gsub("([^/\\]+)[/\\]?$",""));

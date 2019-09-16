@@ -28,7 +28,7 @@ end
         <pe:treeview ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
             <NodeTemplates>
                 <NodeTemplate DataType="file">
-                    <pe:treenode style="height:20px;" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), XPath("this|filesize")/1000, XPath("this|writedate"))%>'></pe:treenode>
+                    <pe:treenode style="height:20px;" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), math.ceil(XPath("this|filesize")/1000), XPath("this|writedate"))%>'></pe:treenode>
                 </NodeTemplate>
             </NodeTemplates>
             <DataNodePlaceholder xpath="*" />

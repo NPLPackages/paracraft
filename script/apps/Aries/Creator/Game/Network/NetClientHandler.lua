@@ -107,9 +107,9 @@ function NetClientHandler:handleErrorMessage(text)
 			local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 			ServerPage.ResetClientInfo()
 			_guihelper.MessageBox(L"已与服务器断开连接,可能服务器已关闭或有其他用户使用该帐号登录.点击\"确定\"返回本地世界",function (result)
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
-				local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
-				InternetLoadWorld.EnterWorld()
+--				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+--				local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+--				InternetLoadWorld.EnterWorld()
 				--if(result == _guihelper.DialogResult.Yes) then
 				--end
 			end,_guihelper.MessageBoxButtons.OK);

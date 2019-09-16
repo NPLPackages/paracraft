@@ -362,6 +362,23 @@ function ServerManager:SendPacketToAllPlayersExcept(packet, excludedPlayer)
     end
 end
 
+-- @param bUpdate: true to update
+function ServerManager:GetStats(bUpdate)
+	self.stats = self.stats or {};
+	local stats = self.stats;
+	if(bUpdate) then
+		stats[1] = {totalPlayers = #(self.playerEntityList)};
+		local names = {};
+		for i =1, #(self.playerEntityList) do
+			local entityPlayer = self.playerEntityList[i];
+			if(entityPlayer.GetUserName) then
+				names[#names+1] = entityPlayer:GetUserName() or "noname";
+			end
+		end
+		stats[2] = {playerNames = names};
+	end
+	return self.stats;
+end
 
 -- Called when a player successfully logs in. Reads player data from disk and inserts the player into the world.
 function ServerManager:PlayerLoggedIn(entityMP)

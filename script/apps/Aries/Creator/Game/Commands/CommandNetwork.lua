@@ -722,3 +722,20 @@ end)
  		end)
      end,
  };
+
+ Commands["netstat"] = {
+ 	name="netstat", 
+ 	quick_ref= format("/netstat"), 
+ 	isLocal=false,
+ 	desc=[[list all active users connected to this server
+]], 
+     handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/ServerManager.lua");
+		local ServerManager = commonlib.gettable("MyCompany.Aries.Game.Network.ServerManager");
+		local stats = ServerManager.GetSingleton():GetStats(true);
+		echo("/netstat output:")
+		echo(stats)
+		local text = commonlib.serialize_compact(stats);
+		_guihelper.MessageBox(text);
+     end,
+ };

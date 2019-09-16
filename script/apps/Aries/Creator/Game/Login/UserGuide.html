@@ -7,7 +7,7 @@
 </head>
 <body>
     <pe:mcml>
-        <script type="text/npl" src="UsrGuide.lua">
+        <script type="text/npl" src="UserGuide.lua">
             <![CDATA[
             UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
             UserGuide.OnInit();
@@ -17,7 +17,7 @@
         <pe:if condition='<%=(name=="step1")%>'>
             <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:-500px;margin-top:-200px;width:600px;height:300px;background:">
                 <div style="float:left">
-                    <div class="helptip" style="position:relative;color:#B9AB73;margin-top:0px;margin-left:0px;padding:4px;padding-left:10px;padding-right:10px;">使用键盘【W/A/S/D】控制角色移动</div>
+                    <div class="helptip" style="position:relative;color:#B9AB73;margin-top:0px;margin-left:0px;padding:4px;padding-left:10px;padding-right:10px;"><%=L"使用键盘【W/A/S/D】控制角色移动"%></div>
                     <div style="float:left;margin-top:40px;margin-left:20px;font-weight:bold;font-size:16px;text-align:center;color:#000000;">
                         <div name="key_w" style="margin-left:52px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">W</div><br />
                         <div name="key_a" style="margin-left:0px;margin-top:4px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">A</div>
@@ -115,7 +115,7 @@
                 </div>
                 <div style="margin-left:50px;margin-top:20px;">
                     <div style="position:relative;margin-left:-91px;margin-top:-20px;width:32px;height:32px;background:url(Texture/3DMapSystem/common/uparrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD)" />
-                    <div style="position:relative;margin-left:-96px;margin-top:-80px;width:40px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
+                    <div style="position:relative;margin-left:-96px;margin-top:-80px;width:80px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
                     <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
                 </div>
             </pe:container>
@@ -127,6 +127,7 @@
                 </div>
                 <div style="margin-left:50px;margin-top:20px;">
                     <div style="position:relative;margin-left:-50px;margin-top:34px;width:32px;height:32px;background:url(Texture/3DMapSystem/common/leftarrow.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeLR)" />
+                    <div style="position:relative;margin-left:-290px;margin-top:36px;width:222px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12);background-animation:url(script/UIAnimation/CommonBar.lua.table#FadeIn)" />
                     <div style="width:128px;height:128px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_32bits.png);" />
                 </div>
             </pe:container>

@@ -31,21 +31,21 @@ end
 
 function UserGuide.ShowPage(param)
 	System.App.Commands.Call("File.MCMLWindowFrame", {
-	url = "script/apps/Aries/Creator/Game/Login/UserGuide.html"..param, 
-	name = "UserGuide.ShowPage", 
-	isShowTitleBar = false,
-	DestroyOnClose = true,
-	style = CommonCtrl.WindowFrame.ContainerStyle,
-	allowDrag = false,
-	bShow = true,
-	zorder = 0,
-	click_through = true,
-	directPosition = true,
-	align = "_fi", 
-	x = 0,
-	y = 0,
-	width = 0,
-	height = 0,
+		url = "script/apps/Aries/Creator/Game/Login/UserGuide.html"..param, 
+		name = "UserGuide.ShowPage", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = false,
+		bShow = true,
+		zorder = 2000,
+		click_through = true,
+		directPosition = true,
+		align = "_fi", 
+		x = 0,
+		y = 0,
+		width = 0,
+		height = 0,
 	});
 end
 

@@ -236,7 +236,14 @@ function WorldCommon.SaveWorldAs()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 			
-	local lastWorldName = WorldCommon.GetWorldTag("name")
+	local lastWorldName = WorldCommon.GetWorldTag("name") or "no_name"
+
+	if(GameLogic.IsRemoteWorld()) then
+		-- always save before save as if world is a remote client world.
+		GameLogic.RunCommand("/touchworld");
+		GameLogic.SaveAll(true, true);
+	end
+
 	local defaultWorldName = lastWorldName;
 	for i=1, 10 do
 		local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
@@ -252,9 +259,9 @@ function WorldCommon.SaveWorldAs()
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
 		if(result and result~="") then
-			local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(result) .. "/";
+			local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. result.. "/";
 			if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
-				_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?", result), function(res)
+				_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						WorldCommon.SaveWorldAsImp(targetFolder);
 					end
