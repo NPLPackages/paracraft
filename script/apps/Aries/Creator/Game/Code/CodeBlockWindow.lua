@@ -445,6 +445,10 @@ function CodeBlockWindow.OnChangeFilename()
 		if(page) then
 			local filename = page:GetValue("filename");
 			self.entity:SetDisplayName(filename);
+			local codeBlock = CodeBlockWindow.GetCodeBlock();
+			if(codeBlock) then
+				codeBlock:SetModified(true);
+			end
 		end
 	end
 end
@@ -723,6 +727,26 @@ function CodeBlockWindow.OnClickSelectLanguageSettings()
 			CodeBlockWindow.UpdateCodeEditorStatus()
 		end
 	end, old_value or "", L"选择语言配置文件", "npl");
+end
+
+function CodeBlockWindow.GetCustomToolbarMCML()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+	local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
+	local entity = CodeBlockWindow.GetCodeEntity()
+	local mcmlText;
+	if(entity) then
+		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
+		mcmlText = LanguageConfigurations:GetCustomToolbarMCML(entity:GetLanguageConfigFile())
+	end
+	if(not mcmlText) then
+		mcmlText = string.format([[<div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
+            <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%%="%s"%%>' />
+        </div>
+        <input type="button" value='<%%="%s"%%>' tooltip='<%%="%s"%%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+]],
+		L"左键查看代码方块中的角色, 右键打开电影方块", L"角色模型", L"也可以通过电影方块编辑");
+	end
+	return mcmlText;
 end
 
 function CodeBlockWindow.OnClickEditMode(name)

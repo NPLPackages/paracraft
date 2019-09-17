@@ -25,7 +25,7 @@ NplCad.categories = {
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
     {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
-    {name = "Export", text = L"导出", colour = "#235789", },
+--    {name = "Export", text = L"导出", colour = "#235789", },
 --    {name = "Animation", text = L"动画", colour = "#717171", },
     
 };
@@ -78,7 +78,7 @@ function NplCad.AppendAll()
 		NplCadDef_Math.GetCmds(),
 		NplCadDef_Skeleton.GetCmds(),
 --		NplCadDef_Animation.GetCmds(),
-		NplCadDef_Export.GetCmds(),
+--		NplCadDef_Export.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);
@@ -125,10 +125,38 @@ function NplCad.CompileCode(code, filename, codeblock)
         block_name = "default"
     end
 	local worldpath = ParaWorld.GetWorldDirectory();
-	
-    local filepath = format("%sblocktemplates/nplcad/%s.x",worldpath, commonlib.Encoding.Utf8ToDefault(block_name));
+	local relativePath = format("blocktemplates/nplcad/%s.x",commonlib.Encoding.Utf8ToDefault(block_name));
+    local filepath = worldpath..relativePath;
 	code = NplCad.GetCode(code, filepath);
+
+	NplCad.SetCodeBlockActorAsset(codeblock, relativePath);
+
 	return CodeCompiler:new():SetFilename(filename):Compile(code);
+end
+
+-- set code block's nearby movie block's first actor's model to filepath if it is not. 
+function NplCad.SetCodeBlockActorAsset(codeBlock, filepath)
+	if(CodeBlockWindow.GetCodeBlock() == codeBlock and CodeBlockWindow.IsVisible()) then
+		local actor;
+		local movieEntity = codeBlock:GetMovieEntity();
+		if(movieEntity and not movieEntity:GetFirstActorStack()) then
+			movieEntity:CreateNPC();
+			CodeBlockWindow:GetSceneContext():UpdateCodeBlock();
+		end
+
+		local sceneContext = CodeBlockWindow:GetSceneContext();
+		if(sceneContext) then
+			actor = sceneContext:GetActor()
+		end
+		actor = actor or codeBlock:GetActor();
+		if(actor) then
+			local assetfile = actor:GetValue("assetfile", 0);
+			if(assetfile ~= filepath) then
+				actor:AddKeyFrameByName("assetfile", 0, filepath);
+				actor:FrameMovePlaying(0);
+			end
+		end
+	end
 end
 
 -- create short cut in code API, so that we can write cube() instead of ShapeBuilder.cube()
@@ -171,7 +199,7 @@ local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.l
 NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
 %s
 local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
-ShapeBuilder.runExportFiles(%q);
+NplCad.ExportToFile(ShapeBuilder.getScene(),%q);
 if(result)then
 	setActorValue("assetfile", %q)
 	setActorValue("showBones", true)
@@ -180,4 +208,45 @@ end
 ]], code, filename, filename, filename, filename, filename)
 end
 
+-- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
+-- return nil or a mcml string. 
+function NplCad.GetCustomToolbarMCML()
+
+	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
+    <div style="float:left;margin-left:0px;margin-top:7px;"
+            tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
+        <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
+    </div>
+]],
+		L"导出");
+	return NplCad.toolBarMcmlText;
+end
+
+function NplCad.OnClickExport(type)
+	local codeBlock = CodeBlockWindow.GetCodeBlock();
+	if(codeBlock) then
+		codeBlock:SetModified();
+		NplCad.export_type = type;
+		codeBlock:GetEntity():Restart();
+		NplCad.export_type = nil;
+	end
+end
+function NplCad.ExportToFile(scene,filename)
+    local type = NplCad.export_type;
+    if(not type or not scene or not filename)then
+        return
+    end
+    local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
+
+    filename = string.match(filename, [[(.+).(.+)$]]);
+     if(type == "stl")then
+        filename = filename .. ".stl";
+        SceneHelper.saveSceneToStl(filename,scene,false,true);
+    elseif(type == "gltf")then
+        filename = filename .. ".gltf";
+        SceneHelper.saveSceneToGltf(filename,scene);
+    end
+    _guihelper.MessageBox(string.format(L"成功导出:%s",filename));
+
+end
 

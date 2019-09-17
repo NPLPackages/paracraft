@@ -20,6 +20,9 @@ local TunnelClient = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"
 
 TunnelClient:Property({"Connected", false, "IsConnected", "SetConnected", auto=true})
 TunnelClient:Property({"bAuthenticated", false, "IsAuthenticated", "SetAuthenticated", auto=true})
+-- whether to log all batch messages to log.txt
+TunnelClient:Property({"logBatchMsg", false, "IsLogBatchMsg", "SetLogBatchMsg", auto=true})
+
 
 TunnelClient:Signal("server_connected")
 
@@ -27,6 +30,11 @@ local clients = {};
 
 function TunnelClient:ctor()
 	self.virtualConns = {};
+	self.lastMsgNids = commonlib.Array:new();
+	self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:OnTimer(timer);
+	end})
+	
 	NPL.RegisterEvent(0, "_n_TunnelClient_network", ";MyCompany.Aries.Game.Network.TunnelClient.OnNetworkEvent();");
 end
 
@@ -65,6 +73,7 @@ function TunnelClient:ConnectServer(ip, port, room_key, username, password, call
 	conn:SetDefaultNeuronFile("script/apps/Aries/Creator/Game/Network/TunnelService/TunnelServer.lua");
 	conn:SetNid(room_key);
 	self.conn = conn;
+	self.timer:Change(200, 200); 
 
 	conn:Connect(5, function(bSuccess)
 		self:SetConnected(bSuccess);
@@ -91,6 +100,7 @@ function TunnelClient:Disconnect()
 		connection:OnError("OnConnectionLost with reason = server actively disconnect");
 	end
 	self.virtualConns = {};
+	self.timer:Change(); 
 end
 
 -- manage virtual connections
@@ -104,10 +114,54 @@ end
 -- @param msg: the raw message table {id=packet_id, .. }. 
 -- @param neuronfile: should be nil. By default, it is ConnectionBase. 
 function TunnelClient:Send(nid, msg, neuronfile)
-	-- TODO; check msg, and route via tunnel server
+	-- check msg, and route via tunnel server
 	if(self.conn) then
-		self.conn:Send({room_key=self.room_key, dest=nid, msg=msg}, nil)
+		-- merge the identical messages to several users into one message, send only once. 
+		if(self.lastMsg ~= msg) then
+			self:SendLastBatchMessages();
+
+			self.lastMsg = msg;
+			self.lastMsgNids:push_back(nid);
+		elseif(msg) then
+			self.lastMsgNids:push_back(nid);
+		else
+			self.conn:Send({room_key=self.room_key, dest=nid, msg=msg}, nil)
+		end
+
+		-- self.conn:Send({room_key=self.room_key, dest=nid, msg=msg}, nil)
 	end
+end
+
+function TunnelClient:SendLastBatchMessages()
+	if(self.lastMsg) then
+		-- batch send identical messages to self.lastMsgNids
+		local nBatchMsgSize = self.lastMsgNids:size();
+		if(nBatchMsgSize == 1) then
+			self.conn:Send({room_key=self.room_key, dest=self.lastMsgNids[1], msg=self.lastMsg}, nil)
+		elseif(nBatchMsgSize > 1) then
+			-- for i = 1, nBatchMsgSize do
+			--	  self.conn:Send({room_key=self.room_key, dest=self.lastMsgNids[i], msg=self.lastMsg}, nil)
+			-- end
+
+			-- send one batch message to all destinations
+			self.conn:Send({room_key=self.room_key, dests = self.lastMsgNids, msg=self.lastMsg}, nil)
+
+			if(self.logBatchMsg) then
+				local msgText = commonlib.serialize_compact(self.lastMsg)
+				LOG.std(nil, "debug", "TunnelClient", "%s batch sent %d bytes to %d end points", self.username, #(msgText), self.lastMsgNids:size());
+				echo(msgText)
+			end
+		else
+			LOG.std(nil, "error", "TunnelClient", "no batch messages to send");
+		end
+		
+		self.lastMsg = nil;
+		self.lastMsgNids:clear();
+	end
+end
+
+function TunnelClient:OnTimer(timer)
+	self:SendLastBatchMessages();
 end
 
 -- login with current user name

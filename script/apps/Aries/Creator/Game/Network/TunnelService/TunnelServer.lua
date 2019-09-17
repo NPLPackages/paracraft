@@ -100,11 +100,32 @@ function TunnelServer:GetClientAddress(username)
 	end
 end
 
+
+-- private: relay a message to dest
+function TunnelServer:sendMessageToDest(dest_username, msg, src_username, room_key, room)
+	if(dest_username) then
+		local user = room:GetUser(dest_username);
+		local dest_addr = self:GetClientAddress(dest_username);
+		if(not dest_addr) then
+			-- no connection for user, notify the source
+			LOG.std(nil, "debug", "TunnelServer", "no connection for user %s in room %s", dest_username, room_key);
+			NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
+		elseif(not user) then
+			-- no valid user found, assume it is disconnected
+			LOG.std(nil, "debug", "TunnelServer", "no valid dest (target) user %s in room %s", dest_username, room_key);
+			NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
+		else
+			-- relay the message
+			NPL.activate(dest_addr, {room_key = room_key, from = src_username, msg=msg, });
+		end
+	end
+end
+
 function TunnelServer:handleReceive(msg)
 	local msg_type = msg.type;
 	local nid = msg.nid or msg.tid;
 	
-	if(not msg_type and msg.room_key and msg.dest) then
+	if(not msg_type and msg.room_key) then
 		-- relay message from source to destination on behalf of source user
 		local src_username = self:GetUserNameFromNid(nid);
 		if(not src_username) then
@@ -113,20 +134,15 @@ function TunnelServer:handleReceive(msg)
 		local room_key = msg.room_key;
 		local room = self:GetRoom(room_key);
 		if(room) then
-			local dest_username = msg.dest;
-			local user = room:GetUser(dest_username);
-			local dest_addr = self:GetClientAddress(dest_username);
-			if(not dest_addr) then
-				-- no connection for user, notify the source
-				LOG.std(nil, "debug", "TunnelServer", "no connection for user %s in room %s", dest_username, room_key);
-				NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
-			elseif(not user) then
-				-- no valid user found, assume it is disconnected
-				LOG.std(nil, "debug", "TunnelServer", "no valid dest (target) user %s in room %s", dest_username, room_key);
-				NPL.activate(dest_addr, {type="tunnel_user_disconnect", username = dest_username, reason="user not found"});
+			if(msg.dest) then
+				self:sendMessageToDest(msg.dest, msg.msg, src_username, room_key, room)
+			elseif(msg.dests) then
+				local dests = msg.dests;
+				for i=1, #dests do
+					self:sendMessageToDest(dests[i], msg.msg, src_username, room_key, room)
+				end
 			else
-				-- relay the message
-				NPL.activate(dest_addr, {room_key = room_key, from = src_username, msg=msg.msg, });
+				-- no destination in message, should never goes here
 			end
 		else
 			-- TODO: no room found,...
@@ -155,6 +171,7 @@ function TunnelServer:handleReceive(msg)
 		-- TODO: call :updateInsertRoom(room_info);
 	end
 end
+
 
 local function activate()
 	local msg = msg;

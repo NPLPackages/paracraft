@@ -22,10 +22,12 @@ local PacketBlockMultiChange = commonlib.inherit(commonlib.gettable("MyCompany.A
 function PacketBlockMultiChange:ctor()
 end
 
+-- @param blockList: we will make a clone of this. 
 function PacketBlockMultiChange:Init(chunkX, chunkZ, blockList, count)
 	self.chunkX = chunkX;
 	self.chunkZ = chunkZ;
-	self.blockList = blockList;
+	local blockList_ = {};
+	self.blockList = blockList_;
 
 	local cx = chunkX * 16;
     local cz = chunkZ * 16;
@@ -33,6 +35,7 @@ function PacketBlockMultiChange:Init(chunkX, chunkZ, blockList, count)
 	local dataList = {};
 	for i=1, #blockList do
 		local packedIndex = blockList[i];
+		blockList_[#blockList_+1] = packedIndex;
 		local x, y, z;
 		x = cx + band(rshift(packedIndex, 12), 15);
 		y = band(packedIndex, 255);

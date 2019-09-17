@@ -61,4 +61,13 @@ function LanguageConfigurations:GetCompiler(filename)
 	return config and config.CompileCode;
 end
 
+-- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
+-- return nil or a mcml string. 
+function LanguageConfigurations:GetCustomToolbarMCML(filename)
+	local config = self:GetConfig(filename)
+	if(config and config.GetCustomToolbarMCML) then
+		return config:GetCustomToolbarMCML();
+	end
+end
+
 LanguageConfigurations:InitSingleton();
