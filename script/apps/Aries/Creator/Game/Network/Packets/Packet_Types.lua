@@ -135,6 +135,8 @@ function Packet_Types:StaticInit()
 	self:AddIdClassMapping(50, true, true, Packets.PacketGetFile);
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketPutFile.lua");
 	self:AddIdClassMapping(51, true, true, Packets.PacketPutFile);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketMultiple.lua");
+	self:AddIdClassMapping(52, true, true, Packets.PacketMultiple);
 	-- TODO: add new packets here
 end
 

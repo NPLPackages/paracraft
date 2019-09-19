@@ -143,13 +143,39 @@ function ChunkObserver:SendPacketToPlayersInChunk(packet, excludingEntityMP)
     end
 end
 
+function ChunkObserver:BeginUpdateBlockEntity()
+	self.isBeginUpdateBlockEntity = true;
+	self.packets = nil;
+end
+
+function ChunkObserver:EndUpdateBlockEntity()
+	if(self.isBeginUpdateBlockEntity) then
+		self.isBeginUpdateBlockEntity = false;
+		if(self.packets) then
+			if(#(self.packets) > 1) then
+				self:SendPacketToPlayersInChunk(Packets.PacketMultiple:new():Init(self.packets));
+				--LOG.std(nil, "debug", "ChunkObserver", "batch sent %d update block messages", #(self.packets));
+			else
+				self:SendPacketToPlayersInChunk(self.packets[1]);
+				--LOG.std(nil, "debug", "ChunkObserver", "sent %d update block messages", #(self.packets));
+			end
+			self.packets = nil;
+		end
+	end
+end
+
 -- send block entities
 function ChunkObserver:UpdateBlockEntity(blockEntity)
 	if (blockEntity and blockEntity:IsBlockEntity()) then
-        local packet = blockEntity:GetDescriptionPacket();
-        if (packet) then
-			self:SendPacketToPlayersInChunk(packet);
-        end
+		local packet = blockEntity:GetDescriptionPacket();
+		if (packet) then
+			if(self.isBeginUpdateBlockEntity) then
+				self.packets = self.packets or {};
+				self.packets[#self.packets + 1] = packet;
+			else
+				self:SendPacketToPlayersInChunk(packet);
+			end
+		end
     end
 end
 
@@ -175,6 +201,7 @@ function ChunkObserver:SendChunkUpdate()
                 z = chunkLocation.chunkZ * 16;
                 self:SendPacketToPlayersInChunk(Packets.PacketMapChunk:new():Init(self:GetMyChunk(), false, self.chunkVerticalChangeBitfield));
 
+				self:BeginUpdateBlockEntity();
                 for y = 0, 15 do
                     if (band(self.chunkVerticalChangeBitfield,  lshift(1,y)) ~= 0) then
                         local min_y = lshift(y, 4);
@@ -187,10 +214,12 @@ function ChunkObserver:SendChunkUpdate()
 						end
                     end
                 end
+				self:EndUpdateBlockEntity();
             else
                 self:SendPacketToPlayersInChunk(Packets.PacketBlockMultiChange:new():Init(chunkLocation.chunkX, chunkLocation.chunkZ, self.blocksToUpdate, self.numBlocksToUpdate));
 
-                for i = 1, #(self.blocksToUpdate) do 
+				self:BeginUpdateBlockEntity();
+				for i = 1, #(self.blocksToUpdate) do 
 					local packedIndex = self.blocksToUpdate[i];
 					x = chunkLocation.chunkX * 16 + band(rshift(packedIndex, 12), 15);
 					y = band(packedIndex, 255);
@@ -201,6 +230,7 @@ function ChunkObserver:SendChunkUpdate()
 						self:UpdateBlockEntity(blockEntity);
 					end
                 end
+				self:EndUpdateBlockEntity();
             end
         end
         self.numBlocksToUpdate = 0;

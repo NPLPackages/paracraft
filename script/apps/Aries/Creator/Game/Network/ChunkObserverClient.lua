@@ -70,13 +70,39 @@ function ChunkObserverClient:SendPacketToServer(packet)
 	self.thePlayerManager:GetWorldClient():GetPlayer():AddToSendQueue(packet);
 end
 
+function ChunkObserverClient:BeginUpdateBlockEntity()
+	self.isBeginUpdateBlockEntity = true;
+	self.packets = nil;
+end
+
+function ChunkObserverClient:EndUpdateBlockEntity()
+	if(self.isBeginUpdateBlockEntity) then
+		self.isBeginUpdateBlockEntity = false;
+		if(self.packets) then
+			if(#(self.packets) > 1) then
+				self:SendPacketToServer(Packets.PacketMultiple:new():Init(self.packets));
+				--LOG.std(nil, "debug", "ChunkObserverClient", "batch sent %d update block messages", #(self.packets));
+			else
+				self:SendPacketToServer(self.packets[1]);
+				--LOG.std(nil, "debug", "ChunkObserverClient", "sent %d update block messages", #(self.packets));
+			end
+			self.packets = nil;
+		end
+	end
+end
+
 -- send block entities
 function ChunkObserverClient:UpdateBlockEntity(blockEntity)
 	if (blockEntity) then
-        local packet = blockEntity:GetDescriptionPacket();
-        if (packet) then
-            self:SendPacketToServer(packet);
-        end
+		local packet = blockEntity:GetDescriptionPacket();
+		if (packet) then
+			if(self.isBeginUpdateBlockEntity) then
+				self.packets = self.packets or {};
+				self.packets[#self.packets + 1] = packet;
+			else
+				self:SendPacketToServer(packet);
+			end
+		end
     end
 end
 
@@ -106,6 +132,8 @@ function ChunkObserverClient:SendChunkUpdate()
             end
         else
             self:SendPacketToServer(Packets.PacketBlockMultiChange:new():Init(chunkLocation.chunkX, chunkLocation.chunkZ, self.blocksToUpdate, self.numBlocksToUpdate));
+
+			self:BeginUpdateBlockEntity();
             for i = 1, #(self.blocksToUpdate) do 
 				local packedIndex = self.blocksToUpdate[i];
 				x = chunkLocation.chunkX * 16 + band(rshift(packedIndex, 12), 15);
@@ -117,6 +145,7 @@ function ChunkObserverClient:SendChunkUpdate()
 					self:UpdateBlockEntity(blockEntity);
 				end
             end
+			self:EndUpdateBlockEntity();
         end
         self.numBlocksToUpdate = 0;
 		self.blocksToUpdate:clear();

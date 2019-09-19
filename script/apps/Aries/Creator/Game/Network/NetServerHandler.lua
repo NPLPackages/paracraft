@@ -273,7 +273,7 @@ function NetServerHandler:handleBlockMultiChange(packet_BlockMultiChange)
 			y = band(packedIndex, 255);
 			z = cz + band(rshift(packedIndex, 8), 15);
 			-- for multiple blocks update, we will NOT notify neighbor changes (assuming some copy, paste operations on the client side)
-			BlockEngine:SetBlock(x, y, z, idList[i], dataList[i], 0);
+			BlockEngine:SetBlock(x, y, z, idList[i], dataList[i]);
         end
 	end
 end

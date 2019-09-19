@@ -49,9 +49,9 @@ function UserIntroduction.ShowPage()
 		allowDrag = false,
 		directPosition = true,
 			align = "_ct",
-			x = -750/2,
+			x = -660/2,
 			y = -500/2,
-			width = 750,
+			width = 660,
 			height = 500,
 		cancelShowAnimation = true,
 	});
