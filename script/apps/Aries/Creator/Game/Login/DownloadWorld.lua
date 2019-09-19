@@ -15,14 +15,21 @@ NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local UniString = commonlib.gettable("System.Core.UniString")
 
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 
 local page;
 -- init function. page script fresh is set to false.
 function DownloadWorld.OnInit()
-	page = document:GetPageCtrl();
-	page:SetValue("url", DownloadWorld.url);
+	local url = DownloadWorld.url or ''
+
+	if UniString.GetTextWidth(url, "System;14") > 480 then
+		url = UniString:new(url):sub(1, 55).text .. '...'
+	end
+
+	page = document:GetPageCtrl()
+	page:SetValue("url", url)
 end
 
 function DownloadWorld.OnDownloadFileNotify(state, text, currentFileSize, totalFileSize)
