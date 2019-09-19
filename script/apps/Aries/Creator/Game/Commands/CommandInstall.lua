@@ -99,6 +99,7 @@ Commands["install"] = {
 						if(entry and entry.entry and entry.entry.url and entry.payload and entry.payload.cached_filepath) then
 							ParaIO.CreateDirectory(dest);
 							if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
+								Files.NotifyNetworkFileChange(dest)
 								TakeBlockModel_(filename)
 							else
 								LOG.std(nil, "warn", "CommandInstall", "failed to copy from %s to %s", entry.payload.cached_filepath, dest);

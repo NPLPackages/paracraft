@@ -258,3 +258,29 @@ function Files.ResolveFilePath(filename)
 	info.filename = filename:match("([^/]+)$");
 	return info;
 end
+
+-- @param filename: must be relative to Root directory instead of world directory 
+function Files.NotifyNetworkFileChange(filename)
+	if(GameLogic.isRemote) then
+		-- uploading file
+		local relativeFilename = Files.GetRelativePath(filename);
+		if(relativeFilename ~= filename) then
+			local file = ParaIO.open(filename, "r")
+			if(file:IsValid()) then
+				local data = file:GetText(0, -1);
+				file:close();
+				GameLogic.GetPlayer():AddToSendQueue(Packets.PacketPutFile:new():Init(relativeFilename, data));
+				LOG.std(nil, "info", "Files", "upload file: %s", relativeFilename)	
+			end
+		end
+	elseif(GameLogic.isServer) then
+		local relativeFilename = Files.GetRelativePath(filename);
+		if(relativeFilename ~= filename) then
+			local servermanager = GameLogic.GetWorld():GetServerManager();
+			if(servermanager) then
+				LOG.std(nil, "info", "Files", "notify all clients about changed file: %s", relativeFilename)
+				servermanager:SendPacketToAllPlayers(Packets.PacketPutFile:new():Init(relativeFilename));
+			end
+		end
+	end
+end

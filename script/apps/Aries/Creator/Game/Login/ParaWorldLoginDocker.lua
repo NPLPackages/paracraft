@@ -204,8 +204,8 @@ local app_install_details = {
 		redistFolder="haqi2/", updaterConfigPath = "config/autoupdater/haqi2_win32.xml"
 	},
 	["truckstar"] = {
-		title=L"创意空间社区版", hasParacraft = false, 
-		cmdLine = 'noupdate="true" debug="main" mc="true" loadpackage="npl_packages/paracraft/" bootstrapper="script/apps/Aries/main_loop.lua" mod="Truck" isDevEnv="true" disable-parent-package-lookup="true"',
+		title=L"创意大厅", hasParacraft = false, 
+		cmdLine = 'noupdate="true" mc="true" loadpackage="npl_packages/paracraft/" bootstrapper="script/apps/Aries/main_loop.lua" mod="Truck" isDevEnv="true" disable-parent-package-lookup="true"',
 		redistFolder="truck/", updaterConfigPath = "config/autoupdater/truckstar_win32.xml",
 		additional_manifest = "assets_manifest_truckload.txt",
 		allowQQHall = true,
@@ -350,7 +350,7 @@ function ParaWorldLoginDocker.OnClickApp(name)
 				MainLogin:next_step({IsLoginModeSelected = true});
 			end
 		end
-	elseif(name == "haqi" or name=="haqi2") then
+	elseif(name == "haqi" or name=="haqi2" or name == "truckstar") then
 		if(not ParaWorldLoginDocker.IsLoadedApp(name))then
 			ParaWorldLoginDocker.InstallApp(name, function(bInstalled)
 				if(bInstalled) then
@@ -358,9 +358,6 @@ function ParaWorldLoginDocker.OnClickApp(name)
 				end
 			end)
 		end
-	elseif(name == "truckstar") then
-		ParaWorldLoginDocker.Restart(name, format('paraworldapp="%s"', name))
-
 	elseif(name == "exit_paraworld") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 		local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");

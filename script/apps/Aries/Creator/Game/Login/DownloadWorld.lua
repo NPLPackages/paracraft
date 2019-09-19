@@ -13,6 +13,7 @@ DownloadWorld.Close();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+NPL.load("(gl)script/ide/System/Core/UniString.lua");
 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local UniString = commonlib.gettable("System.Core.UniString")
@@ -30,6 +31,11 @@ function DownloadWorld.OnInit()
 
 	page = document:GetPageCtrl()
 	page:SetValue("url", url)
+end
+
+-- TODO: 
+function DownloadWorld.HasCloseButton()
+	return false;
 end
 
 function DownloadWorld.OnDownloadFileNotify(state, text, currentFileSize, totalFileSize)

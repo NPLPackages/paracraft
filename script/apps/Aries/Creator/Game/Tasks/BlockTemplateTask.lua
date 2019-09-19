@@ -231,28 +231,7 @@ function BlockTemplate:SaveTemplate()
 			ParaAsset.LoadParaX("", filename):UnloadAsset();
 			LOG.std(nil, "info", "BlockTemplate", "unload to refresh %s", filename);
 
-			if(GameLogic.isRemote) then
-				-- uploading file
-				local relativeFilename = Files.GetRelativePath(filename);
-				if(relativeFilename ~= filename) then
-					local file = ParaIO.open(filename, "r")
-					if(file:IsValid()) then
-						local data = file:GetText(0, -1);
-						file:close();
-						GameLogic.GetPlayer():AddToSendQueue(Packets.PacketPutFile:new():Init(relativeFilename, data));
-						LOG.std(nil, "info", "Files", "upload file: %s", relativeFilename)	
-					end
-				end
-			elseif(GameLogic.isServer) then
-				local relativeFilename = Files.GetRelativePath(filename);
-				if(relativeFilename ~= filename) then
-					local servermanager = GameLogic.GetWorld():GetServerManager();
-					if(servermanager) then
-						LOG.std(nil, "info", "Files", "notify all clients about changed file: %s", relativeFilename)
-						servermanager:SendPacketToAllPlayers(Packets.PacketPutFile:new():Init(relativeFilename));
-					end
-				end
-			end
+			Files.NotifyNetworkFileChange(filename);
 		end
 		return true;
 	end
