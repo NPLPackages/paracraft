@@ -949,7 +949,15 @@ function CodeBlockWindow:GetSceneContext()
 	end
 	return self.sceneContext;
 end
+
 function CodeBlockWindow.NplBrowserIsLoaded()
     return NplBrowserLoaderPage.IsLoaded();
 end
+
+function CodeBlockWindow.OnClickSettings()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockSettings.lua");
+	local CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
+	CodeBlockSettings.Show(true)
+end
+
 CodeBlockWindow:InitSingleton();
