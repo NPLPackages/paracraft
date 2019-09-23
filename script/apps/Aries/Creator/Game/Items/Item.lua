@@ -609,7 +609,7 @@ end
 -- virtual:
 -- when alt key is pressed to pick a block in edit mode. 
 function Item:PickItemFromPosition(x,y,z)
-	itemStack = ItemStack:new():Init(self.id, 1)
+	local itemStack = ItemStack:new():Init(self.id, 1)
 	if(self:HasColorData()) then
 		local block_data = BlockEngine:GetBlockData(x,y,z);
 		if(block_data and block_data~=0) then

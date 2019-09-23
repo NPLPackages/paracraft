@@ -13,9 +13,9 @@
             UserIntroduction.OnInit();
             ]]>
         </script>
-        <aries:window mode="thin" width="660" height="500" title='<%=L"欢迎来到Paracraft" %>' onclose="UserIntroduction.CloseWindow()">
+        <aries:window mode="center" width="660" height="510" title='<%=L"欢迎来到Paracraft！" %>' onclose="UserIntroduction.CloseWindow()">
             <div style="margin-left:30px;margin-top:12px;height:54px;width:600px;text-align:left;color:#ffffff;font-size:13px">
-                ParaCraft是一款个人世界创作工具。包含方块建模、骨骼动画、电影动画和程序设计等强大的创作功能。
+                <%=L"ParaCraft是一款个人世界创作工具。包含方块建模、骨骼动画、电影动画和程序设计等强大的创作功能。" %>
             </div>
             <div style="margin-left:50px;margin-top:0px;height:170px;width:600px">
                 <div style="margin-left:0px;margin-top:0px;height:128px;width:256px;background:url(https://api.keepwork.com/storage/v0/siteFiles/6649/raw#block_modeling.png)" tooltip='<%=L"Paracraft动画与编程教学"%>' onclick="UserIntroduction.OnClick1"></div>
@@ -29,7 +29,7 @@
                 <div style="margin-left:294px;margin-top:-128px;height:128px;width:256px;background:url(https://api.keepwork.com/storage/v0/siteFiles/6651/raw#learn_programming.png)" onclick="UserIntroduction.OnClick1"></div>
                 <div style="float:left;position:relative;margin-left:294px;margin-top:10px;width:256px;text-align:center;font-size:12px;color:#ffffff"><%=L"程序设计" %></div>
             </div>
-            <div style="margin-left:30px;margin-top:10px;height:45px;width:600px;">
+            <div style="margin-left:30px;margin-top:8px;height:45px;width:600px;">
                 <input type="checkbox" onclick="UserIntroduction.OnChangeShowOnStartup" style="margin-top:10px;margin-left:0px" name="showOnStart" checked='<%=UserIntroduction.IsShowOnStartup()%>' />
                 <div style="float:left;position:relative;margin-left:4px;margin-top:10px;font-size:12px;color:#b9b0b0" for="showOnStart"><%=L"进入世界时显示"%></div>
                 <input type="button" value='<%=L"进入新手引导" %>' style="spacing:20px;margin-left:202px;height:40px;min-width:120px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" class="mc_light_orange_button_with_fillet" onclick="UserIntroduction.ShowUserGuide" />

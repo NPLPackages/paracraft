@@ -10,6 +10,7 @@ NplCad.MakeBlocklyFiles();
 -------------------------------------------------------
 ]]
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local NplCad = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.NplCad.NplCad", NplCad);
@@ -239,14 +240,23 @@ function NplCad.ExportToFile(scene,filename)
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
 
     filename = string.match(filename, [[(.+).(.+)$]]);
-     if(type == "stl")then
+    if(type == "stl")then
         filename = filename .. ".stl";
         SceneHelper.saveSceneToStl(filename,scene,false,true);
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
         SceneHelper.saveSceneToGltf(filename,scene);
     end
-    _guihelper.MessageBox(string.format(L"成功导出:%s",filename));
+    _guihelper.MessageBox(string.format(L"成功导出:%s, 是否打开所在目录", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
+		if(res and res == _guihelper.DialogResult.Yes) then
+			local info = Files.ResolveFilePath(filename)
+			if(info and info.relativeToRootPath) then
+				local absPath = ParaIO.GetCurDirectory(0)..info.relativeToRootPath;
+				local absPathFolder = absPath:gsub("[^/\\]+$", "")
+				ParaGlobal.ShellExecute("open", absPathFolder, "", "", 1);
+			end
+		end
+	end, _guihelper.MessageBoxButtons.YesNo);
 
 end
 

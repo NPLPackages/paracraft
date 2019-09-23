@@ -10,7 +10,12 @@
 <script refresh="false" type="text/npl" src="ServerPage.lua"><![CDATA[
 ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage")
 ServerPage.OnInit();
-
+if(not ServerPage.server_creator or ServerPage.server_creator=="") then
+    ServerPage.server_creator = System.User.keepworkUsername or "";
+end
+if(not ServerPage.server_name or ServerPage.server_name=="") then
+    ServerPage.server_name = System.User.keepworkUsername or "";
+end
 isEditServerName = false;
 isEditServerCreator = false;
 isEditServerDetail = false;
@@ -102,7 +107,7 @@ function CopyIPToClipboard(ip)
     ParaMisc.CopyTextToClipboard(ip);
     NPL.load("(gl)script/ide/TooltipHelper.lua");
     local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
-    BroadcastHelper.PushLabel({id="treasuretip", label = format(L"IP地址 %s 复制到剪切板", ip), max_duration=1000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+    BroadcastHelper.PushLabel({id="treasuretip", label = format(L"IP地址 %s 复制到剪切板", ip), max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 end
 
 function ChangeServerName()
@@ -320,7 +325,7 @@ end
     <div style="margin-left:-4px;width:600px;height:1px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8)" />
     <div style="margin-top:5px;margin-bottom:5px;height:38px;">
         <pe:if condition='<%=IsInServer() %>'>
-            <div style="float:left;color:#ffffff;margin-right:5px;">
+            <div style="float:left;color:#ffffff;margin-right:15px;">
             <%=L"服务器地址"%>
             </div>
             <pe:repeat DataSource = "<%=ServerPage.GetAllIPAddress()%>">
@@ -328,6 +333,7 @@ end
                     <div name="<%=Eval('text') %>" style="float:left;margin-right:10px;color:#ffffff;" onclick="CopyIPToClipboard" class="linkbutton" tooltip='<%=L"复制服务器地址"%>'>
                         <%=Eval("text") %>
                     </div>
+                    <input name="<%=Eval('text') %>" class="button" type="button" value='<%=L"复制"%>' onclick="CopyIPToClipboard"/>
                 </pe:repeatitem>
             </pe:repeat>
         </pe:if>

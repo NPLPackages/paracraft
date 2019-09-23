@@ -204,6 +204,8 @@ function NetClientHandler:handleLogin(packet_login)
 	self.currentServerMaxPlayers = packet_login.maxPlayers;
 	packet_login = GameLogic.GetFilters():apply_filters("handleLogin", packet_login);
 	entityPlayer:AutoFindPosition(true);
+
+	GameLogic:event(System.Core.Event:new():init("ps_client_login"));
 end
 
 function NetClientHandler:handleSpawnPosition(packet_SpawnPosition)
@@ -652,5 +654,19 @@ function NetClientHandler:handlePutFile(packet_PutFile)
 			-- only request from server if file is already used. 
 			self:AddToSendQueue(Packets.PacketGetFile:new():Init(packet_PutFile.filename));		
 		end
+	end
+end
+
+function NetClientHandler:handleCodeBlockEvent(packet_CodeBlockEvent)
+	local name = packet_CodeBlockEvent.name;
+	if(name == "ps_broadcast" or name == "ps_redirect") then
+		-- do nothing
+	elseif(name == "ps_restart_codeblock") then
+		local data = packet_CodeBlockEvent.data
+		if(data and data.name) then
+			
+		end
+	else
+  		GameLogic.GetCodeGlobal():handleNetworkEvent(name, packet_CodeBlockEvent.data);
 	end
 end

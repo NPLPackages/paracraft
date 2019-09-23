@@ -11,6 +11,7 @@ local item_ = ItemCodeBlock:new({icon,});
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
@@ -43,5 +44,23 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				end
 			end
 		end
+	end
+end
+
+-- virtual:
+-- when alt key is pressed to pick a block in edit mode. 
+function ItemCodeBlock:PickItemFromPosition(x,y,z)
+	local itemStack = ItemCodeBlock._super.PickItemFromPosition(self, x,y,z)
+	if(itemStack) then
+		local data = itemStack:GetPreferredBlockData()
+		if(data ~= 0) then
+			-- tricky: fixed picking NPL cad 2 block. 
+			-- TODO: this is not a good way to implement it. Do it formally. 
+			if(data == 2048) then
+				itemStack.id = block_types.names.NPLCADCodeBlock or itemStack.id;
+				-- local item = ItemClient.GetItem(block_types.names.NPLCADCodeBlock);
+			end
+		end
+		return itemStack;
 	end
 end

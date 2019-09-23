@@ -29,6 +29,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return self:getFieldAsString('var');
 	end,
@@ -62,6 +63,7 @@ say(key, 1)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'local %s = %s',
+	func_description_js = 'var %s = %s',
 	ToNPL = function(self)
 		return 'local key = "value"\n';
 	end,
@@ -94,6 +96,7 @@ say(key, 1)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = '%s = %s',
+	func_description_js = '%s = %s',
 	ToNPL = function(self)
 		return 'key = "value"\n';
 	end,
@@ -118,6 +121,7 @@ say(text, 1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
+	func_description_js = '"%s"',
 	ToNPL = function(self)
 		return string.format('"%s"', self:getFieldAsString('left'));
 	end,
@@ -143,6 +147,7 @@ say(text, 1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return self:getFieldAsString("value");
 	end,
@@ -221,6 +226,7 @@ say(text, 1)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = '-- %s',
+	func_description_js = '// %s',
 	ToNPL = function(self)
 		return string.format('-- %s', self:getFieldAsString('value'));
 	end,

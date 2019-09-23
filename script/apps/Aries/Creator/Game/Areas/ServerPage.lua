@@ -177,7 +177,7 @@ function ServerPage.CreateServer(host,port)
 		ServerPage.beAdmin = true;
 		--ServerPage.GetIP();
 		ServerPage.ShowPage();
-	end,_guihelper.MessageBoxButtons.Yes);
+	end);
 end
 
 function ServerPage.GetInternetIP()

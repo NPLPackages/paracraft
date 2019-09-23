@@ -45,6 +45,7 @@ local cmds = {
 	canRun = false,
 	nextStatement = true,
 	func_description = 'createNode("%s",%s,%s)',
+	func_description_js = 'createNode("%s",%s,%s)',
 	ToNPL = function(self)
 		return string.format('createNode("%s","%s",%s)\n', 
         self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
@@ -81,6 +82,7 @@ local cmds = {
     previousStatement = true,
 	nextStatement = true,
 	func_description = 'cloneNodeByName(%s,%s,%s)',
+	func_description_js = 'cloneNodeByName(%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('cloneNodeByName("%s","%s","%s")\n', 
             self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
@@ -112,6 +114,7 @@ local cmds = {
     previousStatement = true,
 	nextStatement = true,
 	func_description = 'cloneNode(%s,%s)',
+	func_description_js = 'cloneNode(%s,%s)',
 	ToNPL = function(self)
         return string.format('cloneNode("%s","%s")\n', 
             self:getFieldValue('op'), self:getFieldValue('color'));
@@ -135,6 +138,7 @@ local cmds = {
     previousStatement = true,
 	nextStatement = true,
 	func_description = 'deleteNode(%s)',
+	func_description_js = 'deleteNode(%s)',
 	ToNPL = function(self)
         return string.format('deleteNode("%s")\n', 
             self:getFieldValue('name'));
@@ -172,6 +176,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'move(%s,%s,%s)',
+	func_description_js = 'move(%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('move(%s,%s,%s)\n', 
             self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
@@ -209,6 +214,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'scale(%s,%s,%s)',
+	func_description_js = 'scale(%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('scale(%s,%,%s)\n', 
             self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
@@ -240,6 +246,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'rotate(%s,%s)',
+	func_description_js = 'rotate(%s,%s)',
 	ToNPL = function(self)
         return string.format('rotate(%s,%s)\n', 
             self:getFieldValue('axis'),self:getFieldValue('angle'));
@@ -290,6 +297,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'rotateFromPivot(%s,%s,%s,%s,%s)',
+	func_description_js = 'rotateFromPivot(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('rotateFromPivot(%s,%s,%s,%s,%s)\n', 
             self:getFieldValue('axis'),self:getFieldValue('angle'),
@@ -335,6 +343,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'mirror(%s,%s,%s,%s)',
+	func_description_js = 'mirror(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('mirror(%s,%s,%s,%s)\n', 
             self:getFieldValue('axis_plane'),
@@ -379,6 +388,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'moveNode(%s,%s,%s,%s)',
+	func_description_js = 'moveNode(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('moveNode("%s",%s,%s,%s)\n', 
             self:getFieldValue('name'),
@@ -423,6 +433,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'scaleNode(%s,%s,%s,%s)',
+	func_description_js = 'scaleNode(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('scaleNode("%s",%s,%s,%s)\n', 
             self:getFieldValue('name'),
@@ -459,6 +470,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'rotateNode(%s,%s,%s)',
+	func_description_js = 'rotateNode(%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('rotateNode("%s",%s,%s)\n', 
             self:getFieldValue('name'),
@@ -515,6 +527,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'rotateNodeFromPivot(%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'rotateNodeFromPivot(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('rotateNodeFromPivot("%s",%s,%s,%s,%s,%s)\n', 
             self:getFieldValue('name'),
@@ -566,6 +579,7 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'mirrorNode(%s,%s,%s,%s,%s)',
+	func_description_js = 'mirrorNode(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('mirrorNode("%s",%s,%s,%s,%s)\n', 
             self:getFieldValue('name'),
@@ -598,6 +612,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
+	func_description_js = '"%s"',
 	ToNPL = function(self)
         return string.format('"%s"', 
             self:getFieldValue('value')
@@ -627,6 +642,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
         return string.format('%s', self:getFieldValue('value'));
 	end,
@@ -654,6 +670,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
         return string.format('%s', self:getFieldValue('value'));
 	end,

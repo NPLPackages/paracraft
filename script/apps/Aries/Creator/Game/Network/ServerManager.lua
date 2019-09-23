@@ -393,10 +393,18 @@ function ServerManager:PlayerLoggedIn(entityMP)
 		local entityPlayer = self.playerEntityList[i];
         entityMP:SendPacketToPlayer(Packets.PacketPlayerInfo:new():Init(entityPlayer:GetUserName(), true, entityPlayer.ping));
     end
+
+	local event = System.Core.Event:new():init("ps_user_joined")
+  	event.msg = {username = entityMP:GetUserName(), isServer = true};
+  	GameLogic:event(event);
 end
 
 -- Called when a player disconnects from the game. Writes player data to disk and removes them from the world.
 function ServerManager:PlayerLoggedOut(entityMP)
+	local event = System.Core.Event:new():init("ps_user_left")
+  	event.msg = {username = entityMP:GetUserName(), isServer = true};
+  	GameLogic:event(event);
+
     self:WritePlayerData(entityMP);
     local worldserver = entityMP:GetWorldServer();
 

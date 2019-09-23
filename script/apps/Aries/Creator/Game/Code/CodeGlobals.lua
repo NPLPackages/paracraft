@@ -22,6 +22,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerVia
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
@@ -528,21 +529,27 @@ function CodeGlobals:CheckLobbyServer(bSigninIfNot)
 end
 
 function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
-	self:CheckLobbyServer(true);
-	local event = self:CreateGetTextEvent(event_name);
-	event:AddEventListener("net", callbackFunc);
+	if(event_name:match("^ps_")) then
+		-- for private server event
+		self:RegisterTextEvent(event_name, callbackFunc);
+	else
+		local event = self:CreateGetTextEvent(event_name);
+		event:AddEventListener("net", callbackFunc);
 	
-	if event_name == "connect" then
-		local clients = LobbyServer.GetSingleton():GetClients();
-		for k, v in pairs(clients) do
-			event:DispatchEvent({type="net", msg={userinfo = v}});
-		end
+		if event_name == "connect" then
+			self:CheckLobbyServer(true);
+			local clients = LobbyServer.GetSingleton():GetClients();
+			for k, v in pairs(clients) do
+				event:DispatchEvent({type="net", msg={userinfo = v}});
+			end
 		
-		clients = LobbyServerViaTunnel.GetSingleton():GetClients();
-		for k, v in pairs(clients) do
-			event:DispatchEvent({type="net", msg={userinfo = v}});
+			clients = LobbyServerViaTunnel.GetSingleton():GetClients();
+			for k, v in pairs(clients) do
+				event:DispatchEvent({type="net", msg={userinfo = v}});
+			end
 		end
 	end
+	
 end
 
 function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
@@ -560,42 +567,78 @@ end
 -- send a named message to one computer in the network
 -- @param event_name: if nil, we will send an binary stream (msg) to keepworkUsername, 
 -- which needs to be nid/ip:port (*8099, \\\\10.27.3.5 8099)
-function CodeGlobals:SendNetworkEvent(keepworkUsername, event_name, msg)
-	if(not self:CheckLobbyServer()) then
-		return
-	end
-
-	if(event_name) then
-		if LobbyServer.GetSingleton():IsStarted() then
-			LobbyServer.GetSingleton():SendTo(keepworkUsername, event_name, msg);
+function CodeGlobals:SendNetworkEvent(username, event_name, msg)
+	if(GameLogic.isRemote) then
+		-- client side code
+		if(username == "host" or username == "admin") then
+			GameLogic.GetPlayer():AddToSendQueue(Packets.PacketCodeBlockEvent:new():Init(event_name, msg));	
+		elseif(username == nil or username == "@all") then
+			-- redirect a broadcast to host
+			GameLogic.GetPlayer():AddToSendQueue(Packets.PacketCodeBlockEvent:new():Init("ps_broadcast", {name=event_name, msg = msg}));	
+		else
+			-- redirect to target user
+			GameLogic.GetPlayer():AddToSendQueue(Packets.PacketCodeBlockEvent:new():Init("ps_redirect", {username = username, name = event_name, msg = msg}));	
 		end
+	elseif(GameLogic.isServer) then
+		-- server side code
+		if(username == "host" or username == "admin") then
+			-- handle locally in the next time frame.
+			commonlib.TimerManager.SetTimeout(function()  
+				GameLogic.GetCodeGlobal():handleNetworkEvent(event_name, msg);
+			end, 1)
+			
+		elseif(username == nil or username == "@all") then
+			local servermanager = GameLogic.GetWorld():GetServerManager();
+			if(servermanager) then
+				servermanager:SendPacketToAllPlayers(Packets.PacketCodeBlockEvent:new():Init(event_name, msg));
+			end
+		elseif(type(username) == "number") then
+			local targetEntity = EntityManager.GetEntityById(username);
+			if targetEntity == GameLogic.GetPlayer() then
+				-- handle locally in the next time frame. 
+				commonlib.TimerManager.SetTimeout(function()  
+					GameLogic.GetCodeGlobal():handleNetworkEvent(event_name, msg);
+				end, 1)
+			elseif targetEntity then
+				if(targetEntity.SendPacketToPlayer) then
+					targetEntity:SendPacketToPlayer(Packets.PacketCodeBlockEvent:new():Init(event_name, msg))
+					return true;
+				end
+			end
+		end
+	elseif(self:CheckLobbyServer()) then
+		if(event_name) then
+			if LobbyServer.GetSingleton():IsStarted() then
+				LobbyServer.GetSingleton():SendTo(username, event_name, msg);
+			end
 		
-		if LobbyServerViaTunnel.GetSingleton():IsStarted() then
-			LobbyServerViaTunnel.GetSingleton():SendTo(keepworkUsername, event_name, msg);
-		end
-	else
-		if LobbyServer.GetSingleton():IsStarted() then
-			LobbyServer.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
-		end
+			if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+				LobbyServerViaTunnel.GetSingleton():SendTo(username, event_name, msg);
+			end
+		else
+			if LobbyServer.GetSingleton():IsStarted() then
+				LobbyServer.GetSingleton():SendOriginalMessage(username, msg);
+			end
 		
-		if LobbyServerViaTunnel.GetSingleton():IsStarted() then
-			LobbyServerViaTunnel.GetSingleton():SendOriginalMessage(keepworkUsername, msg);
-		end
+			if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+				LobbyServerViaTunnel.GetSingleton():SendOriginalMessage(username, msg);
+			end
+		end	
 	end
 end
 
 -- send a named message to all computers in the network
 function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
-	if(not self:CheckLobbyServer()) then
-		return
-	end
+	if(GameLogic.isRemote or GameLogic.isServer) then
+		self:SendNetworkEvent("@all", event_name, msg)
+	elseif(self:CheckLobbyServer()) then
+		if LobbyServer.GetSingleton():IsStarted() then
+			LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
+		end
 	
-	if LobbyServer.GetSingleton():IsStarted() then
-		LobbyServer.GetSingleton():BroadcastMessage(event_name, msg)
-	end
-	
-	if LobbyServerViaTunnel.GetSingleton():IsStarted() then
-		LobbyServerViaTunnel.GetSingleton():BroadcastMessage(event_name, msg)
+		if LobbyServerViaTunnel.GetSingleton():IsStarted() then
+			LobbyServerViaTunnel.GetSingleton():BroadcastMessage(event_name, msg)
+		end	
 	end
 end
 

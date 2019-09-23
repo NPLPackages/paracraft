@@ -46,6 +46,7 @@ CodeBlock:Property("Name", "CodeBlock");
 CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", auto=true,});
 CodeBlock:Property({"AutoWait", true, "IsAutoWait", "SetAutoWait", });
 CodeBlock:Property({"modified", false, "IsModified", "SetModified", auto=true});
+CodeBlock:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 
 CodeBlock:Signal("message", function(errMsg) end);
 CodeBlock:Signal("actorClicked", function(actor, mouse_button) end);
@@ -1138,5 +1139,17 @@ function CodeBlock:RunCommand(cmd_name, cmd_text)
 		handlerFunc(self, cmd_text);
 	else
 		return GameLogic.RunCommand(cmd_name, cmd_text);
+	end
+end
+
+function CodeBlock:SetAllowClientExecution(bAllow)
+	if(self:GetEntity()) then
+		self:GetEntity():SetAllowClientExecution(bAllow)
+	end
+end
+
+function CodeBlock:IsAllowClientExecution()
+	if(self:GetEntity()) then
+		return self:GetEntity():IsAllowClientExecution();
 	end
 end

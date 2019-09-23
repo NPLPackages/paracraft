@@ -455,6 +455,33 @@ end)
 },
 
 {
+	type = "networkEventTypes", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"ps_用户加入", "ps_user_joined" },
+				{ L"ps_用户离开", "ps_user_left" },
+				{ L"用户加入", "connect" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+{
 	type = "registerNetworkEvent", 
 	message0 = L"当收到网络消息%1(%2)时",
 	message1 = "%1",
@@ -462,7 +489,7 @@ end)
 		{
 			name = "msg",
 			type = "input_value",
-			shadow = { type = "text", value = "connect",},
+			shadow = { type = "networkEventTypes", value = "connect",},
 			text = "connect", 
 		},
 		{
@@ -506,7 +533,17 @@ while(true) do
    broadcastNetworkEvent("updateScore", {score = 100})
    wait(1);
 end
-]]}},
+]]},
+{desc = "", canRun = false, code = [[
+registerNetworkEvent("ps_user_joined", function(msg)
+    tip("user join: "..msg.username)
+end)
+
+registerNetworkEvent("ps_user_left", function(msg)
+    tip("user left: "..msg.username)
+end)
+]]}
+},
 },
 
 {
@@ -664,6 +701,10 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 			type = "field_dropdown",
 			options = {
 				{ L"/tip hello", "/tip hello" },
+				{ L"改变时间[-1,1]", "/time"},
+				{ L"设置真实光影[1|2|3]", "/shader"},
+				{ L"设置光源颜色[0,2] [0,2] [0,2]", "/light"},
+				{ L"设置太阳颜色[0,2] [0,2] [0,2]", "/sun"},
 				{ L"添加规则:发送事件HelloEvent", "/sendevent HelloEvent {data=1}" },
 				{ L"添加规则:Lever可放在Glowstone上", "/addrule Block CanPlace Lever Glowstone" },
 				{ L"添加规则:Glowstone可被删除", "/addrule Block CanDestroy Glowstone true" },

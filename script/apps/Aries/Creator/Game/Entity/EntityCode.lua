@@ -28,6 +28,7 @@ local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
+Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
@@ -162,6 +163,10 @@ function Entity:SaveToXMLNode(node, bSort)
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	if(self:IsAllowClientExecution()) then
+		node.attr.allowClientExecution = true;
+	end
+
 	if(self:GetLanguageConfigFile()~="") then
 		node.attr.languageConfigFile = self:GetLanguageConfigFile();
 	end
@@ -188,6 +193,7 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
+	self:SetAllowClientExecution(node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 
@@ -264,7 +270,7 @@ function Entity:SetPowered(isPowered)
 		self.isPowered = isPowered;
 		local codeBlock = self:GetCodeBlock(true)
 		if(codeBlock and not codeBlock:IsLoaded()) then
-			if(not GameLogic.isRemote) then
+			if(not GameLogic.isRemote or self:IsAllowClientExecution()) then
 				self:Restart();
 			end
 		end
@@ -275,7 +281,7 @@ function Entity:Refresh()
 	local codeBlock = self:GetCodeBlock()
 	if(codeBlock) then
 		if(self.isPowered and not codeBlock:IsLoaded()) then
-			if(not GameLogic.isRemote) then
+			if(not GameLogic.isRemote or self:IsAllowClientExecution()) then
 				self:Restart();
 			end
 		elseif(not self.isPowered and codeBlock:IsLoaded()) then
@@ -696,4 +702,19 @@ end
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
 	self:MarkForUpdate();
+end
+
+function Entity:SetAllowClientExecution(bAllow)
+	self.isAllowClientExecution = bAllow == true;
+
+	local colorData = self.isAllowClientExecution and 1024 or 0;
+	local old_data = BlockEngine:GetBlockData(self.bx, self.by, self.bz) or 0;	
+	local data = colorData + mathlib.bit.band(old_data, 0x00FF);
+	if(old_data ~= data) then
+		BlockEngine:SetBlockData(self.bx, self.by, self.bz, data);
+	end
+end
+
+function Entity:IsAllowClientExecution()
+	return self.isAllowClientExecution;
 end

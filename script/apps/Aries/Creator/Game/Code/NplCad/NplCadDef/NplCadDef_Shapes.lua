@@ -11,6 +11,7 @@ local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Np
 ]]
 local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_Shapes");
 local cmds = {
+
 {
 	type = "cube", 
 	message0 = L" %1 正方体 %2 %3",
@@ -42,6 +43,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'cube(%s,%s,%s)',
+	func_description_js = 'cube(%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cube("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('size'), self:getFieldValue('color'));
 	end,
@@ -92,6 +94,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'box(%s,%s,%s,%s,%s)',
+	func_description_js = 'box(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('box("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'));
 	end,
@@ -129,6 +132,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'sphere(%s,%s,%s)',
+	func_description_js = 'sphere(%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('sphere("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('color'));
 	end,
@@ -172,6 +176,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'cylinder(%s,%s,%s,%s)',
+	func_description_js = 'cylinder(%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cylinder("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
@@ -224,6 +229,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'cone(%s,%s,%s,%s,%s)',
+	func_description_js = 'cone(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cone("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
@@ -267,6 +273,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'torus(%s,%s,%s,%s)',
+	func_description_js = 'torus(%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('torus("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'));
 	end,
@@ -317,6 +324,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'prism(%s,%s,%s,%s,%s)',
+	func_description_js = 'prism(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('prism("%s",%s,%s,%s,"%s")\n',self:getFieldValue('op'), self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'));
 	end,
@@ -367,6 +375,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'ellipsoid(%s,%s,%s,%s,%s)',
+	func_description_js = 'ellipsoid(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('ellipsoid("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'),
@@ -418,6 +427,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'wedge(%s,%s,%s,%s,%s)',
+	func_description_js = 'wedge(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('wedge("%s",%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'), 
@@ -476,6 +486,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'trapezoid(%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'trapezoid(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('trapezoid(("%s",%s,%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'), 
@@ -572,6 +583,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'wedge_full(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'wedge_full(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return string.format('wedge_full(("%s",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'), 

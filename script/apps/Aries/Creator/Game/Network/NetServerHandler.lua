@@ -459,3 +459,23 @@ function NetServerHandler:handleMobSpawn(packet_MobSpawn)
 		spawnedEntity:Attach();
 	end
 end
+
+
+function NetServerHandler:handleCodeBlockEvent(packet_CodeBlockEvent)
+	local name = packet_CodeBlockEvent.name;
+	if(name == "ps_broadcast" or name == "ps_redirect") then
+		local data = packet_CodeBlockEvent.data;
+		GameLogic.GetCodeGlobal():SendNetworkEvent(name, data.name, data.msg);
+	else
+		local data = packet_CodeBlockEvent.data;
+		local entity = self.playerEntity;
+		if (entity) then
+			if(type(data) == "table") then
+				data.username = entity:GetUserName();
+			else
+				data = {username = entity:GetUserName(), msg = data};
+			end
+		end
+		GameLogic.GetCodeGlobal():handleNetworkEvent(name, data);
+	end
+end
