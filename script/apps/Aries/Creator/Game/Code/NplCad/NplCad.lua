@@ -204,7 +204,7 @@ if(result)then
 	setActorValue("showBones", true)
     NplCad.RefreshFile(%q)
 end
-]], code, filename, filename, filename, filename, filename)
+]], code or "", filename, filename, filename, filename, filename)
 end
 
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 

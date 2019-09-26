@@ -19,6 +19,7 @@ local cmds = {
 	canRun = false,
 	nextStatement = true,
 	func_description = 'createJointRoot()',
+	func_description_js = 'createJointRoot()',
 	ToNPL = function(self)
 		return string.format('createJointRoot()\n'
         );
@@ -71,6 +72,7 @@ createJointRoot()
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'createJoint(%s,%s,%s,%s)\\n%sendJoint()',
+	func_description_js = 'createJoint(%s,%s,%s,%s)\\n%sendJoint()',
 	ToNPL = function(self)
 		return string.format('createJoint("%s",%s,%s,%s)\n    %s\nendJoint()\n', 
             self:getFieldValue('name'),
@@ -103,6 +105,7 @@ endJoint()
     previousStatement = true,
 	nextStatement = true,
 	func_description = 'bindNodeByName(%s)',
+	func_description_js = 'bindNodeByName(%s)',
 	ToNPL = function(self)
         return string.format('bindNodeByName("%s")\n', 
             self:getFieldValue('name'));
@@ -145,6 +148,7 @@ bindNodeByName("object1")
 	canRun = false,
     output = {type = "null",},
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return string.format('%s', 
             self:getFieldAsString('name')

@@ -27,6 +27,7 @@ local cmds = {
 	canRun = false,
 	nextStatement = true,
 	func_description = 'createAnimation(%s)',
+	func_description_js = 'createAnimation(%s)',
 	ToNPL = function(self)
 		return string.format('createAnimation("%s")\n',  self:getFieldValue('name'))
 	end,
@@ -67,6 +68,7 @@ createAnimation("anim")
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'addChannel(%s,%s)\\n%sendChannel()',
+	func_description_js = 'addChannel(%s,%s)\\n%sendChannel()',
 	ToNPL = function(self)
 		return ""
 	end,
@@ -110,6 +112,7 @@ createAnimation("anim")
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'setAnimationTimeValue_Translate(%s,%s,%s,%s)',
+	func_description_js = 'setAnimationTimeValue_Translate(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return "";
 	end,
@@ -153,6 +156,7 @@ createAnimation("anim")
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'setAnimationTimeValue_Scale(%s,%s,%s,%s)',
+	func_description_js = 'setAnimationTimeValue_Scale(%s,%s,%s,%s)',
 	ToNPL = function(self)
         return "";
 	end,
@@ -192,6 +196,7 @@ createAnimation("anim")
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'setAnimationTimeValue_Rotate(%s,%s,%s)',
+	func_description_js = 'setAnimationTimeValue_Rotate(%s,%s,%s)',
 	ToNPL = function(self)
         return "";
 	end,
@@ -250,6 +255,7 @@ createAnimation("anim")
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'setAnimationTimeValue_rotateFromPivot(%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'setAnimationTimeValue_rotateFromPivot(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
         return "";
 	end,
@@ -277,6 +283,7 @@ createAnimation("anim")
 	canRun = false,
     output = {type = "null",},
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return string.format('%s', 
             self:getFieldAsString('name')

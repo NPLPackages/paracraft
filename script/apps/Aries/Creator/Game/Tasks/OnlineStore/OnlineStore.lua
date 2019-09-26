@@ -61,6 +61,14 @@ function OnlineStore:ShowPage(bShow)
 		return
 	end
 
+	-- NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");	
+    -- local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");	
+    -- NplBrowserLoaderPage.Check()	
+    -- if(not NplBrowserLoaderPage.IsLoaded())then	
+	-- 	ParaGlobal.ShellExecute("open", OnlineStore.GetOnlineStoreUrl(), "", "", 1);	
+	-- 	return	
+	-- end
+
 	-- use mcml window
 	if(not page) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");

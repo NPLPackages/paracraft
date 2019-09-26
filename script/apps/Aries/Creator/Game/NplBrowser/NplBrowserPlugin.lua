@@ -247,6 +247,8 @@ end
 -- create a cef window
 function NplBrowserPlugin.Start(p)
     if System.os.GetPlatform() == 'win32' then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
         NplBrowserLoaderPage.Check(function()
             -- TODO: refresh page after download cef3
         end)
