@@ -193,7 +193,7 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
-	self:SetAllowClientExecution(node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
+	selfisAllowClientExecution = (node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 
@@ -704,15 +704,28 @@ function Entity:EndEdit()
 	self:MarkForUpdate();
 end
 
-function Entity:SetAllowClientExecution(bAllow)
-	self.isAllowClientExecution = bAllow == true;
+local client_side_color = 1024;
+local npl_code_color = 2048;
 
-	local colorData = self.isAllowClientExecution and 1024 or 0;
+function Entity:UpdateBlockColor()
+	local colorData;
+	if(self.languageConfigFile == "npl_cad") then
+		-- TODO: tricky: npl_cad always has a purple color
+		colorData = npl_code_color;
+	else
+		colorData = self.isAllowClientExecution and client_side_color or 0;	
+	end
 	local old_data = BlockEngine:GetBlockData(self.bx, self.by, self.bz) or 0;	
 	local data = colorData + mathlib.bit.band(old_data, 0x00FF);
 	if(old_data ~= data) then
 		BlockEngine:SetBlockData(self.bx, self.by, self.bz, data);
 	end
+end
+
+function Entity:SetAllowClientExecution(bAllow)
+	self.isAllowClientExecution = bAllow == true;
+
+	self:UpdateBlockColor()
 end
 
 function Entity:IsAllowClientExecution()

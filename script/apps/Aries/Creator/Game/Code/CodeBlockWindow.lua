@@ -749,7 +749,7 @@ function CodeBlockWindow.GetCustomToolbarMCML()
 	return mcmlText;
 end
 
-function CodeBlockWindow.OnClickEditMode(name)
+function CodeBlockWindow.OnClickEditMode(name,bForceRefresh)
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(not entity) then
 		return
@@ -770,7 +770,7 @@ function CodeBlockWindow.OnClickEditMode(name)
 		CodeBlockWindow.OnClickSelectLanguageSettings()
 	end
 	if(name == "blockMode") then
-		CodeBlockWindow.OpenBlocklyEditor();
+		CodeBlockWindow.OpenBlocklyEditor(bForceRefresh);
 	end
 end
 
@@ -858,7 +858,7 @@ function CodeBlockWindow.GetBlockEditorUrl()
 	local url = DefaultFilters.cmd_open_url(request_url)
     return url;
 end
-function CodeBlockWindow.OpenBlocklyEditor()
+function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
 	if(entity) then
@@ -880,7 +880,7 @@ function CodeBlockWindow.OpenBlocklyEditor()
 			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
 			local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
 				if(bStarted) then
-					CodeBlockWindow.SetNplBrowserVisible(true)
+					CodeBlockWindow.SetNplBrowserVisible(true,bForceRefresh)
 				end
 			end)
 		else

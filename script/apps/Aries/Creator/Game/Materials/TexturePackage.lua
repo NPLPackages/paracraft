@@ -32,13 +32,13 @@ function TexturePackage:ctor()
 
 end
 
-function TexturePackage:Init(type, packagepath, url, bezip, parentfolder, previewimgage, revision, isdownload, name, name_r1, text, author)
+function TexturePackage:Init(type, packagepath, url, bezip, parentfolder, previewImage, revision, isdownload, name, name_r1, text, author)
 	self.type = type;
 	self.url = url;
 	self.bezip = bezip;
 	self.parentfolder = parentfolder;
 	self.revision = revision;
-	self.previewimgage = previewimgage or "";
+	self.previewImage = previewImage or "";
 	self.defaultPreviewImage = defaultPreviewImage;
 	self.isdownload = isdownload or self:IsDownloaded();
 	self.name = name or "";
@@ -65,14 +65,14 @@ function TexturePackage.CreateFromWorldTag(texture_pack_type, texture_pack_path,
 end
 
 -- create from a local zip file or folder
-function TexturePackage.CreateFromLocal(bezip,name,text,packagepath,parentfolder,previewimgage)
+function TexturePackage.CreateFromLocal(bezip,name,text,packagepath,parentfolder,previewImage)
 	local type = "local";
 	local url = "";
 	local isdownload = true;
 	local name_r1 = "";
 	local revision = "";
 	local author = "";
-	return TexturePackage:new():Init(type, packagepath, url, bezip, parentfolder, previewimgage, revision, isdownload, name, name_r1, text, author);
+	return TexturePackage:new():Init(type, packagepath, url, bezip, parentfolder, previewImage, revision, isdownload, name, name_r1, text, author);
 end
 
 -- create from a remote url
@@ -81,13 +81,17 @@ function TexturePackage.CreateFromUrl(url,text,revision, author)
 	local type = "official";
 	local bezip = true;
 	local parentfolder = "";
-	--local packagepath = _ComputeFilePath(url,revision);
-	local name = url:match("([^/]+)%.zip$");
+	local previewImage;
+	
+	local name = url:match("([^/#]+)%.zip");
 	if(name) then
 		name = format("%s_r%s.zip", name, revision);
+		previewImage = name..".png";
+		previewImage = commonlib.Encoding.Utf8ToDefault("worlds/BlockTextures/PreviewImage/")..previewImage;
 	end
 	local name_r1 = text..".zip";
-	return TexturePackage:new():Init(type, nil, url, bezip, parentfolder, nil, revision, nil, name, name_r1, text, author);
+
+	return TexturePackage:new():Init(type, nil, url, bezip, parentfolder, previewImage, revision, nil, name, name_r1, text, author);
 end
 
 function TexturePackage.LoadFromHref(href)
@@ -95,7 +99,7 @@ function TexturePackage.LoadFromHref(href)
 		return 
 	end
 	if(href) then
-		local url = href:match("(http://.*zip)#server[#=]");
+		local url = href:match("(https?://.*)#server[#=]");
 		local revision = href:match("#revision[#=](%d+)") or "";
 		local text = href:match("#text[#=]([^#=]+)") or "";
 		local author = href:match("#author[#=]([^#=]+)");
@@ -110,8 +114,8 @@ function TexturePackage.LoadFromXmlNode(node)
 	if(attr) then
 		attr.packagepath = commonlib.Encoding.Utf8ToDefault(attr.packagepath or "");
 		attr.parentfolder = commonlib.Encoding.Utf8ToDefault(attr.parentfolder or "");
-		attr.previewimgage = commonlib.Encoding.Utf8ToDefault(attr.previewimgage or "");
-		return TexturePackage:new():Init(attr.type, attr.packagepath, attr.url, attr.bezip, attr.parentfolder, attr.previewimgage, attr.revision, node.isdownload, node.name, node.name_r1, node.text);
+		attr.previewImage = commonlib.Encoding.Utf8ToDefault(attr.previewImage or "");
+		return TexturePackage:new():Init(attr.type, attr.packagepath, attr.url, attr.bezip, attr.parentfolder, attr.previewImage, attr.revision, node.isdownload, node.name, node.name_r1, node.text);
 	end
 end
 
@@ -158,29 +162,29 @@ function TexturePackage:GetPackageTextureFiles()
 end
 
 function TexturePackage.LoadFromLocalFile(dir,filename)
-	local bezip,packagename,text,packagepath,parentfolder,previewimgage;
+	local bezip,packagename,text,packagepath,parentfolder,previewImage;
 	packagename = commonlib.Encoding.DefaultToUtf8(filename);
 	text = packagename;
 	--local filename_utf8 = commonlib.Encoding.DefaultToUtf8(filename);
 	local name = filename:match("(.*)%.zip$");
 	if(name) then
 		bezip = true;
-		previewimgage = name..".png";
+		previewImage = name..".png";
 		packagepath = dir..filename;
 	else
 		bezip = false;
 		parentfolder = dir..filename;
 		packagepath = parentfolder;
 		name = filename;
-		previewimgage = name..".png";
+		previewImage = name..".png";
 	end
-	previewimgage = commonlib.Encoding.Utf8ToDefault("worlds/BlockTextures/PreviewImage/")..previewimgage;
-	return TexturePackage.CreateFromLocal(bezip,packagename,text,packagepath,parentfolder,previewimgage);
+	previewImage = commonlib.Encoding.Utf8ToDefault("worlds/BlockTextures/PreviewImage/")..previewImage;
+	return TexturePackage.CreateFromLocal(bezip,packagename,text,packagepath,parentfolder,previewImage);
 end
 
 -- get the preview image path, if nil then ruturn the default preview image;
-function TexturePackage:GetPreviewIamge()
-	return self.previewimgage or defaultPreviewImage;
+function TexturePackage:GetPreviewImage()
+	return self.previewImage or defaultPreviewImage;
 end
 
 -- compute preview image path according to the texture package name
@@ -190,32 +194,32 @@ function TexturePackage:ComputePreviewImagePath()
 		local imagename = self.name:match("(.*)%.zip$") or self.name;
 		path = format("worlds/BlockTextures/PreviewImage/%s.png",imagename);
 		path = commonlib.Encoding.Utf8ToDefault(path);
-		--previewimgage = "worlds/BlockTextures/PreviewImage/"..previewimgage;
+		--previewImage = "worlds/BlockTextures/PreviewImage/"..previewImage;
 	end
 	return path;
 end
 
 function TexturePackage:SetPreviewImagePath(images)
-	if(not self.previewimgage or (not ParaIO.DoesFileExist(self.previewimgage, true))) then
+	if(not self.previewImage or (not ParaIO.DoesFileExist(self.previewImage, true))) then
 		local path = self:ComputePreviewImagePath()
 		for i = 1,#images do
 			if(ParaIO.CopyFile(images[i], path, true)) then
 				--TexturePackageList.SetPreviewImage(package_info.type,package_info.index,newImgPath)
 				local utf8_path = commonlib.Encoding.DefaultToUtf8(path);
-				self.previewimgage = path;
+				self.previewImage = path;
 				TexturePackageList.GenerateTexturePackagesInfo();
 				LOG.std(nil, "info", "TexturePackage", "successfully create new prview image file in %s", utf8_path);
 				break;
 			end
 		end
-		--previewimgage = "worlds/BlockTextures/PreviewImage/"..previewimgage;
+		--previewImage = "worlds/BlockTextures/PreviewImage/"..previewImage;
 	end
 end
 
 -- compute local file name for the url
 function TexturePackage:ComputeFilePath()
 	if(self.type == "official" and self.url and self.url ~= "") then
-		local filename = self.url:match("([^/]+)%.zip$");
+		local filename = self.url:match("([^/#]+)%.zip");
 		return format("worlds/BlockTextures/official/%s_r%s.zip", filename, self.revision);
 	end
 end

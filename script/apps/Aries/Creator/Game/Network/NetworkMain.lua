@@ -74,12 +74,16 @@ function NetworkMain:StartServerViaTunnel(host, port, room_key, username, passwo
 
 	self.tunnelClient:ConnectServer(host, port, room_key, username, password, function(result)
 		if(result) then
-			self.tunnelClient:LoginTunnel(function(result)
+			self.tunnelClient:LoginTunnel(function(result, errorMsg)
 				if(result) then
 					-- start server with the given tunnel client
 					self.server_manager = ServerManager.GetSingleton():Init(host, port, username, self.tunnelClient);
+				else
+					_guihelper.MessageBox(L"服务器错误"..(errorMsg or ""));
 				end
 			end);
+		else
+			_guihelper.MessageBox(L"无法连接服务器");
         end
 	end)
 end
@@ -176,6 +180,8 @@ function NetworkMain:ConnectViaTunnel(ip, port, room_key, username, password)
 		if(result) then
 			-- connect with the given tunnel client
 			self:Connect(ip, port, username, password, self.tunnelClient);
+		else
+			_guihelper.MessageBox(L"无法连接服务器");
 		end
 	end)
 end

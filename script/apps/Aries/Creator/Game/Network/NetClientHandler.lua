@@ -117,6 +117,8 @@ function NetClientHandler:handleErrorMessage(text)
 			--if(player) then
 				--player:UpdateDisplayName("oops! ConnectionLost!");
 			--end
+		else
+			_guihelper.MessageBox(L"服务器返回错误信息"..(text or ""));
 		end
 	end
 	self:Cleanup();

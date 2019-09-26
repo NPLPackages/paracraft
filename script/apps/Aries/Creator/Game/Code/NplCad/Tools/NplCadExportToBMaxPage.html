@@ -1,0 +1,58 @@
+<!--script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.html-->
+<pe:mcml>
+<script type="text/npl" refresh="true" src="NplCadExportToBMaxPage.lua">
+<![CDATA[
+    local page = document:GetPageCtrl();
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.lua");
+    local NplCadExportToBMaxPage = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Tools.NplCadExportToBMaxPage");
+    NplCadExportToBMaxPage.OnInit();
+    
+    function OnClose()
+        NplCadExportToBMaxPage.OnClose();
+    end
+    function OnChange(value)
+        NplCadExportToBMaxPage.OnChange(value);
+    end
+    function BuildBMaxFile(callback)
+        NplCadExportToBMaxPage.BuildBMaxFile(callback);
+    end
+    function OnPreview(callback)
+        NplCadExportToBMaxPage.OnPreview(callback);
+    end
+    function OnExport()
+        NplCadExportToBMaxPage.OnExport();
+    end
+]]></script>
+
+<aries:window mode="thin" title='<%=L"导出BMax模型"%>' style="width:500px;height:420px;" onclose="OnClose">
+    
+    <div style="margin-top:5px;" class="default">
+        <div style="margin-left:122px;margin-top:-20px;">
+            <pe:canvas3d miniscenegraphname="DownloadWorld128" name="model_scene" autoRotateSpeed="0.5" DefaultCameraObjectDist="3.4" IsInteractive="true" RenderTargetSize="256" style="width:256px;height:256px;" />
+        </div>
+        <div style="margin-top:0px;">
+                <pe:label name="label_state" value=""/>
+        </div>
+        <div style="margin-top:15px;">
+            <div style="float:left;"><%=L"数量:"%></div>
+            <div style="float:left;margin-left:5px;">
+                <pe:sliderbar name="block_cnt" min="8" max="64" value="16" style="float:left;margin-left:5px;width:280px;height:22px;" onchange="OnChange()"></pe:sliderbar>
+            </div>
+            <div style="float:left;margin-left:5px;">
+                <pe:label name="label_cnt" style="width:30px;" value=""/>
+            </div>
+            <div style="float:left;margin-left:5px;">
+                <input type="button" value='<%=L"预览"%>' style="width:60px;" class="mc_light_grey_button_with_fillet" onclick="OnPreview()" />
+            </div>
+            <div style="float:left;margin-left:5px;">
+                <input type="button" value='<%=L"导出"%>' style="width:60px;" class="mc_light_grey_button_with_fillet" onclick="OnExport()" />
+            </div>
+        </div>
+        <div style="height:20px;">
+
+        </div>   
+
+    </div>
+</aries:window>
+</pe:mcml>
+

@@ -60,30 +60,30 @@ end
 -- @param password: optional password
 -- @param callbackFunc: function(bSuccess) end
 function TunnelClient:ConnectServer(ip, port, room_key, username, password, callbackFunc)
-	clients[room_key] = self;
-	
 	LOG.std(nil, "info", "TunnelClient", {"connecting to", ip, port, room_key});
 	self.room_key = room_key;
 	self.username = username;
 	self.password = password;
 	-- TODO: reuse connection to the same server
 	local conn = ConnectionBase:new();
-	local params = {host = tostring(ip or "127.0.0.1"), port = tostring(port or 8099), nid = room_key};
-	NPL.AddNPLRuntimeAddress(params);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetHandler.lua");
+	local NetHandler = commonlib.gettable("MyCompany.Aries.Game.Network.NetHandler");
+	local nid = NetHandler:CheckGetNidFromIPAddress(ip, port)
 	conn:SetDefaultNeuronFile("script/apps/Aries/Creator/Game/Network/TunnelService/TunnelServer.lua");
-	conn:SetNid(room_key);
+	conn:SetNid(nid);
 	self.conn = conn;
 	self.timer:Change(200, 200); 
+	clients[nid] = self;
 
-	conn:Connect(5, function(bSuccess)
+	conn:Connect(5, function(bSuccess, errorMsg)
 		self:SetConnected(bSuccess);
 		if(bSuccess) then
 			LOG.std(nil, "info", "TunnelClient", "successfully connected to tunnel server");
 		else
-			LOG.std(nil, "info", "TunnelClient", "failed to connect to tunnel server: %s :%s (room_key: %s)", params.host, params.port, room_key or "");
+			LOG.std(nil, "info", "TunnelClient", "failed to connect to tunnel server: %s :%s (room_key: %s)", tostring(ip), tostring(port), room_key or "");
 		end
 		if(callbackFunc) then
-			callbackFunc(bSuccess);
+			callbackFunc(bSuccess, errorMsg);
 		end
 	end)
 	
@@ -165,6 +165,7 @@ function TunnelClient:OnTimer(timer)
 end
 
 -- login with current user name
+-- @param callbackFunc: function(bAuthenticated, errorMsg) end
 function TunnelClient:LoginTunnel(callbackFunc)
 	-- send a tunnel login message
 	if(self.conn) then
@@ -194,9 +195,16 @@ end
 function TunnelClient:handleCmdMsg(msg)
 	if(msg.type == "tunnel_login") then
 		self:SetAuthenticated(msg.result == true);
-		LOG.std(nil, "info", "TunnelClient", "tunnel client `%s` is authenticated by the room_key: %s", self.username or "", self.room_key or "");
+		if(msg.result == true) then
+			LOG.std(nil, "info", "TunnelClient", "tunnel client `%s` is authenticated by the room_key: %s", self.username or "", self.room_key or "");
+		else
+			LOG.std(nil, "info", "TunnelClient", "tunnel client `%s` login failed because %s", self.username or "", msg.error or "");
+			self.conn:OnConnectionLost();
+			self.conn:OnError("tunnel login failed with reason = "..msg.error or "");
+			self:Disconnect();
+		end
 		if(self.login_callback) then
-			self.login_callback(self:IsAuthenticated());
+			self.login_callback(self:IsAuthenticated(), msg.error);
 		end
 	elseif(msg.type == "tunnel_user_disconnect") then
 		local connection = self.virtualConns[msg.username or ""];
@@ -218,16 +226,13 @@ end
 local function activate()
 	-- echo({"TunnelClient:receive--------->", msg})
 	local msg = msg;
-	local room_key = msg.room_key or msg.nid;
-	if(room_key) then
-		tunnelClient = clients[room_key];
-		if(tunnelClient) then
-			if(msg.type) then
-				tunnelClient:handleCmdMsg(msg);
-			else
-				msg.msg.nid = msg.from;
-				tunnelClient:handleRelayMsg(msg.msg);
-			end
+	local tunnelClient = clients[msg.nid or msg.tid];
+	if(tunnelClient) then
+		if(msg.type) then
+			tunnelClient:handleCmdMsg(msg);
+		else
+			msg.msg.nid = msg.from;
+			tunnelClient:handleRelayMsg(msg.msg);
 		end
 	end
 end

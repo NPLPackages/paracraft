@@ -53,9 +53,7 @@ end
 
 function ConnectionTCP:Connect(timeout, callback_func)
 	if(self.tunnelClient) then
-		if(callback_func) then
-			self.tunnelClient:LoginTunnel(callback_func);
-		end
+		self.tunnelClient:LoginTunnel(callback_func);
 	else
 		return ConnectionTCP._super.Connect(self, timeout, callback_func);
 	end

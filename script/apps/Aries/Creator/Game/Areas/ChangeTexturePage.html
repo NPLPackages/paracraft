@@ -98,7 +98,7 @@ end
                 <pe:if condition='<%=TextureModPage.texture_index == Eval("index") and CurrentTextureDSIsOfficial()%>'>
                     <div style="margin-top:10px;margin-left:10px;width:370px;height:45px;" class="mc_blue_button_with_fillet">
                         <div style="position:relative">
-                            <img name="WorldImage" style="float:left;margin-top:6px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewimgage"),Eval("defaultimgage"))%>' enabled="false" />    
+                            <img name="WorldImage" style="float:left;margin-top:6px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
                             <div style="float:left;margin-left:5px;">
                                 <div style="margin-top:3px;font-size:14px;height:20px;color:#ffffff;"><%=Eval("text")%></div>
                                 <div style="float:left;font-size:12px;color:#aaaaaa;"><%=Eval("name")%></div>
@@ -110,7 +110,7 @@ end
                 <pe:if condition='<%=TextureModPage.texture_index ~= Eval("index") or (not CurrentTextureDSIsOfficial())%>'>
                     <div style="margin-top:10px;margin-left:10px;width:370px;height:45px;" class="mc_dark_grey_button_with_fillet">
                         <div style="position:relative">
-                            <img name="WorldImage" style="float:left;margin-top:6px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewimgage"),Eval("defaultimgage"))%>' enabled="false" />    
+                            <img name="WorldImage" style="float:left;margin-top:6px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
                             <div style="float:left;margin-left:5px;">
                                 <div style="margin-top:3px;font-size:14px;height:20px;color:#ffffff;"><%=Eval("text")%></div>
                                 <div style="float:left;font-size:12px;color:#aaaaaa;"><%=Eval("name")%></div>
@@ -134,13 +134,13 @@ end
             <Columns>
                 <pe:if condition='<%=TextureModPage.texture_index == Eval("index") and CurrentTextureDSIsLocal()%>'>
                     <div style="margin-top:10px;margin-left:10px;height:40px;" class="mc_blue_button_with_fillet">
-                        <img name="WorldImage" zorder="1" style="float:left;margin-top:4px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewimgage"),Eval("defaultimgage"))%>' enabled="false" />    
+                        <img name="WorldImage" zorder="1" style="float:left;margin-top:4px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
                         <input type="button" zorder="1" style="float:left;margin-left:5px;margin-top:7px;width:320px;height:22px;color:#ffffff;text-align:left;background:" value='<%=Eval("text")%>' enabled="false"  />
                     </div>       
                 </pe:if>
                 <pe:if condition='<%=TextureModPage.texture_index ~= Eval("index") or (not CurrentTextureDSIsLocal())%>'>
                     <div name='<%=Eval("packagepath")%>' onclick="SelectTexture" param1="local" style="margin-top:10px;margin-left:10px;height:40px;" class="mc_dark_grey_button_with_fillet">
-                        <img name="WorldImage" zorder="1" style="float:left;margin-top:4px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewimgage"),Eval("defaultimgage"))%>' enabled="false" />
+                        <img name="WorldImage" zorder="1" style="float:left;margin-top:4px;margin-left:4px;width:32px;height:32px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />
                         <input type="button" zorder="1" style="float:left;margin-left:5px;margin-top:7px;width:320px;height:22px;color:#ffffff;text-align:left;background:" value='<%=Eval("text")%>' enabled="false" />
                     </div>                       
                 </pe:if>                       

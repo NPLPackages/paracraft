@@ -54,11 +54,14 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 	if(itemStack) then
 		local data = itemStack:GetPreferredBlockData()
 		if(data ~= 0) then
-			-- tricky: fixed picking NPL cad 2 block. 
-			-- TODO: this is not a good way to implement it. Do it formally. 
 			if(data == 2048) then
+				-- tricky: fixed picking NPL cad 2 block. 
+				-- TODO: this is not a good way to implement it. Do it formally. 
 				itemStack.id = block_types.names.NPLCADCodeBlock or itemStack.id;
 				-- local item = ItemClient.GetItem(block_types.names.NPLCADCodeBlock);
+			elseif(data == 1024) then
+				-- tricky: for client side execution code block
+				itemStack:SetPreferredBlockData(0)
 			end
 		end
 		return itemStack;

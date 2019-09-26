@@ -24,7 +24,10 @@ local TexturePackageList = commonlib.gettable("MyCompany.Aries.Creator.Game.Desk
 
 local info_path = "worlds/BlockTextures/PackagesInfo.xml";
 -- official texture is always fetched remotely.
-local wiki_url = "http://www.paraengine.com/twiki/bin/view/CCWeb/RecommendedTextureListData";
+-- Used to be: local wiki_url = "http://www.paraengine.com/twiki/bin/view/CCWeb/RecommendedTextureListData";
+
+-- this can be modified via https://keepwork.com/official/paracraft/config/RecommendedTextureList 
+local wiki_url = "https://api.keepwork.com/git/v0/projects/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2FRecommendedTextureList.md";
 local official_text_cache_policy = "access plus 7 days";
 
 local defaultPreviewImage = "worlds/BlockTextures/PreviewImage/defaultPreviewImage.png";
@@ -201,20 +204,54 @@ function TexturePackageList.LoadFromHTMLText(text,ds,callbackfun)
 			ds[i] = nil;
 		end
 
-		for href in text:gmatch('href%s*=%s*"[^"]+"') do
-			local package = TexturePackage.LoadFromHref(href);
-			if(package) then
-				local name = package.name;
-				local url = package.url;
-				if(tex_package_map[url]) then
-					package["packagepath"] = tex_package_map[url]["packagepath"];
-					package["parentfolder"] = tex_package_map[url]["parentfolder"];
-					package["previewimgage"] = tex_package_map[url]["previewimgage"];
-					tex_package_map[url] = nil;
-				--else
-					--TexturePackageList.AddTexturePackage(package);
-				end	
-				TexturePackageList.AddTexturePackage(package);
+		if(text:match("<html")) then
+			-- html text
+			for href in text:gmatch('href%s*=%s*"[^"]+"') do
+				local package = TexturePackage.LoadFromHref(href);
+				if(package) then
+					local name = package.name;
+					local url = package.url;
+					if(tex_package_map[url]) then
+						package["packagepath"] = tex_package_map[url]["packagepath"];
+						package["parentfolder"] = tex_package_map[url]["parentfolder"];
+						package["previewImage"] = tex_package_map[url]["previewImage"];
+						tex_package_map[url] = nil;
+					--else
+						--TexturePackageList.AddTexturePackage(package);
+					end	
+					TexturePackageList.AddTexturePackage(package);
+				end
+			end
+		else
+			if(text:match("^{")) then
+				-- just in case it is from keepwork git api
+				local out = {};
+				NPL.FromJson(text, out);
+				if(out.content) then
+					text = out.content;
+				end
+			else
+				-- treat as pure markdown text
+			end
+
+			-- maybe this is markdown text
+			for href in text:gmatch('%-%s+(https?://[^\n\r%s]+)') do
+				if(href:match("([^/#]+)%.zip")) then
+					local package = TexturePackage.LoadFromHref(href);
+					if(package) then
+						local name = package.name;
+						local url = package.url;
+						if(tex_package_map[url]) then
+							package["packagepath"] = tex_package_map[url]["packagepath"];
+							package["parentfolder"] = tex_package_map[url]["parentfolder"];
+							package["previewImage"] = tex_package_map[url]["previewImage"];
+							tex_package_map[url] = nil;
+						--else
+							--TexturePackageList.AddTexturePackage(package);
+						end	
+						TexturePackageList.AddTexturePackage(package);
+					end
+				end
 			end
 		end
 	end
@@ -225,7 +262,6 @@ end
 
 -- load from file if exist, otherwise refresh from disk. 
 function TexturePackageList.LoadTexturePackagesInfo(bForceRefresh)
-	local info_path = "worlds/BlockTextures/PackagesInfo.xml";
 	if(not bForceRefresh and ParaIO.DoesFileExist(info_path, true)) then
 		TexturePackageList.LoadTexturePackagesInfoFromFile(info_path);
 	else
@@ -254,12 +290,12 @@ function TexturePackageList.GenerateTexturePackagesInfo(filename, official_ds,lo
 		return;
 	end
 
-	filename = filename or "worlds/BlockTextures/PackagesInfo.xml";
+	filename = filename or info_path;
 	official_ds = official_ds or TexturePackageList.ds.official;
 	local_ds = local_ds or TexturePackageList.ds.localDisk;
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then 
-		local o = {name="packges",};
+		local o = {name="packages",};
 		for i = 1,2 do
 			local packages_name,ds;
 			if(i == 1) then
@@ -277,7 +313,7 @@ function TexturePackageList.GenerateTexturePackagesInfo(filename, official_ds,lo
 						name = ds[j]["name"],
 						text = ds[j]["text"],
 						bezip = tostring(ds[j]["bezip"]),
-						previewimgage = commonlib.Encoding.DefaultToUtf8(ds[j]["previewimgage"] or ""),
+						previewImage = commonlib.Encoding.DefaultToUtf8(ds[j]["previewImage"] or ""),
 					
 						packagepath = commonlib.Encoding.DefaultToUtf8(ds[j]["packagepath"] or ""),
 						parentfolder = commonlib.Encoding.DefaultToUtf8(ds[j]["parentfolder"] or ""),
@@ -286,7 +322,7 @@ function TexturePackageList.GenerateTexturePackagesInfo(filename, official_ds,lo
 						url = ds[j]["url"];
 						isdownload = tostring(ds[j]["isdownload"]);
 					};
-					local package = {name = "packge",attr = attr,};
+					local package = {name = "package",attr = attr,};
 					packages[#packages + 1] = package;
 				end
 			end
@@ -299,12 +335,12 @@ function TexturePackageList.GenerateTexturePackagesInfo(filename, official_ds,lo
 end
 
 function TexturePackageList.LoadTexturePackagesInfoFromFile(filename,official_ds,local_ds)
-	filename = filename or "worlds/BlockTextures/PackagesInfo.xml";
+	filename = filename or info_path;
 	local rootXML = ParaXML.LuaXML_ParseFile(filename);
 	local packagenode;
-	for localnode in commonlib.XPath.eachNode(rootXML,"/packges/local") do
+	for localnode in commonlib.XPath.eachNode(rootXML,"/packages/local") do
 		if(localnode.attr and localnode.attr.version and localnode.attr.version == "2") then
-			for packagenode in commonlib.XPath.eachNode(localnode,"/packge") do
+			for packagenode in commonlib.XPath.eachNode(localnode,"/package") do
 				local package = TexturePackage.LoadFromXmlNode(packagenode)
 				if(package) then
 					TexturePackageList.AddTexturePackage(package);
@@ -312,9 +348,9 @@ function TexturePackageList.LoadTexturePackagesInfoFromFile(filename,official_ds
 			end
 		end
 	end
-	for officialnode in commonlib.XPath.eachNode(rootXML,"/packges/official") do
+	for officialnode in commonlib.XPath.eachNode(rootXML,"/packages/official") do
 		if(officialnode.attr and officialnode.attr.version and officialnode.attr.version == "2") then
-			for packagenode in commonlib.XPath.eachNode(officialnode,"/packge") do
+			for packagenode in commonlib.XPath.eachNode(officialnode,"/package") do
 				local package = TexturePackage.LoadFromXmlNode(packagenode)
 				if(package) then
 					TexturePackageList.AddTexturePackage(package);
@@ -550,7 +586,7 @@ function TexturePackageList.GetTexturePackageInfo(dir_default,filename)
 		bezip = bezip,
 		name = filename_utf8, 
 		text = commonlib.Encoding.DefaultToUtf8(name), 
-		previewimgage = commonlib.Encoding.DefaultToUtf8(previewImg),
+		previewImage = commonlib.Encoding.DefaultToUtf8(previewImg),
 		parentfolder = commonlib.Encoding.DefaultToUtf8(parent_folder), 
 		packagepath = commonlib.Encoding.DefaultToUtf8(package_path),
 		result = result,

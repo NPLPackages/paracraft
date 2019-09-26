@@ -261,7 +261,7 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh)
 		end
 
 		-- local dir
-		local result = commonlib.Files.Find({}, GameLogic.current_worlddir.."blocktemplates/", 0, 500, function(item)
+		local result = commonlib.Files.Find({}, GameLogic.current_worlddir.."blocktemplates/", 2, 500, function(item)
 			if(item.filename:match("%.bmax$") or item.filename:match("%.blocks%.xml$")) then
 				return true;
 			end

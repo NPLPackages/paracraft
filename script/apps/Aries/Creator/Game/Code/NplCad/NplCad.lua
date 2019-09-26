@@ -26,7 +26,6 @@ NplCad.categories = {
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
     {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
---    {name = "Export", text = L"导出", colour = "#235789", },
 --    {name = "Animation", text = L"动画", colour = "#717171", },
     
 };
@@ -79,7 +78,6 @@ function NplCad.AppendAll()
 		NplCadDef_Math.GetCmds(),
 		NplCadDef_Skeleton.GetCmds(),
 --		NplCadDef_Animation.GetCmds(),
---		NplCadDef_Export.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);
@@ -214,7 +212,7 @@ end
 function NplCad.GetCustomToolbarMCML()
 
 	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
-    <div style="float:left;margin-left:0px;margin-top:7px;"
+    <div style="float:left;margin-left:5px;margin-top:7px;"
             tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
         <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
     </div>
@@ -242,11 +240,42 @@ function NplCad.ExportToFile(scene,filename)
     filename = string.match(filename, [[(.+).(.+)$]]);
     if(type == "stl")then
         filename = filename .. ".stl";
-        SceneHelper.saveSceneToStl(filename,scene,false,true);
+        local swapYZ = true;
+        local bBinary = true;
+        local bEncodeBase64 = true
+        local bIncludeColor = false;
+        SceneHelper.saveSceneToStl(filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor); -- binary
+        NplCad.ShowMessageBox(filename)
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
         SceneHelper.saveSceneToGltf(filename,scene);
+        NplCad.ShowMessageBox(filename)
+    elseif(type == "bmax")then
+        local input_filename = filename .. ".color.stl";
+        local output_filename = filename .. ".bmax";
+        local swapYZ = false;
+        local bBinary = false;
+        local bEncodeBase64 = false
+        local bIncludeColor = true;
+        SceneHelper.saveSceneToStl(input_filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor); -- text 
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.lua");
+        local NplCadExportToBMaxPage = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Tools.NplCadExportToBMaxPage");
+        NplCadExportToBMaxPage.ShowPage(input_filename,output_filename,function(result)
+            if(result)then
+                _guihelper.MessageBox(string.format(L"成功导出:%s, 是否拿在手中?", commonlib.Encoding.DefaultToUtf8(output_filename)), function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+						local info = Files.ResolveFilePath(output_filename)
+						if(info and info.relativeToWorldPath) then
+							GameLogic.RunCommand(format("/take BlockModel {tooltip=\"%s\"}", commonlib.Encoding.DefaultToUtf8(info.relativeToWorldPath)));
+						end
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+            end
+        end);
+
     end
+end
+function NplCad.ShowMessageBox(filename)
     _guihelper.MessageBox(string.format(L"成功导出:%s, 是否打开所在目录", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 		if(res and res == _guihelper.DialogResult.Yes) then
 			local info = Files.ResolveFilePath(filename)
@@ -257,6 +286,51 @@ function NplCad.ExportToFile(scene,filename)
 			end
 		end
 	end, _guihelper.MessageBoxButtons.YesNo);
-
 end
+-- open block xml code from disk
+function NplCad.OnClickOpenFile()
 
+    NPL.load("(gl)script/ide/OpenFileDialog.lua");
+    local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32({{"All Files (*.xml)", "*.xml"}});
+    if(filename) then
+	    local file = ParaIO.open(filename, "r");
+        if(file:IsValid()) then
+			local blockly_xmlcode = file:GetText();
+            local codeEntity = CodeBlockWindow.GetCodeEntity();
+            if(codeEntity)then
+                codeEntity:BeginEdit()
+		        codeEntity:SetBlocklyEditMode(true);
+		        codeEntity:SetBlocklyXMLCode(blockly_xmlcode);
+		        codeEntity:EndEdit()
+
+                CodeBlockWindow.OnClickEditMode("blockMode",true);
+            end
+	        file:close();
+        else
+	        LOG.std(nil, "error", "NplCad", "open file failed:%s",filename);
+		end
+    end
+end
+-- save blockly xml code to disk
+function NplCad.OnClickSaveFile()
+    NPL.load("(gl)script/ide/OpenFileDialog.lua");
+    local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32({{"All Files (*.xml)", "*.xml"}},nil,nil,true);
+    if(filename) then
+
+        local __,postfix = string.match(filename,"(.+)%.(.+)$");
+        if(not postfix or ( postfix and string.lower(postfix) ~= "xml" ))then
+            filename = filename .. ".xml";
+        end
+	    local file = ParaIO.open(filename, "w");
+        if(file:IsValid()) then
+        local codeEntity = CodeBlockWindow.GetCodeEntity();
+            if(codeEntity)then
+                local block_xml_txt = codeEntity:GetBlocklyXMLCode();
+	            file:WriteString(block_xml_txt);
+            end
+	        file:close();
+        else
+	        LOG.std(nil, "error", "NplCad", "save file failed:%s",filename);
+		end
+    end
+end
