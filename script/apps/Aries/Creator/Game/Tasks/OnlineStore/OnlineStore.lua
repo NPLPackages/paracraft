@@ -28,7 +28,11 @@ function OnlineStore:Init()
 end
 
 function OnlineStore.GetOnlineStoreUrl()
-	return format("https://keepwork.com/p/comp/system?port=%s", tostring(OnlineStore.portNumber or 8099));
+	if Syetem.os.GetPlatform() == 'mac' then
+		return format("https://keepwork.com/p/comp/system?type=protocol&port=%s", tostring(OnlineStore.portNumber or 8099));
+	else
+		return format("https://keepwork.com/p/comp/system?port=%s", tostring(OnlineStore.portNumber or 8099));
+	end
 end
 
 local page;
