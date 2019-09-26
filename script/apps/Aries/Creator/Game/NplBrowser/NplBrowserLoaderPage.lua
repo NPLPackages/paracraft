@@ -169,7 +169,7 @@ function NplBrowserLoaderPage.Check(callback)
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
         return
     end
-    
+
     if(NplBrowserLoaderPage.loaded)then
         if(callback)then
             callback(true);
