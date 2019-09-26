@@ -10,14 +10,18 @@ local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);
 ------------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+
+local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
-function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
+
+function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
     local page_ctrl = mcmlNode:GetPageCtrl();
 	local id = mcmlNode:GetInstanceName(rootName);
     local url = mcmlNode:GetAttributeWithCode("url");
@@ -29,14 +33,15 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
     local x = screen_x + left;
 	local y = screen_y + top;
     local input = {id = id, url = url, withControl = withControl, x = x, y = y, width = screen_width, height = screen_height, resize = true, visible = true, };
-    if(min_width and min_width > 0 and screen_width < min_width)then
+
+	if(min_width and min_width > 0 and screen_width < min_width)then
         input.zoom = -1;
     else
         input.zoom = 0;
     end
 
 	local uiScales = Screen:GetUIScaling();
-	
+
 	if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
 		input.x = math.floor(input.x*uiScales[1]);
 		input.y = math.floor(input.y*uiScales[2]);
@@ -44,7 +49,7 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
 		input.height = math.floor(input.height*uiScales[2]);
 	end
 
-    NplBrowserPlugin.OnCreatedCallback(id,function(msg)
+	NplBrowserPlugin.OnCreatedCallback(id, function(msg)
         if(msg)then
             local cmd = msg["cmd"];
             local id = msg["id"];
@@ -62,19 +67,20 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
                 end
             end
         end
-    end)
-    if(NplBrowserPlugin.WindowIsExisted(id))then
+	end)
+
+	if NplBrowserPlugin.WindowIsExisted(id) then
         NplBrowserPlugin.Open(input);
     else
 	    NplBrowserPlugin.Start(input);
-        
-    end
-    -- force save cache for zooming when run pe_nplbrowser.SetVisible after opened cef browser
-    NplBrowserPlugin.UpdateCache(id,input)
+	end
+
+	-- force save cache for zooming when run pe_nplbrowser.SetVisible after opened cef browser
+	NplBrowserPlugin.UpdateCache(id, input);
 
 	CommonCtrl.AddControl(id, id);
 
-    local function resize(id,_parent)
+	local function resize(id, _parent)
         if(_parent and _parent.GetAbsPosition)then
 		    local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
 		    local config = NplBrowserPlugin.GetCache(id);
@@ -97,8 +103,8 @@ function pe_nplbrowser.create(rootName,mcmlNode, bindingContext, _parent, left, 
     end
 
     _parent:SetScript("onsize", function()
-        if(enabledResize)then
-            resize(id,_parent);
+        if enabledResize then
+            resize(id, _parent);
         end
 	end)
 end
@@ -111,9 +117,11 @@ function pe_nplbrowser.Reload(mcmlNode,name,url)
 		NplBrowserPlugin.Open(config);
 	end
 end
-function pe_nplbrowser.SetVisible(mcmlNode,name,visible)
-    local id = mcmlNode:GetInstanceName(name);
+
+function pe_nplbrowser.SetVisible(mcmlNode, name, visible)
+	local id = mcmlNode:GetInstanceName(name);
 	local config = NplBrowserPlugin.GetCache(id);
+
 	if(config)then
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
