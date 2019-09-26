@@ -69,6 +69,16 @@ function GetModCountAsString()
         return "";
     end
 end
+
+function OnClickCustomerService()
+    local message = [[
+        联系客服<br />
+        电话：0755-86967012<br />
+        邮箱：support@paraengine.com<br />
+    ]]
+
+    _guihelper.MessageBox(message)
+end
     
 ]]></script>
 <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:" onclick="OnSelect"></pe:container>
@@ -115,7 +125,8 @@ end
 </pe:container>
 <pe:container alignment="_rb" ClickThrough="true" style="position:relative;background:;width:300px;height:90px;">
     <input type="button" value='<%=L"语言..." %>' spacing="20" align="right" class="mc_big_button" style="position:relative;margin-top:1px;margin-right:10px;color:#572712;font-size:14px;height:36px;" onclick="OnChangeLanguagePage" />
-    <input type="button" value='<%=L"致谢"%>' align="right" style="position:relative;margin-right:10px;margin-top:45px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCredits" />
+    <input type="button" value='<%=L"客服"%>' align="right" style="position:relative;margin-right:10px;margin-top:45px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCustomerService" />
+    <!-- <input type="button" value='<%=L"致谢"%>' align="right" style="position:relative;margin-right:10px;margin-top:45px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCredits" /> -->
     <!--<pe:if condition='<%=Rebranding:GetValue("donation")~="false"%>'>
         <input type="button" value='<%=L"捐赠" %>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="font-size:14px;height:36px;margin-right:20px" onclick="OnClickDonate" />
     </pe:if>-->
