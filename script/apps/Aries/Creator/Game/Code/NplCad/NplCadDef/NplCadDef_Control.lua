@@ -49,6 +49,13 @@ local cmds = {
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'for %s=%d, %d do\\n%send',
+    func_description_js_provider = [[
+    var name = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('var'), Blockly.Variables.NAME_TYPE) || 'i';
+    var start_index = Blockly.JavaScript.valueToCode(block,'start_index', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+    var end_index = Blockly.JavaScript.valueToCode(block,'end_index', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+    var input_statement_input = Blockly.JavaScript.statementToCode(block, 'input') || '';
+    return 'for(var %s = %d; %s <= %d; %s++){\n%s\n}'.format(name,start_index,name,end_index,name,input_statement_input);
+    ]],
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldAsString('input'));
 	end,

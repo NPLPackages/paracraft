@@ -23,7 +23,7 @@ function CodeBlocklyGenerator:ctor()
 
     self.language_names = {
         ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", },
-        ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", },
+        ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", function_provider_name = "func_description_js_provider", },
         ["python"] = { blockly_namesapce = "Python", function_name = "func_description_py", },
     }
 end
@@ -44,6 +44,12 @@ function CodeBlocklyGenerator:GetFunctionName(language)
     local config = self:GetLanguageConfig(language);
     if(config)then
         return config.function_name;
+    end
+end
+function CodeBlocklyGenerator:GetFunctionProviderName(language)
+    local config = self:GetLanguageConfig(language);
+    if(config)then
+        return config.function_provider_name;
     end
 end
 function CodeBlocklyGenerator:GetLanguageConfig(language)
@@ -282,8 +288,14 @@ function CodeBlocklyGenerator:ArgsToStr(cmd,language)
     local language_name = self:GetLanguageName(language);
     local func_name = self:GetFunctionName(language);
 	local func_description = cmd[func_name];
-	local s;
+
+    local func_provider_name = self:GetFunctionProviderName(language);
+	local func_description_provider = cmd[func_provider_name];
 	
+    if(func_description_provider)then
+        return func_description_provider;
+    end
+	local s;
 	if(func_description)then
 		local output = cmd.output;
 		if(output and output.type)then

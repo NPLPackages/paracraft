@@ -39,6 +39,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '((%s) %s (%s))',
+	func_description_js = '((%s) %s (%s))',
 	ToNPL = function(self)
 		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
 	end,
@@ -73,6 +74,7 @@ say(1+1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'math.random(%s,%s)',
+	func_description_js = 'math.random(%s,%s)',
 	ToNPL = function(self)
 		return string.format('math.random(%s,%s)', self:getFieldAsString('from'), self:getFieldAsString('to'));
 	end,
@@ -111,6 +113,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = '((%s) %s (%s))',
+	func_description_js = '((%s) %s (%s))',
 	ToNPL = function(self)
 		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'),self:getFieldAsString('right'));
 	end,
@@ -143,6 +146,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = '(not %s)',
+	func_description_js = '(!%s)',
 	ToNPL = function(self)
 		return string.format('(not %s)', self:getFieldAsString('left'));
 	end,
@@ -181,6 +185,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = '(%s%%s)',
+	func_description_js = '(%s%%s)',
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -205,6 +210,7 @@ say("66%10=="..(66%10))
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'math.floor(%s+0.5)',
+	func_description_js = 'Math.floor(%s+0.5)',
 	ToNPL = function(self)
 		return string.format('math.floor(%s+0.5)', self:getFieldAsString('left'));
 	end,
@@ -236,7 +242,6 @@ end
 				{ L"向下取整", "floor"},
 				{ "tab", "tan"},
 				{ "atan", "atan"},
-				{ "sin", "exp"},
 				{ "log10", "log10"},
 				{ "exp", "exp"},
 			},
@@ -253,6 +258,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'math.%s(%s)',
+	func_description_js = 'Math.%s(%s)',
 	ToNPL = function(self)
 		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));
 	end,

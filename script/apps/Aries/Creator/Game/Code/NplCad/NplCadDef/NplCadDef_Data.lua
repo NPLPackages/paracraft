@@ -169,6 +169,7 @@ say(text, 1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return string.format('%s', self:getFieldAsString('left'));
 	end,
@@ -203,6 +204,7 @@ say(text, 1)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = '%s',
+	func_description_js = '%s',
 	ToNPL = function(self)
 		return string.format('%s\n', self:getFieldAsString('codes'));
 	end,
@@ -253,6 +255,7 @@ say(text, 1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
+	func_description_js = '"%s"',
 	ToNPL = function(self)
 		return string.format('"%s"', self:getFieldAsString('VARIABLE'));
 	end,
@@ -281,6 +284,7 @@ say(text, 1)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'print3d(%s)',
+	func_description_js = 'print3d(%s)',
 	ToNPL = function(self)
         return string.format('print3d(%s)', 
             self:getFieldValue('value')
