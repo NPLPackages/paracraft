@@ -55,7 +55,11 @@ function Entity:SaveToXMLNode(node, bSort)
 end
 
 function Entity:OnClick(x, y, z, mouse_button)
-	self:clicked(mouse_button);
+	if(self:IsRemote() and self:IsServerEntity()) then
+		GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+	else
+		self:clicked(mouse_button);
+	end
 	return true;
 end
 

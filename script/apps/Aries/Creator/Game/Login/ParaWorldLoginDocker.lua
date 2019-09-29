@@ -812,7 +812,7 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 				end
             elseif(state == State.FAIL_TO_UPDATED)then
 				ParaWorldLoginDocker.SetInstalling(false);
-				_guihelper.MessageBox(L"无法应用更新");
+				_guihelper.MessageBox(L"无法应用更新"..L"请确保目前只有一个实例在运行");
 				if(callbackFunc) then
 					callbackFunc(false)
 				end

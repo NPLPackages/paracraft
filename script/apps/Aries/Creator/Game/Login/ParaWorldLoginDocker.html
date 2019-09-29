@@ -21,7 +21,7 @@ local AppButtons = {
 };
 
 local platform = System.os.GetPlatform();
-if(platform == "mac" or platform == "ios" or (platform=="android" and os.Is64BitsSystem())) then
+if(platform == "mac" or platform == "ios" or (platform=="android" and System.os.Is64BitsSystem())) then
 	for kk, vv in ipairs (AppButtons) do
         -- since PKG is not supported in 64bits system. we will disable it.
 		if(vv.name == "truckstar") then

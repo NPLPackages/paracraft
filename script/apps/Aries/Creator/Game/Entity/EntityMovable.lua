@@ -619,12 +619,16 @@ function Entity:OnClick(x, y, z, mouse_button)
 			task:Run();
 		end
 	else
-		local event = Event:new():init("onclick");	
-		event.button = mouse_button;
-		self:event(event);
+		if(self:IsRemote() and self:IsServerEntity()) then
+			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+		else
+			local event = Event:new():init("onclick");	
+			event.button = mouse_button;
+			self:event(event);
 
-		-- signal
-		self:clicked(mouse_button);
+			-- signal
+			self:clicked(mouse_button);
+		end
 	end
 	return true;
 end
