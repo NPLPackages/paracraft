@@ -71,13 +71,7 @@ function GetModCountAsString()
 end
 
 function OnClickCustomerService()
-    local message = [[
-        联系客服<br />
-        电话：0755-86967012<br />
-        邮箱：support@paraengine.com<br />
-    ]]
-
-    _guihelper.MessageBox(message)
+    ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/docs/FAQ/questions", "", "", 1);
 end
     
 ]]></script>

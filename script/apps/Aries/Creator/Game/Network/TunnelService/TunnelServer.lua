@@ -17,6 +17,7 @@ local RoomInfo = commonlib.gettable("MyCompany.Aries.Game.Network.RoomInfo");
 
 local TunnelServer = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Network.TunnelServer"));
 TunnelServer:Property({"maxRoomCount", 50, "GetMaxRoomCount", "SetMaxRoomCount", auto=true})
+TunnelServer:Property({"maxUserPerRoom", 100, "GetMaxUserPerRoom", "SetMaxUserPerRoom", auto=true})
 TunnelServer:Property({"allowClientRoomCreation", true, "IsAllowClientRoomCreation", "SetAllowClientRoomCreation", auto=true})
 
 local s_singletonServer;
@@ -63,6 +64,7 @@ function TunnelServer:GetRoomByNid(nid)
 	return self.nidToRoom[nid]
 end
 
+-- return true if succeed, false, if room is full
 function TunnelServer:AddUserToRoom(username, nid, room)
 	-- a single nid can only be in one room
 	local old_room = self:GetRoomByNid(nid)
@@ -80,15 +82,19 @@ function TunnelServer:AddUserToRoom(username, nid, room)
 			NPL.reject(user.nid);
 		else
 			-- user already in the room
-			return;
+			return true;
 		end
 	end
-	room:AddUser(username, nid);
+	if(room:GetUsersCount() < self:GetMaxUserPerRoom()) then
+		room:AddUser(username, nid);
+		return true;
+	else
+		return false;
+	end
 end
 
 -- @param room_key: new room_key
 -- @param nid: the creator's nid. 
--- TODO: In future, we may prevent the same nid to create multiple rooms. But now it is allowed. 
 -- @return room, errMsg
 function TunnelServer:TryCreateRoom(room_key, nid)
 	if(not room_key) then
@@ -223,11 +229,13 @@ function TunnelServer:handleReceive(msg)
 		if(room and msg.username) then
 			local username = msg.username;
 			-- make unique and verify username with the one in the room
-			self:AddUserToRoom(username, nid, room)
-
-			LOG.std(nil, "info", "TunnelServer", "room: `%s` added client `%s` as %s", room_key, username, nid);
-			-- send reply
-			self:sendMsg(nid, {type="tunnel_login", result = true})
+			if(self:AddUserToRoom(username, nid, room)) then
+				LOG.std(nil, "info", "TunnelServer", "room: `%s` added client `%s` as %s", room_key, username, nid);
+				-- send reply
+				self:sendMsg(nid, {type="tunnel_login", result = true})
+			else
+				self:sendMsg(nid, {type="tunnel_login", result = false, error="room is full"})
+			end
 		end
 	elseif(msg_type == "update_room" and msg.nid) then
 		-- usually sent from lobby Server to update valid rooms

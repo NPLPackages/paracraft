@@ -40,8 +40,12 @@ function RemoteUrl:Init(url)
 	elseif( string.match(url,"^local")) then
 		self.isLocalDisk = true;
 	elseif( string.match(url,"^online")) then
-		
-	elseif( string.match(url,"^p?c?:?/?/?[^%.:]+%.[^%:]+")) then
+
+	elseif( string.match(url,"^/")) then
+		-- skip commands
+	elseif( string.match(url,"^@.+")) then
+		self:ParseUserName()
+	elseif( string.match(url,"%.")) then
 		self:ParseRemoteServer();
 	else
 		return;
@@ -51,9 +55,18 @@ function RemoteUrl:Init(url)
 	end
 end
 
+function RemoteUrl:ParseUserName()
+	self.relativePath = self.url;
+	self.host = "t1.tunnel.keepwork.com";
+	self.port = 8099
+end
+
 -- private function:
 function RemoteUrl:ParseRemoteServer()
-	local host, port = string.match(self.url,"^p?c?:?/?/?([^%.:]+%.[^%:]+):?(.*)$");
+	self.url_protocol = self.url:match("^(%w+)://");
+	local url = self.url:gsub("^%w+://", "");
+	local host, port, relativePath = url:match("^([^:%s]+)[:%s]?(%d*)(.*)");
+
 	if(host and port) then
 		port = port:match("^%d+");
 		if(port) then
@@ -61,7 +74,16 @@ function RemoteUrl:ParseRemoteServer()
 		end
 		self.host = host;
 		self.port = port;
+		self.relativePath = relativePath
 	end
+end
+
+function RemoteUrl:GetRelativePath()
+	return self.relativePath
+end
+
+function RemoteUrl:GetUrlProtocol()
+	return self.url_protocol
 end
 
 function RemoteUrl:IsValid()

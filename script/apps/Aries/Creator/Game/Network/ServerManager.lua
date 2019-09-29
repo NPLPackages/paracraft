@@ -29,10 +29,18 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
-local ServerManager = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Network.ServerManager"));
+local ServerManager = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Network.ServerManager"));
 
+-- The maximum number of players that can be connected at a time.
+ServerManager:Property({"max_players", 40, "GetMaxPlayerCount", "SetMaxPlayerCount", auto=true})
+ServerManager:Property({"view_distance", 200, "GetViewDistance", "SetViewDistance", auto=true})
+-- coult be "Anonymous", "UniversalPassword", "WhiteList"
+ServerManager:Property({"BasicAuthMethod", "Anonymous", "GetBasicAuthMethod", "SetBasicAuthMethod", auto=true})
+ServerManager:Property({"UniversalPassword", "", "GetUniversalPassword", "SetUniversalPassword", auto=true})
+-- True if all players are allowed to use commands (cheats).
+ServerManager:Property({"commandsAllowedForAll", false, "IsCommandsAllowedForAll", "SetCommandsAllowedForAll", auto=true})
 -- run at 20 fps
-ServerManager.tick_rate = 1000/20;
+ServerManager:Property({"tick_rate", 1000/20, "GetTickRate", "SetTickRate", auto=true})
 
 function ServerManager:ctor()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Config/PasswordList.lua");
@@ -49,13 +57,8 @@ function ServerManager:ctor()
 	self.administrators = {};
 	-- current game mode
 	self.game_mode = GameMode:new();
-	-- True if all players are allowed to use commands (cheats).
-    self.commandsAllowedForAll = false;
 	-- index into playerEntities of player to ping, updated every tick;
     self.playerPingIndex = 1;
-	-- The maximum number of players that can be connected at a time.
-	self.max_players = 40;
-	self.view_distance = 200;
 end
 
 local g_instance;
@@ -213,14 +216,13 @@ end
 
 -- Determine if the player is allowed to connect based on current server settings.
 function ServerManager:IsAllowedToLogin(name)
-    name = string.lower(name);
-    return not self.whiteListEnforced or self.administrators[name] or self.whiteListedPlayers[par1Str];
+	name = string.lower(name);
+	return not self.whiteListEnforced or self.administrators[name] or self.whiteListedPlayers[par1Str];
 end
 
 -- checks ban-lists, then white-lists, then space for the server. 
 -- Returns nil on success, or an error message
 function ServerManager:IsUserAllowedToConnect(ip, username)
-	-- TODO: 
 	if (self.bannedPlayers:isBanned(username)) then
 		return "You are banned from this server!";
 	elseif(not self:IsAllowedToLogin(username)) then
@@ -420,9 +422,16 @@ function ServerManager:PlayerLoggedOut(entityMP)
 end
 
 function ServerManager:VerifyUserNamePassword(username, password)
-	if(self.passwordList:IsEmpty()) then
+	local method = self:GetBasicAuthMethod();
+	if(method == "Anonymous") then
 		return true;
-	else
-		return self.passwordList:CheckUser(username, password);
+	elseif(method == "UniversalPassword") then
+		return password == self:GetUniversalPassword();
+	elseif(method == "WhiteList") then
+		if(self.passwordList:IsEmpty()) then
+			return true;
+		else
+			return self.passwordList:CheckUser(username, password);
+		end
 	end
 end

@@ -18,11 +18,19 @@ end
 function OnOK()
     local username = Page:GetValue("username", "");
     local password = Page:GetValue("password", "");
-    if(username == "" or password == "") then
-        _guihelper.MessageBox(L"用户名或密码不能为空");
-        return;
+    if(ServerPage.server_BasicAuthMethod=="UniversalPassword") then
+        username = "";
+        if(password == "") then
+            _guihelper.MessageBox(L"密码不能为空");
+            return;
+        end
+    else
+        if(username == "" or password == "") then
+            _guihelper.MessageBox(L"用户名或密码不能为空");
+            return;
+        end
     end
-    ServerPage.UserLogin(username,password)
+    ServerPage.UserLogin(username, password)
     ClosePage();
 end
 
@@ -84,12 +92,14 @@ end
     
     
     <div>
-        <div style="float:left; margin-left: 27px; margin-top: 10px; color: #ffffff; ">
-            <%=L"用户名"%>
-        </div>
-        <div style="float:left;margin-left:10px;margin-top:10px;">
-            <input type="text" name="username" autofocus="true" value="" rows="1" style="margin-top:0px;margin-left:0px;width:100px;height:24px;" class="mc_text"/>
-        </div>
+        <pe:if condition='<%=ServerPage.server_BasicAuthMethod~="UniversalPassword"%>'>
+            <div style="float:left; margin-left: 27px; margin-top: 10px; color: #ffffff; ">
+                <%=L"用户名"%>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="text" name="username" autofocus="true" value="" rows="1" style="margin-top:0px;margin-left:0px;width:100px;height:24px;" class="mc_text"/>
+            </div>
+        </pe:if>
         <div style="float:left; margin-left: 20px; margin-top: 10px; color: #ffffff; ">
             <%=L"密码"%>
         </div>

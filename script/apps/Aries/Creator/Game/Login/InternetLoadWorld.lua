@@ -417,7 +417,14 @@ function InternetLoadWorld.GotoUrl(url)
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 			CommandManager:Init()
-			CommandManager:RunCommand("connect", urlObj:GetHost().." "..(urlObj:GetPort() or ""));
+			
+			local relativePath = urlObj:GetRelativePath() or ""
+			local room_key = relativePath:match("^@(.+)")
+			if(room_key and room_key~="") then
+				CommandManager:RunCommand(string.format("/connect -tunnel %s %s %s", room_key, urlObj:GetHost(), urlObj:GetPort()));	
+			else
+				CommandManager:RunCommand(string.format("/connect %s %s", urlObj:GetHost(), urlObj:GetPort()));	
+			end
 			return true;
 		elseif(not url or url == "") then
 			_guihelper.MessageBox(L"请输入服务器IP地址, 例如: <br/>127.0.0.1 8099")

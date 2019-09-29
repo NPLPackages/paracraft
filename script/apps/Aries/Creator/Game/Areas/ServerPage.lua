@@ -11,6 +11,8 @@ ServerPage.ShowPage()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/ServerManager.lua");
+local ServerManager = commonlib.gettable("MyCompany.Aries.Game.Network.ServerManager");
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 
 local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
@@ -37,8 +39,6 @@ local needRefreshUserDS = true;
 local passwordList;
 local netClientHandler;
 local user_ds = {};
-ServerPage.beAdmin = false;
-ServerPage.beVistor = false;
 
 function ServerPage.OnInit()
 	page = document:GetPageCtrl();
@@ -46,6 +46,12 @@ function ServerPage.OnInit()
 		local serverManager = NetworkMain:GetServerManager();
 		passwordList = serverManager.passwordList;
 		needRefreshUserDS = true;
+	end
+	local serverManager = ServerManager.GetSingleton();
+	if(serverManager) then
+		page:SetValue("MaxPlayers", serverManager:GetMaxPlayerCount())
+		page:SetValue("BasicAuthMethod", serverManager:GetBasicAuthMethod())
+		page:SetValue("room_password", serverManager:GetUniversalPassword() or "")
 	end
 end
 
@@ -122,6 +128,7 @@ function ServerPage.ShowUserLoginPage(netClientHandler,info)
 	ServerPage.server_creator = info.creator;
 	ServerPage.server_detail = info.detail;
 	ServerPage.server_ip = info.ip;
+	ServerPage.server_BasicAuthMethod = info.BasicAuthMethod;
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Areas/ServerLogin.html", 
 			name = "ServerPage.ServerLogin", 
@@ -142,7 +149,6 @@ function ServerPage.ShowUserLoginPage(netClientHandler,info)
 				width = 400,
 				height = 300,
 		};
-	--echo("111111111111111111");
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
@@ -161,23 +167,65 @@ function ServerPage.CreateServer(host,port)
 		_guihelper.MessageBox(L"服务器创建者不能为空");
 		return;
 	end
-	local info = page:GetValue("text_server_detail_create", "");
-	--if(ServerPage.server_name == "") then
-		--_guihelper.Message(L"服务器名称不能为空");
-		--return;
-	--end
-    ServerPage.server_detail = string.gsub(info,"\r\n","<br/>")
-	--echo("3333333333");
+	ServerPage.server_detail = ""
+	local tunnelServerAddress = page:GetValue("TunnelServerAddress", "");
+	local maxPlayers = tonumber(page:GetValue("MaxPlayers", "16"));
+	local netWorkMode = page:GetValue("NetWorkMode", "Lan");
+
 	page:CloseWindow();
 	if(not System.User.internet_ip) then
 		--ServerPage.GetInternetIP();	
 	end
-	NetworkMain:StartServer(host, port);
-	_guihelper.MessageBox(L"服务器创建成功",function (msg)
-		ServerPage.beAdmin = true;
-		--ServerPage.GetIP();
-		ServerPage.ShowPage();
-	end);
+	
+	ServerPage.SetServerUrl(nil)
+	if(netWorkMode == "Lan") then
+		NetworkMain:StartServer(host, port);
+	elseif(netWorkMode == "TunnelServer") then
+		
+		local tunnelHost, tunnelPort = tunnelServerAddress:match("([^:%s]+)[:%s]?(%d*)");
+		if(tunnelHost~="" and tunnelHost) then
+			if(tunnelPort == "") then
+				tunnelPort = nil;
+			end
+			local room_key = ServerPage.server_creator or "none";
+			
+			NetworkMain:StartServerViaTunnel(tunnelHost, tunnelPort, room_key);
+			local serverUrl = ServerPage.AutoSetServerUrl(tunnelHost, tunnelPort, room_key) or ""
+			LOG.std(nil, "info", "ServerPage", "start via tunnel %s", serverUrl);
+			_guihelper.MessageBox(L"服务器地址".."<br/>"..ServerPage.GetServerUrlTip());
+			ServerPage.CopyIPToClipboard(serverUrl)
+		end
+	else
+		-- TODO: unknown mode
+	end
+end
+
+function ServerPage.GetServerUrl()
+	return ServerPage.serverUrl;
+end
+
+-- such as "t1.tunnel.keepwork.com:8099@test"
+function ServerPage.AutoSetServerUrl(tunnelHost, tunnelPort, room_key)
+	local serverUrl
+	if(room_key and room_key~="") then
+		serverUrl = string.format("%s:%s@%s", tunnelHost, tunnelPort, room_key);
+	else
+		serverUrl = string.format("%s:%s", tunnelHost, tunnelPort);
+	end
+	ServerPage.SetServerUrl(serverUrl);
+	return serverUrl
+end
+
+
+function ServerPage.SetServerUrl(url)
+	ServerPage.serverUrl =  url;
+end
+
+function ServerPage.CopyIPToClipboard(ip)
+    ParaMisc.CopyTextToClipboard(ip);
+    NPL.load("(gl)script/ide/TooltipHelper.lua");
+    local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+    BroadcastHelper.PushLabel({id="treasuretip", label = format(L"IP地址 %s 复制到剪切板", ip), max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 end
 
 function ServerPage.GetInternetIP()
@@ -271,17 +319,19 @@ end
 
 function ServerPage.RefreshUserDS()
 	user_ds = {};
-	local serverManager = NetworkMain:GetServerManager();
-	passwordList = serverManager.passwordList;
-	local password_map = passwordList.password_map
+	local serverManager = ServerManager.GetSingleton();
+	if(serverManager) then
+		passwordList = serverManager.passwordList;
+		local password_map = passwordList.password_map
 	
-	--echo(password_map);
-	if(password_map) then
-		local username,password;	
-		for username,password in pairs(password_map) do
-			user_ds[#user_ds + 1] = {username = username, password = password, beAddUser = false};
+		--echo(password_map);
+		if(password_map) then
+			local username,password;	
+			for username,password in pairs(password_map) do
+				user_ds[#user_ds + 1] = {username = username, password = password, beAddUser = false};
+			end
+			needRefreshUserDS = false;
 		end
-		needRefreshUserDS = false;
 	end
 end
 
@@ -344,14 +394,49 @@ function ServerPage.ResetClientInfo()
 	ServerPage.server_info = {};
 end
 
-function ServerPage.UserLogin(username,password)
-	--echo(username.."||"..password);
+function ServerPage.UserLogin(username, password)
 	ServerPage.netClientHandler:SendLoginPacket(username, password);
 end
+
 --ServerPage.server_name = "";
 --ServerPage.server_creator = "";
 --ServerPage.server_detail = "";
 function ServerPage.GetServerInfo()
 	local serverInfo = {name = ServerPage.server_name, creator = ServerPage.server_creator, ip = ServerPage.server_ip, detail = ServerPage.server_detail};
 	return serverInfo;
+end
+
+function ServerPage.OnChangeMaxPlayers(name, value)
+	value = tonumber(value)
+	local serverManager = ServerManager.GetSingleton();
+	if(serverManager and value) then
+		LOG.std(nil, "info", "ServerPage", "max player set to %d", value);	
+		serverManager:SetMaxPlayerCount(value);
+	end
+end
+
+function ServerPage.OnClickBasicAuthMethod(value)
+	local serverManager = ServerManager.GetSingleton();
+	if(serverManager and value) then
+		LOG.std(nil, "info", "ServerPage", "BasicAuthMethod to %s", value);	
+		serverManager:SetBasicAuthMethod(value);
+	end
+end
+
+function ServerPage.OnChangeRoomPassword()
+	local serverManager = ServerManager.GetSingleton();
+	if(serverManager and page) then
+		serverManager:SetUniversalPassword(page:GetValue("room_password") or "");
+	end
+end
+
+function ServerPage.GetServerUrlTip()
+	local url = ServerPage.GetServerUrl()
+	if(url and url~="") then
+		local shortUrl = url:gsub("^t1.tunnel.keepwork.com:8099", "");
+		if(shortUrl ~= url) then
+			url = format(L"%s 或 %s", shortUrl, url);
+		end
+	end
+	return url;
 end

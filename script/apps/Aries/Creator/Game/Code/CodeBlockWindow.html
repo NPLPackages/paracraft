@@ -11,7 +11,7 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
             <input type="button" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickStop" />
         </div>
         <script type="text/npl" refresh="true">document:write(CodeBlockWindow.GetCustomToolbarMCML());</script>
-        <input type="text" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:120px;height:25px;" class="mc_item" />
+        <input type="text" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:100px;height:25px;" class="mc_item" />
         <div style="float:left;margin-left:0px;margin-top:7px;"
              tooltip='page://script/apps/Aries/Creator/Game/Code/CodeBlockList.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">...</div>

@@ -107,6 +107,7 @@ function Actor:GetStaticVariable()
 		var = MultiAnimBlock:new({name="static"});
 		var:AddVariable(self:GetVariable("name"));
 		var:AddVariable(self:GetVariable("isAgent"));
+		var:AddVariable(self:GetVariable("isServer"));
 		self:SetCustomVariable("static_variable", var);
 		return var;
 	end
@@ -222,6 +223,8 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	timeseries:CreateVariableIfNotExist("scaling", "Linear");
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
 	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
+	timeseries:CreateVariableIfNotExist("isServer", "Discrete"); -- false, whether this entity is a server mode entity
+	
 	timeseries:CreateVariableIfNotExist("skin", "Discrete");
 	timeseries:CreateVariableIfNotExist("blockinhand", "Discrete");
 	timeseries:CreateVariableIfNotExist("opacity", "Linear");
@@ -245,6 +248,8 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		opacity = self:GetValue("opacity", 0);
 		name = newName or self:GetValue("name", 0);
 		local isAgent = self:GetValue("isAgent", 0);
+		local isServerEntity = self:GetValue("isServer", 0);
+
 		if(isReuseActor == nil) then
 			isReuseActor = isAgent
 		end
@@ -327,7 +332,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 			self.entity:SetDummy(true);
 			self.entity:SetGroupId(nil);
 			self.entity:SetSentientField(0);
-			self.entity:SetServerEntity(false);
+			self.entity:SetServerEntity(isServerEntity == true);
 
 			if(skin) then
 				self.entity:SetSkin(skin);
@@ -818,7 +823,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end, old_value);
 	elseif(keyname == "static") then
-		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0)}
+		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0), isServer = self:GetValue("isServer", 0)==true}
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
 		local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
 		EditStaticPropertyPage.ShowPage(function(values)
@@ -828,6 +833,9 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 			if(values.isAgent ~= old_value.isAgent) then
 				self:AddKeyFrameByName("isAgent", 0, values.isAgent);
+			end
+			if(values.isServer ~= old_value.isServer) then
+				self:AddKeyFrameByName("isServer", 0, values.isServer);
 			end
 			if(callbackFunc) then
 				callbackFunc(true);

@@ -135,7 +135,7 @@ end
 function NetClientHandler:handleAuthUser(packet_AuthUser)
 	if(packet_AuthUser.result == "ok") then
 		-- load empty world first and then login. 
-
+		self.last_username = packet_AuthUser.username;
 		-- create the client side player entity
 		self.worldClient.isRemote = true;
 	
@@ -163,41 +163,14 @@ function NetClientHandler:handleAuthUser(packet_AuthUser)
 		else
 			BroadcastHelper.PushLabel({id="NetClientHandler", label = L"用户名密码不正确", max_duration=7000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 		end
-		--echo("555555555555");
+		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 		local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 		ServerPage.ShowUserLoginPage(self,packet_AuthUser.info);
-
-		--NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
-		--local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-		--EnterTextDialog.ShowPage("请输入用户名:密码", function(result)
-			--if(result) then
-				--local username, password = result:match("^(%S+)%s*[=:%s]%s*(%S+)");
-				--if(username and password) then
-					--self:SendLoginPacket(username, password);
-				--end
-			--end
-		--end)
-		--local params = {
-			--url = "script/apps/Aries/Creator/Game/Areas/ServerLogin.html", 
-			--name = "ServerLogin", 
-			--isShowTitleBar = false,
-			--DestroyOnClose = true,
-			--bToggleShowHide=true, 
-			--style = CommonCtrl.WindowFrame.ContainerStyle,
-			--allowDrag = false,
-			--enable_esc_key = true,
-			----bShow = bShow,
-			--click_through = false, 
-			--zorder = -1,
-			--directPosition = true,
-				--align = "_ct",
-				--x = -400/2,
-				--y = -300/2,
-				--width = 400,
-				--height = 300,
-		--};
-		--System.App.Commands.Call("File.MCMLWindowFrame", params);
+	elseif(packet_AuthUser.result == "not allowed") then
+		local text = L"服务器暂时不允许链接， 可能是已经满了。"..(packet_AuthUser.info.errMsg or "");
+		BroadcastHelper.PushLabel({id="NetClientHandler", label = text, max_duration=7000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
+		self:Cleanup();
 	end
 end
 

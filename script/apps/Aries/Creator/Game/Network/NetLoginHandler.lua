@@ -51,17 +51,11 @@ end
 
 -- transfer connection to NetServerHandler
 function NetLoginHandler:InitializePlayerConnection()
-	local errorMsg = self:GetServerManager():IsUserAllowedToConnect(self.playerConnection:GetIPAddress(), self.clientUsername);
-
-    if (errorMsg) then
-        self:KickUser(errorMsg);
-    else
-        local playerEntity = self:GetServerManager():CreatePlayerForUser(self.clientUsername);
-        if (playerEntity) then
-            self:GetServerManager():InitializeConnectionToPlayer(self.playerConnection, playerEntity);
-        end
+	local playerEntity = self:GetServerManager():CreatePlayerForUser(self.clientUsername);
+    if (playerEntity) then
+        self:GetServerManager():InitializeConnectionToPlayer(self.playerConnection, playerEntity);
     end
-	self.finishedProcessing = true;
+    self.finishedProcessing = true;
 end
 
 --  Disconnects the user with the given reason.
@@ -89,15 +83,25 @@ function NetLoginHandler:IsAuthenticated()
 end
 
 function NetLoginHandler:handleAuthUser(packet_AuthUser)
-	self.clientUsername = packet_AuthUser.username;
+	if(packet_AuthUser.username and packet_AuthUser.username ~= "") then
+		self.clientUsername = packet_AuthUser.username;
+	end
 	self.clientPassword = packet_AuthUser.password;
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 	local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 	local info = ServerPage.GetServerInfo();
+	info.BasicAuthMethod = self:GetServerManager():GetBasicAuthMethod();
+
+	local errMsg = self:GetServerManager():IsUserAllowedToConnect(self.playerConnection:GetIPAddress(), self.clientUsername);
+	if(errMsg) then
+		info.errMsg = errMsg;
+		self:SendPacketToPlayer(Packets.PacketAuthUser:new():Init(self.clientUsername, nil, "not allowed", info));
+		-- self:KickUser(errMsg);
+		return
+	end
 
 	if(self:GetServerManager():VerifyUserNamePassword(self.clientUsername, self.clientPassword)) then
-		-- TODO: do authentication. 
 		self:SetAuthenticated();
 		if(self:IsAuthenticated()) then
 			self:SendPacketToPlayer(Packets.PacketAuthUser:new():Init(self.clientUsername, nil, "ok", info));

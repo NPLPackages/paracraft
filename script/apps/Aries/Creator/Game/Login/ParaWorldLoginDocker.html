@@ -17,18 +17,17 @@ local AppButtons = {
 {name="haqi2", icon="Texture/Aries/brand/haqi2_icon.png", onclick=""},
 --{name="user_worlds", icon="Texture/3DMapSystem/AppIcons/png/Tasks_64.png", },
 --{name="tutorial_worlds", icon="Texture/3DMapSystem/AppIcons/png/Intro_64.png", },
-{name="exit_paraworld", icon="Texture/Aries/AppIcons/exit.png", },
+-- {name="exit_paraworld", icon="Texture/Aries/AppIcons/exit.png", },
 };
 
---if(System.os.GetPlatform() == "win32" or System.os.GetPlatform() == "android" or System.os.GetPlatform() == "ios") then
---	local haqi2 = {name="haqi2", icon="Texture/Aries/brand/haqi2_icon.png", onclick=""};
---	for kk, vv in ipairs (AppButtons) do
---		if(vv.name == "haqi") then
---			table.insert(AppButtons, kk + 1, haqi2);
---			break;
---		end	
---	end
---end
+if(System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
+	for kk, vv in ipairs (AppButtons) do
+		if(vv.name == "truckstar") then
+			table.remove(AppButtons, kk);
+			break;
+		end	
+	end
+end
 
 ParaWorldLoginDocker.AutoMarkLoadedApp(AppButtons);
 

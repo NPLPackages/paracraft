@@ -388,16 +388,19 @@ end
 
 -- search package by filename, we will return the package that has the longest name match as filename. 
 -- it has to match at least 50% of the text. 
+-- @param bDirectMatch: direct match, such as for comparing filenames in url
 -- @return package, max_len
-function TexturePackageList.SearchPackage(utf8_filename)
+function TexturePackageList.SearchPackage(utf8_filename, bDirectMatch)
 	if(not utf8_filename or utf8_filename=="") then
 		return;
 	end
-	utf8_filename = utf8_filename:match("[^/]*$");
-	utf8_filename = utf8_filename:gsub("%.zip$", "");
-	utf8_filename = utf8_filename:gsub("[pP]ara[Cc]raft", "");
-	utf8_filename = utf8_filename:gsub("材质", "");
-	utf8_filename = utf8_filename:gsub("资源包", "");
+	if(not bDirectMatch) then
+		utf8_filename = utf8_filename:match("[^/]*$");
+		utf8_filename = utf8_filename:gsub("%.zip$", "");
+		utf8_filename = utf8_filename:gsub("[pP]ara[Cc]raft", "");
+		utf8_filename = utf8_filename:gsub("材质", "");
+		utf8_filename = utf8_filename:gsub("资源包", "");
+	end
 	NPL.load("(gl)script/ide/math/StringUtil.lua");
 	local StringUtil = commonlib.gettable("mathlib.StringUtil");
 	
@@ -408,20 +411,24 @@ function TexturePackageList.SearchPackage(utf8_filename)
 	for i = 1,#ds do
 		package = ds[i];
 		local match_count = StringUtil.LongestCommonSubstring(package.name_r1, utf8_filename);
+		if(bDirectMatch) then
+			match_count = math.max(match_count, StringUtil.LongestCommonSubstring(package.name, utf8_filename));
+		end
 		if(match_count > max_len) then
 			max_len = match_count;
 			best_package = package;
 		end
 	end
-	if(max_len > 4 and max_len > (#utf8_filename)*0.5) then
-		-- at least match 50% of the text
+	if(max_len > 4 and (bDirectMatch or max_len > (#utf8_filename)*0.5)) then
+		-- at least match 50% of the text unless bDirectMatch
 		return best_package, max_len;
 	end
 end
 
 -- @param utf8_filename: if nil or "", default texture is returned. This has to be the filename without directory. 
-function TexturePackageList.GetPackageFuzzyMatch(utf8_filename)
-	package = TexturePackageList.SearchPackage(utf8_filename)
+-- @param bDirectMatch: direct match, such as for comparing filenames in url
+function TexturePackageList.GetPackageFuzzyMatch(utf8_filename, bDirectMatch)
+	package = TexturePackageList.SearchPackage(utf8_filename, bDirectMatch)
 	if(package) then
 		LOG.std(nil, "info", "TexturePackageList", "rough matching %s with %s", utf8_filename, package.name_r1 or "");
 		return package;
@@ -477,7 +484,11 @@ function TexturePackageList.GetOfficialTexturePackage(url, utf8_filename)
 			return package;
 		end
 	end
-	return TexturePackageList.GetPackageFuzzyMatch(utf8_filename);
+	if(utf8_filename and utf8_filename~="") then
+		return TexturePackageList.GetPackageFuzzyMatch(utf8_filename);
+	else
+		return TexturePackageList.GetPackageFuzzyMatch(url, true);
+	end
 end
 
 -- get the TexturePackage object from world tags: type, path, url. 

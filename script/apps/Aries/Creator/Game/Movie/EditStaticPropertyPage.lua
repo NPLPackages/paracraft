@@ -9,7 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
 local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
 EditStaticPropertyPage.ShowPage(function(values)
 	echo(values);
-end, {name="string", isAgent=true})
+end, {name="string", isAgent=true, isServer=false})
 -------------------------------------------------------
 ]]
 
@@ -28,7 +28,7 @@ function EditStaticPropertyPage.OnInit()
 end
 
 -- @param OnOK: function(values) end 
--- @param old_value: {name="ximi", isAgent=true}
+-- @param old_value: {name="ximi", isAgent=true, isServer=false}
 function EditStaticPropertyPage.ShowPage(OnOK, old_value, agentStyles)
 	EditStaticPropertyPage.result = nil;
 	EditStaticPropertyPage.last_values = old_value;
@@ -73,6 +73,7 @@ function EditStaticPropertyPage.UpdateUIFromValue(values)
 	if(page and values) then
 		page:SetValue("name", values.name or "");
 		page:SetValue("isAgent", values.isAgent and tostring(values.isAgent) or "false");
+		page:SetValue("isServer", values.isServer == true);
 	end
 end
 
@@ -93,6 +94,8 @@ function EditStaticPropertyPage.OnOK()
 				v.isAgent = false;
 			end
 		end
+		local isServer = page:GetValue("isServer") or false;
+		v.isServer = isServer;
 		EditStaticPropertyPage.last_values = v;
 		EditStaticPropertyPage.result = "OK";
 		page:CloseWindow();
