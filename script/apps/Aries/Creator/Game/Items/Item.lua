@@ -716,3 +716,7 @@ function Item:DrawIcon(painter, width, height, itemStack)
 		end
 	end
 end
+
+function Item:SerializeServerData(serverdata, bSort)
+	return commonlib.serialize_compact(serverdata, bSort);
+end

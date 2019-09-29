@@ -50,3 +50,27 @@ function ItemTimeSeries:OnItemRightClick(itemStack, entityPlayer)
     return itemStack, true;
 end
 
+function ItemTimeSeries:SerializeServerData(serverdata, bSort)
+	if(serverdata and serverdata.timeseries) then
+		-- this will skip empty time series, usually saves lots of disk space and band width.
+		local o = {};
+		local originalTimeSeries = serverdata.timeseries;
+		for k, v in pairs(originalTimeSeries) do
+			if(type(v) == "table") then
+				if(v.data and #v.data == 0) then
+					-- skip
+				else
+					o[k] = v;
+				end
+			else
+				o[k] = v;
+			end
+		end
+		serverdata.timeseries = o;
+		local text = commonlib.serialize_compact(serverdata, bSort);	
+		serverdata.timeseries = originalTimeSeries;
+		return text;
+	else
+		return commonlib.serialize_compact(serverdata, bSort);	
+	end
+end

@@ -247,10 +247,6 @@ function ItemStack:LoadFromXMLNode(node)
 	end
 end
 
-function ItemStack:SerializeXMLData(sData)
-	return sData;
-end
-
 function ItemStack:SaveToXMLNode(node, bSort)
 	attr = node.attr;
 	if(not attr) then
@@ -262,10 +258,16 @@ function ItemStack:SaveToXMLNode(node, bSort)
 	end
 	if(self.serverdata) then
 		if(type(self.serverdata) == "table") then
-			local sData = commonlib.serialize_compact(self.serverdata, bSort);
-			node[1] = self:SerializeXMLData(sData);
+			local item = ItemClient.GetItem(self.id);
+			local sData;
+			if(item) then
+				sData = item:SerializeServerData(self.serverdata, bSort);
+			else
+				sData = commonlib.serialize_compact(self.serverdata, bSort);
+			end
+			node[1] = sData;
 		else
-			node[1] = self:SerializeXMLData(self.serverdata);
+			node[1] = self.serverdata;
 		end
 	end
 	return node;
