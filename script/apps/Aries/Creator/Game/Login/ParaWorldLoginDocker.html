@@ -20,8 +20,10 @@ local AppButtons = {
 -- {name="exit_paraworld", icon="Texture/Aries/AppIcons/exit.png", },
 };
 
-if(System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
+local platform = System.os.GetPlatform();
+if(platform == "mac" or platform == "ios" or (platform=="android" and os.Is64BitsSystem())) then
 	for kk, vv in ipairs (AppButtons) do
+        -- since PKG is not supported in 64bits system. we will disable it.
 		if(vv.name == "truckstar") then
 			table.remove(AppButtons, kk);
 			break;

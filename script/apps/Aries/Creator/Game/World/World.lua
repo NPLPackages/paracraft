@@ -314,6 +314,14 @@ function World:OnEntityRemoved(entity)
 	end
 end
 
+-- Called when an entity becomes a server entity or vice versa
+function World:OnSetServerEntity(entity)
+	for i=1, #(self.worldTrackers) do
+		self.worldTrackers[i]:OnSetServerEntity(entity);
+	end
+end
+
+
 function World:OnPlaySound(soundName, x, y, z, volume, pitch)
 	for i=1, #(self.worldTrackers) do
 		self.worldTrackers[i]:PlaySound(soundName, x, y, z, volume, pitch);

@@ -301,6 +301,7 @@ end
 				{ L"电影角色", "movieactor" },
 				{ L"广告牌效果", "billboarded" },
 				{ L"是否投影", "shadowCaster" },
+				{ L"是否联机同步", "isServerEntity" },
 				{ L"初始化参数", "initParams" },
 			},
 		},

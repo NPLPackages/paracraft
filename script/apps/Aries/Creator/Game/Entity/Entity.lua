@@ -1135,7 +1135,13 @@ function Entity:IsServerEntity()
 end
 
 function Entity:SetServerEntity(isServerEntity)
-	self.isServerEntity = isServerEntity~=false;
+	isServerEntity = isServerEntity~=false;
+	if(self.isServerEntity ~= isServerEntity) then
+		self.isServerEntity = isServerEntity;
+		if(EntityManager.GetEntityById(self.entityId)) then
+			GameLogic.world:OnSetServerEntity(self);
+		end
+	end
 end
 
 -- virtual function: right click to edit. 

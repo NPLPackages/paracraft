@@ -53,6 +53,10 @@ end
 function WorldTracker:OnEntityDestroy(entity)
 end
 
+-- Called when an entity becomes a server entity or vice versa. Only called when property is changed and after entity is attached. 
+function WorldTracker:OnSetServerEntity(entity)
+end
+
 -- Plays the specified sound.
 function WorldTracker:PlaySound(soundName, x, y, z, volume, pitch)
 end    
@@ -89,3 +93,4 @@ end
 -- @param damage: [1-10), other values will remove it. 
 function WorldTracker:DestroyBlockPartially(entityId, x,y,z, damage)
 end
+

@@ -822,13 +822,28 @@ function Actor:SetShaderCaster(enabled)
 		if(type(enabled) == "string") then
 			enabled = enabled == "true"
 		end
-		entity:SetShaderCaster(enabled)
+		entity:SetShaderCaster(enabled == true)
 	end
 end
 
 function Actor:IsShaderCaster()
 	local entity = self:GetEntity();
 	return entity and entity:SetShaderCaster()
+end
+
+function Actor:SetServerEntity(enabled)
+	local entity = self:GetEntity();
+	if entity then
+		if(type(enabled) == "string") then
+			enabled = enabled == "true"
+		end
+		entity:SetServerEntity(enabled == true)
+	end
+end
+
+function Actor:IsServerEntity()
+	local entity = self:GetEntity();
+	return entity and entity:IsServerEntity()
 end
 
 local internalValues = {
@@ -855,6 +870,7 @@ local internalValues = {
 	["walkSpeed"] = {setter = Actor.SetWalkSpeed, getter = Actor.GetWalkSpeed, isVariable = false}, 
 	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
 	["shadowCaster"] = {setter = Actor.SetShaderCaster, getter = Actor.IsShaderCaster, isVariable = false},
+	["isServerEntity"] = {setter = Actor.SetServerEntity, getter = Actor.IsServerEntity, isVariable = false},
 	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
 }
 

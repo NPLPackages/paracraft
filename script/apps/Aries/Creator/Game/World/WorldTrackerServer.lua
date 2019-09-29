@@ -66,6 +66,16 @@ function WorldTrackerServer:OnEntityDestroy(entity)
 	end
 end
 
+-- Called when an entity becomes a server entity or vice versa
+function WorldTrackerServer:OnSetServerEntity(entity)
+	if(entity.isServerEntity) then
+		self.theWorldServer:GetEntityTracker():AddEntityToTracker(entity);
+	else
+		self.theWorldServer:GetEntityTracker():RemoveEntityFromAllTrackingPlayers(entity);
+	end
+end
+
+
 -- Plays the specified sound. 
 function WorldTrackerServer:PlaySound(soundName, x, y, z, volume, pitch)
     self.theWorldServer:GetServerManager():SendToAllNear(x,y,z, if_else(volume > 1, 16*volume, 16), 
