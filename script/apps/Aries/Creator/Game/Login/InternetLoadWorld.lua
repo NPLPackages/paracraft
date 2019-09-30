@@ -400,7 +400,7 @@ function InternetLoadWorld.GotoUrl(url)
 	local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLessons")
 	local bIsLessonWorld = ParaWorldLessons.EnterWorldById(url)
 	if(not bIsLessonWorld) then
-		local cmdName = url:match("^/(%w+)%s");
+		local cmdName = url:match("^/(%w+)");
 		if(cmdName) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
