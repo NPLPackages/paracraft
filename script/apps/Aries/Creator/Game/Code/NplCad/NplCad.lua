@@ -123,10 +123,9 @@ function NplCad.CompileCode(code, filename, codeblock)
     if(not block_name or block_name == "")then
         block_name = "default"
     end
-	local worldpath = ParaWorld.GetWorldDirectory();
 	local relativePath = format("blocktemplates/nplcad/%s.x",commonlib.Encoding.Utf8ToDefault(block_name));
-    local filepath = worldpath..relativePath;
-	code = NplCad.GetCode(code, filepath);
+    local filepath = GameLogic.GetWorldDirectory()..relativePath;
+	code = NplCad.GetCode(code, filepath, relativePath);
 
 	NplCad.SetCodeBlockActorAsset(codeblock, relativePath);
 
@@ -171,6 +170,7 @@ function NplCad.InstallMethods(codeAPI, shape)
 end
 
 function NplCad.RefreshFile(filename)
+	filename = Files.FindFile(filename);
 	if(filename and ParaIO.DoesFileExist(filename)) then
 		local function filterFunc(shouldRefresh, fullname)
 			if(shouldRefresh and filename:match("[^\\/]+$")==fullname:match("[^\\/]+$")) then
@@ -188,8 +188,8 @@ function NplCad.RefreshFile(filename)
 	end
 end
 
-
-function NplCad.GetCode(code, filename)
+-- @param relativePath: can be nil, in which case filepath will be used. 
+function NplCad.GetCode(code, filename, relativePath)
     return string.format([[
 local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
 local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
@@ -204,7 +204,7 @@ if(result)then
 	setActorValue("showBones", true)
     NplCad.RefreshFile(%q)
 end
-]], code or "", filename, filename, filename, filename, filename)
+]], code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath)
 end
 
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 

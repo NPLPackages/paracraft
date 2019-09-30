@@ -33,7 +33,10 @@ function NPLWebServer.CheckServerStarted(callbackFunc)
 		callbackFunc(true, addr);
 		return true, addr;
 	else
-		GameLogic.CommandManager:RunCommand("/webserver");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+		CommandManager:Init()
+		CommandManager:RunCommand("/webserver");
 		addr = WebServer:site_url();
 		if(addr) then
 			callbackFunc(true, addr);	

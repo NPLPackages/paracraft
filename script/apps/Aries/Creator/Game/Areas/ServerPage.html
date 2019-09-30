@@ -13,9 +13,7 @@ ServerPage.OnInit();
 if(not ServerPage.server_creator or ServerPage.server_creator=="") then
     ServerPage.server_creator = System.User.keepworkUsername or "";
 end
-if(not ServerPage.server_name or ServerPage.server_name=="") then
-    ServerPage.server_name = System.User.keepworkUsername or "";
-end
+
 isEditServerName = false;
 isEditServerCreator = false;
 isEditServerDetail = false;
@@ -51,15 +49,20 @@ function GetTitle()
 end
 
 function GetName()
-    return ServerPage.server_name or L"请输入服务器名称";
-end
-
-function GetInfo()
-    return ServerPage.server_detail or L"请输入服务器介绍";
+    if(ServerPage.server_name =="" or not ServerPage.server_name) then
+        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+        return WorldCommon.GetWorldTag("name") or "";
+    else
+        return ServerPage.server_name;
+    end
 end
 
 function GetCreator()
-    return ServerPage.server_creator or L"请输入服务器创建者";
+    if(ServerPage.server_creator=="" or not ServerPage.server_creator) then
+        return "admin"
+    else
+        return ServerPage.server_creator;
+    end
 end
 
 function CreateServer()
