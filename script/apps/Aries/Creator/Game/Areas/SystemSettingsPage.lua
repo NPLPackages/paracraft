@@ -1220,3 +1220,9 @@ function SystemSettingsPage.OnClickMaintainMovieAspectRatio()
 		UpdateCheckBox("btn_MovieAspectRatio", value);
 	end
 end
+
+function SystemSettingsPage.OnClearMemory()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	Files:UnloadAllUnusedAssets();
+end
