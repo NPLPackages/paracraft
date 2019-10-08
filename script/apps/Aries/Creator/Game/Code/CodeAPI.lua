@@ -87,6 +87,7 @@ local s_env_methods = {
 	"registerStopEvent",
 	"broadcast",
 	"broadcastAndWait",
+	"broadcastTo",
 	"registerNetworkEvent",
 	"broadcastNetworkEvent",
 	"sendNetworkEvent",

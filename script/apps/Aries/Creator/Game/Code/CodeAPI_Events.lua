@@ -69,6 +69,21 @@ function env_imp:broadcastAndWait(text, msg)
 	end
 end
 
+-- @param username: actor name or "@all". "@all" means broadcast
+-- @param msg: msg.from is filled with sender's name if not provided.
+function env_imp:broadcastTo(username, event_name, msg)
+	msg = msg or {}
+	if(type(msg) == "table" and self.actor) then
+		msg.from = msg.from or self.actor:GetName();
+	end
+	if(username == "@all") then
+		env_imp.broadcast(self, event_name, msg)
+	else
+		self.codeblock:BroadcastTextEventTo(username, event_name, msg);
+		env_imp.checkyield(self);
+	end
+end
+
 function env_imp:registerStartEvent(callbackFunc)
 	self.codeblock:RegisterTextEvent("start", callbackFunc);
 end

@@ -301,7 +301,7 @@ say("click me!")
 	nextStatement = true,
 	func_description = 'registerBroadcastEvent(%s, function(%s)\\n%send)',
 	ToNPL = function(self)
-		return string.format('registerBroadcastEvent("%s", function(fromName)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
+		return string.format('registerBroadcastEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 registerBroadcastEvent("jump", function(fromName)
@@ -332,6 +332,7 @@ say("click to jump!")
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	hide_in_toolbox = true, -- deprecated, use broadcast2
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'broadcast(%s)',
@@ -428,6 +429,49 @@ end
 },
 
 {
+	type = "broadcastTo", 
+	message0 = L"广播消息给%1,%2,%3",
+	arg0 = {
+		{
+			name = "username",
+			type = "input_value",
+			shadow = { type = "text", value = "username",},
+			text = "username", 
+		},
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "text", value = "title",},
+			text = "title", 
+		},
+		{
+			name = "params",
+			type = "input_value",
+			shadow = { type = "msgTable", value = "{}",},
+			text = "{}", 
+		},
+	},
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'broadcastTo(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('broadcastTo("%s", "%s", %s)\n', self:getFieldAsString('username'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+registerBroadcastEvent("Hello", function(msg)
+    tip(msg.text.." from "..(msg.from or ""))    
+end)
+setActorValue("name", "Alice")
+broadcastTo("Alice", "Hello", {text="hello"})
+]]},
+},
+},
+
+{
 	type = "registerStopEvent", 
 	message0 = L"当代码方块停止时",
 	message1 = L"%1",
@@ -464,6 +508,8 @@ end)
 			options = {
 				{ L"ps_用户加入", "ps_user_joined" },
 				{ L"ps_用户离开", "ps_user_left" },
+				{ L"ps_服务器启动", "ps_server_started" },
+				{ L"ps_服务器关闭", "ps_server_shutdown" },
 				{ L"用户加入", "connect" },
 			},
 		},
@@ -515,7 +561,24 @@ end)
 	ToNPL = function(self)
 		return string.format('registerNetworkEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
-	examples = {{desc = "", canRun = false, code = [[
+	examples = {{desc = L"私服模式:", canRun = false, code = [[
+registerNetworkEvent("ps_user_joined", function(msg)
+    tip(format("user join: %s id:%d", msg.username, msg.entityId))
+    wait(1)
+    sendNetworkEvent(msg.username, "Hello", {text=msg.username})
+    sendNetworkEvent(msg.entityId, "Hello", {text="welcome"})
+end)
+registerNetworkEvent("ps_user_left", function(msg)
+    tip(format("user left: %s id:%d", msg.username, msg.entityId))
+end)
+registerNetworkEvent("ps_server_started", function(msg)
+    tip(format("server start: %s id:%d", msg.username, msg.entityId))
+end)
+registerNetworkEvent("Hello", function(msg)
+    tip(msg.from..":"..msg.text)
+end)
+]]},
+{desc = L"大厅模式:", canRun = false, code = [[
 registerNetworkEvent("updateScore", function(msg)
    _G[msg.userinfo.keepworkUsername] = msg.score;
    showVariable(msg.userinfo.keepworkUsername)
@@ -534,15 +597,7 @@ while(true) do
    wait(1);
 end
 ]]},
-{desc = "", canRun = false, code = [[
-registerNetworkEvent("ps_user_joined", function(msg)
-    tip("user join: "..msg.username)
-end)
 
-registerNetworkEvent("ps_user_left", function(msg)
-    tip("user left: "..msg.username)
-end)
-]]}
 },
 },
 
@@ -577,8 +632,8 @@ end)
 		{
 			name = "msg",
 			type = "input_value",
-			shadow = { type = "text", value = "score",},
-			text = "score", 
+			shadow = { type = "text", value = "msgname",},
+			text = "msgname", 
 		},
 		{
 			name = "params",
@@ -597,7 +652,21 @@ end)
 	ToNPL = function(self)
 		return string.format('broadcastNetworkEvent("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
 	end,
-	examples = {{desc = "", canRun = false, code = [[
+	examples = {{desc = L"私服模式:", canRun = false, code = [[
+registerNetworkEvent("HelloText", function(msg)
+    tip("HelloText: "..msg.text.." from: "..msg.from)
+    if(GameLogic.isServer) then
+        broadcastNetworkEvent("HelloText", {text=msg.text, from=msg.from}) 
+    end
+end)
+if(GameLogic.isRemote) then
+    for i=1, 2000 do
+        sendNetworkEvent("admin",  "HelloText", {text=i}) 
+        wait(1)
+    end
+end
+]]},
+{desc = L"大厅模式:", canRun = false, code = [[
 hide()
 becomeAgent("@p")
 
@@ -660,9 +729,23 @@ end
 	nextStatement = true,
 	func_description = 'sendNetworkEvent(%s, %s, %s)',
 	ToNPL = function(self)
-		return string.format('sendNetworkEvent("%s", "%s", %s)\n', self:getFieldAsString('usernames'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
+		return string.format('sendNetworkEvent("%s", "%s", %s)\n', self:getFieldAsString('username'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
 	end,
-	examples = {{desc = L"发送消息给指定用户", canRun = false, code = [[
+	examples = {{desc = L"私服模式:", canRun = false, code = [[
+registerNetworkEvent("HelloText", function(msg)
+    tip("HelloText: "..msg.text.." from: "..msg.from)
+    if(GameLogic.isServer) then
+        broadcastNetworkEvent("HelloText", {text=msg.text, from=msg.from}) 
+    end
+end)
+if(GameLogic.isRemote) then
+    for i=1, 2000 do
+        sendNetworkEvent("admin",  "HelloText", {text=i}) 
+        wait(1)
+    end
+end
+]]},
+{desc = L"大厅模式:"..L"发送消息给指定用户", canRun = false, code = [[
 registerNetworkEvent("title", function(msg)
    tip(msg.userinfo.keepworkUsername)
    wait(1)
@@ -672,7 +755,7 @@ end)
 sendNetworkEvent("username", "title", {a=1})
 ]]},
 
-{desc = L"发送原始消息给指定地址(无需登录)", canRun = false, code = [[
+{desc = L"UDP模式:"..L"发送原始消息给指定地址(无需登录)", canRun = false, code = [[
 -- __original is predefined name
 registerNetworkEvent("__original", function(msg)
    log(msg.isUDP)

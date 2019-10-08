@@ -520,6 +520,7 @@ function GameLogic.LoadGame()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	Files:ClearFindFileCache();
+	Files:UnloadAllWorldAssets();
 
 	GameLogic.current_worlddir = ParaWorld.GetWorldDirectory();
 	-- GameLogic.script_dir = GameLogic.current_worlddir.."script/blocks/";

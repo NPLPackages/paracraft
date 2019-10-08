@@ -115,6 +115,10 @@ function ServerManager:Init(host, port, username, tunnelClient)
 	end})
 	self.servertimer:Change(ServerManager.tick_rate, ServerManager.tick_rate);
 	self.isStarted = true;
+
+	local event = System.Core.Event:new():init("ps_server_started")
+  	event.msg = {username = "admin", entityId = EntityManager.GetPlayer().entityId, displayname=EntityManager.GetPlayer():GetDisplayName(), isServer = true};
+  	GameLogic:event(event);
 	return self;
 end
 
@@ -163,6 +167,10 @@ function ServerManager:Shutdown()
 	self.playerEntityList:clear();
 	self:Cleanup();
 	self.isStarted = nil;
+
+	local event = System.Core.Event:new():init("ps_server_shutdown")
+  	event.msg = {username = "host", isServer = true};
+  	GameLogic:event(event);
 end
 
 function ServerManager:TickServerWorlds()
@@ -397,14 +405,14 @@ function ServerManager:PlayerLoggedIn(entityMP)
     end
 
 	local event = System.Core.Event:new():init("ps_user_joined")
-  	event.msg = {username = entityMP:GetUserName(), isServer = true};
+  	event.msg = {username = entityMP:GetUserName(), entityId=entityMP.entityId, displayname=entityMP:GetDisplayName(), isServer = true};
   	GameLogic:event(event);
 end
 
 -- Called when a player disconnects from the game. Writes player data to disk and removes them from the world.
 function ServerManager:PlayerLoggedOut(entityMP)
 	local event = System.Core.Event:new():init("ps_user_left")
-  	event.msg = {username = entityMP:GetUserName(), isServer = true};
+  	event.msg = {username = entityMP:GetUserName(), entityId=entityMP.entityId, isServer = true};
   	GameLogic:event(event);
 
     self:WritePlayerData(entityMP);

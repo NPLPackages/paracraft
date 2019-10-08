@@ -13,15 +13,25 @@ local NplCadDef_Skeleton = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.
 local cmds = {
 {
 	type = "createJointRoot", 
-	message0 = L"骨骼根节点",
+	message0 = L"骨骼根节点 %1",
+    arg0 = {
+        {
+			name = "is_enabled",
+			type = "field_dropdown",
+			options = {
+				{ L"有效", "true" },
+				{ L"无效", "false" },
+			},
+		},
+	},
 	category = "Skeleton", 
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
-	func_description = 'createJointRoot()',
-	func_description_js = 'createJointRoot()',
+	func_description = 'createJointRoot(nil,%s)',
+	func_description_js = 'createJointRoot(null,%s)',
 	ToNPL = function(self)
-		return string.format('createJointRoot()\n'
+		return string.format('createJointRoot(nil,%s)\n',  self:getFieldValue('is_enabled')
         );
 	end,
 	examples = {{desc = "", canRun = true, code = [[

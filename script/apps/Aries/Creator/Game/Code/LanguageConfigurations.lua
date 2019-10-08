@@ -26,6 +26,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
     elseif(filename == "npl_microbit") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua");
+    elseif(filename == "craft2d") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Craft2d/Craft2d.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then
@@ -41,7 +43,7 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 end
 
 function LanguageConfigurations:IsBuildinFilename(filename)
-	return filename == "" or filename=="npl" or filename=="npl_cad" or filename=="npl_microbit"
+	return filename == "" or filename=="npl" or filename=="npl_cad" or filename=="npl_microbit" or filename=="craft2d"
 end
 
 -- enable caching

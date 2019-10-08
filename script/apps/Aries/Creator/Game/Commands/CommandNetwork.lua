@@ -485,6 +485,10 @@ e.g.
 					end);
 				end
 				TestOpenNPLPort_();
+			elseif(not WebServer:IsStarted()) then
+				-- this could happen when game server is started before web server, we will share the same port with exiting server. 
+				port = tonumber(att:GetField("HostPort", "8099"))
+				startserver_()
 			end
 		end
 	end,

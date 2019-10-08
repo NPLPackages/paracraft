@@ -463,6 +463,15 @@ function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 	end
 end
 
+-- similar to BroadcastTextEvent
+-- @paramm dest: dest actor name. 
+function CodeGlobals:BroadcastTextEventTo(dest, text, msg)
+	local event = self:GetTextEvent(text);
+	if(event) then
+		event:DispatchEvent({type="msg", dest=dest, msg=msg});
+	end
+end
+
 function CodeGlobals:RegisterTextEvent(text, callbackFunc)
 	self:CreateGetTextEvent(text):AddEventListener("msg", callbackFunc);
 end
@@ -532,6 +541,10 @@ function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
 	if(event_name:match("^ps_")) then
 		-- for private server event
 		self:RegisterTextEvent(event_name, callbackFunc);
+		if(event_name == "ps_server_started" and GameLogic.isServer) then
+			-- if server is already started when registering this event
+			callbackFunc(_, {type="net", msg={username = "admin", entityId = EntityManager.GetPlayer().entityId, displayname=EntityManager.GetPlayer():GetDisplayName(), isServer = true}});
+		end
 	else
 		local event = self:CreateGetTextEvent(event_name);
 		event:AddEventListener("net", callbackFunc);
@@ -553,22 +566,31 @@ function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
 end
 
 function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
-	local event = self:GetTextEvent(text);
-	if(event) then
-		event:RemoveEventListener("net", callbackFunc);
-		if(text == "connect" and event:GetEventListenerCount("net") == 0) then
-			LobbyServer.GetSingleton():StopAll();
-			LobbyServerViaTunnel.GetSingleton():StopAll()
-			self.isLobbyStarted = false;
+	if(text:match("^ps_")) then
+		self:UnregisterTextEvent(text, callbackFunc);
+	else
+		local event = self:GetTextEvent(text);
+		if(event) then
+			event:RemoveEventListener("net", callbackFunc);
+			if(text == "connect" and event:GetEventListenerCount("net") == 0) then
+				LobbyServer.GetSingleton():StopAll();
+				LobbyServerViaTunnel.GetSingleton():StopAll()
+				self.isLobbyStarted = false;
+			end
 		end
 	end
 end
 
 -- send a named message to one computer in the network
+-- @param username: entity id or player name
 -- @param event_name: if nil, we will send an binary stream (msg) to keepworkUsername, 
+-- @param msg: msg.from will be the sender username if not filled. 
 -- which needs to be nid/ip:port (*8099, \\\\10.27.3.5 8099)
 function CodeGlobals:SendNetworkEvent(username, event_name, msg)
 	if(GameLogic.isRemote) then
+		if(type(msg) == "table") then
+			msg.from = msg.from or EntityManager.GetPlayer():GetUserName();
+		end
 		-- client side code
 		if(username == "host" or username == "admin") then
 			GameLogic.GetPlayer():AddToSendQueue(Packets.PacketCodeBlockEvent:new():Init(event_name, msg));	
@@ -580,6 +602,9 @@ function CodeGlobals:SendNetworkEvent(username, event_name, msg)
 			GameLogic.GetPlayer():AddToSendQueue(Packets.PacketCodeBlockEvent:new():Init("ps_redirect", {username = username, name = event_name, msg = msg}));	
 		end
 	elseif(GameLogic.isServer) then
+		if(type(msg) == "table") then
+			msg.from = msg.from or "admin";
+		end
 		-- server side code
 		if(username == "host" or username == "admin") then
 			-- handle locally in the next time frame.
@@ -592,8 +617,13 @@ function CodeGlobals:SendNetworkEvent(username, event_name, msg)
 			if(servermanager) then
 				servermanager:SendPacketToAllPlayers(Packets.PacketCodeBlockEvent:new():Init(event_name, msg));
 			end
-		elseif(type(username) == "number") then
-			local targetEntity = EntityManager.GetEntityById(username);
+		else
+			local targetEntity
+			if(type(username) == "number") then
+				targetEntity = EntityManager.GetEntityById(username);
+			elseif(type(username) == "string") then
+				targetEntity = EntityManager.GetEntity("__MP__"..username);
+			end
 			if targetEntity == GameLogic.GetPlayer() then
 				-- handle locally in the next time frame. 
 				commonlib.TimerManager.SetTimeout(function()  

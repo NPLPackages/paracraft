@@ -841,7 +841,17 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 	local function onEvent_(_, msg)
-		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+		if(msg and msg.dest) then
+			for i, actor in ipairs(self:GetActors()) do
+				if(msg.dest == actor:GetName()) then
+					-- only activate the first matching actor
+					event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback);
+					break;
+				end
+			end
+		else
+			event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+		end
 	end
 	
 	event.UnRegisterTextEvent = function()
@@ -881,6 +891,12 @@ function CodeBlock:BroadcastTextEvent(text, msg, onFinishedCallback)
 	end
 end
 
+-- similar to BroadcastTextEvent
+-- @paramm dest: dest actor name. 
+function CodeBlock:BroadcastTextEventTo(dest, text, msg)
+	GameLogic.GetCodeGlobal():BroadcastTextEventTo(dest, text, msg);
+end
+
 function CodeBlock:RegisterCloneActorEvent(callbackFunc)
 	local event = self:CreateEvent("onCloneActor");
 	event:SetFunction(callbackFunc);
@@ -889,6 +905,7 @@ end
 function CodeBlock:RegisterNetworkEvent(event_name, callbackFunc)
 	local event = self:CreateEvent(event_name);
 	event:SetIsFireForAllActors(true);
+	event:SetStopLastEvent(false);
 	event:SetFunction(callbackFunc);
 	local function onEvent_(_, msg)
 		event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
@@ -896,11 +913,10 @@ function CodeBlock:RegisterNetworkEvent(event_name, callbackFunc)
 	event:Connect("beforeDestroyed", function()
 		GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_);
 	end)
-	if(event_name == "connect") then
-		self:Connect("beforeStopped", function()
-			GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_, self);
-		end)
-	end
+--	self:Connect("beforeStopped", function()
+--		GameLogic.GetCodeGlobal():UnregisterNetworkEvent(event_name, onEvent_, self);
+--	end)
+
 	GameLogic.GetCodeGlobal():RegisterNetworkEvent(event_name, onEvent_);
 end
 

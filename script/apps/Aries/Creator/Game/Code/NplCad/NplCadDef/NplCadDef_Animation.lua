@@ -13,7 +13,7 @@ local NplCadDef_Animation = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad
 local cmds = {
 {
 	type = "createAnimation", 
-	message0 = L"骨骼动画 %1",
+	message0 = L"骨骼动画 %1 %2",
     arg0 = {
         {
 			name = "name",
@@ -21,15 +21,23 @@ local cmds = {
 			shadow = { type = "text", value = "anim",},
 			text = "",
 		},
+         {
+			name = "is_enabled",
+			type = "field_dropdown",
+			options = {
+				{ L"有效", "true" },
+				{ L"无效", "false" },
+			},
+		},
     },
 	category = "Animation", 
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
-	func_description = 'createAnimation(%s)',
-	func_description_js = 'createAnimation(%s)',
+	func_description = 'createAnimation(%s,%s)',
+	func_description_js = 'createAnimation(%s,%s)',
 	ToNPL = function(self)
-		return string.format('createAnimation("%s")\n',  self:getFieldValue('name'))
+		return string.format('createAnimation("%s",%s)\n',  self:getFieldValue('name'),  self:getFieldValue('is_enabled'))
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 createAnimation("anim")
