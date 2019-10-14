@@ -13,6 +13,8 @@ code_func, errormsg = CodeCompiler:new():SetFilename(virtual_filename):Compile(c
 
 local CodeCompiler = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler"));
 
+CodeCompiler:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode", auto=true})
+
 
 local inject_map = {
 	{"^(%s*function%A+[^%)]+%)%s*)$", "%1 checkyield();"},
@@ -61,9 +63,13 @@ function CodeCompiler:InjectCheckYieldToCode(code)
 	end
 end
 
+
 function CodeCompiler:Compile(code)
 	if(code and code~="") then
-		local code_func, errormsg = loadstring(self:InjectCheckYieldToCode(code), self:GetFilename());
+		if(not self:IsAllowFastMode()) then
+			code = self:InjectCheckYieldToCode(code)
+		end
+		local code_func, errormsg = loadstring(code, self:GetFilename());
 		if(not code_func and errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 		end

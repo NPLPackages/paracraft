@@ -13,13 +13,40 @@ local CodeBlocklyDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBl
 local cmds = {
 -- Data
 {
+	type = "getLocalVariable1", 
+	message0 = L"%1",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_variable",
+			variable = L"变量名",
+			variableTypes = {""},
+			text = L"变量名",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	hide_in_codewindow = true,
+	ToNPL = function(self)
+		return self:getFieldAsString('var');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local key = "value"
+say(key, 1)
+]]}},
+},
+
+{
 	type = "getLocalVariable", 
-	message0 = L"变量%1",
+	message0 = L"%1",
 	arg0 = {
 		{
 			name = "var",
 			type = "field_input",
-			text = "score",
+			text = L"变量名",
 		},
 	},
 	output = {type = "null",},
@@ -36,35 +63,36 @@ local key = "value"
 say(key, 1)
 ]]}},
 },
-
 {
-	type = "createLocalVariable", 
-	message0 = L"新建本地变量%1为%2",
+	type = "assign1", 
+	message0 = L"%1赋值为%2",
 	arg0 = {
 		{
-			name = "var",
-			type = "field_input",
-			text = "score",
+			name = "left",
+			type = "input_value",
+			shadow = { type = "getLocalVariable1", value = L"变量名",},
+			text = L"变量名",
 		},
 		{
-			name = "value",
+			name = "right",
 			type = "input_value",
-			shadow = { type = "functionParams", value = "0",},
-			text = "0",
+			shadow = { type = "functionParams", value = "1",},
+			text = "1",
 		},
 	},
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
+	hide_in_codewindow = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'local %s = %s',
+	func_description = '%s = %s',
 	ToNPL = function(self)
-		return string.format('%s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
+		return string.format('%s = %s\n', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-local key = "value"
-say(key, 1)
+text = "hello"
+say(text, 1)
 ]]}},
 },
 
@@ -99,15 +127,47 @@ text = "hello"
 say(text, 1)
 ]]}},
 },
+
+{
+	type = "createLocalVariable", 
+	message0 = L"新建本地%1为%2",
+	arg0 = {
+		{
+			name = "var",
+			type = "field_input",
+			text = L"变量名",
+		},
+		{
+			name = "value",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "0",},
+			text = "0",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'local %s = %s',
+	ToNPL = function(self)
+		return string.format('%s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local key = "value"
+say(key, 1)
+]]}},
+},
+
 {
 	type = "set", 
-	message0 = L"设置全局变量%1为%2",
+	message0 = L"设置全局%1为%2",
 	arg0 = {
 		{
 			name = "key",
 			type = "input_value",
-			shadow = { type = "text", value = "score",},
-			text = "score", 
+			shadow = { type = "text", value = L"变量名",},
+			text = L"变量名", 
 		},
 		{
 			name = "value",
@@ -534,7 +594,28 @@ local data = actor:GetActorValue("some_data")
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
-
+{
+	type = "getColor", 
+	message0 = "\"%1\"",
+	arg0 = {
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000",
+		},
+	},
+	output = {type = "null",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('"%s"', self:getFieldAsString('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
 {
 	type = "getTableValue", 
 	message0 = L"获取表%1中的%2",

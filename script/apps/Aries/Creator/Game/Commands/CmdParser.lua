@@ -27,6 +27,8 @@ local color, md_text = CmdParser.ParseColor(cmd_text, "#ff0000");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Util/CmdParser.lua");
+NPL.load("(gl)script/ide/System/Core/Color.lua");
+local Color = commonlib.gettable("System.Core.Color");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
 
@@ -160,4 +162,41 @@ function CmdParser.ParseBlockId(cmd_text)
 		end
 	end
 	return nil, cmd_text;
+end
+
+local function validate_rgb(v)
+	v = tonumber(v) or 1;
+	if(v > 2)then
+		v = 2;
+	end
+	if(v < 0)then
+		v = 0;
+	end
+	return v;
+end
+
+-- @param cmd_text: can be "1 0 0" or "#ff0000"
+-- @param min: 0
+-- @param max: 1
+-- @return r,g,b in [min, max] range
+function CmdParser.ParseColorRGB(cmd_text, min, max)
+	min = min or 0
+	max = max or 2
+
+	local r,g,b, color, cmd_text_remain
+	color, cmd_text_remain = cmd_text:match("^%s*(#%w+)%s*(.*)$");
+	if(color) then
+		r,g,b = Color.DWORD_TO_RGBA(Color.ColorStr_TO_DWORD(color))
+		r = r / 255
+		g = g / 255
+		b = b / 255
+		return r,g,b,cmd_text_remain;
+	else
+		r,g,b = cmd_text:match("^%s*([%d%.]+) ([%d%.]+) ([%d%.]+)%s*(.*)$");
+		if(r and g and b) then
+			r,g,b = validate_rgb(r), validate_rgb(g), validate_rgb(b);
+			return r,g,b,cmd_text_remain;
+		end
+	end
+	return nil, nil, nil, cmd_text;
 end

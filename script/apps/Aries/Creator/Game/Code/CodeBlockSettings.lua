@@ -46,6 +46,7 @@ function CodeBlockSettings.OnInit()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
 		page:SetValue("allowClientExecution", entity:IsAllowClientExecution() == true);
+		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
 		local languageFile = entity:GetLanguageConfigFile();
 		if(languageFile == "" or languageFile == "NPL" or languageFile=="npl") then
 			languageFile = ""
@@ -79,5 +80,11 @@ function CodeBlockSettings.OnClickCustomLanguage()
 	end
 end
 
+function CodeBlockSettings.OnChangeAllowFastMode(value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		entity:SetAllowFastMode(value == true);
+	end
+end
 
 

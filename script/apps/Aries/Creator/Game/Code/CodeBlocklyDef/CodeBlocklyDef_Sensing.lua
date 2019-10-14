@@ -701,35 +701,66 @@ say("hi", 2)
 },
 
 {
-	type = "mode", 
-	message0 = L"设置为游戏模式",
+	type = "setMode", 
+	message0 = L"设置模式%1",
 	arg0 = {
+		{
+			name = "input",
+			type = "field_dropdown",
+			text = "game",
+			options = {
+				{ L"游戏模式", "game" },{ L"编辑模式", "edit" },
+			},
+		},
 	},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'cmd("/mode game")',
+	func_description = 'cmd("/mode", %s)',
 	ToNPL = function(self)
-		return string.format('cmd("/mode game")\n');
+		return string.format('cmd("/mode", "%s")\n', self:getFieldAsString('input'));
 	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(GameLogic.GetGameMode() == "edit") then
+    cmd("/mode", "game")
+end
+]]}},
 },
 
 {
-	type = "modeEdit", 
-	message0 = L"设置为编辑模式",
+	type = "getMode", 
+	message0 = L"当前游戏模式",
 	arg0 = {
 	},
+	output = {type = "null",},
 	category = "Sensing", 
 	helpUrl = "", 
-	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'cmd("/mode edit")',
+	canRun = false,
+	func_description = 'GameLogic.GetGameMode()',
 	ToNPL = function(self)
-		return string.format('cmd("/mode edit")\n');
+		return string.format('GameLogic.GetGameMode()');
 	end,
+	examples = {{desc = L"防作弊密码锁", canRun = true, code = [[
+if(GameLogic.GetGameMode() == "edit") then
+    cmd("/mode", "game")
+end
+local hasPassword
+while(not hasPassword) do
+    if(GameLogic.GetGameMode() == "edit") then
+        cmd("/mode", "game")
+        run(function()
+            ask("Enter password: 1234")
+            if(answer == "1234") then
+                hasPassword = true;
+                cmd("/mode", "edit")
+            end
+        end)
+    end
+    wait(1)
+end
+]]}},
 },
 
 };

@@ -235,7 +235,7 @@ end
 
 {
 	type = "join", 
-	message0 = L"连接字符串%1和%2",
+	message0 = L"连接%1和%2",
 	arg0 = {
 		{
 			name = "left",
@@ -367,6 +367,8 @@ end
 				{ "sin", "exp"},
 				{ "log10", "log10"},
 				{ "exp", "exp"},
+				{ L"转成数字", "tonumber"},
+				{ L"转成字符串", "tostring"},
 			},
 		},
 		{

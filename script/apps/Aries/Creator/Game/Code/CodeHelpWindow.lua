@@ -123,7 +123,7 @@ function CodeHelpWindow.AddCodeHelpItem(codeHelpItem)
 		category_items[codeHelpItem.category] = items;
 	end
 	local item = CodeHelpItem:new(codeHelpItem):Init();
-	if(not item.hide_in_toolbox) then
+	if(not item.hide_in_toolbox and not item.hide_in_codewindow) then
 		items[#items+1] = item;
 	end
 	all_command_names[item:GetName()] = item;

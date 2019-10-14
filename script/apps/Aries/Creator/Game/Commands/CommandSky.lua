@@ -201,19 +201,7 @@ Commands["light"] = {
 	desc="set light block color. if no parameter, 1,1,1 is used. " , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(cmd_text) then
-			local r,g,b = cmd_text:match("([%d%.]+) ([%d%.]+) ([%d%.]+)");
-
-			local function validate_rgb(v)
-				v = tonumber(v) or 1;
-				if(v > 2)then
-					v = 2;
-				end
-				if(v < 0)then
-					v = 0;
-				end
-				return v;
-			end
-			r,g,b = validate_rgb(r), validate_rgb(g), validate_rgb(b);
+			local r,g,b = CmdParser.ParseColorRGB(cmd_text, 0, 2)
 			if(r and g and b) then
 				if(ParaTerrain.GetBlockAttributeObject) then
 					ParaTerrain.GetBlockAttributeObject():SetField("BlockLightColor", {r,g,b})
@@ -229,19 +217,7 @@ Commands["sun"] = {
 	desc="set sun color. This will change the diffuse color of all objects.  if no parameter, 1,1,1 is used. " , 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(cmd_text) then
-			local r,g,b = cmd_text:match("([%d%.]+) ([%d%.]+) ([%d%.]+)");
-
-			local function validate_rgb(v)
-				v = tonumber(v) or 1;
-				if(v > 2)then
-					v = 2;
-				end
-				if(v < 0)then
-					v = 0;
-				end
-				return v;
-			end
-			r,g,b = validate_rgb(r), validate_rgb(g), validate_rgb(b);
+			local r,g,b = CmdParser.ParseColorRGB(cmd_text, 0, 2)
 			if(r and g and b) then
 				-- setting the sun color
 				GameLogic.options.auto_skycolor  = false;

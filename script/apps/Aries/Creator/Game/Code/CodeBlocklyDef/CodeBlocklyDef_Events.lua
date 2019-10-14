@@ -783,7 +783,7 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ L"/tip hello", "/tip hello" },
+				{ L"/tip", "/tip" },
 				{ L"改变时间[-1,1]", "/time"},
 				{ L"设置真实光影[1|2|3]", "/shader"},
 				{ L"设置光源颜色[0,2] [0,2] [0,2]", "/light"},

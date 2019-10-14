@@ -39,7 +39,13 @@ end
         <div style="color:#808080;font-size:12px"><%=L"通常在多人联网程序中, 客户端需要执行的代码方块会设置此项"%></div>
     </div>
     <div style="margin-bottom:10px;">
-        <input type="button" align="right" style="min-width:80px" class="button" name="allowClientExecution" value='<%=L"关闭"%>' onclick="ClosePage"/>
+        <input type="checkbox" name="allowFastMode" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowFastMode"/>
+        <div for="allowFastMode" style="float:left;margin-left:5px;" >
+            <%=L"开启高性能模式（高级）"%>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;">
+        <input type="button" align="right" style="min-width:80px" class="button" name="close" value='<%=L"关闭"%>' onclick="ClosePage"/>
     </div>
 </div>
 </aries:window>

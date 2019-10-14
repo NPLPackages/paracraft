@@ -693,6 +693,7 @@ function env_imp:stopMovie(name)
 	channel:Stop();
 end
 
+-- @return the window object itself
 function env_imp:window(mcmlCode, alignment, left, top, width, height)
 	if(mcmlCode) then
 		local filename = ParaIO.GetWritablePath().."temp/codeblock_mcml.html";
@@ -709,9 +710,9 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 			
 			file:close();
 
-			NPL.load("(gl)script/ide/System/Windows/Window.lua");
-			local Window = commonlib.gettable("System.Windows.Window")
-			local my_window = Window:new();
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
+			local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
+			local my_window = CodeWindow:new();
 			
 			local globalTable = self;
 			local pageIndex = function(tab, name)
@@ -731,7 +732,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 			NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 			local viewport = ViewportManager:GetSceneViewport();
-
+			my_window:SetCodeBlock(self.codeblock);
 			my_window:Show({url=filename, 
 				alignment = alignment or "_lt", 
 				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
@@ -743,6 +744,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 			self.codeblock:Connect("codeUnloaded", function()
 				my_window:CloseWindow(true)
 			end)
+			return my_window;
 		end
 	end
 end

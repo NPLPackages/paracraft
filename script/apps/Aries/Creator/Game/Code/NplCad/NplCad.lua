@@ -129,7 +129,11 @@ function NplCad.CompileCode(code, filename, codeblock)
 
 	NplCad.SetCodeBlockActorAsset(codeblock, relativePath);
 
-	return CodeCompiler:new():SetFilename(filename):Compile(code);
+	local compiler = CodeCompiler:new():SetFilename(filename)
+	if(codeblock and codeblock:GetEntity() and codeblock:GetEntity():IsAllowFastMode()) then
+		compiler:SetAllowFastMode(true);
+	end
+	return compiler:Compile(code);
 end
 
 -- set code block's nearby movie block's first actor's model to filepath if it is not. 

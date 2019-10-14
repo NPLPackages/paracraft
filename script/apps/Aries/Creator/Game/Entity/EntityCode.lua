@@ -29,6 +29,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
+Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
@@ -166,6 +167,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
 	end
+	if(self:IsAllowFastMode()) then
+		node.attr.allowFastMode= true;
+	end
 
 	if(self:GetLanguageConfigFile()~="") then
 		node.attr.languageConfigFile = self:GetLanguageConfigFile();
@@ -194,6 +198,7 @@ function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
 	self.isAllowClientExecution = (node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
+	self.isAllowFastMode = (node.attr.allowFastMode == "true" or node.attr.allowFastMode == true);
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 
@@ -730,4 +735,12 @@ end
 
 function Entity:IsAllowClientExecution()
 	return self.isAllowClientExecution;
+end
+
+function Entity:SetAllowFastMode(bAllow)
+	self.isAllowFastMode = bAllow == true;
+end
+
+function Entity:IsAllowFastMode()
+	return self.isAllowFastMode;
 end

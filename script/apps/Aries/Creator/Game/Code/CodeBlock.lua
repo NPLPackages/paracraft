@@ -162,7 +162,11 @@ function CodeBlock:CompileCodeImp(code, filename)
 	if(compileCodeFunc) then
 		return compileCodeFunc(code, filename, self)
 	else
-		return CodeCompiler:new():SetFilename(filename):Compile(code);
+		local compiler = CodeCompiler:new():SetFilename(filename);
+		if(self:GetEntity() and self:GetEntity():IsAllowFastMode()) then
+			compiler:SetAllowFastMode(true);
+		end
+		return compiler:Compile(code);
 	end
 end
 

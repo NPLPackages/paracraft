@@ -1007,6 +1007,11 @@ function GameLogic.CanCollectItem()
 	end
 end
 
+-- @return "edit" or "game"
+function GameLogic.GetGameMode()
+	return GameMode:IsEditor() and "edit" or "game"
+end
+
 -- whether we can edit the world 
 function GameLogic.IsReadOnly()
 	return System.World.readonly or GameLogic.isRemote;
