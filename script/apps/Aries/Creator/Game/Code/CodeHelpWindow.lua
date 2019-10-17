@@ -36,6 +36,7 @@ CodeHelpWindow.currentItems = {};
 CodeHelpWindow.selected_code_name = nil;
 local category_items = {};
 local all_command_names = {};
+local all_function_names = {};
 local languageConfigFile = "";
 
 -- public:
@@ -58,6 +59,7 @@ function CodeHelpWindow.ClearAll()
 	CodeHelpWindow.cmdInited = nil;
 	category_items = {};
 	all_command_names = {};
+	all_function_names = {};
 	CodeHelpWindow.categories = {};
 	CodeHelpWindow.currentItems = {};
 	CodeHelpWindow.selected_code_name = nil;
@@ -127,6 +129,9 @@ function CodeHelpWindow.AddCodeHelpItem(codeHelpItem)
 		items[#items+1] = item;
 	end
 	all_command_names[item:GetName()] = item;
+	if(item.funcName) then
+		all_function_names[item.funcName] = item
+	end
 end
 
 function CodeHelpWindow.AddCodeExamples(examples)
@@ -146,6 +151,10 @@ end
 
 function CodeHelpWindow.GetCodeItemByName(name)
 	return all_command_names[name];
+end
+
+function CodeHelpWindow.GetCodeItemByFuncName(name)
+	return all_function_names[name];
 end
 
 function CodeHelpWindow.OnInit()

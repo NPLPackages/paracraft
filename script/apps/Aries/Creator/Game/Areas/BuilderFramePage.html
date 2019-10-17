@@ -35,13 +35,13 @@ function DS_Items(index)
 end
 
 function OnClickBlock(block_id, mcmlNode)
-    if(mouse_button == "left") then
+    if(mouse_button == "right" and ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL)) then
+        BuilderFramePage.OnHelpBlock(block_id);
+    else
         local item = mcmlNode:GetPreValue("this", true);
         if(item) then
             BuilderFramePage.OnClickBlock(item);
         end
-    elseif(mouse_button == "right") then
-        BuilderFramePage.OnHelpBlock(block_id);
     end
 end
 
@@ -124,7 +124,7 @@ end
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' style="width:32px;height:32px;" tooltip2='<%=L"右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

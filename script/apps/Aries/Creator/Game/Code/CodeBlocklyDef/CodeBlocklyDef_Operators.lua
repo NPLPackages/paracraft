@@ -146,6 +146,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "random",
 	func_description = 'math.random(%s,%s)',
 	ToNPL = function(self)
 		return string.format('math.random(%s,%s)', self:getFieldAsString('from'), self:getFieldAsString('to'));
@@ -216,6 +217,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "not",
 	func_description = '(not %s)',
 	ToNPL = function(self)
 		return string.format('(not %s)', self:getFieldAsString('left'));
@@ -332,6 +334,7 @@ say("66%10=="..(66%10))
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "floor",
 	func_description = 'math.floor(%s+0.5)',
 	ToNPL = function(self)
 		return string.format('math.floor(%s+0.5)', self:getFieldAsString('left'));
@@ -382,6 +385,7 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "math",
 	func_description = 'math.%s(%s)',
 	ToNPL = function(self)
 		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));

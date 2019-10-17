@@ -61,6 +61,7 @@ local cmds = {
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playNote",
 	func_description = 'playNote(%s, %s)',
 	ToNPL = function(self)
 		return string.format('playNote("%s", %s)\n', self:getFieldAsString('note'), self:getFieldAsString('beat'));
@@ -122,6 +123,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playMusic",
 	func_description = 'playMusic(%s)',
 	ToNPL = function(self)
 		return string.format('playMusic("%s")\n', self:getFieldAsString('filename'));
@@ -194,6 +196,7 @@ playMusic()
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playSound",
 	func_description = 'playSound(%s)',
 	ToNPL = function(self)
 		return string.format('playSound("%s")\n', self:getFieldAsString('filename'));
@@ -242,6 +245,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "stopSound",
 	func_description = 'stopSound(%s)',
 	ToNPL = function(self)
 		return string.format('stopSound("%s")\n', self:getFieldAsString('filename'));

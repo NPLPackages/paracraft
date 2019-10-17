@@ -281,13 +281,21 @@ function WorldCommon.SaveWorldAsImp(folderName)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
 		local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
 		local save_world_handler = SaveWorldHandler:new():Init(folderName);
-		local world_info = save_world_handler:LoadWorldInfo();
-		if(world_info) then
-			-- change world name in tag. 
-			local worldname = folderName:match("([^/]+)/?$")
-			world_info.name = commonlib.Encoding.DefaultToUtf8(worldname);
-			-- TODO: change Tag.xml to merge the original authors
-			save_world_handler:SaveWorldInfo(world_info);
+		local xmlRoot = save_world_handler:LoadWorldXmlNode();
+		if(xmlRoot) then
+			for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
+				-- change world name in tag. 
+				local worldname = folderName:match("([^/]+)/?$")
+				local name = commonlib.Encoding.DefaultToUtf8(worldname);
+				node.attr.name = name;
+				-- change Tag.xml to merge the original authors
+				if(node.attr.kpProjectId) then
+					node.attr.fromProjects =  node.attr.fromProjects and (node.attr.fromProjects..","..node.attr.kpProjectId)  or node.attr.kpProjectId;
+					node.attr.kpProjectId = nil;
+				end
+				save_world_handler:SaveWorldXmlNode(xmlRoot);
+				break;
+			end
 		end
 
 		

@@ -819,7 +819,7 @@ function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
             page:Rebuild();
         end
 
-		page:CallMethod("nplbrowser_instance","SetVisible",bVisible)
+		page:CallMethod("nplbrowser_codeblock","SetVisible",bVisible)
         if(bVisible) then
 			if(bForceRefresh == nil) then
 				if(self.lastBlocklyUrl ~= CodeBlockWindow.GetBlockEditorUrl()) then
@@ -828,10 +828,17 @@ function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
 				end
 			end
 			if(bForceRefresh) then
-				page:CallMethod("nplbrowser_instance","Reload",CodeBlockWindow.GetBlockEditorUrl());
+				page:CallMethod("nplbrowser_codeblock","Reload",CodeBlockWindow.GetBlockEditorUrl());
 			end
         end
-        
+        local ctl = page:FindControl("helpContainer")
+		if(ctl) then
+			ctl.visible = not (bVisible == true)
+		end
+		local ctl = page:FindControl("codeContainer")
+		if(ctl) then
+			ctl.visible = not (bVisible == true)
+		end
     end
 end
 
@@ -958,6 +965,46 @@ function CodeBlockWindow.OnClickSettings()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockSettings.lua");
 	local CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
 	CodeBlockSettings.Show(true)
+end
+
+function CodeBlockWindow.OnLearnMore()
+	if(self.curMouseOverCodeItem) then
+		CodeBlockWindow.ShowHelpWndForCodeName(self.curMouseOverCodeItem.type or "")
+		return true;
+	end
+end
+
+function CodeBlockWindow.ShowMouseOverFuncTip(tipUrl)
+	if(tipUrl) then
+		CodeBlockWindow.my_window = CodeBlockWindow.my_window or System.Windows.Window:new();
+		CodeBlockWindow.my_window:Show({url=tipUrl, alignment="_lt", left=0, top=0, width=250, height=300, zorder=10});
+		local layout = CodeBlockWindow.my_window:GetLayout()
+		if(layout and layout.GetUsedSize) then
+			local width, height = layout:GetUsedSize();
+			local mouse_x, mouse_y = ParaUI.GetMousePosition();
+			CodeBlockWindow.my_window:setGeometry(mouse_x, mouse_y+32, width, height);
+			-- echo({mouse_x, mouse_y, width, height})
+		end
+	elseif(CodeBlockWindow.my_window) then
+		CodeBlockWindow.my_window:hide();
+	end
+end
+
+function CodeBlockWindow.OnMouseOverWordChange(word, line, from, to)
+	if(word) then
+		local funcName = word:match("(%w+)")
+		if(funcName) then
+			local codeItem = CodeHelpWindow.GetCodeItemByFuncName(funcName)
+			if(codeItem) then
+				self.curMouseOverCodeItem = codeItem;
+				local tipUrl = "script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html?IsShortTip=true&name="..codeItem:GetName()
+				CodeBlockWindow.ShowMouseOverFuncTip(tipUrl)
+				return;
+			end
+		end
+	end
+	self.curMouseOverCodeItem = nil;
+	CodeBlockWindow.ShowMouseOverFuncTip(nil)
 end
 
 CodeBlockWindow:InitSingleton();

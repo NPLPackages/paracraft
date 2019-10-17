@@ -693,6 +693,7 @@ function env_imp:stopMovie(name)
 	channel:Stop();
 end
 
+local lastWinId = 0;
 -- @return the window object itself
 function env_imp:window(mcmlCode, alignment, left, top, width, height)
 	if(mcmlCode) then
@@ -733,7 +734,9 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 			local viewport = ViewportManager:GetSceneViewport();
 			my_window:SetCodeBlock(self.codeblock);
+			lastWinId = lastWinId + 1
 			my_window:Show({url=filename, 
+				name = self.codeblock:GetFilename() or ("codeWindow"..lastWinId),
 				alignment = alignment or "_lt", 
 				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
 				zorder=2, 

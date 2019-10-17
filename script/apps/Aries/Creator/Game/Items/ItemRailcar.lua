@@ -12,6 +12,7 @@ local ItemRailcar = commonlib.gettable("MyCompany.Aries.Game.Items.ItemRailcar")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockRailBase = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockRailBase")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")

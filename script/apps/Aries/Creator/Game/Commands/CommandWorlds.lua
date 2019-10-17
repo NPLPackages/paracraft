@@ -111,11 +111,12 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [-i|e] [worldname|url|filepath]", 
+	quick_ref="/loadworld [-i|e] [worldname|url|filepath|projectId]", 
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
 e.g.
+/loadworld 530
 /loadworld https://github.com/xxx/xxx.zip
 /loadworld -i https://github.com/xxx/xxx.zip
 /loadworld -e https://github.com/xxx/xxx.zip
@@ -127,9 +128,15 @@ e.g.
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
 
+
+		cmd_text = GameLogic.GetFilters():apply_filters("cmd_loadworld", cmd_text, options);
+
+		if(not cmd_text) then
+			return;
+		end
+
 		cmd_text = cmd_text:gsub("\\", "/");
 		local filename = cmd_text;
-
 		
 		if(filename) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");

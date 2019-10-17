@@ -35,6 +35,7 @@ local cmds = {
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "isTouching",
 	func_description = 'isTouching(%s)',
 	ToNPL = function(self)
 		return string.format('isTouching("%s")\n', self:getFieldAsString('input'));
@@ -77,6 +78,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setActorValue",
 	func_description = 'setActorValue("name", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("name", "%s")\n', self:getFieldAsString('name'));
@@ -112,6 +114,7 @@ say("click us!")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setActorValue",
 	func_description = 'setActorValue("physicsRadius", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsRadius", %s)\n', self:getFieldAsString('radius'));
@@ -148,6 +151,7 @@ cmd("/hide boundingbox")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setActorValue",
 	func_description = 'setActorValue("physicsHeight", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsHeight", %s)\n', self:getFieldAsString('height'));
@@ -193,6 +197,7 @@ cmd("/hide boundingbox")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerCollisionEvent",
 	func_description = 'registerCollisionEvent(%s, function(actor)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerCollisionEvent("%s", function(actor)\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
@@ -234,6 +239,7 @@ end)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcastCollision",
 	func_description = 'broadcastCollision()',
 	ToNPL = function(self)
 		return 'broadcastCollision()\n';
@@ -260,6 +266,7 @@ end)
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "distanceTo",
 	func_description = 'distanceTo(%s)',
 	ToNPL = function(self)
 		return string.format('distanceTo("%s")\n', self:getFieldAsString('input'));
@@ -311,6 +318,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "calculatePushOut",
 	func_description = 'calculatePushOut(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('calculatePushOut(%s, %s, %s)\n', self:getFieldAsString('dx'), self:getFieldAsString('dy'), self:getFieldAsString('dz'));
@@ -353,6 +361,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "ask",
 	func_description = 'ask(%s)',
 	ToNPL = function(self)
 		return string.format('local result = ask("%s")\n', self:getFieldAsString('input'));
@@ -392,6 +401,7 @@ say("hello "..tostring(answer), 2)
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "answer",
 	func_description = 'get("answer")',
 	ToNPL = function(self)
 		return 'get("answer")';
@@ -434,6 +444,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "isKeyPressed",
 	func_description = 'isKeyPressed("%s")',
 	ToNPL = function(self)
 		return string.format('isKeyPressed("%s")', self:getFieldAsString('input'));
@@ -477,6 +488,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "isMouseDown",
 	func_description = 'isMouseDown()',
 	ToNPL = function(self)
 		return string.format('isMouseDown()');
@@ -501,6 +513,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getMousePoint",
 	func_description = 'getMousePoint()',
 	ToNPL = function(self)
 		return string.format('local x, y = getMousePoint()\n');
@@ -520,6 +533,7 @@ local x, y = getMousePoint()
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "mousePickBlock",
 	func_description = 'mousePickBlock()',
 	ToNPL = function(self)
 		return string.format('local x, y, z, blockid = mousePickBlock()\n');
@@ -569,6 +583,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getBlock",
 	func_description = 'getBlock(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('getBlock(%s, %s, %s)', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
@@ -638,6 +653,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setBlock",
 	func_description = 'setBlock(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('setBlock(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('blockId'));
@@ -665,6 +681,7 @@ setBlock(x,y+2,z, id, data)
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getTimer",
 	func_description = 'getTimer()',
 	ToNPL = function(self)
 		return string.format('getTimer()');
@@ -687,6 +704,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "resetTimer",
 	func_description = 'resetTimer()',
 	ToNPL = function(self)
 		return string.format('resetTimer()');
@@ -738,6 +756,7 @@ end
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "GetGameMode",
 	func_description = 'GameLogic.GetGameMode()',
 	ToNPL = function(self)
 		return string.format('GameLogic.GetGameMode()');

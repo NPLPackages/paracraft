@@ -54,7 +54,7 @@ say(key, 1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
-    colourSecondary = "#b1ad4e",
+    colourSecondary = "#ffffff",
 	ToNPL = function(self)
 		return self:getFieldAsString('var');
 	end,
@@ -103,8 +103,8 @@ say(text, 1)
 		{
 			name = "left",
 			type = "input_value",
-			shadow = { type = "getLocalVariable", value = "score",},
-			text = "score",
+			shadow = { type = "getLocalVariable", value = L"变量名",},
+			text = L"变量名",
 		},
 		{
 			name = "right",
@@ -125,6 +125,44 @@ say(text, 1)
 	examples = {{desc = "", canRun = true, code = [[
 text = "hello"
 say(text, 1)
+]]}},
+},
+
+
+{
+	type = "set", 
+	message0 = L"全局%1赋值为%2",
+	arg0 = {
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "text", value = L"变量名",},
+			text = L"变量名", 
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "functionParams", value = "1",},
+			text = "1", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "set",
+	func_description = 'set(%s, %s)',
+	ToNPL = function(self)
+		return string.format('set("%s", %s)\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"也可以用_G.a", canRun = true, code = [[
+_G.a = _G.a or 1
+while(true) do
+    _G.a = a + 1
+    set("a", get("a") + 1)
+    say(a)
+end
 ]]}},
 },
 
@@ -149,9 +187,10 @@ say(text, 1)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "local",
 	func_description = 'local %s = %s',
 	ToNPL = function(self)
-		return string.format('%s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
+		return string.format('local %s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 local key = "value"
@@ -159,41 +198,6 @@ say(key, 1)
 ]]}},
 },
 
-{
-	type = "set", 
-	message0 = L"设置全局%1为%2",
-	arg0 = {
-		{
-			name = "key",
-			type = "input_value",
-			shadow = { type = "text", value = L"变量名",},
-			text = L"变量名", 
-		},
-		{
-			name = "value",
-			type = "input_value",
-            shadow = { type = "functionParams", value = "1",},
-			text = "1", 
-		},
-	},
-	category = "Data", 
-	helpUrl = "", 
-	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'set(%s, %s)',
-	ToNPL = function(self)
-		return string.format('set("%s", %s)\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
-	end,
-	examples = {{desc = L"也可以用_G.a", canRun = true, code = [[
-_G.a = _G.a or 1
-while(true) do
-    _G.a = a + 1
-    set("a", get("a") + 1)
-    say(a)
-end
-]]}},
-},
 
 {
 	type = "registerCloneEvent", 
@@ -220,6 +224,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerCloneEvent",
 	func_description = 'registerCloneEvent(function(%s)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -284,6 +289,7 @@ clone("myself", 3)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "clone",
 	func_description = 'clone(%s, %s)',
 	ToNPL = function(self)
 		return string.format('clone(%s)\n', self:getFieldAsString('input'));
@@ -309,6 +315,7 @@ say("click")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "delete",
 	func_description = "delete()",
 	ToNPL = function(self)
 		return string.format('delete()\n');
@@ -403,6 +410,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setActorValue",
 	func_description = 'setActorValue(%s, %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("%s", "%s")\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
@@ -473,6 +481,7 @@ end)
 	output = {type = "field_variable",},
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getActorValue",
 	func_description = 'getActorValue(%s)',
 	ToNPL = function(self)
 		return string.format('getActorValue("%s")', self:getFieldAsString('key'));
@@ -509,6 +518,7 @@ say("click us!")
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getActor",
 	func_description = 'getActor(%s)',
 	ToNPL = function(self)
 		return string.format('getActor("%s")\n', self:getFieldAsString('actorName'));
@@ -596,7 +606,7 @@ local data = actor:GetActorValue("some_data")
 },
 {
 	type = "getColor", 
-	message0 = "\"%1\"",
+	message0 = "%1",
 	arg0 = {
 		{
 			name = "color",
@@ -795,12 +805,23 @@ say(getHello())
 
 {
 	type = "showVariable", 
-	message0 = L"显示全局变量%1",
+	message0 = L"显示变量%1,%2,%3",
 	arg0 = {
 		{
 			name = "name",
 			type = "field_input",
 			text = "score", 
+		},
+		{
+			name = "title",
+			type = "field_input",
+			text = "", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#0000ff",},
+			text = "#0000ff",
 		},
 	},
 	category = "Data", 
@@ -808,9 +829,10 @@ say(getHello())
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'showVariable("%s")',
+	funcName = "showVariable",
+	func_description = 'showVariable("%s", "%s", %s)',
 	ToNPL = function(self)
-		return string.format('showVariable("%s")\n', self:getFieldAsString('name'));
+		return string.format('showVariable("%s", "%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('title'), self:getFieldAsString('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 _G.score = 1
@@ -839,6 +861,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "hideVariable",
 	func_description = 'hideVariable("%s")',
 	ToNPL = function(self)
 		return string.format('hideVariable("%s")\n', self:getFieldAsString('name'));
@@ -868,6 +891,7 @@ hideVariable("score")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "log",
 	func_description = 'log(%s)',
 	ToNPL = function(self)
 		return string.format('log("%s")\n', self:getFieldAsString('obj'));
@@ -896,6 +920,7 @@ log("hello %s %d", "world", 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "echo",
 	func_description = 'echo(%s)',
 	ToNPL = function(self)
 		return string.format('echo("%s")\n', self:getFieldAsString('obj'));
@@ -924,6 +949,7 @@ echo(something)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "include",
 	func_description = 'include(%s)',
 	ToNPL = function(self)
 		return string.format('include("%s")\n', self:getFieldAsString('filename'));
@@ -951,6 +977,7 @@ hello()
 	helpUrl = "", 
 	canRun = false,
 	output = {type = "field_variable",},
+	funcName = "gettable",
 	func_description = 'gettable(%s)',
 	ToNPL = function(self)
 		return string.format('gettable("%s")\n', self:getFieldAsString('tableName'));
@@ -983,6 +1010,7 @@ say(some_data.b)
 	helpUrl = "", 
 	canRun = false,
 	output = {type = "field_variable",},
+	funcName = "inherit",
 	func_description = 'inherit(%s, %s)',
 	ToNPL = function(self)
 		return string.format('inherit("%s", "%s")\n', self:getFieldAsString('baseClass'), self:getFieldAsString('newClass'));
@@ -1044,6 +1072,7 @@ a:print()
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "saveUserData",
 	func_description = 'saveUserData(%s, %s)',
 	ToNPL = function(self)
 		return string.format('saveUserData("%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('value'));
@@ -1077,6 +1106,7 @@ assert(score == 1)
 	output = {type = "field_variable",},
 	helpUrl = "", 
 	canRun = false,
+	funcName = "loadUserData",
 	func_description = 'loadUserData(%s, %s)',
 	ToNPL = function(self)
 		return string.format('loadUserData("%s", "%s")', self:getFieldAsString('name'), self:getFieldAsString('defaultvalue'));
@@ -1112,6 +1142,7 @@ assert(score == 1)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "saveWorldData",
 	func_description = 'saveWorldData(%s, %s)',
 	ToNPL = function(self)
 		return string.format('saveWorldData("%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('value'));

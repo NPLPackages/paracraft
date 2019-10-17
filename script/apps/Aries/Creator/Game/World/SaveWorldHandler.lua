@@ -39,14 +39,18 @@ function SaveWorldHandler:SaveWorldInfo(world_info)
 	if(not world_info) then
 		return false;
 	end
+	return self:SaveWorldXmlNode({name="pe:mcml",
+			[1] = world_info:SaveToXMLNode(nil),
+	});
+end
+
+-- save world info to tag.xml under the world_path
+function SaveWorldHandler:SaveWorldXmlNode(node)
 	local world_path = self.world_path;
 	world_path = string.gsub(world_path, "[/\\]$", "");
 	local file = ParaIO.open(world_path.."/tag.xml", "w");
 	if(world_path~="" and file:IsValid()) then
 		-- create the tag.xml file under the world root directory. 
-		local node = {name="pe:mcml",
-			[1] = world_info:SaveToXMLNode(nil),
-		}
 		file:WriteString(commonlib.Lua2XmlString(node, true, true));
 		file:close();
 		LOG.std(nil, "info", "WorldInfo",  "saved");
@@ -57,13 +61,11 @@ function SaveWorldHandler:SaveWorldInfo(world_info)
 	end
 end
 
+
 -- load world info from tag.xml under the world_path
 function SaveWorldHandler:LoadWorldInfo()
+	local xmlRoot = self:LoadWorldXmlNode();
 	local world_info = WorldInfo:new();
-	local world_path = self.world_path;
-	world_path = string.gsub(world_path, "[/\\]$", "");
-
-	local xmlRoot = ParaXML.LuaXML_ParseFile(world_path.."/tag.xml");
 	if(xmlRoot) then
 		local node;
 		for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
@@ -74,3 +76,12 @@ function SaveWorldHandler:LoadWorldInfo()
 	return world_info;
 end
 
+function SaveWorldHandler:LoadWorldXmlNode()
+	local world_path = self.world_path;
+	world_path = string.gsub(world_path, "[/\\]$", "");
+
+	local xmlRoot = ParaXML.LuaXML_ParseFile(world_path.."/tag.xml");
+	if(xmlRoot) then
+		return xmlRoot;
+	end
+end

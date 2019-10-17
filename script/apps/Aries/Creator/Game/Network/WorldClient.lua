@@ -92,6 +92,10 @@ end
 
 function WorldClient:OnExit()
 	WorldClient._super.OnExit(self);
+
+	if(self.net_handler) then
+		self.net_handler:Cleanup();
+	end
 	return self;
 end
 

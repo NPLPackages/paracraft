@@ -14,6 +14,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local ItemNPC = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemNPC"));

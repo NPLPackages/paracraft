@@ -28,6 +28,7 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerClickEvent",
 	func_description = 'registerClickEvent(function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -80,6 +81,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerKeyPressedEvent",
 	func_description = 'registerKeyPressedEvent("%s", function(msg)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
@@ -140,6 +142,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerBlockClickEvent",
 	func_description = 'registerBlockClickEvent(%s, function(msg)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerBlockClickEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('blockid'), self:getFieldAsString('input'));
@@ -186,6 +189,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerTickEvent",
 	func_description = 'registerTickEvent(%d, function(msg)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerTickEvent(%d, function()\n    %s\nend)\n',  self:getFieldValue('ticks'), self:getFieldAsString('input'));
@@ -226,6 +230,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerAnimationEvent",
 	func_description = 'registerAnimationEvent(%d, function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerAnimationEvent(%d, function()\n    %s\nend)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
@@ -299,6 +304,7 @@ say("click me!")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerBroadcastEvent",
 	func_description = 'registerBroadcastEvent(%s, function(%s)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
@@ -335,6 +341,7 @@ say("click to jump!")
 	hide_in_toolbox = true, -- deprecated, use broadcast2
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcast",
 	func_description = 'broadcast(%s)',
 	ToNPL = function(self)
 		return string.format('broadcast("%s")\n', self:getFieldAsString('msg'));
@@ -376,6 +383,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcast",
 	func_description = 'broadcast(%s, %s)',
 	ToNPL = function(self)
 		return string.format('broadcast("%s", "%s")\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
@@ -411,6 +419,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcastAndWait",
 	func_description = 'broadcastAndWait(%s)',
 	ToNPL = function(self)
 		return string.format('broadcastAndWait("%s")\n', self:getFieldAsString('msg'));
@@ -457,6 +466,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcastTo",
 	func_description = 'broadcastTo(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('broadcastTo("%s", "%s", %s)\n', self:getFieldAsString('username'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
@@ -487,6 +497,7 @@ broadcastTo("Alice", "Hello", {text="hello"})
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerStopEvent",
 	func_description = 'registerStopEvent(function()\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerStopEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -557,6 +568,7 @@ end)
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "registerNetworkEvent",
 	func_description = 'registerNetworkEvent(%s, function(%s)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerNetworkEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
@@ -648,6 +660,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "broadcastNetworkEvent",
 	func_description = 'broadcastNetworkEvent(%s, %s)',
 	ToNPL = function(self)
 		return string.format('broadcastNetworkEvent("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));
@@ -727,6 +740,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "sendNetworkEvent",
 	func_description = 'sendNetworkEvent(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('sendNetworkEvent("%s", "%s", %s)\n', self:getFieldAsString('username'), self:getFieldAsString('msg'), self:getFieldAsString('params'));
@@ -844,6 +858,7 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "cmd",
 	func_description = 'cmd(%s, %s)',
 	ToNPL = function(self)
 		return string.format('cmd("%s", %s)\n', self:getFieldAsString('msg'), self:getFieldAsString('params'));

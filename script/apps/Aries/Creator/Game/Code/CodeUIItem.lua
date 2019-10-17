@@ -54,6 +54,10 @@ function CodeUIItem:TrackCodeBlock(codeblock)
 	end
 end
 
+function CodeUIItem:GetCodeBlock()
+	return self.codeblock;
+end
+
 function CodeUIItem:OnCodeUnloaded()
 	if(self.codeUI) then
 		self.codeUI:RemoveItem(self.name);
@@ -64,7 +68,14 @@ function CodeUIItem:paintEvent(painter)
 	local name = self:GetGlobalVariableName();
 	local text;
 	if(name) then
-		text = GameLogic.GetCodeGlobal():GetGlobal(name);
+		if(self.codeblock) then
+			-- we will try the containing codeblock's globals
+			text = self.codeblock:GetCodeEnv()[name];
+		else
+			text = GameLogic.GetCodeGlobal():GetGlobal(name);
+		end
+		
+		
 		if(type(text) == "table") then
 			text = commonlib.serialize_in_length(text, 100);
 		else

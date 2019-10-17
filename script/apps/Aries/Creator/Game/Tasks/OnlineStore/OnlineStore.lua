@@ -115,10 +115,10 @@ function OnlineStore:ShowPage(bShow)
 				System.App.Commands.Call("File.MCMLWindowFrame", params);
 				page = params._page;
 				if(params._page) then
-					params._page:CallMethod("nplbrowser_instance", "SetVisible", bShow~=false); 
+					params._page:CallMethod("nplbrowser_store", "SetVisible", bShow~=false); 
 					params._page.OnClose = function()
 						if(params._page) then
-							params._page:CallMethod("nplbrowser_instance", "SetVisible", false); 
+							params._page:CallMethod("nplbrowser_store", "SetVisible", false); 
 						end
 						page = nil;
 					end

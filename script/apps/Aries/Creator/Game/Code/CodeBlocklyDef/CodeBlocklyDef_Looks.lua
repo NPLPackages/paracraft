@@ -34,6 +34,7 @@ local cmds = {
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "say",
 	func_description = 'say(%s, %s)',
 	ToNPL = function(self)
 		return string.format('say("%s", %s)\n', self:getFieldValue('text'), self:getFieldAsString('duration'));
@@ -59,6 +60,7 @@ move(0,1,0)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "say",
 	func_description = 'say(%s)',
 	ToNPL = function(self)
 		return string.format('say("%s")\n', self:getFieldValue('text'));
@@ -85,6 +87,7 @@ say("")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "tip",
 	func_description = 'tip(%s)',
 	ToNPL = function(self)
 		return string.format('tip("%s")\n', self:getFieldValue('text'));
@@ -109,6 +112,7 @@ tip("")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "show",
 	func_description = 'show()',
 	ToNPL = function(self)
 		return string.format('show()\n');
@@ -124,6 +128,7 @@ tip("")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "hide",
 	func_description = 'hide()',
 	ToNPL = function(self)
 		return string.format('hide()\n');
@@ -145,6 +150,7 @@ tip("")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "anim",
 	func_description = 'anim(%d)',
 	ToNPL = function(self)
 		return string.format('anim(%d)\n', self:getFieldValue('animId'));
@@ -184,6 +190,7 @@ anim(0)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "play",
 	func_description = 'play(%s, %s)',
 	ToNPL = function(self)
 		return string.format('play(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
@@ -215,6 +222,7 @@ say("No looping", 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playAndWait",
 	func_description = 'playAndWait(%s, %s)',
 	ToNPL = function(self)
 		return string.format('playAndWait(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
@@ -246,6 +254,7 @@ say("finished")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playLoop",
 	func_description = 'playLoop(%s, %s)',
 	ToNPL = function(self)
 		return string.format('playLoop(%d, %d)\n', self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
@@ -294,6 +303,7 @@ stop()
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playBone",
 	func_description = 'playBone(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('playBone("%s", %d, %d, %s)\n', self:getFieldValue('boneName'),  self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'), self:getFieldValue('isLooping'));
@@ -323,6 +333,7 @@ play(0, 4000)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playSpeed",
 	func_description = 'playSpeed(%d)',
 	ToNPL = function(self)
 		return string.format('playSpeed(%d)\n', self:getFieldValue('speed'));
@@ -345,6 +356,7 @@ stop()
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "stop",
 	func_description = 'stop()',
 	ToNPL = function(self)
 		return 'stop()\n';
@@ -375,6 +387,7 @@ stop()
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "scale",
 	func_description = 'scale(%d)',
 	ToNPL = function(self)
 		return string.format('scale(%d)\n', self:getFieldValue('scaleDelta'));
@@ -401,6 +414,7 @@ scale(-50)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "scaleTo",
 	func_description = 'scaleTo(%d)',
 	ToNPL = function(self)
 		return string.format('scaleTo(%d)\n', self:getFieldValue('scale'));
@@ -461,6 +475,7 @@ scaleTo(100)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "focus",
 	func_description = 'focus(%s)',
 	ToNPL = function(self)
 		return string.format('focus("%s")\n', self:getFieldAsString('name'));
@@ -506,6 +521,7 @@ focus(getActor("someName2"))
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "camera",
 	func_description = 'camera(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('camera(%s, %s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('pitch'), self:getFieldAsString('facing'));
@@ -526,6 +542,7 @@ end
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getScale",
 	func_description = 'getScale()',
 	ToNPL = function(self)
 		return 'getScale()';
@@ -548,6 +565,7 @@ end
 	category = "Looks", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getPlayTime",
 	func_description = 'getPlayTime()',
 	ToNPL = function(self)
 		return 'getPlayTime()';
@@ -599,6 +617,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setMovie",
 	func_description = 'setMovie(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('setMovie("%s", %s, %s, %s)\n', self:getFieldAsString('name'), self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
@@ -651,6 +670,7 @@ playMovie("main", 0, -1);
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playMovie",
 	func_description = 'playMovie(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('playMovie("%s", %d, %d)\n', self:getFieldAsString('name'), self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
@@ -691,6 +711,7 @@ stopMovie("myself");
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "playMovie",
 	func_description = 'playMovie(%s, %s, %s, true)',
 	ToNPL = function(self)
 		return string.format('playMovie("%s", %d, %d, true)\n', self:getFieldAsString('name'), self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'));
@@ -717,6 +738,7 @@ playMovie("myself", 0, 1000, true);
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "stopMovie",
 	func_description = 'stopMovie(%s)',
 	ToNPL = function(self)
 		return string.format('stopMovie("%s")\n', self:getFieldAsString('name'));
@@ -758,6 +780,7 @@ stopMovie();
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setMovieProperty",
 	func_description = 'setMovieProperty(%s, "%s", %s)',
 	ToNPL = function(self)
 		return string.format('setMovieProperty("%s", "%s", %s)\n', self:getFieldAsString('name'), self:getFieldAsString('key'), self:getFieldAsString('value'));
@@ -830,6 +853,7 @@ stopMovie();
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "window",
 	func_description = 'window(%s, "%s", %s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('window([[%s]],"%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
@@ -889,6 +913,34 @@ end
     <input type="button" onclick="OnClose" value="close" style="margin-left:5px"/> 
 </div> 
 ]], "_lt", 10, 10, 300, 100)
+]=]},
+{desc = "Context2d API", canRun = false, code = [=[
+local wnd = window([[<div>draw something</div>]], "_lt",200,20,300,300);
+local ctx = wnd:getContext();
+ctx.globalAlpha = 0.5
+ctx:clearRect()
+ctx.fillStyle = "#80808080"
+ctx:fillRect(0, 0, ctx.width, ctx.height)
+ctx.lineWidth = 2
+ctx.font="System;20;"
+ctx:save()
+ctx:translate(50, 10)
+ctx:rotate(-0.2)
+ctx:drawImage("preview.jpg", 70, 60, 64, 32)
+ctx:strokeText("left click and drag", 10, 30)
+ctx:restore()
+ctx.strokeStyle = "#ff0000"
+ctx:moveTo(0,0)
+ctx:lineTo(80,80)
+ctx:lineTo(0,80)
+ctx:stroke()
+ctx:beginPath()
+ctx:arc(100, 100, 40, 0, 1.4, true)
+ctx:lineTo(190, 120)
+ctx:closePath()
+ctx:stroke()
+ctx.fillStyle = "blue"
+ctx:fill()
 ]=]}
 },
 },

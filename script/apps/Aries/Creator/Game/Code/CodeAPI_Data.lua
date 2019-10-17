@@ -58,7 +58,13 @@ end
 
 function env_imp:showVariable(name, title, color)
 	if(type(name) == "string") then
-		local item = CodeUI:ShowGlobalData(name, title, color);
+		if(color == "") then
+			color = nil;
+		end
+		if(title == "") then
+			title = nil;
+		end
+		local item = CodeUI:ShowGlobalData(name, title, color, self.codeblock);
 		if(item) then
 			item:TrackCodeBlock(self.codeblock)
 		end

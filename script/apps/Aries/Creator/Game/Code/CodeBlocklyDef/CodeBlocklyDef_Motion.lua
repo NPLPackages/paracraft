@@ -36,6 +36,7 @@ local cmds = {
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "moveForward",
 	func_description = 'moveForward(%d, %d)',
 	ToNPL = function(self)
 		return string.format('moveForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
@@ -63,6 +64,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "turn",
 	func_description = 'turn(%d)',
 	ToNPL = function(self)
 		return string.format('turn(%s)\n', self:getFieldAsString('degree'));
@@ -90,6 +92,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "turnTo",
 	func_description = 'turnTo(%d)',
 	ToNPL = function(self)
 		return string.format('turnTo(%s)\n', self:getFieldAsString('degree'));
@@ -167,6 +170,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "turnTo",
 	func_description = 'turnTo(%s)',
 	ToNPL = function(self)
 		return string.format('turnTo("%s")\n', self:getFieldAsString('targetName'));
@@ -228,6 +232,7 @@ end
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "move",
 	func_description = 'move(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('move(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
@@ -277,6 +282,7 @@ say("jump!", 1)
 	isDynamicNPLCode = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "moveTo",
 	func_description = 'moveTo(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('moveTo(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
@@ -304,6 +310,7 @@ moveTo("frog")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "moveTo",
 	func_description = 'moveTo(%s)',
 	ToNPL = function(self)
 		return string.format('moveTo("%s")\n', self:getFieldValue('targetName'));
@@ -360,6 +367,7 @@ moveTo("myActorName::bone_name")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "walk",
 	func_description = 'walk(%s, %s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('walk(%s, %s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'), self:getFieldAsString('duration'));
@@ -393,6 +401,7 @@ walk(-1,0,-1) -- x,y,z
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "walkForward",
 	func_description = 'walkForward(%s, %s)',
 	ToNPL = function(self)
 		return string.format('walkForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
@@ -427,6 +436,7 @@ walkForward(0)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "velocity",
 	func_description = 'velocity(%s)',
 	ToNPL = function(self)
 		return string.format('velocity("%s")\n', self:getFieldAsString('cmd_text'));
@@ -449,6 +459,7 @@ velocity("0 0 0")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "bounce",
 	func_description = 'bounce()',
 	ToNPL = function(self)
 		return 'bounce()';
@@ -472,6 +483,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getX",
 	func_description = 'getX()',
 	ToNPL = function(self)
 		return 'getX()';
@@ -490,6 +502,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getY",
 	func_description = 'getY()',
 	ToNPL = function(self)
 		return 'getY()';
@@ -511,6 +524,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getZ",
 	func_description = 'getZ()',
 	ToNPL = function(self)
 		return 'getZ()';
@@ -529,6 +543,7 @@ end
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getPos",
 	func_description = 'getPos()',
 	ToNPL = function(self)
 		return 'getPos()';
@@ -580,6 +595,7 @@ setPos(x, y+0.5, z)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setPos",
 	func_description = 'setPos(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('setPos(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
@@ -597,6 +613,7 @@ setPos(x, y+0.5, z)
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "getFacing",
 	func_description = 'getFacing()',
 	ToNPL = function(self)
 		return 'getFacing()';

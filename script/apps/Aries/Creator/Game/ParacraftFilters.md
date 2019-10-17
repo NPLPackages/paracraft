@@ -70,7 +70,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnWorldLoaded" when world is successfully loaded
   - "OnWorldUnloaded" when world is unloaded
   - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 
-  
+  - "cmd_loadworld", url, options: hook `/loadworld url` command
+
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:

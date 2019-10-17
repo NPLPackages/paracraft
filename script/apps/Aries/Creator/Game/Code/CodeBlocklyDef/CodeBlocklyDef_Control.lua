@@ -26,6 +26,7 @@ local cmds = {
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "wait",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'wait(%s)',
@@ -48,6 +49,235 @@ end
 },
 },
 
+
+{
+	type = "help_end", 
+	message0 = L"结束",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "end",
+	func_description = 'end',
+	ToNPL = function(self)
+		return string.format('end\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(true) then
+    say("true", 1)
+end
+for i=1, 3 do
+   say(i, 1)
+end
+while(true) do
+    turn(1)
+    wait(0.1)
+end
+]]}
+},
+},
+
+{
+	type = "help_then", 
+	message0 = L"那么",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "then",
+	func_description = 'then',
+	ToNPL = function(self)
+		return string.format('then\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(true) then
+    say("true")
+end
+]]}
+},
+},
+
+{
+	type = "help_return", 
+	message0 = L"返回",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "return",
+	func_description = 'return',
+	ToNPL = function(self)
+		return string.format('return\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+function sum(a, b)
+    local c = a + b
+    return c
+end
+say(sum(1,2))
+]]}
+},
+},
+
+{
+	type = "help_elseif", 
+	message0 = L"否则如果",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "elseif",
+	func_description = 'elseif',
+	ToNPL = function(self)
+		return string.format('elseif\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+a = 2
+if(a == 1) then
+    log("a is 1")
+elseif(a==2) then
+    log("a is 2")
+else
+    log("a is unknown")
+end
+]]}
+},
+},
+
+{
+	type = "help_do", 
+	message0 = L"执行",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "do",
+	func_description = 'do',
+	ToNPL = function(self)
+		return string.format('elseif\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+for i=1, 10 do
+   say(i, 1)
+end
+while(true) do
+    turn(1)
+    wait(0.1)
+end
+]]}
+},
+},
+
+{
+	type = "help_function", 
+	message0 = L"新建并定义一个新函数",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "function",
+	func_description = 'function',
+	ToNPL = function(self)
+		return string.format('function\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+function sayHi()
+    say("hi")
+end
+sayHi()
+]]}
+},
+},
+
+{
+	type = "help_true", 
+	message0 = L"真",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "true",
+	func_description = 'true',
+	ToNPL = function(self)
+		return string.format('true\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(true) then
+    say("true")
+end
+]]}
+},
+},
+
+{
+	type = "help_false", 
+	message0 = L"假",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "false",
+	func_description = 'false',
+	ToNPL = function(self)
+		return string.format('false\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(not false) then
+    say("not false")
+end
+]]}
+},
+},
+
+{
+	type = "help_nil", 
+	message0 = L"空",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "nil",
+	func_description = 'nil',
+	canRun = true,
+	ToNPL = function(self)
+		return string.format('nil\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(aaa == nil) then
+    say("aaa is nil")
+end
+]]}
+},
+},
+
+
 {
 	type = "waitUntil", 
 	message0 = L"等待直到%1",
@@ -61,6 +291,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "repeat",
 	previousStatement = true,
 	nextStatement = true,
 	hide_in_toolbox = false,
@@ -168,6 +399,7 @@ until(false)
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "while",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'while(true) do\\n%send',
@@ -215,6 +447,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "for",
 	func_description = 'for %s=%d, %d do\\n%send',
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldAsString('input'));
@@ -333,6 +566,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
+	funcName = "until",
 	nextStatement = true,
 	func_description = 'repeat wait() until(%s)',
 	ToNPL = function(self)
@@ -365,6 +599,7 @@ say("game started")
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "if",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%send',
@@ -407,6 +642,7 @@ say("game started")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "else",
 	func_description = 'if(%s) then\\n%selse\\n%send',
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nelse\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
@@ -457,6 +693,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
+	funcName = "pairs",
 	nextStatement = true,
 	func_description = 'for %s, %s in pairs(%s) do\\n%send',
 	ToNPL = function(self)
@@ -508,6 +745,7 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "ipairs",
 	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
 	ToNPL = function(self)
 		return string.format('for %s, %s in ipairs(%s) do\n    %s\nend\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
@@ -539,6 +777,7 @@ end
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	funcName = "run",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'run(function()\\n%send)',
@@ -587,6 +826,7 @@ end)
 	color="#00cc00",
 	helpUrl = "", 
 	canRun = false,
+	funcName = "runForActor",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'runForActor(%s, function()\\n%send)',
@@ -620,6 +860,7 @@ say(x..y..z, 1)
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "exit",
 	func_description = 'exit()',
 	ToNPL = function(self)
 		return string.format('exit()\n');
@@ -640,6 +881,7 @@ end)
 	category = "Control", 
 	helpUrl = "", 
 	canRun = true,
+	funcName = "restart",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'restart()',
@@ -673,6 +915,7 @@ end)
 	helpUrl = "", 
 	color = "#cc0000",
 	canRun = false,
+	funcName = "becomeAgent",
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'becomeAgent(%s)',
@@ -700,6 +943,7 @@ becomeAgent("@p")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setOutput",
 	func_description = 'setOutput(%s)',
 	ToNPL = function(self)
 		return string.format('setOutput(%s)\n', self:getFieldAsString('result'));

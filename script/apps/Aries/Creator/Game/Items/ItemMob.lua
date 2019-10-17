@@ -14,6 +14,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local ItemMob = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemMob"));
@@ -65,8 +66,14 @@ function ItemMob:OnCreate(result)
 		
 		if(not EntityManager.HasNonPlayerEntityInBlock(bx,by,bz)) then 
 			if(GameLogic.isRemote) then
-				-- TODO: send creation request packet to server?
-				GameLogic.AddBBS("warn", L"目前只有Server可以创建此类物品", 4000, "255 0 0")
+				-- GameLogic.AddBBS("warn", L"目前只有Server可以创建此类物品", 4000, "255 0 0")
+				local clientMP = EntityManager.GetPlayer();
+				if(clientMP and clientMP.AddToSendQueue) then
+					local x, y, z = BlockEngine:real_bottom(bx,by,bz);
+					clientMP:AddToSendQueue(Packets.PacketEntityMobSpawn:new():Init({x=x,y=y,z=z, item_id = self.block_id}, 11));
+					return true;
+				end
+				return;
 			else
 				-- ignore it if there is already an entity there. 
 				local entity = MyCompany.Aries.Game.EntityManager.EntityMob:Create({bx=bx,by=by,bz=bz, item_id = self.block_id});

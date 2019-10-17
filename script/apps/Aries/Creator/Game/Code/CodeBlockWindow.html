@@ -3,6 +3,9 @@
 <script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
 <![CDATA[
 CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+function OnClickEditMode(name)
+    CodeBlockWindow.OnClickEditMode(name)
+end
 ]]></script>
 <div width="100%" height="100%" style="background-color:#292929;" class="default">
     <div style="margin:5px;">
@@ -17,8 +20,8 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">...</div>
         </div>
         <div style="float:left;padding:2px;margin-left:5px;margin-top:5px;background-color:#0b9b3a;">
-            <input type="button" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="CodeBlockWindow.OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
-            <input type="button" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="CodeBlockWindow.OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
+            <input type="button" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
+            <input type="button" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
         </div>
         <input type="button" name="settings" tooltip='<%=L"设置"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
         <input type="button" value='?' tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;min-width:25px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
@@ -26,24 +29,25 @@ CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
         <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">
-            <pe:nplbrowser name="nplbrowser_instance" min_width="600" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();"/>
+            <pe:nplbrowser name="nplbrowser_codeblock" min_width="600" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();" visible="<%=CodeBlockWindow.IsNPLBrowserVisible()%>"/>
         </pe:container>
+        <div style="position:relative;margin:20px"><%=L"正在加载图块， 首次加载或更新会比较慢，你也可以用外部浏览器编辑图块，再次点击上方图块按钮可查看图块代码"%></div>
     </pe:if>
-    <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">
+    <pe:container alignment="_fi" name="helpContainer" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">
         <iframe src= "script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html" width="200"/>
     </pe:container>
-    <pe:container alignment="_fi" class="mc_paper_panel" style="position:relative;margin-bottom:54px;margin-left:205px;">
+    <pe:container alignment="_fi" name="codeContainer" class="mc_paper_panel" style="position:relative;margin-bottom:54px;margin-left:205px;">
             <pe:container name="blocklyTip" zorder="1" alignment="_lt" style="color:#ffffff;display:none;padding-left:10px;padding-right:10px;position:relative;padding-bottom:3px;margin-left:60px;margin-top:60px;background-color:#0b9b3a80;" >
                 <%=L"点击上方'图块'按钮，可打开图块编辑器"%>
             </pe:container>
             <pe:if condition='<%=CodeBlockWindow.IsShowHelpWnd()%>'>
                 <iframe name="helpWnd" src='<%=CodeBlockWindow.GetHelpWndUrl()%>' height="230"></iframe>
             </pe:if>
+            <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
             <input name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' 
-                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" 
+                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange"
                 ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
     </pe:container>
-    
     <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
         <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
     </pe:container>
