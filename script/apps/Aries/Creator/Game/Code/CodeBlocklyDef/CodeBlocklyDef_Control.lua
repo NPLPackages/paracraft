@@ -185,8 +185,22 @@ end
 
 {
 	type = "help_function", 
-	message0 = L"新建并定义一个新函数",
-	arg0 = {},
+	message0 = L"新建并定义一个新函数%1",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "", 
+		},
+	},
+    arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
@@ -194,9 +208,9 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "function",
-	func_description = 'function',
+	func_description = 'function %s()\\n%send',
 	ToNPL = function(self)
-		return string.format('function\n');
+		return string.format('function %s()\n%send\n', self:getFieldValue('name'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 function sayHi()
@@ -587,6 +601,7 @@ say("game started")
 		{
 			name = "expression",
 			type = "input_value",
+            --check =  "Boolean",
 		},
     },
     arg1 = {
@@ -621,6 +636,7 @@ say("game started")
 		{
 			name = "expression",
 			type = "input_value",
+            --check = "Boolean",
 		},
     },
     arg1 = {
@@ -897,17 +913,39 @@ end)
 },
 
 {
+	type = "becomeAgentOptions", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"当前玩家", "@p" },
+				{ L"某个角色名", "" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Control", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
 	type = "becomeAgent", 
 	message0 = L"成为%1的化身",
 	arg0 = {
 		{
 			name = "name",
 			type = "input_value",
-			options = {
-				{ L"当前玩家", "@p" },
-				{ L"某个角色名", "" },
-			},
-			shadow = { type = "text", value = "@p",},
+			shadow = { type = "text", typeOptions="becomeAgentOptions", value = "@p",},
 			text = "@p",
 		},
 	},

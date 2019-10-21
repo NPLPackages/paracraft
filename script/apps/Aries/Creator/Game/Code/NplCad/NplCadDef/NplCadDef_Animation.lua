@@ -34,6 +34,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
+	funcName = "createAnimation",
 	func_description = 'createAnimation(%s,%s)',
 	func_description_js = 'createAnimation(%s,%s)',
 	ToNPL = function(self)
@@ -75,6 +76,7 @@ createAnimation("anim")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "addChannel",
 	func_description = 'addChannel(%s,%s)\\n%sendChannel()',
 	func_description_js = 'addChannel(%s,%s)\\n%sendChannel()',
 	ToNPL = function(self)
@@ -119,6 +121,7 @@ createAnimation("anim")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setAnimationTimeValue_Translate",
 	func_description = 'setAnimationTimeValue_Translate(%s,%s,%s,%s)',
 	func_description_js = 'setAnimationTimeValue_Translate(%s,%s,%s,%s)',
 	ToNPL = function(self)
@@ -163,6 +166,7 @@ createAnimation("anim")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setAnimationTimeValue_Scale",
 	func_description = 'setAnimationTimeValue_Scale(%s,%s,%s,%s)',
 	func_description_js = 'setAnimationTimeValue_Scale(%s,%s,%s,%s)',
 	ToNPL = function(self)
@@ -203,6 +207,7 @@ createAnimation("anim")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setAnimationTimeValue_Rotate",
 	func_description = 'setAnimationTimeValue_Rotate(%s,%s,%s)',
 	func_description_js = 'setAnimationTimeValue_Rotate(%s,%s,%s)',
 	ToNPL = function(self)
@@ -262,6 +267,7 @@ createAnimation("anim")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "setAnimationTimeValue_rotateFromPivot",
 	func_description = 'setAnimationTimeValue_rotateFromPivot(%s,%s,%s,%s,%s,%s)',
 	func_description_js = 'setAnimationTimeValue_rotateFromPivot(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)

@@ -28,6 +28,7 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	nextStatement = true,
+	funcName = "createJointRoot",
 	func_description = 'createJointRoot(nil,%s)',
 	func_description_js = 'createJointRoot(null,%s)',
 	ToNPL = function(self)
@@ -81,6 +82,7 @@ createJointRoot()
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "createJoint",
 	func_description = 'createJoint(%s,%s,%s,%s)\\n%sendJoint()',
 	func_description_js = 'createJoint(%s,%s,%s,%s)\\n%sendJoint()',
 	ToNPL = function(self)
@@ -114,6 +116,7 @@ endJoint()
 	canRun = false,
     previousStatement = true,
 	nextStatement = true,
+	funcName = "bindNodeByName",
 	func_description = 'bindNodeByName(%s)',
 	func_description_js = 'bindNodeByName(%s)',
 	ToNPL = function(self)

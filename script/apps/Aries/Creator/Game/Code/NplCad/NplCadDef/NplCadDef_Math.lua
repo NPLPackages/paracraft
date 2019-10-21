@@ -73,6 +73,7 @@ say(1+1)
 	category = "Math", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "math.random",
 	func_description = 'math.random(%s,%s)',
 	func_description_js = 'math.random(%s,%s)',
 	ToNPL = function(self)
@@ -209,6 +210,7 @@ say("66%10=="..(66%10))
 	category = "Math", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "math.floor",
 	func_description = 'math.floor(%s+0.5)',
 	func_description_js = 'Math.floor(%s+0.5)',
 	ToNPL = function(self)
@@ -257,6 +259,7 @@ end
 	category = "Math", 
 	helpUrl = "", 
 	canRun = false,
+	funcName = "math",
 	func_description = 'math.%s(%s)',
 	func_description_js = 'Math.%s(%s)',
 	ToNPL = function(self)

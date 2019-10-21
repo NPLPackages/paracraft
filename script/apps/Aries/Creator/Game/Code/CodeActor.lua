@@ -63,6 +63,30 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 	return self;
 end
 
+function Actor:cloneFrom(fromActor)
+	self:SetName(fromActor:GetName())
+	if(self:GetTime() ~= fromActor:GetTime()) then
+		self:SetTime(fromActor:GetTime());
+		self:FrameMove(0, false);
+	end
+	local entity = self:GetEntity();
+	local fromEntity = fromActor:GetEntity();
+	if(entity and fromEntity) then
+		local x, y, z = fromEntity:GetPosition()
+		entity:SetPosition(x, y, z)
+		-- for backward compatibility, we will not clone visibility
+--		if(entity:IsVisible() ~= fromEntity:IsVisible()) then
+--			entity:SetVisible(fromEntity:IsVisible())
+--		end
+		if(entity:GetFacing() ~= fromEntity:GetFacing()) then
+			entity:SetFacing(fromEntity:GetFacing())
+		end
+		if(entity.scaling ~= fromEntity.scaling) then
+			entity:SetScaling(fromEntity:GetScaling())
+		end
+	end
+end
+
 function Actor:ApplyInitParams()
 	local pos = self:GetInitParam("pos")
 	if(pos) then

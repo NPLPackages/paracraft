@@ -46,9 +46,8 @@ end)
 },
 
 {
-	type = "registerKeyPressedEvent", 
-	message0 = L"当%1键按下时",
-	message1 = L"%1",
+	type = "keyEventNames", 
+	message0 = "%1",
 	arg0 = {
 		{
 			name = "keyname",
@@ -67,6 +66,31 @@ end)
 				{L"鼠标滚轮","mouse_wheel"},{L"鼠标按钮","mouse_buttons"}
 			},
 		},
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
+	type = "registerKeyPressedEvent", 
+	message0 = L"当%1键按下时",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "keyname",
+			type = "input_value",
+            shadow = { type = "keyEventNames", value = "space",},
+		},
 		
 	},
     arg1 = {
@@ -82,7 +106,7 @@ end)
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "registerKeyPressedEvent",
-	func_description = 'registerKeyPressedEvent("%s", function(msg)\\n%send)',
+	func_description = 'registerKeyPressedEvent(%s, function(msg)\\n%send)',
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,

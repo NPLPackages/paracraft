@@ -86,8 +86,8 @@ function CodeHelpItem:GetHtml()
 						item_text = item_text();
 					end
 					local arg_text = "";
-					if(arg_item.shadow and arg_item.shadow.type and not arg_item.options) then
-						local item = CodeHelpWindow.GetCodeItemByName(arg_item.shadow.type)
+					if(arg_item.shadow and (arg_item.shadow.type or arg_item.shadow.typeOptions) and not arg_item.options) then
+						local item = CodeHelpWindow.GetCodeItemByName(arg_item.shadow.typeOptions or arg_item.shadow.type)
 						if(item and item.arg0 and item.arg0[1]) then
 							arg_item.options = item.arg0[1].options;
 						end

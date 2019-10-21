@@ -194,21 +194,25 @@ end
 
 -- @param relativePath: can be nil, in which case filepath will be used. 
 function NplCad.GetCode(code, filename, relativePath)
-    return string.format([[
+	if(not NplCad.templateCode) then
+			NplCad.templateCode = [[
 local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
 local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
 ShapeBuilder.create();
 local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
-NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder)
-%s
+NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
+<code>
 local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
 NplCad.ExportToFile(ShapeBuilder.getScene(),%q);
 if(result)then
-	setActorValue("assetfile", %q)
-	setActorValue("showBones", true)
-    NplCad.RefreshFile(%q)
+	setActorValue("assetfile", %q);
+	setActorValue("showBones", true);
+    NplCad.RefreshFile(%q);
 end
-]], code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath)
+]]
+		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
+	end
+    return string.format(NplCad.templateCode, code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath)
 end
 
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 

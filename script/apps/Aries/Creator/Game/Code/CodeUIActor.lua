@@ -47,6 +47,9 @@ function Actor:Init(itemStack, movieclipEntity)
 	return self;
 end
 
+function Actor:cloneFrom(fromActor)
+end
+
 function Actor:ApplyInitParams()
 	local pos = self:GetInitParam("pos")
 	if(pos) then

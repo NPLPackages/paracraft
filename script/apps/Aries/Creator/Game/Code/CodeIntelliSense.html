@@ -1,0 +1,22 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeIntelliSense.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeIntelliSense.lua">
+<![CDATA[
+CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
+CodeIntelliSense.Init()
+]]></script>
+<div style="background-color:#e2dfdf;font-size:12px;color:#000000;">
+    <pe:repeat value="text in CodeIntelliSense.GetItemsDS()">
+        <pe:if condition="<%=index==CodeIntelliSense.displayCandidateIndex%>">
+            <div style="background-color:#4490fa;width:180px;height:20px;">
+                <div style="text-align:right;position:relative;margin-right:5px;color:#e2dfdf"><%=L"回车"%></div>
+                <%=text%>
+            </div>
+        </pe:if>
+        <pe:if condition="<%=index~=CodeIntelliSense.displayCandidateIndex%>">
+            <div style="height:20px;"><%=text%></div>
+        </pe:if>
+    </pe:repeat> 
+</div>
+</pe:mcml>
+

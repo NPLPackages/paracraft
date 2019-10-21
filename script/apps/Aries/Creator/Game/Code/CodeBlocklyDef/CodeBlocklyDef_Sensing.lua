@@ -15,19 +15,41 @@ local CodeBlocklyDef_Sensing = commonlib.gettable("MyCompany.Aries.Game.Code.Cod
 local cmds = {
 -- Sensing
 {
-	type = "isTouching", 
-	message0 = L"是否碰到%1",
+	type = "isTouchingOptions", 
+	message0 = "%1",
 	arg0 = {
 		{
-			name = "input",
-			type = "input_value",
+			name = "value",
+			type = "field_dropdown",
 			options = {
 				{ L"方块", "block" },
 				{ L"附近玩家", "@a" },
 				{ L"某个方块id", "62" },
 				{ L"某个角色名", "" },
 			},
-			shadow = { type = "text", value = "block",},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Sensing", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "isTouching", 
+	message0 = L"是否碰到%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_value",
+			shadow = { type = "text", typeOptions = "isTouchingOptions", value = "block",},
 			text = "block",
 		},
 	},
@@ -78,7 +100,6 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "setActorValue",
 	func_description = 'setActorValue("name", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("name", "%s")\n', self:getFieldAsString('name'));
@@ -114,7 +135,6 @@ say("click us!")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "setActorValue",
 	func_description = 'setActorValue("physicsRadius", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsRadius", %s)\n', self:getFieldAsString('radius'));
@@ -151,7 +171,6 @@ cmd("/hide boundingbox")
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "setActorValue",
 	func_description = 'setActorValue("physicsHeight", %s)',
 	ToNPL = function(self)
 		return string.format('setActorValue("physicsHeight", %s)\n', self:getFieldAsString('height'));
@@ -418,14 +437,15 @@ else
 end
 ]]}},
 },
+
+
 {
-	type = "isKeyPressed", 
-	message0 = L"%1键是否按下",
+	type = "isKeyPressedOptions", 
+	message0 = "%1",
 	arg0 = {
 		{
-			name = "input",
+			name = "value",
 			type = "field_dropdown",
-			text = "space",
 			options = {
 				{ L"空格", "space" },{ L"左", "left" },{ L"右", "right" },{ L"上", "up" },{ L"下", "down" },{ "ESC", "escape" },
 				{"a","a"},{"b","b"},{"c","c"},{"d","d"},{"e","e"},{"f","f"},{"g","g"},{"h","h"},
@@ -438,6 +458,31 @@ end
 				{ "lctrl", "lcontrol" },{ "lshift", "lshift" },{ "lalt", "lmenu" },
 				{"num0","numpad0"},{"num1","numpad1"},{"num2","numpad2"},{"num3","numpad3"},{"num4","numpad4"},{"num5","numpad5"},{"num6","numpad6"},{"num7","numpad7"},{"num8","numpad8"},{"num9","numpad9"},
 			},
+
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Sensing", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+{
+	type = "isKeyPressed", 
+	message0 = L"%1键是否按下",
+	arg0 = {
+		{
+			name = "input",
+			type = "input_value",
+			shadow = { type = "isKeyPressedOptions", value = "space",},
 		},
 	},
 	output = {type = "field_number",},
@@ -445,7 +490,7 @@ end
 	helpUrl = "", 
 	canRun = false,
 	funcName = "isKeyPressed",
-	func_description = 'isKeyPressed("%s")',
+	func_description = 'isKeyPressed(%s)',
 	ToNPL = function(self)
 		return string.format('isKeyPressed("%s")', self:getFieldAsString('input'));
 	end,
@@ -486,6 +531,7 @@ end
 	},
 	output = {type = "field_number",},
 	category = "Sensing", 
+--    extensions = { "colours_Sensing", "output_boolean" },
 	helpUrl = "", 
 	canRun = false,
 	funcName = "isMouseDown",
@@ -719,16 +765,38 @@ say("hi", 2)
 },
 
 {
+	type = "gameModeOptions", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"游戏模式", "game" },{ L"编辑模式", "edit" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Sensing", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
 	type = "setMode", 
 	message0 = L"设置模式%1",
 	arg0 = {
 		{
 			name = "input",
-			type = "field_dropdown",
-			text = "game",
-			options = {
-				{ L"游戏模式", "game" },{ L"编辑模式", "edit" },
-			},
+			type = "input_value",
+            shadow = { type = "gameModeOptions", value = "game",},
 		},
 	},
 	category = "Sensing", 

@@ -6,12 +6,20 @@
 </head>
 <body> 
 <pe:mcml>
-<script type="text/npl" ><![CDATA[
+<script type="text/npl" refresh="false"><![CDATA[
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Translation.lua");
-local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
+Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
+old_lang = Translation.GetCurrentLanguage();
+]]></script>
+<script type="text/npl" ><![CDATA[
 curLang = Translation.GetCustomLanguage() or "auto";
 function ClosePage()
     Page:CloseWindow();
+    if(old_lang ~= Translation.GetCurrentLanguage()) then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+        local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+        ParaWorldLoginDocker.Restart("paracraft")
+    end
 end
 
 function OnOk()

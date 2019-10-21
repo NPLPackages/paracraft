@@ -48,6 +48,7 @@ local cmds = {
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
+	funcName = "for",
 	func_description = 'for %s=%d, %d do\\n%send',
     func_description_js_provider = [[
     var name = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('var'), Blockly.Variables.NAME_TYPE) || 'i';

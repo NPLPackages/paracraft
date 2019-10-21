@@ -36,7 +36,7 @@ CodeHelpWindow.currentItems = {};
 CodeHelpWindow.selected_code_name = nil;
 local category_items = {};
 local all_command_names = {};
-local all_function_names = {};
+local all_function_names = commonlib.ArrayMap:new();
 local languageConfigFile = "";
 
 -- public:
@@ -59,7 +59,7 @@ function CodeHelpWindow.ClearAll()
 	CodeHelpWindow.cmdInited = nil;
 	category_items = {};
 	all_command_names = {};
-	all_function_names = {};
+	all_function_names:clear();
 	CodeHelpWindow.categories = {};
 	CodeHelpWindow.currentItems = {};
 	CodeHelpWindow.selected_code_name = nil;
@@ -116,6 +116,9 @@ function CodeHelpWindow.AddCodeHelpItems(all_cmds)
 	for _, cmd in ipairs(all_cmds) do
 		CodeHelpWindow.AddCodeHelpItem(cmd)
 	end
+	all_function_names:ksort(function(a, b)
+		return a < b
+	end)
 end
 
 function CodeHelpWindow.AddCodeHelpItem(codeHelpItem)
@@ -130,7 +133,7 @@ function CodeHelpWindow.AddCodeHelpItem(codeHelpItem)
 	end
 	all_command_names[item:GetName()] = item;
 	if(item.funcName) then
-		all_function_names[item.funcName] = item
+		all_function_names[string.lower(item.funcName)] = item
 	end
 end
 
@@ -154,7 +157,11 @@ function CodeHelpWindow.GetCodeItemByName(name)
 end
 
 function CodeHelpWindow.GetCodeItemByFuncName(name)
-	return all_function_names[name];
+	return all_function_names:get(name);
+end
+
+function CodeHelpWindow.GetAllFunctionNames()
+	return all_function_names;
 end
 
 function CodeHelpWindow.OnInit()

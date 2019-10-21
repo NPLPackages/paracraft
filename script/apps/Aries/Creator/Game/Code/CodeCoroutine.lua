@@ -196,7 +196,7 @@ function CodeCoroutine:RunImp(msg)
 				self:GetCodeBlock():RestartAll();
 			else
 				LOG.std(nil, "error", "CodeCoroutine", "%s\n%s", result, lastErrorCallstack);
-				local msg = format(L"运行时错误: %s\n在%s", tostring(result), self:GetCodeBlock():GetFilename());
+				local msg = format(L"运行时错误: %s\n在%s", self:GetCodeBlock():BeautifyRuntimeErrorMsg(tostring(result)), self:GetCodeBlock():GetFilename());
 				self:GetCodeBlock():send_message(msg, "error");
 			end
 		end

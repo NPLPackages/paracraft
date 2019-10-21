@@ -16,7 +16,7 @@
         return item and item:CanRunExample()
     end
     function GetColor()
-        return item and item:GetColor();
+        return item and item:GetColor() or "#4a6cd4";
     end
     function GetHtml()
         return item and item:GetHtml();
@@ -38,7 +38,7 @@
 			    nLineCount = nLineCount + 1;
 		    end
         end
-        return nLineCount;
+        return math.max(1, nLineCount);
     end
 
     function OnClickRun()
@@ -85,7 +85,7 @@
         </pe:if>
         <div style="float:left" onclick="OnClickRun" tooltip='<%=CanRun() and (L("左键运行, 右键复制代码").."\n"..GetNPLCode()) or L"右键复制代码"%>'>
             <div style='<%=CanRun() and "background-color:#ff0000;padding:2px;" or ""%>'>
-                <div style='<%=format("background-color:%s;color:#ffffff;padding:1px;padding-left:5px;padding-right:5px;", GetColor())%>'>
+                <div style='<%=format("background-color:%s;color:#ffffff;padding:1px;padding-left:5px;padding-right:5px;min-height:28px;", GetColor())%>'>
                     <%=GetHtml()%>
                 </div>
             </div>

@@ -21,6 +21,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.l
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeIntelliSense.lua");
+local CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
@@ -302,6 +304,8 @@ function CodeBlockWindow.Close()
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.CloseEditorWindow();
 	CodeBlockWindow.lastBlocklyUrl = nil;
+	
+	CodeIntelliSense.Close()
 end
 
 function CodeBlockWindow.CloseEditorWindow()
@@ -800,6 +804,11 @@ function CodeBlockWindow.UpdateEditModeUI()
 		end
 		
 		textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
+
+		textCtrl:Connect("userTyped", CodeIntelliSense, CodeIntelliSense.OnUserTypedCode, "UniqueConnection");
+		textCtrl:Connect("keyPressed", CodeIntelliSense, CodeIntelliSense.OnUserKeyPress, "UniqueConnection");
+		
+		CodeIntelliSense.Close()
 	end
 end
 
@@ -967,44 +976,12 @@ function CodeBlockWindow.OnClickSettings()
 	CodeBlockSettings.Show(true)
 end
 
-function CodeBlockWindow.OnLearnMore()
-	if(self.curMouseOverCodeItem) then
-		CodeBlockWindow.ShowHelpWndForCodeName(self.curMouseOverCodeItem.type or "")
-		return true;
-	end
-end
-
-function CodeBlockWindow.ShowMouseOverFuncTip(tipUrl)
-	if(tipUrl) then
-		CodeBlockWindow.my_window = CodeBlockWindow.my_window or System.Windows.Window:new();
-		CodeBlockWindow.my_window:Show({url=tipUrl, alignment="_lt", left=0, top=0, width=250, height=300, zorder=10});
-		local layout = CodeBlockWindow.my_window:GetLayout()
-		if(layout and layout.GetUsedSize) then
-			local width, height = layout:GetUsedSize();
-			local mouse_x, mouse_y = ParaUI.GetMousePosition();
-			CodeBlockWindow.my_window:setGeometry(mouse_x, mouse_y+32, width, height);
-			-- echo({mouse_x, mouse_y, width, height})
-		end
-	elseif(CodeBlockWindow.my_window) then
-		CodeBlockWindow.my_window:hide();
-	end
-end
-
 function CodeBlockWindow.OnMouseOverWordChange(word, line, from, to)
-	if(word) then
-		local funcName = word:match("(%w+)")
-		if(funcName) then
-			local codeItem = CodeHelpWindow.GetCodeItemByFuncName(funcName)
-			if(codeItem) then
-				self.curMouseOverCodeItem = codeItem;
-				local tipUrl = "script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html?IsShortTip=true&name="..codeItem:GetName()
-				CodeBlockWindow.ShowMouseOverFuncTip(tipUrl)
-				return;
-			end
-		end
-	end
-	self.curMouseOverCodeItem = nil;
-	CodeBlockWindow.ShowMouseOverFuncTip(nil)
+	CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
+end
+
+function CodeBlockWindow.OnLearnMore()
+	return CodeIntelliSense.OnLearnMore()
 end
 
 CodeBlockWindow:InitSingleton();

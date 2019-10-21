@@ -20,50 +20,139 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)Mod.ParaXExporter.BlockConfig");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local BlockConfig = commonlib.gettable("Mod.ParaXExporter.BlockConfig");
+local block = commonlib.gettable("MyCompany.Aries.Game.block")
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 
 local WorldBlocksExporter = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.WorldBlocksExporter"))
+
+function WorldBlocksExporter.save_to_file(asset_file_name,output_root_folder)
+	local content;
+	local file = ParaIO.OpenAssetFile(asset_file_name);
+	if(file:IsValid()) then	
+		content = file:GetText(0, -1);
+		file:close();
+	end
+	local filename = string.format("%s/%s",output_root_folder,asset_file_name);
+	if(content)then
+		ParaIO.CreateDirectory(filename);
+		local file = ParaIO.open(filename, "w");
+		if(file:IsValid()) then	
+			file:WriteString(content,#content);
+			file:close();
+		end
+	end
+	return filename;
+end
+
+function WorldBlocksExporter.copyFiles(input_files,output_root_folder)
+	if(not input_files)then
+		return
+	end
+	local result = {};
+	for k,v in ipairs(input_files) do
+		local filename = WorldBlocksExporter.save_to_file(v,output_root_folder)
+		table.insert(result,filename);
+	end
+	return result;
+end
+
+function WorldBlocksExporter.loadAssetFile(asset_file_name,callback)
+	LOG.std(nil,"info","WorldBlocksExporter.loadAssetFile", asset_file_name);
+	NPL.load("(gl)script/ide/AssetPreloader.lua");
+	local loader = commonlib.AssetPreloader:new({
+		callbackFunc = function(nItemsLeft, loader)
+			if(nItemsLeft <= 0) then
+				if(callback)then
+					callback();
+				end
+			end
+		end
+	});
+	loader:AddAssets(asset_file_name);
+	loader:Start();
+end
 
 function WorldBlocksExporter:ctor()
 
 end
 
-function WorldBlocksExporter:Init(name)
-    self.name= name;
-    return self;
+function WorldBlocksExporter:Init(output_file_name)
+	self.output_file_name = output_file_name;
+	self.mapTextures = {};
+	self.textures = {};
+	return self;
 end
+
 function WorldBlocksExporter:Export()
-end
-function WorldBlocksExporter:ReadRegions()
+
 end
 
 function WorldBlocksExporter:ReadRegion(world_x,world_y,world_z)
-    local region_x, region_z = BlockEngine:GetRegionPos(world_x,world_z);
+	local region_x, region_z = BlockEngine:GetRegionPos(world_x,world_z);
 	LOG.std(nil, "info", "WorldBlocksExporter", "get region index %f %f %f -> %d %d", world_x,world_y,world_z, region_x, region_z);
-    self:ReadChunks(region_x, region_z);
+	self:ReadChunks(region_x, region_z);
 end
-function WorldBlocksExporter:ReadChunks(region_x, region_z)
-    -- read from lowest hight
-    for y = 0,BlockConfig.g_regionChunkDimY-1 do
-        for x = 0,BlockConfig.g_regionChunkDimX-1 do
-            for z = 0,BlockConfig.g_regionChunkDimX-1 do
-                self:ReadChunk(region_x, region_z, x, y, z);
-            end
-        end
-    end
-    _guihelper.MessageBox("done");
 
+function WorldBlocksExporter:ReadChunks(region_x, region_z)
+	local root_dir = ParaIO.GetParentDirectoryFromPath(self.output_file_name, 0);
+	local file_name = ParaIO.GetFileName(self.output_file_name);
+	file_name = string.match(file_name,"(.+)%.(%w+)$");
+	local zip_root_dir = string.format("%s%s/*.*", root_dir, file_name);
+	local zip_root_name = string.format("%s%s/%s_", root_dir, file_name, file_name);
+	local zip_file_name = string.format("%s%s.zip", root_dir, file_name);
+
+	local startChunkX, startChunkZ = region_x * 32, region_z * 32;
+	-- read from lowest hight
+	for y = 0,BlockConfig.g_regionChunkDimY-1 do
+		for x = 0,BlockConfig.g_regionChunkDimX-1 do
+			for z = 0,BlockConfig.g_regionChunkDimX-1 do
+				self:ReadBlock(zip_root_name, startChunkX+x, y, startChunkZ+z);
+			end
+		end
+	end
+
+	ParaAsset.SetAssetServerUrl("http://cdn.keepwork.com/update61/assetdownload/update/");
+	WorldBlocksExporter.loadAssetFile(self.textures, function()
+		local output_root_folder = ParaIO.GetParentDirectoryFromPath(zip_root_name, 0);
+		WorldBlocksExporter.copyFiles(self.textures, output_root_folder);
+	end);
+
+	local file = ParaIO.CreateZip(zip_file_name, "");
+	if (file:IsValid()) then
+		local dir_name = ParaIO.GetFileName(zip_file_name);
+		dir_name = string.match(dir_name,"(.+)%.(%w+)$");
+		file:AddDirectory(dir_name, zip_root_dir, 3);
+		file:close();
+	end
+	_guihelper.MessageBox("done");
 end
-function WorldBlocksExporter:ReadChunk(region_x, region_z, chunk_x, chunk_y, chunk_z)
-	LOG.std(nil, "info", "WorldBlocksExporter", "ReadChunk %d %d %d", chunk_x,chunk_y,chunk_z);
-    -- read from lowest hight
---    for y = 0,BlockConfig.g_chunkBlockDim-1 do
---        for x = 0,BlockConfig.g_chunkBlockDim-1 do
---            for z = 0,BlockConfig.g_chunkBlockDim-1 do
---                self:ReadBlock(region_x, region_z, chunk_x, chunk_y, chunk_z, x, y, z);
---            end
---        end
---    end
-end
-function WorldBlocksExporter:ReadBlock(region_x, region_z, chunk_x, chunk_y, chunk_z, block_x, block_y, block_z)
-	LOG.std(nil, "info", "WorldBlocksExporter", "ReadBlock %d %d %d", block_x,block_y,block_z);
+
+function WorldBlocksExporter:ReadBlock(zip_root_name, chunk_x, chunk_y, chunk_z)
+	--LOG.std(nil, "info", "WorldBlocksExporter", "ReadBlock %d %d %d", block_x,block_y,block_z);
+
+	local blocks = {};
+	local results = {};
+	ParaTerrain.GetBlocksInRegion(chunk_x, chunk_y, chunk_z, chunk_x, chunk_y, chunk_z, block.attributes.cubeMode, results);
+	if(results.count and results.count>0) then
+		local results_x, results_y, results_z, results_tempId, results_data = results.x, results.y, results.z, results.tempId, results.data;
+		for i = 1, results.count do
+			local x,y,z,block_id, block_data = results_x[i], results_y[i], results_z[i], results_tempId[i], results_data[i];
+			if(x and block_id) then
+				local block = {x, y, z, block_id, block_data or 0};
+				table.insert(blocks, block);
+				local blocktemplate = block_types.get(block_id);
+				if(blocktemplate ~= nil and self.mapTextures[block_id] == nil) then
+					self.mapTextures[block_id] = blocktemplate.texture;
+					table.insert(self.textures, blocktemplate.texture);
+				end
+			end
+		end
+	end
+
+	if (#blocks > 0) then
+		NPL.load("(gl)Mod/ParaXExporter/main.lua");
+		local ParaXExporter = commonlib.gettable("Mod.ParaXExporter");
+		local parax_name = zip_root_name..chunk_x.."_"..chunk_y.."_"..chunk_z..".x";
+		ParaXExporter:ConvertBlocksToParaX(blocks, parax_name, true);
+	end
 end

@@ -170,6 +170,37 @@ function CodeBlock:CompileCodeImp(code, filename)
 	end
 end
 
+function CodeBlock:BeautifyCompilerErrorMsg(msg)
+	if(msg) then
+		msg = msg:gsub("(%]:)(%d+)(:)", L"%1第%2行%3")
+		msg = msg:gsub("unfinished string near", L"没有完成的字符串在这个附近")
+		msg = msg:gsub("expected near", L"被期待在这个附近")
+		msg = msg:gsub("expected %(to close", L"被期待(去关闭")
+		msg = msg:gsub("at line (%d+)", L"在第%1行")
+		msg = msg:gsub("unexpected symbol near", L"不被期待的名字在这个附近")
+		msg = msg:gsub("<eof>", L"文件的结束")
+		msg = msg:gsub("%[string \"_block%(", L"[\"代码方块(")
+		msg = msg:gsub("%s(near)%s", L"临近")
+	end
+	return msg;
+end
+
+function CodeBlock:BeautifyRuntimeErrorMsg(msg)
+	if(msg) then
+		msg = msg:gsub("(%]:)(%d+)(:)", L"%1第%2行%3")
+		msg = msg:gsub("a nil value", L"一个无效值nil")
+		msg = msg:gsub("<eof>", L"文件的结束")
+		msg = msg:gsub("%[string \"_block%(", L"[\"代码方块(")
+		msg = msg:gsub("%s(near)%s", L"临近")
+		msg = msg:gsub("attempt to perform arithmetic on", L"尝试执行数学运算在")
+		msg = msg:gsub("attempt to concatenate", L"尝试连接")
+		msg = msg:gsub("attempt to call", L"尝试调用")
+		msg = msg:gsub("attempt to compare", L"尝试比较")
+	end
+	return msg;
+end
+
+
 -- compile code and reload if code is changed. 
 -- @param code: string
 -- return error message if any
@@ -182,7 +213,7 @@ function CodeBlock:CompileCode(code)
 		if(not self.code_func and self.errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
-			msg = format(L"编译错误: %s\n在%s", msg, self:GetFilename());
+			msg = format(L"编译错误: %s\n在%s", self:BeautifyCompilerErrorMsg(msg), self:GetFilename());
 			self:send_message(msg, "error");
 		else
 			self:send_message(L"编译成功!");
@@ -324,6 +355,10 @@ end
 
 function CodeBlock:GetLastActor()
 	return self:GetActors()[#self:GetActors()];
+end
+
+function CodeBlock:GetFirstActor()
+	return self:GetActors()[1];
 end
 
 -- referencing codeblock. It will share actors in the referenced code blocks. 
@@ -954,6 +989,10 @@ end
 function CodeBlock:CloneMyself(msg)
 	local actor = self:CreateActor();
 	if(actor) then
+		local fromActor = self:GetFirstActor()
+		if(fromActor and fromActor~=actor) then
+			actor:cloneFrom(fromActor);
+		end
 		self:GetReferencedCodeBlock():OnCloneActor(actor, msg);
 		return actor;
 	end
@@ -999,7 +1038,7 @@ function CodeBlock:RunTempCode(code, filename)
 	if(not code_func and errormsg) then
 		LOG.std(nil, "error", "CodeBlock", errormsg);
 		local msg = errormsg;
-		msg = format(L"编译错误: %s\n在%s", msg, filename);
+		msg = format(L"编译错误: %s\n在%s", self:BeautifyCompilerErrorMsg(msg), filename);
 		self:send_message(msg, "error");
 	else
 		local env = self:GetCodeEnv();
@@ -1095,7 +1134,7 @@ function CodeBlock:IncludeFile(filename)
 			if(not code_func and errormsg) then
 				LOG.std(nil, "error", "CodeBlock", errormsg);
 				local msg = errormsg;
-				msg = format(L"编译错误: %s\n在%s", msg, filename);
+				msg = format(L"编译错误: %s\n在%s", self:BeautifyCompilerErrorMsg(msg), filename);
 				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
@@ -1112,7 +1151,7 @@ function CodeBlock:IncludeFile(filename)
 						self:RestartAll();
 					else
 						LOG.std(nil, "error", "CodeBlock", "%s\n%s", result, lastErrorCallstack);
-						local msg = format(L"运行时错误: %s\n在%s", tostring(result), filename);
+						local msg = format(L"运行时错误: %s\n在%s", self:BeautifyRuntimeErrorMsg(tostring(result)), filename);
 						self:send_message(msg, "error");
 					end
 				end
