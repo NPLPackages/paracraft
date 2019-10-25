@@ -174,9 +174,8 @@ Commands["midi"] = {
 -- @param channel: 0-15 channels. default to channel 0
 
 /midi 0x00403C90    play a raw note 3C with velocity 40 in channel 0. 
-/midi [1-7]		 do la me fa so la si     
-/midi a[1-7]     lower tone
-/midi g[1-7]     higher tone
+/midi [1-7]		    start from middle C, do la me fa so la si
+/midi [A-Ga-g]['*]  play absolute note pitch, middle c is c'
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNote.lua");

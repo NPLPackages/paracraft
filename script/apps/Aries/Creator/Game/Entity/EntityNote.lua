@@ -116,36 +116,63 @@ function Entity.CreateNoteMsg(note, velocity, channel)
 	return mathlib.bit.lshift(velocity or 64, 16) + mathlib.bit.lshift(note or 60, 8) + status;
 end
 
--- base reference note
-local ref_notes = {
-	a = 46, A = 46,
-	b = 53,	B = 53,
-	c = 60, C = 60,
-	d = 67,	D = 67,
-	e = 74,	E = 74,
-	f = 81,	F = 81,
-	g = 88,	G = 88,
-};
+-- absolute pitch
+-- ref: https://www.merriam-webster.com/dictionary/pitch#art
+local pitch_note = {
+	["C'''"] = 0,
+	["C''"] = 12,
+	["C'"] = 24,
+	["C"] = 36,
+	["c"] = 48,
+	["c'"] = 60,         -- middle C
+	["c''"] = 72,
+	["c'''"] = 84,
+	["c''''"] = 96,
+	["c'''''"] = 108,
+	["c''''''"] = 120,
+}
+
+local pitch_offset = {
+	c = 0, C = 0, ["1"] = 0,
+	d = 2, D = 2, ["2"] = 2,
+	e = 4, E = 4, ["3"] = 4,
+	f = 5, F = 5, ["4"] = 5,
+	g = 7, G = 7, ["5"] = 7,
+	a = 9, A = 9, ["6"] = 9,
+	b = 11,	B = 11, ["7"] = 11,
+}
 
 -- static function: create note from cmd. 
--- @param cmd: if cmd begins with "c" or number, it is in tone C. 
+-- @param cmd: if cmd is a number [1-7], play note in middle c group
+-- if cmd is a absolute pitch c' D, play it 
 function Entity.CreateNoteMsgFromCmd(cmd, baseNote, velocity, channel)
-	local refNote, note = cmd:match("([^%d]?)(%-?%d+)")
+	local note = cmd:match("([1-7])")
+	local pitch = cmd:match("([a-gA-G]'*)")
+
 	if(note) then
-		note = tonumber(note);
-	else
-		return 0;
-	end
-	if(note < 256) then
-		Entity.SetLastCmd(cmd);
-		if(refNote and refNote~="") then
-			local base_note = ref_notes[refNote] or ref_notes["c"];
-			note = note + base_note;
+		note = pitch_note["c'"] + pitch_offset[note]
+	elseif pitch then
+		local pitch_name = pitch:sub(1, 1)
+
+		local pitch_group_name = ''
+		if pitch_name:match("[a-g]") then
+			pitch_group_name = 'c'
 		else
-			note = note + (baseNote or ref_notes["c"]);
+			pitch_group_name = 'C'
 		end
-		note = note % 128;
+		pitch_group_name = pitch_group_name .. pitch:sub(2)
+
+		local base_note = pitch_note[pitch_group_name]
+		if base_note ~= nil then
+			note = base_note + pitch_offset[pitch_name]
+		else
+			return 0
+		end
+	else
+		return 0
 	end
+
+	Entity.SetLastCmd(cmd);
 	return Entity.CreateNoteMsg(note, velocity, channel);
 end
 
