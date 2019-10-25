@@ -338,6 +338,9 @@ function CodeBlockWindow.RestoreWindowLayout()
 end
 
 function CodeBlockWindow.UpdateCodeToEntity()
+	if(CodeBlockWindow.updateCodeTimer) then
+		CodeBlockWindow.updateCodeTimer:Change();
+	end
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(page and entity) then
 		local code = page:GetUIValue("code");
@@ -503,6 +506,22 @@ function CodeBlockWindow.IsShowHelpWnd()
 	return self.isShowHelpWnd;
 end
 
+function CodeBlockWindow.OnPreviewPyConversionPage()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodePyToNplPage.lua");
+    local CodePyToNplPage = commonlib.gettable("MyCompany.Aries.Game.Code.CodePyToNplPage");
+
+    local txt;
+    if(CodeBlockWindow.IsBlocklyEditMode()) then
+        txt = CodeBlockWindow.GetCodeFromEntity()
+	else
+		local textCtrl = CodeBlockWindow.GetTextControl();
+        if(textCtrl)then
+            txt = textCtrl:GetText();
+        end
+	end
+    CodePyToNplPage.ShowPage(txt,function(codes)
+    end);
+end
 function CodeBlockWindow.OnChangeModel()
 	local codeBlock = CodeBlockWindow.GetCodeBlock()
 	if(codeBlock) then
@@ -743,12 +762,24 @@ function CodeBlockWindow.GetCustomToolbarMCML()
 		mcmlText = LanguageConfigurations:GetCustomToolbarMCML(entity:GetLanguageConfigFile())
 	end
 	if(not mcmlText) then
-		mcmlText = string.format([[<div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
-            <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%%="%s"%%>' />
-        </div>
-        <input type="button" value='<%%="%s"%%>' tooltip='<%%="%s"%%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
-]],
-		L"左键查看代码方块中的角色, 右键打开电影方块", L"角色模型", L"也可以通过电影方块编辑");
+        -- testing python conversion
+        local b_pytonpl = ParaEngine.GetAppCommandLineByParam("pytonpl", false);
+        if(b_pytonpl == "true")then
+                mcmlText = string.format([[<div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
+                <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%%="%s"%%>' />
+            </div>
+            <input type="button" value='<%%="%s"%%>' tooltip='<%%="%s"%%>' onclick="CodeBlockWindow.OnPreviewPyConversionPage" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+    ]],
+		    L"左键查看代码方块中的角色, 右键打开电影方块",  L"Python", L"python -> npl");
+        else
+            mcmlText = string.format([[<div class="mc_item" style="float: left; margin-top:3px;margin-left:5px;width: 34px; height: 34px;">
+                <pe:mc_block block_id='CodeActor' style="margin-left: 1px; margin-top: 1px; width:32px;height:32px;" onclick="CodeBlockWindow.OnClickCodeActor" tooltip='<%%="%s"%%>' />
+            </div>
+            <input type="button" value='<%%="%s"%%>' tooltip='<%%="%s"%%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:5px;min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+    ]],
+		    L"左键查看代码方块中的角色, 右键打开电影方块", L"角色模型", L"也可以通过电影方块编辑");
+        end
+        
 	end
 	return mcmlText;
 end
@@ -805,7 +836,7 @@ function CodeBlockWindow.UpdateEditModeUI()
 		
 		textCtrl:SetText(CodeBlockWindow.GetCodeFromEntity());
 
-		textCtrl:Connect("userTyped", CodeIntelliSense, CodeIntelliSense.OnUserTypedCode, "UniqueConnection");
+		textCtrl:Connect("userTyped", CodeBlockWindow, CodeBlockWindow.OnUserTypedCode, "UniqueConnection");
 		textCtrl:Connect("keyPressed", CodeIntelliSense, CodeIntelliSense.OnUserKeyPress, "UniqueConnection");
 		
 		CodeIntelliSense.Close()
@@ -982,6 +1013,14 @@ end
 
 function CodeBlockWindow.OnLearnMore()
 	return CodeIntelliSense.OnLearnMore()
+end
+
+function CodeBlockWindow:OnUserTypedCode(textCtrl, newChar)
+	CodeIntelliSense:OnUserTypedCode(textCtrl, newChar)
+	CodeBlockWindow.updateCodeTimer = CodeBlockWindow.updateCodeTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		CodeBlockWindow.UpdateCodeToEntity();
+	end})
+	CodeBlockWindow.updateCodeTimer:Change(1000, nil);
 end
 
 CodeBlockWindow:InitSingleton();

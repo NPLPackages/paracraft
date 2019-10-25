@@ -24,10 +24,11 @@ end
 -- delete current cloned actor
 function env_imp:delete()
 	if(self.actor) then
-		self.actor:DeleteThisActor();
+		local actor = self.actor;
 		if(self.co) then
 			self.co:SetActor(nil);
 		end
+		actor:DeleteThisActor();
 	end
 	env_imp.checkyield(self);
 end

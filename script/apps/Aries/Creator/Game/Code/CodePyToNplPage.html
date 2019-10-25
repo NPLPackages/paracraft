@@ -1,0 +1,39 @@
+<!--script/apps/Aries/Creator/Game/Code/CodePyToNplPage.html-->
+<pe:mcml>
+<script type="text/npl" refresh="true" src="CodePyToNplPage.lua">
+<![CDATA[
+    local page = document:GetPageCtrl();
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodePyToNplPage.lua");
+    CodePyToNplPage = commonlib.gettable("MyCompany.Aries.Game.Code.CodePyToNplPage");
+    CodePyToNplPage.OnInit();
+    
+    function OnClose()
+        CodePyToNplPage.OnClose();
+    end
+]]></script>
+
+<aries:window mode="thin" title='<%=L"Python转NPL"%>' style="width:500px;height:600px;" onclose="OnClose">
+    
+    <div style="padding-right:5px;" >
+        <div style="color:#ffffff;">python</div>
+        <div class="mc_paper_panel" style="height:250px;" >
+             <input name="py_code" rows="10" language="npl" height="100%" value='<%=CodePyToNplPage.GetInputText() or ""%>' 
+                ReadOnly="false" 
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
+        </div>
+        <div style="height:30px;">
+            <div style="float:left;color:#ffffff;">npl</div>
+            <div style="float:left;">
+                <input type="button" value='<%=L"转换"%>' style="width:80px;margin-left:380px;margin-top:5px;" class="mc_light_grey_button_with_fillet" onclick="CodePyToNplPage.OnConvert()" />
+            </div>
+        </div>
+        <div class="mc_paper_panel" style="height:250px;">
+             <input name="npl_code" rows="10" language="npl" height="100%"  
+                ReadOnly="true" 
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
+        </div>
+
+    </div>
+</aries:window>
+</pe:mcml>
+

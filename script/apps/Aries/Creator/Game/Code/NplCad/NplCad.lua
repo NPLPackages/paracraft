@@ -26,7 +26,7 @@ NplCad.categories = {
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
     {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
---    {name = "Animation", text = L"动画", colour = "#717171", },
+    {name = "Animation", text = L"动画", colour = "#717171", },
     
 };
 
@@ -77,7 +77,7 @@ function NplCad.AppendAll()
 		NplCadDef_Data.GetCmds(),
 		NplCadDef_Math.GetCmds(),
 		NplCadDef_Skeleton.GetCmds(),
---		NplCadDef_Animation.GetCmds(),
+		NplCadDef_Animation.GetCmds(),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);

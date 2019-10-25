@@ -268,10 +268,10 @@ function EditModelTask.OnScalingChanged(text)
 	local self = EditModelTask.GetInstance();
 	if(self) then
 		local modelEntity = self:GetSelectedModel()
-		if(modelEntity and text) then
+		if(modelEntity and modelEntity.setScale and text) then
 			local scaling = tonumber(text);
 			if(scaling and scaling >= 0.1 and scaling<=10) then
-				modelEntity:SetScaling(scaling);
+				modelEntity:setScale(scaling);
 			end
 		end
 	end

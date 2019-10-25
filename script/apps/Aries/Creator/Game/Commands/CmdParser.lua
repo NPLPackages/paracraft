@@ -79,7 +79,7 @@ function CmdParser.ParseEntities(cmd_text, fromEntity)
 end
 
 -- 3d position absolute or relative with ~
--- e.g. "20000 0 20000" or "~ ~1 ~" or "~1 ~-2 ~-3"
+-- e.g. "20000 0 20000" or "~ ~1 ~" or "~1 ~-2 ~-3" or "20000,0, 20000"
 -- return x,y,z, cmd_text_remain: cmd_text_remaining is remaining unparsed text. 
 function CmdParser.ParsePos(cmd_text, entity)
 	local origin_x, origin_y, origin_z;
@@ -88,7 +88,7 @@ function CmdParser.ParsePos(cmd_text, entity)
 	else
 		origin_x, origin_y, origin_z = EntityManager.GetPlayer():GetBlockPos();
 	end
-	local x, y, z, cmd_text_remain = cmd_text:match("^([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s*(.*)$");
+	local x, y, z, cmd_text_remain = cmd_text:match("^([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)%s*(.*)$");
 	if(x) then
 		if(x:match("^~")) then
 			x = x:match("^~(.*)");
@@ -118,7 +118,7 @@ end
 
 -- additional pos in brackets like "(2 -1 0)", "(2 ~ ~)"
 function CmdParser.ParsePosInBrackets(cmd_text)
-	local x, y, z, cmd_text_remain = cmd_text:match("^%(([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%s+([~%-%d]%-?%d*)%)%s*(.*)$");
+	local x, y, z, cmd_text_remain = cmd_text:match("^%(([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)%)%s*(.*)$");
 	if(x) then
 		if(x:match("^~")) then
 			x = x:match("^~(.*)");

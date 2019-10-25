@@ -110,7 +110,12 @@ function CodeCoroutine:SetTimeout(duration, callbackFunc)
 end
 
 function CodeCoroutine:SetActor(actor)
-	self.actor = actor;
+	if(self.actor~=actor) then
+		if(self.actor) then
+			self.actor:Disconnect("beforeRemoved", self, self.Stop);
+		end
+		self.actor = actor;
+	end
 end
 
 function CodeCoroutine:GetActor()
@@ -148,6 +153,12 @@ function CodeCoroutine:Stop()
 	self:SetFinished();
 	-- we need to stop the last coroutine timers, before starting a new one. 
 	self:KillAllTimers();
+	if(self.codeBlock) then
+		self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
+	end
+	if(self.actor) then
+		self.actor:Disconnect("beforeRemoved", self, self.Stop);
+	end
 end
 
 function CodeCoroutine:SetCurrentCodeContext()
@@ -157,10 +168,16 @@ end
 -- Run the same coroutine multiple times will cause the previous one to stop forever.
 function CodeCoroutine:Run(msg, onFinishedCallback)
 	self:Stop();
-	self.isStopped = false;
-	self.isFinished = false;
-	self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
+
 	if(self.code_func) then
+		self.isStopped = false;
+		self.isFinished = false;
+		self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
+
+		if(self.actor) then
+			self.actor:Connect("beforeRemoved", self, self.Stop, "UniqueConnection");
+		end
+
 		self.co = coroutine.create(function()
 			local result, r2, r3, r4 = self:RunImp(msg);
 			self:SetFinished();

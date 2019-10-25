@@ -1,6 +1,6 @@
 --[[
 Title: CodeBlocklyDef_Looks
-Author(s): leio
+Author(s): LiXizhi
 Date: 2018/7/5
 Desc: define blocks in category of Looks
 use the lib:

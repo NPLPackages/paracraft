@@ -58,7 +58,7 @@ function Entity:init()
 	if(block_template) then
 		self.useRealPhysics = not block_template.obstruction;
 	end
-	self:CreateInnerObject(self.filename, self.scale);
+	self:CreateInnerObject(self.filename, self.scaling);
 	return self;
 end
 
@@ -101,8 +101,8 @@ function Entity:CreateInnerObject(filename, scale)
 
 	local model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3]);
 	model:SetField("assetfile", filename);
-	if(self.scale) then
-		model:SetScaling(self.scale);
+	if(self.scaling) then
+		model:SetScaling(self.scaling);
 	end
 	if(self.facing) then
 		model:SetFacing(self.facing);
@@ -135,12 +135,12 @@ function Entity:setYaw(yaw)
 end
 
 function Entity:getScale()
-	return self.scale or 1;
+	return self.scaling or 1;
 end
 
 function Entity:setScale(scale)
-	if(self.scale ~= scale) then
-		self.scale = scale;
+	if(self.scaling ~= scale) then
+		self.scaling = scale;
 		local obj = self:GetInnerObject();
 		if(obj) then
 			obj:SetScale(scale);

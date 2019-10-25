@@ -71,7 +71,7 @@ function CodeGlobals:ctor()
 			  upper = string.upper },
 		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
-			getn = table.getn, sort = table.sort, concat = table.concat },
+			getn = table.getn, sort = table.sort, concat = table.concat, clear=table.clear },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 
 		real = function(bx,by,bz)
@@ -690,7 +690,7 @@ function CodeGlobals:GetCurrentMetaTable()
 end
 
 function CodeGlobals:GetSharedAPI()
-	return shared_API;
+	return self.shared_API;
 end
 
 function CodeGlobals:SetGlobal(name, value)

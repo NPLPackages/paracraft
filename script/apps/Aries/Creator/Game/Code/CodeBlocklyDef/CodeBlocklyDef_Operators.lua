@@ -1,6 +1,6 @@
 --[[
 Title: CodeBlocklyDef_Operators
-Author(s): leio
+Author(s): LiXizhi
 Date: 2018/7/5
 Desc: define blocks in category of Operators
 use the lib:
@@ -385,7 +385,6 @@ end
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	funcName = "math",
 	func_description = 'math.%s(%s)',
 	ToNPL = function(self)
 		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));

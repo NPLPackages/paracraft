@@ -189,6 +189,7 @@ function CodeBlock:BeautifyRuntimeErrorMsg(msg)
 	if(msg) then
 		msg = msg:gsub("(%]:)(%d+)(:)", L"%1第%2行%3")
 		msg = msg:gsub("a nil value", L"一个无效值nil")
+		msg = msg:gsub("a table value", L"一个表值")
 		msg = msg:gsub("<eof>", L"文件的结束")
 		msg = msg:gsub("%[string \"_block%(", L"[\"代码方块(")
 		msg = msg:gsub("%s(near)%s", L"临近")
@@ -196,6 +197,7 @@ function CodeBlock:BeautifyRuntimeErrorMsg(msg)
 		msg = msg:gsub("attempt to concatenate", L"尝试连接")
 		msg = msg:gsub("attempt to call", L"尝试调用")
 		msg = msg:gsub("attempt to compare", L"尝试比较")
+		msg = msg:gsub("attempt to index", L"尝试索引")
 	end
 	return msg;
 end

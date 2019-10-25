@@ -1,6 +1,6 @@
 --[[
 Title: CodeBlocklyDef_Control
-Author(s): leio
+Author(s): LiXizhi
 Date: 2018/7/5
 Desc: define blocks in category of Control
 use the lib:
@@ -104,6 +104,31 @@ end
 },
 
 {
+	type = "help_else", 
+	message0 = L"那么",
+	arg0 = {},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "else",
+	func_description = 'else',
+	ToNPL = function(self)
+		return string.format('then\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+if(distanceTo("mouse-pointer")<3) then
+    say("mouse-pointer")
+else
+    say("")
+end
+]]}
+},
+},
+
+{
 	type = "help_return", 
 	message0 = L"返回",
 	arg0 = {},
@@ -130,8 +155,14 @@ say(sum(1,2))
 
 {
 	type = "help_elseif", 
-	message0 = L"否则如果",
-	arg0 = {},
+	message0 = L"否则如果%1",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+            shadow = { type = "boolean"},
+		},
+	},
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
@@ -139,9 +170,9 @@ say(sum(1,2))
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "elseif",
-	func_description = 'elseif',
+	func_description = 'elseif(%s) then',
 	ToNPL = function(self)
-		return string.format('elseif\n');
+		return string.format('elseif(%s) then\n', self:getFieldValue('expression'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 a = 2
@@ -601,7 +632,6 @@ say("game started")
 		{
 			name = "expression",
 			type = "input_value",
-            --check =  "Boolean",
 		},
     },
     arg1 = {
@@ -636,7 +666,6 @@ say("game started")
 		{
 			name = "expression",
 			type = "input_value",
-            --check = "Boolean",
 		},
     },
     arg1 = {
@@ -658,7 +687,6 @@ say("game started")
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "else",
 	func_description = 'if(%s) then\\n%selse\\n%send',
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nelse\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));

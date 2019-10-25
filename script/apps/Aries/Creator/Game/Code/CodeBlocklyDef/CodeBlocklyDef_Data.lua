@@ -1,6 +1,6 @@
 --[[
 Title: CodeBlocklyDef_Data
-Author(s): leio
+Author(s): LiXizhi
 Date: 2018/7/5
 Desc: define blocks in category of Data
 use the lib:
@@ -549,7 +549,6 @@ local data = actor:GetActorValue("some_data")
 	},
 	output = {type = "null",},
 	category = "Data", 
-    --extensions = {"colours_Data", "output_string"},
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
@@ -575,7 +574,6 @@ local data = actor:GetActorValue("some_data")
 	},
 	output = {type = "field_number",},
 	category = "Data", 
-    --extensions = {"colours_Data", "output_boolean"},
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
@@ -597,7 +595,6 @@ local data = actor:GetActorValue("some_data")
 	},
 	output = {type = "field_number",},
 	category = "Data", 
-    --extensions = {"colours_Data", "output_number"},
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',

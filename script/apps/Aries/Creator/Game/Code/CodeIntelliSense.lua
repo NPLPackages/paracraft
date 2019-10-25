@@ -34,6 +34,8 @@ CodeIntelliSense.maxCandidates = 100;
 CodeIntelliSense.maxDisplayItems = 10;
 CodeIntelliSense.candidateIndex = 1;
 CodeIntelliSense.displayCandidateIndex = 1;
+-- whether to show global variables in code completion. 
+CodeIntelliSense.showGlobals = true;
 codeCompleteWidth = 180;
 intelliWindowMarginTop = 5;
 
@@ -65,17 +67,122 @@ function CodeIntelliSense.Init()
 	page = document:GetPageCtrl();
 end
 
--- return number of candidates
+local skipNames = {
+	["__index"] = true,
+	["isa"] = true,
+	["_super"] = true,
+	["class"] = true,
+	-- tricky: follow skipped keywords will avoid hitting enter key twice when typing them
+	["do"] = true,
+	["then"] = true,
+	["end"] = true,
+	["nil"] = true,
+	["true"] = true,
+	["false"] = true,
+	["else"] = true,
+}
+
+-- @param value: the class object 
+local function AddMemberFunctions(value, items, className, separator, memberName)
+	if(value and type(value) == "table" and #value == 0) then
+		if(memberName and memberName~="") then
+			local text = "^"..memberName
+			for name, value in pairs(value) do
+				if(type(name) == "string" and name:match(text) and not skipNames[name]) then
+					if(#items < CodeIntelliSense.maxCandidates) then
+						items[#items+1] = className..separator..name;
+					else
+						break;
+					end
+				end
+			end
+		else
+			for name, value in pairs(value) do
+				if(#items < CodeIntelliSense.maxCandidates) then
+					if(type(name) == "string" and not skipNames[name]) then
+						items[#items+1] = className..separator..name;
+					end
+				else
+					break;
+				end
+			end
+		end
+	end
+end
+
+local function AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
+	if(value and type(value) == "table" and #value == 0) then
+		AddMemberFunctions(value, items, className, separator, memberName)
+		-- also parse meta table methods, but just 1 level above
+		local metaTable = getmetatable(value)
+		local i=0
+		while(type(metaTable) == "table" and metaTable.__index ~= value and i<4) do
+			value = metaTable.__index
+			if(type(value) == "table") then
+				AddMemberFunctions(value, items, className, separator, memberName)
+				metaTable = getmetatable(value)
+			else
+				break;
+			end
+			i = i + 1;
+		end
+	end
+end
+
+local function AddGlobalVariables(globals, items, word)
+	if(globals and type(globals) == "table") then
+		local text = "^" .. word;
+		for name, value in pairs(globals) do
+			if(type(name) == "string" and name:match(text) and not skipNames[name]) then
+				items[#items+1] = name;
+				if(#items > CodeIntelliSense.maxCandidates) then
+					break;
+				end
+			end
+		end
+	end
+end
+
+
+function CodeIntelliSense.GetSharedAPIGlobals()
+	if(CodeIntelliSense.shared_API) then
+		return CodeIntelliSense.shared_API;
+	end
+	local globals = GameLogic.GetCodeGlobal():GetSharedAPI()
+	if(globals) then
+		local shared_API = {
+			math = globals.math,
+			bit = globals.bit,
+			mathlib = globals.mathlib,
+			commonlib = globals.commonlib,
+			os = globals.os,
+			string = globals.string,
+			table = globals.table,
+			GameLogic = globals.GameLogic,
+			getBlockEntity = globals.getBlockEntity,
+			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
+			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
+		}
+		CodeIntelliSense.shared_API = shared_API
+		return shared_API;
+	else
+		return {};
+	end
+end
+
+-- @param word: "aa", "a.", "b:", "a.c" are all valid names
+-- return number of candidates based on word
 function CodeIntelliSense.SetWord(word)
 	CodeIntelliSense.word = word;
 	CodeIntelliSense.candidateIndex = 1;
-	if(word == nil) then
+	if(word == nil or not word:match("^[%w_%.:]+$")) then
 		CodeIntelliSense.Clear()
 		return 0;
 	end
+	
 	local allNames = CodeHelpWindow.GetAllFunctionNames()
-	word = string.lower(word)
-	local text = "^"..word;
+	local text = "^"..string.lower(word);
+	
 	local items = {};
 	for funcName, codeItem in allNames:pairs() do
 		if(funcName:match(text)) then
@@ -85,6 +192,61 @@ function CodeIntelliSense.SetWord(word)
 			end
 		end
 	end
+	if(CodeIntelliSense.showGlobals) then
+		local globals = GameLogic.GetCodeGlobal():GetCurrentGlobals();
+		if(word:match("[%.:]")) then
+			if(#items == 0) then
+				-- we will also search for global table's member functions if there is no candidates
+				local className, separator, memberName = word:match("^([%w%_]+)([%.:])(%S*)$")
+				if(className == "_G") then
+					-- "_G.a.b" is also supported. 
+					local className1, separator1, memberName1 = memberName:match("^([%w%_]+)([%.:])(%S*)$")
+					if(className1) then
+						local value = globals[className1]
+						AddMemberFunctionsWithMeta(value, items, className..separator..className1, separator1, memberName1)
+					else
+						AddMemberFunctions(globals, items, className, separator, memberName)
+					end
+				elseif(className) then
+					local value = globals[className] or CodeIntelliSense.GetSharedAPIGlobals()[className]
+					for i=1, 5 do
+						if(type(value) == "table") then
+							-- "a.b.c.d" is also supported.
+							local className1, separator1, memberName1 = memberName:match("^([%w%_]+)([%.:])(%S*)$")
+							if(className1) then
+								value = value[className1]
+								className, separator, memberName = className..separator..className1, separator1, memberName1;
+							else
+								break;
+							end
+						else
+							break;
+						end
+					end
+					AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
+				end
+				if(#items > 0) then
+					table.sort(items, function(a, b)
+						return a<b;
+					end)
+					local i=1;
+					while(items[i]) do
+						if(items[i] == items[i+1]) then
+							table.remove(items, i)
+						else
+							i = i + 1;
+						end
+					end
+				end
+			end
+		elseif(#items < CodeIntelliSense.maxCandidates) then
+			-- also add globals
+			AddGlobalVariables(globals, items, word)
+			-- also add shared API globals
+			AddGlobalVariables(CodeIntelliSense.GetSharedAPIGlobals(), items, word)
+		end
+	end
+
 	CodeIntelliSense.items = items;
 	return #items;
 end
@@ -213,11 +375,17 @@ function CodeIntelliSense.GetWordToCursor(textCtrl, pos)
 		if(from and from < to and curPos > from) then
 			local word;
 			if(from > 1) then
-				local separatorChar = text:substr(from, from);
-				if(separatorChar == "." or separatorChar == ":") then
-					local from2 = text:wordPosition(from-1);
-					if(from2 < from) then
-						from = from2
+				for i=1, 5 do
+					local separatorChar = text:substr(from, from);
+					if(separatorChar == "." or separatorChar == ":") then
+						local from2 = text:wordPosition(from-1);
+						if(from2 < from) then
+							from = from2
+						else
+							break;
+						end
+					else
+						break;
 					end
 				end
 			end
@@ -247,9 +415,12 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 		local cursorOnBracket
 		local word, from, to = CodeIntelliSense.GetWordToCursor(textCtrl)
 		if(word) then
+			if(word == codeItem.funcName and skipNames[word]) then
+				return false;
+			end
 			local isProcessed;
 			if(codeItem.func_description) then
-				if((codeItem.previousStatement and codeItem.nextStatement) or text:length() == to) then
+				if(text:length() == to or (not codeItem.nextStatement)) then
 					local code = "";
 					local curPos = nil;
 					local func_description = codeItem.func_description:gsub("\\n", "\n")
@@ -264,6 +435,11 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 					end
 					textCtrl:moveCursor(pos.line, from, false);
 					textCtrl:moveCursor(pos.line, to, true);
+
+					local headingSpaces = textCtrl:GetHeadingSpaces(pos.line)
+					if(headingSpaces) then
+						code = code:gsub("(\n)(.+)", "%1"..headingSpaces.."%2");
+					end
 					textCtrl:InsertTextInCursorPos(code)
 					if(curPos) then
 						textCtrl:moveCursor(pos.line, from+curPos, false);
@@ -283,7 +459,24 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 		if(cursorOnBracket) then
 			CodeIntelliSense.CursorOnBracket(textCtrl)
 		end
+		return true;
+	else
+		local name = CodeIntelliSense.items[CodeIntelliSense.candidateIndex]
+		if(name) then
+			local pos = textCtrl:CursorPos();
+			local text = textCtrl:GetLineText(pos.line);
+			local cursorOnBracket
+			local word, from, to = CodeIntelliSense.GetWordToCursor(textCtrl)
+			if(word) then
+				textCtrl:moveCursor(pos.line, from, false);
+				textCtrl:moveCursor(pos.line, to, true);
+				textCtrl:InsertTextInCursorPos(name)
+			end
+			CodeIntelliSense.Close()
+			return true;
+		end
 	end
+	
 end
 
 function CodeIntelliSense.OnLearnMore()
@@ -327,6 +520,7 @@ function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
 				end
 			end
 		end
+		word = string.lower(word);
 		local codeItem = CodeHelpWindow.GetCodeItemByFuncName(word)
 		if(codeItem) then
 			CodeIntelliSense.curMouseOverCodeItem = codeItem;
@@ -348,24 +542,31 @@ function CodeIntelliSense:OnUserKeyPress(textCtrl, event)
 		end
 	elseif(CodeIntelliSense.GetCount() > 0 and not self.shift_pressed and not self.ctrl_pressed) then
 		if(keyname == "DIK_RETURN" or keyname == "DIK_TAB") then
+			local processed;
 			if(CodeIntelliSense.mode == "AutoComplete") then
-				CodeIntelliSense.DoAutoCompleteImp(textCtrl)
+				processed = CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 			elseif(CodeIntelliSense.mode == "CursorOnBracket") then
-				CodeIntelliSense.DoCursorOnBracketImp(textCtrl)
+				processed = CodeIntelliSense.DoCursorOnBracketImp(textCtrl)
 			end
-			event:accept();
+			if(processed) then
+				event:accept();
+			end
 		elseif(keyname == "DIK_UP") then
 			if(CodeIntelliSense.candidateIndex > 1) then
 				CodeIntelliSense.candidateIndex = CodeIntelliSense.candidateIndex - 1
 				CodeIntelliSense.RefreshPage()
+				event:accept();
 			end
-			event:accept();
+			
 		elseif(keyname == "DIK_DOWN") then
 			if(CodeIntelliSense.candidateIndex < CodeIntelliSense.GetCount()) then
 				CodeIntelliSense.candidateIndex = CodeIntelliSense.candidateIndex + 1
 				CodeIntelliSense.RefreshPage()
+				event:accept();
+			elseif(CodeIntelliSense.candidateIndex>5) then
+				event:accept();
 			end
-			event:accept();
+			
 		elseif(keyname == "DIK_ESCAPE") then
 			CodeIntelliSense.Close()
 			event:accept();
@@ -396,6 +597,7 @@ function CodeIntelliSense.DoCursorOnBracketImp(textCtrl)
 		textCtrl:InsertTextInCursorPos(text)
 	end
 	CodeIntelliSense.Close()
+	return true;
 end
 
 function CodeIntelliSense.CursorOnBracketImp(textCtrl)
@@ -406,24 +608,26 @@ function CodeIntelliSense.CursorOnBracketImp(textCtrl)
 		local separatorChar = curPos > 1 and text:substr(curPos, curPos);
 		if(separatorChar == "(") then
 			local funcName = CodeIntelliSense.GetWordToCursor(textCtrl, {pos = pos.pos-1, line=pos.line})
-			local codeItem = CodeHelpWindow.GetCodeItemByFuncName(string.lower(funcName));
-			if(codeItem) then
-				-- this will force shadow options to be computed
-				local html = codeItem:GetHtml(); 
-				-- let us only do the first parameter to see if it is a drop down list
-				local arg_item = codeItem.arg0 and codeItem.arg0[1];
-				if(arg_item) then
-					if(arg_item.options) then
-						local items = {};
-						for i, option in ipairs(arg_item.options) do
-							items[i] = option[1];
+			if(funcName and funcName~="") then
+				local codeItem = CodeHelpWindow.GetCodeItemByFuncName(string.lower(funcName));
+				if(codeItem) then
+					-- this will force shadow options to be computed
+					local html = codeItem:GetHtml(); 
+					-- let us only do the first parameter to see if it is a drop down list
+					local arg_item = codeItem.arg0 and codeItem.arg0[1];
+					if(arg_item) then
+						if(arg_item.options) then
+							local items = {};
+							for i, option in ipairs(arg_item.options) do
+								items[i] = option[1];
+							end
+							CodeIntelliSense.items = items;
+							CodeIntelliSense.arg_item = arg_item;
+							CodeIntelliSense.candidateIndex = arg_item.selectedIndex or 1;
+							CodeIntelliSense.cursorPos = pos;
+							CodeIntelliSense.mode = "CursorOnBracket";
+							CodeIntelliSense.Update(textCtrl)
 						end
-						CodeIntelliSense.items = items;
-						CodeIntelliSense.arg_item = arg_item;
-						CodeIntelliSense.candidateIndex = arg_item.selectedIndex or 1;
-						CodeIntelliSense.cursorPos = pos;
-						CodeIntelliSense.mode = "CursorOnBracket";
-						CodeIntelliSense.Update(textCtrl)
 					end
 				end
 			end
@@ -441,5 +645,7 @@ function CodeIntelliSense:OnUserTypedCode(textCtrl, newChar)
 			return
 		end
 	end
-	CodeIntelliSense.Close()
+	if(newChar and #newChar > 1) then
+		CodeIntelliSense.Close()
+	end
 end

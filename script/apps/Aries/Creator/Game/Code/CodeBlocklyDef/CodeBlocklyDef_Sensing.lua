@@ -1,6 +1,6 @@
 --[[
 Title: CodeBlocklyDef_Sensing
-Author(s): leio
+Author(s): LiXizhi
 Date: 2018/7/5
 Desc: define blocks in category of Sensing
 use the lib:
@@ -531,7 +531,6 @@ end
 	},
 	output = {type = "field_number",},
 	category = "Sensing", 
---    extensions = { "colours_Sensing", "output_boolean" },
 	helpUrl = "", 
 	canRun = false,
 	funcName = "isMouseDown",

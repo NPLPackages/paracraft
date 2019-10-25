@@ -140,6 +140,7 @@ end
 		{
 			name = "left",
 			type = "input_value",
+            check = "Boolean",
 		},
 	},
 	output = {type = "field_number",},

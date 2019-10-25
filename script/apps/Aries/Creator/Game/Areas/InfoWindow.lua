@@ -91,7 +91,7 @@ function InfoWindow.UpdateInfo()
 			last_info.relativemousepos = string.format("~%d ~%d ~%d (%d %d %d)", x-ox,y-oy,z-oz, rx, ry, rz);
 			last_info.relativemouseposText = string.format("%s: ~%d ~%d ~%d (%d %d %d)", relTargetName or "", x-ox,y-oy,z-oz, rx, ry, rz);
 		else
-			last_info.mousepos = string.format("%d %d %d", result.blockX,result.blockY,result.blockZ);
+			last_info.mousepos = string.format("%d,%d,%d", result.blockX,result.blockY,result.blockZ);
 			local block_id = 0;
 			local block_data = BlockEngine:GetBlockData(result.blockX,result.blockY,result.blockZ);
 			local block_template = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);

@@ -18,10 +18,12 @@ blocks_exporter:ReadRegion(world_x,world_y,world_z);
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)Mod.ParaXExporter.BlockConfig");
+NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local BlockConfig = commonlib.gettable("Mod.ParaXExporter.BlockConfig");
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local ZipFile = commonlib.gettable("System.Util.ZipFile");
 
 local WorldBlocksExporter = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.WorldBlocksExporter"))
 
@@ -83,8 +85,34 @@ function WorldBlocksExporter:Init(output_file_name)
 	return self;
 end
 
-function WorldBlocksExporter:Export()
+function WorldBlocksExporter:ExportTo_glTF(zip_file_name, output_dir)
+	if (not output_dir) then
+		output_dir = ParaIO.GetParentDirectoryFromPath(zip_file_name);
+	end
+	local last_char = string.sub(output_dir, #output_dir);
+	if (last_char ~= "/") then
+		output_dir = output_dir.."/";
+	end
 
+	local zipFile = ZipFile:new();
+	if(zipFile:open(zip_file_name)) then
+		zipFile:unzip(output_dir);
+		zipFile:close();
+
+		local filename = ParaIO.GetFileName(zip_file_name);
+		filename = filename:gsub("%.%w+$", "")
+		output_dir = output_dir .. filename .. "/";
+		local results = commonlib.Files.Find({}, output_dir, 1, 10000, "*.x")
+		for _, result in ipairs(results) do
+			local parax_file = output_dir..result.filename;
+			filename = parax_file:gsub("%.%w+$", "")
+			local glb_file = filename..".glb";
+			ParaScene.ParaXFileExportTo_glTF_File(parax_file, glb_file, nil, true, false);
+		end
+
+		ParaIO.DeleteFile(output_dir.."*.x");
+		ParaIO.DeleteFile(output_dir.."*.xml");
+	end
 end
 
 function WorldBlocksExporter:ReadRegion(world_x,world_y,world_z)
@@ -154,5 +182,21 @@ function WorldBlocksExporter:ReadBlock(zip_root_name, chunk_x, chunk_y, chunk_z)
 		local ParaXExporter = commonlib.gettable("Mod.ParaXExporter");
 		local parax_name = zip_root_name..chunk_x.."_"..chunk_y.."_"..chunk_z..".x";
 		ParaXExporter:ConvertBlocksToParaX(blocks, parax_name, true);
+		local json_data = commonlib.Json.Encode(blocks, true);
+		if (json_data) then
+			local json_file_name = zip_root_name..chunk_x.."_"..chunk_y.."_"..chunk_z..".json";
+			--[[
+			local writer = ParaIO.CreateZip(json_file_name, "");
+			if (writer:IsValid()) then
+				writer:ZipAddData(ParaIO.GetFileName(json_file_name), json_data);
+				writer:close();
+			end
+			]]
+			local file = ParaIO.open(json_file_name, "w");
+			if(file:IsValid()) then
+				file:WriteString(json_data);
+				file:close();
+			end
+		end
 	end
 end

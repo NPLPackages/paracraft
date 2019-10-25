@@ -10,11 +10,13 @@ CodeIntelliSense.Init()
         <pe:if condition="<%=index==CodeIntelliSense.displayCandidateIndex%>">
             <div style="background-color:#4490fa;width:180px;height:20px;">
                 <div style="text-align:right;position:relative;margin-right:5px;color:#e2dfdf"><%=L"回车"%></div>
-                <%=text%>
+                <div style="width:400px"><%=text%></div>
             </div>
         </pe:if>
         <pe:if condition="<%=index~=CodeIntelliSense.displayCandidateIndex%>">
-            <div style="height:20px;"><%=text%></div>
+            <div style="width:180px;height:20px;">
+                <div style="width:400px"><%=text%></div>
+            </div>
         </pe:if>
     </pe:repeat> 
 </div>
