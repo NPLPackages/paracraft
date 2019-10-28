@@ -24,6 +24,7 @@ NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeIntelliSense.lua");
 local CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -205,6 +206,7 @@ function CodeBlockWindow.SetCodeEntity(entity)
 	local isEntityChanged = false;
 	if(self.entity ~= entity) then
 		if(entity) then
+			EntityManager.SetLastTriggerEntity(entity);
 			entity:Connect("beforeRemoved", self, self.OnEntityRemoved, "UniqueConnection");
 			entity:Connect("editModeChanged", self, self.UpdateEditModeUI, "UniqueConnection");
 			entity:Connect("remotelyUpdated", self, self.OnCodeChange, "UniqueConnection");
@@ -304,7 +306,7 @@ function CodeBlockWindow.Close()
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.CloseEditorWindow();
 	CodeBlockWindow.lastBlocklyUrl = nil;
-	
+	EntityManager.SetLastTriggerEntity(nil);
 	CodeIntelliSense.Close()
 end
 
@@ -1012,7 +1014,7 @@ function CodeBlockWindow.OnMouseOverWordChange(word, line, from, to)
 end
 
 function CodeBlockWindow.OnLearnMore()
-	return CodeIntelliSense.OnLearnMore()
+	return CodeIntelliSense.OnLearnMore(CodeBlockWindow.GetTextControl())
 end
 
 function CodeBlockWindow:OnUserTypedCode(textCtrl, newChar)

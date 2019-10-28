@@ -56,6 +56,25 @@ function CodeWindow:registerEvent(eventName, callback)
 	end
 end
 
+-- refresh page control
+function CodeWindow:Refresh(delay)
+	if(self.page) then
+		self.page:Refresh(delay);
+	end
+end
+
+-- get page
+function CodeWindow:GetPage()
+	return self.page;
+end
+
+-- virtual: just save the page object
+function CodeWindow:LoadComponent(url)
+	local page, _ = CodeWindow._super.LoadComponent(self, url);	
+	self.page = page;
+	return page, _;
+end
+
 -- @param event_type: "mousePressEvent", "mouseMoveEvent", "mouseWheelEvent", "mouseReleaseEvent"
 function CodeWindow:handleMouseEvent(event)
 	local event_type = event:GetType();

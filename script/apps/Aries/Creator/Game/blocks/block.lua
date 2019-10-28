@@ -458,6 +458,7 @@ function block:Register(blockWorld)
 end
 
 -- Returns the mobility information of the block, 0 = free, 1 = can't push but can move over, 2 = total immobility and stop pistons
+-- -1 = can be moved regardless of whether it has action.
 function block:getMobilityFlag()
     return self.material:getMaterialMobility();
 end

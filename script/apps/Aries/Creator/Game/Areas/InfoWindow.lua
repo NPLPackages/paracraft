@@ -84,9 +84,16 @@ function InfoWindow.UpdateInfo()
 			local triggerEntity = EntityManager.GetLastTriggerEntity() or entityPlayer;
 			local ox,oy,oz = triggerEntity:GetBlockPos();
 			if(triggerEntity == EntityManager.GetPlayer()) then
-				relTargetName = "player";
+				relTargetName = L"玩家";
 			else
-				relTargetName = triggerEntity:GetName() or triggerEntity.class_name or "Last";
+				relTargetName = triggerEntity:GetName();
+				if(not relTargetName and triggerEntity.GetItemClass) then
+					local item = triggerEntity:GetItemClass()
+					if(item) then
+						relTargetName = item:GetDisplayName();
+					end
+				end
+				relTargetName = relTargetName or "Last";
 			end
 			last_info.relativemousepos = string.format("~%d ~%d ~%d (%d %d %d)", x-ox,y-oy,z-oz, rx, ry, rz);
 			last_info.relativemouseposText = string.format("%s: ~%d ~%d ~%d (%d %d %d)", relTargetName or "", x-ox,y-oy,z-oz, rx, ry, rz);
@@ -107,14 +114,21 @@ function InfoWindow.UpdateInfo()
 				-- single selection
 				local b = curSelection[1];
 				x,y,z = b[1], b[2], b[3];
-				relTargetName = "seletion";
+				relTargetName = L"选择";
 			else
 				local triggerEntity = EntityManager.GetLastTriggerEntity() or entityPlayer;
 				x,y,z = triggerEntity:GetBlockPos();
 				if(triggerEntity == EntityManager.GetPlayer()) then
-					relTargetName = "player";
+					relTargetName = L"玩家";
 				else
-					relTargetName = triggerEntity:GetName() or triggerEntity.class_name or "Last";
+					relTargetName = triggerEntity:GetName();
+					if(not relTargetName and triggerEntity.GetItemClass) then
+						local item = triggerEntity:GetItemClass()
+						if(item) then
+							relTargetName = item:GetDisplayName();
+						end
+					end
+					relTargetName = relTargetName or "Last";
 				end
 			end
 			local dx,dy,dz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side)

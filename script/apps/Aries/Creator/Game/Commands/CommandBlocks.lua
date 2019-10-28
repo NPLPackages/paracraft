@@ -101,7 +101,7 @@ Commands["flood"] = {
 e.g. flood with water in a radius of 5 blocks
 /flood 5
 ]], 
-	handler = function(cmd_name, cmd_text, cmd_params)
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, radius, x, y, z;
 		radius, cmd_text = CmdParser.ParseInt(cmd_text)
 		if(radius) then
@@ -126,7 +126,7 @@ Commands["unflood"] = {
 	name="unflood", 
 	quick_ref="/unflood [radius or 10] [x or playerPosX] [y] [z] ", 
 	desc="unflood", 
-	handler = function(cmd_name, cmd_text, cmd_params)
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, radius, x, y, z;
 		radius, cmd_text = CmdParser.ParseInt(cmd_text)
 		if(radius) then

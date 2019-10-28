@@ -444,6 +444,21 @@ function Entity:OpenEditor(editor_name, entity)
 	CodeBlockWindow.SetCodeEntity(self);
 end
 
+function Entity:CloseEditor()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    CodeBlockWindow.Close()
+end
+
+function Entity:IsEditorOpen()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	if(CodeBlockWindow.GetCodeEntity() == self) then
+		return CodeBlockWindow.IsVisible();
+	end
+end
+
+
 -- get all nearby code entities that should be started as a group, include current one.
 -- @return {idx to true} map
 function Entity:GetAllNearbyCodeEntities()

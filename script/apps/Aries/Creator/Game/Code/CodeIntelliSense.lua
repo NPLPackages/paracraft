@@ -209,6 +209,12 @@ function CodeIntelliSense.SetWord(word)
 					end
 				elseif(className) then
 					local value = globals[className] or CodeIntelliSense.GetSharedAPIGlobals()[className]
+					if(not value) then
+						local codeblock = CodeBlockWindow.GetCodeBlock()
+						if(codeblock and codeblock:IsLoaded()) then
+							value = codeblock:GetCodeEnv()[className];
+						end
+					end
 					for i=1, 5 do
 						if(type(value) == "table") then
 							-- "a.b.c.d" is also supported.
@@ -225,30 +231,41 @@ function CodeIntelliSense.SetWord(word)
 					end
 					AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
 				end
-				if(#items > 0) then
-					table.sort(items, function(a, b)
-						return a<b;
-					end)
-					local i=1;
-					while(items[i]) do
-						if(items[i] == items[i+1]) then
-							table.remove(items, i)
-						else
-							i = i + 1;
-						end
-					end
-				end
 			end
 		elseif(#items < CodeIntelliSense.maxCandidates) then
 			-- also add globals
 			AddGlobalVariables(globals, items, word)
 			-- also add shared API globals
 			AddGlobalVariables(CodeIntelliSense.GetSharedAPIGlobals(), items, word)
+			
+			-- also add globals in current running code block
+			if(#items < CodeIntelliSense.maxCandidates) then
+				local codeblock = CodeBlockWindow.GetCodeBlock()
+				if(codeblock and codeblock:IsLoaded()) then
+					AddGlobalVariables(codeblock:GetCodeEnv(), items, word)
+				end
+			end
 		end
 	end
-
+	CodeIntelliSense.sortAndRemoveDuplicates(items)
 	CodeIntelliSense.items = items;
 	return #items;
+end
+
+function CodeIntelliSense.sortAndRemoveDuplicates(items)
+	if(#items > 0) then
+		table.sort(items, function(a, b)
+			return a<b;
+		end)
+		local i=1;
+		while(items[i]) do
+			if(items[i] == items[i+1]) then
+				table.remove(items, i)
+			else
+				i = i + 1;
+			end
+		end
+	end
 end
 
 function CodeIntelliSense.GetCount()
@@ -479,11 +496,25 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 	
 end
 
-function CodeIntelliSense.OnLearnMore()
+function CodeIntelliSense.OnLearnMore(textCtrl)
 	local item = CodeIntelliSense.curMouseOverCodeItem or CodeIntelliSense.GetCurrentItem()
 	if(item) then
 		CodeBlockWindow.ShowHelpWndForCodeName(item.type or "")
 		return true;
+	elseif(textCtrl) then
+		local pos = textCtrl:CursorPos()
+		local line = textCtrl:GetLineText(pos.line)
+		if(line) then
+			local from,to = line:wordPosition(pos.pos);
+			if(from and from < to) then
+				local word = line:substr(from+1, to);
+				local codeItem = CodeIntelliSense.GetCodeItemInText(word, line, from, to)
+				if(codeItem) then
+					CodeBlockWindow.ShowHelpWndForCodeName(codeItem.type or "")
+					return true;
+				end
+			end
+		end
 	end
 end
 
@@ -507,8 +538,7 @@ function CodeIntelliSense.ShowMouseOverFuncTip(codeItem, x, y)
 	end
 end
 
--- text control callback
-function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
+function CodeIntelliSense.GetCodeItemInText(word, line, from, to)
 	if(word and from<to) then
 		if(from > 1) then
 			local separatorChar = line:substr(from, from);
@@ -523,13 +553,15 @@ function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
 		word = string.lower(word);
 		local codeItem = CodeHelpWindow.GetCodeItemByFuncName(word)
 		if(codeItem) then
-			CodeIntelliSense.curMouseOverCodeItem = codeItem;
-			CodeIntelliSense.ShowMouseOverFuncTip(codeItem)
-			return;
+			return codeItem;
 		end
 	end
-	CodeIntelliSense.curMouseOverCodeItem = nil;
-	CodeIntelliSense.ShowMouseOverFuncTip(nil)
+end
+
+-- text control callback
+function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
+	CodeIntelliSense.curMouseOverCodeItem = CodeIntelliSense.GetCodeItemInText(word, line, from, to)
+	CodeIntelliSense.ShowMouseOverFuncTip(CodeIntelliSense.curMouseOverCodeItem)
 end
 
 -- text control callback

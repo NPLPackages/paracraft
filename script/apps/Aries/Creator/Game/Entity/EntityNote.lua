@@ -143,14 +143,19 @@ local pitch_offset = {
 }
 
 -- static function: create note from cmd. 
--- @param cmd: if cmd is a number [1-7], play note in middle c group
+-- @param cmd: if cmd is a number [1-7], play note in middle c group. [10,127] to play raw note
 -- if cmd is a absolute pitch c' D, play it 
 function Entity.CreateNoteMsgFromCmd(cmd, baseNote, velocity, channel)
-	local note = cmd:match("([1-7])")
+	local note = cmd:match("^%s*(%d+)%s*$")
 	local pitch = cmd:match("([a-gA-G]'*)")
 
 	if(note) then
-		note = pitch_note["c'"] + pitch_offset[note]
+		local note_key = tonumber(note)
+		if(note_key>=1 and note_key<=7) then
+			note = pitch_note["c'"] + (pitch_offset[note] or 0)
+		elseif(note_key<=127) then
+			note = note_key
+		end
 	elseif pitch then
 		local pitch_name = pitch:sub(1, 1)
 

@@ -1226,3 +1226,7 @@ function SystemSettingsPage.OnClearMemory()
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	Files:UnloadAllUnusedAssets();
 end
+
+function SystemSettingsPage.OnOpenBackupFolder()
+	GameLogic.world_revision:OnOpenRevisionDir();
+end

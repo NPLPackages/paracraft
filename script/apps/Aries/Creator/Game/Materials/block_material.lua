@@ -31,7 +31,7 @@ Material.materialMapColor = "#cccccc";
 Material.requiresNoTool = true;
 
 -- Mobility information flag. 0 indicates that this block is normal, 1 indicates that it can't push other blocks, 2
--- indicates that it can't be pushed.
+-- indicates that it can't be pushed. -1 means it can be pushed regardless of its action.
 Material.mobilityFlag = 0;
 
 Material.isAdventureModeExempt = nil;

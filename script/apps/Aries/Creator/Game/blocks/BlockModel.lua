@@ -60,3 +60,7 @@ function block:RotateBlockEnityData(entityData, angle, axis)
 	
 	return entityData;
 end
+
+function block:getMobilityFlag()
+	return -1;
+end

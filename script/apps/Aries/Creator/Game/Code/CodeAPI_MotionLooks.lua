@@ -695,22 +695,14 @@ end
 
 local lastWinId = 0;
 -- @return the window object itself
-function env_imp:window(mcmlCode, alignment, left, top, width, height)
+function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder)
 	if(mcmlCode) then
-		local filename = ParaIO.GetWritablePath().."temp/codeblock_mcml.html";
-		local file = ParaIO.open(filename, "w");
-		if(file:IsValid()) then
-			if(not mcmlCode:match("<pe:mcml")) then
-				-- tricky: we will force creating page scope by inserting a script element. 
-				file:WriteString("<pe:mcml>\n");
-				file:WriteString(mcmlCode, #mcmlCode);
-				file:WriteString("\n</pe:mcml>");
-			else
-				file:WriteString(mcmlCode, #mcmlCode);
-			end
+		if(not mcmlCode:match("<pe:mcml")) then
+			mcmlCode = "<pe:mcml>"..mcmlCode.."</pe:mcml>"
+		end
+		local xmlRoot = ParaXML.LuaXML_ParseString(mcmlCode);
+		if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
 			
-			file:close();
-
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
 			local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
 			local my_window = CodeWindow:new();
@@ -735,11 +727,13 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 			local viewport = ViewportManager:GetSceneViewport();
 			my_window:SetCodeBlock(self.codeblock);
 			lastWinId = lastWinId + 1
-			my_window:Show({url=filename, 
+			my_window:Show({
+				-- xml here
+				url=xmlRoot, 
 				name = self.codeblock:GetFilename() or ("codeWindow"..lastWinId),
 				alignment = alignment or "_lt", 
 				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
-				zorder=2, 
+				zorder=zorder or zorder, 
 				allowDrag=false,
 				parent = viewport:GetUIObject(true),
 				pageGlobalTable = pageIndex,
@@ -748,6 +742,8 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height)
 				my_window:CloseWindow(true)
 			end)
 			return my_window;
+		else
+			LOG.std(nil, "error", "CodeAPI_MotionLooks",  "invalid xml content in window() function")
 		end
 	end
 end

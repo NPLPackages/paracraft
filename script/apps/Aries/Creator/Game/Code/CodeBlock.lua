@@ -1199,7 +1199,7 @@ function CodeBlock:RunCommand(cmd_name, cmd_text)
 	if(handlerFunc) then
 		handlerFunc(self, cmd_text);
 	else
-		return GameLogic.RunCommand(cmd_name, cmd_text);
+		return GameLogic.RunCommand(cmd_name, cmd_text, self:GetEntity());
 	end
 end
 

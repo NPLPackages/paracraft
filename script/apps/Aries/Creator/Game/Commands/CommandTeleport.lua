@@ -21,11 +21,13 @@ Commands["tp"] = {
 	name="tp", 
 	quick_ref="/tp [x] [y] [z]", 
 	isLocal = true,
-	desc=[[teleport to a given position. 
+	desc=[[teleport to a given real world position. 
 format: /tp [x] [y] [z]  
 format: /tp [y]  -- teleport to y
 format: /tp  -- teleport to current position (making a checkpoint)
 format: /tp home -- teleport to home   
+format: /tp [region_x] [region_y] -- teleport to the center of a given region
+/tp 37 37   -- teleport to a region
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local options = {};
@@ -62,8 +64,8 @@ format: /tp home -- teleport to home
 			elseif(x and y and not z) then
 				x,z = x,y;
 				if(x<64 and y <64) then
-					x = x * BlockEngine.region_width;
-					z = z * BlockEngine.region_width;
+					x = (x+0.5) * BlockEngine.region_width;
+					z = (z+0.5) * BlockEngine.region_width;
 				end
 				y = cy;
 			end

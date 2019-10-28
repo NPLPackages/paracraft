@@ -58,16 +58,21 @@ local function canPushBlock(block_id, x,y,z, canMoveFreeBlock)
 			if(block) then
 				if (block:getBlockHardness(x,y,z) == -1) then
 					return false;
-				elseif (block:getMobilityFlag() == 2) then
-					return false;
-				elseif (block:getMobilityFlag() == 1) then
-					if (not canMoveFreeBlock) then
-						return false;
-					end
-					return true;
 				else
-					-- do not push hard object with action 
-					return not block.hasAction;
+					local mobilityFlag = block:getMobilityFlag()
+					if (mobilityFlag == 2) then
+						return false;
+					elseif(mobilityFlag == 1) then
+						if (not canMoveFreeBlock) then
+							return false;
+						end
+						return true;
+					elseif(mobilityFlag == -1) then
+						return true;
+					else
+						-- do not push hard object with action 
+						return not block.hasAction;
+					end
 				end
 			end
         elseif (isExtended(BlockEngine:GetBlockData(x,y,z))) then
@@ -222,13 +227,12 @@ function block:tryExtend(x,y,z,dir)
 		local x2 = x1 - Direction.offsetX[dir];
 		local y2 = y1 - Direction.offsetY[dir];
 		local z2 = z1 - Direction.offsetZ[dir];
-		local target_block_id = BlockEngine:GetBlockId(x2, y2, z2);
-		local target_block_data = BlockEngine:GetBlockData(x2, y2, z2);
+		local target_block_id, target_block_data, target_block_entitydata = BlockEngine:GetBlockFull(x2, y2, z2)
 
 		if (target_block_id == self.id and x2 == x and y2 == y and z2 == z) then
 			BlockEngine:SetBlock(x1, y1, z1, block_types.names.PistonHead, bor(dir, 8));
 		else
-			BlockEngine:SetBlock(x1, y1, z1, target_block_id, target_block_data);
+			BlockEngine:SetBlock(x1, y1, z1, target_block_id, target_block_data, nil, target_block_entitydata);
 		end
 
 		targets[#targets + 1] = {target_block_id, target_block_data};
@@ -284,16 +288,15 @@ function block:OnBlockEvent(x, y, z, event_id, dir)
 				local x1 = x + Direction.offsetX[dir] * 2;
 				local y1 = y + Direction.offsetY[dir] * 2;
 				local z1 = z + Direction.offsetZ[dir] * 2;
-				local target_block_id = BlockEngine:GetBlockId(x1, y1, z1);
-				local target_block_data = BlockEngine:GetBlockData(x1, y1, z1);
+				local target_block_id, target_block_data, target_block_entitydata = BlockEngine:GetBlockFull(x1, y1, z1)
 			
 				if (target_block_id > 0 and canPushBlock(target_block_id, x1, y1, z1, false) and 
-					(block_types.get(target_block_id):getMobilityFlag() == 0 or target_block_id == block_types.names.Piston or target_block_id == block_types.names.StickyPiston)) then
+					(block_types.get(target_block_id):getMobilityFlag() <= 0 or target_block_id == block_types.names.Piston or target_block_id == block_types.names.StickyPiston)) then
 					x = x + Direction.offsetX[dir];
 					y = y + Direction.offsetY[dir];
 					z = z + Direction.offsetZ[dir];
 					BlockEngine:SetBlockToAir(x1, y1, z1, 3);
-					BlockEngine:SetBlock(x, y, z, target_block_id, target_block_data, 3);
+					BlockEngine:SetBlock(x, y, z, target_block_id, target_block_data, 3, target_block_entitydata);
 				else 
 					BlockEngine:SetBlockToAir(x + Direction.offsetX[dir], y + Direction.offsetY[dir], z + Direction.offsetZ[dir], 3);
 				end

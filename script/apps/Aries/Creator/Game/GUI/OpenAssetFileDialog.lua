@@ -275,6 +275,7 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 			end
 		end
 	end
+	OpenAssetFileDialog.GetAllFiles()[OpenAssetFileDialog.IndexLocal].attr.count = #files;
 end
 
 function OpenAssetFileDialog.OnOpenAssetFileDialog()

@@ -322,40 +322,6 @@ end
 },
 },
 
-
-{
-	type = "waitUntil", 
-	message0 = L"等待直到%1",
-	arg0 = {
-		{
-			name = "expression",
-			type = "input_value",
-            shadow = { type = "boolean"},
-		},
-	},
-	category = "Control", 
-	helpUrl = "", 
-	canRun = false,
-	funcName = "repeat",
-	previousStatement = true,
-	nextStatement = true,
-	hide_in_toolbox = false,
-	func_description = "repeat wait(0.01) until(%s)",
-	ToNPL = function(self)
-		return string.format('repeat wait(0.01) until(%s)\n', self:getFieldAsString('expression'));
-	end,
-	examples = {{desc = L"每帧检测一次", canRun = true, code = [[
-say("press space key to continue")
-repeat wait(0.01) until(isKeyPressed("space"))
-say("started")
-]]},
-{desc = L"输入为某个变量或表达式", canRun = false, code = [[
-repeat wait(0.01) until(gamestate == "gameStarted")
-repeat wait(0.01) until(current_level == 1)
-]]},
-},
-},
-
 {
 	type = "repeat", 
 	message0 = L"重复%1次",
@@ -389,41 +355,6 @@ for i=1, 10 do
 end
 ]]}},
 },
-
-{
-	type = "repeat_until", 
-	message0 = L"重复执行",
-	message1 = L"%1",
-	message2 = L"一直到%1",
-	arg1 = {
-		{
-			name = "input",
-			type = "input_statement",
-		},
-	},
-    arg2 = {
-		{
-			name = "expression",
-			type = "input_value",
-		},
-	},
-	category = "Control", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	hide_in_toolbox = true,
-	func_description = "repeat\\n%suntil(%s)",
-	ToNPL = function(self)
-		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-repeat
-    moveForward(0.01)
-until(false)
-]]}},
-},
-
 
 {
 	type = "forever", 
@@ -597,8 +528,78 @@ end
 },
 
 {
-	type = "wait_until", 
-	message0 = L"等待直到%1为真",
+	type = "repeat_until", 
+	message0 = L"重复执行",
+	message1 = L"%1",
+	message2 = L"一直到%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+    arg2 = {
+		{
+			name = "expression",
+			type = "input_value",
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	hide_in_toolbox = true,
+	func_description = "repeat\\n%suntil(%s)",
+	ToNPL = function(self)
+		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+repeat
+    moveForward(0.01)
+until(false)
+]]}},
+},
+
+
+{
+	type = "waitUntil", 
+	message0 = L"等待直到%1",
+	arg0 = {
+		{
+			name = "expression",
+			type = "input_value",
+            shadow = { type = "boolean"},
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "repeat",
+	previousStatement = true,
+	nextStatement = true,
+	hide_in_toolbox = false,
+	func_description = "repeat wait(0.01) until(%s)",
+	ToNPL = function(self)
+		return string.format('repeat wait(0.01) until(%s)\n', self:getFieldAsString('expression'));
+	end,
+	examples = {{desc = L"每帧检测一次", canRun = true, code = [[
+say("press space key to continue")
+repeat wait(0.01) until(isKeyPressed("space"))
+say("started")
+]]},
+{desc = L"输入为某个变量或表达式", canRun = false, code = [[
+repeat wait(0.01) until(gamestate == "gameStarted")
+repeat wait(0.01) until(current_level == 1)
+]]},
+},
+},
+
+
+{
+	type = "while_if", 
+	message0 = L"重复执行直到%1",
+	message1 = L"%1",
 	arg0 = {
 		{
 			name = "expression",
@@ -607,20 +608,29 @@ end
 			text = "status == \"start\""
 		},
     },
+	arg1 = {
+		{
+			name = "input_true",
+			type = "input_statement",
+			text = "", 
+		},
+	},
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
 	funcName = "until",
 	nextStatement = true,
-	func_description = 'repeat wait() until(%s)',
+	func_description = 'while (%s) do\\n%send',
 	ToNPL = function(self)
-		return string.format('repeat wait() until(%s)\n', self:getFieldAsString('expression'));
+		return string.format('while (%s) do\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-status = "gameStarted"
-repeat wait() until(status == "gameStarted")
-say("game started")
+i=3
+while(i>0) do
+    tip(i)
+    i=i-1
+end
 ]]}},
 },
 
