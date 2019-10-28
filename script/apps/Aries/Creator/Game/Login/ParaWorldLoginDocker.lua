@@ -519,11 +519,6 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 	NPL.ClearPublicFiles();
 	NPL.StopNetServer();
 
-	if ParaIO.DoesFileExist("npl_packages/paracraft") then
-		LOG.std(nil, "info", "ParaWorldLoginDocker", "npl_packages/paracraft exists, renaming it ...");
-		ParaIO.MoveFile("npl_packages/paracraft", "npl_packages/paracraft_bak");
-	end
-
 	ParaWorldLoginDocker.loadAdditionalManifestList(appName);
 
 	-- NOT WORKING: 
