@@ -695,7 +695,7 @@ end
 
 local lastWinId = 0;
 -- @return the window object itself
-function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder)
+function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable)
 	if(mcmlCode) then
 		if(not mcmlCode:match("<pe:mcml")) then
 			mcmlCode = "<pe:mcml>"..mcmlCode.."</pe:mcml>"
@@ -708,6 +708,12 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder)
 			local my_window = CodeWindow:new();
 			
 			local globalTable = self;
+			
+			if envTable then
+				setmetatable(envTable, {__index = globalTable});
+				globalTable = envTable;
+			end
+			
 			local pageIndex = function(tab, name)
 				if(name == "document") then
 					return document;
