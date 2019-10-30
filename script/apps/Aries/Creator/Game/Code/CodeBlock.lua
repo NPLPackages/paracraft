@@ -289,6 +289,7 @@ function CodeBlock:Stop()
 	self.codename = nil;
 	self:codeUnloaded();
 	self:stateChanged();
+	self:Disconnect("codeUnloaded");
 end
 
 -- remove all timers without clearing actors.
