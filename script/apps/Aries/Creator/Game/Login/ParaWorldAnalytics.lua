@@ -166,7 +166,9 @@ function ParaWorldAnalytics:GetAnalyticsClient()
 end
 
 function ParaWorldAnalytics:SendEvent(event)
-	self:GetAnalyticsClient():SendEvent(event);
+    if(self:GetAnalyticsClient())then
+        self:GetAnalyticsClient():SendEvent(event);
+    end
 end
 
 -- @param category: string, which category that the event belongs

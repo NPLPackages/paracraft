@@ -24,6 +24,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
 	elseif(filename == "npl_cad") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+	elseif(filename == "mcml" or filename == "html") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlockly.lua");
     elseif(filename == "npl_microbit") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua");
     elseif(filename == "craft2d") then

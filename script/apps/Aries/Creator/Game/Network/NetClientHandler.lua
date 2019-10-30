@@ -612,8 +612,9 @@ end
 function NetClientHandler:handleGetFile(packet_GetFile)
 	if(packet_GetFile.filename and packet_GetFile.data) then
 		if(packet_GetFile.data ~= "") then
-			local filename = Files.GetWorldFilePath(packet_GetFile.filename)
+			local filename = Files.WorldPathToFullPath(packet_GetFile.filename, false)
 			if(filename) then
+				ParaIO.CreateDirectory(filename);
 				local file = ParaIO.open(filename, "w")
 				if(file:IsValid()) then
 					file:WriteString(packet_GetFile.data, #(packet_GetFile.data));

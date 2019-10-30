@@ -39,7 +39,9 @@ end
 NPL.load("(gl)script/kids/ParaWorldCore.lua"); -- ParaWorld platform includes
 NPL.load("(gl)script/ide/app_ipc.lua");
 -- load paracraft packages if any
-NPL.load("npl_packages/paracraft/");
+if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "") then
+	NPL.load("npl_packages/paracraft/");
+end
 
 if(IPCDebugger) then
 	IPCDebugger.Start(); -- enable debugging if there is a command line setting. 

@@ -87,4 +87,11 @@ function CodeBlockSettings.OnChangeAllowFastMode(value)
 	end
 end
 
+function CodeBlockSettings.OnSelectLang(name, value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		entity:SetLanguageConfigFile(value);
+		CodeBlockWindow.UpdateCodeEditorStatus()
+	end
+end
 

@@ -1162,6 +1162,10 @@ function Entity:OpenEditor(editor_name, entity)
 	end
 end
 
+function Entity:GetBlockContainer()
+	return self.block_container
+end
+
 function Entity:UpdateBlockContainer()
 	local x, y, z = self:GetBlockPos();
 	if(not self.block_container) then

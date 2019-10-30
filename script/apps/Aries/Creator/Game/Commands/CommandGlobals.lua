@@ -600,3 +600,16 @@ Commands["fullscreen"] = {
 	end,
 };
 
+Commands["copytoclipboard"] = {
+	name="copytoclipboard", 
+	quick_ref="/copytoclipboard [text]", 
+	desc=[[copy the given text to clipboard
+/copytoclipboard hello
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		if(type(cmd_text) == "string") then
+			ParaMisc.CopyTextToClipboard(cmd_text)
+		end
+	end,
+};
+

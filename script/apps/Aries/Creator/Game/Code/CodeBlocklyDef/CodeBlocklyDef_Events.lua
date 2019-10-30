@@ -174,15 +174,15 @@ end)
 	examples = {
 {desc = L"任意方块被点击", canRun = true, code = [[
 registerBlockClickEvent("any",function(msg)
-	local blockid = msg.blockid;
-	x, y, z, side = msg.x, msg.y, msg.z, msg.side
+    local blockid = msg.blockid;
+    x, y, z, side = msg.x, msg.y, msg.z, msg.side
     say(blockid..":"..x..","..y..","..z..":"..side)
 end)
 ]]},
 {desc = L"某个方块被点击", canRun = true, code = [[
 registerBlockClickEvent("10",function(msg)
-	local blockid = msg.blockid;
-	x, y, z, side = msg.x, msg.y, msg.z, msg.side
+    local blockid = msg.blockid;
+    x, y, z, side = msg.x, msg.y, msg.z, msg.side
     tip("colorblock10:"..x..","..y..","..z..":"..side)
 end)
 ]]},

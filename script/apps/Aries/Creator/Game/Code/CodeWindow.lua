@@ -11,6 +11,7 @@ local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
 ]]
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeContext2d.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeContext2d = commonlib.gettable("MyCompany.Aries.Game.Code.CodeContext2d")
 
 local CodeWindow = commonlib.inherit(commonlib.gettable("System.Windows.Window"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow"));
@@ -99,3 +100,23 @@ function CodeWindow:Render(painterContext)
 	end
 	return CodeWindow._super.Render(self, painterContext);
 end
+
+-- virtual function
+function CodeWindow:FilterImage(filename)
+	local filename_, params = filename:match("^([^;:]+)(.*)$");
+	if(filename_) then
+		local filepath = Files.GetFilePath(filename_);
+		if(filepath) then
+			 if(filepath~=filename_) then
+				filename = filepath..(params or "");
+			 end
+		else
+			-- file not exist, return nil
+			LOG.std(nil, "warn", "CodeWindow", "image file not exist %s", filename);
+			return;
+		end
+	end
+	return filename;
+end
+
+

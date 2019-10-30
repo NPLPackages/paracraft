@@ -1385,6 +1385,8 @@ function GameLogic.AppendChat(text, entity)
 			text = name..":"..(text or "");
 		end
 	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+	MyCompany.Aries.ChatSystem.ChatWindow.InitSystem();
 	ChatChannel.AppendChat({
 			ChannelIndex=ChatChannel.EnumChannels.NearBy, 
 			words=text,
@@ -1410,18 +1412,11 @@ function GameLogic.ShowMsg(text, level)
 	local date_str, time_str = commonlib.log.GetLogTimeString();
 
 	if(level >= 1) then
-		if(GameLogic.error_count == 1) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-			MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage();
-		end
-
-		ChatChannel.AppendChat({ChannelIndex=ChatChannel.EnumChannels.BroadCast, from=0, words=format("%s|%s", time_str, text)});
+		GameLogic.AppendChat(format("%s|%s", time_str, text))
 	end
-
 	if(level >= 2) then
 		local short_text = text:sub(1, 60);
-		
-		BroadcastHelper.PushLabel({id="game_error"..tostring(GameLogic.error_count%3), label = format("%s|%s", time_str, short_text), max_duration=20000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
+		GameLogic.AddBBS("game_error"..tostring(GameLogic.error_count%3), short_text, 20000, "255 0 0");
 	end
 end
 

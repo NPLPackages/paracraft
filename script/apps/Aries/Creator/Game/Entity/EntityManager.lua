@@ -625,7 +625,7 @@ function EntityManager.GetEntitiesInChunkColumn(cx, cz, bCreateIfNotExist)
 	return chunk_column;
 end
 
--- get region object
+-- create get region object
 function EntityManager.GetRegionContainer(bx,bz)
 	local x = rshift(bx, 9);
 	local z = rshift(bz, 9);
@@ -637,6 +637,17 @@ function EntityManager.GetRegionContainer(bx,bz)
 		region = RegionContainer:new():init(x,z);
 		regions[x*128+z] = region;
 		region:LoadFromFile();		
+		return region;
+	end
+end
+
+-- only get region without creating it. 
+function EntityManager.GetRegion(bx,bz)
+	local x = rshift(bx, 9);
+	local z = rshift(bz, 9);
+
+	local region = regions[x*128+z];
+	if(region) then
 		return region;
 	end
 end

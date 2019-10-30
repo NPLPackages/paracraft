@@ -185,7 +185,7 @@ function CodeIntelliSense.SetWord(word)
 	
 	local items = {};
 	for funcName, codeItem in allNames:pairs() do
-		if(funcName:match(text)) then
+		if(funcName:match(text) and type(codeItem) == "table") then
 			items[#items+1] = codeItem.funcName or funcName;
 			if(#items > CodeIntelliSense.maxCandidates) then
 				break;

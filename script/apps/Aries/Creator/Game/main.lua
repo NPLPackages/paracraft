@@ -14,7 +14,9 @@ Game.Start();
 -------------------------------------------------------
 ]]
 -- load paracraft packages if any
-NPL.load("npl_packages/paracraft/");
+if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "") then
+	NPL.load("npl_packages/paracraft/");
+end
 NPL.load("(gl)script/ide/System/System.lua");
 NPL.load("(gl)script/kids/ParaWorldCore.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");

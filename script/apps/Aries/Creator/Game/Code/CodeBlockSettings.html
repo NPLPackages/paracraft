@@ -12,6 +12,9 @@ end
 local languageList = {
     {text=L"NPL"..L"(默认推荐)", value=""},
     {text="NPL CAD", value="npl_cad"},
+    {text="MCML UI", value="mcml"},
+    {text="microbit", value="npl_microbit"},
+    
     -- {text="Python", value="python"},
 }
 function GetLanguageList()
@@ -24,9 +27,10 @@ end
     <div style="margin-bottom:10px;">
         <div style="float:left"><%=L"编程语言:"%></div>
         <div style="float:left">
-            <select name="language" style="height:25px;margin-top:-1px;" AllowUserEdit="true">
+            <select name="language" style="height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnSelectLang" AllowUserEdit="false">
                 <option value="" selected="selected">NPL</option>
                 <option value="npl_cad">CAD</option>
+                <option value="mcml">MCML UI</option>
             </select>
             <input type="button" style="margin-left:5px" class="button" name="btnChangeLang" value='<%=L"自定义语言..."%>' onclick="CodeBlockSettings.OnClickCustomLanguage"/>
         </div>

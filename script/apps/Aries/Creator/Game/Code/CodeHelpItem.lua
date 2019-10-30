@@ -46,8 +46,10 @@ function CodeHelpItem:Init()
 		if(arguments) then
 			local all_fields = self.all_fields;
 			for argIndex, arg in ipairs(arguments) do
-				all_fields[arg.name] = arg;
-				arg.argIndex = argIndex;
+				if(arg.name) then
+					all_fields[arg.name] = arg;
+					arg.argIndex = argIndex;
+				end
 			end
 		end
 		lineNumber = lineNumber + 1;
@@ -72,7 +74,8 @@ function CodeHelpItem:GetHtml()
 	local lines = "";
 	while(message) do
 		local line = message;
-		
+		line = commonlib.Encoding.EncodeHTMLInnerText(line)
+
 		local bContinue = true;
 		while(bContinue) do
 			bContinue = false;
@@ -100,7 +103,7 @@ function CodeHelpItem:GetHtml()
 							arg_item.selectedIndex = arg_item.selectedIndex or 1;
 							item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
 							arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
-							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
+							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(lineNumber).."_"..tostring(arg_index), item_text);
 						elseif(not item_text or item_text=="") then
 							arg_text = '<div style="float:left;margin:3px;background-color:#ffffff;color:#000000;width:5px;height:12px"></div>';
 						else
@@ -111,7 +114,7 @@ function CodeHelpItem:GetHtml()
 							arg_item.selectedIndex = arg_item.selectedIndex or 1;
 							item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
 							arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
-							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
+							arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(lineNumber).."_"..tostring(arg_index), item_text);
 						else
 							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', arg_item.variable or item_text or "");	
 						end
@@ -119,7 +122,7 @@ function CodeHelpItem:GetHtml()
 						arg_item.selectedIndex = arg_item.selectedIndex or 1;
 						item_text = tostring(arg_item.options[arg_item.selectedIndex][1]);
 						arg_item.text = tostring(arg_item.options[arg_item.selectedIndex][2]);
-						arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(arg_index), item_text);
+						arg_text = format('<input type="button" name="%s" onclick="MyCompany.Aries.Game.Code.CodeHelpItem.OnClickDropDown" class="mc_button_grey" style="margin:2px;font-size:12px;height:16px;" value="%s" />', self.type.."_"..tostring(lineNumber).."_"..tostring(arg_index), item_text);
 					elseif(arg_item.type == "field_number") then
 						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text or 0));
 					elseif(arg_item.type == "input_statement") then
@@ -279,12 +282,12 @@ function CodeHelpItem:GetDSItem()
 end
 
 function CodeHelpItem.OnClickDropDown(name, mcmlNode)
-	local itemType, argIndex = name:match("^(.*)_(%d)$");
-	if(itemType and argIndex) then
+	local itemType, lineIndex, argIndex = name:match("^(.*)_(%d)_(%d)$");
+	if(itemType and argIndex and lineIndex) then
 		argIndex = tonumber(argIndex);
 		local self = CodeHelpWindow.GetCodeItemByName(itemType)
 		if(self) then
-			local arg_item = self.arg0[argIndex];
+			local arg_item = self["arg"..lineIndex][argIndex];
 			if(arg_item) then
 				if(arg_item.options) then
 					CodeHelpItem.curDropDownDS = arg_item.options;
@@ -293,7 +296,7 @@ function CodeHelpItem.OnClickDropDown(name, mcmlNode)
 					self:ShowArgumentDropDownWnd(x+width, y, function(result)
 						if(result and result~=arg_item.selectedIndex) then
 							arg_item.selectedIndex = result;
-							self:SetArgumentText(argIndex, arg_item.options[arg_item.selectedIndex][1], mcmlNode);
+							self:SetArgumentText(lineIndex, argIndex, arg_item.options[arg_item.selectedIndex][1], mcmlNode);
 						end
 					end)
 				end
@@ -302,8 +305,8 @@ function CodeHelpItem.OnClickDropDown(name, mcmlNode)
 	end
 end
 
-function CodeHelpItem:SetArgumentText(argIndex, text, mcmlNode)
-	local arg_item = self.arg0[argIndex];
+function CodeHelpItem:SetArgumentText(lineIndex, argIndex, text, mcmlNode)
+	local arg_item = self["arg"..lineIndex][argIndex];
 	if(arg_item) then
 		arg_item.text = text;
 		self:ResetCache();

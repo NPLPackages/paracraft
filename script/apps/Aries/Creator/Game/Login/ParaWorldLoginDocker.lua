@@ -205,7 +205,7 @@ local app_install_details = {
 	},
 	["truckstar"] = {
 		title=L"创意大厅", hasParacraft = false, 
-		cmdLine = 'noupdate="true" mc="true" loadpackage="npl_packages/paracraft/" bootstrapper="script/apps/Aries/main_loop.lua" mod="Truck" isDevEnv="true" disable-parent-package-lookup="true"',
+		cmdLine = 'noupdate="true" mc="true" bootstrapper="script/apps/Aries/main_loop.lua" mod="Truck" isDevEnv="true" disable-parent-package-lookup="true"',
 		redistFolder="truck/", updaterConfigPath = "config/autoupdater/truckstar_win32.xml",
 		additional_manifest = "assets_manifest_truckload.txt",
 		allowQQHall = true,

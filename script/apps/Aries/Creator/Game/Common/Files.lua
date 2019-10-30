@@ -68,8 +68,7 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 							local file = ParaIO.open(filename, "w");
 							if(file:IsValid()) then
 								file:close();
-								GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
-								LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+								Files.GetRemoteWorldFile(any_filename);
 							end	
 							any_filename = filename;
 						else
@@ -87,6 +86,14 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 		return any_filename;
 	end
 end
+
+-- one can check the result after 1 second
+-- @param any_filename: relative to world path. 
+function Files.GetRemoteWorldFile(any_filename)
+	GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
+	LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+end
+
 
 -- check if file exists. 
 -- @param filename: can be relative to current world or sdk root. 
