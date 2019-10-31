@@ -40,13 +40,8 @@ Examples:
 				output_dir, cmd_text = CmdParser.ParseString(cmd_text);
 			end
 		end
-		local sync_result = System.os("git pull");
-		if(sync_result and sync_result:find("^%s*Already up%Wto%Wdate")) then
+		if(output_dir and output_dir~="") then
 			local generator = WikiGen:new():Run(output_dir);
-		else
-			local msg = format("git pull failed: %s, please make sure local dir www/ParaCraftWiki/ is a valid clone of https://github.com/LiXizhi/ParaCraft/wiki/", sync_result or "");
-			LOG.std(nil, "info", "cmd_wikigen", msg);
-			_guihelper.MessageBox(msg);
 		end
 	end,
 };

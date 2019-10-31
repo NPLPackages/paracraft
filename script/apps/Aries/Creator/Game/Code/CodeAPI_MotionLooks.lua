@@ -102,28 +102,35 @@ function env_imp:move(dx,dy,dz, duration)
 	local actor = self.actor;
 	if(actor) then
 		local x,y,z = actor:GetPosition();
-		local targetX = x + (dx or 0)*BlockEngine.blocksize;
-		local targetY = y + (dy or 0)*BlockEngine.blocksize;
-		local targetZ = z + (dz or 0)*BlockEngine.blocksize;
+		dx = (dx or 0)*BlockEngine.blocksize
+		dy = (dy or 0)*BlockEngine.blocksize
+		dz = (dz or 0)*BlockEngine.blocksize
+		local targetX = x + dx;
+		local targetY = y + dy;
+		local targetZ = z + dz;
 		if(not duration) then
 			actor:SetPosition(targetX,targetY,targetZ);
 			env_imp.wait(self, env_imp.GetDefaultTick(self));
 		elseif(duration == 0) then
 			actor:SetPosition(targetX,targetY,targetZ);
 		else
-			local endTime = commonlib.TimerManager.GetCurrentTime()/1000 + duration;
+			local startTime = commonlib.TimerManager.GetCurrentTime()/1000
+			local endTime = startTime + duration;
 			local stepTime = env_imp.GetDefaultTick(self);
-			for i=0, math.floor(duration / stepTime) do
-				local timeLeft = endTime - commonlib.TimerManager.GetCurrentTime()/1000;
-				local stepCount = math.floor(timeLeft/stepTime);
-				local x,y,z = actor:GetPosition();
-				local dx, dy, dz = targetX - x, targetY - y, targetZ - z;
-				if(stepCount>=2) then
-					local inverseStep = 1/stepCount;
-					dx, dy, dz = dx*inverseStep, dy*inverseStep, dz*inverseStep;	
+			while(true) do
+				local curTime = commonlib.TimerManager.GetCurrentTime()/1000;
+				local timeLeft = endTime - curTime;
+				local shouldBe;
+				if((curTime+stepTime) >= endTime) then
+					shouldBe = 1
+				else
+					shouldBe = (curTime+stepTime - startTime) / duration;
 				end
-				env_imp.move(self, dx,dy,dz)
-				if(stepCount<2) then
+				local cur_x,cur_y,cur_z = actor:GetPosition();
+				local sx, sy, sz = x + shouldBe*dx, y + shouldBe*dy, z + shouldBe*dz
+				local dx1, dy1, dz1 = sx - cur_x, sy - cur_y, sz - cur_z;
+				env_imp.move(self, dx1*BlockEngine.blocksize_inverse,dy1*BlockEngine.blocksize_inverse,dz1*BlockEngine.blocksize_inverse)
+				if(shouldBe == 1) then
 					break;
 				end
 			end
