@@ -148,6 +148,7 @@ function BlockTemplatePage.OnClickSave()
 	local template_base_dir = BlockTemplatePage.template_save_dir or default_template_dir;
     local name = page:GetUIValue("name") or page:GetUIValue("tl_name") or "";
 	local desc = page:GetUIValue("template_desc") or page:GetUIValue("template_desc") or "";
+	local useCustomPivot = page:GetUIValue("checkboxUsePivot", false)
     desc = string.gsub(desc,"\r?\n","<br/>")
 	name = name:gsub("%s", "");
 	if(name == "")  then
@@ -173,9 +174,22 @@ function BlockTemplatePage.OnClickSave()
 	end
 
 	local function doSave_()
+		
+
 		local x, y, z = ParaScene.GetPlayer():GetPosition();
 		local bx, by, bz = BlockEngine:block(x,y,z)
 		local player_pos = string.format("%d,%d,%d",bx,by,bz);
+		
+		if(useCustomPivot) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+			local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+			local select_task = SelectBlocks.GetCurrentInstance();
+			if(select_task) then
+				BlockTemplatePage.pivot = select_task:GetPivotPoint();
+				BlockTemplatePage.blocks = select_task:GetCopyOfBlocks(BlockTemplatePage.pivot);
+			end
+		end
+
 		local pivot = string.format("%d,%d,%d",BlockTemplatePage.pivot[1],BlockTemplatePage.pivot[2],BlockTemplatePage.pivot[3]);
 		BlockTemplatePage.SaveToTemplate(filename, BlockTemplatePage.blocks, {
 			name = name,

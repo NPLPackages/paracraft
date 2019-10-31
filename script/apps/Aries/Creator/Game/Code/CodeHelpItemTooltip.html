@@ -15,6 +15,10 @@
     function CanRunExample()
         return item and item:CanRunExample()
     end
+    function HasUrlHelp()
+        return item and item:HasUrlHelp()
+    end
+
     function GetColor()
         return item and item:GetColor() or "#4a6cd4";
     end
@@ -22,6 +26,7 @@
         return item and item:GetHtml();
     end
     
+
     function GetNPLCode()
         local code = item and item:GetNPLCode();
         if(code) then
@@ -62,6 +67,12 @@
         return Page:GetRequestParam("IsShortTip");
     end
 
+    function OnClickHelpUrl()
+        if(item) then
+            item:OpenHelpUrl();
+        end
+    end
+
     function OnClickClose()
         NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
         local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
@@ -77,11 +88,21 @@
     <pe:if condition="<%=not IsShortTip()%>">
         <pe:if condition="<%=IsShowCloseBtn()%>">
             <input class="mc_close_button" type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="OnClickClose" style="margin-top:3px;margin-left:0px;" />
+            <pe:if condition='<%=HasUrlHelp()%>'>
+                <div align="right" onclick="OnClickHelpUrl" style="float:left;position:relative;margin-right:26px;width:24px;height:24px;" tooltip='<%=L"获取更多帮助"%>'>
+                    <div style="margin-top:8px;margin-left:10px;width:8px;height:8px;background-color:#ffd800"></div>
+                </div>
+            </pe:if>
         </pe:if>
         <pe:if condition="<%=not IsShowCloseBtn()%>">
             <div align="right" onclick="OnClickPinToHelpWnd" style="float:left;position:relative;width:24px;height:24px;" tooltip='<%=L"一直显示"%>'>
                 <div style="margin-top:8px;margin-left:10px;width:8px;height:8px;background-color:#dddede"></div>
             </div>
+            <pe:if condition='<%=HasUrlHelp()%>'>
+                <div align="right" onclick="OnClickHelpUrl" style="float:left;position:relative;margin-right:24px;width:24px;height:24px;" tooltip='<%=L"获取更多帮助"%>'>
+                    <div style="margin-top:8px;margin-left:10px;width:8px;height:8px;background-color:#ffd800"></div>
+                </div>
+            </pe:if>
         </pe:if>
         <div style="float:left" onclick="OnClickRun" tooltip='<%=CanRun() and (L("左键运行, 右键复制代码").."\n"..GetNPLCode()) or L"右键复制代码"%>'>
             <div style='<%=CanRun() and "background-color:#ff0000;padding:2px;" or ""%>'>

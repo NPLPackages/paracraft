@@ -849,7 +849,7 @@ stopMovie();
 		},
 	},
 	category = "Looks", 
-	helpUrl = "", 
+	helpUrl = "https://github.com/tatfook/CodeBlockDemos/wiki/Window", 
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,

@@ -224,6 +224,16 @@ function CodeHelpItem:CanRun()
 	return self.canRun;
 end
 
+function CodeHelpItem:HasUrlHelp()
+	return self.helpUrl and self.helpUrl~="";
+end
+
+function CodeHelpItem:OpenHelpUrl()
+	if(self:HasUrlHelp()) then
+		GameLogic.RunCommand("/open " .. self.helpUrl);
+	end
+end
+
 function CodeHelpItem:GetNPLCodeExample()
 	if(self.examples) then
 		local example = self.examples[1];
