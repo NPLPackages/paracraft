@@ -63,9 +63,13 @@ function env_imp:walk(dx,dy,dz, duration)
 		if(entity.MoveTo) then
 			entity:EnableAnimation(true);
 			entity:SetDummy(false);
-			entity:WalkTo(x,y,z);
+			entity:SetBlockTarget(x,y,z);
 			if(not duration) then
-				duration = math.sqrt(dx*dx + dz*dz) * BlockEngine.blocksize / entity:GetWalkSpeed();
+				if(dx == 0 and dz == 0) then
+					duration = 0.01
+				else
+					duration = math.sqrt(dx*dx + dz*dz) * BlockEngine.blocksize / entity:GetWalkSpeed();
+				end
 			end
 			env_imp.wait(self, duration);
 		end

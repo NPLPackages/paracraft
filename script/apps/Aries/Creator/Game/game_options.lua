@@ -422,6 +422,10 @@ function options:ResetWindowTitle()
 			if(GameLogic.IsReadOnly()) then
 				worldName = format("%s (%s)", worldName, L"只读")
 			end
+			local projectId = self:GetProjectId()
+			if(projectId) then
+				worldName = worldName .. " " .. format(L"项目ID:%s", tostring(projectId))
+			end
 			ParaEngine.SetWindowText(format("%s  %s", worldName, System.options.WindowTitle));	
 		end
 	end

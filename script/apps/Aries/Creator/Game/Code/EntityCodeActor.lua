@@ -109,3 +109,8 @@ function Entity:BroadcastCollision()
 		end
 	end
 end
+
+-- Returns true if the entity takes up space in its containing block, such as animals,mob and players. 
+function Entity:CanBeCollidedWith(entity)
+	return self:GetActor():CanBeCollidedWith(entity)
+end

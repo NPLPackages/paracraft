@@ -103,7 +103,7 @@ end
 
 -- virtual function
 function CodeWindow:FilterImage(filename)
-	local filename_, params = filename:match("^([^;:]+)(.*)$");
+	local filename_, params = filename:match("^([^;#:]+)(.*)$");
 	if(filename_) then
 		local filepath = Files.GetFilePath(filename_);
 		if(filepath) then

@@ -181,6 +181,7 @@ function CodeBlock:BeautifyCompilerErrorMsg(msg)
 		msg = msg:gsub("<eof>", L"文件的结束")
 		msg = msg:gsub("%[string \"_block%(", L"[\"代码方块(")
 		msg = msg:gsub("%s(near)%s", L"临近")
+		msg = msg:gsub("malformed number", L"格式不对的数字")
 	end
 	return msg;
 end

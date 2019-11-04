@@ -622,6 +622,7 @@ function Actor:GetPosY()
 end
 
 -- set (physics) group id
+-- actors of the same group does not collide with one another
 function Actor:SetGroupId(id)
 	self.groupId = id and tonumber(id);
 end
@@ -870,6 +871,15 @@ function Actor:IsServerEntity()
 	return entity and entity:IsServerEntity()
 end
 
+-- actors of the same group does not collide with one another
+function Actor:CanBeCollidedWith(entity)
+	if(entity.m_actor) then
+		return self.entity:IsStaticBlocker() and (self.groupId ~= entity.m_actor.groupId);
+	else
+		return self.entity:IsStaticBlocker();
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -937,4 +947,33 @@ function Actor:BecomeAgent(entity)
 	end
 	entity:Connect("collided", self, self.OnCollideWithEntity, "UniqueConnection");
 	entity:Connect("valueChanged", self, self.OnEntityPositionChange, "UniqueConnection");
+end
+
+-- in block coordinates
+function Actor:FindActorsByMinMax(min_x, min_y, min_z, max_x, max_y, max_z)
+    local actors = {};
+	local entities = EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, EntityManager.EntityCodeActor);
+	if(entities and #entities>0) then
+		local thisEntity = self:GetEntity();
+		for i=1, #entities do
+			local entity = entities[i]
+			if(entity ~= thisEntity and entity.GetActor) then
+				actors[#actors + 1] = entity:GetActor();
+			end
+		end
+	end
+	return actors;
+end
+
+-- in block coordinates
+-- @param halfHeight: default to 0, which is the height search range. if it is 0, we will only search at the current actor's height. 
+function Actor:FindActorsByRadius(radius, halfHeight)
+	local entity = self:GetEntity();
+	if entity then
+		halfHeight = halfHeight or 0
+		local cx,cy,cz = entity:GetBlockPos();
+		return self:FindActorsByMinMax(cx-radius, cy-halfHeight, cz-radius, cx+radius, cy+halfHeight, cz+radius, EntityManager.EntityCodeActor);	
+	else
+		return {};
+	end
 end
