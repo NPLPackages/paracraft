@@ -566,9 +566,9 @@ local data = actor:GetActorValue("some_data")
 			name = "value",
 			type = "field_dropdown",
 			options = {
-				{ "true", "true" },
-				{ "false", "false" },
-				{ "nil", "nil" },
+				{ L"真", "true" },
+				{ L"假", "false" },
+				{ L"无效", "nil" },
 			  }
 		},
 	},
@@ -1228,6 +1228,68 @@ assert(monsterCount == 1)
 	func_description = '%s',
 	ToNPL = function(self)
 		return string.format('%s\n', self:getFieldAsString('codes'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+]]}},
+},
+{
+	type = "code_comment", 
+	message0 = L"注释 %1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '-- %s',
+	func_description_js = '// %s',
+	ToNPL = function(self)
+		return string.format('-- %s', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+]]}},
+},
+{
+	type = "code_comment_full", 
+	message0 = L"注释全部 %1",
+	message1 = "%1",
+	message2 = "%1",
+    arg0 = {
+		{
+			name = "label_dummy",
+			type = "input_dummy",
+			text = "",
+		},
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+	},
+    arg2 = {
+		{
+			name = "label_dummy",
+			type = "input_dummy",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '--[[\\n%s\\n]]',
+	func_description_js = '/**\\n%s\\n*/',
+	ToNPL = function(self)
+		return string.format('--[[\n%s\n]]', self:getFieldAsString('value'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 ]]}},

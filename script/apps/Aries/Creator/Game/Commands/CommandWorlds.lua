@@ -173,13 +173,15 @@ e.g.
 					if(isHttp) then
 						local filename = world:GetLocalFileName();
 						if(ParaIO.DoesFileExist(filename)) then
-							_guihelper.MessageBox(L"世界已经存在，是否重新下载?", function()
-								if(res and res == _guihelper.DialogResult.Yes) then
+							_guihelper.MessageBox(L"世界已经存在，是否重新下载?", function(res)
+								if(res == _guihelper.DialogResult.Yes) then
 									LoadWorld_(world, "auto");
-								else
+								elseif(res == _guihelper.DialogResult.No) then
 									LoadWorld_(world, "never");
+								else
+									DownloadWorld.Close();
 								end
-							end, _guihelper.MessageBoxButtons.YesNo);
+							end, _guihelper.MessageBoxButtons.YesNoCancel);
 						end
 					end
 					return;

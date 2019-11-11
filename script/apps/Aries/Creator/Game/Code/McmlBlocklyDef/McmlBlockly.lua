@@ -13,9 +13,10 @@ local McmlBlockly = NPL.export();
 local all_cmds = {}
 
 local default_categories = {
-{name = "window", text = L"窗口", colour="#0078d7", },
-{name = "attribute", text = L"属性" , colour="#7abb55", },
-{name = "style", text = L"样式", colour="#764bcc", },
+{name = "McmlControls", text = L"控件", colour="#0078d7", },
+{name = "McmlAttrs", text = L"属性" , colour="#7abb55", },
+{name = "McmlStyles", text = L"样式", colour="#764bcc", },
+{name = "McmlData", text = L"数据", colour="#459197", },
 };
 
 local is_installed = false;
@@ -26,9 +27,10 @@ function McmlBlockly.AppendAll()
 	is_installed = true;
 	
 	local all_source_cmds = {
-		NPL.load("./McmlBlocklyDef_Window.lua"),
+		NPL.load("./McmlBlocklyDef_Controls.lua"),
 		NPL.load("./McmlBlocklyDef_Styles.lua"),
 		NPL.load("./McmlBlocklyDef_Attrs.lua"),
+		NPL.load("./McmlBlocklyDef_Data.lua"),
 	}
 	for k,v in ipairs(all_source_cmds) do
 		McmlBlockly.AppendDefinitions(v);

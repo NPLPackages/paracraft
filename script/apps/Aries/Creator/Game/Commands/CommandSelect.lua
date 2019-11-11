@@ -21,7 +21,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["select"] = {
 	name="select", 
-	quick_ref="/select [-add|clear|below|all|pivot|move] x y z [(dx dy dz)]", 
+	quick_ref="/select [-add|clear|below|all|pivot|origin|move] x y z [(dx dy dz)]", 
 	desc=[[select blocks in a region.
 -- select all blocks in AABB region
 /select x y z [(dx dy dz)]
@@ -33,10 +33,13 @@ Commands["select"] = {
 /select -clear
 -- select all blocks connected with current selection but not below current selection. 
 /select -all x y z [(dx dy dz)]
--- set pivot point
+-- set pivot point, similar to origin, but also set position
 /select -pivot x y z
+-- origin is used in exporting
+/select -origin x y z
 -- move to a new position
 /select -move x y z
+
 ]] , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
@@ -60,14 +63,16 @@ Commands["select"] = {
 			task.ExtendAABB(bx+radius, by-1-height, bz+radius);
 		elseif(options.clear) then
 			SelectBlocks.CancelSelection();
-		elseif(options.pivot) then
+		elseif(options.pivot or options.origin) then
 			local x, y, z;
 			x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
 			if(x and y and z) then
 				local instance = SelectBlocks.GetCurrentInstance();
 				if(instance) then
 					instance:SetPivotPoint({x,y,z});
-					instance:SetPosition({x,y,z});
+					if(not options.origin) then
+						instance:SetPosition({x,y,z});
+					end
 				end
 			end
 		elseif(options.move) then

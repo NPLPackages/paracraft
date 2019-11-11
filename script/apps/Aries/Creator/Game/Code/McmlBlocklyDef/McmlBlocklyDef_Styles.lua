@@ -10,22 +10,84 @@ use the lib:
 NPL.export({
 -----------------------
 {
-	type = "style_width", 
-	message0 = "向上移动",
+	type = "mcml_styles_float_key_value", 
+	message0 = "%1:%2;",
 	arg0 = {
+        {
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ "float", "float"},
+			},
+		},
+         {
+			name = "value",
+			type = "field_dropdown",
+            options = {
+				{ "left", "left"},
+				{ "center", "center"},
+				{ "right", "right"},
+			},
+		},
 	},
-	category = "style", 
+    output = {type = "null",},
+	category = "McmlStyles", 
 	helpUrl = "", 
 	canRun = true,
-	previousStatement = true,
-	nextStatement = true,
-	func_description = 'width;',
+	func_description = '%s:%s;',
 	ToNPL = function(self)
-		return string.format('width\n');
+		return string.format('%s:%s;',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
+
+
+{
+	type = "mcml_styles_key_value", 
+	message0 = "%1:%2;",
+	arg0 = {
+        {
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ "margin", "margin"},
+				{ "margin-left", "margin-left"},
+				{ "margin-top", "margin-top"},
+				{ "margin-right", "margin-right"},
+				{ "margin-bottom", "margin-bottom"},
+                { "padding", "padding"},
+				{ "paddingn-left", "padding-left"},
+				{ "padding-top", "padding-top"},
+				{ "padding-right", "padding-right"},
+				{ "padding-bottom", "padding-bottom"},
+                { "width", "width"},
+                { "height", "height"},
+                { "background", "background"},
+                { "background-color", "background-color"},
+                { "font-size", "font-size"},
+                { "bold", "bold"},
+			},
+		},
+         {
+			name = "value",
+            type = "input_value",
+			shadow = { type = "text"},
+		},
+	},
+    output = {type = "null",},
+	category = "McmlStyles", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = '%s:%s;',
+	ToNPL = function(self)
+		return string.format('%s:%s;',self:getFieldValue('key'),self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
 
 ---------------------
 })

@@ -19,10 +19,10 @@ operator-precedence: https://developers.google.com/blockly/guides/create-custom-
 local CodeBlocklyGenerator = commonlib.inherit(nil,commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyGenerator"));
 
 function CodeBlocklyGenerator:ctor()
-    self.arg_len = 9; -- the max number of argument, start index is from 0
+    self.arg_len = 100; -- the max number of argument, start index is from 0
 
     self.language_names = {
-        ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", },
+        ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", function_provider_name = "func_description_lua_provider", },
         ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", function_provider_name = "func_description_js_provider", },
         ["python"] = { blockly_namesapce = "Python", function_name = "func_description_py", },
     }

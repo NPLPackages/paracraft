@@ -30,7 +30,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["loadtemplate"] = {
 	name="loadtemplate", 
-	quick_ref="/loadtemplate [-r] [-abspos] [-tp] [-a seconds] [x y z] [templatename]", 
+	quick_ref="/loadtemplate [-r] [-nohistory] [-abspos] [-tp] [-a seconds] [x y z] [templatename]", 
 	desc=[[load template to the given position
 @param -a seconds: animate building progress. the followed number is the number of seconds (duration) of the animation. 
 @param -r: remove blocks
@@ -42,6 +42,7 @@ default name is "default"
 /loadtemplate ~0 ~2 ~ test
 /loadtemplate -a 3 test
 /loadtemplate -r test
+/loadtemplate -nohistory test
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		
@@ -51,7 +52,7 @@ default name is "default"
 		local option;
 		local load_anim_duration;
 		local operation = BlockTemplate.Operations.Load;
-		local UseAbsolutePos, TeleportPlayer;
+		local UseAbsolutePos, TeleportPlayer, nohistory;
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option) then
@@ -64,6 +65,8 @@ default name is "default"
 					operation = BlockTemplate.Operations.Remove;
 				elseif(option == "abspos") then
 					UseAbsolutePos = true;
+				elseif(option == "nohistory") then
+					nohistory = true;
 				elseif(option == "tp") then
 					TeleportPlayer = true;
 				end
@@ -93,7 +96,7 @@ default name is "default"
 			if(fullpath) then
 				local task = BlockTemplate:new({operation = operation, filename = fullpath,
 					blockX = x,blockY = y, blockZ = z, bSelect=nil, load_anim_duration=load_anim_duration,
-					UseAbsolutePos = UseAbsolutePos,TeleportPlayer=TeleportPlayer,
+					UseAbsolutePos = UseAbsolutePos,TeleportPlayer=TeleportPlayer, nohistory= nohistory,
 					})
 				task:Run();
 			else
@@ -106,22 +109,34 @@ default name is "default"
 
 Commands["savetemplate"] = {
 	name="savetemplate", 
-	quick_ref="/savetemplate [templatename]", 
+	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [templatename]", 
 	desc=[[save template with current selection
 @param templatename: if no name is provided, it will be default
 /savetemplate test
+/savetemplate -hollow test
+/savetemplate -auto_pivot test
+/savetemplate -relative_motion test
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
 		local templatename = cmd_text:match("(%S*)$");
 		if(not templatename or templatename == "") then
 			templatename = "default";
 		end
+
 		templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.blocks%.xml$", "");
 		local filename = format("%sblocktemplates/%s.blocks.xml", GameLogic.current_worlddir, templatename);
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, bSelect=nil})
+		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, 
+			filename = filename, 
+			auto_pivot = options.auto_pivot,
+			relative_motion = options.relative_motion,
+			hollow = options.hollow,
+			bSelect=nil})
 		if(task:Run()) then
 			BroadcastHelper.PushLabel({id="savetemplate", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 		end

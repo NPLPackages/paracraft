@@ -440,16 +440,31 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 				if(text:length() == to or (not codeItem.nextStatement)) then
 					local code = "";
 					local curPos = nil;
-					local func_description = codeItem.func_description:gsub("\\n", "\n")
+					
+					local func_description = codeItem.func_description:gsub("\\n", "\n");
+					
+					if(func_description:sub(1, #codeItem.funcName) ~= codeItem.funcName) then
+						local funcParams = func_description:match("(%(.*)$");
+						if(funcParams) then
+							func_description = codeItem.funcName..funcParams;
+						else
+							func_description = codeItem.funcName
+						end
+						cursorOnBracket = false;
+					end
+
 					for text, param in func_description:gmatch("([^%%]+)(%%?%w?)") do
 						code = code..text;
 						if(not curPos and param~="") then
 							curPos = #code;
 							if(code:sub(curPos,curPos) == "(") then
-								cursorOnBracket = true;
+								if(cursorOnBracket == nil) then
+									cursorOnBracket = true;
+								end
 							end
 						end
 					end
+				
 					textCtrl:moveCursor(pos.line, from, false);
 					textCtrl:moveCursor(pos.line, to, true);
 

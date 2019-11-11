@@ -28,6 +28,9 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local CreateBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.CreateBlock"));
 
+-- if true, we will skip history
+CreateBlock.nohistory = nil
+
 function CreateBlock:ctor()
 end
 
@@ -97,10 +100,11 @@ function CreateBlock:Run()
 				GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data});
 			end
-
-			if(GameLogic.GameMode:CanAddToHistory()) then
-				add_to_history = true;
-				self.add_to_history = true;
+			if(not self.nohistory) then
+				if(GameLogic.GameMode:CanAddToHistory()) then
+					add_to_history = true;
+					self.add_to_history = true;
+				end
 			end
 		else
 			return
@@ -111,9 +115,11 @@ function CreateBlock:Run()
 		local dy = self.blockY or 0;
 		local dz = self.blockZ or 0;
 
-		if(GameLogic.GameMode:CanAddToHistory()) then
-			add_to_history = true;
-			self.add_to_history = true;
+		if(not self.nohistory) then
+			if(GameLogic.GameMode:CanAddToHistory()) then
+				add_to_history = true;
+				self.add_to_history = true;
+			end
 		end
 
 		blocks = {};

@@ -27,6 +27,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local BlockTemplate = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate"));
 
@@ -45,8 +46,10 @@ BlockTemplate.Operations = {
 BlockTemplate.operation = BlockTemplate.Operations.Load;
 -- how many concurrent creation point allowed: currently this must be 1
 BlockTemplate.concurrent_creation_point_count = 1;
--- true to add to history. 
-BlockTemplate.add_to_history = nil;
+-- true to disable history
+BlockTemplate.nohistory = nil;
+-- true to export hollow model
+BlockTemplate.hollow = nil;
 
 function BlockTemplate:ctor()
 	self.step = 1;
@@ -139,7 +142,7 @@ function BlockTemplate:LoadTemplate()
 					end
 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, bSelect=self.bSelect})
+					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, bSelect=self.bSelect, nohistory = self.nohistory})
 					task:Run();
 					
 					if( self.TeleportPlayer and root_node.attr.player_pos) then
@@ -180,6 +183,47 @@ function BlockTemplate:RemoveTemplate()
 	end
 end
 
+-- remove blocks whose six sides are all solid blocks. 
+function BlockTemplate:MakeHollow()
+	local blocks = self.blocks;
+	if(blocks and #blocks > 0) then
+		local blockmap = {}
+		for index, b in ipairs(blocks) do
+			local x, y, z, block_id = b[1], b[2], b[3], b[4];
+			local block = block_types.get(block_id);
+			if(block and block:isNormalCube()) then
+				blockmap[BlockEngine:GetSparseIndex(x, y, z)] = index;
+			end
+		end
+		local hollowblocks = {}
+		local removeIndex
+		for _, index in pairs(blockmap) do
+			local b = blocks[index];
+			local x, y, z = b[1], b[2], b[3];
+			local isHollow = true;
+			for side=0, 5 do
+				local dx, dy, dz = Direction.GetOffsetBySide(side)
+				if(not blockmap[BlockEngine:GetSparseIndex(x+dx, y+dy, z+dz)]) then
+					isHollow = false
+					break;
+				end
+			end
+			if(isHollow) then
+				hollowblocks[index] = true;
+			end
+		end
+		if(next(hollowblocks)) then
+			local newBlocks = {}
+			for index, b in ipairs(blocks) do
+				if(not hollowblocks[index]) then
+					newBlocks[#newBlocks+1] = b;
+				end
+			end
+			self.blocks = newBlocks
+		end
+	end
+end
+
 -- Save to template. if no 
 -- self.params: root level attributes
 -- self.filename: 
@@ -190,6 +234,7 @@ function BlockTemplate:SaveTemplate()
 	do
 		self.params = self.params or {};
 		self.params.auto_scale = self.auto_scale;
+		self.params.relative_motion = self.relative_motion;
 		local o = {name="pe:blocktemplate", attr = self.params};
 
 		if(not self.blocks) then
@@ -197,14 +242,18 @@ function BlockTemplate:SaveTemplate()
 			local select_task = MyCompany.Aries.Game.Tasks.SelectBlocks.GetCurrentInstance();
 			if(select_task) then
 				local pivot = select_task:GetPivotPoint();
-				-- local block_pivot = BlockEngine:GetBlock(pivot[1],pivot[2],pivot[3]);
-				-- if(block_pivot and block_pivot.id == block_types.names.Command_Block) then
-				-- 	-- TODO: use the displayed pivot point if it is on a command block. 
-				-- end
+				if(self.auto_pivot) then
+					pivot = select_task:GetSelectionPivot();
+				end
+				self.params.pivot = string.format("%d,%d,%d",pivot[1],pivot[2],pivot[3]);
 				self.blocks = select_task:GetCopyOfBlocks(pivot);
 			else
 				return;
 			end
+		end
+
+		if(self.hollow) then
+			self:MakeHollow()
 		end
 
 		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
@@ -288,7 +337,7 @@ function BlockTemplate:AnimLoadTemplate()
 end
 
 function BlockTemplate:AddBlock(block_id, x,y,z,block_data, entity_data, bCheckCanCreate)
-	if(self.add_to_history) then
+	if(not self.nohistory) then
 		local from_id = BlockEngine:GetBlockId(x,y,z);
 		local from_data, last_entity_data;
 		if(from_id and from_id>0) then

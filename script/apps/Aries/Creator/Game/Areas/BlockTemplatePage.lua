@@ -198,6 +198,7 @@ function BlockTemplatePage.OnClickSave()
 			player_pos = player_pos,
 			pivot = pivot,
 			relative_motion = page:GetValue("checkboxRelativeMotion", false),
+			hollow = page:GetValue("checkboxHollow", false),
 		},function ()
 			if(isThemedTemplate) then
 				BlockTemplatePage.CreateBuildingTaskFile(taskfilename, commonlib.Encoding.DefaultToUtf8(filename), name, BlockTemplatePage.blocks,desc);
@@ -217,7 +218,7 @@ function BlockTemplatePage.OnClickSave()
 	end
 end
 
--- @params params: attributes like author, creation_date, name, etc. 
+-- @params params: attributes like author, creation_date, name, relative_motion, hollow, etc. 
 function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot)
 	if( not GameLogic.IsOwner()) then
 		--_guihelper.MessageBox(format("只有世界的作者, 才能保存模板. 请尊重别人的创意,不要盗版!", tostring(WorldCommon.GetWorldTag("nid"))));
@@ -236,7 +237,11 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, params = params, blocks = blocks})
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
+		params = params, 
+		blocks = blocks, 
+		hollow = params and params.hollow,
+	})
 
 	if(task:Run()) then
 		BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
