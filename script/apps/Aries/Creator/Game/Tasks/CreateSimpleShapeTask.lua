@@ -6,7 +6,7 @@ Desc: Create Simple Shapes like ring, circle, sphere, box, cylinder, etc
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateSimpleShapeTask.lua");
-local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ring", radius=12})
+local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ring", radius=12, block_id, block_data})
 task:Run();
 -------------------------------------------------------
 ]]
@@ -18,6 +18,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 
 local CreateSimpleShape = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.CreateSimpleShape"));
@@ -40,6 +41,17 @@ function CreateSimpleShape:Run()
 	local x = self.x;
 	local y = self.y;
 	local z = self.z;
+
+	if(not self.block_id) then
+		local itemStack = EntityManager.GetPlayer():GetItemInRightHand();
+		if(itemStack) then
+			local item = itemStack:GetItem();
+			if(item) then
+				self.block_data = self.block_data or item:GetBlockData(itemStack);
+			end
+		end
+	end
+
 	self.block_id = self.block_id or GameLogic.GetBlockInRightHand() or block_types.names.Grass;
 
 	if(radius>1000) then
@@ -87,7 +99,7 @@ function CreateSimpleShape:FrameMove()
 end
 
 function CreateSimpleShape:AddBlock(block_template, x,y,z)
-	local from_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
+	local from_block_id, from_block_data, from_entity_data = BlockEngine:GetBlockFull(x,y,z)
 	--block_template:Create(x,y,z, true);
 	local block_id;
 	if(block_template and block_template.id) then
@@ -95,8 +107,8 @@ function CreateSimpleShape:AddBlock(block_template, x,y,z)
 	else
 		block_id = self.block_id
 	end
-	BlockEngine:SetBlock(x, y, z, block_id);
-	self.history[#(self.history)+1] = {x,y,z, block_id, from_id};
+	BlockEngine:SetBlock(x, y, z, block_id, self.block_data);
+	self.history[#(self.history)+1] = {x,y,z, block_id, block_data, from_block_id, from_block_data, from_entity_data};
 end
 
 
@@ -247,7 +259,7 @@ function CreateSimpleShape:Redo()
 	if((#self.history)>0) then
 		local _, b;
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[5] or 0);
 		end
 	end
 end
@@ -256,7 +268,7 @@ function CreateSimpleShape:Undo()
 	if((#self.history)>0) then
 		local _, b;
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[6] or 0, b[7], nil, b[8]);
 		end
 	end
 end

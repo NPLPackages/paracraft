@@ -705,6 +705,7 @@ function env_imp:stopMovie(name)
 end
 
 local lastWinId = 0;
+-- @param alignment: if "headon", it means on top of the current actor. default to "_lt"
 -- @return the window object itself
 function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable)
 	if(mcmlCode) then
@@ -713,10 +714,6 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 		end
 		local xmlRoot = ParaXML.LuaXML_ParseString(mcmlCode);
 		if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
-			
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
-			local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
-			local my_window = CodeWindow:new();
 			
 			local globalTable = self;
 			
@@ -739,28 +736,56 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 				return value;
 			end
 			self.codeblock:SetAutoWait(false)
-			NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-			local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
-			local viewport = ViewportManager:GetSceneViewport();
-			my_window:SetCodeBlock(self.codeblock);
-			lastWinId = lastWinId + 1
-			my_window:Show({
-				-- xml here
-				url=xmlRoot, 
-				name = self.codeblock:GetFilename() or ("codeWindow"..lastWinId),
-				alignment = alignment or "_lt", 
-				left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
-				zorder=zorder or zorder, 
-				allowDrag=false,
-				parent = viewport:GetUIObject(true),
-				pageGlobalTable = pageIndex,
-			});
-			self.codeblock:Connect("codeUnloaded", function()
-				my_window:CloseWindow(true)
-			end)
+
+			local my_window;
+			if(alignment == "headon") then
+				if(self.actor) then
+					local entity = self.actor:GetEntity()
+					if(entity) then
+						my_window = entity:SetHeadOnDisplay({
+							url = xmlRoot,
+							pageGlobalTable = pageIndex,
+						})
+					end
+				end
+			else
+				NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+				local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+				local viewport = ViewportManager:GetSceneViewport();
+
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
+				local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
+				my_window = CodeWindow:new();
+
+				my_window:SetCodeBlock(self.codeblock);
+				lastWinId = lastWinId + 1
+				my_window:Show({
+					-- xml here
+					url=xmlRoot, 
+					name = self.codeblock:GetFilename() or ("codeWindow"..lastWinId),
+					alignment = alignment or "_lt", 
+					left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
+					zorder=zorder or zorder, 
+					allowDrag=false,
+					parent = viewport:GetUIObject(true),
+					pageGlobalTable = pageIndex,
+				});
+				self.codeblock:Connect("codeUnloaded", function()
+					my_window:CloseWindow(true)
+				end)
+			end
 			return my_window;
 		else
 			LOG.std(nil, "error", "CodeAPI_MotionLooks",  "invalid xml content in window() function")
+		end
+	else
+		if(alignment == "headon") then
+			if(self.actor) then
+				local entity = self.actor:GetEntity()
+				if(entity) then
+					entity:SetHeadOnDisplay(nil)
+				end
+			end
 		end
 	end
 end

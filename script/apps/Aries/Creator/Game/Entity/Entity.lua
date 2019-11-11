@@ -597,6 +597,25 @@ end
 function Entity:IsShowHeadOnDisplay()
 end
 
+-- display a mcml v2 url or xmlnode on top of the entity. 
+-- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), pageGlobalTable}
+-- if nil, it will remove head on display
+-- @return the headon display object if created
+function Entity:SetHeadOnDisplay(params)
+	if(not params) then
+		if(self.headonEntity) then
+			self.headonEntity:Destroy();
+			self.headonEntity = nil;
+		end
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
+		local HeadonDisplay = commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay");
+		local gui = HeadonDisplay:new():Init(self);
+		gui:Show(params);
+		return gui;
+	end
+end
+
 -- add stat
 function Entity:AddStat(id, delta_count)
 end

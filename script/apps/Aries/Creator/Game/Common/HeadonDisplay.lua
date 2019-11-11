@@ -1,0 +1,183 @@
+--[[
+Title: Headon Display
+Author(s): LiXizhi
+Date: 2019/11/8
+Desc: Create a headon display object
+use the lib:
+-------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
+local HeadonDisplay = commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay");
+local gui = HeadonDisplay:new():Init(EntityManager.GetPlayer());
+gui:Show({url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>')})
+-------------------------------------------------------
+]]
+NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
+NPL.load("(gl)script/ide/System/Windows/Window.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local PainterContext = commonlib.gettable("System.Core.PainterContext");
+local HeadonDisplay = commonlib.inherit(commonlib.gettable("System.Windows.Window"), commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay"));
+local template_name = "HeadonDisplay_mcmlv2"
+local next_id = 0;
+
+
+function HeadonDisplay:ctor()
+	next_id = next_id + 1
+	self.id = tostring(next_id);
+end
+
+local all_instances = {};
+local DummyObject = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"))
+function DummyObject:Init(obj)
+	all_instances[obj.id] = obj;
+	self.obj = obj;
+	return self;
+end
+function DummyObject:Destroy()
+	all_instances[self.obj.id] = nil
+	self.obj:Destroy();
+	local parent = self:GetParent();
+	if(parent) then
+		local obj = parent:GetInnerObject()
+		if(obj) then
+			obj:ShowHeadOnDisplay(false,0);
+		end
+	end
+	return DummyObject._super.Destroy(self)
+end
+
+
+-- @param parentEntity: should be an entity
+function HeadonDisplay:Init(parentEntity)
+	if(parentEntity.headonEntity) then
+		parentEntity.headonEntity:Destroy();
+	end
+	local obj = parentEntity:GetInnerObject()
+	if(obj) then
+		HeadonDisplay.InitHeadonTemplate();
+		obj:ShowHeadOnDisplay(true,0);
+		obj:SetHeadOnUITemplateName(template_name,0);
+		obj:SetHeadOnText(self.id, 0);
+	end
+	self.painter = System.Core.PainterContext:new();
+
+	local dummyObj = DummyObject:new():Init(self)
+	dummyObj:SetParent(parentEntity)
+	self.dummyObj = dummyObj;
+	parentEntity.headonEntity = dummyObj;
+	return self;
+end
+
+function HeadonDisplay:CloseWindow()
+	HeadonDisplay._super.CloseWindow(self, true);
+	if(self.dummyObj) then
+		self.dummyObj:Destroy()
+	end
+end
+
+-- @param params: {url="", alignment, x,y,width, height, allowDrag,zorder, enable_esc_key, DestroyOnClose, parent, pageGlobalTable}
+-- pageGlobalTable can be a custom page environment table, if nil, it will be the global _G. 
+function HeadonDisplay:ShowWithParams(params)
+	self.name = params.name;
+	self.pageGlobalTable = params.pageGlobalTable;
+
+	-- load component if url has changed
+	if(self.url ~= params.url) then
+		self.url = params.url;
+		if(params.url) then
+			self:LoadComponent(params.url);
+			self:urlChanged(self.url);
+		end
+	end
+	if(not self:isCreated()) then
+		self:create_sys();
+	end
+	local bShow = true;
+	if(bShow) then
+		local nativeWnd = self:GetNativeWindow();
+		if(nativeWnd) then
+			-- reposition/attach to parent
+			local left, top, width, height, alignment = params.left, params.top, params.width, params.height, params.alignment or "_lt";
+			self:SetAlignment(alignment);
+			local x, y, width, height = nativeWnd:GetAbsPosition();
+			self.screen_x, self.screen_y = 0, 0;
+			-- update geometry
+			self:setGeometry(x, y, width, height);
+		end
+	end
+	self:SetDestroyOnClose(params.DestroyOnClose)
+	-- show the window
+	self:show();
+end
+
+
+function HeadonDisplay.InitHeadonTemplate()
+	if(HeadonDisplay.ui_obj and HeadonDisplay.ui_obj:IsValid()) then
+		return HeadonDisplay.ui_obj
+	end
+	local _this = ParaUI.CreateUIObject("button", template_name, "_lt",0,0,100,30);
+	HeadonDisplay.ui_obj = _this;
+	_this.visible = false;
+	_this.enabled = false;
+	_this:SetField("OwnerDraw", true); -- enable owner draw paint event
+	_this:AttachToRoot();
+	_this:SetScript("ondraw", HeadonDisplay.onDraw);
+	return HeadonDisplay.ui_obj; 
+end
+
+-- virtual: if this element is a native window, destroy it. 
+function HeadonDisplay:destroy_sys()
+end
+
+-- bind to native window.
+function HeadonDisplay:create_sys(native_window, initializeWindow, destroyOldWindow)
+	if(self:testAttribute("WA_WState_Created")) then
+		LOG.std(nil, "warn", "Window", "window already created before");
+		return;
+	end
+	if(not native_window) then
+		native_window = HeadonDisplay.InitHeadonTemplate()
+	end
+
+	-- painting context
+	self.painterContext = System.Core.PainterContext:new():init(self);
+	
+	local _this = native_window;
+	self.native_ui_obj = _this;
+	self:setAttribute("WA_WState_Created");     
+	self:UpdateGeometry_Sys();
+	if(self.bSelfPaint~=nil) then
+		self:EnableSelfPaint(self.bSelfPaint);
+	end
+	if(not self.AutoClearBackground) then
+		self:SetAutoClearBackground(self.AutoClearBackground);
+	end
+
+	-- redirect events from native ParaUI object to this object. 
+	_this:SetScript("ondraw", HeadonDisplay.onDraw);
+end
+
+function HeadonDisplay.onDraw(obj)
+	local id = obj.text;
+	local self = all_instances[id];
+	if(self) then
+		self:handleRender()
+	end
+end
+
+-- virtual function
+function HeadonDisplay:FilterImage(filename)
+	local filename_, params = filename:match("^([^;#:]+)(.*)$");
+	if(filename_) then
+		local filepath = Files.GetFilePath(filename_);
+		if(filepath) then
+			 if(filepath~=filename_) then
+				filename = filepath..(params or "");
+			 end
+		else
+			-- file not exist, return nil
+			LOG.std(nil, "warn", "CodeWindow", "image file not exist %s", filename);
+			return;
+		end
+	end
+	return filename;
+end
