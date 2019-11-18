@@ -112,6 +112,7 @@ Commands["savetemplate"] = {
 	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [templatename]", 
 	desc=[[save template with current selection
 @param templatename: if no name is provided, it will be default
+@param auto_pivot: if true, use the bottom center of all blocks as pivot
 /savetemplate test
 /savetemplate -hollow test
 /savetemplate -auto_pivot test
