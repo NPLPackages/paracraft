@@ -188,7 +188,12 @@ function ItemColorBlock:PickPenColorAtMouse(result)
 end
 
 -- virtual function: when selected in right hand
-function ItemColorBlock:OnSelect()
+function ItemColorBlock:OnSelect(itemStack)
+	if(itemStack) then
+		local data = itemStack:GetPreferredBlockData() or 0;
+		local color = self:DataToColor(data);
+		self:SetPenColor(color)
+	end
 	ItemColorBlock._super.OnSelect(self);
 	GameLogic.SetStatus(L"Alt+鼠标左键可拾取颜色. Shift+滚轮调节亮度. +/-饱和度");
 end

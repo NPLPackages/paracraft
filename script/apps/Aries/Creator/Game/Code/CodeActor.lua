@@ -873,7 +873,7 @@ end
 
 -- actors of the same group does not collide with one another
 function Actor:CanBeCollidedWith(entity)
-	if(entity.m_actor) then
+	if(entity.m_actor and self.groupId) then
 		return self.entity:IsStaticBlocker() and (self.groupId ~= entity.m_actor.groupId);
 	else
 		return self.entity:IsStaticBlocker();

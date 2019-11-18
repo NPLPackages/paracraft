@@ -180,7 +180,7 @@ end
 
 function CodeBlockWindow:OnCodeChange()
 	if(not CodeBlockWindow.IsVisible()) then
-		CodeBlockWindow.SetCodeEntity(nil);
+		CodeBlockWindow.SetCodeEntity(nil, true);
 	end
 	if(page) then
 		page:Refresh(0.01);
@@ -201,7 +201,7 @@ function CodeBlockWindow.RestoreCursorPosition()
 	end
 end
 
-function CodeBlockWindow.SetCodeEntity(entity)
+function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 	CodeBlockWindow.HighlightCodeEntity(entity);
 	local isEntityChanged = false;
 	if(self.entity ~= entity) then
@@ -222,7 +222,9 @@ function CodeBlockWindow.SetCodeEntity(entity)
 			self.entity:Disconnect("beforeRemoved", self, self.OnEntityRemoved);
 			self.entity:Disconnect("editModeChanged", self, self.UpdateEditModeUI);
 			self.entity:Disconnect("remotelyUpdated", self, self.OnCodeChange);
-			CodeBlockWindow.UpdateCodeToEntity();
+			if(not bNoCodeUpdate) then
+				CodeBlockWindow.UpdateCodeToEntity();
+			end
 		end
 		self.entity = entity;
 		if(page) then
@@ -331,6 +333,7 @@ function CodeBlockWindow.RestoreWindowLayout()
 	local _this = ParaUI.GetUIObject(code_block_window_name)
 	if(_this:IsValid()) then
 		_this.visible = false;
+		_this:LostFocus();
 	end
 	local viewport = ViewportManager:GetSceneViewport();
 	if(viewport:GetMarginRightHandler() == self) then
