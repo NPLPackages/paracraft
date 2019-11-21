@@ -146,22 +146,27 @@ Commands["savetemplate"] = {
 
 Commands["savemodel"] = {
 	name="savemodel", 
-	quick_ref="/savemodel [-auto_scale] [modelname]", 
+	quick_ref="/savemodel [-auto_scale false] [-interactive|i] [modelname]", 
 	desc=[[save bmax model with current selection. 
 @param -auto_scale: whether or not scale model to one block size. default value is true
 @param modelname: if no name is provided, it will be "default"
+@param -interactive or -i: we will ask the user if file already exists
 @return true, filename
 /savemodel test
 /savemodel -auto_scale false test
+/savemodel -interactive test
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local option;
 		local auto_scale;
+		local options = {};
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option) then
 				if(option == "auto_scale") then
 					auto_scale, cmd_text = CmdParser.ParseBool(cmd_text);
+				else
+					options[option] = true;
 				end
 			else
 				break;
@@ -177,13 +182,30 @@ Commands["savemodel"] = {
 		local relative_path = format("blocktemplates/%s.bmax", templatename);
 		local filename = GameLogic.current_worlddir..relative_path;
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
-		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, auto_scale = auto_scale, bSelect=nil})
-		if(task:Run()) then
-			BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
-			return true, relative_path;
+		local function saveModel_()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+			local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, 
+				filename = filename, auto_scale = auto_scale, bSelect=nil, 
+			})
+			if(task:Run()) then
+				BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				return true, relative_path;
+			end
 		end
+
+		if(options.interactive or options.i) then
+			if(ParaIO.DoesFileExist(filename)) then
+				_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						saveModel_()
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+				return
+			end
+		end
+
+		return saveModel_();
 	end,
 };
 

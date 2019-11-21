@@ -31,9 +31,11 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 			local entity = EntityManager.GetBlockEntity(x,y,z);
 			if(entity and entity:isa(EntityManager.EntityCode)) then
 				local langConfigFile = itemStack:GetDataField("langConfigFile");
+				local codeLanguageType = itemStack:GetDataField("codeLanguageType");
 				if(langConfigFile) then
 					entity:SetLanguageConfigFile(langConfigFile);
 				end
+                entity:SetCodeLanguageType(codeLanguageType);
 				local nplCode = itemStack:GetDataField("nplCode");
 				if(nplCode) then
 					entity:SetNPLCode(nplCode);

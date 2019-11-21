@@ -1042,7 +1042,15 @@ end
 -- usually from help window. There can only be one temp code running. 
 -- @param code: string
 function CodeBlock:RunTempCode(code, filename)
+	local hasFastMode = false;
+	if(self:GetEntity() and self:GetEntity():IsAllowFastMode()) then
+		self:GetEntity():SetAllowFastMode(false);
+		hasFastMode = true;
+	end
 	local code_func, errormsg = self:CompileCodeImp(code, filename or "tempcode");
+	if(hasFastMode) then
+		self:GetEntity():SetAllowFastMode(true);
+	end
 	if(not code_func and errormsg) then
 		LOG.std(nil, "error", "CodeBlock", errormsg);
 		local msg = errormsg;

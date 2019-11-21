@@ -18,7 +18,7 @@ CodeCompiler:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFas
 
 local inject_map = {
 	{"^(%s*function%A+[^%)]+%)%s*)$", "%1 checkyield();"},
-	{"^(%s*local%s+function%W+[^%)]+%)%s*)$", "%1 checkyield();"},
+	{"^(%s*local%s+function%W+[^%)]+%)%s*)$", "%1 checkyield();"}, 
 	{"^(%s*for%s.*%s+do%s*)$", "%1 checkyield();"},
 	{"^(%s*while%A.*%Ado%s*)$", "%1 checkyield();"},
 	{"^(%s*repeat%s*)$", "%1 checkyield();"},

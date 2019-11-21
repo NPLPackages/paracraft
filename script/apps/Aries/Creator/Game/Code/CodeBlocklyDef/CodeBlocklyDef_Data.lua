@@ -226,6 +226,9 @@ say(key, 1)
 	nextStatement = true,
 	funcName = "registerCloneEvent",
 	func_description = 'registerCloneEvent(function(%s)\\n%send)',
+    ToPython = function(self)
+		return string.format('def registerCloneEvent_func("%s"):\n  pass\n%registerCloneEvent(registerCloneEvent_func)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
 	end,
@@ -702,6 +705,9 @@ log(t)
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'function(%s)\\n%send',
+    ToPython = function(self)
+		return string.format('def temp_func(%s):\n  pass\n%s\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('function(%s)\n    %s\nend\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
 	end,
@@ -1249,6 +1255,9 @@ assert(monsterCount == 1)
 	nextStatement = true,
 	func_description = '-- %s',
 	func_description_js = '// %s',
+    ToPython = function(self)
+		return string.format('# %s\n', self:getFieldAsString('value'));
+	end,
 	ToNPL = function(self)
 		return string.format('-- %s', self:getFieldAsString('value'));
 	end,
@@ -1288,6 +1297,9 @@ assert(monsterCount == 1)
 	nextStatement = true,
 	func_description = '--[[\\n%s\\n]]',
 	func_description_js = '/**\\n%s\\n*/',
+    ToPython = function(self)
+		return string.format('"""\n%s\n"""', self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('--[[\n%s\n]]', self:getFieldAsString('value'));
 	end,

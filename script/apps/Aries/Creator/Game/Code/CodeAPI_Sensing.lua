@@ -137,8 +137,9 @@ function env_imp:isKeyPressed(keyname)
 end
 
 -- if left mouse button is down
-function env_imp:isMouseDown()
-	return MouseEvent:buttons() == 1;
+-- @param button: nil or 1 means left button, 2 is right button
+function env_imp:isMouseDown(button)
+	return MouseEvent:buttons() == (button or 1);
 end
 
 -- get block position X (prefer integer, unless not in the center of block)

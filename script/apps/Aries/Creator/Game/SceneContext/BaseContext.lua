@@ -899,6 +899,9 @@ function BaseContext:HandleGlobalKey(event)
 		elseif(dik_key == "DIK_F11") then
 			CommandManager:RunCommand("/open npl://console");
 			event:accept();
+		elseif(ctrl_pressed and dik_key == "DIK_P") then
+			CommandManager:RunCommand("/stop");
+			event:accept();
 		else
 			-- ctrl + Keys
 			if(ctrl_pressed) then

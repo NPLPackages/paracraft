@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2019-11-18 11:52+0800\n"
+"POT-Creation-Date: 2019-11-20 17:45+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -1199,12 +1199,14 @@ msgid "大小："
 msgstr "Size:"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:98
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:101
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:99
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:52
 msgid "远程版本号："
 msgstr "Remote revision:"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/ShareWorld/ShareWorld.html:99
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:108
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:106
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:57
 msgid "本地版本号："
 msgstr "Local revision:"
 
@@ -1356,32 +1358,35 @@ msgstr "use"
 msgid "本地名字："
 msgstr "Local name:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:26
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:38
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:24
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:36
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:19
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:20
 msgid "正在处理中，请勿操作..."
 msgstr "In process, do not operate ..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:94
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:92
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseDataSource.html:44
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/UseLocal.html:43
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:41
 msgid "与数据源同步"
 msgstr "Syncing with data source"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:97
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:95
 msgid "世界名称："
 msgstr "World Name:"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:104
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:102
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:54
 msgid "使用远程版本"
 msgstr "Use remote version"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:110
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:108
 msgid "使用本地离线版本"
 msgstr "Use local offline version"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:113
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Templates/StartSync.html:111
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:59
 msgid "使用本地版本"
 msgstr "Use local version"
 
@@ -1411,7 +1416,7 @@ msgstr "Are you sure to use local lower(older) version"
 msgid ", 替换服务器上更高的版本"
 msgstr "to replace remote higher(newer) version"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:211
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:213
 #: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:163
 #: script/apps/Aries/Creator/Game/Login/CreateNewAvatar.lua:254
 #: script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua:260
@@ -1421,18 +1426,41 @@ msgstr "to replace remote higher(newer) version"
 msgid "无效的世界文件"
 msgstr "Invalid world filename"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:220
-#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:176
-msgid "世界已经存在，是否重新下载?"
-msgstr "World already exist, do you want to download again?"
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:227
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:269
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:41
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:134
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:92
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.html:21
+msgid "请稍后..."
+msgstr "Please Wait..."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:240
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:280
+msgid "网络环境差，或离线中，请联网后再试"
+msgstr ""
+"Poor network connection, or offline, please connect to the network and try "
+"again"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:291
 msgid "世界不存在"
 msgstr "The world doesn't exist."
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:261
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/Main.lua:319
 msgid "暂不支持重命名zip世界"
 msgstr "renaming zip world is not supported"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:44
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:610
+msgid "项目ID："
+msgstr "project id:"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:48
+msgid "世界名字："
+msgstr "World name:"
+
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html:49
+msgid "（只读）"
+msgstr "(Read-only)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:485
 msgid "前进"
@@ -1474,10 +1502,6 @@ msgstr "Signout"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:570
 msgid "正在刷新, 请稍候 ... "
 msgstr "Refreshing, please wait..."
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:610
-msgid "项目ID："
-msgstr "project id:"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:610
 msgid "， 点击打开项目页"
@@ -1563,27 +1587,27 @@ msgstr "This world is local and does not need to switch versions"
 msgid "获取服务器世界列表错误"
 msgstr "Failed to fetch world server list"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:612
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:620
 msgid "仅本地"
 msgstr "Local only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:614
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:622
 msgid "仅网络"
 msgstr "Remote only"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:616
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:624
 msgid "本地版本与远程数据源一致"
 msgstr "Local and remote data source are identical"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:618
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:626
 msgid "本地版本更加新"
 msgstr "Local version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:620
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:628
 msgid "远程版本更加新"
 msgstr "Remote version is newer"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:622
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/WorldList.lua:630
 msgid "获取状态中"
 msgstr "Fetching status..."
 
@@ -1606,13 +1630,6 @@ msgstr "You need to login first."
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:36
 msgid "不能切换当前编辑的世界"
 msgstr "Cannot toggle to currently opened world"
-
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:41
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:134
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:93
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.html:21
-msgid "请稍后..."
-msgstr "Please Wait..."
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html:128
 msgid "上传世界后获得"
@@ -1755,7 +1772,7 @@ msgstr "File %s: %s"
 msgid "重复下载"
 msgstr "repeated download"
 
-#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/GitlabService.lua:69
+#: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/GitlabService.lua:70
 #, lua-format
 msgid "%s文件包含了特殊字符或空格，请重命名文件，否则无法上传。"
 msgstr ""
@@ -2417,7 +2434,7 @@ msgid "关于Paracraft..."
 msgstr "About Paracraft..."
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.html:23
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:774
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:777
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua:31
 msgid "编辑模式"
 msgstr "Edit mode"
@@ -3339,8 +3356,8 @@ msgid "尝试索引"
 msgstr "attempt to index"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:219
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1049
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1145
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1057
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1153
 #, lua-format
 msgid ""
 "编译错误: %s\n"
@@ -3354,7 +3371,7 @@ msgstr ""
 msgid "编译成功!"
 msgstr "Compile succeed!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1162
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1170
 #: script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua:216
 #, lua-format
 msgid ""
@@ -3364,7 +3381,7 @@ msgstr ""
 "Runtime Error:%s\n"
 "in %s"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1172
+#: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:1180
 #, lua-format
 msgid "没有找到文件: %s"
 msgstr "File not found:%s"
@@ -3515,11 +3532,11 @@ msgstr "Actor Model"
 msgid "也可以通过电影方块编辑"
 msgstr "You can also edit through the movie block"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:956
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:961
 msgid "未命名"
 msgstr "Unnamed"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:966
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:971
 msgid "https://keepwork.com/official/paracraft/codeblock"
 msgstr "https://keepwork.com/official/paracraft/codeblock"
 
@@ -4791,56 +4808,56 @@ msgid "鼠标是否按下"
 msgstr "mouse down?"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:541
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:586
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:589
 msgid "点击任意位置传送"
 msgstr "Click anywhere to teleport"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:554
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:557
 msgid "鼠标XY"
 msgstr "mouse XY"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:574
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:577
 msgid "鼠标选取"
 msgstr "mouse pick"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:597
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:600
 msgid "获取方块%1 %2 %3"
 msgstr "get block%1%2%3"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:641
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:644
 msgid "获取方块的Data数据"
 msgstr "get block data"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:645
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:648
 msgid "获取方块的Entity数据"
 msgstr "get block entity data"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:660
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:663
 msgid "放置方块%1 %2 %3 %4"
 msgstr "set block %1 %2 %3 to %4"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:722
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:725
 msgid "计时器"
 msgstr "timer"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:744
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:747
 msgid "重置计时器"
 msgstr "reset timer"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:774
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:777
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:998
 msgid "游戏模式"
 msgstr "view mode"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:793
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:796
 msgid "设置模式%1"
 msgstr "set game mode %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:819
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:822
 msgid "当前游戏模式"
 msgstr "get game mode"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:831
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:834
 msgid "防作弊密码锁"
 msgstr "anti-cheating password lock"
 
@@ -5717,6 +5734,10 @@ msgstr "Auto save mode turned off"
 #: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:65
 msgid "自动保存模式开启"
 msgstr "Auto save mode turned on"
+
+#: script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua:176
+msgid "世界已经存在，是否重新下载?"
+msgstr "World already exist, do you want to download again?"
 
 #: script/apps/Aries/Creator/Game/Common/Translation.lua:241
 msgid "点击这里继续"
@@ -10222,7 +10243,7 @@ msgstr "Ctrl+Right click on bone block to edit"
 msgid "输入摄影机的名字"
 msgstr "Enter camera name"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:407
+#: script/apps/Aries/Creator/Game/Entity/EntityCode.lua:421
 msgid "输入代码"
 msgstr "Enter your code"
 
@@ -10754,6 +10775,7 @@ msgstr "ParaX 3D model exporter"
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:93
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:102
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:111
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:121
 msgid "系统内置插件"
 msgstr "system internal plugin"
 
@@ -10796,6 +10818,10 @@ msgstr "Bluetooth Intelligent building block monitoring"
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:110
 msgid "蓝牙模块"
 msgstr "Bluetooth module"
+
+#: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:120
+msgid "PyRuntime"
+msgstr "PyRuntime"
 
 #: script/apps/Aries/Creator/Game/Login/ChangeLanguagePage.html:31
 msgid "系统默认:"
@@ -11314,7 +11340,6 @@ msgid "输入课程ID或项目ID"
 msgstr "enter class id or project id"
 
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:41
-#: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:21
 msgid "Paracraft动画与编程教学"
 msgstr "Paracraft Animation and Programming Tutorial Videos"
 
@@ -12004,17 +12029,39 @@ msgstr ""
 "Paracraft is a free movie making tool for everyone. You can create movie "
 "scenes, actors, text, music, cameras, etc, in an immersive 3d world. "
 
+#: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:21
+msgid "基于粒子的3D建模，高级场景编辑"
+msgstr "block based 3d modeling, advanced scene editing"
+
 #: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:22
 msgid "方块建模"
 msgstr "Block modeling"
+
+#: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:23
+msgid "强大易用的骨骼动画系统，支持3D骨骼动画，反向动力学"
+msgstr ""
+"Powerful, easy-to-use bone animation system with support for full 3D bone "
+"animation and inverse kinematics."
 
 #: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:24
 msgid "骨骼动画"
 msgstr "Bone Animation"
 
+#: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:27
+msgid "电影制作，支持3D动画电影的串联、并联，以及配音、字幕，导出视频"
+msgstr ""
+"movie making, supporting playing 3D animations in series or in parallel, as "
+"well as adding subtitles and video exporting."
+
 #: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:28
 msgid "电影动画"
 msgstr "Movie and Animation"
+
+#: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:29
+msgid "基于动画的编程，支持图形化编程，文本编程，多人协作"
+msgstr ""
+"Animation-based programming, supporting graphical programming, text "
+"programming and multiplayer collaborations."
 
 #: script/apps/Aries/Creator/Game/Login/UserIntroduction.html:30
 msgid "程序设计"
@@ -12978,7 +13025,7 @@ msgstr "2,3,4 key to change tools; click 2 key again to use trans tool"
 msgid "左键选择骨骼, ESC取消选择, -/+遍历选择"
 msgstr "left click to select bone, esc to deselect, -/+ key to tranverse"
 
-#: script/apps/Aries/Creator/Game/SceneContext/EditMovieContext.lua:395
+#: script/apps/Aries/Creator/Game/SceneContext/EditMovieContext.lua:390
 msgid "人物在锁定模式不可运动(L键可解锁)"
 msgstr "Can not move actor in lock mode (Press L key to unlock)"
 

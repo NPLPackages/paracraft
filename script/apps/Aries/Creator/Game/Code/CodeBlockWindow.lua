@@ -238,7 +238,7 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 	if(codeBlock) then
 		local text = codeBlock:GetLastMessage() or "";
 		if(text == "" and not CodeBlockWindow.GetMovieEntity()) then
-			if(self.entity) then
+			if(self.entity and self.entity:IsCodeEmpty()) then
 				if(self.entity:AutoCreateMovieEntity()) then
 					text = L"我们在代码方块旁边自动创建了一个电影方块! 你现在可以用代码控制电影方块中的演员了!";
 				else
@@ -716,7 +716,7 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	end
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
-		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
+		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
 	end
 end
 
@@ -763,7 +763,7 @@ function CodeBlockWindow.GetCustomToolbarMCML()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	local mcmlText;
 	if(entity) then
-		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile());
+		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
 		mcmlText = LanguageConfigurations:GetCustomToolbarMCML(entity:GetLanguageConfigFile())
 	end
 	if(not mcmlText) then
@@ -894,16 +894,18 @@ end
 function CodeBlockWindow.GetBlockEditorUrl()
     local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
+    local codeLanguageType;
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
 		if(bz) then
 			blockpos = format("%d,%d,%d", bx, by, bz);
 		end
+        codeLanguageType = entity:GetCodeLanguageType();
 	end
 
 	local request_url = "npl://blockeditor"
 	if(blockpos) then
-		request_url = request_url..format("?blockpos=%s", blockpos);
+		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s", blockpos, codeLanguageType or "npl");
 	end
     NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
 	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
@@ -913,16 +915,19 @@ end
 function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
+    local codeLanguageType;
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
 		if(bz) then
 			blockpos = format("%d,%d,%d", bx, by, bz);
 		end
+
+        codeLanguageType = entity:GetCodeLanguageType();
 	end
 
 	local request_url = "npl://blockeditor"
 	if(blockpos) then
-		request_url = request_url..format("?blockpos=%s", blockpos);
+		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s", blockpos, codeLanguageType or "npl");
 	end
 	NplBrowserLoaderPage.Check(function() 		end);
 

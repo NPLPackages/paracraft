@@ -98,6 +98,27 @@ NPL.export({
 ]]}},
 },
 {
+	type = "mcml_data_label", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "label",
+		},
+	},
+	output = {type = "null",},
+	category = "McmlData", 
+	helpUrl = "", 
+	canRun = true,
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('%s',self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
 	type = "mcml_data_string", 
 	message0 = "\"%1\"",
 	arg0 = {
@@ -118,7 +139,6 @@ NPL.export({
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
-
 {
 	type = "mcml_data_number", 
 	message0 = "%1",
@@ -182,7 +202,18 @@ NPL.export({
 	category = "McmlData", 
 	helpUrl = "", 
 	canRun = true,
-	func_description = '%s',
+	func_description_lua_provider = [[
+        var text = Blockly.Lua.valueToCode(block, 'value');
+        if (text) {
+            var index = text.indexOf("\'");
+            var last_index = text.lastIndexOf("\'");
+            if (index > -1 && last_index > -1) {
+                text = text.substr(index + 1, last_index - 1);
+            }
+
+        }
+        return [text]
+    ]],
 	ToNPL = function(self)
 		return string.format('%s',self:getFieldValue('value'));
 	end,
@@ -190,36 +221,5 @@ NPL.export({
 ]]}},
 },
 
-{
-	type = "mcml_multi_attrs", 
-	message0 = "%1",
-	arg0 = {
-        {
-            name = "add" ,
-            type = "field_button",
-            content =  {
-                src = "png/plus-2x.png",
-            },
-            width =  16,
-            height =  16,
-            isLabel = false,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-	},
-	output = {type = "null",},
-	category = "McmlData", 
-	helpUrl = "", 
-	canRun = true,
-	func_description = '%s',
---    func_description_lua_provider = [[
---    var a= 1;
---    return ['"testaaaa"']
---]],
-	ToNPL = function(self)
-		return "";
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
 ---------------------
 })

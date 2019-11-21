@@ -30,6 +30,9 @@ local cmds = {
 	nextStatement = true,
 	funcName = "registerClickEvent",
 	func_description = 'registerClickEvent(function()\\n%send)',
+    ToPython = function(self)
+		return string.format('def registerClickEvent_func():\n  pass\n%sregisterClickEvent(registerClickEvent_func)\n', self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
@@ -107,6 +110,9 @@ end)
 	nextStatement = true,
 	funcName = "registerKeyPressedEvent",
 	func_description = 'registerKeyPressedEvent(%s, function(msg)\\n%send)',
+    ToPython = function(self)
+		return string.format('def registerKeyPressedEvent_func("%s"):\n  pass\nregisterKeyPressedEvent(%s,registerKeyPressedEvent_func)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,

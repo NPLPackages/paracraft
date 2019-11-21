@@ -544,6 +544,9 @@ while(true) do
     if(isMouseDown()) then
         moveTo("mouse-pointer")
         wait(0.3)
+    elseif(isMouseDown(2)) then
+        tip("right mouse button down")
+        wait(0.3)
     end
 end
 ]]}},

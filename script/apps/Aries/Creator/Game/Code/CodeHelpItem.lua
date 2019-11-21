@@ -129,7 +129,7 @@ function CodeHelpItem:GetHtml()
 						arg_text = format('<div style="margin:5px;background-color:#cec8a8;width:80px;height:10px;padding-left:5px;">%s</div>', tostring(item_text or ""));
 					elseif(arg_item.type == "input_expression"  or arg_item.type == "expression") then
 						arg_text = format('<div style="float:left;min-width:25px;height:14px;margin:3px;background-color:#80ff80;color:#000000;">%s</div>', tostring(item_text or ""));
-					elseif(arg_item.type == "input_dummy") then
+					elseif(arg_item.type == "input_dummy" or arg_item.type == "field_button" ) then
 						arg_text = "";
 					else
 						arg_text = format('<span style="font-weight:bold">arg%d<span>', arg_index);
@@ -173,9 +173,19 @@ function CodeHelpItem:getFieldAsString(name)
 	return tostring(self:getFieldValue(name) or "");
 end
 
+-- @param codeLanguageType: "npl" or "javascript" or "python"
 -- @return "" if no code is generated
-function CodeHelpItem:GetNPLCode()
-	if(self.npl_code) then
+function CodeHelpItem:GetNPLCode(codeLanguageType)
+    codeLanguageType = codeLanguageType or "npl"
+
+    if(codeLanguageType == "python")then
+        return self:GetNPLCode_python();
+    else
+        return self:GetNPLCode_npl();
+    end
+end
+function CodeHelpItem:GetNPLCode_npl()
+    if(self.npl_code) then
 		return self.npl_code;
 	end
 	local npl_code = ""
@@ -185,7 +195,22 @@ function CodeHelpItem:GetNPLCode()
 	self.npl_code = npl_code;
 	return npl_code;
 end
-
+function CodeHelpItem:GetNPLCode_python()
+    if(self.python_code) then
+		return self.python_code;
+	end
+	local python_code = ""
+    if(self.ToPython)then
+		python_code = (self:ToPython() or "");
+    else
+		if(self.ToNPL) then
+		    python_code = (self:ToNPL() or "");
+	    end
+    end
+	
+	self.python_code = python_code;
+	return python_code;
+end
 function CodeHelpItem:CopyNPLCodeToClipboard()
 	local code = self:GetNPLCode();
 	if(code) then
@@ -234,7 +259,7 @@ function CodeHelpItem:OpenHelpUrl()
 	end
 end
 
-function CodeHelpItem:GetNPLCodeExample()
+function CodeHelpItem:GetNPLCodeExample(codeLanguageType)
 	if(self.examples) then
 		local example = self.examples[1];
 		return example and example.code;

@@ -38,10 +38,13 @@ local category_items = {};
 local all_command_names = {};
 local all_function_names = commonlib.ArrayMap:new();
 local languageConfigFile = "";
+CodeHelpWindow.codeLanguageType = "npl"; -- "npl" or "javascript" or "python"
 
 -- public:
 -- see also: https://github.com/NPLPackages/paracraft/wiki/languageConfigFile
-function CodeHelpWindow.SetLanguageConfigFile(filename)
+
+function CodeHelpWindow.SetLanguageConfigFile(filename,codeLanguageType)
+    CodeHelpWindow.codeLanguageType = codeLanguageType or "npl"
 	if(languageConfigFile ~= (filename or "")) then
 		languageConfigFile = filename;
 		CodeHelpWindow.category_index = 1;
@@ -220,7 +223,7 @@ function CodeHelpWindow.RunSampleCodeByName(name)
 	if(item and item:CanRun()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-		CodeBlockWindow.RunTempCode(item:GetNPLCode(), item:GetName().."_sample");
+		CodeBlockWindow.RunTempCode(item:GetNPLCode(CodeHelpWindow.codeLanguageType), item:GetName().."_sample");
 	end
 end
 
@@ -229,7 +232,7 @@ function CodeHelpWindow.RunSampleCodeExampleByName(name)
 	if(item and item:CanRunExample()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-		CodeBlockWindow.RunTempCode(item:GetNPLCodeExample(), item:GetName().."_example");
+		CodeBlockWindow.RunTempCode(item:GetNPLCodeExample(CodeHelpWindow.codeLanguageType), item:GetName().."_example");
 	end
 end
 
@@ -292,7 +295,8 @@ function CodeHelpWindow.OnDragEnd(name)
 			if(CodeBlockWindow.IsBlocklyEditMode()) then
 				_guihelper.MessageBox(L"图块模式下不能直接编辑代码, 请用图块编辑器");
 			else
-				CodeBlockWindow.InsertCodeAtCurrentLine(item:GetNPLCode(), not item:HasOutput());
+                local code = item:GetNPLCode(CodeHelpWindow.codeLanguageType);
+				CodeBlockWindow.InsertCodeAtCurrentLine(code, not item:HasOutput());
 			end
 		end
 	end
@@ -315,7 +319,7 @@ function CodeHelpWindow.GenerateWikiDocs(bSilent)
 					local item = items[i];
 					local dsItem = item:GetDSItem();
 					if(dsItem) then
-						local code = item and item:GetNPLCode();
+						local code = item and item:GetNPLCode(CodeHelpWindow.codeLanguageType);
 						if(code) then
 							code = code:gsub("\r?\n%s*\r?\n", "\n")
 							local html = item:GetHtml() or ""
@@ -328,7 +332,7 @@ function CodeHelpWindow.GenerateWikiDocs(bSilent)
 							end
 							docs[#docs+1] = '\n</div>\n<div style="float:left;">\n\n'
 							docs[#docs+1] = "```lua\n"
-							local examples = item:GetNPLCodeExamples();
+							local examples = item:GetNPLCodeExamples(CodeHelpWindow.codeLanguageType);
 							docs[#docs+1] = examples;
 							if(not examples:match("\n%s*$")) then
 								docs[#docs+1] = "\n"

@@ -114,6 +114,14 @@ BuildinMod.buildin_mods = {
 		-- load this module when the package is loaded
 		loadOnStartup = true, 
 	},
+    {
+		name = "PyRuntime", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"PyRuntime", 
+		text=L"系统内置插件",
+		version = "1.0.0",
+		homepage = "https://github.com/tatfook/PyRuntime",
+	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
 

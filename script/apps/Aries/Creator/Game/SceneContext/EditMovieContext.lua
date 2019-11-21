@@ -381,11 +381,6 @@ function EditMovieContext:ToggleLockAllActors(block)
 end
 
 function EditMovieContext:HandleGlobalKey(event)
-	EditMovieContext._super.HandleGlobalKey(self, event);
-	if(event:isAccepted()) then
-		return true;
-	end
-
 	local dik_key = event.keyname;
 	local actor = SelectionManager:GetSelectedActor();
 	local player = EntityManager.GetFocus();
@@ -476,6 +471,11 @@ function EditMovieContext:HandleGlobalKey(event)
 			event:accept();
 		end
 	end
+
+	if(not event:isAccepted()) then
+		return EditMovieContext._super.HandleGlobalKey(self, event);
+	end
+
 	return event:isAccepted();
 end
 

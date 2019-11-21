@@ -135,6 +135,13 @@ function Entity:GetNPLCode()
 	return self.nplcode or self:GetCommand();
 end
 
+function Entity:IsCodeEmpty()
+	local cmd = self:GetCommand()
+	if(not cmd or cmd == "") then
+		return true;
+	end
+end
+
 function Entity:TextToXmlInnerNode(text)
 	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
 		return {name="![CDATA[", [1] = text};
@@ -174,7 +181,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self:GetLanguageConfigFile()~="") then
 		node.attr.languageConfigFile = self:GetLanguageConfigFile();
 	end
-	
+	if(self:GetCodeLanguageType() ~= "" and self:GetCodeLanguageType() ~= nil) then
+		node.attr.codeLanguageType = self:GetCodeLanguageType();
+	end
 	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
 		local blocklyNode = {name="blockly", };
 		node[#node+1] = blocklyNode;
@@ -201,7 +210,8 @@ function Entity:LoadFromXMLNode(node)
 	self.isAllowFastMode = (node.attr.allowFastMode == "true" or node.attr.allowFastMode == true);
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
-
+	self.codeLanguageType = node.attr.codeLanguageType;
+    
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
 		self:ScheduleRefresh();
@@ -396,6 +406,10 @@ function Entity:GetCodeBlock(bCreateIfNotExist)
 		self.codeBlock = CodeBlock:new():Init(self);
 	end
 	return self.codeBlock;
+end
+
+function Entity:IsCodeLoaded()
+	return self.codeBlock and self.codeBlock:IsLoaded();
 end
 
 function Entity:GetFilename()
@@ -656,6 +670,18 @@ function Entity:SetLanguageConfigFile(filename)
 	end
 end
 
+-- set code language type
+-- @param type: "npl" or "javascript" or "python"
+function Entity:SetCodeLanguageType(type)
+    type = type or "npl"
+	if(self:GetCodeLanguageType() ~= type) then
+		self.codeLanguageType = type;
+	end
+end
+-- @return "npl" or "javascript" or "python"
+function Entity:GetCodeLanguageType()
+    return self.codeLanguageType;
+end
 function Entity:ClearIncludedFiles()
 	self.includedFiles = nil;
 end

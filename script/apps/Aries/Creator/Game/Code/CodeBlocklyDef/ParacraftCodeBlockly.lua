@@ -134,3 +134,36 @@ end
 function ParacraftCodeBlockly.GetCodeExamples()
 	return all_examples;
 end
+
+function ParacraftCodeBlockly.CompileCode(code, filename, codeblock)
+    local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
+    local entity = codeblock:GetEntity();
+    local compiler = CodeCompiler:new():SetFilename(filename)
+	if(codeblock and entity and entity:IsAllowFastMode()) then
+		compiler:SetAllowFastMode(true);
+	end
+    local codeLanguageType;
+    if(entity.GetCodeLanguageType)then
+        codeLanguageType = entity:GetCodeLanguageType();
+    end
+    if(codeLanguageType == "python")then
+        local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
+        local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2lua/polyfill.lua")
+        pyruntime:installMethods(codeblock:GetCodeEnv(),py_env);
+        -- this callback is synchronous 
+        pyruntime:transpile(code, function(res)
+            local lua_code = res.lua_code;
+            if(not lua_code)then
+                local error_msg = res.error_msg;
+	            LOG.std(nil, "error", "CodePyToNplPage", error_msg);
+                code = "";
+                return
+            end
+            code = lua_code;
+        end)
+		codeblock:SetModified(true);
+        return  compiler:Compile(code);
+    else
+	    return compiler:Compile(code);
+    end
+end

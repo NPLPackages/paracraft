@@ -24,7 +24,7 @@ function CodeBlocklyGenerator:ctor()
     self.language_names = {
         ["lua"] = { blockly_namesapce = "Lua", function_name = "func_description", function_provider_name = "func_description_lua_provider", },
         ["javascript"] = { blockly_namesapce = "JavaScript", function_name = "func_description_js", function_provider_name = "func_description_js_provider", },
-        ["python"] = { blockly_namesapce = "Python", function_name = "func_description_py", },
+        ["python"] = { blockly_namesapce = "Python", function_name = "func_description_py", function_provider_name = "func_description_py_provider", },
     }
 end
 
@@ -288,7 +288,10 @@ function CodeBlocklyGenerator:ArgsToStr(cmd,language)
     local language_name = self:GetLanguageName(language);
     local func_name = self:GetFunctionName(language);
 	local func_description = cmd[func_name];
-
+    if(language == "python")then
+        -- get func_description from lua func_description if python func_description is nil
+        func_description = func_description or cmd[self:GetFunctionName("lua")];
+    end
     local func_provider_name = self:GetFunctionProviderName(language);
 	local func_description_provider = cmd[func_provider_name];
 	

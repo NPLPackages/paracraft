@@ -28,8 +28,8 @@ function McmlBlockly.AppendAll()
 	
 	local all_source_cmds = {
 		NPL.load("./McmlBlocklyDef_Controls.lua"),
-		NPL.load("./McmlBlocklyDef_Styles.lua"),
 		NPL.load("./McmlBlocklyDef_Attrs.lua"),
+		NPL.load("./McmlBlocklyDef_Styles.lua"),
 		NPL.load("./McmlBlocklyDef_Data.lua"),
 	}
 	for k,v in ipairs(all_source_cmds) do

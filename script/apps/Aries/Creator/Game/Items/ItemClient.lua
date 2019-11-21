@@ -36,6 +36,10 @@ local ds_category_blocks = {};
 
 local custom_block_ids = {};
 
+-- the first custom block id
+local custom_block_id_begin = 2000;
+local custom_block_id_max_count = 3000;
+
 -- add new preloaded item class here. 
 function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/Item.lua");	
@@ -235,6 +239,32 @@ function ItemClient.GetBlockDS(category_name)
 	return ds_blocks;
 end
 
+function ItemClient.MergeCustomBlockToDS(bImmediate)
+	if(not bImmediate) then
+		ItemClient.merge_timer = ItemClient.merge_timer or commonlib.Timer:new({callbackFunc = function(timer)
+			ItemClient.MergeCustomBlockToDS(true)
+		end})
+		ItemClient.merge_timer:Change(1);
+	else
+		local ds = ItemClient.GetBlockDS("tool")
+		-- all custom blocks are in tool category by default
+		if(ds) then
+			-- first remove all custom blocks, and then add again
+			local maxid = custom_block_id_begin+custom_block_id_max_count
+			for i=#ds, 1, -1  do
+				local item = ds[i];
+				if(item.block_id and item.block_id>=custom_block_id_begin and item.block_id<=maxid) then
+					commonlib.removeArrayItem(ds, i);
+				end
+			end
+			for _, item in pairs(custom_block_ids) do
+				ds[#ds+1] = item;
+			end
+		end
+	end
+end
+
+
 function ItemClient.GetItemCount(block_id)
 	return items_count[block_id] or 0
 end
@@ -333,9 +363,6 @@ function ItemClient.OnLeaveWorld()
 	end
 end
 
--- the first custom block id
-local custom_block_id_begin = 2000;
-local custom_block_id_max_count = 3000;
 
 -- custom block is used defined blocks in the current world directory. 
 function ItemClient.LoadCustomBlocks()
@@ -497,6 +524,8 @@ function ItemClient.RegisterCustomItem(params)
 		end
 		-- add to custom block 
 		custom_block_ids[block_id] = item;
+
+		ItemClient.MergeCustomBlockToDS();
 		return item;
 	end
 end

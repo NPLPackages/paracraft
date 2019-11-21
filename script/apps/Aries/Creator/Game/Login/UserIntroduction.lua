@@ -103,9 +103,24 @@ function UserIntroduction.CheckShowOnStartup()
 	end
 end
 
-function UserIntroduction.OnClick1()
-	local url = format("%s/official/docs/index", KeepworkService:GetKeepworkUrl())
-	ParaGlobal.ShellExecute("open", url, "", "", 1)
+function UserIntroduction.OnClickBlock()
+	local url = "https://keepwork.com/official/docs/references/features/3d_modeling";
+	ParaGlobal.ShellExecute("open", url, "", "", 1);
+end
+
+function UserIntroduction.OnClickBone()
+	local url = "https://keepwork.com/official/docs/references/features/animation";
+	ParaGlobal.ShellExecute("open", url, "", "", 1);
+end
+
+function UserIntroduction.OnClickMovie()
+	local url = "https://keepwork.com/official/docs/references/features/movie_making";
+	ParaGlobal.ShellExecute("open", url, "", "", 1);
+end
+
+function UserIntroduction.OnClickProgramming()
+	local url = "https://keepwork.com/official/docs/references/features/programming";
+	ParaGlobal.ShellExecute("open", url, "", "", 1);
 end
 
 function UserIntroduction.ShowUserGuide()

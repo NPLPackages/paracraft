@@ -613,3 +613,25 @@ Commands["copytoclipboard"] = {
 	end,
 };
 
+Commands["stop"] = {
+	name="stop", 
+	quick_ref="/stop", 
+	desc=[[stop all running code blocks (only for edit mode). Hot key is Ctrl+P.
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		if(GameLogic.GameMode:IsEditor()) then
+			-- stop all code blocks
+			local entities = GameLogic.EntityManager.FindEntities({category="b", type="EntityCode"});
+			if(entities and #entities>0) then
+				local count = 0
+				for _, entity in ipairs(entities) do
+					if(entity:IsCodeLoaded()) then
+						entity:GetCodeBlock():Stop();
+						count = count + 1
+					end
+				end
+				GameLogic.AddBBS(nil, format("%d/%d code block is stopped", count, #entities));
+			end
+		end
+	end,
+};
