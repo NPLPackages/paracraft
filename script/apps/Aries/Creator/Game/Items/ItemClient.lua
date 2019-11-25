@@ -389,6 +389,7 @@ function ItemClient.LoadCustomBlocks()
 			end
 		end
 	end
+	ItemClient.MergeCustomBlockToDS();
 end
 
 -- custom block is user defined blocks in the current world directory. 

@@ -1491,6 +1491,9 @@ function Entity:SetPhysicsRadius(radius)
 		if(obj) then
 			obj:SetField("Physics Radius", radius);
 		end
+		if(radius<=0) then
+			self:SetStaticBlocker(false);
+		end
 	end
 end
 

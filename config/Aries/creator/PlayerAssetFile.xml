@@ -140,9 +140,9 @@
 	<asset filename="character/v3/Npc/wuzei/wuzei.x" displayname="乌贼" name="wuzei"/>
 	<asset filename="character/v5/02animals/Deer/Deer.x" displayname="小鹿" name="Deer"/>
 	<asset filename="character/v5/02animals/Elk/Elk.x" displayname="圣诞驯鹿" name="Elk"/>
-	<asset filename="character/v5/02animals/HaiTun/HaiTun.x" displayname="海豚" name="HaiTun"/>
+	<asset filename="character/v5/02animals/HaiTun/HaiTun.x" displayname="海豚" name="HaiTun" hidden="true"/>
 	<asset filename="character/v5/02animals/HalloweenBat/HalloweenBat.x" displayname="万圣节蝙蝠" name="HalloweenBat"/>
-	<asset filename="character/v5/02animals/JingYu/JingYu.x" displayname="鲸鱼" name="JingYu"/>
+	<asset filename="character/v5/02animals/JingYu/JingYu.x" displayname="鲸鱼" name="JingYu" hidden="true"/>
 	<asset filename="character/v5/02animals/JuXiangLv1/JuXiangLv1.x" displayname="巨象Lv1" name="JuXiangLv1"/>
 	<asset filename="character/v5/02animals/JuXiangLv2/JuXiangLv2.x" displayname="巨象Lv2" name="JuXiangLv2"/>
 	<asset filename="character/v5/02animals/JuXiangLv3/JuXiangLv3.x" displayname="巨象Lv3" name="JuXiangLv3"/>

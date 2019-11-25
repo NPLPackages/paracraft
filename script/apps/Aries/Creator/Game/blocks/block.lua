@@ -24,6 +24,7 @@ NPL.load("(gl)script/ide/System/Core/Color.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local Color = commonlib.gettable("System.Core.Color");
 local BlockPieceEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.BlockPieceEffect");
@@ -211,7 +212,7 @@ function block:GetTextureObj(texture_index)
 		if(self.texture_obj~=nil) then
 			return self.texture_obj;
 		else
-			if(type(self.texture) == "string" and (self.texture:match("%.png$") or self.texture:match("%.dds$"))) then
+			if(type(self.texture) == "string" and (self.texture:match("%.png$") or self.texture:match("%.dds$") or self.texture:match("%.jpg"))) then
 				self.texture_obj = ParaAsset.LoadTexture("", self.texture, 1);
 				return self.texture_obj;
 			else
@@ -229,7 +230,7 @@ function block:GetTextureObj(texture_index)
 			return texture_objs[texture_index];
 		else
 			local texture = self:GetTexture(texture_index);
-			if(type(self.texture) == "string" and (self.texture:match("%.png$") or self.texture:match("%.dds$"))) then
+			if(type(self.texture) == "string" and (self.texture:match("%.png$") or self.texture:match("%.dds$" or self.texture:match("%.jpg")))) then
 				texture_objs[texture_index] = ParaAsset.LoadTexture("", texture, 1);
 				return texture_objs[texture_index];
 			else

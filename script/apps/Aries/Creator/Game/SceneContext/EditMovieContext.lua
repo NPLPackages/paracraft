@@ -367,13 +367,29 @@ function EditMovieContext:OnAfterActorFocusChanged()
 	end
 end
 
+-- usually when k key is pressed
+function EditMovieContext:AddKeyFrame()
+	local movieclip = MovieManager:GetActiveMovieClip();
+	if(movieclip and not movieclip:IsPlayingMode()) then
+		local actor = SelectionManager:GetSelectedActor();
+		if(actor and movieclip:IsPaused()) then
+			if(not actor:IsAllowUserControl()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
+				local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+				MovieClipTimeLine.OnClickAddSubFrameKey();
+			else
+				MovieClipController.OnAddKeyFrame();
+			end
+			return true
+		end
+	end	
+end
+
 -- @param block: if nil, means toggle
 function EditMovieContext:ToggleLockAllActors(block)
 	local movieclip = MovieManager:GetActiveMovieClip();
 	if(movieclip and not movieclip:IsPlayingMode()) then
 		if(movieclip:IsPaused()) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 			MovieClipController.ToggleLockAllActors(block);
 		end
 		return true;
@@ -434,13 +450,7 @@ function EditMovieContext:HandleGlobalKey(event)
 		end
 	end
 	if(dik_key == "DIK_K") then
-		local movieclip = MovieManager:GetActiveMovieClip();
-		if(movieclip and not movieclip:IsPlayingMode()) then
-			if(movieclip:IsPaused()) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-				local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-				MovieClipController.OnAddKeyFrame();
-			end
+		if(self:AddKeyFrame()) then
 			event:accept();
 		end
 	elseif(dik_key == "DIK_L") then
@@ -449,8 +459,6 @@ function EditMovieContext:HandleGlobalKey(event)
 		end
 	elseif(dik_key == "DIK_R") then
 		if(not event.ctrl_pressed) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 			if(MovieClipController.OnRecordKeyPressed()) then
 				event:accept();
 			end
@@ -633,8 +641,6 @@ function EditMovieContext:handleDropFile(filename, fileType)
 	if(movieclip and not movieclip:IsPlayingMode()) then
 		local itemStack = movieclip:CreateNPC();
 		if(itemStack) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 			MovieClipController.SetFocusToItemStack(itemStack);
 			local actor = MovieClipController.GetMovieActor();
 			if(actor) then
