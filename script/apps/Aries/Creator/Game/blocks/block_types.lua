@@ -491,6 +491,7 @@ function block_types.LoadFromFile(filename)
 				attr.solid = attr.solid == "true";
 				attr.cubeMode = attr.cubeMode == "true";
 				attr.light = attr.light == "true";
+				attr.liquid = attr.liquid == "true";
 				attr.threeSideTex = attr.threeSideTex == "true";
 				attr.singleSideTex = attr.singleSideTex == "true";
 				attr.fourSideTex = attr.fourSideTex == "true";

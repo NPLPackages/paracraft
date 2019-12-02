@@ -39,6 +39,13 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	func_description = '((%s) %s (%s))',
+	ToPython = function(self)
+		local op = self:getFieldAsString('op')
+		if op == '^' then
+			op = '**'
+		end
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), op, self:getFieldAsString('right'));
+	end,
 	ToNPL = function(self)
 		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
 	end,
@@ -76,6 +83,13 @@ say(1+1)
 	helpUrl = "", 
 	canRun = false,
 	func_description = '((%s) %s (%s))',
+	ToPython = function(self)
+		local op = self:getFieldAsString('op')
+		if op == '~=' then
+			op = '!='
+		end
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), op, self:getFieldAsString('right'));
+	end,
 	ToNPL = function(self)
 		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
 	end,
@@ -115,6 +129,13 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = '((%s) %s (%s))',
+	ToPython = function(self)
+		local op = self:getFieldAsString('op')
+		if op == '~=' then
+			op = '!='
+		end
+		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), op, self:getFieldAsString('right'));
+	end,
 	ToNPL = function(self)
 		return string.format('(%s) %s (%s)', self:getFieldAsString('left'), self:getFieldAsString('op'), self:getFieldAsString('right'));
 	end,
@@ -257,6 +278,9 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = '(%s..%s)',
+	ToPython = function(self)
+		return string.format('("%s" + "%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
+	end,
 	ToNPL = function(self)
 		return string.format('("%s".."%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -281,6 +305,9 @@ say("hello ".."world".."!!!")
 	helpUrl = "", 
 	canRun = false,
 	func_description = '(#%s)',
+	ToPython = function(self)
+		return string.format('len("%s")', self:getFieldAsString('left'));
+	end,
 	ToNPL = function(self)
 		return string.format('(#"%s")', self:getFieldAsString('left'));
 	end,
@@ -336,6 +363,9 @@ say("66%10=="..(66%10))
 	canRun = false,
 	funcName = "floor",
 	func_description = 'math.floor(%s+0.5)',
+	ToPython = function(self)
+		return string.format('round(%s)', self:getFieldAsString('left'));
+	end,
 	ToNPL = function(self)
 		return string.format('math.floor(%s+0.5)', self:getFieldAsString('left'));
 	end,

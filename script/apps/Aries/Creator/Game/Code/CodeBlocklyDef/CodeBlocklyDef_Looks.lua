@@ -856,6 +856,10 @@ stopMovie();
 	nextStatement = true,
 	funcName = "window",
 	func_description = 'window(%s, "%s", %s, %s, %s, %s)',
+	ToPython = function(self)
+		return string.format('window("""%s""","%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
+			self:getFieldAsString('alignment'), self:getFieldAsString('left'), self:getFieldAsString('top'), self:getFieldAsString('width'), self:getFieldAsString('height'));
+	end,
 	ToNPL = function(self)
 		return string.format('window([[%s]],"%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
 			self:getFieldAsString('alignment'), self:getFieldAsString('left'), self:getFieldAsString('top'), self:getFieldAsString('width'), self:getFieldAsString('height'));

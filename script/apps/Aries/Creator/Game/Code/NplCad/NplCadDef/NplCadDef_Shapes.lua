@@ -992,7 +992,40 @@ local cmds = {
     ]]}},
 },
 
-
+{
+	type = "createFromBrep_test", 
+	message0 = L" %1 test %2",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+         
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "createFromBrep_test",
+	func_description = 'createFromBrep_test(%s,%s)',
+	func_description_js = 'createFromBrep_test(%s,%s)',
+	ToNPL = function(self)
+		return string.format('createFromBrep_test("%s","%s")\n', self:getFieldValue('op'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
 
 
 }

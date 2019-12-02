@@ -31,7 +31,11 @@ local cmds = {
 	funcName = "registerClickEvent",
 	func_description = 'registerClickEvent(function()\\n%send)',
     ToPython = function(self)
-		return string.format('def registerClickEvent_func():\n  pass\n%sregisterClickEvent(registerClickEvent_func)\n', self:getFieldAsString('input'));
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerClickEvent_func(msg):\n    %s\nregisterClickEvent(registerClickEvent_func)\n', input);
 	end,
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -111,7 +115,11 @@ end)
 	funcName = "registerKeyPressedEvent",
 	func_description = 'registerKeyPressedEvent(%s, function(msg)\\n%send)',
     ToPython = function(self)
-		return string.format('def registerKeyPressedEvent_func("%s"):\n  pass\nregisterKeyPressedEvent(%s,registerKeyPressedEvent_func)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerKeyPressedEvent_func(msg):\n    %s\nregisterKeyPressedEvent("%s", registerKeyPressedEvent_func)\n', input, self:getFieldAsString('keyname'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
@@ -174,6 +182,13 @@ end)
 	nextStatement = true,
 	funcName = "registerBlockClickEvent",
 	func_description = 'registerBlockClickEvent(%s, function(msg)\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerBlockClickEvent_func(msg):\n    %s\nregisterBlockClickEvent("%s", registerBlockClickEvent_func)\n', input, self:getFieldAsString('blockid'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerBlockClickEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('blockid'), self:getFieldAsString('input'));
 	end,
@@ -221,6 +236,13 @@ end)
 	nextStatement = true,
 	funcName = "registerTickEvent",
 	func_description = 'registerTickEvent(%d, function(msg)\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerTickEvent_func(msg):\n    %s\nregisterTickEvent(%d, registerTickEvent_func)\n', input, self:getFieldValue('ticks'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerTickEvent(%d, function()\n    %s\nend)\n',  self:getFieldValue('ticks'), self:getFieldAsString('input'));
 	end,
@@ -262,6 +284,13 @@ end)
 	nextStatement = true,
 	funcName = "registerAnimationEvent",
 	func_description = 'registerAnimationEvent(%d, function()\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerAnimationEvent_func(msg):\n    %s\nregisterAnimationEvent(%d, registerAnimationEvent_func)\n', input, self:getFieldValue('time'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerAnimationEvent(%d, function()\n    %s\nend)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
 	end,
@@ -336,6 +365,13 @@ say("click me!")
 	nextStatement = true,
 	funcName = "registerBroadcastEvent",
 	func_description = 'registerBroadcastEvent(%s, function(%s)\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerBroadcastEvent_func(msg):\n    %s\nregisterBroadcastEvent("%s", registerBroadcastEvent_func)\n', input, self:getFieldValue('msg'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,
@@ -529,6 +565,13 @@ broadcastTo("Alice", "Hello", {text="hello"})
 	nextStatement = true,
 	funcName = "registerStopEvent",
 	func_description = 'registerStopEvent(function()\\n%send)',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerStopEvent_func(msg):\n    %s\nregisterStopEvent(registerStopEvent_func)\n', input);
+	end,
 	ToNPL = function(self)
 		return string.format('registerStopEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
@@ -600,6 +643,13 @@ end)
 	nextStatement = true,
 	funcName = "registerNetworkEvent",
 	func_description = 'registerNetworkEvent(%s, function(%s)\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerNetworkEvent_func(msg):\n    %s\nregisterNetworkEvent("%s", registerNetworkEvent_func)\n', input, self:getFieldAsString('msg'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerNetworkEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
 	end,

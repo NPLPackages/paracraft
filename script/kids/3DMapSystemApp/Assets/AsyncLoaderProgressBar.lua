@@ -229,12 +229,20 @@ function AsyncLoaderProgressBar:Show(bShow)
 			_this.visible = bShow;
 		end		
 	end
+	self.isShown = _this.visible
+end
+
+-- is enabled
+function AsyncLoaderProgressBar:IsShown()
+	return self.isShown;
 end
 
 -- called every 0.5 seconds. 
 function AsyncLoaderProgressBar:OnTimer(timer)
 	self:UpdateDownloadSpeed();
-	self:Update();
+	if(self:IsShown()) then
+		self:Update();
+	end
 end
 
 if(not ParaEngine.GetAsyncLoaderBytesReceived) then

@@ -52,8 +52,8 @@ function FillLine:Run()
 		self.radius = self.min_radius;
 		local n;
 		for n=1, self.max_radius do
-			local block_id = ParaTerrain.GetBlockTemplateByIdx(self.blockX+self.dx*n,self.blockY+self.dy*n,self.blockZ+self.dz*n);
-			if(block_id ~= 0) then
+			local block = BlockEngine:GetBlock(self.blockX+self.dx*n,self.blockY+self.dy*n,self.blockZ+self.dz*n)
+			if(block and not block.liquid) then
 				self.max_radius = n;
 				if(block_id == self.fill_id) then
 					self.radius = n;
@@ -83,10 +83,12 @@ function FillLine:FrameMove()
 	self.blockY = self.blockY + (self.dy or 0);
 	self.blockZ = self.blockZ + (self.dz or 0);
 
-	if(ParaTerrain.GetBlockTemplateByIdx(self.blockX,self.blockY,self.blockZ) == 0 and self.step <= self.radius) then
+	local block = BlockEngine:GetBlock(self.blockX,self.blockY,self.blockZ)
+
+	if((not block or block.liquid) and self.step <= self.radius) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data, 3, self.fill_sdata);
 		if(GameLogic.GameMode:CanAddToHistory()) then
-			self.history[#(self.history)+1] = {self.blockX,self.blockY,self.blockZ};
+			self.history[#(self.history)+1] = {self.blockX,self.blockY,self.blockZ, block and block.id or 0};
 		end
 	else
 		self.finished = true;
@@ -110,7 +112,7 @@ function FillLine:Undo()
 	if(self.blockX and self.fill_id and (#self.history)>0) then
 		local _, b;
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], 0);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0);
 		end
 	end
 end

@@ -346,6 +346,13 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'for i=1, %d do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('for i in range(%d):\n    %s\n', self:getFieldValue('times'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('for i=1, %d do\n    %s\nend\n', self:getFieldValue('times'), self:getFieldAsString('input'));
 	end,
@@ -379,6 +386,13 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'while(true) do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('while True:\n    %s\n', input);
+	end,
 	ToNPL = function(self)
 		return string.format('while(true) do\n    %s\nend\n', self:getFieldAsString('input'));
 	end,
@@ -425,6 +439,13 @@ end
 	nextStatement = true,
 	funcName = "for",
 	func_description = 'for %s=%d, %d do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('for %s in range(%d, %d):\n    %s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldAsString('input'));
 	end,
@@ -475,6 +496,13 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'for %s=%d, %d, %d do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('for %s in range(%d, %d, %d):\n    %s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldValue('step'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldValue('step'), self:getFieldAsString('input'));
 	end,
@@ -551,6 +579,13 @@ end
 	nextStatement = true,
 	hide_in_toolbox = true,
 	func_description = "repeat\\n%suntil(%s)",
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('while True:\n    %s\n    if %s:\n        break\n', input, self:getFieldAsString('expression'));
+	end,
 	ToNPL = function(self)
 		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
 	end,
@@ -580,6 +615,9 @@ until(false)
 	nextStatement = true,
 	hide_in_toolbox = false,
 	func_description = "repeat wait(0.01) until(%s)",
+	ToPython = function(self)
+		return string.format('while True:\n    wait(0.01)\n    if %s:\n        break\n', self:getFieldAsString('expression'));
+	end,
 	ToNPL = function(self)
 		return string.format('repeat wait(0.01) until(%s)\n', self:getFieldAsString('expression'));
 	end,
@@ -622,6 +660,13 @@ repeat wait(0.01) until(current_level == 1)
 	funcName = "until",
 	nextStatement = true,
 	func_description = 'while (%s) do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input_true')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('while %s:\n    %s\n', self:getFieldAsString('expression'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('while (%s) do\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
 	end,
@@ -658,6 +703,13 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input_true')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('if %s:\n    %s\n', self:getFieldAsString('expression'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
 	end,
@@ -698,6 +750,17 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%selse\\n%send',
+	ToPython = function(self)
+		local input_true = self:getFieldAsString('input_true')
+		local input_else = self:getFieldAsString('input_else')
+		if input_true == '' then
+			input_true = 'pass'
+		end
+		if input_else == '' then
+			input_else = 'pass'
+		end
+		return string.format('if %s:\n    %s\nelse:\n    %s\n', self:getFieldAsString('expression'), input_true, input_else);
+	end,
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nelse\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
 	end,
@@ -750,6 +813,13 @@ end
 	funcName = "pairs",
 	nextStatement = true,
 	func_description = 'for %s, %s in pairs(%s) do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('for %s, %s in %s.items():\n    %s\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('for %s, %s in pairs(%s) do\n    %s\nend\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
@@ -801,6 +871,13 @@ end
 	nextStatement = true,
 	funcName = "ipairs",
 	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('for %s, %s in enumerate(%s):\n    %s\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('for %s, %s in ipairs(%s) do\n    %s\nend\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
 	end,
@@ -835,6 +912,13 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'run(function()\\n%send)',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def run_func():\n    %s\nrun(run_func)\n', input);
+	end,
 	ToNPL = function(self)
 		return string.format('run(function()\n    %s\nend)\n', self:getFieldAsString('input'));
 	end,
@@ -884,6 +968,13 @@ end)
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'runForActor(%s, function()\\n%send)',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def runForActor_func():\n    %s\nrunForActor("%s", runForActor_func)', input, self:getFieldAsString('actor'));
+	end,
 	ToNPL = function(self)
 		return string.format('runForActor("%s", function()\n    %s\nend)\n', self:getFieldAsString('actor'), self:getFieldAsString('input'));
 	end,

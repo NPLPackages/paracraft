@@ -149,10 +149,6 @@ function Entity:setScale(scale)
 	end
 end
 
-function Entity:EndEdit()
-	Entity._super.EndEdit(self);
-end
-
 function Entity:Destroy()
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
@@ -231,7 +227,11 @@ end
 -- Overriden in a sign to provide the text.
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
-	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:GetModelFile(), self:getYaw(), self:getScale());
+	local offsetPos;
+	if(self.offsetPos[1]~=0 or self.offsetPos[2]~=0 or self.offsetPos[3]~=0) then
+		offsetPos = self.offsetPos
+	end
+	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:GetModelFile(), self:getYaw(), self:getScale(), offsetPos);
 end
 
 -- update from packet. 
@@ -248,6 +248,13 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 		end
 		if(scaling) then
 			self:setScale(scaling);
+		end
+		local offset = packet_UpdateEntityBlock.data4;
+		if(not offset and (self.offsetPos[1]~=0 or self.offsetPos[2]~=0 or self.offsetPos[3]~=0)) then
+			offset = {0,0,0}
+		end
+		if(offset) then
+			self:SetOffsetPos(offset)
 		end
 		self:Refresh();
 	end
@@ -274,6 +281,9 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
 		if(mouse_button=="left") then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
+		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+			self:OpenEditor("entity", entity);
+			return true;
 		end
 	else
 		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then

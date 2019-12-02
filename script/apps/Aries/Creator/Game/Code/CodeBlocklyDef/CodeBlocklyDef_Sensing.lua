@@ -218,6 +218,13 @@ cmd("/hide boundingbox")
 	nextStatement = true,
 	funcName = "registerCollisionEvent",
 	func_description = 'registerCollisionEvent(%s, function(actor)\\n%send)',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerCollisionEvent_func(msg):\n    %s\nregisterCollisionEvent("%s", registerCollisionEvent_func)\n', input, self:getFieldAsString('name'));
+	end,
 	ToNPL = function(self)
 		return string.format('registerCollisionEvent("%s", function(actor)\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));
 	end,
@@ -382,6 +389,9 @@ end
 	nextStatement = true,
 	funcName = "ask",
 	func_description = 'ask(%s)',
+	ToPython = function(self)
+		return string.format('result = ask("%s")\n', self:getFieldAsString('input'));
+	end,
 	ToNPL = function(self)
 		return string.format('local result = ask("%s")\n', self:getFieldAsString('input'));
 	end,
@@ -563,6 +573,9 @@ end
 	canRun = false,
 	funcName = "getMousePoint",
 	func_description = 'getMousePoint()',
+	ToPython = function(self)
+		return string.format('x, y = getMousePoint()\n');
+	end,
 	ToNPL = function(self)
 		return string.format('local x, y = getMousePoint()\n');
 	end,
@@ -583,6 +596,9 @@ local x, y = getMousePoint()
 	canRun = false,
 	funcName = "mousePickBlock",
 	func_description = 'mousePickBlock()',
+	ToPython = function(self)
+		return string.format('x, y, z, blockid = mousePickBlock()\n');
+	end,
 	ToNPL = function(self)
 		return string.format('local x, y, z, blockid = mousePickBlock()\n');
 	end,

@@ -61,6 +61,7 @@ end
 function CodeHelpItem:ResetCache()
 	self.html = nil;
 	self.npl_code = nil;
+	self.python_code = nil;
 	self.dsItem = nil;
 end
 

@@ -98,7 +98,7 @@ function CodeUI:GetItemNameForGlobalData(name)
 	return "g_"..name;
 end
 
-function CodeUI:ShowGlobalData(name, title, color)
+function CodeUI:ShowGlobalData(name, title, color, fontSize)
 	local itemName = self:GetItemNameForGlobalData(name)
 	local item = self:GetItem(itemName)
 	if(not item) then
@@ -110,6 +110,9 @@ function CodeUI:ShowGlobalData(name, title, color)
 		item:SetTitle(title or name);
 		if(color) then
 			item:SetColor(color);
+		end
+		if(fontSize) then
+			item:SetFontSize(tonumber(fontSize));
 		end
 	end
 	return item;

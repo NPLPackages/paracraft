@@ -14,10 +14,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeGlobals.lua");
 local CodeGlobals = commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals");
 local CodeUIItem = commonlib.inherit(commonlib.gettable("System.Windows.UITextElement"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIItem"));
 
-CodeUIItem:Property({"Color", "#000000", auto=true});
-CodeUIItem:Property({"Font", nil, auto=true});
-CodeUIItem:Property({"FontSize", nil, auto=true});
-CodeUIItem:Property({"FontScaling", nil, auto=true});
+CodeUIItem:Property({"Color", "#000000"});
 CodeUIItem:Property({"title", nil, "GetTitle", "SetTitle", auto=true});
 CodeUIItem:Property({"BackgroundColor", "#ffffff", auto=true});
 CodeUIItem:Property({"padding_left", 5, });
@@ -34,6 +31,7 @@ end
 function CodeUIItem:Init(name, codeUI)
 	self.name = name;
 	self.codeUI = codeUI;
+	self:SetFontSize(14);
 	return self;
 end
 

@@ -56,7 +56,7 @@ function env_imp:setActorValue(name, value)
 	end
 end
 
-function env_imp:showVariable(name, title, color)
+function env_imp:showVariable(name, title, color, fontSize)
 	if(type(name) == "string") then
 		if(color == "") then
 			color = nil;
@@ -64,7 +64,16 @@ function env_imp:showVariable(name, title, color)
 		if(title == "") then
 			title = nil;
 		end
-		local item = CodeUI:ShowGlobalData(name, title, color, self.codeblock);
+		if(fontSize == "") then
+			fontSize = nil
+		end
+		if(fontSize) then
+			fontSize = tonumber(fontSize)
+			if(fontSize) then
+				fontSize = math.max(math.min(40, fontSize), 6);
+			end
+		end
+		local item = CodeUI:ShowGlobalData(name, title, color, fontSize);
 		if(item) then
 			item:TrackCodeBlock(self.codeblock)
 		end

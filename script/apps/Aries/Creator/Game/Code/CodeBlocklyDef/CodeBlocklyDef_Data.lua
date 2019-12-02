@@ -189,6 +189,9 @@ end
 	nextStatement = true,
 	funcName = "local",
 	func_description = 'local %s = %s',
+	ToPython = function(self)
+		return string.format('%s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
+	end,
 	ToNPL = function(self)
 		return string.format('local %s = %s\n', self:getFieldAsString('var'), self:getFieldAsString('value'));
 	end,
@@ -227,7 +230,11 @@ say(key, 1)
 	funcName = "registerCloneEvent",
 	func_description = 'registerCloneEvent(function(%s)\\n%send)',
     ToPython = function(self)
-		return string.format('def registerCloneEvent_func("%s"):\n  pass\n%registerCloneEvent(registerCloneEvent_func)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerCloneEvent_func(msg):\n    %s\nregisterCloneEvent("%s", registerCloneEvent_func)\n', input, self:getFieldAsString('param'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -580,6 +587,17 @@ local data = actor:GetActorValue("some_data")
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
+	ToPython = function(self)
+		local value = self:getFieldAsString("value")
+		if value == 'true' then
+			value = 'True'
+		elseif value == 'false' then
+			value = 'False'
+		elseif value == 'nil' then
+			value = 'None'
+		end
+		return value;
+	end,
 	ToNPL = function(self)
 		return self:getFieldAsString("value");
 	end,
@@ -706,7 +724,11 @@ log(t)
 	canRun = false,
 	func_description = 'function(%s)\\n%send',
     ToPython = function(self)
-		return string.format('def temp_func(%s):\n  pass\n%s\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def func(%s):\n    %s\n', self:getFieldAsString('param'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('function(%s)\n    %s\nend\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -811,7 +833,7 @@ say(getHello())
 
 {
 	type = "showVariable", 
-	message0 = L"显示变量%1,%2,%3",
+	message0 = L"显示变量%1,%2,%3,%4",
 	arg0 = {
 		{
 			name = "name",
@@ -829,6 +851,12 @@ say(getHello())
             shadow = { type = "colour_picker", value = "#0000ff",},
 			text = "#0000ff",
 		},
+		{
+			name = "fontSize",
+			type = "input_value",
+            shadow = { type = "math_number", value = "14",},
+			text = "14",
+		},
 	},
 	category = "Data", 
 	helpUrl = "", 
@@ -836,9 +864,9 @@ say(getHello())
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "showVariable",
-	func_description = 'showVariable("%s", "%s", %s)',
+	func_description = 'showVariable("%s", "%s", %s, %s)',
 	ToNPL = function(self)
-		return string.format('showVariable("%s", "%s", "%s")\n', self:getFieldAsString('name'), self:getFieldAsString('title'), self:getFieldAsString('color'));
+		return string.format('showVariable("%s", "%s", "%s", %s)\n', self:getFieldAsString('name'), self:getFieldAsString('title'), self:getFieldAsString('color'), self:getFieldAsString('fontSize'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 _G.score = 1
@@ -1301,7 +1329,7 @@ assert(monsterCount == 1)
 		return string.format('"""\n%s\n"""', self:getFieldAsString('input'));
 	end,
 	ToNPL = function(self)
-		return string.format('--[[\n%s\n]]', self:getFieldAsString('value'));
+		return string.format('--[[\n%s\n]]', self:getFieldAsString('input'));
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 ]]}},

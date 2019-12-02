@@ -182,9 +182,14 @@ function VideoRecorder.EndCapture()
 end
 
 function VideoRecorder.ShowRecordingArea(bShow)
+	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
+	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
 	if(VideoRecorder.HasFFmpegPlugin()) then
 		local _parent = ParaUI.GetUIObject("RecordSafeArea");
 		if(not bShow) then
+			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
+				AsyncLoaderProgressBar.GetDefaultAssetBar():Show(true)
+			end
 			if(_parent:IsValid()) then
 				_parent.visible = false;
 				ParaUI.Destroy(_parent.id);
@@ -198,6 +203,9 @@ function VideoRecorder.ShowRecordingArea(bShow)
 			end
 			return;
 		else
+			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
+				AsyncLoaderProgressBar.GetDefaultAssetBar():Show(false)
+			end
 			if(not _parent:IsValid()) then
 				local attr = ParaMovie.GetAttributeObject();
 				local margin_left, margin_top, margin_right, margin_bottom = attr:GetField("MarginLeft",0), attr:GetField("MarginTop",0), attr:GetField("MarginRight",0), attr:GetField("MarginBottom",0);

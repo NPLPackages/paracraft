@@ -18,13 +18,14 @@ function PacketUpdateEntityBlock:ctor()
 end
 
 -- @param data1: any data
-function PacketUpdateEntityBlock:Init(x, y, z, data1, data2, data3)
+function PacketUpdateEntityBlock:Init(x, y, z, data1, data2, data3, data4)
 	self.x = x;
 	self.y = y;
 	self.z = z;
 	self.data1 = data1;
 	self.data2 = data2;
 	self.data3 = data3;
+	self.data4 = data4;
 	return self;
 end
 
