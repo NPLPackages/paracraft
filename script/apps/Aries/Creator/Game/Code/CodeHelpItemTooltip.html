@@ -28,7 +28,7 @@
     
 
     function GetNPLCode()
-        local code = item and item:GetNPLCode();
+        local code = item and item:GetNPLCode(CodeHelpWindow.codeLanguageType);
         if(code) then
             code = code:gsub("\r?\n%s*\r?\n", "\n")
         end

@@ -442,15 +442,18 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 					local curPos = nil;
 					
 					local func_description = codeItem.func_description:gsub("\\n", "\n");
-					
-					if(func_description:sub(1, #codeItem.funcName) ~= codeItem.funcName) then
-						local funcParams = func_description:match("(%(.*)$");
-						if(funcParams) then
-							func_description = codeItem.funcName..funcParams;
-						else
-							func_description = codeItem.funcName
+					if(CodeHelpWindow.codeLanguageType == "python" and codeItem.ToPython) then
+						func_description = codeItem:ToPython();
+					else
+						if(func_description:sub(1, #codeItem.funcName) ~= codeItem.funcName) then
+							local funcParams = func_description:match("(%(.*)$");
+							if(funcParams) then
+								func_description = codeItem.funcName..funcParams;
+							else
+								func_description = codeItem.funcName
+							end
+							cursorOnBracket = false;
 						end
-						cursorOnBracket = false;
 					end
 
 					for text, param in func_description:gmatch("([^%%]+)(%%?%w?)") do

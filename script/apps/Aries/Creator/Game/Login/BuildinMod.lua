@@ -66,6 +66,8 @@ BuildinMod.buildin_mods = {
 		text=L"系统内置插件",
 		version = "1.3",
 		homepage = "https://github.com/tatfook/WorldShare",
+		-- load this module when the package is loaded
+		loadOnStartup = true, 
 	},
 	{
 		name = "ExplorerApp", 

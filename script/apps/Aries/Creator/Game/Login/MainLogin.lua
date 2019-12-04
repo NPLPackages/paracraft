@@ -606,22 +606,26 @@ function MainLogin:ShowLoginModePage()
 		return;
 	end
 
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-		url = "script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html", 
-		name = "ShowLoginModePage", 
-		isShowTitleBar = false,
-		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		zorder = -1,
-		allowDrag = false,
-		directPosition = true,
-			align = "_fi",
-			x = 0,
-			y = 0,
-			width = 0,
-			height = 0,
-		cancelShowAnimation = true,
-	});
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	if(GameLogic.GetFilters():apply_filters("ShowLoginModePage", {})) then
+		System.App.Commands.Call("File.MCMLWindowFrame", {
+			url = "script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html", 
+			name = "ShowLoginModePage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			zorder = -1,
+			allowDrag = false,
+			directPosition = true,
+				align = "_fi",
+				x = 0,
+				y = 0,
+				width = 0,
+				height = 0,
+			cancelShowAnimation = true,
+		});
+	end
 end
 
 function MainLogin:LoadPlugins()

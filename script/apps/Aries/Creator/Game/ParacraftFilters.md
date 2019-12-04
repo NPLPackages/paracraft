@@ -41,6 +41,7 @@ This gives an overview of filters in paracraft. Please search the source code of
 - user input mouse and keyboard:
   - "DefaultContext", context, mode: getting the default scene context for user input
 - GUI:
+  - "ShowLoginModePage": this is the first user interface shown. One must install this filter very early, such as in mod.loadOnStartup. 
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI
   - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. This is the place to initialize your custom GUI. 
   - "show", name, bIsShow: hook `/show name` command to display a custom gui via command

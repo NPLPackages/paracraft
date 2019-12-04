@@ -240,6 +240,13 @@ end
 	nextStatement = true,
 	funcName = "function",
 	func_description = 'function %s()\\n%send',
+	ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def %s()\n    %s\n', self:getFieldValue('name'), input);
+	end,
 	ToNPL = function(self)
 		return string.format('function %s()\n%send\n', self:getFieldValue('name'), self:getFieldAsString('input'));
 	end,
@@ -560,6 +567,8 @@ end
 	message0 = L"重复执行",
 	message1 = L"%1",
 	message2 = L"一直到%1",
+	arg0 = {
+	},
 	arg1 = {
 		{
 			name = "input",
@@ -570,15 +579,18 @@ end
 		{
 			name = "expression",
 			type = "input_value",
+			shadow = { type = "expression_compare", },
+			text = "status == \"start\""
 		},
 	},
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
+	hide_in_codewindow = true,
 	previousStatement = true,
 	nextStatement = true,
-	hide_in_toolbox = true,
-	func_description = "repeat\\n%suntil(%s)",
+	funcName = "repeat", 
+	func_description = "repeat\\n%s\\nuntil(%s)",
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
 		if input == '' then
@@ -590,9 +602,11 @@ end
 		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+i=1
 repeat
-    moveForward(0.01)
-until(false)
+    tip(i)
+    i=i+1
+until(i==3)
 ]]}},
 },
 
@@ -610,7 +624,6 @@ until(false)
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
-	funcName = "repeat",
 	previousStatement = true,
 	nextStatement = true,
 	hide_in_toolbox = false,
@@ -636,7 +649,7 @@ repeat wait(0.01) until(current_level == 1)
 
 {
 	type = "while_if", 
-	message0 = L"重复执行直到%1",
+	message0 = L"重复执行只要%1",
 	message1 = L"%1",
 	arg0 = {
 		{
@@ -657,7 +670,7 @@ repeat wait(0.01) until(current_level == 1)
 	helpUrl = "", 
 	canRun = false,
 	previousStatement = true,
-	funcName = "until",
+	funcName = "while",
 	nextStatement = true,
 	func_description = 'while (%s) do\\n%send',
 	ToPython = function(self)
@@ -678,6 +691,7 @@ while(i>0) do
 end
 ]]}},
 },
+
 
 {
 	type = "control_if", 
