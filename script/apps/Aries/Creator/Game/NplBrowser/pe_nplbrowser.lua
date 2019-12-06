@@ -22,8 +22,8 @@ local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 
 function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
-    local page_ctrl = mcmlNode:GetPageCtrl();
-	local id = mcmlNode.name or mcmlNode:GetInstanceName(rootName);
+	local page_ctrl = mcmlNode:GetPageCtrl();
+	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
     local url = mcmlNode:GetAttributeWithCode("url");
 	local withControl = mcmlNode:GetAttributeWithCode("withControl",false);
 	local visible = mcmlNode:GetAttributeWithCode("visible", nil, true);
@@ -73,7 +73,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 
 	if NplBrowserPlugin.WindowIsExisted(id) then
         NplBrowserPlugin.Open(input);
-    else
+	else
 	    NplBrowserPlugin.Start(input);
 	end
 
@@ -112,7 +112,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 end
 
 function pe_nplbrowser.Reload(mcmlNode,name,url)
-	local id = mcmlNode.name or mcmlNode:GetInstanceName(name);
+	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
 	local config = NplBrowserPlugin.GetCache(id);
 	if(config)then
 		config.url = url;
@@ -121,7 +121,7 @@ function pe_nplbrowser.Reload(mcmlNode,name,url)
 end
 
 function pe_nplbrowser.SetVisible(mcmlNode, name, visible)
-	local id = mcmlNode.name or mcmlNode:GetInstanceName(name);
+	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
 	local config = NplBrowserPlugin.GetCache(id);
 
 	if(config)then
