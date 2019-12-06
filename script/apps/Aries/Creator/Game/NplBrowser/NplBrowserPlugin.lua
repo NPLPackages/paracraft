@@ -131,22 +131,17 @@ function NplBrowserPlugin.RunNextCmd()
         if System.os.GetPlatform() == 'win32' then
             local dll_name = cmd.dll_name or default_dll_name;
             NPL.activate(dll_name, cmd); 
-        else
-            if not NplBrowserPlugin.webview then
-                return false;
-            end
+        end
 
+        if System.os.GetPlatform() == 'mac' then
             if cmd.cmd == 'Show' then
-                NplBrowserPlugin.webview:setVisible(cmd.visible)
-
+                local p = NplBrowserPlugin.GetCache(cmd.id)
                 if cmd.visible then
-                    NplBrowserPlugin.webview:bringToTop();
+                    NplBrowserPlugin.webview = WebView:new():init(p.x, p.y, p.width, p.height, true);
+                    NplBrowserPlugin.webview:loadUrl(p.url);
+                else
+                    NplBrowserPlugin.webview:setVisible(cmd.visible);
                 end
-            end
-
-            if cmd.cmd == 'Open' then
-                NplBrowserPlugin.webview:setVisible(true);
-                NplBrowserPlugin.webview:loadUrl(cmd.url);
             end
         end
 
@@ -347,10 +342,9 @@ function NplBrowserPlugin.Start(p)
     if System.os.GetPlatform() == 'win32' then
         local dll_name = p.dll_name or default_dll_name;
         NPL.activate(dll_name, input);
-    else
-        NplBrowserPlugin.webview = WebView:new():init(x, y, width, height, true);
-        NplBrowserPlugin.webview:loadUrl(url);
+    end
 
+    if System.os.GetPlatform() == 'mac' then
         NplBrowserPlugin.ClearPendingWindow(id);
         NplBrowserPlugin.SetWindowExisted(id, true);
     end
@@ -377,10 +371,8 @@ function NplBrowserPlugin.Open(p)
         callback_file = callback_file,
     }
 
-    if System.os.GetPlatform() ~= 'win32' then
-        NplBrowserPlugin.ClearPendingWindow(p.id);
-        NplBrowserPlugin.SetWindowExisted(p.id, true);
-    end
+    NplBrowserPlugin.ClearPendingWindow(p.id);
+    NplBrowserPlugin.SetWindowExisted(p.id, true);
 
     NplBrowserPlugin.PushBack(input);
 end

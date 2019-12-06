@@ -13,7 +13,8 @@ task:Run();
 -------------------------------------------------------
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager")
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 
 local OnlineStore = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.OnlineStore"));
 
@@ -28,10 +29,12 @@ function OnlineStore:Init()
 end
 
 function OnlineStore.GetOnlineStoreUrl()
+	local host = KeepworkService:GetKeepworkUrl()
+
 	if System.os.GetPlatform() == 'mac' then
-		return format("https://keepwork.com/p/comp/system?type=protocol&port=%s", tostring(OnlineStore.portNumber or 8099));
+		return format("%s/p/comp/system?type=protocol&port=%s", host, tostring(OnlineStore.portNumber or 8099));
 	else
-		return format("https://keepwork.com/p/comp/system?port=%s", tostring(OnlineStore.portNumber or 8099));
+		return format("%s/p/comp/system?port=%s", host, tostring(OnlineStore.portNumber or 8099));
 	end
 end
 
