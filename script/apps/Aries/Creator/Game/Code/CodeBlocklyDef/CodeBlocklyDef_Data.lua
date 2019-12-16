@@ -379,6 +379,14 @@ end
 				{ L"广告牌效果", "billboarded" },
 				{ L"是否投影", "shadowCaster" },
 				{ L"是否联机同步", "isServerEntity" },
+
+				{ L"禁用物理仿真", "dummy" },
+				{ L"重力加速度", "gravity" },
+				{ L"速度", "velocity" },
+				{ L"增加速度", "addVelocity" },
+				{ L"摩擦系数", "surfaceDecay" },
+				{ L"空气阻力", "airDecay" },
+
 				{ L"初始化参数", "initParams" },
 			},
 		},
@@ -683,12 +691,39 @@ log(t)
 
 {
 	type = "newEmptyTable", 
-	message0 = L"空的表{}",
+	message0 = L"表{%1%2%3}",
+	arg0 = {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
 	output = {type = "field_number",},
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '{}',
+	func_description_lua_provider = [[
+        var attrs = Blockly.Extensions.readTextFromMcmlAttrs(block, "Lua", ",");
+        if (attrs) {
+            return "{%s}".format(attrs)
+        }else{
+            return "{}";
+        }
+    ]],
 	ToNPL = function(self)
 		return "{}";
 	end,

@@ -165,9 +165,17 @@ function DynamicObject:SetSurfaceDecay(surface_decay)
 	self.surface_decay = surface_decay;
 end
 
+function DynamicObject:GetSurfaceDecay()
+	return self.surface_decay;
+end
+
 -- set air decay. speed lost per second when in air
 function DynamicObject:SetAirDecay(air_decay)
 	self.air_decay = air_decay;
+end
+
+function DynamicObject:GetAirDecay()
+	return self.air_decay;
 end
 
 function DynamicObject:SetMinSpeed(stopSpeed)

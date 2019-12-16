@@ -11,7 +11,7 @@ NPL.export({
 -----------------------
 {
 	type = "mcml_window", 
-	message0 = "创建窗口",
+	message0 = L"创建窗口",
 	message1 = "%1",
 	message2 = "%1,%2,%3,%4,%5",
 	arg1 = {
@@ -25,20 +25,21 @@ NPL.export({
 			name = "alignment",
 			type = "field_dropdown",
 			options = {
-				{ "左上", "_lt" },
-				{ "左下", "_lb" },
-				{ "居中", "_ct" },
-				{ "居中上", "_ctt" },
-				{ "居中下", "_ctb" },
-				{ "居中左", "_ctl" },
-				{ "居中右", "_ctr" },
-				{ "右上", "_rt" },
-				{ "右下", "_rb" },
-				{ "中间上", "_mt" },
-				{ "中间左", "_ml" },
-				{ "中间右", "_mr" },
-				{ "中间下", "_mb" },
-				{ "全屏", "_fi" },
+				{ L"左上", "_lt" },
+				{ L"左下", "_lb" },
+				{ L"居中", "_ct" },
+				{ L"居中上", "_ctt" },
+				{ L"居中下", "_ctb" },
+				{ L"居中左", "_ctl" },
+				{ L"居中右", "_ctr" },
+				{ L"右上", "_rt" },
+				{ L"右下", "_rb" },
+				{ L"中间上", "_mt" },
+				{ L"中间左", "_ml" },
+				{ L"中间右", "_mr" },
+				{ L"中间下", "_mb" },
+				{ L"全屏", "_fi" },
+				{ L"人物头顶", "headon" },
 			},
 			text = "_lt", 
 		},
@@ -85,7 +86,15 @@ NPL.export({
 	message1 = "%1",
 	message2 = "</div>",
 	arg0 = {
-         {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
             name = "btn",
             type = "field_button",
             content = {
@@ -95,14 +104,6 @@ NPL.export({
             height = 16,
             callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
         },
-        {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
 	},
 	arg1 = {
 		{
@@ -126,235 +127,8 @@ NPL.export({
     ]],
 	ToNPL = function(self)
 		return string.format('<div>\n%s\n</div>\n', 
-        self:getFieldAsString('code'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_button", 
-	message0 = "<button  %1%2%3/>",
-	arg0 = {
-        {
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-        {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "button", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<input type="button"/>');
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_label", 
-	message0 = "<label  %1%2%3/>",
-	arg0 = {
-		{
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-        {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "pe:label", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<pe:label />');
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_text", 
-	message0 = "<text  %1%2%3/>",
-	arg0 = {
-		{
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-        {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "input type='text'", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<input type="text" />');
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_checkbox", 
-	message0 = "<checkbox  %1%2%3/>",
-	arg0 = {
-		 {
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-         {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-    func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "input type='checkbox'", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<input type="checkbox" />');
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_progressbar", 
-	message0 = "<progressbar %1%2%3/>",
-	arg0 = {
-		 {
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-         {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "pe:progressbar", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<pe:progressbar />');
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_sliderbar", 
-	message0 = "<sliderbar %1%2%3/>",
-	arg0 = {
-		 {
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-         {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-	},
-	category = "McmlControls", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	func_description_lua_provider = [[
-        return Blockly.Extensions.getMcmlControlText(block, "pe:sliderbar", "Lua");
-    ]],
-	ToNPL = function(self)
-		return string.format('<pe:sliderbar />');
+            self:getFieldAsString('code')
+        );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -382,6 +156,235 @@ NPL.export({
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
+
+{
+	type = "mcml_button", 
+	message0 = "<button  %1%2%3/>",
+	arg0 = {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "button", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<input type="button"/>');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "mcml_label", 
+	message0 = "<label  %1%2%3/>",
+	arg0 = {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "pe:label", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<pe:label />');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "mcml_text", 
+	message0 = "<text  %1%2%3/>",
+	arg0 = {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "input type='text'", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<input type="text" />');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "mcml_checkbox", 
+	message0 = "<checkbox  %1%2%3/>",
+	arg0 = {
+         {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+    func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "input type='checkbox'", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<input type="checkbox" />');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "mcml_progressbar", 
+	message0 = "<progressbar %1%2%3/>",
+	arg0 = {
+         {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "pe:progressbar", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<pe:progressbar />');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "mcml_sliderbar", 
+	message0 = "<sliderbar %1%2%3/>",
+	arg0 = {
+         {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description_lua_provider = [[
+        return Blockly.Extensions.getMcmlControlText(block, "pe:sliderbar", "Lua");
+    ]],
+	ToNPL = function(self)
+		return string.format('<pe:sliderbar />');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 
 {
 	type = "mcml_br", 

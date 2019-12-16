@@ -49,11 +49,14 @@ function EditEntityPage.GetItemName()
 			type_name = item:GetDisplayName();
 		end
     end
+	
 	if(not name) then
-		return type_name;
+		name = type_name;
 	else
-		return name..":"..(type_name or "");
+		name = name..":"..(type_name or "");
 	end
+	name = commonlib.Encoding.EncodeHTMLInnerText(name:sub(1,50));
+	return name;
 end
 
 function EditEntityPage.GetCommand()
@@ -169,5 +172,12 @@ function EditEntityPage.OnClickEmptyBagSlot(slotNumber)
 			local slot = contView:GetSlot(slotNumber);
 			entity:OnClickEmptySlot(slot);
 		end
+	end
+end
+
+function EditEntityPage.GetCustomEditorPanelMCML()
+	local entity = EditEntityPage.GetEntity()
+	if(entity and entity.GetCustomEditorPanelMCML) then
+		return entity:GetCustomEditorPanelMCML();
 	end
 end

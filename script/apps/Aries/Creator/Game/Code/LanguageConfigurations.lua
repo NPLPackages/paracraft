@@ -30,6 +30,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua");
     elseif(filename == "craft2d") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Craft2d/Craft2d.lua");
+	elseif(filename == "commands") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsBlockly.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then

@@ -31,6 +31,9 @@ NplBrowserLoaderPage.cef_main_files = {
 NplBrowserLoaderPage.loaded = false;
 NplBrowserLoaderPage.timer = nil;
 
+NplBrowserLoaderPage.try_update_max_times = 3;
+NplBrowserLoaderPage.try_times = 0;
+
 local dest_folder = "cef3";
 local config_file = "script/apps/Aries/Creator/Game/NplBrowser/configs/nplbrowser.xml";
 local page;
@@ -141,10 +144,19 @@ function NplBrowserLoaderPage.CreateOrGetAssetsManager(id,redist_root,config_fil
                     elseif(state == AssetsManager.State.UPDATING)then
                         NplBrowserLoaderPage.UpdateProgressText(L"更新中");
                     elseif(state == AssetsManager.State.UPDATED)then
-                        LOG.std(nil, "debug", "AppLauncher", "更新完成")
-                        NplBrowserLoaderPage.UpdateProgressText(L"更新完成");
+                        if(not NplBrowserLoaderPage.MainFilesExisted(redist_root))then
+                            NplBrowserLoaderPage.UpdateProgressText(L"更新错误");
+                            local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+                                NplBrowserLoaderPage.SetChecked(false);
+                            end})
+                            mytimer:Change(3000, nil)
+                        else
+                            LOG.std(nil, "debug", "AppLauncher", "更新完成")
+                            NplBrowserLoaderPage.UpdateProgressText(L"更新完成");
 
-                        NplBrowserLoaderPage.SetChecked(true);
+                            NplBrowserLoaderPage.SetChecked(true);
+                        end
+                        
 
                     elseif(state == AssetsManager.State.FAIL_TO_UPDATED)then
                         NplBrowserLoaderPage.UpdateProgressText(L"更新错误");
@@ -164,12 +176,19 @@ function NplBrowserLoaderPage.CreateOrGetAssetsManager(id,redist_root,config_fil
     return a;
 end
 
+-- @param callback: function(bChecked) end
 function NplBrowserLoaderPage.Check(callback)
     if(not NplBrowserPlugin.OsSupported())then
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
         return
     end
-
+    if(not NplBrowserLoaderPage.MainFilesExisted(dest_folder))then
+        NplBrowserLoaderPage.loaded = false;
+    end
+    if(NplBrowserLoaderPage.try_times >= NplBrowserLoaderPage.try_update_max_times)then
+	    LOG.std(nil, "warn", "NplBrowserLoaderPage.OnCheck", "try update times is full:%d/%d",NplBrowserLoaderPage.try_times,NplBrowserLoaderPage.try_update_max_times);
+        return
+    end
     if(NplBrowserLoaderPage.loaded)then
         if(callback)then
             callback(true);
@@ -198,7 +217,7 @@ function NplBrowserLoaderPage.OnCheck(id,folder,config_file)
 
     if(NplBrowserLoaderPage.buildin_version)then
         a:loadLocalVersion()
-        local cur_version = a:getCurVersion();
+		local cur_version = a:getCurVersion();
         local buildin_version = NplBrowserLoaderPage.buildin_version;
         local cur_version_value = AssetsManager.getVersionNumberValue(cur_version);
         local buildin_version_value = AssetsManager.getVersionNumberValue(buildin_version);
@@ -210,6 +229,9 @@ function NplBrowserLoaderPage.OnCheck(id,folder,config_file)
     end
     NplBrowserLoaderPage.ShowPage();
     NplBrowserLoaderPage.ShowPercent(0);
+    NplBrowserLoaderPage.try_times = NplBrowserLoaderPage.try_times + 1;
+	LOG.std(nil, "warn", "NplBrowserLoaderPage.OnCheck", "try update times:%d",NplBrowserLoaderPage.try_times);
+
     a:check(nil,function()
         local cur_version = a:getCurVersion();
         local latest_version = a:getLatestVersion();
@@ -249,4 +271,18 @@ function NplBrowserLoaderPage.SetChecked(v)
 end
 function NplBrowserLoaderPage.IsLoaded()
     return NplBrowserLoaderPage.loaded;
+end
+-- check if main files are existed, if found anyone isn't exited, the version file will be deleted for running auto update again
+function NplBrowserLoaderPage.MainFilesExisted(redist_root)
+    for k,name in ipairs (NplBrowserLoaderPage.cef_main_files) do
+        local filename = string.format("%s/%s",redist_root, name);
+        if(not ParaIO.DoesFileExist(filename))then
+	        LOG.std(nil, "error", "NplBrowserLoaderPage.MainFilesExisted", "the file isn't existed:%s",filename);
+            local version_filename = string.format("%s/%s",redist_root, AssetsManager.defaultVersionFilename);
+            ParaIO.DeleteFile(version_filename);
+	        LOG.std(nil, "warn", "NplBrowserLoaderPage.MainFilesExisted", "delete the version file for running auto update again:%s",version_filename);
+            return false;
+        end
+    end
+    return true;
 end

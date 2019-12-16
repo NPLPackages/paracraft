@@ -121,8 +121,23 @@ local s_env_methods = {
 	"stopSound",
 	"playMusic",
 
-    -- Microbit
-	"rotateBone",
+    --------------- Microbit
+    -- Animation
+    "createRobotAnimation",
+    "addRobotAnimationChannel",
+    "endRobotAnimationChannel",
+    "addAnimationTimeValue_Rotation",
+    -- Motion
+    "playRobotAnimation",
+    "microbit_servo",
+    "microbit_sleep",
+    "rotateBone",
+    -- Looks
+    "microbit_display_show",
+    "microbit_display_scroll",
+    "microbit_display_clear",
+    -- Sensing
+    "microbit_is_pressed",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 

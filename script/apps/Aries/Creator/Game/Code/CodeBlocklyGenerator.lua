@@ -131,7 +131,7 @@ function CodeBlocklyGenerator:GetCategoryStr(category)
     local bCreateVarBtn = false;
 	for __,cmd in ipairs(all_cmds) do
 		if(category.name == cmd.category and not cmd.hide_in_toolbox)then
-            if(category.name == "Data")then
+            if(category.name == "Data" or category.name == "NplMicrobit.Data" )then
                 if(not bCreateVarBtn)then
                     local variable_type_maps = self:GetAllVariableTypes();
                     local type;

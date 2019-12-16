@@ -9,6 +9,7 @@ local langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockly
 -------------------------------------------------------
 ]]
 local McmlBlockly = NPL.export();
+commonlib.setfield("MyCompany.Aries.Game.Code.McmlBlockly", McmlBlockly);
 
 local all_cmds = {}
 
@@ -47,6 +48,21 @@ end
 -- public:
 function McmlBlockly.GetCategoryButtons()
 	return default_categories;
+end
+
+-- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
+-- return nil or a mcml string. 
+function McmlBlockly.GetCustomToolbarMCML()
+	McmlBlockly.toolBarMcmlText = McmlBlockly.toolBarMcmlText or string.format([[
+    <div style="float:left;margin-left:5px;margin-top:7px;">
+		<input type="button" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.Code.McmlBlockly.OnClickLearn" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+    </div>
+]], L"学习HTML");
+	return McmlBlockly.toolBarMcmlText;
+end
+
+function McmlBlockly.OnClickLearn()
+	ParaGlobal.ShellExecute("open", L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_html", "", "", 1);
 end
 
 -- public:

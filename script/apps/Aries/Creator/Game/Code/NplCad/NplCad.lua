@@ -113,12 +113,6 @@ end
 -- custom compiler here: 
 -- @param codeblock: code block object here
 function NplCad.CompileCode(code, filename, codeblock)
-    local NplOceConnection = NPL.load("Mod/NplCad2/NplOceConnection.lua");
-    if(not NplOceConnection or not NplOceConnection.is_loaded)then
-	    LOG.std(nil, "info", "NplCad", "load nploce failed");
-        return
-    end
-
     local block_name = codeblock:GetBlockName();
     if(not block_name or block_name == "")then
         block_name = "default"
@@ -196,23 +190,26 @@ end
 function NplCad.GetCode(code, filename, relativePath)
 	if(not NplCad.templateCode) then
 			NplCad.templateCode = [[
-local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
-local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
-ShapeBuilder.create();
-local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
-NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
-<code>
-local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
-NplCad.ExportToFile(ShapeBuilder.getScene(),%q);
-if(result)then
-	setActorValue("assetfile", %q);
-	setActorValue("showBones", true);
-    NplCad.RefreshFile(%q);
-end
+    local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
+    local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
+    SceneHelper.LoadPlugin(function()
+        ShapeBuilder.create();
+        local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+        NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
+        <code>
+        local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
+        NplCad.ExportToFile(ShapeBuilder.getScene(),%q);
+        if(result)then
+	        setActorValue("assetfile", %q);
+	        setActorValue("showBones", true);
+            NplCad.RefreshFile(%q);
+        end
+    end)
 ]]
 		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
 	end
-    return string.format(NplCad.templateCode, code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath)
+    local s = string.format(NplCad.templateCode, code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath);
+    return s
 end
 
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 

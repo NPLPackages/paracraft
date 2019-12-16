@@ -9,6 +9,56 @@ use the lib:
 ]]
 NPL.export({
 -----------------------
+
+{
+	type = "mcml_attrs_style_key_value", 
+	message0 = "%1 = \"%2\"%3%4",
+	arg0 = {
+        {
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ "style", "style"},
+			},
+		},
+       
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+        
+	},
+    output = {type = "null",},
+	category = "McmlAttrs", 
+	helpUrl = "", 
+	canRun = true,
+	func_description_lua_provider = [[
+        var key_value = block.getFieldValue("key");
+        var attrs_value = Blockly.Extensions.readTextFromMcmlAttrs(block,"Lua");
+        var s = key_value + "='" + attrs_value + "'"
+        return [s];
+    ]],
+	ToNPL = function(self)
+		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 {
 	type = "mcml_attrs_key_value_onclick", 
 	message0 = "%1 = \"%2\"",
@@ -104,54 +154,6 @@ NPL.export({
 	helpUrl = "", 
 	canRun = true,
 	func_description = '%s="%s"',
-	ToNPL = function(self)
-		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-]]}},
-},
-
-{
-	type = "mcml_attrs_style_key_value", 
-	message0 = "%1 = %2\"%3\"%4",
-	arg0 = {
-        {
-			name = "key",
-			type = "field_dropdown",
-			options = {
-				{ "style", "style"},
-			},
-		},
-       {
-            name = "btn",
-            type = "field_button",
-            content = {
-                src = "png/plus-2x.png"
-            },
-            width = 16,
-            height = 16,
-            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
-        },
-        {
-			name = "start_dummy",
-			type = "input_dummy",
-		},
-        {
-			name = "end_dummy",
-			type = "input_dummy",
-		},
-        
-	},
-    output = {type = "null",},
-	category = "McmlAttrs", 
-	helpUrl = "", 
-	canRun = true,
-	func_description_lua_provider = [[
-        var key_value = block.getFieldValue("key");
-        var attrs_value = Blockly.Extensions.readTextFromMcmlAttrs(block,"Lua");
-        var s = key_value + "='" + attrs_value + "'"
-        return [s];
-    ]],
 	ToNPL = function(self)
 		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,

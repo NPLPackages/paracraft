@@ -882,7 +882,7 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 				{ L"设置真实光影[1|2|3]", "/shader"},
 				{ L"设置光源颜色[0,2] [0,2] [0,2]", "/light"},
 				{ L"设置太阳颜色[0,2] [0,2] [0,2]", "/sun"},
-				{ L"添加规则:发送事件HelloEvent", "/sendevent HelloEvent {data=1}" },
+				{ L"发送事件HelloEvent", "/sendevent HelloEvent {data=1}" },
 				{ L"添加规则:Lever可放在Glowstone上", "/addrule Block CanPlace Lever Glowstone" },
 				{ L"添加规则:Glowstone可被删除", "/addrule Block CanDestroy Glowstone true" },
 				{ L"添加规则:人物自动爬坡", "/addrule Player AutoWalkupBlock false" },

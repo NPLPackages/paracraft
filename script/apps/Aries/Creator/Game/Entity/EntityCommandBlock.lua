@@ -30,7 +30,14 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"));
+Entity:Property({"languageConfigFile", "commands", "GetLanguageConfigFile", "SetLanguageConfigFile"})
+Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
+Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
+
+Entity:Signal("beforeRemoved")
+Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
+Entity:Signal("inventoryChanged", function(slotIndex) end)
 
 -- class name
 Entity.class_name = "EntityCommandBlock";
@@ -46,6 +53,11 @@ function Entity:ctor()
 end
 
 function Entity:Refresh()
+end
+
+function Entity:OnRemoved()
+	self:beforeRemoved();
+	Entity._super.OnRemoved(self);
 end
 
 -- virtual function: handle some external input. 
@@ -176,6 +188,44 @@ function Entity:LoadFromXMLNode(node)
 	if(node.attr.last_output) then
 		self.last_output = tonumber(node.attr.last_output);
 	end
+	for i=1, #node do
+		if(node[i].name == "blockly") then
+			for j=1, #(node[i]) do
+				local sub_node = node[i][j];
+				local code = sub_node[1]
+				if(code) then
+					if(type(code) == "table" and type(code[1]) == "string") then
+						-- just in case cmd.name == "![CDATA["
+						code = code[1];
+					end
+				end
+				if(type(code) == "string") then
+					if(sub_node.name == "xmlcode") then
+						self:SetBlocklyXMLCode(code);
+					elseif(sub_node.name == "nplcode") then
+						self:SetBlocklyNPLCode(code);
+					elseif(sub_node.name == "code") then
+						self:SetNPLCode(code);
+					end
+				end
+			end
+		elseif(node[i].name == "includedFiles") then
+			self.includedFiles = {};
+			for j=1, #(node[i]) do
+				local sub_node = node[i][j];
+				local filename = sub_node[1]
+				self.includedFiles[j] = filename;
+			end
+		end
+	end
+	if(not self.isBlocklyEditMode and not self.nplcode) then
+		self.nplcode = self:GetCommand();
+	end
+	if(self.isBlocklyEditMode) then
+		self:SetCommand(self:GetBlocklyNPLCode());
+	else
+		self:SetCommand(self:GetNPLCode());
+	end
 end
 
 function Entity:SaveToXMLNode(node, bSort)
@@ -186,12 +236,19 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.last_output) then
 		node.attr.last_output = self.last_output;
 	end
-	return node;
-end
+	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
 
--- the title text to display (can be mcml)
-function Entity:GetCommandTitle()
-	return L"输入命令行(可以多行): <div>例如:/echo Hello</div>"
+	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
+		local blocklyNode = {name="blockly", };
+		node[#node+1] = blocklyNode;
+		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
+		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
+		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
+			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
+		end
+	end
+
+	return node;
 end
 
 -- allow editing bag 
@@ -250,5 +307,171 @@ function Entity:FrameMove(deltaTime)
 	if(not self:IsPaused() and not self:AdvanceTime(deltaTime)) then
 		-- stop ticking when there is no timed event. 
 		self:SetFrameMoveInterval(nil);
+	end
+end
+
+function Entity:IsPowered()
+	return self.isPowered;
+end
+
+function Entity:Stop()
+end
+
+function Entity:Restart()
+	self:ExecuteCommand(EntityManager.GetPlayer(), true, true);
+end
+
+
+function Entity:GetLanguageConfigFile()
+	return self.languageConfigFile or "";
+end
+
+function Entity:SetLanguageConfigFile(filename)
+	if(self:GetLanguageConfigFile() ~= filename) then
+		self.languageConfigFile = filename;
+	end
+end
+
+
+-- set code language type
+-- @param type: "npl" or "javascript" or "python"
+function Entity:SetCodeLanguageType(type)
+    type = type or "npl"
+	if(self:GetCodeLanguageType() ~= type) then
+		self.codeLanguageType = type;
+	end
+end
+-- @return "npl" or "javascript" or "python"
+function Entity:GetCodeLanguageType()
+    return self.codeLanguageType;
+end
+
+
+function Entity:SetBlocklyXMLCode(blockly_xmlcode)
+	self.blockly_xmlcode = blockly_xmlcode;
+end
+
+function Entity:GetBlocklyXMLCode()
+	return self.blockly_xmlcode;
+end
+
+
+function Entity:SetBlocklyNPLCode(blockly_nplcode)
+	self.blockly_nplcode = blockly_nplcode;
+	self:SetCommand(blockly_nplcode);
+end
+
+function Entity:GetBlocklyNPLCode()
+	return self.blockly_nplcode;
+end
+
+function Entity:SetNPLCode(nplcode)
+	self.nplcode = nplcode;
+	self:SetCommand(nplcode);
+end
+
+function Entity:GetNPLCode()
+	return self.nplcode or self:GetCommand();
+end
+
+function Entity:IsCodeEmpty()
+	local cmd = self:GetCommand()
+	if(not cmd or cmd == "") then
+		return true;
+	end
+end
+
+function Entity:TextToXmlInnerNode(text)
+	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
+		return {name="![CDATA[", [1] = text};
+	else
+		return text;
+	end
+end
+
+
+function Entity:IsBlocklyEditMode()
+	return self.isBlocklyEditMode;
+end
+
+function Entity:SetBlocklyEditMode(bEnabled)
+	if(self.isBlocklyEditMode~=bEnabled) then
+		self.isBlocklyEditMode = bEnabled;
+		if(bEnabled)  then
+			self:SetCommand(self:GetBlocklyNPLCode());
+		else
+			self:SetCommand(self:GetNPLCode());
+		end
+		self:editModeChanged();
+	end
+end
+
+function Entity:GetCodeBlock(bCreateIfNotExist)
+	if(not self.codeBlock and bCreateIfNotExist) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
+		local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
+		self.codeBlock = CodeBlock:new():Init(self);
+	end
+	return self.codeBlock;
+end
+
+function Entity:IsCodeLoaded()
+	return true;
+end
+
+function Entity:GetFilename()
+	return "";
+end
+
+function Entity:OpenCommandsEditor()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	CodeBlockWindow.Show(true);
+	CodeBlockWindow.SetCodeEntity(self);
+end
+
+function Entity:CloseEditor()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    CodeBlockWindow.Close()
+end
+
+function Entity:SetAllowClientExecution(bAllow)
+end
+
+function Entity:IsAllowClientExecution()
+	return true;
+end
+
+function Entity:SetAllowFastMode(bAllow)
+end
+
+function Entity:IsAllowFastMode()
+	return true;
+end
+
+function Entity:FindNearByMovieEntity()
+	return nil
+end
+
+local EditorPanelMCML
+-- the title text to display (can be mcml)
+function Entity:GetCommandTitle()
+	-- return L"输入命令行(可以多行): <div>例如:/echo Hello</div>"
+	EditorPanelMCML = EditorPanelMCML or string.format([[
+		<div style="float:left;margin-left:5px;margin-top:7px;">
+			<input type="button" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntityCommandBlock.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+		</div>
+	]], L"命令编辑器...");
+	return EditorPanelMCML;
+end
+
+function Entity.OnClickAdvancedEditor()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EditEntityPage.lua");
+	local EditEntityPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditEntityPage");
+	local self = EditEntityPage.GetEntity()
+	if(self and self:isa(Entity)) then
+		EditEntityPage.CloseWindow();
+		self:OpenCommandsEditor();
 	end
 end

@@ -60,4 +60,110 @@ function env_imp:rotateBone(name,angle,axis,duration)
         end
     end
 end
+function env_imp:createOrUpdateVariableRotation(name,axis,type,values)
+    local axis_value;
+    if(axis == "x")then
+        axis_value = vector3d.unit_x;
+    elseif(axis == "y")then
+        axis_value = vector3d.unit_y;
+    elseif(axis == "z")then
+        axis_value = vector3d.unit_z;
+    end
+    local bone_attr_variable_rot = env_imp.getBoneAttVariable(self,name,1);
+    if(bone_attr_variable_rot)then
+	    local var = bone_attr_variable_rot:CreateGetTimeVar();
+	    if(var) then
+            var:Reset();
+            var.type = type or "Linear";
+
+            for k,v in ipairs(values) do
+                local angle = v.value * math.pi / 180;
+                var:AddKey(v.time,Quaternion:new():FromAngleAxis(angle, axis_value));
+            end
+        end
+        return var;
+    end
+end
+function env_imp:microbit_servo(bone_name, axis, value, channel)
+    env_imp.rotateBone(self,bone_name,value,axis,1000);
+end
+function env_imp:microbit_sleep(time)
+end
+function env_imp:microbit_is_pressed(btn)
+end
+function env_imp:microbit_display_show(s)
+end
+function env_imp:microbit_display_scroll(s)
+end
+function env_imp:microbit_display_clear()
+end
+function env_imp:createRobotAnimation(name)
+    if(not self.robot_anims)then
+        self.robot_anims = {};
+    end
+    local robot_animation_container = {};
+    self.robot_anims[name] = robot_animation_container;
+    self.cur_robot_animation_container = robot_animation_container;
+    self.cur_robot_anim = nil;
+end
+function env_imp:playRobotAnimation(name)
+    if(not name or not self.robot_anims[name])then
+        return
+    end
+    local robot_animation_container = self.robot_anims[name];
+    local rot_variables = {};
+    for k,v in ipairs(robot_animation_container)do
+        local bone_name = v.bone_name;
+        local values = v.values;
+        local len = #values;
+        local min_time = values[1].time;
+        local max_time = values[len].time;
+        local var = env_imp.createOrUpdateVariableRotation(self,bone_name,v.axis,v.type,values);
+        if(var)then
+            table.insert(rot_variables,{ bone_name = bone_name, min_time = min_time, max_time = max_time, });
+        end
+    end
+    for k,v in ipairs(rot_variables) do
+        env_imp.playBone(self, v.bone_name, v.min_time, v.max_time - v.min_time);
+    end
+end
+function env_imp:addRobotAnimationChannel(bone_name,axis,channel,type)
+    if(not bone_name)then
+        return
+    end
+    if(env_imp.findBoneAnimByName(self,bone_name))then
+        return
+    end
+    -- create a animation table for bone
+    local anim = {
+        bone_name = bone_name,
+        axis = axis,
+        type = type,
+        values = {};
+    }
+    table.insert(self.cur_robot_animation_container,anim);
+    self.cur_robot_anim = anim;
+end
+function env_imp:addAnimationTimeValue_Rotation(time,value)
+    if(self.cur_robot_anim and self.cur_robot_anim.values)then
+        table.insert(self.cur_robot_anim.values,{ time = time, value = value }); 
+
+        table.sort(self.cur_robot_anim.values,function(a,b)
+            return a.time < b.time;
+        end)
+    end
+end
+function env_imp:findBoneAnimByName(bone_name)
+    if(not bone_name)then
+        return
+    end
+    if(self.robot_anims)then
+        for k,v in ipairs(self.robot_anims) do
+            if(v.bone_name == bone_name)then
+                return v;
+            end
+        end
+    end
+end
+
 

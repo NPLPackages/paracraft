@@ -50,9 +50,9 @@ function env_imp:getActorValue(name)
 	end
 end
 
-function env_imp:setActorValue(name, value)
+function env_imp:setActorValue(name, value, v2, v3)
 	if(self.actor) then
-		self.actor:SetActorValue(name, value)
+		self.actor:SetActorValue(name, value, v2, v3)
 	end
 end
 

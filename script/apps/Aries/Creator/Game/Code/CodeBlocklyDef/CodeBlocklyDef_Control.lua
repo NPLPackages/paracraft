@@ -245,7 +245,7 @@ end
 		if input == '' then
 			input = 'pass'
 		end
-		return string.format('def %s()\n    %s\n', self:getFieldValue('name'), input);
+		return string.format('def %s():\n    %s\n', self:getFieldValue('name'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('function %s()\n%send\n', self:getFieldValue('name'), self:getFieldAsString('input'));

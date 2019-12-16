@@ -53,9 +53,9 @@ function FillLine:Run()
 		local n;
 		for n=1, self.max_radius do
 			local block = BlockEngine:GetBlock(self.blockX+self.dx*n,self.blockY+self.dy*n,self.blockZ+self.dz*n)
-			if(block and not block.liquid) then
+			if(block and (not block.liquid or block.obstruction)) then
 				self.max_radius = n;
-				if(block_id == self.fill_id) then
+				if(block.id == self.fill_id) then
 					self.radius = n;
 				end
 				break;

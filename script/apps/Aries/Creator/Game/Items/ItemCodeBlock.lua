@@ -61,6 +61,10 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 				-- TODO: this is not a good way to implement it. Do it formally. 
 				itemStack.id = block_types.names.NPLCADCodeBlock or itemStack.id;
 				-- local item = ItemClient.GetItem(block_types.names.NPLCADCodeBlock);
+			elseif(data == 768) then
+				-- tricky: fixed picking python block. 
+				-- TODO: this is not a good way to implement it. Do it formally. 
+				itemStack.id = block_types.names.PyRuntimeCodeBlock or itemStack.id;
 			elseif(data == 1024) then
 				-- tricky: for client side execution code block
 				itemStack:SetPreferredBlockData(0)

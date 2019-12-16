@@ -184,7 +184,7 @@ function CmdParser.ParseColorRGB(cmd_text, min, max)
 	max = max or 2
 
 	local r,g,b, color, cmd_text_remain
-	color, cmd_text_remain = cmd_text:match("^%s*(#%w+)%s*(.*)$");
+	color, cmd_text_remain = cmd_text:match("^%s*['\"]?(#%w+)['\"]?%s*(.*)$");
 	if(color) then
 		r,g,b = Color.DWORD_TO_RGBA(Color.ColorStr_TO_DWORD(color))
 		r = r / 255

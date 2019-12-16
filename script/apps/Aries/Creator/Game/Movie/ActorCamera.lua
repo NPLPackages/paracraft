@@ -486,7 +486,16 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		end,old_value,true); 
 	elseif(keyname == "pos") then
 		local title = format(L"起始时间%s, 请输入位置x,y,z:", strTime);
-		old_value = string.format("%f, %f, %f", self:GetValue("lookat_x", curTime) or 0,self:GetValue("lookat_y", curTime) or 0, self:GetValue("lookat_z", curTime) or 0);
+		local bx, by, bz = self:GetValue("lookat_x", curTime),self:GetValue("lookat_y", curTime), self:GetValue("lookat_z", curTime)
+		if(not bx or not by or not bz) then
+			local entity = self:GetEntity() or EntityManager.GetPlayer();
+			bx, by, bz = entity:GetPosition();
+		end
+		bx, by, bz = BlockEngine:block_float(bx, by, bz)
+		bx = bx - 0.5;
+		bz = bz - 0.5;
+		old_value = string.format("%f, %f, %f", bx, by, bz);
+
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -494,10 +503,11 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(result and result~="") then
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
 				if(result and vars[1] and vars[2] and vars[3]) then
+					local x, y, z = BlockEngine:real_bottom(vars[1], vars[2], vars[3])
 					self:BeginUpdate();
-					self:AddKeyFrameByName("lookat_x", nil, vars[1]);
-					self:AddKeyFrameByName("lookat_y", nil, vars[2]);
-					self:AddKeyFrameByName("lookat_z", nil, vars[3]);
+					self:AddKeyFrameByName("lookat_x", nil, x);
+					self:AddKeyFrameByName("lookat_y", nil, y);
+					self:AddKeyFrameByName("lookat_z", nil, z);
 					self:EndUpdate();
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then

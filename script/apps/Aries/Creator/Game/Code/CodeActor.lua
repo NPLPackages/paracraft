@@ -16,6 +16,8 @@ NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/ide/System/Core/Color.lua");
+local Color = commonlib.gettable("System.Core.Color");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local math3d = commonlib.gettable("mathlib.math3d");
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
@@ -554,7 +556,7 @@ end
 
 function Actor:GetColor()
 	local entity = self:GetEntity();
-	return entity and entity:GetColor();
+	return Color.FromValueToStr(entity and entity:GetColor());
 end
 
 function Actor:SetColor(color)
@@ -880,6 +882,81 @@ function Actor:CanBeCollidedWith(entity)
 	end
 end
 
+function Actor:SetVelocity(x,y,z)
+	if(type(x) == "table") then
+		x, y, z = x[1], x[2], x[3];
+	end
+	x, y, z = tonumber(x or 0), tonumber(y or 0), tonumber(z or 0)
+	if(x and y and z) then
+		self.entity:SetDummy(false);
+		self.entity:EnableAnimation(true);
+		self.entity:SetVelocity(x, y, z);
+	end
+end
+
+function Actor:AddVelocity(x,y,z)
+	if(type(x) == "table") then
+		x, y, z = x[1], x[2], x[3];
+	end
+	x, y, z = tonumber(x or 0), tonumber(y or 0), tonumber(z or 0)
+	if(x and y and z) then
+		self.entity:SetDummy(false);
+		self.entity:EnableAnimation(true);
+		return self.entity:AddVelocity(x, y, z);
+	end
+end
+
+function Actor:GetVelocity()
+	return self.entity:GetVelocity();
+end
+
+function Actor:SetGravity(v)
+	v = tonumber(v or 9.81)
+	if(v) then
+		self.entity:SetDummy(false);
+		self.entity:EnableAnimation(true);
+		self.entity:SetGravity(v );
+	end
+end
+
+function Actor:GetGravity()
+	return self.entity:GetGravity();
+end
+
+function Actor:SetSurfaceDecay(v)
+	v = tonumber(v)
+	if(v) then
+		self.entity:SetDummy(false);
+		self.entity:EnableAnimation(true);
+		self.entity:SetSurfaceDecay(v);
+	end
+end
+
+function Actor:GetSurfaceDecay()
+	return self.entity:GetSurfaceDecay();
+end
+
+function Actor:SetAirDecay(v)
+	v = tonumber(v)
+	if(v) then
+		self.entity:SetDummy(false);
+		self.entity:EnableAnimation(true);
+		self.entity:GetPhysicsObject():SetAirDecay(v);
+	end
+end
+
+function Actor:GetAirDecay()
+	return self.entity:GetPhysicsObject():GetAirDecay();
+end
+
+function Actor:SetDummy(isDummy)
+	self.entity:SetDummy(isDummy == true);
+end
+
+function Actor:IsDummy()
+	return self.entity:IsDummy();
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -905,6 +982,14 @@ local internalValues = {
 	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
 	["shadowCaster"] = {setter = Actor.SetShaderCaster, getter = Actor.IsShaderCaster, isVariable = false},
 	["isServerEntity"] = {setter = Actor.SetServerEntity, getter = Actor.IsServerEntity, isVariable = false},
+	
+	["dummy"] = {setter = Actor.SetDummy, getter = Actor.IsDummy, isVariable = false}, 
+	["gravity"] = {setter = Actor.SetGravity, getter = Actor.GetGravity, isVariable = false}, 
+	["velocity"] = {setter = Actor.SetVelocity, getter = Actor.GetVelocity, isVariable = false}, 
+	["addVelocity"] = {setter = Actor.AddVelocity, isVariable = false}, 
+	["surfaceDecay"] = {setter = Actor.SetSurfaceDecay, getter = Actor.GetSurfaceDecay, isVariable = false}, 
+	["airDecay"] = {setter = Actor.SetAirDecay, getter = Actor.GetAirDecay, isVariable = false}, 
+
 	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
 }
 
@@ -922,11 +1007,11 @@ function Actor:GetActorValue(name)
 	end
 end
 
-function Actor:SetActorValue(name, value)
+function Actor:SetActorValue(name, value, v2, v3)
 	local entity = self:GetEntity()
 	if(entity and name) then
 		if(internalValues[name]) then
-			internalValues[name].setter(self, value)
+			internalValues[name].setter(self, value, v2, v3)
 			if(not internalValues[name].isVariable) then
 				return
 			end

@@ -22,6 +22,9 @@ local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 
 function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
+    if(not NplBrowserLoaderPage.IsLoaded())then
+        return
+    end
 	local page_ctrl = mcmlNode:GetPageCtrl();
 	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
     local url = mcmlNode:GetAttributeWithCode("url");

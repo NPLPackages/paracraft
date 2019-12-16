@@ -598,7 +598,7 @@ function Entity:IsShowHeadOnDisplay()
 end
 
 -- display a mcml v2 url or xmlnode on top of the entity. 
--- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), pageGlobalTable}
+-- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), pageGlobalTable, is3D:bool}
 -- if nil, it will remove head on display
 -- @return the headon display object if created
 function Entity:SetHeadOnDisplay(params)

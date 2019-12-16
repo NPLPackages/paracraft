@@ -89,6 +89,9 @@ function CodeBlockWindow.Show(bShow)
 		GameLogic:Connect("WorldUnloaded", CodeBlockWindow, CodeBlockWindow.OnWorldUnload, "UniqueConnection")
 
 		CodeBlockWindow:LoadSceneContext();
+		if(self.entity) then
+			EntityManager.SetLastTriggerEntity(self.entity)
+		end
 	end
 end
 
@@ -213,7 +216,7 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 		end
 		if(self.entity) then
 			local codeBlock = self.entity:GetCodeBlock();
-			if(not self.entity:IsPowered() and (codeBlock and codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
+			if(not self.entity:IsPowered() and (codeBlock and (codeBlock:IsLoaded() or codeBlock:HasRunningTempCode()))) then
 				if(not self.entity:IsEntitySameGroup(entity)) then
 					self.entity:Stop();
 				end
@@ -278,7 +281,10 @@ end
 function CodeBlockWindow.GetCodeEntity(bx, by, bz)
 	if(bx) then
 		local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
-		if(codeEntity and codeEntity.class_name == "EntityCode") then
+		if(codeEntity and codeEntity.class_name == "EntityCode" 
+			or codeEntity.class_name == "EntitySign" 
+			or codeEntity.class_name == "EntityCommandBlock") then
+
 			return codeEntity;
 		end
 	else
@@ -424,12 +430,11 @@ function CodeBlockWindow.OnClickStop()
 end
 
 function CodeBlockWindow.OnClickCompileAndRun()
-	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
-	if(codeBlock and codeBlock:GetEntity()) then
+	if(codeEntity) then
 		-- GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
 		CodeBlockWindow.UpdateCodeToEntity();
-		codeBlock:GetEntity():Restart();
+		codeEntity:Restart();
 	end
 end
 
@@ -467,7 +472,7 @@ end
 
 function CodeBlockWindow.GetFilename()
 	if(self.entity) then
-		return self.entity:GetDisplayName();
+		return self.entity:GetFilename();
 	end
 end
 
@@ -956,7 +961,7 @@ end
 function CodeBlockWindow.GetBlockList()
 	local blockList = {};
 	local entity = self.entity;
-	if(entity) then
+	if(entity and entity.ForEachNearbyCodeEntity) then
 		entity:ForEachNearbyCodeEntity(function(codeEntity)
 			blockList[#blockList+1] = {filename = codeEntity:GetFilename() or L"未命名", entity = codeEntity}
 		end);

@@ -262,6 +262,21 @@ function NplBrowserPlugin.Start(p)
     end
 
     if System.os.GetPlatform() == 'win32' and not NplBrowserPlugin.CheckCefClientExist() then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+		NplBrowserLoaderPage.SetChecked(false);
+		-- we will reinstall chrome cef3
+		_guihelper.MessageBox(L"NPL Chrome浏览器插件丢失，是否重新安装?", function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				local bForceReinstall = true
+				
+				NplBrowserLoaderPage.Check(function(loaded)
+					if(loaded) then
+						NplBrowserPlugin.Start(p)
+					end
+				end, bForceReinstall)
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
 		LOG.std(nil, "warn", "NplBrowserPlugin.Start", "the client [%s] isn't existed, can't start npl browser", default_client_name);
         return false;
     end
