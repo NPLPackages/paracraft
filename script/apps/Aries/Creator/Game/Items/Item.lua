@@ -272,7 +272,7 @@ function Item:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 			if(block_template) then
 				if(not data) then
 					data = block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
-					data = block_template:CalculatePreferredData(data, itemStack:GetPreferredBlockData());
+					data = block_template:CalculatePreferredData(data, itemStack and itemStack:GetPreferredBlockData());
 				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then

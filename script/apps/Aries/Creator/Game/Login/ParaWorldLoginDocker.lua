@@ -270,7 +270,6 @@ end
 
 -- show page
 function ParaWorldLoginDocker.ShowPage()
-	
 	local params;
 	params = {
 		url = "script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.html", 

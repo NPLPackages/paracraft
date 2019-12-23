@@ -1230,3 +1230,14 @@ end
 function SystemSettingsPage.OnOpenBackupFolder()
 	GameLogic.world_revision:OnOpenRevisionDir();
 end
+
+function SystemSettingsPage.OnSetSchoolMode()
+	_guihelper.MessageBox(L"你确定要设置学校模式360天么? 学校模式将禁用启动某些游戏项目，一旦设置不可逆", function(res)
+		if(res and res == _guihelper.DialogResult.Yes) then
+			GameLogic.options:SetSchoolMode(360);
+			if (System.options.isSchool) then
+				_guihelper.MessageBox(L"设置成功");
+			end
+		end
+	end, _guihelper.MessageBoxButtons.YesNo);
+end

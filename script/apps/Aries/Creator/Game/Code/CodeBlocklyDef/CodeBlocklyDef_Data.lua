@@ -719,9 +719,9 @@ log(t)
 	func_description_lua_provider = [[
         var attrs = Blockly.Extensions.readTextFromMcmlAttrs(block, "Lua", ",");
         if (attrs) {
-            return "{%s}".format(attrs)
+            return ["{%s}".format(attrs), Blockly.Lua.ORDER_ATOMIC];
         }else{
-            return "{}";
+            return ["{}", Blockly.Lua.ORDER_ATOMIC];
         }
     ]],
 	ToNPL = function(self)

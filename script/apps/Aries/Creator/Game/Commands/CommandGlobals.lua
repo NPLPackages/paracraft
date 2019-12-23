@@ -417,7 +417,7 @@ Commands["map"] = {
 
 Commands["mode"] = {
 	name="mode", 
-	quick_ref="/mode [game|edit|tutorial]", 
+	quick_ref="/mode [game|edit|tutorial|school]", 
 	mode_deny = "",
 	mode_allow = "",
 	desc=[[locking game mode to the given value. 
@@ -426,28 +426,35 @@ Once locked, user will not be able to toggle unless with command line.
 @param edit: in edit mode, everything is editable. 
 @param tutorial: tutorial mode is same as edit mode, except that mouse picking 
 is only valid if there is a ending block(id=155) below. 
+@param school: playing online games are banned in school mode. 
 e.g.
 /mode game     :lock to game mode
 /mode edit     :lock to edit mode
 /mode          :unlock and toggle between game/edit mode. 
 /mode tutorial 
+/mode school 7 : make school mode for 7 days
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(not System.options.is_mcworld) then
 			return;
 		end
-		cmd_text = cmd_text:match("%w+");
-		if(cmd_text == "") then
-			cmd_text = nil;
-		elseif(cmd_text == "edit") then
-			cmd_text = "editor";
-		elseif(cmd_text == "play") then
-			cmd_text = "game";
+		local mode;
+		mode, cmd_text = CmdParser.ParseString(cmd_text);
+		if(mode == "edit") then
+			mode = "editor";
+		elseif(mode == "play") then
+			mode = "game";
 		end
 
-		GameLogic.options:SetLockedGameMode(cmd_text);
-		if( GameLogic.GameMode:GetMode() ~= cmd_text ) then
-			MyCompany.Aries.Creator.Game.Desktop.OnActivateDesktop(cmd_text);
+		if(mode == "school") then
+			local days;
+			days, cmd_text = CmdParser.ParseInt(cmd_text);
+			GameLogic.options:SetSchoolMode(days or 7);
+		else
+			GameLogic.options:SetLockedGameMode(mode);
+			if( GameLogic.GameMode:GetMode() ~= mode) then
+				MyCompany.Aries.Creator.Game.Desktop.OnActivateDesktop(mode);
+			end	
 		end
 	end,
 };

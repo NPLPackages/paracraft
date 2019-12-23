@@ -239,6 +239,7 @@ entity_data: optional, preferred entity data when created.
     <block id="120"/>
     <block id="121"/>
     <block id="122"/>
+    <!--<block id="61"/>-->
     <block name="Mirror" />
     <block name="BlockLight" />
   </category>

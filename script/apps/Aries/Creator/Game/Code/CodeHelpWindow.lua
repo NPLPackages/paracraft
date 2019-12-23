@@ -109,6 +109,19 @@ function CodeHelpWindow.InitCmds()
 	end
 end
 
+function CodeHelpWindow.OnClickLearn()
+	if(CodeHelpWindow.lastLangConfig and CodeHelpWindow.lastLangConfig.OnClickLearn) then
+		CodeHelpWindow.lastLangConfig.OnClickLearn()
+	else
+		local url = L"https://keepwork.com/official/paracraft/codeblock"
+		if(CodeHelpWindow.codeLanguageType == "python") then
+			url = L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_python"
+		end
+		ParaGlobal.ShellExecute("open", url, "", "", 1);	
+	end
+	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse.codeblock", nil, nil);
+end
+
 -- public: 
 function CodeHelpWindow.SetAllCmds(all_cmds)
 	CodeHelpWindow.all_cmds = all_cmds;

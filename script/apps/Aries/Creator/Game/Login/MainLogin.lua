@@ -608,6 +608,14 @@ function MainLogin:ShowLoginModePage()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+
+	
+	if(not System.options.isSchool) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+		local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+		options:SetSchoolMode();
+	end
+
 	if(GameLogic.GetFilters():apply_filters("ShowLoginModePage", {})) then
 		System.App.Commands.Call("File.MCMLWindowFrame", {
 			url = "script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html", 

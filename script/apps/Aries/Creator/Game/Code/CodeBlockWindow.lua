@@ -283,7 +283,8 @@ function CodeBlockWindow.GetCodeEntity(bx, by, bz)
 		local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
 		if(codeEntity and codeEntity.class_name == "EntityCode" 
 			or codeEntity.class_name == "EntitySign" 
-			or codeEntity.class_name == "EntityCommandBlock") then
+			or codeEntity.class_name == "EntityCommandBlock"
+			or codeEntity.class_name == "EntityCollisionSensor") then
 
 			return codeEntity;
 		end
@@ -973,9 +974,7 @@ function CodeBlockWindow.GetBlockList()
 end
 
 function CodeBlockWindow.OnOpenTutorials()
-	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/paracraft/codeblock", "", "", 1);
-
-	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse.codeblock", nil, nil);
+	CodeHelpWindow.OnClickLearn()
 end
 
 function CodeBlockWindow.OpenExternalFile(filename)

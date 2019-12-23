@@ -438,7 +438,7 @@ Sound related:
   <block singleSideTex="true" text="蓝色裂石" searchkey="蓝色裂石" id="54" icon="Texture/blocks/items/stone_blue.png" texture="Texture/tileset/blocks/stone2_single.dds" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" text="青色裂石" searchkey="青色裂石" id="57" icon="Texture/blocks/items/stone_cyan.png" texture="Texture/tileset/blocks/stone_round_single.dds" obstruction="true" solid="true" cubeMode="true"  />
   <block singleSideTex="true" text="黄色裂石" searchkey="黄色裂石" id="60"  icon="Texture/blocks/items/stone_yellow.png" texture="Texture/tileset/blocks/stone_yellow_single.dds" obstruction="true" solid="true" cubeMode="true"  />
-  <block sixSideTex="true" id="61" toggle_sound="door_open" texture="Texture/tileset/blocks/test_six.dds" obstruction="true" solid="true" cubeMode="true"  />
+  <block sixSideTex="true" name="SixSideBlock"  text="6面体" searchkey="6面体" id="61" toggle_sound="door_open" texture="Texture/tileset/blocks/test_six.dds" obstruction="true" solid="true" cubeMode="true"  />
   <block threeSideTex="true" id="63" texture="Texture/tileset/blocks/top_ice_three.dds" obstruction="true" solid="true" cubeMode="true"  />
   <block threeSideTex="true" id="64" texture="Texture/tileset/blocks/treetrunk2_three.dds" obstruction="true" solid="true" cubeMode="true"  />
   <block threeSideTex="true" id="65" texture="Texture/tileset/blocks/treetrunk_three.dds" obstruction="true" solid="true" cubeMode="true"  />

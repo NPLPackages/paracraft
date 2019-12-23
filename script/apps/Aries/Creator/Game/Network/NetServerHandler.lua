@@ -16,6 +16,7 @@ local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -448,8 +449,14 @@ function NetServerHandler:handleMobSpawn(packet_MobSpawn)
 		spawnedEntity = EntityManager.EntityItem:new():Init(x,y,z, ItemStack:new():Init(packet_MobSpawn.item_id,1));
 		LOG.std(nil, "debug", "server::handleMobSpawn", "item: %d", packet_MobSpawn.item_id or -1);
 	elseif(entity_type == 14) then
-		spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"]});
-		LOG.std(nil, "debug", "server::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
+		local item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"];
+		local item = ItemClient.GetItem(item_id)
+		if(item) then
+			if(not item.max_count or item:GetInWorldCount() < item.max_count) then
+				spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = item_id});
+				LOG.std(nil, "debug", "server::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
+			end
+		end
 	elseif(entity_type == 10) then
 		spawnedEntity = EntityManager.EntityRailcar:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["railcar"]});
 		LOG.std(nil, "debug", "server::handleMobSpawn", "railcar: %d", packet_MobSpawn.item_id or -1);

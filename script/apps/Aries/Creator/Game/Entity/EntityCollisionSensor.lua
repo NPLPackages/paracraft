@@ -65,9 +65,12 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 	return Entity._super.OnNeighborChanged(self, x,y,z, from_block_id);
 end
 
+local EditorPanelMCML
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
-	return "命令或物品脚本将在人物碰撞本方块时执行"
+	EditorPanelMCML = EditorPanelMCML or format([[<div style="text-align:center">%s</div>%s]], 
+		L"命令或物品脚本将在人物碰撞本方块时执行", Entity._super.GetCommandTitle(self));
+	return EditorPanelMCML;
 end
 
 function Entity:HasCommand()

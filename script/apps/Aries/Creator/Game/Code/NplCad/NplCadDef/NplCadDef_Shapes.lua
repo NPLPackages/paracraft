@@ -498,7 +498,7 @@ local cmds = {
 	func_description = 'trapezoid(%s,%s,%s,%s,%s,%s)',
 	func_description_js = 'trapezoid(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('trapezoid(("%s",%s,%s,%s,%s,"%s")\n', 
+        return string.format('trapezoid("%s",%s,%s,%s,%s,"%s")\n', 
             self:getFieldValue('op'), 
             self:getFieldValue('top_w'), self:getFieldValue('bottom_w'), self:getFieldValue('hight'),self:getFieldValue('depth'), 
             self:getFieldValue('color'));

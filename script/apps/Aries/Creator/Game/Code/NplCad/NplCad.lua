@@ -229,7 +229,7 @@ end
 function NplCad.OnClickExport(type)
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then
-		codeBlock:SetModified();
+		codeBlock:SetModified(true);
 		NplCad.export_type = type;
 		codeBlock:GetEntity():Restart();
 		NplCad.export_type = nil;
@@ -277,7 +277,16 @@ function NplCad.ExportToFile(scene,filename)
 				end, _guihelper.MessageBoxButtons.YesNo);
             end
         end);
-
+	elseif(type == "parax")then
+		local output_filename = filename .. ".x";
+		_guihelper.MessageBox(string.format(L"成功导出:%s, 是否拿在手中?", commonlib.Encoding.DefaultToUtf8(output_filename)), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+					local info = Files.ResolveFilePath(output_filename)
+					if(info and info.relativeToWorldPath) then
+						GameLogic.RunCommand(format("/take BlockModel {tooltip=\"%s\"}", commonlib.Encoding.DefaultToUtf8(info.relativeToWorldPath)));
+					end
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
     end
 end
 function NplCad.ShowMessageBox(filename)
@@ -338,4 +347,8 @@ function NplCad.OnClickSaveFile()
 	        LOG.std(nil, "error", "NplCad", "save file failed:%s",filename);
 		end
     end
+end
+
+function NplCad.OnClickLearn()
+	ParaGlobal.ShellExecute("open", L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_cad", "", "", 1);
 end

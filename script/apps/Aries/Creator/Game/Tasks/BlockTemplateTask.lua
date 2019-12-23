@@ -234,7 +234,9 @@ function BlockTemplate:SaveTemplate()
 	do
 		self.params = self.params or {};
 		self.params.auto_scale = self.auto_scale;
-		self.params.relative_motion = self.relative_motion;
+		if(not self.params.relative_motion) then
+			self.params.relative_motion = self.relative_motion;
+		end
 		local o = {name="pe:blocktemplate", attr = self.params};
 
 		if(not self.blocks) then

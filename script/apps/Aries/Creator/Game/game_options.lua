@@ -9,8 +9,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/API/UserProfile.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/World/StereoVisionController.lua");
 local StereoVisionController = commonlib.gettable("MyCompany.Aries.Game.StereoVisionController")
 local UserProfile = commonlib.gettable("MyCompany.Aries.Creator.Game.API.UserProfile");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
@@ -537,6 +535,26 @@ function options:SetLockedGameMode(mode)
 	end
 end
 
+-- @param days: number or nil. if nil, we will read school mode. 
+function options:SetSchoolMode(days)
+	if(type(days) == "number") then
+		System.options.isSchool = true;
+		local expireTime = ParaGlobal.GetSysDateTime() + 86400*days;
+		GameLogic.GetPlayerController():SaveLocalData("school_mode_expire_time", expireTime, true, true);
+		LOG.std(nil, "info", "options", "school mode will expire after %d days", days);
+	else
+		if(System.options.isSchool == nil) then
+			System.options.isSchool = false;
+			local expireTime = GameLogic.GetPlayerController():LoadLocalData("school_mode_expire_time",true,true);
+			if(type(expireTime) == "number") then
+				if(ParaGlobal.GetSysDateTime() < expireTime) then
+					System.options.isSchool = true;
+				end
+			end
+		end
+		LOG.std(nil, "info", "options", "school mode: %s ", System.options.isSchool and "on" or "off");
+	end
+end
 
 function options:SetEnableAutoUIScaling(bEnable)
 	if(bEnable ~= nil) then

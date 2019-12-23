@@ -84,12 +84,29 @@ function env_imp:createOrUpdateVariableRotation(name,axis,type,values)
         return var;
     end
 end
-function env_imp:microbit_servo(bone_name, axis, value, channel)
+function env_imp:microbit_servo(bone_name, axis, value, channel, offset)
     env_imp.rotateBone(self,bone_name,value,axis,1000);
 end
 function env_imp:microbit_sleep(time)
+    time = time or 0;
+    env_imp.wait(self,time/1000);
 end
 function env_imp:microbit_is_pressed(btn)
+    if(not btn)then
+        return
+    end
+    local key = string.lower(btn);
+    if(key == "a")then
+        key = "t"
+    end
+    if(key == "b")then
+        key = "y"
+    end
+    local v = env_imp.isKeyPressed(self,key);
+    if(v)then
+        commonlib.echo({btn = btn , key = key, v = v, });
+    end
+    return v;
 end
 function env_imp:microbit_display_show(s)
 end

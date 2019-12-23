@@ -79,7 +79,9 @@ if(not System.User.keepworktoken) then
 end
 
 commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
-commonlib.setfield("System.options.isSchool", ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true");
+if(ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true") then
+	commonlib.setfield("System.options.isSchool", true);
+end
 
 --System.options.isDevEnv = true;
 -- load from config file
