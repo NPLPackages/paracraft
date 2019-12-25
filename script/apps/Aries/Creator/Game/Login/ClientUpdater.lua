@@ -2,33 +2,59 @@
 Title: ClientUpdater 
 Author(s): LiXizhi
 Date: 2018.7.26
-Desc: for client update on mobile devices
+Desc: for client update without NPLRuntime and dll
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
 local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
 local updater = ClientUpdater:new();
 updater:Check(function(bNeedUpdate, latestVersion)
+	if(bNeedUpdate) then
+		updater:Download(function(bSucceed)
+			if(bSucceed) then
+				updater:Restart()
+			else
+				self:next_step({IsUpdaterStarted = true});
+			end
+		end)
+	else
+		self:next_step({IsUpdaterStarted = true});
+	end
 end);
 ------------------------------------------------------------
 ]]
-local AssetsManager = NPL.load("AutoUpdater");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+local AutoUpdater = NPL.load("AutoUpdater");
 
--- create class
 local ClientUpdater = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater"));
 
+ClientUpdater.appname = "paracraftAppVersion";
+
 function ClientUpdater:ctor()
-	if(not AssetsManager) then
+	if(not ClientUpdater) then
 		LOG.std(nil, "info", "ClientUpdater", "AutoUpdater not found");
 		return;
 	end
-	self.autoUpdater = AssetsManager:new();
+	local autoUpdater = AutoUpdater:new();
+	self.autoUpdater = autoUpdater;
 
-	self.autoUpdater:onInit(ParaIO.GetWritablePath(), "config/autoupdater/paracraft_win32.xml", function(state)
-		self:OnEvent(state);
+	autoUpdater:onInit(self:GetRedistFolder(), self:GetUpdateConfigFilename(), function(state)
 	end)
 end
 
+-- this is the same folder as haqi
+function ClientUpdater:GetRedistFolder()
+	return ParaWorldLoginDocker.GetAppFolder(self.appname);
+end
+
+function ClientUpdater:GetUpdateConfigFilename()
+	return ParaWorldLoginDocker.GetAppConfigByName(self.appname)
+end
+
+-- public function:
 -- @param callbackFunc: function(bNeedUpdate, latestVersion)
 function ClientUpdater:Check(callbackFunc)
 	if(not self.autoUpdater) then
@@ -44,62 +70,32 @@ function ClientUpdater:Check(callbackFunc)
 		end
 		-- echo({self.autoUpdater:getCurVersion(), self.autoUpdater:getLatestVersion()});
 		if(self.autoUpdater:isNeedUpdate())then
-			-- self.autoUpdater:download();
 			callbackFunc(true, self.autoUpdater:getLatestVersion());
 		else
-			callbackFunc(false);
+			callbackFunc(false, self.autoUpdater:getLatestVersion());
 		end
 	end);
 end
 
-function ClientUpdater:OnEvent(state)
-	local a = self.autoUpdater;
-	if(state)then
-        if(state == AssetsManager.State.PREDOWNLOAD_VERSION)then
-            echo("=========PREDOWNLOAD_VERSION");
-        elseif(state == AssetsManager.State.DOWNLOADING_VERSION)then
-            echo("=========DOWNLOADING_VERSION");
-        elseif(state == AssetsManager.State.VERSION_CHECKED)then
-            echo("=========VERSION_CHECKED");
-        elseif(state == AssetsManager.State.VERSION_ERROR)then
-            echo("=========VERSION_ERROR");
-        elseif(state == AssetsManager.State.PREDOWNLOAD_MANIFEST)then
-            echo("=========PREDOWNLOAD_MANIFEST");
-        elseif(state == AssetsManager.State.DOWNLOADING_MANIFEST)then
-            echo("=========DOWNLOADING_MANIFEST");
-        elseif(state == AssetsManager.State.MANIFEST_DOWNLOADED)then
-            echo("=========MANIFEST_DOWNLOADED");
-        elseif(state == AssetsManager.State.MANIFEST_ERROR)then
-            echo("=========MANIFEST_ERROR");
-        elseif(state == AssetsManager.State.PREDOWNLOAD_ASSETS)then
-            echo("=========PREDOWNLOAD_ASSETS");
-            self.timer = commonlib.Timer:new({callbackFunc = function(timer)
-                echo(a:getPercent());
-            end})
-            self.timer:Change(0, 100)
-        elseif(state == AssetsManager.State.DOWNLOADING_ASSETS)then
-            echo("=========DOWNLOADING_ASSETS");
-        elseif(state == AssetsManager.State.ASSETS_DOWNLOADED)then
-            echo("=========ASSETS_DOWNLOADED");
-            echo(a:getPercent());
-            if(self.timer)then
-                self.timer:Change();
-            end
-            -- a:apply();
-        elseif(state == AssetsManager.State.ASSETS_ERROR)then
-            echo("=========ASSETS_ERROR");
-        elseif(state == AssetsManager.State.PREUPDATE)then
-            echo("=========PREUPDATE");
-        elseif(state == AssetsManager.State.UPDATING)then
-            echo("=========UPDATING");
-        elseif(state == AssetsManager.State.UPDATED)then
-            echo("=========UPDATED");
-        elseif(state == AssetsManager.State.FAIL_TO_UPDATED)then
-            echo("=========FAIL_TO_UPDATED");
-        end    
-    end
+-- public function:
+-- @param callbackFunc: function(bSucceed)
+function ClientUpdater:Download(callback)
+	ParaWorldLoginDocker.InstallApp(self.appname, function(bInstalled)
+		callback(bInstalled)
+	end)
 end
-
 function ClientUpdater:OnClickUpdate()
 	ParaGlobal.ShellExecute("open", L"http://paracraft.keepwork.com/download?lang=zh", "", "", 1);
+end
+
+function ClientUpdater:GetCurrentVersion()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+	local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+	return options.GetClientVersion() or ""
+end
+
+function ClientUpdater:Restart()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+	local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+	ParaWorldLoginDocker.Restart(self.appname, format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion()));
 end

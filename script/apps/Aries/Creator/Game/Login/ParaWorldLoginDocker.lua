@@ -187,6 +187,13 @@ local app_install_details = {
 		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
 		allowQQHall = true,
 	},
+	-- only used by ClientUpdater, this will force using the latest version in apps folder
+	["paracraftAppVersion"] = {
+		title=L"paracraft创意空间", hasParacraft = true, 
+		cmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true"',
+		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
+		allowQQHall = true,
+	},
 	["haqi"] = {
 		title=L"魔法哈奇", hasParacraft = true, 
 		cmdLine = 'mc="false" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true" version="kids" partner="keepwork" config="config/GameClient.config.xml"',
@@ -218,7 +225,7 @@ function ParaWorldLoginDocker.IsLoadedApp(name)
 		return true;
 	end
 	if(System.options.mc) then
-		if(name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
+		if(System.options.paraworldapp == name or name == "paracraft" or name == "user_worlds" or name == "tutorial_worlds") then
 			return true;
 		end
 	elseif(System.options.version == "kids") then

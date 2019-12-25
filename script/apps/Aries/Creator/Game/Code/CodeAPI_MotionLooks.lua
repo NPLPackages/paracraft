@@ -393,32 +393,61 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
 		actor:FrameMove(0, false);
 		self.codeblock:OnAnimateActor(actor, time);
 
-		if(timeTo and timeTo>timeFrom) then
+		if(timeTo and timeTo~=timeFrom) then
 			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
-			local function frameMove_(timer)
-				local delta = timer:GetDelta() * actor:GetPlaySpeed();
-				time = time + delta;
-				if(time >= timeTo) then
-					if(isLooping) then
-						if((time - delta) == timeTo) then
-							time = timeFrom;
+			local frameMove_;
+			if(timeTo > timeFrom) then
+				frameMove_ = function(timer)
+					local delta = timer:GetDelta() * actor:GetPlaySpeed();
+					time = time + delta;
+					if(time >= timeTo) then
+						if(isLooping) then
+							if((time - delta) == timeTo) then
+								time = timeFrom;
+							else
+								time = timeTo;
+							end
 						else
 							time = timeTo;
+							timer:Change();
 						end
-					else
-						time = timeTo;
-						timer:Change();
+					end
+					actor:SetTime(time);
+					actor:FrameMove(0, false);
+					if(timeTo == time) then
+						self.codeblock:OnAnimateActor(actor, time);
+						if(onFinishedCallback) then
+							onFinishedCallback();
+						end
 					end
 				end
-				actor:SetTime(time);
-				actor:FrameMove(0, false);
-				if(timeTo == time) then
-					self.codeblock:OnAnimateActor(actor, time);
-					if(onFinishedCallback) then
-						onFinishedCallback();
+			else
+				frameMove_ = function(timer)
+					local delta = timer:GetDelta() * actor:GetPlaySpeed();
+					time = time - delta;
+					if(time <= timeTo) then
+						if(isLooping) then
+							if((time + delta) == timeTo) then
+								time = timeFrom;
+							else
+								time = timeTo;
+							end
+						else
+							time = timeTo;
+							timer:Change();
+						end
+					end
+					actor:SetTime(time);
+					actor:FrameMove(0, false);
+					if(timeTo == time) then
+						self.codeblock:OnAnimateActor(actor, time);
+						if(onFinishedCallback) then
+							onFinishedCallback();
+						end
 					end
 				end
 			end
+
 			if(not self.actor.playTimer) then
 				self.actor.playTimer = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
 				self.actor:Connect("beforeRemoved", function(actor)

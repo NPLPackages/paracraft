@@ -1,0 +1,6 @@
+<configs>
+  <version>http://cdn.keepwork.com/nodejsruntime/version</version>
+  <hosts>
+    <host>http://cdn.keepwork.com/nodejsruntime/</host>
+  </hosts>
+</configs>

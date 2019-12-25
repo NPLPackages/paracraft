@@ -151,6 +151,8 @@ end
 -- update from packet. 
 function Entity:OnUpdateFromPacket(packet_UpdateEntitySign)
 	if(packet_UpdateEntitySign:isa(Packets.PacketUpdateEntitySign)) then
+		self.blockly_nplcode = nil;
+		self.nplcode = nil;
 		self:SetCommand(packet_UpdateEntitySign.text);
 		self.block_data = packet_UpdateEntitySign.data;
 		self:Refresh();
@@ -160,6 +162,11 @@ end
 
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
+	if(self:IsBlocklyEditMode() and self:GetCommand() ~= self.blockly_nplcode) then
+		-- trickly: just in case we modified command directly, we will fallback to npl code instead. 
+		self:SetNPLCode(self:GetCommand())
+		self:SetBlocklyEditMode(false);
+	end
 	self:MarkForUpdate();
 end
 
@@ -278,7 +285,9 @@ end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	if(self:IsBlocklyEditMode()) then
+		node.attr.isBlocklyEditMode = true;
+	end
 
 	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
 		local blocklyNode = {name="blockly", };
@@ -294,6 +303,8 @@ end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
+	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
+
 	for i=1, #node do
 		if(node[i].name == "blockly") then
 			for j=1, #(node[i]) do

@@ -342,7 +342,7 @@ play(0, 4000)
 playSpeed(4)
 playLoop(0, 1000)
 say("Looping", 3)
-playSpeed(1)
+setActorValue("playSpeed", 1)
 stop()
 ]]}},
 },

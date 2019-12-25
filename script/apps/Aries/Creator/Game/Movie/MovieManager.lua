@@ -229,6 +229,20 @@ end
 
 -- return array of actor names
 function MovieManager:GetActorNames()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+	local files = OpenAssetFileDialog.GetLocalModelFiles()
+	if(files) then
+		for _, node in ipairs(files) do
+			local filename = node.attr.filename;
+			if(filename) then
+				local name = filename:match("([^/%.]+)%.[^/]+$");
+				if(name) then
+					self:AddActorName(name)
+				end
+			end
+		end
+	end
 	return self.actor_names;
 end
 

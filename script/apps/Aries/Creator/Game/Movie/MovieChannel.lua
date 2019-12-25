@@ -143,9 +143,13 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 			self:UseCamera();
 		end
 		
-		if(toTime>fromTime) then
+		if(toTime~=fromTime) then
 			movieClip:Resume();	
-			movieClip:SetSpeed(self:GetSpeed())
+			if(toTime > fromTime) then
+				movieClip:SetSpeed(self:GetSpeed())
+			else
+				movieClip:SetSpeed(-self:GetSpeed())
+			end
 		else
 			movieClip:Pause();
 		end
@@ -154,7 +158,7 @@ function MovieChannel:Play(fromTime, toTime, bLooping)
 		self.playFromTime = fromTime;
 		self.playToTime = toTime;
 		self:SetLooping(bLooping == true);
-		if(fromTime < toTime) then
+		if(fromTime ~= toTime) then
 			movieClip:Connect("timeChanged", self, self.OnMovieTimeChange, "UniqueConnection")
 		end
 	end
@@ -180,18 +184,41 @@ end
 function MovieChannel:OnMovieTimeChange()
 	local movieClip = self:GetCurrentMovieClip();
 	if(movieClip) then
-		if(self:IsLooping()) then
-			local delta = movieClip:GetTime()-self.playToTime;
-			if(delta > 0) then
-				movieClip:SetTime(self.playFromTime + ((self.playFromTime + delta) % (self.playToTime - self.playFromTime)))
-				movieClip:Resume();	
+		if(self.playToTime > self.playFromTime) then
+			if(self:IsLooping()) then
+				local delta = movieClip:GetTime()-self.playToTime;
+				if(delta >= 0) then
+					movieClip:SetTime(self.playFromTime + (delta % (self.playToTime - self.playFromTime)))
+					movieClip:Resume();	
+				end
+			else
+				if(movieClip:GetTime() >= self.playToTime) then
+					movieClip:Pause();
+					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+					movieClip:SetTime(self.playToTime);
+					self:FireFinished();
+				end
 			end
 		else
-			if(movieClip:GetTime() >= self.playToTime) then
-				movieClip:Pause();
-				movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
-				movieClip:SetTime(self.playToTime);
-				self:FireFinished();
+			if(self:IsLooping()) then
+				local delta = movieClip:GetTime()-self.playToTime;
+				if(delta <= 0) then
+					movieClip:SetTime(self.playFromTime - ((-delta) % (self.playFromTime - self.playToTime)))
+					movieClip:Resume();	
+				end
+				if(movieClip:GetTime() >= self.playFromTime) then
+					if(movieClip:GetTime() > self.playFromTime) then
+						movieClip:SetTime(self.playFromTime);
+					end
+					movieClip:Resume();	
+				end
+			else
+				if(movieClip:GetTime() <= self.playToTime) then
+					movieClip:Pause();
+					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
+					movieClip:SetTime(self.playToTime);
+					self:FireFinished();
+				end
 			end
 		end
 	end

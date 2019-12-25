@@ -13,17 +13,18 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
 ClientVersion = string.format(L"Paracraft创意空间 v%s", options.GetClientVersion());
 LatestVersion = LatestVersion or false;
-NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
-local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
-local updater = ClientUpdater:new();
-updater:Check(function(bNeedUpdate, latestVersion)
-    if(bNeedUpdate) then
-        LatestVersion = latestVersion;
-        if(Page:IsVisible()) then
-            Page:Refresh();
-        end
-    end
-end);
+    
+-- NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
+-- local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
+-- local updater = ClientUpdater:new();
+-- updater:Check(function(bNeedUpdate, latestVersion)
+--     if(bNeedUpdate) then
+--         LatestVersion = latestVersion;
+--         if(Page:IsVisible()) then
+--             Page:Refresh();
+--         end
+--     end
+-- end);
 ]]></script>
 <pe:if condition='<%=Eval("showbg") == "true"%>'>
     <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 0 1024 545)" ></pe:container>

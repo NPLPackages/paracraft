@@ -669,7 +669,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end, old_value)
 	elseif(keyname == "head") then
 		local title = format(L"起始时间%s, 请输入头部角度(-1.57, 1.57)<br/>左右角度, 上下角度:", strTime);
 		old_value = string.format("%f, %f", self:GetValue("HeadTurningAngle", curTime) or 0,self:GetValue("HeadUpdownAngle", curTime) or 0);

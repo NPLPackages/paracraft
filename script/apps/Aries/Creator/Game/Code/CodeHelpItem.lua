@@ -297,7 +297,7 @@ function CodeHelpItem:GetNPLCodeExamples()
 					if(not example.code:match("^\r?\n")) then
 						out[#out + 1] = "\n";
 					end
-					out[#out + 1] = example.code;
+					out[#out + 1] = example.code:gsub("\t", "    ");
 					if(not example.code:match("\n$")) then
 						out[#out + 1] = "\n";
 					end

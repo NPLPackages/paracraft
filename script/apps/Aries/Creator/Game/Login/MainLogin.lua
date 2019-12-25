@@ -14,12 +14,12 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 -- create class
 local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
-local UserLoginProcess = nil;
 
 -- the initial states in the state machine. 
 -- Please see self:next_step() for more information on the meaning of these states. 
 MainLogin.state = {
 	CheckGraphicsSettings = nil,
+	IsUpdaterStarted = nil,
 	Loaded3DScene = nil,
 	IsCommandLineChecked = nil,
 	IsPackagesLoaded = nil,
@@ -27,67 +27,24 @@ MainLogin.state = {
 	IsPluginLoaded = nil,
 	HasSignedIn = nil,
 	HasInitedTexture = nil,
-		IsRegistrationRequested = nil,
-		IsUserSelected = nil,
-		IsLoginStarted = nil,
-		IsOfflineModeActivated =nil,
-		IsRegRealnm = false,
-		IsRestGatewayConnected = nil,
-		IsProductVersionVerified = nil,
-		IsUserNidSelected = nil,
-		IsRegUserRequested = nil,
-		IsRegUserConfirmRequested = nil,
-		IsAuthenticated = nil,
-		IsNickNameVerified = nil,
-		IsAvatarCreationRequested = nil,
-		IsFamilyInfoVerified = nil,
-		IsGlobalStoreSynced = nil,
-		IsExtendedCostSynced = nil,
-		IsInventoryVerified = nil,
-		IsEssentialItemsVerified = nil,
-		IsPetVerified = nil,
-		IsVIPItemsVerified = nil,
-		IsFriendsVerified = nil,
-		IsJabberInited = nil,	
-		IsCleanCached = nil,
+	
 	IsLoadMainWorldRequested = nil,
 	IsCreateNewWorldRequested = nil,
 	IsLoadTutorialWorldRequested = nil, -- NOT used
-
-	-- table of {user_nid = "1234567", user_name = "", password="",}, as a result of SelectLocalUser
-	local_user = nil,	
+	
 	-- the background 3d world path during login. This is set during Updater progress. We can display some news and movies in it. 
 	login_bg_worldpath = nil,
-	-- a table of {username, password} as a result of UserLoginPage
-	auth_user = nil,
-	-- registration user
-	reg_user = {},
-	-- a table of {worldpath, role, bHideProgressUI, movie, gs_nid, ws_id }, to be passed to LoadWorld command. 
-	-- where gs_nid is the game server nid, and ws_id is the world server id. 
-	load_world_params = nil,
-	-- the main login world
-	login_bg_worldpath = nil,
-	-- the preferred gateway game server during login process. nil or a table of {nid=game_server_nid_string}
-	gateway_server = nil,
 };
-
--- mapping from game server nid to last ping latency in milliseconds
-MainLogin.network_latency = {};
 
 -- start the login procedure. Only call this function once. 
 -- @param init_callback: the one time init function to be called to load theme and config etc.
 function MainLogin:start(init_callback)
 	-- initial states
-	MainLogin.state = {
-		reg_user = {},
-	};
+	MainLogin.state = {};
 	self.init_callback = init_callback;
 	
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/pe_mc_mcml.lua");
 	MyCompany.Aries.Game.mcml_controls.register_all();
-
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserLoginProcess.lua");
-	UserLoginProcess = UserLoginProcess or commonlib.gettable("MyCompany.Aries.Game.UserLoginProcess");
 
 	-- register external functions for each login step. Each handler's first parameter is MainLogin class instance. 
 	-- TODO: add your custom handlers here. 
@@ -96,6 +53,8 @@ function MainLogin:start(init_callback)
 		CheckGraphicsSettings = self.CheckGraphicsSettings,
 		-- load the background 3d scene
 		LoadBackground3DScene = self.LoadBackground3DScene,
+		-- update the core ParaEngine and minimal art assets. The logo page is also displayed here. 
+		UpdateCoreClient = self.UpdateCoreClient,
 		-- check command line
 		CheckCommandLine = self.CheckCommandLine,
 		-- Load buildin packages and mod
@@ -108,48 +67,6 @@ function MainLogin:start(init_callback)
 
 		HasInitedTexture = self.HasInitedTexture,
 
-		-- login page
-		UserLoginProcess = self.Proc_UserLoginProcess,
-			-- access token should already be passed to us command line
-			ExternalUserSignIn = UserLoginProcess.Proc_ExternalUserSignIn,
-			-- establish the first rest connection with the initial gateway game server. 
-			ConnectRestGateway = UserLoginProcess.Proc_ConnectRestGateway,
-			-- Establish connection with the default gateway game server; and authenticate the user and establish jabber connection. 
-			AuthUser = UserLoginProcess.Proc_Authentication,
-			-- verify product version
-			VerifyProductVersion = UserLoginProcess.Proc_VerifyProductVersion,
-			-- select user nid
-			SelectUserNid = UserLoginProcess.SelectUserNid,
-			-- if AuthUser returns msg.isreg is false, we will needs to trigger this one before proceding to next step. 
-			CreateNewAvatar = UserLoginProcess.CreateNewAvatar,
-			-- note:if no nick name is found, this user should be treated as a newly registered user, 
-			-- and we should direct it to CreateNewAvatar page
-			VerifyNickName = UserLoginProcess.Proc_VerifyNickName,
-			-- download the family profile 
-			VerifyFamilyInfo = UserLoginProcess.Proc_VerifyFamilyInfo,
-			-- verify all server objects
-			VerifyServerObjects = UserLoginProcess.Proc_VerifyServerObjects,
-			-- sync global store
-			SyncGlobalStore = UserLoginProcess.Proc_SyncGlobalStore,
-			-- sync extended cost template
-			ExtendedCostTemplate = UserLoginProcess.Proc_SyncExtendedCost,
-			-- verify the inventory 
-			VerifyInventory = UserLoginProcess.Proc_VerifyInventory,
-			-- verify pet
-			VerifyPet = UserLoginProcess.Proc_VerifyPet,
-			-- verify essential items
-			VerifyEssentialItems = UserLoginProcess.Proc_VerifyEssentialItems,
-			-- verify vip items
-			VerifyVIPItems = UserLoginProcess.Proc_VerifyVIPItems,
-			-- verify friends
-			VerifyFriends = UserLoginProcess.Proc_VerifyFriends,
-			-- init jabber
-			InitJabber = UserLoginProcess.Proc_InitJabber,
-			-- Clean Cache
-			CleanCache = UserLoginProcess.Proc_CleanCache,
-			-- pick a world server
-			SelectWorldServer = UserLoginProcess.Proc_SelectWorldServer,
-			
 		-- connect main world
 		LoadMainWorld = self.LoadMainWorld,
 		-- create new world
@@ -184,7 +101,6 @@ function MainLogin:next_step(state_update)
 		if(self.init_callback) then
 			self.init_callback();
 		end
-
 		System.options.version = "kids";
 		if(not System.options.mc) then
 			NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
@@ -193,7 +109,6 @@ function MainLogin:next_step(state_update)
 				ExternalUserModule:Init(true);
 			end
 		end
-
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 		self:next_step({IsInitFuncCalled = true});
 	elseif(not state.CheckGraphicsSettings) then
@@ -203,17 +118,15 @@ function MainLogin:next_step(state_update)
 			-- uncomment to enable 3d bg scene during login
 			-- state.login_bg_worldpath = "worlds/DesignHouse/CreatorLoginBG";
 		end
-
 		self:Invoke_handler("LoadBackground3DScene");
+	elseif(not state.IsUpdaterStarted) then	
+		self:Invoke_handler("UpdateCoreClient");
 	elseif(not state.IsCommandLineChecked) then
 		self:Invoke_handler("CheckCommandLine");
 	elseif(not state.IsPackagesLoaded) then
 		self:Invoke_handler("LoadPackages");
 	elseif(not state.IsLoginModeSelected) then
 		self:Invoke_handler("ShowLoginModePage");
-	--elseif(not state.HasSignedIn) then
-		---- not signed in 
-		--self:Handle_UserLoginProcess();
 	elseif(not state.IsPluginLoaded) then
 		self:Invoke_handler("LoadPlugins");
 	elseif(not state.HasInitedTexture) then
@@ -227,6 +140,65 @@ function MainLogin:next_step(state_update)
 			self:Invoke_handler("ShowCreateWorldPage");
 		end
 	end
+end
+
+function MainLogin:UpdateCoreClient()
+	local platform = System.os.GetPlatform();
+	local testCoreClient = false
+	if(not testCoreClient and (platform=="win32" or System.options.isAB_SDK))then
+		self:next_step({IsUpdaterStarted = true});
+		return
+	end
+	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
+	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
+
+	local function CheckMiniVersion_(ver)
+		local v1,v2,v3 = ver:match("(%d+)%D(%d+)%D(%d+)")
+		if(v3) then
+			v1,v2,v3 = tonumber(v1),tonumber(v2), tonumber(v3)
+			-- NOTE: version here 0.7.509
+			if(v1 < 0 or v2 < 7 or v3 < 510) then
+				_guihelper.MessageBox(format(L"您的版本%s低于最低要求,请尽快更新", ver), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						ClientUpdater:OnClickUpdate()
+					end
+					self:next_step({IsUpdaterStarted = true});
+				end, _guihelper.MessageBoxButtons.YesNo);
+				return false
+			end
+		end
+		return true;
+	end
+
+	if(System.options.paraworldapp == ClientUpdater.appname) then
+		local ver = ParaEngine.GetAppCommandLineByParam("nplver", "")
+		if(CheckMiniVersion_(ver)) then
+			self:next_step({IsUpdaterStarted = true});
+		end
+		return
+	end
+
+	-- check for mini-allowed core nplruntime version
+	local updater = ClientUpdater:new();
+
+	updater:Check(function(bNeedUpdate, latestVersion)
+		if(bNeedUpdate) then
+			updater:Download(function(bSucceed)
+				if(bSucceed) then
+					updater:Restart()
+				else
+					self:next_step({IsUpdaterStarted = true});
+				end
+			end)
+		else
+			if(updater:GetCurrentVersion() ~= latestVersion) then
+				updater:Restart()
+			else
+				self:next_step({IsUpdaterStarted = true});
+			end
+		end
+	end);
 end
 
 function MainLogin:CheckGraphicsSettings()
@@ -364,149 +336,6 @@ function MainLogin:HasInitedTexture()
 	self:next_step({HasInitedTexture = true});
 end
 
--- handles local or internet user login. 
-function MainLogin:Handle_UserLoginProcess()
-	if(System.options.servermode) then
-		self:next_step({HasSignedIn = true});
-	elseif(System.options.loginmode == "local") then
-		-- this is just a silent step to perform local sign in
-		self:next_step({HasSignedIn = true});
-
-	elseif(System.options.loginmode == "internet") then
-		-- for internet
-		local state = self.state;
-		if(not state.IsExternalUserSignedIn) then
-			self:Invoke_handler("ExternalUserSignIn");	
-		elseif(not state.IsRestGatewayConnected) then
-			self:Invoke_handler("ConnectRestGateway");	
-		elseif(not state.IsProductVersionVerified) then
-			self:Invoke_handler("VerifyProductVersion");	
-		elseif(not state.IsUserNidSelected) then
-			self:Invoke_handler("SelectUserNid");	
-		elseif(state.IsRegUserRequested) then		
-			self:Invoke_handler("RegUser");	
-		elseif(state.IsRegUserConfirmRequested) then		
-			self:Invoke_handler("RegUserConfirm");	
-		elseif(not state.IsAuthenticated) then	
-			self:Invoke_handler("AuthUser");
-		elseif(not state.IsFriendsVerified) then
-			self:Invoke_handler("VerifyFriends");		
-		elseif(not state.IsGlobalStoreSynced) then
-			self:Invoke_handler("SyncGlobalStore"); -- move the sync global store process before create avatar
-		elseif(not state.IsExtendedCostSynced) then
-			self:Invoke_handler("ExtendedCostTemplate");
-		elseif(not state.IsAvatarCreationRequested) then		
-			self:Invoke_handler("CreateNewAvatar");
-		elseif(not state.IsNickNameVerified) then
-			self:Invoke_handler("VerifyNickName");
-		elseif(not state.IsFamilyInfoVerified) then	
-			self:Invoke_handler("VerifyFamilyInfo");
-		elseif(not state.IsServerObjectsVerified) then	
-			self:Invoke_handler("VerifyServerObjects");
-		elseif(not state.IsInventoryVerified) then
-			self:Invoke_handler("VerifyInventory");	
-		elseif(not state.IsEssentialItemsVerified) then
-			self:Invoke_handler("VerifyEssentialItems");
-		elseif(not state.IsPetVerified) then
-			self:Invoke_handler("VerifyPet");
-		elseif(not state.IsVIPItemsVerified) then
-			self:Invoke_handler("VerifyVIPItems");
-		elseif(not state.IsCleanCached) then
-			self:Invoke_handler("CleanCache");
-		elseif(not state.IsJabberInited) then
-			self:Invoke_handler("InitJabber");
-		elseif(not state.IsWorldServerSelected) then
-			self:Invoke_handler("SelectWorldServer");
-		else
-			_guihelper.CloseMessageBox();
-			System.User.isOnline = true;
-			self:next_step({HasSignedIn = true});
-		end
-	end
-end
-
--- handles local or internet user login. 
-function MainLogin:user_login_next_step(state_update)
-	local state = self.state;
-	if(state_update) then
-		commonlib.partialcopy(state, state_update);
-	end
-	if(not state.IsExternalUserSignedIn) then
-		self:Invoke_handler("ExternalUserSignIn");	
-	elseif(not state.IsRestGatewayConnected) then
-		self:Invoke_handler("ConnectRestGateway");	
-	elseif(not state.IsProductVersionVerified) then
-		self:Invoke_handler("VerifyProductVersion");	
-	elseif(not state.IsUserNidSelected) then
-		self:Invoke_handler("SelectUserNid");	
-	elseif(state.IsRegUserRequested) then		
-		self:Invoke_handler("RegUser");	
-	elseif(state.IsRegUserConfirmRequested) then		
-		self:Invoke_handler("RegUserConfirm");	
-	elseif(not state.IsAuthenticated) then	
-		self:Invoke_handler("AuthUser");
-	elseif(not state.IsFriendsVerified) then
-		self:Invoke_handler("VerifyFriends");		
-	elseif(not state.IsGlobalStoreSynced) then
-		self:Invoke_handler("SyncGlobalStore"); -- move the sync global store process before create avatar
-	elseif(not state.IsExtendedCostSynced) then
-		self:Invoke_handler("ExtendedCostTemplate");
-	elseif(not state.IsAvatarCreationRequested) then		
-		self:Invoke_handler("CreateNewAvatar");
-	elseif(not state.IsNickNameVerified) then
-		self:Invoke_handler("VerifyNickName");
-	elseif(not state.IsFamilyInfoVerified) then	
-		self:Invoke_handler("VerifyFamilyInfo");
-	elseif(not state.IsServerObjectsVerified) then	
-		self:Invoke_handler("VerifyServerObjects");
-	elseif(not state.IsInventoryVerified) then
-		self:Invoke_handler("VerifyInventory");	
-	elseif(not state.IsEssentialItemsVerified) then
-		self:Invoke_handler("VerifyEssentialItems");
-	elseif(not state.IsPetVerified) then
-		self:Invoke_handler("VerifyPet");
-	elseif(not state.IsVIPItemsVerified) then
-		self:Invoke_handler("VerifyVIPItems");
-	elseif(not state.IsCleanCached) then
-		self:Invoke_handler("CleanCache");
-	elseif(not state.IsJabberInited) then
-		self:Invoke_handler("InitJabber");
-	elseif(not state.IsWorldServerSelected) then
-		self:Invoke_handler("SelectWorldServer");
-	else
-		_guihelper.CloseMessageBox();
-		System.User.isOnline = true;
-		MainLogin:LoadMainWorld();
-		--self:next_step({HasSignedIn = true});
-	end
-end
-
--- handles local or internet user login. 
-function MainLogin:reset_user_login_steps()
-	local state_update = {
-		IsExternalUserSignedIn = nil,
-		IsRestGatewayConnected = nil,
-		IsProductVersionVerified = nil,
-		IsUserNidSelected = nil,
-		IsAuthenticated = nil,
-		IsFriendsVerified = nil,
-		IsGlobalStoreSynced = nil,
-		IsExtendedCostSynced = nil,
-		IsNickNameVerified = nil,
-		IsFamilyInfoVerified = nil,
-		IsServerObjectsVerified = nil,
-		IsInventoryVerified = nil,
-		IsEssentialItemsVerified = nil,
-		IsPetVerified = nil,
-		IsVIPItemsVerified = nil,
-		IsCleanCached = nil,
-		IsJabberInited = nil,
-		IsWorldServerSelected = nil,
-	};
-	local state = self.state;
-	commonlib.partialcopy(state, state_update);
-	System.options.loginmode = "local";
-end
 
 function MainLogin:CheckCommandLine()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
@@ -702,20 +531,12 @@ function MainLogin:LoadMainWorld()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 	local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
 	InternetLoadWorld.ShowPage();
-	--if(InternetLoadWorld.inited) then
-		--InternetLoadWorld.ResetDataSource();	
-	--else
-		--InternetLoadWorld.ShowPage();
-	--end
 end
 
 function MainLogin:ShowCreateWorldPage()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
 	local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 	CreateNewWorld.ShowPage();
-end
-
-function MainLogin:OnSolveNetworkIssue()
 end
 
 function MainLogin:ShowLoginBackgroundPage(bShow, bShowCopyRight, bShowLogo, bShowBg)

@@ -65,6 +65,10 @@ function OpenAssetFileDialog.GetFilters(filterName)
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml", exclude="*.blocks.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
 		};
+	elseif(filterName == "modelStrict") then
+		return {
+			{L"全部文件(*.fbx,*.x,*.bmax)",  "*.fbx;*.x;*.bmax"},
+		};
 	elseif(filterName == "bmax") then
 		return {
 			{L"bmax模型(*.bmax)",  "*.bmax"},
@@ -204,6 +208,7 @@ function OpenAssetFileDialog.GetExistingFiles()
 	return OpenAssetFileDialog.dsExistingFiles;
 end
 
+-- @return array of files
 function OpenAssetFileDialog.UpdateExistingFiles()
 	NPL.load("(gl)script/ide/Files.lua");
 	local rootPath = ParaWorld.GetWorldDirectory();
@@ -276,6 +281,7 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 		end
 	end
 	OpenAssetFileDialog.GetAllFiles()[OpenAssetFileDialog.IndexLocal].attr.count = #files;
+	return files;
 end
 
 function OpenAssetFileDialog.OnOpenAssetFileDialog()
@@ -435,6 +441,14 @@ function OpenAssetFileDialog.GetAllFiles()
 	end
 	return allFiles;
 end
+
+
+-- public functions: refresh and return existing local model files
+function OpenAssetFileDialog.GetLocalModelFiles()
+	OpenAssetFileDialog.filters = OpenAssetFileDialog.GetFilters("modelStrict");
+	return OpenAssetFileDialog.UpdateExistingFiles();
+end
+
 
 function OpenAssetFileDialog.OnChangeCategory(index)
 	OpenAssetFileDialog.category_index = index;

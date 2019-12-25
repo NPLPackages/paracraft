@@ -185,6 +185,7 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self.isPowered = node.attr.isPowered == "true";
+	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	if(node.attr.last_output) then
 		self.last_output = tonumber(node.attr.last_output);
 	end
@@ -236,7 +237,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.last_output) then
 		node.attr.last_output = self.last_output;
 	end
-	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	if(self:IsBlocklyEditMode()) then
+		node.attr.isBlocklyEditMode = true;
+	end
 
 	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
 		local blocklyNode = {name="blockly", };
@@ -280,6 +283,8 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
 		local node = packet_UpdateEntityBlock.data1;
 		if(node) then
+			self.blockly_nplcode = nil;
+			self.nplcode = nil;
 			self:LoadFromXMLNode(node)
 			self:remotelyUpdated();
 		end
@@ -288,6 +293,12 @@ end
 
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
+
+	if(self:IsBlocklyEditMode() and self:GetCommand() ~= self.blockly_nplcode) then
+		-- trickly: just in case we modified command directly, we will fallback to npl code instead. 
+		self:SetNPLCode(self:GetCommand())
+		self:SetBlocklyEditMode(false);
+	end
 	self:MarkForUpdate();
 end
 

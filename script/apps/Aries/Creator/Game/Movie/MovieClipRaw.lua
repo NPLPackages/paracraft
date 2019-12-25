@@ -269,7 +269,9 @@ function MovieClipRaw:FrameMove(deltaTime)
 
 	if(self:GetTime() >= self:GetLength()) then
 		-- just in case there is still /t xx /end event, due to lua number precision error. 
-		self:Pause();
+		if(self:GetSpeed() > 0) then
+			self:Pause();
+		end
 		self:SetTime(self:GetLength());
 		-- call UpdateActors to render the last frame. 
 		if(deltaTime > 0) then

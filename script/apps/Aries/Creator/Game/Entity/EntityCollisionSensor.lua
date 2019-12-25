@@ -2,8 +2,7 @@
 Title: CollisionSensor Entity
 Author(s): LiXizhi
 Date: 2014/2/12
-Desc: replace the first block with second block in bag. 
-try the block below this block if second inventory slot does not exist. 
+Desc: 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCollisionSensor.lua");

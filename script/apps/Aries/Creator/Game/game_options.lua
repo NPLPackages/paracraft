@@ -661,8 +661,7 @@ end
 options.sVersionFileName = "version.txt";
 
 -- get the current client version.
--- @param defaultVersion: if this is nil, 
-function options.GetClientVersion(defaultVersion)
+function options.GetClientVersion()
 	if(not options.ClientVersion) then
 		local bNeedUpdate = true;
 		if( ParaIO.DoesFileExist(options.sVersionFileName)) then
