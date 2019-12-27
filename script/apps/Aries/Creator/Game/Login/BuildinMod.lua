@@ -125,12 +125,12 @@ BuildinMod.buildin_mods = {
 		homepage = "https://github.com/tatfook/PyRuntime",
 	},
     {
-		name = "NplRobot", 
+		name = "NplMicroRobot", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 
-		displayName = L"NplRobot", 
+		displayName = L"NplMicroRobot", 
 		text=L"系统内置插件",
 		version = "1.0.0",
-		homepage = "https://github.com/tatfook/NplRobot",
+		homepage = "https://github.com/tatfook/NplMicroRobot",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
 };

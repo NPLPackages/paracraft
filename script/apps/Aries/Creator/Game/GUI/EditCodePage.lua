@@ -22,7 +22,7 @@ function EditCodePage.OnInit()
 
 	EditCodePage.lastCode = EditCodePage.GetCode();			
 	
-	page:SetValue("content", EditCodePage.lastCode or "空");
+	page:SetValue("content", EditCodePage.lastCode or "");
 end
 
 function EditCodePage.GetItemID()

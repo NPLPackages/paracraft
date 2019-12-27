@@ -323,10 +323,10 @@ entity_data: optional, preferred entity data when created.
     <block name="CmdUrl"/>
     <block name="player_spawn_point"/>
     <block name="Minimap"/>
+    
     <block name="ColorBlock" />
     <block name="MetalBlock" />
     <block name="TransparentColorBlock" />
-  
     <block name="Sandstone_Stairs" />
     <block name="Smooth_Sandstone" />
     <block name="Sand_Slope" />
@@ -334,6 +334,8 @@ entity_data: optional, preferred entity data when created.
     <block name="ColorFence" />
     <block name="ColorWall" />
     <block name="White_Carpet" />
+    <block name="BlockModel" />
+    <block name="PhysicsModel" />
   
     <block name="BlockLight" />
   </category>

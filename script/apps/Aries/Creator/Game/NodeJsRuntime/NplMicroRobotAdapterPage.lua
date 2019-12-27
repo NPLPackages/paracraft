@@ -29,14 +29,15 @@ function NplMicroRobotAdapterPage.ShowPage(bones,callback)
 		bToggleShowHide = true,
 		enable_esc_key = true,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
+		allowDrag = false,
 		zorder = -1,
+        click_through = false,
 		directPosition = true,
 			align = "_ct",
 			x = -500/2,
-			y = -600/2,
+			y = -550/2,
 			width = 500,
-			height = 600,
+			height = 550,
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	
 end

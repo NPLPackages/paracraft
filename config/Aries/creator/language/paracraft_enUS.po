@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paracraft\n"
-"POT-Creation-Date: 2019-12-12 14:41+0800\n"
+"POT-Creation-Date: 2019-12-27 15:02+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: lixizhi <lixizhi@yeah.net>\n"
 "Language-Team: paraengine <lixizhi@paraengine.com>\n"
@@ -252,7 +252,7 @@ msgstr "Change password"
 #: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/PurchasingCode/PurchasingCode.html:130
 #: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/PurchasingCode/Result/Result.html:120
 #: script/apps/Aries/Creator/Game/Areas/SkinPage.html:103
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:333
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:336
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:38
 #: script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html:42
 #: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html:45
@@ -269,7 +269,7 @@ msgstr "Change password"
 #: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:39
 #: script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.html:46
 #: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:106
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:198
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:202
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:50
 #: script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html:30
 #: script/apps/Aries/Creator/Game/Tasks/TransformWnd.html:75
@@ -396,7 +396,7 @@ msgid "获得"
 msgstr "obtain"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/ExplorerApp/Mod/ExplorerApp/components/PurchasingCode/Result/Result.html:118
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:884
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:886
 msgid "金币"
 msgstr "Gold coin"
 
@@ -410,7 +410,7 @@ msgstr "New CAD script"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/NPLCAD/Mod/NPLCAD/EditCadTask.html:13
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:51
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:954
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:956
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.html:105
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.mobile.html:105
 #: script/apps/Aries/Creator/Game/GUI/EditCommandPage.html:122
@@ -470,7 +470,7 @@ msgstr "3D Print"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:600
 #: script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html:139
 #: script/apps/Aries/Creator/Game/Areas/SaveWorldPage.html:76
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:957
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:959
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.html:102
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.mobile.html:102
 #: script/apps/Aries/Creator/Game/GUI/EditCommandPage.html:117
@@ -480,6 +480,7 @@ msgid "保存"
 msgstr "save"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:46
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:70
 msgid "全部文件(*.fbx,*.x,*.bmax)"
 msgstr "All files (*.fbx,*.x,*.bmax)"
 
@@ -492,7 +493,7 @@ msgstr "FBX models (*.FBX)"
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:48
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:53
 #: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:64
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:70
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:74
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:41
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:47
 msgid "bmax模型(*.bmax)"
@@ -503,50 +504,50 @@ msgid "ParaX模型(*.x)"
 msgstr "ParaX model (*.x)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:57
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:78
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:82
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:60
 msgid "全部文件(*.mp3,*.ogg,*.wav)"
 msgstr "All files (*.mp3,*.ogg,*.wav)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:58
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:79
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:83
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:61
 msgid "mp3(*.mp3)"
 msgstr "mp3(*.mp3)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:59
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:80
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:84
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:62
 msgid "ogg(*.ogg)"
 msgstr "ogg(*.ogg)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:60
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:81
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:85
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:63
 msgid "wav(*.wav)"
 msgstr "wav(*.wav)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:64
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:85
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:89
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:67
 msgid "全部文件(*.png,*.jpg)"
 msgstr "All files (*.png,*.jpg)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:65
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:86
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:90
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:68
 msgid "png(*.png)"
 msgstr "png(*.png)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:66
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:87
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:91
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:69
 msgid "jpg(*.jpg)"
 msgstr "jpg(*.jpg)"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/STLExporter/Mod/STLExporter/SaveSTLDialog.lua:162
 #: script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua:127
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:299
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:305
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:279
 msgid "请输入:"
 msgstr "Please enter:"
@@ -580,7 +581,7 @@ msgstr "Failed to upload stl file."
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:239
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:655
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:236
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:963
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:965
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:326
 #: script/apps/Aries/Creator/Game/Login/SelectModulePage.html:132
 #: script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html:39
@@ -797,7 +798,7 @@ msgstr " Please enter a new password "
 #: script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.html:41
 #: script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.html:47
 #: script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.html:107
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:199
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:203
 #: script/apps/Aries/Creator/Game/Tasks/BuildQuestTaskNewTheme.html:51
 #: script/apps/Aries/Creator/Game/Tasks/ExportTask.html:34
 #: script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html:34
@@ -878,7 +879,7 @@ msgstr "World"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/HistoryManager/HistoryManager.html:64
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:42
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:97
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:988
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:990
 msgid "其他"
 msgstr "others"
 
@@ -900,12 +901,13 @@ msgstr "Clear History"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:118
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:59
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:45
-#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:334
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:337
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:769
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.html:37
 #: script/apps/Aries/Creator/Game/Code/CodeBlockSettings.html:53
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:28
 #: script/apps/Aries/Creator/Game/Code/CodeHelpItemTooltip.html:90
+#: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsDef_global.lua:150
 #: script/apps/Aries/Creator/Game/GUI/CheckpointEditPage.html:34
 #: script/apps/Aries/Creator/Game/GUI/CheckpointListPage.html:34
 #: script/apps/Aries/Creator/Game/GUI/CreateNewItem.html:33
@@ -1260,7 +1262,7 @@ msgstr "You can use following web page to share with others"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:99
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:284
 #: script/apps/Aries/Creator/Game/Areas/ServerPage.html:292
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:960
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:962
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.html:101
 #: script/apps/Aries/Creator/Game/GUI/EditBookPage.mobile.html:101
 #: script/apps/Aries/Creator/Game/GUI/EditCommandPage.html:116
@@ -1272,7 +1274,7 @@ msgstr "copy"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/Sync/Progress/Progress.html:100
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:499
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:956
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:958
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLessons.html:39
 msgid "打开"
 msgstr "Open"
@@ -1433,6 +1435,7 @@ msgstr "Invalid world filename"
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:41
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/VersionChange/VersionChange.lua:134
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/service/SyncService/Compare.lua:92
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.html:24
 #: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.html:21
 msgid "请稍后..."
 msgstr "Please Wait..."
@@ -1543,7 +1546,7 @@ msgid "官方推荐作品"
 msgstr "Official Recommended Works"
 
 #: npl_packages/ParacraftBuildinMod/npl_packages/WorldShare/Mod/WorldShare/cellar/UserConsole/UserConsole.html:760
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:918
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:920
 msgid "新手教学视频"
 msgstr "Introduction Video"
 
@@ -2118,7 +2121,7 @@ msgstr "open template manager window"
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:41
 #: script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua:153
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:83
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:965
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:967
 msgid "建造"
 msgstr "build"
 
@@ -2130,7 +2133,7 @@ msgid "装饰"
 msgstr "deco"
 
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:34
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1003
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1005
 #: script/mobile/paracraft/GUI/HelpPage.lua:81
 msgid "人物"
 msgstr "char"
@@ -2149,8 +2152,8 @@ msgstr "tools"
 
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:37
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:48
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:895
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:171
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:897
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:175
 msgid "模板"
 msgstr "temp"
 
@@ -2162,7 +2165,7 @@ msgstr "movie"
 
 #: script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua:43
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html:24
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:889
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:891
 #: script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua:67
 msgid "代码"
 msgstr "code"
@@ -2385,7 +2388,7 @@ msgid "换装..."
 msgstr "Skin..."
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua:73
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:978
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:980
 msgid "窗口"
 msgstr "Window"
 
@@ -2477,7 +2480,7 @@ msgid "自动隐藏"
 msgstr "auto hide"
 
 #: script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua:32
-#: script/apps/Aries/Creator/Game/game_options.lua:427
+#: script/apps/Aries/Creator/Game/game_options.lua:425
 #, lua-format
 msgid "项目ID:%s"
 msgstr "project id:%s"
@@ -2493,7 +2496,7 @@ msgid "您的显卡不支持这个效果, 请升级您的显卡"
 msgstr "your graphic card does not support this effect. "
 
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.html:45
-#: script/apps/Aries/Creator/Game/game_options.lua:351
+#: script/apps/Aries/Creator/Game/game_options.lua:349
 msgid "/shader命令被禁止, 请在设置中解禁"
 msgstr "/shader command is disabled, please enable it in settings"
 
@@ -2606,6 +2609,7 @@ msgstr "game"
 
 #: script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua:46
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:765
+#: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsDef_global.lua:150
 msgid "开启"
 msgstr "on"
 
@@ -3060,7 +3064,7 @@ msgstr "place block"
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:265
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:75
 #: script/apps/Aries/Creator/Game/Areas/WebTutorials.lua:49
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:919
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:921
 msgid "选择方块"
 msgstr "select blocks"
 
@@ -3076,7 +3080,7 @@ msgstr "go left"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:279
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:78
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1012
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1014
 msgid "后退"
 msgstr "go back"
 
@@ -3087,7 +3091,7 @@ msgstr "go right"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:287
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:80
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:999
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1001
 msgid "跳跃"
 msgstr "jump"
 
@@ -3124,6 +3128,10 @@ msgid "打开世界备份目录"
 msgstr "open world backup folder"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:323
+msgid "学校模式360天"
+msgstr "school mode 360 days"
+
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html:326
 msgid "保持电影方块窗口比例"
 msgstr "Keep movie block window proportional"
 
@@ -3137,7 +3145,6 @@ msgstr "OpenGL"
 
 #: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:43
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:822
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:41
 msgid "全屏"
 msgstr "fullscreen"
 
@@ -3235,6 +3242,17 @@ msgstr ""
 "Your display device is about to change: If your video card is not supported, "
 "you need to log in again. Do you want to continue?"
 
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:1235
+msgid ""
+"你确定要设置学校模式360天么? 学校模式将禁用启动某些游戏项目，一旦设置不可逆"
+msgstr ""
+"Are you sure you want to set up the school mode for 360 days? School mode "
+"will disable starting certain game projects. Once set it is irreversible"
+
+#: script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.lua:1239
+msgid "设置成功"
+msgstr "Setup success"
+
 #: script/apps/Aries/Creator/Game/Areas/TextureModPage.lua:116
 #: script/mobile/paracraft/Areas/TexturePage.lua:118
 #, lua-format
@@ -3304,6 +3322,96 @@ msgstr "%s mins"
 #, lua-format
 msgid "命令 /%s"
 msgstr "Command /%s"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:96
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:86
+msgid "准备下载版本号"
+msgstr "prepare to download version number"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:98
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:88
+msgid "下载版本号"
+msgstr "Download version number"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:100
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:90
+msgid "检测版本号"
+msgstr "Detect version number"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:102
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:92
+msgid "版本号错误"
+msgstr "Version number error"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:104
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:94
+msgid "准备下载文件列表"
+msgstr "Prepare a list of files to download"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:106
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:96
+msgid "下载文件列表"
+msgstr "Download file list"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:108
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:98
+msgid "下载文件列表完成"
+msgstr "Download file list complete"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:110
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:100
+msgid "下载文件列表错误"
+msgstr "Error downloading file list"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:112
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:767
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:102
+msgid "准备下载资源文件"
+msgstr "Preparing to download the resource file"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:140
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:130
+msgid "下载资源文件结束"
+msgstr "Finished downloading asset files"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:150
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:140
+msgid "下载资源文件错误"
+msgstr "failed to download asset file"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:152
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:142
+#: script/mobile/paracraft/Login/AutoUpdatePage.lua:88
+msgid "准备更新"
+msgstr "Ready to Update"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:154
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:144
+msgid "更新中"
+msgstr "updating"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:157
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:154
+msgid "更新完成"
+msgstr "Update complete"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:165
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:147
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:161
+msgid "更新错误"
+msgstr "Update error"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:242
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:238
+#, lua-format
+msgid "当前版本(%s)        最新版本(%s)"
+msgstr "Current version (%s) latest version (%s)"
+
+#: script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.lua:257
+#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:254
+#, lua-format
+msgid "更新%s (%d/%d)"
+msgstr "Updating %s (%d/%d)"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:175
 #: script/apps/Aries/Creator/Game/Code/CodeBlock.lua:191
@@ -3512,7 +3620,7 @@ msgstr ""
 "now use the code to control the actors in the movie block!"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:248
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:456
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:457
 msgid ""
 "没有找到电影方块! 请将一个包含演员的电影方块放到代码方块的旁边，就可以用代码"
 "控制演员了!"
@@ -3520,47 +3628,43 @@ msgstr ""
 "No movie block found! Please put a movie block containing actors next to the "
 "Code block, you can then control the actor with code!"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:737
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:738
 msgid "点击查看帮助"
 msgstr "Click to view Help"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:755
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:756
 msgid "文件不存在"
 msgstr "File does not exist"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:762
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:763
 msgid "选择语言配置文件"
 msgstr "Select a language configuration file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:783
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:790
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:784
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:791
 msgid "左键查看代码方块中的角色, 右键打开电影方块"
 msgstr ""
 "left click to view actors in code block, right click to open movie block"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:783
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:784
 msgid "Python"
 msgstr "Python"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:783
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:784
 msgid "python -> npl"
 msgstr "python - npl"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:790
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:791
 msgid "角色模型"
 msgstr "Actor Model"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:790
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:791
 msgid "也可以通过电影方块编辑"
 msgstr "You can also edit through the movie block"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:966
+#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:967
 msgid "未命名"
 msgstr "Unnamed"
-
-#: script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua:976
-msgid "https://keepwork.com/official/paracraft/codeblock"
-msgstr "https://keepwork.com/official/paracraft/codeblock"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:17
 msgid "等待%1秒"
@@ -3608,10 +3712,10 @@ msgstr "create and define a new function %1"
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:17
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:44
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:208
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:581
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:617
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:741
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1277
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:582
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:618
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:742
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1278
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:18
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:94
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Events.lua:162
@@ -3651,13 +3755,13 @@ msgid "%1"
 msgstr "%1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:264
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:587
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:588
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Data.lua:231
 msgid "真"
 msgstr "true"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Control.lua:287
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:588
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:589
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Data.lua:232
 msgid "假"
 msgstr "false"
@@ -3844,7 +3948,7 @@ msgid "新建本地%1为%2"
 msgstr "new local %1=%2"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:207
-msgid "当角色被复制时(%1)"
+msgid "当角色被克隆时(%1)"
 msgstr "when actor is cloned(%1)"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:262
@@ -3858,11 +3962,11 @@ msgid "某个角色"
 msgstr "a given actor"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:282
-msgid "复制%1(%2)"
-msgstr "clone%1(%2)"
+msgid "克隆%1(%2)"
+msgstr "clone %1(%2)"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:320
-msgid "删除角色"
+msgid "删除此克隆角色"
 msgstr "delete this clone"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:356
@@ -3918,7 +4022,7 @@ msgid "透明度"
 msgstr "opacity"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:371
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:469
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:470
 msgid "选中特效"
 msgstr "selection effect"
 
@@ -3955,176 +4059,180 @@ msgid "电影角色"
 msgstr "movie actor"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:379
+msgid "电影播放速度"
+msgstr "movie play speed"
+
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:380
 msgid "广告牌效果"
 msgstr "billboard effects"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:380
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:381
 msgid "是否投影"
 msgstr "cast shadow"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:381
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:382
 msgid "是否联机同步"
 msgstr "whether to sync in network mode"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:383
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:384
 msgid "禁用物理仿真"
 msgstr "disable physics simulation"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:384
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:385
 msgid "重力加速度"
 msgstr "gravity"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:385
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:386
 msgid "速度"
 msgstr "velocity"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:386
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:387
 msgid "增加速度"
 msgstr "add velocity"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:387
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:388
 msgid "摩擦系数"
 msgstr "surface decay"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:388
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:389
 msgid "空气阻力"
 msgstr "air decay"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:390
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:391
 msgid "初始化参数"
 msgstr "initial params"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:410
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:411
 msgid "设置角色的%1为%2"
 msgstr "set actor data %1 to %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:450
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:451
 msgid "改变角色的电影方块"
 msgstr "change actor's movie block"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:458
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:459
 msgid "改变电影角色"
 msgstr "change movie actor"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:463
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:464
 msgid "电影方块广告牌效果"
 msgstr "movie block billboard effects"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:475
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:476
 msgid "多角色初始化参数"
 msgstr "multi-actor initial params"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:489
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:490
 msgid "获取角色的%1"
 msgstr "get actor data %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:526
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:527
 msgid "获取角色对象%1"
 msgstr "get actor %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:589
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:590
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua:29
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Skeleton.lua:23
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Data.lua:233
 msgid "无效"
 msgstr "Invalid"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:660
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:661
 msgid "获取表%1中的%2"
 msgstr "table%1's %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:694
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:695
 msgid "表{%1%2%3}"
 msgstr "table (%1%2%3)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:740
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:741
 msgid "新函数(%1)"
 msgstr "new function (%1)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:805
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:806
 msgid "调用函数%1(%2)"
 msgstr "call function%1 (%2)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:838
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:839
 msgid "调用函数并返回%1(%2)"
 msgstr "call func and return%1(%2)"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:871
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:872
 msgid "显示变量%1,%2,%3,%4"
 msgstr "show variables %1, %2, %3, %4"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:920
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:921
 msgid "隐藏全局变量%1"
 msgstr "hide global variable %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:949
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:950
 msgid "输出日志%1"
 msgstr "output log %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:968
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:969
 msgid "查看log.txt或F11看日志"
 msgstr "Check log.txt or F11 to see the log"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:978
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:979
 msgid "输出到聊天框%1"
 msgstr "echo to chat window%1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1007
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1008
 msgid "引用文件%1"
 msgstr "include file %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1026
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1027
 msgid "文件需要放到当前世界目录下"
 msgstr "Files need to be placed in the current world directory"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1036
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1037
 msgid "获取全局表%1"
 msgstr "get global table %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1063
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1064
 msgid "继承表%1,新表%2"
 msgstr "inherit from %1, new %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1124
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1125
 msgid "保存用户数据%1为%2"
 msgstr "save user data%1=%2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1149
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1150
 msgid "存储本地世界的用户数据"
 msgstr "storing local user data for the world"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1159
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1160
 msgid "加载用户数据%1默认值%2"
 msgstr "load user data%1 default is %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1194
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1195
 msgid "保存世界数据%1为%2"
 msgstr "save world data %1 = %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1219
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1259
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1220
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1260
 msgid "常用于开发关卡编辑器"
 msgstr "often used to develop level editors"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1225
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1265
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1226
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1266
 msgid "从指定的文件加载"
 msgstr "load from a given file"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1236
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1237
 msgid "加载世界数据%1默认值%2"
 msgstr "load world data%1 default value %2"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1276
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1277
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Data.lua:187
 msgid "代码%1"
 msgstr "code %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1306
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1307
 msgid "注释 %1"
 msgstr "comment %1"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1332
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Data.lua:1333
 msgid "注释全部 %1"
 msgstr "comment all %1"
 
@@ -4412,7 +4520,7 @@ msgstr "Start Game!"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:107
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua:32
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:939
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:941
 msgid "显示"
 msgstr "show"
 
@@ -4471,7 +4579,7 @@ msgid "放缩到百分之%1"
 msgstr "scale to %1 percent"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:442
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:915
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:917
 #: script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.html:18
 #: script/apps/Aries/Creator/Game/Movie/MovieClipController.html:67
 msgid "主角"
@@ -4547,72 +4655,58 @@ msgid "窗口%1,%2,%3,%4,%5,%6"
 msgstr "window %1, %2, %3, %4, %5, %6"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:809
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:28
 msgid "左上"
 msgstr "Left Top"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:810
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:29
 msgid "左下"
 msgstr "Left Bottom"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:811
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:30
 msgid "居中"
 msgstr "Center"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:812
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:31
 msgid "居中上"
 msgstr "Center top"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:813
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:32
 msgid "居中下"
 msgstr "Center bottom"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:814
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:33
 msgid "居中左"
 msgstr "Center left"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:815
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:34
 msgid "居中右"
 msgstr "Center right"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:816
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:35
 msgid "右上"
 msgstr "right top"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:817
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:36
 msgid "右下"
 msgstr "right bottom"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:818
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:37
 msgid "中间上"
 msgstr "Middle top"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:819
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:38
 msgid "中间左"
 msgstr "Middle left"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:820
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:39
 msgid "中间右"
 msgstr "middle right"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:821
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:40
 msgid "中间下"
 msgstr "Middle bottom"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Looks.lua:823
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:42
 msgid "人物头顶"
 msgstr "headon"
 
@@ -4968,7 +5062,7 @@ msgstr "reset timer"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua:793
 #: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsDef_blocks.lua:20
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:998
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1000
 msgid "游戏模式"
 msgstr "view mode"
 
@@ -5106,6 +5200,7 @@ msgstr "stop sound%1"
 
 #: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:18
 #: script/apps/Aries/Creator/Game/Code/Craft2d/Craft2d.lua:21
+#: script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobot.lua:25
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua:31
 msgid "运动"
 msgstr "Motion"
@@ -5141,11 +5236,11 @@ msgstr "Math"
 msgid "数据"
 msgstr "Data"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:87
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:84
 msgid "点击我打招呼"
 msgstr "Click me to say hello"
 
-#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:99
+#: script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua:96
 msgid "显示/隐藏角色"
 msgstr "Show/hide characters"
 
@@ -5188,7 +5283,7 @@ msgid "学习更多 (F1)"
 msgstr "Learn more (F1)"
 
 #: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html:80
-#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:276
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:289
 msgid "创建全局变量"
 msgstr "Create global variable"
 
@@ -5196,7 +5291,15 @@ msgstr "Create global variable"
 msgid "左键创建全局变量,右键刷新"
 msgstr "Left-click to create a global variable, right-click refresh"
 
-#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:296
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:116
+msgid "https://keepwork.com/official/paracraft/codeblock"
+msgstr "https://keepwork.com/official/paracraft/codeblock"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:118
+msgid "https://github.com/tatfook/CodeBlockDemos/wiki/learn_python"
+msgstr "https://github.com/tatfook/CodeBlockDemos/wiki/learn_python"
+
+#: script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua:309
 msgid "图块模式下不能直接编辑代码, 请用图块编辑器"
 msgstr ""
 "Code cannot be edited directly in text mode, please use the blockly editor"
@@ -5218,7 +5321,7 @@ msgid "全局"
 msgstr "global"
 
 #: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsBlockly.lua:19
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:893
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:895
 #: script/apps/Aries/Creator/Game/Entity/EntityBlockBone.lua:69
 #: script/apps/Aries/Creator/Game/Entity/EntityHomePoint.lua:65
 #: script/apps/Aries/Creator/Game/Entity/EntityNPC.lua:77
@@ -5290,6 +5393,10 @@ msgstr "set light color %1"
 msgid "设置太阳颜色%1"
 msgstr "set sun color %1"
 
+#: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsDef_global.lua:144
+msgid "多分辨率模型%1"
+msgstr "level of detail model %1"
+
 #: script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsDef_rules.lua:14
 msgid "添加规则%1"
 msgstr "add rule %1"
@@ -5344,10 +5451,6 @@ msgstr "learn HTML"
 msgid "https://github.com/tatfook/CodeBlockDemos/wiki/learn_html"
 msgstr "https://github.com/tatfook/CodeBlockDemos/wiki/learn_html"
 
-#: script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlocklyDef_Controls.lua:14
-msgid "创建窗口"
-msgstr "create window"
-
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:22
 msgid "图形"
 msgstr "graphics"
@@ -5376,15 +5479,20 @@ msgid "导出"
 msgstr "Export"
 
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:270
+#: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:282
 #, lua-format
 msgid "成功导出:%s, 是否拿在手中?"
 msgstr "Successful export: %s, take it in hand now?"
 
-#: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:284
+#: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:293
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobit.lua:152
 #, lua-format
 msgid "成功导出:%s, 是否打开所在目录"
 msgstr "Successfully exported: %s, open the containing directory?"
+
+#: script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua:353
+msgid "https://github.com/tatfook/CodeBlockDemos/wiki/learn_cad"
+msgstr "https://github.com/tatfook/CodeBlockDemos/wiki/learn_cad"
 
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua:16
 msgid "骨骼动画 %1 %2"
@@ -5445,7 +5553,7 @@ msgid "时间 %1 旋转 %2 %3 度 中心点 %4 %5 %6"
 msgstr "time %1 rotate %2 %3 degrees by point %4 %5 %6"
 
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua:287
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1005
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1007
 #: script/apps/Aries/Creator/Game/Effects/EntityAnimation.lua:46
 msgid "待机"
 msgstr "Standby"
@@ -5456,13 +5564,13 @@ msgid "倒下"
 msgstr "lie down"
 
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua:289
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1008
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1010
 #: script/apps/Aries/Creator/Game/Effects/EntityAnimation.lua:48
 msgid "走路"
 msgstr "Walk"
 
 #: script/apps/Aries/Creator/Game/Code/NplCad/NplCadDef/NplCadDef_Animation.lua:290
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1109
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1111
 #: script/apps/Aries/Creator/Game/Effects/EntityAnimation.lua:49
 msgid "跑步"
 msgstr "Running"
@@ -5755,6 +5863,10 @@ msgstr "Export gltf"
 msgid "导出bmax"
 msgstr "Export bmax"
 
+#: script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html:19
+msgid "导出ParaX"
+msgstr "Export ParaX"
+
 #: script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.html:27
 msgid "导出BMax模型"
 msgstr "Exporting  BMax model"
@@ -5767,6 +5879,10 @@ msgstr "Count:"
 #: script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.lua:108
 msgid "正在运行中,请稍等..."
 msgstr "Running, please wait..."
+
+#: script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotDef/NplMicroRobotDef_Motion.lua:15
+msgid "创建机器人"
+msgstr "Create a robot"
 
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Animation.lua:15
 msgid "创建动画%1"
@@ -5863,10 +5979,10 @@ msgid "播放动画%1"
 msgstr "play animation %1"
 
 #: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Motion.lua:38
-msgid "骨骼%1在%2轴旋转%3 Servo %4"
-msgstr "bone %1 of %2 axis, rotate %3 servo %4"
+msgid "骨骼%1在%2轴旋转%3 Servo %4 偏移值 %5"
+msgstr "bone %1 rotates %3 servo %4 offset %5"
 
-#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Motion.lua:96
+#: script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Motion.lua:101
 msgid "休眠 %1 毫秒"
 msgstr "sleep %1 ms"
 
@@ -5939,17 +6055,17 @@ msgstr "Do you want to import external file: %s?"
 msgid "导入失败了 %s"
 msgstr "Import failed %s"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:537
+#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:544
 #, lua-format
 msgid "memory and visible chunk limit changed: %d mb"
 msgstr "memory and visible chunk limit changed: %d mb"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:539
+#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:546
 #, lua-format
 msgid "visible chunk limit changed: %d mb"
 msgstr "visible chunk limit changed: %d mb"
 
-#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:543
+#: script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua:550
 #, lua-format
 msgid "memory limit changed: %d mb"
 msgstr "memory limit changed: %d mb"
@@ -9569,832 +9685,840 @@ msgstr "water drop"
 msgid "苹果"
 msgstr "apple"
 
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:884
+msgid "彩色栅栏"
+msgstr "Color Fence"
+
 #: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:885
+msgid "彩色墙"
+msgstr "Color wall"
+
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:887
 msgid "狙击枪"
 msgstr "Sniper rifle"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:886
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:888
 msgid "书"
 msgstr "book"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:887
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:889
 msgid "书:右键阅读"
 msgstr "Book: Right Click to Read"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:888
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:890
 msgid "木锄头"
 msgstr "Wooden hoe"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:890
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:892
 msgid "程序代码:右键阅读"
 msgstr "Program code: right click to read"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:891
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:893
 msgid "对话剧本"
 msgstr "Dialogue"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:892
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:894
 msgid "对话剧本:点击编辑"
 msgstr "Dialogs: click to edit"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:894
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:896
 msgid "规则:右键阅读"
 msgstr "Rules: Right Click to Read"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:896
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:898
 msgid "命令行"
 msgstr "Command block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:897
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:899
 msgid "右键点击访问Url"
 msgstr "Right-click to visit url"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:898
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:900
 msgid "时间序列"
 msgstr "time series"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:899
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:901
 msgid "时间序列:右键编辑"
 msgstr "time series: right click to edit"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:900
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:902
 msgid "时间序列摄影机"
 msgstr "time series camera"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:901
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:903
 msgid "摄影机:右键编辑"
 msgstr "camera: right click to edit"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:902
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:904
 msgid "时间序列演员"
 msgstr "Time series actor"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:903
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:905
 msgid "演员:右键编辑"
 msgstr "actor: right click to edit"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:904
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:906
 msgid "命令序列"
 msgstr "Command sequence"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:905
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:907
 msgid "小地图"
 msgstr "mini map"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:906
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:908
 msgid "图层"
 msgstr "Overlay"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:907
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:909
 msgid "任务日志"
 msgstr "Quest log"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:908
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:910
 msgid "地形笔刷"
 msgstr "Terrain Brush"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:909
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:911
 msgid "画笔"
 msgstr "Paint Brush"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:910
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:912
 msgid "代码演员"
 msgstr "code actor"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:911
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:913
 msgid "代码演员实例"
 msgstr "code actor instance"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:912
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:914
 msgid "怪物"
 msgstr "Mob"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:913
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:915
 msgid "出生点"
 msgstr "spawn point"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:914
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:916
 msgid "矿车"
 msgstr "rail car"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:916
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:918
 msgid "流动中的岩浆"
 msgstr "flowing lava"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:920
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:922
 msgid "模型方块"
 msgstr "Model block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:921
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:923
 #: script/apps/Aries/Creator/Game/Neuron/EditNeuronBlockPage.html:27
 msgid "记忆学习"
 msgstr "Learn"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:923
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:925
 msgid "创造模式"
 msgstr "edit mode"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:924
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:926
 msgid "行动"
 msgstr "action"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:925
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:927
 #: script/apps/Aries/Creator/Game/Tasks/SelectModelTask.html:40
 msgid "移动"
 msgstr "move"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:926
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:928
 msgid "双击W不放"
 msgstr "Double-click and hold W key"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:927
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:929
 msgid "加速向前移动"
 msgstr "Accelerate forward"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:928
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:930
 msgid "缓慢行走"
 msgstr "sneak"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:929
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:931
 msgid "跳跃/飞行"
 msgstr "Jump / fly"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:930
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:932
 msgid "进入/退出飞行模式"
 msgstr "Enter/Exit fly mode"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:931
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:933
 msgid "瞬移到跳转点"
 msgstr "Teleport to the jump point"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:932
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:934
 msgid "瞬移到上一个跳转点"
 msgstr "move to last teleport location"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:933
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:935
 msgid "点击鼠标中间"
 msgstr "Click the middle mouse button"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:934
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:936
 msgid "瞬间移动"
 msgstr "Teleport"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:935
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:937
 msgid "角色向上位移一层"
 msgstr "go upstairs"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:936
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:938
 msgid "角色向下位移一层"
 msgstr "go downstairs"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:937
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:939
 msgid "弯腰"
 msgstr "bend over"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:938
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:940
 msgid "扔掉手中的方块"
 msgstr "drop the object in hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:940
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:942
 msgid "隐藏界面UI"
 msgstr "hide UI"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:941
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:943
 msgid "透明网格显示模式"
 msgstr "wireframe view"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:942
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:944
 msgid "全屏显示"
 msgstr "fullscreen view"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:943
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:945
 msgid "视角"
 msgstr "viewpoint"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:944
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:946
 msgid "按住鼠标右键并移动"
 msgstr "Hold down the right mouse button and move"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:945
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:947
 msgid "旋转视角"
 msgstr "Rotate the camera"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:946
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:948
 msgid "~"
 msgstr "~"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:947
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:949
 msgid "打开望远镜"
 msgstr "Telescope view"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:948
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:950
 msgid "切换视角"
 msgstr "toggle view mode"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:949
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:951
 msgid "调节摄影机距离"
 msgstr "Adjust the camera distance"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:950
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:952
 msgid "摄像机拉远"
 msgstr "Camera zoom out"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:951
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:953
 msgid "摄像机拉近"
 msgstr "camera zooms in"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:952
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:954
 msgid "摄像机向上移动"
 msgstr "The camera moves up"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:953
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:955
 msgid "摄像机向下移动"
 msgstr "Move the camera down"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:955
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:957
 msgid "新建"
 msgstr "new"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:958
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:960
 msgid "撤销"
 msgstr "undo"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:959
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:961
 msgid "重做"
 msgstr "redo"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:961
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:963
 msgid "剪切"
 msgstr "cut"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:962
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:964
 #: script/apps/Aries/Creator/Game/Movie/KeyFramePopupMenu.lua:33
 msgid "粘贴"
 msgstr "paste"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:964
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:966
 msgid "复制选中物品到新的位置"
 msgstr "Copy the selected item to a new location"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:966
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:968
 msgid "点击鼠标右键"
 msgstr "Right-click"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:967
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:969
 msgid "建造方块/触发机关"
 msgstr "create / trigger block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:968
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:970
 msgid "点击鼠标左键"
 msgstr "Left Click"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:969
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:971
 msgid "删除普通方块，长按删除交互方块"
 msgstr "delete normal block, long hold to delete blocks with actions"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:970
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:972
 msgid "快速创建3个方块；在2个相同方块之间建立线（相隔不能大于19格）"
 msgstr ""
 "Quickly create three blocks; or fill the line between two identical blocks "
 "(less than 19 blocks distance)"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:971
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:973
 msgid "删除光标周围3x3x3的方块"
 msgstr "Remove 3x3x3 block region of the same block type"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:972
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:974
 msgid "吸取场景中的方块替换手中方块"
 msgstr "pick the block at the screen cursor"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:973
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:975
 msgid "用手中方块替换场景中的方块"
 msgstr "replace block at screen cursor position with the one in hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:974
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:976
 msgid "用手中方块替换场景中30格以内连续的同一方块"
 msgstr ""
 "replace all connected same blocks within 30 blocks around the cursor with "
 "the one in hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:975
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:977
 msgid "进入物品高级属性界面；按住Ctrl键继续点击左键可选中一片区域的物品"
 msgstr ""
 "enter advanced property view;  ctrl+left click multiple times to select a "
 "region of blocks"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:976
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:978
 msgid "选择所有与当前方块相连的方块"
 msgstr "Select all blocks connected with the current block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:977
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:979
 msgid "返回上一次选区"
 msgstr "undo last selection"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:979
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:981
 msgid "打开聊天框"
 msgstr "open command line"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:980
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:982
 msgid "打开物品栏"
 msgstr "open inventory"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:981
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:983
 msgid "打开背包"
 msgstr "open bag"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:982
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:984
 msgid "/"
 msgstr "/"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:983
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:985
 msgid "输入命令行"
 msgstr "enter command"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:984
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:986
 msgid "系统设置/退出"
 msgstr "System Settings / Exit"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:985
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:987
 msgid "系统信息"
 msgstr "system info"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:986
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:988
 msgid "录制动画界面"
 msgstr "record animation UI"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:987
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:989
 msgid "内置教程"
 msgstr "build-in tutorial"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:989
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:991
 msgid "切换快捷物品栏"
 msgstr "switch quick launch bar"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:990
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:992
 msgid "滚动鼠标滚轮"
 msgstr "Scroll the mouse wheel"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:991
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:993
 msgid "左键点击快捷物品栏"
 msgstr "Left-click on the shortcut bar"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:992
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:994
 msgid "切换手中物品"
 msgstr "switch items in hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:993
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:995
 msgid "右键点击快捷物品栏"
 msgstr "Right-click on the shortcut bar"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:994
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:996
 msgid "拖拽物品"
 msgstr "Drag items"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:995
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:997
 msgid "复制光标坐标信息"
 msgstr "copy position info at the cursor"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:996
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:998
 msgid "复制光标离人物距离坐标"
 msgstr "copy cursor position relative to the current player"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:997
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:999
 msgid "截图"
 msgstr "Screenshot"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1000
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1002
 msgid "与最近的NPC对话"
 msgstr "talk with the nearest NPC"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1001
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1003
 msgid "建造方块，触发机关"
 msgstr "create / trigger block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1004
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1006
 msgid "以下动作主要适用于电影方块中的演员"
 msgstr "The following actions are mainly applied to actors in the movie block"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1006
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1008
 msgid "死亡静止"
 msgstr "Death still"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1007
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1009
 msgid "弯腰走路"
 msgstr "sneak"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1009
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1011
 msgid "攻击"
 msgstr "Attack"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1010
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1012
 msgid "被攻击"
 msgstr "attacked"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1011
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1013
 msgid "紧锁眉头"
 msgstr "Furrowed brow"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1013
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1015
 msgid "游泳待机"
 msgstr "Swimming standby"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1014
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1016
 msgid "游泳前进"
 msgstr "Swimming forward"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1015
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1017
 msgid "向左前游泳"
 msgstr "swimming left"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1016
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1018
 msgid "向右前游泳"
 msgstr "swimming right"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1017
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1019
 msgid "向后游泳"
 msgstr "Swim backwards"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1018
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1020
 msgid "点头"
 msgstr "Nod"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1019
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1021
 msgid "摇头"
 msgstr "shaking head"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1020
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1022
 msgid "招手"
 msgstr "waving"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1021
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1023
 msgid "欢迎"
 msgstr "Welcome"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1022
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1024
 msgid "再见"
 msgstr "Bye"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1023
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1025
 msgid "准备跳跃"
 msgstr "Jump start"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1024
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1026
 msgid "跳跃中"
 msgstr "Jump in air"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1025
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1027
 msgid "跳跃下降"
 msgstr "Jump landing"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1026
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1028
 msgid "张开双臂"
 msgstr "open arms"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1027
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1029
 msgid "侧身抱手"
 msgstr "hold hands at the side"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1028
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1030
 msgid "坐着手敲键盘"
 msgstr "sitting while stroking keyboard"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1029
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1031
 msgid "伏案思考"
 msgstr "thinking by a table"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1030
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1032
 msgid "太空步"
 msgstr "moon walk"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1031
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1033
 msgid "胜利姿势"
 msgstr "Victory pose"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1032
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1034
 msgid "坐着招手"
 msgstr "Sitting waving"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1033
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1035
 msgid "惊吓"
 msgstr "shocked"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1034
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1036
 msgid "惊讶"
 msgstr "Surprised"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1035
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1037
 msgid "说话"
 msgstr "Speak"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1036
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1038
 msgid "做东西"
 msgstr "Do something"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1037
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1039
 msgid "惊呼"
 msgstr "Exclaimed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1038
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1040
 msgid "疑问"
 msgstr "Question"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1039
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1041
 msgid "左手抬高"
 msgstr "Left hand raise"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1040
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1042
 msgid "敬礼"
 msgstr "Salute"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1041
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1043
 msgid "笑"
 msgstr "Laugh"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1042
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1044
 msgid "抬手"
 msgstr "lift up arm"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1043
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1045
 msgid "屈膝坐着"
 msgstr "sitting on knees"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1044
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1046
 msgid "快速点头"
 msgstr "Quick nod"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1045
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1047
 msgid "快速摇头"
 msgstr "quick shaking head"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1046
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1048
 msgid "跪着"
 msgstr "Kneeling"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1047
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1049
 msgid "低头沉思"
 msgstr "meditation"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1048
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1050
 msgid "哭"
 msgstr "Cry"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1049
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1051
 msgid "思考者"
 msgstr "thinking"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1050
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1052
 msgid "挠头"
 msgstr "Scratching head"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1051
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1053
 msgid "双手前伸摆动"
 msgstr "waving two hands in front of the body"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1052
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1054
 msgid "鞠躬作揖"
 msgstr "Bowing"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1053
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1055
 msgid "跪着说话"
 msgstr "Kneeling speak"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1054
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1056
 msgid "害羞，站着捂脸"
 msgstr "Shy, hands coving face"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1055
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1057
 msgid "右手指向"
 msgstr "Right hand pointing"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1056
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1058
 msgid "跪着不说话"
 msgstr "Knees without speaking"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1057
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1059
 msgid "跪着抬手"
 msgstr "Knees, raising the arm"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1058
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1060
 msgid "跪着捂脸"
 msgstr "Knees, hands coving face"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1059
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1061
 msgid "睁眼躺着不说话"
 msgstr "lying with eyes open without speaking"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1060
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1062
 msgid "坐着闭眼"
 msgstr "Sitting with eyes closed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1061
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1063
 msgid "睁眼躺着说话"
 msgstr "lying with eyes open and speaking"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1062
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1064
 msgid "驾驭"
 msgstr "Mount"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1063
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1065
 msgid "坐着右手推拉"
 msgstr "sitting with right hand moving"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1064
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1066
 msgid "站着打电话"
 msgstr "Making a call"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1065
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1067
 msgid "蹲着"
 msgstr "Squatting"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1066
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1068
 msgid "屈膝张开腿坐着"
 msgstr "Knees, legs open sitting"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1067
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1069
 msgid "伸直腿坐着"
 msgstr "Sitting straight leg"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1068
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1070
 msgid "跪着伸出右手"
 msgstr "Kneeling while streching right arm"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1069
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1071
 msgid "趴着挣扎死去"
 msgstr "struggling to death"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1070
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1072
 msgid "睡觉中，闭眼躺着"
 msgstr "Sleeping, lying with eyes closed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1071
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1073
 msgid "趴着"
 msgstr "crawling still"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1072
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1074
 msgid "甩左手"
 msgstr "reject with left hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1073
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1075
 msgid "托腮沉思"
 msgstr "meditation with hand on the cheek"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1074
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1076
 msgid "抬右手小臂"
 msgstr "Lift right fore-arm"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1075
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1077
 msgid "抬右手大臂"
 msgstr "Lift right arm"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1076
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1078
 msgid "男作揖"
 msgstr "Male bowed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1077
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1079
 msgid "背手"
 msgstr "hands at the back"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1078
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1080
 msgid "拥抱"
 msgstr "Hug"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1079
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1081
 msgid "轻抬左手"
 msgstr "lift left hand gently"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1080
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1082
 msgid "准备战斗"
 msgstr "Ready to fight"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1081
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1083
 msgid "战斗"
 msgstr "Fight"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1082
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1084
 msgid "抱头"
 msgstr "hold head"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1083
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1085
 msgid "女作揖"
 msgstr "Female bowed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1084
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1086
 msgid "悬空抬左手"
 msgstr "lift left arm while in air"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1085
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1087
 msgid "悬空"
 msgstr "in air"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1086
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1088
 msgid "悬空施法"
 msgstr "cast magic while in air"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1087
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1089
 msgid "轻抬右手"
 msgstr "lift left hand gently"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1088
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1090
 msgid "闭眼站着"
 msgstr "Stood with eyes closed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1089
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1091
 msgid "闭眼跪着"
 msgstr "Kneeling with eyes closed"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1090
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1092
 msgid "甩右手"
 msgstr "reject with right hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1091
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1093
 msgid "右手捂嘴"
 msgstr "right hand covering mouth"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1092
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1094
 msgid "双手抱头仰卧"
 msgstr "hold head with two hands while lying"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1093
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1095
 msgid "抱手斜靠"
 msgstr "hold hand lying on the side"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1094
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1096
 msgid "右手向前推"
 msgstr "Right hand push forward"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1095
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1097
 msgid "右手拍桌"
 msgstr "right hand hitting the table"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1096
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1098
 msgid "左侧身躺着"
 msgstr "lying on the left side"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1097
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1099
 msgid "右手拖拽"
 msgstr "drag with right hand"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1098
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1100
 msgid "激怒"
 msgstr "Enraged"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1099
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1101
 msgid "双手捂脸哭泣"
 msgstr "hands on face and crying"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1100
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1102
 msgid "坐着说话"
 msgstr "Sitting and speaking"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1101
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1103
 msgid "屈膝坐着张开双臂"
 msgstr "Sat on knees with open arms"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1102
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1104
 msgid "屈膝坐着摇摆双臂"
 msgstr "sitting and swing arms"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1103
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1105
 msgid "屈膝坐着仰头"
 msgstr "siting and looking upwards"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1104
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1106
 msgid "右手抬起，左手捂嘴"
 msgstr "lift right hand, left hand covering mouth"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1105
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1107
 msgid "左手侧方伸出"
 msgstr "lift left arm and extend on the side"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1106
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1108
 msgid "双手前伸"
 msgstr "reaching forward with two hands"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1107
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1109
 msgid "坐着鼓掌"
 msgstr "Sitting and applause"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1108
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1110
 msgid "悬空抬右手"
 msgstr "lift right arm while in air"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1110
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1112
 msgid "待机休息"
 msgstr "Standby rest"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1112
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1114
 msgid "电影教学"
 msgstr "movie tutorial"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1114
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1116
 msgid "新手教学"
 msgstr "Tutorial"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1117
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1119
 msgid "电路教学"
 msgstr "circuit tutorial"
 
-#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1119
+#: script/apps/Aries/Creator/Game/Common/test_paracraft_temp_poedit_strings.lua:1121
 msgid "小型建筑"
 msgstr "Small building"
 
@@ -10575,7 +10699,13 @@ msgstr "Enter camera name"
 msgid "输入代码"
 msgstr "Enter your code"
 
-#: script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua:465
+#: script/apps/Aries/Creator/Game/Entity/EntityCollisionSensor.lua:71
+msgid "命令或物品脚本将在人物碰撞本方块时执行"
+msgstr ""
+"command or item script will be executed when an entity collides with this "
+"block"
+
+#: script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua:476
 msgid "命令编辑器..."
 msgstr "command editor..."
 
@@ -10654,7 +10784,7 @@ msgstr "Please enter HTML/MCML code"
 msgid "mcml语法错误"
 msgstr "mcml syntax error"
 
-#: script/apps/Aries/Creator/Game/Entity/EntitySign.lua:401
+#: script/apps/Aries/Creator/Game/Entity/EntitySign.lua:412
 msgid "HTML编辑器..."
 msgstr "HTML Editor..."
 
@@ -10863,12 +10993,12 @@ msgstr "ParaX model(*.x,*.xml)"
 msgid "block模版(*.blocks.xml)"
 msgstr "Block template (*.blocks.xml)"
 
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:74
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:78
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:51
 msgid "(*.lua)"
 msgstr "(*.lua)"
 
-#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:91
+#: script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua:95
 #: script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua:73
 msgid "全部文件(*.xml)"
 msgstr "All files (*.xml)"
@@ -10998,7 +11128,7 @@ msgstr ""
 "Ctrl+ left click to select blocks and bones, then left click the model icon "
 "to save"
 
-#: script/apps/Aries/Creator/Game/Items/ItemClient.lua:288
+#: script/apps/Aries/Creator/Game/Items/ItemClient.lua:291
 #, lua-format
 msgid ""
 "\n"
@@ -11007,7 +11137,7 @@ msgstr ""
 "\n"
 "Coins: %d"
 
-#: script/apps/Aries/Creator/Game/Items/ItemClient.lua:291
+#: script/apps/Aries/Creator/Game/Items/ItemClient.lua:294
 #, lua-format
 msgid ""
 "\n"
@@ -11020,7 +11150,7 @@ msgstr ""
 msgid "演员名字"
 msgstr "actor name"
 
-#: script/apps/Aries/Creator/Game/Items/ItemColorBlock.lua:198
+#: script/apps/Aries/Creator/Game/Items/ItemColorBlock.lua:204
 msgid "Alt+鼠标左键可拾取颜色. Shift+滚轮调节亮度. +/-饱和度"
 msgstr ""
 "Alt+MouseLeft to pick color. Shift+MouseWheel adjust brightness. +/- "
@@ -11061,12 +11191,12 @@ msgid "关于Paracraft"
 msgstr "About Paracraft"
 
 #: script/apps/Aries/Creator/Game/Login/AboutParacraft.html:71
-#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:40
+#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:41
 msgid "(c)Tatfook."
 msgstr "(c)Tatfook."
 
 #: script/apps/Aries/Creator/Game/Login/AboutParacraft.html:71
-#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:40
+#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:41
 msgid "powered by NPL and ParaEngine"
 msgstr "powered by NPL and ParaEngine"
 
@@ -11159,8 +11289,8 @@ msgid "PyRuntime"
 msgstr "PyRuntime"
 
 #: script/apps/Aries/Creator/Game/Login/BuildinMod.lua:130
-msgid "NplRobot"
-msgstr "NplRobot"
+msgid "NplMicroRobot"
+msgstr "NplMicroRobot"
 
 #: script/apps/Aries/Creator/Game/Login/ChangeLanguagePage.html:31
 msgid "系统默认:"
@@ -11174,7 +11304,7 @@ msgstr "Change language..."
 msgid "请选择当前使用的语言:"
 msgstr "Select your language"
 
-#: script/apps/Aries/Creator/Game/Login/ClientUpdater.lua:104
+#: script/apps/Aries/Creator/Game/Login/ClientUpdater.lua:88
 msgid "http://paracraft.keepwork.com/download?lang=zh"
 msgstr "http://paracraft.keepwork.com/download?lang=en"
 
@@ -11481,25 +11611,32 @@ msgstr "Not enough gold, renaming failed"
 msgid "暂时无法改名. 错误码%s"
 msgstr "Can not change name. Error code: %s"
 
-#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:35
+#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:36
 msgid "发现新版本:"
 msgstr "New Version Detected:"
 
-#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:36
+#: script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html:37
 msgid "请到官网更新"
 msgstr "Please update from our website"
 
-#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:257
+#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:162
+#, lua-format
+msgid "您的版本%s低于最低要求,请尽快更新"
+msgstr ""
+"Your version %s is below the minimum requirement, please update as soon as "
+"possible"
+
+#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:229
 msgid "您上次运行时更改了图形设置. 是否保存目前的显示设置."
 msgstr ""
 "You have changed your graphic settings, do you wan tot save your current "
 "display settings?"
 
-#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:291
+#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:263
 msgid "创意空间 Paracraft"
 msgstr "Paracraft"
 
-#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:292
+#: script/apps/Aries/Creator/Game/Login/MainLogin.lua:264
 msgid "免费的动画游戏创作工具"
 msgstr "Free Animation & Game Authoring Tool"
 
@@ -11528,7 +11665,7 @@ msgstr ""
 "applications, and open sourced more than 1 million lines of NPL code."
 
 #: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:13
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:207
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:214
 msgid "创意大厅"
 msgstr "Creative Hall"
 
@@ -11545,7 +11682,7 @@ msgstr ""
 "other users in multi-player mode, and releases your own work."
 
 #: script/apps/Aries/Creator/Game/Login/ParaWorldAppTooltip.html:14
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:191
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:198
 msgid "魔法哈奇"
 msgstr "Haqi"
 
@@ -12030,79 +12167,75 @@ msgid "暂时无法登陆，请稍后再试."
 msgstr "Temporarily unable to log in, please try again later."
 
 #: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:185
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:192
 msgid "paracraft创意空间"
 msgstr "Paracraft"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:198
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:205
 msgid "魔法哈奇-青年版"
 msgstr "Haqi2"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:590
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:596
 msgid "官方应用"
 msgstr "Official application"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:673
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:679
 msgid "应用在安装中, 请等待"
 msgstr "Application is in the installation, please wait"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:737
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:743
 msgid "预下载版本号"
 msgstr "Pre-download version number"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:739
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:745
 msgid "正在下载版本信息"
 msgstr "Downloading version information"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:741
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:747
 msgid "版本验证完毕"
 msgstr "Version Verification complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:744
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:750
 msgid "无法获取版本信息"
 msgstr "Unable to get version information"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:749
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:755
 msgid "资源列表预下载"
 msgstr "Resource list pre-download"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:751
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:757
 msgid "资源列表下载中"
 msgstr "Resources List in download"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:753
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:759
 msgid "已经获取资源列表"
 msgstr "A list of resources has been obtained"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:756
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:762
 msgid "无法获取资源列表"
 msgstr "Unable to get list of resources"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:761
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:103
-msgid "准备下载资源文件"
-msgstr "Preparing to download the resource file"
-
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:787
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:793
 msgid "全部资源下载完成"
 msgstr "All Resources Download complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:794
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:800
 msgid "无法获取资源"
 msgstr "Unable to get resource"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:801
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:807
 msgid "正在安装更新"
 msgstr "Installing updates"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:803
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:809
 msgid "安装完成"
 msgstr "Installation Complete"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:810
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:816
 msgid "无法应用更新"
 msgstr "Cannot apply update"
 
-#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:810
+#: script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua:816
 msgid "请确保目前只有一个实例在运行"
 msgstr "Make sure that only one instance is running"
 
@@ -13120,45 +13253,45 @@ msgstr "Unable to connect to the server"
 msgid "你不能同时为客户端和服务器"
 msgstr "You cannot be both a client and server at the same time."
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:84
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:88
 msgid "文件名存在非法字符, 请用英文"
 msgstr "file name contains illegal letters, please use English"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:89
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:93
 msgid "没有指定文件名将取消关联, 是否取消关联?"
 msgstr ""
 "If no file name is specified, connections will be removed. Do you want to "
 "remove connections?"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:111
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:115
 #, lua-format
 msgid "确定要创建并关联脚本文件?<br/>%s<br/>基于模板:%s"
 msgstr ""
 "Do you want to create and associate the script file?<br/>%s<br/> based on "
 "template:%s"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:120
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:124
 #, lua-format
 msgid "是否关联已经存在的文件?<br/>%s<br/>"
 msgstr "Do you want to associate to existing file?<br/>%s<br/>"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:148
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:152
 msgid "创建与物品关联的脚本文件"
 msgstr "create script file which is associated with the item"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:166
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:170
 msgid "请选择一个模板文件或已经存在的文件:"
 msgstr "please select a template file or existing file"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:181
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:185
 msgid "已有文件"
 msgstr "existing file"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:187
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:191
 msgid "文件预览:"
 msgstr "file preview:"
 
-#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:196
+#: script/apps/Aries/Creator/Game/Neuron/CreateNewNeuronScriptFile.html:200
 msgid "文件名:"
 msgstr "filename:"
 
@@ -13247,73 +13380,38 @@ msgstr ""
 "Left-click to create a connection, Ctrl+Left to add, then click to the learn "
 "button. Right click to change target"
 
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:87
-msgid "准备下载版本号"
-msgstr "prepare to download version number"
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NodeJsRuntime.lua:48
+msgid "第一次安装NodeJs Runtime比较慢，请耐心等待！"
+msgstr "The first installation of Node Runtime is slow, please be patient!"
 
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:89
-msgid "下载版本号"
-msgstr "Download version number"
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NodeJsRuntime.lua:51
+msgid "成功安装NodeJs Runtime！"
+msgstr "Successful installed Node Runtime!"
 
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:91
-msgid "检测版本号"
-msgstr "Detect version number"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:93
-msgid "版本号错误"
-msgstr "Version number error"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:95
-msgid "准备下载文件列表"
-msgstr "Prepare a list of files to download"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:97
-msgid "下载文件列表"
-msgstr "Download file list"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:99
-msgid "下载文件列表完成"
-msgstr "Download file list complete"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:101
-msgid "下载文件列表错误"
-msgstr "Error downloading file list"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:131
-msgid "下载资源文件结束"
-msgstr "Finished downloading asset files"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:141
-msgid "下载资源文件错误"
-msgstr "failed to download asset file"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:143
-#: script/mobile/paracraft/Login/AutoUpdatePage.lua:88
-msgid "准备更新"
-msgstr "Ready to Update"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:145
-msgid "更新中"
-msgstr "updating"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:148
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:162
-msgid "更新错误"
-msgstr "Update error"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:155
-msgid "更新完成"
-msgstr "Update complete"
-
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:239
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua:85
 #, lua-format
-msgid "当前版本(%s)        最新版本(%s)"
-msgstr "Current version (%s) latest version (%s)"
+msgid "成功生成:%s,是否打开文件夹？"
+msgstr "Successful build: %s, do you want to open the folder?"
 
-#: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua:255
-#, lua-format
-msgid "更新%s (%d/%d)"
-msgstr "Updating %s (%d/%d)"
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html:47
+msgid "骨骼匹配通道"
+msgstr "bone match channel"
+
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html:53
+msgid "骨骼名称"
+msgstr "bone name"
+
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html:56
+msgid "通道"
+msgstr "channel"
+
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html:96
+msgid "编译"
+msgstr "Compile"
+
+#: script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html:97
+msgid "部署"
+msgstr "Deploy"
 
 #: script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua:269
 msgid "NPL Chrome浏览器插件丢失，是否重新安装?"
@@ -13845,28 +13943,28 @@ msgstr "You died, and will be teleported to spawn pos."
 msgid "只读世界不能进行这个操作"
 msgstr "Read-only world does not support this operation."
 
-#: script/apps/Aries/Creator/Game/game_options.lua:121
+#: script/apps/Aries/Creator/Game/game_options.lua:119
 msgid "http://bbs.paraengine.com/forum.php?mod=forumdisplay&fid=51"
 msgstr "http://www.paracraft.cn/"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:122
+#: script/apps/Aries/Creator/Game/game_options.lua:120
 msgid "https://times.keepwork.com/latest"
 msgstr "https://times.keepwork.com/latest"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:125
+#: script/apps/Aries/Creator/Game/game_options.lua:123
 msgid "https://tieba.baidu.com/f?kw=%E9%AD%94%E6%B3%95%E5%93%88%E5%A5%87"
 msgstr "https://tieba.baidu.com/f?kw=%E9%AD%94%E6%B3%95%E5%93%88%E5%A5%87"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:126
+#: script/apps/Aries/Creator/Game/game_options.lua:124
 #: script/mobile/paracraft/Login/SelectLoginModePage.html:129
 msgid "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 msgstr "https://github.com/LiXizhi/ParaCraftSDK/wiki/Credits"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:376
+#: script/apps/Aries/Creator/Game/game_options.lua:374
 msgid "是否观看在线教程(快捷键F1)?"
 msgstr "Do you want to watch online tutorial (hotkey F1)?"
 
-#: script/apps/Aries/Creator/Game/game_options.lua:423
+#: script/apps/Aries/Creator/Game/game_options.lua:421
 msgid "只读"
 msgstr "Read-only"
 
@@ -14370,6 +14468,24 @@ msgid ""
 msgstr ""
 "position:relative;margin-left:0px;width:512px;height:178px;background:"
 "url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 259 512 175);"
+
+#~ msgid "当角色被复制时(%1)"
+#~ msgstr "when actor is cloned(%1)"
+
+#~ msgid "复制%1(%2)"
+#~ msgstr "clone%1(%2)"
+
+#~ msgid "删除角色"
+#~ msgstr "delete this clone"
+
+#~ msgid "创建窗口"
+#~ msgstr "create window"
+
+#~ msgid "骨骼%1在%2轴旋转%3 Servo %4"
+#~ msgstr "bone %1 of %2 axis, rotate %3 servo %4"
+
+#~ msgid "NplRobot"
+#~ msgstr "NplRobot"
 
 #~ msgid "NPL动画与编程大赛"
 #~ msgstr "NPL Animation & Coding Contest"

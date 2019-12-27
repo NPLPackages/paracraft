@@ -86,6 +86,9 @@ function Actor:cloneFrom(fromActor)
 		if(entity.scaling ~= fromEntity.scaling) then
 			entity:SetScaling(fromEntity:GetScaling())
 		end
+		if(entity:GetOpacity() ~= fromEntity:GetOpacity()) then
+			entity:SetOpacity(fromEntity:GetOpacity())
+		end
 	end
 end
 

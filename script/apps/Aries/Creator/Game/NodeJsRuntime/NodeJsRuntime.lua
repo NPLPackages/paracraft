@@ -23,6 +23,10 @@ function NodeJsRuntime.GetRoot()
 	return ParaIO.GetCurDirectory(0).."NodeJsRuntime";
 end
 function NodeJsRuntime.Check(callback)
+    if(not NodeJsRuntime.OsSupported())then
+	    LOG.std(nil, "info", "NodeJsRuntime", "NodeJsRuntime isn't supported on %s", System.os.GetPlatform());
+        return
+    end
     local nodejs_loader_page = AutoUpdateLoaderPageManager.CreateOrGet_NodeJsRuntime();
     nodejs_loader_page:Check(function(v,downloadUnits)
         local need_unzip = false;
@@ -72,4 +76,12 @@ function NodeJsRuntime.UnZip_node_modules()
 	        zipFile:close();
         end
     end
+end
+
+function NodeJsRuntime.OsSupported()
+    local platform = System.os.GetPlatform();
+    if(platform == "win32")then
+        return true;
+    end
+    return false;
 end

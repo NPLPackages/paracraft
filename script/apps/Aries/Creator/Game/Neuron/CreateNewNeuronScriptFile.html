@@ -26,7 +26,11 @@ function OnClickCategory(node)
         Page:SetValue("fileTabs", "tabTemplate");
     end
 end
-    
+
+function ConvertTextTabToSpaces(text)
+    return text:gsub("\t", "    ")
+end
+
 function OnClickFile(node)
     local filename = node.tooltip;
     local name = node.Name;
@@ -35,7 +39,7 @@ function OnClickFile(node)
 	    if(file:IsValid()) then
 		    local text = file:GetText();
 		    if(text and text~="") then
-			   Page:SetUIValue("filecontent", text);
+			   Page:SetUIValue("filecontent", ConvertTextTabToSpaces(text));
                CreateNewNeuronScriptFile.template_file = {filename=filename, name=name, text=node.Text};
                local default_filename = filename:match("([%w_]+%.%w+)$");
                if(default_filename) then
@@ -62,7 +66,7 @@ function OnSelectFile(name, filepath)
 	if(file:IsValid()) then
 		local text = file:GetText();
 		if(text and text~="") then
-			Page:SetUIValue("filecontent", text);
+			Page:SetUIValue("filecontent", ConvertTextTabToSpaces(text));
             CreateNewNeuronScriptFile.template_file = nil;
 		end
 		file:close();
