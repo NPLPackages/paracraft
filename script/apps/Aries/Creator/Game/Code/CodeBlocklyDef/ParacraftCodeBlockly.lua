@@ -23,6 +23,7 @@ local default_categories = {
 {name = "Sensing", text = L"感知", colour="#69b090", },
 {name = "Operators", text = L"运算", colour="#569138", },
 {name = "Data", text = L"数据", colour="#459197", },
+--{name = "MicrobitRobot", text = L"机器人", colour="#42ccff", },
 };
 
 -- make files for blockly 
@@ -53,7 +54,6 @@ function ParacraftCodeBlockly.AppendAll()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Operators.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sensing.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Sound.lua");
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicrobit/NplMicrobitDef/NplMicrobitDef_Control.lua");
 
 	local CodeBlocklyDef_Control = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Control");
 	local CodeBlocklyDef_Data = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlocklyDef.CodeBlocklyDef_Data");
@@ -74,7 +74,7 @@ function ParacraftCodeBlockly.AppendAll()
 		CodeBlocklyDef_Operators.GetCmds(),
 		CodeBlocklyDef_Sensing.GetCmds(),
 		CodeBlocklyDef_Sound.GetCmds(),
-		--NplMicrobitDef_Control.GetCmds(),
+--        NPL.load("./CodeBlocklyDef_MicrobitRobot.lua");
 	}
 	for k,v in ipairs(all_source_cmds) do
 		ParacraftCodeBlockly.AppendDefinitions(v);

@@ -19,7 +19,104 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
+-- set ranges index to 0 as first 
+function env_imp.fixeRangesToJsIndex(bones)
+    if(not bones)then
+        return
+    end
+    local result = {};
+    for k,v in pairs(bones) do
+        if(type(v) == "table" and v.ranges)then
+            for kk,vv in ipairs(v.ranges) do
+                for kkk,vvv in ipairs(vv) do
+                    vv[kkk] = vv[kkk] - 1;
+                end
+            end
+            v.type = nil; -- remove wrong type
+            table.insert(result,v);
+        end
+    end
+    return result;
+end
+function env_imp.fixRotationValuesAndID(bones)
+    if(not bones)then
+        return
+    end
+    local result = {};
+    for k,v in pairs(bones) do
+        if(type(v) == "table" and v.id and v.id >-1 and v.data)then
+            local axis = v.axis or "x";
+            local data = v.data
+            for kk,vv in ipairs(data) do
+                if(type(vv) == "table")then
+                    local len = #vv;
+                    if(len >= 4)then
+                        local q = Quaternion:new(vv);    
+                        local angle, axis = q:ToAngleAxis();
+                        data[kk] = angle * 180 / 3.1415926;
+                    end
+                end
+            end
+            table.insert(result,v);
+        end
+    end
+    return result;
+end
+function env_imp.getBonesDataFromInventory(inventory)
+    if(not inventory)then
+        return
+    end
+    local slots = inventory.slots or {};
+    local serverdata;
+    for k,v in ipairs(slots) do
+        if(v.id == 10062)then
+            serverdata = v.serverdata;
+            break;
+        end
+    end
+    if(serverdata and serverdata.timeseries and serverdata.timeseries.bones)then
+        return serverdata.timeseries.bones;
+    end
+end
+function env_imp:createMicrobitRobot()
+    local NodeJsRuntime = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NodeJsRuntime.lua");
+    if(not NodeJsRuntime.IsValid())then
+        -- only download
+        NodeJsRuntime.Check()
+        return;
+    end
+    -- check new version
+    NodeJsRuntime.Check();
 
+    local movieEntity = self.codeblock:GetMovieEntity();
+    local filename = self.codeblock:GetBlockName();
+    if(filename == "" or not filename)then
+        filename = "default";
+    end
+    filename = string.format("test/robot/%s.json",filename);
+    if(movieEntity and movieEntity.inventory)then
+        local inventory = movieEntity.inventory;
+
+        local bones = env_imp.getBonesDataFromInventory(inventory) or {};
+        bones = commonlib.copy(bones);
+        bones = env_imp.fixeRangesToJsIndex(bones)
+
+        local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
+        NplMicroRobotAdapterPage.ShowPage(bones,function(type,values)
+                local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua");
+                values = env_imp.fixRotationValuesAndID(values);
+                NplMicroRobot.Run(type,NPL.ToJson(values));
+
+        	    ParaIO.CreateDirectory(filename);
+                local file = ParaIO.open(filename,"w");
+                if(file:IsValid()) then
+		            file:WriteString(NPL.ToJson(values));
+		            file:close();
+	            end
+        end);
+
+    end
+end
 function env_imp:getBoneVariable(name)
     local actor = env_imp.GetActor(self);
     if(actor)then

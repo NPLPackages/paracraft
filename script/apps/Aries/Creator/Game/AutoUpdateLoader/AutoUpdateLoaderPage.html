@@ -1,0 +1,29 @@
+<!-- "script/apps/Aries/Creator/Game/AutoUpdateLoader/AutoUpdateLoaderPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2019.12.26</title>
+</head>
+<body> 
+<pe:mcml>
+<script refresh="true" type="text/npl"><![CDATA[
+    local page = document:GetPageCtrl();
+    function GetPageName()
+        local page_name = page.page_name or "nplbrowser"
+        return page_name;
+    end
+]]></script>
+    <div style="background:url(Texture/whitedot.png);background-color:#000000cc;width:400px;height:30px;color:#ffffff">
+        <pe:if condition="<%=GetPageName() == 'nplbrowser'%>">
+            <div style="float:left;margin:5px;width:20px;height:20px;background:url(Texture/3DMapSystem/AppIcons/png/WebBrowser_64.png);"></div>
+        </pe:if>
+        <pe:if condition="<%=GetPageName() == 'NodeJsRuntime'%>">
+            <div style="float:left;margin-top:5px;">NodeJs:</div>
+        </pe:if>
+        <div style="float:left;margin:5px;width:340px;">
+            <label name="progressText" style="width:400px;height:25px;" value='<%=L"请稍后..."%>'></input><br />
+        </div>
+    </div>
+</pe:mcml>
+</body>
+</html>

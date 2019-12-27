@@ -326,6 +326,15 @@ entity_data: optional, preferred entity data when created.
     <block name="ColorBlock" />
     <block name="MetalBlock" />
     <block name="TransparentColorBlock" />
+  
+    <block name="Sandstone_Stairs" />
+    <block name="Smooth_Sandstone" />
+    <block name="Sand_Slope" />
+    <block name="Sandstone_Slab" />
+    <block name="ColorFence" />
+    <block name="ColorWall" />
+    <block name="White_Carpet" />
+  
     <block name="BlockLight" />
   </category>
   <category name="others" text="其他">

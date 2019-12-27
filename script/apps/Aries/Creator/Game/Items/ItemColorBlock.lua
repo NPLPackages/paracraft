@@ -107,10 +107,16 @@ end
 -- @param entityPlayer: can be nil
 -- @return isUsed: isUsed is true if something happens.
 function ItemColorBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
-	data = self:ColorToData(self:GetPenColor(itemStack));
-
 	-- create with currently selected pen
-	return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
+	if(self:IsColorData8Bits()) then
+		local res = ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
+		if(res) then
+			self:PaintBlock(x,y,z, self:GetPenColor(itemStack))
+		end
+	else
+		data = self:ColorToData(self:GetPenColor(itemStack));
+		return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
+	end
 end
 
 function ItemColorBlock:BlinkPenColor(bForceBlink)

@@ -121,6 +121,9 @@ local s_env_methods = {
 	"stopSound",
 	"playMusic",
 
+    --------------- MicrobitRobot
+    "createMicrobitRobot",
+
     --------------- Microbit
     -- Animation
     "createRobotAnimation",

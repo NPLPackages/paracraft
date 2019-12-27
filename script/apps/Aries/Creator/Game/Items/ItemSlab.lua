@@ -29,7 +29,7 @@ local function GetBoxBlockBySlabID(slab_id)
 	if(not block_id_map)then
 		block_id_map = {
 			[block_types.names.Stone_Slab] = block_types.names.Double_Stone_Slab,
-			[block_types.names.Sandstone_Slab] = block_types.names.Sandstone,
+			[block_types.names.Sandstone_Slab] = block_types.names.Smooth_Sandstone,
 			[block_types.names.Oak_Wood_Slab] = block_types.names.Oak_Wood_Planks,
 			[block_types.names.Cobblestone_Slab] = block_types.names.Cobblestone,
 			[block_types.names.Brick_Slab] = block_types.names.Brick,

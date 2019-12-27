@@ -1,0 +1,104 @@
+﻿<!-- "script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="NplMicroRobotAdapterPage.lua"><![CDATA[
+NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
+NplMicroRobotAdapterPage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function DS_Items(index)
+    local ds = NplMicroRobotAdapterPage.datasource;
+    if(index == nil) then
+        return #ds;
+    else
+        return ds[index];
+    end
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOK(name)
+    ClosePage();
+    if(NplMicroRobotAdapterPage.callback)then
+        NplMicroRobotAdapterPage.callback(name,NplMicroRobotAdapterPage.datasource)
+    end
+end
+function GetListName(index)
+        return NplMicroRobotAdapterPage.GetListName(index);
+end
+function OnSelect(name,value)
+    local index = string.match(name,"channel_(.+)")
+    index = tonumber(index);
+    value = tonumber(value);
+    NplMicroRobotAdapterPage.datasource[index].id = value
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"骨骼匹配通道"%>' onclose="ClosePage">
+    <div style="width:500px;height:600px;" >
+
+    <div style="color:#cccccc;">
+        <div class="mc_border" style="margin-top:10px;padding:10px;width:490px;height:510px;">
+            <div style="float:left;width:380px;color:#ffffff;text-align:center;">
+                <%=L"骨骼名称"%>
+            </div>
+            <div style="float:left;color:#ffffff;width:80px;text-align:center;">
+                <%=L"通道"%>
+            </div>
+            <pe:gridview style="margin-top:5px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="height:32px;">
+                            <div style="float:left;color:#ffffff;">
+                                <div style="float:left;width:380px;text-align:center;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
+                                    <%= Eval("name") %>
+                                </div>
+                                 <div style="float:left;margin-left:12px;font-size:11px;">
+                                    <select name = '<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
+                                        <option value="-1" selected="true">无</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">8</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                    </select>
+                                </div>
+                            </div>
+                    </div>
+                </Columns> 
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:180px;">
+        <input type="button" onclick="OnOK" name="build" value='<%=L"编译"%>' style="float:left;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
+        <input type="button" onclick="OnOK" name="deploy"  value='<%=L"部署"%>' style="float:left;margin-left:20px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
+    </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

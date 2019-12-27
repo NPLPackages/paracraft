@@ -14,11 +14,10 @@ NplBrowserLoaderPage.Check()
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
-NPL.load("npl_mod/AutoUpdater/AssetsManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 NPL.load("(gl)script/ide/timer.lua");
 local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
-local AssetsManager = commonlib.gettable("Mod.AutoUpdater.AssetsManager");
+local AssetsManager = NPL.load("AutoUpdater");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 NPL.load("(gl)script/Github/GitReleaseUpdater.lua");

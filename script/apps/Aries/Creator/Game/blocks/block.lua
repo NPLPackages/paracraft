@@ -881,8 +881,15 @@ end
 function block:OnNeighborChanged(x,y,z,neighbor_block_id)
 	if(self.handleNeighborChange and self.customModel) then
 		local data = self:GetMetaDataFromEnv(x,y,z);
-		if(data ~= BlockEngine:GetBlockData(x,y,z)) then
-			BlockEngine:SetBlockData(x,y,z, data, 3);
+		if(self.color8_data) then
+			local oldData = BlockEngine:GetBlockData(x,y,z)
+			if(data ~= band(oldData, 0xff)) then
+				BlockEngine:SetBlockData(x,y,z, data + band(oldData, 0xff00), 3);
+			end
+		else
+			if(data ~= BlockEngine:GetBlockData(x,y,z)) then
+				BlockEngine:SetBlockData(x,y,z, data, 3);
+			end
 		end
 	end
 end
@@ -957,6 +964,9 @@ block.isAutoUserData = false;
 -- update a block's custom model according to user data. this function is called whenever the block data changes or on load. 
 function block:UpdateModel(blockX, blockY, blockZ, blockData)
 	if(self.customModel and self.models) then
+		if(self.color8_data and blockData) then
+			blockData = band(blockData, 0xff);
+		end
 		-- create a model at block center with custom direction and model type according to nearby models. 
 		local best_model = self:GetBestModel(blockX, blockY, blockZ, blockData);
 		if(best_model) then
@@ -991,7 +1001,12 @@ function block:UpdateModel(blockX, blockY, blockZ, blockData)
 				end
 				ParaScene.Attach(obj);
 				if(best_model.id_data and blockData~=best_model.id_data) then
-					ParaTerrain.SetBlockUserDataByIdx(blockX, blockY, blockZ, best_model.id_data);
+					if(self.color8_data) then
+						local oldData = BlockEngine:GetBlockData(x,y,z) or 0;
+						ParaTerrain.SetBlockUserDataByIdx(blockX, blockY, blockZ, best_model.id_data + band(0xff00, oldData));
+					else
+						ParaTerrain.SetBlockUserDataByIdx(blockX, blockY, blockZ, best_model.id_data);
+					end
 				end
 			end
 		end
