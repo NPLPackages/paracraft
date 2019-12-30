@@ -204,7 +204,7 @@ say(key, 1)
 
 {
 	type = "registerCloneEvent", 
-	message0 = L"当角色被复制时(%1)",
+	message0 = L"当角色被克隆时(%1)",
 	message1 = L"%1",
 	arg0 = {
 		{
@@ -279,7 +279,7 @@ clone("myself", 3)
 
 {
 	type = "clone", 
-	message0 = L"复制%1(%2)",
+	message0 = L"克隆%1(%2)",
 	arg0 = {
 		{
 			name = "input",
@@ -317,7 +317,7 @@ say("click")
 
 {
 	type = "delete", 
-	message0 = L"删除角色", color="#cc0000",
+	message0 = L"删除此克隆角色", color="#cc0000",
 	arg0 = {
 	},
 	category = "Data", 
@@ -738,7 +738,7 @@ log(t)
 
 {
 	type = "newFunction", 
-	message0 = L"新函数(%1)",
+	message0 = L"函数(%1)",
 	message1 = L"%1",
 	arg0 = {
 		{
@@ -771,6 +771,54 @@ log(t)
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 local thinkText = function(text)
+	say(text.."...")
+end
+thinkText("Let me think");
+]]}},
+},
+
+{
+	type = "defineFunction", 
+	message0 = L"定义函数%1(%2)",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "", 
+		},
+		{
+			name = "param",
+			type = "field_input",
+			text = "", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+    },
+	previousStatement = true,
+	nextStatement = true,
+	hide_in_codewindow = true,
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'function %s(%s)\\n%send',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def %s(%s):\n    %s\n', self:getFieldAsString('name'), self:getFieldAsString('param'), input);
+	end,
+	ToNPL = function(self)
+		return string.format('function %s(%s)\n    %s\nend\n', self:getFieldAsString('name'), self:getFieldAsString('param'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+function thinkText(text)
 	say(text.."...")
 end
 thinkText("Let me think");
