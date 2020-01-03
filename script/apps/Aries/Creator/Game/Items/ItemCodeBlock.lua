@@ -44,6 +44,14 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				if(blockly_nplcode) then
 					entity:SetBlocklyNPLCode(blockly_nplcode);
 				end
+				local displayName = itemStack:GetDataField("displayname");
+				if(displayName) then
+					entity:SetDisplayName(displayName)
+				end
+
+				if(nplCode or blockly_nplcode) then
+					entity:AutoCreateMovieEntity();
+				end
 			end
 		end
 	end

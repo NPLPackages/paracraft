@@ -13,6 +13,47 @@ local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Np
 local cmds = {
 
 {
+	type = "createShapeNode", 
+	message0 = L"创建 %1 %2 %3",
+    arg0 = {
+        {
+			name = "var_name",
+			type = "field_variable",
+			variable = "object0",
+			variableTypes = {""},
+			text = "object0",
+		},
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"合并", "true" },
+				{ L"不合并", "false" },
+			},
+		},
+	},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	nextStatement = true,
+	funcName = "createNode",
+	func_description = 'createNode("%s",%s,%s)',
+	func_description_js = 'createNode("%s",%s,%s)',
+	ToNPL = function(self)
+		return string.format('createNode("%s","%s",%s)\n', 
+        self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
 	type = "cube", 
 	message0 = L" %1 正方体 %2 %3",
     arg0 = {
@@ -505,6 +546,93 @@ local cmds = {
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 		
+    ]]}},
+},
+
+{
+	type = "importStl", 
+	message0 = L"引用Stl %1 %2 %3",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "filename",
+			type = "field_dropdown",
+			options = {
+				{ L"Arm01.stl", "Mod/NplCad2/stl/RobotArm/Arm01.stl" },
+				{ L"Arm02.stl", "Mod/NplCad2/stl/RobotArm/Arm02.stl" },
+				{ L"Arm03.stl", "Mod/NplCad2/stl/RobotArm/Arm03.stl" },
+				{ L"Base.stl", "Mod/NplCad2/stl/RobotArm/Base.stl" },
+				{ L"Gripper_Assembly.stl", "Mod/NplCad2/stl/RobotArm/Gripper_Assembly.stl" },
+				{ L"Servo_Motor_MG996R.stl", "Mod/NplCad2/stl/RobotArm/Servo_Motor_MG996R.stl" },
+				{ L"Servo_Motor_Micro_9g.stl", "Mod/NplCad2/stl/RobotArm/Servo_Motor_Micro_9g.stl" },
+				{ L"Waist.stl", "Mod/NplCad2/stl/RobotArm/Waist.stl" },
+			},
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "importStl",
+	func_description = 'importStl(%s,"%s",%s)',
+	ToNPL = function(self)
+        return string.format('importStl("%s","%s","%s")\n', 
+                self:getFieldValue('op'), self:getFieldValue('filename'), 
+                self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "importStl_2", 
+	message0 = L"引用Stl %1 %2 %3",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "filename",
+			type = "field_input",
+			text = "filename",
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "importStl",
+	func_description = 'importStl(%s,"%s",%s)',
+	ToNPL = function(self)
+        return string.format('importStl("%s","%s","%s")\n', 
+                self:getFieldValue('op'), self:getFieldValue('filename'), 
+                self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
 

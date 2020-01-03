@@ -352,13 +352,13 @@ end
 	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'for i=1, %d do\\n%send',
+	func_description = 'for i_=1, %d do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
 		if input == '' then
 			input = 'pass'
 		end
-		return string.format('for i in range(%d):\n    %s\n', self:getFieldValue('times'), input);
+		return string.format('for i_ in range(%d):\n    %s\n', self:getFieldValue('times'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for i=1, %d do\n    %s\nend\n', self:getFieldValue('times'), self:getFieldAsString('input'));

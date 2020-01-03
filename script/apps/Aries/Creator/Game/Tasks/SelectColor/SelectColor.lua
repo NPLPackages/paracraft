@@ -30,30 +30,38 @@ function SelectColor:Run()
 end
 
 -- the following is default 20 colors in Windows's painter app.
+-- this make sure 8 bits are 16 bits colors are identical.
 local colors = {
 	-- row1
 	{color="#000000"},
-	{color="#7f7f7f"},
-	{color="#880015"},
-	{color="#ed1c24"},
-	{color="#ff7f27"},
-	{color="#fff200"},
-	{color="#22b14c"},
-	{color="#00a2e8"},
-	{color="#3f48cc"},
-	{color="#a349a4"},
+	{color="#555555"},
+	{color="#aa0000"},
+	{color="#ff0000"},
+	{color="#ff5500"},
+	{color="#ffff00"},
+	{color="#00aa55"},
+	{color="#00aaff"},
+	{color="#0055ff"},
+	{color="#aa55aa"},
 	-- row2
 	{color="#ffffff"},
-	{color="#c3c3c3"},
-	{color="#b97a57"},
-	{color="#ffaec9"},
-	{color="#ffc90e"},
-	{color="#efe4b0"},
-	{color="#b5e61d"},
-	{color="#99d9ea"},
-	{color="#7092be"},
-	{color="#c8bfe7"},
+	{color="#aaaaaa"},
+	{color="#aa5555"},
+	{color="#ffaaff"},
+	{color="#ffaa00"},
+	{color="#ffffaa"},
+	{color="#aaff00"},
+	{color="#aaffff"},
+	{color="#55aaaa"},
+	{color="#ffaaaa"},
 }
+
+function SelectColor.FormalizeColors(colors)
+	for _, col in ipairs(colors) do
+		col.color = Color.FromValueToStr(Color.convert8_32(Color.convert32_8(Color.ToValue(col.color))))
+	end
+end
+-- SelectColor.FormalizeColors(colors)
 
 function SelectColor.GetColorList()
 	return colors

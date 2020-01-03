@@ -85,6 +85,21 @@ function SelectBlocks.filter_file_exported(id, filename)
 		filename = Files.GetRelativePath(filename)
 		filename = commonlib.Encoding.DefaultToUtf8(filename)
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+	elseif(id == "STL" and filename) then
+		local output_file_name = filename;
+		if(not commonlib.Files.IsAbsolutePath(filename)) then
+			output_file_name = ParaIO.GetWritablePath()..filename;
+		end
+		filename = Files.GetRelativePath(filename)
+		filename = commonlib.Encoding.DefaultToUtf8(filename);
+		GameLogic.AddBBS(nil, L"文件已自动导入你手中的CAD方块", 6000);
+		_guihelper.MessageBox(format(L"文件成功保存在%s,现在打开吗?", filename), function(res)
+			if(res and res == _guihelper.DialogResult.Yes) then
+				ParaGlobal.ShellExecute("open", output_file_name, "", "", 1);
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+		local displayName = filename:match("([^/]+)%.%w+$");
+		GameLogic.RunCommand("take", format("NPLCADCodeBlock {displayname=\"%s\" nplCode=\"importStl('union','%s','#ff0000')\"}", displayName, filename))
 	end
 	SelectBlocks.CancelSelection();
 	return id;

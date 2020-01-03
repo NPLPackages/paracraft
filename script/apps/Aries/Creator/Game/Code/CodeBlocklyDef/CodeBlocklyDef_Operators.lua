@@ -291,7 +291,7 @@ say("hello ".."world".."!!!")
 
 {
 	type = "lengthOf", 
-	message0 = L"字符串%1的长度",
+	message0 = L"对象%1的长度",
 	arg0 = {
 		{
 			name = "left",
@@ -306,7 +306,7 @@ say("hello ".."world".."!!!")
 	canRun = false,
 	func_description = '(#%s)',
 	ToPython = function(self)
-		return string.format('len("%s")', self:getFieldAsString('left'));
+		return string.format('len(%s)', self:getFieldAsString('left'));
 	end,
 	ToNPL = function(self)
 		return string.format('(#"%s")', self:getFieldAsString('left'));

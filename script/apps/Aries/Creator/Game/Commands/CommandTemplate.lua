@@ -190,6 +190,11 @@ Commands["savemodel"] = {
 			})
 			if(task:Run()) then
 				BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				
+				if(options.interactive or options.i) then
+					GameLogic.GetFilters():apply_filters("file_exported", "bmax", filename);
+					GameLogic.GetFilters():apply_filters("user_event_stat", "model", "export.bmax", 10, nil);
+				end
 				return true, relative_path;
 			end
 		end
