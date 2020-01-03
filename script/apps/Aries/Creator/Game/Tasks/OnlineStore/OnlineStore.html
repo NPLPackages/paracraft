@@ -14,12 +14,18 @@ task = OnlineStore.GetInstance();
 </script>
 <aries:window mode="thin" title='<%=L"元件库"%>' onclose="OnlineStore.OnClose">
     <div width="100%" height="100%">
-        <pe:if condition="<%=NplBrowserLoaderPage.IsLoaded()%>" >
+        <pe:if condition="<%= System.os.GetPlatform() ~= 'win32'%>">
             <div style="position:relative;margin:20px" class="default"><%=L"正在加载内置浏览器， 首次加载会比较慢，请耐心等待"%></div>
             <pe:nplbrowser name="nplbrowser_store" enabledResize="true"  min_width="600" url="<%=OnlineStore.GetOnlineStoreUrl()%>" style="background:url();"/>
         </pe:if>
-        <pe:if condition="<%=not NplBrowserLoaderPage.IsLoaded()%>" >
-            <%=L"你没有安装内置浏览器，正在为您安装， 请稍后。 你可以用外部浏览器访问。" %>
+        <pe:if condition="<%= System.os.GetPlatform() == 'win32'%>">
+            <pe:if condition="<%= NplBrowserLoaderPage.IsLoaded()%>" >
+                <div style="position:relative;margin:20px" class="default"><%=L"正在加载内置浏览器， 首次加载会比较慢，请耐心等待"%></div>
+                <pe:nplbrowser name="nplbrowser_store" enabledResize="true"  min_width="600" url="<%=OnlineStore.GetOnlineStoreUrl()%>" style="background:url();"/>
+            </pe:if>
+            <pe:if condition="<%=not NplBrowserLoaderPage.IsLoaded()%>" >
+                <%=L"你没有安装内置浏览器，正在为您安装， 请稍后。 你可以用外部浏览器访问。" %>
+            </pe:if>
         </pe:if>
     </div>
 </aries:window>
