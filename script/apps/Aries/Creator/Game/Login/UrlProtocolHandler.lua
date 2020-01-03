@@ -35,6 +35,7 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 		if cmd_text then
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+			CommandManager:Init()
 			CommandManager:RunCommand(cmd_text)
 		end
 
