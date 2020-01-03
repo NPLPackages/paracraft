@@ -809,6 +809,7 @@ end
 		{
 			name = "data",
 			type = "input_value",
+			shadow = { type = "functionParams", value = "data",},
 			text = "data", 
 		},
 		
@@ -867,6 +868,7 @@ end
 		{
 			name = "data",
 			type = "input_value",
+			shadow = { type = "functionParams", value = "data",},
 			text = "data", 
 		},
 		

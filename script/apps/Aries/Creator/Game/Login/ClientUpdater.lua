@@ -64,15 +64,20 @@ function ClientUpdater:Check(callbackFunc)
 		return
 	end
 	
-	self.autoUpdater:check(nil, function()
+	self.autoUpdater:check(nil, function(bSucceed)
 		if(not callbackFunc) then
 			return
 		end
 		-- echo({self.autoUpdater:getCurVersion(), self.autoUpdater:getLatestVersion()});
-		if(self.autoUpdater:isNeedUpdate())then
-			callbackFunc(true, self.autoUpdater:getLatestVersion());
+		if(bSucceed) then
+			if(self.autoUpdater:isNeedUpdate())then
+				callbackFunc(true, self.autoUpdater:getLatestVersion());
+			else
+				callbackFunc(false, self.autoUpdater:getLatestVersion());
+			end
 		else
-			callbackFunc(false, self.autoUpdater:getLatestVersion());
+			LOG.std(nil, "info", "ClientUpdater", "version error");
+			callbackFunc(nil, self.autoUpdater:getLatestVersion());
 		end
 	end);
 end

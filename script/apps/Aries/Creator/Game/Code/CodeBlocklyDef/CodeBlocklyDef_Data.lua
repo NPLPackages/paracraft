@@ -657,42 +657,8 @@ local data = actor:GetActorValue("some_data")
 ]]}},
 },
 {
-	type = "getTableValue", 
-	message0 = L"获取表%1中的%2",
-	arg0 = {
-		{
-			name = "table",
-			type = "field_variable",
-			variable = "_G",
-			text = "_G",
-		},
-		{
-			name = "key",
-			type = "input_value",
-			variable = "_G",
-			shadow = { type = "text", value = "key",},
-			text = "key", 
-		},
-	},
-	output = {type = "field_number",},
-	category = "Data", 
-	helpUrl = "", 
-	canRun = false,
-	func_description = '%s[%s]',
-	ToNPL = function(self)
-		return string.format('%s["%s"]', self:getFieldAsString('table'), self:getFieldAsString('key'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-local t = {}
-t[1] = "hello"
-t["age"] = 10;
-log(t)
-]]}},
-},
-
-{
 	type = "newEmptyTable", 
-	message0 = L"表{%1%2%3}",
+	message0 = L"{%1%2%3}",
 	arg0 = {
         {
 			name = "start_dummy",
@@ -727,6 +693,72 @@ log(t)
     ]],
 	ToNPL = function(self)
 		return "{}";
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
+]]}},
+},
+{
+	type = "getTableValue", 
+	message0 = L"%1中的%2",
+	arg0 = {
+		{
+			name = "table",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "_G",},
+			text = "_G", 
+		},
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "text", value = "key",},
+			text = "key", 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s[%s]',
+	ToNPL = function(self)
+		return string.format('%s["%s"]', self:getFieldAsString('table'), self:getFieldAsString('key'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
+]]}},
+},
+
+{
+	type = "getArrayValue", 
+	message0 = L"%1的第%2项",
+	arg0 = {
+		{
+			name = "table",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "_G",},
+			text = "_G", 
+		},
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "math_number", value = "1",},
+			text = 1, 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	hide_in_codewindow = true,
+	canRun = false,
+	func_description = '%s[%s]',
+	ToNPL = function(self)
+		return string.format('%s[%s]', self:getFieldAsString('table'), self:getFieldAsString('key'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 local t = {}

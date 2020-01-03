@@ -374,6 +374,7 @@ end
 {
 	type = "askAndWait", 
 	message0 = L"提问%1并等待回答",
+	message1 = L"选项%1",
 	arg0 = {
 		{
 			name = "input",
@@ -382,13 +383,21 @@ end
 			text = L"你叫什么名字?",
 		},
 	},
+	arg1 = {
+		{
+			name = "choices",
+			type = "input_value",
+            shadow = { type = "functionParams", value = "",},
+			text = "",
+		},
+	},
 	category = "Sensing", 
 	helpUrl = "", 
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "ask",
-	func_description = 'ask(%s)',
+	func_description = 'ask(%s, %s)',
 	ToPython = function(self)
 		return string.format('result = ask("%s")\n', self:getFieldAsString('input'));
 	end,

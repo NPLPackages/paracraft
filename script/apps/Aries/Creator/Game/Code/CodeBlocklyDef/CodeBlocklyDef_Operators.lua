@@ -291,13 +291,13 @@ say("hello ".."world".."!!!")
 
 {
 	type = "lengthOf", 
-	message0 = L"对象%1的长度",
+	message0 = L"%1的长度",
 	arg0 = {
 		{
 			name = "left",
 			type = "input_value",
-            shadow = { type = "text", value = "hello",},
-			text = "hello",
+            shadow = { type = "functionParams", value = "",},
+			text = "",
 		},
 	},
 	output = {type = "field_number",},
