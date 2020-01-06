@@ -30,11 +30,6 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 -- call this when command
 function CommandManager:Init()
-	if(self.inited) then
-		return
-	else
-		self.inited = true;
-	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShapes.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua");

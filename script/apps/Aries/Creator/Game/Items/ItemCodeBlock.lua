@@ -25,6 +25,14 @@ block_types.RegisterItemClass("ItemCodeBlock", ItemCodeBlock);
 function ItemCodeBlock:ctor()
 end
 
+function ItemCodeBlock:CompareItems(left, right)
+	if(ItemCodeBlock._super.CompareItems(self, left, right) and left and right) then
+		return left:GetDataField("nplCode") == right:GetDataField("nplCode");
+	else
+		return false;
+	end
+end
+
 function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 	if(ItemCodeBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region)) then
 		if(itemStack) then

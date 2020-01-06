@@ -90,6 +90,8 @@ function env_imp:walkForward(dist, duration)
 		else
 			local facing = entity:GetFacing()
 			env_imp.walk(self, math.cos(facing)*dist, 0, -math.sin(facing)*dist, duration);
+			-- preserve facing, since the walk will modify facing by a slight angle to aim for block center. 
+			entity:SetFacing(facing);
 		end
 	end
 end

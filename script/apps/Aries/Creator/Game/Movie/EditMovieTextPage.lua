@@ -76,14 +76,19 @@ function EditMovieTextPage.OnOK()
 		if(text) then
 			text = text:gsub("\r?\n", "#");
 		end
+		local fontSize = tonumber(page:GetValue("fontsize")) or 25;
+		fontSize = math.min(math.max(fontSize, 8), 100);
+		fontcolor = page:GetValue("fontcolor");
+		bgcolor = page:GetValue("bgcolor");
+
 		EditMovieTextPage.result = {
 			text = text,
-			fontsize = tonumber(page:GetValue("fontsize")),
-			fontcolor = page:GetValue("fontcolor"),
+			fontsize = fontSize,
+			fontcolor = fontcolor,
 			textpos = page:GetValue("textpos"),
 			textanim = page:GetValue("textanim"),
 			bganim = page:GetValue("bganim"),
-			bgcolor = page:GetValue("bgcolor"),
+			bgcolor = bgcolor,
 		};
 		page:CloseWindow();
 	end

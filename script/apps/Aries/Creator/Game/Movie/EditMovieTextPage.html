@@ -14,16 +14,19 @@ EditMovieTextPage.OnInit();
 
 function GetFontSizeDS()
     return {
-        {value=20, text=L"小"},
-        {value=25, text=L"默认", selected=true},
-        {value=30, text=L"中"},
-        {value=40, text=L"大"},
+        {value=20},
+        {value=25, text="25"..L"默认", selected=true},
+        {value=30},
+        {value=40},
     };
 end
 function GetFontColorDS()
     return {
         {value="#ffffff", text=L"白色", selected=true},
         {value="#000000", text=L"黑色"},
+        {value="#ff0000"},
+        {value="#00ff00"},
+        {value="#0000ff"},
     };
 end
 function GetTextAnimDS()
@@ -39,6 +42,9 @@ function GetBGColorDS()
         {value="", text=L"无", selected=true},
         {value="#ffffff", text=L"白色"},
         {value="#000000", text=L"黑色"},
+        {value="#ff0000"},
+        {value="#00ff00"},
+        {value="#0000ff"},
     };
 end
 function GetTextPosDS()
@@ -65,12 +71,12 @@ end
     <div style="margin-top: 5px;">
         <div style="float:left;">
             <%=L"字号:"%>
-            <select name="fontsize" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetFontSizeDS()%>'>
+            <select name="fontsize" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontSizeDS()%>'>
             </select>
         </div>
         <div style="float:left;margin-left:20px;">
             <%=L"字体颜色:"%>
-            <select name="fontcolor" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetFontColorDS()%>'>
+            <select name="fontcolor" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontColorDS()%>'>
             </select>
         </div>
         <div style="float: left; margin-left: 20px;">
@@ -82,7 +88,7 @@ end
     <div style="margin-top: 5px;">
         <div style="float:left;">
             <%=L"背景:"%>
-            <select name="bgcolor" AllowUserEdit="false" style="height:24px;"  DataSource='<%=GetBGColorDS()%>'>
+            <select name="bgcolor" AllowUserEdit="true" style="height:24px;"  DataSource='<%=GetBGColorDS()%>'>
             </select>
         </div>
         <div style="float:left;margin-left:20px;">
