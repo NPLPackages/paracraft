@@ -33,6 +33,7 @@ function env_imp.fixeRangesToJsIndex(bones)
                 end
             end
             v.type = nil; -- remove wrong type
+            v.offset = 0; -- set offset value for servo rotation
             table.insert(result,v);
         end
     end
@@ -100,7 +101,6 @@ function env_imp:createMicrobitRobot()
         local bones = env_imp.getBonesDataFromInventory(inventory) or {};
         bones = commonlib.copy(bones);
         bones = env_imp.fixeRangesToJsIndex(bones)
-
         local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
         NplMicroRobotAdapterPage.ShowPage(bones,function(type,values)
                 local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua");

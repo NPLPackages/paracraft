@@ -138,7 +138,7 @@ function Entity:OpenEditor(editor_name, entity)
 				local filename = result;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-				if(filename~="" and not Files.GetWorldFilePath(filename)) then
+				if(filename~="" and not filename:match("^%d+$") and not Files.GetWorldFilePath(filename)) then
 					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
 				else
 					self.cmd = filename;

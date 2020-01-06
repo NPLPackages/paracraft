@@ -10,9 +10,9 @@
 <script refresh="false" type="text/npl" src="NplMicroRobotAdapterPage.lua"><![CDATA[
 NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
 NplMicroRobotAdapterPage.OnInit();
-
+local page = document:GetPageCtrl();
 function ClosePage()
-    Page:CloseWindow();
+    page:CloseWindow();
 end
 
 function DS_Items(index)
@@ -24,9 +24,6 @@ function DS_Items(index)
     end
 end
 
-function ClosePage()
-    Page:CloseWindow();
-end
 
 function OnOK(name)
     ClosePage();
@@ -36,6 +33,22 @@ function OnOK(name)
 end
 function GetListName(index)
         return NplMicroRobotAdapterPage.GetListName(index);
+end
+function GetOffsetName(index)
+       return string.format("offset_%s",tostring(index));
+end
+function GetOffsetValue(index)
+    local node = NplMicroRobotAdapterPage.datasource[index];
+    return string.format("%s",tostring(node.offset))
+end
+function OnChangeOffset(name,mcmlNode,obj)
+        local value = obj.text;
+        local index = string.match(name,"offset_(.+)")
+        index = tonumber(index);
+        value = tonumber(value);
+        if(type(value) == "number")then
+            NplMicroRobotAdapterPage.datasource[index].offset = value
+        end
 end
 function OnSelect(name,value)
     local index = string.match(name,"channel_(.+)")
@@ -49,22 +62,25 @@ end
 
     <div style="color:#cccccc;">
         <div class="mc_border" style="margin-top:10px;padding:10px;width:490px;height:460px;">
-            <div style="float:left;width:380px;color:#ffffff;text-align:center;">
+            <div style="float:left;width:300px;color:#ffffff;text-align:center;">
                 <%=L"骨骼名称"%>
             </div>
             <div style="float:left;color:#ffffff;width:80px;text-align:center;">
                 <%=L"通道"%>
+            </div>
+            <div style="float:left;color:#ffffff;width:80px;text-align:center;">
+                <%=L"偏移角度"%>
             </div>
             <pe:gridview style="margin-top:5px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="height:32px;">
                             <div style="float:left;color:#ffffff;">
-                                <div style="float:left;width:380px;text-align:center;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
+                                <div style="float:left;width:300px;text-align:center;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
                                     <%= Eval("name") %>
                                 </div>
                                  <div style="float:left;margin-left:12px;font-size:11px;">
-                                    <select name = '<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
+                                    <select name='<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
                                         <option value="-1" selected="true">无</option>
                                         <option value="0">0</option>
                                         <option value="1">1</option>
@@ -83,6 +99,10 @@ end
                                         <option value="14">14</option>
                                         <option value="15">15</option>
                                     </select>
+                                </div>
+                                <div style="float:left;margin-left:10px;">
+                                    <!--<%=Eval("offset")%>-->
+                                    <input type="text" value='<%=GetOffsetValue(Eval("index"))%>' name='<%=GetOffsetName(Eval("index"))%>' onchange="OnChangeOffset" class="mc_text"/>
                                 </div>
                             </div>
                     </div>

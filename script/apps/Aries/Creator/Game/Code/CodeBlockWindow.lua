@@ -36,6 +36,9 @@ local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManag
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow"));
 
+-- whether we are using big code window size
+CodeBlockWindow:Property({"BigCodeWindowSize", false, "IsBigCodeWindowSize", "SetBigCodeWindowSize"});
+
 -- when entity being edited is changed. 
 CodeBlockWindow:Signal("entityChanged", function(entity) end)
 
@@ -60,7 +63,7 @@ function CodeBlockWindow.Show(bShow)
 	
 		local _this = ParaUI.GetUIObject(code_block_window_name);
 		if(not _this:IsValid()) then
-			self.width, self.height, self.margin_right, self.bottom, self.top = self:CalculateMargins();
+			self.width, self.height, self.margin_right, self.bottom, self.top, sceneMarginBottom = self:CalculateMargins();
 			_this = ParaUI.CreateUIObject("container", code_block_window_name, "_mr", 0, self.top, self.width, self.bottom);
 			_this.zorder = -2;
 			_this.background="";
@@ -70,6 +73,14 @@ function CodeBlockWindow.Show(bShow)
 			local viewport = ViewportManager:GetSceneViewport();
 			viewport:SetMarginRight(self.margin_right);
 			viewport:SetMarginRightHandler(self);
+
+			if(sceneMarginBottom~=0) then
+				if(viewport:GetMarginBottomHandler() == nil or viewport:GetMarginBottomHandler() == self) then
+					viewport:SetMarginBottom(sceneMarginBottom);
+					viewport:SetMarginBottomHandler(self);
+				end
+			end
+
 			viewport:Connect("sizeChanged", CodeBlockWindow, CodeBlockWindow.OnViewportChange, "UniqueConnection");
 
 			_this:SetScript("onclick", function() end); -- just disable click through 
@@ -95,6 +106,7 @@ function CodeBlockWindow.Show(bShow)
 	end
 end
 
+
 function CodeBlockWindow.OnShowEscFrame(bShow)
 	if(bShow or bShow == nil) then
 		CodeBlockWindow.SetNplBrowserVisible(false)
@@ -115,6 +127,23 @@ function CodeBlockWindow:OnLayoutRequested(requesterName)
 	end
 end
 
+
+function CodeBlockWindow:IsBigCodeWindowSize()
+	return self.BigCodeWindowSize;
+end
+
+function CodeBlockWindow:SetBigCodeWindowSize(enabled)
+	if(self.BigCodeWindowSize ~= enabled) then
+		self.BigCodeWindowSize = enabled;
+		self:OnViewportChange();
+	end
+end
+
+function CodeBlockWindow.ToggleSize()
+	local self = CodeBlockWindow;
+	self:SetBigCodeWindowSize(not self:IsBigCodeWindowSize());
+end
+
 -- @return width, height, margin_right, margin_bottom, margin_top
 function CodeBlockWindow:CalculateMargins()
 	local MAX_3DCANVAS_WIDTH = 800;
@@ -128,25 +157,40 @@ function CodeBlockWindow:CalculateMargins()
 		width = Screen:GetWidth() - MAX_3DCANVAS_WIDTH;
 	end
 
-	local bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+	local bottom, sceneMarginBottom = 0, 0;
+	if(viewport:GetMarginBottomHandler() == nil or viewport:GetMarginBottomHandler() == self) then
+		bottom = 0;
+		if(self:IsBigCodeWindowSize()) then
+			local sceneWidth = 300;
+			width = math.max(Screen:GetWidth() - sceneWidth, MIN_CODEWINDOW_WIDTH);
+			local sceneBottom = Screen:GetHeight() - math.floor(sceneWidth / 4 * 3);
+			sceneMarginBottom = math.floor(sceneBottom * (Screen:GetUIScaling()[2]))
+		end
+	else
+		bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);	
+	end
+	
 	local margin_right = math.floor(width * Screen:GetUIScaling()[1]);
 	local margin_top = math.floor(viewport:GetTop() / Screen:GetUIScaling()[2]);
-	return width, Screen:GetHeight()-bottom-margin_top, margin_right, bottom, margin_top;
+	return width, Screen:GetHeight()-bottom-margin_top, margin_right, bottom, margin_top, sceneMarginBottom;
 end
 
 function CodeBlockWindow:OnViewportChange()
 	if(CodeBlockWindow.IsVisible()) then
+		local viewport = ViewportManager:GetSceneViewport();
+		
 		-- TODO: use a scene/ui layout manager here
-		local width, height, margin_right, bottom, top = self:CalculateMargins();
+		local width, height, margin_right, bottom, top, sceneMarginBottom = self:CalculateMargins();
 		if(self.width ~= width or self.height ~= height) then
 			self.width = width;
 			self.height = height;
 			self.margin_right = margin_right;
 			self.bottom = bottom;
 			self.top = top;
-			local viewport = ViewportManager:GetSceneViewport();
+			
 			viewport:SetMarginRight(self.margin_right);
 			viewport:SetMarginRightHandler(self);
+
 			local _this = ParaUI.GetUIObject(code_block_window_name);
 			_this:Reposition("_mr", 0, self.top, self.width, self.bottom);
 			if(page) then
@@ -154,7 +198,12 @@ function CodeBlockWindow:OnViewportChange()
 				page:Rebuild();
 			end
 		end
-
+		if(sceneMarginBottom ~= viewport:GetMarginBottom())then
+			if(viewport:GetMarginBottomHandler() == nil or viewport:GetMarginBottomHandler() == self) then
+				viewport:SetMarginBottom(sceneMarginBottom);
+				viewport:SetMarginBottomHandler(self);
+			end
+		end
 	end
 end
 
@@ -343,6 +392,10 @@ function CodeBlockWindow.RestoreWindowLayout()
 		_this:LostFocus();
 	end
 	local viewport = ViewportManager:GetSceneViewport();
+	if(viewport:GetMarginBottomHandler() == self) then
+		viewport:SetMarginBottomHandler(nil);
+		viewport:SetMarginBottom(0);
+	end
 	if(viewport:GetMarginRightHandler() == self) then
 		viewport:SetMarginRightHandler(nil);
 		viewport:SetMarginRight(0);

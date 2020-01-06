@@ -46,6 +46,7 @@ Commands["music"] = {
 		if(not filename or filename=="" or filename=="stop") then
 			BackgroundMusic:Stop();
 		else
+			filename = commonlib.Encoding.Utf8ToDefault(filename)
 			if(filename and filename:match("^http")) then
 				BackgroundMusic:Play(filename);
 			else

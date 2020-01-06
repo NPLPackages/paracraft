@@ -10,6 +10,7 @@ local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.File
 FileDownloader:new():Init(text, url, localFile, callbackFunc);
 FileDownloader:new():Init(nil, url);
 FileDownloader:new():Init("Texture1", "http:/pe.com/blocktexture_FangKuaiGaiNian_16Bits.zip", "worlds/BlockTextures/");
+FileDownloader:new():Init("Texture1", {url="https://baidu.com/", headers={Authorization = "Bearer XXXX"} }, nil, function(bSucceed, filename) echo(filename) end);
 -------------------------------------------------------
 ]]
 local FileDownloader = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader"));
@@ -19,14 +20,21 @@ end
 
 -- init and start downloading
 -- @param text: display title during download, if nil, default to local file name. 
--- @param url: remote url
+-- @param url: remote url string or a table of {url, headers={}}
 -- @param localFile: local filename or folder. if empty it will be computed from the url and saved to somewhere at "temp/webcache/*"
 --  if it is a folder name ending with /, it will be saved to that folder with the name of the url file. 
 -- @param callbackFunc: if succeed, function(true, localFile) end, if not, function(false, errorMsg) end
 -- @param cachePolicy: default to "access plus 5 mins"
 -- @param bAutoDeleteCacheFile: if true we will remove cache file after downloaded.
 function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bAutoDeleteCacheFile)
-	self.url = url;
+	if(type(url) == "table") then
+		self.url = url.url;
+		self.headers = url.headers;
+	else
+		self.url = url;
+		self.headers = nil;
+	end
+
 	if(localFile and localFile:match("/$"))then
 		-- if it is a folder
 		local filename = url:match("([^/]+)$");
@@ -39,7 +47,7 @@ function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bA
 	self.totalFileSize = -1;
 	self.currentFileSize = 0;
 	self.bAutoDeleteCacheFile = bAutoDeleteCacheFile;
-	self:Start(self.url, self.localFile, self.callbackFunc, cachePolicy);
+	self:Start(self.url, self.localFile, self.callbackFunc, cachePolicy, self.headers);
 
 	return self;
 end
@@ -84,7 +92,7 @@ function FileDownloader:Flush()
 end
 
 -- start file downloading. 
-function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
+function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 	local function OnSucceeded(filename)
 		self.isFetching = false;
 		if(callbackFunc) then
@@ -118,8 +126,13 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 	end
 	LOG.std(nil, "info", "FileDownloader", "begin download file %s", src or "");
 	
+	local url = src;
+	if(headers) then
+		url = {url = url, headers = headers};
+	end
+
 	local res = ls:GetFile(System.localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
-		src,
+		url,
 		function (entry)
 			if(dest) then
 				if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then

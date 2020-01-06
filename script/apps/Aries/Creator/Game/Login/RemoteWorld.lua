@@ -7,7 +7,8 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
 local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld");
-local world = RemoteWorld.LoadFromHref(url);
+local world = RemoteWorld.LoadFromHref(url)
+local world = RemoteWorld.LoadFromHref(url):SetHttpHeaders(headers)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
@@ -68,6 +69,11 @@ function RemoteWorld:Init(remotefile, server, text, revision, icon, author, size
 		self.force_nid = System.User.nid; 
 	end
 	
+	return self;
+end
+
+function RemoteWorld:SetHttpHeaders(headers)
+	self.headers = headers;
 	return self;
 end
 
@@ -222,6 +228,11 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 
 	self.FileDownloader = self.FileDownloader or FileDownloader:new();
 
+	local src_with_headers = src;
+	if(self.headers) then
+		src_with_headers = {url = src, headers = self.headers};
+	end
+
 	if(refreshMode ~= "force" and ParaIO.DoesFileExist(dest)) then
 		if(refreshMode == "auto") then
 			local local_filesize = ParaIO.GetFileSize(dest);
@@ -242,7 +253,7 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 			GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
 			
 			-- get http headers only (take care of 302 http redirect)
-			System.os.GetUrl(src, function(err, msg)
+			System.os.GetUrl(src_with_headers, function(err, msg)
 				GameLogic.AddBBS("RemoteWorld", nil);
 				local bUseLocalVersion;
 				if(msg.rcode ~= 200 and (not msg.header or not msg.header:lower():find("\nlocation:", 1 , true))) then
@@ -265,7 +276,6 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 					end
 					LOG.std(nil, "info", "RemoteWorld", "remote file size can not be determined. download again.");
 				end
-				
 				self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);
 			end, "-I");
 		else
@@ -273,7 +283,7 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 			OnCallbackFunc(true, dest);
 		end
 	else
-		self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);	
+		self.FileDownloader:Init(L"世界", src_with_headers, dest, OnCallbackFunc, "access plus 5 mins", true);	
 	end
 end
 

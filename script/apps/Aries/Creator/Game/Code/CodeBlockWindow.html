@@ -24,8 +24,11 @@ end
             <input type="button" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
         </div>
         <input type="button" name="settings" tooltip='<%=L"设置"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
-        <input type="button" value='?' tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-left:5px;margin-top:7px;color:#ffffff;font-size:12px;min-width:25px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
-        <input type="button" align="right" name="saveAndClose" value='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_big_button" style="margin-top:5px;min-width:60px;" />
+        <div style="position:relative;float:left;width:82px;" align="right">
+            <input type="button" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
+            <input type="button" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
+            <input type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
+        </div>
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
         <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">
