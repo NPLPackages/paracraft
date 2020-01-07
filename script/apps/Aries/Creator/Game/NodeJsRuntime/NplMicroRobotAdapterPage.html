@@ -56,31 +56,45 @@ function OnSelect(name,value)
     value = tonumber(value);
     NplMicroRobotAdapterPage.datasource[index].id = value
 end
+function GetSpan(index)
+    local node = NplMicroRobotAdapterPage.datasource[index];
+    if(node.min and node.max)then
+        return string.format("[%d,%d]",node.min,node.max);
+    end
+end
 ]]></script>
 <aries:window mode="thin" title='<%=L"骨骼匹配通道"%>' onclose="ClosePage">
     <div style="width:500px;height:550px;" >
 
     <div style="color:#cccccc;">
         <div class="mc_border" style="margin-top:10px;padding:10px;width:490px;height:460px;">
-            <div style="float:left;width:300px;color:#ffffff;text-align:center;">
+            <div style="float:left;width:140px;color:#ffffff;text-align:center;">
                 <%=L"骨骼名称"%>
             </div>
-            <div style="float:left;color:#ffffff;width:80px;text-align:center;">
-                <%=L"通道"%>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"舵机通道"%>
             </div>
-            <div style="float:left;color:#ffffff;width:80px;text-align:center;">
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"旋转轴"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:100px;text-align:center;">
+                <%=L"旋转区间"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
                 <%=L"偏移角度"%>
             </div>
-            <pe:gridview style="margin-top:5px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+            <pe:gridview style="margin-top:5px;width:490px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="height:32px;">
                             <div style="float:left;color:#ffffff;">
-                                <div style="float:left;width:300px;text-align:center;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)">
-                                    <%= Eval("name") %>
+
+                                <div style="float:left;">
+                                    <input type="button" tooltip='<%= Eval("name") %>' value='<%= Eval("display_name") %>' style="width:140px;text-align:center;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)"/>
                                 </div>
-                                 <div style="float:left;margin-left:12px;font-size:11px;">
-                                    <select name='<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
+                                     <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;" >
+                                        <%=Eval("id")%>
+                                    <!--<select name='<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
                                         <option value="-1" selected="true">无</option>
                                         <option value="0">0</option>
                                         <option value="1">1</option>
@@ -98,11 +112,16 @@ end
                                         <option value="13">13</option>
                                         <option value="14">14</option>
                                         <option value="15">15</option>
-                                    </select>
+                                    </select>-->
                                 </div>
-                                <div style="float:left;margin-left:10px;">
-                                    <!--<%=Eval("offset")%>-->
-                                    <input type="text" value='<%=GetOffsetValue(Eval("index"))%>' name='<%=GetOffsetName(Eval("index"))%>' onchange="OnChangeOffset" class="mc_text"/>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("axis")%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:100px;height:22px;text-align:center;">
+                                    <%=GetSpan(Eval("index"))%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("offset")%>
                                 </div>
                             </div>
                     </div>

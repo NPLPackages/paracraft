@@ -12,144 +12,6 @@ local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.N
 local NplCadDef_ShapeOperators = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.NplCadDef_ShapeOperators");
 local cmds = {
 
-
-
-{
-	type = "createNode", 
-	message0 = L"创建 %1 %2 %3",
-    arg0 = {
-        {
-			name = "var_name",
-			type = "field_variable",
-			variable = "object0",
-			variableTypes = {""},
-			text = "object0",
-		},
-        {
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
-        {
-			name = "value",
-			type = "field_dropdown",
-			options = {
-				{ L"合并", "true" },
-				{ L"不合并", "false" },
-			},
-		},
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	nextStatement = true,
-	funcName = "createNode",
-	func_description = 'createNode("%s",%s,%s)',
-	func_description_js = 'createNode("%s",%s,%s)',
-	ToNPL = function(self)
-		return string.format('createNode("%s","%s",%s)\n', 
-        self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "cloneNodeByName", 
-	message0 = L"%1 复制 %2 %3",
-    arg0 = {
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
-		},
-        {
-			name = "name",
-			type = "input_value",
-			text = "", 
-		},
-         {
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	funcName = "cloneNodeByName",
-	func_description = 'cloneNodeByName(%s,%s,%s)',
-	func_description_js = 'cloneNodeByName(%s,%s,%s)',
-	ToNPL = function(self)
-        return string.format('cloneNodeByName("%s","%s","%s")\n', 
-            self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "cloneNode", 
-	message0 = L"%1 复制 %2",
-    arg0 = {
-        {
-			name = "op",
-			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
-			text = "union", 
-		},
-         {
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	funcName = "cloneNode",
-	func_description = 'cloneNode(%s,%s)',
-	func_description_js = 'cloneNode(%s,%s)',
-	ToNPL = function(self)
-        return string.format('cloneNode("%s","%s")\n', 
-            self:getFieldValue('op'), self:getFieldValue('color'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-{
-	type = "deleteNode", 
-	message0 = L"删除 %1",
-    arg0 = {
-       {
-			name = "name",
-			type = "input_value",
-			text = "", 
-		},
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-    previousStatement = true,
-	nextStatement = true,
-	funcName = "deleteNode",
-	func_description = 'deleteNode(%s)',
-	func_description_js = 'deleteNode(%s)',
-	ToNPL = function(self)
-        return string.format('deleteNode("%s")\n', 
-            self:getFieldValue('name'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
 {
 	type = "move", 
 	message0 = L"移动 %1 %2 %3",
@@ -315,53 +177,7 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
-{
-	type = "mirror", 
-	message0 = L"镜像 %1 中心点 %2 %3 %4",
-    arg0 = {
-        {
-			name = "axis_plane",
-			type = "input_value",
-            shadow = { type = "axis_plane", value = "xy",},
-			text = "'xy'", 
-		},
-        {
-			name = "x",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "y",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        {
-			name = "z",
-			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
-			text = 0, 
-		},
-        
-	},
-	category = "ShapeOperators", 
-	helpUrl = "", 
-	canRun = false,
-	previousStatement = true,
-	nextStatement = true,
-	funcName = "mirror",
-	func_description = 'mirror(%s,%s,%s,%s)',
-	func_description_js = 'mirror(%s,%s,%s,%s)',
-	ToNPL = function(self)
-        return string.format('mirror(%s,%s,%s,%s)\n', 
-            self:getFieldValue('axis_plane'),
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
-            );
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
+
 {
 	type = "moveNode", 
 	message0 = L"移动对象 %1 %2 %3 %4",
@@ -551,6 +367,152 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
+{
+	type = "cloneNodeByName", 
+	message0 = L"%1 复制 %2 %3",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+         {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	funcName = "cloneNodeByName",
+	func_description = 'cloneNodeByName(%s,%s,%s)',
+	func_description_js = 'cloneNodeByName(%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('cloneNodeByName("%s","%s","%s")\n', 
+            self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "cloneNode", 
+	message0 = L"%1 复制 %2",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+         {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	funcName = "cloneNode",
+	func_description = 'cloneNode(%s,%s)',
+	func_description_js = 'cloneNode(%s,%s)',
+	ToNPL = function(self)
+        return string.format('cloneNode("%s","%s")\n', 
+            self:getFieldValue('op'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "deleteNode", 
+	message0 = L"删除 %1",
+    arg0 = {
+       {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	funcName = "deleteNode",
+	func_description = 'deleteNode(%s)',
+	func_description_js = 'deleteNode(%s)',
+	ToNPL = function(self)
+        return string.format('deleteNode("%s")\n', 
+            self:getFieldValue('name'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "mirror", 
+	message0 = L"镜像 %1 中心点 %2 %3 %4",
+    arg0 = {
+        {
+			name = "axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_plane", value = "xy",},
+			text = "'xy'", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "mirror",
+	func_description = 'mirror(%s,%s,%s,%s)',
+	func_description_js = 'mirror(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('mirror(%s,%s,%s,%s)\n', 
+            self:getFieldValue('axis_plane'),
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+            );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
 {
 	type = "mirrorNode", 
 	message0 = L"镜像对象 %1 %2 中心点 %3 %4 %5",

@@ -77,6 +77,11 @@ function RemoteWorld:SetHttpHeaders(headers)
 	return self;
 end
 
+function RemoteWorld:SetProjectId(pid)
+	self.projectId = tonumber(pid);
+	return self;
+end
+
 local world_icons = {
 	"Texture/blocks/items/1000_Tomato.png", 
 	"Texture/blocks/items/1001_Wheat.png", 
@@ -152,7 +157,13 @@ function RemoteWorld:ComputeLocalFileName()
 				filename = filename:gsub("[%W%s]+", "_");
 			end
 		end
-		return ParaIO.GetWritablePath()..format("worlds/DesignHouse/userworlds/%s_r%s.zip", filename, self.revision);
+		local folder = ParaIO.GetWritablePath().."worlds/DesignHouse/userworlds/";
+		if(self.projectId) then
+			folder = folder..format("%d_%s_r%s.zip", self.projectId, filename, self.revision);
+		else
+			folder = folder..format("%s_r%s.zip", filename, self.revision);
+		end
+		return folder;
 	end
 end
 

@@ -433,7 +433,7 @@ say("hello "..tostring(answer), 2)
 
 {
 	type = "answer", 
-	message0 = L"提问的结果",
+	message0 = L"回答",
 	arg0 = {},
 	output = {type = "field_number",},
 	category = "Sensing", 

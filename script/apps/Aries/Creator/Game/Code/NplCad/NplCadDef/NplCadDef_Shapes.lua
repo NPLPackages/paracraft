@@ -13,7 +13,7 @@ local NplCadDef_Shapes = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Np
 local cmds = {
 
 {
-	type = "createShapeNode", 
+	type = "createNode", 
 	message0 = L"创建 %1 %2 %3",
     arg0 = {
         {

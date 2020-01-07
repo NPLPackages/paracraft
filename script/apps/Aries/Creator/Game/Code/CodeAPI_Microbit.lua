@@ -39,22 +39,70 @@ function env_imp.fixeRangesToJsIndex(bones)
     end
     return result;
 end
+
+function env_imp.helper_ReadBonePropertiesFromName(name)
+    if(not name)then
+        return
+    end
+	local display_name, properties = name:match("^(.*)%s*(%{[^%}]+%})_rot");
+	if(properties) then
+		properties = NPL.LoadTableFromString(properties);
+	end
+    return display_name, properties;
+end
+
+function env_imp.helper_radianToDegreeInt(v)
+    v = v * 180 / 3.1415926;
+    v = math.floor(v + 0.5);
+    return v;
+end
 function env_imp.fixRotationValuesAndID(bones)
     if(not bones)then
         return
     end
     local result = {};
     for k,v in pairs(bones) do
-        if(type(v) == "table" and v.id and v.id >-1 and v.data)then
-            local axis = v.axis or "x";
+        if(type(v) == "table" and v.data)then
+            local name = v.name
+            local display_name, properties = env_imp.helper_ReadBonePropertiesFromName(name);
+            properties = properties or {};
+            local rotAxis = properties.rotAxis;
+            local servoId = properties.servoId;
+            local servoOffset = properties.servoOffset; -- input is radian
+            if(servoId and servoId > -1)then
+                v.id = servoId; --set servo id
+                v.offset = env_imp.helper_radianToDegreeInt(servoOffset or 0) --set servo offset
+            end
+            v.display_name = display_name;
+            if(properties.min and properties.max)then
+                v.min = env_imp.helper_radianToDegreeInt(properties.min);
+                v.max = env_imp.helper_radianToDegreeInt(properties.max);
+            end
             local data = v.data
             for kk,vv in ipairs(data) do
+                -- change every quaternion to degree on one axis
                 if(type(vv) == "table")then
                     local len = #vv;
                     if(len >= 4)then
+                        local last_angle = 0;
                         local q = Quaternion:new(vv);    
-                        local angle, axis = q:ToAngleAxis();
-                        data[kk] = angle * 180 / 3.1415926;
+                        if(rotAxis)then
+                            rotAxis = string.lower(rotAxis);
+                            local rot_y,rot_z,rot_x = q:ToEulerAngles();
+                            if(rotAxis == "x")then
+                                last_angle = rot_x;
+                            elseif(rotAxis == "y")then
+                                last_angle = rot_y;
+                            elseif(rotAxis == "z")then
+                                last_angle = rot_z;
+                            end
+                            v.axis = rotAxis;
+                        else
+                            local angle, axis = q:ToAngleAxis();
+                            last_angle = angle;
+                        end
+                        data[kk] = env_imp.helper_radianToDegreeInt(last_angle)
+                        
                     end
                 end
             end
@@ -101,10 +149,10 @@ function env_imp:createMicrobitRobot()
         local bones = env_imp.getBonesDataFromInventory(inventory) or {};
         bones = commonlib.copy(bones);
         bones = env_imp.fixeRangesToJsIndex(bones)
+        bones = env_imp.fixRotationValuesAndID(bones);
         local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
         NplMicroRobotAdapterPage.ShowPage(bones,function(type,values)
                 local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua");
-                values = env_imp.fixRotationValuesAndID(values);
                 NplMicroRobot.Run(type,NPL.ToJson(values));
 
         	    ParaIO.CreateDirectory(filename);
