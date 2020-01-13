@@ -8,7 +8,7 @@ function OnClickEditMode(name)
 end
 ]]></script>
 <div width="100%" height="100%" style="background-color:#292929;" class="default">
-    <div style="margin:5px;">
+    <div style="margin:5px;height:37px;">
         <div style="float:left;margin-left:2px;margin-top:3px">
             <input type="button" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="CodeBlockWindow.OnClickCompileAndRun" />
             <input type="button" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickStop" />
@@ -32,9 +32,9 @@ end
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
         <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">
-            <pe:nplbrowser name="nplbrowser_codeblock" min_width="600" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();" visible="<%=CodeBlockWindow.IsNPLBrowserVisible()%>"/>
+            <pe:nplbrowser name="nplbrowser_codeblock" min_width="600" min_height="550" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();" visible="<%=CodeBlockWindow.IsNPLBrowserVisible()%>"/>
         </pe:container>
-        <div style="position:relative;margin:20px"><%=L"正在加载图块， 首次加载或更新会比较慢，你也可以用外部浏览器编辑图块，再次点击上方图块按钮可查看图块代码"%></div>
+        <pe:container name="browserLoadingTips" class="default" style="position:relative;margin:20px;background:url();"><%=L"正在加载图块， 首次加载或更新会比较慢，你也可以用外部浏览器编辑图块，再次点击上方图块按钮可查看图块代码"%></pe:container>
     </pe:if>
     <pe:container alignment="_fi" name="helpContainer" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">
         <iframe src= "script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html" width="200"/>
@@ -48,7 +48,7 @@ end
             </pe:if>
             <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
             <input name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' 
-                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange"
+                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
                 ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
     </pe:container>
     <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">

@@ -56,6 +56,20 @@ function env_imp.helper_radianToDegreeInt(v)
     v = math.floor(v + 0.5);
     return v;
 end
+
+-- clear names to save memory in microbit
+function env_imp.helper_clear_names(values)
+    for k,v in ipairs(values) do
+        v.name = nil;
+        v.display_name = nil;
+        v.axis = nil;
+        v.min = nil;
+        v.max = nil;
+        v.offset = nil;
+        v.servoScale = nil;
+    end
+    return values;
+end
 function env_imp.fixRotationValuesAndID(bones)
     if(not bones)then
         return
@@ -69,44 +83,48 @@ function env_imp.fixRotationValuesAndID(bones)
             local rotAxis = properties.rotAxis;
             local servoId = properties.servoId;
             local servoOffset = properties.servoOffset; -- input is radian
+            local servoScale = properties.servoScale or 1;
+            local tag = properties.tag;
             if(servoId and servoId > -1)then
                 v.id = servoId; --set servo id
                 v.offset = env_imp.helper_radianToDegreeInt(servoOffset or 0) --set servo offset
-            end
-            v.display_name = display_name;
-            if(properties.min and properties.max)then
-                v.min = env_imp.helper_radianToDegreeInt(properties.min);
-                v.max = env_imp.helper_radianToDegreeInt(properties.max);
-            end
-            local data = v.data
-            for kk,vv in ipairs(data) do
-                -- change every quaternion to degree on one axis
-                if(type(vv) == "table")then
-                    local len = #vv;
-                    if(len >= 4)then
-                        local last_angle = 0;
-                        local q = Quaternion:new(vv);    
-                        if(rotAxis)then
-                            rotAxis = string.lower(rotAxis);
-                            local rot_y,rot_z,rot_x = q:ToEulerAngles();
-                            if(rotAxis == "x")then
-                                last_angle = rot_x;
-                            elseif(rotAxis == "y")then
-                                last_angle = rot_y;
-                            elseif(rotAxis == "z")then
-                                last_angle = rot_z;
+                v.display_name = display_name;
+                if(properties.min and properties.max)then
+                    v.min = env_imp.helper_radianToDegreeInt(properties.min);
+                    v.max = env_imp.helper_radianToDegreeInt(properties.max);
+                end
+                v.servoScale = servoScale;
+                v.tag = tag;
+                local data = v.data
+                for kk,vv in ipairs(data) do
+                    -- change every quaternion to degree on one axis
+                    if(type(vv) == "table")then
+                        local len = #vv;
+                        if(len >= 4)then
+                            local last_angle = 0;
+                            local q = Quaternion:new(vv);    
+                            if(rotAxis)then
+                                rotAxis = string.lower(rotAxis);
+                                local rot_y,rot_z,rot_x = q:ToEulerAngles();
+                                if(rotAxis == "x")then
+                                    last_angle = rot_x;
+                                elseif(rotAxis == "y")then
+                                    last_angle = rot_y;
+                                elseif(rotAxis == "z")then
+                                    last_angle = rot_z;
+                                end
+                                v.axis = rotAxis;
+                            else
+                                local angle, axis = q:ToAngleAxis();
+                                last_angle = angle;
                             end
-                            v.axis = rotAxis;
-                        else
-                            local angle, axis = q:ToAngleAxis();
-                            last_angle = angle;
-                        end
-                        data[kk] = env_imp.helper_radianToDegreeInt(last_angle)
+                            data[kk] = servoScale * env_imp.helper_radianToDegreeInt(last_angle)
                         
+                        end
                     end
                 end
+                table.insert(result,v);
             end
-            table.insert(result,v);
         end
     end
     return result;
@@ -142,6 +160,7 @@ function env_imp:createMicrobitRobot()
     if(filename == "" or not filename)then
         filename = "default";
     end
+    local filename_really = string.format("test/robot/%s_really.json",filename);
     filename = string.format("test/robot/%s.json",filename);
     if(movieEntity and movieEntity.inventory)then
         local inventory = movieEntity.inventory;
@@ -153,14 +172,23 @@ function env_imp:createMicrobitRobot()
         local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
         NplMicroRobotAdapterPage.ShowPage(bones,function(type,values)
                 local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua");
-                NplMicroRobot.Run(type,NPL.ToJson(values));
 
-        	    ParaIO.CreateDirectory(filename);
+                ParaIO.CreateDirectory(filename);
                 local file = ParaIO.open(filename,"w");
                 if(file:IsValid()) then
 		            file:WriteString(NPL.ToJson(values));
 		            file:close();
 	            end
+                values = env_imp.helper_clear_names(values)
+
+                local data = NPL.ToJson(values);
+                local file = ParaIO.open(filename_really,"w");
+                if(file:IsValid()) then
+		            file:WriteString(data);
+		            file:close();
+	            end
+
+                NplMicroRobot.Run(type,data);
         end);
 
     end

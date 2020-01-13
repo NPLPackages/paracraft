@@ -171,6 +171,285 @@ bindNodeByName("object1")
 ]]}},
 },
 
+{
+	type = "startBoneNameConstraint", 
+	message0 = L"约束骨骼属性",
+    message1 = L"%1",
+    arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+	nextStatement = true,
+	funcName = "startBoneNameConstraint",
+	func_description = 'startBoneNameConstraint()\\n%sendBoneNameConstraint()',
+	ToNPL = function(self)
+		return string.format('startBoneNameConstraint()\n    %s\nendBoneNameConstraint()\n', 
+            self:getFieldAsString('input')
+        );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "setBoneConstraint_Name", 
+	message0 = L"骨骼名称 %1",
+	arg0 = {
+		 {
+			name = "name",
+			type = "input_value",
+			shadow = { type = "text", value = "",},
+			text = "",
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint_Name(%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint_Name("%s")', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_min", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"最小角度", "min" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = -90,},
+			text = -90,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_max", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"最大角度", "max" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 90,},
+			text = 90,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_offset", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"偏移角度", "servoOffset" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 90,},
+			text = 90,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "setBoneConstraint_2", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"舵机通道", "servoId" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_3", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"舵机缩放值", "servoScale" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_4", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"旋转轴", "rotAxis" },
+			},
+		},
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"x", "x" },
+				{ L"y", "y" },
+				{ L"z", "z" },
+			},
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s","%s")',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s","%s")', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "setBoneConstraint_5", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"隐藏骨骼", "hidden" },
+			},
+		},
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"false", "false" },
+				{ L"true", "true" },
+			},
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 };
 function NplCadDef_Skeleton.GetCmds()
 	return cmds;

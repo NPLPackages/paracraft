@@ -551,7 +551,7 @@ local cmds = {
 
 {
 	type = "importStl", 
-	message0 = L"引用Stl %1 %2 %3",
+	message0 = L"引用Stl %1 %2 %3 YZ互换 %4",
     arg0 = {
         {
 			name = "op",
@@ -579,6 +579,14 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        {
+			name = "swapYZ",
+			type = "field_dropdown",
+			options = {
+                { L"false", "false" },
+				{ L"true", "true" },
+			},
+		},
         
 	},
     previousStatement = true,
@@ -587,11 +595,14 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	funcName = "importStl",
-	func_description = 'importStl(%s,"%s",%s)',
+	func_description = 'importStl(%s,"%s",%s, %s)',
 	ToNPL = function(self)
-        return string.format('importStl("%s","%s","%s")\n', 
-                self:getFieldValue('op'), self:getFieldValue('filename'), 
-                self:getFieldValue('color'));
+        return string.format('importStl("%s","%s","%s", %s)\n', 
+                self:getFieldValue('op'), 
+                self:getFieldValue('filename'), 
+                self:getFieldValue('color'),
+                self:getFieldValue('swapYZ')
+                );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -599,7 +610,7 @@ local cmds = {
 
 {
 	type = "importStl_2", 
-	message0 = L"引用Stl %1 %2 %3",
+	message0 = L"引用Stl %1 %2 %3 YZ互换 %4",
     arg0 = {
         {
 			name = "op",
@@ -618,6 +629,14 @@ local cmds = {
             shadow = { type = "colour_picker", value = "#ff0000",},
 			text = "#ff0000", 
 		},
+        {
+			name = "swapYZ",
+			type = "field_dropdown",
+			options = {
+                { L"false", "false" },
+				{ L"true", "true" },
+			},
+		},
         
 	},
     previousStatement = true,
@@ -626,11 +645,14 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	funcName = "importStl",
-	func_description = 'importStl(%s,"%s",%s)',
+	func_description = 'importStl(%s,"%s",%s,%s)',
 	ToNPL = function(self)
-        return string.format('importStl("%s","%s","%s")\n', 
-                self:getFieldValue('op'), self:getFieldValue('filename'), 
-                self:getFieldValue('color'));
+        return string.format('importStl("%s","%s","%s",%s)\n', 
+                self:getFieldValue('op'), 
+                self:getFieldValue('filename'), 
+                self:getFieldValue('color'),
+                self:getFieldValue('swapYZ') 
+                );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

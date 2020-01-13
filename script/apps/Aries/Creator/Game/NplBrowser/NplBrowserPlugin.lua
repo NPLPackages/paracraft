@@ -385,10 +385,6 @@ function NplBrowserPlugin.Open(p)
         visible = p.visible,
         callback_file = callback_file,
     }
-
-    NplBrowserPlugin.ClearPendingWindow(p.id);
-    NplBrowserPlugin.SetWindowExisted(p.id, true);
-
     NplBrowserPlugin.PushBack(input);
 end
 
@@ -559,7 +555,7 @@ local function activate()
         local id = msg["id"] or "";
         local parent_handle = msg["parent_handle"] or "";
 
-        if(cmd == "CheckCefWindow")then
+		if(cmd == "CheckCefWindow")then
             local json_config = NplBrowserPlugin.ReadCefClientJsonConfg(cefclient_config_filename);
 
             if json_config then

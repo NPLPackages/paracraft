@@ -62,7 +62,7 @@ function RemoteFile:Download()
 			if(msg.header) then
 				local content_type = string.lower(msg.header):match("\ncontent%-type:%s*([^\r\n]+)");
 				if(content_type) then
-					if(content_type:match("mp3")) then
+					if(content_type:match("mp3") or content_type:match("audio")) then
 						fileExt = "mp3";
 					elseif(content_type:match("wav")) then
 						fileExt = "wav";

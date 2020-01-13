@@ -582,6 +582,108 @@ function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
 	CodeIntelliSense.ShowMouseOverFuncTip(CodeIntelliSense.curMouseOverCodeItem)
 end
 
+function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
+	local curMouseOverCodeItem;
+	if(line) then
+		curMouseOverCodeItem = CodeIntelliSense.GetCodeItemInText(word, line, from, to)
+	end
+
+	
+	local ctl = CodeIntelliSense.contextMenuCtrl;
+	if(not ctl)then
+		ctl = CommonCtrl.ContextMenu:new{
+			name = "CodeIntelliSense.contextMenuCtrl",
+			width = 230,
+			height = 60, -- add menuitemHeight(30) with each new item
+			DefaultNodeHeight = 26,
+			onclick = CodeIntelliSense.OnClickContextMenuItem,
+		};
+		CodeIntelliSense.contextMenuCtrl = ctl;
+		ctl.RootNode:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
+	end
+	local node = ctl.RootNode:GetChild(1);
+	if(node) then
+		node:ClearAllChildren();
+		if(curMouseOverCodeItem) then
+			node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"%s 的帮助...".."  F1", word), tag=curMouseOverCodeItem.type, Name = "help", Type = "Menuitem", onclick = nil, }))
+			node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
+		end
+			
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"裁剪" .. "           Ctrl+ X", Name = "Cut", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"复制" .. "           Ctrl+ C", Name = "Copy", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴" .. "           Ctrl+ V", Name = "Paste", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"全选" .. "           Ctrl+ A", Name = "SelectAll", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"撤销" .. "           Ctrl+ Z", Name = "Undo", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl+ Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
+
+		if(word) then
+			node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"朗读: %s", word), tag = word, Name = "PronounceIt", Type = "Menuitem", onclick = nil, }))
+			if(word:match("^%w+$")) then
+				node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"翻译: %s ...", word), tag = word, Name = "Dictionary", Type = "Menuitem", onclick = nil, }))
+			end
+		end
+		ctl.height = (#node) * 26 + 4;
+	end
+
+	ctl:Show(mouse_x, mouse_y);
+end
+
+function CodeIntelliSense.OnClickContextMenuItem(node)
+	local name = node.Name
+	if(name == "help") then
+		CodeBlockWindow.ShowHelpWndForCodeName(node.tag or "")
+	elseif(name == "Cut") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			if (not ctrl:isReadOnly()) then
+				ctrl:copy();
+				ctrl:del(true);
+				ctrl:userTyped(ctrl);
+			end
+		end
+	elseif(name == "Copy") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			ctrl:copy();
+		end
+	elseif(name == "Paste") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			if (not ctrl:isReadOnly()) then
+				ctrl:paste("Clipboard");
+				ctrl:userTyped(ctrl);
+			end
+		end
+	elseif(name == "SelectAll") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			ctrl:selectAll();
+		end
+	elseif(name == "Undo") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			if (not ctrl:isReadOnly()) then
+				ctrl:undo();
+				ctrl:userTyped(ctrl);
+			end
+		end
+	elseif(name == "Redo") then
+		local ctrl = CodeBlockWindow.GetTextControl()
+		if(ctrl) then
+			if (not ctrl:isReadOnly()) then
+				ctrl:redo();
+				ctrl:userTyped(ctrl);
+			end
+		end
+	elseif(name == "PronounceIt") then
+		GameLogic.RunCommand("/voice ".. node.tag);
+	elseif(name == "Dictionary") then
+		GameLogic.RunCommand("open", format("https://fanyi.baidu.com/#en/zh/"..node.tag));
+	end
+end
+
 -- text control callback
 function CodeIntelliSense:OnUserKeyPress(textCtrl, event)
 	local keyname = event.keyname;

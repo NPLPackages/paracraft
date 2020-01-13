@@ -73,6 +73,21 @@ function CodeHelpWindow.SetCategories(categories)
 	CodeHelpWindow.categories = categories;
 end
 
+-- @return language config object
+function CodeHelpWindow.GetLanguageConfigByBlockPos(bx,by,bz)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	local entity = CodeBlockWindow.GetCodeEntity(bx, by, bz)
+	if(entity) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
+		local langConfig = LanguageConfigurations:LoadConfigByFilename(entity:GetLanguageConfigFile())
+		if(langConfig) then
+			return langConfig;
+		end
+	end
+end
+
 function CodeHelpWindow.InitCmds()
 	if(not CodeHelpWindow.cmdInited) then
 		CodeHelpWindow.cmdInited = true;

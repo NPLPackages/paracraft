@@ -34,9 +34,9 @@ function NplMicroRobotAdapterPage.ShowPage(bones,callback)
         click_through = false,
 		directPosition = true,
 			align = "_ct",
-			x = -500/2,
+			x = -560/2,
 			y = -550/2,
-			width = 500,
+			width = 560,
 			height = 550,
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	

@@ -67,7 +67,7 @@ function WorldRevision:GetDiskRevision()
 	
 	local file = ParaIO.open(self.revision_filename, "r");
 	if(file and file:IsValid()) then
-		revision = tonumber(file:GetText()) or self.current_revision;
+		revision = tonumber(file:GetText()) or self.current_revision or 1;
 		file:close();
 	end
 	return revision or 1;

@@ -64,10 +64,10 @@ function GetSpan(index)
 end
 ]]></script>
 <aries:window mode="thin" title='<%=L"骨骼匹配通道"%>' onclose="ClosePage">
-    <div style="width:500px;height:550px;" >
+    <div style="width:560px;height:550px;" >
 
     <div style="color:#cccccc;">
-        <div class="mc_border" style="margin-top:10px;padding:10px;width:490px;height:460px;">
+        <div class="mc_border" style="margin-top:10px;padding:10px;width:550px;height:460px;">
             <div style="float:left;width:140px;color:#ffffff;text-align:center;">
                 <%=L"骨骼名称"%>
             </div>
@@ -83,7 +83,10 @@ end
             <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
                 <%=L"偏移角度"%>
             </div>
-            <pe:gridview style="margin-top:5px;width:490px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"角度缩放"%>
+            </div>
+            <pe:gridview style="margin-top:5px;width:550px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="height:32px;">
@@ -122,6 +125,9 @@ end
                                 </div>
                                 <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
                                     <%=Eval("offset")%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("servoScale")%>
                                 </div>
                             </div>
                     </div>

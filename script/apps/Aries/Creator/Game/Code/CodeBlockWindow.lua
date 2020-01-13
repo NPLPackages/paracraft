@@ -330,10 +330,10 @@ end
 function CodeBlockWindow.GetCodeEntity(bx, by, bz)
 	if(bx) then
 		local codeEntity = BlockEngine:GetBlockEntity(bx, by, bz)
-		if(codeEntity and codeEntity.class_name == "EntityCode" 
+		if(codeEntity and (codeEntity.class_name == "EntityCode" 
 			or codeEntity.class_name == "EntitySign" 
 			or codeEntity.class_name == "EntityCommandBlock"
-			or codeEntity.class_name == "EntityCollisionSensor") then
+			or codeEntity.class_name == "EntityCollisionSensor")) then
 
 			return codeEntity;
 		end
@@ -924,6 +924,7 @@ function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
         end
 
 		page:CallMethod("nplbrowser_codeblock","SetVisible",bVisible)
+
         if(bVisible) then
 			if(bForceRefresh == nil) then
 				if(self.lastBlocklyUrl ~= CodeBlockWindow.GetBlockEditorUrl()) then
@@ -935,6 +936,11 @@ function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
 				page:CallMethod("nplbrowser_codeblock","Reload",CodeBlockWindow.GetBlockEditorUrl());
 			end
         end
+		local ctl = page:FindControl("browserLoadingTips")
+		if(ctl) then
+			ctl.visible = bVisible
+		end
+
         local ctl = page:FindControl("helpContainer")
 		if(ctl) then
 			ctl.visible = not (bVisible == true)
@@ -966,11 +972,15 @@ function CodeBlockWindow.GetBlockEditorUrl()
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s", blockpos, codeLanguageType or "npl");
 	end
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
-	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
-	local url = DefaultFilters.cmd_open_url(request_url)
-    return url;
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+	local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+	local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)	end)
+	if(bStarted) then
+		return request_url:gsub("^npl:?/*", site_url);
+	end
 end
+
 function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
@@ -1076,6 +1086,18 @@ end
 
 function CodeBlockWindow.OnMouseOverWordChange(word, line, from, to)
 	CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
+end
+
+function CodeBlockWindow.OnRightClick(event)
+	local ctrl = CodeBlockWindow.GetTextControl()
+	if(ctrl) then
+		local info = ctrl:getMouseOverWordInfo()
+		if(info and info.word) then
+			CodeIntelliSense.ShowContextMenuForWord(info.word, info.lineText, info.fromPos, info.toPos)	
+		else
+			CodeIntelliSense.ShowContextMenuForWord();
+		end
+	end
 end
 
 function CodeBlockWindow.OnLearnMore()
