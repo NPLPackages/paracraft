@@ -111,6 +111,8 @@ function MainLogin:next_step(state_update)
 		end
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 		self:next_step({IsInitFuncCalled = true});
+	elseif(not state.IsPackagesLoaded) then
+		self:Invoke_handler("LoadPackages");
 	elseif(not state.CheckGraphicsSettings) then
 		self:Invoke_handler("CheckGraphicsSettings");
 	elseif(not state.Loaded3DScene) then
@@ -123,8 +125,6 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("UpdateCoreClient");
 	elseif(not state.IsCommandLineChecked) then
 		self:Invoke_handler("CheckCommandLine");
-	elseif(not state.IsPackagesLoaded) then
-		self:Invoke_handler("LoadPackages");
 	elseif(not state.IsLoginModeSelected) then
 		self:Invoke_handler("ShowLoginModePage");
 	elseif(not state.IsPluginLoaded) then
