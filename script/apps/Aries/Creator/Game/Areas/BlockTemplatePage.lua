@@ -199,6 +199,7 @@ function BlockTemplatePage.OnClickSave()
 			pivot = pivot,
 			relative_motion = page:GetValue("checkboxRelativeMotion", false),
 			hollow = page:GetValue("checkboxHollow", false),
+			exportReferencedFiles = page:GetValue("checkboxRefFiles", false),
 		},function ()
 			if(isThemedTemplate) then
 				BlockTemplatePage.CreateBuildingTaskFile(taskfilename, commonlib.Encoding.DefaultToUtf8(filename), name, BlockTemplatePage.blocks,desc);
@@ -218,7 +219,7 @@ function BlockTemplatePage.OnClickSave()
 	end
 end
 
--- @params params: attributes like author, creation_date, name, relative_motion, hollow, etc. 
+-- @params params: attributes like author, creation_date, name, relative_motion, hollow, exportReferencedFiles, etc. 
 function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot)
 	if( not GameLogic.IsOwner()) then
 		--_guihelper.MessageBox(format("只有世界的作者, 才能保存模板. 请尊重别人的创意,不要盗版!", tostring(WorldCommon.GetWorldTag("nid"))));
@@ -241,6 +242,7 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 		params = params, 
 		blocks = blocks, 
 		hollow = params and params.hollow,
+		exportReferencedFiles = params and params.exportReferencedFiles,
 	})
 
 	if(task:Run()) then

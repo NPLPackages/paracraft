@@ -118,7 +118,7 @@ function env_imp.fixRotationValuesAndID(bones)
                                 local angle, axis = q:ToAngleAxis();
                                 last_angle = angle;
                             end
-                            data[kk] = servoScale * env_imp.helper_radianToDegreeInt(last_angle)
+                            data[kk] = v.offset + servoScale * env_imp.helper_radianToDegreeInt(last_angle)
                         
                         end
                     end

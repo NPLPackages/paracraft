@@ -50,6 +50,8 @@ BlockTemplate.concurrent_creation_point_count = 1;
 BlockTemplate.nohistory = nil;
 -- true to export hollow model
 BlockTemplate.hollow = nil;
+-- true to export externally referenced files, such as bmax files in movie or model block.
+BlockTemplate.exportReferencedFiles = nil;
 
 function BlockTemplate:ctor()
 	self.step = 1;
@@ -111,6 +113,42 @@ function BlockTemplate:CalculateRelativeMotion(blocks, bx, by, bz)
 				end
 			end
 		end
+	end
+end
+
+-- return table map {filename=true} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
+-- if no external files are referenced, we will return nil.
+function BlockTemplate:GetReferenceFiles(blocks)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
+	local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
+	local movieBlockId = block_types.names.MovieClip;
+	local PhysicsModel = block_types.names.PhysicsModel;
+	local BlockModel = block_types.names.BlockModel;
+
+	local files = {};
+	for i, block in ipairs(blocks) do
+		local block_id = block[4];
+		if(block_id == movieBlockId) then
+			local entityData = block[6];
+			if(entityData) then
+				local movieEntity = EntityMovieClip:new();
+				movieEntity:LoadFromXMLNode(entityData);
+				local files_ = movieEntity:GetReferenceFiles();
+				if(files_) then
+					for filename, _ in pairs(files_) do
+						files[filename] = true;
+					end
+				end
+			end
+		elseif(block_id == PhysicsModel or block_id == BlockModel) then
+			local entityData = block[6];
+			if(entityData and entityData.attr.filename and entityData.attr.filename~="") then
+				files[entityData.attr.filename] = true;
+			end
+		end
+	end
+	if(next(files)) then
+		return files;
 	end
 end
 
@@ -256,6 +294,13 @@ function BlockTemplate:SaveTemplate()
 
 		if(self.hollow) then
 			self:MakeHollow()
+		end
+		
+		if(self.exportReferencedFiles) then
+			local files = self:GetReferenceFiles(self.blocks)
+			if(files) then
+				-- TODO: 
+			end
 		end
 
 		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};

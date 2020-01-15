@@ -109,10 +109,13 @@ default name is "default"
 
 Commands["savetemplate"] = {
 	name="savetemplate", 
-	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [templatename]", 
+	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [-ref] [templatename]", 
 	desc=[[save template with current selection
 @param templatename: if no name is provided, it will be default
 @param auto_pivot: if true, use the bottom center of all blocks as pivot
+@param -hollow: if true, model will be hollow
+@param -relative_motion: if true, movie block will use relative motion
+@param -ref: if true, we will export external referenced files 
 /savetemplate test
 /savetemplate -hollow test
 /savetemplate -auto_pivot test
@@ -137,6 +140,7 @@ Commands["savetemplate"] = {
 			auto_pivot = options.auto_pivot,
 			relative_motion = options.relative_motion,
 			hollow = options.hollow,
+			exportReferencedFiles = options.ref,
 			bSelect=nil})
 		if(task:Run()) then
 			BroadcastHelper.PushLabel({id="savetemplate", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});

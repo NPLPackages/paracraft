@@ -102,6 +102,30 @@ function Entity:GetCameraItemStack()
 	return self.inventory:FindItem(block_types.names.TimeSeriesCamera);
 end
 
+
+-- return table map {filename=true} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
+-- if no external files are referenced, we will return nil.
+function Entity:GetReferenceFiles()
+	local files;
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+					local data = timeSeries.assetfile.data;
+					for i = 1, #(data) do
+						files = files or {}
+						files[data[i]] = true;
+					end
+				end
+			end
+		end
+	end
+	return files;
+end
+
+
 local function offset_time_variable(var, offset)
 	if(var and var.data) then
 		local data = var.data;

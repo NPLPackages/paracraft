@@ -72,9 +72,14 @@ end
                 </div>    
             </pe:if>
             <div>
-                <input type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>
-                <div for="checkboxRelativeMotion" style="float:left" tooltip='<%=L"不选表示使用绝对位置"%>'><%=L"演员使用相对位置"%></div>
-                
+                <div style="float:left">
+                    <input type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>
+                    <div for="checkboxRelativeMotion" style="float:left" tooltip='<%=L"不选表示使用绝对位置"%>'><%=L"演员使用相对位置"%></div>
+                </div>
+                <div style="float:left;margin-left:20px;">
+                    <input type="checkbox" id="checkboxRefFiles" name="checkboxRefFiles" style="margin-top:2px;"/>
+                    <div for="checkboxRefFiles" style="float:left" ><%=L"导出引用"%></div>
+                </div>
             </div>
             <div>
                 <div style="float:left">
