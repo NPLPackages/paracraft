@@ -22,9 +22,14 @@ local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 
 function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
-    if (System.os.GetPlatform() == 'win32' and not NplBrowserLoaderPage.IsLoaded()) then
+    if System.os.GetPlatform() == 'win32' and not NplBrowserLoaderPage.IsLoaded() then
         return
-    end
+	end
+	
+	if System.os.GetPlatform() == 'android' then
+		return
+	end
+
 	local page_ctrl = mcmlNode:GetPageCtrl();
 	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
     local url = mcmlNode:GetAttributeWithCode("url");
