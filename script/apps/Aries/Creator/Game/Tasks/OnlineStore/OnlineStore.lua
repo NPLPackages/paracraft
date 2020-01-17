@@ -31,7 +31,7 @@ end
 function OnlineStore.GetOnlineStoreUrl()
 	local host = KeepworkService:GetKeepworkUrl()
 
-	if System.os.GetPlatform() == 'mac' then
+	if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'android' then
 		return format("%s/p/comp/system?type=protocol&port=%s", host, tostring(OnlineStore.portNumber or 8099));
 	else
 		return format("%s/p/comp/system?port=%s", host, tostring(OnlineStore.portNumber or 8099));
@@ -68,7 +68,7 @@ function OnlineStore:ShowPage(bShow)
 		return
 	end
 
-	if System.os.GetPlatform() == 'win32' then
+	if System.os.GetPlatform() == 'win32' or System.os.GetPlatform() == 'android' then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");	
 		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");	
 		NplBrowserLoaderPage.Check()
