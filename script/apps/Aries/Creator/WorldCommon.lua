@@ -175,7 +175,7 @@ end
 
 
 -- get the current tag field value in the current world. see "[worldpath]/tag.xml" for the tag name, value pairs. 
--- @param field_name: suppported tag names are "name", "nid", "desc", "size"
+-- @param field_name: suppported tag names are "name", "nid", "desc", "size", "isVipWorld"
 function WorldCommon.GetWorldTag(field_name)
 	if(WorldCommon.world_info) then
 		if(field_name == "size") then

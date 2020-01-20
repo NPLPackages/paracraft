@@ -303,6 +303,8 @@ function options:ApplyTexturePack()
 end
 
 function options:OnLoadWorld()
+	self.userType = Mod and Mod.WorldShare and Mod.WorldShare.Store and Mod.WorldShare.Store:Get("user/userType")
+
 	self:OneTimeInit();
 	self:LoadDefaultTransientOptions();
 	GameLogic.RunCommand("language");
@@ -410,6 +412,14 @@ function options:OnLoadWorld()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
 	local WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
 	WorldStacks:PopWorld();
+
+	if(self:IsVipWorld() and not self:IsVip()) then
+		_guihelper.MessageBox(L"本世界只有登录的VIP用户可以访问。即将退出世界。")
+
+		commonlib.TimerManager.SetTimeout(function()  
+			GameLogic.RunCommand("/leaveworld")
+		end, 3000)
+	end
 end
 
 function options:ResetWindowTitle()
@@ -1131,3 +1141,26 @@ function options:SetFullScreenMode(bFullScreen)
 	ParaEngine.GetAttributeObject():SetField("IsFullScreenMode", bFullScreen == true);
 	ParaEngine.GetAttributeObject():CallField("UpdateScreenMode");
 end
+
+function options:IsVipWorld()
+	return WorldCommon.GetWorldTag("isVipWorld")
+end
+
+function options:SetVipWorld(isVipWorld)
+	GameLogic.AddBBS(nil, format("vip world is %s", tostring(isVipWorld)))
+	if(isVipWorld == false) then
+		isVipWorld = nil;
+	end
+	WorldCommon.SetWorldTag("isVipWorld", isVipWorld);
+end
+
+-- "teacher", "vip"
+function options:GetUserType()
+	return self.userType;
+end
+
+function options:IsVip()
+	local userType = self:GetUserType()
+	return userType == "vip" or userType == "teacher"
+end
+

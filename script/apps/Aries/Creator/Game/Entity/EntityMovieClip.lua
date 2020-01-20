@@ -125,6 +125,28 @@ function Entity:GetReferenceFiles()
 	return files;
 end
 
+-- return the number of entities replaced
+function Entity:ReplaceFile(from, to)
+	local count = 0;
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+					local data = timeSeries.assetfile.data;
+					for i = 1, #(data) do
+						if(data[i] == from) then
+							data[i] = to;
+							count = count + 1;
+						end
+					end
+				end
+			end
+		end
+	end
+	return count;
+end
 
 local function offset_time_variable(var, offset)
 	if(var and var.data) then

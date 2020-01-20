@@ -776,6 +776,16 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
 		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
+
+		local bShowBones = false;
+		local sceneContext = self:GetSceneContext();
+		if(sceneContext) then
+			local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(entity)
+			if(langConfig.IsShowBones) then
+				bShowBones = langConfig.IsShowBones()
+			end
+			sceneContext:SetShowBones(bShowBones);
+		end
 	end
 end
 
@@ -960,8 +970,13 @@ function CodeBlockWindow.GetBlockEditorUrl()
     local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
     local codeLanguageType;
+    local codeConfigType;
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
+	    local langConfig = CodeHelpWindow.GetLanguageConfigByBlockPos(bx,by,bz)
+        if(langConfig)then
+            codeConfigType = langConfig.type;
+        end
 		if(bz) then
 			blockpos = format("%d,%d,%d", bx, by, bz);
 		end
@@ -970,7 +985,7 @@ function CodeBlockWindow.GetBlockEditorUrl()
 
 	local request_url = "npl://blockeditor"
 	if(blockpos) then
-		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s", blockpos, codeLanguageType or "npl");
+		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
@@ -985,8 +1000,13 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	local blockpos;
 	local entity = CodeBlockWindow.GetCodeEntity();
     local codeLanguageType;
+    local codeConfigType;
 	if(entity) then
 		local bx, by, bz = entity:GetBlockPos();
+        local langConfig = CodeHelpWindow.GetLanguageConfigByBlockPos(bx,by,bz)
+        if(langConfig)then
+            codeConfigType = langConfig.type;
+        end
 		if(bz) then
 			blockpos = format("%d,%d,%d", bx, by, bz);
 		end
@@ -996,7 +1016,7 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 
 	local request_url = "npl://blockeditor"
 	if(blockpos) then
-		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s", blockpos, codeLanguageType or "npl");
+		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
 	end
 	NplBrowserLoaderPage.Check(function() 		end);
 

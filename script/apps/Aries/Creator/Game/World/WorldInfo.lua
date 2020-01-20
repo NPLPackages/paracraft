@@ -32,6 +32,7 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.texture_pack_path = commonlib.Encoding.Utf8ToDefault(self.texture_pack_path or self.texture_pack or "");
 		self.weather_strength = tonumber(self.weather_strength);
 		self.totaltime = tonumber(self.totaltime);
+		self.isVipWorld = self.isVipWorld == "true" or self.isVipWorld == true;
 		self:SetTotalWorldTime(self.totaltime or 0);
 
 		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
@@ -60,6 +61,7 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		totaltime = self:GetWorldTotalTime(),
 		global_terrain = self.global_terrain,
 		fromProjects = self.fromProjects,
+		isVipWorld = self.isVipWorld,
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);

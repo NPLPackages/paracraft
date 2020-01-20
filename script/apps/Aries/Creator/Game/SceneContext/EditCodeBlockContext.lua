@@ -150,6 +150,10 @@ function EditCodeBlockContext:CreateGetActor()
 						self.actor:Connect("keyChanged", self, EditCodeBlockContext.UpdateActor);
 						self.actor:SetTime(0);
 						self.actor:FrameMove(0);
+						local entity = self.actor:GetEntity();
+						if(entity) then
+							entity:SetSkipPicking(true)
+						end
 					end
 				end
 			end

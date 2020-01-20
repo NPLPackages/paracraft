@@ -15,6 +15,7 @@ task:Run();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
@@ -167,4 +168,49 @@ function ReplaceBlock:Undo()
 			BlockEngine:SetBlock(b[1],b[2],b[3], self.from_id or b[4], b[5] or 0, 3, b[6]);
 		end
 	end
+end
+
+-- @param blocks: if nil, it means entire blocks, or it will only replace in these blocks
+-- @return the number of blocks replaced
+function ReplaceBlock:ReplaceFile(from, to, blocks)
+	if(from == to or not from or not to) then
+		return
+	end
+	local movieBlockId = block_types.names.MovieClip;
+	local PhysicsModel = block_types.names.PhysicsModel;
+	local BlockModel = block_types.names.BlockModel;
+
+	local count = 0;
+	local entities;
+	if(not blocks) then
+		-- all blocks in the world
+		entities = EntityManager.FindEntities({category="b", });
+	else
+		entities = {};
+		-- only selected blocks
+		for _, b in ipairs(blocks) do
+			local entity = EntityManager.GetBlockEntity(b[1], b[2], b[3])
+			if(entity) then
+				entities[#entities+1] = entity;
+			end
+		end
+	end
+	if(entities) then
+		for _, entity in ipairs(entities) do
+			local block_id = entity:GetBlockId()
+			if(block_id == movieBlockId) then
+				if(entity:ReplaceFile(from, to)>0) then
+					count = count + 1;
+				end
+			elseif(block_id == PhysicsModel or block_id == BlockModel) then
+				if(entity:GetModelFile() == from) then
+					entity:SetModelFile(to);
+					entity:Refresh()
+					count = count + 1;
+				end
+			end
+		end
+		GameLogic.AddBBS(nil, format(L"%d个方块中的文件被替换", count))
+	end
+	return count;
 end

@@ -450,6 +450,38 @@ bindNodeByName("object1")
 ]]}},
 },
 
+{
+	type = "setBoneConstraint_6", 
+	message0 = L"%1%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+				{ L"IK", "IK" },
+			},
+		},
+		{
+			name = "value",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2,
+		},
+	},
+	category = "Skeleton", 
+    colour = "#4d4d4d",
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	func_description = 'setBoneConstraint("%s",%s)',
+	ToNPL = function(self)
+		return string.format('setBoneConstraint("%s",%s)', self:getFieldAsString('name'), self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 };
 function NplCadDef_Skeleton.GetCmds()
 	return cmds;

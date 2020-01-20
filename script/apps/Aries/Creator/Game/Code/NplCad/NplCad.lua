@@ -192,7 +192,7 @@ function NplCad.GetCode(code, filename, relativePath)
 			NplCad.templateCode = [[
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
     local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
-    SceneHelper.LoadPlugin(function()
+	SceneHelper.LoadPlugin(function()
         ShapeBuilder.create();
         local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
         NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
@@ -204,6 +204,7 @@ function NplCad.GetCode(code, filename, relativePath)
 	        setActorValue("showBones", true);
             NplCad.RefreshFile(%q);
         end
+		NplCad.StopCodeBlock(codeblock)
     end)
 ]]
 		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
@@ -212,18 +213,37 @@ function NplCad.GetCode(code, filename, relativePath)
     return s
 end
 
+-- virutal function: show bones in code block context
+function NplCad.IsShowBones()
+	return true;
+end
+
+function NplCad.StopCodeBlock(codeblock)
+	commonlib.TimerManager.SetTimeout(function()  
+		if(codeblock) then
+			codeblock:StopAll();
+		end
+	end, 30)
+end
+
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
 -- return nil or a mcml string. 
 function NplCad.GetCustomToolbarMCML()
 
 	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
-    <div style="float:left;margin-left:5px;margin-top:7px;"
+    <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
             tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
         <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
     </div>
 ]],
 		L"导出");
 	return NplCad.toolBarMcmlText;
+end
+
+function NplCad.OnClickShowExport()
+	if(CodeBlockWindow.IsNPLBrowserVisible()) then
+		CodeBlockWindow.SetNplBrowserVisible(false)
+	end
 end
 
 function NplCad.OnClickExport(type)

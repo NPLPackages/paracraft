@@ -19,180 +19,118 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
--- set ranges index to 0 as first 
-function env_imp.fixeRangesToJsIndex(bones)
-    if(not bones)then
+
+function env_imp:start_NplMicroRobot()
+    local MicrobitEmulatorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/MicrobitEmulatorPage.lua");
+    MicrobitEmulatorPage.ShowPage();
+end
+----------------------------Motion
+function env_imp:createOrGetAnimationClip_NplMicroRobot(name)
+    if(not self.robot_clips)then
+        self.robot_clips = {};
+    end
+    local clip = self.robot_clips[name];
+    if(not clip)then
+        clip = {};
+
+        self.robot_clips[name] = clip
+    end
+    self.cur_robot_clip = clip;
+    return clip;
+end
+function env_imp:createAnimationClip_NplMicroRobot(name)
+    env_imp.createOrGetAnimationClip_NplMicroRobot(self,name);
+end
+
+function env_imp:createTimeLine_NplMicroRobot(from,to,loopTimes,speed)
+    if(self.cur_robot_clip)then
+        table.insert(self.cur_robot_clip,{from = from, to = to, loopTimes = loopTimes, speed = speed});
+    end
+end
+
+function env_imp:join_timelines_NplMicroRobot(clip)
+    if(not clip)then
         return
     end
+    local actor = env_imp.GetActor(self);
+	if(not actor) then
+		return
+	end
+    local duration = actor:GetMovieClip():GetLength();
     local result = {};
-    for k,v in pairs(bones) do
-        if(type(v) == "table" and v.ranges)then
-            for kk,vv in ipairs(v.ranges) do
-                for kkk,vvv in ipairs(vv) do
-                    vv[kkk] = vv[kkk] - 1;
-                end
+    for k,timeline in ipairs(clip) do
+        local from = timeline.from;
+        local to = timeline.to;
+        local loopTimes = timeline.loopTimes;
+        local speed = timeline.speed;
+        if(to < 0)then
+            to = duration;
+        end
+        if(loopTimes > 0)then
+            for kk = 1,loopTimes do
+                table.insert(result,{from = from, to = to, speed = speed});
             end
-            v.type = nil; -- remove wrong type
-            v.offset = 0; -- set offset value for servo rotation
-            table.insert(result,v);
         end
     end
     return result;
 end
+function env_imp:play_next_NplMicroRobot(clip,index,callback)
+    local timeline = clip[index];
+    if(not timeline)then
+        if(callback)then
+            callback();
+        end
+        return
+    end
+    local from = timeline.from;
+    local to = timeline.to;
+    local loopTimes = timeline.loopTimes;
+    local speed = timeline.speed;
+     self.play(from,to,false,function()
+        env_imp.play_next_NplMicroRobot(self,clip,index+1,callback)
+    end,speed);
+end
+function env_imp:playAnimationClip_NplMicroRobot(name)
+    
+    local clip = env_imp.createOrGetAnimationClip_NplMicroRobot(self,name);
+    if(clip)then
+        clip = env_imp.join_timelines_NplMicroRobot(self,clip);
+        env_imp.play_next_NplMicroRobot(self,clip,1,function()
+			env_imp.resume(self);
+        end)
+		env_imp.yield(self);
+    end
+end
 
-function env_imp.helper_ReadBonePropertiesFromName(name)
+function env_imp:stopAnimationClip_NplMicroRobot()
+    self:stop();
+end
+----------------------------Looks
+function env_imp:microbit_show_leds(v)
+end
+function env_imp:microbit_show_string(v)
+    env_imp.broadcast(self,"microbit_show_string",v)
+end
+-- @param v: milliseconds
+function env_imp:microbit_pause(v)
+    local seconds = math.floor(v / 1000);
+    env_imp.wait(self, seconds);
+end
+
+----------------------------Events
+-- @param name: "A" or "B" or "AB"
+function env_imp:registerKeyPressedEvent_NplMicroRobot(name,callback)
     if(not name)then
         return
     end
-	local display_name, properties = name:match("^(.*)%s*(%{[^%}]+%})_rot");
-	if(properties) then
-		properties = NPL.LoadTableFromString(properties);
-	end
-    return display_name, properties;
+    name = string.format("microbit_btn_%s",name);
+    env_imp.registerBroadcastEvent(self,name,callback)
+end
+function env_imp:registerGestureEvent_NplMicroRobot(name,callback)
+    name = string.format("microbit_gesture_%s",name);
+    env_imp.registerBroadcastEvent(self,name,callback)
 end
 
-function env_imp.helper_radianToDegreeInt(v)
-    v = v * 180 / 3.1415926;
-    v = math.floor(v + 0.5);
-    return v;
-end
-
--- clear names to save memory in microbit
-function env_imp.helper_clear_names(values)
-    for k,v in ipairs(values) do
-        v.name = nil;
-        v.display_name = nil;
-        v.axis = nil;
-        v.min = nil;
-        v.max = nil;
-        v.offset = nil;
-        v.servoScale = nil;
-    end
-    return values;
-end
-function env_imp.fixRotationValuesAndID(bones)
-    if(not bones)then
-        return
-    end
-    local result = {};
-    for k,v in pairs(bones) do
-        if(type(v) == "table" and v.data)then
-            local name = v.name
-            local display_name, properties = env_imp.helper_ReadBonePropertiesFromName(name);
-            properties = properties or {};
-            local rotAxis = properties.rotAxis;
-            local servoId = properties.servoId;
-            local servoOffset = properties.servoOffset; -- input is radian
-            local servoScale = properties.servoScale or 1;
-            local tag = properties.tag;
-            if(servoId and servoId > -1)then
-                v.id = servoId; --set servo id
-                v.offset = env_imp.helper_radianToDegreeInt(servoOffset or 0) --set servo offset
-                v.display_name = display_name;
-                if(properties.min and properties.max)then
-                    v.min = env_imp.helper_radianToDegreeInt(properties.min);
-                    v.max = env_imp.helper_radianToDegreeInt(properties.max);
-                end
-                v.servoScale = servoScale;
-                v.tag = tag;
-                local data = v.data
-                for kk,vv in ipairs(data) do
-                    -- change every quaternion to degree on one axis
-                    if(type(vv) == "table")then
-                        local len = #vv;
-                        if(len >= 4)then
-                            local last_angle = 0;
-                            local q = Quaternion:new(vv);    
-                            if(rotAxis)then
-                                rotAxis = string.lower(rotAxis);
-                                local rot_y,rot_z,rot_x = q:ToEulerAngles();
-                                if(rotAxis == "x")then
-                                    last_angle = rot_x;
-                                elseif(rotAxis == "y")then
-                                    last_angle = rot_y;
-                                elseif(rotAxis == "z")then
-                                    last_angle = rot_z;
-                                end
-                                v.axis = rotAxis;
-                            else
-                                local angle, axis = q:ToAngleAxis();
-                                last_angle = angle;
-                            end
-                            data[kk] = v.offset + servoScale * env_imp.helper_radianToDegreeInt(last_angle)
-                        
-                        end
-                    end
-                end
-                table.insert(result,v);
-            end
-        end
-    end
-    return result;
-end
-function env_imp.getBonesDataFromInventory(inventory)
-    if(not inventory)then
-        return
-    end
-    local slots = inventory.slots or {};
-    local serverdata;
-    for k,v in ipairs(slots) do
-        if(v.id == 10062)then
-            serverdata = v.serverdata;
-            break;
-        end
-    end
-    if(serverdata and serverdata.timeseries and serverdata.timeseries.bones)then
-        return serverdata.timeseries.bones;
-    end
-end
-function env_imp:createMicrobitRobot()
-    local NodeJsRuntime = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NodeJsRuntime.lua");
-    if(not NodeJsRuntime.IsValid())then
-        -- only download
-        NodeJsRuntime.Check()
-        return;
-    end
-    -- check new version
-    NodeJsRuntime.Check();
-
-    local movieEntity = self.codeblock:GetMovieEntity();
-    local filename = self.codeblock:GetBlockName();
-    if(filename == "" or not filename)then
-        filename = "default";
-    end
-    local filename_really = string.format("test/robot/%s_really.json",filename);
-    filename = string.format("test/robot/%s.json",filename);
-    if(movieEntity and movieEntity.inventory)then
-        local inventory = movieEntity.inventory;
-
-        local bones = env_imp.getBonesDataFromInventory(inventory) or {};
-        bones = commonlib.copy(bones);
-        bones = env_imp.fixeRangesToJsIndex(bones)
-        bones = env_imp.fixRotationValuesAndID(bones);
-        local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobotAdapterPage.lua");
-        NplMicroRobotAdapterPage.ShowPage(bones,function(type,values)
-                local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NplMicroRobot.lua");
-
-                ParaIO.CreateDirectory(filename);
-                local file = ParaIO.open(filename,"w");
-                if(file:IsValid()) then
-		            file:WriteString(NPL.ToJson(values));
-		            file:close();
-	            end
-                values = env_imp.helper_clear_names(values)
-
-                local data = NPL.ToJson(values);
-                local file = ParaIO.open(filename_really,"w");
-                if(file:IsValid()) then
-		            file:WriteString(data);
-		            file:close();
-	            end
-
-                NplMicroRobot.Run(type,data);
-        end);
-
-    end
-end
 function env_imp:getBoneVariable(name)
     local actor = env_imp.GetActor(self);
     if(actor)then

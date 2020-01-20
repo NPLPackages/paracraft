@@ -167,6 +167,29 @@ function BlockTemplate:LoadTemplate()
 					self.blockZ = tonumber(z);
 				end
 			end
+			
+			local node = commonlib.XPath.selectNode(root_node, "/references");
+			if(node) then
+				for _, fileNode in ipairs(node) do
+					local filename = fileNode.attr.filename
+					local filepath = GameLogic.GetWorldDirectory()..filename;
+					if(not ParaIO.DoesFileExist(filepath, true)) then
+						local text = fileNode[1];
+						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+						text = System.Encoding.unbase64(text)
+						ParaIO.CreateDirectory(filepath)
+						local file = ParaIO.open(filepath, "w")
+						if(file:IsValid()) then
+							file:WriteString(text, #text);
+							file:close();
+						else
+							LOG.std(nil, "warn", "BlockTemplate", "failed to write file to: %s", filepath);
+						end
+					else
+						LOG.std(nil, "warn", "BlockTemplate", "load template ignored existing world file: %s", filename);
+					end
+				end
+			end
 
 			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
 			if(node and node[1]) then
@@ -197,6 +220,7 @@ function BlockTemplate:LoadTemplate()
 					return true;
 				end
 			end
+			
 		end
 	end
 	LOG.std(nil, "warn", "BlockTemplate", "failed to load template from file: %s", filename);
@@ -296,14 +320,30 @@ function BlockTemplate:SaveTemplate()
 			self:MakeHollow()
 		end
 		
+		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
+
 		if(self.exportReferencedFiles) then
 			local files = self:GetReferenceFiles(self.blocks)
 			if(files) then
-				-- TODO: 
+				for filename, _ in pairs(files) do
+					-- only export files in the current world directory. 
+					local filepath = GameLogic.GetWorldDirectory()..filename;
+					local file = ParaIO.open(filepath, "r")
+					if(file:IsValid()) then
+						local text = file:GetText(0, -1);
+						file:close();
+						if(text and text~="") then
+							NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+
+							o[2] = o[2] or {name="references", };
+							local ref = o[2];
+							ref[#ref+1] = {name="file", attr={filename=filename, encoding="base64"}, [1] = System.Encoding.base64(text)}
+						end
+					end
+				end
 			end
 		end
-
-		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
+		
 		local xml_data = commonlib.Lua2XmlString(o, true, true);
 		if (xml_data) then
 			

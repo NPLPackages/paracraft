@@ -425,6 +425,68 @@ say("math.cos(1)=="..math.cos(1), 1)
 say("math.abs(-1)=="..math.abs(1), 1)
 ]]}},
 },
+
+{
+	type = "table.remove", 
+	message0 = L"删除%1的第%2项",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "getLocalVariable", value = L"变量名",},
+			text = L"变量名",
+		},
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "math_number", value = "1",},
+			text = 1, 
+		},
+	},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	--hide_in_codewindow = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'table.remove(%s, %s)',
+	ToNPL = function(self)
+		return string.format('table.remove(%s, %s)\n', self:getFieldAsString('name'), self:getFieldAsString('key'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "table.contains", 
+	message0 = L"%1包含%2?",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			shadow = { type = "getLocalVariable", value = L"变量名",},
+			text = L"变量名",
+		},
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "text", value = L"东西",},
+			text = L"东西", 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	-- hide_in_codewindow = true,
+	func_description = 'table.contains(%s, %s)',
+	ToNPL = function(self)
+		return string.format('table.contains(%s, "%s")', self:getFieldAsString('name'), self:getFieldAsString('key'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 };
 function CodeBlocklyDef_Operators.GetCmds()
 	return cmds;

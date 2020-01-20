@@ -366,7 +366,8 @@ examples:
 		end
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 		local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
-		Desktop.OnLeaveWorld(bForceLeave, true);
+		Desktop.ForceExit(true);
+		--Desktop.OnLeaveWorld(bForceLeave, true);
 	end,
 };
 
@@ -381,5 +382,25 @@ Commands["saveas"] = {
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 		WorldCommon.SaveWorldAs()
+	end,
+};
+
+Commands["setworldinfo"] = {
+	name="setworldinfo", 
+	quick_ref="/setworldinfo [-isVipWorld true|false]", 
+	desc=[[set a given world tag
+--this will make world accessible to only vip users
+/setworldinfo -isVipWorld true    
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local option_name = "";
+		while (option_name and cmd_text) do
+			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option_name == "isVipWorld") then
+				local isVipWorld;
+				isVipWorld, cmd_text = CmdParser.ParseBool(cmd_text);
+				GameLogic.options:SetVipWorld(isVipWorld);
+			end
+		end
 	end,
 };

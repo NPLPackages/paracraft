@@ -71,7 +71,7 @@ function CodeGlobals:ctor()
 			  upper = string.upper },
 		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
-			getn = table.getn, sort = table.sort, concat = table.concat, clear=table.clear },
+			getn = table.getn, sort = table.sort, concat = table.concat, clear=table.clear, contains = CodeGlobals.table_contains },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time },
 		alert = _guihelper.MessageBox, 
 		real = function(bx,by,bz)
@@ -726,6 +726,28 @@ end
 
 function CodeGlobals:SetAnyKeyDown(bKeyDown)
 	self.isAnyKeyDown = bKeyDown;
+end
+
+-- helper function for table.contains
+-- @return true or nil
+function CodeGlobals.table_contains(obj, key)
+	if(key == nil) then
+		return
+	end
+	if(type(obj) == "table") then
+		if(type(key) == "string" and obj[key]) then
+			return true;
+		end
+		for k, v in ipairs(obj) do
+			if(v == key) then
+				return true;
+			end
+		end
+	elseif(type(obj) == "string") then
+		if(obj:match(tostring(key))) then
+			return true;
+		end
+	end
 end
 
 -- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape"

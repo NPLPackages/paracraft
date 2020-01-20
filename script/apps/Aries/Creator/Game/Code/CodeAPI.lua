@@ -122,7 +122,22 @@ local s_env_methods = {
 	"playMusic",
 
     --------------- NplMicroRobot
-    "createMicrobitRobot",
+    "start_NplMicroRobot",
+    -- Motion
+    "createOrGetAnimationClip_NplMicroRobot",
+    "createAnimationClip_NplMicroRobot",
+    "createTimeLine_NplMicroRobot",
+    "playAnimationClip_NplMicroRobot",
+    "stopAnimationClip_NplMicroRobot",
+    -- Looks
+    "microbit_show_leds",
+    "microbit_show_string",
+    "microbit_pause",
+    -- Events
+    "registerKeyPressedEvent_NplMicroRobot",
+    "registerGestureEvent_NplMicroRobot",
+    -- Sensing
+    "microbit_is_pressed",
 
     --------------- Microbit
     -- Animation
@@ -139,8 +154,7 @@ local s_env_methods = {
     "microbit_display_show",
     "microbit_display_scroll",
     "microbit_display_clear",
-    -- Sensing
-    "microbit_is_pressed",
+    
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 

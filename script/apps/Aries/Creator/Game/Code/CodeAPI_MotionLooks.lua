@@ -376,7 +376,8 @@ end
 -- @param timeTo: if nil, default to timeFrom
 -- @param isLooping: default to false.
 -- @param onFinishedCallback: only used internally, must be nil.
-function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
+-- @param speed: if(not speed or speed <= 0)then speed = actor:GetPlaySpeed(); end
+function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 	timeFrom = timeFrom or 0;
 	local time = timeFrom;
 	local entity = env_imp.GetEntity(self);
@@ -395,12 +396,16 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
 		actor:FrameMove(0, false);
 		self.codeblock:OnAnimateActor(actor, time);
 
+        
 		if(timeTo and timeTo~=timeFrom) then
 			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
 			local frameMove_;
 			if(timeTo > timeFrom) then
 				frameMove_ = function(timer)
-					local delta = timer:GetDelta() * actor:GetPlaySpeed();
+                    if(not speed or speed <= 0)then
+			            speed = actor:GetPlaySpeed();
+                    end
+					local delta = timer:GetDelta() * speed;
 					time = time + delta;
 					if(time >= timeTo) then
 						if(isLooping) then
@@ -425,7 +430,10 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback)
 				end
 			else
 				frameMove_ = function(timer)
-					local delta = timer:GetDelta() * actor:GetPlaySpeed();
+                    if(not speed or speed <= 0)then
+			            speed = actor:GetPlaySpeed();
+                    end
+					local delta = timer:GetDelta() * speed;
 					time = time - delta;
 					if(time <= timeTo) then
 						if(isLooping) then

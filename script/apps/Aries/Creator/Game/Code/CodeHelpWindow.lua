@@ -79,6 +79,13 @@ function CodeHelpWindow.GetLanguageConfigByBlockPos(bx,by,bz)
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 	local entity = CodeBlockWindow.GetCodeEntity(bx, by, bz)
 	if(entity) then
+		return CodeHelpWindow.GetLanguageConfigByEntity(entity);
+	end
+end
+
+-- @return language config object
+function CodeHelpWindow.GetLanguageConfigByEntity(entity)
+	if(entity) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
 		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 		local langConfig = LanguageConfigurations:LoadConfigByFilename(entity:GetLanguageConfigFile())

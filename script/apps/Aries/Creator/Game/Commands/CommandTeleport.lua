@@ -48,6 +48,7 @@ format: /tp [region_x] [region_y] -- teleport to the center of a given region
 			if(x) then
 				if(x == "home") then
 					x, y, z = GameLogic.GetHomePosition();
+					
 				end
 			end
 			x = tonumber(x);
@@ -179,14 +180,22 @@ Commands["home"] = {
 
 Commands["sethome"] = {
 	name="sethome", 
-	quick_ref="/sethome", 
-	desc="set home born position" , 
+	quick_ref="/sethome [bx by bz]", 
+	desc=[[set home born position
+e.g.
+/sethome
+/sethome 19269,34,19190
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(not System.options.is_mcworld) then
 			return;
 		end
 		local x, y, z;
 		x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
+		if(x and y and z) then
+			x, y, z = BlockEngine:real_bottom(x, y, z)
+			y = y + 0.1;
+		end
 		GameLogic.SetHomePosition(x,y,z);
 	end,
 };

@@ -227,6 +227,33 @@ e.g.
 	end,
 };
 
+Commands["replacefile"] = {
+	name="replacefile", 
+	quick_ref="/replacefile src dest", 
+	desc=[[replace model files from src to dest. this will include 
+Please note, if no blocks are selected by the user, 
+all movie block and model block with matching filenames will be replaced.
+if user has selected some blocks, then replacement only take place in these selected blocks.
+e.g.
+/replacefile blocktemplates/from.bmax    blocktemplates/to.bmax
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		
+		local from, to, radius
+		from, cmd_text = CmdParser.ParseString(cmd_text);
+		to, cmd_text = CmdParser.ParseString(cmd_text);
+		if(from and to) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
+			NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
+			local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
+			
+
+			local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({mode="all"});
+			task:ReplaceFile(from, to, SelectionManager:GetSelectedBlocks());
+		end
+	end,
+};
+
 
 Commands["setblock"] = {
 	name="setblock", 

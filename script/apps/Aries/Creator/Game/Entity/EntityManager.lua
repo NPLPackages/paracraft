@@ -980,7 +980,7 @@ end
 -- find entities by a number of matching parameters
 -- @param params: {category, type, nontype, name, x,y,z,dz,dy,dz,r,rm, count}
 -- category: "e" all entities except block entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
--- "all" for block entities
+-- "all" for all entities including block entities
 -- "b" for block entities
 -- "searchable" for all searchable entities including block entities 
 -- name: only entities with given name.
@@ -1097,7 +1097,7 @@ function EntityManager.FindEntities(params)
 			end
 		end
 	elseif(params.category == "b") then
-		-- "all" for all entities including block entities 
+		-- "b" for block entities 
 		for _, entities in pairs(chunk_column_entities) do
 			for i=1, #entities do
 				local entity = entities[i];

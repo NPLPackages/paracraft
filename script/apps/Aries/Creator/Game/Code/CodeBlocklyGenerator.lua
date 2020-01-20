@@ -131,7 +131,7 @@ function CodeBlocklyGenerator:GetCategoryStr(category)
     local bCreateVarBtn = false;
 	for __,cmd in ipairs(all_cmds) do
 		if(category.name == cmd.category and not cmd.hide_in_toolbox)then
-            if(category.name == "Data" or category.name == "NplMicrobit.Data" )then
+            if(category.name == "Data" or category.name == "NplMicroRobot.Data" )then
                 if(not bCreateVarBtn)then
                     local variable_type_maps = self:GetAllVariableTypes();
                     local type;
@@ -288,8 +288,8 @@ function CodeBlocklyGenerator:ArgsToStr(cmd,language)
     local language_name = self:GetLanguageName(language);
     local func_name = self:GetFunctionName(language);
 	local func_description = cmd[func_name];
-    if(language == "python")then
-        -- get func_description from lua func_description if python func_description is nil
+    if(language == "python" or language == "javascript")then
+        -- get func_description from lua func_description if python/javascript func_description is nil
         func_description = func_description or cmd[self:GetFunctionName("lua")];
     end
     local func_provider_name = self:GetFunctionProviderName(language);
