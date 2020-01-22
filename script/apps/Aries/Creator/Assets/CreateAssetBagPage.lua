@@ -221,9 +221,9 @@ function CreateAssetBagPage.OnClickItem(obj_params)
 			directPosition = true,
 				align = "_ct",
 				x = -140/2,
-				y = -300/2,
+				y = -340/2,
 				width = 140,
-				height = 300,
+				height = 340,
 		});
 		Map3DSystem.App.Creator.ObjectInspectorPage.SetModel(filepath);
 	elseif(mouse_button=="left") then

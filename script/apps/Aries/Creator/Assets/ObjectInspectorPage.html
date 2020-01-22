@@ -13,12 +13,8 @@ function ClosePage()
 	Page:CloseWindow();
 end
 ]]></script>
-<div style="width:140px;height:300px;" class="window">
-    <div class="titlebar" width="100%">
-        <div class="windowlabel" >物品信息</div>
-        <input type="button" style="margin-top:1px;margin-right:5px" onclick="ClosePage" class="closewindow"/>
-    </div>
-    <div class="clientarea" style="margin-left:7px;margin-right:7px">
+<aries:window mode="thin" title='<%=L"物品信息"%>' style="width:140px;height:340px" onclose="ClosePage">
+    <div class="default">
         <pe:canvas3d name="modelCanvas" autoRotateSpeed="0.12" style="margin-left:3px;width:128px;height:128px"></pe:canvas3d>
         <hr />
         <div style="margin-left:5px;margin-right:5px">
@@ -27,11 +23,11 @@ end
         缩略图:<div style="float:left;" class="inborder_golden"><img name="ThumbnailImg" style="width:48px;height:48px;margin:1px"/></div>
         </div>
         <div style="margin-left:5px;margin-top:4px">
-          <input type="button" class="button" style="width:60px;" name="btnSnapshot" value="快照" tooltip="生成缩略图" onclick="Map3DSystem.App.Creator.ObjectInspectorPage.OnTakeSnapShot"/>
-          <input type="button" class="button" style="margin-left:5px;width:40px;" name="btnCancel" value="关闭" onclick="ClosePage()"/>
+            <input type="button" class="button" style="width:60px;" name="btnSnapshot" value="快照" tooltip="生成缩略图" onclick="Map3DSystem.App.Creator.ObjectInspectorPage.OnTakeSnapShot"/>
+            <input type="button" class="button" style="margin-left:5px;width:40px;" name="btnCancel" value="关闭" onclick="ClosePage()"/>
         </div>
     </div>
-</div>
+</aries:window>
 </pe:mcml> 
 </body>
 </html>

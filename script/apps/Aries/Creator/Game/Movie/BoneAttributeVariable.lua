@@ -99,8 +99,6 @@ function BoneAttributeVariable:GetAttributeName()
 	return self.name;
 end
 
-
-
 -- variable is returned as an array of individual variable value at the given time. 
 function BoneAttributeVariable:getValue(anim, time)
 	if(self:GetKeyNum()>0) then

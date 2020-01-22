@@ -186,6 +186,31 @@ function OpenAssetFileDialog.GetModelParams()
 	
 end
 
+-- TODO: 
+function OpenAssetFileDialog.ShowModelInfo()
+	if(OpenAssetFileDialog.curModelAssetFile and OpenAssetFileDialog.curModelAssetFile~="") then
+		NPL.load("(gl)script/kids/3DMapSystemUI/Creator/Objects/ObjectInspectorPage.lua");
+		-- display object inspector page to generate thumbnail icon, etc.  
+		System.App.Commands.Call("File.MCMLWindowFrame", {
+			url="script/apps/Aries/Creator/Assets/ObjectInspectorPage.html",
+			name="Aries.ObjectInspectorPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			text = "查看物品",
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = true,
+			zorder = 10,
+			directPosition = true,
+				align = "_ct",
+				x = -140/2,
+				y = -340/2,
+				width = 140,
+				height = 340,
+		});
+		Map3DSystem.App.Creator.ObjectInspectorPage.SetModel(OpenAssetFileDialog.curModelAssetFile);
+	end
+end
+
 function OpenAssetFileDialog.OnOK()
 	if(page) then
 		local text = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"))
@@ -376,11 +401,16 @@ function OpenAssetFileDialog.RefreshAnims(filepath, tryCount)
 	if(not page) then
 		return
 	end
+	OpenAssetFileDialog.curModelAssetFile = filepath;
 	local self = OpenAssetFileDialog;
 	self.tryCount = tryCount;
 	local asset = ParaAsset.LoadParaX(filepath, filepath);
 	asset:LoadAsset();
 	if(asset:IsValid() and asset:IsLoaded())then
+		local polyCount = asset:GetAttributeObject():GetField("PolyCount", 0);
+		if(page) then
+			page:SetUIValue("PolyCount", polyCount);
+		end
 		local options = OpenAssetFileDialog.GetAnimIdsByFilename(filepath);
 		if(options) then
 			local animIds = OpenAssetFileDialog.GetModelAnimDs();

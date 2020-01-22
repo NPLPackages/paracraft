@@ -1,0 +1,62 @@
+--[[
+Title: NplMicroRobotDef_Looks
+Author(s): leio
+Date: 2019/11/29
+Desc: 
+use the lib:
+-------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotDef/NplMicroRobotDef_Looks.lua");
+-------------------------------------------------------
+]]
+NPL.export({
+
+{
+	type = "microbit_show_leds", 
+	message0 = L"显示 %1",
+	arg0 = {
+        {
+			name = "text",
+            type = "field_matrix",
+		},
+	},
+	hide_in_toolbox = true,
+    
+	category = "NplMicroRobot.Looks", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'microbit_show_leds("%s")',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit_show_string", 
+	message0 = L"显示 %1",
+	arg0 = {
+        {
+			name = "text",
+            type = "input_value",
+            shadow = { type = "text", value = L"hello",},
+			text = L"hello", 
+		},
+	},
+    
+	category = "NplMicroRobot.Looks", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'microbit_show_string(%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+
+
+})

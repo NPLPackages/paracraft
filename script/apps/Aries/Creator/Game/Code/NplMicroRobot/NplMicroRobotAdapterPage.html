@@ -1,0 +1,148 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotAdapterPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="NplMicroRobotAdapterPage.lua"><![CDATA[
+NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotAdapterPage.lua");
+NplMicroRobotAdapterPage.OnInit();
+local page = document:GetPageCtrl();
+function ClosePage()
+    page:CloseWindow();
+end
+
+function DS_Items(index)
+    local ds = NplMicroRobotAdapterPage.datasource;
+    if(index == nil) then
+        return ds and #ds or 0;
+    else
+        return ds[index];
+    end
+end
+
+
+function OnOK(name)
+    ClosePage();
+    if(NplMicroRobotAdapterPage.callback)then
+        NplMicroRobotAdapterPage.callback(name,NplMicroRobotAdapterPage.datasource)
+    end
+end
+function GetListName(index)
+        return NplMicroRobotAdapterPage.GetListName(index);
+end
+function GetOffsetName(index)
+       return string.format("offset_%s",tostring(index));
+end
+function GetOffsetValue(index)
+    local node = NplMicroRobotAdapterPage.datasource[index];
+    return string.format("%s",tostring(node.offset))
+end
+function OnChangeOffset(name,mcmlNode,obj)
+        local value = obj.text;
+        local index = string.match(name,"offset_(.+)")
+        index = tonumber(index);
+        value = tonumber(value);
+        if(type(value) == "number")then
+            NplMicroRobotAdapterPage.datasource[index].offset = value
+        end
+end
+function OnSelect(name,value)
+    local index = string.match(name,"channel_(.+)")
+    index = tonumber(index);
+    value = tonumber(value);
+    NplMicroRobotAdapterPage.datasource[index].id = value
+end
+function GetSpan(index)
+    local node = NplMicroRobotAdapterPage.datasource[index];
+    if(node.min and node.max)then
+        return string.format("[%d,%d]",node.min,node.max);
+    end
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"骨骼匹配通道"%>' onclose="ClosePage">
+    <div style="width:560px;height:550px;" >
+
+    <div style="color:#cccccc;">
+        <div class="mc_border" style="margin-top:10px;padding:10px;width:550px;height:460px;">
+            <div style="float:left;width:140px;color:#ffffff;text-align:center;">
+                <%=L"骨骼名称"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"舵机通道"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"旋转轴"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:100px;text-align:center;">
+                <%=L"旋转区间"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"偏移角度"%>
+            </div>
+            <div style="float:left;margin-left:5px;color:#ffffff;width:60px;text-align:center;">
+                <%=L"角度缩放"%>
+            </div>
+            <pe:gridview style="margin-top:5px;width:550px;height:510px;" name="animChannels" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="height:32px;">
+                            <div style="float:left;color:#ffffff;">
+
+                                <div style="float:left;">
+                                    <input type="button" tooltip='<%= Eval("name") %>' value='<%= Eval("display_name") %>' style="width:140px;text-align:center;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:4 4 4 4)"/>
+                                </div>
+                                     <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;" >
+                                        <%=Eval("id")%>
+                                    <!--<select name='<%=GetListName(Eval("index"))%>' AllowUserEdit="false" style="width:60px;height:22px" onselect="OnSelect">
+                                        <option value="-1" selected="true">无</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">8</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                    </select>-->
+                                </div>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("axis")%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:100px;height:22px;text-align:center;">
+                                    <%=GetSpan(Eval("index"))%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("offset")%>
+                                </div>
+                                <div style="float:left;margin-left:5px;width:60px;height:22px;text-align:center;">
+                                    <%=Eval("servoScale")%>
+                                </div>
+                            </div>
+                    </div>
+                </Columns> 
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:250px;">
+        <input type="button" onclick="OnOK" value='<%=L"知道了"%>' style="float:left;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
+    </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

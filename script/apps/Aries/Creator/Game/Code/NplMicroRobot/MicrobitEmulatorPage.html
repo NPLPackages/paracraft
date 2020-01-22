@@ -1,0 +1,70 @@
+<!-- "script/apps/Aries/Creator/Game/Code/NplMicroRobot/MicrobitEmulatorPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="MicrobitEmulatorPage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+MicrobitEmulatorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/MicrobitEmulatorPage.lua");
+MicrobitEmulatorPage.OnInit();
+local page = document:GetPageCtrl();
+
+function OnMicrobitShowString(args,msg)
+    msg = msg or {};
+    local txt = msg.msg or ""
+    page:SetValue("console",txt);
+end
+function ClosePage()
+    GameLogic.GetCodeGlobal():UnregisterTextEvent("microbit_show_string",OnMicrobitShowString)
+    page:CloseWindow();
+end
+function OnClick(name)
+    GameLogic:event(System.Core.Event:new():init(name))
+end
+function OnSelect(name,value)
+    value = string.format("microbit_gesture_%s",value);
+    GameLogic:event(System.Core.Event:new():init(value))
+end
+
+GameLogic.GetCodeGlobal():RegisterTextEvent("microbit_show_string", OnMicrobitShowString)
+]]></script>
+<aries:window mode="thin" title='<%=L"Microbit模拟器"%>' onclose="ClosePage">
+    <div style="width:300px;height:280px;">
+        <div style="width:297px;height:244px;margin-left:-4px;margin-top:5px;background:url(Mod/NplMicroRobot/textures/microbit.png#0 0 366 298)" >
+            <div style="position:relative;margin-left:15px;margin-top:105px;">
+                <input type="button" name="microbit_btn_A" onclick="OnClick" style="width:35px;height:35px;"/>
+            </div>
+            <div style="position:relative;margin-left:249px;margin-top:105px;">
+                <input type="button" name="microbit_btn_B" onclick="OnClick" style="width:35px;height:35px;"/>
+            </div>
+            <div style="position:relative;margin-left:180px;margin-top:5px;">
+                 <select name='options' AllowUserEdit="false" style="width:100px;height:22px" onselect="OnSelect">
+                    <option value="Shake" selected="true">Shake</option>
+                    <option value="LogoUp">LogoUp</option>
+                    <option value="LogoDown">LogoDown</option>
+                    <option value="ScreenUp">ScreenUp</option>
+                    <option value="ScreenDown">ScreenDown</option>
+                    <option value="TiltLeft">TiltLeft</option>
+                    <option value="TiltRight">TiltRight</option>
+                    <option value="FreeFall">FreeFall</option>
+                    <option value="ThreeG">ThreeG</option>
+                    <option value="SixG">SixG</option>
+                    <option value="EightG">EightG</option>
+                </select>
+            </div>
+            <div style="position:relative;margin-left:90px;margin-top:65px;width:125px;height:120px;">
+                <input name="console" AlwaysShowCurLineBackground="false" rows="3" height="100%"  ReadOnly="true"  UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
+            </div>
+        </div>
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

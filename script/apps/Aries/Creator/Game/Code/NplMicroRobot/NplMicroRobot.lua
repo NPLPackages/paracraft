@@ -26,6 +26,7 @@ commonlib.setfield("MyCompany.Aries.Game.Code.NplMicroRobot.NplMicroRobot", NplM
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Microbit.lua");
 
+NplMicroRobot.exportNoneAnimatedMotors = true;
 
 local is_installed = false;
 local all_cmds = {};
@@ -89,7 +90,75 @@ function NplMicroRobot.GetAllCmds()
 	NplMicroRobot.AppendAll();
 	return all_cmds;
 end
-function NplMicroRobot.OnClickExport(type,code,bx, by, bz)
+
+function NplMicroRobot.CreateActorFromMovieClip(movieEntity)
+	local itemStack = movieEntity:GetFirstActorStack();
+	if(itemStack) then
+		local item = itemStack:GetItem();
+		if(item and item.CreateActorFromItemStack) then
+			local actor = item:CreateActorFromItemStack(itemStack, movieEntity, false, "ActorForNplMicroRobot_");
+			if(actor) then
+				return actor
+			end
+		end
+	end
+end
+
+-- return nil or array of exported motor bones
+function NplMicroRobot.GetBonesFromMovieEntity(movieEntity)
+	if(movieEntity and movieEntity.inventory)then
+		local actor = NplMicroRobot.CreateActorFromMovieClip(movieEntity)
+		if(actor) then
+			actor:SetTime(0);
+			actor:FrameMove(0);
+			local bonesVars = actor:GetBonesVariable();
+			local bones = actor:GetTimeSeries():GetChild("bones");
+
+			NPL.load("(gl)script/ide/System/Scene/Animations/Bones/BoneProxy.lua");
+			local BoneProxy = commonlib.gettable("System.Scene.Animations.Bones.BoneProxy");
+			local obj_attr = actor:GetEntity():GetInnerObject():GetAttributeObject();
+			local bones_ = {};
+			local motor_bones = {};
+			local animInstance = obj_attr:GetChildAt(1,1);
+			-- because time series may contain redundent bone info, we will only export those in X file. 
+			if(animInstance and animInstance:IsValid()) then
+				local bone_count = animInstance:GetChildCount(1);
+				for i = 0, bone_count-1 do
+					local boneProxy = BoneProxy:new():init(animInstance:GetChildAt(i, 1), bones_);
+					local serverId = boneProxy:GetBoneProperty("servoId")
+					if(serverId) then
+						local name = boneProxy.name.."_rot";
+						local bone = bones:GetData()[name]
+						if(bone) then
+							bone = commonlib.copy(bone)
+						end
+						if(not bone and NplMicroRobot.exportNoneAnimatedMotors) then
+							-- Note: bones without animation will have default 0 values
+							bone = {ranges={{1,1},}, times={0}, data={{0,0,0,1}}, name=name}
+						end
+						if(bone) then
+							bone.properties = boneProxy:GetProperties();
+							motor_bones[#motor_bones+1] = bone;
+						end
+					end
+				end
+			end
+
+			actor:OnRemove();
+			actor:Destroy();
+
+			motor_bones = NplMicroRobot.fixeRangesToJsIndex(motor_bones)
+			motor_bones = NplMicroRobot.fixRotationValuesAndID(motor_bones);
+
+			--echo("1111111111111111111")
+			--echo(motor_bones)
+
+			return motor_bones;
+		end
+	end
+end
+
+function NplMicroRobot.OnClickExport(exportType,code,bx, by, bz)
     local codeblock = CodeBlockWindow.GetCodeBlock()
     if(not codeblock)then
         return
@@ -109,40 +178,34 @@ function NplMicroRobot.OnClickExport(type,code,bx, by, bz)
     end
     local filename_really = string.format("test/robot/%s_really.json",filename);
     filename = string.format("test/robot/%s.json",filename);
-    if(movieEntity and movieEntity.inventory)then
-        local inventory = movieEntity.inventory;
+	local bones = NplMicroRobot.GetBonesFromMovieEntity(movieEntity)
+    if(bones) then
+		local values = bones;
+		-- test animation data
+		ParaIO.CreateDirectory(filename);
+		local file = ParaIO.open(filename,"w");
+		if(file:IsValid()) then
+			file:WriteString(NPL.ToJson(values));
+			file:close();
+		end
 
-        local bones = NplMicroRobot.getBonesDataFromInventory(inventory) or {};
-        bones = commonlib.copy(bones);
-        bones = NplMicroRobot.fixeRangesToJsIndex(bones)
-        bones = NplMicroRobot.fixRotationValuesAndID(bones);
+		if(exportType == "view")then
+			local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotAdapterPage.lua");
+			NplMicroRobotAdapterPage.ShowPage(values);
+			return
+		end
 
-        local values = bones;
-        -- test animation data
-        ParaIO.CreateDirectory(filename);
-        local file = ParaIO.open(filename,"w");
-        if(file:IsValid()) then
-		    file:WriteString(NPL.ToJson(values));
-		    file:close();
-	    end
+		values = NplMicroRobot.helper_clear_names(values)
 
-        if(type == "view")then
-            local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotAdapterPage.lua");
-            NplMicroRobotAdapterPage.ShowPage(values);
-            return
-        end
-
-        values = NplMicroRobot.helper_clear_names(values)
-
-        -- test running animation data
-        local data = NPL.ToJson(values);
-        local file = ParaIO.open(filename_really,"w");
-        if(file:IsValid()) then
-		    file:WriteString(data);
-		    file:close();
-	    end
-        code = NplMicroRobot.fixCode(code);
-        NplMicroRobot.Run(type,data,code);
+		-- test running animation data
+		local data = NPL.ToJson(values);
+		local file = ParaIO.open(filename_really,"w");
+		if(file:IsValid()) then
+			file:WriteString(data);
+			file:close();
+		end
+		code = NplMicroRobot.fixCode(code);
+		NplMicroRobot.Run(exportType, data, code);
     end
 end
 function NplMicroRobot.fixCode(code)
@@ -204,17 +267,6 @@ function NplMicroRobot.fixeRangesToJsIndex(bones)
     return result;
 end
 
-function NplMicroRobot.helper_ReadBonePropertiesFromName(name)
-    if(not name)then
-        return
-    end
-	local display_name, properties = name:match("^(.*)%s*(%{[^%}]+%})_rot");
-	if(properties) then
-		properties = NPL.LoadTableFromString(properties);
-	end
-    return display_name, properties;
-end
-
 function NplMicroRobot.helper_radianToDegreeInt(v)
     v = v * 180 / 3.1415926;
     v = math.floor(v + 0.5);
@@ -240,10 +292,10 @@ function NplMicroRobot.fixRotationValuesAndID(bones)
     end
     local result = {};
     for k,v in pairs(bones) do
-        if(type(v) == "table" and v.data)then
-            local name = v.name
-            local display_name, properties = NplMicroRobot.helper_ReadBonePropertiesFromName(name);
-            properties = properties or {};
+        if(type(v) == "table" and v.data and v.properties)then
+            local display_name = v.name;
+            local properties = v.properties;
+            v.properties = nil;
             local rotAxis = properties.rotAxis;
             local servoId = properties.servoId;
             local servoOffset = properties.servoOffset; -- input is radian
