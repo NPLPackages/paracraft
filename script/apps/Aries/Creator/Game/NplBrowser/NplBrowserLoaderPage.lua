@@ -198,6 +198,10 @@ function NplBrowserLoaderPage.Check(callback)
         return
     end
 
+    if(System.os.GetPlatform() == "mac")then
+        return
+    end
+
     local mod = BuildinMod.GetModByName("NplBrowser") or {};
     local version = mod.version;
 
