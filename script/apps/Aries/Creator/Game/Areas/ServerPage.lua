@@ -172,7 +172,7 @@ function ServerPage.CreateServer(host,port)
 	local maxPlayers = tonumber(page:GetValue("MaxPlayers", "16"));
 	local netWorkMode = page:GetValue("NetWorkMode", "Lan");
 
-	page:CloseWindow();
+	
 	if(not System.User.internet_ip) then
 		--ServerPage.GetInternetIP();	
 	end
@@ -198,6 +198,8 @@ function ServerPage.CreateServer(host,port)
 	else
 		-- TODO: unknown mode
 	end
+
+	page:Refresh(1);
 end
 
 function ServerPage.GetServerUrl()
@@ -439,4 +441,9 @@ function ServerPage.GetServerUrlTip()
 		end
 	end
 	return url;
+end
+
+
+function ServerPage.onClickGetPublicIP()
+	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/docs/tutorials/server_with_public_ip", "", "", 1)
 end

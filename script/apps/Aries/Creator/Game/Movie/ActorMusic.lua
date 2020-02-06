@@ -78,14 +78,15 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage(title, function(result)
 		if(result) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
-			local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 			local cmd_text = result;
 			local filename, start_time;
-			filename, cmd_text = CmdParser.ParseString(cmd_text);
-			filename = filename or "";
-			start_time, cmd_text = CmdParser.ParseInt(cmd_text);
+
+			filename, start_time = cmd_text:match("^(.+)[%s:]+([%d%.]+)%s*$");
+			if(start_time) then
+				start_time = tonumber(start_time) or 0;
+			end
 			start_time = start_time or 0;
+			filename = filename or cmd_text or "";
 
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");

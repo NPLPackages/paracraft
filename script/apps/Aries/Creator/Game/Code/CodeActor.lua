@@ -1067,3 +1067,18 @@ function Actor:FindActorsByRadius(radius, halfHeight)
 		return {};
 	end
 end
+
+function Actor:IsMatchMovie(name)
+	-- TODO: 
+	return false;
+end
+
+-- @param movieController: nil or a table of {time = 0, FrameMove = nil}, 
+-- movieController.FrameMove(deltaTime) will be assigned by this function.
+-- @return true if we can play the matched movie
+function Actor:PlayMatchedMovie(name, movieController)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+	if(channel:GetStartBlockPosition()) then
+		-- TODO: 
+	end
+end

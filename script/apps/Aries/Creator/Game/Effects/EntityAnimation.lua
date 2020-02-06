@@ -12,6 +12,8 @@ EntityAnimation.PlayAnimation(entity, "lie")
 EntityAnimation.PlayAnimation(entity, {"lie", 0,"sit"})
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 
 local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
@@ -42,6 +44,8 @@ local anim_map_haqi = {
 
 local anim_map_default;
 
+-- id to name are also read from this xml file.
+local modelAnimNamesFilename = "config/Aries/creator/modelAnim.xml";
 local id_to_names = {
 	[0] = L"待机", 
 	[1] = L"倒下", 
@@ -67,13 +71,8 @@ local id_to_names = {
 	[20003] = L"选择", 
 }
 
-function EntityAnimation.GetAnimTextByID(id)
-	local text = id_to_names[id or -1];
-	if(text) then
-		text = format("%d (%s)", id, text);
-	end
-	return text;
-end
+local assetNameToAnims = {};
+
 
 function EntityAnimation.Init()
 	if(EntityAnimation.isInited) then
@@ -102,6 +101,72 @@ function EntityAnimation.Init()
 		anim_map_player = anim_map_haqi;
 	end
 end
+
+-- public 
+-- @param id: animation id
+-- @param assetfile: some well known asset file name, such as "actor" or ""
+function EntityAnimation.GetAnimTextByID(id, assetfile)
+	local idToNames = EntityAnimation.GetIdNameMapByAssetfile(assetfile) or id_to_names;
+	idToNames = idToNames or id_to_names;
+	local text = idToNames[id or -1];
+	if(text) then
+		text = format("%d (%s)", id, text);
+	end
+	return text;
+end
+
+-- return nil or anim id to name map table for the given asset file
+function EntityAnimation.GetIdNameMapByAssetfile(assetfile)
+	if(assetfile) then
+		EntityAnimation.InitAnimNames();
+		return assetNameToAnims[assetfile];
+	end
+end
+
+function EntityAnimation.InitAnimNames()
+	if(EntityAnimation.initedAnimNames) then
+		return
+	end
+	EntityAnimation.initedAnimNames = true;
+	local xmlRoot = ParaXML.LuaXML_ParseFile(modelAnimNamesFilename);
+	if(xmlRoot) then
+		for node in commonlib.XPath.eachNode(xmlRoot, "/anims/model") do
+			if(node.attr and node.attr.text) then
+				local idNameMap = {};
+				
+				if(node.attr.path) then
+					assetNameToAnims[node.attr.path] = idNameMap;
+				end
+				if(node.attr.name) then
+					assetNameToAnims[node.attr.name] = idNameMap;
+					local path = PlayerAssetFile:GetFilenameByName(node.attr.name)
+					if(path) then
+						assetNameToAnims[path] = idNameMap;
+					end
+				end
+				if(node.attr.name2) then
+					assetNameToAnims[node.attr.name2] = idNameMap;
+					local path = PlayerAssetFile:GetFilenameByName(node.attr.name2)
+					if(path) then
+						assetNameToAnims[path] = idNameMap;
+					end
+				end
+
+				for itemnode in commonlib.XPath.eachNode(node, "/anim") do
+					if(itemnode.attr and itemnode.attr.id and itemnode.attr.desc) then
+						local id = tonumber(itemnode.attr.id)
+						if(id) then
+							idNameMap[id] = L(itemnode.attr.desc)
+						end
+					end
+				end
+			end
+		end
+	else
+		LOG.std(nil, "warn", "EntityAnimation", "failed to load from %s", modelAnimNamesFilename);
+	end
+end
+
 
 -- create get animation id by filename
 -- @param filename: must be string. 

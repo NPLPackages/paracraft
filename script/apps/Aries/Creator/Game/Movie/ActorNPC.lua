@@ -500,7 +500,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(animations) then
 				for _, anim in ipairs(animations) do
 					if(anim.animID) then
-						options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID)}
+						options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID, assetfile)}
 					end
 				end
 				table.sort(options, function(a, b)
@@ -516,7 +516,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local default_anim_placeholders = {0,4,5,13, 37,38,39,41,42,43,44,45,91,135,153, 154, 155, 156,}
 				for _, animId in ipairs(default_anim_placeholders) do
 					if(not hasAnims[animId]) then
-						options[#options+1] = {value = animId, text = EntityAnimation.GetAnimTextByID(animId)};
+						options[#options+1] = {value = animId, text = EntityAnimation.GetAnimTextByID(animId, assetfile)};
 					end
 				end
 			end

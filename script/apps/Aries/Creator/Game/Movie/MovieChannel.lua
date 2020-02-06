@@ -2,7 +2,7 @@
 Title: Movie Channel
 Author(s): LiXizhi
 Date: 2019/1/16
-Desc: there can only be one movie block is that playing per channel
+Desc: there can only be one movie block that is playing per channel
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
@@ -47,7 +47,7 @@ end
 
 function MovieChannel:Destroy()
 	self:Reset();
-	MovieClipRaw._super.Destroy(self);
+	MovieChannel._super.Destroy(self);
 end
 
 
@@ -237,5 +237,4 @@ function MovieChannel:Stop()
 	end
 	self:FireFinished();
 	self:stopped(); -- signal
-	
 end

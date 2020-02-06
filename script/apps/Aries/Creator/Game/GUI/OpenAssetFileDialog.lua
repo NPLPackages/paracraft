@@ -523,7 +523,7 @@ function OpenAssetFileDialog.GetAnimIdsByFilename(assetfile)
 		local options = {};
 		for _, anim in ipairs(animations) do
 			if(anim.animID) then
-				options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID)}
+				options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID, assetfile)}
 			end
 		end
 		table.sort(options, function(a, b)

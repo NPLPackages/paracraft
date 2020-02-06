@@ -157,7 +157,7 @@ end
 --}
 
 local function GetShortCutKeyDS()
-	filename = "config/Aries/creator/shortcutkey.xml";
+	local filename = "config/Aries/creator/shortcutkey.xml";
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
 		for node in commonlib.XPath.eachNode(xmlRoot, "/Items/Type") do
@@ -179,7 +179,7 @@ local function GetShortCutKeyDS()
 end
 
 local function GetAnimDS()
-	filename = "config/Aries/creator/modelAnim.xml";
+	local filename = "config/Aries/creator/modelAnim.xml";
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
 		for node in commonlib.XPath.eachNode(xmlRoot, "/anims/model") do
@@ -187,6 +187,10 @@ local function GetAnimDS()
 				local type_ds = {name = L(node.attr.text)};
 				anim_ds[#anim_ds + 1] = type_ds;
 				local content = "";
+				if(node.attr.desc) then
+					local text = string.format("%s",L(node.attr.desc));
+					content = content..text.."\n";
+				end
 				for itemnode in commonlib.XPath.eachNode(node, "/anim") do
 					if(itemnode.attr and itemnode.attr.id and itemnode.attr.desc) then
 						local text = string.format("%s:%s",L(itemnode.attr.id),L(itemnode.attr.desc));

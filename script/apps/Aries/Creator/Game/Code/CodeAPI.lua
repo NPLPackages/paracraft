@@ -37,6 +37,7 @@ local s_env_methods = {
 	"include",
 	"getActor",
 	"cmd",
+	"getPlayTimer",
 
 	-- Motion
 	"move",
@@ -72,6 +73,8 @@ local s_env_methods = {
 	"focus",
 	"camera",
 	"setMovie",
+	"isMatchMovie",
+	"playMatchedMovie",
 	"setMovieProperty",
 	"playMovie",
 	"stopMovie",

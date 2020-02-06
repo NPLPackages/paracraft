@@ -643,6 +643,70 @@ playMovie("main", 0, -1);
 },
 
 {
+	type = "isMatchMovie", 
+	message0 = L"是否匹配电影%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+	},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	output = {type = "null",},
+	funcName = "isMatchMovie",
+	func_description = 'isMatchMovie(%s)',
+	ToNPL = function(self)
+		return string.format('isMatchMovie("%s")\n', self:getFieldAsString('name'));
+	end,
+	examples = {{desc = L"myself代表当前代码方块的名字", canRun = true, code = [[
+if(isMatchMovie("myself")) then
+	playMatchedMovie("myself")
+end
+]]}},
+},
+
+{
+	type = "playMatchedMovie", 
+	message0 = L"播放匹配的电影%1,%2",
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+            shadow = { type = "text", value = "myself",},
+			text = "myself", 
+		},
+		{
+			name = "waitForFinish",
+			type = "field_dropdown",
+			options = {
+				{ L"并等待", "true" },
+				{ L"不等待", "false" },
+			},
+		},
+	},
+
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "playMatchedMovie",
+	func_description = 'playMatchedMovie(%s, %s)',
+	ToNPL = function(self)
+		return string.format('playMatchedMovie("%s", %s)\n', self:getFieldAsString('name'), self:getFieldAsString('waitForFinish'));
+	end,
+	examples = {{desc = L"myself代表当前代码方块的名字", canRun = true, code = [[
+if(isMatchMovie("myself")) then
+	playMatchedMovie("myself")
+end
+]]}},
+},
+
+{
 	type = "playMovie", 
 	message0 = L"播放电影频道%1从%2到%3毫秒",
 	arg0 = {

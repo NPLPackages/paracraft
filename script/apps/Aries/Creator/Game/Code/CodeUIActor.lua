@@ -658,3 +658,13 @@ end
 
 function Actor:BecomeAgent(entity)
 end
+
+function Actor:IsMatchMovie(name)
+	return false;
+end
+
+-- @param movieController: nil or a table of {time = 0, FrameMove = nil}, 
+-- movieController.FrameMove(deltaTime) will be assigned by this function.
+-- @return true if we can play the matched movie
+function Actor:PlayMatchedMovie(name, movieController)
+end

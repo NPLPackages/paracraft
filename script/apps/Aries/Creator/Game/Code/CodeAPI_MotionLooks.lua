@@ -457,19 +457,11 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 					end
 				end
 			end
-
-			if(not self.actor.playTimer) then
-				self.actor.playTimer = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
-				self.actor:Connect("beforeRemoved", function(actor)
-					if(actor.playTimer) then
-						self.codeblock:KillTimer(actor.playTimer);
-						actor.playTimer = nil;
-					end
-				end)
-			else
-				self.actor.playTimer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+			local timer = env_imp.getPlayTimer(self)
+			if(timer) then
+				timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+				timer:Change(0, deltaTime);
 			end
-			self.actor.playTimer:Change(0, deltaTime);
 		end
 	end
 end
@@ -529,13 +521,49 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 					end
 				end)
 			end
-			if(not self.actor.playTimers[boneName]) then
-				self.actor.playTimers[boneName] = self.codeblock:SetTimer(self.co:MakeCallbackFunc(frameMove_), 0, deltaTime);
-			else
-				self.actor.playTimers[boneName].callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+			local timer = env_imp.getPlayTimer(self, boneName)
+			if(timer) then
+				timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+				timer:Change(0, deltaTime);
 			end
-			self.actor.playTimers[boneName]:Change(0, deltaTime);
 		end
+	end
+end
+
+-- create or get timer for play back. 
+-- @param name: if nil, it is the default timer for play method, other named timers are support supported such as for bone animations. 
+function env_imp:getPlayTimer(name)
+	if(name) then
+		if(not self.actor.playTimers) then
+			self.actor.playTimers = {};
+			self.actor:Connect("beforeRemoved", function(actor)
+				if(actor.playTimers) then
+					for _, timer in pairs(actor.playTimers) do
+						self.codeblock:KillTimer(timer);
+					end
+					actor.playTimers = nil;
+				end
+			end)
+		end
+		local timer = self.actor.playTimers[name]
+		if(not timer) then
+			timer = self.codeblock:SetTimer();
+			self.actor.playTimers[name] = timer
+		end
+		return timer;
+	else
+		local timer = self.actor.playTimer
+		if(not timer) then
+			timer = self.codeblock:SetTimer();
+			self.actor.playTimer = timer
+			self.actor:Connect("beforeRemoved", function(actor)
+				if(actor.playTimer) then
+					self.codeblock:KillTimer(actor.playTimer);
+					actor.playTimer = nil;
+				end
+			end)
+		end
+		return timer;
 	end
 end
 
@@ -654,6 +682,22 @@ local function GetMovieChannelName_(name, codeblock)
 		name = codeblock:GetFilename();
 	end
 	return name;
+end
+
+local function GetMovieChannelByName_(name, codeblock)
+	name = GetMovieChannelName_(name, codeblock)
+	local channel = MovieManager:CreateGetMovieChannel(name);
+	if(not channel:GetStartBlockPosition() and name == codeblock:GetFilename()) then
+		local movieEntity = self.codeblock:GetMovieEntity();
+		if(movieEntity) then
+			local x, y, z = movieEntity:GetBlockPos();
+			channel:SetStartBlockPosition(x, y, z);
+		else
+			channel = nil;
+		end
+	end
+
+	return channel;
 end
 
 -- @param name: movie channel name. 
@@ -823,6 +867,58 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 				local entity = self.actor:GetEntity()
 				if(entity) then
 					entity:SetHeadOnDisplay(nil)
+				end
+			end
+		end
+	end
+end
+
+function env_imp:isMatchMovie(name)
+	if(self.actor) then
+		return self.actor:IsMatchMovie(name);
+	end
+end
+
+function env_imp:playMatchedMovie(name, bWaitForFinish)
+	local actor = env_imp.GetActor(self);
+	if(actor) then
+		local entity = env_imp.GetEntity(self);
+		if(not entity) then
+			return
+		end
+		entity:SetDummy(true);
+		entity:EnableAnimation(false);
+		
+		local channel = GetMovieChannelByName_(name, codeblock);
+		local movieController = {time = 0, FrameMove = nil};
+		if(channel and actor:PlayMatchedMovie(channel.name, movieController)) then
+			local timer = env_imp.getPlayTimer(self)
+			if(timer) then
+				local finished = false;
+				local playReturned = false;
+
+				local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
+				local function frameMove_(timer)
+					local delta = timer:GetDelta() * actor:GetPlaySpeed();
+					if(movieController.FrameMove) then
+						if(movieController.FrameMove(delta)) then
+							timer:Change();
+							finished = true;
+							if(playReturned and bWaitForFinish) then
+								env_imp.resume(self);
+							end
+						end
+					else
+						timer:Change();
+						finished = true;
+					end
+				end
+				timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+				timer:Change(0, deltaTime);
+
+				playReturned = true;
+				if(not finished and bWaitForFinish) then
+					env_imp.yield(self);
 				end
 			end
 		end

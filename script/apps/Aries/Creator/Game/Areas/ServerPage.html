@@ -157,6 +157,14 @@ end
             <pe:if condition='<%=IsInServer()%>'>
                 <div style="margin-top:10px;">
                     <div style="float:left;min-width:100px;">
+                        <%=L"服务器状态："%>
+                    </div>
+                    <div style="float:left;margin-left:5px;color:#47ba18">
+                        <%=L"已经启动"%>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <div style="float:left;min-width:100px;">
                         <%=L"服务器信息："%>
                     </div>
                     <div style="float:left;margin-left:5px">
@@ -173,7 +181,10 @@ end
                     <div style="float:left;margin-left:5px">
                         <div>
                             <input type="radio" checked="checked" id="Lan" name="NetWorkMode" value="Lan" style="margin-top:3px;margin-right:5px"/>
-                            <div for="Lan" style="float:left;"><%=L"局域网, IP地址:"%><%=NPL.GetExternalIP() %></div>
+                            <div style="float:left">
+                                <div for="Lan" style="float:left;"><%=L"局域网, IP地址:"%><%=NPL.GetExternalIP() %></div>
+                                <input type="button" onclick="ServerPage.onClickGetPublicIP"  value='<%=L"如何获得互联网IP?"%>' class="linkbutton_yellow" />
+                            </div>
                         </div>
                         <div style="margin-top:5px;">
                             <input type="radio" id="TunnelServer" name="NetWorkMode" value="TunnelServer" style="margin-top:3px;margin-right:5px"/>

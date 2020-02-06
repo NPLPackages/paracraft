@@ -8,13 +8,20 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/Exporter/WorldBlocksExporter.lua");
 local WorldBlocksExporter = commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.WorldBlocksExporter");
-local blocks_exporter = WorldBlocksExporter:new():Init("world_1");
+local blocks_exporter = WorldBlocksExporter:new():Init("world_1",{json = true, json_slice = false, x = false, zip = true, interval = 2000, });
+
+blocks_exporter:ExportRegionsByRadius(37,37,1,function()
+		_guihelper.MessageBox("done");
+end);
+
 local player = ParaScene.GetPlayer();
 local world_x,world_y,world_z = player:GetPosition();
-blocks_exporter:ReadRegion(world_x,world_y,world_z);
+blocks_exporter:ExportRegionsFrom(world_x,world_z,1,function()
+		_guihelper.MessageBox("done");
+end);
 -------------------------------------------------------
 ]]
-
+NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)Mod.ParaXExporter.BlockConfig");
@@ -77,9 +84,21 @@ end
 function WorldBlocksExporter:ctor()
 
 end
+-- @param output_worldname: the worldname
+-- @param options: extra options table
+-- @param options.root: the name of root folder for exporting, default is "BlocksExport"
+-- @param options.interval: the interval of timer for loading a region, default is 2000 milliseconds
+-- @param options.json: true to export .json file
+-- @param options.json_slice: true to slice json file
+-- @param options.x: true to export .x file
+-- @param options.zip: true to make .zip file
+function WorldBlocksExporter:Init(output_worldname,options)
+	self.output_worldname = output_worldname;
+	self.options = options or {};
+	self.options.root = self.options.root or "BlocksExport";
+	self.options.interval = self.options.interval or 2000;
 
-function WorldBlocksExporter:Init(output_file_name)
-	self.output_file_name = output_file_name;
+
 	self.mapTextures = {};
 	self.textures = {};
 	return self;
@@ -114,50 +133,136 @@ function WorldBlocksExporter:ExportTo_glTF(zip_file_name, output_dir)
 		ParaIO.DeleteFile(output_dir.."*.xml");
 	end
 end
-
-function WorldBlocksExporter:ReadRegion(world_x,world_y,world_z)
+function WorldBlocksExporter:ExportRegionsFrom(world_x, world_z, radius_region_num, callback)
 	local region_x, region_z = BlockEngine:GetRegionPos(world_x,world_z);
-	LOG.std(nil, "info", "WorldBlocksExporter", "get region index %f %f %f -> %d %d", world_x,world_y,world_z, region_x, region_z);
-	self:ReadChunks(region_x, region_z);
+end
+function WorldBlocksExporter:ExportRegionsByRadius(region_x, region_z, radius_region_num, callback)
+	local region_min_x = region_x - radius_region_num;
+	region_min_x = math.max(region_min_x,0);
+	local region_max_x = region_x + radius_region_num;
+
+	local region_min_z = region_z - radius_region_num;
+	region_min_z = math.max(region_min_z,0);
+	local region_max_z = region_z + radius_region_num;
+
+	local regions = {};
+	for x = region_min_x,region_max_x do
+		for z = region_min_z,region_max_z do
+			table.insert(regions,{
+					x = x, 
+					z = z,
+					region_min_x = region_min_x, 
+					region_min_z = region_min_z,
+					region_max_x = region_max_x, 
+					region_max_z = region_max_z,
+			});
+		end
+	end
+	self:ReadChunks_next(regions, 1, function()
+		if(self.options.zip)then
+			self:WriteToZip();
+		end
+		if(callback)then
+			callback();
+		end
+	end)
+end
+function WorldBlocksExporter:ReadChunks_next(regions, index, callback)
+	local region = regions[index];
+	if(not region)then
+		if(callback)then
+			callback();
+		end
+		return
+	end
+	local region_x = region.x;
+	local region_z = region.z;
+
+	local pos_x = region_x * BlockEngine.region_width;
+	local pos_z = region_z * BlockEngine.region_width;
+	local _,pos_y,_ = BlockEngine:real(region_x,10,region_z);
+	ParaScene.GetPlayer():SetPosition(pos_x,pos_y,pos_z);
+	_guihelper.MessageBox(string.format("exporing region:<br/>x %d->%d<br/>z %d->%d<br/>%d_%d",
+			region.region_min_x,region.region_max_x,
+			region.region_min_z,region.region_max_z,
+			region_x, region_z));
+	local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+		self:ExportRegion(region_x, region_z, function(x,z)
+			self:ReadChunks_next(regions, index+1, callback)
+		end)
+	end})
+	mytimer:Change(self.options.interval, nil)
 end
 
-function WorldBlocksExporter:ReadChunks(region_x, region_z)
-	local root_dir = ParaIO.GetParentDirectoryFromPath(self.output_file_name, 0);
-	local file_name = ParaIO.GetFileName(self.output_file_name);
-	file_name = string.match(file_name,"(.+)%.(%w+)$");
-	local zip_root_dir = string.format("%s%s/*.*", root_dir, file_name);
-	local zip_root_name = string.format("%s%s/%s_", root_dir, file_name, file_name);
-	local zip_file_name = string.format("%s%s.zip", root_dir, file_name);
+function WorldBlocksExporter:ExportRegion(region_x, region_z, callback)
+	LOG.std(nil, "info", "WorldBlocksExporter", "export region %d %d", region_x, region_z);
+	local root_dir = string.format("%s%s",ParaIO.GetCurDirectory(0),self.options.root);
+	local out_world_dir = string.format("%s/%s",root_dir, self.output_worldname);
+	LOG.std(nil, "info", "WorldBlocksExporter", "create out folder:%s", out_world_dir);
 
+	local out_dir_blocks_data_json
+	if(self.options.json)then
+		out_dir_blocks_data_json = string.format("%s/BlocksData/json",out_world_dir);
+		ParaIO.CreateDirectory(out_dir_blocks_data_json .. "/");
+	end
+	
+	local out_dir_blocks_data_x;
+	if(self.options.x)then
+		out_dir_blocks_data_x = string.format("%s/BlocksData/x",out_world_dir);
+		ParaIO.CreateDirectory(out_dir_blocks_data_x.. "/");
+	end
+
+	local blocks_map = {};
 	local startChunkX, startChunkZ = region_x * 32, region_z * 32;
 	-- read from lowest hight
 	for y = 0,BlockConfig.g_regionChunkDimY-1 do
 		for x = 0,BlockConfig.g_regionChunkDimX-1 do
 			for z = 0,BlockConfig.g_regionChunkDimX-1 do
-				self:ReadBlock(zip_root_name, startChunkX+x, y, startChunkZ+z);
+				local chunk_x = startChunkX+x;
+				local chunk_y = y;
+				local chunk_z = startChunkZ+z;
+				local blocks = self:ReadBlock(region_x, region_z, chunk_x,chunk_y,chunk_z);
+				local len = #blocks;
+				if(len > 0)then
+					-- export json
+					if(self.options.json)then
+						if(self.options.json_slice)then
+							local filename = string.format("%s/%d_%d_%d_%d_%d.json",out_dir_blocks_data_json,region_x,region_z,chunk_x,chunk_y,chunk_z);
+							WorldBlocksExporter:WriteToJson(filename, blocks)
+						else
+							local key = string.format("%d_%d_%d",chunk_x,chunk_y,chunk_z);
+							blocks_map[key] = blocks;
+						end
+					end
+					-- export x
+					if(self.options.x)then
+						local filename = string.format("%s/%d_%d_%d_%d_%d.x",out_dir_blocks_data_x,region_x,region_z,chunk_x,chunk_y,chunk_z);
+						WorldBlocksExporter:WriteToX(filename, blocks)
+					end
+				end
 			end
 		end
 	end
-
+	-- export json by region
+	if(self.options.json and not self.options.json_slice)then
+		local filename = string.format("%s/%d_%d.json",out_dir_blocks_data_json,region_x,region_z);
+		WorldBlocksExporter:WriteToJson(filename, blocks_map)
+	end
+	if(self.options.x)then
+		ParaIO.DeleteFile(out_dir_blocks_data_x.."/*.xml");
+		ParaIO.DeleteFile(out_dir_blocks_data_x.."/*.bmax");
+	end
+	-- export textures
 	ParaAsset.SetAssetServerUrl("http://cdn.keepwork.com/update61/assetdownload/update/");
 	WorldBlocksExporter.loadAssetFile(self.textures, function()
-		local output_root_folder = ParaIO.GetParentDirectoryFromPath(zip_root_name, 0);
-		WorldBlocksExporter.copyFiles(self.textures, output_root_folder);
+		WorldBlocksExporter.copyFiles(self.textures, out_world_dir);
+		if(callback)then
+			callback(region_x, region_z);
+		end
 	end);
-
-	local file = ParaIO.CreateZip(zip_file_name, "");
-	if (file:IsValid()) then
-		local dir_name = ParaIO.GetFileName(zip_file_name);
-		dir_name = string.match(dir_name,"(.+)%.(%w+)$");
-		file:AddDirectory(dir_name, zip_root_dir, 3);
-		file:close();
-	end
-	_guihelper.MessageBox("done");
 end
 
-function WorldBlocksExporter:ReadBlock(zip_root_name, chunk_x, chunk_y, chunk_z)
-	--LOG.std(nil, "info", "WorldBlocksExporter", "ReadBlock %d %d %d", block_x,block_y,block_z);
-
+function WorldBlocksExporter:ReadBlock(region_x, region_z, chunk_x, chunk_y, chunk_z)
 	local blocks = {};
 	local results = {};
 	ParaTerrain.GetBlocksInRegion(chunk_x, chunk_y, chunk_z, chunk_x, chunk_y, chunk_z, block.attributes.cubeMode, results);
@@ -176,27 +281,32 @@ function WorldBlocksExporter:ReadBlock(zip_root_name, chunk_x, chunk_y, chunk_z)
 			end
 		end
 	end
-
-	if (#blocks > 0) then
-		NPL.load("(gl)Mod/ParaXExporter/main.lua");
-		local ParaXExporter = commonlib.gettable("Mod.ParaXExporter");
-		local parax_name = zip_root_name..chunk_x.."_"..chunk_y.."_"..chunk_z..".x";
-		ParaXExporter:ConvertBlocksToParaX(blocks, parax_name, true);
-		local json_data = commonlib.Json.Encode(blocks, true);
-		if (json_data) then
-			local json_file_name = zip_root_name..chunk_x.."_"..chunk_y.."_"..chunk_z..".json";
-			--[[
-			local writer = ParaIO.CreateZip(json_file_name, "");
-			if (writer:IsValid()) then
-				writer:ZipAddData(ParaIO.GetFileName(json_file_name), json_data);
-				writer:close();
-			end
-			]]
-			local file = ParaIO.open(json_file_name, "w");
-			if(file:IsValid()) then
-				file:WriteString(json_data);
-				file:close();
-			end
+	return blocks;
+end
+function WorldBlocksExporter:WriteToX(file_name, blocks)
+	NPL.load("(gl)Mod/ParaXExporter/main.lua");
+	local ParaXExporter = commonlib.gettable("Mod.ParaXExporter");
+	ParaXExporter:ConvertBlocksToParaX(blocks, file_name, true);
+	
+end
+function WorldBlocksExporter:WriteToJson(json_file_name, blocks)
+	local json_data = commonlib.Json.Encode(blocks, true);
+	if (json_data) then
+		local file = ParaIO.open(json_file_name, "w");
+		if(file:IsValid()) then
+			file:WriteString(json_data);
+			file:close();
 		end
+	end
+end
+function WorldBlocksExporter:WriteToZip()
+	local root_dir = string.format("%s%s",ParaIO.GetCurDirectory(0),self.options.root);
+	local out_world_dir = string.format("%s/%s",root_dir, self.output_worldname);
+
+	local zip_file_name = string.format("%s/%s.zip", root_dir, self.output_worldname);
+	local file = ParaIO.CreateZip(zip_file_name, "");
+	if (file:IsValid()) then
+		file:AddDirectory(self.output_worldname, out_world_dir .. "/*.*", 10);
+		file:close();
 	end
 end
