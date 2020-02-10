@@ -281,3 +281,8 @@ function MovieClipRaw:FrameMove(deltaTime)
 		self:UpdateActors(deltaTime);
 	end
 end
+
+-- @param movieController: nil or a table of {time = 0, FrameMove = nil}, 
+-- movieController.FrameMove(deltaTime) will be assigned by this function.
+function MovieClipRaw:PlayMatchedMovie(playerEntity, movieController)
+end
