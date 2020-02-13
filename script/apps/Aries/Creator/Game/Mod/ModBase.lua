@@ -229,6 +229,10 @@ end
 
 function ModBase:SaveWorldData(worldpath)
 	if (not worldpath) then
+		if GameLogic.IsStarted then
+			worldpath = GameLogic.GetWorldDirectory()
+		end
+
 		return false;
 	end
 
