@@ -54,6 +54,7 @@ end
 
 -- force local time of bone variable
 -- @param time: if nil or -1, the bone will use character animation instance's time
+-- if -1000, it will temporarily disable external bone animation. 
 -- otherwise it will force using the given time from the time series, such allowing 
 -- users to control each bone's play time in time series. 
 function BoneVariable:SetTime(time)

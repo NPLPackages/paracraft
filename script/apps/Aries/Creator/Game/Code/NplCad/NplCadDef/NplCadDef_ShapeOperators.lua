@@ -124,6 +124,8 @@ local cmds = {
     ]]}},
 },
 
+
+
 {
 	type = "rotateFromPivot", 
 	message0 = L"旋转 %1 %2 度 中心点 %3 %4 %5",
@@ -562,6 +564,91 @@ local cmds = {
             self:getFieldValue('axis_plane'),
             self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
             );
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "setLocalPivotOffset", 
+	message0 = L"骨骼绑定中心点偏移 %1 %2 %3",
+    arg0 = {
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "setLocalPivotOffset",
+	func_description = 'setLocalPivotOffset(%s,%s,%s)',
+	func_description_js = 'setLocalPivotOffset(%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('setLocalPivotOffset(%s,%s,%s)\n', 
+            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "setLocalPivotOffset_Node", 
+	message0 = L"骨骼绑定中心点偏移 %1 %2 %3 %4",
+    arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "setLocalPivotOffset_Node",
+	func_description = 'setLocalPivotOffset_Node(%s,%s,%s,%s)',
+	func_description_js = 'setLocalPivotOffset_Node(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('setLocalPivotOffset_Node("%s",%s,%s,%s)\n', 
+            self:getFieldValue('name'),self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

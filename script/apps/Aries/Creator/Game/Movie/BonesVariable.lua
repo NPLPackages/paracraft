@@ -20,6 +20,7 @@ local ATTRIBUTE_FIELDTYPE = commonlib.gettable("System.Core.ATTRIBUTE_FIELDTYPE"
 
 local BonesVariable = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Common.MultiAnimBlock"), commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable"));
 BonesVariable.name = "bones";
+BonesVariable.actorBoneRange = "on"; -- temp value
 
 function BonesVariable:ctor()
 	self.selectedName = nil;
@@ -102,19 +103,24 @@ function BonesVariable:LoadFromActor()
 				local keyCount = var:GetKeyNum();
 				if(keyCount > 0) then
 					local name = var.name;
-					if(name:match("_rot$")) then
-						animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedQuaternion);
+					if(name == "range") then
+						self.hasRange = true;
 					else
-						animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedVector3);
+						if(name:match("_rot$")) then
+							animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedQuaternion);
+						else
+							animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedVector3);
+						end
+						local i=0;
+						animInstance:SetFieldKeyNums(name, keyCount);
+						for time, v in var:GetKeys_Iter(1, -1, 999999) do
+							animInstance:SetFieldKeyTime(name, i, time);
+							animInstance:SetFieldKeyValue(name, i, v);
+							i = i + 1;
+						end
+						HasKeys = true;
+					
 					end
-					local i=0;
-					animInstance:SetFieldKeyNums(name, keyCount);
-					for time, v in var:GetKeys_Iter(1, -1, 999999) do
-						animInstance:SetFieldKeyTime(name, i, time);
-						animInstance:SetFieldKeyValue(name, i, v);
-						i = i + 1;
-					end
-					HasKeys = true;
 				else
 					-- this should never happen
 					HasEmptyVariable = true;
@@ -132,6 +138,44 @@ end
 function BonesVariable:SaveToActor()
 	for name, var in pairs(self:GetVariables()) do
 		var:SaveToTimeVar();
+	end
+end
+
+-- this is a special variable for specifying the ranges when bone animations are enabled. 
+function BonesVariable:GetRangeVariable(bCreateGet)
+	local var = self:GetTimeVariable("range")
+	if(not var and bCreateGet) then
+		var = self:CreateTimeVariable("range")
+		self.hasRange = true;
+	end
+	return var;
+end
+
+function BonesVariable:HasRange()
+	return self.hasRange;
+end
+
+function BonesVariable:IsEnabledAtTime(time)
+	local var = self:GetRangeVariable()
+	if(var) then
+		local value = var:GetTime(1, time);
+		return value == nil or value == "on";
+	end
+end
+
+function BonesVariable:AutoEnableBonesAtTime(curTime)
+	if(self:HasRange()) then
+		local var = self:GetRangeVariable()
+		if(var) then
+			local actorBoneRange = var:getValue(1, curTime) or "on"
+			if(actorBoneRange ~= self.actorBoneRange) then
+				self.actorBoneRange = actorBoneRange;
+				local time = actorBoneRange == "on" and -1 or -1000;
+				for name, var in pairs(self:GetVariables()) do
+					var:SetTime(time)
+				end
+			end
+		end
 	end
 end
 
@@ -218,6 +262,8 @@ function BonesVariable:GetVariables()
 				end
 			end
 		end
+		local var = self:GetRangeVariable(true)
+		self.variables:add(var);
 	end
 	return self.variable_names;
 end
@@ -249,7 +295,28 @@ function BonesVariable:getValue(anim, time)
 	if(var) then
 		return var:getValue(anim, time);
 	else
-		return BonesVariable._super.getValue(self, anim, time);
+		local vars = BonesVariable._super.getValue(self, anim, time);
+		local text = nil;
+
+		local rangeVar = self:GetRangeVariable();
+		if(rangeVar) then
+			text = rangeVar:getValue(anim, time);
+			if(text) then
+				text = text == "on" and L"启用骨骼动画" or L"禁止骨骼动画"
+				text = text.."\n"
+			end
+		end
+
+		if(type(vars) == "table") then
+			for index, v in pairs(vars) do
+				local var = self:GetVariable(index)
+				if(var and var.name) then
+					text = (text or "")..var.name..";";
+				end
+			end
+		end
+
+		return text;
 	end
 end
 

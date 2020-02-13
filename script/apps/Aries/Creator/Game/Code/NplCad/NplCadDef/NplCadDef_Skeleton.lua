@@ -173,6 +173,40 @@ bindNodeByName("object1")
 },
 
 {
+	type = "rotateJoint", 
+	message0 = L"旋转 %1 %2 度",
+    arg0 = {
+        {
+			name = "axis",
+			type = "input_value",
+            shadow = { type = "axis", value = "x",},
+			text = "'x'", 
+		},
+        {
+			name = "angle",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+	},
+	category = "Skeleton", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "rotateJoint",
+	func_description = 'rotateJoint(%s,%s)',
+	func_description_js = 'rotateJoint(%s,%s)',
+	ToNPL = function(self)
+        return string.format('rotateJoint(%s,%s)\n', 
+            self:getFieldValue('axis'),self:getFieldValue('angle'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+
+{
 	type = "startBoneNameConstraint", 
 	message0 = L"约束骨骼属性",
     message1 = L"%1",

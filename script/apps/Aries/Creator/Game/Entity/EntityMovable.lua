@@ -248,8 +248,9 @@ function Entity:LoadFromXMLNode(node)
 	local attr = node.attr;
 	if(attr) then
 		self.skin = node.attr.skin;
+		
 		if(self.skin) then
-			Files.FindFile(self.skin);
+			self:FindSkinFiles(self.skin);
 		end
 
 		if(attr.random_walk_steps) then
@@ -291,7 +292,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.scaling) then
 		attr.scaling = self.scaling;
 	end
-	attr.skin = self.skin;
+	if(self.skin and self.skin~="") then
+		attr.skin = self.skin;
+	end
 	if(self.showHeadOn) then
 		attr.showHeadOn = self.showHeadOn;
 	end
@@ -326,16 +329,34 @@ function Entity:GetSkin()
 	return self.skin;
 end
 
+-- @param skin: if nil, it will use the default skin. 
+-- if it only contains file path, then by default it will always be set at replaceable texture id 2.
+-- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
+-- @return true if all files exist, false if not
+function Entity:FindSkinFiles(skin)
+	local allExists = true;
+	if(skin and skin:match("^(%d+):[^;+]")) then
+		for id, filename in skin:gmatch("(%d+):([^;]+)") do
+			allExists = Files.FindFile(filename) and allExists;
+		end
+	elseif(skin ~= "") then
+		allExists = Files.FindFile(skin) and allExists;
+	end
+	return allExists;
+end
+
 -- set new skin texture by filename. 
 -- @param skin: if nil, it will use the default skin. 
+-- if it only contains file path, then by default it will always be set at replaceable texture id 2.
+-- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
 function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		self.skin = skin;
 		if(skin) then
-			if(Files.FindFile(skin)) then
+			if(self:FindSkinFiles(skin)) then
 				self:RefreshClientModel();
 			else
-				LOG.std(nil, "warn", "Entity:SetSkin", "unknown skin %s", tostring(skin));
+				LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
 			end
 		else
 			self:RefreshSkin();
@@ -364,20 +385,45 @@ function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
 	if(player) then
 		local skin = self:GetSkin();
-		if(skin) then
-			player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
-		else
-			-- if model has shared skin skin file
+		self.skins_ = self.skins_ or {};
+		local skins = self.skins_;
+		for id, skin in pairs(skins) do
+			skin.last_filename = skin.filename;
+			skin.filename = nil;
+		end
+
+		if(skin and skin~="") then
+			if(skin:match("^(%d+):")) then
+				for id, filename in skin:gmatch("(%d+):([^;]+)") do
+					id = tonumber(id)
+					skins[id] = skins[id] or {};
+					skins[id].filename = filename;
+					player:SetReplaceableTexture(id, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(filename), 1));
+				end
+			else
+				player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+				skins[2] = skins[2] or {};
+				skins[2].filename = skin;
+			end
+		end
+		if(not skins[2] or not skins[2].filename) then
+			-- if model has shared skin file at id 2
 			if(PlayerSkins:CheckModelHasSkin(self:GetMainAssetPath())) then
 				local item = self:GetItemClass();
 				if(item) then
 					local skin = item:GetSkinFile();
 					if(skin) then
 						player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+						skins[2] = skins[2] or {}
+						skins[2].filename = skin;
 					end	
 				end
-			else
-				player:SetReplaceableTexture(2, player:GetDefaultReplaceableTexture(2));	
+			end
+		end
+
+		for id, skin in pairs(skins) do
+			if(not skin.filename and skin.last_filename) then
+				player:SetReplaceableTexture(id, player:GetDefaultReplaceableTexture(id));	
 			end
 		end
 	end

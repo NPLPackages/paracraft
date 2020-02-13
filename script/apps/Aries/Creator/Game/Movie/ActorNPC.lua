@@ -334,9 +334,8 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 			self.entity:SetSentientField(0);
 			self.entity:SetServerEntity(isServerEntity == true);
 
-			if(skin) then
-				self.entity:SetSkin(skin);
-			end
+			self.entity:SetSkin(skin);
+			
 			self.entity:SetCanRandomMove(false);
 			self.entity:SetDisplayName(name);
 			self.entity:EnableAnimation(not animate_by_script);
@@ -491,6 +490,12 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		-- get {{value, text}} array of all animations in the asset file. 
 		local options = {};
 		local assetfile = self:GetValue("assetfile", curTime);
+		if(not assetfile) then
+			local entity = self:GetEntity()
+			if(entity) then
+				assetfile = entity:GetMainAssetPath();
+			end
+		end
 		if(assetfile) then
 			assetfile = PlayerAssetFile:GetFilenameByName(assetfile)
 			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
@@ -541,6 +546,13 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 
 	elseif(keyname == "assetfile") then
 		local title = format(L"起始时间%s, 请输入模型路经或名称(默认default)", strTime);
+
+		if(old_value == nil) then
+			local entity = self:GetEntity()
+			if(entity) then
+				old_value = entity:GetMainAssetPath();
+			end
+		end
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
@@ -595,25 +607,17 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	elseif(keyname == "skin") then
 		local title = format(L"起始时间%s, 请输入皮肤ID或名称", strTime);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(title, function(result)
-			if(result and result~="") then
-				if(result:match("^%d+$")) then
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
-					local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins");
-					result = PlayerSkins:GetSkinByString(result);
-				end
-				-- trim strings
-				result = result:gsub("%s+$", "")
-				result = result:gsub("^%s+", "")
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+		local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+		EditSkinPage.ShowPage(function(result)
+			if(result) then
 				self:AddKeyFrameByName(keyname, nil, result);
 				self:FrameMovePlaying(0);
 				if(callbackFunc) then
 					callbackFunc(true);
 				end
 			end
-		end,old_value, L"贴图文件", "texture");
+		end, old_value, title)
 
 	elseif(keyname == "scaling") then
 		local title = format(L"起始时间%s, 请输入放大系数(默认1)", strTime);
@@ -811,6 +815,32 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 						end
 					end,old_value)
 				end
+			else
+				local rangeVar = var:GetRangeVariable();
+				if(rangeVar) then
+					old_value = rangeVar:getValue(1, curTime) or "on";
+				else
+					old_value = "on";
+				end
+				
+				-- TODO: use a dedicated UI 
+				local title = format(L"起始时间%s, 请输入on或off<br/>on代表禁用骨骼动画，off代表使用骨骼动画<br/>", strTime);
+				
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+				local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+				EnterTextDialog.ShowPage(title, function(result)
+					if(result and (result=="on" or result=="off") and old_value~=result) then
+						local bEnabled = CmdParser.ParseBool(result);
+						self:BeginModify();
+						local rangeVar = var:GetRangeVariable(true);
+						rangeVar:AddKey(curTime, result)
+						self:EndModify();
+						self:FrameMovePlaying(0);
+						if(callbackFunc) then
+							callbackFunc(true);
+						end
+					end
+				end, old_value)
 			end
 		end
 	elseif(keyname == "parent") then
@@ -1268,6 +1298,8 @@ function Actor:FrameMovePlaying(deltaTime)
 	blockinhand = self:GetValue("blockinhand", curTime);
 	cam_dist = self:GetValue("cam_dist", curTime);
 
+	self:GetBonesVariable():AutoEnableBonesAtTime(curTime);
+	
 	if(new_x) then
 		entity:SetPosition(new_x, new_y, new_z);
 	end
