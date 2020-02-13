@@ -141,10 +141,10 @@ end
 function ModBase:SetWorldData(key, data, worldpath)
 	if (not worldpath) then
 		if GameLogic.IsStarted then
-			worldpath = GameLogic.GetWorldDirectory()
+			worldpath = GameLogic.GetWorldDirectory();
+		else
+			return false;
 		end
-
-		return false;
 	end
 
 	local modName = self.Name;
@@ -193,10 +193,11 @@ end
 function ModBase:GetWorldData(key, worldpath)
 	if (not worldpath) then
 		if GameLogic.IsStarted then
-			worldpath = GameLogic.GetWorldDirectory()
+			worldpath = GameLogic.GetWorldDirectory();
+		else
+			return false;
 		end
 
-		return false;
 	end
 
 	if (self.worldData == nil) then
@@ -230,10 +231,10 @@ end
 function ModBase:SaveWorldData(worldpath)
 	if (not worldpath) then
 		if GameLogic.IsStarted then
-			worldpath = GameLogic.GetWorldDirectory()
+			worldpath = GameLogic.GetWorldDirectory();
+		else
+			return false;
 		end
-
-		return false;
 	end
 
 	local modName = self.Name;
