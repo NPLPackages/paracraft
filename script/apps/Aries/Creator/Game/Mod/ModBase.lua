@@ -140,50 +140,54 @@ end
 -- e.g self:SetWorldData("mydata",{ hello="world", thank="you" })
 function ModBase:SetWorldData(key, data, worldpath)
 	if (not worldpath) then
-		if GameLogic.IsStarted then
+		if (GameLogic.IsStarted) then
 			worldpath = GameLogic.GetWorldDirectory();
 		else
 			return false;
 		end
 	end
 
+	if (self.worldpath ~= worldpath) then
+		self.worldData = nil;
+	end
+
+	self.worldpath = worldpath;
+
 	local modName = self.Name;
 
-	if (self.worldData == nil) then
+	if (not self.worldData) then
 		local filePath = worldpath .. "mod/" .. modName .. ".xml";
 		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
+		
+		if (not self.worldData) then
+			self.worldData = {{ name = modName }};
+			ParaIO.CreateDirectory(worldpath .. "mod/");
+		end
 	end
 
-	if (self.worldData) then
-		--If exist the same key,delete it.
-		for key, value in pairs(self.worldData[1]) do
-			if (value.name == key) then
-				self.worldData[1][key] = nil;
+	local bIsExist = false;
+
+	for Wkey, WItem in pairs(self.worldData[1]) do
+		if (type(WItem) == 'table' and WItem.name == key) then
+			if type(data) == 'table' then
+				self.worldData[1][Wkey] = { commonlib.serialize_compact(data), name = key, attr = { type = type(data)}};
+			else
+				self.worldData[1][Wkey] = { data, name = key, attr = { type = type(data) }};
 			end
-		end
-	else
-		self.worldData = {{ name = modName }};
-		ParaIO.CreateDirectory(worldpath .. "mod/");
-	end
 
-	local count = 0;
-	local newWorldData = {{name=modName}};
+			bIsExist = true;
 
-	for key,value in pairs(self.worldData[1]) do
-		if (type(key) == "number") then
-			count = count + 1;
-			newWorldData[1][count] = value;
+			break;
 		end
 	end
 
-	if type(data) == 'table' then
-		newWorldData[1][count + 1] = { commonlib.serialize_compact(data), name = key, attr = { type = type(data)}};
-	else
-		newWorldData[1][count + 1] = { data, name = key, attr = { type = type(data) }};
+	if (not bIsExist) then
+		if type(data) == 'table' then
+			self.worldData[1][#self.worldData[1] + 1] = { commonlib.serialize_compact(data), name = key, attr = { type = type(data)}};
+		else
+			self.worldData[1][#self.worldData[1] + 1] = { data, name = key, attr = { type = type(data) }};
+		end
 	end
-
-	self.worldData = newWorldData;
-	return nil;
 end
 
 -- get any data
@@ -192,13 +196,18 @@ end
 -- return { hello = "world", thank = "you" }
 function ModBase:GetWorldData(key, worldpath)
 	if (not worldpath) then
-		if GameLogic.IsStarted then
+		if (GameLogic.IsStarted) then
 			worldpath = GameLogic.GetWorldDirectory();
 		else
 			return false;
 		end
-
 	end
+
+	if self.worldpath ~= worldpath then
+		self.worldData = nil;
+	end
+
+	self.worldpath = worldpath;
 
 	if (self.worldData == nil) then
 		local modName = self.Name;
