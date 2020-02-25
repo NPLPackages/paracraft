@@ -607,6 +607,12 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	elseif(keyname == "skin") then
 		local title = format(L"起始时间%s, 请输入皮肤ID或名称", strTime);
 
+		local assetFilename;
+		local entity = self:GetEntity()
+		if(entity) then
+			assetFilename = entity:GetMainAssetPath();
+		end
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 		local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
 		EditSkinPage.ShowPage(function(result)
@@ -617,7 +623,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end, old_value, title)
+		end, old_value, title, assetFilename)
 
 	elseif(keyname == "scaling") then
 		local title = format(L"起始时间%s, 请输入放大系数(默认1)", strTime);
@@ -654,19 +660,21 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	elseif(keyname == "facing" or keyname == "HeadUpdownAngle" or keyname=="HeadTurningAngle") then
 		local title;
 		if(keyname == "facing") then
-			title = format(L"起始时间%s, 请输入转身的角度(-3.14, 3.14)", strTime);
+			title = format(L"起始时间%s, 请输入转身的角度".."[-180, 180]", strTime);
 		elseif(keyname == "HeadUpdownAngle") then
-			title = format(L"起始时间%s, 请输入头部上下运动的角度(-1.57, 1.57)", strTime);
+			title = format(L"起始时间%s, 请输入头部上下运动的角度".."[-90, 90]", strTime);
 		elseif(keyname == "HeadTurningAngle") then
-			title = format(L"起始时间%s, 请输入头部左右运动的角度(-1.57, 1.57)", strTime);
+			title = format(L"起始时间%s, 请输入头部左右运动的角度".."[-90, 90]", strTime);
 		end
 
+		old_value = (tonumber(old_value) or 0) / math.pi * 180
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
 			result = tonumber(result);
 			if(result) then
+				result = result / 180 * math.pi;
 				self:AddKeyFrameByName(keyname, nil, result);
 				self:FrameMovePlaying(0);
 				if(callbackFunc) then
@@ -675,8 +683,9 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end, old_value)
 	elseif(keyname == "head") then
-		local title = format(L"起始时间%s, 请输入头部角度(-1.57, 1.57)<br/>左右角度, 上下角度:", strTime);
-		old_value = string.format("%f, %f", self:GetValue("HeadTurningAngle", curTime) or 0,self:GetValue("HeadUpdownAngle", curTime) or 0);
+		local title = format(L"起始时间%s, 请输入头部角度[-90, 90]<br/>左右角度, 上下角度:", strTime);
+		old_value = string.format("%f, %f", (self:GetValue("HeadTurningAngle", curTime) or 0) / math.pi * 180, 
+			(self:GetValue("HeadUpdownAngle", curTime) or 0) / math.pi * 180);
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -685,8 +694,8 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
 				if(result and vars[1] and vars[2]) then
 					self:BeginUpdate();
-					self:AddKeyFrameByName("HeadTurningAngle", nil, vars[1]);
-					self:AddKeyFrameByName("HeadUpdownAngle", nil, vars[2]);
+					self:AddKeyFrameByName("HeadTurningAngle", nil, vars[1] / 180 * math.pi);
+					self:AddKeyFrameByName("HeadUpdownAngle", nil, vars[2] / 180 * math.pi);
 					self:EndUpdate();
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
@@ -696,8 +705,10 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end,old_value)
 	elseif(keyname == "rot") then
-		local title = format(L"起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>", strTime);
-		old_value = string.format("%f, %f, %f", self:GetValue("roll", curTime) or 0,self:GetValue("pitch", curTime) or 0,self:GetValue("facing", curTime) or 0);
+		local title = format(L"起始时间%s, 请输入roll, pitch, yaw [-180, 180]<br/>", strTime);
+		old_value = string.format("%f, %f, %f", (self:GetValue("roll", curTime) or 0) / math.pi * 180,
+			(self:GetValue("pitch", curTime) or 0) / math.pi * 180,
+			(self:GetValue("facing", curTime) or 0) / math.pi * 180);
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -706,9 +717,9 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
 				if(result and vars[1] and vars[2] and vars[3]) then
 					self:BeginUpdate();
-					self:AddKeyFrameByName("roll", nil, vars[1]);
-					self:AddKeyFrameByName("pitch", nil, vars[2]);
-					self:AddKeyFrameByName("facing", nil, vars[3]);
+					self:AddKeyFrameByName("roll", nil, vars[1] / 180 * math.pi);
+					self:AddKeyFrameByName("pitch", nil, vars[2] / 180 * math.pi);
+					self:AddKeyFrameByName("facing", nil, vars[3] / 180 * math.pi);
 					self:EndUpdate();
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
@@ -790,8 +801,8 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local quat = rotVar:getValue(1, curTime);
 				if(quat) then
 					local yaw, roll, pitch = Quaternion.ToEulerAngles(quat) 
-					local title = format(L"起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>", strTime);
-					old_value = string.format("%f, %f, %f", roll or 0,pitch or 0,yaw or 0);
+					local title = format(L"起始时间%s, 请输入roll, pitch, yaw [-180, 180]<br/>", strTime);
+					old_value = string.format("%f, %f, %f", (roll or 0) / math.pi * 180, (pitch or 0) / math.pi * 180, (yaw or 0) / math.pi * 180);
 					-- TODO: use a dedicated UI 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 					local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -800,7 +811,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 							local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
 							if(result and vars[1] and vars[2] and vars[3]) then
 								self:BeginUpdate();
-								roll, pitch, yaw  = vars[1], vars[2], vars[3];
+								roll, pitch, yaw  = vars[1] / 180 * math.pi, vars[2] / 180 * math.pi, vars[3] / 180 * math.pi;
 								self:BeginModify();
 								quat = Quaternion.FromEulerAngles(quat, yaw, roll, pitch);
 								rotVarCpp:LoadFromTimeVar();
@@ -1300,10 +1311,6 @@ function Actor:FrameMovePlaying(deltaTime)
 
 	self:GetBonesVariable():AutoEnableBonesAtTime(curTime);
 	
-	if(new_x) then
-		entity:SetPosition(new_x, new_y, new_z);
-	end
-
 	if(obj) then
 		if(cam_dist) then
 			obj:SetField("ObjectToCameraDistance", cam_dist);
@@ -1313,6 +1320,10 @@ function Actor:FrameMovePlaying(deltaTime)
 		obj:SetField("yaw", yaw or 0);
 		obj:SetField("roll", roll or 0);
 		obj:SetField("pitch", pitch or 0);
+
+		if(new_x) then
+			entity:SetPosition(new_x, new_y, new_z);
+		end
 		
 		-- this may cause animation instance to lose all custom bones, Time and EnableAnim properties. 
 		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then

@@ -28,6 +28,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/McmlBlocklyDef/McmlBlockly.lua");
     elseif(filename == "npl_micro_robot") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobot.lua");
+	elseif(filename == "npl_blockpen") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockPenDef/BlockPen.lua");
 	elseif(filename == "commands") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsBlockly.lua");
 	else
@@ -45,7 +47,7 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 end
 
 function LanguageConfigurations:IsBuildinFilename(filename)
-	return filename == "" or filename=="npl" or filename=="npl_cad" or filename=="npl_micro_robot" 
+	return filename == "" or filename=="npl" or filename=="npl_cad" or filename=="npl_micro_robot"  or filename=="npl_blockpen" 
 end
 
 -- enable caching

@@ -353,11 +353,10 @@ function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		self.skin = skin;
 		if(skin) then
-			if(self:FindSkinFiles(skin)) then
-				self:RefreshClientModel();
-			else
+			if(not self:FindSkinFiles(skin)) then
 				LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
 			end
+			self:RefreshClientModel();
 		else
 			self:RefreshSkin();
 		end

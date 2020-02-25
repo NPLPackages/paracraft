@@ -38,6 +38,8 @@ local selectable_var_list = {
 	"pos", -- multiple of x,y,z
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling",
+	"---", -- separator
+	"parent", 
 	"static", -- multiple of "name" and "isAgent"
 };
 
@@ -59,6 +61,7 @@ function Actor:GetMultiVariable()
 		var:AddVariable(self:GetVariable("eye_liftup"));
 		var:AddVariable(self:GetVariable("eye_rot_y"));
 		var:AddVariable(self:GetVariable("eye_roll"));
+		-- var:AddVariable(self:GetVariable("parent"));
 		self:SetCustomVariable("multi_variable", var);
 		return var;
 	end
@@ -143,6 +146,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	timeseries:CreateVariableIfNotExist("has_collision", "Discrete");
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
 	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
+	timeseries:CreateVariableIfNotExist("parent", "LinearTable");
 	
 	self:AddValue("position", self.GetPosVariable);
 	self:AddValue("roll", self.GetRollVariable);
@@ -315,6 +319,59 @@ function Actor:IsAllowUserControl()
 			(((self:GetMultiVariable():GetLastTime()+1) <= curTime) or not MovieClipTimeLine.IsDraggingTimeLine());
 	end
 end
+
+-- return the parent link and parent actor if found.
+-- @return parent, curTime, parentActor, keypath: where parent contains local transform relative to target:
+--  in the form {target="fullname", pos={}, rot={}, use_rot=true}
+function Actor:GetParentLink(curTime)
+	curTime = curTime or self:GetTime();
+	local parent = self:GetValue("parent", curTime);
+	if(parent and type(parent) == "table" and parent.target and parent.target ~="")then
+		-- animate linking to another actor's bone animation. 
+		local actorname, keypath = parent.target:match("^([^:]+):*(.*)"); 
+		if(actorname) then
+			local parentActor = self:FindActor(actorname);
+			if(parentActor and parentActor~=self) then
+				return parent, curTime, parentActor, keypath;
+			end
+		end
+	end
+end
+
+function Actor:ComputePosition(curTime)
+	local new_x = self:GetValue("lookat_x", curTime);
+	local new_y = self:GetValue("lookat_y", curTime);
+	local new_z = self:GetValue("lookat_z", curTime);
+
+	-- animate linking to another actor's bone animation. 
+	local parent, _, parentActor, keypath = self:GetParentLink(curTime);
+	if(keypath and parentActor and parentActor.ComputeWorldTransform)then
+		local p_x, p_y, p_z = parentActor:ComputeWorldTransform(keypath, curTime, parent.pos, parent.rot, parent.use_rot); 
+		if(p_x) then
+			new_x, new_y, new_z = p_x, p_y, p_z;
+		else
+			if(self.last_unknown_keypath~=keypath and keypath and keypath~="") then
+				-- here we just wait 500 and try again only once for a given bone keypath.
+				self.last_unknown_keypath = keypath;
+				self.loader_timer = self.loader_timer or commonlib.Timer:new({callbackFunc = function(timer)
+					self:FrameMovePlaying(0);
+				end})
+				LOG.std(nil, "info", "ActorCamera", "parent bone may be async loading, wait 500ms");
+				self.loader_timer:Change(500, nil);
+			end
+		end
+	end
+
+	if(new_x and new_y and new_z) then
+		if(self.offset_x) then
+			new_x = self.offset_x + new_x;
+			new_y = self.offset_y + new_y;
+			new_z = self.offset_z + new_z;
+		end
+	end
+	return new_x, new_y, new_z;
+end
+
 local camera_params = {0,0,0}; -- yaw, pitch, roll
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
@@ -334,6 +391,7 @@ function Actor:FrameMovePlaying(deltaTime)
 
 	local allow_user_control;
 	if(entity:HasFocus()) then
+		local parent = self:GetParentLink(curTime);
 		local isBehindLastFrame = ((self:GetMultiVariable():GetLastTime()+1) <= curTime);
 		if(isBehindLastFrame) then
 			if(not self.isBehindLastFrame) then
@@ -343,13 +401,13 @@ function Actor:FrameMovePlaying(deltaTime)
 		else
 			self.isBehindLastFrame = isBehindLastFrame;
 		end
-		allow_user_control = not self:IsPlayingMode() and isBehindLastFrame;
+		allow_user_control = (not self:IsPlayingMode() and isBehindLastFrame) and (not parent);
 		if( not allow_user_control ) then
 			ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
 			self:UpdateFPSView(curTime);
 		end
 		entity:SetCameraRoll(eye_roll or 0);
-		if(isBehindLastFrame) then
+		if(isBehindLastFrame and not parent) then
 			return;
 		end
 	else
@@ -368,17 +426,8 @@ function Actor:FrameMovePlaying(deltaTime)
 	
 
 	if(not allow_user_control) then
-		local new_x = self:GetValue("lookat_x", curTime);
-		local new_y = self:GetValue("lookat_y", curTime);
-		local new_z = self:GetValue("lookat_z", curTime);
-
+		local new_x, new_y, new_z = self:ComputePosition(curTime);
 		if(new_x and new_y and new_z) then
-			if(self.offset_x) then
-				new_x = self.offset_x + new_x;
-				new_y = self.offset_y + new_y;
-				new_z = self.offset_z + new_z;
-			end
-			
 			entity:SetPosition(new_x, new_y, new_z);
 			-- due to floating point precision of the view matrix, slowly moved camera may jerk.
 			--LOG.std(nil, "debug", "ActorCamera", "x,y,z: %f %f %f", new_x, new_y, new_z);
@@ -437,6 +486,24 @@ function Actor:SetRestoreCamSettings(settings)
 	if(entity) then
 		return entity:SetRestoreCamSettings(settings);
 	end
+end
+
+-- force adding current values to all transform variables, these include position and rotation.
+function Actor:KeyTransform()
+	local curTime = self:GetTime();
+	local entity = self.entity;
+	if(not entity or not curTime) then
+		return
+	end
+	entity:UpdatePosition();
+	local x,y,z = entity:GetPosition();
+	self:BeginUpdate();
+
+	self:AutoAddKey("lookat_x", curTime, x);
+	self:AutoAddKey("lookat_y", curTime, y);
+	self:AutoAddKey("lookat_z", curTime, z);
+	
+	self:EndUpdate();
 end
 
 function Actor:CreateKeyFromUI(keyname, callbackFunc)
@@ -554,6 +621,24 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end
 		end,old_value)
+	elseif(keyname == "parent") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.lua");
+		local EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");
+		EditParentLinkPage.ShowPage(strTime, self, function(values)
+			if(values.target=="") then
+				-- this will automatically add a key frame, when link is removed. 
+				self:KeyTransform();
+			end
+			self:AddKeyFrameByName(keyname, nil, values);
+			self:FrameMovePlaying(0);
+			if(target~="") then
+				-- this will automatically add a key frame at the position. 
+				self:KeyTransform();
+			end
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+		end, old_value);
 	elseif(keyname == "static") then
 		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0)}
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");

@@ -5,7 +5,8 @@ to_id： optional, from id to to_id.
 is_sdk: only shown in sdk mode
 test_sdk: only shown in sdk mode
 block_data: optional, preferred block data when created, such as those with colors
-entity_data: optional, preferred entity data when created. 
+server_data: optional, preferred server data when created. 
+icon: optional icon
 -->
 <blocklist>
   <category name="static" text="方块">    
@@ -255,6 +256,7 @@ entity_data: optional, preferred entity data when created.
     <block name="pigeon"/>
     <block name="dog"/>
     <block name="chicken"/>
+    <block name="CodeBlock" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
 	</category>
 	
   <category name="gear" text="机关">

@@ -926,6 +926,9 @@ function BaseContext:HandleGlobalKey(event)
 				elseif(dik_key == "DIK_O") then
 					-- show module manager
 					GameLogic.RunCommand("/menu file.loadworld");
+				elseif(dik_key == "DIK_N") then
+					-- show module manager
+					GameLogic.RunCommand("/menu file.createworld");
 				elseif(dik_key == "DIK_F") then
 					-- find block 
 					GameLogic.RunCommand("/menu window.find");

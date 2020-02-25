@@ -141,7 +141,6 @@ function MobPropertyPage.ShowSkinPage()
 			end
 		end
 	end
-	
 end
 
 local asset_file_ds;

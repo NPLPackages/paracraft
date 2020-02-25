@@ -140,8 +140,8 @@ function Item:OnClick()
 		end
 		-- normal block
 		if(GameMode:IsUseCreatorBag()) then
-			if(self.block_data or self.block_entity) then
-				local item = ItemStack:new():Init(block_id, 1, self.block_entity);
+			if(self.block_data or self.server_data) then
+				local item = ItemStack:new():Init(block_id, 1, self.server_data);
 				item:SetPreferredBlockData(self.block_data)
 				GameLogic.SetBlockInRightHand(item);
 			else

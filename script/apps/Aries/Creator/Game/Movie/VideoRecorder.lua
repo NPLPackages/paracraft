@@ -20,12 +20,47 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 
+-- TODO: modify this if you updated the plugin
+local download_url = "https://cdn.keepwork.com/paracraft/Mod/MovieCodecPluginV9.zip"
+local download_version = "0.0.9";
 -- this is the minimum version 
 VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 8;
+
 
 local max_resolution = {4906, 2160};
 local default_resolution = {640, 480};
 local before_capture_resolution;
+
+-- automatically download and install the plugin
+function VideoRecorder.InstallPlugin(callbackFunc)
+	-- GameLogic.RunCommand("/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12")
+	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+	local ModManager = commonlib.gettable("Mod.ModManager");
+	ModManager:GetLoader():InstallFromUrl(download_url, function(bSucceed, msg, package) 
+		LOG.std(nil, "info", "CommandInstall", "bSucceed:  %s: %s", tostring(bSucceed), msg or "");
+		if(bSucceed and package) then
+			ModManager:GetLoader():SetPluginInfo(package.name, {
+				url = download_url, 
+				displayName = L"电影导出插件", 
+				version = download_version,
+				author = "lixizhi",
+				packageId = 12, 
+				homepage = "https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12",
+		        projectType = "paracraft",
+			})
+			ModManager:GetLoader():RebuildModuleList();
+			ModManager:GetLoader():EnablePlugin(package.name, true, true);
+			ModManager:GetLoader():SaveModTableToFile();
+			ModManager:GetLoader():LoadPlugin(package.name);
+			
+		end
+		if(callbackFunc) then
+			callbackFunc(bSucceed);
+		end
+	end);
+end
+
 function VideoRecorder.ToggleRecording()
 	if(ParaMovie.IsRecording()) then
 		VideoRecorder.EndCapture();
@@ -104,9 +139,17 @@ function VideoRecorder.BeginCapture(callbackFunc)
 			end
 		end);
 	else
-		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 请到官方网站下载安装", function(res)
+		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 是否现在安装？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
-				GameLogic.RunCommand("/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12")
+				_guihelper.MessageBox(L"正在安装, 请稍后...");
+				VideoRecorder.InstallPlugin(function(bSucceed)
+					if(bSucceed) then
+						_guihelper.MessageBox(nil);
+						VideoRecorder.BeginCapture(callbackFunc)
+					else
+						_guihelper.MessageBox(L"安装失败了");
+					end
+				end)
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
 		if(callbackFunc) then

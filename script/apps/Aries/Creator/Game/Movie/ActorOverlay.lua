@@ -310,22 +310,24 @@ color("#ff0000"); font(14);<br/>
 	elseif(keyname == "facing") then
 		local title;
 		if(keyname == "facing") then
-			title = format(L"起始时间%s, 请输入转身的角度(-3.14, 3.14)", strTime);
+			title = format(L"起始时间%s, 请输入转身的角度".."[-180, 180]", strTime);
 		end
 
+		old_value = (tonumber(old_value) or 0) / math.pi * 180
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(title, function(result)
 			result = tonumber(result);
 			if(result) then
+				result = result / 180 * math.pi;
 				self:AddKeyFrameByName(keyname, nil, result);
 				self:FrameMovePlaying(0);
 				if(callbackFunc) then
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end, old_value)
 	elseif(keyname == "color") then
 		local title = format(L"起始时间%s, 请输入颜色RGB. 例如:#ffffff", strTime);
 		
@@ -341,8 +343,10 @@ color("#ff0000"); font(14);<br/>
 			end
 		end,old_value)
 	elseif(keyname == "rot") then
-		local title = format(L"起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>", strTime);
-		old_value = string.format("%f, %f, %f", self:GetValue("roll", curTime) or 0,self:GetValue("pitch", curTime) or 0,self:GetValue("facing", curTime) or 0);
+		local title = format(L"起始时间%s, 请输入roll, pitch, yaw [-180, 180]<br/>", strTime);
+		old_value = string.format("%f, %f, %f", (self:GetValue("roll", curTime) or 0) / math.pi * 180,
+			(self:GetValue("pitch", curTime) or 0) / math.pi * 180,
+			(self:GetValue("facing", curTime) or 0) / math.pi * 180);
 		-- TODO: use a dedicated UI 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -351,9 +355,9 @@ color("#ff0000"); font(14);<br/>
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
 				if(result and vars[1] and vars[2] and vars[3]) then
 					self:BeginUpdate();
-					self:AddKeyFrameByName("roll", nil, vars[1]);
-					self:AddKeyFrameByName("pitch", nil, vars[2]);
-					self:AddKeyFrameByName("facing", nil, vars[3]);
+					self:AddKeyFrameByName("roll", nil, vars[1] / 180 * math.pi);
+					self:AddKeyFrameByName("pitch", nil, vars[2] / 180 * math.pi);
+					self:AddKeyFrameByName("facing", nil, vars[3] / 180 * math.pi);
 					self:EndUpdate();
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then

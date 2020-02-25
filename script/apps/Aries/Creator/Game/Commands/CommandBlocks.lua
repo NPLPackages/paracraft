@@ -641,8 +641,6 @@ Example:
 					color = Color.ToValue(color);
 					block_template:SetBlockColor(x,y,z, color)
 				end
-			else
-				GameLogic.AddBBS(nil, L"只能给特殊的ColorBlock上色");
 			end
 		end
 		return false;

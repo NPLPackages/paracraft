@@ -9,17 +9,6 @@ function ClosePage()
     Page:CloseWindow();
 end
 
-local languageList = {
-    {text=L"NPL"..L"(默认推荐)", value=""},
-    {text="NPL CAD", value="npl_cad"},
-    {text="MCML UI", value="mcml"},
-    {text="npl_micro_robot", value="npl_micro_robot"},
-    
-    -- {text="Python", value="python"},
-}
-function GetLanguageList()
-    return languageList;
-end
 ]]></script>
 
 <aries:window mode="thin" title='<%=L"代码方块设置"%>' onclose="ClosePage">
@@ -32,6 +21,7 @@ end
                 <option value="npl_cad">CAD</option>
                 <option value="mcml">MCML UI</option>
                 <option value="commands">commands</option>
+                <option value="npl_blockpen">pen</option>
             </select>
             <input type="button" style="margin-left:5px" class="button" name="btnChangeLang" value='<%=L"自定义语言..."%>' onclick="CodeBlockSettings.OnClickCustomLanguage"/>
         </div>

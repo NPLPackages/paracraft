@@ -77,14 +77,15 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		};
 	end
 	obj_params.name = "mc_player";
-	local skin;
-	local player = EntityManager.GetFocus();
-	if(player and player.GetSkin) then
-		skin = player:GetSkin();
+	pe_mc_player.AutoSetObjectSkin(obj_params)
+
+	if(obj_params.ReplaceableTextures[2]) then
+		local player = EntityManager.GetFocus();
+		if(player and player.GetSkin) then
+			obj_params.ReplaceableTextures[2] = player:GetSkin() or obj_params.ReplaceableTextures[2];
+		end
 	end
-	skin = skin or MyCompany.Aries.Game.PlayerController:GetSkinTexture();
 	
-	obj_params.ReplaceableTextures = {[2] = skin };
 	obj_params.facing = 1.57;
 	-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 	obj_params.Attribute = 128;
@@ -95,6 +96,16 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	pe_mc_player.OnFrameMove(ctl, mcmlNode);
 end
 
+function pe_mc_player.AutoSetObjectSkin(obj_params)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+	local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+	obj_params.ReplaceableTextures = obj_params.ReplaceableTextures or {};
+	if(not PlayerSkins:CheckModelHasSkin(obj_params.AssetFile)) then
+		obj_params.ReplaceableTextures[2] = nil;
+	else
+		obj_params.ReplaceableTextures[2] = MyCompany.Aries.Game.PlayerController:GetSkinTexture();
+	end
+end
 
 function pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 	if(mcmlNode.Canvas3D_ctl and filename and filename~="") then
@@ -103,6 +114,7 @@ function pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 		PlayerAssetFile:Init();
 
 		mcmlNode.obj_params.AssetFile = PlayerAssetFile:GetValidAssetByString(filename)
+		pe_mc_player.AutoSetObjectSkin(mcmlNode.obj_params);
 		mcmlNode.Canvas3D_ctl:ShowModel(mcmlNode.obj_params);
 	end
 end

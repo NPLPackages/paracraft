@@ -19,9 +19,12 @@ local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage
 
 -- data source 
 local ds_skins = {
-	{id=2, filename=""},
-	{id=3, filename=""},
-	{id=4, filename=""},
+	{id=2, filename="", hasSkin=false},
+	{id=3, filename="", hasSkin=false},
+	{id=4, filename="", hasSkin=false},
+	-- {id=0, filename="", hasSkin=false}, -- ParaX does not support R0 by design
+	{id=1, filename="", hasSkin=false},
+	{id=5, filename="", hasSkin=false},
 }
 
 local page;
@@ -97,12 +100,32 @@ end
 -- @param OnOK: function(values) end 
 -- @param old_value: "id:filename;id:filename;" or just "filename"
 -- @param title: custom title 
-function EditSkinPage.ShowPage(OnOK, old_value, title)
+function EditSkinPage.ShowPage(OnOK, old_value, title, assetFilename)
 	EditSkinPage.result = nil;
 	EditSkinPage.title = title;
 	old_value = old_value or "";
 	EditSkinPage.last_value = old_value;
+	EditSkinPage.assetFilename = assetFilename;
 
+	for _, skin in ipairs(ds_skins) do
+		skin.hasSkin = false;
+	end
+
+	if (assetFilename) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+		local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+		local model = PlayerSkins:GetModel(assetFilename)
+		if(model) then
+			for id, skins in pairs(model) do
+				for _, skin in ipairs(ds_skins) do
+					if(skin.id == id) then
+						skin.hasSkin = true;
+					end
+				end
+			end
+		end
+	end
+	
 	EditSkinPage.UpdateDataSourceFromValue(old_value)
 	
 	local params = {
@@ -167,6 +190,25 @@ function EditSkinPage.OnClickOpenTexture(id)
 				end
 			end
 		end, skin.filename, L"贴图文件", "texture");
+	end
+end
+
+function EditSkinPage.OnClickSelectSkin(id)
+	id = tonumber(id:match("%d+"));
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+	local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+	local skins = PlayerSkins:GetSkinsById(EditSkinPage.assetFilename, id)
+	if(skins) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SelectSkinPage.lua");
+		local SelectSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.SelectSkinPage");
+		SelectSkinPage.ShowPage(function(value)
+			if(type(value) == "table" and value.filename) then
+				EditSkinPage.SetSkin(id, value.filename)
+				if(page) then
+					page:Refresh(0.01)
+				end
+			end
+		end, skins)
 	end
 end
 

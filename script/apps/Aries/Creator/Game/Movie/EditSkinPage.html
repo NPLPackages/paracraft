@@ -17,13 +17,16 @@ EditSkinPage.OnInit();
     <div>
         <%=EditSkinPage.GetTitle()%>
     </div>
-    <pe:gridview style="margin-top:10px;height:90px;" name="gvwSkins" CellPadding="0" AllowPaging="false" DefaultNodeHeight="30" pagesize="6"
+    <pe:gridview RememberScrollPos="true" style="margin-top:10px;height:90px;" name="gvwSkins" CellPadding="0" AllowPaging="false" DefaultNodeHeight="30" pagesize="6"
                     DataSource='<%=EditSkinPage.GetSkinDS%>'>
         <Columns>
             <div style="height:30px;color: #ffffff;">
                 <div style="float:left;"><%=format(L"皮肤编号 %d:", Eval("id"))%></div>
-                <div style="float:left;margin-left:5px;width:280px"><input type="text" style="height:23px;" name='<%=Eval("id")%>' value='<%=Eval("filename")%>' onchange="EditSkinPage.OnChangeFilename"/></div>
+                <div style="float:left;margin-left:5px;width:250px"><input type="text" style="height:23px;" name='<%=Eval("id")%>' value='<%=Eval("filename")%>' onchange="EditSkinPage.OnChangeFilename"/></div>
                 <input type="button" name='<%=Eval("id")%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;min-width:20px;" value="..." onclick="EditSkinPage.OnClickOpenTexture" />
+                <pe:if condition='<%=Eval("hasSkin") == true%>'>
+                    <input type="button" name='<%=Eval("id").."select"%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;" value='<%=L"选择..."%>' onclick="EditSkinPage.OnClickSelectSkin" />
+                </pe:if>
             </div>
         </Columns>
     </pe:gridview>

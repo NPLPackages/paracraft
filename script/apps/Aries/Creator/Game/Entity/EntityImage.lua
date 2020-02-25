@@ -229,11 +229,11 @@ function Entity:LoadImageFile()
 			self.need_add_imagefile_loaded_time = true;
 		end
 		
-		if(self.imagefile_loaded_times >= 4) then
+		if(self.imagefile_loaded_times >= 16) then
+			self.imagefile_loaded_times=2*self.imagefile_loaded_times;
 			if(self:IsRemote() or (self.image_filename and self.image_filename:match("^https?://"))) then
 				self.texture:LoadAsset();
 				-- http or remote textures will have a much longer timeout.
-				self.imagefile_loaded_times=2*self.imagefile_loaded_times;
 				if(self.imagefile_loaded_times > 100) then
 					self.imagefile_loaded_timeout = true;
 				end

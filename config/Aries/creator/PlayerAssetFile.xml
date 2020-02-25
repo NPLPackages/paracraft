@@ -56,20 +56,30 @@
   <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
   <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
   <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
+  <asset filename="character/CC/02human/paperman/boy05.x" name="boy05" displayname="boy05"/>
+  <asset filename="character/CC/02human/paperman/boy06.x" name="boy06" displayname="boy06"/>
+  <asset filename="character/CC/02human/paperman/boy07.x" name="boy07" displayname="boy07"/>
   <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
   <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
+  <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
+  <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
 </category>
 <category name="people">
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />  
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
-  <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
+   <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
   <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
   <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
   <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
+  <asset filename="character/CC/02human/paperman/boy05.x" name="boy05" displayname="boy05"/>
+  <asset filename="character/CC/02human/paperman/boy06.x" name="boy06" displayname="boy06"/>
+  <asset filename="character/CC/02human/paperman/boy07.x" name="boy07" displayname="boy07"/>
   <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
   <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
+  <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
+  <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
   <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="大使" name="ABML"/>
 	<asset filename="character/v3/GameNpc/AD/AD.x" displayname="吉莉安" name="AD"/>
 	<asset filename="character/v3/GameNpc/BIANZANG/BIANZANG.x" displayname="拿斧头的老汉" name="BIANZANG"/>

@@ -27,7 +27,7 @@ end
 
 function ItemCodeBlock:CompareItems(left, right)
 	if(ItemCodeBlock._super.CompareItems(self, left, right) and left and right) then
-		return left:GetDataField("nplCode") == right:GetDataField("nplCode");
+		return (left:GetDataField("nplCode") == right:GetDataField("nplCode")) and (left:GetDataField("langConfigFile") == right:GetDataField("langConfigFile"));
 	else
 		return false;
 	end
@@ -70,6 +70,15 @@ end
 function ItemCodeBlock:PickItemFromPosition(x,y,z)
 	local itemStack = ItemCodeBlock._super.PickItemFromPosition(self, x,y,z)
 	if(itemStack) then
+		local entityCode = EntityManager.GetBlockEntity(x, y, z)
+		if(entityCode and entityCode.GetLanguageConfigFile) then
+			local lang = entityCode:GetLanguageConfigFile();
+			if(lang and lang ~= "" and lang ~= "npl") then
+				if(not itemStack:GetDataField("langConfigFile")) then
+					itemStack:SetDataField("langConfigFile", lang);
+				end
+			end
+		end
 		local data = itemStack:GetPreferredBlockData()
 		if(data ~= 0) then
 			if(data == 2048) then
@@ -88,4 +97,49 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 		end
 		return itemStack;
 	end
+end
+
+local displayMap = { npl_blockpen = "pen"}
+function ItemCodeBlock:GetLangIconDisplayText(langName)
+	return displayMap[langName or ""];
+end
+
+local tooltipMap = { 
+	npl_blockpen = L"画笔",
+	npl_micro_robot = L"机器人",
+	npl_cad = L"计算机辅助设计",
+	npl_python = L"Python",
+}
+function ItemCodeBlock:GetLangTooltipText(langName)
+	return tooltipMap[langName or ""] or langName;
+end
+
+
+-- virtual: draw icon with given size at current position (0,0)
+-- this function is only called when IsOwnerDrawIcon property is true. 
+-- @param width, height: size of the icon
+-- @param itemStack: this may be nil. or itemStack instance. 
+function ItemCodeBlock:DrawIcon(painter, width, height, itemStack)
+	ItemCodeBlock._super.DrawIcon(self, painter, width, height, itemStack)
+	if(itemStack) then
+		local lang = itemStack:GetDataField("langConfigFile")
+		local text = self:GetLangIconDisplayText(lang)
+		if(text) then
+			painter:DrawText(0, height-15, width-1, 15, text, 0x122);
+		end
+	end
+end
+
+function ItemCodeBlock:GetTooltipFromItemStack(itemStack)
+	local text = ItemCodeBlock._super.GetTooltipFromItemStack(self, itemStack)
+	if(itemStack) then
+		local lang = itemStack:GetDataField("langConfigFile")
+		if(lang) then
+			local tip = self:GetLangTooltipText(lang)
+			if(tip) then
+				text = (text or "").." "..tip;
+			end
+		end
+	end
+	return text;
 end

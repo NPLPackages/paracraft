@@ -18,6 +18,7 @@ Commands["install"] = {
 	desc=[[install a texture package, mod or bmax file from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
 /install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
+/install -mod https://cdn.keepwork.com/paracraft/Mod/MovieCodecPluginV9.zip
 /install -bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
 /install -ext bmax -filename car https://cdn.keepwork.com/paracraft/officialassets/car.bmax
 /install -ext fbx -filename car https://cdn.keepwork.com/paracraft/officialassets/car.fbx
@@ -56,8 +57,23 @@ Commands["install"] = {
 		
 		if(options["mod"]) then
 			if(url:match("^https?://")) then
-				GameLogic.RunCommand("/show mod")
-				ParaGlobal.ShellExecute("open", url, "", "", 1);
+				if(url:match("%.zip[^/]*$")) then
+					-- download zip directly
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
+					local ModManager = commonlib.gettable("Mod.ModManager");
+					ModManager:GetLoader():InstallFromUrl(url, function(bSucceed, msg, package) 
+						LOG.std(nil, "info", "CommandInstall", "bSucceed:  %s: %s", tostring(bSucceed), msg or "");
+						if(bSucceed and package) then
+							ModManager:GetLoader():LoadPlugin(package.name);
+							ModManager:GetLoader():RebuildModuleList();
+							ModManager:GetLoader():EnablePlugin(package.name, true, true);
+							ModManager:GetLoader():SaveModTableToFile();
+						end
+					end);
+				else
+					GameLogic.RunCommand("/show mod")
+					ParaGlobal.ShellExecute("open", url, "", "", 1);
+				end
 			end
 		elseif((options["bmax"] or options["ext"]) and options["filename"]) then
 			if(url:match("^https?://")) then

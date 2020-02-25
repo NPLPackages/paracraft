@@ -142,8 +142,11 @@ function ItemClient.LoadGlobalBlockList()
 						if(attr.block_data) then
 							itemDS.block_data = tonumber(attr.block_data);
 						end
-						if(attr.entity_data) then
-							itemDS.entity_data = NPL.LoadTableFromString(attr.entity_data);
+						if(attr.server_data) then
+							itemDS.server_data = NPL.LoadTableFromString(attr.server_data);
+						end
+						if(attr.icon) then
+							itemDS.icon = attr.icon;
 						end
 						if(attr.to_id) then
 							local to_id = tonumber(attr.to_id);

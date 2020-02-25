@@ -83,9 +83,7 @@ function SkinPage.ShowPage(entity)
 end
 
 function SkinPage.OnChangeAvatarModel()
-    local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
     NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
-	
 	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
     local lastFilename = EntityManager.GetPlayer():GetMainAssetPath();
 	lastFilename = PlayerAssetFile:GetNameByFilename(lastFilename)
@@ -140,4 +138,22 @@ function SkinPage.OnOK()
 			player:SetSkin(cur_skin);
 		end
 	end
+end
+
+function SkinPage.OnChangeAvatarSkin()
+	local assetFilename = EntityManager.GetPlayer():GetMainAssetPath();
+	assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
+
+	if(page) then
+		page:CloseWindow();
+	end
+
+	local old_value = EntityManager.GetPlayer():GetSkin();
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+	local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+	EditSkinPage.ShowPage(function(result)
+		if(result and result~=old_value) then
+			EntityManager.GetPlayer():SetSkin(result);
+		end
+	end, old_value, "", assetFilename)
 end

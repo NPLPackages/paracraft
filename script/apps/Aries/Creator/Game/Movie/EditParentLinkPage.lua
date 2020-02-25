@@ -87,7 +87,7 @@ function EditParentLinkPage.UpdateUIFromValue(values)
 	if(page and values) then
 		page:SetValue("target", values.target or "");
 		page:SetValue("pos", values.pos and string.format("%f,%f,%f", values.pos[1], values.pos[2], values.pos[3]) or "0,0,0");
-		page:SetValue("rot", values.rot and string.format("%f,%f,%f", values.rot[1], values.rot[2], values.rot[3]) or "0,0,0");
+		page:SetValue("rot", values.rot and string.format("%f,%f,%f", values.rot[1] / math.pi * 180, values.rot[2] / math.pi * 180, values.rot[3] / math.pi * 180) or "0,0,0");
 		page:SetValue("use_rot", values.use_rot and true or false);
 	end
 end
@@ -111,7 +111,7 @@ function EditParentLinkPage.OnOK()
 		end
 		local vars = CmdParser.ParseNumberList(page:GetValue("rot"), nil, "|,%s");
 		if(vars and vars[1] and vars[2] and vars[3]) then
-			v.rot = {vars[1], vars[2], vars[3]}
+			v.rot = {vars[1] / 180 * math.pi, vars[2] / 180 * math.pi, vars[3] / 180 * math.pi}
 		else
 			v.rot = {0,0,0}
 		end

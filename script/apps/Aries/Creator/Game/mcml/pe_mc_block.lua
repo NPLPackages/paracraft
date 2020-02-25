@@ -7,6 +7,8 @@ Desc:
 | name  | desc |
 | block_id | name or id |
 | block_data | optional block_data with colors |
+| server_data | optional server_data  |
+| icon | optional icon |
 | tooltip2 | second line of the tooltip |
 use the lib:
 ------------------------------------------------------------
@@ -85,6 +87,10 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 			local block_data = mcmlNode:GetAttributeWithCode("block_data", nil, true);
 			mcmlNode.block_data = block_data;
 			background = block_item:GetIcon(block_data):gsub("#", ";");	
+		end
+		local icon = mcmlNode:GetAttributeWithCode("icon", nil, true);
+		if(icon and icon ~= "") then
+			background = icon;
 		end
 	end
 	_this.background = background or "";
