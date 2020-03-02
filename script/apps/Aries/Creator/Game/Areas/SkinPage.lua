@@ -97,6 +97,9 @@ function SkinPage.OnChangeAvatarModel()
 			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
 			if(filepath and lastFilename~=filename) then
 				if(SkinPage.GetEntity() == EntityManager.GetPlayer()) then
+					if(not GameLogic.IsVip(nil, true)) then
+						return
+					end
 					GameLogic.RunCommand("/avatar "..filename);
 				end
 			end
@@ -153,6 +156,9 @@ function SkinPage.OnChangeAvatarSkin()
 	local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
 	EditSkinPage.ShowPage(function(result)
 		if(result and result~=old_value) then
+			if(not GameLogic.IsVip(nil, true)) then
+				return
+			end
 			EntityManager.GetPlayer():SetSkin(result);
 		end
 	end, old_value, "", assetFilename)

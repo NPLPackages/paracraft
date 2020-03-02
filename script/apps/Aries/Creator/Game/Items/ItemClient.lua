@@ -264,7 +264,7 @@ function ItemClient.MergeCustomBlockToDS(bImmediate)
 				end
 			end
 			for _, item in pairs(custom_block_ids) do
-				ds[#ds+1] = item;
+				ItemClient.AddBlock(item.block_id, nil, "tool")
 			end
 		end
 	end

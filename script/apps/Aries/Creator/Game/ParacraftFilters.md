@@ -72,6 +72,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnWorldUnloaded" when world is unloaded
   - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 
   - "cmd_loadworld", url, options: hook `/loadworld url` command
+  - "LocalLoadWorld.GetWorldFolderFullPath" filepath:
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
@@ -80,6 +81,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "item_client_new_item_type_added", block_id, item:
   - "user_event_stat", category, action, value, label:
   - "OnBeforeRestart", appName: before entire NPL runtime is restarted. 
+  
 - file exporters:
   - "file_exported", id, filename:
   - "GetExporters", exporters: file exporters

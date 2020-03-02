@@ -1159,6 +1159,7 @@ function options:GetUserType()
 	return self.userType;
 end
 
+-- one can also use GameLogic.IsVip()
 function options:IsVip()
 	local userType = self:GetUserType()
 	return userType == "vip" or userType == "teacher"

@@ -180,7 +180,108 @@ say(text, 1)
 ]]}},
 },
 
-
+{
+	type = "defineFunction", 
+	message0 = L"定义函数%1(%2)",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "", 
+		},
+		{
+			name = "param",
+			type = "field_input",
+			text = "", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "", 
+		},
+    },
+	previousStatement = true,
+	nextStatement = true,
+	hide_in_codewindow = true,
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'function %s(%s)\\n%send',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def %s(%s):\n    %s\n', self:getFieldAsString('name'), self:getFieldAsString('param'), input);
+	end,
+	ToNPL = function(self)
+		return string.format('function %s(%s)\n    %s\nend\n', self:getFieldAsString('name'), self:getFieldAsString('param'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+function thinkText(text)
+	say(text.."...")
+end
+thinkText("Let me think");
+]]}},
+},
+{
+	type = "functionParams", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = ""
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Data", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+    colourSecondary = "#ffffff",
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "callFunction", 
+	message0 = L"调用函数%1(%2)",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_input",
+			text = "log",
+		},
+		{
+			name = "param",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "param",},
+			text = "",
+		},
+	},
+	previousStatement = true,
+	nextStatement = true,
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s(%s)',
+	ToNPL = function(self)
+		return string.format('%s(%s)\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local thinkText = function(text)
+	say(text.."...")
+end
+thinkText("Let me think");
+]]}},
+},
 
 {
 	type = "code_block", 

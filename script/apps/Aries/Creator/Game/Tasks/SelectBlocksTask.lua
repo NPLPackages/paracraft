@@ -1098,7 +1098,62 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 			self.copy_task.operation = "add";
 		end
 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
+		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
+		if(Clipboard) then
+			--Clipboard.Save("block_template", self.copy_task);
+		end
+
 		BroadcastHelper.PushLabel({id="BuildMinimap", label = L"保存成功! Ctrl+V在鼠标所在位置粘贴！", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+	end
+end
+
+-- static public function: 
+-- copy current mouse cursor block to clipboard
+function SelectBlocks.CopyToClipboard()
+	local result = Game.SelectionManager:MousePickBlock();
+	if(result.blockX and result.side) then
+		local bx, by, bz = result.blockX, result.blockY, result.blockZ;
+		local b = {0, 0, 0}
+		b[4], b[5], b[6] = BlockEngine:GetBlockFull(bx, by, bz);
+		if(b[4]) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+			local task = BlockTemplate:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, 
+				blocks = {b},
+				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
+				
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
+			local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
+			local filedata = task:SaveTemplateToString();
+			if(filedata) then
+				if(Clipboard.Save("block_template", filedata)) then
+					GameLogic.AddBBS(nil, format(L"%d个方块已存到裁剪版", 1), 4000, "0 255 0");
+				end
+			end
+		end
+	end
+end
+
+-- static public function: clipboard
+function SelectBlocks.PasteFromClipboard()
+	local result = Game.SelectionManager:MousePickBlock();
+	if(result and result.blockX and result.side) then
+		local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
+		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
+		local obj = Clipboard.LoadByType("block_template")
+		if(type(obj) == "string") then
+			local xmlRoot = ParaXML.LuaXML_ParseString(obj);
+			if(xmlRoot) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+				local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+				local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 
+					UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
+				if(task:LoadTemplateFromXmlNode(xmlRoot)) then
+				end
+			end
+		end
 	end
 end
 

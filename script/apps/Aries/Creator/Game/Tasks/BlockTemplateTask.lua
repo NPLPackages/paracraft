@@ -152,10 +152,9 @@ function BlockTemplate:GetReferenceFiles(blocks)
 	end
 end
 
--- Load template
-function BlockTemplate:LoadTemplate()
-	local filename = self.filename;
-	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+-- @param filename: can be nil
+-- @return true if succeed
+function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 	if(xmlRoot) then
 		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
 		if(root_node and root_node[1]) then
@@ -220,10 +219,17 @@ function BlockTemplate:LoadTemplate()
 					return true;
 				end
 			end
-			
 		end
 	end
-	LOG.std(nil, "warn", "BlockTemplate", "failed to load template from file: %s", filename);
+end
+
+-- Load template
+function BlockTemplate:LoadTemplate()
+	local filename = self.filename;
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(not self:LoadTemplateFromXmlNode(xmlRoot, filename)) then
+		LOG.std(nil, "warn", "BlockTemplate", "failed to load template from file: %s", filename);
+	end
 end
 
 -- remove template
@@ -286,82 +292,85 @@ function BlockTemplate:MakeHollow()
 	end
 end
 
--- Save to template. if no 
--- self.params: root level attributes
--- self.filename: 
--- self.blocks: if nil, the current selection is used. 
-function BlockTemplate:SaveTemplate()
-	local filename = self.filename;
-	ParaIO.CreateDirectory(filename);
-	do
-		self.params = self.params or {};
-		self.params.auto_scale = self.auto_scale;
-		if(not self.params.relative_motion) then
-			self.params.relative_motion = self.relative_motion;
-		end
-		local o = {name="pe:blocktemplate", attr = self.params};
+-- return xml string or nil
+function BlockTemplate:SaveTemplateToString()
+	self.params = self.params or {};
+	self.params.auto_scale = self.auto_scale;
+	if(not self.params.relative_motion) then
+		self.params.relative_motion = self.relative_motion;
+	end
+	local o = {name="pe:blocktemplate", attr = self.params};
 
-		if(not self.blocks) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
-			local select_task = MyCompany.Aries.Game.Tasks.SelectBlocks.GetCurrentInstance();
-			if(select_task) then
-				local pivot = select_task:GetPivotPoint();
-				if(self.auto_pivot) then
-					pivot = select_task:GetSelectionPivot();
-				end
-				self.params.pivot = string.format("%d,%d,%d",pivot[1],pivot[2],pivot[3]);
-				self.blocks = select_task:GetCopyOfBlocks(pivot);
-			else
-				return;
+	if(not self.blocks) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+		local select_task = MyCompany.Aries.Game.Tasks.SelectBlocks.GetCurrentInstance();
+		if(select_task) then
+			local pivot = select_task:GetPivotPoint();
+			if(self.auto_pivot) then
+				pivot = select_task:GetSelectionPivot();
 			end
+			self.params.pivot = string.format("%d,%d,%d",pivot[1],pivot[2],pivot[3]);
+			self.blocks = select_task:GetCopyOfBlocks(pivot);
+		else
+			return;
 		end
+	end
 
-		if(self.hollow) then
-			self:MakeHollow()
-		end
+	if(self.hollow) then
+		self:MakeHollow()
+	end
 		
-		o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
+	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 
-		if(self.exportReferencedFiles) then
-			local files = self:GetReferenceFiles(self.blocks)
-			if(files) then
-				for filename, _ in pairs(files) do
-					-- only export files in the current world directory. 
-					local filepath = GameLogic.GetWorldDirectory()..filename;
-					local file = ParaIO.open(filepath, "r")
-					if(file:IsValid()) then
-						local text = file:GetText(0, -1);
-						file:close();
-						if(text and text~="") then
-							NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+	if(self.exportReferencedFiles) then
+		local files = self:GetReferenceFiles(self.blocks)
+		if(files) then
+			for filename, _ in pairs(files) do
+				-- only export files in the current world directory. 
+				local filepath = GameLogic.GetWorldDirectory()..filename;
+				local file = ParaIO.open(filepath, "r")
+				if(file:IsValid()) then
+					local text = file:GetText(0, -1);
+					file:close();
+					if(text and text~="") then
+						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
 
-							o[2] = o[2] or {name="references", };
-							local ref = o[2];
-							ref[#ref+1] = {name="file", attr={filename=filename, encoding="base64"}, [1] = System.Encoding.base64(text)}
-						end
+						o[2] = o[2] or {name="references", };
+						local ref = o[2];
+						ref[#ref+1] = {name="file", attr={filename=filename, encoding="base64"}, [1] = System.Encoding.base64(text)}
 					end
 				end
 			end
 		end
+	end
 		
-		local xml_data = commonlib.Lua2XmlString(o, true, true);
-		if (xml_data) then
-			
-			if #xml_data >= 10240 then
-				local writer = ParaIO.CreateZip(filename, "");
-				if (writer:IsValid()) then
-					writer:ZipAddData("data", xml_data);
-					writer:close();
-				end
-			else
-				local file = ParaIO.open(filename, "w");
-				if(file:IsValid()) then
-					file:WriteString(xml_data);
-					file:close();
-				end
+	local xml_data = commonlib.Lua2XmlString(o, true, true);
+	return xml_data;
+end
+
+-- Save to template.
+-- self.params: root level attributes
+-- self.filename: 
+-- self.blocks: if nil, the current selection is used. 
+function BlockTemplate:SaveTemplate()
+	local xml_data = self:SaveTemplateToString()
+	if (xml_data) then
+		local filename = self.filename;
+		ParaIO.CreateDirectory(filename);
+		if #xml_data >= 10240 then
+			local writer = ParaIO.CreateZip(filename, "");
+			if (writer:IsValid()) then
+				writer:ZipAddData("data", xml_data);
+				writer:close();
+			end
+		else
+			local file = ParaIO.open(filename, "w");
+			if(file:IsValid()) then
+				file:WriteString(xml_data);
+				file:close();
 			end
 		end
-		
+	
 		if(filename:match("%.bmax$")) then
 			-- refresh it if it is a bmax model.
 			ParaAsset.LoadParaX("", filename):UnloadAsset();
@@ -369,8 +378,8 @@ function BlockTemplate:SaveTemplate()
 
 			Files.NotifyNetworkFileChange(filename);
 		end
-		return true;
 	end
+	return true;
 end
 
 function BlockTemplate:Redo()

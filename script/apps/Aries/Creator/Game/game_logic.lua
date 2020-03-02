@@ -1605,3 +1605,20 @@ function GameLogic:event(event)
 	end
 	GameLogic.GetCodeGlobal():HandleGameEvent(event);
 end
+
+-- @param level: vip level to check, can be nil. 
+-- @param bOpenUIIfNot: if true, we will display a message box asking user to login and guide the user to activate VIP if not. 
+-- @param callbackFunc: only called if user is vip and bOpenUIIfNot is true
+-- return true if the user is vip
+function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
+	if(System.User.isVip) then
+		return true;
+	elseif(bOpenUIIfNot) then
+		_guihelper.MessageBox(L"您需要充值为VIP用户，才能使用此功能", function()
+			-- TODO: 
+			-- step 1: sign in if not
+			-- step 2: if not vip, open external browser to let the user activate VIP
+			-- step 3: invoke callback if possible when user is already VIP. 	
+		end)
+	end
+end

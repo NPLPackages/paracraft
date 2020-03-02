@@ -389,5 +389,5 @@ function KeepWorkRegPage.OnClose()
 	page:CloseWindow();
 end
 function KeepWorkRegPage.VisitTaoMeeService()
-	ParaGlobal.ShellExecute("open", "http://keepwork.com/wiki/license", "", "", 1);
+	ParaGlobal.ShellExecute("open", "https://keepwork.com/official/keepwork/license/license_cn", "", "", 1);
 end

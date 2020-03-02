@@ -17,8 +17,12 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
 
--- simple log any object, same as echo. 
+-- simple log any object, similar to echo. 
 function env_imp:log(...)
+	GameLogic.GetCodeGlobal():log(...);
+end
+
+function env_imp:print(...)
 	GameLogic.GetCodeGlobal():log(...);
 end
 

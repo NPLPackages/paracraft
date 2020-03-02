@@ -80,6 +80,25 @@
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
   <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
   <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
+  
+  <asset filename="character/CC/02human/blockman/cunming.x" displayname="村民" name="cunming"/>
+  <asset filename="character/CC/02human/blockman/cunzhang.x" displayname="村长" name="cunzhang"/>
+  <asset filename="character/CC/02human/blockman/hong_gongbing.x" displayname="弓兵-红" name="hong_gongbing"/>
+  <asset filename="character/CC/02human/blockman/hong_xiaobing.x" displayname="小兵-红" name="hong_xiaobing"/>
+  <asset filename="character/CC/02human/blockman/lan_gongbing.x" displayname="弓兵-蓝" name="lan_gongbing"/>
+  <asset filename="character/CC/02human/blockman/lan_xiaobing.x" displayname="小兵-蓝" name="lan_xiaobing"/>
+  <asset filename="character/CC/02human/blockman/pangjuan_jiangjun.x" displayname="庞涓-将军形态" name="pangjuan_jiangjun"/>
+  <asset filename="character/CC/02human/blockman/shanzei.x" displayname="山贼" name="shanzei"/>
+  <asset filename="character/CC/02human/blockman/sunbin.x" displayname="孙膑" name="sunbin"/>
+  <asset filename="character/CC/02human/blockman/pangjuan.x" displayname="庞涓" name="pangjuan"/>
+  <asset filename="character/CC/02human/blockman/guiguzi.x" displayname="鬼谷子" name="guiguzi"/>
+  <asset filename="character/CC/02human/blockman/archer_black.x" displayname="小弓箭手黑色" name="archer_black"/>
+  <asset filename="character/CC/02human/blockman/archer_red.x" displayname="小弓箭手红色" name="archer_red"/>
+  <asset filename="character/CC/02human/blockman/soldier_black.x" displayname="小士兵黑色" name="soldier_black"/>
+  <asset filename="character/CC/02human/blockman/soldier_red.x" displayname="小士兵红色" name="soldier_red"/>
+  <asset filename="character/CC/02human/blockman/rider_black.x" displayname="小骑兵黑色" name="rider_black"/>
+  <asset filename="character/CC/02human/blockman/rider_red.x" displayname="小骑兵红色" name="rider_red"/>
+  
   <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="大使" name="ABML"/>
 	<asset filename="character/v3/GameNpc/AD/AD.x" displayname="吉莉安" name="AD"/>
 	<asset filename="character/v3/GameNpc/BIANZANG/BIANZANG.x" displayname="拿斧头的老汉" name="BIANZANG"/>
@@ -128,6 +147,7 @@
 	<asset filename="character/v5/01human/Wudi/Wudi.x" displayname="吴迪" name="Wudi"/>
 	<asset filename="character/v5/01human/XianDou/XianDou.x" displayname="仙兜小猪" name="XianDou"/>
 	<asset filename="character/v5/01human/ZhiHuiXing/ZhiHuiXing.x" displayname="启蒙导师" name="ZhiHuiXing"/>
+  
 </category>
 <category name="animals">  
   <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
@@ -279,6 +299,17 @@
 </category>
 <category name="props">  
   <asset filename="model/blockworld/BlockModel/block_model_one.x" name="cube" displayname="可换装立方体"/>
+  
+  <asset filename="character/CC/07items/bingdu.x" displayname="病毒" name="virus"/>
+  <asset filename="character/CC/07items/bingliben.x" displayname="病历本" name="medical_notebook"/>
+  <asset filename="character/CC/07items/shuyibao.x" displayname="输液包" name="blood_vessel"/>
+  <asset filename="character/CC/07items/tingzhengqi.x" displayname="听诊器" name="medical_detector"/>
+  <asset filename="character/CC/07items/wenduji.x" displayname="温度计" name="themo_meter"/>
+  <asset filename="character/CC/07items/yaopin.x" displayname="药瓶" name="medical_bottle"/>
+  <asset filename="character/CC/07items/yaowan.x" displayname="药丸" name="capsule"/>
+  <asset filename="character/CC/07items/yiliaoxiang.x" displayname="医疗箱" name="medical_case"/>
+  <asset filename="character/CC/07items/zhen.x" displayname="针" name="needle"/>
+  
   <asset filename="character/v3/Item/ObjectComponents/WEAPON/2133_SugarFree_PorkMeat_Max.anim.x" displayname="无糖猪肉" name="2133_SugarFree_PorkMeat_Max.anim"/>
 	<asset filename="character/v5/06quest/MysteryAcinusTree/MysteryAcinusTree.x" displayname="神秘浆果树" name="MysteryAcinusTree"/>
 	<asset filename="character/v5/06quest/ZodiacAnimalFlower/ZodiacAnimalFlower.x" displayname="动物花" name="ZodiacAnimalFlower"/>
@@ -379,6 +410,8 @@
 	<asset filename="model/06props/v5/03quest/TreasureBox/TreasureBox_04_an.x" displayname="一只绿色金色的箱子" name="TreasureBox_04_an"/>
 </category>
 <category name="equipment">  
+  <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows"/>
+  <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow"/>
   <asset filename="character/v3/Item/ObjectComponents/WEAPON/1290_VIPStaff1.anim.x" displayname="权杖1" name="1290_VIPStaff1.anim"/>
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1291_VIPStaff2.anim.x" displayname="权杖2" name="1291_VIPStaff2.anim"/>
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1292_VIPStaff3.anim.x" displayname="权杖3" name="1292_VIPStaff3.anim"/>

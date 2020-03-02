@@ -22,8 +22,15 @@ function OnToggleShader(bChecked)
         end
     end
 end
+
 function HasShader()
     return ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1) == 2
+end
+
+function OnToggleShowWatermark(bChecked)
+    if(not GameLogic.IsVip(nil, true)) then
+        Page:SetValue("IsShowLogo", true);
+    end
 end
 
 ]]></script>
@@ -90,7 +97,7 @@ end
     </div>
     <div>
         <input type="checkbox" name="IsRecordAudio" style="margin-top:3px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsRecordAudio"><%=L"录制声音"%></div>
-        <input type="checkbox" name="IsShowLogo" style="margin-top:3px;margin-left:20px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsShowLogo"><%=L"显示水印"%></div>
+        <input type="checkbox" name="IsShowLogo" onclick="OnToggleShowWatermark" style="margin-top:3px;margin-left:20px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsShowLogo"><%=L"显示水印"%></div>
         <input type="checkbox" name="checkboxShader" onclick="OnToggleShader" style="margin-top:3px;margin-left:20px;" checked='<%=HasShader()%>'/><div style="float:left;margin-left:3px;" for="checkboxShader"><%=L"真实光影"%></div>
     </div>
     <div  style="margin:5px;"><hr /></div>

@@ -277,6 +277,9 @@ function WorldCommon.SaveWorldAs()
 end
 
 function WorldCommon.SaveWorldAsImp(folderName)
+	if(not GameLogic.IsVip(nil, true)) then
+		return
+	end
 	if(WorldCommon.CopyWorldTo(folderName)) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
 		local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")

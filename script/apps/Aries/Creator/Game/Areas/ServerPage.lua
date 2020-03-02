@@ -34,6 +34,7 @@ ServerPage.serverRepeat_ds = {
 
 ServerPage.serverRepeat_index = 1;
 ServerPage.select_user_index = 1;
+ServerPage.maxPlayerNonVip = 3;
 
 local needRefreshUserDS = true;
 local passwordList;
@@ -169,10 +170,23 @@ function ServerPage.CreateServer(host,port)
 	end
 	ServerPage.server_detail = ""
 	local tunnelServerAddress = page:GetValue("TunnelServerAddress", "");
-	local maxPlayers = tonumber(page:GetValue("MaxPlayers", "16"));
+	local maxPlayers = tonumber(page:GetValue("MaxPlayers", "16")) or 2;
 	local netWorkMode = page:GetValue("NetWorkMode", "Lan");
 
-	
+	if(maxPlayers > ServerPage.maxPlayerNonVip) then
+		if(not GameLogic.IsVip()) then
+			maxPlayers = ServerPage.maxPlayerNonVip;
+			local serverManager = ServerManager.GetSingleton();
+			if(serverManager) then
+				serverManager:SetMaxPlayerCount(maxPlayers)
+				if(page) then
+					page:SetValue("MaxPlayers", maxPlayers);
+				end
+			end
+			GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
+		end
+	end
+
 	if(not System.User.internet_ip) then
 		--ServerPage.GetInternetIP();	
 	end
@@ -412,6 +426,13 @@ function ServerPage.OnChangeMaxPlayers(name, value)
 	value = tonumber(value)
 	local serverManager = ServerManager.GetSingleton();
 	if(serverManager and value) then
+		if(value > ServerPage.maxPlayerNonVip and not GameLogic.IsVip(nil, true)) then
+			value = ServerPage.maxPlayerNonVip;
+			if(page) then
+				page:SetValue("MaxPlayers", value);
+			end
+			GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
+		end
 		LOG.std(nil, "info", "ServerPage", "max player set to %d", value);	
 		serverManager:SetMaxPlayerCount(value);
 	end

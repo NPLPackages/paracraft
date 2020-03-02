@@ -143,23 +143,22 @@ function ParacraftCodeBlockly.CompileCode(code, filename, codeblock)
     if(entity.GetCodeLanguageType)then
         codeLanguageType = entity:GetCodeLanguageType();
     end
+
     if(codeLanguageType == "python")then
         local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
         local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2lua/polyfill.lua")
-        pyruntime:installMethods(codeblock:GetCodeEnv(),py_env);
-        -- this callback is synchronous 
-        pyruntime:transpile(code, function(res)
-            local lua_code = res.lua_code;
-            if(not lua_code)then
-                local error_msg = res.error_msg;
-	            LOG.std(nil, "error", "CodePyToNplPage", error_msg);
-                code = "";
-                return
-            end
-            code = lua_code;
-        end)
-		codeblock:SetModified(true);
-        return  compiler:Compile(code);
+        pyruntime:installMethods(codeblock:GetCodeEnv(), py_env);
+        
+		-- synchronous
+        local error, luacode = pyruntime:transpile(code)
+
+		if error then
+			local error_msg = luacode
+			return nil, luacode
+		end
+
+		codeblock:SetModified(true)
+        return compiler:Compile(luacode);
     else
 	    return compiler:Compile(code);
     end

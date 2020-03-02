@@ -54,6 +54,115 @@ local cmds = {
 },
 
 {
+	type = "pushNode", 
+	message0 = L"%1 创建 %2 %3 %4",
+	message1 = L"%1",
+    arg0 = {
+		{
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "var_name",
+			type = "field_variable",
+			variable = "object0",
+			variableTypes = {""},
+			text = "object0",
+		},
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"合并", "true" },
+				{ L"不合并", "false" },
+			},
+		},
+	},
+  arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	hide_in_codewindow = true,
+	funcName = "pushNode",
+	func_description = 'pushNode(%s,"%s",%s,%s)\\n%spopNode()',
+	func_description_js = 'pushNode(%s,"%s",%s,%s)\\n%spopNode()',
+	ToNPL = function(self)
+		return string.format('pushNode("%s","%s","%s",%s)\n%spopNode()', 
+        self:getFieldValue('op'), self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "pushNodeByName", 
+	message0 = L"%1 创建 %2 %3 %4",
+	message1 = L"%1",
+    arg0 = {
+		{
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "name",
+			type = "input_value",
+			shadow = { type = "text", value = "",},
+			text = "",
+		},
+        {
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"合并", "true" },
+				{ L"不合并", "false" },
+			},
+		},
+	},
+  arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+    previousStatement = true,
+	nextStatement = true,
+	funcName = "pushNode",
+	func_description = 'pushNode(%s,"%s",%s,%s)\\n%spopNode()',
+	func_description_js = 'pushNode(%s,"%s",%s,%s)\\n%spopNode()',
+	ToNPL = function(self)
+		return string.format('pushNode("%s","%s","%s",%s)\n%spopNode()', 
+        self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'), self:getFieldValue('value'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
 	type = "cube", 
 	message0 = L" %1 正方体 %2 %3",
     arg0 = {

@@ -920,18 +920,35 @@ function BaseContext:HandleGlobalKey(event)
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 					SelectBlocks.ToggleLastInstance();
+					event:accept();
 				elseif(dik_key == "DIK_M") then
 					-- show module manager
 					GameLogic.RunCommand("/show mod");
+					event:accept();
 				elseif(dik_key == "DIK_O") then
 					-- show module manager
 					GameLogic.RunCommand("/menu file.loadworld");
+					event:accept();
 				elseif(dik_key == "DIK_N") then
 					-- show module manager
 					GameLogic.RunCommand("/menu file.createworld");
+					event:accept();
 				elseif(dik_key == "DIK_F") then
 					-- find block 
 					GameLogic.RunCommand("/menu window.find");
+					event:accept();
+				elseif(dik_key == "DIK_C") then
+					-- copy current mouse cursor block to clipboard
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+					SelectBlocks.CopyToClipboard();
+					event:accept();
+				elseif(dik_key == "DIK_V") then
+					-- paste from clipboard
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+					SelectBlocks.PasteFromClipboard();
+					event:accept();
 				end
 			end
 		end

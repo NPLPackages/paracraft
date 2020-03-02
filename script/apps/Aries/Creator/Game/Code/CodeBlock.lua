@@ -172,6 +172,7 @@ end
 
 function CodeBlock:BeautifyCompilerErrorMsg(msg)
 	if(msg) then
+		msg = msg:gsub("invalid syntax at line (%d+) offset (%d+) in code", L"语法错误，在第%1行%2列的代码")
 		msg = msg:gsub("(%]:)(%d+)(:)", L"%1第%2行%3")
 		msg = msg:gsub("unfinished string near", L"没有完成的字符串在这个附近")
 		msg = msg:gsub("expected near", L"被期待在这个附近")

@@ -202,8 +202,18 @@ Commands["menu"] = {
 			GameLogic.RunCommand("/open https://github.com/LiXizhi/ParaCraft/issues");
 		elseif(name == "help.donate") then
 			GameLogic.RunCommand("/open "..L"http://www.nplproject.com/paracraft-donation");
+		elseif(name:match("^community")) then
+			local username = System.User.keepworkUsername
+			if(username) then
+				if(name == "community.myProfile") then
+					GameLogic.RunCommand("/open "..format("https://keepwork.com/u/%s", username));
+				elseif(name == "community.myProjects") then			
+					GameLogic.RunCommand("/open "..format("https://keepwork.com/u/%s/project", username));
+				end
+			end
 		end
 	end,
 };
+
 
 

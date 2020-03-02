@@ -76,33 +76,21 @@ function LocalLoadWorld.ShowOpenWorldPage()
 	LocalLoadWorld.ShowPage_imp();
 end
 
+-- @Note: please use LocalLoadWorld.GetWorldFolderFullPath instead
 -- return world folder such as "[writablepath]/worlds/MyWorlds"
 function LocalLoadWorld.GetWorldFolder()
 	return LocalLoadWorld.OpenWorld_Folder;
 end
 
 function LocalLoadWorld.GetWorldFolderFullPath()
-	local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath");
+	local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath", LocalLoadWorld.GetWorldFolder());
 
-	if (type(myWorldFolder) == 'string') then
-		if (not LocalLoadWorld.OpenWorldFolderFullPath) then
-			LocalLoadWorld.OpenWorldFolderFullPath = myWorldFolder;
-			if (not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
-				if (System.os.GetExternalStoragePath() ~= "") then
-					LocalLoadWorld.OpenWorldFolderFullPath = System.os.GetExternalStoragePath() .. "paracraft/" .. myWorldFolder;
-				else
-					LocalLoadWorld.OpenWorldFolderFullPath = ParaIO.GetWritablePath() .. LocalLoadWorld.OpenWorldFolderFullPath;
-				end
-			end
-		end
-		return LocalLoadWorld.OpenWorldFolderFullPath;
-	end
-
-	if(not LocalLoadWorld.OpenWorldFolderFullPath) then
-		LocalLoadWorld.OpenWorldFolderFullPath = LocalLoadWorld.GetWorldFolder();
-		if(not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
-			if(System.os.GetExternalStoragePath()~="") then
-				LocalLoadWorld.OpenWorldFolderFullPath = System.os.GetExternalStoragePath().."paracraft/worlds/DesignHouse";
+	if (not LocalLoadWorld.OpenWorldFolderFullPath) then
+		LocalLoadWorld.OpenWorldFolderFullPath = myWorldFolder;
+		
+		if (not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
+			if (System.os.GetExternalStoragePath() ~= "") then
+				LocalLoadWorld.OpenWorldFolderFullPath = System.os.GetExternalStoragePath() .. "paracraft/" .. myWorldFolder;
 			else
 				LocalLoadWorld.OpenWorldFolderFullPath = ParaIO.GetWritablePath() .. LocalLoadWorld.OpenWorldFolderFullPath;
 			end

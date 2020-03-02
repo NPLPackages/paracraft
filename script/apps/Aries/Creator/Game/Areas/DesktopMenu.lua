@@ -98,6 +98,18 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"致谢",name = "help.Credits", onclick=nil},
 			},
 		},
+		{text = L"在线社区", order=7, name = "community",children = 
+			{
+				{text = L"在线社区",name = "community.keepwork", cmd="/open https://keepwork.com"},
+				{text = L"探索",name = "community.explore", cmd="/open https://keepwork.com/explore?tab=pickedProjects"},
+				{text = L"学习",name = "community.learn", cmd="/open https://keepwork.com/s"},
+				{Type = "Separator"},
+				{text = L"我的主页",name = "community.myProfile", },
+				{text = L"我的项目",name = "community.myProjects", },
+				{text = L"我的机构",name = "community.mySchool", cmd="/open https://keepwork.com/s/myOrganization"},
+				
+			},
+		},
 	};
 
 	-- apply filter
