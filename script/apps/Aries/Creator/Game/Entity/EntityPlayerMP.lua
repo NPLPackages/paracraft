@@ -291,10 +291,7 @@ function Entity:UpdateEntityActionState()
 	local curSkinId = self:GetSkinId();
 	if(self.lastSkinId ~= curSkinId and curSkinId) then
 		self.lastSkinId = curSkinId;
-		local skin = PlayerSkins:GetSkinByID(curSkinId);
-		if(skin) then
-			self:SetSkin(skin, true);
-		end
+		self:SetSkin(curSkinId, true);
 	end
 	local dataWatcher = self:GetDataWatcher();
 	local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);

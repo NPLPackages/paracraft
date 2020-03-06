@@ -95,6 +95,7 @@ function SystemSettingsPage.OnInit()
 		{text=L"游戏", name="gameparma"},
 		{text=L"控制", name="operation"},
 		{text=L"其他", name="others"},
+		{text=L"世界", name="world"},
 	}
 
 	SystemSettingsPage.sound_volume_list = {
@@ -1157,10 +1158,10 @@ function SystemSettingsPage.ShowPage()
 		DestroyOnClose = true,
 		bToggleShowHide=true, 
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = false,
+		allowDrag = true,
 		enable_esc_key = true,
 		--bShow = bShow,
-		click_through = true, 
+		click_through = false, 
 		zorder = -1,
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
@@ -1240,4 +1241,20 @@ function SystemSettingsPage.OnSetSchoolMode()
 			end
 		end
 	end, _guihelper.MessageBoxButtons.YesNo);
+end
+
+function SystemSettingsPage.OnClickIsVipWorld(value)
+	if(not GameLogic.IsReadOnly()) then
+		if(GameLogic.IsVip(nil, true)) then
+			GameLogic.options:SetVipWorld(value)
+		end
+	end
+end
+
+function SystemSettingsPage.OnClickHasCopyright(value)
+	if(not GameLogic.IsReadOnly()) then
+		if(GameLogic.IsVip(nil, true)) then
+			GameLogic.options:SetHasCopyright(value)
+		end
+	end
 end

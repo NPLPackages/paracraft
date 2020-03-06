@@ -26,6 +26,7 @@ local help_disable_btn_bg = "Texture/Aries/Common/Teen/control/help_disable_32bi
 
 local mc_window_bg = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;267 89 34 34:8 8 8 8";
 local mc_close_btn_bg = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;363 59 26 26:7 7 7 7";
+local mc_help_btn_bg = "Texture/Aries/Common/Teen/control/help_32bits.png;0 0 20 20" -- "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;173 204 16 20";
 local mc_line = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;352 66 1 1";
 
 
@@ -263,6 +264,17 @@ function pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _par
 	_guihelper.SetButtonFontColor(_this, "#FCFCFC", "#FCFCFC");
 	_parent:AddChild(_this);
 	
+	local onhelp = mcmlNode:GetString("onhelp");
+	if(onhelp and onhelp ~= "")then
+		_this = ParaUI.CreateUIObject("button", "help_btn_bg", "_lt", w - 54, 5, 20, 20);
+		_parent:AddChild(_this);
+		_this.background = mc_help_btn_bg;
+		_this.tooltip = L"点击查看帮助";
+		_this:SetScript("onclick", function()
+			Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onhelp, buttonName, mcmlNode)
+		end);
+	end
+
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then

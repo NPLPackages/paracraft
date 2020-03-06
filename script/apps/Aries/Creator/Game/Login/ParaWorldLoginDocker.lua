@@ -182,14 +182,14 @@ ParaWorldLoginDocker.InitParaWorldClient();
 -- @param hasParacraft: whether it contains the latest version of paracraft inside the app.
 local app_install_details = {
 	["paracraft"] = {
-		title=L"paracraft创意空间", hasParacraft = true, 
+		title=L"paracraft帕拉卡", hasParacraft = true, 
 		cmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true"',
 		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
 		allowQQHall = true,
 	},
 	-- only used by ClientUpdater, this will force using the latest version in apps folder
 	["paracraftAppVersion"] = {
-		title=L"paracraft创意空间", hasParacraft = true, 
+		title=L"paracraft帕拉卡", hasParacraft = true, 
 		cmdLine = 'mc="true" bootstrapper="script/apps/Aries/main_loop.lua" noupdate="true"',
 		redistFolder="haqi/", updaterConfigPath = "config/autoupdater/paracraft_win32.xml",
 		allowQQHall = true,

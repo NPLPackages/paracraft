@@ -254,6 +254,11 @@ function WorldCommon.SaveWorldAs()
 		end	
 	end
 	
+	if(GameLogic.options:HasCopyright()) then
+		_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
+		return
+	end
+
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");

@@ -616,3 +616,6 @@ function MovieClipController.OnSettings()
 	end
 end
 
+function MovieClipController.OnClickHelp()
+	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/docs/UserGuide/animation/movie_block", "", "", 1);
+end

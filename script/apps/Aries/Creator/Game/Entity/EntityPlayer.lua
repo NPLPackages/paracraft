@@ -673,10 +673,7 @@ end
 function Entity:SetSkin(skin, bIgnoreSetSkinId)
 	Entity._super.SetSkin(self, skin, bIgnoreSetSkinId);
 	if(not bIgnoreSetSkinId) then
-		local skin_id = PlayerSkins:GetSkinID(self.skin);
-		if(skin_id) then
-			self.dataWatcher:SetField(self.dataFieldSkin, skin_id);
-		end
+		self.dataWatcher:SetField(self.dataFieldSkin, self:GetSkin());
 	end
 end
 

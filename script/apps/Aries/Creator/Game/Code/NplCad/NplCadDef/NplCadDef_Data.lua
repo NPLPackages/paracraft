@@ -441,6 +441,28 @@ thinkText("Let me think");
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
+{
+	type = "setMaxTrianglesCnt", 
+	message0 = L"模型三角形最大数量: %1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_number",
+			text = "-1",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	nextStatement = true,
+	func_description = 'setMaxTrianglesCnt(%s)',
+	ToNPL = function(self)
+		return string.format('setMaxTrianglesCnt(%s)', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
 };
 function NplCadDef_Data.GetCmds()
 	return cmds;

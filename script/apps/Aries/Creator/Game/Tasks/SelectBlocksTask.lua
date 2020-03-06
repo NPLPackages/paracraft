@@ -1101,7 +1101,17 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 		if(Clipboard) then
-			--Clipboard.Save("block_template", self.copy_task);
+			local pivot = self:GetPivotPoint()
+			if(pivot) then
+				local pivot_x,pivot_y,pivot_z = EntityManager.GetPlayer():GetBlockPos();
+				local blocks = {};
+				for i = 1, #(cur_selection) do
+					-- x,y,z,block_id, data, serverdata
+					local b = cur_selection[i];
+					blocks[i] = {b[1]-pivot_x, b[2]-pivot_y, b[3]- pivot_z, b[4], if_else(b[5] == 0, nil, b[5]), b[6]};
+				end
+				SelectBlocks.CopyToClipboard(blocks)
+			end
 		end
 
 		BroadcastHelper.PushLabel({id="BuildMinimap", label = L"保存成功! Ctrl+V在鼠标所在位置粘贴！", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
@@ -1110,25 +1120,31 @@ end
 
 -- static public function: 
 -- copy current mouse cursor block to clipboard
-function SelectBlocks.CopyToClipboard()
+function SelectBlocks.CopyToClipboard(blocks)
 	local result = Game.SelectionManager:MousePickBlock();
 	if(result.blockX and result.side) then
-		local bx, by, bz = result.blockX, result.blockY, result.blockZ;
-		local b = {0, 0, 0}
-		b[4], b[5], b[6] = BlockEngine:GetBlockFull(bx, by, bz);
-		if(b[4]) then
+		if(not blocks) then
+			local bx, by, bz = result.blockX, result.blockY, result.blockZ;
+			local b = {0, 0, 0}
+			b[4], b[5], b[6] = BlockEngine:GetBlockFull(bx, by, bz);
+			if(b[4]) then
+				blocks = {b};
+			end
+		end
+		
+		if(blocks) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 			local task = BlockTemplate:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, 
-				blocks = {b},
-				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
+				blocks = blocks,
+				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false, relative_to_player = (#blocks>1)})
 				
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 			local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 			local filedata = task:SaveTemplateToString();
 			if(filedata) then
 				if(Clipboard.Save("block_template", filedata)) then
-					GameLogic.AddBBS(nil, format(L"%d个方块已存到裁剪版", 1), 4000, "0 255 0");
+					GameLogic.AddBBS(nil, format(L"%d个方块已存到裁剪版", #blocks), 4000, "0 255 0");
 				end
 			end
 		end
@@ -1145,7 +1161,12 @@ function SelectBlocks.PasteFromClipboard()
 		local obj = Clipboard.LoadByType("block_template")
 		if(type(obj) == "string") then
 			local xmlRoot = ParaXML.LuaXML_ParseString(obj);
-			if(xmlRoot) then
+			if(xmlRoot and xmlRoot[1]) then
+				local attr = xmlRoot[1].attr;
+				if(attr and attr.relative_to_player=="true") then
+					bx,by,bz = EntityManager.GetPlayer():GetBlockPos();
+				end
+
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 				local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 				local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 

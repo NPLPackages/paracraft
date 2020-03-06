@@ -105,9 +105,17 @@ function ParaWorldAnalytics:Init(UA)
 
 	self.analyticsClient = GoogleAnalytics:new():init(self.UA, self.user_id, self.client_id,
 													  self.app_name, self.app_version, self.api_rate);
-
+	
 	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: %s %s %s %s %s %d",
 			self.UA, self.user_id or "", self.client_id or "", self.app_name, self.app_version, self.api_rate);
+			
+	if(GoogleAnalytics.LogCollector and commonlib.debug.SetNPLRuntimeErrorCallback) then
+		ParaWorldAnalytics.logger = ParaWorldAnalytics.logger or GoogleAnalytics.LogCollector:new():init(nil, self.app_name);
+		NPL.load("(gl)script/ide/debug.lua");
+		commonlib.debug.SetNPLRuntimeErrorCallback(ParaWorldAnalytics.OnNPLErrorCallBack)
+		LOG.std(nil, "info", "ParaWorldAnalytics", "log server enabled: %s", self.logger.server_url or "");
+	end
+
 	return self;
 end
 
@@ -189,6 +197,30 @@ function ParaWorldAnalytics:Send(category, action, value, label)
 		label = label,
 	});
 end
+
+-- send runtime error log to our log service
+function ParaWorldAnalytics:SendErrorLog(title, body)
+	if(ParaWorldAnalytics.logger) then
+		ParaWorldAnalytics.logger:collect("error", title, body)
+	end
+end
+
+-- @param callback: function(errorMessage, stackInfo) end
+function ParaWorldAnalytics.SetNPLErrorCallback(callback)
+	ParaWorldAnalytics.errorCallback = callback;
+end
+
+function ParaWorldAnalytics.OnNPLErrorCallBack(errorMessage)
+	log(errorMessage);
+	local stackInfo = commonlib.debugstack(2, 5, 1)
+	log("stack:\n");
+	log(stackInfo)
+	ParaWorldAnalytics:SendErrorLog(errorMessage, stackInfo);
+	if(ParaWorldAnalytics.errorCallback) then
+		ParaWorldAnalytics.errorCallback(errorMessage, stackInfo);
+	end
+end
+
 
 -- create a singleton
 local singleton = NPL.export();

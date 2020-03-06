@@ -1,0 +1,24 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/LockDesktop.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="LockDesktop.lua"><![CDATA[
+LockDesktop = commonlib.gettable("MyCompany.Aries.Game.Tasks.LockDesktop")
+LockDesktop.OnInit();
+]]></script>
+<div width="100%" height="100%" style="background-color:#00000080">
+    <div style="text-align:center;font-size:16px;color:#ff0000;margin-top:100px;">
+        <%=LockDesktop.text or L"锁屏"%>
+    </div>
+    <div style="text-align:center;font-size:16px;color:#ff0000;margin-top:10px;">
+        <pe:label name="timeLeft"></pe:label>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

@@ -33,6 +33,7 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.weather_strength = tonumber(self.weather_strength);
 		self.totaltime = tonumber(self.totaltime);
 		self.isVipWorld = self.isVipWorld == "true" or self.isVipWorld == true;
+		self.hasCopyright = self.hasCopyright == "true" or self.hasCopyright == true;
 		self:SetTotalWorldTime(self.totaltime or 0);
 
 		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
@@ -62,6 +63,7 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		global_terrain = self.global_terrain,
 		fromProjects = self.fromProjects,
 		isVipWorld = self.isVipWorld,
+		hasCopyright = self.hasCopyright,
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);

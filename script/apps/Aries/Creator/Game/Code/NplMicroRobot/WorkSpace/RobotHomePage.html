@@ -1,0 +1,100 @@
+<!-- "script/apps/Aries/Creator/Game/Code/NplMicroRobot/WorkSpace/RobotHomePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="RobotHomePage.lua">
+            <![CDATA[
+            NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+            local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+            RobotHomePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/WorkSpace/RobotHomePage.lua");
+            RobotHomePage.OnInit();
+            local page = document:GetPageCtrl();
+
+
+            function ClosePage()
+            page:CloseWindow();
+            end
+            function OnClick(name)
+            end
+            function OnSelect(name,value)
+            end
+            ]]>
+        </script>
+        <aries:window mode="thin" title='<%=L"我的NPL机器人"%>' onclose="ClosePage">
+            <div style="width:650px;height:420px;">
+                <div style="margin-top:15px;">
+                    <div>
+                        <div style="margin-left:10px;font-size:16px;color:#ffffff">
+                            <%=L"创建机器人"%>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="绿色毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="红色毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="黄色毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="暴躁毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="温顺毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="犹豫毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                            <div style="float:left;margin-left:10px;">
+                                <input type="button" value="可爱毛毛虫" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                            </div>
+                        </div>
+                       <div style="margin-top:10px;">
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="蜘蛛" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="书法大师" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="工业手臂" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="8轴机器人" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="16轴机器人" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                           <div style="float:left;margin-left:10px;">
+                               <input type="button" value="自定义" onclick="OnClick" style="width:80px;height:80px;color:#ffffff;" class="mc_blue_button_with_fillet" />
+                           </div>
+                       </div>
+                    </div>
+                    <div style="margin-left:10px;margin-top:10px;font-size:16px;color:#ffffff">
+                        <%=L"步骤"%>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <div style="float:left;margin-left:10px;">
+                            <input type="button" value="1 编辑模型" name="microbit_btn_A" onclick="OnClick" style="width:80px;height:80px;" class="mc_light_grey_button_with_fillet" />
+                        </div>
+                        <div style="float:left;margin-left:10px;">
+                            <input type="button" value="2编辑动画" name="microbit_btn_A" onclick="OnClick" style="width:80px;height:80px;" class="mc_light_grey_button_with_fillet" />
+                        </div>
+                        <div style="float:left;margin-left:10px;">
+                            <input type="button" value="3Microbit" name="microbit_btn_A" onclick="OnClick" style="width:80px;height:80px;" class="mc_light_grey_button_with_fillet" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+

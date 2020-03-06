@@ -166,6 +166,20 @@ function options:OneTimeInit()
 	end
 
 	self:SetMaintainMovieBlockAspectRatio();
+
+	-- error log hook
+	if(System.options.mc and ParaWorldAnalytics) then
+		local i=0;
+		ParaWorldAnalytics.SetNPLErrorCallback(function(errorMessage, stackInfo)
+			i=i+1;
+			if(errorMessage and i < 10000) then
+				GameLogic.AddBBS("nplError"..(i%3), errorMessage:sub(1, 100), 5000, "255 0 0");
+				GameLogic.AppendChat(format("Error %d:", i));
+				GameLogic.AppendChat(errorMessage);
+				GameLogic.AppendChat(stackInfo);
+			end
+		end)
+	end
 end
 
 -- transient options can be modified by game rule and reset when loading a new world.
@@ -1152,6 +1166,17 @@ function options:SetVipWorld(isVipWorld)
 		isVipWorld = nil;
 	end
 	WorldCommon.SetWorldTag("isVipWorld", isVipWorld);
+end
+
+function options:HasCopyright()
+	return WorldCommon.GetWorldTag("hasCopyright")
+end
+
+function options:SetHasCopyright(bValue)
+	if(bValue == false) then
+		bValue = nil;
+	end
+	WorldCommon.SetWorldTag("hasCopyright", bValue);
 end
 
 -- "teacher", "vip"

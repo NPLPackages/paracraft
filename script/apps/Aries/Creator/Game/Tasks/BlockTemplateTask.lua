@@ -299,6 +299,9 @@ function BlockTemplate:SaveTemplateToString()
 	if(not self.params.relative_motion) then
 		self.params.relative_motion = self.relative_motion;
 	end
+	if(not self.params.relative_to_player) then
+		self.params.relative_to_player = self.relative_to_player;
+	end
 	local o = {name="pe:blocktemplate", attr = self.params};
 
 	if(not self.blocks) then
