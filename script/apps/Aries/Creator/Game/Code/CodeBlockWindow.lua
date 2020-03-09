@@ -290,7 +290,7 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 	if(codeBlock) then
 		local text = codeBlock:GetLastMessage() or "";
 		if(text == "" and not CodeBlockWindow.GetMovieEntity()) then
-			if(self.entity and self.entity:IsCodeEmpty()) then
+			if(self.entity and self.entity:IsCodeEmpty() and self.entity.AutoCreateMovieEntity) then
 				if(self.entity:AutoCreateMovieEntity()) then
 					text = L"我们在代码方块旁边自动创建了一个电影方块! 你现在可以用代码控制电影方块中的演员了!";
 				else

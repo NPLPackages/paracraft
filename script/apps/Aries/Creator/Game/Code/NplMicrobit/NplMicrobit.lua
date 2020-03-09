@@ -174,7 +174,11 @@ function NplMicrobit.CompileCode(code, filename, codeblock)
     end
     if(codeLanguageType == "python")then
         local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
-        local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2lua/polyfill.lua")
+		if(not ParacraftCodeBlockly.isPythonRuntimeLoaded) then
+			ParacraftCodeBlockly.isPythonRuntimeLoaded = true;
+			pyruntime:start()
+		end
+        local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2npl/polyfill.lua")
         pyruntime:installMethods(codeblock:GetCodeEnv(),py_env);
         -- this callback is synchronous 
         pyruntime:transpile(code, function(res)

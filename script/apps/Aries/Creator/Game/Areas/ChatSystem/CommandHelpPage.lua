@@ -382,3 +382,62 @@ function CommandHelpPage.OnKeyUp_RETURN(callback)
 		end
 	end
 end
+
+-- @return textcontrol, multilineEditBox control.
+function CommandHelpPage.GetTextControl()
+	if(page) then
+		local textAreaCtrl = page:FindControl("code");
+		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
+		if(textCtrl) then
+			return textCtrl:ViewPort(), textCtrl;
+		end
+	end
+end
+
+function CommandHelpPage.OnRightClick()
+	local ctrl = CommandHelpPage.GetTextControl()
+	if(ctrl) then
+		local info = ctrl:getMouseOverWordInfo()
+		if(info and info.word) then
+			CommandHelpPage.ShowContextMenuForWord(info.word, info.lineText, info.fromPos, info.toPos)	
+		end
+	end
+end
+
+function CommandHelpPage.ShowContextMenuForWord(word, line, from, to)
+	if(not word) then
+		return
+	end
+	local ctl = CommandHelpPage.contextMenuCtrl;
+	if(not ctl)then
+		ctl = CommonCtrl.ContextMenu:new{
+			name = "CodeIntelliSense.contextMenuCtrl",
+			width = 230,
+			height = 60, -- add menuitemHeight(30) with each new item
+			DefaultNodeHeight = 26,
+			onclick = CommandHelpPage.OnClickContextMenuItem,
+		};
+		CommandHelpPage.contextMenuCtrl = ctl;
+		ctl.RootNode:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
+	end
+	
+	local node = ctl.RootNode:GetChild(1);
+	if(node) then
+		node:ClearAllChildren();
+		node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"朗读: %s", word), tag = word, Name = "PronounceIt", Type = "Menuitem", onclick = nil, }))
+		if(word:match("^%w+$")) then
+			node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"翻译: %s ...", word), tag = word, Name = "Dictionary", Type = "Menuitem", onclick = nil, }))
+		end
+		ctl.height = (#node) * 26 + 4;
+	end
+	ctl:Show(mouse_x, mouse_y);
+end
+
+function CommandHelpPage.OnClickContextMenuItem(node)
+	local name = node.Name
+	if(name == "PronounceIt") then
+		GameLogic.RunCommand("/voice ".. node.tag);
+	elseif(name == "Dictionary") then
+		GameLogic.RunCommand("open", format("https://fanyi.baidu.com/#en/zh/"..node.tag));
+	end
+end

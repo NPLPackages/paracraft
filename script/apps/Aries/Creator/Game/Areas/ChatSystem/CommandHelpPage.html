@@ -146,7 +146,7 @@ end
     <pe:if condition ='<%= CommandHelpPage.HasGotCommandName%>'>
         <div style="margin-left:7px;margin-top:5px;margin-right:0px;">
             <div style='font-weight:bold;'><%=L"命令格式"%><input type='button' value='<%=L"帮助"%>' style='float:left;margin-left:10px;' onclick='OnShowCmdHelp' class='mc_button_blue' /></div>
-            <textarea ReadOnly="false" UseSystemControl="true" style='<%=format("textcolor:#ffffff;height:%dpx", CommandHelpPage.height-20)%>' value="<%= GetCommandStr()%>"></textarea>
+            <textarea name="code" ReadOnly="false" UseSystemControl="true" style='<%=format("textcolor:#ffffff;height:%dpx", CommandHelpPage.height-20)%>' value="<%= GetCommandStr()%>" OnRightClick="CommandHelpPage.OnRightClick"></textarea>
         </div>
     </pe:if>
 </div>

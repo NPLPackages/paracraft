@@ -146,7 +146,11 @@ function ParacraftCodeBlockly.CompileCode(code, filename, codeblock)
 
     if(codeLanguageType == "python")then
         local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
-        local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2lua/polyfill.lua")
+		if(not ParacraftCodeBlockly.isPythonRuntimeLoaded) then
+			ParacraftCodeBlockly.isPythonRuntimeLoaded = true;
+			pyruntime:start()
+		end
+        local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2npl/polyfill.lua")
 		local code_env = codeblock:GetCodeEnv()
 		py_env['_set_codeblock_env'](code_env)
         pyruntime:installMethods(code_env, py_env);

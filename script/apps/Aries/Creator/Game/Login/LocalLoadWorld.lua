@@ -83,9 +83,8 @@ function LocalLoadWorld.GetWorldFolder()
 end
 
 function LocalLoadWorld.GetWorldFolderFullPath()
-	local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath", LocalLoadWorld.GetWorldFolder());
-
 	if (not LocalLoadWorld.OpenWorldFolderFullPath) then
+		local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath", LocalLoadWorld.GetWorldFolder());
 		LocalLoadWorld.OpenWorldFolderFullPath = myWorldFolder;
 		
 		if (not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then

@@ -320,9 +320,13 @@ function OpenAssetFileDialog.OnOpenAssetFileDialog()
 		
 	if(filename and page) then
 		local fileItem = Files.ResolveFilePath(filename);
-		if(fileItem and fileItem.relativeToWorldPath) then
-			local filename = fileItem.relativeToWorldPath;
-			OpenAssetFileDialog.SetText(filename);
+		if(fileItem) then
+			if(fileItem.relativeToWorldPath) then
+				local filename = fileItem.relativeToWorldPath;
+				OpenAssetFileDialog.SetText(filename);
+			elseif(fileItem.relativeToRootPath) then
+				OpenAssetFileDialog.SetText(fileItem.relativeToRootPath);
+			end
 		end
 	end
 end

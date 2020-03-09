@@ -216,11 +216,14 @@ end
 
 function CodeGlobals:log(obj, ...)
 	commonlib.echo(obj, ...);
+	local text;
 	if(type(obj) == "string") then
-		self:logAdded(string.format(obj, ...));
+		text = string.format(obj, ...);
 	else
-		self:logAdded(commonlib.serialize_in_length(obj, 100));
+		text = commonlib.serialize_in_length(obj, 100);
 	end
+	self:logAdded(text);
+	GameLogic.AppendChat(text);
 end
 
 -- @return x,y: x in [-500, 500] range

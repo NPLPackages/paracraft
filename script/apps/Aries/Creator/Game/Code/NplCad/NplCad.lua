@@ -116,8 +116,12 @@ function NplCad.CompileCode(code, filename, codeblock)
     local block_name = codeblock:GetBlockName();
     if(not block_name or block_name == "")then
         block_name = "default"
-    end
+		GameLogic.AddBBS("error", L"请给CAD方块指定角色名称", 15000, "255 0 0")
+	end
 	local relativePath = format("blocktemplates/nplcad/%s.x",commonlib.Encoding.Utf8ToDefault(block_name));
+
+	GameLogic.AddBBS("NPLCAD", format(L"CAD模型将保存到%s", relativePath), 5000, "255 0 0")
+
     local filepath = GameLogic.GetWorldDirectory()..relativePath;
 	code = NplCad.GetCode(code, filepath, relativePath);
 
@@ -132,7 +136,7 @@ end
 
 -- set code block's nearby movie block's first actor's model to filepath if it is not. 
 function NplCad.SetCodeBlockActorAsset(codeBlock, filepath)
-	if(CodeBlockWindow.GetCodeBlock() == codeBlock and CodeBlockWindow.IsVisible()) then
+	if(CodeBlockWindow.GetCodeBlock and CodeBlockWindow.GetCodeBlock() == codeBlock and CodeBlockWindow.IsVisible()) then
 		local actor;
 		local movieEntity = codeBlock:GetMovieEntity();
 		if(movieEntity and not movieEntity:GetFirstActorStack()) then
