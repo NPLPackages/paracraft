@@ -108,12 +108,14 @@ function ParaWorldAnalytics:Init(UA)
 	
 	LOG.std(nil, "info", "ParaWorldAnalytics", "analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: %s %s %s %s %s %d",
 			self.UA, self.user_id or "", self.client_id or "", self.app_name, self.app_version, self.api_rate);
-			
+	
+	NPL.load("(gl)script/ide/debug.lua");
 	if(GoogleAnalytics.LogCollector and commonlib.debug.SetNPLRuntimeErrorCallback) then
 		ParaWorldAnalytics.logger = ParaWorldAnalytics.logger or GoogleAnalytics.LogCollector:new():init(nil, self.app_name);
-		NPL.load("(gl)script/ide/debug.lua");
 		commonlib.debug.SetNPLRuntimeErrorCallback(ParaWorldAnalytics.OnNPLErrorCallBack)
 		LOG.std(nil, "info", "ParaWorldAnalytics", "log server enabled: %s", self.logger.server_url or "");
+	else
+		LOG.std(nil, "warn", "ParaWorldAnalytics", "log collector client not found");
 	end
 
 	return self;

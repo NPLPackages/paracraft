@@ -87,12 +87,14 @@ end
 function NplCad.OnSelect()
     if(CodeBlockWindow.GetSceneContext and CodeBlockWindow:GetSceneContext())then
         CodeBlockWindow:GetSceneContext():SetShowBones(true);
+		CodeBlockWindow:GetSceneContext():ShowGrid(true);
     end
 end
 
 function NplCad.OnDeselect()
     if(CodeBlockWindow.GetSceneContext and CodeBlockWindow:GetSceneContext())then
         CodeBlockWindow:GetSceneContext():SetShowBones(false);
+		CodeBlockWindow:GetSceneContext():ShowGrid(false);
     end
 end
 

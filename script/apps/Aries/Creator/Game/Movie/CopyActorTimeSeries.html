@@ -1,0 +1,32 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/CopyActorTimeSeries.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CopyActorTimeSeries.lua"><![CDATA[
+CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
+CopyActorTimeSeries.OnInit();
+]]></script>
+<aries:window mode="thin" style="width:512px;" title='<%=L"复制关键帧"%>' onclose="CopyActorTimeSeries.OnClose">
+<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+    <pe:gridview name="nameGvw" style="height:300px;" DataSource="<%=CopyActorTimeSeries.GetDs%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="3" AllowPaging="false" pagesize="512">
+            <Columns>
+                <div style="float:left;height:30px;min-width:120px">
+                    <input name="<%=Eval('name')>" type="checkbox" checked="checked"/>
+                    <div style="float:left;" for="<%=Eval('name')>"><%=Eval("displayName")%></div>
+                </div>
+    		</Columns>
+        </pe:gridview>
+    <hr />
+    <div style="margin-top:10px;">
+        <input type="button" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="CopyActorTimeSeries.OnClickCopy" value='<%=L"复制"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

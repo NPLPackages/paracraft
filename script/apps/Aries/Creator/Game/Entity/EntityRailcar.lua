@@ -835,7 +835,8 @@ function Entity:ApplyEntityCollision(fromEntity, deltaTime)
                 local dz1 = from_z - z;
                 
 				local vecDir = vector3d:new_from_pool(dx1, 0, dz1):normalize();
-                local cosAngle = math.abs(vecDir:dot(math.cos(self.facing), 0, math.sin(self.facing)));
+				local facing = self.facing or 0;
+                local cosAngle = math.abs(vecDir:dot(math.cos(facing), 0, math.sin(facing)));
 
                 if (cosAngle < 0.800000011920929) then
                     return;

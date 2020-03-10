@@ -47,7 +47,7 @@ function Item_PetTransformMarker:OnClick(mouse_button, callback_func)
 				local hook_msg = { aries_type = "OnUnEquipItem", wndName = "main"};
 				CommonCtrl.os.hook.Invoke(CommonCtrl.os.hook.HookType.WH_CALLWNDPROCRET, 0, "Aries", hook_msg);
 
-				if(callback_func) then
+				if(type(callback_func) == "function") then
 					callback_func();
 				end
 				

@@ -82,7 +82,7 @@ function EditCodeBlockContext:HandleGlobalKey(event)
 end
 
 function EditCodeBlockContext:UpdateCodeBlock()
-	self:updateManipulators();
+	self:updateManipulators(0.01);
 end
 
 function EditCodeBlockContext:GetMovieEntity()
@@ -181,7 +181,26 @@ function EditCodeBlockContext:GetActor()
 	return self.actor;
 end
 
-function EditCodeBlockContext:updateManipulators()
+function EditCodeBlockContext:ShowGrid(bShow)
+	if(self.isShowGrid ~= bShow) then
+		self.isShowGrid = bShow
+		self:updateManipulators(0.01);
+	end
+end
+
+function EditCodeBlockContext:IsShowGrid()
+	return self.isShowGrid;
+end
+
+function EditCodeBlockContext:updateManipulators(delaySeconds)
+	if(delaySeconds and delaySeconds>0) then
+		self.updateTimer = self.updateTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			self:updateManipulators();
+		end})
+		self.updateTimer:Change(math.floor(delaySeconds*1000));
+		return;
+	end
+
 	self:DeleteManipulators();
 	self:RemoveActor();
 	if(self:IsCodeRunning()) then
@@ -200,23 +219,32 @@ function EditCodeBlockContext:updateManipulators()
 		self:AddManipulator(manipCont);
 		manipCont:connectToDependNode(actor);
 
-
-		NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
-		local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
-		local manipCont = RotateManipContainer:new();
-		manipCont:init();
-		manipCont:SetYawPlugName("facing");
-		manipCont:SetYawEnabled(true);
-		manipCont:SetPitchEnabled(false);
-		manipCont:SetRollEnabled(false);
-		self:AddManipulator(manipCont);
-		manipCont:connectToDependNode(actor);
+		if(self:IsShowGrid()) then
+			manipCont.translateManip:SetPlaneSize(10);
+			manipCont.translateManip:SetPlaneColor(0);
+			manipCont.translateManip:SetPlainLineColor(0x20000000);
+			--manipCont.translateManip:SetShowXPlane(true)
+			manipCont.translateManip:SetShowYPlane(true)
+			--manipCont.translateManip:SetShowZPlane(true)
+		end
 
 		if(self:IsShowBones()) then
 			NPL.load("(gl)script/ide/System/Scene/Manipulators/BonesManipContainer.lua");
 			local BonesManipContainer = commonlib.gettable("System.Scene.Manipulators.BonesManipContainer");
 			local manipCont = BonesManipContainer:new();
 			manipCont:init();
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(actor);
+		else
+			-- rotation is disabled when bone is displayed such as for cad block
+			NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
+			local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
+			local manipCont = RotateManipContainer:new();
+			manipCont:init();
+			manipCont:SetYawPlugName("facing");
+			manipCont:SetYawEnabled(true);
+			manipCont:SetPitchEnabled(false);
+			manipCont:SetRollEnabled(false);
 			self:AddManipulator(manipCont);
 			manipCont:connectToDependNode(actor);
 		end
@@ -230,7 +258,7 @@ end
 function EditCodeBlockContext:SetShowBones(bShowBones)
 	if(self.showBones ~= bShowBones) then
 		self.showBones = bShowBones;
-		self:updateManipulators();
+		self:updateManipulators(0.01);
 	end
 end
 

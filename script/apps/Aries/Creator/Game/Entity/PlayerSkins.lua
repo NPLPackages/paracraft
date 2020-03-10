@@ -106,7 +106,7 @@ end
 -- @param id: integer
 function PlayerSkins:GetSkinByID(id)
 	local skins = self:GetSkinsById(defaultModelFile, 2)
-	if(skins) then
+	if(skins and id) then
 		id = ((id) % (#skins)) + 1;
 		local skin = skins[id];
 		if(skin) then

@@ -816,7 +816,7 @@ end,
 -- Post Processor
 function (self, msg, id,callbackFunc, callbackParams, postMsgTranslator, raw_msg, inputMsg, originalMsg)
 	
-	if(type(msg) == "table") then
+	if(type(msg) == "table" and msg.user and msg.dragon) then
 		local ls = System.localserver.CreateStore(nil, 3);
 		if(ls) then
 			-- make url

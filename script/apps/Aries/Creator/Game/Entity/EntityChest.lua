@@ -27,6 +27,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityChest"));
+Entity:Signal("remotelyUpdated")
 
 -- class name
 Entity.class_name = "EntityChest";
