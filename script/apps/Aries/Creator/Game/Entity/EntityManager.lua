@@ -513,6 +513,9 @@ end
 
 -- @param entity_class: nil to match any entity. 
 function EntityManager.GetEntitiesByAABBOfType(entity_class, aabb)
+	if(not aabb) then
+		return
+	end
 	local output;
 	local min_x, min_y, min_z = aabb:GetMinValues();
 	local max_x, max_y, max_z = aabb:GetMaxValues();
@@ -541,6 +544,9 @@ end
 -- Will get all entities within the specified AABB excluding the one passed into it. Args: entityToExclude, aabb
 -- @return array of entities
 function EntityManager.GetEntitiesByAABBExcept(aabb, excludingEntity)
+	if(not aabb) then
+		return
+	end
 	local output;
 	local min_x, min_y, min_z = aabb:GetMinValues();
 	local max_x, max_y, max_z = aabb:GetMaxValues();

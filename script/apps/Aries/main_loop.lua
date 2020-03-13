@@ -449,6 +449,8 @@ local function Aries_load_config(filename)
 			end
 			TestOpenNPLPort_();
 		end
+	elseif (System.options.version == 'kids' or System.options.version == 'teen') then
+		
 	end
 
 	if (System.options.isAB_SDK) then

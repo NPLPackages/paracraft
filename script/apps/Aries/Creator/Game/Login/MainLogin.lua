@@ -144,14 +144,11 @@ end
 
 function MainLogin:UpdateCoreClient()
 	local platform = System.os.GetPlatform();
-	local testCoreClient = false
-	if(not testCoreClient and (platform=="win32" or System.options.isAB_SDK))then
-		self:next_step({IsUpdaterStarted = true});
-		return
-	end
-	
+		
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
+	-- check for mini-allowed core nplruntime version
+	local updater = ClientUpdater:new();
 
 	local function CheckMiniVersion_(ver)
 		local v1,v2,v3 = ver:match("(%d+)%D(%d+)%D(%d+)")
@@ -171,6 +168,35 @@ function MainLogin:UpdateCoreClient()
 		return true;
 	end
 
+	local testCoreClient = false
+	if(not testCoreClient and platform=="win32")then
+		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
+		self:next_step({IsUpdaterStarted = true});
+		if(not System.options.isAB_SDK) then
+			updater:Check(function(bNeedUpdate, latestVersion)
+				if(bNeedUpdate) then
+					System.App.Commands.Call("File.MCMLWindowFrame", {
+						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s", latestVersion, updater:GetCurrentVersion()), 
+						name = "ClientUpdateDialog", 
+						isShowTitleBar = false,
+						DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+						style = CommonCtrl.WindowFrame.ContainerStyle,
+						zorder = 1,
+						allowDrag = false,
+						isTopLevel = true,
+						directPosition = true,
+							align = "_ct",
+							x = -210,
+							y = -100,
+							width = 420,
+							height = 250,
+					});
+				end
+			end);
+		end
+		return
+	end
+
 	if(System.options.paraworldapp == ClientUpdater.appname) then
 		local ver = ParaEngine.GetAppCommandLineByParam("nplver", "")
 		if(CheckMiniVersion_(ver)) then
@@ -178,9 +204,6 @@ function MainLogin:UpdateCoreClient()
 		end
 		return
 	end
-
-	-- check for mini-allowed core nplruntime version
-	local updater = ClientUpdater:new();
 
 	updater:Check(function(bNeedUpdate, latestVersion)
 		if(bNeedUpdate) then

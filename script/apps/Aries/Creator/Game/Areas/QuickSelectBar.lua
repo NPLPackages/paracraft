@@ -304,13 +304,19 @@ function QuickSelectBar.BindProgressBar(IProgress)
 	QuickSelectBar.IProgress = IProgress;
 	if(IProgress) then
 		if(page) then
-			page:FindControl("progress_wnd").visible = true;
+			local wnd = page:FindControl("progress_wnd");
+			if(wnd) then
+				wnd.visible = true;
+			end
 		end
 		QuickSelectBar.IProgress:GetEvents():AddEventListener("OnChange", QuickSelectBar.OnProgressChanged, QuickSelectBar, "QuickSelectBar");
 		QuickSelectBar:OnProgressChanged();
 	else
 		if(page) then
-			page:FindControl("progress_wnd").visible = false;
+			local wnd = page:FindControl("progress_wnd");
+			if(wnd) then
+				wnd.visible = false;
+			end
 		end
 	end
 end

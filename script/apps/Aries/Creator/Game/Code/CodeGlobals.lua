@@ -214,17 +214,61 @@ function CodeGlobals:Reset()
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
+
 function CodeGlobals:log(obj, ...)
-	commonlib.echo(obj, ...);
 	local text;
+	local args = {...};
+	local bPrintArgs = #args > 0;
 	if(type(obj) == "string") then
-		text = string.format(obj, ...);
+		text = obj;
+		if(obj:match("%%")) then
+			if(bPrintArgs) then
+				text = string.format(obj, ...);
+				bPrintArgs = false;
+			end
+		end
 	else
 		text = commonlib.serialize_in_length(obj, 100);
 	end
-	self:logAdded(text);
-	GameLogic.AppendChat(text);
+	if(bPrintArgs) then
+		for _, arg in ipairs(args) do
+			if(type(arg) == "string") then
+				text = text.." "..arg;
+			else
+				text = text.." "..commonlib.serialize_in_length(arg, 100);
+			end
+		end
+	end
+	if(text) then
+		commonlib.echo(text);
+		self:logAdded(text);
+		GameLogic.AppendChat(text);
+	end
 end
+
+-- similar to self:log, except that the first parameter does not support %s formating
+function CodeGlobals:print(...)
+	local text;
+	local args = {...};
+	for _, arg in ipairs(args) do
+		if(text) then
+			text = text.." "
+		else
+			text = "";
+		end
+		if(type(arg) == "string") then
+			text = text..arg;
+		else
+			text = text..commonlib.serialize_in_length(arg, 100);
+		end
+	end
+	if(text) then
+		commonlib.echo(text);
+		self:logAdded(text);
+		GameLogic.AppendChat(text);
+	end
+end
+
 
 -- @return x,y: x in [-500, 500] range
 function CodeGlobals:GetMousePoint()

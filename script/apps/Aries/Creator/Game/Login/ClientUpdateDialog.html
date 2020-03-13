@@ -1,0 +1,44 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion&curVersion=" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2009.8.2</title>
+</head>
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+function OnClose()
+    Page:CloseWindow();
+end
+function OnClickExit()
+    ParaGlobal.ExitApp();
+end
+
+function OnClickChangeLog()
+    ParaGlobal.ShellExecute("open", L"https://keepwork.com/keepwork/changelog/paracraft/changelog_zh", "", "", 1);
+end
+latestVersion = Page:GetRequestParam("latestVersion")
+curVersion = Page:GetRequestParam("curVersion")
+]]></script>
+<aries:window mode="thin" width="420" title='<%=L"关于Paracraft" %>' onclose="OnClose">
+    <div class="default" style="margin:20px">
+        <div style="">
+            <%=L"最新版本为:"%><%=Eval("latestVersion")%>
+        </div>
+        <div style="margin-top:5px">
+            <%=L"您的版本为:"%><%=Eval("curVersion")%>
+        </div>
+        <div style="margin-top:10px;color:#ff6a00">
+            <%=L"强烈建议您升级"%>
+        </div>
+    </div>
+    <hr />
+    <div style="margin-top:30px;margin-bottom:30px;" class="default">
+        <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />    
+        <input type="button" value='<%=L"升级" %>' class="mc_yellow_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
+        <input type="button" value='<%=L"忽略" %>' class="mc_light_grey_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClose"/>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

@@ -785,7 +785,7 @@ function SystemSettingsPage.OnClickEnableShader()
 	local next_state = not cur_state;
 	if(not GameLogic.GetShaderManager():SetShaders(if_else(next_state, 2,1))) then
         if(next_state) then 
-            Page:SetValue("checkboxShader", false);
+            page:SetValue("checkboxShader", false);
             _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
         end
     else

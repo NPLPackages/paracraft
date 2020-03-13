@@ -165,7 +165,7 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 			MovieUISound.PlayAddKey();
 		end
 	elseif(node.Name == "CopyKey") then	
-		if(var and actor) then
+		if(var and actor and time) then
 			KeyFramePopupMenu.last_key_data = var:getValue(time);
 			KeyFramePopupMenu.last_key_name = var.name;
 			KeyFramePopupMenu.copyInRangeStarted = nil;
@@ -173,7 +173,7 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 			KeyFramePopupMenu.copy_to_time = nil;
 		end
 	elseif(node.Name == "CopyInRange") then	
-		if(var and actor) then
+		if(var and actor and time)  then
 			KeyFramePopupMenu.last_key_name = var.name;
 			KeyFramePopupMenu.last_key_data = nil;
 			if(not KeyFramePopupMenu.copyInRangeStarted) then

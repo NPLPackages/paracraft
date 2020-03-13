@@ -146,7 +146,7 @@ function Entity:GetField(field, default_value)
 
 	local lightObject = self:GetInnerObject();
 
-	local value = lightObject:GetField(field, default_value);
+	local value = lightObject and lightObject:GetField(field, default_value) or default_value;
 
 	-- radian to degree
 	if field == "Yaw"   or 
@@ -249,7 +249,9 @@ function Entity:SetField(field, value)
 
 	-- handle properties of C++ world's light object
 	local lightObject = self:GetInnerObject();
-
+	if(not lightObject) then
+		return
+	end
 	if field == "Phi" then
 		if value < 0 or value > 179 then
 			return;

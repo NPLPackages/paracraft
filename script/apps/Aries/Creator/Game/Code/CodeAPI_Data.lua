@@ -22,8 +22,9 @@ function env_imp:log(...)
 	GameLogic.GetCodeGlobal():log(...);
 end
 
+-- similar to log, but without formatting support like %d in first parameter
 function env_imp:print(...)
-	GameLogic.GetCodeGlobal():log(...);
+	GameLogic.GetCodeGlobal():print(...);
 end
 
 function env_imp:echo(obj, ...)

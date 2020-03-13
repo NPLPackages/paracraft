@@ -277,7 +277,7 @@ function BuildQuest:AutoPrebuildBlocks()
 		local blocks = self.bom:GetBlocks();
 
 		local bom = self.bom;
-		if(blocks) then
+		if(blocks and self.step) then
 			-- if auto prebuild, we will auto sort parts. 
 			if(self.step.auto_sort_blocks) then
 				self.bom:SortBlocks();
@@ -469,10 +469,11 @@ function BuildQuest:FinishBlock(block, i)
 			ObtainItemEffect:new({background="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;464 43 18 18", duration=1000, color="#ffffffff", width=18,height=18, 
 				from_3d={bx = bx+block[1], by = by+block[2], bz = bz+block[3],}, to_2d={x=x-8,y=y-8}}):Play();
 		end
-
-		local text = self.step:GetTipText(self.bom:GetFinishedCount());
-		if(text) then
-			GameLogic.SetTipText(text, "<player>");
+		if(self.step) then
+			local text = self.step:GetTipText(self.bom:GetFinishedCount());
+			if(text) then
+				GameLogic.SetTipText(text, "<player>");
+			end
 		end
 	end
 
@@ -523,7 +524,7 @@ function BuildQuest:FrameMove_Building()
 				local dest_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z); 
 				local target_block = block_types.get(block_id);
 				if( dest_id == block_id or (target_block:IsAssociatedBlockID(dest_id))) then
-					if(self.step:isInvertCreate()) then
+					if(self.step and self.step:isInvertCreate()) then
 						ParaTerrain.SelectBlock(x,y,z, true, groupindex_wrong);
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
@@ -558,12 +559,12 @@ function BuildQuest:FrameMove_Building()
 					ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
 					ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
 					-- destroy the block when it is wrong. 
-					if(self.step:isAutoDelete() and not ignoreBlocks[dest_id] and not ignoreBlocks[block_id] and dest_id ~= names.Water and dest_id ~= names.Still_Water) then
+					if(self.step and self.step:isAutoDelete() and not ignoreBlocks[dest_id] and not ignoreBlocks[block_id] and dest_id ~= names.Water and dest_id ~= names.Still_Water) then
 						local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = x,blockY = y, blockZ = z})
 						task:Run();
 					end
 				else
-					if(self.step:isInvertCreate()) then
+					if(self.step and self.step:isInvertCreate()) then
 						if(not block.finished) then
 							self:FinishBlock(block, i);
 							if(self.finished) then
@@ -574,7 +575,7 @@ function BuildQuest:FrameMove_Building()
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
 					else
-						if(self.step:isAutoCreate(true) and not ignoreBlocks[block_id]) then
+						if(self.step and self.step:isAutoCreate(true) and not ignoreBlocks[block_id]) then
 							BlockEngine:SetBlock(x,y,z,block_id,block[5]);
 						end
 						if(self.show_hint) then
