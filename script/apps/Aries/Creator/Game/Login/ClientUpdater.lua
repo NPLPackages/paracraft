@@ -45,11 +45,13 @@ function ClientUpdater:ctor()
 	end)
 end
 
+-- static function:
 -- this is the same folder as haqi
 function ClientUpdater:GetRedistFolder()
 	return ParaWorldLoginDocker.GetAppFolder(self.appname);
 end
 
+-- static function:
 function ClientUpdater:GetUpdateConfigFilename()
 	return ParaWorldLoginDocker.GetAppConfigByName(self.appname)
 end

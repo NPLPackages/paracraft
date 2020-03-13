@@ -144,9 +144,42 @@ end
 
 function MainLogin:UpdateCoreClient()
 	local platform = System.os.GetPlatform();
-		
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
+	
+	local testCoreClient = false
+	if(not testCoreClient and platform=="win32")then
+		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
+		self:next_step({IsUpdaterStarted = true});
+		if(not System.options.isAB_SDK) then
+			local AutoUpdater = NPL.load("AutoUpdater");
+			local updater = AutoUpdater:new();
+			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
+			updater:check(nil, function(bSucceed)
+				if(bSucceed and updater:isNeedUpdate()) then
+					System.App.Commands.Call("File.MCMLWindowFrame", {
+						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s", updater:getLatestVersion(), updater:getCurVersion()), 
+						name = "ClientUpdateDialog", 
+						isShowTitleBar = false,
+						DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+						style = CommonCtrl.WindowFrame.ContainerStyle,
+						zorder = 1,
+						allowDrag = false,
+						isTopLevel = true,
+						directPosition = true,
+							align = "_ct",
+							x = -210,
+							y = -100,
+							width = 420,
+							height = 250,
+					});
+				end
+			end);
+		end
+		return
+	end
+	
 	-- check for mini-allowed core nplruntime version
 	local updater = ClientUpdater:new();
 
@@ -166,35 +199,6 @@ function MainLogin:UpdateCoreClient()
 			end
 		end
 		return true;
-	end
-
-	local testCoreClient = false
-	if(not testCoreClient and platform=="win32")then
-		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
-		self:next_step({IsUpdaterStarted = true});
-		if(not System.options.isAB_SDK) then
-			updater:Check(function(bNeedUpdate, latestVersion)
-				if(bNeedUpdate) then
-					System.App.Commands.Call("File.MCMLWindowFrame", {
-						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s", latestVersion, updater:GetCurrentVersion()), 
-						name = "ClientUpdateDialog", 
-						isShowTitleBar = false,
-						DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-						style = CommonCtrl.WindowFrame.ContainerStyle,
-						zorder = 1,
-						allowDrag = false,
-						isTopLevel = true,
-						directPosition = true,
-							align = "_ct",
-							x = -210,
-							y = -100,
-							width = 420,
-							height = 250,
-					});
-				end
-			end);
-		end
-		return
 	end
 
 	if(System.options.paraworldapp == ClientUpdater.appname) then
