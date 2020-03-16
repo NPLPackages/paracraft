@@ -214,6 +214,7 @@ function ServerPage.CreateServer(host,port)
 	end
 
 	page:Refresh(1);
+	GameLogic.RunCommand("/menu online.teacher_panel");
 end
 
 function ServerPage.GetServerUrl()

@@ -63,6 +63,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"多人联网",order=4, name = "online",children = 
 			{
 				{text = L"多人服务器...",name = "online.server",onclick=nil},
+				{text = L"教师控制面板",name = "online.teacher_panel",onclick=nil},
 			},
 		},
 		{text = L"窗口", order=5, mode="edit", name = "window",children = 

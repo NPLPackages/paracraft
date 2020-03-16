@@ -113,6 +113,9 @@ function ParaWorldAnalytics:Init(UA)
 	if(GoogleAnalytics.LogCollector and commonlib.debug.SetNPLRuntimeErrorCallback) then
 		ParaWorldAnalytics.logger = ParaWorldAnalytics.logger or GoogleAnalytics.LogCollector:new():init(nil, self.app_name);
 		commonlib.debug.SetNPLRuntimeErrorCallback(ParaWorldAnalytics.OnNPLErrorCallBack)
+		if(commonlib.debug.SetNPLRuntimeDebugTraceLevel) then
+			commonlib.debug.SetNPLRuntimeDebugTraceLevel(5);
+		end
 		LOG.std(nil, "info", "ParaWorldAnalytics", "log server enabled: %s", self.logger.server_url or "");
 	else
 		LOG.std(nil, "warn", "ParaWorldAnalytics", "log collector client not found");
@@ -153,17 +156,23 @@ function ParaWorldAnalytics:_user_id()
 end
 
 function ParaWorldAnalytics:_app_name()
+	local name;
 	if System.options.mc then
-		return "paracraft"
+		name = "paracraft"
+	elseif System.options.version == 'kids' then
+		name = "haqi"
+	elseif System.options.version == 'teen' then
+		name = "haqi2"
 	end
 
-	if System.options.version == 'kids' then
-		return "haqi"
+	if(System.options.isFromQQHall) then
+		name = (name or "").."_QQHall"
 	end
-
-	if System.options.version == 'teen' then
-		return "haqi2"
+	local src_app = ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "");
+	if(src_app ~= "") then
+		name = (name or "").." from "..src_app;
 	end
+	return name;
 end
 
 function ParaWorldAnalytics:_client_id()
@@ -214,9 +223,10 @@ end
 
 function ParaWorldAnalytics.OnNPLErrorCallBack(errorMessage)
 	log(errorMessage);
-	local stackInfo = commonlib.debugstack(2, 5, 1)
-	log("stack:\n");
-	log(stackInfo)
+	local stackInfo;
+--	stackInfo = commonlib.debugstack(2, 5, 1)
+--	log("stack:\n");
+--	log(stackInfo)
 	ParaWorldAnalytics:SendErrorLog(errorMessage, stackInfo);
 	if(ParaWorldAnalytics.errorCallback) then
 		ParaWorldAnalytics.errorCallback(errorMessage, stackInfo);

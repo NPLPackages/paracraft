@@ -22,7 +22,14 @@ end
 
 -- @param duration: in seconds
 function LockDesktop.ShowPage(bShow, duration, text)
-	LockDesktop.duration = duration or 10;
+	duration = duration or 10;
+	if(GameLogic.IsServerWorld()) then
+		if(text and text~="") then
+			GameLogic.AddBBS("LockDesktop", text, math.floor(duration*1000), "255 0 0");
+		end
+		return
+	end
+	LockDesktop.duration = duration;
 	LockDesktop.text = text;
 	LockDesktop.timer = LockDesktop.timer or commonlib.Timer:new({callbackFunc = function(timer)
 		LockDesktop.OnTimer(timer)

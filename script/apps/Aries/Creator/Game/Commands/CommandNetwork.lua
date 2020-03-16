@@ -636,10 +636,11 @@ Commands["runat"] = {
 	name="runat", 
 	quick_ref="/runat @name /any_command", 
 	desc=[[Run a local client side command at given player's console
-@param @name: @all for all connected players. @p for last trigger entity. @name for given player name. `__MP__` can be ignored.
+@param @name: @all for all connected players. @p for last trigger entity. @c for all clients without admin. @name for given player name. `__MP__` can be ignored.
 @param /any_command: if command is local, it can be sent to client for execution, otherwise it can only run on server.
 Examples:
 /runat @all /tip hello everyone    send message to every connected user
+/runat @c /tip hello everyone    send message to all clients except the admin user
 /runat @__MP__admin /tip hi, admin   send to admin host
 /runat @admin /tip hi, admin         send to admin host
 /runat @username /tip hi, username   send to a given user
@@ -658,13 +659,15 @@ Examples:
 		cmd_text = cmd_text:gsub("^%s+", "");
 		
 		if(GameLogic.IsServerWorld()) then
-			if(playername == "all") then
+			if(playername == "all" or playername == "c") then
 				local servermanager = GameLogic.GetWorld():GetServerManager();
 				if(servermanager) then
 					servermanager:SendPacketToAllPlayers(GameLogic.Packets.PacketClientCommand:new():Init(cmd_text));
 				end
 				-- also run on the server side 
-				CommandManager:RunFromConsole(cmd_text, EntityManager.GetPlayer());
+				if(playername == "all") then
+					CommandManager:RunFromConsole(cmd_text, EntityManager.GetPlayer());
+				end
 			elseif(playername) then
 				local targetPlayer;
 				if(playername == "p") then

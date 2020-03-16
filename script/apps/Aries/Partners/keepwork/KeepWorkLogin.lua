@@ -135,8 +135,8 @@ function KeepWorkLogin.OnClickLogin(btnName, forms)
 		return 
 	end
 
-	local username = string.gsub(forms.user_name, "^%s*(.-)%s*$", "%1");
-	local password = string.gsub(forms.password, "^%s*(.-)%s*$", "%1");
+	local username = string.gsub(forms.user_name or "", "^%s*(.-)%s*$", "%1");
+	local password = string.gsub(forms.password or "", "^%s*(.-)%s*$", "%1");
 	
 	NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
 	local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");

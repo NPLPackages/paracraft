@@ -43,12 +43,17 @@ function CreateSimpleShape:Run()
 	local z = self.z;
 
 	if(not self.block_id) then
-		local itemStack = EntityManager.GetPlayer():GetItemInRightHand();
-		if(itemStack) then
-			local item = itemStack:GetItem();
-			if(item) then
-				self.block_data = self.block_data or item:GetBlockData(itemStack);
+		local player = EntityManager.GetPlayer()
+		if(player) then
+			local itemStack = player:GetItemInRightHand();
+			if(itemStack) then
+				local item = itemStack:GetItem();
+				if(item) then
+					self.block_data = self.block_data or item:GetBlockData(itemStack);
+				end
 			end
+		else
+			return;
 		end
 	end
 
