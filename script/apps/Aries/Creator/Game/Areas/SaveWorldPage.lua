@@ -63,44 +63,52 @@ function SaveWorldPage.ShowPage(bShow)
 end
 
 function SaveWorldPage.OnSaveWorld(worldname)
-	if(not worldname or worldname=="" or WorldCommon.GetWorldTag("name") == worldname) then
-        GameLogic.QuickSave();
-    else
-		if(not EnterGamePage.CheckRight("uploadgame")) then
-			return;
-		end
-        local cur_dir = ParaWorld.GetWorldDirectory();
-        local filepath = cur_dir:gsub("[^/\\]+[/\\]$", worldname.."/")
-        _guihelper.MessageBox(format("确定要另存为:%s", filepath), function(res)
-			filepath = commonlib.Encoding.Utf8ToDefault(filepath);
-            local res = Map3DSystem.CreateWorld(filepath, ParaWorld.GetWorldDirectory(), true, true, true, true);
-	        if(res == true) then
-                _guihelper.MessageBox("保存成功");
-
-				local tag_filename = filepath.."/tag.xml"
-				local xmlRoot = ParaXML.LuaXML_ParseFile(tag_filename);
-				if(xmlRoot) then
-					local node;
-					for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
-						if(node.attr) then
-							node.attr.name = worldname;
-							break;
+	local function callback()
+		if(not worldname or worldname=="" or WorldCommon.GetWorldTag("name") == worldname) then
+			GameLogic.QuickSave();
+		else
+			if(not EnterGamePage.CheckRight("uploadgame")) then
+				return;
+			end
+			local cur_dir = ParaWorld.GetWorldDirectory();
+			local filepath = cur_dir:gsub("[^/\\]+[/\\]$", worldname.."/")
+			_guihelper.MessageBox(format("确定要另存为:%s", filepath), function(res)
+				filepath = commonlib.Encoding.Utf8ToDefault(filepath);
+				local res = Map3DSystem.CreateWorld(filepath, ParaWorld.GetWorldDirectory(), true, true, true, true);
+				if(res == true) then
+					_guihelper.MessageBox("保存成功");
+	
+					local tag_filename = filepath.."/tag.xml"
+					local xmlRoot = ParaXML.LuaXML_ParseFile(tag_filename);
+					if(xmlRoot) then
+						local node;
+						for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
+							if(node.attr) then
+								node.attr.name = worldname;
+								break;
+							end
+						end
+						NPL.load("(gl)script/ide/LuaXML.lua");
+						local file = ParaIO.open(tag_filename, "w");
+						if(file:IsValid()) then
+							-- create the tag.xml file under the world root directory. 
+							file:WriteString(commonlib.Lua2XmlString(xmlRoot, true) or "");
+							file:close();
 						end
 					end
-					NPL.load("(gl)script/ide/LuaXML.lua");
-					local file = ParaIO.open(tag_filename, "w");
-					if(file:IsValid()) then
-						-- create the tag.xml file under the world root directory. 
-						file:WriteString(commonlib.Lua2XmlString(xmlRoot, true) or "");
-						file:close();
-					end
-				end
+	
+				elseif(type(res) == "string") then  
+					_guihelper.MessageBox(res);
+				end    
+			end)
+		end
+	end
 
-            elseif(type(res) == "string") then  
-                _guihelper.MessageBox(res);
-            end    
-        end)
-    end
+	if GameLogic.GetFilters():apply_filters("SaveWorldPage.OnSaveWorld", callback) then
+		return false
+	end
+
+	callback()
 end
 
 function SaveWorldPage.TakeImage(bTakeIfFileDoesNotExist)
