@@ -109,7 +109,19 @@ function CodeGlobals:ctor()
 			return EntityManager.GetBlockEntity(math.floor(x), math.floor(y), math.floor(z));
 		end,
 		-- set block id at given position
+		-- @param blockId: can be number or string of "id:data"
 		setBlock = function(x,y,z, blockId, blockData)
+			if(type(blockId) == "string") then
+				local id, data = blockId:match("^(%d+):?(%d*)");
+				if(id) then
+					blockId = tonumber(id)
+					if(data and data~="") then
+						blockData = tonumber(data);
+					end
+				else
+					return
+				end
+			end
 			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData);
 		end,
 		-- similar to commonlib.gettable(tabNames) but in page scope.

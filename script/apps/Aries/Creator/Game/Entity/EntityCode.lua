@@ -728,6 +728,8 @@ end
 -- Overriden to provide the network packet for this entity.
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
+	-- we need to update tick just in case the isPowered is not set in scheduleUpdate
+	self:updateTick(x,y,z);
 	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:SaveToXMLNode());
 end
 

@@ -68,7 +68,11 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 				NplBrowserPlugin.Zoom({id = id, zoom = config.zoom});
 			end
 		else
-			NplBrowserPlugin.Open(input);
+            if(enabledResize and config.url == input.url)then
+			    NplBrowserPlugin.ChangePosSize({id = id, x = input.x, y = input.y, width = input.width, height = input.height, });
+            else
+			    NplBrowserPlugin.Open(input);
+            end
 		end
 	else
 		NplBrowserPlugin.Start(input);

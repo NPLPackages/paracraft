@@ -251,6 +251,9 @@ function BaseContext:CheckMousePick()
 end
 
 function BaseContext:HighlightPickBlock(result)
+	if(not click_data or not click_data.last_select_block or not result) then
+		return;
+	end
 	if(click_data.last_select_block.blockX ~= result.blockX or click_data.last_select_block.blockY ~= result.blockY or click_data.last_select_block.blockZ ~= result.blockZ) then
 		if(click_data.last_select_block.blockX) then
 				

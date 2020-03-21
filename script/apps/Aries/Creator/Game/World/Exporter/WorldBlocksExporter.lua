@@ -90,6 +90,31 @@ function WorldBlocksExporter.loadAssetFile(asset_file_name,callback)
 	loader:Start();
 end
 
+function WorldBlocksExporter.ExportRegionTo_glTF(output_dir, radius)
+	local blocks_exporter = WorldBlocksExporter:new():Init(output_dir, {x = true, xfolder = false, zip = false, interval = 2000, });
+	local cx, cy, cz = ParaScene.GetPlayer():GetPosition();
+	blocks_exporter:SetWorldOptions({x = cx, y = cy, z = cz});
+	-- region size is 512 * 512
+	-- if radius <= 512, only one region, radius will be 0, so divide radius by (region_width + 1)
+	local region_width = 512;
+	radius = math.floor(radius / (region_width + 1));
+	blocks_exporter:ExportRegionsFrom(cx,cz,radius,function()
+		_guihelper.MessageBox("done");
+		local last_char = string.sub(output_dir, #output_dir);
+		if (last_char ~= "/") then
+			output_dir = output_dir.."/";
+		end
+		local results = commonlib.Files.Find({}, output_dir, 1, 10000, "*.x")
+		for _, result in ipairs(results) do
+			local parax_file = output_dir..result.filename;
+			filename = parax_file:gsub("%.%w+$", "")
+			local glb_file = filename..".glb";
+			ParaScene.ParaXFileExportTo_glTF_File(parax_file, glb_file, nil, true, false);
+		end
+		ParaIO.DeleteFile(output_dir.."*.x");
+	end);
+end
+
 function WorldBlocksExporter:ctor()
 
 end
@@ -106,6 +131,10 @@ function WorldBlocksExporter:Init(output_worldname,options)
 	self.options = options or {};
 	self.options.root = self.options.root or "BlocksExport";
 	self.options.interval = self.options.interval or 2000;
+	-- create options.root folder if xfolder is true
+	if (self.options.xfolder == nil) then
+		self.options.xfolder = true;
+	end
 
 
 	self.mapTextures = {};
@@ -230,6 +259,9 @@ end
 function WorldBlocksExporter:GetOutputDir()
 	local root_dir = string.format("%s%s",ParaIO.GetCurDirectory(0),self.options.root);
 	local out_world_dir = string.format("%s/%s",root_dir, self.output_worldname);
+	if (not self.options.xfolder) then
+		out_world_dir = self.output_worldname;
+	end
 	return out_world_dir;
 end
 function WorldBlocksExporter:ExportRegion(region_x, region_z, callback)
@@ -242,8 +274,8 @@ function WorldBlocksExporter:ExportRegion(region_x, region_z, callback)
 		ParaIO.CreateDirectory(out_dir_blocks_data_json .. "/");
 	end
 	
-	local out_dir_blocks_data_x;
-	if(self.options.x)then
+	local out_dir_blocks_data_x = out_world_dir;
+	if(self.options.x and self.options.xfolder)then
 		out_dir_blocks_data_x = string.format("%s/BlocksData/x",out_world_dir);
 		ParaIO.CreateDirectory(out_dir_blocks_data_x.. "/");
 	end
@@ -284,10 +316,12 @@ function WorldBlocksExporter:ExportRegion(region_x, region_z, callback)
 		local filename = string.format("%s/%d_%d.json",out_dir_blocks_data_json,region_x,region_z);
 		WorldBlocksExporter:WriteToJson(filename, blocks_map)
 	end
+	--[[
 	if(self.options.x)then
 		ParaIO.DeleteFile(out_dir_blocks_data_x.."/*.xml");
 		ParaIO.DeleteFile(out_dir_blocks_data_x.."/*.bmax");
 	end
+	]]
 	-- export textures
 	ParaAsset.SetAssetServerUrl("http://cdn.keepwork.com/update61/assetdownload/update/");
 	WorldBlocksExporter.loadAssetFile(self.textures, function()

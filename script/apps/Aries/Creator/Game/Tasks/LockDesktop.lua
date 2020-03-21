@@ -9,6 +9,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/LockDesktop.lua");
 local LockDesktop = commonlib.gettable("MyCompany.Aries.Game.Tasks.LockDesktop");
 LockDesktop.ShowPage(true, 5, "window is locked");
+LockDesktop.IsLocked()
 -------------------------------------------------------
 ]]
 local LockDesktop = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Tasks.LockDesktop"));
@@ -23,7 +24,14 @@ end
 -- @param duration: in seconds
 function LockDesktop.ShowPage(bShow, duration, text)
 	duration = duration or 10;
+	if(duration == 0) then
+		LockDesktop.DoUnlock();
+		return;
+	end
 	if(GameLogic.IsServerWorld()) then
+		if(bShow) then
+			LockDesktop.isLocked = true;
+		end
 		if(text and text~="") then
 			GameLogic.AddBBS("LockDesktop", text, math.floor(duration*1000), "255 0 0");
 		end
@@ -61,15 +69,46 @@ function LockDesktop.ShowPage(bShow, duration, text)
 		});
 end
 
+-- call this every 1 secs
+function LockDesktop.DoLock()
+	if(not LockDesktop.isLocked) then
+		LockDesktop.isLocked = true;
+		if(GameLogic.IsRemoteWorld()) then
+			ParaScene.GetAttributeObject():SetField("BlockInput", true);
+			ParaCamera.GetAttributeObject():SetField("BlockInput", true);
+		end
+	end
+	if(GameLogic.IsRemoteWorld()) then
+		ParaEngine.GetAttributeObject():CallField("BringWindowToTop");
+	end
+	if(page) then
+		page:SetValue("timeLeft", tostring(LockDesktop.timeLeft));
+	end
+end
+
+function LockDesktop.IsLocked()
+	return LockDesktop.isLocked;
+end
+
+function LockDesktop.DoUnlock()
+	LockDesktop.isLocked = false;
+	ParaScene.GetAttributeObject():SetField("BlockInput", false);
+	ParaCamera.GetAttributeObject():SetField("BlockInput", false);
+	if(page) then
+		page:CloseWindow();
+		page = nil;
+	end
+	GameLogic.AddBBS("LockDesktop", nil, 0, "255 0 0");
+	if(LockDesktop.timer) then
+		LockDesktop.timer:Change();
+	end
+end
+
 function LockDesktop.OnTimer(timer)
 	LockDesktop.timeLeft = LockDesktop.timeLeft - 1;
 	if(LockDesktop.timeLeft < 0) then
-		timer:Change();
-		if(page) then
-			page:CloseWindow();
-		end
+		LockDesktop.DoUnlock()
 	else
-		page:SetValue("timeLeft", tostring(LockDesktop.timeLeft));
-		ParaEngine.GetAttributeObject():CallField("BringWindowToTop");
+		LockDesktop.DoLock()
 	end
 end

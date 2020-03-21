@@ -1205,13 +1205,16 @@ function SelectBlocks:PasteBlocks(bx, by, bz)
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
 				local dx,dy,dz = MyCompany.Aries.Game.Tasks.TransformBlocks:GetDeltaPosition(copy_task.x,copy_task.y,copy_task.z, copy_task.aabb);
 				
-				TransformWnd.ShowPage(copy_task.blocks, {x=dx, y=dy, z=dz, method=copy_task.operation}, function(trans, res)
+				TransformWnd.ShowPage(copy_task.blocks, {x=dx, y=dy, z=dz, method=copy_task.operation}, function(trans, res, method)
 					if(trans and res == "ok") then
 						copy_task.dx = trans.x;
 						copy_task.dy = trans.y;
 						copy_task.dz = trans.z;
 						copy_task.x,copy_task.y,copy_task.z = nil, nil, nil;
 						copy_task = MyCompany.Aries.Game.Tasks.TransformBlocks:new(copy_task);
+						if(method == "no_clone") then
+							copy_task.operation = "move"
+						end
 						copy_task:Run();
 					end
 				end)

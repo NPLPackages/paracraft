@@ -62,6 +62,7 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				end
 			end
 		end
+		return true;
 	end
 end
 

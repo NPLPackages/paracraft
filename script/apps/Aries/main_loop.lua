@@ -623,7 +623,7 @@ local function Aries_Init()
 	if(not System.options.mc) then
 		-- load all worlds configuration file
 		NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
-		MyCompany.Aries.WorldManager:Init("script/apps/Aries/Scene/AriesGameWorlds.config.xml");
+		MyCompany.Aries.WorldManager:Init("config/Aries/Scene/AriesGameWorlds.config.xml");
 	
 
 		local login_news_page = System.SystemInfo.GetField("login_news_page");

@@ -7,7 +7,7 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
-MyCompany.Aries.WorldManager:Init("script/apps/Aries/Scene/AriesGameWorlds.config.xml");
+MyCompany.Aries.WorldManager:Init("config/Aries/Scene/AriesGameWorlds.config.xml");
 local world = WorldManager:GetWorldInfo("main_town");
 LOG.debug({world, world.worldpath, world.name, })
 local world_info = WorldManager:GetCurrentWorld()
@@ -89,7 +89,7 @@ function WorldManager:Init(filename)
 	end
 
 	-- read all worlds configuration file. 
-	filename = filename or "script/apps/Aries/Scene/AriesGameWorlds.config.xml"
+	filename = filename or "config/Aries/Scene/AriesGameWorlds.config.xml"
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(not xmlRoot) then
 		LOG.std(nil, "error", "WorldManager", "failed loading world config file %s", filename);

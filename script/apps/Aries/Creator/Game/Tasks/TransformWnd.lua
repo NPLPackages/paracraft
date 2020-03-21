@@ -22,7 +22,7 @@ local transform = {};
 local old_transform = {};
 
 -- @param trans: {x, y, z, rot_y, blocks, method}
--- @param callbackFunc: function(trans, result) end, where result is "ok" if user clicked ok. 
+-- @param callbackFunc: function(trans, result, method) end, where result is "ok" if user clicked ok. where method is "clone" "no_clone"
 function TransformWnd.ShowPage(blocks, trans, callbackFunc)
 	TransformWnd:InitSingleton();
 	if(page) then
@@ -60,7 +60,8 @@ function TransformWnd.ShowPage(blocks, trans, callbackFunc)
 	params._page.OnClose = function()
 		ParaTerrain.DeselectAllBlock(groupindex_hint);
 		if(TransformWnd.callbackFunc) then
-			TransformWnd.callbackFunc(transform, TransformWnd.result);
+			local method = page:GetValue("method")
+			TransformWnd.callbackFunc(transform, TransformWnd.result, method);
 		end
 		page = nil;
 	end

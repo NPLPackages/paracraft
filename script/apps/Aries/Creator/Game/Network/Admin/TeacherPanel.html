@@ -1,0 +1,48 @@
+<!-- "script/apps/Aries/Creator/Game/Network/Admin/TeacherPanel.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="TeacherPanel.lua"><![CDATA[
+TeacherPanel = commonlib.gettable("MyCompany.Aries.Game.Network.Admin.TeacherPanel");
+TeacherPanel.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+local AppButtons = {
+{name="lock", tooltip=L"同学们，请看老师", icon="Texture/3DMapSystem/AppIcons/png/login_64.png", },
+{name="chat", tooltip=L"全服广播", icon="Texture/3DMapSystem/AppIcons/png/chat_64.png", },
+{name="summon", tooltip=L"全部到我身边", icon="Texture/Aries/Dock/Web/Action_32bits.png", },
+{name="skins", tooltip=L"改皮肤", icon="Texture/Aries/Item/2333_Christmas_Clothing.png", },
+{name="scale", tooltip=L"改变大小", icon="Texture/Aries/Creator/NC_NPC_32bits.png", },
+{name="teleport", tooltip=L"瞬移到指定用户", icon="Texture/Aries/Friends/tab_nearby_on2_32bits.png", },
+};
+function ds_AppButtons(index)
+    if(not index) then
+        return #AppButtons;
+    else
+        return AppButtons[index];
+    end
+end
+]]></script>
+<aries:window mode="thin" style="width:300px;" title='<%=L"教师控制面板"%>' onclose="ClosePage">
+<div style="margin-top:5px;margin-bottom:10px">
+    <pe:gridview name="ToolBar" style="height:32px;" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="32" pagesize="12" DataSource='<%=ds_AppButtons%>'>
+        <Columns>
+            <div style="width:38px;">
+                <div align="center" style="width:32px;">
+                    <input type="button" name='<%=Eval("name")%>' tooltip='<%=Eval("tooltip")%>' onclick="TeacherPanel.OnClickItem" background='<%=Eval("icon") or ""%>' style="width:32px;height:32px;" />
+                </div>
+            </div>
+        </Columns>
+    </pe:gridview>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

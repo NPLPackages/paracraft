@@ -96,16 +96,14 @@ end
 
 function ExtrudeBlocks:Redo()
 	if((#self.history)>0) then
-		local _, b;
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[6], b[7]);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[6], nil, b[7]);
 		end
 	end
 end
 
 function ExtrudeBlocks:Undo()
 	if((#self.history)>0) then
-		local _, b;
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0);
 		end

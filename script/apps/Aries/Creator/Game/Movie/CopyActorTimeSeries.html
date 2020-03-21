@@ -13,17 +13,45 @@ CopyActorTimeSeries.OnInit();
 ]]></script>
 <aries:window mode="thin" style="width:512px;" title='<%=L"复制关键帧"%>' onclose="CopyActorTimeSeries.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
-    <pe:gridview name="nameGvw" style="height:300px;" DataSource="<%=CopyActorTimeSeries.GetDs%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="3" AllowPaging="false" pagesize="512">
-            <Columns>
-                <div style="float:left;height:30px;min-width:120px">
-                    <input name="<%=Eval('name')>" type="checkbox" checked="checked"/>
-                    <div style="float:left;" for="<%=Eval('name')>"><%=Eval("displayName")%></div>
-                </div>
-    		</Columns>
-        </pe:gridview>
+    <pe:gridview name="nameGvw" style="height:260px;" DataSource="<%=CopyActorTimeSeries.GetDs%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="3" AllowPaging="false" pagesize="512">
+        <Columns>
+            <div style="float:left;height:30px;min-width:120px;color:#ffffff">
+                <input name="<%=Eval('name')%>" type="checkbox" checked="<%=Eval('checked') and 'true'%>" style="margin-top:2px;" onclick="CopyActorTimeSeries.ToggleVariable" />
+                <div style="float:left;margin-left:2px;" ><%=Eval("displayName")%></div>
+            </div>
+    	</Columns>
+    </pe:gridview>
+    <div style="margin-left:300px;margin:5px;">
+        <input name="selectAll" type="checkbox" checked="<%=CopyActorTimeSeries.isSelectAll and 'true'%>"  onclick="CopyActorTimeSeries.ToggleSelect" style="margin-top:2px;"/>
+        <div style="float:left;margin-left:2px;" for="selectAll"><%=L"全选/全取消"%></div>
+    </div>
     <hr />
-    <div style="margin-top:10px;">
-        <input type="button" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="CopyActorTimeSeries.OnClickCopy" value='<%=L"复制"%>' />
+    <div style="margin-top:5px;height:60px;">
+        <div style="position:relative;">
+            <div style="margin-top:4px;margin-left:5px;float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+                <pe:mc_block block_id='<%=CopyActorTimeSeries.GetItemStack().id%>' style="width:32px;height:32px;" tooltip=""/>
+            </div>
+            <div style="float:left;width:160px;margin-left:10px;">
+                <div>
+                    <div style="float:left"><%=L"名称:"%></div>
+                    <%=tostring(CopyActorTimeSeries.GetItemStack():GetDisplayName() or "")%>
+                </div>
+                <div style="color:#808080">
+                    <%=tostring(CopyActorTimeSeries.GetActor():GetValue("assetfile", 0) or "")%>
+                </div>
+            </div>
+            <div style="float:left;margin-left:10px;">
+                <div>
+                    <div style="float:left"><%=L"起始帧:"%></div>
+                    <input name="fromTime" value="0" style="width:60px"/>
+                </div>
+                <div>
+                    <div style="float:left"><%=L"结束帧:"%></div>
+                    <input name="toTime" value="" style="width:60px"/>
+                </div>
+            </div>
+        </div>
+        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-top:5px;margin-right:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="CopyActorTimeSeries.OnClickCopy" value='<%=L"复制"%>' />
     </div>
 </div>
 </aries:window>

@@ -648,12 +648,13 @@ Commands["lock"] = {
 	quick_ref="/lock [duration] [message_text]", 
 	desc=[[lock the user's computer for some seconds. 
 The user can not click, close or switch window. This is usually used by a teacher host to get students' attention
-@param duration: default to 10 seconds
+@param duration: default to 10 seconds. 0 to unlock
 e.g. 
 /runat @all /lock 10  Look at your teacher
 /lock
 /lock 60
 /lock 10  Look at your teacher
+/lock 0 unlock
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local duration;
@@ -661,6 +662,12 @@ e.g.
 		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/LockDesktop.lua");
 		local LockDesktop = commonlib.gettable("MyCompany.Aries.Game.Tasks.LockDesktop");
-		LockDesktop.ShowPage(true, duration, cmd_text);
+		if(duration == 0) then
+			-- unlock
+			LockDesktop.ShowPage(false, duration, cmd_text);
+		else
+			-- lock
+			LockDesktop.ShowPage(true, duration, cmd_text);
+		end
 	end,
 };

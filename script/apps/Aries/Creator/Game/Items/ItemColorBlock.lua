@@ -113,6 +113,7 @@ function ItemColorBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 		if(res) then
 			self:PaintBlock(x,y,z, self:GetPenColor(itemStack))
 		end
+		return res;
 	else
 		data = self:ColorToData(self:GetPenColor(itemStack));
 		return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);

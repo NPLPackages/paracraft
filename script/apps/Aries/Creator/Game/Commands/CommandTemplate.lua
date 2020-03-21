@@ -159,6 +159,7 @@ Commands["savemodel"] = {
 /savemodel test
 /savemodel -auto_scale false test
 /savemodel -interactive test
+/savemodel -interactive "file name"
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local option;
@@ -176,7 +177,8 @@ Commands["savemodel"] = {
 				break;
 			end
 		end
-		local templatename = cmd_text:match("(%S*)$");
+		local templatename;
+		templatename, cmd_text = CmdParser.ParseFilename(cmd_text);
 
 		if(not templatename or templatename == "") then
 			templatename = "default";
@@ -269,6 +271,35 @@ Commands["generatemodel"] = {
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/GenerateModelTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.GenerateModel:new({filename = filename});
 		task:Run()
+	end,
+};
+
+Commands["exportgltf"] = {
+	name="exportgltf", 
+	quick_ref="/exportgltf [-radius] [output]", 
+	desc=[[--export all blocks in then region(region size is 512 * 512) around the player
+	/export myfolder
+	-- export all then regions in radius units around the player
+	/export [-radius] 512 myfolder
+	@param output: it will create a folder call output/output.glb  + textures.
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ExportTask.lua");
+		local Export = commonlib.gettable("MyCompany.Aries.Game.Tasks.Export");
+
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		local radius = 0;
+		local output = cmd_text;
+		if (options.radius) then
+			radius, output = cmd_text:match("%s*(%d*)%s*(%S*)$");
+		end
+		output = commonlib.Encoding.Utf8ToDefault(output);
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/Exporter/WorldBlocksExporter.lua");
+		local WorldBlocksExporter = commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.WorldBlocksExporter");
+
+		WorldBlocksExporter.ExportRegionTo_glTF(output, radius);
 	end,
 };
 

@@ -757,6 +757,9 @@ end
 -- @return is_flying
 function Entity:ToggleFly(bFly)
 	local player = self:GetInnerObject();
+	if(not player) then
+		return
+	end
 	if(bFly == nil) then
 		if(not self:IsFlying()) then
 			bFly = true;

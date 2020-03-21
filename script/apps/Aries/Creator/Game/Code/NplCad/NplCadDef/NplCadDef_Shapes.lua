@@ -255,6 +255,140 @@ local cmds = {
 },
 
 {
+	type = "box_fillet", 
+	message0 = L" %1 圆角 长方体 X %2 Y %3 Z %4 %5 %6 %7",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 2, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 1, 
+		},
+        {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2,3,4,5,6,7,8,9,10,11,12}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+         
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "box_fillet",
+	func_description = 'box_fillet(%s,%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'box_fillet(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('box_fillet("%s",%s,%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), 
+        self:getFieldValue('edges'),
+        self:getFieldValue('values'),
+        self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "box_chamfer", 
+	message0 = L" %1 斜角 长方体 X %2 Y %3 Z %4 %5 %6 %7",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 2, 
+		},
+        {
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 1, 
+		},
+        {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2,3,4,5,6,7,8,9,10,11,12}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+         
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "box_chamfer",
+	func_description = 'box_chamfer(%s,%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'box_chamfer(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('box_chamfer("%s",%s,%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), 
+        self:getFieldValue('edges'),
+        self:getFieldValue('values'),
+        self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
 	type = "sphere", 
 	message0 = L"%1 球体 半径 %2 %3",
     arg0 = {
@@ -292,6 +426,7 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
 },
+
 {
 	type = "cylinder", 
 	message0 = L"%1 柱体 半径 %2 高 %3 %4",
@@ -333,6 +468,126 @@ local cmds = {
 	func_description_js = 'cylinder(%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cylinder("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "cylinder_fillet", 
+	message0 = L"%1 圆角 柱体 半径 %2 高 %3 %4 %5 %6",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+         {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "cylinder_fillet",
+	func_description = 'cylinder_fillet(%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'cylinder_fillet(%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('cylinder_fillet("%s",%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('radius'), self:getFieldValue('height'), 
+        self:getFieldValue('edges'), self:getFieldValue('values'), 
+        self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "cylinder_chamfer", 
+	message0 = L"%1 斜角 柱体 半径 %2 高 %3 %4 %5 %6",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+         {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "cylinder_chamfer",
+	func_description = 'cylinder_chamfer(%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'cylinder_chamfer(%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('cylinder_chamfer("%s",%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('radius'), self:getFieldValue('height'), 
+        self:getFieldValue('edges'), self:getFieldValue('values'), 
+        self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},
@@ -387,6 +642,138 @@ local cmds = {
 	func_description_js = 'cone(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
 		return string.format('cone("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "cone_fillet", 
+	message0 = L"%1 圆角 圆锥体 顶部半径 %2 底部半径 %3 高 %4 %5 %6 %7",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "radius1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "radius2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 4,},
+			text = 4, 
+		},
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "cone_fillet",
+	func_description = 'cone_fillet(%s,%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'cone_fillet(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('cone_fillet("%s",%s,%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), 
+        self:getFieldValue('edges'), self:getFieldValue('values'), 
+        self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "cone_chamfer", 
+	message0 = L"%1 斜角 圆锥体 顶部半径 %2 底部半径 %3 高 %4 %5 %6 %7",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "radius1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "radius2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 4,},
+			text = 4, 
+		},
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 10,},
+			text = 10, 
+		},
+        {
+			name = "edges",
+			type = "field_input",
+			text = "{1,2}", 
+		},
+        {
+			name = "values",
+			type = "field_input",
+			text = "{0.2,0.2}", 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ff0000",},
+			text = "#ff0000", 
+		},
+        
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "cone_chamfer",
+	func_description = 'cone_chamfer(%s,%s,%s,%s,%s,%s,%s)',
+	func_description_js = 'cone_chamfer(%s,%s,%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('cone_chamfer("%s",%s,%s,%s,%s,%s,"%s")\n', self:getFieldValue('op'), 
+        self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), 
+        self:getFieldValue('edges'), self:getFieldValue('values'), 
+        self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

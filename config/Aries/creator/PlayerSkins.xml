@@ -100,12 +100,33 @@
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_K_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_L_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_M_01.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_zhengc3.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_zhengc2.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_zhengc.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_lan_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_lan_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_lan_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_lan_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_hong_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_hong_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_hong_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_hong_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_R_03.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_A_14.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_A_011.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_ai.png" />
+      
     </group>
     <group name="paperman_mouth">
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_02.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_03.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_04.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_05.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_06.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_02_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_03_01.png" />

@@ -46,7 +46,7 @@ end
 function ItemTimeSeries:OnItemRightClick(itemStack, entityPlayer)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 	local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-	MovieClipController.SetFocusToItemStack(itemStack);
+	MovieClipController.OnRightClickItemStack(itemStack)
     return itemStack, true;
 end
 

@@ -51,6 +51,22 @@ function TimeSeries:LoadFromTable(data)
 	end
 end
 
+-- @param data: if nil, it will create empty table and return it. 
+-- @return data 
+function TimeSeries:SaveToTable(data)
+	data = data or {}
+	for k,v in pairs(self.data) do
+		data[k] = v;
+	end
+	if(self.children) then
+		for k,v in pairs(self.children) do
+			data[k] = v:SaveToTable();
+		end
+	end
+	data.isContainer = true;
+	return data;
+end
+
 -- get child timeseries
 function TimeSeries:GetChild(name)
 	if(self.children) then

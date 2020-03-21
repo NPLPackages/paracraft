@@ -184,7 +184,7 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
 	if(obj and obj:IsCharacter()) then
 		assetfile = assetfile or page:GetValue("assetfile");
 		if(assetfile) then
-			assetfile = assetfile:gsub("%s", "");
+			assetfile = assetfile:gsub("^%s+",""):gsub("%s+$","");
 		end
 		local old_filename = assetfile;
 		assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(commonlib.Encoding.Utf8ToDefault(assetfile));
@@ -208,7 +208,7 @@ end
 
 function MobPropertyPage.OnClickOK()
 	local name = page:GetValue("name");
-	name = string.gsub(name,"%s","");
+	name = name and name:gsub("^%s+",""):gsub("%s+$","");
 	local name_len = ParaMisc.GetUnicodeCharNum(name);
 	if(name_len > 16)then
 		_guihelper.MessageBox(L"名字不能超过16个字, 请重新输入");

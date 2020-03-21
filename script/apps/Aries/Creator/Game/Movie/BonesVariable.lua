@@ -416,3 +416,23 @@ function BonesVariable:GetKeys_Iter(anim, TimeFrom, TimeTo)
 		return BonesVariable._super.GetKeys_Iter(self, anim, TimeFrom, TimeTo);
 	end
 end
+
+-- a single attribute like rotation, trans or scaling on a bone. 
+-- @param name: such as "boneName_rot", "boneName_trans", "boneName_scale"
+function BonesVariable:GetBoneAttributeVariableByName(name)
+	local boneName, typeName = (name or ""):match("^(.*)_(%w+)$")
+	if(boneName and typeName) then
+		local boneVar = self:GetChild(boneName);
+		if(boneVar) then
+			local boneAttrVar;
+			if(boneVar:GetRotName() == name) then
+				boneAttrVar = boneVar:GetVariable(1)
+			elseif(boneVar:GetTransName() == name) then
+				boneAttrVar = boneVar:GetVariable(2)
+			elseif(boneVar:GetScaleName() == name) then
+				boneAttrVar = boneVar:GetVariable(3)
+			end
+			return boneAttrVar;
+		end
+	end
+end

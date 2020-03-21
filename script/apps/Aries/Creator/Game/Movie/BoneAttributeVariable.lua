@@ -211,3 +211,16 @@ function BoneAttributeVariable:PasteKeyFramesInRange(time, fromTime, toTime)
 		self:LoadFromTimeVar();
 	end
 end
+
+-- append a key intelligently without introducing keys, it will automatically update the range if necessary.
+-- currently it only works for range 0. 
+-- if type is Linear, it will create a new key only if the last key, the last last key and the new key are all the same. 
+-- if type is Discrete, it will always create a new key. 
+-- @param time: if time is smaller than the last time, previous time, value will be removed. 
+-- @param bForceAppend: always append no matter what. 
+-- @return true if appended.
+function BoneAttributeVariable:AutoAppendKey(time, data, bForceAppend)
+	local res = self:CreateGetTimeVar():AutoAppendKey(time, data, bForceAppend);
+	self:LoadFromTimeVar();
+	return res;
+end

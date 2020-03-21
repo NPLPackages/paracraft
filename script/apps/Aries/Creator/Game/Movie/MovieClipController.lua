@@ -91,14 +91,87 @@ function MovieClipController.GetItemStack()
 	return curItemStack;
 end
 
+function MovieClipController.DeleteSelectedActor()
+	local itemStack = MovieClipController.GetItemStack()
+	local movieClip = MovieClipController.GetMovieClip()
+	if(movieClip and itemStack) then
+		local inventory = movieClip:GetEntity():GetInventory();
+		if(inventory) then
+			local slot_index = inventory:GetItemStackIndex(itemStack)
+			if(slot_index) then
+				inventory:RemoveItem(slot_index)
+			end
+		end
+	end
+end
+
+function MovieClipController.OnClickActorContextMenuItem(node)
+	local name = node.Name;
+	if(name == "copySelected" or name == "pasteSelected") then
+		local actor = MovieClipController.GetMovieActor();
+		if(actor) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CopyActorTimeSeries.lua");
+			local CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
+			if(name == "copySelected") then
+				local movieClip = MovieManager:GetActiveMovieClip();
+				local fromTime, toTime;
+				if(movieClip) then
+					fromTime = movieClip:GetStartTime();
+					toTime = movieClip:GetLength();
+				end
+				CopyActorTimeSeries.ShowPage(actor, actor:GetTime() or fromTime, toTime)
+			else
+				CopyActorTimeSeries.PasteToActor(actor)
+			end
+		end
+	elseif(name == "delete") then
+		MovieClipController.DeleteSelectedActor()
+	end
+end
+
+function MovieClipController.OnShowActorContextMenu(x,y, width, height)
+	if(MovieClipController.contextMenuActor == nil)then
+		MovieClipController.contextMenuActor = CommonCtrl.ContextMenu:new{
+			name = "contextMenuActor",
+			width = 180,
+			height = 30,
+			DefaultNodeHeight = 26,
+			onclick = MovieClipController.OnClickActorContextMenuItem,
+		};
+		local node = MovieClipController.contextMenuActor.RootNode;
+		node:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
+		local node = node:GetChild(1);
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"选择性复制...", Name = "copySelected", Type = "Menuitem",  }));
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴", Name = "pasteSelected", Type = "Menuitem",  }));
+		node:AddChild(CommonCtrl.TreeNode:new({Text = "", Name = "", Type = "Separator",  }));
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"删除", Name = "delete", Type = "Menuitem",  }));
+	end
+	if(not x or not width) then
+		x, y, width, height = _guihelper.GetLastUIObjectPos();
+	end
+	if(x and width) then
+		MovieClipController.contextMenuActor:Show(x, y+height);
+	end
+end
+
+
+function MovieClipController.OnRightClickItemStack(itemStack)
+	if(not MovieClipController.SetFocusToItemStack(itemStack)) then
+		MovieClipController.OnShowActorContextMenu();
+	end
+end
+
 function MovieClipController.SetFocusToItemStack(itemStack)
+	local curItemChanged;
 	if(curItemStack~=itemStack) then
 		curItemStack = itemStack;
+		curItemChanged = true;
 		if(page) then
 			page:Refresh(0.1);
 		end
 	end
 	MovieClipController.SetFocusToActor();
+	return curItemChanged;
 end
 
 function MovieClipController.IsPlayingMode()
