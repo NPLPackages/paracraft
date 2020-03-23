@@ -233,40 +233,39 @@ end
 
 -- save the current world (could be a zip file) to another folder
 function WorldCommon.SaveWorldAs()
-	local function callback()
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
-		local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
-				
-		local lastWorldName = WorldCommon.GetWorldTag("name") or "no_name"
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+			
+	local lastWorldName = WorldCommon.GetWorldTag("name") or "no_name"
+
+	if(GameLogic.IsRemoteWorld()) then
+		-- always save before save as if world is a remote client world.
+		GameLogic.RunCommand("/touchworld");
+		GameLogic.SaveAll(true, true);
+	end
+
+	local defaultWorldName = lastWorldName;
+	for i=1, 10 do
+		local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
+		if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+			defaultWorldName = lastWorldName..L"_副本"..tostring(i);
+		else
+			break;
+		end	
+	end
 	
-		if(GameLogic.IsRemoteWorld()) then
-			-- always save before save as if world is a remote client world.
-			GameLogic.RunCommand("/touchworld");
-			GameLogic.SaveAll(true, true);
-		end
-	
-		local defaultWorldName = lastWorldName;
-		for i=1, 10 do
-			local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
-			if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
-				defaultWorldName = lastWorldName..L"_副本"..tostring(i);
-			else
-				break;
-			end	
-		end
-		
-		if(GameLogic.options:HasCopyright()) then
-			_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
-			return
-		end
-	
-	
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
-			if(result and result~="") then
+	if(GameLogic.options:HasCopyright()) then
+		_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
+		return
+	end
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
+		if(result and result~="") then
+			local function callback()
 				local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. result.. "/";
-				if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+				if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
 					_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
 						if(res and res == _guihelper.DialogResult.Yes) then
 							WorldCommon.SaveWorldAsImp(targetFolder);
@@ -275,18 +274,18 @@ function WorldCommon.SaveWorldAs()
 				else
 					WorldCommon.SaveWorldAsImp(targetFolder);
 				end
-	
+
 				local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
 				GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
 			end
-		end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
-	end
+		
+			if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", callback) then
+				return false
+			end
 
-	if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", callback) then
-		return false
-	end
-
-	callback()
+			callback()
+		end
+	end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
 end
 
 function WorldCommon.SaveWorldAsImp(folderName)
