@@ -259,24 +259,31 @@ function WorldCommon.SaveWorldAs()
 		return
 	end
 
-
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
 		if(result and result~="") then
-			local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. result.. "/";
-			if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
-				_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
-					if(res and res == _guihelper.DialogResult.Yes) then
-						WorldCommon.SaveWorldAsImp(targetFolder);
-					end
-				end, _guihelper.MessageBoxButtons.YesNo);
-			else
-				WorldCommon.SaveWorldAsImp(targetFolder);
+			local function callback()
+				local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. result.. "/";
+				if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+					_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+						if(res and res == _guihelper.DialogResult.Yes) then
+							WorldCommon.SaveWorldAsImp(targetFolder);
+						end
+					end, _guihelper.MessageBoxButtons.YesNo);
+				else
+					WorldCommon.SaveWorldAsImp(targetFolder);
+				end
+
+				local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
+				GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
+			end
+		
+			if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", callback) then
+				return false
 			end
 
-			local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
-			GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
+			callback()
 		end
 	end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
 end

@@ -83,8 +83,13 @@ function LocalLoadWorld.GetWorldFolder()
 end
 
 function LocalLoadWorld.GetWorldFolderFullPath()
+	local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath", LocalLoadWorld.GetWorldFolder());
+
+	if (LocalLoadWorld.OpenWorldFolderFullPath and LocalLoadWorld.OpenWorldFolderFullPath ~= myWorldFolder) then
+		LocalLoadWorld.OpenWorldFolderFullPath = nil
+	end
+
 	if (not LocalLoadWorld.OpenWorldFolderFullPath) then
-		local myWorldFolder = GameLogic.GetFilters():apply_filters("LocalLoadWorld.GetWorldFolderFullPath", LocalLoadWorld.GetWorldFolder());
 		LocalLoadWorld.OpenWorldFolderFullPath = myWorldFolder;
 		
 		if (not commonlib.Files.IsAbsolutePath(LocalLoadWorld.OpenWorldFolderFullPath)) then
@@ -98,14 +103,12 @@ function LocalLoadWorld.GetWorldFolderFullPath()
 	return LocalLoadWorld.OpenWorldFolderFullPath;
 end
 
-local saveWorldPath;
+-- local saveWorldPath;
 -- same as LocalLoadWorld.GetWorldFolderFullPath() by default
 function LocalLoadWorld.GetDefaultSaveWorldPath()
-	if(not saveWorldPath) then
-		saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
-		LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
-	end
-	return saveWorldPath;
+	local saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
+	LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
+	return saveWorldPath
 end
 
 -- refresh all causing world list to be refreshed. 
