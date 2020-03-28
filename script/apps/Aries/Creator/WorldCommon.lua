@@ -279,7 +279,7 @@ function WorldCommon.SaveWorldAs()
 				GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
 			end
 		
-			if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", callback) then
+			if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", false, callback) then
 				return false
 			end
 
