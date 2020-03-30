@@ -312,6 +312,7 @@ function DefaultTheme:Load()
 		},
 		-- Haqi UI Control style
 		["defaultbutton"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4",color="#ffffff"},
+		["card_button"] = {background = "Texture/Aries/Common/ThemeKid/button_highlight_32bits.png;0 0 32 20:12 9 12 9",},
 		["button"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4",color="#ffffff"},
 		["button_highlight"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4",color="#ffffff"},
 		["button_thick"] = {background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4",color="#ffffff"},

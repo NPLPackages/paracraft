@@ -129,6 +129,13 @@ function MovieClipController.OnClickActorContextMenuItem(node)
 	end
 end
 
+-- menu items
+local actorMenuItems = {
+	{name="copySelected", text=L"选择性复制..."}, 
+	{name="pasteSelected", text=L"粘贴"},
+	{name="delete", text=L"删除"},
+};
+
 function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 	if(MovieClipController.contextMenuActor == nil)then
 		MovieClipController.contextMenuActor = CommonCtrl.ContextMenu:new{
@@ -145,6 +152,34 @@ function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴", Name = "pasteSelected", Type = "Menuitem",  }));
 		node:AddChild(CommonCtrl.TreeNode:new({Text = "", Name = "", Type = "Separator",  }));
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"删除", Name = "delete", Type = "Menuitem",  }));
+	end
+	local ctl = MovieClipController.contextMenuActor
+	local node = ctl.RootNode:GetChild(1);
+	if(node) then
+		node:ClearAllChildren();
+		local actor = MovieClipController.GetMovieActor();
+		for index, item in ipairs(actorMenuItems) do
+			local text = item.text or item.name;
+				
+			if(item.name == "pasteSelected") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CopyActorTimeSeries.lua");
+				local CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
+				local obj = CopyActorTimeSeries.GetClipBoardData()
+				if(obj and actor and actor:GetItemStack().id == obj.itemId) then
+					if(obj.fromTime ~= obj.toTime and obj.toTime) then
+						text = format(L"粘贴区间: %d-%d", obj.fromTime, obj.toTime or -1);
+					else
+						text = format(L"%s %s", text, tostring(obj.fromTime or 0));
+					end
+				else
+					text = nil;
+				end
+			end
+			if(text) then
+				node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }))
+			end
+		end
+		ctl.height = (#actorMenuItems) * 26 + 4;
 	end
 	if(not x or not width) then
 		x, y, width, height = _guihelper.GetLastUIObjectPos();

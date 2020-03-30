@@ -26,8 +26,8 @@ local cmds = {
         {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         {
 			name = "value",
@@ -74,8 +74,8 @@ local cmds = {
         {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         {
 			name = "value",
@@ -129,8 +129,8 @@ local cmds = {
         {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         {
 			name = "value",
@@ -181,8 +181,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
          
@@ -233,8 +233,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
          
@@ -295,8 +295,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
          
@@ -362,8 +362,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
          
@@ -407,8 +407,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -452,8 +452,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -508,8 +508,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -568,8 +568,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -626,8 +626,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -688,8 +688,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -754,8 +754,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -804,8 +804,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -855,8 +855,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
         
@@ -908,8 +908,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
        
 	},
@@ -961,8 +961,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
        
 	},
@@ -1021,8 +1021,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
        
 	},
@@ -1072,8 +1072,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         {
 			name = "swapYZ",
@@ -1122,8 +1122,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         {
 			name = "swapYZ",
@@ -1227,8 +1227,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
        
 	},
@@ -1280,8 +1280,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1345,8 +1345,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1387,8 +1387,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1422,8 +1422,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1463,8 +1463,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1528,8 +1528,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1575,8 +1575,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1616,8 +1616,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -1651,8 +1651,8 @@ local cmds = {
 		{
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
          
@@ -1668,6 +1668,60 @@ local cmds = {
 	func_description_js = 'createFromBrep_test(%s,%s)',
 	ToNPL = function(self)
 		return string.format('createFromBrep_test("%s","%s")\n', self:getFieldValue('op'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "text3d", 
+	message0 = L" %1 文字 %2 字体 %3 大小 %4 %5",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "text",
+			type = "field_input",
+			text = "Paracraft",
+		},
+        {
+			name = "fontname",
+			type = "field_dropdown",
+			options = {
+				{ L"微软雅黑", "C:/WINDOWS/FONTS/MSYH.TTC" },
+				{ L"宋体", "C:/WINDOWS/FONTS/SIMSUN.TTC" },
+			},
+		},
+        {
+			name = "size",
+			type = "input_value",
+            shadow = { type = "math_number", value = 16,},
+			text = 1, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
+		},
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "text3d",
+	func_description = 'text3d(%s,"%s","%s",%s, %s)',
+	func_description_js = 'text3d(%s,"%s","%s",%s, %s)',
+	ToNPL = function(self)
+        return string.format('text3d("%s","%s","%s", %s,"%s")\n', 
+			self:getFieldValue('op'), self:getFieldValue('text'), self:getFieldValue('fontname'), self:getFieldValue('size'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

@@ -127,6 +127,12 @@ function PowerItemService:OnUserLoginWorld(msg)
 			LOG.std(nil, "error", "PowerItemService", "user login process encounter some error\n");
 		end
 	end
+	if(msg.nid == "localuser") then
+		commonlib.TimerManager.SetTimeout(function()  
+			Do_Proc_UserLoginfunction({issuccess=true})
+		end, 10)
+		return 
+	end
 	-- proc user login
 	PowerItemManager.Proc_UserLogin(tonumber(msg.nid), worldpath, function(msg)
 		if(not bImmediate) then

@@ -29,8 +29,8 @@ function PacketEntityMove:Init1(entity)
     self.x = math.floor(entity.x * 32);
     self.y = math.floor(entity.y * 32);
     self.z = math.floor(entity.z * 32);
-    self.facing = math.floor(entity.facing * 32);
-    self.pitch = math.floor(entity.rotationPitch * 32);
+    self.facing = math.floor((entity.facing or 0)* 32);
+    self.pitch = math.floor((entity.rotationPitch or 0)* 32);
 	return self;
 end
 

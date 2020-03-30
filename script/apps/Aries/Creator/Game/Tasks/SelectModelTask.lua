@@ -336,6 +336,7 @@ function SelectModel:OnExit()
 	SelectModel.EndEditing();
 end
 
+
 function SelectModel:mousePressEvent(event)
 	local ctrl_pressed = event.ctrl_pressed;
 	local shift_pressed = event.shift_pressed;
@@ -348,7 +349,7 @@ function SelectModel:mousePressEvent(event)
 				if(result.blockX)then
 					ParaTerrain.DeselectAllBlock();
 					local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-					self.entity:SetBlockPos(bx,by,bz);
+					self:MoveToBlockPos(bx,by,bz);
 					if(self.entity.bx) then
 						ParaTerrain.SelectBlock(self.entity.bx, self.entity.by, self.entity.bz, true);
 					end
@@ -549,12 +550,27 @@ function SelectModel.DoMoveNode()
 		end
 	end
 end
+
+
+-- translate
+function SelectModel:MoveToBlockPos(bx, by, bz)
+	if(self.entity) then
+		self.entity:SetBlockPos(bx,by,bz);
+		if(self.entity:IsServerEntity() and self.entity:IsRemote()) then
+			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityMove:new():Init(self.entity));
+		end
+	end
+end
+
 -- rotation
 function SelectModel.DoFacing(v)
 	local self = cur_instance;
 	if(self)then
 		if(self.entity) then
 			self.entity:SetFacingDelta(v);
+			if(self.entity:IsServerEntity() and self.entity:IsRemote()) then
+				GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityMove:new():Init(self.entity));
+			end
 		else
 			local objNode = self:SwapToMiniScene();
 			if(objNode) then
@@ -569,7 +585,14 @@ function SelectModel.DoScaling(v)
 	local self = cur_instance;
 	if(self)then
 		if(self.entity) then
-			self.entity:SetScalingDelta(v);
+			if(self.entity:IsServerEntity() and self.entity:IsRemote()) then
+				self.entity:SetScalingDelta(v);
+				if(self.entity.UpdateAndSendDataWatcher) then
+					self.entity:UpdateAndSendDataWatcher();
+				end
+			else
+				self.entity:SetScalingDelta(v);
+			end
 		else
 			local objNode = self:SwapToMiniScene();
 			if(objNode) then
@@ -584,8 +607,12 @@ function SelectModel.DoRemove()
 	local self = cur_instance;
 	if(self)then
 		if(SelectModel.IsEntity()) then
-			self.entity:Destroy();
-			--self.is_modified = true;
+			if(self.entity:IsServerEntity() and self.entity:IsRemote()) then
+				GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketDestroyEntity:new():Init({self.entity.entityId}));
+			else
+				self.entity:Destroy();
+				--self.is_modified = true;
+			end
 			SelectModel.EndEditing(true);
 		else
 			local objNode = self:SwapToMiniScene();

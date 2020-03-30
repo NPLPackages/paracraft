@@ -224,9 +224,13 @@ end
 function ParaWorldAnalytics.OnNPLErrorCallBack(errorMessage)
 	log(errorMessage);
 	local stackInfo;
---	stackInfo = commonlib.debugstack(2, 5, 1)
---	log("stack:\n");
---	log(stackInfo)
+	if(type(errorMessage) == "string") then
+		local title;
+		title, stackInfo = errorMessage:match("^([^\r\n]+)\r?\n(.*)$")
+		if(stackInfo) then
+			errorMessage = title;
+		end
+	end
 	ParaWorldAnalytics:SendErrorLog(errorMessage, stackInfo);
 	if(ParaWorldAnalytics.errorCallback) then
 		ParaWorldAnalytics.errorCallback(errorMessage, stackInfo);

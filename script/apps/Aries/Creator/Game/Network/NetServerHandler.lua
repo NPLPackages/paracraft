@@ -36,6 +36,11 @@ function NetServerHandler:ctor()
 	self.currentTicks = 0;
 end
 
+-- @return true if we allow client to edit the given entity on server. 
+function NetServerHandler:CheckAllowEditEntity(entity)
+	return true;
+end
+
 function NetServerHandler:Init(playerConnection, playerEntity, server_manager)
 	self.server_manager = server_manager;
 	self.playerConnection = playerConnection;
@@ -309,11 +314,14 @@ function NetServerHandler:handleClickEntity(packet_ClickEntity)
 end
 
 function NetServerHandler:handleEntityMetadata(packet_EntityMetadata)
-    local entity = self.playerEntity;
-    if (entity and packet_EntityMetadata:GetMetadata()) then
+	local entity = self:GetEntityByID(packet_EntityMetadata.entityId) or self.playerEntity;
+    if (entity and self:CheckAllowEditEntity(entity) and packet_EntityMetadata:GetMetadata()) then
         local watcher = entity:GetDataWatcher();
 		if(watcher) then
 			watcher:UpdateWatchedObjectsFromList(packet_EntityMetadata:GetMetadata());
+			if(entity ~= self.playerEntity and entity.LoadFromDataWatcher) then
+				entity:LoadFromDataWatcher();
+			end
 		end
     end
 end
@@ -372,6 +380,19 @@ function NetServerHandler:handleEntityFunction(packet_EntityFunction)
 				local itemStack = ItemStack:new():Init(param.id, param.count, param.serverdata);
 				local entity = EntityManager.EntityItem:new():Init(param.x,param.y,param.z, itemStack, throwed_item_lifetime);
 				entity:Attach();
+			end
+		elseif(name == "mobProperty") then
+			entity = self:GetEntityByID(packet_EntityFunction.entityId);
+			if(entity) then
+--				if(param.displayName) then
+--					entity:SetDisplayName(param.displayName);
+--				end
+--				if(param.name) then
+--					entity:SetName(param.name);
+--				end
+				if(param.canRandomWalk~=nil) then
+					entity:SetCanRandomMove(param.canRandomWalk);
+				end
 			end
 		else
 			-- TODO: for other one time commmand
@@ -488,4 +509,35 @@ function NetServerHandler:handleCodeBlockEvent(packet_CodeBlockEvent)
 		end
 		GameLogic.GetCodeGlobal():handleNetworkEvent(name, data);
 	end
+end
+
+function NetServerHandler:handleDestroyEntity(packet_DestroyEntity)
+    for i =1, #(packet_DestroyEntity.entity_ids) do
+		local entity = self:GetEntityByID(packet_DestroyEntity.entity_ids[i]);
+        if(entity and not entity:IsPlayer() and self:CheckAllowEditEntity(entity)) then
+			entity:Destroy();
+		end
+    end
+end
+
+-- this is usaully called periodially in addition to RelEntity, to force a complete position update. 
+function NetServerHandler:handleEntityMove(packet_EntityMove)
+	local entityOther = self:GetEntityByID(packet_EntityMove.entityId);
+    if (entityOther and self:CheckAllowEditEntity(entityOther)) then
+        entityOther.serverPosX = packet_EntityMove.x;
+        entityOther.serverPosY = packet_EntityMove.y;
+        entityOther.serverPosZ = packet_EntityMove.z;
+        local x = entityOther.serverPosX / 32;
+        local y = entityOther.serverPosY / 32 + 0.015625;
+        local z = entityOther.serverPosZ / 32;
+        local facing;
+		if(packet_EntityMove.facing) then
+			facing = packet_EntityMove.facing / 32;
+		end
+		local pitch;
+		if(packet_EntityMove.pitch) then
+			pitch = packet_EntityMove.pitch / 32;
+		end
+		entityOther:SetPositionAndRotation(x, y, z, facing, pitch);
+    end
 end

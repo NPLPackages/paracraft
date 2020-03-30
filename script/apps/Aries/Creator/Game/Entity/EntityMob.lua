@@ -265,60 +265,76 @@ function Entity:GetNewItemsList()
 	return itemStackArray;
 end
 
+-- send data watcher from client to server
+-- @param bForceAll: if true it will send all fields, otherwise just changed ones.
+function Entity:UpdateAndSendDataWatcher(bForceAll)
+	self:SaveToDataWatcher()
+	GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityMetadata:new():Init(self.entityId, self:GetDataWatcher(), bForceAll));
+end
+
+-- update watched data according to current entity's value
+function Entity:SaveToDataWatcher()
+	local dataWatcher = self:GetDataWatcher();
+	local obj = self:GetInnerObject();
+	if(not obj) then
+		return;
+	end
+	local newAsset = self:GetMainAssetPath();
+	local watchedAsset = dataWatcher:GetField(self.dataFieldAsset);
+	if(watchedAsset ~= newAsset) then
+		dataWatcher:SetField(self.dataFieldAsset, newAsset);
+	end
+	local watchedAnimId = dataWatcher:GetField(self.dataFieldAnim);
+	local curAnimId = obj:GetField("AnimID", curAnimId);
+	if(watchedAnimId ~= curAnimId) then
+		dataWatcher:SetField(self.dataFieldAnim, curAnimId);
+	end
+	local watchedScale = dataWatcher:GetField(self.dataFieldScale);
+	local curScale = obj:GetScale();
+	if(watchedScale ~= curScale) then
+		dataWatcher:SetField(self.dataFieldScale, curScale);
+	end
+	local watchedSkin = dataWatcher:GetField(self.dataFieldSkin);
+	local curSkin = self:GetSkin();
+	if(watchedSkin ~= curSkin and curSkin) then
+		dataWatcher:SetField(self.dataFieldSkin, curSkin);
+	end
+end
+
+-- update entity's value according to watched data received from server.
+function Entity:LoadFromDataWatcher()
+	local dataWatcher = self:GetDataWatcher();
+	local obj = self:GetInnerObject();
+	if(not obj) then
+		return;
+	end
+		
+	local curAsset = dataWatcher:GetField(self.dataFieldAsset);
+	if(curAsset and self:GetMainAssetPath() ~= curAsset) then
+		self:SetMainAssetPath(curAsset);
+	end
+	local curAnimId = dataWatcher:GetField(self.dataFieldAnim);
+	if(obj:GetField("AnimID", 0) ~= curAnimId and curAnimId) then
+		obj:SetField("AnimID", curAnimId);
+	end
+	local curScale = dataWatcher:GetField(self.dataFieldScale);
+	if(obj:GetScale() ~= curScale and curScale) then
+		obj:SetScale(curScale);
+	end
+	local curSkinId = dataWatcher:GetField(self.dataFieldSkin);
+	if(self:GetSkin() ~= curSkinId and curSkinId) then
+		self:SetSkin(curSkinId, true);
+	end
+end
 
 -- update data in data watcher, such as asset, skin, anim, etc
 function Entity:SyncDataWatcher()
 	if(self:IsRemote()) then
 		-- on client: update entity's value according to watched data received from server.
-		local dataWatcher = self:GetDataWatcher();
-		local obj = self:GetInnerObject();
-		if(not obj) then
-			return;
-		end
-		
-		local curAsset = dataWatcher:GetField(self.dataFieldAsset);
-		if(curAsset and self:GetMainAssetPath() ~= curAsset) then
-			self:SetMainAssetPath(curAsset);
-		end
-		local curAnimId = dataWatcher:GetField(self.dataFieldAnim);
-		if(obj:GetField("AnimID", 0) ~= curAnimId and curAnimId) then
-			obj:SetField("AnimID", curAnimId);
-		end
-		local curScale = dataWatcher:GetField(self.dataFieldScale);
-		if(obj:GetScale() ~= curScale and curScale) then
-			obj:SetScale(curScale);
-		end
-		local curSkinId = dataWatcher:GetField(self.dataFieldSkin);
-		if(self:GetSkin() ~= curSkinId and curSkinId) then
-			self:SetSkin(curSkinId, true);
-		end
+		self:LoadFromDataWatcher();
 	elseif(GameLogic.isServer) then
 		-- on server: update watched data according to current entity's value
-		local dataWatcher = self:GetDataWatcher();
-		local obj = self:GetInnerObject();
-		if(not obj) then
-			return;
-		end
-		local newAsset = self:GetMainAssetPath();
-		local watchedAsset = dataWatcher:GetField(self.dataFieldAsset);
-		if(watchedAsset ~= newAsset) then
-			dataWatcher:SetField(self.dataFieldAsset, newAsset);
-		end
-		local watchedAnimId = dataWatcher:GetField(self.dataFieldAnim);
-		local curAnimId = obj:GetField("AnimID", curAnimId);
-		if(watchedAnimId ~= curAnimId) then
-			dataWatcher:SetField(self.dataFieldAnim, curAnimId);
-		end
-		local watchedScale = dataWatcher:GetField(self.dataFieldScale);
-		local curScale = obj:GetScale();
-		if(watchedScale ~= curScale) then
-			dataWatcher:SetField(self.dataFieldScale, curScale);
-		end
-		local watchedSkin = dataWatcher:GetField(self.dataFieldSkin);
-		local curSkin = self:GetSkin();
-		if(watchedSkin ~= curSkin and curSkin) then
-			dataWatcher:SetField(self.dataFieldSkin, curSkin);
-		end
+		self:SaveToDataWatcher();
 	end
 end
 

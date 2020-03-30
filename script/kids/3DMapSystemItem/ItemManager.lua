@@ -214,6 +214,282 @@ function ItemManager.RedirectAllGlobalStoreIconPath()
 	end
 end
 
+-- sync global store without calling ItemManager.GetGlobalStoreItem, such as from Paracraft modules. 
+function ItemManager.SyncGlobalStore()
+	if(not next(ItemManager.GlobalStoreTemplates)) then
+		NPL.load("(gl)script/kids/3DMapSystemApp/API/paraworld.globalstore.lua");
+		local globalstoreitems = paraworld.globalstore.read_from_cache("*");
+		if(globalstoreitems) then
+			for _, item in pairs(globalstoreitems) do
+				ItemManager.SyncGlobalStoreItem(item)
+			end
+			return true;
+		end
+	end
+end
+
+function ItemManager.SyncGlobalStoreItem(globalstoreitem)
+	-- NOTE 2012/11/29: if this table is not deepcopy, the modified template will be written into localserver
+	local gsTemplate = commonlib.deepcopy(globalstoreitem);
+	gsTemplate.template.stats = {};
+	local i;
+	for i = 1, 10 do
+		local type = gsTemplate.template["stat_type_"..i]
+		if(type ~= 0) then
+			gsTemplate.template.stats[type] = gsTemplate.template["stat_value_"..i];
+		end
+	end
+
+	-- parse stats in description
+	local json_str, desc = string.match(gsTemplate.template.description, "^(%[[^%[]*%])(.*)$");
+
+	if(desc) then
+		gsTemplate.template.description = desc;
+	end
+	if(json_str) then
+		gsTemplate.template.description = desc or "";
+		local description_stats = {};
+		NPL.FromJson(json_str, description_stats);
+		local _, _pair;
+		for _, _pair in pairs(description_stats) do
+			gsTemplate.template.stats[_pair.k] = _pair.v;
+		end
+	end
+				
+	-- parse default material
+	if(gsTemplate.template.material == 0) then
+		local class = gsTemplate.template.class;
+		local subclass = gsTemplate.template.subclass;
+
+		if(class == 1 and subclass <= 9) then
+			gsTemplate.template.material = 7;
+		elseif(class == 1 and (subclass == 10 or subclass == 11)) then
+			gsTemplate.template.material = 8;
+		elseif(class == 1 and (subclass >= 15 and subclass <= 17)) then
+			gsTemplate.template.material = 4;
+		elseif(class == 1 and (subclass == 18 or subclass == 19 or subclass == 70 or subclass == 71)) then
+			gsTemplate.template.material = 7;
+		elseif(class == 2 and (subclass == 2)) then
+			gsTemplate.template.material = 3;
+		elseif(class == 3 and (subclass == 6 or subclass == 8)) then
+			gsTemplate.template.material = 5;
+		elseif(class == 3 and (subclass == 7)) then
+			gsTemplate.template.material = 10;
+		elseif(class == 4) then
+			gsTemplate.template.material = 10;
+		elseif(class == 8 or class == 9) then
+			gsTemplate.template.material = 9;
+		elseif(class == 18) then
+			gsTemplate.template.material = 10;
+		elseif(class == 19) then
+			gsTemplate.template.material = 9;
+		elseif(class == 20) then
+			gsTemplate.template.material = 10;
+		end
+	end
+
+	-- for teen version apparel: parse the unisex model and icon
+	if(System.options.version == "teen") then
+		local class = gsTemplate.template.class;
+		local subclass = gsTemplate.template.subclass;
+		if(class == 1) then
+			-- icon female
+			local key = gsTemplate.assetkey;
+
+			-- NOTE: use explicit icon as the icon path and set female icon if exists
+			local base_dir = gsTemplate.icon;
+			local icon_female = string.gsub(base_dir, ".png", "_F.png");
+			if(ParaIO.DoesAssetFileExist(icon_female)) then
+				gsTemplate.icon_female = icon_female;
+			end
+
+			-- NOTE: original implementation check the characters.db item_id reference
+			--		 which non-visual items didn't keep a visual item_id
+			---- check if icon exist
+			--local base_dir = "Texture/Aries/Item_Teen/";
+			--local icon_female = base_dir..key.."_F.png";
+			--gsTemplate.icon = base_dir..key..".png";
+			--if(ParaIO.DoesFileExist(icon_female)) then
+				--gsTemplate.icon_female = icon_female;
+			--end
+
+			---- redirect alternate icon if characters.db item_id reference is available
+			--local alternate_model = GetAlternateModelFromID(gsTemplate.gsid + 30000);
+			--if(alternate_model) then
+				--local gsItem = ItemManager.GetGlobalStoreItemInMemory(alternate_model - 30000);
+				--if(gsItem) then
+					--gsTemplate.icon = gsItem.icon;
+					--gsTemplate.icon_female = gsItem.icon_female;
+				--end
+			--end
+
+			-- 221 apparel_quality(CG) 装备的品质 -1未知 0白 1绿 2蓝 3紫 
+			if(not gsTemplate.template.stats[221]) then
+				-- default unknown
+				gsTemplate.template.stats[221] = -1;
+			end
+		end
+	end
+
+	if(gsTemplate.template.class == 18) then
+		if(System.options.version == "teen") then
+			NPL.load("(gl)script/apps/Aries/Combat/ServerObject/card_server.lua");
+			local Card = commonlib.gettable("MyCompany.Aries.Combat_Server.Card");
+			local gsid, cardkey = string.match(gsTemplate.assetkey, "^(%d-)_(.+)$");
+			if(gsid and cardkey) then
+				gsid = tonumber(gsid);
+				if(gsTemplate.gsid == gsid) then
+					MsgHandler.InitCardTemplateIfNot();
+					local cardTemplate = Card.GetCardTemplate(cardkey);
+					if(cardTemplate and cardTemplate.params) then
+						-- 134 pipcost_card_or_qualification(C) 卡片或卷轴消耗的pips
+						if(cardTemplate.pipcost) then
+							gsTemplate.template.stats[134] = cardTemplate.pipcost;
+							if(cardTemplate.pipcost == -14) then
+								gsTemplate.template.stats[134] = 114;
+							end
+						end
+						-- 135 accuracy_card_or_qualification(C) 卡片或卷轴的命中率 儿童版的百分比发招成功率 仅供卡片提示显示用
+						if(cardTemplate.accuracy) then
+							gsTemplate.template.stats[135] = cardTemplate.accuracy;
+							if(System.options.version == "teen") then
+								gsTemplate.template.stats[135] = 100;
+							end
+						end
+						-- 136 school_card_or_qualification(C) 卡片或卷轴的属性 6火 7冰 8风暴 9神秘 10生命 11死亡 12平衡
+						-- 137 school_requirement(CG) 物品穿着必须系别 1金 2木 3水 4火 5土 6火 7冰 8风暴 9神秘 10生命 11死亡 12平衡 
+						if(cardTemplate.spell_school) then
+							local spell_school = cardTemplate.spell_school;
+							spell_school = string.lower(spell_school);
+							if(spell_school == "fire") then
+								gsTemplate.template.stats[136] = 6;
+							elseif(spell_school == "ice") then
+								gsTemplate.template.stats[136] = 7;
+							elseif(spell_school == "storm") then
+								gsTemplate.template.stats[136] = 8;
+							elseif(spell_school == "myth") then
+								gsTemplate.template.stats[136] = 9;
+							elseif(spell_school == "life") then
+								gsTemplate.template.stats[136] = 10;
+							elseif(spell_school == "death") then
+								gsTemplate.template.stats[136] = 11;
+							elseif(spell_school == "balance") then
+								gsTemplate.template.stats[136] = 12;
+							end
+							-- NOTE 2012/1/9: globalstore item with 137 for aution house school filtering
+							--				  close this stat on local globalstoreitem
+							gsTemplate.template.stats[137] = nil;
+						end
+						-- 138 combatlevel_requirement(CG) 
+						if(cardTemplate.require_level) then
+							gsTemplate.template.stats[138] = cardTemplate.require_level;
+						else
+							gsTemplate.template.stats[138] = nil;
+						end
+						-- 249 card_can_learn(CG) 用户可以靠系别或者辅修得到的技能 主要是白卡 以及配置是在xml文件中 (青年版) 
+						local quality = gsTemplate.template.stats[221];
+						if(cardTemplate.can_learn == true and (not quality or quality == 0)) then
+							-- 221 apparel_quality(CG) 装备的品质 -1未知 0白 1绿 2蓝 3紫 4橙 
+							gsTemplate.template.stats[249] = 1;
+						else
+							gsTemplate.template.stats[249] = nil;
+						end
+						-- 186 cooldown_rounds(CG) 卡片技能的cooldown轮数 
+						if(cardTemplate.params.cooldown) then
+							gsTemplate.template.stats[186] = cardTemplate.params.cooldown;
+						end
+						if(cardTemplate.params.description) then
+							local description = cardTemplate.params.description;
+							local fields = {};
+							local stat_name;
+							for stat_name in string.gmatch(description, "{([^{^}]+)}") do
+								if(cardTemplate.params[stat_name]) then
+									fields["{"..stat_name.."}"] = tostring(cardTemplate.params[stat_name]);
+								else
+									fields["{"..stat_name.."}"] = "";
+								end
+							end
+							description = string.gsub(description, "({[^{^}]+})", fields);
+							gsTemplate.template.description = description;
+						end
+						gsTemplate.template.stats[58] = 1;
+					end
+				end
+			end
+		end
+	end
+				
+	------ NOTE 2012/11/29: replace all "#" at hosting code, otherwise the localserver version is modified
+	---- NOTE 2012/11/18: replace all "#" sign with newline
+	--gsTemplate.template.description = string.gsub(gsTemplate.template.description, "#", "<br/>");
+				
+				
+	gsTemplate.template.description = string.gsub(gsTemplate.template.description, "#", "\n");
+				
+
+	--NOTE 2012/11/23: CreateGemHole is deprecated in teen version
+
+	--if(System.options.version == "teen") then
+		---- 67 Item_CanCreateGemHole_Count(CS) 装备可开槽的数量 只能从0变为一个数值 不能改 (青年版) 当有填写stat36的时候 stat67是1  
+		---- 68 Cost_CraftSlotCharm_Count(CS) 装备镶嵌宝石消耗打孔石的数量 只能从0变为一个数值 不能改 (青年版) 当有填写stat36的时候 stat68是1  
+		--if(gsTemplate.template.stats[36]) then
+			--if(not gsTemplate.template.stats[67]) then
+				--gsTemplate.template.stats[67] = 1;
+			--end
+			--if(not gsTemplate.template.stats[68]) then
+				--gsTemplate.template.stats[68] = 1;
+			--end
+		--end
+	--end
+
+	--local skip_check_keys = {
+		--["未使用"] = true,
+		--["废弃"] = true,
+		--["废除"] = true,
+		--["未开放"] = true,
+	--};
+				
+	local isdeprecated = false;
+	--local skip_key, _;
+	--for skip_key, _ in pairs(skip_check_keys) do
+		--if(string.find(gsTemplate.template.name, skip_key)) then
+			--isdeprecated = true;
+			--break;
+		--end
+	--end
+
+	if(not isdeprecated) then
+		-- record in memory for ItemManager.GetGlobalStoreItemInMemory(gsid)
+		ItemManager.GlobalStoreTemplates[gsTemplate.gsid] = gsTemplate; -- LXZ: why use deep copy? commonlib.deepcopy(gsTemplate)
+	end
+
+	--[[
+	gsTemplate.assetfile = string.lower(gsTemplate.assetfile);
+	local ext = string.match(gsTemplate.assetfile, "%.(%w+)$");
+	if(ParaIO.DoesFileExist(gsTemplate.assetfile, false) == true) then
+		if(ext == "zip") then
+			-- TODO: check the inner zip file existency
+		end
+	else
+		if(ext == nil) then
+			--log("warning: no file extension for global store item:"..tostring(gsTemplate.gsid).." with assetfile:"..tostring(gsTemplate.assetfile).."\n")
+			-- TODO: download the file anyway
+			-- TODO: or specify the files with the asset file name
+		elseif(ext == "zip") then
+			-- TODO: directly download the file, and extract the files to specific folder
+		else
+			-- TODO: directly download the file
+		end
+	end
+	if(string.match(gsTemplate.descfile, "{.+}")) then
+		-- TODO: assetfile is a data content
+	elseif(string.match(gsTemplate.descfile, "http://.+")) then
+		-- TODO: assetfile is a data content
+	end
+	]]
+end
+		
+
 -- Get global store item templates
 -- @param gsids: commer-separated global store ids, a maximum of 10 gsids in one call
 -- @param queueName: request queue name. it can be nil. 
@@ -233,264 +509,7 @@ function ItemManager.GetGlobalStoreItem(gsids, queuename, callbackFunc, cache_po
 		if(msg and msg.globalstoreitems and msg.globalstoreitems[1]) then
 			-- log(string.format("%d globalstoreitems read. dt: %d\n", #(msg.globalstoreitems), ParaGlobal.timeGetTime() - fromTime));
 			for i = 1, #(msg.globalstoreitems) do
-				-- NOTE 2012/11/29: if this table is not deepcopy, the modified template will be written into localserver
-				local gsTemplate = commonlib.deepcopy(msg.globalstoreitems[i]);
-				gsTemplate.template.stats = {};
-				local i;
-				for i = 1, 10 do
-					local type = gsTemplate.template["stat_type_"..i]
-					if(type ~= 0) then
-						gsTemplate.template.stats[type] = gsTemplate.template["stat_value_"..i];
-					end
-				end
-
-				-- parse stats in description
-				local json_str, desc = string.match(gsTemplate.template.description, "^(%[[^%[]*%])(.*)$");
-
-				if(desc) then
-					gsTemplate.template.description = desc;
-				end
-				if(json_str) then
-					gsTemplate.template.description = desc or "";
-					local description_stats = {};
-					NPL.FromJson(json_str, description_stats);
-					local _, _pair;
-					for _, _pair in pairs(description_stats) do
-						gsTemplate.template.stats[_pair.k] = _pair.v;
-					end
-				end
-				
-				-- parse default material
-				if(gsTemplate.template.material == 0) then
-					local class = gsTemplate.template.class;
-					local subclass = gsTemplate.template.subclass;
-
-					if(class == 1 and subclass <= 9) then
-						gsTemplate.template.material = 7;
-					elseif(class == 1 and (subclass == 10 or subclass == 11)) then
-						gsTemplate.template.material = 8;
-					elseif(class == 1 and (subclass >= 15 and subclass <= 17)) then
-						gsTemplate.template.material = 4;
-					elseif(class == 1 and (subclass == 18 or subclass == 19 or subclass == 70 or subclass == 71)) then
-						gsTemplate.template.material = 7;
-					elseif(class == 2 and (subclass == 2)) then
-						gsTemplate.template.material = 3;
-					elseif(class == 3 and (subclass == 6 or subclass == 8)) then
-						gsTemplate.template.material = 5;
-					elseif(class == 3 and (subclass == 7)) then
-						gsTemplate.template.material = 10;
-					elseif(class == 4) then
-						gsTemplate.template.material = 10;
-					elseif(class == 8 or class == 9) then
-						gsTemplate.template.material = 9;
-					elseif(class == 18) then
-						gsTemplate.template.material = 10;
-					elseif(class == 19) then
-						gsTemplate.template.material = 9;
-					elseif(class == 20) then
-						gsTemplate.template.material = 10;
-					end
-				end
-
-				-- for teen version apparel: parse the unisex model and icon
-				if(System.options.version == "teen") then
-					local class = gsTemplate.template.class;
-					local subclass = gsTemplate.template.subclass;
-					if(class == 1) then
-						-- icon female
-						local key = gsTemplate.assetkey;
-
-						-- NOTE: use explicit icon as the icon path and set female icon if exists
-						local base_dir = gsTemplate.icon;
-						local icon_female = string.gsub(base_dir, ".png", "_F.png");
-						if(ParaIO.DoesAssetFileExist(icon_female)) then
-							gsTemplate.icon_female = icon_female;
-						end
-
-						-- NOTE: original implementation check the characters.db item_id reference
-						--		 which non-visual items didn't keep a visual item_id
-						---- check if icon exist
-						--local base_dir = "Texture/Aries/Item_Teen/";
-						--local icon_female = base_dir..key.."_F.png";
-						--gsTemplate.icon = base_dir..key..".png";
-						--if(ParaIO.DoesFileExist(icon_female)) then
-							--gsTemplate.icon_female = icon_female;
-						--end
-
-						---- redirect alternate icon if characters.db item_id reference is available
-						--local alternate_model = GetAlternateModelFromID(gsTemplate.gsid + 30000);
-						--if(alternate_model) then
-							--local gsItem = ItemManager.GetGlobalStoreItemInMemory(alternate_model - 30000);
-							--if(gsItem) then
-								--gsTemplate.icon = gsItem.icon;
-								--gsTemplate.icon_female = gsItem.icon_female;
-							--end
-						--end
-
-						-- 221 apparel_quality(CG) 装备的品质 -1未知 0白 1绿 2蓝 3紫 
-						if(not gsTemplate.template.stats[221]) then
-							-- default unknown
-							gsTemplate.template.stats[221] = -1;
-						end
-					end
-				end
-
-				if(gsTemplate.template.class == 18) then
-					if(System.options.version == "teen") then
-						NPL.load("(gl)script/apps/Aries/Combat/ServerObject/card_server.lua");
-						local Card = commonlib.gettable("MyCompany.Aries.Combat_Server.Card");
-						local gsid, cardkey = string.match(gsTemplate.assetkey, "^(%d-)_(.+)$");
-						if(gsid and cardkey) then
-							gsid = tonumber(gsid);
-							if(gsTemplate.gsid == gsid) then
-								MsgHandler.InitCardTemplateIfNot();
-								local cardTemplate = Card.GetCardTemplate(cardkey);
-								if(cardTemplate and cardTemplate.params) then
-									-- 134 pipcost_card_or_qualification(C) 卡片或卷轴消耗的pips
-									if(cardTemplate.pipcost) then
-										gsTemplate.template.stats[134] = cardTemplate.pipcost;
-										if(cardTemplate.pipcost == -14) then
-											gsTemplate.template.stats[134] = 114;
-										end
-									end
-									-- 135 accuracy_card_or_qualification(C) 卡片或卷轴的命中率 儿童版的百分比发招成功率 仅供卡片提示显示用
-									if(cardTemplate.accuracy) then
-										gsTemplate.template.stats[135] = cardTemplate.accuracy;
-										if(System.options.version == "teen") then
-											gsTemplate.template.stats[135] = 100;
-										end
-									end
-									-- 136 school_card_or_qualification(C) 卡片或卷轴的属性 6火 7冰 8风暴 9神秘 10生命 11死亡 12平衡
-									-- 137 school_requirement(CG) 物品穿着必须系别 1金 2木 3水 4火 5土 6火 7冰 8风暴 9神秘 10生命 11死亡 12平衡 
-									if(cardTemplate.spell_school) then
-										local spell_school = cardTemplate.spell_school;
-										spell_school = string.lower(spell_school);
-										if(spell_school == "fire") then
-											gsTemplate.template.stats[136] = 6;
-										elseif(spell_school == "ice") then
-											gsTemplate.template.stats[136] = 7;
-										elseif(spell_school == "storm") then
-											gsTemplate.template.stats[136] = 8;
-										elseif(spell_school == "myth") then
-											gsTemplate.template.stats[136] = 9;
-										elseif(spell_school == "life") then
-											gsTemplate.template.stats[136] = 10;
-										elseif(spell_school == "death") then
-											gsTemplate.template.stats[136] = 11;
-										elseif(spell_school == "balance") then
-											gsTemplate.template.stats[136] = 12;
-										end
-										-- NOTE 2012/1/9: globalstore item with 137 for aution house school filtering
-										--				  close this stat on local globalstoreitem
-										gsTemplate.template.stats[137] = nil;
-									end
-									-- 138 combatlevel_requirement(CG) 
-									if(cardTemplate.require_level) then
-										gsTemplate.template.stats[138] = cardTemplate.require_level;
-									else
-										gsTemplate.template.stats[138] = nil;
-									end
-									-- 249 card_can_learn(CG) 用户可以靠系别或者辅修得到的技能 主要是白卡 以及配置是在xml文件中 (青年版) 
-									local quality = gsTemplate.template.stats[221];
-									if(cardTemplate.can_learn == true and (not quality or quality == 0)) then
-										-- 221 apparel_quality(CG) 装备的品质 -1未知 0白 1绿 2蓝 3紫 4橙 
-										gsTemplate.template.stats[249] = 1;
-									else
-										gsTemplate.template.stats[249] = nil;
-									end
-									-- 186 cooldown_rounds(CG) 卡片技能的cooldown轮数 
-									if(cardTemplate.params.cooldown) then
-										gsTemplate.template.stats[186] = cardTemplate.params.cooldown;
-									end
-									if(cardTemplate.params.description) then
-										local description = cardTemplate.params.description;
-										local fields = {};
-										local stat_name;
-										for stat_name in string.gmatch(description, "{([^{^}]+)}") do
-											if(cardTemplate.params[stat_name]) then
-												fields["{"..stat_name.."}"] = tostring(cardTemplate.params[stat_name]);
-											else
-												fields["{"..stat_name.."}"] = "";
-											end
-										end
-										description = string.gsub(description, "({[^{^}]+})", fields);
-										gsTemplate.template.description = description;
-									end
-									gsTemplate.template.stats[58] = 1;
-								end
-							end
-						end
-					end
-				end
-				
-				------ NOTE 2012/11/29: replace all "#" at hosting code, otherwise the localserver version is modified
-				---- NOTE 2012/11/18: replace all "#" sign with newline
-				--gsTemplate.template.description = string.gsub(gsTemplate.template.description, "#", "<br/>");
-				
-				
-				gsTemplate.template.description = string.gsub(gsTemplate.template.description, "#", "\n");
-				
-
-				--NOTE 2012/11/23: CreateGemHole is deprecated in teen version
-
-				--if(System.options.version == "teen") then
-					---- 67 Item_CanCreateGemHole_Count(CS) 装备可开槽的数量 只能从0变为一个数值 不能改 (青年版) 当有填写stat36的时候 stat67是1  
-					---- 68 Cost_CraftSlotCharm_Count(CS) 装备镶嵌宝石消耗打孔石的数量 只能从0变为一个数值 不能改 (青年版) 当有填写stat36的时候 stat68是1  
-					--if(gsTemplate.template.stats[36]) then
-						--if(not gsTemplate.template.stats[67]) then
-							--gsTemplate.template.stats[67] = 1;
-						--end
-						--if(not gsTemplate.template.stats[68]) then
-							--gsTemplate.template.stats[68] = 1;
-						--end
-					--end
-				--end
-
-				--local skip_check_keys = {
-					--["未使用"] = true,
-					--["废弃"] = true,
-					--["废除"] = true,
-					--["未开放"] = true,
-				--};
-				
-				local isdeprecated = false;
-				--local skip_key, _;
-				--for skip_key, _ in pairs(skip_check_keys) do
-					--if(string.find(gsTemplate.template.name, skip_key)) then
-						--isdeprecated = true;
-						--break;
-					--end
-				--end
-
-				if(not isdeprecated) then
-					-- record in memory for ItemManager.GetGlobalStoreItemInMemory(gsid)
-					ItemManager.GlobalStoreTemplates[gsTemplate.gsid] = gsTemplate; -- LXZ: why use deep copy? commonlib.deepcopy(gsTemplate)
-				end
-
-				--[[
-				gsTemplate.assetfile = string.lower(gsTemplate.assetfile);
-				local ext = string.match(gsTemplate.assetfile, "%.(%w+)$");
-				if(ParaIO.DoesFileExist(gsTemplate.assetfile, false) == true) then
-					if(ext == "zip") then
-						-- TODO: check the inner zip file existency
-					end
-				else
-					if(ext == nil) then
-						--log("warning: no file extension for global store item:"..tostring(gsTemplate.gsid).." with assetfile:"..tostring(gsTemplate.assetfile).."\n")
-						-- TODO: download the file anyway
-						-- TODO: or specify the files with the asset file name
-					elseif(ext == "zip") then
-						-- TODO: directly download the file, and extract the files to specific folder
-					else
-						-- TODO: directly download the file
-					end
-				end
-				if(string.match(gsTemplate.descfile, "{.+}")) then
-					-- TODO: assetfile is a data content
-				elseif(string.match(gsTemplate.descfile, "http://.+")) then
-					-- TODO: assetfile is a data content
-				end
-				]]
+				ItemManager.SyncGlobalStoreItem(msg.globalstoreitems[i])
 			end
 		end
 		callbackFunc(msg);

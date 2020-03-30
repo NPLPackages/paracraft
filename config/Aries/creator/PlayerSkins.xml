@@ -118,7 +118,11 @@
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_A_14.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_A_011.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_ai.png" />
-      
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_pangjuan.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_si.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_nu.png" />
     </group>
     <group name="paperman_mouth">
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_01.png" />

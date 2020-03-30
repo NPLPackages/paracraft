@@ -46,6 +46,7 @@ end
             <div style="width:185px;height:185px;margin-bottom:5px;background-color:#00000080">
                 <pe:canvas3d name="AssetPreview" DefaultRotY="-1.57" DefaultCameraObjectDist="5" autoRotateSpeed="0.12" miniscenegraphname="AssetPreview" RenderTargetSize="256" style="width:185px;height:185px;" />
                 <div style="position:relative;margin-top:-180px;margin-left:5px;height:25px;width:180px;color:#808080;font-size:12px">
+                    <input name="btnTakeShapshot" tooltip='<%=L"生成缩略图"%>' type="button" style="margin-right:5px;margin-top:2px;width:16px;height:16px;background:url(Texture/3DMapSystem/common/page_white_camera.png)" onclick="OpenAssetFileDialog.OnTakeSnapShot"/>
                     <%=L"面数:"%><pe:label name="PolyCount" style="margin-left:5px;margin-top:1px"></pe:label>
                 </div>
             </div>

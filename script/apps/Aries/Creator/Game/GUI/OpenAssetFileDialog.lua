@@ -661,3 +661,24 @@ function OpenAssetFileDialog.ConvertCSVToXML(csvFilename, xmlFilename)
 		end
 	end
 end
+
+function OpenAssetFileDialog.OnTakeSnapShot()
+	local ctl = page and page:FindControl("AssetPreview");
+	if(ctl) then
+		local text = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"))
+		text = text:match("[^/\\]+$") or "default";
+		text = text:match("^[^%.]+") or text;
+		text = text..".png"
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+		OpenFileDialog.ShowPage("", function(result)
+			if(result and result~="") then
+				local filename = Files.WorldPathToFullPath(result)
+				if(filename) then
+					ctl:SaveToFile(filename, 64)
+					GameLogic.AddBBS(nil, format("缩略图保存到: %s", filename, 4000, "0 255 0"));
+				end
+			end
+		end, text, nil, "texture", true)
+	end
+end

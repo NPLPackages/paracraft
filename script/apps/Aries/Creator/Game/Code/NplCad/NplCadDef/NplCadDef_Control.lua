@@ -165,7 +165,6 @@ end
 ]]}},
 },
 
-
 };
 function NplCadDef_Control.GetCmds()
 	return cmds;

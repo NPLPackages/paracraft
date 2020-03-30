@@ -446,6 +446,7 @@ local function GetGlobalStoreCacheFile()
 	return "Database/"..GetGlobalStoreDBName()..".db.mem";
 end
 
+-- @param gsids: if "*" it will return all
 function paraworld.globalstore.read_from_cache(gsids)
 	if(globalstore_cache == false) then
 		return;
@@ -458,18 +459,22 @@ function paraworld.globalstore.read_from_cache(gsids)
 		end
 	end
 	if(globalstore_cache and gsids) then
-		local unknown_count = 0;
-		local o = {};
-		for gsid in string_gfind(gsids, "([^,]+)") do
-			gsid = tonumber(gsid);
-			local template = globalstore_cache[gsid];
-			if(template) then
-				o[#o+1] = template;
-			else
-				unknown_count = unknown_count + 1;
+		if(gsids == "*") then
+			return globalstore_cache;
+		else
+			local unknown_count = 0;
+			local o = {};
+			for gsid in string_gfind(gsids, "([^,]+)") do
+				gsid = tonumber(gsid);
+				local template = globalstore_cache[gsid];
+				if(template) then
+					o[#o+1] = template;
+				else
+					unknown_count = unknown_count + 1;
+				end
 			end
+			return o, unknown_count;
 		end
-		return o, unknown_count;
 	end
 end
 

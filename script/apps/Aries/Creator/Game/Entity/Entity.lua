@@ -1165,11 +1165,6 @@ end
 
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
-	-- TODO: move this to a separate file to handle editors for all kinds of object. 
-	if(self:IsServerEntity() and self:IsRemote()) then
-		LOG.std(nil, "info", "Entity:OpenEditor", "access denied, entity is only editable on server");
-		return;
-	end
 	if(editor_name == "entity") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EditEntityPage.lua");
 		local EditEntityPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditEntityPage");

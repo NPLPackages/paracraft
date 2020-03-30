@@ -21,8 +21,10 @@ CopyActorTimeSeries.OnInit();
             </div>
     	</Columns>
     </pe:gridview>
-    <div style="margin-left:300px;margin:5px;">
-        <input name="selectAll" type="checkbox" checked="<%=CopyActorTimeSeries.isSelectAll and 'true'%>"  onclick="CopyActorTimeSeries.ToggleSelect" style="margin-top:2px;"/>
+    <div style="margin-left:200px;margin:5px;">
+        <input name="isRelativePos" type="checkbox" checked="<%=CopyActorTimeSeries.isRelativePos and 'true'%>"  style="margin-top:2px;"/>
+        <div style="float:left;margin-left:2px;" for="isRelativePos"><%=L"相对位置"%></div>
+        <input name="selectAll" type="checkbox" checked="<%=CopyActorTimeSeries.isSelectAll and 'true'%>"  onclick="CopyActorTimeSeries.ToggleSelect" style="margin-top:2px;margin-left:20px;"/>
         <div style="float:left;margin-left:2px;" for="selectAll"><%=L"全选/全取消"%></div>
     </div>
     <hr />

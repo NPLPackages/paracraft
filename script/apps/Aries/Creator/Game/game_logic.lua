@@ -1562,6 +1562,15 @@ function GameLogic.ActivateDefaultContext()
 	return GameLogic.GameMode:ActivateDefaultContext();
 end
 
+function GameLogic.ActivateNullContext()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+	local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
+	local context = AllContext:GetContext("null");
+	if(context) then
+		return context:activate();
+	end
+end
+
 -- get current scene context
 function GameLogic.GetSceneContext()
 	return SceneContextManager:GetCurrentContext();

@@ -435,7 +435,7 @@ walkForward(0)
 	helpUrl = "", 
 	canRun = true,
 	previousStatement = true,
-	hide_in_toolbox = true, -- deprecated, use SetActorValue("velocity") instead
+	-- hide_in_toolbox = true, -- deprecated, use SetActorValue("velocity") instead
 	nextStatement = true,
 	funcName = "velocity",
 	func_description = 'velocity(%s)',

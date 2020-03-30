@@ -468,6 +468,182 @@ local cmds = {
 },
 
 {
+	type = "fillet", 
+	message0 = L"圆角 %1 半径 %2",
+    arg0 = {
+        {
+			name = "axis_axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_axis_plane", value = "xyz",},
+			text = "'xyz'", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.1,},
+			text = 0.1, 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "fillet",
+	func_description = 'fillet(%s,%s)',
+	func_description_js = 'fillet(%s,%s)',
+	ToNPL = function(self)
+		return string.format('fillet(%s,%s)\n', self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+fillet("xyz", 0.1) -- make fillet on all edges
+fillet("x", 0.1) -- make fillet on edges paralleled to axis X
+fillet("y", 0.1) -- make fillet on edges paralleled to axis Y
+fillet("z", 0.1) -- make fillet on edges paralleled to axis Z
+fillet("xy", 0.1) -- make fillet on edges belong to XY plane
+fillet("yz", 0.1) -- make fillet on edges belong to YZ plane
+fillet("xz", 0.1) -- make fillet on edges belong to XZ plane
+    ]]}},
+},
+
+{
+	type = "filletNode", 
+	message0 = L"圆角 对象 %1 %2 半径 %3",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "axis_axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_axis_plane", value = "xyz",},
+			text = "'xyz'", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.1,},
+			text = 0.1, 
+		},
+	},
+	hide_in_toolbox = true,
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "filletNode",
+	func_description = 'filletNode(%s,%s,%s)',
+	func_description_js = 'filletNode(%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('filletNode(%s,%s,%s)\n', self:getFieldValue('name'), self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "getEdgeCount", 
+	message0 = L"总的边数",
+	arg0 = {},
+	output = {type = "field_number",},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "getEdgeCount",
+	func_description = 'getEdgeCount()',
+	ToNPL = function(self)
+		return 'getEdgeCount()';
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local edges = {}
+for i = 1, getEdgeCount() do
+	edges[i] = i;
+end
+fillet(edges, 0.1);
+]]}},
+},
+
+{
+	type = "chamfer", 
+	message0 = L"倒角 %1 半径 %2",
+    arg0 = {
+        {
+			name = "axis_axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_axis_plane", value = "xyz",},
+			text = "'xyz'", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.1,},
+			text = 0.1, 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "chamfer",
+	func_description = 'chamfer(%s,%s)',
+	func_description_js = 'chamfer(%s,%s)',
+	ToNPL = function(self)
+		return string.format('chamfer(%s,%s)\n', self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+chamfer("xyz", 0.1) -- make chamfer on all edges
+chamfer("x", 0.1) -- make chamfer on edges paralleled to axis X
+chamfer("y", 0.1) -- make chamfer on edges paralleled to axis Y
+chamfer("z", 0.1) -- make chamfer on edges paralleled to axis Z
+chamfer("xy", 0.1) -- make chamfer on edges belong to XY plane
+chamfer("yz", 0.1) -- make chamfer on edges belong to YZ plane
+chamfer("xz", 0.1) -- make chamfer on edges belong to XZ plane
+    ]]}},
+},
+
+{
+	type = "chamferNode", 
+	message0 = L"倒角 对象 %1 %2 半径 %3",
+    arg0 = {
+        {
+			name = "name",
+			type = "input_value",
+			text = "", 
+		},
+        {
+			name = "axis_axis_plane",
+			type = "input_value",
+            shadow = { type = "axis_axis_plane", value = "xyz",},
+			text = "'xyz'", 
+		},
+        {
+			name = "radius",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.1,},
+			text = 0.1, 
+		},
+	},
+	hide_in_toolbox = true,
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "chamferNode",
+	func_description = 'chamferNode(%s,%s,%s)',
+	func_description_js = 'chamferNode(%s,%s,%s)',
+	ToNPL = function(self)
+		return string.format('chamferNode(%s,%s,%s)\n', self:getFieldValue('name'), self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
 	type = "mirror", 
 	message0 = L"镜像 %1 中心点 %2 %3 %4",
     arg0 = {
@@ -721,6 +897,38 @@ local cmds = {
 			name = "value",
 			type = "field_dropdown",
 			options = {
+				{ L"xy平面", "'xy'" },
+				{ L"xz平面", "'xz'" },
+				{ L"yz平面", "'yz'" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+    output = {type = "null",},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	func_description_js = '%s',
+	ToNPL = function(self)
+        return string.format('%s', self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+{
+	type = "axis_axis_plane", 
+	message0 = L"%1",
+    arg0 = {
+        
+        {
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"全部边", "'xyz'" },
+				{ L"x轴", "'x'" },
+				{ L"y轴", "'y'" },
+				{ L"z轴", "'z'" },
 				{ L"xy平面", "'xy'" },
 				{ L"xz平面", "'xz'" },
 				{ L"yz平面", "'yz'" },

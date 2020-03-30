@@ -637,6 +637,16 @@ function PowerItemManager.SyncGlobalStore(callbackFunc)
 	PowerItemManager.InitCardPack();
 	PowerItemManager.InitGiftPack();
 
+	if(System.options.mc) then
+		NPL.load("(gl)script/kids/3DMapSystemApp/API/paraworld.globalstore.lua");
+		globalstore_templates = paraworld.globalstore.read_from_cache("*");
+		if(globalstore_templates) then
+			if(callbackFunc) then
+				callbackFunc();
+			end
+			return;
+		end
+	end
 	local input_msg = {
 		gsids = "", -- fetch all global store items
 	};
@@ -1626,12 +1636,17 @@ end
 -- @param pres: ChangeItem API required param
 -- @param sets: ChangeItem API required param
 -- @param logevent：bool whether to write server user event 
-function PowerItemManager.ChangeItem(nid, adds, updates, callbackFunc, isgreedy, pres, logevent, sets)
-	nid = tonumber(nid);
+function PowerItemManager.ChangeItem(nid_, adds, updates, callbackFunc, isgreedy, pres, logevent, sets)
+	local nid = tonumber(nid_);
+	
 	if(not nid or not (adds or updates or sets)) then
-		LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.ChangeItem got invalid input: "..
-			commonlib.serialize_compact({nid, adds, updates, sets}));
-		return;
+		if(nid_ == "localuser") then
+			return
+		else
+			LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.ChangeItem got invalid input: "..
+				commonlib.serialize_compact({nid, adds, updates, sets}));
+			return;
+		end
 	end
 	local _logevent = nil;
 	local _log2db = nil;
@@ -2804,12 +2819,16 @@ end
 --		serverdata = item.serverdata,
 --		copies = item.copies,
 --	}, nil if not found
-function PowerItemManager.GetItemByGUID(nid, guid)
-	nid = tonumber(nid);
+function PowerItemManager.GetItemByGUID(nid_, guid)
+	local nid = tonumber(nid_);
 	if(not nid or not guid) then
-		LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemByNIDGUID got invalid input: "..
-			commonlib.serialize_compact({nid, guid}));
-		return;
+		if(nid_ == "localuser") then
+			return nil;
+		else
+			LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemByNIDGUID got invalid input: "..
+				commonlib.serialize_compact({nid, guid}));
+			return;
+		end
 	end
 	local items_user = items_all[nid];
 	if(items_user) then
@@ -2821,12 +2840,16 @@ end
 -- @param nid: user nid
 -- @param bag: bag id
 -- @return: item count or nil for error
-function PowerItemManager.GetItemCountInBag(nid, bag)
-	nid = tonumber(nid);
+function PowerItemManager.GetItemCountInBag(nid_, bag)
+	local nid = tonumber(nid_);
 	if(not nid or not bag) then
-		LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemCountInBag got invalid input: "..
-			commonlib.serialize_compact({nid, bag}));
-		return;
+		if(nid_ == "localuser") then
+			return 0;
+		else
+			LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemCountInBag got invalid input: "..
+				commonlib.serialize_compact({nid, bag}));
+			return;
+		end
 	end
 	local bags_user = bags_all[nid];
 	if(bags_user) then
@@ -2840,12 +2863,16 @@ end
 -- @param nid: user nid
 -- @param bag: item bag in item_instance
 -- @return: item guid list {guid, guid, guid, ...}, nil if not found
-function PowerItemManager.GetItemsInBagInMemory(nid, bag)
-	nid = tonumber(nid);
+function PowerItemManager.GetItemsInBagInMemory(nid_, bag)
+	local nid = tonumber(nid_);
 	if(not nid or not bag) then
-		LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemsInBagInMemory got invalid input: "..
-			commonlib.serialize_compact({nid, bag}));
-		return;
+		if(nid_ == "localuser") then
+			return nil;
+		else
+			LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.GetItemsInBagInMemory got invalid input: "..
+				commonlib.serialize_compact({nid, bag}));
+			return;
+		end
 	end
 	local bags_user = bags_all[nid];
 	if(bags_user) then
@@ -2911,12 +2938,17 @@ end
 -- @param excludebag: 
 -- @return bOwn, guid, bag, copies: if own the gs item, and the guid, bag and copies of the item if own
 -- NOTE: return false if nid and bag are all specified, the item is NOT exist in user nid's bag
-function PowerItemManager.IfOwnGSItem(nid, gsid, bag, excludebag)
-	nid = tonumber(nid);
+function PowerItemManager.IfOwnGSItem(nid_, gsid, bag, excludebag)
+	local nid = tonumber(nid_);
 	if(not nid or not gsid) then
-		LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.IfOwnGSItem got invalid input: "..
-			commonlib.serialize_compact({nid, gsid}));
-		return;
+		if(nid_ == "localuser") then
+			nid = "localuser";
+			return true, 0, 0, 10;
+		else
+			LOG.std(nil, "error", "PowerItemManager", "PowerItemManager.IfOwnGSItem got invalid input: "..
+				commonlib.serialize_compact({nid, gsid}));
+			return;
+		end
 	end
 
 	if(gsid == 0) then

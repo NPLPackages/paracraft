@@ -113,3 +113,13 @@ function BoneVariable:getValue(anim, time)
 	end
 	return v;
 end
+
+function BoneVariable:GetVarByName(name)
+	if(self:GetRotName() == name) then
+		return self.variables[1]
+	elseif(self:GetTransName() == name) then
+		return self.variables[2]
+	elseif(self:GetScaleName() == name) then
+		return self.variables[3]
+	end
+end

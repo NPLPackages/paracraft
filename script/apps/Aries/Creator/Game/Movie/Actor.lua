@@ -305,6 +305,20 @@ end
 function Actor:GetEditableVariableList()
 end
 
+function Actor:GetEditableVariableByName(name)
+	local list = self:GetEditableVariableList()
+	if(list) then
+		local var;
+		for index, varName in ipairs(list) do
+			if(varName == name) then
+				var = self:GetEditableVariable(index)
+				break;
+			end
+		end
+		return var;
+	end
+end
+
 -- virtual: 
 -- get editable variable by index. only used by editor for recently selected variable. 
 -- @param selected_index: nil if it means the current one. 

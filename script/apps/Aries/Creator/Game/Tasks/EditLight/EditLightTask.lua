@@ -200,10 +200,12 @@ function EditLightTask:handleRightClickScene(event, result)
 	end
 
 	local result = result or Game.SelectionManager:MousePickBlock(true, false, false);
-	local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX, result.blockY, result.blockZ, result.side);
+	if(result and result.blockX) then
+		local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX, result.blockY, result.blockZ, result.side);
 
-	local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x, blockY = y, blockZ = z, entityPlayer = EntityManager.GetPlayer(), block_id = 264, side = result.side, from_block_id = result.block_id, side_region=side_region })
-	task:Run();
+		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x, blockY = y, blockZ = z, entityPlayer = EntityManager.GetPlayer(), block_id = 264, side = result.side, from_block_id = result.block_id, side_region=side_region })
+		task:Run();
+	end
 end
 
 function EditLightTask:mouseMoveEvent(event)

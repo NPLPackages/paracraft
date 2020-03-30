@@ -89,6 +89,7 @@ function MobPropertyPage.ShowPage(entity, triggerEntity, OnClose)
 	if(not entity.isa or not entity:isa(EntityMob)) then
 		return
 	end
+
 	entity:BeginEdit();
 	cur_entity = entity;
 	local params = {
@@ -201,6 +202,11 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
 			if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
 				entity:ToggleNextSkin();
 			end
+			if(entity:IsServerEntity() and entity:IsRemote()) then
+				if(entity.UpdateAndSendDataWatcher) then
+					entity:UpdateAndSendDataWatcher();
+				end
+			end
 		end
 	end
 end
@@ -228,6 +234,14 @@ function MobPropertyPage.OnClickOK()
 
 		local canRandomWalk = page:GetValue("canRandomWalk", true);
 		entity:SetCanRandomMove(canRandomWalk);
+
+		if(entity:IsServerEntity() and entity:IsRemote()) then
+			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityFunction:new():Init(entity, "mobProperty", {
+				-- displayName = name, 
+				-- name = name, 
+				canRandomWalk = canRandomWalk==true,
+			}));
+		end
 
 		MobPropertyPage.UpdateAssetFile(entity, obj, page:GetValue("assetfile"));
 	end

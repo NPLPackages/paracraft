@@ -67,23 +67,27 @@ end
 function UserGuide.OnMouseMove2(nCode, appName, msg)
 	local input = Map3DSystem.InputMsg;
 	local Screen = commonlib.gettable("System.Windows.Screen");
-	local arrow = page:FindControl("down_arrow");
-	if (not arrow.visible) then
-		arrow.visible = true;
+	local arrow = page and page:FindControl("down_arrow");
+	if(arrow) then
+		if (not arrow.visible) then
+			arrow.visible = true;
+		end
+		local x, y, width, height = arrow:GetAbsPosition();
+		arrow:Reposition("lt", input.mouse_x - Screen:GetWidth() / 2 - 224, input.mouse_y - Screen:GetHeight() / 2 - 40, width, height);
 	end
-	local x, y, width, height = arrow:GetAbsPosition();
-	arrow:Reposition("lt", input.mouse_x - Screen:GetWidth() / 2 - 224, input.mouse_y - Screen:GetHeight() / 2 - 40, width, height);
 end
 
 function UserGuide.OnMouseMove3(nCode, appName, msg)
 	local input = Map3DSystem.InputMsg;
 	local Screen = commonlib.gettable("System.Windows.Screen");
-	local arrow = page:FindControl("down_arrow2");
-	if (not arrow.visible) then
-		arrow.visible = true;
+	local arrow = page and page:FindControl("down_arrow2");
+	if(arrow) then
+		if (not arrow.visible) then
+			arrow.visible = true;
+		end
+		local x, y, width, height = arrow:GetAbsPosition();
+		arrow:Reposition("lt", input.mouse_x - Screen:GetWidth() / 2 - 224, input.mouse_y - Screen:GetHeight() / 2 - 40, width, height);
 	end
-	local x, y, width, height = arrow:GetAbsPosition();
-	arrow:Reposition("lt", input.mouse_x - Screen:GetWidth() / 2 - 224, input.mouse_y - Screen:GetHeight() / 2 - 40, width, height);
 end
 
 function UserGuide.OnMouseUp(nCode, appName, msg)
@@ -182,7 +186,10 @@ function UserGuide:Step6(event)
 		GameLogic.events:RemoveEventListener("ShowCreatorDesktop", UserGuide.Step6, UserGuide);
 		local param = "?name=step6";
 		UserGuide.ShowPage(param);
-		page:FindControl("down_arrow").visible = false;
+		local ctl = page and page:FindControl("down_arrow")
+		if(ctl) then
+			ctl.visible = false;
+		end
 		CommonCtrl.os.hook.SetWindowsHook({hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC,
 			callback = UserGuide.OnMouseMove2, hookName = "UserGuideMouseMove", appName = "input", wndName = "mouse_move"});
 		GameLogic.events:AddEventListener("HighlightPickBlock", UserGuide.HighlightPickBlock, UserGuide, "UserGuide");
@@ -197,7 +204,10 @@ function UserGuide:Step7(event)
 	page:CloseWindow();
 	local param = "?name=step7";
 	UserGuide.ShowPage(param);
-	page:FindControl("down_arrow2").visible = false;
+	local ctl = page and page:FindControl("down_arrow2")
+	if(ctl) then
+		ctl.visible = false;
+	end
 	CommonCtrl.os.hook.SetWindowsHook({hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC,
 		callback = UserGuide.OnMouseMove3, hookName = "UserGuideMouseMove", appName = "input", wndName = "mouse_move"});
 	GameLogic.events:AddEventListener("DestroyBlockTask", UserGuide.Step8, UserGuide, "UserGuide");

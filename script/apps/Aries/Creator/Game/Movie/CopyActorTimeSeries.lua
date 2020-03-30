@@ -14,16 +14,21 @@ CopyActorTimeSeries.PasteToActor(actor)
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TimeSeries.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local TimeSeries = commonlib.gettable("MyCompany.Aries.Game.Common.TimeSeries");
 local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 
 local CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
 
 local page;
 local nameDS = {};
 CopyActorTimeSeries.isSelectAll = true;
+CopyActorTimeSeries.isRelativePos = true;
 
 function CopyActorTimeSeries.OnInit()
 	page = document:GetPageCtrl();
@@ -54,7 +59,7 @@ function CopyActorTimeSeries.CreatePropertyDs(actor)
 			if(name ~= "---") then
 				local checked = CopyActorTimeSeries.isSelectAll;
 				if(name == "pos") then
-					checked = false;
+					-- checked = false;
 				end
 				ds[#ds+1] = {name=name, displayName = MovieClipTimeLine:GetVariableDisplayName(name), checked = checked};
 			end
@@ -138,41 +143,165 @@ function CopyActorTimeSeries.ToggleVariable(bChecked, mcmlNode)
 	end
 end
 
-function CopyActorTimeSeries.OnClickCopy()
-	if(page and CopyActorTimeSeries.GetActor()) then
+-- @param varNames: array of var names to copy
+-- @param isRelativePos: whether to use relative positioning
+function CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, isRelativePos)
+	if(actor) then
+		local itemStack = actor:GetItemStack();
 		local v = {};
-		local actor = CopyActorTimeSeries.GetActor();
+		local mainTs = actor:GetTimeSeries()
+		for _, name in ipairs(varNames) do
+			local var = mainTs:GetVariable(name);
+			if(not var) then
+				local ts = mainTs:GetChild(name);
+				if(ts) then
+					if(ts.SaveToTable) then
+						var = ts:SaveToTable();
+					end
+				else
+					local varMulti = actor:GetEditableVariableByName(name);
+					if(varMulti and varMulti.GetVariable) then
+						local i=1
+						while(true) do
+							local subVar = varMulti:GetVariable(i);
+							if(subVar) then
+								i = i + 1;
+								local var2 = mainTs:GetVariable(subVar.name);
+								if(var2) then
+									v[subVar.name] = var2;
+								end
+							else
+								break;
+							end
+						end
+					end
+				end
+			end
+			v[name] = var;
+		end
+		if(next(v)) then
+			local data = {data = v, fromTime=fromTime, toTime = toTime, itemId = itemStack.id};
+			if(isRelativePos and actor:GetMovieClipEntity()) then
+				data.isRelativePos = true;
+				data.bx, data.by, data.bz = actor:GetMovieClipEntity():GetBlockPos();
+			end
+			Clipboard.Save("ActorTimeSeries", data)	
+			MovieUISound.PlayAddKey();
+			return true;
+		end
+	end
+end
+
+function CopyActorTimeSeries.OnClickCopy()
+	local actor = CopyActorTimeSeries.GetActor();
+	if(page and actor) then
+		local varNames = {};
 		local mainTs = actor:GetTimeSeries()
 		for _, item in ipairs(nameDS) do
 			if(item.checked) then
-				local var = mainTs:GetVariable(item.name);
-				if(not var) then
-					local ts = mainTs:GetChild(item.name);
-					if(ts) then
-						var = ts:SaveToTable();
-					end
-				end
-				v[item.name] = var;
+				varNames[#varNames+1] = item.name;
 			end
 		end
 		local fromTime = tonumber(page:GetUIValue("fromTime", 0));
 		local toTime = tonumber(page:GetUIValue("toTime", 0));
+		CopyActorTimeSeries.isRelativePos = page:GetValue("isRelativePos", true);
+		
 
-		if(next(v)) then
-			Clipboard.Save("ActorTimeSeries", {data = v, fromTime=fromTime, toTime = toTime, itemId = CopyActorTimeSeries.GetItemStack().id})	
+		if(CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, CopyActorTimeSeries.isRelativePos)) then
 			-- GameLogic.AddBBS(nil, L"", 4000, "0 255 0")
 		end
-
 		page:CloseWindow();
 	end
 end
 
+function CopyActorTimeSeries.GetClipBoardData()
+	local obj = Clipboard.LoadByType("ActorTimeSeries")
+	return obj;
+end
+
+local function offset_time_variable(var, offset)
+	if(var and var.data) then
+		local data = var.data;
+		for i = 1, #(data) do
+			data[i] = data[i] + offset;
+		end
+	end
+end
+
+-- @param offset_x, offset_y, offset_z: in real coordinate
+function CopyActorTimeSeries.OffsetTimeSeriesPositions(itemId, timeSeries, offset_x, offset_y, offset_z)
+	if(not timeSeries) then
+		return;
+	end
+	if(itemId == block_types.names.TimeSeriesNPC or itemId == block_types.names.TimeSeriesOverlay) then
+		offset_time_variable(timeSeries:GetVariable("x"), offset_x);
+		offset_time_variable(timeSeries:GetVariable("y"), offset_y);
+		offset_time_variable(timeSeries:GetVariable("z"), offset_z);
+		local blockVar = timeSeries:GetVariable("block")
+		if(blockVar and blockVar.data) then
+			local data = blockVar.data;
+			for i = 1, #(data) do
+				local blocks = data[i];
+				local new_blocks = {};
+				for sparse_index, b in pairs(blocks) do
+					if(b[1]) then
+						b[1] = b[1] + offset_bx;
+						b[2] = b[2] + offset_by;
+						b[3] = b[3] + offset_bz;
+						new_blocks[BlockEngine:GetSparseIndex(b[1], b[2], b[3])] = b;
+					end
+				end
+				data[i] = new_blocks;
+			end
+		end
+	elseif(itemId == block_types.names.TimeSeriesCamera) then
+		offset_time_variable(timeSeries:GetVariable("lookat_x"), offset_x);
+		offset_time_variable(timeSeries:GetVariable("lookat_y"), offset_y);
+		offset_time_variable(timeSeries:GetVariable("lookat_z"), offset_z);
+	elseif(itemId == block_types.names.TimeSeriesCommands) then
+		local blockVar = timeSeries:GetVariable("block")
+		if(blockVar and blockVar.data) then
+			local data = blockVar.data;
+			for i = 1, #(data) do
+				local blocks = data[i];
+				local new_blocks = {};
+				for sparse_index, b in pairs(blocks) do
+					if(b[1]) then
+						b[1] = b[1] + offset_bx;
+						b[2] = b[2] + offset_by;
+						b[3] = b[3] + offset_bz;
+						new_blocks[BlockEngine:GetSparseIndex(b[1], b[2], b[3])] = b;
+					end
+				end
+				data[i] = new_blocks;
+			end
+		end
+	end
+end
+
 -- public method:
-function CopyActorTimeSeries.PasteToActor(actor)
+-- @param destVar: if nil it will paste everything in clipboard, if not, we will only paste on this variable.
+function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 	actor = actor or MovieClipTimeLine:GetSelectedActor();
 	if(not actor) then
 		return
 	end
+	local function isDestVar_(var)
+		if(var) then
+			if(not destVar) then
+				return true;
+			elseif(destVar.name == "bones") then
+				if(destVar:GetSelectedBone()) then
+					return destVar:GetSelectedBone():GetVarByName(var.name) ~= nil;
+				else
+					return true;
+				end
+			else
+				return destVar.name == var.name;
+			end
+		end
+	end
+
 	local itemStack = actor:GetItemStack();
 	local obj = Clipboard.LoadByType("ActorTimeSeries")
 	if(obj and itemStack) then
@@ -181,22 +310,32 @@ function CopyActorTimeSeries.PasteToActor(actor)
 			actor:BeginModify();
 			local fromTime = obj.fromTime or 0;
 			local toTime = obj.toTime;
-			local pasteFromTime = actor:GetTime() or 0;
+			pasteFromTime = pasteFromTime or actor:GetTime() or 0;
 			local ts = TimeSeries:new();
 			ts:LoadFromTable(obj.data);
+
+			if(obj.isRelativePos and obj.bx and actor:GetMovieClipEntity()) then
+				local bx, by, bz = actor:GetMovieClipEntity():GetBlockPos()
+				local offset_x, offset_y, offset_z = BlockEngine:real_min(bx - obj.bx), BlockEngine:real_min(by - obj.by), BlockEngine:real_min(bz - obj.bz);
+
+				CopyActorTimeSeries.OffsetTimeSeriesPositions(obj.itemId, ts, offset_x, offset_y, offset_z)
+			end
+
 			for i=1, ts:GetVariableCount() do
 				local fromVar = ts:GetVariableByIndex(i);
 				local var = actor:GetVariable(ts:GetVariableName(i));
-				if(var and fromVar) then
+
+				if(var and fromVar and isDestVar_(var)) then
 					var:RemoveKeysInTimeRange(pasteFromTime+fromTime, toTime and (pasteFromTime+toTime));
-					for time, v in fromVar:GetKeys_Iter(1, fromTime-1, fromVar:GetLastTime()) do
+					for time, v in fromVar:GetKeys_Iter(1, fromTime-1, toTime or fromVar:GetLastTime()) do
 						var:UpsertKeyFrame(pasteFromTime+fromTime+time, v)
 					end
 				end
 			end
 			
 			local tsBones = ts:GetChild("bones");
-			if(tsBones) then
+			
+			if(tsBones and (not destVar or destVar.name == "bones") and actor.GetBonesVariable) then
 				local boneVars = actor:GetBonesVariable();
 				if(boneVars) then
 					for i=1, tsBones:GetVariableCount() do
@@ -204,9 +343,9 @@ function CopyActorTimeSeries.PasteToActor(actor)
 						local boneName = tsBones:GetVariableName(i)
 						local var = boneVars:GetBoneAttributeVariableByName(boneName);
 						-- only pasting on matching bone names
-						if(var and fromVar) then
+						if(var and fromVar and isDestVar_(var)) then
 							var:RemoveKeysInTimeRange(pasteFromTime+fromTime, toTime and (pasteFromTime+toTime));
-							for time, v in fromVar:GetKeys_Iter(1, fromTime-1, fromVar:GetLastTime()) do
+							for time, v in fromVar:GetKeys_Iter(1, fromTime-1, toTime or fromVar:GetLastTime()) do
 								var:UpsertKeyFrame(pasteFromTime+fromTime+time, v)
 							end
 						end
@@ -217,6 +356,7 @@ function CopyActorTimeSeries.PasteToActor(actor)
 			actor:EndUpdate();
 			actor:FrameMovePlaying(0);
 			GameLogic.AddBBS(nil, L"成功粘贴参数", 4000, "0 255 0");
+			MovieUISound.PlayAddKey();
 		else
 			local item = ItemClient.GetItem(obj.itemId);
 			if(item) then
@@ -226,6 +366,16 @@ function CopyActorTimeSeries.PasteToActor(actor)
 	end
 end
 
+
+function CopyActorTimeSeries.CopyVarInRangeStarted(var, actor, fromTime, toTime)
+	local varNames = {};
+	varNames[#varNames+1] = var.name;
+	return CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime)
+end
+
+function CopyActorTimeSeries.PasteVarInRangeStarted(var, actor, fromTime)
+	return CopyActorTimeSeries.PasteToActor(actor, var, fromTime)
+end
 
 function CopyActorTimeSeries.OnClose()
 	page:CloseWindow();

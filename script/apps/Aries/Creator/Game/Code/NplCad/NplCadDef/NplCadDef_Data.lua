@@ -14,20 +14,19 @@ local cmds = {
 
 {
 	type = "getLocalVariable", 
-	message0 = L"获取变量%1",
+	message0 = L"%1",
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "score",
-			variableTypes = {""},
-			text = "score",
+			type = "field_input",
+			text = L"变量名",
 		},
 	},
 	output = {type = "null",},
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
+    colourSecondary = "#ffffff",
 	func_description = '%s',
 	func_description_js = '%s',
 	ToNPL = function(self)
@@ -41,20 +40,18 @@ say(key, 1)
 
 {
 	type = "createLocalVariable", 
-	message0 = L"新建本地变量%1为%2",
+	message0 = L"新建本地%1为%2",
 	arg0 = {
 		{
 			name = "var",
-			type = "field_variable",
-			variable = "score",
-			variableTypes = {""},
-			text = "score",
+			type = "field_input",
+			text = L"变量名",
 		},
 		{
 			name = "value",
 			type = "input_value",
-			shadow = { type = "text", value = "value",},
-			text = "value",
+			shadow = { type = "functionParams", value = "0",},
+			text = "0",
 		},
 	},
 	category = "Data", 
@@ -80,13 +77,13 @@ say(key, 1)
 		{
 			name = "left",
 			type = "input_value",
-			shadow = { type = "getLocalVariable", value = "score",},
-			text = "score",
+			shadow = { type = "getLocalVariable", value = "变量名",},
+			text = "变量名",
 		},
 		{
 			name = "right",
 			type = "input_value",
-			shadow = { type = "text", value = "1",},
+			shadow = { type = "functionParams", value = "1",},
 			text = "1",
 		},
 	},
@@ -174,6 +171,84 @@ say(text, 1)
 		return string.format('%s', self:getFieldAsString('left'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+{
+	type = "newEmptyTable", 
+	message0 = L"{%1%2%3}",
+	arg0 = {
+        {
+			name = "start_dummy",
+			type = "input_dummy",
+		},
+        {
+			name = "end_dummy",
+			type = "input_dummy",
+		},
+        {
+            name = "btn",
+            type = "field_button",
+            content = {
+                src = "png/plus-2x.png"
+            },
+            width = 16,
+            height = 16,
+            callback = "FIELD_BUTTON_CALLBACK_append_mcml_attr"
+        },
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description_lua_provider = [[
+        var attrs = Blockly.Extensions.readTextFromMcmlAttrs(block, "Lua", ",");
+        if (attrs) {
+            return ["{%s}".format(attrs), Blockly.Lua.ORDER_ATOMIC];
+        }else{
+            return ["{}", Blockly.Lua.ORDER_ATOMIC];
+        }
+    ]],
+	ToNPL = function(self)
+		return "{}";
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
+]]}},
+},
+
+{
+	type = "getTableValue", 
+	message0 = L"%1中的%2",
+	arg0 = {
+		{
+			name = "table",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "_G",},
+			text = "_G", 
+		},
+		{
+			name = "key",
+			type = "input_value",
+			shadow = { type = "text", value = "key",},
+			text = "key", 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s[%s]',
+	ToNPL = function(self)
+		return string.format('%s["%s"]', self:getFieldAsString('table'), self:getFieldAsString('key'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local t = {}
+t[1] = "hello"
+t["age"] = 10;
+log(t)
 ]]}},
 },
 

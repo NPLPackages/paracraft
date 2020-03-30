@@ -12,6 +12,8 @@ KeyFramePopupMenu.ShowPopupMenu(time, var, actor);
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CopyActorTimeSeries.lua");
+local CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -39,11 +41,9 @@ function KeyFramePopupMenu.SetCurrentVar(time, var, actor)
 	KeyFramePopupMenu.var = var;
 	if(KeyFramePopupMenu.actor~=actor) then
 		KeyFramePopupMenu.actor = actor;
-		KeyFramePopupMenu.last_key_name = nil
 		KeyFramePopupMenu.copyInRangeStarted = nil
 		KeyFramePopupMenu.copy_from_time = nil
 		KeyFramePopupMenu.copy_to_time = nil
-		KeyFramePopupMenu.last_key_data = nil
 	end
 end
 
@@ -73,14 +73,18 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 			node:ClearAllChildren();
 			for index, item in ipairs(itemList) do
 				local text = item.text or item.name;
+				
 				if(item.name == "PasteKey") then
-					if(KeyFramePopupMenu.last_key_name) then
-						if(KeyFramePopupMenu.copy_from_time and KeyFramePopupMenu.copy_to_time) then
-							text = format(L"粘贴区间: %d-%d", KeyFramePopupMenu.copy_from_time,KeyFramePopupMenu.copy_to_time);
-						elseif(KeyFramePopupMenu.last_key_data) then
-							text = format("%s %s:%s", text, KeyFramePopupMenu.last_key_name, commonlib.serialize_in_length(KeyFramePopupMenu.last_key_data, 10));
+					local obj = CopyActorTimeSeries.GetClipBoardData()
+					if(var and obj and actor and actor:GetItemStack().id == obj.itemId and obj.data and obj.data[var.name]) then
+						if(obj.fromTime ~= obj.toTime and obj.toTime) then
+							text = format(L"粘贴区间: %d-%d", obj.fromTime, obj.toTime or -1);
 						else
-							text = nil;
+							local data = obj.data[var.name];
+							if(data and type(data.data) == "table" and data.data[1]) then
+								data = data.data[1]
+							end
+							text = format("%s %s:%s", text, tostring(obj.fromTime or 0), commonlib.serialize_in_length(data, 10));
 						end
 					else
 						text = nil;
@@ -166,36 +170,25 @@ function KeyFramePopupMenu.OnClickMenuItem(node)
 		end
 	elseif(node.Name == "CopyKey") then	
 		if(var and actor and time) then
-			KeyFramePopupMenu.last_key_data = var:getValue(time);
-			KeyFramePopupMenu.last_key_name = var.name;
 			KeyFramePopupMenu.copyInRangeStarted = nil;
 			KeyFramePopupMenu.copy_from_time = nil;
 			KeyFramePopupMenu.copy_to_time = nil;
+			CopyActorTimeSeries.CopyVarInRangeStarted(var, actor, time, time);
 		end
 	elseif(node.Name == "CopyInRange") then	
 		if(var and actor and time)  then
-			KeyFramePopupMenu.last_key_name = var.name;
-			KeyFramePopupMenu.last_key_data = nil;
 			if(not KeyFramePopupMenu.copyInRangeStarted) then
 				KeyFramePopupMenu.copy_from_time = time;
 				KeyFramePopupMenu.copyInRangeStarted = true;
 			else
 				KeyFramePopupMenu.copy_to_time = time;
 				KeyFramePopupMenu.copyInRangeStarted = false;
+				CopyActorTimeSeries.CopyVarInRangeStarted(var, actor, KeyFramePopupMenu.copy_from_time, KeyFramePopupMenu.copy_to_time);
 			end
 		end
 	elseif(node.Name == "PasteKey") then	
-		if(var and actor and KeyFramePopupMenu.last_key_name == var.name) then
-			actor:BeginModify();
-			if(KeyFramePopupMenu.last_key_data) then
-				-- copy single key
-				var:UpsertKeyFrame(time, KeyFramePopupMenu.last_key_data);
-			elseif(KeyFramePopupMenu.copy_from_time and KeyFramePopupMenu.copy_to_time) then
-				-- a range of all key frames
-				var:PasteKeyFramesInRange(time, KeyFramePopupMenu.copy_from_time, KeyFramePopupMenu.copy_to_time);
-			end
-			actor:EndModify();
-			MovieUISound.PlayAddKey();
+		if(var and actor) then
+			CopyActorTimeSeries.PasteVarInRangeStarted(var, actor, time)
 		end
 	end
 end

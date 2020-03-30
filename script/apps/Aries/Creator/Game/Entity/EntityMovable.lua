@@ -657,7 +657,10 @@ end
 function Entity:OnClick(x, y, z, mouse_button)
 	if(mouse_button == "right" and GameLogic.GameMode:CanEditBlock()) then
 		if(self:IsServerEntity() and self:IsRemote()) then
-			LOG.std(nil, "info", "Entity:OnClick", "access denied, entity is only editable on server");
+			-- LOG.std(nil, "info", "Entity:OnClick", "access denied, entity is only editable on server");
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
+			task:Run();
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
