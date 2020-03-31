@@ -1304,8 +1304,14 @@ local cmds = {
 
 {
 	type = "line", 
-	message0 = L"line from(%1,%2,%3) to(%4,%5,%6) color %7",
+	message0 = L"%1 线 起点 %2, %3, %4 终点 %5 %6 %7 %8",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "x1",
 			type = "input_value",
@@ -1357,9 +1363,10 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	funcName = "line",
-	func_description = 'line(%s,%s,%s,%s,%s,%s,%s)',
+	func_description = 'line(%s,%s,%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-     return string.format('line(%s,%s,%s,%s,%s,%s,"%s")\n', 
+     return string.format('line("%s",%s,%s,%s,%s,%s,%s,"%s")\n', 
+                self:getFieldValue('op'), 
             self:getFieldValue('x1'), self:getFieldValue('y1'), self:getFieldValue('z1'),
             self:getFieldValue('x2'), self:getFieldValue('y2'), self:getFieldValue('z2'),
             self:getFieldValue('color'));
@@ -1370,51 +1377,22 @@ local cmds = {
 
 {
 	type = "plane", 
-	message0 = L"plane l %1 w %2 color %3",
+	message0 = L" %1 平面 长 %2 宽 %3 %4",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "l",
 			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
 		},
         {
 			name = "w",
-			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
-		},
-		{
-			name = "color",
-			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffc658",},
-			text = "#ffc658", 
-		},
-        
-	},
-	hide_in_toolbox = true,
-    previousStatement = true,
-	nextStatement = true,
-	category = "Shapes", 
-	helpUrl = "", 
-	canRun = false,
-	funcName = "plane",
-	func_description = 'plane(%s,%s,%s)',
-	ToNPL = function(self)
-    return string.format('plane(%s,%s,"%s")\n', 
-            self:getFieldValue('l'), self:getFieldValue('w'), 
-            self:getFieldValue('color'));
-	end,
-	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
-},
-
-{
-	type = "circle", 
-	message0 = L"circle %1 color %2",
-    arg0 = {
-        {
-			name = "r",
 			type = "input_value",
             shadow = { type = "math_number", value = 1,},
 			text = 1, 
@@ -1433,11 +1411,66 @@ local cmds = {
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
-	funcName = "circle",
-	func_description = 'circle(%s,%s)',
+	funcName = "plane",
+	func_description = 'plane(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('circle(%s,"%s")\n', 
-                self:getFieldValue('r'), 
+    return string.format('plane("%s",%s,%s,"%s")\n', 
+            self:getFieldValue('op'), self:getFieldValue('l'), self:getFieldValue('w'), self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+    ]]}},
+},
+
+{
+	type = "circle", 
+	message0 = L" %1 圆 半径 %2 角度1 %3 角度2 %4 %5",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "r",
+			type = "input_value",
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "a1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 360,},
+			text = 360, 
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
+		},
+        
+	},
+	hide_in_toolbox = true,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "circle",
+	func_description = 'circle(%s,%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('circle("%s",%s,%s,%s,"%s")\n', 
+                self:getFieldValue('op'), 
+                self:getFieldValue('r'),
+                self:getFieldValue('a1'),
+                self:getFieldValue('a2'),
                 self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -1446,19 +1479,37 @@ local cmds = {
 
 {
 	type = "ellipse", 
-	message0 = L"ellipse r1 %1 r2 %2 color %3",
+	message0 = L" %1 椭圆 主半径 %2 次半径 %3 角度1 %4 角度2 %5 %6",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "r1",
 			type = "input_value",
-            shadow = { type = "math_number", value = 10,},
-			text = 10, 
+            shadow = { type = "math_number", value = 4,},
+			text = 4, 
 		},
         {
 			name = "r2",
 			type = "input_value",
-            shadow = { type = "math_number", value = 5,},
-			text = 5, 
+            shadow = { type = "math_number", value = 2,},
+			text = 2, 
+		},
+        {
+			name = "a1",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+        {
+			name = "a2",
+			type = "input_value",
+            shadow = { type = "math_number", value = 360,},
+			text = 360, 
 		},
 		{
 			name = "color",
@@ -1475,10 +1526,12 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	funcName = "ellipse",
-	func_description = 'ellipse(%s,%s,%s)',
+	func_description = 'ellipse(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('ellipse(%s,%s,"%s")\n', 
+        return string.format('ellipse("%s",%s,%s,%s,%s,"%s")\n', 
+                self:getFieldValue('op'), 
                 self:getFieldValue('r1'), self:getFieldValue('r2'),
+                self:getFieldValue('a1'), self:getFieldValue('a2'),
                 self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
@@ -1599,8 +1652,14 @@ local cmds = {
 
 {
 	type = "polygon", 
-	message0 = L"polygon p %1 c %2 color %3",
+	message0 = L" %1 正多边形 边数 %2 外接圆半径 %3 %4",
     arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
         {
 			name = "p",
 			type = "input_value",
@@ -1628,9 +1687,10 @@ local cmds = {
 	helpUrl = "", 
 	canRun = false,
 	funcName = "polygon",
-	func_description = 'polygon(%s,%s,%s)',
+	func_description = 'polygon(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('polygon(%s,%s,"%s")\n', 
+        return string.format('polygon("%s",%s,%s,"%s")\n', 
+                self:getFieldValue('op'), 
                 self:getFieldValue('p'), self:getFieldValue('c'), 
                 self:getFieldValue('color'));
 	end,
@@ -1675,7 +1735,7 @@ local cmds = {
 
 {
 	type = "text3d", 
-	message0 = L" %1 文字 %2 字体 %3 大小 %4 %5",
+	message0 = L" %1 文字 %2 字体 %3 大小 %4 厚度 %5 %6",
     arg0 = {
         {
 			name = "op",
@@ -1699,8 +1759,14 @@ local cmds = {
         {
 			name = "size",
 			type = "input_value",
-            shadow = { type = "math_number", value = 16,},
+            shadow = { type = "math_number", value = 1,},
 			text = 1, 
+		},
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0.1,},
+			text = 0.1, 
 		},
 		{
 			name = "color",
@@ -1710,18 +1776,18 @@ local cmds = {
 		},
         
 	},
-	hide_in_toolbox = true,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
 	funcName = "text3d",
-	func_description = 'text3d(%s,"%s","%s",%s, %s)',
-	func_description_js = 'text3d(%s,"%s","%s",%s, %s)',
+	func_description = 'text3d(%s,"%s","%s", %s, %s, %s)',
+	func_description_js = 'text3d(%s,"%s","%s", %s, %s)',
 	ToNPL = function(self)
-        return string.format('text3d("%s","%s","%s", %s,"%s")\n', 
-			self:getFieldValue('op'), self:getFieldValue('text'), self:getFieldValue('fontname'), self:getFieldValue('size'), self:getFieldValue('color'));
+        return string.format('text3d("%s","%s","%s", %s, %s,"%s")\n', 
+			self:getFieldValue('op'), self:getFieldValue('text'), self:getFieldValue('fontname'),
+			self:getFieldValue('size'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
     ]]}},

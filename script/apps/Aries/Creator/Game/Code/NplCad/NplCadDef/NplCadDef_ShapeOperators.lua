@@ -388,8 +388,8 @@ local cmds = {
          {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
@@ -421,8 +421,8 @@ local cmds = {
          {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ff0000",},
-			text = "#ff0000", 
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
 		},
         
 	},
