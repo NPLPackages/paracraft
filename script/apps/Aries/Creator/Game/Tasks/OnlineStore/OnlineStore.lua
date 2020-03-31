@@ -99,7 +99,7 @@ function OnlineStore:ShowPage(bShow)
 					x, y = -width/2, -height/2;
 				end
 				local params = {
-						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html", 
+						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html?rand=" .. os.time(), 
 						name = "OnlineStore.ShowPage", 
 						isShowTitleBar = false,
 						DestroyOnClose = false,
