@@ -104,7 +104,7 @@ function SaveWorldPage.OnSaveWorld(worldname)
 		end
 	end
 
-	if GameLogic.GetFilters():apply_filters("SaveWorldPage.OnSaveWorld", false, callback) then
+	if GameLogic.GetFilters():apply_filters("SaveWorld", false, callback) then
 		return false
 	end
 

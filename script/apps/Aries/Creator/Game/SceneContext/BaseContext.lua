@@ -988,8 +988,16 @@ function BaseContext:HandleGlobalKey(event)
 			GameLogic.ToggleDesktop("esc");
 		end
 	elseif(dik_key == "DIK_S" and ctrl_pressed) then
-		GameLogic.QuickSave();
-		event:accept();
+		local function callback()
+			GameLogic.QuickSave();
+			event:accept();
+		end
+
+		if GameLogic.GetFilters():apply_filters("SaveWorld", false, callback) then
+			return false;
+		end
+
+		callback();
 	elseif(dik_key == "DIK_F12" and ctrl_pressed) then
 		System.App.Commands.Call("ScreenShot.HideAllUI");
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then
