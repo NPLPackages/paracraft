@@ -30,11 +30,12 @@ end
 
 function OnlineStore.GetOnlineStoreUrl()
 	local host = KeepworkService:GetKeepworkUrl()
+	local token = System.User.keepworktoken or ''
 
 	if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'android' then
-		return format("%s/p/comp/system?type=protocol&port=%s", host, tostring(OnlineStore.portNumber or 8099));
+		return format("%s/p/comp/system?type=protocol&port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
 	else
-		return format("%s/p/comp/system?port=%s", host, tostring(OnlineStore.portNumber or 8099));
+		return format("%s/p/comp/system?port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
 	end
 end
 
@@ -98,7 +99,7 @@ function OnlineStore:ShowPage(bShow)
 					x, y = -width/2, -height/2;
 				end
 				local params = {
-						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html", 
+						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html?rand=" .. os.time(), 
 						name = "OnlineStore.ShowPage", 
 						isShowTitleBar = false,
 						DestroyOnClose = false,

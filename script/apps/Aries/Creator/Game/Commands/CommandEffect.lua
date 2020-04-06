@@ -225,6 +225,38 @@ Commands["hsv"] = {
 	end,
 };
 
+Commands["vignetting"] = {
+	name="vignetting", 
+	quick_ref="/vignetting [amount midpoint roundness feather]", 
+	desc=[[vignetting effect on and off
+/vignetting 0 0.5 0 0   transparent
+/vignetting 1 0.5 0 0   pure white
+/vignetting -1 0.5 0 0  pure dark
+/vignetting 1 0.8 0 0   scale up
+/vignetting 1 0.2 0 0   scale down
+/vignetting 1 0.5 0.5 0     eclipse
+/vignetting 1 0.5 -0.5 0    round corner
+/vignetting 1 0.5 0 0.5     feather effect
+/vignetting    turn it off
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local effect = GameLogic.GetShaderManager():GetEffect("Vignetting");
+		if(effect) then
+			local amount, midpoint, roundness, feather;
+			amount, cmd_text = CmdParser.ParseNumber(cmd_text);
+			midpoint, cmd_text = CmdParser.ParseNumber(cmd_text);
+			roundness, cmd_text = CmdParser.ParseNumber(cmd_text);
+			feather, cmd_text = CmdParser.ParseNumber(cmd_text);
+			if(amount and midpoint and roundness and feather) then
+				effect:SetParam(amount, midpoint, roundness, feather);
+				effect:SetEnabled(true);
+			else
+				effect:SetEnabled(false);
+			end
+		end
+	end,
+};
+
 Commands["viewport"] = {
 	name="viewport", 
 	mode_deny = "",

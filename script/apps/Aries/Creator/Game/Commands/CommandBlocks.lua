@@ -255,6 +255,25 @@ e.g.
 };
 
 
+Commands["findfile"] = {
+	name="findfile", 
+	quick_ref="/findfile [filename]", 
+	desc=[[file blocks with given filename 
+@param filename: if no filename, we will prompt a dialog to enter. 
+e.g.
+/findfile
+/findfile test.bmax
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		
+		local text = cmd_text;
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
+		local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
+		local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
+		task:FindFile(text)
+	end,
+};
+
 Commands["setblock"] = {
 	name="setblock", 
 	quick_ref="/setblock x y z (dx dy dz) [block][:][data] [entityDataTable] [where sameblock]", 

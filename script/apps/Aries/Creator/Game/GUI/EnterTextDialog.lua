@@ -127,6 +127,16 @@ function EnterTextDialog.GetText()
 	return EnterTextDialog.text or L"请输入:";
 end
 
+-- TODO: not implemented
+function EnterTextDialog.SelectAll()
+	if(page) then
+		local ctl = page:FindControl("text")
+		if(ctl) then
+			-- TODO: only mcml2 support text selection in textbox. 
+		end
+	end
+end
+
 function EnterTextDialog.GetButtonsDS()
 	local ds = {};
 	if(EnterTextDialog.options) then

@@ -100,7 +100,7 @@ end
                                   name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd"
                                   tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
                                   onclick="OnClickItem">
-                        <div style="float:left;font-size:12px;" name='<%=Eval("name")%>'>
+                        <div style="float:left;font-size:12px;max-width:178px" name='<%=Eval("name")%>'>
                             <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
                                 <%=Eval("html")%>
                             </div>

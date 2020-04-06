@@ -10,12 +10,14 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
 local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
 local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 task:Run();
+task:FindFile(text)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local FindBlockTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask"));
 
 -- whether to suppress any gui pop up. 
@@ -23,6 +25,8 @@ FindBlockTask:Property({"text", nil, "GetText", "SetText", auto=true});
 
 FindBlockTask.resultDS = {};
 FindBlockTask.selectedIndex = 1;
+FindBlockTask.maxResultCount = 2000;
+local curInstance;
 function FindBlockTask:ctor()
 end
 
@@ -31,7 +35,7 @@ function FindBlockTask.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function FindBlockTask:ShowPage(bShow)
+function FindBlockTask:ShowPage(bShow, entities)
 	curInstance = self;
 	FindBlockTask.filteredResultDS = nil;
 	FindBlockTask.resultDS = {};
@@ -55,11 +59,87 @@ function FindBlockTask:ShowPage(bShow)
 				width = width,
 				height = height,
 		});
-	if(bShow) then
+	if(bShow and not entities) then
+		self.mode = "goto_block";
 		FindBlockTask.FindAll();
+	else
+		self.mode = "text_search";
 	end
 end
 
+function FindBlockTask:IsTextSearchMode()
+	return self.mode == "text_search";
+end
+
+function FindBlockTask:IsGotoBlockMode()
+	return self.mode == "goto_block";
+end
+
+function FindBlockTask:FindFileImp(text)
+	local movieBlockId = block_types.names.MovieClip;
+	local PhysicsModel = block_types.names.PhysicsModel;
+	local BlockModel = block_types.names.BlockModel;
+
+	local results = {};
+	local resultDS = {};
+
+	local function AddEntity_(entity, filename)
+		local item = entity:GetItemClass()
+		local nCount = #results;
+		if(item and nCount < self.maxResultCount) then
+			nCount = nCount + 1;
+			results[nCount] = entity;
+			resultDS[nCount] =  {name="block", attr={index=nCount,name=filename, lowerText = string.lower(filename), icon = item:GetIcon()}};
+			return true;
+		end
+	end
+	local entities = EntityManager.FindEntities({category="b", });
+	for _, entity in ipairs(entities) do
+		if(entity.FindFile) then
+			local bFound, filename, filenames = entity:FindFile(text)
+			if(bFound) then
+				if(filenames) then
+					local bFailed;
+					for _, filename_ in ipairs(filenames) do
+						if(not AddEntity_(entity, filename_)) then
+							bFailed = true;
+							break;
+						end
+					end
+					if(bFailed) then
+						break;
+					end
+				elseif(not AddEntity_(entity, filename)) then
+					break;
+				end
+			end
+		end
+	end
+	if(not next(results)) then
+		GameLogic.AddBBS("FindBlockTask", format(L"没有找到:%s", text), 4000, "255 0 0");
+	else
+		self:ShowPage(true, results);
+		FindBlockTask.resultDS = resultDS;
+		FindBlockTask.results = results;
+		FindBlockTask.UpdateResult();
+	end
+end
+
+-- @param text: if nil, it will show an input dialog for text, otherwise it will show result of the find file
+function FindBlockTask:FindFile(text)
+	if(text and text~="") then
+		self:FindFileImp(text)
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(L"全文搜索:", function(result)
+			if(result and result~="") then
+				FindBlockTask.lastSearchText = result
+				self:FindFileImp(result)
+			end
+		end, FindBlockTask.lastSearchText)
+	end
+end
 
 -- @param bIsDataPrepared: true if data is prepared. if nil, we will prepare the data from input params.
 function FindBlockTask:Run()
@@ -245,6 +325,9 @@ function FindBlockTask.SetResults(entities)
 				end
 			end
 		end
+		table.sort(resultDS, function(a, b)
+			return a.attr.lowerText < b.attr.lowerText;
+		end);
 	end
 end
 
@@ -287,17 +370,18 @@ function FindBlockTask.GetDataSource()
 end
 
 function FindBlockTask.OnClickItem(treenode)
-	local index = treenode.mcmlNode:GetPreValue("this").index;
+	local item = treenode.mcmlNode:GetPreValue("this")
+	local index = item.index;
 
 	FindBlockTask.SetSelectedResultIndex(index)
-	FindBlockTask.OpenItemAtIndex(index);
+	FindBlockTask.GotoItemAtIndex(index);
 
 	if(mouse_button == "left") then
 		FindBlockTask.OnClose()
 	end
 end
 
-function FindBlockTask.OpenItemAtIndex(index)
+function FindBlockTask.GotoItemAtIndex(index)
 	local entity = FindBlockTask.GetResultAt(index);
 	if(entity) then
 		local x, y, z
@@ -308,6 +392,18 @@ function FindBlockTask.OpenItemAtIndex(index)
 		end
 		if(x) then
 			GameLogic.RunCommand(string.format("/goto %d %d %d", x, y, z));
+		end
+		local self = curInstance;
+		if(self and self:IsTextSearchMode() and entity.OpenAtLine) then
+			local ds = FindBlockTask.GetDataSource()
+			if(ds and ds[FindBlockTask.GetSelectedIndex()]) then
+				local item = ds[FindBlockTask.GetSelectedIndex()];
+				local line = item.attr.lowerText:match("(%d+):");
+				if(line) then
+					line = tonumber(line);
+					entity:OpenAtLine(line);
+				end
+			end
 		end
 	end
 end
@@ -367,7 +463,7 @@ function FindBlockTask.GetSelectedResultIndex()
 end
 
 function FindBlockTask.OnOpen()
-	FindBlockTask.OpenItemAtIndex(FindBlockTask.GetSelectedResultIndex());
+	FindBlockTask.GotoItemAtIndex(FindBlockTask.GetSelectedResultIndex());
 	FindBlockTask.OnClose();
 end
 

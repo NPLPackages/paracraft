@@ -637,7 +637,7 @@ function PowerItemManager.SyncGlobalStore(callbackFunc)
 	PowerItemManager.InitCardPack();
 	PowerItemManager.InitGiftPack();
 
-	if(System.options.mc) then
+	if(System.options.localGSL) then
 		NPL.load("(gl)script/kids/3DMapSystemApp/API/paraworld.globalstore.lua");
 		globalstore_templates = paraworld.globalstore.read_from_cache("*");
 		if(globalstore_templates) then

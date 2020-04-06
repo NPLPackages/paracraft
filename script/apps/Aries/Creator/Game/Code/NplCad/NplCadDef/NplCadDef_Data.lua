@@ -293,11 +293,26 @@ log(t)
 		return string.format('function %s(%s)\n    %s\nend\n', self:getFieldAsString('name'), self:getFieldAsString('param'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-function thinkText(text)
-	say(text.."...")
+function intersected()
+  pushNode("union","intersected",'#ffc658',true)
+    sphere("union",1,'#ffc658')
+    cube("intersection",1.5,'#ffc658')
+  popNode()
 end
-thinkText("Let me think");
-]]}},
+function holes()
+  pushNode("difference","holes",'#ffc658',true)
+    cylinder("union",0.5,2,'#ffc658')
+    cylinder("union",0.5,2,'#ffc658')
+    rotate('x',90)
+    cylinder("union",0.5,2,'#ffc658')
+    rotate('z',90)
+  popNode()
+end
+pushNode("union","object0",'#ffc658',true)
+  intersected("")
+  holes("")
+popNode()
+	]]}},
 },
 {
 	type = "functionParams", 
@@ -348,11 +363,25 @@ thinkText("Let me think");
 		return string.format('%s(%s)\n', self:getFieldAsString('name'), self:getFieldAsString('param'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-local thinkText = function(text)
-	say(text.."...")
+function f(x)
+    return 0.5 * x
 end
-thinkText("Let me think");
-]]}},
+
+function g(x)
+    return {x, f(x) * f(x), 0}
+end
+
+for a = -10, 10, 2 do
+    cube("union",1,"#ffc658")
+    move(a,f(a),0)
+end
+
+for a = -10, 10, 1 do
+    sphere("union",0.5,"#ffc658")
+    local t = g(a)
+    move(t[1], t[2], t[3])
+end
+	]]}},
 },
 
 {

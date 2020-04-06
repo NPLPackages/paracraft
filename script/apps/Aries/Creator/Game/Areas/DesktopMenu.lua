@@ -56,6 +56,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"删除".."  Del",name = "edit.delete",onclick=nil},
 				{Type = "Separator"},
 				{text = L"方块跳转...".."  Ctrl+F",name = "window.find",onclick=nil},
+				{text = L"全文搜索...".."  Ctrl+Shift+F",name = "window.findfile", cmd="/findfile", onclick=nil},
 				{text = L"跳到上一层".."  Tab",name = "edit.upstairs",onclick=nil},
 				{text = L"跳到下一层".."  Shift+Tab",name = "edit.downstairs",onclick=nil},
 			},

@@ -50,7 +50,19 @@ local cmds = {
         self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+createNode("object1", "#ffc658", true);
+cube("union", 1.5, "#ffc658");
+sphere("union", 1, "#ff0000");
+
+createNode("object2", "#ffc658", true);
+cube("union", 1.5, "#ffc658");
+sphere("intersection", 1, "#ff0000");
+
+createNode("object3", "#ffc658", true);
+cube("union", 1.5, "#ffc658");
+sphere("difference", 1, "#ff0000");
     ]]}},
+	
 },
 
 {
@@ -106,6 +118,10 @@ local cmds = {
         self:getFieldValue('op'), self:getFieldValue('var_name'), self:getFieldValue('color'), self:getFieldValue('value'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+pushNode("union","object1",'#ffc658',true)
+  cube("union",1,'#ffc658');
+  cylinder("difference",1,10,'#ffc658');
+popNode()
     ]]}},
 },
 
@@ -160,6 +176,10 @@ local cmds = {
         self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'), self:getFieldValue('value'), self:getFieldAsString('input'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+pushNode("union","object1",'#ffc658',true)
+  cube("union",1,'#ffc658');
+  cylinder("difference",1,10,'#ffc658');
+popNode()
     ]]}},
 },
 {
@@ -199,6 +219,7 @@ local cmds = {
 		return string.format('cube("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('size'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+cube("union", 1, "#ffc658");
     ]]}},
 },
 
@@ -251,6 +272,8 @@ local cmds = {
 		return string.format('box("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('x'), self:getFieldValue('y'), self:getFieldValue('z'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+box("union", 1, 1, 2, "#ffc658");
+box("difference", 1, 1, 2, "#ffc658");
     ]]}},
 },
 
@@ -424,6 +447,8 @@ local cmds = {
 		return string.format('sphere("%s",%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+sphere("union", 1, #ffc658");
+sphere("difference", 0.8, #ffc658");
     ]]}},
 },
 
@@ -470,6 +495,8 @@ local cmds = {
 		return string.format('cylinder("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+cylinder("union", 0.5, 2, #ffc658");
+cylinder("difference", 0.8, 4, #ffc658");
     ]]}},
 },
 
@@ -644,6 +671,8 @@ local cmds = {
 		return string.format('cone("%s",%s,%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+cone("union", 1, 4, 4, "#ffc658");
+cone("difference", 1, 4, 4, "#ffc658");
     ]]}},
 },
 
@@ -821,6 +850,8 @@ local cmds = {
 		return string.format('torus("%s",%s,%s,"%s")\n', self:getFieldValue('op'), self:getFieldValue('radius1'), self:getFieldValue('radius2'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+torus("union", 4, 0.5, "#ffc658");
+torus("difference", 4, 0.5, "#ffc658");
     ]]}},
 },
 
@@ -873,6 +904,8 @@ local cmds = {
 		return string.format('prism("%s",%s,%s,%s,"%s")\n',self:getFieldValue('op'), self:getFieldValue('p'), self:getFieldValue('c'), self:getFieldValue('h'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+prism("union", 6, 2, 4, "#ffc658");
+prism("difference", 6, 2, 4, "#ffc658");
     ]]}},
 },
 
@@ -928,6 +961,8 @@ local cmds = {
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+ellipsoid("union", 4, 4, 1, "#ffc658");
+ellipsoid("difference", 4, 4, 1, "#ffc658");
     ]]}},
 },
 {
@@ -981,7 +1016,8 @@ local cmds = {
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-		
+wedge("union", 1, 1, 1, "#ffc658");
+wedge("difference", 1, 1, 1, "#ffc658");
     ]]}},
 },
 {
@@ -1041,7 +1077,8 @@ local cmds = {
             self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-		
+trapezoid("union", 2, 4, 5, 1, "#ffc658");
+trapezoid("difference", 2, 4, 5, 1, "#ffc658");
     ]]}},
 },
 
@@ -1101,6 +1138,7 @@ local cmds = {
                 );
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+importStl("union","Mod/NplCad2/stl/RobotArm/Arm01.stl",'#ffc658', false)
     ]]}},
 },
 
@@ -1405,7 +1443,7 @@ local cmds = {
 		},
         
 	},
-	hide_in_toolbox = true,
+	hide_in_toolbox = false,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -1418,6 +1456,7 @@ local cmds = {
             self:getFieldValue('op'), self:getFieldValue('l'), self:getFieldValue('w'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+plane("union",1,1,'#ffc658')
     ]]}},
 },
 
@@ -1457,7 +1496,7 @@ local cmds = {
 		},
         
 	},
-	hide_in_toolbox = true,
+	hide_in_toolbox = false,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -1474,6 +1513,7 @@ local cmds = {
                 self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+circle("union",2,0,360,'#ffc658')
     ]]}},
 },
 
@@ -1519,7 +1559,7 @@ local cmds = {
 		},
         
 	},
-	hide_in_toolbox = true,
+	hide_in_toolbox = false,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
@@ -1535,6 +1575,7 @@ local cmds = {
                 self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+ellipse("union",4,2,0,360,'#ffc658')
     ]]}},
 },
 
@@ -1651,7 +1692,7 @@ local cmds = {
 },
 
 {
-	type = "polygon", 
+	type = "regularPolygon", 
 	message0 = L" %1 正多边形 边数 %2 外接圆半径 %3 %4",
     arg0 = {
         {
@@ -1680,21 +1721,86 @@ local cmds = {
 		},
         
 	},
-	hide_in_toolbox = true,
+	hide_in_toolbox = false,
+    previousStatement = true,
+	nextStatement = true,
+	category = "Shapes", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "regularPolygon",
+	func_description = 'regularPolygon(%s,%s,%s,%s)',
+	ToNPL = function(self)
+        return string.format('regularPolygon("%s",%s,%s,"%s")\n', 
+                self:getFieldValue('op'), 
+                self:getFieldValue('p'), self:getFieldValue('c'), 
+                self:getFieldValue('color'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+regularPolygon("union",6,2,'#ffc658')
+    ]]}},
+},
+
+{
+	type = "polygon", 
+	message0 = L" %1 多边形 %2 %3",
+    arg0 = {
+        {
+			name = "op",
+			type = "input_value",
+            shadow = { type = "boolean_op", value = "union",},
+			text = "union", 
+		},
+        {
+			name = "p",
+			type = "input_value",
+			shadow = { type = "functionParams", value = "{0,0,0, 1,0,0, 1,1,0}",},
+			text = "{0,0,0, 1,0,0, 1,1,0}",
+		},
+		{
+			name = "color",
+			type = "input_value",
+            shadow = { type = "colour_picker", value = "#ffc658",},
+			text = "#ffc658", 
+		},
+        
+	},
+	hide_in_toolbox = false,
     previousStatement = true,
 	nextStatement = true,
 	category = "Shapes", 
 	helpUrl = "", 
 	canRun = false,
 	funcName = "polygon",
-	func_description = 'polygon(%s,%s,%s,%s)',
+	func_description = 'polygon(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('polygon("%s",%s,%s,"%s")\n', 
+        return string.format('polygon("%s",%s,"%s")\n', 
                 self:getFieldValue('op'), 
-                self:getFieldValue('p'), self:getFieldValue('c'), 
+                self:getFieldValue('p'),
                 self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+polygon("union",{0,0,0, 1,0,0, 1,1,0},'#ffc658')
+-- examples 2
+function star(num, radii)
+    local points = {}
+    for i = 0, num-1 do
+        local a = i * 2 * math.pi / num
+        local r = radii[(i % #radii) + 1]
+        table.insert(points, r * math.cos(a))
+        table.insert(points, r * math.sin(a))
+        table.insert(points, 0)
+    end
+    polygon("union",points,"#ff0000")
+end
+
+
+createNode("object0","#ffff00",false)
+star(10, {1, 2.6})
+star(40, {2,3,3,2})
+move(6, 0, 0)
+extrude(1)
+star(30, {1.5,2,2.5,3,2.5,2})
+move(12, 0, 0)
     ]]}},
 },
 
@@ -1790,6 +1896,21 @@ local cmds = {
 			self:getFieldValue('size'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
+-- example1
+createNode("object4",'#ff0000',true)
+box("union",3,3,1.5,'#ffc658')
+move(0,0,0.75)
+text3d("difference","M","C:/WINDOWS/FONTS/MSYH.TTC", 2, 2, '#ffc658')
+move((-1.2),(-1),0)
+
+--example2
+createNode("object4",'#ff0000',false)
+text3d("union","Paracraft","C:/WINDOWS/FONTS/MSYH.TTC", 1, 0.1, '#0008ff')
+move(0,1,0)
+text3d("union","帕拉卡","C:/WINDOWS/FONTS/MSYH.TTC", 0.6, 0.1, '#ffffff')
+move(6,1,0)
+text3d("union","3D动画编程教育开创者","C:/WINDOWS/FONTS/MSYH.TTC", 0.8, 0.2, '#fd0000')
+move((-1.2),0,0)
     ]]}},
 },
 

@@ -787,3 +787,39 @@ end
 function Entity:IsAllowFastMode()
 	return self.isAllowFastMode;
 end
+
+-- return the NPL code line containing the text
+-- @param text: string to match
+-- @param bExactMatch: if for exact match
+-- return bFound, filename, filenames: if the file text is found. filename contains the full filename
+function Entity:FindFile(text, bExactMatch)
+	local code = self:GetNPLCode()
+	if(code) then
+		local bFound, filename, filenames = mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
+		if(bFound) then
+			local codeFileName = self:GetFilename()
+			if(codeFileName and codeFileName~="") then
+				if(filename) then
+					filename = format("%s:%s", codeFileName, filename)
+				end
+				if(filenames) then
+					for i = 1, #filenames do
+						filenames[i] = format("%s:%s", codeFileName, filenames[i]);
+					end
+				end
+			end
+			return bFound, filename, filenames
+		end
+	end
+end
+
+-- open entity at the given line
+-- @param line: line number.
+-- @param pos: cursor column position. if nil, it default to 1
+function Entity:OpenAtLine(line, pos)
+	self:OpenEditor("entity", EntityManager.GetPlayer())
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	self.cursorPos = {line = line or 1, pos = pos or 1};
+	CodeBlockWindow.RestoreCursorPosition();
+end

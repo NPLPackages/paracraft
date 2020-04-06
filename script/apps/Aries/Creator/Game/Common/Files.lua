@@ -21,6 +21,7 @@ echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketGetFile.lua");
+NPL.load("(gl)script/ide/math/StringUtil.lua");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")

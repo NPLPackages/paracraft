@@ -98,7 +98,12 @@ function CodeHelpItem:GetHtml()
 					end
 
 					if(arg_item.type == "field_input") then
-						arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+						local min_width = 0;
+						item_text = tostring(item_text or "")
+						if(item_text ~= "") then
+							min_width = _guihelper.GetTextWidth(item_text, "System;12;bold");
+						end
+						arg_text = format('<div style="float:left;min-width:%dpx;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', min_width, item_text);
 					elseif(arg_item.type == "input_value") then
 						if(arg_item.options) then
 							arg_item.selectedIndex = arg_item.selectedIndex or 1;
@@ -108,7 +113,10 @@ function CodeHelpItem:GetHtml()
 						elseif(not item_text or item_text=="") then
 							arg_text = '<div style="float:left;margin:3px;background-color:#ffffff;color:#000000;width:5px;height:12px"></div>';
 						else
-							arg_text = format('<div style="float:left;margin:3px;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', item_text or "");
+							local min_width = 0;
+							item_text = tostring(item_text or "");
+							min_width = _guihelper.GetTextWidth(item_text, "System;12;bold");
+							arg_text = format('<div style="float:left;margin:3px;min-width:%d;line-height:12px;font-size:bold;background-color:#ffffff;color:#000000;">%s</div>', min_width, item_text);
 						end
 					elseif(arg_item.type == "field_variable") then
 						if(arg_item.options) then

@@ -644,6 +644,96 @@ chamfer("xz", 0.1) -- make chamfer on edges belong to XZ plane
 },
 
 {
+	type = "extrude", 
+	message0 = L"线性拉伸 长度 %1",
+    arg0 = {
+        {
+			name = "height",
+			type = "input_value",
+            shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "extrude",
+	func_description = 'extrude(%s)',
+	func_description_js = 'extrude(%s)',
+	ToNPL = function(self)
+		return string.format('extrude(%s)\n', self:getFieldValue('height'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+circle("union",2,0,360,'#ffc658')
+extrude(1)
+
+-- extrude and boolean
+createNode("object4",'#ff0000',true)
+box("union",3,1,2,'#ffc658')
+ellipse("difference",1,0.5,0,360,'#ffc658')
+move(0,(-2),0)
+extrude(4)
+    ]]}},
+},
+
+{
+	type = "revolve", 
+	message0 = L"旋转拉伸 %1 角度 %2",
+    arg0 = {
+        {
+			name = "axis",
+			type = "input_value",
+            shadow = { type = "axis", value = "x",},
+			text = "'x'", 
+		},
+        {
+			name = "angle",
+			type = "input_value",
+            shadow = { type = "math_number", value = 360,},
+			text = 360, 
+		},
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "revolve",
+	func_description = 'revolve(%s, %s)',
+	func_description_js = 'revolve(%s, %s)',
+	ToNPL = function(self)
+		return string.format('revolve(%s, %s)\n', self:getFieldValue('axis'), self:getFieldValue('angle'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+plane("union",1,1,'#ffc658')
+move(1,0,0)
+revolve('z', 360)
+move(7,0,0)
+
+polygon("union",{0,0,0,0.8,0.4,0,0.4,0.8,0,0.4,1.2,0,1.2,1.6,0,0,2,0},'#ffc658')
+revolve('y', 360)
+move((-6),0,0)
+
+plane("union",1,1,'#ffc658')
+rotate('x',(-90))
+move(4,0,0)
+revolve('y', (-180))
+plane("union",1,1,'#ffc658')
+rotate('x',(-90))
+move(2,0,0)
+revolve('y', 180)
+move((-2),0,0)
+plane("union",1,1,'#ffc658')
+rotate('x',(-90))
+move(2,0,0)
+revolve('y', (-180))
+move(2,0,0)
+    ]]}},
+},
+
+{
 	type = "mirror", 
 	message0 = L"镜像 %1 中心点 %2 %3 %4",
     arg0 = {

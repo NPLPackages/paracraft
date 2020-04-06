@@ -124,6 +124,18 @@ function MovieClipController.OnClickActorContextMenuItem(node)
 				CopyActorTimeSeries.PasteToActor(actor)
 			end
 		end
+	elseif(name == "rename") then
+		local actor = MovieClipController.GetMovieActor();
+		if(actor) then
+			local oldValue = actor:GetDisplayName()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+			local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+			EnterTextDialog.ShowPage(L"输入新名字", function(result)
+				if(result and result ~= oldValue) then
+					actor:SetDisplayName(result);
+				end
+			end, oldValue)
+		end
 	elseif(name == "delete") then
 		MovieClipController.DeleteSelectedActor()
 	end
@@ -133,6 +145,7 @@ end
 local actorMenuItems = {
 	{name="copySelected", text=L"选择性复制..."}, 
 	{name="pasteSelected", text=L"粘贴"},
+	{name="rename", text=L"重命名..."},
 	{name="delete", text=L"删除"},
 };
 
@@ -171,6 +184,12 @@ function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 					else
 						text = format(L"%s %s", text, tostring(obj.fromTime or 0));
 					end
+				else
+					text = nil;
+				end
+			elseif(item.name == "rename") then
+				if(actor.class_name == "ActorNPC" or actor.class_name == "ActorOverlay") then
+					
 				else
 					text = nil;
 				end

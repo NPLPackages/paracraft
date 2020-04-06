@@ -422,3 +422,14 @@ function Entity.OnClickAdvancedEditor()
 		self:OpenHtmlEditor();
 	end
 end
+
+-- return the NPL code line containing the text
+-- @param text: string to match
+-- @param bExactMatch: if for exact match
+-- return true, filename: if the file text is found. filename contains the full filename
+function Entity:FindFile(text, bExactMatch)
+	local code = self:GetNPLCode()
+	if(code) then
+		return mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
+	end
+end

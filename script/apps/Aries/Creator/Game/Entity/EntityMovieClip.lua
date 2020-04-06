@@ -148,6 +148,55 @@ function Entity:ReplaceFile(from, to)
 	return count;
 end
 
+--@return filename, filenames
+local function AddToSearchResult(index, result, filename, filenames)
+	result = format("%d:%s", index, result);	
+	if(not filename) then
+		filename = result
+	else
+		if(not filenames) then
+			filenames = {filename}
+		end
+		filenames[#filenames+1] = result
+	end
+	return filename, filenames;
+end
+-- @param text: string to match
+-- @param bExactMatch: if for exact match
+-- return true, filename, filenames: if the file text is found. filename contains the full filename, filenames contains multiple results
+function Entity:FindFile(text, bExactMatch)
+	local filename, filenames;
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			local name = itemStack:GetDataField("tooltip")
+			-- skip default actor names
+			if(name and name ~= "" and name ~= "actor") then
+				if((bExactMatch and (name == text)) or (not bExactMatch and name:find(text))) then
+					filename, filenames = AddToSearchResult(i, name, filename, filenames)
+				end
+			end
+			if(itemStack.id == block_types.names.TimeSeriesNPC) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+					local data = timeSeries.assetfile.data;
+					for i = 1, #(data) do
+						-- skip default actor
+						if(data[i] ~= "actor") then
+							if((bExactMatch and (data[i] == text)) or (not bExactMatch and data[i]:find(text))) then
+								filename, filenames = AddToSearchResult(i, data[i], filename, filenames)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if(filename) then
+		return true, filename, filenames
+	end
+end
+
 local function offset_time_variable(var, offset)
 	if(var and var.data) then
 		local data = var.data;
@@ -302,6 +351,14 @@ end
 -- we will select the first actor in the movie block if there is a code block nearby 
 -- otherwise, we will select the default camera object in the movie block. 
 function Entity:AutoSelectActorInEditor()
+	if(self.selectedActorIndex) then
+		local itemStack = self.inventory:GetItem(self.selectedActorIndex)		
+		if(itemStack) then
+			MovieClipController.SetFocusToItemStack(itemStack);
+			return
+		end
+	end
+	
 	local codeEntity = self:GetNearByCodeEntity();
 	if(codeEntity) then
 		local firstActor = self:GetFirstActorStack();
@@ -702,4 +759,13 @@ function Entity:FrameMove(deltaTime)
 			--self:SetFrameMoveInterval(nil);
 		--end
 	end
+end
+
+-- open entity at the given line
+-- @param line: line number.
+-- @param pos: cursor column position. if nil, it default to 1
+function Entity:OpenAtLine(line, pos)
+	self.selectedActorIndex = line
+	self:OpenEditor("entity", EntityManager.GetPlayer())
+	self.selectedActorIndex = nil
 end
