@@ -30,6 +30,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobot.lua");
 	elseif(filename == "npl_blockpen") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/BlockPenDef/BlockPen.lua");
+	elseif(filename == "haqi") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/HaqiDef/Haqi.lua");
 	elseif(filename == "commands") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CommandsDef/CommandsBlockly.lua");
 	else
