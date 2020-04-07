@@ -411,7 +411,7 @@ function CommandHelpPage.ShowContextMenuForWord(word, line, from, to)
 	local ctl = CommandHelpPage.contextMenuCtrl;
 	if(not ctl)then
 		ctl = CommonCtrl.ContextMenu:new{
-			name = "CodeIntelliSense.contextMenuCtrl",
+			name = "CommandHelpPage.contextMenuCtrl",
 			width = 230,
 			height = 60, -- add menuitemHeight(30) with each new item
 			DefaultNodeHeight = 26,

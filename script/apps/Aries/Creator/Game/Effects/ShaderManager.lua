@@ -52,10 +52,10 @@ function ShaderManager:RegisterAllEffects()
 	local effect = ColorEffect:new():Init(self);
 	self:RegisterEffect(effect);
 
---	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/Vignetting.lua");
---	local Vignetting = commonlib.gettable("MyCompany.Aries.Game.Shaders.Vignetting");
---	local effect = Vignetting:new():Init(self);
---	self:RegisterEffect(effect);
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/Vignetting.lua");
+	local Vignetting = commonlib.gettable("MyCompany.Aries.Game.Shaders.Vignetting");
+	local effect = Vignetting:new():Init(self);
+	self:RegisterEffect(effect);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/finalEffect.lua");
 	local finalEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.finalEffect");

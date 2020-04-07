@@ -25,7 +25,7 @@ Commands["shader"] = {
 	mode_deny = "",
 	mode_allow = "",
 	desc=[[graphic shader. default to 1
-/shader 0	fixed function;
+/shader 0   fixed function
 /shader 1   default
 /shader 2   shadow+reflection
 /shader 3   shadow+reflection+HDR+Bloom+Vignette
