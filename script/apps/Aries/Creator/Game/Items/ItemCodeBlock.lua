@@ -91,6 +91,9 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 				-- tricky: fixed picking python block. 
 				-- TODO: this is not a good way to implement it. Do it formally. 
 				itemStack.id = block_types.names.PyRuntimeCodeBlock or itemStack.id;
+			elseif(data == 1280) then
+				-- tricky: fixed picking haqi block. 
+				itemStack.id = block_types.names.HaqiCodeBlock or itemStack.id;
 			elseif(data == 1024) then
 				-- tricky: for client side execution code block
 				itemStack:SetPreferredBlockData(0)

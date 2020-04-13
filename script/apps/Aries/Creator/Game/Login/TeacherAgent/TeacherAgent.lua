@@ -151,7 +151,7 @@ end
 
 function TeacherAgent:OnClickTeacherIcon()
 	-- TODO: 
-	GameLogic.RunCommand("/menu help.help");
+	-- GameLogic.RunCommand("/menu help.help");
 end
 
 -- virtual function: a note is selected to teach

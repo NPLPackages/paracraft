@@ -363,7 +363,7 @@ function NplCad.OnClickSaveFile()
         end
 	    local file = ParaIO.open(filename, "w");
         if(file:IsValid()) then
-        local codeEntity = CodeBlockWindow.GetCodeEntity();
+			local codeEntity = CodeBlockWindow.GetCodeEntity();
             if(codeEntity)then
                 local block_xml_txt = codeEntity:GetBlocklyXMLCode();
 	            file:WriteString(block_xml_txt);

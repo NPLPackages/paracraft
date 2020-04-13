@@ -696,6 +696,7 @@ function CodeBlock:send_message(msg, msgType)
 	if(msgType == "error") then
 		-- LOG.std(nil, "error", "CodeBlock", msg);
 		local date_str, time_str = commonlib.log.GetLogTimeString();
+		
 		local text = commonlib.Encoding.EncodeHTMLInnerText(msg:sub(1, 1024));
 		local html_text = format("<div style='color:#ff0000'><span style='color:#808080'>%s %s: </span>%s%s<div>", date_str, time_str, text, ((#msg)>1024) and "..." or "");
 		GameLogic.SetTipText(html_text, nil, 10)

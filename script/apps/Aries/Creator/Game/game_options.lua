@@ -169,15 +169,8 @@ function options:OneTimeInit()
 
 	-- error log hook
 	if(System.options.mc and ParaWorldAnalytics) then
-		local i=0;
 		ParaWorldAnalytics.SetNPLErrorCallback(function(errorMessage, stackInfo)
-			i=i+1;
-			if(errorMessage and i < 10000) then
-				GameLogic.AddBBS("nplError"..(i%3), errorMessage:sub(1, 100), 5000, "255 0 0");
-				GameLogic.AppendChat(format("Error %d:", i));
-				GameLogic.AppendChat(errorMessage);
-				GameLogic.AppendChat(stackInfo);
-			end
+			GameLogic.OnCodeError(errorMessage, stackInfo)
 		end)
 	end
 end

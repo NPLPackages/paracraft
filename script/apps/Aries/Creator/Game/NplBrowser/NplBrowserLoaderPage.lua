@@ -175,7 +175,9 @@ function NplBrowserLoaderPage.CreateOrGetAssetsManager(id,redist_root,config_fil
     return a;
 end
 
--- @param callback: function(bChecked) end
+
+-- @param callback: function(bChecked) end, bChecked is true if successfully downloaded
+-- return true if we are downloading
 function NplBrowserLoaderPage.Check(callback)
     if(not NplBrowserPlugin.OsSupported())then
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
@@ -195,7 +197,7 @@ function NplBrowserLoaderPage.Check(callback)
         return
     end
     if(NplBrowserLoaderPage.is_opened)then
-        return
+        return not NplBrowserLoaderPage.IsLoaded();
     end
 
     if(System.os.GetPlatform() == "mac")then
@@ -209,6 +211,7 @@ function NplBrowserLoaderPage.Check(callback)
     NplBrowserLoaderPage.buildin_version = version;
     NplBrowserLoaderPage.callback = callback;
     NplBrowserLoaderPage.OnCheck("browser_asset_manager",dest_folder,config_file)
+	return not NplBrowserLoaderPage.IsLoaded();
 end
 function NplBrowserLoaderPage.OnCheck(id,folder,config_file)
 

@@ -1029,9 +1029,7 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
 	end
-	NplBrowserLoaderPage.Check(function() 		end);
-
-    if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
+	local function OpenInternalBrowser_()
 		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
 			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
@@ -1043,6 +1041,27 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 		else
 			CodeBlockWindow.SetNplBrowserVisible(false)
 		end
+	end
+	if(not CodeBlockWindow.NplBrowserIsLoaded()) then
+		local isDownloading
+		isDownloading = NplBrowserLoaderPage.Check(function(result)
+			if(result) then
+				if(isDownloading) then
+					_guihelper.CloseMessageBox();
+				end
+				OpenInternalBrowser_()
+			end
+		end)
+		if(isDownloading) then
+			_guihelper.MessageBox(L"正在更新图块编程系统，请等待1-2分钟。<br/>如果有杀毒软件提示安全警告请允许。", function(res)
+				
+			end, _guihelper.MessageBoxButtons.Nothing);
+			return;
+		end
+	end
+
+    if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
+		OpenInternalBrowser_()
 	else
 		GameLogic.RunCommand("/open "..request_url);
     end

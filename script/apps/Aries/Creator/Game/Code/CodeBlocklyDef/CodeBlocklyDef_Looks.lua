@@ -925,7 +925,7 @@ stopMovie();
 			self:getFieldAsString('alignment'), self:getFieldAsString('left'), self:getFieldAsString('top'), self:getFieldAsString('width'), self:getFieldAsString('height'));
 	end,
 	ToNPL = function(self)
-		return string.format('window([[%s]],"%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
+		return string.format('window([[\n%s\n]],"%s", %s, %s, %s, %s)\n', self:getFieldAsString('mcmlCode'), 
 			self:getFieldAsString('alignment'), self:getFieldAsString('left'), self:getFieldAsString('top'), self:getFieldAsString('width'), self:getFieldAsString('height'));
 	end,
 	examples = {{desc = L"绘图板", canRun = false, code = [=[

@@ -1631,3 +1631,17 @@ function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
 		end)
 	end
 end
+
+local errorCount = 1;
+function GameLogic.OnCodeError(errorMessage, stackInfo)
+	errorCount=errorCount+1;
+	if(errorMessage and errorCount < 10000) then
+		GameLogic.AddBBS("nplError"..(errorCount%3), errorMessage:sub(1, 100), 5000, "255 0 0");
+		local date_str, time_str = commonlib.log.GetLogTimeString();
+		GameLogic.AppendChat(format("Error %d: %s %s", errorCount, date_str, time_str));
+		GameLogic.AppendChat(errorMessage);
+		if(stackInfo) then
+			GameLogic.AppendChat(stackInfo);
+		end
+	end
+end

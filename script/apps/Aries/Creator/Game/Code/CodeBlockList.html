@@ -14,7 +14,7 @@ for index = 1, #blockList do
             if(item.entity:GetAllIncludedFiles()) then
                 local filenames = item.entity:GetAllIncludedFiles()
                 for i = 1, #filenames do
-                    items[#items+1] = {filename = filenames[i], listIndex = index, selected = false, isExternal=true}
+                    items[#items+1] = {filename = filenames[i], displayName = filenames[i]:sub(-26, -1), listIndex = index, selected = false, isExternal=true}
                 end
             end
             local langFile = item.entity:GetLanguageConfigFile();
@@ -62,7 +62,7 @@ end
                         </pe:if>
                         <pe:if condition='<%=Eval("isExternal")%>'>
                             <div width="100%" style="margin-left:8px;padding-left:5px;padding-right:5px;background-color:#a0a0a0;color:#303030">
-                                <%=Eval('filename')%>
+                                <%=Eval('displayName') or Eval('filename')%>
                             </div>
                         </pe:if>
                     </pe:if>
