@@ -137,10 +137,17 @@ function NplBrowserPlugin.RunNextCmd()
             if cmd.cmd == 'Show' then
                 local p = NplBrowserPlugin.GetCache(cmd.id)
                 if cmd.visible then
-                    NplBrowserPlugin.webview = WebView:new():init(p.x, p.y, p.width, p.height, true);
-                    NplBrowserPlugin.webview:loadUrl(p.url);
+                    if not p.isLoadWebview then
+                        NplBrowserPlugin.webview = WebView:new():init(p.x, p.y, p.width, p.height, true);
+                        NplBrowserPlugin.webview:loadUrl(p.url);
+                        p.isLoadWebview = true
+                    else
+                        NplBrowserPlugin.webview:move(p.x, p.y);
+                        NplBrowserPlugin.webview:resize(p.width, p.height);
+                    end
                 else
                     NplBrowserPlugin.webview:setVisible(cmd.visible);
+                    p.isLoadWebview = false
                 end
             end
         end

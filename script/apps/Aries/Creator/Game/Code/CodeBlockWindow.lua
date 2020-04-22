@@ -932,10 +932,10 @@ end
 function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
     if(page)then
 		-- block NPL.activate "cef3/NplCefPlugin.dll" if npl browser isn't loaded
-        -- so that we can running auto updater normally
+		-- so that we can running auto updater normally
         if(not CodeBlockWindow.NplBrowserIsLoaded())then
             return
-        end
+		end
 		page.isNPLBrowserVisible = bVisible;
 
 		if(bVisible and not CodeBlockWindow.temp_nplbrowser_reload)then
@@ -1031,6 +1031,11 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	end
 	local function OpenInternalBrowser_()
 		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
+			if(System.os.GetPlatform() == "mac")then
+				CodeBlockWindow.SetNplBrowserVisible(true, bForceRefresh)
+				return
+			end
+
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
 			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
 			local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
@@ -1059,6 +1064,11 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 			return;
 		end
 	end
+
+	if(System.os.GetPlatform() == "mac")then
+		OpenInternalBrowser_();
+        return
+    end
 
     if(CodeBlockWindow.NplBrowserIsLoaded() and not Keyboard:IsCtrlKeyPressed())then
 		OpenInternalBrowser_()
