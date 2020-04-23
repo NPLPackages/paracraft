@@ -150,6 +150,16 @@ function NplBrowserPlugin.RunNextCmd()
                     p.isLoadWebview = false
                 end
             end
+
+            if cmd.cmd == 'Zoom' then
+                local p = NplBrowserPlugin.GetCache(cmd.id)
+                local uiScales = System.Windows.Screen:GetUIScaling();
+
+                if p.isLoadWebview then
+                    NplBrowserPlugin.webview:move(p.x, p.y);
+                    NplBrowserPlugin.webview:resize(p.width/uiScales[1], p.height/uiScales[2]);
+                end
+            end
         end
 
         NplBrowserPlugin.UpdateCache(id, cmd)
