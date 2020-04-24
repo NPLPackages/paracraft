@@ -376,7 +376,7 @@ end
 -- @param bExactMatch: if for exact match
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local filename = entity:GetModelFile();
+	local filename = self:GetModelFile();
 	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
 		return true, filename
 	end

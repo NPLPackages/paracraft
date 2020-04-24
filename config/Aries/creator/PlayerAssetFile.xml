@@ -92,6 +92,12 @@
   <asset filename="character/CC/02human/blockman/sunbin.x" displayname="孙膑" name="sunbin"/>
   <asset filename="character/CC/02human/blockman/pangjuan.x" displayname="庞涓" name="pangjuan"/>
   <asset filename="character/CC/02human/blockman/guiguzi.x" displayname="鬼谷子" name="guiguzi"/>
+  <!--
+  <asset filename="character/CC/codewar/pangjuanjiangjunxingtai_movie.x" displayname="庞涓将军_多动作" name="pangjuanjiangjunxingtai_movie"/>
+  <asset filename="character/CC/codewar/pangjuanqiuxuexingtai_movie.x" displayname="庞涓学习_多动作" name="pangjuanqiuxuexingtai_movie"/>
+  <asset filename="character/CC/codewar/sunbinjunshixingtai_movie.x" displayname="孙膑军事_多动作" name="sunbinjunshixingtai_movie"/>
+  <asset filename="character/CC/codewar/sunbinqiuxuexingtai_movie.x" displayname="孙膑求学_多动作" name="sunbinqiuxuexingtai_movie"/>
+  -->
   <asset filename="character/CC/02human/blockman/archer_black.x" displayname="小弓箭手黑色" name="archer_black"/>
   <asset filename="character/CC/02human/blockman/archer_red.x" displayname="小弓箭手红色" name="archer_red"/>
   <asset filename="character/CC/02human/blockman/soldier_black.x" displayname="小士兵黑色" name="soldier_black"/>
@@ -147,6 +153,19 @@
 	<asset filename="character/v5/01human/Wudi/Wudi.x" displayname="吴迪" name="Wudi"/>
 	<asset filename="character/v5/01human/XianDou/XianDou.x" displayname="仙兜小猪" name="XianDou"/>
 	<asset filename="character/v5/01human/ZhiHuiXing/ZhiHuiXing.x" displayname="启蒙导师" name="ZhiHuiXing"/>
+	<asset filename="character/v6/01human/ElfTasha/ElfTasha.x" displayname="小花仙" name="ElfTasha"/>
+	<asset filename="character/v6/01human/Archaeologists_Nat/Archaeologists_Nat.x" displayname="矿物学家" name="Archaeologists_Nat"/>
+    <asset filename="character/v6/01human/Archaeologists_Vian/Archaeologists_Vian.x" displayname="地质博士" name="Archaeologists_Vian"/>
+    <asset filename="character/v6/01human/Archaeologists_Vinoer/Archaeologists_Vinoer.x" displayname="地下勘察者" name="Archaeologists_Vinoer"/>
+    <asset filename="character/v6/01human/Archaeologists_Yale/Archaeologists_Yale.x" displayname="赏金猎人" name="Archaeologists_Yale"/>
+    <asset filename="character/v6/01human/ArenaAdministrator/ArenaAdministrator.x" displayname="盗墓者" name="ArenaAdministrator"/>
+    <asset filename="character/v6/01human/ArenicIntendant/ArenicIntendant.x" displayname="胖墩" name="ArenicIntendant"/>
+	<asset filename="character/v6/01human/GoldCoin/GoldCoin.x" displayname="寻宝女卫" name="GoldCoin"/>
+    <asset filename="character/v6/01human/HaiPi/HaiPi.x" displayname="美男子" name="HaiPi"/>
+    <asset filename="character/v6/01human/Gillian/Gillian.x" displayname="蓝衣蒙面女" name="Gillian"/>
+    <asset filename="character/v6/01human/Gillian/Gillian01.x" displayname="红衣蒙面女" name="Gillian01"/>
+    <asset filename="character/v6/01human/PaladinBado/PaladinBado.x" displayname="熊斗士" name="PaladinBado"/>
+
   
 </category>
 <category name="animals">  
@@ -190,21 +209,96 @@
 	<asset filename="character/v5/02animals/Tortoise/Tortoise03.x" displayname="乌龟03" name="Tortoise03"/>
 	<asset filename="character/v5/02animals/UglyDuckling/UglyDuckling.x" displayname="丑小鸭" name="UglyDuckling"/>
 	<asset filename="character/v5/02animals/ZodiacAnimals/Cock/Cock.x" displayname="生肖公鸡" name="ZodiacCock"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Cow/Cow.x" displayname="生肖牛" name="ZodiacCow"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Dog/Dog.x" displayname="生肖狗" name="ZodiacDog"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Dragon/Dragon.x" displayname="生肖龙" name="ZodiacDragon"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Horse/Horse.x" displayname="生肖马" name="ZodiacHorse"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Monkey/Monkey.x" displayname="生肖猴子" name="ZodiacMonkey"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Mouse/Mouse.x" displayname="生肖老鼠" name="ZodiacMouse"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Pig/Pig.x" displayname="生肖猪" name="ZodiacPig"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Rabbit/Rabbit.x" displayname="生肖兔子" name="ZodiacRabbit"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Sheep/Sheep.x" displayname="生肖羊" name="ZodiacSheep"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Snake/Snake.x" displayname="生肖蛇" name="ZodiacSnake"/>
-  <asset filename="character/v5/02animals/ZodiacAnimals/Tiger/Tiger.x" displayname="生肖老虎" name="ZodiacTiger"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Cow/Cow.x" displayname="生肖牛" name="ZodiacCow"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Dog/Dog.x" displayname="生肖狗" name="ZodiacDog"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Dragon/Dragon.x" displayname="生肖龙" name="ZodiacDragon"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Horse/Horse.x" displayname="生肖马" name="ZodiacHorse"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Monkey/Monkey.x" displayname="生肖猴子" name="ZodiacMonkey"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Mouse/Mouse.x" displayname="生肖老鼠" name="ZodiacMouse"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Pig/Pig.x" displayname="生肖猪" name="ZodiacPig"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Rabbit/Rabbit.x" displayname="生肖兔子" name="ZodiacRabbit"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Sheep/Sheep.x" displayname="生肖羊" name="ZodiacSheep"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Snake/Snake.x" displayname="生肖蛇" name="ZodiacSnake"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Tiger/Tiger.x" displayname="生肖老虎" name="ZodiacTiger"/>
+    <asset filename="character/v5/10mobs/HaqiTown/Alexander/Alexander.x" displayname="鸭梨山大" name="Alexander"/>
+    <asset filename="character/v5/10mobs/HaqiTown/BalanceBubble/BalanceBubble.x" displayname="咕噜" name="BalanceBubble"/>
+    <asset filename="character/v5/10mobs/HaqiTown/bingxiong/bingxiong.x" displayname="白熊" name="bingxiong"/>
+	<asset filename="character/v5/10mobs/HaqiTown/Bonfire_Boss/Bonfire_Boss.x" displayname="火魔" name="Bonfire_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathBear/DeathBear.x" displayname="黑熊" name="DeathBear"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathBubble/DeathBubble.x" displayname="死亡咕噜" name="DeathBubble"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathEvilSnowman/DeathEvilSnowman.x" displayname="黑暗雪人" name="DeathEvilSnowman"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathMonkey03/DeathMonkey03.x" displayname="死灵猴" name="DeathMonkey03"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathOctopus03/DeathOctopus03.x" displayname="红色八爪鱼" name="DeathOctopus03"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathPangolin/DeathPangolin.x" displayname="黑暗食蚁兽" name="DeathPangolin"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathSnake/DeathSnake.x" displayname="死灵蛇" name="DeathSnake.x"/>
+	<asset filename="character/v5/10mobs/HaqiTown/DeathSnake_Boss/DeathSnake_Boss.x" displayname="死灵蛇王" name="DeathSnake_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/EvilSnowman/EvilSnowman.x" displayname="胖雪人" name="EvilSnowman"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireBeatle/FireBeatle.x" displayname="火蝎子" name="FireBeatle"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireBeatle_Boss/FireBeatle_Boss.x" displayname="蝎子王" name="FireBeatle_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireBubble/FireBubble.x" displayname="火咕噜" name="FireBubble"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireCrab03/FireCrab03.x" displayname="螃蟹" name="FireCrab03"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireEvilSnowman/FireEvilSnowman.x" displayname="红雪人" name="FireEvilSnowman"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FireManekiNeko/FireManekiNeko.x" displayname="灰猫猫" name="FireManekiNeko"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FlamingSnake/FlamingSnake.x" displayname="炽焰蛇" name="FlamingSnake"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FlamingSnake_Boss/FlamingSnake_Boss.x" displayname="炽焰蛇王" name="FlamingSnake_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/ForestSpikyOgre/ForestSpikyOgre.x" displayname="猩猩王" name="ForestSpikyOgre"/>
+	<asset filename="character/v5/10mobs/HaqiTown/ForestSpikyOgreLower/ForestSpikyOgreLower.x" displayname="猩猩" name="ForestSpikyOgreLower"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FrostMummy/FrostMummy.x" displayname="寒冰木乃伊" name="FrostMummy"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FrostScylla/FrostScylla.x" displayname="冰巨人" name="FrostScylla"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FrostSnake/FrostSnake.x" displayname="寒冰蛇" name="FrostSnake"/>
+	<asset filename="character/v5/10mobs/HaqiTown/FrostSnake_Boss/FrostSnake_Boss.x" displayname="寒冰蛇王" name="FrostSnake_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/GreatIceBearLower/GreatIceBearLower.x" displayname="蓝熊" name="GreatIceBearLower"/>
+	<asset filename="character/v5/10mobs/HaqiTown/GreatStormBearLower/GreatStormBearLower.x" displayname="棕熊" name="GreatStormBearLower"/>
+	<asset filename="character/v5/10mobs/HaqiTown/GreenDevouringRat/GreenDevouringRat.x" displayname="绿精灵鼠" name="GreenDevouringRat"/>
+	<asset filename="character/v5/10mobs/HaqiTown/GreenDevouringRat_Fuben/GreenDevouringRat_Fuben.x" displayname="蓝精灵鼠" name="GreenDevouringRat_Fuben"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IceManekiNeko/IceManekiNeko.x" displayname="棕猫猫" name="IceManekiNeko"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IcePangolin/IcePangolin.x" displayname="寒冰食蚁兽" name="IcePangolin"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IcePangolin_Fuben/IcePangolin_Fuben.x" displayname="冰霜食蚁兽" name="IcePangolin_Fuben"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IceShrimpWarrior/IceShrimpWarrior.x" displayname="冰虾米" name="IceShrimpWarrior"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IronBee/IronBee.x" displayname="风暴蜂" name="IronBee"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IronBee_Boss/IronBee_Boss.x" displayname="蜂王" name="IronBee_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/IronBee_Boss_Fuben/IronBee_Boss_Fuben.x" displayname="火焰蜂" name="IronBee_Boss_Fuben"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeBear/LifeBear.x" displayname="绿熊" name="LifeBear"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeBubble/LifeBubble.x" displayname="草咕噜" name="LifeBubble"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeEvilSnowman/LifeEvilSnowman.x" displayname="绿雪人" name="LifeEvilSnowman"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifePangolin/LifePangolin.x" displayname="生命食蚁兽" name="LifePangolin"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeStoneMonster02/LifeStoneMonster02.x" displayname="生命石巨人" name="LifeStoneMonster02"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeStoneMonster03/LifeStoneMonster03.x" displayname="石巨人" name="LifeStoneMonster03"/>
+	<asset filename="character/v5/10mobs/HaqiTown/LifeToad02/LifeToad02.x" displayname="绿毒蛙" name="LifeToad02"/>
+	<asset filename="character/v5/10mobs/HaqiTown/ManekiNeko/ManekiNeko.x" displayname="招财猫" name="ManekiNeko"/>
+	<asset filename="character/v5/10mobs/HaqiTown/MudMonster/MudMonster.x" displayname="泥浆兽" name="MudMonster"/>
+	<asset filename="character/v5/10mobs/HaqiTown/OrangeBaby/OrangeBaby.x" displayname="橙子宝宝" name="OrangeBaby"/>
+	<asset filename="character/v5/10mobs/HaqiTown/PhoenixWarrior/PhoenixWarrior.x" displayname="火烈鸟" name="PhoenixWarrior"/>
+	<asset filename="character/v5/10mobs/HaqiTown/PhoenixWarrior_Fuben/PhoenixWarrior_Fuben.x" displayname="火鸟" name="PhoenixWarrior_Fuben"/>
+	<asset filename="character/v5/10mobs/HaqiTown/Pineapple/Pineapple.x" displayname="菠萝" name="Pineapple"/>
+	<asset filename="character/v5/10mobs/HaqiTown/RedCrab/RedCrab.x" displayname="火螃蟹" name="RedCrab"/>
+	<asset filename="character/v5/10mobs/HaqiTown/RedCrabLower/RedCrabLower.x" displayname="粉红螃蟹" name="RedCrabLower"/>
+	<asset filename="character/v5/10mobs/HaqiTown/RedDevouringRat/RedDevouringRat.x" displayname="红精灵鼠" name="RedDevouringRat"/>
+	<asset filename="character/v5/10mobs/HaqiTown/ShadowSmashBull/ShadowSmashBull.x" displayname="牛魔王" name="ShadowSmashBull"/>
+	<asset filename="character/v5/10mobs/HaqiTown/SirBanana/SirBanana.x" displayname="香蕉先生" name="SirBanana"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormBeatle01/StormBeatle01.x" displayname="风蝎王" name="StormBeatle01"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormBeatle02/StormBeatle02.x" displayname="风蝎" name="StormBeatle02"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormBubble/StormBubble.x" displayname="风咕噜" name="StormBubble"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormCactus/StormCactus.x" displayname="仙人掌兽" name="StormCactus"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormEvilSnowman/StormEvilSnowman.x" displayname="黄雪人" name="StormEvilSnowman"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StormWindEagle02/StormWindEagle02.x" displayname="雪鹰" name="StormWindEagle02"/>
+	<asset filename="character/v5/10mobs/HaqiTown/StrawberryGirl/StrawberryGirl.x" displayname="草莓姑娘" name="StrawberryGirl"/>
+	<asset filename="character/v5/10mobs/HaqiTown/UndeadManekiNeko/UndeadManekiNeko.x" displayname="黑猫" name="UndeadManekiNeko"/>
+	<asset filename="character/v5/10mobs/HaqiTown/UndeadMonkey/UndeadMonkey.x" displayname="幽灵猴" name="UndeadMonkey"/>
+	<asset filename="character/v5/10mobs/HaqiTown/UndeadMonkey_Fuben/UndeadMonkey_Fuben.x" displayname="火红猴王" name="UndeadMonkey_Fuben"/>
+	<asset filename="character/v5/10mobs/HaqiTown/UndeadMonkey_Boss/UndeadMonkey_Boss.x" displayname="幽灵猴王" name="UndeadMonkey_Boss"/>
+	<asset filename="character/v5/10mobs/HaqiTown/WaterBubble/WaterBubble.x" displayname="水咕噜" name="WaterBubble"/>
+	<asset filename="character/v5/10mobs/HaqiTown/WindEagle/WindEagle.x" displayname="风鹰" name="WindEagle"/>
+
+  <asset filename="character/CC/codewar/lang.x" displayname="狼" name="lang"/>
+  <asset filename="character/CC/codewar/laohu.x" displayname="老虎" name="laohu"/>
+  <asset filename="character/CC/codewar/xiadengma.x" displayname="下等马" name="xiadengma"/>
+  <asset filename="character/CC/codewar/zhongdengma.x" displayname="中等马" name="zhongdengma"/>
+  <asset filename="character/CC/codewar/shangdengma.x" displayname="上等马" name="shangdengma"/>
+    
 </category>
 <category name="fantasy">  
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
-  
   <asset filename="character/v3/GameNpc/BZL/BZL.x" displayname="冰紫龙" name="BZL"/>
 	<asset filename="character/v3/GameNpc/DINA/DINA.x" displayname="蒂娜" name="DINA"/>
 	<asset filename="character/v3/GameNpc/FCSQ/FCSQ.x" displayname="死亡战争骑士" name="FCSQ"/>
@@ -277,25 +371,43 @@
 	<asset filename="character/v5/02animals/XiYiJinJiaoLong/XiYiJinJiaoLong.x" displayname="蜥蜴金蛟龙" name="XiYiJinJiaoLong"/>
 	<asset filename="character/v5/02animals/YuanxiaoBaby/YuanxiaoBaby.x" displayname="元宵宝宝" name="YuanxiaoBaby"/>
 	<asset filename="character/v5/06quest/DisorderRobot/DisorderRobot.x" displayname="无序机器人" name="DisorderRobot"/>
+	<asset filename="character/v6/02animals/XiXueBianFu/XiXueBianFu.x" displayname="吸血蝙蝠" name="XiXueBianFu"/>
+	<asset filename="character/v6/02animals/Mechanics_Helicopter/Mechanics_Helicopter.x" displayname="直升机" name="Mechanics_Helicopter"/>
 </category>
 <category name="vehicles">  
-  <asset filename="character/v5/02animals/XueDiChe/XueDiChe.x" displayname="雪地车" name="XueDiChe"/>
-  <asset filename="character/v5/08functional/BlueBoat/BlueBoat.x" displayname="蓝船" name="BlueBoat"/>
-  <asset filename="character/v5/02animals/NanGuaChe/NanGuaChe.x" displayname="南瓜车" name="NanGuaChe"/>
+    <asset filename="character/v5/02animals/XueDiChe/XueDiChe.x" displayname="雪地车" name="XueDiChe"/>
+    <asset filename="character/v5/08functional/BlueBoat/BlueBoat.x" displayname="蓝船" name="BlueBoat"/>
+    <asset filename="character/v5/02animals/NanGuaChe/NanGuaChe.x" displayname="南瓜车" name="NanGuaChe"/>
 	<asset filename="character/v5/02animals/ShuangRenFeiTing/ShuangRenFeiTing.x" displayname="双人飞艇" name="ShuangRenFeiTing"/>
-  <asset filename="character/v5/02animals/MagicAwingCarpet/MagicAwingCarpet.x" displayname="魔法飞毯" name="MagicAwingCarpet"/>
+    <asset filename="character/v5/02animals/MagicAwingCarpet/MagicAwingCarpet.x" displayname="魔法飞毯" name="MagicAwingCarpet"/>
 	<asset filename="character/v5/02animals/MagicBesom/MagicBesom.x" displayname="魔法扫帚" name="MagicBesom"/>
 	<asset filename="character/v5/02animals/Elephant/Elephant.x" displayname="大象" name="Elephant"/>
 	<asset filename="character/v5/02animals/GoldenDragon/GoldenDragon_02.x" displayname="金属系龙" name="GoldenDragon_02"/>
 	<asset filename="character/v5/02animals/HorsePhoenix/HorsePhoenix.x" displayname="红凤凰" name="HorsePhoenix"/>
 	<asset filename="character/v5/02animals/HorseSilverWolf/HorseSilverWolf.x" displayname="银狼坐骑" name="HorseSilverWolf"/>
-  <asset filename="character/v5/02animals/GrilRabbit/GrilRabbit.x" displayname="粉色兔子坐骑" name="GrilRabbit"/>
-  <asset filename="character/v3/Npc/Hashiqi/xueqiao.x" displayname="狗拉雪橇" name="xueqiao"/>
-  <asset filename="character/v5/02animals/Pegasus/Pegasus.x" displayname="飞马坐骑" name="Pegasus"/>
-  <asset filename="character/v5/02animals/Smilodon/Smilodon.x" displayname="剑齿虎坐骑" name="Smilodon"/>
-  <asset filename="character/v5/02animals/YinYangLingHu/YinYangLingHu.x" displayname="阴阳灵狐坐骑" name="YinYangLingHu"/>
-  <asset filename="character/v5/02animals/Tortoise/Tortoise01.x" displayname="乌龟坐骑" name="Tortoise01"/>
-  <asset filename="character/v5/02animals/Tortoise/Tortoise04.x" displayname="蓝色乌龟坐骑" name="Tortoise04"/>
+    <asset filename="character/v5/02animals/GrilRabbit/GrilRabbit.x" displayname="粉色兔子坐骑" name="GrilRabbit"/>
+    <asset filename="character/v3/Npc/Hashiqi/xueqiao.x" displayname="狗拉雪橇" name="xueqiao"/>
+    <asset filename="character/v5/02animals/Pegasus/Pegasus.x" displayname="飞马坐骑" name="Pegasus"/>
+    <asset filename="character/v5/02animals/Smilodon/Smilodon.x" displayname="剑齿虎坐骑" name="Smilodon"/>
+    <asset filename="character/v5/02animals/Tortoise/Tortoise01.x" displayname="乌龟坐骑" name="Tortoise01"/>
+    <asset filename="character/v5/02animals/Tortoise/Tortoise04.x" displayname="蓝色乌龟坐骑" name="Tortoise04"/>
+    <asset filename="character/v6/10mobs/06CloudIsland/BalanceFengHuang01/BalanceFengHuang01.x" displayname="黑凤凰" name="BalanceFengHuang01"/>
+	<asset filename="character/v6/10mobs/06CloudIsland/BalanceShenJu01/BalanceShenJu01.x" displayname="黑色飞马坐骑" name="BalanceShenJu01"/>
+	<asset filename="character/v6/02animals/YinYangLingHu/YinYangLingHu.x" displayname="紫狐狸坐骑" name="YinYangLingHu"/>
+	<asset filename="character/v6/02animals/YinYangJinHu/YinYangJinHu.x" displayname="金狐狸坐骑" name="YinYangJinHu"/>
+	<asset filename="character/v6/02animals/YinYangHongHu/YinYangHongHu.x" displayname="红狐狸坐骑" name="YinYangHongHu"/>
+	<asset filename="character/v6/02animals/Yangtuo/Yangtuo.x" displayname="羊驼" name="Yangtuo"/>
+	<asset filename="character/v6/02animals/WindEagle_Yellow/WindEagle_Yellow.x" displayname="黄色小神鹰" name="WindEagle_Yellow"/>
+	<asset filename="character/v6/02animals/WindEagle_White/WindEagle_White.x" displayname="白色小神鹰" name="WindEagle_White"/>
+	<asset filename="character/v6/02animals/ShengDanMiLu/ShengDanMiLu.x" displayname="圣诞麋鹿" name="ShengDanMiLu"/>
+	<asset filename="character/v6/02animals/Pegasus_white/Pegasus_white.x" displayname="白马" name="Pegasus_white"/>
+	<asset filename="character/v6/02animals/Pegasus_Brown/Pegasus_Brown.x" displayname="黑马" name="Pegasus_Brown"/>
+	<asset filename="character/v6/02animals/HuLangMoTuo/HuLangMoTuo.x" displayname="火狼摩托" name="HuLangMoTuo"/>
+	<asset filename="character/v6/02animals/AidanReax02/AidanReax02.x" displayname="狮子兽" name="AidanReax02"/>
+	<asset filename="character/v6/02animals/FireBird/FireBird.x" displayname="红火鸟坐骑" name="FireBird"/>
+	<asset filename="character/v6/02animals/FireBird_Rarity/FireBird_Rarity.x" displayname="粉红火鸟坐骑" name="FireBird_Rarity"/>
+	<asset filename="character/v6/02animals/FireBird_Yellow/FireBird_Yellow.x" displayname="黄火鸟坐骑" name="FireBird_Yellow"/>
+	
 </category>
 <category name="props">  
   <asset filename="model/blockworld/BlockModel/block_model_one.x" name="cube" displayname="可换装立方体"/>
@@ -698,4 +810,5 @@
 	<asset filename="character/v5/02animals/ChiBang01/ChiBang01.x" displayname="翅膀01" name="ChiBang01"/>
 	<asset filename="character/v5/02animals/ChiBang02/ChiBang02.x" displayname="翅膀02" name="ChiBang02"/>
 </category>
+
 </PlayerAssets>

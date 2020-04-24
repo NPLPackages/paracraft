@@ -16,6 +16,7 @@ local ServerManager = commonlib.gettable("MyCompany.Aries.Game.Network.ServerMan
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local TeacherPanel = commonlib.gettable("MyCompany.Aries.Game.Network.Admin.TeacherPanel");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 
 local page;
 
@@ -24,6 +25,9 @@ function TeacherPanel.OnInit()
 end
 
 function TeacherPanel.ShowPage(bShow)
+	if(not GameLogic.IsServerWorld()) then
+		return
+	end
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Network/Admin/TeacherPanel.html", 
 			name = "TeacherPanel.ShowPage", 

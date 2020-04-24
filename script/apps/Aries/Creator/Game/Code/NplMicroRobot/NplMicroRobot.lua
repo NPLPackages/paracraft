@@ -1,12 +1,24 @@
 --[[
 Title: NplMicroRobot
 Author(s): leio
-Date: 2018/12/12
+Date: 2019/12/12
 Desc: NplMicroRobot is a blockly program to control animation on microbit
 use the lib:
 -------------------------------------------------------
+-- make configs
 local NplMicroRobot = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobot.lua");
 NplMicroRobot.MakeBlocklyFiles();
+
+- NplMicroRobot package: https://github.com/tatfook/NplMicroRobot
+- the block item id is: 10517
+
+- NodeJsRuntime: https://github.com/zhangleio/NodeJsRuntime
+local NodeJsRuntime = NPL.load("(gl)script/apps/Aries/Creator/Game/NodeJsRuntime/NodeJsRuntime.lua");
+
+- pxt-microbit: https://github.com/microsoft/pxt-microbit
+
+- CodeAPI_Microbit
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Microbit.lua");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/math/Quaternion.lua");
@@ -172,38 +184,23 @@ function NplMicroRobot.OnClickExport(exportType,code,bx, by, bz)
     NodeJsRuntime.Check();
 
     local movieEntity = codeblock:GetMovieEntity();
-    local filename = codeblock:GetBlockName();
-    if(filename == "" or not filename)then
-        filename = "default";
-    end
-    local filename_really = string.format("test/robot/%s_really.json",filename);
-    filename = string.format("test/robot/%s.json",filename);
 	local bones = NplMicroRobot.GetBonesFromMovieEntity(movieEntity)
     if(bones) then
 		local values = bones;
-		-- test animation data
-		ParaIO.CreateDirectory(filename);
-		local file = ParaIO.open(filename,"w");
-		if(file:IsValid()) then
-			file:WriteString(NPL.ToJson(values));
-			file:close();
-		end
-
+        local len = #values;
 		if(exportType == "view")then
 			local NplMicroRobotAdapterPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplMicroRobot/NplMicroRobotAdapterPage.lua");
 			NplMicroRobotAdapterPage.ShowPage(values);
 			return
 		end
-
-		values = NplMicroRobot.helper_clear_names(values)
-
-		-- test running animation data
-		local data = NPL.ToJson(values);
-		local file = ParaIO.open(filename_really,"w");
-		if(file:IsValid()) then
-			file:WriteString(data);
-			file:close();
-		end
+        local data;
+        if(len ~= 0)then
+		    values = NplMicroRobot.helper_clear_names(values)
+		    data = NPL.ToJson(values);
+        else
+		    data = nil;
+        end
+		
 		code = NplMicroRobot.fixCode(code);
 		NplMicroRobot.Run(exportType, data, code);
     end
@@ -370,11 +367,12 @@ function NplMicroRobot.TestData()
     ]]
 end
 function NplMicroRobot.WriteAnimationData(data)
+    data = data or "[]";
     if(not data)then
         return
     end
     local code = string.format([[
-let AnimationData  = %s
+let AnimationData:Array<any>  = %s
     ]],data)
     local filename = string.format("%s/%s",NodeJsRuntime.GetRoot(),"projects/NplMicroRobot/AnimationData.ts");
 	LOG.std(nil, "info", "NplMicroRobot", "write animation to:%s",filename);

@@ -84,9 +84,11 @@ function Entity:init()
 		end
 		local ReplaceableTextures;
 		if(not self.skin) then
-			local skin = item:GetSkinFile();
-			if(skin) then
-				ReplaceableTextures = {[2] = skin};
+			if(item:GetAssetFile() == self:GetMainAssetPath()) then
+				local skin = item:GetSkinFile();
+				if(skin) then
+					ReplaceableTextures = {[2] = skin};
+				end
 			end
 		end
 

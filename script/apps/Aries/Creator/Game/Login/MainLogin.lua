@@ -152,7 +152,7 @@ function MainLogin:UpdateCoreClient()
 	if(not testCoreClient and platform=="win32")then
 		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
 		self:next_step({IsUpdaterStarted = true});
-		if(not System.options.isAB_SDK) then
+		if(not System.options.isAB_SDK and ParaEngine.GetAppCommandLineByParam("noclientupdate", "")=="") then
 			local AutoUpdater = NPL.load("AutoUpdater");
 			local updater = AutoUpdater:new();
 			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)

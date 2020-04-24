@@ -1623,7 +1623,7 @@ function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
 	if(System.User.isVip) then
 		return true;
 	elseif(bOpenUIIfNot) then
-		_guihelper.MessageBox(L"您需要充值为VIP用户，才能使用此功能", function()
+		_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能", function()
 			-- TODO: 
 			-- step 1: sign in if not
 			-- step 2: if not vip, open external browser to let the user activate VIP

@@ -9,6 +9,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
 local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
 NplBrowserPage.Open();
 NplBrowserPage.Open("test","www.keepwork.com","title",nil,"_ct",100,100,400,600);
+
+
+- NplBrowserPlugin
+https://github.com/tatfook/NplBrowser
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");

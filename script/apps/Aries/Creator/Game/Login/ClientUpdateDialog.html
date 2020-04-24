@@ -29,13 +29,13 @@ curVersion = Page:GetRequestParam("curVersion")
             <%=L"您的版本为:"%><%=Eval("curVersion")%>
         </div>
         <div style="margin-top:10px;color:#ff6a00">
-            <%=L"强烈建议您升级"%>
+            <%=L"强烈建议您退出并重新启动更新Paracraft"%>
         </div>
     </div>
     <hr />
     <div style="margin-top:30px;margin-bottom:30px;" class="default">
         <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />    
-        <input type="button" value='<%=L"升级" %>' class="mc_yellow_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
+        <input type="button" value='<%=L"退出" %>' class="mc_yellow_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
         <input type="button" value='<%=L"忽略" %>' class="mc_light_grey_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClose"/>
     </div>
 </aries:window>

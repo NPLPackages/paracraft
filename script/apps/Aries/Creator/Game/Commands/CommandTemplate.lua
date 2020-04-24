@@ -276,30 +276,132 @@ Commands["generatemodel"] = {
 
 Commands["exportgltf"] = {
 	name="exportgltf", 
-	quick_ref="/exportgltf [-radius] [output]", 
-	desc=[[--export all blocks in then region(region size is 512 * 512) around the player
-	/export myfolder
-	-- export all then regions in radius units around the player
-	/export [-radius] 512 myfolder
-	@param output: it will create a folder call output/output.glb  + textures.
+	quick_ref="/exportgltf [-region] [parax] [output]", 
+	desc=[[--export all blocks in the given regions to gltf(glb) files, save to current world dictionary
+/export -region 37_37|37_38
+-- export all selected blocks to gltf(glb) file, save as the output file in current world dictionary
+/export selected1.gltf(glb)
+-- export all blocks in the given chunks in (x y z) radius around player
+/export 32 32 32
+-- export the given parax file to gltf(glb) file
+/export given.x output.gltf(glb)
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ExportTask.lua");
-		local Export = commonlib.gettable("MyCompany.Aries.Game.Tasks.Export");
+		local function ParaXToGltf(parax, gltf)
+			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
+			local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
+			local attr = ParaXModelAttr:new():initFromAssetFile(parax, function(attr)
+				if (attr:SaveToGltf(gltf)) then
+					local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+					_guihelper.MessageBox(string.format(L"成功导出:%s, 是否打开所在目录", commonlib.Encoding.DefaultToUtf8(gltf)), function(res)
+						if(res and res == _guihelper.DialogResult.Yes) then
+							local info = Files.ResolveFilePath(gltf)
+							if(info and info.relativeToRootPath) then
+								local absPath = ParaIO.GetWritablePath()..info.relativeToRootPath;
+								local absPathFolder = absPath:gsub("[^/\\]+$", "")
+								ParaGlobal.ShellExecute("open", absPathFolder, "", "", 1);
+							end
+						end
+					end, _guihelper.MessageBoxButtons.YesNo);
+				else
+					_guihelper.MessageBox(L"parax模型中的纹理加载失败，请稍后重试！");
+				end
+			end)
+		end
 
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
-		local radius = 0;
-		local output = cmd_text;
-		if (options.radius) then
-			radius, output = cmd_text:match("%s*(%d*)%s*(%S*)$");
+		if (options.region) then
+			local data = {};
+			CmdParser.ParseStringList(cmd_text, data);
+			local regions = {};
+			for i = 1, #data do
+				local r = {};
+				CmdParser.ParseNumberList(data[i], r, "_");
+				if (#r > 1) then
+					if (i == 1) then
+						table.insert(regions, {r[1], r[2]});
+					else
+						for j = 1, #regions-1 do
+							if (r[1] ~= regions[j][1] or r[2] ~= regions[j][2]) then
+								table.insert(regions, {r[1], r[2]});
+							end
+						end
+					end
+				end
+			end
+			options = {}
+			options.command = "region";
+			options.regions = regions;
+
+			if (#regions > 1) then
+				local min_x, min_z, max_x, max_z = 255, 255, 0, 0
+				for i =1, #regions do
+					if (min_x > regions[i][1]) then min_x = regions[i][1] end
+					if (min_z > regions[i][2]) then min_z = regions[i][2] end
+					if (max_x < regions[i][1]) then max_x = regions[i][1] end
+					if (max_z < regions[i][2]) then max_z = regions[i][2] end
+				end
+				if ((max_x - min_x + 1) * (max_z - min_z + 1) > #regions) then
+					_guihelper.MessageBox(L"导出失败，所输入的 regions 不相连");
+					return;
+				end
+			end
+		else
+			local x1, y1, z1, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
+			if (x1 and y1 and z1) then
+				local x2, y2, z2 = CmdParser.ParsePos(cmd_text, fromEntity);
+				if (x2 and y2 and z2) then
+					options.command = "range";
+					options.from = {x1, y1, z1};
+					options.to = {x2, y2, z2};
+				else
+					options.command = "radius";
+					options.x = x1;
+					options.y = y1;
+					options.z = z1;
+				end
+			else
+				local filename;
+				filename, cmd_text = CmdParser.ParseFilename(cmd_text);
+				local ext = ParaIO.GetFileExtension(filename);
+				if (ext == "x") then
+					-- export parax to gltf(glb)
+					local gltf = cmd_text;
+					if (not gltf) then
+						gltf = ParaIO.ChangeFileExtension(filename, "glb");
+					end
+					if(ParaIO.DoesFileExist(gltf)) then
+						_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(gltf)), function(res)
+							if(res and res == _guihelper.DialogResult.Yes) then
+								ParaXToGltf(filename, gltf);
+							end
+						end, _guihelper.MessageBoxButtons.YesNo);
+					else
+						ParaXToGltf(filename, gltf);
+					end
+					return;
+				else
+					-- export selected blocks to gltf(glb)
+					if (not filename) then return end
+					local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
+					if (selected_blocks) then
+						options.blocks_string = commonlib.serialize_compact(selected_blocks, true);
+					else
+						_guihelper.MessageBox(L"请先选择物体, Ctrl+左键多次点击场景可选择");
+						return;
+					end
+
+					filename = GameLogic.current_worlddir.."blocktemplates/"..filename
+					options.filename = filename;
+					options.command = "selected";
+				end
+			end
 		end
-		output = commonlib.Encoding.Utf8ToDefault(output);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/World/Exporter/WorldBlocksExporter.lua");
-		local WorldBlocksExporter = commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.WorldBlocksExporter");
-
-		WorldBlocksExporter.ExportRegionTo_glTF(output, radius);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/Exporter/BlocksExport.lua");
+		local BlocksExport = commonlib.gettable("MyCompany.Aries.Creator.Game.Exporter.BlocksExport");
+		BlocksExport.Run(options);
 	end,
 };
 

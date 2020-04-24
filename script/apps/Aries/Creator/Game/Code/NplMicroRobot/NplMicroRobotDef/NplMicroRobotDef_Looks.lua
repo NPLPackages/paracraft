@@ -19,8 +19,6 @@ NPL.export({
             type = "field_matrix",
 		},
 	},
-	hide_in_toolbox = true,
-    
 	category = "NplMicroRobot.Looks", 
 	helpUrl = "", 
 	canRun = false,
@@ -51,6 +49,21 @@ NPL.export({
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'microbit_show_string(%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit_clear_screen", 
+	message0 = L"清除",
+	category = "NplMicroRobot.Looks", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'microbit_clear_screen()',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[

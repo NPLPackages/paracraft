@@ -92,12 +92,12 @@ Commands["registeritem"] = {
 	quick_ref="/registeritem [-alphaTestTexture] [-blendedTexture] [-light] [block_id:2000-2999] [texture] [base_block_id] ", 
 	desc=[[create a new item based on an icon and block id. 
 e.g.
-/registeritem 2000 Texture/blocks/lapis_ore.png 234					thin plate
-/registeritem 2001 Texture/blocks/items/1013_Carrot.png 115			flower
-/registeritem					it will create using the inventory of fromEntity. The first slot item must be a painting, the second one is base block if any. 
-/registeritem -alphaTestTexture 2002 Texture/blocks/glass_pane.png 6 				transparent block emitting light
-/registeritem -blendedTexture 2003 Texture/blocks/ice.png 6 				alpha-blended block emitting light
-/registeritem -light 2004 Texture/blocks/leaves_birch.png 86 				a tree leave block emitting light
+/registeritem 2000 Texture/blocks/lapis_ore.png 234  thin plate
+/registeritem 2001 Texture/blocks/items/1013_Carrot.png 115  flower
+/registeritem     it will create using the inventory of fromEntity. The first slot item must be a painting, the second one is base block if any. 
+/registeritem -alphaTestTexture 2002 Texture/blocks/glass_pane.png 6   transparent block emitting light
+/registeritem -blendedTexture 2003 Texture/blocks/ice.png 6    alpha-blended block emitting light
+/registeritem -light 2004 Texture/blocks/leaves_birch.png 86   a tree leave block emitting light
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(cmd_text) then

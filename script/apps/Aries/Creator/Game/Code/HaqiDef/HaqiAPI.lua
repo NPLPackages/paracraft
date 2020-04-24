@@ -23,7 +23,7 @@ function HaqiAPI:InvokeMethod(name, ...)
 end
 
 local publicMethods = {
-"createArena", "addArenaMob", "removeAllArenas", "removeArena", "setMyCards", "restart", "isArenaModified"
+"createArena", "addArenaMob", "removeAllArenas", "removeArena", "setMyCards", "restart", "isArenaModified", "setCurrentHP", "getCurrentHP", "setUserValue", "getUserValue"
 }
 
 -- create short cut in code API
@@ -109,4 +109,24 @@ function HaqiAPI:addIncludeFiles()
 			end
 		end
 	end
+end
+
+
+function HaqiAPI:setCurrentHP(hpValue)
+    HaqiMod.SetCurrentHP(hpValue)
+end
+
+function HaqiAPI:getCurrentHP()
+    return HaqiMod.GetCurrentHP()
+end
+
+-- set equipment addon value for the current player. 
+-- @param name: "combatlel", "addonlevel_hp_absolute", "addonlevel_damage_percent", "addonlevel_resilience_percent", 
+-- "addonlevel_criticalstrike_percent", "addonlevel_resist_absolute"
+function HaqiAPI:setUserValue(name, value)
+    HaqiMod.SetUserValue(name, value)
+end
+
+function HaqiAPI:getUserValue(name)
+    return HaqiMod.GetUserValue(name)
 end

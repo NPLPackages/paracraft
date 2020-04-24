@@ -987,9 +987,8 @@ function block:UpdateModel(blockX, blockY, blockZ, blockData)
 				obj:SetPosition(x,y,z);
 				obj:SetField("progress", 1);
 				-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
-				obj:SetAttribute(128, true);
 				-- OBJ_SKIP_PICKING = 0x1<<15:
-				obj:SetAttribute(0x8000, true);
+				obj:SetAttribute(128+0x8000, true);
 				-- making it non-persistent, since we will use the block onload callback to load any custom model. 
 				obj:SetField("persistent", false); 
 				obj:SetFacing(best_model.facing or 0);

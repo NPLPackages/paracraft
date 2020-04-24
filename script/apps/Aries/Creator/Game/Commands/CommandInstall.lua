@@ -200,3 +200,19 @@ examples:
 		end
 	end,
 };
+
+
+Commands["makeapp"] = {
+	name="makeapp", 
+	quick_ref="/makeapp", 
+	desc=[[make current world into a standalone app file (zip)
+e.g.
+/makeapp 
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+		local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+		local task = MyCompany.Aries.Game.Tasks.MakeApp:new()
+		task:Run();
+	end,
+};

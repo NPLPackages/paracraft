@@ -120,6 +120,118 @@ NPL.export({
 
 -----------------------
 {
+	type = "setUserValue", 
+	message0 = "设置属性%1 %2",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+{"血量增加绝对值", "addonlevel_hp_absolute"},
+{"伤害增加绝对值", "addonlevel_damage_absolute"},
+{"伤害增加百分之", "addonlevel_damage_percent"},
+{"韧性增加百分之", "addonlevel_resilience_percent"},
+{"暴击率增加百分之", "addonlevel_criticalstrike_percent"},
+{"防御增加绝对值", "addonlevel_resist_absolute"},
+{"战斗等级", "combatlel"},
+			},
+		},
+		{
+			name = "value",
+			type = "field_number",
+			text = "0",
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setUserValue("%s", %s)',
+	ToNPL = function(self)
+		return string.format('setUserValue("%s", %s)\n', self:getFieldValue('name'), self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+
+-----------------------
+{
+	type = "getUserValue", 
+	message0 = "获取属性 %1",
+	arg0 = {
+		{
+			name = "name",
+			type = "field_dropdown",
+			options = {
+{"血量增加绝对值", "addonlevel_hp_absolute"},
+{"伤害增加绝对值", "addonlevel_damage_absolute"},
+{"伤害增加百分之", "addonlevel_damage_percent"},
+{"韧性增加百分之", "addonlevel_resilience_percent"},
+{"暴击率增加百分之", "addonlevel_criticalstrike_percent"},
+{"防御增加绝对值", "addonlevel_resist_absolute"},
+{"战斗等级", "combatlel"},
+
+			},
+		},
+	},
+	output = {type = "field_number",},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getUserValue("%s")',
+	ToNPL = function(self)
+		return string.format('getUserValue("%s")', self:getFieldValue('name'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+-----------------------------------
+{
+	type = "setCurrentHP", 
+	message0 = "设置当前血量 %1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_number",
+			text = "0",
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'setCurrentHP(%s)',
+	ToNPL = function(self)
+		return string.format('setCurrentHP(%s)\n', self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+-----------------------
+{
+	type = "getCurrentHP", 
+	message0 = "获取当前血量",
+	arg0 = {
+	},
+	output = {type = "field_number",},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'getCurrentHP()',
+	ToNPL = function(self)
+		return string.format('getCurrentHP()');
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+-----------------------
+{
 	type = "removeAllArenas", 
 	message0 = "刪除所有法阵",
 	arg0 = {

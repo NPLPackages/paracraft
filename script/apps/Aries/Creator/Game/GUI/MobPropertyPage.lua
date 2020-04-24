@@ -135,11 +135,16 @@ function MobPropertyPage.ShowSkinPage()
 	if(entity) then
 		local obj = entity:GetInnerObject();
 		if(obj) then
-			if(PlayerSkins:CheckModelHasSkin(obj:GetPrimaryAsset():GetKeyName())) then
-				SkinPage.ShowPage(entity);
-			else
-				_guihelper.MessageBox(L"这个模型没有随机皮肤;通用人物有随机皮肤");
-			end
+			local assetFilename = entity:GetMainAssetPath();
+			
+			local old_value = entity:GetSkin();
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+			local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+			EditSkinPage.ShowPage(function(result)
+				if(result and result~=old_value) then
+					entity:SetSkin(result);
+				end
+			end, old_value, "", assetFilename)
 		end
 	end
 end

@@ -111,6 +111,8 @@ end
 function env_imp:microbit_show_string(v)
     env_imp.broadcast(self,"microbit_show_string",v)
 end
+function env_imp:microbit_clear_screen()
+end
 -- @param v: milliseconds
 function env_imp:microbit_pause(v)
     local seconds = math.floor(v / 1000);
