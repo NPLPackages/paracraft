@@ -1031,11 +1031,6 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	end
 	local function OpenInternalBrowser_()
 		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
-			if(System.os.GetPlatform() == "mac")then
-				CodeBlockWindow.SetNplBrowserVisible(true, bForceRefresh)
-				return
-			end
-
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
 			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
 			local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
