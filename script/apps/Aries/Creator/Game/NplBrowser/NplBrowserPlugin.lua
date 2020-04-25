@@ -151,14 +151,18 @@ function NplBrowserPlugin.RunNextCmd()
                 end
             end
 
-            if cmd.cmd == 'Zoom' then
+            if cmd.cmd == 'ChangePosSize' then
                 local p = NplBrowserPlugin.GetCache(cmd.id)
-                local uiScales = System.Windows.Screen:GetUIScaling();
+                NplBrowserPlugin.webview:move(p.x, p.y);
+                NplBrowserPlugin.webview:resize(p.width, p.height);
+            end
 
-                if p.isLoadWebview then
-                    NplBrowserPlugin.webview:move(p.x, p.y);
-                    NplBrowserPlugin.webview:resize(p.width/uiScales[1], p.height/uiScales[2]);
-                end
+            if cmd.cmd == 'Zoom' then
+                -- //TODO
+            end
+
+            if cmd.cmd == 'Open' then
+                -- // TODO
             end
         end
 
@@ -207,7 +211,7 @@ function NplBrowserPlugin.RunRefreshTimer()
                         end
                     end
 
-                    NplBrowserPlugin.RunNextCmd();
+                    NplBrowserPlugin.RunNextCmd();                  
                 end
             }
         )
@@ -424,8 +428,15 @@ function NplBrowserPlugin.ChangePosSize(p, bActivedMode)
     if bActivedMode then
         if System.os.GetPlatform() == 'win32' then
             NPL.activate(dll_name, input);
-        else
-            NplBrowserPlugin.webview:move(input.x, input.y)
+        end
+
+        if System.os.GetPlatform() == 'mac' then
+            if not NplBrowserPlugin.webview then
+                return false;
+            end
+
+            NplBrowserPlugin.webview:move(input.x, input.y);
+            NplBrowserPlugin.webview:resize(input.width, input.height);
         end
 
         NplBrowserPlugin.UpdateCache(id, input)

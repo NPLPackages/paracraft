@@ -43,7 +43,18 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 
     local x = screen_x + left;
 	local y = screen_y + top;
-    local input = {id = id, url = url, withControl = withControl, x = x, y = y, width = screen_width, height = screen_height, resize = true, visible = visible, };
+    local input = {
+		id = id,
+		url = url,
+		withControl = withControl,
+		x = x,
+		y = y,
+		width = screen_width,
+		height = screen_height,
+		resize = true,
+		visible = visible,
+		_parent = _parent,
+	};
 
 	if( (min_width and min_width > 0 and screen_width < min_width) or 
 		(min_height and min_height > 0 and screen_height < min_height))then
@@ -52,13 +63,15 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
         input.zoom = 0;
     end
 
-	local uiScales = Screen:GetUIScaling();
-
-	if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
-		input.x = math.floor(input.x*uiScales[1]);
-		input.y = math.floor(input.y*uiScales[2]);
-		input.width = math.floor(input.width*uiScales[1]);
-		input.height = math.floor(input.height*uiScales[2]);
+	if System.os.GetPlatform() == 'win32' then
+		local uiScales = Screen:GetUIScaling();
+	
+		if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
+			input.x = math.floor(input.x*uiScales[1]);
+			input.y = math.floor(input.y*uiScales[2]);
+			input.width = math.floor(input.width*uiScales[1]);
+			input.height = math.floor(input.height*uiScales[2]);
+		end
 	end
 
 	if NplBrowserPlugin.WindowIsExisted(id) then
@@ -71,7 +84,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
             if(enabledResize and config.url == input.url)then
 			    NplBrowserPlugin.ChangePosSize({id = id, x = input.x, y = input.y, width = input.width, height = input.height, });
             else
-			    NplBrowserPlugin.Open(input);
+				NplBrowserPlugin.Open(input);
             end
 		end
 	else
@@ -106,24 +119,44 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 			    local x = screen_x + left;
 			    local y = screen_y + top;
 			    local width = screen_width;
-			    local height = screen_height;
-				local uiScales = Screen:GetUIScaling();
-				local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
-				if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
-					x = math.floor(x*uiScales[1]);
-					y = math.floor(y*uiScales[2]);
-					width = math.floor(width*uiScales[1]);
-					height = math.floor(height*uiScales[2]);
+				local height = screen_height;
+
+				if System.os.GetPlatform() == 'win32' then
+					local uiScales = Screen:GetUIScaling();
+					if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
+						x = math.floor(x*uiScales[1]);
+						y = math.floor(y*uiScales[2]);
+						width = math.floor(width*uiScales[1]);
+						height = math.floor(height*uiScales[2]);
+					end
 				end
-			    NplBrowserPlugin.ChangePosSize({id = id, x = x, y = y, width = width, height = height, },true);
+
+			    NplBrowserPlugin.ChangePosSize({id = id, x = x, y = y, width = width, height = height}, true);
 		    end
         end
-    end
+	end
 
-    _parent:SetScript("onsize", function()
-        if enabledResize then
+	if System.os.GetPlatform() == 'mac' then
+		local config = NplBrowserPlugin.GetCache(id);
+
+		local function resizeInterval()
+			commonlib.TimerManager.SetTimeout(function()
+				if config.isLoadWebview and config.bResizeInterval then
+					resize(id, _parent);
+					resizeInterval();
+				else
+					config.bResizeInterval = false
+				end
+			end, 0)
+		end
+
+		config.resizeInterval = resizeInterval;
+	end
+
+	_parent:SetScript("onsize", function()
+		if enabledResize then
             resize(id, _parent);
-        end
+		end
 	end)
 end
 
@@ -143,6 +176,20 @@ function pe_nplbrowser.SetVisible(mcmlNode, name, visible)
 	if(config)then
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
+
+		if System.os.GetPlatform() == 'mac' then
+			config.bResizeInterval = false;
+
+			if config.visible then
+				commonlib.TimerManager.SetTimeout(function()
+					if config.resizeInterval and not config.bResizeInterval then
+						config.bResizeInterval = true;
+						config.resizeInterval();
+					end
+				end, 100)
+			end
+		end
+
 		if(not visible) then
 			commonlib.TimerManager.SetTimeout(function()  
 				ParaUI.GetUIObject("root"):Focus();
