@@ -77,6 +77,7 @@ function VideoRecorder.GetCurrentVideoFileName()
 	return VideoRecorderSettings.GetOutputFilepath(); 
 end
 
+-- @return true if plugin is enabled, false if installed but can not be enabled, nil if not installed
 function VideoRecorder.HasFFmpegPlugin()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 	local ModManager = commonlib.gettable("Mod.ModManager");
@@ -138,6 +139,8 @@ function VideoRecorder.BeginCapture(callbackFunc)
 				end
 			end
 		end);
+	elseif(VideoRecorder.HasFFmpegPlugin()==false) then
+		_guihelper.MessageBox(L"视频输出插件没有加载成功，请检查是否有其它客户端在使用")
 	else
 		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 是否现在安装？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then

@@ -77,8 +77,8 @@ say(key, 1)
 		{
 			name = "left",
 			type = "input_value",
-			shadow = { type = "getLocalVariable", value = "变量名",},
-			text = "变量名",
+			shadow = { type = "getLocalVariable", value = L"变量名",},
+			text = L"变量名",
 		},
 		{
 			name = "right",

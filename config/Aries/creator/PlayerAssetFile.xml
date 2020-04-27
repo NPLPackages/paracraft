@@ -92,12 +92,12 @@
   <asset filename="character/CC/02human/blockman/sunbin.x" displayname="孙膑" name="sunbin"/>
   <asset filename="character/CC/02human/blockman/pangjuan.x" displayname="庞涓" name="pangjuan"/>
   <asset filename="character/CC/02human/blockman/guiguzi.x" displayname="鬼谷子" name="guiguzi"/>
-  <!--
+  
   <asset filename="character/CC/codewar/pangjuanjiangjunxingtai_movie.x" displayname="庞涓将军_多动作" name="pangjuanjiangjunxingtai_movie"/>
   <asset filename="character/CC/codewar/pangjuanqiuxuexingtai_movie.x" displayname="庞涓学习_多动作" name="pangjuanqiuxuexingtai_movie"/>
   <asset filename="character/CC/codewar/sunbinjunshixingtai_movie.x" displayname="孙膑军事_多动作" name="sunbinjunshixingtai_movie"/>
   <asset filename="character/CC/codewar/sunbinqiuxuexingtai_movie.x" displayname="孙膑求学_多动作" name="sunbinqiuxuexingtai_movie"/>
-  -->
+  
   <asset filename="character/CC/02human/blockman/archer_black.x" displayname="小弓箭手黑色" name="archer_black"/>
   <asset filename="character/CC/02human/blockman/archer_red.x" displayname="小弓箭手红色" name="archer_red"/>
   <asset filename="character/CC/02human/blockman/soldier_black.x" displayname="小士兵黑色" name="soldier_black"/>

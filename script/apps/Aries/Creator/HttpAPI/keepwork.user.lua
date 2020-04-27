@@ -14,7 +14,7 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 local getInfo_cache_policy = System.localserver.CachePolicy:new("access plus 1 day");
 
 --http://yapi.kp-para.cn/project/32/interface/api/cat_97
-HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST",
+HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false, nil,
 -- PreProcessor
 function(self, inputParams, callbackFunc, option)
     -- Is this unique?
@@ -40,6 +40,8 @@ function(self, inputParams, callbackFunc, option)
 			-- make output msg
 			local output_msg = commonlib.LoadTableFromString(item.payload.data);
 		    LOG.std("", "info","keepwork.user.login", "loaded user info of %s from local server", url);
+            -- set token
+            HttpWrapper.SetToken(output_msg.token);
 			if(callbackFunc) then
 				callbackFunc(200, {}, output_msg);
 			end	
@@ -68,6 +70,9 @@ function(self, err, msg, data)
 	end
     -- make output msg
 	local output_msg = user_info;
+    -- set token
+    HttpWrapper.SetToken(output_msg.token);
+
     -- make url
 	local url = NPL.EncodeURLQuery(self.GetUrl(), {"username", username, "method", self.method})
    -- make entry

@@ -1254,3 +1254,5 @@ L"新手教学"
 L"电路教学"
 -- config/Aries/creator/blocktemplates/buildingtask/smallstructure/info.xml
 L"小型建筑"
+L"主题建筑"
+L"编程教学"

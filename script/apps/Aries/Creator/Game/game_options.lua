@@ -420,7 +420,10 @@ function options:OnLoadWorld()
 	local WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
 	WorldStacks:PopWorld();
 
-	if(self:IsVipWorld() and not self:IsVip()) then
+	if(self:IsVipWorld() and not self:IsVip() and 
+		-- skip standalone app when noclientupdate is true
+		ParaEngine.GetAppCommandLineByParam("noclientupdate", "")=="") then
+		
 		_guihelper.MessageBox(L"本世界只有登录的VIP用户可以访问。即将退出世界。")
 
 		commonlib.TimerManager.SetTimeout(function()  

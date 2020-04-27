@@ -30,6 +30,9 @@ function mcml_controls.register_all()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/pe_checkbox_button.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/pe_nplbrowser.lua");
 	NPL.load("(gl)script/apps/Aries/mcml/pe_aries_textsprite.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_item.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_slot.lua");
+
 
 	-- mc tags
 	Map3DSystem.mcml_controls.RegisterUserControl("pe:mc_player", MyCompany.Aries.Game.mcml.pe_mc_player);
@@ -38,6 +41,9 @@ function mcml_controls.register_all()
 	Map3DSystem.mcml_controls.RegisterUserControl("pe:mc_entity_canvas", MyCompany.Aries.Game.mcml.pe_mc_entity_canvas);
 	Map3DSystem.mcml_controls.RegisterUserControl("pe:checkbox_button", MyCompany.Aries.Game.mcml.pe_checkbox_button);
 	Map3DSystem.mcml_controls.RegisterUserControl("aries:textsprite", MyCompany.Aries.mcml_controls and MyCompany.Aries.mcml_controls.aries_textsprite);
+
+	Map3DSystem.mcml_controls.RegisterUserControl("kp:item", MyCompany.Aries.Game.mcml.kp_item);
+	Map3DSystem.mcml_controls.RegisterUserControl("kp:slot", MyCompany.Aries.Game.mcml.kp_slot);
 
     local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
     Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);

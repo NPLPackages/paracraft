@@ -1139,6 +1139,9 @@ function CodeBlockWindow.NplBrowserIsLoaded()
 end
 
 function CodeBlockWindow.OnClickSettings()
+	if(CodeBlockWindow.IsNPLBrowserVisible()) then
+		CodeBlockWindow.SetNplBrowserVisible(false);
+	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockSettings.lua");
 	local CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
 	CodeBlockSettings.Show(true)

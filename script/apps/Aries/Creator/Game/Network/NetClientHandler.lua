@@ -106,6 +106,10 @@ function NetClientHandler:handleErrorMessage(text)
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 			local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 			ServerPage.ResetClientInfo()
+			local player = EntityManager.GetPlayer()
+			if(player) then
+				player:SetHeadOnDisplay({url=ParaXML.LuaXML_ParseString(format('<pe:mcml><div style="background-color:red;margin-left:-50px;margin-top:-20">%s</div></pe:mcml>', L"与服务器的连接断开了"))})
+			end
 			_guihelper.MessageBox(L"已与服务器断开连接,可能服务器已关闭或有其他用户使用该帐号登录.点击\"确定\"返回本地世界",function (result)
 --				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 --				local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");

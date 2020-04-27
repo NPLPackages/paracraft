@@ -263,7 +263,14 @@ function ItemClient.MergeCustomBlockToDS(bImmediate)
 					commonlib.removeArrayItem(ds, i);
 				end
 			end
+			local items = {}
 			for _, item in pairs(custom_block_ids) do
+				items[#items+1] = item;
+			end
+			table.sort(items, function(a, b) 
+				return a.block_id < b.block_id
+			end)
+			for _, item in ipairs(items) do
 				ItemClient.AddBlock(item.block_id, nil, "tool")
 			end
 		end
