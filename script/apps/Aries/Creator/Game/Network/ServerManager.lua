@@ -107,7 +107,7 @@ function ServerManager:Init(host, port, username, tunnelClient)
 
         NPL.StartNetServer(host, tostring(port + i));
 		self.curHost = host;
-		self.curPort = port;
+		self.curPort = port + i;
 		LOG.std(nil, "Network", "ServerManager", "TCP listening on %s:%s", att:GetField("HostIP"), att:GetField("HostPort"));
     end
 	local Connections = commonlib.gettable("MyCompany.Aries.Game.Network.Connections");
