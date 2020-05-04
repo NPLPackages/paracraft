@@ -7,7 +7,7 @@
     name = Page:GetRequestParam("name") or "";
     local item = CodeHelpWindow.GetCodeItemByName(name);
     function GetExamples()
-        return item and item:GetNPLCodeExamples();
+        return item and item:GetExamples(CodeHelpWindow.codeLanguageType);
     end
     function CanRun()
         return item and item:CanRun()

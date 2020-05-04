@@ -290,6 +290,41 @@ function CodeHelpItem:HasOutput()
 	return self.output;
 end
 
+function CodeHelpItem:GetExamples(codeLanguageType)
+	if(codeLanguageType == "python") then
+		return self:GetPythonCodeExamples()
+	else
+		return self:GetNPLCodeExamples()
+	end
+end
+
+function CodeHelpItem:GetPythonCodeExamples()
+	if(not self.pythonCodeExamples) then
+		self.pythonCodeExamples = "";
+		if(self.examples) then
+			local out = {};
+			for i, example in ipairs(self.examples) do
+				if(example.codePython) then
+					out[#out + 1] = "# ";
+					out[#out + 1] = format(L"例子%d:", i);
+					if(example.desc and example.desc~="") then
+						out[#out + 1] = example.desc;
+					end
+					if(not example.code:match("^\r?\n")) then
+						out[#out + 1] = "\n";
+					end
+					out[#out + 1] = example.codePython:gsub("\t", "    ");
+					if(not example.codePython:match("\n$")) then
+						out[#out + 1] = "\n";
+					end
+				end
+			end
+			self.pythonCodeExamples = self.pythonCodeExamples .. table.concat(out, "");
+		end
+	end
+	return self.pythonCodeExamples;
+end
+
 function CodeHelpItem:GetNPLCodeExamples()
 	if(not self.codeExamples) then
 		self.codeExamples = "";

@@ -1049,7 +1049,9 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 				if(isDownloading) then
 					_guihelper.CloseMessageBox();
 				end
-				OpenInternalBrowser_()
+				if(CodeBlockWindow.IsVisible()) then
+					OpenInternalBrowser_()
+				end
 			end
 		end)
 		if(isDownloading) then

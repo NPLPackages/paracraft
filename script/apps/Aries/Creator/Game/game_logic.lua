@@ -1007,9 +1007,13 @@ function GameLogic.CanCollectItem()
 	end
 end
 
--- @return "edit" or "game"
+-- @return "edit" or "game" or "movie"
 function GameLogic.GetGameMode()
-	return GameMode:IsEditor() and "edit" or "game"
+	if(GameMode:GetMode() == "editor") then
+		return "edit"
+	else
+		return GameMode:GetMode();
+	end
 end
 
 -- whether we can edit the world 

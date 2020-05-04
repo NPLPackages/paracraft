@@ -376,10 +376,7 @@ function ItemClient.OnLeaveWorld()
 	end
 end
 
-
--- custom block is used defined blocks in the current world directory. 
-function ItemClient.LoadCustomBlocks()
-	custom_block_ids = {};
+function ItemClient.GetCustomBlocksXMLRoot()
 	local filename = format("%sblockWorld.lastsave/customblocks.xml", ParaWorld.GetWorldDirectory())
 	if(not ParaIO.DoesAssetFileExist(filename, true)) then
 		filename = format("%sblockWorld/customblocks.xml", ParaWorld.GetWorldDirectory())
@@ -389,15 +386,23 @@ function ItemClient.LoadCustomBlocks()
 	end
 	if(filename) then
 		local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
-		if(xmlRoot) then
-			for node in commonlib.XPath.eachNode(xmlRoot, "/customblocks/block") do
-				local attr = node.attr;
-				if(attr) then
-					attr.id = tonumber(attr.id);
-					attr.base_block_id = tonumber(attr.base_block_id);
-					if(attr.id and attr.base_block_id) then
-						ItemClient.RegisterCustomItem(attr);
-					end
+		return xmlRoot;
+	end
+end
+
+-- custom block is used defined blocks in the current world directory. 
+-- @param xmlRoot: if nil, we will use ItemClient.GetCustomBlocksXMLRoot from working directory
+function ItemClient.LoadCustomBlocks(xmlRoot)
+	custom_block_ids = {};
+	xmlRoot = xmlRoot or ItemClient.GetCustomBlocksXMLRoot();
+	if(xmlRoot) then
+		for node in commonlib.XPath.eachNode(xmlRoot, "/customblocks/block") do
+			local attr = node.attr;
+			if(attr) then
+				attr.id = tonumber(attr.id);
+				attr.base_block_id = tonumber(attr.base_block_id);
+				if(attr.id and attr.base_block_id) then
+					ItemClient.RegisterCustomItem(attr);
 				end
 			end
 		end

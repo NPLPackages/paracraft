@@ -12,6 +12,8 @@ local NetLoginHandler = commonlib.gettable("MyCompany.Aries.Game.Network.NetLogi
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/ConnectionTCP.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetHandler.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ConnectionTCP = commonlib.gettable("MyCompany.Aries.Game.Network.ConnectionTCP");
@@ -127,5 +129,5 @@ function NetLoginHandler:InitializeEnvironment()
 		url = WorldCommon.GetWorldInfo().texture_pack_url,
 		text = WorldCommon.GetWorldInfo().texture_pack_text, -- for fuzzy search
 	};
-	self:SendPacketToPlayer(Packets.PacketUpdateEnv:new():Init(texturePack, nil));
+	self:SendPacketToPlayer(Packets.PacketUpdateEnv:new():Init(texturePack, nil, ItemClient.GetCustomBlocksXMLRoot()));
 end

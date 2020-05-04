@@ -35,7 +35,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			{
 				{text = L"新建...".."  Ctrl+N",name = "file.createworld",onclick=nil},
 				{text = L"打开...".."  Ctrl+O",name = "file.loadworld",onclick=nil},
-				{text = L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil},
+				{text = L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
 				{text = L"另存为...",name = "file.saveworldas",onclick=nil},
 				{Type = "Separator"},
 				{text = L"分享上传...",name = "file.uploadworld",onclick=nil},

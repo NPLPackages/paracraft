@@ -577,7 +577,12 @@ function NetClientHandler:handleUpdateEnv(packet_env)
 		local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 		TextureModPage.OnApplyTexturePack(packet_env.texturePack.type,packet_env.texturePack.path,packet_env.texturePack.url, nil, packet_env.text);
 	end
-	LOG.std(nil, "info", "handleUpdateEnv", packet_env);
+	if(packet_env.customBlocks) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+		local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+		ItemClient.LoadCustomBlocks(packet_env.customBlocks)
+	end
+	-- LOG.std(nil, "info", "handleUpdateEnv", packet_env);
 end
 
 function NetClientHandler:handleEntityFunction(packet_EntityFunction)

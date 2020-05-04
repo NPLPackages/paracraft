@@ -18,9 +18,10 @@ end
 
 -- @param texturePack: 
 -- @param weather: 
-function PacketUpdateEnv:Init(texturePack, weather)
+function PacketUpdateEnv:Init(texturePack, weather, customBlocks)
 	self.texturePack = texturePack;
 	self.weather = weather;
+	self.customBlocks = customBlocks;
 	return self;
 end
 

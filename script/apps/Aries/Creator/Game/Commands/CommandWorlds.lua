@@ -37,7 +37,14 @@ Commands["save"] = {
 		if(not GameLogic.is_started) then
 			return 
 		end
-		GameLogic.QuickSave();
+		local function callback()
+			GameLogic.QuickSave();
+		end
+
+		if GameLogic.GetFilters():apply_filters("SaveWorld", false, callback) then
+			return;
+		end
+		callback();
 	end,
 };
 

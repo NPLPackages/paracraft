@@ -45,7 +45,14 @@ while(true) do
     end
     wait()
 end
-]]}
+]],
+codePython=[[
+while(true):
+    if(isKeyPressed("space")):
+        say("space is pressed", 1)
+    wait()
+]]
+}
 },
 },
 
