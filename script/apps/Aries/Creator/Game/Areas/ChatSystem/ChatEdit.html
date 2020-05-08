@@ -1,4 +1,4 @@
-﻿<!-- "script/apps/Aries/BBSChat/ChatSystem/ChatEdit.html" -->
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html" -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
@@ -8,36 +8,51 @@
 <body>
 <pe:mcml>
 <script type="text/npl" src="ChatEdit.lua"><![CDATA[
+KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+local ChatEdit = MyCompany.Aries.ChatSystem.ChatEdit;
 local page = document:GetPageCtrl();
-MyCompany.Aries.ChatSystem.ChatEdit.Init();
+ChatEdit.Init();
 
 function OnQuickword(sName)
     local btn = page:FindUIControl(sName);
     if(btn and btn:IsValid())then
         local name = btn.name;
         local x,y,width, height = btn:GetAbsPosition();
-        NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/BattleQuickWord.lua");
-        MyCompany.Aries.ChatSystem.BattleQuickWord.OnQuickword(x,y,width, height);
+        local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
+        KpQuickWord.OnQuickword(x,y,width, height);
     end
 end
-function OnClickSmiley()
-    MyCompany.Aries.Desktop.Dock.OnClickSmiley();
+function IsOpened_BulletScreen()
+    return ChatEdit.is_opened_bullet_screen;
 end
-
-function OnTest()
-    _guihelper.MessageBox("111111")
+function OnOpen_BulletScreen()
+    ChatEdit.is_opened_bullet_screen = true
+    page:Refresh(0.01);
+end
+function OnClose_BulletScreen()
+    ChatEdit.is_opened_bullet_screen = false
+    page:Refresh(0.01);
 end
 ]]></script>
 <pe:if condition="<%= not System.options.IsMobilePlatform %>">
     <div width="100%" style="height:24px;background-color:#000000a0;">
-        <!--<div style="float:left;margin-left:1px;">
-            <input type="button" tooltip="快捷语言" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Quickword_32bits.png);" 
-                onclick="OnQuickword()" name="quickword_btn"/>
-            <input type="button" tooltip="表情" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
-                onclick="OnClickSmiley()" name="onsmiley_btn"/>
-        </div>-->
+        <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
+            <div style="float:left;margin-left:1px;">
+                <pe:if condition="<%= IsOpened_BulletScreen() %>">
+                        <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
+                            onclick="OnClose_BulletScreen()" />
+                </pe:if>
+                <pe:if condition="<%= not IsOpened_BulletScreen() %>">
+                        <input type="button" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
+                            onclick="OnOpen_BulletScreen()" />
+                </pe:if>    
+                <input type="button" tooltip="快捷语言" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Quickword_32bits.png);" 
+                    onclick="OnQuickword()" name="quickword_btn"/>
+                
+            </div>
+        </pe:if>    
         <div width="100%" style="position:relative;float:left;margin-top:2px;margin-left:5px;margin-right:22px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
-            <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#000000" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
+            <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
         </div>   
         <input value='X' type="button" align="right" style="position:relative;margin-right:2px;width:20px;margin-top:2px;height:20px;" class="mc_light_grey_button_with_fillet" 
             name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>

@@ -64,6 +64,7 @@ local ProfileManager = commonlib.gettable("Map3DSystem.App.profiles.ProfileManag
 local SmileyPage = commonlib.gettable("MyCompany.Aries.ChatSystem.SmileyPage");
 local Combat = commonlib.gettable("MyCompany.Aries.Combat");
 local Player = commonlib.gettable("MyCompany.Aries.Player");
+local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 
 ChatChannel.channels = {
 --{name=""},
@@ -76,11 +77,20 @@ ChatChannel.channels = {
 {name="组队",bshow=true,color="00dcff",},
 {name="交易",bshow=true,color="ff89be",},
 {name="系统",bshow=true,color="fced4b",},
-{name="全区",bshow=true,color="fced4b",},
-{name="",bshow=true,color="fda000",}, -- "NPC"
-{name="",bshow=true,color="fee11c",}, --"BecomeOnline"
-{name="",bshow=true,color="fbea77",}, -- "ItemObtain"
-{name="副本",bshow=true,color="fee11c",}, -- "Lobby create or join or exit"
+{name="全区",bshow=true,color="fced4b",}, --10
+{name="",bshow=true,color="fda000",}, -- "NPC" 11
+{name="",bshow=true,color="fee11c",}, --"BecomeOnline" 12
+{name="",bshow=true,color="fbea77",}, -- "ItemObtain" 13
+{name="副本",bshow=true,color="fee11c",}, -- "Lobby create or join or exit" 14
+{name="",bshow=true,color="fda000",}, -- "empty" 15
+{name="",bshow=true,color="fda000",}, -- "empty" 16
+{name="",bshow=true,color="fda000",}, -- "empty" 17
+{name="",bshow=true,color="fda000",}, -- "empty" 18
+{name="",bshow=true,color="fda000",}, -- "empty" 19
+{name="",bshow=true,color="fda000",}, -- "empty" 20
+
+{name="本地",bshow=true,color="ffffff",}, -- "KpNearBy" 21
+{name="全局",bshow=true,color="ff0000",}, -- "BroadCast" 22
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;
@@ -102,6 +112,10 @@ local EnumChannels = {
 	BecomeOnline = 12,
 	ItemObtain = 13,
 	Lobby = 14,
+
+	KpNearBy = 21,
+	KpBroadCast = 22,
+    KpMax = 29,
 }
 ChatChannel.EnumChannels = EnumChannels;
 ChatChannel.chatmaxcount = 200;
@@ -138,7 +152,7 @@ function ChatChannel.Init()
 	end
 
 	if(ChatChannel.ChannelIndexAssemble==nil)then
-		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14});
+		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14,21});
 	end
 
 	NPL.load("(gl)script/ide/Network/StreamRateController.lua");
@@ -405,7 +419,29 @@ function ChatChannel.GetChat(ChannelIndexAssemble)
 	return result;
 end
 
-
+function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
+    local msgdata = KpChatChannel.CreateMessage( ChannelIndex, to, toname, words);
+    if(not msgdata)then
+        return
+    end
+    
+	if(ChatChannel.WordsFilter)then
+		local i;
+		for i=1,#(ChatChannel.WordsFilter) do
+			local filter_func = ChatChannel.WordsFilter[i];
+			if(filter_func and type(filter_func)=="function")then
+				msgdata = filter_func(msgdata);
+				if(msgdata == true) then
+					return true;
+				elseif(msgdata==nil or msgdata.words == nil or msgdata.words == "" )then
+					return;
+				end
+			end
+		end
+	end
+	ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+    return true;
+end
 -- send a chat message
 -- @param ChannelIndex	频道索引
 -- @param to				接受者nid
@@ -413,6 +449,9 @@ end
 -- @param words			消息内容
 -- @return true if succeed. or false if speaking too fast or does not pass a given filter
 function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode )
+    if(ChatChannel.Is_Keepwork_Channel(ChannelIndex))then
+        return ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words)
+    end
 	if(not ChatChannel.streamRateCtrler:AddMessage()) then
 		return
 	elseif( ChannelIndex == EnumChannels.Region)then
@@ -745,3 +784,9 @@ function ChatChannel.GetBroadCast_Tip_Num()
 	local v = MyCompany.Aries.Player.LoadLocalData(key, 0);
 	return v;
 end
+function ChatChannel.Is_Keepwork_Channel(index)
+    if(index ~= nil and index >= ChatChannel.EnumChannels.KpNearBy and index <= ChatChannel.EnumChannels.KpMax)then
+        return true;
+    end
+end
+

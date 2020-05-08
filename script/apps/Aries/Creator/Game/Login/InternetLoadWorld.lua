@@ -246,7 +246,14 @@ function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode, onDownl
 				page:CloseWindow();
 			end
 			if(not gs_nid or not ws_id or System.User.nid == 0) then
-				Game.Start(world.worldpath);
+				Game.Start(world.worldpath,nil,nil,nil,nil,function()
+                    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+                    -- connect chat channel
+                    KpChatChannel.Connect(nil,nil,function()
+                        local id = 1000;
+                        KpChatChannel.JoinWorld(id);
+                    end);
+                end);
 			else
 				InternetLoadWorld.SwitchWorldServer(gs_nid, ws_id, function(bSuccess)
 					if(bSuccess) then

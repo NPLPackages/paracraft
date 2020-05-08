@@ -1,0 +1,74 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="KeepWorkShopPage.lua"><![CDATA[
+KeepWorkShopPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.lua");
+KeepWorkShopPage.OnInit()
+    commonlib.echo(KeepWorkShopPage.Current_Item_DS);
+function ClosePage()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #KeepWorkShopPage.Current_Item_DS;
+    else
+        return KeepWorkShopPage.Current_Item_DS[index];
+    end
+end
+    function GetName(index)
+        return KeepWorkShopPage.category[index]["text"];
+    end
+    function OnClick(index)
+        index = tonumber(index)
+        KeepWorkShopPage.OnChangeCategory(index, true);
+    end
+]]></script>
+    <aries:window mode="thin" title='我的背包' onclose="ClosePage">
+    <div style="width:800px;height:500px;">
+        <div style="margin-top:10px;">
+            <pe:if condition='<%= KeepWorkShopPage.category_index == 1 %>'>
+                <input type="button" style="float:left;margin-left:10px;color:#ffffff;font:bold" class="mc_blue_button_with_fillet"  value="<%= GetName(1)%>" name="1" onclick="OnClick"/>
+                <input type="button" style="float:left;margin-left:10px;color:#ffffff;" class="mc_light_grey_button_with_fillet"  value="<%= GetName(2)%>" name="2" onclick="OnClick"/>
+            </pe:if>
+            <pe:if condition='<%= KeepWorkShopPage.category_index == 2 %>'>
+                <input type="button" style="float:left;margin-left:10px;color:#ffffff;" class="mc_light_grey_button_with_fillet"  value="<%= GetName(1)%>" name="1" onclick="OnClick"/>
+                <input type="button" style="float:left;margin-left:10px;color:#ffffff;" class="mc_blue_button_with_fillet"  value="<%= GetName(2)%>" name="2" onclick="OnClick"/>
+            </pe:if>
+        </div>
+        <pe:if condition='<%= KeepWorkShopPage.category_index == 1 %>'>
+            <pe:gridview style="margin:0px" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="width:32px;height:32px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:item gsid='<%=Eval("gsId")%>' style="width:32px;height:32px;" />    
+                    </div>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </pe:if>
+        <pe:if condition='<%= KeepWorkShopPage.category_index == 2 %>'>
+            <pe:gridview style="margin:0px" name="slot_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="width:32px;height:32px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:slot guid='<%=Eval("goodsId")%>' style="width:32px;height:32px;" />    
+                    </div>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </pe:if>
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

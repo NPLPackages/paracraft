@@ -8,6 +8,7 @@
 <body>
 <pe:mcml>
 <script type="text/npl" ><![CDATA[
+KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 local page = document:GetPageCtrl();
 MyCompany.Aries.ChatSystem.ChatWindow.Init();
 
@@ -31,6 +32,19 @@ end
             <pe:custom id="1" oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateBroadTreeView" style="margin-left:10px;height:72px;" />
         </div>
     </div>-->
+    <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
+         <div style="margin-left:10px;margin-top:0px;">
+            <pe:tabs name="tabChannel" onclick="OnSwitchChannelDisplay" 
+                SelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;208 89 21 21:8 8 8 8" UnSelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8" 
+                style="height:20px;background:;padding-top:20px;padding-left:10px;" TextOffsetY="-1" TextColor="#ffffff" SelectedTextColor="#ffffff" 
+                ItemSpacing="2" DefaultIconSize = "8"  TextFont="System;12;norm" >
+                <pe:tab-item name="0" text="全部" selected="true" width="36" height="18" />
+                <pe:tab-item name="21" text="本地" selected="true" width="36" height="18"/>
+                <pe:tab-item name="22" text="全局" width="36" height="18"/>
+            </pe:tabs>
+        </div>
+    </pe:if>    
+
     <pe:if condition="<%= not System.options.IsMobilePlatform %>">
         <pe:container name="canvas" ClickThrough="true" style="position:relative;margin:0px;padding:0px;background:" zorder="-1">
             <div width="100%" height="100%" style="margin-top:2px;margin-bottom:1px;background-color:#000000a0;">

@@ -494,7 +494,6 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 	if(chatdata.is_direct_mcml) then
 		words = chatdata.words or "";
 	end
-	
 	local world_info = WorldManager:GetCurrentWorld()
 	if(world_info.disable_arena_talk) then
 		local player_side = BattlefieldClient:GetPlayerSide(chatdata.from);
@@ -587,7 +586,12 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 	if(not System.options.mc) then
 		nid = System.App.profiles.ProfileManager.GetNID();
 	end
-	if(from==nid and chatdata.to)then
+	if(chatdata.is_keepwork)then
+        is_from_mine = (chatdata.kp_id == chatdata.kp_from_id and chatdata.kp_from_id ~= nil);
+        local kp_from_name = chatdata.kp_from_name or "";
+        mcmlStr = string.format([[<div style="float:left;color:#%s">%s</div><span><font color="ffffff">%s</font></span>]],
+					if_else(is_from_mine,"ff0000","eeee00"),kp_from_name..if_else(chatdata.bHideColon, "", "："), words);
+	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
 				tooltip="%s" style="margin-left:0px;float:left;height:12px;background:url()" name="x"
 				onclick="MyCompany.Aries.ChatSystem.ChatWindow.OnClickName" param1='%s'>
@@ -826,7 +830,7 @@ function ChatWindow.OnSwitchChannelDisplay(name)
 	local chatdata;
 	if(channel_index==ChatChannel.EnumChannels.All)then
 		-- exclude = 10(broadcast)
-		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14}
+		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14,21}
 		chatdata = ChatChannel.GetChat(channels);
 		ChatChannel.SetAppendEventCallbackFilter(channels);
 	elseif(channel_index==ChatChannel.EnumChannels.Region or channel_index==ChatChannel.EnumChannels.BroadCast)then
