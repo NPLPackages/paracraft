@@ -58,7 +58,9 @@ function ServerManager:ctor()
 	-- current game mode
 	self.game_mode = GameMode:new();
 	-- index into playerEntities of player to ping, updated every tick;
-    self.playerPingIndex = 1;
+	self.playerPingIndex = 1;
+	self.curHost = '';
+	self.curPort = 8099;
 end
 
 local g_instance;
@@ -104,7 +106,8 @@ function ServerManager:Init(host, port, username, tunnelClient)
 		end
 
         NPL.StartNetServer(host, tostring(port + i));
-
+		self.curHost = host;
+		self.curPort = port + i;
 		LOG.std(nil, "Network", "ServerManager", "TCP listening on %s:%s", att:GetField("HostIP"), att:GetField("HostPort"));
     end
 	local Connections = commonlib.gettable("MyCompany.Aries.Game.Network.Connections");
