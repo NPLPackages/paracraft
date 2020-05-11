@@ -50,6 +50,7 @@ function CreateSimpleShape:Run()
 				local item = itemStack:GetItem();
 				if(item) then
 					self.block_data = self.block_data or item:GetBlockData(itemStack);
+					self.server_data = self.server_data or item:GetBlockEntityData(itemStack);
 				end
 			end
 		else
@@ -112,7 +113,7 @@ function CreateSimpleShape:AddBlock(block_template, x,y,z)
 	else
 		block_id = self.block_id
 	end
-	BlockEngine:SetBlock(x, y, z, block_id, self.block_data);
+	BlockEngine:SetBlock(x, y, z, block_id, self.block_data, 3, self.server_data);
 	self.history[#(self.history)+1] = {x,y,z, block_id, block_data, from_block_id, from_block_data, from_entity_data};
 end
 

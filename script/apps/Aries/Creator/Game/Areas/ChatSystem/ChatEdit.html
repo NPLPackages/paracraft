@@ -23,14 +23,14 @@ function OnQuickword(sName)
     end
 end
 function IsOpened_BulletScreen()
-    return ChatEdit.is_opened_bullet_screen;
+	return KpChatChannel.BulletScreenIsOpened()
 end
 function OnOpen_BulletScreen()
-    ChatEdit.is_opened_bullet_screen = true
+    KpChatChannel.SetBulletScreen(true)
     page:Refresh(0.01);
 end
 function OnClose_BulletScreen()
-    ChatEdit.is_opened_bullet_screen = false
+    KpChatChannel.SetBulletScreen(false)
     page:Refresh(0.01);
 end
 ]]></script>
@@ -39,11 +39,11 @@ end
         <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
             <div style="float:left;margin-left:1px;">
                 <pe:if condition="<%= IsOpened_BulletScreen() %>">
-                        <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
+                        <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_dark_32bits.png);" 
                             onclick="OnClose_BulletScreen()" />
                 </pe:if>
                 <pe:if condition="<%= not IsOpened_BulletScreen() %>">
-                        <input type="button" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_32bits.png);" 
+                        <input type="button" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Smiley_light_32bits.png);" 
                             onclick="OnOpen_BulletScreen()" />
                 </pe:if>    
                 <input type="button" tooltip="快捷语言" style="font-size:12px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Dock/Web/Quickword_32bits.png);" 

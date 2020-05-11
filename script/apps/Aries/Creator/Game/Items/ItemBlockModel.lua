@@ -67,6 +67,17 @@ function ItemBlockModel:UnpackIntoWorld(itemStack, filename)
 	end
 end
 
+-- virtual function: try to get block entity data from itemStack. 
+-- in most cases, this return nil
+-- @return nil or an xml table
+function ItemBlockModel:GetBlockEntityData(itemStack)
+	local local_filename = itemStack:GetDataField("tooltip");
+	if(local_filename and local_filename ~= "") then
+		local xml_data = {attr = {filename = local_filename} };
+		return xml_data
+	end
+end
+
 function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 	local local_filename = itemStack:GetDataField("tooltip");
 	local filename = local_filename;

@@ -90,7 +90,7 @@ ChatChannel.channels = {
 {name="",bshow=true,color="fda000",}, -- "empty" 20
 
 {name="本地",bshow=true,color="ffffff",}, -- "KpNearBy" 21
-{name="全局",bshow=true,color="ff0000",}, -- "BroadCast" 22
+{name="全局",bshow=true,color="fced4b",}, -- "BroadCast" 22
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;

@@ -13,6 +13,7 @@ end);
 KpChatChannel.LeaveWorld(0);
 -------------------------------------------------------
 ]]
+local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
 local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/SocketIOClient.lua");
@@ -74,6 +75,7 @@ function KpChatChannel.OnOpen(self)
     KpChatChannel.RefreshChatWindow();
 
     commonlib.echo(KpChatChannel.GetUserId());
+    TipRoadManager:CreateRoads();
     
 end
 function KpChatChannel.OnClose(self)
@@ -127,11 +129,35 @@ function KpChatChannel.OnMsg(self, msg)
                 end
                 local msgdata = { ChannelIndex = ChannelIndex, words = content, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
+
+                 
+                if(KpChatChannel.BulletScreenIsOpened())then
+                    local color = "ffffff";
+                    local channel_config = ChatChannel.channels[ChannelIndex];
+                    if(channel_config)then
+                        color = channel_config.color or color;
+                    end
+                    TipRoadManager:PushNode(content,"#".. color);
+                end
             end
         end
         
     end
     
+end
+function KpChatChannel.SetBulletScreen(v)
+    if(GameLogic)then
+        local key = string.format("is_opened_bullet_screen_%d",KpChatChannel.GetUserId());
+	    GameLogic.GetPlayerController():SaveLocalData(key, v, true);
+        TipRoadManager:OnShow(v)
+    end
+end
+function KpChatChannel.BulletScreenIsOpened()
+    if(GameLogic)then
+        local key = string.format("is_opened_bullet_screen_%d",KpChatChannel.GetUserId());
+	    return GameLogic.GetPlayerController():LoadLocalData(key,true,true);
+    end
+    return true;
 end
 function KpChatChannel.JoinWorld(worldId)
     if(not worldId)then
@@ -143,7 +169,7 @@ function KpChatChannel.JoinWorld(worldId)
     KpChatChannel.worldId = worldId;
     local room = KpChatChannel.GetRoom();
 	LOG.std(nil, "info", "KpChatChannel", "try to join world %s", room);
-    KpChatChannel.client:Send("app/join",{ room = room, });
+    KpChatChannel.client:Send("app/join",{ rooms = { room }, });
 end
 function KpChatChannel.LeaveWorld(worldId)
     if(not worldId)then
@@ -151,7 +177,7 @@ function KpChatChannel.LeaveWorld(worldId)
     end
     local room = KpChatChannel.GetRoom();
 	LOG.std(nil, "info", "KpChatChannel", "try to join world %s", room);
-    KpChatChannel.client:Send("app/leave",{ room = room, });
+    KpChatChannel.client:Send("app/leave",{ rooms = { room }, });
     KpChatChannel.Clear();
 end
 function KpChatChannel.IsConnected()
@@ -199,7 +225,7 @@ function KpChatChannel.CreateMessage( ChannelIndex, to, toname, words)
 	    msgdata = { ChannelIndex = ChannelIndex, target = target, worldId = worldId, words = words, type = 2, is_keepwork = true, };
 
     elseif(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = target, worldId = worldId, words = words, type = 3, is_keepwork = true, };
+	    msgdata = { ChannelIndex = ChannelIndex, target = "paracraftGlobal", worldId = worldId, words = words, type = 3, is_keepwork = true, };
     else
 		LOG.std(nil, "warn", "KpChatChannel", "[%s] unsupported channel index in KpChatChannel.SendMessage", tostring(ChannelIndex));
     end
@@ -230,5 +256,7 @@ function KpChatChannel.SendToServer(msgdata)
 
     KpChatChannel.client:Send("app/msg",kp_msg);
 	--ChatChannel.AppendChat(msgdata);
+
+   
 end
 

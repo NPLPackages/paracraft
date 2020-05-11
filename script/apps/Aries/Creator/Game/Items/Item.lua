@@ -448,10 +448,16 @@ function Item:GetTooltip()
 	end
 end
 
--- virtual function: try to get block date from itemStack. 
+-- virtual function: try to get block data from itemStack. 
 -- in most cases, this return nil
 -- @return nil or a number 
 function Item:GetBlockData(itemStack)
+end
+
+-- virtual function: try to get block entity data from itemStack. 
+-- in most cases, this return nil
+-- @return nil or an xml table
+function Item:GetBlockEntityData(itemStack)
 end
 
 function Item:GetStatName()

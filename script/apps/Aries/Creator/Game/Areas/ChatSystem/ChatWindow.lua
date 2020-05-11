@@ -589,8 +589,9 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 	if(chatdata.is_keepwork)then
         is_from_mine = (chatdata.kp_id == chatdata.kp_from_id and chatdata.kp_from_id ~= nil);
         local kp_from_name = chatdata.kp_from_name or "";
-        mcmlStr = string.format([[<div style="float:left;color:#%s">%s</div><span><font color="ffffff">%s</font></span>]],
-					if_else(is_from_mine,"ff0000","eeee00"),kp_from_name..if_else(chatdata.bHideColon, "", "："), words);
+        local color = chatdata.color or "ffffff";
+        mcmlStr = string.format([[<div style="float:left;color:#%s">%s</div><span><font color="#%s">%s</font></span>]],
+					color,kp_from_name..if_else(chatdata.bHideColon, "", "："), color,words);
 	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
 				tooltip="%s" style="margin-left:0px;float:left;height:12px;background:url()" name="x"
