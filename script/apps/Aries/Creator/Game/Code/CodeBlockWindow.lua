@@ -22,6 +22,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua
 NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeIntelliSense.lua");
+local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -54,7 +55,7 @@ function CodeBlockWindow.Show(bShow)
 	if(not bShow) then
 		CodeBlockWindow.Close();
 	else
-        GameLogic.GetFilters():add_filter("OnShowEscFrame", CodeBlockWindow.OnShowEscFrame);
+		GameLogic.GetFilters():add_filter("OnShowEscFrame", CodeBlockWindow.OnShowEscFrame);
 		GameLogic.GetFilters():add_filter("ShowExitDialog", CodeBlockWindow.OnShowExitDialog);
 		
 		GameLogic:desktopLayoutRequested("CodeBlockWindow");
@@ -1112,6 +1113,7 @@ function CodeBlockWindow:LoadSceneContext()
 	if(not sceneContext:IsSelected()) then
 		sceneContext:activate();
 		sceneContext:SetCodeEntity(CodeBlockWindow.GetCodeEntity());
+		CameraController.SetFPSMouseUIMode(true, "codeblockwindow");
 	end
 end
 
@@ -1121,6 +1123,7 @@ function CodeBlockWindow:UnloadSceneContext()
 		sceneContext:SetCodeEntity(nil);
 	end
 	GameLogic.ActivateDefaultContext();
+	CameraController.SetFPSMouseUIMode(false, "codeblockwindow");
 end
 
 function CodeBlockWindow:GetSceneContext()

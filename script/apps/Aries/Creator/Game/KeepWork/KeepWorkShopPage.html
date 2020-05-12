@@ -1,4 +1,4 @@
-<!-- "script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.html" -->
+﻿<!-- "script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.html" -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -28,6 +28,12 @@ end
         index = tonumber(index)
         KeepWorkShopPage.OnChangeCategory(index, true);
     end
+    function OnClickGsid(gsid)
+        _guihelper.MessageBox("gsid:".. gsid);
+    end
+    function OnClickGuid(guid)
+        _guihelper.MessageBox("guid:".. guid);
+    end
 ]]></script>
     <aries:window mode="thin" title='我的背包' onclose="ClosePage">
     <div style="width:800px;height:500px;">
@@ -45,8 +51,8 @@ end
             <pe:gridview style="margin:0px" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                    <div style="width:32px;height:32px;" class="mc_light_grey_button_with_fillet"  >
-                        <kp:item gsid='<%=Eval("gsId")%>' style="width:32px;height:32px;" />    
+                    <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:item gsid='<%=Eval("gsId")%>' style="width:64px;height:64px;" onclick="OnClickGsid"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>
@@ -57,8 +63,8 @@ end
             <pe:gridview style="margin:0px" name="slot_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                    <div style="width:32px;height:32px;" class="mc_light_grey_button_with_fillet"  >
-                        <kp:slot guid='<%=Eval("goodsId")%>' style="width:32px;height:32px;" />    
+                    <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:slot guid='<%=Eval("goodsId")%>' style="width:64px;height:64px;" onclick="OnClickGuid"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

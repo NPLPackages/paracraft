@@ -11,7 +11,30 @@ NPL.load("(gl)script/ide/System/os/GetUrl.lua");
 
 local HttpWrapper = NPL.export()
 
-local api_host = "http://api-dev.kp-para.cn"
+
+HttpWrapper.keepworkServerList = {
+    ONLINE = "https://api.keepwork.com",
+    STAGE = "http://api-dev.kp-para.cn",
+    RELEASE = "http://api-rls.kp-para.cn",
+    LOCAL = "http://api-dev.kp-para.cn",
+}
+HttpWrapper.api_host = nil;
+function HttpWrapper.GetUrl(key)
+    key = key or "keepworkServerList";
+    local url;
+    local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+    local defaultEnv;
+    if(Config and Config.defaultEnv)then
+        defaultEnv = Config.defaultEnv;
+        url  = HttpWrapper[key][defaultEnv];
+    end
+    if(not url)then
+	    LOG.std(nil, "error", "HttpWrapper", "read url failed key = '%s' , defaultEnv = '%s'", key, defaultEnv);
+    else
+	    LOG.std(nil, "info", "HttpWrapper", "read url %s by key = '%s' , defaultEnv = '%s'", url, key, defaultEnv);
+    end
+    return url;
+end
 
 function HttpWrapper.SetToken(token)
     local User = commonlib.gettable('System.User');
@@ -86,7 +109,10 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
     if(not fullname or not url)then
         return 
     end
-    url = string.gsub(url,"%%MAIN%%",api_host);
+    if(not HttpWrapper.api_host)then
+        HttpWrapper.api_host = HttpWrapper.GetUrl();
+    end
+    url = string.gsub(url,"%%MAIN%%",HttpWrapper.api_host);
     -- for more config
     configs = configs or {};
     method = method or "GET"

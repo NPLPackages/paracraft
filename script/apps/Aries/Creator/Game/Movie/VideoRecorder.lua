@@ -63,7 +63,10 @@ end
 
 function VideoRecorder.ToggleRecording()
 	if(ParaMovie.IsRecording()) then
-		VideoRecorder.EndCapture();
+		-- may be is recording in VideoSharing
+		if (VideoRecorder.isRecording) then
+			VideoRecorder.EndCapture();
+		end
 	else
 		VideoRecorder.BeginCapture();
 	end
@@ -93,6 +96,7 @@ function VideoRecorder.BeginCapture(callbackFunc)
 	if(VideoRecorder.HasFFmpegPlugin()) then
 		VideoRecorderSettings.ShowPage(function(res)
 			if(res == "ok") then
+				VideoRecorder.isRecording = true;
 				AudioEngine.SetGarbageCollectThreshold(99999);
 				VideoRecorder.AdjustWindowResolution(function()
 					local start_after_seconds = VideoRecorderSettings.start_after_seconds or 0;
@@ -225,6 +229,7 @@ function VideoRecorder.EndCapture()
 	VideoRecorder.ShowRecordingArea(false);
 	GameLogic.options:SetClickToContinue(true);
 	VideoRecorder.RestoreWindowResolution();
+	VideoRecorder.isRecording = false;
 end
 
 function VideoRecorder.ShowRecordingArea(bShow)

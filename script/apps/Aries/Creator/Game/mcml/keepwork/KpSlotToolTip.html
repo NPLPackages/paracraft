@@ -1,0 +1,36 @@
+<!-- "script/apps/Aries/Creator/Game/mcml/keepwork/KpSlotToolTip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" ><![CDATA[
+KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local page = document:GetPageCtrl();
+local guid = page:GetRequestParam("guid");
+guid = tonumber(guid)
+
+commonlib.echo("=========guid");
+commonlib.echo(guid);
+local item = KeepWorkItemManager.GetItem(guid) or {};
+commonlib.echo("=========item");
+commonlib.echo(item);
+KpItemToolTip_itemTemplate = KeepWorkItemManager.GetItemTemplate(item.gsId) or {};
+function GetGsid()
+    return item.gsId;
+end
+]]></script>
+<div style="color:#ffffff;width:260px;padding:5px;" class="defaultbtn">
+    <div style="font-weight:bold;margin-left:2px;"><%=KpItemToolTip_itemTemplate.name%></div>
+    <div style="margin-top:2px;width:64px;height:64px;" class="mc_blue_button_with_fillet"  >
+        <kp:item gsid='<%=GetGsid() %>' style="width:64px;height:64px;" />    
+    </div>
+    <div style="margin-top:2px;margin-left:2px;"><%=KpItemToolTip_itemTemplate.desc%></div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

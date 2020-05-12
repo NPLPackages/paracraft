@@ -1,0 +1,40 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/VideoSharingSettings.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="VideoSharingSettings.lua">
+            <![CDATA[
+            VideoSharingSettings = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingSettings");
+            VideoSharingSettings.OnInit();
+            ]]>
+        </script>
+        <aries:window mode="no_title" style="width:650px;height:390px" onclose="VideoSharingSettings.OnClose">
+            <div style="margin-top:2px;height:40px;width:650px;text-align:center;color:#ffffff;font-size:14px;font-weight:bold">
+                <%=L"点击选择以下视频模板在倒计时3秒后开始录屏" %>
+            </div>
+            <div style="margin-left:45px;margin-top:10px;height:240px;width:560px">
+                <div style="margin:10px;height:150px;width:230px;background-color:#000000;" onclick="VideoSharingSettings.OnClick10Seconds">
+                    <div style="margin-left:-20px;margin-top:-20px;height:210px;width:270px;background-color:#393939;" onclick="VideoSharingSettings.OnClick10Seconds"></div>
+                </div>
+                <div style="float:left;position:relative;margin-top:-110px;width:230px;text-align:center;font-size:14px;color:#ffffff"><%=L"使用Paracraft制作" %></div>
+                <div style="float:left;position:relative;margin-top:-60px;width:230px;text-align:center;font-size:11px;color:#ffffff"><%=L"https://paracraft.cn/" %></div>
+                <div style="float:left;position:relative;width:230px;text-align:center;font-size:14px;color:#ffffff"><%=L"录屏时间：10秒" %></div>
+                <div style="margin-left:310px;margin-top:-160px;height:150px;width:230px;background-color:#000000;" onclick="VideoSharingSettings.OnClick30Seconds">
+                    <div style="margin-left:-20px;margin-top:-20px;height:210px;width:270px;background-color:#393939;" onclick="VideoSharingSettings.OnClick30Seconds"></div>
+                </div>
+                <div style="float:left;position:relative;margin-left:310px;margin-top:-110px;width:230px;text-align:center;font-size:14px;color:#ffffff"><%=L"使用Paracraft制作" %></div>
+                <div style="float:left;position:relative;margin-left:310px;margin-top:-60px;width:230px;text-align:center;font-size:11px;color:#ffffff"><%=L"https://paracraft.cn/" %></div>
+                <div style="float:left;position:relative;margin-left:310px;width:230px;text-align:center;font-size:14px;color:#ffffff"><%=L"录屏时间：30秒" %></div>
+            </div>
+            <div style="margin-top:2px;height:60px;width:650px;text-align:center;color:#c0c0c0;font-size:13px;">
+                <%=L"使用快捷键【Ctrl+Alt+1】开始录屏10秒，【Ctrl+Alt+3】开始录屏30秒" %>
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>

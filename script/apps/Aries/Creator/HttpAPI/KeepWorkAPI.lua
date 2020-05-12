@@ -4,8 +4,6 @@ Author(s): leio
 Date: 2020/4/23
 Desc:  
 Use Lib: regist all apis of keepwork
-
-
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkAPI.lua");

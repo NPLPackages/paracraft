@@ -40,6 +40,8 @@ function pe_aries_window.render_callback(mcmlNode, rootName, bindingContext, _pa
 		pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
 	elseif(mode == "center") then
 		pe_aries_window.create_center(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
+	elseif(mode == "no_title") then
+		pe_aries_window.create_no_title(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
 	else
 		pe_aries_window.create_lite(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
 	end
@@ -405,6 +407,86 @@ function pe_aries_window.create_center(rootName, mcmlNode, bindingContext, _pare
 	_this = ParaUI.CreateUIObject("container", "mc_panel_line", "_lt", 1, title_height, w-2, 1);
 	_this.background = mc_line;
 	_parent:AddChild(_this);
+	local parent_width, parent_height = w - 2, h - title_height + 4;
+	_this = ParaUI.CreateUIObject("container", "childnode", "_fi", 5, title_height, 7, 7);
+	_this.background=background;
+	_parent:AddChild(_this);
+	_parent = _this;
+
+	local myLayout = parentLayout:new_child();
+	myLayout:reset(0, 0, parent_width, parent_height);
+	myLayout:ResetUsedSize();
+	mcmlNode:DrawChildBlocks_Callback(rootName, bindingContext, _parent, 0, 0, parent_width, parent_height, myLayout, css);
+
+	-- if height is not specified, we will use auto-sizing. 
+	if(not default_height) then
+		local used_width, used_height = myLayout:GetUsedSize();
+		if(used_height < parent_height) then
+			_parent_window.height = h - (parent_height-used_height);
+		end
+	end
+end
+
+function pe_aries_window.create_no_title(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, parentLayout, css)
+	--local isdeepbg = mcmlNode:GetBool("isdeepbg");
+	local w = mcmlNode:GetNumber("width") or (width-left);
+	local default_height = mcmlNode:GetNumber("height")
+	local h = default_height or (height-top);
+	local icon = mcmlNode:GetString("icon") or ""; --32 32
+	local background = mcmlNode:GetString("background") or "";
+	
+	local title_height = mcmlNode:GetNumber("title_height") or 28;
+	
+	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top, w, h);
+	_this.background = mc_window_bg;
+	_parent:AddChild(_this);
+	_parent = _this;
+	local _parent_window = _this;
+	
+	local onhelp = mcmlNode:GetString("onhelp");
+	if(onhelp and onhelp ~= "")then
+		_this = ParaUI.CreateUIObject("button", "help_btn_bg", "_lt", w - 54, 5, 20, 20);
+		_parent:AddChild(_this);
+		_this.background = mc_help_btn_bg;
+		_this.tooltip = L"点击查看帮助";
+		_this:SetScript("onclick", function()
+			Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onhelp, buttonName, mcmlNode)
+		end);
+	end
+
+	local onclose = mcmlNode:GetString("onclose");
+
+	if(onclose and onclose ~= "")then
+		if (mcmlNode:GetNumber("close_height")) then
+			local btn_size = mcmlNode:GetNumber("close_height")
+			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
+		else
+			local btn_size = title_height - 2
+			if(title_height>=32) then
+				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 1, btn_size, btn_size);	
+			else
+				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+			end
+		end
+		
+		_this.background = mc_close_btn_bg;
+		_parent:AddChild(_this);
+
+		if(title_height>=32) then
+			_this.enabled = false;
+			_guihelper.SetUIColor(_this, "#ffffffff");
+			_parent:AddChild(_this);
+			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
+			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this.background = "";
+			_parent:AddChild(_this);
+		end
+
+		_this:SetScript("onclick", function()
+			Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onclose, buttonName, mcmlNode)
+		end);
+	end
+
 	local parent_width, parent_height = w - 2, h - title_height + 4;
 	_this = ParaUI.CreateUIObject("container", "childnode", "_fi", 5, title_height, 7, 7);
 	_this.background=background;

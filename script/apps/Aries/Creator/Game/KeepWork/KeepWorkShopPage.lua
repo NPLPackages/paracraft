@@ -28,7 +28,7 @@ function KeepWorkShopPage.OnInit()
 end
 
 function KeepWorkShopPage.Show()
-    KeepWorkItemManager.Init(function()
+    KeepWorkItemManager.Load(function()
         KeepWorkShopPage.Show__();
     end)
 end
@@ -37,7 +37,7 @@ function KeepWorkShopPage.Show__()
 			url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.html",
 			name = "KeepWorkShopPage.Show", 
 			isShowTitleBar = false,
-			DestroyOnClose = false,
+			DestroyOnClose = true,
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			enable_esc_key = true,

@@ -21,13 +21,26 @@ local KpChatChannel = NPL.export();
 
 KpChatChannel.worldId = nil;
 KpChatChannel.client = nil;
+KpChatChannel.configs = {
+    ONLINE = "https://keepwork.com",
+    STAGE = "http://socket-dev.kp-para.cn",
+    RELEASE = "http://socket-dev.kp-para.cn",
+    LOCAL = "http://socket-dev.kp-para.cn"
+}
 function KpChatChannel.GetUrl()
     local url;
-    if(LOG.level == "debug")then
-        --url = "http://localhost:3000";
-        url = "http://socket-dev.kp-para.cn";
+    local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+    local defaultEnv;
+    if(Config and Config.defaultEnv)then
+        defaultEnv = Config.defaultEnv;
+        url  = KpChatChannel.configs[defaultEnv];
     else
-        url = "http://socket-dev.kp-para.cn";
+	    LOG.std(nil, "error", "KpChatChannel", "read Config.defaultEnv failed from WorldShare Config");
+    end
+    if(not url)then
+	    LOG.std(nil, "error", "KpChatChannel", "read url failed by Config.defaultEnv: %s",defaultEnv);
+    else
+	    LOG.std(nil, "info", "KpChatChannel", "read url %s by Config.defaultEnv: %s",url, defaultEnv);
     end
     return url;
 end
@@ -49,6 +62,9 @@ function KpChatChannel.GetRoom()
 end
 function KpChatChannel.Connect(url,options,onopen_callback)
     if(LOG.level ~= "debug")then
+        return
+    end
+    if(not KpChatChannel.GetToken())then
         return
     end
     url  = url or KpChatChannel.GetUrl();
@@ -147,14 +163,14 @@ function KpChatChannel.OnMsg(self, msg)
 end
 function KpChatChannel.SetBulletScreen(v)
     if(GameLogic)then
-        local key = string.format("is_opened_bullet_screen_%d",KpChatChannel.GetUserId());
+        local key = string.format("is_opened_bullet_screen_%s",tostring(KpChatChannel.GetUserId()));
 	    GameLogic.GetPlayerController():SaveLocalData(key, v, true);
         TipRoadManager:OnShow(v)
     end
 end
 function KpChatChannel.BulletScreenIsOpened()
     if(GameLogic)then
-        local key = string.format("is_opened_bullet_screen_%d",KpChatChannel.GetUserId());
+        local key = string.format("is_opened_bullet_screen_%s",tostring(KpChatChannel.GetUserId()));
 	    return GameLogic.GetPlayerController():LoadLocalData(key,true,true);
     end
     return true;

@@ -8,7 +8,7 @@ KeepWorkItemManager for an authorized user
 please login first
 -------------------------------------------------------
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-KeepWorkItemManager.Init(function()
+KeepWorkItemManager.Load(function()
     commonlib.echo("=====KeepWorkItemManager.globalstore");
     commonlib.echo(KeepWorkItemManager.globalstore);
     commonlib.echo("=====KeepWorkItemManager.extendedcost");
@@ -50,11 +50,11 @@ end
 function KeepWorkItemManager.IsLoaded()
     return KeepWorkItemManager.loaded;
 end
-function KeepWorkItemManager.Init(callback)
-    KeepWorkItemManager.LoadGlobalStore(function()
-        KeepWorkItemManager.LoadExtendedCost(function()
-            KeepWorkItemManager.LoadBags(function()
-                KeepWorkItemManager.LoadItems(function()
+function KeepWorkItemManager.Load(callback)
+    KeepWorkItemManager.LoadGlobalStore(true, function()
+        KeepWorkItemManager.LoadExtendedCost(true, function()
+            KeepWorkItemManager.LoadBags(true, function()
+                KeepWorkItemManager.LoadItems(true, function()
                     KeepWorkItemManager.loaded = true;
                     if(callback)then
                         callback();
@@ -64,8 +64,14 @@ function KeepWorkItemManager.Init(callback)
         end)
     end)
 end
-function KeepWorkItemManager.LoadGlobalStore(callback)
-    keepwork.globalstore.get({},function(err, msg, data)
+function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.globalstore.get({
+        cache_policy = "access plus 0";
+    },function(err, msg, data)
         if(err ~= 200)then
             return
         end
@@ -78,8 +84,14 @@ function KeepWorkItemManager.LoadGlobalStore(callback)
         end
     end)
 end
-function KeepWorkItemManager.LoadExtendedCost(callback)
-    keepwork.extendedcost.get({},function(err, msg, data)
+function KeepWorkItemManager.LoadExtendedCost(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.extendedcost.get({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
         if(err ~= 200)then
             return
         end
@@ -92,8 +104,14 @@ function KeepWorkItemManager.LoadExtendedCost(callback)
         end
     end)
 end
-function KeepWorkItemManager.LoadBags(callback)
-    keepwork.bags.get({},function(err, msg, data)
+function KeepWorkItemManager.LoadBags(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.bags.get({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
         if(err ~= 200)then
             return
         end
@@ -106,8 +124,14 @@ function KeepWorkItemManager.LoadBags(callback)
         end
     end)
 end
-function KeepWorkItemManager.LoadItems(callback)
-    keepwork.items.get({},function(err, msg, data)
+function KeepWorkItemManager.LoadItems(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.items.get({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
         if(err ~= 200)then
             return
         end
@@ -119,4 +143,23 @@ function KeepWorkItemManager.LoadItems(callback)
             end
         end
     end)
+end
+-- @param bag: only check the bag
+-- @param excludebag: 
+-- @return bOwn, guid, bag, copies: if own the gs item, and the guid, bag and copies of the item if own
+-- check if the user has the global store item in inventory
+function KeepWorkItemManager.HasGSItem(gsid, bag, excludebag)
+    if(not gsid)then
+        return
+    end
+
+    gsid = tonumber(gsid)
+    
+    if(gsid > 0)then
+        for k,v in ipairs(KeepWorkItemManager.items) do
+            if( v.gsId == gsid)then
+                return true, v.goodsId, v.bagId, v.amount;
+            end    
+        end
+    end
 end

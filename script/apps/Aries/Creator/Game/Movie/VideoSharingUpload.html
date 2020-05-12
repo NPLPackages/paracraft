@@ -1,0 +1,50 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/VideoSharingUpload.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script type="text/npl" src="VideoSharingUpload.lua">
+            <![CDATA[
+            VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
+            VideoSharingUpload.OnInit();
+            name = Page:GetRequestParam("name") or "ready"
+            ]]>
+        </script>
+        <pe:if condition='<%=(name=="ready")%>'>
+            <aries:window mode="thin" style="width:400px;" title='<%=L"录制视频"%>' onclose="VideoSharingUpload.OnClose">
+                <div style="margin-top:30px;height:40px;width:400px;text-align:center;color:#ffffff;font-size:13px">
+                    <%=L"视频录制完成，文件已保存到电脑桌面。" %>
+                </div>
+                <div style="margin-top:10px;height:50px;width:400px;">
+                    <input type="button" value='<%=L"下载到手机" %>' align="center" style="height:30px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="VideoSharingUpload.OnOK" />
+                </div>
+            </aries:window>
+            <pe:custom src="QRCodeSurface.lua" classns="Paracraft.Controls.QRCodeSurface" style="width:128px;height:128px;">
+            </pe:custom>
+       </pe:if>
+        <pe:if condition='<%=(name=="upload")%>'>
+            <aries:window mode="thin" style="width:400px;" title='<%=L"录制视频"%>' onclose="VideoSharingUpload.OnClose">
+                <div style="margin-top:120px;height:300px;width:400px;text-align:center;color:#ffffff;font-size:13px">
+                    <%=L"视频准备中，请稍后。。。" %>
+                </div>
+            </aries:window>
+        </pe:if>
+        <pe:if condition='<%=(name=="finish")%>'>
+            <aries:window mode="thin" style="width:400px;" title='<%=L"录制视频"%>' onclose="VideoSharingUpload.OnClose">
+                <div style="margin-top:36px;height:140px;width:400px">
+                </div>
+                <div style="margin-top:0px;height:20px;width:400px;text-align:center;color:#ffffff;font-size:12px">
+                    <%=L"视频准备完成" %>
+                </div>
+                <div style="margin-top:0px;height:100px;width:400px;text-align:center;color:#ffffff;font-size:12px">
+                    <%=L"请使用手机扫描二维码下载视频" %>
+                </div>
+            </aries:window>
+        </pe:if>
+    </pe:mcml>
+</body>
+</html>

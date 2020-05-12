@@ -439,7 +439,40 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
 			end
 		end
 	end
-	ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+    if(msgdata.ChannelIndex == EnumChannels.KpBroadCast) then
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		local stone_name = "喇叭";
+		local broadcast_stone_gsid = 23;
+		local purchase_exid = 0;
+		local hasItem, guid, bag, copies = KeepWorkItemManager.HasGSItem(broadcast_stone_gsid);
+        local gsItem = KeepWorkItemManager.GetItemTemplate(broadcast_stone_gsid);
+		if(gsItem) then
+			stone_name = gsItem.name;
+		end
+		if(not hasItem) then
+            _guihelper.MessageBox(format("你没有%s，不能广播！", stone_name),function(result)
+				if(result == _guihelper.DialogResult.Yes)then
+					local command = System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd");
+					if(command) then
+						command:Call({gsid = broadcast_stone_gsid, exid = purchase_exid});
+					end
+				end
+			end,_guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil,{ ok = L"立即购买", cancel = L"再想想", title = L"提示", });
+			return;
+        else
+            if(copies and copies < 100) then
+				_guihelper.Custom_MessageBox(format("发送一条喇叭消息,需要消耗一个%s,确定要发送? 你现在还有%d个%s", stone_name, copies or 0, stone_name),function(result)
+					if(result == _guihelper.DialogResult.Yes)then
+						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+					end
+				end,_guihelper.MessageBoxButtons.OKCancel);
+			else
+				ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+			end
+		end
+    else
+	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+    end
     return true;
 end
 -- send a chat message
@@ -767,6 +800,8 @@ function ChatChannel.SendToServer(msgdata)
 			end
 		end
 		return
+
+		
 	else
 		return;
 	end

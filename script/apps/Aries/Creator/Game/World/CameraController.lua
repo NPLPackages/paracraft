@@ -199,7 +199,17 @@ function CameraController.ToggleCamera(IsFPSView)
 			
 					_this.enabled = false;
 					_guihelper.SetUIColor(_this, "#ffffffff");
-					_this:AttachToRoot();
+
+					local scene_viewport_center = false;
+					if(scene_viewport_center) then
+						NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+						local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+						local viewport = ViewportManager:GetSceneViewport();
+						local parent = viewport:GetUIObject(true)
+						parent:AddChild(_this);
+					else
+						_this:AttachToRoot();
+					end
 				end
 			
 				if( GameLogic.GameMode:IsMovieMode()) then

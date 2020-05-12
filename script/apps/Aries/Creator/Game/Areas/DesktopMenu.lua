@@ -74,6 +74,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
 				{text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
+				{text = L"短视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},
 				-- {text = L"位置坐标...",name = "window.pos",onclick=nil},

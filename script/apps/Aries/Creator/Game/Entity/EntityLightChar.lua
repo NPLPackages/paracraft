@@ -1,19 +1,19 @@
 --[[
-Title: EntityLight
+Title: EntityLightChar
 Author(s): LiXizhi
 Date: 2016/9/21
 Desc: 
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLight.lua");
-local EntityLight = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLight")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLightChar.lua");
+local EntityLightChar = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLightChar")
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
-local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLight"));
+local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLightChar"));
 
 -- light properties
 Entity:Property({"LightType", 1});
@@ -39,26 +39,14 @@ Entity:Property({"Attenuation2", 1});
 Entity:Property({"Theta", 0});
 Entity:Property({"Phi", 0});
 
--- light model properties
-Entity:Property({"modelInitPos", {0,0,0}});
-Entity:Property({"modelOffsetPos", {0,0,0}});
-Entity:Property({"modelScale", 1});
-Entity:Property({"modelYaw", 0});
-Entity:Property({"modelPitch", 0});
-Entity:Property({"modelRoll", 0});
-Entity:Property({"modelFilepath", ""});
-
 -- class name
-Entity.class_name = "EntityLight";
+Entity.class_name = "EntityLightChar";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 Entity.is_persistent = true;
 -- always serialize to 512*512 regional entity file
 Entity.is_regional = true;
 
 function Entity:ctor()
-	self.modelInitPos = {0, 0, 0};
-	self.modelOffsetPos = {0, 0, 0};
-	self.modelFilepath = "model/blockworld/BlockModel/block_model_one.x";
 end
 
 function Entity:init()
@@ -84,22 +72,6 @@ function Entity:isDirectionalLight()
 	return t == 3;
 end
 
-function Entity:SetOffsetPos(offset)
-	local p = self:GetField("modelInitPos");
-	local x, y, z = p[1], p[2], p[3];
-
-	offset[1] = math.min(math.max(-BlockEngine.half_blocksize, offset[1]), BlockEngine.half_blocksize);
-	offset[2] = math.min(math.max(0, offset[2]), BlockEngine.blocksize);
-	offset[3] = math.min(math.max(-BlockEngine.half_blocksize, offset[3]), BlockEngine.half_blocksize);
-	self.modelOffsetPos = offset;
-
-	local lightModel = self.lightModel;
-	if(lightModel) then
-		lightModel:SetPosition(x + offset[1], y + offset[2], z + offset[3]);
-	end
-	self:valueChanged();
-end
-
 function Entity:Clamp(v, min, max)
 	if v < min then
 		return min;
@@ -111,31 +83,12 @@ function Entity:Clamp(v, min, max)
 end
 
 function Entity:GetField(field, default_value)
-	-- hand light model properties first
-	if field == "modelInitPos" then
-		return self.modelInitPos
-	end
-	if field == "modelOffsetPos" then
-		return self.modelOffsetPos
-	end
-	if field == "modelScale" then
-		return self.modelScale or 1
-	end
-	if field == "modelYaw" then
-		return self.modelYaw or 0
-	end
-	if field == "modelPitch" then
-		return self.modelPitch or 0
-	end
-	if field == "modelRoll" then
-		return self.modelRoll or 0
-	end
-	if field == "modelFilepath" then
-		return self.modelFilepath
-	end
-
 	-- properties belong to the C++ world's light object
 	default_value = 0;
+	if(field == "position") then
+		return Entity._super.GetField(self, field, default_value)
+	end
+
 	if field == "Position" or
 	   field == "Direction" or
 	   field == "Diffuse" or
@@ -145,7 +98,6 @@ function Entity:GetField(field, default_value)
 	end
 
 	local lightObject = self:GetInnerObject();
-
 	local value = lightObject and lightObject:GetField(field, default_value) or default_value;
 
 	-- radian to degree
@@ -172,6 +124,10 @@ function Entity:GetField(field, default_value)
 end
 
 function Entity:SetField(field, value)
+	if(field == "position") then
+		return Entity._super.SetField(self, field, value)
+	end
+
 	local oldValue = self:GetField(field);
 
 	-- ATTENTION: skip approximate values, because the multiple manips update values to plugs asynchronously
@@ -185,68 +141,6 @@ function Entity:SetField(field, value)
 		end
 	end
 	
-	-- handle light model properties first
-	if field == "modelOffsetPos" then
-		self:SetOffsetPos(value)
-		return;
-	end
-	if field == "modelScale" then
-		self.modelScale = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetScale(value);
-		end
-		self:valueChanged();
-
-		return;
-	end
-	if field == "modelYaw" then
-		self.modelYaw = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetField("yaw", value);
-		end
-		self:valueChanged();
-
-		return;
-	end
-	if field == "modelPitch" then
-		self.modelPitch = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetField("pitch", value);
-		end
-		self:valueChanged();
-
-		return;
-	end
-	if field == "modelRoll" then
-		self.modelRoll = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetField("roll", value);
-		end
-		self:valueChanged();
-
-		return;
-	end
-	if field == "modelFilepath" then
-		self.modelFilepath = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetField("assetfile", value);
-		end
-		self:valueChanged();
-
-		return;
-	end
-
-
 	-- handle properties of C++ world's light object
 	local lightObject = self:GetInnerObject();
 	if(not lightObject) then
@@ -303,7 +197,7 @@ end
 function Entity:CreateInnerObject()
 	local x, y, z = self:GetPosition();
 
-	local lightObject = ParaScene.CreateObject("CLightObject", self:GetBlockEntityName(), x,y,z);
+	local lightObject = ParaScene.CreateObject("CLightObject", "EntityLightChar", x,y,z);
 
 	lightObject:SetAttribute(0x8000, true);
 	lightObject:SetField("RenderDistance", 100);
@@ -312,24 +206,10 @@ function Entity:CreateInnerObject()
 	self:SetInnerObject(lightObject);
 	ParaScene.Attach(lightObject);
 
-
-	local lightModel = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x,y,z);
-
-	lightModel:SetField("assetfile", self.modelFilepath);
-	lightModel:SetAttribute(0x8080, true);
-	lightModel:SetField("RenderDistance", 100);
-
-	self.lightModel = lightModel;
-	ParaScene.Attach(lightModel);
-
-	self.modelInitPos = {x,y,z};
-
 	return lightObject;
 end
 
 function Entity:Destroy()
-	ParaScene.Delete(self.lightModel);
-
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
 end

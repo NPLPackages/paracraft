@@ -1002,5 +1002,15 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_F1") then
 		GameLogic.RunCommand("/menu help.help");
 	end
+
+	if (ctrl_pressed and event.alt_pressed) then
+		if (dik_key == "DIK_1") then
+			CommandManager:RunCommand("share", "10");
+			event:accept();
+		elseif (dik_key == "DIK_3") then
+			CommandManager:RunCommand("share", "30");
+			event:accept();
+		end
+	end
 	return event:isAccepted();
 end
