@@ -12,6 +12,7 @@ VideoSharingUpload.ShowPage();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharing.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/QREncode.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.share.lua");
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local StorageFilesApi = NPL.load("(gl)Mod/WorldShare/api/Storage/Files.lua")
@@ -19,6 +20,8 @@ local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/Root.lua")
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 local QREncode = commonlib.gettable("MyCompany.Aries.Game.Movie.QREncode");
+
+local download_tip_url = "https://keepwork.com/warning/can-not-download-video.html";
 
 local page;
 function VideoSharingUpload.OnInit()
@@ -64,56 +67,49 @@ function VideoSharingUpload.OnOK()
 		return;
 	end
 	local upload_timer = commonlib.Timer:new({callbackFunc = function(timer)
-		local file_path = VideoSharing.GetOutputFile();
-		StorageFilesApi:Token(file_path, function(data, err)
-			commonlib.echo(data);
-			if not data.token or not data.key then
+		keepwork.shareToken.get({cache_policy = "access plus 0"},function(err, msg, data)
+			if (err ~= 200 or (not data.token) or (not data.key)) then
 				VideoSharingUpload.UploadFailed();
-				return false;
+				return;
 			end
 
+			local file_path = VideoSharing.GetOutputFile();
 			local file = ParaIO.open(file_path, "rb");
 			if (not file:IsValid()) then
 				file:close();
 				VideoSharingUpload.UploadFailed();
-				return false;
+				return;
 			end
 			local content = file:GetText(0, -1);
 			file:close();
 
 			if not content then
 				VideoSharingUpload.UploadFailed();
-				return false;
+				return;
 			end
 
+			local file_name = data.key.."-"..ParaIO.GetFileName(file_path);
 			QiniuRootApi:Upload(
 				data.token,
 				data.key,
-				ParaIO.GetFileName(file_path),
+				file_name,
 				content,
-				function(_, err)
+				function(result, err)
 					if err ~= 200 then
 						VideoSharingUpload.UploadFailed();
-						return false;
+						return;
 					end
 
-					StorageFilesApi:List(function(listData, err)
-						if listData and type(listData.data) ~= 'table' then
+					keepwork.shareUrl.get({key = data.key}, function(err, msg, data)
+						if (err ~= 200 or (not data.data)) then
 							VideoSharingUpload.UploadFailed();
-							return false
+							return;
 						end
+						VideoSharingUpload.ShowQRCode(data.data.."&attname="..file_name);
+					end);
 
-						for key, item in ipairs(listData.data) do
-							if item.key == data.key then
-								if item.downloadUrl then
-									VideoSharingUpload.ShowQRCode(item.downloadUrl.."&attname="..ParaIO.GetFileName(file_path));
-									return true
-								end
-							end
-						end
-
-						VideoSharingUpload.UploadFailed();
-					end)
+					keepwork.shareFile.post({key = data.key}, function(err, msg, data)
+					end);
 				end
 			)
 		end)
@@ -127,6 +123,7 @@ function VideoSharingUpload.UploadFailed()
 end
 
 function VideoSharingUpload.ShowQRCode(url)
+	url = download_tip_url.."?url="..url;
 	local ok, result = QREncode.qrcode(url);
 	if (not ok) then
 		VideoSharingUpload.UploadFailed();
