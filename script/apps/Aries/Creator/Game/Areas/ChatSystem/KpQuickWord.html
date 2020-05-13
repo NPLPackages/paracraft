@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KpQuickWord, by leio, 2020/5/13</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
+local page = document:GetPageCtrl();
+function OnClosePage()
+    page:CloseWindow();
+end
+function OnOK()
+    if(KpQuickWord.project_id and KpQuickWord.callback)then
+        KpQuickWord.callback(KpQuickWord.project_id);
+    end
+    OnClosePage();
+end
+function OnModify(name,mcmlNode)
+    local search_ctl = page:FindUIControl("block_search_text_ctl");
+    if(search_ctl and search_ctl.text) then
+        local id = tonumber(search_ctl.text);
+        if(type(id) == "number")then
+            KpQuickWord.project_id = id;
+        else
+            KpQuickWord.project_id = nil;
+        end
+    end
+end
+]]></script>
+<aries:window  mode="thin" width="400" height="200" title='<%= L"全局广播" %>' onclose="OnClosePage">
+    <div style="padding:10px;color:#ffffff;height:130px;">
+        <div><%= KpQuickWord.words %></div>
+        <div style="margin-top:10px;">
+            <div style="float:left"><%= L"作品ID：" %></div>
+            <div style="float:left;width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+                <input type="text" name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:0px;margin-left:5px;textcolor:#ffffff;height:25px;background:;" onmodify="OnModify" />
+            </div>
+        </div>
+    </div>
+    <div>
+        <div style="margin-left:100px;">
+            <input type="button" class="mc_yellow_button_with_fillet" value='<%= L"确定" %>' style="width:90px;height:28px;"  onclick="OnOK"/>
+            <input type="button" class="mc_light_grey_button_with_fillet" value='<%= L"取消" %>' style="margin-left:20px;width:90px;height:28px;" onclick="OnClosePage"/>
+        </div>
+        
+    </div>
+    
+</aries:window>
+</pe:mcml> 
+</body>
+</html>

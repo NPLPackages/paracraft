@@ -451,18 +451,18 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
 		end
 		if(not hasItem) then
             _guihelper.MessageBox(format("你没有%s，不能广播！", stone_name),function(result)
-				if(result == _guihelper.DialogResult.Yes)then
-					local command = System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd");
-					if(command) then
-						command:Call({gsid = broadcast_stone_gsid, exid = purchase_exid});
-					end
-				end
+--				if(result == _guihelper.DialogResult.OK)then
+--					local command = System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd");
+--					if(command) then
+--						command:Call({gsid = broadcast_stone_gsid, exid = purchase_exid});
+--					end
+--				end
 			end,_guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil,{ ok = L"立即购买", cancel = L"再想想", title = L"提示", });
 			return;
         else
             if(copies and copies < 100) then
-				_guihelper.Custom_MessageBox(format("发送一条喇叭消息,需要消耗一个%s,确定要发送? 你现在还有%d个%s", stone_name, copies or 0, stone_name),function(result)
-					if(result == _guihelper.DialogResult.Yes)then
+				_guihelper.MessageBox(format("发送一条喇叭消息,需要消耗一个%s,确定要发送? 你现在还有%d个%s", stone_name, copies or 0, stone_name),function(result)
+					if(result == _guihelper.DialogResult.OK)then
 						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
 					end
 				end,_guihelper.MessageBoxButtons.OKCancel);

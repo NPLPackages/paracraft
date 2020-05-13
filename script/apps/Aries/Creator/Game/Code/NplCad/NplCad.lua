@@ -204,7 +204,7 @@ function NplCad.GetCode(code, filename, relativePath)
         NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
         <code>
         local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
-        NplCad.ExportToFile(ShapeBuilder.getScene(),%q);
+        NplCad.ExportToFile(ShapeBuilder.getScene(),%q, ShapeBuilder.liner, ShapeBuilder.angular);
         if(result)then
 	        setActorValue("assetfile", %q);
 	        setActorValue("showBones", true);
@@ -261,7 +261,7 @@ function NplCad.OnClickExport(type)
 		NplCad.export_type = nil;
 	end
 end
-function NplCad.ExportToFile(scene,filename)
+function NplCad.ExportToFile(scene,filename, liner, angular)
     local type = NplCad.export_type;
     if(not type or not scene or not filename)then
         return
@@ -275,11 +275,11 @@ function NplCad.ExportToFile(scene,filename)
         local bBinary = true;
         local bEncodeBase64 = true
         local bIncludeColor = false;
-        SceneHelper.saveSceneToStl(filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor); -- binary
+        SceneHelper.saveSceneToStl(filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- binary
         NplCad.ShowMessageBox(filename)
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
-        SceneHelper.saveSceneToGltf(filename,scene);
+        SceneHelper.saveSceneToGltf(filename,scene,false, liner, angular);
         NplCad.ShowMessageBox(filename)
     elseif(type == "bmax")then
         local input_filename = filename .. ".color.stl";

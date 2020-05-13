@@ -15,26 +15,26 @@ local cmds = {
 {
 	type = "move", 
 	message0 = L"移动 %1 %2 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -45,32 +45,32 @@ local cmds = {
 	func_description = 'move(%s,%s,%s)',
 	func_description_js = 'move(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('move(%s,%s,%s)\n', 
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+		return string.format('move(%s,%s,%s)\n', 
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "scale", 
 	message0 = L"缩放 %1 %2 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 	},
@@ -84,27 +84,27 @@ local cmds = {
 	func_description = 'scale(%s,%s,%s)',
 	func_description_js = 'scale(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('scale(%s,%,%s)\n', 
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
-            );
+		return string.format('scale(%s,%,%s)\n', 
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "rotate", 
 	message0 = L"旋转 %1 %2 度",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis",
 			type = "input_value",
-            shadow = { type = "axis", value = "x",},
+			shadow = { type = "axis", value = "x",},
 			text = "'x'", 
 		},
-        {
+		{
 			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
 	},
@@ -117,11 +117,11 @@ local cmds = {
 	func_description = 'rotate(%s,%s)',
 	func_description_js = 'rotate(%s,%s)',
 	ToNPL = function(self)
-        return string.format('rotate(%s,%s)\n', 
-            self:getFieldValue('axis'),self:getFieldValue('angle'));
+		return string.format('rotate(%s,%s)\n', 
+			self:getFieldValue('axis'),self:getFieldValue('angle'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 
@@ -129,38 +129,38 @@ local cmds = {
 {
 	type = "rotateFromPivot", 
 	message0 = L"旋转 %1 %2 度 中心点 %3 %4 %5",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis",
 			type = "input_value",
-            shadow = { type = "axis", value = "x",},
+			shadow = { type = "axis", value = "x",},
 			text = "'x'", 
 		},
-        {
+		{
 			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "tx",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "ty",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "tz",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -171,43 +171,43 @@ local cmds = {
 	func_description = 'rotateFromPivot(%s,%s,%s,%s,%s)',
 	func_description_js = 'rotateFromPivot(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('rotateFromPivot(%s,%s,%s,%s,%s)\n', 
-            self:getFieldValue('axis'),self:getFieldValue('angle'),
-            self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
-            );
+		return string.format('rotateFromPivot(%s,%s,%s,%s,%s)\n', 
+			self:getFieldValue('axis'),self:getFieldValue('angle'),
+			self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "moveNode", 
 	message0 = L"移动对象 %1 %2 %3 %4",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -218,41 +218,41 @@ local cmds = {
 	func_description = 'moveNode(%s,%s,%s,%s)',
 	func_description_js = 'moveNode(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('moveNode("%s",%s,%s,%s)\n', 
-            self:getFieldValue('name'),
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+		return string.format('moveNode("%s",%s,%s,%s)\n', 
+			self:getFieldValue('name'),
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "scaleNode", 
 	message0 = L"缩放对象 %1 %2 %3 %4",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
-        
+		
 	},
 	hide_in_toolbox = true,
 	category = "ShapeOperators", 
@@ -264,32 +264,32 @@ local cmds = {
 	func_description = 'scaleNode(%s,%s,%s,%s)',
 	func_description_js = 'scaleNode(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('scaleNode("%s",%s,%s,%s)\n', 
-            self:getFieldValue('name'),
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+		return string.format('scaleNode("%s",%s,%s,%s)\n', 
+			self:getFieldValue('name'),
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "rotateNode", 
 	message0 = L"旋转对象 %1 %2 %3 度",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "axis",
 			type = "input_value",
-            shadow = { type = "axis", value = "x",},
+			shadow = { type = "axis", value = "x",},
 			text = "'x'", 
 		},
-        {
+		{
 			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
 	},
@@ -302,54 +302,54 @@ local cmds = {
 	func_description = 'rotateNode(%s,%s,%s)',
 	func_description_js = 'rotateNode(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('rotateNode("%s",%s,%s)\n', 
-            self:getFieldValue('name'),
-            self:getFieldValue('axis'),self:getFieldValue('angle'));
+		return string.format('rotateNode("%s",%s,%s)\n', 
+			self:getFieldValue('name'),
+			self:getFieldValue('axis'),self:getFieldValue('angle'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "rotateNodeFromPivot", 
 	message0 = L"旋转对象 %1 %2 %3 度 中心点 %4 %5 %6",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "axis",
 			type = "input_value",
-            shadow = { type = "axis", value = "x",},
+			shadow = { type = "axis", value = "x",},
 			text = "'x'", 
 		},
-        {
+		{
 			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "tx",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "ty",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "tz",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -360,92 +360,92 @@ local cmds = {
 	func_description = 'rotateNodeFromPivot(%s,%s,%s,%s,%s,%s)',
 	func_description_js = 'rotateNodeFromPivot(%s,%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('rotateNodeFromPivot("%s",%s,%s,%s,%s,%s)\n', 
-            self:getFieldValue('name'),
-            self:getFieldValue('axis'),self:getFieldValue('angle'),
-            self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
-            );
+		return string.format('rotateNodeFromPivot("%s",%s,%s,%s,%s,%s)\n', 
+			self:getFieldValue('name'),
+			self:getFieldValue('axis'),self:getFieldValue('angle'),
+			self:getFieldValue('tx'),self:getFieldValue('ty'),self:getFieldValue('tz')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "cloneNodeByName", 
 	message0 = L"%1 复制 %2 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "op",
 			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
+			shadow = { type = "boolean_op", value = "union",},
 			text = "union", 
 		},
-        {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-         {
+		 {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffc658",},
+			shadow = { type = "colour_picker", value = "#ffc658",},
 			text = "#ffc658", 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
+	previousStatement = true,
 	nextStatement = true,
 	funcName = "cloneNodeByName",
 	func_description = 'cloneNodeByName(%s,%s,%s)',
 	func_description_js = 'cloneNodeByName(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('cloneNodeByName("%s","%s","%s")\n', 
-            self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
+		return string.format('cloneNodeByName("%s","%s","%s")\n', 
+			self:getFieldValue('op'), self:getFieldValue('name'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "cloneNode", 
 	message0 = L"%1 复制 %2",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "op",
 			type = "input_value",
-            shadow = { type = "boolean_op", value = "union",},
+			shadow = { type = "boolean_op", value = "union",},
 			text = "union", 
 		},
-         {
+		 {
 			name = "color",
 			type = "input_value",
-            shadow = { type = "colour_picker", value = "#ffc658",},
+			shadow = { type = "colour_picker", value = "#ffc658",},
 			text = "#ffc658", 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
+	previousStatement = true,
 	nextStatement = true,
 	funcName = "cloneNode",
 	func_description = 'cloneNode(%s,%s)',
 	func_description_js = 'cloneNode(%s,%s)',
 	ToNPL = function(self)
-        return string.format('cloneNode("%s","%s")\n', 
-            self:getFieldValue('op'), self:getFieldValue('color'));
+		return string.format('cloneNode("%s","%s")\n', 
+			self:getFieldValue('op'), self:getFieldValue('color'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "deleteNode", 
 	message0 = L"删除 %1",
-    arg0 = {
-       {
+	arg0 = {
+	   {
 			name = "name",
 			type = "input_value",
 			text = "", 
@@ -454,33 +454,33 @@ local cmds = {
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
-    previousStatement = true,
+	previousStatement = true,
 	nextStatement = true,
 	funcName = "deleteNode",
 	func_description = 'deleteNode(%s)',
 	func_description_js = 'deleteNode(%s)',
 	ToNPL = function(self)
-        return string.format('deleteNode("%s")\n', 
-            self:getFieldValue('name'));
+		return string.format('deleteNode("%s")\n', 
+			self:getFieldValue('name'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "fillet", 
 	message0 = L"圆角 %1 半径 %2",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis_axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_axis_plane", value = "xyz",},
+			shadow = { type = "axis_axis_plane", value = "xyz",},
 			text = "'xyz'", 
 		},
-        {
+		{
 			name = "radius",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0.1,},
+			shadow = { type = "math_number", value = 0.1,},
 			text = 0.1, 
 		},
 	},
@@ -503,28 +503,28 @@ fillet("z", 0.1) -- make fillet on edges paralleled to axis Z
 fillet("xy", 0.1) -- make fillet on edges belong to XY plane
 fillet("yz", 0.1) -- make fillet on edges belong to YZ plane
 fillet("xz", 0.1) -- make fillet on edges belong to XZ plane
-    ]]}},
+	]]}},
 },
 
 {
 	type = "filletNode", 
 	message0 = L"圆角 对象 %1 %2 半径 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "axis_axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_axis_plane", value = "xyz",},
+			shadow = { type = "axis_axis_plane", value = "xyz",},
 			text = "'xyz'", 
 		},
-        {
+		{
 			name = "radius",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0.1,},
+			shadow = { type = "math_number", value = 0.1,},
 			text = 0.1, 
 		},
 	},
@@ -541,7 +541,7 @@ fillet("xz", 0.1) -- make fillet on edges belong to XZ plane
 		return string.format('filletNode(%s,%s,%s)\n', self:getFieldValue('name'), self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
@@ -569,17 +569,17 @@ fillet(edges, 0.1);
 {
 	type = "chamfer", 
 	message0 = L"倒角 %1 半径 %2",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis_axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_axis_plane", value = "xyz",},
+			shadow = { type = "axis_axis_plane", value = "xyz",},
 			text = "'xyz'", 
 		},
-        {
+		{
 			name = "radius",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0.1,},
+			shadow = { type = "math_number", value = 0.1,},
 			text = 0.1, 
 		},
 	},
@@ -602,28 +602,28 @@ chamfer("z", 0.1) -- make chamfer on edges paralleled to axis Z
 chamfer("xy", 0.1) -- make chamfer on edges belong to XY plane
 chamfer("yz", 0.1) -- make chamfer on edges belong to YZ plane
 chamfer("xz", 0.1) -- make chamfer on edges belong to XZ plane
-    ]]}},
+	]]}},
 },
 
 {
 	type = "chamferNode", 
 	message0 = L"倒角 对象 %1 %2 半径 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "axis_axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_axis_plane", value = "xyz",},
+			shadow = { type = "axis_axis_plane", value = "xyz",},
 			text = "'xyz'", 
 		},
-        {
+		{
 			name = "radius",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0.1,},
+			shadow = { type = "math_number", value = 0.1,},
 			text = 0.1, 
 		},
 	},
@@ -640,17 +640,17 @@ chamfer("xz", 0.1) -- make chamfer on edges belong to XZ plane
 		return string.format('chamferNode(%s,%s,%s)\n', self:getFieldValue('name'), self:getFieldValue('axis_axis_plane'), self:getFieldValue('radius'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "extrude", 
 	message0 = L"线性拉伸 长度 %1",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "height",
 			type = "input_value",
-            shadow = { type = "math_number", value = 1,},
+			shadow = { type = "math_number", value = 1,},
 			text = 1, 
 		},
 	},
@@ -675,23 +675,23 @@ box("union",3,1,2,'#ffc658')
 ellipse("difference",1,0.5,0,360,'#ffc658')
 move(0,(-2),0)
 extrude(4)
-    ]]}},
+	]]}},
 },
 
 {
 	type = "revolve", 
 	message0 = L"旋转拉伸 %1 角度 %2",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis",
 			type = "input_value",
-            shadow = { type = "axis", value = "x",},
+			shadow = { type = "axis", value = "x",},
 			text = "'x'", 
 		},
-        {
+		{
 			name = "angle",
 			type = "input_value",
-            shadow = { type = "math_number", value = 360,},
+			shadow = { type = "math_number", value = 360,},
 			text = 360, 
 		},
 	},
@@ -730,38 +730,38 @@ rotate('x',(-90))
 move(2,0,0)
 revolve('y', (-180))
 move(2,0,0)
-    ]]}},
+	]]}},
 },
 
 {
 	type = "mirror", 
 	message0 = L"镜像 %1 中心点 %2 %3 %4",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_plane", value = "xy",},
+			shadow = { type = "axis_plane", value = "xy",},
 			text = "'xy'", 
 		},
-        {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -772,49 +772,49 @@ move(2,0,0)
 	func_description = 'mirror(%s,%s,%s,%s)',
 	func_description_js = 'mirror(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('mirror(%s,%s,%s,%s)\n', 
-            self:getFieldValue('axis_plane'),
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
-            );
+		return string.format('mirror(%s,%s,%s,%s)\n', 
+			self:getFieldValue('axis_plane'),
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "mirrorNode", 
 	message0 = L"镜像对象 %1 %2 中心点 %3 %4 %5",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "axis_plane",
 			type = "input_value",
-            shadow = { type = "axis_plane", value = "xy",},
+			shadow = { type = "axis_plane", value = "xy",},
 			text = "'xy'", 
 		},
-        {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -825,39 +825,39 @@ move(2,0,0)
 	func_description = 'mirrorNode(%s,%s,%s,%s,%s)',
 	func_description_js = 'mirrorNode(%s,%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('mirrorNode("%s",%s,%s,%s,%s)\n', 
-            self:getFieldValue('name'),
-            self:getFieldValue('axis_plane'),
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
-            );
+		return string.format('mirrorNode("%s",%s,%s,%s,%s)\n', 
+			self:getFieldValue('name'),
+			self:getFieldValue('axis_plane'),
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "setLocalPivotOffset", 
 	message0 = L"骨骼绑定中心点偏移 %1 %2 %3",
-    arg0 = {
-        {
+	arg0 = {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -868,41 +868,41 @@ move(2,0,0)
 	func_description = 'setLocalPivotOffset(%s,%s,%s)',
 	func_description_js = 'setLocalPivotOffset(%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('setLocalPivotOffset(%s,%s,%s)\n', 
-            self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+		return string.format('setLocalPivotOffset(%s,%s,%s)\n', 
+			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 
 {
 	type = "setLocalPivotOffset_Node", 
 	message0 = L"骨骼绑定中心点偏移 %1 %2 %3 %4",
-    arg0 = {
+	arg0 = {
 		{
 			name = "name",
 			type = "input_value",
 			text = "", 
 		},
-        {
+		{
 			name = "x",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "y",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        {
+		{
 			name = "z",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0,},
+			shadow = { type = "math_number", value = 0,},
 			text = 0, 
 		},
-        
+		
 	},
 	category = "ShapeOperators", 
 	helpUrl = "", 
@@ -913,49 +913,83 @@ move(2,0,0)
 	func_description = 'setLocalPivotOffset_Node(%s,%s,%s,%s)',
 	func_description_js = 'setLocalPivotOffset_Node(%s,%s,%s,%s)',
 	ToNPL = function(self)
-        return string.format('setLocalPivotOffset_Node("%s",%s,%s,%s)\n', 
-            self:getFieldValue('name'),self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
+		return string.format('setLocalPivotOffset_Node("%s",%s,%s,%s)\n', 
+			self:getFieldValue('name'),self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
+},
+
+{
+	type = "deflection", 
+	message0 = L"弦公差 %1 角度公差 %2",
+	arg0 = {
+		{
+			name = "liner",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0.5,},
+			text = 0.5, 
+		},
+		{
+			name = "angular",
+			type = "input_value",
+			shadow = { type = "math_number", value = 28.5,},
+			text = 28.5, 
+		},
+		
+	},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "deflection",
+	func_description = 'deflection(%s,%s)',
+	func_description_js = 'deflection(%s,%s)',
+	ToNPL = function(self)
+		return string.format('deflection(%s,%s)\n', 
+			self:getFieldValue('liner'),self:getFieldValue('angular'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
 },
 
 {
 	type = "boolean_op", 
 	message0 = L"%1",
-    arg0 = {
-        
-        {
+	arg0 = {
+		
+		{
 			name = "value",
 			type = "field_dropdown",
 			options = {
-                { L"+", "union" },
+				{ L"+", "union" },
 				{ L"-", "difference" },
 				{ L"x", "intersection" },
 			},
 		},
 	},
 	hide_in_toolbox = true,
-    output = {type = "null",},
+	output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	func_description = '"%s"',
 	func_description_js = '"%s"',
 	ToNPL = function(self)
-        return string.format('"%s"', 
-            self:getFieldValue('value')
-            );
+		return string.format('"%s"', 
+			self:getFieldValue('value')
+			);
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "axis", 
 	message0 = L"%1",
-    arg0 = {
-        
-        {
+	arg0 = {
+		
+		{
 			name = "value",
 			type = "field_dropdown",
 			options = {
@@ -966,24 +1000,24 @@ move(2,0,0)
 		},
 	},
 	hide_in_toolbox = true,
-    output = {type = "null",},
+	output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
 	func_description_js = '%s',
 	ToNPL = function(self)
-        return string.format('%s', self:getFieldValue('value'));
+		return string.format('%s', self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "axis_plane", 
 	message0 = L"%1",
-    arg0 = {
-        
-        {
+	arg0 = {
+		
+		{
 			name = "value",
 			type = "field_dropdown",
 			options = {
@@ -994,24 +1028,24 @@ move(2,0,0)
 		},
 	},
 	hide_in_toolbox = true,
-    output = {type = "null",},
+	output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
 	func_description_js = '%s',
 	ToNPL = function(self)
-        return string.format('%s', self:getFieldValue('value'));
+		return string.format('%s', self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 {
 	type = "axis_axis_plane", 
 	message0 = L"%1",
-    arg0 = {
-        
-        {
+	arg0 = {
+		
+		{
 			name = "value",
 			type = "field_dropdown",
 			options = {
@@ -1026,17 +1060,17 @@ move(2,0,0)
 		},
 	},
 	hide_in_toolbox = true,
-    output = {type = "null",},
+	output = {type = "null",},
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
 	func_description = '%s',
 	func_description_js = '%s',
 	ToNPL = function(self)
-        return string.format('%s', self:getFieldValue('value'));
+		return string.format('%s', self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-    ]]}},
+	]]}},
 },
 }
 function NplCadDef_ShapeOperators.GetCmds()

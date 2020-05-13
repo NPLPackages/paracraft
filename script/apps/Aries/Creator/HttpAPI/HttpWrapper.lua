@@ -6,6 +6,10 @@ Desc:
 Use Lib:
 -------------------------------------------------------
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+
+NOTE: 
+config cmd line param "Config.defaultEnv" to load different development env
+local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("httpwrapper_version", "ONLINE");  - "ONLINE" or "STAGE" or "RELEASE" or "LOCAL"
 ]]
 NPL.load("(gl)script/ide/System/os/GetUrl.lua");
 
@@ -19,19 +23,26 @@ HttpWrapper.keepworkServerList = {
     LOCAL = "http://api-dev.kp-para.cn",
 }
 HttpWrapper.api_host = nil;
+-- get version for load different development env
+-- return 
+-- "ONLINE" or 
+-- "STAGE" or 
+-- "RELEASE" or 
+-- "LOCAL" or 
+function HttpWrapper.GetDevVersion()
+    local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("httpwrapper_version", "ONLINE");
+    httpwrapper_version = string.upper(httpwrapper_version);
+    return httpwrapper_version;
+end
 function HttpWrapper.GetUrl(key)
     key = key or "keepworkServerList";
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
     local url;
-    local Config = NPL.load("./Config.lua")
-    local defaultEnv;
-    if(Config and Config.defaultEnv)then
-        defaultEnv = Config.defaultEnv;
-        url  = HttpWrapper[key][defaultEnv];
-    end
+    local url  = HttpWrapper[key][httpwrapper_version];
     if(not url)then
-	    LOG.std(nil, "error", "HttpWrapper", "read url failed key = '%s' , defaultEnv = '%s'", key, defaultEnv);
+	    LOG.std(nil, "error", "HttpWrapper", "read url failed key = '%s' , httpwrapper_version = '%s'", key, httpwrapper_version);
     else
-	    LOG.std(nil, "info", "HttpWrapper", "read url %s by key = '%s' , defaultEnv = '%s'", url, key, defaultEnv);
+	    LOG.std(nil, "info", "HttpWrapper", "read url %s by key = '%s' , defaultEnv = '%s'", url, key, httpwrapper_version);
     end
     return url;
 end
@@ -129,12 +140,15 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         end
         commonlib.echo("=========res");
         commonlib.echo(res);
+        commonlib.echo("=========inputParams");
+        commonlib.echo(inputParams);
         if(not res)then
             inputParams = inputParams or {};
             local raw_input = commonlib.deepcopy(inputParams);
             local input;
             if(method == "GET")then
                 input = raw_input;
+	            url = NPL.EncodeURLQuery(url, raw_input);
                 input.url = url;
                 input.method = method;
             else

@@ -9,25 +9,13 @@ local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSyste
 KpQuickWord.OnQuickword();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
+local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
 local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 
 local KpQuickWord = NPL.export();
-
-KpQuickWord.words = [[
-<?xml version="1.0" encoding="utf-8"?>
-<!-- ParaEngine Aries combat dock quickword -->
-<quickwords>
-  <!--all quick word sentences divided into categories-->
-  <node sentence="请大家观看我刚刚完成的解谜作品。"/>
-  <node sentence="我做了一款单人游戏，大家来看看。"/>
-  <node sentence="欢迎大家观看我的编程作品。"/>
-  <node sentence="邀请大家一起欣赏我的教学作品。"/>
-  <node sentence="欢迎大家观看我的动画作品。"/>
-  <node sentence="欢迎大家观看我的校园作品。"/>
-</quickwords>
-]]
 function KpQuickWord.OnQuickword(x,y, width, height)
 	local ctl = CommonCtrl.GetControl("Aries_BattleChat_Quickword");
 	if(ctl == nil)then
@@ -80,10 +68,11 @@ function KpQuickWord.OnQuickword(x,y, width, height)
 	ctl:Show(x+width, y+0);
 end
 
--- @param filename: if nil, it will defaults to "config/Aries/Combat.Quickword.xml"
+-- @param filename: if nil, it will defaults to "config/Aries/Paracraft.Quickword.xml"
 -- return XML root object of the quick words
 function KpQuickWord.GetQuickWordFromFile(filename)
-	KpQuickWord.xmlRoot = KpQuickWord.xmlRoot or ParaXML.LuaXML_ParseString(KpQuickWord.words);
+	filename = filename or "config/Aries/Paracraft.Quickword.xml";
+	KpQuickWord.xmlRoot = KpQuickWord.xmlRoot or ParaXML.LuaXML_ParseFile(filename);
 	return KpQuickWord.xmlRoot;
 end
 
@@ -128,13 +117,13 @@ function KpQuickWord.RefreshQuickword()
 				subNode = node:AddChild(CommonCtrl.TreeNode:new{Text = node_category.attr.name, Name = "looped", Type = "Menuitem"});
 				local node_sentence;
 				for node_sentence in commonlib.XPath.eachNode(node_category, "/node") do
-					subNode:AddChild(CommonCtrl.TreeNode:new({Text = node_sentence.attr.sentence, Name = "xx", Type = "Menuitem", onclick = KpQuickWord.SendQuickword, }));
+					subNode:AddChild(CommonCtrl.TreeNode:new({Text = node_sentence.attr.sentence, Name = "xx", Type = "Menuitem", RawNode = node_sentence,  onclick = KpQuickWord.SendQuickword, }));
 				end
 			end	
 		end
 		local node_sentence;
 		for node_sentence in commonlib.XPath.eachNode(xmlRoot, "/quickwords/node") do
-			node:AddChild(CommonCtrl.TreeNode:new({Text = node_sentence.attr.sentence, Name = "xx", Type = "Menuitem", onclick = KpQuickWord.SendQuickword, }));
+			node:AddChild(CommonCtrl.TreeNode:new({Text = node_sentence.attr.sentence, Name = "xx", Type = "Menuitem", RawNode = node_sentence,  onclick = KpQuickWord.SendQuickword, }));
 		end
 	end
 end
@@ -142,7 +131,43 @@ end
 -- send quick word
 function KpQuickWord.SendQuickword(node)
     if(KpChatChannel.worldId)then
-        local txt = string.format("%s ID:%s",node.Text,tostring(KpChatChannel.worldId));
-	    ChatChannel.SendMessage( ChatChannel.EnumChannels.KpBroadCast, nil, nil, txt );
+        local channel;
+        if(node.RawNode and node.RawNode.attr and node.RawNode.attr.channel)then
+            channel = ChatChannel.EnumChannels[node.RawNode.attr.channel] or channel;
+        end
+        local txt;
+        if(channel == ChatChannel.EnumChannels.KpBroadCast)then
+
+            KpQuickWord.ShowPage(node.Text,function(id)
+                txt = string.format("%s ID:%s",node.Text,tostring(id));
+	            ChatChannel.SendMessage(channel, nil, nil, txt );
+            end)
+        else
+            txt = string.format("%s",node.Text);
+	        ChatChannel.SendMessage(ChatChannel.EnumChannels.KpNearBy, nil, nil, txt );
+        end
     end
+end
+function KpQuickWord.ShowPage(words,callback)
+    KpQuickWord.words = words;
+    KpQuickWord.project_id = nil;
+    KpQuickWord.callback = callback;
+    local params = {
+			url = "script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.html",
+			name = "KpQuickWord.ShowPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = true,
+			enable_esc_key = true,
+			zorder = -1,
+			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			directPosition = true,
+				align = "_ct",
+				x = -400/2,
+				y = -300/2,
+				width = 400,
+				height = 300,
+		};
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end

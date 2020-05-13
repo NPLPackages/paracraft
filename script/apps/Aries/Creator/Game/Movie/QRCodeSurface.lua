@@ -32,7 +32,6 @@ end
 
 function QRCodeSurface:ResetDrawProgress()
 	self.qrcode = VideoSharingUpload.qrcode;
-	self.backgroundPainted = false;
 	self.last_x, self.last_y = 0,0;
 	if(self:width() > 0) then
 		self.block_size = self:width() / #self.qrcode;
@@ -54,11 +53,8 @@ function QRCodeSurface:sizeEvent()
 end
 
 function QRCodeSurface:DrawBackground(painter)
-	if(not self.backgroundPainted) then
-		self.backgroundPainted = true;
-		painter:SetPen("#ffffffff");
-		painter:DrawRect(self:x(), self:y(), self:width(), self:height());
-	end
+	painter:SetPen("#ffffffff");
+	painter:DrawRect(self:x(), self:y(), self:width(), self:height());
 end
 
 function QRCodeSurface:DrawSome(painter)

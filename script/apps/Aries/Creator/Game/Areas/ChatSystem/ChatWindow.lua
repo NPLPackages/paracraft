@@ -977,7 +977,7 @@ end
 
 
 function ChatWindow.BadWordsFilter(msgdata)
-	if(msgdata and msgdata.words and not System.options.mc)then
+	if(msgdata and msgdata.words)then
 		msgdata.words = MyCompany.Aries.Chat.BadWordFilter.FilterString(msgdata.words);
 	end
 	return msgdata;

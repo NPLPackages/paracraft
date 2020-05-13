@@ -7,16 +7,22 @@ Use Lib:
 -------------------------------------------------------
 -- test after login keepwork
 local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+KpChatChannel.StaticInit();
+
+local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+local id = 618;
 KpChatChannel.Connect(nil,nil,function()
-    KpChatChannel.JoinWorld(1000);
+    KpChatChannel.JoinWorld(id);
 end);
-KpChatChannel.LeaveWorld(0);
 -------------------------------------------------------
 ]]
-local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
+local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
 local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/SocketIOClient.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local KpChatChannel = NPL.export();
 
 KpChatChannel.worldId = nil;
@@ -27,20 +33,36 @@ KpChatChannel.configs = {
     RELEASE = "http://socket-dev.kp-para.cn",
     LOCAL = "http://socket-dev.kp-para.cn"
 }
+function KpChatChannel.StaticInit()
+    if(LOG.level ~= "debug")then
+        return
+    end
+	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
+end
+
+function KpChatChannel.OnWorldLoaded()
+    local id = WorldCommon.GetWorldTag("kpProjectId");
+	LOG.std(nil, "info", "KpChatChannel", "OnWorldLoaded: %s",tostring(id));
+    if(id)then
+        id = tonumber(id);
+        -- connect chat channel
+        KpChatChannel.Connect(nil,nil,function()
+            KpChatChannel.JoinWorld(id);
+        end);
+    end
+end
+
 function KpChatChannel.GetUrl()
     local url;
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
+
     local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
-    local defaultEnv;
-    if(Config and Config.defaultEnv)then
-        defaultEnv = Config.defaultEnv;
-        url  = KpChatChannel.configs[defaultEnv];
-    else
-	    LOG.std(nil, "error", "KpChatChannel", "read Config.defaultEnv failed from WorldShare Config");
-    end
+    url  = KpChatChannel.configs[httpwrapper_version];
     if(not url)then
-	    LOG.std(nil, "error", "KpChatChannel", "read url failed by Config.defaultEnv: %s",defaultEnv);
+	    LOG.std(nil, "error", "KpChatChannel", "read url failed by httpwrapper_version: %s",httpwrapper_version);
     else
-	    LOG.std(nil, "info", "KpChatChannel", "read url %s by Config.defaultEnv: %s",url, defaultEnv);
+	    LOG.std(nil, "info", "KpChatChannel", "read url %s by httpwrapper_version: %s",url, httpwrapper_version);
     end
     return url;
 end
@@ -61,9 +83,7 @@ function KpChatChannel.GetRoom()
     end
 end
 function KpChatChannel.Connect(url,options,onopen_callback)
-    if(LOG.level ~= "debug")then
-        return
-    end
+    
     if(not KpChatChannel.GetToken())then
         return
     end
@@ -75,12 +95,11 @@ function KpChatChannel.Connect(url,options,onopen_callback)
         KpChatChannel.client:AddEventListener("OnClose",KpChatChannel.OnClose,KpChatChannel);
     end
     options = options or {};
+    KpChatChannel.onopen_callback = onopen_callback;
     if(KpChatChannel.client.state == "OPEN")then
         KpChatChannel.OnOpen();
         return
     end
-
-    KpChatChannel.onopen_callback = onopen_callback;
     KpChatChannel.client:Connect(url,nil,{ token = KpChatChannel.GetToken(), });
 end
 function KpChatChannel.OnOpen(self)
@@ -271,8 +290,12 @@ function KpChatChannel.SendToServer(msgdata)
     commonlib.echo(kp_msg);
 
     KpChatChannel.client:Send("app/msg",kp_msg);
-	--ChatChannel.AppendChat(msgdata);
 
+    local ChannelIndex =  msgdata.ChannelIndex;
+    if(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        KeepWorkItemManager.LoadItems(true);
+    end
    
 end
 
