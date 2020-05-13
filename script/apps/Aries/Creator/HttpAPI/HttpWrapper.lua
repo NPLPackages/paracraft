@@ -22,7 +22,7 @@ HttpWrapper.api_host = nil;
 function HttpWrapper.GetUrl(key)
     key = key or "keepworkServerList";
     local url;
-    local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+    local Config = NPL.load("./Config.lua")
     local defaultEnv;
     if(Config and Config.defaultEnv)then
         defaultEnv = Config.defaultEnv;
