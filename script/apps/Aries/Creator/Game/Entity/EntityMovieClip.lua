@@ -703,7 +703,7 @@ function Entity:GetNewItemsList()
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.TimeSeriesNPC,1);
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.TimeSeriesCamera,1);
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.TimeSeriesOverlay,1);
-	-- itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.TimeSeriesLight,1);
+	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.TimeSeriesLight,1);
 	return itemStackArray;
 end
 

@@ -115,11 +115,13 @@ function VideoSharingUpload.OnOK()
 		end)
 	end});
 	upload_timer:Change(100, nil);
+	page:CloseWindow();
 	VideoSharingUpload.ShowPage("?name=upload");
 end
 
 function VideoSharingUpload.UploadFailed()
-	commonlib.echo("failed");
+	page:CloseWindow();
+	VideoSharingUpload.ShowPage("?name=error");
 end
 
 function VideoSharingUpload.ShowQRCode(url)
@@ -135,5 +137,6 @@ function VideoSharingUpload.ShowQRCode(url)
 	VideoSharingUpload.QRCodeWnd = commonlib.gettable("MyCompany.Aries.Game.Movie.QRCodeWnd");
 	VideoSharingUpload.QRCodeWnd:Show();
 
+	page:CloseWindow();
 	VideoSharingUpload.ShowPage("?name=finish");
 end

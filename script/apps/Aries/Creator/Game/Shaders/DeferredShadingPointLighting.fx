@@ -2,6 +2,8 @@
 float ViewAspect;
 float TanHalfFOV;
 float2 screenParam;
+float2 viewportOffset;
+float2 viewportScale;
 
 float4x4 matWorld;
 float4x4 matView;
@@ -99,8 +101,8 @@ VSOut MainVS(VSInput input)
     // and https://docs.microsoft.com/en-us/windows/desktop/direct3d9/directly-mapping-texels-to-pixels
 
     float2 texCoord = (proj_pos.xy * float2(0.5, -0.5) + float2(0.5, 0.5) * proj_pos.w) / proj_pos.w + 0.5 / screenParam;
-    output.texCoord = texCoord;
-
+    // 纠正由于代码方块/电影方块面板打开，导致 viewport 缩小而 sample 不正确的问题
+    output.texCoord = texCoord * viewportScale;
 
     return output;
 }
@@ -181,6 +183,8 @@ PSOut MainPS(VSOut input)
         total_color = total_color + lighting(color, normal.xyz, position.xyz);
 
     output.color = float4(total_color, alpha);
+
+//    output.color = color;
 
     return output;
 }

@@ -189,6 +189,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	local old_value = self:GetValue(keyname, curTime);
 
 	if(keyname == "Range") then
+		old_value = old_value or self.entity:GetField(keyname)
 		local title = format(L"起始时间%s, 请输入光源范围", strTime);
 
 		-- TODO: use a dedicated UI 
@@ -204,7 +205,59 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end
 		end,old_value)
+	elseif(keyname == "Falloff") then
+		old_value = old_value or self.entity:GetField(keyname)
+		local title = format(L"起始时间%s, 请输入衰减值", strTime);
+
+		-- TODO: use a dedicated UI 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			result = tonumber(result);
+			if(result) then
+				self:AddKeyFrameByName(keyname, nil, result);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
+		end,old_value)
+	elseif(keyname == "Theta" or keyname == "Phi") then
+		old_value = old_value or self.entity:GetField(keyname)
+		local title = format(L"起始时间%s, 请输入%s角度", strTime, keyname);
+
+		-- TODO: use a dedicated UI 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			result = tonumber(result);
+			if(result) then
+				self:AddKeyFrameByName(keyname, nil, result);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
+		end,old_value)
+	elseif(keyname == "Attenuation0" or keyname == "Attenuation1" or keyname == "Attenuation2") then
+		old_value = old_value or self.entity:GetField(keyname)
+		local title = format(L"起始时间%s, 请输入 %s角度", strTime, keyname);
+
+		-- TODO: use a dedicated UI 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			result = tonumber(result);
+			if(result) then
+				self:AddKeyFrameByName(keyname, nil, result);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
+		end,old_value)
 	elseif(keyname == "LightType") then
+		old_value = old_value or self.entity:GetField(keyname)
 		local title = format(L"起始时间%s, 光源类型:", strTime);
 		local options = {
 			{value = 1, text= L"点光源"},
@@ -230,7 +283,8 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 
 	elseif(keyname == "Diffuse" or keyname == "Specular" or keyname == "Ambient") then
 		local title = format(L"起始时间%s, 请输入颜色RGB. 例如:#ffffff", strTime);
-		old_value = old_value or Color.RGBAfloat_TO_ColorStr(old_value[1],old_value[2],old_value[3])
+		old_value = old_value or self.entity:GetField(keyname)
+		old_value = old_value and Color.RGBAfloat_TO_ColorStr(old_value[1],old_value[2],old_value[3])
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
@@ -342,11 +396,57 @@ function Actor:FrameMovePlaying(deltaTime)
 			entity:SetPosition(new_x, new_y, new_z);
 		end
 	end
+	local LightType = self:GetValue("LightType", curTime)
+	if(LightType) then
+		entity:SetLightType(LightType);
+	end
+	local Diffuse = self:GetValue("Diffuse", curTime)
+	if(Diffuse) then
+		entity:SetDiffuse(Diffuse);
+	end
+	local Ambient = self:GetValue("Ambient", curTime)
+	if(Ambient) then
+		entity:SetAmbient(Ambient);
+	end
+	local Specular = self:GetValue("Specular", curTime)
+	if(Specular) then
+		entity:SetSpecular(Specular);
+	end
+
+	local Range = self:GetValue("Range", curTime)
+	if(Range) then
+		entity:SetRange(Range);
+	end
+	local Falloff = self:GetValue("Falloff", curTime)
+	if(Falloff) then
+		entity:SetFalloff(Falloff);
+	end
+
+	local Attenuation0 = self:GetValue("Attenuation0", curTime)
+	if(Attenuation0) then
+		entity:SetAttenuation0(Attenuation0);
+	end
+	local Attenuation1 = self:GetValue("Attenuation1", curTime)
+	if(Attenuation1) then
+		entity:SetAttenuation1(Attenuation1);
+	end
+	local Attenuation2 = self:GetValue("Attenuation2", curTime)
+	if(Attenuation2) then
+		entity:SetAttenuation2(Attenuation2);
+	end
+
+	local Theta = self:GetValue("Theta", curTime)
+	if(Theta) then
+		entity:SetTheta(Theta);
+	end
+	local Phi = self:GetValue("Phi", curTime)
+	if(Phi) then
+		entity:SetPhi(Phi);
+	end
 	
 	entity:SetFacing(yaw or 0);
 	entity:SetPitch(pitch or 0);
 	entity:SetRoll(roll or 0);
-	entity:SetOpacity(opacity or 1);
 end
 
 function Actor:ComputePosAndRotation(curTime)

@@ -23,8 +23,6 @@
                     <input type="button" value='<%=L"下载到手机" %>' align="center" style="height:30px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="VideoSharingUpload.OnOK" />
                 </div>
             </aries:window>
-            <pe:custom src="QRCodeSurface.lua" classns="Paracraft.Controls.QRCodeSurface" style="width:128px;height:128px;">
-            </pe:custom>
        </pe:if>
         <pe:if condition='<%=(name=="upload")%>'>
             <aries:window mode="thin" style="width:400px;" title='<%=L"下载到手机"%>' onclose="VideoSharingUpload.OnClose">
@@ -42,6 +40,16 @@
                 </div>
                 <div style="margin-top:0px;height:100px;width:400px;text-align:center;color:#ffffff;font-size:12px">
                     <%=L"请使用手机扫描二维码下载视频" %>
+                </div>
+            </aries:window>
+        </pe:if>
+        <pe:if condition='<%=(name=="error")%>'>
+            <aries:window mode="thin" style="width:400px;" title='<%=L"下载到手机"%>' onclose="VideoSharingUpload.OnClose">
+                <div style="margin-top:120px;height:100px;width:400px;text-align:center;color:#ffffff;font-size:13px">
+                    <%=L"文件上传失败，请稍后重试" %>
+                </div>
+                <div style="margin-top:10px;height:50px;width:400px;">
+                    <input type="button" value='<%=L"下载到手机" %>' align="center" style="height:30px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="VideoSharingUpload.OnOK" />
                 </div>
             </aries:window>
         </pe:if>

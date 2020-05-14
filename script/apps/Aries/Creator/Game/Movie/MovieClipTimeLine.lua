@@ -67,6 +67,15 @@ local var_name_to_text = {
 	code = L"代码",
 	static = L"静态属性",
 	cam_dist = L"到镜头的距离",
+	LightType = L"光源类型", 
+	Diffuse = L"漫反射颜色",
+	Specular = L"反射颜色",
+	Ambient = L"环境颜色",
+	Range = L"范围",
+	Falloff = L"衰减范围",
+	Attenuation0 = L"衰减参数0",
+	Attenuation1 = L"衰减参数1",
+	Attenuation2 = L"衰减参数2",
 }
 local var_longname_to_text = {
 	anim = L"动作 (1键)",

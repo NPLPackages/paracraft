@@ -1,43 +1,37 @@
 --[[
 Title: EntityLightChar
 Author(s): LiXizhi
-Date: 2016/9/21
-Desc: 
+Date: 2020/5/14
+Desc: This is a movable entity that can move around the scene. Used by movie block ActorLight.
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLightChar.lua");
 local EntityLightChar = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLightChar")
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLightChar"));
 
 -- light properties
-Entity:Property({"LightType", 1});
+Entity:Property({"LightType", 1, auto=true});
 
-Entity:Property({"Diffuse", {0, 0, 0}});
-Entity:Property({"Specular", {0, 0, 0}});
-Entity:Property({"Ambient", {0, 0, 0}});
+Entity:Property({"Diffuse", {1, 0, 1}, auto=true});
+Entity:Property({"Specular", {1, 0, 0}, auto=true});
+Entity:Property({"Ambient", {1, 0, 0}, auto=true});
 
-Entity:Property({"Position", {0, 0, 0}});
-Entity:Property({"Direction", {0, 0, 0}});
+Entity:Property({"Direction", {0, 0, 0}, auto=true});
 
-Entity:Property({"Yaw", 0});
-Entity:Property({"Pitch", 0});
-Entity:Property({"Roll", 0});
+Entity:Property({"Range", 3, auto=true});
+Entity:Property({"Falloff", 1, auto=true});
 
-Entity:Property({"Range", 1});
-Entity:Property({"Falloff", 0});
+Entity:Property({"Attenuation0", 0.3, auto=true});
+Entity:Property({"Attenuation1", 0.1, auto=true});
+Entity:Property({"Attenuation2", 1, auto=true});
 
-Entity:Property({"Attenuation0", 1});
-Entity:Property({"Attenuation1", 1});
-Entity:Property({"Attenuation2", 1});
-
-Entity:Property({"Theta", 0});
-Entity:Property({"Phi", 0});
+Entity:Property({"Theta", 0.8, auto=true});
+Entity:Property({"Phi", 1, auto=true});
 
 -- class name
 Entity.class_name = "EntityLightChar";
@@ -57,141 +51,155 @@ function Entity:init()
 	return self;
 end
 
+function Entity:SetLightType(value)
+	if(self.LightType == value) then
+		return
+	end
+	self.LightType = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("LightType", self.LightType);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetDiffuse(value)
+	if(commonlib.partialcompare(self.Diffuse, value, 0.01)) then
+		return
+	end
+	self.Diffuse[1] = value[1]
+	self.Diffuse[2] = value[2]
+	self.Diffuse[3] = value[3]
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Diffuse", self.Diffuse);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetSpecular(value)
+	if(commonlib.partialcompare(self.Specular, value, 0.01)) then
+		return
+	end
+	self.Specular[1] = value[1]
+	self.Specular[2] = value[2]
+	self.Specular[3] = value[3]
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Specular", self.Specular);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetAmbient(value)
+	if(commonlib.partialcompare(self.Ambient, value, 0.01)) then
+		return
+	end
+	self.Ambient[1] = value[1]
+	self.Ambient[2] = value[2]
+	self.Ambient[3] = value[3]
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Ambient", self.Ambient);
+	end
+	self:valueChanged();
+end
+
 function Entity:isPointLight()
-	local t = self:GetField("LightType");
-	return t == 1;
+	return self:GetLightType() == 1;
 end
 
 function Entity:isSpotLight()
-	local t = self:GetField("LightType");
-	return t == 2;
+	return self:GetLightType() == 2;
 end
 
 function Entity:isDirectionalLight()
-	local t = self:GetField("LightType");
-	return t == 3;
+	return self:GetLightType() == 3;
 end
 
-function Entity:Clamp(v, min, max)
-	if v < min then
-		return min;
-	end
-	if v > max then
-		return max;
-	end
-	return v;
-end
-
-function Entity:GetField(field, default_value)
-	-- properties belong to the C++ world's light object
-	default_value = 0;
-	if(field == "position") then
-		return Entity._super.GetField(self, field, default_value)
-	end
-
-	if field == "Position" or
-	   field == "Direction" or
-	   field == "Diffuse" or
-	   field == "Specular" or
-	   field == "Ambient" then
-		default_value = {0, 0, 0};
-	end
-
-	local lightObject = self:GetInnerObject();
-	local value = lightObject and lightObject:GetField(field, default_value) or default_value;
-
-	-- radian to degree
-	if field == "Yaw"   or 
-	   field == "Pitch" or 
-	   field == "Roll"  or 
-	   field == "Theta" or 
-	   field == "Phi"   then
-		value = value * 180 / 3.14;
-	end
-
-	-- color from float(0.f - 1.f) to int(0 - 255) 
-	if field == "Diffuse" or
-	   field == "Specular" or
-	   field == "Ambient" then
-		value = {
-				self:Clamp(value[1] * 255, 0, 255),
-				self:Clamp(value[2] * 255, 0, 255),
-				self:Clamp(value[3] * 255, 0, 255),
-				}
-	end
-
-	return value;
-end
-
-function Entity:SetField(field, value)
-	if(field == "position") then
-		return Entity._super.SetField(self, field, value)
-	end
-
-	local oldValue = self:GetField(field);
-
-	-- ATTENTION: skip approximate values, because the multiple manips update values to plugs asynchronously
-	if(type(oldValue) == "table") then
-		if(commonlib.partialcompare(oldValue, value, 0.01)) then
-			return;
-		end
-	elseif(type(oldValue) == "number") then
-		if(math.abs(oldValue - value) < 0.01) then
-			return;
-		end
-	end
-	
-	-- handle properties of C++ world's light object
-	local lightObject = self:GetInnerObject();
-	if(not lightObject) then
+function Entity:SetRange(value)
+	if(commonlib.partialcompare(self.Range, value, 0.01)) then
 		return
 	end
-	if field == "Phi" then
-		if value < 0 or value > 179 then
-			return;
-		end
-
-		local theta = self:GetField("Theta");
-		if value < theta then
-			lightObject:SetField("Theta", value * 3.14 / 180);
-		end
+	self.Range = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Range", self.Range);
 	end
-	if field == "Theta" then
-		if value < 0 or value > 179 then
-			return;
-		end
-
-		local phi = self:GetField("Phi");
-		if value > phi then
-			lightObject:SetField("Phi", value * 3.14 / 180);
-		end
-	end
-
-	-- degree to radian
-	if field == "Yaw"   or 
-	   field == "Pitch" or 
-	   field == "Roll" or 
-	   field == "Theta" or 
-	   field == "Phi"  then
-		value = value * 3.14 / 180;
-	end
-
-	-- color from int(0 - 255) to float(0.f - 1.f)
-	if field == "Diffuse" or
-	   field == "Specular" or
-	   field == "Ambient" then
-		value = {
-				self:Clamp(value[1] / 255, 0, 1),
-				self:Clamp(value[2] / 255, 0, 1),
-				self:Clamp(value[3] / 255, 0, 1),
-				}
-	end
-
-	local result = lightObject:SetField(field, value);
-
 	self:valueChanged();
+end
 
-	return result;
+function Entity:SetFalloff(value)
+	if(commonlib.partialcompare(self.Falloff, value, 0.01)) then
+		return
+	end
+	self.Falloff = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Falloff", self.Falloff);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetAttenuation0(value)
+	if(commonlib.partialcompare(self.Attenuation0, value, 0.01)) then
+		return
+	end
+	self.Attenuation0 = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Attenuation0", self.Attenuation0);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetAttenuation1(value)
+	if(commonlib.partialcompare(self.SetAttenuation1, value, 0.01)) then
+		return
+	end
+	self.SetAttenuation1 = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("SetAttenuation1", self.SetAttenuation1);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetAttenuation2(value)
+	if(commonlib.partialcompare(self.SetAttenuation2, value, 0.01)) then
+		return
+	end
+	self.SetAttenuation2 = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("SetAttenuation2", self.SetAttenuation2);
+	end
+	self:valueChanged();
+end
+
+
+function Entity:SetTheta(value)
+	if(commonlib.partialcompare(self.Theta, value, 0.01)) then
+		return
+	end
+	self.Theta = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Theta", self.Theta);
+	end
+	self:valueChanged();
+end
+
+function Entity:SetPhi(value)
+	if(commonlib.partialcompare(self.Phi, value, 0.01)) then
+		return
+	end
+	self.Phi = value
+	local lightObject = self:GetInnerObject();
+	if(lightObject) then
+		lightObject:SetField("Phi", self.Phi);
+	end
+	self:valueChanged();
 end
 
 function Entity:CreateInnerObject()
@@ -203,6 +211,21 @@ function Entity:CreateInnerObject()
 	lightObject:SetField("RenderDistance", 100);
 	lightObject:SetField("IsDeferredLightOnly", true);
 
+	-- update values from C++ object
+	self.Diffuse = lightObject:GetField("Specular", self.Diffuse);
+	self.Specular = lightObject:GetField("Specular", self.Specular);
+	self.Ambient = lightObject:GetField("Ambient", self.Ambient);
+
+	self.Range = lightObject:GetField("Range", self.Range);
+	self.Falloff = lightObject:GetField("Falloff", self.Range);
+
+	self.Attenuation0 = lightObject:GetField("Attenuation0", self.Attenuation0);
+	self.Attenuation1 = lightObject:GetField("Attenuation1", self.Attenuation1);
+	self.Attenuation2 = lightObject:GetField("Attenuation2", self.Attenuation2);
+
+	self.Theta = lightObject:GetField("Theta", self.Theta);
+	self.Phi = lightObject:GetField("Phi", self.Phi);
+	
 	self:SetInnerObject(lightObject);
 	ParaScene.Attach(lightObject);
 

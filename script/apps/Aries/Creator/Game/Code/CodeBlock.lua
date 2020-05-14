@@ -478,6 +478,10 @@ function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
 				elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
 					actor = CodeUIActor:new():Init(itemStack, movie_entity);
 					break;
+				elseif (itemStack.id == block_types.names.TimeSeriesLight) then
+					-- TODO: 
+					-- actor = CodeLightActor:new():Init(itemStack, movie_entity);
+					break;
 				end
 			end 
 		end

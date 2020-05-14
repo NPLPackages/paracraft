@@ -3,6 +3,8 @@
 float ViewAspect;
 float TanHalfFOV;
 float2 screenParam;
+float2 viewportOffset;
+float2 viewportScale;
 
 float4x4 matWorld;
 float4x4 matView;
