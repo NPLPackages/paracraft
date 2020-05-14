@@ -1630,9 +1630,7 @@ function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
 	if(System.User.isVip) then
 		return true;
 	elseif(bOpenUIIfNot) then
-		_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能", function()
-			GameLogic.GetFilters():apply_filters("VipNotice");
-		end)
+		GameLogic.GetFilters():apply_filters("VipNotice");
 	end
 end
 
