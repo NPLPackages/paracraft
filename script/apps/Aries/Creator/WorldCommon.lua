@@ -289,37 +289,43 @@ function WorldCommon.SaveWorldAs()
 end
 
 function WorldCommon.SaveWorldAsImp(folderName)
-	if(not GameLogic.IsVip(nil, true)) then
+	local function Handle()
+		if(WorldCommon.CopyWorldTo(folderName)) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
+			local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
+			local save_world_handler = SaveWorldHandler:new():Init(folderName);
+			local xmlRoot = save_world_handler:LoadWorldXmlNode();
+			if(xmlRoot) then
+				for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
+					-- change world name in tag. 
+					local worldname = folderName:match("([^/]+)/?$")
+					local name = commonlib.Encoding.DefaultToUtf8(worldname);
+					node.attr.name = name;
+					-- change Tag.xml to merge the original authors
+					if(node.attr.kpProjectId) then
+						node.attr.fromProjects =  node.attr.fromProjects and (node.attr.fromProjects..","..node.attr.kpProjectId)  or node.attr.kpProjectId;
+						node.attr.kpProjectId = nil;
+					end
+					save_world_handler:SaveWorldXmlNode(xmlRoot);
+					break;
+				end
+			end
+	
+			
+			_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+					WorldCommon.OpenWorld(folderName, true)
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		end
+	end
+
+
+	if(not GameLogic.IsVip(nil, true, Handle)) then
 		return
 	end
-	if(WorldCommon.CopyWorldTo(folderName)) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
-		local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
-		local save_world_handler = SaveWorldHandler:new():Init(folderName);
-		local xmlRoot = save_world_handler:LoadWorldXmlNode();
-		if(xmlRoot) then
-			for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
-				-- change world name in tag. 
-				local worldname = folderName:match("([^/]+)/?$")
-				local name = commonlib.Encoding.DefaultToUtf8(worldname);
-				node.attr.name = name;
-				-- change Tag.xml to merge the original authors
-				if(node.attr.kpProjectId) then
-					node.attr.fromProjects =  node.attr.fromProjects and (node.attr.fromProjects..","..node.attr.kpProjectId)  or node.attr.kpProjectId;
-					node.attr.kpProjectId = nil;
-				end
-				save_world_handler:SaveWorldXmlNode(xmlRoot);
-				break;
-			end
-		end
 
-		
-		_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
-			if(res and res == _guihelper.DialogResult.Yes) then
-				WorldCommon.OpenWorld(folderName, true)
-			end
-		end, _guihelper.MessageBoxButtons.YesNo);
-	end
+	Handle();
 end
 
 -- @return true if succeed
