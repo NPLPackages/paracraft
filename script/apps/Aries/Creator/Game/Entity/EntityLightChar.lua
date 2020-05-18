@@ -11,6 +11,7 @@ local EntityLightChar = commonlib.gettable("MyCompany.Aries.Game.EntityManager.E
 ]]
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Color = commonlib.gettable("System.Core.Color");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLightChar"));
 
@@ -104,6 +105,25 @@ function Entity:SetAmbient(value)
 	end
 	self:valueChanged();
 end
+
+-- @param color: 0xff0000 or "#ff00ff"
+function Entity:SetColor(color)
+	local r, g, b = Color.ColorStr_TO_RGBAfloat(tostring(color));
+	if(r and g and b) then
+		local value = {r,g,b}
+		self:SetDiffuse(value)
+		self:SetSpecular(value)
+		self:SetAmbient(value)
+	end
+end
+
+function Entity:GetColor()
+	local value = self:GetSpecular()
+	if(value) then
+		return Color.RGBAfloat_TO_ColorStr(value[1],value[2],value[3])
+	end
+end
+
 
 function Entity:isPointLight()
 	return self:GetLightType() == 1;

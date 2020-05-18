@@ -28,6 +28,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorLight"));
 
 Actor.class_name = "ActorLight";
+Actor:Property({"enablePicking", true, "IsPickingEnabled", "EnablePicking", auto=true})
 
 -- keyframes that can be edited from UI keyframe. 
 local selectable_var_list = {
@@ -127,6 +128,7 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("Ambient", "LinearTable");
 	
 	timeseries:CreateVariableIfNotExist("Range", "Linear");
+	timeseries:CreateVariableIfNotExist("Falloff", "Linear");
 	timeseries:CreateVariableIfNotExist("Attenuation0", "Linear");
 	timeseries:CreateVariableIfNotExist("Attenuation1", "Linear");
 	timeseries:CreateVariableIfNotExist("Attenuation2", "Linear");

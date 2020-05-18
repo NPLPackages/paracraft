@@ -59,3 +59,18 @@ function(self, err, msg, data)
     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.get", callbackFunc); 
 end
 )
+
+--http://yapi.kp-para.cn/project/109/interface/api/1392
+-- post
+HttpWrapper.Create("keepwork.items.exchange", "%MAIN%/gosys/v0/exchange", "POST", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+    -- no cache
+    inputParams.cache_policy = "access plus 0"
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.items.exchange")
+end,
+-- Post Processor
+function(self, err, msg, data)
+    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.exchange", callbackFunc); 
+end
+)

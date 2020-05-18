@@ -277,6 +277,14 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         local bIncludeColor = false;
         SceneHelper.saveSceneToStl(filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- binary
         NplCad.ShowMessageBox(filename)
+    elseif(type == "iges")then
+        filename = filename .. ".iges";
+        SceneHelper.saveSceneToIGES(filename,scene,false);
+        NplCad.ShowMessageBox(filename)
+    elseif(type == "step")then
+        filename = filename .. ".step";
+        SceneHelper.saveSceneToStep(filename,scene,false);
+        NplCad.ShowMessageBox(filename)
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
         SceneHelper.saveSceneToGltf(filename,scene,false, liner, angular);
@@ -288,7 +296,7 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         local bBinary = false;
         local bEncodeBase64 = false
         local bIncludeColor = true;
-        SceneHelper.saveSceneToStl(input_filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor); -- text 
+        SceneHelper.saveSceneToStl(input_filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- text 
         NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.lua");
         local NplCadExportToBMaxPage = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Tools.NplCadExportToBMaxPage");
         NplCadExportToBMaxPage.ShowPage(input_filename,output_filename,function(result)

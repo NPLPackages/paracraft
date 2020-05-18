@@ -24,12 +24,14 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCompiler.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeEvent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeLightActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
 local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
+local CodeLightActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeLightActor");
 local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
@@ -479,8 +481,7 @@ function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
 					actor = CodeUIActor:new():Init(itemStack, movie_entity);
 					break;
 				elseif (itemStack.id == block_types.names.TimeSeriesLight) then
-					-- TODO: 
-					-- actor = CodeLightActor:new():Init(itemStack, movie_entity);
+					actor = CodeLightActor:new():Init(itemStack, movie_entity);
 					break;
 				end
 			end 

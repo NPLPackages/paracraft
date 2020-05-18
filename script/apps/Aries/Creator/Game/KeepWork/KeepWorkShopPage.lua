@@ -11,7 +11,7 @@ KeepWorkShopPage.Show()
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KeepWorkShopPage = NPL.export();
 
-KeepWorkShopPage.category_index = 1;
+KeepWorkShopPage.category_index = 2;
 KeepWorkShopPage.Current_Item_DS = {};
 
 KeepWorkShopPage.category = {

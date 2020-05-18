@@ -39,7 +39,7 @@ end
 NPL.load("(gl)script/kids/ParaWorldCore.lua"); -- ParaWorld platform includes
 NPL.load("(gl)script/ide/app_ipc.lua");
 -- load paracraft packages if any
-if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "") then
+if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "" and ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "")=="") then
 	NPL.load("npl_packages/paracraft/");
 end
 

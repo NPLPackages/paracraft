@@ -114,6 +114,8 @@ function NplBrowserPage.Open(name, url, title, withControl, alignment, x, y, wid
                 NplBrowserPage:new():Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
             else
                 npl_browser_page:Close()
+                npl_browser_page.url = url;
+                npl_browser_page.title = title;
                 local params = npl_browser_page.params;
                 System.App.Commands.Call("File.MCMLWindowFrame", params);	
                 npl_browser_page:SetVisible(true);

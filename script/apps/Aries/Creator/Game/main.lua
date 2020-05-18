@@ -14,7 +14,7 @@ Game.Start();
 -------------------------------------------------------
 ]]
 -- load paracraft packages if any
-if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "") then
+if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "" and ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "")=="") then
 	NPL.load("npl_packages/paracraft/");
 end
 NPL.load("(gl)script/ide/System/System.lua");
