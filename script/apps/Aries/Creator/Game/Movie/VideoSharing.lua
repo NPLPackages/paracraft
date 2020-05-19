@@ -60,14 +60,17 @@ function VideoSharing.InstallPlugin(callbackFunc)
 end
 
 function VideoSharing.ToggleRecording(time)
-	VideoSharingSettings.total_time = time;
-	if(not ParaMovie.IsRecording()) then
-		VideoSharing.BeginCapture();
+	if (ParaMovie.IsRecording()) then
+		VideoSharing.EndCapture(false);
+		ParaIO.DeleteFile(commonlib.Encoding.Utf8ToDefault(VideoSharing.GetOutputFile()));
 	end
+	VideoSharingSettings.total_time = time;
+	VideoSharing.BeginCapture();
 end
 
 function VideoSharing.GetOutputFile()
-	return VideoSharingSettings.GetOutputFilepath();
+	VideoSharing.output = VideoSharing.output or (VideoSharingSettings.GetOutputFilepath());
+	return VideoSharing.output;
 end
 
 -- @return true if plugin is enabled, false if installed but can not be enabled, nil if not installed
@@ -84,6 +87,7 @@ end
 -- @param callbackFunc: called when started. function(bSucceed) end
 function VideoSharing.BeginCapture(callbackFunc)
 	function startCapture()
+		VideoSharing.output = nil;
 		AudioEngine.SetGarbageCollectThreshold(99999);
 		VideoSharing.AdjustWindowResolution(function()
 			local start_after_seconds = VideoSharingSettings.start_after_seconds or 0;
@@ -109,7 +113,7 @@ function VideoSharing.BeginCapture(callbackFunc)
 					attr:SetField("MarginTop", margin);
 					attr:SetField("MarginRight", margin);
 					attr:SetField("MarginBottom", margin);
-					ParaMovie.BeginCapture(VideoSharingSettings.GetOutputFilepath())
+					ParaMovie.BeginCapture(VideoSharing.GetOutputFile())
 					VideoSharing.ShowRecordingArea(true);
 					if(callbackFunc) then
 						callbackFunc(true);
@@ -212,14 +216,16 @@ function VideoSharing.RestoreWindowResolution()
 	end
 end
 
-function VideoSharing.EndCapture()
+function VideoSharing.EndCapture(showUpload)
 	AudioEngine.SetGarbageCollectThreshold(10);
 	ParaMovie.EndCapture();
 	VideoSharing.ShowRecordingArea(false);
 	GameLogic.options:SetClickToContinue(true);
 	VideoSharing.RestoreWindowResolution();
 
-	VideoSharingUpload.ShowPage();
+	if (showUpload) then
+		VideoSharingUpload.ShowPage();
+	end
 end
 
 function VideoSharing.ShowRecordingArea(bShow)
@@ -359,7 +365,7 @@ function VideoSharing.ShowRecordingArea(bShow)
 					VideoSharing.tail_timer:Change(0, 100);
 				end
 				if (elapsed_time >= (VideoSharingSettings.total_time) * 1000) then
-					VideoSharing.EndCapture();
+					VideoSharing.EndCapture(true);
 				end
 			end})
 			VideoSharing.title_timer:Change(1000,500);

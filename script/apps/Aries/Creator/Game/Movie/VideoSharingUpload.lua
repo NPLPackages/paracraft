@@ -39,7 +39,7 @@ function VideoSharingUpload.ShowPage(condition)
 		DestroyOnClose = true,
 		bToggleShowHide=false, 
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
+		allowDrag = false,
 		click_through = false, 
 		bShow = true,
 		isTopLevel = true,
@@ -67,14 +67,14 @@ function VideoSharingUpload.OnOK()
 		return;
 	end
 	local upload_timer = commonlib.Timer:new({callbackFunc = function(timer)
-		keepwork.shareToken.get({cache_policy = "access plus 0"},function(err, msg, data)
+		keepwork.shareToken.get({cache_policy = "access plus 12 hour"},function(err, msg, data)
 			if (err ~= 200 or (not data.token) or (not data.key)) then
 				VideoSharingUpload.UploadFailed();
 				return;
 			end
 
 			local file_path = VideoSharing.GetOutputFile();
-			local file = ParaIO.open(file_path, "rb");
+			local file = ParaIO.open(commonlib.Encoding.Utf8ToDefault(file_path), "rb");
 			if (not file:IsValid()) then
 				file:close();
 				VideoSharingUpload.UploadFailed();
@@ -88,7 +88,7 @@ function VideoSharingUpload.OnOK()
 				return;
 			end
 
-			local file_name = data.key.."-"..ParaIO.GetFileName(file_path);
+			local file_name = ParaIO.GetFileName(file_path);
 			QiniuRootApi:Upload(
 				data.token,
 				data.key,
@@ -100,7 +100,7 @@ function VideoSharingUpload.OnOK()
 						return;
 					end
 
-					keepwork.shareUrl.get({key = data.key}, function(err, msg, data)
+					keepwork.shareUrl.get({cache_policy = "access plus 0", key = data.key}, function(err, msg, data)
 						if (err ~= 200 or (not data.data)) then
 							VideoSharingUpload.UploadFailed();
 							return;

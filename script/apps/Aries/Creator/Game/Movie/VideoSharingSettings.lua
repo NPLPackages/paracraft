@@ -91,7 +91,8 @@ function VideoSharingSettings.GetStereoMode()
 end
 
 function VideoSharingSettings.GetOutputFilepath()
-	return format("%s%s.%s", settings.folder, VideoSharingSettings.GetOutputFilename(), VideoSharingSettings.GetCodecExtension());
+	local date, hour = commonlib.timehelp.GetLocalTime();
+	return format("%s%s_短视频_%s-%s.%s", settings.folder, VideoSharingSettings.GetOutputFilename(), date, hour, VideoSharingSettings.GetCodecExtension());
 end
 
 function VideoSharingSettings.GetOutputFilename()

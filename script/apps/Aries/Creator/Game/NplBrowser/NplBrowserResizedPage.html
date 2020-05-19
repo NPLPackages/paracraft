@@ -1,0 +1,40 @@
+<!-- "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<pe:mcml>
+    <script type="text/npl" refresh="false">
+        <![CDATA[
+        NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
+        function OnClose()
+            NplBrowserResizedPage:Close();
+        end
+        function GetTitle()
+            return NplBrowserResizedPage:GetTitle();
+        end
+        function GetUrl()
+            return NplBrowserResizedPage:GetUrl();
+        end
+        function IsShowControl()
+            return NplBrowserResizedPage:IsShowControl();
+        end
+        function CanClose()
+            return NplBrowserResizedPage:CanClose();
+        end
+        ]]>
+    </script>
+    <div width="100%" height="100%" style="background-color:#000000;">
+        <div style="height:30px;">
+            <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=GetTitle()%></div>
+            <pe:if condition='<%= CanClose() %>'>
+                <input type="button" value="X" align="right" style="width:50px;height:30px;" onclick="OnClose()" class="mc_light_grey_button_with_fillet" />
+            </pe:if>
+        </div>
+        <pe:container width="100%" height="100%">
+            <pe:nplbrowser name='<%= NplBrowserResizedPage.browser_name %>' withControl="<%=IsShowControl()%>" enabledResize="true"  url="<%=GetUrl()%>" />
+        </pe:container>
+    </div>
+</html>
+

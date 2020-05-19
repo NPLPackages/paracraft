@@ -23,3 +23,14 @@ end,
 function(self, err, msg, data)
      return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.user.login.post", callbackFunc); 
 end)
+
+--http://yapi.kp-para.cn/project/32/interface/api/492
+HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.user.profile.get")
+end,
+-- Post Processor
+function(self, err, msg, data)
+     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.user.profile.get", callbackFunc); 
+end)

@@ -1,0 +1,80 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomHomePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ParacraftLearningRoomHomePage.lua"><![CDATA[
+ParacraftLearningRoomHomePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomHomePage.lua");
+ParacraftLearningRoomHomePage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #ParacraftLearningRoomHomePage.Current_Item_DS;
+    else
+        return ParacraftLearningRoomHomePage.Current_Item_DS[index];
+    end
+end
+function IsOpened(index)
+    if(index == 1)then
+        return true;
+    end
+end
+function OnStart(name)
+end
+]]></script>
+    <aries:window mode="thin" title='<%= L"Paracraft 课堂"%>' onclose="ClosePage">
+    <div style="width:800px;height:500px;">
+        <div style="height:180px;">
+            <div style="margin-top:20px;color:#ffffff;text-align:center;">VIP可终身学习Paracraft</div>
+        </div>
+        <div style="margin-top:10px;">
+            <pe:gridview style="margin:0px" name="item_gridview" CellPadding="3" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <pe:if condition='<%= IsOpened(Eval("index")) %>'>
+                            <div>
+                                <div style="width:128px;height:128px;color:#ffffff;" class="mc_blue_button_with_fillet"  >
+                                    <div style="margin-top:10px;text-align:center;">
+                                        <%= Eval("title")%>
+                                    </div>
+                                    <div style="margin-top:30px;text-align:center;">
+                                        <%= Eval("desc")%>
+                                    </div>
+                                </div>
+                                <div style="margin-left:24px;margin-top:5px;">
+                                    <input type="button" style="width:80px;height:30px;color:#ffffff;" class="mc_light_grey_button_with_fillet"  value='<%= L"免费开始"%>' name="free" onclick="OnStart"/>
+                                </div>
+                                <div style="margin-left:24px;margin-top:5px;">
+                                    <input type="button" style="width:80px;height:30px;color:#ffffff;" class="mc_yellow_button_with_fillet"  value='<%= L"Vip开始"%>' name="vip" onclick="OnStartk"/>
+                                </div>
+                            </div>
+                            
+                    </pe:if>
+                    <pe:if condition='<%= not IsOpened(Eval("index")) %>'>
+                            <div style="width:128px;height:128px;color:#ffffff;" class="mc_light_grey_button_with_fillet"  >
+                                <div style="margin-top:10px;text-align:center;">
+                                        <%= Eval("title")%>
+                                    </div>
+                                    <div style="margin-top:30px;text-align:center;">
+                                        <%= Eval("desc")%>
+                                    </div>
+                            </div>
+                    </pe:if>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -5,6 +5,8 @@ Date: 2020/5/6
 Desc:  
 Use Lib:
 -------------------------------------------------------
+using  KeepWorkItemManager.IsEnabled() to debug kp chat:
+
 -- test after login keepwork
 local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 KpChatChannel.StaticInit();
@@ -16,6 +18,7 @@ KpChatChannel.Connect(nil,nil,function()
 end);
 -------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
@@ -23,6 +26,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
 local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/SocketIOClient.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KpChatChannel = NPL.export();
 
 KpChatChannel.worldId = nil;
@@ -34,7 +38,7 @@ KpChatChannel.configs = {
     LOCAL = "http://socket-dev.kp-para.cn"
 }
 function KpChatChannel.StaticInit()
-    if(LOG.level ~= "debug")then
+    if(not KeepWorkItemManager.IsEnabled())then
         return
     end
 	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
@@ -72,10 +76,6 @@ function KpChatChannel.GetUserId()
         return userId;
     end
 end
-function KpChatChannel.GetToken()
-    local User = commonlib.gettable('System.User');
-    return System.User.keepworktoken;
-end
 function KpChatChannel.GetRoom()
     if(KpChatChannel.worldId)then
         local room = string.format("__world_%s__",tostring(KpChatChannel.worldId));
@@ -84,7 +84,7 @@ function KpChatChannel.GetRoom()
 end
 function KpChatChannel.Connect(url,options,onopen_callback)
     
-    if(not KpChatChannel.GetToken())then
+    if(not KeepWorkItemManager.GetToken())then
         return
     end
     url  = url or KpChatChannel.GetUrl();
@@ -100,7 +100,7 @@ function KpChatChannel.Connect(url,options,onopen_callback)
         KpChatChannel.OnOpen();
         return
     end
-    KpChatChannel.client:Connect(url,nil,{ token = KpChatChannel.GetToken(), });
+    KpChatChannel.client:Connect(url,nil,{ token = KeepWorkItemManager.GetToken(), });
 end
 function KpChatChannel.OnOpen(self)
     commonlib.echo("=============OnOpen");
@@ -293,7 +293,6 @@ function KpChatChannel.SendToServer(msgdata)
 
     local ChannelIndex =  msgdata.ChannelIndex;
     if(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
-        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
         KeepWorkItemManager.LoadItems(true);
     end
    
