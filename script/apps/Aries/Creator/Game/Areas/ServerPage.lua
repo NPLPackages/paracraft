@@ -214,7 +214,12 @@ function ServerPage.CreateServer(host,port)
 	end
 
 	page:Refresh(1);
-	GameLogic.RunCommand("/menu online.teacher_panel");
+
+	GameLogic.IsVip("OnlineTeaching", false, function(result)
+		if result then
+			GameLogic.RunCommand("/menu online.teacher_panel");
+		end
+	end);
 end
 
 function ServerPage.GetServerUrl()

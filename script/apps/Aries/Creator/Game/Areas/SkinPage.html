@@ -46,8 +46,10 @@ function ClosePage()
 end
 
 function OnOK()
-    SkinPage.OnOK();
-    ClosePage();
+    GameLogic.IsVip("SkinOfAllProtagonists", true, function()
+        SkinPage.OnOK();
+        ClosePage();
+    end)
 end
 ]]></script>
 <aries:window mode="thin" style="width:500px;height:400px;" title='<%=L"角色外貌"%>' onclose="ClosePage">

@@ -1630,11 +1630,28 @@ end
 -- @param callbackFunc: only called if user is vip and bOpenUIIfNot is true
 -- return true if the user is vip
 function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
-	if(System.User.isVip) then
-		return true;
-	elseif(bOpenUIIfNot) then
-		if not GameLogic.GetFilters():apply_filters("VipNotice", false, callbackFunc) then
-			_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
+	local bEnabled = 
+		GameLogic.GetFilters():apply_filters(
+			"KeepworkPermission",
+			false,
+			bOpenUIIfNot,
+			level,
+			function(bExecuted)
+				if bExecuted == true then
+					if type(callbackFunc) == "function" then
+						callbackFunc();
+					end
+				end
+			end
+		);
+
+	if not bEnabled then
+		if(System.User.isVip) then
+			return true;
+		elseif(bOpenUIIfNot) then
+			if not GameLogic.GetFilters():apply_filters("VipNotice", false, callbackFunc) then
+				_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
+			end
 		end
 	end
 end

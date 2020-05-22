@@ -320,8 +320,7 @@ function WorldCommon.SaveWorldAsImp(folderName)
 		end
 	end
 
-
-	if(not GameLogic.IsVip(nil, true, Handle)) then
+	if(not GameLogic.IsVip("WorldDataSaveAs", true, Handle)) then
 		return
 	end
 
