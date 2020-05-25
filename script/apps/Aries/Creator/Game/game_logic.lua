@@ -1616,6 +1616,19 @@ function GameLogic.SignIn(title, callbackFunc)
 	end
 end
 
+function GameLogic.CheckSignedIn(desc, callback)
+	GameLogic.GetFilters():apply_filters(
+		"LoginModal.CheckSignedIn",
+		false,
+		desc,
+		function(result)
+			if (type(callback) == "function") then
+				callback(result);
+			end
+		end
+	);
+end
+
 -- global custom user or game event
 function GameLogic:event(event)
 	local homeEntity = GameLogic.GetHomeEntity();

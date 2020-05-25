@@ -25,28 +25,34 @@ function TeacherPanel.OnInit()
 end
 
 function TeacherPanel.ShowPage(bShow)
-	if(not GameLogic.IsServerWorld()) then
-		return
-	end
-	local params = {
-			url = "script/apps/Aries/Creator/Game/Network/Admin/TeacherPanel.html", 
-			name = "TeacherPanel.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			bToggleShowHide=true, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			bShow = bShow,
-			click_through = false, 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			directPosition = true,
-				align = "_ctt",
-				x = 0,
-				y = 5,
-				width = 300,
-				height = 78,
-		};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	GameLogic.IsVip("OnlineTeaching", true, function(result)
+		echo(result, true)
+		if (result) then
+			if(not GameLogic.IsServerWorld()) then
+				GameLogic.AddBBS(nil, L"请先启动服务器", 3000, "255 0 0");
+				return
+			end
+			local params = {
+					url = "script/apps/Aries/Creator/Game/Network/Admin/TeacherPanel.html", 
+					name = "TeacherPanel.ShowPage", 
+					isShowTitleBar = false,
+					DestroyOnClose = true,
+					bToggleShowHide=true, 
+					style = CommonCtrl.WindowFrame.ContainerStyle,
+					allowDrag = true,
+					bShow = bShow,
+					click_through = false, 
+					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					directPosition = true,
+						align = "_ctt",
+						x = 0,
+						y = 5,
+						width = 300,
+						height = 78,
+				};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);
+		end
+	end);
 end
 
 function TeacherPanel.OnClickItem(name)

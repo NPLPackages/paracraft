@@ -120,9 +120,11 @@ end
 
 function OnSelectNetWorkMode(value)
     if(value == "TunnelServer") then
-        if(not GameLogic.IsVip(nil, true)) then
-			Page:SetValue("NetWorkMode", "Lan")
-		end
+        GameLogic.IsVip("WanNetworking", false, function(result)
+            if (not result) then
+                Page:SetValue("NetWorkMode", "Lan")
+            end
+        end)
     end
 end
 
@@ -152,13 +154,7 @@ end
                 </div>
                 <div style="float:left;margin-left:5px">
                     <select name="MaxPlayers" style="width:70px;height:24px;" onselect="ServerPage.OnChangeMaxPlayers">
-                        <option value="2">2</option>
-                        <option value="4">4</option>
-                        <option value="8" selected="true">8</option>
-                        <option value="16">16</option>
-                        <option value="32">32</option>
-                        <option value="64">64</option>
-                        <option value="128" >128</option>
+                        <option value="3" selected="true">3</option>
                     </select>
                 </div>
             </div>
