@@ -1625,22 +1625,20 @@ function GameLogic:event(event)
 	GameLogic.GetCodeGlobal():HandleGameEvent(event);
 end
 
--- @param level: vip level to check, can be nil. 
+-- @param name: vip permission to check. 
 -- @param bOpenUIIfNot: if true, we will display a message box asking user to login and guide the user to activate VIP if not. 
 -- @param callbackFunc: only called if user is vip and bOpenUIIfNot is true
 -- return true if the user is vip
-function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
+function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
 	local bEnabled = 
 		GameLogic.GetFilters():apply_filters(
 			"KeepworkPermission",
 			false,
 			bOpenUIIfNot,
-			level,
-			function(bExecuted)
-				if bExecuted == true then
-					if type(callbackFunc) == "function" then
-						callbackFunc();
-					end
+			name,
+			function(result)
+				if type(callbackFunc) == "function" then
+					callbackFunc(result);
 				end
 			end
 		);
