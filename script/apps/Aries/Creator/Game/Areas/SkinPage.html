@@ -46,9 +46,11 @@ function ClosePage()
 end
 
 function OnOK()
-    GameLogic.IsVip("SkinOfAllProtagonists", true, function()
-        SkinPage.OnOK();
-        ClosePage();
+    GameLogic.IsVip("SkinOfAllProtagonists", true, function(result)
+        if result then
+            SkinPage.OnOK();
+            ClosePage();
+        end
     end)
 end
 ]]></script>
