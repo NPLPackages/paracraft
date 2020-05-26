@@ -248,6 +248,7 @@ function CodeBlockWindow.RestoreCursorPosition()
 				if(self.entity and self.entity.cursorPos) then
 					local cursorPos = self.entity.cursorPos;
 					ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
+					ctrl:GetWindow():handleActivateEvent(true);
 				end
 			end
 		end, 200);
@@ -1165,6 +1166,22 @@ end
 
 function CodeBlockWindow.OnLearnMore()
 	return CodeIntelliSense.OnLearnMore(CodeBlockWindow.GetTextControl())
+end
+
+function CodeBlockWindow.FindTextGlobally()
+	local ctrl = CodeBlockWindow.GetTextControl()
+	if(ctrl) then
+		if(ctrl:hasSelectedText()) then
+			local text = ctrl:selectedText()
+			if(text and not text:match("\n")) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
+				local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
+				local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
+				task:ShowFindFile(text)
+				return true;
+			end
+		end
+	end
 end
 
 function CodeBlockWindow:OnUserTypedCode(textCtrl, newChar)

@@ -28,7 +28,7 @@ function KeepWorkShopPage.OnInit()
 end
 
 function KeepWorkShopPage.Show()
-    KeepWorkItemManager.Load(function()
+    KeepWorkItemManager.Load(true,function()
         KeepWorkShopPage.Show__();
     end)
 end

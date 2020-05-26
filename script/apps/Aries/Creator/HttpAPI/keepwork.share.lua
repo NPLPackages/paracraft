@@ -12,7 +12,7 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 
 --http://yapi.kp-para.cn/project/151/interface/api/1967
 -- get
-HttpWrapper.Create("keepwork.shareToken.get", "%MAIN%/storage/v0/qinius/uploadToken", "GET", true, nil,
+HttpWrapper.Create("keepwork.shareToken.get", "%MAIN%/ts-storage/qinius/uploadToken", "GET", true, nil,
 -- PreProcessor
 function(self, inputParams, callbackFunc, option)
    return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.shareToken.get")

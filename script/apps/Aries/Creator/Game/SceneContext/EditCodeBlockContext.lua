@@ -77,6 +77,12 @@ function EditCodeBlockContext:HandleGlobalKey(event)
 		-- GameLogic.AddBBS(nil, "code context");
 	elseif(dik_key == "DIK_1") then
 		self:SetShowBones(not self:IsShowBones())
+	elseif(dik_key == "DIK_F" and event.shift_pressed and event.ctrl_pressed) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+		if(CodeBlockWindow.FindTextGlobally()) then
+			event:accept()
+		end
 	end
 	return EditCodeBlockContext._super.HandleGlobalKey(self, event);
 end

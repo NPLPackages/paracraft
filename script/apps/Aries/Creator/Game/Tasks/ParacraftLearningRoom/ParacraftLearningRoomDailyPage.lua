@@ -8,6 +8,9 @@ Use Lib:
 -------------------------------------------------------
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 ParacraftLearningRoomDailyPage.AutoOpen(1001, 10001);
+
+ParacraftLearningRoomDailyPage.FillDays(1001, 10001);
+ParacraftLearningRoomDailyPage.ShowPage(1001, 10001);
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -104,13 +107,16 @@ function ParacraftLearningRoomDailyPage.IsVip()
 end
 function ParacraftLearningRoomDailyPage.GetNextDay()
     local copies = ParacraftLearningRoomDailyPage.copies or 0;
-    return copies + 1;
+    if(not ParacraftLearningRoomDailyPage.HasCheckedToday())then
+        copies = copies + 1;
+    end
+    return copies;
 end
 function ParacraftLearningRoomDailyPage.IsNextDay(index)
     return index == ParacraftLearningRoomDailyPage.GetNextDay();
 end
 function ParacraftLearningRoomDailyPage.IsFuture(index)
-    if((index) > ParacraftLearningRoomDailyPage.GetNextDay() )then
+    if(index > ParacraftLearningRoomDailyPage.GetNextDay() )then
         return true;
     end
 end
@@ -150,10 +156,12 @@ function ParacraftLearningRoomDailyPage.OnCheck()
         if(err == 200)then
             KeepWorkItemManager.LoadItems(true,function()
                 _guihelper.MessageBox(L"签到成功！",function(res)
+                    ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
                     ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
                 end, _guihelper.MessageBoxButtons.OK);
             end)
         else
+            ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
             ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
         end
     end)
@@ -162,9 +170,6 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index)
     index = tonumber(index)
     if(not ParacraftLearningRoomDailyPage.IsVip())then
         if(ParacraftLearningRoomDailyPage.IsFuture(index))then
-            return
-        end
-        if(ParacraftLearningRoomDailyPage.IsNextDay(index) and ParacraftLearningRoomDailyPage.HasCheckedToday())then
             return
         end
     end
@@ -184,5 +189,5 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
     echo("=====ParacraftLearningRoomDailyPage.OnLearningLand()");
 end
 function ParacraftLearningRoomDailyPage.OnVIP()
-    echo("=====ParacraftLearningRoomDailyPage.OnVIP()");
+    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 end

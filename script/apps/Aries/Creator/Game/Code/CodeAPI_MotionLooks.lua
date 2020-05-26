@@ -47,7 +47,8 @@ end
 -- walk relative to current block position and make it not dummy(has physics simulations)
 -- the entity maybe blocked if target unreachable. 
 -- it will move at the default speed. 
--- @param dx,dy,dz: if z is nil, y is z. in block unit, can be real numbers
+-- @param dx,dy,dz: if z is nil, y is z. in block unit, can be real numbers, 
+-- if dx=0, dy=0, dz=0, it means that we will stop walking. 
 -- @param duration: default to none
 function env_imp:walk(dx,dy,dz, duration)
 	if(not dz) then
@@ -57,6 +58,13 @@ function env_imp:walk(dx,dy,dz, duration)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		local x,y,z = entity:GetBlockPos();
+		if(dx==0 and dz==0 and dy==0) then
+			entity:EnableAnimation(true);
+			entity:SetDummy(false);
+			entity:SetBlockTarget();
+			env_imp.wait(self, duration);
+			return
+		end
 		x = x + math.floor((dx or 0) + 0.5);
 		y = y + math.floor((dy or 0) + 0.5);
 		z = z + math.floor((dz or 0) + 0.5);
@@ -271,7 +279,7 @@ function env_imp:turnTo(degree, pitch, roll)
 		end
 		if(degree) then
 			if(type(degree) == "number") then
-				self.actor:SetFacing(degree*math.pi/180);
+				self.actor:SetFacing(mathlib.ToStandardAngle(degree*math.pi/180));
 			elseif(degree == "mouse-pointer") then
 				local result = SelectionManager:MousePickBlock(true, false, false); 
 				if(result and result.blockX) then

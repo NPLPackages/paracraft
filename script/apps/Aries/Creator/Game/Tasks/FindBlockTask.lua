@@ -11,6 +11,7 @@ local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTa
 local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 task:Run();
 task:FindFile(text)
+task:ShowFindFile(text)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
@@ -93,7 +94,7 @@ function FindBlockTask:FindFileImp(text)
 			return true;
 		end
 	end
-	local entities = EntityManager.FindEntities({category="b", });
+	local entities = EntityManager.FindEntities({category="b", }) or {};
 	for _, entity in ipairs(entities) do
 		if(entity.FindFile) then
 			local bFound, filename, filenames = entity:FindFile(text)
@@ -123,6 +124,11 @@ function FindBlockTask:FindFileImp(text)
 		FindBlockTask.results = results;
 		FindBlockTask.UpdateResult();
 	end
+end
+
+function FindBlockTask:ShowFindFile(text)
+	FindBlockTask.lastSearchText = text or FindBlockTask.lastSearchText;
+	self:FindFile()
 end
 
 -- @param text: if nil, it will show an input dialog for text, otherwise it will show result of the find file
@@ -398,7 +404,8 @@ function FindBlockTask.GotoItemAtIndex(index)
 			local ds = FindBlockTask.GetDataSource()
 			if(ds and ds[FindBlockTask.GetSelectedIndex()]) then
 				local item = ds[FindBlockTask.GetSelectedIndex()];
-				local line = item.attr.lowerText:match("(%d+):");
+				local line = item.attr.lowerText:match(":(%d+):");
+				line = line or item.attr.lowerText:match("(%d+):");
 				if(line) then
 					line = tonumber(line);
 					entity:OpenAtLine(line);

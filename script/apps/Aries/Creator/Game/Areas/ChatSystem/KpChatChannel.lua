@@ -29,6 +29,7 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KpChatChannel = NPL.export();
 
+KpChatChannel.worldId_pending = nil;
 KpChatChannel.worldId = nil;
 KpChatChannel.client = nil;
 KpChatChannel.configs = {
@@ -41,7 +42,14 @@ function KpChatChannel.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
     end
+    echo("====================KpChatChannel.StaticInit()");
+
 	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
+
+    GameLogic.GetFilters():remove_filter("OnKeepWorkLogin", KpChatChannel.OnKeepWorkLogin_Callback);
+    GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", KpChatChannel.OnKeepWorkLogout_Callback);
+    GameLogic.GetFilters():add_filter("OnKeepWorkLogin", KpChatChannel.OnKeepWorkLogin_Callback);
+	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", KpChatChannel.OnKeepWorkLogout_Callback)
 end
 
 function KpChatChannel.OnWorldLoaded()
@@ -49,13 +57,21 @@ function KpChatChannel.OnWorldLoaded()
 	LOG.std(nil, "info", "KpChatChannel", "OnWorldLoaded: %s",tostring(id));
     if(id)then
         id = tonumber(id);
+        KpChatChannel.worldId_pending = id;
         -- connect chat channel
-        KpChatChannel.Connect(nil,nil,function()
-            KpChatChannel.JoinWorld(id);
-        end);
+        KpChatChannel.OnKeepWorkLogin_Callback();
     end
 end
-
+function KpChatChannel.OnKeepWorkLogin_Callback()
+    if(KpChatChannel.worldId_pending)then
+        KpChatChannel.Connect(nil,nil,function()
+            KpChatChannel.JoinWorld(KpChatChannel.worldId_pending);
+        end);
+    end        
+end
+function KpChatChannel.OnKeepWorkLogout_Callback()
+    KpChatChannel.LeaveWorld(KpChatChannel.worldId_pending);
+end
 function KpChatChannel.GetUrl()
     local url;
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
@@ -172,6 +188,7 @@ function KpChatChannel.OnMsg(self, msg)
                     if(channel_config)then
                         color = channel_config.color or color;
                     end
+                    content = string.format(L"%s说:%s",username, content);
                     TipRoadManager:PushNode(content,"#".. color);
                 end
             end

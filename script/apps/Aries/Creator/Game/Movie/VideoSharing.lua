@@ -62,7 +62,7 @@ end
 function VideoSharing.ToggleRecording(time)
 	if (ParaMovie.IsRecording()) then
 		VideoSharing.EndCapture(false);
-		ParaIO.DeleteFile(commonlib.Encoding.Utf8ToDefault(VideoSharing.GetOutputFile()));
+		ParaIO.DeleteFile(VideoSharing.GetOutputFile());
 	end
 	VideoSharingSettings.total_time = time;
 	VideoSharing.BeginCapture();

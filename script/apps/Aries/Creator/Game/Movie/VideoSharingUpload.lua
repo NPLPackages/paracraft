@@ -43,6 +43,7 @@ function VideoSharingUpload.ShowPage(condition)
 		click_through = false, 
 		bShow = true,
 		isTopLevel = true,
+		zorder = 0,
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 			align = "_ct",
@@ -68,47 +69,50 @@ function VideoSharingUpload.OnOK()
 	end
 	local upload_timer = commonlib.Timer:new({callbackFunc = function(timer)
 		keepwork.shareToken.get({cache_policy = "access plus 12 hour"},function(err, msg, data)
-			if (err ~= 200 or (not data.token) or (not data.key)) then
-				VideoSharingUpload.UploadFailed();
+			if (err ~= 200 or (not data.data) or (not data.data.token) or (not data.data.key)) then
+				VideoSharingUpload.UploadFailed("keepwork.shareToken", err, data);
 				return;
 			end
 
 			local file_path = VideoSharing.GetOutputFile();
-			local file = ParaIO.open(commonlib.Encoding.Utf8ToDefault(file_path), "rb");
+			local file = ParaIO.open(file_path, "rb");
 			if (not file:IsValid()) then
 				file:close();
-				VideoSharingUpload.UploadFailed();
+				VideoSharingUpload.UploadFailed("open file", -1, {filename = file_path});
 				return;
 			end
 			local content = file:GetText(0, -1);
 			file:close();
 
 			if not content then
-				VideoSharingUpload.UploadFailed();
+				VideoSharingUpload.UploadFailed("read file", -1, {filename = file_path});
 				return;
 			end
 
-			local file_name = ParaIO.GetFileName(file_path);
+			local token = data.data.token;
+			local key = data.data.key;
+			local file_name = commonlib.Encoding.DefaultToUtf8(ParaIO.GetFileName(file_path));
 			QiniuRootApi:Upload(
-				data.token,
-				data.key,
+				token,
+				key,
 				file_name,
 				content,
 				function(result, err)
 					if err ~= 200 then
-						VideoSharingUpload.UploadFailed();
+						VideoSharingUpload.UploadFailed("QiniuRootApi:Upload", err, result);
 						return;
 					end
 
-					keepwork.shareUrl.get({cache_policy = "access plus 0", key = data.key}, function(err, msg, data)
+					keepwork.shareUrl.get({cache_policy = "access plus 0", key = key}, function(err, msg, data)
 						if (err ~= 200 or (not data.data)) then
-							VideoSharingUpload.UploadFailed();
+							VideoSharingUpload.UploadFailed("keepwork.shareUrl", err, data);
 							return;
 						end
-						VideoSharingUpload.ShowQRCode(data.data.."&attname="..file_name);
+						VideoSharingUpload.ShowQRCode(file_name.."|"..data.data);
 					end);
 
-					keepwork.shareFile.post({key = data.key}, function(err, msg, data)
+					keepwork.shareFile.post({key = key}, function(err, msg, data)
+						LOG.std(nil, "info", "VideoSharingUpload", "%s: {error: %s, data: %s}", "keepwork.shareFile", tostring(err), commonlib.serialize(data));
 					end);
 				end
 			)
@@ -119,16 +123,17 @@ function VideoSharingUpload.OnOK()
 	VideoSharingUpload.ShowPage("?name=upload");
 end
 
-function VideoSharingUpload.UploadFailed()
+function VideoSharingUpload.UploadFailed(stage, error, data)
+	LOG.std(nil, "info", "VideoSharingUpload", "%s: {error: %s, data: %s}", stage, tostring(error), commonlib.serialize(data));
 	page:CloseWindow();
 	VideoSharingUpload.ShowPage("?name=error");
 end
 
 function VideoSharingUpload.ShowQRCode(url)
-	url = download_tip_url.."?url="..url;
+	url = download_tip_url.."?"..url;
 	local ok, result = QREncode.qrcode(url);
 	if (not ok) then
-		VideoSharingUpload.UploadFailed();
+		VideoSharingUpload.UploadFailed("QRCode", -1, {info = "url to qrcode error"});
 		return;
 	end
 
