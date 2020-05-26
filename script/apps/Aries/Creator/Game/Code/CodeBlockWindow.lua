@@ -489,18 +489,20 @@ function CodeBlockWindow.OnClickCompileAndRun()
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if(codeEntity) then
 		if(codeEntity:GetCodeLanguageType() == "python") then
-			if(not GameLogic.IsVip(nil, true)) then
-				GameLogic.AddBBS(nil, L"非VIP用户只能免费运行3次Python语言代码", 15000, "255 0 0")
-				CodeBlockWindow.python_run_times = (CodeBlockWindow.python_run_times or 0) + 1;
-				if(CodeBlockWindow.python_run_times > 3) then
-					return
+			GameLogic.IsVip("PythonCodeBlock", false, function(result)
+				if (result) then
+					CodeBlockWindow.UpdateCodeToEntity();
+					codeEntity:Restart();
+				else
+					GameLogic.AddBBS(nil, L"非VIP用户只能免费运行3次Python语言代码", 15000, "255 0 0")
+					CodeBlockWindow.python_run_times = (CodeBlockWindow.python_run_times or 0) + 1;
 				end
-			end
+			end);
+		else
+			-- GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
+			CodeBlockWindow.UpdateCodeToEntity();
+			codeEntity:Restart();
 		end
-		
-		-- GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
-		CodeBlockWindow.UpdateCodeToEntity();
-		codeEntity:Restart();
 	end
 end
 

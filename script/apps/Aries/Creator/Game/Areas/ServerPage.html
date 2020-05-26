@@ -120,7 +120,7 @@ end
 
 function OnSelectNetWorkMode(value)
     if(value == "TunnelServer") then
-        GameLogic.IsVip("WanNetworking", false, function(result)
+        GameLogic.IsVip("WanNetworking", true, function(result)
             if (not result) then
                 Page:SetValue("NetWorkMode", "Lan")
             end
