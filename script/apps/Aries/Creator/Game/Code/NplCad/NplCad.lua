@@ -386,3 +386,7 @@ end
 function NplCad.OnClickLearn()
 	ParaGlobal.ShellExecute("open", L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_cad", "", "", 1);
 end
+
+function NplCad.GetCustomCodeUIUrl()
+	return "script/apps/Aries/Creator/Game/Code/NplCad/CodeBlockWindowCAD.html"
+end

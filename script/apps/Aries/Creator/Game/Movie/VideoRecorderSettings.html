@@ -28,9 +28,11 @@ function HasShader()
 end
 
 function OnToggleShowWatermark(bChecked)
-    if(not GameLogic.IsVip(nil, true)) then
-        Page:SetValue("IsShowLogo", true);
-    end
+    GameLogic.IsVip("VideoPluginWatermarkRemoval", true, function(vip)
+        if (not vip) then
+            Page:SetValue("IsShowLogo", true);
+        end
+    end)
 end
 
 ]]></script>

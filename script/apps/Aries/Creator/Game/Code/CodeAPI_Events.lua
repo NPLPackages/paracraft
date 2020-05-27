@@ -131,7 +131,7 @@ function env_imp:cmd(cmd, params)
 	if(params ~= nil and params~="") then
 		cmd = cmd.." "..tostring(params);
 	end
-	self.codeblock:RunCommand(cmd)
+	return self.codeblock:RunCommand(cmd)
 end
 
 

@@ -1,0 +1,92 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="TeachingQuestPage.lua"><![CDATA[
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
+TeachingQuestPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #TeachingQuestPage.Current_Item_DS;
+    else
+        return TeachingQuestPage.Current_Item_DS[index];
+    end
+end
+function GetQuest(index)
+    return TeachingQuestPage.quests[TeachingQuestPage.index].quests[index];
+end
+function GetLabel(index)
+    local quest = GetQuest(index);
+    if(quest)then
+        local exid = quest.exid;
+        local s;
+        if(TeachingQuestPage.IsFinished(exid,index))then
+            s = string.format("已完成 %d",index);
+        elseif(TeachingQuestPage.IsActived(exid,index))then
+            s = string.format("已激活 %d",index);
+        elseif(TeachingQuestPage.IsLocked(exid,index))then
+            s = string.format("锁定 %d",index);
+        end
+        return s
+    end
+end
+function OnFinish(index)
+    index = tonumber(index);
+    local quest = GetQuest(index);
+    if(quest)then
+        local exId = quest.exid;
+        local profile = KeepWorkItemManager.GetProfile()
+        local userId = profile.id;
+        if(not userId or not exId)then
+            return
+        end
+            keepwork.items.exchange({
+            userId = userId, 
+            exId = exId,
+        },function(err, msg, data)
+            echo("=====OnFinish");
+            echo(err);
+            echo(msg);
+            echo(data);
+            if(err == 200)then
+                KeepWorkItemManager.LoadItems(true,function()
+                    Page:Refresh();
+                end)
+            end
+        end)
+    end
+end
+]]></script>
+    <aries:window mode="thin" title='<%= L"任务列表"%>' onclose="ClosePage">
+    <div style="width:800px;height:500px;">
+        <div style="height:40px;">
+        </div>
+        <div style="margin-top:10px;">
+            <pe:gridview style="margin:0px;width:800px;height:400px;" name="item_gridview" CellPadding="5" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "160" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                            <div style="width:120px;height:160px;">
+                                <input type="button" name='<%= Eval("index")%>' value='<%= GetLabel(Eval("index"))%>' style="width:120px;height:120px;color:#ffffff;" class="mc_blue_button_with_fillet"  onclick="OnFinish"  />
+                            </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -68,7 +68,7 @@ function VideoSharingUpload.OnOK()
 		return;
 	end
 	local upload_timer = commonlib.Timer:new({callbackFunc = function(timer)
-		keepwork.shareToken.get({cache_policy = "access plus 12 hour"},function(err, msg, data)
+		keepwork.shareToken.get({cache_policy = "access plus 12 hour", share = "video_share"},function(err, msg, data)
 			if (err ~= 200 or (not data.data) or (not data.data.token) or (not data.data.key)) then
 				VideoSharingUpload.UploadFailed("keepwork.shareToken", err, data);
 				return;

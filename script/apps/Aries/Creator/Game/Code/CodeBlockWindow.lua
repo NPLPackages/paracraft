@@ -49,6 +49,8 @@ local groupindex_hint = 3;
 -- this is singleton class
 local self = CodeBlockWindow;
 
+CodeBlockWindow.defaultCodeUIUrl = "script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html";
+
 -- show code block window at the right side of the screen
 -- @param bShow:
 function CodeBlockWindow.Show(bShow)
@@ -87,7 +89,7 @@ function CodeBlockWindow.Show(bShow)
 			_this:SetScript("onclick", function() end); -- just disable click through 
 			_guihelper.SetFontColor(_this, "#ffffff");
 			_this:AttachToRoot();
-			page = System.mcml.PageCtrl:new({url="script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html"});
+			page = System.mcml.PageCtrl:new({url=CodeBlockWindow.defaultCodeUIUrl});
 			page:Create(code_block_window_name.."page", _this, "_fi", 0, 0, 0, 0);
 		end
 
@@ -789,15 +791,25 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
 		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
-
-		local bShowBones = false;
+		
 		local sceneContext = self:GetSceneContext();
 		if(sceneContext) then
 			local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(entity)
+			-- whether to show bones 
+			local bShowBones = false;
 			if(langConfig.IsShowBones) then
 				bShowBones = langConfig.IsShowBones()
 			end
 			sceneContext:SetShowBones(bShowBones);
+
+			-- custom code block theme
+			local codeUIUrl = CodeBlockWindow.defaultCodeUIUrl;
+			if(langConfig.GetCustomCodeUIUrl) then
+				codeUIUrl = langConfig.GetCustomCodeUIUrl() or codeUIUrl;
+			end
+			if(page.url ~= codeUIUrl) then
+				page:Goto(codeUIUrl);
+			end
 		end
 	end
 end

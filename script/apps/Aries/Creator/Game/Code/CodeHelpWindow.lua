@@ -392,4 +392,60 @@ function CodeHelpWindow.GenerateWikiDocs(bSilent)
 		end
 	end
 end
+
+function CodeHelpWindow.DS_CodeItems(index)
+    if(index == nil) then
+        return #CodeHelpWindow.currentItems;
+    else
+        local item = CodeHelpWindow.currentItems[index];
+        if(item) then
+            return item:GetDSItem();
+        end
+    end
+end
+
+function CodeHelpWindow.DS_GlobalData(index)
+    if(index == nil) then
+        return # CodeHelpWindow.RefreshGlobalDataDs();
+    else
+        return CodeHelpWindow.GetGlobalDataDs()[index];
+    end
+end
+
+function CodeHelpWindow.CanRun(name)
+    local item = CodeHelpWindow.GetCodeItemByName(name);
+    return item and item:CanRun();
+end
+function CodeHelpWindow.CanRunExample(name)
+    local item = CodeHelpWindow.GetCodeItemByName(name);
+    return item and item:CanRunExample();
+end
+
+function CodeHelpWindow.GetExampleCode(name)
+    local item = CodeHelpWindow.GetCodeItemByName(name);
+    return item and item:GetNPLCodeExample();
+end
+
+function CodeHelpWindow.OnClickPinToHelpWnd(name)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+    local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    CodeBlockWindow.ShowHelpWndForCodeName(name);
+end
+
+function CodeHelpWindow.OnClickItem(name)
+    if(mouse_button == "left") then
+        CodeHelpWindow.RunSampleCodeByName(name)
+    elseif(mouse_button == "right") then
+        CodeHelpWindow.OnClickPinToHelpWnd(name)
+    end
+end
+
+function CodeHelpWindow.OnClickRunExample()
+    CodeHelpWindow.RunSampleCodeExampleByName(CodeHelpWindow.GetSelectionName());
+end
+
+function CodeHelpWindow.OnClickDataItem(name)
+    CodeHelpWindow.OnClickDataItem(name)
+end
+
 CodeHelpWindow:InitSingleton();
