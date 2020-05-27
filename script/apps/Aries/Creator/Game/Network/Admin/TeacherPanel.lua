@@ -26,7 +26,6 @@ end
 
 function TeacherPanel.ShowPage(bShow)
 	GameLogic.IsVip("OnlineTeaching", true, function(result)
-		echo(result, true)
 		if (result) then
 			if(not GameLogic.IsServerWorld()) then
 				GameLogic.AddBBS(nil, L"请先启动服务器", 3000, "255 0 0");

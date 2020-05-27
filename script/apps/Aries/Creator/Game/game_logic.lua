@@ -1647,8 +1647,8 @@ function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
 		GameLogic.GetFilters():apply_filters(
 			"KeepworkPermission",
 			false,
-			bOpenUIIfNot,
 			name,
+			bOpenUIIfNot,
 			function(result)
 				if type(callbackFunc) == "function" then
 					callbackFunc(result);
