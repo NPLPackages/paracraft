@@ -40,7 +40,15 @@ function OnClickBlock(block_id, mcmlNode)
     else
         local item = mcmlNode:GetPreValue("this", true);
         if(item) then
-            BuilderFramePage.OnClickBlock(item);
+            if (item.block_id == 10516) then
+                GameLogic.IsVip("PythonCodeBlock", true, function(result)
+                    if result then
+                        BuilderFramePage.OnClickBlock(item);
+                    end
+                end)
+            else
+                BuilderFramePage.OnClickBlock(item);
+            end
         end
     end
 end

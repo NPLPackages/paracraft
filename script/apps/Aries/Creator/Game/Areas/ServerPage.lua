@@ -75,27 +75,34 @@ function ServerPage.OnChangeCategory(index, bRefreshPage)
 end
 
 function ServerPage.ShowPage()
-	local params = {
-			url = "script/apps/Aries/Creator/Game/Areas/ServerPage.html", 
-			name = "ServerPage.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			bToggleShowHide=true, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			enable_esc_key = true,
-			--bShow = bShow,
-			click_through = false, 
-			zorder = -1,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			directPosition = true,
-				align = "_ct",
-				x = -600/2,
-				y = -400/2,
-				width = 600,
-				height = 400,
-		};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	GameLogic.CheckSignedIn(
+		L"此功能需要登陆后才能使用",
+		function(result)
+			if (result) then
+				local params = {
+						url = "script/apps/Aries/Creator/Game/Areas/ServerPage.html", 
+						name = "ServerPage.ShowPage", 
+						isShowTitleBar = false,
+						DestroyOnClose = true,
+						bToggleShowHide=true, 
+						style = CommonCtrl.WindowFrame.ContainerStyle,
+						allowDrag = true,
+						enable_esc_key = true,
+						--bShow = bShow,
+						click_through = false, 
+						zorder = -1,
+						app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+						directPosition = true,
+							align = "_ct",
+							x = -600/2,
+							y = -400/2,
+							width = 600,
+							height = 400,
+					};
+				System.App.Commands.Call("File.MCMLWindowFrame", params);
+			end
+		end
+	)
 end
 
 function ServerPage.ShowAddUserPage()
@@ -170,21 +177,23 @@ function ServerPage.CreateServer(host,port)
 	end
 	ServerPage.server_detail = ""
 	local tunnelServerAddress = page:GetValue("TunnelServerAddress", "");
-	local maxPlayers = tonumber(page:GetValue("MaxPlayers", "16")) or 2;
+	local maxPlayers = tonumber(page:GetValue("MaxPlayers")) or 3;
 	local netWorkMode = page:GetValue("NetWorkMode", "Lan");
 
 	if(maxPlayers > ServerPage.maxPlayerNonVip) then
-		if(not GameLogic.IsVip()) then
-			maxPlayers = ServerPage.maxPlayerNonVip;
-			local serverManager = ServerManager.GetSingleton();
-			if(serverManager) then
-				serverManager:SetMaxPlayerCount(maxPlayers)
-				if(page) then
-					page:SetValue("MaxPlayers", maxPlayers);
+		GameLogic.IsVip("Lan40PeopleOnline", false, function(result)
+			if (not result) then
+				maxPlayers = ServerPage.maxPlayerNonVip;
+				local serverManager = ServerManager.GetSingleton();
+				if(serverManager) then
+					serverManager:SetMaxPlayerCount(maxPlayers)
+					if(page) then
+						page:SetValue("MaxPlayers", maxPlayers);
+					end
 				end
+				GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
 			end
-			GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
-		end
+		end)
 	end
 
 	if(not System.User.internet_ip) then
@@ -195,7 +204,6 @@ function ServerPage.CreateServer(host,port)
 	if(netWorkMode == "Lan") then
 		NetworkMain:StartServer(host, port);
 	elseif(netWorkMode == "TunnelServer") then
-		
 		local tunnelHost, tunnelPort = tunnelServerAddress:match("([^:%s]+)[:%s]?(%d*)");
 		if(tunnelHost~="" and tunnelHost) then
 			if(tunnelPort == "") then
@@ -214,7 +222,12 @@ function ServerPage.CreateServer(host,port)
 	end
 
 	page:Refresh(1);
-	GameLogic.RunCommand("/menu online.teacher_panel");
+
+	GameLogic.IsVip("OnlineTeaching", false, function(result)
+		if result then
+			GameLogic.RunCommand("/menu online.teacher_panel");
+		end
+	end);
 end
 
 function ServerPage.GetServerUrl()
@@ -426,16 +439,25 @@ end
 function ServerPage.OnChangeMaxPlayers(name, value)
 	value = tonumber(value)
 	local serverManager = ServerManager.GetSingleton();
+
 	if(serverManager and value) then
-		if(value > ServerPage.maxPlayerNonVip and not GameLogic.IsVip(nil, true)) then
-			value = ServerPage.maxPlayerNonVip;
-			if(page) then
-				page:SetValue("MaxPlayers", value);
+		GameLogic.IsVip("Lan40PeopleOnline", false, function(result)
+			if (not result) then
+				if(value > ServerPage.maxPlayerNonVip) then
+					value = ServerPage.maxPlayerNonVip;
+					if(page) then
+						page:SetValue("MaxPlayers", value);
+					end
+					GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
+				end
+		
+				LOG.std(nil, "info", "ServerPage", "max player set to %d", value);	
+				serverManager:SetMaxPlayerCount(value);
+			else
+				LOG.std(nil, "info", "ServerPage", "max player set to %d", value);	
+				serverManager:SetMaxPlayerCount(value);
 			end
-			GameLogic.AddBBS("vip", L"非VIP用户, 人数上限为"..ServerPage.maxPlayerNonVip, 16000, "255 0 0")
-		end
-		LOG.std(nil, "info", "ServerPage", "max player set to %d", value);	
-		serverManager:SetMaxPlayerCount(value);
+		end)
 	end
 end
 

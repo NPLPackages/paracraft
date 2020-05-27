@@ -1616,6 +1616,19 @@ function GameLogic.SignIn(title, callbackFunc)
 	end
 end
 
+function GameLogic.CheckSignedIn(desc, callback)
+	GameLogic.GetFilters():apply_filters(
+		"LoginModal.CheckSignedIn",
+		false,
+		desc,
+		function(result)
+			if (type(callback) == "function") then
+				callback(result);
+			end
+		end
+	);
+end
+
 -- global custom user or game event
 function GameLogic:event(event)
 	local homeEntity = GameLogic.GetHomeEntity();
@@ -1625,16 +1638,31 @@ function GameLogic:event(event)
 	GameLogic.GetCodeGlobal():HandleGameEvent(event);
 end
 
--- @param level: vip level to check, can be nil. 
+-- @param name: vip permission to check. 
 -- @param bOpenUIIfNot: if true, we will display a message box asking user to login and guide the user to activate VIP if not. 
 -- @param callbackFunc: only called if user is vip and bOpenUIIfNot is true
 -- return true if the user is vip
-function GameLogic.IsVip(level, bOpenUIIfNot, callbackFunc)
-	if(System.User.isVip) then
-		return true;
-	elseif(bOpenUIIfNot) then
-		if not GameLogic.GetFilters():apply_filters("VipNotice", false, callbackFunc) then
-			_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
+function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
+	local bEnabled = 
+		GameLogic.GetFilters():apply_filters(
+			"KeepworkPermission",
+			false,
+			name,
+			bOpenUIIfNot,
+			function(result)
+				if type(callbackFunc) == "function" then
+					callbackFunc(result);
+				end
+			end
+		);
+
+	if not bEnabled then
+		if(System.User.isVip) then
+			return true;
+		elseif(bOpenUIIfNot) then
+			if not GameLogic.GetFilters():apply_filters("VipNotice", false, callbackFunc) then
+				_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
+			end
 		end
 	end
 end

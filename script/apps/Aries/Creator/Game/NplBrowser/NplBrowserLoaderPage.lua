@@ -185,6 +185,9 @@ function NplBrowserLoaderPage.Check(callback)
     end
     if(System.os.GetPlatform() == "mac")then
         NplBrowserLoaderPage.loaded = true;
+        if (type(callback) == "function") then
+            callback(true);
+        end
         return
     end
     if(not NplBrowserLoaderPage.MainFilesExisted(dest_folder))then
