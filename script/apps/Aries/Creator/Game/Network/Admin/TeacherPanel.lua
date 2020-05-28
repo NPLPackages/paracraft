@@ -20,6 +20,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 
 local page;
 
+TeacherPanel.bEnabled = false
+
 function TeacherPanel.OnInit()
 	page = document:GetPageCtrl();
 end
@@ -50,12 +52,13 @@ function TeacherPanel.ShowPage(bShow)
 						height = 78,
 				};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
+			TeacherPanel.bEnabled = true
 		end
 	end);
 end
 
 function TeacherPanel.OnClickItem(name)
-	if(not GameLogic.IsVip(nil, true)) then
+	if(not TeacherPanel.bEnabled) then
 		return
 	end	
 	if(name == "lock") then
