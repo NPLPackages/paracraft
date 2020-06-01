@@ -101,6 +101,7 @@ function env_imp:runForActor(actor, mainFunc)
 	if(type(actor) == "table" and type(mainFunc) == "function") then
 		local isFinished = false;
 		local last_co = self.co;
+		-- TODO: share the same coroutine for a given actor to improve performance when there are tons of runForActor calls. 
 		local co = CodeCoroutine:new():Init(self.codeblock);
 		co:SetActor(actor);
 		co:SetFunction(mainFunc);

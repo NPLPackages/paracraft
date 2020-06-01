@@ -351,7 +351,7 @@ function KeepWorkItemManager.LoadItems(bForced, callback)
         end
     end)
 end
-                    
+-- http://yapi.kp-para.cn/project/32/interface/api/492               
 function KeepWorkItemManager.GetProfile()
     return KeepWorkItemManager.profile or {};
 end

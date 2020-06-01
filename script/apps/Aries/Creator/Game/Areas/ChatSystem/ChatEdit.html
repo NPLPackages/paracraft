@@ -27,11 +27,9 @@ function IsOpened_BulletScreen()
 end
 function OnOpen_BulletScreen()
     KpChatChannel.SetBulletScreen(true)
-    page:Refresh(0.01);
 end
 function OnClose_BulletScreen()
     KpChatChannel.SetBulletScreen(false)
-    page:Refresh(0.01);
 end
 ]]></script>
 <pe:if condition="<%= not System.options.IsMobilePlatform %>">

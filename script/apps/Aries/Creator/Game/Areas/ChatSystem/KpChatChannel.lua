@@ -161,16 +161,21 @@ function KpChatChannel.OnMsg(self, msg)
                 local type = payload.type;
                 local content = payload.content;
 
-                local userId = userInfo.userId;
-                local username = userInfo.username;
+                local userId = payload.id;
+                local username = payload.username;
+                local vip = payload.vip;
+                local tLevel = payload.tLevel;
 
 
---                commonlib.echo("=============body");
+                local timestmap = meta.timestmap;
+
+
+                commonlib.echo("=============body");
 --                commonlib.echo(key);
---                commonlib.echo(payload);
+                commonlib.echo(payload);
 --                commonlib.echo(meta);
 --                commonlib.echo(action);
---                commonlib.echo(userInfo);
+                commonlib.echo(userInfo);
        
                 local ChannelIndex;
                 if(type == 2)then
@@ -178,7 +183,8 @@ function KpChatChannel.OnMsg(self, msg)
                 elseif(type == 3)then
                     ChannelIndex = ChatChannel.EnumChannels.KpBroadCast;
                 end
-                local msgdata = { ChannelIndex = ChannelIndex, words = content, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
+                local channelname = ChatChannel.channels[ChannelIndex];
+                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, vip = vip, tLevel = tLevel, timestmap = timestmap, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
 
                  
@@ -202,6 +208,11 @@ function KpChatChannel.SetBulletScreen(v)
         local key = string.format("is_opened_bullet_screen_%s",tostring(KpChatChannel.GetUserId()));
 	    GameLogic.GetPlayerController():SaveLocalData(key, v, true);
         TipRoadManager:OnShow(v)
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
+    local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
+    if(ChatEdit.page)then
+        ChatEdit.page:Refresh(0.01);
     end
 end
 function KpChatChannel.BulletScreenIsOpened()
@@ -295,12 +306,19 @@ function KpChatChannel.SendToServer(msgdata)
     if(type(msgdata) ~= "table")then
         return
     end
+    local user_info = KeepWorkItemManager.GetProfile();
+
     local kp_msg = {
         target = msgdata.target,
         payload = {
             content = msgdata.words,
             worldId = msgdata.worldId,
             type = msgdata.type,
+
+            id = user_info.id,
+            username = user_info.username,
+            vip = user_info.vip,
+            tLevel = user_info.tLevel,
         },
     }
     commonlib.echo("=============kp_msg");

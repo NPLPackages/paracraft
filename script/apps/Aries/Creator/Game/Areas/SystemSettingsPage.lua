@@ -20,6 +20,7 @@ SystemSettingsPage.ShowPage()
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Scene/main.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 local Scene = commonlib.gettable("MyCompany.Aries.Scene");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -245,6 +246,10 @@ function SystemSettingsPage.InitPageParams()
 	local bAspectRatio = GameLogic.options:IsMaintainMovieBlockAspectRatio();
 	UpdateCheckBox("btn_MovieAspectRatio", bAspectRatio);
 	ds["maintainMovieAspectRatio"] = bAspectRatio;
+
+    -- bullet screen
+    local bOpened = KpChatChannel.BulletScreenIsOpened()
+	UpdateCheckBox("btn_BulletScreen", bOpened);
 end
 
 function SystemSettingsPage.OnClose()
@@ -1222,6 +1227,14 @@ function SystemSettingsPage.OnClickMaintainMovieAspectRatio()
 	end
 end
 
+function SystemSettingsPage.OnClickBulletScreen()
+   local value = KpChatChannel.BulletScreenIsOpened() 
+   value = not value;
+	if(page) then
+		UpdateCheckBox("btn_BulletScreen", value);
+	end
+    KpChatChannel.SetBulletScreen(value)
+end
 function SystemSettingsPage.OnClearMemory()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");

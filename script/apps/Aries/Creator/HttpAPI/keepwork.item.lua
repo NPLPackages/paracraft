@@ -74,3 +74,33 @@ function(self, err, msg, data)
     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.exchange", callbackFunc); 
 end
 )
+
+--http://yapi.kp-para.cn/project/109/interface/api/1472
+-- put
+HttpWrapper.Create("keepwork.items.setClientData", "%MAIN%/gosys/v0/userGoods/clientData", "PUT", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+    -- no cache
+    inputParams.cache_policy = "access plus 0"
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.items.setClientData")
+end,
+-- Post Processor
+function(self, err, msg, data)
+    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.setClientData", callbackFunc); 
+end
+)
+
+--http://yapi.kp-para.cn/project/109/interface/api/1467
+-- get
+HttpWrapper.Create("keepwork.items.getClientData", "%MAIN%/gosys/v0/userGoods/clientData", "GET", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+    -- no cache
+    inputParams.cache_policy = "access plus 0"
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.items.getClientData")
+end,
+-- Post Processor
+function(self, err, msg, data)
+    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.getClientData", callbackFunc); 
+end
+)
