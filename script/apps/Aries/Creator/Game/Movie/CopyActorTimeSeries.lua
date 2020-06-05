@@ -143,6 +143,37 @@ function CopyActorTimeSeries.ToggleVariable(bChecked, mcmlNode)
 	end
 end
 
+-- return true if clipboard obj contains the actor's variable's data. 
+-- @param obj: obj = CopyActorTimeSeries.GetClipBoardData()
+-- @param actor: the actor object. 
+-- @param varName: such as "pos", "facing", etc
+function CopyActorTimeSeries.CheckIfObjContainsVariable(obj, actor, varName)
+	local data = obj and obj.data;
+	if(data and varName and actor and actor:GetItemStack().id == obj.itemId) then
+		if(data[varName]) then
+			return true;
+		else
+			local varMulti = actor:GetEditableVariableByName(varName);
+			if(varMulti and varMulti.GetVariable) then
+				local i=1
+				while(true) do
+					local subVar = varMulti:GetVariable(i);
+					if(subVar) then
+						i = i + 1;
+						if(not data[subVar.name]) then
+							return
+						end
+					else
+						break;
+					end
+				end
+				return true;
+			end
+		end
+	end
+end
+
+
 -- @param varNames: array of var names to copy
 -- @param isRelativePos: whether to use relative positioning
 function CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, isRelativePos)
@@ -286,6 +317,25 @@ function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 	if(not actor) then
 		return
 	end
+	local destVars;
+	-- just in case destVar is a compositive variable like "pos" and "rot"
+	if(destVar and destVar.name) then
+		local varMulti = actor:GetEditableVariableByName(destVar.name);
+		if(varMulti and varMulti.GetVariable) then
+			local i=1
+			while(true) do
+				local subVar = varMulti:GetVariable(i);
+				if(subVar) then
+					i = i + 1;
+					destVars = destVars or {}
+					destVars[subVar.name] = true;
+				else
+					break;
+				end
+			end
+		end
+	end
+
 	local function isDestVar_(var)
 		if(var) then
 			if(not destVar) then
@@ -296,8 +346,10 @@ function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 				else
 					return true;
 				end
-			else
-				return destVar.name == var.name;
+			elseif(destVar.name == var.name) then
+				return true
+			elseif(destVars and destVars[var.name]) then
+				return true
 			end
 		end
 	end
@@ -326,9 +378,11 @@ function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 				local var = actor:GetVariable(ts:GetVariableName(i));
 
 				if(var and fromVar and isDestVar_(var)) then
-					var:RemoveKeysInTimeRange(pasteFromTime+fromTime, toTime and (pasteFromTime+toTime));
+					if(toTime) then
+						var:RemoveKeysInTimeRange(pasteFromTime, pasteFromTime + toTime - fromTime);
+					end
 					for time, v in fromVar:GetKeys_Iter(1, fromTime-1, toTime or fromVar:GetLastTime()) do
-						var:UpsertKeyFrame(pasteFromTime+fromTime+time, v)
+						var:UpsertKeyFrame(pasteFromTime-fromTime+time, v)
 					end
 				end
 			end
@@ -344,9 +398,11 @@ function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 						local var = boneVars:GetBoneAttributeVariableByName(boneName);
 						-- only pasting on matching bone names
 						if(var and fromVar and isDestVar_(var)) then
-							var:RemoveKeysInTimeRange(pasteFromTime+fromTime, toTime and (pasteFromTime+toTime));
+							if(toTime) then
+								var:RemoveKeysInTimeRange(pasteFromTime, pasteFromTime + toTime - fromTime);
+							end
 							for time, v in fromVar:GetKeys_Iter(1, fromTime-1, toTime or fromVar:GetLastTime()) do
-								var:UpsertKeyFrame(pasteFromTime+fromTime+time, v)
+								var:UpsertKeyFrame(pasteFromTime-fromTime+time, v)
 							end
 						end
 					end

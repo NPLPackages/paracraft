@@ -50,11 +50,18 @@ function OnVIP()
     ParacraftLearningRoomDailyPage.OnVIP()
 end
 
+function GetTip()
+    local gsid = 998;
+    local template = KeepWorkItemManager.GetItemTemplate(gsid);
+    local s = string.format(L"完整观看《高手成长日记》中指定的今日学习视频即为签到成功，签到成功送%s。",template.name);
+    return s;
+end
 function GetExchangePoints()
-    local gsid = 10002;
+    local gsid = 998;
+    local template = KeepWorkItemManager.GetItemTemplate(gsid);
     local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
     copies = copies or 0;
-    local s = string.format(L"积分:%d",copies);
+    local s = string.format("%s:%d",template.name, copies);
     return s;
 end
 function GetDays()
@@ -66,11 +73,11 @@ end
     <aries:window mode="thin" width="600" height="500" title='<%= L"每日签到：《高手成长日记》"%>' onclose="ClosePage">
     <div >
         <div style="height:120px;">
-            <div style="margin-top:20px;color:#ffffff;text-align:center;">完整观看《高手成长日记》中指定的今日学习视频即为签到成功，签到成功送积分。</div>
+            <div style="margin-top:20px;color:#ffffff;text-align:center;"><%= GetTip() %></div>
             <div style="margin-left:380px;margin-top:20px;">
                 <div style="float:left;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/points_32bits.png#0 0 20 20);"></div>
                 <div style="float:left;margin-left:2px;color:#ffffff;"><%=GetExchangePoints()%></div>
-                <div style="float:left;margin-left:10px;margin-top:-5px;"><input type="button"  value='<%=L"积分兑换"%>' style="width:85px;height:30px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/blue_bg_32bits.png:6 6 6 6);" onclick="OnOpenWebExchange" /></div>
+                <!--<div style="float:left;margin-left:10px;margin-top:-5px;"><input type="button"  value='<%=L"积分兑换"%>' style="width:85px;height:30px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/blue_bg_32bits.png:6 6 6 6);" onclick="OnOpenWebExchange" /></div>-->
             </div>
             
         </div>

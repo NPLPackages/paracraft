@@ -48,6 +48,7 @@ CodeBlock:Property("Name", "CodeBlock");
 CodeBlock:Property({"DefaultTick", 0.02, "GetDefaultTick", "SetDefaultTick", auto=true,});
 CodeBlock:Property({"AutoWait", true, "IsAutoWait", "SetAutoWait", });
 CodeBlock:Property({"modified", false, "IsModified", "SetModified", auto=true});
+CodeBlock:Property({"maxEventCount", 500});
 CodeBlock:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 
 CodeBlock:Signal("message", function(errMsg) end);
@@ -732,13 +733,18 @@ end
 
 function CodeBlock:CreateEvent(event_name)
 	event_name = event_name or "";
-	local event = CodeEvent:new():Init(self, event_name);
-	
+
 	local events = self.events[event_name];
 	if(not self.events[event_name]) then
 		events = {};
 		self.events[event_name] = events;
 	end
+	if(#events >= self.maxEventCount) then
+		self:send_message(L"注册了太多同名事件"..event_name, "error");
+		self:Stop();
+		return
+	end
+	local event = CodeEvent:new():Init(self, event_name);
 	events[#events + 1] = event;
 	return event;
 end
@@ -748,6 +754,9 @@ end
 function CodeBlock:RegisterAnimationEvent(time, callbackFunc)
 	if(callbackFunc and time) then
 		local event = self:CreateEvent("onAnimateActor");
+		if(not event) then
+			return
+		end
 		event:SetIsFireForAllActors(false);
 		event:SetCanFireCallback(function(actor, curTime)
 			return (time == curTime);
@@ -765,6 +774,9 @@ end
 function CodeBlock:RegisterClickEvent(callbackFunc)
 	self:EnableActorPicking(true);
 	local event = self:CreateEvent("onClickActor");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(false);
 	event:SetFunction(callbackFunc);
 end
@@ -772,6 +784,9 @@ end
 -- use this sparingly, because we will disable auto yield in this mode. 
 function CodeBlock:RegisterStopEvent(callbackFunc)
 	local event = self:CreateEvent("onCodeBlockStopped");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 end
@@ -779,6 +794,9 @@ end
 -- @param blockname: block id or name, if nil or "any", it matches all blocks
 function CodeBlock:RegisterBlockClickEvent(blockname, callbackFunc)
 	local event = self:CreateEvent("onBlockClicked");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 
@@ -830,6 +848,9 @@ local mouseKeys = {
 -- case insensitive
 function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 	local event = self:CreateEvent("onKeyPressed");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetStopLastEvent(false);
 	event:SetFunction(callbackFunc);
@@ -868,6 +889,9 @@ end
 function CodeBlock:RegisterTickEvent(ticks, callbackFunc)
 	ticks = tonumber(ticks or 1);
 	local event = self:CreateEvent("onTick");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 	event:SetStopLastEvent(false);
@@ -892,6 +916,9 @@ end
 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	local event = self:CreateEvent("onText"..text);
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 	local function onEvent_(_, msg)
@@ -953,11 +980,17 @@ end
 
 function CodeBlock:RegisterCloneActorEvent(callbackFunc)
 	local event = self:CreateEvent("onCloneActor");
+	if(not event) then
+		return
+	end
 	event:SetFunction(callbackFunc);
 end
 
 function CodeBlock:RegisterNetworkEvent(event_name, callbackFunc)
 	local event = self:CreateEvent(event_name);
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(true);
 	event:SetStopLastEvent(false);
 	event:SetFunction(callbackFunc);
@@ -1105,6 +1138,9 @@ end
 -- if name is a number, it means a physics_group_id
 function CodeBlock:RegisterCollisionEvent(name, callbackFunc)
 	local event = self:CreateEvent("onCollideActor");
+	if(not event) then
+		return
+	end
 	event:SetIsFireForAllActors(false);
 	event:SetStopLastEvent(false);
 	if(type(name) == "number") then

@@ -90,7 +90,8 @@ ChatChannel.channels = {
 {name="",bshow=true,color="fda000",}, -- "empty" 20
 
 {name="本地",bshow=true,color="ffffff",}, -- "KpNearBy" 21
-{name="全局",bshow=true,color="fced4b",}, -- "BroadCast" 22
+{name="全局",bshow=true,color="fced4b",}, -- "KpBroadCast" 22
+{name="官方公告",bshow=true,color="fced4b",}, -- "KpSystem" 23
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;
@@ -115,6 +116,7 @@ local EnumChannels = {
 
 	KpNearBy = 21,
 	KpBroadCast = 22,
+	KpSystem = 23,
     KpMax = 29,
 }
 ChatChannel.EnumChannels = EnumChannels;
@@ -152,7 +154,7 @@ function ChatChannel.Init()
 	end
 
 	if(ChatChannel.ChannelIndexAssemble==nil)then
-		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14,21});
+		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23});
 	end
 
 	NPL.load("(gl)script/ide/Network/StreamRateController.lua");
@@ -442,25 +444,22 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
     if(msgdata.ChannelIndex == EnumChannels.KpBroadCast) then
         local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		local stone_name = "喇叭";
-		local broadcast_stone_gsid = 23;
 		local purchase_exid = 0;
-		local hasItem, guid, bag, copies = KeepWorkItemManager.HasGSItem(broadcast_stone_gsid);
-        local gsItem = KeepWorkItemManager.GetItemTemplate(broadcast_stone_gsid);
+        local gsItem = KeepWorkItemManager.GetItemTemplate(10001);
 		if(gsItem) then
 			stone_name = gsItem.name;
 		end
-		if(not hasItem) then
-            _guihelper.MessageBox(format("你没有%s，不能广播！", stone_name),function(result)
---				if(result == _guihelper.DialogResult.OK)then
---					local command = System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd");
---					if(command) then
---						command:Call({gsid = broadcast_stone_gsid, exid = purchase_exid});
---					end
---				end
-			end,_guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil,{ ok = L"立即购买", cancel = L"再想想", title = L"提示", });
+        gsid_list = {
+            { gsid = 10002, },
+            { gsid = 10001, },
+        }
+        local copies = KeepWorkItemManager.UnionCopies(gsid_list);
+
+		if(copies == 0) then
+            _guihelper.MessageBox(format("你没有%s，不能广播！", stone_name),nil,nil,nil,nil,nil,nil,{ title = L"温馨提示", });
 			return;
         else
-            if(copies and copies < 100) then
+            if(copies < 100) then
 				_guihelper.MessageBox(format("发送一条喇叭消息,需要消耗一个%s,确定要发送? 你现在还有%d个%s", stone_name, copies or 0, stone_name),function(result)
 					if(result == _guihelper.DialogResult.OK)then
 						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);

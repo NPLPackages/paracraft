@@ -379,9 +379,10 @@ function FindBlockTask.OnClickItem(treenode)
 	local item = treenode.mcmlNode:GetPreValue("this")
 	local index = item.index;
 
+	FindBlockTask.SetSelectedIndex(index)
 	FindBlockTask.SetSelectedResultIndex(index)
 	FindBlockTask.GotoItemAtIndex(index);
-
+	
 	if(mouse_button == "left") then
 		FindBlockTask.OnClose()
 	end

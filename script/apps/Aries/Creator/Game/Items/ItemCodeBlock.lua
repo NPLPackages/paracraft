@@ -103,7 +103,7 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 	end
 end
 
-local displayMap = { npl_blockpen = "pen"}
+local displayMap = { npl_blockpen = "pen", npl_teacher = "Teacher"}
 function ItemCodeBlock:GetLangIconDisplayText(langName)
 	return displayMap[langName or ""];
 end
@@ -113,6 +113,7 @@ local tooltipMap = {
 	npl_micro_robot = L"机器人",
 	npl_cad = L"计算机辅助设计",
 	npl_python = L"Python",
+	npl_teacher = L"教师",
 }
 function ItemCodeBlock:GetLangTooltipText(langName)
 	return tooltipMap[langName or ""] or langName;

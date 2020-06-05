@@ -239,6 +239,8 @@ function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode, onDownl
 
 			if #output == 0 then
 				_guihelper.MessageBox(L"世界文件异常，请重新下载")
+				LOG.std(nil, "warn", "InternetLoadWorld", "invalid downloaded file will be deleted: %s", world.worldpath);
+				ParaIO.DeleteFile(world.worldpath)
 				return false
 			end
 

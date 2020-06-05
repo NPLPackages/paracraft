@@ -76,7 +76,7 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 				
 				if(item.name == "PasteKey") then
 					local obj = CopyActorTimeSeries.GetClipBoardData()
-					if(var and obj and actor and actor:GetItemStack().id == obj.itemId and obj.data and obj.data[var.name]) then
+					if(var and obj and CopyActorTimeSeries.CheckIfObjContainsVariable(obj, actor, var.name)) then
 						if(obj.fromTime ~= obj.toTime and obj.toTime) then
 							text = format(L"粘贴区间: %d-%d", obj.fromTime, obj.toTime or -1);
 						else

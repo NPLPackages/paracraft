@@ -7,10 +7,10 @@ the daily page for learning paracraft
 Use Lib:
 -------------------------------------------------------
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-ParacraftLearningRoomDailyPage.AutoOpen(1001, 10001);
+ParacraftLearningRoomDailyPage.AutoOpen(10001, 30102);
 
-ParacraftLearningRoomDailyPage.FillDays(1001, 10001);
-ParacraftLearningRoomDailyPage.ShowPage(1001, 10001);
+ParacraftLearningRoomDailyPage.FillDays(10001, 30102);
+ParacraftLearningRoomDailyPage.ShowPage(10001, 30102);
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -65,13 +65,13 @@ function ParacraftLearningRoomDailyPage.ShowPage(exid, gsid)
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			enable_esc_key = true,
-			zorder = -1,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			zorder = 100,
+			--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
-				x = -800/2,
+				x = -600/2,
 				y = -500/2,
-				width = 800,
+				width = 600,
 				height = 500,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
@@ -86,8 +86,8 @@ function ParacraftLearningRoomDailyPage.AutoOpen(exid, gsid, callback)
             _guihelper.MessageBox(L"请先登录！");
         return
     end
-    exid = exid or 1001;
-    gsid = gsid or 10001;
+    exid = exid or 10001;
+    gsid = gsid or 30102;
     ParacraftLearningRoomDailyPage.FillDays(exid, gsid)
     if(not ParacraftLearningRoomDailyPage.HasCheckedToday())then
         local index = ParacraftLearningRoomDailyPage.GetNextDay();
@@ -138,32 +138,16 @@ function ParacraftLearningRoomDailyPage.SaveToLocal()
 	GameLogic.GetPlayerController():SaveLocalData(key, true, true);
 end
 function ParacraftLearningRoomDailyPage.OnCheck()
-    local profile = KeepWorkItemManager.GetProfile()
-    local userId = profile.id;
-    local exId = ParacraftLearningRoomDailyPage.exid;
-    if(not userId or not exId)then
-        return
-    end
-     keepwork.items.exchange({
-        userId = userId, 
-        exId = exId,
-    },function(err, msg, data)
-        echo("=====ParacraftLearningRoomDailyPage.OnCheck()");
-        echo(err);
-        echo(msg);
-        echo(data);
+    local exid = ParacraftLearningRoomDailyPage.exid;
+    KeepWorkItemManager.DoExtendedCost(exid, function()
         ParacraftLearningRoomDailyPage.SaveToLocal();
-        if(err == 200)then
-            KeepWorkItemManager.LoadItems(true,function()
-                _guihelper.MessageBox(L"签到成功！",function(res)
-                    ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-                    ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-                end, _guihelper.MessageBoxButtons.OK);
-            end)
-        else
+        _guihelper.MessageBox(L"签到成功！",function(res)
             ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
             ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-        end
+        end, _guihelper.MessageBoxButtons.OK);
+    end, function()
+        ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
+        ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
     end)
 end
 function ParacraftLearningRoomDailyPage.OnOpenWeb(index)

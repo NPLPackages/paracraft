@@ -135,6 +135,8 @@ function Actor:Init(itemStack, movieclipEntity)
 	timeseries:CreateVariableIfNotExist("Theta", "Linear");
 	timeseries:CreateVariableIfNotExist("Phi", "Linear");
 	
+	timeseries:CreateVariableIfNotExist("parent", "LinearTable");
+
 	self:AddValue("position", self.GetPosVariable);
 	
 
@@ -160,6 +162,52 @@ function Actor:Init(itemStack, movieclipEntity)
 		end
 		return self;
 	end
+end
+
+-- return the parent link and parent actor if found.
+-- @return parent, curTime, parentActor, keypath: where parent contains local transform relative to target:
+--  in the form {target="fullname", pos={}, rot={}, use_rot=true}
+function Actor:GetParentLink(curTime)
+	curTime = curTime or self:GetTime();
+	local parent = self:GetValue("parent", curTime);
+	if(parent and type(parent) == "table" and parent.target and parent.target ~="")then
+		-- animate linking to another actor's bone animation. 
+		local actorname, keypath = parent.target:match("^([^:]+):*(.*)"); 
+		if(actorname) then
+			local parentActor = self:FindActor(actorname);
+			if(parentActor and parentActor~=self) then
+				return parent, curTime, parentActor, keypath;
+			end
+		end
+	end
+end
+
+-- force adding current values to all transform variables, these include position and rotation.
+function Actor:KeyTransform()
+	local curTime = self:GetTime();
+	local entity = self.entity;
+	if(not entity or not curTime) then
+		return
+	end
+	entity:UpdatePosition();
+	local x,y,z = entity:GetPosition();
+	self:BeginUpdate();
+
+	self:AutoAddKey("x", curTime, x);
+	self:AutoAddKey("y", curTime, y);
+	self:AutoAddKey("z", curTime, z);
+
+	local obj = entity:GetInnerObject();
+
+	if(obj) then
+		local yaw = obj:GetField("yaw", 0);
+		self:AutoAddKey("facing", curTime, yaw);
+		local roll = obj:GetField("roll", 0);
+		self:AutoAddKey("roll", curTime, roll);
+		local pitch = obj:GetField("pitch", 0);
+		self:AutoAddKey("pitch", curTime, pitch);
+	end
+	self:EndUpdate();
 end
 
 -- @return nil or a table of variable list. 
@@ -356,6 +404,24 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end
 		end, old_value)
+	elseif(keyname == "parent") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.lua");
+		local EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");
+		EditParentLinkPage.ShowPage(strTime, self, function(values)
+			if(values.target=="") then
+				-- this will automatically add a key frame, when link is removed. 
+				self:KeyTransform();
+			end
+			self:AddKeyFrameByName(keyname, nil, values);
+			self:FrameMovePlaying(0);
+			if(target~="") then
+				-- this will automatically add a key frame at the position. 
+				self:KeyTransform();
+			end
+			if(callbackFunc) then
+				callbackFunc(true);
+			end
+		end, old_value);
 	end
 end
 
@@ -458,6 +524,31 @@ function Actor:ComputePosAndRotation(curTime)
 	local yaw = self:GetValue("facing", curTime);
 	local roll = self:GetValue("roll", curTime);
 	local pitch = self:GetValue("pitch", curTime);
+
+	-- animate linking to another actor's bone animation. 
+	local parent, _, parentActor, keypath = self:GetParentLink(curTime);
+	if(keypath and parentActor and parentActor.ComputeWorldTransform)then
+		local p_x, p_y, p_z, p_roll, p_pitch, p_yaw, p_scale = parentActor:ComputeWorldTransform(keypath, curTime, parent.pos, parent.rot, parent.use_rot); 
+		if(p_x) then
+			new_x, new_y, new_z = p_x, p_y, p_z;
+			if(p_roll) then
+				roll, pitch, yaw = p_roll, p_pitch, p_yaw;
+			end
+			if(p_scale) then
+				-- scale = p_scale * (scale or 1);
+			end
+		else
+			if(self.last_unknown_keypath~=keypath and keypath and keypath~="") then
+				-- here we just wait 500 and try again only once for a given bone keypath.
+				self.last_unknown_keypath = keypath;
+				self.loader_timer = self.loader_timer or commonlib.Timer:new({callbackFunc = function(timer)
+					self:FrameMovePlaying(0);
+				end})
+				LOG.std(nil, "info", "ActorLight", "parent bone may be async loading, wait 500ms");
+				self.loader_timer:Change(500, nil);
+			end
+		end
+	end
 
 	return new_x, new_y, new_z, yaw, roll, pitch;
 end

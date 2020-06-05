@@ -42,6 +42,10 @@ Entity.is_persistent = true;
 Entity.is_regional = true;
 
 function Entity:ctor()
+	self.Diffuse = {1, 0, 1}
+	self.Specular = {1, 0, 0}
+	self.Ambient = {1, 0, 0}
+	self.Direction = {0, 0, 0}
 end
 
 function Entity:init()
@@ -65,7 +69,7 @@ function Entity:SetLightType(value)
 end
 
 function Entity:SetDiffuse(value)
-	if(commonlib.partialcompare(self.Diffuse, value, 0.01)) then
+	if(commonlib.partialcompare(self.Diffuse, value, 0.001)) then
 		return
 	end
 	self.Diffuse[1] = value[1]
@@ -79,7 +83,7 @@ function Entity:SetDiffuse(value)
 end
 
 function Entity:SetSpecular(value)
-	if(commonlib.partialcompare(self.Specular, value, 0.01)) then
+	if(commonlib.partialcompare(self.Specular, value, 0.001)) then
 		return
 	end
 	self.Specular[1] = value[1]
@@ -93,7 +97,7 @@ function Entity:SetSpecular(value)
 end
 
 function Entity:SetAmbient(value)
-	if(commonlib.partialcompare(self.Ambient, value, 0.01)) then
+	if(commonlib.partialcompare(self.Ambient, value, 0.001)) then
 		return
 	end
 	self.Ambient[1] = value[1]
@@ -138,7 +142,7 @@ function Entity:isDirectionalLight()
 end
 
 function Entity:SetRange(value)
-	if(commonlib.partialcompare(self.Range, value, 0.01)) then
+	if(commonlib.partialcompare(self.Range, value, 0.001)) then
 		return
 	end
 	self.Range = value
@@ -150,7 +154,7 @@ function Entity:SetRange(value)
 end
 
 function Entity:SetFalloff(value)
-	if(commonlib.partialcompare(self.Falloff, value, 0.01)) then
+	if(commonlib.partialcompare(self.Falloff, value, 0.001)) then
 		return
 	end
 	self.Falloff = value
@@ -162,7 +166,7 @@ function Entity:SetFalloff(value)
 end
 
 function Entity:SetAttenuation0(value)
-	if(commonlib.partialcompare(self.Attenuation0, value, 0.01)) then
+	if(commonlib.partialcompare(self.Attenuation0, value, 0.001)) then
 		return
 	end
 	self.Attenuation0 = value
@@ -174,7 +178,7 @@ function Entity:SetAttenuation0(value)
 end
 
 function Entity:SetAttenuation1(value)
-	if(commonlib.partialcompare(self.SetAttenuation1, value, 0.01)) then
+	if(commonlib.partialcompare(self.SetAttenuation1, value, 0.001)) then
 		return
 	end
 	self.SetAttenuation1 = value
@@ -186,7 +190,7 @@ function Entity:SetAttenuation1(value)
 end
 
 function Entity:SetAttenuation2(value)
-	if(commonlib.partialcompare(self.SetAttenuation2, value, 0.01)) then
+	if(commonlib.partialcompare(self.SetAttenuation2, value, 0.001)) then
 		return
 	end
 	self.SetAttenuation2 = value
@@ -199,7 +203,7 @@ end
 
 
 function Entity:SetTheta(value)
-	if(commonlib.partialcompare(self.Theta, value, 0.01)) then
+	if(commonlib.partialcompare(self.Theta, value, 0.001)) then
 		return
 	end
 	self.Theta = value
@@ -211,7 +215,7 @@ function Entity:SetTheta(value)
 end
 
 function Entity:SetPhi(value)
-	if(commonlib.partialcompare(self.Phi, value, 0.01)) then
+	if(commonlib.partialcompare(self.Phi, value, 0.001)) then
 		return
 	end
 	self.Phi = value

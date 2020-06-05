@@ -272,6 +272,9 @@ function env_imp:ask(text, buttons, cb)
 			end
 			
 			local event = self.codeblock:CreateEvent("onText__EnterTextDialog_Close");
+			if(not event) then
+				return
+			end
 			event:SetIsFireForAllActors(false);
 			event:SetFunction(onClose);
 			local function onEvent_(_, msg)

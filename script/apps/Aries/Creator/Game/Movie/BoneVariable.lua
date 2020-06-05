@@ -43,7 +43,8 @@ function BoneVariable:init(attr, animInstance, parent)
 	return self;
 end
 
--- get current bone pivot
+-- get current bone pivot. 
+-- please note this could return NAN
 function BoneVariable:GetPivot(bRefresh)
 	self.pivot = self.pivot or vector3d:new({0,0,0})
 	if(bRefresh) then
@@ -72,6 +73,7 @@ function BoneVariable:GetRotation(bRefresh)
 	return self.rot;
 end
 
+-- please note this could return NAN
 function BoneVariable:GetPivotRotation(bRefresh)
 	self.pivot_rot = self.pivot_rot or Matrix4:new()
 	if(bRefresh) then

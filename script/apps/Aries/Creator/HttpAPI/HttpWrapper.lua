@@ -85,6 +85,11 @@ function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, f
 	end
 end
 function HttpWrapper.default_postFunc(self, err, msg, data, fullname, callbackFunc)
+    echo("=============HttpWrapper.default_postFunc");
+    echo(fullname);
+    echo(err);
+    echo(msg);
+    echo(data);
     if(not err or err ~= 200)then
         if(callbackFunc)then
             callbackFunc(err, msg, data);
@@ -138,18 +143,28 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         if(prepFunc)then
 			res = prepFunc(self, inputParams, callbackFunc, option);
         end
-        commonlib.echo("=========res");
-        commonlib.echo(res);
-        commonlib.echo("=========inputParams");
+        commonlib.echo("=========HttpWrapper inputParams");
         commonlib.echo(inputParams);
+        commonlib.echo("=========HttpWrapper url");
+        commonlib.echo(url);
+        commonlib.echo("=========HttpWrapper res");
+        commonlib.echo(res);
+        
         if(not res)then
             inputParams = inputParams or {};
             local raw_input = commonlib.deepcopy(inputParams);
             local input;
             if(method == "GET")then
                 input = raw_input;
-	            url = NPL.EncodeURLQuery(url, raw_input);
-                input.url = url;
+                local url_queries = {}
+                for k,v in pairs(raw_input) do
+                    if(k ~= "cache_policy")then
+                        table.insert(url_queries,k);
+                        table.insert(url_queries,v);
+                    end
+                end
+	            local input_url = NPL.EncodeURLQuery(url, url_queries);
+                input.url = input_url;
                 input.method = method;
             else
                 input = {};
@@ -166,9 +181,10 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
             end
             input.headers = headers;
             commonlib.echo("=========input");
-            commonlib.echo(url);
             commonlib.echo(input);
-		    LOG.std(nil, "info","HttpWrapper", "request from: %s", url);
+            commonlib.echo("=========input.url");
+            commonlib.echo(input.url);
+		    LOG.std(nil, "info","HttpWrapper", "request from: %s", input.url);
             System.os.GetUrl(input, function(err, msg, data)
                 if(postFunc)then
                     postFunc(self, err, msg, data);

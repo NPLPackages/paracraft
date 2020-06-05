@@ -20,6 +20,7 @@ local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 MainLogin.state = {
 	CheckGraphicsSettings = nil,
 	IsUpdaterStarted = nil,
+	IsBrowserUpdaterStarted = nil,
 	Loaded3DScene = nil,
 	IsCommandLineChecked = nil,
 	IsPackagesLoaded = nil,
@@ -55,6 +56,8 @@ function MainLogin:start(init_callback)
 		LoadBackground3DScene = self.LoadBackground3DScene,
 		-- update the core ParaEngine and minimal art assets. The logo page is also displayed here. 
 		UpdateCoreClient = self.UpdateCoreClient,
+		-- update buildin chrome browser under win32
+		UpdateCoreBrowser = self.UpdateCoreBrowser,
 		-- check command line
 		CheckCommandLine = self.CheckCommandLine,
 		-- Load buildin packages and mod
@@ -123,6 +126,8 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("LoadBackground3DScene");
 	elseif(not state.IsUpdaterStarted) then	
 		self:Invoke_handler("UpdateCoreClient");
+	elseif(not state.IsBrowserUpdaterStarted) then	
+		self:Invoke_handler("UpdateCoreBrowser");
 	elseif(not state.IsCommandLineChecked) then
 		self:Invoke_handler("CheckCommandLine");
 	elseif(not state.IsLoginModeSelected) then
@@ -226,6 +231,16 @@ function MainLogin:UpdateCoreClient()
 			end
 		end
 	end);
+end
+
+function MainLogin:UpdateCoreBrowser()
+	local platform = System.os.GetPlatform();
+	if(platform=="win32")then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+        local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+        NplBrowserLoaderPage.Check()
+	end
+	MainLogin:next_step({IsBrowserUpdaterStarted = true});
 end
 
 function MainLogin:CheckGraphicsSettings()
@@ -466,6 +481,9 @@ function MainLogin:ShowLoginModePage()
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 	
+    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+    KeepWorkItemManager.StaticInit();
+
 	if(not System.options.isSchool) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 		local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")

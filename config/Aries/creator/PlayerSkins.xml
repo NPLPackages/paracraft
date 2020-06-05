@@ -1,5 +1,5 @@
 <!--config/Aries/creator/PlayerSkins.xml
-只能在后面添加， 否则id不兼容. 
+只能在后面添加， 否则id不兼容.
 -->
 <PlayerSkins>
   <groups>
@@ -31,7 +31,7 @@
       <skin name="黑色外套的男人01" filename="Texture/blocks/human/man_black_clothes01.png" alias="Texture/blocks/human/char_male15.png"/>
       <skin name="黑色外套的男人02" filename="Texture/blocks/human/man_black_clothes02.png" alias="Texture/blocks/human/char_male16.png"/>
       <skin name="老爷爷" filename="Texture/blocks/human/man_gray_clothes01.png" alias="Texture/blocks/human/char_male17.png"/>
-  
+
       <skin name="卡通黑熊外套" filename="Texture/blocks/human/cartoon_black_bearman.png" alias=""/>
       <skin name="卡通粽熊外套" filename="Texture/blocks/human/cartoon_brown_bearman.png" alias=""/>
       <skin name="卡通熊猫外套" filename="Texture/blocks/human/cartoon_pandaman.png" alias=""/>
@@ -139,9 +139,16 @@
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_06_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_07_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a003.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_01_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_02_01.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_03_01.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a001.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a001.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a002.png" />
+
     </group>
     <group name="paperman_body">
       <skin name="" filename="Texture/blocks/Paperman/body/Avatar_boy_body_01.png" />
@@ -224,6 +231,6 @@
       <skinid id="2" group="paperman_body"></skinid>
       <skinid id="5" group="paperman_leg"></skinid>
       <skinid id="1" group="paperman_hair"></skinid>
-    </model>  
+    </model>
   </models>
 </PlayerSkins>

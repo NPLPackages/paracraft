@@ -1311,7 +1311,7 @@ end
 
 -- set real world position for the object. 
 function Entity:SetPosition(x, y, z)
-	if(not x) then 
+	if(not x) then
 		return;
 	end
 	if(self.x~=x or self.y~=y or self.z~=z ) then

@@ -1130,8 +1130,11 @@ function Actor:ComputeBoneWorldTransform(bonename, bUseParentRotation)
 			
 			local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
 			
-			return link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz,
-				 p_roll, p_pitch, p_yaw, parentScale;
+			local x, y, z = link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz
+			-- This fixed a bug where x or y or z could be NAN(0/0), because GetPivotRotation and GetPivot could return NAN
+			if(x == x and y==y and z==z) then
+				return x, y, z, p_roll, p_pitch, p_yaw, parentScale;
+			end
 		end
 	end
 	return link_x, link_y, link_z;
@@ -1220,9 +1223,11 @@ function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot, bUseP
 				p_pitch = (localRot[2] or 0) + p_pitch;
 				p_yaw = (localRot[3] or 0) + p_yaw;
 			end
-			
-			return link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz,
-				 p_roll, p_pitch, p_yaw, parentScale;
+			local x, y, z = link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz
+			-- This fixed a bug where x or y or z could be NAN(0/0), because GetPivotRotation and GetPivot could return NAN
+			if(x == x and y==y and z==z) then
+				return x, y, z, p_roll, p_pitch, p_yaw, parentScale;
+			end
 		end
 	else
 		return link_x, link_y, link_z;

@@ -16,6 +16,9 @@ local id = 618;
 KpChatChannel.Connect(nil,nil,function()
     KpChatChannel.JoinWorld(id);
 end);
+
+-- api declaration:
+http://yapi.kp-para.cn/project/60/interface/api/1952
 -------------------------------------------------------
 ]]
 
@@ -33,9 +36,9 @@ KpChatChannel.worldId_pending = nil;
 KpChatChannel.worldId = nil;
 KpChatChannel.client = nil;
 KpChatChannel.configs = {
-    ONLINE = "https://keepwork.com",
-    STAGE = "http://socket-dev.kp-para.cn",
-    RELEASE = "http://socket-dev.kp-para.cn",
+    ONLINE = "https://socket.keepwork.com",
+    STAGE = "http://socket-rls.kp-para.cn",
+    RELEASE = "http://socket-rls.kp-para.cn",
     LOCAL = "http://socket-dev.kp-para.cn"
 }
 function KpChatChannel.StaticInit()
@@ -155,7 +158,7 @@ function KpChatChannel.OnMsg(self, msg)
         local action = info.action;
         local userInfo = info.userInfo;
 
-        if(action == "msg")then
+        if(key == "app/msg" or key == "paracraftGlobal" )then
             if(payload and userInfo)then
                 local worldId = payload.worldId;
                 local type = payload.type;
@@ -195,6 +198,30 @@ function KpChatChannel.OnMsg(self, msg)
                         color = channel_config.color or color;
                     end
                     content = string.format(L"%s说:%s",username, content);
+                    TipRoadManager:PushNode(content,"#".. color);
+                end
+            end
+        elseif(key == "broadcast")then
+            echo("==========================broadcast");
+            echo(info.data);
+            echo(info.data.msg);
+            if(info.data and info.data.msg)then
+                local content = info.data.msg.text;
+                content = string.gsub(content, "<p>","");
+                content = string.gsub(content, "</p>","");
+                local username = L"管理员";
+                local ChannelIndex = ChatChannel.EnumChannels.KpSystem;
+                local channelname = ChatChannel.channels[ChannelIndex];
+                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, kp_from_name = username, is_keepwork = true, }
+                ChatChannel.AppendChat( msgdata)
+
+                 if(KpChatChannel.BulletScreenIsOpened())then
+                    local color = "ffffff";
+                    local channel_config = ChatChannel.channels[ChannelIndex];
+                    if(channel_config)then
+                        color = channel_config.color or color;
+                    end
+                    content = string.format("[%s]:%s",channel_config.name, content);
                     TipRoadManager:PushNode(content,"#".. color);
                 end
             end
@@ -258,8 +285,8 @@ end
 -- refresh for showing or hiding chat channel
 function KpChatChannel.RefreshChatWindow()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+    -- for refresh
     MyCompany.Aries.ChatSystem.ChatWindow.ShowChatLogPage(true);
-
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 
@@ -269,6 +296,7 @@ function KpChatChannel.RefreshChatWindow()
         ChatEdit.selected_channel = ChatChannel.EnumChannels.NearBy;
     end
     ChatEdit.ShowPage(true);
+    MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
 end
 -- create a chat message
 -- @param ChannelIndex	频道索引

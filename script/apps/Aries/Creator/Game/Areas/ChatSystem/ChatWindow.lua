@@ -587,12 +587,11 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 		nid = System.App.profiles.ProfileManager.GetNID();
 	end
 	if(chatdata.is_keepwork)then
-        is_from_mine = (chatdata.kp_id == chatdata.kp_from_id and chatdata.kp_from_id ~= nil);
         local color = chatdata.color or "ffffff";
         local kp_from_name = chatdata.kp_from_name or "";
         local vip = chatdata.vip;
         local tLevel = chatdata.tLevel;
-        local timestmap = chatdata.timestmap;
+        local timestmap = chatdata.timestmap or "";
 
         local channel_tag = string.format([[<div style="float:left">[%s]</div>]],chatdata.channelname);
         local name_tag_start = [[<div style="float:left">[</div>]]
@@ -608,9 +607,11 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 
         kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
         local timestmap_tag = string.format([[<div style="float:left;margin-left:10px;color:#8b8b8b">%s</div>]],tostring(timestmap));
-        timestmap_tag = "";
-        mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,name_tag_start,vip_tag,teacher_tag,kp_from_name,name_tag_end,words,timestmap_tag);
-
+        if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
+            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestmap_tag);
+        else
+            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,name_tag_start,vip_tag,teacher_tag,kp_from_name,name_tag_end,words,timestmap_tag);
+        end
 	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
 				tooltip="%s" style="margin-left:0px;float:left;height:12px;background:url()" name="x"
@@ -782,7 +783,9 @@ function ChatWindow.AppendChatMessage(chatdata, needrefresh)
 		return;
 	end
 
-	--commonlib.echo("!!:AppendChatMessage");
+	commonlib.echo("!!:AppendChatMessage");
+	commonlib.echo(chatdata);
+	commonlib.echo(needrefresh);
 	if(chatdata.ChannelIndex == ChatChannel.EnumChannels.BroadCast)then
 		
 		if(chatdata.words and string.match(chatdata.words,"lobby|(.+)|lobby"))then
@@ -806,7 +809,14 @@ function ChatWindow.AppendChatMessage(chatdata, needrefresh)
 			end
 		end
 	end
-	
+    if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
+		if(needrefresh) then
+		    ChatWindow.AddBroadCastLine(chatdata);
+        end
+        if(not ChatChannel.AppendFilter[chatdata.ChannelIndex]) then
+			return;
+		end
+	end
 
 	local ctl = ChatWindow.GetTreeView();
 	local rootNode = ctl.RootNode;
@@ -850,7 +860,7 @@ function ChatWindow.OnSwitchChannelDisplay(name)
 	local chatdata;
 	if(channel_index==ChatChannel.EnumChannels.All)then
 		-- exclude = 10(broadcast)
-		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14,21}
+		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23}
 		chatdata = ChatChannel.GetChat(channels);
 		ChatChannel.SetAppendEventCallbackFilter(channels);
 	elseif(channel_index==ChatChannel.EnumChannels.Region or channel_index==ChatChannel.EnumChannels.BroadCast)then
