@@ -176,15 +176,11 @@ function ReplaceBlock:ReplaceFile(from, to, blocks)
 	if(from == to or not from or not to) then
 		return
 	end
-	local movieBlockId = block_types.names.MovieClip;
-	local PhysicsModel = block_types.names.PhysicsModel;
-	local BlockModel = block_types.names.BlockModel;
-
-	local count = 0;
+	
 	local entities;
 	if(not blocks) then
-		-- all blocks in the world
-		entities = EntityManager.FindEntities({category="b", });
+		-- all blocks & entities in the world
+		entities = EntityManager.FindEntities({category="all", });
 	else
 		entities = {};
 		-- only selected blocks
@@ -195,6 +191,17 @@ function ReplaceBlock:ReplaceFile(from, to, blocks)
 			end
 		end
 	end
+	local count = self:ReplaceFileInEntities(from, to, entities);
+	GameLogic.AddBBS(nil, format(L"%d个方块中的文件被替换", count))
+	return count;
+end
+
+function ReplaceBlock:ReplaceFileInEntities(from, to, entities)
+	local movieBlockId = block_types.names.MovieClip;
+	local PhysicsModel = block_types.names.PhysicsModel;
+	local BlockModel = block_types.names.BlockModel;
+
+	local count = 0;
 	if(entities) then
 		for _, entity in ipairs(entities) do
 			local block_id = entity:GetBlockId()
@@ -208,9 +215,10 @@ function ReplaceBlock:ReplaceFile(from, to, blocks)
 					entity:Refresh()
 					count = count + 1;
 				end
+			elseif(entity:IsPersistent() and entity.ReplaceFile and entity:ReplaceFile(from, to)>0) then
+				count = count + 1;
 			end
 		end
-		GameLogic.AddBBS(nil, format(L"%d个方块中的文件被替换", count))
 	end
 	return count;
 end

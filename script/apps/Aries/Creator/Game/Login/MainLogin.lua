@@ -484,6 +484,9 @@ function MainLogin:ShowLoginModePage()
     local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
     KeepWorkItemManager.StaticInit();
 
+    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+    KpChatChannel.StaticInit();
+
 	if(not System.options.isSchool) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 		local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")

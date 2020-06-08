@@ -326,6 +326,15 @@ function Entity:SaveToXMLNode(node, bSort)
 	return node;
 end
 
+-- return the number of entities replaced
+function Entity:ReplaceFile(from, to)
+	if(self:GetModelFile() == from) then
+		self:SetModelFile(to);
+		return 1;
+	end
+	return 0;
+end
+
 -- get skin texture file name
 function Entity:GetSkin()
 	return self.skin;

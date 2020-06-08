@@ -33,9 +33,9 @@ function OnClose_BulletScreen()
 end
 ]]></script>
 <pe:if condition="<%= not System.options.IsMobilePlatform %>">
-    <div width="100%" style="height:25px;background-color:#000000a0;">
+    <div width="100%" style="height:29px;background-color:#000000a0;">
         <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
-            <div style="float:left;margin-left:1px;">
+            <div style="float:left;margin-left:1px;margin-top:2px;">
                 <pe:if condition="<%= IsOpened_BulletScreen() %>">
                         <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:0px;width:25px;height:24px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_on_32bits.png#0 0 25 24);" 
                             onclick="OnClose_BulletScreen()" />
@@ -49,10 +49,10 @@ end
                 
             </div>
         </pe:if>    
-        <div width="100%" style="position:relative;float:left;margin-top:2px;margin-left:5px;margin-right:22px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
+        <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:5px;margin-right:22px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
             <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
         </div>   
-        <input value='X' type="button" align="right" style="position:relative;margin-right:2px;width:20px;margin-top:2px;height:20px;" class="mc_light_grey_button_with_fillet" 
+        <input value='X' type="button" align="right" style="position:relative;margin-right:2px;width:20px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
             name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
     </div>
 </pe:if>
