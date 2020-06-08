@@ -30,6 +30,8 @@ echo("==========bags_number");
 echo(bags_number);
 
 KeepWorkItemManager.DoExtendedCost(10001)
+KeepWorkItemManager.LoadItems({1001,1002})
+KeepWorkItemManager.ReLoadItems({10001,10002});
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Core/Filters.lua");
@@ -66,6 +68,15 @@ function KeepWorkItemManager.StaticInit()
     end
     GameLogic.GetFilters():add_filter("OnKeepWorkLogin", KeepWorkItemManager.OnKeepWorkLogin_Callback);
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", KeepWorkItemManager.OnKeepWorkLogout_Callback)
+
+    -- for testing filter callback
+    KeepWorkItemManager.GetFilter():add_filter("loading", function(state)
+        echo("===KeepWorkItemManager.Filter loading state");
+        echo(state);
+    end);
+    KeepWorkItemManager.GetFilter():add_filter("loaded_all", function()
+        echo("===KeepWorkItemManager.Filter loaded_all");
+    end);
 end
 function KeepWorkItemManager.GetFilter()
     return KeepWorkItemManager.filter;
@@ -390,6 +401,18 @@ function KeepWorkItemManager.LoadBags(bForced, callback)
         end
     end)
 end
+-- reload item's data by gsid
+
+-- @param {table} gsid_list
+function KeepWorkItemManager.ReLoadItems(gsid_list, callback, error_callback)
+    gsid_list = gsid_list or {};
+    local bagNos = KeepWorkItemManager.SearchBagsNoFromGsids(gsid_list);
+    echo("=========KeepWorkItemManager.ReLoadItems gsid_list");
+    echo(gsid_list)
+    echo("=========KeepWorkItemManager.ReLoadItems bagNos");
+    echo(bagNos)
+    KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
+end
 --[[
 {
     "message": "ÇëÇó³É¹¦",
@@ -408,10 +431,25 @@ end
     ]
 }
 --]]
--- @param bagNos: nil to load all, "1001,1002" to load specific bags by bag number
+-- @param bagNos: nil to load all, "{1001,1002}" to load specific bags by bag number
 function KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
+    bagNos = bagNos or {};
+    local len = #bagNos;
+    local bagNos_str
+    if(len > 0)then
+        bagNos_str = "";
+        for k,v in ipairs(bagNos) do
+            if(bagNos_str == "")then
+                bagNos_str = v;
+            else
+                bagNos_str = string.format("%s,%s",bagNos_str,v);
+            end
+        end
+    end
+    echo("=========KeepWorkItemManager.LoadItems bagNos_str");
+    echo(bagNos_str)
     keepwork.items.get({
-        bagNos = bagNos,
+        bagNos = bagNos_str,
         cache_policy = "access plus 0", -- no cache
     },function(err, msg, data)
         echo("=========KeepWorkItemManager.LoadItems");
@@ -425,14 +463,58 @@ function KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
             return
         end
         if(data and data.data)then
-            KeepWorkItemManager.items = data.data;
-
+            local new_items = data.data;
+            KeepWorkItemManager.items = KeepWorkItemManager.UnionItems(KeepWorkItemManager.items, new_items)
+            echo("=========KeepWorkItemManager.items");
+            echo(KeepWorkItemManager.items)
             if(callback)then
                 callback();
             end
         end
     end)
 end
+-- union new_items to items, updated existed item and insert new item
+-- @param {array} items:the items which be updated 
+-- @param {array} new_items: new items
+-- @return {array} items 
+function KeepWorkItemManager.UnionItems(items, new_items)
+    if(not items or not new_items)then
+        return
+    end
+    local updated_items_map = {};
+    for k,v in ipairs(new_items) do
+        for kk,vv in ipairs(items) do
+            if(v.id == vv.id)then
+                -- updated item
+                items[kk] = v;
+                updated_items_map[v.id] = true
+            end
+        end    
+    end
+    for k,v in ipairs(new_items) do
+        if(not updated_items_map[v.id])then
+            -- insert item
+            table.insert(items,v);
+        end
+    end
+    return items;
+end
+--[[
+{
+  channel=0,
+  createdAt="2020-06-03T06:57:52.000Z",
+  extra={  },
+  id=763,
+  nickname="zhangleio3",
+  orgAdmin=0,
+  roleId=0,
+  student=0,
+  tLevel=0,
+  updatedAt="2020-06-03T06:57:52.000Z",
+  username="zhangleio3",
+  vip=0 
+}
+--]]
 -- http://yapi.kp-para.cn/project/32/interface/api/492               
 function KeepWorkItemManager.GetProfile()
     return KeepWorkItemManager.profile or {};
@@ -451,6 +533,8 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
         end
         if(data)then
             KeepWorkItemManager.profile = data;
+            echo("===============profile");
+            echo(data,true);
             if(callback)then
                 callback();
             end
@@ -508,18 +592,8 @@ function KeepWorkItemManager.DoExtendedCost(exid, callback, error_callback)
             echo(bags_number);
             local len = #bags_number;
             if(len > 0)then
-                local s = "";
-                for k,v in ipairs(bags_number) do
-                    if(s == "")then
-                        s = v;
-                    else
-                        s = string.format("%s,%s",s,v);
-                    end
-                end
-                echo("=========s");
-                echo(s);
                 -- reload items data 
-                KeepWorkItemManager.LoadItems(s,callback, error_callback)
+                KeepWorkItemManager.LoadItems(bags_number,callback, error_callback)
                 return
             end
             if(callback)then
@@ -532,14 +606,24 @@ function KeepWorkItemManager.DoExtendedCost(exid, callback, error_callback)
         end
     end)
 end
-function KeepWorkItemManager.SetClientData(gsid, clientdata, callback, error_callback)
+function KeepWorkItemManager.GetClientData(gsid)
+    local bOwn, guid, bag, copies, item = KeepWorkItemManager.HasGSItem(gsid)
+    if(not item)then
+        return
+    end
+    return item.clientData;
+end
+function KeepWorkItemManager.SetClientData(gsid, clientData, callback, error_callback)
     local bOwn, guid, bag, copies, item = KeepWorkItemManager.HasGSItem(gsid)
     if(not bOwn)then
         return
     end
+    clientData = clientData or {};
+    commonlib.echo("==========before setClientData");
+    commonlib.echo(clientdata);
     keepwork.items.setClientData({
         userGoodsId = guid,
-        clientdata,
+        clientData = clientData,
     },function(err, msg, data)
         commonlib.echo("==========setClientData");
         commonlib.echo(err);
@@ -557,6 +641,28 @@ function KeepWorkItemManager.SetClientData(gsid, clientdata, callback, error_cal
             end
         end
     end)
+end
+-- search bag number by gsid
+-- @param {table} gsid_list
+-- @return bags_id
+function KeepWorkItemManager.SearchBagsNoFromGsids(gsid_list)
+    if(not gsid_list)then
+        return
+    end
+    local bags_id = {};
+    local bags_id_map = {};
+    for k,v in ipairs(gsid_list) do
+        local template = KeepWorkItemManager.GetItemTemplate(v);
+        if(template)then
+            local bagId = template.bagId;
+            local bagNo = KeepWorkItemManager.SearchBagNo(bagId)
+            if(not bags_id_map[bagNo])then
+                bags_id_map[bagNo] = true;
+                table.insert(bags_id,bagNo);
+            end
+        end
+    end
+    return bags_id;
 end
 -- search all bag number in a extendedcost for update item data
 -- NOTE: bagNo isn't bagId

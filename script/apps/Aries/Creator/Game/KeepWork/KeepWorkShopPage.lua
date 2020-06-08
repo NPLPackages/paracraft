@@ -28,11 +28,6 @@ function KeepWorkShopPage.OnInit()
 end
 
 function KeepWorkShopPage.Show()
-    KeepWorkItemManager.Load(true,function()
-        KeepWorkShopPage.Show__();
-    end)
-end
-function KeepWorkShopPage.Show__()
     local params = {
 			url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkShopPage.html",
 			name = "KeepWorkShopPage.Show", 

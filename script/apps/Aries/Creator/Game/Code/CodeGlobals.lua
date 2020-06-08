@@ -110,7 +110,7 @@ function CodeGlobals:ctor()
 		end,
 		-- set block id at given position
 		-- @param blockId: can be number or string of "id:data"
-		setBlock = function(x,y,z, blockId, blockData)
+		setBlock = function(x,y,z, blockId, blockData, entity_data)
 			if(type(blockId) == "string") then
 				local id, data = blockId:match("^(%d+):?(%d*)");
 				if(id) then
@@ -122,7 +122,7 @@ function CodeGlobals:ctor()
 					return
 				end
 			end
-			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData);
+			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData, 3, entity_data);
 		end,
 		-- similar to commonlib.gettable(tabNames) but in page scope.
 		-- @param tabNames: table names like "models.users"

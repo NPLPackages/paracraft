@@ -54,6 +54,10 @@ function ParacraftLearningRoomDailyPage.ShowPage(exid, gsid)
         _guihelper.MessageBox(L"请先登录！");
         return
     end
+    if(not KeepWorkItemManager.IsLoaded())then
+        _guihelper.MessageBox(L"正在加载数据，请稍等！");
+        return
+    end
     if(not exid or not gsid)then
         return
     end
@@ -84,6 +88,10 @@ end
 function ParacraftLearningRoomDailyPage.AutoOpen(exid, gsid, callback)
     if(not KeepWorkItemManager.GetToken())then
             _guihelper.MessageBox(L"请先登录！");
+        return
+    end
+    if(not KeepWorkItemManager.IsLoaded())then
+        _guihelper.MessageBox(L"正在加载数据，请稍等！");
         return
     end
     exid = exid or 10001;
@@ -121,21 +129,34 @@ function ParacraftLearningRoomDailyPage.IsFuture(index)
     end
 end
 function ParacraftLearningRoomDailyPage.HasCheckedToday()
-    local profile = KeepWorkItemManager.GetProfile()
-    local userId = profile.id;
-    local exId = ParacraftLearningRoomDailyPage.exid;
+--    local profile = KeepWorkItemManager.GetProfile()
+--    local userId = profile.id;
+--    local exId = ParacraftLearningRoomDailyPage.exid;
+--    local date = ParaGlobal.GetDateFormat("yyyy-M-d");
+--    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
+--	local v = GameLogic.GetPlayerController():LoadLocalData(key,false,true);
+--    return v;
+
     local date = ParaGlobal.GetDateFormat("yyyy-M-d");
-    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
-	local v = GameLogic.GetPlayerController():LoadLocalData(key,false,true);
-    return v;
+    local key = string.format("LearningRoom_HasCheckedToday_%s", date);
+    local gsid = ParacraftLearningRoomDailyPage.gsid;
+    local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
+    return clientData[key];
 end
 function ParacraftLearningRoomDailyPage.SaveToLocal()
-    local profile = KeepWorkItemManager.GetProfile()
-    local userId = profile.id;
-    local exId = ParacraftLearningRoomDailyPage.exid;
+--    local profile = KeepWorkItemManager.GetProfile()
+--    local userId = profile.id;
+--    local exId = ParacraftLearningRoomDailyPage.exid;
+--    local date = ParaGlobal.GetDateFormat("yyyy-M-d");
+--    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
+--	GameLogic.GetPlayerController():SaveLocalData(key, true, true);
+
     local date = ParaGlobal.GetDateFormat("yyyy-M-d");
-    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
-	GameLogic.GetPlayerController():SaveLocalData(key, true, true);
+    local key = string.format("LearningRoom_HasCheckedToday_%s", date);
+    local gsid = ParacraftLearningRoomDailyPage.gsid;
+    local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
+    clientData[key] = true;
+    KeepWorkItemManager.SetClientData(gsid, clientData)
 end
 function ParacraftLearningRoomDailyPage.OnCheck()
     local exid = ParacraftLearningRoomDailyPage.exid;

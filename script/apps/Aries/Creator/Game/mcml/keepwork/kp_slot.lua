@@ -24,13 +24,13 @@ function kp_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, le
 	mcmlNode.uiobject_id = _this.id;
 
 	local guid;
-    local amount = 0;
+    local copies = 0;
 	guid = mcmlNode:GetAttributeWithCode("guid", nil, true);
     local item = KeepWorkItemManager.GetItem(guid);
 	local itemTemplate;
     if(item)then
 	    itemTemplate = KeepWorkItemManager.GetItemTemplate(item.gsId);
-        amount = item.amount;
+        copies = item.copies;
     end
 	local background;
     if(itemTemplate.icon)then
@@ -45,7 +45,7 @@ function kp_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, le
 	_this.font = "System;12;bold";
 	_guihelper.SetUIFontFormat(_this, 38);
 	_this.shadow = true;
-	_this.text = tostring(amount);
+	_this.text = tostring(copies);
 	
 	kp_slot.add_tooltip_and_click(mcmlNode, _this, guid)
 	return true, true, true; -- ignore_onclick, ignore_background, ignore_tooltip;

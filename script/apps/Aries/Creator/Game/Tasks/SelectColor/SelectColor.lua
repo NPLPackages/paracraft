@@ -84,10 +84,15 @@ end
 
 
 function SelectColor:ShowPage()
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	local viewport = ViewportManager:GetSceneViewport();
+	local parent = viewport:GetUIObject(true)
+
 	local window = self:CreateGetToolWindow();
 	window:Show({
 		name="SelectColor", 
 		url="script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.html",
-		alignment="_ctb", left=0, top=-55, width = 300, height = 64,
+		alignment="_ctb", left=0, top=-55, width = 300, height = 64, parent = parent,
 	});
 end

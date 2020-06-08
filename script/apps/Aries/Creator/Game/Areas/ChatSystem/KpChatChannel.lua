@@ -200,6 +200,12 @@ function KpChatChannel.OnMsg(self, msg)
                     content = string.format(L"%s说:%s",username, content);
                     TipRoadManager:PushNode(content,"#".. color);
                 end
+
+                local profile = KeepWorkItemManager.GetProfile()
+                -- 消耗喇叭，在这里同步数据
+                if(userId == profile.id and ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
+                    KeepWorkItemManager.ReLoadItems({10002,10001});
+                end
             end
         elseif(key == "broadcast")then
             echo("==========================broadcast");
@@ -353,11 +359,6 @@ function KpChatChannel.SendToServer(msgdata)
     commonlib.echo(kp_msg);
 
     KpChatChannel.client:Send("app/msg",kp_msg);
-
-    local ChannelIndex =  msgdata.ChannelIndex;
-    if(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
-        KeepWorkItemManager.LoadItems(true);
-    end
    
 end
 

@@ -754,9 +754,10 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			dx = self.targetX - self.x;
 			dz = self.targetZ - self.z;
 			
+			local moveLength = self:GetWalkSpeed() * deltaTime;
 			if(not bFlying) then
 				local dist = (dx)^2 + (dz)^2;
-				if(dist < 0.1) then
+				if(dist <= moveLength or dist < 0.01) then
 					-- reached position
 					self:SetBlockTarget(nil, nil, nil);
 					self:SetPosition(self.targetX, self.y, self.targetZ);
@@ -764,7 +765,7 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 					self.motionY = 0;
 					self.motionZ = 0;
 				else
-					local inverse_dist = 1 / (dist ^ 0.5) * self:GetWalkSpeed() * deltaTime;
+					local inverse_dist = 1 / (dist ^ 0.5) * moveLength;
 					self.motionX = dx * inverse_dist;
 					-- self.motionY = dy * inverse_dist;
 					self.motionZ = dz * inverse_dist;
@@ -776,7 +777,7 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 				--  flying now 
 				local dy = self.targetY - self.y;
 				local dist = (dx)^2 + (dz)^2 + (dy)^2;
-				if(dist < 0.1) then
+				if(dist <= moveLength or dist < 0.01) then
 					-- reached position
 					self:SetBlockTarget(nil, nil, nil);
 					self:SetPosition(self.targetX, self.y, self.targetZ);
@@ -784,7 +785,7 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 					self.motionY = 0;
 					self.motionZ = 0;
 				else
-					local inverse_dist = 1 / (dist ^ 0.5) * self:GetWalkSpeed() * deltaTime;
+					local inverse_dist = 1 / (dist ^ 0.5) * moveLength;
 					self.motionX = dx * inverse_dist;
 					self.motionY = dy * inverse_dist;
 					self.motionZ = dz * inverse_dist;
