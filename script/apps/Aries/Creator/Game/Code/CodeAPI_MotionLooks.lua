@@ -50,14 +50,16 @@ end
 -- @param dx,dy,dz: if z is nil, y is z. in block unit, can be real numbers, 
 -- if dx=0, dy=0, dz=0, it means that we will stop walking. 
 -- @param duration: default to none
-function env_imp:walk(dx,dy,dz, duration)
+-- @param bIsAccurate: if true, we will move precisely dx,dy,dz offset(can be real numbers). 
+-- otherwise we will only walk to integer target block position (no movement if offset does not land in a new block).
+function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
 	if(not dz) then
 		dz = dy;
 		dy = nil;
 	end
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		local x,y,z = entity:GetBlockPos();
+		local x,y,z;
 		if(dx==0 and dz==0 and dy==0) then
 			entity:EnableAnimation(true);
 			entity:SetDummy(false);
@@ -65,9 +67,18 @@ function env_imp:walk(dx,dy,dz, duration)
 			env_imp.wait(self, duration);
 			return
 		end
-		x = x + math.floor((dx or 0) + 0.5);
-		y = y + math.floor((dy or 0) + 0.5);
-		z = z + math.floor((dz or 0) + 0.5);
+		if(not bIsAccurate) then
+			x,y,z = entity:GetBlockPos();
+			x = x + math.floor((dx or 0) + 0.5);
+			y = y + math.floor((dy or 0) + 0.5);
+			z = z + math.floor((dz or 0) + 0.5);
+		else
+			x, y, z = entity:GetPosition();
+			x, y, z = BlockEngine:block_float(x-0.5, y or 128, z-0.5)
+			x = x + dx;
+			y = y + dy;
+			z = z + dz;
+		end
 		if(entity.MoveTo) then
 			entity:EnableAnimation(true);
 			entity:SetDummy(false);
@@ -88,16 +99,18 @@ end
 local useFourDirectionRotationStyle = false;
 
 -- @param dist: in block unit, can be real numbers
-function env_imp:walkForward(dist, duration)
+-- @param bIsAccurate: if true, we will move precisely dx,dy,dz offset(can be real numbers). 
+-- otherwise we will only walk to integer target block position (no movement if offset does not land in a new block).
+function env_imp:walkForward(dist, duration, bIsAccurate)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		if(useFourDirectionRotationStyle) then
 			local dir = Direction.GetDirectionFromFacing(entity:GetFacing());
 			local dx, dy, dz = Direction.GetOffsetBySide(dir);
-			env_imp.walk(self, -dx*dist, -dy*dist, -dz*dist, duration);
+			env_imp.walk(self, -dx*dist, -dy*dist, -dz*dist, duration, bIsAccurate);
 		else
 			local facing = entity:GetFacing()
-			env_imp.walk(self, math.cos(facing)*dist, 0, -math.sin(facing)*dist, duration);
+			env_imp.walk(self, math.cos(facing)*dist, 0, -math.sin(facing)*dist, duration, bIsAccurate);
 			-- preserve facing, since the walk will modify facing by a slight angle to aim for block center. 
 			entity:SetFacing(facing);
 		end

@@ -170,9 +170,16 @@ function KpChatChannel.OnMsg(self, msg)
                 local tLevel = payload.tLevel;
 
 
-                local timestmap = meta.timestmap;
-
-
+                local timestamp = meta.timestamp;
+                if(timestamp)then
+                    local date,time = string.match(timestamp, "(.+)%s(.+)");
+                    local local_date = ParaGlobal.GetDateFormat("yyyy-MM-dd");
+                    if(date and date == local_date)then
+                        timestamp = time;
+                    end
+                    -- erase date if timestamp is in same day
+                    timestamp = string.gsub(timestamp, date, "");
+                end
                 commonlib.echo("=============body");
 --                commonlib.echo(key);
                 commonlib.echo(payload);
@@ -187,7 +194,7 @@ function KpChatChannel.OnMsg(self, msg)
                     ChannelIndex = ChatChannel.EnumChannels.KpBroadCast;
                 end
                 local channelname = ChatChannel.channels[ChannelIndex];
-                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, vip = vip, tLevel = tLevel, timestmap = timestmap, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
+                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, vip = vip, tLevel = tLevel, timestamp = timestamp, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
 
                  
@@ -197,7 +204,7 @@ function KpChatChannel.OnMsg(self, msg)
                     if(channel_config)then
                         color = channel_config.color or color;
                     end
-                    content = string.format(L"%s说:%s",username, content);
+                    content = string.format("%s:%s",username, content);
                     TipRoadManager:PushNode(content,"#".. color);
                 end
 

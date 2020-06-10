@@ -766,10 +766,10 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			local moveLength = self:GetWalkSpeed() * deltaTime;
 			if(not bFlying) then
 				local dist = (dx)^2 + (dz)^2;
-				if(dist <= moveLength or dist < 0.01) then
+				if(dist <= (moveLength^2) or dist < 0.01) then
 					-- reached position
-					self:SetBlockTarget(nil, nil, nil);
 					self:SetPosition(self.targetX, self.y, self.targetZ);
+					self:SetBlockTarget(nil, nil, nil);
 					self.motionX = 0;
 					self.motionY = 0;
 					self.motionZ = 0;

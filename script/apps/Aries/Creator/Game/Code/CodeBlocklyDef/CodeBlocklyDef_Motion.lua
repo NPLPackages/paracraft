@@ -376,7 +376,11 @@ moveTo("myActorName::bone_name")
 walk(1,0) -- x,z
 walk(0,1) -- x,z
 walk(-1,0,-1) -- x,y,z
-]]}},
+]]},
+{desc = L"精准行走模式", canRun = true, code = [[
+walk(0.1, 0, 0, 0.1, true)
+]]}
+},
 },
 
 {
@@ -416,7 +420,11 @@ walkForward(1, 0.5)
 play(0,1000, true)
 moveForward(1, 0.5)
 walkForward(0)
-]]}},
+]]},
+{desc = L"精准行走模式", canRun = true, code = [[
+walkForward(0.1, 0.1, true)
+]]}
+},
 },
 
 {

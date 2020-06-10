@@ -144,7 +144,15 @@ function CodeCoroutine:SetFinished()
 	if(not self.isFinished) then
 		self.isFinished = true;
 		self:finished();
+		if(self.bAutoRelease and self.codeBlock) then
+			self.codeBlock:AddCoroutineToFreePool(self);
+		end
 	end
+end
+
+-- whether we will add to auto release pool when this coroutine is finished. 
+function CodeCoroutine:SetAutoReleasePool(bAutoRelease)
+	self.bAutoRelease = bAutoRelease
 end
 
 -- when stopped, it can no longer be resumed
@@ -182,6 +190,9 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 			local result, r2, r3, r4 = self:RunImp(msg);
 			self:SetFinished();
 			self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
+			if(self.actor) then
+				self.actor:Disconnect("beforeRemoved", self, self.Stop);
+			end
 			if(onFinishedCallback) then
 				onFinishedCallback(result, r2, r3, r4);
 			end

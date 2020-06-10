@@ -29,12 +29,12 @@ end
 <div>
     
     <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
-        <div width="100%" style="height:72px;">
-            <div style="position:relative;width:420px;">
+        <div width="100%" style="position:relative;margin-top:-80px;height:72px;">
+            <div style="position:relative;width:400px;">
                 <pe:custom id="1" oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateBroadTreeView" style="margin-left:10px;height:72px;" />
             </div>
         </div>
-         <div style="margin-left:10px;margin-top:0px;">
+         <div style="margin-left:5px;margin-top:0px;">
             <pe:tabs name="tabChannel" onclick="OnSwitchChannelDisplay" 
                 SelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;208 89 21 21:8 8 8 8" UnSelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8" 
                 style="height:20px;background:;padding-top:20px;padding-left:10px;" TextOffsetY="-1" TextColor="#ffffff" SelectedTextColor="#ffffff" 

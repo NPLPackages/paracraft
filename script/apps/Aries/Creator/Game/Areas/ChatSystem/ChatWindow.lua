@@ -44,7 +44,7 @@ local max_broadcast_msg_show_time = 60000;
 -- the default show positions.
 ChatWindow.DefaultUIPos = {
 	RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
-	LogWnd = {alignment = "_lb", left = 2, top = -280, width = 320, height = 250},
+	LogWnd = {alignment = "_lb", left = 2, top = -280, width = 400, height = 250},
 	EditWnd = {alignment = "_lb", left = 2, top = -30, width = 700, height = 30},
 	ParentWnd = {alignment = "_lb", left = 2, top = -285, width = 700, height = 280},
 }
@@ -370,7 +370,6 @@ function ChatWindow.CreateTreeViewScrollBar(param, mcmlNode)
 	vscrollbar:SetPageSize(param.height);
 	vscrollbar.onchange = ";MyCompany.Aries.ChatSystem.ChatWindow.OnScrollBarChange()";
 
-	--[[
 	local states = {[1] = "highlight", [2] = "pressed", [3] = "disabled", [4] = "normal"};
 	local i;
 	for i = 1, 4 do
@@ -383,7 +382,7 @@ function ChatWindow.CreateTreeViewScrollBar(param, mcmlNode)
 		texture.texture="Texture/Aries/ChatSystem/arrow2_32bits.png;6 6 16 20";
 		texture=vscrollbar:GetTexture("thumb");
 		texture.texture="Texture/Aries/ChatSystem/arrow3_32bits.png;0 0 16 31";
-	end]]
+	end
 	param.parent:AddChild(vscrollbar);
 end
 
@@ -591,7 +590,7 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
         local kp_from_name = chatdata.kp_from_name or "";
         local vip = chatdata.vip;
         local tLevel = chatdata.tLevel;
-        local timestmap = chatdata.timestmap or "";
+        local timestamp = chatdata.timestamp or "";
 
         local channel_tag = string.format([[<div style="float:left">[%s]</div>]],chatdata.channelname);
         local name_tag_start = [[<div style="float:left">[</div>]]
@@ -606,11 +605,11 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
         local name_tag_end = [[<div style="float:left">]:</div>]]
 
         kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
-        local timestmap_tag = string.format([[<div style="float:left;margin-left:10px;color:#8b8b8b">%s</div>]],tostring(timestmap));
+        local timestamp_tag = string.format([[<input type="button" value="%s" style="float:left;margin-left:10px;color:#8b8b8b;background:url();" />]],tostring(timestamp));
         if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
-            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestmap_tag);
+            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestamp_tag);
         else
-            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,name_tag_start,vip_tag,teacher_tag,kp_from_name,name_tag_end,words,timestmap_tag);
+            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,name_tag_start,vip_tag,teacher_tag,kp_from_name,name_tag_end,words,timestamp_tag);
         end
 	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
@@ -680,10 +679,12 @@ function ChatWindow.GetTreeView(name, parent, left, top, width, height, NoClippi
 	name = name or "ChatWindow.TreeView"
 	local ctl = CommonCtrl.GetControl(name);
 	if(not ctl)then
+        left = left or 0;
+        left = left + 5;
 		ctl = CommonCtrl.TreeView:new{
 			name = name,
 			alignment = "_lt",
-			left = left or 0,
+			left = left,
 			top = top or 0,
 			width = width or 350,
 			height = height or 200,
@@ -783,9 +784,9 @@ function ChatWindow.AppendChatMessage(chatdata, needrefresh)
 		return;
 	end
 
-	commonlib.echo("!!:AppendChatMessage");
-	commonlib.echo(chatdata);
-	commonlib.echo(needrefresh);
+--	commonlib.echo("!!:AppendChatMessage");
+--	commonlib.echo(chatdata);
+--	commonlib.echo(needrefresh);
 	if(chatdata.ChannelIndex == ChatChannel.EnumChannels.BroadCast)then
 		
 		if(chatdata.words and string.match(chatdata.words,"lobby|(.+)|lobby"))then

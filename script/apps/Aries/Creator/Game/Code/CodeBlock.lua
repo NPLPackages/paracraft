@@ -295,6 +295,10 @@ function CodeBlock:Stop()
 	self:codeUnloaded();
 	self:stateChanged();
 	self:Disconnect("codeUnloaded");
+	if(self.free_coroutines) then
+		self.free_coroutines:clear();
+		self.free_coroutines = nil;
+	end
 end
 
 -- remove all timers without clearing actors.
@@ -1270,4 +1274,31 @@ function CodeBlock:IsAllowClientExecution()
 	if(self:GetEntity()) then
 		return self:GetEntity():IsAllowClientExecution();
 	end
+end
+
+function CodeBlock:AddCoroutineToFreePool(co)
+	self.free_coroutines = self.free_coroutines or commonlib.UnorderedArraySet:new()
+	if(#self.free_coroutines < 500) then
+		self.free_coroutines:add(co);
+	end
+end
+
+function CodeBlock:PopFreeCoroutine()
+	if(self.free_coroutines and (#self.free_coroutines) >= 1) then
+		local co = self.free_coroutines[#self.free_coroutines];
+		self.free_coroutines:remove(co)
+		return co;
+	end
+end
+
+-- @param bFromAutoReleasePool: if true, we may reuse this coroutine when it is finished.
+function CodeBlock:NewCoroutine(bFromAutoReleasePool)
+	local co = bFromAutoReleasePool and self:PopFreeCoroutine()
+	if(not co) then
+		co = CodeCoroutine:new():Init(self);
+		if(bFromAutoReleasePool) then
+			CodeCoroutine:SetAutoReleasePool(true);
+		end
+	end
+	return co;
 end
