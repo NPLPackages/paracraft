@@ -14,9 +14,9 @@ NPL.load("(gl)script/ide/System/Windows/Window.lua");
 local Window = commonlib.gettable("System.Windows.Window");
 local QRCodeWnd = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Movie.QRCodeWnd"));
 
-function QRCodeWnd:Show(width, height)
-	width = width or 128;
-	height = height or 128;
+function QRCodeWnd:Show()
+	local width = 192;
+	local height = 192;
 	if(not self.window) then
 		local window = Window:new();
 		window:EnableSelfPaint(true);
@@ -27,7 +27,7 @@ function QRCodeWnd:Show(width, height)
 	self.window:Show({
 		name="QRCodeWnd", 
 		url="script/apps/Aries/Creator/Game/Movie/QRCodeWnd.html",
-		alignment="_ct", left=-width/2, top=-height/2 - 30, width = width, height = height, zorder = 1,
+		alignment="_ct", left=-width/2, top=-height/2-16, width = width, height = height, zorder = 1,
 	});
 end
 

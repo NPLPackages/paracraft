@@ -20,6 +20,7 @@ NPL.export({
 				{ "编程", "program" },
 				{ "动画", "animation" },
 				{ "CAD", "CAD" },
+				{ "机器人", "robot" },
 			},
 			text = "编程",
 		},

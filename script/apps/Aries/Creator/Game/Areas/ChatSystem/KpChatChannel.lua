@@ -136,6 +136,35 @@ function KpChatChannel.OnClose(self)
     commonlib.echo("=============OnClose");
     KpChatChannel.Clear();
 end
+-- erase date if timestamp is in same day
+function KpChatChannel.GetTimeStamp(timestamp)
+    if(not timestamp)then
+        return
+    end
+    local date,time = string.match(timestamp, "(.+)%s(.+)");
+    local local_date = ParaGlobal.GetDateFormat("yyyy-MM-dd");
+    if(date and date == local_date)then
+        timestamp = time;
+    end
+    -- erase date if timestamp is in same day
+    timestamp = string.gsub(timestamp, date, "");
+    return timestamp;
+end
+-- check if include a name in usernames_str
+-- @param usernames_str: "name_1,name_2"
+-- @param name: which is be searched
+-- @return true if found
+function KpChatChannel.HasUserName(usernames_str, name)
+    if(not usernames_str or not name)then
+        return
+    end
+    local v;
+	for v in string.gmatch(usernames_str, "([^,]+)") do
+        if(v == name)then
+            return true;
+        end
+	end
+end
 function KpChatChannel.OnMsg(self, msg)
     commonlib.echo("=============OnMsg");
     commonlib.echo(msg);
@@ -167,19 +196,12 @@ function KpChatChannel.OnMsg(self, msg)
                 local userId = payload.id;
                 local username = payload.username;
                 local vip = payload.vip;
+                local student = payload.student;
+                local orgAdmin = payload.orgAdmin;
                 local tLevel = payload.tLevel;
 
 
-                local timestamp = meta.timestamp;
-                if(timestamp)then
-                    local date,time = string.match(timestamp, "(.+)%s(.+)");
-                    local local_date = ParaGlobal.GetDateFormat("yyyy-MM-dd");
-                    if(date and date == local_date)then
-                        timestamp = time;
-                    end
-                    -- erase date if timestamp is in same day
-                    timestamp = string.gsub(timestamp, date, "");
-                end
+                local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
                 commonlib.echo("=============body");
 --                commonlib.echo(key);
                 commonlib.echo(payload);
@@ -194,11 +216,13 @@ function KpChatChannel.OnMsg(self, msg)
                     ChannelIndex = ChatChannel.EnumChannels.KpBroadCast;
                 end
                 local channelname = ChatChannel.channels[ChannelIndex];
-                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, vip = vip, tLevel = tLevel, timestamp = timestamp, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
+                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, 
+                vip = vip, student = student, orgAdmin = orgAdmin, tLevel = tLevel, 
+                timestamp = timestamp, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
 
-                 
-                if(KpChatChannel.BulletScreenIsOpened())then
+                
+                if(KpChatChannel.BulletScreenIsOpened() and KpChatChannel.IsInWorld())then
                     local color = "ffffff";
                     local channel_config = ChatChannel.channels[ChannelIndex];
                     if(channel_config)then
@@ -215,6 +239,7 @@ function KpChatChannel.OnMsg(self, msg)
                 end
             end
         elseif(key == "broadcast")then
+            -- system broadcast
             echo("==========================broadcast");
             echo(info.data);
             echo(info.data.msg);
@@ -228,7 +253,56 @@ function KpChatChannel.OnMsg(self, msg)
                 local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, kp_from_name = username, is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
 
-                 if(KpChatChannel.BulletScreenIsOpened())then
+                 if(KpChatChannel.BulletScreenIsOpened() and KpChatChannel.IsInWorld())then
+                    local color = "ffffff";
+                    local channel_config = ChatChannel.channels[ChannelIndex];
+                    if(channel_config)then
+                        color = channel_config.color or color;
+                    end
+                    content = string.format("[%s]:%s",channel_config.name, content);
+                    TipRoadManager:PushNode(content,"#".. color);
+                end
+            end
+        elseif(key == "msg")then
+            -- system broadcast to user
+            echo("==========================system broadcast to user");
+            echo(info,true);
+            --[[
+            {
+                  meta={ timestamp="2020-06-11 16:56" },
+                  payload={
+                    all=0,
+                    createdAt="2020-06-11T08:56:11.211Z",
+                    extra={  },
+                    id=969,
+                    msg={ text="<p>666</p>", type=0 },
+                    operator="kevinxft",
+                    organizationId=0,
+                    receivers="zhangleio,zhangleio2",
+                    roleId=0,
+                    sendSms=0,
+                    sender=0,
+                    type=0,
+                    updatedAt="2020-06-11T08:56:11.211Z" 
+                  } 
+                }
+            ]]
+            if(payload and payload.receivers and payload.msg)then
+                local receivers = payload.receivers;
+                local user_info = KeepWorkItemManager.GetProfile();
+                if(not KpChatChannel.HasUserName(receivers, user_info.username))then
+                    return
+                end
+                local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
+                local content = payload.msg.text;
+                content = string.gsub(content, "<p>","");
+                content = string.gsub(content, "</p>","");
+                local ChannelIndex = ChatChannel.EnumChannels.KpSystem;
+                local channelname = ChatChannel.channels[ChannelIndex];
+                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, is_keepwork = true, }
+                ChatChannel.AppendChat( msgdata)
+
+                if(KpChatChannel.BulletScreenIsOpened() and KpChatChannel.IsInWorld())then
                     local color = "ffffff";
                     local channel_config = ChatChannel.channels[ChannelIndex];
                     if(channel_config)then
@@ -359,6 +433,8 @@ function KpChatChannel.SendToServer(msgdata)
             id = user_info.id,
             username = user_info.username,
             vip = user_info.vip,
+            student = user_info.student,
+            orgAdmin = user_info.orgAdmin,
             tLevel = user_info.tLevel,
         },
     }

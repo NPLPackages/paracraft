@@ -98,6 +98,16 @@ function CodeActorItemStack:GetMovieEntity()
 	return self.entityCode:FindNearByMovieEntity();
 end
 
+function CodeActorItemStack:OnClickActorEntity(actor, mouse_button)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCodeActor/EditCodeActor.lua");
+	local EditCodeActor = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCodeActor");
+	if(not EditCodeActor.GetInstance()) then
+		local task = EditCodeActor:new():Init(self.entityCode);
+		task:Run();
+		EditCodeActor.SetFocusToItemStack(self:GetItemStack());
+	end
+end
+
 -- create a movie actor based on this inventory item stack. 
 -- only used in an editor
 -- return movie actor created
@@ -112,6 +122,12 @@ function CodeActorItemStack:CreateMovieActor()
 				-- keep a week reference here for EditCodeActor's right click scene picking
 				actor.codeActorItemStack = self;
 				self:ApplyInitParams(actor);
+				local entity = actor:GetEntity();
+				if(entity) then
+					entity.OnClick = function(entity, x, y, z, mouse_button)
+						return self:OnClickActorEntity(actor, mouse_button);
+					end
+				end
 				return actor;
 			end
 		end

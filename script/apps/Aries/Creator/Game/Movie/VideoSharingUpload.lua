@@ -21,7 +21,8 @@ local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing
 local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 local QREncode = commonlib.gettable("MyCompany.Aries.Game.Movie.QREncode");
 
-local download_tip_url = "https://keepwork.com/warning/can-not-download-video.html";
+--local download_tip_url = "http://dev.kp-para.cn/p/video-share/";
+local download_tip_url = "https://keepwork.com/p/video-share/";
 
 local page;
 function VideoSharingUpload.OnInit()
@@ -108,7 +109,7 @@ function VideoSharingUpload.OnOK()
 							VideoSharingUpload.UploadFailed("keepwork.shareUrl", err, data);
 							return;
 						end
-						VideoSharingUpload.ShowQRCode(file_name.."|"..data.data);
+						VideoSharingUpload.ShowQRCode(data.data.."&attname="..file_name);
 					end);
 
 					keepwork.shareFile.post({key = key}, function(err, msg, data)
@@ -130,7 +131,7 @@ function VideoSharingUpload.UploadFailed(stage, error, data)
 end
 
 function VideoSharingUpload.ShowQRCode(url)
-	url = download_tip_url.."?"..url;
+	url = download_tip_url..commonlib.Encoding.url_encode(url);
 	local ok, result = QREncode.qrcode(url);
 	if (not ok) then
 		VideoSharingUpload.UploadFailed("QRCode", -1, {info = "url to qrcode error"});

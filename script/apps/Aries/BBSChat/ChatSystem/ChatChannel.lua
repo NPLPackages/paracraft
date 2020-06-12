@@ -460,7 +460,7 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
 			return;
         else
             if(copies < 100) then
-				_guihelper.MessageBox(format("发送一条喇叭消息,需要消耗一个%s,确定要发送? 你现在还有%d个%s", stone_name, copies or 0, stone_name),function(result)
+				_guihelper.MessageBox(format("发送一条广播消息,需要消耗一个[%s],确定要发送? 你现在还有%d个[%s]", stone_name, copies or 0, stone_name),function(result)
 					if(result == _guihelper.DialogResult.OK)then
 						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
 					end

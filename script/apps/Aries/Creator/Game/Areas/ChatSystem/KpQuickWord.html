@@ -14,7 +14,14 @@ function OnClosePage()
     page:CloseWindow();
 end
 function OnOK()
-    if(KpQuickWord.project_id and KpQuickWord.callback)then
+    if(not KpQuickWord.project_id)then
+        if(GameLogic)then
+	        GameLogic.AddBBS("statusBar", L"请输入作品ID哦。", 5000, "255 0 0");
+        end
+        
+       return 
+    end
+    if(KpQuickWord.callback)then
         KpQuickWord.callback(KpQuickWord.project_id);
     end
     OnClosePage();

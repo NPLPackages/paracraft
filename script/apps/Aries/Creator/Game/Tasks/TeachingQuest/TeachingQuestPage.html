@@ -21,8 +21,8 @@
 			end
 			]]>
 		</script>
-		<aries:window mode="thin" style="width:650px;height:430px" title='<%= L"任务列表"%>' onclose="TeachingQuestPage.OnClose">
-			<div style="margin:20px;height:0px;color:#ffffff">
+		<aries:window mode="thin" style="width:680px;height:430px" title='<%= L"任务列表"%>' onclose="TeachingQuestPage.OnClose">
+			<div style="margin:26px;height:0px;color:#ffffff">
 				<div>
 					<div style="float:left;">
 						<%=L"任务类型："%>
@@ -30,26 +30,52 @@
 							<option value="program" selected="true">编程</option>
 							<option value="animation">动画</option>
 							<option value="CAD">CAD</option>
+							<option value="robot">机器人</option>
 						</select>
 					</div>
-					<div style="float:left;margin-left:230px;">
+					<div style="float:left;margin-left:210px;">
 						<%=L"已解锁世界"%>
-						<input type="button" name="unlocked" value='<%=TeachingQuestPage.GetUnlockedTasks()%>' style="color: #ffffff; background:; margin-left:10px;text-align:left;max-width:60px;" />
+						<input type="button" name="UnlockedTasks" value='<%=TeachingQuestPage.GetUnlockedTasks()%>' style="color: #ffffff;margin-left:10px;text-align:left;max-width:60px;background:;" />
 					</div>
 					<div style="float:left;margin-left:10px;">
 						<%=L"已完成任务"%>
-						<input type="button" name="unlocked" value="<%=TeachingQuestPage.GetFinishedTasks()%>" style="color: #ffffff; background:; margin-left:10px;text-align:left;max-width:60px;" />
+						<input type="button" name="FinishedTasks" value="<%=TeachingQuestPage.GetFinishedTasks()%>" style="color: #ffffff; margin-left:10px;text-align:left;max-width:60px;background:;" />
 					</div>
 				</div>
 			</div>
 			<div>
-				<pe:gridview style="margin:0px;width:650px;height:400px;" name="item_gridview" CellPadding="20" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="140"
+				<pe:gridview style="margin:0px;width:680px;height:430px;" name="item_gridview" CellPadding="22" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="140"
 							 DataSource='<%=DS_Items%>'>
 					<Columns>
-						<div style="width:180px;height:0px;">
-							<input type="button" name='<%= Eval("index")%>' value='<%= TeachingQuestPage.GetTaskTitle(Eval("index"))%>' style="width:180px;height:140px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="TeachingQuestPage.OnClickItem" />
-						</div>
-
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Finished)%>'>
+							<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_finished_32bits.png#0 0 40 40);"></div>
+							</div>
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"已完成"%></div>
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Activated)%>'>
+							<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_activated_32bits.png#0 0 40 40);"></div>
+							</div>
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"可完成"%></div>
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Acceptable)%>'>
+							<div style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>
+							</div>
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"领取入场券解锁"%></div>
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Locked)%>'>
+							<div style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>
+							</div>
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"完成前1节课解锁"%></div>
+						</pe:if>
+						<div style="float:left;position:relative;margin-top:6px;width:183px;text-align:center;font-size:13px;color:#ffffff"><%= TeachingQuestPage.GetTaskTitle(Eval("index"))%></div>
 					</Columns>
 					<EmptyDataTemplate>
 					</EmptyDataTemplate>

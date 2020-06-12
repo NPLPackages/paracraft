@@ -885,6 +885,7 @@ stopMovie();
 				{ L"中间下", "_mb" },
 				{ L"全屏", "_fi" },
 				{ L"人物头顶", "headon" },
+				{ L"人物头顶".."3D", "headon3D" },
 			},
 			text = "_lt", 
 		},

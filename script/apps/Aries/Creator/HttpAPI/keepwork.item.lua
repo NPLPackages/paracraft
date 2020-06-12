@@ -75,6 +75,21 @@ function(self, err, msg, data)
 end
 )
 
+--http://yapi.kp-para.cn/project/109/interface/api/1397
+-- get
+HttpWrapper.Create("keepwork.items.checkExchange", "%MAIN%/gosys/v0/checkExchange", "GET", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+    -- no cache
+    inputParams.cache_policy = "access plus 0"
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.items.checkExchange")
+end,
+-- Post Processor
+function(self, err, msg, data)
+    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.items.checkExchange", callbackFunc); 
+end
+)
+
 --http://yapi.kp-para.cn/project/109/interface/api/1472
 -- put
 HttpWrapper.Create("keepwork.items.setClientData", "%MAIN%/gosys/v0/userGoods/clientData", "PUT", true, nil,

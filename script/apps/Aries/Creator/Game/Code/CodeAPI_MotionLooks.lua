@@ -842,14 +842,19 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 			self.codeblock:SetAutoWait(false)
 
 			local my_window;
-			if(alignment == "headon") then
+			if(alignment == "headon" or alignment == "headon3D") then
 				if(self.actor) then
 					local entity = self.actor:GetEntity()
 					if(entity) then
-						my_window = entity:SetHeadOnDisplay({
+						local params = {
 							url = xmlRoot,
 							pageGlobalTable = pageIndex,
-						})
+						}
+						if(alignment == "headon3D") then
+							params.is3D = true
+							params.facing = -1.57
+						end
+						my_window = entity:SetHeadOnDisplay(params)
 					end
 				end
 			else
@@ -883,7 +888,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 			LOG.std(nil, "error", "CodeAPI_MotionLooks",  "invalid xml content in window() function")
 		end
 	else
-		if(alignment == "headon") then
+		if(alignment == "headon" or alignment == "headon3D") then
 			if(self.actor) then
 				local entity = self.actor:GetEntity()
 				if(entity) then

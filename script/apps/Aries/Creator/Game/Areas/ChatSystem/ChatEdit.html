@@ -35,16 +35,16 @@ end
 <pe:if condition="<%= not System.options.IsMobilePlatform %>">
     <div width="100%" style="height:29px;background-color:#000000a0;">
         <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
-            <div style="float:left;margin-left:5px;margin-top:2px;">
+            <div style="float:left;margin-left:5px;margin-top:4px;">
                 <pe:if condition="<%= IsOpened_BulletScreen() %>">
-                        <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:0px;width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_on_32bits.png#0 0 26 26);" 
+                        <input type="button" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:0px;width:21px;height:21px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_on_32bits.png#0 0 21 21);" 
                             onclick="OnClose_BulletScreen()" />
                 </pe:if>
                 <pe:if condition="<%= not IsOpened_BulletScreen() %>">
-                        <input type="button" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:0px;width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_off_32bits.png#0 0 26 26);" 
+                        <input type="button" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:0px;width:21px;height:21px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_off_32bits.png#0 0 21 21);" 
                             onclick="OnOpen_BulletScreen()" />
                 </pe:if>    
-                <input type="button" tooltip="快捷语言" style="font-size:12px;margin-left:10px;margin-top:0px;width:29px;height:24px;background:url(Texture/Aries/Creator/keepwork/chat/quick_language_off_32bits.png#0 0 29 24);" 
+                <input type="button" tooltip="快捷语言" style="font-size:12px;margin-left:10px;margin-top:1px;width:24px;height:20px;background:url(Texture/Aries/Creator/keepwork/chat/quick_language_off_32bits.png#0 0 24 20);" 
                     onclick="OnQuickword()" name="quickword_btn"/>
                 
             </div>

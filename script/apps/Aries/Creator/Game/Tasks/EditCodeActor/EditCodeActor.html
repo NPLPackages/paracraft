@@ -23,7 +23,7 @@ end
 
 ]]>
 </script>
-<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:330px" title='<%=L"代码方块中的角色"%>' onclose="EditCodeActor.OnClose">
+<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:390px" title='<%=L"代码方块中的角色"%>' onclose="EditCodeActor.OnClose">
 <pe:if condition="<%=EditCodeActor.GetInstance()~=nil%>">
     <div>
         <div class="mc_item" style="float:left;width: 34px; height: 34px;">
@@ -57,7 +57,7 @@ end
         <div><div style="float:left;min-width:60px;"><%=L"方向"%></div><input class="mc_input" name="rot" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditCodeActor.UpdateActorFromPage" width="100%"/></div>
         <div><div style="float:left;min-width:60px;"><%=L"大小"%></div><input class="mc_input" name="scaling" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditCodeActor.UpdateActorFromPage" width="100%"/></div>
         <div><div style="float:left;min-width:60px;"><%=L"时间起点"%></div><input class="mc_input" name="startTime" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditCodeActor.UpdateActorFromPage" width="100%"/></div>
-        <div><div style="float:left;min-width:60px;"><%=L"用户数据"%></div><input class="mc_input" name="userData" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditCodeActor.UpdateActorFromPage" width="100%"/></div>
+        <div><div style="margin-top:5px;" class="mc_paper_panel" ><input class="mc_input" name="userData" ShowLineNumber="true" rows="4" UseSystemControl="true" type="text" style="height:88px;" value='' EmptyText='<%=L"用户数据"%>' onchange="EditCodeActor.UpdateActorFromPage" width="100%" CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/></div></div>
     </div>
 </pe:if>
 </aries:window>

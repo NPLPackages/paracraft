@@ -589,6 +589,8 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
         local color = chatdata.color or "ffffff";
         local kp_from_name = chatdata.kp_from_name or "";
         local vip = chatdata.vip;
+        local student = chatdata.student;
+        local orgAdmin = chatdata.orgAdmin;
         local tLevel = chatdata.tLevel;
         local timestamp = chatdata.timestamp or "";
 
@@ -596,11 +598,12 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
         local name_tag_start = [[<div style="float:left">[</div>]]
         local vip_tag = ""
         local teacher_tag = ""
-        if(vip == 1)then
-            vip_tag = [[<div style="float:left;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/chat/vip_32bits.png#0 0 18 18)"></div>]];
-        end
-        if(tLevel == 1)then
+
+        -- show T tag first
+        if(orgAdmin == 1 or tLevel == 1)then
             teacher_tag = [[<div style="float:left;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/chat/teacher_32bits.png#0 0 18 18)"></div>]];
+        elseif(vip == 1 or student == 1)then
+            vip_tag = [[<div style="float:left;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/chat/vip_32bits.png#0 0 18 18)"></div>]];
         end
         local name_tag_end = [[<div style="float:left">]:</div>]]
 

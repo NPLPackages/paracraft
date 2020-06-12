@@ -16,11 +16,11 @@ NPL.load("(gl)script/ide/System/Windows/Window.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PainterContext = commonlib.gettable("System.Core.PainterContext");
 local HeadonDisplay = commonlib.inherit(commonlib.gettable("System.Windows.Window"), commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay"));
+HeadonDisplay:Property({"bIsBillBoard", false, "IsBillBoarded", "SetBillBoarded", auto=true});
+
 local template_name = "HeadonDisplay_mcmlv2"
 local template_3d_name = "HeadonDisplay_3d_mcmlv2"
-
 local next_id = 0;
-
 
 function HeadonDisplay:ctor()
 	next_id = next_id + 1
@@ -77,6 +77,27 @@ function HeadonDisplay:GetParentEntity()
 	return self.dummyObj and self.dummyObj:GetParent();
 end
 
+function HeadonDisplay:SetHeadOnZEnabled(bEnabled)
+	local parentEntity = self:GetParentEntity();
+	if(parentEntity) then
+		local obj = parentEntity:GetInnerObject()
+		if(obj) then
+			obj:SetField("HeadOnZEnabled", bEnabled==true);
+		end
+	end
+end
+
+function HeadonDisplay:SetHeadOn3DScalingEnabled(bEnabled)
+	local parentEntity = self:GetParentEntity();
+	if(parentEntity) then
+		local obj = parentEntity:GetInnerObject()
+		if(obj) then
+			obj:SetField("HeadOn3DScalingEnabled", bEnabled==true);
+		end
+	end
+end
+
+
 -- @param params: {url="", alignment, x,y,width, height, allowDrag,zorder, enable_esc_key, DestroyOnClose, parent, pageGlobalTable, 
 --	is3D, offset, facing}
 -- pageGlobalTable can be a custom page environment table, if nil, it will be the global _G. 
@@ -100,6 +121,7 @@ function HeadonDisplay:ShowWithParams(params)
 			if(offset) then
 				obj:SetHeadOnOffset(offset.x or 0, offset.y or 0, offset.z or 0, 0);
 			end
+			-- setting 3d facing will automatically make the text control to render in 3d. 
 			obj:SetField("HeadOn3DFacing", params.facing or 0);
 		else
 			HeadonDisplay.InitHeadonTemplate();
@@ -215,6 +237,9 @@ function HeadonDisplay.onDraw(obj)
 	local id = obj.text;
 	local self = all_instances[id];
 	if(self) then
+		if(self:IsBillBoarded()) then
+			self.painterContext:LoadBillboardMatrix();
+		end
 		self:handleRender()
 	end
 end

@@ -8,16 +8,67 @@ local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Tea
 TeachingQuestPage.ShowPage();
 -----------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestMessage.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local TeachingQuestMessage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestMessage.lua");
 
 local TeachingQuestPage = NPL.export();
-TeachingQuestPage.MainWorldId = "10373";
+TeachingQuestPage.ticketExid= 10002;
+TeachingQuestPage.ticketGsid = 10003;
+TeachingQuestPage.rewardGsid = 998;
+
+TeachingQuestPage.MainWorldId = ParaEngine.GetAppCommandLineByParam("world_id", nil);
+
 TeachingQuestPage.quests = {}
 TeachingQuestPage.taskCallback = {}
 TeachingQuestPage.currentType = "program";
-TeachingQuestPage.currentIndex = 1;
+TeachingQuestPage.currentIndex = -1;
+
+-- task exid
+-- TeachingQuestPage.programExid = 10003;
+-- TeachingQuestPage.animationExid = 10004;
+-- TeachingQuestPage.cadExid = 10005;
+-- TeachingQuestPage.robotExid = 10006;
+TeachingQuestPage.TaskExids = {10003, 10004, 10005, 10006};
+
+-- task exid
+-- TeachingQuestPage.programExidVip = 10013;
+-- TeachingQuestPage.animationExidVip = 10014;
+-- TeachingQuestPage.cadExidVip = 10015;
+-- TeachingQuestPage.robotExidVip = 10016;
+TeachingQuestPage.VipTaskExids = {10013, 10014, 10015, 10016};
+
+-- task gsid
+-- TeachingQuestPage.programGsid = 30202;
+-- TeachingQuestPage.animationGsid = 30203;
+-- TeachingQuestPage.cadGsid = 30204;
+-- TeachingQuestPage.robotGsid = 30205;
+TeachingQuestPage.totalTaskGsid = 30201;
+TeachingQuestPage.TaskGsids = {30202, 30203, 30204, 30205};
+
+-- teacher state
+TeachingQuestPage.HasNewTask = 1;
+TeachingQuestPage.TaskInProgress = 2;
+TeachingQuestPage.AllFinished = 3;
+
+-- task state
+TeachingQuestPage.Finished = 1;
+TeachingQuestPage.Activated = 2;
+TeachingQuestPage.Acceptable = 3;
+TeachingQuestPage.Locked = 4;
+
+-- task type
+TeachingQuestPage.ProgramType = 1;
+TeachingQuestPage.AnimationType = 2;
+TeachingQuestPage.CADType = 3;
+TeachingQuestPage.RobotType = 4;
+TeachingQuestPage.UnknowType = 5;
+
+TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "robot"};
+TeachingQuestPage.TaskTypeIndex = {
+	program = TeachingQuestPage.ProgramType,
+	animation = TeachingQuestPage.AnimationType,
+	CAD = TeachingQuestPage.CADType,
+	robot = TeachingQuestPage.RobotType
+};
 
 local page;
 function TeachingQuestPage.OnInit()
@@ -25,7 +76,8 @@ function TeachingQuestPage.OnInit()
 end
 function TeachingQuestPage.ShowPage(type)
 	TeachingQuestPage.currentType = type;
-	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.TaskTypeToIndex(type)];
+	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type] or {};
+	TeachingQuestPage.CheckTaskCount(type);
 
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html",
@@ -39,42 +91,62 @@ function TeachingQuestPage.ShowPage(type)
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 		align = "_ct",
-		x = -650 / 2,
+		x = -680 / 2,
 		y = -430 / 2,
-		width = 650,
+		width = 680,
 		height = 430,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	page:SetValue("TaskType", type);
-end
-function TeachingQuestPage.AddTasks(tasks, type)
-	TeachingQuestPage.quests[TeachingQuestPage.TaskTypeToIndex(type)] = tasks;
-	TeachingQuestPage.taskCallback[TeachingQuestPage.TaskTypeToIndex(type)](true);
+	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type]);
 end
 
-function TeachingQuestPage.RegisterTasksChanged(callback, type)
-	TeachingQuestPage.taskCallback[TeachingQuestPage.TaskTypeToIndex(type)] = callback;
+function TeachingQuestPage.IsVip()
+	local gsid = 10;
+	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
+	return (copies and copies > 0);
 end
 
-function TeachingQuestPage.GetCurrentSelectTask(index)
-	index = index or TeachingQuestPage.currentIndex;
-	if (TeachingQuestPage.currentType and index) then
-		return TeachingQuestPage.quests[TeachingQuestPage.TaskTypeToIndex(TeachingQuestPage.currentType)][index];
+function TeachingQuestPage.CheckTaskCount(type)
+	local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.TaskGsids[type]);
+	if (template) then
+		if (#TeachingQuestPage.Current_Item_DS > template.max) then
+			for i = #TeachingQuestPage.Current_Item_DS, template.max+1, -1 do
+				TeachingQuestPage.Current_Item_DS[i] = nil;
+			end
+		end
 	else
-		return nil;
+		TeachingQuestPage.Current_Item_DS = {};
 	end
 end
 
-function TeachingQuestPage.TaskTypeToIndex(type)
-	if (type == "program") then
-		return 1
-	elseif (type == "animation") then
-		return 2
-	elseif (type == "CAD") then
-		return 3
+function TeachingQuestPage.AddTasks(tasks, type)
+	TeachingQuestPage.quests[type] = tasks;
+	commonlib.TimerManager.SetTimeout(function()  
+		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);
+		local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[type]);
+		local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
+		if (count < max) then
+			if (ticket > 0) then
+				TeachingQuestPage.taskCallback[type](TeachingQuestPage.TaskInProgress);
+			else
+				TeachingQuestPage.taskCallback[type](TeachingQuestPage.HasNewTask);
+			end
+		else
+			TeachingQuestPage.taskCallback[type](TeachingQuestPage.AllFinished);
+		end
+	end, 2000)
+end
+
+function TeachingQuestPage.RegisterTasksChanged(callback, type)
+	TeachingQuestPage.taskCallback[type] = callback;
+end
+
+function TeachingQuestPage.GetCurrentSelectTask(index)
+	if (TeachingQuestPage.currentType and index > 0) then
+		return TeachingQuestPage.quests[TeachingQuestPage.currentType][index];
 	else
-		return 4
+		return nil;
 	end
 end
 
@@ -89,96 +161,69 @@ function TeachingQuestPage.IsTaskProject(pid)
 	return false;
 end
 
--- index start as 1
-function TeachingQuestPage.IsFinished(exid, index)
-	index = index or 1;
-	local cnt = TeachingQuestPage.GetMarkItemCnt(exid);
-	index = index - 1
-	if(index < cnt)then
-		return true
-	end
-end
-function TeachingQuestPage.CanAccept(exid, index)
-	local precondition, cost, goal = KeepWorkItemManager.GetConditions(exid);
-	if(not precondition)then
-		return true
-	end
---    for k,v in ipairs(precondition) do
---        local gsid = v.goods.gsId;
---        local amount = v.amount or 0;
---        local bOwn, guid, bag, copies = KeepWorkItemManager.HasGSItem(gsId);
---        copies = copies or 0;
---        if(copies < amount)then
---            return false;
---        end
---    end
-	return true;
-end
-function TeachingQuestPage.IsActived(exid, index)
-	local cnt = TeachingQuestPage.GetMarkItemCnt(exid);
-	index = index - 1
-	if(index == cnt)then
-		return true
+function TeachingQuestPage.GetTaskItemMax(gsid)
+	local template = KeepWorkItemManager.GetItemTemplate(gsid);
+	if (template) then
+		return template.max or 0;
+	else
+		return 0;
 	end
 end
 
-function TeachingQuestPage.IsLocked(exid, index)
-	local cnt = TeachingQuestPage.GetMarkItemCnt(exid);
-	index = index - 1
-	if(index > cnt)then
-		return true
-	end
-end
-function TeachingQuestPage.GetMarkItem(exid)
-	local precondition, cost, goal = KeepWorkItemManager.GetConditions(exid);
-	if(not goal)then
-		return
-	end
-	if(goal[1] and goal[1]["goods"])then
-		local mark_item = goal[1]["goods"][1]["goods"];
-		return mark_item;
-	end
-end
-function TeachingQuestPage.GetMarkItemCnt(exid)
-	local item = TeachingQuestPage.GetMarkItem(exid);
-	if(not item)then
-		return 0;
-	end
-	local gsid = item.gsId;
+function TeachingQuestPage.GetTaskItemCount(gsid)
 	local bOwn, guid, bag, copies = KeepWorkItemManager.HasGSItem(gsid);
 	copies = copies or 0;
 	return copies;
-end
-
-function TeachingQuestPage.OnClickItem(index)
-	TeachingQuestPage.currentIndex = index;
-	local task = TeachingQuestPage.GetCurrentSelectTask(index);
-	if (task) then
-		GameLogic.RunCommand("/loadworld "..task.pid);
-		page:CloseWindow();
-	end
-end
-
-function TeachingQuestPage.GetUnlockedTasks()
-	return "3/20";
-end
-
-function TeachingQuestPage.GetFinishedTasks()
-	return "2/20";
-end
-
-function TeachingQuestPage.OnSelectTaskType(name, value)
-	TeachingQuestPage.currentType = value;
-	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.TaskTypeToIndex(value)];
-	page:Refresh(0);
 end
 
 function TeachingQuestPage.OnClose()
 	page:CloseWindow();
 end
 
+function TeachingQuestPage.GetUnlockedTasks()
+	local type = TeachingQuestPage.currentType;
+	local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);
+	local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[type]);
+	local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
+	if (ticket > 0 and count < max) then
+		count = count + 1;
+	end
+	return string.format("%d/%d", count, max);
+end
+
+function TeachingQuestPage.GetFinishedTasks()
+	local type = TeachingQuestPage.currentType;
+	local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);
+	local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[type]);
+	return string.format("%d/%d", count, max);
+end
+
+function TeachingQuestPage.OnSelectTaskType(name, value)
+	TeachingQuestPage.currentType = TeachingQuestPage.TaskTypeIndex[value];
+	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.currentType] or {};
+	TeachingQuestPage.CheckTaskCount(TeachingQuestPage.currentType);
+	page:Refresh(0);
+end
+
 function TeachingQuestPage.GetTaskState(index)
-	return L"已激活";
+	local task = TeachingQuestPage.GetCurrentSelectTask(index);
+	if (task) then
+		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[TeachingQuestPage.currentType]);
+		if (index <= count) then
+			return TeachingQuestPage.Finished;
+		elseif (index > count + 1) then
+			return TeachingQuestPage.Locked;
+		else
+			local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
+			if (ticket > 0) then
+				return TeachingQuestPage.Activated;
+			else
+				return TeachingQuestPage.Acceptable;
+			end
+		end
+	else
+		return TeachingQuestPage.Locked;
+	end
 end
 
 function TeachingQuestPage.GetTaskTitle(index)
@@ -187,5 +232,32 @@ function TeachingQuestPage.GetTaskTitle(index)
 		return task.title;
 	else
 		return L"";
+	end
+end
+
+function TeachingQuestPage.OnClickItem(index)
+	local function StartTask()
+		TeachingQuestPage.currentIndex = index;
+		local task = TeachingQuestPage.GetCurrentSelectTask(index);
+		if (task) then
+			page:CloseWindow();
+			GameLogic.RunCommand("/loadworld -force "..task.pid);
+		end
+	end
+	local state = TeachingQuestPage.GetTaskState(index);
+	if (state == TeachingQuestPage.Finished) then
+		StartTask();
+	elseif (state == TeachingQuestPage.Activated) then
+		local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
+		if (TeachingQuestPage.IsVip()) then
+			exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
+		end
+		KeepWorkItemManager.CheckExchange(exid, function(canExchange)
+			if (canExchange.data) then
+				StartTask();
+			end
+		end);
+	else
+		-- task is locked
 	end
 end

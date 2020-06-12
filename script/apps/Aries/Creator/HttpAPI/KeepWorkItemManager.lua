@@ -54,8 +54,10 @@ KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
 
 function KeepWorkItemManager.IsEnabled()
-    local kpitem_enabled = ParaEngine.GetAppCommandLineByParam("kpitem_enabled", false);
-    return kpitem_enabled;
+--    local kpitem_enabled = ParaEngine.GetAppCommandLineByParam("kpitem_enabled", false);
+--    return kpitem_enabled;
+
+    return true;
 end
 
 function KeepWorkItemManager.StaticInit()
@@ -606,6 +608,29 @@ function KeepWorkItemManager.DoExtendedCost(exid, callback, error_callback)
         end
     end)
 end
+
+function KeepWorkItemManager.CheckExchange(exid, callback, error_callback)
+	if (not exid) then
+		return
+	end
+    local profile = KeepWorkItemManager.GetProfile()
+    local userId = profile.id;
+    keepwork.items.checkExchange({
+        userId = userId, 
+        exId = exid,
+    },function(err, msg, data)
+        if(err == 200)then
+            if(callback)then
+                callback(data);
+            end
+        else
+            if(error_callback)then
+                error_callback(err, msg, data);
+            end
+        end
+    end)
+end
+
 function KeepWorkItemManager.GetClientData(gsid)
     local bOwn, guid, bag, copies, item = KeepWorkItemManager.HasGSItem(gsid)
     if(not item)then

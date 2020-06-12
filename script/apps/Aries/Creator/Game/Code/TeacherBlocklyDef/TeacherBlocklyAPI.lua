@@ -1,4 +1,4 @@
---[[
+﻿--[[
 Title: Teacher Block 
 Author(s): 
 Date: 
@@ -38,6 +38,8 @@ function TeacherBlocklyAPI:InstallAPIToCodeEnv(codeEnv)
 end
 
 function TeacherBlocklyAPI:Init(codeEnv)
+	local fileName = "script/UIAnimation/CommonBounce.lua.table";
+	UIAnimManager.LoadUIAnimationFile(fileName);
 	self.codeEnv = codeEnv;
 	self:InstallAPIToCodeEnv(codeEnv);
 		
@@ -51,13 +53,14 @@ function TeacherBlocklyAPI:BecomeTeacherNPC(type)
 	if (actor) then
 		self.obj = actor:GetEntity():GetInnerObject();
 	end
-	self.type = type;
+
+	self.type = TeachingQuestPage.TaskTypeIndex[type] or TeachingQuestPage.UnknowType;
 end
 
 function TeacherBlocklyAPI:SetTeacherNPCTasks(tasks)
 	if (tasks and type(tasks) == "table") then
-		TeachingQuestPage.RegisterTasksChanged(function(show)
-			self:ShowHeadOn(show);
+		TeachingQuestPage.RegisterTasksChanged(function(state)
+			self:ShowHeadOn(state);
 		end, self.type);
 		TeachingQuestPage.AddTasks(tasks, self.type);
 		self:InvokeMethod("registerClickEvent", function()
@@ -66,28 +69,31 @@ function TeacherBlocklyAPI:SetTeacherNPCTasks(tasks)
 	end
 end
 
-function TeacherBlocklyAPI:ShowHeadOn(show)
+function TeacherBlocklyAPI:ShowHeadOn(state)
 	if (not self.obj) then return end
+		local actor_name = {L"编程导师", L"动画导师", L"CAD导师", L"机器人导师"};
+		if (state == TeachingQuestPage.AllFinished) then
+			local headon_mcml = string.format(
+				[[<div style="width:80px;height:20px;">
+					<div style="margin-top:20px;width:80px;height:20px;text-align:center;color:#00ff00;font-size:14px;font-weight:bold">%s</div>
+				</div>]],
+				actor_name[self.type]);
+			headon_speech.Speak(self.obj, headon_mcml, -1, nil, true);
+		else
+			local state_img = {"Texture/Aries/HeadOn/exclamation.png", "Texture/Aries/HeadOn/question.png"};
+			local left = {"32px", "24px"};
+			local width = {"16px", "32px"};
+			local headon_mcml = string.format(
+				[[<div style="width:80px;height:80px;">
+					<img style="margin-left:%s;width:%s;height:64px;background:url(%s);" />
+					<div style="margin-top:20px;width:80px;height:20px;text-align:center;color:#00ff00;font-size:14px;font-weight:bold">%s</div>
+				</div>]],
+				left[state], width[state], state_img[state], actor_name[self.type]);
 
-	if (show) then
-		local name = headon_speech.Speek(self.obj, "<img style=\"margin-left:15px;width:13px;height:51px;background:url(Texture/Aries/HeadOn/exclamation.png#0 0 13 51);\" />", -1, nil, true);
-		local control = ParaUI.GetUIObject(name);
-		control.y = control.y - 10;
-		local up = false;
-		self.mytime = self.mytime or commonlib.Timer:new({callbackFunc = function(timer)
-			if (up) then
-				up = false;
-				control.y = control.y + 5;
-			else
-				up = true;
-				control.y = control.y - 5;
-			end
-			control:ApplyAnim();
-		end});
-		self.mytime:Change(100, 200);
-	else
-		headon_speech.SpeakClear(self.obj);
-		self.mytime:Change();
-		self.mytime = nil;
-	end
+			local ctl_name = headon_speech.Speak(self.obj, headon_mcml, -1, nil, true);
+			local _parent = ParaUI.GetUIObject(ctl_name);
+			local img = _parent:GetChildAt(0):GetChildAt(0);
+			local fileName = "script/UIAnimation/CommonBounce.lua.table";
+			UIAnimManager.PlayUIAnimationSequence(img, fileName, "ShakeUD", true);
+		end
 end

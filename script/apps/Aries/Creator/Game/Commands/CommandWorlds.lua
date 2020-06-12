@@ -118,15 +118,17 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [-i|e] [worldname|url|filepath|projectId]", 
+	quick_ref="/loadworld [-i|e|force] [worldname|url|filepath|projectId]", 
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
+@param -force: always use online world without checking if it is different to local.  
 e.g.
 /loadworld 530
 /loadworld https://github.com/xxx/xxx.zip
 /loadworld -i https://github.com/xxx/xxx.zip
 /loadworld -e https://github.com/xxx/xxx.zip
+/loadworld -force 530
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
