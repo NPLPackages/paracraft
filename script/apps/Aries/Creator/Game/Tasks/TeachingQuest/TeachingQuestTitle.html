@@ -22,7 +22,7 @@
                         <%=L"知识岛" %>
                     </div>
                     <div style="margin-top:0px;width:420px;height:20px;text-align:center;color:#ffffff;font-size:12px">
-                        <%=L"使用入场券解锁世界，每日可完成一个任务并获得积分兑换奖励" %>
+                        <%=L"每日可使用一张入场券完成一次观看课程视频的任务并获得知识豆奖励" %>
                     </div>
                     <input type="button" style="spacing:4px;width:40px;height:30px;margin-left:426px;margin-top:-34px;" value='<%=L"退出" %>' class="mc_light_grey_button_with_fillet" onclick="TeachingQuestTitle.OnClose" />
                 </div>
@@ -31,7 +31,7 @@
                     <div style="margin-left:10px;">
                         <%=L"知识豆："%>
                         <input type="button" name="reward" value='<%=TeachingQuestTitle.GetTotalPoints()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
-                        <input type="button" style="width:66px;height:28px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="积分兑换" class="mc_orange_button_with_fillet" onclick="" />
+                        <input type="button" style="width:76px;height:28px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="知识豆兑换" class="mc_orange_button_with_fillet" onclick="" />
                     </div>
                     <pe:if condition='<%=(ticket=="receive")%>'>
                         <div style="margin-top:-23px;margin-left:310px">

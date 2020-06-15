@@ -93,12 +93,15 @@ function TeachingQuestTitle.GetTaskTitle()
 end
 
 function TeachingQuestTitle.GetTaskInfo()
+	--[[
 	local task = TeachingQuestPage.GetCurrentSelectTask(TeachingQuestPage.currentIndex);
 	if (task and task.info) then
 		return task.info;
 	else
 		L"使用入场券开始任务";
 	end
+	]]
+	return L"点击【开始任务】按钮观看视频，完整观看视频后自动获得知识豆奖励";
 end
 
 function TeachingQuestTitle.GetTotalPoints()
@@ -160,9 +163,9 @@ function TeachingQuestTitle.StartTask()
 					if (firstStart) then
 						firstStart = false;
 						if (TeachingQuestPage.IsVip()) then
-							_guihelper.MessageBox(L"尊贵的VIP用户，完成任务后自动奖励了2倍的知识豆");
+							_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆。您已开通VIP，自动获得了20知识豆！");
 						else
-							_guihelper.MessageBox(L"完成任务后自动奖励了10知识豆，升级为VIP可以奖励2倍知识豆，确定升级吗？", function(res)
+							_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆，是否开通VIP获取双倍知识豆？", function(res)
 								if(res and res == _guihelper.DialogResult.Yes) then
 									ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 								end
@@ -176,7 +179,7 @@ function TeachingQuestTitle.StartTask()
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then
-			_guihelper.MessageBox(L"是否要使用 1 入场券开始任务？", function(res)
+			_guihelper.MessageBox(L"是否使用1张入场券开始当前世界任务？", function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
 					local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
 					if (TeachingQuestPage.IsVip()) then
@@ -200,7 +203,7 @@ end
 
 function TeachingQuestTitle.OnReturn()
 	if (not TeachingQuestTitle.IsTaskFinished()) then
-		_guihelper.MessageBox(L"任务尚未开始，确定要退出吗？", function(res)
+		_guihelper.MessageBox(L"任务尚未开始，是否确定退出当前任务世界？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				page:CloseWindow();
 				GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);

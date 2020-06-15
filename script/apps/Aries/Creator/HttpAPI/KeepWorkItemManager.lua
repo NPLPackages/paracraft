@@ -143,7 +143,7 @@ end
         icon="http://www.baidu.com",
         id=2,
         max=11,
-        name="×æ×ÚÎïÆ·",
+        name="ç¥–å®—ç‰©å“",
         price=111,
         stackable=true,
         typeId=3,
@@ -236,7 +236,7 @@ end
   createdAt="2020-05-21T06:54:00.000Z",
   dayMax=1,
   deleted=false,
-  desc="Ãâ·ÑÈë³¡È¯",
+  desc="å…è´¹å…¥åœºåˆ¸",
   destoryAfterUse=true,
   expiredRules=1,
   expiredSeconds=0,
@@ -244,7 +244,7 @@ end
   icon="Texture/Aries/Item/1022_LargeLollipop.png",
   id=13,
   max=7,
-  name="Ãâ·ÑÈë³¡È¯",
+  name="å…è´¹å…¥åœºåˆ¸",
   price=999999999999,
   stackable=true,
   typeId=3,
@@ -283,21 +283,21 @@ function KeepWorkItemManager.Load(bForced, callback)
         end            
         return
     end
-    KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØGlobalStore");
+    KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½GlobalStore");
     KeepWorkItemManager.LoadGlobalStore(true, function()
-        KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØExtendedCost");
+        KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½ExtendedCost");
         KeepWorkItemManager.LoadExtendedCost(true, function()
-            KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØ±³°ü");
+            KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½èƒŒåŒ…");
             KeepWorkItemManager.LoadBags(true, function()
-                KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØÎïÆ·");
+                KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½ç‰©å“");
                 KeepWorkItemManager.LoadItems(nil, function()
-                    KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØÈËÎïĞÅÏ¢");
+                    KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½äººç‰©ä¿¡æ¯");
                     KeepWorkItemManager.LoadProfile(true, function()
                         KeepWorkItemManager.loaded = true;
                         if(callback)then
                             callback();
                         end            
-                        KeepWorkItemManager.GetFilter():apply_filters("loading", L"¼ÓÔØÍê³É");
+                        KeepWorkItemManager.GetFilter():apply_filters("loading", L"åŠ è½½å®Œæˆ");
                         KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
                     end)
                 end)
@@ -360,23 +360,23 @@ end
         bagNo=1001,
         createdAt="2020-06-01T07:14:07.000Z",
         deleted=false,
-        desc="¶ÔÓÃ»§ÏÔÊ¾ÄÚÈİÓëÊıÁ¿µÄÎïÆ·",
+        desc="å¯¹ç”¨æˆ·æ˜¾ç¤ºå†…å®¹ä¸æ•°é‡çš„ç‰©å“",
         id=4,
-        name="ÏÔÊ¾ÎïÆ·",
+        name="æ˜¾ç¤ºç‰©å“",
         updatedAt="2020-06-01T07:14:25.000Z" 
       },
       {
         bagNo=1002,
         createdAt="2020-06-01T07:15:07.000Z",
         deleted=false,
-        desc="²»¶ÔÓÃ»§ÏÔÊ¾µÄ±ê¼ÇÀàÎïÆ·",
+        desc="ä¸å¯¹ç”¨æˆ·æ˜¾ç¤ºçš„æ ‡è®°ç±»ç‰©å“",
         id=5,
-        name="Òş²ØÎïÆ·",
+        name="éšè—ç‰©å“",
         updatedAt="2020-06-01T07:15:07.000Z" 
       } 
     } 
   },
-  message="ÇëÇó³É¹¦" 
+  message="è¯·æ±‚æˆåŠŸ" 
 }
 --]]
 function KeepWorkItemManager.LoadBags(bForced, callback)
@@ -417,7 +417,7 @@ function KeepWorkItemManager.ReLoadItems(gsid_list, callback, error_callback)
 end
 --[[
 {
-    "message": "ÇëÇó³É¹¦",
+    "message": "è¯·æ±‚æˆåŠŸ",
     "data": [
         {
             "id": 477,
