@@ -1,7 +1,7 @@
 ﻿--[[
 Title: TeachingQuestTitle
-Author(s): 
-Date: 
+Author(s): chenjinxian 
+Date: 2020/6/3
 Desc:  
 Use Lib:
 -------------------------------------------------------
@@ -33,13 +33,17 @@ function TeachingQuestTitle.OnWorldLoaded()
 	if (projectId == TeachingQuestPage.MainWorldId) then
 		commonlib.TimerManager.SetTimeout(function()  
 			KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
-				if (canExchange.data) then
+				if (canExchange.data and canExchange.data.ret == true) then
 					TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
 				else
-					TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+					if (canExchange.data and canExchange.data.reason == 5) then
+						TeachingQuestTitle.ShowPage("?info=main&ticket=non_week");
+					else
+						TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+					end
 				end
 			end, function(err, msg, data)
-				TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
+				TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
 			end);
 		end, 3000)
 	else
@@ -49,6 +53,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 				if (state == TeachingQuestPage.Finished or state == TeachingQuestPage.Activated) then
 					TeachingQuestTitle.ShowPage("?info=task");
 				else
+					_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
 					GameLogic.RunCommand("/leaveworld")
 				end
 			end
@@ -131,10 +136,14 @@ end
 function TeachingQuestTitle.ReceiveTicket()
 	KeepWorkItemManager.DoExtendedCost(TeachingQuestPage.ticketExid, function()
 		KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
-			if (canExchange.data) then
+			if (canExchange.data and canExchange.data.ret == true) then
 				TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
 			else
-				TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+				if (canExchange.data and canExchange.data.reason == 5) then
+					TeachingQuestTitle.ShowPage("?info=main&ticket=non_week");
+				else
+					TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+				end
 			end
 		end, function()
 			TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");

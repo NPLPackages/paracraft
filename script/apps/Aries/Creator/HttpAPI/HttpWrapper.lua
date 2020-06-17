@@ -85,11 +85,6 @@ function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, f
 	end
 end
 function HttpWrapper.default_postFunc(self, err, msg, data, fullname, callbackFunc)
-    echo("=============HttpWrapper.default_postFunc");
-    echo(fullname);
-    echo(err);
-    echo(msg);
-    echo(data);
     if(not err or err ~= 200)then
         if(callbackFunc)then
             callbackFunc(err, msg, data);
@@ -143,12 +138,6 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         if(prepFunc)then
 			res = prepFunc(self, inputParams, callbackFunc, option);
         end
-        commonlib.echo("=========HttpWrapper inputParams");
-        commonlib.echo(inputParams);
-        commonlib.echo("=========HttpWrapper url");
-        commonlib.echo(url);
-        commonlib.echo("=========HttpWrapper res");
-        commonlib.echo(res);
         
         if(not res)then
             inputParams = inputParams or {};
@@ -180,11 +169,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
                 headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken());
             end
             input.headers = headers;
-            commonlib.echo("=========input");
-            commonlib.echo(input);
-            commonlib.echo("=========input.url");
-            commonlib.echo(input.url);
-		    LOG.std(nil, "info","HttpWrapper", "request from: %s", input.url);
+		    LOG.std(nil, "debug","HttpWrapper input", input);
             System.os.GetUrl(input, function(err, msg, data)
                 if(postFunc)then
                     postFunc(self, err, msg, data);

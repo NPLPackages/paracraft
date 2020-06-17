@@ -275,7 +275,7 @@ function EditModelTask.OnScalingChanged(text)
 		local modelEntity = self:GetSelectedModel()
 		if(modelEntity and modelEntity.setScale and text) then
 			local scaling = tonumber(text);
-			if(scaling and scaling >= 0.1 and scaling<=10) then
+			if(scaling and scaling >= (modelEntity.minScale or 0.1) and scaling <= (modelEntity.maxScale or 10)) then
 				modelEntity:setScale(scaling);
 			end
 		end

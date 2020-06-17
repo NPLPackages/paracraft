@@ -239,10 +239,10 @@ end
 function ChatEdit.OnTimer(timer)
 	if(ChatWindow.is_shown) then
 		if(ChatEdit.HasFocus()) then
-			--ChatEdit.FadeIn();
-			--ChatWindow.FadeIn();
+			ChatEdit.FadeIn();
+			ChatWindow.FadeIn();
 		else
-			--ChatEdit.FadeOut(0.2);
+			ChatEdit.FadeOut(0.2);
 			ChatWindow.FadeOut(0.2);
 		end
 	end		

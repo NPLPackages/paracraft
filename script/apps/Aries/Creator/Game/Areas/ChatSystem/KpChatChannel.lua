@@ -45,7 +45,7 @@ function KpChatChannel.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
     end
-    echo("====================KpChatChannel.StaticInit()");
+	LOG.std("", "info", "KpChatChannel", "StaticInit");
 
 	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
 
@@ -63,6 +63,8 @@ function KpChatChannel.OnWorldLoaded()
         KpChatChannel.worldId_pending = id;
         -- connect chat channel
         KpChatChannel.OnKeepWorkLogin_Callback();
+    else
+        KpChatChannel.Clear();
     end
 end
 function KpChatChannel.OnKeepWorkLogin_Callback()
@@ -122,18 +124,17 @@ function KpChatChannel.Connect(url,options,onopen_callback)
     KpChatChannel.client:Connect(url,nil,{ token = KeepWorkItemManager.GetToken(), });
 end
 function KpChatChannel.OnOpen(self)
-    commonlib.echo("=============OnOpen");
+	LOG.std("", "info", "KpChatChannel", "OnOpen");
     if(KpChatChannel.onopen_callback)then
         KpChatChannel.onopen_callback();
     end
     KpChatChannel.RefreshChatWindow();
 
-    commonlib.echo(KpChatChannel.GetUserId());
     TipRoadManager:CreateRoads();
     
 end
 function KpChatChannel.OnClose(self)
-    commonlib.echo("=============OnClose");
+	LOG.std("", "info", "KpChatChannel", "OnClose");
     KpChatChannel.Clear();
 end
 -- erase date if timestamp is in same day
@@ -166,13 +167,10 @@ function KpChatChannel.HasUserName(usernames_str, name)
 	end
 end
 function KpChatChannel.OnMsg(self, msg)
-    commonlib.echo("=============OnMsg");
-    commonlib.echo(msg);
+	--LOG.std("", "debug", "KpChatChannel OnMsg", msg);
     if(not msg or not msg.data)then
         return
     end
-    commonlib.echo("=============data");
-    commonlib.echo(msg.data);
     msg = msg.data;
 
     -- see: script/apps/GameServer/socketio/packet.lua
@@ -202,12 +200,6 @@ function KpChatChannel.OnMsg(self, msg)
 
 
                 local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
-                commonlib.echo("=============body");
---                commonlib.echo(key);
-                commonlib.echo(payload);
---                commonlib.echo(meta);
---                commonlib.echo(action);
-                commonlib.echo(userInfo);
        
                 local ChannelIndex;
                 if(type == 2)then
@@ -240,9 +232,6 @@ function KpChatChannel.OnMsg(self, msg)
             end
         elseif(key == "broadcast")then
             -- system broadcast
-            echo("==========================broadcast");
-            echo(info.data);
-            echo(info.data.msg);
             if(info.data and info.data.msg)then
                 local content = info.data.msg.text;
                 content = string.gsub(content, "<p>","");
@@ -265,8 +254,7 @@ function KpChatChannel.OnMsg(self, msg)
             end
         elseif(key == "msg")then
             -- system broadcast to user
-            echo("==========================system broadcast to user");
-            echo(info,true);
+
             --[[
             {
                   meta={ timestamp="2020-06-11 16:56" },
@@ -326,7 +314,7 @@ function KpChatChannel.SetBulletScreen(v)
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
     if(ChatEdit.page)then
-        ChatEdit.page:Refresh(0.01);
+        ChatEdit.page:Refresh(0);
     end
 end
 function KpChatChannel.BulletScreenIsOpened()
@@ -382,8 +370,19 @@ function KpChatChannel.RefreshChatWindow()
     else
         ChatEdit.selected_channel = ChatChannel.EnumChannels.NearBy;
     end
-    ChatEdit.ShowPage(true);
     MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
+
+
+    -- refresh the state of TipRoadManager
+    if(KpChatChannel.IsInWorld())then
+        TipRoadManager:OnShow(true);
+    else
+        TipRoadManager:OnShow(false);
+    end
+    if(ChatEdit.page)then
+        -- refresh the state of shortcut button
+        ChatEdit.page:Refresh(0);
+    end
 end
 -- create a chat message
 -- @param ChannelIndex	频道索引
@@ -438,8 +437,6 @@ function KpChatChannel.SendToServer(msgdata)
             tLevel = user_info.tLevel,
         },
     }
-    commonlib.echo("=============kp_msg");
-    commonlib.echo(kp_msg);
 
     KpChatChannel.client:Send("app/msg",kp_msg);
    

@@ -73,11 +73,8 @@ function KeepWorkItemManager.StaticInit()
 
     -- for testing filter callback
     KeepWorkItemManager.GetFilter():add_filter("loading", function(state)
-        echo("===KeepWorkItemManager.Filter loading state");
-        echo(state);
     end);
     KeepWorkItemManager.GetFilter():add_filter("loaded_all", function()
-        echo("===KeepWorkItemManager.Filter loaded_all");
     end);
 end
 function KeepWorkItemManager.GetFilter()
@@ -86,14 +83,11 @@ end
 function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
 	LOG.std(nil, "info", "KeepWorkItemManager", "OnKeepWorkLogin_Callback");
     KeepWorkItemManager.Load(true, function()
-        commonlib.echo("=====KeepWorkItemManager.globalstore");
-        commonlib.echo(KeepWorkItemManager.globalstore);
-        commonlib.echo("=====KeepWorkItemManager.extendedcost");
-        commonlib.echo(KeepWorkItemManager.extendedcost);
-        commonlib.echo("=====KeepWorkItemManager.bags");
-        commonlib.echo(KeepWorkItemManager.bags);
-        commonlib.echo("=====KeepWorkItemManager.items");
-        commonlib.echo(KeepWorkItemManager.items);
+	    LOG.std(nil, "debug", "KeepWorkItemManager.globalstore", KeepWorkItemManager.globalstore);
+	    LOG.std(nil, "debug", "KeepWorkItemManager.extendedcost", KeepWorkItemManager.extendedcost);
+	    LOG.std(nil, "debug", "KeepWorkItemManager.bags", KeepWorkItemManager.bags);
+	    LOG.std(nil, "debug", "KeepWorkItemManager.items", KeepWorkItemManager.items);
+	    LOG.std(nil, "debug", "KeepWorkItemManager.profile", KeepWorkItemManager.profile);
     end)            
     return res;
 end
@@ -143,7 +137,7 @@ end
         icon="http://www.baidu.com",
         id=2,
         max=11,
-        name="祖宗物品",
+        name="物品",
         price=111,
         stackable=true,
         typeId=3,
@@ -313,18 +307,13 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
     keepwork.globalstore.get({
         cache_policy = "access plus 0";
     },function(err, msg, data)
-        echo("==============KeepWorkItemManager.LoadGlobalStore");
-        echo(err);
-        echo(data);
         if(err ~= 200)then
             return
         end
         if(data and data.data and data.data.rows)then
             KeepWorkItemManager.globalstore = data.data.rows;
-        echo("==============KeepWorkItemManager.LoadGlobalStore 2");
 
             if(callback)then
-        echo("==============KeepWorkItemManager.LoadGlobalStore 3");
                 callback();
             end
         end
@@ -409,15 +398,11 @@ end
 function KeepWorkItemManager.ReLoadItems(gsid_list, callback, error_callback)
     gsid_list = gsid_list or {};
     local bagNos = KeepWorkItemManager.SearchBagsNoFromGsids(gsid_list);
-    echo("=========KeepWorkItemManager.ReLoadItems gsid_list");
-    echo(gsid_list)
-    echo("=========KeepWorkItemManager.ReLoadItems bagNos");
-    echo(bagNos)
     KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
 end
 --[[
 {
-    "message": "请求成功",
+    "message": "璇锋眰鎴愬姛",
     "data": [
         {
             "id": 477,
@@ -448,16 +433,10 @@ function KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
             end
         end
     end
-    echo("=========KeepWorkItemManager.LoadItems bagNos_str");
-    echo(bagNos_str)
     keepwork.items.get({
         bagNos = bagNos_str,
         cache_policy = "access plus 0", -- no cache
     },function(err, msg, data)
-        echo("=========KeepWorkItemManager.LoadItems");
-        echo(err)
-        echo(msg)
-        echo(data)
         if(err ~= 200)then
             if(error_callback)then
                 error_callback(err, msg, data)
@@ -467,8 +446,6 @@ function KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
         if(data and data.data)then
             local new_items = data.data;
             KeepWorkItemManager.items = KeepWorkItemManager.UnionItems(KeepWorkItemManager.items, new_items)
-            echo("=========KeepWorkItemManager.items");
-            echo(KeepWorkItemManager.items)
             if(callback)then
                 callback();
             end
@@ -535,8 +512,6 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
         end
         if(data)then
             KeepWorkItemManager.profile = data;
-            echo("===============profile");
-            echo(data,true);
             if(callback)then
                 callback();
             end
@@ -590,8 +565,6 @@ function KeepWorkItemManager.DoExtendedCost(exid, callback, error_callback)
         if(err == 200)then
 
             local bags_number = KeepWorkItemManager.SearchBagsNoFromExid(exid);
-            echo("=========bags_number");
-            echo(bags_number);
             local len = #bags_number;
             if(len > 0)then
                 -- reload items data 
@@ -644,16 +617,10 @@ function KeepWorkItemManager.SetClientData(gsid, clientData, callback, error_cal
         return
     end
     clientData = clientData or {};
-    commonlib.echo("==========before setClientData");
-    commonlib.echo(clientdata);
     keepwork.items.setClientData({
         userGoodsId = guid,
         clientData = clientData,
     },function(err, msg, data)
-        commonlib.echo("==========setClientData");
-        commonlib.echo(err);
-        commonlib.echo(msg);
-        commonlib.echo(data);
         if(err == 200)then
             --synchronize data to memory 
             item.clientData = clientData;
@@ -700,7 +667,6 @@ function KeepWorkItemManager.SearchBagsNoFromExid(exid)
     local function read_ids(data)
         if(data)then
             for k,v in ipairs(data) do
-                echo(v);
                 if(v.goods and v.goods.bagId)then
                     local bagId = v.goods.bagId;
                     local bagNo = KeepWorkItemManager.SearchBagNo(bagId)
@@ -710,10 +676,6 @@ function KeepWorkItemManager.SearchBagsNoFromExid(exid)
         end
     end
     local precondition,cost,goal = KeepWorkItemManager.GetConditions(exid);
-    echo("=========precondition");
-    echo(precondition);
-    echo(cost);
-    echo(goal);
     read_ids(precondition)
     read_ids(cost)
     if(goal)then

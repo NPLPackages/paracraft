@@ -81,7 +81,7 @@ function TipRoadManager:PushNode(txt,color,font_size,font_weight)
     road:AddCarNode(node);
 end
 function TipRoadManager:OnShow(v)
-    if(self.created and self.container)then
+    if(self.created and self.container and self.container:IsValid())then
         self.container.visible = v;
     end
 end

@@ -27,7 +27,8 @@ local info_path = "worlds/BlockTextures/PackagesInfo.xml";
 -- Used to be: local wiki_url = "http://www.paraengine.com/twiki/bin/view/CCWeb/RecommendedTextureListData";
 
 -- this can be modified via https://keepwork.com/official/paracraft/config/RecommendedTextureList 
-local wiki_url = "https://api.keepwork.com/git/v0/projects/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2FRecommendedTextureList.md";
+local wiki_url = "https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2FRecommendedTextureList.md";
+				  
 local official_text_cache_policy = "access plus 7 days";
 
 local defaultPreviewImage = "worlds/BlockTextures/PreviewImage/defaultPreviewImage.png";

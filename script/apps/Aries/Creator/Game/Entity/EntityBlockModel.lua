@@ -30,8 +30,8 @@ local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockModel"));
 
 Entity:Property({"scale", 1, "getScale", "setScale"});
-Entity:Property({"minScale", 0.1});
-Entity:Property({"maxScale", 10});
+Entity:Property({"minScale", 0.02});
+Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
 

@@ -1856,11 +1856,9 @@ move(12, 0, 0)
 		},
         {
 			name = "fontname",
-			type = "field_dropdown",
-			options = {
-				{ L"微软雅黑", "C:/WINDOWS/FONTS/MSYH.TTC" },
-				{ L"宋体", "C:/WINDOWS/FONTS/SIMSUN.TTC" },
-			},
+			type = "input_value",
+			shadow = { type = "font", value = "微软雅黑",},
+			text = "'微软雅黑'", 
 		},
         {
 			name = "size",
@@ -1888,10 +1886,10 @@ move(12, 0, 0)
 	helpUrl = "", 
 	canRun = false,
 	funcName = "text3d",
-	func_description = 'text3d(%s,"%s","%s", %s, %s, %s)',
-	func_description_js = 'text3d(%s,"%s","%s", %s, %s)',
+	func_description = 'text3d(%s,"%s",%s, %s, %s, %s)',
+	func_description_js = 'text3d(%s,"%s",%s, %s, %s)',
 	ToNPL = function(self)
-        return string.format('text3d("%s","%s","%s", %s, %s,"%s")\n', 
+        return string.format('text3d("%s","%s",%s, %s, %s,"%s")\n', 
 			self:getFieldValue('op'), self:getFieldValue('text'), self:getFieldValue('fontname'),
 			self:getFieldValue('size'), self:getFieldValue('height'), self:getFieldValue('color'));
 	end,
@@ -1914,6 +1912,35 @@ move((-1.2),0,0)
     ]]}},
 },
 
+{
+	type = "font", 
+	message0 = L"%1",
+	arg0 = {
+		
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"微软雅黑", "'MSYH'" },
+				{ L"宋体", "'SIMSUN'" },
+				{ L"仿宋", "'SIMFANG'" },
+				{ L"楷体", "'SIMKAI'" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	output = {type = "null",},
+	category = "ShapeOperators", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+	func_description_js = '%s',
+	ToNPL = function(self)
+		return string.format('%s', self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
+},
 
 }
 function NplCadDef_Shapes.GetCmds()
