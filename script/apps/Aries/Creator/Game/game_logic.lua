@@ -228,6 +228,11 @@ function GameLogic.InitCommon()
 	local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
 	TeachingQuestTitle.StaticInit();
    
+    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+    KpChatChannel.StaticInit();
+
+    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+    KeepWorkItemManager.StaticInit();
 end
 
 -- call this when user first enters a game world.

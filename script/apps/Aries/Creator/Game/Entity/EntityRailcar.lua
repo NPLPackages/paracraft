@@ -48,6 +48,8 @@ Entity.is_persistent = true;
 Entity.isServerEntity = true;
 
 Entity:Property({"group_id", GameLogic.SentientGroupIDs.Mob})
+-- max number of collisions to process per frame. too many collisions will lead to HIGH CPU. 
+Entity:Property({"max_collision_count", 2})
 Entity.sentient_fields = {[GameLogic.SentientGroupIDs.Player] = true};
 
 --private: 
@@ -57,6 +59,7 @@ Entity.targetZ = 0;
 Entity.targetFacing = 0;
 Entity.targetPitch = 0;
 Entity.smoothFrames = 0;
+
 
 -- mapping from direction data to from:{x,y,z} to:{x,y,z} where mc_id  pc_id
 local RailDirMatrix = {
@@ -170,29 +173,31 @@ function Entity:init()
 	end
 end
 
+local validateNumber = mathlib.validateNumber;
+
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 
 	local attr = node.attr;
 	if(attr) then
 		if(attr.motionX) then
-			self.motionX = tonumber(attr.motionX) or 0
+			self.motionX = validateNumber(tonumber(attr.motionX) or 0)
 		end
 		if(attr.motionY) then
-			self.motionY = tonumber(attr.motionY) or 0
+			self.motionY = validateNumber(tonumber(attr.motionY) or 0)
 		end
 		if(attr.motionZ) then
-			self.motionZ = tonumber(attr.motionZ) or 0
+			self.motionZ = validateNumber(tonumber(attr.motionZ) or 0)
 		end
 		if (attr.onGround) then
 			self.onGround = attr.onGround == "true"
 		end
 		if (attr.rotationPitch) then
-			self.rotationPitch = tonumber(attr.rotationPitch) or 0;
+			self.rotationPitch = validateNumber(tonumber(attr.rotationPitch) or 0);
 			self.prevRotationPitch = self.rotationPitch;
 		end
 		if (attr.rotationYaw) then
-			self.rotationYaw = tonumber(attr.rotationYaw) or 0;
+			self.rotationYaw = validateNumber(tonumber(attr.rotationYaw) or 0);
 			self.prevRotationYaw = self.rotationYaw;
 		end
 	end
@@ -469,7 +474,8 @@ function Entity:FrameMove(deltaTime)
 		local collisionList = EntityManager.GetEntitiesByAABBExcept(self:GetCollisionAABB(), self);
 
 		if (collisionList and (#collisionList)>0) then
-			for _, entityObj in ipairs(collisionList) do
+			for i=1, math.min(self.max_collision_count, #collisionList) do
+				local entityObj = collisionList[i]
 				if (entityObj:isa(EntityRailcar) and entityObj ~= self.riddenByEntity) then
 					entityObj:ApplyEntityCollision(self, deltaTime);
 				end
@@ -641,8 +647,13 @@ function Entity:UpdateOnTrack(deltaTime, bx, by, bz, maxSpeed, slopeDecayFactor,
     end
 
 	-- adjust direction according to rail track direction
-    self.motionX = curMotionSpeed * dirX / dirLength;
-    self.motionZ = curMotionSpeed * dirZ / dirLength;
+	if(dirLength>0.001) then
+		self.motionX = curMotionSpeed * dirX / dirLength;
+		self.motionZ = curMotionSpeed * dirZ / dirLength;
+	else
+		self.motionX = 0;
+		self.motionZ = 0;
+	end
     local deltaDistWalked;
     
     if (self.riddenByEntity) then
@@ -745,7 +756,7 @@ function Entity:UpdateOnTrack(deltaTime, bx, by, bz, maxSpeed, slopeDecayFactor,
         local dirY = (vecLastRailPosY - vecOnRailPtY) * 0.05;
         curMotionSpeed = math.sqrt(self.motionX * self.motionX + self.motionZ * self.motionZ);
 
-        if (curMotionSpeed > 0 and dirY~=0) then
+        if (curMotionSpeed > 0.0001 and dirY~=0) then
             self.motionX = self.motionX / curMotionSpeed * (curMotionSpeed + dirY);
             self.motionZ = self.motionZ / curMotionSpeed * (curMotionSpeed + dirY);
         end

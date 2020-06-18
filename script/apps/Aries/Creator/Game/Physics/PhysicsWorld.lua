@@ -83,9 +83,11 @@ end
 -- @param aabb: 
 -- @param entity: 
 -- @param filterEntityFunc: nil or a function(destEntity, entity) end, this function should return true for destEntity's collision to be considered.
--- Entity.CanBeCollidedWith and Entity.IsVisible are good choices for this function. 
+-- @param max_entity_collision_count: max number of entity collisions to return. too many collisions will lead to HIGH CPU and AABB pool overflow.
+-- Entity.CanBeCollidedWith and Entity.IsVisible are good choices for this function. If nil, it will return all. 
+-- Please note block collisions are always returned regardless of this. 
 -- return array list of bounding box (all bounding box is read-only), modifications will lead to unexpected result. 
-function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc)
+function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc, max_entity_collision_count)
     self.collidingBoundingBoxes:clear();
 	
     local blockMinX,  blockMinY, blockMinZ = BlockEngine:block(aabb:GetMinValues());
@@ -106,17 +108,28 @@ function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc)
     local distExpand = 0.25;
     local listEntities = EntityManager.GetEntitiesByAABBExcept(aabb:clone():Expand(distExpand, distExpand, distExpand), entity);
 
+	local count = 0;
+
 	if(listEntities) then
 		filterEntityFunc = filterEntityFunc or CanBeCollidedWith_;
 		for _, entityCollided in ipairs(listEntities) do
 			if(filterEntityFunc(entityCollided, entity)) then
 				local collisionAABB = entityCollided:GetCollisionAABB();
 				if(collisionAABB and collisionAABB:Intersect(aabb)) then
+					
 					self.collidingBoundingBoxes:add(collisionAABB);
+					count = count + 1;
+					if(max_entity_collision_count and count>=max_entity_collision_count) then
+						break;
+					end
 				end
 				collisionAABB = entity:CheckGetCollisionBox(entityCollided);
 				if(collisionAABB and collisionAABB:Intersect(aabb)) then
 					self.collidingBoundingBoxes:add(collisionAABB);
+					count = count + 1;
+					if(max_entity_collision_count and count>=max_entity_collision_count) then
+						break;
+					end
 				end
 			end
 		end

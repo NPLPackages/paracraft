@@ -86,6 +86,12 @@ function TipRoad:DrawCarNode(car_node)
         ParaUI.Destroy(car_node.id);
     end
 end
+function TipRoad:Clear()
+    for k, car_node in ipairs(self.car_nodes) do
+        ParaUI.Destroy(car_node.id);
+    end
+    self.car_nodes = {};
+end
 function TipRoad:OnFrame(delta)
     local pre_car_node = nil;
     for k,v in ipairs (self.car_nodes) do

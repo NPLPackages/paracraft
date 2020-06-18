@@ -58,6 +58,7 @@ end
 function KpChatChannel.OnWorldLoaded()
     local id = WorldCommon.GetWorldTag("kpProjectId");
 	LOG.std(nil, "info", "KpChatChannel", "OnWorldLoaded: %s",tostring(id));
+    TipRoadManager:Clear();
     if(id)then
         id = tonumber(id);
         KpChatChannel.worldId_pending = id;

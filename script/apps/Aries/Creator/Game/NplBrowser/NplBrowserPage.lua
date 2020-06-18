@@ -8,9 +8,11 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPage.lua");
 local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
 NplBrowserPage.Open();
-NplBrowserPage.Open("test","www.keepwork.com","title",nil,"_ct",100,100,400,600);
+NplBrowserPage.Open("test","www.keepwork.com","title",nil,"_ct",100,100,400,600, nil, nil, function()
+    commonlib.echo("============onclose");
+end);
 
-
+NplBrowserPage.Goto("test", "https://keepwork.com/zhanglei/empty/index")
 - NplBrowserPlugin
 https://github.com/tatfook/NplBrowser
 ------------------------------------------------------------
@@ -27,7 +29,6 @@ NplBrowserPage.height = 560;
 NplBrowserPage.default_window_name = "NplBrowserWindow_Instance";
 NplBrowserPage.default_template_url = "script/apps/Aries/Creator/Game/NplBrowser/pe_nplbrowser_template.html";
 NplBrowserPage.default_url = "www.keepwork.com";
-
 NplBrowserPage.pages_map= {}; -- hold window's name and NplBrowserPage instance
 function NplBrowserPage.CheckNumber(v)
     if(v == nil)then
@@ -50,7 +51,8 @@ end
 -- @param height:window's height.
 -- @param window_template_url:a mcml page which rendering the style of cef window, default value is "Mod/NplBrowser/pe_nplbrowser_template.html"
 -- @param zorder:the show level of Window,default value is 10001.
-function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
+-- @param callback: callback function for close
+function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder, callback)
     url = url or NplBrowserPage.default_url;
 	name = name or NplBrowserPage.default_window_name;
 	zorder = zorder or 10001;
@@ -67,6 +69,7 @@ function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, w
     self.url = url;
     self.title = title;
     self.withControl = withControl;
+    self.callback = callback;
     local params = {
 		url = window_template_url, 
 		name = name, 
@@ -89,6 +92,13 @@ function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, w
     self.params = params;
 
     local pageCtrl = params._page;
+
+    NplBrowserPlugin.OnCreatedCallback("nplbrowser_instance", function()
+        if(self.pageCtrl)then
+            self.pageCtrl:Refresh(0);
+            self:Reload();
+        end
+    end)
     if(pageCtrl)then
         self.pageCtrl = pageCtrl;
         NplBrowserPage.pages_map[name] = self;
@@ -103,13 +113,22 @@ function NplBrowserPage:Create(name, url, title, withControl, alignment, x, y, w
     end
     return self;
 end
-
+function NplBrowserPage.Goto(name, url)
+    if(not name)then
+        return
+    end
+    local npl_browser_page = NplBrowserPage.GetPage(name);
+    if(npl_browser_page)then
+        npl_browser_page:Reload(url)
+    end
+end
 -- Create or open a cef window after download resources
 function NplBrowserPage.Open(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
     NplBrowserLoaderPage.Check(function(result)
         if(result)then
 	        name = name or NplBrowserPage.default_window_name;
             local npl_browser_page = NplBrowserPage.GetPage(name);
+            
             if(not npl_browser_page)then
                 NplBrowserPage:new():Create(name, url, title, withControl, alignment, x, y, width, height, window_template_url, zorder)
             else
@@ -124,9 +143,10 @@ function NplBrowserPage.Open(name, url, title, withControl, alignment, x, y, wid
         end
     end)
 end
-function NplBrowserPage:Reload()
+function NplBrowserPage:Reload(url)
+    url = url or self.url
     if(self.pageCtrl)then
-        self.pageCtrl:CallMethod("nplbrowser_instance", "Reload", self.url); 
+        self.pageCtrl:CallMethod("nplbrowser_instance", "Reload", url); 
     end
 end
 function NplBrowserPage:SetVisible(b)
@@ -138,6 +158,9 @@ function NplBrowserPage:Close()
 	self:SetVisible(false)
     if(self.pageCtrl)then
 		self.pageCtrl:CloseWindow(); 
+    end
+    if(self.callback)then
+        self.callback();
     end
 end
 -- get the instance of NplBrowserPage

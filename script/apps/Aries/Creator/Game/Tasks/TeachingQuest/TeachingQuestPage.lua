@@ -1,4 +1,4 @@
---[[
+﻿--[[
 Title: 
 Author: leio
 Date: 2020/5/21
@@ -62,6 +62,7 @@ TeachingQuestPage.CADType = 3;
 TeachingQuestPage.RobotType = 4;
 TeachingQuestPage.UnknowType = 5;
 
+TeachingQuestPage.TaskTypeTexts = {"编程", "动画", "CAD", "机器人"};
 TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "robot"};
 TeachingQuestPage.TaskTypeIndex = {
 	program = TeachingQuestPage.ProgramType,
@@ -140,6 +141,16 @@ end
 
 function TeachingQuestPage.RegisterTasksChanged(callback, type)
 	TeachingQuestPage.taskCallback[type] = callback;
+end
+
+function TeachingQuestPage.GetTaskOptions()
+	local taskOptions = {};
+	for i = 1, #TeachingQuestPage.quests do
+		if (#(TeachingQuestPage.quests[i]) > 0) then
+			table.insert(taskOptions, {text=TeachingQuestPage.TaskTypeTexts[i], value=TeachingQuestPage.TaskTypeNames[i]});
+		end
+	end
+	return taskOptions;
 end
 
 function TeachingQuestPage.GetCurrentSelectTask(index)

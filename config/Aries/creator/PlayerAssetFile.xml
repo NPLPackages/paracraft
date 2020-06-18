@@ -427,6 +427,7 @@
 	<asset filename="character/v5/02animals/XiYiJinJiaoLong/XiYiJinJiaoLong.x" displayname="蜥蜴金蛟龙" name="XiYiJinJiaoLong"/>
 	<asset filename="character/v5/02animals/YuanxiaoBaby/YuanxiaoBaby.x" displayname="元宵宝宝" name="YuanxiaoBaby"/>
 	<asset filename="character/v5/06quest/DisorderRobot/DisorderRobot.x" displayname="无序机器人" name="DisorderRobot"/>
+	<asset filename="character/v5/06quest/FlyerRobot/FlyerRobot.x" displayname="飞行机器人" name="FlyerRobot"/>
 	<asset filename="character/v6/02animals/XiXueBianFu/XiXueBianFu.x" displayname="吸血蝙蝠" name="XiXueBianFu"/>
 	<asset filename="character/v6/02animals/Mechanics_Helicopter/Mechanics_Helicopter.x" displayname="直升机" name="Mechanics_Helicopter"/>
 </category>
@@ -551,7 +552,6 @@
 	<asset filename="character/v5/08functional/IceStone/IceStone.x" displayname="冰石" name="IceStone"/>
 	<asset filename="character/v5/08functional/JoyBean/JoyBean.x" displayname="欢乐豆" name="JoyBean"/>
 	<asset filename="character/v5/08functional/JumpJumpBed/JumpJumpBed_anim.x" displayname="跳跳床" name="JumpJumpBed_anim"/>
-	<asset filename="character/v5/09effect/InstanceDoor/InstanceDoor_model.x" displayname="传送门模型" name="InstanceDoor_model"/>
 	<asset filename="model/01building/v5/01house/Lighthouse/Lighthouse_an.x" displayname="旋转的黄色光束的双面的灯" name="Lighthouse_an"/>
 	<asset filename="model/01building/v5/01house/MagicCamp/MagicTree/MagicTree_Star01.x" displayname="蓝色五角星中间黄色笑脸" name="MagicTree_Star01"/>
 	<asset filename="model/01building/v5/01house/MagicCamp/MetallicityTotem/MetallicityTotem_an.x" displayname="六个盾牌呈圆圈状旋转" name="MetallicityTotem_an"/>

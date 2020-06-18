@@ -26,18 +26,22 @@
 				<div>
 					<div style="float:left;">
 						<%=L"任务类型："%>
-						<select name="TaskType" style="height:23px" onselect="TeachingQuestPage.OnSelectTaskType">
+						<select name="TaskType" style="height:23px" DataSource="<%=TeachingQuestPage.GetTaskOptions()%>" onselect="TeachingQuestPage.OnSelectTaskType">
+							<!--
 							<option value="program" selected="true">编程</option>
 							<option value="animation">动画</option>
 							<option value="CAD">CAD</option>
 							<option value="robot">机器人</option>
+							-->
 						</select>
 					</div>
+					<!--
 					<div style="float:left;margin-left:210px;">
 						<%=L"已解锁世界"%>
 						<input type="button" name="UnlockedTasks" value='<%=TeachingQuestPage.GetUnlockedTasks()%>' style="color: #ffffff;margin-left:10px;text-align:left;max-width:60px;background:;" />
 					</div>
-					<div style="float:left;margin-left:10px;">
+					-->
+					<div style="float:left;margin-left:360px;">
 						<%=L"已完成任务"%>
 						<input type="button" name="FinishedTasks" value="<%=TeachingQuestPage.GetFinishedTasks()%>" style="color: #ffffff; margin-left:10px;text-align:left;max-width:60px;background:;" />
 					</div>

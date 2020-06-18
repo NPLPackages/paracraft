@@ -8,8 +8,11 @@ use the lib:
 local NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
 NplBrowserResizedPage:Show("https://keepwork.com", "title", false, true);
 
-NplBrowserResizedPage:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50;});
-NplBrowserResizedPage:Show("https://keepwork.com", "title", false, false, { left = 100, top = 50, right = 100, bottom = 50;});
+NplBrowserResizedPage:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50});
+NplBrowserResizedPage:Show("https://keepwork.com", "title", false, false, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, });
+NplBrowserResizedPage:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, candrag = true, });
+
+NplBrowserResizedPage:Goto("https://keepwork.com/zhanglei/empty/index")
 
 -------------------------------------------------------
 ]]
@@ -19,7 +22,7 @@ local NplBrowserResizedPage = NPL.export();
 
 NplBrowserResizedPage.name = "NplBrowserResizedPage_instance";
 NplBrowserResizedPage.mcml_url = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.html";
-NplBrowserResizedPage.padding_options = {
+NplBrowserResizedPage.options = {
 	left = 0,
 	top = 0,
 	right = 0,
@@ -38,12 +41,13 @@ NplBrowserResizedPage.is_show_control = true;
 NplBrowserResizedPage.is_show_close = true;
 NplBrowserResizedPage.browser_name = "NplBrowserResizedPage_browser_instance";
 NplBrowserResizedPage.callback = nil; -- fire "ONSHOW" or "ONCLOSE" or "ONRESIZE"
-function NplBrowserResizedPage:Show(url, title, is_show_control, is_show_close, padding_options,callback)
+function NplBrowserResizedPage:Show(url, title, is_show_control, is_show_close, options,callback)
 	url = url or NplBrowserResizedPage.default_url;
     self.title = title;
     self.is_show_control = is_show_control;
     self.is_show_close = is_show_close;
-    self.padding_options = padding_options or self.padding_options;
+    self.options = options or self.options;
+    
     self.callback = callback;
 	NplBrowserLoaderPage.Check(function(result) 		
 	if(result)then
@@ -59,6 +63,10 @@ function NplBrowserResizedPage:_Show(url)
 		self.url = url;
 	end
 
+    local candrag = false
+    if(self.options.candrag)then
+        candrag = true;
+    end
     local _this = self:GetUIObject();
 	if(not _this) then
 		local width, height  = self:CalculateSize();
@@ -67,9 +75,26 @@ function NplBrowserResizedPage:_Show(url)
 		_this = ParaUI.CreateUIObject("container", name, "_ct", -width / 2, -height / 2, width, height);
 		_this.zorder = -2;
 		_this.background="";
+        _this.candrag = candrag;
 		_this:SetScript("onsize", function()
 			self:OnResize();
 		end)
+
+        _this:SetScript("ondragmove", function(ui_obj)
+		    local x, y = ui_obj:GetAbsPosition();
+            if(x<0) then x=0; end
+		    if(y<0) then y=0; end
+            self.drag_x = x;
+            self.drag_y = y;
+	    end);
+	    _this:SetScript("ondragend", function(ui_obj)
+            local x = self.drag_x;
+            local y = self.drag_y;
+		    if(x<0) then x=0; end
+		    if(y<0) then y=0; end
+
+		    _this:Reposition("_lt", x, y, self.width, self.height)
+	    end);
 
 		_this:SetScript("onclick", function() end); -- just disable click through 
 		_guihelper.SetFontColor(_this, "#ffffff");
@@ -88,15 +113,17 @@ function NplBrowserResizedPage:_Show(url)
 			self.page:CallMethod(self.browser_name, "Reload", self.url); 
 		end	
 	end
-    self.callback("ONSHOW");
+    if(self.callback)then
+        self.callback("ONSHOW");
+    end
 end
 function NplBrowserResizedPage:CalculateSize()
 	local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
-    local padding_options = self.padding_options;
-	local left = padding_options.left or 0;
-	local top = padding_options.top or 0;
-	local right = padding_options.right or 0;
-	local bottom = padding_options.bottom or 0;
+    local options = self.options;
+	local left = options.left or 0;
+	local top = options.top or 0;
+	local right = options.right or 0;
+	local bottom = options.bottom or 0;
 
 	local w = width - left - right;
 	local h = height - top - bottom;
@@ -132,6 +159,10 @@ function NplBrowserResizedPage:IsVisible()
 	end
 end
 function NplBrowserResizedPage:OnResize()
+    if(self.options.fixed or self.options.candrag)then
+        return
+    end
+    commonlib.echo("===============resize");
 	local width, height  = self:CalculateSize();
 	if(self.width ~= width or self.height ~= height)then
 		self.width = width;
@@ -154,5 +185,11 @@ function NplBrowserResizedPage:IsShowControl()
 end
 function NplBrowserResizedPage:CanClose()
 	return self.is_show_close;
+end
+function NplBrowserResizedPage:Goto(url)
+    url = url or self.url;
+    if(self.page)then
+	    self.page:CallMethod(self.browser_name, "Reload", url); 
+    end
 end
 

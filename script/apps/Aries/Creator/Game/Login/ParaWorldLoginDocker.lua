@@ -503,8 +503,9 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 			-- load all pkg files in redist folder
 			ParaWorldLoginDocker.LoadAllMainPackagesInFolder(redistFolder);
 		end
-		--local assetManifest = System.Core.DOM.GetDOM("AssetManager"):GetChild("CAssetManifest")
-		--assetManifest:CallField("Clear")
+		local asset_manifest = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CAssetManifest");
+		asset_manifest:CallField("Clear")
+		asset_manifest:SetField("LoadManifestFile", redistFolder.."assets_manifest.txt")
 	end
 
 	if(additional_commandline_params) then

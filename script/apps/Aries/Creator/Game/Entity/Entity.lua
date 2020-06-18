@@ -41,6 +41,7 @@ NPL.load("(gl)script/ide/headon_speech.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/DataWatcher.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketEntityEffect.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/ide/mathlib.lua");
 local Color = commonlib.gettable("System.Core.Color");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local DataWatcher = commonlib.gettable("MyCompany.Aries.Game.Common.DataWatcher");
@@ -68,6 +69,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 local Entity = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"));
 
 Entity:Property({"position", nil, "getPosition", "setPosition"});
+-- max number of collisions to process per frame. too many collisions will lead to HIGH CPU. 
+Entity:Property({"max_collision_count", 10})
 
 Entity:Signal("focusIn");
 Entity:Signal("focusOut");
@@ -279,26 +282,30 @@ function Entity:SetWorld(world)
     self.worldObj = world;
 end
 
+
+local validateNumber = mathlib.validateNumber;
+
 -- load from an xml node. 
 function Entity:LoadFromXMLNode(node)
 	if(node) then
 		local attr = node.attr;
 		if(attr) then
 			if(attr.bx) then
-				self.bx = self.bx or tonumber(attr.bx);
-				self.by = self.by or tonumber(attr.by);
-				self.bz = self.bz or tonumber(attr.bz);
+				self.bx = validateNumber(self.bx or tonumber(attr.bx));
+				self.by = validateNumber(self.by or tonumber(attr.by));
+				self.bz = validateNumber(self.bz or tonumber(attr.bz));
+
 			end
 			if(attr.x) then
-				self.x = tonumber(attr.x);
-				self.y = tonumber(attr.y);
-				self.z = tonumber(attr.z);
+				self.x = validateNumber(tonumber(attr.x));
+				self.y = validateNumber(tonumber(attr.y));
+				self.z = validateNumber(tonumber(attr.z));
 			end
 			if(attr.name) then
 				self.name = attr.name;
 			end
 			if(attr.facing) then
-				self.facing = tonumber(attr.facing);
+				self.facing = tonumber(attr.facing) or self.facing;
 			end
 			if(attr.anim and attr.anim~="") then
 				self.anim = attr.anim;
@@ -2371,7 +2378,7 @@ function Entity:MoveEntityByDisplacement(dx,dy,dz)
 		local oldAABB = boundingBox:clone_from_pool();
 		
 		-- apply motion physics by extending the aabb and checking offsets with all colliding aabb. 
-		local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(boundingBox:clone_from_pool():AddCoord(dx, dy, dz), self);
+		local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(boundingBox:clone_from_pool():AddCoord(dx, dy, dz), self, nil, self.max_collision_count);
 
 		if(dy~=0) then
 			for i= 1, listCollisions:size() do

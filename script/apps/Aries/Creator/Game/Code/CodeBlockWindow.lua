@@ -106,6 +106,7 @@ function CodeBlockWindow.Show(bShow)
 		if(self.entity) then
 			EntityManager.SetLastTriggerEntity(self.entity)
 		end
+		GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 	end
 end
 
@@ -199,6 +200,7 @@ function CodeBlockWindow:OnViewportChange()
 			if(page) then
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
+				GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 			end
 		end
 		if(sceneMarginBottom ~= viewport:GetMarginBottom())then
@@ -370,6 +372,7 @@ function CodeBlockWindow.Close()
 	CodeBlockWindow.lastBlocklyUrl = nil;
 	EntityManager.SetLastTriggerEntity(nil);
 	CodeIntelliSense.Close()
+	GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = false});	
 end
 
 function CodeBlockWindow.CloseEditorWindow()

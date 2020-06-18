@@ -135,3 +135,9 @@ function TipRoadManager:OnResize()
         road:OnResize(width)
     end
 end
+function TipRoadManager:Clear()
+    for k = 1, self.cnt do
+        local road = self.roads[k];
+        road:Clear()
+    end
+end

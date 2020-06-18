@@ -338,7 +338,7 @@ function ChatEdit.OnClickSend(name)
 			elseif(ChatChannel.SendMessage( ChatEdit.selected_channel, nil, nil, words )) then
 				ChatEdit.ResetDefaultChannelText(true);
 				sentence_history:PushSentence(words);
-				ChatEdit.LostFocus();
+				--ChatEdit.LostFocus();
 				if(System.options.IsMobilePlatform) then
 					MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(true);
 				end

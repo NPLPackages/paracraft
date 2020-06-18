@@ -29,8 +29,14 @@ function TeachingQuestTitle.OnWorldLoaded()
 		page:CloseWindow();
 	end
 	local projectId = tostring(GameLogic.options:GetProjectId());
-	commonlib.echo(projectId);
 	if (projectId == TeachingQuestPage.MainWorldId) then
+		if(not KeepWorkItemManager.GetToken())then
+			_guihelper.MessageBox(L"本世界只有登录的用户可以访问。即将退出世界！");
+			commonlib.TimerManager.SetTimeout(function()  
+				GameLogic.RunCommand("/leaveworld")
+			end, 2000)
+			return
+		end
 		commonlib.TimerManager.SetTimeout(function()  
 			KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
 				if (canExchange.data and canExchange.data.ret == true) then
@@ -45,29 +51,67 @@ function TeachingQuestTitle.OnWorldLoaded()
 			end, function(err, msg, data)
 				TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
 			end);
+			GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
+			GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 		end, 3000)
 	else
-		commonlib.TimerManager.SetTimeout(function()  
-			if (TeachingQuestPage.IsTaskProject(projectId)) then
-				local state = TeachingQuestPage.GetTaskState(TeachingQuestPage.currentIndex);
-				if (state == TeachingQuestPage.Finished or state == TeachingQuestPage.Activated) then
+		if (TeachingQuestPage.IsTaskProject(projectId)) then
+			local state = TeachingQuestPage.GetTaskState(TeachingQuestPage.currentIndex);
+			if (state == TeachingQuestPage.Finished or state == TeachingQuestPage.Activated) then
+				commonlib.TimerManager.SetTimeout(function()  
 					TeachingQuestTitle.ShowPage("?info=task");
-				else
-					_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
+					GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
+					GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
+					GameLogic.GetFilters():add_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
+					GameLogic.GetFilters():add_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
+				end, 2000)
+			else
+				_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
+				commonlib.TimerManager.SetTimeout(function()  
 					GameLogic.RunCommand("/leaveworld")
-				end
+				end, 2000)
 			end
-		end, 2000)
+		end
 	end
 end
 
-function TeachingQuestTitle.ShowPage(param)
+function TeachingQuestTitle:MoveDown(event)
+	if (event.bShow) then
+		TeachingQuestTitle.ShowPage(nil, 0, 32);
+	else
+		TeachingQuestTitle.ShowPage(nil, 0, 0);
+	end
+end
+
+function TeachingQuestTitle:MoveLeft(event)
+	if (event.bShow) then
+		local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
+		local offset = (width + 488)/2 - (width - event.width);
+		TeachingQuestTitle.ShowPage(nil, -offset, 0);
+	else
+		TeachingQuestTitle.ShowPage(nil, 0, 0);
+	end
+end
+
+function TeachingQuestTitle.OnShowEscFrame(bShow)
+	if(bShow or bShow == nil) then
+		NplBrowserResizedPage:Close();
+	end
+	return bShow;
+end
+
+function TeachingQuestTitle.OnShowExitDialog(p1)
+	NplBrowserResizedPage:Close();
+	return p1;
+end
+
+function TeachingQuestTitle.ShowPage(param, offsetX, offsetY)
 	if (page) then
 		page:CloseWindow();
 	end
-	param = param or "?info=main&ticket=receive";
+	TeachingQuestTitle.showParam = param or TeachingQuestTitle.showParam;
 	local params = {
-		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html"..param, 
+		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html"..TeachingQuestTitle.showParam, 
 		name = "TeachingQuestTitle.ShowPage", 
 		isShowTitleBar = false,
 		DestroyOnClose = true,
@@ -79,8 +123,8 @@ function TeachingQuestTitle.ShowPage(param)
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 			align = "_ctt",
-			x = 0,
-			y = 0,
+			x = offsetX or 0,
+			y = offsetY or 0,
 			width = 488,
 			height = 110,
 		cancelShowAnimation = true,
@@ -158,14 +202,14 @@ function TeachingQuestTitle.StartTask()
 	--task.url = "https://keepwork.com/official/tips/p1/1_10_11536";
 	if (task and task.url) then
 		local function ShowTaskVideo(firstStart)
-			-- always set width=1080, height=622 if window'size > 1080 * 622
+			-- always set width=1080, height=630 if window'size > 1080 * 630
 			local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 			local left, top = 2000, 1000;
-			if (width >= 1080 and height >= 622) then
+			if (width >= 1080 and height >= 630) then
 				left = (width - 1080) / 2;
-				top = (height - 622) / 2;
+				top = (height - 630) / 2;
 			end
-			NplBrowserResizedPage:Show(task.url, task.title, false, true, {left=left, top=top, right=left, bottom=top;}, function(state)
+			NplBrowserResizedPage:Show(task.url, task.title, false, true, {left=left, top=top, right=left, bottom=top, fixed=true, candrag=true}, function(state)
 				if (state == "ONSHOW") then
 					TeachingQuestTitle.ShowPage("?info=task");
 				elseif (state == "ONCLOSE") then
@@ -181,6 +225,7 @@ function TeachingQuestTitle.StartTask()
 							end, _guihelper.MessageBoxButtons.YesNo);
 						end
 					end
+					NplBrowserResizedPage:Goto(task.url);
 					TeachingQuestTitle.ShowPage("?info=task");
 				end
 			end);
@@ -206,20 +251,28 @@ function TeachingQuestTitle.StartTask()
 end
 
 function TeachingQuestTitle.OnClose()
+	GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
+	GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 	page:CloseWindow();
 	GameLogic.RunCommand("/leaveworld")
 end
 
 function TeachingQuestTitle.OnReturn()
+	local function ReturnMainWorld()
+		GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
+		GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
+		GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
+		GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
+		page:CloseWindow();
+		GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);
+	end
 	if (not TeachingQuestTitle.IsTaskFinished()) then
 		_guihelper.MessageBox(L"任务尚未开始，是否确定退出当前任务世界？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
-				page:CloseWindow();
-				GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);
+				ReturnMainWorld()
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
 	else
-		page:CloseWindow();
-		GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);
+		ReturnMainWorld()
 	end
 end
