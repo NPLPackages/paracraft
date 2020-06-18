@@ -140,6 +140,14 @@ BuildinMod.buildin_mods = {
 		version = "1.0.0",
 		homepage = "https://github.com/tatfook/HaqiMod",
 	},
+	{
+		name = "GeneralGameServerMod", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"通用游戏服务器", 
+		text=L"系统内置插件",
+		version = "1.0.0",
+		homepage = "https://github.com/tatfook/GeneralGameServerMod",
+	},
 	-- TODO: add more preinstalled paracraft mod package here
 };
 

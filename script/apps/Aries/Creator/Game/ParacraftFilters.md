@@ -90,7 +90,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnInstallModel": filename, url: called when /install -ext bmax commands are executed. 
 
 - command:
-  - "register_command": register additional commands
+  - "register_command": Commands, slashCommandObj:  register additional commands
 
 - networking:
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 

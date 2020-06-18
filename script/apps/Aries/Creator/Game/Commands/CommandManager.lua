@@ -78,7 +78,7 @@ function CommandManager:Init()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandQuest.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWiki.lua");
 
-	GameLogic.GetFilters():apply_filters("register_command", msg);
+	GameLogic.GetFilters():apply_filters("register_command", Commands, SlashCommand.GetSingleton());
 
 	self:Register(SlashCommand.GetSingleton());
 end
@@ -240,7 +240,6 @@ function CommandManager:Register(slash_command)
 	self.slash_command = slash_command;
 
 	-- register all predefined system commands
-	local name, cmd
 	for name, cmd in pairs(Commands) do
 		slash_command:RegisterSlashCommand(cmd);
 	end
