@@ -160,6 +160,11 @@ function ParacraftLearningRoomDailyPage.SaveToLocal()
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
 	clientData[key] = true;
+    for k, v in pairs(clientData) do
+        if(k ~= key)then
+	        clientData[k] = nil; -- clear other days
+        end
+    end
 	KeepWorkItemManager.SetClientData(gsid, clientData)
 end
 function ParacraftLearningRoomDailyPage.OnCheck()

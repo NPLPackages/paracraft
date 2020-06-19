@@ -18,6 +18,8 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
 
 local last_audio_src;
+-- from name to audio_src
+local channels = {};
 
 local default_music_map = {
 	["1"] = "Audio/Haqi/AriesRegionBGMusics/ambForest.ogg",
@@ -129,15 +131,40 @@ function BackgroundMusic:PlayBackgroundSound(audio_src, bToggleIfSame)
 	end
 end
 
+function BackgroundMusic:PlayOnChannel(name, audio_src)
+	if(audio_src) then
+		if(channels[name] ~= audio_src) then
+			if(channels[name]) then
+				channels[name]:stop();
+			end
+			channels[name] = audio_src;
+			audio_src:play2d();
+			return true;
+		end
+	end
+end
+
 -- @param filename: if nil, it will stop current music. otherwise it will only stop of music is the same. 
 function BackgroundMusic:Stop(filename)
 	-- stop currently playing music
 	if(last_audio_src) then
-		if(filename and BackgroundMusic:GetMusic(filename) ~= last_audio_src) then
-			return;
+		if(not filename or BackgroundMusic:GetMusic(filename) == last_audio_src) then
+			last_audio_src:stop();
+			last_audio_src = nil;
 		end
-		last_audio_src:stop();
-		last_audio_src = nil;
+	end
+	if(next(channels) ) then
+		local curMusic = filename or BackgroundMusic:GetMusic(filename)
+		for key, audio in pairs(channels) do
+			if(not curMusic) then
+				audio:stop();
+			elseif(curMusic == audio) then
+				audio:stop();
+				channels[key] = nil
+				return
+			end
+		end
+		channels = {}
 	end
 end
 

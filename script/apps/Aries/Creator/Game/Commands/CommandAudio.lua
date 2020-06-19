@@ -25,19 +25,23 @@ Commands["music"] = {
 	name="music", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/music [filename|1~6] [from_time]", 
-	desc=[[change background music. specify a number for internal music
-@param filename: can be disk or http url file
+	quick_ref="/music [-channelName] [filename|1~6] [from_time]", 
+	desc=[[play or stop background music. 
+@param filename: can be disk or http url file or specify a number for internal music
 /music music.ogg 0	play music.ogg at current world directory from the beginning (0 seconds) 
-/music 1			play music 1 
-/music stop			to stop the music
-/music				empty is also to stop the music
+/music 1 			play music 1 
+/music stop 		to stop the music
+/music 				empty means to stop all background musics
 /music 1.mp3 10.1   play 1.mp3 from 10.1 seconds
 /music http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
+/music -c1 music.ogg   play music.ogg on channel "c1"
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
 		local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
+
+		local channelName;
+		channelName, cmd_text = CmdParser.ParseOption(cmd_text);
 
 		local filename, from_time
 		filename, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
@@ -56,7 +60,11 @@ Commands["music"] = {
 						sound:stop();
 						sound:seek(from_time);
 					end
-					BackgroundMusic:PlayBackgroundSound(sound);
+					if(channelName) then
+						BackgroundMusic:PlayOnChannel(channelName, sound);
+					else
+						BackgroundMusic:PlayBackgroundSound(sound);
+					end
 				end
 			end
 		end

@@ -21,7 +21,6 @@ end);
 http://yapi.kp-para.cn/project/60/interface/api/1952
 -------------------------------------------------------
 ]]
-
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
@@ -360,6 +359,9 @@ function KpChatChannel.Clear()
 end
 -- refresh for showing or hiding chat channel
 function KpChatChannel.RefreshChatWindow()
+    if(not System.options.mc) then
+	    return
+    end
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
     -- for refresh
     MyCompany.Aries.ChatSystem.ChatWindow.ShowChatLogPage(true);

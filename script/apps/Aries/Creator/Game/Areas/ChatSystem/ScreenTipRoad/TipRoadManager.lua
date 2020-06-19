@@ -138,6 +138,8 @@ end
 function TipRoadManager:Clear()
     for k = 1, self.cnt do
         local road = self.roads[k];
-        road:Clear()
+        if(road)then
+            road:Clear()
+        end
     end
 end
