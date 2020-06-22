@@ -88,7 +88,6 @@ function TeachingQuestPage.ShowPage(type)
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		allowDrag = true,
 		enable_esc_key = true,
-		zorder = -1,
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 		align = "_ct",
@@ -214,6 +213,7 @@ function TeachingQuestPage.OnSelectTaskType(name, value)
 	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.currentType] or {};
 	TeachingQuestPage.CheckTaskCount(TeachingQuestPage.currentType);
 	page:Refresh(0);
+	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[TeachingQuestPage.currentType]);
 end
 
 function TeachingQuestPage.GetTaskState(index)

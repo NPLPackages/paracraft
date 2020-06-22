@@ -996,6 +996,8 @@ local internalValues = {
 	["airDecay"] = {setter = Actor.SetAirDecay, getter = Actor.GetAirDecay, isVariable = false}, 
 
 	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
+	["userData"] = {getter = Actor.GetCustomUserData, isVariable = false},
+	
 }
 
 

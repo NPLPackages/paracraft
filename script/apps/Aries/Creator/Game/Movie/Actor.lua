@@ -68,6 +68,11 @@ function Actor:GetInitParams()
 	return self.initParams;
 end
 
+-- get custom user data in init params
+function Actor:GetCustomUserData()
+	return self.initParams and self.initParams.userData;
+end
+
 function Actor:SetInitParam(name, value)
 	self.initParams = self.initParams or {};
 	self.initParams[name] = value;

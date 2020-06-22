@@ -232,7 +232,9 @@ function GameLogic.InitCommon()
     KpChatChannel.StaticInit();
 
     local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-    KeepWorkItemManager.StaticInit();
+	KeepWorkItemManager.StaticInit();
+	
+	GameLogic.KeepWorkItemManager = KeepWorkItemManager;
 end
 
 -- call this when user first enters a game world.
