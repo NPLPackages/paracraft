@@ -34,7 +34,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 			_guihelper.MessageBox(L"本世界只有登录的用户可以访问。即将退出世界！");
 			commonlib.TimerManager.SetTimeout(function()  
 				GameLogic.RunCommand("/leaveworld")
-			end, 2000)
+			end, 3000)
 			return
 		end
 		commonlib.TimerManager.SetTimeout(function()  
@@ -53,6 +53,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 			end);
 			GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
 			GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
+			GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 		end, 3000)
 	else
 		if (TeachingQuestPage.IsTaskProject(projectId)) then
@@ -64,12 +65,13 @@ function TeachingQuestTitle.OnWorldLoaded()
 					GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 					GameLogic.GetFilters():add_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
 					GameLogic.GetFilters():add_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
+					GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 				end, 2000)
 			else
 				_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
 				commonlib.TimerManager.SetTimeout(function()  
 					GameLogic.RunCommand("/leaveworld")
-				end, 2000)
+				end, 3000)
 			end
 		end
 	end
@@ -103,6 +105,16 @@ end
 function TeachingQuestTitle.OnShowExitDialog(p1)
 	NplBrowserResizedPage:Close();
 	return p1;
+end
+
+function TeachingQuestTitle.OnKeepWorkLogout_Callback(res)
+	GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
+	GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
+	GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
+	GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
+	GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
+	page:CloseWindow();
+	GameLogic.RunCommand("/leaveworld")
 end
 
 function TeachingQuestTitle.ShowPage(param, offsetX, offsetY)
@@ -205,11 +217,24 @@ function TeachingQuestTitle.StartTask()
 			-- always set width=1080, height=630 if window'size > 1080 * 630
 			local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 			local left, top = 2000, 1000;
-			if (width >= 1080 and height >= 630) then
+			if (width >= 1100 and height >= 800) then
 				left = (width - 1080) / 2;
 				top = (height - 630) / 2;
 			end
-			NplBrowserResizedPage:Show(task.url, task.title, false, true, {left=left, top=top, right=left, bottom=top, fixed=true, candrag=true}, function(state)
+
+			local options = {left=left, top=top, right=left, bottom=top, fixed=true, candrag=true, autoscale=true, resizefunc=function()
+				local x, y, w, h= ParaUI.GetUIObject("root"):GetAbsPosition();
+				if (w >= 1100 and h >= 800) then
+					return 1080, 630;
+				else
+					if (w / (h-200) > 1080 / 630) then
+						return (h-200)/630*1080, (h-200);
+					else
+						return (w-20), (w-20)*630/1080;
+					end
+				end
+			end};
+			NplBrowserResizedPage:Show(task.url, task.title, false, true, options, function(state)
 				if (state == "ONSHOW") then
 					TeachingQuestTitle.ShowPage("?info=task");
 				elseif (state == "ONCLOSE") then
@@ -229,7 +254,6 @@ function TeachingQuestTitle.StartTask()
 					TeachingQuestTitle.ShowPage("?info=task");
 				end
 			end);
-			NplBrowserResizedPage:OnResize();
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then
@@ -263,6 +287,7 @@ function TeachingQuestTitle.OnReturn()
 		GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 		GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
 		GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
+		GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
 		page:CloseWindow();
 		GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);
 	end

@@ -131,6 +131,10 @@
   <asset filename="character/CC/artwar/movie/zhu_17.x" displayname="竹简碎片17" name="zhu_17"/>
   <asset filename="character/CC/artwar/movie/zhu_all.x" displayname="竹简碎片all" name="zhu_all"/>
   <asset filename="character/CC/artwar/movie/复制.x" displayname="复制" name="复制"/> -->
+<!-- 6·9更新
+  <asset filename="character/CC/artwar/movie/tyndall.x" displayname="丁达尔" name="tyndall"/>
+  <asset filename="character/CC/artwar/movie/xiaobing_kongshou_lan.x" displayname="步兵空手_蓝方" name="xiaobing_kongshou_lan"/>
+  <asset filename="character/CC/artwar/movie/xiaobing_jian_lan.x" displayname="步兵持剑_蓝方" name="xiaobing_jian_lan"/> -->
 
   <!-- 电影用 -->
   <asset filename="character/CC/codewar/pangjuanjiangjunxingtai_movie.x" displayname="庞涓将军_多动作" name="pangjuanjiangjunxingtai_movie"/>
@@ -515,7 +519,8 @@
   <asset filename="character/CC/artwar/build/fang2.x" displayname="房子2" name="fang2"/>
   <asset filename="character/CC/artwar/build/fang3.x" displayname="房子3" name="fang3"/>
   <asset filename="character/CC/artwar/build/guanai.x" displayname="关隘" name="guanai"/> -->
-
+<!-- 6·22日新加 -->
+  <!-- <asset filename="character/CC/artwar/build/xiaofangzi.x" displayname="小房子" name="xiaofangzi"/> -->
 
   <asset filename="character/v3/Item/ObjectComponents/WEAPON/2133_SugarFree_PorkMeat_Max.anim.x" displayname="无糖猪肉" name="2133_SugarFree_PorkMeat_Max.anim"/>
 	<asset filename="character/v5/06quest/MysteryAcinusTree/MysteryAcinusTree.x" displayname="神秘浆果树" name="MysteryAcinusTree"/>
@@ -620,12 +625,16 @@
   <asset filename="character/CC/artwar/game/changjian.x" displayname="长剑" name="changjian"/>
   <asset filename="character/CC/artwar/game/fuchen.x" displayname="拂尘" name="fuchen"/>
   <asset filename="character/CC/artwar/game/guaizhang.x" displayname="拐杖" name="guaizhang"/>
-  <asset filename="character/CC/artwar/game/huoba.x" displayname="火把" name="huoba"/>
+  <asset filename="character/CC/artwar/game/huoba_ming.x" displayname="火把" name="huoba"/>
+  <!-- <asset filename="character/CC/artwar/game/huoba_mie.x" displayname="火把" name="huoba"/>   -->
   <asset filename="character/CC/artwar/game/shanzi.x" displayname="扇子" name="shanzi"/>
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe"/>
   <asset filename="character/CC/artwar/game/lance.x" displayname="枪" name="lance"/>
   <asset filename="character/CC/artwar/game/ge.x" displayname="戈" name="ge"/>
+<!-- 6·11更新 -->
+  <!-- <asset filename="character/CC/artwar/game/jiguannu.x" displayname="机关弩" name="jiguannu"/>
+  <asset filename="character/CC/artwar/game/jiguannu_dipan.x" displayname="机关弩底盘" name="jiguannu_dipan"/> -->
 
   <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows"/>
   <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow"/>

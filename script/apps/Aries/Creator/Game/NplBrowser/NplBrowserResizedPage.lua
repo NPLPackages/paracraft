@@ -70,6 +70,9 @@ function NplBrowserResizedPage:_Show(url)
     local _this = self:GetUIObject();
 	if(not _this) then
 		local width, height  = self:CalculateSize();
+		if (self.options.autoscale and self.options.resizefunc) then
+			width, height  = self.options.resizefunc();
+		end
 		self.width = width;
 		self.height = height;
 		_this = ParaUI.CreateUIObject("container", name, "_ct", -width / 2, -height / 2, width, height);
@@ -142,15 +145,18 @@ function NplBrowserResizedPage:GetUIObject()
 		return _this;
 	end
 end
-function NplBrowserResizedPage:Close()
+function NplBrowserResizedPage:Close_Internal()
     local obj = self:GetUIObject();
 	if(obj) then
 		obj.visible = false;
 		self.page:CallMethod(self.browser_name, "SetVisible", false); 
-        if(self.callback)then
-            self.callback("ONCLOSE");
-        end
 	end
+end
+function NplBrowserResizedPage:Close()
+    self:Close_Internal();
+    if(self.callback)then
+        self.callback("ONCLOSE");
+    end
 end
 function NplBrowserResizedPage:IsVisible()
 	local obj = self:GetUIObject();
@@ -159,20 +165,27 @@ function NplBrowserResizedPage:IsVisible()
 	end
 end
 function NplBrowserResizedPage:OnResize()
+	local function Resize(width, height)
+		if(self.width ~= width or self.height ~= height)then
+			self.width = width;
+			self.height = height;
+
+			local _this = self:GetUIObject();
+			_this:Reposition("_ct", -width / 2, -height / 2, width, height);
+			self.page:Refresh(0);
+			self.callback("ONRESIZE");
+		end
+	end
+	if (self.options.autoscale and self.options.resizefunc) then
+		local width, height  = self.options.resizefunc();
+		Resize(width, height);
+		return;
+	end
     if(self.options.fixed or self.options.candrag)then
         return
     end
-    commonlib.echo("===============resize");
 	local width, height  = self:CalculateSize();
-	if(self.width ~= width or self.height ~= height)then
-		self.width = width;
-		self.height = height;
-
-		local _this = self:GetUIObject();
-		_this:Reposition("_ct", -width / 2, -height / 2, width, height);
-		self.page:Refresh(0);
-        self.callback("ONRESIZE");
-	end
+	Resize(width, height);
 end
 function NplBrowserResizedPage:GetTitle()
 	return self.title;

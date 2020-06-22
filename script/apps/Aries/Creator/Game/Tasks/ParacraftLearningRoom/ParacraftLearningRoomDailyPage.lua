@@ -7,10 +7,9 @@ the daily page for learning paracraft
 Use Lib:
 -------------------------------------------------------
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-ParacraftLearningRoomDailyPage.AutoOpen(10001, 30102);
+ParacraftLearningRoomDailyPage.DoCheckin();
 
-ParacraftLearningRoomDailyPage.FillDays(10001, 30102);
-ParacraftLearningRoomDailyPage.ShowPage(10001, 30102);
+ParacraftLearningRoomDailyPage.ShowPage()
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -19,8 +18,8 @@ local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Tea
 local ParacraftLearningRoomDailyPage = NPL.export()
 
 local page;
-ParacraftLearningRoomDailyPage.exid = nil;
-ParacraftLearningRoomDailyPage.gsid = nil;
+ParacraftLearningRoomDailyPage.exid = 10001;
+ParacraftLearningRoomDailyPage.gsid = 30102;
 ParacraftLearningRoomDailyPage.max_cnt = 32;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
@@ -28,15 +27,14 @@ ParacraftLearningRoomDailyPage.Current_Item_DS = {
 function ParacraftLearningRoomDailyPage.OnInit()
 	page = document:GetPageCtrl();
 end
-function ParacraftLearningRoomDailyPage.FillDays(exid, gsid)
+function ParacraftLearningRoomDailyPage.FillDays()
+    local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local template = KeepWorkItemManager.GetItemTemplate(gsid);
 	if(not template)then
 		return
 	end
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
 
-	ParacraftLearningRoomDailyPage.exid = exid;
-	ParacraftLearningRoomDailyPage.gsid = gsid;
 	ParacraftLearningRoomDailyPage.max_cnt = template.max or 0;
 	ParacraftLearningRoomDailyPage.copies = copies or 0;
 
@@ -50,18 +48,8 @@ function ParacraftLearningRoomDailyPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function ParacraftLearningRoomDailyPage.ShowPage(exid, gsid)
-	if(not KeepWorkItemManager.GetToken())then
-		_guihelper.MessageBox(L"请先登录！");
-		return
-	end
-	if(not KeepWorkItemManager.IsLoaded())then
-		_guihelper.MessageBox(L"正在加载数据，请稍等！");
-		return
-	end
-	if(not exid or not gsid)then
-		return
-	end
+function ParacraftLearningRoomDailyPage.ShowPage()
+	ParacraftLearningRoomDailyPage.FillDays()
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.html",
 			name = "ParacraftLearningRoomDailyPage.ShowPage", 
@@ -86,8 +74,8 @@ function ParacraftLearningRoomDailyPage.ClosePage()
 		page:CloseWindow();
 	end
 end
-function ParacraftLearningRoomDailyPage.AutoOpen(exid, gsid, callback)
-	if(not KeepWorkItemManager.GetToken())then
+function ParacraftLearningRoomDailyPage.DoCheckin(callback)
+    if(not KeepWorkItemManager.GetToken())then
 			_guihelper.MessageBox(L"请先登录！");
 		return
 	end
@@ -95,27 +83,30 @@ function ParacraftLearningRoomDailyPage.AutoOpen(exid, gsid, callback)
 		_guihelper.MessageBox(L"正在加载数据，请稍等！");
 		return
 	end
-	exid = exid or 10001;
-	gsid = gsid or 30102;
-	ParacraftLearningRoomDailyPage.FillDays(exid, gsid)
-	if(not ParacraftLearningRoomDailyPage.HasCheckedToday())then
-		local index = ParacraftLearningRoomDailyPage.GetNextDay();
-		ParacraftLearningRoomDailyPage.OnOpenWeb(index)
-	else
-		ParacraftLearningRoomDailyPage.ShowPage(exid, gsid);
-	end
-	if(callback)then
-		callback();
-	end
+    if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
+		ParacraftLearningRoomDailyPage.ShowPage();
+    else
+	    ParacraftLearningRoomDailyPage.FillDays();
+        local index = ParacraftLearningRoomDailyPage.GetNextDay();
+        index = index - 1;
+	    LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
+        local exid = ParacraftLearningRoomDailyPage.exid;
+	    KeepWorkItemManager.DoExtendedCost(exid, function()
+		    ParacraftLearningRoomDailyPage.SaveToLocal();
+		    _guihelper.MessageBox(L"签到成功。关闭窗口后将自动播放今日学习视频。", function(res)
+	            ParacraftLearningRoomDailyPage.OnOpenWeb(index)
+            end, _guihelper.MessageBoxButtons.OK);    
+	    end, function()
+		    ParacraftLearningRoomDailyPage.ShowPage();
+	    end)
+
+        
+    end
 end
 function ParacraftLearningRoomDailyPage.IsVip()
 	local gsid = 10;
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
 	return (copies and copies > 0);
---    local profile = KeepWorkItemManager.GetProfile()
---    if(profile.vip == 1)then
---        return true;
---    end
 end
 function ParacraftLearningRoomDailyPage.GetNextDay()
 	local copies = ParacraftLearningRoomDailyPage.copies or 0;
@@ -133,14 +124,10 @@ function ParacraftLearningRoomDailyPage.IsFuture(index)
 	end
 end
 function ParacraftLearningRoomDailyPage.HasCheckedToday()
---    local profile = KeepWorkItemManager.GetProfile()
---    local userId = profile.id;
---    local exId = ParacraftLearningRoomDailyPage.exid;
---    local date = ParaGlobal.GetDateFormat("yyyy-M-d");
---    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
---	local v = GameLogic.GetPlayerController():LoadLocalData(key,false,true);
---    return v;
-
+    -- for red tip, hide tip before data loaded
+    if(not KeepWorkItemManager.IsLoaded())then
+		return true
+	end
 	local date = ParaGlobal.GetDateFormat("yyyy-M-d");
 	local key = string.format("LearningRoom_HasCheckedToday_%s", date);
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
@@ -148,13 +135,6 @@ function ParacraftLearningRoomDailyPage.HasCheckedToday()
 	return clientData[key];
 end
 function ParacraftLearningRoomDailyPage.SaveToLocal()
---    local profile = KeepWorkItemManager.GetProfile()
---    local userId = profile.id;
---    local exId = ParacraftLearningRoomDailyPage.exid;
---    local date = ParaGlobal.GetDateFormat("yyyy-M-d");
---    local key = string.format("LearningRoom_HasCheckedToday_%s_%s_%s", tostring(userId), tostring(exId), date);
---	GameLogic.GetPlayerController():SaveLocalData(key, true, true);
-
 	local date = ParaGlobal.GetDateFormat("yyyy-M-d");
 	local key = string.format("LearningRoom_HasCheckedToday_%s", date);
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
@@ -167,34 +147,25 @@ function ParacraftLearningRoomDailyPage.SaveToLocal()
     end
 	KeepWorkItemManager.SetClientData(gsid, clientData)
 end
-function ParacraftLearningRoomDailyPage.OnCheck()
-	local exid = ParacraftLearningRoomDailyPage.exid;
-	KeepWorkItemManager.DoExtendedCost(exid, function()
-		ParacraftLearningRoomDailyPage.SaveToLocal();
-		_guihelper.MessageBox(L"签到成功！",function(res)
-			ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-			ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-		end, _guihelper.MessageBoxButtons.OK);
-	end, function()
-		ParacraftLearningRoomDailyPage.FillDays(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-		ParacraftLearningRoomDailyPage.ShowPage(ParacraftLearningRoomDailyPage.exid, ParacraftLearningRoomDailyPage.gsid);
-	end)
-end
-function ParacraftLearningRoomDailyPage.OnOpenWeb(index)
+function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	index = tonumber(index)
-	if(not ParacraftLearningRoomDailyPage.IsVip())then
+	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
 			return
 		end
 	end
-
+    if(index < 1)then
+        index = 1;
+    end
+	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnOpenWeb", index);
 	local url = string.format("https://keepwork.com/official/tips/s1/1_%d",index);
 	local NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
 	NplBrowserResizedPage:Show(url, "", false, true, nil, function(state)
 		if(state == "ONCLOSE")then
-			if(ParacraftLearningRoomDailyPage.IsNextDay(index) and not ParacraftLearningRoomDailyPage.HasCheckedToday())then
-				 ParacraftLearningRoomDailyPage.OnCheck();
-			end
+            local empty_url = "https://keepwork.com/zhanglei/empty/index";
+            NplBrowserResizedPage.url = empty_url;
+            NplBrowserResizedPage:Goto(empty_url);
+            NplBrowserResizedPage:Close_Internal();
 		end
 	end);
 	ParacraftLearningRoomDailyPage.ClosePage();
