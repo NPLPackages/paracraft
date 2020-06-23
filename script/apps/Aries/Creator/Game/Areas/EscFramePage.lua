@@ -80,45 +80,48 @@ function EscFramePage.ShowPage(bShow)
 	if(System.options.IsMobilePlatform) then
 		EscFramePage.ShowPage_Mobile()
 	else
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
-		local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
-			
-		local bActivateMenu = true;
-		if(bShow ~= false) then
-			if(page and page:IsVisible()) then
-				bActivateMenu = false;
-			end
-			DesktopMenuPage.ActivateMenu(bActivateMenu);
-		end
-		EscFramePage.bForceHide = bShow == false;
-
-		local params = {
-				url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html", 
-				name = "EscFramePage.ShowPage", 
-				isShowTitleBar = false,
-				DestroyOnClose = true,
-				bToggleShowHide=true, 
-				style = CommonCtrl.WindowFrame.ContainerStyle,
-				allowDrag = false,
-				enable_esc_key = true,
-				bShow = bShow,
-				click_through = false, 
-				zorder = -1,
-				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-				directPosition = true,
-					align = "_ct",
-					x = -300/2,
-					y = -300/2,
-					width = 300,
-					height = 350,
-			};
-		System.App.Commands.Call("File.MCMLWindowFrame", params);
-		if(bShow ~= false) then
-			params._page.OnClose = function()
-				if(not EscFramePage.bForceHide) then
-					DesktopMenuPage.ActivateMenu(false);
+		local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', bShow)
+		if not isCustomShow then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
+			local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+				
+			local bActivateMenu = true;
+			if(bShow ~= false) then
+				if(page and page:IsVisible()) then
+					bActivateMenu = false;
 				end
-			end;
+				DesktopMenuPage.ActivateMenu(bActivateMenu);
+			end
+			EscFramePage.bForceHide = bShow == false;
+
+			local params = {
+					url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html", 
+					name = "EscFramePage.ShowPage", 
+					isShowTitleBar = false,
+					DestroyOnClose = true,
+					bToggleShowHide=true, 
+					style = CommonCtrl.WindowFrame.ContainerStyle,
+					allowDrag = false,
+					enable_esc_key = true,
+					bShow = bShow,
+					click_through = false, 
+					zorder = -1,
+					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					directPosition = true,
+						align = "_ct",
+						x = -300/2,
+						y = -300/2,
+						width = 300,
+						height = 350,
+				};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);
+			if(bShow ~= false) then
+				params._page.OnClose = function()
+					if(not EscFramePage.bForceHide) then
+						DesktopMenuPage.ActivateMenu(false);
+					end
+				end;
+			end
 		end
 	end
 end

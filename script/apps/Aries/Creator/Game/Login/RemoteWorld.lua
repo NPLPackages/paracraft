@@ -244,6 +244,7 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 		src_with_headers = {url = src, headers = self.headers};
 	end
 
+	local showBBS = GameLogic.GetFilters():apply_filters("download_remote_world_show_bbs");
 	if(refreshMode ~= "force" and ParaIO.DoesFileExist(dest)) then
 		if(refreshMode == "auto") then
 			local local_filesize = ParaIO.GetFileSize(dest);
@@ -252,17 +253,20 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 				LOG.std(nil, "info", "RemoteWorld", "world %s already exist locally with correct file size %d", dest, last_filesize);
 				OnCallbackFunc(true, dest);
 			else
-				GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
+				if (showBBS or showBBS == nil) then
+					GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
+				end				
 				LOG.std(nil, "info", "RemoteWorld", "remote(%d) and local(%d) file size differs, we will download again", last_filesize, local_filesize);
 				self.FileDownloader:Init(L"世界", src, dest, function(bSuccess, dest)
 					self.FileDownloader:Flush();
 					OnCallbackFunc(bSuccess, dest);
 				end, "access plus 5 mins", true);
 			end
-		elseif(refreshMode == "check") then
-			
-			GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
-			
+		elseif(refreshMode == "check") then			
+			if (showBBS or showBBS == nil) then
+				GameLogic.AddBBS("RemoteWorld", L("下载中...")..src, 8000, "255 0 0");
+			end	
+						
 			-- get http headers only (take care of 302 http redirect)
 			System.os.GetUrl(src_with_headers, function(err, msg)
 				GameLogic.AddBBS("RemoteWorld", nil);

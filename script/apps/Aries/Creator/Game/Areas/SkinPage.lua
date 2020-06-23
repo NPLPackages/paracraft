@@ -59,7 +59,8 @@ end
 
 function SkinPage.ShowPage(entity)
 	cur_entity = entity;
-	local params = {
+	local customParams = GameLogic.GetFilters():apply_filters('SkinPage.PageParams')
+	local params = customParams or {
 			url = "script/apps/Aries/Creator/Game/Areas/SkinPage.html", 
 			name = "SkinPage.ShowPage", 
 			isShowTitleBar = false,

@@ -85,8 +85,10 @@ function InventoryPage.ShowPage()
 		end
 	end
 
+	local customParams = GameLogic.GetFilters():apply_filters("InventoryPage.PageParams")
+
 	if(System.options.IsMobilePlatform) then
-		local params = {
+		local params = customParams or {
 			url = "script/apps/Aries/Creator/Game/Areas/InventoryPage.mobile.html", 
 			name = "InventoryPage.ShowPage", 
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
@@ -116,7 +118,7 @@ function InventoryPage.ShowPage()
 		end
 		DesktopMenuPage.ActivateMenu(bActivateMenu);
 
-		local params = {
+		local params = customParams or {
 			url = "script/apps/Aries/Creator/Game/Areas/InventoryPage.html", 
 			name = "InventoryPage.ShowPage", 
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 

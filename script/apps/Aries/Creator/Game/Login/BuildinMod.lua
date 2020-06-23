@@ -14,7 +14,7 @@ BuildinMod.AddBuildinMods();
 local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
 
 -- package_path can be the same, so the same package zip can contain multiple mods
-BuildinMod.buildin_mods = {
+local buildInModList = {
 	{
 		name = "ParaXExporter", 
 		-- package_path = "npl_packages/BMaxToParaXExporter/", 
@@ -57,26 +57,6 @@ BuildinMod.buildin_mods = {
 		text=L"系统内置插件",
 		version = "1.1",
 		homepage = "https://github.com/LiXizhi/stlexporter",
-	},
-	{
-		name = "WorldShare", 
-		-- package_path = "npl_packages/WorldShare/", 
-		package_path = "npl_packages/ParacraftBuildinMod/", 
-		displayName = L"KeepWork世界分享", 
-		text=L"系统内置插件",
-		version = "1.3",
-		homepage = "https://github.com/tatfook/WorldShare",
-		-- load this module when the package is loaded
-		loadOnStartup = true, 
-	},
-	{
-		name = "ExplorerApp", 
-		-- package_path = "tatfook/ExplorerApp/", 
-		package_path = "npl_packages/ParacraftBuildinMod/", 
-		displayName = L"探索APP", 
-		text=L"系统内置插件",
-		version = "0.9",
-		homepage = "https://github.com/tatfook/ExplorerApp",
 	},
 	{
 		name = "EMapMod", 
@@ -149,7 +129,49 @@ BuildinMod.buildin_mods = {
 		homepage = "https://github.com/tatfook/GeneralGameServerMod",
 	},
 	-- TODO: add more preinstalled paracraft mod package here
-};
+}
+
+local isCodepku = ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true"
+
+if (not isCodepku) then
+	local worldShare = {
+		name = "WorldShare", 
+		-- package_path = "npl_packages/WorldShare/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"KeepWork世界分享", 
+		text=L"系统内置插件",
+		version = "1.3",
+		homepage = "https://github.com/tatfook/WorldShare",
+		-- load this module when the package is loaded
+		loadOnStartup = true, 
+	};
+	local explorerApp = {
+		name = "ExplorerApp", 
+		-- package_path = "tatfook/ExplorerApp/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"探索APP", 
+		text=L"系统内置插件",
+		version = "0.9",
+		homepage = "https://github.com/tatfook/ExplorerApp",
+	};
+	table.insert(buildInModList, worldShare);
+	table.insert(buildInModList, explorerApp);
+else
+	local codepkuMod = {
+		name = "CodePku", 
+		-- package_path = "npl_packages/WorldShare/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"玩学世界", 
+		text=L"系统内置插件",
+		version = "1.3",
+		homepage = "https://github.com/tatfook/WorldShare",
+		-- load this module when the package is loaded
+		loadOnStartup = true, 
+	};
+	table.insert(buildInModList, codepkuMod);
+end
+
+BuildinMod.buildin_mods = buildInModList
 
 -- called at the very beginning before plugins are loaded.
 function BuildinMod.AddBuildinMods()

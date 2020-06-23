@@ -73,6 +73,8 @@ System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution
 
 System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 
+-- System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
+
 System.User = System.User or {};
 if(not System.User.keepworktoken) then
 	System.User.keepworktoken = ParaEngine.GetAppCommandLineByParam("keepworktoken",nil);

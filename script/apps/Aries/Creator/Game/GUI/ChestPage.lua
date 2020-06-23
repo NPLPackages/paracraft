@@ -60,8 +60,12 @@ function ChestPage.ShowPage(entity, OnClose)
 	cur_entity = entity;
 	entity:BeginEdit();
 	local params;
+
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+	local customParams = GameLogic.GetFilters():apply_filters('ChestPage.PageParams')
+
 	if(System.options.IsMobilePlatform) then
-		params = {
+		params = customParams or {
 			url = "script/apps/Aries/Creator/Game/GUI/ChestPage.mobile.html", 
 			name = "ChestPage.ShowPage", 
 			isShowTitleBar = false,
@@ -82,7 +86,7 @@ function ChestPage.ShowPage(entity, OnClose)
 				height = 520,
 		};
 	else
-		params = {
+		params = customParams or {
 			url = "script/apps/Aries/Creator/Game/GUI/ChestPage.html", 
 			name = "ChestPage.ShowPage", 
 			isShowTitleBar = false,

@@ -373,10 +373,12 @@ function Desktop.OnExit(bForceExit, bRestart)
 					end
 				end
 			};
-			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);
+			echo("game desktop")
+			echo(dialog);
 			if(dialog and dialog.callback and dialog.text) then
 				_guihelper.MessageBox(dialog.text, 
-					dialog.callback, _guihelper.MessageBoxButtons.YesNoCancel);
+					dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
 			end
 		end
 	else

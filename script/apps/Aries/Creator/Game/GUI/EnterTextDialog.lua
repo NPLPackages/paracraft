@@ -71,7 +71,8 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 	end
 	EnterTextDialog.options = options;
 	showParams = showParams or {};
-	local params = {
+	local customParams = GameLogic.GetFilters():apply_filters('EnterTextDialog.PageParams', showParams)
+	local params = customParams or {
 			url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
 			name = "EnterTextDialog.ShowPage", 
 			isShowTitleBar = false,

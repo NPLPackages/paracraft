@@ -472,8 +472,12 @@ function options:ShowTouchPad(bShow)
 	-- on windows touch device, if the user has clicked with touch device before it enters a 3d world, we will show the touch controller. 
 	local IsTouchDevice = self:HasTouchDevice()
 	if(System.options.IsTouchDevice or IsTouchDevice) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
-		local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+		local TouchMiniKeyboard = GameLogic.GetFilters():apply_filters("TouchMiniKeyboard");
+		if(not TouchMiniKeyboard) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+			TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+		end
+
 		TouchMiniKeyboard.CheckShow(true);
 
 		-- enable touch mode

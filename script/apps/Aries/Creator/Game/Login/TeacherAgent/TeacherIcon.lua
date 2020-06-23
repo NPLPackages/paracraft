@@ -59,7 +59,11 @@ function TeacherIcon.Show(bShow)
 end
 
 function TeacherIcon.ComputeLeftPos()
-	local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+	local TouchVirtualKeyboardIcon = GameLogic.GetFilters():apply_filters("TouchVirtualKeyboardIcon");
+	if not TouchVirtualKeyboardIcon then
+		TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+	end
+
 	if(TouchVirtualKeyboardIcon.IsSingletonVisible and TouchVirtualKeyboardIcon.IsSingletonVisible()) then
 		local icon = TouchVirtualKeyboardIcon.GetSingleton();
 		return (icon.left or 0) + (icon.width or 64) + 5;

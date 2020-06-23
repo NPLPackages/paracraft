@@ -95,7 +95,7 @@ function KpChatChannel.GetUserId()
     if(Mod and Mod.WorldShare and Mod.WorldShare.Store)then
         local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"))
         return userId;
-    end
+    end    
 end
 function KpChatChannel.GetRoom()
     if(KpChatChannel.worldId)then
