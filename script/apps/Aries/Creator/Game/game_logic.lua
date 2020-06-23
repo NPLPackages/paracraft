@@ -1534,7 +1534,7 @@ end
 -- @param text: nil to clear text on that channel.
 -- e.g. GameLogic.AddBBS("channel", format("hi"), 4000, "0 255 0")
 function GameLogic.AddBBS(channel, text, max_duration, color, font_size)
-	BroadcastHelper.PushLabel({id=channel or "GameLogic", label = text, max_duration=max_duration or 4000, color = color or "0 255 0", scaling=1.1, bold=true, shadow=true, font_size=font_size or 21});
+	BroadcastHelper.PushLabel({id=channel or "GameLogic", label = text, max_duration=max_duration or 4000, color = color or "0 255 0", scaling=1.1, bold=true, shadow=true, font_size=font_size or 16});
 end
 
 -- @param text: text to show in the status bar.  if nil, it will clear it. 
