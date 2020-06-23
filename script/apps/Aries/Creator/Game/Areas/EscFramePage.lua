@@ -80,7 +80,7 @@ function EscFramePage.ShowPage(bShow)
 	if(System.options.IsMobilePlatform) then
 		EscFramePage.ShowPage_Mobile()
 	else
-		local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', bShow)
+		local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', false, bShow)
 		if not isCustomShow then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
 			local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");

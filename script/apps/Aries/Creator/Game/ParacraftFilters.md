@@ -52,6 +52,17 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "show_custom_create_new_world", behavior("show" or "close"):use this filter to customize your CreateNewWorld page.
   - "show_custom_download_world", behavior("show" or "close"), url:use this filter to customize your DownloadWorld page.
   - "OnShowEscFrame", bShow: whenever the esc key frame window is shown or hide
+  - "AriesWindow.CustomStyle": false, rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css, mode: custom aries window styles.
+  - "TouchVirtualKeyboardIcon", keyboardIcon: custom mobile keyboard icon.
+  - "TouchMiniKeyboard", TouchMiniKeyboard: custom touchMiniKeyboard.
+  - "ShowLoginBackgroundPage", true: custom login background page when.
+  - "ChestPage.PageParams", chestPageDefaultParams: custom chest page.
+  - "EnterTextDialog.PageParams", enterTextDialogPageParams: custom enter text dialog page params.
+  - "EscFramePage.ShowPage", false: Used to customize the dialog box that pops up when exiting the world.
+  - "InventoryPage.PageParams", inventoryPageDefaultParams: custom backpack interface.
+  - "SkinPage.PageParams", skinPageDefaultParams: custom skin page. 
+  - "SystemSettingsPage.CheckBoxBackground", pageInfo, page, name, bChecked: custom system setting dialog's checkbox checked styles.
+  - "SystemSettingsPage.PageParams", defaultPageParams: custom system setting page.
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
@@ -73,6 +84,11 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 
   - "cmd_loadworld", url, options: hook `/loadworld url` command
   - "LocalLoadWorld.GetWorldFolderFullPath" filepath:
+  - "CodeAPIInstallMethods", codeBlockApiCollections: inject custom code block apis.
+  - "ParacraftCodeBlocklyAppendDefinitions",ParacraftCodeBlockly: inject custom code blocks. 
+  - "ParacraftCodeBlocklyCategories", ParacraftCodeBlocklyDefaultCategories: inject custom code block categories. 
+  - "download_remote_world_show_bbs", true: whether show bbs when downloading remote world.
+  - "file_downloader_show_label", true, when fileDownloader downloads, choose whether to display the download progress prompt.
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:

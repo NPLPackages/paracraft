@@ -33,9 +33,9 @@ local mc_line = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;352 66 1 
 
 function pe_aries_window.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
 	local mode = mcmlNode:GetString("mode") or "full"; -- full or lite
-	local useDefaultStyle = GameLogic.GetFilters():apply_filters('AriesWindow.CustomStyle',rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css, mode);
-
-	if (useDefaultStyle) then
+	local useCustomStyle = GameLogic.GetFilters():apply_filters('AriesWindow.CustomStyle', false, rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css, mode);
+		
+	if (not useCustomStyle) then
 		if(mode == "full")then
 			pe_aries_window.create_full(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
 		elseif(mode == "thin" or mode == "mc")then
