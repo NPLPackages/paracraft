@@ -76,6 +76,15 @@ function GameMode:IsEditor()
 	end
 end
 
+-- can we chat or show chat content. 
+function GameMode:CanChat()
+	return self.mode ~= "strictgame";
+end
+
+function GameMode:CanUseCommand()
+	return self.mode ~= "strictgame";
+end
+
 -- activate default context according to current mode.
 function GameMode:ActivateDefaultContext()
 	local context;

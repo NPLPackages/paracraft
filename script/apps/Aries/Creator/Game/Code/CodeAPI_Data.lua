@@ -27,6 +27,16 @@ function env_imp:print(...)
 	GameLogic.GetCodeGlobal():print(...);
 end
 
+-- @param level: default to 5 
+function env_imp:printStack(level)
+	local stack = commonlib.debugstack(2, level or 5, 1)
+	for line in stack:gmatch("([^\r\n]+)") do
+		if(not line:match("C function") and not line:match("CodeCoroutine.lua")) then
+			env_imp.echo(self, line);
+		end
+	end
+end
+
 function env_imp:echo(obj, ...)
 	commonlib.echo(obj, ...);
 	if(type(obj) == "string") then

@@ -14,7 +14,6 @@ UserIntroduction.ShowPage()
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
 
 UserIntroduction.page= nil;
 UserIntroduction.showOnStart = false;

@@ -88,7 +88,6 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
     else
 	    ParacraftLearningRoomDailyPage.FillDays();
         local index = ParacraftLearningRoomDailyPage.GetNextDay();
-        index = index - 1;
 	    LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
         local exid = ParacraftLearningRoomDailyPage.exid;
 	    KeepWorkItemManager.DoExtendedCost(exid, function()
@@ -162,10 +161,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	local NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
 	NplBrowserResizedPage:Show(url, "", false, true, nil, function(state)
 		if(state == "ONCLOSE")then
-            local empty_url = "https://keepwork.com/zhanglei/empty/index";
-            NplBrowserResizedPage.url = empty_url;
-            NplBrowserResizedPage:Goto(empty_url);
-            NplBrowserResizedPage:Close_Internal();
+            NplBrowserResizedPage:GotoEmpty();
 		end
 	end);
 	ParacraftLearningRoomDailyPage.ClosePage();

@@ -135,6 +135,8 @@ function Desktop.OnActivateDesktop(mode)
 	
 	if(mode == "game" or mode== "adventure") then
 		GameLogic.EnterGameMode();
+	elseif(mode == "strictgame" ) then
+		GameLogic.EnterGameMode(false, true);
 	elseif(mode == "editor" or mode=="creative") then
 		GameLogic.EnterEditorMode();
 	elseif(mode == "tutorial") then

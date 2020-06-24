@@ -32,28 +32,28 @@
                         <%=L"知识豆："%>
                         <input type="button" name="reward" value='<%=TeachingQuestTitle.GetTotalPoints()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
                         <!--
-                        <input type="button" style="width:76px;height:28px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="知识豆兑换" class="mc_orange_button_with_fillet" onclick="" />
+                        <input type="button" style="width:76px;height:28px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"知识豆兑换" %>' class="mc_orange_button_with_fillet" onclick="" />
                         -->
                     </div>
                     <pe:if condition='<%=(ticket=="receive")%>'>
                         <div style="margin-top:-23px;margin-left:310px">
                             <%=L"入场券："%>
                             <input type="button" name="ticket" value='<%=TeachingQuestTitle.GetTotalTickets()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
-                            <input type="button" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="领取入场券" class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.ReceiveTicket" />
+                            <input type="button" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"领取入场券" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.ReceiveTicket" />
                         </div>
                     </pe:if>
                     <pe:if condition='<%=(ticket=="non_today")%>'>
                         <div style="margin-top:-23px;margin-left:310px">
                             <%=L"入场券："%>
                             <input type="button" name="ticket" value='<%=TeachingQuestTitle.GetTotalTickets()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
-                            <input type="button" enabled="false" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="今日已领完" class="mc_blue_button_with_fillet" onclick="" />
+                            <input type="button" enabled="false" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"今日已领完" %>' class="mc_blue_button_with_fillet" onclick="" />
                         </div>
                     </pe:if>
                     <pe:if condition='<%=(ticket=="non_week")%>'>
                         <div style="margin-top:-23px;margin-left:310px">
                             <%=L"入场券："%>
                             <input type="button" name="ticket" value='<%=TeachingQuestTitle.GetTotalTickets()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
-                            <input type="button" enabled="false" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value="本周已领完" class="mc_blue_button_with_fillet" onclick="" />
+                            <input type="button" enabled="false" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"本周已领完" %>' class="mc_blue_button_with_fillet" onclick="" />
                         </div>
                     </pe:if>
                 </div>
@@ -79,15 +79,15 @@
                         <input type="button" name="totalpoints" value='<%=TeachingQuestTitle.GetTotalPoints()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
                     </div>
                     <pe:if condition='<%=(not TeachingQuestTitle.IsTaskFinished())%>'>
-                        <input type="button" style="width:80px;height:26px;margin-top:-24px;margin-left:386px;color:#ffffff;" value="开始任务" class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                        <input type="button" style="width:80px;height:26px;margin-top:-24px;margin-left:386px;color:#ffffff;" value='<%=L"开始任务" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
                     </pe:if>
                     <pe:if condition='<%=(TeachingQuestTitle.IsTaskInProcess())%>'>
-                        <input type="button" enabled="false" style="width:90px;height:26px;margin-top:-24px;margin-left:376px;color:#ffffff;" value="任务进行中" class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                        <input type="button" enabled="false" style="width:90px;height:26px;margin-top:-24px;margin-left:376px;color:#ffffff;" value='<%=L"任务进行中" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
                     </pe:if>
                     <pe:if condition='<%=(TeachingQuestTitle.IsTaskFinished() and not TeachingQuestTitle.IsTaskInProcess())%>'>
                         <div style="margin-top:-23px;margin-left:284px">
                             <%=L"任务已完成"%>
-                            <input type="button" style="width:100px;height:26px;margin-top:-2px;margin-left:15px;color:#ffffff;" value="查看任务内容" class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                            <input type="button" style="width:100px;height:26px;margin-top:-2px;margin-left:15px;color:#ffffff;" value='<%=L"查看任务内容" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
                         </div>
                     </pe:if>
                 </div>

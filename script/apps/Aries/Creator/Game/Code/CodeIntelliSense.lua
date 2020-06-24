@@ -144,6 +144,9 @@ local function AddGlobalVariables(globals, items, word)
 end
 
 
+local function dummyFunc()
+end
+
 function CodeIntelliSense.GetSharedAPIGlobals()
 	if(CodeIntelliSense.shared_API) then
 		return CodeIntelliSense.shared_API;
@@ -160,6 +163,8 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			table = globals.table,
 			GameLogic = globals.GameLogic,
 			getBlockEntity = globals.getBlockEntity,
+			print = dummyFunc,
+			printStack = dummyFunc,
 			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 		}

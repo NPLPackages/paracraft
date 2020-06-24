@@ -276,6 +276,12 @@ function ChatEdit.SendTextSilent(words, channel)
 end
 
 function ChatEdit.OnClickSend(name)
+	if(not GameLogic.GameMode:CanChat()) then
+		GameLogic.AddBBS(nil, L"当前模式不允许聊天", 5000, "255 0 0");
+		ChatEdit.LostFocus();
+		return
+	end
+
 	local words = "";
 	local _editbox = ChatEdit.GetInputControl();
 	if(_editbox) then

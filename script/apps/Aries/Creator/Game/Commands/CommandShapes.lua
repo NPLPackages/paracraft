@@ -16,6 +16,9 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 
+-- max radius of shapes
+local maxRadius = 500;
+
 Commands["box"] = {
 	name="box", 
 	quick_ref="/box dx dy dz", 
@@ -31,7 +34,7 @@ e.g.
 		dx, cmd_text = CmdParser.ParseInt(cmd_text);
 		dy, cmd_text = CmdParser.ParseInt(cmd_text);
 		dz, cmd_text = CmdParser.ParseInt(cmd_text);
-		if(dx and dy and dz) then
+		if(dx and dy and dz and dx<maxRadius and dy < 100 and dz < maxRadius) then
 			local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="box", dx=dx, dy=dy, dz=dz})
 			task:Run();
 		end
@@ -60,8 +63,10 @@ e.g.
 		if(plane and plane == "") then
 			plane = "y";
 		end
-		local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ring", radius=radius, thickness=thickness, plane = plane})
-		task:Run();
+		if(radius < maxRadius) then
+			local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ring", radius=radius, thickness=thickness, plane = plane})
+			task:Run();
+		end
 	end,
 };
 
@@ -83,8 +88,10 @@ e.g.
 		if(plane and plane == "") then
 			plane = "y";
 		end
-		local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="circle", radius=radius, plane = plane})
-		task:Run();
+		if(radius < maxRadius) then
+			local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="circle", radius=radius, plane = plane})
+			task:Run();
+		end
 	end,
 };
 
@@ -109,8 +116,10 @@ e.g.
 		else
 			beSolid = false;
 		end
-		local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="sphere", radius=radius, beSolid=beSolid})
-		task:Run();
+		if(radius < maxRadius) then
+			local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="sphere", radius=radius, beSolid=beSolid})
+			task:Run();
+		end
 	end,
 };
 
@@ -136,8 +145,10 @@ e.g.
 		else
 			beSolid = false;
 		end
-		local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ellipsoid", radiusX=radiusX, radiusY=radiusY, radiusZ=radiusZ, beSolid=beSolid})
-		task:Run();
+		if(radiusX < maxRadius and radiusY < maxRadius and radiusZ < maxRadius) then
+			local task = MyCompany.Aries.Game.Tasks.CreateSimpleShape:new({shape="ellipsoid", radiusX=radiusX, radiusY=radiusY, radiusZ=radiusZ, beSolid=beSolid})
+			task:Run();
+		end
 	end,
 };
 

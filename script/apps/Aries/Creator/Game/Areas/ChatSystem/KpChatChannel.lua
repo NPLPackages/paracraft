@@ -319,8 +319,11 @@ function KpChatChannel.SetBulletScreen(v)
 end
 function KpChatChannel.BulletScreenIsOpened()
     if(GameLogic)then
-        local key = string.format("is_opened_bullet_screen_%s",tostring(KpChatChannel.GetUserId()));
-	    return GameLogic.GetPlayerController():LoadLocalData(key,true,true);
+		local userId = KpChatChannel.GetUserId();
+		if (userId) then
+			local key = string.format("is_opened_bullet_screen_%s",tostring(userId));
+			return GameLogic.GetPlayerController():LoadLocalData(key,true,true);
+		end
     end
     return true;
 end

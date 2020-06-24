@@ -32,7 +32,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 
 	local page_ctrl = mcmlNode:GetPageCtrl();
 	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
-    local url = mcmlNode:GetAttributeWithCode("url");
+    local url = mcmlNode:GetAttributeWithCode("url","",true);
 	local withControl = mcmlNode:GetAttributeWithCode("withControl",false);
 	local visible = mcmlNode:GetAttributeWithCode("visible", nil, true);
 	visible = not (visible == false or visible=="false");
