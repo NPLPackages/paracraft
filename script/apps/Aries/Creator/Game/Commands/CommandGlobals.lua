@@ -433,6 +433,7 @@ e.g.
 /mode          :unlock and toggle between game/edit mode. 
 /mode tutorial 
 /mode school 7 : make school mode for 7 days
+/mode strictgame : no commands, no cheating. Only activated when game is readonly.
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(not System.options.is_mcworld) then

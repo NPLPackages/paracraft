@@ -84,6 +84,7 @@ function NplBrowserResizedPage:_Show(url)
 		end)
 
         _this:SetScript("ondragmove", function(ui_obj)
+			self.is_draging = true;
 		    local x, y = ui_obj:GetAbsPosition();
             if(x<0) then x=0; end
 		    if(y<0) then y=0; end
@@ -91,12 +92,17 @@ function NplBrowserResizedPage:_Show(url)
             self.drag_y = y;
 	    end);
 	    _this:SetScript("ondragend", function(ui_obj)
+			self.is_draging = false;
             local x = self.drag_x;
             local y = self.drag_y;
 		    if(x<0) then x=0; end
 		    if(y<0) then y=0; end
 
-		    _this:Reposition("_lt", x, y, self.width, self.height)
+		    --_this:Reposition("_lt", x, y, self.width, self.height)
+			local _1, _2, w, h = ParaUI.GetUIObject("root"):GetAbsPosition();
+			local left = (w - self.width)/2;
+			local top = (h - self.height)/2;
+			_this:Reposition("_ct", -self.width/2+x-left, -self.height/2+y-top, self.width, self.height);
 	    end);
 
 		_this:SetScript("onclick", function() end); -- just disable click through 
@@ -109,8 +115,10 @@ function NplBrowserResizedPage:_Show(url)
 
 		self.page = page;
 	end
+
 	if(_this and self.page)then
 		_this.visible = true;
+        _this.candrag = candrag;
 		self.page:CallMethod(self.browser_name, "SetVisible", true); 
 		if(url_changed)then
 			self.page:CallMethod(self.browser_name, "Reload", self.url); 
@@ -176,6 +184,9 @@ function NplBrowserResizedPage:OnResize()
 			self.callback("ONRESIZE");
 		end
 	end
+	if (self.is_draging) then
+		return;
+	end
 	if (self.options.autoscale and self.options.resizefunc) then
 		local width, height  = self.options.resizefunc();
 		Resize(width, height);
@@ -201,8 +212,15 @@ function NplBrowserResizedPage:CanClose()
 end
 function NplBrowserResizedPage:Goto(url)
     url = url or self.url;
+    self.url = url;
     if(self.page)then
 	    self.page:CallMethod(self.browser_name, "Reload", url); 
     end
 end
-
+function NplBrowserResizedPage:GotoEmpty()
+    local url = "https://keepwork.com/zhanglei/empty/index";
+    NplBrowserResizedPage:Goto(url);
+    commonlib.TimerManager.SetTimeout(function()  
+		ParaUI.GetUIObject("root"):Focus();
+	end, 1000)
+end

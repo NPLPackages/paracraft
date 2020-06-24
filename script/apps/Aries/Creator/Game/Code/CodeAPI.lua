@@ -29,6 +29,7 @@ local s_env_methods = {
 	"xpcall",
 	-- Data
 	"print",
+	"printStack",
 	"log",
 	"echo",
 	"setActorValue",

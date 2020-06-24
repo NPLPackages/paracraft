@@ -965,15 +965,19 @@ function BaseContext:HandleGlobalKey(event)
 		CommandManager:RunCommand("record");
 		event:accept();
 	elseif(dik_key == "DIK_RETURN") then
-		--System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-		MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-		event:accept();
+		if(GameLogic.GameMode:CanChat()) then
+			--System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+			MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+			event:accept();
+		end
 	elseif(dik_key == "DIK_SLASH") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-		MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-		MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
-		event:accept();
+		if(GameLogic.GameMode:CanChat()) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+			MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+			MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
+			event:accept();
+		end
 	elseif(dik_key == "DIK_GRAVE") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/World/CameraController.lua");
 		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")

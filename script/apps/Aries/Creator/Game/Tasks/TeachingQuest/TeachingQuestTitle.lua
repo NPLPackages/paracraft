@@ -250,10 +250,11 @@ function TeachingQuestTitle.StartTask()
 							end, _guihelper.MessageBoxButtons.YesNo);
 						end
 					end
-					NplBrowserResizedPage:Goto(task.url);
+                    NplBrowserResizedPage:GotoEmpty();
 					TeachingQuestTitle.ShowPage("?info=task");
 				end
 			end);
+			NplBrowserResizedPage:OnResize();
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then

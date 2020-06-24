@@ -62,7 +62,7 @@ TeachingQuestPage.CADType = 3;
 TeachingQuestPage.RobotType = 4;
 TeachingQuestPage.UnknowType = 5;
 
-TeachingQuestPage.TaskTypeTexts = {"编程", "动画", "CAD", "机器人"};
+TeachingQuestPage.TaskTypeTexts = {L"编程", L"动画", L"CAD", L"机器人"};
 TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "robot"};
 TeachingQuestPage.TaskTypeIndex = {
 	program = TeachingQuestPage.ProgramType,

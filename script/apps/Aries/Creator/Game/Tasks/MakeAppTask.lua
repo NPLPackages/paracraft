@@ -24,14 +24,8 @@ local MakeApp = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"
 function MakeApp:ctor()
 end
 
-function MakeApp:Run()
-	if(System.os.GetPlatform()~="win32") then
-		_guihelper.MessageBox(L"此功能需要使用Windows操作系统");
-		return
-	end
-	if(not GameLogic.IsVip(nil, true)) then
-		return;
-	end
+
+function MakeApp:RunImp()
 	local name = WorldCommon.GetWorldTag("name");
 	self.name = name
 	local dirName = commonlib.Encoding.Utf8ToDefault(name)
@@ -44,6 +38,18 @@ function MakeApp:Run()
 			self:MakeApp()
 		end
 	end, _guihelper.MessageBoxButtons.YesNo);
+end
+
+function MakeApp:Run()
+	if(System.os.GetPlatform()~="win32") then
+		_guihelper.MessageBox(L"此功能需要使用Windows操作系统");
+		return
+	end
+	GameLogic.IsVip("MakeApp", true, function(result) 
+		if(result) then  
+			self:RunImp()
+		end
+	end)
 end
 
 function MakeApp:MakeApp()

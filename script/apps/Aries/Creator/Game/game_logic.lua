@@ -1053,9 +1053,12 @@ function GameLogic.SetMode(mode, bFireModeChangeEvent)
 end
 
 -- call this to enter game mode and begin to spawn all kinds of creatures and display game UI 
-function GameLogic.EnterGameMode(bIsSurvival)
+-- @param bStrictGame: no commands, no chatting, no cheating. 
+function GameLogic.EnterGameMode(bIsSurvival, bStrictGame)
 	if(bIsSurvival) then
 		GameLogic.SetMode("survival", true);
+	elseif(bStrictGame) then
+		GameLogic.SetMode("strictgame", true);
 	else
 		GameLogic.SetMode("game", true);
 	end

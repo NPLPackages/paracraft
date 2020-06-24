@@ -212,6 +212,7 @@ end
 -- @param code: string
 -- return error message if any
 function CodeBlock:CompileCode(code)
+	code = code or "";
 	if(self:IsModified() or (self.last_code ~= code or not self.code_func)) then
 		self:Unload();
 		self:SetModified(false);

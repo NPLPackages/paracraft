@@ -532,8 +532,8 @@ function Entity:ApplyExpansionData()
 	end
 	local rows = self.rows;
 	local columns = self.columns;
-	width = math.ceil(image_width/columns);
-	height = math.ceil(image_height/rows);
+	width = math.floor(image_width/columns);
+	height = math.floor(image_height/rows);
 	--block_left_in_image = 0;
 	--block_top_in_image = 0;
 	original_dot_x = 0;
