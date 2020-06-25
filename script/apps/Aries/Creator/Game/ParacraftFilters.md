@@ -61,7 +61,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "AriesWindow.CustomStyle": false, rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css, mode: custom aries window styles.  
   - "ShowLoginBackgroundPage", true: custom login background page when.
   - "ChestPage.PageParams", chestPageDefaultParams: custom chest page.
-  - "EnterTextDialog.PageParams", enterTextDialogPageParams: custom enter text dialog page params.
+  - "EnterTextDialog.PageParams", enterTextDialogPageParams, params: custom enter text dialog page params.
   - "EscFramePage.ShowPage", false: Used to customize the dialog box that pops up when exiting the world.
   - "InventoryPage.PageParams", inventoryPageDefaultParams: custom backpack interface.
   - "SkinPage.PageParams", skinPageDefaultParams: custom skin page. 

@@ -1159,37 +1159,30 @@ function SystemSettingsPage.OnOK()
 end
 
 function SystemSettingsPage.ShowPage()
-	GameLogic.IsVip("CreateVipWorld", false, function(result)
-		local url = "script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html";
-		if (result) then
-			url = url.."?user=teacher";
-		end
-		local customParams = GameLogic.GetFilters():apply_filters('SystemSettingsPage.PageParams');
-		local params = customParams or {
-			--url = "script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html", 
-			url = url,
-			name = "SystemSettingsPage.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			bToggleShowHide=true, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			enable_esc_key = true,
-			--bShow = bShow,
-			click_through = false, 
-			zorder = -1,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			directPosition = true,
-				align = "_ct",
-				x = -350/2,
-				y = -430/2,
-				width = 350,
-				height = 430,
-		};
-		--CreatorDesktop.params.bShow = bShow;
-		System.App.Commands.Call("File.MCMLWindowFrame", params);
-		--SystemSettingsPage.InitPageParams()
-	end);
+	local customParams = GameLogic.GetFilters():apply_filters('SystemSettingsPage.PageParams');
+	local params = customParams or {
+		url = "script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html", 
+		name = "SystemSettingsPage.ShowPage", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		bToggleShowHide=true, 
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = true,
+		enable_esc_key = true,
+		--bShow = bShow,
+		click_through = false, 
+		zorder = -1,
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		directPosition = true,
+			align = "_ct",
+			x = -350/2,
+			y = -430/2,
+			width = 350,
+			height = 430,
+	};
+	--CreatorDesktop.params.bShow = bShow;
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	--SystemSettingsPage.InitPageParams()
 end
 
 function SystemSettingsPage.OnCancel()
@@ -1269,7 +1262,11 @@ end
 
 function SystemSettingsPage.OnClickIsVipWorld(value)
 	if(not GameLogic.IsReadOnly()) then
-		GameLogic.options:SetVipWorld(value)
+		GameLogic.IsVip("CreateVipWorld", true, function(result)
+			if(result) then
+				GameLogic.options:SetVipWorld(value)
+			end
+		end);
 	end
 end
 

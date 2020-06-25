@@ -12,7 +12,6 @@ SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Sy
 GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 SystemSettingsPage.OnInit();
-user = Page:GetRequestParam("user") or ""
 
 function TotalDragTime(value)
     ParaCamera.GetAttributeObject():SetField("TotalDragTime", value)
@@ -350,14 +349,12 @@ end
                             <div style="float:left;margin-left:5px;margin-right:5px;color:#ffd800"><%=L"派生自:"..WorldCommon.GetWorldTag("fromProjects")%></div>
                         </pe:if>
                     </div>
-                    <pe:if condition='<%=(user=="teacher")%>'>
-                        <div style="margin-top:5px;">
-                            <div style="float:left;margin-top:2px" tooltip="<%=L'是否只有VIP用户可以访问'%>"><input type="checkbox" name="isVipWorld" checked="<%=GameLogic.options:IsVipWorld()%>" onclick="SystemSettingsPage.OnClickIsVipWorld" /></div>
-                            <div style="float:left;margin-left:5px;" for="isVipWorld"><%=L"VIP世界"%></div>
-                        </div>
-                    </pe:if>
                     <div style="margin-top:5px;">
-                        <div style="float:left;margin-top:2px" tooltip="<%=L'申请版权保护的世界无法被他人复制'%>"><input type="checkbox" name="hasCopyright" checked="<%=GameLogic.options:HasCopyright()%>" onclick="SystemSettingsPage.OnClickHasCopyright"/></div>
+                        <div style="float:left;margin-top:2px"><input type="checkbox" name="isVipWorld" tooltip="<%=L'是否只有VIP用户可以访问'%>" checked="<%=GameLogic.options:IsVipWorld()%>" onclick="SystemSettingsPage.OnClickIsVipWorld" /></div>
+                        <div style="float:left;margin-left:5px;" for="isVipWorld"><%=L"VIP世界"%></div>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <div style="float:left;margin-top:2px" ><input type="checkbox" name="hasCopyright" tooltip="<%=L'申请版权保护的世界无法被他人复制'%>" checked="<%=GameLogic.options:HasCopyright()%>" onclick="SystemSettingsPage.OnClickHasCopyright"/></div>
                         <div style="float:left;margin-left:5px;" for="hasCopyright"><%=L"申请版权保护"%></div>
                     </div>
                 </pe:if>

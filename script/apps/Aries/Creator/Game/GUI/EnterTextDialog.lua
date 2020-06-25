@@ -71,27 +71,28 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 	end
 	EnterTextDialog.options = options;
 	showParams = showParams or {};
-	local customParams = GameLogic.GetFilters():apply_filters('EnterTextDialog.PageParams', showParams)
-	local params = customParams or {
-			url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
-			name = "EnterTextDialog.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			bToggleShowHide=false, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			click_through = false, 
-			enable_esc_key = true,
-			bShow = true,
-			isTopLevel = true,
-			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			directPosition = true,
-				align = showParams.align or "_ct",
-				x = showParams.x or -200,
-				y = showParams.y or -150,
-				width = showParams.width or 400,
-				height = showParams.height or 400,
-		};
+	local params = {
+		url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
+		name = "EnterTextDialog.ShowPage", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		bToggleShowHide=false, 
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = true,
+		click_through = false, 
+		enable_esc_key = true,
+		bShow = true,
+		isTopLevel = true,
+		---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		directPosition = true,
+			align = showParams.align or "_ct",
+			x = showParams.x or -200,
+			y = showParams.y or -150,
+			width = showParams.width or 400,
+			height = showParams.height or 400,
+	};
+	params = GameLogic.GetFilters():apply_filters('EnterTextDialog.PageParams', params, showParams)
+	
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
 	if(default_text) then
