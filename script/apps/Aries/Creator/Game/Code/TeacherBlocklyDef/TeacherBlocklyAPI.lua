@@ -78,7 +78,7 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 					<div style="margin-top:20px;width:80px;height:20px;text-align:center;color:#00ff00;font-size:14px;font-weight:bold">%s</div>
 				</div>]],
 				actor_name[self.type]);
-			headon_speech.Speak(self.obj, headon_mcml, -1, nil, true);
+			headon_speech.Speak(self.obj, headon_mcml, -1, nil, true, nil, -100);
 		else
 			local state_img = {"Texture/Aries/HeadOn/exclamation.png", "Texture/Aries/HeadOn/question.png"};
 			local left = {"32px", "24px"};
@@ -90,7 +90,7 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 				</div>]],
 				left[state], width[state], state_img[state], actor_name[self.type]);
 
-			local ctl_name = headon_speech.Speak(self.obj, headon_mcml, -1, nil, true);
+			local ctl_name = headon_speech.Speak(self.obj, headon_mcml, -1, nil, true, nil, -100);
 			local _parent = ParaUI.GetUIObject(ctl_name);
 			local img = _parent:GetChildAt(0):GetChildAt(0);
 			local fileName = "script/UIAnimation/CommonBounce.lua.table";

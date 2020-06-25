@@ -190,6 +190,13 @@ function TeachingQuestPage.OnClose()
 	page:CloseWindow();
 end
 
+function TeachingQuestPage.RefreshItem()
+	if (page) then
+		page:Refresh(0);
+		page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[TeachingQuestPage.currentType]);
+	end
+end
+
 function TeachingQuestPage.GetUnlockedTasks()
 	local type = TeachingQuestPage.currentType;
 	local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);

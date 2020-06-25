@@ -16,7 +16,7 @@
             ]]>
         </script>
         <pe:if condition='<%=(info=="main")%>'>
-            <aries:window mode="no_title" style="width:488px;height:110px">
+            <aries:window mode="no_title" style="width:488px;height:120px">
                 <div style="height:25px;color:#ffffff;">
                     <div style="margin-top:-20px;width:420px;height:24px;text-align:center;color:#ffffff;font-size:14px;font-weight:bold">
                         <%=L"知识岛" %>
@@ -54,6 +54,18 @@
                             <%=L"入场券："%>
                             <input type="button" name="ticket" value='<%=TeachingQuestTitle.GetTotalTickets()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
                             <input type="button" enabled="false" style="width:80px;height:26px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"本周已领完" %>' class="mc_blue_button_with_fillet" onclick="" />
+                        </div>
+                    </pe:if>
+                </div>
+                <div style="margin-top:-23px;margin-left:214px;width:60px;height:20px;">
+                    <pe:if condition='<%=TeachingQuestTitle.IsPanelVisible%>'>
+                        <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeachingQuestTitle.OnHidePanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/uparrow.png)">
+                            <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeachingQuestTitle.OnHidePanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=not TeachingQuestTitle.IsPanelVisible%>'>
+                        <div tooltip='<%=L"点击显示面板"%>' onclick="TeachingQuestTitle.OnShowPanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/downarrow.png)">
+                            <div tooltip='<%=L"点击显示面板"%>' onclick="TeachingQuestTitle.OnShowPanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
                         </div>
                     </pe:if>
                 </div>

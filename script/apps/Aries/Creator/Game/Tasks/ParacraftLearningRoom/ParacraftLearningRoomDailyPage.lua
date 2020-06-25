@@ -11,6 +11,8 @@ ParacraftLearningRoomDailyPage.DoCheckin();
 
 ParacraftLearningRoomDailyPage.ShowPage()
 --]]
+local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
@@ -79,28 +81,32 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 			_guihelper.MessageBox(L"请先登录！");
 		return
 	end
+
+	local check = function()
+		if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
+			ParacraftLearningRoomDailyPage.ShowPage();
+		else
+			ParacraftLearningRoomDailyPage.FillDays();
+			local index = ParacraftLearningRoomDailyPage.GetNextDay();
+			LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
+			local exid = ParacraftLearningRoomDailyPage.exid;
+			KeepWorkItemManager.DoExtendedCost(exid, function()
+				ParacraftLearningRoomDailyPage.SaveToLocal();
+				_guihelper.MessageBox(L"签到成功。关闭窗口后将自动播放今日学习视频。", function(res)
+					ParacraftLearningRoomDailyPage.OnOpenWeb(index)
+				end, _guihelper.MessageBoxButtons.OK);    
+			end, function()
+				ParacraftLearningRoomDailyPage.ShowPage();
+			end)
+
+			
+		end
+	end
 	if(not KeepWorkItemManager.IsLoaded())then
-		_guihelper.MessageBox(L"正在加载数据，请稍等！");
+		KeepWorkItemManager.GetFilter():add_filter("loaded_all", check);
 		return
 	end
-    if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
-		ParacraftLearningRoomDailyPage.ShowPage();
-    else
-	    ParacraftLearningRoomDailyPage.FillDays();
-        local index = ParacraftLearningRoomDailyPage.GetNextDay();
-	    LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
-        local exid = ParacraftLearningRoomDailyPage.exid;
-	    KeepWorkItemManager.DoExtendedCost(exid, function()
-		    ParacraftLearningRoomDailyPage.SaveToLocal();
-		    _guihelper.MessageBox(L"签到成功。关闭窗口后将自动播放今日学习视频。", function(res)
-	            ParacraftLearningRoomDailyPage.OnOpenWeb(index)
-            end, _guihelper.MessageBoxButtons.OK);    
-	    end, function()
-		    ParacraftLearningRoomDailyPage.ShowPage();
-	    end)
-
-        
-    end
+	check();
 end
 function ParacraftLearningRoomDailyPage.IsVip()
 	local gsid = 10;
@@ -158,10 +164,9 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
     end
 	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnOpenWeb", index);
 	local url = string.format("https://keepwork.com/official/tips/s1/1_%d",index);
-	local NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
-	NplBrowserResizedPage:Show(url, "", false, true, nil, function(state)
+	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, "", false, true, nil, function(state)
 		if(state == "ONCLOSE")then
-            NplBrowserResizedPage:GotoEmpty();
+            NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
 		end
 	end);
 	ParacraftLearningRoomDailyPage.ClosePage();
@@ -172,15 +177,23 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 		return
 	end
 
-	local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
-	if (template) then
-		if (TeachingQuestPage.MainWorldId == nil) then
-			-- TeachingQuestPage.MainWorldId = template.extension;
-			TeachingQuestPage.MainWorldId = tostring(template.desc);
+	local learning = function()
+		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
+		if (template) then
+			if (TeachingQuestPage.MainWorldId == nil) then
+				-- TeachingQuestPage.MainWorldId = template.extension;
+				TeachingQuestPage.MainWorldId = tostring(template.desc);
+			end
+			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+			UserConsole:HandleWorldId(TeachingQuestPage.MainWorldId, "force");
 		end
-		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-		UserConsole:HandleWorldId(TeachingQuestPage.MainWorldId, "force");
 	end
+	if(not KeepWorkItemManager.IsLoaded())then
+		KeepWorkItemManager.GetFilter():add_filter("loaded_all", learning);
+		return
+	end
+
+	learning();
 end
 function ParacraftLearningRoomDailyPage.OnVIP()
 	ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 

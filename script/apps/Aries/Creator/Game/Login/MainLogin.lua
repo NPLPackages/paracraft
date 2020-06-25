@@ -303,7 +303,7 @@ function MainLogin:LoadBackground3DScene()
 		return self:next_step({Loaded3DScene = true});
 	end
 	System.options.WindowTitle = string.format("%s -- ver %s", L"帕拉卡 Paracraft", GameLogic.options.GetClientVersion());
-	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, L"免费的动画游戏创作工具"));
+	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, L"3D动画游戏创作工具"));
 
 	-- just in case it is from web browser. inform to switch to 3d display. 
 	if(System.options.IsWebBrowser) then

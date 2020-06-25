@@ -11,7 +11,8 @@ TeachingQuestTitle.ShowPage();
 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
-local NplBrowserResizedPage = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserResizedPage.lua");
+local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+
 local TeachingQuestTitle = NPL.export()
 
 local page;
@@ -22,9 +23,11 @@ end
 function TeachingQuestTitle.StaticInit()
 	GameLogic:Connect("WorldLoaded", TeachingQuestTitle, TeachingQuestTitle.OnWorldLoaded, "UniqueConnection");
 end
-
+function TeachingQuestTitle.CreateOrGetBrowserPage()
+	return NplBrowserManager:CreateOrGet("TeachingQuest_BrowserPage");
+end
 function TeachingQuestTitle.OnWorldLoaded()
-	NplBrowserResizedPage:Close();
+	TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	if (page) then
 		page:CloseWindow();
 	end
@@ -38,19 +41,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 			return
 		end
 		commonlib.TimerManager.SetTimeout(function()  
-			KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
-				if (canExchange.data and canExchange.data.ret == true) then
-					TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
-				else
-					if (canExchange.data and canExchange.data.reason == 5) then
-						TeachingQuestTitle.ShowPage("?info=main&ticket=non_week");
-					else
-						TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
-					end
-				end
-			end, function(err, msg, data)
-				TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
-			end);
+			TeachingQuestTitle.CheckAndShow();
 			GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
 			GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 			GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
@@ -77,6 +68,30 @@ function TeachingQuestTitle.OnWorldLoaded()
 	end
 end
 
+function TeachingQuestTitle.CheckAndShow()
+	KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
+		if (canExchange.data and canExchange.data.ret == true) then
+			TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
+		else
+			if (canExchange.data and canExchange.data.reason == 5) then
+				TeachingQuestTitle.ShowPage("?info=main&ticket=non_week");
+			else
+				TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+			end
+		end
+	end, function(err, msg, data)
+		TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+	end);
+end
+
+function TeachingQuestTitle.OnShowPanel()
+	TeachingQuestTitle.CheckAndShow();
+end
+
+function TeachingQuestTitle.OnHidePanel()
+	TeachingQuestTitle.ShowPage(nil, 0, -100, false);
+end
+
 function TeachingQuestTitle:MoveDown(event)
 	if (event.bShow) then
 		TeachingQuestTitle.ShowPage(nil, 0, 32);
@@ -97,13 +112,13 @@ end
 
 function TeachingQuestTitle.OnShowEscFrame(bShow)
 	if(bShow or bShow == nil) then
-		NplBrowserResizedPage:Close();
+		TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	end
 	return bShow;
 end
 
 function TeachingQuestTitle.OnShowExitDialog(p1)
-	NplBrowserResizedPage:Close();
+	TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	return p1;
 end
 
@@ -117,10 +132,12 @@ function TeachingQuestTitle.OnKeepWorkLogout_Callback(res)
 	GameLogic.RunCommand("/leaveworld")
 end
 
-function TeachingQuestTitle.ShowPage(param, offsetX, offsetY)
+function TeachingQuestTitle.ShowPage(param, offsetX, offsetY, show)
 	if (page) then
 		page:CloseWindow();
 	end
+	if (show == nil) then show = true end
+	TeachingQuestTitle.IsPanelVisible = show;
 	TeachingQuestTitle.showParam = param or TeachingQuestTitle.showParam;
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html"..TeachingQuestTitle.showParam, 
@@ -138,7 +155,7 @@ function TeachingQuestTitle.ShowPage(param, offsetX, offsetY)
 			x = offsetX or 0,
 			y = offsetY or 0,
 			width = 488,
-			height = 110,
+			height = 120,
 		cancelShowAnimation = true,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
@@ -180,7 +197,7 @@ function TeachingQuestTitle.IsTaskFinished()
 end
 
 function TeachingQuestTitle.IsTaskInProcess()
-	return NplBrowserResizedPage:IsVisible();
+	return TeachingQuestTitle.CreateOrGetBrowserPage():IsVisible();
 end
 
 function TeachingQuestTitle.GetTotalTickets()
@@ -191,19 +208,8 @@ end
 
 function TeachingQuestTitle.ReceiveTicket()
 	KeepWorkItemManager.DoExtendedCost(TeachingQuestPage.ticketExid, function()
-		KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
-			if (canExchange.data and canExchange.data.ret == true) then
-				TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
-			else
-				if (canExchange.data and canExchange.data.reason == 5) then
-					TeachingQuestTitle.ShowPage("?info=main&ticket=non_week");
-				else
-					TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
-				end
-			end
-		end, function()
-			TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
-		end);
+		TeachingQuestTitle.CheckAndShow();
+		TeachingQuestPage.RefreshItem();
 	end, function(err, msg, data)
 		TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
 	end);
@@ -211,32 +217,35 @@ end
 
 function TeachingQuestTitle.StartTask()
 	local task = TeachingQuestPage.GetCurrentSelectTask(TeachingQuestPage.currentIndex);
-	--task.url = "https://keepwork.com/official/tips/p1/1_10_11536";
+	--task.url = "https://keepwork.com/official/tips/cad/1_2_11921";
 	if (task and task.url) then
 		local function ShowTaskVideo(firstStart)
-			-- always set width=1080, height=630 if window'size > 1080 * 630
+			-- always set width=1080, height=656 if window'size > 1080 * 656
 			local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 			local left, top = 2000, 1000;
 			if (width >= 1100 and height >= 800) then
 				left = (width - 1080) / 2;
-				top = (height - 630) / 2;
+				top = (height - 656) / 2;
 			end
 
 			local options = {left=left, top=top, right=left, bottom=top, fixed=true, candrag=true, autoscale=true, resizefunc=function()
 				local x, y, w, h= ParaUI.GetUIObject("root"):GetAbsPosition();
 				if (w >= 1100 and h >= 800) then
-					return 1080, 630;
+					return 1080, 656;
 				else
-					if (w / (h-200) > 1080 / 630) then
-						return (h-200)/630*1080, (h-200);
+					if (w / (h-200) > 1080 / 656) then
+						return (h-200)/656*1080, (h-200);
 					else
-						return (w-20), (w-20)*630/1080;
+						return (w-20), (w-20)*656/1080;
 					end
 				end
 			end};
-			NplBrowserResizedPage:Show(task.url, task.title, false, true, options, function(state)
+			TeachingQuestTitle.CreateOrGetBrowserPage():Show(task.url, task.title, false, true, options, function(state)
 				if (state == "ONSHOW") then
-					TeachingQuestTitle.ShowPage("?info=task");
+					--TeachingQuestTitle.ShowPage("?info=task");
+					if (page) then
+						page:CloseWindow();
+					end
 				elseif (state == "ONCLOSE") then
 					if (firstStart) then
 						firstStart = false;
@@ -250,11 +259,11 @@ function TeachingQuestTitle.StartTask()
 							end, _guihelper.MessageBoxButtons.YesNo);
 						end
 					end
-                    NplBrowserResizedPage:GotoEmpty();
+					TeachingQuestTitle.CreateOrGetBrowserPage():GotoEmpty();
 					TeachingQuestTitle.ShowPage("?info=task");
 				end
 			end);
-			NplBrowserResizedPage:OnResize();
+			TeachingQuestTitle.CreateOrGetBrowserPage():OnResize();
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then
