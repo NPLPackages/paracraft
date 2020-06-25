@@ -176,6 +176,7 @@ function CodeAPI:new(codeBlock)
 	o._G = GameLogic.GetCodeGlobal():GetCurrentGlobals();
 
 	CodeAPI.InstallMethods(o);
+	GameLogic.GetFilters():apply_filters("CodeAPIInstallMethods",o);
 	setmetatable(o, GameLogic.GetCodeGlobal():GetCurrentMetaTable());
 	return o;
 end

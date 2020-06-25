@@ -119,9 +119,11 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 	end
 	self.isFetching = true;
 
+	local showLabel = GameLogic.GetFilters():apply_filters("file_downloader_show_label");
+
 	local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 	local label_id = src or "userworlddownload";
-	if(self.text ~= "official_texture_package") then
+	if(self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
 		BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text), max_duration=20000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 	end
 	LOG.std(nil, "info", "FileDownloader", "begin download file %s", src or "");
@@ -175,7 +177,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 				LOG.std(nil, "warn", "FileDownloader", msg);
 				GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);
 			end
-			if(text and self.text ~= "official_texture_package") then
+			if(text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
 				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 			end	
 		end

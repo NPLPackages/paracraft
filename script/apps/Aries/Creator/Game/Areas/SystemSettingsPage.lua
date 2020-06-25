@@ -22,7 +22,7 @@ NPL.load("(gl)script/apps/Aries/Scene/main.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 local Scene = commonlib.gettable("MyCompany.Aries.Scene");
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 
@@ -156,10 +156,13 @@ local function GetCheckBoxText(value)
 end
 
 local function UpdateCheckBox(name, bChecked)
+	local useDefaultStyle = GameLogic.GetFilters():apply_filters('SystemSettingsPage.CheckBoxBackground', page, name, bChecked);
 	if(page) then
 		bChecked = bChecked == true or bChecked == "true";
 		page:SetValue(name, GetCheckBoxText(bChecked))
-		page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 197 40 18:8 8 8 8" or "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4");
+		if (useDefaultStyle or useDefaultStyle == nil) then
+			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 197 40 18:8 8 8 8" or "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4");
+		end
 	end
 end
 
@@ -1161,7 +1164,8 @@ function SystemSettingsPage.ShowPage()
 		if (result) then
 			url = url.."?user=teacher";
 		end
-		local params = {
+		local customParams = GameLogic.GetFilters():apply_filters('SystemSettingsPage.PageParams');
+		local params = customParams or {
 			--url = "script/apps/Aries/Creator/Game/Areas/SystemSettingsPage.html", 
 			url = url,
 			name = "SystemSettingsPage.ShowPage", 

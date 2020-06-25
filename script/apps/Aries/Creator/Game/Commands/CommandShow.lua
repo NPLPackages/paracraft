@@ -93,8 +93,11 @@ Other show filters:
 		elseif(name == "ui" or name == "UI") then
 			System.App.Commands.Call("ScreenShot.HideAllUI");
 		elseif(name == "keyboard") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
-			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+			local TouchVirtualKeyboardIcon = GameLogic.GetFilters():apply_filters("TouchVirtualKeyboardIcon");
+			if not TouchVirtualKeyboardIcon then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+				TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+			end
 			TouchVirtualKeyboardIcon.ShowSingleton(true);
 		elseif(name == "overlaybuffer") then
 			NPL.load("(gl)script/ide/System/Scene/Overlays/OverlayPicking.lua");
@@ -139,8 +142,11 @@ Commands["hide"] = {
 		elseif(name == "ui" or name == "UI") then
 			System.App.Commands.Call("ScreenShot.HideAllUI");
 		elseif(name == "keyboard") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
-			local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+			local TouchVirtualKeyboardIcon = GameLogic.GetFilters():apply_filters("TouchVirtualKeyboardIcon");
+            if not TouchVirtualKeyboardIcon then
+                NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+                TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+            end
 			TouchVirtualKeyboardIcon.ShowSingleton(false);
 		elseif(name == "terrain") then
 			GameLogic.RunCommand("/terrain -hide")

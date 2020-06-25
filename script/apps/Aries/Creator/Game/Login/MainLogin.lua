@@ -417,8 +417,12 @@ end
 
 function MainLogin:CheckShowTouchVirtualKeyboard()
 	if(System.options.IsTouchDevice) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
-		local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+		local TouchVirtualKeyboardIcon = GameLogic.GetFilters():apply_filters("TouchVirtualKeyboardIcon");
+		if not TouchVirtualKeyboardIcon then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+			TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+		end
+
 		TouchVirtualKeyboardIcon.ShowSingleton(true);
 	end
 end
@@ -588,34 +592,36 @@ function MainLogin:ShowCreateWorldPage()
 end
 
 function MainLogin:ShowLoginBackgroundPage(bShow, bShowCopyRight, bShowLogo, bShowBg)
-	local url = "script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html?"
-	if(bShow) then
-		if(bShowCopyRight) then
-			url = url.."showcopyright=true&";
+	if (GameLogic.GetFilters():apply_filters("ShowLoginBackgroundPage", {})) then
+		local url = "script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html?"
+		if(bShow) then
+			if(bShowCopyRight) then
+				url = url.."showcopyright=true&";
+			end
+			if(bShowLogo) then
+				url = url.."showtoplogo=true&";
+			end
+			if(not self.state.login_bg_worldpath and bShowBg==false) then
+				url = url.."showbg=false&";
+			end
 		end
-		if(bShowLogo) then
-			url = url.."showtoplogo=true&";
-		end
-		if(not self.state.login_bg_worldpath and bShowBg==false) then
-			url = url.."showbg=false&";
-		end
-	end
 
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-		url = url, 
-		name = "LoginBGPage", 
-		isShowTitleBar = false,
-		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = false,
-		zorder = -2,
-		bShow = bShow,
-		directPosition = true,
-			align = "_fi",
-			x = 0,
-			y = 0,
-			width = 0,
-			height = 0,
-		cancelShowAnimation = true,
-	});
+		System.App.Commands.Call("File.MCMLWindowFrame", {
+			url = url, 
+			name = "LoginBGPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = false,
+			zorder = -2,
+			bShow = bShow,
+			directPosition = true,
+				align = "_fi",
+				x = 0,
+				y = 0,
+				width = 0,
+				height = 0,
+			cancelShowAnimation = true,
+		});
+	end
 end

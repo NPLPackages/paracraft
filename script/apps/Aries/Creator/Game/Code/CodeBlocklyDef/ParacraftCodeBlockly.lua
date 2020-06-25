@@ -76,6 +76,7 @@ function ParacraftCodeBlockly.AppendAll()
 	for k,v in ipairs(all_source_cmds) do
 		ParacraftCodeBlockly.AppendDefinitions(v);
 	end
+	GameLogic.GetFilters():apply_filters("ParacraftCodeBlocklyAppendDefinitions",ParacraftCodeBlockly);
 end
 
 -- all shared extended examples. 
@@ -118,6 +119,7 @@ end
 
 -- public:
 function ParacraftCodeBlockly.GetCategoryButtons()
+	default_categories = GameLogic.GetFilters():apply_filters("ParacraftCodeBlocklyCategories",default_categories);
 	return default_categories;
 end
 
