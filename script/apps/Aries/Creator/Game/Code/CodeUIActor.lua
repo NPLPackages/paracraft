@@ -23,6 +23,8 @@ local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.A
 Actor:Property("Name", "CodeUIActor");
 Actor:Property({"entityClass", "EntityCodeActor"});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
+-- frame move interval in milliseconds
+Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Actor:Signal("dataSourceChanged");
 Actor:Signal("clicked", function(actor, mouseButton) end);
 Actor:Signal("beforeRemoved", function(self) end);
@@ -667,4 +669,66 @@ end
 -- movieController.FrameMove(deltaTime) will be assigned by this function.
 -- @return true if we can play the matched movie
 function Actor:PlayMatchedMovie(name, movieController)
+end
+
+
+-- @return nil or a table of {actor, boneName, pos, rot, use_rot}
+function Actor:GetParentInfo()
+	return self.parentInfo;
+end
+
+-- attach this code actor to another code actor. 
+-- @param parentActor: which actor to attach to. if nil, it will detach from existing actor. 
+-- @param boneName: which bone of the parent actor to attach to. default to root bone. 
+-- @param pos: nil or 3d position offset
+-- @param rot: nil or 3d rotation 
+-- @param bUseRotation: whether to use the parent bone's rotation. default to true
+function Actor:AttachTo(parentActor, boneName, pos, rot, bUseRotation)
+	if(parentActor and parentActor.ComputeBoneWorldPosAndRot) then
+		self.parentInfo = self.parentInfo or {};
+		local parent = self.parentInfo;
+		if(parent.actor ~= parentActor) then
+			if(parent.actor) then
+				parent.actor:Disconnect("beforeRemoved", self, self.Detach);
+			end
+			parent.actor = parentActor;
+			self:ChangeTimer(10, self:GetFrameMoveInterval());
+			parentActor:Connect("beforeRemoved", self, self.Detach, "UniqueConnection");
+		end
+		parent.boneName = boneName;
+		parent.pos = pos;
+		parent.rot = rot;
+		parent.use_rot = bUseRotation~=false;
+	else
+		if(self.parentInfo and self.parentInfo.actor) then
+			self.parentInfo.actor:Disconnect("beforeRemoved", self, self.Detach);
+		end
+		self.parentInfo = nil;
+		self:KillTimer();
+	end
+end
+
+function Actor:Detach()
+	self:AttachTo(nil)
+end
+
+function Actor:UpdatePosAndRotFromParentActor()
+	local parent = self:GetParentInfo();
+	local entity = self.entity;
+	if(parent and entity) then
+		local obj = entity:GetInnerObject();
+		local new_x, new_y, new_z, roll, pitch, yaw = parent.actor:ComputeBoneWorldPosAndRot(parent.boneName, parent.pos, parent.rot, parent.use_rot); 
+		if(new_x) then
+			entity:SetPosition(new_x, new_y, new_z);
+			obj:SetField("yaw", yaw or 0);
+			obj:SetField("roll", roll or 0);
+			obj:SetField("pitch", pitch or 0);	
+		end
+	end
+end
+
+function Actor:OnTick()
+	if(self.parentInfo) then
+		self:UpdatePosAndRotFromParentActor();
+	end
 end

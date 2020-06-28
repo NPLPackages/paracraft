@@ -17,6 +17,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+local Matrix4 = commonlib.gettable("mathlib.Matrix4");
+local Quaternion = commonlib.gettable("mathlib.Quaternion");
+local math3d = commonlib.gettable("mathlib.math3d");
+local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
 local Color = commonlib.gettable("System.Core.Color");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local math3d = commonlib.gettable("mathlib.math3d");
@@ -327,7 +331,7 @@ function Actor:OnRemove()
 		self:RestoreFocus();
 	end
 	self:beforeRemoved(self);
-
+	self:KillTimer();
 	Actor._super.OnRemove(self);
 end
 
@@ -1082,5 +1086,149 @@ function Actor:PlayMatchedMovie(name, movieController)
 	local channel = MovieManager:CreateGetMovieChannel(name);
 	if(channel:GetStartBlockPosition()) then
 		-- TODO: 
+	end
+end
+
+-- get bone's world position and rotation. 
+-- @param boneName: like "R_Hand". can be nil.
+-- @param localPos: if not nil, this is the local offset
+-- @param localRot: if not nil, this is the local rotation {roll, pitch yaw}
+-- @param bUseParentRotation: use the parent rotation.
+-- @return x,y,z, roll, pitch yaw, scale: in world space.  
+-- return nil, if such information is not available, such as during async loading.
+function Actor:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUseParentRotation)
+	local entity = self.entity;
+	if(entity) then
+		local link_x, link_y, link_z = entity:GetPosition()
+		local bFoundTarget;
+		self.parentPivot = self.parentPivot or mathlib.vector3d:new();
+		
+		local parentBoneRotMat;
+		if(boneName) then
+			local bones = self:GetBonesVariable();
+			local boneVar = bones:GetChild(boneName);
+			if(boneVar) then
+				self:UpdateAnimInstance();
+				local pivot = boneVar:GetPivot(true);
+				self.parentPivot:set(pivot);
+				if(bUseParentRotation) then
+					parentBoneRotMat = boneVar:GetPivotRotation(true);
+				end
+				bFoundTarget = true;
+			end
+		else
+			self.parentPivot:set(0,0,0);
+			bFoundTarget = true;
+		end 
+		if(bFoundTarget) then
+			local parentObj = entity:GetInnerObject();
+			local parentScale = parentObj:GetScale() or 1;
+			local dx,dy,dz = 0,0,0;
+			if(not bUseParentRotation and localPos) then
+				self.parentPivot:add((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+			end
+
+			self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
+			self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
+			self.parentPivot:multiplyInPlace(self.parentTrans);
+			self.parentQuat = self.parentQuat or mathlib.Quaternion:new();
+			if(parentScale~=1) then
+				self.parentTrans:RemoveScaling();
+			end
+			self.parentQuat:FromRotationMatrix(self.parentTrans);
+			if(bUseParentRotation and parentBoneRotMat) then
+				self.parentPivotRot = self.parentPivotRot or Quaternion:new();
+				self.parentPivotRot:FromRotationMatrix(parentBoneRotMat);
+				self.parentQuat:multiplyInplace(self.parentPivotRot);
+
+				if(localRot) then
+					self.localRotQuat = self.localRotQuat or Quaternion:new();
+					self.localRotQuat:FromEulerAngles((localRot[3] or 0), (localRot[1] or 0), (localRot[2] or 0));
+					self.parentQuat:multiplyInplace(self.localRotQuat);
+				end
+		
+				if(localPos) then
+					self.localPos = self.localPos or mathlib.vector3d:new();
+					self.localPos:set((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+					self.localPos:rotateByQuatInplace(self.parentQuat);
+					dx, dy, dz = self.localPos[1], self.localPos[2], self.localPos[3];
+				end
+			end
+			
+			local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
+			
+			if(not bUseParentRotation and localRot) then
+				-- just for backward compatibility, bUseParentRotation should be enabled in most cases
+				p_roll = (localRot[1] or 0) + p_roll;
+				p_pitch = (localRot[2] or 0) + p_pitch;
+				p_yaw = (localRot[3] or 0) + p_yaw;
+			end
+			local x, y, z = link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz
+			-- This fixed a bug where x or y or z could be NAN(0/0), because GetPivotRotation and GetPivot could return NAN
+			if(x == x and y==y and z==z) then
+				return x, y, z, p_roll, p_pitch, p_yaw, parentScale;
+			end
+		end
+	end
+end
+
+-- @return nil or a table of {actor, boneName, pos, rot, use_rot}
+function Actor:GetParentInfo()
+	return self.parentInfo;
+end
+
+-- attach this code actor to another code actor. 
+-- @param parentActor: which actor to attach to. if nil, it will detach from existing actor. 
+-- @param boneName: which bone of the parent actor to attach to. default to root bone. 
+-- @param pos: nil or 3d position offset
+-- @param rot: nil or 3d rotation 
+-- @param bUseRotation: whether to use the parent bone's rotation. default to true
+function Actor:AttachTo(parentActor, boneName, pos, rot, bUseRotation)
+	if(parentActor and parentActor.ComputeBoneWorldPosAndRot) then
+		self.parentInfo = self.parentInfo or {};
+		local parent = self.parentInfo;
+		if(parent.actor ~= parentActor) then
+			if(parent.actor) then
+				parent.actor:Disconnect("beforeRemoved", self, self.Detach);
+			end
+			parent.actor = parentActor;
+			self:ChangeTimer(10, self:GetFrameMoveInterval());
+			parentActor:Connect("beforeRemoved", self, self.Detach, "UniqueConnection");
+		end
+		parent.boneName = boneName;
+		parent.pos = pos;
+		parent.rot = rot;
+		parent.use_rot = bUseRotation~=false;
+	else
+		if(self.parentInfo and self.parentInfo.actor) then
+			self.parentInfo.actor:Disconnect("beforeRemoved", self, self.Detach);
+		end
+		self.parentInfo = nil;
+		self:KillTimer();
+	end
+end
+
+function Actor:Detach()
+	self:AttachTo(nil)
+end
+
+function Actor:UpdatePosAndRotFromParentActor()
+	local parent = self:GetParentInfo();
+	local entity = self.entity;
+	if(parent and entity) then
+		local obj = entity:GetInnerObject();
+		local new_x, new_y, new_z, roll, pitch, yaw = parent.actor:ComputeBoneWorldPosAndRot(parent.boneName, parent.pos, parent.rot, parent.use_rot); 
+		if(new_x) then
+			entity:SetPosition(new_x, new_y, new_z);
+			obj:SetField("yaw", yaw or 0);
+			obj:SetField("roll", roll or 0);
+			obj:SetField("pitch", pitch or 0);	
+		end
+	end
+end
+
+function Actor:OnTick()
+	if(self.parentInfo) then
+		self:UpdatePosAndRotFromParentActor();
 	end
 end

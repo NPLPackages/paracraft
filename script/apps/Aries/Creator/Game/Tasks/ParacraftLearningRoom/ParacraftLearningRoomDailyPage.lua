@@ -83,6 +83,7 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 	end
 
 	local check = function()
+		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
 		if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
 			ParacraftLearningRoomDailyPage.ShowPage();
 		else
@@ -178,6 +179,7 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 	end
 
 	local learning = function()
+		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
 		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
 		if (template) then
 			if (TeachingQuestPage.MainWorldId == nil) then

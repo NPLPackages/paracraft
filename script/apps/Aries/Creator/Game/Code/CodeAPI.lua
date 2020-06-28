@@ -71,6 +71,7 @@ local s_env_methods = {
 	"scaleTo",
 	"getPlayTime",
 	"getScale",
+	"attachTo",
 	"focus",
 	"camera",
 	"setMovie",

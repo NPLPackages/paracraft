@@ -203,7 +203,7 @@ function NplCad.GetCode(code, filename, relativePath)
         local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
         NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
         <code>
-        local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene());
+        local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene(), ShapeBuilder.liner, ShapeBuilder.angular);
         NplCad.ExportToFile(ShapeBuilder.getScene(),%q, ShapeBuilder.liner, ShapeBuilder.angular);
         if(result)then
 	        setActorValue("assetfile", %q);
@@ -384,7 +384,7 @@ function NplCad.OnClickSaveFile()
 end
 
 function NplCad.OnClickLearn()
-	ParaGlobal.ShellExecute("open", L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_cad", "", "", 1);
+	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/docs/CAD/intro", "", "", 1);
 end
 
 function NplCad.GetCustomCodeUIUrl()

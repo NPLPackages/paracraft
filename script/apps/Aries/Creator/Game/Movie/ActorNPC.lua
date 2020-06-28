@@ -1143,7 +1143,7 @@ end
 -- get world transform of a given sub part (bone).
 -- @param keypath: subpart of this actor of which we are computing, such as "bones::R_Hand", if nil it is current actor.
 -- @param localPos: if not nil, this is the local offset
--- @param localRow: if not nil, this is the local rotation {roll, pitch yaw}
+-- @param localRot: if not nil, this is the local rotation {roll, pitch yaw}
 -- @param bUseParentRotation: use the parent rotation
 -- @return x,y,z, roll, pitch yaw, scale: in world space.  
 -- return nil, if such information is not available, such as during async loading.

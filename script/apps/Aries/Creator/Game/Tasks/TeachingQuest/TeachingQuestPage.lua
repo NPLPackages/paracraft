@@ -79,6 +79,9 @@ function TeachingQuestPage.ShowPage(type)
 	TeachingQuestPage.currentType = type;
 	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type] or {};
 	TeachingQuestPage.CheckTaskCount(type);
+	if (TeachingQuestPage.RefreshItem()) then
+		return;
+	end
 
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html",
@@ -194,6 +197,7 @@ function TeachingQuestPage.RefreshItem()
 	if (page) then
 		page:Refresh(0);
 		page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[TeachingQuestPage.currentType]);
+		return;
 	end
 end
 

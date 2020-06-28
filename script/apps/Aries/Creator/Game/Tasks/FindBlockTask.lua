@@ -402,7 +402,7 @@ function FindBlockTask.GotoItemAtIndex(index)
 		end
 		local self = curInstance;
 		if(self and self:IsTextSearchMode() and entity.OpenAtLine) then
-			local ds = FindBlockTask.GetDataSource()
+			local ds = FindBlockTask.resultDS
 			if(ds and ds[index or FindBlockTask.GetSelectedIndex()]) then
 				local item = ds[index or FindBlockTask.GetSelectedIndex()];
 				local line = item.attr.lowerText:match(":(%d+):");

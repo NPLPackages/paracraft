@@ -950,3 +950,28 @@ function env_imp:playMatchedMovie(name, bWaitForFinish)
 		end
 	end
 end
+
+function env_imp:attachTo(parentActor, boneName, pos, rot, bUseRotation)
+	local actor = env_imp.GetActor(self);
+	if(actor and actor.AttachTo) then
+		if(type(parentActor) == "string" and parentActor~="") then
+			parentActor = GameLogic.GetCodeGlobal():GetActorByName(parentActor)
+		end
+		if(not parentActor or parentActor=="") then
+			actor:AttachTo(nil);
+		elseif(parentActor and parentActor.AttachTo and actor~=parentActor) then
+			if(boneName == "") then
+				boneName = nil;
+			elseif(type(boneName) == "string") then
+				boneName = boneName:gsub("(bones::)", "");
+			end
+			if(type(pos) ~= "table") then
+				pos = nil;
+			end
+			if(type(rot) ~= "table") then
+				rot = nil;
+			end
+			actor:AttachTo(parentActor, boneName, pos, rot, bUseRotation);
+		end
+	end
+end

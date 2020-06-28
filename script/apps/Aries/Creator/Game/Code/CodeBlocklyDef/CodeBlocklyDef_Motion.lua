@@ -428,6 +428,47 @@ walkForward(0.1, 0.1, true)
 },
 
 {
+	type = "attachTo", 
+	message0 = L"固定到%1的骨骼%2上",
+	arg0 = {
+		{
+			name = "targetName",
+			type = "input_value",
+			shadow = { type = "text", value = L"父角色",},
+			text = L"父角色",
+		},
+		{
+			name = "boneName",
+			type = "input_value",
+			shadow = { type = "text", value = "",},
+			text = "",
+		},
+	},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "attachTo",
+	func_description = 'attachTo(%s,%s)',
+	ToNPL = function(self)
+		return string.format('attachTo("%s","%s")\n', self:getFieldValue('targetName'), self:getFieldValue('boneName'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+attachTo("parent", "R_Hand")
+-- with position offset
+attachTo("parent", "R_Hand", {0,1,1})
+-- with offset and rotation {roll, pitch, roll}
+attachTo("parent", "R_Hand", {0,1,1}, {0, 0, 1.57})
+-- without parent bone's rotation
+attachTo("parent", "R_Hand", nil, nil, false)
+-- detach
+attachTo(nil)
+]]},
+},
+},
+
+{
 	type = "velocity", 
 	message0 = L"速度%1",
 	arg0 = {
