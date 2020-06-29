@@ -133,6 +133,7 @@ function NplBrowserFrame:_Show(url)
 		self.page:CallMethod(self.browser_name, "SetVisible", true); 
 		if(url_changed)then
 			self.page:CallMethod(self.browser_name, "Reload", self.url); 
+			self.page:Refresh(0);
 		end	
 	end
     if(self.callback)then
