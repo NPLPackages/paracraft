@@ -161,14 +161,24 @@ else
 		name = "CodePku", 
 		-- package_path = "npl_packages/WorldShare/", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 
-		displayName = L"玩学世界", 
+		displayName = L"玩学世界用户模块", 
 		text=L"系统内置插件",
 		version = "1.3",
-		homepage = "https://github.com/tatfook/WorldShare",
+		homepage = "https://github.com/tatfook/codepku",
 		-- load this module when the package is loaded
 		loadOnStartup = true, 
 	};
+	local codepkuCommonMod = {
+		name = "CodePkuCommon", 
+		-- package_path = "npl_packages/WorldShare/", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"玩学世界通用模块", 
+		text=L"系统内置插件",
+		version = "1.3",
+		homepage = "https://github.com/tatfook/codepkucommon",		
+	};
 	table.insert(buildInModList, codepkuMod);
+	table.insert(buildInModList, codepkuCommonMod);
 end
 
 BuildinMod.buildin_mods = buildInModList
