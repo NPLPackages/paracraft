@@ -2680,6 +2680,9 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 			SwfLoadingBarPage.UpdateText("正在登录游戏服务器");
 		end
 
+		local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
+		TeachingQuestTitle.StaticInit();
+
 		if(is_standalone) then
 			stage_states.connect_world = "done";
 			-- standalone mode will just log out the server. 

@@ -110,7 +110,7 @@ end
 -- @param ...: ususally fromEntity, 
 function CommandManager:RunText(text, ...)
 	if(text) then
-		for cmd in text:gmatch("(/*[^\r\n/;]+)") do
+		for cmd in text:gmatch("(/*[^\r\n;]+)") do
 			self:RunCommand(cmd, nil, ...);
 		end
 	end

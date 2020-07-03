@@ -530,7 +530,7 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 
 	-- NOT WORKING: 
 	-- NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-	-- local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	-- local ViewportManager = commonlib.gettable("System.Scene.V  iewports.ViewportManager");
 	-- ViewportManager:GetGUIViewport():SetPosition("_fi", 0,0,0,0);
 	-- ViewportManager:GetGUIViewport():Apply();
 	-- ViewportManager:GetSceneViewport():SetPosition("_fi", 0,0,0,0);

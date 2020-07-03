@@ -530,6 +530,35 @@ function Actor:SetTime(time)
 	self.time = time;
 end
 
+function Actor:GetParentActor()
+	local parentInfo = self:GetParentInfo()
+	return parentInfo and parentInfo.actor;
+end
+
+function Actor:SetParentOffset(pos)
+	local parentInfo = self:GetParentInfo()
+	if(parentInfo) then
+		if(type(pos) == "string") then
+			pos = NPL.LoadTableFromString("{"..pos.."}")
+		end
+		if(type(pos) == "table" and pos[1] and pos[2] and pos[3]) then
+			parentInfo.pos = pos;
+		end
+	end
+end
+
+function Actor:SetParentRot(rot)
+	local parentInfo = self:GetParentInfo()
+	if(parentInfo) then
+		if(type(rot) == "string") then
+			rot = NPL.LoadTableFromString("{"..rot.."}")
+		end
+		if(type(rot) == "table" and rot[1] and rot[2] and rot[3]) then
+			parentInfo.rot = rot;
+		end
+	end
+end
+
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
@@ -545,6 +574,9 @@ local internalValues = {
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
+	["parent"] = {getter = Actor.GetParentActor, isVariable = false},
+	["parentOffset"] = {setter = Actor.SetParentOffset, isVariable = false},
+	["parentRot"] = {setter = Actor.SetParentRot, isVariable = false},
 }
 
 

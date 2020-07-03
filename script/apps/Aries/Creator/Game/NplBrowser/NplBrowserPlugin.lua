@@ -18,6 +18,9 @@ NplBrowserPlugin.OnCreatedCallback(id,function()
     NplBrowserPlugin.ChangePosSize({id = id, x = 100, y = 100, width = 800, height = 400, });
     NplBrowserPlugin.Quit({id = id,});
 end)
+
+-- the source of plugin is here:
+https://github.com/tatfook/NplBrowser
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/STL.lua");

@@ -20,7 +20,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GoalTracker.lua");
 NPL.load("(gl)script/apps/Aries/Creator/ToolTipsPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 
 
@@ -28,7 +27,6 @@ local TeamMembersPage = commonlib.gettable("MyCompany.Aries.Team.TeamMembersPage
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BuilderDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderDock");
 local GameDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameDock");
-local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 local BlockMinimap = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockMinimap");
 local GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GoalTracker");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")

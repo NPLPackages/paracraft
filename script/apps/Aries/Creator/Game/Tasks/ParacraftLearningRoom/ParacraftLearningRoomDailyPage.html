@@ -40,6 +40,7 @@ function OnCheck()
     ParacraftLearningRoomDailyPage.OnCheck();
 end
 function OnOpenWeb(index)
+	ParacraftLearningRoomDailyPage.ClosePage();
     ParacraftLearningRoomDailyPage.OnOpenWeb(index,true);
 end
 
@@ -53,7 +54,7 @@ end
 function GetTip()
     local gsid = 998;
     local template = KeepWorkItemManager.GetItemTemplate(gsid);
-    local s = string.format(L"完整观看《高手成长日记》中指定的今日学习视频即为签到成功，签到成功送%s。",template.name);
+    local s = string.format(L"点击下方[签到]按钮完成今日签到，每日可按顺序签到一次并获得4个%s，签到成功后可观看当日学习视频。可以点击列表项目重复观看已签到视频，VIP用户可提前观看未签到视频。",template.name);
     return s;
 end
 function GetExchangePoints()
@@ -69,11 +70,18 @@ function GetDays()
     local s = string.format(L"已完成:%d天",copies);
     return s;
 end
+function GetLabel(index)
+    local s = string.format(L"视频%s",tostring(index));
+    return s;
+end
+function OnCheckinToday()
+    ParacraftLearningRoomDailyPage.OnCheckinToday();
+end
 ]]></script>
     <aries:window mode="thin" width="600" height="500" title='<%= L"每日签到：《高手成长日记》"%>' onclose="ClosePage">
     <div >
         <div style="height:120px;">
-            <div style="margin-top:20px;color:#ffffff;text-align:center;"><%= GetTip() %></div>
+            <div style="margin-top:20px;color:#ffffff;"><%= GetTip() %></div>
             <div style="margin-left:380px;margin-top:20px;">
                 <div style="float:left;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/points_32bits.png#0 0 20 20);"></div>
                 <div style="float:left;margin-left:2px;color:#ffffff;"><%=GetExchangePoints()%></div>
@@ -101,50 +109,46 @@ end
             <pe:gridview style="margin:0px;width:600px;height:400px;" name="item_gridview" CellPadding="15" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="7" DefaultNodeHeight = "68" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                            <div style="width:62px;height:68px;">
+                            <div style="width:60px;height:80px;">
 
                                 <pe:if condition='<%= IsFuture(Eval("index")) %>'>
-                                    <input type="button" name='<%= Eval("index")%>' style="width:62px;height:68px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);" onclick="OnOpenWeb"  />
-                                    <div style="position:relative;margin-top:-60px;width:62px;height:68px;color:#ffffff;">
+                                    <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
+                                    <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#ffffff;">
                                         <div style="text-align:center;">
-                                            <%= Eval("index")%>
+                                             <%= GetLabel(Eval("index"))%>
                                         </div>
-                                        <div zorder="101" style="margin-left:20px;margin-top:5px;width:25px;height:25px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/vip_big_32bits.png#0 0 25 25);"></div>
                                     </div>
                                 </pe:if>
                                 <pe:if condition='<%= not IsFuture(Eval("index")) %>'>
                                     <pe:if condition='<%= IsNextDay(Eval("index")) %>'>
                                         <pe:if condition='<%= HasCheckedToday(Eval("index")) %>'>
-                                            <input type="button" name='<%= Eval("index")%>' style="width:62px;height:68px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/orange_bg_32bits.png:6 6 6 6);" onclick="OnOpenWeb"  />
-                                            <div style="position:relative;margin-top:-60px;width:62px;height:68px;color:#ffffff;">
+                                            <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_orange_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
+                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#ffffff;">
                                                 <div style="text-align:center;">
-                                                    <%= Eval("index")%>
-                                                </div>
-                                                <div zorder="101" style="margin-top:10px;text-align:center;">
                                                     <%= L"签到成功" %>
                                                 </div>
                                             </div>
                                             
                                         </pe:if>
                                         <pe:if condition='<%= not HasCheckedToday(Eval("index")) %>'>
-                                           <input type="button" name='<%= Eval("index")%>' style="width:62px;height:68px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/orange_border_32bits.png:6 6 6 6);" onclick="OnOpenWeb"  />
-                                            <div style="position:relative;margin-top:-60px;width:62px;height:68px;color:#e67300;">
-                                                <div style="text-align:center;">
-                                                    <%= Eval("index")%>
-                                                </div>
-                                                <div zorder="101" style="margin-top:10px;text-align:center;">
-                                                    <%= L"今日签到" %>
+                                           <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png#0 0 70 60);" onclick="OnCheckinToday"  />
+                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#ffffff;">
+                                                <div zorder="101" style="margin-top:0px;text-align:center;">
+                                                    <%= L"点击签到" %>
                                                 </div>
                                             </div>
+                                            <!--fire practices-->
+                                            <div style="position:relative;margin-left:-5px;margin-top:-70px;width:70px;height:70px;background:" >
+                                                <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_btn_overlay" width="70" height="70"/>
+                                            </div>     
                                         </pe:if>
                                     </pe:if>
                                     <pe:if condition='<%= not IsNextDay(Eval("index")) %>'>
-                                        <input type="button" name='<%= Eval("index")%>' style="width:62px;height:68px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/green_bg_32bits.png:3 3 3 3);" onclick="OnOpenWeb"  />
-                                         <div style="position:relative;margin-top:-60px;width:62px;height:68px;color:#ffffff;">
+                                        <input type="button" name='<%= Eval("index")%>' style="width:70px;height:61px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
+                                         <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#ffffff;">
                                             <div style="text-align:center;">
-                                                <%= Eval("index")%>
+                                                <%= GetLabel(Eval("index"))%>
                                             </div>
-                                            <div zorder="101" style="margin-left:20px;margin-top:10px;width:25px;height:25px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/checked_big_32bits.png#0 0 25 25);"></div>
                                         </div>
                                     </pe:if>
                                 </pe:if>

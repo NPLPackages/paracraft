@@ -144,6 +144,19 @@ function BackgroundMusic:PlayOnChannel(name, audio_src)
 	end
 end
 
+-- @param name: channel name
+function BackgroundMusic:StopChannel(name)
+	if(not name) then
+		self:Stop();
+	else
+		if(channels[name]) then
+			channels[name]:stop();
+			channels[name] = nil;
+		end
+	end
+end
+
+
 -- @param filename: if nil, it will stop current music. otherwise it will only stop of music is the same. 
 function BackgroundMusic:Stop(filename)
 	-- stop currently playing music

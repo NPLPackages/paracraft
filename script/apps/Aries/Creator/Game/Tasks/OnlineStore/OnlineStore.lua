@@ -56,6 +56,11 @@ function OnlineStore:RefreshPage()
 end
 
 function OnlineStore:Run()
+	local projectId = tostring(GameLogic.options:GetProjectId());
+	if (projectId == "10373") then
+		_guihelper.MessageBox(L"当前世界无法使用元件库功能。");
+		return;
+	end
 	self.finished = true;
 	self:ShowPage(true);
 end

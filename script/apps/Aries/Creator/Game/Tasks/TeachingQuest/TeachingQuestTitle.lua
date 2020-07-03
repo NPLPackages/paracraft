@@ -32,6 +32,12 @@ function TeachingQuestTitle.OnWorldLoaded()
 		page:CloseWindow();
 	end
 	local projectId = tostring(GameLogic.options:GetProjectId());
+	if (TeachingQuestPage.MainWorldId == nil) then
+		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
+		if (template) then
+			TeachingQuestPage.MainWorldId = tostring(template.desc);
+		end
+	end
 	if (projectId == TeachingQuestPage.MainWorldId) then
 		if(not KeepWorkItemManager.GetToken())then
 			_guihelper.MessageBox(L"本世界只有登录的用户可以访问。即将退出世界！");
@@ -42,10 +48,11 @@ function TeachingQuestTitle.OnWorldLoaded()
 		end
 		commonlib.TimerManager.SetTimeout(function()  
 			TeachingQuestTitle.CheckAndShow();
-			GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
-			GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
+			--GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
+			--GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 			GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
-		end, 3000)
+			GameLogic.RunCommand("/hide quickselectbar");
+		end, 200)
 	else
 		if (TeachingQuestPage.IsTaskProject(projectId)) then
 			local state = TeachingQuestPage.GetTaskState(TeachingQuestPage.currentIndex);
@@ -57,7 +64,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 					GameLogic.GetFilters():add_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
 					GameLogic.GetFilters():add_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 					GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
-				end, 2000)
+				end, 1000)
 			else
 				_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
 				commonlib.TimerManager.SetTimeout(function()  
@@ -69,6 +76,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 end
 
 function TeachingQuestTitle.CheckAndShow()
+	--[[
 	KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
 		if (canExchange.data and canExchange.data.ret == true) then
 			TeachingQuestTitle.ShowPage("?info=main&ticket=receive");
@@ -81,6 +89,13 @@ function TeachingQuestTitle.CheckAndShow()
 		end
 	end, function(err, msg, data)
 		TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
+	end);
+	]]
+	KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
+		if (canExchange.data and canExchange.data.ret == true) then
+			KeepWorkItemManager.DoExtendedCost(TeachingQuestPage.ticketExid, function()
+			end);
+		end
 	end);
 end
 
@@ -128,7 +143,9 @@ function TeachingQuestTitle.OnKeepWorkLogout_Callback(res)
 	GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
 	GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 	GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
-	page:CloseWindow();
+	if (page) then
+		page:CloseWindow();
+	end
 	GameLogic.RunCommand("/leaveworld")
 end
 

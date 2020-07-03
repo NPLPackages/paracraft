@@ -8,8 +8,6 @@ Use Lib:
 -------------------------------------------------------
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 ParacraftLearningRoomDailyPage.DoCheckin();
-
-ParacraftLearningRoomDailyPage.ShowPage()
 --]]
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
 
@@ -82,32 +80,48 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 		return
 	end
 
-	local check = function()
-		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
-		if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
-			ParacraftLearningRoomDailyPage.ShowPage();
-		else
-			ParacraftLearningRoomDailyPage.FillDays();
-			local index = ParacraftLearningRoomDailyPage.GetNextDay();
-			LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
-			local exid = ParacraftLearningRoomDailyPage.exid;
-			KeepWorkItemManager.DoExtendedCost(exid, function()
-				ParacraftLearningRoomDailyPage.SaveToLocal();
-				_guihelper.MessageBox(L"签到成功。关闭窗口后将自动播放今日学习视频。", function(res)
-					ParacraftLearningRoomDailyPage.OnOpenWeb(index)
-				end, _guihelper.MessageBoxButtons.OK);    
-			end, function()
-				ParacraftLearningRoomDailyPage.ShowPage();
-			end)
+	local show_page = function()
+        ParacraftLearningRoomDailyPage.ShowPage();
 
-			
-		end
+--		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
+--		if(ParacraftLearningRoomDailyPage.HasCheckedToday())then
+--			ParacraftLearningRoomDailyPage.ShowPage();
+--		else
+--			ParacraftLearningRoomDailyPage.FillDays();
+--			local index = ParacraftLearningRoomDailyPage.GetNextDay();
+--			LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.DoCheckin", index);
+--			local exid = ParacraftLearningRoomDailyPage.exid;
+--			KeepWorkItemManager.DoExtendedCost(exid, function()
+--				ParacraftLearningRoomDailyPage.SaveToLocal();
+--				_guihelper.MessageBox(L"签到成功。关闭窗口后将自动播放今日学习视频。", function(res)
+--					ParacraftLearningRoomDailyPage.OnOpenWeb(index)
+--				end, _guihelper.MessageBoxButtons.OK);    
+--			end, function()
+--				ParacraftLearningRoomDailyPage.ShowPage();
+--			end)
+--
+--			
+--		end
 	end
 	if(not KeepWorkItemManager.IsLoaded())then
-		KeepWorkItemManager.GetFilter():add_filter("loaded_all", check);
+		KeepWorkItemManager.GetFilter():add_filter("loaded_all", show_page);
 		return
 	end
-	check();
+	show_page();
+end
+function ParacraftLearningRoomDailyPage.OnCheckinToday()
+    local index = ParacraftLearningRoomDailyPage.GetNextDay();
+	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnCheckinToday", index);
+	ParacraftLearningRoomDailyPage.ClosePage();
+	local exid = ParacraftLearningRoomDailyPage.exid;
+	KeepWorkItemManager.DoExtendedCost(exid, function()
+		ParacraftLearningRoomDailyPage.SaveToLocal();
+		_guihelper.MessageBox(L"今日签到成功，自动获得4个知识豆。关闭窗口后将自动播放今日学习视频。", function(res)
+			ParacraftLearningRoomDailyPage.OnOpenWeb(index)
+		end, _guihelper.MessageBoxButtons.OK);    
+	end, function()
+		_guihelper.MessageBox(L"签到失败！");
+	end)
 end
 function ParacraftLearningRoomDailyPage.IsVip()
 	local gsid = 10;
@@ -170,7 +184,6 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
             NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
 		end
 	end);
-	ParacraftLearningRoomDailyPage.ClosePage();
 end
 function ParacraftLearningRoomDailyPage.OnLearningLand()
 	if(not KeepWorkItemManager.GetToken())then

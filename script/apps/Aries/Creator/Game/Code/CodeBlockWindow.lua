@@ -811,6 +811,7 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 			local codeUIUrl = CodeBlockWindow.defaultCodeUIUrl;
 			if(langConfig.GetCustomCodeUIUrl) then
 				codeUIUrl = langConfig.GetCustomCodeUIUrl() or codeUIUrl;
+				codeUIUrl = Files.FindFile(codeUIUrl)
 			end
 			if(page.url ~= codeUIUrl) then
 				page:Goto(codeUIUrl);

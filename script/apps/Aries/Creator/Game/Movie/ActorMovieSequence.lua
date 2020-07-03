@@ -160,11 +160,11 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 	end
 	if(movieclip) then
 		local activeMovieClip = MovieManager:GetActiveMovieClip();
-		local isPlayingMode = activeMovieClip:GetEntity():IsPlayingMode();
+		local isPlayingMode = activeMovieClip and activeMovieClip:GetEntity():IsPlayingMode();
 		movieclip:GetEntity():EnablePlayingMode(isPlayingMode);
 
 		-- always pause local movie clip since its time will be controlled by this ActorMovieSequence block.
-		if(not movieclip:IsPaused()) then
+		if(activeMovieClip and not movieclip:IsPaused()) then
 			movieclip:Pause();
 		end
 		-- change the current time of the movie block. 

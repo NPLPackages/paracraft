@@ -269,6 +269,10 @@ function NplBrowserLoaderPage.OnMovingFileCallback(dest, cur, total)
 end
 function NplBrowserLoaderPage.SetChecked(v)
     NplBrowserLoaderPage.loaded = v;
+    if(v)then
+        local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+        NplBrowserManager:PreShowAll();
+    end
     if(NplBrowserLoaderPage.callback)then
         NplBrowserLoaderPage.callback(v);
 

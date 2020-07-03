@@ -16,7 +16,9 @@ NplBrowserFrame:Goto("https://keepwork.com/zhanglei/empty/index")
 
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local NplBrowserFrame = commonlib.inherit(nil,NPL.export());
 
@@ -43,13 +45,26 @@ function NplBrowserFrame:ctor()
     self.is_show_close = true;
     self.browser_name = nil;
     self.callback = nil; -- fire "ONSHOW" or "ONCLOSE" or "ONRESIZE"
+
+    self.cef_is_preshow = false;
 end
 function NplBrowserFrame:OnInit(name)
     self.name = name;
     self.browser_name = string.format("NplBrowserFrame_browser_instance_%s",self.name);
     return self;
 end
-function NplBrowserFrame:Show(url, title, is_show_control, is_show_close, options,callback)
+function NplBrowserFrame:CefIsCreated()
+    return self.cef_is_created;
+end
+function NplBrowserFrame:PreShow(url, is_show_control)
+    local id = self.browser_name;
+	url = url or self.default_url;
+    if(not self.cef_is_preshow)then
+        NplBrowserPlugin.Start({id = id, url = url, withControl = is_show_control, x = 10000, y = 10000, width = 1, height = 1, });
+        self.cef_is_preshow = true
+    end
+end
+function NplBrowserFrame:Show(url, title, is_show_control, is_show_close, options, callback)
 	url = url or self.default_url;
     self.title = title;
     self.is_show_control = is_show_control;
@@ -238,7 +253,8 @@ function NplBrowserFrame:Goto(url)
     end
 end
 function NplBrowserFrame:GotoEmpty()
-    local url = "https://keepwork.com/zhanglei/empty/index";
+    local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+    local url = NplBrowserManager.empty_html;
     self:Goto(url);
     commonlib.TimerManager.SetTimeout(function()  
 		ParaUI.GetUIObject("root"):Focus();

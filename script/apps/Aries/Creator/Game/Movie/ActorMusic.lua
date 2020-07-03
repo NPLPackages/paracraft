@@ -90,7 +90,7 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-			if(filename~="" and not Files.GetWorldFilePath(filename)) then
+			if(filename~="" and not Files.GetWorldFilePath(filename) and not ParaIO.DoesFileExist(filename, true)) then
 				_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
 			else
 				local value = {filename, start_time};

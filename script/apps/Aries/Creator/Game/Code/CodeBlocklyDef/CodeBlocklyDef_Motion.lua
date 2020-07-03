@@ -464,6 +464,10 @@ attachTo("parent", "R_Hand", {0,1,1}, {0, 0, 1.57})
 attachTo("parent", "R_Hand", nil, nil, false)
 -- detach
 attachTo(nil)
+-- properties
+parent = getActorValue("parent")
+setActorValue("parentOffset", "0, 2, 0")
+setActorValue("parentRot", {0, 3.14, 0})
 ]]},
 },
 },

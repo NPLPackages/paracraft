@@ -167,7 +167,7 @@ function KpChatChannel.HasUserName(usernames_str, name)
 	end
 end
 function KpChatChannel.OnMsg(self, msg)
-	--LOG.std("", "debug", "KpChatChannel OnMsg", msg);
+	LOG.std("", "debug", "KpChatChannel OnMsg", msg);
     if(not msg or not msg.data)then
         return
     end
@@ -187,6 +187,8 @@ function KpChatChannel.OnMsg(self, msg)
 
         if(key == "app/msg" or key == "paracraftGlobal" )then
             if(payload and userInfo)then
+
+
                 local worldId = payload.worldId;
                 local type = payload.type;
                 local content = payload.content;
@@ -198,6 +200,13 @@ function KpChatChannel.OnMsg(self, msg)
                 local orgAdmin = payload.orgAdmin;
                 local tLevel = payload.tLevel;
 
+                if(not KpChatChannel.IsInWorld())then
+                    return
+                end
+                if(KpChatChannel.worldId ~= worldId)then
+                    return
+                end
+                
 
                 local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
        

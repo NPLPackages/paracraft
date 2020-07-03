@@ -35,6 +35,7 @@ Commands["music"] = {
 /music 1.mp3 10.1   play 1.mp3 from 10.1 seconds
 /music http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
 /music -c1 music.ogg   play music.ogg on channel "c1"
+/music -c1 stop channel "c1"
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
@@ -48,7 +49,11 @@ Commands["music"] = {
 		from_time, cmd_text = CmdParser.ParseInt(cmd_text);
 
 		if(not filename or filename=="" or filename=="stop") then
-			BackgroundMusic:Stop();
+			if(channelName) then
+				BackgroundMusic:Stop();
+			else
+				BackgroundMusic:StopChannel(channelName);	
+			end
 		else
 			filename = commonlib.Encoding.Utf8ToDefault(filename)
 			if(filename and filename:match("^http")) then

@@ -25,7 +25,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision] [on|off]", 
+	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision|quickselectbar] [on|off]", 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -34,6 +34,7 @@ Other show filters:
 /show vision   : AI memory vision
 /show keyboard   show keyboard for touch device
 /show overlaybuffer    show overlay picking buffer on left top corner
+/show quickselectbar
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name, bIsShow;
@@ -48,6 +49,9 @@ Other show filters:
 		elseif(name == "desktop") then
 			local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 			Desktop.ShowAllAreas();
+		elseif(name == "quickselectbar") then
+			local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+			QuickSelectBar.ShowPage(true);
 		elseif(name == "boundingbox") then
 			GameLogic.options:ShowBoundingBox(true);
 		elseif(name == "wireframe") then
@@ -111,8 +115,12 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard]", 
-	desc="hide different type of things" , 
+	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard|quickselectbar]", 
+	desc=[[hide different type of things.e.g.
+/hide quickselectbar
+/hide desktop
+/hide player
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
@@ -124,6 +132,9 @@ Commands["hide"] = {
 		elseif(name == "desktop") then
 			local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 			Desktop.HideAllAreas();
+		elseif(name == "quickselectbar") then
+			local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+			QuickSelectBar.ShowPage(false);
 		elseif(name == "boundingbox") then
 			GameLogic.options:ShowBoundingBox(false);
 		elseif(name == "wireframe") then

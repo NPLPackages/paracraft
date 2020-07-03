@@ -75,7 +75,7 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 		if (state == TeachingQuestPage.AllFinished) then
 			local headon_mcml = string.format(
 				[[<div style="width:80px;height:20px;">
-					<div style="margin-top:20px;width:80px;height:20px;text-align:center;color:#00ff00;font-size:14px;font-weight:bold">%s</div>
+					<div style="margin-top:20px;width:80px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:#fcf73c;shadow-color:#8000468e;text-shadow:true">%s</div>
 				</div>]],
 				actor_name[self.type]);
 			headon_speech.Speak(self.obj, headon_mcml, -1, nil, true, nil, -100);
@@ -86,7 +86,7 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 			local headon_mcml = string.format(
 				[[<div style="width:80px;height:80px;">
 					<img style="margin-left:%s;width:%s;height:64px;background:url(%s);" />
-					<div style="margin-top:20px;width:80px;height:20px;text-align:center;color:#00ff00;font-size:14px;font-weight:bold">%s</div>
+					<div style="margin-top:20px;width:80px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:#fcf73c;shadow-color:#8000468e;text-shadow:true">%s</div>
 				</div>]],
 				left[state], width[state], state_img[state], actor_name[self.type]);
 

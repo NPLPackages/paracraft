@@ -102,6 +102,22 @@ function TeachingQuestPage.ShowPage(type)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
 	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type]);
+	commonlib.TimerManager.SetTimeout(function()  
+		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
+		local state = L"  （本周已发放一张）";
+		KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
+			if (canExchange.data) then
+				if (canExchange.data.reason == 5) then
+					state = L"  （本周已发放两张）";
+				elseif (canExchange.data.reason == 3) then
+					state = L"  （已达到获取上限）";
+				end
+			end
+			page:SetValue("TicketState", count..state);
+		end, function(err, msg, data)
+			page:SetValue("TicketState", count..state);
+		end);
+	end, 100)
 end
 
 function TeachingQuestPage.IsVip()
@@ -187,6 +203,12 @@ function TeachingQuestPage.GetTaskItemCount(gsid)
 	local bOwn, guid, bag, copies = KeepWorkItemManager.HasGSItem(gsid);
 	copies = copies or 0;
 	return copies;
+end
+
+function TeachingQuestPage.GetTotalTickets()
+	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(TeachingQuestPage.ticketGsid)
+	copies = copies or 0;
+	return tostring(copies);
 end
 
 function TeachingQuestPage.OnClose()

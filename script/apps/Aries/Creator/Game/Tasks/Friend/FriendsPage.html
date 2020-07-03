@@ -1,0 +1,95 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="FriendsPage.lua"><![CDATA[
+local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+FriendsPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function OnChange(index)
+    FriendsPage.OnChange(index);
+end
+function IsSelected(index)
+    return FriendsPage.index == index;
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #FriendsPage.Current_Item_DS;
+    else
+        return FriendsPage.Current_Item_DS[index];
+    end
+end
+]]></script>
+<aries:window mode="thin" width="300" height="500" title='<%= L"好友"%>' onclose="ClosePage">
+<div style="color:#ffffff">
+
+    <div>
+        <%=L"搜索框"%>
+        <input type="text" name="input_search" style="width:200px"/>
+    </div>
+
+    <div>
+        标签栏
+        <pe:if condition='<%= IsSelected(1)%>'>
+            <input type="button" name="1" value='<%=L"最近"%>' onclick="OnChange" tooltip='<%=L"最近"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= not IsSelected(1)%>'>
+            <input type="button" name="1" value='<%=L"最近"%>' onclick="OnChange" tooltip='<%=L"最近"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= IsSelected(2)%>'>
+            <input type="button" name="2" value='<%=L"好友"%>' onclick="OnChange" tooltip='<%=L"好友"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= not IsSelected(2)%>'>
+            <input type="button" name="2" value='<%=L"好友"%>' onclick="OnChange" tooltip='<%=L"好友"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= IsSelected(3)%>'>
+            <input type="button" name="3" value='<%=L"关注"%>' onclick="OnChange" tooltip='<%=L"关注"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= not IsSelected(3)%>'>
+            <input type="button" name="3" value='<%=L"关注"%>' onclick="OnChange" tooltip='<%=L"关注"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= IsSelected(4)%>'>
+            <input type="button" name="4" value='<%=L"粉丝"%>' onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%= not IsSelected(4)%>'>
+            <input type="button" name="4" value='<%=L"粉丝"%>' onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        
+    </div>
+
+    <div type ="box" style="width:280px;height:400px">
+        列表
+           <div style="margin-top:0px;">
+            <pe:gridview style="margin:0px;width:260px;height:400px;" name="item_gridview" CellPadding="15" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                            <div style="color:#ffffff">
+                                <%=Eval("label")%>
+                            </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+
+    <div type ="box" style="margin-bottom:0px;">
+        底部
+        <input type="button" name="last" value="添加好友" onclick="" tooltip="添加好友"/>
+        <input type="button" name="last" value="好友申请" onclick="" tooltip="好友申请"/>
+    </div>
+</div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

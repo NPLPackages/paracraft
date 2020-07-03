@@ -10,8 +10,6 @@
         local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
         local page_ctrl = document:GetPageCtrl();
         local name = page_ctrl:GetRequestParam("name");
-        commonlib.echo("===========name");
-        commonlib.echo(name);
         local browser_page = NplBrowserManager:CreateOrGet(name);
         
         function OnClose()
