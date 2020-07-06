@@ -44,7 +44,7 @@ function block:CreateBlockEntity(x,y,z, block_data, serverdata)
 			return entity;
 		end
 	else
-		LOG.std(nil, "error", "block %d does not have entity class defined", self.id);
+		LOG.std(nil, "error", "BlockEntityBase", "block %d does not have entity class defined", self.id);
 	end
 end
 

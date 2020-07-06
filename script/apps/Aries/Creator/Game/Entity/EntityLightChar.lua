@@ -22,8 +22,6 @@ Entity:Property({"Diffuse", {1, 0, 1}, auto=true});
 Entity:Property({"Specular", {1, 0, 0}, auto=true});
 Entity:Property({"Ambient", {1, 0, 0}, auto=true});
 
-Entity:Property({"Direction", {0, 0, 0}, auto=true});
-
 Entity:Property({"Range", 3, auto=true});
 Entity:Property({"Falloff", 1, auto=true});
 
@@ -45,7 +43,6 @@ function Entity:ctor()
 	self.Diffuse = {1, 0, 1}
 	self.Specular = {1, 0, 0}
 	self.Ambient = {1, 0, 0}
-	self.Direction = {0, 0, 0}
 end
 
 function Entity:init()

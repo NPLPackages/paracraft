@@ -88,7 +88,7 @@ function EditLightManipContainer:paintEvent(painter)
 		local nodeDirPlug = node:findPlug("Direction");
 		local dir = nodeDirPlug:GetValue();
 
-		local nodePosPlug = node:findPlug("Position");
+		local nodePosPlug = node:findPlug("position");
 		local worldPos = nodePosPlug:GetValue();
 		local camx,camy,camz = ParaCamera.GetPosition();
 		local toCam = {camx - worldPos[1], camy - worldPos[2] - 0.5, camz - worldPos[3]}
@@ -163,22 +163,31 @@ end
 function EditLightManipContainer:connectToDependNode(node)
 	self.node = node;
 
-	local nodePosPlug = node:findPlug("Position");
-	local parentManipPosPlug = self:findPlug("position");
-	self:addPlugToManipConversionCallback(parentManipPosPlug, function(self, manipPlug)
-		local p = nodePosPlug:GetValue();
-		return {p[1], p[2]+0.5, p[3]};
+	local plugPos = node:findPlug("position");
+	local plugOffsetPos = node:findPlug("offsetPos");
+
+	-- one way binding 
+	local manipPosPlug = self:findPlug("position");
+	self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
+		local p1 = plugPos:GetValue();
+		local p2 = plugOffsetPos:GetValue();
+		return {p1[1]+p2[1], p1[2]+p2[2], p1[3]+p2[3]}
 	end);
 
-	-- ATTENTION: trick part about position
-	local manipPosPlug = self.translateManip:findPlug("position");
-
-	self:addManipToPlugConversionCallback(nodePosPlug, function(self, nodePlug)
-		local pos = nodePosPlug:GetValue();
-		local offsetPos = manipPosPlug:GetValue();
-		self.translateManip:SetField("position", {0, 0, 0});
-		return {pos[1]+offsetPos[1], pos[2]+offsetPos[2], pos[3]+offsetPos[3]};
-	end);
+	-- two-way binding for offset position conversion:
+	if(plugOffsetPos) then
+		local manipTranslatePlug = self.translateManip:findPlug("position");
+		self:addManipToPlugConversionCallback(plugOffsetPos, function(self, plug)
+			local p1 = manipTranslatePlug:GetValue();
+			local p2 = plugPos:GetValue();
+			return {p1[1]-p2[1], p1[2]-p2[2], p1[3]-p2[3]}
+		end);
+		self:addPlugToManipConversionCallback(manipTranslatePlug, function(self, manipPlug)
+			local p1 = plugOffsetPos:GetValue();
+			local p2 = plugPos:GetValue();
+			return {p1[1]+p2[1], p1[2]+p2[2], p1[3]+p2[3]}
+		end);
+	end
 
 
 	if self.node:isPointLight() or self.node:isSpotLight() then

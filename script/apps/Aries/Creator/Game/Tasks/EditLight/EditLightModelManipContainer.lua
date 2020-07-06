@@ -65,14 +65,7 @@ end
 function EditLightModelManipContainer:connectToDependNode(node)
 	self.node = node;
 
-	local pos_add = function(p1, p2)
-		return {p1[1]+p2[1], p1[2]+p2[2], p1[3]+p2[3]}
-	end
-	local pos_sub = function(p1, p2)
-		return {p1[1]-p2[1], p1[2]-p2[2], p1[3]-p2[3]}
-	end
-
-	local plugPos = node:findPlug("modelInitPos");
+	local plugPos = node:findPlug("position");
 	local plugOffsetPos = node:findPlug("modelOffsetPos");
 
 	-- one way binding 
