@@ -72,7 +72,7 @@ Examples:
 			set_get = "set"; 
 		end
 
-		if(name:match("^[/%-]")) then
+		if(name and name:match("^[/%-]")) then
 			objPath = name;
 			name, cmd_text = CmdParser.ParseString(cmd_text);
 		end

@@ -68,13 +68,31 @@ function TipRoad:DrawCarNode(car_node)
     local state = car_node:GetState();
     if(state == TipCarNode.states.waitting)then
         local x = car_node:GetPosition();
-        local width = car_node:GetLength();
 
-        local _this = ParaUI.CreateUIObject("text", car_node.id, "_lt", x, 0, width, car_node.font_size)
-		_this.text = car_node.txt;
-        _this.font = car_node:GetFont();
-		self.container:AddChild(_this);
-		_guihelper.SetFontColor(_this, car_node.color);
+        local temp_width = 10000;
+        local temp_height = 10000;
+		local mcmlStr = string.format([[<div style="float:left;">%s</div>]],car_node.txt or "");
+        local xmlRoot = ParaXML.LuaXML_ParseString(mcmlStr);
+		if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
+			local xmlRoot = Map3DSystem.mcml.buildclass(xmlRoot);
+			
+            -- create container for rendering mcml of car node
+            local _parent = ParaUI.CreateUIObject("container", car_node.id , "lt", x, 0, temp_width, temp_height);
+            _parent:SetField("ClickThrough", true);
+	        _parent.background = "";
+		    self.container:AddChild(_parent);
+            				
+			local myLayout = Map3DSystem.mcml_controls.layout:new();
+			myLayout:reset(0, 0, temp_width, temp_height);
+	        
+            -- create mcml 
+            local mcml_page_name = self.id.. "_mcml_" .. car_node.id
+			Map3DSystem.mcml_controls.create(mcml_page_name, xmlRoot, nil, _parent, 0, 0, temp_width, temp_height,nil, myLayout);
+			local usedW, usedH = myLayout:GetUsedSize();
+            local left, top, width, height = myLayout:GetPreferredRect();
+            -- set the length of car
+            car_node:SetLength(usedW);
+		end
 
     elseif(state == TipCarNode.states.running)then
         local _this = ParaUI.GetUIObject(car_node.id);
@@ -152,16 +170,15 @@ end
 function TipRoad:OnResize(width)
     self.width = width;
     self.container.width = width;
-
-     for k, v in ipairs(self.car_nodes) do
+    for k, v in ipairs(self.car_nodes) do
         local state = v:GetState();
         if(state == TipCarNode.states.stop or state == TipCarNode.states.waitting)then
             local pos = self:GetLength();
-            v:SetPosition(pos + v:GetSafeDistance());
-
+            local x = width + pos + v:GetSafeDistance();
+            v:SetPosition(x);
 	        local _this = ParaUI.GetUIObject(v.id);
             if(_this and _this:IsValid())then
-                _this.x = v:GetPosition();
+                _this.x = x;
             end
         end
     end

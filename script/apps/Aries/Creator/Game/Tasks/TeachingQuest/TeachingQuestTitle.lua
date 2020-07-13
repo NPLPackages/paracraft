@@ -267,8 +267,10 @@ function TeachingQuestTitle.StartTask()
 					if (firstStart) then
 						firstStart = false;
 						if (TeachingQuestPage.IsVip()) then
+							GameLogic.AddBBS("statusBar", L"获得了20个知识豆。", 3000, "0 255 0");
 							_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆。您已开通VIP，自动获得了20知识豆！");
 						else
+							GameLogic.AddBBS("statusBar", L"获得了10个知识豆。", 3000, "0 255 0");
 							_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆，是否开通VIP获取双倍知识豆？", function(res)
 								if(res and res == _guihelper.DialogResult.Yes) then
 									ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 

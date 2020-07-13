@@ -70,17 +70,28 @@ function GetDays()
     local s = string.format(L"已完成:%d天",copies);
     return s;
 end
-function GetLabel(index)
-    local s = string.format(L"视频%s",tostring(index));
+function GetTitle(index)
+    local s = string.format(L"%s",ParacraftLearningRoomDailyPage.lessons_title[index] or "");
     return s;
+end
+function GetLabel(index)
+    local title = string.format(L"%s",ParacraftLearningRoomDailyPage.lessons_title[index] or "");
+    local len = ParaMisc.GetUnicodeCharNum(title);
+    if(len > 8)then
+	    title = ParaMisc.UniSubString(title, 1, 7) or "";
+        return title .. "...";
+    else
+        return title;
+    end
 end
 function OnCheckinToday()
     ParacraftLearningRoomDailyPage.OnCheckinToday();
 end
 ]]></script>
     <aries:window mode="thin" width="600" height="500" title='<%= L"每日签到：《高手成长日记》"%>' onclose="ClosePage">
-    <div >
         <div style="height:120px;">
+            <!--black background-->
+            <div style="position:relative;margin-left:-2px;margin-top:2px;width:595px;height:117px;background-color:#000000;"></div>
             <div style="margin-top:20px;color:#ffffff;"><%= GetTip() %></div>
             <div style="margin-left:380px;margin-top:20px;">
                 <div style="float:left;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/points_32bits.png#0 0 20 20);"></div>
@@ -89,7 +100,7 @@ end
             </div>
             
         </div>
-        <div style="margin-left:-4px;width:598px;height:50px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);" >
+        <div style="margin-left:-4px;width:598px;height:50px;color:#ffffff;background-color:#585858;" >
             <div style="margin-top:15px;">
                 <div style="float:left;width:300px;padding-left:10px;">
                     <%=GetDays()%>
@@ -105,15 +116,17 @@ end
             </div>
             
         </div>
-        <div style="margin-top:0px;">
-            <pe:gridview style="margin:0px;width:600px;height:400px;" name="item_gridview" CellPadding="15" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="7" DefaultNodeHeight = "68" 
+        <div >
+            <!--black background-->
+            <div style="position:relative;margin-left:-2px;margin-top:2px;width:595px;height:295px;background-color:#000000;"></div>
+            <pe:gridview style="margin-left:10px;width:600px;height:400px;" name="item_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "100" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                            <div style="width:60px;height:80px;">
+                            <div style="width:100px;height:100px;">
 
                                 <pe:if condition='<%= IsFuture(Eval("index")) %>'>
-                                    <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
-                                    <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#ffffff;">
+                                    <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
+                                    <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#7a7a7a;">
                                         <div style="text-align:center;">
                                              <%= GetLabel(Eval("index"))%>
                                         </div>
@@ -122,19 +135,21 @@ end
                                 <pe:if condition='<%= not IsFuture(Eval("index")) %>'>
                                     <pe:if condition='<%= IsNextDay(Eval("index")) %>'>
                                         <pe:if condition='<%= HasCheckedToday(Eval("index")) %>'>
-                                            <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_orange_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
-                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#ffffff;">
+                                            <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_orange_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
+                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#7a7a7a;">
                                                 <div style="text-align:center;">
-                                                    <%= L"签到成功" %>
+                                                    <!--<%= L"签到成功" %>-->
+                                                    <%= GetLabel(Eval("index"))%>
                                                 </div>
                                             </div>
                                             
                                         </pe:if>
                                         <pe:if condition='<%= not HasCheckedToday(Eval("index")) %>'>
-                                           <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png#0 0 70 60);" onclick="OnCheckinToday"  />
-                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#ffffff;">
+                                           <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnCheckinToday"  />
+                                            <div style="position:relative;margin-left:-5px;margin-top:1px;width:70px;height:60px;color:#7a7a7a;">
                                                 <div zorder="101" style="margin-top:0px;text-align:center;">
-                                                    <%= L"点击签到" %>
+                                                    <!--<%= L"点击签到" %>-->
+                                                    <%= GetLabel(Eval("index"))%>
                                                 </div>
                                             </div>
                                             <!--fire practices-->
@@ -144,8 +159,8 @@ end
                                         </pe:if>
                                     </pe:if>
                                     <pe:if condition='<%= not IsNextDay(Eval("index")) %>'>
-                                        <input type="button" name='<%= Eval("index")%>' style="width:70px;height:61px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" onclick="OnOpenWeb"  />
-                                         <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#ffffff;">
+                                        <input type="button" name='<%= Eval("index")%>' style="width:70px;height:61px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
+                                         <div style="position:relative;margin-left:-5px;width:70px;height:60px;color:#7a7a7a;">
                                             <div style="text-align:center;">
                                                 <%= GetLabel(Eval("index"))%>
                                             </div>

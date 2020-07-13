@@ -21,12 +21,9 @@ TipCarNode.farthest_pos = -100000000;
 function TipCarNode:ctor()
     
 end
-function TipCarNode:OnInit(txt, color, font_size, font_weight, safe_distance, speed, acceleration)
+function TipCarNode:OnInit(txt, safe_distance, speed, acceleration)
     self.id = ParaGlobal.GenerateUniqueID();
     self.txt = txt;
-    self.color = color;
-    self.font_size = font_size or 16;
-    self.font_weight = font_weight  or "norm";
     self.safe_distance = safe_distance;
     self.speed = speed;
     self.acceleration = acceleration;
@@ -34,6 +31,7 @@ function TipCarNode:OnInit(txt, color, font_size, font_weight, safe_distance, sp
     self.start_x = TipCarNode.farthest_pos;
     self.x = TipCarNode.farthest_pos;
     self.t = 0;
+    self.length = 0;
     return self;
 end
 function TipCarNode:GetState()
@@ -52,12 +50,11 @@ function TipCarNode:SetPosition(x)
     self.start_x = x;
     self.x = x;
 end
-function TipCarNode:GetFont()
-	local font = string.format("%s;%d;%s", "System", self.font_size, self.font_weight);
-    return font;
+function TipCarNode:SetLength(length)
+    self.length = length;
 end
 function TipCarNode:GetLength()
-    return _guihelper.GetTextWidth(self.txt,self:GetFont());
+    return self.length;
 end
 -- moving car by time delta
 -- @param speed_state: the state of accelerated speed, 0 normal, -1 speed cut, 1 speed up

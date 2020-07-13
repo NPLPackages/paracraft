@@ -46,7 +46,7 @@ local buildInModList = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"NplBrowser", 
 		text=L"系统内置插件",
-		version = "0.0.17",
+		version = "0.0.19",
 		homepage = "https://github.com/tatfook/NplBrowser",
 	},
 	{

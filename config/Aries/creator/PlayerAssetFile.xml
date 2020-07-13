@@ -482,7 +482,7 @@
   <asset filename="character/CC/07items/yaowan.x" displayname="药丸" name="capsule"/>
   <asset filename="character/CC/07items/yiliaoxiang.x" displayname="医疗箱" name="medical_case"/>
   <asset filename="character/CC/07items/zhen.x" displayname="针" name="needle"/>
-  <asset filename="character/CC/07items/tiaogezi.x" displayname="跳房子" name="tiaogezi"/>
+  <asset filename="character/CC/artwar/game/tiaogezi.x" displayname="跳房子" name="tiaogezi"/>
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/chai.x" displayname="柴火" name="chai"/>
   <asset filename="character/CC/artwar/game/desk.x" displayname="复古木桌" name="desk"/>

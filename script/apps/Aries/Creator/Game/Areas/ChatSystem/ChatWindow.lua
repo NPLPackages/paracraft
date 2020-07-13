@@ -586,34 +586,8 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 		nid = System.App.profiles.ProfileManager.GetNID();
 	end
 	if(chatdata.is_keepwork)then
-        local color = chatdata.color or "ffffff";
-        local kp_from_name = chatdata.kp_from_name or "";
-        local vip = chatdata.vip;
-        local student = chatdata.student;
-        local orgAdmin = chatdata.orgAdmin;
-        local tLevel = chatdata.tLevel;
-        local timestamp = chatdata.timestamp or "";
-
-        local channel_tag = string.format([[<div style="float:left">[%s]</div>]],chatdata.channelname);
-        local name_tag_start = [[<div style="float:left">[</div>]]
-        local vip_tag = ""
-        local teacher_tag = ""
-
-        -- show T tag first
-        if(orgAdmin == 1 or tLevel == 1)then
-            teacher_tag = [[<div style="float:left;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/chat/teacher_32bits.png#0 0 18 18)"></div>]];
-        elseif(vip == 1 or student == 1)then
-            vip_tag = [[<div style="float:left;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/chat/vip_32bits.png#0 0 18 18)"></div>]];
-        end
-        local name_tag_end = [[<div style="float:left">]:</div>]]
-
-        kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
-        local timestamp_tag = string.format([[<input type="button" value="%s" style="float:left;margin-left:10px;color:#8b8b8b;background:url();" />]],tostring(timestamp));
-        if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
-            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestamp_tag);
-        else
-            mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,name_tag_start,vip_tag,teacher_tag,kp_from_name,name_tag_end,words,timestamp_tag);
-        end
+    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+       mcmlStr = KpChatChannel.CreateMcmlStrToChatWindow(chatdata);
 	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
 				tooltip="%s" style="margin-left:0px;float:left;height:12px;background:url()" name="x"

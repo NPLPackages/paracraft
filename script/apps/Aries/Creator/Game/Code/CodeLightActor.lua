@@ -25,6 +25,8 @@ Actor:Property({"entityClass", "EntityCodeActor"});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- frame move interval in milliseconds
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
+Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
+Actor:Property({"playSpeed", 1, "GetPlaySpeed", "SetPlaySpeed", auto=true});
 Actor:Signal("dataSourceChanged");
 Actor:Signal("clicked", function(actor, mouseButton) end);
 Actor:Signal("beforeRemoved", function(self) end);
@@ -229,7 +231,7 @@ function Actor:ResetOffsetPosAndRotation()
 	local curTime = self:GetTime();
 	local entity = self.entity;
 
-	if(not entity or not curTime or entity:IsScreenMode()) then
+	if(not entity or not curTime) then
 		return
 	end
 	local eX, eY, eZ = entity:GetPosition();
@@ -445,10 +447,9 @@ function Actor:SetMovieActorImp(itemStack, movie_entity)
 		self:Init(itemStack, movie_entity);
 		self:FrameMove(self:GetTime(), false);
 		entity = self:GetEntity();
-		if(not entity:IsScreenMode()) then
-			entity:SetPosition(x,y,z);
-			entity:SetFacing(facing);
-		end
+		entity:SetPosition(x,y,z);
+		entity:SetFacing(facing);
+		
 		if(not wasVisible) then
 			entity:SetVisible(wasVisible);
 		end
@@ -572,6 +573,7 @@ local internalValues = {
 	["x"] = {setter = Actor.SetPosX, getter = Actor.GetPosX, isVariable = false}, 
 	["y"] = {setter = Actor.SetPosY, getter = Actor.GetPosY, isVariable = false}, 
 	["z"] = {setter = Actor.SetPosZ, getter = Actor.GetPosZ, isVariable = false}, 
+	["playSpeed"] = {setter = Actor.SetPlaySpeed, getter = Actor.GetPlaySpeed, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
 	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
 	["parent"] = {getter = Actor.GetParentActor, isVariable = false},

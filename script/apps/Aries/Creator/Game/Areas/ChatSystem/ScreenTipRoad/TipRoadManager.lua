@@ -8,8 +8,7 @@ Use Lib:
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 TipRoadManager:CreateRoads();
 for k = 1, 100 do
-    local txt = string.format("hello world %d",k);
-    TipRoadManager:PushNode(txt,"#ff0000");
+    TipRoadManager:PushNode(string.format('<div style="float:left;color:#ffffff;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;shadow-color:#8000468e;text-shadow:true">hello world %d</div>',k));
 end
 -------------------------------------------------------
 ]]
@@ -35,11 +34,14 @@ TipRoadManager.gap = 5;
 
 TipRoadManager.name = "TipRoadManager_Instance";
 function TipRoadManager:CreateRoads()
+	local root = ParaUI.GetUIObject("root");
+    root:SetScript("onsize", function()
+        self:OnResize();
+	end)
     if(self.created)then
         return
     end
     self.created = true;
-	local root = ParaUI.GetUIObject("root");
     local width = root.width;
     local height = TipRoadManager.height * TipRoadManager.cnt;
     self.width = width;
@@ -48,9 +50,7 @@ function TipRoadManager:CreateRoads()
 	container.background = "";
     root:AddChild(container);
 
-    root:SetScript("onsize", function()
-        self:OnResize();
-	end)
+    
     self.container = container;
     for k = 1, self.cnt do
         local y = (k-1) * self.height
@@ -64,7 +64,7 @@ function TipRoadManager:CreateRoads()
 
     timer:Change(0, self.interval)
 end
-function TipRoadManager:PushNode(txt,color,font_size,font_weight)
+function TipRoadManager:PushNode(txt)
     if(not self.created)then
         return
     end
@@ -75,9 +75,7 @@ function TipRoadManager:PushNode(txt,color,font_size,font_weight)
     else
         safe_distance = self:GetPreferredDistance();
     end
-    font_size = font_size or self.font_size;
-    font_weight = font_weight or self.font_weight;
-    local node = TipCarNode:new():OnInit(txt, color, font_size, font_weight, safe_distance, self.speed, self.acceleration);
+    local node = TipCarNode:new():OnInit(txt, safe_distance, self.speed, self.acceleration);
     road:AddCarNode(node);
 end
 function TipRoadManager:OnShow(v)
@@ -127,12 +125,14 @@ function TipRoadManager:OnFrame(delta)
 end
 function TipRoadManager:OnResize()
 	local root = ParaUI.GetUIObject("root");
-    local width = root.width;
+	local __, __, width, height = root:GetAbsPosition();
     self.width = width;
     self.container.width = width;
     for k = 1, self.cnt do
         local road = self.roads[k];
-        road:OnResize(width)
+        if(road)then
+            road:OnResize(width)
+        end
     end
 end
 function TipRoadManager:Clear()

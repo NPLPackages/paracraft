@@ -32,7 +32,7 @@ NplBrowserLoaderPage.timer = nil;
 
 NplBrowserLoaderPage.try_update_max_times = 3;
 NplBrowserLoaderPage.try_times = 0;
-
+NplBrowserLoaderPage.callback_maps = {};
 local dest_folder = "cef3";
 local config_file = "script/apps/Aries/Creator/Game/NplBrowser/configs/nplbrowser.xml";
 local page;
@@ -203,6 +203,9 @@ function NplBrowserLoaderPage.Check(callback)
         end
         return
     end
+    if(callback)then
+        NplBrowserLoaderPage.callback_maps[callback] = true;
+    end
     if(NplBrowserLoaderPage.is_opened)then
         return not NplBrowserLoaderPage.IsLoaded();
     end
@@ -212,7 +215,7 @@ function NplBrowserLoaderPage.Check(callback)
 
     NplBrowserLoaderPage.is_opened = true;
     NplBrowserLoaderPage.buildin_version = version;
-    NplBrowserLoaderPage.callback = callback;
+    
     NplBrowserLoaderPage.OnCheck("browser_asset_manager",dest_folder,config_file)
 	return not NplBrowserLoaderPage.IsLoaded();
 end
@@ -269,11 +272,15 @@ function NplBrowserLoaderPage.OnMovingFileCallback(dest, cur, total)
 end
 function NplBrowserLoaderPage.SetChecked(v)
     NplBrowserLoaderPage.loaded = v;
-    if(NplBrowserLoaderPage.callback)then
-        NplBrowserLoaderPage.callback(v);
-
-        NplBrowserLoaderPage.callback = nil;
+    if(v)then
+	    LOG.std(nil, "info", "NplBrowserLoaderPage", "NplBrowser is loaded");
+        local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+        NplBrowserManager:PreShowAll();
     end
+    for callback,v in pairs(NplBrowserLoaderPage.callback_maps) do
+        callback(v)
+    end
+    NplBrowserLoaderPage.callback_maps = {};
     NplBrowserLoaderPage.Close();
     NplBrowserLoaderPage.is_opened = false;
     NplBrowserLoaderPage.asset_manager = nil;
