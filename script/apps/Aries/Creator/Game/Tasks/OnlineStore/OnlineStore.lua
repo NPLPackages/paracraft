@@ -28,15 +28,14 @@ function OnlineStore:Init()
 	return self;
 end
 
-function OnlineStore.GetOnlineStoreUrl()
-	local host = KeepworkService:GetKeepworkUrl()
-	local token = System.User.keepworktoken or ''
-
+function OnlineStore.GetOnlineStoreUrl(name)
+	local host = KeepworkService:GetKeepworkUrl();
+	local token = System.User.keepworktoken or '';
+	local url = format("%s/p/comp/system?port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
 	if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'android' then
-		return format("%s/p/comp/system?type=protocol&port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
-	else
-		return format("%s/p/comp/system?port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
+		url = format("%s/p/comp/system?type=protocol&port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
 	end
+	return GameLogic.GetFilters():apply_filters("OnlineStore.CustomOnlineStoreUrl", url, name);
 end
 
 local page;
@@ -55,21 +54,21 @@ function OnlineStore:RefreshPage()
 	end
 end
 
-function OnlineStore:Run()
+function OnlineStore:Run(name)
 	local projectId = tostring(GameLogic.options:GetProjectId());
 	if (projectId == "10373") then
 		_guihelper.MessageBox(L"当前世界无法使用元件库功能。");
 		return;
 	end
 	self.finished = true;
-	self:ShowPage(true);
+	self:ShowPage(true, name);
 end
 
 
-function OnlineStore:ShowPage(bShow)
+function OnlineStore:ShowPage(bShow, name)
 	if(false) then
 		if(bShow) then
-			GameLogic.RunCommand(format("/open -name OnlineStore -title %s -width 1020 -height 680 -alignment _ct %s", L"元件库", OnlineStore.GetOnlineStoreUrl()));
+			GameLogic.RunCommand(format("/open -name OnlineStore -title %s -width 1020 -height 680 -alignment _ct %s", L"元件库", OnlineStore.GetOnlineStoreUrl(name)));
 		end
 		return
 	end
@@ -79,8 +78,8 @@ function OnlineStore:ShowPage(bShow)
 		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");	
 		NplBrowserLoaderPage.Check()
 		if not NplBrowserLoaderPage.IsLoaded() then	
-			ParaGlobal.ShellExecute("open", OnlineStore.GetOnlineStoreUrl(), "", "", 1);	
-			return	
+			ParaGlobal.ShellExecute("open", OnlineStore.GetOnlineStoreUrl(name), "", "", 1);
+			return
 		end
 	end
 
@@ -103,8 +102,10 @@ function OnlineStore:ShowPage(bShow)
 					alignment, width, height = "_ct", 1020, 680;
 					x, y = -width/2, -height/2;
 				end
+				local url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html?rand=" .. os.time();
+				local customUrl = GameLogic.GetFilters():apply_filters("OnlineStore.getPageParamUrl", url, name);
 				local params = {
-						url = "script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.html?rand=" .. os.time(), 
+						url = customUrl,
 						name = "OnlineStore.ShowPage", 
 						isShowTitleBar = false,
 						DestroyOnClose = false,

@@ -98,6 +98,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "item_client_new_item_type_added", block_id, item:
   - "user_event_stat", category, action, value, label:
   - "OnBeforeRestart", appName: before entire NPL runtime is restarted. 
+  - "GameName", titlename: get game name string
+  - "GameDescription", desc: get game description string, which will be shown in the window title area
   
 - file exporters:
   - "file_exported", id, filename:
@@ -119,7 +121,9 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "downloadFile_notify", downloadState(0:downloading, 1:complete, 2:terminated),text(downloadFile text tips),currentFileSize, totalFileSize
 - urlprotocol:  
   - "load_world_from_cmd_precheck",  hijacking cmdline_world, return a custom path
-
+- tasks:
+  - "OnlineStore.CustomOnlineStoreUrl", OnlineStoreUrl, name: add custom online store url based on name
+  - "OnlineStore.getPageParamUrl", url: default url in online store params, name: custom url paramater
   
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 
