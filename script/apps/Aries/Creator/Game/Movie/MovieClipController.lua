@@ -68,11 +68,10 @@ function MovieClipController.OnClosePage()
 	self.RestoreFocusToCurrentPlayer();
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
 	
-	if(GameLogic.IsServerWorld() or GameLogic.IsRemoteWorld()) then
-		if(self.activeClip and self.activeClip:GetEntity()) then
-			self.activeClip:GetEntity():MarkForUpdate();
-		end
-	end
+    if(self.activeClip and self.activeClip:GetEntity()) then
+        self.activeClip:GetEntity():MarkForUpdate();
+    end
+
 	MovieClipController:OnActiveMovieClipChange(nil);
 end
 
