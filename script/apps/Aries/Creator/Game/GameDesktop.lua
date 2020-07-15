@@ -282,7 +282,7 @@ function Desktop.ShowAllAreas()
 		return;
 	end
 	local mode = Desktop.mode;
-	
+	local MainUIButtons = GameLogic.GetFilters():apply_filters('MainUIButtons', nil);
 	if(mode == "editor") then
 		GameDock.ShowPage(false);
 		BuilderDock.ShowPage(true);
@@ -290,6 +290,9 @@ function Desktop.ShowAllAreas()
 		BlockMinimap.ShowPage(true);
 		DesktopMenuPage.ShowPage(true);
 		GoalTracker.ShowPage(true);
+		if MainUIButtons ~= nil then
+			MainUIButtons.ShowPage();
+		end
 	else
 		BuilderDock.ShowPage(false);
 		GameDock.ShowPage(true);
@@ -298,6 +301,9 @@ function Desktop.ShowAllAreas()
 		GoalTracker.ShowPage(true);
 		DesktopMenuPage.ShowPage(true);
 		ToolTipsPage.ShowPage(false);
+		if MainUIButtons ~= nil then
+			MainUIButtons.ShowPage();
+		end
 	end
 	GameLogic.GameMode:SetViewMode(false);
 end

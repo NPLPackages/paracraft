@@ -160,11 +160,14 @@ function MainLogin:UpdateCoreClient()
 		if(not System.options.isAB_SDK and ParaEngine.GetAppCommandLineByParam("noclientupdate", "")=="") then
 			local AutoUpdater = NPL.load("AutoUpdater");
 			local updater = AutoUpdater:new();
+			local gamename = "Paracraft"
+			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
+
 			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
 			updater:check(nil, function(bSucceed)
 				if(bSucceed and updater:isNeedUpdate()) then
 					System.App.Commands.Call("File.MCMLWindowFrame", {
-						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s", updater:getLatestVersion(), updater:getCurVersion()), 
+						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
 						name = "ClientUpdateDialog", 
 						isShowTitleBar = false,
 						DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
@@ -302,8 +305,12 @@ function MainLogin:LoadBackground3DScene()
 	if(System.options.servermode) then
 		return self:next_step({Loaded3DScene = true});
 	end
-	System.options.WindowTitle = string.format("%s -- ver %s", L"帕拉卡 Paracraft", GameLogic.options.GetClientVersion());
-	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, L"3D动画游戏创作工具"));
+
+	local titlename = GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
+	local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画游戏创作工具")
+
+	System.options.WindowTitle = string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
+	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));
 
 	-- just in case it is from web browser. inform to switch to 3d display. 
 	if(System.options.IsWebBrowser) then

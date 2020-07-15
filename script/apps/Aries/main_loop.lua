@@ -73,7 +73,7 @@ System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution
 
 System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 
--- System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
+System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
 
 System.User = System.User or {};
 if(not System.User.keepworktoken) then
@@ -203,7 +203,11 @@ local function Aries_load_config(filename)
 
 	if(System.options.mc)then
 		-- use paracraft icon file, it can also be any *.ico file on disk
-		ParaEngine.GetAttributeObject():SetField("Icon", ":IDR_PARAWORLD_ICO");
+		if (System.options.isCodepku) then			
+			ParaEngine.GetAttributeObject():SetField("Icon", "icon.ico");
+		else		
+			ParaEngine.GetAttributeObject():SetField("Icon", ":IDR_PARAWORLD_ICO");
+		end				
 	end
 
 	System.options.is_client = true;
