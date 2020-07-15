@@ -67,6 +67,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "SkinPage.PageParams", skinPageDefaultParams: custom skin page. 
   - "SystemSettingsPage.CheckBoxBackground", pageInfo, page, name, bChecked: custom system setting dialog's checkbox checked styles.
   - "SystemSettingsPage.PageParams", defaultPageParams: custom system setting page.
+  - "MainUIButtons": custom main page ui.
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
@@ -90,7 +91,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "LocalLoadWorld.GetWorldFolderFullPath" filepath:
   - "download_remote_world_show_bbs", true: whether show bbs when downloading remote world.
   - "file_downloader_show_label", true, when fileDownloader downloads, choose whether to display the download progress prompt.
-
+  - "WorldName.ResetWindowTitle": get custom window title for the world
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:
