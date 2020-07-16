@@ -13,3 +13,4 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkAPI.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.item.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.user.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.quiz.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.mall.lua");

@@ -49,8 +49,7 @@ function EditEntityPage.GetItemName()
 			type_name = item:GetDisplayName();
 		end
     end
-	
-	if(not name) then
+	if(not name or name == "") then
 		name = type_name;
 	else
 		name = name..":"..(type_name or "");

@@ -11,26 +11,17 @@ NPL.load("(gl)script/ide/System/localserver/localserver.lua");
 
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
-local getInfo_cache_policy = System.localserver.CachePolicy:new("access plus 1 day");
-
 --http://yapi.kp-para.cn/project/32/interface/api/cat_97
-HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false, nil,
--- PreProcessor
-function(self, inputParams, callbackFunc, option)
-   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.user.login.post")
-end,
--- Post Processor
-function(self, err, msg, data)
-     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.user.login.post", callbackFunc); 
-end)
+HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false)
 
 --http://yapi.kp-para.cn/project/32/interface/api/492
-HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true, nil,
+HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true)
+
+
+--http://yapi.kp-para.cn/project/32/interface/api/2552
+HttpWrapper.Create("keepwork.user.getinfo", "%MAIN%/core/v0/users/:id/detail", "GET", true, nil,
 -- PreProcessor
-function(self, inputParams, callbackFunc, option)
-   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.user.profile.get")
-end,
+HttpWrapper.default_prepFunc,
 -- Post Processor
-function(self, err, msg, data)
-     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.user.profile.get", callbackFunc); 
-end)
+HttpWrapper.default_postFunc
+)

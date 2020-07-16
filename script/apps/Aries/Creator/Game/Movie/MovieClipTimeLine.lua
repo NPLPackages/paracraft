@@ -76,6 +76,7 @@ local var_name_to_text = {
 	Attenuation0 = L"衰减参数0",
 	Attenuation1 = L"衰减参数1",
 	Attenuation2 = L"衰减参数2",
+	is_fps = L"第一人称",
 }
 local var_longname_to_text = {
 	anim = L"动作 (1键)",

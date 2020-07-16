@@ -62,6 +62,9 @@ function NplBrowserFrame:PreShow(url, is_show_control)
     if(not self.cef_is_preshow)then
         NplBrowserPlugin.Start({id = id, url = url, withControl = is_show_control, x = 10000, y = 10000, width = 1, height = 1, });
         self.cef_is_preshow = true
+        NplBrowserPlugin.OnCreatedCallback(id,function()
+            self:GotoEmpty();
+        end)
     end
 end
 function NplBrowserFrame:Show(url, title, is_show_control, is_show_close, options, callback)

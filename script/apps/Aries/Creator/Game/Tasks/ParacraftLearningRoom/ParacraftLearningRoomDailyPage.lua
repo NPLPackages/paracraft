@@ -50,7 +50,7 @@ HTML与用户UI
 删除电影方块中的摄像机
 写出工整的代码
 代码和命令中的注释
-/avator命令
+/avatar命令
 让电影控制主角
 /shader命令
 查看图块的源代码
@@ -94,7 +94,7 @@ function ParacraftLearningRoomDailyPage.LoadLessonsConfig()
     if(not ParacraftLearningRoomDailyPage.is_loaded_lessons)then
         ParacraftLearningRoomDailyPage.lessons_title = {};
         ParacraftLearningRoomDailyPage.is_loaded_lessons = true;
-        for title in string.gfind(ParacraftLearningRoomDailyPage.lessons, "([^\n]+)") do
+        for title in string.gfind(ParacraftLearningRoomDailyPage.lessons, "([^\r\n]+)") do
             if(title and title ~= "")then
                 table.insert(ParacraftLearningRoomDailyPage.lessons_title,title);
             end
