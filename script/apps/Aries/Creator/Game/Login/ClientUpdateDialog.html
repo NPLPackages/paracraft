@@ -19,8 +19,9 @@ function OnClickChangeLog()
 end
 latestVersion = Page:GetRequestParam("latestVersion")
 curVersion = Page:GetRequestParam("curVersion")
+curGame = Page:GetRequestParam("curGame")
 ]]></script>
-<aries:window mode="thin" width="420" title='<%=L"关于Paracraft" %>' onclose="OnClose">
+<aries:window mode="thin" width="420" title='<%=format(L"关于%s", curGame)%>' onclose="OnClose">
     <div class="default" style="margin:20px">
         <div style="">
             <%=L"最新版本为:"%><%=Eval("latestVersion")%>
@@ -29,7 +30,7 @@ curVersion = Page:GetRequestParam("curVersion")
             <%=L"您的版本为:"%><%=Eval("curVersion")%>
         </div>
         <div style="margin-top:10px;color:#ff6a00">
-            <%=L"强烈建议您退出并重新启动更新Paracraft"%>
+            <%=format(L"强烈建议您退出并重新启动更新%s",curGame)%>
         </div>
     </div>
     <hr />

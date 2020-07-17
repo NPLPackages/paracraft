@@ -435,8 +435,8 @@ Commands["/avatar"] = {
 	desc=[[change current avatar model. if no filename is specified, default one is used. 
 @param playername: if not specified and containing entity is a biped, it is the containing entity like NPC; otherwise it is current player
 @param filename: can be relative to current world directory or one of the preinstalled ones like "actor". 
-/avator dog    : change the current player to dog avator
-/avator @test test.fbx :change 'test' player to a fbx file in current world directory. 
+/avatar dog    : change the current player to dog avator
+/avatar @test test.fbx :change 'test' player to a fbx file in current world directory. 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local playerEntity, hasInputName;

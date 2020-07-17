@@ -1,0 +1,73 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ChatRoomPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ChatRoomPage.lua">
+            <![CDATA[
+            ChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ChatRoomPage.lua");
+            ChatRoomPage.OnInit();
+            ]]>
+        </script>
+        <aries:window mode="center_white" style="width:750px;height:533px" title='<%=ChatRoomPage.GetClassName()%>' onclose="ChatRoomPage.OnClose">
+            <div style="margin-left:-4px;margin-top:1px;margin-bottom:1px;width:750px;height:495px;">
+                <div style="width:748px;height:1px;background-color:#cdcdcd"></div>
+                <div style="position:relative;">
+                    <div style="float:left;width:480px;height:490px;">
+                        <div style="width:480px;height:31px;background-color:#292929;color:#ff9f40">
+                            <div style="margin-left:26px;margin-top:6px;"><%=L"聊天"%></div>
+                            <div style="margin-left:10px;margin-top:2px;width:56px;height:2px;background-color:#ff9f40;"></div>
+                        </div>
+                        <div style="width:480px;height:1px;background-color:#cdcdcd"></div>
+                        <div style="width:480px;height:330px;">
+                        </div>
+                        <div style="width:480px;height:2px;background-color:#cdcdcd"></div>
+                        <div style="width:480px;height:126px;background-color:#e2e7e8">
+                        </div>
+                    </div>
+                    <div style="float:left;width:2px;height:484px;background-color:#cdcdcd"></div>
+                    <div style="float:left;width:266px;height:484px;">
+                        <div style="width:266px;height:31px;background-color:#292929;color:#ffffff">
+                            <div style="float:left;margin-left:10px;margin-top:6px;"><%=ChatRoomPage.GetClassPeoples()%></div>
+                            <input type="button" style="float:left;width:52px;height:20px;margin-left:98px;margin-top:6px;color:#ffffff;" value='<%=L"+邀请"%>' class="mc_blue_button_with_fillet" tooltip='<%=L"邀请所有未上课成员"%>' onclick="ChatRoomPage.InviteAll" />
+                        </div>
+                        <div style="width:266px;height:1px;background-color:#cdcdcd"></div>
+                        <div>
+                            <pe:gridview style="margin:1px;width:264px;height:460px;" name="class_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="50"
+                                         DataSource='<%=ChatRoomPage.ClassItems()%>'>
+                                <Columns>
+                                    <div style="width:264px;height:50px;">
+                                        <pe:if condition='<%=Eval("online")%>'>
+                                            <div style="float:left;margin-left:12px;margin-top:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ClassManager/online_head_32bits.png#0 0 48 48);">
+                                                <div style="margin-left:6px;margin-top:8px;">
+                                                    <%=ChatRoomPage.GetShortName(Eval("name"))%>
+                                                </div>
+                                            </div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not Eval("online")%>'>
+                                            <div style="float:left;margin-left:12px;margin-top:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ClassManager/offline_head_32bits.png#0 0 48 48);">
+                                                <div style="margin-left:6px;margin-top:8px;">
+                                                    <%=ChatRoomPage.GetShortName(Eval("name"))%>
+                                                </div>
+                                            </div>
+                                        </pe:if>
+                                        <div style="float:left;margin-left:10px;margin-top:6px;"><%=Eval("name")%></div>
+                                        <input type="button" style="float:left;width:52px;height:20px;margin-left:98px;margin-top:6px;color:#ffffff;" value='<%=L"+邀请"%>' class="mc_blue_button_with_fillet" tooltip='<%=L"邀请所有未上课成员"%>' onclick="ChatRoomPage.InviteAll" />
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+

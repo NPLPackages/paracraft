@@ -444,7 +444,9 @@ function options:ResetWindowTitle()
 			if(projectId) then
 				worldName = worldName .. " " .. format(L"项目ID:%s", tostring(projectId))
 			end
-			ParaEngine.SetWindowText(format("%s  %s", worldName, System.options.WindowTitle));	
+			local windowTitle = format("%s  %s", worldName, System.options.WindowTitle)
+			windowTitle = GameLogic.GetFilters():apply_filters('WorldName.ResetWindowTitle', windowTitle, System.options.WindowTitle)
+			ParaEngine.SetWindowText(windowTitle);	
 		end
 	end
 end

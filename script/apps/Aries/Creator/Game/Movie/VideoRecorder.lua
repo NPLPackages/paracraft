@@ -148,7 +148,7 @@ function VideoRecorder.BeginCapture(callbackFunc)
 	else
 		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 是否现在安装？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
-				_guihelper.MessageBox(L"正在安装, 请稍后...");
+				_guihelper.MessageBox(L"正在安装, 请稍候...");
 				VideoRecorder.InstallPlugin(function(bSucceed)
 					if(bSucceed) then
 						_guihelper.MessageBox(nil);

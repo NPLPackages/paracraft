@@ -33,6 +33,7 @@ function mcml_controls.register_all()
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_item.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_slot.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_redtip.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_usertag.lua");
 
 
 	-- mc tags
@@ -46,6 +47,7 @@ function mcml_controls.register_all()
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:item", MyCompany.Aries.Game.mcml.kp_item);
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:slot", MyCompany.Aries.Game.mcml.kp_slot);
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:redtip", MyCompany.Aries.Game.mcml.kp_redtip);
+	Map3DSystem.mcml_controls.RegisterUserControl("kp:usertag", MyCompany.Aries.Game.mcml.kp_usertag);
 
     local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
     Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);

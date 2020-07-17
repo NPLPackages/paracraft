@@ -14,37 +14,15 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 -- get
 HttpWrapper.Create("keepwork.shareToken.get", "%MAIN%/ts-storage/qinius/uploadToken", "GET", true, nil,
 -- PreProcessor
-function(self, inputParams, callbackFunc, option)
-   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.shareToken.get")
-end,
+HttpWrapper.default_prepFunc,
 -- Post Processor
-function(self, err, msg, data)
-    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.shareToken.get", callbackFunc); 
-end
+HttpWrapper.default_postFunc
 )
 
 --http://yapi.kp-para.cn/project/151/interface/api/1982
 -- get
-HttpWrapper.Create("keepwork.shareUrl.get", "%MAIN%/ts-storage/files/downloadUrl", "GET", true, nil,
--- PreProcessor
-function(self, inputParams, callbackFunc, option)
-   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.shareUrl.get")
-end,
--- Post Processor
-function(self, err, msg, data)
-    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.shareUrl.get", callbackFunc); 
-end
-)
+HttpWrapper.Create("keepwork.shareUrl.get", "%MAIN%/ts-storage/files/downloadUrl", "GET", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/1872
 -- get
-HttpWrapper.Create("keepwork.shareFile.post", "%MAIN%/core/v0/shareFile", "POST", true, nil,
--- PreProcessor
-function(self, inputParams, callbackFunc, option)
-   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.shareFile.post")
-end,
--- Post Processor
-function(self, err, msg, data)
-    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.shareFile.post", callbackFunc); 
-end
-)
+HttpWrapper.Create("keepwork.shareFile.post", "%MAIN%/core/v0/shareFile", "POST", true)

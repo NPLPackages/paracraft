@@ -32,8 +32,17 @@ echo(bags_number);
 KeepWorkItemManager.DoExtendedCost(10001)
 KeepWorkItemManager.LoadItems({1001,1002})
 KeepWorkItemManager.ReLoadItems({10001,10002});
+
+
+KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
+    echo("==========userinfo");
+    echo(data);
+end)
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+NPL.load("(gl)script/ide/Json.lua");
+local Encoding = commonlib.gettable("System.Encoding");
 NPL.load("(gl)script/ide/System/Core/Filters.lua");
 local Filters = commonlib.gettable("System.Core.Filters");
 
@@ -278,9 +287,9 @@ function KeepWorkItemManager.Load(bForced, callback)
         return
     end
     KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载GlobalStore");
-    KeepWorkItemManager.LoadGlobalStore(true, function()
+    KeepWorkItemManager.LoadGlobalStore(false, function()
         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载ExtendedCost");
-        KeepWorkItemManager.LoadExtendedCost(true, function()
+        KeepWorkItemManager.LoadExtendedCost(false, function()
             KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载背包");
             KeepWorkItemManager.LoadBags(true, function()
                 KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载物品");
@@ -305,7 +314,7 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
         cache_policy = "access plus 0";
     end
     keepwork.globalstore.get({
-        cache_policy = "access plus 0";
+        cache_policy = cache_policy;
     },function(err, msg, data)
         if(err ~= 200)then
             return
@@ -513,7 +522,7 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
         if(data)then
             KeepWorkItemManager.profile = data;
             if(callback)then
-                callback();
+                callback(err, msg, data);
             end
         end
     end)
@@ -707,4 +716,52 @@ function KeepWorkItemManager.SearchBagNo(bagId)
     if(bag)then
         return bag.bagNo; 
     end
+end
+-- get userinfo
+-- if input = nil, or input.username = nil, getting login user info
+-- @param input
+-- @param input.username
+-- @param input.cache_policy
+function KeepWorkItemManager.GetUserInfo(input,callback)
+    input = input or {};
+    local username = input.username;
+    local cache_policy = input.cache_policy;
+    if(not username or username == commonlib.getfield("System.User.username"))then
+        KeepWorkItemManager.LoadProfile(false, callback)
+        return
+    end
+    local id = "kp" .. Encoding.base64(commonlib.Json.Encode({username=username}));
+    -- this request is by router path
+    keepwork.user.getinfo({
+        cache_policy = cache_policy,
+        router_params = {
+            id = id,
+        }
+    },function(err, msg, data)
+        if(callback)then
+            callback(err, msg, data);
+        end
+    end)
+end
+function KeepWorkItemManager.GetUserTag(user_info)
+    if(not user_info)then
+        return
+    end
+    local tag;
+    local vip = user_info.vip;
+    local tLevel = user_info.tLevel;
+    local student = user_info.student;
+    local orgAdmin = user_info.orgAdmin;
+    if(tLevel == 1)then
+        if(vip == 1)then
+            tag = "VT";
+        else
+            tag = "T";
+        end
+    elseif(student == 1 or orgAdmin == 1)then
+        if(vip == 1)then
+            tag = "V";
+        end
+    end
+    return tag;
 end

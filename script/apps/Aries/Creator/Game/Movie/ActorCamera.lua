@@ -38,6 +38,7 @@ local selectable_var_list = {
 	"pos", -- multiple of x,y,z
 	"rot", -- multiple of "roll", "pitch", "facing"
 	"scaling",
+	"is_fps",
 	"---", -- separator
 	"parent", 
 	"static", -- multiple of "name" and "isAgent"
@@ -621,6 +622,21 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end
 		end,old_value)
+	elseif(keyname == "is_fps") then
+		local title = format(L"起始时间%s, 是否为第一人称(1或0)", strTime);
+
+		-- TODO: use a dedicated UI 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+		EnterTextDialog.ShowPage(title, function(result)
+			if(result) then
+				self:AddKeyFrameByName("is_fps", nil, (result == "true" or result=="1") and 1 or 0);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
+		end, old_value~= nil and tostring(old_value))
 	elseif(keyname == "parent") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.lua");
 		local EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");

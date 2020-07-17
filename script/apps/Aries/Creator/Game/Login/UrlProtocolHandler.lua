@@ -31,6 +31,69 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);
 		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
 
+		local action_text = urlProtocol:match("action=(%w+)")
+
+		if action_text == "runcode" then
+			local action_text_text = urlProtocol:match("text=(.+)")
+
+			if not action_text_text then
+				return false
+			end
+
+			local code = action_text_text
+
+			local function CreateSandBoxEnv()
+				local env = {
+					alert = _guihelper and _guihelper.MessageBox or commonlib.echo,
+					GameLogic = commonlib.gettable("GameLogic"),
+					cmd = GameLogic and GameLogic.RunCommand or commonlib.echo,
+				};
+				local meta = {__index = _G};
+				setmetatable(env, meta);
+				return env;
+			end
+
+			local function SaveCode()
+				local filename = "temp/console.lua";
+				local tmp_file = ParaIO.open(filename, "w");
+				if(tmp_file) then
+					if(code) then
+						tmp_file:write(code, #code);
+					end
+					tmp_file:close();
+				end
+				return filename;
+			end
+
+			-- Run code and print result
+			local function RunWithResult()
+				if (not code or code == "") then
+					return;
+				end
+
+				local fromLogPos = commonlib.log.GetLogPos();
+				local filename = SaveCode();
+				NPL.load("(gl)script/ide/System/Compiler/nplc.lua");
+				local code_func, errormsg = NPL.loadstring(code, filename);
+
+				if (code_func) then
+					local env = CreateSandBoxEnv();
+					setfenv(code_func, env);
+
+					local ok, result = pcall(code_func);
+					
+					if (ok) then
+						if (type(env.main) == "function") then
+							setfenv(env.main, env);
+							ok, result = pcall(env.main);
+						end
+					end
+				end
+			end
+
+			RunWithResult()
+		end
+
 		local cmd_text = urlProtocol:match("cmd%(\"(.+)\"%)")
 
 		if cmd_text then

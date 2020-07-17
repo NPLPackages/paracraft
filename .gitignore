@@ -65,6 +65,15 @@ script/ide
 /script/kids/3DMapSystemUI/MiniGames/*
 !/script/kids/3DMapSystemUI/MiniGames/app_main.lua
 !/script/kids/3DMapSystemUI/MiniGames/SwfLoadingBarPage.lua
+!/script/kids/3DMapSystemUI/CCS/
+/script/kids/3DMapSystemUI/CCS/*
+!/script/kids/3DMapSystemUI/CCS/DB.lua
+!/script/kids/3DMapSystemUI/CCS/InventorySlot.lua
+!/script/kids/3DMapSystemUI/CCS/Inventory.lua
+!/script/kids/3DMapSystemUI/CCS/CartoonFaceComponent.lua
+!/script/kids/3DMapSystemUI/CCS/DefaultAppearance.lua
+!/script/kids/3DMapSystemUI/CCS/Predefined.lua
+
 
 !/script/kids/3DMapSystemApp
 /script/kids/3DMapSystemApp/*

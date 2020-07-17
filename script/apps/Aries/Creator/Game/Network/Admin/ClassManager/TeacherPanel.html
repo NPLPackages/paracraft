@@ -1,0 +1,60 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TeacherPanel.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="TeacherPanel.lua">
+            <![CDATA[
+            TeacherPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TeacherPanel.lua");
+            TeacherPanel.OnInit();
+            ]]>
+        </script>
+        <pe:container ClickThrough="true" alignment="_mt" width="0" height="48px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#222 349 2 32)">
+            <pe:if condition='<%=not TeacherPanel.InClass%>'>
+                <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:48px;">
+                    <input type="button" style="width:104px;height:26px;margin-top:11px;margin-left:20px;color:#ffffff;" value='<%=L"上课" %>' class="mc_green_button_with_fillet" onclick="TeacherPanel.SelectClass" />
+                </pe:container>
+            </pe:if>
+            <pe:if condition='<%=TeacherPanel.InClass%>'>
+                <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:48px;">
+                    <div style="margin-top:11px;float:left;color:#ffffff;">
+                        <input type="button" style="width:104px;height:26px;margin-left:20px;color:#ffffff;" value='<%=L"下课" %>' class="mc_orange_button_with_fillet" onclick="TeacherPanel.LeaveClass" />
+                        <div style="float:left;margin-left:10px;margin-top:2px;"><%=TeacherPanel.GetClassName()%></div>
+                        <div style="float:left;margin-left:10px;margin-top:1px;color:#3f4143;"> | </div>
+                        <div style="float:left;margin-left:10px;margin-top:2px;"><%=TeacherPanel.GetClassStudents()%></div>
+                    </div>
+                </pe:container>
+                <pe:container alignment="_rt" style="margin-top:10px;position:relative;width:300px;height:32px;background:;">
+                    <div style="width:26px;position:relative;margin-right:20px;" align="right">
+                        <input type="button" name="btnUrl" tooltip='<%=L"分享链接"%>' onclick="TeacherPanel.ShareUrl" style="width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_to_share_32bits.png#0 0 26 26);" />
+                    </div>
+                    <div style="width:27px;position:relative;float:right;margin-right:70px;" align="right">
+                        <input type="button" name="btnConnect" tooltip='<%=L"联机"%>' onclick="TeacherPanel.ConnectClass" style="width:27px;height:27px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_to_connect_32bits.png#0 0 27 27);" />
+                    </div>
+                    <div style="width:33px;position:relative;float:right;margin-right:120px;" align="right">
+                        <pe:if condition='<%=not TeacherPanel.IsChatting%>'>
+                            <input type="button" name="btnChat" tooltip='<%=L"课堂聊天"%>' onclick="TeacherPanel.OpenChat" style="width:32px;height:26px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_to_chat_32bits.png#0 0 32 26);" />
+                        </pe:if>
+                        <pe:if condition='<%=TeacherPanel.IsChatting%>'>
+                            <input type="button" name="btnChat" tooltip='<%=L"课堂聊天"%>' onclick="TeacherPanel.OpenChat" style="width:32px;height:26px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_chatting_32bits.png#0 0 32 26);" />
+                        </pe:if>
+                    </div>
+                    <div style="width:34px;position:relative;float:right;margin-right:180px;" align="right">
+                        <pe:if condition='<%=not TeacherPanel.IsLocked%>'>
+                            <input type="button" name="btnLock" tooltip='<%=L"点击锁屏"%>' onclick="TeacherPanel.Lock" style="width:32px;height:27px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_unlock_32bits.png#0 0 32 27);" />
+                        </pe:if>
+                        <pe:if condition='<%=TeacherPanel.IsLocked%>'>
+                            <input type="button" name="btnUnLock" tooltip='<%=L"点击解锁"%>' onclick="TeacherPanel.UnLock" style="width:32px;height:29px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_locked_32bits.png#0 0 32 29);" />
+                        </pe:if>
+                    </div>
+                </pe:container>
+            </pe:if>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+
