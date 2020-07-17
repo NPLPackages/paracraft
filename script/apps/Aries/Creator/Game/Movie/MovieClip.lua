@@ -130,7 +130,11 @@ function MovieClip:ShowGUI(bShow, bForceEditorMode)
 			MovieClipController:SetForceEditorMode(bForceEditorMode);
 		end
 		MovieClipTimeLine:ShowTimeline("activated");
-		MovieClipController.ShowPage(true);
+		
+		self.entity:BeginEdit(); 
+		MovieClipController.ShowPage(true, function() 
+			self.entity:EndEdit();
+		end);
 	else
 		MovieClipTimeLine:ShowTimeline();
 		MovieClipController.ShowPage(false);
