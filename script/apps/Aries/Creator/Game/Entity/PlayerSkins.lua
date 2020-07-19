@@ -23,6 +23,12 @@ local models_has_skin = {
 	["character/CC/01char/char_male.x"] = true,
 	["character/CC/01char/MainChar/MainChar.x"] = true,
 }
+local models_default_skins = {
+	["character/CC/02human/actor/actor.x"] = "Texture/blocks/human/boy_worker01.png",
+	["character/CC/01char/char_male.x"] = "Texture/blocks/human/boy_blue_shirt01.png",
+	["character/CC/01char/MainChar/MainChar.x"] = "Texture/blocks/human/boy_blue_shirt01.png",
+}
+
 local defaultModelFile = "character/CC/02human/actor/actor.x";
 
 -- mapping from group name to array of skins
@@ -100,6 +106,10 @@ function PlayerSkins:CheckModelHasSkin(asset_filename)
 	if(asset_filename and models_has_skin[asset_filename]) then
 		return true;
 	end
+end
+
+function PlayerSkins:GetDefaultSkinForModel(filename)
+	return models_default_skins[filename];
 end
 
 -- deprecated: 

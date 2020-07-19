@@ -455,6 +455,7 @@ Commands["/avatar"] = {
 			local assetfile = cmd_text;
 			assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
 			if(assetfile and assetfile~=playerEntity:GetMainAssetPath()) then
+				local oldAssetFile = playerEntity:GetMainAssetPath()
 				if(playerEntity.SetModelFile) then
 					playerEntity:SetModelFile(old_filename);
 				else
@@ -465,6 +466,9 @@ Commands["/avatar"] = {
 					playerEntity:SetSkin(nil);
 				else
 					playerEntity:RefreshSkin();
+				end
+				if(math.abs(EntityManager.PlayerAssetFile:GetDefaultScale(oldAssetFile) - playerEntity:GetScaling()) < 0.01) then
+					playerEntity:SetScaling(EntityManager.PlayerAssetFile:GetDefaultScale(assetfile))
 				end
 			elseif(not assetfile) then
 				LOG.std(nil, "warn", "cmd:avatar", "file %s not found", cmd_text or "");

@@ -762,6 +762,10 @@ function KeepWorkItemManager.GetUserTag(user_info)
         if(vip == 1)then
             tag = "V";
         end
+    else
+        if(vip == 1)then
+            tag = "V";
+        end
     end
     return tag;
 end

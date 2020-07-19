@@ -1,0 +1,1531 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Advanced CCS modification page for Aries p</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="EditCCSTask.lua">
+EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+EditCCSTask.OnInit();
+    
+function DS_Func_Hairs(index)
+    return EditCCSTask.DS_Func_Hairs(index)
+end
+
+function DS_Func_BaseSkins(index)
+    return EditCCSTask.DS_Func_BaseSkins(index)
+end
+
+function DS_Func_CartoonFace(index_Func)
+    return EditCCSTask.GetDS_Func_CartoonFace(index_Func)
+end
+
+function Custom_ComposedFace(params)
+    EditCCSTask.Custom_ComposedFace(params)
+end
+
+function ClickCartoonFaceComponent(value)
+    EditCCSTask.ClickCartoonFaceComponent(value)
+end
+
+function DS_Func_CharacterSlot(index_Func)
+    return EditCCSTask.GetDS_Func_CharacterSlot(index_Func)
+end
+
+function Custom_OriginalCCSMain(params)
+    EditCCSTask.Custom_OriginalCCSMain(params)
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return 1;
+    elseif(index == 1) then
+        return {};
+    end
+end
+
+function OnClose()
+    Page:CloseWindow();
+end
+</script>
+<aries:window style="width:400px;height:600px" title='<%=L"换装"%>' mode="thin" onclose="OnClose">
+<pe:tabs name="AdvTools" style="margin:8px">
+    <!-- old file
+    <pe:tab-item name="Basic" text="基本" style="padding:4px">
+        <div style="" class="default">
+            Part 1: Base Character Skin
+            <pe:gridview DataSource="<%=DS_Func_BaseSkins%>" name="BaseSkins" style="width:350px;height:71px;" 
+                VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                <Columns>
+                    <a style="width:70px;height:70px;margin:0px;"
+                        onclick="EditCCSTask.TestSkin" param1='<%=Eval("color")%>'>
+                        <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                    </a>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>Empty Items</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>Data Fetching, Please wait ... </b>
+                </FetchingDataTemplate>
+            </pe:gridview>
+            <hr/>
+            Part 2: EyeAddon
+            <br/>
+            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='0'>Nothing</a>
+            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='1'>Glass1</a>
+            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='2'>Glass2</a>
+            <hr/>
+            Part 3: Wings
+            <br/>
+            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='0'>Nothing</a>
+            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='1'>Wings1</a>
+            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='2'>Wings2</a>
+            <br/>
+            Part 4: Generate Database
+            <input type="button" value="Generate!" style="width:64px;" onclick="EditCCSTask.ClickDBUpdate"/>
+            <br/>
+            Part 5: 抱抱龙颜色
+            <input type="button" value="1" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Purple"/>
+            <input type="button" value="2" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Red"/>
+            <input type="button" value="3" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Green"/>
+            <input type="button" value="4" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Orange"/>
+            <input type="button" value="5" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_DarkPurple"/>
+            <input type="button" value="6" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_DarkRed"/>
+            <br/>
+            Part 6: 换资源路径
+            <div>新路径:<input style="width:200px" name="newasset"/><input type="button" name="changeasset" value="改资源" onclick="EditCCSTask.OnChangeAsset"/></div>
+            <br/>
+            <hr/>
+            <hr/>
+        </div>
+    </pe:tab-item>
+    -->
+    <pe:tab-item name="Hair" text="头发&肤色" style="padding:4px">
+        <div style="" class="default">
+            <div>发型：</div>
+            <pe:gridview DataSource="<%=DS_Func_Hairs%>" name="Hairs" style="width:350px;height:350px;" 
+                VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                <Columns>
+                    <a style="width:70px;height:70px;margin:0px;" tooltip='<%=Eval("tooltip")%>' 
+                        onclick="EditCCSTask.TestHair" param1='<%=Eval("style")%>' param2='<%=Eval("color")%>'>
+                        <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                    </a>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>Empty Items</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>Data Fetching, Please wait ... </b>
+                </FetchingDataTemplate>
+            </pe:gridview>
+            <div>肤色：</div>
+            <pe:gridview DataSource="<%=DS_Func_BaseSkins%>" name="BaseSkins" style="width:350px;" 
+                VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                <Columns>
+                    <a style="width:70px;height:70px;margin:0px;"
+                        onclick="EditCCSTask.TestSkin" param1='<%=Eval("color")%>'>
+                        <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                    </a>
+                </Columns>
+                <EmptyDataTemplate>
+                    <b>Empty Items</b>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b>Data Fetching, Please wait ... </b>
+                </FetchingDataTemplate>
+            </pe:gridview>
+        </div>
+    </pe:tab-item>
+    
+    <pe:tab-item name="CartoonFace" text="卡通脸" selected="true" style="padding:4px">
+        <div style="" class="default">
+            
+            <div style="background-color:#f7dfca">
+            <pe:tabs name="CartoonFace" style="height:190px;margin:8px;">
+                <pe:tab-item name="Wrinkle" text="皱纹" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(1)%>" name="Wrinkle" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;" tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+                <pe:tab-item name="Eye" text="眼睛" selected="true" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(2)%>" name="Eye" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;"  tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+                <pe:tab-item name="Eyebrow" text="眉毛" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(3)%>" name="Eyebrow" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;"  tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+                <pe:tab-item name="Mouth" text="嘴巴" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(4)%>" name="Mouth" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;"  tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+                <pe:tab-item name="Nose" text="鼻子" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(5)%>" name="Nose" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;"  tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+                <pe:tab-item name="Mark" text="眼镜" style="padding:4px" onclick="ClickCartoonFaceComponent">
+                    <pe:gridview DataSource="<%=DS_Func_CartoonFace(6)%>" name="Mark" style="width:350px;height:142px;" 
+                        VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
+                        ItemsPerLine="4" AllowPaging="false" pagesize="250">
+                        <Columns>
+                            <a style="width:70px;height:70px;margin:0px;"  tooltip='<%=Eval("tooltip")%>'
+                                onclick="EditCCSTask.TestCartoonFace" param1='<%=Eval("type")%>' param2='<%=Eval("style")%>'>
+                                <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
+                            </a>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <b>Empty Items</b>
+                        </EmptyDataTemplate>
+                        <FetchingDataTemplate>
+                            <b>Data Fetching, Please wait ... </b>
+                        </FetchingDataTemplate>
+                    </pe:gridview>
+                </pe:tab-item>
+            </pe:tabs>
+            </div>
+            
+            <pe:custom oncreate="Custom_ComposedFace" style="margin-top:10px;width:256px;height:256px;"/>
+            
+        </div>
+    </pe:tab-item>
+    
+    <pe:tab-item name="Aries Character Slots" text="手持装备" style="padding:4px">
+        <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSHandhelds" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+            <Columns>
+            <form>
+                <div style="">
+                    <input type="button" value="左手空空" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="0"/>
+                    <input type="button" value="右手空空" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="0"/>
+                    <br/>
+                    <input type="button" value="帽子空空" style="width:64px;" onclick="EditCCSTask.ClickHatUpdate" gsid="0"/>
+                    <input type="button" value="背包空空" style="width:64px;" onclick="EditCCSTask.ClickBackUpdate" gsid="0"/>
+                    <br/>
+                    <div style="height:20px;"/>
+             <form>
+      <br/>
+        <input type="button" value="右烈火S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2304_FireMagicWandS4" gsid="2304"/>
+        <input type="button" value="右寒冰S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2305_IceMagicWandS4" gsid="2305"/>
+        <input type="button" value="右风暴S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2306_StormMagicWandS4" gsid="2306"/>
+        <input type="button" value="右生命S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2307_LifeMagicWandS4" gsid="2307"/>
+        <input type="button" value="右死亡S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2308_DeathMagicWandS4" gsid="2308"/>
+		      <br/>
+        <input type="button" value="左烈火S4" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2309_FireLeftHandS4" gsid="2309"/>
+        <input type="button" value="左寒冰S4" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2310_IceLeftHandS4" gsid="2310"/>
+        <input type="button" value="左风暴S4" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2311_StormLeftHandS4" gsid="2311"/>
+        <input type="button" value="左生命S4" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2312_LifeLeftHandS4" gsid="2312"/>
+        <input type="button" value="左死亡S4" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2313_DeathLeftHandS4" gsid="2313"/>
+        <br/>
+        <input type="button" value="龙息灵盾3" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2212_TheStrongest_FireLevel55_Left_Final" gsid="2212"/>
+        <input type="button" value="冰裂灵盾3" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2213_TheStrongest_IceLevel55_Left_Final" gsid="2213"/>
+        <input type="button" value="雷霆灵盾3" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2214_TheStrongest_StormLevel55_Left_Final" gsid="2214"/>
+        <input type="button" value="神翼灵盾3" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2215_TheStrongest_LifeLevel55_Left_Final" gsid="2215"/>
+        <input type="button" value="灾厄灵盾3" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2216_TheStrongest_DeathLevel55_Left_Final" gsid="2216"/>
+        <br/>
+        <input type="button" value="龙息灵盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2207_TheStrongest_FireLevel55_Left_EVO" gsid="2207"/>
+        <input type="button" value="冰裂灵盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2208_TheStrongest_IceLevel55_Left_EVO" gsid="2208"/>
+        <input type="button" value="雷霆灵盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2209_TheStrongest_StormLevel55_Left_EVO" gsid="2209"/>
+        <input type="button" value="神翼灵盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2210_TheStrongest_LifeLevel55_Left_EVO" gsid="2210"/>
+        <input type="button" value="灾厄灵盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2211_TheStrongest_DeathLevel55_Left_EVO" gsid="2211"/>
+        <br/>
+        <input type="button" value="龙息灵盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2202_TheStrongest_FireLevel55_Left" gsid="2202"/>
+        <input type="button" value="冰裂灵盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2203_TheStrongest_IceLevel55_Left" gsid="2203"/>
+        <input type="button" value="雷霆灵盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2204_TheStrongest_StormLevel55_Left" gsid="2204"/>
+        <input type="button" value="神翼灵盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2205_TheStrongest_LifeLevel55_Left" gsid="2205"/>
+        <input type="button" value="灾厄灵盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2206_TheStrongest_DeathLevel55_Left" gsid="2206"/>
+        <br/>
+        <input type="button" value="恶魔锤1" tooltip="2131_AngryDemon_Hammer" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="2131"/>
+        <input type="button" value="恶魔锤2" tooltip="2134_AngryDemon_Hammer_Max" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="2134"/>
+        <input type="button" value="肘子肉1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2130_SugarFree_PorkMeat" gsid="2130"/>
+        <input type="button" value="肘子肉2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2133_SugarFree_PorkMeat_Max" gsid="2133"/>
+        <input type="button" value="青钢盾1" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2129_FinedayPig_Shield" gsid="2129"/>
+        <input type="button" value="青钢盾2" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" tooltip="2132_FinedayPig_Shield_Max" gsid="2132"/>
+        <br/>                            
+        <input type="button" value="左手2117" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="2117"/>
+        <br/>
+        <input type="button" value="烈火S4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2119_TheStrongest_FireLevel55" gsid="2119"/>
+        <input type="button" value="寒冰S4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2120_TheStrongest_IceLevel55" gsid="2120"/>
+        <input type="button" value="风暴S4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2121_TheStrongest_StormLevel55" gsid="2121"/>
+        <input type="button" value="生命S4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2122_TheStrongest_LifeLevel55" gsid="2122"/>
+        <input type="button" value="死亡S4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2123_TheStrongest_DeathLevel55" gsid="2123"/>
+        <br/>
+        <input type="button" value="强S2冰1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1860"/>
+        <input type="button" value="强S2火2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1861"/>
+        <input type="button" value="强S2风3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1862"/>
+        <input type="button" value="强S2生4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1863"/>
+        <input type="button" value="强S2死5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1864"/>
+        <input type="button" value="强化魔晶" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1865"/>
+        <br/>
+        <input type="button" value="S2冰1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1823"/>
+        <input type="button" value="S2火2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1831"/>
+        <input type="button" value="S2风3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1841"/>
+        <input type="button" value="S2生4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1849"/>
+        <input type="button" value="S2死5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1858"/>
+        <br/>
+        <input type="button" value="1943" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1943"/>
+        <input type="button" value="1953" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1953"/>
+        <input type="button" value="1963" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1963"/>
+        <input type="button" value="1973" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1973"/>
+        <input type="button" value="1983" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1983"/>
+        <br/>
+
+        <input type="button" value="火初学" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1807"/>
+        <input type="button" value="冰初学" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1808"/>
+        <input type="button" value="风初学" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1809"/>
+        <input type="button" value="生初学" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1810"/>
+        <input type="button" value="死初学" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1811"/>
+
+        <input type="button" value="魔晶法杖左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1788"/>
+        <input type="button" value="魔晶法杖右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1788"/>
+
+        <input type="button" value="喇叭花左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21005"/>
+        <input type="button" value="喇叭花右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21005"/>
+                
+        <input type="button" value="棒棒糖左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1022"/>
+        <input type="button" value="棒棒糖右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1022"/>
+                
+        <input type="button" value="红色浆果左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21001"/>
+        <input type="button" value="红色浆果右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21001"/>
+        <br/>
+        <input type="button" value="黄色浆果左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21002"/>
+        <input type="button" value="黄色浆果右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21002"/>
+                
+        <input type="button" value="蓝色浆果左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21003"/>
+        <input type="button" value="蓝色浆果右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21003"/>
+                
+        <input type="button" value="绿色浆果左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21004"/>
+        <input type="button" value="绿色浆果右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21004"/>
+        <br/>
+        <input type="button" value="急救箱左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="21006"/>
+        <input type="button" value="急救箱右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="21006"/>
+                
+        <input type="button" value="探测器左手" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1147"/>
+        <input type="button" value="探测器右手" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1147"/>
+                
+        <input type="button" value="元宵火把左" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1156"/>
+        <input type="button" value="元宵火把右" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1156"/>
+        <br/>
+        <input type="button" value="古奇凿子左" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1157"/>
+        <input type="button" value="古奇凿子右" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1157"/>
+                
+        <input type="button" value="蓝色风车左" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1187"/>
+        <input type="button" value="蓝色风车右" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1187"/>
+                
+        <input type="button" value="粉色风车左" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1188"/>
+        <input type="button" value="粉色风车右" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1188"/>
+        <br/>
+        <input type="button" value="橙色风车左" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1189"/>
+        <input type="button" value="橙色风车右" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1189"/>
+        <br/>
+        <input type="button" value="S1火1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1747"/>
+        <input type="button" value="S1冰2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1748"/>
+        <input type="button" value="S1风3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1749"/>
+        <input type="button" value="S1死4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1750"/>
+        <input type="button" value="S1生5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1751"/>
+        <br/>
+        <input type="button" value="40火商1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1684"/>
+        <input type="button" value="40冰商2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1685"/>
+        <input type="button" value="40风商3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1686"/>
+        <input type="button" value="40死商4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1687"/>
+        <input type="button" value="40生商5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1688"/>
+        <br/>
+        <input type="button" value="1月28商1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1645"/>
+        <input type="button" value="1月28商2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1646"/>
+        <input type="button" value="1月28商3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1647"/>
+        <input type="button" value="1月28商4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1648"/>
+        <input type="button" value="1月28商5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1649"/>
+        <input type="button" value="玫瑰杖" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1650"/>
+        <br/>
+        <input type="button" value="23日1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1465"/>
+        <input type="button" value="23日2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1466"/>
+        <input type="button" value="23日3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1467"/>
+        <input type="button" value="23日4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1468"/>
+        <input type="button" value="23日5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1469"/>
+        <br/>
+        <input type="button" value="1月13商1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1512"/>
+        <input type="button" value="1月13商2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1513"/>
+        <input type="button" value="1月13商3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1514"/>
+        <input type="button" value="1月13商4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1515"/>
+        <input type="button" value="1月13商5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1516"/>
+        <br/>
+        <input type="button" value="1月20杖1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1607"/>
+        <input type="button" value="1月20杖2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1608"/>
+        <input type="button" value="1月20杖3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1609"/>
+        <input type="button" value="1月20杖4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1610"/>
+        <input type="button" value="1月20杖5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1611"/>
+        <br/>
+        <input type="button" value="1月13普1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1517"/>
+        <input type="button" value="1月13普2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1518"/>
+        <input type="button" value="1月13普3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1519"/>
+        <input type="button" value="1月13普4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1520"/>
+        <input type="button" value="1月13普5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1521"/>
+        <br/>
+        <input type="button" value="手持1" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1266"/>
+        <input type="button" value="手持2" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1267"/>
+        <input type="button" value="手持3" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1268"/>
+        <input type="button" value="手持4" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1269"/>
+        <input type="button" value="手持5" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1270"/>
+        <input type="button" value="手持6" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1271"/>
+        <br/>
+        <input type="button" value="手持7" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1272"/>
+        <input type="button" value="手持8" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1273"/>
+        <input type="button" value="手持9" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1274"/>
+        <input type="button" value="手持10" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1275"/>
+        <input type="button" value="手持11" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1276"/>
+        <br/>
+        <input type="button" value="手持1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1266"/>
+        <input type="button" value="手持2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1267"/>
+        <input type="button" value="手持3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1268"/>
+        <input type="button" value="手持4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1269"/>
+        <input type="button" value="手持5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1270"/>
+        <input type="button" value="手持6" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1271"/>
+        <br/>
+        <input type="button" value="手持7" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1272"/>
+        <input type="button" value="手持8" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1273"/>
+        <input type="button" value="手持9" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1274"/>
+        <input type="button" value="手持10" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1275"/>
+        <input type="button" value="手持11" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1276"/>
+        <br/>
+        <input type="button" value="商手持1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1445"/>
+        <input type="button" value="商手持2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1446"/>
+        <input type="button" value="商手持3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1447"/>
+        <input type="button" value="商手持4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1448"/>
+        <input type="button" value="商手持5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1449"/>
+        <br/>
+        <input type="button" value="VIP1" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1290"/>
+        <input type="button" value="VIP2" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1291"/>
+        <input type="button" value="VIP3" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1292"/>
+        <input type="button" value="VIP4" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1293"/>
+        <input type="button" value="VIP5" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1294"/>
+        <input type="button" value="VIP6" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1295"/>
+        <br/>
+        <input type="button" value="VIP7" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1296"/>
+        <input type="button" value="VIP8" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1297"/>
+        <input type="button" value="VIP9" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1298"/>
+        <input type="button" value="VIP10" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1299"/>
+        <input type="button" value="VIP11" style="width:48px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="1300"/>
+        <br/>
+        <input type="button" value="VIP1" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1290"/>
+        <input type="button" value="VIP2" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1291"/>
+        <input type="button" value="VIP3" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1292"/>
+        <input type="button" value="VIP4" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1293"/>
+        <input type="button" value="VIP5" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1294"/>
+        <input type="button" value="VIP6" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1295"/>
+        <br/>
+        <input type="button" value="VIP7" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1296"/>
+        <input type="button" value="VIP8" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1297"/>
+        <input type="button" value="VIP9" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1298"/>
+        <input type="button" value="VIP10" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1299"/>
+        <input type="button" value="VIP11" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1300"/>
+        <br/>
+                    </form>
+                </div>
+            </form>
+            </Columns>
+        </pe:gridview>
+    </pe:tab-item>
+    <pe:tab-item name="NewCharacterAndPet" text="衣帽背包" style="padding:4px">
+        <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSItems" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+            <Columns>
+            <form>
+               <br/>
+                <input type="button" value="男火S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2234_FireHatS4_Boy" gsid="2234" slot="0"/>
+                <input type="button" value="男冰S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2241_IceHatS4_Boy" gsid="2241" slot="0"/>
+                <input type="button" value="男风S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2248_StormHatS4_Boy" gsid="2248" slot="0"/>
+                <input type="button" value="男生S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2255_LifeHatS4_Boy" gsid="2255" slot="0"/>
+                <input type="button" value="男死S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2262_DeathHatS4_Boy" gsid="2262" slot="0"/>  
+                          <br/>
+                <input type="button" value="女火S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2269_FireHatS4_Girl" gsid="2269" slot="0"/>
+                <input type="button" value="女冰S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2276_IceHatS4_Girl" gsid="2276" slot="0"/>
+                <input type="button" value="女风S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2283_StormHatS4_Girl" gsid="2283" slot="0"/>
+                <input type="button" value="女生S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2290_LifeHatS4_Girl" gsid="2290" slot="0"/>
+                <input type="button" value="女死S4帽" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2297_DeathHatS4_Girl" gsid="2297" slot="0"/>  
+			               <br/>
+                <input type="button" value="烈火S4衣" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2236_FireShirtS4" gsid="2236" slot="16"/>
+                <input type="button" value="寒冰S4衣" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2243_IceShirtS4" gsid="2243" slot="16"/>
+                <input type="button" value="风暴S4衣" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2250_StormShirtS4" gsid="2250" slot="16"/>
+                <input type="button" value="生命S4衣" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2257_LifeShirtS4" gsid="2257" slot="16"/>
+                <input type="button" value="死亡S4衣" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2264_DeathShirtS4" gsid="2264" slot="16"/>  	
+			               <br/>
+                <input type="button" value="烈火S4鞋" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2237_FireBootS4" gsid="2237" slot="19"/>
+                <input type="button" value="寒冰S4鞋" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2244_IceBootS4" gsid="2244" slot="19"/>
+                <input type="button" value="风暴S4鞋" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2251_StormBootS4" gsid="2251" slot="19"/>
+                <input type="button" value="生命S4鞋" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2258_LifeBootS4" gsid="2258" slot="19"/>
+                <input type="button" value="死亡S4鞋" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2265_DeathBootS4" gsid="2265" slot="19"/>  
+			               <br/>
+                <input type="button" value="烈火S4背" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2235_FireBackS4" gsid="2235" slot="26"/>
+                <input type="button" value="寒冰S4背" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2242_IceBackS4" gsid="2242" slot="26"/>
+                <input type="button" value="风暴S4背" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2249_StormBackS4" gsid="2249" slot="26"/>
+                <input type="button" value="生命S4背" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2256_LifeBackS4" gsid="2256" slot="26"/>
+                <input type="button" value="死亡S4背" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2263_DeathBackS4" gsid="2263" slot="26"/>  
+                <br/>
+                <input type="button" value="萌卷灰女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2180_Errantry_GrayHead_Girl01" gsid="2180" slot="0"/>
+                <input type="button" value="萌卷灰男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2177_Errantry_GrayHead_Boy01" gsid="2177" slot="0"/>
+                <input type="button" value="萌卷绿女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2181_Errantry_GreenHead_Girl02" gsid="2181" slot="0"/>
+                <input type="button" value="萌卷绿男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2178_Errantry_GreenHead_Boy02" gsid="2178" slot="0"/>
+                <input type="button" value="萌卷紫女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2182_Errantry_RedHead_Girl03" gsid="2182" slot="0"/>
+                <input type="button" value="萌卷紫男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2179_Errantry_RedHead_Boy03" gsid="2179" slot="0"/>
+                <br/>
+                <input type="button" value="菠菜红女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2175_Spinage_RedHead_Girl02" gsid="2175" slot="0"/>
+                <input type="button" value="菠菜红男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2172_Spinage_RedHead_Boy02" gsid="2172" slot="0"/>
+                <input type="button" value="菠菜棕女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2174_Spinage_BrownHead_Girl01" gsid="2174" slot="0"/>
+                <input type="button" value="菠菜棕男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2171_Spinage_BrownHead_Boy01" gsid="2171" slot="0"/>
+                <input type="button" value="菠菜绿女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2176_Spinage_GreenHead_Girl03" gsid="2176" slot="0"/>
+                <input type="button" value="菠菜绿男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2173_Spinage_GreenHead_Boy03" gsid="2173" slot="0"/>
+                <br/>
+                <input type="button" value="布丁红女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2169_Ragnarok_RedHead_Girl02" gsid="2169" slot="0"/>
+                <input type="button" value="布丁红男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2166_Ragnarok_RedHead_Boy02" gsid="2166" slot="0"/>
+                <input type="button" value="布丁绿女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2170_Ragnarok_GreenHead_Girl03" gsid="2170" slot="0"/>
+                <input type="button" value="布丁绿男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2167_Ragnarok_GreenHead_Boy03" gsid="2167" slot="0"/>
+                <input type="button" value="布丁白女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2168_Ragnarok_GrayHead_Girl01" gsid="2168" slot="0"/>
+                <input type="button" value="布丁白男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2165_Ragnarok_GrayHead_Boy01" gsid="2165" slot="0"/>
+                <br/>
+                <input type="button" value="精灵红女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2135_Elf_BrownHead_Girl01" gsid="2135" slot="0"/>
+                <input type="button" value="精灵红男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2140_Elf_BrownHead_Boy01" gsid="2140" slot="0"/>
+                <input type="button" value="精灵黑女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2145_Elf_BlackHead_Girl01" gsid="2145" slot="0"/>
+                <input type="button" value="精灵黑男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2150_Elf_BlackHead_Boy01" gsid="2150" slot="0"/>
+                <input type="button" value="精灵白女" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2155_Elf_WhiteHead_Girl01" gsid="2155" slot="0"/>
+                <input type="button" value="精灵白男" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" tooltip="2160_Elf_WhiteHead_Boy01" gsid="2160" slot="0"/>
+                <br/>
+                <input type="button" value="测试" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1023" slot="xxx"/>
+                <input type="button" value="红帽2115" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2115"/>
+                <input type="button" value="绿帽2116" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2116"/>
+                <br/>
+                <input type="button" value="万圣头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2112"/>
+                <input type="button" value="万圣衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2113"/>
+                <input type="button" value="万圣鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2114"/>
+                <br/>
+                <input type="button" value="男戒效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12886"/>
+                <input type="button" value="女戒效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12887"/>
+                <br/>
+                <input type="button" value="S3火头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2075"/>
+                <input type="button" value="S3火背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2076"/>
+                <input type="button" value="S3火衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2077"/>
+                <input type="button" value="S3火鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2078"/>
+                <br/>
+                <input type="button" value="S3冰头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2082"/>
+                <input type="button" value="S3冰背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2083"/>
+                <input type="button" value="S3冰衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2084"/>
+                <input type="button" value="S3冰鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2085"/>
+                <br/>
+                <input type="button" value="S3电头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2089"/>
+                <input type="button" value="S3电背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2090"/>
+                <input type="button" value="S3电衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2091"/>
+                <input type="button" value="S3电鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2092"/>
+                <br/>
+                <input type="button" value="S3生头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2096"/>
+                <input type="button" value="S3生背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2097"/>
+                <input type="button" value="S3生衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2098"/>
+                <input type="button" value="S3生鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2099"/>
+                <br/>
+                <input type="button" value="S3死头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2103"/>
+                <input type="button" value="S3死背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2104"/>
+                <input type="button" value="S3死衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2105"/>
+                <input type="button" value="S3死鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2106"/>
+                <br/>
+                <input type="button" value="女炫1头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2055"/>
+                <input type="button" value="女炫1衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2056"/>
+                <input type="button" value="女炫1鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2057"/>
+                <br/>
+                <input type="button" value="女炫2头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2058"/>
+                <input type="button" value="女炫2衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2059"/>
+                <input type="button" value="女炫2鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2060"/>
+                <br/>
+                <input type="button" value="女炫3头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2061"/>
+                <input type="button" value="女炫3衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2062"/>
+                <input type="button" value="女炫3鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2063"/>
+                <br/>
+                <input type="button" value="男炫1头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2064"/>
+                <input type="button" value="男炫1衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2065"/>
+                <input type="button" value="男炫1鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2066"/>
+                <br/>
+                <input type="button" value="男炫2头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2067"/>
+                <input type="button" value="男炫2衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2068"/>
+                <input type="button" value="男炫2鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2069"/>
+                <br/>
+                <input type="button" value="男炫3头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2070"/>
+                <input type="button" value="男炫3衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2071"/>
+                <input type="button" value="男炫3鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="2072"/>
+                <br/>
+                <input type="button" value="强化火1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12811"/>
+                <input type="button" value="强化冰1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12812"/>
+                <input type="button" value="强化电1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12813"/>
+                <input type="button" value="强化生1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12814"/>
+                <input type="button" value="强化死1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12815"/>
+                <br/>
+                <input type="button" value="强化火2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12816"/>
+                <input type="button" value="强化冰2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12817"/>
+                <input type="button" value="强化电2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12818"/>
+                <input type="button" value="强化生2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12819"/>
+                <input type="button" value="强化死2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12820"/>
+                <br/>
+                <input type="button" value="强化火3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12821"/>
+                <input type="button" value="强化冰3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12822"/>
+                <input type="button" value="强化电3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12823"/>
+                <input type="button" value="强化生3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12824"/>
+                <input type="button" value="强化死3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12825"/>
+                <br/>
+                <input type="button" value="强化火4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12826"/>
+                <input type="button" value="强化冰4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12827"/>
+                <input type="button" value="强化电4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12828"/>
+                <input type="button" value="强化生4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12829"/>
+                <input type="button" value="强化死4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12830"/>
+                <br/>
+                <input type="button" value="强化火5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12831"/>
+                <input type="button" value="强化冰5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12832"/>
+                <input type="button" value="强化电5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12833"/>
+                <input type="button" value="强化生5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12834"/>
+                <input type="button" value="强化死5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12835"/>
+                <br/>
+                <input type="button" value="圣诞背包" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1859"/>
+                <br/>
+
+                <input type="button" value="S2冰帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1822"/>
+                <input type="button" value="S2火帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1833"/>
+                <input type="button" value="S2风帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1840"/>
+                <input type="button" value="S2生帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1848"/>
+                <input type="button" value="S2死帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1856"/>
+                <br/>
+                <input type="button" value="S2冰衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1819"/>
+                <input type="button" value="S2火衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1827"/>
+                <input type="button" value="S2风衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1837"/>
+                <input type="button" value="S2生衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1847"/>
+                <input type="button" value="S2死衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1855"/>
+                <br/>
+                <input type="button" value="S2冰鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1821"/>
+                <input type="button" value="S2火鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1834"/>
+                <input type="button" value="S2风鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1835"/>
+                <input type="button" value="S2生鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1843"/>
+                <input type="button" value="S2死鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1853"/>
+                <br/>
+                <input type="button" value="S2冰背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1820"/>
+                <input type="button" value="S2火背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1832"/>
+                <input type="button" value="S2风背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1839"/>
+                <input type="button" value="S2生背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1844"/>
+                <input type="button" value="S2死背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1851"/>
+                <br/>
+
+
+                <input type="button" value="大天使之翼" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1812"/>
+                <br/>
+                <input type="button" value="1789清凉帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1789"/>
+                <input type="button" value="1790清凉衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1790"/>
+                <input type="button" value="1791清凉鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1791"/>
+                <input type="button" value="酷夏背包" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1795"/>
+                <br/>
+                <input type="button" value="1792迷你帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1792"/>
+                <input type="button" value="1793迷你裙" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1793"/>
+                <input type="button" value="1794迷你鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1794"/>
+                <input type="button" value="泳圈" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1796"/>
+                <br/>
+                <input type="button" value="蝴蝶效果" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12851"/>
+                <input type="button" value="蝴蝶效果无" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12881"/>
+                <input type="button" value="1771王冠" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1771"/>
+                <input type="button" value="1772王冠" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1772"/>
+                <br/>
+                <input type="button" value="S1火衣效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11721"/>
+                <input type="button" value="S1冰衣效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11722"/>
+                <input type="button" value="S1风衣效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11723"/>
+                <input type="button" value="S1死衣效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11724"/>
+                <input type="button" value="S1生衣效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11725"/>
+                <br/>
+                <input type="button" value="1726效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11726"/>
+                <input type="button" value="1727效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11727"/>
+                <input type="button" value="1903效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11728"/>
+                <input type="button" value="1904效" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11729"/>
+                <input type="button" value="效果无" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12881"/>
+                <br/>
+                <input type="button" value="S1火帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1714"/>
+                <input type="button" value="S1冰帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1715"/>
+                <input type="button" value="S1风帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1716"/>
+                <input type="button" value="S1死帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1717"/>
+                <input type="button" value="S1生帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1718"/>
+                <br/>
+                <input type="button" value="S1死帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1719"/>
+                <input type="button" value="S1生帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1720"/>
+                <br/>
+                <input type="button" value="S1火衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1721"/>
+                <input type="button" value="S1冰衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1722"/>
+                <input type="button" value="S1风衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1723"/>
+                <input type="button" value="S1死衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1724"/>
+                <input type="button" value="S1生衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1725"/>
+                <br/>
+                <input type="button" value="S1死衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1726"/>
+                <input type="button" value="S1生衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1727"/>
+                <br/>
+                <input type="button" value="S1火鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1728"/>
+                <input type="button" value="S1冰鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1729"/>
+                <input type="button" value="S1风鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1730"/>
+                <input type="button" value="S1死鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1731"/>
+                <input type="button" value="S1生鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1732"/>
+                <br/>
+                <input type="button" value="S1死鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1733"/>
+                <input type="button" value="S1生鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1734"/>
+                <br/>
+                <input type="button" value="S1火背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1735"/>
+                <input type="button" value="S1冰背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1736"/>
+                <input type="button" value="S1风背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1737"/>
+                <input type="button" value="S1死背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1738"/>
+                <input type="button" value="S1生背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1739"/>
+                <br/>
+
+
+                <input type="button" value="女春头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1706"/>
+                <input type="button" value="女春衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1708"/>
+                <input type="button" value="女春鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1710"/>
+                <br/>
+                <input type="button" value="男春头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1705"/>
+                <input type="button" value="男春衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1707"/>
+                <input type="button" value="男春鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1709"/>
+                <br/>
+                <input type="button" value="男春背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1711"/>
+                <input type="button" value="女春背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1712"/>
+                <input type="button" value="暗黑之翼" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1713"/>
+                <br/>
+                <input type="button" value="女婚头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1689"/>
+                <input type="button" value="女婚衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1690"/>
+                <input type="button" value="女婚鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1691"/>
+                <br/>
+                <input type="button" value="男婚头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1692"/>
+                <input type="button" value="男婚衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1693"/>
+                <input type="button" value="男婚鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1694"/>
+                <br/>
+                <input type="button" value="商32火帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1659"/>
+                <input type="button" value="商32冰帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1660"/>
+                <input type="button" value="商32风帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1661"/>
+                <input type="button" value="商32死帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1662"/>
+                <input type="button" value="商32生帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1663"/>
+                <br/>
+                <input type="button" value="商32火衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1664"/>
+                <input type="button" value="商32冰衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1665"/>
+                <input type="button" value="商32风衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1666"/>
+                <input type="button" value="商32死衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1667"/>
+                <input type="button" value="商32生衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1668"/>
+                <br/>
+                <input type="button" value="商32火鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1669"/>
+                <input type="button" value="商32冰鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1670"/>
+                <input type="button" value="商32风鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1671"/>
+                <input type="button" value="商32死鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1672"/>
+                <input type="button" value="商32生鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1673"/>
+                <br/>
+                <input type="button" value="商32火背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1674"/>
+                <input type="button" value="商32冰背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1675"/>
+                <input type="button" value="商32风背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1676"/>
+                <input type="button" value="商32死背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1677"/>
+                <input type="button" value="商32生背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1678"/>
+                <br/>
+                <input type="button" value="学生男头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1651"/>
+                <input type="button" value="学生男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1653"/>
+                <input type="button" value="学生男鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1658"/>
+                <input type="button" value="学生男背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1656"/>
+                <br/>
+                <input type="button" value="学生女头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1652"/>
+                <input type="button" value="学生女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1654"/>
+                <input type="button" value="学生女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1655"/>
+                <input type="button" value="学生女背" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1657"/>
+                <br/>
+                <input type="button" value="1月28火帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1612"/>
+                <input type="button" value="1月28冰帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1613"/>
+                <input type="button" value="1月28风帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1614"/>
+                <input type="button" value="1月28死帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1615"/>
+                <input type="button" value="1月28生帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1616"/>
+                <br/>
+                <input type="button" value="新年女帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1617"/>
+                <input type="button" value="新年兔帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1618"/>
+                <input type="button" value="新年兔帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1619"/>
+                <input type="button" value="玫瑰礼帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1620"/>
+                <br/>
+                <input type="button" value="1月28火衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1621"/>
+                <input type="button" value="1月28冰衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1622"/>
+                <input type="button" value="1月28风衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1623"/>
+                <input type="button" value="1月28死衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1624"/>
+                <input type="button" value="1月28生衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1625"/>
+                <br/>
+                <input type="button" value="新年女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1626"/>
+                <input type="button" value="新年兔衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1627"/>
+                <input type="button" value="新年兔衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1628"/>
+                <br/>
+                <input type="button" value="1月28火鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1629"/>
+                <input type="button" value="1月28冰鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1630"/>
+                <input type="button" value="1月28风鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1631"/>
+                <input type="button" value="1月28死鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1632"/>
+                <input type="button" value="1月28生鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1633"/>
+                <br/>
+                <input type="button" value="新年女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1634"/>
+                <br/>
+                <input type="button" value="1月28火背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1635"/>
+                <input type="button" value="1月28冰背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1636"/>
+                <input type="button" value="1月28风背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1637"/>
+                <input type="button" value="1月28死背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1638"/>
+                <input type="button" value="1月28生背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1639"/>
+                <br/>
+                <input type="button" value="1月20火帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1522"/>
+                <input type="button" value="1月20冰帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1523"/>
+                <input type="button" value="1月20风帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1524"/>
+                <input type="button" value="1月20死帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1525"/>
+                <input type="button" value="1月20生帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1526"/>
+                <br/>
+                <input type="button" value="1月20火帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1527"/>
+                <input type="button" value="1月20冰帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1528"/>
+                <input type="button" value="1月20风帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1529"/>
+                <input type="button" value="1月20死帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1530"/>
+                <input type="button" value="1月20生帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1531"/>
+                <br/>
+                <input type="button" value="1月20通帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1532"/>
+                <input type="button" value="1月20通帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1533"/>
+                <br/>
+                <input type="button" value="1月20火帽兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1534"/>
+                <input type="button" value="1月20冰帽兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1535"/>
+                <input type="button" value="1月20风帽兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1536"/>
+                <input type="button" value="1月20死帽兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1537"/>
+                <input type="button" value="1月20生帽兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1538"/>
+                <br/>
+                <input type="button" value="1月20火衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1539"/>
+                <input type="button" value="1月20冰衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1540"/>
+                <input type="button" value="1月20风衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1541"/>
+                <input type="button" value="1月20死衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1542"/>
+                <input type="button" value="1月20生衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1543"/>
+                <br/>
+                <input type="button" value="1月20火衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1544"/>
+                <input type="button" value="1月20冰衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1545"/>
+                <input type="button" value="1月20风衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1546"/>
+                <input type="button" value="1月20死衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1547"/>
+                <input type="button" value="1月20生衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1548"/>
+                <br/>
+                <input type="button" value="1月20通衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1549"/>
+                <input type="button" value="1月20通衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1550"/>
+                <br/>
+                <input type="button" value="1月20火衣兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1551"/>
+                <input type="button" value="1月20冰衣兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1552"/>
+                <input type="button" value="1月20风衣兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1553"/>
+                <input type="button" value="1月20死衣兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1554"/>
+                <input type="button" value="1月20生衣兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1555"/>
+                <br/>
+                <input type="button" value="1月20火鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1556"/>
+                <input type="button" value="1月20冰鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1557"/>
+                <input type="button" value="1月20风鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1558"/>
+                <input type="button" value="1月20死鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1559"/>
+                <input type="button" value="1月20生鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1560"/>
+                <br/>
+                <input type="button" value="1月20火鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1561"/>
+                <input type="button" value="1月20冰鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1562"/>
+                <input type="button" value="1月20风鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1563"/>
+                <input type="button" value="1月20死鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1564"/>
+                <input type="button" value="1月20生鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1565"/>
+                <br/>
+                <input type="button" value="1月20通鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1566"/>
+                <input type="button" value="1月20通鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1567"/>
+                <br/>
+                <input type="button" value="1月20火鞋兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1568"/>
+                <input type="button" value="1月20冰鞋兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1569"/>
+                <input type="button" value="1月20风鞋兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1570"/>
+                <input type="button" value="1月20死鞋兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1571"/>
+                <input type="button" value="1月20生鞋兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1572"/>
+                <br/>
+                <input type="button" value="1月20火背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1573"/>
+                <input type="button" value="1月20冰背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1574"/>
+                <input type="button" value="1月20风背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1575"/>
+                <input type="button" value="1月20死背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1576"/>
+                <input type="button" value="1月20生背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1577"/>
+                <br/>
+                <input type="button" value="1月20火背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1578"/>
+                <input type="button" value="1月20冰背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1579"/>
+                <input type="button" value="1月20风背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1580"/>
+                <input type="button" value="1月20死背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1581"/>
+                <input type="button" value="1月20生背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1582"/>
+                <br/>
+                <input type="button" value="1月20通背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1583"/>
+                <input type="button" value="1月20通背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1584"/>
+                <br/>
+                <input type="button" value="1月20火背兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1585"/>
+                <input type="button" value="1月20冰背兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1586"/>
+                <input type="button" value="1月20风背兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1587"/>
+                <input type="button" value="1月20死背兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1588"/>
+                <input type="button" value="1月20生背兑" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1589"/>
+                <br/>
+                <input type="button" value="1月13帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1487"/>
+                <input type="button" value="1月13帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1488"/>
+                <input type="button" value="1月13帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1489"/>
+                <input type="button" value="1月13帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1490"/>
+                <input type="button" value="1月13帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1491"/>
+                <br/>
+                <input type="button" value="1月13衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1492"/>
+                <input type="button" value="1月13衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1493"/>
+                <input type="button" value="1月13衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1494"/>
+                <input type="button" value="1月13衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1495"/>
+                <input type="button" value="1月13衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1496"/>
+                <br/>
+                <input type="button" value="1月13鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1497"/>
+                <input type="button" value="1月13鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1498"/>
+                <input type="button" value="1月13鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1499"/>
+                <input type="button" value="1月13鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1500"/>
+                <input type="button" value="1月13鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1501"/>
+                <br/>
+                <input type="button" value="1月13翅1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1502"/>
+                <input type="button" value="1月13翅2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1503"/>
+                <input type="button" value="1月13翅3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1504"/>
+                <input type="button" value="1月13翅4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1505"/>
+                <input type="button" value="1月13翅5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1506"/>
+                <br/>
+                <input type="button" value="闪灵帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1479"/>
+                <input type="button" value="闪灵衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1480"/>
+                <input type="button" value="闪灵鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1481"/>
+                <input type="button" value="闪灵翅" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1482"/>
+                <br/>
+                <input type="button" value="异域帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1483"/>
+                <input type="button" value="异域衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1484"/>
+                <input type="button" value="异域鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1485"/>
+                <input type="button" value="异域翅" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1486"/>
+                <br/>
+                <input type="button" value="男爵帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1473"/>
+                <input type="button" value="男爵衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1474"/>
+                <input type="button" value="男爵鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1475"/>
+                <br/>
+                <input type="button" value="公主帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1476"/>
+                <input type="button" value="公主衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1477"/>
+                <input type="button" value="公主鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1478"/>
+                <br/>
+                <input type="button" value="学徒帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1470"/>
+                <input type="button" value="学徒衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1471"/>
+                <input type="button" value="学徒鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1472"/>
+                <br/>
+                <input type="button" value="商通帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1450"/>
+                <input type="button" value="商通帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1451"/>
+                <input type="button" value="商通帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1452"/>
+                <br/>
+                <input type="button" value="商通衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1453"/>
+                <input type="button" value="商通衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1454"/>
+                <input type="button" value="商通衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1455"/>
+                <br/>
+                <input type="button" value="商通鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1456"/>
+                <input type="button" value="商通鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1457"/>
+                <input type="button" value="商通鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1458"/>
+                <br/>
+                <input type="button" value="商通背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1459"/>
+                <input type="button" value="商通背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1460"/>
+                <input type="button" value="商通背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1461"/>
+                <br/>
+                <input type="button" value="兑换火玉装" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1178"/>
+                <br/>
+                <input type="button" value="火套帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1370"/>
+                <input type="button" value="冰套帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1371"/>
+                <input type="button" value="风套帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1372"/>
+                <input type="button" value="死套帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1373"/>
+                <input type="button" value="生套帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1374"/>
+                <br/>
+                <input type="button" value="火套帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1375"/>
+                <input type="button" value="冰套帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1376"/>
+                <input type="button" value="风套帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1377"/>
+                <input type="button" value="死套帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1378"/>
+                <input type="button" value="生套帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1379"/>
+                <br/>
+                <input type="button" value="火套帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1380"/>
+                <input type="button" value="冰套帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1381"/>
+                <input type="button" value="风套帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1382"/>
+                <input type="button" value="死套帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1383"/>
+                <input type="button" value="生套帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1384"/>
+                <br/>
+                <input type="button" value="火套衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1385"/>
+                <input type="button" value="冰套衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1386"/>
+                <input type="button" value="风套衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1387"/>
+                <input type="button" value="死套衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1388"/>
+                <input type="button" value="生套衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1389"/>
+                <br/>
+                <input type="button" value="火套衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1390"/>
+                <input type="button" value="冰套衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1391"/>
+                <input type="button" value="风套衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1392"/>
+                <input type="button" value="死套衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1393"/>
+                <input type="button" value="生套衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1394"/>
+                <br/>
+                <input type="button" value="火套衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1395"/>
+                <input type="button" value="冰套衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1396"/>
+                <input type="button" value="风套衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1397"/>
+                <input type="button" value="死套衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1398"/>
+                <input type="button" value="生套衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1399"/>
+                <br/>
+                
+                <input type="button" value="火套鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1400"/>
+                <input type="button" value="冰套鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1401"/>
+                <input type="button" value="风套鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1402"/>
+                <input type="button" value="死套鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1403"/>
+                <input type="button" value="生套鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1404"/>
+                <br/>
+                <input type="button" value="火套鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1405"/>
+                <input type="button" value="冰套鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1406"/>
+                <input type="button" value="风套鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1407"/>
+                <input type="button" value="死套鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1408"/>
+                <input type="button" value="生套鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1409"/>
+                <br/>
+                <input type="button" value="火套鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1410"/>
+                <input type="button" value="冰套鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1411"/>
+                <input type="button" value="风套鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1412"/>
+                <input type="button" value="死套鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1413"/>
+                <input type="button" value="生套鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1414"/>
+                <br/>
+                
+                <input type="button" value="火套背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1415"/>
+                <input type="button" value="冰套背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1416"/>
+                <input type="button" value="风套背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1417"/>
+                <input type="button" value="死套背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1418"/>
+                <input type="button" value="生套背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1419"/>
+                <br/>
+                <input type="button" value="火套背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1420"/>
+                <input type="button" value="冰套背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1421"/>
+                <input type="button" value="风套背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1422"/>
+                <input type="button" value="死套背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1423"/>
+                <input type="button" value="生套背2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1424"/>
+                <br/>
+                <input type="button" value="火套背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1425"/>
+                <input type="button" value="冰套背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1426"/>
+                <input type="button" value="风套背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1427"/>
+                <input type="button" value="死套背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1428"/>
+                <input type="button" value="生套背3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1429"/>
+                <br/>
+
+                <input type="button" value="火帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1334"/>
+                <input type="button" value="冰帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1335"/>
+                <input type="button" value="风帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1336"/>
+                <input type="button" value="死帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1337"/>
+                <input type="button" value="生帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1338"/>
+                <br/>
+                <input type="button" value="火帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1339"/>
+                <input type="button" value="冰帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1340"/>
+                <input type="button" value="风帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1341"/>
+                <input type="button" value="死帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1342"/>
+                <input type="button" value="生帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1343"/>
+                <input type="button" value="通帽7" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1344"/>
+                <input type="button" value="通帽8" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1345"/>
+                <br/>
+                <input type="button" value="火衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1346"/>
+                <input type="button" value="冰衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1347"/>
+                <input type="button" value="风衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1348"/>
+                <input type="button" value="死衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1349"/>
+                <input type="button" value="生衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1350"/>
+                <br/>
+                <input type="button" value="火衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1351"/>
+                <input type="button" value="冰衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1352"/>
+                <input type="button" value="风衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1353"/>
+                <input type="button" value="死衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1354"/>
+                <input type="button" value="生衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1355"/>
+                <input type="button" value="通衣7" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1356"/>
+                <input type="button" value="通衣8" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1357"/>
+                <br/>
+                <input type="button" value="火鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1358"/>
+                <input type="button" value="冰鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1359"/>
+                <input type="button" value="风鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1360"/>
+                <input type="button" value="死鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1361"/>
+                <input type="button" value="生鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1362"/>
+                <br/>
+                <input type="button" value="火鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1363"/>
+                <input type="button" value="冰鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1364"/>
+                <input type="button" value="风鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1365"/>
+                <input type="button" value="死鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1366"/>
+                <input type="button" value="生鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1367"/>
+                <input type="button" value="通鞋7" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1368"/>
+                <input type="button" value="通鞋8" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1369"/>
+                <br/>
+
+                <input type="button" value="火帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1301"/>
+                <input type="button" value="冰帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1302"/>
+                <input type="button" value="风帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1303"/>
+                <input type="button" value="死帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1304"/>
+                <input type="button" value="生帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1305"/>
+                <br/>
+                <input type="button" value="火帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1306"/>
+                <input type="button" value="冰帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1307"/>
+                <input type="button" value="风帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1308"/>
+                <input type="button" value="死帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1309"/>
+                <input type="button" value="生帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1310"/>
+                <input type="button" value="通帽6" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1311"/>
+                <br/>
+                <input type="button" value="火衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1312"/>
+                <input type="button" value="冰衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1313"/>
+                <input type="button" value="风衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1314"/>
+                <input type="button" value="死衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1315"/>
+                <input type="button" value="生衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1316"/>
+                <br/>
+                <input type="button" value="火衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1317"/>
+                <input type="button" value="冰衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1318"/>
+                <input type="button" value="风衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1319"/>
+                <input type="button" value="死衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1320"/>
+                <input type="button" value="生衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1321"/>
+                <input type="button" value="通衣6" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1322"/>
+                <br/>
+                <input type="button" value="火鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1323"/>
+                <input type="button" value="冰鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1324"/>
+                <input type="button" value="风鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1325"/>
+                <input type="button" value="死鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1326"/>
+                <input type="button" value="生鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1327"/>
+                <br/>
+                <input type="button" value="火鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1328"/>
+                <input type="button" value="冰鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1329"/>
+                <input type="button" value="风鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1330"/>
+                <input type="button" value="死鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1331"/>
+                <input type="button" value="生鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1332"/>
+                <input type="button" value="通鞋6" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1333"/>
+                <br/>
+                <input type="button" value="普通帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1278"/>
+                <input type="button" value="普通衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1279"/>
+                <input type="button" value="普通鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1280"/>
+                <br/>
+                <input type="button" value="普通帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1281"/>
+                <input type="button" value="普通衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1282"/>
+                <input type="button" value="普通鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1283"/>
+                <br/>
+                <input type="button" value="VIP帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1284"/>
+                <input type="button" value="VIP衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1285"/>
+                <input type="button" value="VIP衣1效果" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12850"/>
+                <input type="button" value="VIP衣1效果无" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12881"/>
+                <input type="button" value="VIP鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1286"/>
+                <br/>
+                <input type="button" value="VIP帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1287"/>
+                <input type="button" value="VIP衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1288"/>
+                <input type="button" value="VIP衣2效果" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12880"/>
+                <input type="button" value="VIP衣2效果无" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="12881"/>
+                <input type="button" value="VIP鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1289"/>
+                <br/>
+            
+                <input type="button" value="火帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1231"/>
+                <input type="button" value="冰帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1232"/>
+                <input type="button" value="风帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1233"/>
+                <input type="button" value="死帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1234"/>
+                <input type="button" value="生帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1235"/>
+                <br/>
+                <input type="button" value="通帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1236"/>
+                <input type="button" value="通帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1237"/>
+                <input type="button" value="通帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1238"/>
+                <input type="button" value="通帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1239"/>
+                <input type="button" value="通帽5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1240"/>
+                <br/>
+                <input type="button" value="火衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1241"/>
+                <input type="button" value="冰衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1242"/>
+                <input type="button" value="风衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1243"/>
+                <input type="button" value="死衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1244"/>
+                <input type="button" value="生衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1245"/>
+                <br/>
+                <input type="button" value="通衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1246"/>
+                <input type="button" value="通衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1247"/>
+                <input type="button" value="通衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1248"/>
+                <input type="button" value="通衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1249"/>
+                <input type="button" value="通衣5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1250"/>
+                <br/>
+                <input type="button" value="火鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1251"/>
+                <input type="button" value="冰鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1252"/>
+                <input type="button" value="风鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1253"/>
+                <input type="button" value="死鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1254"/>
+                <input type="button" value="生鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1255"/>
+                <br/>
+                <input type="button" value="通鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1256"/>
+                <input type="button" value="通鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1257"/>
+                <input type="button" value="通鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1258"/>
+                <input type="button" value="通鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1259"/>
+                <input type="button" value="通鞋5" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1260"/>
+                <br/>
+                <input type="button" value="火背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1261"/>
+                <input type="button" value="冰背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1262"/>
+                <input type="button" value="风背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1263"/>
+                <input type="button" value="死背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1264"/>
+                <input type="button" value="生背1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1265"/>
+                <br/>
+
+                <input type="button" value="可乐装帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1216"/>
+                <input type="button" value="可乐装衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1217"/>
+                <input type="button" value="可乐装裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1218"/>
+                <input type="button" value="可乐装鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1219"/>
+                <br/>
+                <input type="button" value="报纸装帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1220"/>
+                <input type="button" value="报纸装衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1221"/>
+                <input type="button" value="报纸装裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1222"/>
+                <input type="button" value="报纸装鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1223"/>
+                <br/>
+                <input type="button" value="塑料装帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1224"/>
+                <input type="button" value="塑料套装" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1225"/>
+                <br/>
+                <input type="button" value="女仆装帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1226"/>
+                <input type="button" value="女仆装衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1227"/>
+                <input type="button" value="女仆装鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1229"/>
+                <input type="button" value="女仆装手" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1230"/>
+                <br/>
+                <input type="button" value="银色铠甲" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1190"/>
+                <br/>
+                <input type="button" value="糖果装帽1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1191"/>
+                <input type="button" value="糖果装衣1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1192"/>
+                <input type="button" value="糖果装裤1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1193"/>
+                <input type="button" value="糖果装腕1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1194"/>
+                <input type="button" value="糖果装鞋1" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1195"/>
+                <br/>
+                <input type="button" value="糖果装帽2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1196"/>
+                <input type="button" value="糖果装衣2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1197"/>
+                <input type="button" value="糖果装裤2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1198"/>
+                <input type="button" value="糖果装腕2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1199"/>
+                <input type="button" value="糖果装鞋2" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1200"/>
+                <br/>
+                <input type="button" value="糖果装帽3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1201"/>
+                <input type="button" value="糖果装衣3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1202"/>
+                <input type="button" value="糖果装裤3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1203"/>
+                <input type="button" value="糖果装腕3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1204"/>
+                <input type="button" value="糖果装鞋3" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1205"/>
+                <br/>
+                <input type="button" value="糖果装帽4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1206"/>
+                <input type="button" value="糖果装衣4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1207"/>
+                <input type="button" value="糖果装裤4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1208"/>
+                <input type="button" value="糖果装腕4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1209"/>
+                <input type="button" value="糖果装鞋4" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1210"/>
+                <br/>
+                <input type="button" value="夏日红帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1211"/>
+                <input type="button" value="夏日红衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1212"/>
+                <input type="button" value="夏日红裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1213"/>
+                <input type="button" value="夏日红腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1214"/>
+                <input type="button" value="夏日红鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1215"/>
+                <br/>
+                <input type="button" value="棒糖女上" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1158"/>
+                <input type="button" value="棒糖女下" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1159"/>
+                <input type="button" value="棒糖女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1160"/>
+                <br/>
+                <input type="button" value="清爽女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1161"/>
+                <input type="button" value="清爽女裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1162"/>
+                <input type="button" value="清爽女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1163"/>
+                <input type="button" value="清爽手腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1186"/>
+                <br/>
+                <input type="button" value="淑女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1164"/>
+                <input type="button" value="淑女裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1165"/>
+                <input type="button" value="淑女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1166"/>
+                <br/>
+                <input type="button" value="功夫黑衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1167"/>
+                <input type="button" value="功夫黑裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1168"/>
+                <input type="button" value="功夫黑鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1169"/>
+                <br/>
+                <input type="button" value="功夫黄衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1170"/>
+                <input type="button" value="功夫黄裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1171"/>
+                <input type="button" value="功夫黄鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1172"/>
+                <br/>
+                <input type="button" value="西瓜女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1173"/>
+                <input type="button" value="西瓜女裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1174"/>
+                <input type="button" value="西瓜女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1175"/>
+                <br/>
+                <input type="button" value="西瓜男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1176"/>
+                <input type="button" value="西瓜男裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1177"/>
+                <input type="button" value="西瓜男鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1178"/>
+                <input type="button" value="西瓜帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1185"/>
+                <br/>
+                <input type="button" value="棒糖男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1179"/>
+                <input type="button" value="棒糖男裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1180"/>
+                <input type="button" value="棒糖男鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1181"/>
+                <br/>
+                <input type="button" value="清爽男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1182"/>
+                <input type="button" value="清爽男裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1183"/>
+                <input type="button" value="清爽男鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1184"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="元宵女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1151"/>
+                <input type="button" value="元宵女裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1152"/>
+                <input type="button" value="元宵女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1153"/>
+                <br/>
+                <input type="button" value="元宵男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1154"/>
+                <input type="button" value="元宵男裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1155"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="锅盖帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1136"/>
+                <input type="button" value="新年金帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1137"/>
+                <input type="button" value="装扮眼镜" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1150"/>
+                <br/>
+                <input type="button" value="新年女衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1138"/>
+                <input type="button" value="新年女裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1139"/>
+                <input type="button" value="新年女鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1140"/>
+                <input type="button" value="新年女手" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1148"/>
+                <br/>
+                <input type="button" value="新年男衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1141"/>
+                <input type="button" value="新年男裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1142"/>
+                <input type="button" value="新年男鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1143"/>
+                <input type="button" value="新年男手" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1149"/>
+                <br/>
+                <input type="button" value="新年拜年衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1144"/>
+                <input type="button" value="新年拜年裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1145"/>
+                <input type="button" value="新年拜年鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1146"/>
+                <br/>
+                <input type="button" value="白射手衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1107"/>
+                <input type="button" value="白射手裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1108"/>
+                <input type="button" value="白射手鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1109"/>
+                <input type="button" value="白射手腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1110"/>
+                <br/>
+                <input type="button" value="黑射手衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1111"/>
+                <input type="button" value="黑射手裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1112"/>
+                <input type="button" value="黑射手鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1113"/>
+                <input type="button" value="黑射手腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1114"/>
+                <br/>
+                <input type="button" value="丹瑟衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1115"/>
+                <input type="button" value="丹瑟裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1116"/>
+                <input type="button" value="丹瑟鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1117"/>
+                <input type="button" value="丹瑟腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1118"/>
+                <br/>
+                <input type="button" value="D达人衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1119"/>
+                <input type="button" value="D达人裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1120"/>
+                <input type="button" value="D达人鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1121"/>
+                <input type="button" value="D达人面具" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1135"/>
+                <br/>
+                <input type="button" value="B达人衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1123"/>
+                <input type="button" value="B达人裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1124"/>
+                <input type="button" value="B达人鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1125"/>
+                <br/>
+                <input type="button" value="F达人衣" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1127"/>
+                <input type="button" value="F达人裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1128"/>
+                <input type="button" value="F达人鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1129"/>
+                <br/>
+                <input type="button" value="海盗鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1131"/>
+                <input type="button" value="猫头拖鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1132"/>
+                <input type="button" value="老大拖鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1133"/>
+                <input type="button" value="紫红鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1134"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="森林上装" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1001"/>
+                <input type="button" value="森林下装" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1002"/>
+                <input type="button" value="森林手腕" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1003"/>
+                <input type="button" value="森林鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1004"/>
+                <br/>
+                <input type="button" value="白色红条短T恤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1005"/>
+                <input type="button" value="迷彩小短裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1006"/>
+                <input type="button" value="红色帆布鞋" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1007"/>
+                <br/>
+                <input type="button" value="警察服" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1008"/>
+                <input type="button" value="警察裤" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1009"/>
+                <input type="button" value="警察靴" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1010"/>
+                <input type="button" value="警察帽" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1011"/>
+                <input type="button" value="警察镜" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1021"/>
+                <br/>
+                
+                <!--<input type="button" value="紫抱抱龙头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11001"/>
+                <input type="button" value="紫抱抱龙身" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11002"/>
+                <input type="button" value="紫抱抱龙尾" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11003"/>
+                <input type="button" value="紫抱抱龙翅" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11004"/>
+                <br/>
+                <input type="button" value="火抱抱龙头" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11005"/>
+                <input type="button" value="火抱抱龙身" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11006"/>
+                <input type="button" value="火抱抱龙尾" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11007"/>
+                <input type="button" value="火抱抱龙翅" style="width:64px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="11008"/>-->
+                <br/>
+                <div style="height:16px;"/>
+                <br/>
+                <input type="button" value="黄色冬日外套" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1023"/>
+                <input type="button" value="黄色冬日靴子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1024"/>
+                <input type="button" value="黄色冬日棉帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1025"/>
+                <input type="button" value="黄色冬日紧身裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1026"/>
+                <br/>
+                <input type="button" value="野人女式皮束胸" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1027"/>
+                <input type="button" value="野人男式麻布七分裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1028"/>
+                <input type="button" value="野人女式麻布短裙" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1029"/>
+                <br/>
+                <input type="button" value="野人男式毛靴" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1030"/>
+                <input type="button" value="野人女式毛靴" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1031"/>
+                <input type="button" value="野人手镯" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1032"/>
+                <br/>
+                <input type="button" value="黑色沙滩拖鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1033"/>
+                <input type="button" value="红色比基尼" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1034"/>
+                <input type="button" value="红色星星女式沙滩裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1035"/>
+                <input type="button" value="红色星星男式沙滩裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1036"/>
+                <br/>
+                <input type="button" value="蔚蓝色比基尼" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1037"/>
+                <input type="button" value="蔚蓝色白边短裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1038"/>
+                <input type="button" value="黄色星星碧绿边比基尼" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1039"/>
+                <input type="button" value="黄色星星碧绿边短裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1040"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="野人新红上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1041"/>
+                <input type="button" value="野人新红下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1043"/>
+                <input type="button" value="野人新红脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1045"/>
+                <br/>
+                <input type="button" value="野人新黄上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1042"/>
+                <input type="button" value="野人新黄下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1044"/>
+                <input type="button" value="野人新黄脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1046"/>
+                <br/>
+                <input type="button" value="工装上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1047"/>
+                <input type="button" value="工装下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1048"/>
+                <input type="button" value="工装脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1049"/>
+                <br/>
+                <input type="button" value="初始1上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1050"/>
+                <input type="button" value="初始1下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1051"/>
+                <input type="button" value="初始1脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1052"/>
+                <br/>
+                <input type="button" value="初始2上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1053"/>
+                <input type="button" value="初始2下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1054"/>
+                <input type="button" value="初始2脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1055"/>
+                <br/>
+                <input type="button" value="初始3上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1056"/>
+                <input type="button" value="初始3下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1057"/>
+                <input type="button" value="初始3脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1058"/>
+                <br/>
+                <input type="button" value="初始4上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1059"/>
+                <input type="button" value="初始4下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1060"/>
+                <input type="button" value="初始4脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1061"/>
+                <br/>
+                <input type="button" value="初始5上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1062"/>
+                <input type="button" value="初始5下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1063"/>
+                <input type="button" value="初始5脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1064"/>
+                <br/>
+                <input type="button" value="初始6上" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1103"/>
+                <input type="button" value="初始6下" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1104"/>
+                <input type="button" value="初始6脚" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1105"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="小翅膀" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1065"/>
+                <input type="button" value="糖果背包" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1106"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="滑冰上衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1066"/>
+                <input type="button" value="滑冰裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1067"/>
+                <input type="button" value="滑冰鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1068"/>
+                <br/>
+                <input type="button" value="篮球上衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1069"/>
+                <input type="button" value="篮球裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1070"/>
+                <input type="button" value="篮球鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1071"/>
+                <br/>
+                <input type="button" value="医生上衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1072"/>
+                <input type="button" value="医生裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1073"/>
+                <input type="button" value="医生鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1074"/>
+                <br/>
+                <input type="button" value="大使上衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1075"/>
+                <input type="button" value="大使裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1076"/>
+                <input type="button" value="大使鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1077"/>
+                <br/>
+                <input type="button" value="大使帽子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1078"/>
+                <input type="button" value="大使手腕" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1079"/>
+                <br/>
+                <input type="button" value="工装紫上衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1080"/>
+                <input type="button" value="工装绿裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1081"/>
+                <br/>
+                
+                <div style="height:16px;"/>
+                <input type="button" value="紫色大脚帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1082"/>
+                <input type="button" value="紫色棉衣" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1083"/>
+                <input type="button" value="玫瑰紧身裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1084"/>
+                <br/>
+                <input type="button" value="黑白猫帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1085"/>
+                <input type="button" value="万圣节衣服" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1086"/>
+                <input type="button" value="万圣节裤子" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1101"/>
+                <br/>
+                <input type="button" value="海盗帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1087"/>
+                <input type="button" value="红灰条纹海盗服" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1088"/>
+                <input type="button" value="红白格纹裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1089"/>
+                <br/>
+                <input type="button" value="圣诞帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1090"/>
+                <input type="button" value="圣诞棉服" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1091"/>
+                <input type="button" value="圣诞吊带服" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1092"/>
+                <br/>
+                <input type="button" value="绿色横纹裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1093"/>
+                <input type="button" value="粉红横纹裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1094"/>
+                <br/>
+                <input type="button" value="圣诞黑鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1095"/>
+                <input type="button" value="圣诞红鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1100"/>
+                <br/>
+                <input type="button" value="麋鹿帽" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1096"/>
+                <input type="button" value="麋鹿服" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1097"/>
+                <input type="button" value="麋鹿裤" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1098"/>
+                <br/>
+                <input type="button" value="麋鹿鞋" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1099"/>
+                <input type="button" value="麋鹿手套" style="width:96px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="1102"/>
+                <br/>
+            </form>
+            </Columns>
+        </pe:gridview>
+    </pe:tab-item>
+<!--    <pe:tab-item name="Attachment" text="Attachment" style="padding:4px">
+        <div style="">
+            Part 1: Attachment Test
+            <hr/>
+            Part 2: Standard Attachment
+            <hr/>
+        </div>
+    </pe:tab-item>
+    <pe:tab-item name="Animation" text="Animation" style="padding:4px">
+        <div style="">
+            Part 1: Generic Animation Test
+            <hr/>
+            Part 2: Custom Animation Test
+            <hr/>
+        </div>
+    </pe:tab-item>-->
+</pe:tabs>
+
+</aries:window>
+</pe:mcml>
+</body>
+</html>

@@ -29,34 +29,43 @@
                         <div style="width:480px;height:126px;background-color:#e2e7e8">
                         </div>
                     </div>
-                    <div style="float:left;width:2px;height:484px;background-color:#cdcdcd"></div>
-                    <div style="float:left;width:266px;height:484px;">
+                    <div style="float:left;width:2px;height:490px;background-color:#cdcdcd"></div>
+                    <div style="float:left;width:266px;height:490px;">
                         <div style="width:266px;height:31px;background-color:#292929;color:#ffffff">
                             <div style="float:left;margin-left:10px;margin-top:6px;"><%=ChatRoomPage.GetClassPeoples()%></div>
                             <input type="button" style="float:left;width:52px;height:20px;margin-left:98px;margin-top:6px;color:#ffffff;" value='<%=L"+邀请"%>' class="mc_blue_button_with_fillet" tooltip='<%=L"邀请所有未上课成员"%>' onclick="ChatRoomPage.InviteAll" />
                         </div>
                         <div style="width:266px;height:1px;background-color:#cdcdcd"></div>
                         <div>
-                            <pe:gridview style="margin:1px;width:264px;height:460px;" name="class_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="50"
+                            <pe:gridview style="margin:1px;margin-top:8px;width:264px;height:460px;" name="class_gridview" CellPadding="1" VerticalScrollBarStep="24" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="49"
                                          DataSource='<%=ChatRoomPage.ClassItems()%>'>
                                 <Columns>
-                                    <div style="width:264px;height:50px;">
+                                    <div style="width:264px;height:49px;">
                                         <pe:if condition='<%=Eval("online")%>'>
                                             <div style="float:left;margin-left:12px;margin-top:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ClassManager/online_head_32bits.png#0 0 48 48);">
-                                                <div style="margin-left:6px;margin-top:8px;">
+                                                <div style="margin-left:6px;margin-top:8px;color:#ffffff;">
                                                     <%=ChatRoomPage.GetShortName(Eval("name"))%>
                                                 </div>
                                             </div>
                                         </pe:if>
                                         <pe:if condition='<%=not Eval("online")%>'>
                                             <div style="float:left;margin-left:12px;margin-top:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ClassManager/offline_head_32bits.png#0 0 48 48);">
-                                                <div style="margin-left:6px;margin-top:8px;">
+                                                <div style="margin-left:6px;margin-top:8px;color:#ffffff;">
                                                     <%=ChatRoomPage.GetShortName(Eval("name"))%>
                                                 </div>
                                             </div>
                                         </pe:if>
-                                        <div style="float:left;margin-left:10px;margin-top:6px;"><%=Eval("name")%></div>
-                                        <input type="button" style="float:left;width:52px;height:20px;margin-left:98px;margin-top:6px;color:#ffffff;" value='<%=L"+邀请"%>' class="mc_blue_button_with_fillet" tooltip='<%=L"邀请所有未上课成员"%>' onclick="ChatRoomPage.InviteAll" />
+                                        <div style="float:left;margin-left:10px;margin-top:8px;"><%=Eval("name")%></div>
+                                        <pe:if condition='<%=Eval("teacher")%>'>
+                                            <div style="float:left;margin-left:12px;margin-top:10px;width:40px;height:20px;background:url(Texture/Aries/Creator/keepwork/ClassManager/teacher_bg_32bits.png#0 0 8 8:3 3 3 3);">
+                                                <div style="margin-left:8px;font-size:12px;">
+                                                    <%=L"老师"%>
+                                                </div>
+                                            </div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not Eval("online")%>'>
+                                            <input type="button" style="float:right;width:52px;height:24px;margin-top:8px;margin-right:20px;color:#ffffff;" align="right" value='<%=L"邀请"%>' class="mc_blue_button_with_fillet" onclick="ChatRoomPage.InviteOne(Eval('index'))" />
+                                        </pe:if>
                                     </div>
                                 </Columns>
                                 <EmptyDataTemplate>

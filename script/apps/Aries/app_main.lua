@@ -411,7 +411,8 @@ function MyCompany.Aries.OnConnection(app, connectMode)
 
 		if(System.options.mc) then
 			NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
-			MyCompany.Aries.Chat.BadWordFilter.Init();
+            local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
+			BadWordFilter.Init();
 		end
 	end
 end

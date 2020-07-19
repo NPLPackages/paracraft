@@ -117,9 +117,14 @@ BlockPSOut pixelShader(Interpolants i)
 	float category = 1.0;
 	if (g_CategoryID.x > 0)
 		category = g_CategoryID.x / 256.0;
-	output.BlockInfo = float4(category, BlockLightStrength.x, BlockLightStrength.y, 1);
-	output.Depth = float4(i.normal.a, 0, 0, 1);
-	output.Normal = float4(i.normal.xyz, 1);
+	
+	// 2020.7.18. Xizhi, fixed deferred rendering alpha blended effects
+	float alpha = (normalColor.w < ALPHA_TESTING_REF) ? 0 : 1; 
+	
+	output.BlockInfo = float4(category, BlockLightStrength.x, BlockLightStrength.y, alpha);
+	output.Depth = float4(i.normal.a, 0, 0, alpha);
+	output.Normal = float4(i.normal.xyz, alpha);
+
 	return output;
 }
 

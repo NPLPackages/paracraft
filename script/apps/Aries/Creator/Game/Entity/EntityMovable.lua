@@ -17,6 +17,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerHeadController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PlayerHeadController = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerHeadController");
@@ -364,7 +366,7 @@ function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		self.skin = skin;
 		if(skin) then
-			if(not self:FindSkinFiles(skin)) then
+			if(not self.isCustomModel and not self:FindSkinFiles(skin)) then
 				LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
 			end
 			self:RefreshClientModel();
@@ -380,8 +382,10 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 	local playerObj = playerObj or self:GetInnerObject();
 	if(playerObj) then
 		-- refresh skin and base model, preserving all custom bone info
-		if(playerObj:GetField("assetfile", "") ~= self:GetMainAssetPath()) then
-			playerObj:SetField("assetfile", self:GetMainAssetPath());
+		local assetPath = self:GetMainAssetPath()
+		if(playerObj:GetField("assetfile", "") ~= assetPath) then
+			playerObj:SetField("assetfile", assetPath);
+			self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
 		end
 		self:RefreshSkin(playerObj);
 		self:RefreshRightHand(playerObj);
@@ -391,10 +395,21 @@ end
 function Entity:RefreshRightHand(player)
 end
 
+-- whether it is a custom model
+function Entity:IsCustomModel()
+	return self.isCustomModel
+end
+
 function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
 	if(player) then
 		local skin = self:GetSkin();
+
+		if(self.isCustomModel) then
+			PlayerAssetFile:RefreshCustomModel(player, skin)
+			return 
+		end
+
 		self.skins_ = self.skins_ or {};
 		local skins = self.skins_;
 		for id, skin in pairs(skins) do
@@ -410,6 +425,8 @@ function Entity:RefreshSkin(player)
 					skins[id].filename = filename;
 					player:SetReplaceableTexture(id, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(filename), 1));
 				end
+			elseif(skin:match("^%d+#")) then
+				-- ignore ccs skins
 			else
 				player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
 				skins[2] = skins[2] or {};
@@ -418,19 +435,17 @@ function Entity:RefreshSkin(player)
 		end
 		if(not skins[2] or not skins[2].filename) then
 			-- if model has shared skin file at id 2
-			if(PlayerSkins:CheckModelHasSkin(self:GetMainAssetPath())) then
-				local item = self:GetItemClass();
-				if(item) then
-					local skin = item:GetSkinFile();
-					if(skin) then
-						player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
-						skins[2] = skins[2] or {}
-						skins[2].filename = skin;
-					end	
+			local mainAssetPath = self:GetMainAssetPath()
+			if(PlayerSkins:CheckModelHasSkin(mainAssetPath)) then
+				local skin = PlayerSkins:GetDefaultSkinForModel(mainAssetPath)
+				if(skin) then
+					player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+					skins[2] = skins[2] or {}
+					skins[2].filename = skin;
 				end
 			end
 		end
-
+		
 		for id, skin in pairs(skins) do
 			if(not skin.filename and skin.last_filename) then
 				player:SetReplaceableTexture(id, player:GetDefaultReplaceableTexture(id));	

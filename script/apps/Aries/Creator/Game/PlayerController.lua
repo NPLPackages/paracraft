@@ -401,6 +401,30 @@ function PlayerController:LoadLocalData(name, default_value, bIsGlobal)
 	return default_value;
 end
 
+function PlayerController:LoadRemoteData(name, default_value)
+	local value = GameLogic.GetFilters():apply_filters('Player.LoadRemoteData', nil, name, default_value)
+	if(value~=nil) then
+		return value
+	end
+	if(System.User.username) then
+		name = NPL.EncodeURLQuery(name, {"name", System.User.username})
+	end
+	value = self:LoadLocalData(name, default_value, true)
+	return value;
+end
+
+function PlayerController:SaveRemoteData(name, value, bDeferSave)
+	local result = GameLogic.GetFilters():apply_filters('Player.SaveRemoteData', nil, name, value, bDeferSave)
+	if(result~=nil) then
+		return result
+	end
+	if(System.User.username) then
+		name = NPL.EncodeURLQuery(name, {"name", System.User.username})
+	end
+	return self:SaveLocalData(name, value, true, bDeferSave)
+end
+
+
 function PlayerController:FlushLocalData()
 	local ls = System.localserver.CreateStore(nil, 3, if_else(System.options.version == "teen", "userdata.teen", "userdata"));
 	if(ls) then

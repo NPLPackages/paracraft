@@ -153,16 +153,37 @@ function SkinPage.OnChangeAvatarSkin()
 		page:CloseWindow();
 	end
 
-	local old_value = EntityManager.GetPlayer():GetSkin();
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
-	local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
-	EditSkinPage.ShowPage(function(result)
-		if(result and result~=old_value) then
-			GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-				if(isVip) then
-					EntityManager.GetPlayer():SetSkin(result);
-				end
-			end)
-		end
-	end, old_value, "", assetFilename)
+	local entity = EntityManager.GetPlayer()
+	if(not entity) then
+		return
+	end
+	local old_value = entity:GetSkin();
+
+	if(entity.IsCustomModel and entity:IsCustomModel()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
+		local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+		EditCCSTask:ShowPage(entity, function(ccsString)
+			if(ccsString ~= old_value) then
+				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+					if(isVip) then
+						EntityManager.GetPlayer():SetSkin(ccsString);
+					else
+						EntityManager.GetPlayer():SetSkin(old_value);
+					end
+				end)
+			end
+		end);
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+		local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+		EditSkinPage.ShowPage(function(result)
+			if(result and result~=old_value) then
+				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+					if(isVip) then
+						entity:SetSkin(result);
+					end
+				end)
+			end
+		end, old_value, "", assetFilename)
+	end
 end

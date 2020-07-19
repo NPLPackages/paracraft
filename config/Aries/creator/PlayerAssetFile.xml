@@ -9,6 +9,7 @@
 <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
 <category name="common">
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
+  <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
   <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
   <asset filename="character/CC/03animals/pig/pig.x" name="pig" displayname="小猪"/>
@@ -68,6 +69,7 @@
 <category name="people">
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
+  <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
   <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
   <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
   <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
@@ -95,6 +97,8 @@
   <asset filename="character/CC/artwar/game/blue_archer.x" displayname="弓兵_蓝方" name="lan_gongbing"/>
   <asset filename="character/CC/artwar/game/blue_soldier.x" displayname="小兵_蓝方" name="lan_xiaobing"/>
   -->
+  <!-- 7-16更新 -->
+  <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia"/>
 
   <!-- artwar in shanghai电影 -->
   <!-- <asset filename="character/CC/artwar/movie/sunbin_movie.x" displayname="孙膑_演员" name="sunbin_movie"/>
@@ -626,7 +630,7 @@
   <asset filename="character/CC/artwar/game/fuchen.x" displayname="拂尘" name="fuchen"/>
   <asset filename="character/CC/artwar/game/guaizhang.x" displayname="拐杖" name="guaizhang"/>
   <asset filename="character/CC/artwar/game/huoba_ming.x" displayname="火把" name="huoba"/>
-  <!-- <asset filename="character/CC/artwar/game/huoba_mie.x" displayname="火把" name="huoba"/>   -->
+  <!-- <asset filename="character/CC/artwar/game/huoba_mie.x" displayname="火把灭" name="huoba"/>   -->
   <asset filename="character/CC/artwar/game/shanzi.x" displayname="扇子" name="shanzi"/>
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe"/>

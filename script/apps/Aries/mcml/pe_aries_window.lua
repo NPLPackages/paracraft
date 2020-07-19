@@ -29,7 +29,7 @@ local mc_close_btn_bg = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;3
 local mc_help_btn_bg = "Texture/Aries/Common/Teen/control/help_32bits.png;0 0 20 20" -- "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;173 204 16 20";
 local mc_line = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;352 66 1 1";
 
-local mc_window_bg_white = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;279 397 15 15:6 6 6 6";
+local mc_window_bg_white = "Texture/Aries/Creator/keepwork/ClassManager/white_bg_32bits.png;0 0 34 34:8 8 8 8";
 
 
 

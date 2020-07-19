@@ -62,6 +62,7 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		end,
 	};
 	mcmlNode.Canvas3D_ctl = ctl;
+	mcmlNode.control = ctl;
 	ctl:Show(true);
 
 	local obj_params = ObjEditor.GetObjectParams(ParaScene.GetPlayer());

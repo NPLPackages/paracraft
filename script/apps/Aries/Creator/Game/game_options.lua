@@ -335,10 +335,11 @@ function options:OnLoadWorld()
 	GameLogic.GetSkyEntity():Refresh();
 
 	if(System.options.mc) then
-		self:SetMainPlayerAssetName();
-		if(self.mainPlayerAssetPath) then
-			EntityManager.GetPlayer():SetMainAssetPath(self.mainPlayerAssetPath)
+		local mainAssetFilename = self:GetMainPlayerAssetName();
+		if(mainAssetFilename) then
+			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
+		
 		player:SetScale(1);
 		self.jump_up_speed = 5*1.3;
 		local att = ParaTerrain.GetBlockAttributeObject();
@@ -420,7 +421,8 @@ function options:OnLoadWorld()
 	local WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
 	WorldStacks:PopWorld();
 
-	if(self:IsVipWorld() and not self:IsVip() and 
+	-- TODO: 2020.7.17. disabled IsVipWorld until server fixed
+	if(false and self:IsVipWorld() and not self:IsVip() and 
 		-- skip standalone app when noclientupdate is true
 		ParaEngine.GetAppCommandLineByParam("noclientupdate", "")=="") then
 		
@@ -729,17 +731,14 @@ end
 function options:SetMainPlayerAssetName(value)
 	local key = "Paracraft_System_MainPlayer_AssetName";
 	if(value == nil) then
-		if(self.mainPlayerAssetPath == nil) then
-			self.mainPlayerAssetPath = GameLogic.GetPlayerController():LoadLocalData(key,nil, true);
-		end
-	elseif(self.mainPlayerAssetPath ~= value) then
-		self.mainPlayerAssetPath = value;
-		GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
+		-- Do nothing:
+	elseif(self:GetMainPlayerAssetName() ~= value) then
+		GameLogic.GetPlayerController():SaveRemoteData(key, value);
 	end
 end
 
 function options:GetMainPlayerAssetName()
-	return self.mainPlayerAssetPath;
+	return GameLogic.GetPlayerController():LoadRemoteData("Paracraft_System_MainPlayer_AssetName");
 end
 
 

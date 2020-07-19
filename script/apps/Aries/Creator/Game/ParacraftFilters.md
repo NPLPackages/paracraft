@@ -125,6 +125,9 @@ This gives an overview of filters in paracraft. Please search the source code of
 - tasks:
   - "OnlineStore.CustomOnlineStoreUrl", OnlineStoreUrl, name: add custom online store url based on name
   - "OnlineStore.getPageParamUrl", url: default url in online store params, name: custom url paramater
-  
+- online:
+  - "Player.LoadRemoteData": nil, name, default_value: 
+  - "Player.SaveRemoteData": nil, name, value, bDeferSave: 
+
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 
