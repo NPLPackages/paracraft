@@ -364,17 +364,20 @@ function OpenAssetFileDialog.GetModelFilename()
 	return OpenAssetFileDialog.modelFilename;
 end
 
-function OpenAssetFileDialog.UpdateModel()
-	local filepath = PlayerAssetFile:GetValidAssetByString(OpenAssetFileDialog.modelFilename);
+-- @param modelName: filename of the model, if nil, it is OpenAssetFileDialog.modelFilename
+function OpenAssetFileDialog.UpdateModel(modelName)
+	local filepath = PlayerAssetFile:GetValidAssetByString(modelName or OpenAssetFileDialog.modelFilename);
 	if(filepath) then
 		local ctl = page:FindControl("AssetPreview");
 		if(ctl) then
-			local ReplaceableTextures;
-			if(PlayerSkins:CheckModelHasSkin(filepath)) then
+			local ReplaceableTextures, CCSInfoStr;
+			if(PlayerAssetFile:IsCustomModel(filepath)) then
+				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
 			end
-			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures});
+			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr});
 
 			OpenAssetFileDialog.RefreshAnims(filepath);
 		end
@@ -384,20 +387,7 @@ end
 function OpenAssetFileDialog.SetText(text)
 	if(page and text) then
 		page:SetValue("text", commonlib.Encoding.DefaultToUtf8(text));
-		local filepath = PlayerAssetFile:GetValidAssetByString(text);
-		if(filepath) then
-			local ctl = page:FindControl("AssetPreview");
-			if(ctl) then
-				local ReplaceableTextures;
-				if(PlayerSkins:CheckModelHasSkin(filepath)) then
-					-- TODO:  hard code worker skin here
-					ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
-				end
-				ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures});
-
-				OpenAssetFileDialog.RefreshAnims(filepath);
-			end
-		end	
+		OpenAssetFileDialog.UpdateModel(text)
 	end
 end
 
