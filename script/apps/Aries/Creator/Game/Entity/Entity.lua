@@ -1070,7 +1070,7 @@ function Entity:Say(text, duration, bAbove3D)
 		end
 		local obj = self:GetInnerObject();
 		if(obj) then
-			headon_speech.Speek(obj, text, duration or 4, bAbove3D);
+			headon_speech.Speek(obj, text, duration or 4, bAbove3D, nil, nil, -1000);
 			return true;
 		end
 	else
