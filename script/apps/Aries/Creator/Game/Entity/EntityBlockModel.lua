@@ -69,6 +69,21 @@ function Entity:HasRealPhysics()
 	return self.useRealPhysics;
 end
 
+-- this function may remove entity object and create a new one inplace
+function Entity:EnablePhysics(bEnabled)
+	if(bEnabled ~= self.useRealPhysics) then
+		local x, y, z = self:GetBlockPos()
+		local block_id, block_data, entity_data = Game.BlockEngine:GetBlockFull(x,y,z)
+		local item_id = bEnabled and 22 or 254;
+		if(bEnabled) then
+			entity_data.attr.item_id = item_id;
+		else
+		end
+		BlockEngine:SetBlock(x,y,z, item_id, block_data, 3, entity_data)
+		return true;
+	end
+end
+
 -- @param filename: if nil, self.filename is used
 function Entity:GetModelDiskFilePath(filename)
 	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));

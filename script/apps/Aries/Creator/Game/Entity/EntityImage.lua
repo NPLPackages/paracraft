@@ -99,8 +99,9 @@ function Entity:OnBlockLoaded(x,y,z, data)
 		LOG.std(nil, "warn", "info", "fix BlockSign entity facing and block data incompatibility in early version: %d %d %d", self.bx, self.by, self.bz);
 		self:UpdateBlockDataByFacing();
 	end
-	-- self:Refresh(true);
-	self:ScheduleRefresh(x,y,z);
+	if(not self:RefreshBakedImage()) then
+		self:ScheduleRefresh(x,y,z);
+	end
 end
 
 
@@ -652,6 +653,65 @@ function Entity:Refresh(bForceRefresh)
 
 	filename = self:GetDerivedImageFilename() or filename;
 	
+	self:UpdateImageModel(filename, self:GetDerivedImageFilename()==nil)
+end
+
+function Entity:SaveToXMLNode(node, bSort)
+	node = Entity._super.SaveToXMLNode(self, node, bSort);
+	local filename = self:GetDerivedImageFilename() or self:GetImageFilePath();
+	if(filename) then
+		local rawPath, tailPath = filename:match("^([^;:]+)(.*)$");
+		rawPath = Files.GetRelativePath(rawPath);
+		-- relative to world directory path
+		node.attr.rawPath = rawPath;
+		-- ;: numbers after the image file path. 
+		node.attr.tailPath = tailPath;
+		if(self.root_entity_coord) then
+			local x, y, z = self:GetBlockPos();
+			node.attr.rx = self.root_entity_coord.x - x;
+			node.attr.ry = self.root_entity_coord.y - y;
+			node.attr.rz = self.root_entity_coord.z - z;
+		end
+		if(not self:GetDerivedImageFilename()) then
+			node.attr.isSingle = true
+		end
+	end
+end
+
+function Entity:LoadFromXMLNode(node)
+	Entity._super.LoadFromXMLNode(self, node);
+	local attr = node.attr;
+	if(attr and attr.rawPath) then
+		self.rawPath = attr.rawPath
+		self.tailPath = attr.tailPath
+		self.isSingle = attr.isSingle ~= nil;
+		self.hasBakedImage = true;
+		if(attr.rx) then
+			local x, y, z = self:GetBlockPos();
+			self.root_entity_coord = {x=x+tonumber(attr.rx), y=y+tonumber(attr.ry), z=z+tonumber(attr.rz)};
+		end
+	end
+end
+
+function Entity:RefreshBakedImage()
+	if(self.hasBakedImage and self.rawPath) then
+		self.hasBakedImage = false;
+		local filename = Files.GetWorldFilePath(self.rawPath);
+		if(filename) then
+			if(self.cmd and self.cmd~="") then
+				self:SetImageFileName(filename);
+			end
+			local fullImagePath = filename..(self.tailPath or "")
+			if(not self.isSingle) then
+				self:SetDerivedImageFilename(fullImagePath);	
+			end
+			self:UpdateImageModel(fullImagePath, self.isSingle)
+		end
+		return true;
+	end
+end
+
+function Entity:UpdateImageModel(filename, isSingle)
 	if(self.last_filename ~= filename) then
 		if(filename) then
 			-- only create C++ object when image is not empty
@@ -676,7 +736,7 @@ function Entity:Refresh(bForceRefresh)
 				end
 			end
 			self.last_filename = filename;
-			if(self:GetDerivedImageFilename()) then
+			if(not isSingle) then
 				self.text_offset.y = 0.5;
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100, 100, nil, self.text_offset, -1.57);
 			else
@@ -686,6 +746,7 @@ function Entity:Refresh(bForceRefresh)
 		end
 	end
 end
+
 
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
@@ -746,16 +807,32 @@ end
 -- Overriden in a sign to provide the text.
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
-	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data, self:GetDerivedImageFilename());
+	local filename = self:GetDerivedImageFilename();
+	if(filename) then
+		local rawPath, tailPath = filename:match("^([^;:]+)(.*)$");
+		rawPath = Files.GetRelativePath(rawPath);
+		filename = rawPath..tailPath;
+	end
+	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data, filename);
 end
 
 -- update from packet. 
 function Entity:OnUpdateFromPacket(packet_UpdateEntitySign)
 	if(packet_UpdateEntitySign:isa(Packets.PacketUpdateEntitySign)) then
 		self:SetCommand(packet_UpdateEntitySign.text);
-		self:SetDerivedImageFilename(packet_UpdateEntitySign.text2);
 		self.block_data = packet_UpdateEntitySign.data;
-		self:Refresh(true);
+
+		local filename = packet_UpdateEntitySign.text2;
+		if(filename) then
+			self.isSingle = false;
+			self.rawPath, self.tailPath = filename:match("^([^;:]+)(.*)$");
+		else
+			self.isSingle = true;
+			self.rawPath = self:GetImageFilePath();
+			self.tailPath = nil;
+		end
+		self.hasBakedImage = true;
+		self:RefreshBakedImage()
 	end
 end
 
@@ -781,3 +858,4 @@ function Entity:FindFile(text, bExactMatch)
 		return true, filename
 	end
 end
+
