@@ -810,6 +810,8 @@ end
 
 local lastWinId = 0;
 -- @param alignment: if "headon", it means on top of the current actor. default to "_lt"
+-- it can also be "global_lt", which will attach to root gui object, 
+-- instead of scene viewport window, whose zorder is always -5. 
 -- @return the window object itself
 function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable)
 	if(mcmlCode) then
@@ -858,9 +860,17 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 					end
 				end
 			else
-				NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-				local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
-				local viewport = ViewportManager:GetSceneViewport();
+				local parent;
+				if(alignment and alignment:match("^global")) then
+					parent = nil;
+					alignment = alignment:gsub("^(global)", "")
+				else
+					NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+					local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+					local viewport = ViewportManager:GetSceneViewport();
+
+					parent = viewport:GetUIObject(true);
+				end
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
 				local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
@@ -876,7 +886,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 					left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
 					zorder=zorder or zorder, 
 					allowDrag=false,
-					parent = viewport:GetUIObject(true),
+					parent = parent,
 					pageGlobalTable = pageIndex,
 				});
 				self.codeblock:Connect("codeUnloaded", function()
