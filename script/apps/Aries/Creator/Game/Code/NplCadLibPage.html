@@ -1,0 +1,91 @@
+<!--script/apps/Aries/Creator/Game/Code/NplCadLibPage.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="NplCadLibPage.lua">
+<![CDATA[
+    local NplCadLibPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCadLibPage.lua");
+    NplCadLibPage:OnInit();
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function DS_Items_Menu(index)
+        if(index == nil) then
+            return #NplCadLibPage.Current_Item_DS_Menus;
+        else
+            return NplCadLibPage.Current_Item_DS_Menus[index];
+        end
+    end
+    function DS_Items(index)
+        if(index == nil) then
+            return #NplCadLibPage.Current_Item_DS;
+        else
+            return NplCadLibPage.Current_Item_DS[index];
+        end
+    end
+    
+    function GetIcon(index)
+        return NplCadLibPage:GetIcon(index);
+    end
+    function GetTooltip(index)
+        local s = string.format("script/apps/Aries/Creator/Game/Code/NplCadLibTooltip.html?index=%d",index);
+        return s;
+    end
+    local maxCharCount = 10;
+    function GetName(name)
+        local len = ParaMisc.GetUnicodeCharNum(name);
+        if(len >= maxCharCount)then
+	        name = ParaMisc.UniSubString(name, 1, maxCharCount-2) or "";
+            return name .. "...";
+        else
+            return name;
+        end
+    end
+    function OnSelectedMenu(index)
+        NplCadLibPage:OnSelectedMenu(index);
+    end
+    function IsSelectedMenu(index)
+        return NplCadLibPage.selected_menu_index == index;
+    end
+    function OnSelected(index)
+        NplCadLibPage:OnSelected(index);
+    end
+]]></script>
+<aries:window mode="thin" width="400" height="520" title='<%= L"NPLCAD 代码库"%>' onclose="ClosePage">
+   <div style="color:#ffffff;">
+        <div style="float:left;">
+            <pe:gridview style="margin-left:5px;margin-top:5px;width:80px;height:500px;" name="menu_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "30" 
+                DataSource='<%=DS_Items_Menu%>'>
+	            <Columns>
+                            <div >
+                                <pe:if condition="<%=IsSelectedMenu(Eval('index'))%>">
+                                    <input type="button" value="<%=GetName(Eval('title'))%>" style="margin-top:5px;width:80px;height:30px;color:#ffffff" class="mc_blue_button_with_fillet"/>
+                                </pe:if>
+                                <pe:if condition="<%=not IsSelectedMenu(Eval('index'))%>">
+                                    <input type="button" value="<%=GetName(Eval('title'))%>" name="<%=Eval('index')%>" style="margin-top:5px;width:80px;height:30px;color:#ffffff" class="mc_light_grey_button_with_fillet" onclick="OnSelectedMenu"/>
+                                </pe:if>
+                            </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+       </div>
+       <div style="float:left;">
+            <pe:gridview style="margin-left:5px;width:300px;height:500px;" name="item_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "40" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                            <div style="width:80px;height:30px;">
+                                <img src="<%=GetIcon(Eval('index'))%>" name="<%=Eval('index')%>" onclick="OnSelected" style="width:80px;height:45px;" bindtooltip="<%=GetTooltip(Eval('index'))%>"/>
+                                <div style="color:#ffffff;text-align:center;">
+                                    <%=GetName(Eval('name'))%>
+                                </div>
+                            </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+       </div>
+   </div>
+</aries:window>
+</pe:mcml>
+

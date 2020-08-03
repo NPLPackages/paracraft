@@ -16,15 +16,15 @@ local page;
 
 FriendsPage.data_sources = {
     {
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
-        { label = "1"},
+        { label = "1", mouseover_bg = "Texture/Aries/Common/underline_blue_32bits.png", nid = "10086"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
+--        { label = "1"},
     },
     {
         { label = "2"},
@@ -118,4 +118,7 @@ function FriendsPage.OnRefresh()
     if(page)then
         page:Refresh(0);
     end
+end
+function FriendsPage.ClickItem(index)
+	commonlib.echo("aaaaaaaaaa")
 end

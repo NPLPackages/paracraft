@@ -1,0 +1,29 @@
+<!--script/apps/Aries/Creator/Game/Code/NplCadLibTooltip.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="NplCadLibPage.lua">
+<![CDATA[
+    local NplCadLibPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCadLibPage.lua");
+    local page_ctrl = document:GetPageCtrl();
+    local index = page_ctrl:GetRequestParam("index");
+    local node = NplCadLibPage:GetNode(index);
+    function GetName()
+        if(node)then
+            return node.name;
+        end
+    end
+    function GetIcon()
+        return NplCadLibPage:GetIcon(index) or ""
+    end
+]]></script>
+   <div style="color:#ffffff;width:420px;height:275px;padding:10px;background-color:#000000;" >
+       <div>
+           <div>
+                <%=GetName()%>
+           </div>
+           <div style="margin-top:10px;">
+                <img style="width:400px;height:225px;" src="<%=GetIcon()%>"/>
+           </div>
+       </div>
+   </div>
+</pe:mcml>
+

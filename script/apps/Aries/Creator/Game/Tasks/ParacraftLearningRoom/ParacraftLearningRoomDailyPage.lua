@@ -230,6 +230,13 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	index = tonumber(index)
 	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
+            _guihelper.MessageBox(L"非VIP用户仅可观看已签到视频，是否开通VIP观看此视频？", function(res)
+                if(res == _guihelper.DialogResult.OK) then
+                    ParacraftLearningRoomDailyPage.OnVIP();
+                else
+                    ParacraftLearningRoomDailyPage.ShowPage();
+	            end
+            end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right,nil,nil,nil,nil,{ ok = L"立即开通", cancel = L"暂不开通", title = L"开通VIP", });
 			return
 		end
 	end

@@ -1,4 +1,4 @@
-<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.html" -->
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.html" -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -26,22 +26,25 @@ function DS_Items(index)
         return FriendsPage.Current_Item_DS[index];
     end
 end
+function ClickItem(index)
+    FriendsPage.ClickItem(index)
+end
 ]]></script>
-<aries:window mode="thin" width="300" height="500" title='<%= L"好友"%>' onclose="ClosePage">
+<aries:window mode="thin" width="300" height="500" title='<%= L"好友啊"%>' onclose="ClosePage">
 <div style="color:#ffffff">
 
-    <div>
-        <%=L"搜索框"%>
-        <input type="text" name="input_search" style="width:200px"/>
+    <div style="margin-left:13px;margin-top:5px;width:210px;">
+        <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+            <input type="text" EmptyText='<%=L"搜索: 请输入您要查找的账号"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
+        </div>
     </div>
 
     <div>
-        标签栏
         <pe:if condition='<%= IsSelected(1)%>'>
-            <input type="button" name="1" value='<%=L"最近"%>' onclick="OnChange" tooltip='<%=L"最近"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
+            <input type="button" name="1" value='<%=L"最近联系"%>' onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:80px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
         </pe:if>
         <pe:if condition='<%= not IsSelected(1)%>'>
-            <input type="button" name="1" value='<%=L"最近"%>' onclick="OnChange" tooltip='<%=L"最近"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" name="1" value='<%=L"最近联系"%>' onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:80px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
         </pe:if>
         <pe:if condition='<%= IsSelected(2)%>'>
             <input type="button" name="2" value='<%=L"好友"%>' onclick="OnChange" tooltip='<%=L"好友"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
@@ -65,15 +68,28 @@ end
     </div>
 
     <div type ="box" style="width:280px;height:400px">
-        列表
            <div style="margin-top:0px;">
             <pe:gridview style="margin:0px;width:260px;height:400px;" name="item_gridview" CellPadding="15" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                            <div style="color:#ffffff">
-                                <%=Eval("label")%>
-                            </div>
-                            
+                        <div style="color:#ffffff">
+                            <a style="width:196px;height:30px;margin:0px;padding:0px;background:;"
+                               onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                <input type="button" Normal_BG="" MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="float:right;margin-top:0px;width:196px;height:30px;background:;" />
+                                <div style="margin-left:-1px;margin-top:-32px;padding-left:5px;padding-top:2px;width:210px;height:30px;">
+                                    <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
+                                       onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                        <aries:onlinestatus width="32" height="26" nid='<%=Eval("nid")%>' />
+                                    </a>
+                                    <div style="float:right;margin-left:0px;margin-top:3px;width:108px;font-size:12pt;color:#ffffff">
+                                        <div style="width:170px;">
+                                            <pe:name nid='<%=Eval("nid")%>' linked=false useyou=false />
+                                        </div>
+                                    </div>
+                                    <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' />
+                                </div>
+                            </a>
+                        </div>
                 </Columns>
 	            <EmptyDataTemplate>
 	            </EmptyDataTemplate>

@@ -63,6 +63,10 @@ end
           <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
           <input type="button" class="mc_light_grey_button_with_fillet" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right%>'>
+          <input type="button" class="mc_light_grey_button_with_fillet" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
     </div>
   </pe:if>
 </aries:window>

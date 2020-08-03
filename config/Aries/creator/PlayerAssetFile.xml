@@ -500,6 +500,12 @@
   <asset filename="character/CC/artwar/game/zhujian4.x" displayname="竹简4" name="zhujian4"/>
   <asset filename="character/CC/artwar/game/lunyi.x" displayname="轮椅" name="lunyi"/>
   <asset filename="character/CC/artwar/game/yuxi.x" displayname="玉玺" name="yuxi"/>
+<!-- 7·21更新 -->
+  <asset filename="character/CC/artwar/game/liangshi.x" displayname="粮食" name="liangshi"/>
+  <asset filename="character/CC/artwar/game/caoyao_daoju.x" displayname="草药（道具）" name="caoyao_item"/>
+  <asset filename="character/CC/artwar/game/caoyao_shouchi.x" displayname="草药" name="caoyao"/>
+  <asset filename="character/CC/artwar/game/mumen.x" displayname="木门" name="mumen"/>
+  <asset filename="character/CC/artwar/game/mumen_poor.x" displayname="破木门" name="mumen_poor"/>  
   <!-- <asset filename="character/CC/artwar/game/复制.x" displayname="复制" name="复制"/>  -->
 <!-- 孙子兵法素材 -->
   <!-- <asset filename="character/CC/artwar/build/xiaofangzi1.x" displayname="小房子1" name="xiaofangzi1"/>

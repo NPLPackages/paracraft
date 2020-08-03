@@ -44,9 +44,7 @@ function OnOpenWeb(index)
     ParacraftLearningRoomDailyPage.OnOpenWeb(index,true);
 end
 
-function OnOpenWebExchange()
-    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/", "", 1); 
-end
+
 function OnVIP()
     ParacraftLearningRoomDailyPage.OnVIP()
 end
@@ -97,7 +95,6 @@ end
             <div style="margin-left:380px;margin-top:20px;">
                 <div style="float:left;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/points_32bits.png#0 0 20 20);"></div>
                 <div style="float:left;margin-left:2px;color:#ffffff;"><%=GetExchangePoints()%></div>
-                <!--<div style="float:left;margin-left:10px;margin-top:-5px;"><input type="button"  value='<%=L"积分兑换"%>' style="width:85px;height:30px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/blue_bg_32bits.png:6 6 6 6);" onclick="OnOpenWebExchange" /></div>-->
             </div>
             
         </div>

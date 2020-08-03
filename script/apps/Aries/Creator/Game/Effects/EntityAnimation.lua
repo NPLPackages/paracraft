@@ -30,7 +30,7 @@ local anim_map = {
 	["Create"] = 71, 
 }
 
--- this is only used in haqi, intead of PC character. 
+-- for haqi players
 local anim_map_haqi = {
 	["lie"] = {"character/Animation/v3/Sleep.x", 20001},
 	["sit"] = {"character/Animation/v5/ElfFemale_sit.x", 20002},
@@ -41,8 +41,9 @@ local anim_map_haqi = {
 	["Break"] = {"character/Animation/v5/ElfFemale_Break.x"}, 
 	["Create"] = {"character/Animation/v5/ElfFemale_Break.x"}, 
 }
-
-local anim_map_default;
+local assetNameToAnimMap = {
+	["character/v3/Elf/Female/ElfFemale.xml"] = anim_map_haqi,
+}
 
 -- id to name are also read from this xml file.
 local modelAnimNamesFilename = "config/Aries/creator/modelAnim.xml";
@@ -73,33 +74,24 @@ local id_to_names = {
 
 local assetNameToAnims = {};
 
-
 function EntityAnimation.Init()
 	if(EntityAnimation.isInited) then
 		return
 	end
-	
 	EntityAnimation.isInited = true;
-	-- TODO: load anim_map from XML file?
-	for name, data in pairs(anim_map) do
-		if(type(data) == "table" and data[2] and data[2]>10000) then
-			ParaAsset.CreateBoneAnimProvider(data[2], data[1], data[1], false);
-		end
-	end
+end
 
-	if(not System.options.mc) then
-		for name, data in pairs(anim_map_haqi) do
+function EntityAnimation.GetAnimMapByAssetFile(filename)
+	local animMap = filename and assetNameToAnimMap[filename] or anim_map;
+	if(not animMap.isLoaded__) then
+		animMap.isLoaded__ = 1;
+		for name, data in pairs(animMap) do
 			if(type(data) == "table" and data[2] and data[2]>10000) then
 				ParaAsset.CreateBoneAnimProvider(data[2], data[1], data[1], false);
 			end
 		end
 	end
-
-	if(System.options.mc) then
-		anim_map_player = anim_map;
-	else
-		anim_map_player = anim_map_haqi;
-	end
+	return animMap
 end
 
 -- public 
@@ -179,13 +171,9 @@ function EntityAnimation.CreateGetAnimId(filename, entity)
 	else
 		if(entity) then
 			local asset_file = entity:GetMainAssetPath();
-			if(asset_file) then
-				filename = anim_map_player[filename] or filename;
-			else
-				filename = anim_map[filename] or filename;
-			end
+			filename = EntityAnimation.GetAnimMapByAssetFile(asset_file)[filename] or filename;
 		else
-			filename = anim_map[filename] or filename;
+			filename = EntityAnimation.GetAnimMapByAssetFile(nil)[filename] or filename;
 		end
 		
 		local anim_id = -1;

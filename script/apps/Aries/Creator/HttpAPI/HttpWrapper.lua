@@ -54,22 +54,6 @@ function HttpWrapper.GetToken()
 end
 local default_cache_policy = System.localserver.CachePolicy:new("access plus 1 hour");
 
--- create url for caching
-function HttpWrapper.get_default_cache_url(self)
-    if(not self)then
-        return
-    end
-    local url_queries = { "method", self.method };
-    if(self.tokenRequired)then
-        local username = commonlib.getfield("System.User.username")
-        if(username)then
-            table.insert(url_queries,"localserver_username");
-            table.insert(url_queries,username);
-        end
-    end
-	local url = NPL.EncodeURLQuery(self.GetUrl(), url_queries)
-    return url;
-end
 function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option)
     cache_policy = inputParams.cache_policy or default_cache_policy;
     if(type(cache_policy) == "string") then
@@ -81,7 +65,7 @@ function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option)
 		return 
 	end
     -- make url
-	local url = HttpWrapper.get_default_cache_url(self);
+	local url = self.input_cache_url;
 	local item = ls:GetItem(url)
 	if(item and item.entry and item.payload) then
 		if(not cache_policy:IsExpired(item.payload.creation_date)) then
@@ -108,7 +92,7 @@ function HttpWrapper.default_postFunc(self, err, msg, data)
 	local output_msg = data;
 
     -- make url
-	local url = HttpWrapper.get_default_cache_url(self);
+	local url = self.input_cache_url;
    -- make entry
 	local item = {
 		entry = System.localserver.WebCacheDB.EntryInfo:new({url = url,}),
@@ -127,6 +111,24 @@ function HttpWrapper.default_postFunc(self, err, msg, data)
 		LOG.std("", "warning",fullname, LOG.tostring("warning: failed saving to local server %s \n", tostring(url))..LOG.tostring(output_msg));
 	end
 end
+-- only encode getting request to an unique url
+-- @param input:
+-- @param input.url:
+-- @param input.method:
+-- @param input.headers:
+function HttpWrapper.EncodeInputToUniqueURL(input)
+    input = input or {};
+    local url = input.url or "";
+    local url_queries = { "method", input.method };
+    if(input.headers)then
+        for k,v in pairs(input.headers) do
+            table.insert(url_queries,k);
+            table.insert(url_queries,v);
+        end
+    end
+	local input_cache_url = NPL.EncodeURLQuery(url, url_queries);
+    return input_cache_url;
+end
 -- NOTE: only cache method == "GET"
 function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepFunc, postFunc)
     if(not fullname or not url)then
@@ -135,7 +137,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
     if(not HttpWrapper.api_host)then
         HttpWrapper.api_host = HttpWrapper.GetUrl();
     end
-    url = string.gsub(url,"%%MAIN%%",HttpWrapper.api_host);
+    local static_url = string.gsub(url,"%%MAIN%%",HttpWrapper.api_host);
     -- for more config
     configs = configs or {};
     method = method or "GET"
@@ -151,48 +153,55 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         ["router_params"] = true,
     }
     local function activate(self, inputParams, callbackFunc, option)
+        local url = static_url;
         inputParams = inputParams or {};
-
+        self.inputParams = inputParams;
         if(inputParams.router_params)then
              url = UrlConverter.ToPath(url,inputParams.router_params)
         end
+
+        local input = nil;
+        local raw_input = commonlib.deepcopy(inputParams);
+
+        if(method == "GET")then
+            input = raw_input;
+            local url_queries = {}
+            for k,v in pairs(raw_input) do
+                -- remove keywords
+                if(not keyword_params[k])then
+                    table.insert(url_queries,k);
+                    table.insert(url_queries,v);
+                end
+            end
+            input.url = NPL.EncodeURLQuery(url, url_queries);
+            input.method = method;
+        else
+            input = {};
+            input.url = url;
+            input.method = method;
+            input.form = raw_input;
+        end
+        if(input.json == nil)then
+            input.json = true;
+        end
+        -- set headers
+        local headers = raw_input.headers or {};
+        if(tokenRequired)then
+            headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken());
+        end
+        input.headers = headers;
+
+        local input_cache_url = HttpWrapper.EncodeInputToUniqueURL(input);
+        self.input_cache_url  = input_cache_url;
+        LOG.std(nil, "debug","HttpWrapper input.url", input.url);
+        LOG.std(nil, "debug","HttpWrapper input_cache_url", input_cache_url);
         local res;
         -- only cache method == "GET"
         if(method == "GET" and prepFunc)then
 			res = prepFunc(self, inputParams, callbackFunc, option);
         end
-        
         if(not res)then
-            local raw_input = commonlib.deepcopy(inputParams);
-            local input;
-            if(method == "GET")then
-                input = raw_input;
-                local url_queries = {}
-                for k,v in pairs(raw_input) do
-                    -- remove keywords
-                    if(not keyword_params[k])then
-                        table.insert(url_queries,k);
-                        table.insert(url_queries,v);
-                    end
-                end
-	            local input_url = NPL.EncodeURLQuery(url, url_queries);
-                input.url = input_url;
-                input.method = method;
-            else
-                input = {};
-                input.url = url;
-                input.method = method;
-                input.form = raw_input;
-            end
-            if(input.json == nil)then
-                input.json = true
-            end
-            local headers = raw_input.headers or {};
-            if(tokenRequired)then
-                headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken());
-            end
-            input.headers = headers;
-		    LOG.std(nil, "debug","HttpWrapper input", input);
+            LOG.std(nil, "debug","HttpWrapper input", input);
             System.os.GetUrl(input, function(err, msg, data)
                 -- only cache method == "GET"
                 if(method == "GET" and postFunc)then
@@ -205,14 +214,13 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         end
 	end
     o = setmetatable({
-		GetUrl = function() return url end,
         fullname = fullname,
         method = method,
         tokenRequired = tokenRequired,
 	}, {
 		__call = activate,
 		__tostring = function(self)
-            return string.format("%s:(%s)(%s)",fullname,url,method);
+            return string.format("%s:(%s)(%s)",self.fullname,self.input_cache_url or "", self.method);
 		end
 	});
 	commonlib.setfield(fullname, o);
