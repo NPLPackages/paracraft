@@ -61,9 +61,9 @@ function(self, err, msg, data)
 end
 )
 
---http://yapi.kp-para.cn/project/32/interface/api/1072
+--http://yapi.kp-para.cn/project/32/interface/api/1082
 -- get
-HttpWrapper.Create("keepwork.quiz.getuserworld", "%MAIN%/core/v0/projects", "GET", true, nil,
+HttpWrapper.Create("keepwork.quiz.getuserworld", "%MAIN%/core/v0/worlds", "GET", true, nil,
 -- PreProcessor
 function(self, inputParams, callbackFunc, option)
    return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.quiz.getuserworld.get")

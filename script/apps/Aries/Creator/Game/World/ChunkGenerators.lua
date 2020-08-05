@@ -42,6 +42,10 @@ function ChunkGenerators:RegisterBuildinGenerators()
 	local NullChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.NullChunkGenerator");
 	ChunkGenerators:Register("null", NullChunkGenerator);
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldChunkGenerator.lua");
+	local ParaWorldChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator");
+	ChunkGenerators:Register("paraworld", ParaWorldChunkGenerator);
+
 	-- TODO: add other buildin generators here. plugins can register using self:Register function or via GetWorldGeneratorClass filters. 
 end
 

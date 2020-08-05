@@ -505,8 +505,36 @@
   <asset filename="character/CC/artwar/game/caoyao_daoju.x" displayname="草药（道具）" name="caoyao_item"/>
   <asset filename="character/CC/artwar/game/caoyao_shouchi.x" displayname="草药" name="caoyao"/>
   <asset filename="character/CC/artwar/game/mumen.x" displayname="木门" name="mumen"/>
-  <asset filename="character/CC/artwar/game/mumen_poor.x" displayname="破木门" name="mumen_poor"/>  
+  <asset filename="character/CC/artwar/game/mumen_poor.x" displayname="破木门" name="mumen_poor"/>
   <!-- <asset filename="character/CC/artwar/game/复制.x" displayname="复制" name="复制"/>  -->
+  <!-- 8·5更新 -->
+  <asset filename="character/CC/artwar/furnitures/BiJiBenDianNao.x" displayname="笔记本电脑" name="BiJiBenDianNao"/>
+  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Da.x" displayname="大号告示牌" name="GaoShiPai_Da"/>
+  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Xiao.x" displayname="小号告示牌" name="GaoShiPai_Xiao"/>
+  <asset filename="character/CC/artwar/furnitures/HeiBan.x" displayname="黑板" name="HeiBan"/>
+  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Heng.x" displayname="黑相框（横）" name="HeiXiangKuang_Heng"/>
+  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Shu.x" displayname="黑相框（竖）" name="HeiXiangKuang_Shu"/>
+  <!-- <asset filename="character/CC/artwar/furnitures/JiangBei_Jin.x" displayname="金奖杯" name="JiangBei_Jin"/>
+  <asset filename="character/CC/artwar/furnitures/JiangBei_Tong.x" displayname="铜奖杯" name="JiangBei_Tong"/>
+  <asset filename="character/CC/artwar/furnitures/JiangBei_Yin.x" displayname="银奖杯" name="JiangBei_Yin"/> -->
+  <asset filename="character/CC/artwar/furnitures/JiangZhuo.x" displayname="讲台" name="JiangZhuo"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Da.x" displayname="金相框（大）" name="JinXiangKuang_Da"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Heng.x" displayname="金相框（横）" name="JinXiangKuang_Heng"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Shu.x" displayname="金相框（竖）" name="JinXiangKuang_Shu"/>
+  <asset filename="character/CC/artwar/furnitures/SheDeng_Bai.x" displayname="射灯（白）" name="SheDeng_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/SheDeng_Hei.x" displayname="射灯（黑）" name="SheDeng_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/Shu.x" displayname="书" name="Shu"/>
+  <asset filename="character/CC/artwar/furnitures/WeiLan_Chang.x" displayname="围栏（长）" name="WeiLan_Chang"/>
+  <asset filename="character/CC/artwar/furnitures/WeiLan_Duan.x" displayname="围栏（短）" name="WeiLan_Duan"/>
+  <asset filename="character/CC/artwar/furnitures/YinShuiJi.x" displayname="饮水机" name="YinShuiJi"/>
+  <asset filename="character/CC/artwar/furnitures/YiZi.x" displayname="椅子" name="YiZi"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Bai.x" displayname="展灯（白）" name="ZhanDeng_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Bai.x" displayname="展灯（长白）" name="ZhanDeng_Chang_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Hei.x" displayname="展灯（长黑）" name="ZhanDeng_Chang_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Hei.x" displayname="展灯（黑）" name="ZhanDeng_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/ZhuoZi.x" displayname="桌子" name="ZhuoZi"/>
+
+
 <!-- 孙子兵法素材 -->
   <!-- <asset filename="character/CC/artwar/build/xiaofangzi1.x" displayname="小房子1" name="xiaofangzi1"/>
   <asset filename="character/CC/artwar/build/xiaofangzi2.x" displayname="小房子2" name="xiaofangzi2"/>
@@ -645,6 +673,12 @@
 <!-- 6·11更新 -->
   <!-- <asset filename="character/CC/artwar/game/jiguannu.x" displayname="机关弩" name="jiguannu"/>
   <asset filename="character/CC/artwar/game/jiguannu_dipan.x" displayname="机关弩底盘" name="jiguannu_dipan"/> -->
+<!-- 8·5更新 -->
+  <asset filename="character/CC/artwar/game/firetrap_off.x" displayname="火焰陷阱" name="firetrap_off"/>
+  <asset filename="character/CC/artwar/game/firetrap_on.x" displayname="火焰陷阱（触发）" name="firetrap_on"/>
+  <asset filename="character/CC/artwar/game/bushoujia.x" displayname="捕兽夹" name="bushoujia"/>
+  <asset filename="character/CC/artwar/game/huoba_daoju.x" displayname="火把（道具）" name="huoba_daoju"/>
+  <!-- <asset filename="character/CC/artwar/game/tianshucanjuan.x" displayname="天书" name="tianshucanjuan"/> -->
 
   <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows"/>
   <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow"/>

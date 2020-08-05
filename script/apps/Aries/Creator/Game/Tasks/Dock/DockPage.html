@@ -1,0 +1,86 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.html" -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="DockPage.lua" refresh="false"><![CDATA[
+    local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+    function ds_top_line_1(index)
+        if(index == nil) then
+            return #DockPage.top_line_1;
+        else
+            return DockPage.top_line_1[index];
+        end
+    end
+    function ds_top_line_2(index)
+        if(index == nil) then
+            return #DockPage.top_line_2;
+        else
+            return DockPage.top_line_2[index];
+        end
+    end
+    function OnClick(id)
+        DockPage.OnClick(id)
+    end
+    
+]]></script>
+    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;height:200px;background:;">
+        <div style="height:100px;">
+            <pe:gridview name="gridview_1" style="width:440px;height:100px;" AllowPaging="false" CellPadding="10" ItemsPerLine="6" DefaultNodeHeight = "45" pagesize="6"
+                DataSource='<%=ds_top_line_1%>'>
+	            <Columns>
+                    <div style="width:60px;height:45px;">
+                        <pe:if condition='<%= (Eval("enabled") == true) %>' >
+                            <input type="button" name='<%=Eval("id")%>' value='<%=Eval("label")%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+                        </pe:if>
+                    </div>
+	            </Columns>
+	            <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText=""/>
+            </pe:gridview>
+
+        </div>
+        <div style="margin-top:-40px;height:100px;">
+            <pe:gridview name="gridview_2" style="width:440px;height:100px;" AllowPaging="false" CellPadding="10" ItemsPerLine="6" DefaultNodeHeight = "45" pagesize="6"
+                DataSource='<%=ds_top_line_2%>'>
+	            <Columns>
+                    <div style="width:60px;height:45px;">
+                        <pe:if condition='<%= (Eval("enabled2") == true) %>' >
+                            <input type="button" name='<%=Eval("id")%>' value='<%=Eval("label")%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+                        </pe:if>
+                    </div>
+	            </Columns>
+	            <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText=""/>
+            </pe:gridview>
+        </div>
+    </pe:container>
+    <pe:container ClickThrough="true" alignment="_ctb" style="position:relative;height:60px;background:;">
+        <div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="button" name='character' value='<%=L"人物"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;">
+                <input type="button" name='work' value='<%=L"作品"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;">
+                <input type="button" name='explore' value='<%=L"探索"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;">
+                <input type="button" name='learn' value='<%=L"学习"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="button" name='school' value='<%=L"学校"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="button" name='system' value='<%=L"系统"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="button" name='vip' value='<%=L"会员"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            </div>
+        </div>
+        
+    </pe:container>
+    
+</pe:mcml> 
+</body>
+</html>

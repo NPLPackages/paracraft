@@ -6,9 +6,11 @@ Desc:
 use the lib:
 -------------------------------------------------------
 local NplCadLibPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCadLibPage.lua");
-NplCadLibPage:Show();
+NplCadLibPage:ToggleVisible();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 NPL.load("(gl)script/ide/XPath.lua");
 local XPath = commonlib.XPath;
 local NplCadLibPage = NPL.export();
@@ -23,12 +25,13 @@ NplCadLibPage.Current_Item_DS = {};
 function NplCadLibPage:OnInit()
     self.page = document:GetPageCtrl();
 end
+
 function NplCadLibPage:Show()
 	local params = {
 			url = self.mcml_url,
 			name = self.name, 
 			isShowTitleBar = false,
-			DestroyOnClose = true,
+			DestroyOnClose = false,
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			enable_esc_key = true,
@@ -46,6 +49,17 @@ function NplCadLibPage:Show()
         self.Current_Item_DS_Menus = data;
         self:OnSelectedMenu(self.selected_menu_index);
     end)
+end
+function NplCadLibPage:ToggleVisible()
+    if(self.page)then
+        if(self.page:IsVisible())then
+            self.page:CloseWindow();
+        else
+            self:Show();
+        end
+    else
+        self:Show();
+    end
 end
 function NplCadLibPage:OnSelectedMenu(index)
     self.selected_menu_index = index;
@@ -88,6 +102,7 @@ function NplCadLibPage:OnRefresh()
         self.page:Refresh(0);
     end
 end
+-- only load once
 function NplCadLibPage:LoadMenuData(callback)
     if(self.menus)then
         if(callback)then
@@ -130,14 +145,18 @@ function NplCadLibPage:OnSelected(index)
         if(data and data.codes)then
             local codes_block = data.codes.block;
             local codes_lua = data.codes.lua;
-            commonlib.echo("============codes_block");
-            commonlib.echo(codes_block);
-            commonlib.echo("============codes_lua");
-            commonlib.echo(codes_lua);
-
-            NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-            local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-            CodeBlockWindow.UpdateBlocklyCode(codes_block, codes_lua)
+            
+            local codeEntity = CodeBlockWindow.GetCodeEntity() or {};
+            local languageConfigFile = codeEntity.languageConfigFile;
+            if(not codeEntity or not CodeBlockWindow.IsVisible() or languageConfigFile ~= "npl_cad")then
+                _guihelper.MessageBox(L"请打开 npl block cad")
+                return
+            end
+            _guihelper.MessageBox(L"你是否要使用代码库的源码？", function(res)
+	            if(res and res == _guihelper.DialogResult.Yes) then
+                    CodeBlockWindow.UpdateBlocklyCode(codes_block, codes_lua)
+	            end
+            end, _guihelper.MessageBoxButtons.YesNo);
         end
     end)
 end

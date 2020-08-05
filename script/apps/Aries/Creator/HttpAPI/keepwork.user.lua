@@ -25,3 +25,6 @@ HttpWrapper.default_prepFunc,
 -- Post Processor
 HttpWrapper.default_postFunc
 )
+
+--http://yapi.kp-para.cn/project/32/interface/api/2477
+HttpWrapper.Create("keepwork.user.school", "%MAIN%/core/v0/users/school", "GET", true)

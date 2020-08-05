@@ -244,6 +244,7 @@ function ChatEdit.OnTimer(timer)
 		else
 			ChatEdit.FadeOut(0.2);
 			ChatWindow.FadeOut(0.2);
+	        CommandHelpPage.ClosePage();
 		end
 	end		
 end

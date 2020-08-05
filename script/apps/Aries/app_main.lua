@@ -409,7 +409,7 @@ function MyCompany.Aries.OnConnection(app, connectMode)
 		command = System.App.Commands.AddNamedCommand(
 			{name = commandName, app_key = app.app_key, icon = app.icon, });
 
-		if(System.options.mc) then
+		if(System.options.mc and (not System.options.isCodepku)) then
 			NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
             local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 			BadWordFilter.Init();

@@ -197,8 +197,14 @@ end
 -- virtual function: when selected in right hand
 function ItemColorBlock:OnSelect(itemStack)
 	if(itemStack) then
-		local data = itemStack:GetPreferredBlockData() or 0;
-		local color = self:DataToColor(data);
+		local color = itemStack:GetDataField("color")
+		if(color) then
+			color = Color.ToValue(color);
+		end
+		if(not color) then
+			local data = itemStack:GetPreferredBlockData() or 0;
+			color = self:DataToColor(data);
+		end
 		self:SetPenColor(color)
 	end
 	ItemColorBlock._super.OnSelect(self);

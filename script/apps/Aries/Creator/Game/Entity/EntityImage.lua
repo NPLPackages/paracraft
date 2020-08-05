@@ -660,20 +660,22 @@ function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	local filename = self:GetDerivedImageFilename() or self:GetImageFilePath();
 	if(filename) then
-		local rawPath, tailPath = filename:match("^([^;:]+)(.*)$");
-		rawPath = Files.GetRelativePath(rawPath);
-		-- relative to world directory path
-		node.attr.rawPath = rawPath;
-		-- ;: numbers after the image file path. 
-		node.attr.tailPath = tailPath;
-		if(self.root_entity_coord) then
-			local x, y, z = self:GetBlockPos();
-			node.attr.rx = self.root_entity_coord.x - x;
-			node.attr.ry = self.root_entity_coord.y - y;
-			node.attr.rz = self.root_entity_coord.z - z;
-		end
-		if(not self:GetDerivedImageFilename()) then
-			node.attr.isSingle = true
+		local rawPath, tailPath = filename:match("^(..[^;:]+)(.*)$");
+		if(rawPath) then
+			rawPath = Files.GetRelativePath(rawPath);
+			-- relative to world directory path
+			node.attr.rawPath = rawPath;
+			-- ;: numbers after the image file path. 
+			node.attr.tailPath = tailPath;
+			if(self.root_entity_coord) then
+				local x, y, z = self:GetBlockPos();
+				node.attr.rx = self.root_entity_coord.x - x;
+				node.attr.ry = self.root_entity_coord.y - y;
+				node.attr.rz = self.root_entity_coord.z - z;
+			end
+			if(not self:GetDerivedImageFilename()) then
+				node.attr.isSingle = true
+			end
 		end
 	end
 end
@@ -809,9 +811,13 @@ function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
 	local filename = self:GetDerivedImageFilename();
 	if(filename) then
-		local rawPath, tailPath = filename:match("^([^;:]+)(.*)$");
-		rawPath = Files.GetRelativePath(rawPath);
-		filename = rawPath..tailPath;
+		local rawPath, tailPath = filename:match("^(..[^;:]+)(.*)$");
+		if(rawPath) then
+			rawPath = Files.GetRelativePath(rawPath);
+			filename = rawPath..tailPath;
+		else
+			filename = nil;
+		end
 	end
 	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data, filename);
 end
@@ -825,7 +831,7 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntitySign)
 		local filename = packet_UpdateEntitySign.text2;
 		if(filename) then
 			self.isSingle = false;
-			self.rawPath, self.tailPath = filename:match("^([^;:]+)(.*)$");
+			self.rawPath, self.tailPath = filename:match("^(..[^;:]+)(.*)$");
 		else
 			self.isSingle = true;
 			self.rawPath = self:GetImageFilePath();

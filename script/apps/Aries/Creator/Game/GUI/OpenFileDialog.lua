@@ -243,6 +243,7 @@ function OpenFileDialog.UpdateExistingFiles()
 				local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, ":.", System.World.worldzipfile);
 				for i = 1, #result do
 					if(type(filterFunc) == "function" and filterFunc(result[i])) then
+						result[i].filename = commonlib.Encoding.Utf8ToDefault(result[i].filename);
 						files[#files+1] = {name="file", attr=result[i]};
 					end
 				end

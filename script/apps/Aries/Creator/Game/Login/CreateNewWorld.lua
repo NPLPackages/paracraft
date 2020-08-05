@@ -40,7 +40,8 @@ CreateNewWorld.terrain_info = {
 	{index = 1,terrain = "superflat",  show_value = "超级平坦", description = "海拔0米,无地下"},
 	{index = 2,terrain = "custom", show_value = "随机地形", description = "森林，沙漠，雪地，山洞"},
 	{index = 3,terrain = "empty", show_value = "空", description = "SDK用户可用命令行创建地基"},
-	--{index = 4,terrain = "flat",  show_value = "高原", description = "海拔128米"},
+	{index = 4,terrain = "paraworld",  show_value = "并行世界", description = "3D社区"},
+	--{index = 5,terrain = "flat",  show_value = "高原", description = "海拔128米"},
 }
 CreateNewWorld.oneday_time_info = {
 	{index = 1,realtime = "short", show_value = "10min/day", description = "10分钟"},

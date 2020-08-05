@@ -117,9 +117,7 @@ function World:InitBlockGenerator()
 				end
 				block_generator:SetFlatLayers(layers);
 
-			elseif(world_generator == "empty" or 
-				-- Disable complex generator on mobile platform for the moment, since performance is really bad with current implementation. 
-				System.options.IsMobilePlatform) then
+			elseif(world_generator == "empty") then
 				block_generator = self:GetChunkProvider():CreateGenerator("empty");
 			else
 				-- any custom generator by name. 

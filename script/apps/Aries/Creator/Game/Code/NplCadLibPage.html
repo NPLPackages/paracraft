@@ -70,10 +70,10 @@
             </pe:gridview>
        </div>
        <div style="float:left;">
-            <pe:gridview style="margin-left:5px;width:300px;height:500px;" name="item_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "40" 
+            <pe:gridview style="margin-left:5px;width:310px;height:500px;" name="item_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "65" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                            <div style="width:80px;height:30px;">
+                            <div style="width:80px;height:65px;">
                                 <img src="<%=GetIcon(Eval('index'))%>" name="<%=Eval('index')%>" onclick="OnSelected" style="width:80px;height:45px;" bindtooltip="<%=GetTooltip(Eval('index'))%>"/>
                                 <div style="color:#ffffff;text-align:center;">
                                     <%=GetName(Eval('name'))%>
