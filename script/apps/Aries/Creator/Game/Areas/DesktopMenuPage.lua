@@ -127,7 +127,7 @@ end
 -- show/hide
 function DesktopMenuPage.ShowPage(bShow)
 
-	if GameLogic.GetFilters():apply_filters("DesktopMenuPage.ShowPage",bShow) then
+	if GameLogic.GetFilters():apply_filters("DesktopMenuPage.ShowPage", false, bShow) then
 		return;
 	end
 

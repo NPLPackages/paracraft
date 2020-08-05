@@ -146,7 +146,9 @@ end
                 <input type="button" value='<%=L"超平坦" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
                 <input type="button" value='<%=L"随机地形" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",2) %>' onclick="OnClickModify" param1="terrain" param2="2"/>
                 <input type="button" value='<%=L"空" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",3) %>' onclick="OnClickModify" param1="terrain" param2="3"/>
-                <input type="button" value='<%=L"并行世界" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",4) %>' onclick="OnClickModify" param1="terrain" param2="4"/>
+                <pe:if condition="<%=System.options.isAB_SDK == true%>">
+                    <input type="button" value='<%=L"并行世界" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",4) %>' onclick="OnClickModify" param1="terrain" param2="4"/>
+                </pe:if>
             </div>
         </div>
     </div>
