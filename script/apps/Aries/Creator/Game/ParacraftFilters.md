@@ -68,6 +68,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "SystemSettingsPage.CheckBoxBackground", pageInfo, page, name, bChecked: custom system setting dialog's checkbox checked styles.
   - "SystemSettingsPage.PageParams", defaultPageParams: custom system setting page.
   - "MainUIButtons": custom main page ui.
+  - "DesktopMenuPage.ShowPage": bShow:boolean    custom DesktopMenuPage.ShowPage
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
