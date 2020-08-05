@@ -126,6 +126,11 @@ end
 
 -- show/hide
 function DesktopMenuPage.ShowPage(bShow)
+
+	if GameLogic.GetFilters():apply_filters("DesktopMenuPage.ShowPage",bShow) then
+		return;
+	end
+
 	if(System.options.IsMobilePlatform) then
 		return
 	end
