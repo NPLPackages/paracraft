@@ -221,6 +221,11 @@ function QuickSelectBar:OnHandToolIndexChanged(event)
 end
 
 function QuickSelectBar.ShowPage(bShow)
+
+	if GameLogic.GetFilters():apply_filters("QuickSelectBar.ShowPage", false, bShow) then
+		return;
+	end
+
 	if(GameLogic.GameMode:IsMovieMode() and bShow) then
 		return;
 	end

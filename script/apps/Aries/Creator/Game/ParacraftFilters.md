@@ -69,6 +69,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "SystemSettingsPage.PageParams", defaultPageParams: custom system setting page.
   - "MainUIButtons": custom main page ui.
   - "DesktopMenuPage.ShowPage": bShow:boolean    custom DesktopMenuPage.ShowPage
+  - "QuickSelectBar.ShowPage":bShow:boolean custom QuickSelectBar.ShowPage
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
