@@ -507,14 +507,14 @@ function BlockEngine:GetNextDynamicTypeInColumn(x,y,z, max_dist)
 end
 
 -- @param attr: bitwise field. default to block.attributes.onload (which is usually entity block)
--- @return block_id, block_y: nil if no dynamic type is found downward. 
+-- @return block_id, block_y, block_data: nil if no dynamic type is found downward. 
 function BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, attr, max_dist)
 	attr = attr or block.attributes.onload;
 	local dist = ParaTerrain.FindFirstBlock(x,y,z, 5, max_dist or y, attr);
 	if(dist > 0) then
 		y = y-dist;
-		local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
-		return block_id, y;
+		local block_id, block_data = ParaTerrain.GetBlockFullData(x,y,z);
+		return block_id, y, block_data;
 	else
 		return nil, nil;
 	end

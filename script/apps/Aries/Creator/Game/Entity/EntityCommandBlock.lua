@@ -182,6 +182,13 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 	end
 end
 
+function Entity:ClearCommand()
+	self.cmd = nil;
+	self.blockly_xmlcode = nil
+	self.blockly_nplcode = nil
+	self.nplcode = nil
+end
+
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	self.isPowered = node.attr.isPowered == "true";

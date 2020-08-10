@@ -76,7 +76,7 @@ function OnlineStore:ShowPage(bShow, name)
 	if System.os.GetPlatform() == 'win32' or System.os.GetPlatform() == 'android' then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");	
 		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");	
-		NplBrowserLoaderPage.Check()
+		NplBrowserLoaderPage.CheckOnce()
 		if not NplBrowserLoaderPage.IsLoaded() then	
 			ParaGlobal.ShellExecute("open", OnlineStore.GetOnlineStoreUrl(name), "", "", 1);
 			return

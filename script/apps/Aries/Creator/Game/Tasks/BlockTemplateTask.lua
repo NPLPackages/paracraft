@@ -229,6 +229,8 @@ function BlockTemplate:LoadTemplate()
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(not self:LoadTemplateFromXmlNode(xmlRoot, filename)) then
 		LOG.std(nil, "warn", "BlockTemplate", "failed to load template from file: %s", filename);
+	else
+		return true
 	end
 end
 

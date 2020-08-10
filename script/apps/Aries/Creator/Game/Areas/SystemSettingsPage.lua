@@ -1213,7 +1213,11 @@ function SystemSettingsPage.OnChangeStereoEyeDist(value)
 end
 
 function SystemSettingsPage.OnChangeUIScaling(value)
-	GameLogic.options:SetUIScaling(value);
+	SystemSettingsPage.uiScaling = value
+	SystemSettingsPage.mytimer = SystemSettingsPage.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+		GameLogic.options:SetUIScaling(SystemSettingsPage.uiScaling);
+	end})
+	SystemSettingsPage.mytimer:Change(500)
 end
 
 function SystemSettingsPage.OnClickResetUIScaling()

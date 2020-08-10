@@ -236,12 +236,13 @@ function MainLogin:UpdateCoreClient()
 	end);
 end
 
+
 function MainLogin:UpdateCoreBrowser()
 	local platform = System.os.GetPlatform();
 	if(platform=="win32")then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
         local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
-        NplBrowserLoaderPage.Check()
+        NplBrowserLoaderPage.CheckOnce()
 	end
 	MainLogin:next_step({IsBrowserUpdaterStarted = true});
 end
@@ -413,11 +414,29 @@ function MainLogin:CheckCommandLine()
 	self:next_step({IsCommandLineChecked = true});	
 end
 
+
+function MainLogin:PreloadDailyCheckinAndTeachingWnd()
+	if(not System.options.cmdline_world or System.options.cmdline_world == "") then
+		local platform = System.os.GetPlatform();
+		if(platform=="win32")then
+			local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+			local cef_preshow = ParaEngine.GetAppCommandLineByParam("cef_preshow", "true");
+			if(cef_preshow == "true")then
+				-- TODO: shall we move preloader to a later phase, no need to be on startup!
+				NplBrowserManager:PreShowWnd("DailyCheckBrowser")
+				NplBrowserManager:PreShowWnd("TeachingQuest_BrowserPage")
+			end
+		end
+	end
+end
+
 -- load predefined mod packages if any
 function MainLogin:LoadPackages()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
 	local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
 	BuildinMod.AddBuildinMods();
+
+	self:PreloadDailyCheckinAndTeachingWnd();
 
 	self:next_step({IsPackagesLoaded = true});
 end

@@ -112,6 +112,10 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/pe_mc_mcml.lua");
 	MyCompany.Aries.Game.mcml_controls.register_all();
 
+	-- mcml v2
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/mcml.lua");
+	MyCompany.Aries.Game.mcml2.mcml_controls.register_all();
+
 	-- this is for offline mode just in case it happens.
 	System.User.nid = System.User.nid or 0;
 

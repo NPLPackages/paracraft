@@ -259,7 +259,7 @@ Commands["get"] = {
 	name="get", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="get [name]", 
+	quick_ref="/get [name]", 
 	desc=[[
 get name, value pair from local server. e.g.
 /get Coin

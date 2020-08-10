@@ -6,7 +6,7 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
-NplBrowserManager:PreShowAll();
+NplBrowserManager:PreShowWnd(wndName, url)
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", "title", false, true);
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50});
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", "title", false, false, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, });
@@ -36,8 +36,30 @@ function NplBrowserManager:CloseAll()
         v:Close();
     end
 end
--- previous to load cef3 exe 
-function NplBrowserManager:PreShowAll()
-    NplBrowserManager:CreateOrGet("DailyCheckBrowser"):PreShow(NplBrowserManager.empty_html, false);
-    NplBrowserManager:CreateOrGet("TeachingQuest_BrowserPage"):PreShow(NplBrowserManager.empty_html, false);
+
+-- preload a given window to a given url, so it is faster to show later. 
+-- @param url: default to empty page. 
+function NplBrowserManager:PreShowWnd(wndName, url)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+	local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+	if(NplBrowserLoaderPage.IsLoaded()) then
+		NplBrowserManager:CreateOrGet(wndName):PreShow(url or NplBrowserManager.empty_html, false);
+	else
+		self.preShowList = self.preShowList or {}
+		if(self.preShowList[wndName]==nil) then
+			self.preShowList[wndName] = url or NplBrowserManager.empty_html;
+		end
+		NplBrowserLoaderPage.CheckOnce()
+	end
+end
+
+function NplBrowserManager:LoadAllPreShowWindows()
+	if(self.preShowList) then
+		for wnd, url in pairs(self.preShowList) do
+			if(url) then
+				NplBrowserManager:CreateOrGet(wnd):PreShow(url, false);
+				self.preShowList[wnd] = false;
+			end
+		end
+	end
 end

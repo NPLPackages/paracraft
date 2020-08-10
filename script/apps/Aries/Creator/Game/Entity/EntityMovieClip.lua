@@ -733,7 +733,8 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
 		local node = packet_UpdateEntityBlock.data1;
 		if(node) then
-			self.length = nil;
+			self.length = nil
+			self:ClearCommand()
 			self:LoadFromXMLNode(node)
 			local movieClip = self:GetMovieClip()
 			if(movieClip and movieClip:HasCreatedActors()) then

@@ -10,7 +10,8 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
-NplBrowserLoaderPage.Check()
+NplBrowserLoaderPage.CheckOnce()
+NplBrowserLoaderPage.Check(callback)
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/BuildinMod.lua");
@@ -176,9 +177,19 @@ function NplBrowserLoaderPage.CreateOrGetAssetsManager(id,redist_root,config_fil
 end
 
 
+function NplBrowserLoaderPage.CheckOnce()
+	if(not NplBrowserLoaderPage.isCheckOnce) then
+		NplBrowserLoaderPage.Check()
+	end
+end
+
 -- @param callback: function(bChecked) end, bChecked is true if successfully downloaded
 -- return true if we are downloading
 function NplBrowserLoaderPage.Check(callback)
+	if(not NplBrowserLoaderPage.isCheckOnce) then
+		NplBrowserLoaderPage.isCheckOnce = true;
+	end
+
     if(not NplBrowserPlugin.OsSupported())then
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
         return
@@ -275,7 +286,7 @@ function NplBrowserLoaderPage.SetChecked(v)
     if(v)then
 	    LOG.std(nil, "info", "NplBrowserLoaderPage", "NplBrowser is loaded");
         local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
-        NplBrowserManager:PreShowAll();
+        NplBrowserManager:LoadAllPreShowWindows();
     end
     for callback,v in pairs(NplBrowserLoaderPage.callback_maps) do
         callback(v)

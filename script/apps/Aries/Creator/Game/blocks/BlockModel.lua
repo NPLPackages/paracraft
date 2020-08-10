@@ -39,7 +39,7 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 	return 0;
 end
 
-function block:RotateBlockEnityData(entityData, angle, axis)
+function block:RotateBlockEntityData(entityData, angle, axis)
 	if(not axis or axis == "y") then
 		if(entityData and entityData.attr) then
 			local lastFacing = entityData.attr.facing or 0;

@@ -198,20 +198,26 @@ function NplCad.GetCode(code, filename, relativePath)
 			NplCad.templateCode = [[
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
     local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
-	SceneHelper.LoadPlugin(function()
-        ShapeBuilder.create();
-        local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
-        NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
-        <code>
-        local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene(), ShapeBuilder.liner, ShapeBuilder.angular);
-        NplCad.ExportToFile(ShapeBuilder.getScene(),%q, ShapeBuilder.liner, ShapeBuilder.angular);
-        if(result)then
-	        setActorValue("assetfile", %q);
-	        setActorValue("showBones", true);
-            NplCad.RefreshFile(%q);
-        end
-		NplCad.StopCodeBlock(codeblock)
-    end)
+	local isFinished = false;
+	SceneHelper.LoadPlugin(co:MakeCallbackFuncAsync(function()
+		isFinished = true;
+		resume();
+    end))
+	if(not isFinished) then
+		yield();
+	end
+    ShapeBuilder.create();
+    local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+    NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
+    <code>
+    local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene(), ShapeBuilder.liner, ShapeBuilder.angular);
+    NplCad.ExportToFile(ShapeBuilder.getScene(),%q, ShapeBuilder.liner, ShapeBuilder.angular);
+    if(result)then
+	    setActorValue("assetfile", %q);
+	    setActorValue("showBones", true);
+        NplCad.RefreshFile(%q);
+    end
+	NplCad.StopCodeBlock(codeblock)
 ]]
 		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
 	end
@@ -235,23 +241,15 @@ end
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
 -- return nil or a mcml string. 
 function NplCad.GetCustomToolbarMCML()
---	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
---        <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
---        <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
---                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
---            <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
---        </div>
---    
---]],
---		L"代码库",L"导出");
-        NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
+	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
+        <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
         <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
                 tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
         </div>
     
 ]],
-		L"导出");
+		L"代码库",L"导出");
 	return NplCad.toolBarMcmlText;
 end
 function NplCad.OnShowCodeLib()

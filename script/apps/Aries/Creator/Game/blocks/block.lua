@@ -1535,7 +1535,7 @@ end
 -- @param angle: usually 1.57, -1.57, 3.14, -3.14, 0.
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the rotated block data. 
-function block:RotateBlockEnityData(entityData, angle, axis)
+function block:RotateBlockEntityData(entityData, angle, axis)
 	return entityData;
 end
 
@@ -1647,6 +1647,20 @@ function block:GetBlockColorByData(blockData)
 		color = self.mapcolor;
 	end
 	color = Color.ToValue(color);
+	return color;
+end
+
+function block:GetBlockColorStrByData(blockData)
+	local color; 
+	if(self.color_data) then
+		color = Color.convert16_32(blockData or 0);
+	elseif(self.color8_data) then
+		local data = blockData or 0;	
+		color = Color.convert8_32(0xff - rshift(data, 8));
+	elseif(self.mapcolor) then
+		color = self.mapcolor;
+	end
+	color = Color.FromValueToStr(color);
 	return color;
 end
 

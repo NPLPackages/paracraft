@@ -737,7 +737,7 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 	end
 
 	local timer;
-	autoUpdater:onInit(redist_root, ParaWorldLoginDocker.GetAppConfigByName(appName),function(state)
+	autoUpdater:onInit(redist_root, ParaWorldLoginDocker.GetAppConfigByName(appName),function(state, param1, param2)
         if(state)then
 			local State = AutoUpdater.State;
             if(state == State.PREDOWNLOAD_VERSION)then
@@ -814,7 +814,16 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 				end
             elseif(state == State.FAIL_TO_UPDATED)then
 				ParaWorldLoginDocker.SetInstalling(false);
-				_guihelper.MessageBox(L"无法应用更新"..L"请确保目前只有一个实例在运行");
+				local filename, errorCode = param1, param2;
+				if(errorCode == AutoUpdater.UpdateFailedReason.MD5) then
+					_guihelper.MessageBox(format(L"文件MD5校验失败:%s, 请重新更新", filename or ""));
+				elseif(errorCode == AutoUpdater.UpdateFailedReason.Uncompress) then
+					_guihelper.MessageBox(format(L"无法解压文件:%s, 请重试", filename or ""));
+				elseif(errorCode == AutoUpdater.UpdateFailedReason.Move) then
+					_guihelper.MessageBox(format(L"无法应用更新: 无法移动文件到%s.", filename or "")..L"请确保目前只有一个实例在运行");
+				else
+					_guihelper.MessageBox(L"无法应用更新"..L"请确保目前只有一个实例在运行");
+				end
 				if(callbackFunc) then
 					callbackFunc(false)
 				end

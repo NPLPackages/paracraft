@@ -190,7 +190,7 @@ function block:RotateBlockData(blockData, angle, axis)
 	axis = axis or "y"
 	-- rotation around axis
 	if(axis == "y") then
-		local side = data_to_side[blockData or 0];
+		local side = data_to_side[blockData or 1] or 0;
 		if(side < 4) then
 			local facing = Direction.directionTo3DFacing[side];
 			blockData = side_to_data[Direction.GetDirectionFromFacing(facing + angle)];

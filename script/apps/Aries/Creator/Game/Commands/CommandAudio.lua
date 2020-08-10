@@ -164,8 +164,8 @@ Commands["sound"] = {
 
 Commands["stopsound"] = {
 	name="stopsound", 
-	quick_ref="/sound name", 
-	desc="stop a sound", 
+	quick_ref="/stopsound name", 
+	desc="stop a sound by name", 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local sound_name, filename, volume, pitch;
 		sound_name, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");

@@ -152,9 +152,19 @@ function NplCadLibPage:OnSelected(index)
                 _guihelper.MessageBox(L"请打开 npl block cad")
                 return
             end
+            local is_visible = CodeBlockWindow.IsNPLBrowserVisible();
+            if(is_visible)then
+                CodeBlockWindow.SetNplBrowserVisible(false);
+            end
             _guihelper.MessageBox(L"你是否要使用代码库的源码？", function(res)
 	            if(res and res == _guihelper.DialogResult.Yes) then
-                    CodeBlockWindow.UpdateBlocklyCode(codes_block, codes_lua)
+                    CodeBlockWindow.UpdateBlocklyCode(codes_block, codes_lua);
+                    -- force open nplbrowser to reload new code
+                    CodeBlockWindow.OpenBlocklyEditor(true);
+                else
+                  if(is_visible)then
+                    CodeBlockWindow.SetNplBrowserVisible(true);
+                  end  
 	            end
             end, _guihelper.MessageBoxButtons.YesNo);
         end

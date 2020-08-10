@@ -329,7 +329,7 @@ function TransformBlocks:RotateBlocksWithFillingGap(blocks, final_blocks, rot_an
 						blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
 					end
 					if(entityData) then
-						entityData = blockTemplate:RotateBlockEnityData(entityData, -rot_angle, axis);
+						entityData = blockTemplate:RotateBlockEntityData(entityData, -rot_angle, axis);
 					end
 				end
 				final_blocks[#final_blocks+1] = {x0+cx, y0+cy, z0+cz, b[4], blockData, entityData,}
@@ -354,7 +354,7 @@ function TransformBlocks:RotateBlocksRightAngle(blocks, final_blocks, rot_angle,
 				blockData = blockTemplate:RotateBlockData(blockData, -rot_angle, axis);
 			end
 			if(entityData) then
-				entityData = blockTemplate:RotateBlockEnityData(entityData, -rot_angle, axis);
+				entityData = blockTemplate:RotateBlockEntityData(entityData, -rot_angle, axis);
 			end
 		end
 		if(axis== "x") then

@@ -988,7 +988,7 @@ function options:IsStereoControllerEnabled()
 end
 
 -- @param value: if 0, the original unscaled scaling is used. If nil, it will load from setting file. 
--- value is usually [1,2].  where 1 means the 960*560, which is the smallest UI size allowed. 
+-- value is usually [1,2].  where 1 means original size
 function options:SetUIScaling(value)
 	local scaling = 1;
 	local key = "Paracraft_System_SetUIScaling";
@@ -997,22 +997,20 @@ function options:SetUIScaling(value)
 	else
 		GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
 	end
-	if(value) then
-		if(value >= 1 and value <= 10) then
-			local ui_height = value*self.min_ui_height;
-			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {960,560});
-			local frame_height = frame_size[2];
-			scaling = frame_height / ui_height;
-		else
-			scaling = 1;
+	if(value and value~=0) then
+		scaling = value
+		local frame_size = ParaEngine.GetAttributeObject():GetField("WindowResolution", {960,560});
+		local frame_height = frame_size[2];
+		if(frame_height < self.min_ui_height*scaling) then
+			scaling = frame_height / self.min_ui_height;
 		end
 	end
 	ParaUI.GetUIObject("root"):SetField("UIScale", {scaling, scaling});
 end
 
 function options:GetUIScaling()
-	local ui_height = ParaUI.GetUIObject("root").height;
-	return ui_height/640;
+	local scaling = ParaUI.GetUIObject("root"):GetField("UIScale", {1, 1});
+	return scaling[1];
 end
 
 -- async asset loader
