@@ -143,6 +143,12 @@ function ParacraftLearningRoomDailyPage.ShowPage()
 				height = 500,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+    if(page)then
+        local index = ParacraftLearningRoomDailyPage.GetNextDay();
+        local row = math.floor((index-1) / 5) + 1;
+	    page:CallMethod("item_gridview", "ScrollToRow", row);
+    end
+
 end
 function ParacraftLearningRoomDailyPage.ClosePage()
 	if(page)then
