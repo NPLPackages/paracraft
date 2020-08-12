@@ -103,8 +103,16 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnBeforeRestart", appName: before entire NPL runtime is restarted. 
   - "GameName", titlename: get game name string
   - "GameDescription", desc: get game description string, which will be shown in the window title area
-  - "HandleGlobalKeyByRETURN", custom handle global key by DIK_RETURN
-  - "HandleGlobalKeyBySLASH", custom handle global key by DIK_SLASH
+  - "HandleGlobalKeyByRETURN" , custom handle global key by DIK_RETURN
+  - "HandleGlobalKeyBySLASH" , custom handle global key by DIK_SLASH
+  - "HandlePlayerKeyEventByB" , custom handle global key by DIK_B
+  - "HandlePlayerKeyEventByE" , custom handle global key by DIK_E
+  - "HandlePlayerKeyEventByF5" , custom handle global key by DIK_F5
+  - "HandleGlobalKeyByF12" , custom handle global key by DIK_F12
+  - "HandleGlobalKeyByF4" , custom handle global key by DIK_F4
+  - "HandleGlobalKeyByF11" , custom handle global key by DIK_F11
+  - "HandleGlobalKeyByF9" , custom handle global key by DIK_F9
+  - "HandleGlobalKeyByF1" , custom handle global key by DIK_F1
   
 - file exporters:
   - "file_exported", id, filename:
