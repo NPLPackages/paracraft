@@ -1,0 +1,265 @@
+﻿<!-- "script/apps/Aries/Inventory/Pages/KeepWorkStackableItem.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KeepWorkStackableItem, by Andy, 2009/8/5</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkStackableItem.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+--local ItemPage = MyCompany.Aries.Inventory.PurchaseStackableItem;
+local KeepWorkStackableItemPage = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage
+local ItemManager = Map3DSystem.Item.ItemManager;
+local hasGSItem = ItemManager.IfOwnGSItem;
+local VIP = commonlib.gettable("MyCompany.Aries.VIP");
+
+local haqi_RMB_Currency = System.options.haqi_RMB_Currency
+local haqi_GameCurrency = System.options.haqi_GameCurrency
+
+--ItemPage.OnInit();
+local item_data = pageCtrl:GetRequestParam("item_data");
+item_data = commonlib.Json.Decode(item_data);
+KeepWorkStackableItemPage.OnInit(item_data)
+local default_count = pageCtrl:GetRequestParam("count");
+default_count = tonumber(default_count) or 1;
+local price = 0;
+local pbuyprice = 0;
+local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
+
+local max_count = 99; 
+if(gsItem) then
+    local bhas,_,_,count = hasGSItem(gsid);
+    if(not gsItem.template.maxcount or gsItem.template.maxcount<=0) then
+        max_count = 99;
+    else
+        max_count = math.min(math.max(gsItem.template.maxcount - (count or 0),0), 9999999);
+    end
+end
+
+function GetCountDesc()
+    return format("输入购买数量(1-%d)", max_count);
+end
+
+local last_bean = System.App.profiles.ProfileManager.GetUserInfoInMemory();
+
+if(gsItem) then
+	name = gsItem.template.name;
+	price = gsItem.ebuyprice;
+    pbuyprice = gsItem.count;
+else
+    name = "unknown";
+    price = 0;
+    pbuyprice = 0;
+end
+
+local mymoney = 0;
+local my_p_money = 0;
+local bhas,_,_,count = hasGSItem(984);
+if (bhas and count) then
+    my_p_money = count;
+end
+
+local ProfileManager = System.App.profiles.ProfileManager;
+local myInfo = ProfileManager.GetUserInfoInMemory(ProfileManager.GetNID());
+
+if(myInfo) then
+    mymoney = myInfo.emoney;
+end
+
+function IsKids()
+    if (System.options.version=="kids")then
+        return true
+    else
+        return false
+    end
+end
+
+function GetBuyDesc1()
+    return KeepWorkStackableItemPage.GetBuyDesc1()
+end
+
+function GetBuyDesc2()
+    return "确定要购买吗";    
+end
+
+defaultDesc1 = GetBuyDesc1();
+defaultDesc2 = GetBuyDesc2();
+
+function OnOK()
+    KeepWorkStackableItemPage.OnOK()
+end
+
+function pageCtrl.OnClose()
+    --ItemPage.StopTimer();
+end
+
+--ItemPage.StartTimer(pageCtrl.name, gsid);
+
+function OnCancel()
+    pageCtrl:CloseWindow();
+end
+
+function OnInitValue()
+    local count = default_count;
+    if(count <= 1) then
+        count = 1;
+    elseif(count > max_count) then
+        count = max_count;
+    end
+    if (IsKids()) then
+        pageCtrl:SetValue("count", count);
+        pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+    else
+        pageCtrl:SetValue("countTeen", count);
+        pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+    end
+end
+function OnDecrease()
+    local count;
+    if (IsKids()) then
+        count = pageCtrl:GetValue("count");
+    else
+        count = pageCtrl:GetValue("countTeen");
+    end
+    count = tonumber(count);
+    if(count) then
+        if(count <= 1) then
+            count = 1;
+        elseif(count > max_count) then
+            count = max_count;
+        else
+            count = count - 1;
+        end
+        KeepWorkStackableItemPage.setBuyNum(count)
+
+        if (IsKids()) then
+            pageCtrl:SetValue("count", count);
+            pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+        else
+            pageCtrl:SetValue("countTeen", count);
+            pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+        end
+    end
+    
+end
+
+function OnIncrease()
+    local count;
+    if (IsKids()) then
+        count = pageCtrl:GetValue("count");
+    else
+        count = pageCtrl:GetValue("countTeen");
+    end
+    count = tonumber(count);
+    if(count) then
+        if(count < 1) then
+            count = 1;
+        elseif(count >= max_count) then
+            count = max_count;
+        else
+            count = count + 1;
+        end
+
+        KeepWorkStackableItemPage.setBuyNum(count)
+        if (IsKids()) then
+            pageCtrl:SetValue("count", count);
+            pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+        else
+            pageCtrl:SetValue("countTeen", count);
+            pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+        end
+    end
+end
+function OnKeyUp()
+    local count;
+    if (IsKids()) then
+        count = pageCtrl:GetValue("count");
+    else
+        count = pageCtrl:GetValue("countTeen");
+    end
+    count = tonumber(count) or 1;
+    if(count < 1)then
+        count = 1;
+        if (IsKids()) then
+            pageCtrl:SetValue("count", count);
+            pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+        else
+            pageCtrl:SetValue("countTeen", count);
+            pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+        end
+    elseif(count > max_count)then
+        count = max_count;
+        if (IsKids()) then
+            pageCtrl:SetValue("count", count);
+            pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+        else
+            pageCtrl:SetValue("countTeen", count);
+            pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+        end
+    else
+        if (IsKids()) then
+            pageCtrl:SetValue("buydesc1", GetBuyDesc1());
+        else
+            pageCtrl:SetValue("buydesc1Teen", GetBuyDesc1());
+        end
+    end
+end
+
+function canChooseNums()
+    return KeepWorkStackableItemPage.canChooseNums()
+end
+
+function getBuyBtDesc()
+    return KeepWorkStackableItemPage.getBuyBtDesc()
+end
+-- tricky code to decrease the count actually the min value
+--OnDecrease();
+
+OnInitValue()
+]]></script>
+
+<div style="width:466px;height:355px;">
+    <pe:if condition='<%=IsKids() %>'>
+        <div style="width:466px;height:332px;padding:23px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
+            <div style="width:411px;height:240px;">
+                <div style="width:411px;height:160px;">
+                    <pe:if condition='<%=canChooseNums() %>'>
+                        <div style="float:right;padding-left:24px;padding-top:20px;width:145px;height:135px;margin:21px;background:url(Texture/Aries/Inventory/PurchaseItem/Item_bg_32bits.png#0 0 8 135:2 68 3 65)">
+                            <pe:item gsid='<%=Eval("gsid")%>' style="width:96px;height:96px" isclickable="false"/>
+                        </div>
+                        <div style="float:right;margin-top:48px;">
+                            <input type="button" style="width:38px;height:42px;background:url(Texture/Aries/Inventory/PurchaseItem/count_down_32bits.png#0 0 38 42)" onclick="OnDecrease()"/>
+                            <div style="float:right;padding-left:50px;padding-top:8px;width:119px;height:40px;background:url(Texture/Aries/Inventory/PurchaseItem/count_input_32bits.png#0 0 119 40)">
+                                <input type="text" name="count" value="1" onkeyup="OnKeyUp()" style="width:40px;height:25px;background:;"/>
+                            </div>
+                            <input type="button" style="width:38px;height:42px;background:url(Texture/Aries/Inventory/PurchaseItem/count_up_32bits.png#0 0 38 42)" onclick="OnIncrease()"/>
+                            <div style="margin-left:48px;color:#f0f0f0"><%=GetCountDesc() %></div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=not canChooseNums() %>'>
+                        <div style="float:right;padding-left:24px;padding-top:20px;width:145px;height:135px;margin-left:140px;background:url(Texture/Aries/Inventory/PurchaseItem/Item_bg_32bits.png#0 0 8 135:2 68 3 65)">
+                            <pe:item gsid='<%=Eval("gsid")%>' style="width:96px;height:96px" isclickable="false"/>
+                        </div>
+                    </pe:if>
+                </div>
+                <br/>
+                <div style="margin-left:36px;margin-top:10px;color:#f0f0f0">
+                    <label name="buydesc1" style="height:20px;" value='<%=Eval("defaultDesc1")%>'/>
+                    <br/>
+                    <label name="buydesc2" style="height:20px;" value='<%=Eval("defaultDesc2")%>'/>
+                </div>
+            </div>
+        </div>
+        <div style="width:466px;height:48px;margin-top:-36px;">
+            <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:154px;height:48px;"></pe:goalpointer>
+            <input type="button" class="button" value="下次再说" style="margin-left:70px;width:154px;height:48px;" onclick="OnCancel()"/>
+            <input type="button" class="button" value="<%=getBuyBtDesc()%>" style="margin-left:10px;width:154px;height:48px;" onclick="OnOK()"/>
+        </div>
+    </pe:if>
+
+</div>
+</pe:mcml> 
+</body>
+</html>

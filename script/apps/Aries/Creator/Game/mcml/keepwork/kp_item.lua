@@ -32,7 +32,10 @@ function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, le
     if(itemTemplate and itemTemplate.icon)then
         background = itemTemplate.icon;
     end
-	_this.background = background or "";
+    if(not background or background == "" or background == "0")then
+        background = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png",gsid);
+    end
+	_this.background = background;
 
 	
 	

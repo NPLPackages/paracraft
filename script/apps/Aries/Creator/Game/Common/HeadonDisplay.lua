@@ -246,17 +246,19 @@ end
 
 -- virtual function
 function HeadonDisplay:FilterImage(filename)
-	local filename_, params = filename:match("^([^;#:]+)(.*)$");
-	if(filename_) then
-		local filepath = Files.GetFilePath(filename_);
-		if(filepath) then
-			 if(filepath~=filename_) then
-				filename = filepath..(params or "");
-			 end
-		else
-			-- file not exist, return nil
-			LOG.std(nil, "warn", "CodeWindow", "image file not exist %s", filename);
-			return;
+	if(not filename:match("^https?:") and not filename:match("^%w:")) then
+		local filename_, params = filename:match("^([^;#:]+)(.*)$");
+		if(filename_) then
+			local filepath = Files.GetFilePath(filename_);
+			if(filepath) then
+				 if(filepath~=filename_) then
+					filename = filepath..(params or "");
+				 end
+			else
+				-- file not exist, return nil
+				LOG.std(nil, "warn", "HeadonDisplay", "image file not exist %s", filename);
+				return;
+			end
 		end
 	end
 	return filename;

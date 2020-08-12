@@ -28,6 +28,7 @@ function kp_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, le
 	guid = mcmlNode:GetAttributeWithCode("guid", nil, true);
     local item = KeepWorkItemManager.GetItem(guid);
 	local itemTemplate;
+    local gsid = item.gsId;
     if(item)then
 	    itemTemplate = KeepWorkItemManager.GetItemTemplate(item.gsId);
         copies = item.copies;
@@ -36,7 +37,10 @@ function kp_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, le
     if(itemTemplate.icon)then
         background = itemTemplate.icon;
     end
-	_this.background = background or "";
+    if(not background or background == "" or background == "0")then
+        background = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png",gsid);
+    end
+	_this.background = background;
 
 	_this:GetAttributeObject():SetField("TextOffsetY", height/2 - 8)
 	_this:GetAttributeObject():SetField("TextShadowQuality", 8);

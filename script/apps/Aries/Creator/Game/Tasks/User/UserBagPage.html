@@ -1,0 +1,46 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/UserInfo/UserBagPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="UserBagPage.lua"><![CDATA[
+local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
+UserBagPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #UserBagPage.Current_Item_DS;
+    else
+        return UserBagPage.Current_Item_DS[index];
+    end
+end
+    
+function OnClickGuid(guid)
+    _guihelper.MessageBox("guid:".. guid);
+end
+]]></script>
+    <aries:window mode="thin" width="600" height="500" title='<%= L"背包"%>' onclose="ClosePage">
+    <div>
+        <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="7" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight = "32" 
+            DataSource='<%=DS_Items%>'>
+	        <Columns>
+                <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
+                    <kp:slot guid='<%=Eval("goodsId")%>' style="width:64px;height:64px;" onclick="OnClickGuid"/>    
+                </div>
+            </Columns>
+	        <EmptyDataTemplate>
+	        </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

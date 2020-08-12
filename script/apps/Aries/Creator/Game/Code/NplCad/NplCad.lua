@@ -268,11 +268,12 @@ function NplCad.OnClickExport(type)
 		codeBlock:SetModified(true);
 		NplCad.export_type = type;
 		codeBlock:GetEntity():Restart();
-		NplCad.export_type = nil;
 	end
 end
 function NplCad.ExportToFile(scene,filename, liner, angular)
     local type = NplCad.export_type;
+	NplCad.export_type = nil;
+
     if(not type or not scene or not filename)then
         return
     end

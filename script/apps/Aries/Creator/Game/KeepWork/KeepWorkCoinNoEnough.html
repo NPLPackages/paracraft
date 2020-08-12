@@ -1,0 +1,89 @@
+﻿<!-- "script/apps/Aries/Inventory/Pages/KeepWorkCoinNoEnough.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KeepWorkCoinNoEnough, by yangguiyi, 2020/8/6</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkCoinNoEnough.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local KeepWorkCoinNoEnough = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkCoinNoEnough
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+local WorldList = NPL.load("./WorldList")
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+
+local item_data = pageCtrl:GetRequestParam("item_data");
+KeepWorkCoinNoEnough.OnInit(item_data)
+
+function OnCancel()
+    pageCtrl:CloseWindow();
+end
+
+function OnOK()
+    KeepWorkCoinNoEnough.OnOK()
+end
+
+function getLeftBean()
+    return KeepWorkCoinNoEnough.getLeftBean()
+end
+
+function OnDailyCheck()
+        if(KeepworkServiceSession:IsSignedIn())then
+            ParacraftLearningRoomDailyPage.DoCheckin();
+            return
+        end
+        LoginModal:CheckSignedIn(L"请先登录", function(result)
+        if result == true then
+            Mod.WorldShare.Utils.SetTimeOut(function()
+                if result then
+                    WorldList:RefreshCurrentServerList()
+                    local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+                    ParacraftLearningRoomDailyPage.DoCheckin();
+                end
+            end, 500)
+        end
+    end)
+end
+
+function OnLearningLand()
+        if(KeepworkServiceSession:IsSignedIn())then
+            ParacraftLearningRoomDailyPage.OnLearningLand();
+            return
+        end
+        LoginModal:CheckSignedIn(L"请先登录", function(result)
+        if result == true then
+            Mod.WorldShare.Utils.SetTimeOut(function()
+                if result then
+                    WorldList:RefreshCurrentServerList()
+                    local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+                    ParacraftLearningRoomDailyPage.OnLearningLand();
+                end
+            end, 300)
+        end
+    end)
+end
+
+]]></script>
+
+<div style="width:466px;height:355px;">
+    <div style="width:466px;height:332px;padding:23px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
+        <div style="width:411px;height:240px;">
+            <div style="width:411px;height:160px;">
+                <div style="margin-left:48px;margin-top:60px;color:#f0f0f0"><%="知识币余额不足，请充值！" %></div>
+                <div style="margin-left:48px;color:#f0f0f0"><%=getLeftBean() %></div>
+            </div>
+        </div>
+    </div>
+    <div style="width:466px;height:48px;margin-top:-46px;">
+        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:140px;width:80px;height:30px;"></pe:goalpointer>
+        <input type="button" style="margin-left:140px;width:80px;height:30px;" onclick="OnOK()" class="defaultbutton" value="马上充值"/>
+        <input type="button" style="margin-left:30px;width:80px;height:30px;" onclick="OnCancel()" class="defaultbutton" value="下次再说"/>
+    </div>
+
+</div>
+</pe:mcml> 
+</body>
+</html>

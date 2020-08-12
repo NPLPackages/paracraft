@@ -1,0 +1,208 @@
+﻿<!-- "script/apps/Aries/Inventory/Pages/KeepWorkSingleItem.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KeepWorkSingleItem, by Andy, 2009/8/5</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkSingleItem.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local ItemManager = Map3DSystem.Item.ItemManager;
+local hasGSItem = ItemManager.IfOwnGSItem;
+
+gsid = pageCtrl:GetRequestParam("gsid");
+gsid = tonumber(gsid);
+
+local haqi_RMB_Currency = System.options.haqi_RMB_Currency
+local haqi_GameCurrency = System.options.haqi_GameCurrency
+
+local price = 0;
+local pbuyprice = 0;
+local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
+if(gsItem) then
+	name = gsItem.template.name;
+	price = gsItem.ebuyprice;
+    pbuyprice = gsItem.count;
+end
+
+local mymoney = 0;
+local my_p_money = 0;
+local bhas,_,__,count = hasGSItem(984);
+if (bhas and count) then
+    my_p_money = count;
+end
+
+local ProfileManager = System.App.profiles.ProfileManager;
+local myInfo = ProfileManager.GetUserInfoInMemory(ProfileManager.GetNID());
+if(myInfo) then
+    mymoney = myInfo.emoney;
+end
+
+if(pbuyprice and pbuyprice>0) then
+    -- this cost real money
+    tips = name.."需要"..pbuyprice..haqi_RMB_Currency.."，你现在有"..my_p_money..haqi_RMB_Currency.."。你确认要购买吗？";
+else
+    -- check for discount value
+    local isHalfPriceDay = false;
+    local discount = 1
+
+    if(discount and tonumber(discount) == 0.5) then
+        isHalfPriceDay = true;
+        price = price * tonumber(discount);
+    end
+    local discountPrefix = "";
+    if(isHalfPriceDay) then
+        discountPrefix = "今天是半价日，";
+    end
+
+    if(price and price == 0) then
+        tips = format("%s是免费的, 你确认要领取么?", name);
+    else
+        tips = discountPrefix..name.."需要"..price..haqi_GameCurrency.."，你现在有"..mymoney..haqi_GameCurrency.."。你确认要购买吗？";
+    end
+end
+
+function IsKids()
+    if (System.options.version=="kids")then
+        return true
+    else
+        return false
+    end
+end
+
+function OnOK()
+    NPL.load("(gl)script/apps/Aries/mcml/pe_goal_pointer.lua");
+    local goal_manager = commonlib.gettable("MyCompany.Aries.mcml_controls.goal_manager");
+    if(goal_manager.match_param("gsid", gsid)) then
+        goal_manager.finish("purchase_confirm");
+    end
+
+    -- 12010_WishStone_DarklyCombatBack
+    if(gsid == 12010) then
+        if(hasGSItem(1713)) then
+            _guihelper.MessageBox([[<div style="margin-left:20px;margin-top:20px;">你已经有火炎之翼了，不需要购买火炎之翼许愿石。</div>]])
+            return;
+        end
+    end
+
+    -- 47 ExtendedCost_ID_Store(C) 商城中对应物品的extendedcost id
+    local exid;
+    -- gsItem is previously fetched in the starting process
+    local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
+    if(gsItem) then
+	    exid = gsItem.template.stats[47];
+    end
+
+    if(exid) then
+        local exTemplate = ItemManager.GetExtendedCostTemplateInMemory(exid);
+		if(exTemplate) then
+            local _, v;
+			for _, v in ipairs(exTemplate.pres) do
+                if (tonumber(v.key)==-15) then
+                    if( (tonumber(v.value) or 0) >= 1) then
+                        if(not MyCompany.Aries.VIP.IsVIPAndActivated()) then
+                            pageCtrl:CloseWindow();
+                            _guihelper.Custom_MessageBox("你现在还没有魔法星哦，" .. gsItem.template.name .. "需要魔法的力量才能使用购买哦，你确定要购买能量石加入魔法星吗？",function(result)
+					            if(result == _guihelper.DialogResult.Yes)then
+						            Map3DSystem.mcml_controls.pe_item.OnClickGSItem(998,true);
+					            end
+				            end,_guihelper.MessageBoxButtons.YesNo,{yes = "Texture/Aries/Common/PurchaseImmediately_32bits.png; 0 0 153 49", no = "Texture/Aries/Common/IKnow_32bits.png; 0 0 153 49"});
+                            return;
+                        end
+                    end
+                end
+            end
+
+			local i, from;
+			for i, from in ipairs(exTemplate.froms) do
+				if(from.key == 984) then -- magic bean
+					local bHas, guid, bag, copies = ItemManager.IfOwnGSItem(984);
+					if(bHas == false or (bHas == true and from.value > copies)) then
+                        NPL.load("(gl)script/apps/Aries/Desktop/GUIHelper/CustomMessageBox.lua");
+                        local s=string.format("很抱歉，你的%s数量不足，先多兑换点%s再来买吧！",haqi_RMB_Currency,haqi_RMB_Currency);
+                        _guihelper.Custom_MessageBox(s,function(result)
+	                        if(result == _guihelper.DialogResult.Yes)then
+                                if(System.options.version=="kids") then
+		                            NPL.load("(gl)script/apps/Aries/VIP/PurChaseMagicBean.lua");
+                                else
+                                    NPL.load("(gl)script/apps/Aries/VIP/PurChaseMagicBean.teen.lua");
+                                end
+		                        MyCompany.Aries.Inventory.PurChaseMagicBean.Show();
+	                        end
+                        end,_guihelper.MessageBoxButtons.YesNo,{yes = "Texture/Aries/Common/PurchaseMagicBean_32bits.png; 0 0 153 49", no = "Texture/Aries/Common/Later_32bits.png; 0 0 153 49"});
+                        return;
+                    end
+                end
+            end
+        end    
+
+	    System.Item.ItemManager.ExtendedCost(exid, nil, nil, function(msg)
+		    if(msg) then
+			    log("+++++++Purchase item with ExtendedCost return: #"..tostring(gsid).." #"..tostring(exid).." +++++++\n")
+			    commonlib.echo(msg);
+		    end
+            MyCompany.Aries.HaqiShop.InvokeCallbackBySeq(Page:GetRequestParam("seq"), msg)
+	    end, function(msg) end, "purchase");
+    else
+        -- do return end
+	    System.Item.ItemManager.PurchaseItem(gsid, 1, function(msg)
+		    if(msg) then
+			    log("+++++++Purchase item return: #"..tostring(gsid).." +++++++\n")
+			    commonlib.echo(msg);
+		    end
+            MyCompany.Aries.HaqiShop.InvokeCallbackBySeq(Page:GetRequestParam("seq"), msg)
+	    end, function(msg) end, nil, "purchase");
+    end
+    pageCtrl:CloseWindow();
+end
+
+function OnCancel()
+    pageCtrl:CloseWindow();
+end
+
+]]></script>
+<div style="width:466px;height:355px;">
+    <pe:if condition='<%=IsKids() %>'>
+        <div style="width:466px;height:332px;padding:23px;background:url(Texture/Aries/Inventory/PurchaseItem/frame_bg_32bits.png#0 0 55 332:23 159 23 173)">
+            <div style="width:411px;height:240px;background:url(Texture/Aries/Inventory/PurchaseItem/content_bg_32bits.png#0 0 256 240:233 20 22 20)">
+                <div style="width:411px;height:160px;">
+                    <div style="padding-left:24px;padding-top:20px;float:right;width:145px;height:135px;margin:21px;margin-left:130px;background:url(Texture/Aries/Inventory/PurchaseItem/Item_bg_32bits.png#0 0 8 135:2 68 3 65)">
+                        <pe:item gsid='<%=Eval("gsid")%>' style="width:96px;height:96px" isclickable="false"/>
+                    </div>
+                </div>
+                <br/>
+                <div style="margin-left:36px;margin-top:12px;margin-right:36px;color:#011132"><%=Eval("tips")%></div>
+            </div>
+        </div>
+        <div style="width:466px;height:48px;margin-top:-36px;">
+            <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:154px;height:48px;"></pe:goalpointer>
+            <input type="button" style="margin-left:70px;width:154px;height:48px;background:url(Texture/Aries/Inventory/PurchaseItem/buy_btn_32bits.png#0 0 154 48)" onclick="OnOK()"/>
+            <input type="submit" style="width:154px;height:48px;background:url(Texture/Aries/Inventory/PurchaseItem/cancel_btn_32bits.png#0 0 154 48)" onclick="OnCancel()"/>
+        </div>
+    </pe:if>
+
+    <pe:if condition='<%=not IsKids() %>'>
+        <div style="width:466px;height:240px;padding:10px;" class="window">
+            <div style="height:19px;margin-top:-10px;margin-left:-10px;">
+              <div class="windowlabel"><%=Eval("name")%></div>
+            </div>
+            <div style="width:430px;height:120px;margin-top:10px">
+                <div style="padding-left:15px;padding-top:15px;float:right;width:115px;height:115px;margin:5px;margin-left:160px;">
+                    <pe:item gsid='<%=Eval("gsid")%>' style="width:90px;height:90px" isclickable="false"/>
+                </div>
+            </div>
+            <br/>
+            <div style="margin-left:30px;margin-top:10px;margin-right:30px;"><%=Eval("tips")%></div>
+        </div>
+        <div style="width:466px;height:48px;margin-top:-46px;">
+            <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:140px;width:80px;height:30px;"></pe:goalpointer>
+            <input type="button" style="margin-left:140px;width:80px;height:30px;" onclick="OnOK()"  class="button_highlight" value="马上购买"/>
+            <input type="submit" style="margin-left:30px;width:80px;height:30px;" onclick="OnCancel()" class="button_thick" value="下次再说"/>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml> 
+</body>
+</html>

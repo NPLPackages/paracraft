@@ -24,14 +24,12 @@ function TreeItems(index)
 end
 function GridsItems(index)
     if(index == nil) then    
-        return #KeepWorkMallPage.grid_data_sources[KeepWorkMallPage.top_bt_index][KeepWorkMallPage.menu_item_index];
+        return #KeepWorkMallPage.grid_data_sources;
     else
-        return KeepWorkMallPage.grid_data_sources[KeepWorkMallPage.top_bt_index][KeepWorkMallPage.menu_item_index][index];
+        return KeepWorkMallPage.grid_data_sources[index];
     end
 end
-function ClickItem(index)
-    KeepWorkMallPage.ClickItem(index)
-end
+
 function TypeBeExpand(expanded)
     if(expanded and expanded == true) then
         return true;
@@ -53,23 +51,24 @@ function ChangeMenuType(treenode)
 end
 function ChangeMenuItem(name,mcmlNode)
 
-    local type_index = tonumber(mcmlNode:GetAttribute("param1"));
-    local menu_item_index = tonumber(mcmlNode:GetAttribute("param2"));
+    --local type_index = tonumber(mcmlNode:GetAttribute("param1"));
+    --local menu_item_index = tonumber(mcmlNode:GetAttribute("param2"));
 
-    KeepWorkMallPage.ChangeMenuItem(menu_item_index)
+    local attr = mcmlNode:GetAttribute("param1")
+    local menu_item_index = attr.menu_item_index
+    commonlib.echo(mcmlNode:GetAttribute("param1"), true)
+    KeepWorkMallPage.ChangeMenuItem(attr)
 end
 
 function SearchBlock(name,mcmlNode)
     local search_ctrl = Page:FindUIControl(name)
-    print("ffffffffffffffffffff", search_ctrl.text)
+    KeepWorkMallPage.GetGoodsData(nil, search_ctrl.text, true)
 end
 function OnclickBuy(name,mcmlNode)
-    local exid = tonumber(mcmlNode:GetAttribute("param1"));
-    local gsid = 30102
-	local command = System.App.Commands.GetCommand("Profile.Aries.PurchaseItemWnd");
-	if(command) then
-		command:Call({gsid = gsid,callback=callback});
-	end
+    --local exid = tonumber(mcmlNode:GetAttribute("param1"));
+    local data = mcmlNode:GetAttribute("param1")
+    KeepWorkMallPage.OnClickBuy(data)
+        
 end
 ]]></script>
 <aries:window mode="thin" width="650" height="450" title='<%= L"资源中心"%>' onclose="ClosePage">
@@ -77,7 +76,7 @@ end
 
     <div style="margin-left:13px;margin-top:5px;width:210px;">
         <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
-            <input type="text" EmptyText='<%=L"搜索: 请输入您要查找的账号"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
+            <input type="text" EmptyText='<%=L"搜索: 请输入您要查找的商品"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
         </div>
     </div>
 
@@ -123,10 +122,10 @@ end
                 <NodeTemplate DataType="item">
                     <div style="height:32px;margin-left:2px;" MouseOverBG="">
                         <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_blue" />
+                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_blue" />
                         </pe:if>
                         <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_grey" />
+                            <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_grey" />
                         </pe:if>
                     </div>
                 </NodeTemplate>
@@ -135,8 +134,8 @@ end
     </div>
 
     <div>
-        <div style="position:relative;margin-left:200px;margin-top:2px;width:400px;height:300px;background-color:#000000;"></div>
-        <pe:gridview style="margin-left:200px;" name="item_gridview" CellPadding="2" VerticalScrollBarStep="36" 
+        <div style="position:relative;margin-left:200px;margin-top:2px;width:400px;height:300px;"></div>
+        <pe:gridview style="margin-left:200px;" name="item_gridview" CellPadding="5" VerticalScrollBarStep="36" 
                      VerticalScrollBarOffsetX="8" AllowPaging="true" ItemsPerLine="3" DefaultNodeHeight="50"
                      DataSource='<%=GridsItems%>' pagesize="9">
             <PagerSettings Position="Bottom" height="36" style="position:relative;width:340px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
@@ -156,75 +155,31 @@ end
                 </form>
             </PagerTemplate>
             <Columns>
-                <!-- <div style="width:100px;height:100px;padding-left:0px;">
-                    <div style="position:relative">
-                        <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);" tooltip='<%="啊啊啊"%>' onclick="" />
-                        <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
-                            <div style="text-align:center;">
-                                <%= Eval("name")%>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="button" name='<%= Eval("name")%>' style="width:70px;height:60px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" tooltip='<%="啊啊啊"%>' onclick="" />
-                    <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
-                        <div style="text-align:center;">
-                            <%= Eval("name")%>
-                        </div>
-
-                    </div>
-                    <div style="position:relative;margin-left:-5px;margin-top:-70px;width:70px;height:70px;background:" >
-                        <img style="background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);width:70px;height:60px;"/>
-                    </div>  
-                </div> -->
-                    <div style="width:140px;height:93px;background:url(Texture/Aries/HaqiShop/bg.png#0 0 16 16:5 5 5 5);">
-                        <div style="margin-left:3px;margin-top:2px;width:158px;height:20px;font-size:12;font-weight:bold;text-align:center;color:#03285A;"><%=Eval("name") %></div>
+                    <!-- <div style="width:140px;height:93px;background:url(Texture/Aries/HaqiShop/bg.png#0 0 16 16:5 5 5 5);"></div> -->
+                    <div style="width:140px;height:93px;;background-color:#000000;">
+                        <div style="margin-left:3px;margin-top:2px;width:158px;height:20px;font-size:12;font-weight:bold;text-align:center;color:#ffffff;"><%=Eval("name") %></div>
                         <div >
                             <div style="float:left;margin-left:3px;margin-top:2px;padding:5px;width:64px;height:64px;background:url(Texture/Aries/NewProfile/bg_equip_32bits.png#0 0 32 32:5 5 5 5);">
-                                <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' showdefaulttooltip="true" style="margin-left:0px;width:54px;height:54px;" />
+                                <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' tooltip = '<%=Eval("description")%>' icon = "" showdefaulttooltip="false" style="margin-left:0px;width:54px;height:54px;" />
+                                <div style="position:relative;margin-top:-17px;padding-left:-3px;height:12px;;font-size:12;color:#ffffff;"><%=Eval("tag_desc") %></div>
+                                <div style="position:relative;margin-top:-59px;padding-left:36px;height:12px;;font-size:12;color:#ffffff;"><%=Eval("vip_desc") %></div>
                                 <!-- <pe:if condition='<%=not IsRightSchool(Eval("gsid")) %>'>
                                     <div zorder="1" style="position:relative;margin-left:-4px;margin-top:-59px;width:62px;height:62px;background:url(Texture/Aries/Desktop/ItemOutline/outline_school_not_match_32bits.png: 7 7 7 7)"/>
                                 </pe:if> -->
                             </div>
-                            <pe:if condition='<%=true %>'>
-                                <div style="float:left;margin-left:5px;padding-left:5px;font-size:12px;">
-                                    <div style="height:18px;"><%=999 %></div>
-                                </div>
-                                <div>
-                                    <pe:goalpointer listen="purchase" param_name1="gsid" param_value1='<%=Eval("gsid")%>' style="position:relative;margin-left:120px;margin-top:-25px;width:50px;height:26px"></pe:goalpointer>
-                                    <input type="button" class="button" value="购买" onclick="OnclickBuy()" name='<%=0 %>' param1='<%=2404 %>' param2='<%=2408 %>' style="margin-left:80px;margin-top:-22px;font-size:12px;width:50px;"/>
-                                </div>
-                            </pe:if>
-                            <!-- <pe:if condition='<%=Eval("exid")~=0 or IncludeSpecialID(Eval("exid"),Eval("gsid"))%>'>
-                                <pe:if condition='<%=true %>'>
-                                    <div style="float:left;margin-left:0px;padding-left:1px;font-size:12px;">
-                                        <div style="height:18px;"><%=GetLine(Eval("exid"),1, true) %></div>
-                                        <div style="height:18px;"><%=GetLine(Eval("exid"),2, true) %></div>
-                                        <div style="height:18px;"><%=GetLine(Eval("exid"),3, true) %></div>
-                                    </div>
-                                    <div><input type="button" value="出售" class="button" onclick="DoSell()" name='<%=Eval("exid") %>' param1='<%=Eval("exid") %>' param2='<%=Eval("gsid") %>' style="margin-left:105px;margin-top:-22px;font-size:12px;width:50px;"/></div>
+                            <div style="float:left;margin-left:5px;padding-left:5px;font-size:12px;">
+                                <div style="height:18px;color:#ffffff;"><%=Eval("cost_desc")%></div>
+                            </div>
+                            <div>
+                                <pe:goalpointer listen="purchase" param_name1="gsid" param_value1='<%=Eval("gsid")%>' style="position:relative;margin-left:120px;margin-top:-25px;width:50px;height:26px"></pe:goalpointer>
+                                <pe:if condition='<%=Eval("enabled")%>'>
+                                    <input type="button" class="button" value='<%=Eval("buy_txt")%>' enabled='true' onclick="OnclickBuy()" name='<%=0 %>' param1='<%= XPath("this") %>' style="margin-left:80px;margin-top:-22px;font-size:12px;width:50px;"/>
                                 </pe:if>
-                                <pe:if condition='<%=not IsSelling(Eval("gsid"), Eval("exid")) %>'>
-                                    <div style="float:left;margin-left:0px;padding-left:1px;font-size:12px;">
-                                        <pe:if condition='<%=Eval("exid")~=0 %>'>
-                                            <div style="height:18px;"><%=GetLine(Eval("exid"),1) %></div>
-                                            <div style="height:18px;"><%=GetLine(Eval("exid"),2) %></div>
-                                            <div style="height:18px;"><%=GetLine(Eval("exid"),3) %></div>
-                                        </pe:if>
-                                        <pe:if condition='<%=Eval("exid")==0 %>'>
-                                            <%=GetSingleItemPrice(Eval("gsid")) %>
-                                        </pe:if>
-                                    </div>
-                                    <div>
-                                        <pe:if condition='<%=not IncludeSpecialID(Eval("exid"),Eval("gsid")) %>'>
-                                            <pe:goalpointer listen="purchase" param_name1="gsid" param_value1='<%=Eval("gsid")%>' style="position:relative;margin-left:120px;margin-top:-25px;font-size:12px;width:50px;height:26px"></pe:goalpointer>
-                                            <input type="button" class="button" value="购买" onclick="DoBuy()" name='<%=Eval("exid") %>' param1='<%=Eval("exid") %>' param2='<%=Eval("gsid") %>' style="margin-left:105px;margin-top:-22px;font-size:12px;width:50px;"/>
-                                        </pe:if>
-                                        <pe:if condition='<%=IncludeSpecialID(Eval("exid"),Eval("gsid")) %>'>
-                                            <input type="button" class="button" value="领取" onclick="DoExchange()" name='<%=Eval("exid") %>' param1='<%=Eval("exid") %>' param2='<%=Eval("gsid") %>' style="margin-left:105px;margin-top:-22px;font-size:12px;width:50px;"/>
-                                        </pe:if>
-                                    </div>
+                                <pe:if condition='<%=not Eval("enabled")%>'>
+                                    <input type="button" class="button" value='<%=Eval("buy_txt")%>' enabled="false" onclick="OnclickBuy()" name='<%=0 %>' param1='<%= XPath("this") %>' style="margin-left:80px;margin-top:-22px;font-size:12px;width:50px;"/>
                                 </pe:if>
-                            </pe:if> -->
+                                
+                            </div>
                         </div>
                     </div>
             </Columns>
@@ -232,12 +187,6 @@ end
             </EmptyDataTemplate>
         </pe:gridview>
     </div>
-
-    <!--<div type ="box" style="margin-bottom:0px;">
-        底部
-        <input type="button" name="last" value="添加好友" onclick="" tooltip="添加好友"/>
-        <input type="button" name="last" value="好友申请" onclick="" tooltip="好友申请"/>
-    </div>-->
 </div>
 
         </aries:window>

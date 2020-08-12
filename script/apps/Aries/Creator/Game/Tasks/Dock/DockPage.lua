@@ -40,6 +40,7 @@ function DockPage.Show()
             click_through = true,
         } );
         DockPage._root = DockPage.page:Create("DockPage.Show_instance", nil, "_fi", 0, 0, 0, 0)
+	    DockPage._root:GetAttributeObject():SetField("ClickThrough", true);
     end
     DockPage._root.visible = true;
     DockPage.is_show = true;
@@ -57,6 +58,9 @@ function DockPage.OnClick(id)
     if(id == "character")then
         local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
         UserInfoPage.ShowPage();
+    elseif(id == "bag")then
+        local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
+        UserBagPage.ShowPage();
     elseif(id == "work")then
         
         GameLogic.RunCommand("/menu file.loadworld");

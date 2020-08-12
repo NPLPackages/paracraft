@@ -29,6 +29,7 @@ local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel")
 local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/SocketIOClient.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
 local KpChatChannel = NPL.export();
 
 KpChatChannel.worldId_pending = nil;
@@ -315,16 +316,7 @@ function KpChatChannel.CreateMcmlStrToTipRoad(chatdata)
 
     local channel_tag = "";
     local name_tag_start = [[<div style="float:left">[</div>]]
-    local user_tag = KeepWorkItemManager.GetUserTag(chatdata);
-    if(user_tag)then
-        if(user_tag == "VT")then
-            user_tag = string.format([[<kp:usertag tag="%s" style="float:left;width:34px;height:18px;" />]],user_tag);
-        else
-            user_tag = string.format([[<kp:usertag tag="%s" style="float:left;width:18px;height:18px;" />]],user_tag);
-        end
-    else
-        user_tag = "";
-    end
+    local user_tag = KpUserTag.GetMcml(chatdata);
     local name_tag_end = [[<div style="float:left">]:</div>]]
 
     kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
@@ -357,16 +349,8 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
 
     local channel_tag = string.format([[<div style="float:left">[%s]</div>]],chatdata.channelname);
     local name_tag_start = [[<div style="float:left">[</div>]]
-    local user_tag = KeepWorkItemManager.GetUserTag(chatdata);
-    if(user_tag)then
-        if(user_tag == "VT")then
-            user_tag = string.format([[<kp:usertag tag="%s" style="float:left;width:34px;height:18px;" />]],user_tag);
-        else
-            user_tag = string.format([[<kp:usertag tag="%s" style="float:left;width:18px;height:18px;" />]],user_tag);
-        end
-    else
-        user_tag = "";
-    end
+
+    local user_tag = KpUserTag.GetMcml(chatdata);
     local name_tag_end = [[<div style="float:left">]:</div>]]
 
     kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
