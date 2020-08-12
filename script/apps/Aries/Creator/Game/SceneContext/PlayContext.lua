@@ -206,8 +206,10 @@ function PlayContext:keyPressEvent(event)
 
 	local dik_key = event.keyname;
 	if(dik_key == "DIK_B") then
-		if(System.options.mc) then
-			GameLogic.ToggleDesktop("bag");
+		if not GameLogic.GetFilters():apply_filters("HandlePlayerKeyEventByB") then 
+			if(System.options.mc) then
+				GameLogic.ToggleDesktop("bag");
+			end
 		end
 	elseif(dik_key == "DIK_Q") then
 		GameLogic.GetPlayerController():ThrowBlockInHand();

@@ -825,22 +825,28 @@ function BaseContext:handlePlayerKeyEvent(event)
 			end
 			event:accept();
 		elseif(dik_key == "DIK_B") then
-			if(System.options.mc) then
-				GameLogic.ToggleDesktop("bag");
-				event:accept();
+			if not GameLogic.GetFilters():apply_filters("HandlePlayerKeyEventByB") then 
+				if(System.options.mc) then
+					GameLogic.ToggleDesktop("bag");
+					event:accept();
+				end
 			end
 		elseif(dik_key == "DIK_W") then
 			GameLogic.WalkForward();
 			event:accept();
 		elseif(dik_key == "DIK_E") then
-			GameLogic.ToggleDesktop("builder");
-			event:accept();
+			if not GameLogic.GetFilters():apply_filters("HandlePlayerKeyEventByE") then 
+				GameLogic.ToggleDesktop("builder");
+				event:accept();
+			end
 		elseif(dik_key == "DIK_Q") then
 			GameLogic.GetPlayerController():ThrowBlockInHand();
 			event:accept();
 		elseif(dik_key == "DIK_F5") then
-			GameLogic.ToggleCamera();
-			event:accept();
+			if not GameLogic.GetFilters():apply_filters("HandlePlayerKeyEventByF5") then
+				GameLogic.ToggleCamera();
+				event:accept();
+			end
 		elseif(dik_key == "DIK_X") then
 			GameLogic.TalkToNearestNPC();
 			event:accept();
@@ -863,18 +869,22 @@ function BaseContext:HandleGlobalKey(event)
 	local ctrl_pressed = event.ctrl_pressed;
 	if(System.options.isAB_SDK or System.options.mc) then
 		if(dik_key == "DIK_F12" and not ctrl_pressed) then
-			System.App.Commands.Call("Help.Debug");
-			event:accept();
+			if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByF12") then
+				System.App.Commands.Call("Help.Debug");
+				event:accept();
+			end
 		elseif(dik_key == "DIK_F3" and ctrl_pressed) then
 			System.App.Commands.Call("File.MCMLBrowser");
 			event:accept();
 		elseif(dik_key == "DIK_F4") then
-			if(ctrl_pressed) then
-				System.App.Commands.Call("Help.ToggleReportAndBoundingBox");
-			else
-				System.App.Commands.Call("Help.ToggleWireFrame");
+			if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByF4") then
+				if(ctrl_pressed) then
+					System.App.Commands.Call("Help.ToggleReportAndBoundingBox");
+				else
+					System.App.Commands.Call("Help.ToggleWireFrame");
+				end
+				event:accept();
 			end
-			event:accept();
 		end
 		if(event:isAccepted()) then
 			return true;
@@ -900,8 +910,10 @@ function BaseContext:HandleGlobalKey(event)
 			end
 			event:accept();
 		elseif(dik_key == "DIK_F11") then
-			CommandManager:RunCommand("/open npl://console");
-			event:accept();
+			if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByF11") then
+				CommandManager:RunCommand("/open npl://console");
+				event:accept();
+			end
 		elseif(ctrl_pressed and dik_key == "DIK_P") then
 			CommandManager:RunCommand("/stop");
 			event:accept();
@@ -962,8 +974,10 @@ function BaseContext:HandleGlobalKey(event)
 	end
 	
 	if(dik_key == "DIK_F9") then
-		CommandManager:RunCommand("record");
-		event:accept();
+		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByF9") then
+			CommandManager:RunCommand("record");
+			event:accept();
+		end
 	elseif(dik_key == "DIK_RETURN") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByRETURN") then
 			if(GameLogic.GameMode:CanChat()) then
@@ -1008,7 +1022,9 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then
 		GameLogic.RunCommand("/open npl://debugger");
 	elseif(dik_key == "DIK_F1") then
-		GameLogic.RunCommand("/menu help.help");
+		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByF1") then
+			GameLogic.RunCommand("/menu help.help");
+		end
 	end
 
 	if (ctrl_pressed and event.alt_pressed) then
