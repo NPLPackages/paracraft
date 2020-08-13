@@ -46,6 +46,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "DefaultContext", context, mode: getting the default scene context for user input
   - "TouchVirtualKeyboardIcon", keyboardIcon: custom mobile keyboard icon.
   - "TouchMiniKeyboard", TouchMiniKeyboard: custom touchMiniKeyboard.
+  - "KeyPressEvent" , event:KeyEvent KeyPressEvent: custom KeyPressEvent
 - GUI:
   - "ShowLoginModePage": this is the first user interface shown. One must install this filter very early, such as in mod.loadOnStartup. 
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI

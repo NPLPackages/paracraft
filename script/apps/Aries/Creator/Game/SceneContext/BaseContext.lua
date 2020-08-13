@@ -574,6 +574,8 @@ end
 
 -- virtual: actually means key stroke. 
 function BaseContext:keyPressEvent(event)
+	GameLogic.GetFilters():apply_filters("KeyPressEvent", false, event)
+
 	if(self:handleHookedKeyEvent(event)) then
 		return true;
 	end
