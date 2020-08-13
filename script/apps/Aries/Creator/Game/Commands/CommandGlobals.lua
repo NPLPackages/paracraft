@@ -344,17 +344,30 @@ Commands["useplayerpivoty"] = {
 
 Commands["renderdist"] = {
 	name="renderdist", 
-	quick_ref="/renderdist [10-200]", 
+	quick_ref="/renderdist [-super] [10-200]", 
 	desc=[[render distance between 10 and maxrenderdist. 
 The upper limit is set by command /maxrenderdist 
 /renderdist 96
+/renderdist -super 2000   using multiframe rendering for unlimited distance
 ]], 
 	mode_deny = "",
 	mode_allow = "",
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(cmd_text) then
+			local options = {};
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
 			local dist = tonumber(cmd_text)
-			GameLogic.options:SetRenderDist(dist);
+
+			if(dist) then
+				if(options.super) then
+					GameLogic.options:SetSuperRenderDist(dist);
+					if(dist and dist > GameLogic.options:GetRenderDist() and dist>64) then
+						GameLogic.options:SetFogEnd(dist - 64);
+					end
+				else
+					GameLogic.options:SetRenderDist(dist);
+				end
+			end
 		end
 	end,
 };

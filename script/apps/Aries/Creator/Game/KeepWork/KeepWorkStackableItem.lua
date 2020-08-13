@@ -5,6 +5,8 @@ Date: 2020/7/21
 Desc:  script/apps/Aries/Creator/Game/KeepWork/KeepWorkStackableItem.html
 Use Lib:
 -------------------------------------------------------
+local KeepWorkStackableItem = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkStackableItem.lua");
+KeepWorkStackableItem.openBeanNoEnoughView();
 -------------------------------------------------------
 ]]
 local KeepWorkStackableItemPage = {};
@@ -78,10 +80,91 @@ function KeepWorkStackableItemPage.GetBuyDesc1()
 
 	
 	
-	local desc = string.format("需要%d个%s，你现在有%d个%s", result_price, cost_name, my_money, cost_name)
+	local desc = string.format("需要%d个%s，你现在有%d个%s,确定要购买吗?", result_price, cost_name, my_money, cost_name)
 	
 	return desc
 end
+
+-- {
+-- 	exchangeResult={
+-- 	  costList={
+-- 		{
+-- 		  amount=2,
+-- 		  goodsInfo={
+-- 			bagId=4,
+-- 			beans=1,
+-- 			canHandsel=false,
+-- 			canTrade=false,
+-- 			canUse=false,
+-- 			coins=1,
+-- 			createdAt="2020-06-01T07:31:06.000Z",
+-- 			dayMax=500,
+-- 			deleted=false,
+-- 			desc="通过活动与任务获得的兑换物。上限500，每天最多可获得50。",
+-- 			destoryAfterUse=false,
+-- 			expiredRules=1,
+-- 			expiredSeconds=0,
+-- 			gsId=998,
+-- 			icon="0",
+-- 			id=10,
+-- 			max=2500,
+-- 			name="知识豆",
+-- 			showAt=1,
+-- 			stackable=true,
+-- 			typeId=7,
+-- 			updatedAt="2020-08-11T06:52:19.000Z",
+-- 			weekMax=2500 
+-- 		  } 
+-- 		} 
+-- 	  },
+-- 	  gainList={
+-- 		{
+-- 		  amount=1,
+-- 		  goodsInfo={
+-- 			bagId=4,
+-- 			beans=20,
+-- 			canHandsel=false,
+-- 			canTrade=false,
+-- 			canUse=true,
+-- 			coins=98,
+-- 			createdAt="2020-06-01T07:48:30.000Z",
+-- 			dayMax=9999999999,
+-- 			deleted=false,
+-- 			desc="用于在世界频道中广播，每条消息消耗1个。",
+-- 			destoryAfterUse=true,
+-- 			expiredRules=1,
+-- 			expiredSeconds=0,
+-- 			gsId=10001,
+-- 			icon="0",
+-- 			id=12,
+-- 			max=9999999999,
+-- 			name="世界喇叭",
+-- 			showAt=1,
+-- 			stackable=true,
+-- 			typeId=8,
+-- 			updatedAt="2020-06-01T08:28:43.000Z",
+-- 			weekMax=9999999999 
+-- 		  } 
+-- 		} 
+-- 	  } 
+-- 	},
+-- 	mOrder={
+-- 	  bean=0,
+-- 	  coin=0,
+-- 	  createdAt="2020-08-12T07:14:25.228Z",
+-- 	  id=38,
+-- 	  mProductId=1,
+-- 	  mProductName="大力丸商品",
+-- 	  platform=1,
+-- 	  quantity=1,
+-- 	  ruleId=100000,
+-- 	  state=3,
+-- 	  stateLog={ completedAt="2020-08-12T07:14:25.228Z" },
+-- 	  updatedAt="2020-08-12T07:14:25.228Z",
+-- 	  userId=623 
+-- 	} ,
+--	icon=""
+--   }
 
 function KeepWorkStackableItemPage.OnOK()
 	if is_need_vip and not is_vip then
@@ -108,8 +191,11 @@ function KeepWorkStackableItemPage.OnOK()
 	local cost_name = cost_data.name or ""
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(cost_data.gsId)
 	local my_money = copies and copies or 0
-	
-	if my_money < result_price then
+	local is_not_enough = my_money < result_price
+	-- is_not_enough = true
+	-- cost_data.gsId = 998
+	-- cost_data.gsId = 888
+	if is_not_enough then
 		if cost_data.gsId == bean_gsid then
 			KeepWorkStackableItemPage.openBeanNoEnoughView()
 		elseif cost_data.gsId == coin_gsid then
@@ -134,7 +220,9 @@ function KeepWorkStackableItemPage.OnOK()
         }
 	},function(err, msg, data)
 		if err == 200 then
-			_guihelper.MessageBox("购买成功!");
+			data.icon = item_data.icon
+			-- GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
+			KeepWorkStackableItemPage.openGetItemView(data)
 			KeepWorkItemManager.LoadItems()
 			page:CloseWindow()
 		elseif err == 500 then
@@ -169,8 +257,6 @@ end
 
 function KeepWorkStackableItemPage.openBeanNoEnoughView()
 
-	local params = {}
-	local seq = 1
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		-- TODO:  Add uid to url
 		url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkBeanNoEnough.html", 
@@ -185,10 +271,10 @@ function KeepWorkStackableItemPage.openBeanNoEnoughView()
 		enable_esc_key = true,
 		directPosition = true,
 			align = "_ct",
-			x = -466/2,
-			y = -400/2,
-			width = 466,
-			height = 355,
+			x = -400/2,
+			y = -330/2,
+			width = 400,
+			height = 330,
 	});
 end
 
@@ -210,10 +296,10 @@ function KeepWorkStackableItemPage.openCoinNoEnoughView()
 		enable_esc_key = true,
 		directPosition = true,
 			align = "_ct",
-			x = -466/2,
-			y = -400/2,
-			width = 466,
-			height = 355,
+			x = -400/2,
+			y = -216/2,
+			width = 400,
+			height = 216,
 	});
 end
 
@@ -228,4 +314,33 @@ function KeepWorkStackableItemPage.canChooseNums()
 	end
 
 	return false
+end
+
+function KeepWorkStackableItemPage.getGoodName()
+	return item_data and item_data.name or ""
+end
+
+function KeepWorkStackableItemPage.openGetItemView(data)
+	-- data.icon = "Texture/Aries/Creator/keepwork/items/item_10001_32bits.png"
+	data = commonlib.Json.Encode(data);
+	local url = System.localserver.UrlHelper.BuildURLQuery("script/apps/Aries/Creator/Game/KeepWork/KeepWorkGetItem.html", {item_data = data});
+	System.App.Commands.Call("File.MCMLWindowFrame", {
+		-- TODO:  Add uid to url
+		url = url, 
+		name = "keepWork.GetItem", 
+		app_key = MyCompany.Aries.app.app_key, 
+		isShowTitleBar = false,
+		isTopLevel = true,
+		allowDrag = true,
+		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = 10,
+		enable_esc_key = true,
+		directPosition = true,
+			align = "_ct",
+			x = -400/2,
+			y = -304/2,
+			width = 400,
+			height = 304,
+	});
 end

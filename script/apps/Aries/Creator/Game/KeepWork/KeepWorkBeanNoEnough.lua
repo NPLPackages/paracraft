@@ -21,7 +21,6 @@ end
 function KeepWorkBeanNoEnough.getLeftBean()
     local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(bean_gsid)
 	my_bean = copies or 0;
-	local desc = "你的知识豆余额：" .. my_bean
 
-	return desc
+	return my_bean
 end

@@ -66,24 +66,24 @@ function OnLearningLand()
     end)
 end
 
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+
 ]]></script>
-
-<div style="width:466px;height:355px;">
-    <div style="width:466px;height:332px;padding:23px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
-        <div style="width:411px;height:240px;">
-            <div style="width:411px;height:160px;">
-                <div style="margin-left:48px;margin-top:60px;color:#f0f0f0"><%="知识币余额不足，请充值！" %></div>
-                <div style="margin-left:48px;color:#f0f0f0"><%=getLeftBean() %></div>
-            </div>
-        </div>
+<aries:window mode="thin" width="400" height="216" title='<%=L"提示"%>' onclose="ClosePage">
+    <div style="width:400;margin-left:21px;margin-top:39px;">
+        <div style="color:#f0f0f0"><%="知识币余额不足，请充值！" %></div>
+        <div style="float:left; margin-top:13px; color:#999999; font-size:14px;"><%="你的知识币余额: " %></div>
+        <div style="float:left;margin-top:18px;margin-left:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_coin_32bits.png#0 0 16 16:0 0 0 0);"></div> 
+        <div style="float:left;margin-left:0px; margin-top:13px; color:#ffc900; font-size:14px;"><%=getLeftBean() %></div>
     </div>
-    <div style="width:466px;height:48px;margin-top:-46px;">
-        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:140px;width:80px;height:30px;"></pe:goalpointer>
-        <input type="button" style="margin-left:140px;width:80px;height:30px;" onclick="OnOK()" class="defaultbutton" value="马上充值"/>
-        <input type="button" style="margin-left:30px;width:80px;height:30px;" onclick="OnCancel()" class="defaultbutton" value="下次再说"/>
+    <div style="width:400px;height:48px;margin-top:42px;">
+        <pe:goalpointer listen="purchase_confirm" style="width:90px;height:32px;"></pe:goalpointer>
+        <input type="button" style="margin-left:90px;width:90px;height:32px;" onclick="OnCancel()" class="mc_big_button" value="下次再说"/>
+        <input type="button" style="margin-left:20px;width:90px;height:32px;" onclick="OnOK()" class="mc_big_button" value="马上充值"/>
     </div>
-
-</div>
+</aries:window>
 </pe:mcml> 
 </body>
 </html>

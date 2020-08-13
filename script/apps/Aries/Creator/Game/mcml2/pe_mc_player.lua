@@ -64,8 +64,10 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		PlayerAssetFile:Init();
 
 		local obj_params = ObjEditor.GetObjectParams(ParaScene.GetPlayer());
+		if (filename) then
+			obj_params.AssetFile = PlayerAssetFile:GetValidAssetByString(filename);
+		end
 
-		--[[
 		NPL.load("(gl)script/apps/Aries/Creator/Game/PlayerController.lua");
 		
 		if(not obj_params.AssetFile or obj_params.AssetFile == "") then
@@ -75,10 +77,6 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 				x = 0, y=0, z=0, facing=0,
 				Attribute = 128,
 			};
-		end
-		]]
-		if (filename) then
-			obj_params.AssetFile = PlayerAssetFile:GetValidAssetByString(filename);
 		end
 		obj_params.name = "mc_player";
 		self:AutoSetObjectSkin(obj_params)

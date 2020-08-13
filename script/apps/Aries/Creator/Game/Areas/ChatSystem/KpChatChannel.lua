@@ -23,6 +23,7 @@ http://yapi.kp-para.cn/project/60/interface/api/1952
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatHelper.lua");
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
@@ -30,6 +31,7 @@ local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/Socke
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
+local KpChatHelper = commonlib.gettable("MyCompany.Aries.Creator.ChatSystem.KpChatHelper");
 local KpChatChannel = NPL.export();
 
 KpChatChannel.worldId_pending = nil;
@@ -196,6 +198,11 @@ function KpChatChannel.OnMsg(self, msg)
 
                 local userId = payload.id;
                 local username = payload.username;
+                local nickname = payload.nickname;
+                local kp_from_name = nickname;
+                if(not kp_from_name or kp_from_name == "")then
+                    kp_from_name = username;
+                end
                 local vip = payload.vip;
                 local student = payload.student;
                 local orgAdmin = payload.orgAdmin;
@@ -220,7 +227,7 @@ function KpChatChannel.OnMsg(self, msg)
                 local channelname = ChatChannel.channels[ChannelIndex];
                 local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, 
                 vip = vip, student = student, orgAdmin = orgAdmin, tLevel = tLevel, 
-                timestamp = timestamp, kp_from_name = username, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
+                timestamp = timestamp, kp_from_name = kp_from_name, kp_from_id = userId, kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
                 ChatChannel.AppendChat( msgdata)
 
                 
@@ -308,6 +315,7 @@ function KpChatChannel.CreateMcmlStrToTipRoad(chatdata)
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
     local kp_from_name = chatdata.kp_from_name or "";
+    
     local vip = chatdata.vip;
     local student = chatdata.student;
     local orgAdmin = chatdata.orgAdmin;
@@ -341,6 +349,8 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
     local kp_from_name = chatdata.kp_from_name or "";
+    local kp_from_id = chatdata.kp_from_id;
+
     local vip = chatdata.vip;
     local student = chatdata.student;
     local orgAdmin = chatdata.orgAdmin;
@@ -353,7 +363,7 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     local user_tag = KpUserTag.GetMcml(chatdata);
     local name_tag_end = [[<div style="float:left">]:</div>]]
 
-    kp_from_name = string.format([[<div style="float:left">%s</div>]],kp_from_name);
+    kp_from_name = string.format([[<input type="button" name="%d" value="%s" onclick="MyCompany.Aries.Creator.ChatSystem.KpChatHelper.ShowUserInfo" style="float:left;color:#%s;background:url()" />]],kp_from_id, kp_from_name, color);
     local timestamp_tag = string.format([[<input type="button" value="%s" style="float:left;margin-left:10px;color:#8b8b8b;background:url();" />]],tostring(timestamp));
     if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
         mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestamp_tag);
@@ -494,6 +504,7 @@ function KpChatChannel.SendToServer(msgdata)
 
             id = user_info.id,
             username = user_info.username,
+            nickname = user_info.nickname,
             vip = user_info.vip,
             student = user_info.student,
             orgAdmin = user_info.orgAdmin,

@@ -308,7 +308,7 @@ function MainLogin:LoadBackground3DScene()
 	end
 
 	local titlename = GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
-	local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画游戏创作工具")
+	local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画编程创作工具")
 
 	System.options.WindowTitle = string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
 	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));

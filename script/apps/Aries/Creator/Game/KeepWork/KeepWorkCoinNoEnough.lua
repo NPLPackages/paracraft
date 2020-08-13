@@ -20,9 +20,8 @@ end
 function KeepWorkCoinNoEnough.getLeftBean()
     local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(coin_gsid)
 	my_coin = copies or 0;
-	local desc = "你的知识币余额：" .. my_coin
 
-	return desc
+	return my_coin
 end
 
 function KeepWorkCoinNoEnough.OnOK()

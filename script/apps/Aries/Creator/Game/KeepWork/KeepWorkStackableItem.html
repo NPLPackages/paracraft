@@ -28,11 +28,11 @@ local price = 0;
 local pbuyprice = 0;
 local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
 
-local max_count = 99; 
+local max_count = 999; 
 if(gsItem) then
     local bhas,_,_,count = hasGSItem(gsid);
     if(not gsItem.template.maxcount or gsItem.template.maxcount<=0) then
-        max_count = 99;
+        max_count = 999;
     else
         max_count = math.min(math.max(gsItem.template.maxcount - (count or 0),0), 9999999);
     end
@@ -81,7 +81,7 @@ function GetBuyDesc1()
 end
 
 function GetBuyDesc2()
-    return "确定要购买吗";    
+    return "";    
 end
 
 defaultDesc1 = GetBuyDesc1();
@@ -214,52 +214,63 @@ end
 function getBuyBtDesc()
     return KeepWorkStackableItemPage.getBuyBtDesc()
 end
+
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+function getGoodName()
+    return KeepWorkStackableItemPage.getGoodName()
+end
+
+function getIcon()
+    return item_data.icon
+end
 -- tricky code to decrease the count actually the min value
 --OnDecrease();
 
 OnInitValue()
 ]]></script>
-
-<div style="width:466px;height:355px;">
-    <pe:if condition='<%=IsKids() %>'>
-        <div style="width:466px;height:332px;padding:23px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
-            <div style="width:411px;height:240px;">
-                <div style="width:411px;height:160px;">
-                    <pe:if condition='<%=canChooseNums() %>'>
-                        <div style="float:right;padding-left:24px;padding-top:20px;width:145px;height:135px;margin:21px;background:url(Texture/Aries/Inventory/PurchaseItem/Item_bg_32bits.png#0 0 8 135:2 68 3 65)">
-                            <pe:item gsid='<%=Eval("gsid")%>' style="width:96px;height:96px" isclickable="false"/>
-                        </div>
-                        <div style="float:right;margin-top:48px;">
-                            <input type="button" style="width:38px;height:42px;background:url(Texture/Aries/Inventory/PurchaseItem/count_down_32bits.png#0 0 38 42)" onclick="OnDecrease()"/>
-                            <div style="float:right;padding-left:50px;padding-top:8px;width:119px;height:40px;background:url(Texture/Aries/Inventory/PurchaseItem/count_input_32bits.png#0 0 119 40)">
-                                <input type="text" name="count" value="1" onkeyup="OnKeyUp()" style="width:40px;height:25px;background:;"/>
-                            </div>
-                            <input type="button" style="width:38px;height:42px;background:url(Texture/Aries/Inventory/PurchaseItem/count_up_32bits.png#0 0 38 42)" onclick="OnIncrease()"/>
-                            <div style="margin-left:48px;color:#f0f0f0"><%=GetCountDesc() %></div>
-                        </div>
-                    </pe:if>
-                    <pe:if condition='<%=not canChooseNums() %>'>
-                        <div style="float:right;padding-left:24px;padding-top:20px;width:145px;height:135px;margin-left:140px;background:url(Texture/Aries/Inventory/PurchaseItem/Item_bg_32bits.png#0 0 8 135:2 68 3 65)">
-                            <pe:item gsid='<%=Eval("gsid")%>' style="width:96px;height:96px" isclickable="false"/>
-                        </div>
-                    </pe:if>
+<aries:window mode="thin" width="400" height="304" title='<%=getGoodName()%>' onclose="ClosePage">
+    <div style="width:411px;height:230px;">
+        <div style="width:411px;height:160px;">
+            <pe:if condition='<%=canChooseNums() %>'>
+                <div style="float:right;padding-left:20px;padding-top:20px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                   <div style="position:relative;width:123px">
+                        <div style="position:relative;margin-left:6px;margin-top:0px;">
+                            <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
+                        </div>                              
+                    </div>
                 </div>
-                <br/>
-                <div style="margin-left:36px;margin-top:10px;color:#f0f0f0">
-                    <label name="buydesc1" style="height:20px;" value='<%=Eval("defaultDesc1")%>'/>
-                    <br/>
-                    <label name="buydesc2" style="height:20px;" value='<%=Eval("defaultDesc2")%>'/>
+                <div style="float:right;width:141px;height:32px;margin-top:52px;margin-left:25px;background-color:#2b2b29;">
+                    <input type="button" value='<%=L"-"%>' style="width:50px;height:30px;color:#ffffff;font-size:30;background:)" onclick="OnDecrease()"/>
+                    <label name="count" value="1" onkeyup="OnKeyUp()" style="color:#FFFFFF;text-align:center;width:40px;height:25px;margin-top:5;"/>
+                    <input type="button" value='<%=L"+"%>' style="width:50px;height:30px;color:#ffffff;font-size:26;background:)" onclick="OnIncrease()"/>
+                    <div style="margin-left:8px;margin-top:10px;color:#666666;font-size:14px;"><%=GetCountDesc() %></div>
                 </div>
-            </div>
+            </pe:if>
+            <pe:if condition='<%=not canChooseNums() %>'>
+                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                    <div style="position:relative;width:123px">
+                         <div style="position:relative;margin-left:6px;margin-top:0px;">
+                             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
+                         </div>                              
+                     </div>
+                 </div>
+            </pe:if>
         </div>
-        <div style="width:466px;height:48px;margin-top:-36px;">
-            <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:154px;height:48px;"></pe:goalpointer>
-            <input type="button" class="button" value="下次再说" style="margin-left:70px;width:154px;height:48px;" onclick="OnCancel()"/>
-            <input type="button" class="button" value="<%=getBuyBtDesc()%>" style="margin-left:10px;width:154px;height:48px;" onclick="OnOK()"/>
+        <br/>
+        <div style="margin-left:36px;margin-top:10px;color:#f0f0f0">
+            <label name="buydesc1" style="height:30px;font-size:16px;" value='<%="Eval("defaultDesc1")"%>'/>
+            <br/>
+            <label name="buydesc2" style="height:30px;font-size:16px;" value='<%=Eval("defaultDesc2")%>'/>
         </div>
-    </pe:if>
-
-</div>
+    </div>
+    <div style="width:466px;height:32px;margin-top:0px;margin-left:20px">
+        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
+        <input type="button" class="mc_big_button" value="下次再说" style="margin-left:70px;width:90px;height:32px;" onclick="OnCancel()"/>
+        <input type="button" class="mc_big_button" value="<%=getBuyBtDesc()%>" style="margin-left:20px;width:90px;height:32px;" onclick="OnOK()"/>
+    </div>
+</aries:window>
 </pe:mcml> 
 </body>
 </html>

@@ -9,7 +9,8 @@ local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/K
 KeepWorkMallPage.Show();
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local KeepWorkMallPage = NPL.export();
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 
@@ -17,6 +18,8 @@ local page;
 local level_to_index = {}
 local menu_item_index = 0
 local cur_classifyId = 0
+local bean_gsid = 998;
+local coin_gsid = 888
 KeepWorkMallPage.menu_data_sources = {}
 KeepWorkMallPage.menu_data_sources = {
 	{
@@ -55,41 +58,59 @@ function KeepWorkMallPage.OnInit()
 end
 
 function KeepWorkMallPage.Show()
-	local params = {
-			url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.html",
-			name = "KeepWorkMallPage.Show", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			enable_esc_key = true,
-			zorder = -1,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			directPosition = true,
-				align = "_ct",
-				x = -650/2,
-				y = -450/2,
-				width = 650,
-				height = 450,
-		};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
-	KeepWorkMallPage.OnChangeTopBt(1);
+    if(KeepworkServiceSession:IsSignedIn())then
+        KeepWorkMallPage.ShowView()
+        return
+    end
+    LoginModal:CheckSignedIn(L"请先登录", function(result)
+        if result == true then
+            Mod.WorldShare.Utils.SetTimeOut(function()
+                if result then
+					KeepWorkMallPage.ShowView()
+                end
+            end, 500)
+        end
+    end)
+end
 
-    keepwork.mall.menus.get({
-        cache_policy,
-        platform =  1,
-    },function(err, msg, data)
+function KeepWorkMallPage.ShowView()
+	keepwork.mall.menus.get({
+		cache_policy,
+		platform =  1,
+	},function(err, msg, data)
 		level_to_index = {}
 		menu_item_index = 0
 	
 		local level = 1
 		KeepWorkMallPage.menu_data_sources = {}
 		KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
+
+		local view_width = 1084
+		local view_height = 638
+		local params = {
+				url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.html",
+				name = "KeepWorkMallPage.Show", 
+				isShowTitleBar = false,
+				DestroyOnClose = true,
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				allowDrag = true,
+				enable_esc_key = true,
+				zorder = -1,
+				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+				directPosition = true,
+					align = "_ct",
+					x = -view_width/2,
+					y = -view_height/2,
+					width = view_width,
+					height = view_height,
+			};
+		System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+		KeepWorkMallPage.OnChangeTopBt(1);
 		KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
 	end)
-	
-
 end
+
 function KeepWorkMallPage.OnChangeTopBt(index)
 	index = tonumber(index)
     KeepWorkMallPage.top_bt_index = index;
@@ -105,7 +126,7 @@ function KeepWorkMallPage.ChangeMenuItem(attr)
 end
 function KeepWorkMallPage.OnRefresh()
     if(page)then
-        page:Refresh(0.05);
+        page:Refresh(0.2);
     end
 end
 function KeepWorkMallPage.ChangeMenuType(level, index)
@@ -171,8 +192,8 @@ function KeepWorkMallPage.HandleMenuData(parent_t, data, level)
 
 		-- 记录默认展示的索引
 		if temp_t.attr.menu_item_index and temp_t.attr.menu_item_index == KeepWorkMallPage.defaul_select_menu_item_index then
-			KeepWorkMallPage.cur_select_level = parent_t.attr.level
-			KeepWorkMallPage.cur_select_type_index = parent_t.attr.index
+			KeepWorkMallPage.cur_select_level = parent_t.attr and parent_t.attr.level or 1
+			KeepWorkMallPage.cur_select_type_index = parent_t.attr and parent_t.attr.index or 1
 			KeepWorkMallPage.GetGoodsData(temp_t.attr.server_data.id)
 		end
 	end	
@@ -183,100 +204,6 @@ local tagList = {
 	[2] = "latest",
 	[3] = "hot",
 }
-
--- {
---     bean=0,
---     coin=0,
---     createdAt="2020-07-21T08:50:28.000Z",
---     description="测试兑换10001",
---     icon="http://qiniu-public-dev.keepwork.com/admin5-6bb607b0-d172-11ea-a1c7-af49ce54d063",
---     id=12,
---     isVip=false,
---     method=0,
---     name="测试兑换10001",
---     rule={
---       createdAt="2020-06-04T08:18:35.000Z",
---       desc="测试兑换10001",
---       exId=10001,
---       exchangeCosts={ { amount=1, id=15 } },
---       exchangeTargets={
---         {
---           goods={
---             {
---               amount=1,
---               goods={
---                 bagId=8,
---                 beans=100000,
---                 canHandsel=true,
---                 canTrade=true,
---                 canUse=true,
---                 coins=100000,
---                 createdAt="2020-06-04T08:16:07.000Z",
---                 dayMax=100000,
---                 deleted=false,
---                 desc="测试物品10003",
---                 destoryAfterUse=true,
---                 expiredRules=1,
---                 expiredSeconds=0,
---                 gsId=10003,
---                 icon="none",
---                 id=16,
---                 max=100000,
---                 name="测试物品10003",
---                 stackable=true,
---                 typeId=8,
---                 updatedAt="2020-06-04T09:10:14.000Z",
---                 weekMax=100000 
---               },
---               id=16 
---             },
---             {
---               amount=1,
---               goods={
---                 bagId=9,
---                 beans=100000,
---                 canHandsel=true,
---                 canTrade=true,
---                 canUse=true,
---                 coins=100000,
---                 createdAt="2020-06-04T08:19:34.000Z",
---                 dayMax=100000,
---                 deleted=false,
---                 desc="测试物品10004",
---                 destoryAfterUse=true,
---                 expiredRules=1,
---                 expiredSeconds=0,
---                 gsId=10004,
---                 icon="none",
---                 id=17,
---                 max=100000,
---                 name="测试物品10004",
---                 stackable=true,
---                 typeId=8,
---                 updatedAt="2020-06-04T09:10:27.000Z",
---                 weekMax=100000 
---               },
---               id=17 
---             } 
---           },
---           probability=100 
---         } 
---       },
---       greedy=false,
---       icon="http://qiniu-public-dev.keepwork.com/admin5-6bb607b0-d172-11ea-a1c7-af49ce54d063",
---       id=27,
---       name="测试兑换10001",
---       preconditions={ { amount=6, id=12, op="gte" } },
---       storage=-1,
---       updatedAt="2020-07-29T08:06:41.000Z" 
---     },
---     ruleId=10001,
---     showAt=2,
---     sn=0,
---     status=1,
---     tags="latest,hot",
---     updatedAt="2020-08-10T05:20:00.000Z" 
---   },
 
 function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
 	-- classifyId 类别id
@@ -300,40 +227,45 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
             ["x-per-page"] = 1000,
             ["x-page"] = 1,
         }
-    },function(err, msg, data)
+	},function(err, msg, data)
 		for k, v in pairs(data.rows) do
 			v.cost_name = ""
 			v.cost = 0
 			v.cost_desc = ""
-			v.tag_desc = ""
 			v.enabled = true
-			v.vip_desc = v.isVip and "vip" or ""
-
+			v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
+			v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
+			v.isLink = v.purchaseUrl ~= nil and v.purchaseUrl ~= ""
 			-- 售完或者到达购买上限的情况下不允许购买
 			v.buy_txt = "购买"
 			if v.rule and v.rule.storage == 0 then
 				v.buy_txt = "售完"
 				v.enabled = false
+			else
+				v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
 			end
-
-			v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
-
-			if v.tags == "latest" then
-				v.tag_desc = "最新"
-			elseif v.tags == "hot" then
-				v.tag_desc = "热门"
-			elseif v.tags == "latest,hot" or v.tags == "hot,latest" then
-				v.tag_desc = "最新热门"
-			end
+			
 			
 			if v.rule and v.rule.exchangeCosts and v.rule.exchangeCosts[1] then
 				v.cost = v.rule.exchangeCosts[1].amount
-
+				
 				local cost_item_data = KeepWorkItemManager.GetItemTemplateById(v.rule.exchangeCosts[1].id) or {}
 				v.cost_name = cost_item_data.name or ""
-				v.cost_desc = v.cost .. v.cost_name				
+
+				if cost_item_data.gsId == bean_gsid then
+					v.is_cost_bean = true
+				elseif cost_item_data.gsId == coin_gsid then
+					v.is_cost_coin = true
+				end
+
+				if v.is_cost_bean or v.is_cost_coin then
+					v.cost_desc = v.cost
+				else
+					v.cost_desc = v.cost .. v.cost_name
+				end
+			elseif v.price then
+				v.cost_desc = v.price
 			end
-			
 		end
 
 		KeepWorkMallPage.grid_data_sources = data.rows
@@ -349,6 +281,11 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
 end
 
 function KeepWorkMallPage.OnClickBuy(item_data)
+	if item_data.isLink then
+		ParaGlobal.ShellExecute("open", "iexplore.exe", item_data.purchaseUrl or "", "", 1); 
+		return
+	end
+
 	item_data = commonlib.Json.Encode(item_data);
 	local params = {}
 	local seq = 1
@@ -367,10 +304,10 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		enable_esc_key = true,
 		directPosition = true,
 			align = "_ct",
-			x = -466/2,
-			y = -400/2,
-			width = 466,
-			height = 355,
+			x = -400/2,
+			y = -304/2,
+			width = 400,
+			height = 304,
 	});
 end
 
@@ -405,9 +342,14 @@ end
 -- 2 背包数量还没达到限制的购买数量 但买了之后会超过限制数量 必须看是否允许贪婪 若允许 则可以购买 但后买后的数量依然不能超过限制数量
 --   若不允许 则不允许购买
 function KeepWorkMallPage.checkIsGetLimit(data)
+	if data.isLink then
+		return true
+	end
+
 	if nil == data.rule then
 		return false
 	end
+
 	local exchange_targets = data.rule.exchangeTargets or {}
 	local greedy = data.rule.greedy
 	local target_list = exchange_targets[1].goods or {}
@@ -431,4 +373,13 @@ function KeepWorkMallPage.checkIsGetLimit(data)
 	end
 
 	return true
+end
+
+local top_bt_desc_list = {
+	[1] = "全部类别",
+	[2] = "最新类别",
+	[3] = "热门类别"
+}
+function KeepWorkMallPage.getTopBtDesc()
+	return top_bt_desc_list[KeepWorkMallPage.top_bt_index or 1] or ""
 end

@@ -145,6 +145,7 @@ end
 
 -- return true if url protocol is installed
 -- @param protocol_name: default to "paracraft://"
+-- @return bFound, exeName
 function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 	protocol_name = protocol_name or "paracraft";
 	protocol_name = protocol_name:gsub("[://]+","");
@@ -159,7 +160,7 @@ function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 				local filename = cmd:gsub("/", "\\"):match("\"([^\"]+)");
 				if(ParaIO.DoesFileExist(filename, false)) then
 					LOG.std(nil, "info", "Url protocol", "%s:// found in registry as %s", protocol_name, cmd);
-					return true;
+					return true, filename;
 				else
 					LOG.std(nil, "warn", "Url protocol", "%s:// file not found at %s", protocol_name, filename);
 				end
@@ -170,8 +171,19 @@ end
 
 function UrlProtocolHandler:CheckInstallUrlProtocol()
 	if(System.os.GetPlatform() == "win32" and not (System.options and (System.options.isFromQQHall or System.options.isSchool))) then
-		if(self:HasUrlProtocol()) then
-			return true;
+		local bFound, exeName = self:HasUrlProtocol()
+		if(bFound) then
+			local curPath = ParaIO.GetCurDirectory(0):gsub("\\", "/")
+			exeName = exeName:gsub("\\", "/")
+			if(exeName:sub(1, #curPath) == curPath) then
+				return true
+			else
+				_guihelper.MessageBox(format(L"发现多个Paracraft版本在您的电脑上, 是否用当前目录下的版本%s作为默认的世界浏览器?<br/>安装paracraft://URL协议，需要管理员权限", curPath), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						self:RegisterUrlProtocol();
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+			end
 		else
 			_guihelper.MessageBox(L"安装paracraft://URL协议后, 可用浏览器打开3D世界, 是否现在安装？(可能需要管理员权限)", function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then

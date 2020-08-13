@@ -211,8 +211,8 @@ function Canvas3D:ShowModel(obj, bAutoAdjustCamera)
 		------------------------------------
 		-- init camera
 		------------------------------------
-		scene:CameraSetLookAtPos(0,0.7,0);
-		scene:CameraSetEyePosByAngle(0, 0.3, 5);
+		scene:CameraSetLookAtPos(0,0.8,0);
+		scene:CameraSetEyePosByAngle(0, 0.25, 4);
 		
 		if(self.mask_texture) then
 			scene:SetMaskTexture(ParaAsset.LoadTexture("", self.mask_texture, 1));
@@ -286,7 +286,9 @@ function Canvas3D:ShowModel(obj, bAutoAdjustCamera)
 					if(camInfo~=nil)then
 						self:AdjustCamera(camInfo,bb,scale);
 					else					
-						self:AutoAdjustCameraByBoundingBox(bb);
+						if (scale == 1) then
+							self:AutoAdjustCameraByBoundingBox(bb);
+						end
 					end
 				end	
 			end

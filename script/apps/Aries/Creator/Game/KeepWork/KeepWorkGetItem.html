@@ -1,0 +1,78 @@
+﻿<!-- "script/apps/Aries/Inventory/Pages/KeepWorkGetItem.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KeepWorkGetItem, by yangguiyi, 2009/8/12</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkGetItem.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+--local ItemPage = MyCompany.Aries.Inventory.PurchaseStackableItem;
+local KeepWorkGetItem = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkGetItem
+local ItemManager = Map3DSystem.Item.ItemManager;
+local hasGSItem = ItemManager.IfOwnGSItem;
+local VIP = commonlib.gettable("MyCompany.Aries.VIP");
+
+local haqi_RMB_Currency = System.options.haqi_RMB_Currency
+local haqi_GameCurrency = System.options.haqi_GameCurrency
+
+--ItemPage.OnInit();
+local item_data = pageCtrl:GetRequestParam("item_data");
+item_data = commonlib.Json.Decode(item_data);
+KeepWorkGetItem.OnInit(item_data)
+
+function OnOK()
+    GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
+    pageCtrl:CloseWindow();
+end
+
+
+function canChooseNums()
+    return KeepWorkGetItem.canChooseNums()
+end
+
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+
+function getIcon()
+    return item_data and item_data.icon or ""
+end
+
+function getItemName()
+    if nil == item_data then
+        return ""
+    end
+    local mOrder = item_data.mOrder
+    if nil == mOrder then
+        return ""
+    end
+    local name = mOrder.mProductName or ""
+    local num = mOrder.quantity or 0
+    local desc = name .. "x" .. num
+    return desc
+end
+
+-- tricky code to decrease the count actually the min value
+--OnDecrease();
+]]></script>
+<aries:window mode="thin" width="400" height="304" title='<%=L"提示"%>' onclose="ClosePage">
+    <div style="margin-top:40px;float:left;padding-left:20px;padding-top:20px;margin-left:40px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+        <div style="position:relative;margin-left:6px;margin-top:0px;">
+            <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
+        </div>   
+     </div>
+     <div style="float:left">
+        <div style="margin-left:8px;margin-top:60px;color:#ffffff;font-size:14px;"><%="你获得了"%></div>
+        <div style="margin-left:8px;margin-top:20px;color:#999999;font-size:14px;"><%=getItemName()%></div>
+    </div>
+    <div style="width:400px;height:32px;margin-top:50px;margin-left:80px">
+        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
+        <input type="button" class="mc_big_button" value="收下" style="margin-left:70px;width:90px;height:32px;" onclick="OnOK()"/>
+    </div>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>

@@ -236,6 +236,10 @@ function GameLogic.InitCommon()
 		ParacraftCI.StaticInit();
 	end
 	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
+	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
+	ParaWorldMain:Init()
+
 	GameLogic.KeepWorkItemManager = KeepWorkItemManager;
 end
 

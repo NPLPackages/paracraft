@@ -27,7 +27,7 @@ function ParaWorldMinimapWnd:Show()
 	self.window:Show({
 		name="ParaWorldMinimapWnd", 
 		url="script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.html",
-		alignment="_rt", left=-210, top=10, width = 200, height = 200,
+		alignment="_rt", left=-210, top=10, width = 200, height = 200, zorder = -12
 	});
 end
 
