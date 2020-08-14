@@ -11,7 +11,7 @@ MyCompany.Aries.Game.mcml2.pe_mc_player:RegisterAs("pe:mc_player");
 ]]
 
 NPL.load("(gl)script/ide/System/Windows/mcml/PageElement.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2//Canvas3D.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/Canvas3D.lua");
 local PageElement = commonlib.gettable("System.Windows.mcml.PageElement");
 local Canvas3D = commonlib.gettable("MyCompany.Aries.Game.mcml2.Canvas3D");
 
@@ -44,10 +44,15 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		if(IsInteractive == nil) then
 			IsInteractive = true;
 		end
-		local autoRotateSpeed = self:GetNumber("autoRotateSpeed")
+		local autoRotateSpeed = self:GetNumber("AutoRotateSpeed")
 		if(autoRotateSpeed == nil) then
 			autoRotateSpeed = 0;
 		end
+		local lookAtHeight = self:GetNumber("LookAtHeight");
+		
+		
+		local cameraObjectDist = self:GetNumber("CameraObjectDist");
+		local renderTargetSize = self:GetNumber("RenderTargetSize") or 256;
 		local miniSceneName = self:GetAttributeWithCode("miniscenegraphname");
 
 		local _this = self.control;
@@ -57,6 +62,9 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		if (miniSceneName) then
 			_this:SetMiniscenegraphname(miniSceneName.."_v2");
 		end
+		_this:SetLookAtHeight(lookAtHeight or 1.5);
+		_this:SetDefaultCameraObjectDist(cameraObjectDist or 7);
+		_this:SetRenderTargetSize(renderTargetSize, renderTargetSize);
 
 		local filename = self:GetAttributeWithCode("assetfile");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");

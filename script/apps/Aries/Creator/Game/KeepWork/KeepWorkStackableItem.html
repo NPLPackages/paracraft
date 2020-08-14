@@ -28,11 +28,11 @@ local price = 0;
 local pbuyprice = 0;
 local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
 
-local max_count = 999; 
+local max_count = item_data.rule.storage > 0 and item_data.rule.storage or 999; 
 if(gsItem) then
     local bhas,_,_,count = hasGSItem(gsid);
     if(not gsItem.template.maxcount or gsItem.template.maxcount<=0) then
-        max_count = 999;
+        max_count = item_data.rule.storage > 0 and item_data.rule.storage or 999;
     else
         max_count = math.min(math.max(gsItem.template.maxcount - (count or 0),0), 9999999);
     end

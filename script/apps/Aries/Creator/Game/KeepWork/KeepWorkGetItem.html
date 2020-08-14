@@ -28,11 +28,6 @@ function OnOK()
     pageCtrl:CloseWindow();
 end
 
-
-function canChooseNums()
-    return KeepWorkGetItem.canChooseNums()
-end
-
 function ClosePage()
     pageCtrl:CloseWindow();
 end
@@ -45,12 +40,9 @@ function getItemName()
     if nil == item_data then
         return ""
     end
-    local mOrder = item_data.mOrder
-    if nil == mOrder then
-        return ""
-    end
-    local name = mOrder.mProductName or ""
-    local num = mOrder.quantity or 0
+
+    local name = item_data.mProductName or ""
+    local num = item_data.quantity or 0
     local desc = name .. "x" .. num
     return desc
 end

@@ -22,3 +22,6 @@ HttpWrapper.Create("keepwork.mall.goods.get", "%MAIN%/core/v0/mall/products", "G
 
 --http://yapi.kp-para.cn/project/32/interface/api/2457
 HttpWrapper.Create("keepwork.mall.buy", "%MAIN%/core/v0/mall/products/buy", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/2727
+HttpWrapper.Create("keepwork.mall.orderResule", "%MAIN%/core/v0/mall/mOrders/", "GET", false)

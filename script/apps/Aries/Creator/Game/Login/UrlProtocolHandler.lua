@@ -178,7 +178,7 @@ function UrlProtocolHandler:CheckInstallUrlProtocol()
 			if(exeName:sub(1, #curPath) == curPath) then
 				return true
 			else
-				_guihelper.MessageBox(format(L"发现多个Paracraft版本在您的电脑上, 是否用当前目录下的版本%s作为默认的世界浏览器?<br/>安装paracraft://URL协议，需要管理员权限", curPath), function(res)
+				_guihelper.MessageBox(format(L"发现多个Paracraft版本在您的电脑上, 是否用当前目录下的版本%s作为默认的世界浏览器?<br/>安装paracraft://URL协议，需要管理员权限", commonlib.Encoding.DefaultToUtf8(curPath)), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						self:RegisterUrlProtocol();
 					end

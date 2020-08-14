@@ -5,7 +5,7 @@ Date: 2020/8/6
 Desc: A 3D canvas container for displaying picture, 3D scene, etc
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2//Canvas3D.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/Canvas3D.lua");
 local Canvas3D = commonlib.gettable("MyCompany.Aries.Game.mcml2.Canvas3D");
 ------------------------------------------------------------
 ]]
@@ -211,8 +211,8 @@ function Canvas3D:ShowModel(obj, bAutoAdjustCamera)
 		------------------------------------
 		-- init camera
 		------------------------------------
-		scene:CameraSetLookAtPos(0,0.8,0);
-		scene:CameraSetEyePosByAngle(0, 0.25, 4);
+		scene:CameraSetLookAtPos(0,0.4,0);
+		scene:CameraSetEyePosByAngle(0, 0.25, 2.5);
 		
 		if(self.mask_texture) then
 			scene:SetMaskTexture(ParaAsset.LoadTexture("", self.mask_texture, 1));

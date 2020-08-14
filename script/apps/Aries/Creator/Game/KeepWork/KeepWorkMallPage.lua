@@ -14,6 +14,7 @@ local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua
 local KeepWorkMallPage = NPL.export();
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 
+commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkMallPage", KeepWorkMallPage);
 local page;
 local level_to_index = {}
 local menu_item_index = 0
@@ -70,7 +71,13 @@ function KeepWorkMallPage.Show()
                 end
             end, 500)
         end
-    end)
+	end)
+	
+	NPL.SetTimer("10086", 1, ";MyCompany.Aries.Creator.Game.KeepWork.KeepWorkMallPage.TimerTest();");
+end
+
+function KeepWorkMallPage.TimerTest(param)
+	print("sssssssssssss", param)
 end
 
 function KeepWorkMallPage.ShowView()
@@ -276,14 +283,17 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
 		else
 			KeepWorkMallPage.OnRefresh()
 		end
-		KeepWorkMallPage.OnRefresh()
     end)
 end
 
 function KeepWorkMallPage.OnClickBuy(item_data)
 	if item_data.isLink then
-		ParaGlobal.ShellExecute("open", "iexplore.exe", item_data.purchaseUrl or "", "", 1); 
+		ParaGlobal.ShellExecute("open", item_data.purchaseUrl, "", "", 1); 
 		return
+	end
+	local KeepWorkStackableItemPage = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage
+	if KeepWorkStackableItemPage then
+		KeepWorkStackableItemPage.closeView()
 	end
 
 	item_data = commonlib.Json.Encode(item_data);
@@ -297,6 +307,8 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		app_key = MyCompany.Aries.app.app_key, 
 		isShowTitleBar = false,
 		-- isTopLevel = true,
+		click_through = false,
+		bShow = true,
 		allowDrag = true,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 		style = CommonCtrl.WindowFrame.ContainerStyle,

@@ -29,7 +29,6 @@ local is_cost_bean = true
 function KeepWorkGetItem.OnInit(data)
 	page = document:GetPageCtrl();
 	item_data = data
-	print("rrrrrrrrrrrrrrr")
 	commonlib.echo(item_data, true)
 end
 

@@ -153,9 +153,6 @@ end
 
 -- clean up all nearby paintings which are derived from this one. 
 function Entity:ResetDerivedPaintings()
-	if(self:IsRemote()) then
-		return;
-	end
 	if(self.start_block_coord and self.rows) then
 		local rows = self.rows;
 		local columns = self.columns;
@@ -176,11 +173,9 @@ function Entity:ResetDerivedPaintings()
 		for row_index = 1,rows do
 			for column_index = 1,columns do
 				local image_entity = EntityManager.GetEntityInBlock(block_x,block_y,block_z,self.class_name);
-
 				if(image_entity) then
 					image_entity.root_entity_coord = nil; 
 					image_entity:SetDerivedImageFilename(nil);
-					image_entity:Refresh();
 				end
 
 				if(facing == 0) then
@@ -201,49 +196,8 @@ function Entity:ResetDerivedPaintings()
 	else
 		self.root_entity_coord = nil; 
 		self:SetDerivedImageFilename(nil);
-		self:Refresh();
 	end
-end
-
-local texture;
-
--- called on the root image to load the image
-function Entity:LoadImageFile()
-	if(not self.texture) then
-		local filename = self.image_filename; 
-		if(filename) then
-			filename = string.match(filename,"([^;]*);?");
-			self.texture = ParaAsset.LoadTexture("",filename,1);
-			self.texture:LoadAsset();
-		else
-			return;
-		end
-	end
-		
-	local image_width = self.texture:GetWidth();
-	if(image_width > 0) then
-		self.imagefile_loaded = true;
-		self:Refresh(true);
-	else
-		if(self.need_add_imagefile_loaded_time ~= false) then
-			self.imagefile_loaded_times = self.imagefile_loaded_times + 1;
-			self.need_add_imagefile_loaded_time = true;
-		end
-		
-		if(self.imagefile_loaded_times >= 16) then
-			self.imagefile_loaded_times=2*self.imagefile_loaded_times;
-			if(self:IsRemote() or (self.image_filename and self.image_filename:match("^https?://"))) then
-				self.texture:LoadAsset();
-				-- http or remote textures will have a much longer timeout.
-				if(self.imagefile_loaded_times > 100) then
-					self.imagefile_loaded_timeout = true;
-				end
-			else
-				self.imagefile_loaded_timeout = true;
-			end
-		end
-		GameLogic.GetSim():ScheduleBlockUpdate(self.bx, self.by, self.bz, self:GetBlockId(), 5*self.imagefile_loaded_times);
-	end
+	self:Refresh()
 end
 
 local data_expand_dir = {
@@ -334,9 +288,6 @@ end
 -- expansion data is written to self.start_block_coord, self.rows,self.columns,
 -- @return true if succeed, or false if not ImageEntity has not been properly loaded, such as during RegionLoad time
 function Entity:CaculateImageExpansionData()
-	if(self:IsRemote()) then
-		return;
-	end
 	-- if any neighbour has EntityImage's block_id but the entity is not ready yet. 
 	local bHasInvalidImageEntity;
 
@@ -513,46 +464,17 @@ end
 -- i.e. setting the other_image_entity.derived_image_filename and call their refresh. 
 -- expansion data is from self.start_block_coord, self.rows,self.columns, etc. 
 function Entity:ApplyExpansionData()
-	if(self:IsRemote()) then
-		return;
-	end
 	if(not self.image_filename) then
 		return;
 	end
-	--local block_left_in_image,block_top_in_image;
-	local original_dot_x,original_dot_y;
-	local width,height;
-
-	local image_width, image_height = string.match(self.image_filename,";%d+%s%d+%s(%d+)%s(%d+)");
-	
-	if(image_width and image_height) then
-
-	else
-		image_width = self.texture:GetWidth();
-		image_height = self.texture:GetHeight();
-	end
 	local rows = self.rows;
 	local columns = self.columns;
-	width = math.floor(image_width/columns);
-	height = math.floor(image_height/rows);
-	--block_left_in_image = 0;
-	--block_top_in_image = 0;
-	original_dot_x = 0;
-	original_dot_y = 0;
-	
 		
 	local start_block_x = self.start_block_coord.x;
 	local start_block_y = self.start_block_coord.y;
 	local start_block_z = self.start_block_coord.z;
 	local root_entity_coord = {x = self.bx, y = self.by, z = self.bz};
-	local filename = string.match(self.image_filename,"([^;]*);?");
-
-	local l,t,w,h;
-	l = original_dot_x;
-	t = original_dot_y;
-	w = width;
-	h = height;
-	--local image_filename = string.match(filename,"([^;]*);?");
+	
 	local x = start_block_x;
 	local y = start_block_y;
 	local z = start_block_z;
@@ -566,8 +488,7 @@ function Entity:ApplyExpansionData()
 				if(image_entity) then
 					-- set target image, and save a reference to the root block's coordinate.  
 					image_entity.root_entity_coord = root_entity_coord; 
-					image_entity:SetDerivedImageFilename(filename..";"..tostring(l).." "..tostring(t).." "..tostring(w).." "..tostring(h));
-					image_entity:Refresh();
+					image_entity:SetDerivedImageFilename(self.image_filename);
 				end
 				
 				if(facing == 0) then
@@ -579,10 +500,7 @@ function Entity:ApplyExpansionData()
 				elseif(facing == 2) then
 					x = x - 1;
 				end
-				l = l + w;
 			end
-			l = original_dot_x;
-			t = t + h;
 			x = start_block_x;
 			z = start_block_z;
 			y = y - 1;
@@ -596,10 +514,6 @@ end
 function Entity:SetImageFileName(filename)
 	if(self.image_filename ~= filename) then
 		self.image_filename = filename;
-		self.imagefile_loaded = nil;
-		self.imagefile_loaded_times = nil;
-		self.imagefile_loaded_timeout = nil;
-		self.texture = nil;
 	end
 end
 
@@ -609,72 +523,62 @@ function Entity:HasImage()
 	end
 end
 
--- change the current image displayed according to current settings. 
 function Entity:Refresh(bForceRefresh)
 	self.bNeedUpdate = nil;
 
 	local filename = self:GetImageFilePath(); 
-	local bFileExist;
-	filename, bFileExist = self:GetFullFilePath(filename);
-	if(filename and filename ~= "" and not bFileExist) then
-		self.cmd = nil;
-		GameLogic.AddBBS("image", format(L"图片文件:%s 不存在,请检查路径是否正确", filename), nil, "255 0 0");
-		return;
+	if(filename) then
+		filename = self:GetFullFilePath(filename);
 	end
+	
 	if(filename and bForceRefresh)then
 		if(filename == "") then
 			if(self.image_filename) then
 				self:ResetDerivedPaintings();
 			end
 			self:SetImageFileName(nil);
+			self:UpdateImageModel(nil, true)
 		else
 			self:SetImageFileName(filename);
 			
-			if((not self.imagefile_loaded) and (not self.imagefile_loaded_timeout)) then
-				self:LoadImageFile();
-				return;
-			elseif(self.imagefile_loaded_timeout) then
-				LOG.std(nil, "warn", self.class_name, "failed to load image file %s", self.image_filename or "");
-			elseif(self.imagefile_loaded) then
-				if(self:CaculateImageExpansionData()) then
-					self:ApplyExpansionData();
+			if(self:CaculateImageExpansionData()) then
+				self:ApplyExpansionData();
+				self:UpdateImageModel(filename, self:GetDerivedImageFilename()==nil)
+			else
+				if(not self.bHasWaitedOneTickOnLoad) then
+					self.bHasWaitedOneTickOnLoad = true;
+					self:ScheduleRefresh();
 				else
-					if(not self.bHasWaitedOneTickOnLoad) then
-						self.bHasWaitedOneTickOnLoad = true;
-						self:ScheduleRefresh();
-					else
-						local x, y, z = self:GetBlockPos();
-						LOG.std(nil, "warn", self.class_name, "invalid block entity at pos: %d %d %d", x, y, z);
-					end
+					local x, y, z = self:GetBlockPos();
+					LOG.std(nil, "warn", self.class_name, "invalid block entity at pos: %d %d %d", x, y, z);
 				end
-			end			
+			end
 		end		
 	end	
-
-	filename = self:GetDerivedImageFilename() or filename;
-	
-	self:UpdateImageModel(filename, self:GetDerivedImageFilename()==nil)
 end
+
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	local filename = self:GetDerivedImageFilename() or self:GetImageFilePath();
+	local filename = self:GetImageFilePath();
 	if(filename) then
-		local rawPath, tailPath = filename:match("^(..[^;:]+)(.*)$");
-		if(rawPath) then
-			rawPath = Files.GetRelativePath(rawPath);
-			-- relative to world directory path
-			node.attr.rawPath = rawPath;
-			-- ;: numbers after the image file path. 
-			node.attr.tailPath = tailPath;
-			if(self.root_entity_coord) then
+		-- relative to world directory path
+		local isSingle = self:IsSingleImage();
+		node.attr.isSingle = isSingle
+		if(not isSingle) then
+			node.attr.rows = self.rows;
+			node.attr.columns = self.columns;
+
+			if(self.start_block_coord) then
 				local x, y, z = self:GetBlockPos();
-				node.attr.rx = self.root_entity_coord.x - x;
-				node.attr.ry = self.root_entity_coord.y - y;
-				node.attr.rz = self.root_entity_coord.z - z;
-			end
-			if(not self:GetDerivedImageFilename()) then
-				node.attr.isSingle = true
+				local rx = self.start_block_coord.x - x;
+				local ry = self.start_block_coord.y - y;
+				local rz = self.start_block_coord.z - z;
+				if(rx~=0 or ry~=0 or rz ~=0) then
+					node.attr.rx = rx;
+					node.attr.ry = ry;
+					node.attr.rz = rz;
+				end
 			end
 		end
 	end
@@ -683,14 +587,14 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local attr = node.attr;
-	if(attr and attr.rawPath) then
-		self.rawPath = attr.rawPath
-		self.tailPath = attr.tailPath
-		self.isSingle = attr.isSingle ~= nil;
-		self.hasBakedImage = true;
-		if(attr.rx) then
+	if(attr and attr.isSingle~=nil) then
+		self.isSingle = attr.isSingle == "true" or attr.isSingle == true;
+		if(not self.isSingle) then
+			self.hasBakedImage = true;
+			self.rows = tonumber(attr.rows)
+			self.columns = tonumber(attr.columns)
 			local x, y, z = self:GetBlockPos();
-			self.root_entity_coord = {x=x+tonumber(attr.rx), y=y+tonumber(attr.ry), z=z+tonumber(attr.rz)};
+			self.start_block_coord = {x=x+tonumber(attr.rx or 0), y=y+tonumber(attr.ry or 0), z=z+tonumber(attr.rz or 0)};
 		end
 	end
 end
@@ -698,27 +602,32 @@ end
 function Entity:RefreshBakedImage()
 	if(self.hasBakedImage and self.rawPath) then
 		self.hasBakedImage = false;
-		local filename = Files.GetWorldFilePath(self.rawPath);
+		local filename = self:GetImageFilePath(); 
 		if(filename) then
-			if(self.cmd and self.cmd~="") then
-				self:SetImageFileName(filename);
-			end
-			local fullImagePath = filename..(self.tailPath or "")
-			if(not self.isSingle) then
-				self:SetDerivedImageFilename(fullImagePath);	
-			end
-			self:UpdateImageModel(fullImagePath, self.isSingle)
+			filename, bFileExist = self:GetFullFilePath(filename);
+			self:SetImageFileName(filename);
+			self:ApplyExpansionData();
+			self:UpdateImageModel(filename, self.isSingle)
 		end
 		return true;
 	end
 end
 
+function Entity:IsSingleImage()
+	return (self.rows == 1 and self.columns==1);
+end
+
 function Entity:UpdateImageModel(filename, isSingle)
-	if(self.last_filename ~= filename) then
-		if(filename) then
+	local imageSizeChanged = (self.last_columns~=self.columns or self.last_rows~=self.rows)
+	if(self.last_filename ~= (filename or "") or imageSizeChanged) then
+		self.last_filename = filename or "";
+		self.last_columns = self.columns;
+		self.last_rows = self.rows;
+
+		if(filename and filename ~="") then
 			-- only create C++ object when image is not empty
 			if(not self.obj) then
-				local obj = self:CreateInnerObject(self.modelFile, nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
+				local obj = self:CreateInnerObject("model/blockworld/BlockModel/block_model_one.x", nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
 				if(obj) then
 					-- making it using custom renderer since we are using chunk buffer to render. 
 					obj:SetAttribute(0x20000, true);
@@ -727,23 +636,56 @@ function Entity:UpdateImageModel(filename, isSingle)
 		end
 		local obj = self:GetInnerObject();
 		if(obj) then
-			if(filename) then
+			local mat = mathlib.Matrix4:new():identity();
+			local imageRadius = 1;
+			local gridWidth, gridHeight = self.columns, self.rows;
+			if(not isSingle or imageSizeChanged) then
+				imageRadius = math.max(gridWidth, gridHeight);
+				if(isSingle or self.last_filename == "") then
+					mat:setScale(BlockEngine.blocksize, BlockEngine.blocksize, BlockEngine.blocksize)
+					obj:SetField("LocalTransform", mat)	
+				else
+					local matScale = mathlib.Matrix4:new():identity();
+					matScale:setScale(imageRadius*2*BlockEngine.blocksize, imageRadius*2*BlockEngine.blocksize, imageRadius*2*BlockEngine.blocksize);
+					mat:offsetTrans(0, -0.5, 0);
+
+					local data = self.block_data or 0;
+					if(data>=4 and data<12) then
+						local quat = Direction.GetQuaternionByData(data);
+						mat = mat:multiply(mathlib.Quaternion:new({quat.x, quat.y, quat.z, quat.w}):ToRotationMatrix());
+					end
+					mat = mat:multiply(matScale);
+
+					if(self.start_block_coord and (self.start_block_coord.x ~= self.bx or self.start_block_coord.y ~= self.by or self.start_block_coord.z ~= self.bz)) then
+						local dx = (self.start_block_coord.x - self.bx) * BlockEngine.blocksize;
+						local dy = (self.start_block_coord.y - self.by) * BlockEngine.blocksize;
+						local dz = (self.start_block_coord.z - self.bz) * BlockEngine.blocksize;
+						mat:offsetTrans(dx, dy, dz);
+					end
+					obj:SetField("LocalTransform", mat)	
+				end
+			end
+
+			if(self.last_filename ~= "") then
 				-- update rotation based on block data
 				local data = self.block_data or 0;
 				if(data < 4) then
 					obj:SetFacing(Direction.directionTo3DFacing[data]);
 				elseif(data < 12) then
 					obj:SetFacing(0);
-					obj:SetRotation(Direction.GetQuaternionByData(data));
+					if(isSingle)  then
+						obj:SetRotation(Direction.GetQuaternionByData(data));
+					end
 				end
 			end
-			self.last_filename = filename;
-			if(not isSingle) then
-				self.text_offset.y = 0.5;
-				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100, 100, nil, self.text_offset, -1.57);
-			else
+
+			if(isSingle) then
 				self.text_offset.y = 0.45;
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 90, 90, nil, self.text_offset, -1.57);
+			else
+				local imageScale = imageRadius*2;
+				local text_offset = {x = (self.text_offset.x + gridWidth*0.5-0.5)  / imageScale, y = (0.5+imageRadius) / imageScale, z = self.text_offset.z / imageScale}
+				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100/imageScale * gridWidth, 100/imageScale*gridHeight, nil, text_offset, -1.57);
 			end
 		end
 	end
@@ -800,45 +742,23 @@ end
 function Entity:SetDerivedImageFilename(filename)
 	if(self.derived_image_filename~=filename) then
 		self.derived_image_filename = filename;
-		if(not self:IsRemote()) then
-			self:MarkForUpdate();
-		end
 	end
 end
 
 -- Overriden in a sign to provide the text.
 function Entity:GetDescriptionPacket()
 	local x,y,z = self:GetBlockPos();
-	local filename = self:GetDerivedImageFilename();
-	if(filename) then
-		local rawPath, tailPath = filename:match("^(..[^;:]+)(.*)$");
-		if(rawPath) then
-			rawPath = Files.GetRelativePath(rawPath);
-			filename = rawPath..tailPath;
-		else
-			filename = nil;
-		end
-	end
-	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data, filename);
+	return Packets.PacketUpdateEntitySign:new():Init(x,y,z, self.cmd, self.block_data);
 end
 
 -- update from packet. 
 function Entity:OnUpdateFromPacket(packet_UpdateEntitySign)
 	if(packet_UpdateEntitySign:isa(Packets.PacketUpdateEntitySign)) then
-		self:SetCommand(packet_UpdateEntitySign.text);
 		self.block_data = packet_UpdateEntitySign.data;
-
-		local filename = packet_UpdateEntitySign.text2;
-		if(filename) then
-			self.isSingle = false;
-			self.rawPath, self.tailPath = filename:match("^(..[^;:]+)(.*)$");
-		else
-			self.isSingle = true;
-			self.rawPath = self:GetImageFilePath();
-			self.tailPath = nil;
+		if((self.cmd or "") ~= (packet_UpdateEntitySign.text or "")) then
+			self:SetCommand(packet_UpdateEntitySign.text);
+			self:ScheduleRefresh()
 		end
-		self.hasBakedImage = true;
-		self:RefreshBakedImage()
 	end
 end
 
@@ -846,11 +766,6 @@ end
 function Entity:updateTick(x,y,z)
 	if(self.bNeedUpdate) then
 		self:Refresh(true);
-	end
-	if(self.imagefile_loaded or self.imagefile_loaded_timeout) then
-		return;
-	else
-		self:LoadImageFile();
 	end
 end
 
