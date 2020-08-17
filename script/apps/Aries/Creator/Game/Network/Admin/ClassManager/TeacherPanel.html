@@ -14,12 +14,12 @@
             ]]>
         </script>
         <pe:container ClickThrough="true" alignment="_mt" width="0" height="48px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#222 349 2 32)">
-            <pe:if condition='<%=not TeacherPanel.InClass%>'>
+            <pe:if condition='<%=not TeacherPanel.IsClassStarted()%>'>
                 <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:48px;">
                     <input type="button" style="width:104px;height:26px;margin-top:11px;margin-left:20px;color:#ffffff;" value='<%=L"上课" %>' class="mc_green_button_with_fillet" onclick="TeacherPanel.SelectClass" />
                 </pe:container>
             </pe:if>
-            <pe:if condition='<%=TeacherPanel.InClass%>'>
+            <pe:if condition='<%=TeacherPanel.IsClassStarted()%>'>
                 <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:48px;">
                     <div style="margin-top:11px;float:left;color:#ffffff;">
                         <input type="button" style="width:104px;height:26px;margin-left:20px;color:#ffffff;" value='<%=L"下课" %>' class="mc_orange_button_with_fillet" onclick="TeacherPanel.LeaveClass" />

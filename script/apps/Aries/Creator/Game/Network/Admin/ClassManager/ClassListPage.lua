@@ -9,6 +9,7 @@ local ClassListPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin
 ClassListPage.ShowPage()
 -------------------------------------------------------
 ]]
+local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 local ClassListPage = NPL.export()
 
 local page;
@@ -17,7 +18,8 @@ function ClassListPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function ClassListPage.ShowPage()
+function ClassListPage.ShowPage(onClose)
+	ClassListPage.result = false;
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassListPage.html", 
 		name = "ClassListPage.ShowPage", 
@@ -35,6 +37,19 @@ function ClassListPage.ShowPage()
 		height = 230,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+	params._page.OnClose = function()
+		if(onClose) then
+			onClose(ClassListPage.result);
+		end
+	end
+
+	if (#ClassManager.ClassList > 0) then
+		page:SetValue("ClassList", ClassManager.ClassList[1].classId);
+	end
+	if (#ClassManager.ProjectList > 0) then
+		page:SetValue("WorldList", ClassManager.ProjectList[1]);
+	end
 end
 
 function ClassListPage.OnClose()
@@ -42,7 +57,10 @@ function ClassListPage.OnClose()
 end
 
 function ClassListPage.GetClassList()
-	local classes = {}
+	local classes = {};
+	for i = 1, #ClassManager.ClassList do
+		classes[i] = {text = ClassManager.ClassList[i].name, value = ClassManager.ClassList[i].classId};
+	end
 	return classes;
 end
 
@@ -52,14 +70,12 @@ end
 function ClassListPage.OnRemoveClass(value)
 end
 
-function ClassListPage.WriteClassName(name, mcmlNode)
-	if (page) then
-		local value = mcmlNode:GetUIValue();
-		page:SetValue("ClassList", value);
-	end
-end
-
 function ClassListPage.GetWorldList()
+	local worldList = {};
+	for i = 1, #ClassManager.ProjectList do
+		worldList[i] = {text = ClassManager.ProjectList[i], value = ClassManager.ProjectList[i]};
+	end
+	return worldList;
 end
 
 function ClassListPage.OnSelectWorld(name, value)
@@ -68,21 +84,21 @@ end
 function ClassListPage.OnRemoveWorld(value)
 end
 
-function ClassListPage.WriteWorldName(name, mcmlNode)
-	if (page) then
-		local name = mcmlNode:GetUIValue();
-		page:SetValue("WorldList", name);
-	end
-end
-
 function ClassListPage.OnOK()
-	local class = page:GetValue("ClassList");
-	local world = page:GetValue("WorldList");
-	if (class and #class > 0) then
-		page:CloseWindow();
-		local TeacherPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TeacherPanel.lua");
-		TeacherPanel.SetInClass(class, world);
+	local classId = page:GetValue("ClassList", nil);
+	local worldId = page:GetValue("WorldList", nil);
+	classId = tonumber(classId);
+	worldId = tonumber(worldId);
+	if (classId and worldId) then
+		ClassManager.CreateClassroom(classId, worldId, function(result, data)
+			if (result) then
+				ClassListPage.result = true;
+				page:CloseWindow();
+			else
+				_guihelper.MessageBox(L"所选择的班级或世界ID无效");
+			end
+		end);
 	else
-		_guihelper.MessageBox(L"请输入班级名和世界ID");
+		_guihelper.MessageBox(L"请选择班级和世界ID");
 	end
 end

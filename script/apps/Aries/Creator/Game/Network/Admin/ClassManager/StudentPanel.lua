@@ -9,22 +9,19 @@ local StudentPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/
 StudentPanel.ShowPage(true)
 -------------------------------------------------------
 ]]
+local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+local ShareUrlContext = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlContext.lua");
 local StudentPanel = NPL.export()
 
-StudentPanel.IsLocked = false;
 StudentPanel.IsChatting = false;
-StudentPanel.CurrentClassName = "";
-StudentPanel.CurrentWorldId = "";
+StudentPanel.ShowUrl = false;
 
 local page;
 function StudentPanel.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function StudentPanel.ShowPage(reset, offsetY)
-	if (reset) then
-		StudentPanel.OnClose()
-	end
+function StudentPanel.ShowPage()
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/StudentPanel.html", 
 			name = "StudentPanel.ShowPage", 
@@ -38,13 +35,11 @@ function StudentPanel.ShowPage(reset, offsetY)
 			directPosition = true,
 				align = "_mt",
 				x = 0,
-				y = offsetY or 0,
+				y = 0,
 				width = 0,
 				height = 48,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	GameLogic.GetEvents():AddEventListener("DesktopMenuShow", StudentPanel.MoveDown, StudentPanel, "StudentPanel");
 end
 
 function StudentPanel.OnClose()
@@ -71,8 +66,7 @@ function StudentPanel:MoveDown(event)
 end
 
 function StudentPanel.GetClassName()
-	--return StudentPanel.CurrentClassName;
-	return "编程1班";
+	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId);
 end
 
 function StudentPanel.GetClassTime()
@@ -80,44 +74,76 @@ function StudentPanel.GetClassTime()
 end
 
 function StudentPanel.GetTeacherName()
-	return "张晓老师";
+	local teacher = ClassManager.GetClassTeacherInfo();
+	if (teacher) then
+		return teacher.username;
+	end
 end
 
 function StudentPanel.GetWorldID()
-	local worldId = "当前上课世界ID：".."12345";
+	local worldId = "当前上课世界ID："..ClassManager.CurrentWorldId;
 	return worldId;
 end
 
 function StudentPanel.OpenChat()
-	StudentPanel.IsChatting = true;
-	if (page) then
-		page:Refresh(0);
-	end
-	local ChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ChatRoomPage.lua");
-	ChatRoomPage.ShowPage()
+	ClassManager.LoadClassroomInfo(ClassManager.CurrentClassroomId, function(classId, projectId, roomId)
+		StudentPanel.IsChatting = true;
+		if (page) then
+			page:Refresh(0);
+		end
+		local SChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/SChatRoomPage.lua");
+		SChatRoomPage.ShowPage(function(result)
+			if (result) then
+				StudentPanel.IsChatting = false;
+				if (page) then
+					page:Refresh(0);
+				end
+			end
+		end)
+	end);
 end
 
 function StudentPanel.ShareUrl()
-	StudentPanel.OnClose();
-end
-
-function StudentPanel.SetInClass(class, worldId)
-	StudentPanel.CurrentClassName = class;
-	StudentPanel.CurrentWorldId = worldId;
-	if (worldId and #worldId > 1) then
-		GameLogic:Connect("WorldLoaded", StudentPanel, StudentPanel.OnWorldLoaded, "UniqueConnection");
-		GameLogic:Connect("WorldUnloaded", StudentPanel, StudentPanel.OnWorldUnload, "UniqueConnection");
-		GameLogic.RunCommand("/loadworld -force "..worldId);
-		return;
+	if (StudentPanel.ShowUrl) then
+		ShareUrlContext.OnClose()
+	else
+		ShareUrlContext.ShowPage()
 	end
+	StudentPanel.ShowUrl = not StudentPanel.ShowUrl;
 	if (page) then
 		page:Refresh(0);
 	end
 end
 
+function StudentPanel.IsClassStarted()
+	return ClassManager.InClass;
+end
+
+function StudentPanel.StartClass()
+	ClassManager.JoinClassroom(ClassManager.CurrentClassroomId);
+	ClassManager.SendMessage("cmd:join");
+	local projectId = GameLogic.options:GetProjectId();
+	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
+		if (page) then
+			page:Refresh(0);
+		else
+			StudentPanel.ShowPage();
+		end
+	else
+		StudentPanel.EnterTeachingWorld(ClassManager.CurrentWorldId)
+	end
+end
+
+function StudentPanel.EnterTeachingWorld(worldId)
+	GameLogic:Connect("WorldLoaded", StudentPanel, StudentPanel.OnWorldLoaded, "UniqueConnection");
+	--GameLogic:Connect("WorldUnloaded", StudentPanel, StudentPanel.OnWorldUnload, "UniqueConnection");
+	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+	UserConsole:HandleWorldId(worldId, "force");
+end
+
 function StudentPanel.OnWorldLoaded()
-	local projectId = tostring(GameLogic.options:GetProjectId());
-	if (projectId == StudentPanel.CurrentWorldId) then
+	local projectId = GameLogic.options:GetProjectId();
+	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
 		commonlib.TimerManager.SetTimeout(function()
 			StudentPanel.ShowPage();
 		end, 1000);
@@ -126,8 +152,5 @@ end
 
 function StudentPanel.OnWorldUnload()
 	local projectId = tostring(GameLogic.options:GetProjectId());
-	if (projectId == StudentPanel.CurrentWorldId) then
-		StudentPanel.Reset();
-	end
 end
 

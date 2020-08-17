@@ -19,23 +19,17 @@
                     <%=L"上课班级" %>
                     <select name="ClassList"
                             DataSource="<%=ClassListPage.GetClassList()%>"
-                            EmptyText='<%= L"请输入班级名" %>'
-                            onselect="ClassListPage.OnSelectClass"
-                            onremove="ClassListPage.OnRemoveClass"
-                            class="bbs_text text_field"
-                            style="margin-left:6px;margin-top:-2px;height:23px;width:240px;"></select>
-                    <input name="ShowClass" onchange="ClassListPage.WriteClassName" type="text" class="bbs_text" style="height:22px;margin-left:-240px; width:220px;" EmptyText='<%= L"请输入班级名" %>' />
+                            style="margin-left:6px;margin-top:-2px;height:23px;width:240px;">
+                    </select>
                 </div>
                 <div style="margin-left:20px;margin-top:20px;height:24px;width:480px;text-align:left;color:#ffffff;font-size:13px">
                     <%=L"世界ID" %>
                     <select name="WorldList"
                             DataSource="<%=ClassListPage.GetWorldList()%>"
                             EmptyText='<%= L"请输入世界ID" %>'
-                            onselect="ClassListPage.OnSelectWorld"
-                            onremove="ClassListPage.OnRemoveWorld"
                             class="bbs_text text_field"
-                            style="margin-left:24px;margin-top:-2px;height:23px;width:240px;"></select>
-                    <input name="ShowWorld" onchange="ClassListPage.WriteWorldName" type="text" class="bbs_text" style="height:22px;margin-left:-240px; width:220px;" EmptyText='<%= L"请输入世界ID" %>' />
+                            style="margin-left:24px;margin-top:-2px;height:23px;width:240px;">
+                    </select>
                 </div>
                 <div style="margin-top:40px;">
                     <input type="button" name="OK" DefaultButton="true" style="margin-left:71px;min-width:84px;height:30px;" class="mc_big_button" onclick="ClassListPage.OnOK" value='<%=L"确定"%>' />

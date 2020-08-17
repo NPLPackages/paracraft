@@ -9,6 +9,7 @@ local ShareUrlPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/
 ShareUrlPage.ShowPage()
 -------------------------------------------------------
 ]]
+local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 local ShareUrlPage = NPL.export()
 
 local page;
@@ -44,8 +45,14 @@ end
 function ShareUrlPage.ShareClassPage()
 end
 
-function ShareUrlPage.ShareOrganPage()
+function ShareUrlPage.ShareOrgPage()
 end
 
 function ShareUrlPage.ShareInputUrl()
+	local text = page:GetValue("url", nil);
+	if (text and text ~= "") then
+		ClassManager.SendMessage("link:"..text);
+	else
+		_guihelper.MessageBox(L"请输入要分享的链接");
+	end
 end

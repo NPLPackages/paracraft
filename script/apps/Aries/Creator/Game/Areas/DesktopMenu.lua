@@ -65,10 +65,16 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"多人联网",order=4, name = "online",children = 
 			{
 				{text = L"多人服务器...",name = "online.server",onclick=nil},
-				{text = L"教师控制面板",name = "online.teacher_panel",onclick=nil},
+				{text = L"联网控制面板",name = "online.teacher_panel",onclick=nil},
 			},
 		},
-		{text = L"窗口", order=5, mode="edit", name = "window",children = 
+		{text = L"机构",order=5, name = "organization",children = 
+			{
+				{text = L"老师面板",name = "organization.teacher_panel",onclick=nil},
+				{text = L"学生面板",name = "organization.student_panel",onclick=nil},
+			},
+		},
+		{text = L"窗口", order=6, mode="edit", name = "window",children = 
 			{
 				{text = L"角色换装...",name = "window.changeskin", onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
@@ -86,7 +92,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"MOD插件管理...".."  Ctrl+M",name = "window.mod",cmd="/show mod"},
 			},
 		},
-		{text = L"帮助", order=6, name = "help",children = 
+		{text = L"帮助", order=7, name = "help",children = 
 			{
 				{text = L"新手引导",name = "help.userintroduction", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
@@ -104,7 +110,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"致谢",name = "help.Credits", onclick=nil},
 			},
 		},
-		{text = L"在线社区", order=7, name = "community",children = 
+		{text = L"在线社区", order=8, name = "community",children = 
 			{
 				{text = L"在线社区",name = "community.keepwork", cmd="/open https://keepwork.com"},
 				{text = L"探索",name = "community.explore", cmd="/open https://keepwork.com/explore?tab=pickedProjects"},
