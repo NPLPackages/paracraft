@@ -191,7 +191,7 @@ function DesktopMenu.RebuildMenuItem(menuItem)
 				if(item.Type == "Separator") then
 					node:AddChild(CommonCtrl.TreeNode:new({Type = item.Type, }));
 				else
-					node:AddChild(CommonCtrl.TreeNode:new({Text = item.text, Name = item.name, Type = "Menuitem", onclick = item.onclick, }));
+					node:AddChild(CommonCtrl.TreeNode:new({Text = item.text, Name = item.name, Type = "Menuitem", Enable = item.Enable,  onclick = item.onclick, }));
 					menu_name_map[item.name] = item;
 				end
 			end
