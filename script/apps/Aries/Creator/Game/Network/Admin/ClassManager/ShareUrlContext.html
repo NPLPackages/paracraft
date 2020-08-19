@@ -1,0 +1,53 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlContext.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ShareUrlContext.lua">
+            <![CDATA[
+            ShareUrlContext = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlContext.lua");
+            ShareUrlContext.OnInit();
+            ]]>
+        </script>
+        <aries:window mode="no_title" style="width:376px;height:286px">
+            <div style="width:376px;height:286px;">
+                <div style="margin-left:12px;margin-top:-20px;height:30px;text-align:left;color:#ffffff;font-size:14px;font-weight:bold;">
+                    <%=L"查看分享链接" %>
+                </div>
+                <div style="margin-left:-9px;margin-right:1px;"><hr /></div>
+                <div>
+                    <pe:gridview style="margin-top:20px;width:376px;height:246px;" name="link_gridview" CellPadding="1" VerticalScrollBarStep="24" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="76"
+                                 DataSource='<%=ShareUrlContext.ClassItems()%>'>
+                        <Columns>
+                            <div style="width:376px;height:76px;">
+                                <div style="margin-left:12px;margin-top:0px;width:326px;height:27px;">
+                                    <div style="float:left;margin-left:0px;margin-top:0px;width:15px;height:15px;background:url(Texture/Aries/Creator/keepwork/ClassManager/class_to_share_32bits.png#0 0 26 26);"></div>
+                                    <div name='<%= Eval("index")%>' onclick="ShareUrlContext.OnClickItem" style="float:left;margin-left:6px;margin-top:0px;color:#ffffff;">
+                                        <%=(Eval("link"))%>
+                                    </div>
+                                </div>
+                                <div style="margin-left:28px;margin-top:0px;width:326px;height:16px;color:#848484;">
+                                    <div style="float:left;margin-left:6px;">
+                                        <%=(Eval("teacher"))%>
+                                    </div>
+                                    <div style="float:left;margin-left:6px;">
+                                        <%=(Eval("time"))%>
+                                    </div>
+                                </div>
+                                <div style="margin-top:10px;margin-left:0px;margin-right:12px;"><hr /></div>
+                           </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+           </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+            

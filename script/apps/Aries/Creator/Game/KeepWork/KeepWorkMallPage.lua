@@ -21,6 +21,8 @@ local menu_item_index = 0
 local cur_classifyId = 0
 local bean_gsid = 998;
 local coin_gsid = 888
+local menu_node_data = {}
+
 KeepWorkMallPage.menu_data_sources = {}
 KeepWorkMallPage.menu_data_sources = {
 	{
@@ -72,12 +74,6 @@ function KeepWorkMallPage.Show()
             end, 500)
         end
 	end)
-	
-	NPL.SetTimer("10086", 1, ";MyCompany.Aries.Creator.Game.KeepWork.KeepWorkMallPage.TimerTest();");
-end
-
-function KeepWorkMallPage.TimerTest(param)
-	print("sssssssssssss", param)
 end
 
 function KeepWorkMallPage.ShowView()
@@ -85,11 +81,16 @@ function KeepWorkMallPage.ShowView()
 		cache_policy,
 		platform =  1,
 	},function(err, msg, data)
+		KeepWorkMallPage.cur_select_level = 1
+		KeepWorkMallPage.cur_select_type_index = 1
+		KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
+		
 		level_to_index = {}
 		menu_item_index = 0
 	
 		local level = 1
 		KeepWorkMallPage.menu_data_sources = {}
+		menu_node_data = {}
 		KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
 
 		local view_width = 1084
@@ -139,10 +140,11 @@ end
 function KeepWorkMallPage.ChangeMenuType(level, index)
 	KeepWorkMallPage.cur_select_level = level
 	KeepWorkMallPage.cur_select_type_index = index
-	KeepWorkMallPage.ExpandedNode(KeepWorkMallPage.menu_data_sources, level, index)
+	KeepWorkMallPage.changeMenuNodeType(KeepWorkMallPage.menu_data_sources, level, index)
     KeepWorkMallPage.OnRefresh()
 end
 
+-- 切换到某个类别的时候会自动收起其他的展开的类别 确定是不能收起当前类别
 function KeepWorkMallPage.ExpandedNode(data, level, index)
 	for k, v in pairs(data) do
 		if type(v) == "table" and v.name == "type" then
@@ -168,6 +170,17 @@ function KeepWorkMallPage.ExpandedNode(data, level, index)
     end
 
 	return false
+end
+
+-- 切换到某个类别的时候不会自动收起其他的展开的类别 但能收起当前类别
+function KeepWorkMallPage.changeMenuNodeType(data, level, index)
+	for k, v in pairs(menu_node_data) do
+		if type(v) == "table" and v.name == "type" then
+			if v.attr.level == level and v.attr.index == index then
+				v.attr.expanded = not v.attr.expanded
+			end
+		end
+    end
 end
 
 function KeepWorkMallPage.HandleMenuData(parent_t, data, level)
@@ -202,6 +215,10 @@ function KeepWorkMallPage.HandleMenuData(parent_t, data, level)
 			KeepWorkMallPage.cur_select_level = parent_t.attr and parent_t.attr.level or 1
 			KeepWorkMallPage.cur_select_type_index = parent_t.attr and parent_t.attr.index or 1
 			KeepWorkMallPage.GetGoodsData(temp_t.attr.server_data.id)
+		end
+
+		if temp_t.name == "type" then
+			menu_node_data[#menu_node_data + 1] = temp_t
 		end
 	end	
 end

@@ -22,15 +22,15 @@ DockPage.top_line_1 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"大赛", id = "competition", enabled = true, },
+    { label = L"大赛", id = "competition", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_dasai_32bits.png#0 0 85 75", },
 }
 DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"签到", id = "checkin", enabled2 = true, },
-    { label = L"知识岛", id = "island", enabled2 = true, },
+    { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangriji_32bits.png#0 0 85 75", },
+    { label = L"每周实战", id = "island", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
 }
 
 function DockPage.Show()
@@ -40,6 +40,7 @@ function DockPage.Show()
             click_through = true,
         } );
         DockPage._root = DockPage.page:Create("DockPage.Show_instance", nil, "_fi", 0, 0, 0, 0)
+        DockPage._root.zorder = -100;
 	    DockPage._root:GetAttributeObject():SetField("ClickThrough", true);
     end
     DockPage._root.visible = true;
@@ -116,7 +117,7 @@ function DockPage.OnClick_system_menu()
 	end
 	
 	local x,y,width, height = _guihelper.GetLastUIObjectPos();
-	ctl:Show(x-105, y-ctl.height);
+	ctl:Show(x - 0, y - 120);
 end
 function DockPage.OnClick_Menuitem_server()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
@@ -136,4 +137,24 @@ function DockPage.OnClick_Menuitem_system()
 end
 function DockPage.OnClick_Menuitem_exit()
     GameLogic.RunCommand("/menu file.exit");
+end
+function DockPage.FindUIControl(name)
+    if(not name or not DockPage.page)then
+        return
+    end
+    return   DockPage.page:FindUIControl(name);
+end
+function DockPage.RenderButton_1(index)
+    local node = DockPage.top_line_1[index];
+    local s = string.format([[
+        <input type="button" name='%s' tooltip='%s' onclick="OnClick" style="width:85px;height:75px;background:url(%s)"/>
+    ]],node.id,node.label,node.bg);
+    return s;
+end
+function DockPage.RenderButton_2(index)
+    local node = DockPage.top_line_2[index];
+    local s = string.format([[
+        <input type="button" name='%s' tooltip='%s' onclick="OnClick" style="width:85px;height:75px;background:url(%s)"/>
+    ]],node.id,node.label,node.bg);
+    return s;
 end

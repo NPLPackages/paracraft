@@ -137,10 +137,10 @@ end
                         <div style="margin-left:5px;margin-top:5px;height:23px;width:153px;background-color:#1b1b1b">
                             <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|index") %>' style="margin-left:5px;width:100px;height:23px;font-weight:bold;color:#999999;text-offset-y:-2;text-align:left;background:" />
                             <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
-                                <div style="float:left;margin-left:7px;margin-top:5px;width:16px;height:16px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_arrow_2_32bits.png#0 0 16 16);" />
+                                <div style="float:left;margin-left:7px;margin-top:5px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_2_32bits.png#0 0 16 16);" />
                             </pe:if>
                             <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
-                                <div style="float:left;margin-left:4px;margin-top:8px;width:16px;height:16px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_arrow_1_32bits.png#0 0 16 16);" />
+                                <div style="float:left;margin-left:4px;margin-top:8px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);" />
                             </pe:if>
                         </div>
                     </div>
@@ -169,18 +169,18 @@ end
             <PagerSettings Position="Bottom" height="36" style="position:relative;width:498px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
             <PagerTemplate>
                 <form>
-                    <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:355px;margin-top:5px;background-rotation:-1.57;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>
+                    <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:355px;margin-top:5px;background-rotation:-1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>
                     <div style="float:left;margin-top:0px;text-singleline:true">
                         <label name="page" style="color:#FFFFFF;text-align:center;width:45px;height:18px;margin:4px"/>
                     </div>
-                    <input type="button" name="next" zorder=2 style="width:20px;height:20px;margin-top:7px;background-rotation:1.57;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_arrow_1_32bits.png#0 0 16 16)"/>
+                    <input type="button" name="next" zorder=2 style="width:20px;height:20px;margin-top:7px;background-rotation:1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16)"/>
                 </form>
             </PagerTemplate>
             <Columns>
                     <!-- <div style="width:140px;height:93px;background:url(Texture/Aries/HaqiShop/bg.png#0 0 16 16:5 5 5 5);"></div> -->
                     <div style="width:123px;height:159px;">
-                        <div style="margin-left:-1px;padding:5px;width:123px;height:115px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
-                            <!-- <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' tooltip = '<%=Eval("description")%>' icon = "" showdefaulttooltip="false" background="Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10" style="margin-left:0px;width:54px;height:54px;" /> -->
+                        <div style="margin-left:-1px;padding:5px;width:123px;height:115px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                            <!-- <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' tooltip = '<%=Eval("description")%>' icon = "" showdefaulttooltip="false" background="Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10" style="margin-left:0px;width:54px;height:54px;" /> -->
                             <div style="position:relative;width:123px">
                                 <div style="position:relative;margin-left:18px;margin-top:18px;">
                                     <!-- <pe:if condition='<%=Eval("isLink") %>'>
@@ -193,10 +193,10 @@ end
                                 </div>
 
                                 <pe:if condition='<%=Eval("is_show_hot_tag") %>'>
-                                    <div zorder="1" style="margin-top:0px;padding-left:-3px;width:40;height:18;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/tag_hot_32bits.png#0 0 40 18:0 0 0 0);"></div>
+                                    <div zorder="1" style="margin-top:0px;padding-left:-3px;width:40;height:18;background:url(Texture/Aries/Creator/keepwork/Mall/tag_hot_32bits.png#0 0 40 18:0 0 0 0);"></div>
                                 </pe:if>
                                 <pe:if condition='<%=Eval("is_show_latest_tag") %>'>
-                                    <div zorder="1" style="margin-top:0px;padding-left:-3px;width:40;height:18;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/tag_latest_32bits.png#0 0 40 18:0 0 0 0);"></div>
+                                    <div zorder="1" style="margin-top:0px;padding-left:-3px;width:40;height:18;background:url(Texture/Aries/Creator/keepwork/Mall/tag_latest_32bits.png#0 0 40 18:0 0 0 0);"></div>
                                 </pe:if>                                
                             </div>
                             
@@ -205,7 +205,7 @@ end
                             </div> -->
                             
                             <pe:if condition='<%=Eval("isVip") %>'>
-                                <div zorder="1" style="margin-top:-4px;margin-left:86px;width:33;height:33;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/tag_vip.png#0 0 33 33:0 0 0 0);"></div>    
+                                <div zorder="1" style="margin-top:-4px;margin-left:86px;width:33;height:33;background:url(Texture/Aries/Creator/keepwork/Mall/tag_vip.png#0 0 33 33:0 0 0 0);"></div>    
                             </pe:if>      
                                   
                             <div>
@@ -218,11 +218,11 @@ end
                         <div style="margin-top:0px;height:20px;font-size:12;font-weight:bold;color:#999999;"><%=Eval("name") %></div>
                         <div style="margin-top:5px;margin-left:5px;padding-left:5px;font-size:12px;">
                             <pe:if condition='<%=Eval("is_cost_bean") %>'>
-                                <div style="margin-top:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_bean_32bits.png#0 0 16 16:0 0 0 0);"></div> 
+                                <div style="margin-top:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/keepwork/Mall/icon_bean_32bits.png#0 0 16 16:0 0 0 0);"></div> 
                             </pe:if>
                              
                             <pe:if condition='<%=Eval("is_cost_coin") %>'>
-                                <div style="margin-top:2px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_coin_32bits.png#0 0 16 16:0 0 0 0);"></div>  
+                                <div style="margin-top:2px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/keepwork/Mall/icon_coin_32bits.png#0 0 16 16:0 0 0 0);"></div>  
                             </pe:if>
                             
                             <div style="float:left;height:20px;color:#ae8a04;"><%=Eval("cost_desc")%></div>

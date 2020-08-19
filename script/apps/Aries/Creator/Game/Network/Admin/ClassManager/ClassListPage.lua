@@ -48,7 +48,7 @@ function ClassListPage.ShowPage(onClose)
 		page:SetValue("ClassList", ClassManager.ClassList[1].classId);
 	end
 	if (#ClassManager.ProjectList > 0) then
-		page:SetValue("WorldList", ClassManager.ProjectList[1]);
+		page:SetValue("WorldList", ClassManager.ProjectList[1].projectId);
 	end
 end
 
@@ -73,7 +73,7 @@ end
 function ClassListPage.GetWorldList()
 	local worldList = {};
 	for i = 1, #ClassManager.ProjectList do
-		worldList[i] = {text = ClassManager.ProjectList[i], value = ClassManager.ProjectList[i]};
+		worldList[i] = {text = ClassManager.ProjectList[i].projectName.."("..ClassManager.ProjectList[i].projectId..")", value = ClassManager.ProjectList[i].projectId};
 	end
 	return worldList;
 end

@@ -807,11 +807,7 @@ function options:GetMaxViewDist()
 end
 
 function options:GetSavableMaxDist()
-	if(System.options.IsMobilePlatform) then
-		return 64;
-	else
-		return 256;
-	end
+	return 256;
 end
 
 

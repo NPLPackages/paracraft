@@ -13,12 +13,54 @@ StudyPage.OnInit()
 function ClosePage()
     Page:CloseWindow();
 end
-]]></script>
-    <aries:window mode="thin" width="600" height="500" title='<%= L"学习"%>' onclose="ClosePage">
-    <div>
 
+function GridsItems(index)
+    if(index == nil) then    
+        return #StudyPage.grid_data_sources;
+    else
+        return StudyPage.grid_data_sources[index];
+    end
+end
+
+function clickGridItem(name,mcmlNode)
+    local param1 = mcmlNode:GetAttribute("param1")
+    StudyPage.clickGridItem(param1)
+end
+
+function OnclickNewPlayer()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
+    local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
+    UserIntroduction.ShowPage()
+end
+
+function onclickTieBa()
+    StudyPage.onclickTieBa()
+end
+]]></script>
+
+<aries:window mode="thin" width="610" height="400" title='<%= L"学习"%>' onclose="ClosePage">
+    <pe:gridview style="margin-left:30px;height:310;" name="item_gridview" CellPadding="16" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="10"
+                    DataSource='<%=GridsItems%>' pagesize="6">
+        <Columns>
+                <div style="width:160px;height:123px;background:;">
+                    <input type="button" name="next" zorder=0 style="position:relative;width:160px;height:123px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);" onclick="clickGridItem" param1='<%=XPath("this") %>'/>
+                    <div style="margin-top:50px;height:20px;font-size:12;font-weight:bold;color:#ffffff;text-align:center;"><%=Eval("name") %></div>
+                </div>
+        </Columns>
+        <EmptyDataTemplate>
+        </EmptyDataTemplate>
+    </pe:gridview>
+
+    <input type="button" class="button" value='<%="新手指引"%>' onclick="OnclickNewPlayer" param1='<%= XPath("this") %>' style="float:left;margin-left:50px;margin-top:10px;font-size:16px;width:80px;height:28px"/>
+    <div style="float:left;margin-left:300px;">
+        <!-- <div style="font-size:14;color:#ffffff">
+            百度贴吧
+        </div> -->
+        <input type="button" style="font-size:14px;color:#ffffff;font-weight:bold;height:19px;background-color:#ffffff;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)" value='百度贴吧' onclick="onclickTieBa" />
+        <div style="font-size:14;color:#ffffff;margin-top:5;margin-left:3;">
+            QQ群:839673135
+        </div>
     </div>
-    
 </aries:window>
 </pe:mcml>
 </body>

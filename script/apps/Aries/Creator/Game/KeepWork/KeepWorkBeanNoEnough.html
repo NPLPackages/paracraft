@@ -12,7 +12,7 @@ local pageCtrl = document:GetPageCtrl();
 local KeepWorkBeanNoEnough = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkBeanNoEnough
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-local WorldList = NPL.load("./WorldList")
+--local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 
 local item_data = pageCtrl:GetRequestParam("item_data");
@@ -28,6 +28,7 @@ end
 
 function OnDailyCheck()
     if(KeepworkServiceSession:IsSignedIn())then
+        pageCtrl:CloseWindow();
         ParacraftLearningRoomDailyPage.DoCheckin();
         return
     end
@@ -35,9 +36,10 @@ function OnDailyCheck()
         if result == true then
             Mod.WorldShare.Utils.SetTimeOut(function()
                 if result then
-                    WorldList:RefreshCurrentServerList()
+                    --WorldList:RefreshCurrentServerList()
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
                     ParacraftLearningRoomDailyPage.DoCheckin();
+                    pageCtrl:CloseWindow();
                 end
             end, 500)
         end
@@ -53,7 +55,7 @@ function OnLearningLand()
         if result == true then
             Mod.WorldShare.Utils.SetTimeOut(function()
                 if result then
-                    WorldList:RefreshCurrentServerList()
+                    --WorldList:RefreshCurrentServerList()
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
                     ParacraftLearningRoomDailyPage.OnLearningLand();
                 end
@@ -70,7 +72,7 @@ end
 <aries:window mode="thin" width="400" height="330" title='<%=L"提示"%>' onclose="ClosePage">
     <div style="margin-left:21px;margin-top:40px;color:#ffffff;font-size:16px;"><%="知识豆余额不足，无法购买。" %></div>
     <div style="float:left; margin-left:21px; margin-top:13px; color:#999999; font-size:14px;"><%="你的知识豆余额: " %></div>
-    <div style="float:left;margin-top:18px;margin-left:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/icon_bean_32bits.png#0 0 16 16:0 0 0 0);"></div> 
+    <div style="float:left;margin-top:18px;margin-left:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/keepwork/Mall/icon_bean_32bits.png#0 0 16 16:0 0 0 0);"></div> 
     <div style="float:left;margin-left:0px; margin-top:13px; color:#ffc900; font-size:14px;"><%=getLeftBean() %></div>
 
     <div style="margin-left:21px;margin-top:39px;color:#f0f0f0"><%="你可以前往每日签到、知识岛 赚知识豆。" %></div>

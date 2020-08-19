@@ -78,25 +78,30 @@ function TeacherPanel.SelectClass()
 end
 
 function TeacherPanel.LeaveClass()
-	ClassManager.DismissClassroom(ClassManager.CurrentClassroomId, function(result, data)
-		if (result) then
-			ClassManager.SendMessage("cmd:leave");
-			ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);
-			if (page) then
-				page:Refresh(0);
-			end
-		else
-			_guihelper.MessageBox(L"请重试！");
+	_guihelper.MessageBox(L"确定要结束上课吗？", function(res)
+		if(res == _guihelper.DialogResult.OK) then
+			ClassManager.DismissClassroom(ClassManager.CurrentClassroomId, function(result, data)
+				if (result) then
+					ClassManager.SendMessage("cmd:leave");
+					ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);
+					if (page) then
+						page:Refresh(0);
+					end
+				else
+					_guihelper.MessageBox(L"请重试！");
+				end
+			end);
 		end
-	end);
+	end, _guihelper.MessageBoxButtons.OKCancel);
 end
 
 function TeacherPanel.GetClassName()
-	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId);
+	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId) or ClassManager.CurrentClassName;
 end
 
 function TeacherPanel.GetClassStudents()
-	local student = string.format(L"在课学生：%d人", #(ClassManager.StudentList));
+	local count = ClassManager.GetOnlineCount();
+	local student = string.format(L"在课学生：%d人", count);
 	return student;
 end
 
@@ -135,6 +140,13 @@ function TeacherPanel.OpenChat()
 end
 
 function TeacherPanel.ConnectClass()
+	_guihelper.MessageBox(L"确定要开启联机模式吗？", function(res)
+		if(res == _guihelper.DialogResult.OK) then
+			GameLogic.RunCommand("/connectGGS");
+			ClassManager.SendMessage("cmd:connect");
+			GameLogic.AddBBS(nil, L"联机成功！", 3000, "0 255 0");
+		end
+	end, _guihelper.MessageBoxButtons.OKCancel);
 end
 
 function TeacherPanel.ShareUrl()

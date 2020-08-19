@@ -27,7 +27,7 @@ local coin_gsid = 888
 local bean_gid = 10
 local is_cost_bean = true
 local requestOrderTimes = 0
-local requestOrderMaxTimes = 8
+local requestOrderMaxTimes = 10
 local orderId = 0
 
 function KeepWorkStackableItemPage.OnInit(data)
@@ -201,8 +201,10 @@ function KeepWorkStackableItemPage.OnOK()
 	-- cost_data.gsId = 888
 	if is_not_enough then
 		if cost_data.gsId == bean_gsid then
+			page:CloseWindow()
 			KeepWorkStackableItemPage.openBeanNoEnoughView()
 		elseif cost_data.gsId == coin_gsid then
+			page:CloseWindow()
 			KeepWorkStackableItemPage.openCoinNoEnoughView()
 		else
 			local need_num = result_price - my_money
@@ -399,6 +401,7 @@ function KeepWorkStackableItemPage.requestOrderResult()
 				end, 500)
 			elseif data.state == 1 then
 				-- 关闭弹窗
+				GameLogic.AddBBS("statusBar", L"订单请求中请求成功", 5000, "0 255 0");
 				_guihelper.CloseMessageBox()
 				_guihelper.MessageBoxClass.CheckShowCallback = nil
 				-- 确保不会因为延时出现时间差的问题

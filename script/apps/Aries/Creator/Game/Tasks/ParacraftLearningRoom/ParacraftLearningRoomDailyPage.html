@@ -87,12 +87,19 @@ function OnCheckinToday()
     ParacraftLearningRoomDailyPage.OnCheckinToday();
 end
 ]]></script>
-    <aries:window mode="thin" width="600" height="500" title='<%= L"每日签到：《高手成长日记》"%>' onclose="ClosePage">
+    <aries:window mode="thin" width="600" height="500" title='<%= L"高手成长日记"%>' onclose="ClosePage">
         <div style="height:120px;">
             <!--black background-->
             <div style="position:relative;margin-left:-2px;margin-top:2px;width:595px;height:117px;background-color:#000000;"></div>
-            <div style="margin-top:20px;color:#ffffff;"><%= GetTip() %></div>
-            <div style="margin-left:380px;margin-top:20px;">
+            <div style="margin-left:50px;margin-top:10px;color:#ffffff;">
+                <div><%=L"由行业专家精心准备的每日编程技巧，学会这些，你也是高手！"%></div>
+                <div><%=L'完成"每日成长"更可获得知识豆，用来兑换丰富的奖品。'%></div>
+                <div>
+                    <div style="float:left"><%=L"Paracraft会员，不受每日一个的数量限制，可提前浏览全部内容"%></div>
+                    <div style="float:left;margin-left:5px;margin-top:-5px;"><input type="button"  value='<%=L"马上开通"%>' style="width:85px;height:30px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/orange_bg_32bits.png:6 6 6 6);" onclick="OnVIP" /></div>
+                </div>
+            </div>
+            <div style="margin-left:440px;margin-top:20px;">
                 <div style="float:left;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/points_32bits.png#0 0 20 20);"></div>
                 <div style="float:left;margin-left:2px;color:#ffffff;"><%=GetExchangePoints()%></div>
             </div>
@@ -108,8 +115,8 @@ end
                     <div style="float:left;margin-left:5px;">已完成</div>
                     <div style="float:left;margin-left:5px;">|</div>
                     <div style="float:left;margin-left:5px;margin-top:2px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/vip_32bits.png#0 0 20 20);"></div>
-                    <div style="float:left;margin-left:5px;">VIP可看</div>
-                    <div style="float:left;margin-left:10px;margin-top:-5px;"><input type="button"  value='<%=L"开通VIP"%>' style="width:85px;height:30px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/orange_bg_32bits.png:6 6 6 6);" onclick="OnVIP" /></div>
+                    <div style="float:left;margin-left:5px;">会员可见</div>
+                    <div style="float:left;margin-left:10px;margin-top:-5px;"></div>
                 </div>
             </div>
             
@@ -123,7 +130,7 @@ end
                             <div style="width:100px;height:100px;padding-left:15px;">
 
                                 <pe:if condition='<%= IsFuture(Eval("index")) %>'>
-                                    <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
+                                    <input type="button" name='<%= Eval("index")%>' style="margin-top:-8px;width:73px;height:64px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray_32bits.png#0 0 73 64);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
                                     <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
                                         <div style="text-align:center;">
                                              <%= GetLabel(Eval("index"))%>

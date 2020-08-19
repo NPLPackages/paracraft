@@ -157,22 +157,33 @@ function BlockEngine.OnSaveBlockRegion()
 	end
 end
 
+function BlockEngine.IsRegionLoaded(regionX, regionY)
+	local region_id = regionX*100000+regionY;
+	return custom_model_load_map[region_id]
+end
+
+function BlockEngine.SetRegionLoaded(regionX, regionY)
+	local region_id = regionX*100000+regionY;
+	custom_model_load_map[region_id] = true;
+end
+
 function BlockEngine.OnLoadBlockRegion()
 	if(GameLogic) then
 		if(not GameLogic.GetFilters():apply_filters("OnLoadBlockRegion", true, msg.x, msg.y)) then
 			return;
 		end
 	end
+	
+	if(BlockEngine.IsRegionLoaded(msg.x, msg.y)) then
+		return;
+	end
+	BlockEngine.SetRegionLoaded(msg.x, msg.y)
+	
 	if(BlockEngine:IsRemote()) then
 		return;
 	end
 	LOG.std(nil, "system", "BlockEngine", "loading block region %d %d", msg.x, msg.y);
-	local region_id = msg.x*100000+msg.y;
-	if(custom_model_load_map[region_id]) then
-		return;
-	end
-	custom_model_load_map[region_id] = true;
-	
+
 	local startChunkX, startChunkY, startChunkZ = msg.x*32, 0, msg.y*32;
 	local endChunkX, endChunkY, endChunkZ = startChunkX+32-1, 15, startChunkZ+32-1;
 

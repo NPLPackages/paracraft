@@ -234,7 +234,7 @@ OnInitValue()
     <div style="width:411px;height:230px;">
         <div style="width:411px;height:160px;">
             <pe:if condition='<%=canChooseNums() %>'>
-                <div style="float:right;padding-left:20px;padding-top:20px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                <div style="float:right;padding-left:20px;padding-top:20px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
                    <div style="position:relative;width:123px">
                         <div style="position:relative;margin-left:6px;margin-top:0px;">
                             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
@@ -249,7 +249,7 @@ OnInitValue()
                 </div>
             </pe:if>
             <pe:if condition='<%=not canChooseNums() %>'>
-                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/Game/KeepWork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
                     <div style="position:relative;width:123px">
                          <div style="position:relative;margin-left:6px;margin-top:0px;">
                              <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
@@ -260,7 +260,7 @@ OnInitValue()
         </div>
         <br/>
         <div style="margin-left:36px;margin-top:10px;color:#f0f0f0">
-            <label name="buydesc1" style="height:30px;font-size:16px;" value='<%="Eval("defaultDesc1")"%>'/>
+            <label name="buydesc1" style="height:30px;font-size:16px;" value='<%=Eval("defaultDesc1")%>'/>
             <br/>
             <label name="buydesc2" style="height:30px;font-size:16px;" value='<%=Eval("defaultDesc2")%>'/>
         </div>

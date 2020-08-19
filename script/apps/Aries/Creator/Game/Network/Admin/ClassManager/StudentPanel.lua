@@ -66,7 +66,7 @@ function StudentPanel:MoveDown(event)
 end
 
 function StudentPanel.GetClassName()
-	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId);
+	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId) or ClassManager.CurrentClassName;
 end
 
 function StudentPanel.GetClassTime()
@@ -75,9 +75,7 @@ end
 
 function StudentPanel.GetTeacherName()
 	local teacher = ClassManager.GetClassTeacherInfo();
-	if (teacher) then
-		return teacher.username;
-	end
+	return ClassManager.GetMemberUIName(teacher);
 end
 
 function StudentPanel.GetWorldID()
@@ -121,7 +119,7 @@ end
 
 function StudentPanel.StartClass()
 	ClassManager.JoinClassroom(ClassManager.CurrentClassroomId);
-	ClassManager.SendMessage("cmd:join");
+	ClassManager.SendMessage("tip:join");
 	local projectId = GameLogic.options:GetProjectId();
 	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
 		if (page) then
