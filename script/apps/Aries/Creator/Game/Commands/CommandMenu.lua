@@ -147,6 +147,12 @@ Commands["menu"] = {
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/TeacherPanel.lua");
 			local TeacherPanel = commonlib.gettable("MyCompany.Aries.Game.Network.Admin.TeacherPanel");
 			TeacherPanel.ShowPage()
+		elseif(name == "organization.teacher_panel") then
+			local TeacherPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TeacherPanel.lua");
+			TeacherPanel.ShowPage()
+		elseif(name == "organization.student_panel") then
+			local StudentPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/StudentPanel.lua");
+			StudentPanel.ShowPage()
 		elseif(name:match("^help%.help")) then
 			-- name can be "help.help", "help.help.tutorial", "help.help.shortcutkey"
 			-- "help.help.tutorial.newusertutorial", "help.help.tutorial.MovieMaking", 

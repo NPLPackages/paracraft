@@ -23,16 +23,21 @@
     function OnClick(id)
         DockPage.OnClick(id)
     end
-    
+    function RenderButton_1(index)
+        return DockPage.RenderButton_1(index);
+    end
+    function RenderButton_2(index)
+        return DockPage.RenderButton_2(index);
+    end
 ]]></script>
-    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;height:200px;background:;">
+    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;height:200px;background:;">
         <div style="height:100px;">
-            <pe:gridview name="gridview_1" style="width:440px;height:100px;" AllowPaging="false" CellPadding="10" ItemsPerLine="6" DefaultNodeHeight = "45" pagesize="6"
+            <pe:gridview name="gridview_1" style="position:relative;width:540px;height:100px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_1%>'>
 	            <Columns>
-                    <div style="width:60px;height:45px;">
+                    <div style="width:85px;height:75px;">
                         <pe:if condition='<%= (Eval("enabled") == true) %>' >
-                            <input type="button" name='<%=Eval("id")%>' value='<%=Eval("label")%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+                            <%= RenderButton_1(Eval("index"))%>
                         </pe:if>
                     </div>
 	            </Columns>
@@ -40,13 +45,13 @@
             </pe:gridview>
 
         </div>
-        <div style="margin-top:-40px;height:100px;">
-            <pe:gridview name="gridview_2" style="width:440px;height:100px;" AllowPaging="false" CellPadding="10" ItemsPerLine="6" DefaultNodeHeight = "45" pagesize="6"
+        <div style="margin-top:-20px;height:100px;">
+            <pe:gridview name="gridview_2" style="width:540px;height:100px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_2%>'>
 	            <Columns>
-                    <div style="width:60px;height:45px;">
+                    <div style="width:85px;height:75px;">
                         <pe:if condition='<%= (Eval("enabled2") == true) %>' >
-                            <input type="button" name='<%=Eval("id")%>' value='<%=Eval("label")%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+                            <%= RenderButton_2(Eval("index"))%>
                         </pe:if>
                     </div>
 	            </Columns>
@@ -55,33 +60,33 @@
         </div>
     </pe:container>
     <pe:container ClickThrough="true" alignment="_ctb" style="position:relative;height:60px;background:;">
-        <div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='character' value='<%=L"人物"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+        <div style="margin-top:-5px;">
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='character' tooltip='<%=L"人物"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_renwu_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='bag' value='<%=L"背包"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='bag' tooltip='<%=L"背包"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_beibao_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;">
-                <input type="button" name='work' value='<%=L"作品"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='work' tooltip='<%=L"作品"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_zuoping_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;">
-                <input type="button" name='explore' value='<%=L"探索"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='explore' tooltip='<%=L"探索"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_tangsuo_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;">
-                <input type="button" name='study' value='<%=L"学习"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:80px;height:55px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='study' tooltip='<%=L"学习"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xuexi_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='school' value='<%=L"学校"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='school' tooltip='<%=L"学校"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xuexiao_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='system' value='<%=L"系统"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='system' tooltip='<%=L"系统"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xitong_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='vip' value='<%=L"会员"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='vip' tooltip='<%=L"会员"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_huiyuan_32bits.png#0 0 132 64)"/>
             </div>
-            <div style="float:left;margin-left:10px;margin-top:10px;">
-                <input type="button" name='mall' value='<%=L"商城"%>' onclick="OnClick" class="mc_light_grey_button_with_fillet" style="width:60px;height:45px;"/>
+            <div style="float:left;margin-left:7px;">
+                <input type="button" name='mall' tooltip='<%=L"商城"%>' onclick="OnClick" style="width:132px;height:64px;background:url(Texture/Aries/Creator/keepwork/dock/btn_shangcheng_32bits.png#0 0 132 64)"/>
             </div>
         </div>
         

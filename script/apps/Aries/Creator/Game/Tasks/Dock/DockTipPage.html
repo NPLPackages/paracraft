@@ -1,0 +1,116 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Leio, 2020/8/17</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true"><![CDATA[
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.lua");
+
+DockTipPage.GetInstance():OnInit_GetPageCtrl();
+local pageCtrl = document:GetPageCtrl();
+local name = pageCtrl:GetRequestParam("name");
+local node = DockTipPage.GetInstance():GetFirstNode(name) or {};
+
+local param = DockTipPage.GetInstance():GetParams(name) or {};
+function GetGsid()
+    return node.gsid;
+end
+function HasBtn()
+    if(node.btn and node.btn == "none")then
+        return false;
+    end
+    if(node.btn and node.btn ~= "")then
+        return true;
+    end
+    if(param.btn and param.btn ~= "")then
+        return true;
+    end
+end
+function GetBtnValue()
+    if(node.btn)then
+        return node.btn;
+    end
+    if(param.btn)then
+        return param.btn;
+    end
+end
+function GetName()
+    if(HasBtn())then
+        return
+    end
+   
+end
+function GetTitle()
+    if(node.title)then
+        return node.title;
+    end
+    if(param.title)then
+        return param.title;
+    end
+end
+function GetDesc()
+    local name = "";
+	local gsItem = KeepWorkItemManager.GetItemTemplate(node.gsid);
+    if(gsItem)then
+		name = gsItem.name;
+    end
+    local s = string.format("%sx%d",name,node.count)
+    return s;
+end
+function DoAction()
+    DockTipPage.GetInstance():Manual_RemoveFirstNode();
+    DockTipPage.GetInstance():DoAction(node);
+end
+function IsType(type)
+    if(name == type)then
+        return true;
+    end
+end
+function GetText()
+    local s = string.format("%d秒自动关闭",DockTipPage.duration/1000)
+    return s;
+end
+function DoNext()
+    DoAction()
+end
+function SetActiveTimer()
+    DockTipPage.GetInstance():SetActiveTimer();
+    pageCtrl:SetValue("active_timer",DockTipPage.GetInstance():TimerIsEnabled());
+end
+pageCtrl:SetValue("active_timer",DockTipPage.GetInstance():TimerIsEnabled());
+]]></script>
+
+ <div style="font-size:12px;">
+    <div class="anchor_tooltip_bg" style="width:200px;height:86px;">
+    <input type="button" onclick="DoNext" zorder="2" class="anchor_tooltip_close"/>
+    <div style="position:relative;margin-left:90px;margin-top:60px;">
+        <input type="checkbox" name="active_timer" onclick="SetActiveTimer"/><%=GetText() %>
+    </div>
+    
+    <div type="button" class="anchor_tooltip_downarrow" style="position:relative;margin-top:80px;margin-left:105px;" />
+    
+        <div style="text-align:center;">
+            <%=GetTitle() %>   
+        </div>
+        <div>
+            <div style="float:left;margin-left:5px;margin-top:5px;" class="item">
+                <kp:item gsid='<%=GetGsid()%>' isdragable="false" style="width:42px;height:42px" />
+            </div>
+            <div style="float:left;margin-left:5px;margin-top:5px;"><%=GetDesc()%></div>
+            <pe:if condition='<%=HasBtn() %>'>
+                <input type="button" class="defaultbtn" value='<%=GetBtnValue() %>' onclick="DoAction()" style="font-size:12px;margin-left:15px;margin-top:15px;height:26px;"/>
+            </pe:if>
+        </div>
+        
+    </div>
+
+</div>
+</pe:mcml> 
+
+</body>
+</html>

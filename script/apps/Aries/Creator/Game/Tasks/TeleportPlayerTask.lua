@@ -185,18 +185,51 @@ function TeleportPlayer:Run()
 		local newPosX, newPosY, newPosZ = BlockEngine:real(bx, by, bz);
 		newPosY = newPosY + BlockEngine.half_blocksize + 0.1;
 		self.newPosX, self.newPosY, self.newPosZ = newPosX, newPosY, newPosZ;
-		entityPlayer:SetPosition(self.newPosX, self.newPosY, self.newPosZ);
+		self:TeleportToPosImp(entityPlayer, self.newPosX, self.newPosY, self.newPosZ)
 		add_to_history = true;
 	elseif(self.x) then
 		-- teleport to a real world position. 
 		local newPosX, newPosY, newPosZ = self.x, self.y, self.z;
 		self.newPosX, self.newPosY, self.newPosZ = newPosX, newPosY, newPosZ;
-		entityPlayer:SetPosition(self.newPosX, self.newPosY, self.newPosZ);
+		self:TeleportToPosImp(entityPlayer, self.newPosX, self.newPosY, self.newPosZ)
 		add_to_history = true;
 	end
 
 	if(add_to_history and self.add_to_history == nil) then
 		UndoManager.PushCommand(self);
+	end
+end
+
+-- static method
+-- @param x, z: in world block position
+-- @param radius: TODO: not implemented. 
+function TeleportPlayer.LockInputUntilRegionLoaded(x, z, radius)
+	local regionX = math.floor(x / 512)
+	local regionY = math.floor(z / 512)
+	if(not BlockEngine.IsRegionLoaded(regionX, regionY)) then
+		System.os.options.DisableInput(true);
+		local step = 100;
+		local count = 1;
+		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+			if(not BlockEngine.IsRegionLoaded(regionX, regionY) and count < 8) then
+				step = math.min(1000, step * 2);
+				count = count + 1;
+				timer:Change(step)
+			else
+				System.os.options.DisableInput(false);
+			end
+		end})
+		mytimer:Change(step);
+	end
+end
+
+function TeleportPlayer:TeleportToPosImp(entityPlayer, x, y, z)
+	if(entityPlayer) then
+		entityPlayer:SetPosition(x, y, z);
+		local x, y, z = entityPlayer:GetBlockPos()
+		if(entityPlayer == EntityManager.GetPlayer()) then
+			TeleportPlayer.LockInputUntilRegionLoaded(x, z)
+		end
 	end
 end
 

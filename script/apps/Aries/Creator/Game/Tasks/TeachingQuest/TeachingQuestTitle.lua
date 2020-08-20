@@ -12,6 +12,7 @@ TeachingQuestTitle.ShowPage();
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 
 local TeachingQuestTitle = NPL.export()
 
@@ -52,6 +53,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 			--GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 			GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 			GameLogic.RunCommand("/hide quickselectbar");
+            DockPage.Show();
 		end, 200)
 	else
 		if (TeachingQuestPage.IsTaskProject(projectId)) then
@@ -72,6 +74,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 				end, 3000)
 			end
 		end
+        DockPage.Hide();
 	end
 end
 

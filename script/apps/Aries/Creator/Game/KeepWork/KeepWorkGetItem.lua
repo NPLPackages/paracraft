@@ -25,6 +25,7 @@ local bean_gsid = 998;
 local coin_gsid = 888
 local bean_gid = 10
 local is_cost_bean = true
+local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.lua");
 
 function KeepWorkGetItem.OnInit(data)
 	page = document:GetPageCtrl();
@@ -113,4 +114,18 @@ end
 --   }
 
 function KeepWorkGetItem.OnOK()
+	local exchange_result = item_data.exchangeResult or {}
+	local gain_list = exchange_result.gainList or {}
+
+	-- local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.lua");
+	for key, value in pairs(gain_list) do
+		local item = value or {}
+		local goods_info = item.goodsInfo
+		local gsid = goods_info.gsId or 0
+	
+		local amount = item.amount
+		
+		DockTipPage.GetInstance():PushGsid(gsid,amount);
+	end
+
 end

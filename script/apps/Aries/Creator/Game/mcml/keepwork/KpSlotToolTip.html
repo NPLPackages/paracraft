@@ -1,4 +1,4 @@
-<!-- "script/apps/Aries/Creator/Game/mcml/keepwork/KpSlotToolTip.html" -->
+﻿<!-- "script/apps/Aries/Creator/Game/mcml/keepwork/KpSlotToolTip.html" -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -13,11 +13,7 @@ local page = document:GetPageCtrl();
 local guid = page:GetRequestParam("guid");
 guid = tonumber(guid)
 
-commonlib.echo("=========guid");
-commonlib.echo(guid);
 local item = KeepWorkItemManager.GetItem(guid) or {};
-commonlib.echo("=========item");
-commonlib.echo(item);
 KpItemToolTip_itemTemplate = KeepWorkItemManager.GetItemTemplate(item.gsId) or {};
 function GetGsid()
     return item.gsId;

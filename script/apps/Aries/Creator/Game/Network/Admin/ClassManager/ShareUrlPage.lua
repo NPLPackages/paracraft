@@ -1,4 +1,4 @@
---[[
+﻿--[[
 Title: Class List 
 Author(s): Chenjinxian
 Date: 2020/7/6
@@ -9,6 +9,7 @@ local ShareUrlPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/
 ShareUrlPage.ShowPage()
 -------------------------------------------------------
 ]]
+local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 local ShareUrlPage = NPL.export()
 
 local page;
@@ -41,11 +42,31 @@ function ShareUrlPage.OnClose()
 	page:CloseWindow();
 end
 
-function ShareUrlPage.ShareClassPage()
+function ShareUrlPage.ShareOrgPage()
+	local orgUrl = ClassManager.GetCurrentOrgUrl();
+	if (orgUrl) then
+		local text = string.format("https://keepwork.com/org/%s/index", orgUrl);
+		ClassManager.SendMessage("link:"..text);
+		GameLogic.AddBBS(nil, L"班级链接分享成功！", 2000, "0 255 0");
+	end
 end
 
-function ShareUrlPage.ShareOrganPage()
+function ShareUrlPage.ShareClassPage()
+	local orgUrl = ClassManager.GetCurrentOrgUrl();
+	if (orgUrl) then
+		local text = string.format("https://keepwork.com/org/%s/student/OrgStudentClass/%d", orgUrl, ClassManager.CurrentClassId);
+		ClassManager.SendMessage("link:"..text);
+		GameLogic.AddBBS(nil, L"机构链接分享成功！", 2000, "0 255 0");
+	end
 end
 
 function ShareUrlPage.ShareInputUrl()
+	local text = page:GetValue("url", nil);
+	if (text and text ~= "") then
+		ClassManager.SendMessage("link:"..text);
+		GameLogic.AddBBS(nil, L"链接分享成功！", 2000, "0 255 0");
+		page:SetValue("url", "");
+	else
+		_guihelper.MessageBox(L"请输入要分享的链接");
+	end
 end

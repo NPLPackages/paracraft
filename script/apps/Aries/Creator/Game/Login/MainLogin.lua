@@ -517,6 +517,11 @@ function MainLogin:ShowLoginModePage()
     local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
     KpChatChannel.StaticInit();
 
+	if (not System.options.isCodepku) then
+		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		ClassManager.StaticInit();
+	end
+
 	if(not System.options.isSchool) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 		local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")

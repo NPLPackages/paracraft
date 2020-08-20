@@ -10,6 +10,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/mcml.lua");
 MyCompany.Aries.Game.mcml2.mcml_controls.register_all();
 ------------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 local mcml_controls = commonlib.gettable("MyCompany.Aries.Game.mcml2.mcml_controls");
 
 local is_init = false;

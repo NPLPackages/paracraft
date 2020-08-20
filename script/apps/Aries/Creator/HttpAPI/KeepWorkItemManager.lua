@@ -38,6 +38,8 @@ KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
     echo("==========userinfo");
     echo(data);
 end)
+
+local gsItem = KeepWorkItemManager.GetItemTemplate(gsid);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Encoding/base64.lua");

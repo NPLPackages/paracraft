@@ -383,9 +383,7 @@ Commands["maxrenderdist"] = {
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(cmd_text) then
 			local dist = tonumber(cmd_text)
-			if(dist >=64 and dist<=1024) then
-				GameLogic.options:SetMaxViewDist(dist);
-			end
+			GameLogic.options:SetMaxViewDist(dist);
 		end
 	end,
 };
