@@ -89,8 +89,8 @@ function CodeBlockWindow.Show(bShow)
 			_this:SetScript("onclick", function() end); -- just disable click through 
 			_guihelper.SetFontColor(_this, "#ffffff");
 			_this:AttachToRoot();
-			local code_block_ui_url = GameLogic.GetFilters():apply_filters("CodeBlockUIUrl", CodeBlockWindow.defaultCodeUIUrl)			
-			page = System.mcml.PageCtrl:new({url=code_block_ui_url});
+			
+			page = System.mcml.PageCtrl:new({url=CodeBlockWindow.GetDefaultCodeUIUrl()});
 			page:Create(code_block_window_name.."page", _this, "_fi", 0, 0, 0, 0);
 		end
 
@@ -109,6 +109,11 @@ function CodeBlockWindow.Show(bShow)
 		end
 		GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 	end
+end
+
+function CodeBlockWindow.GetDefaultCodeUIUrl()
+	local codeUIUrl = GameLogic.GetFilters():apply_filters("CodeBlockUIUrl", CodeBlockWindow.defaultCodeUIUrl)
+	return codeUIUrl;
 end
 
 
@@ -810,7 +815,7 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 
 			-- custom code block theme
 			-- local codeUIUrl = CodeBlockWindow.defaultCodeUIUrl;
-			local codeUIUrl = GameLogic.GetFilters():apply_filters("CodeBlockUIUrl", CodeBlockWindow.defaultCodeUIUrl)
+			local codeUIUrl = CodeBlockWindow.GetDefaultCodeUIUrl();
 			if(langConfig.GetCustomCodeUIUrl) then
 				codeUIUrl = langConfig.GetCustomCodeUIUrl() or codeUIUrl;
 				codeUIUrl = Files.FindFile(codeUIUrl)
