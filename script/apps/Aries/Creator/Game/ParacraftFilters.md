@@ -133,6 +133,10 @@ This gives an overview of filters in paracraft. Please search the source code of
 - online:
   - "Player.LoadRemoteData": nil, name, default_value: 
   - "Player.SaveRemoteData": nil, name, value, bDeferSave: 
+- code block editor
+  - "CodeBlockUIUrl": defaultCodeBlockEditorUrl:custom code block default html path
+  - "CodeBlockEditorOpened": nil, custom code block editor
+  - "CustomCodeBlockClicked": false, determine whether code block can be opened
 
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

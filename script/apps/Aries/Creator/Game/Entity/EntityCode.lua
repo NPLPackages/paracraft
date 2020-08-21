@@ -440,7 +440,11 @@ end
 
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
-function Entity:OnClick(x, y, z, mouse_button, entity, side)
+function Entity:OnClick(x, y, z, mouse_button, entity, side)	
+	if (GameLogic.GetFilters():apply_filters("CustomCodeBlockClicked", false, self, mouse_button, entity)) then
+		return true;
+	end
+	
 	if(GameLogic.isRemote) then
 		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 			self:OpenEditor("entity", entity);
@@ -461,6 +465,7 @@ function Entity:OpenEditor(editor_name, entity)
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
     CodeBlockWindow.Show(true);
 	CodeBlockWindow.SetCodeEntity(self);
+	GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity)	
 end
 
 function Entity:CloseEditor()
