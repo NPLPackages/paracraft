@@ -46,6 +46,11 @@ Commands["menu"] = {
 /menu help.actiontutorial
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		-- apply filter
+		if (GameLogic.GetFilters():apply_filters("menu_command", false, cmd_name, cmd_text, cmd_params)) then
+			return;
+		end
+
 		local name, bIsShow;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		if(not name) then
