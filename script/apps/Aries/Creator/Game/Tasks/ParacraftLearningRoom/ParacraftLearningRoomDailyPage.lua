@@ -283,6 +283,15 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 
 	learning();
 end
+function ParacraftLearningRoomDailyPage:Refresh()
+    if(not page)then
+        return
+    end
+    page:Refresh(0);
+end
 function ParacraftLearningRoomDailyPage.OnVIP()
-	ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
+	--ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
+	GameLogic.GetFilters():apply_filters("VipNotice", true, function()
+        ParacraftLearningRoomDailyPage:Refresh();
+    end);
 end

@@ -172,11 +172,16 @@ end
 
 function KeepWorkStackableItemPage.OnOK()
 	if is_need_vip and not is_vip then
+		--[[
 		ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 		_guihelper.MessageBox("开通VIP后点击【确定】，刷新VIP状态。", function()
 			page:CloseWindow()
 			KeepWorkItemManager.LoadItems()
 		end)
+		]]
+		page:CloseWindow()
+		GameLogic.GetFilters():apply_filters("VipNotice", true);
+
 		
 		return
 	end
@@ -199,20 +204,6 @@ function KeepWorkStackableItemPage.OnOK()
 	-- is_not_enough = true
 	-- cost_data.gsId = 998
 	-- cost_data.gsId = 888
-	if is_not_enough then
-		if cost_data.gsId == bean_gsid then
-			page:CloseWindow()
-			KeepWorkStackableItemPage.openBeanNoEnoughView()
-		elseif cost_data.gsId == coin_gsid then
-			page:CloseWindow()
-			KeepWorkStackableItemPage.openCoinNoEnoughView()
-		else
-			local need_num = result_price - my_money
-			_guihelper.MessageBox(string.format("您的%s不足，还需要%d个%s", cost_name, need_num, cost_name))
-		end
-		
-		return
-	end	
 
 	local gsid = item_data.id
     keepwork.mall.buy({
@@ -243,7 +234,21 @@ function KeepWorkStackableItemPage.OnOK()
 				KeepWorkItemManager.LoadItems()
 				page:CloseWindow()
 			else
-				GameLogic.AddBBS("statusBar", L"购买失败!", 5000, "0 255 0");
+
+				if is_not_enough then
+					if cost_data.gsId == bean_gsid then
+						page:CloseWindow()
+						KeepWorkStackableItemPage.openBeanNoEnoughView()
+					elseif cost_data.gsId == coin_gsid then
+						page:CloseWindow()
+						KeepWorkStackableItemPage.openCoinNoEnoughView()
+					else
+						local need_num = result_price - my_money
+						_guihelper.MessageBox(string.format("您的%s不足，还需要%d个%s", cost_name, need_num, cost_name))
+					end
+				else
+					GameLogic.AddBBS("statusBar", L"购买失败!", 5000, "0 255 0");
+				end	
 			end
 
 		elseif err == 500 then
@@ -294,9 +299,9 @@ function KeepWorkStackableItemPage.openBeanNoEnoughView()
 		directPosition = true,
 			align = "_ct",
 			x = -400/2,
-			y = -330/2,
+			y = -216/2,
 			width = 400,
-			height = 330,
+			height = 216,
 	});
 end
 

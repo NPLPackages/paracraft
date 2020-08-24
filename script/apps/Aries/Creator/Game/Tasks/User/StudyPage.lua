@@ -78,28 +78,30 @@ function StudyPage.clickStudy()
 end
 
 function StudyPage.clickKnowledgeIsland()
-	print("打开知识岛")
-	if(KeepworkServiceSession:IsSignedIn())then
-		ParacraftLearningRoomDailyPage.OnLearningLand();
-		return
-	end
-	LoginModal:CheckSignedIn(L"请先登录", function(result)
-		if result == true then
-			Mod.WorldShare.Utils.SetTimeOut(function()
-				if result then
-					-- WorldList:RefreshCurrentServerList()
-					local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-					ParacraftLearningRoomDailyPage.OnLearningLand();
-				end
-			end, 300)
-		end
-	end)
+	local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
+	TeachingQuestLinkPage.ShowPage();
+	-- if(KeepworkServiceSession:IsSignedIn())then
+	-- 	ParacraftLearningRoomDailyPage.OnLearningLand();
+	-- 	return
+	-- end
+	-- LoginModal:CheckSignedIn(L"请先登录", function(result)
+	-- 	if result == true then
+	-- 		Mod.WorldShare.Utils.SetTimeOut(function()
+	-- 			if result then
+	-- 				-- WorldList:RefreshCurrentServerList()
+	-- 				local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+	-- 				ParacraftLearningRoomDailyPage.OnLearningLand();
+	-- 			end
+	-- 		end, 300)
+	-- 	end
+	-- end)
 end
 
 function StudyPage.clickArtOfWar()
-	local word_id = 5968
-	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	UserConsole:HandleWorldId(word_id, "force");
+	_guihelper.MessageBox("敬请期待")
+	-- local word_id = 5986
+	-- local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+	-- UserConsole:HandleWorldId(word_id, "force");
 end
 
 function StudyPage.clickVideoRes()
@@ -119,10 +121,10 @@ function StudyPage.onclickTieBa()
 end
 
 StudyPage.grid_data_sources = {
-	{name="碎片化学习", type = grid_type_list.study, click_cb = StudyPage.clickStudy},
-	{name="知识岛", type = grid_type_list.knowledge_island, click_cb = StudyPage.clickKnowledgeIsland},
-	{name="孙子子兵法", type = grid_type_list.art_of_war, click_cb = StudyPage.clickArtOfWar},
+	{name="成长日记", type = grid_type_list.study, click_cb = StudyPage.clickStudy},
+	{name="每周实战", type = grid_type_list.knowledge_island, click_cb = StudyPage.clickKnowledgeIsland},
+	{name="玩学课堂", type = grid_type_list.art_of_war, click_cb = StudyPage.clickArtOfWar},
 	{name="视频资源", type = grid_type_list.video_res, click_cb = StudyPage.clickVideoRes},
-	{name="Doc", type = grid_type_list.doc, click_cb = StudyPage.clickDoc},
+	{name="文档资料", type = grid_type_list.doc, click_cb = StudyPage.clickDoc},
 	{name="百度知道", type = grid_type_list.baidu_konw, click_cb = StudyPage.clickBaiduKnow},
 }

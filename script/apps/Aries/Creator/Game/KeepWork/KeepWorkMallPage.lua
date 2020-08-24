@@ -92,9 +92,17 @@ function KeepWorkMallPage.ShowView()
 		KeepWorkMallPage.menu_data_sources = {}
 		menu_node_data = {}
 		KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
+		local att = ParaEngine.GetAttributeObject();
+		local oldsize = att:GetField("ScreenResolution", {1280,720});
 
-		local view_width = 1084
-		local view_height = 638
+		local standard_width = 1280
+		local standard_height = 720
+		
+		local view_width = 904
+		local view_height = 518
+
+		local ratio = view_width/standard_width
+
 		local params = {
 				url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.html",
 				name = "KeepWorkMallPage.Show", 
@@ -103,7 +111,7 @@ function KeepWorkMallPage.ShowView()
 				style = CommonCtrl.WindowFrame.ContainerStyle,
 				allowDrag = true,
 				enable_esc_key = true,
-				zorder = -1,
+				zorder = 1,
 				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 				directPosition = true,
 					align = "_ct",

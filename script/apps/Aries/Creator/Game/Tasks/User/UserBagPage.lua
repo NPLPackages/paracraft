@@ -30,7 +30,7 @@ function UserBagPage.ShowPage()
 			DestroyOnClose = true,
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
-			enable_esc_key = false,
+			enable_esc_key = true,
 			zorder = 100,
 			--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
@@ -53,6 +53,10 @@ function UserBagPage.Refresh()
 end
 function UserBagPage.CanFill(item)
     if(not item)then
+        return
+    end
+    local copies = item.copies or 0;
+    if(copies <= 0)then
         return
     end
     for k,bagId in ipairs(UserBagPage.accepted_bags) do

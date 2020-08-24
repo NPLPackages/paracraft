@@ -63,17 +63,15 @@ function TeacherPanel:MoveDown(event)
 end
 
 function TeacherPanel.SelectClass()
-	ClassManager.LoadAllClassesAndProjects(function()
-		if (#ClassManager.ClassList > 0 and #ClassManager.ProjectList > 0) then
-			local ClassListPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassListPage.lua");
-			ClassListPage.ShowPage(function(result)
-				if (result) then
-					--TeacherPanel.StartClass(ClassManager.CurrentClassId, ClassManager.CurrentWorldId);
-				end
-			end);
-		else
-			_guihelper.MessageBox(L"获取班级信息失败, 请重试！");
-		end
+	ClassManager.LoadAllClasses(function()
+		ClassManager.LoadAllProjects(function()
+			if (#ClassManager.ClassList > 0 and #ClassManager.ProjectList > 0) then
+				local ClassListPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassListPage.lua");
+				ClassListPage.ShowPage();
+			else
+				_guihelper.MessageBox(L"获取班级信息失败, 请重试！");
+			end
+		end);
 	end);
 end
 
@@ -150,8 +148,16 @@ function TeacherPanel.ConnectClass()
 end
 
 function TeacherPanel.ShareUrl()
-	local ShareUrlPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlPage.lua");
-	ShareUrlPage.ShowPage()
+	local orgUrl = ClassManager.GetCurrentOrgUrl();
+	if (orgUrl) then
+		local ShareUrlPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlPage.lua");
+		ShareUrlPage.ShowPage()
+	else
+		ClassManager.LoadAllClasses(function()
+			local ShareUrlPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlPage.lua");
+			ShareUrlPage.ShowPage()
+		end);
+	end
 end
 
 function TeacherPanel.IsClassStarted()

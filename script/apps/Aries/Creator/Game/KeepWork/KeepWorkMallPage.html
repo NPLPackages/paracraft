@@ -75,46 +75,46 @@ function getTopBtDesc()
     return KeepWorkMallPage.getTopBtDesc()
 end
 ]]></script>
-<aries:window mode="thin" width="1084" height="638" title='<%= L"资源中心"%>' onclose="ClosePage">
+<aries:window name="iframe" mode="thin" width="904" height="538" title='<%= L"商城"%>' onclose="ClosePage">
 <div style="color:#ffffff">
-    <div style="margin-left:-4px;margin-top:2px;width:1082px;height:107px;background-color:#3b3b3b;">
+    <div style="margin-left:-4px;margin-top:2px;width:902px;height:57px;background-color:#3b3b3b;">
         <pe:if condition='<%= IsSelected(1)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="1" value='<%=L"全部"%>' onclick="OnChangeTopBt" tooltip='<%=L"全部"%>' style="position:relative;width:50px;margin-left:30px;margin-top:72px;color:#d56a00;font-size:16;" background=""/>
-                <div style="float:left;width:75px;height:4px;margin-top:100px;margin-left:17px;background-color:#d56a00;"></div>
+                <input type="button" name="1" value='<%=L"全部"%>' onclick="OnChangeTopBt" tooltip='<%=L"全部"%>' style="position:relative;width:50px;margin-left:30px;margin-top:22px;color:#d56a00;font-size:16;" background=""/>
+                <div style="float:left;width:75px;height:4px;margin-top:50px;margin-left:17px;background-color:#d56a00;"></div>
             </div>
         </pe:if>
         <pe:if condition='<%= not IsSelected(1)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="1" value='<%=L"全部"%>' onclick="OnChangeTopBt" tooltip='<%=L"全部"%>' style="width:50px;margin-left:30px;margin-top:72px;color:#999999;font-size:16;" background=""/>
+                <input type="button" name="1" value='<%=L"全部"%>' onclick="OnChangeTopBt" tooltip='<%=L"全部"%>' style="width:50px;margin-left:30px;margin-top:22px;color:#999999;font-size:16;" background=""/>
             </div>
         </pe:if>
 
         <pe:if condition='<%= IsSelected(2)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="2" value='<%=L"最新"%>' onclick="OnChangeTopBt" tooltip='<%=L"最新"%>' style="position:relative;width:50px;margin-left:30px;margin-top:72px;color:#d56a00;font-size:16;" background=""/>
-                <div style="float:left;width:75px;height:4px;margin-top:100px;margin-left:17px;background-color:#d56a00;"></div>
+                <input type="button" name="2" value='<%=L"最新"%>' onclick="OnChangeTopBt" tooltip='<%=L"最新"%>' style="position:relative;width:50px;margin-left:30px;margin-top:22px;color:#d56a00;font-size:16;" background=""/>
+                <div style="float:left;width:75px;height:4px;margin-top:50px;margin-left:17px;background-color:#d56a00;"></div>
             </div>
         </pe:if>
         <pe:if condition='<%= not IsSelected(2)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="2" value='<%=L"最新"%>' onclick="OnChangeTopBt" tooltip='<%=L"最新"%>' style="width:50px;margin-left:30px;margin-top:72px;color:#999999;font-size:16;" background=""/>
+                <input type="button" name="2" value='<%=L"最新"%>' onclick="OnChangeTopBt" tooltip='<%=L"最新"%>' style="width:50px;margin-left:30px;margin-top:22px;color:#999999;font-size:16;" background=""/>
             </div>
         </pe:if>
 
         <pe:if condition='<%= IsSelected(3)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="3" value='<%=L"热门"%>' onclick="OnChangeTopBt" tooltip='<%=L"热门"%>' style="position:relative;width:50px;margin-left:30px;margin-top:72px;color:#d56a00;font-size:16;" background=""/>
-                <div style="float:left;width:75px;height:4px;margin-top:100px;margin-left:17px;background-color:#d56a00;"></div>
+                <input type="button" name="3" value='<%=L"热门"%>' onclick="OnChangeTopBt" tooltip='<%=L"热门"%>' style="position:relative;width:50px;margin-left:30px;margin-top:22px;color:#d56a00;font-size:16;" background=""/>
+                <div style="float:left;width:75px;height:4px;margin-top:50px;margin-left:17px;background-color:#d56a00;"></div>
             </div>
         </pe:if>
         <pe:if condition='<%= not IsSelected(3)%>'>
             <div style="float:left;width:75px;height:36px;">
-                <input type="button" name="3" value='<%=L"热门"%>' onclick="OnChangeTopBt" tooltip='<%=L"热门"%>' style="width:50px;margin-left:30px;margin-top:72px;color:#999999;font-size:16;" background=""/>
+                <input type="button" name="3" value='<%=L"热门"%>' onclick="OnChangeTopBt" tooltip='<%=L"热门"%>' style="width:50px;margin-left:30px;margin-top:22px;color:#999999;font-size:16;" background=""/>
             </div>         
         </pe:if>
         
-        <div style="float:left;margin-left:550px;margin-top:70px;width:292px;">
+        <div style="float:left;margin-left:370px;margin-top:20px;width:292px;">
             <!-- <div style="width:292px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);"> -->
             <div style="width:292px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
                 <input type="text" EmptyText='<%=L"请输入您要搜索的内容"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
@@ -122,7 +122,7 @@ end
         </div>
     </div>
 
-    <div style="float:left;width:217px;height:498px;margin-top:0px;background-color:#1b1b1b;">
+    <div style="float:left;width:220px;height:448px;margin-left:-3px;margin-top:0px;background-color:#1b1b1b;">
         <div style="margin-left:10px;padding-left:12px;font-size:14px;">
             <div style="height:18px;color:#ffffff;margin-top:25px;"><%=getTopBtDesc()%></div>
             <!-- <label name="topBtDesc" style="height:18px;color:#ffffff;margin-top:10px;" value='<%=getTopBtDesc()%>'/> -->
@@ -163,17 +163,17 @@ end
         </pe:treeview>
     </div>
 
-    <div style="float:left;width:860px;height:498px;margin-top:0px;background-color:#0c0c0c;">
-        <pe:gridview style="margin-left:15px;" name="item_gridview" CellPadding="32" AllowPaging="true" ItemsPerLine="5" DefaultNodeHeight="50"
-                     DataSource='<%=GridsItems%>' pagesize="10">
+    <div style="float:left;width:680px;height:448px;margin-top:0px;background-color:#0c0c0c;">
+        <pe:gridview style="margin-left:30px;" name="item_gridview" CellPadding="23" AllowPaging="true" ItemsPerLine="4 " DefaultNodeHeight="50"
+                     DataSource='<%=GridsItems%>' pagesize="8">
             <PagerSettings Position="Bottom" height="36" style="position:relative;width:498px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
             <PagerTemplate>
                 <form>
-                    <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:355px;margin-top:5px;background-rotation:-1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>
-                    <div style="float:left;margin-top:0px;text-singleline:true">
+                    <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:255px;margin-top:15px;background-rotation:-1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>
+                    <div style="float:left;margin-top:10px;text-singleline:true">
                         <label name="page" style="color:#FFFFFF;text-align:center;width:45px;height:18px;margin:4px"/>
                     </div>
-                    <input type="button" name="next" zorder=2 style="width:20px;height:20px;margin-top:7px;background-rotation:1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16)"/>
+                    <input type="button" name="next" zorder=2 style="width:20px;height:20px;margin-top:17px;background-rotation:1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16)"/>
                 </form>
             </PagerTemplate>
             <Columns>

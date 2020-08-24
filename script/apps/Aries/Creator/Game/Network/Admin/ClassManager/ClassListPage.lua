@@ -19,7 +19,6 @@ function ClassListPage.OnInit()
 end
 
 function ClassListPage.ShowPage(onClose)
-	ClassListPage.result = false;
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassListPage.html", 
 		name = "ClassListPage.ShowPage", 
@@ -37,12 +36,6 @@ function ClassListPage.ShowPage(onClose)
 		height = 230,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	params._page.OnClose = function()
-		if(onClose) then
-			onClose(ClassListPage.result);
-		end
-	end
 
 	if (#ClassManager.ClassList > 0) then
 		page:SetValue("ClassList", ClassManager.ClassList[1].classId);
@@ -92,7 +85,6 @@ function ClassListPage.OnOK()
 	if (classId and worldId) then
 		ClassManager.CreateClassroom(classId, worldId, function(result, data)
 			if (result) then
-				ClassListPage.result = true;
 				page:CloseWindow();
 			else
 				_guihelper.MessageBox(L"所选择的班级或世界ID无效");

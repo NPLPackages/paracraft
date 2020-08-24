@@ -8,6 +8,7 @@ Use Lib:
 local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.lua");
 DockTipPage.GetInstance():PushGsid(888);
 DockTipPage.GetInstance():PushGsid(998,100);
+DockTipPage.GetInstance():PushGsid(888,10);
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
@@ -59,7 +60,7 @@ function DockTipPage:ChangeWorld()
 	self.is_showing_node = false;
 end
 function DockTipPage:GetNodeList()
-	return self.node_list,self.node_map;
+	return self.node_list;
 end
 function DockTipPage:GetUserName()
     local User = commonlib.gettable("System.User")
@@ -74,7 +75,6 @@ function DockTipPage:OnInit()
 	self.timer = commonlib.Timer:new();
 	self.timer.callbackFunc = DockTipPage.TimerCallBack;
 	self.node_list = {};
-	self.node_map = {};
 	self.pending_gsid_list = {};
 
 	self.pos_list = {
@@ -95,9 +95,6 @@ function DockTipPage:RemoveTopNode()
 	local node = self.node_list[1];
 	if(node)then
 		table.remove(self.node_list,1);
-		if(node.gsid)then
-			self.node_map[node.gsid] = nil;
-		end
 	end
 	self:HideTip();
 	return node;
@@ -207,13 +204,6 @@ end
 function DockTipPage:CheckCanShow()
     return DockPage.IsShow();
 end
---是否已经包含
-function DockTipPage:HasNodeByGsid(gsid)
-	if(not gsid)then return end
-	if(self.node_map[gsid])then
-		return true;
-	end
-end
 
 function DockTipPage:GetTipCount()
 	return #self.node_list;
@@ -221,13 +211,7 @@ end
 function DockTipPage:__PushNode(node)
 	if(not node or node.animation_only)then return end
 	local gsid = node.gsid;
-	if(self:HasNodeByGsid(gsid))then
-		return;
-	end
 	table.insert(self.node_list,node);
-	if(gsid)then
-		self.node_map[gsid] = gsid;
-	end
 end
 function DockTipPage:PushNode(node)
 	if(not node)then return end
@@ -254,10 +238,6 @@ function DockTipPage:DeleteNodeByName(name)
 	local node = self:GetFirstNode();
 	if(node and node.name and node.name == name)then
 		table.remove(self.node_list,1);
-
-		if(node.gsid)then
-			self.node_map[node.gsid] = nil;
-		end
 	end
 end
 function DockTipPage:ShowPage()

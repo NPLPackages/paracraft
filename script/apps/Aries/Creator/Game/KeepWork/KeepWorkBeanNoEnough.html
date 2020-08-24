@@ -69,23 +69,20 @@ function ClosePage()
 end
 
 ]]></script>
-<aries:window mode="thin" width="400" height="330" title='<%=L"提示"%>' onclose="ClosePage">
+<aries:window mode="thin" width="400" height="216" title='<%=L"提示"%>' onclose="ClosePage">
     <div style="margin-left:21px;margin-top:40px;color:#ffffff;font-size:16px;"><%="知识豆余额不足，无法购买。" %></div>
     <div style="float:left; margin-left:21px; margin-top:13px; color:#999999; font-size:14px;"><%="你的知识豆余额: " %></div>
     <div style="float:left;margin-top:18px;margin-left:3px;float:left;width:16;height:16;background:url(Texture/Aries/Creator/keepwork/Mall/icon_bean_32bits.png#0 0 16 16:0 0 0 0);"></div> 
     <div style="float:left;margin-left:0px; margin-top:13px; color:#ffc900; font-size:14px;"><%=getLeftBean() %></div>
 
-    <div style="margin-left:21px;margin-top:39px;color:#f0f0f0"><%="你可以前往每日签到、知识岛 赚知识豆。" %></div>
+    <!-- <div style="margin-left:21px;margin-top:39px;color:#f0f0f0"><%="你可以前往每日签到、知识岛 赚知识豆。" %></div>
     <div style="margin-left:21px;margin-top:10px;">
-        <!-- <input type="button" class="button" value="确定" style="margin-left:10px;width:54px;height:48px;" onclick="OnCancel()"/>
-        <input type="button" class="button" value="确定" style="margin-left:30px;width:54px;height:48px;" onclick="OnCancel()"/> -->
         <div style="float:left;margin-left:0px;">
             <input type="button" tooltip='<%=L"每日签到"%>' onclick="OnDailyCheck" style="float:left;width:70px;height:50px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6)" />
             <div style="position:relative;width:70px;margin-top:-45px;color:#ffffff;" >
                 <div zorder="1001" style="margin-left:26px;width:18px;height:18px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/check_btn_32bits.png#0 0 18 18)"></div>
                 <div style="margin-top:5px;text-align:center;"><%= L"每日签到" %></div>
             </div>
-            <!-- <kp:redtip style="position:relative;margin-left:55;margin-top:-45px;" onupdate='<%= HasCheckedToday()%>'></kp:redtip> -->
         </div>
         <div style="float:left;margin-left:10px;">
             <input type="button" tooltip='<%=L"知识岛"%>' onclick="OnLearningLand" style="float:left;width:70px;height:50px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);" />
@@ -95,8 +92,8 @@ end
             </div>
         </div>
         
-    </div>
-    <div style="width:90px;height:32px;margin-top:33px;margin-left:0px;">
+    </div> -->
+    <div style="width:90px;height:32px;margin-top:42px;margin-left:0px;">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;width:90px;height:32px;"></pe:goalpointer>
         <input type="button" class="mc_big_button" value="确定" style="margin-left:150px;width:90px;height:32px;" onclick="OnCancel()"/>
         <!-- <input type="button" class="button" value="<%=getBuyBtDesc()%>" style="margin-left:10px;width:154px;height:48px;" onclick="OnOK()"/> -->

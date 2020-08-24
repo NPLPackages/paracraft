@@ -150,6 +150,7 @@ function NplBrowserPlugin.RunNextCmd()
                     end
                 else
                     NplBrowserPlugin.webview:setVisible(cmd.visible);
+                    NplBrowserPlugin.webview:loadUrl("");
                     p.isLoadWebview = false
                 end
             end

@@ -25,9 +25,13 @@ function KeepWorkCoinNoEnough.getLeftBean()
 end
 
 function KeepWorkCoinNoEnough.OnOK()
+	--[[
 	ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 	_guihelper.MessageBox("充值成功后点击【确定】，刷新知识币数量。", function()
 		page:CloseWindow()
 		KeepWorkItemManager.LoadItems()
 	end)
+	]]
+	page:CloseWindow()
+	GameLogic.GetFilters():apply_filters("VipNotice", true);
 end

@@ -57,24 +57,31 @@ function ClassManager.OnKeepWorkLogin_Callback()
 	if (KpChatChannel.client) then
 		KpChatChannel.client:AddEventListener("OnMsg",ClassManager.OnMsg,ClassManager);
 		commonlib.TimerManager.SetTimeout(function()
-			ClassManager.LoadAllClassesAndProjects();
-			ClassManager.LoadOnlineClassroom(function(classId, projectId, classroomId)
-				if (ClassManager.IsTeacherInClass()) then
-					_guihelper.MessageBox("你所在的班级正在上课！", function(res)
-						if(res and res == _guihelper.DialogResult.Yes)then
+			--ClassManager.LoadAllClassesAndProjects();
+			-- first load teacher classroom
+			local roleId = 2;
+			ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId)
+				if (classId and projectId and classroomId) then
+					if (ClassManager.IsTeacherInClass()) then
+						_guihelper.MessageBox("你所在的班级正在上课，即将自动进入课堂！");
+						commonlib.TimerManager.SetTimeout(function()
 							ClassManager.InClass = true;
 							TeacherPanel.StartClass();
-						else
-							ClassManager.DismissClassroom(ClassManager.CurrentClassroomId);
-						end
-					end, _guihelper.MessageBoxButtons.YesNo, {yes = "立即上课", no = "立即下课", show_label = true});
+						end, 2000);
+					end
 				else
-					_guihelper.MessageBox("你所在的班级正在上课！", function(res)
-						if(res and res == _guihelper.DialogResult.Yes)then
-							ClassManager.InClass = true;
-							StudentPanel.StartClass();
+					-- no teacher classroom, then load student classroom
+					local roleId = 1;
+					ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId)
+						if (classId and projectId and classroomId) then
+							_guihelper.MessageBox("你所在的班级正在上课，是否直接进入课堂？", function(res)
+								if(res and res == _guihelper.DialogResult.Yes)then
+									ClassManager.InClass = true;
+									StudentPanel.StartClass();
+								end
+							end, _guihelper.MessageBoxButtons.YesNo);
 						end
-					end, _guihelper.MessageBoxButtons.YesNo, {yes = "立即上课", no = "暂时不", show_label = true});
+					end);
 				end
 			end);
 		end, 1000)
@@ -88,14 +95,19 @@ function ClassManager.OnKeepWorkLogout_Callback()
 	end
 end
 
-function ClassManager.LoadAllClassesAndProjects(callback)
-	ClassManager.Reset();
+function ClassManager.LoadAllClasses(callback)
+	if (#ClassManager.ClassList > 0) then
+		ClassManager.ClassList = {};
+	end
+	if (#ClassManager.OrgClassIdMap > 0) then
+		ClassManager.OrgClassIdMap = {};
+	end
 	keepwork.userOrgInfo.get(nil, function(err, msg, data)
 		local orgs = data and data.data and data.data.allOrgs;
 		if (orgs == nil) then return end
 
 		for i = 1, #orgs do
-			keepwork.classes.get({cache_policy = "access plus 0", organizationId = orgs[i].id}, function(err, msg, data)
+			keepwork.classes.get({cache_policy = "access plus 0", organizationId = orgs[i].id, roleId=2}, function(err, msg, data)
 				local classes = data and data.data;
 				if (classes == nil) then return end
 
@@ -108,40 +120,50 @@ function ClassManager.LoadAllClassesAndProjects(callback)
 				end
 
 				if (i == #orgs) then
-					local projectId = GameLogic.options:GetProjectId();
-					if (projectId and tonumber(projectId)) then
-						table.insert(ClassManager.ProjectList, {projectId = tonumber(projectId), projectName = WorldCommon.GetWorldTag("name")});
+					if (callback) then
+						callback();
 					end
-					keepwork.classroom.get({cache_policy = "access plus 0"}, function(err, msg, data)
-						local rooms = data and data.data and data.data.rows;
-						if (rooms) then
-							local function findProject(id)
-								for j = 1, #ClassManager.ProjectList do
-									if (id == ClassManager.ProjectList[j].projectId) then
-										return true;
-									end
-								end
-								return false;
-							end
-							for j = 1, #rooms do
-								if (not findProject(rooms[j].projectId)) then
-									table.insert(ClassManager.ProjectList, {projectId = rooms[j].projectId, projectName = rooms[j].projectName});
-								end
-							end
-						end
-
-						if (callback) then
-							callback();
-						end
-					end);
 				end
 			end);
 		end
 	end);
 end
 
-function ClassManager.LoadOnlineClassroom(callback)
-	keepwork.classroom.get({cache_policy = "access plus 0"}, function(err, msg, data)
+function ClassManager.LoadAllProjects(callback)
+	if (#ClassManager.ProjectList > 0) then
+		ClassManager.ProjectList = {};
+	end
+	local projectId = GameLogic.options:GetProjectId();
+	if (projectId and tonumber(projectId)) then
+		table.insert(ClassManager.ProjectList, {projectId = tonumber(projectId), projectName = WorldCommon.GetWorldTag("name")});
+	end
+	keepwork.classroom.get({cache_policy = "access plus 0", roleId = 2}, function(err, msg, data)
+		local rooms = data and data.data and data.data.rows;
+		if (rooms) then
+			local function findProject(id)
+				for j = 1, #ClassManager.ProjectList do
+					if (id == ClassManager.ProjectList[j].projectId) then
+						return true;
+					end
+				end
+				return false;
+			end
+			for j = 1, #rooms do
+				if (not findProject(rooms[j].projectId)) then
+					table.insert(ClassManager.ProjectList, {projectId = rooms[j].projectId, projectName = rooms[j].projectName});
+				end
+			end
+		end
+
+		if (callback) then
+			callback();
+		end
+	end);
+end
+
+function ClassManager.LoadOnlineClassroom(roleId, callback)
+	keepwork.classroom.get({cache_policy = "access plus 0", status = 1, roleId = roleId}, function(err, msg, data)
+		commonlib.echo(data);
 		local rooms = data and data.data and data.data.rows;
 		if (rooms) then
 			for i = 1, #rooms do
@@ -151,6 +173,9 @@ function ClassManager.LoadOnlineClassroom(callback)
 					return;
 				end
 			end
+		end
+		if (callback) then
+			callback();
 		end
 	end);
 end
@@ -323,6 +348,7 @@ function ClassManager.ProcessMessage(payload, meta)
 end
 
 function ClassManager.OnMsg(self, msg)
+			commonlib.echo(msg);
 	if (not msg or not msg.data) then return end
 
 	local data = msg.data;

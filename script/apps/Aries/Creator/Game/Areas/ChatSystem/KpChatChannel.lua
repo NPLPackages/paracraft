@@ -189,7 +189,7 @@ function KpChatChannel.OnMsg(self, msg)
         local userInfo = info.userInfo;
 
         if(key == "app/msg" or key == "paracraftGlobal" )then
-            if(payload and userInfo and meta and meta.target == KpChatChannel.GetRoom())then
+            if(payload and userInfo)then
 
 
                 local worldId = payload.worldId;
@@ -211,7 +211,7 @@ function KpChatChannel.OnMsg(self, msg)
                 if(not KpChatChannel.IsInWorld())then
                     return
                 end
-                if(KpChatChannel.worldId ~= worldId)then
+                if(KpChatChannel.worldId ~= worldId and key == "app/msg" )then
                     return
                 end
                 
