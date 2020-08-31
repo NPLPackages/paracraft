@@ -34,7 +34,7 @@ end
                 <pe:custom id="1" oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateBroadTreeView" style="margin-left:10px;height:72px;" />
             </div>
         </div>
-         <div style="margin-left:5px;margin-top:0px;">
+         <pe:container name="canvas_tab_btn"  style="margin-left:5px;margin-top:0px;background:">
             <pe:tabs name="tabChannel" onclick="OnSwitchChannelDisplay" 
                 SelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;208 89 21 21:8 8 8 8" UnSelectedMenuItemBG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8" 
                 style="height:20px;background:;padding-top:20px;padding-left:10px;" TextOffsetY="-1" TextColor="#ffffff" SelectedTextColor="#ffffff" 
@@ -43,7 +43,7 @@ end
                 <pe:tab-item name="21" text='<%=L"本地"%>' selected="true" width="36" height="18"/>
                 <pe:tab-item name="22" text='<%=L"全局"%>' width="36" height="18"/>
             </pe:tabs>
-        </div>
+        </pe:container>
     </pe:if>    
 
     <pe:if condition="<%= not System.options.IsMobilePlatform %>">

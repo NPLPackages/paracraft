@@ -10,6 +10,8 @@ ClassListPage.ShowPage()
 -------------------------------------------------------
 ]]
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
+local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local ClassListPage = NPL.export()
 
 local page;
@@ -18,7 +20,7 @@ function ClassListPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function ClassListPage.ShowPage(onClose)
+function ClassListPage.ShowPage()
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassListPage.html", 
 		name = "ClassListPage.ShowPage", 
@@ -83,13 +85,36 @@ function ClassListPage.OnOK()
 	classId = tonumber(classId);
 	worldId = tonumber(worldId);
 	if (classId and worldId) then
-		ClassManager.CreateClassroom(classId, worldId, function(result, data)
-			if (result) then
-				page:CloseWindow();
-			else
-				_guihelper.MessageBox(L"所选择的班级或世界ID无效");
-			end
-		end);
+		local function createClassroom(classId, worldId, page)
+			ClassManager.CreateAndEnterClassroom(classId, worldId, function(result, data)
+				if (result) then
+					page:CloseWindow();
+				else
+					_guihelper.MessageBox(L"所选择的世界ID无效");
+				end
+			end);
+		end
+
+		local projectId = GameLogic.options:GetProjectId();
+		if (projectId and tonumber(projectId) == worldId) then
+			Compare:Init(function(result)
+				if result then
+					local remote = tonumber(Mod.WorldShare.Store:Get("world/remoteRevision")) or 0;
+					if (remote > 0) then
+						createClassroom(classId, worldId, page)
+					else
+						page:CloseWindow();
+						_guihelper.MessageBox(L"当前创建的世界还未上传，请先上传世界再使用该世界ID创建课堂");
+						GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true);
+					end
+				else
+					--_guihelper.MessageBox(L"获取当前世界的版本信息失败！");
+					createClassroom(classId, worldId, page);
+				end
+			end)
+		else
+			createClassroom(classId, worldId, page)
+		end
 	else
 		_guihelper.MessageBox(L"请选择班级和世界ID");
 	end

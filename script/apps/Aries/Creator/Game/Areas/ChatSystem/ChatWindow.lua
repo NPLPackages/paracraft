@@ -11,6 +11,9 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage();
 MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
+
+
+MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
 -------------------------------------------------------
 ]]
 if(not System.options.mc) then
@@ -46,9 +49,46 @@ ChatWindow.DefaultUIPos = {
 	RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
 	LogWnd = {alignment = "_lb", left = 2, top = -280, width = 400, height = 250},
 	EditWnd = {alignment = "_lb", left = 2, top = -30, width = 700, height = 30},
+	EditWnd_ggs_valid = {alignment = "_lb", left = 2, top = -30, width = 400, height = 30},
 	ParentWnd = {alignment = "_lb", left = 2, top = -285, width = 700, height = 280},
+	ParentWnd_ggs_valid = {alignment = "_lb", left = 2, top = -380, width = 700, height = 280},
 }
+-- reset ParentWnd and EditWnd position and size
+function ChatWindow.ResetPosition(ggs_valid)
+    local parent_wnd_pos_config;
+    local edit_wnd_pos_config;
 
+    -- set ggs_mode first
+    ChatWindow.ggs_mode = ggs_valid;
+
+    if(ggs_valid)then
+        ChatWindow.ShowAllPage(true)
+    end
+
+    if(ggs_valid)then
+        parent_wnd_pos_config = ChatWindow.DefaultUIPos.ParentWnd_ggs_valid;
+        edit_wnd_pos_config = ChatWindow.DefaultUIPos.EditWnd_ggs_valid;
+    else
+        parent_wnd_pos_config = ChatWindow.DefaultUIPos.ParentWnd;
+        edit_wnd_pos_config = ChatWindow.DefaultUIPos.EditWnd;
+    end
+	local _parentwnd = ChatWindow.CreateGetParentWnd();
+    if(_parentwnd and _parentwnd:IsValid())then
+		_parentwnd:Reposition(parent_wnd_pos_config.alignment,parent_wnd_pos_config.left,parent_wnd_pos_config.top,parent_wnd_pos_config.width,parent_wnd_pos_config.height);
+    end
+    
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
+    local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
+
+	local edit_container = ParaUI.GetUIObject("ChatEditPage");
+     if(edit_container and edit_container:IsValid())then
+		edit_container:Reposition(edit_wnd_pos_config.alignment,edit_wnd_pos_config.left,edit_wnd_pos_config.top,edit_wnd_pos_config.width,edit_wnd_pos_config.height);
+        if(ChatEdit.page)then
+			ChatEdit.page:Refresh(0);
+        end
+    end
+end
 -- public: call this once at init time. 
 function ChatWindow.InitSystem()
 	if(ChatWindow.IsInited) then
@@ -69,6 +109,20 @@ function ChatWindow.InitSystem()
 	ChatChannel.AddFilter(ChatWindow.BadWordsFilter);
 	ChatChannel.AddFilter(ChatWindow.ChatCommandFilter);
 	-- ChatChannel.AddFilter(ChatWindow.BattleFieldFilter);
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+	GameLogic.GetFilters():add_filter("ggs", function(msg)
+	    LOG.std("", "info", "ChatWindow recieve ggs filter", msg);
+        
+        msg = msg or {};
+        if(msg.action == "LoadWorld")then
+            ChatWindow.ResetPosition(true);
+        elseif(msg.action == "ExitWorld")then
+            ChatWindow.ResetPosition(false);
+        end
+    end)
+
 end
 
 -- show the chat log page and the edit box page
@@ -307,6 +361,11 @@ function ChatWindow.FadeIn(animSeconds)
 			local _parent = ChatWindow.page:FindControl("canvas");
 			--local _parent = ParaUI.GetUIObject("ChatLogPage");
 			UIAnimManager.ChangeAlpha("Aries.ChatWindow", _parent, 255, 256/(animSeconds or 0.5))
+
+			local canvas_tab_btn = ChatWindow.page:FindControl("canvas_tab_btn");
+            if(canvas_tab_btn and canvas_tab_btn:IsValid())then
+			    UIAnimManager.ChangeAlpha("Aries.ChatWindow_canvas_tab_btn", canvas_tab_btn, 255, 256/(animSeconds or 0.5))
+            end
 		end
 	end
 end
@@ -318,6 +377,11 @@ function ChatWindow.FadeOut(animSeconds)
 			local _parent = ChatWindow.page:FindControl("canvas");
 			--local _parent = ParaUI.GetUIObject("ChatLogPage");
 			UIAnimManager.ChangeAlpha("Aries.ChatWindow", _parent, if_else(System.options.version == "teen", 0, 0), 256/(animSeconds or 4))
+
+            local canvas_tab_btn = ChatWindow.page:FindControl("canvas_tab_btn");
+            if(canvas_tab_btn and canvas_tab_btn:IsValid())then
+			    UIAnimManager.ChangeAlpha("Aries.ChatWindow_canvas_tab_btn", canvas_tab_btn, 0, 256/(animSeconds or 4))
+            end
 		end
 	end
 end

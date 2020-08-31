@@ -58,7 +58,7 @@ function DefaultTheme:Load()
 	-- how many minutes are there in a day.
 	-- ParaScene.SetDayLength(900);
 	
-	_guihelper.SetDefaultMsgBoxMCMLTemplate("script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.html");
+	_guihelper.SetDefaultMsgBoxMCMLTemplate("script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.kp.html");
 	
 	-- NOTE: choose a font carefully for Aquarius
 	
@@ -243,6 +243,24 @@ function DefaultTheme:Load()
 
 	local pe_css = commonlib.gettable("Map3DSystem.mcml_controls.pe_css");
 	pe_css.default = {
+		["kp_yellow_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
+		["kp_gray_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
+		["kp_window_container"] = {
+			["padding-left"] = 2,
+			["padding-top"] = 39,
+			["padding-right"] = 2,
+			["padding-bottom"] = 2,
+        },
+		["kp_item"] = {
+            ["background"] = "Texture/Aries/Creator/keepwork/Window/tooltip/tipkuang_32bits.png:14 14 14 14",
+            ["width"] = 64,
+			["height"] = 64,
+        },
+        ["kp_tooltip_bg"] = {
+            ["background"] = "Texture/Aries/Creator/keepwork/Window/tooltip/tipbj_32bits.png:14 14 14 14",
+        },
+
+
 		["default"] = {color="#ffffff"},
 		-- Mobile version UI Control style
 		["mobile_button"] = {background = "Texture/Aries/Creator/Mobile/blocks_UI_32bits.png;1 1 34 34:12 12 12 12", },

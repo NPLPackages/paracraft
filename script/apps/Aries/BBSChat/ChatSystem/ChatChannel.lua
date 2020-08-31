@@ -445,13 +445,14 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
         local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		local stone_name = "喇叭";
 		local purchase_exid = 0;
-        local gsItem = KeepWorkItemManager.GetItemTemplate(10001);
+        local stone_gsid = 10001;
+        local gsItem = KeepWorkItemManager.GetItemTemplate(stone_gsid);
 		if(gsItem) then
 			stone_name = gsItem.name;
 		end
         gsid_list = {
             { gsid = 10002, },
-            { gsid = 10001, },
+            { gsid = stone_gsid, },
         }
         local copies = KeepWorkItemManager.UnionCopies(gsid_list);
 
@@ -460,7 +461,8 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
 			return;
         else
             if(copies < 100) then
-				_guihelper.MessageBox(format("发送一条广播消息,需要消耗一个[%s],确定要发送? 你现在还有%d个[%s]", stone_name, copies or 0, stone_name),function(result)
+				_guihelper.MessageBox(format([[<div style="float:left">发送一条广播消息,需要消耗1个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:32px;height:32px;" />,确定要发送?</div><div style="margin-top:5px;"><div>你现在还有%d个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:32px;height:32px;" /></div></div>
+                ]], stone_gsid, copies or 0, stone_gsid),function(result)
 					if(result == _guihelper.DialogResult.OK)then
 						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
 					end

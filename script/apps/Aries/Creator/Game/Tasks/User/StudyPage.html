@@ -38,7 +38,8 @@ function onclickTieBa()
 end
 ]]></script>
 
-<aries:window mode="thin" width="610" height="400" title='<%= L"学习"%>' onclose="ClosePage">
+<kp:window width="610" height="400" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_xuexi_32bits.png"  onclose="ClosePage">
+    <div class="kp_window_container">
     <pe:gridview style="margin-left:30px;height:310;" name="item_gridview" CellPadding="16" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="10"
                     DataSource='<%=GridsItems%>' pagesize="6">
         <Columns>
@@ -56,12 +57,13 @@ end
         <!-- <div style="font-size:14;color:#ffffff">
             百度贴吧
         </div> -->
-        <input type="button" style="font-size:14px;color:#ffffff;font-weight:bold;height:19px;background-color:#ffffff;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)" value='百度贴吧' onclick="onclickTieBa" />
-        <div style="font-size:14;color:#ffffff;margin-top:5;margin-left:3;">
+        <input type="button" style="font-size:14px;color:#000000;font-weight:bold;height:19px;background-color:#000000;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)" value='百度贴吧' onclick="onclickTieBa" />
+        <div style="font-size:14;color:#000000;margin-top:5;margin-left:3;">
             QQ群:839673135
         </div>
     </div>
-</aries:window>
+    </div>
+</kp:window>
 </pe:mcml>
 </body>
 </html>

@@ -10,6 +10,7 @@ TeacherPanel.ShowPage()
 -------------------------------------------------------
 ]]
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+local TChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TChatRoomPage.lua");
 local TeacherPanel = NPL.export()
 
 TeacherPanel.IsLocked = false;
@@ -62,6 +63,12 @@ function TeacherPanel:MoveDown(event)
 	end
 end
 
+function TeacherPanel.Refresh()
+	if (page) then
+		page:Refresh(0);
+	end
+end
+
 function TeacherPanel.SelectClass()
 	ClassManager.LoadAllClasses(function()
 		ClassManager.LoadAllProjects(function()
@@ -78,13 +85,14 @@ end
 function TeacherPanel.LeaveClass()
 	_guihelper.MessageBox(L"确定要结束上课吗？", function(res)
 		if(res == _guihelper.DialogResult.OK) then
+			ClassManager.SendMessage("cmd:leave");
 			ClassManager.DismissClassroom(ClassManager.CurrentClassroomId, function(result, data)
 				if (result) then
-					ClassManager.SendMessage("cmd:leave");
 					ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);
 					if (page) then
 						page:Refresh(0);
 					end
+					TChatRoomPage.ShowPage(false);
 				else
 					_guihelper.MessageBox(L"请重试！");
 				end
@@ -99,6 +107,9 @@ end
 
 function TeacherPanel.GetClassStudents()
 	local count = ClassManager.GetOnlineCount();
+	if (count > 0) then
+		count = count - 1;
+	end
 	local student = string.format(L"在课学生：%d人", count);
 	return student;
 end
@@ -120,27 +131,24 @@ function TeacherPanel.UnLock()
 end
 
 function TeacherPanel.OpenChat()
-	ClassManager.LoadClassroomInfo(ClassManager.CurrentClassroomId, function(classId, projectId, roomId)
-		TeacherPanel.IsChatting = true;
-		if (page) then
-			page:Refresh(0);
-		end
-		local TChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TChatRoomPage.lua");
-		TChatRoomPage.ShowPage(function(result)
-			if (result) then
-				TeacherPanel.IsChatting = false;
-				if (page) then
-					page:Refresh(0);
-				end
-			end
-		end)
-	end);
+	TeacherPanel.IsChatting = true;
+	if (page) then
+		page:Refresh(0);
+	end
+	TChatRoomPage.ShowPage(true);
+end
+
+function TeacherPanel.CloseChat()
+	TeacherPanel.IsChatting = false;
+	if (page) then
+		page:Refresh(0);
+	end
 end
 
 function TeacherPanel.ConnectClass()
 	_guihelper.MessageBox(L"确定要开启联机模式吗？", function(res)
 		if(res == _guihelper.DialogResult.OK) then
-			GameLogic.RunCommand("/connectGGS");
+			GameLogic.RunCommand("/connectGGS -isSyncBlock");
 			ClassManager.SendMessage("cmd:connect");
 			GameLogic.AddBBS(nil, L"联机成功！", 3000, "0 255 0");
 		end

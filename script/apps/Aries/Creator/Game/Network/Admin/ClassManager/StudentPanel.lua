@@ -11,6 +11,7 @@ StudentPanel.ShowPage(true)
 ]]
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 local ShareUrlContext = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlContext.lua");
+local SChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/SChatRoomPage.lua");
 local StudentPanel = NPL.export()
 
 StudentPanel.IsChatting = false;
@@ -51,18 +52,22 @@ function StudentPanel.OnClose()
 	end
 end
 
-function StudentPanel.Reset()
-	StudentPanel.IsLocked = false;
-	StudentPanel.CurrentClassName = "";
-	StudentPanel.CurrentWorldId = "";
-end
-
 function StudentPanel:MoveDown(event)
 	if (event.bShow) then
 		StudentPanel.ShowPage(false, 32);
 	else
 		StudentPanel.ShowPage(false, 0);
 	end
+end
+
+function StudentPanel.Reset()
+end
+
+function StudentPanel.LeaveClass()
+	if (page) then
+		page:Refresh(0);
+	end
+	SChatRoomPage.ShowPage(false);
 end
 
 function StudentPanel.GetClassName()
@@ -74,8 +79,7 @@ function StudentPanel.GetClassTime()
 end
 
 function StudentPanel.GetTeacherName()
-	local teacher = ClassManager.GetClassTeacherInfo();
-	return ClassManager.GetMemberUIName(teacher);
+	return ClassManager.GetMemberUIName(ClassManager.GetCurrentTeacher(), true);
 end
 
 function StudentPanel.GetWorldID()
@@ -84,21 +88,18 @@ function StudentPanel.GetWorldID()
 end
 
 function StudentPanel.OpenChat()
-	ClassManager.LoadClassroomInfo(ClassManager.CurrentClassroomId, function(classId, projectId, roomId)
-		StudentPanel.IsChatting = true;
-		if (page) then
-			page:Refresh(0);
-		end
-		local SChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/SChatRoomPage.lua");
-		SChatRoomPage.ShowPage(function(result)
-			if (result) then
-				StudentPanel.IsChatting = false;
-				if (page) then
-					page:Refresh(0);
-				end
-			end
-		end)
-	end);
+	StudentPanel.IsChatting = true;
+	if (page) then
+		page:Refresh(0);
+	end
+	SChatRoomPage.ShowPage(true);
+end
+
+function StudentPanel.CloseChat()
+	StudentPanel.IsChatting = false;
+	if (page) then
+		page:Refresh(0);
+	end
 end
 
 function StudentPanel.ShareUrl()

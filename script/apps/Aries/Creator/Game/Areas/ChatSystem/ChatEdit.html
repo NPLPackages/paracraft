@@ -31,6 +31,11 @@ end
 function OnClose_BulletScreen()
     KpChatChannel.SetBulletScreen(false)
 end
+function IsGGSMode()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+    local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
+    return ChatWindow.ggs_mode;
+end
 ]]></script>
 <pe:if condition="<%= not System.options.IsMobilePlatform %>">
     <div width="100%" style="height:29px;background-color:#000000a0;">
@@ -49,13 +54,26 @@ end
                 
             </div>
         </pe:if>    
-        <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:80px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
-            <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
-        </div>   
-        <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:30px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-            name="send"  tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-        <input value='X' type="button" align="right" style="position:relative;margin-right:5px;width:20px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-            name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+           
+        <!--hiding send/close btn-->
+        <pe:if condition="<%=not IsGGSMode()%>">
+            <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:80px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
+                <input type="text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
+            </div>
+            <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:30px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
+                name="send"  tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+            <input value='X' type="button" align="right" style="position:relative;margin-right:5px;width:20px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
+                name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+        </pe:if>
+        <pe:if condition="<%=IsGGSMode()%>">
+            <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:60px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
+                <input type="text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/>
+            </div>
+            <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:5px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
+                name="send"  tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+        </pe:if>
+        
+        
     </div>
 </pe:if>
 <pe:if condition="<%= System.options.IsMobilePlatform %>">

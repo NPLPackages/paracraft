@@ -33,9 +33,9 @@ F3信息状态栏
 代码方块
 获得帮助
 日志文件
-过山车（上）
-过山车（中）
-过山车（下）
+过山车的开头
+过山车的中间
+过山车的结束
 空气墙
 /blockimage
 禁止跳跃
@@ -44,13 +44,13 @@ F3信息状态栏
 彩色告示牌
 HTML与用户UI
 录制视频F9
-/tip命令
+/tip 命令
 机关与/sendevent
 代码方块控制电影播放
-删除电影方块中的摄像机
+删除电影方块中的摄影机
 写出工整的代码
 代码和命令中的注释
-/avatar命令
+/avatar 命令
 让电影控制主角
 /shader命令
 查看图块的源代码
@@ -61,10 +61,10 @@ HTML与用户UI
 复制电影角色
 选择性复制角色关键帧
 到镜头的距离
-响应HTML中的按钮事件（上）
-响应HTML中的按钮事件（下）
-HTML中的数据绑定（上）
-HTML中的数据绑定（下）
+响应HTML中的按钮事件(上）
+响应HTML中的按钮事件(下）
+HTML中的数据绑定 （上）
+HTML中的数据绑定 （下）
 中继器的几个用处
 隐藏的含羞草
 出生点的作用
@@ -74,7 +74,7 @@ HTML中的数据绑定（下）
 CAD与3D打印
 如何摆放箭头和有方向的物品
 代码方块中的角色（上）
-代码方块中的角色（中)
+代码方块中的角色（中）
 代码方块中的角色（下）
 更加精细的bmax模型
 物理模型与/lod命令
@@ -82,6 +82,61 @@ CAD与3D打印
 用骨骼方块制作电风扇（下）
 控制CAD模型的面数
 CAD中建立骨骼绑定
+点光源
+电影方块中加入光源
+代码方块中加入光源
+绑定光源到骨骼
+主角手中的光源
+聚光灯
+地形笔刷的技巧
+地形画笔的技巧
+CodeBlockTest (上）
+CodeBlockTest (下）
+骨骼动画的RST快捷键
+骨骼与反向动力学（上）
+骨骼与反向动力学（下）
+电影方块中的图层角色
+代码方块控制图层角色
+3D立体输出
+CodeBlockLesson（上）
+CodeBlockLesson（下）
+生成独立应用程序
+Paracraft作者写的教材
+相似原理介绍
+MindManager
+学习的本质
+我的童年
+教育的本质
+如何保持有事可做？
+从自然界到虚拟世界
+从虚拟世界到物理世界
+自学编程
+3学以致用
+作品就是你自己
+作品是最好的老师
+寻找一位导师
+作品历史记录与备份
+未来教育的评估方式
+随心所欲的创作
+Scratch与Paracraft的区别
+Minecraft与Paracraft的区别
+孩子应该学习什么编程语言？
+NPL语言简介
+编程基本概念与语法
+程序的本质
+数字与数学
+变量与名字
+字符串与文字
+表与数组
+函数
+内置函数
+对自学编程的建议
+打字练习
+打字快捷键
+format函数
+漂亮的代码
+减少if语句
+重新学习代码方块
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -187,7 +242,7 @@ end
 function ParacraftLearningRoomDailyPage.IsVip()
 	local gsid = 10;
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
-	return (copies and copies > 0);
+	return (copies and copies > 0) or (System and System.User and System.User.isVip);
 end
 function ParacraftLearningRoomDailyPage.GetNextDay()
 	local copies = ParacraftLearningRoomDailyPage.copies or 0;
@@ -290,7 +345,6 @@ function ParacraftLearningRoomDailyPage:Refresh()
     page:Refresh(0);
 end
 function ParacraftLearningRoomDailyPage.OnVIP()
-	--ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 	GameLogic.GetFilters():apply_filters("VipNotice", true, function()
         ParacraftLearningRoomDailyPage:Refresh();
     end);

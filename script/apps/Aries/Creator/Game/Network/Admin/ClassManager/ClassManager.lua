@@ -29,7 +29,6 @@ ClassManager.IsLocking = false;
 ClassManager.InGGS = false;
 ClassManager.CanSpeak = true;
 
-ClassManager.CurrentOrgLoginUrl = nil;
 ClassManager.CurrentClassId = nil;
 ClassManager.CurrentWorldId = nil; 
 ClassManager.CurrentClassroomId = nil;
@@ -39,8 +38,9 @@ ClassManager.CurrentWorldName = nil;
 ClassManager.OrgClassIdMap = {};
 ClassManager.ClassList = {};
 ClassManager.ProjectList = {};
-ClassManager.ClassMemberList = {};
 ClassManager.ShareLinkList = {};
+-- {} userId, username, nickname, teacher, online, inclass
+ClassManager.ClassMemberList = {};
 
 ClassManager.ChatDataList = {};
 ClassManager.ChatDataMax = 200;
@@ -48,6 +48,7 @@ ClassManager.ChatDataMax = 200;
 local init = false;
 function ClassManager.StaticInit()
 	if (init) then return end
+	init = true;
 
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogin", ClassManager.OnKeepWorkLogin_Callback);
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", ClassManager.OnKeepWorkLogout_Callback)
@@ -57,21 +58,18 @@ function ClassManager.OnKeepWorkLogin_Callback()
 	if (KpChatChannel.client) then
 		KpChatChannel.client:AddEventListener("OnMsg",ClassManager.OnMsg,ClassManager);
 		commonlib.TimerManager.SetTimeout(function()
-			--ClassManager.LoadAllClassesAndProjects();
 			-- first load teacher classroom
 			local roleId = 2;
-			ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId)
+			ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId, userId)
 				if (classId and projectId and classroomId) then
-					if (ClassManager.IsTeacherInClass()) then
-						_guihelper.MessageBox("你所在的班级正在上课，即将自动进入课堂！");
-						commonlib.TimerManager.SetTimeout(function()
-							ClassManager.InClass = true;
-							TeacherPanel.StartClass();
-						end, 2000);
-					end
+					_guihelper.MessageBox("你所在的班级正在上课，即将自动进入课堂！");
+					commonlib.TimerManager.SetTimeout(function()
+						ClassManager.InClass = true;
+						TeacherPanel.StartClass();
+					end, 2000);
 				else
 					-- no teacher classroom, then load student classroom
-					local roleId = 1;
+					roleId = 1;
 					ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId)
 						if (classId and projectId and classroomId) then
 							_guihelper.MessageBox("你所在的班级正在上课，是否直接进入课堂？", function(res)
@@ -133,9 +131,9 @@ function ClassManager.LoadAllProjects(callback)
 	if (#ClassManager.ProjectList > 0) then
 		ClassManager.ProjectList = {};
 	end
-	local projectId = GameLogic.options:GetProjectId();
-	if (projectId and tonumber(projectId)) then
-		table.insert(ClassManager.ProjectList, {projectId = tonumber(projectId), projectName = WorldCommon.GetWorldTag("name")});
+	local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld');
+	if (currentWorld and currentWorld.kpProjectId) then
+		table.insert(ClassManager.ProjectList, {projectId = tonumber(currentWorld.kpProjectId), projectName = WorldCommon.GetWorldTag("name")});
 	end
 	keepwork.classroom.get({cache_policy = "access plus 0", roleId = 2}, function(err, msg, data)
 		local rooms = data and data.data and data.data.rows;
@@ -163,12 +161,45 @@ end
 
 function ClassManager.LoadOnlineClassroom(roleId, callback)
 	keepwork.classroom.get({cache_policy = "access plus 0", status = 1, roleId = roleId}, function(err, msg, data)
-		commonlib.echo(data);
 		local rooms = data and data.data and data.data.rows;
 		if (rooms) then
 			for i = 1, #rooms do
 				if (rooms[i].status == 1) then
 					ClassManager.CurrentClassName = rooms[i].class.name;
+					ClassManager.ClassMemberList = {};
+					if (rooms[i].teacherInfo) then
+						ClassManager.ClassMemberList[1] =
+							{userId = rooms[i].teacherInfo.id, name = ClassManager.GetMemberUIName2(rooms[i].teacherInfo.username, rooms[i].teacherInfo.nickname),
+								teacher = true, online = true, inclass = true};
+					end
+					ClassManager.LoadClassroomInfo(rooms[i].id, callback);
+					return;
+				end
+			end
+		end
+		if (callback) then
+			callback();
+		end
+	end);
+end
+
+function ClassManager.LoadClassroom(roomId, roleId, callback)
+	keepwork.classroom.get({cache_policy = "access plus 0", status = 1, roleId = roleId}, function(err, msg, data)
+		local rooms = data and data.data and data.data.rows;
+		if (rooms) then
+			for i = 1, #rooms do
+				if (rooms[i].status == 1 and rooms[i].id == roomId) then
+					ClassManager.CurrentClassName = rooms[i].class.name;
+					ClassManager.ClassMemberList = {};
+					if (rooms[i].teacherInfo) then
+						local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+						if (rooms[i].teacherInfo.id == userId) then
+							return;
+						end
+						ClassManager.ClassMemberList[1] =
+							{userId = rooms[i].teacherInfo.id, name = ClassManager.GetMemberUIName2(rooms[i].teacherInfo.username, rooms[i].teacherInfo.nickname),
+								teacher = true, online = true, inclass = true};
+					end
 					ClassManager.LoadClassroomInfo(rooms[i].id, callback);
 					return;
 				end
@@ -189,19 +220,55 @@ function ClassManager.LoadClassroomInfo(classroomId, callback)
 		ClassManager.CurrentClassId = room.classId;
 		ClassManager.CurrentClassroomId = room.id;
 		ClassManager.CurrentWorldName = room.project.name;
-		ClassManager.ClassMemberList = room.classroomUser or {};
+
+		if (#ClassManager.ClassMemberList < 1) then
+			ClassManager.ClassMemberList = {
+				{userId = room.userId, name = ClassManager.GetMemberUIName2(System.User.username, System.User.NickName), teacher = true, online = true, inclass = true}, 
+			};
+		end
+
+		for i = 1, #(room.classroomUser) do
+			local user = room.classroomUser[i];
+			if (user.userId ~= room.userId and user.user.tLevel == 1) then
+				table.insert(ClassManager.ClassMemberList,
+				{
+					userId = user.userId,
+					name = ClassManager.GetMemberUIName2(user.user.username, user.user.nickname),
+					teacher = true,
+					online = user.online,
+					inclass = false,
+				})
+			end
+		end
+		for i = 1, #(room.classroomUser) do
+			local user = room.classroomUser[i];
+			if (user.userId ~= room.userId and user.user.tLevel == 0) then
+				table.insert(ClassManager.ClassMemberList,
+				{
+					userId = user.userId,
+					name = ClassManager.GetMemberUIName2(user.user.username, user.user.nickname),
+					teacher = false,
+					online = user.online,
+					inclass = false,
+				})
+			end
+		end
 		if (callback) then
-			callback(room.classId, room.projectId, classroomId);
+			callback(room.classId, room.projectId, classroomId, room.userId);
 		end
 	end);
 end
 
-function ClassManager.CreateClassroom(classId, projectId, callback)
+function ClassManager.CreateAndEnterClassroom(classId, projectId, callback)
 	keepwork.classroom.post({classId = classId, projectId = projectId}, function(err, msg, data)
 		if (err == 200) then
-			ClassManager.CurrentClassId = classId;
-			ClassManager.CurrentWorldId = projectId;
 			ClassManager.InClass = true;
+			local roleId = 2;
+			ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId, userId)
+				if (classId and projectId and classroomId) then
+					TeacherPanel.StartClass();
+				end
+			end);
 		end
 		if (callback) then
 			callback(err == 200, data);
@@ -244,42 +311,48 @@ function ClassManager.ClassNameFromId(classId)
 	end
 end
 
-function ClassManager.IsTeacherInClass()
-	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
-	for i = 1, #ClassManager.ClassMemberList do
-		if (userId == ClassManager.ClassMemberList[i].userId) then
-			local userInfo = ClassManager.ClassMemberList[i].user;
-			return userInfo.tLevel == 1 and userInfo.student == 0;
-		end
-	end
-	return false;
-end
-
-function ClassManager.GetClassTeacherInfo()
-	for i = 1, #ClassManager.ClassMemberList do
-		local userInfo = ClassManager.ClassMemberList[i].user;
-		if (userInfo and userInfo.tLevel == 1 and userInfo.student == 0) then
-			return userInfo;
-		end
-	end
-end
-
 function ClassManager.GetMemberUIName(userInfo, teacher)
-	local name = userInfo.nickname;
+	if (not userInfo) then return end
+	local name = userInfo.name;
+	if (name == nil or name == "") then
+		name = userInfo.nickname;
+	end
 	if (name == nil or name == "") then
 		name = userInfo.username;
 	end
-	if (teacher and userInfo.tLevel == 1 and userInfo.student == 0) then
+	if (teacher) then
 		name = name..L"老师";
 	end
 	return name;
 end
 
+function ClassManager.GetMemberUIName2(username, nickname, teacher)
+	local name = nickname;
+	if (name == nil or name == "") then
+		name = username;
+	end
+	if (teacher) then
+		name = name..L"老师";
+	end
+	return name;
+end
+
+function ClassManager.GetCurrentTeacher()
+	if (#ClassManager.ClassMemberList > 0) then
+		return ClassManager.ClassMemberList[1];
+	end
+end
+
+function ClassManager.IsTeacherInClass()
+	local teacher = ClassManager.GetCurrentTeacher();
+	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+	return teacher and teacher.userId == userId;
+end
+
 function ClassManager.GetOnlineCount()
 	local count = 0;
 	for i = 1, #ClassManager.ClassMemberList do
-		local userInfo = ClassManager.ClassMemberList[i].user;
-		if (ClassManager.ClassMemberList[i].online and (userInfo.tLevel == 0 or userInfo.student == 1)) then
+		if (ClassManager.ClassMemberList[i].online) then
 			count = count + 1;
 		end
 	end
@@ -302,7 +375,16 @@ function ClassManager.RunCommand(command)
 	elseif (command == "unlock") then
 		LockDesktop.ShowPage(false, 0, cmd_text);
 	elseif (command == "connect") then
-		GameLogic.RunCommand("/connectGGS");
+		GameLogic.RunCommand("/connectGGS -isSyncBlock");
+	elseif (command == "leave") then
+		ClassManager.Reset();
+		StudentPanel.LeaveClass();
+	elseif (command == "nospeak") then
+		ClassManager.CanSpeak = false;
+		SChatRoomPage.Refresh();
+	elseif (command == "canspeak") then
+		ClassManager.CanSpeak = true;
+		SChatRoomPage.Refresh();
 	end
 end
 
@@ -311,8 +393,48 @@ function ClassManager.AddLink(link, name, timestamp)
 	ShareUrlContext.Refresh();
 end
 
+function ClassManager.RefreshChatRoomList(userId, inclass, online)
+	for i = 1, #ClassManager.ClassMemberList do
+		if (ClassManager.ClassMemberList[i].userId == userId) then
+			ClassManager.ClassMemberList[i].inclass = inclass;
+			ClassManager.ClassMemberList[i].online = online;
+			break;
+		end
+	end
+	if (ClassManager.IsTeacherInClass()) then
+		TChatRoomPage.Refresh();
+		TeacherPanel.Refresh();
+	else
+		SChatRoomPage.Refresh();
+	end
+end
+
+function ClassManager.StudentJointClassroom(roomId)
+	if (ClassManager.InClass) then
+		return;
+	end
+	local roleId = 1;
+	ClassManager.LoadClassroom(roomId, roleId, function(classId, projectId, classroomId)
+		local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+		local currentTeacher = ClassManager.GetCurrentTeacher();
+		if (currentTeacher and currentTeacher.userId == userId) then
+			return;
+		end
+		if (classId and projectId and classroomId) then
+			local text = string.format(L"%s邀请你上课，是否加入课堂？", ClassManager.GetMemberUIName(currentTeacher, true));
+			_guihelper.MessageBox(text, function(res)
+				if(res and res == _guihelper.DialogResult.Yes)then
+					ClassManager.InClass = true;
+					StudentPanel.StartClass();
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		end
+	end);
+end
+
 function ClassManager.ProcessMessage(payload, meta)
-	local name = ClassManager.GetMemberUIName(payload, true)
+	local currentTeacher = ClassManager.GetCurrentTeacher();
+	local name = ClassManager.GetMemberUIName(payload, currentTeacher ~= nil and currentTeacher.userId == payload.id)
 	local result = commonlib.split(payload.content, ":");
 	local type, content = result[1], result[2];
 	if (#result > 2) then
@@ -327,8 +449,21 @@ function ClassManager.ProcessMessage(payload, meta)
 			ClassManager.RunCommand(content);
 		end
 	elseif (type == "tip") then
-		TChatRoomPage.Refresh();
-		SChatRoomPage.Refresh();
+		local tipType = result[2];
+		if (tipType == "invite") then
+			if (result[3] == "all") then
+				local roomId = result[4];
+				ClassManager.StudentJointClassroom(roomId);
+			else
+				local roomId = result[4];
+				local id = tonumber(result[3]);
+				if (id == userId) then
+					ClassManager.StudentJointClassroom(roomId);
+				end
+			end
+		else
+			ClassManager.RefreshChatRoomList(payload.id, content=="join", true);
+		end
 	elseif (type == "link") then
 		if (userId ~= payload.id) then
 			ClassManager.AddLink(content, name, meta.timestamp);
@@ -348,7 +483,6 @@ function ClassManager.ProcessMessage(payload, meta)
 end
 
 function ClassManager.OnMsg(self, msg)
-			commonlib.echo(msg);
 	if (not msg or not msg.data) then return end
 
 	local data = msg.data;
@@ -364,25 +498,11 @@ function ClassManager.OnMsg(self, msg)
 		local action = payload and payload.action;
 
 		if (action == "classroom_start") then
-			ClassManager.LoadClassroomInfo(payload.classroomId, function(classId, projectId, classroomId)
-				ClassManager.CurrentClassroomId = classroomId;
-				local teacher = ClassManager.GetClassTeacherInfo();
-				if (not teacher) then return end
-
-				local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
-				if (userId == teacher.id) then
-					TeacherPanel.StartClass();
-				else
-					local text = string.format(L"%s邀请你上课，是否加入课堂？", ClassManager.GetMemberUIName(teacher, true));
-					_guihelper.MessageBox(text, function(res)
-						if(res and res == _guihelper.DialogResult.Yes)then
-							ClassManager.InClass = true;
-							StudentPanel.StartClass();
-						end
-					end, _guihelper.MessageBoxButtons.YesNo);
-				end
-			end);
-			return;
+			ClassManager.StudentJointClassroom(payload.classroomId);
+		elseif (action == "online") then
+			ClassManager.RefreshChatRoomList(payload.userId, false, true);
+		elseif (action == "offline") then
+			ClassManager.RefreshChatRoomList(payload.userId, false, false);
 		end
 		if (key == "app/msg" and payload and userInfo) then
 			local room = string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId));
@@ -444,8 +564,11 @@ function ClassManager.OnProcessMsg(msgdata)
 		table.remove(ClassManager.ChatDataList, 1); 
 	end
 
-	SChatRoomPage.AppendChatMessage(msgdata, true);
-	TChatRoomPage.AppendChatMessage(msgdata, true);
+	if (ClassManager.IsTeacherInClass()) then
+		TChatRoomPage.AppendChatMessage(msgdata, true);
+	else
+		SChatRoomPage.AppendChatMessage(msgdata, true);
+	end
 end
 
 function ClassManager.FilterURL(words)
@@ -532,6 +655,12 @@ function ClassManager.MessageToMcml(chatdata)
 			text = fromName..L"关闭了屏幕锁屏";
 		elseif (words == "connect") then
 			text = fromName..L"开启了联机模式";
+		elseif (words == "nospeak") then
+			text = fromName..L"开启了全员禁言";
+		elseif (words == "canspeak") then
+			text = fromName..L"取消了全员禁言";
+		else
+			return;
 		end
 		local width = _guihelper.GetTextWidth(text, "System;12") + 10;
 		mcmlStr = string.format(
@@ -546,7 +675,6 @@ function ClassManager.MessageToMcml(chatdata)
 			]],
 		width, text);
 	elseif (type == "link") then
-		commonlib.echo(words);
 		local text = string.format(L"%s分享链接：%s", fromName, words);
 		local width = _guihelper.GetTextWidth(text, "System;12");
 		local height = 22;

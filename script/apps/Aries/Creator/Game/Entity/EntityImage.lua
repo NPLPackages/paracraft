@@ -121,7 +121,20 @@ function Entity:ScheduleRefresh(x,y,z)
 end
 
 function Entity:GetImageFilePath()
-	return sys_images[self.cmd or ""] or self.cmd;
+	local cmd = self.cmd or "";
+	cmd = cmd:gsub("^$%(.*%)", "")
+	return sys_images[cmd] or cmd;
+end
+
+-- self.cmd like $(/loadworld 503)preview.jpg
+-- return nil, if inline command does not exist
+function Entity:GetInlineCommand()
+	if(self.cmd) then
+		local cmd = self.cmd:match("^$%((.*)%)")
+		if(cmd and cmd~="") then
+			return cmd
+		end
+	end
 end
 
 -- return full file name and whether file exist. 
@@ -694,7 +707,27 @@ end
 
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
-	return L"输入图片的名字或路径<div>格式: 相对路径[;l t w h][:l t r b]</div><div>例如: preview.jpg;0 0 100 64</div>"
+	return L"输入图片的名字或路径<div>格式: 相对路径[;l t w h][:l t r b]</div><div>例如: preview.jpg;0 0 100 64</div>".."<div>$(tip hello)preview.jpg</div>"
+end
+
+function Entity:RunCommand()
+	if(self.root_entity_coord) then
+		local x = self.root_entity_coord.x;
+		local y = self.root_entity_coord.y;
+		local z = self.root_entity_coord.z;
+		if(x~=self.bx or y~=self.by or z~=self.bz) then
+			local entity = EntityManager.GetBlockEntity(x, y, z);
+			if(entity and entity.RunCommand) then
+				entity:RunCommand();
+			end
+			return
+		end
+	end
+	local cmd = self:GetInlineCommand()
+	if(cmd) then
+		-- TODO: isRemote() to run on server?
+		GameLogic.RunCommand(cmd);
+	end
 end
 
 -- right click to show item
@@ -712,6 +745,8 @@ function Entity:OnClick(x, y, z, mouse_button)
 			end
 			self:EndEdit();
 		end, old_value, L"贴图文件", "texture");
+	else
+		self:RunCommand()
 	end
 	return true;
 end

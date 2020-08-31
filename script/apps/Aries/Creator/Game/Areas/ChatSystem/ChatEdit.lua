@@ -111,9 +111,12 @@ function ChatEdit.GetInputControl()
 			if(System.options.IsMobilePlatform) then
 				return ChatEdit.page:FindUIControl("chatedit_words_mobile");
 			else
-				return ChatEdit.page:FindUIControl("chatedit_words");
+                if(ChatWindow.ggs_mode)then
+				    return ChatEdit.page:FindUIControl("chatedit_words_ggsmode");
+                else
+				    return ChatEdit.page:FindUIControl("chatedit_words");
+                end
 			end
-			--return ChatEdit.page:FindUIControl("chatedit_words");
 		end
 	end
 end

@@ -49,18 +49,18 @@ function ParaWorldMain:OnWorldUnload()
 end
 
 function ParaWorldMain:ShowAllAreas()
-	if(System.options.isAB_SDK)then
+	--if(System.options.isAB_SDK)then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 		ParaWorldMinimapWnd:Show();
-	end
+	--end
 end
 
 function ParaWorldMain:CloseAllAreas()
-	if(System.options.isAB_SDK)then
+	--if(System.options.isAB_SDK)then
 		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 		ParaWorldMinimapWnd:Close();
-	end
+	--end
 end
 
 

@@ -10,5 +10,12 @@ local KpChatHelper = commonlib.gettable("MyCompany.Aries.Creator.ChatSystem.KpCh
 -------------------------------------------------------
 ]]
 local KpChatHelper = commonlib.gettable("MyCompany.Aries.Creator.ChatSystem.KpChatHelper");
-function KpChatHelper.ShowUserInfo(userId)
+function KpChatHelper.ShowUserInfo(username)
+    if(not username)then
+        return
+    end
+    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+    if(page and page.ShowUserInfoPage)then
+        page.ShowUserInfoPage({ username = username }); 
+    end
 end

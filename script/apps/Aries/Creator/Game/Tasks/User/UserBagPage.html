@@ -25,13 +25,13 @@ function OnClickGuid(guid)
     --_guihelper.MessageBox("guid:".. guid);
 end
 ]]></script>
-    <aries:window mode="thin" width="600" height="500" title='<%= L"背包"%>' onclose="ClosePage">
-    <div>
+    <kp:window width="600" height="500" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_beibao_32bits.png" onclose="ClosePage">
+    <div class="kp_window_container">
         <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="7" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight = "32" 
             DataSource='<%=DS_Items%>'>
 	        <Columns>
-                <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
-                    <kp:slot guid='<%=Eval("goodsId")%>' style="width:64px;height:64px;" onclick="OnClickGuid"/>    
+                <div class="kp_item" >
+                    <kp:slot guid='<%=Eval("goodsId")%>'class="kp_item"  onclick="OnClickGuid"/>    
                 </div>
             </Columns>
 	        <EmptyDataTemplate>
@@ -39,7 +39,7 @@ end
         </pe:gridview>
     </div>
     
-</aries:window>
+</kp:window>
 </pe:mcml>
 </body>
 </html>

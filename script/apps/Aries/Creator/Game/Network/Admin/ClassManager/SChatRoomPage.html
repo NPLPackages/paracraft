@@ -31,8 +31,13 @@
                             <div onclick="SChatRoomPage.ShowAll" style="margin-left:10px;margin-top:5px;width:20px;height:19px;background:url(Texture/Aries/Creator/keepwork/ClassManager/no_talking_s_icon_32bits.png#0 0 19 19);"></div>
                         </div>
                         <div style="width:480px;height:97px;background-color:#e2e7e8">
-                            <textarea name="MessageText" autofocus="true" AlwaysShowCurLineBackground="false" UseSystemControl="true" style="margin-left:6px;height:60px;color:#e2e7e8;"></textarea>
-                            <input type="button" onclick="SChatRoomPage.SendMessage" style="float:right;width:54px;height:28px;margin-top:0px;margin-right:12px;color:#ffffff;" align="right" value='<%=L"发送"%>' class="mc_blue_button_with_fillet" />
+                            <textarea name="MessageText" ReadOnly='<%=not SChatRoomPage.CanSpeak()%>' UseSystemControl="true" style="margin-left:6px;height:60px;color:#e2e7e8;"></textarea>
+                            <pe:if condition='<%=SChatRoomPage.CanSpeak()%>'>
+                                <input type="button" enabled="true" onclick="SChatRoomPage.SendMessage" style="float:right;width:54px;height:28px;margin-top:0px;margin-right:12px;color:#ffffff;" align="right" value='<%=L"发送"%>' class="mc_blue_button_with_fillet" />
+                            </pe:if>
+                            <pe:if condition='<%=not SChatRoomPage.CanSpeak()%>'>
+                                <input type="button" enabled="false" onclick="SChatRoomPage.SendMessage" style="float:right;width:54px;height:28px;margin-top:0px;margin-right:12px;color:#ffffff;" align="right" value='<%=L"发送"%>' class="mc_blue_button_with_fillet" />
+                            </pe:if>
                         </div>
                     </div>
                     <div style="float:left;width:2px;height:490px;background-color:#cdcdcd"></div>
@@ -51,6 +56,10 @@
                                                 <div style="margin-left:-6px;margin-top:8px;text-align:center;color:#ffffff;">
                                                     <%=SChatRoomPage.GetShortName(Eval("name"))%>
                                                 </div>
+                                                <pe:if condition='<%=not Eval("inclass")%>'>
+                                                    <div style="margin-left:28px;margin-top:-3px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/ClassManager/not_in_classroom_32bits.png#0 0 16 16);">
+                                                    </div>
+                                                </pe:if>
                                             </div>
                                         </pe:if>
                                         <pe:if condition='<%=not Eval("online")%>'>
@@ -60,13 +69,16 @@
                                                 </div>
                                             </div>
                                         </pe:if>
-                                        <div style="float:left;margin-left:10px;margin-top:8px;"><%=Eval("name")%></div>
                                         <pe:if condition='<%=Eval("teacher")%>'>
+                                            <div style="float:left;margin-left:10px;margin-top:8px;width:70px;"><%=Eval("name")..L"老师"%></div>
                                             <div style="float:left;margin-left:12px;margin-top:10px;width:40px;height:20px;background:url(Texture/Aries/Creator/keepwork/ClassManager/teacher_bg_32bits.png#0 0 8 8:3 3 3 3);">
                                                 <div style="margin-left:8px;font-size:12px;">
                                                     <%=L"老师"%>
                                                 </div>
                                             </div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not Eval("teacher")%>'>
+                                            <div style="float:left;margin-left:10px;margin-top:8px;"><%=Eval("name")%></div>
                                         </pe:if>
                                     </div>
                                 </Columns>

@@ -9,9 +9,8 @@ local TChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin
 TChatRoomPage.ShowPage()
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/SmileyPage.lua");
-local SmileyPage = commonlib.gettable("MyCompany.Aries.ChatSystem.SmileyPage");
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+local TeacherPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TeacherPanel.lua");
 local TChatRoomPage = NPL.export()
 
 local page;
@@ -20,17 +19,25 @@ function TChatRoomPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function TChatRoomPage.ShowPage(onClose)
-	TChatRoomPage.result = false;
+function TChatRoomPage.ShowPage(bShow)
+	if (page) then
+		if (bShow and page:IsVisible()) then
+			return;
+		end
+		if ((not bShow) and (not page:IsVisible())) then
+			return;
+		end
+	end
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/TChatRoomPage.html", 
 		name = "TChatRoomPage.ShowPage", 
 		isShowTitleBar = false,
-		DestroyOnClose = true,
+		DestroyOnClose = false,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		allowDrag = true,
+		bShow = bShow,
 		enable_esc_key = true,
-		click_through = true, 
+		click_through = false, 
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 		align = "_ct",
@@ -40,26 +47,17 @@ function TChatRoomPage.ShowPage(onClose)
 		height = 533,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	params._page.OnClose = function()
-		if(onClose) then
-			onClose(TChatRoomPage.result);
-		end
-	end
 end
 
 function TChatRoomPage.Refresh()
 	if (page) then
-		ClassManager.LoadClassroomInfo(ClassManager.CurrentClassroomId, function(classId, projectId, roomId)
-			page:CloseWindow();
-			TChatRoomPage.ShowPage();
-		end);
+		page:Refresh(0);
 	end
 end
 
 function TChatRoomPage.OnClose()
-	TChatRoomPage.result = true;
-	page:CloseWindow();
+	TChatRoomPage.ShowPage(false);
+	TeacherPanel.CloseChat();
 end
 
 function TChatRoomPage.GetClassName()
@@ -68,47 +66,26 @@ end
 
 function TChatRoomPage.GetClassPeoples()
 	local onlineCount = ClassManager.GetOnlineCount();
-	local text = string.format(L"班级成员 %d/%d", onlineCount+1, #ClassManager.ClassMemberList);
+	local text = string.format(L"班级成员 %d/%d", onlineCount, (#ClassManager.ClassMemberList));
 	return text;
 end
 
 function TChatRoomPage.InviteAll()
+	ClassManager.SendMessage("tip:invite:all:"..ClassManager.CurrentClassroomId);
 end
 
 function TChatRoomPage.InviteOne(userId)
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		if (userId == member.userId) then
-			_guihelper.MessageBox(member.user.username);
+	for i = 2, #ClassManager.ClassMemberList do
+		local userInfo = ClassManager.ClassMemberList[i];
+		if (userId == userInfo.userId) then
+			ClassManager.SendMessage("tip:invite:"..userId..":"..ClassManager.CurrentClassroomId);
 			return;
 		end
 	end
 end
 
 function TChatRoomPage.ClassItems()
-	local items = {};
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 1 and userInfo.student == 0) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = true, online = member.online, userId = member.userId});
-		end
-	end
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 1 and userInfo.student == 1) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = true, online = member.online, userId = member.userId});
-		end
-	end
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 0) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = false, online = member.online, userId = member.userId});
-		end
-	end
-	return items;
+	return ClassManager.ClassMemberList;
 end
 
 function TChatRoomPage.GetShortName(name)
@@ -126,11 +103,15 @@ function TChatRoomPage.IsForbiddened()
 end
 
 function TChatRoomPage.ForbiddenChat()
-	ClassManager.SendMessage("cmd:".."nospeak");
+	ClassManager.SendMessage("cmd:nospeak");
+	ClassManager.CanSpeak = false;
+	page:Refresh(0);
 end
 
 function TChatRoomPage.AllowChat()
-	ClassManager.SendMessage("cmd:".."canspeak");
+	ClassManager.SendMessage("cmd:canspeak");
+	ClassManager.CanSpeak = true;
+	page:Refresh(0);
 end
 
 function TChatRoomPage.SendMessage()

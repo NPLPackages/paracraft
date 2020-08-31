@@ -29,9 +29,14 @@ end
 function ClickItem(index)
     FriendsPage.ClickItem(index)
 end
+
+function GetTimeDesc(time)
+    print("xxxxxxxxxaaaaaa", time)
+    return FriendsPage.GetTimeDesc(time)
+end
 ]]></script>
-<aries:window mode="thin" width="300" height="500" title='<%= L"好友啊"%>' onclose="ClosePage">
-<div style="color:#ffffff">
+<kp:window name="iframe" mode="lite" width="260" height="500" title='<%= L"好友"%>' onclose="ClosePage">
+    <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
 
     <div style="margin-left:13px;margin-top:5px;width:210px;">
         <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
@@ -67,26 +72,30 @@ end
         
     </div>
 
-    <div type ="box" style="width:280px;height:400px">
+    <div type ="box" style="width:270px;height:380px">
            <div style="margin-top:0px;">
-            <pe:gridview style="margin:0px;width:260px;height:400px;" name="item_gridview" CellPadding="15" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+            <pe:gridview style="margin:0px;width:270px;height:400px;" name="item_gridview" CellPadding="12" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                         <div style="color:#ffffff">
-                            <a style="width:196px;height:30px;margin:0px;padding:0px;background:;"
+                            <a style="width:240x;height:30px;margin:0px;padding:0px;background:;"
                                onclick="ClickItem" param1='<%=Eval("nid")%>'>
-                                <input type="button" Normal_BG="" MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="float:right;margin-top:0px;width:196px;height:30px;background:;" />
-                                <div style="margin-left:-1px;margin-top:-32px;padding-left:5px;padding-top:2px;width:210px;height:30px;">
-                                    <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
+                                <input type="button" Normal_BG="" onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="position:relative;margin-top:0px;width:240px;height:30px;background:;" />
+                                <div style="position:relative;margin-left:0px;margin-top:0px;padding-left:5px;padding-top:2px;width:240px;height:30px;">
+                                    <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
                                        onclick="ClickItem" param1='<%=Eval("nid")%>'>
-                                        <aries:onlinestatus width="32" height="26" nid='<%=Eval("nid")%>' />
-                                    </a>
-                                    <div style="float:right;margin-left:0px;margin-top:3px;width:108px;font-size:12pt;color:#ffffff">
-                                        <div style="width:170px;">
-                                            <pe:name nid='<%=Eval("nid")%>' linked=false useyou=false />
-                                        </div>
+                                        <aries:onlinestatus width="240" height="26" nid='<%=Eval("nid")%>' />
+                                    </a> -->
+                                    <div style="float: left;margin-left:0px;margin-top:0px;">
+                                        <img zorder="0" src='<%=Eval("icon")%>'width="28" height="28"/>
                                     </div>
-                                    <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' />
+                                    <div style="float: left;margin-left:8px;margin-top:5px;width:60px;font-size:12pt;color:#000000">
+                                        <%=Eval("name") %>
+                                    </div>
+                                    <div style="float: left;margin-left:23px;margin-top:5px;width:100px;font-size:12pt;color:#000000;text-align: right;">
+                                        <%=GetTimeDesc(Eval("time")) %>
+                                    </div>
+                                    <!-- <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' /> -->
                                 </div>
                             </a>
                         </div>
@@ -98,7 +107,6 @@ end
     </div>
 
     <div type ="box" style="margin-bottom:0px;">
-        底部
         <input type="button" name="last" value="添加好友" onclick="" tooltip="添加好友"/>
         <input type="button" name="last" value="好友申请" onclick="" tooltip="好友申请"/>
     </div>

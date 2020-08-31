@@ -14,6 +14,7 @@ UserIntroduction.ShowPage()
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
+local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 
 UserIntroduction.page= nil;
 UserIntroduction.showOnStart = false;
@@ -25,7 +26,8 @@ end
 
 function UserIntroduction.OnWorldLoaded()
 	local revision = GameLogic.options:GetRevision()
-	if((not revision or revision < 2) and GameLogic.GetMode() == "editor" and not GameLogic.IsRemoteWorld()) then
+	local projectId = tostring(GameLogic.options:GetProjectId());
+	if((not revision or revision < 2) and GameLogic.GetMode() == "editor" and not GameLogic.IsRemoteWorld() and projectId ~= TeachingQuestPage.MainWorldId) then
 		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 			UserIntroduction.CheckShowOnStartup()
 		end})
@@ -38,6 +40,10 @@ function UserIntroduction.OnInit()
 end
 
 function UserIntroduction.ShowPage()
+	if (not GameLogic.GameMode:IsEditor()) then
+		_guihelper.MessageBox(L"非编辑模式下无法使用新手引导！");
+		return;
+	end
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Login/UserIntroduction.html", 
 		name = "CreateMCNewWorld", 

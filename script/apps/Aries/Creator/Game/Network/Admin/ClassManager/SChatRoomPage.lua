@@ -9,9 +9,8 @@ local SChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin
 SChatRoomPage.ShowPage()
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/SmileyPage.lua");
-local SmileyPage = commonlib.gettable("MyCompany.Aries.ChatSystem.SmileyPage");
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+local StudentPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/StudentPanel.lua");
 local SChatRoomPage = NPL.export()
 
 local page;
@@ -20,17 +19,25 @@ function SChatRoomPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function SChatRoomPage.ShowPage(onClose)
-	SChatRoomPage.result = false;
+function SChatRoomPage.ShowPage(bShow)
+	if (page) then
+		if (bShow and page:IsVisible()) then
+			return;
+		end
+		if ((not bShow) and (not page:IsVisible())) then
+			return;
+		end
+	end
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Network/Admin/ClassManager/SChatRoomPage.html", 
 		name = "SChatRoomPage.ShowPage", 
 		isShowTitleBar = false,
-		DestroyOnClose = true,
+		DestroyOnClose = false,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		allowDrag = true,
+		bShow = bShow,
 		enable_esc_key = true,
-		click_through = true, 
+		click_through = false, 
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 		align = "_ct",
@@ -40,26 +47,17 @@ function SChatRoomPage.ShowPage(onClose)
 		height = 533,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	params._page.OnClose = function()
-		if(onClose) then
-			onClose(SChatRoomPage.result);
-		end
-	end
 end
 
 function SChatRoomPage.Refresh()
 	if (page) then
-		ClassManager.LoadClassroomInfo(ClassManager.CurrentClassroomId, function(classId, projectId, roomId)
-			page:CloseWindow();
-			SChatRoomPage.ShowPage();
-		end);
+		page:Refresh(0);
 	end
 end
 
 function SChatRoomPage.OnClose()
-	SChatRoomPage.result = true;
-	page:CloseWindow();
+	SChatRoomPage.ShowPage(false);
+	StudentPanel.CloseChat();
 end
 
 function SChatRoomPage.GetClassName()
@@ -68,34 +66,12 @@ end
 
 function SChatRoomPage.GetClassPeoples()
 	local onlineCount = ClassManager.GetOnlineCount();
-	local text = string.format(L"班级成员 %d/%d", onlineCount+1, #ClassManager.ClassMemberList);
+	local text = string.format(L"班级成员 %d/%d", onlineCount, (#ClassManager.ClassMemberList));
 	return text;
 end
 
 function SChatRoomPage.ClassItems()
-	local items = {};
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 1 and userInfo.student == 0) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = true, online = member.online});
-		end
-	end
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 1 and userInfo.student == 1) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = true, online = member.online});
-		end
-	end
-	for i = 1, #ClassManager.ClassMemberList do
-		local member = ClassManager.ClassMemberList[i];
-		local userInfo = member.user;
-		if (userInfo.tLevel == 0) then
-			table.insert(items, {name = ClassManager.GetMemberUIName(userInfo), teacher = false, online = member.online});
-		end
-	end
-	return items;
+	return ClassManager.ClassMemberList;
 end
 
 function SChatRoomPage.GetShortName(name)
@@ -106,6 +82,10 @@ function SChatRoomPage.GetShortName(name)
 		return name;
 	end
 	return name;
+end
+
+function SChatRoomPage.CanSpeak()
+	return ClassManager.CanSpeak;
 end
 
 function SChatRoomPage.ShowOnlyTeacher()

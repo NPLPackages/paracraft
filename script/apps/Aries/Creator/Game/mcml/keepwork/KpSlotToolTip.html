@@ -19,12 +19,12 @@ function GetGsid()
     return item.gsId;
 end
 ]]></script>
-<div style="color:#ffffff;width:260px;padding:5px;" class="defaultbtn">
-    <div style="font-weight:bold;margin-left:2px;"><%=KpItemToolTip_itemTemplate.name%></div>
-    <div style="margin-top:2px;width:64px;height:64px;" class="mc_blue_button_with_fillet"  >
-        <kp:item gsid='<%=GetGsid() %>' style="width:64px;height:64px;" />    
+<div style="color:#ffffff;width:255px;padding:10px;" class="kp_tooltip_bg">
+    <div style="color:#ffffff;font-size:16px;"><%=KpItemToolTip_itemTemplate.name%></div>
+    <div style="margin-top:2px;" class="kp_item" >
+        <kp:item gsid='<%=GetGsid() %>' class="kp_item" />    
     </div>
-    <div style="margin-top:2px;margin-left:2px;"><%=KpItemToolTip_itemTemplate.desc%></div>
+    <div style="margin-top:2px;color:#c7c7c7;font-size:12px;"><%=KpItemToolTip_itemTemplate.desc%></div>
 </div>
 </pe:mcml>
 </body>

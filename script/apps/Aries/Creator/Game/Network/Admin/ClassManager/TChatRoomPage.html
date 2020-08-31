@@ -32,7 +32,7 @@
                                 <div onclick="TChatRoomPage.ForbiddenChat" style="margin-left:10px;margin-top:5px;width:20px;height:18px;background:url(Texture/Aries/Creator/keepwork/ClassManager/talk_t_icon_32bits.png#0 0 20 18);"></div>
                             </pe:if>
                             <pe:if condition='<%=TChatRoomPage.IsForbiddened()%>'>
-                                <div onclick="TChatRoomPage.AllowChat" style="margin-left:10px;margin-top:5px;width:20px;height:19px;background:url(Texture/Aries/Creator/keepwork/ClassManager/no_talking_t_icon_32bits.png#0 0 27 18);"></div>
+                                <div onclick="TChatRoomPage.AllowChat" style="margin-left:10px;margin-top:5px;width:20px;height:19px;background:url(Texture/Aries/Creator/keepwork/ClassManager/no_talking_t_icon_32bits.png#0 0 20 19);"></div>
                             </pe:if>
                         </div>
                         <div style="width:480px;height:97px;background-color:#e2e7e8">
@@ -44,9 +44,7 @@
                     <div style="float:left;width:266px;height:490px;">
                         <div style="width:266px;height:31px;background-color:#292929;color:#ffffff">
                             <div style="float:left;margin-left:10px;margin-top:6px;"><%=TChatRoomPage.GetClassPeoples()%></div>
-                            <!--
                             <input type="button" style="float:left;width:52px;height:20px;margin-left:98px;margin-top:6px;color:#ffffff;" value='<%=L"+邀请"%>' class="mc_blue_button_with_fillet" tooltip='<%=L"邀请所有未上课成员"%>' onclick="TChatRoomPage.InviteAll" />
-                            -->
                         </div>
                         <div style="width:266px;height:1px;background-color:#cdcdcd"></div>
                         <div>
@@ -59,6 +57,10 @@
                                                 <div style="margin-left:-6px;margin-top:8px;text-align:center;color:#ffffff;">
                                                     <%=TChatRoomPage.GetShortName(Eval("name"))%>
                                                 </div>
+                                                <pe:if condition='<%=not Eval("inclass")%>'>
+                                                    <div style="margin-left:28px;margin-top:-3px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/ClassManager/not_in_classroom_32bits.png#0 0 16 16);">
+                                                    </div>
+                                                </pe:if>
                                             </div>
                                         </pe:if>
                                         <pe:if condition='<%=not Eval("online")%>'>
@@ -68,16 +70,19 @@
                                                 </div>
                                             </div>
                                         </pe:if>
-                                        <div style="float:left;margin-left:10px;margin-top:8px;"><%=Eval("name")%></div>
                                         <pe:if condition='<%=Eval("teacher")%>'>
+                                            <div style="float:left;margin-left:10px;margin-top:8px;width:70px;"><%=Eval("name")..L"老师"%></div>
                                             <div style="float:left;margin-left:12px;margin-top:10px;width:40px;height:20px;background:url(Texture/Aries/Creator/keepwork/ClassManager/teacher_bg_32bits.png#0 0 8 8:3 3 3 3);">
                                                 <div style="margin-left:8px;font-size:12px;">
                                                     <%=L"老师"%>
                                                 </div>
                                             </div>
                                         </pe:if>
-                                        <pe:if condition='<%=not Eval("online")%>'>
-                                            <input type="button" name='<%= Eval("userId")%>' style="float:right;width:52px;height:24px;margin-top:8px;margin-right:20px;color:#ffffff;" align="right" value='<%=L"邀请"%>' class="mc_blue_button_with_fillet" onclick="TChatRoomPage.InviteOne" />
+                                        <pe:if condition='<%=not Eval("teacher")%>'>
+                                            <div style="float:left;margin-left:10px;margin-top:8px;"><%=Eval("name")%></div>
+                                        </pe:if>
+                                        <pe:if condition='<%=Eval("online") and not Eval("inclass")%>'>
+                                            <input type="button" name='<%= Eval("userId")%>' style="float:right;width:52px;height:24px;margin-top:8px;margin-right:14px;color:#ffffff;" align="right" value='<%=L"邀请"%>' class="mc_blue_button_with_fillet" onclick="TChatRoomPage.InviteOne" />
                                         </pe:if>
                                     </div>
                                 </Columns>
