@@ -15,6 +15,13 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 
 local ParaWorldMiniChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldMiniChunkGenerator"))
+local defaultFilename = "miniworld.template.xml"
+-- dynamic blocks are not supported. 
+local ignoreList = {[9]=true,[219]=true,[253]=true,[110]=true,[215]=true,[216]=true,[217]=true,[196]=true,[218]=true,[22]=true,[254]=true,[212]=true,[189]=true, [221]=true};
+-- dynamic water to still water
+local replaceList = {[75]=76,};
+-- max allowed blocks
+ParaWorldMiniChunkGenerator.MaxAllowedBlock = 200000;
 
 function ParaWorldMiniChunkGenerator:ctor()
 end
@@ -28,6 +35,99 @@ end
 
 function ParaWorldMiniChunkGenerator:OnExit()
 	ParaWorldMiniChunkGenerator._super.OnExit(self);
+end
+
+
+function ParaWorldMiniChunkGenerator:GetPivot()
+	return 19136, 12, 19136
+end
+
+function ParaWorldMiniChunkGenerator:GetAllBlocks()
+	local blocks = {};
+	local originX, from_y, originZ = self:GetPivot();
+	for x = 19140, 19259 do
+		for z = 19140, 19259 do
+			local block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,255,z, 255, 255-from_y);
+			while(block_id and y >= from_y) do
+				if(not ignoreList[block_id]) then
+					block_id = replaceList[block_id] or block_id
+					local block = block_types.get(block_id);
+					local node;
+					if(block) then
+						local entity = block:GetBlockEntity(x,y,z);
+						if(entity) then
+							node = entity:SaveToXMLNode();
+						end
+					end
+					if(block_data == 0) then
+						block_data = nil
+					end
+					blocks[#blocks+1] = {x-originX, y-from_y, z-originX, block_id, block_data, node}
+				end
+				block_id, y = BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, 255)
+			end
+		end
+	end
+	return blocks;
+end
+
+function ParaWorldMiniChunkGenerator:GetTemplateFilepath()
+	return GameLogic.GetWorldDirectory()..defaultFilename;
+end
+
+function ParaWorldMiniChunkGenerator:GetBlockCountInTemplate(filename)
+	local count = 0;
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(xmlRoot) then
+		local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(node and node.attr and node.attr.count) then
+			count = tonumber(node.attr.count) or 0
+		end
+	end
+	return count;
+end
+
+function ParaWorldMiniChunkGenerator:ShowBlockTip(count)
+	count = count or self.count or 0;
+	if(count < self.MaxAllowedBlock) then
+		GameLogic.AddBBS("paraworld", format(L"剩余空间%d%%", math.floor((self.MaxAllowedBlock - count)/self.MaxAllowedBlock * 100)), 5000, "0 255 0");
+	else
+		GameLogic.AddBBS("paraworld", L"方块数量大于20万块，请删除一定方块后上传", 5000, "255 0 0");
+	end
+end
+
+function ParaWorldMiniChunkGenerator:OnLoadWorld()
+	local filename = self:GetTemplateFilepath();
+	local count = self:GetBlockCountInTemplate(filename)
+	if(count) then
+		self.count = count;
+		self:ShowBlockTip()
+	end
+end
+
+function ParaWorldMiniChunkGenerator:GetTotalCount()
+	return self.count or 0;
+end
+
+
+function ParaWorldMiniChunkGenerator:OnSaveWorld()
+	local blocks = self:GetAllBlocks();
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+	local filename = self:GetTemplateFilepath();
+	
+	local x, y, z = self:GetPivot();
+	local params = {count = #blocks};
+	params.pivot = string.format("%d,%d,%d", x, y, z)
+	self.count = #blocks;
+	if(#blocks > self.MaxAllowedBlock) then
+		commonlib.resize(blocks, self.MaxAllowedBlock);
+	end
+	self:ShowBlockTip()
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
+		params = params,
+		blocks = blocks})
+	task:Run();
 end
 
 -- get params for generating flat terrain

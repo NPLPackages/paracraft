@@ -1185,3 +1185,18 @@ function options:IsVip()
 	return userType == "vip" or userType == "teacher"
 end
 
+-- use command "/show tips" or "/hide tips"
+-- like auto tips and others
+function options:ShowSystemTips(bShow)
+	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
+	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
+	if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
+		AsyncLoaderProgressBar.GetDefaultAssetBar():Show(bShow)
+	end
+
+	if(bShow) then
+		GameLogic.CreateGetAutoSaver():OnEnterWorld();
+	else
+		GameLogic.CreateGetAutoSaver():OnLeaveWorld();
+	end
+end

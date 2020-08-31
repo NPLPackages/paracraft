@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="TeachingQuestLinkPage.lua"><![CDATA[
+local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
+
+local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
+TeachingQuestLinkPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function OnOpen(type_index)
+    type_index = tonumber(type_index);
+    TeachingQuestPage.ShowPage(type_index);
+    ClosePage();
+end
+]]></script>
+<kp:window mode="lite" width="400" height="250" title='<%= L"每周实战"%>' onclose="ClosePage">
+    <div class="kp_window_container">
+        <div style="margin-left:25px;margin-top:50px;">
+            <input type="button" value="<%=L'编程'%>" name="1" onclick="OnOpen" style="float:left;margin-left:10px;width:100px;height:100px;" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" value="<%=L'动画'%>" name="2" onclick="OnOpen" style="float:left;margin-left:10px;width:100px;height:100px;" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" value="<%=L'CAD'%>" name="3" onclick="OnOpen" style="float:left;margin-left:10px;width:100px;height:100px;" class="mc_light_grey_button_with_fillet"/>
+        </div>
+        
+    </div>
+    
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

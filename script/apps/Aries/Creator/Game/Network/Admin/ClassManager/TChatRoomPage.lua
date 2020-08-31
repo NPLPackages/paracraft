@@ -61,7 +61,7 @@ function TChatRoomPage.OnClose()
 end
 
 function TChatRoomPage.GetClassName()
-	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId);
+	return ClassManager.ClassNameFromId(ClassManager.CurrentClassId) or ClassManager.CurrentClassName;
 end
 
 function TChatRoomPage.GetClassPeoples()
@@ -71,14 +71,30 @@ function TChatRoomPage.GetClassPeoples()
 end
 
 function TChatRoomPage.InviteAll()
-	ClassManager.SendMessage("tip:invite:all:"..ClassManager.CurrentClassroomId);
+	_guihelper.MessageBox(L"邀请所有未上课成员一起上课？", function(res)
+		if(res == _guihelper.DialogResult.OK) then
+			for i = 2, #ClassManager.ClassMemberList do
+				local userInfo = ClassManager.ClassMemberList[i];
+				if (userInfo.online and not userInfo.inclass) then
+					local room = string.format("__user_%d__", userInfo.userId);
+					ClassManager.SendMessage("invite:"..userInfo.userId..":"..ClassManager.CurrentClassroomId, room);
+				end
+			end
+		end
+	end, _guihelper.MessageBoxButtons.OKCancel);
 end
 
 function TChatRoomPage.InviteOne(userId)
 	for i = 2, #ClassManager.ClassMemberList do
 		local userInfo = ClassManager.ClassMemberList[i];
 		if (userId == userInfo.userId) then
-			ClassManager.SendMessage("tip:invite:"..userId..":"..ClassManager.CurrentClassroomId);
+			local tip = string.format(L"邀请%s上课？", userInfo.name);
+			_guihelper.MessageBox(tip, function(res)
+				if(res == _guihelper.DialogResult.OK) then
+					local room = string.format("__user_%d__", userId);
+					ClassManager.SendMessage("invite:"..userId..":"..ClassManager.CurrentClassroomId, room);
+				end
+			end, _guihelper.MessageBoxButtons.OKCancel);
 			return;
 		end
 	end
@@ -103,9 +119,13 @@ function TChatRoomPage.IsForbiddened()
 end
 
 function TChatRoomPage.ForbiddenChat()
-	ClassManager.SendMessage("cmd:nospeak");
-	ClassManager.CanSpeak = false;
-	page:Refresh(0);
+	_guihelper.MessageBox(L"确定要开户全员禁言吗（老师发言不受限制）？", function(res)
+		if(res == _guihelper.DialogResult.OK) then
+			ClassManager.SendMessage("cmd:nospeak");
+			ClassManager.CanSpeak = false;
+			page:Refresh(0);
+		end
+	end, _guihelper.MessageBoxButtons.OKCancel);
 end
 
 function TChatRoomPage.AllowChat()

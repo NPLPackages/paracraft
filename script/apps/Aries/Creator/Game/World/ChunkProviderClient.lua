@@ -146,3 +146,10 @@ function ChunkProviderClient:OnExit()
 		self:GetGenerator():OnExit();
 	end
 end
+
+
+function ChunkProviderClient:OnSaveWorld()
+	if(self:GetGenerator()) then
+		self:GetGenerator():OnSaveWorld();
+	end
+end

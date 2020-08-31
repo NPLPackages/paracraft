@@ -25,7 +25,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision|quickselectbar] [on|off]", 
+	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision|quickselectbar|tips] [on|off]", 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -96,6 +96,8 @@ Other show filters:
 			end
 		elseif(name == "ui" or name == "UI") then
 			System.App.Commands.Call("ScreenShot.HideAllUI");
+		elseif(name == "tips") then
+			GameLogic.options:ShowSystemTips(true);
 		elseif(name == "keyboard") then
 			local TouchVirtualKeyboardIcon = GameLogic.GetFilters():apply_filters("TouchVirtualKeyboardIcon");
 			if not TouchVirtualKeyboardIcon then
@@ -115,7 +117,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard|quickselectbar]", 
+	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard|quickselectbar|tips]", 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -150,6 +152,8 @@ Commands["hide"] = {
 			if(memoryContext) then
 				memoryContext:SetVisible(false);
 			end
+		elseif(name == "tips") then
+			GameLogic.options:ShowSystemTips(false);
 		elseif(name == "ui" or name == "UI") then
 			System.App.Commands.Call("ScreenShot.HideAllUI");
 		elseif(name == "keyboard") then

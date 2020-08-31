@@ -119,6 +119,34 @@ function LocalLoadWorld.RefreshAll(refresh_delay)
 	page:Refresh(refresh_delay);
 end
 
+-- @param worldTitle: can be nil
+function LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+	local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+	local worldpath = CreateNewWorld.CreateWorld({
+		worldname = myHomeWorldName, 
+		title = worldTitle or format(L"%s的家园", System.User.keepworkUsername),
+		creationfolder = CreateNewWorld.GetWorldFolder(),
+		world_generator = "paraworldMini",
+		seed = worldname,
+		inherit_scene = true,
+		inherit_char = true,
+	})
+	return worldpath;
+end
+
+function LocalLoadWorld.CreateGetHomeWorld()
+	local myHomeWorldName;
+	if(System.User.keepworkUsername) then
+		local folderPath = LocalLoadWorld.GetDefaultSaveWorldPath();
+		myHomeWorldName = tostring(System.User.keepworkUsername).."_main";
+		-- create home world if not exist
+		if(not ParaIO.DoesFileExist(folderPath.."/"..myHomeWorldName.."/tag.xml", false)) then
+			LocalLoadWorld.CreateHomeWorld(myHomeWorldName)
+		end
+		return folderPath.."/"..myHomeWorldName;
+	end
+end
 
 function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 	-- update the file path
@@ -131,6 +159,15 @@ function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 		
 		local folderPath = LocalLoadWorld.GetDefaultSaveWorldPath();
 
+		local myHomeWorldName;
+		if(System.User.keepworkUsername) then
+			myHomeWorldName = tostring(System.User.keepworkUsername).."_main";
+			-- create home world if not exist
+			if(not ParaIO.DoesFileExist(folderPath.."/"..myHomeWorldName.."/tag.xml", false)) then
+				LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
+			end
+		end
+		
 		-- add folders in myworlds/DesignHouse
 		local output = LocalLoadWorld.SearchFiles(nil, folderPath, LocalLoadWorld.MaxItemPerFolder);
 		if(output and #output>0) then
@@ -147,6 +184,10 @@ function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 							if(filenameUTF8 ~= node.attr.name) then
 								-- show dir name if differs from world name
 								display_name = format("%s(%s)", node.attr.name or "", filenameUTF8);
+							end
+							if(myHomeWorldName and item.filename == myHomeWorldName) then
+								-- use a different display format
+								display_name = node.attr.name or filenameUTF8;
 							end
 							-- only add world with the same nid
 							LocalLoadWorld.AddWorldToDS({worldpath = folderPath.."/"..item.filename, 
@@ -184,7 +225,7 @@ function LocalLoadWorld.BuildLocalWorldList(bForceRefresh, bSelectFirst)
 				end	
 			end
 		end
-		
+
 		-- add *.zip world package file 
 		local output = LocalLoadWorld.SearchFiles(nil, folderPath, LocalLoadWorld.MaxItemPerFolder, "*.zip");
 		if(output and #output>0) then

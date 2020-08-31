@@ -216,6 +216,7 @@ local app_install_details = {
 		redistFolder="truck/", updaterConfigPath = "config/autoupdater/truckstar_win32.xml",
 		additional_manifest = "assets_manifest_truckload.txt",
 		allowQQHall = true,
+		isGame = true,
 	},
 }
 

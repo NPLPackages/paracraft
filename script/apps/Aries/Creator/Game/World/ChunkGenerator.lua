@@ -111,6 +111,11 @@ function ChunkGenerator:OnExit()
 	end
 end
 
+-- virtual function:
+function ChunkGenerator:OnSaveWorld()
+	
+end
+
 function ChunkGenerator:GetWorld()
 	return self._World;
 end

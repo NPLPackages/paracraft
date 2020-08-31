@@ -22,6 +22,9 @@ function TeacherPanel.OnInit()
 end
 
 function TeacherPanel.ShowPage()
+	if (page) then
+		page:CloseWindow();
+	end
 	GameLogic.IsVip("OnlineTeaching", true, function(result)
 		if (result) then
 			local params = {
@@ -85,7 +88,6 @@ end
 function TeacherPanel.LeaveClass()
 	_guihelper.MessageBox(L"确定要结束上课吗？", function(res)
 		if(res == _guihelper.DialogResult.OK) then
-			ClassManager.SendMessage("cmd:leave");
 			ClassManager.DismissClassroom(ClassManager.CurrentClassroomId, function(result, data)
 				if (result) then
 					ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);

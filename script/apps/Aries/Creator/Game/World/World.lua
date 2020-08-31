@@ -76,6 +76,14 @@ function World:OnPreloadWorld()
 	GameLogic.SetIsRemoteWorld(false, false);
 end
 
+function World:OnSaveWorld()
+	return self:GetChunkProvider():OnSaveWorld();
+end
+
+function World:OnLoadWorld()
+	return self:GetChunkProvider():OnLoadWorld();
+end
+
 function World:GetWorldPath()
 	if(not self.worldpath) then
 		self.worldpath = ParaWorld.GetWorldDirectory();

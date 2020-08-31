@@ -66,7 +66,7 @@ function ClassManager.OnKeepWorkLogin_Callback()
 					commonlib.TimerManager.SetTimeout(function()
 						ClassManager.InClass = true;
 						TeacherPanel.StartClass();
-					end, 2000);
+					end, 1500);
 				else
 					-- no teacher classroom, then load student classroom
 					roleId = 1;
@@ -76,13 +76,15 @@ function ClassManager.OnKeepWorkLogin_Callback()
 								if(res and res == _guihelper.DialogResult.Yes)then
 									ClassManager.InClass = true;
 									StudentPanel.StartClass();
+								else
+									ClassManager.Reset();
 								end
 							end, _guihelper.MessageBoxButtons.YesNo);
 						end
 					end);
 				end
 			end);
-		end, 1000)
+		end, 500)
 	end
 end
 
@@ -266,6 +268,7 @@ function ClassManager.CreateAndEnterClassroom(classId, projectId, callback)
 			local roleId = 2;
 			ClassManager.LoadOnlineClassroom(roleId, function(classId, projectId, classroomId, userId)
 				if (classId and projectId and classroomId) then
+					ClassManager.InClass = true;
 					TeacherPanel.StartClass();
 				end
 			end);
@@ -280,9 +283,6 @@ function ClassManager.DismissClassroom(classroomId, callback)
 	keepwork.dismiss.post({classroomId = classroomId}, function(err, msg, data)
 		if (callback) then
 			callback(err == 200, data);
-		end
-		if (err == 200) then
-			ClassManager.Reset();
 		end
 	end);
 end
@@ -376,9 +376,6 @@ function ClassManager.RunCommand(command)
 		LockDesktop.ShowPage(false, 0, cmd_text);
 	elseif (command == "connect") then
 		GameLogic.RunCommand("/connectGGS -isSyncBlock");
-	elseif (command == "leave") then
-		ClassManager.Reset();
-		StudentPanel.LeaveClass();
 	elseif (command == "nospeak") then
 		ClassManager.CanSpeak = false;
 		SChatRoomPage.Refresh();
@@ -404,6 +401,16 @@ function ClassManager.RefreshChatRoomList(userId, inclass, online)
 	if (ClassManager.IsTeacherInClass()) then
 		TChatRoomPage.Refresh();
 		TeacherPanel.Refresh();
+		local room = string.format("__user_%d__", userId);
+		if (ClassManager.IsLocking) then
+			ClassManager.SendMessage("cmd:lock:"..userId, room);
+		end
+		if (ClassManager.InGGS) then
+			ClassManager.SendMessage("cmd:connect:"..userId, room);
+		end
+		if (not ClassManager.CanSpeak) then
+			ClassManager.SendMessage("cmd:nospeak:"..userId, room);
+		end
 	else
 		SChatRoomPage.Refresh();
 	end
@@ -426,6 +433,8 @@ function ClassManager.StudentJointClassroom(roomId)
 				if(res and res == _guihelper.DialogResult.Yes)then
 					ClassManager.InClass = true;
 					StudentPanel.StartClass();
+				else
+					ClassManager.Reset();
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
 		end
@@ -449,21 +458,7 @@ function ClassManager.ProcessMessage(payload, meta)
 			ClassManager.RunCommand(content);
 		end
 	elseif (type == "tip") then
-		local tipType = result[2];
-		if (tipType == "invite") then
-			if (result[3] == "all") then
-				local roomId = result[4];
-				ClassManager.StudentJointClassroom(roomId);
-			else
-				local roomId = result[4];
-				local id = tonumber(result[3]);
-				if (id == userId) then
-					ClassManager.StudentJointClassroom(roomId);
-				end
-			end
-		else
-			ClassManager.RefreshChatRoomList(payload.id, content=="join", true);
-		end
+		ClassManager.RefreshChatRoomList(payload.id, content=="join", true);
 	elseif (type == "link") then
 		if (userId ~= payload.id) then
 			ClassManager.AddLink(content, name, meta.timestamp);
@@ -499,6 +494,11 @@ function ClassManager.OnMsg(self, msg)
 
 		if (action == "classroom_start") then
 			ClassManager.StudentJointClassroom(payload.classroomId);
+		elseif (action == "classroom_dismiss") then
+			ClassManager.Reset();
+			if (not ClassManager.IsTeacherInClass()) then
+				StudentPanel.LeaveClass();
+			end
 		elseif (action == "online") then
 			ClassManager.RefreshChatRoomList(payload.userId, false, true);
 		elseif (action == "offline") then
@@ -506,8 +506,29 @@ function ClassManager.OnMsg(self, msg)
 		end
 		if (key == "app/msg" and payload and userInfo) then
 			local room = string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId));
-			if (meta and meta.target == room) then
+			if (not meta) then return end
+
+			if (meta.target == room) then
 				ClassManager.ProcessMessage(payload, meta);
+			elseif (string.find(meta.target, "__user_") ~= nil) then
+				-- invite msg send to __user_id__ room
+				local result = commonlib.split(payload.content, ":");
+				if (#result ~= 3) then return end
+				if (result[1] == "invite") then
+					local roomId = tonumber(result[3]);
+					local id = tonumber(result[2]);
+					local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+					if (id == userId) then
+						ClassManager.StudentJointClassroom(roomId);
+					end
+				elseif (result[1] == "cmd") then
+					local cmd = result[2];
+					local id = tonumber(result[3]);
+					local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+					if (id == userId) then
+						ClassManager.RunCommand(cmd);
+					end
+				end
 			end
 		end
 	end
@@ -515,6 +536,10 @@ end
 
 function ClassManager.Reset()
 	ClassManager.InClass = false;
+	ClassManager.IsLocking = false;
+	ClassManager.InGGS = false;
+	ClassManager.CanSpeak = true;
+
 	ClassManager.CurrentClassId = nil;
 	ClassManager.CurrentWorldId = nil; 
 	ClassManager.CurrentClassroomId = nil;
@@ -524,16 +549,16 @@ function ClassManager.Reset()
 	ClassManager.OrgClassIdMap = {};
 	ClassManager.ClassList = {};
 	ClassManager.ProjectList = {};
-	ClassManager.ClassMemberList = {};
 	ClassManager.ShareLinkList = {};
+	ClassManager.ClassMemberList = {};
 
 	ClassManager.ChatDataList = {};
 end
 
-function ClassManager.SendMessage(content)
+function ClassManager.SendMessage(content, target)
 	local msgdata = {
 		ChannelIndex = ChatChannel.EnumChannels.KpNearBy,
-		target = string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId)),
+		target = target or string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId)),
 		worldId = ClassManager.CurrentWorldId,
 		words = content,
 		type = 2,

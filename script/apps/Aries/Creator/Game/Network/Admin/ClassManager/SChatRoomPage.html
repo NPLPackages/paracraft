@@ -36,6 +36,9 @@
                                 <input type="button" enabled="true" onclick="SChatRoomPage.SendMessage" style="float:right;width:54px;height:28px;margin-top:0px;margin-right:12px;color:#ffffff;" align="right" value='<%=L"发送"%>' class="mc_blue_button_with_fillet" />
                             </pe:if>
                             <pe:if condition='<%=not SChatRoomPage.CanSpeak()%>'>
+                                <div style="float:left;width:480px;margin-top:-40px;text-align:center;color:#808080;">
+                                    <%=L"当前为禁言状态，暂时不能发言"%>
+                                </div>
                                 <input type="button" enabled="false" onclick="SChatRoomPage.SendMessage" style="float:right;width:54px;height:28px;margin-top:0px;margin-right:12px;color:#ffffff;" align="right" value='<%=L"发送"%>' class="mc_blue_button_with_fillet" />
                             </pe:if>
                         </div>

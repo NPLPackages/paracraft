@@ -29,10 +29,10 @@
                         <div style="width:480px;height:2px;background-color:#cdcdcd"></div>
                         <div style="width:480px;height:29px;background-color:#e2e7e8">
                             <pe:if condition='<%=not TChatRoomPage.IsForbiddened()%>'>
-                                <div onclick="TChatRoomPage.ForbiddenChat" style="margin-left:10px;margin-top:5px;width:20px;height:18px;background:url(Texture/Aries/Creator/keepwork/ClassManager/talk_t_icon_32bits.png#0 0 20 18);"></div>
+                                <div onclick="TChatRoomPage.ForbiddenChat" tooltip='<%=L"点击开启禁言，只有老师可以发言"%>' style="margin-left:10px;margin-top:5px;width:20px;height:18px;background:url(Texture/Aries/Creator/keepwork/ClassManager/talk_t_icon_32bits.png#0 0 20 18);"></div>
                             </pe:if>
                             <pe:if condition='<%=TChatRoomPage.IsForbiddened()%>'>
-                                <div onclick="TChatRoomPage.AllowChat" style="margin-left:10px;margin-top:5px;width:20px;height:19px;background:url(Texture/Aries/Creator/keepwork/ClassManager/no_talking_t_icon_32bits.png#0 0 20 19);"></div>
+                                <div onclick="TChatRoomPage.AllowChat" tooltip='<%=L"点击取消禁言，所有人都可以发言"%>' style="margin-left:10px;margin-top:5px;width:27px;height:19px;background:url(Texture/Aries/Creator/keepwork/ClassManager/no_talking_t_icon_32bits.png#0 0 27 19);"></div>
                             </pe:if>
                         </div>
                         <div style="width:480px;height:97px;background-color:#e2e7e8">
