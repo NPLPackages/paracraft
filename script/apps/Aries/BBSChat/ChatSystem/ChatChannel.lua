@@ -92,6 +92,7 @@ ChatChannel.channels = {
 {name="本地",bshow=true,color="ffffff",}, -- "KpNearBy" 21
 {name="全局",bshow=true,color="fced4b",}, -- "KpBroadCast" 22
 {name="官方公告",bshow=true,color="fced4b",}, -- "KpSystem" 23
+{name="学校",bshow=true,color="ffa74f",}, -- "KpSchool" 24
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;
@@ -117,6 +118,7 @@ local EnumChannels = {
 	KpNearBy = 21,
 	KpBroadCast = 22,
 	KpSystem = 23,
+	KpSchool = 24,
     KpMax = 29,
 }
 ChatChannel.EnumChannels = EnumChannels;
@@ -471,6 +473,13 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
 				ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
 			end
 		end
+    elseif(msgdata.ChannelIndex == EnumChannels.KpSchool) then
+        local school_room = KpChatChannel.GetSchoolRoom();
+        if(not school_room)then
+            _guihelper.MessageBox(L"你还没有加入学校，不能发送这个频道的消息。")
+            return
+        end
+	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
     else
 	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
     end

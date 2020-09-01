@@ -68,7 +68,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"联网控制面板",name = "online.teacher_panel",onclick=nil},
 			},
 		},
-		{text = L"机构",order=5, name = "organization",children = 
+		{text = L"机构",order=5, mode="edit", name = "organization",children = 
 			{
 				{text = L"老师面板",name = "organization.teacher_panel",onclick=nil},
 				{text = L"学生面板",name = "organization.student_panel",onclick=nil},

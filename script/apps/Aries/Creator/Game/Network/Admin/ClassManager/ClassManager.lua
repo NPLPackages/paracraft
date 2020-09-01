@@ -50,11 +50,13 @@ function ClassManager.StaticInit()
 	if (init) then return end
 	init = true;
 
+	GameLogic:Connect("WorldLoaded", ClassManager, ClassManager.OnWorldLoaded, "UniqueConnection");
+	GameLogic:Connect("WorldUnloaded", ClassManager, ClassManager.OnWorldUnload, "UniqueConnection");
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogin", ClassManager.OnKeepWorkLogin_Callback);
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", ClassManager.OnKeepWorkLogout_Callback)
 end
 
-function ClassManager.OnKeepWorkLogin_Callback()
+function ClassManager.OnWorldLoaded()
 	if (KpChatChannel.client) then
 		KpChatChannel.client:AddEventListener("OnMsg",ClassManager.OnMsg,ClassManager);
 		commonlib.TimerManager.SetTimeout(function()
@@ -84,15 +86,21 @@ function ClassManager.OnKeepWorkLogin_Callback()
 					end);
 				end
 			end);
-		end, 500)
+		end, 5000)
 	end
 end
 
-function ClassManager.OnKeepWorkLogout_Callback()
+function ClassManager.OnWorldUnload()
 	if (KpChatChannel.client) then
 		KpChatChannel.client:RemoveEventListener("OnMsg",ClassManager.OnMsg,ClassManager);
 		ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);
 	end
+end
+
+function ClassManager.OnKeepWorkLogin_Callback()
+end
+
+function ClassManager.OnKeepWorkLogout_Callback()
 end
 
 function ClassManager.LoadAllClasses(callback)
@@ -163,6 +171,7 @@ end
 
 function ClassManager.LoadOnlineClassroom(roleId, callback)
 	keepwork.classroom.get({cache_policy = "access plus 0", status = 1, roleId = roleId}, function(err, msg, data)
+		commonlib.echo(data);
 		local rooms = data and data.data and data.data.rows;
 		if (rooms) then
 			for i = 1, #rooms do
@@ -215,6 +224,7 @@ end
 
 function ClassManager.LoadClassroomInfo(classroomId, callback)
 	keepwork.info.get({cache_policy = "access plus 0", classroomId = classroomId}, function(err, msg, data)
+		commonlib.echo(data);
 		local room = data and data.data;
 		if (room == nil) then return end
 

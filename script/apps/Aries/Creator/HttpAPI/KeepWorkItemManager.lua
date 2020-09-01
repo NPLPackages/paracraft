@@ -298,12 +298,16 @@ function KeepWorkItemManager.Load(bForced, callback)
                 KeepWorkItemManager.LoadItems(nil, function()
                     KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载人物信息");
                     KeepWorkItemManager.LoadProfile(true, function()
-                        KeepWorkItemManager.loaded = true;
-                        if(callback)then
-                            callback();
-                        end            
-                        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
-                        KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
+                        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载学校信息");
+                        KeepWorkItemManager.LoadSchool(true, function()
+                            KeepWorkItemManager.loaded = true;
+                            if(callback)then
+                                callback();
+                            end            
+                            KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
+                            KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
+                        end)
+                        
                     end)
                 end)
             end)
@@ -533,6 +537,47 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
         end
     end)
 end
+--[[
+{
+  createdAt="2020-07-19T17:49:25.000Z",
+  id=273168,
+  name="清华大学",
+  region={
+    city={ id=215, name="北京市" },
+    country={ id=1, name="中国" },
+    county={ id=223, name="海淀区" },
+    state={ id=214, name="北京市" } 
+  },
+  regionId=223,
+  type="大学",
+  updatedAt="2020-07-19T17:49:25.000Z" 
+}
+]]
+-- http://yapi.kp-para.cn/project/32/interface/api/2477
+function KeepWorkItemManager.GetSchool()
+    return KeepWorkItemManager.school or {};
+end
+-- load school of logined user
+function KeepWorkItemManager.LoadSchool(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.user.school({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+        if(data)then
+            KeepWorkItemManager.school = data;
+            if(callback)then
+                callback(err, msg, data);
+            end
+        end
+    end)
+end
+
 -- check if the user has the global store item in inventory
 -- @param {number} gsid: global store id
 -- @return bOwn, guid, bag, copies, item

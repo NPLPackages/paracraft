@@ -66,7 +66,6 @@ function DockPage.OnClick(id)
         local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
         UserBagPage.ShowPage();
     elseif(id == "work")then
-        
         GameLogic.RunCommand("/menu file.loadworld");
     elseif(id == "explore")then
         local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
@@ -74,6 +73,11 @@ function DockPage.OnClick(id)
     elseif(id == "study")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
         StudyPage.ShowPage();
+    elseif(id == "home")then
+        GameLogic.RunCommand("/loadworld home");
+    elseif(id == "friends")then
+        local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+        FriendsPage.Show();
     elseif(id == "school")then
         local MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
         MySchool:Show();

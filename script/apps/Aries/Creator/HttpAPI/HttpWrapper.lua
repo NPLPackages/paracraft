@@ -8,7 +8,7 @@ Use Lib:
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
 NOTE: 
-config cmd line param "Config.defaultEnv" to load different development env
+config cmd line "httpwrapper_version" to get different environment
 local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("httpwrapper_version", "ONLINE");  - "ONLINE" or "STAGE" or "RELEASE" or "LOCAL"
 ]]
 NPL.load("(gl)script/ide/System/os/GetUrl.lua");
@@ -24,7 +24,7 @@ HttpWrapper.keepworkServerList = {
     LOCAL = "http://api-dev.kp-para.cn",
 }
 HttpWrapper.api_host = nil;
--- get version for load different development env
+-- get version for loading different development environment
 -- return 
 -- "ONLINE" or 
 -- "STAGE" or 
@@ -43,7 +43,7 @@ function HttpWrapper.GetUrl(key)
     if(not url)then
 	    LOG.std(nil, "error", "HttpWrapper", "read url failed key = '%s' , httpwrapper_version = '%s'", key, httpwrapper_version);
     else
-	    LOG.std(nil, "info", "HttpWrapper", "read url %s by key = '%s' , defaultEnv = '%s'", url, key, httpwrapper_version);
+	    LOG.std(nil, "info", "HttpWrapper", "read url %s by key = '%s' , httpwrapper_version = '%s'", url, key, httpwrapper_version);
     end
     return url;
 end

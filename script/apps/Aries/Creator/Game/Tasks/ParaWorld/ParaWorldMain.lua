@@ -33,7 +33,13 @@ function ParaWorldMain:Init()
 end
 
 function ParaWorldMain:IsCurrentParaWorld()
-	return (WorldCommon.GetWorldTag("world_generator") == "paraworld");
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	return (generatorName == "paraworld" or generatorName == "paraworldMini");
+end
+
+function ParaWorldMain:IsMiniWorld()
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	return (generatorName == "paraworldMini");
 end
 
 function ParaWorldMain:OnWorldLoaded()
@@ -49,18 +55,14 @@ function ParaWorldMain:OnWorldUnload()
 end
 
 function ParaWorldMain:ShowAllAreas()
-	--if(System.options.isAB_SDK)then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
-		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
-		ParaWorldMinimapWnd:Show();
-	--end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+	ParaWorldMinimapWnd:Show();
 end
 
 function ParaWorldMain:CloseAllAreas()
-	--if(System.options.isAB_SDK)then
-		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
-		ParaWorldMinimapWnd:Close();
-	--end
+	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+	ParaWorldMinimapWnd:Close();
 end
 
 

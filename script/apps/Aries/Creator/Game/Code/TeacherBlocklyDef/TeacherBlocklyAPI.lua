@@ -10,17 +10,9 @@ local TeacherBlocklyAPI = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Teac
 ]]
 NPL.load("(gl)script/ide/headon_speech.lua");
 NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
-local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.rawfile.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 local TeacherBlocklyAPI = commonlib.inherit(nil, NPL.export());
-
--- program data https://keepwork.com/official/paracraft/config/program
--- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2Fprogram.md
--- animation data https://keepwork.com/official/paracraft/config/animation
--- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2Fanimation.md
--- CAD data https://keepwork.com/official/paracraft/config/CAD
--- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2FCAD.md
-local taskUrl = "core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2F";
 
 function TeacherBlocklyAPI:ctor()
 	self.type = "program";
@@ -58,6 +50,13 @@ function TeacherBlocklyAPI:Init(codeEnv)
 	return self;
 end
 
+-- program data https://keepwork.com/official/paracraft/config/program
+-- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2Fprogram.md
+-- animation data https://keepwork.com/official/paracraft/config/animation
+-- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2Fanimation.md
+-- CAD data https://keepwork.com/official/paracraft/config/CAD
+-- https://api.keepwork.com/core/v0/repos/official%2Fparacraft/files/official%2Fparacraft%2Fconfig%2FCAD.md
+
 -- @param penBlockId: default to 10
 function TeacherBlocklyAPI:BecomeTeacherNPC(type)
 	local actor = self:InvokeMethod("getActor", "myself");
@@ -68,16 +67,18 @@ function TeacherBlocklyAPI:BecomeTeacherNPC(type)
 	self.type = TeachingQuestPage.TaskTypeIndex[type] or TeachingQuestPage.UnknowType;
 
 	local function getTaskFromUrl(taskName, callback)
-		local url = string.format("%s/%s%s.md", HttpWrapper.GetUrl(), taskUrl, taskName);
-		local ls = System.localserver.CreateStore(nil, 3, "userdata");
-		if(ls) then
-			local res = ls:GetURL(System.localserver.CachePolicy:new("access plus 0"), url, function(msg)
-				local data = commonlib.LoadTableFromString(msg.data);
-				if (data and callback) then
-					callback(data);
-				end
-			end);
-		end
+		keepwork.rawfile.get({
+			cache_policy =  "access plus 0",
+			router_params = {
+				repoPath = "official%%2Fparacraft",
+				filePath = "official%%2Fparacraft%%2Fconfig%%2F"..taskName..".md",
+			}
+		},function(err, msg, data)
+			local result = commonlib.LoadTableFromString(data);
+			if (result and callback) then
+				callback(result);
+			end
+		end)
 	end
 
 	getTaskFromUrl(TeachingQuestPage.TaskTypeNames[self.type], function(data)
@@ -88,7 +89,9 @@ function TeacherBlocklyAPI:BecomeTeacherNPC(type)
 		end, self.type);
 		TeachingQuestPage.AddTasks(tasks, self.type);
 		self:InvokeMethod("registerClickEvent", function()
-			TeachingQuestPage.ShowPage(self.type);
+			if (data.npcScript) then
+				TeacherBlocklyAPI.RunExternalFunc(data.npcScript);
+			end
 		end);
 	end);
 end
@@ -150,5 +153,12 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 		local img = _parent:GetChildAt(0):GetChildAt(0);
 		local fileName = "script/UIAnimation/CommonBounce.lua.table";
 		UIAnimManager.PlayUIAnimationSequence(img, fileName, "ShakeUD", true);
+	end
+end
+
+
+function TeacherBlocklyAPI.RunExternalFunc(func)
+	if (type(func) == "string" and func ~= "") then
+		NPL.DoString(func);
 	end
 end

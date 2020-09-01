@@ -94,7 +94,10 @@
                         <input type="button" style="width:80px;height:26px;margin-top:-24px;margin-left:386px;color:#ffffff;" value='<%=L"开始任务" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
                     </pe:if>
                     <pe:if condition='<%=(TeachingQuestTitle.IsTaskInProcess())%>'>
-                        <input type="button" enabled="false" style="width:90px;height:26px;margin-top:-24px;margin-left:376px;color:#ffffff;" value='<%=L"任务进行中" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                        <div style="margin-top:-23px;margin-left:284px">
+                            <%=L"任务进行中"%>
+                            <input type="button" style="width:100px;height:26px;margin-top:-2px;margin-left:15px;color:#ffffff;" value='<%=L"确认完成" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.FinishedTask" />
+                        </div>
                     </pe:if>
                     <pe:if condition='<%=(TeachingQuestTitle.IsTaskFinished() and not TeachingQuestTitle.IsTaskInProcess())%>'>
                         <div style="margin-top:-23px;margin-left:284px">

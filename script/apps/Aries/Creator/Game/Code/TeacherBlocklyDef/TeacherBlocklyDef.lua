@@ -75,7 +75,7 @@ NPL.export({
 	},
 	category = "npc", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "anim",

@@ -75,10 +75,13 @@ local page;
 function TeachingQuestPage.OnInit()
 	page = document:GetPageCtrl();
 end
-function TeachingQuestPage.ShowPage(type)
-	TeachingQuestPage.currentType = type;
-	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type] or {};
-	TeachingQuestPage.CheckTaskCount(type);
+function TeachingQuestPage.ShowPage(type_)
+	if (type(type_) == "string") then
+		type_ = TeachingQuestPage.TaskTypeIndex[type_] or TeachingQuestPage.UnknowType;
+	end
+	TeachingQuestPage.currentType = type_;
+	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type_] or {};
+	TeachingQuestPage.CheckTaskCount(type_);
 	if (TeachingQuestPage.RefreshItem()) then
 		return;
 	end
@@ -101,7 +104,7 @@ function TeachingQuestPage.ShowPage(type)
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type]);
+	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type_]);
 	commonlib.TimerManager.SetTimeout(function()  
 		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
 		local state = L"  （本周已发放一张）";
@@ -139,26 +142,39 @@ function TeachingQuestPage.CheckTaskCount(type)
 	end
 end
 
+function TeachingQuestPage.ResetTasks()
+	TeachingQuestPage.taskCallback = {};
+end
+
 function TeachingQuestPage.AddTasks(tasks, type)
-	TeachingQuestPage.quests[type] = tasks;
-	commonlib.TimerManager.SetTimeout(function()  
-		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);
-		local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[type]);
-		local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
-		if (count < max) then
-			if (ticket > 0) then
-				TeachingQuestPage.taskCallback[type](TeachingQuestPage.TaskInProgress);
-			else
-				TeachingQuestPage.taskCallback[type](TeachingQuestPage.HasNewTask);
+	if (tasks ~= nil and #tasks > 1) then
+		TeachingQuestPage.quests[type] = tasks;
+	end
+	local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[type]);
+	local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[type]);
+	local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
+	if (count < max) then
+		if (ticket > 0) then
+			for i = 1, #TeachingQuestPage.taskCallback[type] do
+				TeachingQuestPage.taskCallback[type][i](TeachingQuestPage.TaskInProgress);
 			end
 		else
-			TeachingQuestPage.taskCallback[type](TeachingQuestPage.AllFinished);
+			for i = 1, #TeachingQuestPage.taskCallback[type] do
+				TeachingQuestPage.taskCallback[type][i](TeachingQuestPage.HasNewTask);
+			end
 		end
-	end, 2000)
+	else
+		for i = 1, #TeachingQuestPage.taskCallback[type] do
+			TeachingQuestPage.taskCallback[type][i](TeachingQuestPage.AllFinished);
+		end
+	end
 end
 
 function TeachingQuestPage.RegisterTasksChanged(callback, type)
-	TeachingQuestPage.taskCallback[type] = callback;
+	if (not TeachingQuestPage.taskCallback[type]) then
+		TeachingQuestPage.taskCallback[type] = {};
+	end
+	table.insert(TeachingQuestPage.taskCallback[type], callback);
 end
 
 function TeachingQuestPage.GetTaskOptions()

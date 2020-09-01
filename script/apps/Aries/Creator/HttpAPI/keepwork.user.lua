@@ -17,6 +17,8 @@ HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", 
 --http://yapi.kp-para.cn/project/32/interface/api/492
 HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true)
 
+-- https://api.keepwork.com/core/v0/users/3   更新用户信息
+HttpWrapper.Create("keepwork.user.setinfo", "%MAIN%/core/v0/users/:id", "PUT", true);
 
 --http://yapi.kp-para.cn/project/32/interface/api/2552
 HttpWrapper.Create("keepwork.user.getinfo", "%MAIN%/core/v0/users/:id/detail", "GET", true, nil,

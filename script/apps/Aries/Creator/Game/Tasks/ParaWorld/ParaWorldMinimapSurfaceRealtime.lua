@@ -17,6 +17,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapSur
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 local ParaWorldMinimapSurfaceRealtime = commonlib.inherit(commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurface"), commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurfaceRealtime"));
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconColor", "#ffffff80"});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIcon", "Texture/Aries/WorldMaps/common/maparrow_32bits.png"});
@@ -24,6 +25,7 @@ ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconSize", 32});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconCenterX", 15});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconCenterY", 19});
 ParaWorldMinimapSurfaceRealtime:Property({"IsTrackMainPlayer", true});
+ParaWorldMinimapSurfaceRealtime:Property({"ClickToTeleport", true});
 
 -- mapping from block_id to block color like "#ff0000"
 local color_table = nil;
@@ -57,4 +59,25 @@ function ParaWorldMinimapSurfaceRealtime:paintEvent(painter)
 			end
 		end
 	end
+end
+
+-- virtual: 
+function ParaWorldMinimapSurfaceRealtime:mousePressEvent(mouse_event)
+	if(mouse_event:button() == "left") then
+		mouse_event:accept();
+		local pos = mouse_event:localPos();
+		local x, z = self:MapToWorldPos(pos[1], pos[2])
+		local y = self:GetHeightByWorldPos(x, z)
+		if(y) then
+			GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
+		end
+	end
+end
+
+-- virtual: 
+function ParaWorldMinimapSurfaceRealtime:mouseReleaseEvent(mouse_event)
+end
+
+-- virtual: 
+function ParaWorldMinimapSurfaceRealtime:mouseWheelEvent(mouse_event)
 end

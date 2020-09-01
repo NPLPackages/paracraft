@@ -100,6 +100,15 @@ function KpChatChannel.GetUserId()
         return userId;
     end    
 end
+
+function KpChatChannel.GetSchoolRoom()
+    local school = KeepWorkItemManager.GetSchool();
+    local id = school.id;
+    if(id)then
+        local room = string.format("__world_school_%s__",tostring(id));
+        return room
+    end
+end
 function KpChatChannel.GetRoom()
     if(KpChatChannel.worldId)then
         local room = string.format("__world_%s__",tostring(KpChatChannel.worldId));
@@ -187,11 +196,11 @@ function KpChatChannel.OnMsg(self, msg)
         local meta = info.meta;
         local action = info.action;
         local userInfo = info.userInfo;
-
         if(key == "app/msg" or key == "paracraftGlobal" )then
             if(payload and userInfo)then
 
 
+                local ChannelIndex = payload.ChannelIndex;
                 local worldId = payload.worldId;
                 local type = payload.type;
                 local content = payload.content;
@@ -211,23 +220,28 @@ function KpChatChannel.OnMsg(self, msg)
                 if(not KpChatChannel.IsInWorld())then
                     return
                 end
-                if(KpChatChannel.worldId ~= worldId and key == "app/msg" )then
-                    return
+
+                -- check if it is in the same world
+                if(ChannelIndex == ChatChannel.EnumChannels.KpNearBy)then
+                    if(meta.target ~= KpChatChannel.GetRoom())then
+                        return
+                    end    
                 end
-                
-				if (key == "app/msg" and meta.target ~= KpChatChannel.GetRoom()) then
-					return
-				end
+
+                -- check if it is in the same school
+                if(ChannelIndex == ChatChannel.EnumChannels.KpSchool)then
+                    if(meta.target ~= KpChatChannel.GetSchoolRoom())then
+                        return
+                    end    
+                end
 
                 local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
        
-                local ChannelIndex;
-                if(type == 2)then
-                    ChannelIndex = ChatChannel.EnumChannels.KpNearBy;
-                elseif(type == 3)then
-                    ChannelIndex = ChatChannel.EnumChannels.KpBroadCast;
-                end
+
                 local channelname = ChatChannel.channels[ChannelIndex];
+                if(not channelname)then
+                    return
+                end
                 local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, 
                 vip = vip, student = student, orgAdmin = orgAdmin, tLevel = tLevel, 
                 timestamp = timestamp, kp_from_name = kp_from_name, kp_from_id = userId, kp_username = username,  kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
@@ -410,6 +424,12 @@ function KpChatChannel.JoinWorld(worldId)
     local room = KpChatChannel.GetRoom();
 	LOG.std(nil, "info", "KpChatChannel", "try to join world %s", room);
     KpChatChannel.client:Send("app/join",{ rooms = { room }, });
+
+    local room_school = KpChatChannel.GetSchoolRoom();
+    if(room_school)then
+        LOG.std(nil, "info", "KpChatChannel", "try to join school room %s", room_school);
+        KpChatChannel.client:Send("app/join",{ rooms = { room_school }, });
+    end
 end
 function KpChatChannel.LeaveWorld(worldId)
     if(not worldId)then
@@ -470,14 +490,16 @@ end
 -- http://yapi.kp-para.cn/project/60/interface/api/1952
 function KpChatChannel.CreateMessage( ChannelIndex, to, toname, words)
 	local msgdata;
-    local target = KpChatChannel.GetRoom();
     local worldId = KpChatChannel.worldId;
     if(not worldId)then
 		LOG.std(nil, "warn", "KpChatChannel", "world id is required");
         return
     end
     if(ChannelIndex == ChatChannel.EnumChannels.KpNearBy)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = target, worldId = worldId, words = words, type = 2, is_keepwork = true, };
+	    msgdata = { ChannelIndex = ChannelIndex, target = KpChatChannel.GetRoom(), worldId = worldId, words = words, type = 2, is_keepwork = true, };
+
+    elseif(ChannelIndex == ChatChannel.EnumChannels.KpSchool)then
+	    msgdata = { ChannelIndex = ChannelIndex, target = KpChatChannel.GetSchoolRoom(), worldId = worldId, words = words, type = 2, is_keepwork = true, };
 
     elseif(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
 	    msgdata = { ChannelIndex = ChannelIndex, target = "paracraftGlobal", worldId = worldId, words = words, type = 3, is_keepwork = true, };
@@ -503,6 +525,7 @@ function KpChatChannel.SendToServer(msgdata)
     local kp_msg = {
         target = msgdata.target,
         payload = {
+            ChannelIndex = msgdata.ChannelIndex,
             content = msgdata.words,
             worldId = msgdata.worldId,
             type = msgdata.type,

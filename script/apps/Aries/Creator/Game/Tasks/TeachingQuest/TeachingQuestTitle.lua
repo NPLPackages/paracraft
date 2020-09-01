@@ -28,7 +28,8 @@ function TeachingQuestTitle.CreateOrGetBrowserPage()
 	return NplBrowserManager:CreateOrGet("TeachingQuest_BrowserPage");
 end
 function TeachingQuestTitle.OnWorldLoaded()
-	TeachingQuestTitle.CreateOrGetBrowserPage():Close();
+	TeachingQuestPage.ResetTasks();
+	--TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	if (page) then
 		page:CloseWindow();
 	end
@@ -54,6 +55,9 @@ function TeachingQuestTitle.OnWorldLoaded()
 			GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 			GameLogic.RunCommand("/hide quickselectbar");
             DockPage.Show();
+			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+			ClassManager.OnWorldLoaded();
+
 		end, 200)
 	else
 		if (TeachingQuestPage.IsTaskProject(projectId)) then
@@ -130,13 +134,13 @@ end
 
 function TeachingQuestTitle.OnShowEscFrame(bShow)
 	if(bShow or bShow == nil) then
-		TeachingQuestTitle.CreateOrGetBrowserPage():Close();
+		--TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	end
 	return bShow;
 end
 
 function TeachingQuestTitle.OnShowExitDialog(p1)
-	TeachingQuestTitle.CreateOrGetBrowserPage():Close();
+	--TeachingQuestTitle.CreateOrGetBrowserPage():Close();
 	return p1;
 end
 
@@ -216,8 +220,9 @@ function TeachingQuestTitle.IsTaskFinished()
 	return state == TeachingQuestPage.Finished;
 end
 
+local taskInProcess = false;
 function TeachingQuestTitle.IsTaskInProcess()
-	return TeachingQuestTitle.CreateOrGetBrowserPage():IsVisible();
+	return taskInProcess;
 end
 
 function TeachingQuestTitle.GetTotalTickets()
@@ -235,11 +240,13 @@ function TeachingQuestTitle.ReceiveTicket()
 	end);
 end
 
+local firstStart = true;
 function TeachingQuestTitle.StartTask()
 	local task = TeachingQuestPage.GetCurrentSelectTask(TeachingQuestPage.currentIndex);
 	--task.url = "https://keepwork.com/official/tips/cad/1_2_11921";
 	if (task and task.url) then
-		local function ShowTaskVideo(firstStart)
+		local function ShowTaskVideo(first)
+			--[[
 			-- always set width=1080, height=656 if window'size > 1080 * 656
 			local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 			local left, top = 2000, 1000;
@@ -286,6 +293,12 @@ function TeachingQuestTitle.StartTask()
 				end
 			end);
 			TeachingQuestTitle.CreateOrGetBrowserPage():OnResize();
+			]]
+
+			firstStart = first;
+			taskInProcess = true;
+			ParaGlobal.ShellExecute("open", task.url, "", "", 1);
+			TeachingQuestTitle.ShowPage("?info=task");
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then
@@ -306,7 +319,27 @@ function TeachingQuestTitle.StartTask()
 	end
 end
 
+function TeachingQuestTitle.FinishedTask()
+	if (firstStart) then
+		firstStart = false;
+		if (TeachingQuestPage.IsVip()) then
+			GameLogic.AddBBS("statusBar", L"获得了20个知识豆。", 3000, "0 255 0");
+			_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆。您已开通VIP，自动获得了20知识豆！");
+		else
+			GameLogic.AddBBS("statusBar", L"获得了10个知识豆。", 3000, "0 255 0");
+			_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆，是否开通VIP获取双倍知识豆？", function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+					ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		end
+	end
+	taskInProcess = false;
+	TeachingQuestTitle.ShowPage("?info=task");
+end
+
 function TeachingQuestTitle.OnClose()
+	taskInProcess = false;
 	GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
 	GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 	page:CloseWindow();
@@ -315,6 +348,7 @@ end
 
 function TeachingQuestTitle.OnReturn()
 	local function ReturnMainWorld()
+		taskInProcess = false;
 		GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
 		GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 		GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);

@@ -13,6 +13,7 @@ ParaWorldMinimapWnd:Close();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapSurface.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 local ParaWorldMinimapSurface = commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurface");
 local Window = commonlib.gettable("System.Windows.Window");
 local ParaWorldMinimapWnd = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd"));
@@ -26,7 +27,7 @@ function ParaWorldMinimapWnd:Show()
 
 		self.window2 = Window:new();
 	end
-	
+
 	self.window:Show({
 		name="ParaWorldMinimapWnd", 
 		url="script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.html?isSurface=true",
@@ -39,6 +40,7 @@ function ParaWorldMinimapWnd:Show()
 		alignment="_rt", left=-202, top=10, width = 192, height = 220, zorder = -11
 	});
 end
+
 
 function ParaWorldMinimapWnd.CloseWindow()
 	local self = ParaWorldMinimapWnd

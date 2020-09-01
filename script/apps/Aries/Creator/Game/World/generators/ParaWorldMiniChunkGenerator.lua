@@ -10,6 +10,7 @@ ChunkGenerators:Register("paraworldMini", ParaWorldMiniChunkGenerator);
 -----------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
@@ -35,6 +36,9 @@ end
 
 function ParaWorldMiniChunkGenerator:OnExit()
 	ParaWorldMiniChunkGenerator._super.OnExit(self);
+	if(self.timer) then
+		self.timer:Change();
+	end
 end
 
 
@@ -102,6 +106,31 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	if(count) then
 		self.count = count;
 		self:ShowBlockTip()
+	end
+	self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:OnTimer()
+	end})
+	self.timer:Change(1000, 1000);
+end
+
+function ParaWorldMiniChunkGenerator:OnTimer()
+	local player = EntityManager.GetPlayer()
+	local x, y, z = player:GetBlockPos();
+	local minX, minY, minZ = self:GetPivot();
+	local maxX = minX+128;
+	local maxZ = minZ+128;
+	local newX = math.min(maxX-5, math.max(minX+5, x));
+	local newZ = math.min(maxZ-5, math.max(minZ+5, z));
+	local newY = math.max(minY, y);
+	if(x~=newX or y~=newY or z~=newZ) then
+		player:SetBlockPos(newX, newY, newZ)
+		if(y~=newY and not GameLogic.IsReadOnly()) then
+			local blockTemplate = BlockEngine:GetBlock(newX, minY-1, newZ)	
+			if(not blockTemplate) then
+				local ground_block_id = 62;
+				BlockEngine:SetBlock(newX, minY-1, newZ, ground_block_id);
+			end
+		end
 	end
 end
 

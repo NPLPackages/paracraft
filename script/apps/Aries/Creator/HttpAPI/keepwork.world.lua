@@ -26,6 +26,7 @@ HttpWrapper.Create("keepwork.miniworld.list", "%MAIN%/core/v0/3DCampus/paraMinis
 
 --http://yapi.kp-para.cn/project/32/interface/api/2837
 -- 获取我的paraWorld列表
+-- 第一个世界为用户默认的世界
 HttpWrapper.Create("keepwork.world.mylist", "%MAIN%/core/v0/3DCampus/my/paraWorlds", "GET", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/2772
