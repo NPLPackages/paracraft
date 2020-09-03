@@ -382,11 +382,13 @@ function Desktop.OnExit(bForceExit, bRestart)
 	if(GameLogic.IsReadOnly()) then
 		if(bForceExit or Desktop.is_exiting) then
 			-- double click to exit without saving. 
-			checkLockWorld(function()
-				local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-				KeepworkServiceSession:Logout();
-				Desktop.ForceExit();
-			end);
+			if (not System.options.isCodepku) then
+				checkLockWorld(function()
+					local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+					KeepworkServiceSession:Logout();
+					Desktop.ForceExit();
+				end);
+			end
 		else
 			Desktop.is_exiting = true;
 
@@ -401,11 +403,17 @@ function Desktop.OnExit(bForceExit, bRestart)
 				callback = function(res)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
-						--Desktop.ForceExit(bRestart);
-						ParaWorldLoginAdapter:EnterWorld(true);
+						if (not System.options.isCodepku) then
+							ParaWorldLoginAdapter:EnterWorld(true);
+						else
+							Desktop.ForceExit(bRestart);
+						end
 					elseif(res and res == _guihelper.DialogResult.No) then
-						--Desktop.ForceExit(bRestart);
-						ParaWorldLoginAdapter:EnterWorld(true);
+						if (not System.options.isCodepku) then
+							ParaWorldLoginAdapter:EnterWorld(true);
+						else
+							Desktop.ForceExit(bRestart);
+						end
 					end
 				end
 			};
@@ -421,11 +429,13 @@ function Desktop.OnExit(bForceExit, bRestart)
 			if(Desktop.is_exiting) then
 				-- GameLogic.QuickSave();
 			end
-			checkLockWorld(function()
-				local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-				KeepworkServiceSession:Logout();
-				Desktop.ForceExit();
-			end);
+			if (not System.options.isCodepku) then
+				checkLockWorld(function()
+					local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+					KeepworkServiceSession:Logout();
+					Desktop.ForceExit();
+				end);
+			end
 		else
 			Desktop.is_exiting = true;
 			local projectId = GameLogic.options:GetProjectId();
@@ -440,11 +450,17 @@ function Desktop.OnExit(bForceExit, bRestart)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
-						--Desktop.ForceExit(bRestart);
-						ParaWorldLoginAdapter:EnterWorld(true);
+						if (not System.options.isCodepku) then
+							ParaWorldLoginAdapter:EnterWorld(true);
+						else
+							Desktop.ForceExit(bRestart);
+						end
 					elseif(res and res == _guihelper.DialogResult.No) then
-						--Desktop.ForceExit(bRestart);
-						ParaWorldLoginAdapter:EnterWorld(true);
+						if (not System.options.isCodepku) then
+							ParaWorldLoginAdapter:EnterWorld(true);
+						else
+							Desktop.ForceExit(bRestart);
+						end
 					end
 				end
 			};

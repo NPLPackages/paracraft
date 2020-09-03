@@ -65,6 +65,11 @@
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
   <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
   <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
+  <asset filename="character/CC/02human/paperman/Female_teachers.x" name="Female_teachers" displayname="女老师"/>
+  <asset filename="character/CC/02human/paperman/Male_teacher.x" name="Male_teacher" displayname="男老师"/>
+  <asset filename="character/CC/02human/paperman/xiaolong.x" name="xiaolong" displayname="小龙"/>
+  <asset filename="character/CC/02human/paperman/zaizai.x" name="zaizai" displayname="崽崽"/>
+  <asset filename="character/CC/02human/paperman/nuannuan.x" name="nuannuan" displayname="囡囡"/>
 </category>
 <category name="people">
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
@@ -82,7 +87,13 @@
   <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
   <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
   <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
-  <!-- artwar in shanghai角色
+  <asset filename="character/CC/02human/paperman/Female_teachers.x" name="Female_teachers" displayname="女老师"/>
+  <asset filename="character/CC/02human/paperman/Male_teacher.x" name="Male_teacher" displayname="男老师"/>
+  <asset filename="character/CC/02human/paperman/xiaolong.x" name="xiaolong" displayname="小龙"/>
+  <asset filename="character/CC/02human/paperman/zaizai.x" name="zaizai" displayname="崽崽"/>
+  <asset filename="character/CC/02human/paperman/nuannuan.x" name="nuannuan" displayname="囡囡"/>
+
+    <!-- artwar in shanghai角色
   <asset filename="character/CC/artwar/game/sunbin.x" displayname="孙膑" name="sunbin"/>
   <asset filename="character/CC/artwar/game/sunbin_junshi.x" displayname="孙膑军师" name="sunbin_adviser"/>
   <asset filename="character/CC/artwar/game/pangjuan.x" displayname="庞涓" name="pangjuan"/>
@@ -168,6 +179,51 @@
   <asset filename="character/CC/02human/blockman/soldier_red.x" displayname="小士兵红色" name="soldier_red"/>
   <asset filename="character/CC/02human/blockman/rider_black.x" displayname="小骑兵黑色" name="rider_black"/>
   <asset filename="character/CC/02human/blockman/rider_red.x" displayname="小骑兵红色" name="rider_red"/>
+
+<!-- 创意空间社区专用学生模型 -->
+  <!-- <asset filename="character/CC/artwar/movie/school5.x" displayname="男老师" name="shcool5"/>
+  <asset filename="character/CC/artwar/movie/school21.x" displayname="女老师" name="shcool21"/> -->
+  <asset filename="character/CC/artwar/movie/school42.x" displayname="博物馆长" name="shcool42"/>
+  <!-- <asset filename="character/CC/artwar/movie/school1.x" displayname="向明小学男生1" name="shcool1"/>
+  <asset filename="character/CC/artwar/movie/school2.x" displayname="向明小学男生2" name="shcool2"/>
+  <asset filename="character/CC/artwar/movie/school3.x" displayname="向明小学男生3" name="shcool3"/>
+  <asset filename="character/CC/artwar/movie/school4.x" displayname="向明小学男生4" name="shcool4"/>
+  <asset filename="character/CC/artwar/movie/school6.x" displayname="朝阳小学男生1" name="shcool6"/>
+  <asset filename="character/CC/artwar/movie/school7.x" displayname="朝阳小学男生2" name="shcool7"/>
+  <asset filename="character/CC/artwar/movie/school8.x" displayname="朝阳小学男生3" name="shcool8"/>
+  <asset filename="character/CC/artwar/movie/school9.x" displayname="朝阳小学男生4" name="shcool9"/>
+  <asset filename="character/CC/artwar/movie/school10.x" displayname="南山小学男生1" name="shcool10"/>
+  <asset filename="character/CC/artwar/movie/school11.x" displayname="南山小学男生2" name="shcool11"/>
+  <asset filename="character/CC/artwar/movie/school12.x" displayname="南山小学男生3" name="shcool12"/>
+  <asset filename="character/CC/artwar/movie/school13.x" displayname="南山小学男生4" name="shcool13"/>
+  <asset filename="character/CC/artwar/movie/school14.x" displayname="思南小学男生1" name="shcool14"/>
+  <asset filename="character/CC/artwar/movie/school15.x" displayname="思南小学男生2" name="shcool15"/>
+  <asset filename="character/CC/artwar/movie/school16.x" displayname="思南小学男生3" name="shcool16"/>
+  <asset filename="character/CC/artwar/movie/school40.x" displayname="思南小学男生4" name="shcool41"/>
+  <asset filename="character/CC/artwar/movie/school17.x" displayname="世外小学男生1" name="shcool17"/>
+  <asset filename="character/CC/artwar/movie/school18.x" displayname="世外小学男生2" name="shcool18"/>
+  <asset filename="character/CC/artwar/movie/school19.x" displayname="世外小学男生3" name="shcool19"/>
+  <asset filename="character/CC/artwar/movie/school20.x" displayname="世外小学男生4" name="shcool20"/>
+  <asset filename="character/CC/artwar/movie/school22.x" displayname="向明小学女生1" name="shcool22"/>
+  <asset filename="character/CC/artwar/movie/school23.x" displayname="向明小学女生2" name="shcool23"/>
+  <asset filename="character/CC/artwar/movie/school24.x" displayname="向明小学女生3" name="shcool24"/>
+  <asset filename="character/CC/artwar/movie/school25.x" displayname="向明小学女生4" name="shcool25"/>
+  <asset filename="character/CC/artwar/movie/school26.x" displayname="向明小学女生5" name="shcool26"/>
+  <asset filename="character/CC/artwar/movie/school27.x" displayname="南山小学女生1" name="shcool27"/>
+  <asset filename="character/CC/artwar/movie/school28.x" displayname="南山小学女生2" name="shcool28"/>
+  <asset filename="character/CC/artwar/movie/school29.x" displayname="南山小学女生3" name="shcool29"/>
+  <asset filename="character/CC/artwar/movie/school30.x" displayname="南山小学女生4" name="shcool30"/>
+  <asset filename="character/CC/artwar/movie/school31.x" displayname="南山小学女生5" name="shcool31"/>
+  <asset filename="character/CC/artwar/movie/school32.x" displayname="思南小学女生1" name="shcool32"/>
+  <asset filename="character/CC/artwar/movie/school33.x" displayname="思南小学女生2" name="shcool33"/>
+  <asset filename="character/CC/artwar/movie/school34.x" displayname="思南小学女生3" name="shcool34"/>
+  <asset filename="character/CC/artwar/movie/school35.x" displayname="思南小学女生4" name="shcool35"/>
+  <asset filename="character/CC/artwar/movie/school43.x" displayname="思南小学女生5" name="shcool43"/>
+  <asset filename="character/CC/artwar/movie/school36.x" displayname="世外小学女生1" name="shcool36"/>
+  <asset filename="character/CC/artwar/movie/school37.x" displayname="世外小学女生2" name="shcool37"/>
+  <asset filename="character/CC/artwar/movie/school38.x" displayname="世外小学女生3" name="shcool38"/>
+  <asset filename="character/CC/artwar/movie/school39.x" displayname="世外小学女生4" name="shcool39"/>
+  <asset filename="character/CC/artwar/movie/school40.x" displayname="世外小学女生5" name="shcool40"/> -->
 
 
   <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="大使" name="ABML"/>
