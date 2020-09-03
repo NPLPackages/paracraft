@@ -113,7 +113,9 @@ end
 
 -- virtual function:
 function ChunkGenerator:OnSaveWorld()
-	
+end
+
+function ChunkGenerator:OnLoadWorld()
 end
 
 function ChunkGenerator:GetWorld()

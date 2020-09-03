@@ -36,8 +36,8 @@ end
 
 function ParaWorldMiniChunkGenerator:OnExit()
 	ParaWorldMiniChunkGenerator._super.OnExit(self);
-	if(self.timer) then
-		self.timer:Change();
+	if(self.lock_timer) then
+		self.lock_timer:Change();
 	end
 end
 
@@ -110,13 +110,13 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 	
-	self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
-		self:OnTimer()
+	self.lock_timer = self.lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:OnLockTimer()
 	end})
-	self.timer:Change(1000, 1000);
+	self.lock_timer:Change(1000, 1000);
 end
 
-function ParaWorldMiniChunkGenerator:OnTimer()
+function ParaWorldMiniChunkGenerator:OnLockTimer()
 	local player = EntityManager.GetPlayer()
 	local x, y, z = player:GetBlockPos();
 	local minX, minY, minZ = self:GetPivot();
