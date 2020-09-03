@@ -131,7 +131,9 @@ end
 function TChatRoomPage.AllowChat()
 	ClassManager.SendMessage("cmd:canspeak");
 	ClassManager.CanSpeak = true;
-	page:Refresh(0);
+	if (page) then
+		page:Refresh(0);
+	end
 end
 
 function TChatRoomPage.SendMessage()

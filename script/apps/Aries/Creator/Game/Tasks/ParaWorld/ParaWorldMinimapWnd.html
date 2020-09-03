@@ -10,10 +10,13 @@
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 isSurface = Page:GetRequestParam("isSurface") == "true"
+if(isSurface) then
+    ParaWorldMinimapWnd.OnInit()
+end
 ]]>
 </script>
 <pe:if condition="<%=isSurface%>">
-    <pe:custom src="ParaWorldMinimapSurface.lua" classns="Paracraft.Controls.ParaWorldMinimapSurface" style="margin-left:0px;margin-top:25px;width:192px;height:192px;"></pe:custom>
+    <pe:custom name="surface" src="ParaWorldMinimapSurface.lua" classns="Paracraft.Controls.ParaWorldMinimapSurface" style="margin-left:0px;margin-top:25px;width:192px;height:192px;"></pe:custom>
 </pe:if>
 <pe:if condition="<%=not isSurface%>">
     <div style="color:#ffffff;padding-left:5px;padding-top:5px;background-color:#000000;height:25px;width:192px">
@@ -21,7 +24,14 @@ isSurface = Page:GetRequestParam("isSurface") == "true"
         <!--<div style="float:left;width:155px"><%=ParaWorldMinimapWnd.GetWorldName()%></div>-->
         <!--<input type="button" onclick="ParaWorldMinimapWnd.CloseWindow()" name="close" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#367 63 18 18);width:18px;height:18px;margin-left:5px;" />-->
     </div>
-    <pe:custom src="ParaWorldMinimapSurfaceRealtime.lua" classns="Paracraft.Controls.ParaWorldMinimapSurfaceRealtime" style="margin-left:0px;width:192px;height:192px;"></pe:custom>
+    <pe:custom name="surfaceRealtime" src="ParaWorldMinimapSurfaceRealtime.lua" classns="Paracraft.Controls.ParaWorldMinimapSurfaceRealtime" style="margin-left:0px;width:192px;height:192px;"></pe:custom>
+    <div style="padding-left:2px;padding-bottom:2px;background-color:#000000;height:30px;width:192px;">
+        <div style="background-color:#f0f0f0;height:28px;width:188px;height:28px;padding-top:2px;">
+            <input type="button" tooltip="并行世界列表" onclick="ParaWorldMinimapWnd.OnClickParaWorldList()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_worldmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:85px;" />
+            <input type="button" tooltip="世界信息" onclick="ParaWorldMinimapWnd.OnLocalWorldInfo()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_localmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:8px;" />
+            <input type="button" tooltip="回到出生点" onclick="ParaWorldMinimapWnd.OnClickSpawnpoint()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_spawnpoint_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:5px;" />
+        </div>
+    </div>
 </pe:if>
 </pe:mcml>
 </html>

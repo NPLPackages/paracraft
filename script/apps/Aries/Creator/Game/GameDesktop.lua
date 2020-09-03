@@ -21,7 +21,8 @@ NPL.load("(gl)script/apps/Aries/Creator/ToolTipsPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 
 local TeamMembersPage = commonlib.gettable("MyCompany.Aries.Team.TeamMembersPage");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -361,21 +362,50 @@ function Desktop.OnExit(bForceExit, bRestart)
 	if(ModManager:OnClickExitApp(bForceExit, bRestart)) then
 		return
 	end
+
+	local function checkLockWorld(callback)
+        local currentEnterWorld = Mod.WorldShare.Store:Get("world/currentEnterWorld")
+        if (currentEnterWorld.project and currentEnterWorld.project.memberCount or 0) > 1 then
+            Mod.WorldShare.MsgBox:Show(L"请稍后...")
+			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
+            KeepworkServiceWorld:UnlockWorld(function()
+                if (callback) then
+                    callback()
+                end
+            end)
+		else
+			if (callback) then
+				callback()
+			end
+        end
+	end
 	if(GameLogic.IsReadOnly()) then
 		if(bForceExit or Desktop.is_exiting) then
 			-- double click to exit without saving. 
-			Desktop.ForceExit();
+			checkLockWorld(function()
+				local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+				KeepworkServiceSession:Logout();
+				Desktop.ForceExit();
+			end);
 		else
 			Desktop.is_exiting = true;
+
+			local projectId = GameLogic.options:GetProjectId();
+			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+				ParaWorldLoginAdapter.ShowExitWorld(true);
+				return true;
+			end
 
 			local dialog = {
 				text = L"确定要退出当前世界么？", 
 				callback = function(res)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
-						Desktop.ForceExit(bRestart);
+						--Desktop.ForceExit(bRestart);
+						ParaWorldLoginAdapter:EnterWorld(true);
 					elseif(res and res == _guihelper.DialogResult.No) then
-						Desktop.ForceExit(bRestart);
+						--Desktop.ForceExit(bRestart);
+						ParaWorldLoginAdapter:EnterWorld(true);
 					end
 				end
 			};
@@ -391,18 +421,30 @@ function Desktop.OnExit(bForceExit, bRestart)
 			if(Desktop.is_exiting) then
 				-- GameLogic.QuickSave();
 			end
-			Desktop.ForceExit();
+			checkLockWorld(function()
+				local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+				KeepworkServiceSession:Logout();
+				Desktop.ForceExit();
+			end);
 		else
 			Desktop.is_exiting = true;
+			local projectId = GameLogic.options:GetProjectId();
+			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+				ParaWorldLoginAdapter.ShowExitWorld(true);
+				return true;
+			end
+
 			local dialog = {
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
 				callback = function(res)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
-						Desktop.ForceExit(bRestart);
+						--Desktop.ForceExit(bRestart);
+						ParaWorldLoginAdapter:EnterWorld(true);
 					elseif(res and res == _guihelper.DialogResult.No) then
-						Desktop.ForceExit(bRestart);
+						--Desktop.ForceExit(bRestart);
+						ParaWorldLoginAdapter:EnterWorld(true);
 					end
 				end
 			};
@@ -423,20 +465,25 @@ function Desktop.ForceExit(bRestart)
 
 	local platform = System.os.GetPlatform();
 	if(platform == "android" or platform == "ios" ) then
+		GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 		-- disable close on these platform. 
 		MyCompany.Aries.Game.Exit();
 		-- soft restart the NPL runtime state to login screen. 
 		System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
 	elseif(System.options.IsMobilePlatform) then
+		GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 		MyCompany.Aries.Game.Exit();
 		-- soft restart the NPL runtime state to login screen. 
 		Map3DSystem.App.Commands.Call("Profile.Aries.MobileRestart");
 	else
 		ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);
 		if(bRestart) then
+			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 			Game.Exit();
 			System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
 		else
+			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+			ClassManager.OnExitApp();
 			Game.Exit();
 			ParaGlobal.ExitApp();
 		end

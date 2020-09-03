@@ -107,6 +107,9 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 		self.count = count;
 		self:ShowBlockTip()
 	end
+	GameLogic.RunCommand("/speedscale 2");
+	GameLogic.options:SetViewBobbing(false, true)
+	
 	self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
 		self:OnTimer()
 	end})

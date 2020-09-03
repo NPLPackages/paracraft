@@ -358,8 +358,8 @@ moveTo("myActorName::bone_name")
 		{
 			name = "duration",
 			type = "input_value",
-            shadow = { type = "math_number", value = 0.5,},
-			text = 0.5, 
+            shadow = { type = "math_number", value = -1,},
+			text = -1, 
 		},
 	},
 	category = "Motion", 
@@ -376,9 +376,11 @@ moveTo("myActorName::bone_name")
 walk(1,0) -- x,z
 walk(0,1) -- x,z
 walk(-1,0,-1) -- x,y,z
+walk(0,0,0,-1) -- walk and stop
 ]]},
 {desc = L"精准行走模式", canRun = true, code = [[
 walk(0.1, 0, 0, 0.1, true)
+walk(0,0,0) -- stop
 ]]}
 },
 },

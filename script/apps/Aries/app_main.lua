@@ -2684,6 +2684,9 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 		local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
 		TeachingQuestTitle.StaticInit();
 
+		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		ClassManager.OnWorldLoaded();
+
 		if(is_standalone) then
 			stage_states.connect_world = "done";
 			-- standalone mode will just log out the server. 

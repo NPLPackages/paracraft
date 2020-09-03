@@ -49,13 +49,17 @@ function ParaWorldMinimapSurfaceRealtime:paintEvent(painter)
 			
 			local x, y = self:WorldToMapPos(bx, bz)
 			if(x and y) then
+				painter:Save()
 				painter:SetPen(self.PlayerIconColor);
+
 				painter:PushMatrix()
 				painter:Translate(self:x() + x, self:y() + y)
 				painter:Rotate(facing / math.pi * 180)
 				local iconSize = self.PlayerIconSize;
 				painter:DrawRectTexture( - self.PlayerIconCenterX,  -self.PlayerIconCenterY, iconSize, iconSize, self.PlayerIcon)
 				painter:PopMatrix()
+
+				painter:Restore()
 			end
 		end
 	end

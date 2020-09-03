@@ -82,11 +82,22 @@ function KeepWorkItemManager.StaticInit()
     GameLogic.GetFilters():add_filter("OnKeepWorkLogin", KeepWorkItemManager.OnKeepWorkLogin_Callback);
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", KeepWorkItemManager.OnKeepWorkLogout_Callback)
 
+	
     -- for testing filter callback
     KeepWorkItemManager.GetFilter():add_filter("loading", function(state)
     end);
     KeepWorkItemManager.GetFilter():add_filter("loaded_all", function()
     end);
+end
+function KeepWorkItemManager.OnGGSMsg(msg)
+    msg = msg or {};
+    local action = msg.action;
+    -- for changing nickname
+    if(action == "UpdateNickName")then
+        -- force load profile
+        KeepWorkItemManager.LoadProfile(true);
+    end
+
 end
 function KeepWorkItemManager.GetFilter()
     return KeepWorkItemManager.filter;

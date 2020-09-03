@@ -531,13 +531,15 @@ Commands["clicktocontinue"] = {
 
 Commands["memlimit"] = {
 	name="memlimit", 
-	quick_ref="/memlimit [-v] [size_in_MB]", 
+	quick_ref="/memlimit [-v] [-s] [size_in_MB]", 
 	mode_deny = "",
 	mode_allow = "",
 	desc=[[change the memory limit of the block vertex buffer
 @param -v: set the visible chunk size
-/memlimit 100   : change memory limit to 100mb
-/memlimit -v 10   : change visible chunk limit to 10mb
+@param -s: silent mode
+/memlimit 500   : change memory limit to 500mb
+/memlimit -v 500   : change visible chunk limit to 500mb
+/memlimit -v -s 500   : silent mode
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local max_mem;
@@ -549,17 +551,24 @@ Commands["memlimit"] = {
 			local max_mem_bytes = max_mem*1024*1024;
 			-- convert to byte
 			local attr = ParaTerrain.GetBlockAttributeObject();
+			local isSilentMode = options["s"];
 			if(options["v"]) then
 				attr:SetField("MaxVisibleVertexBufferBytes", max_mem_bytes);
 				if(attr:GetField("VertexBufferSizeLimit", 0) < max_mem_bytes) then
 					attr:SetField("VertexBufferSizeLimit", max_mem_bytes);
-					GameLogic.AddBBS(nil, format(L"memory and visible chunk limit changed: %d mb", max_mem));
+					if(not isSilentMode) then
+						GameLogic.AddBBS(nil, format(L"memory and visible chunk limit changed: %d mb", max_mem));
+					end
 				else
-					GameLogic.AddBBS(nil, format(L"visible chunk limit changed: %d mb", max_mem));
+					if(not isSilentMode) then
+						GameLogic.AddBBS(nil, format(L"visible chunk limit changed: %d mb", max_mem));
+					end
 				end
 			else
 				attr:SetField("VertexBufferSizeLimit", max_mem_bytes);
-				GameLogic.AddBBS(nil, format(L"memory limit changed: %d mb", max_mem));
+				if(not isSilentMode) then
+					GameLogic.AddBBS(nil, format(L"memory limit changed: %d mb", max_mem));
+				end
 			end
 		end
 	end,

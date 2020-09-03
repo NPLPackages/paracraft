@@ -119,8 +119,6 @@ function StudentPanel.IsClassStarted()
 end
 
 function StudentPanel.StartClass()
-	ClassManager.JoinClassroom(ClassManager.CurrentClassroomId);
-	ClassManager.SendMessage("tip:join");
 	local projectId = GameLogic.options:GetProjectId();
 	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
 		if (page) then
@@ -128,6 +126,8 @@ function StudentPanel.StartClass()
 		else
 			StudentPanel.ShowPage();
 		end
+		ClassManager.JoinClassroom(ClassManager.CurrentClassroomId);
+		ClassManager.SendMessage("tip:join");
 	else
 		StudentPanel.EnterTeachingWorld(ClassManager.CurrentWorldId)
 	end
@@ -135,7 +135,6 @@ end
 
 function StudentPanel.EnterTeachingWorld(worldId)
 	GameLogic:Connect("WorldLoaded", StudentPanel, StudentPanel.OnWorldLoaded, "UniqueConnection");
-	--GameLogic:Connect("WorldUnloaded", StudentPanel, StudentPanel.OnWorldUnload, "UniqueConnection");
 	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 	UserConsole:HandleWorldId(worldId, "force");
 end
@@ -145,11 +144,8 @@ function StudentPanel.OnWorldLoaded()
 	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
 		commonlib.TimerManager.SetTimeout(function()
 			StudentPanel.ShowPage();
+			ClassManager.JoinClassroom(ClassManager.CurrentClassroomId);
+			ClassManager.SendMessage("tip:join");
 		end, 1000);
 	end
 end
-
-function StudentPanel.OnWorldUnload()
-	local projectId = tostring(GameLogic.options:GetProjectId());
-end
-

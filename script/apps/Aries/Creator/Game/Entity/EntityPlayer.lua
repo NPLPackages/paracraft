@@ -853,14 +853,6 @@ function Entity:UpdateActionState()
 	end
 end
 
-function Entity:GetSpeedScale()
-	return GameLogic.options.WalkSpeedScale;
-end
-
-function Entity:SetSpeedScale(value)
-	self.speedscale = value;
-end
-
 function Entity:GetCurrentSpeedScale()
 	local speed;
 	if(self:IsFlying()) then

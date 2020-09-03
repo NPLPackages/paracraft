@@ -118,6 +118,7 @@ end
 
 function TeacherPanel.Lock()
 	TeacherPanel.IsLocked = true;
+	ClassManager.IsLocking = true;
 	if (page) then
 		page:Refresh(0);
 	end
@@ -126,6 +127,7 @@ end
 
 function TeacherPanel.UnLock()
 	TeacherPanel.IsLocked = false;
+	ClassManager.IsLocking = false;
 	if (page) then
 		page:Refresh(0);
 	end
@@ -153,6 +155,7 @@ function TeacherPanel.ConnectClass()
 			GameLogic.RunCommand("/connectGGS -isSyncBlock");
 			ClassManager.SendMessage("cmd:connect");
 			GameLogic.AddBBS(nil, L"联机成功！", 3000, "0 255 0");
+			ClassManager.InGGS = true;
 		end
 	end, _guihelper.MessageBoxButtons.OKCancel);
 end
@@ -190,7 +193,6 @@ end
 
 function TeacherPanel.EnterTeachingWorld(worldId)
 	GameLogic:Connect("WorldLoaded", TeacherPanel, TeacherPanel.OnWorldLoaded, "UniqueConnection");
-	--GameLogic:Connect("WorldUnloaded", TeacherPanel, TeacherPanel.OnWorldUnload, "UniqueConnection");
 	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 	UserConsole:HandleWorldId(worldId, "force");
 end
@@ -203,8 +205,3 @@ function TeacherPanel.OnWorldLoaded()
 		end, 1000);
 	end
 end
-
-function TeacherPanel.OnWorldUnload()
-	local projectId = tostring(GameLogic.options:GetProjectId());
-end
-

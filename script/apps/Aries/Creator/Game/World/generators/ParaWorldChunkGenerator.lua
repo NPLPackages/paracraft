@@ -30,6 +30,11 @@ function ParaWorldChunkGenerator:OnExit()
 	ParaWorldChunkGenerator._super.OnExit(self);
 end
 
+function ParaWorldChunkGenerator:OnLoadWorld()
+	GameLogic.RunCommand("/speedscale 2");
+	GameLogic.options:SetViewBobbing(false, true)
+end
+
 -- get params for generating flat terrain
 -- one can modify its properties before running custom chunk generator. 
 function ParaWorldChunkGenerator:GetFlatLayers()

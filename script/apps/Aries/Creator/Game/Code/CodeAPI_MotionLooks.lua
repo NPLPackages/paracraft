@@ -49,7 +49,7 @@ end
 -- it will move at the default speed. 
 -- @param dx,dy,dz: if z is nil, y is z. in block unit, can be real numbers, 
 -- if dx=0, dy=0, dz=0, it means that we will stop walking. 
--- @param duration: default to none
+-- @param duration: default to none. if negative, we will stop the player when time has reached. 
 -- @param bIsAccurate: if true, we will move precisely dx,dy,dz offset(can be real numbers). 
 -- otherwise we will only walk to integer target block position (no movement if offset does not land in a new block).
 function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
@@ -64,7 +64,9 @@ function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
 			entity:EnableAnimation(true);
 			entity:SetDummy(false);
 			entity:SetBlockTarget();
-			env_imp.wait(self, duration);
+			if(not duration or  duration>=0) then
+				env_imp.wait(self, duration);
+			end
 			return
 		end
 		if(not bIsAccurate) then
@@ -83,7 +85,8 @@ function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
 			entity:EnableAnimation(true);
 			entity:SetDummy(false);
 			entity:SetBlockTarget(x,y,z);
-			if(not duration) then
+			local stopAfterDuration = duration and duration < 0;
+			if(not duration or stopAfterDuration) then
 				if(dx == 0 and dz == 0) then
 					duration = 0.01
 				else
@@ -91,6 +94,17 @@ function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
 				end
 			end
 			env_imp.wait(self, duration);
+
+			if(stopAfterDuration) then
+				for i=1, 10 do
+					if(entity:HasTarget()) then
+						env_imp.wait(self, 0.6);
+					end
+				end
+				entity:EnableAnimation(true);
+				entity:SetDummy(false);
+				entity:SetBlockTarget();
+			end
 		end
 	end
 end

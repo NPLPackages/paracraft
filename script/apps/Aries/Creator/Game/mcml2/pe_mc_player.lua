@@ -12,6 +12,12 @@ MyCompany.Aries.Game.mcml2.pe_mc_player:RegisterAs("pe:mc_player");
 
 NPL.load("(gl)script/ide/System/Windows/mcml/PageElement.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/Canvas3D.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PageElement = commonlib.gettable("System.Windows.mcml.PageElement");
 local Canvas3D = commonlib.gettable("MyCompany.Aries.Game.mcml2.Canvas3D");
 
@@ -67,8 +73,6 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		_this:SetRenderTargetSize(renderTargetSize, renderTargetSize);
 
 		local filename = self:GetAttributeWithCode("assetfile");
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
-		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 		PlayerAssetFile:Init();
 
 		local obj_params = ObjEditor.GetObjectParams(ParaScene.GetPlayer());
@@ -131,8 +135,6 @@ function pe_mc_player:OnAfterChildLayout(layout, left, top, right, bottom)
 end
 
 function pe_mc_player:AutoSetObjectSkin(obj_params)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
-	local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 	obj_params.ReplaceableTextures = obj_params.ReplaceableTextures or {};
 	if(not PlayerSkins:CheckModelHasSkin(obj_params.AssetFile)) then
 		obj_params.ReplaceableTextures[2] = nil;

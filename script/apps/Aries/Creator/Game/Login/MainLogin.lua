@@ -517,6 +517,11 @@ function MainLogin:ShowLoginModePage()
     local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
     KpChatChannel.StaticInit();
 
+	if (not System.options.isCodepku) then
+		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		ClassManager.StaticInit();
+	end
+
 	if(not System.options.isSchool) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 		local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
@@ -606,9 +611,15 @@ function MainLogin:LoadMainWorld()
 	if(self:CheckLoadWorldFromCmdLine() or System.options.servermode) then
 		return;
 	end
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
-    local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
-    ParaWorldLoginAdapter:EnterWorld();
+	if (not System.options.isCodepku) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+		ParaWorldLoginAdapter:EnterWorld();
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+		local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+		InternetLoadWorld.ShowPage();
+	end
 end
 
 function MainLogin:ShowCreateWorldPage()

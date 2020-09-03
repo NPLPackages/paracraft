@@ -36,7 +36,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local icon = mcmlNode:GetAttributeWithCode("icon", nil, true)
 	local parent_width, parent_height = w, h;
 	
-	local title_height = mcmlNode:GetNumber("title_height") or 28;
+	local title_height = 28;
 	
 	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top, w, h);
 	_this.background = window_bg;
@@ -54,15 +54,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	_this.enabled = false;
 	_this.text = title or "";
 	_this.background = "";
-	if(title_height >= 32) then
-		if (mcmlNode:GetNumber("close_height")) then
-			_this.font = "System;14;bold";
-		else
-			_this.font = "System;20;bold";
-		end
-	else
-		_this.font = "System;14;bold";
-	end
+	_this.font = "System;14;bold";
 	_guihelper.SetUIFontFormat(_this, 36)
 	_guihelper.SetButtonFontColor(_this, "#FCFCFC", "#FCFCFC");
 	_parent:AddChild(_this);
@@ -70,17 +62,8 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
-		if (mcmlNode:GetNumber("close_height")) then
-			local btn_size = mcmlNode:GetNumber("close_height")
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
-		else
-			local btn_size = title_height - 2
-			if(title_height>=32) then
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 5, btn_size, btn_size);	
-			else
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 5, btn_size, btn_size);	
-			end
-		end
+		local btn_size = 22
+		_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-15, 10, btn_size, btn_size);	
 		
 		_this.background = close_bg;
 		_parent:AddChild(_this);

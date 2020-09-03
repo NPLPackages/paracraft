@@ -115,12 +115,19 @@ function ChatWindow.InitSystem()
 	GameLogic.GetFilters():add_filter("ggs", function(msg)
 	    LOG.std("", "info", "ChatWindow recieve ggs filter", msg);
         
+        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
         msg = msg or {};
         if(msg.action == "LoadWorld")then
+            DockPage.Show();
             ChatWindow.ResetPosition(true);
         elseif(msg.action == "ExitWorld")then
+            DockPage.Hide();
             ChatWindow.ResetPosition(false);
         end
+        KeepWorkItemManager.OnGGSMsg(msg);
+
     end)
 
 end

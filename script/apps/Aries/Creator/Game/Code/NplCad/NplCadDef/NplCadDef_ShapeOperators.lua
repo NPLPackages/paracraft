@@ -859,6 +859,7 @@ move(2,0,0)
 		},
 		
 	},
+	hide_in_toolbox = true,
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
@@ -904,6 +905,7 @@ move(2,0,0)
 		},
 		
 	},
+	hide_in_toolbox = true,
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,

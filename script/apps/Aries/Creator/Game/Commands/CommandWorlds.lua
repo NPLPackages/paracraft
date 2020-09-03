@@ -392,8 +392,11 @@ examples:
 		end
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 		local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
-		Desktop.ForceExit(true);
+		--Desktop.ForceExit(true);
 		--Desktop.OnLeaveWorld(bForceLeave, true);
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+		ParaWorldLoginAdapter:EnterWorld(true);
 	end,
 };
 

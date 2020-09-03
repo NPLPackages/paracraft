@@ -240,6 +240,11 @@ function GameLogic.InitCommon()
 	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 	ParaWorldMain:Init()
 
+	if (not System.options.isCodepku) then
+		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		ClassManager.StaticInit();
+	end
+
 	GameLogic.KeepWorkItemManager = KeepWorkItemManager;
 end
 
@@ -991,7 +996,7 @@ function GameLogic.FrameMove(timer)
 end
 
 function GameLogic.OnDead()
-	_guihelper.MessageBox(L"你挂了, 将被传送到出生点", function()
+	_guihelper.MessageBox(L"您已被重置回出生点。", function()
 		CommandManager:RunCommand("/tp home");
 	end)
 end
@@ -1511,9 +1516,16 @@ end
 -- toggle desktop view
 function GameLogic.ToggleDesktop(name)
 	if(name == "esc") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
-		local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
-		EscFramePage.ShowPage();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+		local projectId = GameLogic.options:GetProjectId();
+		if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+			ParaWorldLoginAdapter.ShowExitWorld(true);
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+			local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+			EscFramePage.ShowPage();
+		end
 	elseif(name == "builder") then
 		if(GameMode:IsUseCreatorBag()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
