@@ -25,7 +25,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref="/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|mod|physics|vision|quickselectbar|tips] [on|off]", 
+	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|
+mod|physics|vision|quickselectbar|tips|map] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -109,6 +110,10 @@ Other show filters:
 			NPL.load("(gl)script/ide/System/Scene/Overlays/OverlayPicking.lua");
 			local OverlayPicking = commonlib.gettable("System.Scene.Overlays.OverlayPicking");
 			OverlayPicking:DebugShow("_lt", 10, 10, 256, 256);
+		elseif(name == "map") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+			ParaWorldMinimapWnd:Show();
 		end
 	end,
 };
@@ -117,7 +122,8 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref="/hide [desktop|player|boundingbox|wireframe|touch|terrain|vision|ui|keyboard|quickselectbar|tips]", 
+	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
+vision|ui|keyboard|quickselectbar|tips|map]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -165,6 +171,10 @@ Commands["hide"] = {
 			TouchVirtualKeyboardIcon.ShowSingleton(false);
 		elseif(name == "terrain") then
 			GameLogic.RunCommand("/terrain -hide")
+		elseif(name == "map") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+			ParaWorldMinimapWnd:Close();
 		end
 	end,
 };

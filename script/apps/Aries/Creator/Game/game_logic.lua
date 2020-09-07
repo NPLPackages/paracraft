@@ -1519,7 +1519,7 @@ function GameLogic.ToggleDesktop(name)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 		local projectId = GameLogic.options:GetProjectId();
-		if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+		if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
 			ParaWorldLoginAdapter.ShowExitWorld(true);
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");

@@ -388,12 +388,14 @@ function Desktop.OnExit(bForceExit, bRestart)
 					KeepworkServiceSession:Logout();
 					Desktop.ForceExit();
 				end);
+			else
+				Desktop.ForceExit();
 			end
 		else
 			Desktop.is_exiting = true;
 
 			local projectId = GameLogic.options:GetProjectId();
-			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
 				ParaWorldLoginAdapter.ShowExitWorld(true);
 				return true;
 			end
@@ -435,11 +437,13 @@ function Desktop.OnExit(bForceExit, bRestart)
 					KeepworkServiceSession:Logout();
 					Desktop.ForceExit();
 				end);
+			else
+				Desktop.ForceExit();
 			end
 		else
 			Desktop.is_exiting = true;
 			local projectId = GameLogic.options:GetProjectId();
-			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
 				ParaWorldLoginAdapter.ShowExitWorld(true);
 				return true;
 			end
@@ -451,13 +455,17 @@ function Desktop.OnExit(bForceExit, bRestart)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
 						if (not System.options.isCodepku) then
-							ParaWorldLoginAdapter:EnterWorld(true);
+							checkLockWorld(function()
+								ParaWorldLoginAdapter:EnterWorld(true);
+							end);
 						else
 							Desktop.ForceExit(bRestart);
 						end
 					elseif(res and res == _guihelper.DialogResult.No) then
 						if (not System.options.isCodepku) then
-							ParaWorldLoginAdapter:EnterWorld(true);
+							checkLockWorld(function()
+								ParaWorldLoginAdapter:EnterWorld(true);
+							end);
 						else
 							Desktop.ForceExit(bRestart);
 						end

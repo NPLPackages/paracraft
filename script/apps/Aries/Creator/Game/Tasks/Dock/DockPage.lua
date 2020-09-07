@@ -57,11 +57,8 @@ function DockPage.IsShow()
 end
 function DockPage.OnClick(id)
     if(id == "character")then
-        NPL.load("Mod/GeneralGameServerMod/App/View/UserInfo.lua");
-        local UserInfo = commonlib.gettable("Mod.GeneralGameServerMod.App.View.UserInfo");
-        UserInfo:Show();
-        -- local ui = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/ui.lua");
-        -- ui:ShowWindow({url = "%ui%/Page/UserInfoPage.html"});
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        page.ShowUserInfoPage({username = System.User.keepworkUsername});
     elseif(id == "bag")then
         local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
         UserBagPage.ShowPage();

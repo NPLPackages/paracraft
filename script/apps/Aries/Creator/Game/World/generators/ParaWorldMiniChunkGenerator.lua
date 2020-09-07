@@ -122,16 +122,15 @@ function ParaWorldMiniChunkGenerator:OnLockTimer()
 	local minX, minY, minZ = self:GetPivot();
 	local maxX = minX+128;
 	local maxZ = minZ+128;
-	local newX = math.min(maxX-5, math.max(minX+5, x));
-	local newZ = math.min(maxZ-5, math.max(minZ+5, z));
-	local newY = math.max(minY, y);
+	local newX = math.min(maxX-5, math.max(minX+4, x));
+	local newZ = math.min(maxZ-5, math.max(minZ+4, z));
+	local newY = math.max(minY-1, y);
 	if(x~=newX or y~=newY or z~=newZ) then
 		player:SetBlockPos(newX, newY, newZ)
 		if(y~=newY and not GameLogic.IsReadOnly()) then
-			local blockTemplate = BlockEngine:GetBlock(newX, minY-1, newZ)	
+			local blockTemplate = BlockEngine:GetBlock(newX, minY-2, newZ)	
 			if(not blockTemplate) then
-				local ground_block_id = 62;
-				BlockEngine:SetBlock(newX, minY-1, newZ, ground_block_id);
+				BlockEngine:SetBlock(newX, minY-2, newZ, names.Bedrock);
 			end
 		end
 	end

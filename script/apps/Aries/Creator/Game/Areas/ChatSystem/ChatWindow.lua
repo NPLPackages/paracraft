@@ -128,6 +128,7 @@ function ChatWindow.InitSystem()
         end
         KeepWorkItemManager.OnGGSMsg(msg);
 
+		return msg;  -- 保证其它filter也能收到此消息
     end)
 
 end

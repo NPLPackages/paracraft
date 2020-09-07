@@ -75,6 +75,11 @@ function ParaWorldMinimapSurfaceRealtime:mousePressEvent(mouse_event)
 		if(y) then
 			GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
 		end
+	elseif(mouse_event:button() == "right") then
+		mouse_event:accept();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+		ParaWorldMinimapWnd:RefreshMap()
 	end
 end
 
