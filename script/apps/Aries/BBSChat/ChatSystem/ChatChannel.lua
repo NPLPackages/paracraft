@@ -93,6 +93,7 @@ ChatChannel.channels = {
 {name="全局",bshow=true,color="fced4b",}, -- "KpBroadCast" 22
 {name="官方公告",bshow=true,color="fced4b",}, -- "KpSystem" 23
 {name="学校",bshow=true,color="ffa74f",}, -- "KpSchool" 24
+{name="好友",bshow=true,color="00dcff",}, -- "KpFriend" 25
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;
@@ -119,6 +120,7 @@ local EnumChannels = {
 	KpBroadCast = 22,
 	KpSystem = 23,
 	KpSchool = 24,
+	KpFriend = 25,
     KpMax = 29,
 }
 ChatChannel.EnumChannels = EnumChannels;

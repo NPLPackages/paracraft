@@ -136,7 +136,8 @@ function KpChatChannel.Connect(url,options,onopen_callback)
     KpChatChannel.client:Connect(url,nil,{ token = KeepWorkItemManager.GetToken(), });
 end
 function KpChatChannel.OnOpen(self)
-	LOG.std("", "info", "KpChatChannel", "OnOpen");
+	local userId = KpChatChannel.GetUserId();
+	LOG.std("", "info", "KpChatChannel", "OnOpen userId:%s", tostring(userId));
     if(KpChatChannel.onopen_callback)then
         KpChatChannel.onopen_callback();
     end
@@ -234,7 +235,11 @@ function KpChatChannel.OnMsg(self, msg)
                         return
                     end    
                 end
-
+                if(ChannelIndex == ChatChannel.EnumChannels.KpFriend)then
+                    local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
+                    FriendManager:OnMsg(payload, msg);
+                    return
+                end
                 local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
        
 
@@ -436,7 +441,7 @@ function KpChatChannel.LeaveWorld(worldId)
         return
     end
     local room = KpChatChannel.GetRoom();
-	LOG.std(nil, "info", "KpChatChannel", "try to join world %s", room);
+	LOG.std(nil, "info", "KpChatChannel", "try to leave world %s", room);
     KpChatChannel.client:Send("app/leave",{ rooms = { room }, });
     KpChatChannel.Clear();
 end
@@ -484,11 +489,12 @@ function KpChatChannel.RefreshChatWindow()
 end
 -- create a chat message
 -- @param ChannelIndex	频道索引
--- @param to			接受者nid
+-- @param toid			接受者nid
 -- @param toname		接受者名字,可为nil
 -- @param words			消息内容
+-- @param roomName		房间ID
 -- http://yapi.kp-para.cn/project/60/interface/api/1952
-function KpChatChannel.CreateMessage( ChannelIndex, to, toname, words)
+function KpChatChannel.CreateMessage( ChannelIndex, toid, toname, words, roomName)
 	local msgdata;
     local worldId = KpChatChannel.worldId;
     if(not worldId)then
@@ -503,6 +509,9 @@ function KpChatChannel.CreateMessage( ChannelIndex, to, toname, words)
 
     elseif(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
 	    msgdata = { ChannelIndex = ChannelIndex, target = "paracraftGlobal", worldId = worldId, words = words, type = 3, is_keepwork = true, };
+
+    elseif(ChannelIndex == ChatChannel.EnumChannels.KpFriend)then
+	    msgdata = { ChannelIndex = ChannelIndex, target = roomName, worldId = worldId, words = words, type = 4, is_keepwork = true, toid = toid, };
     else
 		LOG.std(nil, "warn", "KpChatChannel", "[%s] unsupported channel index in KpChatChannel.SendMessage", tostring(ChannelIndex));
     end
@@ -530,12 +539,15 @@ function KpChatChannel.SendToServer(msgdata)
             worldId = msgdata.worldId,
             type = msgdata.type,
 
+            toid = msgdata.toid,
+
             id = user_info.id,
             username = user_info.username,
             nickname = user_info.nickname,
             vip = user_info.vip,
             student = user_info.student,
             orgAdmin = user_info.orgAdmin,
+            tLevel = user_info.tLevel,
             tLevel = user_info.tLevel,
         },
     }

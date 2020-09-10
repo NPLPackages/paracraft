@@ -20,6 +20,10 @@ HttpWrapper.Create("keepwork.world.joined_list", "%MAIN%/core/v0/joinedWorlds", 
 -- 上传paraMini世界
 HttpWrapper.Create("keepwork.miniworld.upload", "%MAIN%/core/v0/3DCampus/paraMinis", "POST", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3052
+-- 获取用户自己的paraMini列表
+HttpWrapper.Create("keepwork.miniworld.mylist", "%MAIN%/core/v0/3DCampus/my/paraMinis", "GET", true)
+
 --http://yapi.kp-para.cn/project/32/interface/api/2762
 -- 获取paraMini世界列表
 HttpWrapper.Create("keepwork.miniworld.list", "%MAIN%/core/v0/3DCampus/paraMinis", "GET", true)

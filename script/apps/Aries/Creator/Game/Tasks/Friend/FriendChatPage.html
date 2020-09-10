@@ -1,0 +1,150 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="FriendChatPage.lua"><![CDATA[
+local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
+FriendChatPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    FriendChatPage.CloseView();
+end
+function OnChange(index)
+    FriendChatPage.OnChange(index);
+end
+function IsSelected(index)
+    return FriendChatPage.index == index;
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #FriendChatPage.Current_Item_DS;
+    else
+        return FriendChatPage.Current_Item_DS[index];
+    end
+end
+function ClickItem(name,mcmlNode)
+    local item_index = mcmlNode:GetAttribute("param1")
+    FriendChatPage.ClickItem(item_index)
+end
+
+function IsItemSelect(item_index)
+    return FriendChatPage.IsItemSelect(item_index)
+end
+
+function GetTimeDesc(time)
+    return FriendChatPage.GetTimeDesc(time)
+end
+
+function GetChatName()
+    return FriendChatPage.GetChatName(time)
+end
+
+function SendMsg()
+    FriendChatPage.SendMsg()
+end
+
+function GetIcon(data)
+    return FriendChatPage.GetIcon(data)
+end
+
+function IsShowRedPoint(userId)
+    return FriendChatPage.IsShowRedPoint(userId)
+end
+
+function GetUnReadMsgNum(userId)
+    return FriendChatPage.GetUnReadMsgNum(userId)
+end
+
+function OnSearch()
+    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+        local search_ctrl = Page:FindUIControl("search_text_ctl")
+        local search_text = search_ctrl and search_ctrl.text or ""
+        FriendChatPage.FlushCurDataAndView(search_text)
+	end 
+end
+]]></script>
+<kp:window name="iframe" mode="lite" width="760" height="583" title='<%= L"好友"%>' onclose="ClosePage">
+<div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
+
+    <div style="float: left;width:258px;height: 583px;">
+        <div style="margin-left:10px;margin-top:8px;width:110px;">
+            <div style="width:242px;height:24px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
+                <input type="text" EmptyText='<%=L"搜索好友"%>' name="search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#dedede;height:24px;background:;" onkeyup="OnSearch" />
+            </div>
+        </div>
+    
+        <div type ="box" style="width:258px;height:500px;margin-left: -12px;">
+               <div style="margin-top:0px;">
+                <pe:gridview style="margin:0px;width:258px;height:500px;" RememberScrollPos="true" name="item_gridview" CellPadding="12" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                    DataSource='<%=DS_Items%>'>
+                    <Columns>
+                            <div style="color:#ffffff">
+                                <a style="width:256px;height:66px;margin:0px;padding:0px;background:;"
+                                   onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                    <input type="button" Normal_BG="" onclick="ClickItem" param1='<%=Eval("id") %>' MouseOver_BG='' alwaysmouseover="true" style="position:relative;margin-top:0px;width:256px;height:66px;background:;" />
+                                    
+                                    <div style="position:relative;margin-left:10px;margin-top:5px;width:256px;height:66px;">
+                                        <div style="float: left;margin-left:0px;margin-top:4px;">
+                                            <img zorder="0" src='<%=GetIcon(XPath("this"))%>' width="46" height="46"/>
+                                        </div>
+                                        <div style="float: left;margin-left: 8px;margin-top: 4;">
+                                            <div style="margin-top:0px;width:100px;color:#000000">
+                                                <%=Eval("nickname") %>
+                                            </div>
+                                            <div style="margin-top:0px;width:100px;font-size:14pt;color:#575757;">
+                                                <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
+                                            </div>
+                                        </div>
+
+                                        <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
+                                            <div style="float: left;margin-left: 52px; margin-top:20px;width:16px;height:14px; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
+                                                <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
+                                                    <%=GetUnReadMsgNum(Eval("id")) %>
+                                                </div>
+                                            </div>
+                                        </pe:if>
+                                    </div>
+
+                                    <pe:if condition='<%=IsItemSelect(Eval("id"))%>'>
+                                        <div style="position: relative;width:257px;height:66px;margin-left: 0px;padding:0px;background: url(Texture/Aries/Creator/keepwork/friends/bjxuanzhong_16X16_32bits.png#0 0 16 16:4 4 4 4);">
+                                        </div>
+                                    </pe:if>
+
+                                </a>
+                            </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+        </div>
+    </div>
+
+    <div style="float: left; width: 497px; height: 542px; background:url(Texture/Aries/Creator/keepwork/friends/bjsixinliaotian_32X32_32bits.png#0 0 32 32:6 6 16 16)" name="chat">
+        <div style="margin-top:-25px;width:497px;height: 20px;color:#ffffff;text-align: center;">
+            <%=GetChatName() %>
+        </div>
+        <pe:container name="chat_content" alignment="_lt" style="margin-top:0px;width:505px;height:436px;background: ;">
+        </pe:container>
+        <pe:container name="send_content" alignment="_lt" style="margin-top:0px;width:497px;height:60px;background: ;">
+            <!-- <div style="width:497px;height:70px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+                <input type="text" EmptyText='' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="width:497px;height:70px;margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" />
+            </div> -->
+            <div style="width: 498;height: 2;background-color:#616161;"></div>
+            <textarea rows="3" name="sendText"></textarea>
+        </pe:container>
+
+        <input type="button" value="发送" onclick="SendMsg" param1='<%= XPath("this") %>' style="margin-left: 385;margin-top:0px;font-size: 20px; width:106px;height:40px;color: #000000;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" />
+    </div>
+</div>
+    
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,108 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldSites.lua">
+            <![CDATA[
+            ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+            ParaWorldSites.OnInit()
+
+            function Matrix_Items()
+                return ParaWorldSites.RowNumbers;
+            end
+
+            function RowNumIcon(index)
+                local index = Eval("index");
+                if (index) then
+                    return "Texture/Aries/Creator/keepwork/ParaWorld/number/"..index.."_15X14_32bits.png";
+                else
+                    return "Texture/Aries/Creator/keepwork/ParaWorld/number/1_15X14_32bits.png";
+                end
+            end
+
+            function GetPosString()
+                if (ParaWorldSites.currentRow and ParaWorldSites.currentColumn) then
+                    return string.format("%d-%d", ParaWorldSites.currentRow, ParaWorldSites.currentColumn);
+                else
+                    return "";
+                end
+            end
+
+            ]]>
+        </script>
+        <kp:window width="520" height="392" onclose="ParaWorldSites.OnClose">
+            <div style="margin-left:20px;margin-top:7px;width:128px;height:32px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_sanwei_96X25_32bits.png);"></div>
+            <div style="float:left;">
+                <div style="margin-left:34px;margin-top:8px;">
+                    <pe:repeat DataSource="<%=Matrix_Items()%>">
+                        <pe:repeatitem style="float:left;">
+                            <div style="<%= 'float:left;margin-left:11px;width:16px;height:16px;background:url(' .. RowNumIcon() .. ')' %>"></div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+                <div style="margin-left:10px;margin-top:6px;">
+                    <pe:repeat DataSource="<%=Matrix_Items()%>">
+                        <pe:repeatitem style="float:left;">
+                            <div style="<%= 'margin-top:11px;width:16px;height:16px;background:url(' .. RowNumIcon() .. ')' %>"></div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+                <div style="margin-left:24px;margin-top:-278px;width:292px;height:292px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang_64X64_32bits.png#0 0 64 64:20 20 20 20);">
+                    <pe:gridview style="margin-left:5px;margin-top:5px;" name="item_gridview" CellPadding="2" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="10" DefaultNodeHeight="24"
+                                 DataSource='<%=ParaWorldSites.Current_Item_DS%>'>
+                        <Columns>
+                            <pe:if condition='<%=Eval("valid")%>'>
+                                <div style="width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang2_26X26_32bits.png#0 0 26 26);">
+                                    <pe:if condition='<%=Eval("state")==ParaWorldSites.Available%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaWorldSites.OnClickItem" style="margin:1px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_kexuan_24X24_32bits.png#0 0 24 24);" />
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("state")==ParaWorldSites.Locked%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaWorldSites.OnClickItem" style="margin:1px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_bukexuan_24X24_32bits.png#0 0 24 24);"></div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("state")==ParaWorldSites.Checked%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaWorldSites.OnClickItem" style="margin:1px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_yiruzhu_24X24_32bits.png#0 0 24 24);"></div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("state")==ParaWorldSites.Selected%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaWorldSites.OnClickItem" style="margin:1px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_yixuan_24X24_32bits.png#0 0 24 24);"></div>
+                                    </pe:if>
+                                </div>
+                            </pe:if>
+                            <pe:if condition='<%=not Eval("valid")%>'>
+                                <div name='<%= Eval("index")%>' style="width:26px;height:26px;background:;"></div>
+                            </pe:if>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                    <div align="center" style="margin-top:-173px;width:54px;height:54px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang3_26X26_32bits.png#0 0 26 26:8 8 8 8);">
+                        <div align="center" onclick="ParaWorldSites.OnClickMain" style="margin-top:2px;width:54px;height:49px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/xuexiao_54X49_32bits.png#0 0 54 49);"></div>
+                    </div>
+                </div>
+                <div style="margin-top:2px;margin-left:44px;">
+                    <div style="float:left;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_kexuan_24X24_32bits.png#0 0 24 24);" />
+                    <div style="float:left;margin-left:0px;margin-top:5px;width:27px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_kexuan_27X15_32bits.png#0 0 27 15);" />
+                    <div style="float:left;margin-left:5px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_yixuan_24X24_32bits.png#0 0 24 24);" />
+                    <div style="float:left;margin-left:0px;margin-top:5px;width:27px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_yixuan_27X15_32bits.png#0 0 27 15);" />
+                    <div style="float:left;margin-left:6px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_yiruzhu_24X24_32bits.png#0 0 24 24);" />
+                    <div style="float:left;margin-left:0px;margin-top:5px;width:39px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_yiruzhu_39X15_32bits.png#0 0 39 15);" />
+                    <div style="float:left;margin-left:6px;width:24px;height:24px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_bukexuan_24X24_32bits.png#0 0 24 24);" />
+                    <div style="float:left;margin-left:0px;margin-top:5px;width:39px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_bukexuan_39X15_32bits.png#0 0 39 15);" />
+                </div>
+            </div>
+            <div style="float:left;margin-left:10px;width:192px;height:351px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang4_192X351_32bits.png#0 0 192 351)">
+                <div style="margin-top:10px;margin-left:10px;">
+                    <div style="float:left;width:12px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_didian_12X15_32bits.png#0 0 12 15);" />
+                    <div style="float:left;margin-left:10px;margin-top:-4px;base-font-size:16px;font-size:16px;"><%=GetPosString()%></div>
+                    <div style="float:left;margin-left:10px;margin-top:-4px;base-font-size:16px;font-size:16px;"><%=ParaWorldSites.currentName%></div>
+                </div>
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

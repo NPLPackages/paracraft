@@ -33,6 +33,10 @@ end
 function ParaWorldChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
+
+	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId()) then
+		GameLogic.RunCommand("/ggs connect -silent=false");
+	end
 end
 
 -- get params for generating flat terrain

@@ -49,6 +49,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "KeyPressEvent" , event:KeyEvent KeyPressEvent: custom KeyPressEvent
 - GUI:
   - "ShowLoginModePage": this is the first user interface shown. One must install this filter very early, such as in mod.loadOnStartup. 
+  - "ShowClientUpdaterNotice": show client updater notice when stared updater.
+  - "HideClientUpdaterNotice": hide client updater notice when finished updater.
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI
   - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. This is the place to initialize your custom GUI. 
   - "show", name, bIsShow: hook `/show name` command to display a custom gui via command

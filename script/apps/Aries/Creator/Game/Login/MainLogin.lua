@@ -217,7 +217,15 @@ function MainLogin:UpdateCoreClient()
 		return
 	end
 
+	if (platform == 'mac' or System.os.GetPlatform() == "ios") then
+		GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice")
+	end
+
 	updater:Check(function(bNeedUpdate, latestVersion)
+		if (platform == 'mac' or System.os.GetPlatform() == "ios") then
+			GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice")
+		end
+
 		if(bNeedUpdate) then
 			updater:Download(function(bSucceed)
 				if(bSucceed) then

@@ -11,9 +11,12 @@
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
 FriendsPage.OnInit()
 function ClosePage()
-    Page:CloseWindow();
+    Page:CloseWindow()
+    FriendsPage.CloseView()
 end
 function OnChange(index)
+    local search_ctrl = Page:FindUIControl("search_text_ctl")
+    search_ctrl.text = ""
     FriendsPage.OnChange(index);
 end
 function IsSelected(index)
@@ -26,75 +29,174 @@ function DS_Items(index)
         return FriendsPage.Current_Item_DS[index];
     end
 end
-function ClickItem(index)
-    FriendsPage.ClickItem(index)
+function ClickItem(data)
+    FriendsPage.ClickItem(data)
 end
 
 function GetTimeDesc(time)
-    print("xxxxxxxxxaaaaaa", time)
     return FriendsPage.GetTimeDesc(time)
 end
+
+function AddFriend()
+    FriendsPage.AddFriend()
+end
+
+function OpenApply()
+    FriendsPage.OpenApply()
+end
+
+function OnCancelFollow(data)
+    FriendsPage.OnCancelFollow(data)
+end
+
+function OnFollowOrUnFollow(data)
+    if data.isFriend then
+        FriendsPage.OnCancelFollow(data)
+    else
+        FriendsPage.ToFollow(data.id)
+    end
+end
+
+function GetFollowBtText(data)
+    if data.isFriend then
+        return "互相关注"
+    end
+    return "已关注"
+end
+
+function GetFansBtText(data)
+    if data.isFriend then
+        return "互相关注"
+    end
+    return "回关"
+end
+
+
+function OnSearch()
+    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+        local search_ctrl = Page:FindUIControl("search_text_ctl")
+        local search_text = search_ctrl and search_ctrl.text or ""
+        FriendsPage.FlushCurDataAndView(search_text)
+	end 
+end
+
+function IsShowRedPoint(userId)
+    return FriendsPage.IsShowRedPoint(userId)
+end
+
+function GetUnReadMsgNum(userId)
+    return FriendsPage.GetUnReadMsgNum(userId)
+end
 ]]></script>
-<kp:window name="iframe" mode="lite" width="260" height="500" title='<%= L"好友"%>' onclose="ClosePage">
+<kp:window name="iframe" mode="lite" width="330" height="583" title='<%= L"好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
 
-    <div style="margin-left:13px;margin-top:5px;width:210px;">
-        <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
-            <input type="text" EmptyText='<%=L"搜索: 请输入您要查找的账号"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
+    <div style="width: 330;height: 86;margin-left: -2;margin-top: -2; background:url(Texture/Aries/Creator/keepwork/friends/bj1_16X16_32bits.png#0 0 16 16:4 4 4 4)">
+        <div style="margin-left:8px;margin-top:8px;width:310px;height:24px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
+            <input type="text" EmptyText='<%=L"搜索: 请输入您要查找的账号"%>' class="mc_text" name="search_text_ctl" uiname="earch_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#dedede;height:24px;background:;" onkeyup="OnSearch" />
+        </div>
+    
+        <div>
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7">
+                <pe:if condition='<%= IsSelected(1)%>'>
+                    <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
+                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15);"></div> 
+                  </pe:if>
+                  <pe:if condition='<%= not IsSelected(1)%>'>
+                      <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:62px;height:15px; margin-left: 7; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15)"/>
+                  </pe:if>
+            </div>
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
+                <pe:if condition='<%= IsSelected(2)%>'>
+                    <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
+                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0);"></div>
+                  </pe:if>
+                  <pe:if condition='<%= not IsSelected(2)%>'>
+                      <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="width:63px;height:16px; margin-left: 7; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0))"/>
+                  </pe:if>
+            </div>
+    
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
+                <pe:if condition='<%= IsSelected(3)%>'>
+                    <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
+                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0);"></div>
+                  </pe:if>
+                  <pe:if condition='<%= not IsSelected(3)%>'>
+                      <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="width:30px;height:14px; margin-left: 22; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0)"/>
+                  </pe:if>
+            </div>
+    
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
+                <pe:if condition='<%= IsSelected(4)%>'>
+                    <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
+                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0);"></div>
+                  </pe:if>
+                  <pe:if condition='<%= not IsSelected(4)%>'>
+                      <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:32px;height:14px; margin-left: 22; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0)"/>
+                  </pe:if>
+            </div>
+            
         </div>
     </div>
 
-    <div>
-        <pe:if condition='<%= IsSelected(1)%>'>
-            <input type="button" name="1" value='<%=L"最近联系"%>' onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:80px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= not IsSelected(1)%>'>
-            <input type="button" name="1" value='<%=L"最近联系"%>' onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:80px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= IsSelected(2)%>'>
-            <input type="button" name="2" value='<%=L"好友"%>' onclick="OnChange" tooltip='<%=L"好友"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= not IsSelected(2)%>'>
-            <input type="button" name="2" value='<%=L"好友"%>' onclick="OnChange" tooltip='<%=L"好友"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= IsSelected(3)%>'>
-            <input type="button" name="3" value='<%=L"关注"%>' onclick="OnChange" tooltip='<%=L"关注"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= not IsSelected(3)%>'>
-            <input type="button" name="3" value='<%=L"关注"%>' onclick="OnChange" tooltip='<%=L"关注"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= IsSelected(4)%>'>
-            <input type="button" name="4" value='<%=L"粉丝"%>' onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:50px;margin-left:2px;color:#ffffff;" class="mc_blue_button_with_fillet"/>
-        </pe:if>
-        <pe:if condition='<%= not IsSelected(4)%>'>
-            <input type="button" name="4" value='<%=L"粉丝"%>' onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:50px;margin-left:2px;" class="mc_light_grey_button_with_fillet"/>
-        </pe:if>
-        
-    </div>
-
-    <div type ="box" style="width:270px;height:380px">
+    <div type ="box" style="width:326px;height:421px;background:;">
            <div style="margin-top:0px;">
-            <pe:gridview style="margin:0px;width:270px;height:400px;" name="item_gridview" CellPadding="12" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+            <pe:gridview style="margin:0px;width:340px;height:421px;" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                         <div style="color:#ffffff">
-                            <a style="width:240x;height:30px;margin:0px;padding:0px;background:;"
-                               onclick="ClickItem" param1='<%=Eval("nid")%>'>
-                                <input type="button" Normal_BG="" onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="position:relative;margin-top:0px;width:240px;height:30px;background:;" />
-                                <div style="position:relative;margin-left:0px;margin-top:0px;padding-left:5px;padding-top:2px;width:240px;height:30px;">
+                            <a style="width:320x;height:66px;margin:0px;padding:0px;background:;"
+                               onclick="ClickItem" param1='<%= XPath("this") %>'>
+                                <input type="button" Normal_BG="" name='<%= XPath("this") %>' onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='Texture/Aries/Creator/keepwork/friends/bjxuanzhong_16X16_32bits.png' alwaysmouseover="true" style="margin-left: -6; position:relative;margin-top:0px;width:326px;height:66px;background:;" />
+                                <div style="position:relative;margin-left:0px;margin-top:8px;padding-left:5px;padding-top:2px;width:240px;height:66px;">
                                     <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
-                                       onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                        onclick="ClickItem" param1='<%=Eval("nid")%>'>
                                         <aries:onlinestatus width="240" height="26" nid='<%=Eval("nid")%>' />
                                     </a> -->
                                     <div style="float: left;margin-left:0px;margin-top:0px;">
-                                        <img zorder="0" src='<%=Eval("icon")%>'width="28" height="28"/>
+                                        <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46"/>
                                     </div>
-                                    <div style="float: left;margin-left:8px;margin-top:5px;width:60px;font-size:12pt;color:#000000">
-                                        <%=Eval("name") %>
+                                    <div style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
+                                        <%=Eval("nickname") %>
                                     </div>
-                                    <div style="float: left;margin-left:23px;margin-top:5px;width:100px;font-size:12pt;color:#000000;text-align: right;">
-                                        <%=GetTimeDesc(Eval("time")) %>
-                                    </div>
+                                    <pe:if condition='<%=IsSelected(1) or IsSelected(2)%>'>
+                                        <div style="float: left;margin-left:38px;margin-top:0px;">
+                                            <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
+                                                <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
+                                            </div>
+    
+                                            <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
+                                                <div style="margin-left: 82; margin-top:5px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
+                                                    <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
+                                                        <%=GetUnReadMsgNum(Eval("id")) %>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </pe:if>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=IsSelected(3)%>'>
+                                        <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
+                                            <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                            <pe:if condition='<%= Eval("isFriend") %>'>
+                                                <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
+                                            </pe:if>
+                                            <pe:if condition='<%= not Eval("isFriend") %>'>
+                                                <div zorder="1" style="margin-left: 13; margin-top:5px;width:44;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_yiguanzhu_40X13_32bits.png#0 0 44 14:0 0 0 0);"></div>
+                                            </pe:if>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=IsSelected(4)%>'>
+                                        <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
+                                            <input type="button" onclick="OnFollowOrUnFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                            <pe:if condition='<%= Eval("isFriend") %>'>
+                                                <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
+                                            </pe:if>
+                                            <pe:if condition='<%= not Eval("isFriend") %>'>
+                                                <div zorder="1" style="margin-left: 18; margin-top:5px;width:26;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_huiguan_26X12_32bits.png#0 0 26 14:0 0 0 0);"></div>
+                                            </pe:if>
+                                        </div>
+                                    </pe:if>
                                     <!-- <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' /> -->
                                 </div>
                             </a>
@@ -106,9 +208,9 @@ end
         </div>
     </div>
 
-    <div type ="box" style="margin-bottom:0px;">
-        <input type="button" name="last" value="添加好友" onclick="" tooltip="添加好友"/>
-        <input type="button" name="last" value="好友申请" onclick="" tooltip="好友申请"/>
+    <div type ="box" style="width: 330;height: 36; margin-top:3px;margin-left: -2px;background: url(Texture/Aries/Creator/keepwork/friends/bj2_64X32_32bits.png#0 0 64 32:20 10 20 10);">
+        <input type="button" name="add" onclick="AddFriend" tooltip="添加好友" style="width: 25;height: 25; color: #ffffff;margin-left: 25px;margin-top: 7; background: url(Texture/Aries/Creator/keepwork/friends/btn_tianjianhaoyou_25X25_32bits.png#0 0 25 25:0 0 0 0);" />
+        <input type="button" name="apply" onclick="OpenApply" tooltip="好友申请" style="width: 25;height: 25;color: #ffffff; margin-left: 15px;margin-top: 7; background: url(Texture/Aries/Creator/keepwork/friends/btn_haoyoushenq_25X25_32bits.png#0 0 25 25:0 0 0 0);" />
     </div>
 </div>
     

@@ -1,0 +1,34 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldTakeSeat.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldTakeSeat.lua">
+            <![CDATA[
+            ParaWorldTakeSeat = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldTakeSeat.lua");
+            ParaWorldTakeSeat.OnInit()
+
+            ]]>
+        </script>
+        <kp:window width="400" height="200" mode="lite" title='<%= L"占座"%>' onclose="ParaWorldTakeSeat.OnClose">
+            <div style="width:400px;height:160px;">
+                <div style="margin-left:50px;margin-top:80px;height:24px;width:480px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"世界ID" %>
+                    <select name="WorldList"
+                            DataSource="<%=ParaWorldTakeSeat.GetMiniWorldList()%>"
+                            style="margin-left:6px;margin-top:-2px;height:23px;width:240px;"></select>
+                </div>
+                <div style="margin-top:40px;">
+                    <input type="button" name="OK" hotkey="DIK_RETURN" style="margin-left:80px;min-width:84px;height:30px;" class="kp_yellow_button" onclick="ParaWorldTakeSeat.OnOK" value='<%=L"确定"%>' />
+                    <input type="button" name="Cancel" style="margin-left:60px;min-width:84px;height:30px;" class="kp_gray_button" onclick="ParaWorldTakeSeat.OnClose" value='<%=L"取消"%>' />
+                </div>
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

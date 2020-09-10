@@ -20,7 +20,13 @@ local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 
+-- paraWorld
+-- { id, name, objectId, objectType, cover, commitId, projectId ... }
+
+-- projectId
 ParaWorldLoginAdapter.MainWorldId = nil;
+-- id
+ParaWorldLoginAdapter.ParaWorldId = nil;
 
 ParaWorldLoginAdapter.ids = {
     ONLINE = { 
@@ -80,6 +86,7 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
                 local world_info = data[1];
                 if(world_info.projectId)then
                     world_id =  world_info.projectId;
+					ParaWorldLoginAdapter.ParaWorldId = world_info.id;
                 end
             end
         end

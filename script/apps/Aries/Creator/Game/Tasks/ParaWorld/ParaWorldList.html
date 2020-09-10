@@ -1,0 +1,50 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldList.lua">
+            <![CDATA[
+            ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
+            ParaWorldList.OnInit()
+
+            function GetWorldPreview()
+                local url = Eval("cover");
+                if (url) then
+                    return url;
+                else
+                    return "Texture/Aries/Creator/keepwork/ParaWorld/zuopkuang_266X134_32bits.png#0 0 32 32:8 8 8 8";
+                end
+            end
+
+            function GetSettleString()
+                local count = Eval("settleCount");
+                local total = 96;
+                return string.format("%d/%d", count, total);
+            end
+            ]]>
+        </script>
+        <kp:window width="860" height="420" onclose="ParaWorldList.OnClose">
+            <div style="margin-left:20px;margin-top:7px;width:128px;height:32px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_bingxing_96X25_32bits.png);"></div>
+            <div style="margin-left:0px;">
+                <pe:gridview style="width:860px;height:380px;" name="item_gridview" CellPadding="14" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="160"
+                             DataSource='<%=ParaWorldList.Current_Item_DS%>'>
+                    <Columns>
+                        <div name='<%= Eval("index")%>' onclick="ParaWorldList.OnClickItem" style="<%= 'width:256px;height:134px;background:url(' .. GetWorldPreview() .. ')' %>"></div>
+                        <div style="float:left;position:relative;margin-top:-30px;padding-right:10px;width:256px;text-align:right;base-font-size:15px;font-size:16px;shadow-quality:8;color:#ffffff;shadow-color:#000000;text-shadow:true"><%= GetSettleString()%></div>
+                        <div style="float:left;position:relative;margin-top:6px;width:256px;text-align:center;base-font-size:16px;font-size:16px;color:#000000"><%= Eval("name")%></div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

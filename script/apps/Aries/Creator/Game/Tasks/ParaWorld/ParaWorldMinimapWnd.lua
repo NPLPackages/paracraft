@@ -85,9 +85,11 @@ function ParaWorldMinimapWnd.OnClickSpawnpoint()
 end
 
 function ParaWorldMinimapWnd.OnLocalWorldInfo()
-	_guihelper.MessageBox(L"入驻并行世界的功能将在9.10日开放。 快去建设自己的家园吧, 将你的家园安放在大世界周围的地块中")
+	local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+	ParaWorldSites.ShowPage();
 end
 
 function ParaWorldMinimapWnd.OnClickParaWorldList()
-	_guihelper.MessageBox(L"并行世界列表将在9.10日开放。在新建世界时，选择并行世界，创建属于自己的多人联网并行世界，未来可以邀请好友入驻到你的并行世界中")
+	local ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
+	ParaWorldList.ShowPage();
 end

@@ -1,0 +1,160 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/FriendsProjectPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="FriendsProjectPage.lua"><![CDATA[
+local FriendsProjectPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsProjectPage.lua");
+FriendsProjectPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    FriendsProjectPage.CloseView()
+end
+function OnChange(index)
+    FriendsProjectPage.OnChange(index);
+end
+function IsSelected(index)
+    return FriendsProjectPage.index == index;
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #FriendsProjectPage.Current_Item_DS;
+    else
+        return FriendsProjectPage.Current_Item_DS[index];
+    end
+end
+
+function GetTimeDesc(time)
+    return FriendsProjectPage.GetTimeDesc(time)
+end
+
+function SearchFriend()
+    local search_ctrl = Page:FindUIControl("block_search_text_ctl")
+    FriendsProjectPage.SearchFriend(search_ctrl.text)
+end
+
+function GetIcon(data)
+    return FriendsProjectPage.GetIcon(data)
+end
+
+function GetFansBtText(data)
+
+    return FriendsProjectPage.GetFansBtText(data)
+end
+
+function Follow(data)
+    FriendsProjectPage.ToFollow(data.id)
+end
+
+function ClickItem(name,mcmlNode)
+    
+    local item_index = mcmlNode:GetAttribute("param1")
+    FriendsProjectPage.ClickItem(item_index)
+end
+
+function IsItemSelect(item_index)
+    return FriendsProjectPage.IsItemSelect(item_index)
+end
+
+function CanClick(data)
+    print("xxxxxxxxxxxxxxxxxxxxx",data.id, FriendsProjectPage.IsFollow(data.id))
+    return not FriendsProjectPage.IsFollow(data.id)
+end
+
+function OnSearch()
+    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+        SearchFriend()
+	end
+end
+
+function GetRegisterTimeStr(at_time)
+print("xxxxxxxxxxxxxxx", at_time)
+    return FriendsProjectPage.GetRegisterTimeStr(at_time)
+end
+
+function GetIdDesc(id)
+    return "项目 ID:" .. id
+end
+
+function IsEmpty() 
+    print("yyyyyyyyyyyyyyyyyyy", #FriendsProjectPage.Current_Item_DS == 0)
+    return #FriendsProjectPage.Current_Item_DS == 0
+end
+
+]]></script>
+<kp:window name="iframe" mode="lite" width="630" height="432" title='<%= L"项目列表"%>' onclose="ClosePage">
+    <div style="color:#ffffff;padding-left:2px;padding-top:36px;padding-right:2px;padding-bottom:2px;">
+
+    <div type ="box" style="width:630;height:313px">
+        <div style="position: relative; width:604;height:298px;margin-top:8px;margin-left: 10;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuliebiaobj_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+        
+        <div style="margin-top:6px;">
+            <pe:if condition = '<%=IsEmpty()%>'>
+                <div style="float: left;margin-left:130;margin-top:128px;">
+                    <img zorder="1" src='Texture/Aries/Creator/keepwork/friends/zi_meiyou_512X64_32bits.png' width="512" height="64"/>
+                </div>
+                <!-- <div style="width:512;height:64px;margin-top:128px;margin-left: 130;background: url(Texture/Aries/Creator/keepwork/friends/zi_meiyou_512X64_32bits.png#0 0 512 64);"></div> -->
+            </pe:if>
+            
+            <pe:if condition = '<%=not IsEmpty()%>'>
+                <pe:gridview style="margin:0px;width:630;height:313px;" RememberScrollPos="true" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight = "64" 
+                    DataSource='<%=DS_Items%>'>
+                    <Columns>
+                            <div style="width:284;height:64px;margin:0px;margin-left: 8;padding:0px;background: url(Texture/Aries/Creator/keepwork/friends/kuang1_284X274_32bits.png#0 0 32 32:13 13 13 13);">
+                                <a onclick="ClickItem" param1='<%=XPath("this|index") %>'>
+                                    <input type="button" Normal_BG="" name='<%=XPath("this|index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' MouseOver_BG='' alwaysmouseover="true" style="position:relative;margin-top:0px;width:284px;height:64px;background:;" />
+                                    
+                                    <pe:if condition='<%=IsItemSelect(Eval("index"))%>'>
+                                        <div style="position: relative;width:284;height:64px;margin:-1px;margin-left: -1;padding:0px;background: url(Texture/Aries/Creator/keepwork/friends/kuang2_284X274_32bits.png#0 0 32 32:13 13 13 13);">
+                                        </div>
+                                    </pe:if>
+                                    
+                                    <div style="position:relative;margin-left:10px;margin-top:6px;padding-left:5px;padding-top:2px;width:284px;height:30px;">
+                                        <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
+                                            onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                            <aries:onlinestatus width="550" height="26" nid='<%=Eval("nid")%>' />
+                                        </a> -->
+                                        <!-- <div style="float: left;margin-left:0px;margin-top:0px;">
+                                            <img zorder="0" src='<%=GetIcon(XPath("this"))%>'width="46" height="46"/>
+                                        </div> -->
+                                        <div style="float: left;;">
+                                            <div style="margin-left:3px;margin-top:2px;width:120px;color:#000000">
+                                                <%=Eval("name") %>
+                                            </div>
+                                            <div style="margin-left:3px;margin-top:2px;width:120px;font-size:12pt;color:#999999">
+                                                <%=GetRegisterTimeStr(Eval("updatedAt"))%>
+                                            </div>
+                                        </div>
+
+                                        <div style="float: left;">
+                                            <div style="margin-left:43px;margin-top:2px;width:80px;height: 16;text-align: center ;font-size:12pt;color:#000000;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuIDbj_16X16_32bits.png#0 0 16 16:4 4 4 4);">
+                                                <%=GetIdDesc(Eval("id"))%>
+                                            </div>
+                                        </div>
+
+                                        <!-- <div style="float: left;margin-left:5px;margin-top:10px;font-size:12pt;color:#000000;text-align: right;">
+                                            <input type="button" value='拒绝' onclick="Follow" name='<%= XPath("this") %>' tooltip='拒绝' style="color: #000000; width: 52;height: 27; font-size: 14;background: url(Texture/Aries/Creator/keepwork/friends/btn_shousuo_36X28_32bits.png#0 0 32 32:8 8 8 8);"/>
+                                            <input type="button" value='回关' onclick="Follow" name='<%= XPath("this") %>' tooltip='回关' style="margin-left: 15; color: #000000; width: 52;height: 27; font-size: 14;background: url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X32_32bits.png#0 0 32 32:8 8 8 8);"/>
+                                        </div> -->
+                                    </div>
+                                </a>
+                            </div>
+                    </Columns>
+
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </pe:if>
+        </div>
+    </div>
+</div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

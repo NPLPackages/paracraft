@@ -110,11 +110,45 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 	
+	if(self:GetTotalCount() < 10) then
+		self:ShowCreateFromTemplateWnd()
+	end
+
 	self.lock_timer = self.lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		self:OnLockTimer()
 	end})
 	self.lock_timer:Change(1000, 1000);
+
+	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId()) then
+		GameLogic.RunCommand("/ggs connect -silent=false");
+	end
 end
+
+function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
+	-- TODO: for chenjinxian, use following code to load template, Effie will provide all template bmax files as keepwork git url
+	-- you need to download and load the selected one
+
+	-- following code is tested by Xizhi
+--	_guihelper.MessageBox(L"shall we load from a template?", function()
+--		local filename = self:GetTemplateFilepath()
+--		self:LoadFromTemplateFile(filename)
+--	end)
+	
+end
+
+-- please note: it does not clear the scene, it simply load template to pivot point
+-- @param filename: bmax filename
+function ParaWorldMiniChunkGenerator:LoadFromTemplateFile(filename)
+	filename = filename or self:GetTemplateFilepath()
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+	local minX, minY, minZ = self:GetPivot();
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
+			blockX = minX,blockY = minY, blockZ = minZ, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false})
+	task:Run();
+end
+
 
 function ParaWorldMiniChunkGenerator:OnLockTimer()
 	local player = EntityManager.GetPlayer()

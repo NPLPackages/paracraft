@@ -152,7 +152,7 @@ end
 function TeacherPanel.ConnectClass()
 	_guihelper.MessageBox(L"确定要开启联机模式吗？", function(res)
 		if(res == _guihelper.DialogResult.OK) then
-			GameLogic.RunCommand("/connectGGS -isSyncBlock");
+			GameLogic.RunCommand("/ggs connect -isSyncBlock");
 			ClassManager.SendMessage("cmd:connect");
 			GameLogic.AddBBS(nil, L"联机成功！", 3000, "0 255 0");
 			ClassManager.InGGS = true;

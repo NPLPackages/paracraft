@@ -49,3 +49,12 @@ HttpWrapper.Create("keepwork.user.following", "%MAIN%/core/v0/users/following", 
 --http://yapi.kp-para.cn/project/32/interface/api/2882
 -- 获取用户粉丝
 HttpWrapper.Create("keepwork.user.followers", "%MAIN%/core/v0/users/followers", "GET", true)
+
+-- 查询
+HttpWrapper.Create("keepwork.user.search", "%MAIN%/core/v0/users/search", "POST", true)
+
+-- 是否关注(多人)
+HttpWrapper.Create("keepwork.user.focus", "%MAIN%/core/v0/favorites/search", "POST", true)
+
+-- 获取作品列表
+HttpWrapper.Create("keepwork.user.projects", "%MAIN%/core/v0/projects", "GET", true)

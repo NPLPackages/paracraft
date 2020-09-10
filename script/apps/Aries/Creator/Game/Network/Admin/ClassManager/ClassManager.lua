@@ -47,8 +47,6 @@ ClassManager.ChatDataMax = 200;
 
 local init = false;
 function ClassManager.StaticInit()
-	--GameLogic:Connect("WorldLoaded", ClassManager, ClassManager.OnWorldLoaded, "UniqueConnection");
-	--GameLogic:Connect("WorldUnloaded", ClassManager, ClassManager.OnWorldUnload, "UniqueConnection");
 	if (init) then return end
 	init = true;
 
@@ -56,12 +54,12 @@ function ClassManager.StaticInit()
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", ClassManager.OnKeepWorkLogout_Callback)
 end
 
-function ClassManager.OnWorldLoaded()
+function ClassManager.OnWorldLoaded(delay)
+	delay = delay or 3000;
 	if (KpChatChannel.client) then
 		commonlib.TimerManager.SetTimeout(function()
 			local projectId = GameLogic.options:GetProjectId();
 			if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
-				GameLogic.events:AddEventListener("OnWorldUnload", ClassManager.OnWorldUnload, ClassManager, "ClassManager");
 				return;
 			end
 
@@ -84,18 +82,19 @@ function ClassManager.OnWorldLoaded()
 									ClassManager.InClass = true;
 									StudentPanel.StartClass();
 								else
-									ClassManager.Reset();
+									ClassManager.StudentLeave();
 								end
 							end, _guihelper.MessageBoxButtons.YesNo);
 						end
 					end);
 				end
 			end);
-		end, 2000)
+		end, delay)
 	end
 end
 
 function ClassManager.OnWorldUnload(self, event)
+	--[[
 	local projectId = GameLogic.options:GetProjectId();
 	if (projectId and tonumber(projectId) == ClassManager.CurrentWorldId) then
 		if (not ClassManager.IsTeacherInClass() and ClassManager.InClas) then
@@ -104,6 +103,7 @@ function ClassManager.OnWorldUnload(self, event)
 		end
 		ClassManager.Reset();
 	end
+	]]
 end
 
 function ClassManager.OnExitApp()
@@ -125,10 +125,13 @@ function ClassManager.OnKeepWorkLogin_Callback()
 		KpChatChannel.client:AddEventListener("OnOpen",ClassManager.OnOpen,ClassManager);
 		KpChatChannel.client:AddEventListener("OnMsg",ClassManager.OnMsg,ClassManager);
 		KpChatChannel.client:AddEventListener("OnClose",ClassManager.OnClose,ClassManager);
-	end
-	local worldName = WorldCommon.GetWorldTag("name");
-	if (worldName ~= nil and worldName ~= "") then
-		ClassManager.OnWorldLoaded();
+
+		commonlib.TimerManager.SetTimeout(function()
+			local worldName = WorldCommon.GetWorldTag("name");
+			if (worldName == nil or worldName == "") then
+				ClassManager.OnWorldLoaded(100);
+			end
+		end, 1000);
 	end
 end
 
@@ -159,6 +162,14 @@ function ClassManager.OnOpen(self)
 end
 
 function ClassManager.OnClose(self)
+end
+
+function ClassManager.StudentLeave()
+	if (ClassManager.InClass) then
+		ClassManager.SendMessage("tip:leave");
+		ClassManager.LeaveClassroom(ClassManager.CurrentClassroomId);
+		ClassManager.Reset();
+	end
 end
 
 function ClassManager.LoadAllClasses(callback)
@@ -304,7 +315,7 @@ function ClassManager.LoadClassroomInfo(classroomId, callback)
 					name = ClassManager.GetMemberUIName2(user.user.username, user.user.nickname),
 					teacher = true,
 					online = user.online,
-					inclass = false,
+					inclass = user.inRoom,
 				})
 			end
 		end
@@ -317,7 +328,7 @@ function ClassManager.LoadClassroomInfo(classroomId, callback)
 					name = ClassManager.GetMemberUIName2(user.user.username, user.user.nickname),
 					teacher = false,
 					online = user.online,
-					inclass = false,
+					inclass = user.inRoom,
 				})
 			end
 		end
@@ -444,7 +455,7 @@ function ClassManager.RunCommand(command)
 		LockDesktop.ShowPage(false, 0, cmd_text);
 	elseif (command == "connect") then
 		ClassManager.InGGS = true;
-		GameLogic.RunCommand("/connectGGS -isSyncBlock");
+		GameLogic.RunCommand("/ggs connect -isSyncBlock");
 	elseif (command == "nospeak") then
 		ClassManager.CanSpeak = false;
 		SChatRoomPage.Refresh();
@@ -511,7 +522,7 @@ function ClassManager.StudentJointClassroom(roomId)
 					ClassManager.InClass = true;
 					StudentPanel.StartClass();
 				else
-					ClassManager.Reset();
+					ClassManager.StudentLeave();
 				end
 			end, _guihelper.MessageBoxButtons.YesNoCancel);
 		end
