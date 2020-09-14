@@ -267,7 +267,9 @@ function ChatEdit.LostFocus()
 		vscrollbar.visible = false;
 	end
 	CommandHelpPage.ClosePage();
-	ChatWindow.HideAll();
+    if(not ChatWindow.ggs_mode)then
+	    ChatWindow.HideAll();
+    end
 end
 
 -- send text without writing to history. 

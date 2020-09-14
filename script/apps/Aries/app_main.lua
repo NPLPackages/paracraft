@@ -2681,6 +2681,10 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 			SwfLoadingBarPage.UpdateText("正在登录游戏服务器");
 		end
 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+		ParaWorldLoginAdapter.CheckAndReset();
+
 		local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
 		TeachingQuestTitle.StaticInit();
 

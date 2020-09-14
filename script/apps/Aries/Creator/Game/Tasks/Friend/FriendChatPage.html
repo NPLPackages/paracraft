@@ -44,7 +44,7 @@ function GetChatName()
     return FriendChatPage.GetChatName(time)
 end
 
-function SendMsg()
+function ClickSendMsg()
     FriendChatPage.SendMsg()
 end
 
@@ -66,6 +66,16 @@ function OnSearch()
         local search_text = search_ctrl and search_ctrl.text or ""
         FriendChatPage.FlushCurDataAndView(search_text)
 	end 
+end
+
+function SendMsg()
+    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+        FriendChatPage.SendMsg()
+	end 
+end
+
+function OnFocus()
+    Page:FindUIControl("sendText"):Focus();
 end
 ]]></script>
 <kp:window name="iframe" mode="lite" width="760" height="583" title='<%= L"好友"%>' onclose="ClosePage">
@@ -129,17 +139,22 @@ end
         <div style="margin-top:-25px;width:497px;height: 20px;color:#ffffff;text-align: center;">
             <%=GetChatName() %>
         </div>
+        
         <pe:container name="chat_content" alignment="_lt" style="margin-top:0px;width:505px;height:436px;background: ;">
         </pe:container>
-        <pe:container name="send_content" alignment="_lt" style="margin-top:0px;width:497px;height:60px;background: ;">
+        <pe:container name="send_content" alignment="_lt" style="margin-top:0px;width:497px;height:106px;background: ;">
             <!-- <div style="width:497px;height:70px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
                 <input type="text" EmptyText='' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="width:497px;height:70px;margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" />
             </div> -->
-            <div style="width: 498;height: 2;background-color:#616161;"></div>
-            <textarea rows="3" name="sendText"></textarea>
+            <div style="width: 498px;height: 2;background-color:#616161;"></div>
+            <!-- <textarea rows="3" name="sendText"></textarea> -->
+            <input type="button" Normal_BG="" onclick="OnFocus" param1='' MouseOver_BG='' alwaysmouseover="true" style="position:relative;margin-top:0px;width:498px;height:106px;background:;" />
+            <input type="text" EmptyText='' class="mc_text" name="sendText" uiname="earch_text_obj" CaretColor="#ff000000" style="margin-top:2px;margin-left:5px;textcolor:#000000;height:24px;background:;" onkeyup="SendMsg" />
+        
+            <input type="button" value="发送" onclick="ClickSendMsg" param1='<%= XPath("this") %>' style="margin-left: 385;margin-top:30px;font-size: 20px; width:106px;height:40px;color: #000000;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" />
         </pe:container>
 
-        <input type="button" value="发送" onclick="SendMsg" param1='<%= XPath("this") %>' style="margin-left: 385;margin-top:0px;font-size: 20px; width:106px;height:40px;color: #000000;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" />
+        
     </div>
 </div>
     

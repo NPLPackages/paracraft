@@ -7,6 +7,13 @@ Desc: A flat grid world, where the center is 256*256, the outer is 128*128 grid.
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldChunkGenerator.lua");
 local ParaWorldChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator");
 ChunkGenerators:Register("paraworld", ParaWorldChunkGenerator);
+
+local filename = nil;
+local gen = GameLogic.GetBlockGenerator()
+local x, y = gen:GetGridXYBy2DIndex(5,5)
+local bx, by, bz = gen:GetBlockOriginByGridXY(x, y)
+gen:LoadTemplateAtGridXY(x, y, filename)
+GameLogic.EntityManager.GetPlayer():SetBlockPos(bx, by, bz)
 -----------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
@@ -55,6 +62,50 @@ function ParaWorldChunkGenerator:SetFlatLayers(layers)
 	self.flat_layers = layers;
 end
 
+function ParaWorldChunkGenerator:GetWorldCenter()
+	return 19200, 12, 19200
+end
+
+-- @param worldX, worldY:  world block position
+function ParaWorldChunkGenerator:FromWorldPosToGridXY(worldX, worldY)
+	local cx, _, cy = self:GetWorldCenter();
+	return math.floor((worldX - cx)/128), math.floor((worldY - cy)/128)
+end
+
+
+-- if x, y == 0, 0, we will return the block containing the center. 
+-- (0,0), (-1, 0), (0,1), (-1, 0)
+-- @param x: [-4, 5]
+-- @param y: [-4, 5]
+-- @return: x, y, z
+function ParaWorldChunkGenerator:GetBlockOriginByGridXY(x, y)
+	local cx, cy, cz = self:GetWorldCenter();
+	return cx + x*128, cy, cz + y*128;
+end
+
+-- get gridXY by a map 2d position's left, top coordinates
+-- @param left: [0,9] 
+-- @param right: [0,9]
+function ParaWorldChunkGenerator:GetGridXYBy2DIndex(left, top)
+	return 5-top, 5-left;
+end
+
+function ParaWorldChunkGenerator:Get2DIndexByGridXY(x, y)
+	return 5-x, 5-y;
+end
+
+function ParaWorldChunkGenerator:LoadTemplateAtGridXY(x, y, filename)
+	if(filename) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+		local minX, minY, minZ = self:GetBlockOriginByGridXY(x, y);
+		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
+				blockX = minX,blockY = minY, blockZ = minZ, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false})
+		task:Run();
+	end
+end
+
+
 -- generate flat terrain
 function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 	local layers = self:GetFlatLayers();
@@ -77,7 +128,7 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 	local ground_block_id = 62;
 	local road_edge_id = 180;
 	
-	local worldCenterX, worldCenterZ  = 19200, 19200;
+	local worldCenterX, _, worldCenterZ  = self:GetWorldCenter();
 	local gridOffsetX = (x*16 - worldCenterX) / 128;
 	local gridOffsetZ = (z*16 - worldCenterZ) / 128;
 	local isPGCArea = false

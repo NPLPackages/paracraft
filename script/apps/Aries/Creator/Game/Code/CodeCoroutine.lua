@@ -79,12 +79,12 @@ end
 -- @important: this function should be called inside coroutine, the callbackFunc is gauranteed NOT to be inside any coroutine, because we use a timer for it. 
 -- so it is always safe to call resume inside callbackFunc
 function CodeCoroutine:MakeCallbackFuncAsync(callbackFunc)
-	return function(p1, p2, p3, p4)
+	return function(p1, p2, p3, p4, p5)
 		commonlib.TimerManager.SetTimeout(function()
 			if(not self.isStopped) then
 				self:SetCurrentCodeContext();
 				if(callbackFunc) then
-					callbackFunc(p1, p2, p3, p4);
+					callbackFunc(p1, p2, p3, p4, p5);
 				end
 			end	
 		end, 0)

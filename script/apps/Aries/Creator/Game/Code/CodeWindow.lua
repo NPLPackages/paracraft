@@ -11,6 +11,8 @@ local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
 ]]
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeContext2d.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
+local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Point = commonlib.gettable("mathlib.Point");
 local CodeContext2d = commonlib.gettable("MyCompany.Aries.Game.Code.CodeContext2d")
@@ -26,6 +28,33 @@ end
 
 function CodeWindow:SetCodeBlock(codeblock)
 	self.codeblock = codeblock
+end
+
+-- run all page event like button onclick in a seperate coroutine in parallel. 
+-- also make sure there are no two functions of the same type are running in parallel.
+function CodeWindow:GetPageEventFilterFunc(pageEnv)
+	self.pageFunctions = self.pageFunctions or {};
+	return function(pFunc)
+		if(type(pFunc) == "function") then
+			return function(p1, p2, p3, p4, p5)
+				local co = self.pageFunctions[pFunc]
+				if(not co or co:IsFinished()) then
+					local last_co = self.co;
+					local co = CodeCoroutine:new():Init(pageEnv.codeblock);
+					self.pageFunctions[pFunc] = co;
+					co:SetActor(pageEnv.actor);
+					co:SetFunction(function()
+						pFunc(p1, p2, p3, p4, p5);
+					end);
+					co:Run();
+					if(last_co) then
+						last_co:SetCurrentCodeContext();
+					end
+				end
+			end
+		end
+		return pFunc;
+	end
 end
 
 function CodeWindow:prepareCodeContext()

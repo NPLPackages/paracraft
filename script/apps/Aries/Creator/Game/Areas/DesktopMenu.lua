@@ -68,17 +68,19 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"联网控制面板",name = "online.teacher_panel",onclick=nil},
 			},
 		},
+		--[[
 		{text = L"机构",order=5, mode="edit", name = "organization",children = 
 			{
 				{text = L"老师面板",name = "organization.teacher_panel",onclick=nil},
 				{text = L"学生面板",name = "organization.student_panel",onclick=nil},
 			},
 		},
+		]]
 		{text = L"窗口", order=6, mode="edit", name = "window",children = 
 			{
 				{text = L"角色换装...",name = "window.changeskin", onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
-				{text = L"商城...",name = "window.mall",onclick=nil},
+				{text = L"资源...",name = "window.mall",onclick=nil},
 				{text = L"背包...",name = "window.userbag",onclick=nil},
 				{text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},

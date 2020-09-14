@@ -159,10 +159,10 @@ end
 function FriendConnection:UpdateLastMsgTag(callback)
     local len = #(self.unread_msgs);
     local node = self.unread_msgs[1];
-    print("ttttttt", node)
-    if node then
-        print("xxxs",node.msgKey)
-    end
+    -- print("ttttttt", node)
+    -- if node then
+    --     print("xxxs",node.msgKey)
+    -- end
     if(node and node.msgKey)then
         local roomId = self.roomId;
         local msgKey = node.msgKey;

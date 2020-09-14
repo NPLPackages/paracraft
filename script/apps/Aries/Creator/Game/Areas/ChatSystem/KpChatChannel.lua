@@ -473,7 +473,6 @@ function KpChatChannel.RefreshChatWindow()
     else
         ChatEdit.selected_channel = ChatChannel.EnumChannels.NearBy;
     end
-    MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
 
 
     -- refresh the state of TipRoadManager
@@ -481,6 +480,7 @@ function KpChatChannel.RefreshChatWindow()
         TipRoadManager:OnShow(true);
     else
         TipRoadManager:OnShow(false);
+        MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
     end
     if(ChatEdit.page)then
         -- refresh the state of shortcut button

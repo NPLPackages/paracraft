@@ -233,8 +233,9 @@ function FriendsPage.OnRefresh()
 end
 function FriendsPage.ClickItem(data)
     if mouse_button == "left" then
-		local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-		user_page.ShowUserInfoPage({username=data.username});
+		-- local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+		-- user_page.ShowUserInfoPage({username=data.username});
+		FriendsPage.PrivateLetter(data);
     elseif mouse_button == "right" then
         FriendsPage.OpenFriendMenu(data)
     end
@@ -506,6 +507,7 @@ function FriendsPage.ClearData()
 	FriendsPage.UnreadMsg = {}
 	TypeToCb = {}
 	FriendList = nil
+	FriendManager.unread_msgs_loaded = false;
 end
 
 function FriendsPage.GetIsOpen()

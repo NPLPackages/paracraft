@@ -14,6 +14,8 @@ MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
 
 
 MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
+
+dispatch dik_key == "DIK_RETURN" in BaseContext.lua
 -------------------------------------------------------
 ]]
 if(not System.options.mc) then
@@ -57,7 +59,6 @@ ChatWindow.DefaultUIPos = {
 function ChatWindow.ResetPosition(ggs_valid)
     local parent_wnd_pos_config;
     local edit_wnd_pos_config;
-
     -- set ggs_mode first
     ChatWindow.ggs_mode = ggs_valid;
 

@@ -35,9 +35,8 @@
 
             ]]>
         </script>
-        <kp:window width="520" height="392" onclose="ParaWorldSites.OnClose">
-            <div style="margin-left:20px;margin-top:7px;width:128px;height:32px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_sanwei_96X25_32bits.png);"></div>
-            <div style="float:left;">
+        <kp:window width="520" height="392" title='<%= ParaWorldSites.GetParaWorldName()%>' onclose="ParaWorldSites.OnClose">
+            <div style="float:left;margin-top:39px;">
                 <div style="margin-left:34px;margin-top:8px;">
                     <pe:repeat DataSource="<%=Matrix_Items()%>">
                         <pe:repeatitem style="float:left;">
@@ -94,7 +93,7 @@
                     <div style="float:left;margin-left:0px;margin-top:5px;width:39px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_bukexuan_39X15_32bits.png#0 0 39 15);" />
                 </div>
             </div>
-            <div style="float:left;margin-left:10px;width:192px;height:351px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang4_192X351_32bits.png#0 0 192 351)">
+            <div style="float:left;margin-left:10px;margin-top:39px;width:192px;height:351px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/dikuang4_192X351_32bits.png#0 0 192 351)">
                 <div style="margin-top:10px;margin-left:10px;">
                     <div style="float:left;width:12px;height:15px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_didian_12X15_32bits.png#0 0 12 15);" />
                     <div style="float:left;margin-left:10px;margin-top:-4px;base-font-size:16px;font-size:16px;"><%=GetPosString()%></div>

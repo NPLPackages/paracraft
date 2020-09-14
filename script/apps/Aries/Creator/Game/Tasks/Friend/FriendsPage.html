@@ -101,10 +101,11 @@ end
                 <pe:if condition='<%= IsSelected(1)%>'>
                     <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
                     <div zorder="1" style="margin-left: 7; margin-top:8px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15);"></div> 
-                  </pe:if>
-                  <pe:if condition='<%= not IsSelected(1)%>'>
-                      <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="width:62px;height:15px; margin-left: 7; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15)"/>
-                  </pe:if>
+                </pe:if>
+                <pe:if condition='<%= not IsSelected(1)%>'>
+                    <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15);"></div> 
+                </pe:if>
             </div>
             <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
                 <pe:if condition='<%= IsSelected(2)%>'>
@@ -112,7 +113,8 @@ end
                     <div zorder="1" style="margin-left: 7; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0);"></div>
                   </pe:if>
                   <pe:if condition='<%= not IsSelected(2)%>'>
-                      <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="width:63px;height:16px; margin-left: 7; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0))"/>
+                    <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0);"></div>
                   </pe:if>
             </div>
     
@@ -122,7 +124,8 @@ end
                     <div zorder="1" style="margin-left: 22; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0);"></div>
                   </pe:if>
                   <pe:if condition='<%= not IsSelected(3)%>'>
-                      <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="width:30px;height:14px; margin-left: 22; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0)"/>
+                    <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0);"></div>
                   </pe:if>
             </div>
     
@@ -132,7 +135,8 @@ end
                     <div zorder="1" style="margin-left: 22; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0);"></div>
                   </pe:if>
                   <pe:if condition='<%= not IsSelected(4)%>'>
-                      <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="width:32px;height:14px; margin-left: 22; margin-top:8px;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0)"/>
+                    <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0);"></div>
                   </pe:if>
             </div>
             
@@ -159,7 +163,7 @@ end
                                     <div style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
                                         <%=Eval("nickname") %>
                                     </div>
-                                    <pe:if condition='<%=IsSelected(1) or IsSelected(2)%>'>
+                                    <pe:if condition='<%=IsSelected(1)%>'>
                                         <div style="float: left;margin-left:38px;margin-top:0px;">
                                             <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
                                                 <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
@@ -175,6 +179,24 @@ end
                                             </pe:if>
                                         </div>
                                     </pe:if>
+
+                                    <pe:if condition='<%=IsSelected(2)%>'>
+                                        <div style="float: left;margin-left:38px;margin-top:0px;">
+                                            <!-- <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
+                                                <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
+                                            </div> -->
+    
+                                            <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
+                                                <div style="margin-left: 82; margin-top:16px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
+                                                    <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
+                                                        <%=GetUnReadMsgNum(Eval("id")) %>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </pe:if>
+                                        </div>
+                                    </pe:if>
+
                                     <pe:if condition='<%=IsSelected(3)%>'>
                                         <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
                                             <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>

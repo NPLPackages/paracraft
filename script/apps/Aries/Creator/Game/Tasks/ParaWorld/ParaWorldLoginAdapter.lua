@@ -138,6 +138,8 @@ end
 function ParaWorldLoginAdapter.ShowExitWorld(restart)
 	_guihelper.MessageBox(L"是否离开当前世界，返回登录界面？", function(res)
 		if(res and res == _guihelper.DialogResult.Yes)then
+			ParaWorldLoginAdapter.MainWorldId = nil;
+			ParaWorldLoginAdapter.ParaWorldId = nil;
 			Desktop.is_exiting = true;
 			local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 			KeepworkServiceSession:Logout(nil, function()
@@ -146,4 +148,21 @@ function ParaWorldLoginAdapter.ShowExitWorld(restart)
 			Desktop.ForceExit(restart);
 		end
 	end, _guihelper.MessageBoxButtons.YesNo);
+end
+
+
+function ParaWorldLoginAdapter.CheckAndReset()
+	commonlib.TimerManager.SetTimeout(function()
+		ParaWorldLoginAdapter:SearchWorldID(function(world_id)
+			LOG.std(nil, "info", "ParaWorldLoginAdapter", " found world_id:%s", tostring(world_id));
+			ParaWorldLoginAdapter.MainWorldId = world_id;
+
+			local projectId = GameLogic.options:GetProjectId();
+			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
+			else
+				ParaWorldLoginAdapter.MainWorldId = nil;
+				ParaWorldLoginAdapter.ParaWorldId = nil
+			end
+		end)
+	end, 1000);
 end

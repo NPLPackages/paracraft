@@ -891,6 +891,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 				my_window = CodeWindow:new();
 
 				my_window:SetCodeBlock(self.codeblock);
+				globalTable.pageEventFilterFunc = my_window:GetPageEventFilterFunc(self)
 				lastWinId = lastWinId + 1
 				my_window:Show({
 					-- xml here

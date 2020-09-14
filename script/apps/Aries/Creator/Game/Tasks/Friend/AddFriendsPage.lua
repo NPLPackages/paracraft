@@ -10,7 +10,7 @@ AddFriendsPage.Show();
 --]]
 
 local AddFriendsPage = NPL.export();
-
+local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
 local page;
 local DateTool = os.date
 AddFriendsPage.Current_Item_DS = {};
@@ -94,6 +94,10 @@ function AddFriendsPage.SearchFriend(text)
 end
 
 function AddFriendsPage.ToFollow(userId)
+    if AddFriendsPage.IsFollow(userId) then
+        AddFriendsPage.OnCancelFollow(userId)
+        return
+    end
     print("AddFriendsPage.ToFollow", userId)
 	-- userId = 176382
 	keepwork.user.follow({
@@ -115,6 +119,47 @@ function AddFriendsPage.ToFollow(userId)
         if is_open then
             friend_page.FlushCurDataAndView()
         end
+	end)
+end
+
+function AddFriendsPage.OnCancelFollow(userId)
+    local chat_user_data = FriendChatPage.GetCurChatUesrData()
+	if userId == chat_user_data.id then
+		GameLogic.AddBBS("statusBar", L"您与对方正在聊天中，请先关闭聊天窗口", 5000, "0 255 0");
+		return
+    end
+    
+	local show_text = "你确定要取消关注吗？\n取消关注后对方将不在好友列表中，且以后不再接收此人的会话消息。"
+	_guihelper.MessageBox(show_text, function()
+		AddFriendsPage.UnFollow(userId)
+	end)
+end
+
+function AddFriendsPage.UnFollow(userId)
+	-- userId = 176382
+	keepwork.user.unfollow({
+		objectType = 0,
+		objectId = userId,
+	},function(err, msg, data)
+		-- commonlib.echo(data, true)
+		if err == 200 then
+			GameLogic.AddBBS("statusBar", L"取消关注成功", 5000, "0 255 0");
+            local function updata_cb()
+                AddFriendsPage.OnRefresh()
+            end
+            AddFriendsPage.UpdataFoucsList(updata_cb)
+    
+            -- 刷新好友界面
+            local friend_page = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+            local is_open = friend_page.GetIsOpen()
+            if is_open then
+                friend_page.FlushCurDataAndView()
+            end
+
+			if FriendChatPage.IsOpen then
+				FriendChatPage.FlushCurDataAndView()
+			end
+		end
 	end)
 end
 
