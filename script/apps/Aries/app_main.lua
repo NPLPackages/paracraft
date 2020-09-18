@@ -2681,15 +2681,17 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 			SwfLoadingBarPage.UpdateText("正在登录游戏服务器");
 		end
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
-		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
-		ParaWorldLoginAdapter.CheckAndReset();
+		if (not System.options.isCodepku) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+			local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+			ParaWorldLoginAdapter.CheckAndReset();
 
-		local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
-		TeachingQuestTitle.StaticInit();
+			local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
+			TeachingQuestTitle.StaticInit();
 
-		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
-		ClassManager.OnWorldLoaded();
+			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+			ClassManager.OnWorldLoaded();
+		end
 
 		if(is_standalone) then
 			stage_states.connect_world = "done";

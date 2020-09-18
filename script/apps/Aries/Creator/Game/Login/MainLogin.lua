@@ -519,13 +519,14 @@ function MainLogin:ShowLoginModePage()
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 	
-    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-    KeepWorkItemManager.StaticInit();
-
-    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-    KpChatChannel.StaticInit();
-
 	if (not System.options.isCodepku) then
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		KeepWorkItemManager.StaticInit();
+
+		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+		KpChatChannel.StaticInit();
+
+	
 		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 		ClassManager.StaticInit();
 	end

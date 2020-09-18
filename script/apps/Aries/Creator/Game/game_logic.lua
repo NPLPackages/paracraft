@@ -221,15 +221,17 @@ function GameLogic.InitCommon()
 
 	GameLogic.CreateGetAutoSaver();
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
-	local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-	UserIntroduction.StaticInit()
+	if (not System.options.isCodepku) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
+		local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
+		UserIntroduction.StaticInit()
 
-    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-    KpChatChannel.StaticInit();
+		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+		KpChatChannel.StaticInit();
 
-    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-	KeepWorkItemManager.StaticInit();
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		KeepWorkItemManager.StaticInit();
+	end
 
 	if ((not System.options.isCodepku) and ParaEngine.GetAppCommandLineByParam("open_ci", false) == "true") then
 		local ParacraftCI = NPL.load("(gl)script/apps/Aries/ParacraftCI/ParacraftCI.lua");
@@ -245,7 +247,7 @@ function GameLogic.InitCommon()
 		ClassManager.StaticInit();
 	end
 
-	GameLogic.KeepWorkItemManager = KeepWorkItemManager;
+	GameLogic.KeepWorkItemManager = KeepWorkItemManager or nil;
 end
 
 -- call this when user first enters a game world.
