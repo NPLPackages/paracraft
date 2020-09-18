@@ -108,6 +108,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "GameDescription", desc: get game description string, which will be shown in the window title area
   - "HandleGlobalKeyByRETURN", custom handle global key by DIK_RETURN
   - "HandleGlobalKeyBySLASH", custom handle global key by DIK_SLASH
+  - "CheckInstallUrlProtocol" false, determine whether checking install paracraft url protocol
   
 - file exporters:
   - "file_exported", id, filename:
