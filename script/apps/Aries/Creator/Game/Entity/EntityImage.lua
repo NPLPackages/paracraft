@@ -804,12 +804,15 @@ function Entity:updateTick(x,y,z)
 	end
 end
 
+function Entity:GetText()
+	return self:GetImageFilePath()
+end
 
 -- @param text: string to match
 -- @param bExactMatch: if for exact match
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local filename = self:GetImageFilePath();
+	local filename = self:GetText();
 	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
 		return true, filename
 	end

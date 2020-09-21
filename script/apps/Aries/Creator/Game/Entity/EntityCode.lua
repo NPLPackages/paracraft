@@ -806,12 +806,16 @@ function Entity:HasDiskFileMirror()
 	return self.hasDiskFileMirror;
 end
 
+function Entity:GetText()
+	return self:GetNPLCode()
+end
+
 -- return the NPL code line containing the text
 -- @param text: string to match
 -- @param bExactMatch: if for exact match
 -- return bFound, filename, filenames: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local code = self:GetNPLCode()
+	local code = self:GetText()
 	if(code) then
 		local bFound, filename, filenames = mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
 		if(bFound) then

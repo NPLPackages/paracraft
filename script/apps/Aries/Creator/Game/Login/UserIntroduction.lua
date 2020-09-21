@@ -12,9 +12,10 @@ UserIntroduction.StaticInit()
 UserIntroduction.ShowPage()
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
+local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 
 UserIntroduction.page= nil;
 UserIntroduction.showOnStart = false;
@@ -27,7 +28,7 @@ end
 function UserIntroduction.OnWorldLoaded()
 	local revision = GameLogic.options:GetRevision()
 	local projectId = tostring(GameLogic.options:GetProjectId());
-	if((not revision or revision < 2) and GameLogic.GetMode() == "editor" and not GameLogic.IsRemoteWorld() and projectId ~= TeachingQuestPage.MainWorldId) then
+	if((not revision or revision < 2) and GameLogic.GetMode() == "editor" and not GameLogic.IsRemoteWorld() and projectId ~= ParaWorldLoginAdapter.MainWorldId) then
 		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 			UserIntroduction.CheckShowOnStartup()
 		end})

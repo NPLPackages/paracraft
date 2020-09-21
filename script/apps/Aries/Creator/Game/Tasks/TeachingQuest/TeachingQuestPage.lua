@@ -146,6 +146,17 @@ function TeachingQuestPage.ResetTasks()
 	TeachingQuestPage.taskCallback = {};
 end
 
+function TeachingQuestPage.HasTaskInProgress()
+	for i = 1, #TeachingQuestPage.TaskGsids do
+		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.TaskGsids[i]);
+		local max = TeachingQuestPage.GetTaskItemMax(TeachingQuestPage.TaskGsids[i]);
+		if (count < max) then
+			return true;
+		end
+	end
+	return false;
+end
+
 function TeachingQuestPage.AddTasks(tasks, type)
 	if (tasks ~= nil and #tasks > 1) then
 		TeachingQuestPage.quests[type] = tasks;

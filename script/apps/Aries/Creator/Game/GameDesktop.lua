@@ -476,7 +476,13 @@ function Desktop.OnExit(bForceExit, bRestart)
 			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
 			if(dialog and dialog.callback and dialog.text) then
 				_guihelper.MessageBox(dialog.text, 
+<<<<<<< .mine
 					dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
+||||||| .r25553
+					dialog.callback, _guihelper.MessageBoxButtons.YesNoCancel);
+=======
+					dialog.callback, dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
+>>>>>>> .r25615
 			end
 		end
 	end

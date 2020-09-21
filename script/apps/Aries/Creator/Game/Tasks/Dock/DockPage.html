@@ -5,7 +5,11 @@
 <body>
 <pe:mcml>
 <script type="text/npl" src="DockPage.lua" refresh="false"><![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
     local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+
     function ds_top_line_1(index)
         if(index == nil) then
             return #DockPage.top_line_1;
@@ -28,6 +32,19 @@
     end
     function RenderButton_2(index)
         return DockPage.RenderButton_2(index);
+    end
+    function CanShowVip()
+        local list = DockPage.hide_vip_world_ids[HttpWrapper.GetDevVersion()];
+        if(list)then
+			local projectId = GameLogic.options:GetProjectId();
+            projectId = tonumber(projectId);
+            for k,id in ipairs(list) do
+                if(id == projectId)then
+                    return false;
+                end
+            end
+        end
+        return true;
     end
 ]]></script>
     <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;margin-right:180px;height:200px;background:;">
@@ -97,10 +114,12 @@
                 <!--系统-->
                 <input type="button" name='system' onclick="OnClick" style="width:70px;height:90px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xitong_32bits.png#0 0 70 90)"/>
             </div>
-            <div style="float:left;margin-left:7px;">
-                <!--会员-->
-                <input type="button" name='vip' onclick="OnClick" style="width:70px;height:90px;background:url(Texture/Aries/Creator/keepwork/dock/btn_huiyuan_32bits.png#0 0 70 90)"/>
-            </div>
+            <pe:if condition="<%=CanShowVip()%>">
+                <div style="float:left;margin-left:7px;">
+                    <!--会员-->
+                    <input type="button" name='vip' onclick="OnClick" style="width:70px;height:90px;background:url(Texture/Aries/Creator/keepwork/dock/btn_huiyuan_32bits.png#0 0 70 90)"/>
+                </div>
+            </pe:if>
             <div style="float:left;margin-left:7px;">
                 <!--资源-->
                 <input type="button" name='mall' onclick="OnClick" style="width:70px;height:90px;background:url(Texture/Aries/Creator/keepwork/dock/btn_ziyuan_32bits.png#0 0 70 90)"/>

@@ -494,12 +494,16 @@ function Entity.OnClickAdvancedEditor()
 	end
 end
 
+function Entity:GetText()
+	return self:GetNPLCode()
+end
+
 -- return the NPL code line containing the text
 -- @param text: string to match
 -- @param bExactMatch: if for exact match
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local code = self:GetNPLCode()
+	local code = self:GetText()
 	if(code) then
 		return mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
 	end

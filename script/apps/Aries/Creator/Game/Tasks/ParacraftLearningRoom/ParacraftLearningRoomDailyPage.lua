@@ -10,12 +10,13 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 ParacraftLearningRoomDailyPage.DoCheckin();
 --]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
+local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 
 local ParacraftLearningRoomDailyPage = NPL.export()
 
@@ -321,6 +322,9 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 
 	local learning = function()
 		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
+		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+		UserConsole:HandleWorldId(ParaWorldLoginAdapter.GetDefaultWorldID(), "force");
+		--[[
 		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
 		if (template) then
 			if (TeachingQuestPage.MainWorldId == nil) then
@@ -328,8 +332,9 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 				TeachingQuestPage.MainWorldId = tostring(template.desc);
 			end
 			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-			UserConsole:HandleWorldId(TeachingQuestPage.MainWorldId, "force");
+			UserConsole:HandleWorldId(ParaWorldLoginAdapter.MainWorldId, "force");
 		end
+		]]
 	end
 	if(not KeepWorkItemManager.IsLoaded())then
 		KeepWorkItemManager.GetFilter():add_filter("loaded_all", learning);

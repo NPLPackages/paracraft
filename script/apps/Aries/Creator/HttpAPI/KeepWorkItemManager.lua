@@ -314,7 +314,9 @@ function KeepWorkItemManager.Load(bForced, callback)
                             KeepWorkItemManager.loaded = true;
                             if(callback)then
                                 callback();
-                            end            
+                            end  
+                            KeepWorkItemManager.LoadMutingInfo(true)
+
                             KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
                             KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
                         end)
@@ -507,6 +509,29 @@ function KeepWorkItemManager.UnionItems(items, new_items)
         end
     end
     return items;
+end
+
+function KeepWorkItemManager.GetMutingInfo()
+    return KeepWorkItemManager.mutings;
+end
+function KeepWorkItemManager.LoadMutingInfo(bForced, callback)
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+    keepwork.user.mutings({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+        if(data)then
+            KeepWorkItemManager.mutings = data;
+            if(callback)then
+                callback(err, msg, data);
+            end
+        end
+    end)
 end
 --[[
 {

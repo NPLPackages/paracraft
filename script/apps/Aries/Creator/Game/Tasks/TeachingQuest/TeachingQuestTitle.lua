@@ -9,6 +9,8 @@ local TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Te
 TeachingQuestTitle.ShowPage();
 --]]
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
@@ -32,14 +34,15 @@ function TeachingQuestTitle.OnWorldLoaded()
 	if (page) then
 		page:CloseWindow();
 	end
-	local projectId = tostring(GameLogic.options:GetProjectId());
-	if (TeachingQuestPage.MainWorldId == nil) then
+	local projectId = GameLogic.options:GetProjectId();
+	projectId = tonumber(projectId);
+	if (ParaWorldLoginAdapter.MainWorldId == nil) then
 		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
 		if (template) then
-			TeachingQuestPage.MainWorldId = tostring(template.desc);
+			ParaWorldLoginAdapter.MainWorldId = tostring(template.desc);
 		end
 	end
-	if (projectId == TeachingQuestPage.MainWorldId) then
+	if (projectId == ParaWorldLoginAdapter.MainWorldId) then
 		if(not KeepWorkItemManager.GetToken())then
 			_guihelper.MessageBox(L"本世界只有登录的用户可以访问。即将退出世界！");
 			commonlib.TimerManager.SetTimeout(function()  
@@ -56,7 +59,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 
 		end, 200)
 	else
-		if (TeachingQuestPage.IsTaskProject(projectId)) then
+		if (TeachingQuestPage.IsTaskProject(tostring(projectId))) then
 			local state = TeachingQuestPage.GetTaskState(TeachingQuestPage.currentIndex);
 			if (state == TeachingQuestPage.Finished or state == TeachingQuestPage.Activated) then
 				commonlib.TimerManager.SetTimeout(function()  
@@ -350,7 +353,8 @@ function TeachingQuestTitle.OnReturn()
 		GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 		GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
 		page:CloseWindow();
-		GameLogic.RunCommand("/loadworld -force "..TeachingQuestPage.MainWorldId);
+		--GameLogic.RunCommand("/loadworld -force "..ParaWorldLoginAdapter.MainWorldId);
+		ParaWorldLoginAdapter:EnterWorld(true);
 	end
 	if (not TeachingQuestTitle.IsTaskFinished()) then
 		_guihelper.MessageBox(L"任务尚未开始，是否确定退出当前任务世界？", function(res)

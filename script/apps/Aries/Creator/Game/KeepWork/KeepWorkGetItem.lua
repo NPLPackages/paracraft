@@ -30,7 +30,6 @@ local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/Dock
 function KeepWorkGetItem.OnInit(data)
 	page = document:GetPageCtrl();
 	item_data = data
-	commonlib.echo(item_data, true)
 end
 
 -- {
@@ -124,8 +123,11 @@ function KeepWorkGetItem.OnOK()
 		local gsid = goods_info.gsId or 0
 	
 		local amount = item.amount
+		local isModel = goods_info.modelUrl ~= nil and goods_info.modelUrl ~= ""
+		if not isModel then
+			DockTipPage.GetInstance():PushGsid(gsid,amount);
+		end
 		
-		DockTipPage.GetInstance():PushGsid(gsid,amount);
 	end
 
 end

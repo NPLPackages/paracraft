@@ -22,6 +22,7 @@ local cur_classifyId = 0
 local bean_gsid = 998;
 local coin_gsid = 888
 local menu_node_data = {}
+KeepWorkMallPage.isOpen = false
 
 KeepWorkMallPage.menu_data_sources = {}
 KeepWorkMallPage.menu_data_sources = {
@@ -58,6 +59,7 @@ KeepWorkMallPage.defaul_select_menu_item_index = 1
 KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
 function KeepWorkMallPage.OnInit()
 	page = document:GetPageCtrl();
+	page.OnClose = KeepWorkMallPage.CloseView
 end
 
 function KeepWorkMallPage.Show()
@@ -77,6 +79,7 @@ function KeepWorkMallPage.Show()
 end
 
 function KeepWorkMallPage.ShowView()
+	KeepWorkMallPage.isOpen = true
 	keepwork.mall.menus.get({
 		cache_policy,
 		platform =  1,
@@ -98,8 +101,8 @@ function KeepWorkMallPage.ShowView()
 		local standard_width = 1280
 		local standard_height = 720
 		
-		local view_width = 904
-		local view_height = 518
+		local view_width = 996
+		local view_height = 613
 
 		local ratio = view_width/standard_width
 
@@ -121,6 +124,15 @@ function KeepWorkMallPage.ShowView()
 					height = view_height,
 			};
 		System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+		GameLogic.GetFilters():add_filter("OnInstallModel", function ()
+            Mod.WorldShare.Utils.SetTimeOut(function()
+				if KeepWorkMallPage.isOpen then
+					KeepWorkMallPage.HandleDataSources()
+					KeepWorkMallPage.FlushView(true)
+				end
+            end, 500)
+		end);
 
 		KeepWorkMallPage.OnChangeTopBt(1);
 		KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
@@ -195,11 +207,17 @@ function KeepWorkMallPage.HandleMenuData(parent_t, data, level)
 	if level_to_index[level] == nil then
 		level_to_index[level] = 0
 	end
+
 	
 	for k, v in pairs(data) do
 		local temp_t = {}
 		temp_t.name = v.children == nil and "item" or "type"
+		
 		temp_t.attr = {}
+		-- 中间级别的样式处理
+		if temp_t.name == "type" then
+			temp_t.attr.isMidleMenu = level > 1
+		end
 		temp_t.attr.server_data = v
 		temp_t.attr.type_index = 1
 		temp_t.attr.text = v.name
@@ -260,55 +278,114 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
             ["x-page"] = 1,
         }
 	},function(err, msg, data)
-		for k, v in pairs(data.rows) do
-			v.cost_name = ""
-			v.cost = 0
-			v.cost_desc = ""
-			v.enabled = true
-			v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
-			v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
-			v.isLink = v.purchaseUrl ~= nil and v.purchaseUrl ~= ""
-			-- 售完或者到达购买上限的情况下不允许购买
-			v.buy_txt = "购买"
-			if v.rule and v.rule.storage == 0 then
-				v.buy_txt = "售完"
-				v.enabled = false
-			else
-				v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
-			end
-			
-			
-			if v.rule and v.rule.exchangeCosts and v.rule.exchangeCosts[1] then
-				v.cost = v.rule.exchangeCosts[1].amount
-				
-				local cost_item_data = KeepWorkItemManager.GetItemTemplateById(v.rule.exchangeCosts[1].id) or {}
-				v.cost_name = cost_item_data.name or ""
-
-				if cost_item_data.gsId == bean_gsid then
-					v.is_cost_bean = true
-				elseif cost_item_data.gsId == coin_gsid then
-					v.is_cost_coin = true
-				end
-
-				if v.is_cost_bean or v.is_cost_coin then
-					v.cost_desc = v.cost
-				else
-					v.cost_desc = v.cost .. v.cost_name
-				end
-			elseif v.price then
-				v.cost_desc = v.price
-			end
-		end
-
 		KeepWorkMallPage.grid_data_sources = data.rows
-		if only_refresh_grid then
-			local gvw_name = "item_gridview";
-			local node = page:GetNode(gvw_name);
-			pe_gridview.DataBind(node, gvw_name, false);
-		else
-			KeepWorkMallPage.OnRefresh()
-		end
+		KeepWorkMallPage.HandleDataSources()
+		KeepWorkMallPage.FlushView(only_refresh_grid)
     end)
+end
+
+function KeepWorkMallPage.FlushView(only_refresh_grid)
+	if only_refresh_grid then
+		local gvw_name = "item_gridview";
+		local node = page:GetNode(gvw_name);
+		pe_gridview.DataBind(node, gvw_name, false);
+	else
+		KeepWorkMallPage.OnRefresh()
+	end
+end
+
+function KeepWorkMallPage.HandleDataSources()
+	if nil == KeepWorkMallPage.grid_data_sources then
+		return
+	end
+
+	for k, v in pairs(KeepWorkMallPage.grid_data_sources) do
+			
+		v.goods_data = {}
+		if v.rule and v.rule.exchangeTargets and v.rule.exchangeTargets[1] then
+			local goods = v.rule.exchangeTargets[1].goods
+			
+			for index, value in ipairs(goods) do
+				local goods_data = KeepWorkItemManager.GetItemTemplateById(goods[1].id) or {}
+				-- print("bbbbbbbbb")
+				-- commonlib.echo(goods_data, true)
+				v.goods_data[#v.goods_data + 1] = goods_data
+			end
+		end
+
+		v.cost_name = ""
+		v.cost = 0
+		v.cost_desc = ""
+		v.enabled = true
+		v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
+		v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
+		v.isLink = v.purchaseUrl ~= nil and v.purchaseUrl ~= ""
+		v.isModelProduct = #v.goods_data == 1 and v.goods_data[1].modelUrl ~= nil and v.goods_data[1].modelUrl ~= ""
+		-- 售完或者到达购买上限的情况下不允许购买
+		v.buy_txt = "购买"
+		if v.rule and v.rule.storage == 0 then
+			v.buy_txt = "售完"
+			v.enabled = false
+			v.is_sell = true
+		else
+			v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
+
+			if v.isModelProduct then
+				local good_data = v.goods_data[1]
+				local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(good_data.gsId)
+				local bag_nums = copies and copies or 0
+				v.bag_nums = bag_nums
+				if bag_nums > 0 then
+					if GameLogic.IsReadOnly() then
+						v.buy_txt = "已拥有"
+						v.enabled = false
+						v.is_has = true
+					else
+						v.buy_txt = "使用"
+						v.enabled = true
+						v.can_use = true
+						-- 如果有使用中的显示的需求
+						local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+						if EditModelTask then
+							local file = EditModelTask:GetModelFileInHand()
+							if file == string.format("blocktemplates/%s.%s", good_data.name, good_data.fileType) then
+								v.buy_txt = "已使用"
+								v.enabled = false
+								v.is_use = true
+								v.can_use = false
+							end
+						end
+
+					end
+
+					--file ：blocktemplates/河马.bmax
+					
+				end
+			end
+		end
+		
+		
+		if v.rule and v.rule.exchangeCosts and v.rule.exchangeCosts[1] then
+			v.cost = v.rule.exchangeCosts[1].amount
+			
+			local cost_item_data = KeepWorkItemManager.GetItemTemplateById(v.rule.exchangeCosts[1].id) or {}
+			v.cost_name = cost_item_data.name or ""
+
+			if cost_item_data.gsId == bean_gsid then
+				v.is_cost_bean = true
+			elseif cost_item_data.gsId == coin_gsid then
+				v.is_cost_coin = true
+			end
+
+			if v.is_cost_bean or v.is_cost_coin then
+				v.cost_desc = v.cost
+			else
+				v.cost_desc = v.cost .. v.cost_name
+			end
+		elseif v.price then
+			v.cost_desc = v.price
+		end
+	end
 end
 
 function KeepWorkMallPage.OnClickBuy(item_data)
@@ -316,6 +393,23 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		ParaGlobal.ShellExecute("open", item_data.purchaseUrl, "", "", 1); 
 		return
 	end
+
+	if item_data.enabled == false then
+		return
+	end
+
+	if item_data.isModelProduct and item_data.bag_nums and item_data.bag_nums > 0 then
+		if GameLogic.IsReadOnly() then
+			return
+		end
+		local good_data = item_data.goods_data[1]
+		local model_url = good_data.modelUrl or ""
+		local command = string.format("/install -ext %s -filename %s %s", good_data.fileType, good_data.name, model_url)
+		GameLogic.RunCommand(command)
+		
+		return
+	end
+
 	local KeepWorkStackableItemPage = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage
 	if KeepWorkStackableItemPage then
 		KeepWorkStackableItemPage.closeView()
@@ -341,10 +435,10 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		enable_esc_key = true,
 		directPosition = true,
 			align = "_ct",
-			x = -400/2,
-			y = -304/2,
-			width = 400,
-			height = 304,
+			x = -396/2,
+			y = -274/2,
+			width = 396,
+			height = 274,
 	});
 end
 
@@ -419,4 +513,8 @@ local top_bt_desc_list = {
 }
 function KeepWorkMallPage.getTopBtDesc()
 	return top_bt_desc_list[KeepWorkMallPage.top_bt_index or 1] or ""
+end
+
+function KeepWorkMallPage.CloseView()
+	KeepWorkMallPage.isOpen = false
 end

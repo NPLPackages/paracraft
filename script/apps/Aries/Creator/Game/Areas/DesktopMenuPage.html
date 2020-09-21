@@ -16,6 +16,15 @@ DesktopMenuPage.OnInit();
 function OnClickMenu(name)
     DesktopMenu.OnClickMenuItem(name);
 end
+function GetProjectId()
+    local id = GameLogic.options:GetProjectId();
+    return id;
+end
+function OnComplain()
+    local UserComplainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserComplainPage.lua");
+    local input_msg = UserComplainPage.MakeProjectMsg(GetProjectId());
+    UserComplainPage.ShowPage(UserComplainPage.Types.PROJECT,input_msg);
+end
 ]]></script>
 <pe:container ClickThrough="true" alignment="_mt" width="0" height="32px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#497 342 2 32)">
     <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:32px;">
@@ -32,9 +41,15 @@ end
             </pe:repeatitem>
         </pe:repeat>
     </pe:container>
-    <pe:container alignment="_rt" style="position:relative;width:200px;height:32px;background:;">
+    <pe:container alignment="_rt" style="position:relative;width:285px;height:32px;background:;">
+        
         <div style="position:relative;">
-            <input type="button" name="projectId" style="height:32px" tooltip='<%=L"点击访问作品项目页面"%>' onclick="DesktopMenuPage.OnClickProjectId" value="<%=DesktopMenuPage.GetProjectText()%>" class="mc_button_grey"/>
+            <div style="float:left;width:82px;" >
+                <pe:if condition="<%=GetProjectId() ~= nil %>">
+                    <input type="button" style="margin-top:3px;width:82px;" onclick="OnComplain" value="<%=L'举报违规'%>" class="kp_gray_light_button"/>
+                </pe:if>
+            </div>
+            <input type="button" name="projectId" style="float:left;margin-left:2px;height:32px" tooltip='<%=L"点击访问作品项目页面"%>' onclick="DesktopMenuPage.OnClickProjectId" value="<%=DesktopMenuPage.GetProjectText()%>" class="mc_button_grey"/>
         </div>
         <div style="width:36px;position:relative;" align="right">
             <div tooltip='<%=L"自动隐藏"%>' name="btnPinMenu" onclick="DesktopMenuPage.TogglePinned" style="padding:2px;width:30px;height:30px;background:;background2:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 364 25 26:6 6 6 6);">

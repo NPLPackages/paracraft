@@ -245,6 +245,7 @@ function DefaultTheme:Load()
 	pe_css.default = {
 		["kp_yellow_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
 		["kp_gray_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
+		["kp_gray_light_button"] = {background = "Texture/Aries/Creator/keepwork/complain/btn_jubaoweigui_32x28_32bits.png;0 0 32 28:12 12 12 12", ["text-offset-y"] = -2, ["font-size"] = 14, height = 28},
 		["kp_window_container"] = {
 			["padding-left"] = 2,
 			["padding-top"] = 39,

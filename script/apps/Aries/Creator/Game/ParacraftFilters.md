@@ -116,6 +116,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "export_to_file", filename:
   - "select_exporter", id:
   - "OnInstallModel": filename, url: called when /install -ext bmax commands are executed. 
+  - "CheckInstallUrlProtocol" false, determine whether checking install paracraft url protocol
 
 - command:
   - "register_command": Commands, slashCommandObj:  register additional commands

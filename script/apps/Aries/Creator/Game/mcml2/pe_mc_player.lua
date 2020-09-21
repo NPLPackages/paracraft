@@ -50,7 +50,7 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		if(IsInteractive == nil) then
 			IsInteractive = true;
 		end
-		local autoRotateSpeed = self:GetNumber("AutoRotateSpeed")
+		local autoRotateSpeed = self:GetNumber("autoRotateSpeed")
 		if(autoRotateSpeed == nil) then
 			autoRotateSpeed = 0;
 		end

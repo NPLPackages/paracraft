@@ -15,7 +15,8 @@ local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.Para
 
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
 
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 
 -- set this to true when keepwork `?token=` signin is fully supported. 
 ParaWorldLesson.autoSigninWebUrl = true;
@@ -143,7 +144,9 @@ function ParaWorldLesson:GetFirstWorldUrl(callbackFunc)
 					projectId = projectId:gsub("^['\"](.+)['\"]$", "%1");
 					projectId = tonumber(projectId);
 					if(projectId) then
-						KeepworkService:GetWorldByProjectId(projectId, function(worldInfo)
+						KeepworkServiceWorld:GetWorldByProjectId(projectId, function(worldInfo)
+							echo(worldInfo, true)
+
 							if worldInfo and worldInfo.archiveUrl then
 								self.worldUrl = worldInfo.archiveUrl;
 							end

@@ -54,7 +54,7 @@ function ParaWorldList.ShowPage()
 					for i = 1, #(data.rows) do
 						local exist = false;
 						for j = 1, #ParaWorldList.Current_Item_DS do
-							if (ParaWorldList.Current_Item_DS[j].id == data.rows[i].id) then
+							if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
 								exist = true;
 								break;
 							end

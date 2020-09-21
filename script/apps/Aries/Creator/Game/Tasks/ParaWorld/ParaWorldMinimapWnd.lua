@@ -94,7 +94,9 @@ function ParaWorldMinimapWnd.OnLocalWorldInfo()
 	else
 		local generatorName = WorldCommon.GetWorldTag("world_generator");
 		if (generatorName == "paraworld") then
-			_guihelper.MessageBox(L"入驻并行世界的功能将在9.17日开放。 快去建设自己的家园吧, 将你的家园安放在大世界周围的地块中");
+			--_guihelper.MessageBox(L"入驻并行世界的功能将在9.17日开放。 快去建设自己的家园吧, 将你的家园安放在大世界周围的地块中");
+			local ParaWorldApply = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldApply.lua");
+			ParaWorldApply.ShowPage();
 		elseif (generatorName == "paraworldMini") then
 			_guihelper.MessageBox(L"请到并行世界中选择要入驻的大世界，在并行世界列表中可以点击进入并行世界！");
 		end

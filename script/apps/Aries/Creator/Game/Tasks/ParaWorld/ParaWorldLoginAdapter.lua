@@ -86,7 +86,6 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
                 local world_info = data[1];
                 if(world_info.projectId)then
                     world_id =  world_info.projectId;
-					ParaWorldLoginAdapter.ParaWorldId = world_info.id;
                 end
             end
         end
@@ -98,6 +97,7 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
 end
 -- enter offline world
 function ParaWorldLoginAdapter:EnterOfflineWorld()
+	ParaWorldLoginAdapter.MainWorldId = ParaWorldLoginAdapter.GetDefaultWorldID();
     NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 	local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
 	InternetLoadWorld.ShowPage();
@@ -153,16 +153,31 @@ end
 
 function ParaWorldLoginAdapter.CheckAndReset()
 	commonlib.TimerManager.SetTimeout(function()
-		ParaWorldLoginAdapter:SearchWorldID(function(world_id)
-			LOG.std(nil, "info", "ParaWorldLoginAdapter", " found world_id:%s", tostring(world_id));
-			ParaWorldLoginAdapter.MainWorldId = world_id;
-
-			local projectId = GameLogic.options:GetProjectId();
-			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId) then
-			else
-				ParaWorldLoginAdapter.MainWorldId = nil;
-				ParaWorldLoginAdapter.ParaWorldId = nil
+		ParaWorldLoginAdapter.MainWorldId = ParaWorldLoginAdapter.GetDefaultWorldID();
+		ParaWorldLoginAdapter.ParaWorldId = nil;
+		local projectId = GameLogic.options:GetProjectId();
+		keepwork.world.mylist(nil, function(err, msg, data)
+			if (err == 200 and data) then
+				for i = 1, #data do
+					if (data[i].projectId == tonumber(projectId)) then
+						ParaWorldLoginAdapter.MainWorldId = data[i].projectId;
+						ParaWorldLoginAdapter.ParaWorldId = data[i].id;
+						return;
+					end
+				end
 			end
-		end)
+
+			keepwork.world.list(nil, function(err, msg, data)
+				if (data and data.rows) then
+					for i = 1, #(data.rows) do
+						if (data.rows[i].projectId == tonumber(projectId)) then
+							ParaWorldLoginAdapter.MainWorldId = data.rows[i].projectId;
+							ParaWorldLoginAdapter.ParaWorldId = data.rows[i].id;
+							break;
+						end
+					end
+				end
+			end);
+		end);
 	end, 1000);
 end

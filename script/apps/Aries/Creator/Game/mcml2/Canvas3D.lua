@@ -16,45 +16,46 @@ local Canvas3D = commonlib.inherit(commonlib.gettable("System.Windows.UIElement"
 Canvas3D:Property("Name", "Canvas3D");
 Canvas3D:Property({"BackgroundColor", "#ffffff", auto=true});
 Canvas3D:Property({"Background", nil, auto=true});
-	--how many degrees per pixel movement
+--how many degrees per pixel movement
 Canvas3D:Property({"RotSpeed", 0.004, auto=true});
-	-- how many degrees (in radian) to rotate around the Y axis per second. if nil or 0 it will not rotate. common values are 0.12
+-- how many degrees (in radian) to rotate around the Y axis per second. if nil or 0 it will not rotate. common values are 0.12
 Canvas3D:Property({"AutoRotateSpeed", 0, auto=true});
-	-- how many percentage of MaxZoomDist to pan for each mouse pixel movement
+-- how many percentage of MaxZoomDist to pan for each mouse pixel movement
 Canvas3D:Property({"PanSpeed", 0.001, auto=true});
-	--model config camera name
+--model config camera name
 Canvas3D:Property({"CameraName", nil, auto=true});
-	-- the default came object distance, if nil, we will automatically calculate according to the bounding box. 
+-- the default came object distance, if nil, we will automatically calculate according to the bounding box. 
 Canvas3D:Property({"DefaultCameraObjectDist", 7, auto=true});
 Canvas3D:Property({"DefaultLiftupAngle", 0.25, auto=true});
 Canvas3D:Property({"DefaultRotY", 0, auto=true});
-	-- camera look at height. if nil, the bounding box of the asset will be used for height calculation. 
+-- camera look at height. if nil, the bounding box of the asset will be used for height calculation. 
 Canvas3D:Property({"LookAtHeight", 1.5, auto=true});
-	-- camera lift up angle range in 3D mode. 
+-- camera lift up angle range in 3D mode. 
 Canvas3D:Property({"MaxLiftupAngle", 1.3, auto=true});
 Canvas3D:Property({"MinLiftupAngle", 0.1, auto=true});
-	-- how many meters to zoom in and out in 3D mode. 
+-- how many meters to zoom in and out in 3D mode. 
 Canvas3D:Property({"MaxZoomDist", 20, auto=true});
 Canvas3D:Property({"MinZoomDist", 0.01, auto=true});
-	-- must be power of 2, like 128, 256. This is only used in ShowModel. 
-	-- However, one can use the set size function miniscenegraph to specify both height and width.
+-- must be power of 2, like 128, 256. This is only used in ShowModel. 
+-- However, one can use the set size function miniscenegraph to specify both height and width.
 Canvas3D:Property({"RenderTargetSize", 256, "GetRenderTargetSize", "SetRenderTargetSize"});
-	-- the camera's field of view when a render target is used. 
-	-- FieldOfView = 1.57,
-	-- whether it will receive and responds to mouse event
+-- the camera's field of view when a render target is used. 
+-- FieldOfView = 1.57,
+-- whether it will receive and responds to mouse event
 Canvas3D:Property({"IsInteractive", true, auto=true});
-	-- if not nil, it will render into Miniscenegraphname; if not nil, object will be rendered into an external mini scene graph with this name. 
-	-- please refer to mcml tag pe:canvas3dui for example of using external scenes. 
+-- if not nil, it will render into Miniscenegraphname; if not nil, object will be rendered into an external mini scene graph with this name. 
+-- please refer to mcml tag pe:canvas3dui for example of using external scenes. 
 Canvas3D:Property({"ExternalSceneName", nil, auto=true});
-	-- in case ExternalSceneName is provided, this is the offset used for displaying the object. 
+-- in case ExternalSceneName is provided, this is the offset used for displaying the object. 
 Canvas3D:Property({"ExternalOffsetX", 0, auto=true});
 Canvas3D:Property({"ExternalOffsetY", 0, auto=true});
 Canvas3D:Property({"ExternalOffsetZ", 0, auto=true});
-	-- if not provided, it means "false". if true and ExternalSceneName is provided, we will set the external mini scene's camera according to this node's settings. 
+-- if not provided, it means "false". if true and ExternalSceneName is provided, we will set the external mini scene's camera according to this node's settings. 
 Canvas3D:Property({"IgnoreExternalCamera", nil, auto=true});
-	-- the miniscenegraph name to use if no one is specified. In case self.ExternalSceneName is provided, this is the object name in the external scene. 
+-- the miniscenegraph name to use if no one is specified. In case self.ExternalSceneName is provided, this is the object name in the external scene. 
 Canvas3D:Property({"Miniscenegraphname", "Mcml2DefaultCanvas3D", auto=true});
-Canvas3D:Property({"IsActiveRendering", false, auto=true});
+-- if false, one must manually call Draw() method
+Canvas3D:Property({"IsActiveRendering", true, auto=true});
 
 function Canvas3D:ctor()
 	-- mouse down position
@@ -468,6 +469,7 @@ function Canvas3D:SetMaskTexture(textureFile)
 end
 
 function Canvas3D:mousePressEvent(e)
+	if (not self.IsInteractive) then return end
 	self.lastMouseDown.x = e:pos():x();
 	self.lastMouseDown.y = e:pos():y();
 	self.IsMouseDown = true;
@@ -480,6 +482,7 @@ function Canvas3D:mousePressEvent(e)
 end
 
 function Canvas3D:mouseMoveEvent(e)
+	if (not self.IsInteractive) then return end
 	if (self.IsMouseDown) then
 		local mouse_dx, mouse_dy = e:pos():x() - self.lastMousePos.x, e:pos():y() - self.lastMousePos.y;
 		if (mouse_dx ~= 0 or mouse_dy ~= 0) then
@@ -531,6 +534,7 @@ function Canvas3D:mouseMoveEvent(e)
 end
 
 function Canvas3D:mouseReleaseEvent(e)
+	if (not self.IsInteractive) then return end
 	if (not self.IsMouseDown) then
 		return;
 	end
@@ -546,6 +550,7 @@ function Canvas3D:mouseReleaseEvent(e)
 end
 
 function Canvas3D:mouseWheelEvent(e)
+	if (not self.IsInteractive) then return end
 	if (self.resourceName == nil) then
 		return;
 	end
@@ -578,9 +583,21 @@ function Canvas3D:mouseWheelEvent(e)
 end
 
 function Canvas3D:mouseEnterEvent(mouse_event)
+	if (not self.IsInteractive) then return end
 end
 
 function Canvas3D:mouseLeaveEvent(mouse_event)
+	if (not self.IsInteractive) then return end
+end
+
+-- manually draw the miniscene graph, in case active rendering is disabled. 
+function Canvas3D:Draw(deltaTime)
+	local scene = ParaScene.GetMiniSceneGraph(self.resourceName);
+	if(scene:IsValid()) then
+		if(not scene:IsActiveRenderingEnabled()) then
+			scene:Draw(deltaTime or 0);
+		end
+	end	
 end
 
 function Canvas3D:paintEvent(painter)
@@ -616,7 +633,6 @@ function Canvas3D:paintEvent(painter)
 		end
 
 		if(scene:IsValid()) then
-			scene:Draw(0);
 			painter:SetPen(self:GetBackgroundColor());
 			painter:DrawRectTexture(self:x(), self:y(), self:width(), self:height(), scene:GetTexture());
 		end
