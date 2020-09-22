@@ -526,12 +526,6 @@ function MainLogin:ShowLoginModePage()
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
 
-<<<<<<< .mine
-	
-||||||| .r25553
-	if (not System.options.isCodepku) then
-=======
->>>>>>> .r25615
 		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 		ClassManager.StaticInit();
 	end

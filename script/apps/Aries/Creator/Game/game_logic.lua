@@ -229,17 +229,8 @@ function GameLogic.InitCommon()
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
 
-<<<<<<< .mine
 		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		KeepWorkItemManager.StaticInit();
-	end
-||||||| .r25553
-    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-	KeepWorkItemManager.StaticInit();
-=======
-		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-		KeepWorkItemManager.StaticInit();
->>>>>>> .r25615
 
 		GameLogic.KeepWorkItemManager = KeepWorkItemManager;
 
@@ -252,15 +243,9 @@ function GameLogic.InitCommon()
 		ClassManager.StaticInit();
 	end
 
-<<<<<<< .mine
-	GameLogic.KeepWorkItemManager = KeepWorkItemManager or nil;
-||||||| .r25553
-	GameLogic.KeepWorkItemManager = KeepWorkItemManager;
-=======
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
 	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 	ParaWorldMain:Init()
->>>>>>> .r25615
 end
 
 -- call this when user first enters a game world.
