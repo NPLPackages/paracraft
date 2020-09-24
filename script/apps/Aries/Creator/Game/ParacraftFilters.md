@@ -109,6 +109,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "HandleGlobalKeyByRETURN", custom handle global key by DIK_RETURN
   - "HandleGlobalKeyBySLASH", custom handle global key by DIK_SLASH
   - "CheckInstallUrlProtocol" false, determine whether checking install paracraft url protocol
+  - "AppInstallDetails" AppInstallDetails, custom app_install_details 
   
 - file exporters:
   - "file_exported", id, filename:
