@@ -645,7 +645,10 @@ end
 -- apps that must be installed with latest version. 
 -- @param appName: default to source app Name
 function ParaWorldLoginDocker.GetAppInstallDetails(appName)
-	return app_install_details[appName or ParaWorldLoginDocker.GetSourceAppName()];
+	local AppInstallDetails = app_install_details[appName or ParaWorldLoginDocker.GetSourceAppName()];
+	AppInstallDetails = GameLogic.GetFilters():apply_filters("AppInstallDetails",AppInstallDetails);
+		
+	return AppInstallDetails;
 end
 
 function ParaWorldLoginDocker.ForceExitApp()
