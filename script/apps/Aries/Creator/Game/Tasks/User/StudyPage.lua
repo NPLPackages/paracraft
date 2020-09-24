@@ -98,10 +98,10 @@ function StudyPage.clickKnowledgeIsland()
 end
 
 function StudyPage.clickArtOfWar()
-	_guihelper.MessageBox("敬请期待")
-	-- local word_id = 5986
-	-- local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	-- UserConsole:HandleWorldId(word_id, "force");
+	-- _guihelper.MessageBox("敬请期待")
+	local word_id = 19405
+	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+	UserConsole:HandleWorldId(word_id, "force");
 end
 
 function StudyPage.clickVideoRes()

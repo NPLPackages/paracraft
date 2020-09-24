@@ -390,11 +390,15 @@ function Entity:SetOffsetPos(v)
 	end
 end
 
+function Entity:GetText()
+	return self:GetModelFile();
+end
+
 -- @param text: string to match
 -- @param bExactMatch: if for exact match
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local filename = self:GetModelFile();
+	local filename = self:GetText();
 	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
 		return true, filename
 	end

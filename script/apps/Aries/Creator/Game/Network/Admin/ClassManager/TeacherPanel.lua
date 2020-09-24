@@ -15,16 +15,15 @@ local TeacherPanel = NPL.export()
 
 TeacherPanel.IsLocked = false;
 TeacherPanel.IsChatting = false;
+TeacherPanel.IsPanelVisible = true;
 
 local page;
 function TeacherPanel.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function TeacherPanel.ShowPage()
-	if (page) then
-		page:CloseWindow();
-	end
+function TeacherPanel.ShowPage(offsetY)
+	TeacherPanel.OnClose()
 	GameLogic.IsVip("OnlineTeaching", true, function(result)
 		if (result) then
 			local params = {
@@ -40,29 +39,61 @@ function TeacherPanel.ShowPage()
 					directPosition = true,
 						align = "_mt",
 						x = 0,
-						y = 0,
+						y = offsetY or 0,
 						width = 0,
 						height = 48,
 				};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-			--GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeacherPanel.MoveDown, TeacherPanel, "TeacherPanel");
+			GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeacherPanel.MoveDown, TeacherPanel, "TeacherPanel");
+			GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeacherPanel.MoveLeft, TeacherPanel, "TeacherPanel");
 		end
 	end);
 end
 
 function TeacherPanel.OnClose()
 	if (page) then
-		--GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeacherPanel.MoveDown, TeacherPanel);
+		GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeacherPanel.MoveDown, TeacherPanel);
+		GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeacherPanel.MoveLeft, TeacherPanel);
 		page:CloseWindow();
 	end
 end
 
 function TeacherPanel:MoveDown(event)
 	if (event.bShow) then
-		TeacherPanel.ShowPage(false, 32);
+		if (TeacherPanel.IsPanelVisible) then
+			TeacherPanel.ShowPage(32);
+		else
+			TeacherPanel.ShowPage(32-32);
+		end
 	else
-		TeacherPanel.ShowPage(false, 0);
+		if (TeacherPanel.IsPanelVisible) then
+			TeacherPanel.ShowPage();
+		else
+			TeacherPanel.ShowPage(-32);
+		end
+	end
+end
+
+function TeacherPanel:MoveLeft(event)
+	if (event.bShow) then
+		TeacherPanel.OnHidePanel();
+	else
+		TeacherPanel.OnShowPanel();
+	end
+end
+
+function TeacherPanel.OnShowPanel()
+	if (not TeacherPanel.IsPanelVisible) then
+		TeacherPanel.IsPanelVisible = true;
+		TeacherPanel.ShowPage();
+	end
+end
+
+function TeacherPanel.OnHidePanel()
+	if (TeacherPanel.IsPanelVisible) then
+		TeacherPanel.IsPanelVisible = false;
+		TeacherPanel.ShowPage(-32);
 	end
 end
 

@@ -53,6 +53,18 @@
                     </div>
                 </pe:container>
             </pe:if>
+            <pe:container alignment="_ctb" style="position:relative;background:;width:60px;height:20px;">
+                <pe:if condition='<%=TeacherPanel.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeacherPanel.OnHidePanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/uparrow.png)">
+                        <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeacherPanel.OnHidePanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not TeacherPanel.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击显示面板"%>' onclick="TeacherPanel.OnShowPanel" style="margin-left:14px;margin-top:3px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/downarrow.png)">
+                        <div tooltip='<%=L"点击显示面板"%>' onclick="TeacherPanel.OnShowPanel" style="margin-left:-14px;margin-top:-5px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+            </pe:container>
         </pe:container>
     </pe:mcml>
 </body>

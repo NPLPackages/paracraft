@@ -1,0 +1,130 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/UserComplainPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="UserComplainPage.lua"><![CDATA[
+local UserComplainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserComplainPage.lua");
+UserComplainPage.OnInit()
+function OnClose()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #UserComplainPage.radio_ds;
+    else
+        return UserComplainPage.radio_ds[index];
+    end
+end
+function IsSelected(index)
+    local item = UserComplainPage.radio_ds[index];
+    if(item)then
+        return item.checked;
+    end
+end
+function OnSelected(index)
+    for k,v in ipairs(UserComplainPage.radio_ds) do
+        if(k == index)then
+            v.checked = true;
+        else
+            v.checked = false;
+        end
+    end
+    Page:Refresh(0);
+end
+function GetTitle()
+    if(UserComplainPage.output_msg)then
+        local input_type = UserComplainPage.output_msg.input_type;
+        local input_msg = UserComplainPage.output_msg.input_msg;
+        if(input_msg)then
+            return input_msg.title;
+        end
+    end
+end
+function GetSelectedRadioItem()
+    for k,v in ipairs(UserComplainPage.radio_ds) do
+        if(v.checked)then
+            return v;
+        end
+    end
+end
+function OnOK()
+    local desc = Page:GetUIValue("desc");
+    local len = ParaMisc.GetUnicodeCharNum(desc);
+    if(len > 250)then
+        _guihelper.MessageBox(L"您输入的内容太长了，最多250个字符。");
+        return
+    end
+    UserComplainPage.output_msg.desc = desc;
+    local radio_item = GetSelectedRadioItem();
+
+    local output_msg = UserComplainPage.output_msg;
+    local msg = {
+        type = radio_item.key,
+        source = 1,
+        objectType = UserComplainPage.TypesValue[output_msg.input_type],
+        description = output_msg.desc, 
+        content = output_msg.input_msg,
+    }
+    keepwork.user.complain(msg,function(err, msg, data)
+        if(err ~= 200)then
+            _guihelper.MessageBox(L"提交失败！");
+            return
+        end
+        _guihelper.MessageBox(L"举报成功，感谢您的反馈！");
+        OnClose();
+    end)
+end
+]]></script>
+    <kp:window width="700" height="510" title="<%=L'投诉举报'%>" onclose="OnClose">
+    <div class="kp_window_container">
+        <div style="padding:20px;">
+            <div style="width:124px;height:16px;background:url(Texture/Aries/Creator/keepwork/complain/zi_jubaoneirong_124X16_32bits.png#0 0 124 16)"/>
+            <div style="margin-top:10px;padding:5px;width:655px;height:80px;color:#646464;background:url(Texture/Aries/Creator/keepwork/complain/di1_32x32_32bits.png:14 14 14 14)">
+                <%=GetTitle()%>
+            </div>
+            <div style="margin-top:20px;width:69px;height:16px;background:url(Texture/Aries/Creator/keepwork/complain/zi_jubaoleixing_69X16_32bits.png#0 0 69 16)"/>
+
+            <pe:gridview style="margin-left:0px;height:80px;" name="radio_gridview" CellPadding="7" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="margin-top:10px;width:80px;">
+                        <pe:if condition="<%= IsSelected(Eval('index'))%>" >
+                            <input type="button" style="float:left;margin-top:4px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/complain/dian2_10X10_32bits.png)"/>
+                            <div style="float:left;margin-left:2px;">
+                                <input type="button" value="<%=Eval('label')%>" style="background:"/>
+                            </div>
+                        </pe:if>
+                        <pe:if  condition="<%=not IsSelected(Eval('index'))%>">
+                            <input type="button" name="<%=Eval('index')%>" onclick="OnSelected()" style="float:left;margin-top:4px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/complain/dian1_14X14_32bits.png)"/>
+                            <div style="float:left;margin-left:2px;">
+                                <input type="button" name="<%=Eval('index')%>" onclick="OnSelected()" value="<%=Eval('label')%>" style="background:"/>
+                            </div>
+                        </pe:if>
+                        
+                    </div>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+            <div style="margin-top:-30px;width:130px;height:17px;background:url(Texture/Aries/Creator/keepwork/complain/zi_jubaoshuoming_130X17_32bits.png#0 0 130 17)"/>
+            
+            <div style="margin-top:20px;padding:5px;width:655px;height:130px;color:#646464;background:url(Texture/Aries/Creator/keepwork/complain/di2_32x32_32bits.png:14 14 14 14)" >
+                <input type="text" EmptyText="<%=L'您可以对您举报的内容详细描述'%>" name="desc" UseSystemControl="true" rows="5" CaretColor="#ff000000" textcolor="#646464"  style="width:655px;height:125px;" />
+            </div>
+            <div style="margin-left:145px;margin-top:10px;">
+                <input type="button" value="<%=L'取消'%>"  onclick="OnClose()" style="width:180px;height:64px;" class="kp_gray_button"/>
+                <input type="button" value="<%=L'确定'%>" onclick="OnOK()" style="margin-left:10px;width:180px;height:64px;" class="kp_yellow_button"/>
+            </div>
+        </div>
+    </div>
+    
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

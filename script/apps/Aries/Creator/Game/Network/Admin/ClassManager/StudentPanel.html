@@ -27,9 +27,7 @@
                         <div style="float:left;margin-left:10px;margin-top:-8px;width:80px;height:38px;background:url(Texture/Aries/Creator/keepwork/ClassManager/students_in_class_32bits.png#0 0 80 38);"></div>
                         <div style="float:left;margin-left:20px;margin-top:2px;"><%=StudentPanel.GetClassName()%></div>
                         <div style="float:left;margin-left:10px;margin-top:1px;color:#717171;"> | </div>
-                        <div style="float:left;margin-left:10px;margin-top:2px;"><%=L"已上课"%></div>
-                        <div style="float:left;margin-left:0px;margin-top:2px;color:#7fb4ff;"><%=StudentPanel.GetClassTime()%></div>
-                        <div style="float:left;margin-left:0px;margin-top:2px;"><%=L"分钟"%></div>
+                        <div style="float:left;margin-left:10px;margin-top:2px;color:#7fb4ff;" name="class_time"><%=StudentPanel.GetClassTime()%></div>
                         <div style="float:left;margin-left:10px;margin-top:1px;color:#717171;"> | </div>
                         <div style="float:left;margin-left:10px;margin-top:2px;color:#7fb4ff;"><%=StudentPanel.GetTeacherName()%></div>
                         <div style="float:left;margin-left:10px;margin-top:1px;color:#717171;"> | </div>
@@ -50,6 +48,18 @@
                     </div>
                 </pe:container>
             </pe:if>
+            <pe:container alignment="_ctb" style="position:relative;background:;width:60px;height:20px;">
+                <pe:if condition='<%=StudentPanel.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击隐藏面板"%>' onclick="StudentPanel.OnHidePanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/uparrow.png)">
+                        <div tooltip='<%=L"点击隐藏面板"%>' onclick="StudentPanel.OnHidePanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not StudentPanel.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击显示面板"%>' onclick="StudentPanel.OnShowPanel" style="margin-left:14px;margin-top:3px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/downarrow.png)">
+                        <div tooltip='<%=L"点击显示面板"%>' onclick="StudentPanel.OnShowPanel" style="margin-left:-14px;margin-top:-5px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+            </pe:container>
         </pe:container>
     </pe:mcml>
 </body>

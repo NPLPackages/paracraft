@@ -139,12 +139,12 @@ function KpQuickWord.SendQuickword(node)
         if(channel == ChatChannel.EnumChannels.KpBroadCast)then
 
             KpQuickWord.ShowPage(node.Text,function(id)
-                txt = string.format("%s ID:%s",node.Text,tostring(id));
-	            ChatChannel.SendMessage(channel, nil, nil, txt );
+                txt = string.format("%sID:%s",node.Text,tostring(id));
+	            ChatChannel.SendMessage(channel, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
             end)
         else
             txt = string.format("%s",node.Text);
-	        ChatChannel.SendMessage(ChatChannel.EnumChannels.KpNearBy, nil, nil, txt );
+	        ChatChannel.SendMessage(ChatChannel.EnumChannels.KpNearBy, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
         end
     end
 end

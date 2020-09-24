@@ -2787,6 +2787,10 @@ function Entity:GetOpacity()
 	end
 end
 
+-- virtual function: return searchable text
+function Entity:GetText()
+end
+
 -- @param effectId: 0 will use unlit biped selection effect. 1 will use yellow border style. -1 to disable it.
 function Entity:SetSelectionEffect(effectId)
 	local obj = self:GetInnerObject();

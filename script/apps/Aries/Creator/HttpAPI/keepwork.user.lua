@@ -58,3 +58,20 @@ HttpWrapper.Create("keepwork.user.focus", "%MAIN%/core/v0/favorites/search", "PO
 
 -- 获取作品列表
 HttpWrapper.Create("keepwork.user.projects", "%MAIN%/core/v0/projects", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/947
+-- 新增举报投诉
+HttpWrapper.Create("keepwork.user.complain", "%MAIN%/core/v0/feedbacks", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/3127
+-- 获取用户的禁言状态
+HttpWrapper.Create("keepwork.user.mutings", "%MAIN%/core/v0/mutings", "GET", true)
+
+--http://yapi.kp-para.cn/project/158/interface/api/2262
+-- 活动列表
+HttpWrapper.Create("keepwork.user.activity_list", "%MAIN%/online-quiz/v0/activity/home", "GET", false,nil,
+-- PreProcessor
+HttpWrapper.default_prepFunc,
+-- Post Processor
+HttpWrapper.default_postFunc
+)

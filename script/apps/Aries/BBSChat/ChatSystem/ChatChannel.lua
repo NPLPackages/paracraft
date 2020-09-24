@@ -127,6 +127,11 @@ ChatChannel.EnumChannels = EnumChannels;
 ChatChannel.chatmaxcount = 200;
 ChatChannel.chatdata = ChatChannel.chatdata or {};
 ChatChannel.JID_Buffer = ChatChannel.JID_Buffer or {};
+
+ChatChannel.InputTypes = {
+    FromEditBox = 0,
+    FromQuickWord = 1,
+}
 -- do not perform vip field check when sending message. 
 local ignore_vip = true;
 
@@ -425,7 +430,17 @@ function ChatChannel.GetChat(ChannelIndexAssemble)
 	return result;
 end
 
-function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words)
+function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inputType)
+    inputType = inputType or ChatChannel.InputTypes.FromEditBox;
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+    if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
+        if(inputType ~= ChatChannel.InputTypes.FromQuickWord)then
+			_guihelper.MessageBox(L"这个频道只能发快捷语言！");
+            return
+        end
+    end
     local msgdata = KpChatChannel.CreateMessage( ChannelIndex, to, toname, words);
     if(not msgdata)then
         return
@@ -492,10 +507,12 @@ end
 -- @param to				接受者nid
 -- @param toname			接受者名字,可为nil
 -- @param words			消息内容
+-- @param bSilentMode
+-- @param inputType{ChatChannel.InputTypes}		文字的输入来源	
 -- @return true if succeed. or false if speaking too fast or does not pass a given filter
-function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode )
+function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode, inputType)
     if(ChatChannel.Is_Keepwork_Channel(ChannelIndex))then
-        return ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words)
+        return ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, inputType)
     end
 	if(not ChatChannel.streamRateCtrler:AddMessage()) then
 		return

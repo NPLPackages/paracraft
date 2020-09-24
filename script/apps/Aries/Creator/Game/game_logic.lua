@@ -231,23 +231,21 @@ function GameLogic.InitCommon()
 
 		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		KeepWorkItemManager.StaticInit();
-	end
 
-	if ((not System.options.isCodepku) and ParaEngine.GetAppCommandLineByParam("open_ci", false) == "true") then
-		local ParacraftCI = NPL.load("(gl)script/apps/Aries/ParacraftCI/ParacraftCI.lua");
-		ParacraftCI.StaticInit();
-	end
+		GameLogic.KeepWorkItemManager = KeepWorkItemManager;
+
+		if ((not System.options.isCodepku) and ParaEngine.GetAppCommandLineByParam("open_ci", false) == "true") then
+			local ParacraftCI = NPL.load("(gl)script/apps/Aries/ParacraftCI/ParacraftCI.lua");
+			ParacraftCI.StaticInit();
+		end
 	
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
-	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
-	ParaWorldMain:Init()
-
-	if (not System.options.isCodepku) then
 		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 		ClassManager.StaticInit();
 	end
 
-	GameLogic.KeepWorkItemManager = KeepWorkItemManager or nil;
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
+	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
+	ParaWorldMain:Init()
 end
 
 -- call this when user first enters a game world.

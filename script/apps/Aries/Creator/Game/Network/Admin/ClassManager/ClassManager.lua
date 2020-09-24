@@ -295,6 +295,8 @@ function ClassManager.LoadClassroomInfo(classroomId, callback)
 		local room = data and data.data;
 		if (room == nil) then return end
 
+		local date = string.gsub(room.createdAt, "T", " ");
+		ClassManager.CreatedTime = ClassManager.DateToMinutes(date, true);
 		ClassManager.CurrentWorldId = room.projectId;
 		ClassManager.CurrentClassId = room.classId;
 		ClassManager.CurrentClassroomId = room.id;
@@ -604,6 +606,13 @@ function ClassManager.OnMsg(self, msg)
 			local room = string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId));
 			if (not meta) then return end
 
+			if (meta.timestamp) then
+				if (not ClassManager.IsTeacherInClass()) then
+					local updatedTime = ClassManager.DateToMinutes(meta.timestamp..":0");
+					StudentPanel.UpdateClassTime(updatedTime);
+				end
+			end
+
 			if (meta.target == room) then
 				ClassManager.ProcessMessage(payload, meta);
 			elseif (string.find(meta.target, "__user_") ~= nil) then
@@ -645,7 +654,7 @@ function ClassManager.Reset()
 	ClassManager.OrgClassIdMap = {};
 	ClassManager.ClassList = {};
 	ClassManager.ProjectList = {};
-	ClassManager.ShareLinkList = {};
+	--ClassManager.ShareLinkList = {};
 	ClassManager.ClassMemberList = {};
 
 	ClassManager.ChatDataList = {};
@@ -824,4 +833,19 @@ function ClassManager.MessageToMcml(chatdata)
 	end
 
 	return mcmlStr;
+end
+
+function ClassManager.DateToMinutes(date, gmt)
+	local __,__,year,month,day,hour,min,sec = string.find(date,"(.+)-(.+)-(.+) (.+):(.+):(.+)");
+	year = tonumber(year);
+	month = tonumber(month);
+	day = tonumber(day);
+	hour = tonumber(hour);
+	min = tonumber(min);
+	local days = commonlib.GetDaysFrom_1900_1_1(year, month, day)
+	local total_mins = days * 24 * 60 + 60*hour + min;
+	if (gmt) then
+		total_mins = total_mins + 8 * 60;
+	end
+	return total_mins;
 end

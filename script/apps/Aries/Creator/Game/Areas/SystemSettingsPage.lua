@@ -96,7 +96,7 @@ function SystemSettingsPage.OnInit()
 		{text=L"游戏", name="gameparma"},
 		{text=L"控制", name="operation"},
 		{text=L"其他", name="others"},
-		{text=L"世界", name="world"},
+		--{text=L"世界", name="world"},
 	}
 
 	SystemSettingsPage.sound_volume_list = {

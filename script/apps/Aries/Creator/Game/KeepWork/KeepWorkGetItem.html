@@ -51,21 +51,22 @@ end
 -- tricky code to decrease the count actually the min value
 --OnDecrease();
 ]]></script>
-<aries:window mode="thin" width="400" height="304" title='<%=L"提示"%>' onclose="ClosePage">
-    <div style="margin-top:40px;float:left;padding-left:20px;padding-top:20px;margin-left:40px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+<kp:window mode="lite" width="400" height="304" title='<%=L"提示"%>' onclose="ClosePage">
+    <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
+    <div style="margin-top:40px;float:left;padding-left:20px;padding-top:20px;margin-left:40px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
         <div style="position:relative;margin-left:6px;margin-top:0px;">
             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
         </div>   
      </div>
      <div style="float:left">
-        <div style="margin-left:8px;margin-top:60px;color:#ffffff;font-size:14px;"><%="你获得了"%></div>
+        <div style="margin-left:8px;margin-top:60px;color:#000000;font-size:14px;"><%="你获得了"%></div>
         <div style="margin-left:8px;margin-top:20px;color:#999999;font-size:14px;"><%=getItemName()%></div>
     </div>
-    <div style="width:400px;height:32px;margin-top:50px;margin-left:80px">
-        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
-        <input type="button" class="mc_big_button" value="收下" style="margin-left:70px;width:90px;height:32px;" onclick="OnOK()"/>
+    <div style="width:400px;height:32px;margin-top:35px;margin-left:80px">
+        <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:100px;height:38px;"></pe:goalpointer>
+        <input type="button" value="收下" style="margin-left:70px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16)" onclick="OnOK()"/>
     </div>
-</aries:window>
+</kp:window>
 </pe:mcml> 
 </body>
 </html>

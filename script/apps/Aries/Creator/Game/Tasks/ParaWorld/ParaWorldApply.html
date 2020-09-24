@@ -1,0 +1,182 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldApply.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldApply.lua">
+            <![CDATA[
+            ParaWorldApply = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldApply.lua");
+            ParaWorldApply.OnInit()
+            local page = document:GetPageCtrl()
+
+            function get_provinces()
+                return ParaWorldApply.provinces
+            end
+
+            function get_cities()
+                return ParaWorldApply.cities
+            end
+
+            function get_areas()
+                return ParaWorldApply.areas
+            end
+
+            function select_province(name, value)
+                if value == 0 then
+                    return false
+                end
+
+                ParaWorldApply.GetCities(value, function(data)
+                    ParaWorldApply.cities = data
+                    ParaWorldApply.areas = {
+                        {
+                        text = L"区",
+                        value = 0,
+                        selected = true,
+                        }
+                    }
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                end)
+            end
+
+            function select_city(name, value)
+                if value == 0 then
+                    return false
+                end
+
+                ParaWorldApply.GetAreas(value, function(data)
+                    ParaWorldApply.areas = data
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                end)
+            end
+
+            function select_area(name, value)
+                if value == 0 then
+                    return false
+                end
+            end
+
+            function select_province1(name, value)
+                if value == 0 then
+                    return false
+                end
+
+                ParaWorldApply.GetCities(value, function(data)
+                    ParaWorldApply.cities1 = data
+                    ParaWorldApply.areas = {
+                        {
+                        text = L"区",
+                        value = 0,
+                        selected = true,
+                        }
+                    }
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                end)
+            end
+
+            function select_city1(name, value)
+                if value == 0 then
+                    return false
+                end
+
+                ParaWorldApply.GetAreas(value, function(data)
+                    ParaWorldApply.areas1 = data
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                end)
+            end
+
+            function select_type(name ,value)
+                if (value == "game") then
+                    ParaWorldApply.SelectType = ParaWorldApply.SelectGame;
+                elseif (value == "org") then
+                    ParaWorldApply.SelectType = ParaWorldApply.SelectOrg;
+                elseif (value == "school") then
+                    ParaWorldApply.SelectType = ParaWorldApply.SelectSchool;
+                elseif (value == "region") then
+                    ParaWorldApply.SelectType = ParaWorldApply.SelectRegion;
+                    ParaWorldApply.GetProvinces(function(data)
+                        ParaWorldApply.provinces1 = data;
+                        local text = page:GetValue("paraworld_name", nil);
+                        page:Refresh(0);
+                        page:SetValue("paraworld_name", text);
+                    end);
+                end
+                if (value ~= "regin") then
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                end
+            end
+            ]]>
+        </script>
+        <kp:window width="520" height="400" mode="lite" title='<%= L"申请并行世界"%>' onclose="ParaWorldApply.OnClose">
+            <div style="margin-top:50px;margin-left:10px;width:520px;height:308px;">
+                <div style="margin-left:40px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"名称：" %>
+                    <input type="text" name="paraworld_name" EmptyText='<%=L"请输入并行世界名称"%>' class="mc_text" style="width:300px;height:26px;margin-left:10px;" />
+                </div>
+                <div style="margin-left:40px;margin-top:10px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"类型：" %>
+                    <select name="paraworld_type" onselect="select_type" style="margin-left:10px;width:300px;height:24px">
+                        <option value="game">大赛</option>
+                        <option value="org">机构</option>
+                        <option value="school" selected="selected">学校</option>
+                        <option value="region">地域</option>
+                    </select>
+                </div>
+                <div style="margin-left:95px;margin-top:6px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <pe:if condition='<%=ParaWorldApply.SelectType == ParaWorldApply.SelectGame%>'>
+                        <select name="GameList" DataSource="<%=ParaWorldApply.GetGameList()%>" style="height:24px;width:240px;"></select>
+                    </pe:if>
+                    <pe:if condition='<%=ParaWorldApply.SelectType == ParaWorldApply.SelectOrg%>'>
+                        <select name="OrgList" DataSource="<%=ParaWorldApply.GeOrgList()%>" style="height:24px;width:240px;"></select>
+                    </pe:if>
+                    <pe:if condition='<%=ParaWorldApply.SelectType == ParaWorldApply.SelectSchool%>'>
+                        <select name="SchoolList" DataSource="<%=ParaWorldApply.GetSchoolList()%>" style="height:24px;width:240px;"></select>
+                    </pe:if>
+                    <pe:if condition='<%=ParaWorldApply.SelectType == ParaWorldApply.SelectRegion%>'>
+                        <select name="province1" style="margin-left:0px;width:90px;height: 24px;" DataSource="<%= ParaWorldApply.provinces1 %>" onselect="select_province1"></select>
+                        <select name="city1" DataSource="<%= ParaWorldApply.cities1 %>" style="margin-left: 15px;width:90px;height: 24px;" onselect="select_city1"></select>
+                        <select name="area_type" DataSource="<%= ParaWorldApply.areas1 %>" style="margin-left: 15px;width:90px;height: 24px;" ></select>
+                    </pe:if>
+                </div>
+                <div style="margin-left:10px;margin-top:10px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"所属区域：" %>
+                    <select name="province" style="margin-left: 10px;width:90px;height: 24px;" DataSource="<%= get_provinces() %>" onselect="select_province"></select>
+                    <select name="city" DataSource="<%= get_cities() %>" style="margin-left: 15px;width:90px;height: 24px;" onselect="select_city"></select>
+                    <select name="area" DataSource="<%= get_areas() %>" style="margin-left: 15px;width:90px;height: 24px;" ></select>
+                </div>
+                <div style="margin-left:40px;margin-top:10px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"项目：" %>
+                    <div style="float:left;width:300px;height:24px;margin-left:10px;"><%=ParaWorldApply.GetWorldId()%></div>
+                </div>
+                <div style="margin-left:17px;margin-top:0px;height:24px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"commitId：" %>
+                    <div style="float:left;width:300px;height:24px;margin-left:10px;"><%=ParaWorldApply.GetWorldCommitId()%></div>
+                </div>
+                <div style="margin-left:40px;margin-top:2px;height:60px;text-align:left;color:#000000;font-size:13px">
+                    <%=L"封面：" %>
+                    <div style="<%= 'float:left;width:180px;height:115px;margin-top:2px;margin-left:10px;background:url(' .. ParaWorldApply.GetWorldCoverUrl() .. ')' %>"></div>
+                </div>
+            </div>
+            <div style="width:520px;height:30px;">
+                <input type="button" name="OK" hotkey="DIK_RETURN" style="margin-left:150px;min-width:84px;height:30px;" class="kp_yellow_button" onclick="ParaWorldApply.OnOK" value='<%=L"确定"%>' />
+                <input type="button" name="Cancel" style="margin-left:60px;min-width:84px;height:30px;" class="kp_gray_button" onclick="ParaWorldApply.OnClose" value='<%=L"取消"%>' />
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

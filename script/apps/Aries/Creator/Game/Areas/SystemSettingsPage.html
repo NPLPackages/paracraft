@@ -86,19 +86,12 @@ end
                         <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"分辨率" %></div>
                         <div style="float:left;margin-left:12px;font-size:11px;">
                             <select name = "ScreenResolution" AllowUserEdit="false" style="height:22px">
-                                <option value="400 × 266">400 × 266</option>
-                                <option value="400 × 300">400 × 300</option>
-                                <option value="480 × 280">480 × 280</option>
-                                <option value="640 × 480">640 × 480</option>
-                                <option value="800 × 533">800 × 533</option>
-                                <option value="800 × 600">800 × 600</option>
-                                <option value="960 × 560" selected="true">960 × 560(默认)</option>
-                                <option value="1020 × 595">1020 × 595</option>
-                                <option value="1020 × 680">1020 × 680</option>
-                                <option value="1024 × 768">1024 × 768</option>
-                                <option value="1280 × 720">1280 × 720(推荐)</option>
-                                <option value="1440 × 900">1440 × 900</option>
-                                <option value="1600 × 800">1600 × 800</option>
+                                <option value="3840 × 2160">3840X2160 (4K)</option>
+                                <option value="2560 × 1440">2560X1440 (2K)</option>
+                                <option value="1920 × 1080">1920X1080 (1080p)</option>
+                                <option value="1280 × 720" selected="true">1280X720 (720p)</option>
+                                <option value="1600 × 1200">1600X1200 (UXGA)</option>
+                                <option value="1024 × 768">1024X768 (XGA)</option>
                             </select>
                         </div>
                     </div>
@@ -337,6 +330,7 @@ end
                         </div>
                     </div>
                 </pe:if>
+                <!--
                 <pe:if condition='<%=GetCategoryDSIndex() == 5 %>' >
                     <div style="margin-top:5px;">
                         <div style="float:left;color:#9a9393"><%=L"当前世界"%></div>
@@ -358,6 +352,7 @@ end
                         <div style="float:left;margin-left:5px;" for="hasCopyright"><%=L"申请版权保护"%></div>
                     </div>
                 </pe:if>
+                -->
                 </div>
             </pe:treeview>
         </div>

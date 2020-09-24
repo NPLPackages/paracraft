@@ -11,6 +11,7 @@ KeepWorkStackableItem.openBeanNoEnoughView();
 ]]
 local KeepWorkStackableItemPage = {};
 commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage", KeepWorkStackableItemPage);
+local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
@@ -231,7 +232,13 @@ function KeepWorkStackableItemPage.OnOK()
 				data.icon = item_data.icon
 				-- GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
 				KeepWorkStackableItemPage.openGetItemView(data)
-				KeepWorkItemManager.LoadItems()
+				KeepWorkItemManager.LoadItems(nil, function ()
+					if KeepWorkMallPage.isOpen then
+						KeepWorkMallPage.GetGoodsData()
+					end
+					
+				end)
+
 				page:CloseWindow()
 			else
 
@@ -421,7 +428,7 @@ function KeepWorkStackableItemPage.requestOrderResult()
 				end, 500)
 			elseif data.state == 1 then
 				-- 关闭弹窗
-				GameLogic.AddBBS("statusBar", L"订单请求中请求成功", 5000, "0 255 0");
+				GameLogic.AddBBS("statusBar", L"订单请求成功", 5000, "0 255 0");
 				_guihelper.CloseMessageBox()
 				_guihelper.MessageBoxClass.CheckShowCallback = nil
 				-- 确保不会因为延时出现时间差的问题
@@ -430,6 +437,7 @@ function KeepWorkStackableItemPage.requestOrderResult()
 				end, 10)
 
 				data.icon = item_data.icon
+				data.isModelProduct = item_data.isModelProduct
 				-- GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
 				KeepWorkStackableItemPage.openGetItemView(data)
 				KeepWorkItemManager.LoadItems()

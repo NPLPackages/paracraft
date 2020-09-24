@@ -40,7 +40,10 @@ function kp_redtip.render_callback(mcmlNode, rootName, bindingContext, _parent, 
 	    CommonCtrl.AddControl(instName_timer, timer);
     end
     timer.callbackFunc = function()
-	    local bShowing_redtip = mcmlNode:GetAttributeWithCode("onupdate",false,true);
+	    local bShowing_redtip = mcmlNode:GetBool("value",false);
+        if(not bShowing_redtip)then
+	        bShowing_redtip = mcmlNode:GetAttributeWithCode("onupdate",false,true);
+        end
         showBg(bShowing_redtip);
     end
     timer:Change(0, 1000)

@@ -230,26 +230,36 @@ end
 
 OnInitValue()
 ]]></script>
-<aries:window mode="thin" width="400" height="304" title='<%=getGoodName()%>' onclose="ClosePage">
-    <div style="width:411px;height:230px;">
-        <div style="width:411px;height:160px;">
+<div style="width: 396px;height: 274px; background: url(Texture/Aries/Creator/keepwork/Mall/tipbj_32bits.png#0 0 32 32:8 8 8 8);">
+    <div style="margin-left: 14px;margin-top: 10px;">
+        <div style="position:relative;color: #ffffff;">
+            <%=getGoodName()%>
+        </div>
+        <input type="button" class="mc_big_button" value="" style="margin-left:350px;width:19px;height:20px;background: url(Texture/Aries/Creator/keepwork/Mall/tipX_19X20_32bits.png#0 0 19 20)" onclick="OnCancel()"/>
+    </div>
+
+    <div style="width:411px;height:190px;">
+        <div style="width:411px;height:150px;">
             <pe:if condition='<%=canChooseNums() %>'>
-                <div style="float:right;padding-left:20px;padding-top:20px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                <div style="float:right;margin-left:15px;margin-top:20px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
                    <div style="position:relative;width:123px">
                         <div style="position:relative;margin-left:6px;margin-top:0px;">
                             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
                         </div>                              
                     </div>
                 </div>
-                <div style="float:right;width:141px;height:32px;margin-top:52px;margin-left:25px;background-color:#2b2b29;">
-                    <input type="button" value='<%=L"-"%>' style="width:50px;height:30px;color:#ffffff;font-size:30;background:)" onclick="OnDecrease()"/>
-                    <label name="count" value="1" onkeyup="OnKeyUp()" style="color:#FFFFFF;text-align:center;width:40px;height:25px;margin-top:5;"/>
-                    <input type="button" value='<%=L"+"%>' style="width:50px;height:30px;color:#ffffff;font-size:26;background:)" onclick="OnIncrease()"/>
-                    <div style="margin-left:8px;margin-top:10px;color:#666666;font-size:14px;"><%=GetCountDesc() %></div>
+                <div style="float:right;width:180px;height:32px;margin-top:20px;margin-left:25px;background:;">
+                    <input type="button" value='' style="float: left; width:40px;height:38px;color:#ffffff;font-size:30;background:url(Texture/Aries/Creator/keepwork/Mall/btn_del_40X38_32bits.png#0 0 40 38)" onclick="OnDecrease()"/>
+                    <div style="float: left;margin-top: 1px; width: 94px;height: 32px; background: url(Texture/Aries/Creator/keepwork/Mall/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                        <label name="count" value="1" onkeyup="OnKeyUp()" style="color:#000000;text-align:center;width:40px;height:25px;margin-top:5;margin-left: 28px;"/>
+                    </div>
+                    
+                    <input type="button" value='' style="float: left;width:40px;height:38px;color:#ffffff;font-size:26;background:url(Texture/Aries/Creator/keepwork/Mall/btn_add_40X38_32bits.png#0 0 40 38)" onclick="OnIncrease()"/>
+                    <!-- <div style="margin-left:8px;margin-top:10px;color:#666666;font-size:14px;"><%=GetCountDesc() %></div> -->
                 </div>
             </pe:if>
             <pe:if condition='<%=not canChooseNums() %>'>
-                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:124px;height:113px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10);">
+                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
                     <div style="position:relative;width:123px">
                          <div style="position:relative;margin-left:6px;margin-top:0px;">
                              <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
@@ -259,18 +269,18 @@ OnInitValue()
             </pe:if>
         </div>
         <br/>
-        <div style="margin-left:36px;margin-top:10px;color:#f0f0f0">
-            <label name="buydesc1" style="width:340px; height:60px;font-size:16px;" value='<%=Eval("defaultDesc1")%>'/>
+        <div style="margin-left:48px;margin-top:0px;color:#f0f0f0;">
+            <label name="buydesc1" style="width:340px; height:60px;font-size:12pt;" value='<%=Eval("defaultDesc1")%>'/>
             <br/>
-            <label name="buydesc2" style="height:60px;font-size:16px;" value='<%=Eval("defaultDesc2")%>'/>
+            <label name="buydesc2" style="height:60px;font-size:12pt;" value='<%=Eval("defaultDesc2")%>'/>
         </div>
     </div>
-    <div style="width:466px;height:32px;margin-top:0px;margin-left:20px">
+    <div style="width:466px;height:32px;margin-top:0px;margin-left:55px">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
-        <input type="button" class="mc_big_button" value="下次再说" style="margin-left:70px;width:90px;height:32px;" onclick="OnCancel()"/>
-        <input type="button" class="mc_big_button" value="<%=getBuyBtDesc()%>" style="margin-left:20px;width:90px;height:32px;" onclick="OnOK()"/>
+        <input type="button" value="下次再说" style="margin-left:0px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnCancel()"/>
+        <input type="button" value="<%=getBuyBtDesc()%>" style="margin-left:80px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnOK()"/>
     </div>
-</aries:window>
+</div>
 </pe:mcml> 
 </body>
 </html>
