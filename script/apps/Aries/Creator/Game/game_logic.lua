@@ -687,7 +687,7 @@ function GameLogic.GetUnSavedTime()
 	
 end
 
--- @param bSaveToLastSaveFolder: whether to save block to "blockworld.lastsave" folder
+-- @param bSaveToLastSaveFolder: whether to save block to "blockWorld.lastsave" folder
 -- @param bForceSave: default to nil, if true, we will save regardless the world is readonly or remote. 
 function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	if(not bForceSave and (System.World.readonly or GameLogic.isRemote)) then

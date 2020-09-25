@@ -14,9 +14,19 @@ local x, y = gen:GetGridXYBy2DIndex(5,5)
 local bx, by, bz = gen:GetBlockOriginByGridXY(x, y)
 gen:LoadTemplateAtGridXY(x, y, filename)
 GameLogic.EntityManager.GetPlayer():SetBlockPos(bx, by, bz)
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldChunkGenerator.lua");
+local ParaWorldChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator");
+local x, y, z = GameLogic.EntityManager.GetPlayer():GetBlockPos()
+ParaWorldChunkGenerator:LoadTemplate(x, y, z, GameLogic.GetWorldDirectory().."miniworld.template.xml")
 -----------------------------------------------
 ]]
+NPL.load("(gl)script/ide/IDE.lua");
+NPL.load("(gl)script/ide/System/System.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/Chunk.lua");
+local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
@@ -24,6 +34,7 @@ local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
 
 function ParaWorldChunkGenerator:ctor()
+	self:SetWorkerThreadCount(1)
 end
 
 -- @param world: WorldManager, if nil, it means a local generator. 
@@ -94,17 +105,28 @@ function ParaWorldChunkGenerator:Get2DIndexByGridXY(x, y)
 	return 5-x, 5-y;
 end
 
+-- static function:
 function ParaWorldChunkGenerator:LoadTemplateAtGridXY(x, y, filename)
 	if(filename) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
-		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 		local minX, minY, minZ = self:GetBlockOriginByGridXY(x, y);
-		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
-				blockX = minX,blockY = minY, blockZ = minZ, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false})
-		task:Run();
+		self:LoadTemplate(minX, minY, minZ, filename)
 	end
 end
 
+-- call this function to use a worker thread to load the template file
+function ParaWorldChunkGenerator:LoadTemplateAsync(x, y, z, filename)
+	self:InvokeCustomFuncAsync("LoadTemplateAsyncImp", {x=x, y=y, z=z, filename=filename})
+end
+
+-- consider using LoadTemplateAsync instead. 
+-- @param x, y, z: pivot origin. 
+function ParaWorldChunkGenerator:LoadTemplate(x, y, z, filename)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
+			blockX = x,blockY = y, blockZ = z, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false, nohistory=true})
+	task:Run();
+end
 
 -- generate flat terrain
 function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
@@ -209,4 +231,95 @@ function ParaWorldChunkGenerator:GetClassAddress()
 		filename="script/apps/Aries/Creator/Game/World/generators/ParaWorldChunkGenerator.lua", 
 		classpath="MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"
 	};
+end
+
+
+-- this function is called in worker thread
+-- @param params: {x, y, z, filename}
+function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+	local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+	block_types.init();
+	block_types.RecomputeAttributeOfAllBlocks()
+
+	local x, y, z, filename = params.x, params.y, params.z, params.filename
+	
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(xmlRoot) then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(root_node and root_node[1]) then
+			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+			if(node and node[1]) then
+				local blocks = NPL.LoadTableFromString(node[1]);
+				if(blocks and #blocks > 0) then
+					local bx, by, bz = x, y, z;
+					LOG.std(nil, "info", "BlockTemplate", "LoadTemplate from file: %s at pos:%d %d %d", filename, bx, by, bz);
+
+					if(root_node.attr and root_node.attr.relative_motion == "true") then
+						BlockTemplate:CalculateRelativeMotion(blocks, bx, by, bz);
+					end
+
+					local addList = {};
+					local is_suspended_before = ParaTerrain.GetBlockAttributeObject():GetField("IsLightUpdateSuspended", false);
+					if(not is_suspended_before) then
+						ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
+					end
+					for _, b in ipairs(blocks) do
+						local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];
+						if(block_id) then
+							local last_block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
+							local last_block = block_types.get(last_block_id);
+							if(last_block) then
+								
+							end
+							if(block_id ~= last_block_id) then
+								ParaTerrain.SetBlockTemplateByIdx(x,y,z, block_id);
+							end
+							
+							if(b[5]) then
+								ParaTerrain.SetBlockUserDataByIdx(x,y,z, b[5]);
+							end
+							local block = block_types.get(block_id);
+							
+							if(block and block.onload) then
+								addList[#addList+1] = b;
+							end
+						end
+					end
+					if(not is_suspended_before) then
+						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
+					end
+					if(#addList > 0) then
+						NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
+							cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", params= {addList=addList, x=bx, y=by, z=bz}, 
+							gen_id = msg.gen_id, address = msg.address,
+						});
+					end
+					return true;
+				end
+			end
+		end
+	end
+end
+
+-- called in main thread, similar in Chunk:ApplyMapChunkData
+function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
+	local addList = params.addList;
+	local bx, by, bz = params.x, params.y, params.z
+	if(addList) then
+		LOG.std(nil, "info", "ParaWorldChunkGenerator", "ApplyOnLoadBlocks: %d blocks", #addList)
+		for _, b in ipairs(addList) do
+			local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];
+			local block_template = block_types.get(block_id);
+			if(block_template) then
+				local block_data = b[5];
+				if(not block_template.cubeMode and block_template.customModel) then
+					block_template:UpdateModel(x,y,z, block_data)
+				end
+				block_template:OnBlockAdded(x,y,z, block_data, b[6]);
+			end
+		end
+	end
 end

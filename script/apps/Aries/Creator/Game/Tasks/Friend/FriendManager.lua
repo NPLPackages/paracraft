@@ -15,6 +15,7 @@ end)
 local FriendConnection = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendConnection.lua");
 local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 local FriendManager = NPL.export();
 
 local UserData = {}
@@ -190,7 +191,6 @@ function FriendManager:OnMsg(payload, full_msg)
     -- commonlib.echo(payload,true);
     -- commonlib.echo("=============FriendManager:OnMsg full_msg");
     -- commonlib.echo(full_msg,true);
-  print("nnnnnnnnnnnnnnnnnnnnnnnnnnnn", payload.id)
     if UserData == nil then
       UserData = {}
       KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
@@ -219,6 +219,10 @@ function FriendManager:OnMsg(payload, full_msg)
     if FriendsPage.GetIsOpen() then
       FriendsPage.OnMsg(payload, full_msg)
     end
+
+    -- if DockPage.is_show and not FriendsPage.GetIsOpen() then
+    --   DockPage.LoadFriendsMess()
+    -- end
 end
 -- send a message to user
 -- @param {number} userId

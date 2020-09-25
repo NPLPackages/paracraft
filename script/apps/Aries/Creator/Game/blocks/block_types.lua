@@ -681,3 +681,14 @@ function block_types.update_registered_templates(blockWorld)
 		LOG.std(nil, "info", "block_types", "registering %d block templates", count);
 	end
 end
+
+function block_types.RecomputeAttributeOfAllBlocks()
+	if(all_types) then
+		local count = 0;
+		for id, block in pairs(all_types) do
+			if(id<4096) then
+				block:RecomputeAttribute();
+			end
+		end
+	end
+end

@@ -172,15 +172,15 @@ end
 --------------------------------
 
 -- Load all neuron data from a given XML file. 
--- @param filename: if nil, it first search the "[currentworld]/blockworld.lastsave/neurons.xml", if not found, it will search "[currentworld]/blockworld/neurons.xml"
+-- @param filename: if nil, it first search the "[currentworld]/blockWorld.lastsave/neurons.xml", if not found, it will search "[currentworld]/blockWorld/neurons.xml"
 -- @return true if there is local NPC file. or nil if not. 
 function NeuronManager.LoadFromFile(filename)
 	if(not filename) then
-		local test_filename = format("%sblockworld.lastsave/%s", ParaWorld.GetWorldDirectory(), default_filename);
+		local test_filename = format("%sblockWorld.lastsave/%s", ParaWorld.GetWorldDirectory(), default_filename);
 		if(ParaIO.DoesAssetFileExist(test_filename, true))then
 			filename = test_filename;
 		else
-			test_filename = format("%sblockworld/%s", ParaWorld.GetWorldDirectory(), default_filename);
+			test_filename = format("%sblockWorld/%s", ParaWorld.GetWorldDirectory(), default_filename);
 			if(ParaIO.DoesAssetFileExist(test_filename, true))then
 				filename = test_filename;
 			end
@@ -210,13 +210,13 @@ function NeuronManager.LoadFromFile(filename)
 	end
 end
 
--- @param bSaveToLastSaveFolder: whether to save block to "blockworld.lastsave" folder
+-- @param bSaveToLastSaveFolder: whether to save block to "blockWorld.lastsave" folder
 function NeuronManager.SaveToFile(bSaveToLastSaveFolder)
 	local filename;
 	if(bSaveToLastSaveFolder) then
-		filename = format("%sblockworld.lastsave/%s", ParaWorld.GetWorldDirectory(), default_filename);
+		filename = format("%sblockWorld.lastsave/%s", ParaWorld.GetWorldDirectory(), default_filename);
 	else
-		filename = format("%sblockworld/%s", ParaWorld.GetWorldDirectory(), default_filename);
+		filename = format("%sblockWorld/%s", ParaWorld.GetWorldDirectory(), default_filename);
 	end
 	
 	local strList = {};

@@ -201,7 +201,7 @@ function WorldRevision:AutoCleanupBackup()
 end
 
 -- compress and generate zip package for the current world.
--- it will ignore ./blockworld and package ./blockworld.lastsave   
+-- it will ignore ./blockWorld and package ./blockWorld.lastsave   
 -- @param filename: the output zip file. 
 function WorldRevision:GeneratePackage(filename)
 	-- compress the world in self.source, if it is not already compressed
@@ -225,7 +225,7 @@ function WorldRevision:GeneratePackage(filename)
 					return true;
 				end)
 				-- this fixed a bug when zip fails adding the lastsave folder because it looks like a file instead of folder to zip. 
-				local dest_folder = worldname.."/blockworld.lastsave/";
+				local dest_folder = worldname.."/blockWorld.lastsave/";
 				for _, file in ipairs(files) do
 					if(file.filename) then
 						writer:AddDirectory(dest_folder, last_world_folder..file.filename, 0);

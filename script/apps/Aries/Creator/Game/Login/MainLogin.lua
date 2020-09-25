@@ -195,10 +195,11 @@ function MainLogin:UpdateCoreClient()
 		local v1,v2,v3 = ver:match("(%d+)%D(%d+)%D(%d+)")
 		if(v3) then
 			v1,v2,v3 = tonumber(v1),tonumber(v2), tonumber(v3)
-			-- NOTE: version here 0.7.509
+			
 			local isCodepku = ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true"
-
-			if(not isCodepku and (v1 < 0 or v2 < 7 or v3 < 510)) then
+			-- NOTE: version here 0.7.509
+			local minVer = {0, 7, 509}
+			if(not isCodepku and (v1 < minVer[1] or (v1 == minVer[1] and v2 < minVer[2]) or (v1 == minVer[1] and v2 == minVer[2] and v3 < minVer[3]))) then
 				_guihelper.MessageBox(format(L"您的版本%s低于最低要求,请尽快更新", ver), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						ClientUpdater:OnClickUpdate()

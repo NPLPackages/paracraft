@@ -30,12 +30,14 @@ ParaWorldLoginAdapter.ParaWorldId = nil;
 
 ParaWorldLoginAdapter.ids = {
     ONLINE = { 
-        18355, -- 默认世界 知识岛
+        19759, -- paracraft 主城
+        -- 18355, -- 精彩佛山
         --18626, --希望空间 
     },
-    STAGE = { 1192, },
+    STAGE = { 1296, },
     RELEASE = { 
-        1192, -- 默认世界 知识岛
+        1296, -- paracraft 主城
+        -- 1192, -- 精彩佛山
         --1236, --希望空间 
     },
     LOCAL = {},

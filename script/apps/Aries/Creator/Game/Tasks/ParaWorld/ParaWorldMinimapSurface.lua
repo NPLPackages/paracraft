@@ -123,6 +123,8 @@ function ParaWorldMinimapSurface:UpdatePlayerPos(x, y, facing)
 			local gridSize = self.GridSize;
 			local centerX, centerY = math.floor(x / gridSize)*gridSize+gridSize/2, math.floor(y / gridSize)*gridSize+gridSize/2;
 			self:SetMapCenter(centerX, centerY)
+			local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+			ParaWorldSites.LoadMiniWorldOnPos(x, y);
 		end
 	end
 end
@@ -143,7 +145,8 @@ function ParaWorldMinimapSurface:SetMapCenter(x, y)
 			self.lockTop =  999999;
 			self.lockBottom =  999999;
 		else
-			local radius = math.floor(self.GridSize*1.25/2);
+			--local radius = math.floor(self.GridSize*1.25/2);
+			local radius = math.floor(self.GridSize*1/2);
 			self.lockLeft =  x - radius;
 			self.lockRight =  x + radius;
 			self.lockTop =  y - radius;

@@ -46,6 +46,9 @@ function UserBagPage.ShowPage()
         UserBagPage.Refresh();
     end);
 end
+function UserBagPage.GetPageCtrl()
+    return page;
+end
 function UserBagPage.Refresh()
     if(page and page:IsVisible())then
         page:Refresh(0);

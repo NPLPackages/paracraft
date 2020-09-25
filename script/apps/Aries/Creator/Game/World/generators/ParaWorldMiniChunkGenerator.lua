@@ -28,6 +28,10 @@ local replaceList = {[75]=76,};
 -- max allowed blocks
 ParaWorldMiniChunkGenerator.MaxAllowedBlock = 200000;
 
+local road_block_id = 71;
+local ground_block_id = 62;
+local road_edge_id = 180;
+
 function ParaWorldMiniChunkGenerator:ctor()
 end
 
@@ -55,9 +59,16 @@ function ParaWorldMiniChunkGenerator:GetAllBlocks()
 	local originX, from_y, originZ = self:GetPivot();
 	for x = 19140, 19259 do
 		for z = 19140, 19259 do
-			local block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,255,z, 255, 255-from_y);
-			while(block_id and y >= from_y) do
+			local block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,255,z, 255, 255-from_y-1);
+			while(block_id and y >= (from_y-1)) do
 				if(not ignoreList[block_id]) then
+					if(y < from_y) then
+						if(y == (from_y - 1) and block_id ~= ground_block_id) then
+							-- ignore if the ground block does not change. 
+						else
+							break;
+						end
+					end
 					block_id = replaceList[block_id] or block_id
 					local block = block_types.get(block_id);
 					local node;
@@ -267,9 +278,6 @@ end
 
 -- generate flat terrain
 function ParaWorldMiniChunkGenerator:GenerateFlat(c, x, z)
-	local road_block_id = 71;
-	local ground_block_id = 62;
-	local road_edge_id = 180;
 	
 	local worldCenterX, worldCenterZ  = 19200, 19200;
 	local gridOffsetX = (x*16 - worldCenterX) / 64;

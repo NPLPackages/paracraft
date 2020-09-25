@@ -47,7 +47,9 @@ function StudyPage.ShowPage()
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
-
+function StudyPage.GetPageCtrl()
+    return page;
+end
 function StudyPage.clickGridItem(item_data)
 	commonlib.echo(item_data, true)
 	if nil == item_data then

@@ -153,3 +153,81 @@ Commands["camerayaw"] = {
 	end,
 };
 
+Commands["panorama"] = {
+	name="panorama", 
+	quick_ref="/panorama x y z", 
+	desc=[[
+		create panorama screenshot and save
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local att = ParaEngine.GetAttributeObject();
+		att:SetField("ScreenResolution", {1024, 1024}); 
+		att:CallField("UpdateScreenMode");
+		
+		GameLogic.RunCommand("/property -all-2 PasueScene true")
+		
+		local x, y, z = CmdParser.ParsePos(cmd_text)
+
+		function setPlayerPos(x, y, z)
+			GameLogic.RunCommand(string.format("/goto %s %s %s", x, y, z))
+		end
+
+		setPlayerPos(x, y, z)
+
+		GameLogic.RunCommand("/hide desktop")
+		GameLogic.RunCommand("/hide")
+		GameLogic.RunCommand("/fov 1.57")
+
+		--[[
+
+			NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+			local Screen = commonlib.gettable("System.Windows.Screen");
+			local width = Screen:GetWidth()
+			local height = Screen:GetHeight()
+			
+			local size = math.min(width, height)
+			GameLogic.RunCommand(string.format("/viewport _lt 0 0 %s %s", size, size))
+			]]
+
+		function shot(pitch, yaw, name, chain)
+			local pos = {
+				[0] = {x-1, y, z},
+				[1] = {x, y, z+1},
+				[2] = {x+1, y, z},
+				[3] = {x, y, z-1},
+				[4] = {x, y+1, z},
+				[5] = {x, y-1, z},
+			}
+
+			local p = pos[name]
+
+			setPlayerPos(p[1], p[2], p[3])
+			
+			ParaCamera.SetEyePos(1, pitch, yaw)
+
+			commonlib.TimerManager.SetTimeout(function() 
+				ParaMovie.TakeScreenShot(string.format("Screen Shots/%s.jpg", name))
+
+				chain()
+			end, 1000)
+		end
+
+		shot(0, 3.14, 0, function()
+			shot(0, -1.57, 1, function()
+				shot(0, 0, 2, function()
+					shot(0, 1.57, 3, function()
+						shot(-1.57, 3.14, 4, function()
+							shot(1.57, 3.14, 5, function()
+								GameLogic.RunCommand("/t 2 /property -all-2 PasueScene false")	
+								GameLogic.RunCommand("/show desktop")
+								GameLogic.RunCommand("/show")
+--								GameLogic.RunCommand(string.format("/viewport _lt 0 0 %s %s", width, height))
+							end)	
+						end)	
+					end)
+				end)
+			end)
+		end)
+
+	end,
+};

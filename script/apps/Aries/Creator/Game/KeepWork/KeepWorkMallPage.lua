@@ -136,6 +136,10 @@ function KeepWorkMallPage.ShowView()
 
 		KeepWorkMallPage.OnChangeTopBt(1);
 		KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
+
+        if(KeepWorkMallPage.show_callback)then
+            KeepWorkMallPage.show_callback();
+        end
 	end)
 end
 
@@ -215,9 +219,9 @@ function KeepWorkMallPage.HandleMenuData(parent_t, data, level)
 		
 		temp_t.attr = {}
 		-- 中间级别的样式处理
-		if temp_t.name == "type" then
-			temp_t.attr.isMidleMenu = level > 1
-		end
+		-- if temp_t.name == "type" then
+		-- 	temp_t.attr.isMidleMenu = level > 1
+		-- end
 		temp_t.attr.server_data = v
 		temp_t.attr.type_index = 1
 		temp_t.attr.text = v.name
@@ -345,8 +349,9 @@ function KeepWorkMallPage.HandleDataSources()
 						v.enabled = true
 						v.can_use = true
 						-- 如果有使用中的显示的需求
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 						local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-						if EditModelTask then
+						if EditModelTask and EditModelTask.GetModelFileInHand then
 							local file = EditModelTask:GetModelFileInHand()
 							if file == string.format("blocktemplates/%s.%s", good_data.name, good_data.fileType) then
 								v.buy_txt = "已使用"
@@ -517,4 +522,7 @@ end
 
 function KeepWorkMallPage.CloseView()
 	KeepWorkMallPage.isOpen = false
+end
+function KeepWorkMallPage.GetPageCtrl()
+    return page;
 end

@@ -164,6 +164,10 @@ function Entity:GetImageFacing()
 	return (self.block_data or 0) % 4;
 end
 
+function Entity:IsImageHorizontal()
+	return (self.block_data or 0) >= 4;
+end
+
 -- clean up all nearby paintings which are derived from this one. 
 function Entity:ResetDerivedPaintings()
 	if(self.start_block_coord and self.rows) then
@@ -219,6 +223,16 @@ local data_expand_dir = {
 	[1] = {0, 1, 1},
 	[2] = {1, 1, 0},
 	[3] = {-1, 1, 0},
+	-- horizontal
+	[4] = {1, 0, 1},
+	[5] = {-1, 0, -1},
+	[6] = {-1, 0, 1},
+	[7] = {1, 0, -1},
+
+	[8] = {-1, 0, 1},
+	[9] = {1, 0, -1},
+	[10] = {-1, 0, -1},
+	[11] = {1, 0, 1},
 };
 
 -- return a vector relative to current block. 
@@ -226,74 +240,37 @@ function Entity:GetExpandDirectionByData(data)
 	return data_expand_dir[data or 0] or data_expand_dir.zero;
 end
 
--- LiXizhi: half-done work: for images on the ground. 
--- @return length_x, length_y, length_z;
-function Entity:CalculateLengths()
-	-- if any neighbour has EntityImage's block_id but the entity is not ready yet. 
-	local bHasInvalidImageEntity;
-
+-- only call this when image is horizontal
+-- @return length_x, length_z;
+function Entity:CalculateHorizontalLengths()
 	-- the root entity information;
 	local root_x = self.bx;
 	local root_y = self.by;
 	local root_z = self.bz;
 	local root_block_id = self:GetBlockId();
-	local root_block_facing = self:GetImageFacing();
-
-	-- calculate length_x, length_y, length_z;
-	local length_x, length_y, length_z;
+	
+	-- calculate length_x, length_z;
+	local length_x, length_z;
 	local x,y,z = root_x,root_y,root_z;
 	local dir = self:GetExpandDirectionByData(self.block_data);
-	local bFirstBoundary = true;
-	for dx = 0, Entity.maxExpandLength do
-		for dy = 0, Entity.maxExpandLength do	
-			for dz = 0, Entity.maxExpandLength do
-				local lx, ly, lz = dx*dir[1], dy*dir[2], dz*dir[3];
-				local x, y, z = root_x+lx, root_y+ly, root_z+lz;
-				local neighbor_id = BlockEngine:GetBlockId(x,y,z);
-				local bIsBoundary;
-				if(root_block_id ~= neighbor_id) then
-					bIsBoundary = true;
-				else
-					local neighbor_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
-					if(neighbor_entity) then
-						neighbor_facing = neighbor_entity:GetImageFacing();
-						if(neighbor_facing ~= root_block_facing or neighbor_entity:HasImage()) then
-							bIsBoundary = true;
-						end
-					else
-						bHasInvalidImageEntity = true;
-						bIsBoundary = true;
-					end
-				end
-				
-				if(bIsBoundary) then
-					if(bFirstBoundary) then
-						bFirstBoundary = false;
-						length_x = (dx > 0) and dx or length_x;
-						length_y = (dy > 0) and dy or length_y;
-						length_z = (dz > 0) and dz or length_z;
-					else
-						length_x = (not length_x and dx > 0) and dx or length_x;
-						length_y = (not length_y and dy > 0) and dy or length_y;
-						length_z = (not length_z and dz > 0) and dz or length_z;
-					end
-					break;
-				end
-				if(dir.z == 0 or (length_z and dz >= length_z)) then
-					break
-				end
-			end
-			if(dir.y == 0 or (length_y and dy >= length_y)) then
-				break
-			end
-		end
-		if(dir.x == 0 or (length_x and dx >= length_x)) then
+	if(dir[1] == 0 and dir[3] == 0) then
+		return 1, 1
+	end
+	for dx = 1, Entity.maxExpandLength do
+		local neighbor_id = BlockEngine:GetBlockId(root_x+dx*dir[1], root_y, root_z);
+		if(root_block_id ~= neighbor_id) then
+			length_x = dx;
 			break
 		end
 	end
-	self.length_x =	 length_x or 1;
-	self.length_y =	 length_y or 1;
-	self.length_z =	 length_z or 1;
+	for dz = 1, Entity.maxExpandLength do
+		local neighbor_id = BlockEngine:GetBlockId(root_x, root_y, root_z + dz*dir[3]);
+		if(root_block_id ~= neighbor_id) then
+			length_z = dz;
+			break
+		end
+	end
+	return length_x or 1, length_z or 1;
 end
 
 -- only called for the block containing the actual image to calculate the total block 
@@ -322,7 +299,18 @@ function Entity:CaculateImageExpansionData()
 	local z = root_z;
 
 	local neighbor_id,neighbor_facing;
+
 	
+	local isHorizontal = self:IsImageHorizontal()
+	if(isHorizontal) then
+		local rows, columns = self:CalculateHorizontalLengths()
+		self.rows = rows;
+		self.columns = columns;
+		self.start_block_coord = {x = root_x, y = root_y, z = root_z};
+		return true;
+	end
+	
+
 	while(true) do
 		y = y + 1;
 		neighbor_id = BlockEngine:GetBlockId(x,y,z)
@@ -495,6 +483,23 @@ function Entity:ApplyExpansionData()
 	local facing = self:GetImageFacing();
 
 	if(rows ~= 1 or columns ~= 1) then
+		local isHorizontal = self:IsImageHorizontal()
+		if(isHorizontal) then
+			local dir = self:GetExpandDirectionByData(self.block_data);
+			for dx = 0, rows-1 do
+				for dz = 0, columns-1 do
+					local lx, lz = dx*dir[1], dz*dir[3];
+					local image_entity = EntityManager.GetEntityInBlock(start_block_x + lx, y, start_block_z + lz, self.class_name);
+					if(image_entity) then
+						-- set target image, and save a reference to the root block's coordinate.  
+						image_entity.root_entity_coord = root_entity_coord; 
+						image_entity:SetDerivedImageFilename(self.image_filename);
+					end
+				end
+			end
+			return
+		end
+
 		for row_index = 1,rows do
 			for column_index = 1,columns do
 				local image_entity = EntityManager.GetEntityInBlock(x,y,z,self.class_name);
@@ -697,6 +702,14 @@ function Entity:UpdateImageModel(filename, isSingle)
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 90, 90, nil, self.text_offset, -1.57);
 			else
 				local imageScale = imageRadius*2;
+				local data = self.block_data or 0;
+				if(data>=4 and data<12) then
+					local imageDir = data%4;
+					if(imageDir == 2 or imageDir == 3) then
+						gridWidth, gridHeight = gridHeight, gridWidth;
+					end
+				end
+
 				local text_offset = {x = (self.text_offset.x + gridWidth*0.5-0.5)  / imageScale, y = (0.5+imageRadius) / imageScale, z = self.text_offset.z / imageScale}
 				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100/imageScale * gridWidth, 100/imageScale*gridHeight, nil, text_offset, -1.57);
 			end

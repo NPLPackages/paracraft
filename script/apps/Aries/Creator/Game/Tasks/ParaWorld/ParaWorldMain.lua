@@ -58,6 +58,9 @@ function ParaWorldMain:ShowAllAreas()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 	ParaWorldMinimapWnd:Show();
+
+	local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+	ParaWorldSites.Reset();
 end
 
 function ParaWorldMain:CloseAllAreas()

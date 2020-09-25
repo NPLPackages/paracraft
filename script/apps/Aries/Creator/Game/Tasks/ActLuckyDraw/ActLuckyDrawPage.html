@@ -1,0 +1,88 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ActLuckyDraw/ActLuckyDrawPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ActLuckyDrawPage.lua"><![CDATA[
+local ActLuckyDrawPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActLuckyDraw/ActLuckyDrawPage.lua");
+ActLuckyDrawPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    ActLuckyDrawPage.CloseView()
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #ActLuckyDrawPage.Current_Item_DS;
+    else
+        return ActLuckyDrawPage.Current_Item_DS[index];
+    end
+end
+
+function LuckyDraw()
+    ActLuckyDrawPage.LuckyDraw()
+end
+
+function OpenRewardList()
+    ActLuckyDrawPage.OpenRewardList()
+end
+
+function IsLuckyDrawBtEnable()
+    return ActLuckyDrawPage.draw_bt_enable
+end
+
+function GetActState()
+    return ActLuckyDrawPage.GetActState()
+end
+
+function IsShowDrawBt()
+    return ActLuckyDrawPage.id and ActLuckyDrawPage.id ~= 0
+end
+]]></script>
+<div style="width: 730px; height: 401px;">
+    <div type ="box" style="width:697px;height:401px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/tu1_697x401_32bits.png#0 0 697 401);">
+        <!-- <div style="position: relative; width:540px;height:270px;margin-top:8px;margin-left: 10;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuliebiaobj_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div> -->
+        <input type="button" value="" onclick="ClosePage" style="margin-top: 22px; margin-left:664px;width:74px;height:89px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_X_74X89_32bits.png#0 0 74 89);"/>
+        <div style="width: 730px; height: 30px; margin-top: 190px;">
+            <!-- <pe:if condition='<%=IsLuckyDrawBtEnable() %>'>
+                <input type="button" value="" onclick="LuckyDraw" style="float:right;margin-left:265px;width:218px;height:110px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_choujiang_218X110_32bits.png#0 0 218 110);"/>
+            </pe:if>
+
+            <pe:if condition='<%=not IsLuckyDrawBtEnable() %>'>
+                <input type="button" value="" onclick="LuckyDraw" enabled='false' style="float:right;margin-left:265px;width:218px;height:110px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_choujiang_218X110_32bits.png#0 0 218 110);"/>
+            </pe:if> -->
+
+
+            <pe:if condition='<%=GetActState() == 1%>'>
+                <div style="float:right;margin-left:275px;width:208px;height:58px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_weikaishi_208X58_32bits.png#0 0 208 58);"></div>
+            </pe:if>
+
+            <pe:if condition='<%=GetActState() == 2%>'>
+                <pe:if condition='<%=IsShowDrawBt()%>'>
+                    <input type="button" value="" onclick="LuckyDraw" style="float:right;margin-left:265px;width:218px;height:110px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_choujiang_218X110_32bits.png#0 0 218 110);"/>
+                </pe:if>
+    
+                <pe:if condition='<%=not IsShowDrawBt()%>'>
+                    <div style="float:right;margin-left:275px;width:208px;height:58px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_xiaqi_208X58_32bits.png#0 0 208 58);"></div>
+                </pe:if>
+                
+            </pe:if>
+
+            <pe:if condition='<%=GetActState() == 3%>'>
+                <div style="float:right;margin-left:275px;width:208px;height:58px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_jieshu_208X58_32bits.png#0 0 208 58);"></div>
+            </pe:if>
+            
+            <input type="button" value="" onclick="OpenRewardList" style="float:right;margin-left:25px;margin-top: 27px; width:116px;height:22px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_chakanzhongjiang_116X22_32bits.png#0 0 116 22)"/>
+        </div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

@@ -606,15 +606,15 @@ function ClassManager.OnMsg(self, msg)
 			local room = string.format("__classroom_%s__", tostring(ClassManager.CurrentClassroomId));
 			if (not meta) then return end
 
-			if (meta.timestamp) then
-				if (not ClassManager.IsTeacherInClass()) then
-					local updatedTime = ClassManager.DateToMinutes(meta.timestamp..":0");
-					StudentPanel.UpdateClassTime(updatedTime);
-				end
-			end
-
 			if (meta.target == room) then
 				ClassManager.ProcessMessage(payload, meta);
+
+				if (meta.timestamp) then
+					if (not ClassManager.IsTeacherInClass()) then
+						local updatedTime = ClassManager.DateToMinutes(meta.timestamp..":0");
+						StudentPanel.UpdateClassTime(updatedTime);
+					end
+				end
 			elseif (string.find(meta.target, "__user_") ~= nil) then
 				-- invite msg send to __user_id__ room
 				local result = commonlib.split(payload.content, ":");

@@ -42,7 +42,7 @@ function TeachingQuestTitle.OnWorldLoaded()
 			ParaWorldLoginAdapter.MainWorldId = tostring(template.desc);
 		end
 	end
-	if (projectId == ParaWorldLoginAdapter.MainWorldId) then
+	if (projectId ~= nil and projectId == ParaWorldLoginAdapter.MainWorldId) then
 		if(not KeepWorkItemManager.GetToken())then
 			_guihelper.MessageBox(L"本世界只有登录的用户可以访问。即将退出世界！");
 			commonlib.TimerManager.SetTimeout(function()  

@@ -151,7 +151,7 @@ end
 
     </div>
 
-    <div style="float:left;width:155px;height:516px;margin-left:5px;margin-top:0px;">
+    <div style="float:left;width:155px;height:516px;margin-left:5px;margin-top:12px;">
         <!-- <div style="margin-left:10px;padding-left:12px;font-size:14px;">
             <div style="height:18px;color:#ffffff;margin-top:25px;"><%=getTopBtDesc()%></div>
         </div> -->
@@ -162,22 +162,21 @@ end
                 </NodeTemplate>
                 <NodeTemplate DataType="type_template">
                     <div style="height:36px">
-                        <pe:if condition='<%= TypeBeExpand(XPath("this|isMidleMenu")) == false %>'>
-                            <div style="margin-left:5px;margin-top:5px;height:32px;width:96px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)">
-                                <input type="button" value='' name='<%=XPath("this|index") %>' style="position:relative;margin-left:5px;width:96px;height:32px;font-weight:bold;background:" />
-                                <div style="float:left;margin-left: -20px;margin-top: 3px;">
-                                    <div style="position:relative;text-align:center;color: #181818;"><%=XPath("this|text") %></div>
-                                    <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
-                                        <div style="position:relative;margin-left:94px;margin-top:7px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_qiehuan1_14X8_32bits.png#0 0 14 8);" />
-                                    </pe:if>
-                                    <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
-                                        <div style="position:relative;margin-left:94px;margin-top:7px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_qiehuan2_14X8_32bits.png#0 0 14 8);" />
-                                    </pe:if>
-                                </div>
+                        
+                        <div style="margin-left:0px;margin-top:7px;height:32px;width:96px;background:">
+                            <input type="button" value='' zorder="-1" name='<%=XPath("this|index") %>' style="position:relative;margin-left:0px;width:96px;height:32px;font-weight:bold;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)" />
+                            <div style="float:left;margin-left: -20px;margin-top: 3px;">
+                                <div style="position:relative;margin-left: 18px;margin-top: 2px; text-align:center;color: #181818;"><%=XPath("this|text") %></div>
+                                <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
+                                    <div style="position:relative;margin-left:94px;margin-top:7px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_qiehuan1_14X8_32bits.png#0 0 14 8);" />
+                                </pe:if>
+                                <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
+                                    <div style="position:relative;margin-left:94px;margin-top:7px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_qiehuan2_14X8_32bits.png#0 0 14 8);" />
+                                </pe:if>
                             </div>
-                        </pe:if>
+                        </div>
 
-                        <pe:if condition='<%= TypeBeExpand(XPath("this|isMidleMenu")) == true %>'>
+                        <!-- <pe:if condition='<%= TypeBeExpand(XPath("this|isMidleMenu")) == true %>'>
                             <div style="margin-left:5px;margin-top:5px;height:32px;width:96px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8)">
                                 <input type="button" value='' name='<%=XPath("this|index") %>' style="position:relative;margin-left:5px;width:96px;height:32px;font-weight:bold;background:" />
                                 <div style="float:left;margin-left: -20px;margin-top: 3px;">
@@ -190,7 +189,7 @@ end
                                     </pe:if>
                                 </div>
                             </div>
-                        </pe:if>
+                        </pe:if> -->
                     </div>
                 </NodeTemplate>
                 <NodeTemplate DataType="item">

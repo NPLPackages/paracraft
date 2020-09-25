@@ -18,10 +18,9 @@ task:Run();
 
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Task.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/FastRandom.lua");
 local FastRandom = commonlib.gettable("MyCompany.Aries.Game.Common.CustomGenerator.FastRandom");
-local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")

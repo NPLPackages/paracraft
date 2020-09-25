@@ -365,7 +365,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 
 	local function checkLockWorld(callback)
         local currentEnterWorld = Mod.WorldShare.Store:Get("world/currentEnterWorld")
-        if (currentEnterWorld.project and currentEnterWorld.project.memberCount or 0) > 1 then
+        if (currentEnterWorld and currentEnterWorld.project and currentEnterWorld.project.memberCount or 0) > 1 then
             Mod.WorldShare.MsgBox:Show(L"请稍后...")
 			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
             KeepworkServiceWorld:UnlockWorld(function()

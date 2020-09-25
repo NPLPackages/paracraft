@@ -338,9 +338,11 @@ end
 
 local workers = {};
 local worker_index = 0;
+
+-- @param nIndex: force a given worker index
 -- return the activation file name
-function ChunkGenerator:GetFreeWorkerName()
-	worker_index = (worker_index+1) % (self.worker_count);
+function ChunkGenerator:GetFreeWorkerName(nIndex)
+	worker_index = ((nIndex or worker_index)+1) % (self.worker_count);
 	local worker_name = workers[worker_index];
 	if(not worker_name) then
 		local name = "gen"..worker_index;
@@ -374,6 +376,12 @@ function ChunkGenerator:GenerateChunkAsync(chunk, x, z)
 	local worker_name = self:GetFreeWorkerName();
 	cur_generator = self;
 	NPL.activate(worker_name, {x=x, z=z, gen_id=self:GetId(), cmd="GenerateChunk", seed = self:GetSeed(), address = self:GetClassAddress()});
+end
+
+function ChunkGenerator:InvokeCustomFuncAsync(funcName, params)
+	local worker_name = self:GetFreeWorkerName(0);
+	cur_generator = self;
+	NPL.activate(worker_name, {x=x, z=z, gen_id=self:GetId(), cmd="CustomFunc", seed = self:GetSeed(), funcName = funcName, params = params, address = self:GetClassAddress()});
 end
 
 -- apply chunk data in main thread
@@ -536,7 +544,7 @@ end
 
 NPL.this(function()
 	local msg = msg;
-	if( msg.cmd == "GenerateChunk") then
+	if( msg.cmd == "GenerateChunk" or msg.cmd == "CustomFunc") then
 		-- peek message queue and remove chunks whose gen_id is different from the top. 
 		if((VerifyOutOfWorldRequest() or msg.gen_id) ~= msg.gen_id) then
 			LOG.std(nil, "debug", "GenerateChunkAsync", "skipping out of world chunk %d %d", msg.x, msg.z);
@@ -553,15 +561,22 @@ NPL.this(function()
 		local gen = cur_generator;
 		
 		if(gen) then
-			local chunk = Chunk:new():Init(world, msg.x, msg.z);
-			LOG.std(nil, "debug", "GenerateChunkAsync", "chunk %d %d", msg.x, msg.z);
-			-- create chunk and world.
-			if(not gen:GenerateChunkAsyncImp(chunk, msg.x, msg.z)) then
-				gen:GenerateChunkImp(chunk, msg.x, msg.z)
+			if(msg.cmd == "GenerateChunk") then
+				local chunk = Chunk:new():Init(world, msg.x, msg.z);
+				LOG.std(nil, "debug", "GenerateChunkAsync", "chunk %d %d", msg.x, msg.z);
+				-- create chunk and world.
+				if(not gen:GenerateChunkAsyncImp(chunk, msg.x, msg.z)) then
+					gen:GenerateChunkImp(chunk, msg.x, msg.z)
+				end
+				NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
+					cmd="ApplyChunkData", data = chunk:GetMapChunkData(), x = msg.x, z = msg.z, gen_id = msg.gen_id
+				});
+			elseif(msg.cmd == "CustomFunc") then
+				local func = gen[msg.funcName]
+				if(type(func) == "function") then
+					func(gen, msg.params, msg);
+				end
 			end
-			NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
-				cmd="ApplyChunkData", data = chunk:GetMapChunkData(), x = msg.x, z = msg.z, gen_id = msg.gen_id
-			});
 		end
 	elseif( msg.cmd == "ApplyChunkData") then
 		if(cur_generator and cur_generator:GetId() == msg.gen_id) then

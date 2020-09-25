@@ -19,7 +19,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 local ParaWorldMinimapSurfaceRealtime = commonlib.inherit(commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurface"), commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurfaceRealtime"));
-ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconColor", "#ffffff80"});
+ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconColor", "#ffffffcc"});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIcon", "Texture/Aries/WorldMaps/common/maparrow_32bits.png"});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconSize", 32});
 ParaWorldMinimapSurfaceRealtime:Property({"PlayerIconCenterX", 15});

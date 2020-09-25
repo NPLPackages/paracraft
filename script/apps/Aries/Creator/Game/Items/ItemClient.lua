@@ -3,7 +3,7 @@ Title: Item Client
 Author(s): LiXizhi
 Date: 2013/7/14
 Desc: all block template.
-User defined custom blocks in the current world directory is saved in `blockworld.lastsave/customblocks.xml`
+User defined custom blocks in the current world directory is saved in `blockWorld.lastsave/customblocks.xml`
 
 use the lib:
 ------------------------------------------------------------
@@ -516,9 +516,11 @@ function ItemClient.RegisterCustomItem(params)
 		new_block.modelName = base_block.modelName;
 		new_block.hasAction = base_block.hasAction;
 		new_block.color_data = base_block.color_data;
+		new_block.color8_data = base_block.color8_data;
 		new_block.texture = real_filename;
 		new_block.icon = params.icon or new_block.texture or base_block.icon;
 		new_block.opacity = base_block.opacity;
+		new_block.handleNeighborChange = base_block.handleNeighborChange;
 
 		new_block.name = "customblock"..tostring(new_block.id);
 		new_block.class = base_block.class;

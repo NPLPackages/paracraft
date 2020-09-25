@@ -39,6 +39,37 @@ NPL.export({
 },
 
 {
+	type = "BecomeGeneralNPC", 
+	message0 = "创建通用NPC config %1 类型 %2",
+	arg0 = {
+		{
+			name = "configName",
+			type = "field_input",
+			text = "GeneralNPC",
+		},
+		{
+			name = "npcType",
+			type = "field_dropdown",
+			options = {
+				{ "大富抽奖", "tatfook_lucky" },
+			},
+			text = "大富抽奖",
+		},
+	},
+	category = "npc", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'BecomeGeneralNPC("%s", "%s")',
+	ToNPL = function(self)
+		return string.format('BecomeGeneralNPC("%s", "%s")\n', self:getFieldValue('configName'), self:getFieldAsString('npcType'));
+	end,
+	examples = {{desc = "创建通用NPC", canRun = false, code = [[
+]]}},
+},
+
+{
 	type = "SetTeacherNPCTasks", 
 	message0 = "设置学习任务 %1",
 	arg0 = {

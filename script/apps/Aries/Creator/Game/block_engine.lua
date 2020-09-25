@@ -46,7 +46,7 @@ BlockEngine.sim_interval = 300;
 
 -- block size in meters
 -- width in metters
-BlockEngine.region_width = 512;
+BlockEngine.region_width = 533.3333; -- 512;
 BlockEngine.blocksize = BlockEngine.region_width/512;
 BlockEngine.blocksize_inverse = 1/BlockEngine.blocksize;
 BlockEngine.half_blocksize = BlockEngine.blocksize/2;

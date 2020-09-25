@@ -103,7 +103,11 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		obj_params.facing = 1.57;
 		-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 		obj_params.Attribute = 128;
-
+	
+		local scaling = obj_params.scaling;
+		obj_params.scaling = 1;
+		_this:ShowModel(obj_params);
+		obj_params.scaling = scaling;
 		_this:ShowModel(obj_params);
 	end
 

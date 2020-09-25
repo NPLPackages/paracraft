@@ -522,6 +522,36 @@ end
 -- @param callbackFunc: function(bBeginLesson) end
 -- @return true if we have processed the world id
 function ParaWorldLessons.EnterWorldById(id, callbackFunc)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+	local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+	CommandManager:Init()
+
+	if (id == "36x135") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 1322)
+		return
+	elseif (id == "24x95" or id == "28x93" or id == "28x94" or id == "28x96") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 709)
+		return
+	elseif (id == "33x122") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 1562)
+		return
+	elseif (id == "29x118") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 19351)
+		return
+	elseif (id == "28x83" or id == "23x83") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 19352)
+		return
+	elseif (id == "28x112" or id == "28x114" or id == "28x115" or id == "28x125" or id =="28x126" or id == "28x116") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 536)
+		return
+	elseif (id == "28x117" or id == "50x117") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 801)
+		return
+	elseif (id == "34x123" or id == "34x124" or id == "50x124") then
+		CommandManager:RunCommand("/loadreadonlyworld " .. 565)
+		return
+	end
+
 	ParaWorldLessons.StaticInit()
 	id = tostring(id);
 	id = id:gsub("%s", "");

@@ -306,7 +306,23 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column)
 	if (not ParaWorldSites.SitesNumber or #ParaWorldSites.SitesNumber < 1) then
 		ParaWorldSites.InitSitesNumber();
 	end
+	if (not ParaWorldSites.Current_Item_DS or #ParaWorldSites.Current_Item_DS < 1) then
+		ParaWorldSites.InitSitesData();
+	end
+	local currentItem;
+	for i = 1, #ParaWorldSites.Current_Item_DS do
+		local item = ParaWorldSites.Current_Item_DS[i];
+		if (item.x == row and item.y == column) then
+			currentItem = item;
+			if (currentItem.loaded) then
+				return;
+			else
+				break;
+			end
+		end
+	end
 
+	currentItem.loaded = true;
 	local sn = ParaWorldSites.GetIndexFromPos(row, column);
 	keepwork.world.get({router_params={id=ParaWorldLoginAdapter.ParaWorldId}}, function(err, msg, data)
 		if (data and data.sites) then
@@ -317,10 +333,15 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column)
 					local filename = ParaIO.GetFileName(path);
 					local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
 					KeepworkServiceWorld:GetSingleFile(seat.paraMini.projectId, filename, function(content)
-						if (not content) then return end
+						if (not content) then
+							currentItem.loaded = false;
+							return;
+						end
 
-						local name = commonlib.Encoding.Utf8ToDefault(seat.paraMini.name);
-						local template_file = ParaIO.GetCurDirectory(0)..BlockTemplatePage.global_template_dir..name..".xml";
+						--local name = commonlib.Encoding.Utf8ToDefault(seat.paraMini.name);
+						local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
+						ParaIO.CreateDirectory(miniTemplateDir);
+						local template_file = miniTemplateDir..seat.paraMini.projectId..".xml";
 						local file = ParaIO.open(template_file, "w");
 						if (file:IsValid()) then
 							file:write(content, #content);
@@ -329,11 +350,15 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column)
 							local x, y = gen:GetGridXYBy2DIndex(column,row);
 							local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
 							gen:LoadTemplateAtGridXY(x, y, template_file);
+							currentItem.loaded = true;
 						end
 					end);
-					break;
+					return;
 				end
 			end
+			currentItem.loaded = false;
+		else
+			currentItem.loaded = false;
 		end
 	end);
 end
@@ -344,5 +369,18 @@ function ParaWorldSites.LoadMiniWorldOnPos(x, z)
 		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
 		local row, column = gen:Get2DIndexByGridXY(gridX, gridY);
 		ParaWorldSites.LoadMiniWorldOnSeat(row, column);
+	end
+end
+
+function ParaWorldSites.Reset()
+	if (not ParaWorldSites.SitesNumber or #ParaWorldSites.SitesNumber < 1) then
+		ParaWorldSites.InitSitesNumber();
+	end
+	if (not ParaWorldSites.Current_Item_DS or #ParaWorldSites.Current_Item_DS < 1) then
+		ParaWorldSites.InitSitesData();
+	end
+
+	for i = 1, #ParaWorldSites.Current_Item_DS do
+		ParaWorldSites.Current_Item_DS[i].loaded = false;
 	end
 end

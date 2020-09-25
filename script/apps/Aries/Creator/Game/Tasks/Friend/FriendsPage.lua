@@ -86,10 +86,16 @@ function FriendsPage.Show()
 			IsOpen = true
 
 			FriendsPage.UpdataUnAllLoadMsg()
+
+            if(FriendsPage.show_callback)then
+                FriendsPage.show_callback();
+            end
 		end);
 	end)
 end
-
+function FriendsPage.GetPageCtrl()
+    return page;
+end
 function FriendsPage.GetRecentFromFriendsList()
 	if nil == FriendList then
 		return {}
