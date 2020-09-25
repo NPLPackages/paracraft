@@ -196,7 +196,9 @@ function MainLogin:UpdateCoreClient()
 		if(v3) then
 			v1,v2,v3 = tonumber(v1),tonumber(v2), tonumber(v3)
 			-- NOTE: version here 0.7.509
-			if(v1 < 0 or v2 < 7 or v3 < 510) then
+			local isCodepku = ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true"
+
+			if(not isCodepku and (v1 < 0 or v2 < 7 or v3 < 510)) then
 				_guihelper.MessageBox(format(L"您的版本%s低于最低要求,请尽快更新", ver), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						ClientUpdater:OnClickUpdate()
