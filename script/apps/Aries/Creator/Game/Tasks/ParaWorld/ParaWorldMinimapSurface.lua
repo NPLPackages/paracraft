@@ -29,7 +29,7 @@ ParaWorldMinimapSurface:Property({"GridColor", "#33333380"});
 ParaWorldMinimapSurface:Property({"BlocksSamplingSize", 4});
 ParaWorldMinimapSurface:Property({"BlocksSamplingLODSize", 4});
 ParaWorldMinimapSurface:Property({"BlocksPerFrame", 500, desc = "how many blocks to render per frame. "});
-ParaWorldMinimapSurface:Property({"BackgroundColor", "#000000"});
+ParaWorldMinimapSurface:Property({"BackgroundColor", "#75ae23"});
 -- use self:LockMap() method to lock. do not set this manually. 
 ParaWorldMinimapSurface:Property({"isMapLocked", false});
 
@@ -187,7 +187,7 @@ function ParaWorldMinimapSurface:paintEvent(painter)
 		return;
 	end
 	self:DrawBackground(painter);
-	if(self:DrawSome(painter)) then
+	if(not self:IsMapLocked() and self:DrawSome(painter)) then
 		if(self:IsShowGrid()) then
 			self:DrawGrid(painter);
 		end
@@ -289,6 +289,20 @@ function ParaWorldMinimapSurface:DrawGrid(painter)
 	end
 end
 
+-- return true, if some part of the map is locked. we will redraw when map is loaded
+function ParaWorldMinimapSurface:IsMapLocked()
+	local attWorld = ParaTerrain.GetBlockAttributeObject()
+	local from_x, from_y = self.map_left, self.map_top;
+	for x = self.map_left, self.map_left +self.map_width, 512 do
+		for y = self.map_top, self.map_top +self.map_height, 512 do	
+			local attRegion = attWorld:GetChild(format("region_%d_%d", math.floor(x/512), math.floor(y/512)))		
+			if(attRegion:GetField("IsLocked", false)) then
+				return true
+			end
+		end
+	end
+end
+
 -- @return true if we have finished drawing
 function ParaWorldMinimapSurface:DrawSome(painter)
 	local step_size = self.step_size;
@@ -296,6 +310,7 @@ function ParaWorldMinimapSurface:DrawSome(painter)
 	local block_count = self.block_count;
 
 	local from_x, from_y = self.map_left, self.map_top;
+	
 	local count = 0;
 
 	local width, height = self:width(), self:height();

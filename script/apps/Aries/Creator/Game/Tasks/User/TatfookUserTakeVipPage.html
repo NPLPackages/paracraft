@@ -1,0 +1,63 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/UserInfo/TatfookUserTakeVipPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="TatfookUserTakeVipPage.lua"><![CDATA[
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
+local TatfookUserTakeVipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TatfookUserTakeVipPage.lua");
+TatfookUserTakeVipPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function IsVip()
+    return KeepWorkItemManager.IsVip()
+end
+function OnClick()
+    keepwork.user.takevip_bycode({
+        promoCodeName = "I_love_tatfook"
+    },function(err, msg, data)
+        data = data or {};
+        if(err ~= 200)then
+            if(data.code == 36)then
+                _guihelper.MessageBox(L"已使用过此兑换码！")
+            else
+                _guihelper.MessageBox(L"领取失败！")
+            end
+            return
+        end
+        if(IsVip())then
+            _guihelper.MessageBox(L"续费会员成功！")
+        else
+            _guihelper.MessageBox(L"领取会员成功！")
+        end
+        local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
+        UserInfo:LoginWithToken();
+        KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadProfile");
+        KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems");
+        ClosePage();
+    end)
+end
+
+]]></script>
+
+<kp:window width="955" height="580" title='<%=L"Paracraft会员" %>' onclose="ClosePage">
+    <div style="margin-left: 10px; margin-top: 40px; width: 932px; height: 534x; background: url(Texture/Aries/Creator/keepwork/vip/huiyuan_932X534_32bits.png#0 0 932 534)">
+        <input type="button"  onclick="OnClick" style="margin-left:55px;margin-top:380px;width: 184px;height: 124x;background: url(Texture/Aries/Creator/keepwork/vip/btn_zhaojiazhangkaitong_184X124_32bits.png#0 0 184 124)" />
+        <pe:if condition="<%=IsVip()%>">
+            <div style="margin-left:120px;margin-top:-45px;color:#000000;"><%=L"续费会员" %></div>
+        </pe:if>
+        <pe:if condition="<%=not IsVip()%>">
+            <div style="margin-left:120px;margin-top:-45px;color:#000000;"><%=L"领取会员" %></div>
+        </pe:if>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -29,6 +29,17 @@ function GetFontColorDS()
         {value="#0000ff"},
     };
 end
+
+function GetTextBGDS()
+    return {
+        {value="", text="无", selected=true},
+        {value="grey", text=L"灰色半透明"},
+        {value="black", text=L"黑色"},
+        {value="white", text=L"白色"},
+    };
+end
+    
+
 function GetTextAnimDS()
     return {
         {value="", text=L"立即出现", selected=true},
@@ -82,6 +93,11 @@ end
         <div style="float: left; margin-left: 20px;">
             <%=L"文字动画:"%>
             <select name="textanim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetTextAnimDS()%>'>
+            </select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <%=L"文字背景:"%>
+            <select name="textbg" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetTextBGDS()%>'>
             </select>
         </div>
     </div>

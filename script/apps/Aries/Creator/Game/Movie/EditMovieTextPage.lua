@@ -88,6 +88,7 @@ function EditMovieTextPage.OnOK()
 			textpos = page:GetValue("textpos"),
 			textanim = page:GetValue("textanim"),
 			bganim = page:GetValue("bganim"),
+			textbg = page:GetValue("textbg"),
 			bgcolor = bgcolor,
 		};
 		page:CloseWindow();
@@ -107,6 +108,9 @@ function EditMovieTextPage.UpdateUIFromValue(values)
 		end
 		if(values.textpos) then
 			page:SetValue("textpos", values.textpos);
+		end
+		if(values.textbg) then
+			page:SetValue("textbg", values.textbg);
 		end
 		if(values.textanim) then
 			page:SetValue("textanim", values.textanim);

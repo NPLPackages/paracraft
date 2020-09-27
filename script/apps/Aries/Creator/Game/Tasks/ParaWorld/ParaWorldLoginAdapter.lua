@@ -40,7 +40,9 @@ ParaWorldLoginAdapter.ids = {
         -- 1192, -- 精彩佛山
         --1236, --希望空间 
     },
-    LOCAL = {},
+    LOCAL = {
+        1412, -- paracraft 主城
+    },
 }
 function ParaWorldLoginAdapter.GetDefaultWorldID()
     local httpwrapper_version = HttpWrapper.GetDevVersion();

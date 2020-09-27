@@ -123,7 +123,7 @@ function TeacherBlocklyAPI:BecomeGeneralNPC(configName, npcType)
 			local data = datas[i];
 			if (data.npcType == npcType) then
 				self.name = data.npcName or self.name;
-				self:ShowHeadOn(data.npcState or TeachingQuestPage.AllFinished);
+				self:ShowHeadOn(data.npcState or TeachingQuestPage.AllFinished, data.npcColor);
 				self:InvokeMethod("registerClickEvent", function()
 					if (data.npcScript) then
 						TeacherBlocklyAPI.RunExternalFunc(data.npcScript);
@@ -166,15 +166,15 @@ function TeacherBlocklyAPI:anim(anim_id)
 	end
 end
 
-function TeacherBlocklyAPI:ShowHeadOn(state)
+function TeacherBlocklyAPI:ShowHeadOn(state, npcColor)
 	if (not self.obj) then return end
 	--local actor_name = {L"编程导师", L"动画导师", L"CAD导师", L"机器人导师"};
 	if (state == TeachingQuestPage.AllFinished) then
 		local headon_mcml = string.format(
 			[[<pe:mcml><div style="margin-left:-100px;margin-top:-60px;width:200px;height:20px;">
-				<div style="margin-top:20px;width:200px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:#fcf73c;shadow-color:#8000468e;text-shadow:true">%s</div>
+				<div style="margin-top:20px;width:200px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:%s;shadow-color:#8000468e;text-shadow:true">%s</div>
 			</div></pe:mcml>]],
-			self.name);
+			npcColor or "#fcf73c", self.name);
 		--headon_speech.Speak(self.obj, headon_mcml, -1, nil, true, nil, -100);
 		self.obj:SetHeadOnDisplay({url=ParaXML.LuaXML_ParseString(headon_mcml)})
 	else
@@ -184,9 +184,9 @@ function TeacherBlocklyAPI:ShowHeadOn(state)
 		local headon_mcml = string.format(
 			[[<pe:mcml><div style="margin-left:-100px;margin-top:-120px;width:200px;height:80px;">
 				<img style="margin-left:%s;width:%s;height:64px;background:url(%s);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeUD);" />
-				<div style="margin-top:20px;width:200px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:#fcf73c;shadow-color:#8000468e;text-shadow:true">%s</div>
+				<div style="margin-top:20px;width:200px;height:20px;text-align:center;font-size:15px;base-font-size:15;font-weight:bold;shadow-quality:8;color:%s;shadow-color:#8000468e;text-shadow:true">%s</div>
 			</div></pe:mcml>]],
-			left[state], width[state], state_img[state], self.name);
+			left[state], width[state], state_img[state], npcColor or "#fcf73c", self.name);
 
 		--[[
 		local ctl_name = headon_speech.Speak(self.obj, headon_mcml, -1, nil, true, nil, -100);

@@ -40,6 +40,11 @@ KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
 end)
 
 local gsItem = KeepWorkItemManager.GetItemTemplate(gsid);
+
+
+KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadProfile");
+KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems");
+
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Encoding/base64.lua");
@@ -63,11 +68,8 @@ KeepWorkItemManager.items = {};
 KeepWorkItemManager.profile = {};
 KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
-
+KeepWorkItemManager.is_init = false;
 function KeepWorkItemManager.IsEnabled()
---    local kpitem_enabled = ParaEngine.GetAppCommandLineByParam("kpitem_enabled", false);
---    return kpitem_enabled;
-
     return true;
 end
 
@@ -75,6 +77,10 @@ function KeepWorkItemManager.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
     end
+    if(KeepWorkItemManager.is_init)then
+        return
+    end
+    KeepWorkItemManager.is_init = true;
 	LOG.std(nil, "info", "KeepWorkItemManager", "StaticInit");
     if(not KeepWorkItemManager.filter)then
         KeepWorkItemManager.filter = Filters:new();
@@ -83,10 +89,16 @@ function KeepWorkItemManager.StaticInit()
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", KeepWorkItemManager.OnKeepWorkLogout_Callback)
 
 	
-    -- for testing filter callback
-    KeepWorkItemManager.GetFilter():add_filter("loading", function(state)
+    KeepWorkItemManager.GetFilter():add_filter("KeepWorkItemManager_LoadItems", function()
+        KeepWorkItemManager.LoadItems(nil, function()
+                KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems_Finished");
+        end)
     end);
-    KeepWorkItemManager.GetFilter():add_filter("loaded_all", function()
+
+    KeepWorkItemManager.GetFilter():add_filter("KeepWorkItemManager_LoadProfile", function()
+        KeepWorkItemManager.LoadProfile(true, function()
+             KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadProfile_Finished");
+        end)
     end);
 end
 function KeepWorkItemManager.OnGGSMsg(msg)
@@ -867,4 +879,9 @@ function KeepWorkItemManager.GetItemTemplateById(id)
             return v
         end
     end
+end
+function KeepWorkItemManager.IsVip()
+	local gsid = 10;
+	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
+	return (copies and copies > 0) or (System and System.User and System.User.isVip);
 end

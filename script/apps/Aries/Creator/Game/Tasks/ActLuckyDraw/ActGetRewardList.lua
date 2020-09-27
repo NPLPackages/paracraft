@@ -87,6 +87,7 @@ function ActGetRewardList.Show()
             end
 
             ActGetRewardList.ServerData = {}
+            ActGetRewardList.CurSelectIndex = #data
             for index = #data, 1, -1 do
                 ActGetRewardList.ServerData[#ActGetRewardList.ServerData + 1] = data[index]
             end
@@ -146,13 +147,17 @@ function ActGetRewardList.HandleData()
     local list = {}
     local last_reward_data = ActGetRewardList.ServerData[ActGetRewardList.CurSelectIndex] or {}
     local userLotteries = last_reward_data.userLotteries or {}
+	table.sort(userLotteries, function(a, b)
+		return (b.award > a.award)
+	end)
+
     local index = 0
     ActGetRewardList.Current_Item_DS = {}
     for i, v in ipairs(userLotteries) do
         if v.award and list[v.award] == nil then
             index = index + 1
             ActGetRewardList.Current_Item_DS[index] = {is_show_level = true, level = v.award}
-            list[v.award] = v.award
+            list[v.award] = 0
             index = index + 1
         end
 
@@ -167,29 +172,32 @@ function ActGetRewardList.HandleData()
 
         local userList = ActGetRewardList.Current_Item_DS[index].userList
         userList[#userList + 1] = {name = v.user.username, award = v.award}
-
+        list[v.award] = list[v.award] + 1
         -- print("sssssssss", v.user.username, index)
         if #ActGetRewardList.Current_Item_DS[index].userList > 4 then
             index = index + 1
         end        
     end
 
+    -- print("gggggggggggggggggg")
+    -- commonlib.echo(list, true)
+
 
     for k, v in pairs(ActGetRewardList.Current_Item_DS) do
         if v.userList then
-            v.mcml_str = ActGetRewardList.GetShowStr(v.userList)
+            v.mcml_str = ActGetRewardList.GetShowStr(v.userList, list)
         end
     end
 end
 
-function ActGetRewardList.GetShowStr(userList)
+function ActGetRewardList.GetShowStr(userList, list)
     local mcml_str = ""
     for k, v in pairs(userList) do
         local left_px = "25px"
-        local str = string.format('<div style="float: left;margin-left: %s;margin-top:5px;color: #136c5e; font-size:12pt; font-weight:bold; width:100px">%s</div>', left_px, v.name)
-        if #userList == 1 then
+        local str = string.format('<div style="float: left;margin-left: %s;margin-top:3px;color: #136c5e; font-size:12pt; font-weight:bold; width:100px">%s</div>', left_px, v.name)
+        if list[v.award] == 1 then
             left_px = "280px"
-            str = string.format('<div style="float: left;margin-left: %s;margin-top:5px;color: #136c5e; font-size:12pt; font-weight:bold; width:100px; text-align:center">%s</div>', left_px, v.name)
+            str = string.format('<div style="float: left;margin-left: %s;margin-top:3px;color: #136c5e; font-size:12pt; font-weight:bold; width:100px; text-align:center">%s</div>', left_px, v.name)
         end
         
         mcml_str = mcml_str .. str

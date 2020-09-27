@@ -33,6 +33,12 @@ local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
 
+-- this is the host side ignore list, which could be different from ParaWorldMiniChunkGenerator's ignoreList
+local ignoreList = {[9]=true,[253]=true,[110]=true,[216]=true,[217]=true,[196]=true,[218]=true,
+	[219]=true,[215]=true,[254]=true,[189]=true, [221]=true,[212]=true, [22]=true,
+};
+
+
 function ParaWorldChunkGenerator:ctor()
 	self:SetWorkerThreadCount(1)
 end
@@ -109,7 +115,11 @@ end
 function ParaWorldChunkGenerator:LoadTemplateAtGridXY(x, y, filename)
 	if(filename) then
 		local minX, minY, minZ = self:GetBlockOriginByGridXY(x, y);
-		self:LoadTemplate(minX, minY, minZ, filename)
+		if(ParaTerrain.LoadBlockAsync) then
+			self:LoadTemplateAsync(minX, minY, minZ, filename)
+		else
+			self:LoadTemplate(minX, minY, minZ, filename)
+		end
 	end
 end
 
@@ -121,11 +131,12 @@ end
 -- consider using LoadTemplateAsync instead. 
 -- @param x, y, z: pivot origin. 
 function ParaWorldChunkGenerator:LoadTemplate(x, y, z, filename)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
-	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
-			blockX = x,blockY = y, blockZ = z, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false, nohistory=true})
-	task:Run();
+	self:LoadTemplateImp({x=x, y=y, z=z, filename=filename})
+--	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+--	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+--	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
+--			blockX = x,blockY = y, blockZ = z, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false, nohistory=true})
+--	task:Run();
 end
 
 -- generate flat terrain
@@ -234,6 +245,70 @@ function ParaWorldChunkGenerator:GetClassAddress()
 end
 
 
+-- only call this in main thread. use LoadTemplateAsyncImp for async mode
+function ParaWorldChunkGenerator:LoadTemplateImp(params)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+	local x, y, z, filename = params.x, params.y, params.z, params.filename
+	
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(xmlRoot) then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(root_node and root_node[1]) then
+			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+			if(node and node[1]) then
+				local blocks = NPL.LoadTableFromString(node[1]);
+				if(blocks and #blocks > 0) then
+					local bx, by, bz = x, y, z;
+					LOG.std(nil, "info", "BlockTemplate", "LoadTemplate from file: %s at pos:%d %d %d", filename, bx, by, bz);
+
+					if(root_node.attr and root_node.attr.relative_motion == "true") then
+						BlockTemplate:CalculateRelativeMotion(blocks, bx, by, bz);
+					end
+
+					local addList = {};
+					local is_suspended_before = ParaTerrain.GetBlockAttributeObject():GetField("IsLightUpdateSuspended", false);
+					if(not is_suspended_before) then
+						ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
+					end
+					for _, b in ipairs(blocks) do
+						local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];
+						if(block_id and not ignoreList[block_id]) then
+							local last_block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
+							local last_block = block_types.get(last_block_id);
+							if(last_block) then
+								
+							end
+							if(block_id ~= last_block_id) then
+								ParaTerrain.SetBlockTemplateByIdx(x,y,z, block_id);
+							end
+							
+							if(b[5]) then
+								ParaTerrain.SetBlockUserDataByIdx(x,y,z, b[5]);
+							end
+							local block = block_types.get(block_id);
+							
+							if(block and block.onload) then
+								addList[#addList+1] = b;
+							end
+						end
+					end
+					if(not is_suspended_before) then
+						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
+					end
+					if(#addList > 0) then
+						self:ApplyOnLoadBlocks({addList=addList, x=bx, y=by, z=bz})
+					end
+					local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", math.floor(bx/512), math.floor(bz/512)))
+					attRegion:SetField("RefreshLightChunkColumns", {math.floor(bx/16), math.floor(bz/16), 128/16});
+
+					return true;
+				end
+			end
+		end
+	end
+end
+
 -- this function is called in worker thread
 -- @param params: {x, y, z, filename}
 function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
@@ -266,37 +341,27 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 					if(not is_suspended_before) then
 						ParaTerrain.GetBlockAttributeObject():CallField("SuspendLightUpdate");
 					end
+					local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", math.floor(bx/512), math.floor(bz/512)))
+					attRegion:SetField("IsLocked", true)
+
 					for _, b in ipairs(blocks) do
 						local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];
-						if(block_id) then
-							local last_block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
-							local last_block = block_types.get(last_block_id);
-							if(last_block) then
-								
-							end
-							if(block_id ~= last_block_id) then
-								ParaTerrain.SetBlockTemplateByIdx(x,y,z, block_id);
-							end
-							
-							if(b[5]) then
-								ParaTerrain.SetBlockUserDataByIdx(x,y,z, b[5]);
-							end
+						if(block_id and not ignoreList[block_id]) then
+							ParaTerrain.LoadBlockAsync(x,y,z, block_id, b[5] or 0)
 							local block = block_types.get(block_id);
-							
 							if(block and block.onload) then
 								addList[#addList+1] = b;
 							end
 						end
 					end
+					attRegion:SetField("IsLocked", false)
 					if(not is_suspended_before) then
 						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
 					end
-					if(#addList > 0) then
-						NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
-							cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", params= {addList=addList, x=bx, y=by, z=bz}, 
-							gen_id = msg.gen_id, address = msg.address,
-						});
-					end
+					NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
+						cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", params= {addList=addList, x=bx, y=by, z=bz}, 
+						gen_id = msg.gen_id, address = msg.address,
+					});
 					return true;
 				end
 			end
@@ -308,7 +373,10 @@ end
 function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 	local addList = params.addList;
 	local bx, by, bz = params.x, params.y, params.z
-	if(addList) then
+	local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", math.floor(bx/512), math.floor(bz/512)))
+	attRegion:SetField("RefreshLightChunkColumns", {math.floor(bx/16), math.floor(bz/16), 128/16});
+
+	if(addList and #addList > 0) then
 		LOG.std(nil, "info", "ParaWorldChunkGenerator", "ApplyOnLoadBlocks: %d blocks", #addList)
 		for _, b in ipairs(addList) do
 			local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];

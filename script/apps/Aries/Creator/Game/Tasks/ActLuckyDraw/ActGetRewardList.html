@@ -78,13 +78,14 @@ function ChangeItem(index)
 end
 
 function IsShowItem(index)
+    --return true
     return ActGetRewardList.ServerData[index] ~= nil
 end
 ]]></script>
 <div style="width: 860px; height: 616px;">
-    <div style="width: 130px;height: 400px;float:left;margin-top: 187px;">
+    <div style="width: 130px;height: 400px;float:left;margin-top: 157px;">
         <pe:if condition='<%=IsShowItem(1)%>'>
-            <div style="width:121px;height:51px;margin-top: 8px">
+            <div style="width:121px;height:51px;margin-top: 6px">
                 <pe:if condition='<%=IsItemSelect(1)%>'>
                     <input type="button" name="1" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_3_1_121X51_32bits.png#0 0 121 51)"/>
                 </pe:if>
@@ -95,7 +96,7 @@ end
             </div>
         </pe:if>
         <pe:if condition='<%=IsShowItem(2)%>'>
-            <div style="width:121px;height:51px;margin-top: 8px;">
+            <div style="width:121px;height:51px;margin-top: 6px;">
                 <pe:if condition='<%=IsItemSelect(2)%>'>
                     <input type="button" name="2" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_10_1_121X51_32bits.png#0 0 121 51)"/>
                 </pe:if>
@@ -107,7 +108,7 @@ end
         </pe:if>   
 
         <pe:if condition='<%=IsShowItem(3)%>'>
-            <div style="width:121px;height:51px;margin-top: 8px;">
+            <div style="width:121px;height:51px;margin-top: 6px;">
                 <pe:if condition='<%=IsItemSelect(3)%>'>
                     <input type="button" name="3" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_17_1_121X51_32bits.png#0 0 121 51)"/>
                 </pe:if>
@@ -119,7 +120,7 @@ end
         </pe:if>   
 
         <pe:if condition='<%=IsShowItem(4)%>'>
-            <div style="width:121px;height:51px;margin-top: 8px;">
+            <div style="width:121px;height:51px;margin-top: 6px;">
                 <pe:if condition='<%=IsItemSelect(4)%>'>
                     <input type="button" name="4" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_24_1_121X51_32bits.png#0 0 121 51)"/>
                 </pe:if>
@@ -131,13 +132,25 @@ end
         </pe:if>   
 
         <pe:if condition='<%=IsShowItem(5)%>'>
-            <div style="width:121px;height:51px;margin-top: 8px;">
+            <div style="width:121px;height:51px;margin-top: 6px;">
                 <pe:if condition='<%=IsItemSelect(5)%>'>
                     <input type="button" name="5" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_31_1_121X51_32bits.png#0 0 121 51)"/>
                 </pe:if>
     
                 <pe:if condition='<%=not IsItemSelect(5)%>'>
                     <input type="button" name="5" zorder="-1" onclick="ChangeItem" style="margin-left: 24px; width:97px;height:35px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_31_97X35_32bits.png#0 0 97 35)"/>
+                </pe:if>
+            </div>
+        </pe:if>   
+
+        <pe:if condition='<%=IsShowItem(6)%>'>
+            <div style="width:121px;height:51px;margin-top: 6px;">
+                <pe:if condition='<%=IsItemSelect(6)%>'>
+                    <input type="button" name="6" zorder="-1" onclick="ChangeItem" style="margin-top: -5px; width:121px;height:51px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_7_1_121X51_32bits.png#0 0 121 51)"/>
+                </pe:if>
+    
+                <pe:if condition='<%=not IsItemSelect(6)%>'>
+                    <input type="button" name="6" zorder="-1" onclick="ChangeItem" style="margin-left: 24px; width:97px;height:35px;background: url(Texture/Aries/Creator/keepwork/ActLuckyDraw/btn_7_121X51_32bits.png#0 0 97 35)"/>
                 </pe:if>
             </div>
         </pe:if>   
@@ -150,7 +163,7 @@ end
             <!-- <pe:container name = "ImgTable" alignment="_lt" ClickThrough="true" style="width:400px;height:400px;background: url(Texture/Aries/Creator/keepwork/ActGetRewardList/timg.png#0 0 1020 1020)"></pe:container> -->
             <!-- <input type="button" class="button" value="按钮" MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="float:right;margin-top:0px;width:212px;height:30px;"/> -->
             <!-- <div name = "ImgTable" style=" width: 400px;height: 400px; background: url(Texture/Aries/Creator/keepwork/ActGetRewardList/timg.png#0 0 1020 1020);"></div> -->
-            <pe:gridview style="margin-left:35px;width:670px;height:580px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="true" pagesize="12" ItemsPerLine="1" DefaultNodeHeight = "30" 
+            <pe:gridview style="margin-left:35px;width:670px;height:570px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="true" pagesize="12" ItemsPerLine="1" DefaultNodeHeight = "30" 
                 DataSource='<%=DS_Items%>'>
                 <PagerSettings Position="Bottom" height="36" style="position:relative;width:834px;margin-top:-43px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
                 <PagerTemplate>

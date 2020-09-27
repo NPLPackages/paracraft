@@ -13,6 +13,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 local Screen = commonlib.gettable("System.Windows.Screen");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -30,6 +31,7 @@ local default_values = {
 	textpos = "bottom",
 	bganim = "",
 	textanim = "",
+	textbg = nil,
 	bgcolor = "",
 }
 Actor.default_values = default_values;
@@ -126,6 +128,9 @@ function Actor:AddKeyFrameOfText(values)
 		end
 		if(values.textanim == default_values.textanim) then
 			values.textanim = nil;
+		end
+		if(values.textbg == "") then
+			values.textbg = nil;
 		end
 		if(values.bgcolor == default_values.bgcolor) then
 			values.bgcolor = nil;
@@ -226,8 +231,23 @@ function Actor:GetTextObj(bCreateIfNotExist)
 	end
 end
 
+local image_path = {
+	["grey"] = "Texture/alphadot.png",
+	["white"] = "Texture/whitedot.png",
+	["black"] = "Texture/bg_black.png",
+}
+
+-- @param filename: relative to world directory or "grey" or ""
+function Actor:GetTextImagePathByName(filename)
+	if(filename and filename~="") then
+		return image_path[filename] or Files.GetWorldFilePath(filename) or filename;
+	else
+		return "";
+	end
+end
+
 -- update UI text with given values. 
-function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, bgalpha, textalpha, bgcolor)
+function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor)
 	local obj = self:GetTextObj(true);
 	if(not obj) then
 		return
@@ -258,6 +278,12 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, bgalpha, textalp
 		obj.font = format("System;%d;bold", fontsize);
 	else
 		obj.font = format("System;%d;bold", default_values.fontsize);
+	end
+
+	if(textbg and textbg~="") then
+		obj.background = self:GetTextImagePathByName(textbg);
+	else
+		obj.background = "";
 	end
 
 	if(bgcolor and bgcolor~="") then
@@ -334,6 +360,6 @@ function Actor:FrameMovePlaying(deltaTime)
 				text = text:gsub("#", "\n");
 			end
 		end
-		self:UpdateTextUI(text, fontsize, fontcolor, textpos, bgalpha, textalpha, bgcolor);
+		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor);
 	end
 end

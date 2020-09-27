@@ -52,6 +52,7 @@ NPL.export({
 			type = "field_dropdown",
 			options = {
 				{ "大富抽奖", "tatfook_lucky" },
+				{ "李老师", "tatfook_vip" },
 			},
 			text = "大富抽奖",
 		},

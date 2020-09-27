@@ -81,7 +81,7 @@ function ParaWorldSites.ShowPage()
 			ParaWorldSites.CheckIsMyParaworld(function(world)
 				ParaWorldSites.IsOwner = true;
 			end);
-		end, 100);
+		end, 10);
 	end
 end
 
@@ -321,6 +321,9 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column)
 			end
 		end
 	end
+	if (not currentItem) then
+		return;
+	end
 
 	currentItem.loaded = true;
 	local sn = ParaWorldSites.GetIndexFromPos(row, column);
@@ -368,6 +371,9 @@ function ParaWorldSites.LoadMiniWorldOnPos(x, z)
 		local gen = GameLogic.GetBlockGenerator();
 		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
 		local row, column = gen:Get2DIndexByGridXY(gridX, gridY);
+		if (row < 1 or column < 1 or row > 10 or column > 10) then
+			return;
+		end
 		ParaWorldSites.LoadMiniWorldOnSeat(row, column);
 	end
 end

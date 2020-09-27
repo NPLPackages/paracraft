@@ -67,7 +67,7 @@ function ParaWorldList.ShowPage()
 				end
 			end);
 		end);
-	end, 100);
+	end, 10);
 end
 
 function ParaWorldList.OnClose()
