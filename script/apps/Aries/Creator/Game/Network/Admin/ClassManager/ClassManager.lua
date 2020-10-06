@@ -180,19 +180,22 @@ function ClassManager.LoadAllClasses(callback)
 		ClassManager.OrgClassIdMap = {};
 	end
 	keepwork.userOrgInfo.get(nil, function(err, msg, data)
-		local orgs = data and data.data and data.data.allOrgs;
+		local orgs = data and data.data;
 		if (orgs == nil) then return end
+		if (orgs.allOrgs) then
+			orgs = orgs.allOrgs;
+		end
 
 		for i = 1, #orgs do
-			keepwork.classes.get({cache_policy = "access plus 0", organizationId = orgs[i].id, roleId=2}, function(err, msg, data)
+			keepwork.classes.get({cache_policy = "access plus 0", orgId = orgs[i].id, roleId=2}, function(err, msg, data)
 				local classes = data and data.data;
 				if (classes == nil) then return end
 
-				ClassManager.OrgClassIdMap[orgs[i].loginUrl] = {}
+				ClassManager.OrgClassIdMap[orgs[i].orgUrl] = {}
 				for j = 1, #classes do
 					if (classes[j].classId and classes[j].name) then
 						table.insert(ClassManager.ClassList, classes[j]);
-						ClassManager.OrgClassIdMap[orgs[i].loginUrl][j] = classes[j].classId;
+						ClassManager.OrgClassIdMap[orgs[i].orgUrl][j] = classes[j].classId;
 					end
 				end
 

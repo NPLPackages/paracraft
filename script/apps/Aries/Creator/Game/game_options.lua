@@ -323,6 +323,7 @@ function options:OnLoadWorld()
 	self:ApplyTexturePack();
 
 	-- load saved user settings
+	ParaCamera.GetAttributeObject():SetField("TurnBipedWhenWalkBackward", true);	
 	local profile = UserProfile.GetUser();
 	self.LockedGameMode = nil;
 	self.NormalDensity = self.DefaultDensity;

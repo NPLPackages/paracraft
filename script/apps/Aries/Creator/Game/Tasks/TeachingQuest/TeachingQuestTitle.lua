@@ -96,12 +96,15 @@ function TeachingQuestTitle.CheckAndShow()
 		TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
 	end);
 	]]
+
+	--[[
 	KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
 		if (canExchange.data and canExchange.data.ret == true) then
 			KeepWorkItemManager.DoExtendedCost(TeachingQuestPage.ticketExid, function()
 			end);
 		end
 	end);
+	]]
 end
 
 function TeachingQuestTitle.OnShowPanel()
@@ -300,6 +303,7 @@ function TeachingQuestTitle.StartTask()
 		end
 
 		if (not TeachingQuestTitle.IsTaskFinished()) then
+			--[[
 			_guihelper.MessageBox(L"是否使用1张入场券开始当前世界任务？", function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
 					local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
@@ -311,6 +315,14 @@ function TeachingQuestTitle.StartTask()
 					end);
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
+			]]
+			local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
+			if (TeachingQuestPage.IsVip()) then
+				exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
+			end
+			KeepWorkItemManager.DoExtendedCost(exid, function()
+				ShowTaskVideo(true);
+			end);
 		else
 			ShowTaskVideo(false);
 		end
@@ -322,14 +334,16 @@ function TeachingQuestTitle.FinishedTask()
 		firstStart = false;
 		if (TeachingQuestPage.IsVip()) then
 			GameLogic.AddBBS("statusBar", L"获得了20个知识豆。", 3000, "0 255 0");
-			_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆。您已开通VIP，自动获得了20知识豆！");
+			--_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆。您已开通VIP，自动获得了20知识豆！");
 		else
 			GameLogic.AddBBS("statusBar", L"获得了10个知识豆。", 3000, "0 255 0");
+			--[[
 			_guihelper.MessageBox(L"普通用户完成任务后自动获得10知识豆，VIP用户获得20知识豆，是否开通VIP获取双倍知识豆？", function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
 					ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/vip", "", 1); 
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
+			]]
 		end
 	end
 	taskInProcess = false;

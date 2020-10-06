@@ -27,7 +27,7 @@
 					帕拉卡每周向用户自动发放两张知识岛小课堂【入场券】
 					(用户进入知识岛即可自动获取一张【入场券】，每日最
 					多发放一张，每周最多发放两张，每位用户最多可以同时
-	                拥有七张入场券)
+					拥有七张入场券)
 				]]
 			end
 			]]>
@@ -46,18 +46,21 @@
 							-->
 						</select>
 					</div>
+						<!--
 					<div style="float:left;margin-left:40px;">
 						<%=L"入场券数量"%>
 						<input type="button" name="TicketState" value='<%="..."%>' style="color: #ffffff;margin-left:10px;text-align:left;max-width:60px;background:;" />
 						<div tooltip="<%=TicketTooltip()%>" style="float:left;margin-left:126px;margin-top:3px;height:16px;width:16px;background:url(Texture/Aries/HeadOn/Question_Mark_32bits.png)">
 						</div>
 					</div>
-					<div style="float:left;margin-left:90px;">
+						-->
+					<div style="float:left;margin-left:350px;">
 						<%=L"已完成任务"%>
 						<input type="button" name="FinishedTasks" value="<%=TeachingQuestPage.GetFinishedTasks()%>" style="color: #ffffff; margin-left:10px;text-align:left;max-width:60px;background:;" />
 					</div>
 				</div>
 			</div>
+			<!--
 			<div>
 				<pe:gridview style="margin:0px;width:680px;height:430px;" name="item_gridview" CellPadding="22" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="140"
 							 DataSource='<%=DS_Items%>'>
@@ -89,6 +92,51 @@
 								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>
 							</div>
 							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"完成前1节课解锁"%></div>
+						</pe:if>
+						<div style="float:left;position:relative;margin-top:6px;width:183px;text-align:center;font-size:13px;color:#ffffff"><%= TeachingQuestPage.GetTaskTitle(Eval("index"))%></div>
+					</Columns>
+					<EmptyDataTemplate>
+					</EmptyDataTemplate>
+				</pe:gridview>
+			</div>
+			-->
+			<div>
+				<pe:gridview style="margin:0px;width:680px;height:430px;" name="item_gridview" CellPadding="22" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="140"
+							 DataSource='<%=DS_Items%>'>
+					<Columns>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Finished)%>'>
+							<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" tooltip='<%=L"已完成"%>' style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_finished_32bits.png#0 0 40 40);"></div>
+							</div>
+							<!--
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"已完成"%></div>
+							-->
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Activated)%>'>
+							<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" tooltip='<%=L"可完成"%>' style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_activated_32bits.png#0 0 40 40);"></div>
+							</div>
+							<!--
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"可完成"%></div>
+							-->
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Acceptable)%>'>
+							<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div name='<%= Eval("index")%>' onclick="TeachingQuestPage.OnClickItem" style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>
+							</div>
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"需会员解锁"%></div>
+						</pe:if>
+						<pe:if condition='<%=(TeachingQuestPage.GetTaskState(Eval("index"))==TeachingQuestPage.Locked)%>'>
+							<div style="height:103px;width:183px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_bg_32bits.png#0 0 183 103)">
+								<div style="width:183px;height:140px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+								<div zorder="1" tooltip='<%=L"完成前1节课解锁"%>' style="margin-left:77px;margin-top:-110px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>
+							</div>
+							<!--
+							<div style="float:left;position:relative;margin-top:-30px;width:183px;text-align:center;font-size:12px;color:#ffffff"><%=L"完成前1节课解锁"%></div>
+							-->
 						</pe:if>
 						<div style="float:left;position:relative;margin-top:6px;width:183px;text-align:center;font-size:13px;color:#ffffff"><%= TeachingQuestPage.GetTaskTitle(Eval("index"))%></div>
 					</Columns>

@@ -98,7 +98,6 @@ function ActLuckyDrawPage.Show()
             
                     if err == 200 then
                         ActLuckyDrawPage.RewardData = data
-                        print("aaaaaaaaaaaaaaaaaaaaaa", #ActLuckyDrawPage.RewardData)
                     end
                     openView()
                 end)

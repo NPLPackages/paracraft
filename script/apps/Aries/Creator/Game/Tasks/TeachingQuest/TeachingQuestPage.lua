@@ -105,6 +105,7 @@ function TeachingQuestPage.ShowPage(type_)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
 	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type_]);
+	--[[
 	commonlib.TimerManager.SetTimeout(function()  
 		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
 		local state = L"  （本周已发放一张）";
@@ -121,6 +122,7 @@ function TeachingQuestPage.ShowPage(type_)
 			page:SetValue("TicketState", count..state);
 		end);
 	end, 100)
+	]]
 end
 
 function TeachingQuestPage.IsVip()
@@ -283,13 +285,33 @@ function TeachingQuestPage.GetTaskState(index)
 		if (index <= count) then
 			return TeachingQuestPage.Finished;
 		elseif (index > count + 1) then
-			return TeachingQuestPage.Locked;
+			if (index <= 5) then
+				return TeachingQuestPage.Locked;
+			else
+				--if (TeachingQuestPage.IsVip() or count < 5) then
+				if (TeachingQuestPage.IsVip()) then
+					return TeachingQuestPage.Locked;
+				else
+					return TeachingQuestPage.Acceptable;
+				end
+			end
 		else
+			--[[
 			local ticket = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
 			if (ticket > 0) then
 				return TeachingQuestPage.Activated;
 			else
 				return TeachingQuestPage.Acceptable;
+			end
+			]]
+			if (index <= 5) then
+				return TeachingQuestPage.Activated;
+			else
+				if (TeachingQuestPage.IsVip()) then
+					return TeachingQuestPage.Activated;
+				else
+					return TeachingQuestPage.Acceptable;
+				end
 			end
 		end
 	else
@@ -327,6 +349,11 @@ function TeachingQuestPage.OnClickItem(index)
 			if (canExchange.data) then
 				StartTask();
 			end
+		end);
+	elseif (state == TeachingQuestPage.Acceptable) then
+		-- task is acceptable, show vip
+		GameLogic.GetFilters():apply_filters("VipNotice", true, function()
+			page:Refresh(0);
 		end);
 	else
 		-- task is locked

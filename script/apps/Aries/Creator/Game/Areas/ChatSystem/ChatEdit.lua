@@ -398,6 +398,11 @@ function ChatEdit.HasFocus()
 			if(x<=mouseX and mouseX <= (x+width) and y<=mouseY and mouseY<(y+height+32)) then
 				return true;
 			end
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/CommandHelpPage.lua");
+            local CommandHelpPage = commonlib.gettable("MyCompany.Aries.ChatSystem.CommandHelpPage");
+            if(CommandHelpPage.IsVisible() and CommandHelpPage.HitTest())then
+                return true;
+            end
 		end
 	end
 	if(ChatEdit.is_shown) then

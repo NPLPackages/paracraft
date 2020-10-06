@@ -647,6 +647,9 @@ function Entity:AutoFindPosition(bUseSpawnPoint)
 			GameLogic.options:SetLoginPosition(x, y, z);
 			local bx, by, bz = self:GetBlockPos();
 			LOG.std(nil, "info", "AutoFindVerticalPosition", "player is spawned at highest solid block: %d %d %d", bx, by, bz);
+		else
+			-- in offline mode, apply_filters PlayerHasLoginPosition to {20000, -120, 20000}
+			GameLogic.options:SetLoginPosition(20000, -120, 20000);
 		end	
 	end
 end

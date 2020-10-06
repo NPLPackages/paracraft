@@ -15,6 +15,10 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 -- 获取自己创建的以及参与的世界列表
 HttpWrapper.Create("keepwork.world.joined_list", "%MAIN%/core/v0/joinedWorlds", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/1082
+-- 只包含自己创建的世界，供旧的paracraft客户端使用
+HttpWrapper.Create("keepwork.world.worlds_list", "%MAIN%/core/v0/worlds", "GET", true)
+
 
 --http://yapi.kp-para.cn/project/32/interface/api/2752
 -- 上传paraMini世界

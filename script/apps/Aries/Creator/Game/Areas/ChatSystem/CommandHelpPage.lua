@@ -441,3 +441,18 @@ function CommandHelpPage.OnClickContextMenuItem(node)
 		GameLogic.RunCommand("open", format("https://fanyi.baidu.com/#en/zh/"..node.tag));
 	end
 end
+function CommandHelpPage.IsVisible()
+    return ( page and page:IsVisible() );
+end
+function CommandHelpPage.HitTest()
+    if(page)then
+        local _parent = page:GetParentUIObject();
+        if(_parent and _parent:IsValid())then
+            local x, y, width, height = _parent:GetAbsPosition();
+			local mouseX, mouseY = ParaUI.GetMousePosition();
+            if(x<=mouseX and mouseX <= (x+width) and y<=mouseY and mouseY<(y+height+32)) then
+				return true;
+			end
+        end
+    end
+end

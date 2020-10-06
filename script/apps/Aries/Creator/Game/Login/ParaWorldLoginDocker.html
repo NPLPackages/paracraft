@@ -45,7 +45,7 @@ function GetButtonCount()
 end
 ]]></script>
 <!--@NOTE: disable app bar for mc world for school reasons-->
-<pe:if condition="<%=not System.options.mc%>">
+<pe:if condition="<%=not System.options.mc or System.options.isDevEnv%>">
     <pe:container alignment="_ctt" style='<%=format("background-color:#80808080;padding-top:5px;padding:5px;height:64x;width:%dpx", GetButtonCount()*47+10)%>'>
         <pe:gridview name="AppBar" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="48" pagesize="12" DataSource='<%=ds_AppButtons%>'>
             <Columns>

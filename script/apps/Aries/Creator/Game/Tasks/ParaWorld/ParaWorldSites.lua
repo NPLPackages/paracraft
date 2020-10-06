@@ -35,6 +35,7 @@ ParaWorldSites.currentName = L"主世界";
 ParaWorldSites.paraWorldName = L"并行世界";
 
 ParaWorldSites.IsOwner = false;
+ParaWorldSites.AllMiniWorld = {};
 
 local rows = 10;
 local columns = 10;
@@ -118,7 +119,7 @@ function ParaWorldSites.CheckIsMyParaworld(callback)
 	if (not projectId) then return end
 	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
 
-	keepwork.world.joined_list({}, function(err, msg, data)
+	keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 		if (data and type(data) == "table") then
 			for i = 1, #data do
 				local world = data[i];
@@ -366,15 +367,82 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column)
 	end);
 end
 
+function ParaWorldSites.LoadMiniWorldInRandom(row, column)
+	--[[
+	if (row < 1) then
+		keepwork.miniworld.list({searchType = "school"}, function(err, msg, data)
+			commonlib.echo(data);
+		end);
+	elseif (row > 10) then
+		keepwork.miniworld.list({searchType = "latest"}, function(err, msg, data)
+			commonlib.echo(data);
+		end);
+	elseif (column < 1) then
+		keepwork.miniworld.list({searchType = "rank"}, function(err, msg, data)
+			commonlib.echo(data);
+		end);
+	elseif (column > 10) then
+		keepwork.miniworld.list({searchType = "friend"}, function(err, msg, data)
+			commonlib.echo(data);
+		end);
+	end
+	]]
+	local key = string.format("%d_%d", row, column);
+	if (ParaWorldSites.AllMiniWorld[key] and ParaWorldSites.AllMiniWorld[key].loaded) then
+		return;
+	end
+	ParaWorldSites.AllMiniWorld[key] = {loaded = true};
+	keepwork.miniworld.list({searchType = "latest"}, function(err, msg, data)
+		if (data and data.count and data.rows) then
+			math.randomseed(ParaGlobal.GetGameTime());
+			local index = math.random(1, data.count);
+			local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
+			local filename = ParaIO.GetFileName(path);
+			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
+			KeepworkServiceWorld:GetSingleFile(data.rows[index].projectId, filename, function(content)
+				if (not content) then
+					ParaWorldSites.AllMiniWorld[key].loaded = false;
+					return;
+				end
+
+				local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
+				ParaIO.CreateDirectory(miniTemplateDir);
+				local template_file = miniTemplateDir..data.rows[index].projectId..".xml";
+				local file = ParaIO.open(template_file, "w");
+				if (file:IsValid()) then
+					file:write(content, #content);
+					file:close();
+					local gen = GameLogic.GetBlockGenerator();
+					local x, y = gen:GetGridXYBy2DIndex(column,row);
+					local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
+					gen:LoadTemplateAtGridXY(x, y, template_file);
+					ParaWorldSites.AllMiniWorld[key].loaded = true;
+				else
+					ParaWorldSites.AllMiniWorld[key].loaded = false;
+				end
+			end);
+		else
+			ParaWorldSites.AllMiniWorld[key].loaded = false;
+		end
+	end);
+end
+
 function ParaWorldSites.LoadMiniWorldOnPos(x, z)
+	function loadMiniWorld(row, column)
+		if (row < 1 or column < 1 or row > 10 or column > 10) then
+			ParaWorldSites.LoadMiniWorldInRandom(row, column);
+		else
+			ParaWorldSites.LoadMiniWorldOnSeat(row, column);
+		end
+	end
 	if (GameLogic.IsReadOnly() and ParaWorldLoginAdapter.ParaWorldId and WorldCommon.GetWorldTag("world_generator") == "paraworld") then
 		local gen = GameLogic.GetBlockGenerator();
 		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
 		local row, column = gen:Get2DIndexByGridXY(gridX, gridY);
-		if (row < 1 or column < 1 or row > 10 or column > 10) then
-			return;
+		for i = -1, 1 do
+			loadMiniWorld(row + i, column);
+			loadMiniWorld(row, column + i);
 		end
-		ParaWorldSites.LoadMiniWorldOnSeat(row, column);
 	end
 end
 
@@ -388,5 +456,9 @@ function ParaWorldSites.Reset()
 
 	for i = 1, #ParaWorldSites.Current_Item_DS do
 		ParaWorldSites.Current_Item_DS[i].loaded = false;
+	end
+
+	for _, item in pairs(ParaWorldSites.AllMiniWorld) do
+		item.loaded = false;
 	end
 end

@@ -11,6 +11,8 @@ ChunkGenerators:Register("paraworldMini", ParaWorldMiniChunkGenerator);
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapSurface.lua");
+local ParaWorldMinimapSurface = commonlib.gettable("Paracraft.Controls.ParaWorldMinimapSurface");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -156,6 +158,16 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:RefreshMap()
+			-- player may be hided by the blocks from template
+			local x, y, z = GameLogic.GetHomePosition();
+			if(x and y and z) then
+				local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
+				x, y, z = BlockEngine:ConvertToBlockIndex_float(x, y, z);
+				y = ParaWorldMinimapSurface:GetHeightByWorldPos(x, z)
+				if(y) then
+					GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
+				end
+			end
 		end
 	end);
 	]]
@@ -224,7 +236,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	local currentWorldName = WorldCommon.GetWorldTag("name");
 	if (myHomeWorldName == currentWorldName and WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		local function uploadMiniWorld(projectId)
-			keepwork.world.joined_list({}, function(err, msg, data)
+			keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 				if (data and type(data) == "table") then
 					for i = 1, #data do
 						local world = data[i];
