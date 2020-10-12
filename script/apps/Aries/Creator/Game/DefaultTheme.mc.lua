@@ -52,8 +52,8 @@ function DefaultTheme:Load()
 	System.options.tradable_bag_family = {0,1,3,23,25,12,13,14};
 
 	local version = commonlib.getfield("System.options.version");
-    System.options.haqi_RMB_Currency="Ä§¶¹";
-    System.options.haqi_GameCurrency="Ææ¶¹";
+    System.options.haqi_RMB_Currency="Ä§ï¿½ï¿½";
+    System.options.haqi_GameCurrency="ï¿½æ¶¹";
 
 	-- how many minutes are there in a day.
 	-- ParaScene.SetDayLength(900);
@@ -115,11 +115,13 @@ function DefaultTheme:Load()
 	_this.font = fontStr;
 	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4";
 	-- _guihelper.SetFontColor(_this, "#ffffff");
-	
+
 	_this=ParaUI.GetDefaultObject("listbox");
 	_this.font = fontStr;
 	_this.background = "Texture/Aries/Common/ThemeKid/dropdown_bg.png:3 3 3 3";
-	UpdateScrollBar_(_this:GetChild("vscrollbar"));
+	local listbox_vscrollbar_up = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;450 112 11 12";
+	local listbox_vscrollbar_down = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;470 114 11 12";
+	_guihelper.UpdateScrollBar(_this:GetChild("vscrollbar"), scrollbar_track, listbox_vscrollbar_up, listbox_vscrollbar_down, scrollbar_thumb);
 
 	_this=ParaUI.GetDefaultObject("container");
 	_this.background = "Texture/3DMapSystem/common/ThemeLightBlue/container_bg.png: 4 4 4 4";
@@ -940,7 +942,7 @@ function DefaultTheme:Load()
 		{name = "Aries.UI.LoaderUI.logoTxt", type="container",bg="", alignment = "_rb", left=-320-20, top=-20-5, width=320, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
 		{name = "Aries.UI.LoaderUI.logo", type="container",bg="", alignment = "_ct", left=-512/2, top=-290/2, width=512, height=128, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
 		{name = "Aries.UI.LoaderUI.progressbar_bg", type="container",bg="Texture/Aries/Loader/loading_panel_32bits.png: 60 60 60 60", alignment = "_ct", left=-240, top=-90, width=480, height=128, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		{name = "Aries.UI.LoaderUI.text", type="text", text="ÕýÔÚ¼ÓÔØ¹þÆæÐ¡Õò...", color = "255 255 255", alignment = "_ct", left=-100+10, top=28, width=200, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
+		{name = "Aries.UI.LoaderUI.text", type="text", text="ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½...", color = "255 255 255", alignment = "_ct", left=-100+10, top=28, width=200, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
 		{name = "Aries.UI.LoaderUI.gossip", type="text", texts={
 			"dummy",
 

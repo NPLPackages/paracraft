@@ -118,18 +118,20 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [-i|e|force] [worldname|url|filepath|projectId|home]", 
+	quick_ref="/loadworld [-i|e|force|personal] [worldname|url|filepath|projectId|home]", 
 	mode_deny = "", -- allow load world in all game modes
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
 @param -force: always use online world without checking if it is different to local.  
+@param -personal: login required. always sync online world to local folder, then enter.
 e.g.
 /loadworld 530
 /loadworld https://github.com/xxx/xxx.zip
 /loadworld -i https://github.com/xxx/xxx.zip
 /loadworld -e https://github.com/xxx/xxx.zip
 /loadworld -force 530
+/loadworld -personal 530
 /loadworld home
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
