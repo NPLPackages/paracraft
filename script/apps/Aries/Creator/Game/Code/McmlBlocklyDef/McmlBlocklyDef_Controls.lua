@@ -59,7 +59,7 @@ NPL.export({
             self:getFieldAsString('code')
         );
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -82,7 +82,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('%s',self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -120,7 +120,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<input type="button"/>');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -158,7 +158,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<pe:label />');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -196,7 +196,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<input type="text" />');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -234,7 +234,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<input type="checkbox" />');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -272,7 +272,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<pe:progressbar />');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -310,7 +310,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('<pe:sliderbar />');
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -327,7 +327,7 @@ NPL.export({
 	ToNPL = function(self)
 		return '<br/>';
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 

@@ -30,6 +30,7 @@ local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
 
@@ -58,8 +59,24 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 
-	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId()) then
+	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and KeepworkService:IsSignedIn()) then
 		GameLogic.RunCommand("/ggs connect -silent=false");
+	end
+
+	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+	if ((not GameLogic.IsReadOnly()) and KeepworkService:IsSignedIn() and (not WorldCommon.GetWorldTag("fromProjects"))) then
+		keepwork.world.myschoolParaWorld({}, function(err, msg, data)
+			if (data and data.schoolParaWorld and tostring(data.schoolParaWorld.projectId) == GameLogic.options:GetProjectId()) then
+			else
+				local ParaWorldSchools = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSchools.lua");
+				ParaWorldSchools.ShowPage(function(projectId)
+					if (projectId) then
+						WorldCommon.ReplaceWorld(projectId);
+					end
+				end);
+			end
+		end);
 	end
 end
 
@@ -160,6 +177,7 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 	local road_pgc_block_id = 68;
 	local ground_block_id = 62;
 	local road_edge_id = 180;
+	local road_light_id = 6;
 	
 	local worldCenterX, _, worldCenterZ  = self:GetWorldCenter();
 	local gridOffsetX = (x*16 - worldCenterX) / 128;
@@ -170,6 +188,8 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 		ground_block_id = 59;
 		isPGCArea = true
 	end
+	local worldDX, worldDY, worldDZ = c.Coords.WorldX, c.Coords.WorldY, c.Coords.WorldZ
+
 	for bx = 0, 15 do
 		local worldX = bx + (x * 16);
 		for bz = 0, 15 do
@@ -185,9 +205,18 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 						((offsetZ == 3 or offsetZ==124) and (offsetX>=3 and offsetX<=124))) then
 						c:SetType(bx, by+1, bz, road_edge_id, false);
 					end
+					if (((offsetX == 3 or offsetX==124) and (offsetZ>=3 and offsetZ<=122) and ((offsetZ-3)%20 == 0)) or
+						((offsetZ == 3 or offsetZ==124) and (offsetX>=3 and offsetX<=122) and ((offsetX-3)%20 == 0)) or
+						(offsetX == 124 and offsetZ == 124)) then
+						c:SetType(bx, by+1, bz, road_pgc_block_id, false);
+						c:SetType(bx, by+2, bz, road_light_id, false);
+					end
 				end
 			else
-				c:SetType(bx, by, bz, ground_block_id, false);
+				-- just in case we loaded template before generating terrain. we will ignore top grass layer
+				if(ParaTerrain.GetBlockTemplateByIdx(worldDX + bx, worldDY + by, worldDZ + bz) == 0) then
+					c:SetType(bx, by, bz, ground_block_id, false);
+				end
 			end
 		end
 	end
@@ -203,6 +232,14 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 					if( ((offsetX == 3 or offsetX==252) and (offsetZ>=3 and offsetZ<=252)) or 
 						((offsetZ == 3 or offsetZ==252) and (offsetX>=3 and offsetX<=252))) then
 						c:SetType(bx, by+1, bz, road_edge_id, false);
+					end
+					if (((offsetX == 3 or offsetX==252) and (offsetZ>=3 and offsetZ<=122) and ((offsetZ-3)%20 == 0)) or
+						((offsetZ == 3 or offsetZ==252) and (offsetX>=3 and offsetX<=122) and ((offsetX-3)%20 == 0)) or
+						((offsetX == 3 or offsetX==252) and (offsetZ>=131 and offsetZ<=250) and ((offsetZ-131)%20 == 0)) or
+						((offsetZ == 3 or offsetZ==252) and (offsetX>=131 and offsetX<=250) and ((offsetX-131)%20 == 0)) or
+						(offsetX == 252 and offsetZ == 252) or ((offsetX == 3 or offsetX == 252) and offsetZ == 124) or ((offsetZ == 3 or offsetZ == 252) and offsetX == 124)) then
+						c:SetType(bx, by+1, bz, road_pgc_block_id, false);
+						c:SetType(bx, by+2, bz, road_light_id, false);
 					end
 				end
 			end

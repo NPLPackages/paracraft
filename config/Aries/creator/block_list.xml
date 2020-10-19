@@ -338,8 +338,10 @@ icon: optional icon
     <block name="White_Carpet" />
     <block name="BlockModel" />
     <block name="PhysicsModel" />
-  
     <block name="BlockLight" />
+    
+    <block name="InvisibleBlock" />
+    <block name="InvisibleGlowStone" />
   </category>
   <category name="others" text="其他">
   </category>

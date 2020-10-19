@@ -138,10 +138,17 @@ function DockPage.OnClick(id)
         last_page_ctrl = UserBagPage.GetPageCtrl();
     elseif(id == "work")then
         --GameLogic.RunCommand("/menu file.loadworld");
-
-        local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-        UserConsole:ShowPage();
-        last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+            
+		if(mouse_button == "right") then
+            -- the new version
+            local UserConsoleCreate = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Create/Create.lua")
+            UserConsoleCreate:Show();
+            last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+        else
+            local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+            UserConsole:ShowPage();
+            last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+		end
     elseif(id == "explore")then
         local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
         UserConsole.OnClickOfficialWorlds();

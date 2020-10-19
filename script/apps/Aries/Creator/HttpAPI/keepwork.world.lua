@@ -19,6 +19,10 @@ HttpWrapper.Create("keepwork.world.joined_list", "%MAIN%/core/v0/joinedWorlds", 
 -- 只包含自己创建的世界，供旧的paracraft客户端使用
 HttpWrapper.Create("keepwork.world.worlds_list", "%MAIN%/core/v0/worlds", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3357
+-- 获取用户学校大世界
+HttpWrapper.Create("keepwork.world.myschoolParaWorld", "%MAIN%/core/v0/3DCampus/my/schoolParaWorld", "GET", true)
+
 
 --http://yapi.kp-para.cn/project/32/interface/api/2752
 -- 上传paraMini世界

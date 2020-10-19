@@ -457,3 +457,30 @@ Commands["setworldinfo"] = {
 		end
 	end,
 };
+
+Commands["resetworld"] = {
+	name="resetworld", 
+	quick_ref="/resetworld [-overwrite|replace] [template|projectId]", 
+	desc=[[reset a world by template file, replace a world by projectId
+@param -overwrite: load template file to overwrite the world. 
+@param -replace: download world by projectId, then replace the current world.  
+/loadworld -overwrite test.xml
+/loadworld -replace 20576
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		if (options.overwrite) then
+			if (ParaIO.DoesFileExist(cmd_text)) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunkGenerator.lua");
+				local ParaWorldMiniChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldMiniChunkGenerator");
+				ParaWorldMiniChunkGenerator:LoadFromTemplateFile(cmd_text);
+			end
+		elseif (options.replace) then
+			NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+			WorldCommon.ReplaceWorld(cmd_text);
+		end
+
+	end,
+};

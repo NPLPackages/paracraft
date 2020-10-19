@@ -41,6 +41,7 @@ Sound related:
 @param color_data: whether block can be painted with colors. 
 @param color8_data: whether block uses the high 8 bits of block data for colors, instead of all 16 bits 
 @param opacity: [1,15] 1 for air. 2 for water and ice, 15 for solid block. value is automatically set, unless you want to explicitly adjust the default.
+@param invisible: true or false for invisible blocks
 -->
 <blocks>
   <block singleSideTex="true" name="Stone" text="石块" searchkey="石块条纹棕" mc_id="1" id="56" mapcolor="#827a57" material="rock" step_sound="stone" icon="Texture/blocks/items/stone.png" texture="Texture/blocks/stone.png" obstruction="true" solid="true" cubeMode="true"  />
@@ -466,6 +467,10 @@ Sound related:
   <!--Added Xizhi 2019.12.26 -->
   <block name="ColorFence" text="彩色栅栏" searchkey="彩色栅栏" id="267" texture="Texture/blocks/colorblock.png" item_class="ItemColorBlock" color8_data="true" obstruction="true" customModel="true" template="Fence?filename=model/blockworld/Fence/Fence" />
   <block name="ColorWall" text="彩色墙" searchkey="彩色墙" id="268" texture="Texture/blocks/colorblock.png" item_class="ItemColorBlock" color8_data="true" template="Wall?filename=model/blockworld/StoneWall/StoneWall" />
+  
+  <!--Added Xizhi 2020.10.15 -->
+  <block name="InvisibleBlock" text="隐形阻挡方块" searchkey="隐形阻挡方块" id="269" texture="Texture/blocks/glass_pane.png" item_class="ItemInvisibleBlock" invisible="true" obstruction="true" cubeMode="true" alphaTestTexture="true" />
+  <block name="InvisibleGlowStone" text="隐形萤石" searchkey="隐形萤石" id="270" texture="Texture/blocks/glass_pane.png" item_class="ItemInvisibleBlock" invisible="true" light="true" cubeMode="true" alphaTestTexture="true" />
   
   <!--
   model/06props/v5/06combat/Common/PKSword/PKSword.x

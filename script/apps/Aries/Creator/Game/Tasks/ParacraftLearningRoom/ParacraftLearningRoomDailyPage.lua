@@ -121,7 +121,10 @@ MindManager
 作品历史记录与备份
 未来教育的评估方式
 随心所欲的创作
-《程序员爸爸成长日记》介绍
+Scratch与Paracraft的区别
+Minecraft与Paracraft的区别
+孩子应该学习什么编程语言？
+NPL语言简介
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

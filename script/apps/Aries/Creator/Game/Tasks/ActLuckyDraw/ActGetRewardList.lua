@@ -159,6 +159,10 @@ function ActGetRewardList.HandleData()
             ActGetRewardList.Current_Item_DS[index] = {is_show_level = true, level = v.award}
             list[v.award] = 0
             index = index + 1
+        else
+            if ActGetRewardList.Current_Item_DS[index] and ActGetRewardList.Current_Item_DS[index].userList and #ActGetRewardList.Current_Item_DS[index].userList > 4 then
+                index = index + 1
+            end
         end
 
         if ActGetRewardList.Current_Item_DS[index] == nil then
@@ -173,10 +177,7 @@ function ActGetRewardList.HandleData()
         local userList = ActGetRewardList.Current_Item_DS[index].userList
         userList[#userList + 1] = {name = v.user.username, award = v.award}
         list[v.award] = list[v.award] + 1
-        -- print("sssssssss", v.user.username, index)
-        if #ActGetRewardList.Current_Item_DS[index].userList > 4 then
-            index = index + 1
-        end        
+        -- print("sssssssss", v.user.username, index)     
     end
 
     -- print("gggggggggggggggggg")

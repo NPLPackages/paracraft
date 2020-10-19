@@ -88,6 +88,12 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
+				elseif(block.invisible and not block.solid) then
+					-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
+					result = ParaTerrain.MousePick(picking_dist, result, 0x84);
+					if(result.blockX) then
+						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
+					end
 				end
 			end
 			local root_ = ParaUI.GetUIObject("root");

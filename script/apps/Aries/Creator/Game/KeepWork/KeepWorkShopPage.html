@@ -48,11 +48,11 @@ end
             </pe:if>
         </div>
         <pe:if condition='<%= KeepWorkShopPage.category_index == 1 %>'>
-            <pe:gridview style="margin:0px" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+            <pe:gridview style="margin:0px" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                    <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
-                        <kp:item gsid='<%=Eval("gsId")%>' style="width:64px;height:64px;" onclick="OnClickGsid"/>    
+                    <div style="width:128px;height:64px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:item gsid='<%=Eval("gsId")%>' style="width:128px;height:64px;" onclick="OnClickGsid"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>
@@ -60,11 +60,11 @@ end
             </pe:gridview>
         </pe:if>
         <pe:if condition='<%= KeepWorkShopPage.category_index == 2 %>'>
-            <pe:gridview style="margin:0px" name="slot_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+            <pe:gridview style="margin:0px" name="slot_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
-                    <div style="width:64px;height:64px;" class="mc_light_grey_button_with_fillet"  >
-                        <kp:slot guid='<%=Eval("goodsId")%>' style="width:64px;height:64px;" onclick="OnClickGuid"/>    
+                    <div style="width:128px;height:64px;" class="mc_light_grey_button_with_fillet"  >
+                        <kp:slot guid='<%=Eval("goodsId")%>' style="width:128px;height:64px;" onclick="OnClickGuid"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

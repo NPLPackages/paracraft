@@ -45,7 +45,7 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlAttrs", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description_lua_provider = [[
         var key_value = block.getFieldValue("key");
         var attrs_value = Blockly.Extensions.readTextFromMcmlAttrs(block,"Lua");
@@ -55,7 +55,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -80,12 +80,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlAttrs", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s=%s',
 	ToNPL = function(self)
 		return string.format('%s=%s',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 {
@@ -120,12 +120,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlAttrs", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s=%s',
 	ToNPL = function(self)
 		return string.format('%s=%s',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 {
@@ -152,12 +152,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlAttrs", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s="%s"',
 	ToNPL = function(self)
 		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 

@@ -288,7 +288,7 @@ function WorldCommon.SaveWorldAs()
 	end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
 end
 
-function WorldCommon.SaveWorldAsImp(folderName)
+function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
 	local function Handle()
 		if(WorldCommon.CopyWorldTo(folderName)) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
@@ -311,12 +311,15 @@ function WorldCommon.SaveWorldAsImp(folderName)
 				end
 			end
 	
-			
-			_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
-				if(res and res == _guihelper.DialogResult.Yes) then
-					WorldCommon.OpenWorld(folderName, true)
-				end
-			end, _guihelper.MessageBoxButtons.YesNo);
+			if (callbackFunc and type(callbackFunc) == "function") then
+				callbackFunc(true);
+			else
+				_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						WorldCommon.OpenWorld(folderName, true)
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+			end
 		end
 	end
 
@@ -401,5 +404,46 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 		end
 		LOG.std(nil, "info", "CopyWorldTo", "%s is copied to %s ( %d files)", parentDir, destinationFolder, fileCount); 
 		return true;
+	end
+end
+
+function WorldCommon.ReplaceWorld(targetProjectId)
+	WorldCommon.sourceWorldName = WorldCommon.GetWorldTag("name");
+	WorldCommon.destWorldId = targetProjectId;
+	GameLogic:Connect("WorldLoaded", WorldCommon, WorldCommon.OnWorldLoaded, "UniqueConnection");
+	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+	UserConsole:HandleWorldId(targetProjectId, "force");
+end
+
+function WorldCommon.ReplaceWorldImp()
+	if(GameLogic.options:HasCopyright()) then
+		_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
+		return false;
+	end
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(WorldCommon.sourceWorldName).. "/";
+	WorldCommon.SaveWorldAsImp(targetFolder, function(result)
+		if (result) then
+			_guihelper.MessageBox(string.format(L"替换成功，即将进入【%s】。", WorldCommon.sourceWorldName));
+		end
+		WorldCommon.sourceWorldName = nil
+		commonlib.TimerManager.SetTimeout(function()
+			WorldCommon.OpenWorld(targetFolder, true);
+		end, 2000);
+	end);
+end
+
+function WorldCommon.OnWorldLoaded()
+	GameLogic:Disconnect("WorldLoaded", WorldCommon, WorldCommon.OnWorldLoaded, "UniqueConnection");
+	local projectId = GameLogic.options:GetProjectId();
+	if (projectId and tostring(projectId) == tostring(WorldCommon.destWorldId)) then
+		commonlib.TimerManager.SetTimeout(function()
+			_guihelper.MessageBox(L"正在使用当前世界替换原有的并行世界...");
+		end, 3000);
+		commonlib.TimerManager.SetTimeout(function()
+			WorldCommon.ReplaceWorldImp()
+		end, 4000);
 	end
 end

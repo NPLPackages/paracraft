@@ -516,6 +516,7 @@ function block_types.LoadFromFile(filename)
 
 				attr.climbable = attr.climbable == "true";
 				attr.blockcamera = attr.blockcamera == "true";
+				attr.invisible = attr.invisible == "true";
 				attr.handleNeighborChange = attr.handleNeighborChange == "true";
 				attr.framemove = attr.framemove == "true" or attr.tick_random == "true";
 				if(attr.itemModelScaling) then

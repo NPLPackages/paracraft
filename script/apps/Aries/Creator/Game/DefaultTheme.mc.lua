@@ -256,7 +256,7 @@ function DefaultTheme:Load()
         },
 		["kp_item"] = {
             ["background"] = "Texture/Aries/Creator/keepwork/Window/tooltip/tipkuang_32bits.png:14 14 14 14",
-            ["width"] = 64,
+            ["width"] = 128,
 			["height"] = 64,
         },
         ["kp_tooltip_bg"] = {

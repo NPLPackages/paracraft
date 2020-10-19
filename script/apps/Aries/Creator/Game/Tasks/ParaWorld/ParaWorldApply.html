@@ -102,8 +102,19 @@
                     ParaWorldApply.SelectType = ParaWorldApply.SelectGame;
                 elseif (value == "org") then
                     ParaWorldApply.SelectType = ParaWorldApply.SelectOrg;
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                    page:SetValue("OrgList", ParaWorldApply.orgData[1].id);
                 elseif (value == "school") then
                     ParaWorldApply.SelectType = ParaWorldApply.SelectSchool;
+                    local text = page:GetValue("paraworld_name", nil);
+                    page:Refresh(0);
+                    page:SetValue("paraworld_name", text);
+                    page:SetValue("SchoolList", ParaWorldApply.schoolData.id);
+                    page:SetValue("province", ParaWorldApply.schoolData.region.state.id);
+                    page:SetValue("city", ParaWorldApply.schoolData.region.city.id);
+                    page:SetValue("area", ParaWorldApply.schoolData.region.county.id);
                 elseif (value == "region") then
                     ParaWorldApply.SelectType = ParaWorldApply.SelectRegion;
                     ParaWorldApply.GetProvinces(function(data)
@@ -113,11 +124,6 @@
                         page:SetValue("paraworld_name", text);
                     end);
                 end
-                if (value ~= "regin") then
-                    local text = page:GetValue("paraworld_name", nil);
-                    page:Refresh(0);
-                    page:SetValue("paraworld_name", text);
-                end
             end
             ]]>
         </script>
@@ -125,12 +131,14 @@
             <div style="margin-top:50px;margin-left:10px;width:520px;height:308px;">
                 <div style="margin-left:40px;height:24px;text-align:left;color:#000000;font-size:13px">
                     <%=L"名称：" %>
-                    <input type="text" name="paraworld_name" EmptyText='<%=L"请输入并行世界名称"%>' class="mc_text" style="width:300px;height:26px;margin-left:10px;" />
+                    <input type="text" name="paraworld_name" EmptyText='<%=L"请输入并行世界名称"%>' value='<%=ParaWorldApply.GetWorldName()%>' class="mc_text" style="width:300px;height:26px;margin-left:10px;" />
                 </div>
                 <div style="margin-left:40px;margin-top:10px;height:24px;text-align:left;color:#000000;font-size:13px">
                     <%=L"类型：" %>
                     <select name="paraworld_type" onselect="select_type" style="margin-left:10px;width:300px;height:24px">
+                        <!--
                         <option value="game">大赛</option>
+                        -->
                         <option value="org">机构</option>
                         <option value="school" selected="selected">学校</option>
                         <option value="region">地域</option>
@@ -162,10 +170,12 @@
                     <%=L"项目：" %>
                     <div style="float:left;width:300px;height:24px;margin-left:10px;"><%=ParaWorldApply.GetWorldId()%></div>
                 </div>
+                <!--
                 <div style="margin-left:17px;margin-top:0px;height:24px;text-align:left;color:#000000;font-size:13px">
                     <%=L"commitId：" %>
                     <div style="float:left;width:300px;height:24px;margin-left:10px;"><%=ParaWorldApply.GetWorldCommitId()%></div>
                 </div>
+                -->
                 <div style="margin-left:40px;margin-top:2px;height:60px;text-align:left;color:#000000;font-size:13px">
                     <%=L"封面：" %>
                     <div style="<%= 'float:left;width:180px;height:115px;margin-top:2px;margin-left:10px;background:url(' .. ParaWorldApply.GetWorldCoverUrl() .. ')' %>"></div>

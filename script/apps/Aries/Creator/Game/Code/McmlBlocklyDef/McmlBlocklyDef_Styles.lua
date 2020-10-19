@@ -34,12 +34,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:%s;',
 	ToNPL = function(self)
 		return string.format('%s:%s;',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -75,12 +75,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:%s%s;',
 	ToNPL = function(self)
 		return string.format('%s:%s%s;',self:getFieldValue('key'),self:getFieldValue('value'),self:getFieldValue('unit'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -116,12 +116,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:%s%s;',
 	ToNPL = function(self)
 		return string.format('%s:%s%s;',self:getFieldValue('key'),self:getFieldValue('value'),self:getFieldValue('unit'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -154,12 +154,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:%s%s;',
 	ToNPL = function(self)
 		return string.format('%s:%s%s;',self:getFieldValue('key'),self:getFieldValue('value'),self:getFieldValue('unit'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -191,12 +191,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:%s%s;',
 	ToNPL = function(self)
 		return string.format('%s:%s%s;',self:getFieldValue('key'),self:getFieldValue('value'),self:getFieldValue('unit'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -216,12 +216,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = 'font-weight:%s;',
 	ToNPL = function(self)
 		return string.format('font-weight:%s;',self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -247,7 +247,7 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
     func_description_lua_provider = [[
         var key_value = block.getFieldValue("key");
         var text = Blockly.Lua.valueToCode(block, 'value');
@@ -264,7 +264,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('%s:%s;',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -288,12 +288,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = '%s:url(%s);',
 	ToNPL = function(self)
 		return string.format('%s:url(%s);',self:getFieldValue('key'),self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 
@@ -315,12 +315,12 @@ NPL.export({
     output = {type = "null",},
 	category = "McmlStyles", 
 	helpUrl = "", 
-	canRun = true,
+	canRun = false,
 	func_description = 'position:%s;',
 	ToNPL = function(self)
 		return string.format('position:%s;',self:getFieldValue('value'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 

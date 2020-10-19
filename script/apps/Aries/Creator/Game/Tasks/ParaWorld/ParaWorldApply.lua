@@ -60,19 +60,19 @@ function ParaWorldApply.ShowPage()
 
 				ParaWorldApply.GetRegionData();
 			end);
-		end, 100);
+		end, 10);
 	end);
 end
 
 function ParaWorldApply.CheckIsMyParaworld(callback)
 	local projectId = GameLogic.options:GetProjectId();
 	if (not projectId) then
-		_guihelper.MessageBox(L"请到您所属的并行世界进行操作！");
+		_guihelper.MessageBox(L"请先分享世界，分享后可以提交申请！");
 		return;
 	end
 	projectId = tonumber(projectId);
 	if (not projectId) then
-		_guihelper.MessageBox(L"请到您所属的并行世界进行操作！");
+		_guihelper.MessageBox(L"请先分享世界，分享后可以提交申请！");
 		return;
 	end
 	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
@@ -88,7 +88,7 @@ function ParaWorldApply.CheckIsMyParaworld(callback)
 					return;
 				end
 			end
-			_guihelper.MessageBox(L"请到您所属的并行世界进行操作！");
+			_guihelper.MessageBox(L"请先分享世界，分享后可以提交申请！");
 		end
 	end);
 end
@@ -133,7 +133,7 @@ function ParaWorldApply.GetWorldCommitId()
 end
 
 function ParaWorldApply.GetWorldCoverUrl()
-	if (ParaWorldApply.CurrentWorld.extra and ParaWorldApply.CurrentWorld.extra.coverUrl) then
+	if (ParaWorldApply.CurrentWorld.extra and ParaWorldApply.CurrentWorld.extra.coverUrl and ParaWorldApply.CurrentWorld.extra.coverUrl ~= "") then
 		return ParaWorldApply.CurrentWorld.extra.coverUrl;
 	else
 		return ParaWorldApply.CurrentWorld.project.extra.imageUrl;
@@ -174,6 +174,29 @@ function ParaWorldApply.GetRegionData()
 
 		if (page) then
 			page:Refresh(0)
+			if (ParaWorldApply.schoolData) then
+				page:SetValue("SchoolList", ParaWorldApply.schoolData.id);
+				ParaWorldApply.GetCities(ParaWorldApply.schoolData.region.state.id, function(data)
+					if type(data) ~= "table" then
+						return false
+					end
+
+					ParaWorldApply.cities = data
+				
+					ParaWorldApply.GetAreas(ParaWorldApply.schoolData.region.city.id, function(data)
+						if type(data) ~= "table" then
+							return false
+						end
+
+						ParaWorldApply.areas = data
+						page:Refresh(0);
+						page:SetValue("SchoolList", ParaWorldApply.schoolData.id);
+						page:SetValue("province", ParaWorldApply.schoolData.region.state.id);
+						page:SetValue("city", ParaWorldApply.schoolData.region.city.id);
+						page:SetValue("area", ParaWorldApply.schoolData.region.county.id);
+					end);
+				end);
+			end
 		end
 	end)
 end
@@ -258,7 +281,7 @@ function ParaWorldApply.OnOK()
 		return;
 	end
 
-	local region = page:GetValue("area", nil);
+	local region = page:GetValue("city", nil);
 	if (not region or region == 0) then
 		_guihelper.MessageBox(L"请选择有效的区域！");
 		return;

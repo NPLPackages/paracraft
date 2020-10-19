@@ -33,6 +33,7 @@ OpenAssetFileDialog.categories = {
 	{name = "common", text = L"常用" , colour="#7abb55", },
 	{name = "people", text = L"人类", colour="#764bcc", },
 	{name = "animals", text = L"动物", colour="#d83b01", },
+	{name = "furnitures", text = L"装饰", colour="#69b090", },
 	{name = "fantasy", text = L"科幻", colour="#8f6d40", },
 	{name = "vehicles", text = L"交通", colour="#69b090", },
 	{name = "props", text = L"物品", colour="#69b090", },

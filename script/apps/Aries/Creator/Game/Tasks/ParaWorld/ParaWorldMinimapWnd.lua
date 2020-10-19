@@ -14,6 +14,8 @@ ParaWorldMinimapWnd:RefreshMap()
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapSurface.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
@@ -104,6 +106,10 @@ function ParaWorldMinimapWnd.OnLocalWorldInfo()
 end
 
 function ParaWorldMinimapWnd.OnClickParaWorldList()
+	if (not KeepworkService:IsSignedIn()) then
+		LoginModal:ShowPage();
+		return;
+	end
 	--_guihelper.MessageBox(L"并行世界列表将在9.11日开放。在新建世界时，选择并行世界，创建属于自己的多人联网并行世界，未来可以邀请好友入驻到你的并行世界中")
 	local ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
 	ParaWorldList.ShowPage();

@@ -394,12 +394,23 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column)
 	ParaWorldSites.AllMiniWorld[key] = {loaded = true};
 	keepwork.miniworld.list({searchType = "latest"}, function(err, msg, data)
 		if (data and data.count and data.rows) then
+			local worlds = {};
+			for i = 1, #data.rows do
+				if (data.rows[i].block and (data.rows[i].block > 100 or data.rows[i].block == -1)) then
+					worlds[#worlds + 1] = data.rows[i];
+				end
+			end
+			if (#worlds < 1) then
+				ParaWorldSites.AllMiniWorld[key].loaded = false;
+				return;
+			end
+
 			math.randomseed(ParaGlobal.GetGameTime());
-			local index = math.random(1, data.count);
+			local index = math.random(1, #worlds);
 			local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 			local filename = ParaIO.GetFileName(path);
 			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
-			KeepworkServiceWorld:GetSingleFile(data.rows[index].projectId, filename, function(content)
+			KeepworkServiceWorld:GetSingleFile(worlds[index].projectId, filename, function(content)
 				if (not content) then
 					ParaWorldSites.AllMiniWorld[key].loaded = false;
 					return;
@@ -407,7 +418,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column)
 
 				local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
 				ParaIO.CreateDirectory(miniTemplateDir);
-				local template_file = miniTemplateDir..data.rows[index].projectId..".xml";
+				local template_file = miniTemplateDir..worlds[index].projectId..".xml";
 				local file = ParaIO.open(template_file, "w");
 				if (file:IsValid()) then
 					file:write(content, #content);

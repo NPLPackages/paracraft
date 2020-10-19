@@ -27,11 +27,11 @@ end
 ]]></script>
     <kp:window width="600" height="500" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_beibao_32bits.png" onclose="ClosePage">
     <div class="kp_window_container">
-        <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="7" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight = "32" 
+        <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="7" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight = "32" 
             DataSource='<%=DS_Items%>'>
 	        <Columns>
                 <div class="kp_item" >
-                    <kp:slot guid='<%=Eval("goodsId")%>'class="kp_item"  onclick="OnClickGuid"/>    
+                    <kp:slot guid='<%=Eval("goodsId")%>'class="kp_item"  />    
                 </div>
             </Columns>
 	        <EmptyDataTemplate>

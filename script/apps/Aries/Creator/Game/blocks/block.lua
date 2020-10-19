@@ -406,6 +406,16 @@ function block:SetLightValue(nValue)
 	self:UpdateAttribute("torchLightValue", tonumber(nValue) or 0);
 end
 
+-- @param nValue: [0-15] a value of 0 means no light. 
+function block:SetInvisibleLightValue(nValue)
+	local params = {IsUpdating = true, attFlag = self:RecomputeAttribute(), isVisible=false, torchLightValue =  tonumber(nValue) or 0};
+	if(not self.blockWorld) then
+		ParaTerrain.RegisterBlockTemplate(self.id, params);
+	else
+		ParaBlockWorld.RegisterBlockTemplate(self.blockWorld, self.id, params);
+	end	
+end
+
 
 function block:GetSpeedReduction()
 	return self.speedReduction or 1;

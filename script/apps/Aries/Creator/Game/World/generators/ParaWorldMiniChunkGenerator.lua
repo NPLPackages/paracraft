@@ -127,8 +127,8 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 	
-	if(self:GetTotalCount() < 2) then
-		self:ShowCreateFromTemplateWnd()
+	if(self:GetTotalCount() < 10) then
+		--self:ShowCreateFromTemplateWnd()
 	end
 
 	self.lock_timer = self.lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
@@ -150,7 +150,6 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 --		local filename = self:GetTemplateFilepath()
 --		self:LoadFromTemplateFile(filename)
 --	end)
-	--[[
 	local ParaWorldTemplates = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldTemplates.lua");
 	ParaWorldTemplates.ShowPage(function(filename)
 		if (filename) then
@@ -159,6 +158,7 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:RefreshMap()
 			-- player may be hided by the blocks from template
+			--[[
 			local x, y, z = GameLogic.GetHomePosition();
 			if(x and y and z) then
 				local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
@@ -168,9 +168,9 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 					GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
 				end
 			end
+			]]
 		end
 	end);
-	]]
 end
 
 -- please note: it does not clear the scene, it simply load template to pivot point
@@ -245,7 +245,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 							if (world.extra and world.extra.worldTagName) then
 								worldName = world.extra.worldTagName;
 							end
-							keepwork.miniworld.upload({projectId = projectId, name = worldName, type="main", commitId = world.commitId}, function(err, msg, data)
+							keepwork.miniworld.upload({projectId = projectId, name = worldName, type="main", commitId = world.commitId, block = self:GetTotalCount()}, function(err, msg, data)
 								if (err == 200) then
 									_guihelper.MessageBox(L"上传成功！");
 								end

@@ -153,6 +153,7 @@ Commands["camerayaw"] = {
 	end,
 };
 
+
 Commands["panorama"] = {
 	name="panorama", 
 	quick_ref="/panorama x y z", 
@@ -160,58 +161,98 @@ Commands["panorama"] = {
 		create panorama screenshot and save
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local att = ParaEngine.GetAttributeObject();
-		att:SetField("ScreenResolution", {1024, 1024}); 
-		att:CallField("UpdateScreenMode");
-		
-		GameLogic.RunCommand("/property -all-2 PasueScene true")
-		
 		local x, y, z = CmdParser.ParsePos(cmd_text)
 
+		if not x or not y or not z then
+			return false
+		end
+		
 		function setPlayerPos(x, y, z)
 			GameLogic.RunCommand(string.format("/goto %s %s %s", x, y, z))
 		end
+				
+		local Screen = commonlib.gettable("System.Windows.Screen")
+		local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager")
+		local viewport = ViewportManager:GetSceneViewport()
 
-		setPlayerPos(x, y, z)
+		local width = Screen:GetWidth()
+		local height = Screen:GetHeight()
+		local _width = math.max(width, height)
+		local _height = math.min(width, height)
 
-		GameLogic.RunCommand("/hide desktop")
-		GameLogic.RunCommand("/hide")
-		GameLogic.RunCommand("/fov 1.57")
+		local pos = {
+			[0] = {x-1, y, z},
+			[1] = {x, y, z+1},
+			[2] = {x+1, y, z},
+			[3] = {x, y, z-1},
+			[4] = {x, y+1, z},
+			[5] = {x, y-1, z},
+		}
 
-		--[[
+		local rootPath = ""
 
-			NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-			local Screen = commonlib.gettable("System.Windows.Screen");
-			local width = Screen:GetWidth()
-			local height = Screen:GetHeight()
-			
-			local size = math.min(width, height)
-			GameLogic.RunCommand(string.format("/viewport _lt 0 0 %s %s", size, size))
-			]]
+		if System.os.GetExternalStoragePath() ~= "" then
+			rootPath = System.os.GetExternalStoragePath() .. "paracraft/"
+		else
+			rootPath = ParaIO.GetWritablePath()
+		end
+
+		local currentTime = os.time()
 
 		function shot(pitch, yaw, name, chain)
-			local pos = {
-				[0] = {x-1, y, z},
-				[1] = {x, y, z+1},
-				[2] = {x+1, y, z},
-				[3] = {x, y, z-1},
-				[4] = {x, y+1, z},
-				[5] = {x, y-1, z},
-			}
-
 			local p = pos[name]
-
 			setPlayerPos(p[1], p[2], p[3])
 			
 			ParaCamera.SetEyePos(1, pitch, yaw)
 
-			commonlib.TimerManager.SetTimeout(function() 
-				ParaMovie.TakeScreenShot(string.format("Screen Shots/%s.jpg", name))
+			commonlib.TimerManager.SetTimeout(function()
+				local tempfile = string.format("%sScreen Shots/cubemap_tmp_%s_%s.jpg", rootPath, currentTime, name)
+				ParaMovie.TakeScreenShot(tempfile)
+				chain()
+			end, 1000)
+		end
+
+		function crop_shot(name, chain)			
+			local r = ParaUI.GetUIObject("root")
+
+			local offset = (_width * _width / _height - _width) / 2
+			--local c = ParaUI.CreateUIObject("container", "RenderCubMapImage" .. os.time(), "_lt", -offset, 0, _width * _width / _height, _height);
+			local c = ParaUI.CreateUIObject("container", "RenderCubMapImage" .. os.time(), "_lt", 0, 0, _width * _width / _height, _height);
+
+			local tempfile = string.format("%sScreen Shots/cubemap_tmp_%s_%s.jpg", rootPath, currentTime, name)
+			c.background = tempfile
+
+			r:AddChild(c)
+
+			ParaEngine.ForceRender()
+			ParaEngine.ForceRender()
+	
+			commonlib.TimerManager.SetTimeout(function()
+				local filepath = string.format("%sScreen Shots/%s.jpg", rootPath, name)
+				ParaMovie.TakeScreenShot(filepath, _height, _height)
+				ParaUI.DestroyUIObject(c)
 
 				chain()
 			end, 1000)
 		end
 
+		---[[
+		
+		GameLogic.RunCommand("/property -all-2 PasueScene true")
+		GameLogic.RunCommand("/hide desktop")
+		GameLogic.RunCommand("/hide tips")
+		GameLogic.RunCommand("/hide")
+		GameLogic.RunCommand("/fov 1.57")
+
+		ParaUI.ShowCursor(false)
+		ParaScene.EnableMiniSceneGraph(false);
+		ParaEngine.ForceRender()
+		ParaEngine.ForceRender()
+
+		--viewport:SetPosition("_ctt", 0, 0, _height, _height)
+		viewport:SetPosition("_lt", 0, 0, _height, _height)
+		ParaUI.GetUIObject("root").visible = false
+			
 		shot(0, 3.14, 0, function()
 			shot(0, -1.57, 1, function()
 				shot(0, 0, 2, function()
@@ -220,8 +261,34 @@ Commands["panorama"] = {
 							shot(1.57, 3.14, 5, function()
 								GameLogic.RunCommand("/t 2 /property -all-2 PasueScene false")	
 								GameLogic.RunCommand("/show desktop")
+								GameLogic.RunCommand("/show tips")
 								GameLogic.RunCommand("/show")
---								GameLogic.RunCommand(string.format("/viewport _lt 0 0 %s %s", width, height))
+
+								ParaUI.ShowCursor(true)
+								ParaScene.EnableMiniSceneGraph(true);
+								ParaEngine.ForceRender()
+								ParaEngine.ForceRender()
+						
+								viewport:SetPosition("_fi", 0, 0, 0, 0)
+								ParaUI.GetUIObject("root").visible = true
+
+								crop_shot(0, function()  -- clear root ui object cache
+									crop_shot(0, function()
+										crop_shot(1, function()
+											crop_shot(2, function()
+												crop_shot(3, function()
+													crop_shot(4, function()
+														crop_shot(5, function()
+															-- send event
+															CommandManager:RunCommand('/sendevent after_generate_panorama')
+														end)
+													end)
+												end)
+											end)
+										end)
+									end)
+								end)
+
 							end)	
 						end)	
 					end)
@@ -229,5 +296,7 @@ Commands["panorama"] = {
 			end)
 		end)
 
+		
+		--]]
 	end,
 };

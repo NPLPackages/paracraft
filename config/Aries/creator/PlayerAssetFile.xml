@@ -108,8 +108,10 @@
   <asset filename="character/CC/artwar/game/blue_archer.x" displayname="弓兵_蓝方" name="lan_gongbing"/>
   <asset filename="character/CC/artwar/game/blue_soldier.x" displayname="小兵_蓝方" name="lan_xiaobing"/>
   -->
-  <!-- 7-16更新 -->
   <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia"/>
+  <!-- 9-27更新 -->
+  <asset filename="character/CC/artwar/game/assassin.x" displayname="刺客" name="assassin"/>
+
 
   <!-- artwar in shanghai电影 -->
   <!-- <asset filename="character/CC/artwar/movie/sunbin_movie.x" displayname="孙膑_演员" name="sunbin_movie"/>
@@ -568,31 +570,6 @@
 <!-- 9·17更新 -->
   <asset filename="character/CC/artwar/game/zhanqi_qin.x" displayname="秦国战旗" name="zhanqi_qin"/>
   <!-- 8·5更新 -->
-  <asset filename="character/CC/artwar/furnitures/BiJiBenDianNao.x" displayname="笔记本电脑" name="BiJiBenDianNao"/>
-  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Da.x" displayname="大号告示牌" name="GaoShiPai_Da"/>
-  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Xiao.x" displayname="小号告示牌" name="GaoShiPai_Xiao"/>
-  <asset filename="character/CC/artwar/furnitures/HeiBan.x" displayname="黑板" name="HeiBan"/>
-  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Heng.x" displayname="黑相框（横）" name="HeiXiangKuang_Heng"/>
-  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Shu.x" displayname="黑相框（竖）" name="HeiXiangKuang_Shu"/>
-  <!-- <asset filename="character/CC/artwar/furnitures/JiangBei_Jin.x" displayname="金奖杯" name="JiangBei_Jin"/>
-  <asset filename="character/CC/artwar/furnitures/JiangBei_Tong.x" displayname="铜奖杯" name="JiangBei_Tong"/>
-  <asset filename="character/CC/artwar/furnitures/JiangBei_Yin.x" displayname="银奖杯" name="JiangBei_Yin"/> -->
-  <asset filename="character/CC/artwar/furnitures/JiangZhuo.x" displayname="讲台" name="JiangZhuo"/>
-  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Da.x" displayname="金相框（大）" name="JinXiangKuang_Da"/>
-  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Heng.x" displayname="金相框（横）" name="JinXiangKuang_Heng"/>
-  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Shu.x" displayname="金相框（竖）" name="JinXiangKuang_Shu"/>
-  <asset filename="character/CC/artwar/furnitures/SheDeng_Bai.x" displayname="射灯（白）" name="SheDeng_Bai"/>
-  <asset filename="character/CC/artwar/furnitures/SheDeng_Hei.x" displayname="射灯（黑）" name="SheDeng_Hei"/>
-  <asset filename="character/CC/artwar/furnitures/Shu.x" displayname="书" name="Shu"/>
-  <asset filename="character/CC/artwar/furnitures/WeiLan_Chang.x" displayname="围栏（长）" name="WeiLan_Chang"/>
-  <asset filename="character/CC/artwar/furnitures/WeiLan_Duan.x" displayname="围栏（短）" name="WeiLan_Duan"/>
-  <asset filename="character/CC/artwar/furnitures/YinShuiJi.x" displayname="饮水机" name="YinShuiJi"/>
-  <asset filename="character/CC/artwar/furnitures/YiZi.x" displayname="椅子" name="YiZi"/>
-  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Bai.x" displayname="展灯（白）" name="ZhanDeng_Bai"/>
-  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Bai.x" displayname="展灯（长白）" name="ZhanDeng_Chang_Bai"/>
-  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Hei.x" displayname="展灯（长黑）" name="ZhanDeng_Chang_Hei"/>
-  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Hei.x" displayname="展灯（黑）" name="ZhanDeng_Hei"/>
-  <asset filename="character/CC/artwar/furnitures/ZhuoZi.x" displayname="桌子" name="ZhuoZi"/>
 
 
 <!-- 孙子兵法素材 -->
@@ -821,6 +798,150 @@
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2429_Dream2_Flower_Left.anim.x" displayname="梦之花2" name="2429_Dream2_Flower_Left.anim" school="false"/>
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1684_ShopFireWand04.anim.x" displayname="火魔杖04" name="1684_ShopFireWand04.anim" school="false"/>
 </category>
+
+<category name="furnitures">
+  <asset filename="character/CC/artwar/furnitures/JiangZhuo.x" displayname="讲台" name="JiangZhuo"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Da.x" displayname="金相框（大）" name="JinXiangKuang_Da"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Heng.x" displayname="金相框（横）" name="JinXiangKuang_Heng"/>
+  <asset filename="character/CC/artwar/furnitures/JinXiangKuang_Shu.x" displayname="金相框（竖）" name="JinXiangKuang_Shu"/>
+  <asset filename="character/CC/artwar/furnitures/SheDeng_Bai.x" displayname="射灯（白）" name="SheDeng_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/SheDeng_Hei.x" displayname="射灯（黑）" name="SheDeng_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/Shu.x" displayname="书" name="Shu"/>
+  <asset filename="character/CC/artwar/furnitures/WeiLan_Chang.x" displayname="围栏（长）" name="WeiLan_Chang"/>
+  <asset filename="character/CC/artwar/furnitures/WeiLan_Duan.x" displayname="围栏（短）" name="WeiLan_Duan"/>
+  <asset filename="character/CC/artwar/furnitures/YinShuiJi.x" displayname="饮水机" name="YinShuiJi"/>
+  <asset filename="character/CC/artwar/furnitures/YiZi.x" displayname="椅子" name="YiZi"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Bai.x" displayname="展灯（白）" name="ZhanDeng_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Bai.x" displayname="展灯（长白）" name="ZhanDeng_Chang_Bai"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Chang_Hei.x" displayname="展灯（长黑）" name="ZhanDeng_Chang_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/ZhanDeng_Hei.x" displayname="展灯（黑）" name="ZhanDeng_Hei"/>
+  <asset filename="character/CC/artwar/furnitures/ZhuoZi.x" displayname="桌子" name="ZhuoZi"/>
+  <asset filename="character/CC/artwar/furnitures/BiJiBenDianNao.x" displayname="笔记本电脑" name="BiJiBenDianNao"/>
+  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Da.x" displayname="大号告示牌" name="GaoShiPai_Da"/>
+  <asset filename="character/CC/artwar/furnitures/GaoShiPai_Xiao.x" displayname="小号告示牌" name="GaoShiPai_Xiao"/>
+  <asset filename="character/CC/artwar/furnitures/HeiBan.x" displayname="黑板" name="HeiBan"/>
+  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Heng.x" displayname="黑相框（横）" name="HeiXiangKuang_Heng"/>
+  <asset filename="character/CC/artwar/furnitures/HeiXiangKuang_Shu.x" displayname="黑相框（竖）" name="HeiXiangKuang_Shu"/>
+  <asset filename="character/CC/artwar/furnitures/JiangBei_Jin.x" displayname="金奖杯" name="JiangBei_Jin"/>
+  <asset filename="character/CC/artwar/furnitures/JiangBei_Tong.x" displayname="铜奖杯" name="JiangBei_Tong"/>
+  <asset filename="character/CC/artwar/furnitures/JiangBei_Yin.x" displayname="银奖杯" name="JiangBei_Yin"/>
+  <asset filename="character/CC/artwar/furnitures/bai_bideng_1.x" displayname="白色壁灯1" name="bai_bideng_1"/>
+  <asset filename="character/CC/artwar/furnitures/bai_bideng_2.x" displayname="白色壁灯2" name="bai_bideng_2"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_1_off.x" displayname="白色窗户1-关" name="bai_chuang_1_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_1_on.x" displayname="白色窗户1-开" name="bai_chuang_1_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_2_off.x" displayname="白色窗户2-关" name="bai_chuang_2_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_3_off.x" displayname="白色窗户3-关" name="bai_chuang_3_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_3_on.x" displayname="白色窗户3-开" name="bai_chuang_3_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_4_off.x" displayname="白色窗户4-关" name="bai_chuang_4_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_4_on.x" displayname="白色窗户4-开" name="bai_chuang_4_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_5_off.x" displayname="白色窗户5-关" name="bai_chuang_5_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_5_on.x" displayname="白色窗户5-开" name="bai_chuang_5_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_6_off.x" displayname="白色窗户6-关" name="bai_chuang_6_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_6_on.x" displayname="白色窗户6-开" name="bai_chuang_6_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_7_off.x" displayname="白色窗户7-关" name="bai_chuang_7_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_7_on.x" displayname="白色窗户7-开" name="bai_chuang_7_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_dan.x" displayname="白色窗户8-单" name="bai_chuang_dan"/>
+  <asset filename="character/CC/artwar/furnitures/bai_chuang_duo.x" displayname="白色窗户8-多" name="bai_chuang_duo"/>
+  <asset filename="character/CC/artwar/furnitures/bai_ludeng.x" displayname="白色路灯" name="bai_ludeng"/>
+  <asset filename="character/CC/artwar/furnitures/bai_men_off.x" displayname="白色木门-关" name="bai_men_off"/>
+  <asset filename="character/CC/artwar/furnitures/bai_men_on.x" displayname="白色木门-开" name="bai_men_on"/>
+  <asset filename="character/CC/artwar/furnitures/bai_shafa_dan.x" displayname="白色沙发" name="bai_shafa_dan"/>
+  <asset filename="character/CC/artwar/furnitures/bai_shuzhuangtai.x" displayname="白色梳妆台" name="bai_shuzhuangtai"/>
+  <asset filename="character/CC/artwar/furnitures/bai_shuzhuo.x" displayname="白色书桌" name="bai_shuzhuo"/>
+  <asset filename="character/CC/artwar/furnitures/bai_taideng.x" displayname="白色台灯" name="bai_taideng"/>
+  <asset filename="character/CC/artwar/furnitures/bai_yigui.x" displayname="白色衣柜" name="bai_yigui"/>
+  <asset filename="character/CC/artwar/furnitures/bai_yizi.x" displayname="白色椅子" name="bai_yizi"/>
+  <asset filename="character/CC/artwar/furnitures/bai_zhuozi.x" displayname="白色桌子" name="bai_zhuozi"/>
+  <asset filename="character/CC/artwar/furnitures/baibingxiang.x" displayname="白色冰箱" name="baibingxiang"/>
+  <asset filename="character/CC/artwar/furnitures/baichangdeng.x" displayname="白色长凳" name="baichangdeng"/>
+  <asset filename="character/CC/artwar/furnitures/baichuangtougui.x" displayname="白色床头柜" name="baichuangtougui"/>
+  <asset filename="character/CC/artwar/furnitures/baiguizi.x" displayname="白色柜子" name="baiguizi"/>
+  <asset filename="character/CC/artwar/furnitures/chengbingxiang.x" displayname="橙色冰箱" name="chengbingxiang"/>
+  <asset filename="character/CC/artwar/furnitures/dianbingxiang_tiaowen.x" displayname="条纹电冰箱" name="dianbingxiang_tiaowen"/>
+  <asset filename="character/CC/artwar/furnitures/heise_diannao.x" displayname="黑色电脑" name="heise_diannao"/>
+  <asset filename="character/CC/artwar/furnitures/heise_dianshiji.x" displayname="黑色电视机" name="heise_dianshiji"/>
+  <asset filename="character/CC/artwar/furnitures/hese_bideng_1.x" displayname="褐色壁灯-1" name="hese_bideng_1"/>
+  <asset filename="character/CC/artwar/furnitures/hese_bideng_2.x" displayname="褐色壁灯-2" name="hese_bideng_2"/>
+  <asset filename="character/CC/artwar/furnitures/hese_changyi.x" displayname="褐色长椅" name="hese_changyi"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_1_off.x" displayname="褐色窗户1-关" name="hese_chuang_1_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_1_on.x" displayname="褐色窗户1-开" name="hese_chuang_1_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_2_off.x" displayname="褐色窗户2-关" name="hese_chuang_2_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_3_off.x" displayname="褐色窗户3-关" name="hese_chuang_3_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_3_on.x" displayname="褐色窗户3-开" name="hese_chuang_3_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_4_off.x" displayname="褐色窗户4-关" name="hese_chuang_4_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_4_on.x" displayname="褐色窗户4-开" name="hese_chuang_4_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_5_off.x" displayname="褐色窗户5-关" name="hese_chuang_5_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_5_on.x" displayname="褐色窗户5-开" name="hese_chuang_5_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_6_off.x" displayname="褐色窗户6-关" name="hese_chuang_6_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_6_on.x" displayname="褐色窗户6-开" name="hese_chuang_6_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_7_off.x" displayname="褐色窗户7-关" name="hese_chuang_7_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_7_on.x" displayname="褐色窗户7-开" name="hese_chuang_7_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_dan.x" displayname="褐色窗户8-单" name="hese_chuang_dan"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuang_duo.x" displayname="褐色窗户8-多" name="hese_chuang_duo"/>
+  <asset filename="character/CC/artwar/furnitures/hese_chuangtougui.x" displayname="褐色床头柜" name="hese_chuangtougui"/>
+  <asset filename="character/CC/artwar/furnitures/hese_danrenchuang.x" displayname="褐色单人床" name="hese_danrenchuang"/>
+  <asset filename="character/CC/artwar/furnitures/hese_danrenshafa.x" displayname="褐色单人沙发" name="hese_danrenshafa"/>
+  <asset filename="character/CC/artwar/furnitures/hese_duorenchuang.x" displayname="褐色多人床" name="hese_duorenchuang"/>
+  <asset filename="character/CC/artwar/furnitures/hese_duorenshafa.x" displayname="褐色多人沙发" name="hese_duorenshafa"/>
+  <asset filename="character/CC/artwar/furnitures/hese_guizi.x" displayname="褐色柜子" name="hese_guizi"/>
+  <asset filename="character/CC/artwar/furnitures/hese_ludeng.x" displayname="褐色路灯" name="hese_ludeng"/>
+  <asset filename="character/CC/artwar/furnitures/hese_men_off.x" displayname="褐色木门-关" name="hese_men_off"/>
+  <asset filename="character/CC/artwar/furnitures/hese_men_on.x" displayname="褐色木门-开" name="hese_men_on"/>
+  <asset filename="character/CC/artwar/furnitures/hese_shuzhuangtai.x" displayname="褐色梳妆台" name="hese_shuzhuangtai"/>
+  <asset filename="character/CC/artwar/furnitures/hese_shuzhuo.x" displayname="褐色书桌" name="hese_shuzhuo"/>
+  <asset filename="character/CC/artwar/furnitures/hese_taideng.x" displayname="褐色台灯" name="hese_taideng"/>
+  <asset filename="character/CC/artwar/furnitures/hese_yigui.x" displayname="褐色衣柜" name="hese_yigui"/>
+  <asset filename="character/CC/artwar/furnitures/hese_yizi.x" displayname="褐色椅子" name="hese_yizi"/>
+  <asset filename="character/CC/artwar/furnitures/hese_zhuozi.x" displayname="褐色桌子" name="hese_zhuozi"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_bideng_1.x" displayname="黄色壁灯-1" name="huangse_bideng_1"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_bideng_2.x" displayname="黄色壁灯-2" name="huangse_bideng_2"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_changyi.x" displayname="黄色长椅" name="huangse_changyi"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_1_off.x" displayname="黄色窗户1-关" name="huangse_chuang_1_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_2_off.x" displayname="黄色窗户2-关" name="huangse_chuang_2_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_3_off.x" displayname="黄色窗户3-关" name="huangse_chuang_3_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_3_on.x" displayname="黄色窗户3-开" name="huangse_chuang_3_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_4_off.x" displayname="黄色窗户4-关" name="huangse_chuang_4_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_4_on.x" displayname="黄色窗户4-开" name="huangse_chuang_4_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_5_off.x" displayname="黄色窗户5-关" name="huangse_chuang_5_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_5_on.x" displayname="黄色窗户5-开" name="huangse_chuang_5_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_6_off.x" displayname="黄色窗户6-关" name="huangse_chuang_6_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_6_on.x" displayname="黄色窗户6-开" name="huangse_chuang_6_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_7_off.x" displayname="黄色窗户7-关" name="huangse_chuang_7_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_7_on.x" displayname="黄色窗户7-开" name="huangse_chuang_7_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_dan.x" displayname="黄色窗户8-单" name="huangse_chuang_dan"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuang_duo.x" displayname="黄色窗户8-多" name="huangse_chuang_duo"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_chuangtougui.x" displayname="黄色床头柜" name="huangse_chuangtougui"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_danrenchuang.x" displayname="黄色单人床" name="huangse_danrenchuang"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_danrenshafa.x" displayname="黄色单人沙发" name="huangse_danrenshafa"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_duorenchuang.x" displayname="黄色多人床" name="huangse_duorenchuang"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_duorenshafa.x" displayname="黄色多人沙发" name="huangse_duorenshafa"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_guizi.x" displayname="黄色柜子" name="huangse_guizi"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_ludeng.x" displayname="黄色路灯" name="huangse_ludeng"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_men_off.x" displayname="黄色木门-关" name="huangse_men_off"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_men_on.x" displayname="黄色木门-开" name="huangse_men_on"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_shuzhuangtai.x" displayname="黄色梳妆台" name="huangse_shuzhuangtai"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_shuzhuo.x" displayname="黄色书桌" name="huangse_shuzhuo"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_taideng.x" displayname="黄色台灯" name="huangse_taideng"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_yigui.x" displayname="黄色衣柜" name="huangse_yigui"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_yizi.x" displayname="黄色椅子" name="huangse_yizi"/>
+  <asset filename="character/CC/artwar/furnitures/huangse_zhuozi.x" displayname="黄色桌子" name="huangse_zhuozi"/>
+  <asset filename="character/CC/artwar/furnitures/kongtiao.x" displayname="空调" name="kongtiao"/>
+  <asset filename="character/CC/artwar/furnitures/lvbingxiang.x" displayname="绿冰箱" name="lvbingxiang"/>
+  <asset filename="character/CC/artwar/furnitures/maojin_1.x" displayname="毛巾-1" name="maojin_1"/>
+  <asset filename="character/CC/artwar/furnitures/maojin_2.x" displayname="毛巾-2" name="maojin_2"/>
+  <asset filename="character/CC/artwar/furnitures/maojin_3.x" displayname="毛巾-3" name="maojin_3"/>
+  <asset filename="character/CC/artwar/furnitures/maojin_4.x" displayname="毛巾-4" name="maojin_4"/>
+  <asset filename="character/CC/artwar/furnitures/maojin_5.x" displayname="毛巾-5" name="maojin_5"/>
+  <asset filename="character/CC/artwar/furnitures/motianlun.x" displayname="摩天轮" name="motianlun"/>
+  <asset filename="character/CC/artwar/furnitures/weibolu.x" displayname="微波炉" name="weibolu"/>
+  <asset filename="character/CC/artwar/furnitures/youxiji_cheng.x" displayname="游戏机-橙色" name="youxiji_cheng"/>
+  <asset filename="character/CC/artwar/furnitures/youxiji_hong.x" displayname="游戏机-红色" name="youxiji_hong"/>
+  <asset filename="character/CC/artwar/furnitures/youxiji_lv.x" displayname="游戏机-绿色" name="youxiji_lv"/>
+  <asset filename="character/CC/artwar/furnitures/youxiji_zi.x" displayname="游戏机-紫色" name="youxiji_zi"/>
+  <asset filename="character/CC/artwar/furnitures/zhutai_off.x" displayname="烛台-灭" name="zhutai_off"/>
+  <asset filename="character/CC/artwar/furnitures/zhutai_on.x" displayname="烛台-明" name="zhutai_on"/>
+</category>
+
 <category name="effects">
   <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
 	<asset filename="character/v5/06quest/MoFaXing/MoFaXing_Efx.x" displayname="魔法星" name="MoFaXing_Efx"/>

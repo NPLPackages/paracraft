@@ -480,7 +480,7 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inpu
 			return;
         else
             if(copies < 100) then
-				_guihelper.MessageBox(format([[<div style="float:left">发送一条广播消息,需要消耗1个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:32px;height:32px;" />,确定要发送?</div><div style="margin-top:5px;"><div>你现在还有%d个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:32px;height:32px;" /></div></div>
+				_guihelper.MessageBox(format([[<div style="float:left">发送一条广播消息,需要消耗1个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" />,确定要发送?</div><div style="margin-top:5px;"><div>你现在还有%d个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" /></div></div>
                 ]], stone_gsid, copies or 0, stone_gsid),function(result)
 					if(result == _guihelper.DialogResult.OK)then
 						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
