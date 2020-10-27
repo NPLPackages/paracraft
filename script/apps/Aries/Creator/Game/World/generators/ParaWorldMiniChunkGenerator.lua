@@ -128,7 +128,7 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	GameLogic.options:SetViewBobbing(false, true)
 	
 	if(self:GetTotalCount() < 10) then
-		--self:ShowCreateFromTemplateWnd()
+		self:ShowCreateFromTemplateWnd()
 	end
 
 	self.lock_timer = self.lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
@@ -181,6 +181,8 @@ function ParaWorldMiniChunkGenerator:LoadFromTemplateFile(filename)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 	local minX, minY, minZ = self:GetPivot();
+	minX = minX + 4;
+	minZ = minZ + 4;
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = filename,
 			blockX = minX,blockY = minY, blockZ = minZ, bSelect=false, UseAbsolutePos = false, TeleportPlayer = false})
 	task:Run();

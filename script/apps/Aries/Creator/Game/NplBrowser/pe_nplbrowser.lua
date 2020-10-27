@@ -39,6 +39,8 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 	local enabledResize = mcmlNode:GetBool("enabledResize");
 	local min_width = mcmlNode:GetNumber("min_width");
 	local min_height = mcmlNode:GetNumber("min_height");
+	width = mcmlNode:GetNumber("width") or width;
+	height = mcmlNode:GetNumber("height") or height;
 	local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
 
     local x = screen_x + left;
@@ -49,8 +51,8 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 		withControl = withControl,
 		x = x,
 		y = y,
-		width = screen_width,
-		height = screen_height,
+		width = width or screen_width,
+		height = height or screen_height,
 		resize = true,
 		visible = visible,
 		_parent = _parent,
@@ -118,8 +120,8 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 		    if(config)then
 			    local x = screen_x + left;
 			    local y = screen_y + top;
-			    local width = screen_width;
-				local height = screen_height;
+				local width = width or screen_width;
+				local height = height or screen_height;
 
 				if System.os.GetPlatform() == 'win32' then
 					local uiScales = Screen:GetUIScaling();

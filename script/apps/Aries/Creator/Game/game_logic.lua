@@ -132,7 +132,6 @@ GameLogic.current_worlddir = "temp/emptyworld/";
 -- one time singleton init
 function GameLogic:ctor()
 	self:InitAPIPath();
-
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
 	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
 	DefaultFilters:Install();
@@ -143,11 +142,16 @@ function GameLogic:ctor()
 		-- do not leak events to hook chain. 
 		SceneContextManager:SetAcceptAllEvents(true);
 	end
-
 	ParaWorldAnalytics = ParaWorldAnalytics or NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
 	if(ParaWorldAnalytics) then
+		ParaWorldAnalytics:staticInit()
 		GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
 			ParaWorldAnalytics:Send(category, action, value, label);
+			return catetory;
+		end)
+
+		GameLogic:GetFilters():add_filter("user_behavior", function(action, value, otherParam)
+			ParaWorldAnalytics:behaviorStateEnter( action, value, otherParam);
 			return catetory;
 		end)
 	end
@@ -341,6 +345,11 @@ end
 -- get the current world. 
 function GameLogic.GetWorld()
 	return GameLogic.world;
+end
+
+function GameLogic.getCurrentWorldId( ... )
+	local world  	= GameLogic.world
+	return world.projectId or world.kpProjectId
 end
 
 function GameLogic.GetPlayerController()
@@ -1059,6 +1068,11 @@ end
 
 -- set mode 
 function GameLogic.SetMode(mode, bFireModeChangeEvent)
+	if mode == 'editor' then
+		if(GameLogic.options:GetProjectId()) then
+			GameLogic.GetFilters():apply_filters("user_behavior", "editWorld", "enter" , GameLogic.options:GetProjectId());
+		end
+	end
 	GameLogic.mode = mode;
 	GameMode:SetInnerMode(mode);
 	if(bFireModeChangeEvent~=false) then

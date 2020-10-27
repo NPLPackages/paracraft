@@ -14,16 +14,28 @@
 
             ]]>
         </script>
-        <kp:window width="720" height="420" title='<%=L"选择模板"%>' onclose="ParaWorldTemplates.OnClose">
-            <div style="margin-top:40px;width:720px;height:326px;">
-                <div onclick="ParaWorldTemplates.ShowPrevious" style="margin-left:10px;margin-top:110px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageLeft64.png);" />
+        <kp:window width="840" height="500" title='<%=L"选择模板"%>' onclose="ParaWorldTemplates.OnClose">
+            <div style="margin-top:40px;width:840px;height:20px;text-align:center;base-font-size:20px;font-size:20px;font-weight:bold;color:#000000">
+                <%=L"欢迎来到虚拟校园"%>
+            </div>
+            <div style="margin-top:10px;margin-left:40px;width:760px;height:20px;color:#000000">
+                <%=L"亲爱的伙伴！欢迎来到帕拉卡的创意空间！让我们一起发挥想象力，使用方块、动画、模型、编程，创造出一座具有人工智能的未来虚拟校园吧！请选择一个感兴趣的主题作为起点，开始我们的创造之旅。"%>
+            </div>
+            <div style="margin-top:0px;width:840px;height:360px;">
+                <div onclick="ParaWorldTemplates.ShowPrevious" style="margin-left:10px;margin-top:120px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageLeft64.png);" />
+                <div style="float:left;margin-top:-96px;margin-left:110px;width:128px;height:128px;">
+                    <img style="width:128px;height:128px;" src='<%=ParaWorldTemplates.GetPreviousImage()%>' />
+                </div>
                 <div style="margin-top:-160px;width:256px;height:256px;" align="center">
                     <img style="width:256px;height:256px;" src='<%=ParaWorldTemplates.GetCurrentImage()%>' />
                     <div style="margin-top:0px;text-align:center;base-font-size:16px;font-size:16px;"><%=ParaWorldTemplates.GetCurrentName()%></div>
                 </div>
-                <div onclick="ParaWorldTemplates.ShowNext" style="float:right;margin-top:-160px;margin-right:10px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageRight64.png);" align="right" />
+                <div style="float:right;margin-top:-224px;margin-right:120px;width:128px;height:128px;" align="right">
+                    <img style="width:128px;height:128px;" src='<%=ParaWorldTemplates.GetNextImage()%>' />
+                </div>
+                <div onclick="ParaWorldTemplates.ShowNext" style="float:right;margin-top:-192px;margin-right:10px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageRight64.png);" align="right" />
             </div>
-            <div style="width:720px;height:30px;">
+            <div style="width:840px;height:30px;">
                 <input type="button" name="OK" hotkey="DIK_RETURN" align="center" style="min-width:104px;height:40px;" class="kp_yellow_button" onclick="ParaWorldTemplates.OnOK" value='<%=L"确定"%>' />
             </div>
         </kp:window>

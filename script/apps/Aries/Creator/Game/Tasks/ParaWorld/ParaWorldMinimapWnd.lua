@@ -32,8 +32,10 @@ function ParaWorldMinimapWnd:Show()
 		window:EnableSelfPaint(true);
 		window:SetAutoClearBackground(false);
 		self.window = window;
+		self.window:SetCanHaveFocus(false);
 
 		self.window2 = Window:new();
+		self.window2:SetCanHaveFocus(false);
 	end
 
 	self.window:Show({

@@ -191,6 +191,7 @@ function Desktop.OnActivateDesktop(mode)
 			if(Desktop.mode == "editor") then
 				GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
 			else
+				GameLogic.GetFilters():apply_filters("user_behavior", "editWorld", "leave" , Mod.WorldShare.Store:Get("world/currentEnterWorld").kpProjectId );
 				GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
 			end
 		end

@@ -347,12 +347,29 @@ function DockTipPage:PushGsid(gsid, count, tag)
 	if(not self.is_init)then
 		return
 	end
-
-	if(not gsid)then return end
+    if(not DockTipPage.CanPush(gsid))then
+        return
+    end
     count = count or 1;
 	LOG.std("", "info","DockTipPage:PushGsid",{gsid = gsid, count = count, });
 	local node = { name = "bag", gsid = gsid, count = count, title = L"你获得了新物品！", animation_only = false};
 	self:PushNode(node);
+end
+
+function DockTipPage.CanPush(gsid)
+    if(not gsid)then
+        return
+    end
+    local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
+    local itemTemplate = KeepWorkItemManager.GetItemTemplate(gsid);
+    if(not itemTemplate)then
+        return
+    end
+    for k,bagId in ipairs(UserBagPage.accepted_bags) do
+        if(itemTemplate.bagId == bagId)then
+            return true;         
+        end
+    end
 end
 
 

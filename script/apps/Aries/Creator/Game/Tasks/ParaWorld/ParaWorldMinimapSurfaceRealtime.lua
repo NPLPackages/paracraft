@@ -65,6 +65,42 @@ function ParaWorldMinimapSurfaceRealtime:paintEvent(painter)
 	end
 end
 
+-- teleport player to position, and wait at most nTimeLeft for terrain to load. 
+-- @param nTimeLeft: if nil, default to 1000ms. 
+function ParaWorldMinimapSurfaceRealtime:GotoPos(x, z, nTimeLeft, bRefreshMap)
+	if(not nTimeLeft) then
+		nTimeLeft = 1000;
+	end
+	if(nTimeLeft < 0) then
+		return
+	end
+	local y = self:GetHeightByWorldPos(x, z)
+	if(y) then
+		GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
+		if(bRefreshMap) then
+			commonlib.TimerManager.SetTimeout(function()  
+				self:RefreshMap()
+			end, 500)
+		end
+		return true
+	else
+		local nStepInterval = 300;
+		local _, playerY, _ = EntityManager.GetPlayer():GetBlockPos();
+		GameLogic.RunCommand(format("/goto %d %d %d", x, playerY, z))
+		commonlib.TimerManager.SetTimeout(function()  
+			local curX, _, curZ = EntityManager.GetPlayer():GetBlockPos();
+			self:GotoPos(curX, curZ, nTimeLeft - nStepInterval, true)
+		end, nStepInterval)
+	end
+end
+
+
+function ParaWorldMinimapSurfaceRealtime:RefreshMap()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+	ParaWorldMinimapWnd:RefreshMap()
+end
+
 -- virtual: 
 function ParaWorldMinimapSurfaceRealtime:mousePressEvent(mouse_event)
 	if(mouse_event:button() == "left") then
@@ -72,16 +108,14 @@ function ParaWorldMinimapSurfaceRealtime:mousePressEvent(mouse_event)
 		local pos = mouse_event:localPos();
 		local x, z = self:MapToWorldPos(pos[1], pos[2])
 		local y = self:GetHeightByWorldPos(x, z)
-		if(y) then
+		if(x>0 and x<64000 and z>0 and z<64000) then
 			local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
 			ParaWorldSites.LoadMiniWorldOnPos(x, z);
-			GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z))
+			self:GotoPos(x, z)
 		end
 	elseif(mouse_event:button() == "right") then
 		mouse_event:accept();
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
-		local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
-		ParaWorldMinimapWnd:RefreshMap()
+		self:RefreshMap()
 	end
 end
 

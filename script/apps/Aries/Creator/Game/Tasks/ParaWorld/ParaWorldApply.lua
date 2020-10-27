@@ -48,7 +48,7 @@ function ParaWorldApply.ShowPage()
 
 		ParaWorldApply.schoolData = nil
 		ParaWorldApply.orgData = nil
-		ParaWorldApply.SelectType = ParaWorldApply.SelectSchool;
+		ParaWorldApply.SelectType = ParaWorldApply.SelectRegion;
 		commonlib.TimerManager.SetTimeout(function()
 			KeepworkServiceSchoolAndOrg:GetMyAllOrgsAndSchools(function(schoolData, orgData)
 				if type(schoolData) == "table" and schoolData.regionId then
@@ -91,6 +91,18 @@ function ParaWorldApply.CheckIsMyParaworld(callback)
 			_guihelper.MessageBox(L"请先分享世界，分享后可以提交申请！");
 		end
 	end);
+end
+
+function ParaWorldApply.GetTypeList()
+	local typeList = {};
+	typeList[1] = {text = L"地域", value = "region"};
+	if (ParaWorldApply.orgData and #ParaWorldApply.orgData > 0) then
+		typeList[#typeList + 1] = {text = L"机构", value = "org"};
+	end
+	if (ParaWorldApply.schoolData) then
+		typeList[#typeList + 1] = {text = L"学校", value = "school"};
+	end
+	return typeList;
 end
 
 function ParaWorldApply.GetGameList()
@@ -173,8 +185,10 @@ function ParaWorldApply.GetRegionData()
 		ParaWorldApply.provinces = data
 
 		if (page) then
-			page:Refresh(0)
 			if (ParaWorldApply.schoolData) then
+				ParaWorldApply.SelectType = ParaWorldApply.SelectSchool;
+				page:Refresh(0);
+				page:SetValue("paraworld_type", "school");
 				page:SetValue("SchoolList", ParaWorldApply.schoolData.id);
 				ParaWorldApply.GetCities(ParaWorldApply.schoolData.region.state.id, function(data)
 					if type(data) ~= "table" then
@@ -190,12 +204,46 @@ function ParaWorldApply.GetRegionData()
 
 						ParaWorldApply.areas = data
 						page:Refresh(0);
+						page:SetValue("paraworld_type", "school");
 						page:SetValue("SchoolList", ParaWorldApply.schoolData.id);
 						page:SetValue("province", ParaWorldApply.schoolData.region.state.id);
 						page:SetValue("city", ParaWorldApply.schoolData.region.city.id);
 						page:SetValue("area", ParaWorldApply.schoolData.region.county.id);
 					end);
 				end);
+			elseif (ParaWorldApply.orgData and #ParaWorldApply.orgData > 0) then
+				ParaWorldApply.SelectType = ParaWorldApply.SelectOrg;
+				page:Refresh(0);
+				page:SetValue("paraworld_type", "org");
+				page:SetValue("OrgList", ParaWorldApply.orgData[1].id);
+			else
+				ParaWorldApply.provinces1 = {
+					{
+						text = L"省",
+						value = 0,
+						selected = true,
+					}
+				}
+
+				ParaWorldApply.cities1 = {
+					{
+						text = L"市",
+						value = 0,
+						selected = true,
+					}
+				}
+
+				ParaWorldApply.areas1 = {
+					{
+						text = L"区",
+						value = 0,
+						selected = true,
+					}
+				}
+				ParaWorldApply.provinces1 = data;
+
+				page:Refresh(0);
+				page:SetValue("paraworld_type", "region");
 			end
 		end
 	end)

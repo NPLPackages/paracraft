@@ -18,15 +18,14 @@ local VIP = commonlib.gettable("MyCompany.Aries.VIP");
 local haqi_RMB_Currency = System.options.haqi_RMB_Currency
 local haqi_GameCurrency = System.options.haqi_GameCurrency
 
---ItemPage.OnInit();
-local item_data = pageCtrl:GetRequestParam("item_data");
-item_data = commonlib.Json.Decode(item_data);
-KeepWorkStackableItemPage.OnInit(item_data)
+KeepWorkStackableItemPage.OnInit();
+
 local default_count = pageCtrl:GetRequestParam("count");
 default_count = tonumber(default_count) or 1;
 local price = 0;
 local pbuyprice = 0;
 local gsItem = System.Item.ItemManager.GetGlobalStoreItemInMemory(gsid);
+local item_data = KeepWorkStackableItemPage.GetItemData()
 
 local max_count = item_data.rule.storage > 0 and item_data.rule.storage or 999; 
 if(gsItem) then

@@ -39,10 +39,10 @@ function ParaWorldTemplates.ShowPage(onClose)
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 			align = "_ct",
-			x = -720 / 2,
-			y = -420 / 2,
-			width = 720,
-			height = 420,
+			x = -840 / 2,
+			y = -500 / 2,
+			width = 840,
+			height = 500,
 		};
 		System.App.Commands.Call("File.MCMLWindowFrame", params);
 		
@@ -98,6 +98,22 @@ function ParaWorldTemplates.GetCurrentName()
 	if (#ParaWorldTemplates.Templates >= ParaWorldTemplates.CurrentIndex) then
 		local name = ParaWorldTemplates.Templates[ParaWorldTemplates.CurrentIndex].name;
 		return string.format("%s（%d/%d）", name, ParaWorldTemplates.CurrentIndex, #ParaWorldTemplates.Templates);
+	end
+end
+
+function ParaWorldTemplates.GetPreviousImage()
+	if (ParaWorldTemplates.CurrentIndex > 1) then
+		return ParaWorldTemplates.Templates[ParaWorldTemplates.CurrentIndex-1].img;
+	else
+		return "";
+	end
+end
+
+function ParaWorldTemplates.GetNextImage()
+	if (ParaWorldTemplates.CurrentIndex < #ParaWorldTemplates.Templates) then
+		return ParaWorldTemplates.Templates[ParaWorldTemplates.CurrentIndex+1].img;
+	else
+		return "";
 	end
 end
 

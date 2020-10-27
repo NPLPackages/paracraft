@@ -9,8 +9,9 @@ local KeepWorkStackableItem = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepW
 KeepWorkStackableItem.openBeanNoEnoughView();
 -------------------------------------------------------
 ]]
-local KeepWorkStackableItemPage = {};
+local KeepWorkStackableItemPage = NPL.export();
 commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage", KeepWorkStackableItemPage);
+
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
@@ -33,6 +34,13 @@ local orderId = 0
 
 function KeepWorkStackableItemPage.OnInit(data)
 	page = document:GetPageCtrl();
+end
+
+function KeepWorkStackableItemPage.GetItemData()
+	return item_data or {}
+end
+
+function KeepWorkStackableItemPage.InitData(data)
 	item_data = data
 
 	-- 获取知识豆数量

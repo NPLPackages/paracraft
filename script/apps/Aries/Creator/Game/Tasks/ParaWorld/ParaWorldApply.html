@@ -40,8 +40,10 @@
                         }
                     }
                     local text = page:GetValue("paraworld_name", nil);
+                    local v = page:GetValue("paraworld_type", nil);
                     page:Refresh(0);
                     page:SetValue("paraworld_name", text);
+                    page:SetValue("paraworld_type", v);
                 end)
             end
 
@@ -53,8 +55,10 @@
                 ParaWorldApply.GetAreas(value, function(data)
                     ParaWorldApply.areas = data
                     local text = page:GetValue("paraworld_name", nil);
+                    local v = page:GetValue("paraworld_type", nil);
                     page:Refresh(0);
                     page:SetValue("paraworld_name", text);
+                    page:SetValue("paraworld_type", v);
                 end)
             end
 
@@ -81,6 +85,7 @@
                     local text = page:GetValue("paraworld_name", nil);
                     page:Refresh(0);
                     page:SetValue("paraworld_name", text);
+            page:SetValue("paraworld_type", "region");
                 end)
             end
 
@@ -94,7 +99,8 @@
                     local text = page:GetValue("paraworld_name", nil);
                     page:Refresh(0);
                     page:SetValue("paraworld_name", text);
-                end)
+            page:SetValue("paraworld_type", "region");
+               end)
             end
 
             function select_type(name ,value)
@@ -105,7 +111,10 @@
                     local text = page:GetValue("paraworld_name", nil);
                     page:Refresh(0);
                     page:SetValue("paraworld_name", text);
-                    page:SetValue("OrgList", ParaWorldApply.orgData[1].id);
+                    if (ParaWorldApply.orgData and #ParaWorldApply.orgData > 0) then
+                        page:SetValue("OrgList", ParaWorldApply.orgData[1].id);
+                    end
+                    page:SetValue("paraworld_type", "org");
                 elseif (value == "school") then
                     ParaWorldApply.SelectType = ParaWorldApply.SelectSchool;
                     local text = page:GetValue("paraworld_name", nil);
@@ -115,6 +124,7 @@
                     page:SetValue("province", ParaWorldApply.schoolData.region.state.id);
                     page:SetValue("city", ParaWorldApply.schoolData.region.city.id);
                     page:SetValue("area", ParaWorldApply.schoolData.region.county.id);
+                    page:SetValue("paraworld_type", "school");
                 elseif (value == "region") then
                     ParaWorldApply.SelectType = ParaWorldApply.SelectRegion;
                     ParaWorldApply.GetProvinces(function(data)
@@ -122,6 +132,7 @@
                         local text = page:GetValue("paraworld_name", nil);
                         page:Refresh(0);
                         page:SetValue("paraworld_name", text);
+                        page:SetValue("paraworld_type", "region");
                     end);
                 end
             end
@@ -135,14 +146,7 @@
                 </div>
                 <div style="margin-left:40px;margin-top:10px;height:24px;text-align:left;color:#000000;font-size:13px">
                     <%=L"类型：" %>
-                    <select name="paraworld_type" onselect="select_type" style="margin-left:10px;width:300px;height:24px">
-                        <!--
-                        <option value="game">大赛</option>
-                        -->
-                        <option value="org">机构</option>
-                        <option value="school" selected="selected">学校</option>
-                        <option value="region">地域</option>
-                    </select>
+                    <select name="paraworld_type" onselect="select_type" DataSource="<%=ParaWorldApply.GetTypeList()%>" style="margin-left:10px;width:300px;height:24px"></select>
                 </div>
                 <div style="margin-left:95px;margin-top:6px;height:24px;text-align:left;color:#000000;font-size:13px">
                     <pe:if condition='<%=ParaWorldApply.SelectType == ParaWorldApply.SelectGame%>'>

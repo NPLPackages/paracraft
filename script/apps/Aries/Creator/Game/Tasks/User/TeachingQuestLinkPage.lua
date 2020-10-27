@@ -26,10 +26,10 @@ function TeachingQuestLinkPage.ShowPage()
 			--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
-				x = -400/2,
-				y = -250/2,
-				width = 400,
-				height = 250,
+				x = -530/2,
+				y = -224/2,
+				width = 530,
+				height = 224,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end

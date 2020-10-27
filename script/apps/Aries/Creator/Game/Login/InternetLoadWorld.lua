@@ -197,6 +197,8 @@ end
 -- @param refreshMode: nil|"auto"|"never"|"force".  
 -- @param onDownloadCompleted: function(bSucceed, localWorldPath) end, if return true, it will not continue to load the world.
 function InternetLoadWorld.LoadWorld(world, homeserver_nid, refreshMode, onDownloadCompleted)
+	--print("InternetLoadWorld.LoadWorld" , world.kpProjectId ,world.projectId )
+	GameLogic.GetFilters():apply_filters("user_behavior", "stayWolrd", world.kpProjectId or world.projectId );
 	if( world.remotefile and world.remotefile:match("^local://")) then
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")

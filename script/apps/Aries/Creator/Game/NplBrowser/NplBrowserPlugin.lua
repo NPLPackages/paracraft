@@ -581,6 +581,19 @@ function NplBrowserPlugin.ReadCefClientJsonConfg(filename)
     end
 end
 
+function NplBrowserPlugin.CloseAllBrowsers()
+    if (not NplBrowserPlugin.windows_caches or type(NplBrowserPlugin.windows_caches) ~= 'table') then
+        return false;
+    end
+
+    for key, config in pairs(NplBrowserPlugin.windows_caches) do
+        if (key ~= 'NplBrowserFrame_browser_instance_TeachingQuest_BrowserPage') then
+            config.visible = false;
+            NplBrowserPlugin.Show(config);
+        end
+    end
+end
+
 local function activate()
     if msg then
         local cmd = msg["cmd"];

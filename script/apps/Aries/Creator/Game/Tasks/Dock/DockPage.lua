@@ -30,6 +30,7 @@ DockPage.top_line_1 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
+--    { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangrenwu_32bits.png#0 0 85 75", },
     { label = L"用户社区", id = "web_keepwork_home", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_yonghushequ_32bits.png#0 0 85 75", },
     { label = L"大赛", id = "competition", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_dasai_32bits.png#0 0 85 75", },
 }
@@ -38,7 +39,7 @@ DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangriji_32bits.png#0 0 85 75", },
-    { label = L"每周实战", id = "week_quest", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
+    { label = L"实战提升", id = "week_quest", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_ketang_32bits.png#0 0 85 75", },
 }
 
@@ -122,6 +123,9 @@ function DockPage.OnClickTop(id)
         StudyPage.clickArtOfWar();
     elseif(id == "web_keepwork_home")then
 	    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com", "", 1); 
+    elseif(id == "user_tip")then
+        local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
+        DailyTask.Show();
     end
 end
 function DockPage.OnClick(id)

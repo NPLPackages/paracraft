@@ -199,6 +199,14 @@ Commands["panorama"] = {
 
 		local currentTime = os.time()
 
+		function tempfile_path(name)
+			return string.format("%sScreen Shots/cubemap_tmp_%s_%s.jpg", rootPath, currentTime, name)
+		end
+
+		function delete_tempfile(name)
+			ParaIO.DeleteFile(tempfile_path(name))
+		end
+
 		function shot(pitch, yaw, name, chain)
 			local p = pos[name]
 			setPlayerPos(p[1], p[2], p[3])
@@ -206,8 +214,10 @@ Commands["panorama"] = {
 			ParaCamera.SetEyePos(1, pitch, yaw)
 
 			commonlib.TimerManager.SetTimeout(function()
-				local tempfile = string.format("%sScreen Shots/cubemap_tmp_%s_%s.jpg", rootPath, currentTime, name)
+				local tempfile = tempfile_path(name)
+
 				ParaMovie.TakeScreenShot(tempfile)
+
 				chain()
 			end, 1000)
 		end
@@ -216,12 +226,9 @@ Commands["panorama"] = {
 			local r = ParaUI.GetUIObject("root")
 
 			local offset = (_width * _width / _height - _width) / 2
-			--local c = ParaUI.CreateUIObject("container", "RenderCubMapImage" .. os.time(), "_lt", -offset, 0, _width * _width / _height, _height);
 			local c = ParaUI.CreateUIObject("container", "RenderCubMapImage" .. os.time(), "_lt", 0, 0, _width * _width / _height, _height);
 
-			local tempfile = string.format("%sScreen Shots/cubemap_tmp_%s_%s.jpg", rootPath, currentTime, name)
-			c.background = tempfile
-
+			c.background = tempfile_path(name)
 			r:AddChild(c)
 
 			ParaEngine.ForceRender()
@@ -244,12 +251,14 @@ Commands["panorama"] = {
 		GameLogic.RunCommand("/hide")
 		GameLogic.RunCommand("/fov 1.57")
 
+		ParaScene.GetAttributeObject():SetField("BlockInput", true)
+		ParaCamera.GetAttributeObject():SetField("BlockInput", true)
+
 		ParaUI.ShowCursor(false)
 		ParaScene.EnableMiniSceneGraph(false);
 		ParaEngine.ForceRender()
 		ParaEngine.ForceRender()
 
-		--viewport:SetPosition("_ctt", 0, 0, _height, _height)
 		viewport:SetPosition("_lt", 0, 0, _height, _height)
 		ParaUI.GetUIObject("root").visible = false
 			
@@ -260,12 +269,7 @@ Commands["panorama"] = {
 						shot(-1.57, 3.14, 4, function()
 							shot(1.57, 3.14, 5, function()
 								GameLogic.RunCommand("/t 2 /property -all-2 PasueScene false")	
-								GameLogic.RunCommand("/show desktop")
-								GameLogic.RunCommand("/show tips")
-								GameLogic.RunCommand("/show")
 
-								ParaUI.ShowCursor(true)
-								ParaScene.EnableMiniSceneGraph(true);
 								ParaEngine.ForceRender()
 								ParaEngine.ForceRender()
 						
@@ -274,11 +278,32 @@ Commands["panorama"] = {
 
 								crop_shot(0, function()  -- clear root ui object cache
 									crop_shot(0, function()
+										delete_tempfile(0)
 										crop_shot(1, function()
+											delete_tempfile(1)
 											crop_shot(2, function()
+												delete_tempfile(2)
 												crop_shot(3, function()
+													delete_tempfile(3)
 													crop_shot(4, function()
+														delete_tempfile(4)
 														crop_shot(5, function()
+															delete_tempfile(5)
+
+															GameLogic.RunCommand("/show desktop")
+															GameLogic.RunCommand("/show tips")
+															GameLogic.RunCommand("/show")
+							
+															ParaUI.ShowCursor(true)
+															ParaScene.EnableMiniSceneGraph(true);
+							
+															GameLogic.RunCommand("/fov 1")
+															GameLogic.RunCommand("/cameradist 10")
+															GameLogic.RunCommand("/camerapitch 0")
+
+															ParaScene.GetAttributeObject():SetField("BlockInput", false)
+															ParaCamera.GetAttributeObject():SetField("BlockInput", false)
+													
 															-- send event
 															CommandManager:RunCommand('/sendevent after_generate_panorama')
 														end)

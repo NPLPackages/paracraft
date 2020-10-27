@@ -177,7 +177,7 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 	local road_pgc_block_id = 68;
 	local ground_block_id = 62;
 	local road_edge_id = 180;
-	local road_light_id = 6;
+	local road_light_id = 270;
 	
 	local worldCenterX, _, worldCenterZ  = self:GetWorldCenter();
 	local gridOffsetX = (x*16 - worldCenterX) / 128;
@@ -208,7 +208,7 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 					if (((offsetX == 3 or offsetX==124) and (offsetZ>=3 and offsetZ<=122) and ((offsetZ-3)%20 == 0)) or
 						((offsetZ == 3 or offsetZ==124) and (offsetX>=3 and offsetX<=122) and ((offsetX-3)%20 == 0)) or
 						(offsetX == 124 and offsetZ == 124)) then
-						c:SetType(bx, by+1, bz, road_pgc_block_id, false);
+						--c:SetType(bx, by+1, bz, road_pgc_block_id, false);
 						c:SetType(bx, by+2, bz, road_light_id, false);
 					end
 				end
@@ -238,7 +238,7 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 						((offsetX == 3 or offsetX==252) and (offsetZ>=131 and offsetZ<=250) and ((offsetZ-131)%20 == 0)) or
 						((offsetZ == 3 or offsetZ==252) and (offsetX>=131 and offsetX<=250) and ((offsetX-131)%20 == 0)) or
 						(offsetX == 252 and offsetZ == 252) or ((offsetX == 3 or offsetX == 252) and offsetZ == 124) or ((offsetZ == 3 or offsetZ == 252) and offsetX == 124)) then
-						c:SetType(bx, by+1, bz, road_pgc_block_id, false);
+						--c:SetType(bx, by+1, bz, road_pgc_block_id, false);
 						c:SetType(bx, by+2, bz, road_light_id, false);
 					end
 				end

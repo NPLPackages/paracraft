@@ -416,14 +416,16 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 	end
 
 	local KeepWorkStackableItemPage = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage
+	
 	if KeepWorkStackableItemPage then
 		KeepWorkStackableItemPage.closeView()
 	end
 
-	item_data = commonlib.Json.Encode(item_data);
+	local KeepWorkStackableItem = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkStackableItem.lua");
+	KeepWorkStackableItem.InitData(item_data)
 	local params = {}
 	local seq = 1
-	local url = System.localserver.UrlHelper.BuildURLQuery("script/apps/Aries/Creator/Game/KeepWork/KeepWorkStackableItem.html", {item_data = item_data});
+	local url = System.localserver.UrlHelper.BuildURLQuery("script/apps/Aries/Creator/Game/KeepWork/KeepWorkStackableItem.html", {});
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		-- TODO:  Add uid to url
 		url = url, 

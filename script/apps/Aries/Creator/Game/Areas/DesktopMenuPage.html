@@ -25,6 +25,12 @@ function OnComplain()
     local input_msg = UserComplainPage.MakeProjectMsg(GetProjectId());
     UserComplainPage.ShowPage(UserComplainPage.Types.PROJECT,input_msg);
 end
+function OnPanorama()
+    DesktopMenu.CloseEscFramePage();
+    DesktopMenuPage.ActivateMenu();
+    local Panorama = NPL.load("(gl)Mod/WorldShare/cellar/Panorama/Panorama.lua")
+    Panorama:ShowCreate()
+end
 ]]></script>
 <pe:container ClickThrough="true" alignment="_mt" width="0" height="32px" style="position:relative;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#497 342 2 32)">
     <pe:container alignment="_lt" style="position:relative;background:;width:600px;height:32px;">
@@ -44,7 +50,7 @@ end
     <pe:container alignment="_rt" style="position:relative;width:285px;height:32px;background:;">
         
         <div style="position:relative;">
-            <div style="float:left;width:82px;" >
+            <div style="float:left;width:84px;" >
                 <pe:if condition="<%=GetProjectId() ~= nil %>">
                     <input type="button" style="margin-top:3px;width:82px;" onclick="OnComplain" value="<%=L'举报违规'%>" class="kp_gray_light_button"/>
                 </pe:if>

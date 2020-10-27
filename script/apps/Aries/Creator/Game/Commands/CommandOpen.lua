@@ -39,7 +39,6 @@ Examples:
 /open mcml://hello.html     default to open with mcml v1 (may change in future)
 /open mcml1://hello.html    open with mcml v1
 /open mcml2://hello.html    open with mcml v2
-/open store
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options = {};

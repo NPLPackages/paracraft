@@ -69,6 +69,11 @@ KeepWorkItemManager.profile = {};
 KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
 KeepWorkItemManager.is_init = false;
+
+function KeepWorkItemManager.TestMsg(gsid)
+    gsid = gsid or 1000;
+    _guihelper.MessageBox(gsid);
+end
 function KeepWorkItemManager.IsEnabled()
     return true;
 end
