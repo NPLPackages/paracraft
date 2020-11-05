@@ -625,6 +625,16 @@ function MainLogin:LoadMainWorld()
 	if (not System.options.isCodepku) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+
+		-- 新用户进入新手世界
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
+		local isFirstLogin = KeepWorkItemManager.HasGSItem(37);
+		local tutorial = ParaEngine.GetAppCommandLineByParam("tutorial", "false");
+		if (KeepworkService:IsSignedIn() and (tutorial == "true" or (tutorial ~= "false" and isFirstLogin))) then
+			return GameLogic.RunCommand(string.format("/loadworld %s", 24062)); 
+		end
+	
 		ParaWorldLoginAdapter:EnterWorld();
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");

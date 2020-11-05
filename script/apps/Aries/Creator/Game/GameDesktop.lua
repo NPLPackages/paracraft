@@ -191,7 +191,7 @@ function Desktop.OnActivateDesktop(mode)
 			if(Desktop.mode == "editor") then
 				GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
 			else
-				GameLogic.GetFilters():apply_filters("user_behavior", "editWorld", "leave" , Mod.WorldShare.Store:Get("world/currentEnterWorld").kpProjectId );
+				GameLogic.GetFilters():apply_filters("user_behavior", 2, "editWorld");
 				GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
 			end
 		end
@@ -406,6 +406,8 @@ function Desktop.OnExit(bForceExit, bRestart)
 				callback = function(res)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
+						GameLogic.GetFilters():apply_filters("user_behavior", 2, "stayWorld");
+
 						if (not System.options.isCodepku) then
 							ParaWorldLoginAdapter:EnterWorld(true);
 						else

@@ -1,0 +1,116 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/MsgCenter.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MsgCenter.lua"><![CDATA[
+local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
+MsgCenter.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    MsgCenter.CloseView()
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #MsgCenter.ButtonData;
+    else
+        return MsgCenter.ButtonData[index];
+    end
+end
+
+function Msg_DS_Items(index)
+    if(index == nil) then
+        return #MsgCenter.MsgList;
+    else
+        return MsgCenter.MsgList[index];
+    end
+end
+
+function ClickItem(index)
+    MsgCenter.ClickItem(index)
+end
+
+function IsSelect(index)
+    return MsgCenter.select_index == index
+end
+
+function IsOnlyMsg(msg_type)
+    return msg_type == MsgCenter.MsgType.tong_zhi
+end
+
+function ClickItemButton(msg_type)
+    MsgCenter.ClickItemButton(msg_type)
+end
+]]></script>
+<kp:window name="iframe" width="640" height="613" icon="" title='<%= L"消息中心"%>'   onclose="ClosePage">
+    <div style="color:#ffffff;width:640px;height:613px" class="kp_window_container">
+        <div type ="box" style="width:110px;height:500px;margin-left: 6px;margin-top: 5px;float: left;">
+             <pe:gridview style="margin:0px;width:110px;height:500px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                 DataSource='<%=Button_DS_Items%>'>
+                 <Columns>
+                        <pe:if condition='<%=IsSelect(Eval("index")) %>'>
+                            <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
+                                <input type="button" value='<%=Eval("name") %>' name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                            </div>
+                        </pe:if> 
+
+                        <pe:if condition='<%=not IsSelect(Eval("index")) %>'>
+                            <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
+                                <input type="button" value='<%=Eval("name") %>' name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                            </div>
+                        </pe:if> 
+
+                 </Columns>
+                 <EmptyDataTemplate>
+                 </EmptyDataTemplate>
+             </pe:gridview>
+         </div>
+         <div style="margin-left: 20px;margin-top: 10px; width:478px; height: 540px; background: url(Texture/Aries/Creator/keepwork/MsgCenter/dikuangbj_16X16_32bits.png#0 0 16 16:4 4 4 4);float: left;">
+            <pe:gridview style="margin:0px;width:478px;height:540px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+            DataSource='<%=Msg_DS_Items%>'>
+            <Columns>
+                    <div style="color:#000000;width: 460px;height: 60px;float: left;background: url(Texture/Aries/Creator/keepwork/MsgCenter/bjmokuai_64X64_32bits.png#0 0 64 64:16 16 16 16)">
+                       <!-- <input type="button" value='<%=Eval("name") %>' onclick="ClickItem" param1='<%=Eval("id") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" /> -->
+                        <pe:if condition='<%=IsOnlyMsg(Eval("msg_type")) %>'>
+                            <div style="width: 440px;height: 50px; margin-top: 5px;margin-left: 10px;">
+                                <pe:if condition='<%=Eval("color_name") ~= nil %>'>
+                                    <div style="float: left;"><%=Eval("msg_content1")%></div>
+                                    <div style="float: left;color:#ff0000;"><%=Eval("color_name")%></div>
+                                    <div style="float: left;"><%=Eval("msg_content2")%></div>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("color_name") == nil %>'>
+                                    <div><%=Eval("msg_content1")%></div>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsOnlyMsg(Eval("msg_type")) %>'>
+                            <div style="width: 340px;height: 50px; margin-top: 5px;margin-left: 10px;float: left;">
+                                <pe:if condition='<%=Eval("color_name") ~= nil %>'>
+                                    <div style="float: left;"><%=Eval("msg_content1")%></div>
+                                    <div style="float: left;color:#ff0000;"><%=Eval("color_name")%></div>
+                                    <div style="float: left;"><%=Eval("msg_content2")%></div>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("color_name") == nil %>'>
+                                    <div><%=Eval("msg_content1")%></div>
+                                </pe:if>
+                            </div>
+
+                            <input type="button" value='回关' name = '<%=Eval("msg_type") %>' onclick="ClickItemButton" param1='<%=Eval("index") %>' style="float: left;margin-left: 18px; margin-top:15px;width:70px;height:28px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_lv_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                        </pe:if>
+                    </div>
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+        </div>
+     </div>
+</kp:window>
+    </pe:mcml>
+</body>
+</html>
+

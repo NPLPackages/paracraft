@@ -180,7 +180,7 @@ function GameMode:CanSelect()
 end
 
 function GameMode:CanRightClickToCreateBlock()
-	return GameMode:GetContextField("GetModeCanRightClickToCreateBlock", true);
+	return GameMode:GetContextField("ModeCanRightClickToCreateBlock", true);
 end
 
 function GameMode:CanEditBlock()
@@ -210,7 +210,7 @@ function GameMode:CanDestroyBlock()
 	elseif(self.mode == "movie") then
 		return self:CanRightClickToCreateBlock()
 	else
-		return false;
+		return GameMode:GetContextField("ModeCanDestroyBlock", false);
 	end
 end
 

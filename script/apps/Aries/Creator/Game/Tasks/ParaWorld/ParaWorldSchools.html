@@ -1,0 +1,33 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSchools.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldSchools.lua">
+            <![CDATA[
+            ParaWorldSchools = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSchools.lua");
+            ParaWorldSchools.OnInit()
+
+            ]]>
+        </script>
+        <kp:window width="720" height="420" title='<%=L"选择模板"%>' onclose="ParaWorldSchools.OnClose">
+            <div style="margin-top:40px;width:720px;height:326px;">
+                <div onclick="ParaWorldSchools.ShowPrevious" style="margin-left:10px;margin-top:110px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageLeft64.png);" />
+                <div style="margin-top:-160px;width:256px;height:256px;" align="center">
+                    <img style="width:256px;height:256px;" src='<%=ParaWorldSchools.GetCurrentImage()%>' />
+                    <div style="margin-top:0px;text-align:center;base-font-size:16px;font-size:16px;"><%=ParaWorldSchools.GetCurrentName()%></div>
+                </div>
+                <div onclick="ParaWorldSchools.ShowNext" style="float:right;margin-top:-160px;margin-right:10px;width:64px;height:64px;background:url(Texture/3DMapSystem/common/PageRight64.png);" align="right" />
+            </div>
+            <div style="width:720px;height:30px;">
+                <input type="button" name="OK" hotkey="DIK_RETURN" align="center" style="min-width:104px;height:40px;" class="kp_yellow_button" onclick="ParaWorldSchools.OnOK" value='<%=L"确定"%>' />
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

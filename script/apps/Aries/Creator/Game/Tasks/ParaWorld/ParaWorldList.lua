@@ -14,6 +14,30 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 local ParaWorldList = NPL.export();
 
 ParaWorldList.Current_Item_DS = {};
+ParaWorldList.provinces = {
+	{
+		text = L"省",
+		value = 0,
+		selected = true,
+	}
+}
+
+ParaWorldList.cities = {
+	{
+		text = L"市",
+		value = 0,
+		selected = true,
+	}
+}
+
+ParaWorldList.areas = {
+	{
+		text = L"区",
+		value = 0,
+		selected = true,
+	}
+}
+
 
 local myParaWorldCount = 0;
 local currentRegion = nil;
@@ -91,30 +115,6 @@ function ParaWorldList.OnClickItem(index)
 end
 
 function ParaWorldList.GetRegionData()
-	ParaWorldList.provinces = {
-		{
-			text = L"省",
-			value = 0,
-			selected = true,
-		}
-	}
-
-	ParaWorldList.cities = {
-		{
-			text = L"市",
-			value = 0,
-			selected = true,
-		}
-	}
-
-	ParaWorldList.areas = {
-		{
-			text = L"区",
-			value = 0,
-			selected = true,
-		}
-	}
-
 	ParaWorldList.GetProvinces(function(data)
 		if type(data) ~= "table" then
 			return false
@@ -265,6 +265,7 @@ function ParaWorldList.SeachParaWorld(keyWord, regionId)
 					end
 					page:Refresh(0);
 					page:SetValue("seach_text", nil);
+					page:FindControl('seach_text'):Focus();
 				end
 			end);
 		end);

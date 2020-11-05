@@ -27,9 +27,9 @@ function TeachingQuestLinkPage.ShowPage()
 			directPosition = true,
 				align = "_ct",
 				x = -530/2,
-				y = -224/2,
+				y = -353/2,
 				width = 530,
-				height = 224,
+				height = 353,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end

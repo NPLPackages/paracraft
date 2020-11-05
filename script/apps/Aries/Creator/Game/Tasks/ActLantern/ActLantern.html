@@ -1,0 +1,142 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ActLantern/ActLantern.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ActLantern.lua"><![CDATA[
+local ActLantern = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActLantern/ActLantern.lua");
+ActLantern.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    ActLantern.CloseView()
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #ActLantern.Current_Item_DS;
+    else
+        return ActLantern.Current_Item_DS[index];
+    end
+end
+
+function LuckyDraw()
+    ActLantern.LuckyDraw()
+end
+
+function OpenRewardList()
+    ActLantern.OpenRewardList()
+end
+
+function IsLuckyDrawBtEnable()
+    return ActLantern.draw_bt_enable
+end
+
+function IsShowStartView()
+    return ActLantern.IsShowStartView()
+end
+
+function IsShowQuestionView()
+    return ActLantern.IsShowQuestionView()
+end
+
+function IsShowSuccessView()
+    return ActLantern.IsShowSuccessView()
+end
+
+function IsShowFailView()
+    return ActLantern.IsShowFailView()
+end
+
+function OpenQuestionView()
+    ActLantern.OpenQuestionView()
+end
+
+function GetAnswerDesc(data, index)
+    return data.answer_list[index].desc
+end
+
+function SelectAnswer(name,mcmlNode)
+    local select_index = tonumber(mcmlNode:GetAttribute("param1"));
+    local data = mcmlNode:GetAttribute("param2")
+    ActLantern.SelectAnswer(select_index, data)
+
+end
+
+function OnOk()
+    ActLantern.OnOk()
+end
+
+function GetQuestionDesc(index, desc)
+    return string.format("%s.%s", index, desc)
+end
+]]></script>
+<div style="width: 700px; height: 662px;">
+    <div type ="box" style="width:668px;height:662px;background: url(Texture/Aries/Creator/keepwork/ActLantern/tu3_668x662_32bits.png#0 0 668 662);">
+        <!-- <div style="position: relative; width:540px;height:270px;margin-top:8px;margin-left: 10;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuliebiaobj_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div> -->
+        <input type="button" value="" onclick="ClosePage" style="margin-top: 22px; margin-left:590px;width:74px;height:89px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_X_74X89_32bits.png#0 0 74 89);"/>
+
+        <pe:if condition='<%=IsShowStartView() %>'>
+            <div style="margin-left: 105px;margin-top: 40px; width:460px;height:63px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi_460x63_32bits.png#0 0 460 63);"></div>
+            <input type="button" value="" onclick="OpenQuestionView"  style="margin-left:505px;margin-top: 30px; width:67px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_kaishi_67x20_32bits.png#0 0 67 20);"/>
+        </pe:if>
+
+        <pe:if condition='<%=IsShowQuestionView() %>'>
+            <pe:gridview style="margin-top: 20px; margin-left:120px;width:480px;height:446px;" RememberScrollPos="true" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" ItemsPerLine="1" DefaultNodeHeight = "30" 
+                DataSource='<%=DS_Items%>'>
+                <Columns>
+                    <pe:if condition='<%=Eval("is_question")%>'>
+                        <div style="font-size:14px;; font-weight:bold;color: #136c5e;"><%=GetQuestionDesc(Eval("question_data_index"), Eval("desc"))%></div>
+                    </pe:if>
+
+                    <pe:if condition='<%=not Eval("is_question")%>'>
+                        <div style="position: relative;">
+                            <input type="button" name="answer1" value="" onclick="SelectAnswer" param1="1" param2='<%=XPath("this")%>'  style="position: relative;margin-left:0px;margin-top: 0px; width:100px;height:25px;background: ;"/>
+                            <div style="float: left;margin-left:0px;margin-top:4px; width:14px;height:14px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_an_14x14_32bits.png#0 0 14 14);">
+                                <pe:if condition='<%=Eval("select_index") == 1%>'>
+                                    <div style="float: left;margin-left:0px;margin-top:0px; width:14px;height:14px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_liang_14x14_32bits.png#0 0 14 14);"></div>
+                                </pe:if>
+                            </div>
+
+                            <div style="margin-left: 5px; float: left;font-size:14px;; font-weight:bold;color: #ae3a0b;"><%=GetAnswerDesc(XPath("this"), 1)%></div>
+                        </div>
+
+                        <div style="position: relative; margin-left: 140px;">
+                            <input type="button" name="answer2" value="" onclick="SelectAnswer" param1="2" param2='<%=XPath("this")%>'  style="position: relative;margin-left:0px;margin-top: 0px; width:100px;height:25px;background: "/>
+                            <div style="float: left;margin-left:0px;margin-top:4px; width:14px;height:14px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_an_14x14_32bits.png#0 0 14 14);">
+                                <pe:if condition='<%=Eval("select_index") == 2%>'>
+                                    <div style="float: left;margin-left:0px;margin-top:0px; width:14px;height:14px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_liang_14x14_32bits.png#0 0 14 14);"></div>
+                                </pe:if>
+                            </div>
+
+                            <div style="margin-left: 5px; float: left;font-size:14px;; font-weight:bold;color: #ae3a0b;"><%=GetAnswerDesc(XPath("this"), 2)%></div>
+                        </div>
+                    </pe:if>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+            <input type="button" value="" onclick="OnOk" style="float:right;margin-left:245px;margin-top: 12px; width:218px;height:110px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_queren_218X110_32bits.png#0 0 218 110);"/>
+        </pe:if>
+    
+        <pe:if condition='<%=IsShowSuccessView() %>'>
+            <div style="margin-left: 145px;margin-top: 140px; width:393px;height:145px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi1_393x145_32bits.png#0 0 393 145);"></div>
+            <!-- <input type="button" value="" onclick="OpenQuestionView"  style="margin-left:455px;margin-top: 30px; width:67px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_kaishi_67x20_32bits.png#0 0 67 20);"/> -->
+        </pe:if>
+
+        <pe:if condition='<%=IsShowFailView() %>'>
+            <div style="margin-left: 225px;margin-top: 140px; width:393px;height:145px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi2_213x120_32bits.png#0 0 393 145);"></div>
+            <!-- <input type="button" value="" onclick="OpenQuestionView"  style="margin-left:455px;margin-top: 30px; width:67px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_kaishi_67x20_32bits.png#0 0 67 20);"/> -->
+        </pe:if>
+    
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

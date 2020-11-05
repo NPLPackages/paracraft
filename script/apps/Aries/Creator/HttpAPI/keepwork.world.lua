@@ -27,6 +27,13 @@ HttpWrapper.Create("keepwork.world.myschoolParaWorld", "%MAIN%/core/v0/3DCampus/
 -- 获取随机并行世界填充
 HttpWrapper.Create("keepwork.world.paraWorldFillings", "%MAIN%/core/v0/3DCampus/paraWorldFillings", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3487
+-- 判断是否有权限管理三地世界座位
+HttpWrapper.Create("keepwork.world.canManageParaWorldMinis", "%MAIN%/core/v0/3DCampus/canManageParaWorldMinis", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/3492
+-- 管理3d座位
+HttpWrapper.Create("keepwork.world.paraWorldMinis", "%MAIN%/core/v0/3DCampus/paraWorldMinis", "POST", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/2752
 -- 上传paraMini世界
@@ -55,11 +62,11 @@ HttpWrapper.Create("keepwork.world.get", "%MAIN%/core/v0/3DCampus/paraWorlds/:id
 
 --http://yapi.kp-para.cn/project/32/interface/api/2822
 -- paraWorld锁座
-HttpWrapper.Create("keepwork.world.lock_seat", "%MAIN%/core/v0/3DCampus/paraWorlds/sites/lock", "POST", true)
+--HttpWrapper.Create("keepwork.world.lock_seat", "%MAIN%/core/v0/3DCampus/paraWorlds/sites/lock", "POST", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/2827
 -- paraWorld解锁座
-HttpWrapper.Create("keepwork.world.unlock_seat", "%MAIN%/core/v0/3DCampus/paraWorlds/sites/unlock", "POST", true)
+--HttpWrapper.Create("keepwork.world.unlock_seat", "%MAIN%/core/v0/3DCampus/paraWorlds/sites/unlock", "POST", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/2807
 -- paraWorld占座

@@ -27,14 +27,14 @@ TeachingQuestPage.currentIndex = -1;
 -- TeachingQuestPage.animationExid = 10004;
 -- TeachingQuestPage.cadExid = 10005;
 -- TeachingQuestPage.robotExid = 10006;
-TeachingQuestPage.TaskExids = {10003, 10004, 10005, 10006};
+TeachingQuestPage.TaskExids = {10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010};
 
 -- task exid
 -- TeachingQuestPage.programExidVip = 10013;
 -- TeachingQuestPage.animationExidVip = 10014;
 -- TeachingQuestPage.cadExidVip = 10015;
 -- TeachingQuestPage.robotExidVip = 10016;
-TeachingQuestPage.VipTaskExids = {10013, 10014, 10015, 10016};
+TeachingQuestPage.VipTaskExids = {10013, 10014, 10015, 10016, 10017, 10018, 10019, 10040};
 
 -- task gsid
 -- TeachingQuestPage.programGsid = 30202;
@@ -42,7 +42,7 @@ TeachingQuestPage.VipTaskExids = {10013, 10014, 10015, 10016};
 -- TeachingQuestPage.cadGsid = 30204;
 -- TeachingQuestPage.robotGsid = 30205;
 TeachingQuestPage.totalTaskGsid = 30201;
-TeachingQuestPage.TaskGsids = {30202, 30203, 30204, 30205};
+TeachingQuestPage.TaskGsids = {30202, 30203, 30204, 30205, 30206, 30207, 30208, 30209};
 
 -- teacher state
 TeachingQuestPage.HasNewTask = 1;
@@ -59,70 +59,67 @@ TeachingQuestPage.Locked = 4;
 TeachingQuestPage.ProgramType = 1;
 TeachingQuestPage.AnimationType = 2;
 TeachingQuestPage.CADType = 3;
-TeachingQuestPage.RobotType = 4;
-TeachingQuestPage.UnknowType = 5;
+TeachingQuestPage.LanguageType = 4;
+TeachingQuestPage.MathType = 5;
+TeachingQuestPage.EnglishType = 6;
+TeachingQuestPage.ScienceType = 7;
+TeachingQuestPage.HumanitiesType = 8;
+TeachingQuestPage.UnknowType = 9;
 
-TeachingQuestPage.TaskTypeTexts = {L"编程", L"动画", L"CAD", L"机器人"};
-TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "robot"};
+TeachingQuestPage.TaskTypeTexts = {L"编程", L"动画", L"CAD", L"语文", L"数学", L"英语", L"科学", L"人文"};
+TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "language", "Math", "english", "science", "humanities"};
 TeachingQuestPage.TaskTypeIndex = {
 	program = TeachingQuestPage.ProgramType,
 	animation = TeachingQuestPage.AnimationType,
 	CAD = TeachingQuestPage.CADType,
-	robot = TeachingQuestPage.RobotType
+	language = TeachingQuestPage.LanguageType,
+	Math = TeachingQuestPage.MathType,
+	english = TeachingQuestPage.EnglishType,
+	science = TeachingQuestPage.ScienceType,
+	humanities = TeachingQuestPage.HumanitiesType,
 };
+
+local has_special_jurisdiction = false
 
 local page;
 function TeachingQuestPage.OnInit()
 	page = document:GetPageCtrl();
 end
 function TeachingQuestPage.ShowPage(type_)
-	if (type(type_) == "string") then
-		type_ = TeachingQuestPage.TaskTypeIndex[type_] or TeachingQuestPage.UnknowType;
-	end
-	TeachingQuestPage.currentType = type_;
-	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type_] or {};
-	TeachingQuestPage.CheckTaskCount(type_);
-	if (TeachingQuestPage.RefreshItem()) then
-		return;
-	end
+	has_special_jurisdiction = false
+	GameLogic.IsVip("VipWeeklyTraining", false, function(result)
+		has_special_jurisdiction = result
 
-	local params = {
-		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html",
-		name = "TeachingQuestPage.ShowPage", 
-		isShowTitleBar = false,
-		DestroyOnClose = true,
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
-		enable_esc_key = true,
-		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-		directPosition = true,
-		align = "_ct",
-		x = -680 / 2,
-		y = -430 / 2,
-		width = 680,
-		height = 430,
-	};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type_]);
-	--[[
-	commonlib.TimerManager.SetTimeout(function()  
-		local count = TeachingQuestPage.GetTaskItemCount(TeachingQuestPage.ticketGsid);
-		local state = L"  （本周已发放一张）";
-		KeepWorkItemManager.CheckExchange(TeachingQuestPage.ticketExid, function(canExchange)
-			if (canExchange.data) then
-				if (canExchange.data.reason == 5) then
-					state = L"  （本周已发放两张）";
-				elseif (canExchange.data.reason == 3) then
-					state = L"  （已达到获取上限）";
-				end
-			end
-			page:SetValue("TicketState", count..state);
-		end, function(err, msg, data)
-			page:SetValue("TicketState", count..state);
-		end);
-	end, 100)
-	]]
+		if (type(type_) == "string") then
+			type_ = TeachingQuestPage.TaskTypeIndex[type_] or TeachingQuestPage.UnknowType;
+		end
+		TeachingQuestPage.currentType = type_;
+		TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type_] or {};
+		TeachingQuestPage.CheckTaskCount(type_);
+		if (TeachingQuestPage.RefreshItem()) then
+			return;
+		end
+	
+		local params = {
+			url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html",
+			name = "TeachingQuestPage.ShowPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = true,
+			enable_esc_key = true,
+			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			directPosition = true,
+			align = "_ct",
+			x = -680 / 2,
+			y = -430 / 2,
+			width = 680,
+			height = 430,
+		};
+		System.App.Commands.Call("File.MCMLWindowFrame", params);
+	
+		page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[type_]);		
+	end);
 end
 
 function TeachingQuestPage.IsVip()
@@ -271,11 +268,16 @@ function TeachingQuestPage.GetFinishedTasks()
 end
 
 function TeachingQuestPage.OnSelectTaskType(name, value)
-	TeachingQuestPage.currentType = TeachingQuestPage.TaskTypeIndex[value];
-	TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.currentType] or {};
-	TeachingQuestPage.CheckTaskCount(TeachingQuestPage.currentType);
-	page:Refresh(0);
-	page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[TeachingQuestPage.currentType]);
+	GameLogic.IsVip("VipWeeklyTraining", false, function(result)
+		has_special_jurisdiction = result
+		
+		TeachingQuestPage.currentType = TeachingQuestPage.TaskTypeIndex[value];
+		TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[TeachingQuestPage.currentType] or {};
+		TeachingQuestPage.CheckTaskCount(TeachingQuestPage.currentType);
+		page:Refresh(0);
+		page:SetValue("TaskType", TeachingQuestPage.TaskTypeNames[TeachingQuestPage.currentType]);
+	end);
+
 end
 
 function TeachingQuestPage.GetTaskState(index)
@@ -289,7 +291,7 @@ function TeachingQuestPage.GetTaskState(index)
 				return TeachingQuestPage.Locked;
 			else
 				--if (TeachingQuestPage.IsVip() or count < 5) then
-				if (TeachingQuestPage.IsVip()) then
+				if (TeachingQuestPage.IsVip() or has_special_jurisdiction) then
 					return TeachingQuestPage.Locked;
 				else
 					return TeachingQuestPage.Acceptable;
@@ -307,7 +309,7 @@ function TeachingQuestPage.GetTaskState(index)
 			if (index <= 5) then
 				return TeachingQuestPage.Activated;
 			else
-				if (TeachingQuestPage.IsVip()) then
+				if (TeachingQuestPage.IsVip() or has_special_jurisdiction) then
 					return TeachingQuestPage.Activated;
 				else
 					return TeachingQuestPage.Acceptable;
@@ -341,14 +343,18 @@ function TeachingQuestPage.OnClickItem(index)
 	if (state == TeachingQuestPage.Finished) then
 		StartTask();
 	elseif (state == TeachingQuestPage.Activated) then
-		local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
-		if (TeachingQuestPage.IsVip()) then
-			exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
-		end
-		KeepWorkItemManager.CheckExchange(exid, function(canExchange)
-			if (canExchange.data) then
-				StartTask();
+		GameLogic.IsVip("VipWeeklyTraining", false, function(result)
+			has_special_jurisdiction = result
+			
+			local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
+			if (TeachingQuestPage.IsVip() or has_special_jurisdiction) then
+				exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
 			end
+			KeepWorkItemManager.CheckExchange(exid, function(canExchange)
+				if (canExchange.data) then
+					StartTask();
+				end
+			end);
 		end);
 	elseif (state == TeachingQuestPage.Acceptable) then
 		-- task is acceptable, show vip

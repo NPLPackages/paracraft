@@ -144,16 +144,16 @@ function GameLogic:ctor()
 	end
 	ParaWorldAnalytics = ParaWorldAnalytics or NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
 	if(ParaWorldAnalytics) then
-		ParaWorldAnalytics:staticInit()
+		-- ParaWorldAnalytics:staticInit()
 		GameLogic:GetFilters():add_filter("user_event_stat", function(category, action, value, label)
 			ParaWorldAnalytics:Send(category, action, value, label);
 			return catetory;
 		end)
 
-		GameLogic:GetFilters():add_filter("user_behavior", function(action, value, otherParam)
-			ParaWorldAnalytics:behaviorStateEnter( action, value, otherParam);
-			return catetory;
-		end)
+		-- GameLogic:GetFilters():add_filter("user_behavior", function(action, value, otherParam)
+		-- 	ParaWorldAnalytics:behaviorStateEnter( action, value, otherParam);
+		-- 	return catetory;
+		-- end)
 	end
 end
 
@@ -1099,7 +1099,7 @@ end
 function GameLogic.SetMode(mode, bFireModeChangeEvent)
 	if mode == 'editor' then
 		if(GameLogic.options:GetProjectId()) then
-			GameLogic.GetFilters():apply_filters("user_behavior", "editWorld", "enter" , GameLogic.options:GetProjectId());
+			GameLogic.GetFilters():apply_filters("user_behavior", 2, "editWorld");
 		end
 	end
 	GameLogic.mode = mode;

@@ -1,0 +1,144 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ActLantern/ActLanternReward.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ActLanternReward.lua"><![CDATA[
+local ActLanternReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActLantern/ActLanternReward.lua");
+ActLanternReward.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    ActLanternReward.CloseView()
+end
+function OnChange(index)
+    ActLanternReward.OnChange(index);
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #ActLanternReward.Current_Item_DS;
+    else
+        return ActLanternReward.Current_Item_DS[index];
+    end
+end
+
+function GetTimeDesc(time)
+    return ActLanternReward.GetTimeDesc(time)
+end
+
+function SearchFriend()
+    local search_ctrl = Page:FindUIControl("block_search_text_ctl")
+    ActLanternReward.SearchFriend(search_ctrl.text)
+end
+
+function GetIcon(data)
+    return ActLanternReward.GetIcon(data)
+end
+
+function GetFansBtText(data)
+
+    return ActLanternReward.GetFansBtText(data)
+end
+
+function Follow(data)
+    ActLanternReward.ToFollow(data.id)
+end
+
+function ClickItem()
+end
+
+function CanClick(data)
+    return not ActLanternReward.IsFollow(data.id)
+end
+
+function OnSearch()
+    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+        SearchFriend()
+	end
+end
+
+function Fefuse(data)
+    ActLanternReward.Fefuse(data)
+end
+
+function GetShowStr(userList)
+    return ActLanternReward.GetShowStr(userList)
+end
+
+function IsItemSelect(index)
+    return ActLanternReward.CurSelectIndex == index
+end
+
+function ChangeItem(index)
+    ActLanternReward.ChangeItem(tonumber(index))
+end
+
+function IsShowItem(index)
+    --return true
+    return ActLanternReward.ServerData[index] ~= nil
+end
+]]></script>
+<div style="width: 700px; height: 616px;">
+
+    <div type ="box" style="margin-left: -50px; float:left;width:700px;height:616px;background: url(Texture/Aries/Creator/keepwork/ActLantern/tu2_700X616_32bits.png#0 0 700 616);">
+        <!-- <div style="position: relative; width:540px;height:270px;margin-top:8px;margin-left: 10;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuliebiaobj_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div> -->
+        <input type="button" value="" onclick="ClosePage" style="margin-top: 25px; margin-left:635px;width:74px;height:89px;background: url(Texture/Aries/Creator/keepwork/ActLantern/btn_X_74X89_32bits.png#0 0 74 89);"/>
+        <div style="margin-top:28px;">
+            <!-- <pe:container name = "ImgTable" alignment="_lt" ClickThrough="true" style="width:400px;height:400px;background: url(Texture/Aries/Creator/keepwork/ActLanternReward/timg.png#0 0 1020 1020)"></pe:container> -->
+            <!-- <input type="button" class="button" value="按钮" MouseOver_BG='<%=Eval("mouseover_bg")%>' alwaysmouseover="true" style="float:right;margin-top:0px;width:212px;height:30px;"/> -->
+            <!-- <div name = "ImgTable" style=" width: 400px;height: 400px; background: url(Texture/Aries/Creator/keepwork/ActLanternReward/timg.png#0 0 1020 1020);"></div> -->
+            <pe:gridview style="margin-left:35px;width:670px;height:570px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="true" pagesize="12" ItemsPerLine="1" DefaultNodeHeight = "30" 
+                DataSource='<%=DS_Items%>'>
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:834px;margin-top:-43px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:69px;height:30px;margin-left:57px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/ActLantern/btn_shangyiye_69X30_32bits.png#0 0 69 30);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true;margin-left:158px;">
+                            <label name="page" style="color:#000000;text-align:center;width:45px;height:18px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="margin-left:170px;width:69px;height:30px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/ActLantern/btn_xiayiye_69X30_32bits.png#0 0 69 30)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <pe:if condition='<%=Eval("is_show_level")%>'>
+                        <pe:if condition='<%=Eval("level") == 1%>'>
+                            <div style="width: 730px;height:31px;background:">
+                                <div style="margin-left: 250px; width: 161px;height: 31px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi1_161X31_32bits.png#0 0 161 31);"></div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=Eval("level") == 2%>'>
+                            <div style="width: 730px;height:31px;background:">
+                                <div style="margin-left: 250px; width: 161px;height: 31px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi2_161X31_32bits.png#0 0 161 31);"></div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=Eval("level") == 3%>'>
+                            <div style="width: 730px;height:31px;background:">
+                                <div style="margin-left: 250px; width: 161px;height: 31px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi3_161X31_32bits.png#0 0 161 31);"></div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=Eval("level") == 4%>'>
+                            <div style="width: 730px;height:31px;background:">
+                                <div style="margin-left: 250px; width: 161px;height: 31px;background: url(Texture/Aries/Creator/keepwork/ActLantern/zi4_161X31_32bits.png#0 0 161 31);"></div>
+                            </div>
+                        </pe:if>
+                    </pe:if>
+
+                    <pe:if condition='<%=not Eval("is_show_level")%>'>
+                        <%=Eval("mcml_str")%>
+                    </pe:if>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+</div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

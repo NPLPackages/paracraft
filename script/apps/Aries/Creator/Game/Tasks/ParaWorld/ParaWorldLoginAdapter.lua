@@ -120,8 +120,8 @@ function ParaWorldLoginAdapter:EnterWorld(close)
 			ParaWorldLoginAdapter:EnterWorld();
 		end);
 		return;
-	end
-
+    end
+    
     ParaWorldLoginAdapter:SearchWorldID(function(world_id)
 	    LOG.std(nil, "info", "ParaWorldLoginAdapter", " found world_id:%s", tostring(world_id));
         if(not world_id)then

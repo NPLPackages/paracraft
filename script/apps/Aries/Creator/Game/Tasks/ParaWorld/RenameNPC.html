@@ -1,0 +1,26 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/RenameNPC.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="RenameNPC.lua">
+            <![CDATA[
+            RenameNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/RenameNPC.lua");
+            RenameNPC.OnInit()
+
+            ]]>
+        </script>
+        <aries:window title='<%=L"修改名称"%>' mode="thin" onclose="RenameNPC.OnClose">
+            <div style="width:300px;height:60px;margin-top:20px;">
+                <input type="text" name="npc_name" EmptyText='<%=L"请输入新的名称"%>' style="width:200px;height:26px;margin-left:10px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
+                <input type="button" style="width:60px;height:26px;margin-left:10px;color:#ffffff;" value='<%=L"确定" %>' class="mc_blue_button_with_fillet" onclick="RenameNPC.OnOK" />
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+

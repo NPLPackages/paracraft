@@ -16,6 +16,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCollectable.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
@@ -26,6 +27,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ParaWorldNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
 local math_abs = math.abs;
 
@@ -78,16 +80,22 @@ end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
-	ParaWorldNPC.LoadNPCFromHomePoint(node);
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	if (generatorName == "paraworld") then
+		ParaWorldNPC.LoadNPCFromHomePoint(node);
+	end
 end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = node or {name='entity', attr={}};
-	local npcList = {};
-	for i = 1, #ParaWorldNPC.npcList do
-		npcList[i] = {name = 'npc', attr = ParaWorldNPC.npcList[i]};
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	if (generatorName == "paraworld") then
+		local npcList = {};
+		for i = 1, #ParaWorldNPC.npcList do
+			npcList[i] = {name = 'npc', attr = ParaWorldNPC.npcList[i]};
+		end
+		node[#node+1] = npcList;
 	end
-	node[#node+1] = npcList;
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	return node;
 end
@@ -112,8 +120,6 @@ function Entity:OnClick(x, y, z, mouse_button)
 		local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
 		task:Run();
 
-		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 		local generatorName = WorldCommon.GetWorldTag("world_generator");
 		if (generatorName == "paraworld") then
 			ParaWorldNPC.ShowPage();

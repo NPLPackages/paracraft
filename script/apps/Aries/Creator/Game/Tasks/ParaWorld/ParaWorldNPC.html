@@ -1,0 +1,43 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldNPC.lua">
+            <![CDATA[
+            ParaWorldNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.lua");
+            ParaWorldNPC.OnInit()
+
+            ]]>
+        </script>
+        <aries:window title='<%=L"编辑NPC"%>' mode="thin" onclose="ParaWorldNPC.OnClose">
+            <div style="width:320px;height:200px;margin-left:20px;margin-top:20px;">
+                <div style="width:320px;height:200px;">
+                    <pe:gridview style="width:320px;height:200px;" name="npc_gridview" CellPadding="2" VerticalScrollBarStep="16" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="26"
+                                 DataSource='<%=ParaWorldNPC.npcList%>'>
+                        <Columns>
+                            <div style="width:320px;height:26px;color:#ffffff">
+                                <input type="checkbox" name='<%=string.format("check_%d", Eval("index"))%>' style="float:left;position:relative;" checked='<%=Eval("show")%>' onclick='ParaWorldNPC.ShowNPC()'/>
+                                <div style="float:left;margin-left:5px;margin-top:-3px;width:140px;" for='<%=Eval("index")%>'><%=Eval("npcName")%></div>
+                                <input type="button" style="float:left;width:50px;height:20px;margin-top:-2px;margin-left:20px;" value='<%=L"瞬移" %>' name='<%=Eval("index")%>' onclick="ParaWorldNPC.MoveNPC" class="mc_light_grey_button_with_fillet" />
+                                <input type="button" style="float:left;width:50px;height:20px;margin-top:-2px;margin-left:20px;" value='<%=L"改名" %>' name='<%=Eval("index")%>' onclick="ParaWorldNPC.RenameNPC" class="mc_light_grey_button_with_fillet" />
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+                <!--
+                <select name="npc_list" style="margin-left:10px;width:170px;height:26px;" DataSource="<%=ParaWorldNPC.GetNPCList()%>"></select>
+            <input type="button" style="width:80px;height:24px;margin-top:20px;margin-left:100px;" value='<%=L"创建NPC" %>' name="create_npc" onclick="SelectModel.DoClick" class="mc_light_grey_button_with_fillet" />
+                -->
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+

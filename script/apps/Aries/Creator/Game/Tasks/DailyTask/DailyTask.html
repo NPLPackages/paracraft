@@ -1,0 +1,75 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/DailyTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="DailyTask.lua"><![CDATA[
+local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
+DailyTask.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    DailyTask.CloseView()
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #DailyTask.ButtonData;
+    else
+        return DailyTask.ButtonData[index];
+    end
+end
+
+function ClickItem(name,mcmlNode)
+    local attr = mcmlNode:GetAttribute("param1")
+    local click_cb = attr.click_cb
+    if DailyTask[click_cb] then
+        DailyTask[click_cb]()
+    end
+end
+
+function GetCompletePro(data)
+    return DailyTask.GetCompletePro(data)
+end
+
+function GetRewardDesc(data)
+    return DailyTask.GetRewardDesc(data)
+end
+
+]]></script>
+<kp:window name="iframe" width="870" height="443" icon="Texture/Aries/Creator/keepwork/DailyTask/biaoti_chengzhangrenwu_32bits.png#0 0 142 64"   onclose="ClosePage">
+    <div style="color:#ffffff;width:870px;height:443px" class="kp_window_container">
+        <div style="color: #101010;margin-left: 35px;margin-top: 10px;">马上开始今天的学习任务吧，完成任务可以获得知识豆奖励哦~</div>
+        <div type ="box" style="width:850px;height:443px;margin-left: 16px;margin-top: 0px;float: left;">
+             <pe:gridview style="margin:0px;width:850px;height:443px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "35" 
+                 DataSource='<%=Button_DS_Items%>'>
+                 <Columns>
+                         <div style="color:#ffffff;width: 263px;height: 170px;float: left;">
+                            <input zorder="1" type="button" value='' name="1" onclick="ClickItem" style="position: relative;width:263px;height:170px;background: ;" param1='<%= XPath("this") %>' class="mc_light_grey_button_with_fillet"/>
+                            <div style="position:relative;margin-left:0px;margin-top:0px;">
+                                <img zorder="-1" src='<%=Eval("bg_img") %>'width="263" height="170"/>
+                            </div>
+                            <!-- <div style="text-align: center;width: 263px;margin-top: 20px;"><%=Eval("name") %></div> -->
+                            <div style="margin-left: 15px;margin-top: 142px;">
+                                <div style="float: left; margin-left: 0px;margin-top: 2px; width: 17px;height: 16px; background: url(Texture/Aries/Creator/keepwork/DailyTask/icondouzi_17X15_32bits.png#0 0 17 16);"></div>
+                                <div style="color:#000000; float: left; margin-left: 10px;margin-top: 0px;font-size: 16pt;width: 30px;"><%=GetRewardDesc(XPath("this"))%></div>
+                                <div style="color:#000000; float: left; margin-left: 157px;margin-top: 0px;font-size: 16pt;"><%=GetCompletePro(XPath("this"))%></div>
+                            </div>
+
+                         </div>
+
+                         
+                 </Columns>
+                 <EmptyDataTemplate>
+                 </EmptyDataTemplate>
+             </pe:gridview>
+         </div>
+     </div>
+</kp:window>
+    </pe:mcml>
+</body>
+</html>
+

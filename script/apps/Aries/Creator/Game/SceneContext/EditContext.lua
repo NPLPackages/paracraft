@@ -18,6 +18,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
+local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local EditContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"), commonlib.gettable("MyCompany.Aries.Game.SceneContext.EditContext"));
 
 EditContext:Property("Name", "EditContext");
