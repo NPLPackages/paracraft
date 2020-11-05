@@ -84,9 +84,45 @@ function EditContext:OnLeftLongHoldBreakBlock()
 	self:TryDestroyBlock(SelectionManager:GetPickingResult());
 end
 
+--virtual function: called repeatedly whenever mouse button is down. 
+function EditContext:OnMouseDownTimer(timer)
+	local bLeftButtonDown = ParaUI.IsMousePressed(0)
+	local bRightButtonDown = ParaUI.IsMousePressed(1)
+	local bMiddleButtonDown = ParaUI.IsMousePressed(2)
+
+	local mouse_setting_list = GameLogic.options:GetMouseSettingList();
+	local mouse_event = ""
+	if (bLeftButtonDown and not bRightButtonDown and not bMiddleButtonDown) then
+		mouse_event = "left"
+	elseif (not bLeftButtonDown and bRightButtonDown and not bMiddleButtonDown) then
+		mouse_event = "right"
+	elseif (not bLeftButtonDown and not bRightButtonDown and bMiddleButtonDown) then
+		mouse_event = "middle"
+	end
+
+	if mouse_setting_list[mouse_event] == "DeleteBlock" then
+		self:OnLeftMouseHold(timer:GetDelta());
+	elseif mouse_setting_list[mouse_event] == "CreateBlock" then
+		self:OnRightMouseHold(timer:GetDelta());
+	else
+		self:UpdateClickStrength(-1)
+		timer:Change();
+	end
+end
+
 
 -- virtual: 
 function EditContext:mousePressEvent(event)
+	local mouse_setting_list = GameLogic.options:GetMouseSettingList();
+	local mouse_event = event.mouse_button or ""
+	if mouse_setting_list[mouse_event] == "DeleteBlock" then
+		event.mouse_button = "left"
+	elseif mouse_setting_list[mouse_event] == "CreateBlock" then
+		event.mouse_button = "right"
+	elseif mouse_setting_list[mouse_event] == "ChooseBlock" then
+		event.mouse_button = "middle"
+	end
+
 	EditContext._super.mousePressEvent(self, event);
 	if(event:isAccepted()) then
 		return
@@ -153,6 +189,7 @@ function EditContext:handleLeftClickScene(event, result)
 				if(result.entity and result.entity:IsBlockEntity() and result.entity:GetBlockId() == result.block_id) then
 					-- this fixed a bug where block entity is larger than the block like the physics block model.
 					local bx, by, bz = result.entity:GetBlockPos();
+					
 					is_processed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, bx, by, bz, event.mouse_button, EntityManager.GetPlayer(), result.side);	
 				else
 					is_processed = GameLogic.GetPlayerController():OnClickBlock(result.block_id, result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side);	
@@ -232,13 +269,23 @@ function EditContext:mouseReleaseEvent(event)
 
 		if(isClickProcessed) then	
 			-- do nothing
-		elseif(event.mouse_button == "left") then
-			self:handleLeftClickScene(event, result);
-		elseif(event.mouse_button == "right") then
-			self:handleRightClickScene(event, result);
-		elseif(event.mouse_button == "middle") then
-			self:handleMiddleClickScene(event, result);
+		else
+			local mouse_setting_list = GameLogic.options:GetMouseSettingList();
+			local mouse_event = event.mouse_button or ""
+
+			if mouse_setting_list[mouse_event] == "DeleteBlock" then
+				event.mouse_button = "left"
+				self:handleLeftClickScene(event, result);
+			elseif mouse_setting_list[mouse_event] == "CreateBlock" then
+				event.mouse_button = "right"
+				self:handleRightClickScene(event, result);
+			elseif mouse_setting_list[mouse_event] == "ChooseBlock" then
+				event.mouse_button = "middle"
+				self:handleMiddleClickScene(event, result);
+			end
 		end
+
+		
 	end
 end
 

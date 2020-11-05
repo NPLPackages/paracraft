@@ -407,6 +407,9 @@ Commands["skin"] = {
 /skin @test 1:  change 'test' player's skin to id=1
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		if(GameLogic.IsSocialWorld()) then
+			return
+		end
 		local playerEntity, hasInputName;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		if(not playerEntity and not hasInputName) then
@@ -439,6 +442,9 @@ Commands["/avatar"] = {
 /avatar @test test.fbx :change 'test' player to a fbx file in current world directory. 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		if(GameLogic.IsSocialWorld()) then
+			return
+		end
 		local playerEntity, hasInputName;
 		playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
 		if(not playerEntity and not hasInputName) then
@@ -451,6 +457,7 @@ Commands["/avatar"] = {
 		if(not cmd_text or cmd_text=="") then
 			cmd_text = "default";
 		end
+		
 		if(cmd_text and playerEntity) then
 			local assetfile = cmd_text;
 			assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);

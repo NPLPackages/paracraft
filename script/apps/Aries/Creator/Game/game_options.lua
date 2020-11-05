@@ -1204,3 +1204,28 @@ function options:ShowSystemTips(bShow)
 		GameLogic.CreateGetAutoSaver():OnLeaveWorld();
 	end
 end
+
+function options:SetMouseSettingList(list)
+	self.moust_setting_list = list
+end
+
+function options:GetMouseSettingList(list)
+	if self.moust_setting_list == nil then
+		local mouse_select_list = Game.PlayerController:LoadRemoteData("SystemSettingsPage.mouse_select_list", nil)
+		if mouse_select_list then
+			self.moust_setting_list = {}
+			for k, v in pairs(mouse_select_list) do
+				self.moust_setting_list[v] = k
+			end
+			return self.moust_setting_list
+		end
+
+		self.moust_setting_list = {
+			["left"] = "DeleteBlock",
+			["right"] = "CreateBlock",
+			["middle"] = "ChooseBlock",
+		}
+	end
+
+	return self.moust_setting_list
+end

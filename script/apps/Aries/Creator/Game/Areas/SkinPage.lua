@@ -23,6 +23,12 @@ local SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPa
 local page;
 local cur_skin;
 local cur_entity;
+local ok_callback;
+
+local function OKCallback()
+	if (type(ok_callback) == "function") then ok_callback() end
+end
+
 function SkinPage.OnInit()
 	page = document:GetPageCtrl();
 	if(not SkinPage.official_ds) then
@@ -57,7 +63,8 @@ function SkinPage.GetCurSkin()
 	return skin;
 end
 
-function SkinPage.ShowPage(entity)
+function SkinPage.ShowPage(entity, okcallback)
+	ok_callback = okcallback;
 	cur_entity = entity;
 	local customParams = GameLogic.GetFilters():apply_filters('SkinPage.PageParams')
 	local params = customParams or {
@@ -141,6 +148,7 @@ function SkinPage.OnOK()
 				player:SetMainAssetPath(PlayerAssetFile:GetFilenameByName("default"))
 			end
 			player:SetSkin(cur_skin);
+			OKCallback();
 		end
 	end
 end
@@ -167,6 +175,7 @@ function SkinPage.OnChangeAvatarSkin()
 				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
 					if(isVip) then
 						EntityManager.GetPlayer():SetSkin(ccsString);
+						OKCallback();
 					else
 						EntityManager.GetPlayer():SetSkin(old_value);
 					end
@@ -181,6 +190,7 @@ function SkinPage.OnChangeAvatarSkin()
 				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
 					if(isVip) then
 						entity:SetSkin(result);
+						OKCallback();
 					end
 				end)
 			end

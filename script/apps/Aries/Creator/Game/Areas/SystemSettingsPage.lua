@@ -87,6 +87,11 @@ SystemSettingsPage.category_operation = {
 		{left_text=L"返回上步操作",name="",right_type="text",right_value="Ctrl + Y"},	   
 }
 
+SystemSettingsPage.mouse_select_list = {
+	["DeleteBlock"] = "left",
+	["CreateBlock"] = "right",
+	["ChooseBlock"] = "middle",
+}
 
 local page;
 -- purchase the item directly from global store
@@ -253,6 +258,19 @@ function SystemSettingsPage.InitPageParams()
     -- bullet screen
     local bOpened = KpChatChannel.BulletScreenIsOpened()
 	UpdateCheckBox("btn_BulletScreen", bOpened);
+
+	-- 鼠标设置
+	-- local profile = KeepWorkItemManager.GetProfile() or {}
+	local mouse_select_list = Game.PlayerController:LoadRemoteData("SystemSettingsPage.mouse_select_list", nil)
+	if mouse_select_list then
+		SystemSettingsPage.mouse_select_list = mouse_select_list
+	end
+	-- for k, v in pairs(SystemSettingsPage.mouse_select_list) do
+	-- 	page:SetNodeValue(k, v)	
+	-- end
+	local is_on = SystemSettingsPage.mouse_select_list["DeleteBlock"] == "right"
+	-- UpdateCheckBox("btn_MouseChange", is_on);
+	page:SetNodeValue("ChangeMouseLeftRight", is_on);
 end
 
 function SystemSettingsPage.OnClose()
@@ -1278,4 +1296,43 @@ function SystemSettingsPage.OnClickHasCopyright(value)
 	if(not GameLogic.IsReadOnly()) then
 		GameLogic.options:SetHasCopyright(value)
 	end
+end
+
+function SystemSettingsPage.OnChangeMouseSetting(name, value)
+	if SystemSettingsPage.mouse_select_list[name] == nil then
+		return
+	end
+
+	local old_value = SystemSettingsPage.mouse_select_list[name]
+	SystemSettingsPage.mouse_select_list[name] = value
+	
+	local value_to_key_list = {}
+	for k, v in pairs(SystemSettingsPage.mouse_select_list) do
+		if v == value and k ~= name then
+			SystemSettingsPage.mouse_select_list[k] = old_value
+		end
+
+		-- page:SetNodeValue(k, SystemSettingsPage.mouse_select_list[k])
+		value_to_key_list[SystemSettingsPage.mouse_select_list[k]] = k
+	end
+
+	page:Refresh(0.01);
+	
+	GameLogic.GetPlayerController():SaveRemoteData("SystemSettingsPage.mouse_select_list", SystemSettingsPage.mouse_select_list);
+	GameLogic.options:SetMouseSettingList(value_to_key_list)
+end
+
+function SystemSettingsPage.GetMouseSetting(name)
+	if name == nil then
+		return ""
+	end
+
+	return SystemSettingsPage.mouse_select_list[name] or ""
+end
+
+function SystemSettingsPage.OnClickEnableMouseChange(value)
+	page:SetNodeValue("ChangeMouseLeftRight", value);
+
+	local change_event = value and "right" or "left"
+	SystemSettingsPage.OnChangeMouseSetting("DeleteBlock", change_event)
 end

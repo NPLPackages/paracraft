@@ -204,6 +204,8 @@ function Game.OnLogin(worldObj)
 	
 	-- init desktop and UI
 	Desktop.OnActivateDesktop(GameLogic.GetMode());
+
+
 	-- mark as started. 
 	Game.is_started = true;
 	
@@ -233,6 +235,7 @@ function Game.OnLogin(worldObj)
 	Game.mytimer = Game.mytimer or commonlib.Timer:new({callbackFunc = Game.FrameMove})
 	Game.mytimer:Change(30,30);
 
+    GameLogic.After_OnActivateDesktop();
 	LOG.std(nil, "info", "Game", "Game.OnLogin finished");
 end
 

@@ -74,7 +74,10 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 	self.op_mode = nil;
 	self.from_pos = nil;
 	self.to_pos = nil;
-	if(event:button() == "right") then
+	local mouse_setting_list = GameLogic.options:GetMouseSettingList();
+	local mouse_event = event:button() or ""
+
+	if(mouse_setting_list[mouse_event] == "CreateBlock") then
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.isFaceMode = true;
 			self.op_mode = "create";
@@ -93,7 +96,7 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 				end
 			end)
 		end
-	elseif(event:button() == "left") then
+	elseif(mouse_setting_list[mouse_event] == "DeleteBlock") then
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.op_mode = "delete";
 		elseif(Keyboard:IsCtrlKeyPressed())  then

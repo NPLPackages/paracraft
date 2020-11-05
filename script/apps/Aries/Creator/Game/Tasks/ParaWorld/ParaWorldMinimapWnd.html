@@ -12,6 +12,8 @@ ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.P
 isSurface = Page:GetRequestParam("isSurface") == "true"
 if(isSurface) then
     ParaWorldMinimapWnd.OnInit()
+else
+    ParaWorldMinimapWnd.OnInitWnd()
 end
 ]]>
 </script>
@@ -19,8 +21,10 @@ end
     <pe:custom name="surface" src="ParaWorldMinimapSurface.lua" classns="Paracraft.Controls.ParaWorldMinimapSurface" style="margin-left:0px;margin-top:25px;width:192px;height:192px;"></pe:custom>
 </pe:if>
 <pe:if condition="<%=not isSurface%>">
-    <div style="color:#ffffff;padding-left:5px;padding-top:5px;background-color:#000000;height:25px;width:192px">
-        <div style="float:left;width:155px"><%=L"地图"%></div>
+    <div style="color:#ffffff;background-color:#000000;height:25px;width:192px">
+        <div style="float:left;">
+            <input type="button" name="mapName" value='<%=ParaWorldMinimapWnd.nameMap or L"地图"%>' tooltip = '<%=L"点击看作者信息"%>' onclick="ParaWorldMinimapWnd.OnClickMapName" style="color:#aad1f7;background:url();width:192px;height:25px;margin-top:0px;" />
+        </div>
         <!--<div style="float:left;width:155px"><%=ParaWorldMinimapWnd.GetWorldName()%></div>-->
         <!--<input type="button" onclick="ParaWorldMinimapWnd.CloseWindow()" name="close" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#367 63 18 18);width:18px;height:18px;margin-left:5px;" />-->
     </div>

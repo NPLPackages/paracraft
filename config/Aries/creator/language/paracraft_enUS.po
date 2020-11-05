@@ -14642,7 +14642,7 @@ msgid "来自:"
 msgstr "From:"
 
 #: script/apps/Aries/Creator/Game/Login/DownloadWorld.html:45
-msgid "正在下载世界, 请稍后..."
+msgid "正在下载世界, 请稍候..."
 msgstr "Downloading world, please wait..."
 
 #: script/apps/Aries/Creator/Game/Login/InternetLoadWorld.html:93

@@ -25,9 +25,12 @@ local ParaWorldMinimapWnd = commonlib.inherit(nil, commonlib.gettable("MyCompany
 
 -- page only for surface window. Not the realtime window
 local page;
+local pageWnd;
 
 function ParaWorldMinimapWnd:Show()
 	if(not self.window) then
+		ParaWorldMinimapWnd.nameMap = nil;
+		
 		local window = Window:new();
 		window:EnableSelfPaint(true);
 		window:SetAutoClearBackground(false);
@@ -36,6 +39,8 @@ function ParaWorldMinimapWnd:Show()
 
 		self.window2 = Window:new();
 		self.window2:SetCanHaveFocus(false);
+
+		GameLogic.GetFilters():add_filter("OnEnterParaWorldGrid", ParaWorldMinimapWnd.OnEnterParaWorldGrid);
 	end
 
 	self.window:Show({
@@ -53,6 +58,10 @@ end
 
 function ParaWorldMinimapWnd.OnInit()
 	page = document:GetPageCtrl();
+end
+
+function ParaWorldMinimapWnd.OnInitWnd()
+	pageWnd = document:GetPageCtrl();
 end
 
 -- refresh the map
@@ -75,6 +84,7 @@ function ParaWorldMinimapWnd.CloseWindow()
 		self.window2:CloseWindow(true)
 		self.window2 = nil;
 		page = nil;
+		pageWnd = nil;
 	end
 end
 
@@ -115,4 +125,25 @@ function ParaWorldMinimapWnd.OnClickParaWorldList()
 	--_guihelper.MessageBox(L"并行世界列表将在9.11日开放。在新建世界时，选择并行世界，创建属于自己的多人联网并行世界，未来可以邀请好友入驻到你的并行世界中")
 	local ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
 	ParaWorldList.ShowPage();
+end
+
+function ParaWorldMinimapWnd.OnClickMapName()
+	if (ParaWorldMinimapWnd.nameMap and ParaWorldMinimapWnd.userId) then
+		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+		page.ShowUserInfoPage({userId = ParaWorldMinimapWnd.userId});
+	end
+end
+
+-- @param params: {projectName, x, y}
+function ParaWorldMinimapWnd.OnEnterParaWorldGrid(params)
+	ParaWorldMinimapWnd.SetMapName(params.projectName, params.userId);
+	return params;
+end
+
+function ParaWorldMinimapWnd.SetMapName(name, userId)
+	if(pageWnd) then
+		ParaWorldMinimapWnd.nameMap = name;
+		ParaWorldMinimapWnd.userId = userId;
+		pageWnd:SetValue("mapName", name or L"地图")
+	end
 end

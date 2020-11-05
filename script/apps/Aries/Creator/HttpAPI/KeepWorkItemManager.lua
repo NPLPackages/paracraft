@@ -45,6 +45,7 @@ local gsItem = KeepWorkItemManager.GetItemTemplate(gsid);
 KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadProfile");
 KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems");
 
+
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Encoding/base64.lua");
@@ -69,7 +70,7 @@ KeepWorkItemManager.profile = {};
 KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
 KeepWorkItemManager.is_init = false;
-
+KeepWorkItemManager.exid_preload_items = 11000; --preload item after login
 function KeepWorkItemManager.TestMsg(gsid)
     gsid = gsid or 1000;
     _guihelper.MessageBox(gsid);
@@ -328,20 +329,38 @@ function KeepWorkItemManager.Load(bForced, callback)
                     KeepWorkItemManager.LoadProfile(true, function()
                         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载学校信息");
                         KeepWorkItemManager.LoadSchool(true, function()
-                            KeepWorkItemManager.loaded = true;
-                            if(callback)then
-                                callback();
-                            end  
-                            KeepWorkItemManager.LoadMutingInfo(true)
 
-                            KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
-                            KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
+                            KeepWorkItemManager.LoadItemsFromStaticExId(function()
+                                KeepWorkItemManager.loaded = true;
+                                if(callback)then
+                                    callback();
+                                end  
+                                KeepWorkItemManager.LoadMutingInfo(true)
+
+                                KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
+                                KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
+                            end)
+                            
+                            
                         end)
                         
                     end)
                 end)
             end)
         end)
+    end)
+end
+
+-- create or load items from a static exid, these item are used to read/save client data in common
+function KeepWorkItemManager.LoadItemsFromStaticExId(callback)
+    KeepWorkItemManager.DoExtendedCost(KeepWorkItemManager.exid_preload_items,function()
+        if(callback)then
+            callback();
+        end
+    end,function()
+        if(callback)then
+            callback();
+        end
     end)
 end
 function KeepWorkItemManager.LoadGlobalStore(bForced, callback)

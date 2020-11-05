@@ -33,6 +33,7 @@ ParaWorldSites.Available = 4;
 ParaWorldSites.currentRow = 5;
 ParaWorldSites.currentColumn = 5;
 ParaWorldSites.currentName = L"主世界";
+ParaWorldSites.currentItem = nil;
 
 ParaWorldSites.paraWorldName = L"并行世界";
 
@@ -52,6 +53,7 @@ function ParaWorldSites.ShowPage()
 	ParaWorldSites.currentRow = 5;
 	ParaWorldSites.currentColumn = 5;
 	ParaWorldSites.currentName = L"主世界";
+	ParaWorldSites.currentItem = nil;
 	if (not ParaWorldSites.SitesNumber or #ParaWorldSites.SitesNumber < 1) then
 		ParaWorldSites.InitSitesNumber();
 	end
@@ -96,7 +98,7 @@ function ParaWorldSites.GetParaWorldName()
 	return ParaWorldSites.paraWorldName;
 end
 
-function ParaWorldSites.UpdateSitesState()
+function ParaWorldSites.UpdateSitesState(callback)
 	local state = ParaWorldSites.Locked;
 	if (ParaWorldLoginAdapter.ParaWorldId) then
 		state = ParaWorldSites.Available;
@@ -109,7 +111,12 @@ function ParaWorldSites.UpdateSitesState()
 		if (data and data.sites) then
 			ParaWorldSites.paraWorldName = data.name;
 			ParaWorldSites.SetCurrentSite(data.sites);
-			page:Refresh(0);
+			if (page) then
+				page:Refresh(0);
+			end
+			if (callback) then
+				callback();
+			end
 		end
 	end);
 end
@@ -148,9 +155,21 @@ function ParaWorldSites.SetCurrentSite(sites)
 						item.state = ParaWorldSites.Locked;
 					elseif (seat.status == "checked") then
 						item.state = ParaWorldSites.Checked;
+						local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+						if (seat.paraMini and seat.paraMini.userId == userId) then
+							item.state = ParaWorldSites.Selected;
+						end
 					end
 					if (seat.paraMini and seat.paraMini.name) then
 						item.name = seat.paraMini.name;
+						if (_guihelper.GetTextWidth(item.name, "System;16") > 132) then
+							if (string.find(item.name, L"的家园") or string.find(item.name, "_main")) then
+								local text = string.sub(item.name, 1, 8);
+								item.name = string.format(L"%s...的家园", text);
+							else
+								item.name = commonlib.utf8.sub(item.name, 1, 8);
+							end
+						end
 					end
 					break;
 				end
@@ -184,7 +203,6 @@ function ParaWorldSites.InitSitesNumber()
 	-- first down to radius unit, then right to radius unit, up to radius unit, last left to radius unit
 	-- radius from 3 to 9, 3 5 7 9
 	local index = 1;
-	local radius = 3;
 	local corner1, corner2 = 4, 7;
 	for radius = 3, 9, 2 do
 		-- down
@@ -212,7 +230,7 @@ function ParaWorldSites.InitSitesNumber()
 	end
 end
 
-function ParaWorldSites.GetIndexFromPos(row, column)
+function ParaWorldSites.GetSeatNumFromPos(row, column)
 	for i = 1, #ParaWorldSites.SitesNumber do
 		local pos = ParaWorldSites.SitesNumber[i];
 		if (pos.row == row and pos.column == column) then
@@ -221,10 +239,43 @@ function ParaWorldSites.GetIndexFromPos(row, column)
 	end
 end
 
+function ParaWorldSites.GetItemFromPos(row, column)
+	for i = 1, #ParaWorldSites.Current_Item_DS do
+		local item = ParaWorldSites.Current_Item_DS[i];
+		if (item.x == row and item.y == column) then
+			return item;
+		end
+	end
+end
+
+function ParaWorldSites.GotoSelectWorld()
+	local item = ParaWorldSites.currentItem;
+	if (item) then
+		local gen = GameLogic.GetBlockGenerator();
+		local x, y = gen:GetGridXYBy2DIndex(item.y, item.x);
+		local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
+		bx = bx + 64;
+		bz = bz + 64;
+		local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
+		y = y or by;
+		GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
+		ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
+			local cx, _, cz = gen:GetWorldCenter();
+			local bornX = bx + x - cx;
+			local bornZ = bz + z - cz;
+			GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
+		end);
+	else
+		GameLogic.RunCommand("/home");
+	end
+end
+
 function ParaWorldSites.OnClickItem(index)
+	ParaWorldSites.currentItem = nil;
 	local projectId = GameLogic.options:GetProjectId();
 	local item = ParaWorldSites.Current_Item_DS[index];
 	if (item and projectId and tonumber(projectId)) then
+		ParaWorldSites.currentItem = item;
 		ParaWorldSites.currentRow, ParaWorldSites.currentColumn = item.x, item.y;
 		if (item.state == ParaWorldSites.Locked) then
 			ParaWorldSites.currentName = L"该地块已锁定";
@@ -232,7 +283,7 @@ function ParaWorldSites.OnClickItem(index)
 			if (ParaWorldSites.IsOwner) then
 				_guihelper.MessageBox("该地块已锁定，你确定要解锁吗？", function(res)
 					if(res and res == _guihelper.DialogResult.OK) then
-						local id = ParaWorldSites.GetIndexFromPos(item.x, item.y);
+						local id = ParaWorldSites.GetSeatNumFromPos(item.x, item.y);
 						keepwork.world.unlock_seat({paraWorldId=ParaWorldLoginAdapter.ParaWorldId, sn=id}, function(err, msg, data)
 							if (err == 200) then
 								ParaWorldSites.UpdateSitesState();
@@ -241,7 +292,7 @@ function ParaWorldSites.OnClickItem(index)
 					end
 				end, _guihelper.MessageBoxButtons.OKCancel);
 			end
-		elseif (item.state == ParaWorldSites.Checked) then
+		elseif (item.state == ParaWorldSites.Checked or item.state == ParaWorldSites.Selected) then
 			ParaWorldSites.currentName = item.name or L"该地块已有人入驻";
 			page:Refresh(0);
 			local gen = GameLogic.GetBlockGenerator();
@@ -251,17 +302,20 @@ function ParaWorldSites.OnClickItem(index)
 			bz = bz + 64;
 			local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
 			y = y or by;
-			ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true);
-			GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz))
+			GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
+			ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
+				local cx, _, cz = gen:GetWorldCenter();
+				local bornX = bx + x - cx;
+				local bornZ = bz + z - cz;
+				GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
+			end);
 		else
 			ParaWorldSites.currentName = item.name or L"空地";
-			ParaWorldSites.Current_Item_DS[index].state = ParaWorldSites.Selected;
-			page:Refresh(0);
 
 			if (ParaWorldSites.IsOwner) then
 				_guihelper.MessageBox(L"该地块为空地，你确定要锁定吗（否则占座）？", function(res)
 					if(res and res == _guihelper.DialogResult.OK) then
-						local id = ParaWorldSites.GetIndexFromPos(item.x, item.y);
+						local id = ParaWorldSites.GetSeatNumFromPos(item.x, item.y);
 						keepwork.world.lock_seat({paraWorldId=ParaWorldLoginAdapter.ParaWorldId, sn=id}, function(err, msg, data)
 							if (err == 200) then
 								ParaWorldSites.UpdateSitesState();
@@ -286,7 +340,7 @@ function ParaWorldSites.ShowTakeSeat(item, index)
 	
 	ParaWorldTakeSeat.ShowPage(function(res, worldId)
 		if (res) then
-			local id = ParaWorldSites.GetIndexFromPos(item.x, item.y);
+			local id = ParaWorldSites.GetSeatNumFromPos(item.x, item.y);
 			if (not id) then
 				resetState();
 				_guihelper.MessageBox(L"所选的座位无效！");
@@ -311,10 +365,11 @@ function ParaWorldSites.OnClickMain()
 	ParaWorldSites.currentRow = 5;
 	ParaWorldSites.currentColumn = 5;
 	ParaWorldSites.currentName = L"主世界";
+	ParaWorldSites.currentItem = nil;
 	page:Refresh(0);
 end
 
-function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center)
+function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 	if (not ParaWorldSites.SitesNumber or #ParaWorldSites.SitesNumber < 1) then
 		ParaWorldSites.InitSitesNumber();
 	end
@@ -327,8 +382,14 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center)
 		if (item.x == row and item.y == column) then
 			currentItem = item;
 			if (currentItem.loaded) then
-				if (center and currentItem.projectName and currentItem.projectName ~= "") then
-					GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", currentItem.projectName), 3000, "0 255 0");
+				if (center) then
+					GameLogic.GetFilters():apply_filters("OnEnterParaWorldGrid", {projectName = currentItem.projectName, userId = currentItem.userId, x = currentItem.x, y = currentItem.y, });
+					if (currentItem.projectName and currentItem.projectName ~= "") then
+						GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", currentItem.projectName), 3000, "0 255 0");
+						if (currentItem.bornAt and callback) then
+							callback(currentItem.bornAt[1], currentItem.bornAt[2], currentItem.bornAt[3]);
+						end
+					end
 				end
 				return;
 			else
@@ -341,7 +402,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center)
 	end
 
 	currentItem.loaded = true;
-	local sn = ParaWorldSites.GetIndexFromPos(row, column);
+	local sn = ParaWorldSites.GetSeatNumFromPos(row, column);
 	keepwork.world.get({router_params={id=ParaWorldLoginAdapter.ParaWorldId}}, function(err, msg, data)
 		if (data and data.sites) then
 			for i = 1, #data.sites do
@@ -369,22 +430,59 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center)
 							gen:LoadTemplateAtGridXY(x, y, template_file);
 							currentItem.loaded = true;
 							currentItem.projectName = seat.paraMini.name;
+							currentItem.bornAt = seat.paraMini.bornAt;
+							currentItem.userId = seat.paraMini.userId;
 							if (center) then
 								GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", seat.paraMini.name), 3000, "0 255 0");
+								if (seat.paraMini.bornAt and callback) then
+									callback(seat.paraMini.bornAt[1], seat.paraMini.bornAt[2], seat.paraMini.bornAt[3]);
+								end
 							end
 						end
 					end);
 					return;
 				end
 			end
-			currentItem.loaded = false;
+
+			if (center) then
+				GameLogic.GetFilters():apply_filters("OnEnterParaWorldGrid", {projectName = nil, userId = nil, x = currentItem.x, y = currentItem.y, });
+			end
+			if (currentItem.adProjectId) then
+				local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
+				local filename = ParaIO.GetFileName(path);
+				local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
+				KeepworkServiceWorld:GetSingleFile(currentItem.adProjectId, filename, function(content)
+					if (not content) then
+						currentItem.loaded = false;
+						return;
+					end
+
+					local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
+					ParaIO.CreateDirectory(miniTemplateDir);
+					local template_file = miniTemplateDir..currentItem.adProjectId..".xml";
+					local file = ParaIO.open(template_file, "w");
+					if (file:IsValid()) then
+						file:write(content, #content);
+						file:close();
+						local gen = GameLogic.GetBlockGenerator();
+						local x, y = gen:GetGridXYBy2DIndex(column,row);
+						gen:LoadTemplateAtGridXY(x, y, template_file, true);
+						currentItem.loaded = true;
+						currentItem.projectName = nil;
+						currentItem.bornAt = nil;
+						currentItem.userId = nil;
+					end
+				end);
+			else
+				currentItem.loaded = false;
+			end
 		else
 			currentItem.loaded = false;
 		end
 	end);
 end
 
-function ParaWorldSites.LoadMiniWorldInRandom(row, column, center)
+function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 	--[[
 	if (row < 1) then
 		keepwork.miniworld.list({searchType = "school"}, function(err, msg, data)
@@ -408,6 +506,10 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center)
 	if (ParaWorldSites.AllMiniWorld[key] and ParaWorldSites.AllMiniWorld[key].loaded) then
 		if (center and ParaWorldSites.AllMiniWorld[key].projectName and ParaWorldSites.AllMiniWorld[key].projectName ~= "") then
 			GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", ParaWorldSites.AllMiniWorld[key].projectName), 3000, "0 255 0");
+			GameLogic.GetFilters():apply_filters("OnEnterParaWorldGrid", {projectName = ParaWorldSites.AllMiniWorld[key].projectName, userId = ParaWorldSites.AllMiniWorld[key].userId, x = row, y = column, });
+			if (ParaWorldSites.AllMiniWorld[key].bornAt and callback) then
+				callback(ParaWorldSites.AllMiniWorld[key].bornAt[1], ParaWorldSites.AllMiniWorld[key].bornAt[2], ParaWorldSites.AllMiniWorld[key].bornAt[3]);
+			end
 		end
 		return;
 	end
@@ -422,6 +524,9 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center)
 			end
 			if (#worlds < 1) then
 				ParaWorldSites.AllMiniWorld[key].loaded = false;
+				if (center) then
+					GameLogic.GetFilters():apply_filters("OnEnterParaWorldGrid", {projectName = nil, userId = nil, x = currentItem.x, y = currentItem.y, });
+				end
 				return;
 			end
 
@@ -448,8 +553,13 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center)
 					gen:LoadTemplateAtGridXY(x, y, template_file);
 					ParaWorldSites.AllMiniWorld[key].loaded = true;
 					ParaWorldSites.AllMiniWorld[key].projectName = worlds[index].name;
+					ParaWorldSites.AllMiniWorld[key].userId = worlds[index].userId;
+					ParaWorldSites.AllMiniWorld[key].bornAt = worlds[index].bornAt;
 					if (center) then
 						GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", worlds[index].name), 3000, "0 255 0");
+						if (worlds[index].bornAt and callback) then
+							callback(worlds[index].bornAt[1], worlds[index].bornAt[2], worlds[index].bornAt[3]);
+						end
 					end
 				else
 					ParaWorldSites.AllMiniWorld[key].loaded = false;
@@ -461,19 +571,19 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center)
 	end);
 end
 
-function ParaWorldSites.LoadMiniWorldOnPos(x, z)
-	function loadMiniWorld(row, column, center)
+function ParaWorldSites.LoadMiniWorldOnPos(x, z, callback)
+	function loadMiniWorld(row, column, center, callback)
 		if (row < 1 or column < 1 or row > 10 or column > 10) then
-			ParaWorldSites.LoadMiniWorldInRandom(row, column, center);
+			ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback);
 		else
-			ParaWorldSites.LoadMiniWorldOnSeat(row, column, center);
+			ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback);
 		end
 	end
 	if (GameLogic.IsReadOnly() and ParaWorldLoginAdapter.ParaWorldId and WorldCommon.GetWorldTag("world_generator") == "paraworld") then
 		local gen = GameLogic.GetBlockGenerator();
 		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
 		local row, column = gen:Get2DIndexByGridXY(gridX, gridY);
-		loadMiniWorld(row, column, true);
+		loadMiniWorld(row, column, true, callback);
 		for i = -1, 1, 2 do
 			loadMiniWorld(row + i, column);
 			loadMiniWorld(row, column + i);
@@ -492,10 +602,70 @@ function ParaWorldSites.Reset()
 	for i = 1, #ParaWorldSites.Current_Item_DS do
 		ParaWorldSites.Current_Item_DS[i].loaded = false;
 		ParaWorldSites.Current_Item_DS[i].projectName = "";
+		ParaWorldSites.Current_Item_DS[i].userId = userId; 
+		ParaWorldSites.Current_Item_DS[i].bornAt = nil; 
+		ParaWorldSites.Current_Item_DS[i].adProjectId = nil; 
 	end
 
 	for _, item in pairs(ParaWorldSites.AllMiniWorld) do
 		item.loaded = false;
 		item.projectName = "";
+		item.userId = nil;
+		item.bornAt = nil;
 	end
+end
+
+function ParaWorldSites.LoadAdvertisementWorld()
+	--[[
+	function loadTemplate(projectId, row, column)
+		local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
+		local filename = ParaIO.GetFileName(path);
+		local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
+		KeepworkServiceWorld:GetSingleFile(projectId, filename, function(content)
+			if (not content) then
+				return;
+			end
+
+			local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
+			ParaIO.CreateDirectory(miniTemplateDir);
+			local template_file = miniTemplateDir..projectId..".xml";
+			local file = ParaIO.open(template_file, "w");
+			if (file:IsValid()) then
+				file:write(content, #content);
+				file:close();
+				local gen = GameLogic.GetBlockGenerator();
+				local x, y = gen:GetGridXYBy2DIndex(column,row);
+				gen:LoadTemplateAtGridXY(x, y, template_file);
+			end
+		end);
+	end
+	]]
+
+	keepwork.world.paraWorldFillings({}, function(err, msg, data)
+		if (err == 200 and data and #data > 0) then
+			ParaWorldSites.UpdateSitesState(function()
+				local count = 1;
+				for i = 1, #data do
+					if (i > 1) then
+						count = count + data[i-1].quantity;
+					end
+					local index = 1;
+					local projectIds = data[i].projectIds;
+					for j = count, count + data[i].quantity - 1 do
+						if (#projectIds < index) then
+							break;
+						end
+						local projectId = projectIds[index];
+						local row, column = ParaWorldSites.SitesNumber[j].row, ParaWorldSites.SitesNumber[j].column;
+						local item = ParaWorldSites.GetItemFromPos(row, column);
+						if (item and item.state == ParaWorldSites.Available) then
+							--loadTemplate(projectId, row, column);
+							item.adProjectId = projectId;
+							index = index + 1;
+						end
+					end
+				end
+			end);
+		end
+	end);
 end

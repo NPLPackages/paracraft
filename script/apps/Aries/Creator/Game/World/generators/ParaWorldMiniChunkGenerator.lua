@@ -135,10 +135,6 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 		self:OnLockTimer()
 	end})
 	self.lock_timer:Change(1000, 1000);
-
-	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId()) then
-		GameLogic.RunCommand("/ggs connect -silent=false");
-	end
 end
 
 function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
@@ -239,15 +235,21 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	if (myHomeWorldName == currentWorldName and WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		local function uploadMiniWorld(projectId)
 			keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
+				commonlib.echo(data);
 				if (data and type(data) == "table") then
 					for i = 1, #data do
 						local world = data[i];
 						if (world.projectId == projectId) then
+							--[[
 							local worldName = world.worldName;
 							if (world.extra and world.extra.worldTagName) then
 								worldName = world.extra.worldTagName;
 							end
-							keepwork.miniworld.upload({projectId = projectId, name = worldName, type="main", commitId = world.commitId, block = self:GetTotalCount()}, function(err, msg, data)
+							]]
+							local player = EntityManager.GetPlayer()
+							local x, y, z = player:GetBlockPos();
+							keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
+								block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)
 								if (err == 200) then
 									_guihelper.MessageBox(L"上传成功！");
 								end

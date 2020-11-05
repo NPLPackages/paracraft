@@ -10,6 +10,7 @@ DockPage.Show();
 DockPage.Hide();
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
@@ -29,8 +30,7 @@ DockPage.top_line_1 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"", },
---    { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangrenwu_32bits.png#0 0 85 75", },
+    { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangrenwu_32bits.png#0 0 85 75", },
     { label = L"用户社区", id = "web_keepwork_home", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_yonghushequ_32bits.png#0 0 85 75", },
     { label = L"大赛", id = "competition", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_dasai_32bits.png#0 0 85 75", },
 }
@@ -74,6 +74,10 @@ function DockPage.Show()
         DockPage.HandleFriendsRedTip(true);
     end)
 
+    -- 每日首次登陆自动打开任务面板
+    if not DailyTaskManager.CheckIsFirstOpenView() then
+        DailyTaskManager.OpenDailyTaskView()
+    end
 end
 function DockPage.Hide()
     DockPage.is_show = false;

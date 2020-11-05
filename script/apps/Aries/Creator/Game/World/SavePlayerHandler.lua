@@ -10,6 +10,7 @@ local SavePlayerHandler = commonlib.gettable("MyCompany.Aries.Game.SavePlayerHan
 local world_info = SavePlayerHandler:new();
 -------------------------------------------------------
 ]]
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local SavePlayerHandler = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.SavePlayerHandler"));
 
 -- x,y,z,block_id
@@ -48,6 +49,15 @@ function SavePlayerHandler:ReadPlayerData(entity)
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot and xmlRoot[1]) then
 		local node = xmlRoot[1]
+		if( GameLogic.IsSocialWorld() and node.attr) then
+			-- disable skin and main asset, using the social outfit for current player. 
+			if(node.attr.skin) then
+				node.attr.skin = nil;
+			end
+			if(node.attr.model_filename) then
+				node.attr.model_filename = nil;
+			end
+		end
 		entity:LoadFromXMLNode(node);
 		LOG.std(nil,"info", "SavePlayerHandler", "loaded player %s from file", name);
 		return node;

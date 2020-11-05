@@ -109,9 +109,19 @@ function ParaWorldMinimapSurfaceRealtime:mousePressEvent(mouse_event)
 		local x, z = self:MapToWorldPos(pos[1], pos[2])
 		local y = self:GetHeightByWorldPos(x, z)
 		if(x>0 and x<64000 and z>0 and z<64000) then
-			local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
-			ParaWorldSites.LoadMiniWorldOnPos(x, z);
 			self:GotoPos(x, z)
+			local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+			ParaWorldSites.LoadMiniWorldOnPos(x, z, function(bx, by, bz)
+				local gen = GameLogic.GetBlockGenerator();
+				local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
+				local ox, _, oz = gen:GetBlockOriginByGridXY(gridX, gridY);
+				ox = ox + 64;
+				oz = oz + 64;
+				local cx, _, cz = gen:GetWorldCenter();
+				local bornX = ox + bx - cx;
+				local bornZ = oz + bz - cz;
+				GameLogic.RunCommand(format("/goto %d %d %d", bornX, by, bornZ));
+			end);
 		end
 	elseif(mouse_event:button() == "right") then
 		mouse_event:accept();

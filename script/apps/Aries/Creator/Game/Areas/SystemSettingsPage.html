@@ -61,6 +61,10 @@ function ChangeFullScreenMode()
     SystemSettingsPage.OnClickEnableFullScreenMode();
 end
 
+function GetMouseSetting(name)
+    return SystemSettingsPage.GetMouseSetting(name);
+end
+
 ]]></script>
 <!--<aries:window title="系统设置" style="width:350px;height:430px;" onclose="MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage.OnCancel">-->
     <div style="width:350px;height:430px;" class="mc_panel">
@@ -245,61 +249,117 @@ end
                 </pe:if>
                 <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"消除方块" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"消除方块" %></div>
                         <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
-                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 186 11 13)"/>
+                            <pe:if condition='<%=GetMouseSetting("DeleteBlock") == "left" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("DeleteBlock") == "right" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("DeleteBlock") == "middle" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#69 186 11 13)"/>
+                            </pe:if>
                         </div>
+
+                        <!-- <div style="float:left;margin-left:10px;font-size:11px;">
+                            <select name = "DeleteBlock" AllowUserEdit="false" style="height:22px" onselect="SystemSettingsPage.OnChangeMouseSetting">
+                                <option value="left" selected='true'>左键</option>
+                                <option value="right">右键</option>
+                                <option value="middle">滚轮</option>
+                            </select>
+                        </div> -->
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"放置方块" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"放置方块" %></div>
                         <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
-                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 186 11 13)"/>
+                            <pe:if condition='<%=GetMouseSetting("CreateBlock") == "left" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("CreateBlock") == "right" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("CreateBlock") == "middle" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#69 186 11 13)"/>
+                            </pe:if>
                         </div>
+
+                        <!-- <div style="float:left;margin-left:10px;font-size:11px;">
+                            <select name = "CreateBlock" AllowUserEdit="false" style="height:22px" onselect="SystemSettingsPage.OnChangeMouseSetting">
+                                <option value="left">左键</option>
+                                <option value="right" selected='true'>右键</option>
+                                <option value="middle">滚轮</option>
+                            </select>
+                        </div> -->
                     </div>
+                    <!-- <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"鼠标左右互换" %></div>
+                    <div style="float:left;margin-top:2px;margin-left:0px;">
+                        <input name='btn_MouseChange' value='开' type="button" onclick='SystemSettingsPage.OnClickEnableMouseChange' style="width:100px;height:20px;font-size:12px;background:Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#382 197 40 18:8 8 8 8;" class="mc_light_grey_button_with_fillet"/>
+                    </div> -->
+                    <input type="checkbox" name="ChangeMouseLeftRight" style="margin-left:123px;margin-top:3px;" onclick="SystemSettingsPage.OnClickEnableMouseChange"/>
+                    <div style="float:left;margin-left:3px;" for="ChangeMouseLeftRight"><%=L"鼠标左右互换"%></div>
+
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"选择方块" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"选择方块" %></div>
                         <div style="float:left;margin-top:2px;margin-left:20px;width:100px;height:20px;" class="mc_light_grey_button_with_fillet">
-                            <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#69 186 11 13)"/>
+                            <pe:if condition='<%=GetMouseSetting("ChooseBlock") == "left" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("ChooseBlock") == "right" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#51 186 11 13)"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetMouseSetting("ChooseBlock") == "middle" %>' >
+                                <div style="margin-left:42px;margin-top:3px;width:11px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#69 186 11 13)"/>
+                            </pe:if>
                         </div>
+
+                        <!-- <div style="float:left;margin-left:10px;font-size:11px;">
+                            <select name = "ChooseBlock" AllowUserEdit="false" style="height:22px" onselect="SystemSettingsPage.OnChangeMouseSetting">
+                                <option value="left">左键</option>
+                                <option value="right">右键</option>
+                                <option value="middle" selected='true'>滚轮</option>
+                            </select>
+                        </div> -->
                     </div>
+
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向前" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"向前" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">W</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向左" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"向左" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">A</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"后退" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"后退" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">S</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"向右" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"向右" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">D</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"跳跃" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"跳跃" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Space</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"潜行" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"潜行" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Shift</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"飞翔" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"飞翔" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">F</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"帮助" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"帮助" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">F1</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"撤销上步操作" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"撤销上步操作" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Ctrl + Z</div>
                     </div>
                     <div style="height:25px;margin-top:4px;">
-                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:center;font-size:12px;" ><%=L"返回上步操作" %></div>
+                        <div style="float:left;margin-left:5px;width:100px;height:20px;text-align:center;font-size:12px;" ><%=L"返回上步操作" %></div>
                         <div style="float:left;margin-top:0px;margin-left:20px;width:100px;height:20px;text-align:center;font-size:12px;" class="mc_light_grey_button_with_fillet">Ctrl + Y</div>
                     </div>
                 </pe:if>

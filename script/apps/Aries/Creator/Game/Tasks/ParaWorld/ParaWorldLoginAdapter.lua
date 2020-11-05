@@ -79,10 +79,6 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
     ]]
     keepwork.world.mylist({
     },function(err, msg, data)
-        commonlib.echo("==========world.mylist");
-        commonlib.echo(err);
-        commonlib.echo(msg);
-        commonlib.echo(data,true);
         local world_id = ParaWorldLoginAdapter.GetDefaultWorldID();
         if(err == 200)then
             -- the first item is right world
@@ -166,6 +162,8 @@ function ParaWorldLoginAdapter.CheckAndReset()
 					if (data[i].projectId == tonumber(projectId)) then
 						ParaWorldLoginAdapter.MainWorldId = data[i].projectId;
 						ParaWorldLoginAdapter.ParaWorldId = data[i].id;
+						local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+						ParaWorldSites.LoadAdvertisementWorld();
 						return;
 					end
 				end
@@ -177,6 +175,8 @@ function ParaWorldLoginAdapter.CheckAndReset()
 						if (data.rows[i].projectId == tonumber(projectId)) then
 							ParaWorldLoginAdapter.MainWorldId = data.rows[i].projectId;
 							ParaWorldLoginAdapter.ParaWorldId = data.rows[i].id;
+							local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");
+							ParaWorldSites.LoadAdvertisementWorld();
 							break;
 						end
 					end

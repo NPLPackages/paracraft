@@ -23,6 +23,10 @@ HttpWrapper.Create("keepwork.world.worlds_list", "%MAIN%/core/v0/worlds", "GET",
 -- 获取用户学校大世界
 HttpWrapper.Create("keepwork.world.myschoolParaWorld", "%MAIN%/core/v0/3DCampus/my/schoolParaWorld", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3387
+-- 获取随机并行世界填充
+HttpWrapper.Create("keepwork.world.paraWorldFillings", "%MAIN%/core/v0/3DCampus/paraWorldFillings", "GET", true)
+
 
 --http://yapi.kp-para.cn/project/32/interface/api/2752
 -- 上传paraMini世界

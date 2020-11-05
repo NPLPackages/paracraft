@@ -90,7 +90,7 @@ local names;
 -- TODO: testing only, replace this with 
 -- local BlockTerrain = ParaTerrain;
 local BlockTerrain = commonlib.gettable("MyCompany.Aries.Game.Fake_ParaTerrain")
-
+local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 -- expose to global environment
 _G["GameLogic"] = commonlib.gettable("MyCompany.Aries.Game.GameLogic"); 
 _G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
@@ -226,6 +226,10 @@ function GameLogic.InitCommon()
 	GameLogic.CreateGetAutoSaver();
 
 	if (not System.options.isCodepku) then
+
+        local DockAssetsPreloader = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockAssetsPreloader.lua");
+        DockAssetsPreloader.Start();
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
 		local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
 		UserIntroduction.StaticInit()
@@ -252,6 +256,29 @@ function GameLogic.InitCommon()
 	ParaWorldMain:Init()
 end
 
+-- for checking desktop state after activate desktop
+function GameLogic.After_OnActivateDesktop()
+    local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+
+
+    if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and KeepworkService:IsSignedIn()) then
+	    local generatorName = WorldCommon.GetWorldTag("world_generator");
+        if(generatorName == "paraworld")then
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GameDock.lua");
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BuilderDock.lua");
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+            local GameDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GameDock");
+            local BuilderDock = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderDock");
+            local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+            GameDock.ShowPage(false);
+		    BuilderDock.ShowPage(false);
+		    QuickSelectBar.ShowPage(false);
+        end
+	end
+end
 -- call this when user first enters a game world.
 function GameLogic.Init(worldObj)
 	GameLogic.InitCommon();
@@ -748,6 +775,8 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	NeuronManager.SaveToFile(bSaveToLastSaveFolder);
 	EntityManager.SaveToFile(bSaveToLastSaveFolder==true);
 	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+	DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.UpdataWorld)
+
 	ModManager:OnWorldSave();
 	GameLogic.world_revision:UpdateWorldFileSize();
 	GameLogic:WorldSaved(); -- signal
@@ -1711,6 +1740,11 @@ function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
 			end
 		end
 	end
+end
+
+-- if the current world is social, where the current player maintains its social outfit. 
+function GameLogic.IsSocialWorld()
+	return Paracraft.Controls.ParaWorldMain:IsCurrentParaWorld();
 end
 
 local errorCount = 1;

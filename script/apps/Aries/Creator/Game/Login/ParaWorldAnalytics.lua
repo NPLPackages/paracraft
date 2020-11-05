@@ -369,7 +369,9 @@ function ParaWorldAnalytics:staticInit( ... )
 	self.behaviorParamMap 	= behaviorParamMap
 	self.timeInterval 	= 5000 	-- 间隔两秒
 	self.timeSaveLimit 	= 10 	-- 120秒
-	self.userId 	= Mod.WorldShare.Store:Get("user/userId")
+    if(Mod and Mod.WorldShare and Mod.WorldShare.Store)then
+	    self.userId 	= Mod.WorldShare.Store:Get("user/userId")
+    end
 	self.defaultJasonInfo 	= commonlib.Json.Encode({});
 
 	self:sendLastData()
@@ -377,7 +379,7 @@ function ParaWorldAnalytics:staticInit( ... )
 end
 
 function ParaWorldAnalytics:sendLastData()
-	if not KeepworkServiceSession:IsSignedIn() then
+	if not KeepworkServiceSession or not KeepworkServiceSession:IsSignedIn() then
 		return 
 	end
 	local behaviorParamMap 	= self.behaviorParamMap

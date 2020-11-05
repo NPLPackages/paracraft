@@ -17,6 +17,7 @@ local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowse
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
+local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 
 local ParacraftLearningRoomDailyPage = NPL.export()
 
@@ -192,6 +193,9 @@ function ParacraftLearningRoomDailyPage.ShowPage()
 	    page:CallMethod("item_gridview", "ScrollToRow", row);
     end
 
+	if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
+		GameLogic.AddBBS("desktop", L"至少需要学习20秒才能获得学习任务奖励哦~", 3000, "0 255 0"); 
+	end
 end
 function ParacraftLearningRoomDailyPage.ClosePage()
 	if(page)then
@@ -217,15 +221,7 @@ function ParacraftLearningRoomDailyPage.OnCheckinToday()
     local index = ParacraftLearningRoomDailyPage.GetNextDay();
 	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnCheckinToday", index);
 	ParacraftLearningRoomDailyPage.ClosePage();
-	local exid = ParacraftLearningRoomDailyPage.exid;
-	KeepWorkItemManager.DoExtendedCost(exid, function()
-		ParacraftLearningRoomDailyPage.SaveToLocal();
-		_guihelper.MessageBox(L"今日签到成功，自动获得4个知识豆。关闭窗口后将自动播放今日学习视频。", function(res)
-			ParacraftLearningRoomDailyPage.OnOpenWeb(index)
-		end, _guihelper.MessageBoxButtons.OK);    
-	end, function()
-		_guihelper.MessageBox(L"签到失败！");
-	end)
+	ParacraftLearningRoomDailyPage.OnOpenWeb(index)
 end
 function ParacraftLearningRoomDailyPage.IsVip()
 	return KeepWorkItemManager.IsVip()
@@ -256,18 +252,21 @@ function ParacraftLearningRoomDailyPage.HasCheckedToday()
 	local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
 	return clientData[key];
 end
-function ParacraftLearningRoomDailyPage.SaveToLocal()
+function ParacraftLearningRoomDailyPage.SaveToLocal(callback)
 	local date = ParaGlobal.GetDateFormat("yyyy-M-d");
 	local key = string.format("LearningRoom_HasCheckedToday_%s", date);
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
 	clientData[key] = true;
     for k, v in pairs(clientData) do
-        if(k ~= key)then
-	        clientData[k] = nil; -- clear other days
+		if(k ~= key)then
+			if string.find(k, "daily_task_data") == nil then
+				clientData[k] = nil; -- clear other days
+			end
         end
-    end
-	KeepWorkItemManager.SetClientData(gsid, clientData)
+	end
+	
+	KeepWorkItemManager.SetClientData(gsid, clientData, callback)
 end
 function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
     if(not NplBrowserLoaderPage.IsLoaded())then
@@ -292,10 +291,32 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
     end
 	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnOpenWeb", index);
 	local url = string.format("https://keepwork.com/official/tips/s1/1_%d",index);
+	local start_time = os.time()
+
 	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, "", false, true, nil, function(state)
 		if(state == "ONCLOSE")then
             NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
-            ParacraftLearningRoomDailyPage.ShowPage();
+			
+			
+			local end_time = os.time()
+			if not ParacraftLearningRoomDailyPage.HasCheckedToday() and end_time - start_time >= 20 then
+				local exid = ParacraftLearningRoomDailyPage.exid;
+				KeepWorkItemManager.DoExtendedCost(exid, function()
+					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
+					-- _guihelper.MessageBox(L"今日签到成功，自动获得4个知识豆。", function(res)
+						
+					-- end, _guihelper.MessageBoxButtons.OK);   
+					-- ParacraftLearningRoomDailyPage.ShowPage();
+
+					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
+					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
+					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
+				end, function()
+					_guihelper.MessageBox(L"签到失败！");
+				end)
+			else
+				ParacraftLearningRoomDailyPage.ShowPage();
+			end
 		end
 	end);
 end

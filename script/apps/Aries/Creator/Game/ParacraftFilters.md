@@ -97,6 +97,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "download_remote_world_show_bbs", true: whether show bbs when downloading remote world.
   - "file_downloader_show_label", true, when fileDownloader downloads, choose whether to display the download progress prompt.
   - "WorldName.ResetWindowTitle": get custom window title for the world
+  - "OnEnterParaWorldGrid" params {projectName, userId, x, y}: when player enters a new paraworld grid at x, y
+
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
   - "desktop_menu", menu_items:
