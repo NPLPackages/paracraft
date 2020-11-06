@@ -378,8 +378,8 @@ function ParaWorldAnalytics:staticInit( ... )
 	self:timerInit()
 end
 
-function ParaWorldAnalytics:sendLastData()
-	if not KeepworkServiceSession or not KeepworkServiceSession:IsSignedIn() then
+function ParaWorldAnalytics:sendLastData()	
+	if System.options.isCodepku or not KeepworkServiceSession or not KeepworkServiceSession:IsSignedIn() then
 		return 
 	end
 	local behaviorParamMap 	= self.behaviorParamMap

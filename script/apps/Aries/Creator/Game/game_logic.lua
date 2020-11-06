@@ -258,13 +258,15 @@ end
 
 -- for checking desktop state after activate desktop
 function GameLogic.After_OnActivateDesktop()
-    local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+		
+	local isKeepworkSignIn = not System.options.isCodepku and KeepworkService:IsSignedIn();
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
     local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 
 
-    if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and KeepworkService:IsSignedIn()) then
+    if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and isKeepworkSignIn) then
 	    local generatorName = WorldCommon.GetWorldTag("world_generator");
         if(generatorName == "paraworld")then
             NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GameDock.lua");
