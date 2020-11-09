@@ -170,7 +170,7 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 			if(node) then
 				for _, fileNode in ipairs(node) do
 					local filename = fileNode.attr.filename
-					local filepath = GameLogic.GetWorldDirectory()..filename;
+					local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
 					if(not ParaIO.DoesFileExist(filepath, true)) then
 						local text = fileNode[1];
 						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
@@ -331,7 +331,7 @@ function BlockTemplate:SaveTemplateToString()
 		if(files) then
 			for filename, _ in pairs(files) do
 				-- only export files in the current world directory. 
-				local filepath = GameLogic.GetWorldDirectory()..filename;
+				local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
 				local file = ParaIO.open(filepath, "r")
 				if(file:IsValid()) then
 					local text = file:GetText(0, -1);

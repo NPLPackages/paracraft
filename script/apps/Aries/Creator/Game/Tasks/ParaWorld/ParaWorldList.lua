@@ -77,6 +77,7 @@ function ParaWorldList.ShowPage()
 					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data[i];
 					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS].top = true;
 				end
+				page:Refresh(0);
 				myParaWorldCount = #data;
 			end
 

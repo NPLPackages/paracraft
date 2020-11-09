@@ -174,18 +174,38 @@ function DailyTaskManager.CheckTaskCompelete(task_id)
 end
 
 function DailyTaskManager.OpenDailyTaskView()
-	commonlib.TimerManager.SetTimeout(function()
+	local open_cb = function ()
 		if TaskKey == nil then
 			return
 		end
 		
+		if MyCompany.Aries.Creator.Game.Desktop.App == nil then
+			return
+		end
+
+		if DailyTaskManager.CheckIsFirstOpenView() then
+			return
+		end
+
 		local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
 		DailyTask.Show();
 	
 		local clientData = DailyTaskManager.GetClientData()
 		clientData[TaskKey].is_auto_open_view = true
 		KeepWorkItemManager.SetClientData(DailyTaskManager.gsid, clientData)
-	end, 1000);
+	end
+	
+	commonlib.TimerManager.SetTimeout(function()
+		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+		if DockPage.IsShow() then
+			if(not KeepWorkItemManager.IsLoaded())then
+				KeepWorkItemManager.GetFilter():add_filter("loaded_all", open_cb);
+				return
+			end
+		
+			open_cb()
+		end
+	end, 3000);
 end
 
 -- 检测当天是否自动弹出过任务面板

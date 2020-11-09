@@ -241,7 +241,7 @@ function ParaWorldSites.GotoSelectWorld()
 	local item = ParaWorldSites.currentItem;
 	if (item) then
 		local gen = GameLogic.GetBlockGenerator();
-		local x, y = gen:GetGridXYBy2DIndex(item.y, item.x);
+		local x, y = 5 - item.x, 5 - item.y;
 		local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
 		bx = bx + 64;
 		bz = bz + 64;
@@ -297,7 +297,7 @@ function ParaWorldSites.OnClickItem(index)
 						ParaWorldSites.ShowAdminSeat(item, index);
 					else
 						local gen = GameLogic.GetBlockGenerator();
-						local x, y = gen:GetGridXYBy2DIndex(item.y, item.x);
+						local x, y = 5 - item.x, 5 - item.y;
 						local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
 						bx = bx + 64;
 						bz = bz + 64;
@@ -314,7 +314,7 @@ function ParaWorldSites.OnClickItem(index)
 				end);
 			else
 				local gen = GameLogic.GetBlockGenerator();
-				local x, y = gen:GetGridXYBy2DIndex(item.y, item.x);
+				local x, y = 5 - item.x, 5 - item.y;
 				local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
 				bx = bx + 64;
 				bz = bz + 64;
@@ -341,7 +341,7 @@ function ParaWorldSites.OnClickItem(index)
 							end
 						end);
 					else
-						ParaWorldSites.ShowTakeSeat(item, index);
+						ParaWorldSites.ShowAdminSeat(item, index);
 					end
 				end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil,{ ok = L"锁定", cancel = L"占座", });
 			else
@@ -473,7 +473,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 							file:write(content, #content);
 							file:close();
 							local gen = GameLogic.GetBlockGenerator();
-							local x, y = gen:GetGridXYBy2DIndex(column,row);
+							local x, y = 5 - row, 5 - column;
 							gen:LoadTemplateAtGridXY(x, y, template_file);
 							currentItem.loaded = true;
 							currentItem.projectName = seat.paraMini.name;
@@ -512,7 +512,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 						file:write(content, #content);
 						file:close();
 						local gen = GameLogic.GetBlockGenerator();
-						local x, y = gen:GetGridXYBy2DIndex(column,row);
+						local x, y = 5 - row, 5 - column;
 						gen:LoadTemplateAtGridXY(x, y, template_file, true);
 						currentItem.loaded = true;
 						currentItem.projectName = nil;
@@ -596,7 +596,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 					file:write(content, #content);
 					file:close();
 					local gen = GameLogic.GetBlockGenerator();
-					local x, y = gen:GetGridXYBy2DIndex(column,row);
+					local x, y = 5 - row, 5 - column;
 					gen:LoadTemplateAtGridXY(x, y, template_file);
 					ParaWorldSites.AllMiniWorld[key].loaded = true;
 					ParaWorldSites.AllMiniWorld[key].projectName = worlds[index].name;
@@ -734,7 +734,7 @@ function ParaWorldSites.CreateArrow(param, mcmlNode)
 		local x, y, z = player:GetBlockPos();
 		local gen = GameLogic.GetBlockGenerator();
 		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
-		row, column = gen:Get2DIndexByGridXY(gridX, gridY);
+		row, column = 5 - gridX, 5 - gridY;
 	end
 	local _this = ParaUI.CreateUIObject("container", "ParaWorldSites_Arrow", "_lt", param.left,param.top,26,26);
 	_this.background = "Texture/Aries/Creator/keepwork/map/maparrow_32bits.png";

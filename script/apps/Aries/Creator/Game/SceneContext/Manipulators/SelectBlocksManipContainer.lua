@@ -76,8 +76,18 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 	self.to_pos = nil;
 	local mouse_setting_list = GameLogic.options:GetMouseSettingList();
 	local mouse_event = event:button() or ""
+	local setting = mouse_setting_list[mouse_event]
 
-	if(mouse_setting_list[mouse_event] == "CreateBlock") then
+	-- 按住ctrl的时候 还是按照以前使用左键的逻辑 以前左键是用作 DeleteBlock
+	if event.ctrl_pressed and mouse_setting_list["left"] == "CreateBlock" then
+		if setting == "CreateBlock" then
+			setting = "DeleteBlock"
+		elseif setting == "DeleteBlock" then
+			setting = "CreateBlock"
+		end
+	end
+
+	if(setting == "CreateBlock") then
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.isFaceMode = true;
 			self.op_mode = "create";
@@ -96,7 +106,7 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 				end
 			end)
 		end
-	elseif(mouse_setting_list[mouse_event] == "DeleteBlock") then
+	elseif(setting == "DeleteBlock") then
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.op_mode = "delete";
 		elseif(Keyboard:IsCtrlKeyPressed())  then

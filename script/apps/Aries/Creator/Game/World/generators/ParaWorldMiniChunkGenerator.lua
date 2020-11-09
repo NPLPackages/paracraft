@@ -227,6 +227,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	self:ShowBlockTip()
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
 		params = params,
+		exportReferencedFiles = true,
 		blocks = blocks})
 	task:Run();
 

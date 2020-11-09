@@ -75,9 +75,7 @@ function DockPage.Show()
     end)
 
     -- 每日首次登陆自动打开任务面板
-    if not DailyTaskManager.CheckIsFirstOpenView() then
-        DailyTaskManager.OpenDailyTaskView()
-    end
+    DailyTaskManager.OpenDailyTaskView()
 end
 function DockPage.Hide()
     DockPage.is_show = false;

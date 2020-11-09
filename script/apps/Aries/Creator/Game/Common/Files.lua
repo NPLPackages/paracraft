@@ -31,6 +31,19 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
+-- additional world search path
+Files.worldSearchPath = nil;
+
+-- currently only one addtional world search path can be added. 
+function Files.AddWorldSearchPath(worldPath)
+	Files.worldSearchPath = worldPath;
+end
+
+-- this is called when world exits
+function Files.ClearWorldSearchPaths()
+	Files.worldSearchPath = nil;
+end
+
 -- @param filename: the filename maybe relative to the current world or the SDK root. 
 -- in case it is relative to the world, we will return a path relative to SDK root. 
 -- @param search_folder: if nil, it is current world directory, otherwise, one can specify an additional search folder in addition to current world directory. 
@@ -42,6 +55,7 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 		if(any_filename:match("^/\\")) then
 			any_filename = any_filename:gsub("^/\\+", "");
 		end
+		search_folder = search_folder or Files.worldSearchPath
 		if(not ParaIO.DoesAssetFileExist(any_filename, true)) then
 			local filename = GameLogic.GetWorldDirectory()..any_filename;
 			if(ParaIO.DoesAssetFileExist(filename, true)) then
@@ -127,6 +141,7 @@ Files.reverse_cache = {};
 function Files:ClearFindFileCache()
 	self.reverse_cache = {};
 	self.cache = {};
+	Files.ClearWorldSearchPaths()
 end
 
 function Files:UnloadAllUnusedAssets()
@@ -185,7 +200,7 @@ function Files:UnloadAllWorldAssets()
 		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
-				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$");
+				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
 				if(ext) then
 					ext = string.lower(ext)
 					if(ext == "bmax" or ext == "x" or ext == "fbx") then
@@ -203,7 +218,7 @@ function Files:UnloadAllWorldAssets()
 		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
-				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$");
+				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
 				-- also release http textures
 				if(not ext and filename:match("^https?://")) then
 					local localFilename = attr:GetField("LocalFileName", "")	

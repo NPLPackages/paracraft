@@ -273,14 +273,23 @@ function EditContext:mouseReleaseEvent(event)
 		else
 			local mouse_setting_list = GameLogic.options:GetMouseSettingList();
 			local mouse_event = event.mouse_button or ""
+			local setting = mouse_setting_list[mouse_event]
+			-- 按住ctrl的时候 并且反转了鼠标之后 还是按照以前使用左键的逻辑 以前左键是用作 DeleteBlock
+			if event.ctrl_pressed and mouse_setting_list["left"] == "CreateBlock" then
+				if setting == "CreateBlock" then
+					setting = "DeleteBlock"
+				elseif setting == "DeleteBlock" then
+					setting = "CreateBlock"
+				end
+			end
 
-			if mouse_setting_list[mouse_event] == "DeleteBlock" then
+			if setting == "DeleteBlock" then
 				event.mouse_button = "left"
 				self:handleLeftClickScene(event, result);
-			elseif mouse_setting_list[mouse_event] == "CreateBlock" then
+			elseif setting == "CreateBlock" then
 				event.mouse_button = "right"
 				self:handleRightClickScene(event, result);
-			elseif mouse_setting_list[mouse_event] == "ChooseBlock" then
+			elseif setting == "ChooseBlock" then
 				event.mouse_button = "middle"
 				self:handleMiddleClickScene(event, result);
 			end

@@ -26,14 +26,22 @@ TeachingQuestPage.currentIndex = -1;
 -- TeachingQuestPage.programExid = 10003;
 -- TeachingQuestPage.animationExid = 10004;
 -- TeachingQuestPage.cadExid = 10005;
--- TeachingQuestPage.robotExid = 10006;
+-- TeachingQuestPage.languageExid = 10006;
+-- TeachingQuestPage.MathExid = 10007;
+-- TeachingQuestPage.englishExid = 10008;
+-- TeachingQuestPage.scienceExid = 10009;
+-- TeachingQuestPage.humanitiesExid = 10010;
 TeachingQuestPage.TaskExids = {10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010};
 
 -- task exid
 -- TeachingQuestPage.programExidVip = 10013;
 -- TeachingQuestPage.animationExidVip = 10014;
 -- TeachingQuestPage.cadExidVip = 10015;
--- TeachingQuestPage.robotExidVip = 10016;
+-- TeachingQuestPage.languageExidVip = 10016;
+-- TeachingQuestPage.MathExidVip = 10017;
+-- TeachingQuestPage.englishExidVip = 10018;
+-- TeachingQuestPage.scienceExidVip = 10019;
+-- TeachingQuestPage.humanitiesExidVip = 10040;
 TeachingQuestPage.VipTaskExids = {10013, 10014, 10015, 10016, 10017, 10018, 10019, 10040};
 
 -- task gsid
@@ -347,9 +355,10 @@ function TeachingQuestPage.OnClickItem(index)
 			has_special_jurisdiction = result
 			
 			local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
-			if (TeachingQuestPage.IsVip() or has_special_jurisdiction) then
+			if (TeachingQuestPage.IsVip()) then
 				exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
 			end
+			
 			KeepWorkItemManager.CheckExchange(exid, function(canExchange)
 				if (canExchange.data) then
 					StartTask();

@@ -31,12 +31,15 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
 
 -- this is the host side ignore list, which could be different from ParaWorldMiniChunkGenerator's ignoreList
 local ignoreList = {[9]=true,[253]=true,[110]=true,[216]=true,[217]=true,[196]=true,[218]=true,
-	[219]=true,[215]=true,[254]=true,[189]=true, [221]=true,[212]=true, [22]=true,
+	[219]=true,[189]=true, [221]=true,[212]=true, 
+	-- [22]=true,[254]=true,  -- bmax is supported
+	-- [215]=true, -- chest
 };
 
 
@@ -55,7 +58,23 @@ function ParaWorldChunkGenerator:OnExit()
 	ParaWorldChunkGenerator._super.OnExit(self);
 end
 
+-- for temporary world files
+function ParaWorldChunkGenerator:GetWorldSearchPath()
+	if(not self.worldSearchPath) then
+		self.worldSearchPath = ParaIO.GetWritablePath().."temp/paraworld/temp/";
+	end
+	return self.worldSearchPath;
+end
+
 function ParaWorldChunkGenerator:OnLoadWorld()
+	local searchPath = self:GetWorldSearchPath();
+	local result = commonlib.Files.Find({}, searchPath, 3, 10000, "*.*") or {};
+	for i, file in ipairs(result) do
+		ParaIO.DeleteFile(searchPath..file.filename)
+	end
+	
+	Files.AddWorldSearchPath(searchPath)
+
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 
@@ -171,7 +190,10 @@ end
 -- call this function to use a worker thread to load the template file
 -- @param bEnableLogics: true to enable logics like code block and movie block in the file
 function ParaWorldChunkGenerator:LoadTemplateAsync(x, y, z, filename, bEnableLogics)
-	self:InvokeCustomFuncAsync("LoadTemplateAsyncImp", {x=x, y=y, z=z, filename=filename, bEnableLogics = bEnableLogics})
+	self:InvokeCustomFuncAsync("LoadTemplateAsyncImp", {
+			x=x, y=y, z=z, filename=filename, bEnableLogics = bEnableLogics, 
+			worldDir = GameLogic.GetWorldDirectory(),
+		})
 end
 
 -- consider using LoadTemplateAsync instead. 
@@ -385,7 +407,7 @@ function ParaWorldChunkGenerator:LoadTemplateImp(params)
 end
 
 -- this function is called in worker thread
--- @param params: {x, y, z, filename}
+-- @param params: {x, y, z, filename, worldDir}
 function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
@@ -400,6 +422,33 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 	if(xmlRoot) then
 		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
 		if(root_node and root_node[1]) then
+			local references = commonlib.XPath.selectNode(root_node, "/references");
+			if(references) then
+				-- "/pe:blocktemplate/references/file"
+				local worldSearchDir = self:GetWorldSearchPath();
+				NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+				for _, file in ipairs(commonlib.XPath.selectNodes(references, "/file") or {}) do
+					if(file.attr) then
+						local filename = file.attr.filename;
+						if(file[1] and filename) then
+							local fileData = System.Encoding.unbase64(file[1])
+							if(fileData) then
+								-- TODO: use a different search path than current world directory. 
+								local filepath = worldSearchDir..commonlib.Encoding.Utf8ToDefault(filename);
+								ParaIO.CreateDirectory(filepath)
+								local file = ParaIO.open(filepath, "w")
+								if(file:IsValid()) then
+									LOG.std(nil, "info", "BlockTemplate", "bmax file saved to : %s", filepath);
+									file:WriteString(fileData, #fileData);
+									file:close();
+								else
+									LOG.std(nil, "warn", "BlockTemplate", "failed to write file to: %s", filepath);
+								end
+							end
+						end
+					end
+				end
+			end
 			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
 			if(node and node[1]) then
 				local blocks = NPL.LoadTableFromString(node[1]);

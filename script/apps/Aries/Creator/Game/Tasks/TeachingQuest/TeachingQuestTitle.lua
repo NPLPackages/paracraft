@@ -197,6 +197,7 @@ function TeachingQuestTitle.ShowPage(param, offsetX, offsetY, show)
 	if (show == nil) then show = true end
 	TeachingQuestTitle.IsPanelVisible = show;
 	TeachingQuestTitle.showParam = param or TeachingQuestTitle.showParam;
+	
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html"..TeachingQuestTitle.showParam, 
 		name = "TeachingQuestTitle.ShowPage", 
@@ -354,16 +355,21 @@ function TeachingQuestTitle.StartTask()
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
 			]]
+			if (taskInProcess) then
+				return;
+			end
+			taskInProcess = true;
 			TaskTime = os.time()
 
-			GameLogic.IsVip("VipWeeklyTraining", false, function(result)
-				local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
-				if (TeachingQuestPage.IsVip() or result) then
-					exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
-				end
-				KeepWorkItemManager.DoExtendedCost(exid, function()
-					ShowTaskVideo(true);
-				end);
+			-- GameLogic.IsVip("VipWeeklyTraining", false, function(result)
+
+			-- end);
+			local exid = TeachingQuestPage.TaskExids[TeachingQuestPage.currentType]
+			if (TeachingQuestPage.IsVip()) then
+				exid = TeachingQuestPage.VipTaskExids[TeachingQuestPage.currentType]
+			end
+			KeepWorkItemManager.DoExtendedCost(exid, function()
+				ShowTaskVideo(true);
 			end);
 
 		else
