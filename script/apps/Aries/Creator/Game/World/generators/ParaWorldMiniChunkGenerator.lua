@@ -146,6 +146,9 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 --		local filename = self:GetTemplateFilepath()
 --		self:LoadFromTemplateFile(filename)
 --	end)
+	if (GameLogic.IsReadOnly()) then
+		return;
+	end
 	local ParaWorldTemplates = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldTemplates.lua");
 	ParaWorldTemplates.ShowPage(function(filename)
 		if (filename) then
@@ -217,19 +220,21 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	local filename = self:GetTemplateFilepath();
 	
 	local x, y, z = self:GetPivot();
-	local params = {count = #blocks};
+	local params = {};
 	params.pivot = string.format("%d,%d,%d", x, y, z)
 	params.relative_motion = true;
-	self.count = #blocks;
-	if(#blocks > self.MaxAllowedBlock) then
-		commonlib.resize(blocks, self.MaxAllowedBlock);
-	end
-	self:ShowBlockTip()
+	
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
 		params = params,
 		exportReferencedFiles = true,
 		blocks = blocks})
 	task:Run();
+	self.count = params.count or 0
+	self:ShowBlockTip()
+
+	if(self.count > self.MaxAllowedBlock) then
+		return
+	end
 
 	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
 	local currentWorldName = WorldCommon.GetWorldTag("name");

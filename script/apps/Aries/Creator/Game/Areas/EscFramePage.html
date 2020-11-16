@@ -100,24 +100,34 @@ function OnClickButton(name,mcmlNode)
     ClosePage();
     if(name=="shareWorld") then
         OnUploadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.share_world");
     elseif(name=="saveWorld") then
         OnSaveGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.save_world");
     elseif(name=="changeTexture") then
         OnTextureModPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.change_texture");
     elseif(name=="loadWorld") then
         OnLoadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.load_world");
     elseif(name=="systemSetting") then
         OnSettings();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.system_setting");
     elseif(name=="exitWorld") then
         OnLeave();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.exit_world");
     elseif(name=="friends") then
         OnFriendsPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.friends");
     elseif(name=="continueGame") then
-        ClosePage();  
+        ClosePage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.continue_game");
     elseif(name=="createNewWorld") then
         CreateNewWorld();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.create_new_world");
     elseif(name=="openServerPage") then
         ServerPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.open_server_page");
     end
 end
 

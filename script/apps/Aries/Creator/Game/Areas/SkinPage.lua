@@ -90,6 +90,29 @@ function SkinPage.ShowPage(entity, okcallback)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
+
+function SkinPage.ChangeModel(assetfile)
+	assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
+	local playerEntity = SkinPage.GetEntity();
+	if(assetfile and assetfile~=playerEntity:GetMainAssetPath()) then
+		local oldAssetFile = playerEntity:GetMainAssetPath()
+		if(playerEntity.SetModelFile) then
+			playerEntity:SetModelFile(assetfile);
+		else
+			playerEntity:SetMainAssetPath(assetfile);
+		end
+		-- this ensure that at least one default skin is selected
+		if(playerEntity:GetSkin()) then
+			playerEntity:SetSkin(nil);
+		else
+			playerEntity:RefreshSkin();
+		end
+		if(math.abs(EntityManager.PlayerAssetFile:GetDefaultScale(oldAssetFile) - playerEntity:GetScaling()) < 0.01) then
+			playerEntity:SetScaling(EntityManager.PlayerAssetFile:GetDefaultScale(assetfile))
+		end
+	end
+end
+
 function SkinPage.OnChangeAvatarModel()
     NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
@@ -107,7 +130,8 @@ function SkinPage.OnChangeAvatarModel()
 				if(SkinPage.GetEntity() == EntityManager.GetPlayer()) then
 					GameLogic.IsVip("ChangeAvatarSkin", true, function(isVIP)
 						if(isVIP) then
-							GameLogic.RunCommand("/avatar "..filename);
+							SkinPage.ChangeModel(filename);
+							OKCallback();
 						end
 					end)
 				end

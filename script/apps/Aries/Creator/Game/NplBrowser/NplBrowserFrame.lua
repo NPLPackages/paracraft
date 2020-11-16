@@ -26,11 +26,18 @@ local NplBrowserFrame = commonlib.inherit(nil,NPL.export());
 function NplBrowserFrame:ctor()
     self.name = nil;
     self.mcml_url = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserFrame.html";
-    self.options = {
+    self.default_options = {
 	    left = 0,
 	    top = 0,
 	    right = 0,
 	    bottom = 0,
+        zorder = nil,
+        resizefunc = nil,
+        autoscale = false,
+        fixed = false,
+        candrag = false,
+        closeBtnTitle = "X"
+
     };
     self.min_w = 960;
     self.min_h = 560;
@@ -72,7 +79,12 @@ function NplBrowserFrame:Show(url, title, is_show_control, is_show_close, option
     self.title = title;
     self.is_show_control = is_show_control;
     self.is_show_close = is_show_close;
-    self.options = options or self.options;
+    options = options or {};
+    -- union options and default_options
+    for k,v in pairs(self.default_options) do
+        options[k] = options[k] or self.default_options[k]
+    end
+    self.options = options
     
     self.callback = callback;
 	NplBrowserLoaderPage.Check(function(result) 		

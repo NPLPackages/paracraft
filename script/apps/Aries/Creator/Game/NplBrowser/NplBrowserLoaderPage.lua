@@ -297,6 +297,10 @@ function NplBrowserLoaderPage.SetChecked(v)
     NplBrowserLoaderPage.asset_manager = nil;
 end
 function NplBrowserLoaderPage.IsLoaded()
+    if (System.os.GetPlatform() == 'mac') then
+        return true;
+    end
+
     return NplBrowserLoaderPage.loaded;
 end
 -- check if main files are existed, if found anyone isn't exited, the version file will be deleted for running auto update again

@@ -41,6 +41,12 @@ end
         </div>
     </div>
     <div style="margin-bottom:10px;">
+        <input type="checkbox" name="isOpenSource" style="margin-top:2px" onclick="CodeBlockSettings.OnSetOpenSource"/>
+        <div for="isOpenSource" style="float:left;margin-left:5px;" >
+            <%=L"是否开源（只读模式下别人是否能看到代码）"%>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;">
         <input type="button" align="right" style="min-width:80px" class="button" name="close" value='<%=L"关闭"%>' onclick="ClosePage"/>
     </div>
 </div>

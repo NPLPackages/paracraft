@@ -49,21 +49,37 @@
                 <input type="text" name="seach_text" onchange="InputKeyWorld" EmptyText='<%=L"请输入并行世界名称搜索"%>' value="" class="mc_text" style="float:left;width:300px;height:28px;margin-left:78px;" />
             </div>
             <div style="margin-left:0px;margin-top:-10px;">
-                <pe:gridview style="width:860px;height:460px;" name="item_gridview" CellPadding="20" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="166"
-                             DataSource='<%=ParaWorldList.Current_Item_DS%>'>
-                    <Columns>
-                        <div name='<%= Eval("index")%>' onclick="ParaWorldList.OnClickItem" style="<%= 'margin-left:7px;margin-top:7px;width:240px;height:128px;background:url(' .. GetWorldPreview() .. ')' %>">
-                            <div name='<%= Eval("index")%>' onclick="ParaWorldList.OnClickItem" style="margin-left:-7px;margin-top:-7px;width:254px;height:142px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/tupiandi_32X32_32bits.png#0 0 32 32:12 12 12 12);"></div>
-                            <pe:if condition='<%=Eval("top")==true%>'>
-                                <div zorder="1" style="margin-left:202px;margin-top:-140px;width:43px;height:47px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zhiding_43X47_32bits.png#0 0 43 47);"></div>
-                            </pe:if>
-                        </div>
-                        <div style="float:left;position:relative;margin-top:-30px;padding-right:10px;width:240px;text-align:right;base-font-size:16px;font-size:16px;shadow-quality:8;color:#ffffff;shadow-color:#000000;text-shadow:true"><%= GetSettleString()%></div>
-                        <div style="float:left;position:relative;margin-top:6px;width:240px;height:20px;text-align:center;base-font-size:16px;font-size:16px;color:#000000"><%= Eval("name")%></div>
-                    </Columns>
-                    <EmptyDataTemplate>
-                    </EmptyDataTemplate>
-                </pe:gridview>
+                <pe:if condition='<%=(#ParaWorldList.Current_Item_DS) > 0%>'>
+                    <pe:gridview style="width:860px;height:460px;" name="item_gridview" CellPadding="16" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="176"
+                                 DataSource='<%=ParaWorldList.Current_Item_DS%>'>
+                        <Columns>
+                            <div style="margin-left:0px;margin-top:0px;width:254px;height:142px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/tupiandi_32X32_32bits.png#0 0 32 32:12 12 12 12);">
+                                <div name='<%= Eval("index")%>' onclick="ParaWorldList.OnClickItem" style="<%= 'margin-left:7px;margin-top:7px;width:240px;height:128px;background:url(' .. GetWorldPreview() .. ')' %>">
+                                    <pe:if condition='<%=Eval("isMine")%>'>
+                                        <div zorder="1" style="margin-left:-4px;margin-top:109px;width:84px;height:23px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_shijie_84X23_32bits.png#0 0 84 23);">
+                                            <pe:if condition='<%=ParaWorldList.IsDefaultWorld(Eval("index"))%>'>
+                                                <div zorder="1" name='<%= Eval("index")%>' onclick="ParaWorldList.ResetDefaultWorld" style="margin-left:14px;margin-top:5px;width:47px;height:11px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_quxiao_47X11_32bits.png#0 0 47 11);"></div>
+                                            </pe:if>
+                                            <pe:if condition='<%=not ParaWorldList.IsDefaultWorld(Eval("index"))%>'>
+                                                <div zorder="1" name='<%= Eval("index")%>' onclick="ParaWorldList.SetDefaultWorld" style="margin-left:14px;margin-top:5px;width:47px;height:11px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_shewei_47X11_32bits.png#0 0 47 11);"></div>
+                                            </pe:if>
+                                        </div>
+                                    </pe:if>
+                                </div>
+                                <pe:if condition='<%=Eval("topNo") > 0%>'>
+                                    <div zorder="1" style="margin-left:209px;margin-top:-133px;width:43px;height:47px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zhiding_43X47_32bits.png#0 0 43 47);"></div>
+                                </pe:if>
+                            </div>
+                            <div style="float:left;position:relative;margin-top:-30px;padding-right:10px;width:240px;text-align:right;base-font-size:16px;font-size:16px;shadow-quality:8;color:#ffffff;shadow-color:#000000;text-shadow:true"><%= GetSettleString()%></div>
+                            <div style="float:left;position:relative;margin-top:6px;width:240px;height:20px;text-align:center;base-font-size:16px;font-size:16px;color:#000000"><%= Eval("name")%></div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </pe:if>
+                <pe:if condition='<%=(#ParaWorldList.Current_Item_DS) < 1 and (#ParaWorldList.provinces) > 1%>'>
+                    <div align="center" style="margin-top:180px;width:221px;height:46px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_zanwushijie_221X46_32bits.png#0 0 221 46);"></div>
+                </pe:if>
             </div>
 
         </kp:window>

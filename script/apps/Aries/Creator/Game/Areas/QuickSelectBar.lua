@@ -431,3 +431,11 @@ end
 function QuickSelectBar.OnClickOnlineStore()
 	GameLogic.RunCommand("/open store");
 end
+
+function QuickSelectBar.OnClickMall()
+	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+	if not KeepWorkMallPage.isOpen then
+		KeepWorkMallPage.Show();
+	end
+	
+end

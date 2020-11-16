@@ -115,7 +115,7 @@ function BlockTemplate:CalculateRelativeMotion(blocks, bx, by, bz)
 	end
 end
 
--- return table map {filename=true} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
+-- return table map {filename=referenceCount} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
 -- if no external files are referenced, we will return nil.
 function BlockTemplate:GetReferenceFiles(blocks)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
@@ -135,14 +135,14 @@ function BlockTemplate:GetReferenceFiles(blocks)
 				local files_ = movieEntity:GetReferenceFiles();
 				if(files_) then
 					for filename, _ in pairs(files_) do
-						files[filename] = true;
+						files[filename] = (files[filename] or 0) + 1;
 					end
 				end
 			end
 		elseif(block_id == PhysicsModel or block_id == BlockModel) then
 			local entityData = block[6];
 			if(entityData and entityData.attr.filename and entityData.attr.filename~="") then
-				files[entityData.attr.filename] = true;
+				files[entityData.attr.filename] = (files[entityData.attr.filename] or 0) + 1;
 			end
 		end
 	end
@@ -293,6 +293,25 @@ function BlockTemplate:MakeHollow()
 	end
 end
 
+-- @param fileData: bmax file content string
+function BlockTemplate:GetBlockCountInString(fileData)
+	local count = 0;
+	local xmlRoot = ParaXML.LuaXML_ParseString(fileData);
+	if(xmlRoot) then
+		local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(node and node.attr and node.attr.count) then
+			count = tonumber(node.attr.count) or 0
+		elseif(node and node[1]) then
+			local blocks = NPL.LoadTableFromString(node[1]);
+			if(blocks and #blocks > 0) then
+				count = #blocks;
+			end
+		end
+	end
+	return count;
+end
+
+
 -- return xml string or nil
 function BlockTemplate:SaveTemplateToString()
 	self.params = self.params or {};
@@ -323,18 +342,20 @@ function BlockTemplate:SaveTemplateToString()
 	if(self.hollow) then
 		self:MakeHollow()
 	end
-		
+	local totalCount = #(self.blocks);
 	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 
 	if(self.exportReferencedFiles) then
 		local files = self:GetReferenceFiles(self.blocks)
 		if(files) then
-			for filename, _ in pairs(files) do
+			for filename, refCount in pairs(files) do
 				-- only export files in the current world directory. 
 				local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
 				local file = ParaIO.open(filepath, "r")
 				if(file:IsValid()) then
 					local text = file:GetText(0, -1);
+					local fileBlockCount = self:GetBlockCountInString(text);
+					totalCount = totalCount + refCount * fileBlockCount;
 					file:close();
 					if(text and text~="") then
 						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
@@ -347,7 +368,8 @@ function BlockTemplate:SaveTemplateToString()
 			end
 		end
 	end
-		
+	o.attr.count = totalCount;
+	self.params.count = totalCount;
 	local xml_data = commonlib.Lua2XmlString(o, true, true);
 	return xml_data;
 end

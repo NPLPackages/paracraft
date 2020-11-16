@@ -14,30 +14,6 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 local ParaWorldList = NPL.export();
 
 ParaWorldList.Current_Item_DS = {};
-ParaWorldList.provinces = {
-	{
-		text = L"省",
-		value = 0,
-		selected = true,
-	}
-}
-
-ParaWorldList.cities = {
-	{
-		text = L"市",
-		value = 0,
-		selected = true,
-	}
-}
-
-ParaWorldList.areas = {
-	{
-		text = L"区",
-		value = 0,
-		selected = true,
-	}
-}
-
 
 local myParaWorldCount = 0;
 local currentRegion = nil;
@@ -47,6 +23,33 @@ function ParaWorldList.OnInit()
 end
 
 function ParaWorldList.ShowPage()
+	ParaWorldList.provinces = {
+		{
+			text = L"省",
+			value = 0,
+			selected = true,
+		}
+	}
+
+	ParaWorldList.cities = {
+		{
+			text = L"市",
+			value = 0,
+			selected = true,
+		}
+	}
+
+	ParaWorldList.areas = {
+		{
+			text = L"区",
+			value = 0,
+			selected = true,
+		}
+	}
+	for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
+		ParaWorldList.Current_Item_DS[i] = nil;
+	end
+
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.html",
 		name = "ParaWorldList.ShowPage", 
@@ -65,40 +68,13 @@ function ParaWorldList.ShowPage()
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
-		ParaWorldList.Current_Item_DS[i] = nil;
-	end
-	myParaWorldCount = 0;
 	currentRegion = nil;
 	commonlib.TimerManager.SetTimeout(function()
-		keepwork.world.mylist(nil, function(err, msg, data)
-			if (err == 200 and data) then
-				for i = 1, #data do
-					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data[i];
-					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS].top = true;
-				end
-				page:Refresh(0);
-				myParaWorldCount = #data;
+		ParaWorldList.LoadAllWorlds(function(loaded)
+			page:Refresh(0);
+			if (loaded) then
+				ParaWorldList.GetRegionData();
 			end
-
-			keepwork.world.list(nil, function(err, msg, data)
-				if (data and data.rows) then
-					for i = 1, #(data.rows) do
-						local exist = false;
-						for j = 1, #ParaWorldList.Current_Item_DS do
-							if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
-								exist = true;
-								break;
-							end
-						end
-						if (not exist) then
-							ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
-						end
-					end
-					page:Refresh(0);
-					ParaWorldList.GetRegionData();
-				end
-			end);
 		end);
 	end, 10);
 end
@@ -112,6 +88,57 @@ function ParaWorldList.OnClickItem(index)
 	if (item and item.projectId) then
 		page:CloseWindow();
 		GameLogic.RunCommand("/loadworld -force "..item.projectId);
+	end
+end
+
+function ParaWorldList.SetDefaultWorld(index)
+	if (not index) then return end
+	local item = ParaWorldList.Current_Item_DS[index];
+	if (item and item.projectId) then
+		keepwork.world.defaultParaWorld({paraWorldId = item.id}, function(err, msg, data)
+			if (err == 200) then
+				Mod.WorldShare.Store:Set("world/paraWorldId", item.id);
+				for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
+					ParaWorldList.Current_Item_DS[i] = nil;
+				end
+				ParaWorldList.LoadAllWorlds(function(loaded)
+					if (loaded) then
+						page:Refresh(0);
+					end
+				end);
+			end
+		end);
+	end
+end
+
+function ParaWorldList.ResetDefaultWorld(index)
+	if (not index) then return end
+	local item = ParaWorldList.Current_Item_DS[index];
+	if (item and item.projectId) then
+		keepwork.world.defaultParaWorld({paraWorldId = 0}, function(err, msg, data)
+			if (err == 200) then
+				Mod.WorldShare.Store:Set("world/paraWorldId", 0);
+				for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
+					ParaWorldList.Current_Item_DS[i] = nil;
+				end
+				ParaWorldList.LoadAllWorlds(function(loaded)
+					if (loaded) then
+						page:Refresh(0);
+					end
+				end);
+			end
+		end);
+	end
+end
+
+function ParaWorldList.IsDefaultWorld(index)
+	if (not index) then return end
+	local default = Mod.WorldShare.Store:Get("world/paraWorldId");
+	local item = ParaWorldList.Current_Item_DS[index];
+	if (item and item.id == default and default > 0) then
+		return true;
+	else
+		return false;
 	end
 end
 
@@ -241,39 +268,58 @@ function ParaWorldList.SeachParaWorld(keyWord, regionId)
 	end
 	currentRegion = regionId or currentRegion;
 	if ((keyWord == nil or keyWord == "") and currentRegion == nil) then
-		keepwork.world.mylist(nil, function(err, msg, data)
-			if (err == 200 and data) then
-				for i = 1, #data do
-					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data[i];
-					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS].top = true;
-				end
-				myParaWorldCount = #data;
+		ParaWorldList.LoadAllWorlds(function(loaded)
+			if (loaded) then
+				page:Refresh(0);
+				page:SetValue("seach_text", nil);
+				page:FindControl('seach_text'):Focus();
 			end
-
-			keepwork.world.list(nil, function(err, msg, data)
-				if (data and data.rows) then
-					for i = 1, #(data.rows) do
-						local exist = false;
-						for j = 1, #ParaWorldList.Current_Item_DS do
-							if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
-								exist = true;
-								break;
-							end
-						end
-						if (not exist) then
-							ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
-						end
-					end
-					page:Refresh(0);
-					page:SetValue("seach_text", nil);
-					page:FindControl('seach_text'):Focus();
-				end
-			end);
 		end);
 	else
-		keepwork.world.list({keyword = keyWord, regionId = currentRegion}, function(err, msg, data)
-			if (data and data.rows) then
-				for i = 1, #(data.rows) do
+		ParaWorldList.LoadWorldsByRegion(keyWord, currentRegion, function()
+			page:Refresh(0);
+			if (keyWord) then
+				page:SetValue("seach_text", keyWord);
+				page:FindControl('seach_text'):Focus();
+				page:FindControl('seach_text'):SetCaretPosition(-1);
+			end
+		end);
+	end
+end
+
+function ParaWorldList.LoadAllWorlds(callback)
+	keepwork.world.list({}, function(err, msg, data)
+		if (data and data.rows) then
+			for i = 1, #(data.rows) do
+				if (data.rows[i].topNo > 0) then
+					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
+				end
+			end
+			if (callback) then
+				callback(false);
+			end
+		end
+
+		keepwork.world.mylist(nil, function(err, msg, mydata)
+			if (err == 200 and mydata) then
+				for i = 1, #mydata do
+					local exist = false;
+					for j = 1, #ParaWorldList.Current_Item_DS do
+						if (ParaWorldList.Current_Item_DS[j].projectId == mydata[i].projectId and ParaWorldList.Current_Item_DS[j].name == mydata[i].name) then
+							ParaWorldList.Current_Item_DS[j].isMine = true;
+							exist = true;
+							break;
+						end
+					end
+					if (not exist) then
+						ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = mydata[i];
+						ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS].isMine = true;
+					end
+				end
+			end
+
+			for i = 1, #(data.rows) do
+				if (data.rows[i].topNo == 0) then
 					local exist = false;
 					for j = 1, #ParaWorldList.Current_Item_DS do
 						if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
@@ -285,13 +331,34 @@ function ParaWorldList.SeachParaWorld(keyWord, regionId)
 						ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
 					end
 				end
-				page:Refresh(0);
-				if (keyWord) then
-					page:SetValue("seach_text", keyWord);
-					page:FindControl('seach_text'):Focus();
-					page:FindControl('seach_text'):SetCaretPosition(-1);
-				end
+			end
+
+			if (callback) then
+				callback(true);
 			end
 		end);
-	end
+	end);
+end
+
+function ParaWorldList.LoadWorldsByRegion(keyWord, regionId, callback)
+	keepwork.world.list({keyword = keyWord, regionId = currentRegion}, function(err, msg, data)
+		if (data and data.rows) then
+			for i = 1, #(data.rows) do
+				local exist = false;
+				for j = 1, #ParaWorldList.Current_Item_DS do
+					if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
+						exist = true;
+						break;
+					end
+				end
+				if (not exist) then
+					ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
+				end
+			end
+
+			if (callback) then
+				callback();
+			end
+		end
+	end);
 end

@@ -23,6 +23,7 @@ local ParaWorldTakeSeat = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Par
 local ParaWorldAdminSeat = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldAdminSeat.lua");
 local ParaWorldAdmin = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldAdmin.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
 local ParaWorldSites = NPL.export();
 
 ParaWorldSites.SitesNumber = {};
@@ -291,6 +292,9 @@ function ParaWorldSites.OnClickItem(index)
 						keepwork.world.paraWorldMinis({paraWorldId=ParaWorldLoginAdapter.ParaWorldId, status="clear", sn=id}, function(err, msg, data)
 							if (err == 200) then
 								ParaWorldSites.UpdateSitesState();
+								local gen = GameLogic.GetBlockGenerator();
+								gen:ResetGridXY(5 - item.x, 5 - item.y);
+								item.loaded = false;
 							end
 						end);
 					elseif (res == _guihelper.DialogResult.No) then
@@ -368,6 +372,11 @@ function ParaWorldSites.ShowTakeSeat(item, index)
 			keepwork.world.take_seat({paraMiniId=worldId, paraWorldId=ParaWorldLoginAdapter.ParaWorldId, sn=id}, function(err, msg, data)
 				if (err == 200) then
 					_guihelper.MessageBox(L"入驻成功！");
+					if (item.loaded) then
+						local gen = GameLogic.GetBlockGenerator();
+						gen:ResetGridXY(5 - item.x, 5 - item.y);
+						item.loaded = false;
+					end
 				else
 					_guihelper.MessageBox(L"该座位已被占用，请选择其他座位入驻！");
 				end
@@ -397,6 +406,11 @@ function ParaWorldSites.ShowAdminSeat(item, index)
 			keepwork.world.paraWorldMinis({paraWorldId=ParaWorldLoginAdapter.ParaWorldId, username=username, status="checked", sn=id}, function(err, msg, data)
 				if (err == 200) then
 					_guihelper.MessageBox(L"修改成功！");
+					if (item.loaded) then
+						local gen = GameLogic.GetBlockGenerator();
+						gen:ResetGridXY(5 - item.x, 5 - item.y);
+						item.loaded = false;
+					end
 				end
 				ParaWorldSites.UpdateSitesState();
 			end);
@@ -457,8 +471,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 				if (seat.sn and seat.paraMini and seat.sn == sn) then
 					local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 					local filename = ParaIO.GetFileName(path);
-					local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
-					KeepworkServiceWorld:GetSingleFile(seat.paraMini.projectId, filename, function(content)
+					KeepworkServiceWorld:GetSingleFileByCommitId(seat.paraMini.projectId, seat.paraMini.commitId, filename, function(content)
 						if (not content) then
 							currentItem.loaded = false;
 							return;
@@ -474,7 +487,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 							file:close();
 							local gen = GameLogic.GetBlockGenerator();
 							local x, y = 5 - row, 5 - column;
-							gen:LoadTemplateAtGridXY(x, y, template_file);
+							gen:LoadTemplateAtGridXY(x, y, template_file, seat.openCode == 1);
 							currentItem.loaded = true;
 							currentItem.projectName = seat.paraMini.name;
 							currentItem.bornAt = seat.paraMini.bornAt;
@@ -486,7 +499,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 								end
 							end
 						end
-					end);
+					end, true);
 					return;
 				end
 			end
@@ -497,7 +510,6 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 			if (currentItem.adProjectId) then
 				local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 				local filename = ParaIO.GetFileName(path);
-				local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
 				KeepworkServiceWorld:GetSingleFile(currentItem.adProjectId, filename, function(content)
 					if (not content) then
 						currentItem.loaded = false;
@@ -581,8 +593,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 			local index = math.random(1, #worlds);
 			local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 			local filename = ParaIO.GetFileName(path);
-			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
-			KeepworkServiceWorld:GetSingleFile(worlds[index].projectId, filename, function(content)
+			KeepworkServiceWorld:GetSingleFileByCommitId(worlds[index].projectId, worlds[index].commitId, filename, function(content)
 				if (not content) then
 					ParaWorldSites.AllMiniWorld[key].loaded = false;
 					return;
@@ -611,7 +622,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 				else
 					ParaWorldSites.AllMiniWorld[key].loaded = false;
 				end
-			end);
+			end, true);
 		else
 			ParaWorldSites.AllMiniWorld[key].loaded = false;
 		end
@@ -673,31 +684,6 @@ function ParaWorldSites.Reset()
 end
 
 function ParaWorldSites.LoadAdvertisementWorld()
-	--[[
-	function loadTemplate(projectId, row, column)
-		local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
-		local filename = ParaIO.GetFileName(path);
-		local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
-		KeepworkServiceWorld:GetSingleFile(projectId, filename, function(content)
-			if (not content) then
-				return;
-			end
-
-			local miniTemplateDir = ParaIO.GetCurDirectory(0).."temp/miniworlds/";
-			ParaIO.CreateDirectory(miniTemplateDir);
-			local template_file = miniTemplateDir..projectId..".xml";
-			local file = ParaIO.open(template_file, "w");
-			if (file:IsValid()) then
-				file:write(content, #content);
-				file:close();
-				local gen = GameLogic.GetBlockGenerator();
-				local x, y = gen:GetGridXYBy2DIndex(column,row);
-				gen:LoadTemplateAtGridXY(x, y, template_file);
-			end
-		end);
-	end
-	]]
-
 	keepwork.world.paraWorldFillings({}, function(err, msg, data)
 		if (err == 200 and data and #data > 0) then
 			ParaWorldSites.UpdateSitesState(function()

@@ -294,7 +294,7 @@ function env_imp:ask(text, buttons, cb)
 				GameLogic:event(event);
 			end
 		
-			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height});
+			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false});
 		else
 			EnterTextDialog.OnClose();
 			cb();
@@ -305,7 +305,7 @@ function env_imp:ask(text, buttons, cb)
 			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFuncAsync(function(result)
 				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
 				env_imp.resume(self);
-			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height})
+			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false})
 			env_imp.yield(self)
 		else
 			self.co:SetTimeout(0.02, function()

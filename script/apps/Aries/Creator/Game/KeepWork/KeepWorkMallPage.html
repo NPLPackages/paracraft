@@ -9,6 +9,7 @@
 <pe:mcml>
 <script refresh="true" type="text/npl" src="KeepWorkMallPage.lua"><![CDATA[
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 KeepWorkMallPage.OnInit()
 function ClosePage()
     Page:CloseWindow();
@@ -97,6 +98,10 @@ function IsOnlyNumber(desc)
     return false
 end
 
+function ShowBuyModel()
+    KeepWorkMallPage.ShowBuyModel()
+end
+
 ]]></script>
 <kp:window name="iframe" width="996" height="613" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_ziyuan_32bits.png"   onclose="ClosePage">
     <div style="color:#ffffff;" class="kp_window_container">
@@ -151,11 +156,11 @@ end
 
     </div>
 
-    <div style="float:left;width:155px;height:516px;margin-left:5px;margin-top:12px;">
+    <div style="float:left;width:120px;height:450px;margin-left:5px;margin-top:12px;">
         <!-- <div style="margin-left:10px;padding-left:12px;font-size:14px;">
             <div style="height:18px;color:#ffffff;margin-top:25px;"><%=getTopBtDesc()%></div>
         </div> -->
-        <pe:treeview name="tvwHelp" DataSource='<%=TreeItems()%>' OnClick="ChangeMenuType" ItemToggleSize="0" style="height:508px;margin-left:10px;margin-top:4px;background:" VerticalScrollBarOffsetX="6">
+        <pe:treeview name="tvwHelp" DataSource='<%=TreeItems()%>' OnClick="ChangeMenuType" ItemToggleSize="0" style="height:450px;margin-left:10px;margin-top:4px;background:" VerticalScrollBarOffsetX="6">
             <NodeTemplates>
                 <NodeTemplate DataType="type">
                     <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
@@ -224,12 +229,27 @@ end
                 </NodeTemplate>
             </NodeTemplates>
         </pe:treeview>
+
+        <div style="margin-left:30px;margin-top:10px;color:#000000;height: 40px;">
+            <div style="float:left;width:30px;height:15px;" >
+                <kp:item gsid="998" style="margin-left:-20px;margin-top:-5px;width:64px;height:32px;"/>
+            </div>
+            <pe:label name="bean_label" style="float:left;margin-left:5px;color:#000000;margin-top: 2px;" value='0'></pe:label>
+            <!-- <div name="bean_label" style="float:left;margin-left:2px;color:#000000;"><%=GetExchangeP  -->
+        </div>
+        <!-- <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
+            <input type="button" value='已购' name='has_buy' onclick="ShowBuyModel" style="margin-left: 3px; width:96px;height:32px;color:#181818;text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan3_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+        </pe:if>
+        <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
+            <input type="button" value='已购' name='has_buy' onclick="ShowBuyModel" style="margin-left: 3px; width:96px;height:32px;color:#181818;text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+        </pe:if> -->
+        
     </div>
 
-    <div style="float:left;width:834px;height:520px;margin-top:0px;background:;">
-        <pe:gridview style="margin-left:30px;" name="item_gridview" CellPadding="20" AllowPaging="true" ItemsPerLine="4 " DefaultNodeHeight="50"
-                     DataSource='<%=GridsItems%>' pagesize="8">
-            <PagerSettings Position="Bottom" height="36" style="position:relative;width:834px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+    <div style="float:left;width:864px;height:520px;margin-top:0px;background:;">
+        <pe:gridview style="margin-left:30px;" name="item_gridview" CellPadding="22" AllowPaging="false" ItemsPerLine="4 " DefaultNodeHeight="50"
+                     DataSource='<%=GridsItems%>'>
+            <PagerSettings Position="Bottom" height="36" style="position:relative;width:864px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
             <PagerTemplate>
                 <form>
                     <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:348px;margin-top:15px;background-rotation:-1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>

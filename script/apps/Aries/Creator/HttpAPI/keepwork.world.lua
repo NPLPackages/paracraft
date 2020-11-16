@@ -35,6 +35,10 @@ HttpWrapper.Create("keepwork.world.canManageParaWorldMinis", "%MAIN%/core/v0/3DC
 -- 管理3d座位
 HttpWrapper.Create("keepwork.world.paraWorldMinis", "%MAIN%/core/v0/3DCampus/paraWorldMinis", "POST", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3507
+-- 用户设置其默认大世界
+HttpWrapper.Create("keepwork.world.defaultParaWorld", "%MAIN%/core/v0/3DCampus/users/defaultParaWorld", "PUT", true)
+
 --http://yapi.kp-para.cn/project/32/interface/api/2752
 -- 上传paraMini世界
 HttpWrapper.Create("keepwork.miniworld.upload", "%MAIN%/core/v0/3DCampus/paraMinis", "POST", true)

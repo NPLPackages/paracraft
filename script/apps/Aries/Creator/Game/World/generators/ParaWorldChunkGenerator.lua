@@ -30,6 +30,7 @@ local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	
@@ -37,11 +38,16 @@ local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.
 
 -- this is the host side ignore list, which could be different from ParaWorldMiniChunkGenerator's ignoreList
 local ignoreList = {[9]=true,[253]=true,[110]=true,[216]=true,[217]=true,[196]=true,[218]=true,
-	[219]=true,[189]=true, [221]=true,[212]=true, 
+	-- [219]=true,[189]=true, [221]=true,[212]=true, 
 	-- [22]=true,[254]=true,  -- bmax is supported
 	-- [215]=true, -- chest
 };
 
+local lastGridParams = {};
+-- mapping from x,y grid pos to code block pos {x, y, z}
+local gridCodeBlocks = {};
+-- mapping from x,y grid pos to true
+local activeGrids = {};
 
 function ParaWorldChunkGenerator:ctor()
 	self:SetWorkerThreadCount(1)
@@ -56,6 +62,11 @@ end
 
 function ParaWorldChunkGenerator:OnExit()
 	ParaWorldChunkGenerator._super.OnExit(self);
+	GameLogic.GetFilters():remove_filter("OnEnterParaWorldGrid", ParaWorldChunkGenerator.OnEnterParaWorldGrid);
+	ParaWorldChunkGenerator.ClearStatic();
+	if(self.lock_timer) then
+		self.lock_timer:Change();
+	end
 end
 
 -- for temporary world files
@@ -66,7 +77,14 @@ function ParaWorldChunkGenerator:GetWorldSearchPath()
 	return self.worldSearchPath;
 end
 
+function ParaWorldChunkGenerator.ClearStatic()
+	GridParams = {};
+	gridCodeBlocks = {};
+	activeGrids = {};
+end
+
 function ParaWorldChunkGenerator:OnLoadWorld()
+	ParaWorldChunkGenerator.ClearStatic();
 	local searchPath = self:GetWorldSearchPath();
 	local result = commonlib.Files.Find({}, searchPath, 3, 10000, "*.*") or {};
 	for i, file in ipairs(result) do
@@ -78,7 +96,9 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	GameLogic.RunCommand("/speedscale 2");
 	GameLogic.options:SetViewBobbing(false, true)
 
+
 	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and KeepworkService:IsSignedIn()) then
+		GameLogic.options:SetLockedGameMode("game");
 		GameLogic.RunCommand("/ggs connect -silent=false");
 	end
 
@@ -97,6 +117,13 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 			end
 		end);
 	end
+	
+	self.code_timer = self.code_timer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:OnCodeTimer()
+	end})
+	self.code_timer:Change(1000, 1000);
+
+	GameLogic.GetFilters():add_filter("OnEnterParaWorldGrid", ParaWorldChunkGenerator.OnEnterParaWorldGrid);
 end
 
 -- get params for generating flat terrain
@@ -149,13 +176,15 @@ end
 
 -- delete everything at x, y grid position. 
 function ParaWorldChunkGenerator:ResetGridXY(x, y)
+	ParaWorldChunkGenerator.EnableCodeBlocksInGrid(x, y, false)
+	ParaWorldChunkGenerator.UnregisterCodeBlocksOnGrid(x, y);
 	local minX, minY, minZ = self:GetBlockOriginByGridXY(x, y);
 	self:ResetGridImp(minX, minY, minZ)
 end
 
 -- reset a grid
 function ParaWorldChunkGenerator:ResetGridImp(minX, minY, minZ)
-	size = size or 120;
+	size = size or 124;
 	local ground_block_id = 62;
 
 	for x = minX+4, minX + size - 1 do
@@ -178,6 +207,7 @@ end
 -- @param bEnableLogics: true to enable logics like code block and movie block in the file
 function ParaWorldChunkGenerator:LoadTemplateAtGridXY(x, y, filename, bEnableLogics)
 	if(filename) then
+		ParaWorldChunkGenerator.UnregisterCodeBlocksOnGrid(x, y);
 		local minX, minY, minZ = self:GetBlockOriginByGridXY(x, y);
 		if(ParaTerrain.LoadBlockAsync) then
 			self:LoadTemplateAsync(minX, minY, minZ, filename, bEnableLogics)
@@ -304,7 +334,6 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 			-- code block on ground?
 			BlockEngine:SetBlock(worldX, by,worldZ, 219, 0, 3, {attr={}, {name="cmd",[[--tip('hello world')]]}})
 			BlockEngine:SetBlock(worldX, by-1,worldZ, 157, 0, 3)
-			local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 			local entity = EntityManager.GetEntity("player_spawn_point");
 			if (not entity) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
@@ -394,7 +423,7 @@ function ParaWorldChunkGenerator:LoadTemplateImp(params)
 						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
 					end
 					if(#addList > 0) then
-						self:ApplyOnLoadBlocks({addList=addList, x=bx, y=by, z=bz})
+						self:ApplyOnLoadBlocks({addList=addList, x=bx, y=by, z=bz, bEnableLogics=bEnableLogics})
 					end
 					local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", math.floor(bx/512), math.floor(bz/512)))
 					attRegion:SetField("RefreshLightChunkColumns", {math.floor(bx/16), math.floor(bz/16), 128/16});
@@ -470,7 +499,7 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 
 					for _, b in ipairs(blocks) do
 						local x, y, z, block_id = b[1]+bx, b[2]+by, b[3]+bz, b[4];
-						if(block_id and (bEnableLogics or not ignoreList[block_id])) then
+						if(block_id and (not ignoreList[block_id])) then
 							ParaTerrain.LoadBlockAsync(x,y,z, block_id, b[5] or 0)
 							local block = block_types.get(block_id);
 							if(block and block.onload) then
@@ -483,7 +512,8 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
 					end
 					NPL.activate("(main)script/apps/Aries/Creator/Game/World/ChunkGenerator.lua", {
-						cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", params= {addList=addList, x=bx, y=by, z=bz}, 
+						cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", 
+						params= {addList=addList, x=bx, y=by, z=bz, bEnableLogics=bEnableLogics}, 
 						gen_id = msg.gen_id, address = msg.address,
 					});
 					return true;
@@ -498,9 +528,13 @@ end
 function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 	local addList = params.addList;
 	local bx, by, bz = params.x, params.y, params.z
+	local bEnableLogics = params.bEnableLogics
+	local gridX, gridY = self:FromWorldPosToGridXY(bx, bz)
+	ParaWorldChunkGenerator.UnregisterCodeBlocksOnGrid(gridX, gridY)
 	local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", math.floor(bx/512), math.floor(bz/512)))
 	attRegion:SetField("RefreshLightChunkColumns", {math.floor(bx/16), math.floor(bz/16), 128/16});
 
+	local hasDelayedCodeBlocks;
 	if(addList and #addList > 0) then
 		LOG.std(nil, "info", "ParaWorldChunkGenerator", "ApplyOnLoadBlocks: %d blocks", #addList)
 		for _, b in ipairs(addList) do
@@ -511,8 +545,146 @@ function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 				if(not block_template.cubeMode and block_template.customModel) then
 					block_template:UpdateModel(x,y,z, block_data)
 				end
+				if(block_id == 219) then
+					-- for code blocks, 
+					local serverData = b[6];
+					if(serverData and serverData.attr and serverData.attr.isPowered) then
+						serverData.attr.delayLoad = true;
+						-- make open source by default, so that we can right click to view code content. 
+						serverData.attr.isOpenSource = true;
+						ParaWorldChunkGenerator.RegisterCodeBlocksOnGrid(gridX, gridY, {x=x, y=y, z=z}, bEnableLogics)
+						hasDelayedCodeBlocks = true;
+					end
+				end
 				block_template:OnBlockAdded(x,y,z, block_data, b[6]);
 			end
+		end
+	end
+	if(hasDelayedCodeBlocks and lastGridParams and lastGridParams.x == gridX and lastGridParams.y == gridY) then
+		ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)
+	end
+end
+
+-- static function: when user entered a paraworld grid. 
+-- @params: {x, y} 2d index Y and X
+function ParaWorldChunkGenerator.OnEnterParaWorldGrid(params)
+	if(params.x and params.y) then
+		local gridX, gridY = ParaWorldChunkGenerator:GetGridXYBy2DIndex(params.y, params.x)
+		
+		if(lastGridParams.userId == params.userId and lastGridParams.x == gridX and lastGridParams.y == gridY) then
+			-- identical grid, do nothing
+		else
+			lastGridParams.userId = params.userId;
+			lastGridParams.x = gridX;
+			lastGridParams.y = gridY;
+			ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)
+		end
+	end
+	return params;
+end
+
+local function GetGridIndex(x, y)
+	return 1000 * x + y
+end
+
+-- @param codeBlockPos: {x, y, z}
+function ParaWorldChunkGenerator.RegisterCodeBlocksOnGrid(x, y, codeBlockPos, bEnableLogics)
+	local index = GetGridIndex(x, y)
+	local blockList = gridCodeBlocks[index];
+	if(not blockList) then
+		blockList = {bEnableLogics = bEnableLogics}
+		gridCodeBlocks[index] = blockList
+	end
+	blockList[#blockList+1] = codeBlockPos;
+end
+
+function ParaWorldChunkGenerator.UnregisterCodeBlocksOnGrid(x, y)
+	local index = GetGridIndex(x, y)
+	if(gridCodeBlocks[index]) then
+		gridCodeBlocks[index] = nil
+		return true
+	end
+end
+
+function ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
+	local index = GetGridIndex(x, y)
+	if(gridCodeBlocks[index]) then
+		if(bEnable) then
+			activeGrids[index] = {x=x, y=y}
+		else
+			activeGrids[index] = nil;
+		end
+			
+		local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+		local count = 0;
+		for _, codeBlockPos in ipairs(gridCodeBlocks[index]) do
+			local entity = EntityManager.GetBlockEntity(codeBlockPos.x, codeBlockPos.y, codeBlockPos.z)
+			if(entity and entity:GetBlockId() == 219 and entity:IsPowered()) then
+				if(bEnable) then
+					if(not entity:IsCodeLoaded()) then
+						entity:Restart();
+						count = count + 1;
+					end
+				else
+					if(entity:IsCodeLoaded()) then
+						entity:Stop();
+						count = count + 1;
+					end
+				end
+			end
+		end
+		if(count > 0) then
+			LOG.std(nil, "info", "ParaWorldChunkGenerator", "Enable (%d) CodeBlocks In Grid: %d %d %s", count, x, y, tostring(bEnable));
+			if(bEnable) then
+				GameLogic.AddBBS("ParaWorldEnableCode", format(L"加载了(%d)个代码方块，在%d,%d", count, x, y), 3000, "0 255 0");
+			else
+				GameLogic.AddBBS("ParaWorldDisableCode", format(L"卸载了(%d)个代码方块，在%d,%d", count, x, y), 3000, "0 255 0");
+			end
+		end
+	end
+end
+
+function ParaWorldChunkGenerator.EnableCodeBlocksInGrid(x, y, bEnable)
+	local index = GetGridIndex(x, y)
+	if(gridCodeBlocks[index]) then
+		if(bEnable) then
+			if(gridCodeBlocks[index].bEnableLogics) then
+				ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
+			else
+				-- ask user for permission if logics are not enabled.
+				_guihelper.MessageBox(format(L"是否加载当前地块中的代码?"), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
+					end
+				end, _guihelper.MessageBoxButtons.YesNo);
+			end
+		else
+			ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
+		end
+	else
+		activeGrids[index] = nil;
+	end
+end
+
+function ParaWorldChunkGenerator:OnCodeTimer()
+	local player = EntityManager.GetPlayer()
+	if(not player) then
+		return
+	end
+	local x, y, z = player:GetBlockPos();
+
+	local leavingGridIndex;
+	for index, grid in pairs(activeGrids) do
+		local gx, _, gz = self:GetBlockOriginByGridXY(grid.x, grid.y);
+		if( math.abs(x - gx - 64) > 80  or math.abs(z - gz - 64) > 80) then
+			leavingGridIndex = index;
+			break;
+		end
+	end
+	if(leavingGridIndex) then
+		local grid = activeGrids[leavingGridIndex]
+		if(grid) then
+			ParaWorldChunkGenerator.EnableCodeBlocksInGrid(grid.x, grid.y, false)
 		end
 	end
 end

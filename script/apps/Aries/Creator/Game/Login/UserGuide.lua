@@ -1,6 +1,6 @@
 --[[
 Title: UserGuide.html code-behind script
-Author(s): 
+Author(s): chenjinxian
 Date: 
 Desc: 
 use the lib:
@@ -47,6 +47,11 @@ function UserGuide.ShowPage(param)
 		width = 0,
 		height = 0,
 	});
+	GameLogic:Connect("WorldUnloaded", UserGuide, UserGuide.OnWorldUnload, "UniqueConnection");
+end
+
+function UserGuide:OnWorldUnload()
+	UserGuide.CloseWindow();
 end
 
 function UserGuide.OnMouseDown(nCode, appName, msg)
@@ -261,5 +266,7 @@ function UserGuide.CloseWindow()
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideMouseMove", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideMouseUp", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideKeyDown", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});
-	page:CloseWindow();
+	if (page) then
+		page:CloseWindow();
+	end
 end

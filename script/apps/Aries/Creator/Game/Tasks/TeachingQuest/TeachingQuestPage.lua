@@ -101,13 +101,33 @@ function TeachingQuestPage.ShowPage(type_)
 		if (type(type_) == "string") then
 			type_ = TeachingQuestPage.TaskTypeIndex[type_] or TeachingQuestPage.UnknowType;
 		end
+
+		-- event tracking
+		if (type_ == TeachingQuestPage.ProgramType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.program");
+		elseif (type_ == TeachingQuestPage.AnimationType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.animation");
+		elseif (type_ == TeachingQuestPage.CADType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.CAD");
+		elseif (type_ == TeachingQuestPage.languageType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.language");
+		elseif (type_ == TeachingQuestPage.MathType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.math");
+		elseif (type_ == TeachingQuestPage.EnglishType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.english");
+		elseif (type_ == TeachingQuestPage.ScienceType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.science");
+		elseif (type_ == TeachingQuestPage.HumanitiesType) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.task.humanities");
+		end
+
 		TeachingQuestPage.currentType = type_;
 		TeachingQuestPage.Current_Item_DS = TeachingQuestPage.quests[type_] or {};
 		TeachingQuestPage.CheckTaskCount(type_);
 		if (TeachingQuestPage.RefreshItem()) then
 			return;
 		end
-	
+
 		local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.html",
 			name = "TeachingQuestPage.ShowPage", 

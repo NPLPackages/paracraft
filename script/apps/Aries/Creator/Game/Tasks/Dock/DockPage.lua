@@ -115,19 +115,25 @@ end
 function DockPage.OnClickTop(id)
     if(id == "competition")then
         DockPage.OnActivity();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.competition");
     elseif(id == "checkin")then
         ParacraftLearningRoomDailyPage.DoCheckin();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.checkin");
     elseif(id == "week_quest")then
         local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
         TeachingQuestLinkPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.week_quest");
     elseif(id == "codewar")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
         StudyPage.clickArtOfWar();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.code_war");
     elseif(id == "web_keepwork_home")then
 	    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com", "", 1); 
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
     elseif(id == "user_tip")then
         local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
         DailyTask.Show();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
     end
 end
 function DockPage.OnClick(id)
@@ -138,10 +144,12 @@ function DockPage.OnClick(id)
     if(id == "character")then
         local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
         last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
     elseif(id == "bag")then
         local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
         UserBagPage.ShowPage();
         last_page_ctrl = UserBagPage.GetPageCtrl();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.bag");
     elseif(id == "work")then
         --GameLogic.RunCommand("/menu file.loadworld");
             
@@ -154,17 +162,25 @@ function DockPage.OnClick(id)
             local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
             UserConsole:ShowPage();
             last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
-		end
+        end
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.work");
     elseif(id == "explore")then
         local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
         UserConsole.OnClickOfficialWorlds();
         last_page_ctrl = Mod.WorldShare.Store:Get("page/MainPage")
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.explore");
     elseif(id == "study")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
         StudyPage.ShowPage();
         last_page_ctrl = StudyPage.GetPageCtrl();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.study");
     elseif(id == "home")then
-        GameLogic.RunCommand("/loadworld home");
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.home");
+        
+        local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
+        SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
+            GameLogic.RunCommand("/loadworld home");
+        end);
     elseif(id == "friends")then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.show_callback = function()
@@ -177,15 +193,20 @@ function DockPage.OnClick(id)
         -- DockPage.SaveFriendsFansLocalData()
         DockPage.ChangeFriendRedTipState(false)
         DockPage.is_show_apply_red_tip = false
+
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.friends");
         return
     elseif(id == "school")then
         local MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
         MySchool:Show();
         last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.MySchool')
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");
     elseif(id == "system")then
         DockPage.OnClick_system_menu();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.system");
     elseif(id == "vip")then
         ParacraftLearningRoomDailyPage.OnVIP();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.vip");
     elseif(id == "mall")then
         local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
         KeepWorkMallPage.show_callback = function()
@@ -194,6 +215,7 @@ function DockPage.OnClick(id)
             DockPage.last_page_ctrl_id = id;
         end
         KeepWorkMallPage.Show();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.mall");
         return
     else
         --_guihelper.MessageBox(id);

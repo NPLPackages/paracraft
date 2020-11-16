@@ -98,6 +98,8 @@ end
 
 function ParaWorldMinimapWnd.OnClickSpawnpoint()
 	GameLogic.RunCommand("/home")
+
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.spawn_point");
 end
 
 function ParaWorldMinimapWnd.OnLocalWorldInfo()
@@ -115,6 +117,8 @@ function ParaWorldMinimapWnd.OnLocalWorldInfo()
 			_guihelper.MessageBox(L"请到并行世界中选择要入驻的大世界，在并行世界列表中可以点击进入并行世界！");
 		end
 	end
+
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.local_worldinfo");
 end
 
 function ParaWorldMinimapWnd.OnClickParaWorldList()
@@ -125,6 +129,8 @@ function ParaWorldMinimapWnd.OnClickParaWorldList()
 	--_guihelper.MessageBox(L"并行世界列表将在9.11日开放。在新建世界时，选择并行世界，创建属于自己的多人联网并行世界，未来可以邀请好友入驻到你的并行世界中")
 	local ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
 	ParaWorldList.ShowPage();
+
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.paraworld_list");
 end
 
 function ParaWorldMinimapWnd.OnClickMapName()
@@ -146,4 +152,20 @@ function ParaWorldMinimapWnd.SetMapName(name, userId)
 		ParaWorldMinimapWnd.userId = userId;
 		pageWnd:SetValue("mapName", name or L"地图")
 	end
+end
+
+function ParaWorldMinimapWnd.OnClickEnableSound()
+	if (ParaAudio.GetVolume()>0) then
+		ParaAudio.SetVolume(0);
+	else
+		ParaAudio.SetVolume(1);
+	end
+	if (pageWnd) then
+		pageWnd:Refresh(0);
+	end
+end
+
+function ParaWorldMinimapWnd.OnClickEvnTime()
+	local ParaWorldEnvTime = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldEnvTime.lua");
+	ParaWorldEnvTime.ShowPage();
 end

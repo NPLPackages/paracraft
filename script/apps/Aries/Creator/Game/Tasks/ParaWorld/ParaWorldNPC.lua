@@ -126,7 +126,7 @@ end
 function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
 	local function getTaskFromUrl(taskName, callback)
 		keepwork.rawfile.get({
-			cache_policy =  "access plus 1 day",
+			cache_policy =  "access plus 0",
 			router_params = {
 				repoPath = "official%%2Fparacraft",
 				filePath = "official%%2Fparacraft%%2Fconfig%%2F"..taskName..".md",

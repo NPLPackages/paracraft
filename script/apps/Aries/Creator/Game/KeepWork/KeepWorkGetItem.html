@@ -48,12 +48,20 @@ function getItemName()
     return desc
 end
 
+function OpenCrteate()
+    KeepWorkGetItem.OpenCrteate()
+end
+
+function OpenHome()
+    KeepWorkGetItem.OpenHome()
+end
+
 -- tricky code to decrease the count actually the min value
 --OnDecrease();
 ]]></script>
 <kp:window mode="lite" width="400" height="304" title='<%=L"提示"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
-    <div style="margin-top:40px;float:left;padding-left:20px;padding-top:20px;margin-left:40px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
+    <div style="margin-top:40px;float:left;padding-left:20px;padding-top:20px;margin-left:40px;width:114px;height:104px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
         <div style="position:relative;margin-left:6px;margin-top:0px;">
             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
         </div>   
@@ -62,7 +70,20 @@ end
         <div style="margin-left:8px;margin-top:60px;color:#000000;font-size:14px;"><%="你获得了"%></div>
         <div style="margin-left:8px;margin-top:20px;color:#999999;font-size:14px;"><%=getItemName()%></div>
     </div>
-    <div style="width:400px;height:32px;margin-top:35px;margin-left:80px">
+    <div style="width:400px;height:20px;margin-top:5px;margin-left:75px; color: #000000;font-weight:bold;font-size: 20pt;">
+        <div style="float:left;">前往</div>
+        <div style="float:left;color: #ff0000;">
+            <input type="button" value="创造" style="margin-left:-12px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenCrteate"/>
+        </div>
+        <div style="float:left;margin-left:1px">或</div>
+        <div style="float:left;color: #ff0000;">
+            <input type="button" value="家园" style="margin-left:-1px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenHome"/>
+        </div>
+        <div style="float:left;margin-left:2px;">点击</div>
+        <div style="float:left;margin-top:-3px;margin-left:-12px;width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png#0 0 36 36)"></div>
+        <div style="float:left;margin-left:3px">即可使用哦</div>
+    </div>
+    <div style="width:400px;height:32px;margin-top:20px;margin-left:80px">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:100px;height:38px;"></pe:goalpointer>
         <input type="button" value="收下" style="margin-left:70px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16)" onclick="OnOK()"/>
     </div>

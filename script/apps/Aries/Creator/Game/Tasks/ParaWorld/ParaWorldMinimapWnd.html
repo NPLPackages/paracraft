@@ -31,7 +31,14 @@ end
     <pe:custom name="surfaceRealtime" src="ParaWorldMinimapSurfaceRealtime.lua" classns="Paracraft.Controls.ParaWorldMinimapSurfaceRealtime" style="margin-left:0px;width:192px;height:192px;"></pe:custom>
     <div style="padding-left:2px;padding-bottom:2px;background-color:#000000;height:30px;width:192px;">
         <div style="background-color:#f0f0f0;height:28px;width:188px;height:28px;padding-top:2px;">
-            <input type="button" tooltip="并行世界列表" onclick="ParaWorldMinimapWnd.OnClickParaWorldList()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_worldmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:85px;" />
+            <pe:if condition='<%=ParaAudio.GetVolume()>0%>'>
+                <input type="button" tooltip="关闭背景音乐" onclick="ParaWorldMinimapWnd.OnClickEnableSound()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yinyue1_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:5px;" />
+            </pe:if>
+            <pe:if condition='<%=ParaAudio.GetVolume()==0%>'>
+                <input type="button" tooltip="打开背景音乐" onclick="ParaWorldMinimapWnd.OnClickEnableSound()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yinyue2_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:5px;" />
+            </pe:if>
+            <input type="button" tooltip="调整光线强度" onclick="ParaWorldMinimapWnd.OnClickEvnTime()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_guang_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:5px;" />
+            <input type="button" tooltip="并行世界列表" onclick="ParaWorldMinimapWnd.OnClickParaWorldList()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_worldmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:30px;" />
             <input type="button" tooltip="世界信息" onclick="ParaWorldMinimapWnd.OnLocalWorldInfo()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_localmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:8px;" />
             <input type="button" tooltip="回到出生点" onclick="ParaWorldMinimapWnd.OnClickSpawnpoint()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_spawnpoint_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:5px;" />
         </div>

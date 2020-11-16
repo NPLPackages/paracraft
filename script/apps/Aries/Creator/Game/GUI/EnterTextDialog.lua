@@ -55,7 +55,7 @@ end
 -- @param options: only used when type is "select" or "buttons". 
 -- when type_ is "select": it is {{value="0", text="zero"},{value="1"}}
 -- when type_ is "buttons": it is {"text1", "text2", "text3"}, result is button Index 
--- @param showParams: nil or {align="_ct", x, y, width, height}
+-- @param showParams: nil or {align="_ct", x, y, width, height, isTopLevel=false}
 function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, showParams)
 	EnterTextDialog.result = nil;
 	EnterTextDialog.text = text;
@@ -82,7 +82,7 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 		click_through = false, 
 		enable_esc_key = true,
 		bShow = true,
-		isTopLevel = true,
+		isTopLevel = (showParams.isTopLevel ~= false),
 		---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 			align = showParams.align or "_ct",

@@ -854,6 +854,14 @@ function BaseContext:handlePlayerKeyEvent(event)
 		elseif(dik_key == "DIK_X") then
 			GameLogic.TalkToNearestNPC();
 			event:accept();
+		elseif(dik_key == "DIK_R") then
+			-- local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+			
+			-- if KeepWorkMallPage.isOpen then
+			-- 	KeepWorkMallPage.Close()
+			-- else
+			-- 	KeepWorkMallPage.Show();
+			-- end
 		end
 	elseif(self:HandleQuickSelectKey(event)) then
 		-- quick select key

@@ -47,6 +47,7 @@ function CodeBlockSettings.OnInit()
 	if(entity) then
 		page:SetValue("allowClientExecution", entity:IsAllowClientExecution() == true);
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
+		page:SetValue("isOpenSource", entity:IsOpenSource() == true);
 		local languageFile = entity:GetLanguageConfigFile();
 		if(languageFile == "" or languageFile == "NPL" or languageFile=="npl") then
 			languageFile = ""
@@ -95,3 +96,9 @@ function CodeBlockSettings.OnSelectLang(name, value)
 	end
 end
 
+function CodeBlockSettings.OnSetOpenSource(value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		entity:SetOpenSource(value == true);
+	end
+end
