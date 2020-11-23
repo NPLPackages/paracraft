@@ -61,7 +61,7 @@ function ParaWorldMiniChunkGenerator:GetAllBlocks()
 	local originX, from_y, originZ = self:GetPivot();
 	for x = 19140, 19259 do
 		for z = 19140, 19259 do
-			local block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,255,z, 255, 255-from_y-1);
+			local block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,255,z, 0xffff, 255-from_y-1);
 			while(block_id and y >= (from_y-1)) do
 				if(not ignoreList[block_id]) then
 					if(y < from_y) then
@@ -85,7 +85,7 @@ function ParaWorldMiniChunkGenerator:GetAllBlocks()
 					end
 					blocks[#blocks+1] = {x-originX, y-from_y, z-originX, block_id, block_data, node}
 				end
-				block_id, y = BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, 255)
+				block_id, y = BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, 0xffff)
 			end
 		end
 	end

@@ -29,9 +29,13 @@ local DockTipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/Dock
 
 function KeepWorkGetItem.OnInit(data)
 	page = document:GetPageCtrl();
+
 	item_data = data
 end
 
+function KeepWorkGetItem.IsShowModelDesc()
+	return item_data.isModelProduct
+end
 -- {
 -- 	exchangeResult={
 -- 	  costList={

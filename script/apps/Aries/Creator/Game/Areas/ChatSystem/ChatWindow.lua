@@ -29,7 +29,7 @@ NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
 NPL.load("(gl)script/apps/Aries/SlashCommand/SlashCommand.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/SmileyPage.lua");
-
+NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
 local Scene = commonlib.gettable("MyCompany.Aries.Scene");
 local MsgHandler = commonlib.gettable("MyCompany.Aries.Combat.MsgHandler");
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
@@ -41,6 +41,7 @@ local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
 local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 local SmileyPage = commonlib.gettable("MyCompany.Aries.ChatSystem.SmileyPage");
 local Player = commonlib.gettable("MyCompany.Aries.Player");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 
 -- max number of broadcast message to display
 local max_broadcast_message = 3;
@@ -1058,7 +1059,7 @@ end
 
 function ChatWindow.BadWordsFilter(msgdata)
 	if(msgdata and msgdata.words)then
-		msgdata.words = MyCompany.Aries.Chat.BadWordFilter.FilterString(msgdata.words);
+		msgdata.words = BadWordFilter.FilterString(msgdata.words);
 	end
 	return msgdata;
 end

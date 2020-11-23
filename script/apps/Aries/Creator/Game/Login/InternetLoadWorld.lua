@@ -18,6 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteServerList.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/WorldUploadPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
+NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
 local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 local WorldUploadPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.WorldUploadPage");
 local RemoteServerList = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteServerList");
@@ -30,6 +31,7 @@ local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local ItemManager = commonlib.gettable("Map3DSystem.Item.ItemManager");
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/OtherPeopleWorlds.lua");
@@ -889,7 +891,7 @@ function InternetLoadWorld.ChangeNickName()
 	local count_charCN = math.floor((string.len(nickname) - ParaMisc.GetUnicodeCharNum(nickname))/2);
 	local count_weight = ParaMisc.GetUnicodeCharNum(nickname) + count_charCN;
 	
-	local certified_nickname = MyCompany.Aries.Chat.BadWordFilter.FilterStringForUserName(nickname);
+	local certified_nickname = BadWordFilter.FilterStringForUserName(nickname);
 	if(certified_nickname ~= nickname) then
 		_guihelper.MessageBox(format(L"你的昵称中包含非法语言:%s", certified_nickname));
 		return;

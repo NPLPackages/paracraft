@@ -367,16 +367,16 @@ function KeepWorkMallPage.HandleDataSources()
 						v.is_use = false
 						v.can_use = true
 						-- 如果有使用中的显示的需求
-						local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-						if EditModelTask and EditModelTask.GetModelFileInHand then
-							local file = EditModelTask:GetModelFileInHand()
-							if file == modelUrl or file == string.format("blocktemplates/%s.%s", good_data.name, good_data.fileType) then
-								v.buy_txt = "已使用"
-								v.enabled = false
-								v.is_use = true
-								v.can_use = false
-							end
-						end
+						-- local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+						-- if EditModelTask and EditModelTask.GetModelFileInHand then
+						-- 	local file = EditModelTask:GetModelFileInHand()
+						-- 	if file == modelUrl or file == string.format("blocktemplates/%s.%s", good_data.name, good_data.fileType) then
+						-- 		v.buy_txt = "已使用"
+						-- 		v.enabled = false
+						-- 		v.is_use = true
+						-- 		v.can_use = false
+						-- 	end
+						-- end
 
 					end
 
@@ -408,6 +408,10 @@ function KeepWorkMallPage.HandleDataSources()
 			v.cost_desc = v.price
 		end
 	end
+
+	table.sort(KeepWorkMallPage.grid_data_sources, function(a, b)
+		return (a.id > b.id);
+	end);
 end
 
 function KeepWorkMallPage.OnClickBuy(item_data)
@@ -598,16 +602,16 @@ function KeepWorkMallPage.ShowBuyModel()
 					data.enabled = true
 					data.can_use = true
 					-- 如果有使用中的显示的需求
-					local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-					if EditModelTask and EditModelTask.GetModelFileInHand then
-						local file = EditModelTask:GetModelFileInHand()
-						if file == string.format("blocktemplates/%s.%s", data.name, v.fileType) then
-							data.buy_txt = "已使用"
-							data.enabled = false
-							data.is_use = true
-							data.can_use = false
-						end
-					end
+					-- local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+					-- if EditModelTask and EditModelTask.GetModelFileInHand then
+					-- 	local file = EditModelTask:GetModelFileInHand()
+					-- 	if file == string.format("blocktemplates/%s.%s", data.name, v.fileType) then
+					-- 		data.buy_txt = "已使用"
+					-- 		data.enabled = false
+					-- 		data.is_use = true
+					-- 		data.can_use = false
+					-- 	end
+					-- end
 				end
 	
 				KeepWorkMallPage.grid_data_sources[#KeepWorkMallPage.grid_data_sources + 1] = data

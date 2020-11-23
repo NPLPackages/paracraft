@@ -16,6 +16,8 @@ local FriendConnection = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Frie
 local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 local FriendManager = NPL.export();
 
 local UserData = {}
@@ -301,7 +303,7 @@ end
 function FriendManager:BadWordsFilter(msgdata)
   local words = ""
 	if(msgdata)then
-		words = MyCompany.Aries.Chat.BadWordFilter.FilterString(msgdata);
+		words = BadWordFilter.FilterString(msgdata);
 	end
 	return words;
 end

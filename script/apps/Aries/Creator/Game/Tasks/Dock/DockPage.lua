@@ -15,12 +15,13 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
+local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
 DockPage.RefuseFansList = {}
-
+DockPage.IsShowClassificationPage = false
 DockPage.hide_vip_world_ids = {
     ONLINE = { 18626 },
     RELEASE = { 1236 },
@@ -64,7 +65,7 @@ function DockPage.Show()
 
     
     DockPage.LoadActivityList();
-
+    
     KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
         if(err ~= 200)then
             return
@@ -76,6 +77,12 @@ function DockPage.Show()
 
     -- 每日首次登陆自动打开任务面板
     DailyTaskManager.OpenDailyTaskView()
+
+    -- 每次登陆如果没有实名认证的弹实名认证窗口
+    if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
+        DockPage.IsShowClassificationPage = true
+        RegisterModal:ShowClassificationPage()
+    end
 end
 function DockPage.Hide()
     DockPage.is_show = false;
@@ -176,11 +183,24 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.study");
     elseif(id == "home")then
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.home");
-        
-        local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
-        SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
-            GameLogic.RunCommand("/loadworld home");
-        end);
+        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+
+        _guihelper.MessageBox(
+            format(L"即将离开【%s】进入【%s】", WorldCommon.GetWorldTag(), format(L"%s的家园", System.User.username)),
+            function(res)
+                if(res == _guihelper.DialogResult.OK)then
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+                    local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+                    LocalLoadWorld.CreateGetHomeWorld();
+    
+                    local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
+                    SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
+                        GameLogic.RunCommand("/loadworld home");
+                    end);
+                end
+            end,
+            _guihelper.MessageBoxButtons.OKCancel
+        )
     elseif(id == "friends")then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.show_callback = function()

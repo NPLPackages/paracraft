@@ -72,9 +72,9 @@ end
 
 -- @param posRotIncrements: smooth movement over this number of ticks
 function Entity:SetPositionAndRotation2(x,y,z, facing, pitch, posRotIncrements)
-    self.targetX = x;
-    self.targetY = y;
-    self.targetZ = z;
+    self.targetX = x or self.targetX;
+    self.targetY = y or self.targetY;
+    self.targetZ = z or self.targetZ;
     self.targetFacing = facing or self.targetFacing;
     self.targetPitch = pitch or self.targetPitch;
     self.smoothFrames = posRotIncrements or 1;
@@ -82,8 +82,8 @@ end
 
 -- @param posRotIncrements: smooth movement over this number of ticks
 function Entity:SetTargetHeadRotation(yaw, pitch, posRotIncrements)
-    self.targetHeadYaw = yaw;
-    self.targetHeadPitch = pitch;
+    self.targetHeadYaw = yaw or self.targetHeadYaw;
+    self.targetHeadPitch = pitch or self.targetHeadPitch;
     self.smoothFramesHead = posRotIncrements or 1;
 end
 

@@ -579,6 +579,8 @@ function ParaWorldChunkGenerator.OnEnterParaWorldGrid(params)
 			lastGridParams.y = gridY;
 			ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)
 		end
+		local ParaWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldUserInfo.lua");
+		ParaWorldUserInfo.ShowPage(params);
 	end
 	return params;
 end
@@ -645,6 +647,8 @@ function ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
 end
 
 function ParaWorldChunkGenerator.EnableCodeBlocksInGrid(x, y, bEnable)
+	commonlib.echo("EnableCodeBlocksInGrid");
+	commonlib.echo(bEnable);
 	local index = GetGridIndex(x, y)
 	if(gridCodeBlocks[index]) then
 		if(bEnable) then
@@ -652,11 +656,13 @@ function ParaWorldChunkGenerator.EnableCodeBlocksInGrid(x, y, bEnable)
 				ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
 			else
 				-- ask user for permission if logics are not enabled.
+				--[[
 				_guihelper.MessageBox(format(L"是否加载当前地块中的代码?"), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
 					end
 				end, _guihelper.MessageBoxButtons.YesNo);
+				]]
 			end
 		else
 			ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
@@ -687,4 +693,9 @@ function ParaWorldChunkGenerator:OnCodeTimer()
 			ParaWorldChunkGenerator.EnableCodeBlocksInGrid(grid.x, grid.y, false)
 		end
 	end
+end
+
+function ParaWorldChunkGenerator.GetCodeBlockListInGrid(x, y)
+	local index = GetGridIndex(x, y)
+	return gridCodeBlocks[index];
 end

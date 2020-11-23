@@ -29,6 +29,8 @@ MainLogin.state = {
 	HasSignedIn = nil,
 	HasInitedTexture = nil,
 	
+	IsPreloadedTextures = nil, -- added by leio
+
 	IsLoadMainWorldRequested = nil,
 	IsCreateNewWorldRequested = nil,
 	IsLoadTutorialWorldRequested = nil, -- NOT used
@@ -69,6 +71,9 @@ function MainLogin:start(init_callback)
 		LoadPlugins = self.LoadPlugins,
 
 		HasInitedTexture = self.HasInitedTexture,
+
+
+		PreloadTextures = self.PreloadTextures,
 
 		-- connect main world
 		LoadMainWorld = self.LoadMainWorld,
@@ -136,6 +141,8 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("LoadPlugins");
 	elseif(not state.HasInitedTexture) then
 		self:Invoke_handler("HasInitedTexture");
+	elseif(not state.IsPreloadedTextures) then
+		self:Invoke_handler("PreloadTextures");
 	else
 		-- already signed in 
 		if(not state.IsLoadMainWorldRequested) then	
@@ -616,6 +623,16 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 		end
 		return true;
 	end
+end
+function MainLogin:PreloadTextures()
+	if(System.options.servermode) then
+		self:next_step({IsPreloadedTextures = true});
+        return
+	end
+    local DockAssetsPreloader = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockAssetsPreloader.lua");
+    DockAssetsPreloader.Start(function()
+		self:next_step({IsPreloadedTextures = true});
+    end);
 end
 
 function MainLogin:LoadMainWorld()

@@ -137,7 +137,7 @@ end
                             <div style="width:100px;height:100px;padding-left:15px;">
 
                                 <pe:if condition='<%= IsFuture(Eval("index")) %>'>
-                                    <input type="button" name='<%= Eval("index")%>' style="margin-top:2px;width:60px;height:57px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png#0 0 60 57);" tooltip='<%=GetTitle(Eval("index"))%>' />
+                                    <input type="button" name='<%= Eval("index")%>' style="margin-top:2px;width:60px;height:57px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png#0 0 60 57);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
                                     <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
                                         <div style="text-align:center;">
                                              <%= GetLabel(Eval("index"))%>

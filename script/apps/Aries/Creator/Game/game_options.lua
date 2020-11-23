@@ -688,6 +688,13 @@ function options:HasTouchDevice()
 	end
 end
 
+-- get the current npl runtime version
+function options.GetBaseVersion()
+	local baseVersion = ParaEngine.GetAppCommandLineByParam("base_version", "2.0.0")
+	
+	return baseVersion
+end
+
 -- the version file should contain a single line of text such as "1.0.0"
 options.sVersionFileName = "version.txt";
 

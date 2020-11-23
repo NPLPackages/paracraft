@@ -101,9 +101,15 @@ end
 
 function StudyPage.clickArtOfWar()
 	-- _guihelper.MessageBox("敬请期待")
-	local word_id = 19405
-	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	UserConsole:HandleWorldId(word_id, "force");
+	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+	local info = string.format(L"即将离开【%s】进入【%s】", WorldCommon.GetWorldTag("name") or "", L"孙子兵法");
+	_guihelper.MessageBox(info, function(res)
+		if(res and res == _guihelper.DialogResult.OK) then
+			local word_id = 19405
+			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+			UserConsole:HandleWorldId(word_id, "force");
+		end
+	end, _guihelper.MessageBoxButtons.OKCancel);
 end
 
 function StudyPage.clickVideoRes()

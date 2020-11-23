@@ -690,15 +690,15 @@ function KeepWorkItemManager.DoExtendedCost(exid, callback, error_callback)
     end
     local profile = KeepWorkItemManager.GetProfile()
     local userId = profile.id;
-	LOG.std(nil, "debug", "KeepWorkItemManager.DoExtendedCost", "before DoExtendedCost userId = %s, exid = %s", tostring(userId), tostring(exid));
+	LOG.std(nil, "info", "KeepWorkItemManager.DoExtendedCost", "before DoExtendedCost userId = %s, exid = %s", tostring(userId), tostring(exid));
     keepwork.items.exchange({
         userId = userId, 
         exId = exid,
     },function(err, msg, data)
-	    LOG.std(nil, "debug", "KeepWorkItemManager.DoExtendedCost", "after DoExtendedCost userId = %s, exid = %s", tostring(userId), tostring(exid));
-	    LOG.std(nil, "debug", "KeepWorkItemManager.DoExtendedCost err", err);
-	    LOG.std(nil, "debug", "KeepWorkItemManager.DoExtendedCost msg", msg);
-	    LOG.std(nil, "debug", "KeepWorkItemManager.DoExtendedCost data", data);
+	    LOG.std(nil, "info", "KeepWorkItemManager.DoExtendedCost", "after DoExtendedCost userId = %s, exid = %s", tostring(userId), tostring(exid));
+	    LOG.std(nil, "info", "KeepWorkItemManager.DoExtendedCost err", err);
+	    LOG.std(nil, "info", "KeepWorkItemManager.DoExtendedCost msg", msg);
+	    LOG.std(nil, "info", "KeepWorkItemManager.DoExtendedCost data", data);
         if(err == 200)then
 
             local bags_number = KeepWorkItemManager.SearchBagsNoFromExid(exid);
@@ -754,16 +754,16 @@ function KeepWorkItemManager.SetClientData(gsid, clientData, callback, error_cal
         return
     end
     clientData = clientData or {};
-	LOG.std(nil, "debug", "KeepWorkItemManager.setClientData", "before setClientData userGoodsId = %s", tostring(guid));
-	LOG.std(nil, "debug", "KeepWorkItemManager.setClientData clientData", clientData);
+	LOG.std(nil, "info", "KeepWorkItemManager.setClientData", "before setClientData userGoodsId = %s", tostring(guid));
+	LOG.std(nil, "info", "KeepWorkItemManager.setClientData clientData", clientData);
     keepwork.items.setClientData({
         userGoodsId = guid,
         clientData = clientData,
     },function(err, msg, data)
-	    LOG.std(nil, "debug", "KeepWorkItemManager.setClientData", "after setClientData userGoodsId = %s", tostring(guid));
-        LOG.std(nil, "debug", "KeepWorkItemManager.setClientData err", err);
-	    LOG.std(nil, "debug", "KeepWorkItemManager.setClientData msg", msg);
-	    LOG.std(nil, "debug", "KeepWorkItemManager.setClientData data", data);
+	    LOG.std(nil, "info", "KeepWorkItemManager.setClientData", "after setClientData userGoodsId = %s", tostring(guid));
+        LOG.std(nil, "info", "KeepWorkItemManager.setClientData err", err);
+	    LOG.std(nil, "info", "KeepWorkItemManager.setClientData msg", msg);
+	    LOG.std(nil, "info", "KeepWorkItemManager.setClientData data", data);
         if(err == 200)then
             --synchronize data to memory 
             item.clientData = clientData;

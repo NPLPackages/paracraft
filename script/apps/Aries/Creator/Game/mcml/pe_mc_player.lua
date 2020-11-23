@@ -35,6 +35,13 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		autoRotateSpeed = 0;
 	end
 
+	local callback = function(ctl)
+		pe_mc_player.OnFrameMove(ctl, mcmlNode);
+	end;
+	if (mcmlNode:GetBool("NoFrameMove")) then
+		callback = nil;
+	end
+
 	local miniSceneName = mcmlNode:GetAttributeWithCode("miniscenegraphname") or "pe:player"..ParaGlobal.GenerateUniqueID();
 
 	local instName = mcmlNode:GetInstanceName(rootName);
@@ -57,9 +64,7 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		DefaultCameraObjectDist = mcmlNode:GetNumber("DefaultCameraObjectDist") or 7,
 		DefaultLiftupAngle = mcmlNode:GetNumber("DefaultLiftupAngle") or 0.25,
 		LookAtHeight = mcmlNode:GetNumber("LookAtHeight") or 1.5,
-		FrameMoveCallback = function(ctl)
-			pe_mc_player.OnFrameMove(ctl, mcmlNode);
-		end,
+		FrameMoveCallback = callback,
 	};
 	mcmlNode.Canvas3D_ctl = ctl;
 	mcmlNode.control = ctl;

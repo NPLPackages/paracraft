@@ -101,7 +101,8 @@ function ParaWorldNPC.CreateNPCImp(npc)
 			npc.npcColor or "#fcf73c", npc.npcName);
 		entity:SetHeadOnDisplay({url=ParaXML.LuaXML_ParseString(headon_mcml)})
 		entity.OnClick = function(entity, x, y, z, mouse_button)
-			GameLogic.RunCommand("/loadworld -force 19405");
+			local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
+			StudyPage.clickArtOfWar();
 			return true;
 		end
 	elseif (npc.npcType == "code_learn") then

@@ -96,7 +96,11 @@ function TeachingQuestTitle.OnWorldLoaded()
 						end
 					end
 
-					TeachingQuestTitle.ShowPage("?info=task");
+					if (TeachingQuestPage.currentType < TeachingQuestPage.LanguageType) then
+						TeachingQuestTitle.OnShowPanel();
+					else
+						TeachingQuestTitle.OnHidePanel();
+					end
 					GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
 					GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 					GameLogic.GetFilters():add_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
@@ -141,18 +145,18 @@ function TeachingQuestTitle.CheckAndShow()
 end
 
 function TeachingQuestTitle.OnShowPanel()
-	TeachingQuestTitle.CheckAndShow();
+	TeachingQuestTitle.ShowPage();
 end
 
 function TeachingQuestTitle.OnHidePanel()
-	TeachingQuestTitle.ShowPage(nil, 0, -100, false);
+	TeachingQuestTitle.ShowPage(0, -100, false);
 end
 
 function TeachingQuestTitle:MoveDown(event)
 	if (event.bShow) then
-		TeachingQuestTitle.ShowPage(nil, 0, 32);
+		TeachingQuestTitle.ShowPage(0, 32);
 	else
-		TeachingQuestTitle.ShowPage(nil, 0, 0);
+		TeachingQuestTitle.ShowPage(0, 0);
 	end
 end
 
@@ -160,9 +164,9 @@ function TeachingQuestTitle:MoveLeft(event)
 	if (event.bShow) then
 		local x, y, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 		local offset = (width + 488)/2 - (width - event.width);
-		TeachingQuestTitle.ShowPage(nil, -offset, 0);
+		TeachingQuestTitle.ShowPage(-offset, 0);
 	else
-		TeachingQuestTitle.ShowPage(nil, 0, 0);
+		TeachingQuestTitle.ShowPage(0, 0);
 	end
 end
 
@@ -190,16 +194,15 @@ function TeachingQuestTitle.OnKeepWorkLogout_Callback(res)
 	GameLogic.RunCommand("/leaveworld")
 end
 
-function TeachingQuestTitle.ShowPage(param, offsetX, offsetY, show)
+function TeachingQuestTitle.ShowPage(offsetX, offsetY, show)
 	if (page) then
 		page:CloseWindow();
 	end
 	if (show == nil) then show = true end
 	TeachingQuestTitle.IsPanelVisible = show;
-	TeachingQuestTitle.showParam = param or TeachingQuestTitle.showParam;
 	
 	local params = {
-		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html"..TeachingQuestTitle.showParam, 
+		url = "script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.html", 
 		name = "TeachingQuestTitle.ShowPage", 
 		isShowTitleBar = false,
 		DestroyOnClose = true,
@@ -266,6 +269,7 @@ function TeachingQuestTitle.GetTotalTickets()
 	return tostring(copies);
 end
 
+--[[
 function TeachingQuestTitle.ReceiveTicket()
 	KeepWorkItemManager.DoExtendedCost(TeachingQuestPage.ticketExid, function()
 		TeachingQuestTitle.CheckAndShow();
@@ -274,6 +278,7 @@ function TeachingQuestTitle.ReceiveTicket()
 		TeachingQuestTitle.ShowPage("?info=main&ticket=non_today");
 	end);
 end
+]]
 
 local firstStart = true;
 function TeachingQuestTitle.StartTask()
@@ -336,7 +341,7 @@ function TeachingQuestTitle.StartTask()
 				TeachingQuestTitle.FinishedTask(true)
 			else
 				ParaGlobal.ShellExecute("open", task.url, "", "", 1);
-				TeachingQuestTitle.ShowPage("?info=task");
+				TeachingQuestTitle.ShowPage();
 			end
 		end
 
@@ -397,13 +402,13 @@ function TeachingQuestTitle.FinishedTask(complete_task_directly)
 		
 		if not DailyTaskManager.CheckTaskCompelete(DailyTaskManager.task_id_list.WeekWork) and (os.time() - TaskTime >= TimeLimit or complete_task_directly) then
 			DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.WeekWork, function ()
-				TeachingQuestTitle.ShowPage("?info=task");
+				TeachingQuestTitle.ShowPage();
 			end)
 			
 		end
 	end
 	taskInProcess = false;
-	TeachingQuestTitle.ShowPage("?info=task");
+	TeachingQuestTitle.ShowPage();
 end
 
 function TeachingQuestTitle.OnClose()

@@ -25,7 +25,7 @@ end
             <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Stop%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
             <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Question%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/Help.png);width:24px;height:24px;" /></pe:if>
         </pe:if>    
-        <div style="float:left;padding:16px;height:120px;">
+        <div style="float:left;padding:30px;height:120px;font-size:16px;">
             <!-- tricky: always reference content like below. It allows MCML code that needs page:Refresh to work inside content.-->
             <script refresh="false" IsInitialized='<%=_guihelper.values.IsInitialized%>'>
                 document.write(_guihelper.values.content);
@@ -35,37 +35,37 @@ end
   <pe:if condition='<%=_guihelper.values.buttons~=_guihelper.MessageBoxButtons.Nothing%>'>
     <div style="padding:5px;padding-bottom:10px;">
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel%>'>
-          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:113px;margin-top:5px;width:180px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK%>'>
-          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:220px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:220px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNo%>'>
-          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:113px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="kp_gray_button" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNoCancel%>'>
-            <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:6px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-            <input type="button" class="kp_gray_button" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-            <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:6px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="kp_gray_button" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.AbortRetryIgnore%>'>
-        <input type="button" class="kp_yellow_button" name="Abort" value='<%=L"终止"%>' style="margin-left:6px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="kp_gray_button" name="Retry" value='<%=L"重试"%>' style="margin-left:34px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="kp_gray_button" name="Ignore" value='<%=L"忽略"%>' style="margin-left:34px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_yellow_button" name="Abort" value='<%=L"终止"%>' style="margin-left:6px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" name="Retry" value='<%=L"重试"%>' style="margin-left:34px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" name="Ignore" value='<%=L"忽略"%>' style="margin-left:34px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.RetryCancel%>'>
-        <input type="button" class="kp_yellow_button" name="Retry" value='<%=L"重试"%>' style="margin-left:113px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_yellow_button" name="Retry" value='<%=L"重试"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel%>'>
-          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="kp_gray_button" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right%>'>
-          <input type="button" class="kp_gray_button" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
     </div>
   </pe:if>

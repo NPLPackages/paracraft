@@ -235,9 +235,11 @@ function BaseContext:CheckMousePick()
 	CameraController.OnMousePick(result, SelectionManager:GetPickingDist());
 	
 	if(result.length and result.blockX) then
-		if(not EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
-			SelectionManager:ClearPickingResult();
-		end
+        if(EntityManager.GetFocus())then
+            if(not EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
+			    SelectionManager:ClearPickingResult();
+		    end
+        end
 	end
 	
 	-- highlight the block or terrain that the mouse picked

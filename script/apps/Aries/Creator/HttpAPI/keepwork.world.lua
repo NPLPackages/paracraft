@@ -109,3 +109,16 @@ HttpWrapper.Create("keepwork.world.unlike", "%MAIN%/core/v0/3DCampus/paraWorldSt
 HttpWrapper.Create("keepwork.world.is_liked", "%MAIN%/core/v0/3DCampus/paraWorldStars/search", "POST", true)
 
 
+--http://yapi.kp-para.cn/project/32/interface/api/752
+-- 获取项目信息
+HttpWrapper.Create("keepwork.world.detail", "%MAIN%/core/v0/projects/:id/detail", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/3552
+-- 点赞
+HttpWrapper.Create("keepwork.world.star", "%MAIN%/core/v0/projects/:id/star", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/3572
+-- 是否点过赞
+HttpWrapper.Create("keepwork.world.is_stared", "%MAIN%/core/v0/projects/:id/star", "GET", true)
+
+

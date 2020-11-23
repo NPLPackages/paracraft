@@ -56,6 +56,10 @@ function OpenHome()
     KeepWorkGetItem.OpenHome()
 end
 
+function IsShowModelDesc()
+    return KeepWorkGetItem.IsShowModelDesc()
+end
+
 -- tricky code to decrease the count actually the min value
 --OnDecrease();
 ]]></script>
@@ -71,17 +75,19 @@ end
         <div style="margin-left:8px;margin-top:20px;color:#999999;font-size:14px;"><%=getItemName()%></div>
     </div>
     <div style="width:400px;height:20px;margin-top:5px;margin-left:75px; color: #000000;font-weight:bold;font-size: 20pt;">
-        <div style="float:left;">前往</div>
-        <div style="float:left;color: #ff0000;">
-            <input type="button" value="创造" style="margin-left:-12px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenCrteate"/>
-        </div>
-        <div style="float:left;margin-left:1px">或</div>
-        <div style="float:left;color: #ff0000;">
-            <input type="button" value="家园" style="margin-left:-1px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenHome"/>
-        </div>
-        <div style="float:left;margin-left:2px;">点击</div>
-        <div style="float:left;margin-top:-3px;margin-left:-12px;width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png#0 0 36 36)"></div>
-        <div style="float:left;margin-left:3px">即可使用哦</div>
+        <pe:if condition = '<%=IsShowModelDesc()%>'>
+            <div style="float:left;">前往</div>
+            <div style="float:left;color: #ff0000;">
+                <input type="button" value="创造" style="margin-left:-12px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenCrteate"/>
+            </div>
+            <div style="float:left;margin-left:1px">或</div>
+            <div style="float:left;color: #ff0000;">
+                <input type="button" value="家园" style="margin-left:-1px;width:35px;height:20px;color: #ff0000; background:;font-weight:bold;font-size: 14pt;margin-top: 1px;" onclick="OpenHome"/>
+            </div>
+            <div style="float:left;margin-left:2px;">点击</div>
+            <div style="float:left;margin-top:-3px;margin-left:-12px;width:26px;height:26px;background:url(Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png#0 0 36 36)"></div>
+            <div style="float:left;margin-left:3px">即可使用哦</div>
+        </pe:if>
     </div>
     <div style="width:400px;height:32px;margin-top:20px;margin-left:80px">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:100px;height:38px;"></pe:goalpointer>

@@ -243,13 +243,24 @@ Commands["panorama"] = {
 			end, 1000)
 		end
 
+		function delay(time, chain)
+			commonlib.TimerManager.SetTimeout(function()
+				chain()
+			end, time)
+		end
+
 		---[[
 		
 		GameLogic.RunCommand("/property -all-2 PasueScene true")
 		GameLogic.RunCommand("/hide desktop")
 		GameLogic.RunCommand("/hide tips")
 		GameLogic.RunCommand("/hide")
-		GameLogic.RunCommand("/fov 1.57")
+		
+		-- GameLogic.RunCommand("/fov 1.57")
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/CameraController.lua");
+		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
+		CameraController.AnimateFieldOfView(1.57, 10);
+
 
 		ParaScene.GetAttributeObject():SetField("BlockInput", true)
 		ParaCamera.GetAttributeObject():SetField("BlockInput", true)
@@ -261,61 +272,65 @@ Commands["panorama"] = {
 
 		viewport:SetPosition("_lt", 0, 0, _height, _height)
 		ParaUI.GetUIObject("root").visible = false
-			
-		shot(0, 3.14, 0, function()
-			shot(0, -1.57, 1, function()
-				shot(0, 0, 2, function()
-					shot(0, 1.57, 3, function()
-						shot(-1.57, 3.14, 4, function()
-							shot(1.57, 3.14, 5, function()
-								GameLogic.RunCommand("/t 2 /property -all-2 PasueScene false")	
 
-								ParaEngine.ForceRender()
-								ParaEngine.ForceRender()
-						
-								viewport:SetPosition("_fi", 0, 0, 0, 0)
-								ParaUI.GetUIObject("root").visible = true
+		delay(1000, function()
+			shot(0, 3.14, 0, function()
+				shot(0, -1.57, 1, function()
+					shot(0, 0, 2, function()
+						shot(0, 1.57, 3, function()
+							shot(-1.57, 3.14, 4, function()
+								shot(1.57, 3.14, 5, function()
+									GameLogic.RunCommand("/t 2 /property -all-2 PasueScene false")	
 
-								crop_shot(0, function()  -- clear root ui object cache
-									crop_shot(0, function()
-										delete_tempfile(0)
-										crop_shot(1, function()
-											delete_tempfile(1)
-											crop_shot(2, function()
-												delete_tempfile(2)
-												crop_shot(3, function()
-													delete_tempfile(3)
-													crop_shot(4, function()
-														delete_tempfile(4)
-														crop_shot(5, function()
-															delete_tempfile(5)
-
-															GameLogic.RunCommand("/show desktop")
-															GameLogic.RunCommand("/show tips")
-															GameLogic.RunCommand("/show")
+									ParaEngine.ForceRender()
+									ParaEngine.ForceRender()
 							
-															ParaUI.ShowCursor(true)
-															ParaScene.EnableMiniSceneGraph(true);
-							
-															GameLogic.RunCommand("/fov 1")
-															GameLogic.RunCommand("/cameradist 10")
-															GameLogic.RunCommand("/camerapitch 0")
+									viewport:SetPosition("_fi", 0, 0, 0, 0)
+									ParaUI.GetUIObject("root").visible = true
 
-															ParaScene.GetAttributeObject():SetField("BlockInput", false)
-															ParaCamera.GetAttributeObject():SetField("BlockInput", false)
-													
-															-- send event
-															CommandManager:RunCommand('/sendevent after_generate_panorama')
+									crop_shot(0, function()  -- clear root ui object cache
+										crop_shot(0, function()
+											delete_tempfile(0)
+											crop_shot(1, function()
+												delete_tempfile(1)
+												crop_shot(2, function()
+													delete_tempfile(2)
+													crop_shot(3, function()
+														delete_tempfile(3)
+														crop_shot(4, function()
+															delete_tempfile(4)
+															crop_shot(5, function()
+																delete_tempfile(5)
+
+																GameLogic.RunCommand("/show desktop")
+																GameLogic.RunCommand("/show tips")
+																GameLogic.RunCommand("/show")
+								
+																ParaUI.ShowCursor(true)
+																ParaScene.EnableMiniSceneGraph(true);
+								
+																-- GameLogic.RunCommand("/fov 1")
+																CameraController.AnimateFieldOfView(1, 10);
+																
+																GameLogic.RunCommand("/cameradist 10")
+																GameLogic.RunCommand("/camerapitch 0")
+
+																ParaScene.GetAttributeObject():SetField("BlockInput", false)
+																ParaCamera.GetAttributeObject():SetField("BlockInput", false)
+														
+																-- send event
+																CommandManager:RunCommand('/sendevent after_generate_panorama')
+															end)
 														end)
 													end)
 												end)
 											end)
 										end)
 									end)
-								end)
 
+								end)	
 							end)	
-						end)	
+						end)
 					end)
 				end)
 			end)

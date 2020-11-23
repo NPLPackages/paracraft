@@ -115,14 +115,31 @@
   <asset filename="character/CC/artwar/game/assassin.x" displayname="刺客" name="assassin"/>
   <!-- 11-5更新 -->
   <asset filename="character/CC/artwar/movie/boy_ground_service.x" displayname="男地勤" name="boy_ground_service"/>
-  <asset filename="character/CC/artwar/movie/boy_police.x" displayname="男警察" name="boy_police"/>
-  <asset filename="character/CC/artwar/movie/boy_worker_1.x" displayname="男工人" name="boy_worker_1"/>
   <asset filename="character/CC/artwar/movie/girl_ground_service.x" displayname="女地勤" name="girl_ground_service"/>
-<!--   <asset filename="character/CC/artwar/game/girl_police.x" displayname="女警察" name="girl_police"/> -->
-  <asset filename="character/CC/artwar/movie/girl_worker_1.x" displayname="女工人" name="girl_worker_1"/>
+  <asset filename="character/CC/artwar/movie/boy_police.x" displayname="男民警" name="boy_police"/>
+  <asset filename="character/CC/artwar/movie/girl_police.x" displayname="女民警" name="girl_police"/>
+  <asset filename="character/CC/artwar/movie/boy_police_c.x" displayname="男网警" name="boy_police_c"/> 
+  <asset filename="character/CC/artwar/movie/girl_police_c.x" displayname="女网警" name="girl_police_c"/> 
+  <asset filename="character/CC/artwar/movie/boy_traffic_police.x" displayname="男交警" name="boy_traffic_police"/> 
+  <asset filename="character/CC/artwar/movie/girl_traffic_police.x" displayname="女交警" name="girl_traffic_police"/>  
+  <asset filename="character/CC/artwar/movie/boy_traffic_police_c.x" displayname="男辅警" name="boy_traffic_police_c"/> 
+  <asset filename="character/CC/artwar/movie/girl_traffic_police_c.x" displayname="女辅警" name="girl_traffic_police_c"/> 
   <asset filename="character/CC/artwar/movie/thief.x" displayname="小偷" name="thief"/>
-
-
+  <asset filename="character/CC/artwar/movie/fireman.x" displayname="消防员" name="fireman"/>
+  <asset filename="character/CC/artwar/movie/boy_worker_1.x" displayname="男工人" name="boy_worker_1"/>
+  <asset filename="character/CC/artwar/movie/girl_worker_1.x" displayname="女工人" name="girl_worker_1"/>
+  <asset filename="character/CC/artwar/movie/boy_cook.x" displayname="男厨师" name="boy_cook"/> 
+  <asset filename="character/CC/artwar/movie/girl_cook.x" displayname="女厨师" name="girl_cook"/> 
+  <asset filename="character/CC/artwar/movie/boy_waiter1.x" displayname="男服务员1" name="boy_waiter1"/> 
+  <asset filename="character/CC/artwar/movie/girl_waiter1.x" displayname="女服务员1" name="girl_waiter1"/> 
+  <asset filename="character/CC/artwar/movie/boy_waiter2.x" displayname="男服务员2" name="boy_waiter2"/> 
+  <asset filename="character/CC/artwar/movie/girl_waiter2.x" displayname="女服务员2" name="girl_waiter2"/> 
+<!--   <asset filename="character/CC/artwar/movie/boy_air_force.x" displayname="男空军" name="boy_air_force"/> 
+  <asset filename="character/CC/artwar/movie/girl_air_force.x" displayname="女空军" name="girl_air_force"/> 
+  <asset filename="character/CC/artwar/movie/boy_land_force.x" displayname="男陆军" name="boy_land_force"/> 
+  <asset filename="character/CC/artwar/movie/girl_land_force.x" displayname="女陆军" name="girl_land_force"/> 
+  <asset filename="character/CC/artwar/movie/boy_navy_force.x" displayname="男海军" name="boy_navy_force"/> 
+  <asset filename="character/CC/artwar/movie/girl_navy_force.x" displayname="女海军" name="girl_navy_force"/>  -->
 
 
   <!-- artwar in shanghai电影 -->
@@ -238,7 +255,6 @@
   <asset filename="character/CC/artwar/movie/school38.x" displayname="世外小学女生3" name="shcool38"/>
   <asset filename="character/CC/artwar/movie/school39.x" displayname="世外小学女生4" name="shcool39"/>
   <asset filename="character/CC/artwar/movie/school40.x" displayname="世外小学女生5" name="shcool40"/> -->
-  <asset filename="character/CC/artwar/movie/fireman.x" displayname="消防员" name="fireman"/>
 
 
   <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="大使" name="ABML" school="false"/>

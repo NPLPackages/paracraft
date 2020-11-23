@@ -11,10 +11,11 @@
             <![CDATA[
             TeachingQuestTitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestTitle.lua");
             TeachingQuestTitle.OnInit();
-            info = Page:GetRequestParam("info") or "main"
-            ticket = Page:GetRequestParam("ticket") or "receive"
+            --info = Page:GetRequestParam("info") or "main"
+            --ticket = Page:GetRequestParam("ticket") or "receive"
             ]]>
         </script>
+        <!--
         <pe:if condition='<%=(info=="main")%>'>
             <aries:window mode="no_title" style="width:488px;height:120px">
                 <div style="height:25px;color:#ffffff;">
@@ -31,9 +32,6 @@
                     <div style="margin-left:10px;">
                         <%=L"知识豆："%>
                         <input type="button" name="reward" value='<%=TeachingQuestTitle.GetTotalPoints()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
-                        <!--
-                        <input type="button" style="width:76px;height:28px;margin-top:-2px;margin-left:5px;color:#ffffff;" value='<%=L"知识豆兑换" %>' class="mc_orange_button_with_fillet" onclick="" />
-                        -->
                     </div>
                     <pe:if condition='<%=(ticket=="receive")%>'>
                         <div style="margin-top:-23px;margin-left:310px">
@@ -71,6 +69,8 @@
                 </div>
             </aries:window>
         </pe:if>
+        -->
+        <!--
         <pe:if condition='<%=(info=="task")%>'>
             <aries:window mode="no_title" style="width:488px;height:110px">
                 <div style="height:25px;color:#ffffff;">
@@ -108,6 +108,54 @@
                 </div>
             </aries:window>
         </pe:if>
+        -->
+        <aries:window mode="no_title" style="width:488px;height:120px">
+            <div style="height:25px;color:#ffffff;">
+                <div style="margin-left:48px;margin-top:-20px;width:420px;height:24px;text-align:center;color:#ffffff;font-size:14px;font-weight:bold">
+                    <%= TeachingQuestTitle.GetTaskTitle() %>
+                </div>
+                <div style="margin-left:54px;margin-top:0px;width:420px;height:20px;text-align:center;color:#ffffff;font-size:12px">
+                    <%= TeachingQuestTitle.GetTaskInfo() %>
+                </div>
+                <pe:if condition='<%=(not TeachingQuestTitle.IsTaskInProcess())%>'>
+                    <input type="button" style="spacing:4px;width:40px;height:30px;margin-left:10px;margin-top:-34px;" value='<%=L"返回" %>' class="mc_light_grey_button_with_fillet" onclick="TeachingQuestTitle.OnReturn" />
+                </pe:if>
+            </div>
+            <div style="margin:5px;"><hr /></div>
+            <div style="margin-top:6px;width:488px;height:50px;color:#ffffff;">
+                <div style="margin-left:10px;">
+                    <%=L"知识豆："%>
+                    <input type="button" name="totalpoints" value='<%=TeachingQuestTitle.GetTotalPoints()%>' style="color: #ffffff; background:; margin-top: 0px;text-align:left;max-width:60px;" />
+                </div>
+                <pe:if condition='<%=(not TeachingQuestTitle.IsTaskFinished())%>'>
+                    <input type="button" style="width:80px;height:26px;margin-top:-24px;margin-left:386px;color:#ffffff;" value='<%=L"开始任务" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                </pe:if>
+                <pe:if condition='<%=(TeachingQuestTitle.IsTaskInProcess())%>'>
+                    <div style="margin-top:-23px;margin-left:284px">
+                        <%=L"任务进行中"%>
+                        <input type="button" style="width:100px;height:26px;margin-top:-2px;margin-left:15px;color:#ffffff;" value='<%=L"确认完成" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.FinishedTask" />
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=(TeachingQuestTitle.IsTaskFinished() and not TeachingQuestTitle.IsTaskInProcess())%>'>
+                    <div style="margin-top:-23px;margin-left:284px">
+                        <%=L"任务已完成"%>
+                        <input type="button" style="width:100px;height:26px;margin-top:-2px;margin-left:15px;color:#ffffff;" value='<%=L"查看任务内容" %>' class="mc_blue_button_with_fillet" onclick="TeachingQuestTitle.StartTask" />
+                    </div>
+                </pe:if>
+            </div>
+            <div style="margin-top:-23px;margin-left:214px;width:60px;height:20px;">
+                <pe:if condition='<%=TeachingQuestTitle.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeachingQuestTitle.OnHidePanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/uparrow.png)">
+                        <div tooltip='<%=L"点击隐藏面板"%>' onclick="TeachingQuestTitle.OnHidePanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not TeachingQuestTitle.IsPanelVisible%>'>
+                    <div tooltip='<%=L"点击显示面板"%>' onclick="TeachingQuestTitle.OnShowPanel" style="margin-left:14px;width:32px;height:16px;background:url(Texture/3DMapSystem/common/downarrow.png)">
+                        <div tooltip='<%=L"点击显示面板"%>' onclick="TeachingQuestTitle.OnShowPanel" style="margin-left:-14px;margin-top:-2px;width:60px;height:20px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/gray_bg_32bits.png:6 6 6 6);"></div>
+                    </div>
+                </pe:if>
+            </div>
+        </aries:window>
     </pe:mcml>
 </body>
 </html>
