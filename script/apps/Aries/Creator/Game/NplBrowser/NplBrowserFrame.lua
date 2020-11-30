@@ -36,11 +36,10 @@ function NplBrowserFrame:ctor()
         autoscale = false,
         fixed = false,
         candrag = false,
-        closeBtnTitle = "X"
+        closeBtnTitle = "X",
+        scale_screen = nil,
 
     };
-    self.min_w = 960;
-    self.min_h = 560;
     self.page = nil;
     self.ui_obj = nil;
     self.width = nil;
@@ -82,7 +81,9 @@ function NplBrowserFrame:Show(url, title, is_show_control, is_show_close, option
     options = options or {};
     -- union options and default_options
     for k,v in pairs(self.default_options) do
-        options[k] = options[k] or self.default_options[k]
+        if(options[k] == nil)then
+            options[k] = self.default_options[k]
+        end
     end
     self.options = options
     
@@ -106,6 +107,15 @@ function NplBrowserFrame:_Show(url)
     if(self.options.candrag)then
         candrag = true;
     end
+    local bg_obj = self:GetBGUIObject();
+    if(not candrag)then
+        if(not bg_obj)then
+		    bg_obj = ParaUI.CreateUIObject("container", name .. "_bg", "_fi", 0, 0, 0, 0);
+		    bg_obj.background="";
+		    bg_obj:AttachToRoot();
+        end
+    end
+    
     local _this = self:GetUIObject();
 	if(not _this) then
 		local width, height  = self:CalculateSize();
@@ -155,7 +165,11 @@ function NplBrowserFrame:_Show(url)
 
 		self.page = page;
 	end
+    
 	if(_this and self.page)then
+        if(bg_obj)then
+		    bg_obj.visible = true;
+        end
 		_this.visible = true;
         _this.candrag = candrag;
 		_this.zorder = zorder;
@@ -177,16 +191,33 @@ function NplBrowserFrame:CalculateSize()
 	local right = options.right or 0;
 	local bottom = options.bottom or 0;
 
-	local w = width - left - right;
-	local h = height - top - bottom;
-	
-	if(w < self.min_w)then
-		w = self.min_w
-	end
-	if(h < self.min_h)then
-		h = self.min_h
-	end
+    local w = width;
+    local h = height;
+    if(options.scale_screen)then
+        local h_value,v_value,direction = string.match(options.scale_screen,"(.+):(.+):(.+)");
+        if(h_value and v_value and direction)then
+            h_value = tonumber(h_value)
+            v_value = tonumber(v_value)
+            local scale_v = h_value / v_value;
+            if(direction == "h")then
+                w = width;
+                h = width / scale_v;
+            else
+                w = height * scale_v;
+                h = height;
+            end
+        end
+    end
+	w = w - left - right;
+	h = h - top - bottom;
+
 	return w,h;
+end
+function NplBrowserFrame:GetBGUIObject()
+	local _this = ParaUI.GetUIObject(self.name .. "_bg");
+	if(_this:IsValid()) then
+		return _this;
+	end
 end
 function NplBrowserFrame:GetUIObject()
 	local _this = ParaUI.GetUIObject(self.name);
@@ -195,6 +226,10 @@ function NplBrowserFrame:GetUIObject()
 	end
 end
 function NplBrowserFrame:Close_Internal()
+    local bg_obj = self:GetBGUIObject();
+    if(bg_obj)then
+		bg_obj.visible = false;
+    end
     local obj = self:GetUIObject();
 	if(obj) then
 		obj.visible = false;

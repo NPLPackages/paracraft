@@ -91,6 +91,12 @@ end
 function CanShowApplyFriendRedTip()
     return FriendsPage.show_apply_friend_red_tip;
 end
+
+function GetNmae(data)
+	local name = data.nickname or data.username
+	name = name or ""
+    return name
+end
 ]]></script>
 <kp:window name="iframe" mode="lite" width="330" height="583" title='<%= L"好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
@@ -165,7 +171,7 @@ end
                                         <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46"/>
                                     </div>
                                     <div style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
-                                        <%=Eval("nickname") %>
+                                        <%=GetNmae(XPath("this")) %>
                                     </div>
                                     <pe:if condition='<%=IsSelected(1)%>'>
                                         <div style="float: left;margin-left:38px;margin-top:0px;">

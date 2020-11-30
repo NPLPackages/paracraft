@@ -74,6 +74,12 @@ function OnClickOpenTemplateDir()
     BlockTemplatePage.OnClickOpenTemplateDir()
 end
 
+function OnSelectOfficial()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+    local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+    QuickSelectBar.OnClickTemplate();
+end
+
 function OnSelectNode(name, mcmlNode)
     local item = mcmlNode:GetPreValue("this", true);
     --Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
@@ -167,6 +173,9 @@ end
             </div>
             <pe:treeview name="gvwBlockTemplates" class="mc_border" VerticalScrollBarStep="20" RememberScrollPos="true" DataSource='<%=DS_GetBlockTemplates()%>' DefaultNodeHeight="20" OnClick="tvwOnClickNode()" style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;height:235px;">
 	            <NodeTemplates>
+                    <NodeTemplate DataType="official">
+                        <pe:treenode text='<%=XPath("this|text")%>' style="color:#cccccc" expanded='<%=XPath("this|expanded")%>' OnClick="OnSelectOfficial"></pe:treenode>
+                    </NodeTemplate>
                     <NodeTemplate DataType="folder">
                         <pe:treenode text='<%=XPath("this|text")%>' style="color:#cccccc" expanded='<%=XPath("this|expanded")%>'></pe:treenode>
                     </NodeTemplate>

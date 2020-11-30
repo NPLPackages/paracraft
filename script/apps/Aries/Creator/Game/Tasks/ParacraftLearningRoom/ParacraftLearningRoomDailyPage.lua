@@ -299,7 +299,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	local title = ParacraftLearningRoomDailyPage.GetTitle(index);
 	
 	GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
-	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { closeBtnTitle = L"退出" }, function(state)
+	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
 		if(state == "ONCLOSE")then
 			GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
             NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();

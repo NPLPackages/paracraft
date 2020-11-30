@@ -66,6 +66,11 @@ function OnSearch()
 	end
 end
 
+function GetNmae(data)
+	local name = data.nickname or data.username
+	name = name or ""
+    return name
+end
 ]]></script>
 <kp:window name="iframe" mode="lite" width="560" height="207" title='<%= L"添加好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
@@ -96,7 +101,7 @@ end
                                         <img zorder="0" src='<%=GetIcon(XPath("this"))%>'width="46" height="46"/>
                                     </div>
                                     <div style="float: left;margin-left:16px;margin-top:8px;width:120px;color:#000000">
-                                        <%=Eval("nickname") %>
+                                        <%=GetNmae(XPath("this")) %>
                                     </div>
                                     <div style="float: left;margin-left:267px;margin-top:10px;font-size:12pt;color:#000000;text-align: right;">
                                         <!-- <pe:if condition='<%=CanClick(XPath("this"))%>'>

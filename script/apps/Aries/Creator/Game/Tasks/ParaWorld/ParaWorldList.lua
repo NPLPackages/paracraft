@@ -87,13 +87,7 @@ end
 function ParaWorldList.OnClickItem(index)
 	local item = ParaWorldList.Current_Item_DS[index];
 	if (item and item.projectId) then
-		local info = string.format(L"即将离开【%s】进入【%s】", WorldCommon.GetWorldTag("name") or "", item.name);
-		_guihelper.MessageBox(info, function(res)
-			if(res and res == _guihelper.DialogResult.OK) then
-				page:CloseWindow();
-				GameLogic.RunCommand("/loadworld -force "..item.projectId);
-			end
-		end, _guihelper.MessageBoxButtons.OKCancel);
+		GameLogic.RunCommand("/loadworld -force "..item.projectId);
 	end
 end
 

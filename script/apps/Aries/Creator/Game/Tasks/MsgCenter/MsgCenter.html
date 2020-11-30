@@ -36,32 +36,58 @@ function ClickItem(index)
 end
 
 function IsSelect(index)
-    return MsgCenter.select_index == index
+    return MsgCenter.select_button_index == index
 end
 
 function IsOnlyMsg(msg_type)
-    return msg_type == MsgCenter.MsgType.tong_zhi
+    return msg_type ~= MsgCenter.MsgType.interaction
 end
 
 function ClickItemButton(msg_type)
     MsgCenter.ClickItemButton(msg_type)
 end
+
+function GetDivBtnDesc(data)
+    return MsgCenter.GetDivBtnDesc(data)
+end
+
+function OnClickCancelFollow(data)
+	MsgCenter.OnClickCancelFollow(data)
+end
+
+function OnClickFollow(data)
+	MsgCenter.OnClickFollow(data)
+end
+
+function OnCommentCheck(data)
+	MsgCenter.OnCommentCheck(data)
+end
+
+function OnClickAllowJoin(data)
+	MsgCenter.OnClickAllowJoin(data)
+end
+
+function HasMsg()
+    return #MsgCenter.MsgList > 0
+end
 ]]></script>
-<kp:window name="iframe" width="640" height="613" icon="" title='<%= L"消息中心"%>'   onclose="ClosePage">
+<kp:window name="iframe" width="640" height="613" icon="Texture/Aries/Creator/keepwork/MsgCenter/biaoti_xiaoxizhongxin_32bits.png#0 0 158 64"   onclose="ClosePage">
     <div style="color:#ffffff;width:640px;height:613px" class="kp_window_container">
-        <div type ="box" style="width:110px;height:500px;margin-left: 6px;margin-top: 5px;float: left;">
-             <pe:gridview style="margin:0px;width:110px;height:500px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+        <div type ="box" style="width:110px;height:500px;margin-left: 0px;margin-top: 0px;float: left;">
+             <pe:gridview style="margin:0px;width:110px;height:500px;float:left" RememberScrollPos="false" name="button_gridview" CellPadding="12" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
                  DataSource='<%=Button_DS_Items%>'>
                  <Columns>
                         <pe:if condition='<%=IsSelect(Eval("index")) %>'>
                             <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
-                                <input type="button" value='<%=Eval("name") %>' name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                <input type="button" value='' zorder=-1 name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="position: relative; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                <%=Eval("word_div") %>
                             </div>
                         </pe:if> 
 
                         <pe:if condition='<%=not IsSelect(Eval("index")) %>'>
                             <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
-                                <input type="button" value='<%=Eval("name") %>' name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                <input type="button" value='' zorder=-1 name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="position: relative; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                <%=Eval("word_div") %>
                             </div>
                         </pe:if> 
 
@@ -70,43 +96,61 @@ end
                  </EmptyDataTemplate>
              </pe:gridview>
          </div>
-         <div style="margin-left: 20px;margin-top: 10px; width:478px; height: 540px; background: url(Texture/Aries/Creator/keepwork/MsgCenter/dikuangbj_16X16_32bits.png#0 0 16 16:4 4 4 4);float: left;">
-            <pe:gridview style="margin:0px;width:478px;height:540px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
-            DataSource='<%=Msg_DS_Items%>'>
-            <Columns>
-                    <div style="color:#000000;width: 460px;height: 60px;float: left;background: url(Texture/Aries/Creator/keepwork/MsgCenter/bjmokuai_64X64_32bits.png#0 0 64 64:16 16 16 16)">
-                       <!-- <input type="button" value='<%=Eval("name") %>' onclick="ClickItem" param1='<%=Eval("id") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" /> -->
-                        <pe:if condition='<%=IsOnlyMsg(Eval("msg_type")) %>'>
-                            <div style="width: 440px;height: 50px; margin-top: 5px;margin-left: 10px;">
-                                <pe:if condition='<%=Eval("color_name") ~= nil %>'>
-                                    <div style="float: left;"><%=Eval("msg_content1")%></div>
-                                    <div style="float: left;color:#ff0000;"><%=Eval("color_name")%></div>
-                                    <div style="float: left;"><%=Eval("msg_content2")%></div>
-                                </pe:if>
-                                <pe:if condition='<%=Eval("color_name") == nil %>'>
-                                    <div><%=Eval("msg_content1")%></div>
-                                </pe:if>
-                            </div>
-                        </pe:if>
-                        <pe:if condition='<%=not IsOnlyMsg(Eval("msg_type")) %>'>
-                            <div style="width: 340px;height: 50px; margin-top: 5px;margin-left: 10px;float: left;">
-                                <pe:if condition='<%=Eval("color_name") ~= nil %>'>
-                                    <div style="float: left;"><%=Eval("msg_content1")%></div>
-                                    <div style="float: left;color:#ff0000;"><%=Eval("color_name")%></div>
-                                    <div style="float: left;"><%=Eval("msg_content2")%></div>
-                                </pe:if>
-                                <pe:if condition='<%=Eval("color_name") == nil %>'>
-                                    <div><%=Eval("msg_content1")%></div>
-                                </pe:if>
-                            </div>
-
-                            <input type="button" value='回关' name = '<%=Eval("msg_type") %>' onclick="ClickItemButton" param1='<%=Eval("index") %>' style="float: left;margin-left: 18px; margin-top:15px;width:70px;height:28px;background:url(Texture/Aries/Creator/keepwork/MsgCenter/btn_lv_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
-                        </pe:if>
-                    </div>
-            </Columns>
-            <EmptyDataTemplate>
-            </EmptyDataTemplate>
-        </pe:gridview>
+         <div style="margin-left: 20px;margin-top: 10px; width:478px; height: 540px; background: url(Texture/Aries/Creator/keepwork/MsgCenter/dikuangbj_16X16_32bits.png#0 0 16 16:5 5 5 5);float: left;">
+            <pe:if condition='<%=HasMsg()%>'>
+                <div style="width:495px; height: 535px;margin-left: 7px;margin-top: 5px;">
+                    <pe:gridview style="margin:0px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="2" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                    DataSource='<%=Msg_DS_Items%>'>
+                        <Columns>
+                                <div style="color:#000000;float: left;background: url(Texture/Aries/Creator/keepwork/MsgCenter/bjmokuai_64X64_32bits.png#0 0 64 64:16 16 16 16)">
+                                <!-- <input type="button" value='<%=Eval("name") %>' onclick="ClickItem" param1='<%=Eval("id") %>' alwaysmouseover="true" style="float: left; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" /> -->
+                                    <div style="width: 460px;height: 70px;"></div>
+                                    <div style="margin-top: -70px;font-size: 12pt;">
+                                        <pe:if condition='<%=IsOnlyMsg(Eval("msg_type")) %>'>
+                                            <div style="width: 440px; margin-top: 18px;margin-left: 15px;">
+                                                <div style="height: 42px;"></div>
+                                                <div style="margin-top: -42px;line-height:20px;"><%=Eval("msg_content1")%></div>
+                                            </div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not IsOnlyMsg(Eval("msg_type")) %>'>
+                                            <div style="width: 340px;height: 42px; margin-top: 18px;margin-left: 15px;float: left;">
+                                                <pe:if condition='<%=Eval("color_name") ~= nil %>'>
+                                                    <div style="width: 340px;">
+                                                        <div style="float: left;"><%=Eval("msg_content1")%>
+                                                            <div style="float:left;color:#16be3d; text-singleline:true"><%=Eval("color_name")%></div>
+                                                            <%=Eval("msg_content2")%>
+                                                        </div>
+                                                        <!-- <div class="book-detail-store-item align-center-vertical">居中文字</div> -->
+                                                        <!-- <div style="float: left;">啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
+                                                            <div style="float:left;color:#16be3d; text-singleline:true">哈哈哈哈哈哈</div>
+                                                            <%=Eval("msg_content2")%>
+                                                        </div> -->
+                
+                                                        <!-- <div style="float: left;color:#ff0000;"><%=Eval("color_name")%></div> -->
+                                                        <!-- <div style="float: left;"><%=Eval("msg_content2")%></div> -->
+                                                    </div>
+                
+                                                </pe:if>
+                                                <pe:if condition='<%=Eval("color_name") == nil %>'>
+                                                    <div><%=Eval("msg_content1")%></div>
+                                                </pe:if>
+                                            </div>
+                                            <!-- <%=Eval("div_button")%> -->
+                                            <%=GetDivBtnDesc(XPath("this"))%>
+                                        </pe:if>
+                
+                                        <div style="margin-left: 16px;color: #9e9e9e;margin-top: 6px;height: 36px;"><%=Eval("time_desc")%></div>
+                                    </div>
+                                </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </pe:if>
+            <pe:if condition='<%=not HasMsg()%>'>
+                <div style="margin-top: 190px;margin-left: 180px;width: 116px;height: 96px; background: url(Texture/Aries/Creator/keepwork/MsgCenter/wuxiaoxi_116X96_32bits.png#0 0 116 96);"></div>
+            </pe:if>
         </div>
      </div>
 </kp:window>

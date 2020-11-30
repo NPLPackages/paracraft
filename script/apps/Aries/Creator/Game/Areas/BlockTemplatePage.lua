@@ -264,6 +264,8 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh)
 	
 		local root = {name="root", attr={},};
 	
+		local official_global = {name="official", attr={text=L"官方模板"},};
+		root[#root+1] = official_global;
 		local folder_global = {name="folder", attr={text=L"全局模板"},};
 		root[#root+1] = folder_global;
 		local folder_local = {name="folder", attr={text=L"本地模板", expanded=true},};

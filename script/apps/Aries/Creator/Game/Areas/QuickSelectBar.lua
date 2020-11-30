@@ -15,6 +15,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ObtainItemEffect.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchButton.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local TouchButton = commonlib.gettable("MyCompany.Aries.Game.Common.TouchButton");
 local ObtainItemEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.ObtainItemEffect");
@@ -237,6 +239,13 @@ function QuickSelectBar.ShowPage(bShow)
 		height = 78;
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.mobile.html"; 
 	else
+		--[[
+		if (QuickSelectBar.ShowTemplate()) then
+			width = 500;
+		else
+			width = 455;
+		end
+		]]
 		width = 455;
 		height = 96;
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html";
@@ -438,4 +447,25 @@ function QuickSelectBar.OnClickMall()
 		KeepWorkMallPage.Show();
 	end
 	
+end
+
+function QuickSelectBar.ShowTemplate()
+	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	return (generatorName == "paraworldMini") or (generatorName == "paraworld" and KeepworkService:IsSignedIn());
+end
+
+function QuickSelectBar.OnClickTemplate()
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	if (generatorName == "paraworldMini") then
+		local gen = GameLogic.GetBlockGenerator();
+		gen:ShowCreateFromTemplateWnd(0);
+	elseif (generatorName == "paraworld") then
+		local ParaWorldSchools = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSchools.lua");
+		ParaWorldSchools.ShowPage(function(projectId)
+			if (projectId) then
+				WorldCommon.ReplaceWorld(projectId);
+			end
+		end, 0);
+	end
 end

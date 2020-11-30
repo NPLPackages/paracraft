@@ -23,10 +23,12 @@ local s_env_methods = {
 	"resume", 
 	"yield", 
 	"checkyield",
-	"GetEntity",
+	"terminate",
 	"restart",
 	"exit",
 	"xpcall",
+	"GetEntity",
+	
 	-- Data
 	"print",
 	"printStack",

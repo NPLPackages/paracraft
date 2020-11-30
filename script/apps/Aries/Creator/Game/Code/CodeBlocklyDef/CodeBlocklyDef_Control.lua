@@ -1038,7 +1038,17 @@ say("Press X key to exit")
 registerKeyPressedEvent("x", function()
     exit()
 end)
-]]}},
+]]},
+{desc = L"终止执行当前线程", canRun = true, code = [[
+say("Press X key to terminate")
+while(true) do
+    turn(1)
+    if(isKeyPressed("x")) then
+        terminate()
+    end
+end
+]]}
+},
 },
 
 {

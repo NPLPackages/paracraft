@@ -21,7 +21,7 @@ NPL.export({
 				{ "动画", "animation" },
 				{ "CAD", "CAD" },
 				{ "语文", "language" },
-				{ "数学", "Math" },
+				{ "数学", "math" },
 				{ "英语", "english" },
 				{ "科学", "science" },
 				{ "人文", "humanities" },

@@ -194,8 +194,8 @@ function AddFriendsPage.UpdataFoucsList(updata_cb)
         objectType = 0,
         objectId = {["$in"] = SearchIdList},
     },function(err, msg, data)
-        print("获取关注列表结果", err, msg)
-        commonlib.echo(data, true)
+        -- print("获取关注列表结果", err, msg)
+        -- commonlib.echo(data, true)
         FollowList = {}
         for k, v in pairs(data.rows) do
             FollowList[v.objectId] = v

@@ -75,13 +75,13 @@ TeachingQuestPage.HumanitiesType = 8;
 TeachingQuestPage.UnknowType = 9;
 
 TeachingQuestPage.TaskTypeTexts = {L"编程", L"动画", L"CAD", L"语文", L"数学", L"英语", L"科学", L"人文"};
-TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "language", "Math", "english", "science", "humanities"};
+TeachingQuestPage.TaskTypeNames = {"program", "animation", "CAD", "language", "math", "english", "science", "humanities"};
 TeachingQuestPage.TaskTypeIndex = {
 	program = TeachingQuestPage.ProgramType,
 	animation = TeachingQuestPage.AnimationType,
 	CAD = TeachingQuestPage.CADType,
 	language = TeachingQuestPage.LanguageType,
-	Math = TeachingQuestPage.MathType,
+	math = TeachingQuestPage.MathType,
 	english = TeachingQuestPage.EnglishType,
 	science = TeachingQuestPage.ScienceType,
 	humanities = TeachingQuestPage.HumanitiesType,

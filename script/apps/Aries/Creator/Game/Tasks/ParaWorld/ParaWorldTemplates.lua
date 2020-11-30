@@ -25,7 +25,7 @@ function ParaWorldTemplates.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function ParaWorldTemplates.ShowPage(onClose)
+function ParaWorldTemplates.ShowPage(onClose, delay)
 	commonlib.TimerManager.SetTimeout(function()
 		result = nil;
 		local params = {
@@ -67,7 +67,7 @@ function ParaWorldTemplates.ShowPage(onClose)
 				page:Refresh(0);
 			end
 		end);
-	end, 2000);
+	end, delay or 2000);
 end
 
 function ParaWorldTemplates.OnClose()
@@ -77,12 +77,17 @@ end
 function ParaWorldTemplates.OnOK()
 	if (#ParaWorldTemplates.Templates >= ParaWorldTemplates.CurrentIndex) then
 		local template = ParaWorldTemplates.Templates[ParaWorldTemplates.CurrentIndex];
-		local name = commonlib.Encoding.Utf8ToDefault(template.name);
-		local template_file = ParaIO.GetCurDirectory(0)..BlockTemplatePage.global_template_dir..name..".xml";
-		FileDownloader:new():Init(template.name, template.url, template_file, function(res, localFile)
-			result = localFile;
-			page:CloseWindow();
-		end);
+		local info = string.format(L"即将使用家园模板【%s】替换当前世界", template.name);
+		_guihelper.MessageBox(info, function(res)
+			if(res and res == _guihelper.DialogResult.OK) then
+				local name = commonlib.Encoding.Utf8ToDefault(template.name);
+				local template_file = ParaIO.GetCurDirectory(0)..BlockTemplatePage.global_template_dir..name..".xml";
+				FileDownloader:new():Init(template.name, template.url, template_file, function(res, localFile)
+					result = localFile;
+					page:CloseWindow();
+				end);
+			end
+		end, _guihelper.MessageBoxButtons.OKCancel);
 	end
 end
 

@@ -220,6 +220,8 @@ function CodeCoroutine:RunImp(msg)
 		if(not ok) then
 			if(result:match("_stop_all_")) then
 				self:GetCodeBlock():StopAll();
+			elseif(result:match("_terminate_")) then
+				-- terminate only the coroutine
 			elseif(result:match("_restart_all_")) then
 				self:GetCodeBlock():RestartAll();
 			else

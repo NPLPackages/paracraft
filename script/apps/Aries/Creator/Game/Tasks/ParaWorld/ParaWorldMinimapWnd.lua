@@ -64,14 +64,25 @@ function ParaWorldMinimapWnd.OnInitWnd()
 	pageWnd = document:GetPageCtrl();
 end
 
--- refresh the map
-function ParaWorldMinimapWnd:RefreshMap()
-	if(page) then
-		local ctl = page:FindControl("surface");
-		if(ctl) then
-			-- rebuild map
-			ctl:Invalidate();
+-- static function: refresh the map
+-- @param delayTime: seconds to delay before refreshing. default to 0, which means refresh immediately
+function ParaWorldMinimapWnd:RefreshMap(delayTime)
+	delayTime = delayTime or 0;
+	if(delayTime == 0) then
+		if(page) then
+			local ctl = page:FindControl("surface");
+			if(ctl) then
+				-- rebuild map
+				ctl:Invalidate();
+			end
 		end
+	else
+		if(not ParaWorldMinimapWnd.refreshTimer) then
+			ParaWorldMinimapWnd.refreshTimer = commonlib.Timer:new({callbackFunc = function(timer)
+				ParaWorldMinimapWnd:RefreshMap(0)
+			end})
+		end
+		ParaWorldMinimapWnd.refreshTimer:Change(math.floor(delayTime * 1000));
 	end
 end
 

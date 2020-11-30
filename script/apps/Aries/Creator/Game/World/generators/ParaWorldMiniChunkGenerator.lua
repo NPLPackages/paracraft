@@ -128,7 +128,10 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	GameLogic.options:SetViewBobbing(false, true)
 	
 	if(self:GetTotalCount() < 10) then
-		self:ShowCreateFromTemplateWnd()
+		local revision = GameLogic.options:GetRevision();
+		if (not GameLogic.IsReadOnly() and (not revision or revision < 2)) then
+			self:ShowCreateFromTemplateWnd()
+		end
 	end
 
 	self.lock_timer = self.lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
@@ -137,7 +140,7 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	self.lock_timer:Change(1000, 1000);
 end
 
-function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
+function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd(delay)
 	-- TODO: for chenjinxian, use following code to load template, Effie will provide all template bmax files as keepwork git url
 	-- you need to download and load the selected one
 
@@ -146,9 +149,6 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 --		local filename = self:GetTemplateFilepath()
 --		self:LoadFromTemplateFile(filename)
 --	end)
-	if (GameLogic.IsReadOnly()) then
-		return;
-	end
 	local ParaWorldTemplates = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldTemplates.lua");
 	ParaWorldTemplates.ShowPage(function(filename)
 		if (filename) then
@@ -169,7 +169,7 @@ function ParaWorldMiniChunkGenerator:ShowCreateFromTemplateWnd()
 			end
 			]]
 		end
-	end);
+	end, delay);
 end
 
 -- please note: it does not clear the scene, it simply load template to pivot point

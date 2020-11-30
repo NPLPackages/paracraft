@@ -21,7 +21,7 @@ function ParaWorldSchools.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function ParaWorldSchools.ShowPage(onClose)
+function ParaWorldSchools.ShowPage(onClose, delay)
 	commonlib.TimerManager.SetTimeout(function()
 		result = nil;
 		local params = {
@@ -63,7 +63,7 @@ function ParaWorldSchools.ShowPage(onClose)
 				page:Refresh(0);
 			end
 		end);
-	end, 2000);
+	end, delay or 2000);
 end
 
 function ParaWorldSchools.OnClose()
@@ -73,8 +73,13 @@ end
 function ParaWorldSchools.OnOK()
 	if (#ParaWorldSchools.Templates >= ParaWorldSchools.CurrentIndex) then
 		local template = ParaWorldSchools.Templates[ParaWorldSchools.CurrentIndex];
-		result = template.projectId;
-		page:CloseWindow();
+		local info = string.format(L"即将使用【%s】替换当前世界", template.name);
+		_guihelper.MessageBox(info, function(res)
+			if(res and res == _guihelper.DialogResult.OK) then
+				result = template.projectId;
+				page:CloseWindow();
+			end
+		end, _guihelper.MessageBoxButtons.OKCancel);
 	end
 end
 

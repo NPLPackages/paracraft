@@ -48,7 +48,14 @@ function OnGameMarket()
 end
 
 function OnLoadGame()
-    GameLogic.RunCommand("/menu file.loadworld");
+    if(mouse_button == "right") then
+        -- the new version
+        local UserConsoleCreate = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Create/Create.lua")
+        UserConsoleCreate:Show();
+        last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+    else
+        GameLogic.RunCommand("/menu file.loadworld");
+    end
 end
 
 function OnUploadGame()

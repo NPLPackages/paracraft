@@ -879,6 +879,7 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 			options = {
 				{ L"/tip", "/tip" },
 				{ L"改变时间[-1,1]", "/time"},
+				{ L"加载世界:项目id", "/loadworld"},
 				{ L"设置真实光影[1|2|3]", "/shader"},
 				{ L"设置光源颜色[0,2] [0,2] [0,2]", "/light"},
 				{ L"设置太阳颜色[0,2] [0,2] [0,2]", "/sun"},

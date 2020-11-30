@@ -328,6 +328,14 @@ function KpChatChannel.OnMsg(self, msg)
                     TipRoadManager:PushNode(mcmlStr);
                 end
             end
+
+            -- 消息中心
+            if payload and (payload.msgType =="interactionMsg" or payload.msgType =="orgMsg" or payload.msgType =="sysMsg") then
+                local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                if DockPage then
+                    DockPage.HandMsgCenterMsgData()
+                end
+            end
         end
         
     end

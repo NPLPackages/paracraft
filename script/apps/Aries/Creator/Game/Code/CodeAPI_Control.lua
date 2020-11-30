@@ -35,6 +35,11 @@ function env_imp:exit(msg)
 	error("_stop_all_");
 end
 
+-- stop the coroutine
+function env_imp:terminate()
+	error("_terminate_");
+end
+
 function env_imp:restart(msg)
 	env_imp.wait(self, 1);
 	error("_restart_all_");

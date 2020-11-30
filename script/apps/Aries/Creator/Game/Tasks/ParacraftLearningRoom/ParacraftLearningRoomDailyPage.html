@@ -147,8 +147,8 @@ end
                                 <pe:if condition='<%= not IsFuture(Eval("index")) %>'>
                                     <pe:if condition='<%= IsNextDay(Eval("index")) %>'>
                                         <pe:if condition='<%= HasCheckedToday(Eval("index")) %>'>
-                                            <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/xuexiwancheng_64X64_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
-                                            <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
+                                            <input type="button" name='<%= Eval("index")%>' style="width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/xuexiwancheng_64X64_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb"  />
+                                            <div style="position:relative;margin-left:-15px;margin-top:-3px;width:90px;height:60px;color:#7a7a7a;">
                                                 <div style="text-align:center;">
                                                     <!--<%= L"签到成功" %>-->
                                                     <%= GetLabel(Eval("index"))%>
@@ -157,8 +157,8 @@ end
                                             
                                         </pe:if>
                                         <pe:if condition='<%= not HasCheckedToday(Eval("index")) %>'>
-                                           <input type="button" name='<%= Eval("index")%>' style="width:70px;height:60px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnCheckinToday"  />
-                                            <div style="position:relative;margin-left:-15px;width:90px;height:60px;color:#7a7a7a;">
+                                           <input type="button" name='<%= Eval("index")%>' style="width:64px;height:64px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnCheckinToday"  />
+                                            <div style="position:relative;margin-left:-15px;margin-top:-3px;width:90px;height:60px;color:#7a7a7a;">
                                                 <div zorder="101" style="margin-top:0px;text-align:center;">
                                                     <!--<%= L"点击签到" %>-->
                                                     <%= GetLabel(Eval("index"))%>

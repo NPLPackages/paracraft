@@ -12,7 +12,8 @@ ParaWorldNPC.ShowPage();
 local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNPC.lua");
-NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.rawfile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.npc.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -126,6 +127,7 @@ end
 
 function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
 	local function getTaskFromUrl(taskName, callback)
+		--[[
 		keepwork.rawfile.get({
 			cache_policy =  "access plus 0",
 			router_params = {
@@ -138,6 +140,25 @@ function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
 				callback(result);
 			end
 		end)
+		]]
+		keepwork.npc.list({cache_policy = "access plus 0", code = taskName}, function(err, msg, data)
+			if (data and #data > 0) then
+				local result = {};
+				result.npcName = data[1].npcName;
+				result.npcScript = data[1].npcScript;
+				keepwork.npc.tasks({cache_policy = "access plus 0", code = taskName}, function(err, msg, data)
+					result.npcTasks = {};
+					if (data and data.rows) then
+						for i = 1, #data.rows do
+							result.npcTasks[i] = {pid = data.rows[i].pid, title = data.rows[i].title, info = data.rows[i].info, url = data.rows[i].url};
+						end
+						if (callback) then
+							callback(result);
+						end
+					end
+				end);
+			end
+		end);
 	end
 
 	local function runExternalFunc(func)

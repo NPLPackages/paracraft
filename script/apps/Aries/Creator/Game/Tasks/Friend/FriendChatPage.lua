@@ -255,7 +255,13 @@ function FriendChatPage.DrawConversationNodeHandler2(_parent, treeNode)
 	elseif treeNode.portrait and treeNode.portrait ~= "" then
 		icon = treeNode.portrait
 	end
-	local name = treeNode.ifmyself and "我" or treeNode.nickname
+	local name = ""
+	if treeNode.ifmyself then
+		name = "我"
+	else
+		name = treeNode.nickname or treeNode.username
+	end
+
 	local content_text = treeNode.Text or ""
 	
 	local mcmlStr = ""
@@ -574,7 +580,7 @@ function FriendChatPage.OnMsg(payload, full_msg)
 
 	local chat_data = {}
 	chat_data.Text = payload.content
-	chat_data.nickname = ChatUserData.nickname
+	chat_data.nickname = ChatUserData.nickname or ChatUserData.username
 	chat_data.ifmyself = UserData.id == payload.id
 
 	chat_data.portrait = ChatUserData.portrait or ""
@@ -623,7 +629,9 @@ function FriendChatPage.CloseView()
 end
 
 function FriendChatPage.GetChatName()
-	return "与" .. ChatUserData.nickname .. "聊天中"
+	local name = ChatUserData.nickname or ChatUserData.username
+	name = name or ""
+	return "与" .. name .. "聊天中"
 end
 
 function FriendChatPage.ClickItem(id)
@@ -705,7 +713,7 @@ function FriendChatPage.CreateChatContentView()
 				show_data.ifmyself = UserData.id == v.id
 				
 				if show_data.ifmyself == false then
-					show_data.nickname = ChatUserData.nickname
+					show_data.nickname = ChatUserData.nickname or ChatUserData.username
 					show_data.portrait = ChatUserData.portrait or ""
 				end
 				ctl.RootNode:AddChild(CommonCtrl.TreeNode:new(show_data));
@@ -735,7 +743,7 @@ function FriendChatPage.CreateChatContentView()
 				show_data.ifmyself = UserData.id == chat_data.senderId
 				
 				if show_data.ifmyself == false then
-					show_data.nickname = ChatUserData.nickname
+					show_data.nickname = ChatUserData.nickname or ChatUserData.username
 					show_data.portrait = ChatUserData.portrait or ""
 				end
 				ctl.RootNode:AddChild(CommonCtrl.TreeNode:new(show_data));

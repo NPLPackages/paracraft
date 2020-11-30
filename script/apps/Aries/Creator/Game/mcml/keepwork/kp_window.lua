@@ -68,6 +68,8 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 		_this.background = close_bg;
 		_parent:AddChild(_this);
 
+		local tooltip = mcmlNode:GetAttributeWithCode("tooltip");
+		_this.tooltip = tooltip;
 		if(title_height>=32) then
 			_this.enabled = false;
 			_guihelper.SetUIColor(_this, "#ffffffff");

@@ -105,6 +105,11 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 	if ((not GameLogic.IsReadOnly()) and KeepworkService:IsSignedIn() and (not WorldCommon.GetWorldTag("fromProjects"))) then
+		local revision = GameLogic.options:GetRevision();
+		if (revision and revision > 1) then
+			return;
+		end
+
 		keepwork.world.myschoolParaWorld({}, function(err, msg, data)
 			if (data and data.schoolParaWorld and tostring(data.schoolParaWorld.projectId) == GameLogic.options:GetProjectId()) then
 			else
@@ -507,6 +512,9 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 							end
 						end
 					end
+					-- uncomment to test async loading
+					-- ParaEngine.Sleep(5)
+
 					attRegion:SetField("IsLocked", false)
 					if(not is_suspended_before) then
 						ParaTerrain.GetBlockAttributeObject():CallField("ResumeLightUpdate");
@@ -515,7 +523,7 @@ function ParaWorldChunkGenerator:LoadTemplateAsyncImp(params, msg)
 						cmd="CustomFunc", funcName = "ApplyOnLoadBlocks", 
 						params= {addList=addList, x=bx, y=by, z=bz, bEnableLogics=bEnableLogics}, 
 						gen_id = msg.gen_id, address = msg.address,
-					});
+					}); 
 					return true;
 				end
 			end
@@ -560,6 +568,10 @@ function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 			end
 		end
 	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+	ParaWorldMinimapWnd:RefreshMap(0.5)
+
 	if(hasDelayedCodeBlocks and lastGridParams and lastGridParams.x == gridX and lastGridParams.y == gridY) then
 		ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)
 	end
@@ -647,8 +659,6 @@ function ParaWorldChunkGenerator.EnableCodeBlocksInGridImp(x, y, bEnable)
 end
 
 function ParaWorldChunkGenerator.EnableCodeBlocksInGrid(x, y, bEnable)
-	commonlib.echo("EnableCodeBlocksInGrid");
-	commonlib.echo(bEnable);
 	local index = GetGridIndex(x, y)
 	if(gridCodeBlocks[index]) then
 		if(bEnable) then

@@ -17,6 +17,7 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
 local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
+local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -30,10 +31,10 @@ DockPage.is_show = true;
 DockPage.top_line_1 = {
     { label = L"", },
     { label = L"", },
-    { label = L"", },
     { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangrenwu_32bits.png#0 0 85 75", },
     { label = L"用户社区", id = "web_keepwork_home", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_yonghushequ_32bits.png#0 0 85 75", },
     { label = L"大赛", id = "competition", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_dasai_32bits.png#0 0 85 75", },
+    { label = L"消息中心", id = "msg_center", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_xiaoxi_32bits.png#0 0 85 75", },
 }
 DockPage.top_line_2 = {
     { label = L"", },
@@ -73,6 +74,8 @@ function DockPage.Show()
         UserData = data
         -- DockPage.HandleFriendsFansLocalData()
         DockPage.HandleFriendsRedTip(true);
+
+        DockPage.HandMsgCenterMsgData();
     end)
 
     -- 每日首次登陆自动打开任务面板
@@ -82,6 +85,11 @@ function DockPage.Show()
     if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
         DockPage.IsShowClassificationPage = true
         RegisterModal:ShowClassificationPage()
+    end
+
+    -- 每次登陆判断是否弹出活动框
+    if Notice and Notice.CheckCanShow() then
+        Notice.Show()
     end
 end
 function DockPage.Hide()
@@ -141,6 +149,9 @@ function DockPage.OnClickTop(id)
         local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
         DailyTask.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
+    elseif(id == "msg_center")then
+        local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
+        MsgCenter.Show();
     end
 end
 function DockPage.OnClick(id)
@@ -185,22 +196,14 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.home");
         local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
-        _guihelper.MessageBox(
-            format(L"即将离开【%s】进入【%s】", WorldCommon.GetWorldTag(), format(L"%s的家园", System.User.username)),
-            function(res)
-                if(res == _guihelper.DialogResult.OK)then
-                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
-                    local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
-                    LocalLoadWorld.CreateGetHomeWorld();
-    
-                    local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
-                    SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
-                        GameLogic.RunCommand("/loadworld home");
-                    end);
-                end
-            end,
-            _guihelper.MessageBoxButtons.OKCancel
-        )
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+        local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+        LocalLoadWorld.CreateGetHomeWorld();
+
+        local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
+        SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
+            GameLogic.RunCommand("/loadworld home");
+        end);
     elseif(id == "friends")then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.show_callback = function()
@@ -337,6 +340,16 @@ function DockPage.RenderButton_1(index)
             end
         </script>
         <kp:redtip style="position:relative;margin-left:53px;margin-top:-74px;" onupdate='<%%= RedTip_Activity_Checked()%%>' ></kp:redtip>
+        ]],"");
+    elseif (id == "msg_center") then
+        tip_str = string.format([[
+        <script type="text/npl" refresh="false">
+            local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+            function HasMsgCenterUnReadMsg()
+                return DockPage.HasMsgCenterUnReadMsg();
+            end
+        </script>
+        <kp:redtip style="position:relative;margin-left:53px;margin-top:-74px;" onupdate='<%%= HasMsgCenterUnReadMsg()%%>' ></kp:redtip>
         ]],"");
     end
     local s = string.format([[
@@ -531,3 +544,41 @@ function DockPage.ChangeFriendRedTipState(state)
     end
 end
 
+function DockPage.HasMsgCenterUnReadMsg()
+    return DockPage.GetMsgCenterUnReadNum() > 0
+end
+
+function DockPage.HandMsgCenterMsgData(is_need_repeat)
+    if not DockPage.is_show then
+        return
+    end  
+
+    keepwork.msgcenter.unReadCount({
+    },function(err, msg, data)
+        if err == 200 then
+            local all_count = 0
+            for k, v in pairs(data.data) do
+                all_count = all_count + v
+            end
+            DockPage.SetMsgCenterUnReadNum(all_count)
+            if DockPage.is_show then
+                DockPage.page:Refresh(0);
+            end 
+        end
+    end)
+
+    -- if is_need_repeat then
+    --     commonlib.TimerManager.SetTimeout(function()          
+    --         DockPage.HandMsgCenterMsgData(true)
+    --     end, 60000)
+    -- end
+
+end
+
+function DockPage.SetMsgCenterUnReadNum(num)
+    DockPage.MsgCenterUnReadNum = num or 0
+end
+
+function DockPage.GetMsgCenterUnReadNum()
+    return DockPage.MsgCenterUnReadNum or 0
+end

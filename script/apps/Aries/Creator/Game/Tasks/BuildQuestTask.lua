@@ -667,8 +667,6 @@ function BuildQuest:FrameMove_SetOrigin()
 	ParaTerrain.DeselectAllBlock(groupindex_hint);
 	ParaTerrain.DeselectAllBlock(groupindex_wrong);
 
-	local land_blocks = self:GetLandBlocks();
-
 	local hasRealTerrain = GameLogic.options.has_real_terrain;
 
 	local force_y_pos;
@@ -685,12 +683,12 @@ function BuildQuest:FrameMove_SetOrigin()
 		local snap_to_y = nil;
 		block.obstruction = nil;
 		for dy = math.min(-3,block[2]), 3 do
-			local dest_id = ParaTerrain.GetBlockTemplateByIdx(x,y+dy,z); 
-			
-			if(not land_blocks[dest_id]) then
+			local blockTemplate = BlockEngine:GetBlock(x,y+dy,z)
+
+			if(blockTemplate and (not blockTemplate:isNormalCube())) then
 				block.obstruction = true;
 				ParaTerrain.SelectBlock(x, y+dy, z, true, groupindex_wrong);
-			elseif(dest_id > 0) then
+			elseif(blockTemplate) then
 				-- tricky: if top most block is ok, the entire column is ok.
 				block.obstruction = false; 
 				snap_to_y = dy;
