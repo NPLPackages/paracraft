@@ -9,8 +9,6 @@ local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/M
 MsgCenter.Show();
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local MsgCenter = NPL.export();
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
@@ -20,12 +18,6 @@ local page;
 MsgCenter.isOpen = false
 MsgCenter.server_data = {}
 
-MsgCenter.keepworkList = {
-    ONLINE = "https://keepwork.com",
-    STAGE = "http://dev.kp-para.cn",
-    RELEASE = "http://rls.kp-para.cn",
-    LOCAL = "http://dev.kp-para.cn",
-}
 -- 与服务器的类型对应
 MsgCenter.MsgType = {
 	all = 0,
@@ -53,6 +45,14 @@ MsgCenter.MsgList = {
 	-- {msg_content1 = "希望小学的 ", msg_content2 = " 关注了你", msg_type = MsgCenter.MsgType.guan_zhu, time = 0, color_name = " 啊啊 "},
 }
 
+local interaction_type_desc = {
+	[MsgCenter.InteractionType.fans] = "关注了你",
+	[MsgCenter.InteractionType.comment] = "评论了你的《%s》",
+	[MsgCenter.InteractionType.like] = "觉得你的《%s》很赞", 	
+	[MsgCenter.InteractionType.collect] = "收藏了你的《%s》", 
+	[MsgCenter.InteractionType.jion] = "申请加入项目《%s》", 	
+}
+
 -- <div style="line-height:14px;font-size:12px;color:#fced4b;" class='bordertext'>
 --     <div style="width: 300;margin-top: 300;margin-left: 100;">
 --         <div onclick="test" style="float:left;margin-left:0px;">[公告]恭喜啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊<a style="margin-left:0px;float:left;height:12px;background:url()" name="x" 
@@ -76,13 +76,14 @@ function MsgCenter.OnInit()
 end
 
 function MsgCenter.Show()
-    if(KeepworkServiceSession:IsSignedIn())then
+    if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         MsgCenter.ShowView()
         return
-    end
-    LoginModal:CheckSignedIn(L"请先登录", function(result)
+	end
+	
+	GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
         if result == true then
-            Mod.WorldShare.Utils.SetTimeOut(function()
+            commonlib.TimerManager.SetTimeout(function()
                 if result then
 					MsgCenter.ShowView()
                 end
@@ -225,14 +226,6 @@ function MsgCenter.HandleData(data, updata_cb)
 		return
 	end
 	MsgCenter.MsgList = {}
-
-	local interaction_type_desc = {
-		[MsgCenter.InteractionType.fans] = "关注了你",
-		[MsgCenter.InteractionType.comment] = "评论了你的《%s》",
-		[MsgCenter.InteractionType.like] = "觉得你的《%s》很赞", 	
-		[MsgCenter.InteractionType.collect] = "收藏了你的《%s》", 
-		[MsgCenter.InteractionType.jion] = "申请加入项目《%s》", 	
-	}
 
 	local click_data = MsgCenter.ButtonData[MsgCenter.select_button_index] or {}
 	local msg_type = click_data.msg_type or 1
@@ -423,9 +416,9 @@ end
 function MsgCenter.OnCommentCheck(data)
 	local pro_id = data.server_data.msg.projectId or 0
     local httpwrapper_version = HttpWrapper.GetDevVersion();
-	local url = MsgCenter.keepworkList[httpwrapper_version];
-	url = url .. "/pbl/project/" .. pro_id
-	ParaGlobal.ShellExecute("open", url, "", "", 1); 
+	local url = GameLogic.GetFilters():apply_filters('get_keepwork_url');
+	url = url .. "/pbl/project/" .. pro_id;
+	GameLogic.GetFilters():apply_filters('open_keepwork_url', url);
 end
 
 function MsgCenter.OnClickAllowJoin(data)

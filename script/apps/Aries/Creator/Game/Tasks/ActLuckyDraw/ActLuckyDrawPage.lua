@@ -10,8 +10,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActLuckyDraw/ActLuckyDrawPage
 
 local ActLuckyDrawPage = NPL.export();
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local page;
 ActLuckyDrawPage.Current_Item_DS = {};
@@ -162,20 +160,21 @@ function ActLuckyDrawPage.LuckyDraw()
         end) 
     end
 
-    if(KeepworkServiceSession:IsSignedIn())then
+    if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         draw_cb()
         return
     end
-    LoginModal:CheckSignedIn(L"请先登录", function(result)
+
+    GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
         if result == true then
             ActLuckyDrawPage.UpdataDrawBt()
-            -- Mod.WorldShare.Utils.SetTimeOut(function()
+            -- commonlib.TimerManager.SetTimeout(function()
             --     if result then
 			-- 		draw_cb()
             --     end
             -- end, 500)
         end
-	end)    
+	end)
 end
 
 function ActLuckyDrawPage.OpenRewardList()

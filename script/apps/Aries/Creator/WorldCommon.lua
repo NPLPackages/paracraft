@@ -411,8 +411,7 @@ function WorldCommon.ReplaceWorld(targetProjectId)
 	WorldCommon.sourceWorldName = WorldCommon.GetWorldTag("name");
 	WorldCommon.destWorldId = targetProjectId;
 	GameLogic:Connect("WorldLoaded", WorldCommon, WorldCommon.OnWorldLoaded, "UniqueConnection");
-	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	UserConsole:HandleWorldId(targetProjectId, "force");
+	CommandManager:RunCommand(format('/loadworld -s -force %d', targetProjectId))
 end
 
 function WorldCommon.ReplaceWorldImp()

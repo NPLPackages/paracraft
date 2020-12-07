@@ -14,7 +14,6 @@ commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemP
 
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local page;
 local item_data
@@ -422,12 +421,10 @@ function KeepWorkStackableItemPage.requestOrderResult()
 		return
 	end
 	GameLogic.AddBBS("statusBar", L"订单请求中，请稍等...", 5000, "0 255 0");
-	
-	
-	KeepworkService:GetToken()
+
     keepwork.mall.orderResule({
         headers = {
-			["Authorization"] = format("Bearer %s", token),
+			["Authorization"] = format("Bearer %s", System.User.keepworktoken),
         }
 	},function(err, msg, data)
 		if err == 200 then

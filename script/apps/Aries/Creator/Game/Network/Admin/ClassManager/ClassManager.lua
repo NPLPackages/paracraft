@@ -213,7 +213,7 @@ function ClassManager.LoadAllProjects(callback)
 	if (#ClassManager.ProjectList > 0) then
 		ClassManager.ProjectList = {};
 	end
-	local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld');
+	local currentWorld = GameLogic.GetFilters():apply_filters('current_world');
 	if (currentWorld and currentWorld.kpProjectId) then
 		table.insert(ClassManager.ProjectList, {projectId = tonumber(currentWorld.kpProjectId), projectName = WorldCommon.GetWorldTag("name")});
 	end
@@ -274,7 +274,7 @@ function ClassManager.LoadClassroom(roomId, roleId, callback)
 					ClassManager.CurrentClassName = rooms[i].class.name;
 					ClassManager.ClassMemberList = {};
 					if (rooms[i].teacherInfo) then
-						local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+						local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 						if (rooms[i].teacherInfo.id == userId) then
 							return;
 						end
@@ -427,7 +427,7 @@ end
 
 function ClassManager.IsTeacherInClass()
 	local teacher = ClassManager.GetCurrentTeacher();
-	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+	local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 	return teacher and teacher.userId == userId;
 end
 
@@ -509,7 +509,7 @@ function ClassManager.StudentJointClassroom(roomId)
 	end
 	local roleId = 1;
 	ClassManager.LoadClassroom(roomId, roleId, function(classId, projectId, classroomId)
-		local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+		local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 		local currentTeacher = ClassManager.GetCurrentTeacher();
 		if (currentTeacher and currentTeacher.userId == userId) then
 			return;
@@ -545,7 +545,7 @@ function ClassManager.ProcessMessage(payload, meta)
 		end
 	end
 
-	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+	local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 	if (type == "cmd") then
 		if (userId ~= payload.id) then
 			ClassManager.RunCommand(content);
@@ -625,14 +625,14 @@ function ClassManager.OnMsg(self, msg)
 				if (result[1] == "invite") then
 					local roomId = tonumber(result[3]);
 					local id = tonumber(result[2]);
-					local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+					local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 					if (id == userId) then
 						ClassManager.StudentJointClassroom(roomId);
 					end
 				elseif (result[1] == "cmd") then
 					local cmd = result[2];
 					local id = tonumber(result[3]);
-					local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+					local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 					if (id == userId) then
 						ClassManager.RunCommand(cmd);
 					end

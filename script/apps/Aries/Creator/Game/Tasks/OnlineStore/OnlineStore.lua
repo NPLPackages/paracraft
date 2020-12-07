@@ -14,7 +14,6 @@ task:Run();
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager")
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 
 local OnlineStore = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.OnlineStore"));
 
@@ -29,7 +28,7 @@ function OnlineStore:Init()
 end
 
 function OnlineStore.GetOnlineStoreUrl(name)
-	local host = KeepworkService:GetKeepworkUrl();
+	local host = GameLogic.GetFilters():apply_filters('get_keepwork_url');
 	local token = System.User.keepworktoken or '';
 	local url = format("%s/p/comp/system?port=%s&token=%s", host, tostring(OnlineStore.portNumber or 8099), token);
 	if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'android' then

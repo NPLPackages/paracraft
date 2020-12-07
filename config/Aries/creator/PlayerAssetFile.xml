@@ -134,6 +134,17 @@
   <asset filename="character/CC/artwar/movie/girl_waiter1.x" displayname="女服务员1" name="girl_waiter1"/> 
   <asset filename="character/CC/artwar/movie/boy_waiter2.x" displayname="男服务员2" name="boy_waiter2"/> 
   <asset filename="character/CC/artwar/movie/girl_waiter2.x" displayname="女服务员2" name="girl_waiter2"/> 
+<!--   12-2更新 -->
+  <asset filename="character/CC/artwar/movie/boy_staff_bank.x" displayname="男职员" name="boy_staff_bank"/> 
+  <asset filename="character/CC/artwar/movie/girl_staff_bank.x" displayname="女职员" name="girl_staff_bank"/> 
+  <asset filename="character/CC/artwar/movie/boy_breeder.x" displayname="男饲养员" name="boy_breeder"/> 
+  <asset filename="character/CC/artwar/movie/girl_breeder.x" displayname="女饲养员" name="girl_breeder"/> 
+  <asset filename="character/CC/artwar/movie/boy_archaeologist.x" displayname="男考古学家" name="boy_archaeologist"/> 
+  <asset filename="character/CC/artwar/movie/girl_archaeologist.x" displayname="女考古学家" name="girl_archaeologist"/> 
+  <asset filename="character/CC/artwar/movie/boy_host.x" displayname="男主持" name="boy_host"/> 
+  <asset filename="character/CC/artwar/movie/girl_host.x" displayname="女主持" name="girl_host"/> 
+
+
 <!--   <asset filename="character/CC/artwar/movie/boy_air_force.x" displayname="男空军" name="boy_air_force"/> 
   <asset filename="character/CC/artwar/movie/girl_air_force.x" displayname="女空军" name="girl_air_force"/> 
   <asset filename="character/CC/artwar/movie/boy_land_force.x" displayname="男陆军" name="boy_land_force"/> 

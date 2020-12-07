@@ -243,229 +243,227 @@ end
 
 -------------------------------------------------------------埋点时长实现 暂时存放-----------------------------------------------------------------------
 ----------------------------------------------------以下是waiter引用--------------------------------------------------------------------
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+-- function ParaWorldAnalytics:behaviorStateEnter(action , state , otherParam)
+-- 	--print("behaviorStateEnter",action , state , otherParam)
+-- 	local behaviorParamMap 	= self.behaviorParamMap 				
+-- 	if not behaviorParamMap[action] then 
+-- 		--print("ParaWorldAnalytics:behaviorStateEnter not exist action" , action)
+-- 		return
+-- 	end
+-- 	local nowTime 	= os.time()
 
-function ParaWorldAnalytics:behaviorStateEnter(action , state , otherParam)
-	--print("behaviorStateEnter",action , state , otherParam)
-	local behaviorParamMap 	= self.behaviorParamMap 				
-	if not behaviorParamMap[action] then 
-		--print("ParaWorldAnalytics:behaviorStateEnter not exist action" , action)
-		return
-	end
-	local nowTime 	= os.time()
+-- 	if action == 'editWorld' and (not otherParam) then
+-- 		return 
+-- 	elseif state == nil then
 
-	if action == 'editWorld' and (not otherParam) then
-		return 
-	elseif state == nil then
+-- 		return 
+-- 	end
 
-		return 
-	end
+-- 	--需要根据不一样的行为判断
+-- 	--初始化的流程
+-- 	if action == 'editWorld' then
+-- 		if behaviorParamMap[action].state ~= 'enter' and state =='enter' then
+-- 			--print("ParaWorldAnalyticsbehaviorStateEnter editWorld11111111111111111")
+-- 			behaviorParamMap[action].beginTime 	= nowTime
+-- 			behaviorParamMap[action].state 	= 'enter'
+-- 			behaviorParamMap[action].timeCount 	= 0
+-- 			behaviorParamMap[action].worldId 	= otherParam
+-- 			return
+-- 		end
+-- 	else
+-- 		if behaviorParamMap[action].state == 'init' then
+-- 			--print("ParaWorldAnalytics behaviorStateEnter stayWorld11111111111111")
+-- 			behaviorParamMap[action].beginTime 	= nowTime
+-- 			behaviorParamMap[action].state 	= state
+-- 			behaviorParamMap[action].timeCount 	= 0
+-- 			return
+-- 		end
+-- 	end
+-- 	--进入存储流程
 
-	--需要根据不一样的行为判断
-	--初始化的流程
-	if action == 'editWorld' then
-		if behaviorParamMap[action].state ~= 'enter' and state =='enter' then
-			--print("ParaWorldAnalyticsbehaviorStateEnter editWorld11111111111111111")
-			behaviorParamMap[action].beginTime 	= nowTime
-			behaviorParamMap[action].state 	= 'enter'
-			behaviorParamMap[action].timeCount 	= 0
-			behaviorParamMap[action].worldId 	= otherParam
-			return
-		end
-	else
-		if behaviorParamMap[action].state == 'init' then
-			--print("ParaWorldAnalytics behaviorStateEnter stayWorld11111111111111")
-			behaviorParamMap[action].beginTime 	= nowTime
-			behaviorParamMap[action].state 	= state
-			behaviorParamMap[action].timeCount 	= 0
-			return
-		end
-	end
-	--进入存储流程
+-- 	if action == 'editWorld' then
+-- 		if behaviorParamMap[action].state == 'enter' and state == 'leave' then
+-- 			--print("ParaWorldAnalytics behaviorStateEnter editWorld222222222222222222222")
+-- 			self:checkSendData(action , otherParam , behaviorParamMap[action].beginTime )
+-- 			behaviorParamMap[action].beginTime 	= nowTime
+-- 			behaviorParamMap[action].state 	= 'inActive'
+-- 			behaviorParamMap[action].timeCount 	= 0
+-- 			behaviorParamMap[action].worldId 	= otherParam
+-- 		end
+-- 	else
 
-	if action == 'editWorld' then
-		if behaviorParamMap[action].state == 'enter' and state == 'leave' then
-			--print("ParaWorldAnalytics behaviorStateEnter editWorld222222222222222222222")
-			self:checkSendData(action , otherParam , behaviorParamMap[action].beginTime )
-			behaviorParamMap[action].beginTime 	= nowTime
-			behaviorParamMap[action].state 	= 'inActive'
-			behaviorParamMap[action].timeCount 	= 0
-			behaviorParamMap[action].worldId 	= otherParam
-		end
-	else
+-- 		if behaviorParamMap[action].state == state then 
+-- 			--print("ParaWorldAnalytics:behaviorStateEnter state keep same " , action , state)
+-- 			return 
+-- 		end
+-- 		--print("behaviorStateEnter stayWorld22222222222222222222222222222")
+-- 		self:checkSendData(action , behaviorParamMap[action].state , behaviorParamMap[action].beginTime )
+-- 		behaviorParamMap[action].beginTime 	= nowTime
+-- 		local tempState 	= behaviorParamMap[action].state
+-- 		behaviorParamMap[action].state 	= state
+-- 		behaviorParamMap[action].timeCount 	= 0
 
-		if behaviorParamMap[action].state == state then 
-			--print("ParaWorldAnalytics:behaviorStateEnter state keep same " , action , state)
-			return 
-		end
-		--print("behaviorStateEnter stayWorld22222222222222222222222222222")
-		self:checkSendData(action , behaviorParamMap[action].state , behaviorParamMap[action].beginTime )
-		behaviorParamMap[action].beginTime 	= nowTime
-		local tempState 	= behaviorParamMap[action].state
-		behaviorParamMap[action].state 	= state
-		behaviorParamMap[action].timeCount 	= 0
+-- 		if action == 'stayWolrd' then
+-- 			self:behaviorStateEnter("editWorld" , "leave" , tempState)
+-- 		end
+-- 	end
+-- end
 
-		if action == 'stayWolrd' then
-			self:behaviorStateEnter("editWorld" , "leave" , tempState)
-		end
-	end
-end
+-- function ParaWorldAnalytics:checkSendData( action , stateInfo ,beginTime  )
+-- 	local nowTime 	= os.time()
+-- 	local timeInterval 	= nowTime - beginTime
+-- 	if (nowTime - beginTime) < self.timeSaveLimit then -- 不足时间长度的抛弃
+-- 		return
+-- 	end
+-- 	self:sendBehaviorData(action , stateInfo , beginTime , nowTime)
+-- end
 
-function ParaWorldAnalytics:checkSendData( action , stateInfo ,beginTime  )
-	local nowTime 	= os.time()
-	local timeInterval 	= nowTime - beginTime
-	if (nowTime - beginTime) < self.timeSaveLimit then -- 不足时间长度的抛弃
-		return
-	end
-	self:sendBehaviorData(action , stateInfo , beginTime , nowTime)
-end
+-- function ParaWorldAnalytics:sendBehaviorData(action , stateInfo , beginTime , endTime )
+-- 	--生成数据包
+-- 	local unitInfo 	= {}
+-- 	unitInfo.userId 	= self.userId
+-- 	unitInfo.worldId 	= stateInfo --假如是世界id 就是留在世界的时间
+-- 	unitInfo.beginAt 	= beginTime
+-- 	unitInfo.endAt 		= endTime
+-- 	unitInfo.duration 	= endTime - beginTime
+-- 	unitInfo.traceId	= string.format("%s_%s_%s_%s" , unitInfo.userId , beginTime , action , stateInfo)
 
-function ParaWorldAnalytics:sendBehaviorData(action , stateInfo , beginTime , endTime )
-	--生成数据包
-	local unitInfo 	= {}
-	unitInfo.userId 	= self.userId
-	unitInfo.worldId 	= stateInfo --假如是世界id 就是留在世界的时间
-	unitInfo.beginAt 	= beginTime
-	unitInfo.endAt 		= endTime
-	unitInfo.duration 	= endTime - beginTime
-	unitInfo.traceId	= string.format("%s_%s_%s_%s" , unitInfo.userId , beginTime , action , stateInfo)
+-- 	if KeepworkServiceSession:IsSignedIn() then -- 是否是登录模式
+-- 		--print('ParaWorldAnalytics sendBehaviorData1111111111111111111111')
+-- 		for i,v in pairs(unitInfo) do
+-- 			--print(i,v)
+-- 		end
+-- 	    keepwork.burieddata.sendSingleBuriedData({
+-- 	        category 	= 'behavior',
+-- 	        action 		= action,
+-- 	        data 		= unitInfo
+-- 	    },function(err, msg, data)
+-- 	        commonlib.echo("==========burieddata");
+-- 	        commonlib.echo(err);
+-- 	        commonlib.echo(msg);
+-- 	        commonlib.echo(data,true);
+-- 	    end)
+-- 	else
+-- 		--print('ParaWorldAnalytics sendBehaviorData222222222222222222222222')
+-- 		--离线模式
+-- 		local keyName 	= string.format('paraData_%s' , action )
 
-	if KeepworkServiceSession:IsSignedIn() then -- 是否是登录模式
-		--print('ParaWorldAnalytics sendBehaviorData1111111111111111111111')
-		for i,v in pairs(unitInfo) do
-			--print(i,v)
-		end
-	    keepwork.burieddata.sendSingleBuriedData({
-	        category 	= 'behavior',
-	        action 		= action,
-	        data 		= unitInfo
-	    },function(err, msg, data)
-	        commonlib.echo("==========burieddata");
-	        commonlib.echo(err);
-	        commonlib.echo(msg);
-	        commonlib.echo(data,true);
-	    end)
-	else
-		--print('ParaWorldAnalytics sendBehaviorData222222222222222222222222')
-		--离线模式
-		local keyName 	= string.format('paraData_%s' , action )
+-- 		local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
+-- 		local infoMap  				= commonlib.Json.Decode(infoStr)
+-- 		infoMap[unitInfo.beginAt] 	= unitInfo
+-- 		infoStr 					= commonlib.Json.Encode(infoMap)
+-- 		GameLogic.GetPlayerController():SaveLocalData(keyName , infoStr)
+-- 	end
+-- end
 
-		local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
-		local infoMap  				= commonlib.Json.Decode(infoStr)
-		infoMap[unitInfo.beginAt] 	= unitInfo
-		infoStr 					= commonlib.Json.Encode(infoMap)
-		GameLogic.GetPlayerController():SaveLocalData(keyName , infoStr)
-	end
-end
+-- function ParaWorldAnalytics:staticInit( ... )
+-- 	if self.firstInit then
+-- 		return 
+-- 	end
+-- 	self.firstInit 	= true
+-- 	local behaviorParamMap 	= {}
+-- 	behaviorParamMap.stayWolrd 	= {state  = 'init' , beginTime 	= -1 , timeCount = 0 }
+-- 	behaviorParamMap.editWorld 	= {state  = 'init' , beginTime 	= -1 , timeCount = 0 }
+-- 	self.behaviorParamMap 	= behaviorParamMap
+-- 	self.timeInterval 	= 5000 	-- 间隔两秒
+-- 	self.timeSaveLimit 	= 10 	-- 120秒
+--     
+-- 	    self.userId 	= Store:Get("user/userId")
+--   
+-- 	self.defaultJasonInfo 	= commonlib.Json.Encode({});
 
-function ParaWorldAnalytics:staticInit( ... )
-	if self.firstInit then
-		return 
-	end
-	self.firstInit 	= true
-	local behaviorParamMap 	= {}
-	behaviorParamMap.stayWolrd 	= {state  = 'init' , beginTime 	= -1 , timeCount = 0 }
-	behaviorParamMap.editWorld 	= {state  = 'init' , beginTime 	= -1 , timeCount = 0 }
-	self.behaviorParamMap 	= behaviorParamMap
-	self.timeInterval 	= 5000 	-- 间隔两秒
-	self.timeSaveLimit 	= 10 	-- 120秒
-    if(Mod and Mod.WorldShare and Mod.WorldShare.Store)then
-	    self.userId 	= Mod.WorldShare.Store:Get("user/userId")
-    end
-	self.defaultJasonInfo 	= commonlib.Json.Encode({});
+-- 	self:sendLastData()
+-- 	self:timerInit()
+-- end
 
-	self:sendLastData()
-	self:timerInit()
-end
+-- function ParaWorldAnalytics:sendLastData()	
+-- 	if System.options.isCodepku or not KeepworkServiceSession or not KeepworkServiceSession:IsSignedIn() then
+-- 		return 
+-- 	end
+-- 	local behaviorParamMap 	= self.behaviorParamMap
+-- 	for key , unit in pairs(behaviorParamMap) do
+-- 		local keyName 	= string.format('paraData_%s' , action )
+-- 		local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
+-- 		if infoStr ~= self.defaultJasonInfo then
+-- 			local infoMap  				= commonlib.Json.Decode(infoStr)
+-- 			self:sendDataSet(infoMap ,key)
+-- 		end
+-- 	end
 
-function ParaWorldAnalytics:sendLastData()	
-	if System.options.isCodepku or not KeepworkServiceSession or not KeepworkServiceSession:IsSignedIn() then
-		return 
-	end
-	local behaviorParamMap 	= self.behaviorParamMap
-	for key , unit in pairs(behaviorParamMap) do
-		local keyName 	= string.format('paraData_%s' , action )
-		local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
-		if infoStr ~= self.defaultJasonInfo then
-			local infoMap  				= commonlib.Json.Decode(infoStr)
-			self:sendDataSet(infoMap ,key)
-		end
-	end
+-- end
 
-end
+-- --发送本地存储数据的方法
+-- function ParaWorldAnalytics:sendDataSet( infoMap , action)
+-- 	local array 	= {}
+-- 	for i,v in pairs(infoMap) do
+-- 		local unit 	= {category = 'behavior' ,action = action , data = v}
+-- 		table.insert(array , unit)
+-- 	end
 
---发送本地存储数据的方法
-function ParaWorldAnalytics:sendDataSet( infoMap , action)
-	local array 	= {}
-	for i,v in pairs(infoMap) do
-		local unit 	= {category = 'behavior' ,action = action , data = v}
-		table.insert(array , unit)
-	end
+-- 	if #array == 1 then
+-- 	    keepwork.burieddata.sendSingleBuriedData(arrays[1],function(err, msg, data)
+-- 	        commonlib.echo("==========burieddata");
+-- 	        commonlib.echo(err);
+-- 	        commonlib.echo(msg);
+-- 	        commonlib.echo(data,true);
+-- 	    end)
+-- 	else
+-- 	    keepwork.burieddata.sendBuriedData(arrays,function(err, msg, data)
+-- 	        commonlib.echo("==========burieddata");
+-- 	        commonlib.echo(err);
+-- 	        commonlib.echo(msg);
+-- 	        commonlib.echo(data,true);
+-- 	    end)
+-- 	end
+-- 	local keyName 	= string.format('paraData_%s' , action )
+-- 	GameLogic.GetPlayerController():SaveLocalData(keyName , self.defaultJasonInfo)
+-- end
 
-	if #array == 1 then
-	    keepwork.burieddata.sendSingleBuriedData(arrays[1],function(err, msg, data)
-	        commonlib.echo("==========burieddata");
-	        commonlib.echo(err);
-	        commonlib.echo(msg);
-	        commonlib.echo(data,true);
-	    end)
-	else
-	    keepwork.burieddata.sendBuriedData(arrays,function(err, msg, data)
-	        commonlib.echo("==========burieddata");
-	        commonlib.echo(err);
-	        commonlib.echo(msg);
-	        commonlib.echo(data,true);
-	    end)
-	end
-	local keyName 	= string.format('paraData_%s' , action )
-	GameLogic.GetPlayerController():SaveLocalData(keyName , self.defaultJasonInfo)
-end
+-- --存储本地的数据
+-- function ParaWorldAnalytics:saveLastData(unit ,action , nowTime , otherParam )
+-- 	local keyName 	= string.format('paraData_%s' , action )
+-- 	local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
+-- 	local infoMap  				= commonlib.Json.Decode(infoStr)
+-- 	local unitInfo 				= {}
+-- 	unitInfo.userId 	= self.userId
+-- 	unitInfo.worldId 	= otherParam --假如是世界id 就是留在世界的时间
+-- 	unitInfo.beginAt 	= unit.beginTime
+-- 	unitInfo.endAt 		= nowTime
+-- 	unitInfo.duration 	= nowTime - unit.beginTime
+-- 	unitInfo.traceId	= string.format("%s_%s_%s_%s" , unitInfo.userId , unit.beginTime , action , stateInfo)
+-- 	unit.timeCount 		= 0
+-- 	infoMap[unitInfo.beginAt] 	= unitInfo
+-- 	infoStr 					= commonlib.Json.Encode(infoMap)
+-- 	GameLogic.GetPlayerController():SaveLocalData(keyName , infoStr)	
+-- end
 
---存储本地的数据
-function ParaWorldAnalytics:saveLastData(unit ,action , nowTime , otherParam )
-	local keyName 	= string.format('paraData_%s' , action )
-	local infoStr 				= GameLogic.GetPlayerController():LoadLocalData(keyName , self.defaultJasonInfo)
-	local infoMap  				= commonlib.Json.Decode(infoStr)
-	local unitInfo 				= {}
-	unitInfo.userId 	= self.userId
-	unitInfo.worldId 	= otherParam --假如是世界id 就是留在世界的时间
-	unitInfo.beginAt 	= unit.beginTime
-	unitInfo.endAt 		= nowTime
-	unitInfo.duration 	= nowTime - unit.beginTime
-	unitInfo.traceId	= string.format("%s_%s_%s_%s" , unitInfo.userId , unit.beginTime , action , stateInfo)
-	unit.timeCount 		= 0
-	infoMap[unitInfo.beginAt] 	= unitInfo
-	infoStr 					= commonlib.Json.Encode(infoMap)
-	GameLogic.GetPlayerController():SaveLocalData(keyName , infoStr)	
-end
+-- function ParaWorldAnalytics:timerInit()
+-- 	self.countTimer = self.countTimer or commonlib.Timer:new({callbackFunc = function()
+-- 		self:behaviorCallback();
+-- 	end})
+-- 	self.countTimer:Change(0 , self.timeInterval)
+-- end
 
-function ParaWorldAnalytics:timerInit()
-	self.countTimer = self.countTimer or commonlib.Timer:new({callbackFunc = function()
-		self:behaviorCallback();
-	end})
-	self.countTimer:Change(0 , self.timeInterval)
-end
-
-function ParaWorldAnalytics:behaviorCallback()
-	local behaviorParamMap 	= self.behaviorParamMap
-	local nowTime 			= os.time()
-	--print("ParaWorldAnalytics behaviorCallback",nowTime)
-	for key , unit in pairs(behaviorParamMap) do
-		if unit.state ~= 'init' and unit.state ~= 'inActive' then
-			unit.timeCount 	= unit.timeCount + self.timeInterval / 1000
-			if unit.timeCount > 120 then
-				if key == 'editWorld' then
-					--print('ParaWorldAnalytics behaviorCallback editWorld')
-					self:saveLastData(unit , key , nowTime , unit.worldId )
-				else
-					--print('ParaWorldAnalytics behaviorCallback stayworld')
-					self:saveLastData(unit , key , nowTime , unit.state)
-				end
+-- function ParaWorldAnalytics:behaviorCallback()
+-- 	local behaviorParamMap 	= self.behaviorParamMap
+-- 	local nowTime 			= os.time()
+-- 	--print("ParaWorldAnalytics behaviorCallback",nowTime)
+-- 	for key , unit in pairs(behaviorParamMap) do
+-- 		if unit.state ~= 'init' and unit.state ~= 'inActive' then
+-- 			unit.timeCount 	= unit.timeCount + self.timeInterval / 1000
+-- 			if unit.timeCount > 120 then
+-- 				if key == 'editWorld' then
+-- 					--print('ParaWorldAnalytics behaviorCallback editWorld')
+-- 					self:saveLastData(unit , key , nowTime , unit.worldId )
+-- 				else
+-- 					--print('ParaWorldAnalytics behaviorCallback stayworld')
+-- 					self:saveLastData(unit , key , nowTime , unit.state)
+-- 				end
 				
-			end
-		end
-	end
-end
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 -- create a singleton
 local singleton = NPL.export();

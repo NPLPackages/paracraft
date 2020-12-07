@@ -10,8 +10,6 @@ ClassListPage.ShowPage()
 -------------------------------------------------------
 ]]
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
-local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
-local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local ClassListPage = NPL.export()
 
 local page;
@@ -97,9 +95,9 @@ function ClassListPage.OnOK()
 
 		local projectId = GameLogic.options:GetProjectId();
 		if (projectId and tonumber(projectId) == worldId) then
-			Compare:Init(function(result)
+			GameLogic.GetFilters():apply_filters('compare_init', function(result)
 				if result then
-					local remote = tonumber(Mod.WorldShare.Store:Get("world/remoteRevision")) or 0;
+					local remote = tonumber(GameLogic.GetFilters():apply_filters('store_get', 'world/remoteRevision')) or 0;
 					if (remote > 0) then
 						createClassroom(classId, worldId, page)
 					else

@@ -9,7 +9,6 @@ local ParaWorldApply = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWo
 ParaWorldApply.ShowPage();
 -------------------------------------------------------
 ]]
-local KeepworkServiceSchoolAndOrg = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/SchoolAndOrg.lua")
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 local ParaWorldApply = NPL.export();
 
@@ -50,7 +49,7 @@ function ParaWorldApply.ShowPage()
 		ParaWorldApply.orgData = nil
 		ParaWorldApply.SelectType = ParaWorldApply.SelectRegion;
 		commonlib.TimerManager.SetTimeout(function()
-			KeepworkServiceSchoolAndOrg:GetMyAllOrgsAndSchools(function(schoolData, orgData)
+			GameLogic.GetFilters():apply_filters('get_my_orgs_and_schools', function(schoolData, orgData)
 				if type(schoolData) == "table" and schoolData.regionId then
 					ParaWorldApply.schoolData= schoolData
 				end
@@ -75,7 +74,7 @@ function ParaWorldApply.CheckIsMyParaworld(callback)
 		_guihelper.MessageBox(L"请先分享世界，分享后可以提交申请！");
 		return;
 	end
-	local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+	local userId = tonumber(GameLogic.GetFilters():apply_filters('get_user_id'));
 
 	keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 		if (data and type(data) == "table") then
@@ -250,7 +249,7 @@ function ParaWorldApply.GetRegionData()
 end
 
 function ParaWorldApply.GetProvinces(callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion("province", nil, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region', 'province', nil, function(data)
 		if type(data) ~= "table" then
 			return false
 		end
@@ -273,7 +272,7 @@ function ParaWorldApply.GetProvinces(callback)
 end
 
 function ParaWorldApply.GetCities(id, callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion("city", id, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region',"city", id, function(data)
 		if type(data) ~= "table" then
 			return false
 		end
@@ -296,7 +295,7 @@ function ParaWorldApply.GetCities(id, callback)
 end
 
 function ParaWorldApply.GetAreas(id, callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion('area', id, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region', 'area', id, function(data)
 		if type(data) ~= "table" then
 			return false
 		end

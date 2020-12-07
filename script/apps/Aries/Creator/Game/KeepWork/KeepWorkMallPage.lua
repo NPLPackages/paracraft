@@ -9,8 +9,7 @@ local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/K
 KeepWorkMallPage.Show();
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+
 local KeepWorkMallPage = NPL.export();
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 
@@ -79,17 +78,15 @@ function KeepWorkMallPage.OnCreate()
 end
 
 function KeepWorkMallPage.Show()
-    if(KeepworkServiceSession:IsSignedIn())then
+    if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         KeepWorkMallPage.ShowView()
         return
-    end
-    LoginModal:CheckSignedIn(L"请先登录", function(result)
-        if result == true then
-            Mod.WorldShare.Utils.SetTimeOut(function()
-                if result then
-					KeepWorkMallPage.ShowView()
-                end
-            end, 500)
+	end
+	GameLogic.GetFilters():apply_filters('is_signed_in', L"请先登录", function(result)
+		if result == true then
+			commonlib.TimerManager.SetTimeout(function()
+				KeepWorkMallPage.ShowView()
+			end, 500)
         end
 	end)
 end
@@ -100,62 +97,64 @@ function KeepWorkMallPage.ShowView()
 		cache_policy,
 		platform =  1,
 	},function(err, msg, data)
-		KeepWorkMallPage.cur_select_level = 1
-		KeepWorkMallPage.cur_select_type_index = 1
-		KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
+		if err == 200 and data then
+			KeepWorkMallPage.cur_select_level = 1
+			KeepWorkMallPage.cur_select_type_index = 1
+			KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
+			
+			level_to_index = {}
+			menu_item_index = 0
 		
-		level_to_index = {}
-		menu_item_index = 0
+			local level = 1
+			KeepWorkMallPage.menu_data_sources = {}
+			menu_node_data = {}
+			KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
+			local att = ParaEngine.GetAttributeObject();
+			local oldsize = att:GetField("ScreenResolution", {1280,720});
 	
-		local level = 1
-		KeepWorkMallPage.menu_data_sources = {}
-		menu_node_data = {}
-		KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
-		local att = ParaEngine.GetAttributeObject();
-		local oldsize = att:GetField("ScreenResolution", {1280,720});
-
-		local standard_width = 1280
-		local standard_height = 720
-		
-		local view_width = 996
-		local view_height = 613
-
-		local ratio = view_width/standard_width
-
-		local params = {
-				url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.html",
-				name = "KeepWorkMallPage.Show", 
-				isShowTitleBar = false,
-				DestroyOnClose = true,
-				style = CommonCtrl.WindowFrame.ContainerStyle,
-				allowDrag = true,
-				enable_esc_key = true,
-				zorder = 0,
-				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-				directPosition = true,
-					align = "_ct",
-					x = -view_width/2,
-					y = -view_height/2,
-					width = view_width,
-					height = view_height,
-			};
-		System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-		GameLogic.GetFilters():add_filter("OnInstallModel", function ()
-            Mod.WorldShare.Utils.SetTimeOut(function()
-				if KeepWorkMallPage.isOpen then
-					KeepWorkMallPage.HandleDataSources()
-					KeepWorkMallPage.FlushView(true)
-				end
-            end, 500)
-		end);
-
-		KeepWorkMallPage.OnChangeTopBt(1);
-		KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
-
-        if(KeepWorkMallPage.show_callback)then
-            KeepWorkMallPage.show_callback();
-        end
+			local standard_width = 1280
+			local standard_height = 720
+			
+			local view_width = 996
+			local view_height = 613
+	
+			local ratio = view_width/standard_width
+	
+			local params = {
+					url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.html",
+					name = "KeepWorkMallPage.Show", 
+					isShowTitleBar = false,
+					DestroyOnClose = true,
+					style = CommonCtrl.WindowFrame.ContainerStyle,
+					allowDrag = true,
+					enable_esc_key = true,
+					zorder = 0,
+					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					directPosition = true,
+						align = "_ct",
+						x = -view_width/2,
+						y = -view_height/2,
+						width = view_width,
+						height = view_height,
+				};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);
+	
+			GameLogic.GetFilters():add_filter("OnInstallModel", function ()
+				commonlib.TimerManager.SetTimeout(function()
+					if KeepWorkMallPage.isOpen then
+						KeepWorkMallPage.HandleDataSources()
+						KeepWorkMallPage.FlushView(true)
+					end
+				end, 500)
+			end);
+	
+			KeepWorkMallPage.OnChangeTopBt(1);
+			KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
+	
+			if(KeepWorkMallPage.show_callback)then
+				KeepWorkMallPage.show_callback();
+			end
+		end
 	end)
 end
 

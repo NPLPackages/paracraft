@@ -103,22 +103,19 @@ function ParaWorldLoginAdapter:EnterOfflineWorld()
 	InternetLoadWorld.ShowPage();
 end
 function ParaWorldLoginAdapter:EnterWorld(close)
-	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-	local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 	if (close) then
-		if (not KeepworkService:IsSignedIn() and not KeepworkServiceSession:GetCurrentUserToken()) then
+		if (not GameLogic.GetFilters():apply_filters('is_signed_in') and not GameLogic.GetFilters():apply_filters('store_get', 'user/token')) then
 			Desktop.ForceExit(true);
 		end
 	end
-    if(System.options.loginmode == "offline" and not KeepworkService:IsSignedIn())then
+    if(System.options.loginmode == "offline" and not GameLogic.GetFilters():apply_filters('is_signed_in'))then
         ParaWorldLoginAdapter:EnterOfflineWorld();
         return
     end
-	if (not KeepworkService:IsSignedIn() and KeepworkServiceSession:GetCurrentUserToken()) then
-		local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
-		UserInfo:LoginWithToken(function()
-			ParaWorldLoginAdapter:EnterWorld();
-		end);
+    if (not GameLogic.GetFilters():apply_filters('is_signed_in') and not GameLogic.GetFilters():apply_filters('store_get', 'user/token')) then
+        GameLogic.GetFilters():apply_filters('login_with_token', function()
+            ParaWorldLoginAdapter:EnterWorld();
+        end)
 		return;
     end
     
@@ -128,9 +125,8 @@ function ParaWorldLoginAdapter:EnterWorld(close)
             ParaWorldLoginAdapter:EnterOfflineWorld();
             return
         end
-		ParaWorldLoginAdapter.MainWorldId = world_id;
-        local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	    UserConsole:HandleWorldId(world_id, "force");
+        ParaWorldLoginAdapter.MainWorldId = world_id;
+        GameLogic.RunCommand(format('/loadworld -s -force %d', world_id));
     end)
     
 end
@@ -140,11 +136,12 @@ function ParaWorldLoginAdapter.ShowExitWorld(restart)
 		if(res and res == _guihelper.DialogResult.Yes)then
 			ParaWorldLoginAdapter.MainWorldId = nil;
 			ParaWorldLoginAdapter.ParaWorldId = nil;
-			Desktop.is_exiting = true;
-			local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-			KeepworkServiceSession:Logout(nil, function()
-				GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true);
-			end);
+			Desktop.is_exiting = true;			
+
+            GameLogic.GetFilters():apply_filters('logout', nil, function()
+                GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true);
+            end);
+
 			Desktop.ForceExit(restart);
 		end
 	end, _guihelper.MessageBoxButtons.YesNo);

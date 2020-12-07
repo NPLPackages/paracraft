@@ -31,7 +31,7 @@ HttpWrapper.api_host = nil;
 -- "RELEASE" or 
 -- "LOCAL" or 
 function HttpWrapper.GetDevVersion()
-    local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("httpwrapper_version", "ONLINE");
+    local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE");
     httpwrapper_version = string.upper(httpwrapper_version);
     return httpwrapper_version;
 end

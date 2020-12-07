@@ -450,9 +450,8 @@ function QuickSelectBar.OnClickMall()
 end
 
 function QuickSelectBar.ShowTemplate()
-	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
-	return (generatorName == "paraworldMini") or (generatorName == "paraworld" and KeepworkService:IsSignedIn());
+	return (generatorName == "paraworldMini") or (generatorName == "paraworld" and GameLogic.GetFilters():apply_filters('is_signed_in'));
 end
 
 function QuickSelectBar.OnClickTemplate()

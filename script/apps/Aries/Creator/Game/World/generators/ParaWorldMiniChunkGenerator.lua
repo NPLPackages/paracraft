@@ -271,7 +271,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 			if(res and res == _guihelper.DialogResult.Yes)then
 				GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true, function(res)
 					if (res) then
-						local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld');
+						local currentWorld = GameLogic.GetFilters():apply_filters('current_world');
 						if (currentWorld and currentWorld.kpProjectId) then
 							uploadMiniWorld(tonumber(currentWorld.kpProjectId));
 						end

@@ -173,29 +173,34 @@ function DailyTaskManager.CheckTaskCompelete(task_id)
 	return false
 end
 
-function DailyTaskManager.OpenDailyTaskView()
-	local open_cb = function ()
-		if TaskKey == nil then
-			return
-		end
-		
-		if MyCompany.Aries.Creator.Game.Desktop.App == nil then
-			return
-		end
-
-		if DailyTaskManager.CheckIsFirstOpenView() then
-			return
-		end
-
-		local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
-		DailyTask.Show();
-	
-		local clientData = DailyTaskManager.GetClientData()
-		clientData[TaskKey].is_auto_open_view = true
-		KeepWorkItemManager.SetClientData(DailyTaskManager.gsid, clientData)
+function DailyTaskManager.AutoOpenDailyTaskView()
+	if TaskKey == nil then
+		return
 	end
 	
+	if MyCompany.Aries.Creator.Game.Desktop.App == nil then
+		return
+	end
+
+	if DailyTaskManager.CheckIsFirstOpenView() then
+		return
+	end
+
+	local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
+	DailyTask.Show();
+
+	local clientData = DailyTaskManager.GetClientData()
+	clientData[TaskKey].is_auto_open_view = true
+	KeepWorkItemManager.SetClientData(DailyTaskManager.gsid, clientData)
+end
+
+function DailyTaskManager.DelayOpenDailyTaskView()	
 	commonlib.TimerManager.SetTimeout(function()
+		-- 没过新手 不弹这个窗口
+        if not KeepWorkItemManager.HasGSItem(60000) and (System.User.realname == nil or System.User.realname == "") then
+            return
+		end
+		
 		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 		if DockPage.IsShow() then
 			if(not KeepWorkItemManager.IsLoaded())then
@@ -203,7 +208,7 @@ function DailyTaskManager.OpenDailyTaskView()
 				return
 			end
 		
-			open_cb()
+			DailyTaskManager.AutoOpenDailyTaskView()
 		end
 	end, 3000);
 end

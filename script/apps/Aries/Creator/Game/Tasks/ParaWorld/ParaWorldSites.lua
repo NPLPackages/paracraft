@@ -23,7 +23,7 @@ local ParaWorldTakeSeat = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Par
 local ParaWorldAdminSeat = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldAdminSeat.lua");
 local ParaWorldAdmin = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldAdmin.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua");
+
 local ParaWorldSites = NPL.export();
 
 ParaWorldSites.SitesNumber = {};
@@ -145,7 +145,7 @@ function ParaWorldSites.SetCurrentSite(sites)
 						item.state = ParaWorldSites.Locked;
 					elseif (seat.status == "checked") then
 						item.state = ParaWorldSites.Checked;
-						local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"));
+						local userId = tonumber(GameLogic.GetFilters():apply_filters('store_get', 'user/userId'));
 						if (seat.paraMini and seat.paraMini.userId == userId) then
 							item.state = ParaWorldSites.Selected;
 						end
@@ -473,7 +473,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 				if (seat.sn and seat.paraMini and seat.sn == sn) then
 					local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 					local filename = ParaIO.GetFileName(path);
-					KeepworkServiceWorld:GetSingleFileByCommitId(seat.paraMini.projectId, seat.paraMini.commitId, filename, function(content)
+					GameLogic.GetFilters():apply_filters('get_single_file_by_commit_id', seat.paraMini.projectId, seat.paraMini.commitId, filename, function(content)
 						if (not content) then
 							currentItem.loaded = false;
 							return;
@@ -515,7 +515,7 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 			if (currentItem.adProjectId) then
 				local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 				local filename = ParaIO.GetFileName(path);
-				KeepworkServiceWorld:GetSingleFile(currentItem.adProjectId, filename, function(content)
+				GameLogic.GetFilters():apply_filters('get_single_file', currentItem.adProjectId, filename, function(content)
 					if (not content) then
 						currentItem.loaded = false;
 						return;
@@ -600,7 +600,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 			local index = math.random(1, #worlds);
 			local path = ParaWorldMiniChunkGenerator:GetTemplateFilepath();
 			local filename = ParaIO.GetFileName(path);
-			KeepworkServiceWorld:GetSingleFileByCommitId(worlds[index].projectId, worlds[index].commitId, filename, function(content)
+			GameLogic.GetFilters():apply_filters('get_single_file_by_commit_id',worlds[index].projectId, worlds[index].commitId, filename, function(content)
 				if (not content) then
 					ParaWorldSites.AllMiniWorld[key].loaded = false;
 					return;

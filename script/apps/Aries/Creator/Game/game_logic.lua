@@ -229,10 +229,6 @@ function GameLogic.InitCommon()
 
         
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
-		local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-		UserIntroduction.StaticInit()
-
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
 
@@ -256,10 +252,8 @@ function GameLogic.InitCommon()
 end
 
 -- for checking desktop state after activate desktop
-function GameLogic.After_OnActivateDesktop()
-	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-		
-	local isKeepworkSignIn = not System.options.isCodepku and KeepworkService:IsSignedIn();
+function GameLogic.After_OnActivateDesktop()	
+	local isKeepworkSignIn = not System.options.isCodepku and GameLogic.GetFilters():apply_filters('is_signed_in');
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
     local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
@@ -1098,31 +1092,7 @@ end
 
 -- set mode 
 function GameLogic.SetMode(mode, bFireModeChangeEvent)
-	if Mod and Mod.WorldShare then
-		local loadWorldFinish = Mod.WorldShare.Store:Get('world/loadWorldFinish')
-
-		if loadWorldFinish then
-			if mode == 'editor' then
-				GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.world.edit");
-
-				-- stop play event tracking
-				if GameLogic.GameMode:GetMode() ~= mode then
-					GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.world.play", { ended = true });
-				end
-		
-				GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.world.edit", { started = true });
-			else
-				GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.world.play");
-
-				-- stop edit event tracking
-				if GameLogic.GameMode:GetMode() ~= mode then
-					GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.world.edit", { ended = true });
-				end
-		
-				GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.world.play", { started = true });
-			end
-		end
-	end
+	GameLogic.GetFilters():apply_filters('set_mode', mode, bFireModeChangeEvent);
 
 	GameLogic.mode = mode;
 	GameMode:SetInnerMode(mode);

@@ -310,7 +310,7 @@ function options:ApplyTexturePack()
 end
 
 function options:OnLoadWorld()
-	self.userType = Mod and Mod.WorldShare and Mod.WorldShare.Store and Mod.WorldShare.Store:Get("user/userType")
+	self.userType = GameLogic.GetFilters():apply_filters('get_user_type');
 
 	self:OneTimeInit();
 	self:LoadDefaultTransientOptions();

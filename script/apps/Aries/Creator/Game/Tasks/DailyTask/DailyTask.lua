@@ -11,13 +11,10 @@ DailyTask.Show();
 local DailyTask = NPL.export();
 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 local TaskIdList = DailyTaskManager.GetTaskIdList()
-
 
 commonlib.setfield("MyCompany.Aries.Creator.Game.DailyTask.DailyTask", DailyTask);
 local page;
@@ -35,13 +32,13 @@ function DailyTask.OnInit()
 end
 
 function DailyTask.Show()
-    if(KeepworkServiceSession:IsSignedIn())then
+    if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         DailyTask.ShowView()
         return
     end
-    LoginModal:CheckSignedIn(L"请先登录", function(result)
+    GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
         if result == true then
-            Mod.WorldShare.Utils.SetTimeOut(function()
+            commonlib.TimerManager.SetTimeout(function()
                 if result then
 					DailyTask.ShowView()
                 end
@@ -112,17 +109,14 @@ end
 function DailyTask.UpdataWorld()
 	if(mouse_button == "right") then
 		-- the new version
-		local UserConsoleCreate = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Create/Create.lua")
-		UserConsoleCreate:Show();
+		GameLogic.GetFilters():apply_filters('show_create_page')
 	else
-		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-		UserConsole:ShowPage();
+		GameLogic.GetFilters():apply_filters('show_console_page')
 	end
 end
 
 function DailyTask.VisitWorld()
-	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	UserConsole.OnClickOfficialWorlds();
+	GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
 end
 
 function DailyTask.GetCompletePro(data)

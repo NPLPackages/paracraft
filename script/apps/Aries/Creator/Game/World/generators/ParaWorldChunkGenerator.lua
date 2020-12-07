@@ -31,7 +31,6 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
@@ -97,14 +96,14 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	GameLogic.options:SetViewBobbing(false, true)
 
 
-	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and KeepworkService:IsSignedIn()) then
+	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		GameLogic.options:SetLockedGameMode("game");
 		GameLogic.RunCommand("/ggs connect -silent=false");
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-	if ((not GameLogic.IsReadOnly()) and KeepworkService:IsSignedIn() and (not WorldCommon.GetWorldTag("fromProjects"))) then
+	if ((not GameLogic.IsReadOnly()) and GameLogic.GetFilters():apply_filters('is_signed_in') and (not WorldCommon.GetWorldTag("fromProjects"))) then
 		local revision = GameLogic.options:GetRevision();
 		if (revision and revision > 1) then
 			return;

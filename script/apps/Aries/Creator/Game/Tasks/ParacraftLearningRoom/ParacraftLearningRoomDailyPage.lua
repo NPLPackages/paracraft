@@ -335,8 +335,7 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 
 	local learning = function()
 		KeepWorkItemManager.GetFilter():remove_all_filters("loaded_all");
-		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-		UserConsole:HandleWorldId(ParaWorldLoginAdapter.GetDefaultWorldID(), "force");
+		GameLogic.RunCommand(format("/loadworld -s -force %d", ParaWorldLoginAdapter.GetDefaultWorldID()));
 		--[[
 		local template = KeepWorkItemManager.GetItemTemplate(TeachingQuestPage.totalTaskGsid);
 		if (template) then
@@ -344,8 +343,7 @@ function ParacraftLearningRoomDailyPage.OnLearningLand()
 				-- TeachingQuestPage.MainWorldId = template.extension;
 				TeachingQuestPage.MainWorldId = tostring(template.desc);
 			end
-			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-			UserConsole:HandleWorldId(ParaWorldLoginAdapter.MainWorldId, "force");
+			GameLogic.RunCommand(format("/loadworld -s -force %d", ParaWorldLoginAdapter.GetDefaultWorldID()));
 		end
 		]]
 	end

@@ -9,6 +9,7 @@ local StudentPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/
 StudentPanel.ShowPage(true)
 -------------------------------------------------------
 ]]
+local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 local ShareUrlContext = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ShareUrlContext.lua");
 local SChatRoomPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/SChatRoomPage.lua");
@@ -168,10 +169,9 @@ function StudentPanel.StartClass()
 	end
 end
 
-function StudentPanel.EnterTeachingWorld(worldId)
+function StudentPanel.EnterTeachingWorld(projectId)
 	GameLogic:Connect("WorldLoaded", StudentPanel, StudentPanel.OnWorldLoaded, "UniqueConnection");
-	local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-	UserConsole:HandleWorldId(worldId, "force");
+	CommandManager:Run(format('/loadworld -s -force %d', projectId))
 end
 
 function StudentPanel.OnWorldLoaded()

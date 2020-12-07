@@ -73,6 +73,14 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "MainUIButtons": custom main page ui.
   - "DesktopMenuPage.ShowPage": bShow:boolean    custom DesktopMenuPage.ShowPage
   - "QuickSelectBar.ShowPage":bShow:boolean custom QuickSelectBar.ShowPage
+  - "show_certificate_page": Show certificate page
+  - "check_signed_in": Show login modal if not login
+  - "show_login_page": Show login page
+  - "show_create_page": Show create page
+  - "show_console_page": Show console page
+  - "show_offical_worlds_page": Show offical worlds page
+  - "show_school_page": Show school page
+  - "show_server_page": Show server page
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
@@ -98,6 +106,9 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "file_downloader_show_label", true, when fileDownloader downloads, choose whether to display the download progress prompt.
   - "WorldName.ResetWindowTitle": get custom window title for the world
   - "OnEnterParaWorldGrid" params {projectName, userId, x, y}: when player enters a new paraworld grid at x, y
+  - "compare_init": Compare current world bewteen remove version and local version
+  - "current_world": Get current selected world
+  - "check_and_updated_before_enter_my_home": Check and updated brefore enter my home
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
@@ -105,6 +116,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "new_item", itemStackArray, self:
   - "item_client_new_item_type_added", block_id, item:
   - "user_event_stat", category, action, value, label:
+  - "user_behavior", event tracking
   - "OnBeforeRestart", appName: before entire NPL runtime is restarted. 
   - "GameName", titlename: get game name string
   - "GameDescription", desc: get game description string, which will be shown in the window title area
@@ -112,6 +124,22 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "HandleGlobalKeyBySLASH", custom handle global key by DIK_SLASH
   - "CheckInstallUrlProtocol" false, determine whether checking install paracraft url protocol
   - "AppInstallDetails" AppInstallDetails, custom app_install_details 
+  - "is_signed_in": Is user signed in
+  - "login_with_token": Login with token
+  - "logout": Logout
+  - "get_user_type": Get user type
+  - "get_user_id": Get user Id
+  - "set_mode": Set game mode(game/edit)
+  - "open_keepwork_url": Open Keepwork url with token
+  - "get_keepwork_url": Get base keepwork url
+  - "get_world_by_project_id": Get current world instance by project id
+  - "get_project_id_by_lesson_id": Get project id by lesson id
+  - "get_my_orgs_and_schools": Get my orgs and schools
+  - "get_school_region": Get school region province/city/area
+  - "get_single_file": Get single file
+  - "get_single_file_by_commit_id": Get single file by commit id
+  - "get_socket_url": Get socket url
+  - "get_core_api_url": Get core api url
   
 - file exporters:
   - "file_exported", id, filename:

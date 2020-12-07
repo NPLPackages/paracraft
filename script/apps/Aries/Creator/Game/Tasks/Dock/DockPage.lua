@@ -15,7 +15,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
-local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
 local DockPage = NPL.export();
@@ -39,7 +38,7 @@ DockPage.top_line_1 = {
 DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
-    { label = L"", },
+    { label = L"活动公告", id = "notice", enabled2 = true, bg ="Texture/Aries/Creator/keepwork/dock/btn2_gonggao_32bits.png#0 0 85 75"},
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangriji_32bits.png#0 0 85 75", },
     { label = L"实战提升", id = "week_quest", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_ketang_32bits.png#0 0 85 75", },
@@ -79,17 +78,20 @@ function DockPage.Show()
     end)
 
     -- 每日首次登陆自动打开任务面板
-    DailyTaskManager.OpenDailyTaskView()
+    DailyTaskManager.DelayOpenDailyTaskView()
 
     -- 每次登陆如果没有实名认证的弹实名认证窗口
     if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
         DockPage.IsShowClassificationPage = true
-        RegisterModal:ShowClassificationPage()
+        GameLogic.GetFilters():apply_filters('show_certificate_page', function()
+            local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
+            DailyTaskManager.AutoOpenDailyTaskView()
+        end);
     end
 
     -- 每次登陆判断是否弹出活动框
     if Notice and Notice.CheckCanShow() then
-        Notice.Show()
+        Notice.Show(0)
     end
 end
 function DockPage.Hide()
@@ -152,6 +154,10 @@ function DockPage.OnClickTop(id)
     elseif(id == "msg_center")then
         local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
         MsgCenter.Show();
+    elseif(id == "notice")then
+        if Notice then
+            Notice.Show(1);
+        end
     end
 end
 function DockPage.OnClick(id)
@@ -173,19 +179,13 @@ function DockPage.OnClick(id)
             
 		if(mouse_button == "right") then
             -- the new version
-            local UserConsoleCreate = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Create/Create.lua")
-            UserConsoleCreate:Show();
-            last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+            last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page')
         else
-            local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-            UserConsole:ShowPage();
-            last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+            last_page_ctrl = GameLogic.GetFilters():apply_filters('show_console_page')
         end
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.work");
     elseif(id == "explore")then
-        local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-        UserConsole.OnClickOfficialWorlds();
-        last_page_ctrl = Mod.WorldShare.Store:Get("page/MainPage")
+        last_page_ctrl = GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.explore");
     elseif(id == "study")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
@@ -200,10 +200,9 @@ function DockPage.OnClick(id)
         local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
         LocalLoadWorld.CreateGetHomeWorld();
 
-        local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua");
-        SyncMain:CheckAndUpdatedBeforeEnterMyHome(function()
+        GameLogic.GetFilters():apply_filters('check_and_updated_before_enter_my_home', function()
             GameLogic.RunCommand("/loadworld home");
-        end);
+        end)
     elseif(id == "friends")then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.show_callback = function()
@@ -220,9 +219,7 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.friends");
         return
     elseif(id == "school")then
-        local MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
-        MySchool:Show();
-        last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.MySchool')
+        last_page_ctrl = GameLogic.GetFilters():apply_filters('show_school_page');
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");
     elseif(id == "system")then
         DockPage.OnClick_system_menu();
@@ -280,12 +277,7 @@ function DockPage.OnClick_Menuitem_server()
     ServerPage.ShowPage();
 end
 function DockPage.OnClick_Menuitem_server_join()
-    local Server = NPL.load("(gl)Mod/WorldShare/cellar/Server/Server.lua")
-    Server:ShowPage()
-
-    --local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-    --UserConsole:ShowHistoryManager()
-
+    GameLogic.GetFilters():apply_filters('show_server_page')
 end
 function DockPage.OnClick_Menuitem_plugin()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");

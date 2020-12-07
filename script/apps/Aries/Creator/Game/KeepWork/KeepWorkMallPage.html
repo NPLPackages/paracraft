@@ -152,15 +152,15 @@ end
             <input type="button" value='搜索' onclick="SearchProduct" tooltip="搜索" style="float: left;color: #000000;margin-left: -7px; margin-top: 0px;font-size: 14pt;width: 55px;height: 25px; background:url(Texture/Aries/Creator/keepwork/friends/btn_shousuo_36X28_32bits.png#0 0 32 32:8 8 8 8)" />
     </div>
 
-    <div style="margin-left: 0px;width:998px;height:47px;background:url(Texture/Aries/Creator/keepwork/Mall/zhuangshi_997X47_32bits.png#0 0 997 47);">
+    <div style="margin-left: 0px;width:998px;height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/zhuangshi_997X47_32bits.png#0 0 997 47);">
 
     </div>
 
-    <div style="float:left;width:120px;height:450px;margin-left:5px;margin-top:12px;">
+    <div style="float:left;width:130px;height:460px;margin-left:15px;margin-top:18px;">
         <!-- <div style="margin-left:10px;padding-left:12px;font-size:14px;">
             <div style="height:18px;color:#ffffff;margin-top:25px;"><%=getTopBtDesc()%></div>
         </div> -->
-        <pe:treeview name="tvwHelp" DataSource='<%=TreeItems()%>' OnClick="ChangeMenuType" ItemToggleSize="0" style="height:450px;margin-left:10px;margin-top:4px;background:" VerticalScrollBarOffsetX="6">
+        <pe:treeview name="tvwHelp" DataSource='<%=TreeItems()%>' OnClick="ChangeMenuType" ItemToggleSize="0" style="height:460px;margin-left:10px;margin-top:4px;background:" VerticalScrollBarOffsetX="6">
             <NodeTemplates>
                 <NodeTemplate DataType="type">
                     <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
@@ -230,7 +230,7 @@ end
             </NodeTemplates>
         </pe:treeview>
 
-        <div style="margin-left:30px;margin-top:10px;color:#000000;height: 40px;">
+        <div style="margin-left:35px;margin-top:25px;color:#000000;height: 40px;">
             <div style="float:left;width:30px;height:15px;" >
                 <kp:item gsid="998" style="margin-left:-20px;margin-top:-5px;width:64px;height:32px;"/>
             </div>
@@ -246,10 +246,10 @@ end
         
     </div>
 
-    <div style="float:left;width:864px;height:520px;margin-top:0px;background:;">
-        <pe:gridview style="margin-left:30px;" name="item_gridview" CellPadding="22" AllowPaging="false" ItemsPerLine="4 " DefaultNodeHeight="50"
+    <div style="float:left;width:824px;height:520px;margin-top:0px;background:;">
+        <pe:gridview style="margin-left:5px;" name="item_gridview" CellPadding="18" AllowPaging="false" ItemsPerLine="4 " DefaultNodeHeight="50"
                      DataSource='<%=GridsItems%>'>
-            <PagerSettings Position="Bottom" height="36" style="position:relative;width:864px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+            <PagerSettings Position="Bottom" height="36" style="position:relative;width:824px;margin-top:-30px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
             <PagerTemplate>
                 <form>
                     <input type="button" name="pre" zorder="2" style="width:20px;height:20px;margin-left:348px;margin-top:15px;background-rotation:-1.57;background:url(Texture/Aries/Creator/keepwork/Mall/icon_arrow_1_32bits.png#0 0 16 16);"/>

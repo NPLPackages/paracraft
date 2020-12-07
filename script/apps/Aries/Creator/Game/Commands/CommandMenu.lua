@@ -176,10 +176,6 @@ Commands["menu"] = {
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 			local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 			TeacherAgent:SetEnabled(not TeacherAgent:IsEnabled())
-		elseif(name == "help.userintroduction") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
-			local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-			UserIntroduction.ShowPage()
 		elseif(name == "help.videotutorials") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/videoguide");
 		elseif(name == "help.learn") then

@@ -10,7 +10,6 @@ ParaWorldList.ShowPage();
 -------------------------------------------------------
 ]]
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-local KeepworkServiceSchoolAndOrg = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/SchoolAndOrg.lua")
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 local ParaWorldList = NPL.export();
 
@@ -97,7 +96,7 @@ function ParaWorldList.SetDefaultWorld(index)
 	if (item and item.projectId) then
 		keepwork.world.defaultParaWorld({paraWorldId = item.id}, function(err, msg, data)
 			if (err == 200) then
-				Mod.WorldShare.Store:Set("world/paraWorldId", item.id);
+				GameLogic.GetFilters():apply_filters('store_set', "world/paraWorldId", item.id);
 				for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
 					ParaWorldList.Current_Item_DS[i] = nil;
 				end
@@ -117,7 +116,7 @@ function ParaWorldList.ResetDefaultWorld(index)
 	if (item and item.projectId) then
 		keepwork.world.defaultParaWorld({paraWorldId = 0}, function(err, msg, data)
 			if (err == 200) then
-				Mod.WorldShare.Store:Set("world/paraWorldId", 0);
+				GameLogic.GetFilters():apply_filters('store_set', "world/paraWorldId", 0);
 				for i = #(ParaWorldList.Current_Item_DS), 1, -1 do
 					ParaWorldList.Current_Item_DS[i] = nil;
 				end
@@ -133,7 +132,7 @@ end
 
 function ParaWorldList.IsDefaultWorld(index)
 	if (not index) then return end
-	local default = Mod.WorldShare.Store:Get("world/paraWorldId");
+	local default = GameLogic.GetFilters():apply_filters('store_get', 'world/paraWorldId');
 	local item = ParaWorldList.Current_Item_DS[index];
 	if (item and item.id == default and default > 0) then
 		return true;
@@ -157,7 +156,7 @@ function ParaWorldList.GetRegionData()
 end
 
 function ParaWorldList.GetProvinces(callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion("province", nil, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region', "province", nil, function(data)
 		if type(data) ~= "table" then
 			return false
 		end
@@ -180,7 +179,7 @@ function ParaWorldList.GetProvinces(callback)
 end
 
 function ParaWorldList.GetCities(id, callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion("city", id, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region', "city", id, function(data)
 		if type(data) ~= "table" then
 			return false
 		end
@@ -203,7 +202,7 @@ function ParaWorldList.GetCities(id, callback)
 end
 
 function ParaWorldList.GetAreas(id, callback)
-	KeepworkServiceSchoolAndOrg:GetSchoolRegion('area', id, function(data)
+	GameLogic.GetFilters():apply_filters('get_school_region', 'area', id, function(data)
 		if type(data) ~= "table" then
 			return false
 		end

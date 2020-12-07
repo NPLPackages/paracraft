@@ -7,9 +7,6 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActLantern/ActLantern.lua").Show();
 --]]
-
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 
 local ActLantern = NPL.export();
@@ -93,14 +90,14 @@ function ActLantern.Show()
                     end
 
                     -- 再判断用户是否登录了
-                    if KeepworkServiceSession:IsSignedIn() then
+                    if GameLogic.GetFilters():apply_filters('is_signed_in') then
                         ActLantern.ShowView()
                         return
                     end
 
-                    LoginModal:CheckSignedIn(L"请先登录", function(result)
+                    GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
                         if result == true then
-                            Mod.WorldShare.Utils.SetTimeOut(function()
+                            commonlib.TimerManager.SetTimeout(function()
                                 if result then
                                     ActLantern.ShowView()
                                 end

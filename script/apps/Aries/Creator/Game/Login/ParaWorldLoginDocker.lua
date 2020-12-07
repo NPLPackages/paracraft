@@ -85,21 +85,16 @@ commonlib.setfield("System.options.paraworldapp", ParaEngine.GetAppCommandLineBy
 -- @param title: additional text to show to the user in the login box
 -- @param callbackFunc: optional callback function(bSucceed) end when user actually signed in
 function ParaWorldLoginDocker.SignIn(title, callbackFunc)
-	local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua");
-	if(KeepworkService and KeepworkService:IsSignedIn()) then
+	if(GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		if(callbackFunc) then
 			callbackFunc(true)
 		end
 	else
-		local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-		local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-		Store:Set("user/loginText", title or L"请先登录")
-
-		LoginModal:Init(function(bSucceed)
+		GameLogic.GetFilters():apply_filters('check_signed_in', title or L"请先登录", function(bSucceed)
 			if(callbackFunc) then
 				callbackFunc(bSucceed~=false)
 			end
-		end);
+		end)
 	end
 end
 			

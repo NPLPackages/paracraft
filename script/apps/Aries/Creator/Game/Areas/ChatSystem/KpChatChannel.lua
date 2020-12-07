@@ -37,12 +37,7 @@ local KpChatChannel = NPL.export();
 KpChatChannel.worldId_pending = nil;
 KpChatChannel.worldId = nil;
 KpChatChannel.client = nil;
-KpChatChannel.configs = {
-    ONLINE = "https://socket.keepwork.com",
-    STAGE = "http://socket-rls.kp-para.cn",
-    RELEASE = "http://socket-rls.kp-para.cn",
-    LOCAL = "http://socket-dev.kp-para.cn"
-}
+
 function KpChatChannel.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
@@ -85,8 +80,7 @@ function KpChatChannel.GetUrl()
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
     local httpwrapper_version = HttpWrapper.GetDevVersion();
 
-    local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
-    url  = KpChatChannel.configs[httpwrapper_version];
+    url = GameLogic.GetFilters():apply_filters('get_socket_url');
     if(not url)then
 	    LOG.std(nil, "error", "KpChatChannel", "read url failed by httpwrapper_version: %s",httpwrapper_version);
     else
@@ -95,10 +89,7 @@ function KpChatChannel.GetUrl()
     return url;
 end
 function KpChatChannel.GetUserId()
-    if(Mod and Mod.WorldShare and Mod.WorldShare.Store)then
-        local userId = tonumber(Mod.WorldShare.Store:Get("user/userId"))
-        return userId;
-    end    
+    return GameLogic.GetFilters():apply_filters('get_user_id') 
 end
 
 function KpChatChannel.GetSchoolRoom()

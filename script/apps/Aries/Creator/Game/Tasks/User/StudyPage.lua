@@ -18,10 +18,8 @@ local grid_type_list = {
 	doc = 5,
 	baidu_konw = 6,
 }
-local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
--- local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 
 function StudyPage.OnInit()
     page = document:GetPageCtrl();
@@ -62,13 +60,13 @@ function StudyPage.clickGridItem(item_data)
 end
 
 function StudyPage.clickStudy()
-    if(KeepworkServiceSession:IsSignedIn())then
+    if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         ParacraftLearningRoomDailyPage.DoCheckin();
         return
     end
-    LoginModal:CheckSignedIn(L"请先登录", function(result)
+    GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
         if result == true then
-            Mod.WorldShare.Utils.SetTimeOut(function()
+            commonlib.TimerManager.SetTimeout(function()
                 if result then
                     -- WorldList:RefreshCurrentServerList()
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
@@ -82,13 +80,13 @@ end
 function StudyPage.clickKnowledgeIsland()
 	local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
 	TeachingQuestLinkPage.ShowPage();
-	-- if(KeepworkServiceSession:IsSignedIn())then
+	-- if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
 	-- 	ParacraftLearningRoomDailyPage.OnLearningLand();
 	-- 	return
 	-- end
-	-- LoginModal:CheckSignedIn(L"请先登录", function(result)
+	-- GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
 	-- 	if result == true then
-	-- 		Mod.WorldShare.Utils.SetTimeOut(function()
+	-- 		commonlib.TimerManager.SetTimeout(function()
 	-- 			if result then
 	-- 				-- WorldList:RefreshCurrentServerList()
 	-- 				local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
@@ -105,9 +103,8 @@ function StudyPage.clickArtOfWar()
 	local info = string.format(L"即将离开【%s】进入【%s】", WorldCommon.GetWorldTag("name") or "", L"孙子兵法");
 	_guihelper.MessageBox(info, function(res)
 		if(res and res == _guihelper.DialogResult.OK) then
-			local word_id = 19405
-			local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-			UserConsole:HandleWorldId(word_id, "force");
+			local world_id = 19405
+			GameLogic.RunCommand(format('/loadworld -s -force %d', world_id))
 		end
 	end, _guihelper.MessageBoxButtons.OKCancel);
 end

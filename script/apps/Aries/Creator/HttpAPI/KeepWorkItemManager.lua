@@ -253,6 +253,47 @@ function KeepWorkItemManager.GetCost(exid)
         return template.exchangeCosts;
     end
 end
+--[[
+{
+  {
+    goods={
+      {
+        amount=1,
+        goods={
+          animationUrl="",
+          bagId=5,
+          beans=9999999999,
+          canHandsel=false,
+          canTrade=false,
+          canUse=false,
+          coins=9999999999,
+          createdAt="2020-10-28T10:05:52.000Z",
+          dayMax=1,
+          deleted=false,
+          desc="任务系统记录用",
+          destoryAfterUse=false,
+          expiredRules=1,
+          fileType="",
+          gifUrl="",
+          gsId=40002,
+          holdingLimit=1,
+          icon="0",
+          id=131,
+          max=1,
+          modelUrl="",
+          name="任务系统记录用",
+          stackable=true,
+          typeId=9,
+          updatedAt="2020-10-28T10:05:52.000Z",
+          weekMax=1 
+        },
+        id=131 
+      } 
+    },
+    probability=100 
+  } 
+}
+]]
 function KeepWorkItemManager.GetGoal(exid)
     local template = KeepWorkItemManager.GetExtendedCostTemplate(exid);
     if(template)then
@@ -353,6 +394,33 @@ end
 
 -- create or load items from a static exid, these item are used to read/save client data in common
 function KeepWorkItemManager.LoadItemsFromStaticExId(callback)
+    local goals = KeepWorkItemManager.GetGoal(KeepWorkItemManager.exid_preload_items);
+    local loaded = false;
+    if(goals)then
+        loaded = true;
+        for k,v in ipairs(goals) do
+            local goods = v.goods;
+            for kk,vv in ipairs(goods) do
+                if(vv.goods)then
+                    local gsId = vv.goods.gsId;
+                    local amount = vv.amount;
+                    local bOwn, guid, bag, copies, item = KeepWorkItemManager.HasGSItem(gsId)
+                    if(not bOwn or copies < amount)then
+                        loaded = false;
+                        break
+                    end
+                end
+            end
+        end
+    end
+    if(loaded)then
+	    LOG.std(nil, "info", "KeepWorkItemManager.LoadItemsFromStaticExId ignored", KeepWorkItemManager.exid_preload_items);
+        if(callback)then
+            callback();
+        end
+        return
+    end
+	LOG.std(nil, "info", "KeepWorkItemManager.LoadItemsFromStaticExId", KeepWorkItemManager.exid_preload_items);
     KeepWorkItemManager.DoExtendedCost(KeepWorkItemManager.exid_preload_items,function()
         if(callback)then
             callback();

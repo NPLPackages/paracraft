@@ -140,13 +140,9 @@ function KeepWorkGetItem.OpenCrteate()
 	page:CloseWindow();
 	if(mouse_button == "right") then
 		-- the new version
-		local UserConsoleCreate = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Create/Create.lua")
-		UserConsoleCreate:Show();
-		last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page')
 	else
-		local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
-		UserConsole:ShowPage();
-		last_page_ctrl = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
+		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_console_page')
 	end
 end
 

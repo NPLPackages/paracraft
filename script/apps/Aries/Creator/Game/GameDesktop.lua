@@ -363,29 +363,12 @@ function Desktop.OnExit(bForceExit, bRestart)
 		return
 	end
 
-	local function checkLockWorld(callback)
-        local currentEnterWorld = Mod.WorldShare.Store:Get("world/currentEnterWorld")
-        if (currentEnterWorld and currentEnterWorld.project and currentEnterWorld.project.memberCount or 0) > 1 then
-            Mod.WorldShare.MsgBox:Show(L"请稍后...")
-			local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
-            KeepworkServiceWorld:UnlockWorld(function()
-                if (callback) then
-                    callback()
-                end
-            end)
-		else
-			if (callback) then
-				callback()
-			end
-        end
-	end
 	if(GameLogic.IsReadOnly()) then
 		if(bForceExit or Desktop.is_exiting) then
 			-- double click to exit without saving. 
 			if (not System.options.isCodepku) then
-				checkLockWorld(function()
-					local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-					KeepworkServiceSession:Logout();
+				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+					GameLogic.GetFilters():apply_filters('logout');
 					Desktop.ForceExit();
 				end);
 			else
@@ -434,9 +417,8 @@ function Desktop.OnExit(bForceExit, bRestart)
 				-- GameLogic.QuickSave();
 			end
 			if (not System.options.isCodepku) then
-				checkLockWorld(function()
-					local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-					KeepworkServiceSession:Logout();
+				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+					GameLogic.GetFilters():apply_filters('logout');
 					Desktop.ForceExit();
 				end);
 			else
@@ -457,7 +439,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
 						if (not System.options.isCodepku) then
-							checkLockWorld(function()
+							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 								ParaWorldLoginAdapter:EnterWorld(true);
 							end);
 						else
@@ -465,7 +447,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 						end
 					elseif(res and res == _guihelper.DialogResult.No) then
 						if (not System.options.isCodepku) then
-							checkLockWorld(function()
+							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 								ParaWorldLoginAdapter:EnterWorld(true);
 							end);
 						else

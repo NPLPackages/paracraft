@@ -13,10 +13,6 @@ VideoSharingUpload.ShowPage();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharing.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/QREncode.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.share.lua");
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-local StorageFilesApi = NPL.load("(gl)Mod/WorldShare/api/Storage/Files.lua")
-local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/Root.lua")
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 local QREncode = commonlib.gettable("MyCompany.Aries.Game.Movie.QREncode");
@@ -64,8 +60,8 @@ function VideoSharingUpload.OnClose()
 end
 
 function VideoSharingUpload.OnOK()
-	if (not KeepworkService:IsSignedIn()) then
-		LoginModal:ShowPage();
+	if (not GameLogic.GetFilters():apply_filters('is_signed_in')) then
+		GameLogic.GetFilters():apply_filters('show_login_page');
 		return;
 	end
 	local upload_timer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -93,7 +89,8 @@ function VideoSharingUpload.OnOK()
 			local token = data.data.token;
 			local key = data.data.key;
 			local file_name = commonlib.Encoding.DefaultToUtf8(ParaIO.GetFileName(file_path));
-			QiniuRootApi:Upload(
+			GameLogic.GetFilters():apply_filters(
+				'qiniu_upload_file',
 				token,
 				key,
 				file_name,

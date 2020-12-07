@@ -15,9 +15,6 @@ local ParaWorldLessons = commonlib.gettable("MyCompany.Aries.Game.MainLogin.Para
 
 local ParaWorldLesson = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLesson"))
 
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
-
 -- set this to true when keepwork `?token=` signin is fully supported. 
 ParaWorldLesson.autoSigninWebUrl = true;
 
@@ -144,16 +141,14 @@ function ParaWorldLesson:GetFirstWorldUrl(callbackFunc)
 					projectId = projectId:gsub("^['\"](.+)['\"]$", "%1");
 					projectId = tonumber(projectId);
 					if(projectId) then
-						KeepworkServiceWorld:GetWorldByProjectId(projectId, function(worldInfo)
-							echo(worldInfo, true)
-
+						GameLogic.GetFilters():apply_filters('get_world_by_project_id', projectId, function(worldInfo)
 							if worldInfo and worldInfo.archiveUrl then
 								self.worldUrl = worldInfo.archiveUrl;
 							end
 							if(callbackFunc) then
 								callbackFunc(self.worldUrl)
 							end
-						end)
+						end);
 					end
 				end
 			end
@@ -177,7 +172,12 @@ end
 
 function ParaWorldLesson:GetLessonUrl()
 	if(not self.lessonUrl) then
-		self.lessonUrl = format("%s/l/visitor/package/%d/lesson/%d", KeepworkService:GetKeepworkUrl(), self:GetPackageId(), self:GetLessonId())
+		self.lessonUrl = format(
+			"%s/l/visitor/package/%d/lesson/%d",
+			GameLogic.GetFilters():apply_filters('get_keepwork_base_url'),
+			self:GetPackageId(),
+			self:GetLessonId()
+		)
 	end
 	return self.lessonUrl;
 end
@@ -306,7 +306,11 @@ function ParaWorldLesson:SendRecord()
 	local userId = self:GetUserId() or 0;
 	local learnAPIUrl;
 	if(self:GetRecordId()) then
-		learnAPIUrl = format("%s/lesson/v0/learnRecords/%d", KeepworkService:GetKeepworkUrl(), self:GetRecordId());
+		learnAPIUrl = format(
+			"%s/lesson/v0/learnRecords/%d",
+			GameLogic.GetFilters():apply_filters('get_keepwork_base_url'),
+			self:GetRecordId()
+		);
 		learnAPIUrl = self:BuildUrlWithToken(learnAPIUrl)
 		return ParaWorldLessons.UrlRequest(learnAPIUrl , "PUT", {id=userId, extra = self:GetClientData()}, function(err, msg, data)
 			LOG.std(nil, "debug", "ParaWorldLessons", "send record returned:", err);
