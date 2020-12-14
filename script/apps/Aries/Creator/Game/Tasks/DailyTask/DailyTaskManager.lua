@@ -12,11 +12,12 @@ local DailyTaskManager = NPL.export();
 commonlib.setfield("MyCompany.Aries.Creator.Game.DailyTask.DailyTaskManager", DailyTaskManager);
 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-
+local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 local TaskKey = "daily_task_data"
 DailyTaskManager.gsid = 40002;
 
 DailyTaskManager.task_id_list = {
+	-- NewPlayerGuid = "100",
 	GrowthDiary = "101",
 	WeekWork = "102",
 	Classroom = "103",
@@ -25,6 +26,7 @@ DailyTaskManager.task_id_list = {
 }
 
 DailyTaskManager.task_data = {
+	-- [DailyTaskManager.task_id_list.NewPlayerGuid] = {complete_times = 0, max_times = 1, is_get_reward = false},
 	[DailyTaskManager.task_id_list.GrowthDiary] = {complete_times = 0, max_times = 1},
 	[DailyTaskManager.task_id_list.WeekWork] = {complete_times = 0, max_times = 1},
 	[DailyTaskManager.task_id_list.Classroom] = {complete_times = 0, max_times = 1},
@@ -35,6 +37,7 @@ DailyTaskManager.task_data = {
 }
 
 DailyTaskManager.exid_list = {
+	-- [DailyTaskManager.task_id_list.NewPlayerGuid] = 40001,
 	[DailyTaskManager.task_id_list.GrowthDiary] = 10001,
 	[DailyTaskManager.task_id_list.WeekWork] = 10024,
 	[DailyTaskManager.task_id_list.Classroom] = 10025,
@@ -43,6 +46,7 @@ DailyTaskManager.exid_list = {
 }
 
 DailyTaskManager.desc_list = {
+	-- [DailyTaskManager.task_id_list.NewPlayerGuid] = "你太棒了！奖励你%s个知识豆，再接再厉哦~",
 	[DailyTaskManager.task_id_list.GrowthDiary] = "你太棒了！奖励你%s个知识豆，再接再厉哦~",
 	[DailyTaskManager.task_id_list.WeekWork] = "为你的学习点赞，奖励你%s个知识豆，再接再厉哦~",
 	[DailyTaskManager.task_id_list.Classroom] = "你太棒了！奖励你%s个知识豆，再接再厉哦~",
@@ -81,6 +85,11 @@ end
 
 -- 完成某个任务
 function DailyTaskManager.AchieveTask(task_id, callback, exid)
+	-- 没登录的话不记录数据
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        return
+	end
+
 	local clientData = DailyTaskManager.GetClientData()
 	local task_data = clientData[TaskKey]
 	local data = task_data[task_id]
@@ -126,6 +135,14 @@ function DailyTaskManager.GetClientData()
 	local clientData = KeepWorkItemManager.GetClientData(DailyTaskManager.gsid) or {};
 	local is_new_day, time_stamp = DailyTaskManager.CheckIsNewDay(clientData)
 	if is_new_day then
+		-- 新手引导任务 完成了之后 不清除数据
+		if clientData[TaskKey] then
+			local new_player_guid_task_data = clientData[TaskKey][DailyTaskManager.task_id_list.NewPlayerGuid]
+			if new_player_guid_task_data then
+				DailyTaskManager.task_data[DailyTaskManager.task_id_list.NewPlayerGuid] = new_player_guid_task_data
+			end
+		end
+
 		clientData[TaskKey] = DailyTaskManager.task_data
 		clientData[TaskKey].time_stamp = time_stamp
 		clientData[TaskKey].is_auto_open_view = false
@@ -165,7 +182,11 @@ function DailyTaskManager.CheckTaskCompelete(task_id)
 	if data == nil then
 		return true
 	end
-	
+
+	if task_id == DailyTaskManager.task_id_list.GrowthDiary then
+		return ParacraftLearningRoomDailyPage.HasCheckedToday()-- 成长日记 以是否签到了为标准 现在是否签到成功改成看20秒之后才算成功
+	end
+
 	if data.complete_times >= data.max_times then
 		return true
 	end
@@ -186,8 +207,10 @@ function DailyTaskManager.AutoOpenDailyTaskView()
 		return
 	end
 
-	local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
-	DailyTask.Show();
+	-- local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
+	-- DailyTask.Show();
+	local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+	QuestPage.Show();
 
 	local clientData = DailyTaskManager.GetClientData()
 	clientData[TaskKey].is_auto_open_view = true
@@ -233,4 +256,42 @@ function DailyTaskManager.AchieveVisitWorldTask(world_id)
 		task_data.visit_world_list[world_id] = 1
 		DailyTaskManager.AchieveTask(task_id)
 	end
+end
+
+function DailyTaskManager.GetTaskExidList()
+	return DailyTaskManager.exid_list
+end
+
+function DailyTaskManager.AchieveNewPlayerTask()
+	-- 没登录的话不记录数据
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        return
+	end
+	local task_id = DailyTaskManager.task_id_list.NewPlayerGuid
+	local clientData = DailyTaskManager.GetClientData()
+	local task_data = clientData[TaskKey]
+	local data = task_data[task_id]
+	if data == nil then
+		return
+	end
+
+	if DailyTaskManager.CheckTaskCompelete(task_id) then
+		return
+	end
+
+	data.complete_times = data.complete_times + 1
+	KeepWorkItemManager.SetClientData(DailyTaskManager.gsid, clientData)
+end
+
+function DailyTaskManager.IsAllTaskComplete()
+	local id_list = DailyTaskManager.GetTaskIdList()
+	local is_all_complete = true
+	for k, v in pairs(id_list) do
+		if not DailyTaskManager.CheckTaskCompelete(v) then
+			is_all_complete = false
+			break
+		end
+	end
+
+	return is_all_complete
 end

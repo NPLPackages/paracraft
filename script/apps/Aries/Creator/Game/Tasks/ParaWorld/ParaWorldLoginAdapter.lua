@@ -44,6 +44,9 @@ ParaWorldLoginAdapter.ids = {
         1412, -- paracraft 主城
     },
 }
+
+ParaWorldLoginAdapter.SchoolWorldId = 20576;
+
 function ParaWorldLoginAdapter.GetDefaultWorldID()
     local httpwrapper_version = HttpWrapper.GetDevVersion();
     local ids = ParaWorldLoginAdapter.ids[httpwrapper_version];
@@ -84,7 +87,7 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
             -- the first item is right world
             if(data and data[1])then
                 local world_info = data[1];
-                if(world_info.projectId)then
+                if(world_info.projectId and world_info.projectId ~= ParaWorldLoginAdapter.SchoolWorldId)then
                     world_id =  world_info.projectId;
                 end
             end

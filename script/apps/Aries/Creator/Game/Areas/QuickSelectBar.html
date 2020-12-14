@@ -89,7 +89,7 @@ end
             </pe:gridview>
         </div>
         <div style="position:relative;margin-left:373px;margin-top:0px;">
-            <pe:if condition='<%=GameLogic.GameMode:IsEditor()%>'>
+            <pe:if condition='<%=GameLogic.GameMode:IsEditor() and GameLogic.options:GetProjectId() ~= "29477"%>'>
                 <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/map/btn_E_32X32_32bits.png#0 0 36 36)"/>
                 <pe:if condition='<%=false%>'>
                     <div style="float:left;position:relative;margin-top:0px;margin-left:6px;" ><input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickOnlineStore" tooltip='<%=L"元件库"%>' style="width:36px;height:36px;background:url(Texture/blocks/items/ts_char_on.png)"/></div>

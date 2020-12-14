@@ -444,6 +444,7 @@ Commands["setworldinfo"] = {
 	desc=[[set a given world tag
 --this will make world accessible to only vip users
 /setworldinfo -isVipWorld true    
+/setworldinfo -selectWater true    
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local option_name = "";
@@ -453,6 +454,10 @@ Commands["setworldinfo"] = {
 				local isVipWorld;
 				isVipWorld, cmd_text = CmdParser.ParseBool(cmd_text);
 				GameLogic.options:SetVipWorld(isVipWorld);
+			else
+				local value;
+				value, cmd_text = CmdParser.ParseBool(cmd_text);
+				GameLogic.options:SetWorldOption(option_name, value);
 			end
 		end
 	end,

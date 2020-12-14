@@ -24,6 +24,13 @@
             return DockPage.top_line_2[index];
         end
     end
+    function ds_top_line_3(index)
+        if(index == nil) then
+            return #DockPage.top_line_3;
+        else
+            return DockPage.top_line_3[index];
+        end
+    end
     function OnClickTop(id)
         DockPage.OnClickTop(id)
     end
@@ -35,6 +42,9 @@
     end
     function RenderButton_2(index)
         return DockPage.RenderButton_2(index);
+    end
+    function RenderButton_3(index)
+        return DockPage.RenderButton_3(index);
     end
     function CanShowVip()
         local list = DockPage.hide_vip_world_ids[HttpWrapper.GetDevVersion()];
@@ -54,7 +64,7 @@
         return DockPage.show_friend_red_tip;
     end
 ]]></script>
-    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:180px;background:;">
+    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:270px;background:;">
         <div style="width:510px;height:90px;">
             <pe:gridview name="gridview_1" style="position:relative;width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_1%>'>
@@ -76,6 +86,19 @@
                     <div style="width:85px;height:75px;">
                         <pe:if condition='<%= (Eval("enabled2") == true) %>' >
                             <%= RenderButton_2(Eval("index"))%>
+                        </pe:if>
+                    </div>
+	            </Columns>
+	            <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText=""/>
+            </pe:gridview>
+        </div>
+        <div style="margin-top:-10px;width:510px;height:90px;">
+            <pe:gridview name="gridview_3" style="width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
+                DataSource='<%=ds_top_line_3%>'>
+	            <Columns>
+                    <div style="width:85px;height:75px;">
+                        <pe:if condition='<%= (Eval("enabled3") == true) %>' >
+                            <%= RenderButton_3(Eval("index"))%>
                         </pe:if>
                     </div>
 	            </Columns>

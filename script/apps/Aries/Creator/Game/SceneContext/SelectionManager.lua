@@ -82,7 +82,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					-- remove blocks for non-exist blocks
 					LOG.std(nil, "warn", "MousePick", "non-exist block detected with id %d", result.block_id);
 					BlockEngine:SetBlock(result.blockX,result.blockY,result.blockZ, 0);
-				elseif(block.material:isLiquid() and block_types.names.LilyPad ~= GameLogic.GetBlockInRightHand()) then
+				elseif(block.material:isLiquid() and block_types.names.LilyPad ~= GameLogic.GetBlockInRightHand() and not GameLogic.options:GetWorldOption("selectWater")) then
 					-- if we are picking a liquid object, we discard it and pick again for solid or obstruction or customModel object. 
 					result = ParaTerrain.MousePick(picking_dist, result, 0x85);
 					if(result.blockX) then

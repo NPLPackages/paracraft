@@ -126,10 +126,32 @@ Scratch与Paracraft的区别
 Minecraft与Paracraft的区别
 孩子应该学习什么编程语言？
 NPL语言简介
+代码方块教学1
+Paracraft由多少行代码构成的
+代码方块教学2
+语法、注释、Log语句
+代码方块教学3《乒乓球游戏》
+什么是编译？
+代码方块教学4《钢琴》
+程序的本质
+代码方块教学5《迷宫小游戏》
+数字与数学
+代码方块教学6《全局变量》
+变量与名字
+代码方块教学7《双重机关与事件》
+变量的作用域
+代码方块教学8《制作图形界面》
+变量的使用方法
+代码方块教学9《代码方块的输出》
+变量举例
+字符串与文字
+字符串常用操作
+字符串练习
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
 }
+ParacraftLearningRoomDailyPage.max_lesson = 0 --最大课程数，添加或者删除课程时记得修改这个
 
 function ParacraftLearningRoomDailyPage.OnInit()
 	page = document:GetPageCtrl();
@@ -221,6 +243,35 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 	end
 	show_page();
 end
+
+function ParacraftLearningRoomDailyPage.GetMaxLearnDays()
+	if ParacraftLearningRoomDailyPage.max_lesson == 0 then
+		local nLesson = 0
+		for title in string.gfind(ParacraftLearningRoomDailyPage.lessons, "([^\r\n]+)") do
+            if(title and title ~= "")then
+                nLesson = nLesson + 1
+            end
+		end
+		ParacraftLearningRoomDailyPage.max_lesson = nLesson
+	end
+	-- print("最大课程数是================",ParacraftLearningRoomDailyPage.max_lesson)
+end
+
+function ParacraftLearningRoomDailyPage.GetLearnDays()
+	local gsid = ParacraftLearningRoomDailyPage.gsid;
+	local template = KeepWorkItemManager.GetItemTemplate(gsid);
+	if(not template)then
+		return 0
+	end
+	local bHas,guid,bagid,copies,item = KeepWorkItemManager.HasGSItem(gsid)
+	-- print("数据是===================",bHas,guid,bagid,copies)
+	-- commonlib.echo(item,true)
+	if not bHas then
+		return 0
+	end
+	return copies or 0
+end
+
 function ParacraftLearningRoomDailyPage.OnCheckinToday()
     local index = ParacraftLearningRoomDailyPage.GetNextDay();
 	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnCheckinToday", index);
@@ -250,10 +301,15 @@ function ParacraftLearningRoomDailyPage.HasCheckedToday()
     if(not KeepWorkItemManager.IsLoaded())then
 		return true
 	end
+	ParacraftLearningRoomDailyPage.GetMaxLearnDays()
 	local date = ParaGlobal.GetDateFormat("yyyy-M-d");
 	local key = string.format("LearningRoom_HasCheckedToday_%s", date);
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
+	local nLearnDays = ParacraftLearningRoomDailyPage.GetLearnDays()
+	if nLearnDays >= ParacraftLearningRoomDailyPage.max_lesson then
+		return true
+	end
 	return clientData[key];
 end
 function ParacraftLearningRoomDailyPage.SaveToLocal(callback)

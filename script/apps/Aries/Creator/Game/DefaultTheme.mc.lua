@@ -806,6 +806,9 @@ function DefaultTheme:Load()
 		["animated_upgrade_overlay"] = {
 			["background"] = "Texture/Aries/Common/ThemeTeen/animated/UIefx_QiangHua_Red/UIefx_QiangHua_Red_64bits_fps10_a006.png",
 		},
+		["animated_task_icon_overlay"] = {
+			["background"] = "Texture/Aries/Creator/keepwork/Effect/DockTaskIcon/renwu_32bits_fps12_a028.png",
+		},
 	}
 
 	NPL.load("(gl)script/ide/ContextMenu.lua");

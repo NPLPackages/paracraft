@@ -267,7 +267,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 			end);
 		end
 
-		_guihelper.MessageBox(L"世界已保存，是否要上传迷你世界？", function(res)
+		_guihelper.MessageBox(L"世界已保存，是否要上传迷你地块？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes)then
 				GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true, function(res)
 					if (res) then

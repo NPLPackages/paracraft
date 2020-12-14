@@ -101,6 +101,16 @@ function block:isProvidingStrongPower(x, y, z, direction)
     end
 end
 
+function block:OnBlockRemoved(x,y,z, last_id, last_data)
+	block._super.OnBlockRemoved(self, x,y,z, last_id, last_data);
+
+	if(not GameLogic.isRemote) then
+		if(last_data and last_data>=8) then
+			self:NotifyNeighborBlocksByDir(x, y, z, last_data)
+		end
+	end
+end
+
 -- virtual function: some signal is received. do not know the source. x,y,z is this block.
 function block:NotifyNeighborBlocksByDir(x, y, z, dir)
     BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);

@@ -22,6 +22,7 @@ local UserData = nil
 DockPage.FriendsFansData = nil
 DockPage.RefuseFansList = {}
 DockPage.IsShowClassificationPage = false
+DockPage.hasOpenTaskPage = false
 DockPage.hide_vip_world_ids = {
     ONLINE = { 18626 },
     RELEASE = { 1236 },
@@ -29,8 +30,8 @@ DockPage.hide_vip_world_ids = {
 DockPage.is_show = true;
 DockPage.top_line_1 = {
     { label = L"", },
-    { label = L"", },
-    { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangrenwu_32bits.png#0 0 85 75", },
+	{ label = L"", },
+    { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_renwu_32bits.png#0 0 85 75", },
     { label = L"用户社区", id = "web_keepwork_home", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_yonghushequ_32bits.png#0 0 85 75", },
     { label = L"大赛", id = "competition", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_dasai_32bits.png#0 0 85 75", },
     { label = L"消息中心", id = "msg_center", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_xiaoxi_32bits.png#0 0 85 75", },
@@ -42,6 +43,14 @@ DockPage.top_line_2 = {
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangriji_32bits.png#0 0 85 75", },
     { label = L"实战提升", id = "week_quest", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_ketang_32bits.png#0 0 85 75", },
+}
+DockPage.top_line_3 = {
+    { label = L"", },
+    { label = L"", },
+    { label = L"", },
+    { label = L"", },
+    { label = L"", },
+    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },
 }
 
 DockPage.show_friend_red_tip = false
@@ -78,16 +87,18 @@ function DockPage.Show()
     end)
 
     -- 每日首次登陆自动打开任务面板
-    DailyTaskManager.DelayOpenDailyTaskView()
+	-- Deleted By LiXizhi: 2020.12.11. 
+    -- DailyTaskManager.DelayOpenDailyTaskView()
 
     -- 每次登陆如果没有实名认证的弹实名认证窗口
-    if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
-        DockPage.IsShowClassificationPage = true
-        GameLogic.GetFilters():apply_filters('show_certificate_page', function()
-            local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
-            DailyTaskManager.AutoOpenDailyTaskView()
-        end);
-    end
+	-- Deleted By LiXizhi: 2020.12.11. 
+--    if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
+--        DockPage.IsShowClassificationPage = true
+--        GameLogic.GetFilters():apply_filters('show_certificate_page', function()
+--            local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
+--            DailyTaskManager.AutoOpenDailyTaskView()
+--        end);
+--    end
 
     -- 每次登陆判断是否弹出活动框
     if Notice and Notice.CheckCanShow() then
@@ -148,15 +159,30 @@ function DockPage.OnClickTop(id)
 	    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com", "", 1); 
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
     elseif(id == "user_tip")then
-        local DailyTask = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTask.lua");
-        DailyTask.Show();
+        local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+        QuestPage.Show();
+        
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
+        DockPage.hasOpenTaskPage = true
+        DockPage.page:Refresh(0);
     elseif(id == "msg_center")then
         local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
         MsgCenter.Show();
     elseif(id == "notice")then
         if Notice then
             Notice.Show(1);
+        end
+    elseif (id == 'present') then
+        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            GameLogic.GetFilters():apply_filters(
+                'show_certificate',
+                function(result)
+                    if (result) then
+                        -- GameLogic.AddBBS(nil, L'领取成功', 5000, '0 255 0');
+                        DockPage.page:Refresh(0.01)
+                    end
+                end
+            );
         end
     end
 end
@@ -323,6 +349,7 @@ function DockPage.RenderButton_1(index)
     local node = DockPage.top_line_1[index];
     local tip_str = "";
     local id = node.id;
+    local bg = node.bg
     if(id == "competition")then
         tip_str = string.format([[
         <script type="text/npl" refresh="false">
@@ -343,11 +370,38 @@ function DockPage.RenderButton_1(index)
         </script>
         <kp:redtip style="position:relative;margin-left:53px;margin-top:-74px;" onupdate='<%%= HasMsgCenterUnReadMsg()%%>' ></kp:redtip>
         ]],"");
+    elseif (id == "user_tip") then
+        if not DockPage.hasOpenTaskPage then
+            -- 判断下是否有未完成的任务
+            -- 日常任务
+            local is_all_task_complete = DailyTaskManager.IsAllTaskComplete()
+            -- 任务
+            local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
+            local quest_datas = QuestProvider:GetInstance():GetQuestItems() or {}
+            for i, v in ipairs(quest_datas) do
+                if not v.questItemContainer:IsFinished() then
+                    is_all_task_complete = false
+                    break
+                end
+            end
+
+            if not is_all_task_complete then
+                bg = ""
+                tip_str = [[
+                    <div style="position:relative;margin-left:0px;margin-top:-75px;width:85px;height:75px;background: Texture/Aries/Creator/keepwork/dock/btn2_di_32bits.png#0 0 85 75" ></div>                
+                    <div style="position:relative;margin-left:8px;margin-top:-85px;width:64px;height:64px;background:" >
+                        <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_task_icon_overlay" width="64" height="64"/>
+                    </div>
+                    ]]
+            end
+        end
+
     end
+
     local s = string.format([[
         <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
         %s
-    ]],node.id,node.bg,tip_str);
+    ]],node.id,bg,tip_str);
     return s;
 end
 
@@ -383,6 +437,30 @@ function DockPage.RenderButton_2(index)
     return s;
 end
 
+function DockPage.RenderButton_3(index)
+    local node = DockPage.top_line_3[index];
+    local tip_str = "";
+    local id = node.id;
+
+    if (id == "present") then
+        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            return string.format([[
+                <div style="position:relative;">
+                    <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_btn_overlay" style="margin-top: -5px;margin-left: -5px;" width="80" height="80"/>
+                </div>
+                <input type="button" name='%s' onclick="OnClickTop" style="width:75px;height:75px;background:url(%s)"/>
+            ]],node.id,node.bg);
+        else
+            return ''
+        end
+    end
+
+    local s = string.format([[
+        <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
+        %s
+    ]],node.id,node.bg,tip_str);
+    return s;
+end
 
 function DockPage.LoadActivityList(callback)
     keepwork.user.activity_list({},function(err, msg, data)

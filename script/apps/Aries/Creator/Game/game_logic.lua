@@ -50,6 +50,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -85,6 +87,8 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+
 -- block names enumeration
 local names;
 -- TODO: testing only, replace this with 
@@ -165,6 +169,8 @@ function GameLogic:InitAPIPath()
 	GameLogic.CommandManager = CommandManager;
 	GameLogic.block_types = block_types;
 	GameLogic.ItemClient = ItemClient;
+    GameLogic.QuestAction = QuestAction;
+
 	_G["GameLogic"] = GameLogic; 
 	_G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
 

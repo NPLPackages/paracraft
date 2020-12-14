@@ -680,7 +680,7 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 	else
 		self:MarkBlockForUpdate(x, y, z);
 
-		local cur_block_data = last_block_id;
+		local cur_block_data = last_block_data;
 		if(block_id ~= last_block_id) then
 			ParaTerrain.SetBlockTemplateByIdx(x,y,z,block_id);
 			cur_block_data = 0;

@@ -51,7 +51,7 @@ end
         
         <div style="position:relative;">
             <div style="float:left;width:84px;" >
-                <pe:if condition="<%=GetProjectId() ~= nil %>">
+                <pe:if condition="<%=GetProjectId() ~= nil and GameLogic.IsReadOnly()%>">
                     <input type="button" style="margin-top:3px;width:82px;" onclick="OnComplain" value="<%=L'举报违规'%>" class="kp_gray_light_button"/>
                 </pe:if>
             </div>

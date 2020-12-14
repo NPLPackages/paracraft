@@ -154,7 +154,7 @@ function ParaWorldSites.SetCurrentSite(sites)
 						item.name = seat.paraMini.name;
 						if (_guihelper.GetTextWidth(item.name, "System;16") > 132) then
 							if (string.find(item.name, L"的家园") or string.find(item.name, "_main")) then
-								local text = string.sub(item.name, 1, 8);
+								local text = commonlib.utf8.sub(item.name, 1, 8);
 								item.name = string.format(L"%s...的家园", text);
 							else
 								item.name = commonlib.utf8.sub(item.name, 1, 8);

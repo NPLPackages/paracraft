@@ -1236,3 +1236,14 @@ function options:GetMouseSettingList(list)
 
 	return self.moust_setting_list
 end
+
+function options:GetWorldOption(option)
+	return WorldCommon.GetWorldTag(option)
+end
+
+function options:SetWorldOption(option, bValue)
+	if(bValue == false) then
+		bValue = nil;
+	end
+	WorldCommon.SetWorldTag(option, bValue);
+end

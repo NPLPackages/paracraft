@@ -150,7 +150,12 @@
   <asset filename="character/CC/artwar/movie/boy_land_force.x" displayname="男陆军" name="boy_land_force"/> 
   <asset filename="character/CC/artwar/movie/girl_land_force.x" displayname="女陆军" name="girl_land_force"/> 
   <asset filename="character/CC/artwar/movie/boy_navy_force.x" displayname="男海军" name="boy_navy_force"/> 
-  <asset filename="character/CC/artwar/movie/girl_navy_force.x" displayname="女海军" name="girl_navy_force"/>  -->
+  <asset filename="character/CC/artwar/movie/girl_navy_force.x" displayname="女海军" name="girl_navy_force"/>  
+  <asset filename="character/CC/artwar/movie/boy_navy_force.x" displayname="男海军" name="boy_navy_force"/> 
+  <asset filename="character/CC/artwar/movie/girl_navy_force.x" displayname="女海军" name="girl_navy_force"/>  
+  <asset filename="character/CC/artwar/movie/the_elderly.x" displayname="老男人" name="the_elderly"/> 
+  <asset filename="character/CC/artwar/movie/taoist.x" displayname="道士" name="taoist"/> 
+-->
 
 
   <!-- artwar in shanghai电影 -->
@@ -755,6 +760,9 @@
   <asset filename="character/CC/artwar/game/bushoujia.x" displayname="捕兽夹" name="bushoujia"/>
   <asset filename="character/CC/artwar/game/huoba_daoju.x" displayname="火把（道具）" name="huoba_daoju"/>
   <!-- <asset filename="character/CC/artwar/game/tianshucanjuan.x" displayname="天书" name="tianshucanjuan"/> -->
+  <asset filename="character/CC/artwar/furnitures/umbrella_close.x" displayname="纸伞_闭" name="umbrella_close"/>
+  <asset filename="character/CC/artwar/furnitures/umbrella_open.x" displayname="纸伞_开" name="umbrella_open"/>
+  <asset filename="character/CC/artwar/game/hammer.x" displayname="锤子" name="hammer"/>
 
   <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows"/>
   <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow"/>
@@ -981,6 +989,8 @@
   <asset filename="character/CC/artwar/furnitures/zhutai_off.x" displayname="烛台-灭" name="zhutai_off"/>
   <asset filename="character/CC/artwar/furnitures/zhutai_on.x" displayname="烛台-明" name="zhutai_on"/>
   <asset filename="character/CC/artwar/furnitures/fountain3.x" displayname="喷水池" name="fountain3"/>
+  <asset filename="character/CC/artwar/furnitures/closestool.x" displayname="马桶" name="closestool"/>
+  <asset filename="character/CC/artwar/furnitures/incense_burner.x" displayname="丹炉" name="incense_burner"/>
  <!--  <asset filename="character/CC/artwar/furnitures/baozhi_off.x" displayname="报纸_安全" name="baozhi_off"/>
   <asset filename="character/CC/artwar/furnitures/baozhi_on.x" displayname="报纸_危险" name="baozhi_on"/>
   <asset filename="character/CC/artwar/furnitures/cd_on.x" displayname="插电板_危险1" name="cd_on"/>
@@ -1045,7 +1055,8 @@
   <asset filename="character/CC/artwar/furnitures/you.x" displayname="油" name="you"/>
   <asset filename="character/CC/artwar/furnitures/yundou_off.x" displayname="熨斗_安全" name="yundou_off"/>
   <asset filename="character/CC/artwar/furnitures/yundou_on.x" displayname="熨斗_危险" name="yundou_on"/>
-  <asset filename="character/CC/artwar/furnitures/zhanglang.x" displayname="蟑螂" name="zhanglang"/> -->
+  <asset filename="character/CC/artwar/furnitures/zhanglang.x" displayname="蟑螂" name="zhanglang"/>
+   -->
 
 </category>
 

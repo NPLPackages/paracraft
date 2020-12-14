@@ -128,6 +128,10 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
 	    LOG.std(nil, "debug", "KeepWorkItemManager.bags", KeepWorkItemManager.bags);
 	    LOG.std(nil, "debug", "KeepWorkItemManager.items", KeepWorkItemManager.items);
 	    LOG.std(nil, "debug", "KeepWorkItemManager.profile", KeepWorkItemManager.profile);
+
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
+        local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
+        QuestProvider:OnInit();
     end)            
     return res;
 end
@@ -241,6 +245,40 @@ function KeepWorkItemManager.GetConditions(exid)
     local goal = KeepWorkItemManager.GetGoal(exid);
     return precondition,cost,goal
 end
+--[[
+{
+  {
+    amount=6,
+    goods={
+      bagId=4,
+      beans=20,
+      canHandsel=false,
+      canTrade=false,
+      canUse=true,
+      coins=98,
+      createdAt="2020-06-01T07:48:30.000Z",
+      dayMax=9999999999,
+      deleted=false,
+      desc="用于在世界频道中广播，每条消息消耗1个。",
+      destoryAfterUse=true,
+      expiredRules=1,
+      expiredSeconds=0,
+      gsId=10001,
+      holdingLimit=8888888888,
+      icon="0",
+      id=12,
+      max=9999999999,
+      name="世界喇叭",
+      stackable=true,
+      typeId=8,
+      updatedAt="2020-06-01T08:28:43.000Z",
+      weekMax=9999999999 
+    },
+    id=12,
+    op="gte" 
+  } 
+}
+--]]
 function KeepWorkItemManager.GetPrecondition(exid)
     local template = KeepWorkItemManager.GetExtendedCostTemplate(exid);
     if(template)then
