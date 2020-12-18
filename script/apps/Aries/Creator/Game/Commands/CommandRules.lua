@@ -44,6 +44,7 @@ Some examples rules:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameRules.lua");
 			local GameRules = commonlib.gettable("MyCompany.Aries.Game.GameRules");
 			GameRules:AddRule(name, value);
+			GameLogic.GetFilters():apply_filters("cmd_addrule_end", {name= name, value =value,})
 		end
 	end,
 };
