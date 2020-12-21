@@ -38,5 +38,33 @@ NPL.export({
 ]]}},
 },
 
+{
+	type = "CrocoKit_Sensor_GetRGBValue", 
+	message0 = L"颜色传感器返回%1",
+	arg0 = {
+		{
+			name = "input",
+			type = "field_dropdown",
+			options = {
+				{ L"R值", "GetValueR" },
+				{ L"G值", "GetValueG" },
+				{ L"B值", "GetValueB" },
+			},
+			text = "R值", 
+		},
+	},
+	output = {type = "null",},
+	category = "NplMicroRobot.Sensing", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'CrocoKit_Sensor.GetRGBValue(CrocoKit_Sensor.enGetRGB.%s)',
+	ToNPL = function(self)
+		return ""
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+
+]]}},
+},
+
 
 })

@@ -33,7 +33,7 @@ NPL.export({
 
 {
 	type = "microbit_show_string", 
-	message0 = L"显示 %1",
+	message0 = L"显示字符串 %1",
 	arg0 = {
         {
 			name = "text",
@@ -49,6 +49,30 @@ NPL.export({
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'microbit_show_string(%s)',
+	ToNPL = function(self)
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "microbit_show_number", 
+	message0 = L"显示数字 %1",
+	arg0 = {
+        {
+			name = "text",
+            type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+	},
+    
+	category = "NplMicroRobot.Looks", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'microbit_show_number(%s)',
 	ToNPL = function(self)
 	end,
 	examples = {{desc = "", canRun = true, code = [[

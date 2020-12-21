@@ -242,7 +242,7 @@ function DailyTaskManager.CheckIsFirstOpenView()
 	return clientData[TaskKey].is_auto_open_view
 end
 
-function DailyTaskManager.AchieveVisitWorldTask(world_id)
+function DailyTaskManager.AchieveVisitWorldTask(key)
 	-- 探索同一个世界的话无效
 	local task_id = DailyTaskManager.task_id_list.VisitWorld
 	local task_data = DailyTaskManager.GetTaskData(task_id)
@@ -252,8 +252,8 @@ function DailyTaskManager.AchieveVisitWorldTask(world_id)
 	end
 
 	local visit_world_list = task_data.visit_world_list or {}
-	if task_data.visit_world_list[world_id] == nil then
-		task_data.visit_world_list[world_id] = 1
+	if task_data.visit_world_list[key] == nil then
+		task_data.visit_world_list[key] = 1
 		DailyTaskManager.AchieveTask(task_id)
 	end
 end

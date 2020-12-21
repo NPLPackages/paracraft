@@ -78,6 +78,10 @@ function KeepWorkMallPage.OnCreate()
 end
 
 function KeepWorkMallPage.Show()
+	if System.options.isCodepku then
+		return
+	end
+
     if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         KeepWorkMallPage.ShowView()
         return

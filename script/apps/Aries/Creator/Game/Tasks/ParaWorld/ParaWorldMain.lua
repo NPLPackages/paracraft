@@ -46,6 +46,11 @@ function ParaWorldMain:OnWorldLoaded()
 	if(self:IsCurrentParaWorld()) then
 		self:ShowAllAreas()
 	end
+
+	if (self:IsMiniWorld()) then
+		local ParaWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldUserInfo.lua");
+		ParaWorldUserInfo.ShowInMiniWorld();
+	end
 end
 
 function ParaWorldMain:OnWorldUnload()

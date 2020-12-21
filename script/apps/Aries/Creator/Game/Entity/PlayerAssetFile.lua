@@ -142,9 +142,9 @@ end
 -- @param skin: this is actually CCS string 
 function PlayerAssetFile:RefreshCustomModel(player, skin)
 	if(skin and skin:match("^%d+#")) then
-		CCS.ApplyCCSInfoString(player, skin);
+		CCS.ApplyCCSInfoString_MC(player, skin);
 	else
-		CCS.ApplyCCSInfoString(player, self:GetDefaultCCSString());
+		CCS.ApplyCCSInfoString_MC(player, self:GetDefaultCCSString());
 	end
 end
 

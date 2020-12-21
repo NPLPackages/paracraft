@@ -41,17 +41,21 @@ function TeachingQuestTitle.OnWorldLoaded()
 	if not DailyTaskManager.CheckTaskCompelete(DailyTaskManager.task_id_list.VisitWorld) then
 		local world_generator = WorldCommon.GetWorldTag("world_generator");
 		local world_id = WorldCommon.GetWorldTag("kpProjectId");
-		if world_id then
-			local world_name = WorldCommon.GetWorldTag("name");
-			local sunzi_world_id = "19405" -- 排除孙子兵法世界
-			local exclude_world = {
-				["Paracraft小课堂"] = 1,
-				["孙子兵法"] = 1,
-			}
-			
-			if world_generator ~= "paraworld" and GameLogic.IsReadOnly() and world_id ~= sunzi_world_id and exclude_world[world_name] == nil and not TeachingQuestPage.IsTaskProject(tostring(projectId)) then
-				DailyTaskManager.AchieveVisitWorldTask(world_id)
-			end
+		local world_name = WorldCommon.GetWorldTag("name");
+
+		local key = world_id
+		if key == nil then
+			key = world_name or ""
+		end
+		
+		local sunzi_world_id = "19405" -- 排除孙子兵法世界
+		local exclude_world = {
+			["Paracraft小课堂"] = 1,
+			["孙子兵法"] = 1,
+		}
+		
+		if world_generator ~= "paraworld" and GameLogic.IsReadOnly() and world_id ~= sunzi_world_id and exclude_world[world_name] == nil and not TeachingQuestPage.IsTaskProject(tostring(projectId)) then
+			DailyTaskManager.AchieveVisitWorldTask(key)
 		end
 	end
 	

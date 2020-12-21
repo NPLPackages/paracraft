@@ -66,6 +66,9 @@ function ParaWorldChunkGenerator:OnExit()
 	if(self.lock_timer) then
 		self.lock_timer:Change();
 	end
+	if (self.christmas_timer) then
+		self.christmas_timer:Change();
+	end
 end
 
 -- for temporary world files
@@ -128,6 +131,13 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	self.code_timer:Change(1000, 1000);
 
 	GameLogic.GetFilters():add_filter("OnEnterParaWorldGrid", ParaWorldChunkGenerator.OnEnterParaWorldGrid);
+
+	-- will show in activity day
+	--[[
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/GeneralNPC.lua");
+	local GeneralNPC = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.GeneralNPC");
+	self.christmas_timer = GeneralNPC.ShowChristmasHatNPC(self.christmas_timer);
+	]]
 end
 
 -- get params for generating flat terrain

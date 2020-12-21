@@ -67,6 +67,9 @@ end
           <input type="button" class="kp_gray_button" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
           <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK_CustomLabel%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:220px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
     </div>
   </pe:if>
 </kp:window>

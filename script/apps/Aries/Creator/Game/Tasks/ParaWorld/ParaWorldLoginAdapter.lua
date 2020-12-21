@@ -129,7 +129,7 @@ function ParaWorldLoginAdapter:EnterWorld(close)
             return
         end
         ParaWorldLoginAdapter.MainWorldId = world_id;
-        GameLogic.RunCommand(format('/loadworld -s -force %d', world_id));
+        GameLogic.RunCommand(format('/loadworld -s -force -failed %d', world_id));
     end)
     
 end

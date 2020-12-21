@@ -23,7 +23,10 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["text"] = {
 	name="text", 
 	quick_ref="/text [-p] [-w] text", 
-	desc=[[show movie text at bottom of the screen. 
+	desc=[[show movie text at bottom of the screen. text may contain wiki mark up. 
+highlight: =your words= 
+bold: *your phrase*
+]].."url: [[https://paracraft.cn][paracraft]]\n"..[[
 /text -p user has to click in order to continue. if will pause the calling entity, and resume when closed.  
 /text -w user must wait for text to finish and no way to advance to next time event. 
 /text default mode is that entity is not paused, and user can click left button to fast continue to next time event. 

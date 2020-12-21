@@ -121,4 +121,16 @@ HttpWrapper.Create("keepwork.world.star", "%MAIN%/core/v0/projects/:id/star", "P
 -- 是否点过赞
 HttpWrapper.Create("keepwork.world.is_stared", "%MAIN%/core/v0/projects/:id/star", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/1322
+-- 收藏
+HttpWrapper.Create("keepwork.world.favorite", "%MAIN%/core/v0/favorites", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/1327
+-- 取消收藏
+HttpWrapper.Create("keepwork.world.unfavorite", "%MAIN%/core/v0/favorites", "DELETE", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/1332
+-- 是否已收藏
+HttpWrapper.Create("keepwork.world.is_favorited", "%MAIN%/core/v0/favorites/exist", "GET", true)
+
 

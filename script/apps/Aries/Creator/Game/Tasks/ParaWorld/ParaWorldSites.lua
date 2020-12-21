@@ -706,7 +706,7 @@ function ParaWorldSites.LoadAdvertisementWorld()
 					local index = 1;
 					local projectIds = data[i].projectIds;
 					for j = count, count + data[i].quantity - 1 do
-						if (#projectIds < index) then
+						if (#projectIds < index or j > #ParaWorldSites.SitesNumber) then
 							break;
 						end
 						local projectId = projectIds[index];

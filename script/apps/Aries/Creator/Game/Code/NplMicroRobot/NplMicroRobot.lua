@@ -45,12 +45,15 @@ local all_cmds = {};
 local all_cmds_map = {};
 NplMicroRobot.categories = {
     {name = "NplMicroRobot.Motion", text = L"运动", colour="#42ccff", },
+    {name = "NplMicroRobot.Servo", text = L"舵机", colour = "#0000cd", },
     {name = "NplMicroRobot.Looks", text = L"显示", colour = "#7abb55", },
     {name = "NplMicroRobot.Events", text = L"事件", colour="#764bcc", },
     {name = "NplMicroRobot.Control", text = L"控制", colour = "#d83b01", },
---    {name = "NplMicroRobot.Sensing", text = L"感知", colour="#69b090", },
+    {name = "NplMicroRobot.Sensing", text = L"感知", colour="#69b090", },
     {name = "NplMicroRobot.Operators", text = L"运算", colour = "#569138", },
     {name = "NplMicroRobot.Data", text = L"数据", colour="#459197", },
+    {name = "NplMicroRobot.MbitCar", text = L"小车", colour="#d2691e", },
+    
 };
 NplMicroRobot.type= "NplMicroRobot";
 -- make files for blockly 
@@ -76,12 +79,14 @@ function NplMicroRobot.AppendAll()
 
 	local all_source_cmds = {
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Motion.lua");
+        NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Servo.lua");
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Looks.lua");
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Events.lua");
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Control.lua");
---        NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Sensing.lua");
+        NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Sensing.lua");
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Operators.lua");
         NPL.load("./NplMicroRobotDef/NplMicroRobotDef_Data.lua");
+        NPL.load("./NplMicroRobotDef/NplMicroRobotDef_MbitCar.lua");
 	}
 	for k,v in ipairs(all_source_cmds) do
 		NplMicroRobot.AppendDefinitions(v);
@@ -92,8 +97,12 @@ end
 function NplMicroRobot.AppendDefinitions(source)
 	if(source)then
 		for k,v in ipairs(source) do
-			table.insert(all_cmds,v);
-			all_cmds_map[v.type] = v;
+            if(v.type)then
+			    table.insert(all_cmds,v);
+			    all_cmds_map[v.type] = v;
+            else
+	            LOG.std(nil, "error", "NplMicroRobot find empty type in cmd:", v);
+            end
 		end
 	end
 end

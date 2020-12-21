@@ -146,8 +146,10 @@ end
 function ParaWorldApply.GetWorldCoverUrl()
 	if (ParaWorldApply.CurrentWorld.extra and ParaWorldApply.CurrentWorld.extra.coverUrl and ParaWorldApply.CurrentWorld.extra.coverUrl ~= "") then
 		return ParaWorldApply.CurrentWorld.extra.coverUrl;
-	else
+	elseif (ParaWorldApply.CurrentWorld.project.extra and ParaWorldApply.CurrentWorld.project.extra.imageUrl) then
 		return ParaWorldApply.CurrentWorld.project.extra.imageUrl;
+	else
+		return "";
 	end
 end
 

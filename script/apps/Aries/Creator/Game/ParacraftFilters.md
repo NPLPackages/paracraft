@@ -79,8 +79,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "show_create_page": Show create page
   - "show_console_page": Show console page
   - "show_offical_worlds_page": Show offical worlds page
-  - "show_school_page": Show school page
   - "show_server_page": Show server page
+  - "cellar.my_school.after_selected_school": Show my school page and return is selected a school.
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.

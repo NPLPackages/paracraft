@@ -22,7 +22,7 @@ local UserData = nil
 DockPage.FriendsFansData = nil
 DockPage.RefuseFansList = {}
 DockPage.IsShowClassificationPage = false
-DockPage.hasOpenTaskPage = false
+DockPage.isShowTaskIconEffect = true
 DockPage.hide_vip_world_ids = {
     ONLINE = { 18626 },
     RELEASE = { 1236 },
@@ -86,24 +86,14 @@ function DockPage.Show()
         DockPage.HandMsgCenterMsgData();
     end)
 
-    -- 每日首次登陆自动打开任务面板
-	-- Deleted By LiXizhi: 2020.12.11. 
-    -- DailyTaskManager.DelayOpenDailyTaskView()
-
-    -- 每次登陆如果没有实名认证的弹实名认证窗口
-	-- Deleted By LiXizhi: 2020.12.11. 
---    if (System.User.realname == nil or System.User.realname == "") and not DockPage.IsShowClassificationPage then
---        DockPage.IsShowClassificationPage = true
---        GameLogic.GetFilters():apply_filters('show_certificate_page', function()
---            local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
---            DailyTaskManager.AutoOpenDailyTaskView()
---        end);
---    end
-
     -- 每次登陆判断是否弹出活动框
     if Notice and Notice.CheckCanShow() then
         Notice.Show(0)
     end
+
+    DockPage.isShowTaskIconEffect = true
+
+    DockPage.CheckIsTaskCompelete()
 end
 function DockPage.Hide()
     DockPage.is_show = false;
@@ -163,7 +153,7 @@ function DockPage.OnClickTop(id)
         QuestPage.Show();
         
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
-        DockPage.hasOpenTaskPage = true
+        DockPage.isShowTaskIconEffect = false
         DockPage.page:Refresh(0);
     elseif(id == "msg_center")then
         local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
@@ -180,6 +170,7 @@ function DockPage.OnClickTop(id)
                     if (result) then
                         -- GameLogic.AddBBS(nil, L'领取成功', 5000, '0 255 0');
                         DockPage.page:Refresh(0.01)
+                        GameLogic.QuestAction.AchieveTask("40002_1", 1, true)
                     end
                 end
             );
@@ -245,7 +236,16 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.friends");
         return
     elseif(id == "school")then
-        last_page_ctrl = GameLogic.GetFilters():apply_filters('show_school_page');
+        last_page_ctrl = GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+            
+            KeepWorkItemManager.LoadProfile(false, function()
+                local profile = KeepWorkItemManager.GetProfile()
+                -- 是否选择了学校
+                if profile and profile.schoolId and profile.schoolId > 0 then
+                    GameLogic.QuestAction.AchieveTask("40003_1", 1, true)
+                end
+            end)
+        end);
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");
     elseif(id == "system")then
         DockPage.OnClick_system_menu();
@@ -371,21 +371,29 @@ function DockPage.RenderButton_1(index)
         <kp:redtip style="position:relative;margin-left:53px;margin-top:-74px;" onupdate='<%%= HasMsgCenterUnReadMsg()%%>' ></kp:redtip>
         ]],"");
     elseif (id == "user_tip") then
-        if not DockPage.hasOpenTaskPage then
+        -- 任务
+
+        if DockPage.isShowTaskIconEffect then
             -- 判断下是否有未完成的任务
             -- 日常任务
-            local is_all_task_complete = DailyTaskManager.IsAllTaskComplete()
-            -- 任务
+            
+            local is_all_task_complete = true
             local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
-            local quest_datas = QuestProvider:GetInstance():GetQuestItems() or {}
-            for i, v in ipairs(quest_datas) do
-                if not v.questItemContainer:IsFinished() then
-                    is_all_task_complete = false
-                    break
+            if QuestProvider:GetInstance().questItemContainer_map then
+                local quest_datas = QuestProvider:GetInstance():GetQuestItems() or {}
+                for i, v in ipairs(quest_datas) do
+                    -- 有可以领取任务的时候
+        
+                    if not v.questItemContainer:IsFinished() then
+                        is_all_task_complete = false
+                        break
+                    end
                 end
             end
 
-            if not is_all_task_complete then
+            local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+            local quest_page_open = QuestPage.IsOpen()
+            if not is_all_task_complete and not quest_page_open then
                 bg = ""
                 tip_str = [[
                     <div style="position:relative;margin-left:0px;margin-top:-75px;width:85px;height:75px;background: Texture/Aries/Creator/keepwork/dock/btn2_di_32bits.png#0 0 85 75" ></div>                
@@ -651,4 +659,24 @@ end
 
 function DockPage.GetMsgCenterUnReadNum()
     return DockPage.MsgCenterUnReadNum or 0
+end
+
+function DockPage.CheckIsTaskCompelete()
+    local profile = KeepWorkItemManager.GetProfile()
+    -- 是否实名认证
+   if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+        GameLogic.QuestAction.SetValue("40002_1",1);
+   end 
+
+   -- 是否选择了学校
+   if profile and profile.schoolId and profile.schoolId > 0 then
+        GameLogic.QuestAction.SetValue("40003_1",1);
+   end
+
+   -- 是否已选择了区域
+   if profile and profile.region and profile.region.hasChildren == 0 then
+        GameLogic.QuestAction.SetValue("40004_1",1);
+   end
+
+   DockPage.page:Refresh(0.01)
 end
