@@ -57,6 +57,8 @@ local Filters = commonlib.gettable("System.Core.Filters");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkAPI.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
+local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
+
 local KeepWorkItemManager = NPL.export()
 
 KeepWorkItemManager.globalstore_map = {};
@@ -129,6 +131,8 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
 	    LOG.std(nil, "debug", "KeepWorkItemManager.items", KeepWorkItemManager.items);
 	    LOG.std(nil, "debug", "KeepWorkItemManager.profile", KeepWorkItemManager.profile);
 
+        Keepwork:OnLogin();  -- 用户登录成功 数据准备就绪
+
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
         local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
         QuestProvider:OnInit();
@@ -136,7 +140,10 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
     return res;
 end
 function KeepWorkItemManager.OnKeepWorkLogout_Callback(res)
-	LOG.std(nil, "info", "KeepWorkItemManager", "OnKeepWorkLogout_Callback");
+    LOG.std(nil, "info", "KeepWorkItemManager", "OnKeepWorkLogout_Callback");
+    
+    Keepwork:OnLogout();  -- 用户登录成功 数据准备就绪
+
     KeepWorkItemManager.Clear();
     return res;
 end

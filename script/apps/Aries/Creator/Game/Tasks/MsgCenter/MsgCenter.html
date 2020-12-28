@@ -70,6 +70,17 @@ end
 function HasMsg()
     return #MsgCenter.MsgList > 0
 end
+
+function ClickName(name, mcmlNode)
+    local data = mcmlNode:GetAttribute("param1")
+    local server_data = data.server_data or {}
+    local msg = server_data.msg or {}
+    local username = msg.username
+    if username then
+        local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+        user_page.ShowUserInfoPage({username=username});
+    end
+end
 ]]></script>
 <kp:window name="iframe" width="640" height="613" icon="Texture/Aries/Creator/keepwork/MsgCenter/biaoti_xiaoxizhongxin_32bits.png#0 0 158 64"   onclose="ClosePage">
     <div style="color:#ffffff;width:640px;height:613px" class="kp_window_container">
@@ -117,7 +128,7 @@ end
                                                 <pe:if condition='<%=Eval("color_name") ~= nil %>'>
                                                     <div style="width: 340px;">
                                                         <div style="float: left;"><%=Eval("msg_content1")%>
-                                                            <div style="float:left;color:#16be3d; text-singleline:true"><%=Eval("color_name")%></div>
+                                                            <div onclick="ClickName" param1='<%=XPath("this")%>' style="float:left;color:#16be3d; text-singleline:true"><%=Eval("color_name")%></div>
                                                             <%=Eval("msg_content2")%>
                                                         </div>
                                                         <!-- <div class="book-detail-store-item align-center-vertical">居中文字</div> -->

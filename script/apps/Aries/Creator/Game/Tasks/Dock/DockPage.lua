@@ -17,6 +17,7 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
+local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -49,8 +50,8 @@ DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"", },
     { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },
+    { label = L"寻找帽子", id = "find_hat", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/ActRedhat/btn2_maozi_32bits.png#0 0 85 75"},
 }
 
 DockPage.show_friend_red_tip = false
@@ -175,6 +176,10 @@ function DockPage.OnClickTop(id)
                 end
             );
         end
+    elseif (id == 'find_hat') then
+        if ActRedhatExchange then
+            ActRedhatExchange.ShowView()
+        end
     end
 end
 function DockPage.OnClick(id)
@@ -246,12 +251,14 @@ function DockPage.OnClick(id)
                 end
             end)
         end);
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");        
     elseif(id == "system")then
         DockPage.OnClick_system_menu();
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.system");
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.system");        
     elseif(id == "vip")then
-        ParacraftLearningRoomDailyPage.OnVIP();
+        -- ParacraftLearningRoomDailyPage.OnVIP("dock");
+        local VipToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolTip.lua")
+        VipToolTip:Init(true)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.vip");
     elseif(id == "mall")then
         local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
@@ -462,6 +469,16 @@ function DockPage.RenderButton_3(index)
             return ''
         end
     end
+    if(id == "find_hat") then
+        if ActRedhatExchange and ActRedhatExchange.CheckCanShow() then
+            return string.format([[
+                <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
+                %s
+            ]],node.id,node.bg,tip_str);
+        else
+            return ''
+        end
+    end
 
     local s = string.format([[
         <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
@@ -639,7 +656,7 @@ function DockPage.HandMsgCenterMsgData(is_need_repeat)
                 all_count = all_count + v
             end
             DockPage.SetMsgCenterUnReadNum(all_count)
-            if DockPage.is_show then
+            if DockPage.is_show and DockPage.page then
                 DockPage.page:Refresh(0);
             end 
         end
@@ -677,6 +694,7 @@ function DockPage.CheckIsTaskCompelete()
    if profile and profile.region and profile.region.hasChildren == 0 then
         GameLogic.QuestAction.SetValue("40004_1",1);
    end
-
-   DockPage.page:Refresh(0.01)
+   if(DockPage.page)then
+        DockPage.page:Refresh(0.01)
+   end
 end

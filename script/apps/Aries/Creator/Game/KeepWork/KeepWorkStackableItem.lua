@@ -90,11 +90,29 @@ function KeepWorkStackableItemPage.GetBuyDesc1()
 	local target_num = exchange_targets[1] and exchange_targets[1].goods[1].amount or 0
 	local result_target_num = target_num * buy_num
 
+	if result_price > my_money then
+		return "完成任务，可免费获得知识豆。"
+	end
 	
 	
-	local desc = string.format("需要%d个%s，你现在有%d个%s,确定要购买吗?", result_price, cost_name, my_money, cost_name)
+	local desc = string.format("需要%d个%s,确定要购买吗?", result_price, cost_name)
 	
 	return desc
+end
+
+function KeepWorkStackableItemPage.IsEnough()
+	local rule = item_data.rule or {}
+
+	local exchange_costs = rule.exchangeCosts or {}
+	local price = exchange_costs[1] and exchange_costs[1].amount or 0
+	local result_price = price * buy_num
+
+	local id = exchange_costs[1] and exchange_costs[1].id or 0
+	local cost_data = KeepWorkItemManager.GetItemTemplateById(id) or {}
+	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(cost_data.gsId)
+	local my_money = copies and copies or 0
+
+	return my_money >= result_price
 end
 
 -- {

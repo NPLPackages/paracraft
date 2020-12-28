@@ -48,8 +48,8 @@ function ParaWorldMain:OnWorldLoaded()
 	end
 
 	if (self:IsMiniWorld()) then
-		local ParaWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldUserInfo.lua");
-		ParaWorldUserInfo.ShowInMiniWorld();
+		local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
+		MiniWorldUserInfo.ShowInMiniWorld();
 	end
 end
 

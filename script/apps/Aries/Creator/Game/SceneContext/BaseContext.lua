@@ -244,7 +244,9 @@ function BaseContext:CheckMousePick()
 	
 	-- highlight the block or terrain that the mouse picked
 	if(result.length and result.length<SelectionManager:GetPickingDist() and GameLogic.GameMode:CanSelect()) then
-		self:HighlightPickBlock(result);
+		if (GameLogic.GameMode:IsEditor()) then
+			self:HighlightPickBlock(result);
+		end
 		self:HighlightPickEntity(result);
 		return result;
 	else
@@ -834,6 +836,20 @@ function BaseContext:handlePlayerKeyEvent(event)
 			-- fly mode
 			if(GameMode:CanFly()) then
 				GameLogic.ToggleFly();
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+				local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+				local generatorName = WorldCommon.GetWorldTag("world_generator");
+				if (generatorName == "paraworld") then
+					GameLogic.GetFilters():apply_filters("VipNotice", true, "fly_on_paraworld",function()
+						local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+						if (KeepWorkItemManager.IsVip()) then
+							GameLogic.options:SetCanJumpInAir(true);
+						end
+					end);
+				else
+					_guihelper.MessageBox(L"此世界禁止飞行哦！");
+				end
 			end
 			event:accept();
 		elseif(dik_key == "DIK_B") then

@@ -97,6 +97,13 @@ function GetNmae(data)
 	name = name or ""
     return name
 end
+
+function ClickHead(name, mcmlNode)
+    local data = mcmlNode:GetAttribute("param1")
+    local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+    user_page.ShowUserInfoPage({username=data.username});
+end
+
 ]]></script>
 <kp:window name="iframe" mode="lite" width="330" height="583" title='<%= L"好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
@@ -168,9 +175,9 @@ end
                                         <aries:onlinestatus width="240" height="26" nid='<%=Eval("nid")%>' />
                                     </a> -->
                                     <div style="float: left;margin-left:0px;margin-top:0px;">
-                                        <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46"/>
+                                        <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46" onclick="ClickHead" param1='<%= XPath("this") %>'/>
                                     </div>
-                                    <div style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
+                                    <div onclick="ClickHead" param1='<%= XPath("this") %>' style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
                                         <%=GetNmae(XPath("this")) %>
                                     </div>
                                     <pe:if condition='<%=IsSelected(1)%>'>

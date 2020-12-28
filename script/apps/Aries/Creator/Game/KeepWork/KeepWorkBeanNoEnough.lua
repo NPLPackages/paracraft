@@ -24,3 +24,9 @@ function KeepWorkBeanNoEnough.getLeftBean()
 
 	return my_bean
 end
+
+function KeepWorkBeanNoEnough.OnRefresh()
+    if(page)then
+        page:Refresh(0.1);
+    end
+end

@@ -532,10 +532,10 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 						local x, y = 5 - row, 5 - column;
 						gen:LoadTemplateAtGridXY(x, y, template_file, true);
 						currentItem.loaded = true;
-						currentItem.projectName = nil;
-						currentItem.projectId = nil;
+						--currentItem.projectName = nil;
+						--currentItem.projectId = nil;
 						currentItem.bornAt = nil;
-						currentItem.userId = nil;
+						--currentItem.userId = nil;
 					end
 				end);
 			else
@@ -679,7 +679,7 @@ function ParaWorldSites.Reset()
 		ParaWorldSites.Current_Item_DS[i].loaded = false;
 		ParaWorldSites.Current_Item_DS[i].projectName = "";
 		ParaWorldSites.Current_Item_DS[i].projectId = nil; 
-		ParaWorldSites.Current_Item_DS[i].userId = userId; 
+		ParaWorldSites.Current_Item_DS[i].userId = nil; 
 		ParaWorldSites.Current_Item_DS[i].bornAt = nil; 
 		ParaWorldSites.Current_Item_DS[i].adProjectId = nil; 
 		ParaWorldSites.Current_Item_DS[i].openCode = false; 
@@ -704,6 +704,7 @@ function ParaWorldSites.LoadAdvertisementWorld()
 						count = count + data[i-1].quantity;
 					end
 					local index = 1;
+					local projects = data[i].projects;
 					local projectIds = data[i].projectIds;
 					for j = count, count + data[i].quantity - 1 do
 						if (#projectIds < index or j > #ParaWorldSites.SitesNumber) then
@@ -715,6 +716,11 @@ function ParaWorldSites.LoadAdvertisementWorld()
 						if (item and item.state == ParaWorldSites.Available) then
 							--loadTemplate(projectId, row, column);
 							item.adProjectId = projectId;
+							if (projects and projects[index]) then
+								item.projectName = projects[index].name;
+								item.projectId = projects[index].id;
+								item.userId = projects[index].userId;
+							end
 							index = index + 1;
 						end
 					end

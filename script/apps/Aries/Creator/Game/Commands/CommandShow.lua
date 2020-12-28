@@ -77,7 +77,7 @@ Other show filters:
 			else
 				GameLogic.RunCommand("/terrain -hide")
 			end
-		elseif(name == "player") then
+		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(true);
 		elseif(name == "physics") then
 			if(bIsShow == nil) then
@@ -88,8 +88,6 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SelectModulePage.lua");
 			local SelectModulePage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SelectModulePage")
 			SelectModulePage.ShowPage();
-		elseif(name == "") then
-			ParaScene.GetAttributeObject():SetField("ShowMainPlayer", true);
 		elseif(name == "vision") then
 			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
 			if(memoryContext) then
@@ -149,10 +147,8 @@ vision|ui|keyboard|quickselectbar|tips|map]],
 			GameLogic.options:ShowWireframe(false);
 		elseif(name == "touch") then
 			GameLogic.options:ShowTouchPad(false);
-		elseif(name == "player") then
+		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(false);
-		elseif(name == "") then
-			ParaScene.GetAttributeObject():SetField("ShowMainPlayer", false);
 		elseif(name == "vision") then
 			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
 			if(memoryContext) then

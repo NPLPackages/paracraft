@@ -224,6 +224,10 @@ end
 function getIcon()
     return item_data.icon
 end
+
+function IsEnough()
+    return KeepWorkStackableItemPage.IsEnough()
+end
 -- tricky code to decrease the count actually the min value
 --OnDecrease();
 
@@ -241,9 +245,9 @@ OnInitValue()
         <div style="width:411px;height:150px;">
             <pe:if condition='<%=canChooseNums() %>'>
                 <div style="float:right;margin-left:15px;margin-top:20px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
-                   <div style="position:relative;width:123px">
-                        <div style="position:relative;margin-left:6px;margin-top:0px;">
-                            <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
+                   <div style="position:relative;width:114px">
+                        <div style="position:relative;margin-left:0px;margin-top:5px;">
+                            <img zorder="0" src='<%=getIcon()%>'width="114" height="57"/>
                         </div>                              
                     </div>
                 </div>
@@ -258,10 +262,10 @@ OnInitValue()
                 </div>
             </pe:if>
             <pe:if condition='<%=not canChooseNums() %>'>
-                <div style="float:right;padding-left:20px;padding-top:20px;margin-left:130px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
-                    <div style="position:relative;width:123px">
-                         <div style="position:relative;margin-left:6px;margin-top:0px;">
-                             <img zorder="0" src='<%=getIcon()%>'width="79" height="70"/>
+                <div style="float:right;padding-top:20px;margin-left:130px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
+                    <div style="position:relative;width:114px">
+                         <div style="position:relative;margin-left:0px;margin-top:5px;">
+                             <img zorder="0" src='<%=getIcon()%>'width="114" height="57"/>
                          </div>                              
                      </div>
                  </div>
@@ -276,8 +280,16 @@ OnInitValue()
     </div>
     <div style="width:466px;height:32px;margin-top:0px;margin-left:55px">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
-        <input type="button" value="下次再说" style="margin-left:0px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnCancel()"/>
-        <input type="button" value="<%=getBuyBtDesc()%>" style="margin-left:80px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnOK()"/>
+        <input type="button" value="下次再说" style="float: left; margin-left:0px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnCancel()"/>
+        <pe:if condition='<%=IsEnough() %>'>
+            <input type="button" value="<%=getBuyBtDesc()%>" style="float: left;margin-left:80px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnOK()"/>
+        </pe:if>
+        <pe:if condition='<%=not IsEnough() %>'>
+            <!-- <div style="float: left;margin-left:80px;width:100px;height:38px; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);">
+                <div style="margin-left: 23px;margin-top: 7px;"><%=getBuyBtDesc()%></div>
+            </div> -->
+            <input type="button" value="<%=getBuyBtDesc()%>" style="margin-left:80px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);"/>
+        </pe:if>
     </div>
 </div>
 </pe:mcml> 

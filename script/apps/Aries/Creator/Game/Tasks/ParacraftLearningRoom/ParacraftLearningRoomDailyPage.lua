@@ -336,13 +336,16 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	index = tonumber(index)
 	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
+			ParacraftLearningRoomDailyPage.OnVIP("daily_note");
+			--[[
             _guihelper.MessageBox(L"非VIP用户仅可观看已签到视频，是否开通VIP观看此视频？", function(res)
                 if(res == _guihelper.DialogResult.OK) then
-                    ParacraftLearningRoomDailyPage.OnVIP();
+                    ParacraftLearningRoomDailyPage.OnVIP("daily_note");
                 else
                     ParacraftLearningRoomDailyPage.ShowPage();
 	            end
             end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right,nil,nil,nil,nil,{ ok = L"立即开通", cancel = L"暂不开通", title = L"开通VIP", });
+			]]
 			return
 		end
 	end
@@ -416,8 +419,8 @@ function ParacraftLearningRoomDailyPage:Refresh()
     end
     page:Refresh(0);
 end
-function ParacraftLearningRoomDailyPage.OnVIP()
-	GameLogic.GetFilters():apply_filters("VipNotice", true, function()
+function ParacraftLearningRoomDailyPage.OnVIP(from)
+	GameLogic.GetFilters():apply_filters("VipNotice", true, from, function()
         ParacraftLearningRoomDailyPage:Refresh();
     end);
 end

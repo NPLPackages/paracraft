@@ -18,6 +18,7 @@ function KpChatHelper.ShowMenu(str_username_chatid)
     end
 	local username, chatid = string.match(str_username_chatid,"(.+)_(.+)");
     if(mouse_button == "left") then
+        KpChatHelper.ShowUserInfo(username);
 	elseif(mouse_button == "right") then
         KpChatHelper.OnShowContextMenu(username, chatid);
 	end

@@ -428,7 +428,7 @@ Commands["map"] = {
 
 Commands["mode"] = {
 	name="mode", 
-	quick_ref="/mode [game|edit|tutorial|school]", 
+	quick_ref="/mode [game|edit|tutorial|school|strictgame]", 
 	mode_deny = "",
 	mode_allow = "",
 	desc=[[locking game mode to the given value. 

@@ -34,7 +34,7 @@ function kp_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, le
         copies = item.copies;
     end
 	local background;
-    if(itemTemplate.icon)then
+    if(itemTemplate and itemTemplate.icon)then
         background = itemTemplate.icon;
     end
     if(not background or background == "" or background == "0")then

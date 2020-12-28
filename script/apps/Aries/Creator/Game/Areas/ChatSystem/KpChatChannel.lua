@@ -295,6 +295,13 @@ function KpChatChannel.OnMsg(self, msg)
                   } 
                 }
             ]]
+            if(payload and payload.chargeType == 1) then
+                local product = payload.product
+                KeepWorkItemManager.LoadProfile(true, function()
+                    _guihelper.MessageBox("恭喜您"..product.description)
+               end)
+                return
+            end
             if(payload and payload.muteType == 1)then
                 KeepWorkItemManager.LoadMutingInfo(true);
                 return

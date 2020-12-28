@@ -52,6 +52,11 @@ function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bA
 	return self;
 end
 
+-- it displays nothing.
+function FileDownloader:SetSilent()
+	self.isSilent = true;
+end
+
 function FileDownloader:GetTotalFileSize()
 	return self.totalFileSize or -1;
 end
@@ -124,7 +129,9 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 	local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 	local label_id = src or "userworlddownload";
 	if(self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
-		BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text), max_duration=20000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
+		if(not self.isSilent) then
+			BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text), max_duration=20000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+		end
 	end
 	LOG.std(nil, "info", "FileDownloader", "begin download file %s", src or "");
 	
@@ -158,6 +165,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 		function (msg, url)
 			local text;
 			self.DownloadState = self.DownloadState;
+			local isRedText = false;
 			if(msg.DownloadState == "") then
 				text = L"下载中..."
 				if(msg.totalFileSize) then
@@ -173,12 +181,13 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
 				OnFail(L"下载终止了");
+				isRedText = true;
 				LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", url);
 				LOG.std(nil, "warn", "FileDownloader", msg);
 				GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);
 			end
-			if(text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
-				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
+			if(not self.isSilent and text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
+				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = isRedText and "255 0 0" or "0 255 0", scaling=1.1, bold=true, shadow=true,});
 			end	
 		end
 	);

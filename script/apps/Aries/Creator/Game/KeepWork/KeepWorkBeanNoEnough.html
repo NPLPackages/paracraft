@@ -68,6 +68,18 @@ function ClosePage()
     pageCtrl:CloseWindow();
 end
 
+function OpenVip()
+    GameLogic.GetFilters():apply_filters("VipNotice", true, "fly_on_paraworld",function()
+    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+    if (KeepWorkItemManager.IsVip()) then
+        KeepWorkBeanNoEnough.OnRefresh()
+
+        local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+        KeepWorkMallPage.FlushView()
+    end
+    end);
+end
+
 ]]></script>
 <kp:window name="iframe" mode="lite" width="400" height="216" title='<%= L"提示"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">

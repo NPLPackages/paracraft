@@ -256,6 +256,7 @@ function TexturePackage:DownloadRemoteFile(callbackFunc)
 	end
 
 	self.FileDownloader = self.FileDownloader or FileDownloader:new();
+	self.FileDownloader:SetSilent();
 	self.FileDownloader:Init(L"材质包", src, dest, OnCallbackFunc, "access plus 5 mins");
 end
 

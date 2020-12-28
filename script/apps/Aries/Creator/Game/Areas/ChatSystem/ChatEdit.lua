@@ -316,13 +316,19 @@ function ChatEdit.OnClickSend(name)
 
 		local bSendMessage = true;
 		if (words:match("^/")) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-			words, bSendMessage = CommandManager:RunFromConsole(words);
-			if(type(words) ~= "string") then
-				words = "";
+			CommandHelpPage.ClosePage();
+			if(GameLogic.GameMode:CanUseCommand()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+				words, bSendMessage = CommandManager:RunFromConsole(words);
+				if(type(words) ~= "string") then
+					words = "";
+				end
+			else
+				GameLogic.AddBBS(nil, L"当前模式不允许使用命令", 5000, "255 0 0");
+				ChatEdit.LostFocus();
+				return
 			end
-			CommandHelpPage.ClosePage();	
 		else
 			local player = EntityManager.GetPlayer();
 			if(player:SendChatMsg(words)) then

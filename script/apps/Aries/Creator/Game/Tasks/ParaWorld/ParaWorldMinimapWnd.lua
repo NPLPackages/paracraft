@@ -151,7 +151,11 @@ end
 
 -- @param params: {projectName, x, y}
 function ParaWorldMinimapWnd.OnEnterParaWorldGrid(params)
-	ParaWorldMinimapWnd.SetMapName(params.projectName, params.userId);
+	local name = params.projectName;
+	if (params.x < 7 and params.x > 4 and params.y < 7 and params.y > 4) then
+		name = ParaWorldMinimapWnd.GetWorldName();
+	end
+	ParaWorldMinimapWnd.SetMapName(name, params.userId);
 	return params;
 end
 

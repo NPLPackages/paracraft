@@ -706,7 +706,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		EnterTextDialog.ShowPage(title, function(result)
 			if(result and result~="") then
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-				if(result and vars[1] and vars[2]) then
+				if(result and vars and vars[1] and vars[2]) then
 					self:BeginUpdate();
 					self:AddKeyFrameByName("HeadTurningAngle", nil, vars[1] / 180 * math.pi);
 					self:AddKeyFrameByName("HeadUpdownAngle", nil, vars[2] / 180 * math.pi);
@@ -729,7 +729,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		EnterTextDialog.ShowPage(title, function(result)
 			if(result and result~="") then
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-				if(result and vars[1] and vars[2] and vars[3]) then
+				if(result and vars and vars[1] and vars[2] and vars[3]) then
 					self:BeginUpdate();
 					self:AddKeyFrameByName("roll", nil, vars[1] / 180 * math.pi);
 					self:AddKeyFrameByName("pitch", nil, vars[2] / 180 * math.pi);
@@ -759,7 +759,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		EnterTextDialog.ShowPage(title, function(result)
 			if(result and result~="") then
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-				if(result and vars[1] and vars[2] and vars[3]) then
+				if(result and vars and vars[1] and vars[2] and vars[3]) then
 					local x, y, z = BlockEngine:real_bottom(vars[1], vars[2], vars[3])
 					self:BeginUpdate();
 					self:AddKeyFrameByName("x", nil, x);
@@ -823,7 +823,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					EnterTextDialog.ShowPage(title, function(result)
 						if(result and result~="") then
 							local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-							if(result and vars[1] and vars[2] and vars[3]) then
+							if(result and vars and vars[1] and vars[2] and vars[3]) then
 								self:BeginUpdate();
 								roll, pitch, yaw  = vars[1] / 180 * math.pi, vars[2] / 180 * math.pi, vars[3] / 180 * math.pi;
 								self:BeginModify();

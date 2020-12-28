@@ -78,7 +78,7 @@ end
 
 -- can we chat or show chat content. 
 function GameMode:CanChat()
-	return self.mode ~= "strictgame";
+	return true;
 end
 
 function GameMode:CanUseCommand()

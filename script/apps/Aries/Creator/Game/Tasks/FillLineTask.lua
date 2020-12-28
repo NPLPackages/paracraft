@@ -85,7 +85,7 @@ function FillLine:FrameMove()
 
 	local block = BlockEngine:GetBlock(self.blockX,self.blockY,self.blockZ)
 
-	if((not block or block.liquid) and self.step <= self.radius) then
+	if((not block or (block.liquid and not block.obstruction)) and self.step <= self.radius) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data, 3, self.fill_sdata);
 		if(GameLogic.GameMode:CanAddToHistory()) then
 			self.history[#(self.history)+1] = {self.blockX,self.blockY,self.blockZ, block and block.id or 0};

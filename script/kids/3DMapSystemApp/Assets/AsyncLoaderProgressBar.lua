@@ -340,7 +340,7 @@ function AsyncLoaderProgressBar:Update()
 	--nItemLeft = nItemLeft + samples[last_index]
 	local nDownloadSpeed = self:GetDownloadSpeed();
 	local nRemainingBytes = self:GetRemainingBytes();
-	if(nItemLeft > 0 or self.download_duration>2000) then
+	if(nItemLeft > 0 or self.download_duration>10000) then
 		local remain_count_str = "";
 		if(nRemainingBytes > 1000) then
 			remain_count_str = string.format("%.2fMB", nRemainingBytes*0.000001);

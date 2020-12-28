@@ -85,7 +85,7 @@ function ParaWorldMiniChunkGenerator:GetAllBlocks()
 					end
 					blocks[#blocks+1] = {x-originX, y-from_y, z-originX, block_id, block_data, node}
 				end
-				block_id, y = BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, 0xffff)
+				block_id, y, block_data = BlockEngine:GetNextBlockOfTypeInColumn(x,y,z, 0xffff)
 			end
 		end
 	end
