@@ -80,3 +80,7 @@ HttpWrapper.default_postFunc
 --http://yapi.kp-para.cn/project/32/interface/api/3212
 -- 使用兑换码激活会员
 HttpWrapper.Create("keepwork.user.takevip_bycode", "%MAIN%/core/v0/promoCodes/use", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/3702
+-- 获取服务器时间
+HttpWrapper.Create("keepwork.user.server_time", "%MAIN%/core/v0/keepworks/currentTime", "GET", true)

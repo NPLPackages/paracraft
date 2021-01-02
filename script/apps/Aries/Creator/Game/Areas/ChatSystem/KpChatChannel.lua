@@ -297,7 +297,8 @@ function KpChatChannel.OnMsg(self, msg)
             ]]
             if(payload and payload.chargeType == 1) then
                 local product = payload.product
-                KeepWorkItemManager.LoadProfile(true, function()
+                KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
+                    GameLogic.GetFilters():apply_filters('login_with_token')
                     _guihelper.MessageBox("恭喜您"..product.description)
                end)
                 return

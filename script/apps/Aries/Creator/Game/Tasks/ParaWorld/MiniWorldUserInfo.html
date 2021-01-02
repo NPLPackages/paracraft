@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="MiniWorldUserInfo.lua">
+            <![CDATA[
+            MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
+            MiniWorldUserInfo.OnInit()
+
+            ]]>
+        </script>
+        <pe:container alignment="_lt" style="position:relative;background:;width:305px;height:70px;">
+            <div style="position:relative;margin-left:6px;width:305px;height:65px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/di_305X65_32bits.png#8 0 305 65);">
+                <div style="float:left;width:192px;height:65px;">
+                    <div style="margin-left:70px;margin-top:6px;width:110px;height:24px;font-size:12px;color:#000000"><%=MiniWorldUserInfo.GetProjectName()%></div>
+                    <div style="margin-left:70px;margin-top:6px;font-size:12px;color:#ffffff">
+                        <%=MiniWorldUserInfo.GetUpdatedTime()%>
+                    </div>
+                </div>
+                <pe:if condition='<%=not MiniWorldUserInfo.IsStared()%>'>
+                    <div onclick="MiniWorldUserInfo.OnClickStar" style="float:left;margin-top:10px;margin-left:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_weidian_48X48_32bits.png#0 0 48 48);">
+                    </div>
+                    <div style="float:left;margin-top:35px;margin-left:-108px;height:24px;text-align:center;font-size:14px;color:#000000"><%=MiniWorldUserInfo.GetStarCount()%></div>
+                </pe:if>
+                <pe:if condition='<%=MiniWorldUserInfo.IsStared()%>'>
+                    <div style="float:left;margin-top:10px;margin-left:0px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yidian_48X48_32bits.png#0 0 48 48);">
+                        <div style="margin-top:25px;height:24px;text-align:center;font-size:14px;color:#000000"><%=MiniWorldUserInfo.GetStarCount()%></div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not MiniWorldUserInfo.IsFavorited()%>'>
+                    <div onclick="MiniWorldUserInfo.OnClickFavorite" style="float:left;margin-top:10px;margin-left:6px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_shoucang_48X48_32bits.png#0 0 48 48);">
+                    </div>
+                    <div style="float:left;margin-top:35px;margin-left:-58px;height:24px;text-align:center;font-size:14px;color:#000000"><%=MiniWorldUserInfo.GetFavoritesCount()%></div>
+                </pe:if>
+                <pe:if condition='<%=MiniWorldUserInfo.IsFavorited()%>'>
+                    <div onclick="MiniWorldUserInfo.OnClickUnFavorite" style="float:left;margin-top:10px;margin-left:6px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yishoucang_48X48_32bits.png#0 0 48 48);">
+                    </div>
+                    <div style="float:left;margin-top:35px;margin-left:-58px;height:24px;text-align:center;font-size:14px;color:#000000"><%=MiniWorldUserInfo.GetFavoritesCount()%></div>
+                </pe:if>
+            </div>
+            <div onclick="MiniWorldUserInfo.OnClickUserInfo" style="position:relative;float:left;width:68px;height:68px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btouxiang_68X68_32bits.png#0 0 68 68);">
+            </div>
+            <div onclick="MiniWorldUserInfo.OnClickUserInfo" style="position:relative;float:left;margin-top:-4px;width:68px;height:68px;">
+                <pe:mc_player name="UserPlayer" miniscenegraphname="AvatarUserCharacter" style="width:64px;height:64px;" IsInteractive="false" NoFrameMove="true" RenderTargetSize="64" DefaultCameraObjectDist="3" />
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+

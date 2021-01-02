@@ -1,0 +1,49 @@
+<!-- "script/apps/Aries/Inventory/Pages/ActRedhatExchangeTip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="ActRedhatExchangeTip.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local ActRedhatExchangeTip = NPL.load("script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchangeTip.lua")
+local item_data = pageCtrl:GetRequestParam("item_data");
+ActRedhatExchangeTip.OnInit(item_data)
+
+function OnCancel()
+    pageCtrl:CloseWindow();
+end
+
+function GetDesc()
+    return ActRedhatExchangeTip.getTipsDesc()
+end
+
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+
+function getItemIcon()
+    return ActRedhatExchangeTip.getItemIcon()
+end
+
+function onClickExchange()
+    ActRedhatExchangeTip.onClickExchange()
+end
+
+]]></script>
+<div style="width: 396px;height: 280px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipbj_32bits.png#0 0 32 32:16 16 8 8);">
+    <div style="font-size: 16px; base-font-size: 16px;color: #ffffff; margin-top: 10px; margin-left: 10px;">爷爷的帽子</div>
+    <input type="button" style="margin-left: 364; margin-top: -24px; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipX_19X20_32bits.png#0 0 20 20);" onclick="ClosePage()"/>
+    <div style="position: relative;margin-top: 10px; margin-left: 150px;width: 114px;height: 114px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/kuang2_114X144_32bits.png#0 0 114 114);">
+        <img src='<%=getItemIcon()%>' width="128" height="64" style="margin-top: 24px; margin-left: -10px;"/>
+    </div>
+    <div style="margin-left: 14px;margin-top: 130px;">            
+        <div style="position:relative; margin-left: 18px; font-size: 12px; base-font-size: 12px; color: #ffffff;">
+            <%=GetDesc()%>
+        </div>
+        <input type="button" class="" value="下次再说" style="font-size: 16px ;base-font-size: 16px ; font-weight: bold;margin-left:30px;margin-top: 40px; width:108px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16)" onclick="ClosePage()"/>
+        <input type="button" class="" value="马上兑换" style="font-size: 16px ;base-font-size: 16px ; font-weight: bold;margin-left:230px;margin-top: -38px; width:108px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16)" onclick="onClickExchange()"/>
+    </div>        
+</div>
+</pe:mcml> 
+</body>
+</html>

@@ -18,6 +18,7 @@ NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
 local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
+local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -49,9 +50,9 @@ DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"", },
     { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },
     { label = L"寻找帽子", id = "find_hat", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/ActRedhat/btn2_maozi_32bits.png#0 0 85 75"},
+    { label = L"周末活动", id = "act_week", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/dock/btn2_chuangzaozhoumo_32bits.png#0 0 85 75"},
 }
 
 DockPage.show_friend_red_tip = false
@@ -95,6 +96,10 @@ function DockPage.Show()
     DockPage.isShowTaskIconEffect = true
 
     DockPage.CheckIsTaskCompelete()
+
+    ActWeek.GetServerTime(function()
+        DockPage.page:Refresh(0)
+    end)
 end
 function DockPage.Hide()
     DockPage.is_show = false;
@@ -180,6 +185,8 @@ function DockPage.OnClickTop(id)
         if ActRedhatExchange then
             ActRedhatExchange.ShowView()
         end
+    elseif (id == 'act_week') then
+        ActWeek.ShowView()
     end
 end
 function DockPage.OnClick(id)
@@ -469,8 +476,21 @@ function DockPage.RenderButton_3(index)
             return ''
         end
     end
+
+    
     if(id == "find_hat") then
         if ActRedhatExchange and ActRedhatExchange.CheckCanShow() then
+            return string.format([[
+                <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
+                %s
+            ]],node.id,node.bg,tip_str);
+        else
+            return ''
+        end
+    end
+    
+    if(id == "act_week") then
+        if ActWeek.GetActState() == ActWeek.ActState.going then
             return string.format([[
                 <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
                 %s

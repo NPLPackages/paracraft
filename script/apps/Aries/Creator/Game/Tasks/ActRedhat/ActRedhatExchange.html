@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+    <script refresh="true" type="text/npl" src="ActRedhatExchange.lua"><![CDATA[
+        local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua");
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        ActRedhatExchange.OnInit()
+        function ClosePage()
+            Page:CloseWindow();
+            ActRedhatExchange.closeView()
+        end
+        function getExchangeData(index)
+            if(index == nil) then        
+                return #ActRedhatExchange.exchangeDatas;
+            else
+                return ActRedhatExchange.exchangeDatas[index];
+            end
+        end
+
+
+        function onClickExchange(name,mcmlNode)
+            local data = mcmlNode:GetAttribute("param1")            
+            ActRedhatExchange.OnClickExchange(data)
+        end
+
+        function getLeftNumStr()
+            local strLeftNum = string.format("%d个",ActRedhatExchange.getLeftHat())
+            return strLeftNum
+        end
+
+        function isCanExchange(data)
+            local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(58002)   
+            local bHas1,guid1,bagid1,copies1 = KeepWorkItemManager.HasGSItem(58003)       
+            local have_num = ActRedhatExchange.getLeftHat()
+            local needhat = data.num
+            if(have_num >= needhat)then
+                if not data.isrepeat then
+                    if bHas or bHas1 then
+                        return false
+                    end
+                end
+                return true
+            end
+            return false
+        end
+
+        function isShowExchange(data)
+            local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(58002)   
+            local bHas1,guid1,bagid1,copies1 = KeepWorkItemManager.HasGSItem(58003) 
+            if not data.isrepeat then
+                if bHas or bHas1 then
+                    return false
+                end
+            end
+            return true
+        end
+
+        function getExchangeIcon(index)
+            print("hahahahahahahahahahahaha",index)
+            if index == nil then
+                return #ActRedhatExchange.cover
+            else
+                return ActRedhatExchange.cover[index]
+            end
+        end      
+        ]]></script>
+    <div style="width: 960px; height: 580px;background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
+        <!--title-->
+        <div style="width: 960; height: 60px;">
+            <input type="button" style="margin-left: 930px; margin-top: 10x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipX_19X20_32bits.png#0 0 20 20);" onclick="ClosePage()"/>
+            <div style="margin-top: -40px; margin-left: 20px; width: 256px; height: 64px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/biaoti_maozi_32bits.png#0 0 256 64);"></div>
+        </div>
+        <!--left-->
+        <div style="width: 300px; height: 500px; position: relative; margin-top: 0px; margin-left: -16px;"> <!--Texture/Aries/Creator/keepwork/ActRedhat/-->
+            <div style="position: relative; margin-left: 70px; margin-top: 8px; width: 172px;height: 40px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/duihuan_172X40_32bits.png#0 0 172 40);"></div>
+            <pe:gridview style="margin-top: 30px;" name="gridview_1"  AllowPaging="false" CellPadding="30" ItemsPerLine="1" DefaultNodeHeight = "50"
+                DataSource='<%=getExchangeData%>'>
+                <Columns>
+                    <div style="width: 260px; height: 106px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/bjk_258X118_32bits.png#0 0 256 112);">
+                        <div style="width: 128px;height: 64px; margin-top: 20px; margin-left: 10px;">
+                            <img src='<%=Eval("icon")%>' width="128" height="64"/>                            
+                        </div>
+                        <div style="position: relative; margin-left: 150px; margin-top: -42px; width: 28px; height: 22px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/icon_maozi_27X22_32bits.png#0 0 28 22);"></div>
+                        <pe:if condition='<%=isShowExchange(XPath("this"))%>'>                           
+                            <label name="buydesc1" style="font-size:12pt; position: relative;margin-left: 150px; margin-top: -70px;" value='<%=Eval("name")%>'/>
+                        </pe:if>
+                        <pe:if condition='<%=not isShowExchange(XPath("this"))%>'>                              
+                            <label name="buydesc1" style="font-size:12pt; position: relative;margin-left: 150px; margin-top: -70px;" value='已兑换'/>
+                        </pe:if>
+                        <label name="buydesc2" style="font-size:12pt; position: relative;margin-left: -76px; margin-top: -40px;" value='X'/>
+                        <label name="buydesc3" style="font-size:12pt; position: relative;margin-left: -60px; margin-top: -40px;" value='<%=Eval("needhat")%>'/>
+                        <pe:if condition='<%=isCanExchange(XPath("this"))%>'>                           
+                            <input type="button" value="兑换" style=" width:102px;height:30px; margin-left: 150px; margin-top: -14px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/btn_lv_32X32_32bits.png#0 0 32 32:16 16 8 8)" onclick="onClickExchange()" param1='<%= XPath("this") %>'/>
+                        </pe:if>
+
+                        <pe:if condition='<%=not isCanExchange(XPath("this"))%>'>                              
+                            <input type="button" value="兑换"  enabled="false" style=" width:102px;height:30px; margin-left: 150px; margin-top: -14px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/btn_hui_32X32_32bits.png#0 0 32 32:16 16 8 8)" onclick="onClickExchange()" param1='<%= XPath("this") %>'/>
+                        </pe:if>                       
+                    </div>
+                </Columns>
+            </pe:gridview>
+
+            <div style="margin-top: -36px; margin-left: 30px;">
+                <div style="position: relative; margin-left: 10px; margin-top: 10px; width: 28px; height: 22px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/icon_maozi_27X22_32bits.png#0 0 28 22);"></div>
+                <label name="buydesc4" style="font-size:12pt; position: relative;margin-left: 46px; margin-top: 14px;" value='拥有'/>
+                <label name="buydesc5" style="font-size:12pt; position: relative;margin-left: -200px; margin-top: 14px;" value='<%=getLeftNumStr()%>'/>
+            </div>
+        </div>
+        <!--right-->
+        <div style="width: 640px; height: 520px; position: relative; margin-top: -10px; margin-left: 300px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/youkuang_32X32_32bits.png#0 0 32 32:16 16 8 8);">
+            <pe:gridview name = "gridview_2" RememberScrollPos="true" style="height:500px;margin-top: 10px;margin-left: 10px;" VerticalScrollBarStep="100" AllowPaging="false" CellPadding="2" ItemsPerLine="1" DefaultNodeHeight = "10" 
+                DataSource='<%=getExchangeIcon%>'>
+                <Columns>
+                    <!-- <img style="width: 640px; height: 2863px;" src="Texture/Aries/Creator/keepwork/ActRedhat/actredhat_bg_640X2863_32bits.png" /> -->
+                    <div style="width: 640px; height: 3000px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/actredhat_bg_640X2863_32bits.png#0 0 640 3000);"></div>
+                </Columns>                
+            </pe:gridview>
+        </div>
+    </div>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,37 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldEnvTime.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldEnvTime.lua">
+            <![CDATA[
+            ParaWorldEnvTime = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldEnvTime.lua");
+            ParaWorldEnvTime.OnInit()
+
+            NPL.load("(gl)script/mobile/paracraft/Areas/SettingPage.lua");
+            SettingPage = commonlib.gettable("ParaCraft.Mobile.Desktop.SettingPage");
+            ]]>
+        </script>
+        <kp:window width="400" height="160" onclose="ParaWorldEnvTime.OnClose">
+            <div style="margin-left:20px;margin-top:7px;width:96px;height:26px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/zi_guangxian_96X26_32bits.png#0 0 96 26);"></div>
+            <div style="margin-top:40px;width:400px;height:150px;">
+                <div style="margin-left:90px;margin-top:10px;">
+                    <div style="float:left;margin-left:0px;margin-top:0px;width:28px;height:29px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_guang_28X29_32bits.png#0 0 28 29)" />
+                    <div style="float:left;margin-top:8px;width:130px;height:10px;margin-left:20px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/xian_130X10_32bits.png#0 0 130 10);">
+                        <pe:sliderbar name="mcTimeSlider" min="0" max="1000" min_step="1" value="<%=SettingPage.GetTimeOfDayStd()%>" button_bg="Texture/Aries/Creator/keepwork/ParaWorld/btn_yuan_20X20_32bits.png;0 0 20 20" button_width="18" button_height="18" style="float:left;margin-top:-4px;width:138px;height:18px;background:;" onchange="ParaWorldEnvTime.OnTimeSliderChanged"></pe:sliderbar>
+                    </div>
+                    <div style="float:left;margin-left:20px;margin-top:-2px;width:28px;height:29px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/icon_yueliang_28X29_32bits.png#0 0 28 29)" />
+                </div>
+                <!--
+                <input type="button" onclick="ParaWorldEnvTime.SetDefault" align="center" style="margin-top:20px;width:120px;height:40px;background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_gensui_120X40_32bits.png#0 0 120 40);" />
+                -->
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>
+

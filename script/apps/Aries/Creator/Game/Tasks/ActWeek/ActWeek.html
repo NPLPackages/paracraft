@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ActWeek.lua"><![CDATA[
+local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua");
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+ActWeek.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    ActWeek.closeView()
+end
+function getExchangeData(index)
+    if(index == nil) then        
+        return #ActWeek.exchangeDatas;
+    else
+        return ActWeek.exchangeDatas[index];
+    end
+end
+
+function DataSource(index)
+    if index == nil then
+        return #ActWeek.poster
+    else
+        return ActWeek.poster[index]
+    end
+end
+
+function GetReward(name)
+    ActWeek.GetReward(name)
+end
+
+function GetGetRewardState(index)
+    return ActWeek.GetGetRewardState(index)
+end
+
+function OpenVipNotice()
+    ActWeek.OpenVipNotice()
+end
+]]></script>
+<!-- <kp:window name="iframe" width="740" height="483" icon="" onclose="ClosePage" style="margin-left: 0px;">
+
+</kp:window> -->
+<div style="width: 810px;height: 523px;">
+    <div style="width: 740px;height: 523px; margin-left: 140px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
+        <input type="button" onclick="ClosePage" style="width: 22px;height: 22px; margin-left: 700px;margin-top: 8px; position: relative;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+        <div style="color:#ffffff;position: relative;" class="kp_window_container">
+            <div style="width: 785px; height: 483px; position: relative; margin-top: -10px; margin-left: -45px;">
+                <pe:gridview name = "" RememberScrollPos="true" style="height:523px;margin-top: 8px;margin-left: -40px;" VerticalScrollBarStep="100" AllowPaging="false" CellPadding="2" ItemsPerLine="1" DefaultNodeHeight = "10" 
+                    DataSource='<%=DataSource%>'>
+                    <Columns>
+                        <div style="width: 801px;height: 438px;background: url(Texture/Aries/Creator/keepwork/ActWeek/haibao_801X438_32bits.png#0 0 801 438);">
+                            <pe:if condition='<%=GetGetRewardState(1) == 1%>'>
+                                <input type="button" name = "1" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 277px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_daiwanc_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetGetRewardState(1) == 2%>'>
+                                <input type="button" name = "1" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 277px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_lingqu_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetGetRewardState(1) == 3%>'>
+                                <input type="button" name = "1" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 277px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_yilingqu_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>
+
+                            <pe:if condition='<%=GetGetRewardState(2) == 1%>'>
+                                <input type="button" name = "2" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 29px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_daiwanc_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetGetRewardState(2) == 2%>'>
+                                <input type="button" name = "2" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 29px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_lingqu_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>
+                            <pe:if condition='<%=GetGetRewardState(2) == 3%>'>
+                                <input type="button" name = "2" onclick="GetReward" style="float: left; width: 154px;height: 40px; margin-left: 29px;margin-top: 359px;background: url(Texture/Aries/Creator/keepwork/ActWeek/btn_yilingqu_154X40_32bits.png#0 0 154 40);"/>
+                            </pe:if>  
+                        </div>
+                        
+                        <div style="width: 724px;height: 345px;margin-left: 85px; background: url(Texture/Aries/Creator/keepwork/ActWeek/hdneirong_724X345_32bits.png#0 0 724 345);"></div>
+                        <div style="width: 722px;height: 625px;margin-left: 85px; background: url(Texture/Aries/Creator/keepwork/ActWeek/hdguizhe_722X729_32bits.png#0 0 722 625);">
+                            <input type="button" name = "2" value="成为会员" onclick="OpenVipNotice" style="font-size:25px; width: 228px;height: 68px; margin-left: 242px;margin-top: 505px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);"/>
+                        </div>
+                        <div style="width: 724px;height: 345px;margin-left: 85px; background: url(Texture/Aries/Creator/keepwork/ActWeek/hdshijian_724X345_32bits.png#0 0 722 345);"></div>
+                    </Columns>                
+                </pe:gridview>
+            </div>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

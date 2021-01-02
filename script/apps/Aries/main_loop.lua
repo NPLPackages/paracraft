@@ -587,9 +587,9 @@ local function Aries_Init()
 	
 	-- in case back buffer is not big enough, we will use UI scaling. 
 	if(System.options.mc) then
-		ParaUI.SetMinimumScreenSize(960,560,true);
+		ParaUI.SetMinimumScreenSize(1020,595,true);
 	else
-		ParaUI.SetMinimumScreenSize(960,560,true);
+		ParaUI.SetMinimumScreenSize(1020,595,true);
 	end
 
 	local att = ParaEngine.GetAttributeObject();

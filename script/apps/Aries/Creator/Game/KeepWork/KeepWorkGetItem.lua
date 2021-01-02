@@ -36,6 +36,10 @@ end
 function KeepWorkGetItem.IsShowModelDesc()
 	return item_data.isModelProduct
 end
+
+function KeepWorkGetItem.IsUseInPlayer()
+	return item_data.is_use_in_player
+end
 -- {
 -- 	exchangeResult={
 -- 	  costList={

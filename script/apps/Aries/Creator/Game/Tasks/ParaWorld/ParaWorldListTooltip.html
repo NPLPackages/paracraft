@@ -1,0 +1,25 @@
+﻿<!--script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldListTooltip.html-->
+<pe:mcml>
+    <script type="text/npl" refresh="false" src="ParaWorldList.lua">
+        <![CDATA[
+        ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
+        ParaWorldList.OnInit();
+        local index = Page:GetRequestParam("index")
+
+        function getIndex()
+            if (index) then
+                return tonumber(index);
+            end
+        end
+        ]]>
+    </script>
+    <div>
+        <pe:if condition='<%=ParaWorldList.IsDefaultWorld(getIndex())%>'>
+            <input type="button" value='<%=L"取消默认"%>' style="min-width:80px;height:30px;" class="kp_green_button" name='<%=getIndex()%>' onclick="ParaWorldList.ResetDefaultWorld" />
+        </pe:if>
+        <pe:if condition='<%=not ParaWorldList.IsDefaultWorld(getIndex())%>'>
+            <input type="button" value='<%=L"设为默认"%>' style="min-width:80px;height:30px;" class="kp_green_button" name='<%=getIndex()%>' onclick="ParaWorldList.SetDefaultWorld" />
+        </pe:if>
+    </div>
+</pe:mcml>
+

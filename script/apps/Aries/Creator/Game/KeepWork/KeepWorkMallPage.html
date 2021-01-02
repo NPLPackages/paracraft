@@ -83,7 +83,7 @@ function getTopBtDesc()
 end
 
 function IsShowFlag(data)
-    if data.is_sell or data.is_has or data.can_use or data.is_use then
+    if data.is_sell or data.is_has or data.can_use or data.is_use or data.vip_enabled then
         return true
     end
 
@@ -96,10 +96,6 @@ function IsOnlyNumber(desc)
     end
 
     return false
-end
-
-function ShowBuyModel()
-    KeepWorkMallPage.ShowBuyModel()
 end
 
 ]]></script>
@@ -237,12 +233,6 @@ end
             <pe:label name="bean_label" style="float:left;margin-left:5px;color:#000000;margin-top: 2px;" value='0'></pe:label>
             <!-- <div name="bean_label" style="float:left;margin-left:2px;color:#000000;"><%=GetExchangeP  -->
         </div>
-        <!-- <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
-            <input type="button" value='已购' name='has_buy' onclick="ShowBuyModel" style="margin-left: 3px; width:96px;height:32px;color:#181818;text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan3_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
-        </pe:if>
-        <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|menu_item_index")) %>'>
-            <input type="button" value='已购' name='has_buy' onclick="ShowBuyModel" style="margin-left: 3px; width:96px;height:32px;color:#181818;text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
-        </pe:if> -->
         
     </div>
 
@@ -308,11 +298,14 @@ end
 
     
                             <pe:if condition='<%=IsShowFlag(XPath("this"))%>'>
+                                <pe:if condition='<%=Eval("show_state") == 4%>'>
+                                    <div style="margin-left: 32px; margin-top:7px;width: 101px; height:19px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_huiyuan_101X19_32bits.png#0 0 101 19);"></div>
+                                </pe:if>
                                 <pe:if condition='<%=Eval("is_sell")%>'>
                                     <div style="margin-left: 52px; margin-top:9px;width: 63px; height:18px;background:url(Texture/Aries/Creator/keepwork/Mall/zi_shouwan_63X18_32bits.png#0 0 63 18);"></div>
                                 </pe:if>
                                 <pe:if condition='<%=Eval("is_has")%>'>
-                                    <div style="margin-left: 42px; margin-top:9px;width: 80px; height:18px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_yiyongyou_80X18_32bits.png#0 0 80 18);"></div>
+                                    <div style="margin-left: 52px; margin-top:9px;width: 61px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_keyong_61X17_32bits.png#0 0 61 17);"></div>
                                 </pe:if>
                                 <pe:if condition='<%=Eval("can_use")%>'>
                                     <div style="margin-left: 3px; margin-top:-3px;width: 164px; height:36px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_keshiyong_164X36_32bits.png#0 0 164 36);"></div>

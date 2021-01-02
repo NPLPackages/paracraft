@@ -1,0 +1,41 @@
+﻿<!-- "script/apps/Aries/Inventory/Pages/ActRedhatNoEnough.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="ActRedhatNoEnough.lua" refresh="true"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local ActRedhatNoEnough = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatNoEnough.lua")
+
+function OnCancel()
+    pageCtrl:CloseWindow();
+end
+
+function getLeftHat()
+    return ActRedhatNoEnough.getLeftHat()
+end
+
+function ClosePage()
+    pageCtrl:CloseWindow();
+end
+
+]]></script>
+<div style="width: 396px;height: 280px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipbj_32bits.png#0 0 32 32:16 16 8 8);">
+    <div style="font-size: 16px; base-font-size: 16px;color: #ffffff; margin-top: 10px; margin-left: 10px;"><%="兑换失败"%></div>
+    <input type="button" style="margin-left: 364; margin-top: -24px; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipX_19X20_32bits.png#0 0 20 20);" onclick="ClosePage()"/>
+    <div style="position: relative;margin-top: 10px; margin-left: 150px;width: 114px;height: 114px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/kuang2_114X144_32bits.png#0 0 114 114);">
+        <img src='Texture/Aries/Creator/keepwork/items/item_90000_32bits.png' width="128" height="64" style="margin-top: 24px; margin-left: -10px;"/>
+    </div>
+    <div style="margin-left:120px;margin-top:130px;color:#ffffff;font-size:16px;"><%="帽子数量不足，无法兑换。" %></div>
+    <div style="float:left; margin-left:120px; margin-top:8px; color:#ffffff; font-size:14px;"><%="你的帽子数量余额: " %></div>
+    <div style="float:left;margin-top:10px;margin-left:3px;float:left;width:28;height:22;background:url(Texture/Aries/Creator/keepwork/ActRedhat/icon_maozi_27X22_32bits.png#0 0 28 22);"></div> 
+    <div style="float:left;margin-left:5px; margin-top:10px; color:#ffffff; font-size:14px;"><%=getLeftHat() %></div>
+
+  
+    <div style="width:90px;height:32px;margin-top:18px;margin-left:0px;">
+        <input type="button" value="确定" style="margin-left:150px;width:108px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnCancel()"/>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

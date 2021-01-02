@@ -1,0 +1,47 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldCodeList.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaWorldCodeList.lua">
+            <![CDATA[
+            ParaWorldCodeList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldCodeList.lua");
+            ParaWorldCodeList.OnInit()
+
+            function codeInfo()
+                --return string.format(L"代码方块%d（%d, %d, %d）", Eval("index"), Eval("x"), Eval("y"), Eval("z"))
+                return string.format(L"代码方块%d", Eval("index"))
+            end
+            ]]>
+        </script>
+        <aries:window mode="no_title" style="width:200px;height:130px">
+            <div style="width:200px;height:130px;">
+                <div style="margin-left:6px;margin-top:-20px;height:20px;text-align:left;color:#ffffff;font-size:13px;">
+                    <%=L"列表" %>
+                </div>
+                <div style="margin-left:-9px;margin-right:1px;"><hr /></div>
+                <div>
+                    <pe:gridview style="margin-top:0px;width:200px;height:102px;" name="codelist_gridview" CellPadding="1" VerticalScrollBarStep="24" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="30"
+                                 DataSource='<%=ParaWorldCodeList.GetCodeList()%>'>
+                        <Columns>
+                            <div style="width:200px;height:26px;color:#ffffff">
+                                <div style="float:left;margin-left:5px;margin-top:0px;width:100px;"><%=codeInfo()%></div>
+                                <pe:if condition='<%=ParaWorldCodeList.CanOpenCodeBlock(Eval("index"))%>'>
+                                    <input type="button" style="float:left;width:50px;height:20px;margin-top:2px;margin-left:10px;" value='<%=L"查看" %>' name='<%=Eval("index")%>' onclick="ParaWorldCodeList.OpenCode" class="mc_light_grey_button_with_fillet" />
+                                </pe:if>
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>
+

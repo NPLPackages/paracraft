@@ -482,7 +482,8 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
         cache_policy = "access plus 0";
     end
     keepwork.globalstore.get({
-        cache_policy = cache_policy;
+        cache_policy = cache_policy,
+        ["x-per-page"] = 10000,
     },function(err, msg, data)
         if(err ~= 200)then
             return

@@ -33,5 +33,5 @@ function KeepWorkCoinNoEnough.OnOK()
 	end)
 	]]
 	page:CloseWindow()
-	GameLogic.GetFilters():apply_filters("VipNotice", true);
+	--GameLogic.GetFilters():apply_filters("VipNotice", true);
 end

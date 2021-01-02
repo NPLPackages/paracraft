@@ -1,0 +1,46 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/QuestRewardPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="QuestRewardPage.lua"><![CDATA[
+local QuestRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestRewardPage.lua");
+QuestRewardPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetRewardData(index)
+    if index == nil then
+        return #QuestRewardPage.RewardData
+    else
+        return QuestRewardPage.RewardData[index]
+    end
+end
+
+function GetRewardDiv()
+    return QuestRewardPage.GetRewardDiv()
+end
+
+function GetRewardDesc()
+    return QuestRewardPage.GetRewardDesc()
+end
+
+]]></script>
+<div style="width: 474px;height: 351px;background: Texture/Aries/Creator/keepwork/Quest/gongxi_474X351_32bits.png#0 0 474 351;">
+    <input type="button" value="" onclick="ClosePage" width="22" height="22" style="position: relative; margin-left: 435px;margin-top: 30px; background: Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22;"/>
+    <div style="margin-top: 100px; width: 474px;height: 150px;">
+        <%=GetRewardDiv()%>
+    </div>
+    <div style="font-size: 14px; width: 474px; margin-top: 0px;margin-left: 0px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=GetRewardDesc()%></div>
+
+</div>
+
+</pe:mcml>
+</body>
+</html>
+

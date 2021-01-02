@@ -206,7 +206,7 @@ function KeepWorkStackableItemPage.OnOK()
 		end)
 		]]
 		page:CloseWindow()
-		GameLogic.GetFilters():apply_filters("VipNotice", true);
+		--GameLogic.GetFilters():apply_filters("VipNotice", true);
 
 		
 		return
@@ -256,6 +256,7 @@ function KeepWorkStackableItemPage.OnOK()
 			elseif data.state == 1 then
 				data.icon = item_data.icon
 				data.isModelProduct = item_data.isModelProduct
+				data.is_use_in_player = item_data.is_use_in_player
 				-- GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
 				KeepWorkStackableItemPage.openGetItemView(data)
 				KeepWorkItemManager.LoadItems(nil, function ()
@@ -462,6 +463,7 @@ function KeepWorkStackableItemPage.requestOrderResult()
 
 				data.icon = item_data.icon
 				data.isModelProduct = item_data.isModelProduct
+				data.is_use_in_player = item_data.is_use_in_player
 				-- GameLogic.AddBBS("statusBar", L"购买成功!", 5000, "0 255 0");
 				KeepWorkStackableItemPage.openGetItemView(data)
 				KeepWorkItemManager.LoadItems()

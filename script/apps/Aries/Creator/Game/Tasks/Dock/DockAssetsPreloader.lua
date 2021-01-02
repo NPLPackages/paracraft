@@ -178,7 +178,20 @@ local assets = {
 DockAssetsPreloader.cur_time = 0;
 DockAssetsPreloader.timeout = 30000;
 DockAssetsPreloader.timer = nil;
+function DockAssetsPreloader.GetLoginMode()
+    if(System and System.options and System.options.loginmode)then
+        return System.options.loginmode;
+    end
+end
 function DockAssetsPreloader.Start(callback)
+    local loginmode = DockAssetsPreloader.GetLoginMode();
+	LOG.std(nil, "info", "DockAssetsPreloader check loginmode:", loginmode);
+    if(loginmode == "offline")then
+        if(callback)then
+            callback();
+        end
+        return
+    end
     if(DockAssetsPreloader.is_start)then
         if(callback)then
             callback();

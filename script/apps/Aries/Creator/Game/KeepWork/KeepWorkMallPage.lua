@@ -57,6 +57,14 @@ KeepWorkMallPage.top_bt_index = 1;
 
 KeepWorkMallPage.defaul_select_menu_item_index = 1
 KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
+
+KeepWorkMallPage.show_state = {
+	sell = 1, 			--出售状态
+	has = 2, 			-- 已拥有
+	can_use = 3, 		-- 可使用
+	vip_enabled = 4,	-- vip专属
+	sell_out = 5,		-- 售完
+}
 function KeepWorkMallPage.OnInit()
 	page = document:GetPageCtrl();
 	page.OnClose = KeepWorkMallPage.CloseView
@@ -322,7 +330,16 @@ function KeepWorkMallPage.HandleDataSources()
 	if nil == KeepWorkMallPage.grid_data_sources then
 		return
 	end
+	-- System.User.isVip = true
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+	-- 换装背包id
+    local bagId, bagNo = 0, 1007;
+    for _, bag in ipairs(KeepWorkItemManager.bags) do
+        if (bagNo == bag.bagNo) then 
+            bagId = bag.id;
+            break;
+        end
+    end
 
 	for k, v in pairs(KeepWorkMallPage.grid_data_sources) do
 			
@@ -345,12 +362,16 @@ function KeepWorkMallPage.HandleDataSources()
 		v.isLink = v.purchaseUrl ~= nil and v.purchaseUrl ~= ""
 		local modelUrl = v.goods_data[1] and v.goods_data[1].modelUrl or ""
 		v.isModelProduct = #v.goods_data == 1 and modelUrl ~= ""
+
+		v.vip_enabled = false
 		-- 售完或者到达购买上限的情况下不允许购买
 		v.buy_txt = "购买"
+		v.show_state = KeepWorkMallPage.show_state.sell
 		if v.rule and v.rule.storage == 0 then
 			v.buy_txt = "售完"
 			v.enabled = false
 			v.is_sell = true
+			v.show_state = KeepWorkMallPage.show_state.sell_out
 		else
 			v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
 
@@ -358,29 +379,33 @@ function KeepWorkMallPage.HandleDataSources()
 				local good_data = v.goods_data[1]
 				local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(good_data.gsId)
 				local bag_nums = copies and copies or 0
+
+				if good_data.extra and good_data.extra.vip_enabled == true then
+					v.vip_enabled = true
+					v.enabled = false
+					v.show_state = KeepWorkMallPage.show_state.vip_enabled
+				end
+
+				-- 如果是vip专属 再判断下是不是vip 如果是vip 那么就直接已拥有的显示
+				if v.vip_enabled and System.User.isVip then
+					bag_nums = 1
+				end
+
 				v.bag_nums = bag_nums
+				v.is_use_in_player = good_data.bagId == bagId
 				if bag_nums > 0 then
-					if GameLogic.IsReadOnly() then
+					if GameLogic.IsReadOnly() or good_data.bagId == bagId then
 						v.buy_txt = "已拥有"
 						v.enabled = false
 						v.is_has = true
+						v.can_use = false
+						v.show_state = KeepWorkMallPage.show_state.has
 					else
 						v.buy_txt = "使用"
 						v.enabled = true
 						v.is_use = false
 						v.can_use = true
-						-- 如果有使用中的显示的需求
-						-- local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-						-- if EditModelTask and EditModelTask.GetModelFileInHand then
-						-- 	local file = EditModelTask:GetModelFileInHand()
-						-- 	if file == modelUrl or file == string.format("blocktemplates/%s.%s", good_data.name, good_data.fileType) then
-						-- 		v.buy_txt = "已使用"
-						-- 		v.enabled = false
-						-- 		v.is_use = true
-						-- 		v.can_use = false
-						-- 	end
-						-- end
-
+						v.show_state = KeepWorkMallPage.show_state.can_use
 					end
 
 					--file ：blocktemplates/河马.bmax
@@ -423,10 +448,32 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		return
 	end
 
-	if item_data.enabled == false then
+	if item_data.is_use_in_player and item_data.bag_nums > 0 then
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        page.ShowUserInfoPage({username = System.User.keepworkUsername});
 		return
 	end
 
+	if item_data.enabled == false then
+		if item_data.vip_enabled and not item_data.is_has then
+			GameLogic.GetFilters():apply_filters("VipNotice", true, "vip_goods",function()
+				if (KeepWorkItemManager.IsVip()) then
+					local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+					KeepWorkMallPage.HandleDataSources()
+					KeepWorkMallPage.FlushView()
+				end
+			end);
+			
+			-- System.User.isVip = true
+			-- if (KeepWorkItemManager.IsVip()) then
+			-- 	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+			-- 	KeepWorkMallPage.HandleDataSources()
+			-- 	KeepWorkMallPage.FlushView()
+			-- end
+		end
+		return
+	end
+	
 	if item_data.isModelProduct and item_data.bag_nums and item_data.bag_nums > 0 then
 		if GameLogic.IsReadOnly() then
 			return
@@ -566,65 +613,6 @@ end
 
 function KeepWorkMallPage.GetPageCtrl()
     return page;
-end
-
--- 展示已购买的模型
-function KeepWorkMallPage.ShowBuyModel()
-    if nil == KeepWorkItemManager.globalstore then
-        return nil
-	end
-
-	KeepWorkItemManager.is_select_show_model = true
-
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
-	local is_handle_list = #KeepWorkMallPage.all_mod_list > 0
-	local list = is_handle_list and KeepWorkMallPage.all_mod_list or KeepWorkItemManager.globalstore
-	KeepWorkMallPage.grid_data_sources = {}
-    for k,v in pairs(list) do
-		if v.fileType == "bmax" then
-			if not is_handle_list then
-				KeepWorkMallPage.all_mod_list[#KeepWorkMallPage.all_mod_list + 1] = v
-			end
-			
-			local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(v.gsId)
-			local bag_nums = copies and copies or 0
-			if bag_nums > 0 then
-				local data = {}
-				data.isModelProduct = true
-				-- 售完或者到达购买上限的情况下不允许购买
-				data.icon = string.format("Texture/Aries/Creator/keepwork/items/item_%s_32bits.png", v.gsId)
-				data.bag_nums = bag_nums
-				data.name = v.name
-				
-				if GameLogic.IsReadOnly() then
-					data.buy_txt = "已拥有"
-					data.enabled = false
-					data.is_has = true
-				else
-					data.buy_txt = "使用"
-					data.enabled = true
-					data.can_use = true
-					-- 如果有使用中的显示的需求
-					-- local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-					-- if EditModelTask and EditModelTask.GetModelFileInHand then
-					-- 	local file = EditModelTask:GetModelFileInHand()
-					-- 	if file == string.format("blocktemplates/%s.%s", data.name, v.fileType) then
-					-- 		data.buy_txt = "已使用"
-					-- 		data.enabled = false
-					-- 		data.is_use = true
-					-- 		data.can_use = false
-					-- 	end
-					-- end
-				end
-	
-				KeepWorkMallPage.grid_data_sources[#KeepWorkMallPage.grid_data_sources + 1] = data
-			end
-        end
-	end
-
-	KeepWorkMallPage.cur_select_level = 0
-	KeepWorkMallPage.cur_select_type_index = 0
-	KeepWorkMallPage.FlushView()
 end
 
 function KeepWorkMallPage.RefreshBeanNum()

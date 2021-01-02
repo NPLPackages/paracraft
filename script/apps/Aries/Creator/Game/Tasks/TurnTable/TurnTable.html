@@ -1,0 +1,42 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/TurnTable/TurnTable.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="TurnTable.lua"><![CDATA[
+local TurnTable = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TurnTable/TurnTable.lua");
+TurnTable.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    TurnTable.CloseView()
+end
+
+function StartDraw()
+    TurnTable.StartDraw()
+end
+
+function GetDesc()
+    return TurnTable.GetDesc()
+end
+
+]]></script>
+<div style="width: 637px; height: 583px;">
+    <div type ="box" style="width:637px;height:563px;background: url(Texture/Aries/Creator/keepwork/TurnTable/bj_64x64_32bits.png#0 0 64 64:16 16 16 16);">
+        <!-- <div style="position: relative; width:540px;height:270px;margin-top:8px;margin-left: 10;background: url(Texture/Aries/Creator/keepwork/friends/xiangmuliebiaobj_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div> -->
+        <div style="position: relative;margin-left: 100px;margin-top: -60px; width:437px;height:81px;background: url(Texture/Aries/Creator/keepwork/TurnTable/tou_437x81_32bits.png#0 0 437 81);"></div>
+        <input type="button" value="" onclick="ClosePage" style="margin-top: 10px; margin-left:600px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/TurnTable/guanbi_32bits.png#0 0 22 22);"/>
+        <!-- <div name="table" style="width:305px;height:305px;background: url(Texture/Aries/Creator/keepwork/TurnTable/table.png#0 0 610 610)"></div> -->
+        <!-- <input type="button" value="" onclick="StartDraw"  style="margin-left:505px;margin-top: 30px; width:67px;height:20px;background: url(Texture/Aries/Creator/keepwork/TurnTable/btn_kaishi_67x20_32bits.png#0 0 67 20);"/> -->
+        <div style="color: #136c5e;width: 530px;font-weight: bold;font-size: 16px;margin-left: 30px;base-font-size:16"><%=GetDesc()%></div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+
