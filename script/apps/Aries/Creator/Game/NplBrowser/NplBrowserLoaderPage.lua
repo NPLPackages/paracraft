@@ -194,12 +194,12 @@ function NplBrowserLoaderPage.Check(callback)
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
         return
     end
-    if(System.os.GetPlatform() == "mac")then
+    if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == 'ios')then
         NplBrowserLoaderPage.loaded = true;
         if (type(callback) == "function") then
             callback(true);
         end
-        return
+        return not NplBrowserLoaderPage.IsLoaded();
     end
     if(not NplBrowserLoaderPage.MainFilesExisted(dest_folder))then
         NplBrowserLoaderPage.loaded = false;

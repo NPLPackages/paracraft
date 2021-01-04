@@ -34,6 +34,8 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local h = default_height or (height-top);
 	local title = mcmlNode:GetAttribute("title_text") or mcmlNode:GetAttributeWithCode("title", nil, true);
 	local icon = mcmlNode:GetAttributeWithCode("icon", nil, true)
+	local iconWidth = mcmlNode:GetNumber("icon_width") or 128
+	local iconHeight = mcmlNode:GetNumber("icon_height") or 64
 	local parent_width, parent_height = w, h;
 	
 	local title_height = 28;
@@ -45,7 +47,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local _parent_window = _this;
 
 	 if(icon and icon ~= "" and not title)then
-        _this = ParaUI.CreateUIObject("container", "icon", "_lt", 5, -22, 128, 64);
+        _this = ParaUI.CreateUIObject("container", "icon", "_lt", 5, -22, iconWidth, iconHeight);
 	    _this.background = icon;
 	    _parent:AddChild(_this);
     end

@@ -138,7 +138,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
         end
 	end
 
-	if System.os.GetPlatform() == 'mac' then
+	if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
 		local config = NplBrowserPlugin.GetCache(id);
 
 		local function resizeInterval()
@@ -179,7 +179,7 @@ function pe_nplbrowser.SetVisible(mcmlNode, name, visible)
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
 
-		if System.os.GetPlatform() == 'mac' then
+		if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
 			config.bResizeInterval = false;
 
 			if config.visible then

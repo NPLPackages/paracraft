@@ -136,12 +136,34 @@ function NplBrowserPlugin.RunNextCmd()
             NPL.activate(dll_name, cmd); 
         end
 
-        if System.os.GetPlatform() == 'mac' then
+        if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
             if cmd.cmd == 'Show' then
                 local p = NplBrowserPlugin.GetCache(cmd.id)
+
                 if cmd.visible then
                     if not p.isLoadWebview then
-                        NplBrowserPlugin.webview = WebView:new():init(p.x, p.y, p.width, p.height, true);
+                        local x
+                        local y
+                        local width
+                        local height
+
+                        if System.os.GetPlatform() == 'ios' then
+                            local uiScales = System.Windows.Screen:GetUIScaling();
+
+                            if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
+                                x = math.floor((p.x - 55) / uiScales[1]);
+                                y = math.floor(p.y / uiScales[2]);
+                                width = math.floor((p.width - 55) / uiScales[1]);
+                                height = math.floor(p.height / uiScales[2]);
+                            end
+                        else
+                            x = p.x
+                            y = p.y
+                            width = p.width
+                            height = p.height
+                        end
+                        NplBrowserPlugin.webview = WebView:new():init(x, y, width, height, true);
+
                         NplBrowserPlugin.webview:loadUrl(p.url);
                         p.isLoadWebview = true
                     else
@@ -384,7 +406,7 @@ function NplBrowserPlugin.Start(p)
         NPL.activate(dll_name, input);
     end
 
-    if System.os.GetPlatform() == 'mac' then
+    if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
         NplBrowserPlugin.ClearPendingWindow(id);
         NplBrowserPlugin.SetWindowExisted(id, true);
     end
@@ -545,7 +567,7 @@ function NplBrowserPlugin.OsSupported()
                     end
                 end
             end
-        elseif System.os.GetPlatform() == 'mac' then
+        elseif System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
             NplBrowserPlugin.isSupported = true;
         else
             NplBrowserPlugin.isSupported = false;
