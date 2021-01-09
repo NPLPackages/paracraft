@@ -31,7 +31,8 @@ local pe_mc_block = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_block");
 
 
 function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
-	local _this = ParaUI.CreateUIObject("button", "b", "_lt", left, top, right-left, bottom-top);
+	local btnName = mcmlNode:GetAttributeWithCode("uiname", nil, true) or "b";
+	local _this = ParaUI.CreateUIObject("button", btnName, "_lt", left, top, right-left, bottom-top);
 	_guihelper.SetUIColor(_this, "#ffffffff");
 	local animstyle = mcmlNode:GetNumber("animstyle");
 	if(animstyle) then

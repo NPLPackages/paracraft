@@ -81,6 +81,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "show_offical_worlds_page": Show offical worlds page
   - "show_server_page": Show server page
   - "cellar.my_school.after_selected_school": Show my school page and return is selected a school.
+  - "cellar.vip_notice.init": Show vip notice page
+  - "cellar.vip_notice.close": Close vip notice page
 
 - world:
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.

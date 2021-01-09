@@ -88,20 +88,20 @@ end
                 DataSource='<%=ds_CustomBtn%>'>
 	            <Columns>
 		            <div style="width:40px;height:40px;padding:3px;margin-left:1px;">
-                        <pe:mc_slot tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:32px;height:32px;" onclick='OnClickItem' />
+                        <pe:mc_slot uiname='<%=format("QuickSelectBar.btn%d", Eval("index"))%>' tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:32px;height:32px;" onclick='OnClickItem' />
                     </div>
 	            </Columns>
             </pe:gridview>
         </div>
         <div style="position:relative;margin-left:373px;margin-top:0px;">
             <pe:if condition='<%=GameLogic.GameMode:IsEditor() and GameLogic.options:GetProjectId() ~= "29477"%>'>
-                <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/map/btn_E_32X32_32bits.png#0 0 36 36)"/>
+                <input uiname="QuickSelectBar.btnInventory" name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/map/btn_E_32X32_32bits.png#0 0 36 36)"/>
                 <pe:if condition='<%=false%>'>
                     <div style="float:left;position:relative;margin-top:0px;margin-left:6px;" ><input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickOnlineStore" tooltip='<%=L"元件库"%>' style="width:36px;height:36px;background:url(Texture/blocks/items/ts_char_on.png)"/></div>
                 </pe:if>
 
                 <pe:if condition='<%=IsShowMallIcon()%>'>
-                    <input name="btnMall" type="button" onclick="QuickSelectBar.OnClickMall" tooltip='<%=L"资源: 快捷键R"%>' style="margin-top:1px;margin-left:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png#0 0 36 36)" />
+                    <input uiname="QuickSelectBar.btnMall" name="btnMall" type="button" onclick="QuickSelectBar.OnClickMall" tooltip='<%=L"资源: 快捷键R"%>' style="margin-top:1px;margin-left:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png#0 0 36 36)" />
                 </pe:if>
                 
                 <!--

@@ -445,6 +445,8 @@ function QuickSelectBar.OnClickMall()
 	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
 	if not KeepWorkMallPage.isOpen then
 		KeepWorkMallPage.Show();
+	else
+		KeepWorkMallPage.Close()
 	end
 	
 end

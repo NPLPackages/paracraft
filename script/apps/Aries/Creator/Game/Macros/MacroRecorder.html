@@ -1,0 +1,20 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Macros/MacroRecorder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MacroRecorder.lua"><![CDATA[
+MacroRecorder = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroRecorder")
+MacroRecorder.OnInit();
+]]></script>
+<div style="background-color:#00000080;width:64px;height:32px;">
+    <input uiname="MacroRecorder.Stop" type="button" name="Stop" tooltip="结束并退出录制" style="margin-left:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/rec_off.png)" onclick="MacroRecorder.OnStop()"/>
+    <pe:label name="text" style="margin-left:5px;margin-top:5px;color:#ff0000"></pe:label>
+</div>
+</pe:mcml> 
+</body>
+</html>

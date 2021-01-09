@@ -112,7 +112,8 @@ function pe_aries_window.create_lite(rootName, mcmlNode, bindingContext, _parent
 	end
 
 	if(onclose and onclose ~= "")then
-		_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", - 34, 5, 30, 20);
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
+		_this = ParaUI.CreateUIObject("button", btnName, "_rt", - 34, 5, 30, 20);
 		_this.background = close_btn_bg;
 		_parent:AddChild(_this);
 		_this:SetScript("onclick", function()
@@ -216,7 +217,8 @@ function pe_aries_window.create_full(rootName, mcmlNode, bindingContext, _parent
 	end
 
 	if(onclose and onclose ~= "")then
-		_this = ParaUI.CreateUIObject("button", "close_btn_bg", "_lt", w - 34, 5, 30, 20);
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn_bg";
+		_this = ParaUI.CreateUIObject("button", btnName, "_lt", w - 34, 5, 30, 20);
 		_this.background = close_btn_bg;
 		_parent:AddChild(_this);
 		_this:SetScript("onclick", function()
@@ -287,15 +289,16 @@ function pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _par
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
 		if (mcmlNode:GetNumber("close_height")) then
 			local btn_size = mcmlNode:GetNumber("close_height")
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
 		else
 			local btn_size = title_height - 2
 			if(title_height>=32) then
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-10, 1, btn_size, btn_size);	
 			else
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-1, 1, btn_size, btn_size);	
 			end
 		end
 		
@@ -307,7 +310,7 @@ function pe_aries_window.create_thin_mc(rootName, mcmlNode, bindingContext, _par
 			_guihelper.SetUIColor(_this, "#ffffffff");
 			_parent:AddChild(_this);
 			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -title_height*2, 0, title_height*2, title_height);
 			_this.background = "";
 			_parent:AddChild(_this);
 		end
@@ -380,16 +383,17 @@ function pe_aries_window.create_center(rootName, mcmlNode, bindingContext, _pare
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
 		if (mcmlNode:GetNumber("close_height")) then
 			local btn_size = mcmlNode:GetNumber("close_height")
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
+			_this = ParaUI.CreateUIObject("button",btnName, "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
 		else
 			--local btn_size = title_height - 2
 			local btn_size = 26
 			if(title_height>=32) then
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-8, (title_height - btn_size) / 2, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button",btnName, "_rt", -btn_size-8, (title_height - btn_size) / 2, btn_size, btn_size);	
 			else
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button",btnName, "_rt", -btn_size-1, 1, btn_size, btn_size);	
 			end
 		end
 		
@@ -401,7 +405,7 @@ function pe_aries_window.create_center(rootName, mcmlNode, bindingContext, _pare
 			_guihelper.SetUIColor(_this, "#ffffffff");
 			_parent:AddChild(_this);
 			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -title_height*2, 0, title_height*2, title_height);
 			_this.background = "";
 			_parent:AddChild(_this);
 		end
@@ -464,15 +468,16 @@ function pe_aries_window.create_no_title(rootName, mcmlNode, bindingContext, _pa
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
 		if (mcmlNode:GetNumber("close_height")) then
 			local btn_size = mcmlNode:GetNumber("close_height")
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
 		else
 			local btn_size = title_height - 2
 			if(title_height>=32) then
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-10, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-10, 1, btn_size, btn_size);	
 			else
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-1, 1, btn_size, btn_size);	
 			end
 		end
 		
@@ -484,7 +489,7 @@ function pe_aries_window.create_no_title(rootName, mcmlNode, bindingContext, _pa
 			_guihelper.SetUIColor(_this, "#ffffffff");
 			_parent:AddChild(_this);
 			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -title_height*2, 0, title_height*2, title_height);
 			_this.background = "";
 			_parent:AddChild(_this);
 		end
@@ -558,16 +563,17 @@ function pe_aries_window.create_center_white(rootName, mcmlNode, bindingContext,
 	local onclose = mcmlNode:GetString("onclose");
 
 	if(onclose and onclose ~= "")then
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
 		if (mcmlNode:GetNumber("close_height")) then
 			local btn_size = mcmlNode:GetNumber("close_height")
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -(btn_size / 2) - btn_size, (title_height-btn_size) / 2, btn_size, btn_size)
 		else
 			--local btn_size = title_height - 2
 			local btn_size = 26
 			if(title_height>=32) then
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-8, (title_height - btn_size) / 2, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-8, (title_height - btn_size) / 2, btn_size, btn_size);	
 			else
-				_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-1, 1, btn_size, btn_size);	
+				_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-1, 1, btn_size, btn_size);	
 			end
 		end
 		
@@ -579,7 +585,7 @@ function pe_aries_window.create_center_white(rootName, mcmlNode, bindingContext,
 			_guihelper.SetUIColor(_this, "#323232ff");
 			_parent:AddChild(_this);
 			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -title_height*2, 0, title_height*2, title_height);
 			_this.background = "";
 			_parent:AddChild(_this);
 		end

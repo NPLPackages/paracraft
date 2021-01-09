@@ -124,10 +124,10 @@ end
         <pe:repeat DataSource="<%=GetCategoryButtons()%>">
             <pe:repeatitem style="float:left;width:60px;">
                 <pe:if condition='<%=BuilderFramePage.category_index == Eval("index") %>' >
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' uiname = "builder_cur_category_btn" onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' uiname = '<%=format("BuilderFramePage.category_%d", Eval("index"))%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
                 </pe:if>
                 <pe:if condition='<%=BuilderFramePage.category_index ~= Eval("index") %>' >
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' uiname = '<%=format("BuilderFramePage.category_%d", Eval("index"))%>'  name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
                 </pe:if>
             </pe:repeatitem>
         </pe:repeat>
@@ -138,7 +138,7 @@ end
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block uiname = '<%=format("BuilderFramePage.block_%d", Eval("block_id"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

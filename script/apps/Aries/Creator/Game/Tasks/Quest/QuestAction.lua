@@ -95,7 +95,8 @@ function QuestAction.OpenPage(name)
     if name == 'certificate' then
         GameLogic.GetFilters():apply_filters('show_certificate', function(result)
             if result then
-                QuestAction.AchieveTask("40002_1", 1, true)
+                -- QuestAction.AchieveTask("40002_1", 1, true)
+                QuestAction.AchieveTask("40006_1", 1, true)
             end
             
         end);
@@ -148,13 +149,28 @@ function QuestAction.GetLabel(task_id, task_data)
     if(task_id == "60001_1")then
         return QuestAction.GetLabel_60001_1(task_id, task_data)
     end
+
+    if(task_id == "60007_1")then
+        return QuestAction.GetLabel_60007_1(task_id, task_data)
+    end
 end
+
 function QuestAction.GetLabel_60001_1(task_id, task_data)
     if task_data == nil then
         return
     end
     
     local value = task_data.value == 52 and 1 or 0
+    local finished_value = 1
+    return string.format("%s/%s", value, finished_value)
+end
+
+function QuestAction.GetLabel_60007_1(task_id, task_data)
+    if task_data == nil then
+        return
+    end
+    
+    local value = task_data.value == 26 and 1 or 0
     local finished_value = 1
     return string.format("%s/%s", value, finished_value)
 end

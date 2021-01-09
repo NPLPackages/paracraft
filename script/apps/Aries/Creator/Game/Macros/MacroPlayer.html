@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Macros/MacroPlayer.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MacroPlayer.lua"><![CDATA[
+MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer")
+MacroPlayer.OnInit();
+]]></script>
+<pe:container name="cursorClick" style="width:32px;height:32px;position:relative;background:url()" onclick="MacroPlayer.OnClickCursor">
+    <input type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/clicky.png);width:32px;height:32px;" />
+    <input name="cursorBtn" type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/cursor_big_32bits.png#0 0 42 42);width:42px;height:42px;margin-left:12px;margin-top:15px;" />
+    <div style="margin-top:32px;">
+        <img name="mouseBtn" style="position:relative;width:32px;height:32px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)" />
+        <pe:container name="altKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png)">ALT</pe:container>
+        <pe:container name="ctrlKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">CTRL</pe:container>
+        <pe:container name="shiftKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">SHIFT</pe:container>
+    </div>
+</pe:container>
+<pe:container name="keyPress" alignment="_ctt" style="margin-top:50px;height:32px;position:relative;background:url()">
+    <div style="float:left;background-color:#00000080;color:#ffffff;padding:5px;height:32px;">请用键盘按</div>
+    <div style="float:left;">
+        <input type="button" name="key1" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        <input type="button" name="key2" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        <input type="button" name="key3" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+    </div>
+</pe:container>
+<pe:container name="progressController" style="background-color:#00000080;margin-left:10px;margin-top:10px;height:32px;color:#ffffff">
+    <div style="float:left"><pe:progressbar name="progress" Minimum = "0" Value = "0" Maximum = "100" Step = "1" style="margin-left:5px;margin-top:5px;width:150px;height:16px;"/></div>
+    <input name="stop" type="button" tooltip="停止示教宏播放" style="margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/stop_off.png)" onclick="MacroPlayer.OnClickStop()"/>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>

@@ -24,7 +24,8 @@ local ParacraftLearningRoomDailyPage = NPL.export()
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt = 32;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 133;
+ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
 F3信息状态栏
@@ -147,6 +148,18 @@ Paracraft由多少行代码构成的
 字符串与文字
 字符串常用操作
 字符串练习
+表的基本概念
+表与数组的创建方法
+表的用法举例
+如何定义函数
+调用函数
+有返回值的函数
+内置函数 and or
+内置函数 if
+如何避免 if
+内置函数 while for
+学习NPL语言的总结
+学习编程的建议
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -176,7 +189,12 @@ function ParacraftLearningRoomDailyPage.FillDays()
 	end
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
 
-	ParacraftLearningRoomDailyPage.max_cnt = template.max or 0;
+    -- getting preset value first from client
+    local cnt = ParacraftLearningRoomDailyPage.max_cnt_preset;
+    if(template.max and template.max > cnt)then
+        cnt = template.max;
+    end
+	ParacraftLearningRoomDailyPage.max_cnt = cnt;
 	ParacraftLearningRoomDailyPage.copies = copies or 0;
 
 	ParacraftLearningRoomDailyPage.Current_Item_DS = {};

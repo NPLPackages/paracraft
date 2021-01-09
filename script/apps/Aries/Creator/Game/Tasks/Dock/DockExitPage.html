@@ -1,0 +1,41 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Dock/DockTipPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Leio, 2020/8/17</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true"><![CDATA[
+    local DockExitPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockExitPage.lua")
+    DockExitPage.OnInit()
+    function ClosePage()
+        DockExitPage.OnClose()
+    end
+
+    function OnClick(id)        
+        DockExitPage.OnClick(id)
+    end
+
+]]></script>
+    <!-- Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png -->
+    <kp:window width ="520" height = "320" icon = "Texture/Aries/Creator/keepwork/Window/title/biaoti_xitong_32bits.png" onclose = "ClosePage()">
+        <div style="width: 530px; height: 60px;margin-top: 68px;">
+            <input type="button"  value="加入服务器" name="server_join" style="margin-left: 50px; width: 178px;height: 58px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClick"/>
+            <input type="button"  value="插件管理" name="plugin" style="margin-left: 60px; width: 178px;height: 58px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClick"/>
+        </div>
+        <div style="width: 530px; height: 60px;margin-top: 20px;">
+            <input type="button"  value="联系客服" name="service" style="margin-left: 50px; width: 178px;height: 58px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClick"/>
+            <input type="button"  value="系统设置" name="system" style="margin-left: 60px; width: 178px;height: 58px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClick"/>
+        </div>
+
+        <div style="width: 530px; height: 60px;margin-top: 30px;">
+            <input type="button"  value="退出" name="exit" style="margin-left: 170px; width: 178px;height: 58px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClick"/>            
+        </div>
+
+    </kp:window> 
+</pe:mcml> 
+
+</body>
+</html>

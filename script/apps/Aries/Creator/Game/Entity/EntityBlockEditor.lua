@@ -114,7 +114,7 @@ function Entity:OpenEditor()
     if(bz) then
 		blockpos = format("%d,%d,%d", bx, by, bz);
 	end
-    local url = string.format("%snpl_block_editor/microbit?blockpos=%s",site_url,blockpos);
+    local url = string.format("%snpl_block_editor/cad?blockpos=%s",site_url,blockpos);
     if(not Keyboard:IsCtrlKeyPressed())then
         local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
         NplBrowserManager:CreateOrGet("NplBlockEditorBrowser"):Show(url, "NplBlockEditor", true, true);

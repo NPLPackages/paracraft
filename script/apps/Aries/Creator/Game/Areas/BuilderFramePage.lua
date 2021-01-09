@@ -151,9 +151,11 @@ function BuilderFramePage.SearchBlock(search_text)
 	--local block_tag;
 	if(search_text) then
 		local block_tag = string.gsub(search_text,"%s","");
+		local btnName = format("BuilderFramePage.category_%d", BuilderFramePage.category_index)
+		
 		if(block_tag == "") then
 			search_text_nil = true;
-			local cur_category_obj = ParaUI.GetUIObject("builder_cur_category_btn");
+			local cur_category_obj = ParaUI.GetUIObject(btnName);
 			cur_category_obj.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;208 89 21 21:8 8 8 8";
 
 			local category = BuilderFramePage.GetCategoryButtons()[1];
@@ -161,7 +163,7 @@ function BuilderFramePage.SearchBlock(search_text)
 		else
 			if(first_search or search_text_nil) then
 				search_text_nil = false;
-				local cur_category_obj = ParaUI.GetUIObject("builder_cur_category_btn");
+				local cur_category_obj = ParaUI.GetUIObject(btnName);
 				cur_category_obj.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8";
 			end 
 			

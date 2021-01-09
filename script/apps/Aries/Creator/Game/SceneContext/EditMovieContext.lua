@@ -404,7 +404,6 @@ function EditMovieContext:HandleGlobalKey(event)
 		if(player:IsControlledExternally()) then
 			if(dik_key == "DIK_W" or dik_key == "DIK_A" or dik_key == "DIK_D" or dik_key == "DIK_S" or dik_key == "DIK_SPACE") then
 				GameLogic.AddBBS("lock", L"人物在锁定模式不可运动(L键可解锁)", 4000, "#808080");
-				event:accept();
 				return true;
 			end
 		end

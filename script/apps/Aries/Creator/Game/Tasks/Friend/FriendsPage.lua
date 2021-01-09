@@ -407,7 +407,11 @@ end
 function FriendsPage.PrivateLetter(chat_user_data)
 	-- page:CloseWindow()
 	-- FriendsPage.CloseView()
-	FriendChatPage.Show(UserData, chat_user_data);
+
+	-- 要先判断是否好友
+	if chat_user_data.isFriend or FriendsPage.index == TopBtListType.RecentContact or FriendsPage.index == TopBtListType.Friend then
+		FriendChatPage.Show(UserData, chat_user_data);
+	end
 end
 
 function FriendsPage.ToFollow(userId)
@@ -594,11 +598,8 @@ function FriendsPage.OnMsg(payload, full_msg)
 
 	-- 收到消息 最近联系列表得刷新一下
 	if FriendsPage.index == TopBtListType.RecentContact then
-		print("...收到消息 最近联系列表得刷新一下")
 		FriendsPage.AddUnReadMsg(payload.id, 1, payload.content)
-		commonlib.echo(FriendsPage.UnreadMsg, true)
 		local list = FriendsPage.GetRecentFromFriendsList()
-		commonlib.echo(list, true)
 		FriendsPage.SetListDataAndFlushGridView(list)
 	else
 		FriendsPage.AddUnReadMsg(payload.id, 1, payload.content)

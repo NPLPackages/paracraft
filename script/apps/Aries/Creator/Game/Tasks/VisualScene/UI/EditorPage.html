@@ -1,0 +1,72 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/EditorPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="EditorPage.lua"><![CDATA[
+local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
+local EditorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/EditorPage.lua");
+EditorPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function DS_Items(index)
+    if(index == nil) then
+        return #EditorPage.Current_Item_DS;
+    else
+        return EditorPage.Current_Item_DS[index];
+    end
+end
+
+function OnClick(index)
+    local node = EditorPage.Current_Item_DS[tonumber(index)];
+    node.node:run();
+end
+function onRefresh()
+    EditorPage.OnRefresh();
+end
+function onNew()
+    local editor = VisualSceneLogic.activedEditor("first_editor");
+    local node, code_component, movieclip_component = editor:createBlockCodeNode();
+    if(node and code_component)then
+        code_component:setCodeFileName("test/follow.lua")
+    end
+    onRefresh();
+end
+function onStop()
+    local editor = VisualSceneLogic.activedEditor("first_editor");
+    editor:stop();
+end
+    
+]]></script>
+    <aries:window mode="thin" width="160" height="500" title='<%= L"场景编辑器"%>' onclose="ClosePage">
+        <div >
+            <div style="padding-left:5px;padding-right:5px;">
+                <input type="button" class="mc_light_grey_button_with_fillet" style="width:140px;" value="新增" onclick="onNew"/>
+            </div>
+            <div style="padding-left:5px;padding-top:5px;padding-right:5px;">
+                <input type="button" class="mc_light_grey_button_with_fillet" style="width:140px;" value="停止所有" onclick="onStop"/>
+            </div>
+            
+           <pe:gridview style="margin-top:5px;width:160px;height:500px;" name="item_gridview" CellPadding="3" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight = "64" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                            <div style="width:64px;height:64px;padding-left:5px;">
+                                <input type="button" name='<%= Eval("index")%>' style="width:64px;height:64px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png);" onclick="OnClick"  />
+                            </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -59,7 +59,9 @@ function pe_mc_slot.render_callback(mcmlNode, rootName, bindingContext, _parent,
 	-- default destination container
 	mcmlNode.destInventory = mcmlNode:GetAttributeWithCode("DestInventory", nil, true);
 
-	local _this = ParaUI.CreateUIObject("button", "b", "_lt", left, top, right-left, bottom-top);
+	local btnName = mcmlNode:GetAttributeWithCode("uiname", nil, true) or "b";
+
+	local _this = ParaUI.CreateUIObject("button", btnName, "_lt", left, top, right-left, bottom-top);
 	_guihelper.SetUIColor(_this, "#ffffffff");
 	local animstyle = mcmlNode:GetNumber("animstyle");
 	if(animstyle) then

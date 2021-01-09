@@ -54,9 +54,9 @@ function Notice.GetPageData(data)
         temp.name = v.name
         temp.index = k
         table.insert(Notice.tblNoticeDt,temp);
-    end
+    end    
     Notice.nDataNum = #Notice.tblNoticeDt
-    commonlib.echo(Notice.tblNoticeDt,true)
+    -- commonlib.echo(Notice.tblNoticeDt,true)
 end
 
 function Notice.GetTimeStamp(strTime)
@@ -162,16 +162,17 @@ function Notice.getCover(index)
     return Notice.tblNoticeDt[index].cover
 end
 
+function Notice.IsValidUrl(url)
+    local isValid = false
+    if string.find(url, "http://") or string.find(url, "https://") or string.find(url, "ftp://") then
+        isValid = true
+    end
+    return isValid
+end
+
 --点击公告图片，此处需要添加埋点事件
 function Notice.OnImageBgClick()
     local name = Notice.tblNoticeDt[Notice.nSelectIndex].name
-    if name == "双旦活动" or name == "帮爷爷找帽子" then
-        local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
-        ActRedhatExchange.ShowView()
-		GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
-        return 
-    end
-
     if string.find(name, "创造周末") and string.find(name, "创造周末") > 0 then
         local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
         ActWeek.ShowView()
@@ -179,8 +180,8 @@ function Notice.OnImageBgClick()
     end
 
     local url = Notice.tblNoticeDt[Notice.nSelectIndex].url;
-    if(url and #url ~= 0) then
-        ParaGlobal.ShellExecute("open", "iexplore.exe", url, "", 1);
+    if(url and #url ~= 0 and Notice.IsValidUrl(url)) then 
+        ParaGlobal.ShellExecute("open",url, "","", 1);
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
     else
         return 

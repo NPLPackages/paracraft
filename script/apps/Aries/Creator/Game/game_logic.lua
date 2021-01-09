@@ -232,9 +232,6 @@ function GameLogic.InitCommon()
 	GameLogic.CreateGetAutoSaver();
 
 	if (not System.options.isCodepku) then
-
-        
-
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
 
@@ -255,6 +252,9 @@ function GameLogic.InitCommon()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
 	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 	ParaWorldMain:Init()
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/Macros.lua");
+	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 end
 
 -- for checking desktop state after activate desktop

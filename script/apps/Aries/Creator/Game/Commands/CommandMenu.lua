@@ -101,8 +101,10 @@ Commands["menu"] = {
 			GameLogic.RunCommand("export");
 		elseif(name == "file.worldrevision") then
 			if(not GameLogic.IsReadOnly()) then
-				GameLogic.world_revision:Backup();
-				GameLogic.world_revision:OnOpenRevisionDir();
+				if GameLogic.world_revision then
+					GameLogic.world_revision:Backup();
+					GameLogic.world_revision:OnOpenRevisionDir();
+				end
 			else
 				_guihelper.MessageBox(L"世界是只读的，无需备份");
 			end

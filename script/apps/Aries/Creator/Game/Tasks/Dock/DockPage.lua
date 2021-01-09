@@ -50,8 +50,8 @@ DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },
-    { label = L"寻找帽子", id = "find_hat", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/ActRedhat/btn2_maozi_32bits.png#0 0 85 75"},
+    { label = L"", },
+    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },    
     { label = L"周末活动", id = "act_week", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/dock/btn2_chuangzaozhoumo_32bits.png#0 0 85 75"},
 }
 
@@ -176,7 +176,7 @@ function DockPage.OnClickTop(id)
                     if (result) then
                         -- GameLogic.AddBBS(nil, L'领取成功', 5000, '0 255 0');
                         DockPage.page:Refresh(0.01)
-                        GameLogic.QuestAction.AchieveTask("40002_1", 1, true)
+                        GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
                     end
                 end
             );
@@ -325,7 +325,7 @@ function DockPage.OnClick_Menuitem_plugin()
     SelectModulePage.ShowPage()
 end
 function DockPage.OnClick_Menuitem_service()
-	ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com/official/docs/FAQ/questions", "", 1); 
+	ParaGlobal.ShellExecute("open", "https://keepwork.com/official/docs/FAQ/questions", "","", 1); 
 end
 function DockPage.OnClick_Menuitem_system()
     GameLogic.RunCommand("/menu file.settings");
@@ -472,18 +472,6 @@ function DockPage.RenderButton_3(index)
                 </div>
                 <input type="button" name='%s' onclick="OnClickTop" style="width:75px;height:75px;background:url(%s)"/>
             ]],node.id,node.bg);
-        else
-            return ''
-        end
-    end
-
-    
-    if(id == "find_hat") then
-        if ActRedhatExchange and ActRedhatExchange.CheckCanShow() then
-            return string.format([[
-                <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
-                %s
-            ]],node.id,node.bg,tip_str);
         else
             return ''
         end
@@ -699,22 +687,29 @@ function DockPage.GetMsgCenterUnReadNum()
 end
 
 function DockPage.CheckIsTaskCompelete()
-    local profile = KeepWorkItemManager.GetProfile()
-    -- 是否实名认证
-   if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-        GameLogic.QuestAction.SetValue("40002_1",1);
-   end 
-
-   -- 是否选择了学校
-   if profile and profile.schoolId and profile.schoolId > 0 then
-        GameLogic.QuestAction.SetValue("40003_1",1);
-   end
-
-   -- 是否已选择了区域
-   if profile and profile.region and profile.region.hasChildren == 0 then
-        GameLogic.QuestAction.SetValue("40004_1",1);
-   end
-   if(DockPage.page)then
-        DockPage.page:Refresh(0.01)
-   end
+    commonlib.TimerManager.SetTimeout(function()
+        local profile = KeepWorkItemManager.GetProfile()
+        -- 是否实名认证
+    --    if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+    --         GameLogic.QuestAction.SetValue("40002_1",1);
+    --    end 
+    
+        -- 是否新的实名认证任务
+       if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            GameLogic.QuestAction.SetValue("40006_1",1);
+       end
+    
+       -- 是否选择了学校
+       if profile and profile.schoolId and profile.schoolId > 0 then
+            GameLogic.QuestAction.SetValue("40003_1",1);
+       end
+    
+       -- 是否已选择了区域
+       if profile and profile.region and profile.region.hasChildren == 0 then
+            GameLogic.QuestAction.SetValue("40004_1",1);
+       end
+       if(DockPage.page)then
+            DockPage.page:Refresh(0.01)
+       end
+    end, 1000)
 end

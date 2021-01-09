@@ -299,6 +299,7 @@ function KpChatChannel.OnMsg(self, msg)
                 local product = payload.product
                 KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
                     GameLogic.GetFilters():apply_filters('login_with_token')
+                    GameLogic.GetFilters():apply_filters('cellar.vip_notice.close')
                     _guihelper.MessageBox("恭喜您"..product.description)
                end)
                 return

@@ -12,6 +12,7 @@ local conn = FriendManager:Connect(userId,function()
     FriendManager:SendMessage(userId,{ words = "hello world" })
 end)
 --]]
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local FriendConnection = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendConnection.lua");
 local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
@@ -306,4 +307,44 @@ function FriendManager:BadWordsFilter(msgdata)
 		words = BadWordFilter.FilterString(msgdata);
 	end
 	return words;
+end
+function FriendManager.ChatWithFriend(chat_uid)
+	-- page:CloseWindow()
+  -- FriendManager.CloseView()
+  
+  if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+    return
+  end
+
+  local user_data = KeepWorkItemManager.GetProfile()
+
+  if chat_uid == user_data.id then
+    GameLogic.AddBBS(nil, L"自己不能和自己聊天，谢谢", 5000, "0 255 0");
+    return
+  end
+  
+	keepwork.user.friends({
+		username="",
+        headers = {
+            ["x-per-page"] = 200,
+            ["x-page"] = 1,
+        }
+	},function(err, msg, data)
+    if err == 200 then
+      local chat_user_data = nil
+      for k, v in pairs(data.rows) do
+        if chat_uid == v.id then
+          chat_user_data = v
+          break
+        end
+      end
+
+      if chat_user_data then
+        FriendChatPage.Show(user_data, chat_user_data);
+      else
+        GameLogic.AddBBS(nil, L"你们还不是好友，请成为好友后再开始聊天吧", 5000, "0 255 0");
+      end
+    end
+	end)
+
 end

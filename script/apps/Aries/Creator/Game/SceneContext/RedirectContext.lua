@@ -230,6 +230,9 @@ function RedirectContext:mouseReleaseEvent(event)
 		return
 	end
 	if(self.is_click) then
+		if(GameLogic.Macros:IsRecording()) then
+			GameLogic.Macros:AddMacro("SceneClick", GameLogic.Macros.GetButtonTextFromClickEvent(event), GameLogic.Macros.GetSceneClickParams())
+		end
 		local result = Game.SelectionManager:GetPickingResult();
 		if(event.mouse_button == "left") then
 			self:handleLeftClickScene(event, result)

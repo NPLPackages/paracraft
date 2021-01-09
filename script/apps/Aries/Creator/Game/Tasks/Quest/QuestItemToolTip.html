@@ -1,0 +1,26 @@
+﻿<!-- "script/apps/Aries/Creator/Game/mcml/keepwork/KpItemToolTip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" ><![CDATA[
+QuestItemToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItemToolTip.lua");
+local page = document:GetPageCtrl();
+
+]]></script>
+<div style="color:#ffffff;width:358px;padding:10px;" class="kp_tooltip_bg">
+    <div style="color:#ffffff;font-size:16px;base-font-size:16;">
+        <%=QuestItemToolTip.GetDescDiv()%>
+        <!-- <div>放学回家后下载安装帕拉卡指引：</div>
+        <div>1、访问paracraft.cn，在右上角找到下载按钮，点击后进入下载页面。</div> -->
+    </div>
+</div>
+
+</pe:mcml>
+</body>
+</html>
+

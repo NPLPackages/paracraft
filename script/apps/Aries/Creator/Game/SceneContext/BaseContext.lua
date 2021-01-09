@@ -486,10 +486,13 @@ function BaseContext:mousePressEvent(event)
 	if GameLogic.GetFilters():apply_filters("BaseContextMousePressEvent", false, event) then
 		return
 	end
-	local temp = ParaUI.GetUIObjectAtPoint(event.x, event.y);
-	if(temp:IsValid()) then
-		return;
+	if(not event.isEmulated) then
+		local temp = ParaUI.GetUIObjectAtPoint(event.x, event.y);
+		if(temp:IsValid()) then
+			return;
+		end
 	end
+
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
@@ -585,13 +588,10 @@ end
 -- virtual: actually means key stroke. 
 function BaseContext:keyPressEvent(event)
 	GameLogic.GetFilters():apply_filters("KeyPressEvent", false, event)
-	if(event:isAccepted()) then
-		return true;
-	end
-	if(self:handleHookedKeyEvent(event)) then
-		return true;
-	end
-	if(self:HandleGlobalKey(event)) then
+	if(event:isAccepted() or self:handleHookedKeyEvent(event) or self:HandleGlobalKey(event)) then
+		if(GameLogic.Macros:IsRecording() and event:isAccepted() and not event.recorded) then
+			GameLogic.Macros:AddMacro("KeyPress", GameLogic.Macros.GetButtonTextFromKeyEvent(event));
+		end
 		return true;
 	end
 end
@@ -687,7 +687,8 @@ function BaseContext:OnCreateSingleBlock(x,y,z, block_id, result)
 	end
 end
 
-function BaseContext:OnCreateBlock(result)
+-- @param event: optional event object
+function BaseContext:OnCreateBlock(result, event)
 	if result.blockX == nil or result.blockY == nil or result.blockZ == nil then
 		return;
 	end	
@@ -712,9 +713,14 @@ function BaseContext:OnCreateBlock(result)
 		task:Run();
 		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id), 1, nil);
 	else
-		local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
-		local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
-		local alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
+		local ctrl_pressed, shift_pressed, alt_pressed;
+		if(event) then
+			ctrl_pressed, shift_pressed, alt_pressed = event.ctrl_pressed, event.shift_pressed, event.alt_pressed
+		else
+			ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+			shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
+			alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
+		end
 		
 		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id or result.block_id), 1, nil);
 
@@ -805,7 +811,7 @@ function BaseContext:handleRightClickScene(event, result)
 	end
 	if(not isProcessed and click_data.right_holding_time<400 and result and result.blockX) then
 		if(GameMode:CanRightClickToCreateBlock()) then
-			self:OnCreateBlock(result);
+			self:OnCreateBlock(result, event);
 		end
 	end
 end
@@ -859,7 +865,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 			end
 		elseif(dik_key == "DIK_W") then
 			GameLogic.WalkForward();
-			event:accept();
+			
 		elseif(dik_key == "DIK_E") then
 			GameLogic.ToggleDesktop("builder");
 			event:accept();

@@ -29,6 +29,8 @@ QuestPage.isOpen = false
 QuestPage.TaskData = {}
 QuestPage.is_add_event = false
 
+local OwlTaskId = 40005
+
 QuestPage.TaskIdToClickCb = {
 	-- [40001] = "EnterWorld",
 	[TaskIdList.GrowthDiary] = "GrowthDiary",
@@ -71,10 +73,15 @@ local VersionToKey = {
 	LOCAL = 3,
 }
 
+local HideTaskList = {
+	[40002] = 1,
+}
+
 local TargetProgerssValue = 60
 local MaxProgressValue = 100
 local RewardNums = 5
 local exp_gsid = 998
+local modele_bag_id = 0
 
 function QuestPage.OnInit()
 	page = document:GetPageCtrl();
@@ -99,9 +106,9 @@ function QuestPage.Show()
 end
 
 function QuestPage.RefreshData()
+	QuestPage.CheckIsTaskCompelete()
 	QuestPage.HandleTaskData()
 	QuestPage.HandleGiftData()
-	QuestPage.CheckIsTaskCompelete()
 	QuestPage.OnRefresh()
 end
 
@@ -114,10 +121,10 @@ function QuestPage.ShowView()
 	-- if QuestProvider.GetInstance == nil then
 	-- 	return
 	-- end
-
+	QuestPage.CheckIsTaskCompelete()
 	QuestPage.HandleTaskData()
 	QuestPage.HandleGiftData()
-	QuestPage.CheckIsTaskCompelete()
+	
 	
 	if not QuestPage.is_add_event then
 		QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnRefresh,function()
@@ -134,6 +141,14 @@ function QuestPage.ShowView()
 
 		QuestPage.is_add_event = true
 	end
+
+    local bagNo = 1007;
+    for _, bag in ipairs(KeepWorkItemManager.bags) do
+        if (bagNo == bag.bagNo) then 
+            modele_bag_id = bag.id;
+            break;
+        end
+    end
 	
 
 	QuestPage.isOpen = true
@@ -171,6 +186,30 @@ end
 function QuestPage.OnCreate()
 	-- local exp_num = 88
 	-- QuestPage.SetExpProgress(exp_num)
+
+
+	-- 找到猫头鹰item 创建toolsbag
+	local owl_item_index = 0
+	for k, v in pairs(QuestPage.TaskData) do
+		if v.task_id == OwlTaskId then
+			owl_item_index = k
+			break
+		end
+	end
+
+	if owl_item_index > 0 then
+		commonlib.TimerManager.SetTimeout(function()
+			local tree_view = page:GetNode("item_gridview"):GetChild("pe:treeview")
+			local owl_item = tree_view[owl_item_index]
+			local button = owl_item:GetChildWithAttribute("name", "item_root"):GetChildWithAttribute("name", "canvas")
+
+			local QuestItemToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItemToolTip.lua");
+			local desc_data = {
+				"如果家里电脑没有安装帕拉卡，让爸爸妈妈百度搜索<div style='color: #ffff00 ;float: left;'>帕拉卡</div>帮你下载安装哦。",
+			}
+			QuestItemToolTip.Show(button.uiobject_id, desc_data)
+		end, 10)
+	end
 end
 
 function QuestPage.OnRefresh()
@@ -272,34 +311,44 @@ function QuestPage.HandleTaskData(data)
 	-- echo(quest_datas, true)
 	for i, v in ipairs(quest_datas) do
 		-- 获取兑换规则
-		local exid = v.exid
-		local index = #QuestPage.TaskData + 1
-		local task_data = {}
-		local exchange_data = KeepWorkItemManager.GetExtendedCostTemplate(exid)
-		local name = exchange_data.name
-		local desc = exchange_data.desc
-
-		task_data.name = name
-		task_data.task_id = v.exid
-		task_data.task_desc = desc
-		task_data.task_pro_desc = QuestPage.GetTaskProDescByQuest(v)
-		task_data.task_state = QuestPage.GetTaskStateByQuest(v)
-		task_data.task_type = QuestPage.GetTaskType(v)
-		task_data.is_main_task = task_data.task_type == "main"
-
-		task_data.bg_img = QuestPage.GetBgImg(task_data)
-		task_data.questItemContainer = v.questItemContainer
-		-- 限定最多1个
-		task_data.goods_data = {}
-		for i, v in ipairs(exchange_data.exchangeTargets[1].goods) do
-			if ShowRewardIdList[v.goods.gsId] then
-				task_data.goods_data[#task_data.goods_data + 1] = v
+		if HideTaskList[v.exid] == nil then
+			local exid = v.exid
+			local index = #QuestPage.TaskData + 1
+			local task_data = {}
+			local exchange_data = KeepWorkItemManager.GetExtendedCostTemplate(exid)
+			local name = exchange_data.name
+			local desc = exchange_data.desc
+	
+			task_data.name = name
+			task_data.task_id = v.exid
+			task_data.task_desc = desc
+			task_data.task_pro_desc = QuestPage.GetTaskProDescByQuest(v)
+			task_data.task_state = QuestPage.GetTaskStateByQuest(v)
+			task_data.task_type = QuestPage.GetTaskType(v)
+			task_data.is_main_task = task_data.task_type == "main"
+	
+			task_data.bg_img = QuestPage.GetBgImg(task_data)
+			task_data.questItemContainer = v.questItemContainer
+			-- 限定最多1个
+			task_data.goods_data = {}
+			for i2, v2 in ipairs(exchange_data.exchangeTargets[1].goods) do
+				if v2.goods.gsId < 60001 or v2.goods.gsId > 70000 then
+					task_data.goods_data[#task_data.goods_data + 1] = v2
+				end
 			end
+
+			QuestPage.TaskData[index] = task_data
 		end
-		-- print("aaaaaaaaaaaaaaaaaa", v)
-		-- echo(task_data.goods_data, true)
-		QuestPage.TaskData[index] = task_data
 	end
+
+	-- 主线任务在前
+	table.sort(QuestPage.TaskData, function(a, b)
+		if a.is_main_task then
+			return true
+		end
+
+		return false
+	end)
 
 	---------------------------------------这块代码使用的是旧版的任务数据---------------------------------------
 	-- local task_id_list = DailyTaskManager.GetTaskIdList()
@@ -537,8 +586,13 @@ end
 function QuestPage.CheckIsTaskCompelete()
     local profile = KeepWorkItemManager.GetProfile()
     -- 是否实名认证
-   if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-        GameLogic.QuestAction.SetValue("40002_1",1);
+--    if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+--         GameLogic.QuestAction.SetValue("40002_1",1);
+--    end 
+
+    -- 是否新的实名认证
+	if GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+        GameLogic.QuestAction.SetValue("40006_1",1);
    end 
 
    -- 是否选择了学校
@@ -550,4 +604,12 @@ function QuestPage.CheckIsTaskCompelete()
    if profile and profile.region and profile.region.hasChildren == 0 then
         GameLogic.QuestAction.SetValue("40004_1",1);
    end
+end
+
+function QuestPage.IsRoleModel(item_data)
+	if item_data and item_data.bagId == modele_bag_id then
+		return true
+	end
+
+	return false
 end
