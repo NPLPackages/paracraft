@@ -10,62 +10,50 @@
 <script refresh="true" type="text/npl" src="EditorPage.lua"><![CDATA[
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
 local EditorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/EditorPage.lua");
-EditorPage.OnInit()
-function ClosePage()
-    Page:CloseWindow();
-end
-function DS_Items(index)
-    if(index == nil) then
-        return #EditorPage.Current_Item_DS;
-    else
-        return EditorPage.Current_Item_DS[index];
-    end
-end
+local editor = VisualSceneLogic.getSelectedEditor();
 
-function OnClick(index)
-    local node = EditorPage.Current_Item_DS[tonumber(index)];
-    node.node:run();
-end
-function onRefresh()
-    EditorPage.OnRefresh();
-end
-function onNew()
-    local editor = VisualSceneLogic.activedEditor("first_editor");
-    local node, code_component, movieclip_component = editor:createBlockCodeNode();
-    if(node and code_component)then
-        code_component:setCodeFileName("test/follow.lua")
-    end
-    onRefresh();
-end
 function onStop()
-    local editor = VisualSceneLogic.activedEditor("first_editor");
+    if(not editor)then
+        return
+    end
     editor:stop();
 end
-    
+function onRun()
+    if(not editor)then
+        return
+    end
+    editor:run();
+end   
+function onToggleSize()
+    EditorPage.ToggleSize();
+end
+function onClose()
+    EditorPage.Show(false);
+end 
 ]]></script>
-    <aries:window mode="thin" width="160" height="500" title='<%= L"场景编辑器"%>' onclose="ClosePage">
-        <div >
-            <div style="padding-left:5px;padding-right:5px;">
-                <input type="button" class="mc_light_grey_button_with_fillet" style="width:140px;" value="新增" onclick="onNew"/>
-            </div>
-            <div style="padding-left:5px;padding-top:5px;padding-right:5px;">
-                <input type="button" class="mc_light_grey_button_with_fillet" style="width:140px;" value="停止所有" onclick="onStop"/>
-            </div>
-            
-           <pe:gridview style="margin-top:5px;width:160px;height:500px;" name="item_gridview" CellPadding="3" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight = "64" 
-                DataSource='<%=DS_Items%>'>
-	            <Columns>
-                            <div style="width:64px;height:64px;padding-left:5px;">
-                                <input type="button" name='<%= Eval("index")%>' style="width:64px;height:64px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png);" onclick="OnClick"  />
-                            </div>
-                            
-                </Columns>
-	            <EmptyDataTemplate>
-	            </EmptyDataTemplate>
-            </pe:gridview>
+<div width="100%" height="100%" style="background-color:#292929;" class="default">
+    <div style="margin:5px;height:37px;">
+        <div style="float:left;margin-left:2px;margin-top:3px">
+            <input type="button" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="onRun" />
+            <input type="button" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="onStop" />
         </div>
+        
+        
+        <div style="position:relative;float:left;width:82px;" align="right">
+            <input type="button" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="onToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
+            <input type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="onClose()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
+        </div>
+    </div>
     
-</aries:window>
+    <pe:container alignment="_fi" name="helpContainer" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">
+        <iframe src= "script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/EditorInspector.html" width="200"/>
+    </pe:container>
+    <pe:container alignment="_fi" name="codeContainer" class="mc_paper_panel" style="position:relative;margin-bottom:54px;margin-left:205px;">
+        <iframe src= "script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/SceneNodeInspector.html" />
+    </pe:container>
+    <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
+    </pe:container>
+</div>
 </pe:mcml>
 </body>
 </html>

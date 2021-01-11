@@ -17,7 +17,7 @@ local MovieClipComponent = commonlib.inherit(BaseComponent, NPL.export());
 
 MovieClipComponent:Property({"ComponentName", "MovieClipComponent", auto = true,  camelCase = true, });
 MovieClipComponent:Property({"BlockPosition", {0,0,0}, auto = true,  camelCase = true, });
-MovieClipComponent:Property({"Assetfile", "", auto = true,  camelCase = true, });
+MovieClipComponent:Property({"Assetfile", "character/CC/02human/paperman/girl04.x", auto = true,  camelCase = true, });
 
 function MovieClipComponent:ctor()
     self.blockid = 228;

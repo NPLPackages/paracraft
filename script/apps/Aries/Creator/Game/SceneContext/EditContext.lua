@@ -124,6 +124,9 @@ function EditContext:mousePressEvent(event)
 		event.mouse_button = "middle"
 	end
 
+	if(GameLogic.Macros:IsRecording()) then
+		GameLogic.Macros:MarkMousePress(event)
+	end
 	EditContext._super.mousePressEvent(self, event);
 	if(event:isAccepted()) then
 		return

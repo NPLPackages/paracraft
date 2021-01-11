@@ -6,7 +6,7 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
-local editor = VisualSceneLogic.activedEditor("first_editor");
+local editor = VisualSceneLogic.onSelectedEditorByName(VisualSceneLogic.PresetEditors.GlobalEditor);
 local node, code_component, movieclip_component = editor:createBlockCodeNode();
 if(node and code_component)then
     code_component:setCodeFileName("test/follow.lua")
@@ -21,6 +21,9 @@ local VisualSceneLogic = NPL.export();
 VisualSceneLogic.active_scripts = {};
 VisualSceneLogic.editors = {};
 
+VisualSceneLogic.PresetEditors = {
+    GlobalEditor = "GlobalEditor",
+}
 function VisualSceneLogic.createOrGetEditor(name)
     if(not name)then
         return
@@ -28,14 +31,34 @@ function VisualSceneLogic.createOrGetEditor(name)
     local editor = VisualSceneLogic.editors[name];
     if(not editor)then
         editor = Editor:new();
+        editor.Name = name;
     end
     VisualSceneLogic.editors[name] = editor;
     return editor;
 end
-function VisualSceneLogic.activedEditor(name)
-    VisualSceneLogic.cur_editor = VisualSceneLogic.createOrGetEditor(name);
+-- getSelectedEditor
+function VisualSceneLogic.getSelectedEditor()
     return VisualSceneLogic.cur_editor;
 end
-function VisualSceneLogic.getActivedEditor()
+-- reSelectedEditor
+function VisualSceneLogic.reSelectedEditor()
+    VisualSceneLogic.onSelectedEditorByName(VisualSceneLogic.getSelectedEditorName())
+end
+-- getSelectedEditorName
+function VisualSceneLogic.getSelectedEditorName()
+    if(VisualSceneLogic.cur_editor)then
+        return VisualSceneLogic.cur_editor.Name;
+    end
+end
+-- onSelectedEditorByName
+function VisualSceneLogic.onSelectedEditorByName(name)
+    if(not name)then
+        return
+    end
+    VisualSceneLogic.cur_editor = VisualSceneLogic.createOrGetEditor(name);
+	GameLogic.GetFilters():apply_filters("VisualSceneLogic.onSelectedEditorByName", name);
     return VisualSceneLogic.cur_editor;
+end
+function VisualSceneLogic.nofityChanged()
+	GameLogic.GetFilters():apply_filters("VisualSceneLogic.nofityChanged");
 end

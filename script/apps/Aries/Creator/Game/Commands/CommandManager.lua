@@ -316,9 +316,16 @@ function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fro
 	local line_index = fromLine or 1;
 	local line_count = toLine or #cmd_list;
 	self.cmd_list = cmd_list;
+	local macros;
 	while line_index <= line_count do
 		local cmd = cmd_list[line_index];
-		if(cmd~="") then
+		if(cmd~="" and cmd:match("^[%w_%.]+%(.*%)$")) then
+			-- macro command
+			macros = macros or {}
+			macros[#macros+1] = cmd;
+			line_index = line_index + 1;
+		elseif(cmd~="") then
+			-- ordinary command
 			last_result, goto_label = self:RunWithVariables(variables, cmd, fromEntity);
 			if( last_result == false) then
 				if(goto_label) then
@@ -416,7 +423,13 @@ function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fro
 			else
 				line_index = line_index + 1;
 			end
+		else
+			line_index = line_index + 1;
 		end
+	end
+	if(macros) then
+		local text = table.concat(macros, "\n");
+		GameLogic.Macros:Play(text);
 	end
 	return last_result;
 end

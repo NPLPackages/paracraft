@@ -1,0 +1,121 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/SceneNodeInspector.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SceneNodeInspector.lua"><![CDATA[
+local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
+local SceneNodeInspector = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/SceneNodeInspector.lua");
+local editor = VisualSceneLogic.getSelectedEditor();
+SceneNodeInspector.OnInit();
+local node = {};
+if(editor)then
+    node = editor.selected or {};
+end
+function getComponents()
+    return SceneNodeInspector.components;
+end
+function getUid()
+    return node.Uid;
+end
+function getName()
+    return node.Name;
+end
+function getComponentByIndex(index)
+    local index = tonumber(index);
+    local component_node = SceneNodeInspector.components[index];
+    if(component_node and component_node.component)then
+        return component_node.component;
+    end
+end
+
+function getComponentValue(index,key)
+    local component = getComponentByIndex(index);
+    if(component and component[key])then
+        return component[key];
+    end
+end
+function getComponentName(index)
+    return getComponentValue(index,"ComponentName")
+end
+function onGotoBlockPosition(index)
+    local pos = getComponentValue(index,"BlockPosition");
+    if(pos)then
+        local cmd = string.format("/goto %s %s %s",pos[1],pos[2],pos[3])
+        GameLogic.RunCommand(cmd);
+    end
+end
+]]></script>
+    
+    <div width="100%" height="100%" style="background-color:#000000;" class="default">
+            <h2 style="font-weight:bold;font-size:14px;">scene node inspector</h2>
+        <div>
+            <div style="float:left;">Uid:</div>
+            <div style="float:left;"><%=getUid()%></div>
+        </div>
+        <div>
+            <div style="float:left;">Name:</div>
+            <div style="float:left;"><%=getName()%></div>
+            <div style="float:left;"><input type="button" value='<%=L"编辑"%>' name='<%=Eval("index")%>' onclick="" class="mc_button_grey" /></div>
+        </div>
+        <div>
+            <pe:repeat DataSource="<%=getComponents()%>">
+                 <pe:repeatitem >
+                    <h2 style="font-weight:bold;font-size:14px;"><%=getComponentName(Eval("index"))%></h2>
+                     <pe:if condition='<%= getComponentName(Eval("index")) == "CodeComponent" %>'>
+                         <div>
+                            <div style="float:left;">CodeFileName:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "CodeFileName")%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"编辑"%>' name='<%=Eval("index")%>' onclick="onCodeFileName" class="mc_button_grey" /></div>
+                         </div>
+                         <div>
+                            <div style="float:left;">Code:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "Code")%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"编辑"%>' name='<%=Eval("index")%>' onclick="onCode" class="mc_button_grey" /></div>
+                         </div>
+                         <div>
+                            <div style="float:left;">BlockPosition:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[1]%></div>
+                            <div style="float:left;">,</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[2]%></div>
+                            <div style="float:left;">,</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[3]%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"跳转"%>' name='<%=Eval("index")%>' onclick="onGotoBlockPosition" class="mc_button_green"/></div>
+                         </div>
+                         <div>
+                            <div style="float:left;">Runabled:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "Runabled")%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"编辑"%>' name='<%=Eval("index")%>' onclick="onRunabled" class="mc_button_grey" /></div>
+                         </div>
+                     </pe:if>
+                     <pe:if condition='<%= getComponentName(Eval("index")) == "MovieClipComponent" %>'>
+                         <div>
+                            <div style="float:left;">Assetfile:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "Assetfile")%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"编辑"%>' name='<%=Eval("index")%>' onclick="" class="mc_button_grey" /></div>
+                         </div>
+                         <div>
+                            <div style="float:left;">BlockPosition:</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[1]%></div>
+                            <div style="float:left;">,</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[2]%></div>
+                            <div style="float:left;">,</div>
+                            <div style="float:left;"><%=getComponentValue(Eval("index"), "BlockPosition")[3]%></div>
+                            <div style="float:left;"><input type="button" value='<%=L"跳转"%>' name='<%=Eval("index")%>' onclick="onGotoBlockPosition" class="mc_button_green"/></div>
+                         </div>
+                     </pe:if>
+
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        <div style="padding:10px;"><input width="100%" style="height:30px;" type="button" value='<%=L"添加组件"%>' name='<%=Eval("index")%>' onclick="" class="mc_light_grey_button_with_fillet" /></div>
+    </div>
+    
+</pe:mcml>
+</body>
+</html>
+

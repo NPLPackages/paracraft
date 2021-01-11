@@ -175,7 +175,7 @@ function Macros:EndRecord()
 		end
 		local text = table.concat(out, "\n");
 		ParaMisc.CopyTextToClipboard(text);
-		GameLogic.AddBBS(nil, format("%d macros are copied to clipboard", #(self.macros)), 5000, "0 255 0")
+		GameLogic.AddBBS(nil, format(L"%d个示教宏命令已经复制到裁剪版", #(self.macros)), 5000, "0 255 0")
 	end
 	GameLogic.GetFilters():apply_filters("Macro_EndRecord");
 end
@@ -192,12 +192,10 @@ function Macros:GetLastCameraParams()
 end
 
 function Macros:LockInput()
-	ParaScene.GetAttributeObject():SetField("BlockInput", true);
-	ParaCamera.GetAttributeObject():SetField("BlockInput", true);
+	System.os.options.DisableInput(true);
 end
 function Macros:UnlockInput()
-	ParaScene.GetAttributeObject():SetField("BlockInput", false);
-	ParaCamera.GetAttributeObject():SetField("BlockInput", false);
+	System.os.options.DisableInput(false);
 end
 
 -- @param text: text lines of macros.
@@ -378,3 +376,12 @@ function Macros:OnTimer()
 		self:Tick_RecordPlayerMove()
 	end
 end
+
+local lastMouseDownEvent = {};
+function Macros:MarkMousePress(event)
+	lastMouseDownEvent.x = event.x;
+	lastMouseDownEvent.y = event.y;
+	lastMouseDownEvent.mouse_button = event.mouse_button;
+	lastMouseDownEvent.clickTime = commonlib.TimerManager.GetCurrentTime();
+end
+

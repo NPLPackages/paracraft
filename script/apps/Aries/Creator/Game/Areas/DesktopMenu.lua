@@ -60,7 +60,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"全文搜索...".."  Ctrl+Shift+F",name = "window.findfile", cmd="/findfile", onclick=nil},
 				{text = L"跳到上一层".."  Tab",name = "edit.upstairs",onclick=nil},
 				{text = L"跳到下一层".."  Shift+Tab",name = "edit.downstairs",onclick=nil},
-				{text = L"录制宏...", name = "window.macro", cmd="/macro", onclick=nil},
+				{text = L"录制宏命令...", name = "window.macro", cmd="/macro", onclick=nil},
 			},
 		},
 		{text = L"多人联网",order=4, name = "online",children = 

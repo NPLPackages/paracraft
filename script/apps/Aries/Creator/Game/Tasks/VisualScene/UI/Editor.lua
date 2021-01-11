@@ -33,9 +33,8 @@ Editor:Property({"Scene", auto = true, type = "Scene", camelCase = true, });
 
 function Editor:ctor()
     self.Scene = Scene:new();
-
     self.pair_block_pos_allocation = SkySpacePairBlock:new();
-
+    self.selected = nil;
 end
 function Editor:run()
     self.Scene.RootNode:run();
@@ -45,6 +44,10 @@ function Editor:stop()
 end
 function Editor:clear()
     self.Scene:clear();
+end
+function Editor:select(node)
+    self.selected = node;
+	GameLogic.GetFilters():add_filter("Editor.select", self, node);
 end
 function Editor:createBlockCodeNode(parent, name)
     parent = parent or self.Scene.RootNode;
@@ -63,6 +66,9 @@ function Editor:createBlockCodeNode(parent, name)
     local movieclip_component = ComponentFactory.getComponent("MovieClipComponent"):new()
     movieclip_component:setBlockPosition(position_movieclip);
     node:addComponent(movieclip_component);
+
+	GameLogic.GetFilters():add_filter("Editor.createBlockCodeNode", self, node);
+
     return node, code_component, movieclip_component;
 end
 function Editor:toJson()
