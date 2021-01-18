@@ -478,7 +478,7 @@ function Entity:GetCommandTitle()
 	-- return L"输入命令行(可以多行): <div>例如:/echo Hello</div>"
 	EditorPanelMCML = EditorPanelMCML or string.format([[
 		<div style="float:left;margin-left:5px;margin-top:7px;">
-			<input type="button" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntityCommandBlock.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+			<input type="button" uiname="EditEntityPage.CommandEditor" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntityCommandBlock.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
 		</div>
 	]], L"命令编辑器...");
 	return EditorPanelMCML;

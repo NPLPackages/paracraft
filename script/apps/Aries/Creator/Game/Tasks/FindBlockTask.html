@@ -12,26 +12,26 @@ GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask")
 FindBlockTask.OnInit();
 ]]></script>
-<aries:window style="width:512px;" title='<%=L"搜索"%>' mode="thin" onclose="FindBlockTask.OnClose">
+<aries:window style="width:512px;" title='<%=L"搜索"%>' mode="thin" uiname_onclose="FindBlockTask.OnClose" onclose="FindBlockTask.OnClose">
     <div style="margin:10px;color:#ffffff;font-size:14px;">
         <div class="mc_paper_panel">
             <pe:treeview name="result" style="background:;height:256px;" VerticalScrollBarStep="20" DefaultNodeHeight="20" DataSource='<%=FindBlockTask.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="true" DefaultIndentation="0">
                 <NodeTemplates>
                     <NodeTemplate DataType="block">
-                        <pe:treenode icon='<%=XPath("this|icon")%>' selected='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindBlockTask.OnClickItem" text='<%=format("%s", XPath("this|name") or "")%>' ></pe:treenode>
+                        <pe:treenode icon='<%=XPath("this|icon")%>' selected='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>' text='<%=format("%s", XPath("this|name") or "")%>' ></pe:treenode>
                     </NodeTemplate>
                 </NodeTemplates>
             </pe:treeview>
         </div>
         <div style="margin-top:5px;">
             <div style="position:relative">
-                <input type="text" autofocus="true" onkeyup="FindBlockTask.OnKeyUp" onchange="FindBlockTask.OnTextChange" name="text" style="margin-right:100px;height:24px" />
+                <input type="text" autofocus="true" onkeyup="FindBlockTask.OnKeyUp" onchange="FindBlockTask.OnTextChange" uiname="FindBlockTask.text" name="text" style="margin-right:100px;height:24px" />
             </div>
-            <input type="button" DefaultButton="true" align="right" name="ok" value='<%=L"确定"%>' onclick="FindBlockTask.OnOpen" style="width:80px;" class="mc_light_grey_button_with_fillet" />
+            <input type="button" DefaultButton="true" align="right" uiname="FindBlockTask.ok" name="ok" value='<%=L"确定"%>' onclick="FindBlockTask.OnOpen" style="width:80px;" class="mc_light_grey_button_with_fillet" />
         </div>
         <div style="margin-top:5px;">
-            <input type="checkbox" style="margin-top:1px;margin-right:3px;" checked="true" name="checkAll"/><div for="checkAll" style="float:left;font-size:10px;color:#808080"><%=L"全部: 代码方块,告示牌..."%></div>
-            <input type="button" align="right" name="cancel" value='<%=L"取消"%>' onclick="FindBlockTask.OnClose" style="width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
+            <input type="checkbox" style="margin-top:1px;margin-right:3px;" checked="true" uiname="FindBlockTask.checkAll" name="checkAll"/><div uiname="FindBlockTask.checkAll_for" for="checkAll" style="float:left;font-size:10px;color:#808080"><%=L"全部: 代码方块,告示牌..."%></div>
+            <input type="button" align="right" uiname="FindBlockTask.cancel" name="cancel" value='<%=L"取消"%>' onclick="FindBlockTask.OnClose" style="width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
         </div>
     </div>
 </aries:window>

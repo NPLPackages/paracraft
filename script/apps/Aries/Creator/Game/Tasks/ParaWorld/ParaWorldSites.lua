@@ -447,7 +447,6 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 					GameLogic.GetFilters():apply_filters("OnEnterParaWorldGrid",
 						{projectName = currentItem.projectName, projectId = currentItem.projectId, openCode = currentItem.openCode, userId = currentItem.userId, x = currentItem.x, y = currentItem.y, });
 					if (currentItem.projectName and currentItem.projectName ~= "") then
-						GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.world.visit_user_home", { homeUserId = currentItem.userId, userHomeName = currentItem.name });
 						GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", currentItem.projectName), 3000, "0 255 0");
 						if (currentItem.bornAt and callback) then
 							callback(currentItem.bornAt[1], currentItem.bornAt[2], currentItem.bornAt[3]);
@@ -497,7 +496,6 @@ function ParaWorldSites.LoadMiniWorldOnSeat(row, column, center, callback)
 							currentItem.userId = seat.paraMini.userId;
 							currentItem.openCode = seat.openCode == 1;
 							if (center) then
-								GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.world.visit_user_home", { homeUserId = currentItem.userId, userHomeName = currentItem.name });
 								GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", seat.paraMini.name), 3000, "0 255 0");
 								if (seat.paraMini.bornAt and callback) then
 									callback(seat.paraMini.bornAt[1], seat.paraMini.bornAt[2], seat.paraMini.bornAt[3]);

@@ -699,6 +699,7 @@ function SelectBlocks:handleLeftClickScene(event)
 		-- clicking without ctrl key will cancel the selection mode. 
 		SelectBlocks.CancelSelection();
 	end
+	event:accept();
 end
 
 function SelectBlocks:keyPressEvent(event)
@@ -707,26 +708,33 @@ function SelectBlocks:keyPressEvent(event)
 	if(dik_key == "DIK_ESCAPE")then
 		-- cancel selection. 
 		SelectBlocks.CancelSelection();
+		event:accept();
 	elseif(dik_key == "DIK_DELETE" or dik_key == "DIK_DECIMAL")then
 		SelectBlocks.DeleteSelection();
+		event:accept();
 	elseif(dik_key == "DIK_EQUALS")then
 		if(event.ctrl_pressed) then
 			SelectBlocks.TransformSelection({scalingX = 2, scalingY = 2, scalingZ = 2})
 		else
 			SelectBlocks.AutoExtrude(true);
 		end
+		event:accept();
 	elseif(dik_key == "DIK_MINUS")then
 		if(event.ctrl_pressed) then
 			SelectBlocks.TransformSelection({scalingX = 0.5, scalingY = 0.5, scalingZ = 0.5})
 		else
 			SelectBlocks.AutoExtrude(false);
 		end
+		event:accept();
 	elseif(dik_key == "DIK_LBRACKET")then
 		SelectBlocks.TransformSelection({rot_angle=1.57, rot_axis = "y"})
+		event:accept();
 	elseif(dik_key == "DIK_RBRACKET")then
 		SelectBlocks.TransformSelection({rot_angle=-1.57, rot_axis = "y"})
+		event:accept();
 	elseif(dik_key == "DIK_A" and event.ctrl_pressed)then
 		SelectBlocks.SelectAll(true)
+		event:accept();
 	elseif(dik_key == "DIK_C" or dik_key == "DIK_V" or dik_key == "DIK_X" )then
 		if(event.ctrl_pressed) then
 			if(dik_key == "DIK_C")then
@@ -736,6 +744,11 @@ function SelectBlocks:keyPressEvent(event)
 			else
 				self:PasteBlocks();
 			end
+			event:accept();
+			if(GameLogic.Macros:IsRecording()) then
+				local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+				GameLogic.Macros:AddMacro("NextKeyPressWithMouseMove", angleX, angleY);
+			end
 		end
 	elseif(dik_key == "DIK_Z")then
 		if(event.ctrl_pressed) then
@@ -743,8 +756,10 @@ function SelectBlocks:keyPressEvent(event)
 		elseif(dik_key == "DIK_Z") then
 			UndoManager.Undo();
 		end
+		event:accept();
 	elseif(dik_key == "DIK_Y")then
 		UndoManager.Redo();
+		event:accept();
 	elseif(dik_key == "DIK_RETURN" or dik_key == "DIK_NUMPADENTER")then
 		if(TransformWnd:IsVisible()) then
 			TransformWnd.TransformSelection();

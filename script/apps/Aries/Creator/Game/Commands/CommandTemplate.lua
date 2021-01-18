@@ -36,6 +36,7 @@ Commands["loadtemplate"] = {
 @param -r: remove blocks
 @param -abspos: whether load using absolute position. 
 @param -tp: whether teleport player to template player's location. 
+@param -opaque: replace air block to black color block.
 @param x,y,z: absolute or relative position, default to current player position
 @param templatename: filename relative to current world or blocktemplates/. If no file extension is specified, [name].blocks.xml is used. 
 default name is "default"
@@ -53,22 +54,26 @@ default name is "default"
 		local load_anim_duration;
 		local operation = BlockTemplate.Operations.Load;
 		local UseAbsolutePos, TeleportPlayer, nohistory;
+		local opaque;
+
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option) then
-				if(option == "a") then
+				if (option == "a") then
 					load_anim_duration, cmd_text = CmdParser.ParseInt(cmd_text);
-					if(load_anim_duration ~= 0) then
+					if (load_anim_duration ~= 0) then
 						operation = BlockTemplate.Operations.AnimLoad;
 					end
-				elseif(option == "r") then
+				elseif (option == "r") then
 					operation = BlockTemplate.Operations.Remove;
-				elseif(option == "abspos") then
+				elseif (option == "abspos") then
 					UseAbsolutePos = true;
-				elseif(option == "nohistory") then
+				elseif (option == "nohistory") then
 					nohistory = true;
-				elseif(option == "tp") then
+				elseif (option == "tp") then
 					TeleportPlayer = true;
+				elseif (option == "opaque") then
+					opaque = true;
 				end
 			else
 				break;
@@ -77,27 +82,44 @@ default name is "default"
 		load_anim_duration = load_anim_duration or 0;
 
 		local x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
-		if(not x) then
+
+		if (not x) then
 			fromEntity = fromEntity or EntityManager.GetPlayer();
-			if(fromEntity) then
+			if (fromEntity) then
 				x,y,z = fromEntity:GetBlockPos();
 			end
 		end
-		if(x) then
+
+		if (x) then
 			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 			local filename = cmd_text;
-			if(filename=="") then
+
+			if (filename == "") then
 				templatename = "default";
 			end
+
 			if(not filename:match("%.xml$") and not filename:match("%.bmax$")) then
-				filename = filename..".blocks.xml";
+				filename = filename .. ".blocks.xml";
 			end
+
 			local fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
+			
 			if(fullpath) then
-				local task = BlockTemplate:new({operation = operation, filename = fullpath,
-					blockX = x,blockY = y, blockZ = z, bSelect=nil, load_anim_duration=load_anim_duration,
-					UseAbsolutePos = UseAbsolutePos,TeleportPlayer=TeleportPlayer, nohistory= nohistory,
-					})
+				local task = BlockTemplate:new(
+					{
+						operation = operation,
+						filename = fullpath,
+						blockX = x,
+						blockY = y,
+						blockZ = z,
+						bSelect = nil,
+						load_anim_duration = load_anim_duration,
+						UseAbsolutePos = UseAbsolutePos,
+						TeleportPlayer = TeleportPlayer,
+						nohistory = nohistory,
+						opaque = opaque,
+					}
+				);
 				task:Run();
 			else
 				LOG.std(nil, "info", "loadtemplate", "file %s not found", filename);

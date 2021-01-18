@@ -54,15 +54,15 @@ function OnOK()
     end)
 end
 ]]></script>
-<aries:window mode="thin" style="width:500px;height:400px;" title='<%=L"角色外貌"%>' onclose="ClosePage">
+<aries:window mode="thin" style="width:500px;height:400px;" title='<%=L"角色外貌"%>' uiname_onclose="SkinPage.ClosePage" onclose="ClosePage">
     <div style="float:left;width:180px;margin-left:13px;margin-top:3px;">
         <div style="position:relative;margin-left:-48px;margin-top:10px;width:256px;height:226px;">
             <div >
                 <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" isinteractive="false" />
             </div>
         </div>
-        <input type="button" onclick="SkinPage.OnChangeAvatarModel"  value='<%=L"更改造型..."%>' style="position:relative;margin-top:260px;margin-left:20px;min-width:130px;" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" onclick="SkinPage.OnChangeAvatarSkin"  value='<%=L"更改皮肤..."%>' style="position:relative;margin-top:295px;margin-left:20px;min-width:130px;" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" uiname="SkinPage.OnChangeAvatarModel" onclick="SkinPage.OnChangeAvatarModel"  value='<%=L"更改造型..."%>' style="position:relative;margin-top:260px;margin-left:20px;min-width:130px;" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" uiname="SkinPage.OnChangeAvatarSkin" onclick="SkinPage.OnChangeAvatarSkin"  value='<%=L"更改皮肤..."%>' style="position:relative;margin-top:295px;margin-left:20px;min-width:130px;" class="mc_light_grey_button_with_fillet"/>
     </div>
     <div style="float:left;margin-left:8px;margin-top:10px;width:270px;height:335px;color:#cccccc">
         <div class="mc_border" style="margin-top:5px;padding:10px;">
@@ -95,7 +95,7 @@ end
                                     <%= Eval("name") %>
                                 </div>
                             </div>
-                            <input type="button" onclick="ChangeSkin" name="btn_change" param1='<%=Eval("index") %>' style="position:relative;min-width:200px;background:"/>
+                            <input type="button" uiname='<%="SkinPage.ChangeSkin.Click"..Eval("index") %>'  onclick="ChangeSkin" name="btn_change" param1='<%=Eval("index") %>' style="position:relative;min-width:200px;background:"/>
                         </pe:if>
                     </div>
                 </Columns> 
@@ -105,7 +105,7 @@ end
         </div>
     </div>
     <div style="height:30px;">
-        <input type="button" onclick="OnOK"  value='<%=L"确定"%>' style="margin-top:-10px;margin-left:240px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
+        <input type="button" uiname="SkinPage.OnOK" onclick="OnOK"  value='<%=L"确定"%>' style="margin-top:-10px;margin-left:240px;min-width:60px;height:26px;font-size:16px;color:#ffffff" class="mc_light_grey_button_with_fillet" />    
     </div>
 </aries:window>
 </pe:mcml>

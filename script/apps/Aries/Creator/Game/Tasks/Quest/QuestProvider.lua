@@ -10,6 +10,17 @@ ExID from 40000 to 49999
 ------------------------------------------------------------------------------------------------------------------------
 extra in 兑换规则
 {
+  "activeconditions": [
+        {   
+            "type" : "QuestDateCondition", 
+            "values" : [ 
+                { "date": "2021-1-11", "duration": "10:00:00-12:00:00" },
+                { "date": "2021-1-11", "duration": "14:00:00-16:00:00" },
+                { "date": "2021-1-11", "duration": "20:00:00-22:00:00" },
+            ],
+            "strict": false,
+        }
+    ],
   "preconditions": [
     { "id": "60003_1", "title": "", "desc": "", "finished_value": 5, "goto_world": [29477,1376,1376], "click":"" , "task_type":"main", "custom_show": true, },
     { "id": "60003_2", "title": "", "desc": "", "finished_value": "abc" },
@@ -24,6 +35,8 @@ QuestProvider:GetInstance():SetValue("60003_2","ABC");
 QuestProvider:GetInstance():Refresh();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/timer.lua");
+
 NPL.load("(gl)script/ide/EventDispatcher.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/Quest.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItem.lua");
@@ -263,6 +276,8 @@ function QuestProvider:FillQuestItemTemplateBy_Virtual_Condition(exid)
                     quest_template.click = v.click;
                     quest_template.task_type = v.task_type;
                     quest_template.custom_show = v.custom_show;
+                    quest_template.exp = v.exp;
+                    quest_template.order = v.order;
                     self:AddQuestItemTemplate(quest_template);
                 end
             end
@@ -315,6 +330,10 @@ function QuestProvider:Refresh()
         if(quest_gsid)then
             local itemContainer = self:CreateOrGetQuestItemContainer(quest_gsid);
 
+            -- check virtual active condition
+            if(extra and extra.activeconditions)then
+                itemContainer:ParseActiveConditions(extra.activeconditions);
+            end
             -- check virtual condition
             local extra = self:GetExtra(exid);
             if(extra and extra.preconditions)then

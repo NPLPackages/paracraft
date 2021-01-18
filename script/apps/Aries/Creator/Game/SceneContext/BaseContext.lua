@@ -212,6 +212,37 @@ function BaseContext:handleItemMouseEvent(event)
 	return event:isAccepted();
 end
 
+function BaseContext:handleMouseEvent(event)
+	if(GameLogic.Macros:IsRecording()) then
+		GameLogic.Macros:SaveViewportParams();
+		local eventType = event:GetType() 
+		if(eventType == "mousePressEvent") then
+			self.is_click = false;
+		end
+	end
+
+	BaseContext._super.handleMouseEvent(self, event);
+	
+	if(GameLogic.Macros:IsRecording() and not event.recorded) then
+		local eventType = event:GetType() 
+		if(eventType == "mousePressEvent") then
+			self:BeginMouseClickCheck();
+			GameLogic.Macros:MarkMousePress(event)
+		elseif(event:isAccepted() and eventType == "mouseReleaseEvent") then
+			event.recorded = true;
+			local is_click = self.is_click or self:EndMouseClickCheck(event); 
+			if(is_click) then
+				GameLogic.Macros:AddMacro("SceneClick", GameLogic.Macros.GetButtonTextFromClickEvent(event), GameLogic.Macros.GetSceneClickParams())
+			else
+				local mousePressEvent = GameLogic.Macros:GetLastMousePressEvent()
+				local startAngleX, startAngleY = GameLogic.Macros.GetSceneClickParams(mousePressEvent.x, mousePressEvent.y)
+				local endAngleX, endAngleY = GameLogic.Macros.GetSceneClickParams()
+				GameLogic.Macros:AddMacro("SceneDrag", GameLogic.Macros.GetButtonTextFromClickEvent(event), startAngleX, startAngleY, endAngleX, endAngleY)
+			end
+		end
+	end
+end
+
 -- this function is called repeatedly if MousePickTimer is enabled. 
 -- it can also be called independently. 
 -- @return the picking result table
@@ -513,13 +544,15 @@ end
 
 -- virtual: 
 function BaseContext:mouseReleaseEvent(event)
+	self.is_click = self:EndMouseClickCheck(event); 
+
 	if GameLogic.GetFilters():apply_filters("BaseContextMouseReleaseEvent", false, event) then
 		return
 	end
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
-	self.is_click = self:EndMouseClickCheck(event); 
+
 	self.left_holding_time = click_data.left_holding_time;
 	self.right_holding_time = click_data.right_holding_time;
 	
@@ -585,13 +618,20 @@ function BaseContext:handleItemKeyEvent(event)
 	end
 end
 
+function BaseContext:handleKeyEvent(event)
+	BaseContext._super.handleKeyEvent(self, event);
+	if(event:isAccepted()) then
+		if(GameLogic.Macros:IsRecording() and event:isAccepted() and not event.recorded) then
+			event.recorded = true;
+			GameLogic.Macros:AddMacro("KeyPress", GameLogic.Macros.GetButtonTextFromKeyEvent(event));
+		end
+	end
+end
+
 -- virtual: actually means key stroke. 
 function BaseContext:keyPressEvent(event)
 	GameLogic.GetFilters():apply_filters("KeyPressEvent", false, event)
 	if(event:isAccepted() or self:handleHookedKeyEvent(event) or self:HandleGlobalKey(event)) then
-		if(GameLogic.Macros:IsRecording() and event:isAccepted() and not event.recorded) then
-			GameLogic.Macros:AddMacro("KeyPress", GameLogic.Macros.GetButtonTextFromKeyEvent(event));
-		end
 		return true;
 	end
 end
@@ -835,6 +875,17 @@ function BaseContext:handlePlayerKeyEvent(event)
 		end
 		event:accept();
 	elseif(not event.ctrl_pressed and not event.alt_pressed) then
+		if(GameLogic.Macros:IsRecording()) then
+			if(dik_key == "DIK_SPACE" or dik_key == "DIK_F" or dik_key == "DIK_X") then
+				if(EntityManager.GetFocus() == EntityManager.GetPlayer()) then
+					local player = EntityManager.GetPlayer();
+					if(player) then
+						local x, y, z = player:GetPosition()
+						GameLogic.Macros:AddMacro("FocusPlayer", x, y, z);
+					end
+				end
+			end
+		end
 		if(dik_key == "DIK_SPACE") then
 			GameLogic.DoJump();
 			event:accept();
@@ -989,18 +1040,23 @@ function BaseContext:HandleGlobalKey(event)
 						GameLogic.RunCommand("/menu window.find");
 					end
 					event:accept();
-				elseif(dik_key == "DIK_C") then
-					-- copy current mouse cursor block to clipboard
+				elseif(dik_key == "DIK_C" or dik_key == "DIK_V") then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
-					SelectBlocks.CopyToClipboard();
+						
+					if(dik_key == "DIK_C") then
+						-- copy current mouse cursor block to clipboard
+						SelectBlocks.CopyToClipboard();
+					elseif(dik_key == "DIK_V") then
+						-- paste from clipboard
+						SelectBlocks.PasteFromClipboard();
+					end
 					event:accept();
-				elseif(dik_key == "DIK_V") then
-					-- paste from clipboard
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
-					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
-					SelectBlocks.PasteFromClipboard();
-					event:accept();
+					
+					if(GameLogic.Macros:IsRecording()) then
+						local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+						GameLogic.Macros:AddMacro("NextKeyPressWithMouseMove", angleX, angleY);
+					end
 				end
 			end
 		end
@@ -1050,10 +1106,13 @@ function BaseContext:HandleGlobalKey(event)
 		
 	elseif(dik_key == "DIK_F12" and ctrl_pressed) then
 		System.App.Commands.Call("ScreenShot.HideAllUI");
+		event:accept();
 	elseif(dik_key == "DIK_I" and ctrl_pressed and event.shift_pressed) then
 		GameLogic.RunCommand("/open npl://debugger");
+		event:accept();
 	elseif(dik_key == "DIK_F1") then
 		GameLogic.RunCommand("/menu help.help");
+		event:accept();
 	end
 
 	if (ctrl_pressed and event.alt_pressed) then

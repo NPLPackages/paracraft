@@ -24,23 +24,28 @@ end
 
 -- @param duration: in seconds
 function MacroRecorder.ShowPage()
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Macros/MacroRecorder.html", 
-			name = "MacroRecorderTask.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			bShow = true,
-			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 1000,
-			allowDrag = true,
-			directPosition = true,
-				align = "_lt",
-				x = 10,
-				y = 10,
-				width = 64,
-				height = 32,
-		});
+	local params = {
+		url = "script/apps/Aries/Creator/Game/Macros/MacroRecorder.html", 
+		name = "MacroRecorderTask.ShowPage", 
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		isShowTitleBar = false,
+		bShow = true,
+		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = 1000,
+		allowDrag = true,
+		isPinned = true,
+		directPosition = true,
+			align = "_lt",
+			x = 10,
+			y = 10,
+			width = 64,
+			height = 32,
+	}
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		page = nil;
+	end;
 end
 
 function MacroRecorder.OnMacroStopped()

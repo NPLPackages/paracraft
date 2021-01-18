@@ -18,11 +18,7 @@ function GetTabviewButtons()
 end
 
 function OnChangeTabview(index)
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua");
-    local BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
-    BuilderFramePage.isSearching = false;
-    CreatorDesktop.tabview_index = tonumber(index);
-    page:Refresh(0.01);
+    CreatorDesktop.OnChangeTabview(index);
 end
 
 function ToggleCurPage()

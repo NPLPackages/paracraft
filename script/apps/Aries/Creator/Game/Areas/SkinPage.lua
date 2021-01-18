@@ -179,7 +179,6 @@ end
 
 function SkinPage.OnChangeAvatarSkin()
 	local assetFilename = EntityManager.GetPlayer():GetMainAssetPath();
-	assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
 
 	if(page) then
 		page:CloseWindow();
@@ -206,7 +205,13 @@ function SkinPage.OnChangeAvatarSkin()
 				end)
 			end
 		end);
+	elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+		local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+		CustomSkinPage.ShowPage(assetFilename, old_value, function()
+		end);
 	else
+		assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 		local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
 		EditSkinPage.ShowPage(function(result)

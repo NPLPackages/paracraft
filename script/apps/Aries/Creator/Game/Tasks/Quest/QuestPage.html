@@ -10,6 +10,8 @@
 <script refresh="true" type="text/npl" src="QuestPage.lua"><![CDATA[
 local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 QuestPage.OnInit()
+KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
 function ClosePage()
     Page:CloseWindow();
     QuestPage.CloseView()
@@ -59,10 +61,6 @@ function GetCompletePro(data)
     return QuestPage.GetCompletePro(data)
 end
 
-function GetRewardDesc(data)
-    return QuestPage.GetRewardDesc(data)
-end
-
 function GetGiftItemIcon(item_data)
     local gsid = item_data.gsId or 998
     local path = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png#32 0 65 64", gsid)
@@ -79,11 +77,9 @@ function IsLastGift(index)
     return index == #QuestPage.GiftData
 end
 
-function GetReard(name, mcmlNode)
+function GetReward(name, mcmlNode)
     local param = mcmlNode:GetAttribute("param1")
-    --local QuestRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestRewardPage.lua");
-    --QuestRewardPage.Show(param);
-    QuestPage.GetReard(param)
+    QuestPage.GetReward(param)
 end
 
 function Goto(name, mcmlNode)
@@ -93,6 +89,7 @@ end
 
 function OnClikcGift(name, mcmlNode)
     local param = mcmlNode:GetAttribute("param1")
+    QuestPage.OnClikcGift(param)
 end
 
 function IsNotTask()
@@ -103,8 +100,29 @@ function IsRoleModel(item_data)
     return QuestPage.IsRoleModel(item_data)
 end
 
+function IsShowExpIcon(data)
+    return data.reward_exp ~= nil
+end
+
+function GetItemDesc(data)
+    if data.reward_exp then
+        return "探索力"
+    end
+
+    if data.goods and data.goods.gsId then
+        --local itemTemplate = KeepWorkItemManager.GetItemTemplate(data.goods.gsId) or {};
+        --return itemTemplate.desc
+        return data.goods.name
+    end
+    return ""
+end
+
+function GetExp()
+    return QuestPage.GetExp()
+end
+
 ]]></script>
-<kp:window name="iframe" width="960" height="450" icon="Texture/Aries/Creator/keepwork/Quest/biaoti_renwu2_32bits.png#0 0 142 64"   onclose="ClosePage">
+<kp:window name="iframe" width="960" height="580" icon="Texture/Aries/Creator/keepwork/Quest/biaoti_renwu2_32bits.png#0 0 142 64"   onclose="ClosePage">
     <div style="color:#ffffff;width:960;height:630px" class="kp_window_container">
         <!-- <div style="color: #101010;margin-left: 15px;margin-top: 12px;width: 661px;height: 23px; background: Texture/Aries/Creator/keepwork/Quest/zi_renwu_661X23_32bits.png#0 0 661 23;"></div> -->
         <pe:if condition='<%=IsNotTask()%>'>
@@ -126,11 +144,10 @@ end
                             </pe:if>
                             <div style="width: 360px; height:90px; float: left;">
                                 <div style="width: 360px; height:45px;">
-                                    <div style="base-font-size:20px; font-size:20px; margin-left: 45px; margin-top: 16px;color:#000000;float: left;font-weight: bold;"><%=Eval("name") %></div>
-                                    
+                                    <div style="width: 360px;base-font-size:20px; font-size:20px; margin-left: 45px; margin-top: 16px;color:#000000;float: left;font-weight: bold;"><%=Eval("name") %></div>
                                 </div>
                                 
-                                <div style="base-font-size:14px; font-size:14px; margin-left: 44px; margin-top: 2px;color:#000000;font-weight: bold;"><%=Eval("task_desc") %></div>
+                                <div style="base-font-size:14px; font-size:14px; margin-left: 50px; margin-top: 2px;color:#000000;font-weight: bold;"><%=Eval("task_desc") %></div>
                             </div>
 
                             <div style="width: 400px; height:90px; float: left;">
@@ -150,13 +167,22 @@ end
 
                                                 <div style="width: 60px; height: 60px; background: Texture/Aries/Creator/keepwork/Quest/wupingdi_60X60_32bits.png#0 0 40 40;">
                                                     <!-- <img style="margin-top: 12px;margin-left: 12px; position: relative;" src='<%=GetGiftItemIcon(Eval("goods")) %>' width="36" height="36"/> -->
-                                                    <pe:if condition = '<%=IsRoleModel(Eval("goods"))%>'>
-                                                        <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 3px;margin-left: 12px; position: relative; width:72px;height:72px;"/>
+                                                    <div zorder="1" tooltip='<%=GetItemDesc(XPath("this"))%>' style="width: 60px; height: 60px; position: relative;"></div>
+                                                    <pe:if condition = '<%=IsShowExpIcon(XPath("this"))%>'>
+                                                        <div style="width: 56px;height: 50px; margin-top: 10px;margin-left: 12px; position: relative;background: Texture/Aries/Creator/keepwork/Quest/wuping_EXP2_37X37_32bits.png#0 0 56 50;"></div>
+                                                        <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("exp") %></div>
                                                     </pe:if>
-                                                    <pe:if condition = '<%=not IsRoleModel(Eval("goods")) %>'>
-                                                        <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 12px;margin-left: -3px; position: relative; width:72px;height:36px;"/>
+                                                    <pe:if condition = '<%=not IsShowExpIcon(XPath("this"))%>'>
+                                                        <pe:if condition = '<%=IsRoleModel(Eval("goods"))%>'>
+                                                            <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 3px;margin-left: 12px; position: relative; width:72px;height:72px;"/>
+                                                        </pe:if>
+                                                        <pe:if condition = '<%=not IsRoleModel(Eval("goods")) %>'>
+                                                            <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 12px;margin-left: -5px; position: relative; width:72px;height:36px;"/>
+                                                        </pe:if>
+                                                        <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount") %></div>  
                                                     </pe:if>
-                                                    <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount") %></div>                                                    
+                                                    
+                                                    
                                                 </div>
                                             </Columns>
                                             <EmptyDataTemplate>
@@ -171,7 +197,7 @@ end
                                     <div style="margin-top: 40px;margin-left: 50px; width: 61px;height: 18px;background:Texture/Aries/Creator/keepwork/Quest/zi_daiwancheng_61X18_32bits.png#0 0 61 18;"></div>
                                 </pe:if>
                                 <pe:if condition = '<%=Eval("task_state") == 1%>'>
-                                    <input type="button" value="领取" onclick="GetReard" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54)" />
+                                    <input type="button" value="领取" onclick="GetReward" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54)" />
                                 </pe:if>
                                 <pe:if condition = '<%=Eval("task_state") == 2%>'>
                                     <div style="margin-top: 18px;margin-left: 50px; width: 60px;height: 58px;background:Texture/Aries/Creator/keepwork/Quest/yiwancheng_60X58_32bits.png#0 0 60 58;"></div>
@@ -189,10 +215,11 @@ end
              </pe:gridview>
          </div>
 
-         <!-- <div style="margin-left: 10px;margin-top: 0px; width:926px;height: 130px; background: Texture/Aries/Creator/keepwork/Quest/tiao_926X130_32bits.png#0 0 926 130;">
+         <div style="margin-left: 10px;margin-top: 0px; width:926px;height: 130px; background: Texture/Aries/Creator/keepwork/Quest/tiao_926X130_32bits.png#0 0 926 130;">
             <div style="margin-left:158px;margin-top:84px; position: relative; width: 697px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div>
-            
-            <div style="margin-left:158px;margin-top:84px;position: relative;">
+            <!-- <div style="margin-left:850px;margin-top:84px; position: relative; width: 60px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div> -->
+
+            <!-- <div style="margin-left:158px;margin-top:84px;position: relative;">
                 <pe:progressbar name="expbar" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
                 style="width:697px;height:10px;" miniblockwidth="15"
                 blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
@@ -200,17 +227,19 @@ end
                 />
             </div>
 
-            <div style="margin-left:850px;margin-top:84px; position: relative; width: 60px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div>
             <div style="margin-left:850px;margin-top:84px;position: relative;">
                 <pe:progressbar name="expbar2" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
                 style="width:60px;height:10px;" miniblockwidth="15"
                 blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
                 background=""
                 />
+            </div> -->
+            <div style="position: relative;">
+                <pe:label name="exp_desc" value="0" style="width: 50px;height: 50px; position: relative;margin-top:80px;margin-left: 35px;color: #000000; font-size: 30px; base-font-size:30px;text-align: center;"/>
             </div>
-        
+            
             <div type ="box" style="width:774px;height:180px;margin-left: 158px;margin-top: 7px; position: relative;">
-                <pe:gridview style="margin:0px;width:774px;height:180px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "0" 
+                <pe:gridview style="margin:0px;width:774px;height:180px;float:left" RememberScrollPos="true" name="gift_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "0" 
                     DataSource='<%=GiftDsItem%>'>
                     <Columns>
                             <div style="color:#ffffff;width: 140px;height: 110px;float: left;">
@@ -226,18 +255,11 @@ end
                                         width: 55px;height: 56px;background: ;" />
                                     </pe:if>
 
-                                    <pe:if condition = '<%=Eval("is_get") %>'>
+                                    <pe:if condition = '<%=Eval("state") == 2%>'>
                                         <div style="position:relative;margin-top: 47px;margin-left: 23px; width: 22px; height:22px;; background: Texture/Aries/Creator/keepwork/Quest/dagou_22X22_32bits.png#0 0 22 22;"></div>
                                     </pe:if>
                                     
-                                    <pe:if condition = '<%=Eval("is_catch") %>'>
-                                        <div style="margin-top: 69px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                                    </pe:if>
-                                    <pe:if condition = '<%=not Eval("is_catch") %>'>
-                                        <div style="margin-top: 69px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan2_24X24_32bits.png#0 0 24 24;"></div>
-                                    </pe:if>
-                                    
-                                    
+                                    <div style="margin-top: 69px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan2_24X24_32bits.png#0 0 24 24;"></div>                                    
                                     <img style="margin-top: 3px;margin-left: 1px;" src='<%=Eval("number_img") %>'width="23" height="12"/>
                                </div>
    
@@ -248,7 +270,19 @@ end
                     <EmptyDataTemplate>
                     </EmptyDataTemplate>
                 </pe:gridview>
-            </div> -->
+            </div>
+
+            <pe:container name="pro" ClickThrough="true" style="width:705px;height:30px;margin-left:159px;margin-top:72px;position: relative;background:;" SelfPaint="true">
+                <div style="position: relative;margin-top:5px;">
+                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                </div>
+                <div style="margin-left: -1px; margin-top: 12; width:697px;height:10px;background: url(Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png#0 0 32 10: 7 4 7 4);">
+                </div>
+            </pe:container>
         </div>
      </div>
 </kp:window>

@@ -13,9 +13,9 @@ EditCodePage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditCodePage");
 EditCodePage.OnInit();
 
 ]]></script>
-<aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" onclose="EditCodePage.OnClose()">
+<aries:window mode="thin" title='<%=EditCodePage.GetTitle()%>' style="width:360px;" uiname_onclose="EditCodePage.OnClose" onclose="EditCodePage.OnClose()">
     <div style="height: 320px; margin-right: 4px; margin-left: -4px; padding: 5px;" class="mc_paper_panel" width="100%" >
-        <textarea language="npl" name="content" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
+        <textarea language="npl" uiname="EditCodePage.content" name="content" verticalscrollbarstep="40" rows="15" ShowLineNumber="true" UseSystemControl="true" style="background:;color:#ffffff" syntax_map="NPL"></textarea>
     </div>
    <div style="margin-top:5px;padding-bottom:10px;">
         <pe:if condition='<%=GameLogic.GameMode:CanEditBlock() %>'>
@@ -24,12 +24,12 @@ EditCodePage.OnInit();
                     <%=EditCodePage.GetScriptFileName()%>
                 </div>
                 <!--<input type="button" name="edit" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickEdit" value='<%=L"编辑"%>' />-->
-                <input type="button" name="save" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickSave" value='<%=L"保存并关闭"%>' />
+                <input type="button" uiname="EditCodePage.save" name="save" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnClickSave" value='<%=L"保存并关闭"%>' />
             </div>
-            <input type="button" name="changefile" style="margin-left:5px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnCreateNewFile" value='<%=L"新建/更改"%>' />
+            <input type="button" uiname="EditCodePage.changefile" name="changefile" style="margin-left:5px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditCodePage.OnCreateNewFile" value='<%=L"新建/更改"%>' />
         </pe:if>
         <pe:if condition='<%=not GameLogic.GameMode:CanEditBlock() %>'>
-            <input type="button" name="close" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"关闭"%>' />
+            <input type="button" uiname="EditCodePage.close" name="close" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"关闭"%>' />
         </pe:if>
     </div>
 </aries:window>

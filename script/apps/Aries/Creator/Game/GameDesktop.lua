@@ -436,7 +436,8 @@ function Desktop.OnExit(bForceExit, bRestart)
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
 				callback = function(res)
 					Desktop.is_exiting = false;
-					if(res and res == _guihelper.DialogResult.Yes) then
+
+					if (res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
 						if (not System.options.isCodepku) then
 							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
@@ -445,7 +446,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 						else
 							Desktop.ForceExit(bRestart);
 						end
-					elseif(res and res == _guihelper.DialogResult.No) then
+					elseif (res and res == _guihelper.DialogResult.No) then
 						if (not System.options.isCodepku) then
 							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 								ParaWorldLoginAdapter:EnterWorld(true);
@@ -453,6 +454,12 @@ function Desktop.OnExit(bForceExit, bRestart)
 						else
 							Desktop.ForceExit(bRestart);
 						end
+					elseif (res and res == _guihelper.DialogResult.Cancel) then
+						Desktop.is_exiting = true;
+
+						commonlib.TimerManager.SetTimeout(function()
+							Desktop.is_exiting = false;
+						end, 3000)
 					end
 				end
 			};

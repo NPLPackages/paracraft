@@ -8,7 +8,7 @@ function ClosePage()
     _guihelper.OnMessageBoxClick("Cancel");
 end
 ]]></script>
-<aries:window  mode="thin" style="width:340px" title='<%= (_guihelper.values.options.title or L"信息") %>' onclose="ClosePage">
+<aries:window  mode="thin" style="width:340px" title='<%= (_guihelper.values.options.title or L"信息") %>' uiname_onclose="DefaultMessageBox.ClosePage" onclose="ClosePage">
   <div style="padding:5px;width:330px;color:#cccccc">
         <pe:if condition='<%=type(_guihelper.values.icon)=="string"%>'>
             <img style="margin-right:5px;width:24px;height:24px;" src='<%=_guihelper.values.icon%>'/>
@@ -35,37 +35,37 @@ end
   <pe:if condition='<%=_guihelper.values.buttons~=_guihelper.MessageBoxButtons.Nothing%>'>
     <div style="padding:5px;padding-bottom:10px;">
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel%>'>
-          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:72px;margin-top:5px;width:90px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%=L"确定"%>' style="margin-left:72px;margin-top:5px;width:90px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK%>'>
-          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="OK" value='<%=L"确定"%>' style="margin-left:125px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%=L"确定"%>' style="margin-left:125px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNo%>'>
-          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="mc_big_button" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.Yes" name="Yes" value='<%=L"是"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_big_button" uiname="DefaultMessageBox.No" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNoCancel%>'>
-            <input type="button" class="mc_big_button" hotkey="DIK_RETURN" name="Yes" value='<%=L"是"%>' style="margin-left:20px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
-            <input type="button" class="mc_big_button" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
-            <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="mc_big_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.Yes" name="Yes" value='<%=L"是"%>' style="margin-left:20px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="mc_big_button" uiname="DefaultMessageBox.No" name="No" value='<%=L"否"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.AbortRetryIgnore%>'>
-        <input type="button" class="mc_big_button" name="Abort" value='<%=L"终止"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="mc_big_button" name="Retry" value='<%=L"重试"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="mc_big_button" name="Ignore" value='<%=L"忽略"%>' style="margin-left:25px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Abort" name="Abort" value='<%=L"终止"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Retry" name="Retry" value='<%=L"重试"%>' style="margin-left:5px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Ignore" name="Ignore" value='<%=L"忽略"%>' style="margin-left:25px;width:100px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.RetryCancel%>'>
-        <input type="button" class="mc_big_button" name="Retry" value='<%=L"重试"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
-        <input type="button" class="mc_big_button" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Retry" name="Retry" value='<%=L"重试"%>' style="margin-left:72px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="mc_big_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:15px;margin-top:5px;width:90px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel%>'>
-          <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="mc_light_grey_button_with_fillet" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_light_grey_button_with_fillet" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
       <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right%>'>
-          <input type="button" class="mc_light_grey_button_with_fillet" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
-          <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_light_grey_button_with_fillet" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:72px;margin-top:5px;width:90px;height:28px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="mc_yellow_button_with_fillet" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:15px;margin-top:5px;width:90px;height:28px;" onclick="_guihelper.OnMessageBoxClick()"/>
       </pe:if>
     </div>
   </pe:if>

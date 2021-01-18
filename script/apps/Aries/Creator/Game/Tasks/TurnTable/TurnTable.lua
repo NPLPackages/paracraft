@@ -9,7 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TurnTable/TurnTable.lua").Sho
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
-
+local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local TurnTable = NPL.export();
 commonlib.setfield("MyCompany.Aries.Creator.Game.Tasks.TurnTable", TurnTable);
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
@@ -21,7 +22,7 @@ TurnTable.RewardData = {
     {exid = 30004, probility = 40, value = 0, bean_num = 10},
     {exid = 30006, probility = 12, value = 0, bean_num = 30},
     {exid = 30008, probility = 2, value = 0, bean_num = 50},
-    {exid = 0, probility = 15, value = 0, bean_num = "明天再来"},
+    {exid = 0, probility = 15, value = 0, bean_num = "明天再来", exp = 20},
     {exid = 30007, probility = 6, value = 0, bean_num = 40},
     {exid = 30005, probility = 25, value = 0, bean_num = 20},
     
@@ -242,7 +243,8 @@ function TurnTable.MotionFinish()
             local callback = function()
                 GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.turnable')
                 if exid == 0 then
-                    GameLogic.AddBBS(nil, "很遗憾没有抽中奖励，别灰心，明天还可以再来哦");
+                    local desc = string.format("恭喜你抽中%s探索力", TurnTable.DrawData.exp)
+                    GameLogic.AddBBS(nil, desc);
                 else
                     local desc = string.format("恭喜你抽中%s知识豆", TurnTable.DrawData.bean_num)
                     GameLogic.AddBBS(nil, desc);
@@ -253,7 +255,21 @@ function TurnTable.MotionFinish()
             end
     
             if exid == 0 then
-                callback()
+                if QuestPage.IsVisible() then
+                    QuestPage.RefreshData()
+                end
+                
+                QuestAction.AddExp(TurnTable.DrawData.exp, function()
+                    if QuestPage.IsVisible() then
+                        local exp = QuestAction.GetExp()
+                        QuestPage.ProgressToExp(true, exp)
+                        QuestPage.HandleGiftData()
+                        QuestPage.OnRefreshGiftGridView()
+                    end
+
+                    callback()
+                end)
+                
             else
                 KeepWorkItemManager.DoExtendedCost(exid, callback);
             end

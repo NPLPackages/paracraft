@@ -30,13 +30,13 @@ end
 <div style="padding:5px;padding-bottom:10px;max-width:400px;" class="mc_panel">
     <div>
         <div style="margin-left:8px;" class="default">
-            <input type="button" tooltip='<%=L"关闭"%>' name="cancel" DefaultButton="true" align="left" style="margin-right:5px;width:24px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='X' />
+            <input type="button" tooltip='<%=L"关闭"%>' uiname="CreateNewItem.cancel" name="cancel" DefaultButton="true" align="left" style="margin-right:5px;width:24px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='X' />
             <%=L"新建物品"%>
         </div>
         <pe:repeat DataSource="<%=CreateNewItem.itemStackArray%>">
             <pe:repeatitem>
                 <div style="float:left;margin-left:8px;margin-top:4px;" class="mc_item">
-                    <pe:mc_block block_id='<%=Eval("id")%>' onclick="OnSelectItem" style="margin:1px;width:32px;height:32px;"></pe:mc_block>
+                    <pe:mc_block uiname='<%="CreateNewItem.block_"..Eval("id")%>' block_id='<%=Eval("id")%>' onclick="OnSelectItem" style="margin:1px;width:32px;height:32px;"></pe:mc_block>
                 </div>
             </pe:repeatitem>
         </pe:repeat>

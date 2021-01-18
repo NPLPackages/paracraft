@@ -52,8 +52,13 @@ function KeepWorkStackableItemPage.InitData(data)
 	
 	local rule = item_data.rule or {}
 	local exchange_costs = rule.exchangeCosts or {}
-	local gid = exchange_costs[1] and exchange_costs[1].id or 0
-	is_cost_bean = bean_gid == gid
+
+	if exchange_costs[1] and exchange_costs[1].id then
+		is_cost_bean = bean_gid == exchange_costs[1].id
+	end
+	if exchange_costs[1] and exchange_costs[1].gsId then
+		is_cost_bean = bean_gsid == exchange_costs[1].gsId
+	end
 	
 	local gsid = 10;
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
@@ -76,8 +81,8 @@ function KeepWorkStackableItemPage.GetBuyDesc1()
 	local result_price = price * buy_num
 	local good_name = item_data.name
 
-	local id = exchange_costs[1] and exchange_costs[1].id or 0
-	local cost_data = KeepWorkItemManager.GetItemTemplateById(id) or {}
+	-- local id = exchange_costs[1] and exchange_costs[1].gsId or 0
+	local cost_data = KeepWorkStackableItemPage.GetItemTemplate(exchange_costs[1]) or {}
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(cost_data.gsId)
 	local my_money = copies and copies or 0
 
@@ -107,8 +112,8 @@ function KeepWorkStackableItemPage.IsEnough()
 	local price = exchange_costs[1] and exchange_costs[1].amount or 0
 	local result_price = price * buy_num
 
-	local id = exchange_costs[1] and exchange_costs[1].id or 0
-	local cost_data = KeepWorkItemManager.GetItemTemplateById(id) or {}
+	-- local id = exchange_costs[1] and exchange_costs[1].gsId or 0
+	local cost_data = KeepWorkStackableItemPage.GetItemTemplate(exchange_costs[1]) or {}
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(cost_data.gsId)
 	local my_money = copies and copies or 0
 
@@ -221,8 +226,8 @@ function KeepWorkStackableItemPage.OnOK()
 	local result_price = price * buy_num
 	
 	-- 判断是否不够钱
-	local id = exchange_costs[1] and exchange_costs[1].id or 0
-	local cost_data = KeepWorkItemManager.GetItemTemplateById(id) or {}
+	-- local id = exchange_costs[1] and exchange_costs[1].gsId or 0
+	local cost_data = KeepWorkStackableItemPage.GetItemTemplate(exchange_costs[1]) or {}
 	local cost_name = cost_data.name or ""
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(cost_data.gsId)
 	local my_money = copies and copies or 0
@@ -382,8 +387,8 @@ end
 function KeepWorkStackableItemPage.canChooseNums()
 	local rule = item_data.rule or {}
 	local exchange_targets = rule.exchangeTargets or {}
-	local id = exchange_targets[1] and exchange_targets[1].goods[1].id or 0
-	local cost_item_data = KeepWorkItemManager.GetItemTemplateById(id) or {}
+	local data = exchange_targets[1] and exchange_targets[1].goods[1] or {}
+	local cost_item_data = KeepWorkStackableItemPage.GetItemTemplate(data) or {}
 
 	if cost_item_data.max and cost_item_data.max > 1 then
 		return true
@@ -474,4 +479,14 @@ function KeepWorkStackableItemPage.requestOrderResult()
 		
 		end
 	end)
+end
+
+function KeepWorkStackableItemPage.GetItemTemplate(item)
+	if item.gsId then
+		return KeepWorkItemManager.GetItemTemplate(item.gsId)
+	end
+
+	if item.id then
+		return KeepWorkItemManager.GetItemTemplateById(item.id)
+	end
 end

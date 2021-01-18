@@ -226,6 +226,41 @@ end
 function BlockTemplate:LoadTemplate()
 	local filename = self.filename;
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+
+	if (self.opaque) then
+		local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+
+		if(node and node[1]) then
+			local blocks = NPL.LoadTableFromString(node[1]);
+			for key, item in ipairs(blocks) do
+				if (item and item[4] == 0) then
+					item[4] = 10
+				elseif (item and item[4] ~= 0 and item[4] ~= 10) then
+					local beExist = false
+
+					if (item and type(item[4]) == 'number') then
+						for iKey, iItem in ipairs(ItemClient.GetBlockDS()) do
+							if (iItem and iItem.block_id == item[4]) then
+								beExist = true;
+								break;
+							end
+						end
+					end
+
+					if (not beExist) then
+						item[5] = item[4] % 4096;
+						item[4] = 10;
+					end
+				end
+			end
+			
+			xmlRoot[1][1][1] = commonlib.serialize(blocks)
+		end
+	end
+
 	if(not self:LoadTemplateFromXmlNode(xmlRoot, filename)) then
 		LOG.std(nil, "warn", "BlockTemplate", "failed to load template from file: %s", filename);
 	else

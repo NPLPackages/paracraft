@@ -165,6 +165,8 @@ function MiniWorldUserInfo.OnClickStar()
 			starCount = starCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
+
+			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
 		end
 	end);
 end

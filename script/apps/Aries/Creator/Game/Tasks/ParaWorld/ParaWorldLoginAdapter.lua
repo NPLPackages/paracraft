@@ -38,11 +38,16 @@ ParaWorldLoginAdapter.ids = {
     RELEASE = { 
         1296, -- paracraft 主城
         -- 1192, -- 精彩佛山
-        --1236, --希望空间 
+        --1236, --希望空间
     },
     LOCAL = {
         1412, -- paracraft 主城
     },
+}
+
+ParaWorldLoginAdapter.campIds = {
+    ONLINE = 41570,
+    RELEASE = 1471,
 }
 
 ParaWorldLoginAdapter.SchoolWorldId = 20576;
@@ -59,6 +64,13 @@ function ParaWorldLoginAdapter.GetDefaultWorldID()
 end
 -- search a world id to login
 function ParaWorldLoginAdapter:SearchWorldID(callback)
+    local http_env = HttpWrapper.GetDevVersion();
+    if (System.User.isVipSchool) then
+        if(callback)then
+            callback(self.campIds[http_env]);
+        end
+        return;
+    end
     --[[
         {
           {
@@ -85,10 +97,10 @@ function ParaWorldLoginAdapter:SearchWorldID(callback)
         local world_id = ParaWorldLoginAdapter.GetDefaultWorldID();
         if(err == 200)then
             -- the first item is right world
-            if(data and data[1])then
+            if (data and data[1]) then
                 local world_info = data[1];
-                if(world_info.projectId and world_info.projectId ~= ParaWorldLoginAdapter.SchoolWorldId)then
-                    world_id =  world_info.projectId;
+                if (world_info.projectId and world_info.projectId ~= ParaWorldLoginAdapter.SchoolWorldId) then
+                    world_id = world_info.projectId;
                 end
             end
         end

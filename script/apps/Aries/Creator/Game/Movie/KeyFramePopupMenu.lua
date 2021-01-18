@@ -97,7 +97,11 @@ function KeyFramePopupMenu.ShowPopupMenu(time, var, actor)
 					end
 				end
 				if(text) then
-					node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }))
+					local uiname;
+					if(item.name and item.name~="") then
+						uiname = "KeyFramePopupMenu."..item.name
+					end
+					node:AddChild(CommonCtrl.TreeNode:new({Text = text, uiname=uiname, Name = item.name, Type = "Menuitem", onclick = nil, }))
 				end
 			end
 			ctl.height = (#itemList) * 26 + 4;

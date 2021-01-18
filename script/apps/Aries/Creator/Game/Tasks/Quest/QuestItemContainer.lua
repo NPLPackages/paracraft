@@ -13,10 +13,12 @@ NPL.load("(gl)script/ide/EventDispatcher.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItemTemplate.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItem.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestDateCondition.lua");
 local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
 local QuestItem = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestItem");
 local QuestItemContainer = commonlib.inherit(commonlib.gettable("commonlib.EventSystem"),commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestItemContainer"))
 local QuestItemTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestItemTemplate");
+local QuestDateCondition = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestDateCondition");
 QuestItemContainer.Events = {
     OnChanged = "OnChanged",
     OnFinish = "OnFinish",
@@ -28,6 +30,9 @@ function QuestItemContainer:OnInit(provider, gsid, client_data)
     self.gsid = gsid;
     self.children = {};
     self:Parse(client_data)
+    self.active_conditions = {};
+    self.parsed_active_conditions = false;
+
     return self;
 end
 function QuestItemContainer:Parse(client_data)
@@ -43,6 +48,31 @@ function QuestItemContainer:Parse(client_data)
             self:AddChild(quest_item);
         end
     end
+end
+function QuestItemContainer:ParseActiveConditions(active_conditions)
+    if(not active_conditions)then
+        return
+    end
+    if(self.parsed_active_conditions)then
+        return
+    end
+    self.parsed_active_conditions = true;
+    for k,v in ipairs(active_conditions) do
+        local type = v.type;
+        if(type == "QuestDateCondition")then
+            local condition = QuestDateCondition:new();
+            condition:Parse(v);
+            table.insert(self.active_conditions,condition);
+        end
+    end
+end
+function QuestItemContainer:IsActivated()
+    for k,v in ipairs(self.active_conditions) do
+        if(v.IsValid and not v:IsValid())then
+            return false
+        end
+    end
+    return true;
 end
 function QuestItemContainer:GetChildById(id)
     if(not id)then
@@ -125,6 +155,9 @@ function QuestItemContainer:SetValue(id, value)
     if(not id)then
         return
     end
+    if(not self:IsActivated())then
+        return
+    end
     if(self:CanFinish() or self:IsFinished())then
         return
     end
@@ -135,6 +168,12 @@ function QuestItemContainer:SetValue(id, value)
     end
 end
 function QuestItemContainer:Refresh()
+    for k,v in ipairs(self.active_conditions) do
+        if(v.Refresh)then
+            v:Refresh();
+        end
+    end
+
     for k,v in ipairs(self.children) do
         v:Refresh();
     end

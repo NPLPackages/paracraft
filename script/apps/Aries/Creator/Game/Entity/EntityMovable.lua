@@ -386,6 +386,7 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 		if(playerObj:GetField("assetfile", "") ~= assetPath) then
 			playerObj:SetField("assetfile", assetPath);
 			self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
+			self.hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(assetPath);
 		end
 		self:RefreshSkin(playerObj);
 		self:RefreshRightHand(playerObj);
@@ -400,6 +401,10 @@ function Entity:IsCustomModel()
 	return self.isCustomModel
 end
 
+function Entity:HasCustomGeosets()
+	return self.hasCustomGeosets
+end
+
 function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
 	if(player) then
@@ -408,6 +413,11 @@ function Entity:RefreshSkin(player)
 		if(self.isCustomModel) then
 			PlayerAssetFile:RefreshCustomModel(player, skin)
 			return 
+		end
+
+		if(self.hasCustomGeosets) then
+			PlayerAssetFile:RefreshCustomGeosets(player, skin);
+			return;
 		end
 
 		self.skins_ = self.skins_ or {};

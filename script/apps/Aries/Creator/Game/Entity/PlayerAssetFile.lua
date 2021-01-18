@@ -78,9 +78,16 @@ function PlayerAssetFile:LoadFromXMLFile(filename)
 							filename_to_name_map[attr.filename] = attr.name;
 							name_to_filename_map[attr.name] = attr.filename;
 						end
+						
 						if(category and not attr.hidden) then
 							category[#category+1] = attr;
 						end
+
+						local debug = ParaEngine.GetAppCommandLineByParam("debug", false);
+						if(debug =="true" and attr.isTest)then
+							category[#category+1] = attr;
+						end
+
 						if(attr.category) then
 							local category_ = self:GetCategoryItems(attr.category);
 							category_[#category_+1] = attr;
@@ -134,6 +141,10 @@ function PlayerAssetFile:IsCustomModel(filename)
 	return "character/v3/Elf/Female/ElfFemale.xml" == filename;
 end
 
+function PlayerAssetFile:HasCustomGeosets(filename)
+	return string.find(filename, "CustomGeoset") ~= nil;
+end
+
 -- mostly for haqi character
 function PlayerAssetFile:GetDefaultCCSString()
 	return "0#1#0#2#1#@0#F#0#0#0#0#0#F#0#0#0#0#9#F#0#0#0#0#9#F#0#0#0#0#10#F#0#0#0#0#8#F#0#0#0#0#0#F#0#0#0#0#@1#10001#0#3#11009#0#0#0#0#0#0#0#0#1072#1073#1074#0#0#0#0#0#0#0#0#";
@@ -151,4 +162,36 @@ end
 -- get default player scale for the given file. default to 1
 function PlayerAssetFile:GetDefaultScale(filename)
 	return default_scales[filename] or 1;
+end
+
+function PlayerAssetFile:GetDefaultCustomGeosets()
+	return "1#201#301#401#501#803#902#@1:Texture/blocks/Paperman/hair/Avatar_boy_hair_01.png;2:Texture/blocks/Paperman/body/Avatar_girl_body_xiaofu.png;3:Texture/blocks/Paperman/eye/eye1.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/Paperman/leg/Avatar_girl_leg_xiaofu.png";
+end
+
+function PlayerAssetFile:RefreshCustomGeosets(player, skin)
+	if (not skin or (not skin:match("^%d+#"))) then
+		skin = self:GetDefaultCustomGeosets();
+	end
+	local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
+	if (not geosets) then
+		geosets = skin;
+	end
+	if (geosets) then
+		local charater = player:ToCharacter();
+		local geoset;
+		for geoset in string.gfind(geosets, "([^#]+)") do
+			local id = tonumber(geoset);
+			charater:SetCharacterSlot(id / 100, id % 100);
+		end
+	end
+
+	if (textures) then
+		for id, filename in textures:gmatch("(%d+):([^;]+)") do
+			id = tonumber(id)
+			player:SetReplaceableTexture(id, ParaAsset.LoadTexture("", filename, 1));
+		end
+	end
+
+	if (attachments) then
+	end
 end

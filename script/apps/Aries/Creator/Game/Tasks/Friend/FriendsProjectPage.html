@@ -61,7 +61,6 @@ function IsItemSelect(item_index)
 end
 
 function CanClick(data)
-    print("xxxxxxxxxxxxxxxxxxxxx",data.id, FriendsProjectPage.IsFollow(data.id))
     return not FriendsProjectPage.IsFollow(data.id)
 end
 

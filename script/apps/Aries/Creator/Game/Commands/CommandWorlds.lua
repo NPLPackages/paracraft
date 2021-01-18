@@ -123,6 +123,7 @@ Commands["loadworld"] = {
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
+@param -s: slient load.
 @param -force: always use online world without checking if it is different to local.  
 @param -personal: login required. always sync online world to local folder, then enter.
 e.g.

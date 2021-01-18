@@ -36,12 +36,15 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["del"] = {
 	name="del", 
 	quick_ref="/del", 
-	desc=[[delete selected blocks
-format: /del [-below] [radius]
+	desc=[[delete selected blocks.
+e.g.
+/del 
+
+usage 2: /del [-below] [radius]
 delete all blocks below the current player's position in a radius of 256 (by default). 
 e.g.  /del -below 256
 
-format: /del -mode [real|block]
+usage 3:  /del -mode [real|block]
 e.g. whether terrain blocks are auto generated when deleting blocks. 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)

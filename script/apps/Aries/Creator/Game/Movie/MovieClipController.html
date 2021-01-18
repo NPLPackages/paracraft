@@ -56,48 +56,48 @@ function OnClickEmptySlot(mcmlNode)
 end
 
 ]]></script>
-<aries:window mode="thin" style="width:200px;" title='<%=L"电影片段"%>' onhelp="MovieClipController.OnClickHelp" onclose="MovieClipController.OnClose">
+<aries:window mode="thin" style="width:200px;" title='<%=L"电影片段"%>' onhelp="MovieClipController.OnClickHelp" uiname_onclose="MovieClipController.OnClose" onclose="MovieClipController.OnClose">
     <pe:if condition='<%=not MovieClipController.IsPlayingMode()%>'>
     <div>
         <div>
             <div class="mc_item" style="float:left;width: 34px; height: 34px;">
-                <input type="button" zorder="1" name="AddNPC" value="+" tooltip='<%=L"添加演员"%>' style="margin-left:4px;margin-top:4px;width:26px;height:26px;" class="mc_light_grey_button_with_fillet" onclick="MovieClipController.OnClickAddNPC()"/>
+                <input type="button" zorder="1" uiname="MovieClipController.AddNPC" name="AddNPC" value="+" tooltip='<%=L"添加演员"%>' style="margin-left:4px;margin-top:4px;width:26px;height:26px;" class="mc_light_grey_button_with_fillet" onclick="MovieClipController.OnClickAddNPC()"/>
             </div>
             <div class="mc_item" style="float: left; width: 34px; height: 34px;">
-                <input type="button" zorder="1" name="godview" tooltip='<%=L"主角"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="MovieClipController.OnClickGodMode()"/>
+                <input type="button" zorder="1" uiname="MovieClipController.godview" name="godview" tooltip='<%=L"主角"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="MovieClipController.OnClickGodMode()"/>
             </div>
         </div>
         <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="512">
             <Columns>
                 <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
                     <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
-                        <pe:mc_slot switchTouchButton="true" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot switchTouchButton="true" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
                 <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
                     <div class="mc_item">
-                        <pe:mc_slot switchTouchButton="true" class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot switchTouchButton="true" class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
 			</Columns>
         </pe:gridview>
     </div>
     <div style="margin-top:0px;">
-        <input type="button" name="addkeyframe" tooltip='<%=L"左键:加入关键帧(K)\n右键:锁定/解锁角色(L)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/key_off.png)" onclick="MovieClipController.OnClickAddKeyFrameButton()"/>
-        <input type="button" name="record" tooltip='<%=L"扮演录制/暂停(R)\nshift+左键:清空所有录制的动作"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/auto_off.png)" onclick="MovieClipController.OnRecord()"/>
-        <input type="button" name="settings" tooltip='<%=L"设置或修改当前角色"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="MovieClipController.OnSettings()"/>
+        <input type="button" uiname="MovieClipController.addkeyframe" name="addkeyframe" tooltip='<%=L"左键:加入关键帧(K)\n右键:锁定/解锁角色(L)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/key_off.png)" onclick="MovieClipController.OnClickAddKeyFrameButton()"/>
+        <input type="button" uiname="MovieClipController.record" name="record" tooltip='<%=L"扮演录制/暂停(R)\nshift+左键:清空所有录制的动作"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/auto_off.png)" onclick="MovieClipController.OnRecord()"/>
+        <input type="button" uiname="MovieClipController.settings" name="settings" tooltip='<%=L"设置或修改当前角色"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="MovieClipController.OnSettings()"/>
     </div>
     </pe:if>
     <div style="padding-bottom:8px;">
         <!--<input type="button" name="pause" tooltip='<%=L"暂停"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="MovieClipController.OnPause()"/>-->
-        <input type="button" name="to_begin" tooltip='<%=L"到开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/back_off.png);" onclick="MovieClipController.OnGotoBeginFrame()"/>
-        <input type="button" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="MovieClipController.OnPlay()"/>
+        <input type="button" uiname="MovieClipController.to_begin" name="to_begin" tooltip='<%=L"到开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/back_off.png);" onclick="MovieClipController.OnGotoBeginFrame()"/>
+        <input type="button" uiname="MovieClipController.play" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="MovieClipController.OnPlay()"/>
         <pe:if condition='<%=MovieClipController.IsPlayingMode()%>'>
-            <input type="button" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/rec_off.png); " onclick="MovieClipController.OnCaptureVideo()"/>
+            <input type="button" uiname="MovieClipController.record" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/rec_off.png); " onclick="MovieClipController.OnCaptureVideo()"/>
         </pe:if>
-        <input type="button" name="to_end" tooltip='<%=L"到结束"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/go_off.png); " onclick="MovieClipController.OnGotoEndFrame()"/>
+        <input type="button" uiname="MovieClipController.to_end" name="to_end" tooltip='<%=L"到结束"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/go_off.png); " onclick="MovieClipController.OnGotoEndFrame()"/>
         <!--current time display-->
-        <input type="button" name="text" enabled="false" style="margin-left:10px;margin-top:6px;width:70px;background:;font-size:14px;color:#00ff00;font-weight:bold;text-align:left;"/>
+        <input type="button" uiname="MovieClipController.text" name="text" enabled="false" style="margin-left:10px;margin-top:6px;width:70px;background:;font-size:14px;color:#00ff00;font-weight:bold;text-align:left;"/>
     </div>
 </aries:window>
 </pe:mcml>

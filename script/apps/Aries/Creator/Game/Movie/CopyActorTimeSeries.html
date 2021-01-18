@@ -11,12 +11,12 @@
 CopyActorTimeSeries = commonlib.gettable("MyCompany.Aries.Game.Movie.CopyActorTimeSeries");
 CopyActorTimeSeries.OnInit();
 ]]></script>
-<aries:window mode="thin" style="width:512px;" title='<%=L"复制关键帧"%>' onclose="CopyActorTimeSeries.OnClose">
+<aries:window mode="thin" style="width:512px;" title='<%=L"复制关键帧"%>' uiname_onclose="CopyActorTimeSeries.OnClose" onclose="CopyActorTimeSeries.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
     <pe:gridview name="nameGvw" style="height:260px;" DataSource="<%=CopyActorTimeSeries.GetDs%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="3" AllowPaging="false" pagesize="512">
         <Columns>
             <div style="float:left;height:30px;min-width:120px;color:#ffffff">
-                <input name="<%=Eval('name')%>" type="checkbox" checked="<%=Eval('checked') and 'true'%>" style="margin-top:2px;" onclick="CopyActorTimeSeries.ToggleVariable" />
+                <input name="<%=Eval('name')%>" uiname='<%="CopyActorTimeSeries.Key."..Eval("name")%>' type="checkbox" checked="<%=Eval('checked') and 'true'%>" style="margin-top:2px;" onclick="CopyActorTimeSeries.ToggleVariable" />
                 <div style="float:left;margin-left:2px;" ><%=Eval("displayName")%></div>
             </div>
     	</Columns>
@@ -24,7 +24,7 @@ CopyActorTimeSeries.OnInit();
     <div style="margin-left:200px;margin:5px;">
         <input name="isRelativePos" type="checkbox" checked="<%=CopyActorTimeSeries.isRelativePos and 'true'%>"  style="margin-top:2px;"/>
         <div style="float:left;margin-left:2px;" for="isRelativePos"><%=L"相对位置"%></div>
-        <input name="selectAll" type="checkbox" checked="<%=CopyActorTimeSeries.isSelectAll and 'true'%>"  onclick="CopyActorTimeSeries.ToggleSelect" style="margin-top:2px;margin-left:20px;"/>
+        <input name="selectAll" uiname="CopyActorTimeSeries.selectAll" type="checkbox" checked="<%=CopyActorTimeSeries.isSelectAll and 'true'%>"  onclick="CopyActorTimeSeries.ToggleSelect" style="margin-top:2px;margin-left:20px;"/>
         <div style="float:left;margin-left:2px;" for="selectAll"><%=L"全选/全取消"%></div>
     </div>
     <hr />
@@ -45,15 +45,15 @@ CopyActorTimeSeries.OnInit();
             <div style="float:left;margin-left:10px;">
                 <div>
                     <div style="float:left"><%=L"起始帧:"%></div>
-                    <input name="fromTime" value="0" style="width:60px"/>
+                    <input uiname="CopyActorTimeSeries.fromTime" name="fromTime" value="0" style="width:60px"/>
                 </div>
                 <div>
                     <div style="float:left"><%=L"结束帧:"%></div>
-                    <input name="toTime" value="" style="width:60px"/>
+                    <input uiname="CopyActorTimeSeries.toTime" name="toTime" value="" style="width:60px"/>
                 </div>
             </div>
         </div>
-        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-top:5px;margin-right:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="CopyActorTimeSeries.OnClickCopy" value='<%=L"复制"%>' />
+        <input type="button" uiname="CopyActorTimeSeries.OK"  name="OK" DefaultButton="true" align="right" style="margin-top:5px;margin-right:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="CopyActorTimeSeries.OnClickCopy" value='<%=L"复制"%>' />
     </div>
 </div>
 </aries:window>

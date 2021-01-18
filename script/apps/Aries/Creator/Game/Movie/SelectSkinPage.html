@@ -12,7 +12,7 @@ SelectSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.SelectSkinPage")
 SelectSkinPage.OnInit();
 
 ]]></script>
-<aries:window mode="thin" style="width:512px;" title='<%=L"选择皮肤"%>' onclose="SelectSkinPage.OnClose">
+<aries:window mode="thin" style="width:512px;" title='<%=L"选择皮肤"%>' uiname_onclose="SelectSkinPage.OnClose" onclose="SelectSkinPage.OnClose">
 <div style="margin-left:5px; margin-right:10px;margin-bottom: 15px; color: #ffffff;" >
     <div class="mc_paper_panel">
         <pe:gridview style="margin-top:10px;height:300px;" name="gvwSkinList" CellPadding="5" AllowPaging="false" DefaultNodeHeight="64" pagesize="500"
@@ -25,7 +25,7 @@ SelectSkinPage.OnInit();
         </pe:gridview>
     </div>
     <div style="margin-top:10px;">
-        <input type="button" name="Cancel" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="SelectSkinPage.OnClose" value='<%=L"取消"%>' />
+        <input type="button" uiname="SelectSkinPage.Cancel" name="Cancel" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="SelectSkinPage.OnClose" value='<%=L"取消"%>' />
     </div>
 </div>
 </aries:window>

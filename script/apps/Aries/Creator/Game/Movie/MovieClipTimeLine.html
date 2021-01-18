@@ -28,27 +28,27 @@ end
         <div width="100%" style='<%=format("height:%d", MovieClipTimeLine.height)%>'>
             <div style="background:url(Texture/whitedot.png);background-color:#ffffffcc">
                 <div style='<%=format("position: relative; background:; margin-left: 64px; margin-top: -%dpx; height: %dpx; width: 64px", 16, 16)%>'>
-                    <input type="button" name="actorname" value='<%=L"全局"%>' style="font-size: 11px; margin-top:0px;margin-left: 0px; background-color: #097c04; background:url(Texture/whitedot.png); text-align:center; color: #ffffff; height: 16px; width: 64px" />
+                    <input type="button" uiname="MovieClipTimeLine.actorname" name="actorname" value='<%=L"全局"%>' style="font-size: 11px; margin-top:0px;margin-left: 0px; background-color: #097c04; background:url(Texture/whitedot.png); text-align:center; color: #ffffff; height: 16px; width: 64px" />
                 </div>
                 <div style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #0000ff; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="button" zorder="1" name="varname" tooltip='<%=L"点击切换"%>' spacing="0" style='<%=format("font-size:11px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight)%>' value='<%=L"文字"%>' onclick="MovieClipTimeLine.OnClickToggleSubVariable" />
+                    <input type="button" zorder="1" uiname="MovieClipTimeLine.varname" name="varname" tooltip='<%=L"点击切换"%>' spacing="0" style='<%=format("font-size:11px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight)%>' value='<%=L"文字"%>' onclick="MovieClipTimeLine.OnClickToggleSubVariable" />
                 </div>
                 <div align="right" style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #0000ff; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="button" zorder="1" name="addOrUpdateKeyFrame" spacing="0" style='<%=format("font-size:11px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight)%>' value="+" tooltip='<%=L"添加/修改关键帧"%>' onclick="MovieClipTimeLine.OnClickAddSubFrameKey" />
+                    <input type="button" zorder="1" uiname="MovieClipTimeLine.addOrUpdateKeyFrame" name="addOrUpdateKeyFrame" spacing="0" style='<%=format("font-size:11px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight)%>' value="+" tooltip='<%=L"添加/修改关键帧"%>' onclick="MovieClipTimeLine.OnClickAddSubFrameKey" />
                 </div>
                 <pe:custom name="subFrames" width="100%" oncreate="OnCreateSubFrameCtrl" style='<%=format("margin-left:64px;margin-right:64px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>
             </div>
             <div style="background:url(Texture/whitedot.png);background-color:#000000cc">
                 <div style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #9af6aa; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="text" name="starttime" tooltip='<%=L"开始时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
+                    <input type="text" uiname="MovieClipTimeLine.starttime" name="starttime" tooltip='<%=L"开始时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
                 </div>
                 <div align="right" style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #9af6aa; margin-left: 0px; margin-top: 0px; height: %dpx; width: 64px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="text" name="endtime" tooltip='<%=L"结束时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
+                    <input type="text" uiname="MovieClipTimeLine.endtime" name="endtime" tooltip='<%=L"结束时间(秒)"%>' enable_ime="false" spacing="0" style='<%=format("background:;margin-left:0px;margin-top:-4px;height:%dpx;width:64px", MovieClipTimeLine.timelineHeight+4)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
                 </div>
                 <pe:custom name="keyframes" width="100%" oncreate="OnCreateKeyFrameCtrl" style='<%=format("margin-left:64px;margin-right:64px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>
             </div>
             <div>
-                <pe:sliderbar name="timeline" show_step_button="true" step_left_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;299 401 10 11:2 2 2 2" step_right_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;337 401 10 11:2 2 2 2"
+                <pe:sliderbar uiname="MovieClipTimeLine.timeline" name="timeline" show_step_button="true" step_left_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;299 401 10 11:2 2 2 2" step_right_button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;337 401 10 11:2 2 2 2"
                               onchange="MovieClipTimeLine.OnTimeChanged()" onclick="MovieClipTimeLine.OnClickTimeButton()" min="0" max="30000" min_step="1" value="0" style='<%=format("background:;height:%dpx;", MovieClipTimeLine.timeSliderHeight)%>' button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;310 401 26 11:3 3 3 3"
                               buttontext_color="#cccccc" buttontext_format="%d / %d" button_width="128" button_height='<%=MovieClipTimeLine.timeSliderHeight%>' EditorWidth="90" EditorFormat="%d" IsShowEditor="false" direction="horizontal" />
             </div>

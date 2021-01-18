@@ -7,6 +7,7 @@ test_sdk: only shown in sdk mode
 block_data: optional, preferred block data when created, such as those with colors
 server_data: optional, preferred server data when created. 
 icon: optional icon
+uid: unique id used in macro recording
 -->
 <blocklist>
   <category name="static" text="方块">    
@@ -256,7 +257,7 @@ icon: optional icon
     <block name="pigeon"/>
     <block name="dog"/>
     <block name="chicken"/>
-    <block name="CodeBlock" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
+    <block name="CodeBlock" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
 	</category>
 	
   <category name="gear" text="机关">

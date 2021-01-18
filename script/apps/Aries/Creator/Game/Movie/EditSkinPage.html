@@ -12,7 +12,7 @@ EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
 EditSkinPage.OnInit();
 
 ]]></script>
-<aries:window mode="thin" style="width:512px;" title='<%=L"演员的皮肤"%>' onclose="EditSkinPage.OnClose">
+<aries:window mode="thin" style="width:512px;" title='<%=L"演员的皮肤"%>' uiname_onclose="EditSkinPage.OnClose" onclose="EditSkinPage.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
     <div>
         <%=EditSkinPage.GetTitle()%>
@@ -22,20 +22,20 @@ EditSkinPage.OnInit();
         <Columns>
             <div style="height:30px;color: #ffffff;">
                 <div style="float:left;"><%=format(L"皮肤编号 %d:", Eval("id"))%></div>
-                <div style="float:left;margin-left:5px;width:250px"><input type="text" style="height:23px;" name='<%=Eval("id")%>' value='<%=Eval("filename")%>' onchange="EditSkinPage.OnChangeFilename"/></div>
-                <input type="button" name='<%=Eval("id")%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;min-width:20px;" value="..." onclick="EditSkinPage.OnClickOpenTexture" />
+                <div style="float:left;margin-left:5px;width:250px"><input type="text" style="height:23px;" uiname='<%="EditSkinPage.text."..Eval("id")%>' name='<%=Eval("id")%>' value='<%=Eval("filename")%>' onchange="EditSkinPage.OnChangeFilename"/></div>
+                <input type="button" uiname='<%="EditSkinPage.open."..Eval("id")%>' name='<%=Eval("id")%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;min-width:20px;" value="..." onclick="EditSkinPage.OnClickOpenTexture" />
                 <pe:if condition='<%=Eval("hasSkin") == true%>'>
-                    <input type="button" name='<%=Eval("id").."select"%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;" value='<%=L"选择..."%>' onclick="EditSkinPage.OnClickSelectSkin" />
+                    <input type="button" uiname='<%="EditSkinPage.select."..Eval("id")%>' name='<%=Eval("id").."select"%>' class="mc_light_grey_button_with_fillet"  style="margin-left:5px;" value='<%=L"选择..."%>' onclick="EditSkinPage.OnClickSelectSkin" />
                 </pe:if>
             </div>
         </Columns>
     </pe:gridview>
     <div style="margin-top:5px;">
-        <input type="button" onclick="EditSkinPage.OnClickHowToSkin"  value='<%=L"如何获得和制作皮肤贴图文件?"%>' class="linkbutton_yellow" />
+        <input type="button" uiname="EditSkinPage.OnClickHowToSkin" onclick="EditSkinPage.OnClickHowToSkin"  value='<%=L"如何获得和制作皮肤贴图文件?"%>' class="linkbutton_yellow" />
     </div>
     <div style="margin-top:10px;">
-        <input type="button" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditSkinPage.OnOK" value='<%=L"确定"%>' />
-        <input type="button" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditSkinPage.OnClose" value='<%=L"取消"%>' />
+        <input type="button" uiname="EditSkinPage.OK" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditSkinPage.OnOK" value='<%=L"确定"%>' />
+        <input type="button" uiname="EditSkinPage.Cancel" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditSkinPage.OnClose" value='<%=L"取消"%>' />
     </div>
 </div>
 </aries:window>

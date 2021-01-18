@@ -125,6 +125,13 @@ function pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 	end
 end
 
+function pe_mc_player.SetCustomGeosets(mcmlNode, pageInst, customGeosets)
+	if(mcmlNode.Canvas3D_ctl and customGeosets and customGeosets~="") then
+		mcmlNode.obj_params.CustomGeosets = customGeosets;
+		mcmlNode.Canvas3D_ctl:ShowModel(mcmlNode.obj_params);
+	end
+end
+
 -- on frame move: facing the mouse cursor
 function pe_mc_player.OnFrameMove(ctl, mcmlNode)
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();

@@ -49,6 +49,53 @@ function Editor:select(node)
     self.selected = node;
 	GameLogic.GetFilters():add_filter("Editor.select", self, node);
 end
+-- follow magic for user
+function Editor:createOrGetFollowMagic()
+    local name = "FollowMagic_Node"
+    local code_component_name = "FollowMagic_CodeComponent"
+    local movieclip_component_name = "FollowMagic_MovieClipComponent"
+    local parent = self.Scene.RootNode;
+    local node = parent:getChildByName(name);
+    if(not node)then
+        local node, code_component, movieclip_component = self:createBlockCodeNode(parent, name)
+        if(node and code_component and movieclip_component)then
+            code_component:setCode(
+[[registerClickEvent(function()
+    say("hello!", 2)
+
+end)
+
+local p_x,p_y,p_z = getPos("@p");
+setPos(p_x - 1,p_y,p_z - 1)
+turnTo("@p")
+anim(0)
+say("hello!", 2)
+while(true) do
+  if(((distanceTo("@p")) > (4))) then
+    turnTo("@p")
+    
+    local x,y,z = getPos();
+    local p_x,p_y,p_z = getPos("@p");
+    setPos(x,p_y,z)
+    anim(4)
+    moveForward(3, 0.5)
+  else
+    turnTo("@p")
+    anim(0)
+  end
+end
+
+]])
+            code_component.Name = code_component_name;
+            movieclip_component.Name = movieclip_component_name;
+            return node, code_component, movieclip_component;
+        end
+    else
+        code_component = node:getComponentByName(code_component_name);
+        movieclip_component = node:getComponentByName(movieclip_component_name);
+        return node, code_component, movieclip_component;
+    end
+end
 function Editor:createBlockCodeNode(parent, name)
     parent = parent or self.Scene.RootNode;
     local position_code, position_movieclip = self.pair_block_pos_allocation:getNextPairPosition();

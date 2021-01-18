@@ -371,14 +371,16 @@ function OpenAssetFileDialog.UpdateModel(modelName)
 	if(filepath) then
 		local ctl = page:FindControl("AssetPreview");
 		if(ctl) then
-			local ReplaceableTextures, CCSInfoStr;
+			local ReplaceableTextures, CCSInfoStr, CustomGeosets;
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
 				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
+				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
 			end
-			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr});
+			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets});
 
 			OpenAssetFileDialog.RefreshAnims(filepath);
 		end

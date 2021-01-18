@@ -146,6 +146,10 @@ end
 -- }
 function ActWeek.GetActState()
     local act_item = KeepWorkItemManager.GetItemTemplate(ActWeek.act_gisd)
+    if nil == act_item then
+        return ActWeek.ActState.act_end
+    end
+
     local extra = act_item.extra or {}
     
     local start_time_t = ActWeek.StringToTable(extra.act_start_time)

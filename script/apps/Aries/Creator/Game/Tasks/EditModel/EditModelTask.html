@@ -9,13 +9,13 @@ task = EditModelTask.GetInstance();
 ]]>
 </script>
 <div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:256px;height:64px", task:IsTransformMode() and "#8080ff80" or "#80808080") %>' >
-    <input name="toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" onclick="EditModelTask.OnClickToggleMode" />
+    <input name="toggleBtn" uiname="EditModelTask.toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" onclick="EditModelTask.OnClickToggleMode" />
     <pe:if condition='<%=task:IsTransformMode()%>'>
         <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
             <div style="float:left;margin-left:3px">
                 <span style="margin-left:5px;"><%=L"方向"%></span><input name="facing" type="text" style="margin-left:2px;width:30px;height:20px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
                 <span style="margin-left:5px;"><%=L"大小"%></span><input name="scale" type="text" style="margin-left:2px;width:30px;height:20px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
-                <input name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnResetModel" />
+                <input uiname="EditModelTask.resetBtn" name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnResetModel" />
             </div>
             <div><%=task:GetSelectedModel():GetModelFile()%></div>
         </pe:if>
@@ -24,7 +24,7 @@ task = EditModelTask.GetInstance();
         </pe:if>
     </pe:if>
     <pe:if condition='<%=not task:IsTransformMode()%>'>
-        <input name="changeModelBtn" value='<%=L"模型..."%>' tooltip='<%=L"Ctrl+左键选择方块与骨骼, 并保存为bmax模型"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnClickChangeModelFile" />
+        <input uiname="EditModelTask.changeModelBtn" name="changeModelBtn" value='<%=L"模型..."%>' tooltip='<%=L"Ctrl+左键选择方块与骨骼, 并保存为bmax模型"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnClickChangeModelFile" />
         <div><%=task:GetModelFileInHand()%></div>
     </pe:if>
 </div>

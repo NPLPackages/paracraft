@@ -15,13 +15,13 @@ function OnClose()
     Page:CloseWindow();
 end
 ]]></script>
-<aries:window style="width:512px;" title='<%=L"导出"%>' mode="thin" onclose="OnClose">
+<aries:window style="width:512px;" title='<%=L"导出"%>' mode="thin" uiname_onclose="ExportTask.OnClose" onclose="OnClose">
     <div style="margin:10px;color:#ffffff;font-size:14px;">
         <div><%=L"请选择你希望导出的文件类型"%></div>
         <pe:treeview style="background:;height:256px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0">
             <pe:repeat DataSource="<%=Export.GetExporterDB()%>">
                 <pe:repeatitem>
-                    <div name='<%=Eval("id")%>' onclick="Export.OnSelectExporter" style="margin:3px;" width="100%"class="mc_button_grey">
+                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style="margin:3px;" width="100%"class="mc_button_grey">
                         <pe:container zorder="1" style="background:;margin:3px;color:#000000" enabled="false">
                             <div style="font-weight:bold"><%=Eval("title")%></div>
                             <div><%=Eval("desc") or ""%></div>
@@ -31,7 +31,7 @@ end
             </pe:repeat>
         </pe:treeview>
         <div style="margin:10px;">
-            <input type="button" align="right" name="cancel" value='<%=L"取消"%>' onclick="OnClose" style="min-width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
+            <input type="button" align="right" uiname="ExportTask.Cancel" name="cancel" value='<%=L"取消"%>' onclick="OnClose" style="min-width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
         </div>
     </div>
 </aries:window>

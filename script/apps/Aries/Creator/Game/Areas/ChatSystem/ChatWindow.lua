@@ -56,6 +56,7 @@ ChatWindow.DefaultUIPos = {
 	ParentWnd = {alignment = "_lb", left = 2, top = -285, width = 700, height = 280},
 	ParentWnd_ggs_valid = {alignment = "_lb", left = 2, top = -380, width = 700, height = 280},
 }
+
 -- reset ParentWnd and EditWnd position and size
 function ChatWindow.ResetPosition(ggs_valid)
     local parent_wnd_pos_config;
@@ -134,8 +135,13 @@ function ChatWindow.InitSystem()
 
 		return msg;  -- 保证其它filter也能收到此消息
     end)
-
 end
+
+-- if we are in ggs connected game server mode, in which chating is important. 
+function ChatWindow.IsGGSMode()
+	return ChatWindow.ggs_mode;
+end
+
 
 -- show the chat log page and the edit box page
 -- @param bSetFocus: default to false. if true, the editbox will have the focus. 

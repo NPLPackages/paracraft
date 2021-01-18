@@ -10,7 +10,7 @@ SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
     <pe:gridview style="" name="gvwColorTable" CellPadding="5" DefaultNodeHeight="24" pagesize="20" ItemsPerLine="10"
                  DataSource='<%=SelectColor.GetColorList()%>'>
         <Columns>
-            <div name='<%=Eval("index")%>' style='<%=string.format("color:#ffffff;width:24px;height:24px;background-color:%s", Eval("color"))%>' onclick="SelectColor.OnClickColor"></div>
+            <div name='<%=Eval("index")%>' uiname='<%="SelectColor.Index_"..Eval("index")%>' style='<%=string.format("color:#ffffff;width:24px;height:24px;background-color:%s", Eval("color"))%>' onclick="SelectColor.OnClickColor"></div>
         </Columns>
     </pe:gridview>
 </div>

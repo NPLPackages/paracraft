@@ -669,10 +669,10 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 		['28x83'] = 19352,
 	}
 
-	-- if (classIdMapsToProjectId[id]) then
-	-- 	CommandManager:RunCommand("/loadreadonlyworld " .. classIdMapsToProjectId[id])
-	-- 	return
-	-- end
+	if (classIdMapsToProjectId[id]) then
+		CommandManager:RunCommand("/loadreadonlyworld " .. classIdMapsToProjectId[id])
+		return
+	end
 
 	-- ParaWorldLessons.StaticInit()
 	-- id = tostring(id);

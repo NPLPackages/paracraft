@@ -471,7 +471,8 @@ function CommandManager:LoadCmdHelpFile()
 						-- @note Xizhi: show both source file and xml file version if they differ and desc begins with a Chinese letter. 
 						if(cmd_class.desc~=attr.desc and cmd_class.desc) then
 							-- prepend source version
-							local src_desc = Encoding.EncodeHTMLInnerText(cmd_class.desc);
+							--local src_desc = Encoding.EncodeHTMLInnerText(cmd_class.desc);
+							local src_desc = cmd_class.desc;
 							
 							if(attr.desc and (string.byte(attr.desc, 1) or 0) > 128) then
 								cmd.desc = (src_desc or "").."\n"..attr.desc;
@@ -485,7 +486,8 @@ function CommandManager:LoadCmdHelpFile()
 						if(cmd_class.quick_ref~=attr.quick_ref and cmd_class.quick_ref) then
 							-- append xml quick ref version
 							cmd.desc = (attr.quick_ref or "").."\n"..cmd.desc;
-							cmd.quick_ref = Encoding.EncodeHTMLInnerText(cmd_class.quick_ref);
+							--cmd.quick_ref = Encoding.EncodeHTMLInnerText(cmd_class.quick_ref);
+							cmd.quick_ref = cmd_class.quick_ref;
 						else
 							cmd.quick_ref = attr.quick_ref;
 						end
@@ -542,7 +544,8 @@ function CommandManager:LoadCmdHelpFile()
 	end
 	for name, cmd in pairs(SlashCommand.slash_command_maps) do
 		if(not cmd_helps[name]) then
-			cmd_helps[name] = {name = name, quick_ref = Encoding.EncodeHTMLInnerText(cmd.quick_ref), desc = Encoding.EncodeHTMLInnerText(cmd.desc or ""), params = {}, instances = {}, }
+			--cmd_helps[name] = {name = name, quick_ref = Encoding.EncodeHTMLInnerText(cmd.quick_ref), desc = Encoding.EncodeHTMLInnerText(cmd.desc or ""), params = {}, instances = {}, }
+			cmd_helps[name] = {name = name, quick_ref = cmd.quick_ref, desc = cmd.desc or "", params = {}, instances = {}, }
 			cmd_type[#cmd_type + 1] = cmd_helps[name];
 		end
 	end

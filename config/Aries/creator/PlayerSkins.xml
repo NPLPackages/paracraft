@@ -148,6 +148,7 @@
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a001.png" />
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a002.png" />
+      <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_mask.png" />
 
     </group>
     <group name="paperman_body">

@@ -298,7 +298,7 @@ function NplBrowserLoaderPage.SetChecked(v)
 end
 function NplBrowserLoaderPage.IsLoaded()
     if (System.os.GetPlatform() == 'mac' or
-        System.os.GetPlatform() == 'android' or
+        -- System.os.GetPlatform() == 'android' or
         System.os.GetPlatform() == 'ios' ) then
         return true;
     end

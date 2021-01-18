@@ -118,10 +118,10 @@ end
                 <div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"天气设置"%></div>
                 <!--<div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>-->
                 <div>
-                    <input type="button" name="weather_sun" style="margin-left:9px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
-                    <input type="button" name="weather_cloudy" style="margin-left:11px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
-                    <input type="button" name="weather_rain" style="margin-left:14px;width:11px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
-                    <input type="button" name="weather_snow" style="margin-left:14px;width:17px;height:18px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_sun" name="weather_sun" style="margin-left:9px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_cloudy" name="weather_cloudy" style="margin-left:11px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_rain" name="weather_rain" style="margin-left:14px;width:11px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_snow" name="weather_snow" style="margin-left:14px;width:17px;height:18px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
                 </div>
                 
             </div>
@@ -130,7 +130,7 @@ end
                 <div style="margin-left:5px;margin-top:10px;">
                     <div style="float:left;margin-left:3px;margin-top:0px;width:21px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
                     <div style="float:left;margin-top:6px;width:138;height:7px;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
-                        <pe:sliderbar name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
                     </div>
                     <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
                 </div>
@@ -142,14 +142,14 @@ end
                     <pe:colorpicker tooltip='<%=L"火把等积木的颜色"%>' version="1" style="color:#cccccc"  name="NewBlockColorpicker" onchange="EnvFramePage.OnBlockColorChanged" />
                 </div>
                 <div style="margin-top:2px;">
-                    <input type="button" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="SetLightColor"/>
-                    <input type="button" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_red" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_yellow" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_green" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_light_blue" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_dark_blue" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_purple" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_white" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_black" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="SetLightColor"/>
                 </div>            
             </div>
             <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
@@ -169,7 +169,7 @@ end
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"多云"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="OnCloudnessChanged()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.cloudness" name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="OnCloudnessChanged()"></pe:sliderbar>
                     </div>
                 </div>
                 <!--<div style="margin-top:5px;">
@@ -187,13 +187,13 @@ end
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"过大会导致运行缓慢, 可以考虑使用超级远景"%>'><%=L"可视距离"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar name="renderDist" min="30" max="200" value="96" style="width:80px;height:22px;" onchange="OnRenderDistChanged()" ></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.renderDist" name="renderDist" min="30" max="200" value="96" style="width:80px;height:22px;" onchange="OnRenderDistChanged()" ></pe:sliderbar>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"摄影机不动时,会持续渲染几公里内的场景,并不消耗显存"%>'><%=L"超级远景"%></div>
                     <div style="float:left;margin-top:4px;margin-left:9px;">
-                        <pe:sliderbar name="superRenderDist" min="0" max="5000" value="96" style="width:80px;height:22px;" onchange="OnSuperRenderDistChanged()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.superRenderDist" name="superRenderDist" min="0" max="5000" value="96" style="width:80px;height:22px;" onchange="OnSuperRenderDistChanged()"></pe:sliderbar>
                     </div>
                 </div>
             </div>

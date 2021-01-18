@@ -62,6 +62,10 @@ function Game.OnStaticInit()
 	local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 	PlayerSkins:Init();
 	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+	CustomCharItems:Init();
+	
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 	local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 	SoundManager:Init();

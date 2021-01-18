@@ -8,6 +8,7 @@
 <PlayerAssets>
 <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
 <category name="common">
+  <asset filename="character/CC/02human/CustomGeoset/actor.fbx" name="customchar" displayname="测试换装人物" isTest="true" hidden="true"/>
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
   <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" school="false"/>
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
@@ -73,8 +74,12 @@
 </category>
 <category name="people">
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
+  <asset filename="character/CC/02human/CustomGeoset/actor.fbx" name="customchar" displayname="测试换装人物" isTest="true" hidden="true"/>
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
   <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
+  <asset filename="character/CC/02human/keepwork/avatar/pp.x" name="papa" displayname="帕帕" />
+  <asset filename="character/CC/02human/keepwork/avatar/lala.x" name="lala" displayname="拉拉" />
+  <asset filename="character/CC/02human/keepwork/avatar/kk.x" name="kaka" displayname="卡卡" />  
   <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
   <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
   <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
@@ -147,6 +152,10 @@
   <asset filename="character/CC/artwar/movie/spaceman.x" displayname="宇航员" name="spaceman"/> 
   <asset filename="character/CC/artwar/movie/girl_cleaner.x" displayname="女环卫工人" name="女环卫工人"/> 
   <asset filename="character/CC/artwar/movie/boy_cleaner.x" displayname="男环卫工人" name="男环卫工人"/> 
+<!--   1-14更新 -->  
+  <asset filename="character/CC/artwar/movie/bio_man.x" displayname="防疫员" name="bio_man"/> 
+  <asset filename="character/CC/artwar/movie/nurse.x" displayname="护士" name="nurse"/> 
+  <asset filename="character/CC/artwar/movie/doctor.x" displayname="医生" name="doctor"/> 
 
 
 <!--   <asset filename="character/CC/artwar/movie/boy_air_force.x" displayname="男空军" name="boy_air_force"/> 
@@ -304,7 +313,7 @@
 	<asset filename="character/v5/01human/GuGe/GuGe.x" displayname="探险家古格" name="GuGe" school="false"/>
 	<asset filename="character/v5/01human/HaqiAmbassador/HaqiAmbassador.x" displayname="哈奇大使" name="HaqiAmbassador" school="false"/>
 	<asset filename="character/v5/01human/JianDingShi/JianDingShi.x" displayname="鉴定师" name="JianDingShi" school="false"/>
-	<asset filename="character/v5/01human/Lala/lala.x" displayname="拉拉" name="lala" school="false"/>
+	<asset filename="character/v5/01human/Lala/lala.x" displayname="啦啦" name="lalela" school="false"/>
 	<asset filename="character/v5/01human/LingShouLiieRen/LingShouLiieRen.x" displayname="灵兽猎人" name="LingShouLiieRen" school="false"/>
 	<asset filename="character/v5/01human/LordMohan/LordMohan.x" displayname="莫汉勋爵" name="LordMohan" school="false"/>
 	<asset filename="character/v5/01human/MiNa/MiNa.x" displayname="米娜" name="MiNa" school="false"/>
@@ -1057,8 +1066,16 @@
   <asset filename="character/CC/artwar/furnitures/you.x" displayname="油" name="you"/>
   <asset filename="character/CC/artwar/furnitures/yundou_off.x" displayname="熨斗_安全" name="yundou_off"/>
   <asset filename="character/CC/artwar/furnitures/yundou_on.x" displayname="熨斗_危险" name="yundou_on"/>
-  <asset filename="character/CC/artwar/furnitures/zhanglang.x" displayname="蟑螂" name="zhanglang"/>
-   -->
+  <asset filename="character/CC/artwar/furnitures/zhanglang.x" displayname="蟑螂" name="zhanglang"/>   -->
+  <asset filename="character/CC/artwar/furnitures/cotton_swab.x" displayname="绵签" name="cotton_swab"/>
+  <asset filename="character/CC/artwar/furnitures/blackboard_cyan.x" displayname="黑板（绿）" name="blackboard_cyan"/>
+  <asset filename="character/CC/artwar/furnitures/blackboard_black.x" displayname="黑板（黑）" name="blackboard_black"/>
+  <asset filename="character/CC/artwar/furnitures/blackboard_white.x" displayname="黑板（白）" name="blackboard_white"/>
+  <asset filename="character/CC/artwar/furnitures/food1.x" displayname="食物1" name="food1"/>
+  <asset filename="character/CC/artwar/furnitures/food2.x" displayname="食物2" name="food2"/>
+  <asset filename="character/CC/artwar/furnitures/food3.x" displayname="食物3" name="food3"/>
+  <asset filename="character/CC/artwar/furnitures/temperature_measuring_gun.x" displayname="测温枪" name="temperature_measuring_gun"/>
+
 
 </category>
 

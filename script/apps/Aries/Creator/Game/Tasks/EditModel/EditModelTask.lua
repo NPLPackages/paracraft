@@ -182,6 +182,7 @@ function EditModelTask:handleLeftClickScene(event, result)
 	else
 		self:SetTransformMode(false);
 	end
+	event:accept();
 end
 
 function EditModelTask:handleRightClickScene(event, result)
@@ -196,6 +197,7 @@ function EditModelTask:handleRightClickScene(event, result)
 	else
 		self:SetTransformMode(false);
 	end
+	event:accept();
 end
 
 function EditModelTask:mouseMoveEvent(event)

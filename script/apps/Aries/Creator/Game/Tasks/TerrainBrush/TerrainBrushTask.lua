@@ -367,15 +367,20 @@ function TerrainBrushTask:keyPressEvent(event)
 	if(dik_key == "DIK_ADD" or dik_key == "DIK_EQUALS") then
 		-- increase radius
 		self.item:SetPenRadius(self.item:GetPenRadius()*1.1);
+		event:accept();
 	elseif(dik_key == "DIK_SUBTRACT" or dik_key == "DIK_MINUS") then
 		-- decrease radius
 		self.item:SetPenRadius(self.item:GetPenRadius()*0.9);
+		event:accept();
 	elseif(dik_key == "DIK_Z")then
 		UndoManager.Undo();
+		event:accept();
 	elseif(dik_key == "DIK_Y")then
 		UndoManager.Redo();
+		event:accept();
 	elseif(dik_key == "DIK_ESCAPE")then
 		self:OnExit();
+		event:accept();
 		return;
 	end
 	self:GetSceneContext():keyPressEvent(event);

@@ -51,8 +51,8 @@ DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },    
-    { label = L"周末活动", id = "act_week", enabled3 = true, bg= "Texture/Aries/Creator/keepwork/dock/btn2_chuangzaozhoumo_32bits.png#0 0 85 75"},
+    { label = L"", },
+    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },   
 }
 
 DockPage.show_friend_red_tip = false
@@ -98,7 +98,7 @@ function DockPage.Show()
     DockPage.CheckIsTaskCompelete()
 
     ActWeek.GetServerTime(function()
-        DockPage.page:Refresh(0)
+        DockPage.page:Refresh(1)
     end)
 end
 function DockPage.Hide()
@@ -711,5 +711,7 @@ function DockPage.CheckIsTaskCompelete()
        if(DockPage.page)then
             DockPage.page:Refresh(0.01)
        end
+
+       GameLogic.QuestAction.SetDailyTaskValue("40008_1",1)
     end, 1000)
 end

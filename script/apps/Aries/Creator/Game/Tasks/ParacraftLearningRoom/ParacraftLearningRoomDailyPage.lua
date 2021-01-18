@@ -237,9 +237,9 @@ function ParacraftLearningRoomDailyPage.ShowPage()
 	    page:CallMethod("item_gridview", "ScrollToRow", row);
     end
 
-	if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
-		GameLogic.AddBBS("desktop", L"至少需要学习20秒才能获得学习任务奖励哦~", 3000, "0 255 0"); 
-	end
+	-- if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
+	-- 	GameLogic.AddBBS("desktop", L"至少需要学习20秒才能获得学习任务奖励哦~", 3000, "0 255 0"); 
+	-- end
 end
 function ParacraftLearningRoomDailyPage.ClosePage()
 	if(page)then
@@ -395,6 +395,8 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
 					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
+
+					GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
 				end, function()
 					_guihelper.MessageBox(L"签到失败！");
 				end)

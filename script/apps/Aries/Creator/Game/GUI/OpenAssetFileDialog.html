@@ -28,15 +28,15 @@ function OnSelectAnim(treenode)
     end
 end
 ]]></script>
-<aries:window mode="thin" title='<%=L"选择一个模型"%>' style="width:680px;" onclose="OnClose">
+<aries:window mode="thin" title='<%=L"选择一个模型"%>' style="width:680px;" uiname_onclose="OpenAssetFileDialog.OnClose" onclose="OnClose">
     <div style="margin-left:0px;margin-top:5px;">
         <pe:repeat DataSource="<%=OpenAssetFileDialog.GetCategoryButtons()%>">
             <pe:repeatitem style="float:left;">
                 <pe:if condition='<%=OpenAssetFileDialog.category_index == Eval("index") %>'>
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="OpenAssetFileDialog.category_"..Eval("name")%>' name='<%=Eval("index")%>' style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
                 </pe:if>
                 <pe:if condition='<%=OpenAssetFileDialog.category_index ~= Eval("index") %>'>
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OpenAssetFileDialog.OnChangeCategory" style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="OpenAssetFileDialog.category_"..Eval("name")%>' name='<%=Eval("index")%>' onclick="OpenAssetFileDialog.OnChangeCategory" style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;min-width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
                 </pe:if>
             </pe:repeatitem>
         </pe:repeat>
@@ -46,7 +46,7 @@ end
             <div style="width:185px;height:185px;margin-bottom:5px;background-color:#00000080">
                 <pe:canvas3d name="AssetPreview" DefaultRotY="-1.57" DefaultCameraObjectDist="5" autoRotateSpeed="0.12" miniscenegraphname="AssetPreview" RenderTargetSize="256" style="width:185px;height:185px;" />
                 <div style="position:relative;margin-top:-180px;margin-left:5px;height:25px;width:180px;color:#808080;font-size:12px">
-                    <input name="btnTakeShapshot" tooltip='<%=L"生成缩略图"%>' type="button" style="margin-right:5px;margin-top:2px;width:16px;height:16px;background:url(Texture/3DMapSystem/common/page_white_camera.png)" onclick="OpenAssetFileDialog.OnTakeSnapShot"/>
+                    <input uiname="OpenAssetFileDialog.btnTakeShapshot" name="btnTakeShapshot" tooltip='<%=L"生成缩略图"%>' type="button" style="margin-right:5px;margin-top:2px;width:16px;height:16px;background:url(Texture/3DMapSystem/common/page_white_camera.png)" onclick="OpenAssetFileDialog.OnTakeSnapShot"/>
                     <%=L"面数:"%><pe:label name="PolyCount" style="margin-left:5px;margin-top:1px"></pe:label>
                 </div>
             </div>
@@ -61,13 +61,13 @@ end
         </div>
         <div style="float:left;width:450px">
             <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px;">
-                <pe:treeview ShowIcon="false" name="tvwFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetAllFiles()%>' DefaultNodeHeight="20" style="height:300px;background:;">
+                <pe:treeview ShowIcon="false" uiname="OpenAssetFileDialog.tvwFiles" name="tvwFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetAllFiles()%>' DefaultNodeHeight="20" style="height:300px;background:;">
                     <NodeTemplates>
                         <NodeTemplate DataType="file">
-                            <pe:treenode style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), math.ceil(XPath("this|filesize")/1000), XPath("this|writedate"))%>'></pe:treenode>
+                            <pe:treenode uiname='<%="OpenAssetFileDialog.sel."..XPath("this|filename")%>'  style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), math.ceil(XPath("this|filesize")/1000), XPath("this|writedate"))%>'></pe:treenode>
                         </NodeTemplate>
                         <NodeTemplate DataType="commonfile">
-                            <pe:treenode style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=XPath("this|text")%>'></pe:treenode>
+                            <pe:treenode style="height:20px;" uiname='<%="OpenAssetFileDialog.sel."..XPath("this|text")%>' indent="10" OnClick="OnSelectFile" can_select="true" text='<%=XPath("this|text")%>'></pe:treenode>
                         </NodeTemplate>
                         <NodeTemplate DataType="category">
                             <pe:treenode style="height:20px;color:#0066c8" expanded='<%=XPath("this|expanded")%>' text='<%=format("%s (%d)", XPath("this|text"), XPath("this|count") or 0)%>'></pe:treenode>
@@ -83,10 +83,10 @@ end
             <%=OpenAssetFileDialog.GetText()%>
         </div>
         <div>
-            <input type="text" enable_ime="false" name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
-            <input type="button" class="mc_light_grey_button_with_fillet" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAssetFileDialog.OnOpenAssetFileDialog"/>
-            <input type="button" name="OK" DefaultButton="true" style="margin-left:20px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OpenAssetFileDialog.OnOK" value='<%=L"确定"%>' />
-            <input type="button" name="Cancel" DefaultButton="true" style="margin-left:10px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"取消"%>' />
+            <input type="text" enable_ime="false" uiname="OpenAssetFileDialog.text" name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
+            <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAssetFileDialog.openfile" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAssetFileDialog.OnOpenAssetFileDialog"/>
+            <input type="button" uiname="OpenAssetFileDialog.OK" name="OK" DefaultButton="true" style="margin-left:20px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OpenAssetFileDialog.OnOK" value='<%=L"确定"%>' />
+            <input type="button" uiname="OpenAssetFileDialog.Cancel" name="Cancel" DefaultButton="true" style="margin-left:10px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"取消"%>' />
         </div>
     </div>
 </aries:window>

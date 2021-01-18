@@ -25,26 +25,26 @@ function GetNames()
 end
 
 ]]></script>
-<aries:window mode="thin" style="width:512px;" title='<%=L"演员的静态属性"%>' onclose="EditStaticPropertyPage.OnClose">
+<aries:window mode="thin" style="width:512px;" title='<%=L"演员的静态属性"%>' uiname_onclose="EditStaticPropertyPage.OnClose" onclose="EditStaticPropertyPage.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
     <div>
         <%=L"演员的名字:"%>
-        <select name="name" AllowUserEdit="true" style="height:25px;width:200px" DataSource="<%=GetNames()%>"></select>
+        <select uiname="EditStaticPropertyPage.name" name="name" AllowUserEdit="true" style="height:25px;width:200px" DataSource="<%=GetNames()%>"></select>
     </div>
     <div>
         <%=L"是否为全局角色:"%>
-        <select name="isAgent" AllowUserEdit="false" style="height:25px;" DataSource="<%=EditStaticPropertyPage.agentStyles%>"></select>
+        <select uiname="EditStaticPropertyPage.isAgent" name="isAgent" AllowUserEdit="false" style="height:25px;" DataSource="<%=EditStaticPropertyPage.agentStyles%>"></select>
     </div>
     <div style="color:#808080">
         <%=L"不同电影方块之间可以共享同名的全局角色,全局角色不会被删除或重复创建"%>
     </div>
     <div>
-        <input type="checkbox" name="isServer" style="margin-top:3px;" />
+        <input type="checkbox" uiname="EditStaticPropertyPage.isServer" name="isServer" style="margin-top:3px;" />
         <div for="isServer" style="float:left;margin-left:5px;"><%=L"是否同步到客户端"%></div>
     </div>
     <div style="margin-top:10px;">
-        <input type="button" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnOK" value='<%=L"确定"%>' />
-        <input type="button" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnClose" value='<%=L"取消"%>' />
+        <input type="button" uiname="EditStaticPropertyPage.OK" name="OK" DefaultButton="true" style="margin-left:260px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnOK" value='<%=L"确定"%>' />
+        <input type="button" uiname="EditStaticPropertyPage.Cancel" name="Cancel" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditStaticPropertyPage.OnClose" value='<%=L"取消"%>' />
     </div>
 </div>
 </aries:window>

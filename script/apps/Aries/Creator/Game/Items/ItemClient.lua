@@ -147,6 +147,9 @@ function ItemClient.LoadGlobalBlockList()
 						if(attr.server_data) then
 							itemDS.server_data = NPL.LoadTableFromString(attr.server_data);
 						end
+						if(attr.uid) then
+							itemDS.uid = attr.uid;
+						end
 						if(attr.icon) then
 							itemDS.icon = attr.icon;
 						end

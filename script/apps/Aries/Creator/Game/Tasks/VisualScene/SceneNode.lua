@@ -24,6 +24,17 @@ function SceneNode:ctor()
     self.index = 0;
     self.Level = 0;
 end
+-- get first component by name
+function SceneNode:getComponentByName(name)
+    if(not name)then
+        return
+    end
+    for k, v in ipairs(self.components) do
+        if(v.Name == name)then
+            return v;
+        end
+    end
+end
 function SceneNode:addComponent(component, index)
     if(not component)then
         return

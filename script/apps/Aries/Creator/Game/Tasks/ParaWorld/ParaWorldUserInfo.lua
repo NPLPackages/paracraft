@@ -27,6 +27,7 @@ local isFavorited= false;
 local favoriteCount = 0;
 local isCodeOn = true;
 local asset = "character/CC/02human/paperman/boy01.x";
+local timer;
 
 function ParaWorldUserInfo.OnInit()
 	page = document:GetPageCtrl();
@@ -73,6 +74,40 @@ function ParaWorldUserInfo.Refresh(userId)
 	if (userId == currentId) then
 		return;
 	end
+
+	if (timer) then
+		timer:Change(nil, nil)
+		timer = nil;
+	end
+
+	local times = 0
+
+	timer = commonlib.Timer:new(
+		{
+			callbackFunc = function()
+				if (times > 20) then
+					GameLogic.GetFilters():apply_filters(
+						"user_behavior",
+						1,
+						"click.world.visit_user_home",
+						{
+							homeUserId = worldParams.userId or 0,
+							userHomeName = worldParams.projectName or '',
+							userHomeProjectId = worldParams.projectId or 0
+						}
+					);
+
+					timer:Change(nil, nil);
+					return;
+				end
+
+				times = times + 1;
+			end
+		}
+	)
+
+	timer:Change(0, 1000)
+
 	currentId = userId;
 	page:Refresh(0);
 
@@ -141,6 +176,8 @@ function ParaWorldUserInfo.OnClickStar()
 			starCount = starCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
+
+			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
 		end
 	end);
 	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.home.thumbs_up");

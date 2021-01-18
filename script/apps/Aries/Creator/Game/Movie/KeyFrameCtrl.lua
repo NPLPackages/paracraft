@@ -66,8 +66,23 @@ function KeyFrameCtrl:new(o)
 
 	self.__index = self;
 	setmetatable(o, self)
+
+	if(o.uiname) then
+		CommonCtrl.AddControl(o.uiname, o)
+	end
 	return o
 end
+
+function KeyFrameCtrl:handleEvent(eventName, ...)
+	local func = self[eventName];
+	if(func) then
+		func(self, ...);
+	end
+	if(KeyFrameCtrl.__onuievent__) then
+		KeyFrameCtrl.__onuievent__(self, eventName, ...);
+	end
+end
+
 
 -- clear all objects
 function KeyFrameCtrl:clear()
@@ -132,6 +147,19 @@ function KeyFrameCtrl:intersect(time)
     return true;
 end
 
+function KeyFrameCtrl:RemoveKeyFrame(time, time_index)
+	if(self.onremove_keyframe) then
+		-- shift click to remove key
+		self.onremove_keyframe(time);
+	end
+end
+
+function KeyFrameCtrl:ClickKeyFrame(time, time_index)
+	if(self.onclick_frame) then
+		self.onclick_frame(time);
+	end
+end
+
 function KeyFrameCtrl:OnClickKeyFrame(uiobj)
 	if(uiobj) then
 		local time_index = tonumber(uiobj.name);
@@ -143,7 +171,7 @@ function KeyFrameCtrl:OnClickKeyFrame(uiobj)
 			if(time_index) then
 				if(shift_pressed and time and self.onremove_keyframe) then
 					-- shift click to remove key
-					self.onremove_keyframe(time);
+					self:handleEvent("RemoveKeyFrame", time, time_index)
 					return;
 				end
 			end
@@ -161,7 +189,7 @@ function KeyFrameCtrl:OnClickKeyFrame(uiobj)
 			else
 				-- right click to goto that frame. 
 				if(time and self.onclick_frame) then
-					self.onclick_frame(time);
+					self:handleEvent("ClickKeyFrame", time, time_index)
 				end
 			end
 		end
@@ -210,6 +238,24 @@ function KeyFrameCtrl:OnFrameMoveShifting()
 	end
 end
 
+function KeyFrameCtrl:MoveKeyFrame(new_time, shift_begin_time)
+	if(self.onmove_keyframe) then
+		self.onmove_keyframe(new_time, shift_begin_time);
+	end
+end
+
+function KeyFrameCtrl:ShiftKeyFrame(shift_begin_time, offset_time)
+	if(self.onshift_keyframe) then
+		self.onshift_keyframe(shift_begin_time, offset_time);
+	end
+end
+
+function KeyFrameCtrl:CopyKeyFrame(new_time, shift_begin_time)
+	if(self.oncopy_keyframe) then
+		self.oncopy_keyframe(new_time, shift_begin_time);
+	end
+end
+
 -- @param bIsOK:true to perform the final shift operation. otherwise cancel it. 
 function KeyFrameCtrl:OnEndShiftFrame(bIsOK)
 	if(not self.is_shifting) then
@@ -229,17 +275,11 @@ function KeyFrameCtrl:OnEndShiftFrame(bIsOK)
 		local offset_time = new_time - self.shift_begin_time;
 		
 		if(self.single_shift) then
-			if(self.onmove_keyframe) then
-				self.onmove_keyframe(new_time, self.shift_begin_time);
-			end
+			self:handleEvent("MoveKeyFrame", new_time, self.shift_begin_time)
 		elseif(self.single_copy) then
-			if(self.oncopy_keyframe) then
-				self.oncopy_keyframe(new_time, self.shift_begin_time);
-			end
+			self:handleEvent("CopyKeyFrame", new_time, self.shift_begin_time)
 		else
-			if(self.onshift_keyframe) then
-				self.onshift_keyframe(self.shift_begin_time, offset_time);
-			end
+			self:handleEvent("ShiftKeyFrame", self.shift_begin_time, offset_time)
 		end
 	end
 	self.single_shift = nil;
@@ -270,6 +310,16 @@ function KeyFrameCtrl:GetTimeFromUIObj(ui_obj)
 	if(time) then
 		return tonumber(time);
 	end
+end
+
+-- return x, y position. 
+function KeyFrameCtrl:GetXYPosByTime(time)
+	local _parent = self:GetParent();
+	local x, y, width, height = _parent:GetAbsPosition();
+	local totalTime = math.max(1, self:GetLength());
+	x = x + math.floor(((time - self:GetStartTime()) / totalTime) * (width-self.key_button_width) + self.key_button_width/2);
+	y = math.floor(y + height/2)
+	return x, y;
 end
 
 -- get time and ui_x from relative mouse position. It will automatically snap to closest key time. 
@@ -392,6 +442,12 @@ end
 
 function KeyFrameCtrl:GetParent()
 	return self.parent;
+end
+
+function KeyFrameCtrl:GetCurTimeButtonId()
+	if(self.btn_curtime) then
+		return self.btn_curtime.id
+	end
 end
 
 -- @param bSnapToGrid: [not implemented] whether to snap to closest keyframe grid. 

@@ -399,3 +399,31 @@ function Files.NotifyNetworkFileChange(filename)
 		end
 	end
 end
+
+function Files:UnloadFoldAssets(foldpath)
+	local assetManager = ParaEngine.GetAttributeObject():GetChild("AssetManager");
+	local textureManager = assetManager:GetChild("TextureManager")	
+	
+	for i=1, textureManager:GetChildCount(0) do
+		local attr = textureManager:GetChildAt(i)
+		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+			local filename = attr:GetField("name", "");
+			
+			if filename ~= "" and string.find(filename, foldpath) then
+				local ext = filename:match("%.(%w+)$");
+				-- also release http textures
+				if(not ext and filename:match("^https?://")) then
+					local localFilename = attr:GetField("LocalFileName", "")	
+					ext = localFilename:match("^temp/webcache/.*%.(%w+)$");
+				end
+				if(ext) then
+					ext = string.lower(ext)
+					if(ext == "jpg" or ext == "png" or ext == "dds") then
+						ParaAsset.LoadTexture("", filename, 1):UnloadAsset();
+						LOG.std(nil, "info", "Files", "unload unused asset file: %s", filename);
+					end
+				end	
+			end
+		end
+	end
+end

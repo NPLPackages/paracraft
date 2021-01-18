@@ -160,10 +160,6 @@ function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 		local node = MovieClipController.contextMenuActor.RootNode;
 		node:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
 		local node = node:GetChild(1);
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"选择性复制...", Name = "copySelected", Type = "Menuitem",  }));
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴", Name = "pasteSelected", Type = "Menuitem",  }));
-		node:AddChild(CommonCtrl.TreeNode:new({Text = "", Name = "", Type = "Separator",  }));
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"删除", Name = "delete", Type = "Menuitem",  }));
 	end
 	local ctl = MovieClipController.contextMenuActor
 	local node = ctl.RootNode:GetChild(1);
@@ -194,7 +190,11 @@ function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 				end
 			end
 			if(text) then
-				node:AddChild(CommonCtrl.TreeNode:new({Text = text, Name = item.name, Type = "Menuitem", onclick = nil, }))
+				local uiname;
+				if(item.name~="") then
+					uiname = "contextMenuActor."..item.name
+				end
+				node:AddChild(CommonCtrl.TreeNode:new({Text = text, uiname=uiname, Name = item.name, Type = "Menuitem", onclick = nil, }))
 			end
 		end
 		ctl.height = (#actorMenuItems) * 26 + 4;

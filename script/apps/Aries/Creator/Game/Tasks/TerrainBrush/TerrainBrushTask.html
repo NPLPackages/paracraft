@@ -11,7 +11,7 @@ task = TerrainBrushTask.GetInstance();
 <div style="padding:5px;background-color:#808080;color:#ffffff">
     <pe:repeat value="tool in TerrainBrushTask.GetTools()">
         <span style='<%=tool.name==task:GetToolName() and "background-color:#008000" %>'>
-            <input name='<%=tool.name%>' tooltip='<%=tool.tooltip%>' type="button" onclick="TerrainBrushTask.OnClickTool"
+            <input uiname='<%="TerrainBrushTask."..tool.name%>' name='<%=tool.name%>' tooltip='<%=tool.tooltip%>' type="button" onclick="TerrainBrushTask.OnClickTool"
                    style='<%=format("float:left;padding:5px;width:32px;height:32px;background:url(%s);", tool.icon)%>' />
         </span>
     </pe:repeat>

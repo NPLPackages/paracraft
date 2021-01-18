@@ -111,7 +111,16 @@ function OnClickManageTemplateWnd()
     BuildQuest.ShowPage();
 end
 
-function dummy()
+function GetBlockUIName(id, data, uid)
+    local text;
+    if(uid)then
+        text = "BuilderFramePage.block_"..uid;
+    elseif(data and data~=0) then
+        text = format("BuilderFramePage.block_%d:%d", id, data)
+    else
+        text = format("BuilderFramePage.block_%d", id)
+    end
+    return text;
 end
 ]]></script>
 <div style="">
@@ -134,11 +143,11 @@ end
     </div>
     <div style="margin-left:8px;margin-top:1px;width:240px;height:335px;color:#cccccc">
         <pe:if condition='<%=BuilderFramePage.category_name ~= "template" and BuilderFramePage.category_name ~= "playerbag"%>'>
-            <pe:gridview style="margin:0px" name="new_builder_gvwItems" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+            <pe:gridview style="margin:0px" uiname="BuilderFramePage.gridviewItems" name="new_builder_gvwItems" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block uiname = '<%=format("BuilderFramePage.block_%d", Eval("block_id"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>
