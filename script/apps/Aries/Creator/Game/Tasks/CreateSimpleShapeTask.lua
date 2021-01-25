@@ -66,9 +66,14 @@ function CreateSimpleShape:Run()
 	end
 
 	if(not x) then
-		local px, py, pz = ParaScene.GetPlayer():GetPosition();
-		local bx, by, bz = BlockEngine:block(px, py+0.1, pz);
-		x,y,z = bx, by, bz;
+		local player = EntityManager.GetPlayer()
+		if(player) then
+			x,y,z = player:GetBlockPos();
+		else
+			local px, py, pz = ParaScene.GetPlayer():GetPosition();
+			local bx, by, bz = BlockEngine:block(px, py+0.1, pz);
+			x,y,z = bx, by, bz;
+		end
 	end
 
 	if(shape == "ring") then

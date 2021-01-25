@@ -73,7 +73,6 @@ function CodeGlobals:ctor()
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
 			getn = table.getn, sort = table.sort, concat = table.concat, clear=table.clear, contains = CodeGlobals.table_contains },
 		os = { clock = os.clock, difftime = os.difftime, time = os.time, date = os.date },
-		alert = _guihelper.MessageBox, 
 		real = function(bx,by,bz)
 			return BlockEngine:real(bx,by,bz);
 		end,

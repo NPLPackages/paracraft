@@ -188,6 +188,14 @@ function env_imp:setPos(x, y, z)
 	end
 end
 
+-- same as moveTo, except that we use real coordinate in block unit
+function env_imp:setBlockPos(bx, by, bz)
+	local actor = self.actor;
+	if(actor) then
+		actor:SetBlockPos(bx, by, bz);
+	end
+end
+
 -- @param objName: nil or "self" or any actor name. if "@p" it means current player
 -- same as getX(), getY(), getZ(), except that we return real coordinate in block unit
 function env_imp:getPos(objName)

@@ -34,6 +34,7 @@ local s_env_methods = {
 	"printStack",
 	"log",
 	"echo",
+	"alert",
 	"setActorValue",
 	"getActorValue",
 	"showVariable",
@@ -58,6 +59,7 @@ local s_env_methods = {
 	"getFacing",
 	"getPos",
 	"setPos",
+	"setBlockPos",
 	-- Looks
 	"say",
 	"show",
@@ -160,8 +162,7 @@ local s_env_methods = {
     -- Looks
     "microbit_display_show",
     "microbit_display_scroll",
-    "microbit_display_clear",
-    
+	"microbit_display_clear",
 }
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 

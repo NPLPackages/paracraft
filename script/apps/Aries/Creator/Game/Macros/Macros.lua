@@ -53,11 +53,18 @@ SceneClickTrigger("shift+right",-0.19781,0.07273)
 SceneClick("shift+right",-0.19781,0.07273)
 SceneDragTrigger("ctrl+left",-0.35925,0.23271,-0.05236,0.23562)
 SceneDrag("ctrl+left",-0.35925,0.23271,-0.05236,0.23562)
-Tip("some text")
-Broadcast("globalGameEvent")
+
 SetPlaySpeed(1.25)
 SetAutoPlay(true)
 SetHelpLevel(0)
+
+loadtemplate("aaa.bmax")
+tip("some text")
+voice("text to speech")
+sound("1.mp3")
+text("bottom line big text", 5000)
+broadcast("globalGameEvent")
+
 ```
 
 ## How to make UI control recordable?
@@ -81,8 +88,11 @@ GameLogic.Macros:Play(text)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/Macro.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroVoice.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroControl.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
 local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -355,7 +365,7 @@ function Macros:AddMacro(text, ...)
 	end
 	local name = text:match("^([^%(]+)");
 	if(cameraViewMacros[name]) then
-		self:CheckAddCameraView();
+		self:CheckAddCameraView(true);
 	end
 	local macro = Macro:new():Init(text);
 	if(macro:IsValid()) then
@@ -484,12 +494,10 @@ function Macros.OnShowExitDialog(p1)
 end
 
 -- peek next macro in execution. Usually used by Idle macro to merge with triggers
--- @param nOffset: nil or 0 or 1.  if 1, it will return the next's next macro. 
+-- @param nOffset: nil or 1 or 2.  if 2, it will return the next's next macro. 
 function Macros:PeekNextMacro(nOffset)
-	if(not nOffset or nOffset == 0) then
-		return self.nextMacro;
-	elseif(nOffset == 1) then
-		return self.nextMacro1;
+	if(self.macros and self.curLine) then
+		return self.macros[self.curLine + (nOffset or 1)];
 	end
 end
 
@@ -502,13 +510,13 @@ function Macros:PlayMacros(macros, fromLine, speed)
 			Macros.SetPlaySpeed(speed);
 		end
 	end
-
+	self.macros = macros;
+	
 	while(true) do
 		local m = macros[fromLine];
 		if(m) then
 			self.isPlaying = true;
-			self.nextMacro = macros[fromLine + 1];
-			self.nextMacro1 = macros[fromLine + 2];
+			self.curLine = fromLine
 			local isAsync = nil;
 			GameLogic.GetFilters():apply_filters("Macro_PlayMacro", fromLine, macros);
 			m:Run(function()
@@ -586,7 +594,14 @@ function Macros:Tick_RecordPlayerMove()
 			--self:AddMacro("CameraLookat", lookatX, lookatY, lookatZ);
 		end
 	elseif(focusEntity and focusEntity:isa(EntityManager.EntityCamera) and not focusEntity:IsControlledExternally()) then
-		self:CheckAddCameraView();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+		local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+		local movieClip = MovieManager:GetActiveMovieClip()
+		if(movieClip and movieClip:IsPlaying() and movieClip:HasCamera()) then
+			-- do not record when movie clip is playing with a camera. 
+		else
+			self:CheckAddCameraView();	
+		end
 	end
 end
 

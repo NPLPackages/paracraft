@@ -206,6 +206,7 @@ function CodeBlockWindow:OnViewportChange()
 			if(page) then
 				CodeBlockWindow.UpdateCodeToEntity();
 				page:Rebuild();
+				CodeBlockWindow.RestoreCursorPosition()
 				GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 			end
 		end
@@ -258,7 +259,13 @@ function CodeBlockWindow.RestoreCursorPosition()
 				if(self.entity and self.entity.cursorPos) then
 					local cursorPos = self.entity.cursorPos;
 					ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
-					ctrl:GetWindow():handleActivateEvent(true);
+					ctrl:setFocus("OtherFocusReason")
+					local window = ctrl:GetWindow()
+					if(window) then
+						window.isEmulatedFocus = true;
+						window:handleActivateEvent(true);
+						window.isEmulatedFocus = nil;
+					end
 				end
 			end
 		end, 200);

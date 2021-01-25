@@ -54,7 +54,7 @@ end
 local function SetKeyEventFromButtonText(event, button)
 	-- mouse_button is a global variable
 	event.isEmulated= true;
-	event.keyname = button:match("(DIK_%w+)");
+	event.keyname = button:match("(DIK_[%w_]+)");
 	event.shift_pressed = button:match("shift") and true 
 	event.alt_pressed = button:match("alt") and true
 	event.ctrl_pressed = button:match("ctrl") and true
@@ -139,7 +139,7 @@ end
 function Macros.KeyPressTrigger(button)
 	if(button and button ~= "") then
 		local callback = {};
-		MacroPlayer.SetKeyPressTrigger(button, function()
+		MacroPlayer.SetKeyPressTrigger(button, nil, function()
 			if(callback.OnFinish) then
 				callback.OnFinish();
 			end
@@ -150,8 +150,72 @@ end
 
 function Macros.WindowKeyPressTrigger(ctrlName, button)
 	if(button and button ~= "") then
+		-- get final text in editbox
+		local nOffset = 0;
+		local targetText = "";
+		while(true) do
+			nOffset = nOffset + 1;
+			local nextMacro = Macros:PeekNextMacro(nOffset)
+			if(nextMacro and (nextMacro.name == "Idle" or nextMacro.name == "WindowKeyPressTrigger" or nextMacro.name == "WindowInputMethod" or nextMacro.name == "WindowKeyPress")) then
+				if(nextMacro.name ~= "Idle") then
+					local nextUIName = nextMacro:GetParams()[1];
+					if(nextUIName == ctrlName) then
+						if(nextMacro.name == "WindowKeyPress") then
+							local text = nextMacro:GetParams()[2];
+							if(not text or not Macros.IsButtonLetter(text)) then
+								break;
+							end
+						elseif(nextMacro.name == "WindowInputMethod") then
+							local text = nextMacro:GetParams()[2];
+							if(text) then
+								targetText = targetText..text;
+							else
+								break;
+							end
+						end
+					else
+						break;
+					end
+				end
+			else
+				break;
+			end
+		end
+		if(targetText and targetText ~= "") then
+			local nOffset = 0;
+			while(true) do
+				nOffset = nOffset - 1;
+				local nextMacro = Macros:PeekNextMacro(nOffset)
+				if(nextMacro and (nextMacro.name == "Idle" or nextMacro.name == "WindowKeyPressTrigger" or nextMacro.name == "WindowInputMethod" or nextMacro.name == "WindowKeyPress")) then
+					if(nextMacro.name ~= "Idle") then
+						local nextUIName = nextMacro:GetParams()[1];
+						if(nextUIName == ctrlName) then
+							if(nextMacro.name == "WindowKeyPress") then
+								local text = nextMacro:GetParams()[2];
+								if(not text or not Macros.IsButtonLetter(text)) then
+									break;
+								end
+							elseif(nextMacro.name == "WindowInputMethod") then
+								local text = nextMacro:GetParams()[2];
+								if(text) then
+									targetText = text..targetText;
+								else
+									break;
+								end
+							end
+						else
+							break;
+						end
+					end
+				else
+					break;
+				end
+			end
+		end
+
+
 		local callback = {};
-		MacroPlayer.SetKeyPressTrigger(button, function()
+		MacroPlayer.SetKeyPressTrigger(button, targetText, function()
 			if(callback.OnFinish) then
 				callback.OnFinish();
 			end

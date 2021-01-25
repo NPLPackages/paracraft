@@ -8,6 +8,8 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 ]]
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 
 local Keepwork = NPL.export();
@@ -52,7 +54,6 @@ end
 -- 首次登录回调
 function Keepwork:FirstLoginCallback()
     local userinfo = self:GetUserInfo();
-    
     userinfo.extra = userinfo.extra or {};
     userinfo.extra.ParacraftPlayerEntityInfo = userinfo.extra.ParacraftPlayerEntityInfo or {};
     userinfo.extra.ParacraftPlayerEntityInfo.asset = userinfo.extra.ParacraftPlayerEntityInfo.asset or "character/CC/02human/paperman/boy01.x";
@@ -69,6 +70,54 @@ function Keepwork:FirstLoginCallback()
     end);
 end
 
+function Keepwork:CheckUserQRCode()
+    local userinfo = self:GetUserInfo();
+    local wxacodes = userinfo.wxacodes or {};
+    userinfo.wxacodes = wxacodes;
+    local qrcodes = {BB = "", FY = ""};
+    userinfo.qrcodes = qrcodes;
+
+    local function download(qrcode, url)
+        local realfilename = string.format("temp/qrcodes/%s.jpg", qrcode);
+        local filename = string.format("temp/qrcodes/%s_%s.jpg", userinfo.id, qrcode)
+        local file = ParaIO.open(filename, "r");
+        if (file:IsValid()) then
+            file:close();
+            ParaIO.CopyFile(filename, realfilename, true);
+        else
+            local downloader = FileDownloader:new();
+            downloader:SetSilent();
+            downloader:Init(nil,  url, filename, function()
+                ParaIO.CopyFile(filename, realfilename, true);
+            end, "access plus 0");
+        end
+    end
+
+    for qrcode, _ in pairs(qrcodes) do
+        local exist = false;
+        for _, wxacode in ipairs(wxacodes) do
+            if (qrcode == wxacode.situation) then
+                exist = true;
+                qrcodes[qrcode] = wxacode.wxacode;
+                break;
+            end
+        end
+        if (not exist) then
+            keepwork.user.bindWxacode({
+                situation = qrcode
+            }, function(err, msg, data)
+
+                if (err == 200) then
+                    qrcodes[qrcode] = data.wxacode;
+                    download(qrcode, qrcodes[qrcode]);
+                end
+            end);
+        else
+            download(qrcode, qrcodes[qrcode]);
+        end
+    end
+end
+
 -- 用户登录成功
 function Keepwork:OnLogin()
     self.isLogin = true;
@@ -76,6 +125,8 @@ function Keepwork:OnLogin()
     if (self:IsFirstLoginParacraft()) then
         self:FirstLoginCallback();
     end
+
+    self:CheckUserQRCode();
 end
 
 -- 用户退出

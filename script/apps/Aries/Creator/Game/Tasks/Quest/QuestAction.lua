@@ -76,6 +76,13 @@ QuestAction.TaskState = {
     can_go = 3,				-- 前往
 }
 
+QuestAction.winter_camp_jion_gsid = 90004
+QuestAction.winter_camp_jion_exid = 30028
+
+QuestAction.begain_exid = 40015
+QuestAction.end_exid = 40024
+QuestAction.is_always_exist_exid = 40024
+
 function QuestAction.GetGoToWorldId(target_id)
     local template = QuestAction.GetItemTemplate(target_id);
     if(template)then
@@ -83,6 +90,14 @@ function QuestAction.GetGoToWorldId(target_id)
         
     end
 end
+
+--[[
+	desc: 用于设置任务进度
+	param:
+		id：对应兑换规则中的自定义json字符串里的id字段 如兑换规则40015中 id配置的是 40015_60011_1
+		value: 任务进度 上限是自定义字符串中 finished_value字段中配置的值
+]]
+
 function QuestAction.SetValue(id,value)
     if(not id)then
         return
@@ -90,9 +105,16 @@ function QuestAction.SetValue(id,value)
     
     QuestProvider:GetInstance():SetValue(id,value);
 end
+
+--[[
+	desc: 获取任务进度 返回SetValue过的最大值
+	param:
+		id：对应兑换规则中的自定义json字符串里的id字段
+]]
 function QuestAction.GetValue(id)
     return QuestProvider:GetInstance():GetValue(id);
 end
+
 function QuestAction.GetFinishedValue(id)
     local template = QuestAction.GetItemTemplate(id);
     if(template)then
@@ -108,6 +130,13 @@ end
 function QuestAction.FindItemById(id)
     return QuestProvider:GetInstance():FindItemById(id);
 end
+
+--[[
+	desc: 结束任务 会判断所有子任务中的value是否都已经达到配置的finished_value
+	param:
+		quest_gsid：对应兑换规则中的所配置的交换目标物品 如兑换规则40015 配置的标志物品是 60011
+]]
+
 function QuestAction.DoFinish(quest_gsid)
     if(not quest_gsid)then
         return
@@ -116,6 +145,20 @@ function QuestAction.DoFinish(quest_gsid)
     if(item)then
         item:DoFinish();
     end
+end
+--[[
+	desc: 任务是否结束
+	param:
+		quest_gsid：对应兑换规则中的所配置的交换目标物品 如兑换规则40015 配置的标志物品是 60011
+]]
+
+function QuestAction.IsFinish(quest_gsid)
+    if(not quest_gsid)then
+        return true
+    end
+    
+    local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(quest_gsid)
+    return bHas
 end
 
 function QuestAction.OpenPage(name)
@@ -425,3 +468,18 @@ function QuestAction.SetGiftState(gift_id, state)
     KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
 end
 ----------------------------------------日常任务处理/end-------------------------------------------------
+-- 是否补课界面
+function QuestAction.ShowCourseView(is_make_up)
+    QuestCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestCoursePage.lua");
+    QuestCoursePage.Show(is_make_up)
+end
+
+function QuestAction.ShowDialogPage(dialog_data, end_callback)
+    local QuestDialogPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestDialogPage.lua");
+    QuestDialogPage.Show(dialog_data, end_callback);
+end
+
+function QuestAction.IsJionWinterCamp()
+    local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(QuestAction.winter_camp_jion_gsid)
+    return bHas
+end

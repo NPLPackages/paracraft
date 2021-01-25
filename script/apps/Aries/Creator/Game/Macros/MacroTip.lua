@@ -8,6 +8,7 @@ Use Lib:
 -------------------------------------------------------
 GameLogic.Macros.Tip("some mcml text here")
 GameLogic.Macros.Broadcast("globalGameEvent")
+GameLogic.Macros.Text("bottom line big text", 5000)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
@@ -16,8 +17,6 @@ local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 
 -- @param text: mcml text, if nil, it will remove the tip. 
 function Macros.Tip(text)
-	-- TODO: show a tip 
-	-- GameLogic.AddBBS("MacroTip", text, 10000, "0 255 0");
 	MacroPlayer.ShowTip(text)
 end
 Macros.tip = Macros.Tip;
@@ -28,6 +27,13 @@ function Macros.Broadcast(msg)
 end
 Macros.broadcast = Macros.Broadcast
 
+
+-- @param text: show big one line text at the bottom, if nil, it will remove the tip. 
+-- @param duration: milli seconds. if nil, it is forever
+function Macros.Text(text, duration)
+	MacroPlayer.ShowText(text, duration)
+end
+Macros.text = Macros.Text;
 
 
 

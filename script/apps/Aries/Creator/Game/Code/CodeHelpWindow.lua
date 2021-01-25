@@ -242,12 +242,14 @@ end
 -- @param bRefreshPage: false to stop refreshing the page
 function CodeHelpWindow.OnChangeCategory(index, bRefreshPage)
     CodeHelpWindow.category_index = index or CodeHelpWindow.category_index;
-	local category = CodeHelpWindow.GetCategoryButtons()[CodeHelpWindow.category_index];
-	if(category) then
-		CodeHelpWindow.category_name = category.name;
-		CodeHelpWindow.currentItems = category_items[category.name] or {};
+	local cateButtons = CodeHelpWindow.GetCategoryButtons()
+	if(cateButtons) then
+		local category = cateButtons[CodeHelpWindow.category_index];
+		if(category) then
+			CodeHelpWindow.category_name = category.name;
+			CodeHelpWindow.currentItems = category_items[category.name] or {};
+		end
 	end
-
 	if(bRefreshPage~=false and page) then
 		page:Refresh(0.01);
 	end

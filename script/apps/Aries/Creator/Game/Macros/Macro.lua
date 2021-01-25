@@ -65,22 +65,42 @@ function Macro:CreateTriggerMacro()
 	end
 end
 
+-- nil or an array of parameters
+function Macro:GetParams()
+	if(type(self.params) == "string") then
+		self.params = NPL.LoadTableFromString("{"..self.params.."}");
+	end
+	return self.params;
+end
 
 -- @param onFinished: optional callback function when macro is finished. 
 -- @return nil if macro is finished immediately, or {} if not. 
 function Macro:Run(onFinished)
-	local function OnFinish()
+	self.OnFinish = function()
+		self.isFinished = true;
 		if(onFinished) then
 			onFinished()
 		end
+		self.OnFinish = nil;
 	end
 
+	self:RunImp();
+end
+
+-- only called when the screen size changes
+function Macro:RunAgain()
+	if(not self.isFinished and self:IsTrigger() and self.OnFinish) then
+		self:RunImp();
+	end
+end
+
+function Macro:RunImp()
+	if(not self.OnFinish) then
+		return
+	end
 	if(self:IsValid()) then
 		LOG.std(nil, "debug", "Macro:Run", "%s(%s)", self.name, self.params or "");
-		local params
-		if(self.params) then
-			params = NPL.LoadTableFromString("{"..self.params.."}");
-		end
+		local params = self:GetParams();
 		local result;
 		if(not params) then
 			result = self.func();
@@ -88,14 +108,13 @@ function Macro:Run(onFinished)
 			result = self.func(unpack(params));
 		end
 		if(type(result) == "table") then
-			result.OnFinish = OnFinish;
+			result.OnFinish = self.OnFinish;
 			return result;
 		else
-			OnFinish();
+			self.OnFinish();
 		end
 	else
-		OnFinish();
+		self.OnFinish();
 	end
 end
-
 

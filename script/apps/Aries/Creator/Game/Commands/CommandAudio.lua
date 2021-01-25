@@ -99,7 +99,7 @@ You must have internet connection to use this.
 		lang = lang or "zh";
 
 		if(cmd_text~="") then
-			local url = format("http://tts.baidu.com/text2audio?lan=%s&ie=UTF-8&spd=%d&text=%s", lang, speed, commonlib.Encoding.url_encode(cmd_text));
+			local url = format("https://tts.baidu.com/text2audio?per=1&lan=%s&ie=UTF-8&spd=%d&text=%s", lang, speed, commonlib.Encoding.url_encode(cmd_text));
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
 			local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
 			HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
@@ -118,10 +118,10 @@ Commands["sound"] = {
 	quick_ref="/sound name_or_filename [filename] [from_time] [volume:0-1] [pitch:0-1]", 
 	desc=[[play a non-loop sound by a given name. There can be only one sound playing for each name
 @param filename: filepath can be relative to current world or a http:// url. 
-/sound anyname break.ogg 0.2 1.3			play break.ogg in channel anyname
-/sound break							play a predefined sound
-/sound 1.mp3							play 1.mp3 on its own channel.
-/sound 1.mp3 10.1						play 1.mp3 from 10.1 seconds
+/sound anyname break.ogg 0.2 1.3    play break.ogg in channel anyname
+/sound break    play a predefined sound
+/sound 1.mp3    play 1.mp3 on its own channel.
+/sound 1.mp3 10.1    play 1.mp3 from 10.1 seconds
 /sound http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)

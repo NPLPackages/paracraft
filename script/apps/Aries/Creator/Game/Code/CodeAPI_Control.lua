@@ -123,3 +123,31 @@ function env_imp:runForActor(actor, mainFunc)
 	end
 end
 
+-- return after user has pressed enter key
+-- @param callbackFunc: if there is a callback function, we will display OKCancel
+-- @return nil or "OK"
+function env_imp:alert(text, callbackFunc)
+	local buttons
+	if(callbackFunc) then
+		buttons = _guihelper.MessageBoxButtons.OKCancel_CustomLabel;
+	else
+		buttons = _guihelper.MessageBoxButtons.OK_CustomLabel
+	end
+
+	local res;
+	_guihelper.MessageBox(text, self.co:MakeCallbackFuncAsync(function(result)
+		res = result;
+		env_imp.resume(self)
+	end), buttons)
+	env_imp.yield(self);
+	if(res == _guihelper.DialogResult.OK) then
+		res = "OK"
+	elseif(res == _guihelper.DialogResult.Cancel) then
+		res = "Cancel"
+	end
+
+	if(callbackFunc and res == "OK") then
+		callbackFunc(res);
+	end
+	return res;
+end

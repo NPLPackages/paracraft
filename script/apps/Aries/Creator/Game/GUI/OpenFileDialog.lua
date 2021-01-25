@@ -156,6 +156,10 @@ function OpenFileDialog.OnOK()
 	end
 end
 
+function OpenFileDialog.IsSelectedFromExistingFiles()
+	return OpenFileDialog.lastSelectedFile == OpenFileDialog.result;
+end
+
 function OpenFileDialog.GetExistingFiles()
 	return OpenFileDialog.dsExistingFiles or {};
 end
@@ -268,6 +272,9 @@ function OpenFileDialog.OnOpenFileDialog()
 		if(fileItem) then
 			if(fileItem.relativeToWorldPath) then
 				local filename = fileItem.relativeToWorldPath;
+				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+			elseif(fileItem.relativeToRootPath) then
+				local filename = fileItem.relativeToRootPath;
 				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
 			else
 				filename = filename:match("[^/\\]+$")

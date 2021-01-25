@@ -13,11 +13,12 @@ OpenFileDialog.OnInit()
 function OnClose()
     Page:CloseWindow();
 end
-
+OpenFileDialog.lastSelectedFile = nil;
 function OnSelectFile(treenode)
     local filename = treenode.mcmlNode:GetPreValue("this").filename;
     if(filename) then
-        Page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+        OpenFileDialog.lastSelectedFile = filename
+        Page:SetValue("text", commonlib.Encoding.DefaultToUtf8(OpenFileDialog.lastSelectedFile));
     end
 end
 

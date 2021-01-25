@@ -527,11 +527,11 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end
 		
-		local title = format(L"起始时间%s, 请输入动画ID或名称:", strTime);
+		local title = format(L"起始时间%s, 请选择动画ID或名称:", strTime);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
-		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-		EnterTextDialog.ShowPage(title, function(result)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
+		local ActorAnimationsDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.ActorAnimationsDialog");
+		ActorAnimationsDialog.ShowPage(assetfile, options, function(result)
 			if(result and result ~= "") then
 				result = EntityAnimation.CreateGetAnimId(result);	
 				if( type(result) == "number") then
@@ -542,8 +542,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value, "select", options);
-
+		end, title);
 	elseif(keyname == "assetfile") then
 		local title = format(L"起始时间%s, 请输入模型路经或名称(默认default)", strTime);
 

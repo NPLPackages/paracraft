@@ -172,11 +172,12 @@ Commands["savetemplate"] = {
 
 Commands["savemodel"] = {
 	name="savemodel", 
-	quick_ref="/savemodel [-auto_scale false] [-interactive|i] [modelname]", 
+	quick_ref="/savemodel [-auto_scale false] [-f] [-interactive|i] [modelname]", 
 	desc=[[save bmax model with current selection. 
 @param -auto_scale: whether or not scale model to one block size. default value is true
 @param modelname: if no name is provided, it will be "default"
 @param -interactive or -i: we will ask the user if file already exists
+@param -f: force overwrite existing file
 @return true, filename
 /savemodel test
 /savemodel -auto_scale false test
@@ -228,7 +229,7 @@ Commands["savemodel"] = {
 		end
 
 		if(options.interactive or options.i) then
-			if(ParaIO.DoesFileExist(filename)) then
+			if(not options.f and ParaIO.DoesFileExist(filename)) then
 				_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						saveModel_()

@@ -84,3 +84,7 @@ HttpWrapper.Create("keepwork.user.takevip_bycode", "%MAIN%/core/v0/promoCodes/us
 --http://yapi.kp-para.cn/project/32/interface/api/3702
 -- 获取服务器时间
 HttpWrapper.Create("keepwork.user.server_time", "%MAIN%/core/v0/keepworks/currentTime", "GET", true)
+
+-- 生成小程序码的图片
+-- http://yapi.kp-para.cn/project/32/interface/api/3772
+HttpWrapper.Create("keepwork.user.bindWxacode", "%MAIN%/core/v0/users/bindWxacode","POST",true)

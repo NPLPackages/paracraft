@@ -83,6 +83,7 @@ e.g.
 				x, y, z = GameLogic.EntityManager.GetPlayer():GetBlockPos();
 			end
 			GameLogic.Macros.SetPlayOrigin(x, y, z)
+			GameLogic.Macros.SetMacroOrigin()
 			GameLogic.Macros.SetAutoPlay(isAutoPlay);
 			GameLogic.Macros.SetHelpLevel(nHelpLevel);
 			GameLogic.Macros.SetPlaySpeed(playSpeed);

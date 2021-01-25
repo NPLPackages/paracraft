@@ -37,11 +37,14 @@ function QuestItemTemplate:ctor()
     self.custom_show = nil; -- true to custom showing label, see QuestAction.GetLabel(task_id)
     self.exp = nil;  -- exp for gift
     self.order = nil -- "order" be use to sort task
+    self.visible = nil -- be able to vis
 end
+
 function QuestItemTemplate:GetUniqueKey()
     local key = string.format("%s_%s",tostring(self.gsid), tostring(self.id));
     return key;
 end
+
 function QuestItemTemplate:GetData()
     local data = {
         exid = self.exid,
@@ -57,6 +60,7 @@ function QuestItemTemplate:GetData()
         custom_show = self.custom_show,
         exp = self.exp,
         order = self.order,
+        visible = self.visible,
     }
     return data;
 end

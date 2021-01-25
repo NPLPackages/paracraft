@@ -17,6 +17,7 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
+local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
 local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
 local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
 local DockPage = NPL.export();
@@ -51,12 +52,11 @@ DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"", },
-    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },   
+    { label = L"冬令营", id = "wintercamp", enabled3 = true, bg="Texture/Aries/Creator/keepwork/WinterCamp/btn2_donglingying_32bits.png#0 0 85 75", },  
+    { label = L"实名礼包", id = "present", enabled3 = true, bg="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#484 458 90 91", },        
 }
 
 DockPage.show_friend_red_tip = false
-
 function DockPage.Show()
     local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
     if(not KeepWorkItemManager.GetToken())then
@@ -93,13 +93,17 @@ function DockPage.Show()
         Notice.Show(0)
     end
 
+    if MacroCodeCampActIntro.CheckCanShow() then
+        MacroCodeCampActIntro.ShowView()
+    end
+
     DockPage.isShowTaskIconEffect = true
 
     DockPage.CheckIsTaskCompelete()
 
     ActWeek.GetServerTime(function()
         DockPage.page:Refresh(1)
-    end)
+    end)        
 end
 function DockPage.Hide()
     DockPage.is_show = false;
@@ -187,6 +191,8 @@ function DockPage.OnClickTop(id)
         end
     elseif (id == 'act_week') then
         ActWeek.ShowView()
+    elseif (id == 'wintercamp') then
+        MacroCodeCampActIntro.ShowView()
     end
 end
 function DockPage.OnClick(id)
@@ -479,6 +485,17 @@ function DockPage.RenderButton_3(index)
     
     if(id == "act_week") then
         if ActWeek.GetActState() == ActWeek.ActState.going then
+            return string.format([[
+                <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
+                %s
+            ]],node.id,node.bg,tip_str);
+        else
+            return ''
+        end
+    end
+
+    if(id == "wintercamp") then
+        if MacroCodeCampActIntro.CheckCanShow() then
             return string.format([[
                 <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
                 %s

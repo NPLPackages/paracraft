@@ -151,7 +151,10 @@ function Export.ExportAsBMax()
 		if(result and result~="") then
 			local filename = result;
 			local filenameUtf8 = commonlib.Encoding.DefaultToUtf8(filename);
-			local bSuccess, filename = GameLogic.RunCommand("savemodel", "-interactive \""..filenameUtf8.."\"");
+			
+			-- we will force overwrite if user selected from existing file
+			local opt = SaveFileDialog.IsSelectedFromExistingFiles() and "-f" or ""
+			local bSuccess, filename = GameLogic.RunCommand("savemodel", format("-interactive %s \"%s\"", opt, filenameUtf8));
 			if(bSuccess and filename) then
 				
 			end

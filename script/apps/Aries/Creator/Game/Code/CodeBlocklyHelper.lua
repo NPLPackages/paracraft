@@ -33,7 +33,7 @@ function CodeBlocklyHelper.SaveFiles(folder_name,categories,all_cmds)
         
     end
     CodeBlocklyHelper.WriteToFile(folder_name .. "/BlocklyExecution.js",code_generator:GetBlocklyCode());
-    CodeBlocklyHelper.WriteToFile(folder_name .. "/LanguageKeywords.json.js",code_generator:GetKeywords());
+    CodeBlocklyHelper.WriteToFile(folder_name .. "/LanguageKeywords.json",code_generator:GetKeywords());
 end
 
 function CodeBlocklyHelper.WriteToFile(filename,content)

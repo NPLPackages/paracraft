@@ -12,6 +12,7 @@ MacroPlayer.ShowPage();
 MacroPlayer.ShowController(false);
 -------------------------------------------------------
 ]]
+local Screen = commonlib.gettable("System.Windows.Screen");
 local KeyEvent = commonlib.gettable("System.Windows.KeyEvent");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -22,6 +23,79 @@ function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
 	GameLogic.GetFilters():add_filter("Macro_EndPlay", MacroPlayer.OnEndPlay);
 	GameLogic.GetFilters():add_filter("Macro_PlayMacro", MacroPlayer.OnPlayMacro);
+	Screen:Connect("sizeChanged", MacroPlayer, MacroPlayer.OnViewportChange, "UniqueConnection");
+end
+
+function MacroPlayer.OnInitEnd()
+	local KeyInput = page:FindControl("KeyInput");
+	if(KeyInput) then
+		KeyInput:SetField("CanHaveFocus", true); 
+		KeyInput:SetField("InputMethodEnabled", false); 
+		KeyInput:SetScript("onkeydown", function()
+			local event = KeyEvent:init("keyPressEvent")
+			MacroPlayer.OnKeyDown(event)
+		end);
+		KeyInput:Focus();
+	end
+	MacroPlayer.HideAll()
+	local cursorClick = page:FindControl("cursorClick");
+	if(cursorClick) then
+		cursorClick:SetScript("onmousewheel", function()
+			MacroPlayer.OnMouseWheel()
+		end);
+	end
+	
+	if(GameLogic.IsReadOnly()) then
+		MacroPlayer.ShowController(false);
+	end
+end
+
+function MacroPlayer.RefreshPage(dTime)
+	if(page) then
+		page:Refresh(dTime)
+	end
+end
+
+function MacroPlayer.OnPageClosed()
+	if(page) then
+		if(page.keyboardWnd) then
+			page.keyboardWnd:Show(false);
+			page.keyboardWnd = nil
+		end
+	end
+	if(MacroPlayer.waitActionTimer) then
+		MacroPlayer.waitActionTimer:Change();
+	end
+	if(MacroPlayer.animCursorTimer) then
+		MacroPlayer.animCursorTimer:Change();
+	end
+	if(MacroPlayer.animKeyPressTimer) then
+		MacroPlayer.animKeyPressTimer:Change();
+	end
+	if(MacroPlayer.animDragTimer) then
+		MacroPlayer.animDragTimer:Change();
+	end
+	if(MacroPlayer.autoPlayTimer) then
+		MacroPlayer.autoPlayTimer:Change();
+	end
+	if(MacroPlayer.textTimer) then
+		MacroPlayer.textTimer:Change();
+	end
+end
+
+function MacroPlayer.OnViewportChange(width, height)
+	if(page and MacroPlayer.triggerCallbackFunc) then
+		MacroPlayer.RefreshPage(0);
+		
+		if(page and page.keyboardWnd) then
+			page.keyboardWnd:Destroy();
+			page.keyboardWnd = nil;
+		end
+		local m = Macros:PeekNextMacro(0)
+		if(m and m:IsTrigger()) then
+			m:RunAgain()
+		end
+	end
 end
 
 -- @param duration: in seconds
@@ -47,29 +121,9 @@ function MacroPlayer.ShowPage()
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
+		MacroPlayer.OnPageClosed();
 		page = nil;
 	end;
-
-	local KeyInput = page:FindControl("KeyInput");
-	if(KeyInput) then
-		KeyInput:SetField("CanHaveFocus", true); 
-		KeyInput:SetScript("onkeydown", function()
-			local event = KeyEvent:init("keyPressEvent")
-			MacroPlayer.OnKeyDown(event)
-		end);
-		KeyInput:Focus();
-	end
-	MacroPlayer.HideAll()
-	local cursorClick = page:FindControl("cursorClick");
-	if(cursorClick) then
-		cursorClick:SetScript("onmousewheel", function()
-			MacroPlayer.OnMouseWheel()
-		end);
-	end
-	
-	if(GameLogic.IsReadOnly()) then
-		MacroPlayer.ShowController(false);
-	end
 end
 
 function MacroPlayer.HideAll()
@@ -77,12 +131,15 @@ function MacroPlayer.HideAll()
 	MacroPlayer.expectedKeyButton = nil;
 	MacroPlayer.expectedDragButton = nil;
 	MacroPlayer.expectedMouseWheelDelta = nil;
+	MacroPlayer.expectedEditBoxText = nil;
 	MacroPlayer.ShowCursor(false);
 	MacroPlayer.ShowKeyPress(false);
 	MacroPlayer.ShowDrag(false);
 	MacroPlayer.ShowTip()
+	MacroPlayer.ShowText()
 	MacroPlayer.ShowEditBox(false);
 	MacroPlayer.ShowMouseWheel(false);
+	MacroPlayer.ShowKeyboard(false);
 end
 
 function MacroPlayer.OnPlayMacro(fromLine, macros)
@@ -100,7 +157,6 @@ end
 function MacroPlayer.CloseWindow()
 	if(page) then
 		page:CloseWindow();
-		page = nil;
 	end
 end
 
@@ -117,9 +173,52 @@ function MacroPlayer.InvokeTriggerCallback()
 	end
 end
 
+local nStartTime = 0;
+MacroPlayer.ShowTipTime = 5000;
 function MacroPlayer.SetTriggerCallback(callback)
+	if(callback) then
+		GameLogic.AddBBS("Macro", nil);
+		if(Macros.IsShowButtonTip()) then
+			nStartTime = commonlib.TimerManager.GetCurrentTime();
+			MacroPlayer.waitActionTimer = MacroPlayer.waitActionTimer or commonlib.Timer:new({callbackFunc = function(timer)
+				if(page and MacroPlayer.triggerCallbackFunc) then
+					local elapsedTime = commonlib.TimerManager.GetCurrentTime() - nStartTime;
+					if(elapsedTime > MacroPlayer.ShowTipTime) then
+						MacroPlayer.ShowMoreTips();
+						nStartTime = commonlib.TimerManager.GetCurrentTime() + MacroPlayer.ShowTipTime;
+					end
+				else
+					timer:Change();
+				end
+			end})
+			MacroPlayer.waitActionTimer:Change(33, 33);
+		else
+			if(MacroPlayer.waitActionTimer) then
+				MacroPlayer.waitActionTimer:Change(nil);
+			end
+		end
+	else
+		if(MacroPlayer.waitActionTimer) then
+			MacroPlayer.waitActionTimer:Change(nil);
+		end
+	end
 	MacroPlayer.triggerCallbackFunc = callback;
 	MacroPlayer.Focus();
+end
+
+-- called every MacroPlayer.ShowTipTime time, when user is not responding correctly
+function MacroPlayer.ShowMoreTips()
+	if(MacroPlayer.expectedKeyButton) then
+		local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
+		if(count and count > 1) then
+			GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
+			Macros.voice("你需要同时按下2个按键")
+		end
+	end
+	if(MacroPlayer.expectedDragButton) then
+		Macros.voice("按住鼠标左键不要放手， 同时拖动鼠标到目标点")
+		GameLogic.AddBBS("Macro", format(L"按住鼠标左键不要放手， 同时拖动鼠标到目标点", count), 5000, "0 255 0");
+	end
 end
 
 local cursorTick = 0;
@@ -134,7 +233,7 @@ function MacroPlayer.AnimCursorBtn(bRestart)
 			x = x + 12;
 			y = y + 15;
 			local cursorBtn = page:FindControl("cursorBtn")
-			cursorBtn.visible = true;
+			
 
 			local mouseX, mouseY = ParaUI.GetMousePosition();
 			
@@ -146,9 +245,11 @@ function MacroPlayer.AnimCursorBtn(bRestart)
 			end
 			local diffDistance = math.sqrt((mouseX - x)^2 + (mouseY - y)^2)
 			if( diffDistance > 16 ) then
+				cursorBtn.visible = true;
 				cursorBtn.translationx = math.floor((mouseX - x) * progress + 0.5);
 				cursorBtn.translationy = math.floor((mouseY - y) * progress + 0.5);
 			else
+				cursorBtn.visible = false;
 				cursorBtn.translationx = 0;
 				cursorBtn.translationy = 0;
 				cursorTick = 0;
@@ -186,57 +287,27 @@ function MacroPlayer.AnimKeyPressBtn(bRestart)
 	end
 end
 
-local keyMaps = {
-	["SLASH"] = "/ ?",
-	["MINUS"] = "- _",
-	["PERIOD"] = ". >",
-	["COMMA"] = ", <",
-	["SPACE"] = L"空格",
-	["EQUALS"] = "= +",
-	["ESCAPE"] = "ESC",
-	["DELETE"] = "DEL",
-	["LSHIFT"] = "SHIFT",
-	["RSHIFT"] = "SHIFT",
-	["shift"] = "SHIFT",
-	["ctrl"] = "CTRL",
-	["LCONTROL"] = "CTRL",
-	["RCONTROL"] = "CTRL",
-	["BACKSPACE"] = "←---",
-	["alt"] = "ALT",
-	["LMENU"] = "ALT",
-	["RMENU"] = "ALT",
-	["UP"] = "↑",
-	["DOWN"] = "↓",
-	["LEFT"] = "←",
-	["RIGHT"] = "→",
-	["RETURN"] = L"回车",
-	["APOSTROPHE"] = "' \"",
-	["LBRACKET"] = "[ {",
-	["RBRACKET"] = "] }",
-	["SEMICOLON"] = ": ;",
-	["GRAVE"] = "` ~",
-	["BACKSLASH"] = "\\|",
-	["MULTIPLY"] = "*",
-	["1"] = "1 !",
-	["2"] = "2 @",
-	["3"] = "3 #",
-	["4"] = "4 $",
-	["5"] = "5 %",
-	["6"] = "6 ^",
-	["7"] = "7 &",
-	["8"] = "8 *",
-	["9"] = "9 (",
-	["0"] = "0 )",
-	["WIN_LWINDOW"] = "左Win",
-	["WIN_RWINDOW"] = "右win",
-}
-local function ConvertKeyNameToButtonText(btnText)
-	if(btnText) then
-		btnText = btnText:gsub("DIK_", "")
-		btnText = string.upper(btnText);
-		btnText = keyMaps[btnText] or btnText;
+-- @return the number of key buttons to press
+function MacroPlayer.ShowKeyboard(bShow, button)
+	local count = 0;
+	if(page) then
+		local parent = MacroPlayer.GetRootUIObject()
+
+		if(not page.keyboardWnd) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/VirtualKeyboard.lua");
+			local VirtualKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.VirtualKeyboard");
+			page.keyboardWnd = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 150);
+		end
+		page.keyboardWnd:Show(bShow);
+		
+		if(bShow and button and button~="") then
+			count = page.keyboardWnd:ShowButtons(button)
+			if(count == 0) then
+				page.keyboardWnd:Show(false);
+			end
+		end
 	end
-	return btnText
+	return count;
 end
 
 function MacroPlayer.ShowKeyPress(bShow, button)
@@ -251,7 +322,7 @@ function MacroPlayer.ShowKeyPress(bShow, button)
 				local buttons = {};
 				local duplicatedMap = {};
 				for text in button:gmatch("([%w_]+)") do
-					text = ConvertKeyNameToButtonText(text)
+					text = Macros.ConvertKeyNameToButtonText(text)
 					if(not duplicatedMap[text]) then
 						duplicatedMap[text] = true
 						buttons[#buttons+1] = text;
@@ -409,12 +480,15 @@ end
 function MacroPlayer.OnClickCursor()
 	if(MacroPlayer.expectedDragButton) then
 		GameLogic.AddBBS("Macro", L"按住鼠标左键不要放手， 同时拖动鼠标到目标点", 5000, "255 0 0");
+		Macros.voice("按住鼠标左键不要放手， 同时拖动鼠标到目标点")
 		return;
 	elseif(MacroPlayer.expectedKeyButton and not MacroPlayer.expectedEditBoxText) then
 		GameLogic.AddBBS("Macro", L"鼠标移动到这里，但不要点击", 5000, "255 0 0");
+		Macros.voice("鼠标移动到这里，但不要点击")
 		return
 	elseif(MacroPlayer.expectedMouseWheelDelta) then
 		GameLogic.AddBBS("Macro", L"不要点击鼠标, 而是滚动鼠标中间的滚轮", 5000, "255 0 0");
+		Macros.voice("不要点击鼠标, 而是滚动鼠标中间的滚轮")
 		return
 	end
 	
@@ -423,6 +497,7 @@ function MacroPlayer.OnClickCursor()
 		if(MacroPlayer.expectedEditBoxText) then
 			if(not MacroPlayer.expectedButton) then
 				GameLogic.AddBBS("Macro", L"请按照指示输入文字", 5000, "255 0 0");
+				Macros.voice("请按照指示输入文字")
 				return;
 			else
 				MacroPlayer.expectedEditBoxText = nil;
@@ -434,14 +509,20 @@ function MacroPlayer.OnClickCursor()
 		MacroPlayer.InvokeTriggerCallback()
 	elseif(MacroPlayer.expectedButton and reason) then
 		if(reason == "keyboardButtonWrong") then
-			GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮，同时点击鼠标", 5000, "255 0 0");
+			GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标", 5000, "255 0 0");
+			Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标")
 		elseif(reason == "mouseButtonWrong") then
 			GameLogic.AddBBS("Macro", L"请点击正确的鼠标按键", 5000, "255 0 0");
+			Macros.voice("请点击正确的鼠标按键")
 		end
 	end
 end
 
 function MacroPlayer.OnKeyDown(event)
+	if(Macros.IsAutoPlay()) then
+		MacroPlayer.DoAutoPlay();
+		return
+	end
 	local button = MacroPlayer.expectedKeyButton
 	if(not button) then
 		return
@@ -456,7 +537,7 @@ function MacroPlayer.OnKeyDown(event)
 	if(button:match("alt") and not event.alt_pressed) then
 		isOK = false
 	end
-	local keyname = button:match("(DIK_%w+)");
+	local keyname = button:match("(DIK_[%w_]+)");
 	if(keyname and keyname~=event.keyname) then
 		isOK = false
 	end
@@ -467,16 +548,18 @@ function MacroPlayer.OnKeyDown(event)
 		if(diffDistance > 16) then
 			isOK = false
 			GameLogic.AddBBS("Macro", L"请将鼠标移动到目标点，再按键盘", 5000, "255 0 0");
+			Macros.voice("请将鼠标移动到目标点，再按键盘")
 		end
 	end
 
 	if(isOK) then
 		if(MacroPlayer.expectedEditBoxText) then
 			MacroPlayer.expectedEditBoxText = nil;
-			MacroPlayer.ShowEditBox(false)
 		end
+		MacroPlayer.ShowEditBox(false)
 		MacroPlayer.expectedKeyButton = nil;
 		MacroPlayer.ShowKeyPress(false)
+		MacroPlayer.ShowKeyboard(false)
 		MacroPlayer.ShowCursor(false);
 		MacroPlayer.InvokeTriggerCallback()
 	end
@@ -491,7 +574,7 @@ function MacroPlayer.SetClickTrigger(mouseX, mouseY, button, callbackFunc)
 	end
 end
 
-function MacroPlayer.SetKeyPressTrigger(button, callbackFunc)
+function MacroPlayer.SetKeyPressTrigger(button, targetText, callbackFunc)
 	if(page) then
 		MacroPlayer.CheckDoAutoPlay(callbackFunc)
 		MacroPlayer.expectedKeyButton = button;
@@ -500,8 +583,16 @@ function MacroPlayer.SetKeyPressTrigger(button, callbackFunc)
 			MacroPlayer.ShowCursor(true, mouseX, mouseY)	
 		end
 		MacroPlayer.SetTriggerCallback(callbackFunc)
-		if(Macros.IsShowKeyButtonTip()) then
-			MacroPlayer.ShowKeyPress(true, button)
+		
+		if(targetText and targetText~="") then
+			MacroPlayer.ShowEditBox(true, targetText)
+			if(Macros.IsShowKeyButtonTip()) then
+				MacroPlayer.ShowKeyPress(true, button)
+			end
+		else
+			if(Macros.IsShowKeyButtonTip()) then
+				MacroPlayer.ShowKeyPress(true, button)
+			end
 		end
 	end
 end
@@ -512,17 +603,17 @@ function MacroPlayer.SetEditBoxTrigger(mouseX, mouseY, text, textDiff, callbackF
 		MacroPlayer.expectedEditBoxText = text;
 		MacroPlayer.SetTriggerCallback(callbackFunc)
 
-		-- if we do not need user to enter text, just click to enter
 		local keyButtons = Macros.TextToKeyName(textDiff)
 		if(keyButtons) then
 			MacroPlayer.ShowEditBox(true, text, textDiff)
 			MacroPlayer.expectedKeyButton = keyButtons; 
-			Macros.SetNextKeyPressWithMouseMove(mouseX, mouseY);
+			Macros.SetNextKeyPressWithMouseMove(nil, nil); -- mouseX, mouseY
 			if(Macros.IsShowKeyButtonTip()) then
 				MacroPlayer.ShowKeyPress(true, keyButtons)
 			end
 			MacroPlayer.ShowCursor(true, mouseX, mouseY);
 		else
+			-- we do not need user to enter text, just click to enter
 			MacroPlayer.ShowEditBox(true, text..L"(点击)")
 			MacroPlayer.expectedButton = "left";
 			MacroPlayer.ShowCursor(true, mouseX, mouseY, "left");
@@ -578,12 +669,13 @@ function MacroPlayer.ShowDrag(bShow, startX, startY, endX, endY, button)
 			dragPoints.visible = bShow;
 			if(bShow) then
 				local startPoint = page:FindControl("startPoint")
-				startPoint.x = startX - 16;
-				startPoint.y = startY - 16;
+				local width = 24;
+				startPoint.x = startX - width;
+				startPoint.y = startY - width;
 				
 				local endPoint = page:FindControl("endPoint")
-				endPoint.x = endX - 16;
-				endPoint.y = endY - 16;
+				endPoint.x = endX - width;
+				endPoint.y = endY - width;
 
 				if(Macros.IsShowButtonTip()) then
 					MacroPlayer.AnimDragBtn(true)
@@ -645,9 +737,11 @@ function MacroPlayer.OnDragEnd()
 		else
 			-- tell the user to drag to the target location. 
 			GameLogic.AddBBS("Macro", L"请拖动鼠标到目标点", 5000, "255 0 0");
+			Macros.voice("请拖动鼠标到目标点")
 		end
 	else
 		GameLogic.AddBBS("Macro", L"拖动鼠标时需要按正确的按键", 5000, "255 0 0");
+		Macros.voice("拖动鼠标时需要按正确的按键")
 	end
 	if(Macros.IsShowButtonTip()) then
 		MacroPlayer.AnimDragBtn(true)
@@ -661,10 +755,33 @@ function MacroPlayer.ShowTip(text)
 		local tipWnd = page:FindControl("tipWnd");
 		if(text and text~="") then
 			tipWnd.visible = true;
-			page:SetUIValue("tipText", text)
+			page:SetValue("tipText", text)
 		else
 			tipWnd.visible = false;
-			page:SetUIValue("tipText", "")
+			page:SetValue("tipText", "")
+		end
+	end	
+end
+
+-- @param text: text.  if nil, we will hide it. 
+-- @param duration: the max duration
+function MacroPlayer.ShowText(text, duration)
+	if(page) then
+		local textWnd = page:FindControl("textWnd");
+		if(text and text~="") then
+			textWnd.visible = true;
+			page:SetValue("text", text)
+		else
+			textWnd.visible = false;
+			page:SetValue("text", "")
+		end
+		if(duration) then
+			MacroPlayer.textTimer = MacroPlayer.textTimer or commonlib.Timer:new({callbackFunc = function(timer)
+				MacroPlayer.ShowText(nil)
+			end})
+			MacroPlayer.textTimer:Change(duration);
+		elseif(MacroPlayer.textTimer) then
+			MacroPlayer.textTimer:Change();
 		end
 	end	
 end
@@ -674,7 +791,7 @@ function MacroPlayer.ShowEditBox(bShow, text, textDiff)
 		local editBox = page:FindControl("editBox");
 		editBox.visible = bShow;
 		if(bShow) then
-			page:SetUIValue("editboxText", text or "")
+			page:SetValue("editboxText", text or "")
 		end
 	end	
 end
@@ -688,6 +805,7 @@ function MacroPlayer.OnMouseWheel()
 			MacroPlayer.InvokeTriggerCallback()
 		else
 			GameLogic.AddBBS("Macro", L"请向另外一个方向滚动鼠标中间的滚轮", 5000, "255 0 0");
+			Macros.voice("请向另外一个方向滚动鼠标中间的滚轮")
 		end
 	end
 end
@@ -703,16 +821,26 @@ end
 
 function MacroPlayer.CheckDoAutoPlay(callbackFunc)
 	if(Macros.IsAutoPlay()) then
-		local defaultInterval = 200;
+		MacroPlayer.Focus()
+		local defaultInterval = Macros.GetLastIdleTime() or 200;
 		defaultInterval = math.max(math.floor(defaultInterval / Macros.GetPlaySpeed() + 0.5), 10)
-		commonlib.TimerManager.SetTimeout(function()  
-			if(Macros.IsAutoPlay()) then
-				if(MacroPlayer.triggerCallbackFunc) then
-					MacroPlayer.HideAll()
-					MacroPlayer.InvokeTriggerCallback();
-				end
-			end
-		end, defaultInterval)
+
+		MacroPlayer.autoPlayTimer = MacroPlayer.autoPlayTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			MacroPlayer.DoAutoPlay()
+		end})
+		MacroPlayer.autoPlayTimer:Change(defaultInterval)
+	end
+end
+
+function MacroPlayer.DoAutoPlay()
+	if(MacroPlayer.autoPlayTimer) then
+		MacroPlayer.autoPlayTimer:Change()
+	end
+	if(Macros.IsAutoPlay()) then
+		if(MacroPlayer.triggerCallbackFunc) then
+			MacroPlayer.HideAll()
+			MacroPlayer.InvokeTriggerCallback();
+		end
 	end
 end
 

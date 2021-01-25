@@ -22,8 +22,8 @@ local DefaultTriggerInterval = 200;
 -- @return nil or {OnFinish=function() end}
 function Macros.Idle(timeMs, bForceWait)
 	if(timeMs and timeMs > 0 and not bForceWait) then
-		local nextMacro = Macros:PeekNextMacro()
-		local nextNextMacro = Macros:PeekNextMacro(1)
+		local nextMacro = Macros:PeekNextMacro(1)
+		local nextNextMacro = Macros:PeekNextMacro(2)
 		-- also merge CameraLookat and Trigger. 
 		if(nextMacro and nextMacro:IsTrigger() or 
 			(nextNextMacro and nextNextMacro:IsTrigger() and nextMacro.name == "CameraLookat")) then
@@ -42,6 +42,31 @@ function Macros.Idle(timeMs, bForceWait)
 	mytimer:Change(timeMs);
 	return callback;
 end
+
+-- return nil or time in ms.  
+function Macros.GetLastIdleTime()
+	local offset = 0;
+	local timeMs;
+	while(true) do
+		offset = offset - 1;
+		local m = Macros:PeekNextMacro(offset);
+		if(m) then
+			if(m.name == "Idle") then
+				local params = m:GetParams() or {};
+				if(params[1]) then
+					timeMs = params[1];
+				end
+				break;
+			elseif(m:IsTrigger()) then
+				break
+			end
+		else
+			break;
+		end
+	end
+	return timeMs;
+end
+
 
 
 
