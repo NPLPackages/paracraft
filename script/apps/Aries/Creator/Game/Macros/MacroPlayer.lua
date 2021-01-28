@@ -539,7 +539,17 @@ function MacroPlayer.OnKeyDown(event)
 	end
 	local keyname = button:match("(DIK_[%w_]+)");
 	if(keyname and keyname~=event.keyname) then
-		isOK = false
+		-- this fixed some numeric key lock issues.
+		if( (keyname == "DIK_END" and (event.keyname == "DIK_1" or event.keyname == "DIK_NUMPAD1")) or 
+			(keyname == "DIK_HOME" and (event.keyname == "DIK_7" or event.keyname == "DIK_NUMPAD7")) or 
+			(keyname == "DIK_PAGE_DOWN" and (event.keyname == "DIK_3" or event.keyname == "DIK_NUMPAD3")) or 
+			(keyname == "DIK_PAGE_UP" and (event.keyname == "DIK_9" or event.keyname == "DIK_NUMPAD9")) ) then
+			GameLogic.AddBBS("Macro2", L"你可能需要按【NUM LOCK】按键", 5000, "0 255 0");
+			is_OK = true
+		else
+			isOK = false
+		end
+		
 	end
 	local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
 	if(mouseX and mouseY) then

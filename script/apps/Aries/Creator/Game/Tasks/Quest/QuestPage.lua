@@ -134,7 +134,8 @@ end
 
 function QuestPage.ShowView()
 	if page and page:IsVisible() then
-		return
+		page:CloseWindow()
+		QuestPage.CloseView()
 	end
 
 	-- if QuestProvider.GetInstance == nil then
