@@ -387,8 +387,10 @@ function TeachingQuestPage.OnClickItem(index)
 		end);
 	elseif (state == TeachingQuestPage.Acceptable) then
 		-- task is acceptable, show vip
-		GameLogic.GetFilters():apply_filters("VipNotice", true, "vip_weekly_training", function()
-			page:Refresh(0);
+		GameLogic.IsVip("VipWeeklyTraining", true, function(result)
+			if result then
+				page:Refresh(0);
+			end
 		end);
 	else
 		-- task is locked

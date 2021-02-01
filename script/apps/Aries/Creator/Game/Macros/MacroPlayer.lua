@@ -12,6 +12,9 @@ MacroPlayer.ShowPage();
 MacroPlayer.ShowController(false);
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local KeyEvent = commonlib.gettable("System.Windows.KeyEvent");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
@@ -23,10 +26,18 @@ function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
 	GameLogic.GetFilters():add_filter("Macro_EndPlay", MacroPlayer.OnEndPlay);
 	GameLogic.GetFilters():add_filter("Macro_PlayMacro", MacroPlayer.OnPlayMacro);
-	Screen:Connect("sizeChanged", MacroPlayer, MacroPlayer.OnViewportChange, "UniqueConnection");
 end
 
 function MacroPlayer.OnInitEnd()
+	local obj = MacroPlayer.GetRootUIObject()
+	if(obj) then
+		-- local viewport = ViewportManager:GetSceneViewport()
+		-- viewport:Connect("sizeChanged", MacroPlayer, MacroPlayer.OnViewportChange, "UniqueConnection");
+		obj:SetScript("onsize", function()
+			MacroPlayer.OnViewportChange();
+		end)
+	end
+
 	local KeyInput = page:FindControl("KeyInput");
 	if(KeyInput) then
 		KeyInput:SetField("CanHaveFocus", true); 
@@ -57,6 +68,10 @@ function MacroPlayer.RefreshPage(dTime)
 end
 
 function MacroPlayer.OnPageClosed()
+	if(MacroPlayer.attachedWnd) then
+		MacroPlayer.attachedWnd:CloseWindow();
+		MacroPlayer.attachedWnd = nil;
+	end
 	if(page) then
 		if(page.keyboardWnd) then
 			page.keyboardWnd:Show(false);
@@ -83,7 +98,7 @@ function MacroPlayer.OnPageClosed()
 	end
 end
 
-function MacroPlayer.OnViewportChange(width, height)
+function MacroPlayer.OnViewportChange()
 	if(page and MacroPlayer.triggerCallbackFunc) then
 		MacroPlayer.RefreshPage(0);
 		
@@ -296,7 +311,7 @@ function MacroPlayer.ShowKeyboard(bShow, button)
 		if(not page.keyboardWnd) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/VirtualKeyboard.lua");
 			local VirtualKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.VirtualKeyboard");
-			page.keyboardWnd = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 150);
+			page.keyboardWnd = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 400, 1024);
 		end
 		page.keyboardWnd:Show(bShow);
 		
@@ -566,6 +581,7 @@ function MacroPlayer.OnKeyDown(event)
 		if(MacroPlayer.expectedEditBoxText) then
 			MacroPlayer.expectedEditBoxText = nil;
 		end
+		MovieUISound.PlayAddKey();
 		MacroPlayer.ShowEditBox(false)
 		MacroPlayer.expectedKeyButton = nil;
 		MacroPlayer.ShowKeyPress(false)
@@ -820,11 +836,15 @@ function MacroPlayer.OnMouseWheel()
 	end
 end
 
-function MacroPlayer.ShowMouseWheel(bShow)
+function MacroPlayer.ShowMouseWheel(bShow, mouseX, mouseY)
 	if(page) then
 		local mouseWheel = page:FindControl("mouseWheel");
 		if(mouseWheel) then
 			mouseWheel.visible = (bShow == true);
+			if(bShow) then
+				mouseWheel.x = mouseX or 300;
+				mouseWheel.y = mouseY or 50;
+			end
 		end
 	end	
 end
@@ -860,8 +880,27 @@ function MacroPlayer.SetMouseWheelTrigger(mouseWheelDelta, mouseX, mouseY, callb
 		MacroPlayer.expectedMouseWheelDelta = mouseWheelDelta;
 		MacroPlayer.SetTriggerCallback(callbackFunc)
 		if(Macros.IsShowButtonTip()) then
-			MacroPlayer.ShowMouseWheel(true)
+			MacroPlayer.ShowMouseWheel(true, mouseX, mouseY)
 		end
 		MacroPlayer.ShowCursor(true, mouseX, mouseY, "")
 	end
 end
+
+-- @param window: attach a mcml v2 window object to it, usually from CodeBlock's window() function
+function MacroPlayer.AttachWindow(window)
+	if(window) then
+		MacroPlayer.ShowController(false);
+		local parent = MacroPlayer.GetRootUIObject()
+		if(parent) then
+			local win = window:GetNativeWindow()
+			if(win) then
+				MacroPlayer.attachedWnd = window;
+				win.zorder = 1000;
+				parent:AddChild(win)
+				return true
+			end
+		end
+	end
+	return false
+end
+

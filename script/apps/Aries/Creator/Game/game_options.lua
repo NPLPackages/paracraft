@@ -342,6 +342,10 @@ function options:OnLoadWorld()
 		if(mainAssetFilename) then
 			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
+		local mainSkins = self:GetMainPlayerSkins();
+		if (mainSkins) then
+			EntityManager.GetPlayer():SetSkin(mainSkins);
+		end
 		
 		player:SetScale(1);
 		self.jump_up_speed = 5*1.3;
@@ -752,6 +756,18 @@ function options:GetMainPlayerAssetName()
 	return GameLogic.GetPlayerController():LoadRemoteData("Paracraft_System_MainPlayer_AssetName");
 end
 
+function options:SetMainPlayerSkins(value)
+	local key = "Paracraft_System_MainPlayer_Skins";
+	if(value == nil) then
+		-- Do nothing:
+	elseif(self:GetMainPlayerSkins() ~= value) then
+		GameLogic.GetPlayerController():SaveRemoteData(key, value);
+	end
+end
+
+function options:GetMainPlayerSkins(value)
+	return GameLogic.GetPlayerController():LoadRemoteData("Paracraft_System_MainPlayer_Skins");
+end
 
 -- obsoleted: set view bobbing and save to disk
 function options:ToggleViewBobbing(viewBobbing)
@@ -1183,6 +1199,14 @@ function options:SetHasCopyright(bValue)
 		bValue = nil;
 	end
 	WorldCommon.SetWorldTag("hasCopyright", bValue);
+end
+
+function options:IsCommunityWorld()
+	return GameLogic.GetFilters():apply_filters('service.local_service_word.is_community_world', false)
+end
+
+function options:SetCommunityWorld(bValue)
+	GameLogic.GetFilters():apply_filters('service.local_service_world.set_community_world', bValue)
 end
 
 -- "teacher", "vip"

@@ -88,3 +88,11 @@ HttpWrapper.Create("keepwork.user.server_time", "%MAIN%/core/v0/keepworks/curren
 -- 生成小程序码的图片
 -- http://yapi.kp-para.cn/project/32/interface/api/3772
 HttpWrapper.Create("keepwork.user.bindWxacode", "%MAIN%/core/v0/users/bindWxacode","POST",true)
+
+-- 获取总学校 机构数
+-- http://yapi.kp-para.cn/project/130/interface/api/3812
+HttpWrapper.Create("keepwork.user.total_orgs", "%MAIN%/accounting/org/totalOrgs","GET",true)
+
+-- 用户荣誉列表
+-- http://yapi.kp-para.cn/project/32/interface/api/3817
+HttpWrapper.Create("keepwork.user.honors", "%MAIN%/core/v0/users/honors","GET",true);

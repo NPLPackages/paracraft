@@ -898,12 +898,19 @@ function BaseContext:handlePlayerKeyEvent(event)
 				local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 				local generatorName = WorldCommon.GetWorldTag("world_generator");
 				if (generatorName == "paraworld") then
-					GameLogic.GetFilters():apply_filters("VipNotice", true, "fly_on_paraworld",function()
-						local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-						if (KeepWorkItemManager.IsVip()) then
+					GameLogic.IsVip("FlyOnParaWorld", true, function(result)
+						if result then
 							GameLogic.options:SetCanJumpInAir(true);
 						end
-					end);
+					end)
+					-- GameLogic.GetFilters():apply_filters("VipNotice", true, "fly_on_paraworld",function()
+					--     local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+					--     if (KeepWorkItemManager.IsVip()) then
+					-- 	    GameLogic.options:SetCanJumpInAir(true);
+					--     end
+					-- end);
+					-- if (not KeepWorkItemManager.IsVip()) then
+                    -- end
 				else
 					_guihelper.MessageBox(L"此世界禁止飞行哦！");
 				end

@@ -56,38 +56,40 @@ function ActWeek.ShowView()
     end
     GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.weekend')
     keepwork.user.server_time({},function(err, msg, data)
-        server_time = ActWeek.GetTimeStamp(data.now)
-        local act_state = ActWeek.GetActState()
-        if act_state ~= ActWeek.ActState.going then
-            if act_state == ActWeek.ActState.not_start then
-                GameLogic.AddBBS(nil, L"活动尚未开始，敬请关注");
+        if err == 200 then
+            server_time = ActWeek.GetTimeStamp(data.now)
+            local act_state = ActWeek.GetActState()
+            if act_state ~= ActWeek.ActState.going then
+                if act_state == ActWeek.ActState.not_start then
+                    GameLogic.AddBBS(nil, L"活动尚未开始，敬请关注");
+                end
+                if act_state == ActWeek.ActState.act_end then
+                    GameLogic.AddBBS(nil, L"活动已结束，感谢您的参与");
+                end
+                return
             end
-            if act_state == ActWeek.ActState.act_end then
-                GameLogic.AddBBS(nil, L"活动已结束，感谢您的参与");
-            end
-            return
+    
+            local view_width = 870
+            local view_height = 523
+            local params = {
+                url = "script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.html",
+                name = "ActWeek.ShowView", 
+                isShowTitleBar = false,
+                DestroyOnClose = true,
+                style = CommonCtrl.WindowFrame.ContainerStyle,
+                allowDrag = true,
+                enable_esc_key = true,
+                zorder = 0,
+                app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+                directPosition = true,
+                    align = "_ct",
+                    x = -view_width/2 - 80,
+                    y = -view_height/2,
+                    width = view_width,
+                    height = view_height,
+            };
+            System.App.Commands.Call("File.MCMLWindowFrame", params);
         end
-
-        local view_width = 870
-        local view_height = 523
-        local params = {
-            url = "script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.html",
-            name = "ActWeek.ShowView", 
-            isShowTitleBar = false,
-            DestroyOnClose = true,
-            style = CommonCtrl.WindowFrame.ContainerStyle,
-            allowDrag = true,
-            enable_esc_key = true,
-            zorder = 0,
-            app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-            directPosition = true,
-                align = "_ct",
-                x = -view_width/2 - 80,
-                y = -view_height/2,
-                width = view_width,
-                height = view_height,
-        };
-        System.App.Commands.Call("File.MCMLWindowFrame", params);
     end)
 end
 
@@ -256,11 +258,13 @@ function ActWeek.StringToTable(str)
 end
 
 function ActWeek.OpenVipNotice()
-    GameLogic.GetFilters():apply_filters("VipNotice", true, "vip_goods",function()
-        if (KeepWorkItemManager.IsVip()) then
-            local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
-            KeepWorkMallPage.HandleDataSources()
-            KeepWorkMallPage.FlushView()
+    GameLogic.IsVip("VipGoods", true, function(result)
+        if result then
+            if (KeepWorkItemManager.IsVip()) then
+                local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+                KeepWorkMallPage.HandleDataSources()
+                KeepWorkMallPage.FlushView()
+            end
         end
-    end);
+    end)
 end

@@ -29,3 +29,5 @@ HttpWrapper.default_postFunc
 )
 
 
+HttpWrapper.Create("github.get", ":filepath", "GET", false)
+

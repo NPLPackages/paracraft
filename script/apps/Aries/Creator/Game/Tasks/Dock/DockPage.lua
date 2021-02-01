@@ -101,9 +101,10 @@ function DockPage.Show()
 
     DockPage.CheckIsTaskCompelete()
 
-    ActWeek.GetServerTime(function()
-        DockPage.page:Refresh(1)
-    end)        
+    DockPage.ShowCampIcon()
+    -- ActWeek.GetServerTime(function()
+    --     DockPage.page:Refresh(1)
+    -- end)    
 end
 function DockPage.Hide()
     DockPage.is_show = false;
@@ -284,6 +285,15 @@ function DockPage.OnClick(id)
         KeepWorkMallPage.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.mall");
         return
+    elseif id == "vip_make_up" then
+        -- if System.User.isVip then
+        --     GameLogic.RunCommand(string.format("/goto  %d %d %d", 19258,16,19134));
+        --     local QuestCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestCoursePage.lua");
+        --     QuestCoursePage.Show(true)
+        -- else
+            local VipMakeUp = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipMakeUp.lua")
+            VipMakeUp.Show()
+        -- end
     else
         --_guihelper.MessageBox(id);
     end
@@ -498,6 +508,9 @@ function DockPage.RenderButton_3(index)
     if(id == "wintercamp") then
         if MacroCodeCampActIntro.CheckCanShow() then
             return string.format([[
+                <div style="position:relative;">
+                    <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_btn_overlay" style="margin-top: -8px;margin-left: 0px;" width="80" height="84"/>
+                </div>
                 <input type="button" name='%s' onclick="OnClickTop" style="width:85px;height:75px;background:url(%s)"/>
                 %s
             ]],node.id,node.bg,tip_str);
@@ -732,4 +745,41 @@ function DockPage.CheckIsTaskCompelete()
 
        GameLogic.QuestAction.SetDailyTaskValue("40008_1",1)
     end, 1000)
+end
+
+function DockPage.ShowCampIcon()
+    -- if not System.options.isDevMode then
+    --     return
+    -- end
+
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local world_id = WorldCommon.GetWorldTag("kpProjectId");
+    local camp_id_list = {
+        ONLINE = 41570,
+        RELEASE = 1471,
+    }
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
+    local camp_id = camp_id_list[httpwrapper_version]
+    if tonumber(world_id) == camp_id then
+        local DockCampIcon = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockCampIcon.lua");
+        DockCampIcon.Show();
+    end
+end
+
+function DockPage.CanShowCampVip()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local world_id = WorldCommon.GetWorldTag("kpProjectId");
+    local camp_id_list = {
+        ONLINE = 41570,
+        RELEASE = 1471,
+    }
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
+    local camp_id = camp_id_list[httpwrapper_version]
+    if tonumber(world_id) == camp_id then
+        return true
+    end
+
+    return false
 end

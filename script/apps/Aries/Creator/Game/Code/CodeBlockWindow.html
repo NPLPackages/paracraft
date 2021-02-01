@@ -14,13 +14,13 @@ end
             <input type="button" uiname="CodeBlockWindow.pause" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickStop" />
         </div>
         <script type="text/npl" refresh="true">document:write(CodeBlockWindow.GetCustomToolbarMCML());</script>
-        <input type="text" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:100px;height:25px;" class="mc_item" />
+        <input type="text" uiname="CodeBlockWindow.filename" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="margin-left:10px;margin-top:7px;textcolor:#ffffff;width:100px;height:25px;" class="mc_item" />
         <div style="float:left;margin-left:0px;margin-top:7px;"
              tooltip='page://script/apps/Aries/Creator/Game/Code/CodeBlockList.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">...</div>
         </div>
         <div style="float:left;padding:2px;margin-left:5px;margin-top:5px;background-color:#0b9b3a;">
-            <input type="button" uiname="CodeBlockWindow.blockMode"  name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
+            <input type="button" uiname="CodeBlockWindow.blockMode" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
             <input type="button" uiname="CodeBlockWindow.codeMode" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
         </div>
         <input type="button" uiname="CodeBlockWindow.settings" name="settings" tooltip='<%=L"设置"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>

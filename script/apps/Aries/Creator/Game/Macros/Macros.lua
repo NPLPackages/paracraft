@@ -46,6 +46,7 @@ SetPlaySpeed(1)
 ## Macro Lists
 ```
 Idle(500)
+Wait(5000)
 CameraMove(8,0.54347,0.18799)
 CameraLookat(19980.29883,-126.59001,19998.52929)
 PlayerMove(19181,5,19198,0.23781)
@@ -59,6 +60,7 @@ SetAutoPlay(true)
 SetHelpLevel(0)
 
 loadtemplate("aaa.bmax")
+loadtemplate("abc.bmax", "-r")
 tip("some text")
 voice("text to speech")
 sound("1.mp3")
@@ -125,6 +127,7 @@ function Macros:Init()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroSliderBar.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeyFrameCtrl.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroMCSlot.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroDropdownListbox.lua");
 	-- TODO: add more here
 end
 
@@ -163,6 +166,7 @@ function Macros:BeginRecord()
 	commonlib.__onuievent__ = Macros.OnGUIEvent;
 	System.Windows.Window.__onuievent__ = Macros.OnWindowGUIEvent;
 	CommonCtrl.SliderBar.__onuievent__ = Macros.OnSliderbarEvent;
+	CommonCtrl.dropdownlistbox.__onuievent__ = Macros.OnDropdownListboxEvent;
 	KeyFrameCtrl.__onuievent__ = Macros.OnKeyFrameCtrlEvent;
 
 	self.tickTimer = self.tickTimer or commonlib.Timer:new({callbackFunc = function(timer)
@@ -227,6 +231,24 @@ function Macros.OnWindowGUIEvent(window, event)
 	end
 end
 
+-- only for CommonCtrl.OnDropdownListboxEvent exclusively
+function Macros.OnDropdownListboxEvent(dropdownCtl, eventName, dx, dy)
+	local uiname = dropdownCtl.uiname;
+	if(uiname) then
+		if(eventName == "OnClickDropDownButton") then
+			Macros:AddMacro("DropdownClickDropDownButton", uiname)
+		elseif(eventName == "OnTextChange") then
+			Macros:AddMacro("DropdownTextChange", uiname, dropdownCtl:GetValue())
+		elseif(eventName == "OnMouseUpListBoxCont") then
+			Macros:AddMacro("DropdownListBoxCont", uiname, dropdownCtl:GetValue())
+		elseif(eventName == "OnSelectListBox") then
+			Macros:AddMacro("DropdownSelect", uiname, dropdownCtl:GetValue())
+		elseif(eventName == "OnMouseUpClose") then
+			Macros:AddMacro("DropdownMouseUpClose", uiname)
+		end
+	end
+end
+
 -- only for CommonCtrl.SliderBar exclusively
 function Macros.OnSliderbarEvent(sliderBar, eventName)
 	local uiname = sliderBar.uiname;
@@ -264,6 +286,9 @@ function Macros.OnKeyFrameCtrlEvent(ctrl, eventName, p1, p2)
 		elseif(eventName == "CopyKeyFrame") then
 			-- p1, p2: new_time, shift_begin_time
 			Macros:AddMacro("KeyFrameCtrlCopy", uiname, p1, p2)
+		elseif(eventName == "ClickTimeLine") then
+			-- p1: time
+			Macros:AddMacro("KeyFrameCtrlClickTimeLine", uiname, p1)
 		end
 	end
 end
@@ -407,6 +432,7 @@ function Macros:EndRecord()
 	commonlib.__onuievent__ = nil;
 	System.Windows.Window.__onuievent__ = nil;
 	CommonCtrl.SliderBar.__onuievent__ = nil;
+	CommonCtrl.dropdownlistbox.__onuievent__ = nil;
 	KeyFrameCtrl.__onuievent__ = nil;
 	if(self.tickTimer) then
 		self.tickTimer:Change();
@@ -460,6 +486,43 @@ function Macros:LoadMacrosFromText(text)
 	return macros;
 end
 
+
+-- @param cx, cy, cz: if nil, we will not play using absolute position. otherwise, we will play relatively. 
+function Macros:PrepareDefaultPlayMode(cx, cy, cz, isAutoPlay, bNoHelp, nSpeed)
+	Macros.SetPlayOrigin(cx, cy, cz)
+    Macros.SetAutoPlay(isAutoPlay);
+    Macros.SetHelpLevel(bNoHelp and 0 or 1);
+    Macros.SetPlaySpeed(nSpeed or 1);
+end
+	
+
+function Macros:PrepareInitialBuildState()
+    GameLogic.RunCommand("/mode edit");
+    GameLogic.RunCommand("/clearbag");
+    GameLogic.RunCommand("/camerayaw 3.14");
+    local player = GameLogic.EntityManager.GetPlayer()
+    player:ToggleFly(false)
+    lastPlayerX, lastPlayerY, lastPlayerZ = player:GetBlockPos();
+    player:SetHandToolIndex(1);
+    local BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
+    BuilderFramePage.OnChangeCategory(1, false)
+    local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
+    CreatorDesktop.OnChangeTabview(1)
+    CreatorDesktop.ShowNewPage(false)
+    
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+    local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+    OpenAssetFileDialog.OnChangeCategory(2);
+    
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
+    local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+    CodeHelpWindow.OnChangeCategory(1)
+    
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
+    local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
+    ChatEdit.LostFocus()
+end
+
 -- @param text: text lines of macros. if nil, it will play from clipboard
 function Macros:Play(text, speed)
 	text = text or ParaMisc.GetTextFromClipboard() or "";
@@ -482,13 +545,16 @@ function Macros:BeginPlay()
 end
 
 function Macros.OnShowExitDialog(p1)
+	if(p1 == false) then
+		return
+	end
 	if(Macros:IsPlaying()) then
 		_guihelper.MessageBox(L"是否退出示教系统?", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				Macros:Stop();
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
-		return;
+		return false;
 	end
 	return p1;
 end
@@ -498,6 +564,30 @@ end
 function Macros:PeekNextMacro(nOffset)
 	if(self.macros and self.curLine) then
 		return self.macros[self.curLine + (nOffset or 1)];
+	end
+end
+
+function Macros:GetMacroByIndex(index)
+	if(self.macros) then
+		return self.macros[index];
+	end
+end
+
+-- @param fromIndex: if nil, default to 1
+-- @return macro, index:   index of the next macro of name from fromIndex. return nil if not found
+function Macros:FindNextMacro(name, fromIndex)
+	fromIndex = fromIndex or 1;
+	while(true) do
+		local macro = self:GetMacroByIndex(fromIndex)
+		if(macro) then
+			if(macro.name == name) then
+				
+				return macro, fromIndex;
+			end
+		else
+			break;
+		end
+		fromIndex = fromIndex + 1;
 	end
 end
 

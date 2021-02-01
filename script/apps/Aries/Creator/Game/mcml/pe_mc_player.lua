@@ -12,6 +12,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/pe_mc_player.lua");
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+
 -- create class
 local pe_mc_player = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_player");
 
@@ -108,6 +111,10 @@ function pe_mc_player.AutoSetObjectSkin(obj_params)
 	obj_params.ReplaceableTextures = obj_params.ReplaceableTextures or {};
 	if(not PlayerSkins:CheckModelHasSkin(obj_params.AssetFile)) then
 		obj_params.ReplaceableTextures[2] = nil;
+		PlayerAssetFile:Init();
+		if(PlayerAssetFile:HasCustomGeosets(obj_params.AssetFile)) then
+			obj_params.CustomGeosets = MyCompany.Aries.Game.PlayerController:GetSkinTexture();
+		end
 	else
 		obj_params.ReplaceableTextures[2] = MyCompany.Aries.Game.PlayerController:GetSkinTexture();
 	end
@@ -115,10 +122,7 @@ end
 
 function pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 	if(mcmlNode.Canvas3D_ctl and filename and filename~="") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
-		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 		PlayerAssetFile:Init();
-
 		mcmlNode.obj_params.AssetFile = PlayerAssetFile:GetValidAssetByString(filename)
 		pe_mc_player.AutoSetObjectSkin(mcmlNode.obj_params);
 		mcmlNode.Canvas3D_ctl:ShowModel(mcmlNode.obj_params);

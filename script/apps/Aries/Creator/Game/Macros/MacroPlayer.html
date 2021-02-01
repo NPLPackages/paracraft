@@ -45,11 +45,11 @@ end
     <img name="endPoint" class="MouseCursor3" />
 </pe:container>
 <pe:container name="keyPress" alignment="_ctt" style="margin-left:-60px;margin-top:50px;height:32px;position:relative;background:url()">
-    <div style="float:left;background-color:#00000080;color:#ffffff;padding:5px;height:32px;">请用键盘按</div>
+    <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding-left:8px;padding-right:8px;padding:5px;height:32px;">请用键盘按</div>
     <div style="float:left;">
-        <input type="button" name="key1" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
-        <input type="button" name="key2" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
-        <input type="button" name="key3" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        <input type="button" name="key1" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        <input type="button" name="key2" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        <input type="button" name="key3" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
     </div>
 </pe:container>
 <pe:container name="editBox" alignment="_ctt" style="margin-top:10px;height:32px;position:relative;background:url()">
@@ -57,9 +57,11 @@ end
         <pe:label name="editboxText" style="width:150px;color:#ffcccc"/>
     </div>
 </pe:container>
-<pe:container name="mouseWheel" alignment="_ctt" style="margin-top:20px;position:relative;background:url()">
-    <div style="float:left;background-color:#00000080;color:#ffffff;padding:5px;height:32px;">在目标位置滚动鼠标滚轮</div>
-    <img name="mouseBtn" style="position:relative;margin-top:-16px;width:64px;height:64px;background:url(Texture/Aries/Quest/TutorialMouse_MiddleClick_32bits.png)" />
+<pe:container name="mouseWheel" alignment="_lt" zorder="-3" style="position:relative;background:url()">
+    <div style="margin-left:-85px;margin-top:-64px">
+        <img name="mouseBtn" style="position:relative;margin-top:32px;margin-left:-16px;width:64px;height:64px;background:url(Texture/Aries/Quest/TutorialMouse_MiddleClick_32bits.png)" />
+        <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding:5px;height:32px;">在目标位置滚动鼠标滚轮</div>
+    </div>
 </pe:container>
 <pe:container name="KeyInput" style="height:1px;width:1px;position:relative;background:url()">
 </pe:container>

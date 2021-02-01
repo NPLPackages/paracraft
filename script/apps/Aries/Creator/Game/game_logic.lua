@@ -142,6 +142,8 @@ function GameLogic:ctor()
 
 	GameLogic.GetFilters():add_filter("OnBeforeLoadBlockRegion", GameLogic.OnBeforeLoadBlockRegion);
 	GameLogic.GetFilters():add_filter("OnSaveBlockRegion", GameLogic.OnSaveBlockRegion);
+	GameLogic.GetFilters():add_filter("OnLoadBlockRegion", GameLogic.OnLoadBlockRegion);
+	
 	if(System.options.mc) then
 		-- do not leak events to hook chain. 
 		SceneContextManager:SetAcceptAllEvents(true);
@@ -406,6 +408,26 @@ function GameLogic.OnBeforeLoadBlockRegion(bContinue, region_x, region_y)
 	return bContinue;
 end
 
+-- @return false to disable loading region entities
+function GameLogic.OnLoadBlockRegion(bContinue, region_x, region_y)
+	if(not GameLogic.IsRegionLoadedFired) then
+		GameLogic.loadWorldTimer = GameLogic.loadWorldTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			if(not GameLogic.IsRegionLoadedFired) then
+				if(GameLogic.GetTickCount() > 30) then
+					GameLogic.IsRegionLoadedFired = true
+					LOG.std(nil, "system", "GameLogic", "OnWorldInitialRegionsLoaded");
+					GameLogic.GetFilters():apply_filters("OnWorldInitialRegionsLoaded", true);
+				else
+					timer:Change(500);
+				end
+			end
+		end})
+		GameLogic.loadWorldTimer:Change(500);
+	end
+	return bContinue;
+end
+
+
 function GameLogic.OnSaveBlockRegion(bContinue, region_x, region_y, region_type)
 	return bContinue;
 end
@@ -580,6 +602,8 @@ function GameLogic.LoadGame()
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	Files:ClearFindFileCache();
 	Files:UnloadAllWorldAssets();
+	GameLogic.IsRegionLoadedFired = nil;
+	GameLogic.tickCount = 0;
 
 	System.os.options.DisableInput(true);
 
@@ -869,6 +893,11 @@ function GameLogic.Exit()
 		GameLogic.codeGlobal:Destroy();
 		GameLogic.codeGlobal = nil;
 	end
+
+	if(GameLogic.loadWorldTimer) then
+		GameLogic.loadWorldTimer:Change();
+		GameLogic.loadWorldTimer = nil;
+	end
 end
 
 local slow_timer_tick = 1;
@@ -979,6 +1008,11 @@ function GameLogic:IsTick(deltaTime)
 	return self.ticks:IsTick(deltaTime)
 end
 
+-- the number of frame moves that has been called. 
+function GameLogic.GetTickCount()
+	return GameLogic.tickCount or 0;
+end
+
 -- called 30 FPS framemove.
 function GameLogic.FrameMove(timer)
 	if(GameLogic.IsPaused()) then
@@ -997,7 +1031,8 @@ function GameLogic.FrameMove(timer)
 	end
 
 	GameLogic.lastGameTime = GameLogic.gameFRC:GetField("Time", 0);
-
+	GameLogic.tickCount = (GameLogic.tickCount or 0) + 1;
+	
 	local simDeltaTime = math.min(100,deltaTime);
 	-- 20FPS simulation tick
 	local bIsTick = GameLogic:IsTick(deltaTime);
@@ -1730,12 +1765,10 @@ function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
 		);
 
 	if not bEnabled then
-		if(System.User.isVip) then
+		if (System.User.isVip) then
 			return true;
-		elseif(bOpenUIIfNot) then
-			if not GameLogic.GetFilters():apply_filters("VipNotice", false, "", callbackFunc) then
-				_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
-			end
+		elseif (bOpenUIIfNot) then
+			_guihelper.MessageBox(L"您需要登录并成为VIP用户，才能使用此功能")
 		end
 	else
 		if(System.User.isVip) then

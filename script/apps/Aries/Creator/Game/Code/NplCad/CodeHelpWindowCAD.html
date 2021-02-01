@@ -10,10 +10,10 @@ CodeHelpWindow.OnInit();
         <pe:repeat DataSource="<%=CodeHelpWindow.GetCategoryButtons()%>">
             <pe:repeatitem style="float:left;">
                 <pe:if condition='<%=CodeHelpWindow.category_index == Eval("index") %>'>
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="CodeHelpWindow.Category_"..Eval("name")%>' name='<%=Eval("index")%>' style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
                 </pe:if>
                 <pe:if condition='<%=CodeHelpWindow.category_index ~= Eval("index") %>'>
-                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="CodeHelpWindow.OnChangeCategory" style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="CodeHelpWindow.Category_"..Eval("name")%>' name='<%=Eval("index")%>' onclick="CodeHelpWindow.OnChangeCategory" style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
                 </pe:if>
             </pe:repeatitem>
         </pe:repeat>
@@ -21,12 +21,12 @@ CodeHelpWindow.OnInit();
     <div class="mc_paper_panel" style="margin-top:5px;padding-top:10px;color:#4a6cd4">
         <pe:if condition='<%=CodeHelpWindow.category_name == "Data"%>'>
             <div style="margin-bottom:5px;margin-left:10px;">
-                <input type="button" value='<%=L"创建全局变量"%>' tooltip='<%=L"左键创建全局变量,右键刷新"%>' onclick="CodeHelpWindow.OnCreateVariable" style="color:#ffffff;font-size:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" uiname="CodeHelpWindow.OnCreateVariable" value='<%=L"创建全局变量"%>' tooltip='<%=L"左键创建全局变量,右键刷新"%>' onclick="CodeHelpWindow.OnCreateVariable" style="color:#ffffff;font-size:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
             </div>
-            <pe:gridview style="margin:0px;height:137px;" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"
+            <pe:gridview style="margin:0px;height:137px;" uiname="CodeHelpWindow.gvwData" name="gvwData" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"
                          DataSource='<%=CodeHelpWindow.DS_GlobalData%>'>
                 <Columns>
-                    <div tooltip='<%=Eval("datatype")%>' name='<%=Eval("name")%>' onclick="CodeHelpWindow.OnClickDataItem">
+                    <div tooltip='<%=Eval("datatype")%>' uiname='<%="CodeHelpWindow.Data."..Eval("name")%>' name='<%=Eval("name")%>' onclick="CodeHelpWindow.OnClickDataItem">
                         <div style="margin-left:10px;min-width:40px;background-color:#ff6a00;color:#ffffff;padding-left:5px;padding-right:5px;">
                             <%=Eval("name")%>
                         </div>
@@ -36,11 +36,12 @@ CodeHelpWindow.OnInit();
                 </EmptyDataTemplate>
             </pe:gridview>
         </pe:if>
-        <pe:gridview style="margin:0px;margin-left:4px;" name="gvwFunctions" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="28" RememberScrollPos="true"
+        <pe:gridview style="margin:0px;margin-left:4px;" uiname="CodeHelpWindow.gvwFunctions" name="gvwFunctions" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="28" RememberScrollPos="true"
                         DataSource='<%=CodeHelpWindow.DS_CodeItems%>'>
             <Columns>
                 <div style="width:300px">
                     <pe:container style="background:url();margin-top:3px;margin-bottom:2px;padding-right:5px;"
+                                  uiname='<%=format("CodeHelpWindow.Item.%s.%s", CodeHelpWindow.category_name, Eval("name"))%>'
                                   name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd"
                                   tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
                                   onclick="CodeHelpWindow.OnClickItem">

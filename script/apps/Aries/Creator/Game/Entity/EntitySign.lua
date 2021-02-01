@@ -407,7 +407,7 @@ local EditorPanelMCML
 function Entity:GetCommandTitle()
 	EditorPanelMCML = EditorPanelMCML or string.format([[
 		<div style="float:left;margin-left:5px;margin-top:7px;">
-			<input type="button" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntitySign.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+			<input type="button" uiname="EditEntityPage.OpenHTMLEditor" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntitySign.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
 		</div>
 	]], L"HTML编辑器...");
 	return EditorPanelMCML;

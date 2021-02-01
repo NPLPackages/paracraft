@@ -170,9 +170,17 @@ function MainLogin:UpdateCoreClient()
 			local gamename = "Paracraft"
 			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
 
+			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在检查版本...', 30000, nil, nil, nil, nil, '_ct', true)
+
 			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
 			updater:check(nil, function(bSucceed)
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+
 				if(bSucceed and updater:isNeedUpdate()) then
+					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, updater, gamename) then
+						return
+					end
+
 					System.App.Commands.Call("File.MCMLWindowFrame", {
 						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
 						name = "ClientUpdateDialog", 

@@ -708,6 +708,12 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 			if(filename and filename~="") then
 				-- repeated calls are cached
 				filename = Files.FindFile(filename);
+				if (not filename) then
+					local fileItem = Files.ResolveFilePath(filename);
+					if (fileItem and fileItem.relativeToRootPath) then
+						filename = fileItem.relativeToRootPath;
+					end
+				end
 				if(filename) then
 					if(not width or not height) then
 						local texture = ParaAsset.LoadTexture("", filename, 1);

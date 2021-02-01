@@ -49,7 +49,7 @@ function TouchVirtualKeyboard:ctor()
 			{name="0", char="0",col=1, name2 = ")", char2 = ")", vKey = DIK_SCANCODE.DIK_0, fn={name="F10", vKey = DIK_SCANCODE.DIK_F10}},
 			{name="-", char="-",col=1, name2 = "_", char2 = "_", vKey = DIK_SCANCODE.DIK_MINUS, fn={name="F11", vKey = DIK_SCANCODE.DIK_F11, click_to_close = true}},
 			{name="=", char="=",col=1, name2 = "+", char2 = "+", vKey = DIK_SCANCODE.DIK_EQUALS, fn={name="F12", vKey = DIK_SCANCODE.DIK_F12, click_to_close = true}},
-			{name="Backspace", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_BACK},
+			{name="Backspace", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_BACKSPACE},
 		},
 		{
 			{col=1, },

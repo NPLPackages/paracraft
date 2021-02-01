@@ -34,6 +34,8 @@ local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");	
+local ParaWorldNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.lua");
+local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 
 local ParaWorldChunkGenerator = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerator"), commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator"))
 
@@ -106,6 +108,10 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 		GameLogic.RunCommand("/ggs connect -silent=false");
 		DockPage.Show();
 		MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
+
+		for i = 1, #TeachingQuestPage.TaskTypeNames do
+			ParaWorldNPC.CreateTeacherNPC(nil, nil, TeachingQuestPage.TaskTypeNames[i]);
+		end
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
@@ -351,7 +357,6 @@ function ParaWorldChunkGenerator:GenerateFlat(c, x, z)
 				local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({block_id = block_types.names.player_spawn_point, blockX=worldX, blockY=by+1, blockZ=worldZ})
 				task:Run();
 
-				local ParaWorldNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.lua");
 				ParaWorldNPC.CreateDefaultNPC(worldX, by+1, worldZ);
 			end
 		end

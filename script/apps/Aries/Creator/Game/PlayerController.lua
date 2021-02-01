@@ -73,6 +73,10 @@ function PlayerController:GetSkinTexture()
 	end
 	if(not skin) then
 		-- this function may be called before world is loaded, so check load block_types
+		skin = GameLogic.options:GetMainPlayerSkins();
+		if (skin) then
+			return skin;
+		end
 		block_types.init();
 		local item = ItemClient.GetItem(block_types.names.player);
 		if(item) then

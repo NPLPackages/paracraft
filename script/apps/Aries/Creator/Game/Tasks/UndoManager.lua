@@ -51,6 +51,7 @@ function UndoManager.Undo()
 	if(cmd) then
 		if(cmd[1].Undo) then
 			cmd[1]:Undo();
+			UndoManager:commandAdded(); -- signal
 		end
 		undo_list:remove(cmd);
 		redo_list:push_back(cmd);
@@ -62,6 +63,7 @@ function UndoManager.Redo()
 	if(cmd) then
 		if(cmd[1].Redo) then
 			cmd[1]:Redo();
+			UndoManager:commandAdded(); -- signal
 		end
 		redo_list:remove(cmd);
 		undo_list:push_back(cmd);

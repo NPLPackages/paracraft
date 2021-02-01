@@ -100,6 +100,10 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 			end
 		end
 		
+		if(PlayerAssetFile:HasCustomGeosets(obj_params.AssetFile)) then
+			obj_params.CustomGeosets = MyCompany.Aries.Game.PlayerController:GetSkinTexture();
+		end
+
 		obj_params.facing = 1.57;
 		-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 		obj_params.Attribute = 128;

@@ -10,6 +10,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Macro.lua");
 local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
 -------------------------------------------------------
 ]]
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Application = commonlib.gettable("System.Windows.Application");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
@@ -39,6 +40,23 @@ function Macros.ButtonClick(btnName, button, eventname)
 		end
 		local emulatedKeys = Keyboard:GetEmulatedKeys()
 		SetKeyboardFromButtonText(emulatedKeys, button)
+
+		-- tricky: process special buttons 
+		if(btnName == "MovieClipController.play") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+			local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+			local movieClip = MovieManager:GetActiveMovieClip()
+			if(movieClip) then
+				local focusEntity = EntityManager.GetFocus();
+				if(focusEntity) then
+					focusEntity:SetFocus();
+					local obj = focusEntity:GetInnerObject();
+					if(obj and obj.ToCharacter) then
+						obj:ToCharacter():SetFocus();
+					end
+				end
+			end
+		end
 
 		-- trickly: id is a global variable for _guihelper.GetLastUIObjectPos()
 		id = obj.id; 

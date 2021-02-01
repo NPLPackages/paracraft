@@ -142,7 +142,7 @@ function PlayerAssetFile:IsCustomModel(filename)
 end
 
 function PlayerAssetFile:HasCustomGeosets(filename)
-	return string.find(filename, "CustomGeoset") ~= nil;
+	return filename ~= nil and string.find(filename, "CustomGeoset") ~= nil;
 end
 
 -- mostly for haqi character
@@ -165,7 +165,7 @@ function PlayerAssetFile:GetDefaultScale(filename)
 end
 
 function PlayerAssetFile:GetDefaultCustomGeosets()
-	return "1#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye1.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png";
+	return "1#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png";
 end
 
 function PlayerAssetFile:RefreshCustomGeosets(player, skin)

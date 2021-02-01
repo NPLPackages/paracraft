@@ -128,141 +128,85 @@ end
         <pe:if condition='<%=IsNotTask()%>'>
             <div style="margin-top: 140px;margin-left: 360px; width: 277px;height: 87px;background:Texture/Aries/Creator/keepwork/Quest/zi_zanshi_277X87_32bits.png#0 0 277 87;"></div>
         </pe:if>
-        <div type ="box" style="width:960px;height:400px;margin-left: 4px;margin-top: 0px;float: left;">
-             <pe:gridview style="margin:0px;width:960px;height:400px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
-                 DataSource='<%=Button_DS_Items%>'>
-                 <Columns>
-                         <div name="item_root" style="color:#ffffff;width: 926px;height: 90px;float: left;">
-                            <div style="position:relative;margin-left:0px;margin-top:0px;">
-                                <img zorder="-1" src='<%=Eval("bg_img") %>'width="926" height="90"/>
-                            </div>
-                            <input type="button" name="canvas" value="" onclick="" param1 = '' style="position:relative;margin-left:0px;margin-top:0px;width: 926px; height: 90; background:url()" />
-                            <!-- <pe:container name="canvas" ClickThrough="true" style="position:relative;margin-left:0px;margin-top:0px;width: 926px; height: 90;" zorder="1">
-                            </pe:container> -->
-                            <pe:if condition='<%=Eval("is_main_task")%>'>
-                                <div style="position:relative;margin-top: -1px;margin-left: -2px; width: 69px;height: 62px; background: Texture/Aries/Creator/keepwork/Quest/zhuxian_69X62_32bits.png#0 0 69 62;"></div>
-                            </pe:if>
-                            <div style="width: 360px; height:90px; float: left;">
-                                <div style="width: 360px; height:45px;">
-                                    <div style="width: 360px;base-font-size:20px; font-size:20px; margin-left: 45px; margin-top: 16px;color:#000000;float: left;font-weight: bold;"><%=Eval("name") %></div>
-                                </div>
-                                
-                                <div style="base-font-size:14px; font-size:14px; margin-left: 50px; margin-top: 2px;color:#000000;font-weight: bold;"><%=Eval("task_desc") %></div>
-                            </div>
-
-                            <div style="width: 400px; height:90px; float: left;">
-                                <div style="width: 160px;height:90px;float: left">
-                                    <div style="width: 160px;height:90px;base-font-size:16px; font-size:16px; margin-left: 18px; margin-top: 33px;color:#666666;text-align: center;"><%=Eval("task_pro_desc") %></div>
-                                </div>
-                                <div style="width: 240px;height:90px;float: left;">
-                                    <!-- <div style="color: #000000;">啊啊啊啊啊</div> -->
-                                    <div type ="box" style="width:240px;height:90px;margin-left: 4px;margin-top: 5px;float: left;">
-                                        <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "0" 
-                                            DataSource='<%=Eval("goods_data") %>'>
-                                            <Columns>
-                                                <!-- <div class="kp_item" >
-                                                    <kp:slot guid='<%=XPath("this|goods|id")%>'class="kp_item"  /> 
-                                                </div> -->
-                                                <!-- <kp:slot guid='<%=XPath("this|goods|id")%>'class="kp_item"  />  -->
-
-                                                <div style="width: 60px; height: 60px; background: Texture/Aries/Creator/keepwork/Quest/wupingdi_60X60_32bits.png#0 0 40 40;">
-                                                    <!-- <img style="margin-top: 12px;margin-left: 12px; position: relative;" src='<%=GetGiftItemIcon(Eval("goods")) %>' width="36" height="36"/> -->
-                                                    <div zorder="1" tooltip='<%=GetItemDesc(XPath("this"))%>' style="width: 60px; height: 60px; position: relative;"></div>
-                                                    <pe:if condition = '<%=IsShowExpIcon(XPath("this"))%>'>
-                                                        <div style="width: 56px;height: 50px; margin-top: 10px;margin-left: 12px; position: relative;background: Texture/Aries/Creator/keepwork/Quest/wuping_EXP2_37X37_32bits.png#0 0 56 50;"></div>
-                                                        <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("exp") %></div>
-                                                    </pe:if>
-                                                    <pe:if condition = '<%=not IsShowExpIcon(XPath("this"))%>'>
-                                                        <pe:if condition = '<%=IsRoleModel(Eval("goods"))%>'>
-                                                            <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 3px;margin-left: 12px; position: relative; width:72px;height:72px;"/>
-                                                        </pe:if>
-                                                        <pe:if condition = '<%=not IsRoleModel(Eval("goods")) %>'>
-                                                            <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 12px;margin-left: -5px; position: relative; width:72px;height:36px;"/>
-                                                        </pe:if>
-                                                        <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount") %></div>  
-                                                    </pe:if>
-                                                    
-                                                    
-                                                </div>
-                                            </Columns>
-                                            <EmptyDataTemplate>
-                                            </EmptyDataTemplate>
-                                        </pe:gridview>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div name="button_list" style="width: 165px; height:90px; float: left;">
-                                <pe:if condition = '<%=Eval("task_state") == 0%>'>
-                                    <div style="margin-top: 40px;margin-left: 50px; width: 61px;height: 18px;background:Texture/Aries/Creator/keepwork/Quest/zi_daiwancheng_61X18_32bits.png#0 0 61 18;"></div>
-                                </pe:if>
-                                <pe:if condition = '<%=Eval("task_state") == 1%>'>
-                                    <input type="button" value="领取" onclick="GetReward" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54)" />
-                                </pe:if>
-                                <pe:if condition = '<%=Eval("task_state") == 2%>'>
-                                    <div style="margin-top: 18px;margin-left: 50px; width: 60px;height: 58px;background:Texture/Aries/Creator/keepwork/Quest/yiwancheng_60X58_32bits.png#0 0 60 58;"></div>
-                                </pe:if>
-                                <pe:if condition = '<%=Eval("task_state") == 3%>'>
-                                    <input type="button" value="前往" onclick="Goto" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_lvse_134X54_32bits.png#0 0 134 54)" />
-                                </pe:if>
-                            </div>
-                         </div>
-
-                         
-                 </Columns>
-                 <EmptyDataTemplate>
-                 </EmptyDataTemplate>
-             </pe:gridview>
-         </div>
-
-         <div style="margin-left: 10px;margin-top: 0px; width:926px;height: 130px; background: Texture/Aries/Creator/keepwork/Quest/tiao_926X130_32bits.png#0 0 926 130;">
-            <div style="margin-left:158px;margin-top:84px; position: relative; width: 697px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div>
-            <!-- <div style="margin-left:850px;margin-top:84px; position: relative; width: 60px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div> -->
-
-            <!-- <div style="margin-left:158px;margin-top:84px;position: relative;">
-                <pe:progressbar name="expbar" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
-                style="width:697px;height:10px;" miniblockwidth="15"
-                blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
-                background=""
-                />
-            </div>
-
-            <div style="margin-left:850px;margin-top:84px;position: relative;">
-                <pe:progressbar name="expbar2" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
-                style="width:60px;height:10px;" miniblockwidth="15"
-                blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
-                background=""
-                />
-            </div> -->
-            <div style="position: relative;">
-                <pe:label name="exp_desc" value="0" style="width: 50px;height: 50px; position: relative;margin-top:80px;margin-left: 35px;color: #000000; font-size: 30px; base-font-size:30px;text-align: center;"/>
-            </div>
-            
-            <div type ="box" style="width:774px;height:180px;margin-left: 158px;margin-top: 7px; position: relative;">
-                <pe:gridview style="margin:0px;width:774px;height:180px;float:left" RememberScrollPos="true" name="gift_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "0" 
-                    DataSource='<%=GiftDsItem%>'>
+        <pe:if condition='<%=not IsNotTask()%>'>
+            <div type ="box" style="width:960px;height:400px;margin-left: 4px;margin-top: 0px;float: left;">
+                <pe:gridview style="margin:0px;width:960px;height:400px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                    DataSource='<%=Button_DS_Items%>'>
                     <Columns>
-                            <div style="color:#ffffff;width: 140px;height: 110px;float: left;">
-                               <div style="position:relative;margin-left:117px;margin-top:0px;">
-                                    <pe:if condition = '<%=IsLastGift(Eval("index")) %>'>
-                                        <img zorder="-1" style="position:relative;margin-top: -3px;margin-left: -32px;" src='<%=Eval("img") %>'width="86" height="70"/>
-                                        <input type="button" value="" onclick="OnClikcGift" param1 = '<%=XPath("this") %>' style="position:relative;margin-top: -3px;margin-left: -32px;
-                                        width: 86px;height: 70px;background: ;" />
-                                    </pe:if>
-                                    <pe:if condition = '<%=not IsLastGift(Eval("index")) %>'>
-                                        <img zorder="-1" style="position:relative;margin-top: 8px;margin-left: -20px;" src='<%=Eval("img") %>'width="55" height="56"/>
-                                        <input type="button" value="" onclick="OnClikcGift" param1 = '<%=XPath("this") %>' style="position:relative;margin-top: 8px;margin-left: -20px;
-                                        width: 55px;height: 56px;background: ;" />
-                                    </pe:if>
-
-                                    <pe:if condition = '<%=Eval("state") == 2%>'>
-                                        <div style="position:relative;margin-top: 47px;margin-left: 23px; width: 22px; height:22px;; background: Texture/Aries/Creator/keepwork/Quest/dagou_22X22_32bits.png#0 0 22 22;"></div>
-                                    </pe:if>
-                                    
-                                    <div style="margin-top: 69px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan2_24X24_32bits.png#0 0 24 24;"></div>                                    
-                                    <img style="margin-top: 3px;margin-left: 1px;" src='<%=Eval("number_img") %>'width="23" height="12"/>
+                            <div name="item_root" style="color:#ffffff;width: 926px;height: 90px;float: left;">
+                               <div style="position:relative;margin-left:0px;margin-top:0px;">
+                                   <img zorder="-1" src='<%=Eval("bg_img") %>'width="926" height="90"/>
+                               </div>
+                               <input type="button" name="canvas" value="" onclick="" param1 = '' style="position:relative;margin-left:0px;margin-top:0px;width: 926px; height: 90; background:url()" />
+                               <!-- <pe:container name="canvas" ClickThrough="true" style="position:relative;margin-left:0px;margin-top:0px;width: 926px; height: 90;" zorder="1">
+                               </pe:container> -->
+                               <pe:if condition='<%=Eval("is_main_task")%>'>
+                                   <div style="position:relative;margin-top: -1px;margin-left: -2px; width: 69px;height: 62px; background: Texture/Aries/Creator/keepwork/Quest/zhuxian_69X62_32bits.png#0 0 69 62;"></div>
+                               </pe:if>
+                               <div style="width: 360px; height:90px; float: left;">
+                                   <div style="width: 360px; height:45px;">
+                                       <div style="width: 360px;base-font-size:20px; font-size:20px; margin-left: 45px; margin-top: 14px;color:#000000;float: left;font-weight: bold;"><%=Eval("name") %></div>
+                                   </div>
+                                   
+                                   <div style="base-font-size:12px; font-size:12px; margin-left: 56px; margin-top: 2px;color:#666666;"><%=Eval("task_desc") %></div>
                                </div>
    
+                               <div style="width: 400px; height:90px; float: left;">
+                                   <div style="width: 160px;height:90px;float: left">
+                                       <div style="width: 160px;height:90px;base-font-size:16px; font-size:16px; margin-left: 18px; margin-top: 33px;color:#666666;text-align: center;"><%=Eval("task_pro_desc") %></div>
+                                   </div>
+                                   <div style="width: 240px;height:90px;float: left;">
+                                       <!-- <div style="color: #000000;">啊啊啊啊啊</div> -->
+                                       <div type ="box" style="width:240px;height:90px;margin-left: 4px;margin-top: 5px;float: left;">
+                                           <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "0" 
+                                               DataSource='<%=Eval("goods_data") %>'>
+                                               <Columns>
+                                                   <!-- <div class="kp_item" >
+                                                       <kp:slot guid='<%=XPath("this|goods|id")%>'class="kp_item"  /> 
+                                                   </div> -->
+                                                   <!-- <kp:slot guid='<%=XPath("this|goods|id")%>'class="kp_item"  />  -->
+   
+                                                   <div style="width: 60px; height: 60px; background: Texture/Aries/Creator/keepwork/Quest/wupingdi_60X60_32bits.png#0 0 40 40;">
+                                                       <!-- <img style="margin-top: 12px;margin-left: 12px; position: relative;" src='<%=GetGiftItemIcon(Eval("goods")) %>' width="36" height="36"/> -->
+                                                       <div zorder="1" tooltip='<%=GetItemDesc(XPath("this"))%>' style="width: 60px; height: 60px; position: relative;"></div>
+                                                       <pe:if condition = '<%=IsShowExpIcon(XPath("this"))%>'>
+                                                           <div style="width: 56px;height: 50px; margin-top: 10px;margin-left: 12px; position: relative;background: Texture/Aries/Creator/keepwork/Quest/wuping_EXP2_37X37_32bits.png#0 0 56 50;"></div>
+                                                           <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("exp") %></div>
+                                                       </pe:if>
+                                                       <pe:if condition = '<%=not IsShowExpIcon(XPath("this"))%>'>
+                                                           <pe:if condition = '<%=IsRoleModel(Eval("goods"))%>'>
+                                                               <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 3px;margin-left: 12px; position: relative; width:72px;height:72px;"/>
+                                                           </pe:if>
+                                                           <pe:if condition = '<%=not IsRoleModel(Eval("goods")) %>'>
+                                                               <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 12px;margin-left: -5px; position: relative; width:72px;height:36px;"/>
+                                                           </pe:if>
+                                                           <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount") %></div>  
+                                                       </pe:if>
+                                                       
+                                                       
+                                                   </div>
+                                               </Columns>
+                                               <EmptyDataTemplate>
+                                               </EmptyDataTemplate>
+                                           </pe:gridview>
+                                       </div>
+                                   </div>
+                               </div>
+   
+                               <div name="button_list" style="width: 165px; height:90px; float: left;">
+                                   <pe:if condition = '<%=Eval("task_state") == 0%>'>
+                                       <div style="margin-top: 40px;margin-left: 50px; width: 61px;height: 18px;background:Texture/Aries/Creator/keepwork/Quest/zi_daiwancheng_61X18_32bits.png#0 0 61 18;"></div>
+                                   </pe:if>
+                                   <pe:if condition = '<%=Eval("task_state") == 1%>'>
+                                       <input type="button" value="领取" onclick="GetReward" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54)" />
+                                   </pe:if>
+                                   <pe:if condition = '<%=Eval("task_state") == 2%>'>
+                                       <div style="margin-top: 18px;margin-left: 50px; width: 60px;height: 58px;background:Texture/Aries/Creator/keepwork/Quest/yiwancheng_60X58_32bits.png#0 0 60 58;"></div>
+                                   </pe:if>
+                                   <pe:if condition = '<%=Eval("task_state") == 3%>'>
+                                       <input type="button" value="前往" onclick="Goto" param1 = '<%=Eval("task_id") %>' style="base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_lvse_134X54_32bits.png#0 0 134 54)" />
+                                   </pe:if>
+                               </div>
                             </div>
    
                             
@@ -271,19 +215,77 @@ end
                     </EmptyDataTemplate>
                 </pe:gridview>
             </div>
-
-            <pe:container name="pro" ClickThrough="true" style="width:705px;height:30px;margin-left:159px;margin-top:72px;position: relative;background:;" SelfPaint="true">
-                <div style="position: relative;margin-top:5px;">
-                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                    <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
-                </div>
-                <div style="margin-left: -1px; margin-top: 12; width:697px;height:10px;background: url(Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png#0 0 32 10: 7 4 7 4);">
-                </div>
-            </pe:container>
-        </div>
+   
+            <div style="margin-left: 10px;margin-top: 0px; width:926px;height: 130px; background: Texture/Aries/Creator/keepwork/Quest/tiao_926X130_32bits.png#0 0 926 130;">
+               <div style="margin-left:158px;margin-top:84px; position: relative; width: 697px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div>
+               <!-- <div style="margin-left:850px;margin-top:84px; position: relative; width: 60px; height: 10px; background: Texture/Aries/Creator/keepwork/Quest/jingdutiao2_32X10_32bits.png#0 0 32 10:7 4 7 4;"></div> -->
+   
+               <!-- <div style="margin-left:158px;margin-top:84px;position: relative;">
+                   <pe:progressbar name="expbar" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
+                   style="width:697px;height:10px;" miniblockwidth="15"
+                   blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
+                   background=""
+                   />
+               </div>
+   
+               <div style="margin-left:850px;margin-top:84px;position: relative;">
+                   <pe:progressbar name="expbar2" Minimum = "0" Maximum = "100" Value = "0" Step = "1"
+                   style="width:60px;height:10px;" miniblockwidth="15"
+                   blockimage="Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png;0 0 32 10: 7 4 7 4"
+                   background=""
+                   />
+               </div> -->
+               <div style="position: relative;">
+                   <pe:label name="exp_desc" value="0" style="width: 50px;height: 50px; position: relative;margin-top:80px;margin-left: 35px;color: #000000; font-size: 30px; base-font-size:30px;text-align: center;"/>
+               </div>
+               
+               <div type ="box" style="width:774px;height:180px;margin-left: 158px;margin-top: 7px; position: relative;">
+                   <pe:gridview style="margin:0px;width:774px;height:180px;float:left" RememberScrollPos="true" name="gift_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "0" 
+                       DataSource='<%=GiftDsItem%>'>
+                       <Columns>
+                               <div style="color:#ffffff;width: 140px;height: 110px;float: left;">
+                                  <div style="position:relative;margin-left:117px;margin-top:0px;">
+                                       <pe:if condition = '<%=IsLastGift(Eval("index")) %>'>
+                                           <img zorder="-1" style="position:relative;margin-top: -3px;margin-left: -32px;" src='<%=Eval("img") %>'width="86" height="70"/>
+                                           <input type="button" value="" onclick="OnClikcGift" param1 = '<%=XPath("this") %>' style="position:relative;margin-top: -3px;margin-left: -32px;
+                                           width: 86px;height: 70px;background: ;" />
+                                       </pe:if>
+                                       <pe:if condition = '<%=not IsLastGift(Eval("index")) %>'>
+                                           <img zorder="-1" style="position:relative;margin-top: 8px;margin-left: -20px;" src='<%=Eval("img") %>'width="55" height="56"/>
+                                           <input type="button" value="" onclick="OnClikcGift" param1 = '<%=XPath("this") %>' style="position:relative;margin-top: 8px;margin-left: -20px;
+                                           width: 55px;height: 56px;background: ;" />
+                                       </pe:if>
+   
+                                       <pe:if condition = '<%=Eval("state") == 2%>'>
+                                           <div style="position:relative;margin-top: 47px;margin-left: 23px; width: 22px; height:22px;; background: Texture/Aries/Creator/keepwork/Quest/dagou_22X22_32bits.png#0 0 22 22;"></div>
+                                       </pe:if>
+                                       
+                                       <div style="margin-top: 69px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan2_24X24_32bits.png#0 0 24 24;"></div>                                    
+                                       <img style="margin-top: 3px;margin-left: 1px;" src='<%=Eval("number_img") %>'width="23" height="12"/>
+                                  </div>
+      
+                               </div>
+      
+                               
+                       </Columns>
+                       <EmptyDataTemplate>
+                       </EmptyDataTemplate>
+                   </pe:gridview>
+               </div>
+   
+               <pe:container name="pro" ClickThrough="true" style="width:705px;height:30px;margin-left:159px;margin-top:72px;position: relative;background:;" SelfPaint="true">
+                   <div style="position: relative;margin-top:5px;">
+                       <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                       <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                       <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                       <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                       <div style="float: left; margin-left: 117px;width: 24px; height:24px;; background: Texture/Aries/Creator/keepwork/Quest/yuan_24X24_32bits.png#0 0 24 24;"></div>
+                   </div>
+                   <div style="margin-left: -1px; margin-top: 12; width:697px;height:10px;background: url(Texture/Aries/Creator/keepwork/Quest/jingdutiao_32X10_32bits.png#0 0 32 10: 7 4 7 4);">
+                   </div>
+               </pe:container>
+           </div>
+        </pe:if>
      </div>
 </kp:window>
     </pe:mcml>

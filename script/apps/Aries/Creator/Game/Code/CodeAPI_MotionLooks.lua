@@ -887,11 +887,9 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 					parent = nil;
 					alignment = alignment:gsub("^(global)", "")
 				else
-					NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-					local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
-					local viewport = ViewportManager:GetSceneViewport();
-
-					parent = viewport:GetUIObject(true);
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SceneViewport.lua");
+					local SceneViewport = commonlib.gettable("MyCompany.Aries.Game.Common.SceneViewport")
+					parent = SceneViewport.GetUIObject();
 				end
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");

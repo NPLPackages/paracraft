@@ -85,6 +85,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "cellar.vip_notice.close": Close vip notice page
 
 - world:
+  - "OnWorldInitialRegionsLoaded": called only once after the first world regions are loaded. 
   - "PlayerHasLoginPosition", nil, x,y,z: called whenever the player is at its spawn position in both local or remote world.
   - "BeforeSetSpawnPoint", {x,y,z}: before player spawn point is set
   - "SetSpawnPoint", nil, x,y,z: whenever the player spawn point is set. 
@@ -111,6 +112,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "compare_init": Compare current world bewteen remove version and local version
   - "current_world": Get current selected world
   - "check_and_updated_before_enter_my_home": Check and updated brefore enter my home
+  - "service.local_service_world.set_community_world": set community world enabled.
+  - "service.local_service_word.is_community_world": is community world.
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:

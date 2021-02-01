@@ -157,13 +157,13 @@ end
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"真实光影"%></div>
                     <div style="float:left;margin-top:0px;margin-left:9px;">
-                        <select name="comboShader" style="margin-top:0px;height:22px" onselect="OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
+                        <select uiname="EnvFramePage.comboShader" name="comboShader" style="margin-top:0px;height:22px" onselect="OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"需要shader HDR下生效,可调整画面整体亮度"%>'><%=L"眼睛亮度"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar name="eye_bightness" min="0.01" max="0.9" value="0.5" style="width:80px;height:22px;" onchange="OnChangeEyeBrightness()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.eye_bightness" name="eye_bightness" min="0.01" max="0.9" value="0.5" style="width:80px;height:22px;" onchange="OnChangeEyeBrightness()"></pe:sliderbar>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
@@ -212,7 +212,7 @@ end
                             </pe:if>
                             <pe:if condition='<%=Eval("right_type") == "button"%>'>
                                 <div style="float:left;margin-top:3px;margin-left:5px;">
-                                    <input name="checkboxViewBobbing" value='<%= Eval("right_value")%>' type="checkbox" onclick='<%= Eval("onclick")%>' style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
+                                    <input uiname="EnvFramePage.checkboxViewBobbing" name="checkboxViewBobbing" value='<%= Eval("right_value")%>' type="checkbox" onclick='<%= Eval("onclick")%>' style="width:32px;height:16px;" UncheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;207 450 32 16" CheckedBG="Texture/Aries/Creator/Desktop/Inventory_32bits.png;242 450 32 16"/>
                                 </div>
                             </pe:if>
                             <pe:if condition='<%=Eval("right_type") == "text"%>'>

@@ -203,10 +203,17 @@ end
 -- static method
 -- @param x, z: in world block position
 -- @param radius: TODO: not implemented. 
-function TeleportPlayer.LockInputUntilRegionLoaded(x, z, radius)
+function TeleportPlayer.LockInputUntilRegionLoaded(x, z, radius, entityPlayer)
 	local regionX = math.floor(x / 512)
 	local regionY = math.floor(z / 512)
 	if(not BlockEngine.IsRegionLoaded(regionX, regionY)) then
+		local bFreePlayerControl = false;
+		if(entityPlayer) then
+			if(not entityPlayer:IsFlying()) then
+				bFreePlayerControl = true;
+				entityPlayer:ToggleFly(true);
+			end
+		end
 		System.os.options.DisableInput(true);
 		local step = 100;
 		local count = 1;
@@ -217,6 +224,9 @@ function TeleportPlayer.LockInputUntilRegionLoaded(x, z, radius)
 				timer:Change(step)
 			else
 				System.os.options.DisableInput(false);
+				if(bFreePlayerControl and entityPlayer) then
+					entityPlayer:ToggleFly(false);
+				end
 			end
 		end})
 		mytimer:Change(step);
@@ -228,7 +238,7 @@ function TeleportPlayer:TeleportToPosImp(entityPlayer, x, y, z)
 		entityPlayer:SetPosition(x, y, z);
 		local x, y, z = entityPlayer:GetBlockPos()
 		if(entityPlayer == EntityManager.GetPlayer()) then
-			TeleportPlayer.LockInputUntilRegionLoaded(x, z)
+			TeleportPlayer.LockInputUntilRegionLoaded(x, z, nil, entityPlayer)
 		end
 	end
 end

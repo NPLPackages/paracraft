@@ -717,6 +717,9 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
             return
         end
         if(data)then
+			if (data.extra and data.extra.ParacraftPlayerEntityInfo and data.extra.ParacraftPlayerEntityInfo.skin) then
+				GameLogic.options:SetMainPlayerSkins(data.extra.ParacraftPlayerEntityInfo.skin);
+			end
             KeepWorkItemManager.profile = data;
             if(callback)then
                 callback(err, msg, data);

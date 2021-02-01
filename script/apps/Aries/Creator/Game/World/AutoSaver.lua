@@ -25,6 +25,7 @@ AutoSaver.interval = 10 * 60 * 1000;
 AutoSaver.autosave_operation_count = 15;
 AutoSaver.mode = "tip";
 AutoSaver.operation_count = 0;
+AutoSaver.timeout = false;
 
 function AutoSaver:ctor()
 	GameLogic:Connect("WorldLoaded", self, self.OnEnterWorld, "UniqueConnection");
@@ -46,9 +47,10 @@ end
 -- @param nCount: default to 1
 function AutoSaver:IncreaseOperation(nCount)
 	self.operation_count = self.operation_count + (nCount or 1);
-	if(self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
-		self.operation_count = 1;
+	if(self.timeout and self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
+		--self.operation_count = 1;
 		self:DoAutoSave();
+		self:ResetTimer();
 	end
 end
 
@@ -84,18 +86,25 @@ end
 
 function AutoSaver:DoAutoSave()
 	if(GameLogic.GameMode:IsEditor()) then
-		if (self:IsSaveMode()) then
-			-- save mode
-			GameLogic.QuickSave();
-		else
-			-- tip mode
-			if(not GameLogic.IsRemoteWorld() and not ParaMovie.IsRecording()) then
-				if(System.options.IsMobilePlatform) then
-					GameLogic.AddBBS("UndoManager", L"记得保存你的世界～", 5000, "0 255 0");
-				else
-					GameLogic.AddBBS("UndoManager", L"记得保存你的世界哦～(Ctrl+S)", 5000, "0 255 0");
+		if(self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
+			self.timeout = false;
+			self.operation_count = 1;
+
+			if (self:IsSaveMode()) then
+				-- save mode
+				GameLogic.QuickSave();
+			else
+				-- tip mode
+				if(not GameLogic.IsRemoteWorld() and not ParaMovie.IsRecording()) then
+					if(System.options.IsMobilePlatform) then
+						GameLogic.AddBBS("UndoManager", L"记得保存你的世界～", 5000, "0 255 0");
+					else
+						GameLogic.AddBBS("UndoManager", L"记得保存你的世界哦～(Ctrl+S)", 5000, "0 255 0");
+					end
 				end
 			end
+		else
+			self.timeout = true;
 		end
 	end
 end

@@ -12,6 +12,8 @@ MovieUISound.PlayRemoveKey();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -28,8 +30,10 @@ function MovieUISound.PlaySound(name)
 	end
 end
 
+local i = 1;
 function MovieUISound.PlayAddKey()
-	MovieUISound.PlaySound("AddKey");
+	i = (i + 1) % 2;
+	SoundManager:PlaySound("addkey"..i, "click");
 end
 
 function MovieUISound.PlayRemoveKey()

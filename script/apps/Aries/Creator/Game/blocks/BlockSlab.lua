@@ -41,10 +41,12 @@ end
 -- Returns a bounding box from the pool of bounding boxes.
 -- this box can change after the pool has been cleared to be reused
 function block:GetCollisionBoundingBoxFromPool(x,y,z)
-	local aabb = self.collisionAABBs[BlockEngine:GetBlockData(x,y,z)];
-	if( aabb ) then
-		return aabb:clone_from_pool():Offset(BlockEngine:real_min(x,y,z));
-	end
+    if(self.collisionAABBs)then
+	    local aabb = self.collisionAABBs[BlockEngine:GetBlockData(x,y,z)];
+	    if( aabb ) then
+		    return aabb:clone_from_pool():Offset(BlockEngine:real_min(x,y,z));
+	    end
+    end
 end
 
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx,camy,camz, lookat_x,lookat_y,lookat_z)

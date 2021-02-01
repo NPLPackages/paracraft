@@ -166,6 +166,7 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 				end
 			end
 			GameLogic.Login(nil, function(msg)
+				LOG.std(nil,"debug","GameLogic.Login", filename);
 				Game.OnLogin(worldObj);
 				if(callbackFunc) then
 					callbackFunc(true);

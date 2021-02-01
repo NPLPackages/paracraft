@@ -64,10 +64,9 @@ function ParaWorldLoginAdapter.GetDefaultWorldID()
 end
 -- search a world id to login
 function ParaWorldLoginAdapter:SearchWorldID(callback)
-    local http_env = HttpWrapper.GetDevVersion();
     if (System.User.isVipSchool) then
         if(callback)then
-            callback(self.campIds[http_env]);
+            callback(self.campIds[HttpWrapper.GetDevVersion()]);
         end
         return;
     end
@@ -118,7 +117,16 @@ function ParaWorldLoginAdapter:EnterOfflineWorld()
 	InternetLoadWorld.ShowPage();
 end
 function ParaWorldLoginAdapter:EnterWorld(close)
-	if (close) then
+    if (close) then
+        local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')
+
+        if (currentEnterWorld and
+            currentEnterWorld.kpProjectId and
+            tonumber(currentEnterWorld.kpProjectId) == self.campIds[HttpWrapper.GetDevVersion()]) then
+            Desktop.ForceExit(true);
+            return;
+        end
+
 		if (not GameLogic.GetFilters():apply_filters('is_signed_in') and not GameLogic.GetFilters():apply_filters('store_get', 'user/token')) then
 			Desktop.ForceExit(true);
 		end

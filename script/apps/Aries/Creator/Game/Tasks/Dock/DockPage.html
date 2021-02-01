@@ -60,13 +60,17 @@
         return true;
     end
 
+    function CanShowCampVip()
+        return DockPage.CanShowCampVip();
+    end
+
     function CanShowFriendRedTip()
         return DockPage.show_friend_red_tip;
     end
 ]]></script>
     <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:270px;background:;">
         <div style="width:510px;height:90px;">
-            <pe:gridview name="gridview_1" style="position:relative;width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
+            <pe:gridview ClickThrough="true" name="gridview_1" style="position:relative;width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_1%>'>
 	            <Columns>
                     <div style="width:85px;height:75px;">
@@ -80,7 +84,7 @@
 
         </div>
         <div style="margin-top:-10px;width:510px;height:90px;">
-            <pe:gridview name="gridview_2" style="width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
+            <pe:gridview ClickThrough="true" name="gridview_2" style="width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_2%>'>
 	            <Columns>
                     <div style="width:85px;height:75px;">
@@ -93,7 +97,7 @@
             </pe:gridview>
         </div>
         <div style="margin-top:-10px;width:510px;height:90px;">
-            <pe:gridview name="gridview_3" style="width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
+            <pe:gridview ClickThrough="true" name="gridview_3" style="width:540px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_3%>'>
 	            <Columns>
                     <div style="width:85px;height:75px;">
@@ -161,7 +165,15 @@
         </div>
         
     </pe:container>
-    
+    <pe:if condition="<%=CanShowCampVip()%>">
+        <pe:container ClickThrough="true" alignment="_ctr" style="position:relative;height:90px;background:;">
+            <div style="float:left;margin-right:17px;">
+                <!--资源-->
+                <img ClickThrough="true" name='vip_make_up' onclick="OnClick" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="82" height="82"/>
+                <input type="button" name='vip_make_up' onclick="OnClick" style="width:91px;height:89px;background:url(Texture/Aries/Creator/keepwork/dock/buketequan_91X89_32bits.png#0 0 91 89)"/>
+            </div>
+        </pe:container>
+    </pe:if>
 </pe:mcml> 
 </body>
 </html>

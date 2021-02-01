@@ -72,6 +72,8 @@ function QuestProvider:GetInstance()
     return QuestProvider.provider_instance;
 end
 function QuestProvider:OnInit()
+    self:UpdateServerTime()
+
     QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnInit,function(__, event)
     end, nil, "QuestProvider_OnInit")
     QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnRefresh,function(__, event)
@@ -83,7 +85,7 @@ function QuestProvider:OnInit()
         -- 埋点
         -- 抗疫知识埋点=
         if quest_item_container and quest_item_container.gsid == 60029 then
-            -- body
+            GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.winter_camp.lessons.epidemic', { from = quest_item.id })
         end
         if quest_item.value == quest_item.finished_value then
             GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.quest_action.when_finish')
@@ -105,13 +107,25 @@ function QuestProvider:OnInit()
                 end)
             end
 
-            if exid == GameLogic.QuestAction.end_exid then
+            if exid == GameLogic.QuestAction.end_exid or exid == 40027 then
+                local gsid = exid == 40027 and 60025 or 60026
                 keepwork.wintercamp.finishcertificate({
                     gsId=GameLogic.QuestAction.winter_camp_jion_gsid,
-                    courseGsId=event.quest_item_container.gsid,
+                    certificateGsId=gsid,
                 },function(err, msg, data)
                 end)
+
+                if exid == GameLogic.QuestAction.end_exid then
+                    _guihelper.MessageBox("恭喜您顺利结业，证书已发放，点击确定前往查看", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+                    _guihelper.MsgBoxClick_CallBack = function(res)
+                        if(res == _guihelper.DialogResult.OK) then
+                            local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+                            user_page.ShowUserInfoPage({username=System.User.keepworkUsername, HeaderTabIndex="honor"});
+                        end
+                    end
+                end
             end
+            
             -- body
         end
     end, nil, "QuestProvider_OnFinished")
@@ -344,12 +358,14 @@ function QuestProvider:FillQuestItemTemplateBy_Real_Condition(exid)
 end
 -- refresh the state of valid quest node
 function QuestProvider:Refresh()
+    
     local quest_nodes = self:GetActivedQuestNodes();
 	LOG.std(nil, "info", "QuestProvider quest_nodes:", quest_nodes);
     if(not quest_nodes)then
         return
     end
      for k,v in ipairs(quest_nodes) do
+        
         local exid = v.exid;
         local quest_gsid = self:SearchQuestGsidFromExid(exid)
         if(quest_gsid)then
@@ -437,7 +453,6 @@ function QuestProvider:CreateOrGetQuestItemContainer(gsid,data)
                 end)
             end
         end)
-
         self.questItemContainer_map[gsid] = item;
     end
     return item;
@@ -532,4 +547,25 @@ function QuestProvider:GetQuestItems(isDump)
         end)
     end
     return result;
+end
+
+function QuestProvider:UpdateServerTime()
+    keepwork.user.server_time({
+    },function(err, msg, data)
+        if(err == 200)then
+            self.server_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
+            local time = System.options.isDevMode and 3000 or 60000
+            commonlib.TimerManager.SetTimeout(function()  
+                self:UpdateServerTime()
+            end, time)
+        end
+    end)
+end
+
+function QuestProvider:GetServerTime()
+    return self.server_time_stamp or 0
+end
+
+function QuestProvider:SetServerTime(server_time_stamp)
+    self.server_time_stamp = server_time_stamp or 0
 end

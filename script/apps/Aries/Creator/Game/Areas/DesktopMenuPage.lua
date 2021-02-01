@@ -12,6 +12,8 @@ DesktopMenuPage.ShowPage(true);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SceneViewport.lua");
+local SceneViewport = commonlib.gettable("MyCompany.Aries.Game.Common.SceneViewport")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local DesktopMenu = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenu");
 local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
@@ -83,6 +85,7 @@ function DesktopMenuPage.TogglePinned()
 	local viewport = ViewportManager:GetSceneViewport();
 	if(DesktopMenuPage.IsPinned) then
 		local height = 32;
+		SceneViewport.SetVirtualMarginTop(0)
 		if(viewport:GetMarginTopHandler() == nil) then
 			viewport:SetTop(math.floor(32 * (Screen:GetUIScaling()[2])));
 			viewport:SetMarginTopHandler(DesktopMenuPage);
@@ -111,11 +114,13 @@ function DesktopMenuPage.ActivateMenu(bActivate)
 		if(not page or not page:IsVisible()) then
 			DesktopMenuPage.ShowPage(true);
 		end
+		SceneViewport.SetVirtualMarginTop(32)
 	else
 		if(not DesktopMenuPage.IsPinned) then
 			if(page and page:IsVisible()) then
 				DesktopMenuPage.ShowPage(false);
 			end
+			SceneViewport.SetVirtualMarginTop(0)
 		end
 	end
 end

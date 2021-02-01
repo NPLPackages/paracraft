@@ -12,7 +12,7 @@ VipToolTip:Init(true)
 ]]
 -- service
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-
+local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
 -- UI
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
@@ -20,6 +20,11 @@ local VipToolTip = NPL.export()
 VipToolTip.onlyRecharge = false;
 
 function VipToolTip:Init(bEnable, callback)
+    if VipToolTip then
+        VipToolNew.Show()
+        return
+    end
+
     VipToolTip.callback = callback
     if not KeepworkService:IsSignedIn() then
         GameLogic.GetFilters():apply_filters('store_set',"user/loginText",L"您需要登录并成为VIP用户，才能使用此功能")

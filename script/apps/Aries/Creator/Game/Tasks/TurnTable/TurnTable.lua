@@ -216,7 +216,7 @@ function TurnTable.TodayHasDraw()
         return false
     end
 	-- 获取今日凌晨的时间戳 1603949593
-	local day_time_stamp = TurnTable.GetWeeHours(server_time)
+	local day_time_stamp = TurnTable.GetWeeHours(server_time) or 0
 
 	if day_time_stamp <= time_stamp then
 		return true, day_time_stamp

@@ -363,7 +363,7 @@ function KeyFrameCtrl:GetKeyTimeByUIPos(rx)
 	return time, ui_x;
 end
 
--- goto a given frame by clicking on the blanck space. .
+-- goto a given frame by clicking on the blank space.
 -- if we are clicking close to keyframe, we will goto the frame next to the keyframe. 
 function KeyFrameCtrl:OnClickTimeLine(uiobj)
 	if(uiobj) then
@@ -372,9 +372,15 @@ function KeyFrameCtrl:OnClickTimeLine(uiobj)
 		local time, ui_x = self:GetKeyTimeByUIPos(rx);
 
 		if(time and self.onclick_frame) then
-			self:UpdateLastClickFrame(time, ui_x)
-			self.onclick_frame(time);
+			self:handleEvent("ClickTimeLine", time, ui_x)
 		end
+	end
+end
+
+function KeyFrameCtrl:ClickTimeLine(time, ui_x)
+	if(time and self.onclick_frame) then
+		self:UpdateLastClickFrame(time, ui_x)
+		self.onclick_frame(time);
 	end
 end
 

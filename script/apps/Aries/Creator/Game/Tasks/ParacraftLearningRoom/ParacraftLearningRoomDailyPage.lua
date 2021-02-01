@@ -440,7 +440,9 @@ function ParacraftLearningRoomDailyPage:Refresh()
     page:Refresh(0);
 end
 function ParacraftLearningRoomDailyPage.OnVIP(from)
-	GameLogic.GetFilters():apply_filters("VipNotice", true, from, function()
-        ParacraftLearningRoomDailyPage:Refresh();
-    end);
+	GameLogic.IsVip("VipGoods", true, function(result)
+		if result then
+			ParacraftLearningRoomDailyPage:Refresh();
+		end
+	end);
 end

@@ -75,8 +75,8 @@ function ParaWorldNPC.CreateNPCImp(npc)
 	local x, y, z = BlockEngine:ConvertToRealPosition_float(npc.x, npc.y, npc.z);
 	local entity = EntityManager.EntityNPC:Create({x=x,y=y-0.5,z=z, item_id = block_types.names["villager"]});
 	local assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(npc.npcModel);
-	if (npc.f) then
-		entity:SetFacing(npc.f % math.pi);
+	if (npc.f and tonumber(npc.f)) then
+		entity:SetFacing(tonumber(npc.f));
 	end
 	entity:SetPersistent(false);
 	entity:SetServerEntity(false);
@@ -201,6 +201,10 @@ function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
 			return;
 		end
 		entity.OnClick = function(entity, x, y, z, mouse_button)
+			if (data.npcName) then
+				GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.world.npc', { npcName = data.npcName })
+			end
+
 			if (data.npcScript) then
 				runExternalFunc(data.npcScript);
 			end

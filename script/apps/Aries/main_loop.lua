@@ -68,6 +68,7 @@ if(not System.options.mc and commandLine and commandLine:match("mc=true")) then
 end
 
 System.options.isDevEnv = (ParaEngine.GetAppCommandLineByParam("isDevEnv","false") == "true");
+System.options.isDevMode = (ParaEngine.GetAppCommandLineByParam("isDevMode", "false") == "true");
 
 System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution",nil);
 
