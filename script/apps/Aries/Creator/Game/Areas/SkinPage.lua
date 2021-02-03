@@ -206,10 +206,6 @@ function SkinPage.OnChangeAvatarSkin()
 			end
 		end);
 	elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
-		local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
-		CustomSkinPage.ShowPage(assetFilename, old_value, function()
-		end);
 	else
 		assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");

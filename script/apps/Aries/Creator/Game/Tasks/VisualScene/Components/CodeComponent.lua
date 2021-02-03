@@ -11,6 +11,8 @@ local CodeComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualS
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
+NPL.load("(gl)script/ide/timer.lua");
+
 local BaseComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BaseComponent.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local CodeComponent = commonlib.inherit(BaseComponent, NPL.export());
@@ -19,7 +21,6 @@ CodeComponent:Property({"ComponentName", "CodeComponent", auto = true,  camelCas
 CodeComponent:Property({"BlockPosition", {0,0,0}, auto = true,  camelCase = true, });
 CodeComponent:Property({"Code", "", auto = true,  camelCase = true, });
 CodeComponent:Property({"CodeFileName", "", auto = true,  camelCase = true, });
-CodeComponent:Property({"Runabled", true, auto = true,  camelCase = true, });
 
 function CodeComponent:ctor()
     self.blockid = 219;
@@ -58,35 +59,69 @@ function CodeComponent:GetFileContent(filename)
     end
 end
 function CodeComponent:run()
-    if(self.entity_code and self.Runabled)then
+    local entity = self:getEntity()
+    if(entity)then
         local txt = self.Code;
         if(self.CodeFileName and self.CodeFileName ~= "")then
             txt = string.format('include("%s")',self.CodeFileName);
         end
-        self.entity_code:SetNPLCode(txt);
-        self.entity_code:Restart()
+        entity:SetNPLCode(txt);
+        entity:Restart()
     end
 end
 function CodeComponent:stop()
-    if(self.entity_code)then
-        self.entity_code:Stop();
+    local entity = self:getEntity()
+    if(entity)then
+        entity:Stop();
     end
 end
-function CodeComponent:onAddedToScene(scene)
+function CodeComponent:reload()
+    self:createEntity();
+end
+function CodeComponent:getEntity()
     local x = self.BlockPosition[1];
     local y = self.BlockPosition[2];
     local z = self.BlockPosition[3];
-    BlockEngine:SetBlock(x,y,z, self.blockid);
-    local entity_code = BlockEngine:GetBlockEntity(x,y,z);
-    if(entity_code and entity_code.class_name == "EntityCode")then
-        entity_code:SetDisplayName(self.Name);
-        self.entity_code = entity_code;
+    local entity = BlockEngine:GetBlockEntity(x,y,z);
+    if(entity and entity.class_name == "EntityCode")then
+        return entity;
     end
-    
+end
+function CodeComponent:createEntity()
+    local entity = self:getEntity();
+    if(not entity)then
+        local x = self.BlockPosition[1];
+        local y = self.BlockPosition[2];
+        local z = self.BlockPosition[3];
+        BlockEngine:SetBlock(x,y,z, self.blockid);
+        entity = self:getEntity();
+        if(entity)then
+            entity:SetDisplayName(self.Name);
+        else
+            if(not self.timer)then
+                self.timer = commonlib.Timer:new({callbackFunc = function(timer)
+                    self:createEntity();
+                end})
+                self.timer:Change(0, 1000)
+            end
+        end
+        
+    else
+        if(self.timer)then
+            self.timer:Change()
+        end
+    end
+end
+function CodeComponent:onAddedToScene(scene)
+    self:createEntity();
 end
 function CodeComponent:onRemovedFromScene(scene)
-    if(self.entity_code)then
-        self.entity_code = nil;
+    local entity = self:getEntity();
+    if(entity)then
+        entity:Detach();
+    end
+    if(self.timer)then
+        self.timer:Change()
     end
 end
 function CodeComponent:toJson()
@@ -94,7 +129,6 @@ function CodeComponent:toJson()
     object.ComponentName = self.ComponentName;
     object.BlockPosition = { self.BlockPosition[1], self.BlockPosition[2], self.BlockPosition[3], };
     object.Code = self.Code;
-    object.Runabled = self.Runabled;
     return object;
 end
 

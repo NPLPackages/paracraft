@@ -24,7 +24,7 @@ local ParacraftLearningRoomDailyPage = NPL.export()
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 133;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 141;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -160,6 +160,14 @@ Paracraft由多少行代码构成的
 内置函数 while for
 学习NPL语言的总结
 学习编程的建议
+打字练习1
+打字练习2
+打字练习3
+打字练习4
+打字练习5
+打字练习6
+跟随我
+示教系统（上）
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -354,7 +362,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	index = tonumber(index)
 	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
-			ParacraftLearningRoomDailyPage.OnVIP("daily_note");
+			ParacraftLearningRoomDailyPage.OnVIP("DailyNote");
 			--[[
             _guihelper.MessageBox(L"非VIP用户仅可观看已签到视频，是否开通VIP观看此视频？", function(res)
                 if(res == _guihelper.DialogResult.OK) then
@@ -440,7 +448,7 @@ function ParacraftLearningRoomDailyPage:Refresh()
     page:Refresh(0);
 end
 function ParacraftLearningRoomDailyPage.OnVIP(from)
-	GameLogic.IsVip("VipGoods", true, function(result)
+	GameLogic.IsVip(from, true, function(result)
 		if result then
 			ParacraftLearningRoomDailyPage:Refresh();
 		end

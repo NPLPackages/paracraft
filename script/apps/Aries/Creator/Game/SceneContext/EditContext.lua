@@ -87,6 +87,15 @@ end
 
 --virtual function: called repeatedly whenever mouse button is down. 
 function EditContext:OnMouseDownTimer(timer)
+	if(Keyboard:IsAltKeyPressed() or Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
+		local click_data = self:GetClickData();
+		click_data.right_holding_time = 0;
+		click_data.left_holding_time = 0;
+		self:UpdateClickStrength(-1)
+		timer:Change();
+		return
+	end
+
 	local bLeftButtonDown = ParaUI.IsMousePressed(0)
 	local bRightButtonDown = ParaUI.IsMousePressed(1)
 	local bMiddleButtonDown = ParaUI.IsMousePressed(2)

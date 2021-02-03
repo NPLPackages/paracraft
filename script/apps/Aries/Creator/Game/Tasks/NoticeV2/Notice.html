@@ -1,0 +1,142 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Notice/Notice.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Notice.lua"><![CDATA[
+local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua");
+Notice.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Notice.CloseView()
+end
+isShowToday = Notice.isSelectShowToday
+function NoRemind()
+    print(isShowToday)
+    local node = document:GetPageCtrl():GetNode("checkRemind")
+    if(node) then
+        isShowToday = not isShowToday
+        node:SetUIValue("checked",isShowToday)
+        Notice.isSelectShowToday = isShowToday              
+    end
+end
+
+function getNoticeDt(index)
+    if(index == nil) then        
+        return #Notice.rendData;
+    else
+        return Notice.rendData[index];
+    end
+end
+
+function getSignDt()
+    return Notice.signData
+end
+
+function OnImageClick(data)   
+    Notice.OnImageClick(data)
+end
+
+function OnMainImageClick()    
+    Notice.OnMainImageClick()
+end
+
+function GoPrePage()
+    Notice.OnClickNextPage(-1)
+end
+
+function GoNextPage()
+    Notice.OnClickNextPage(1)
+end
+
+function getMainCover()
+    return Notice.mainData.cover
+end
+
+function isRendNext()
+    local datasize = Notice.nDataNum
+    if datasize > 4 then
+        return true
+    end
+    return false
+end
+
+function OnSignClick(id)
+    Notice.ClickSign(id)
+end
+
+function IsCanSign(index)    
+    return Notice.IsHaveSign(index)
+end
+
+]]></script>
+<div style="width: 1080px; height: 720px;color: #0000fc;" ClickThrough = "false">
+    <div  style="width:1065px;height:625px;background: url(Texture/Aries/Creator/keepwork/Noticev2/beijingban_1065X625_32bits.png#0 0 1065 625);">
+        <!--close button  -->
+        <input type="button" value="" onclick="ClosePage" style="margin-top: 28px; margin-left:1010px;width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/Noticev2/guanbi_32bits.png#0 0 32 32);"/>  
+        <!-- content main-->
+        <div name="mainbg" style="margin-left: 32px; width: 1024px;height: 256px;">
+            <img style="width:1024px;height:256px" src='<%=getMainCover()%>' onclick="OnMainImageClick"/>
+            <div zorder = "1" style="margin-top: -256px; width: 1024px;height: 256px; background: url(Texture/Aries/Creator/keepwork/Noticev2/dabanner_64X64_32bits.png#0 0 64 64:15 15 18 18);"></div>
+        </div>
+        <!-- content other -->
+        <div name="girdBg" style="margin-left: 28px;margin-top: 4px; width: 1024px; height: 300px;">
+            <pe:gridview name="gridview_1"  AllowPaging="false" CellPadding="1" ItemsPerLine="16" DefaultNodeHeight = "128" style="width: 1024px;"
+                DataSource='<%=getNoticeDt%>'>
+                <Columns>
+                    <div style="width: 256px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Noticev2/xiaobanner_64X64_32bits.png#0 0 64 64:15 15 18 18);">
+                        <a type="button" onclick="OnImageClick" param1='<%= XPath("this") %>'>
+                            <img zorder="-1"  style="width:256px;height:128px"  src='<%=Eval("cover")%>' />  
+                        </a>                                 
+                    </div>
+                </Columns>
+            </pe:gridview>
+
+            <!-- next button -->
+            <pe:if  condition='<%=isRendNext()%>'> 
+                <div  name = "nextbtn" style="width: 1024px; height: 70px; margin-top: -250px;">
+                    <input  type="button" onclick="GoPrePage()" style="margin-left: 6px; width: 64px;height: 64px; background: url(Texture/Aries/Creator/keepwork/Noticev2/qiehuan1_64X64_32bits.png#0 0 64 64);"/>
+                    <input  type="button" onclick="GoNextPage()" style="margin-left: 980px; margin-top: -64px; width: 64px;height: 64px; background: url(Texture/Aries/Creator/keepwork/Noticev2/qiehuan2_64X64_32bits.png#0 0 64 64);"/>
+                </div>               
+            </pe:if>
+        </div>
+        <!-- content sign -->
+        <div name="signbg" style="width: 1065px; margin-top: -140px; margin-left: 32px;">
+            <pe:repeat DataSource="<%=getSignDt()%>">
+                <pe:repeatitem>
+                    <div style="float: left; margin-left: 8px;">
+                        <input type="button" name='<%=Eval("name")%>' onclick="OnSignClick" style='<%=Eval("icon")%>'/>
+                        <div zorder = "1" style='<%=Eval("dayicon")%>'></div>
+                        <pe:if condition='<%=IsCanSign(Eval("index"))%>'>
+                            <pe:if condition='<%=Eval("index") ~= 7%>'> 
+                                <input type="button" zorder = "2" style="margin-top: -128px; width: 128px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Noticev2/yilingqu2_32X32_32bits.png#0 0 32 32:10 10 16 16);"/>
+                                <div zorder = "3" style="margin-top: -80px; margin-left: 20px; width: 83px;height: 41px; background: url(Texture/Aries/Creator/keepwork/Noticev2/yilingqu_83X41_32bits.png#0 0 83 41);"></div>
+                            </pe:if>  
+                            <pe:if condition='<%=Eval("index") == 7%>'> 
+                                <input type="button" zorder = "2" style="margin-top: -128px; width: 194px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Noticev2/yilingqu2_32X32_32bits.png#0 0 32 32:10 10 16 16);"/>
+                                <div zorder = "3" style="margin-top: -80px; margin-left: 60px; width: 83px;height: 41px; background: url(Texture/Aries/Creator/keepwork/Noticev2/yilingqu_83X41_32bits.png#0 0 83 41);"></div>
+                            </pe:if> 
+                        </pe:if>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>           
+        </div>
+        <!-- content remind -->
+        <div style="margin-top: 30px;">                
+            <div style="margin-left: 920px; margin-top: -20px;">
+                <input type="checkbox" name = "checkRemind" checked='<%=isShowToday%>' onclick="NoRemind" style="float: left; margin-top: 4px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/Noticev2/dian1_normal_14X14_32bits.png#0 0 14 14" CheckedBG="Texture/Aries/Creator/keepwork/Noticev2/dian1_select_14X14_32bits.png#0 0 14 14"/>
+                <div onclick="NoRemind" style="float: left;margin-left: 5px;margin-top: 1px;width: 100px;height: 20px;  background: url(Texture/Aries/Creator/keepwork/Noticev2/zi_100X20_32bits.png#0 0 100 20);" ></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

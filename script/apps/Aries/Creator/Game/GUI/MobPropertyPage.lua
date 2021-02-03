@@ -273,3 +273,9 @@ function MobPropertyPage.OnOpenAssetFile()
 		end
 	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");
 end
+
+function MobPropertyPage.OnOpenCustomModel()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+	local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+	CustomSkinPage.ShowPage();
+end

@@ -1,0 +1,86 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/EditorInspector.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="EditorInspector.lua"><![CDATA[
+local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
+local EditorInspector = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Inspector/EditorInspector.lua");
+local editor = VisualSceneLogic.getSelectedEditor();
+EditorInspector.OnInit();
+function DS_Items(index)
+    if(index == nil) then
+        return #EditorInspector.Current_Item_DS;
+    else
+        return EditorInspector.Current_Item_DS[index];
+    end
+end
+function getNodeByIndex(index)
+    local node = EditorInspector.Current_Item_DS[tonumber(index)];
+    return node;
+end
+function onClick(index)
+    local node = getNodeByIndex(index)
+    if(node)then
+        editor:select(node.node)
+        VisualSceneLogic.nofityChanged();
+    end
+end
+function onRefresh()
+    EditorInspector.OnRefresh();
+end
+function onNew()
+    local node, code_component, movieclip_component = editor:createBlockCodeNode();
+    if(node and code_component)then
+        code_component:setCode('say("hello");wait(2);say("");')
+    end
+    editor:select(node)
+    VisualSceneLogic.nofityChanged();
+end
+function isSelected(index)
+    local node = getNodeByIndex(index);
+    if(node and node.node)then
+        return node.node == editor.selected;
+    end
+end
+function onDelete()
+end
+]]></script>
+        <div height="100%" style="width:200px;background-color:#292929;" class="default">
+            <div style="padding-left:5px;padding-right:5px;">
+                <div>
+                    <div style="float:left;">
+                        <input type="button" class="mc_light_grey_button_with_fillet" style="width:90px;" value="新增" onclick="onNew"/>
+                    </div>
+                    <div style="float:left;margin-left:5px;">
+                        <input type="button" class="mc_light_grey_button_with_fillet" style="width:90px;" value="删除" onclick="onDelete"/>
+                    </div>
+                </div>
+                
+            </div>
+           <pe:gridview style="margin-top:5px;width:200px;" height="100%" name="item_gridview" CellPadding="3" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+	            <Columns>
+                    <div style="width:32px;height:32px;padding-left:5px;">
+                        <pe:if condition='<%= isSelected(Eval("index"))%>'>
+                            <input type="button" name='<%= Eval("index")%>' style="width:32px;height:32px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png);" onclick="onClick"  />
+                        </pe:if>
+                        <pe:if condition='<%= not isSelected(Eval("index"))%>'>
+                            <input type="button" name='<%= Eval("index")%>' style="width:32px;height:32px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png);" onclick="onClick"  />
+                        </pe:if>
+                    </div>
+                            
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    
+</pe:mcml>
+</body>
+</html>
+

@@ -40,9 +40,11 @@ function Quest:Init(extendedcost)
 			local desc = data.desc;
 			local exId = data.exId;
 			local gsId = QuestProvider:GetInstance():SearchQuestGsidFromExid(exId);
-			local node = self.graphData:AddNode();
-			node.data = {name = name, desc = desc, exid = exId, gsId = gsId, templateData = {Id = exId, Title = string.format("%s（%d）", name, gsId)}};
-			nodes[data.exId] = node;
+			if gsId then
+				local node = self.graphData:AddNode();
+				node.data = {name = name, desc = desc, exid = exId, gsId = gsId, templateData = {Id = exId, Title = string.format("%s（%d）", name, gsId)}};
+				nodes[data.exId] = node;
+			end
 		end
 	end
 

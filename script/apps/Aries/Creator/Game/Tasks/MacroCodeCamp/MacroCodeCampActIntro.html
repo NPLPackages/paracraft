@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+    <script refresh="true" type="text/npl" src="MacroCodeCampActIntro.lua"><![CDATA[
+        local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
+        MacroCodeCampActIntro.OnInit()
+        function ClosePage()
+            MacroCodeCampActIntro.ClosePage()
+        end
+        
+        function isEnterJoin()
+            return MacroCodeCampActIntro.isEnterJoin
+        end
+        ]]></script>
+    <div style="width: 1024px; height: 592px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/bjk_32bits.png#0 0 1024 592);">
+        <!--title-->
+        <div style="width: 1024px; height: 60px;">
+            <input type="button" style="margin-left: 952px; margin-top: 74x; width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/guanbi_32bits.png#0 0 32 32);" onclick="ClosePage()"/>
+        </div>
+        <pe:if condition = '<%=isEnterJoin()%>'>
+            <!-- <div>1111111111111111111111111111</div> -->
+            <div style="margin-left: 400px; margin-top: 110px; width: 200px; height: 200px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/ewm_32X32_32bits.png#0 0 32 32:10 10 12 12);"></div>
+        </pe:if>
+
+        <pe:if condition = '<%=not isEnterJoin()%>'><div class=""></div>
+            <!-- <div>2222222222222222222222222222</div> -->
+        </pe:if>
+    </div>
+</pe:mcml>
+</body>
+</html>

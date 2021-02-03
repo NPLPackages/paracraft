@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+    <script refresh="true" type="text/npl" src="MacroCodeCampIntro.lua"><![CDATA[
+        local MacroCodeCampIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampIntro.lua");
+        MacroCodeCampIntro.OnInit()
+        function ClosePage()
+            MacroCodeCampIntro.m_nCurIndex = 1
+            Page:CloseWindow();
+        end
+        
+        function GoPrePage()
+            MacroCodeCampIntro.OnClickNext(-1)
+        end
+
+        function GoNextPage()
+            MacroCodeCampIntro.OnClickNext(1)
+        end
+
+        function getIndex()
+            return MacroCodeCampIntro.m_nCurIndex
+        end
+
+        function getSchool(index)
+            if index== nil then
+                return #MacroCodeCampIntro.schools
+            else
+                return MacroCodeCampIntro.schools[index]
+            end
+        end
+        
+        ]]></script>
+    
+    <div style="width: 740px; height: 560px;">        
+        <!--title-->
+        <div style="width: 740px; height: 60px;">
+            <input zorder="3" type="button" style="margin-left: 660px; margin-top: 20px; width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/guanbi_32bits.png#0 0 32 32);" onclick="ClosePage()"/>
+        </div>
+        <!--content-->
+        <input type="button" value="" onclick="GoPrePage"  style="margin-top: 160px; margin-left: 18px;width: 64px;height: 64px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/qiehuan1_64X64_32bits.png#0 0 64 64);"/>
+        <input zorder="2" type="button" value="" onclick="GoNextPage"  style="margin-top: 160px; margin-left: 592x;width: 64px;height:64px ;background: url(Texture/Aries/Creator/keepwork/WinterCamp/qiehuan2_64X64_32bits.png#0 0 64 64);"/>
+
+        <pe:if condition= '<%=getIndex() == 1%>'>
+            <div style="margin-top: -286px; margin-left: -28px; width: 814px; height: 546px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/1_735X546_32bits.png#0 0 814 546);"></div>
+        </pe:if>
+        <pe:if condition= '<%=getIndex() == 2%>'>
+            <div style="margin-top: -286px;width: 722px; height: 546px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/2_722X546__32bits.png#0 0 722 546);"></div>
+        </pe:if>
+        <pe:if condition= '<%=getIndex() == 3%>'>
+            <div style="margin-top: -286px;width: 722px; height: 546px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/3_722X546_32bits.png#0 0 722 546);"></div>
+        </pe:if>        
+    </div>
+</pe:mcml>
+</body>
+</html>

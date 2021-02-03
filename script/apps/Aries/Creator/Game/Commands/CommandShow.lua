@@ -121,7 +121,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
-vision|ui|keyboard|quickselectbar|tips|map]], 
+vision|ui|keyboard|quickselectbar|tips|map|info]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -145,6 +145,8 @@ vision|ui|keyboard|quickselectbar|tips|map]],
 			GameLogic.options:ShowBoundingBox(false);
 		elseif(name == "wireframe") then
 			GameLogic.options:ShowWireframe(false);
+		elseif(name == "info") then
+			GameLogic.options:SetShowInfoWindow(false);
 		elseif(name == "touch") then
 			GameLogic.options:ShowTouchPad(false);
 		elseif(name == "player" or name=="") then

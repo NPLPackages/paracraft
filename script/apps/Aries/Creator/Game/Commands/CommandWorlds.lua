@@ -118,7 +118,7 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [-i|e|force|personal] [worldname|url|filepath|projectId|home]", 
+	quick_ref="/loadworld [-i|e|force|personal] [worldname|url|filepath|projectId|home|back]", 
 	mode_deny = "", -- allow load world in all game modes
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
@@ -136,6 +136,7 @@ e.g.
 /loadworld -force 530
 /loadworld -personal 530
 /loadworld home
+/loadworld back
 /loadworld -s -inplace 530 | /sendevent globalSetPos  {x, y, z}
 /loadworld -s -fork 530 new_world_name
 ]], 

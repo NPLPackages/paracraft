@@ -15,6 +15,8 @@ PlayerAssetFile:GetFilenameByName(name)
 ]]
 NPL.load("(gl)script/kids/3DMapSystemUI/CCS/ccs.lua");
 local CCS = commonlib.gettable("Map3DSystem.UI.CCS");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
@@ -165,7 +167,7 @@ function PlayerAssetFile:GetDefaultScale(filename)
 end
 
 function PlayerAssetFile:GetDefaultCustomGeosets()
-	return "1#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png";
+	return CustomCharItems.defaultSkinString;
 end
 
 function PlayerAssetFile:RefreshCustomGeosets(player, skin)
@@ -182,7 +184,7 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 		local geoset;
 		for geoset in string.gfind(geosets, "([^#]+)") do
 			local id = tonumber(geoset);
-			charater:SetCharacterSlot(id / 100, id % 100);
+			charater:SetCharacterSlot(math.floor(id / 100), id % 100);
 		end
 	end
 
@@ -196,9 +198,14 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	if (attachments) then
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
-			local meshModel = ParaAsset.LoadStaticMesh("", filename);
+			local meshModel;
+			if (string.find(filename, "anim.x")) then
+				meshModel = ParaAsset.LoadParaX("", filename);
+			else
+				meshModel = ParaAsset.LoadStaticMesh("", filename);
+			end
 			if (meshModel) then
-				charater:AddAttachment(meshModel, id);
+				charater:AddAttachment(meshModel, id, id);
 			end
 		end
 	end

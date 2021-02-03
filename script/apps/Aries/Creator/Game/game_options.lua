@@ -1202,7 +1202,7 @@ function options:SetHasCopyright(bValue)
 end
 
 function options:IsCommunityWorld()
-	return GameLogic.GetFilters():apply_filters('service.local_service_word.is_community_world', false)
+	return GameLogic.GetFilters():apply_filters('service.local_service_world.is_community_world', false)
 end
 
 function options:SetCommunityWorld(bValue)

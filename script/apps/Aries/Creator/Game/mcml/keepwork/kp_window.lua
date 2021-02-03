@@ -65,7 +65,8 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 
 	if(onclose and onclose ~= "")then
 		local btn_size = 22
-		_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -btn_size-15, 10, btn_size, btn_size);	
+		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
+		_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-15, 10, btn_size, btn_size);	
 		
 		_this.background = close_bg;
 		_parent:AddChild(_this);
@@ -77,7 +78,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 			_guihelper.SetUIColor(_this, "#ffffffff");
 			_parent:AddChild(_this);
 			-- the actual touchable area is 2 times bigger, to make it easier to click on some touch device. 
-			_this = ParaUI.CreateUIObject("button", "close_btn", "_rt", -title_height*2, 0, title_height*2, title_height);
+			_this = ParaUI.CreateUIObject("button", btnName, "_rt", -title_height*2, 0, title_height*2, title_height);
 			_this.background = "";
 			_parent:AddChild(_this);
 		end

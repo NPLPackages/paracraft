@@ -56,7 +56,7 @@ function SceneNode:addComponent(component, index)
     end
     if(self.Scene)then
         if(component.onAddedToScene)then
-            component:onAddedToScene(self);
+            component:onAddedToScene(self.Scene);
         end
     end
 
@@ -77,9 +77,12 @@ function SceneNode:removeComponent(component)
             return
         end
     end
+    if(component.onRemovedFromNode)then
+        component:onRemovedFromNode(self);
+    end
     if(self.Scene)then
-        if(component.onRemovedFromNode)then
-            component:onRemovedFromNode(self.Scene);
+        if(component.onRemovedFromScene)then
+            component:onRemovedFromScene(self.Scene);
         end
     end
     for k,v in ipairs(self.components) do
@@ -255,10 +258,15 @@ function SceneNode:toJson()
 end
 
 function SceneNode:run()
+    -- for creating entity
+    self:runNode(self,"reload");
     self:runNode(self,"run");
 end
 function SceneNode:stop()
     self:runNode(self,"stop");
+end
+function SceneNode:reload()
+    self:runNode(self,"reload");
 end
 function SceneNode:runNode(parent, action)
     if(not parent)then
@@ -266,7 +274,7 @@ function SceneNode:runNode(parent, action)
     end
     if(parent.components)then
         for kk,vv in ipairs(parent.components) do
-            if(vv.Runabled and vv[action])then
+            if(vv[action])then
                 vv[action](vv);
             end
         end

@@ -424,6 +424,8 @@ function Macros:AddMacro(text, ...)
 	end
 end
 
+local MaxNonVIPMacroAllowed = 3000;
+
 function Macros:EndRecord()
 	if(not self.isRecording) then
 		return;
@@ -443,6 +445,14 @@ function Macros:EndRecord()
 			out[#out+1] = m:ToString();
 		end
 		out[#out+1] = "Broadcast(\"macroFinished\")";
+		if(#out > MaxNonVIPMacroAllowed) then
+			if(not GameLogic.IsVip()) then
+				_guihelper.MessageBox(format(L"非会员用户只能录制%d个示教宏命令,你录制了%d。是否要开通会员?", MaxNonVIPMacroAllowed, #(self.macros)), function()
+					-- TODO: 开通VIP
+
+				end)
+			end
+		end
 		local text = table.concat(out, "\n");
 		ParaMisc.CopyTextToClipboard(text);
 		GameLogic.AddBBS(nil, format(L"%d个示教宏命令已经复制到裁剪版", #(self.macros)), 5000, "0 255 0")
@@ -500,6 +510,7 @@ function Macros:PrepareInitialBuildState()
     GameLogic.RunCommand("/mode edit");
     GameLogic.RunCommand("/clearbag");
     GameLogic.RunCommand("/camerayaw 3.14");
+	GameLogic.RunCommand("/hide info");
     local player = GameLogic.EntityManager.GetPlayer()
     player:ToggleFly(false)
     lastPlayerX, lastPlayerY, lastPlayerZ = player:GetBlockPos();
@@ -743,6 +754,12 @@ function Macros:CheckAddCameraView()
 		lastCameraPos.lookatX, lastCameraPos.lookatY, lastCameraPos.lookatZ = lookatX, lookatY, lookatZ
 		self:AddMacro("CameraLookat", lookatX, lookatY, lookatZ);
 	end
+end
+
+function Macros.AutoCompleteTrigger()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
+	local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
+	MacroPlayer.AutoCompleteTrigger();
 end
 
 function Macros:OnTimer()

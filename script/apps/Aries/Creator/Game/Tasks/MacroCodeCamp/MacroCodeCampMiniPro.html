@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+    <script refresh="true" type="text/npl" src="MacroCodeCampMiniPro.lua"><![CDATA[
+        local MacroCodeCampMiniPro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampMiniPro.lua");
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        local userinfo = KeepWorkItemManager.GetProfile();
+        MacroCodeCampMiniPro.OnInit()
+        function ClosePage()
+            Page:CloseWindow();
+        end        
+
+        function GetQRCodeStyle()
+            return string.format("margin-top: 118px; margin-left: 216px; width: 226px;height: 226px; background:url(temp/qrcodes/%s_BB.jpg)", userinfo.id);
+        end
+
+        function getDesc(index)
+            return MacroCodeCampMiniPro.GetContent(index)
+        end
+        
+        ]]></script>
+    <div style="width: 658px; height: 609px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/bjk3_658X609_32bits.png#0 0 658 609);">
+        <!--title-->
+        <div style="width: 658px; height: 60px;">
+            <input type="button" style="margin-left: 600px; margin-top: 14px; width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/guanbi_32bits.png#0 0 32 32);" onclick="ClosePage()"/>
+        </div>
+        <div style='<%=GetQRCodeStyle()%>'></div>
+        <div style="margin-top: 12px; margin-left: 32px; width: 414px; height: 77px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/bjk4_414X77_32bits.png#0 0 414 77);">
+            <div style="margin-left: 60px; margin-top: 22px; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #ffffff;"><%=L"中国关心下一代工程委员会健康体育发展中心"%></div>
+            <div style="margin-left: 70px; margin-top: 4px; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #ffffff;"><%=L"认证3D可视化动画编程评测独家教学平台"%></div>
+        </div>
+        <div style="margin-top: -400px; margin-left: 212px; width: 414px; height: 77px;background: url(Texture/Aries/Creator/keepwork/WinterCamp/bjk4_414X77_32bits.png#0 0 414 77);">
+            <div style="margin-left: 10px; margin-top: 22px; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #ffffff;"><%=getDesc(1)%></div>
+            <div style="margin-left: 10px; margin-top: 4px; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #ffffff;"><%=getDesc(2)%></div>
+        </div>
+    </div>
+</pe:mcml>
+</body>
+</html>

@@ -242,6 +242,9 @@ function GameLogic.InitCommon()
 
 		GameLogic.KeepWorkItemManager = KeepWorkItemManager;
 
+        local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
+        VisualSceneLogic.staticInit();
+
 		if ((not System.options.isCodepku) and ParaEngine.GetAppCommandLineByParam("open_ci", false) == "true") then
 			local ParacraftCI = NPL.load("(gl)script/apps/Aries/ParacraftCI/ParacraftCI.lua");
 			ParacraftCI.StaticInit();
@@ -828,6 +831,8 @@ function GameLogic.BeforeRestart(appName)
 end
 
 function GameLogic.Exit()
+	ModManager:OnWillLeaveWorld();
+
 	GameLogic.IsStarted = false;
 	GameLogic.SetTipText(nil);
 	local playerController = GameLogic.GetPlayerController();

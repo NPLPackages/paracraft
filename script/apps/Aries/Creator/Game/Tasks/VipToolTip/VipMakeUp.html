@@ -1,0 +1,42 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/VipMakeUp/VipMakeUp.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="VipMakeUp.lua"><![CDATA[
+local VipMakeUp = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipMakeUp.lua")
+VipMakeUp.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+end
+
+function GetDesc1()
+    return VipMakeUp.GetDesc1()
+end
+
+function GetDesc2()
+    return VipMakeUp.GetDesc2()
+end
+
+function MakeUp()
+    VipMakeUp.MakeUp()
+end
+
+]]></script>
+
+<div type ="box" style="width:1020px;height:603px;background: url(Texture/Aries/Creator/keepwork/vip/buketongdao_1020X603_32bits.png#0 0 1020 603);">
+    <input type="button" style="position: relative; margin-top: 67px; margin-left: 945px; width: 40px;height: 40px;background:;" onclick="ClosePage()" />
+    <div style="position: relative; width: 184px;height: 30px;">
+        <div style="width: 280px;height: 280px; background-color: #ffffff;margin-top: 160px;margin-left: 370px;"></div>
+        <input type="button" style="margin-left: 400px;margin-top: 40px; width: 226px;height: 85px;background: url(Texture/Aries/Creator/keepwork/vip/woyaobuke_226X85_32bits.png#0 0 226 85);" onclick="MakeUp()" />
+    </div>
+</div>
+    
+</pe:mcml>
+</body>
+</html>
+

@@ -224,10 +224,15 @@ end
 -- called every MacroPlayer.ShowTipTime time, when user is not responding correctly
 function MacroPlayer.ShowMoreTips()
 	if(MacroPlayer.expectedKeyButton) then
-		local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
-		if(count and count > 1) then
-			GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
-			Macros.voice("你需要同时按下2个按键")
+		local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
+		if(mouseX and mouseY) then
+			-- key press at given scene location. 
+		else
+			local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
+			if(count and count > 1) then
+				GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
+				Macros.voice("你需要同时按下2个按键")
+			end
 		end
 	end
 	if(MacroPlayer.expectedDragButton) then
@@ -867,12 +872,18 @@ function MacroPlayer.DoAutoPlay()
 		MacroPlayer.autoPlayTimer:Change()
 	end
 	if(Macros.IsAutoPlay()) then
-		if(MacroPlayer.triggerCallbackFunc) then
-			MacroPlayer.HideAll()
-			MacroPlayer.InvokeTriggerCallback();
-		end
+		MacroPlayer.AutoCompleteTrigger()
 	end
 end
+
+-- auto finish current trigger and play the next macro
+function MacroPlayer.AutoCompleteTrigger()
+	if(MacroPlayer.triggerCallbackFunc) then
+		MacroPlayer.HideAll()
+		MacroPlayer.InvokeTriggerCallback();
+	end
+end
+
 
 function MacroPlayer.SetMouseWheelTrigger(mouseWheelDelta, mouseX, mouseY, callbackFunc)
 	if(page) then

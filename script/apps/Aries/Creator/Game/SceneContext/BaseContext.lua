@@ -30,6 +30,7 @@ local BaseContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseCo
 ]]
 NPL.load("(gl)script/ide/System/Core/SceneContext.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_hotkey.lua");
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local hotkey_manager = commonlib.gettable("System.mcml_controls.hotkey_manager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
@@ -140,8 +141,18 @@ end
 
 --virtual function: called repeatedly whenever mouse button is down. 
 function BaseContext:OnMouseDownTimer(timer)
+	if(Keyboard:IsAltKeyPressed() or Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
+		local click_data = self:GetClickData();
+		click_data.right_holding_time = 0;
+		click_data.left_holding_time = 0;
+		self:UpdateClickStrength(-1)
+		timer:Change();
+		return
+	end
+
 	local bLeftButtonDown = ParaUI.IsMousePressed(0)
 	local bRightButtonDown = ParaUI.IsMousePressed(1)
+	
 	if(bLeftButtonDown and not bRightButtonDown) then
 		self:OnLeftMouseHold(timer:GetDelta());
 	elseif(bRightButtonDown and not bLeftButtonDown) then
@@ -1012,6 +1023,10 @@ function BaseContext:HandleGlobalKey(event)
 			-- ctrl + Keys
 			if(ctrl_pressed) then
 				if(dik_key == "DIK_T") then
+					if(GameLogic.Macros:IsRecording()) then
+						local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+						GameLogic.Macros:AddMacro("NextKeyPressWithMouseMove", angleX, angleY);
+					end
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWindow.lua");
 					local InfoWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWindow");
 					InfoWindow.CopyToClipboard("mousepos")

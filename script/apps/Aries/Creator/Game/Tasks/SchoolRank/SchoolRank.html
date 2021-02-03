@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+    <script refresh="true" type="text/npl" src="MacroCodeCampMiniPro.lua"><![CDATA[
+        local SchoolRank = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolRank/SchoolRank.lua");
+        SchoolRank.OnInit()
+        function ClosePage()
+            Page:CloseWindow();
+        end
+
+        function GetRankData(index)
+            if index == nil then
+                return #SchoolRank.rank_data
+            else
+                return SchoolRank.rank_data[index]
+            end
+        end
+
+        function isOtherRank(index)
+            if index > 3 then
+                return true
+            end
+            return false
+        end
+
+        function getOtherStyle(index)
+            local style = string.format("margin-top: 32px; margin-left: 36px; width: 18px; height: 19px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/s%d_18X19_32bits.png#0 0 18 19);",index)
+            if index == 10 then
+                style = string.format("margin-top: 32px; margin-left: 36px; width: 18px; height: 19px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/s%d_18X19_32bits.png#0 0 26 20);",index)
+            end
+            return style
+        end
+
+        function getLimitStr(str)
+            return SchoolRank.WordsLimit(str)
+        end
+
+        function gotoSchool(name,mcmlNode)
+            local worldid = mcmlNode:GetAttribute("param1")            
+            print("gotoSchool===============",worldid)
+            if worldid ~= -1 then
+                GameLogic.RunCommand(string.format("/loadworld -froce %d", worldid));
+            end
+        end       
+        ]]></script>
+        <div style="width: 740px; height: 566px;background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
+            <!--title-->
+            <div style="width: 740; height: 46px;">
+                <input type="button" style="margin-left: 700px; margin-top: 10x; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+                <div style="margin-top: -24px; margin-left: 20px; width: 122px; height: 26px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/paihangb_122X26_32bits.png#0 0 122 26);"></div>
+            </div>
+
+            <div style="width: 746px; height: 500px;">
+                <div style="margin-left: 20px; margin-top: 4px; width: 700px; height: 30px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/tiao_700X28_32bits.png#0 0 700 28);"></div>
+                <pe:gridview style="margin-left: 12px;" RememberScrollPos="true" name="gridview_2" CellPadding="8" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "8" 
+                    DataSource='<%=GetRankData%>'>
+                    <Columns>
+                        <pe:if condition= '<%=Eval("rank") == 1%>'>
+                            <div style="width: 700px; height: 84px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/bjk_32X32_32bits.png#0 0 32 32:10 10 12 12);">
+                                <div style="margin-top: 16px; margin-left: 16px; width: 66px; height: 55px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/1_66X55_32bits.png#0 0 66 55);"></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #000000;margin-left: 200px;margin-top: -40px;"><%=getLimitStr(Eval("schoolname"))%></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #F5B11D;margin-left: 460px;margin-top: -40px;"><%=Eval("grades")%></div>
+                                <input type="button" value='<%=L"前往"%>' onclick='gotoSchool' param1='<%= Eval("projectId") %>' style="font-size: 24px;base-font-size: 24px; margin-top: -56px; margin-left: 560px; height:54px ;width: 134px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/btn_lvse_134X54_32bits.png#0 0 134 54);"/>
+                            </div>
+                        </pe:if>
+                        <pe:if condition= '<%=Eval("rank") == 2%>'>
+                            <div style="width: 700px; height: 84px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/bjk_32X32_32bits.png#0 0 32 32:10 10 12 12);">
+                                <div style="margin-top: 16px; margin-left: 16px; width: 66px; height: 55px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/2_66X55_32bits.png#0 0 66 55);"></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #000000;margin-left: 200px;margin-top: -40px;"><%=getLimitStr(Eval("schoolname"))%></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #F5B11D;margin-left: 460px;margin-top: -40px;"><%=Eval("grades")%></div>
+                                <input type="button" value='<%=L"前往"%>' onclick='gotoSchool' param1='<%= Eval("projectId") %>' style="font-size: 24px;base-font-size: 24px; margin-top: -56px; margin-left: 560px; height:54px ;width: 134px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/btn_lvse_134X54_32bits.png#0 0 134 54);"/>
+                            </div>
+                        </pe:if>
+                        <pe:if condition= '<%=Eval("rank") == 3%>'>
+                            <div style="width: 700px; height: 84px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/bjk_32X32_32bits.png#0 0 32 32:10 10 12 12);">
+                                <div style="margin-top: 16px; margin-left: 16px; width: 66px; height: 55px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/3_66X55_32bits.png#0 0 66 55);"></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #000000;margin-left: 200px;margin-top: -40px;"><%=getLimitStr(Eval("schoolname"))%></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #F5B11D;margin-left: 460px;margin-top: -40px;"><%=Eval("grades")%></div>
+                                <input type="button" value='<%=L"前往"%>' onclick='gotoSchool' param1='<%= Eval("projectId") %>' style="font-size: 24px;base-font-size: 24px; margin-top: -56px; margin-left: 560px; height:54px ;width: 134px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/btn_lvse_134X54_32bits.png#0 0 134 54);"/>
+                            </div>
+                        </pe:if>
+                        <pe:if condition= '<%=isOtherRank(Eval("rank"))%>'>
+                            <div style="width: 700px; height: 84px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/bjk_32X32_32bits.png#0 0 32 32:10 10 12 12);">
+                                <div style='<%=getOtherStyle(Eval("rank"))%>'></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #000000;margin-left: 200px;margin-top: -24px;"><%=getLimitStr(Eval("schoolname"))%></div>
+                                <div style=" font-size: 20px; base-font-size: 20px; color: #F5B11D;margin-left: 460px;margin-top: -24px;"><%=Eval("grades")%></div>
+                                <input type="button" value='<%=L"前往"%>' onclick='gotoSchool' param1='<%= Eval("projectId") %>' style="font-size: 24px;base-font-size: 24px; margin-top: -42px; margin-left: 560px; height:54px ;width: 134px; background: url(Texture/Aries/Creator/keepwork/SchoolRank/btn_lvse_134X54_32bits.png#0 0 134 54);"/>
+                            </div>
+                        </pe:if>
+                    </Columns>
+                </pe:gridview>
+            </div>
+        </div>  
+</pe:mcml>
+</body>
+</html>

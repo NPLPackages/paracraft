@@ -6,15 +6,6 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local Editor = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Editor.lua");
-local editor = Editor:new();
-local node, code_component, movieclip_component = editor:createBlockCodeNode();
-code_component:setCodeFileName("test/follow.lua")
-
-local node, code_component, movieclip_component = editor:createBlockCodeNode();
-code_component:setCode('say("hi"); wait(2); say("bye")wait(2); say("")')
-editor:run();
-
-echo(editor:toJson(),true);
 ------------------------------------------------------------
 --]]
 local SkySpacePairBlock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BlockPositionAllocations/SkySpacePairBlock.lua");
@@ -33,8 +24,14 @@ Editor:Property({"Scene", auto = true, type = "Scene", camelCase = true, });
 
 function Editor:ctor()
     self.Scene = Scene:new();
-    self.pair_block_pos_allocation = SkySpacePairBlock:new();
+    self.pair_block_pos_allocation = nil
     self.selected = nil;
+end
+function Editor:onInit(block_pos_allocation)
+    block_pos_allocation = block_pos_allocation or SkySpacePairBlock:new();
+    self.pair_block_pos_allocation = block_pos_allocation;
+    return self;
+
 end
 function Editor:run()
     self.Scene.RootNode:run();
@@ -45,9 +42,66 @@ end
 function Editor:clear()
     self.Scene:clear();
 end
+function Editor:reload()
+    self.Scene.RootNode:reload();
+end
 function Editor:select(node)
     self.selected = node;
 	GameLogic.GetFilters():add_filter("Editor.select", self, node);
+end
+function Editor:createOrGetFollowTeacher(codes)
+    codes = codes or [[
+local words = {
+    "好好学习，天天向上。",
+    "你的作品是最棒的！",
+}
+registerClickEvent(function()
+    local index = math.random(#words)
+    local word = words[index]
+    say(word, 2)
+end)
+
+local p_x,p_y,p_z = getPos("@p");
+setPos(p_x - 6,p_y,p_z - 6)
+turnTo("@p")
+anim(0)
+say("hello!", 2)
+while(true) do
+  if(((distanceTo("@p")) > (4))) then
+    turnTo("@p")
+    
+    local x,y,z = getPos();
+    local p_x,p_y,p_z = getPos("@p");
+    setPos(x,p_y,z)
+    anim(4)
+    moveForward(3, 0.5)
+  else
+    turnTo("@p")
+    anim(0)
+  end
+end
+]]
+    local name = "FollowTeacher_Node"
+    local code_component_name = "FollowTeacher_CodeComponent"
+    local movieclip_component_name = "FollowTeacher_MovieClipComponent"
+    local parent = self.Scene.RootNode;
+    local node = parent:getChildByName(name);
+    if(not node)then
+        local node, code_component, movieclip_component = self:createBlockCodeNode(parent, name)
+        if(node and code_component and movieclip_component)then
+            code_component:setCode(codes)
+            code_component.Name = code_component_name;
+            movieclip_component.Name = movieclip_component_name;
+            return node, code_component, movieclip_component;
+        end
+    else
+        code_component = node:getComponentByName(code_component_name);
+        if(code_component)then
+            code_component:setCode(codes);
+        end
+        movieclip_component = node:getComponentByName(movieclip_component_name);
+        return node, code_component, movieclip_component;
+    end
 end
 -- follow magic for user
 function Editor:createOrGetFollowMagic()
@@ -66,7 +120,7 @@ function Editor:createOrGetFollowMagic()
 end)
 
 local p_x,p_y,p_z = getPos("@p");
-setPos(p_x - 1,p_y,p_z - 1)
+setPos(p_x - 6,p_y,p_z - 6)
 turnTo("@p")
 anim(0)
 say("hello!", 2)

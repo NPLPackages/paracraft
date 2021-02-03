@@ -237,7 +237,51 @@ function Macros.WindowClickTrigger(btnName, button, localX, localY)
 end
 
 
+-- when saving bmax model, a message box may popup asking the user to click yes to overwrite if file exists. 
+-- we will automatically confirm such message box, if the next macro is not message box trigger button. 
+function Macros.ConfirmNextMessageBoxClick()
+	-- we will do nothing, if next trigger is DefaultMessageBox
+	local nOffset = 0;
+	local targetText = "";
+	while(true) do
+		nOffset = nOffset + 1;
+		local nextMacro = Macros:PeekNextMacro(nOffset)
+		if(nextMacro) then
+			if(nextMacro:IsTrigger()) then
+				if(nextMacro.name == "ButtonClickTrigger") then
+					local nextUIName = nextMacro:GetParams()[1];
+					if(nextUIName and nextUIName:match("^DefaultMessageBox")) then
+						return;
+					end
+				end
+			end
+		else
+			break;
+		end
+	end
+	-- we will automatically confirm such message box, if the next macro is not message box trigger button. 
+	local obj = ParaUI.GetUIObject("DefaultMessageBox.ClosePage")
+	if(obj and obj:IsValid()) then
+		local btnName;
+		if(ParaUI.GetUIObject("DefaultMessageBox.Yes"):IsValid()) then
+			btnName = "DefaultMessageBox.Yes"
+		elseif(ParaUI.GetUIObject("DefaultMessageBox.OK"):IsValid()) then
+			btnName = "DefaultMessageBox.OK"
+		end
 
+		if(btnName) then
+			local callback = {};
+			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+				Macros.ButtonClick(btnName, "left");
+				if(callback.OnFinish) then
+					callback.OnFinish();
+				end
+			end})
+			mytimer:Change(1000);
+			return callback;
+		end
+	end
+end
 
 
 

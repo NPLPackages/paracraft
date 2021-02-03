@@ -36,7 +36,8 @@ end
         <div style="float:left;">
             <div>
                 <select uiname="MobPropertyPage.assetfile" name="assetfile" onselect="MobPropertyPage.OnChangeAssetFile" class="mc_text" DataSource='<%=MobPropertyPage.GetAssetFileDS()%>' AllowUserEdit="true" style="width:200px;height:25px;"/>
-                <input type="button" class="mc_light_grey_button_with_fillet" uiname="MobPropertyPage.openfile" name="openfile" value='<%=L"选择模型..."%>' tooltip='<%=L"打开文件浏览器"%>' style="min-width:100px;height:25px;margin-left:3px;" onclick="MobPropertyPage.OnOpenAssetFile"/>
+                <input type="button" class="mc_light_grey_button_with_fillet" uiname="MobPropertyPage.openfile" name="openfile" value='<%=L"选择模型..."%>' tooltip='<%=L"打开文件浏览器"%>' style="min-width:90px;height:25px;margin-left:3px;" onclick="MobPropertyPage.OnOpenAssetFile"/>
+                <input type="button" class="mc_light_grey_button_with_fillet" uiname="MobPropertyPage.openfile" name="openfile" value='<%=L"换装模型"%>' tooltip='<%=L"选择可换装模型"%>' style="min-width:70px;height:25px;margin-left:3px;" onclick="MobPropertyPage.OnOpenCustomModel" />
             </div>
             <div>
                 <input type="button" class="mc_light_grey_button_with_fillet" uiname="MobPropertyPage.randomSkin" name="randomSkin" value='<%=L"选择皮肤"%>' onclick="MobPropertyPage.ShowSkinPage"/>

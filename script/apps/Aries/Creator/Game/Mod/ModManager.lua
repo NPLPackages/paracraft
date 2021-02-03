@@ -58,6 +58,11 @@ function ModManager:OnWorldSave()
 	LOG.std(nil, "info", "ModManager", "plugins (mods) saved in world");
 end
 
+-- singal
+function ModManager:OnWillLeaveWorld()
+	self:InvokeMethod("OnWillLeaveWorld");
+end
+
 -- signal
 function ModManager:OnLeaveWorld()
 	self:InvokeMethod("OnLeaveWorld");

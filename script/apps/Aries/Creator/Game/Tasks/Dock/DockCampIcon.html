@@ -1,0 +1,53 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Dock/DockCampIcon.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="DockCampIcon.lua"><![CDATA[
+local DockCampIcon = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockCampIcon.lua");
+DockCampIcon.OnInit()
+
+function GetCurTime()
+    return DockCampIcon.GetCurTime()
+end
+
+function GoPlan()
+    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    Page.Show(nil, {url = "@/code/Schedule.html", width=1012, height=597});
+end
+
+function GoTo()
+    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    Page.Show(nil, {url = "@/code/WinterCampMap.html", width=1012, height=594});
+end
+]]></script>
+<pe:container alignment="_lb" width="100%" height="100%" style="background:">
+    <div style="color: #ffffff;margin-top: 12px; text-align: center;" height="100%" width="100%">
+        <div style="width:241px;height:88px;background:">
+            <!-- <input type="button" zorder="2" style="position: relative;width:241px;height:88px;background:" onclick="GoPlan()"  /> -->
+            <div style="position: relative;width:241px;height:88px;background:url(Texture/Aries/Creator/keepwork/dock/richenganpai_241X88_32bits.png#0 0 241 88)" onclick="GoPlan()"></div>
+            <img ClickThrough="true" style="position: relative;margin-left: 153;margin-top: -14;" uiname="animator" zorder="-1" class="animated_btn_overlay" width="82" height="82"/>
+            <div style="position: relative;margin-left:0px;base-font-size:20px; font-size: 20px; color:#ffffff;">
+                <pe:label name="cur_time" zorder="0" style="height: 50px;float:left;color:#ffffff; margin-top: 30px; margin-left: -87;">0</pe:label>
+             </div>
+             
+        </div>
+
+        <div style="margin-top: 12px; width:241px;height:88px;background:">
+            <!-- <input type="button" zorder="2" style="position: relative;width:241px;height:88px;background:" onclick="GoPlan()"  /> -->
+            <div style="position: relative;width:241px;height:88px;background:url(Texture/Aries/Creator/keepwork/dock/lijiqianwang_241X88_32bits.png#0 0 241 88)" onclick="GoTo()"></div>
+            <img ClickThrough="true" style="position: relative;margin-left: 153;margin-top: -14;" uiname="animator" zorder="-1" class="animated_btn_overlay" width="82" height="82"/>
+            <div style="position: relative;margin-left:0px;base-font-size:20px; font-size: 20px; color:#ffffff;">
+                <pe:label name="cur_state" zorder="0" style="height: 50px;float:left;color:#ffffff; margin-top: 30px; margin-left: -87;">0</pe:label>
+             </div>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

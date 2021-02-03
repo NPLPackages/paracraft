@@ -137,7 +137,7 @@ function Export.OnSelectExporter(id)
 	end
 end
 
-function Export.ExportAsTemplate(id)
+function Export.ExportAsTemplate()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 	local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 	SelectBlocks.SaveToTemplate();
@@ -152,6 +152,9 @@ function Export.ExportAsBMax()
 			local filename = result;
 			local filenameUtf8 = commonlib.Encoding.DefaultToUtf8(filename);
 			
+			if(GameLogic.Macros:IsRecording()) then
+				GameLogic.Macros:AddMacro("ConfirmNextMessageBoxClick");
+			end
 			-- we will force overwrite if user selected from existing file
 			local opt = SaveFileDialog.IsSelectedFromExistingFiles() and "-f" or ""
 			local bSuccess, filename = GameLogic.RunCommand("savemodel", format("-interactive %s \"%s\"", opt, filenameUtf8));

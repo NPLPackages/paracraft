@@ -1,0 +1,348 @@
+<!--config/Aries/creator/CustomCharItems.xml
+
+id段         位置  参数                  贴图编号            模型编号
+80000 80999  头部  geoset category="3"              
+81000 81999  眼睛  geoset category="2"   3眼睛 4嘴巴            
+82000 82999  头饰  geoset category="0"   1头发              1短发 2丸子头 3呆毛短发 4长刘海短发 5赛亚人 6长刘海中分 7长散发 8单马尾 9呆毛双马尾 10呆毛长直
+83000 83999  帽子  geoset category="0" attachment id="11"
+84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍
+85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤
+86000 86999  背部  attachment id="15"
+87000 97999  手持  attachment id="1"
+88000 88999  嘴巴                        4嘴巴      
+89000 89999  坐骑  暂不开放
+
+geoset list
+"hair" = 0, 头发
+"facialhair" = 1, 胡子
+"eyeaddon" = 2, 眼罩或眼镜 
+"head" = 3, 头
+"hand" = "gloves" = 4, 手或手套 
+"boots" = 5, 鞋子
+"ears" = 7, 耳朵
+"shirt" = "armsleeves" = "sleeves" = 8,  衣服
+"pants" = 9, 裤子
+"wings" = 10, 翅膀
+"tabard" = 12, 战袍
+"robe" = 13, 袍子
+"skirt" = 14, 裙子
+"cape" = 15, 披风
+
+texture list
+geoset 8, texture id 2
+geoset 9, texture id 5
+geoset 0, texture id 1
+
+model id
+
+-->
+<CustomCharItems>
+  <items>
+    <!--      80000 80999  头部  geoset category="3"    -->
+
+    <!--    <item id="80001" model="actor;"><geoset category="3" id="1"></geoset></item>    -->
+
+    <!--      81000 81999  眼睛  geoset category="2"   3眼睛 4嘴巴        -->
+    <item id="81001" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_02_blackman.png"></texture></item>
+    <item id="81002" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_ai.png"></texture></item>
+    <item id="81003" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_01_01.png"></texture></item>
+    <item id="81004" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_02_01.png"></texture></item>
+    <item id="81005" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_011.png"></texture></item>
+    <item id="81006" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_14.png"></texture></item>
+    <item id="81007" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AA.png"></texture></item>
+    <item id="81008" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AB.png"></texture></item>
+    <item id="81009" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AC.png"></texture></item>
+    <item id="81010" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AD.png"></texture></item>
+    <item id="81011" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AE.png"></texture></item>
+    <item id="81012" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AF.png"></texture></item>
+    <item id="81013" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AG.png"></texture></item>
+    <item id="81014" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_B_01.png"></texture></item>
+    <item id="81015" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_C_01.png"></texture></item>
+    <item id="81016" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_D_01.png"></texture></item>
+    <item id="81017" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_F_01.png"></texture></item>
+    <item id="81018" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png"></texture></item>
+    <item id="81019" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a002.png"></texture></item>
+    <item id="81020" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a003.png"></texture></item>
+    <item id="81021" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_01.png"></texture></item>
+    <item id="81022" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_H_01.png"></texture></item>
+    <item id="81023" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_I_01.png"></texture></item>
+    <item id="81024" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_J_01.png"></texture></item>
+    <item id="81025" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_K_01.png"></texture></item>
+    <item id="81026" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_L_01.png"></texture></item>
+    <item id="81027" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_M_01.png"></texture></item>
+    <item id="81028" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_N_01.png"></texture></item>
+    <item id="81029" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_O_01.png"></texture></item>
+    <item id="81030" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_P_01.png"></texture></item>
+    <item id="81031" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_Q_01.png"></texture></item>
+    <item id="81032" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_01.png"></texture></item>
+    <item id="81033" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_03.png"></texture></item>
+    <item id="81034" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_S_01.png"></texture></item>
+    <item id="81035" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_T_01.png"></texture></item>
+    <item id="81036" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_02_01.png"></texture></item>
+    <item id="81037" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_01.png"></texture></item>
+    <item id="81038" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_02.png"></texture></item>
+    <item id="81039" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_03.png"></texture></item>
+    <item id="81040" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_01.png"></texture></item>
+    <item id="81041" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_02.png"></texture></item>
+    <item id="81042" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_03.png"></texture></item>
+    <item id="81043" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_0.png"></texture></item>
+    <item id="81044" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_01.png"></texture></item>
+    <item id="81045" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_02.png"></texture></item>
+    <item id="81046" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_03.png"></texture></item>
+    <item id="81047" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_E_01.png"></texture></item>
+    <item id="81048" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_F_01.png"></texture></item>
+    <item id="81049" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a001.png"></texture></item>
+    <item id="81050" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a002.png"></texture></item>
+    <item id="81051" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a003.png"></texture></item>
+    <item id="81052" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_G_01.png"></texture></item>
+    <item id="81053" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_H_01.png"></texture></item>
+    <item id="81054" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_I_01.png"></texture></item>
+    <item id="81055" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_J_01.png"></texture></item>
+    <item id="81056" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_K_01.png"></texture></item>
+    <item id="81057" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_L_01.png"></texture></item>
+    <item id="81058" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_M_01.png"></texture></item>
+    <item id="81059" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_ai.png"></texture></item>
+    <item id="81060" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_le.png"></texture></item>
+    <item id="81061" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_nu.png"></texture></item>
+    <item id="81062" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_xi.png"></texture></item>
+    <item id="81063" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_ai.png"></texture></item>
+    <item id="81064" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_le.png"></texture></item>
+    <item id="81065" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_nu.png"></texture></item>
+    <item id="81066" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_xi.png"></texture></item>
+    <item id="81067" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_le.png"></texture></item>
+    <item id="81068" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_nu.png"></texture></item>
+    <item id="81069" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_pangjuan.png"></texture></item>
+    <item id="81070" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin.png"></texture></item>
+    <item id="81071" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_ai.png"></texture></item>
+    <item id="81072" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_nu.png"></texture></item>
+    <item id="81073" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_si.png"></texture></item>
+    <item id="81074" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_xi.png"></texture></item>
+    <item id="81075" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc.png"></texture></item>
+    <item id="81076" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc2.png"></texture></item>
+    <item id="81077" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc3.png"></texture></item>
+    <item id="81078" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye1.png"></texture></item>
+
+
+    <!--      82000 82999  头饰  geoset category="0"   1头发              1短发 2丸子头 3呆毛短发 4长刘海短发 5赛亚人 6长刘海中分 7长散发 8单马尾 9呆毛双马尾 10呆毛长直    -->
+    <item id="82001" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png"></texture></item>
+    <item id="82002" model="actor;"><geoset category="0" id="2"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_girl_hair_01.png"></texture></item>
+    <item id="82003" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png"></texture></item>
+    <item id="82004" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_02.png"></texture></item>
+    <item id="82005" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_03.png"></texture></item>
+    <item id="82006" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_04.png"></texture></item>
+    <item id="82007" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_05.png"></texture></item>
+    <item id="82008" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_06.png"></texture></item>
+    <item id="82009" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_07.png"></texture></item>
+    <item id="82010" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_08.png"></texture></item>
+    <item id="82011" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_09.png"></texture></item>
+    <item id="82012" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_10.png"></texture></item>
+    <item id="82013" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_11.png"></texture></item>
+    <item id="82014" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_12.png"></texture></item>
+    <item id="82015" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_13.png"></texture></item>
+    <item id="82016" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_14.png"></texture></item>
+    <item id="82017" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_15.png"></texture></item>
+    <item id="82018" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_16.png"></texture></item>
+    <item id="82019" model="actor;"><geoset category="0" id="3"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_17.png"></texture></item>
+    <item id="82020" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png"></texture></item>
+    <item id="82021" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_02.png"></texture></item>
+    <item id="82022" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_03.png"></texture></item>
+    <item id="82023" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_04.png"></texture></item>
+    <item id="82024" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_05.png"></texture></item>
+    <item id="82025" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_06.png"></texture></item>
+    <item id="82026" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_07.png"></texture></item>
+    <item id="82027" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_08.png"></texture></item>
+    <item id="82028" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_09.png"></texture></item>
+    <item id="82029" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_10.png"></texture></item>
+    <item id="82030" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_11.png"></texture></item>
+    <item id="82031" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_12.png"></texture></item>
+    <item id="82032" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_13.png"></texture></item>
+    <item id="82033" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_14.png"></texture></item>
+    <item id="82034" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_15.png"></texture></item>
+    <item id="82035" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_16.png"></texture></item>
+    <item id="82036" model="actor;"><geoset category="0" id="4"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_17.png"></texture></item>
+    <item id="82037" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png"></texture></item>
+    <item id="82038" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_02.png"></texture></item>
+    <item id="82039" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_03.png"></texture></item>
+    <item id="82040" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_04.png"></texture></item>
+    <item id="82041" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_05.png"></texture></item>
+    <item id="82042" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_06.png"></texture></item>
+    <item id="82043" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_07.png"></texture></item>
+    <item id="82044" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_08.png"></texture></item>
+    <item id="82045" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_09.png"></texture></item>
+    <item id="82046" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_10.png"></texture></item>
+    <item id="82047" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_11.png"></texture></item>
+    <item id="82048" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_12.png"></texture></item>
+    <item id="82049" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_13.png"></texture></item>
+    <item id="82050" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_14.png"></texture></item>
+    <item id="82051" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_15.png"></texture></item>
+    <item id="82052" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_16.png"></texture></item>
+    <item id="82053" model="actor;"><geoset category="0" id="5"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_17.png"></texture></item>
+    <item id="82054" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png"></texture></item>
+    <item id="82055" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_02.png"></texture></item>
+    <item id="82056" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_03.png"></texture></item>
+    <item id="82057" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_04.png"></texture></item>
+    <item id="82058" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_05.png"></texture></item>
+    <item id="82059" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_06.png"></texture></item>
+    <item id="82060" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_07.png"></texture></item>
+    <item id="82061" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_08.png"></texture></item>
+    <item id="82062" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_09.png"></texture></item>
+    <item id="82063" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_10.png"></texture></item>
+    <item id="82064" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_11.png"></texture></item>
+    <item id="82065" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_12.png"></texture></item>
+    <item id="82066" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_13.png"></texture></item>
+    <item id="82067" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_14.png"></texture></item>
+    <item id="82068" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_15.png"></texture></item>
+    <item id="82069" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_16.png"></texture></item>
+    <item id="82070" model="actor;"><geoset category="0" id="6"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_17.png"></texture></item>
+    <item id="82071" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa014.png"></texture></item>
+    <item id="82072" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa015.png"></texture></item>
+    <item id="82073" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa016.png"></texture></item>
+    <item id="82074" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa017.png"></texture></item>
+    <item id="82075" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa018.png"></texture></item>
+    <item id="82076" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa019.png"></texture></item>
+    <item id="82077" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa020.png"></texture></item>
+    <item id="82078" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa021.png"></texture></item>
+    <item id="82079" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa022.png"></texture></item>
+    <item id="82080" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa01.png"></texture></item>
+    <item id="82081" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa02.png"></texture></item>
+    <item id="82082" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa03.png"></texture></item>
+    <item id="82083" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa04.png"></texture></item>
+    <item id="82084" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa05.png"></texture></item>
+    <item id="82085" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa06.png"></texture></item>
+    <item id="82086" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa07.png"></texture></item>
+    <item id="82087" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa08.png"></texture></item>
+    <item id="82088" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa09.png"></texture></item>
+    <item id="82089" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa010.png"></texture></item>
+    <item id="82090" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa011.png"></texture></item>
+    <item id="82091" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa012.png"></texture></item>
+    <item id="82092" model="actor;"><geoset category="0" id="7"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa013.png"></texture></item>
+    <item id="82093" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa014.png"></texture></item>
+    <item id="82094" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa015.png"></texture></item>
+    <item id="82095" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa016.png"></texture></item>
+    <item id="82096" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa017.png"></texture></item>
+    <item id="82097" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa018.png"></texture></item>
+    <item id="82098" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa019.png"></texture></item>
+    <item id="82099" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa020.png"></texture></item>
+    <item id="82100" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa021.png"></texture></item>
+    <item id="82101" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa022.png"></texture></item>
+    <item id="82102" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa01.png"></texture></item>
+    <item id="82103" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa02.png"></texture></item>
+    <item id="82104" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa03.png"></texture></item>
+    <item id="82105" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa04.png"></texture></item>
+    <item id="82106" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa05.png"></texture></item>
+    <item id="82107" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa06.png"></texture></item>
+    <item id="82108" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa07.png"></texture></item>
+    <item id="82109" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa08.png"></texture></item>
+    <item id="82110" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa09.png"></texture></item>
+    <item id="82111" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa010.png"></texture></item>
+    <item id="82112" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa011.png"></texture></item>
+    <item id="82113" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa012.png"></texture></item>
+    <item id="82114" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa013.png"></texture></item>
+    <item id="82115" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa014.png"></texture></item>
+    <item id="82116" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa015.png"></texture></item>
+    <item id="82117" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa016.png"></texture></item>
+    <item id="82118" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa017.png"></texture></item>
+    <item id="82119" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa018.png"></texture></item>
+    <item id="82120" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa019.png"></texture></item>
+    <item id="82121" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa020.png"></texture></item>
+    <item id="82122" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa021.png"></texture></item>
+    <item id="82123" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa022.png"></texture></item>
+    <item id="82124" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa01.png"></texture></item>
+    <item id="82125" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa02.png"></texture></item>
+    <item id="82126" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa03.png"></texture></item>
+    <item id="82127" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa04.png"></texture></item>
+    <item id="82128" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa05.png"></texture></item>
+    <item id="82129" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa06.png"></texture></item>
+    <item id="82130" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa07.png"></texture></item>
+    <item id="82131" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa08.png"></texture></item>
+    <item id="82132" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa09.png"></texture></item>
+    <item id="82133" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa010.png"></texture></item>
+    <item id="82134" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa011.png"></texture></item>
+    <item id="82135" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa012.png"></texture></item>
+    <item id="82136" model="actor;"><geoset category="0" id="9"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa013.png"></texture></item>
+    <item id="82137" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa014.png"></texture></item>
+    <item id="82138" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa015.png"></texture></item>
+    <item id="82139" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa016.png"></texture></item>
+    <item id="82140" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa017.png"></texture></item>
+    <item id="82141" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa018.png"></texture></item>
+    <item id="82142" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa019.png"></texture></item>
+    <item id="82143" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa020.png"></texture></item>
+    <item id="82144" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa021.png"></texture></item>
+    <item id="82145" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa022.png"></texture></item>
+    <item id="82146" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa01.png"></texture></item>
+    <item id="82147" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa02.png"></texture></item>
+    <item id="82148" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa03.png"></texture></item>
+    <item id="82149" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa04.png"></texture></item>
+    <item id="82150" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa05.png"></texture></item>
+    <item id="82151" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa06.png"></texture></item>
+    <item id="82152" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa07.png"></texture></item>
+    <item id="82153" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa08.png"></texture></item>
+    <item id="82154" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa09.png"></texture></item>
+    <item id="82155" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa010.png"></texture></item>
+    <item id="82156" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa011.png"></texture></item>
+    <item id="82157" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa012.png"></texture></item>
+    <item id="82158" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/girl-toufa013.png"></texture></item>
+
+
+    <!--      83000 83999  帽子  geoset category="0" attachment id="11"    -->
+    <item id="83001" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/v3/Item/ObjectComponents/Head/1137_NewYearGoldenHat.x"></attachment></item>
+    
+    <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
+    <item id="84000" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png"></texture></item>
+    <item id="84001" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_boy_body_graduation.png"></texture></item>
+    <item id="84002" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_boy_body_party.png"></texture></item>
+    <item id="84003" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_boy_body_activity.png"></texture></item>
+    <item id="84004" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_girl_body_default.png"></texture></item>
+    <item id="84005" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_girl_body_activity.png"></texture></item>
+    <item id="84006" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_girl_body_graduation.png"></texture></item>
+    <item id="84007" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/Avatar_girl_body_party.png"></texture></item>
+    
+    <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
+    <item id="85000" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png"></texture></item>
+    <item id="85001" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_graduation.png"></texture></item>
+    <item id="85002" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_party.png"></texture></item>
+    <item id="85003" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_activity.png"></texture></item>
+    <item id="85004" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_girl_leg_default.png"></texture></item>
+    
+    <!--      86000 86999  背部  attachment id="15"    -->
+    <item id="86000" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Head/1137_NewYearGoldenHat.x"></attachment></item>
+    
+    <!--      87000 97999  手持  attachment id="1"    -->
+    <item id="87000" model="actor;"><attachment id="1" filename="character/v3/Item/ObjectComponents/Head/1137_NewYearGoldenHat.x"></attachment></item>
+
+    <!--    88000 88999  嘴巴                        4嘴巴          -->
+    <item id="88001" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>
+    <item id="88002" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png"></texture></item>
+    <item id="88003" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a003.png"></texture></item>
+    <item id="88004" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_01_01.png"></texture></item>
+    <item id="88005" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_02_01.png"></texture></item>
+    <item id="88006" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_03_01.png"></texture></item>
+    <item id="88007" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a002.png"></texture></item>
+    <item id="88008" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a003.png"></texture></item>
+    <item id="88009" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"></texture></item>
+    <item id="88010" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_c001.png"></texture></item>
+    <item id="88011" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a001.png"></texture></item>
+    <item id="88012" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a002.png"></texture></item>
+    <item id="88013" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_mask.png"></texture></item>
+    <item id="88014" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_01.png"></texture></item>
+    <item id="88015" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_02.png"></texture></item>
+    <item id="88016" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_03.png"></texture></item>
+    <item id="88017" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_04.png"></texture></item>
+    <item id="88018" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_05.png"></texture></item>
+    <item id="88019" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_06.png"></texture></item>
+    <item id="88020" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_01.png"></texture></item>
+    <item id="88021" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_02_01.png"></texture></item>
+    <item id="88022" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_03_01.png"></texture></item>
+    <item id="88023" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_04_01.png"></texture></item>
+    <item id="88024" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"></texture></item>
+    <item id="88025" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_06_01.png"></texture></item>
+    <item id="88026" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_07_01.png"></texture></item>
+
+    
+    <!--    89000 89999  坐骑  暂不开放    -->
+
+  </items>
+  <models type="actor">
+    <model filename="character/CC/02human/CustomGeoset/actor.x"></model>
+  </models>
+</CustomCharItems>

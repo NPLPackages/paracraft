@@ -6,11 +6,12 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
-VisualSceneLogic.OnWorldLoaded();
+VisualSceneLogic.staticInit();
 ------------------------------------------------------------
 --]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local SkySpacePairBlock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BlockPositionAllocations/SkySpacePairBlock.lua");
 
 local Editor = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Editor.lua");
 
@@ -21,35 +22,39 @@ VisualSceneLogic.editors = {};
 VisualSceneLogic.PresetEditors = {
     GlobalEditor = "GlobalEditor",
 }
+function VisualSceneLogic.staticInit()
+    GameLogic:Connect("WorldLoaded", VisualSceneLogic, VisualSceneLogic.OnWorldLoaded, "UniqueConnection");
+	GameLogic:Connect("WorldUnloaded", VisualSceneLogic, VisualSceneLogic.OnWorldUnload, "UniqueConnection");
+end
 function VisualSceneLogic.OnWorldLoaded()
-    local editor = VisualSceneLogic.onSelectedEditorByName(VisualSceneLogic.PresetEditors.GlobalEditor);
-    if(not editor)then
-        return
-    end
-    local node, code_component, movieclip_component = editor:createOrGetFollowMagic();
-    if(node and code_component and movieclip_component)then
-        -- active magic by internal code
-        node:run();
+	LOG.std(nil, "info", "VisualSceneLogic", "OnWorldLoaded");
+    VisualSceneLogic.is_init = true;
+
+    local editor = VisualSceneLogic.createOrGetEditor();
+    if(editor)then
+        editor:reload();
     end
 end
 function VisualSceneLogic.OnWorldUnload()
-    local editor = VisualSceneLogic.onSelectedEditorByName(VisualSceneLogic.PresetEditors.GlobalEditor);
-    if(not editor)then
-        return
-    end
-    local node, code_component, movieclip_component = editor:createOrGetFollowMagic();
-    if(node and code_component and movieclip_component)then
-        -- stop magic by internal code
-        node:stop();
-    end
+	LOG.std(nil, "info", "VisualSceneLogic", "OnWorldUnload");
+    VisualSceneLogic.is_init = false;
 end
+-- @param name: default name is "GlobalEditor"
 function VisualSceneLogic.createOrGetEditor(name)
-    if(not name)then
+    if(not VisualSceneLogic.is_init)then
+		LOG.std(nil, "info", "VisualSceneLogic", "VisualSceneLogic isn't initiated");
         return
+    end
+    name = name or VisualSceneLogic.PresetEditors.GlobalEditor;
+    local block_pos_allocation = VisualSceneLogic.block_pos_allocation;
+    if(not block_pos_allocation)then
+        block_pos_allocation = SkySpacePairBlock:new();
+        VisualSceneLogic.block_pos_allocation = block_pos_allocation;
     end
     local editor = VisualSceneLogic.editors[name];
     if(not editor)then
-        editor = Editor:new();
+        --NOTE: using global position allocation for every editor
+        editor = Editor:new():onInit(block_pos_allocation);
         editor.Name = name;
     end
     VisualSceneLogic.editors[name] = editor;

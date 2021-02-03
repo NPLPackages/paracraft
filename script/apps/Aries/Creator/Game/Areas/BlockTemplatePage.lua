@@ -208,6 +208,9 @@ function BlockTemplatePage.OnClickSave()
 			GameLogic.GetFilters():apply_filters("file_exported", "template", filename);
 		end, bSaveSnapshot);
 	end
+	if(GameLogic.Macros:IsRecording()) then
+		GameLogic.Macros:AddMacro("ConfirmNextMessageBoxClick");
+	end
 	if(ParaIO.DoesFileExist(filename)) then
 		_guihelper.MessageBox(format(L"模板文件%s已经存在, 是否要覆盖之前的文件?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
