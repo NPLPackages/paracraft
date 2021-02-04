@@ -15,6 +15,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.avatar.lua");
+NPL.load("(gl)script/ide/System/Encoding/guid.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPage");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
@@ -22,6 +23,7 @@ local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.P
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local guid = commonlib.gettable("System.Encoding.guid");
 
 local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
 
@@ -32,14 +34,12 @@ local currentSkin;
 CustomSkinPage.category_ds = {
 	{tex1 = "zi_toubu2_28X14_32bits", tex2 = "zi_toubu1_28X14_32bits", name = "head"},
 	{tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye"},
-	{tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth"},
-	{tex1 = "zi_maozi1_28X14_32bits", tex2 = "zi_maozi2_28X14_32bits", name = "hat"},
 	{tex1 = "zi_toushi1_28X14_32bits", tex2 = "zi_toushi2_28X14_32bits", name = "hair"},
+	{tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth"},
 	{tex1 = "zi_yifu1_28X14_32bits", tex2 = "zi_yifu2_28X14_32bits", name = "shirt"},
 	{tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants"},
 	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment"},
 	{tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back"},
-	{tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "mount"},
 };
 CustomSkinPage.category_index = 1;
 CustomSkinPage.model_index = 1;
@@ -59,6 +59,9 @@ function CustomSkinPage.ShowPage(OnClose)
 	CustomSkinPage.Current_Item_DS = {};
 	CustomSkinPage.Current_Model_DS = {};
 	CustomSkinPage.Current_Icon_DS = {};
+	for i = 1, #CustomSkinPage.category_ds do
+		CustomSkinPage.Current_Icon_DS[i] = {}; 
+	end
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Movie/CustomSkinPage.html", 
@@ -82,23 +85,24 @@ function CustomSkinPage.ShowPage(OnClose)
 
 	params._page.OnClose = function()
 		if(OnClose) then
-			OnClose();
+			OnClose(currentModelFile, currentSkin);
 		end
 	end;
 
 	keepwork.actors.list(nil, function(err, msg, data)
 		if (err == 200 and data and data.count > 0) then
+			CustomSkinPage.model_index = 1;
 			for i = 1, data.count do
 				local actor = data.rows[i];
-				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin};
+				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name};
 			end
 			if (CustomSkinPage.Current_Model_DS[1].asset ~= currentModelFile) then
 				currentModelFile = CustomSkinPage.Current_Model_DS[1].asset;
 				page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
 			end
 			currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
-		else
-			CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
+		--else
+			--CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
 		end
 		CustomSkinPage.OnChangeCategory(CustomSkinPage.category_index);
 	end);
@@ -108,18 +112,26 @@ function CustomSkinPage.SelectModel(index)
 	if (CustomSkinPage.model_index ~= index) then
 		CustomSkinPage.model_index = index;
 		CustomSkinPage.UpdateModel(CustomSkinPage.Current_Model_DS[index])
+		CustomSkinPage.OnChangeCategory(1);
 	end
 end
 
 function CustomSkinPage.DeleteModel(index)
+	local model = CustomSkinPage.Current_Model_DS[index];
+	keepwork.actors.delete({router_params = {id = model.id}}, function(err, msg, data)
+		if (err == 200) then
+			for i = index, #CustomSkinPage.Current_Model_DS-1 do
+				CustomSkinPage.Current_Model_DS[index] = CustomSkinPage.Current_Model_DS[index + 1];
+			end
+			CustomSkinPage.Current_Model_DS[#CustomSkinPage.Current_Model_DS] = nil;
+			CustomSkinPage.Refresh();
+		end
+	end);
 end
 
 function CustomSkinPage.UpdateModel(model)
-	if (currentModelFile ~= model.asset) then
-		currentModelFile = model.asset;
-		page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
-	end
-	page:CallMethod("MyPlayer", "SetCustomGeosets", model.skin);
+	currentModelFile = model.asset;
+	currentSkin = model.skin;
 end
 
 function CustomSkinPage.Refresh()
@@ -140,8 +152,16 @@ function CustomSkinPage.OnChangeCategory(index)
 end
 
 function CustomSkinPage.UpdateCustomGeosets(index)
-	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
 	local item = CustomSkinPage.Current_Item_DS[index];
+	commonlib.echo(item);
+	commonlib.echo(CustomSkinPage.Current_Icon_DS);
+	--[[
+	if (CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id == item.id) then
+		return;
+	end
+	]]
+
+	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
 	if (item.geoset) then
 		skinTable.geosets[math.floor(item.geoset/100) + 1] = item.geoset % 100;
 	end
@@ -154,20 +174,44 @@ function CustomSkinPage.UpdateCustomGeosets(index)
 		skinTable.attachments[tonumber(id)] = filename;
 	end
 
+	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id = item.id;
+	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].name= item.name;
+	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].icon = item.icon;
 	currentSkin = CustomCharItems:SkinTableToString(skinTable);
-	page:CallMethod("MyPlayer", "SetCustomGeosets", currentSkin);
-end
-
-function CustomSkinPage.CreateNewActor()
-	CustomSkinPage.Current_Model_DS[#CustomSkinPage.Current_Model_DS+1] = {asset = CustomCharItems.defaultModelFile, skin = PlayerAssetFile:GetDefaultCustomGeosets()};
 	CustomSkinPage.Refresh();
 end
 
-function CustomSkinPage.OnClickOK()
+function CustomSkinPage.CreateNewActor()
+	local index = #CustomSkinPage.Current_Model_DS+1;
+	local model = {asset = CustomCharItems.defaultModelFile, skin = PlayerAssetFile:GetDefaultCustomGeosets()};
+	keepwork.actors.add({name = guid.uuid(), equipment = model}, function(err, msg, data)
+		if (err == 200) then
+			model.id = data.id;
+			model.name = data.name;
+			CustomSkinPage.Current_Model_DS[index] = model;
+			CustomSkinPage.Refresh();
+		end
+	end);
+end
+
+function CustomSkinPage.OnClickSave()
 	local model = CustomSkinPage.Current_Model_DS[CustomSkinPage.model_index];
-	model.skin = currentSkin;
+	if (model) then
+		local equipment = {asset = currentModelFile, skin = currentSkin};
+		keepwork.actors.modify({router_params = {id = model.id}, name = model.name, equipment = equipment}, function(err, msg, data)
+			if (err == 200) then
+				model.skin = currentSkin;
+			end
+		end);
+	end
+end
+
+function CustomSkinPage.OnClickOK()
+	page:CloseWindow();
 end
 
 function CustomSkinPage.OnClose()
+	currentModelFile = nil;
+	currentSkin = nil;
 	page:CloseWindow();
 end

@@ -780,4 +780,3 @@ function Macros:MarkMousePress(event)
 	lastMouseDownEvent.mouse_button = event.mouse_button;
 	lastMouseDownEvent.clickTime = commonlib.TimerManager.GetCurrentTime();
 end
-

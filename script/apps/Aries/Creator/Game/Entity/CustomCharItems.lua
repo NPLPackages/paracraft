@@ -80,8 +80,7 @@ function CustomCharItems:Init()
 					local item = {};
 					item.id = node.attr.id;
 					item.gsid = node.attr.gsid;
-					item.icon1 = node.attr.icon1;
-					item.icon2 = node.attr.icon1;
+					item.icon = node.attr.icon;
 					item.name = node.attr.name;
 					groups[#groups+1] = item;
 				end
@@ -122,8 +121,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin)
 		for _, item in ipairs(groups) do
 			local data = self:GetItemById(item.id, modelType);
 			if (data and (checkGeoset == 0 or checkGeoset == data.geoset)) then
-				data.icon1 = item.icon1;
-				data.icon2 = item.icon2;
+				data.icon = item.icon;
 				data.name = item.name;
 				itemList[#itemList+1] = data;
 			end

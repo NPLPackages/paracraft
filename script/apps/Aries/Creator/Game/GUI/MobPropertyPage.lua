@@ -179,8 +179,8 @@ function MobPropertyPage.GetAssetFileDS()
 end
 
 
-function MobPropertyPage.OnChangeAssetFile()
-	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"));
+function MobPropertyPage.OnChangeAssetFile(skin)
+	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"), skin);
 end
 
 function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
@@ -201,11 +201,15 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
 				entity:SetMainAssetPath(assetfile);
 			end
 			
-			-- this ensure that at least one shirt is displayed if it contains geosets.
-			entity:SetCharacterSlot(CharGeosets["shirt"], 1);
-			-- this ensure that at least one default skin is selected
-			if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
-				entity:ToggleNextSkin();
+			if (PlayerAssetFile:HasCustomGeosets(assetfile) and skin) then
+				entity:SetSkin(skin);
+			else
+				-- this ensure that at least one shirt is displayed if it contains geosets.
+				entity:SetCharacterSlot(CharGeosets["shirt"], 1);
+				-- this ensure that at least one default skin is selected
+				if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
+					entity:ToggleNextSkin();
+				end
 			end
 			if(entity:IsServerEntity() and entity:IsRemote()) then
 				if(entity.UpdateAndSendDataWatcher) then
@@ -277,5 +281,15 @@ end
 function MobPropertyPage.OnOpenCustomModel()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
 	local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
-	CustomSkinPage.ShowPage();
+	CustomSkinPage.ShowPage(function(filename, skin)
+		if (filename and skin) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
+			if(filepath) then
+				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
+				MobPropertyPage.OnChangeAssetFile(skin);
+			end
+		end
+	end);
 end

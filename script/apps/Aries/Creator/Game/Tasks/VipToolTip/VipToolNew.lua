@@ -88,11 +88,11 @@ end
 
 function VipToolNew.OnCreate()
     local parent  = page:GetParentUIObject()
-    local qrcode_width = 125
-    local qrcode_height = 125
+    local qrcode_width = 140
+    local qrcode_height = 140
     local block_size = qrcode_width / #VipToolNew.qrcode
 
-    local qrcode = ParaUI.CreateUIObject("container", "qrcode", "_lt", 61, 121, qrcode_width, qrcode_height);
+    local qrcode = ParaUI.CreateUIObject("container", "qrcode", "_lt", 553, 147, qrcode_width, qrcode_height);
     qrcode:SetField("OwnerDraw", true); -- enable owner draw paint event
     qrcode:SetField("SelfPaint", true);
     qrcode:SetScript("ondraw", function(test)

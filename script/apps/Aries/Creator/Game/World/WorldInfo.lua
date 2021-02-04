@@ -36,6 +36,8 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.hasCopyright = self.hasCopyright == "true" or self.hasCopyright == true;
 		self.selectWater = self.selectWater == "true" or self.selectWater == true;
 		self:SetTotalWorldTime(self.totaltime or 0);
+
+		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
 	end
 end
 

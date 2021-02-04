@@ -7,10 +7,8 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show();
 --]]
-local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
-local NoticeTimeId = 2001
 local Notice = NPL.export();
 Notice.isSelectShowToday = true;
 Notice.nSelectIndex = 1;
@@ -20,24 +18,6 @@ Notice.servertime = 0
 Notice.isCanClickNext = true
 Notice.mainData = {}
 Notice.rendData = {}
-
-local exids = {
-    sign1=11001,
-    sign2=11001,
-    sign3=11002,
-    sign4=11002,
-    sign5=11003,
-    sign6=11003,
-    sign7=11004
-}
-Notice.signData ={}
-Notice.signTime = 0;-- 上一次签到时间
-Notice.signNum = 0; --连续签到天数
-
-local minSignTimeDis = 24 * 60 * 60 --间隔一天
-local maxSignTimeDis = 48 * 60 * 60 --间隔两天
-
-Notice.gsid = 40004
 
 function Notice.OnInit()
     page = document:GetPageCtrl();
@@ -88,53 +68,11 @@ function Notice.GetPageData(data)
         end        
     end
     Notice.nDataNum = #Notice.tblNoticeDt
-    local addNum = Notice.GetAddNum(Notice.nDataNum) --数据不足，先补充无用数据
-    for i = 1,addNum do
-        local temp = {}
-        temp.id = 10001 + i;
-        temp.cover = "";
-        temp.url = "";
-        temp.name = "temp"
-        temp.index = Notice.nDataNum + i
-        table.insert(Notice.tblNoticeDt,temp);
-    end
-
-    Notice.nDataNum = #Notice.tblNoticeDt
     for i = Notice.nSelectIndex,Notice.nSelectIndex + 3 do 
         Notice.rendData[i] = Notice.tblNoticeDt[i]
     end
     --commonlib.echo(Notice.tblNoticeDt,true)
     --commonlib.echo(data,true)
-end
-
-function Notice.GetAddNum(num)
-    if num <= 4 then
-        return 4 - num
-    elseif num > 4 and num <= 8 then
-        return 8 - num
-    elseif num > 8 and num <= 12 then
-        return 12 - num
-    else
-        return 16 - num
-    end
-end
-
-function Notice.InitSignConfig()
-    local icons = {"1_138X138_32bits","1_138X138_32bits","2_138X138_32bits","2_138X138_32bits","3_138X138_32bits","4_138X138_32bits","5_194X138_32bits"}
-    local dayicons = {"d1_75X35_32bits","d2_75X35_32bits","d3_75X35_32bits","d4_75X35_32bits","d5_75X35_32bits","d6_75X35_32bits","d7_75X35_32bits"}
-    Notice.signData  = {}
-    for i=1,7 do
-        local temp = {}
-        temp.name = string.format("sign%d",i)
-        temp.index = i
-        temp.icon = string.format("width: 128px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Noticev2/%s.png#0 0 138 138);",icons[i])
-        temp.dayicon = string.format("margin-top: -128px; margin-left: -10px;width: 75px;height: 35px; background: url(Texture/Aries/Creator/keepwork/Noticev2/%s.png#0 0 75 35);",dayicons[i])
-        if i == 7 then
-            temp.icon = string.format("width: 194px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Noticev2/%s.png#0 0 194 138);",icons[i])
-            temp.dayicon = string.format("margin-top: -128px; margin-left: -10px;width: 106px;height: 35px; background: url(Texture/Aries/Creator/keepwork/Noticev2/%s.png#0 0 106 35);",dayicons[i])
-        end
-        Notice.signData[#Notice.signData + 1] = temp
-    end
 end
 
 function Notice.GetTimeStamp(strTime)
@@ -145,94 +83,6 @@ function Notice.GetTimeStamp(strTime)
     return time_stamp;
 end
 
-function Notice.GetServerTime(callback)
-    keepwork.user.server_time({}, function(err, msg, data)
-        if err ~= 200 then
-            print("获取服务器时间失败！")
-            return 
-        end
-        -- print("notice================================",err)
-        -- commonlib.echo(data,true)
-        local server_time = Notice.GetTimeStamp(data.now)
-        local year = os.date("%Y", server_time)	
-        local month = os.date("%m", server_time)
-        local day = os.date("%d", server_time)
-        local day_time_stamp = os.time({year = year, month = month, day = day, hour=0, minute=0, second=0})  
-        Notice.servertime = day_time_stamp  
-        Notice.InitSignConfig()
-        Notice.InitSignData()    
-        if callback then
-            callback()
-        end        
-    end)
-end
-
-function Notice.CheckCanSign(index)
-    local curTime = Notice.servertime
-    local signTime = Notice.signTime
-    if index == Notice.signNum + 1 then
-        local isCanSign = ((curTime - signTime ) >= minSignTimeDis and (curTime - signTime ) < maxSignTimeDis) or  signTime == 0
-        if isCanSign then
-            return true
-        end        
-        return false
-    else
-        return false
-    end  
-end
-
-function Notice.IsHaveSign(index)
-    if index <= Notice.signNum then
-        return true
-    end
-    return false
-end
-
-function Notice.InitSignData()
-    local clientData = KeepWorkItemManager.GetClientData(Notice.gsid) or {}
-    Notice.signTime = clientData.signTime or 0
-    Notice.signNum = clientData.signNum or 0
-    print("初始化数据")
-    commonlib.echo(clientData,true)    
-    local timeDis = Notice.servertime - Notice.signTime
-    local isSignDisc = (timeDis >= maxSignTimeDis and Notice.signNum > 0) --七日签到连续签到断开
-    local isNewState = (timeDis >= minSignTimeDis and timeDis < maxSignTimeDis and Notice.signNum >= 7) --七日签到的新一轮
-    if isSignDisc or isNewState then 
-        Notice.signNum = 0
-        Notice.signTime = 0        
-        clientData.signNum = Notice.signNum
-        clientData.signTime = Notice.signTime
-        print("连续签到断开或者开始下一轮签到")
-        KeepWorkItemManager.SetClientData(Notice.gsid, clientData, function()
-            print("连续签到断开")
-        end); 
-    end    
-    print("sign data is isSignDisc,isNewState,Notice.servertime,Notice.signTime,Notice.signNum,timeDis",isSignDisc,isNewState,Notice.servertime,Notice.signTime,Notice.signNum,timeDis)    
-end
-
-function Notice.ClickSign(id)
-    local index = tonumber(string.sub(id,5,-1))
-    if Notice.CheckCanSign(index) then 
-        local exid = exids[id]
-        --print("duihuan===============",exid)
-        KeepWorkItemManager.DoExtendedCost(exid, function()        
-            Notice.signTime = Notice.servertime
-            Notice.signNum = Notice.signNum + 1
-            local clientData = KeepWorkItemManager.GetClientData(Notice.gsid) or {}
-            clientData.signNum = Notice.signNum
-            clientData.signTime = Notice.signTime
-            KeepWorkItemManager.SetClientData(Notice.gsid, clientData, function()
-                _guihelper.MessageBox("签到成功~")
-                Notice.RefreshPage()
-            end);
-        end,function() 
-            GameLogic.AddBBS(nil, L"签到失败!", 3000, "0 255 0");
-        end);         
-    else
-        print("不可签到")
-    end
-end
-
 function Notice.Show(nType)
     keepwork.notic.announcements({
     },function(info_err, info_msg, info_data)
@@ -240,32 +90,29 @@ function Notice.Show(nType)
             --commonlib.echo(info_data,true)            
             Notice.GetPageData(info_data); 
             if Notice.nDataNum > 0 then
-                Notice.GetServerTime(function()
-                    local viewwidth = 1080
-                    local viewheight = 720
-                    local params = {
-                        url = "script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.html",
-                        name = "Notice.Show", 
-                        isShowTitleBar = false,
-                        DestroyOnClose = true,
-                        style = CommonCtrl.WindowFrame.ContainerStyle,
-                        allowDrag = true,
-                        enable_esc_key = true,
-                        zorder = -1,
-                        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-                        directPosition = true,                
-                        align = "_ct",
-                        x = -viewwidth/2,
-                        y = -viewheight/2,
-                        width = viewwidth,
-                        height = viewheight,
-                    };                
-                    System.App.Commands.Call("File.MCMLWindowFrame", params)            
-                end)                
+                local viewwidth = 1080
+                local viewheight = 660
+                local params = {
+                    url = "script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.html",
+                    name = "Notice.Show", 
+                    isShowTitleBar = false,
+                    DestroyOnClose = true,
+                    style = CommonCtrl.WindowFrame.ContainerStyle,
+                    allowDrag = true,
+                    enable_esc_key = true,
+                    zorder = -1,
+                    app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+                    directPosition = true,                
+                    align = "_ct",
+                    x = -viewwidth/2,
+                    y = -viewheight/2,
+                    width = viewwidth,
+                    height = viewheight,
+                };                
+                System.App.Commands.Call("File.MCMLWindowFrame", params)               
             else
                 if nType == 1 then --点击活动按钮进入的
                     _guihelper.MessageBox("目前暂无公告及活动哦");
-                    -- GameLogic.AddBBS(nil,"目前暂无公告及活动哦",3000,"255,0,0")
                 end
             end            
         else

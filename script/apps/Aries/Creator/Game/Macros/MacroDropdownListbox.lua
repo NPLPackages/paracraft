@@ -88,9 +88,7 @@ end
 function Macros.DropdownSelect(name, value)
 	local ctl = CommonCtrl.GetControl(name)
 	if(ctl and ctl.handleEvent) then
-		local listBoxCont = ctl:GetListBoxContainer()
-		listBoxCont.text = tostring(value);
-		ctl:handleEvent("OnSelectListBox");
+		ctl:handleEvent("OnSelectListBox", value);
 		ctl:SetValue(value);
 	end
 end

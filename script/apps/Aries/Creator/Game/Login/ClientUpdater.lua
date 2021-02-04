@@ -56,6 +56,31 @@ function ClientUpdater:GetUpdateConfigFilename()
 	return ParaWorldLoginDocker.GetAppConfigByName(self.appname)
 end
 
+function ClientUpdater:CopyAssetsToWritablePath()
+	local version = ParaIO.open(ParaIO.GetWritablePath() .. 'apps/haqi/version.txt', "r");
+
+	if (version:IsValid()) then
+		return
+	end
+
+	local fileList = {
+		'version.txt',
+		'assets_manifest.txt',
+		'npl_packages/ParacraftBuildinMod.zip',
+		'main.pkg',
+		'main_mobile_res.pkg',
+		'main150727.pkg',
+	}
+
+	for key, item in ipairs(fileList) do
+		ParaIO.CopyFile(
+			item,
+			ParaIO.GetWritablePath() .. 'apps/haqi/' .. item,
+			true
+		)
+	end
+end
+
 -- public function:
 -- @param callbackFunc: function(bNeedUpdate, latestVersion)
 function ClientUpdater:Check(callbackFunc)
@@ -64,6 +89,10 @@ function ClientUpdater:Check(callbackFunc)
 			callbackFunc(false);
 		end
 		return
+	end
+
+	if System.os.GetPlatform() == 'android' then
+		self:CopyAssetsToWritablePath()
 	end
 
 	self.autoUpdater:check(nil, function(bSucceed)

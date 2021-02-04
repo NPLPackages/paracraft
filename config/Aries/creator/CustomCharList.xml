@@ -6,310 +6,699 @@
 	</category>
 		
 	<category name="eye" text="眼睛">
-		<item id="81001" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_02_blackman.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_02_blackman.png" name="眼睛1"/>
-		<item id="81002" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_ai.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_ai.png" name="眼睛2"/>
-		<item id="81003" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_01_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_01_01.png" name="眼睛3"/>
-		<item id="81004" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_02_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_02_01.png" name="眼睛4"/>
-		<item id="81005" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_A_011.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_A_011.png" name="眼睛5"/>
-		<item id="81006" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_A_14.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_A_14.png" name="眼睛6"/>
-		<item id="81007" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AA.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AA.png" name="眼睛7"/>
-		<item id="81008" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AB.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AB.png" name="眼睛8"/>
-		<item id="81009" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AC.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AC.png" name="眼睛9"/>
-		<item id="81010" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AD.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AD.png" name="眼睛10"/>
-		<item id="81011" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AE.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AE.png" name="眼睛11"/>
-		<item id="81012" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AF.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AF.png" name="眼睛12"/>
-		<item id="81013" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_AG.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_AG.png" name="眼睛13"/>
-		<item id="81014" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_B_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_B_01.png" name="眼睛14"/>
-		<item id="81015" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_C_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_C_01.png" name="眼睛15"/>
-		<item id="81016" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_D_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_D_01.png" name="眼睛16"/>
-		<item id="81017" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_F_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_F_01.png" name="眼睛17"/>
-		<item id="81018" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_fps10_a001.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_fps10_a001.png" name="眼睛18"/>
-		<item id="81019" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_fps10_a002.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_fps10_a002.png" name="眼睛19"/>
-		<item id="81020" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_fps10_a003.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_fps10_a003.png" name="眼睛20"/>
-		<item id="81021" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_G_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_G_01.png" name="眼睛21"/>
-		<item id="81022" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_H_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_H_01.png" name="眼睛22"/>
-		<item id="81023" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_I_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_I_01.png" name="眼睛23"/>
-		<item id="81024" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_J_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_J_01.png" name="眼睛24"/>
-		<item id="81025" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_K_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_K_01.png" name="眼睛25"/>
-		<item id="81026" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_L_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_L_01.png" name="眼睛26"/>
-		<item id="81027" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_M_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_M_01.png" name="眼睛27"/>
-		<item id="81028" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_N_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_N_01.png" name="眼睛28"/>
-		<item id="81029" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_O_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_O_01.png" name="眼睛29"/>
-		<item id="81030" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_P_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_P_01.png" name="眼睛30"/>
-		<item id="81031" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_Q_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_Q_01.png" name="眼睛31"/>
-		<item id="81032" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_R_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_R_01.png" name="眼睛32"/>
-		<item id="81033" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_R_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_R_03.png" name="眼睛33"/>
-		<item id="81034" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_S_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_S_01.png" name="眼睛34"/>
-		<item id="81035" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_boy_T_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_boy_T_01.png" name="眼睛35"/>
-		<item id="81036" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_02_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_02_01.png" name="眼睛36"/>
-		<item id="81037" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_B_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_B_01.png" name="眼睛37"/>
-		<item id="81038" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_B_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_B_02.png" name="眼睛38"/>
-		<item id="81039" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_B_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_B_03.png" name="眼睛39"/>
-		<item id="81040" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_C_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_C_01.png" name="眼睛40"/>
-		<item id="81041" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_C_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_C_02.png" name="眼睛41"/>
-		<item id="81042" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_C_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_C_03.png" name="眼睛42"/>
-		<item id="81043" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_D_0.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_D_0.png" name="眼睛43"/>
-		<item id="81044" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_D_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_D_01.png" name="眼睛44"/>
-		<item id="81045" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_D_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_D_02.png" name="眼睛45"/>
-		<item id="81046" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_D_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_D_03.png" name="眼睛46"/>
-		<item id="81047" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_E_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_E_01.png" name="眼睛47"/>
-		<item id="81048" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_F_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_F_01.png" name="眼睛48"/>
-		<item id="81049" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_fps10_a001.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_fps10_a001.png" name="眼睛49"/>
-		<item id="81050" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_fps10_a002.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_fps10_a002.png" name="眼睛50"/>
-		<item id="81051" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_fps10_a003.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_fps10_a003.png" name="眼睛51"/>
-		<item id="81052" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_G_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_G_01.png" name="眼睛52"/>
-		<item id="81053" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_H_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_H_01.png" name="眼睛53"/>
-		<item id="81054" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_I_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_I_01.png" name="眼睛54"/>
-		<item id="81055" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_J_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_J_01.png" name="眼睛55"/>
-		<item id="81056" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_K_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_K_01.png" name="眼睛56"/>
-		<item id="81057" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_L_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_L_01.png" name="眼睛57"/>
-		<item id="81058" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_girl_M_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_girl_M_01.png" name="眼睛58"/>
-		<item id="81059" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_hong_ai.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_hong_ai.png" name="眼睛59"/>
-		<item id="81060" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_hong_le.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_hong_le.png" name="眼睛60"/>
-		<item id="81061" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_hong_nu.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_hong_nu.png" name="眼睛61"/>
-		<item id="81062" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_hong_xi.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_hong_xi.png" name="眼睛62"/>
-		<item id="81063" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_lan_ai.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_lan_ai.png" name="眼睛63"/>
-		<item id="81064" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_lan_le.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_lan_le.png" name="眼睛64"/>
-		<item id="81065" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_lan_nu.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_lan_nu.png" name="眼睛65"/>
-		<item id="81066" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_lan_xi.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_lan_xi.png" name="眼睛66"/>
-		<item id="81067" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_le.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_le.png" name="眼睛67"/>
-		<item id="81068" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_nu.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_nu.png" name="眼睛68"/>
-		<item id="81069" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_pangjuan.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_pangjuan.png" name="眼睛69"/>
-		<item id="81070" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_sunbin.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_sunbin.png" name="眼睛70"/>
-		<item id="81071" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_sunbin_ai.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_sunbin_ai.png" name="眼睛71"/>
-		<item id="81072" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_sunbin_nu.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_sunbin_nu.png" name="眼睛72"/>
-		<item id="81073" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_sunbin_si.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_sunbin_si.png" name="眼睛73"/>
-		<item id="81074" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_xi.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_xi.png" name="眼睛74"/>
-		<item id="81075" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_zhengc.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_zhengc.png" name="眼睛75"/>
-		<item id="81076" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_zhengc2.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_zhengc2.png" name="眼睛76"/>
-		<item id="81077" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye_zhengc3.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye_zhengc3.png" name="眼睛77"/>
-		<item id="81078" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/eye1.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/eye1.png" name="眼睛78"/>
+		<item id="81001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_02_blackman.png" name="眼睛1"/>
+		<item id="81002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_ai.png" name="眼睛2"/>
+		<item id="81003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_01_01.png" name="眼睛3"/>
+		<item id="81004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_02_01.png" name="眼睛4"/>
+		<item id="81005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_011.png" name="眼睛5"/>
+		<item id="81006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_14.png" name="眼睛6"/>
+		<item id="81007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AA.png" name="眼睛7"/>
+		<item id="81008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AB.png" name="眼睛8"/>
+		<item id="81009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AC.png" name="眼睛9"/>
+		<item id="81010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AD.png" name="眼睛10"/>
+		<item id="81011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AE.png" name="眼睛11"/>
+		<item id="81012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AF.png" name="眼睛12"/>
+		<item id="81013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AG.png" name="眼睛13"/>
+		<item id="81014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_B_01.png" name="眼睛14"/>
+		<item id="81015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_C_01.png" name="眼睛15"/>
+		<item id="81016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_D_01.png" name="眼睛16"/>
+		<item id="81017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_F_01.png" name="眼睛17"/>
+		<item id="81018" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a001.png" name="眼睛18"/>
+		<item id="81019" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a002.png" name="眼睛19"/>
+		<item id="81020" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a003.png" name="眼睛20"/>
+		<item id="81021" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_01.png" name="眼睛21"/>
+		<item id="81022" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_H_01.png" name="眼睛22"/>
+		<item id="81023" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_I_01.png" name="眼睛23"/>
+		<item id="81024" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_J_01.png" name="眼睛24"/>
+		<item id="81025" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_K_01.png" name="眼睛25"/>
+		<item id="81026" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_L_01.png" name="眼睛26"/>
+		<item id="81027" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_M_01.png" name="眼睛27"/>
+		<item id="81028" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_N_01.png" name="眼睛28"/>
+		<item id="81029" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_O_01.png" name="眼睛29"/>
+		<item id="81030" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_P_01.png" name="眼睛30"/>
+		<item id="81031" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_Q_01.png" name="眼睛31"/>
+		<item id="81032" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_01.png" name="眼睛32"/>
+		<item id="81033" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_03.png" name="眼睛33"/>
+		<item id="81034" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_S_01.png" name="眼睛34"/>
+		<item id="81035" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_T_01.png" name="眼睛35"/>
+		<item id="81036" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_02_01.png" name="眼睛36"/>
+		<item id="81037" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_01.png" name="眼睛37"/>
+		<item id="81038" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_02.png" name="眼睛38"/>
+		<item id="81039" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_03.png" name="眼睛39"/>
+		<item id="81040" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_01.png" name="眼睛40"/>
+		<item id="81041" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_02.png" name="眼睛41"/>
+		<item id="81042" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_03.png" name="眼睛42"/>
+		<item id="81043" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_0.png" name="眼睛43"/>
+		<item id="81044" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_01.png" name="眼睛44"/>
+		<item id="81045" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_02.png" name="眼睛45"/>
+		<item id="81046" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_03.png" name="眼睛46"/>
+		<item id="81047" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_E_01.png" name="眼睛47"/>
+		<item id="81048" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_F_01.png" name="眼睛48"/>
+		<item id="81049" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a001.png" name="眼睛49"/>
+		<item id="81050" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a002.png" name="眼睛50"/>
+		<item id="81051" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a003.png" name="眼睛51"/>
+		<item id="81052" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_G_01.png" name="眼睛52"/>
+		<item id="81053" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_H_01.png" name="眼睛53"/>
+		<item id="81054" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_I_01.png" name="眼睛54"/>
+		<item id="81055" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_J_01.png" name="眼睛55"/>
+		<item id="81056" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_K_01.png" name="眼睛56"/>
+		<item id="81057" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_L_01.png" name="眼睛57"/>
+		<item id="81058" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_M_01.png" name="眼睛58"/>
+		<item id="81059" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_ai.png" name="眼睛59"/>
+		<item id="81060" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_le.png" name="眼睛60"/>
+		<item id="81061" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_nu.png" name="眼睛61"/>
+		<item id="81062" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_xi.png" name="眼睛62"/>
+		<item id="81063" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_ai.png" name="眼睛63"/>
+		<item id="81064" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_le.png" name="眼睛64"/>
+		<item id="81065" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_nu.png" name="眼睛65"/>
+		<item id="81066" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_xi.png" name="眼睛66"/>
+		<item id="81067" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_le.png" name="眼睛67"/>
+		<item id="81068" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_nu.png" name="眼睛68"/>
+		<item id="81069" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_pangjuan.png" name="眼睛69"/>
+		<item id="81070" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin.png" name="眼睛70"/>
+		<item id="81071" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_ai.png" name="眼睛71"/>
+		<item id="81072" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_nu.png" name="眼睛72"/>
+		<item id="81073" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_si.png" name="眼睛73"/>
+		<item id="81074" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_xi.png" name="眼睛74"/>
+		<item id="81075" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc.png" name="眼睛75"/>
+		<item id="81076" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc2.png" name="眼睛76"/>
+		<item id="81077" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc3.png" name="眼睛77"/>
+		<item id="81078" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye1.png" name="眼睛78"/>
 	</category>
 	
 	<category name="hair" text="头饰">
-		<item id="82001" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/1_Avatar_boy_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/1_Avatar_boy_hair_01.png" name="头发1"/>
-		<item id="82002" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/2Avatar_girl_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/2Avatar_girl_hair_01.png" name="头发2"/>
-		<item id="82003" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_01.png" name="头发3"/>
-		<item id="82004" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_02.png" name="头发4"/>
-		<item id="82005" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_03.png" name="头发5"/>
-		<item id="82006" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_04.png" name="头发6"/>
-		<item id="82007" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_05.png" name="头发7"/>
-		<item id="82008" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_06.png" name="头发8"/>
-		<item id="82009" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_07.png" name="头发9"/>
-		<item id="82010" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_08.png" name="头发10"/>
-		<item id="82011" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_09.png" name="头发11"/>
-		<item id="82012" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_10.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_10.png" name="头发12"/>
-		<item id="82013" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_11.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_11.png" name="头发13"/>
-		<item id="82014" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_12.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_12.png" name="头发14"/>
-		<item id="82015" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_13.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_13.png" name="头发15"/>
-		<item id="82016" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_14.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_14.png" name="头发16"/>
-		<item id="82017" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_15.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_15.png" name="头发17"/>
-		<item id="82018" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_16.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_16.png" name="头发18"/>
-		<item id="82019" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/3Avatar_boy_hair_17.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/3Avatar_boy_hair_17.png" name="头发19"/>
-		<item id="82020" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_01.png" name="头发20"/>
-		<item id="82021" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_02.png" name="头发21"/>
-		<item id="82022" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_03.png" name="头发22"/>
-		<item id="82023" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_04.png" name="头发23"/>
-		<item id="82024" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_05.png" name="头发24"/>
-		<item id="82025" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_06.png" name="头发25"/>
-		<item id="82026" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_07.png" name="头发26"/>
-		<item id="82027" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_08.png" name="头发27"/>
-		<item id="82028" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_09.png" name="头发28"/>
-		<item id="82029" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_10.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_10.png" name="头发29"/>
-		<item id="82030" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_11.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_11.png" name="头发30"/>
-		<item id="82031" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_12.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_12.png" name="头发31"/>
-		<item id="82032" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_13.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_13.png" name="头发32"/>
-		<item id="82033" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_14.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_14.png" name="头发33"/>
-		<item id="82034" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_15.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_15.png" name="头发34"/>
-		<item id="82035" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_16.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_16.png" name="头发35"/>
-		<item id="82036" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/4Avatar_boy_hair_17.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/4Avatar_boy_hair_17.png" name="头发36"/>
-		<item id="82037" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_01.png" name="头发37"/>
-		<item id="82038" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_02.png" name="头发38"/>
-		<item id="82039" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_03.png" name="头发39"/>
-		<item id="82040" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_04.png" name="头发40"/>
-		<item id="82041" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_05.png" name="头发41"/>
-		<item id="82042" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_06.png" name="头发42"/>
-		<item id="82043" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_07.png" name="头发43"/>
-		<item id="82044" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_08.png" name="头发44"/>
-		<item id="82045" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_09.png" name="头发45"/>
-		<item id="82046" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_10.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_10.png" name="头发46"/>
-		<item id="82047" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_11.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_11.png" name="头发47"/>
-		<item id="82048" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_12.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_12.png" name="头发48"/>
-		<item id="82049" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_13.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_13.png" name="头发49"/>
-		<item id="82050" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_14.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_14.png" name="头发50"/>
-		<item id="82051" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_15.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_15.png" name="头发51"/>
-		<item id="82052" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_16.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_16.png" name="头发52"/>
-		<item id="82053" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/5Avatar_boy_hair_17.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/5Avatar_boy_hair_17.png" name="头发53"/>
-		<item id="82054" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_01.png" name="头发54"/>
-		<item id="82055" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_02.png" name="头发55"/>
-		<item id="82056" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_03.png" name="头发56"/>
-		<item id="82057" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_04.png" name="头发57"/>
-		<item id="82058" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_05.png" name="头发58"/>
-		<item id="82059" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_06.png" name="头发59"/>
-		<item id="82060" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_07.png" name="头发60"/>
-		<item id="82061" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_08.png" name="头发61"/>
-		<item id="82062" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_09.png" name="头发62"/>
-		<item id="82063" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_10.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_10.png" name="头发63"/>
-		<item id="82064" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_11.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_11.png" name="头发64"/>
-		<item id="82065" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_12.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_12.png" name="头发65"/>
-		<item id="82066" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_13.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_13.png" name="头发66"/>
-		<item id="82067" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_14.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_14.png" name="头发67"/>
-		<item id="82068" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_15.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_15.png" name="头发68"/>
-		<item id="82069" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_16.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_16.png" name="头发69"/>
-		<item id="82070" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/6Avatar_boy_hair_17.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/6Avatar_boy_hair_17.png" name="头发70"/>
-		<item id="82071" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa014.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa014.png" name="头发71"/>
-		<item id="82072" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa015.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa015.png" name="头发72"/>
-		<item id="82073" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa016.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa016.png" name="头发73"/>
-		<item id="82074" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa017.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa017.png" name="头发74"/>
-		<item id="82075" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa018.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa018.png" name="头发75"/>
-		<item id="82076" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa019.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa019.png" name="头发76"/>
-		<item id="82077" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa020.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa020.png" name="头发77"/>
-		<item id="82078" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa021.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa021.png" name="头发78"/>
-		<item id="82079" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa022.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa022.png" name="头发79"/>
-		<item id="82080" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa01.png" name="头发80"/>
-		<item id="82081" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa02.png" name="头发81"/>
-		<item id="82082" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa03.png" name="头发82"/>
-		<item id="82083" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa04.png" name="头发83"/>
-		<item id="82084" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa05.png" name="头发84"/>
-		<item id="82085" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa06.png" name="头发85"/>
-		<item id="82086" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa07.png" name="头发86"/>
-		<item id="82087" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa08.png" name="头发87"/>
-		<item id="82088" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa09.png" name="头发88"/>
-		<item id="82089" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa010.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa010.png" name="头发89"/>
-		<item id="82090" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa011.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa011.png" name="头发90"/>
-		<item id="82091" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa012.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa012.png" name="头发91"/>
-		<item id="82092" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/7girl-toufa013.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/7girl-toufa013.png" name="头发92"/>
-		<item id="82093" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa014.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa014.png" name="头发93"/>
-		<item id="82094" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa015.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa015.png" name="头发94"/>
-		<item id="82095" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa016.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa016.png" name="头发95"/>
-		<item id="82096" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa017.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa017.png" name="头发96"/>
-		<item id="82097" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa018.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa018.png" name="头发97"/>
-		<item id="82098" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa019.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa019.png" name="头发98"/>
-		<item id="82099" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa020.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa020.png" name="头发99"/>
-		<item id="82100" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa021.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa021.png" name="头发100"/>
-		<item id="82101" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa022.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa022.png" name="头发101"/>
-		<item id="82102" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa01.png" name="头发102"/>
-		<item id="82103" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa02.png" name="头发103"/>
-		<item id="82104" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa03.png" name="头发104"/>
-		<item id="82105" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa04.png" name="头发105"/>
-		<item id="82106" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa05.png" name="头发106"/>
-		<item id="82107" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa06.png" name="头发107"/>
-		<item id="82108" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa07.png" name="头发108"/>
-		<item id="82109" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa08.png" name="头发109"/>
-		<item id="82110" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa09.png" name="头发110"/>
-		<item id="82111" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa010.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa010.png" name="头发111"/>
-		<item id="82112" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa011.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa011.png" name="头发112"/>
-		<item id="82113" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa012.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa012.png" name="头发113"/>
-		<item id="82114" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/8girl-toufa013.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/8girl-toufa013.png" name="头发114"/>
-		<item id="82115" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa014.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa014.png" name="头发115"/>
-		<item id="82116" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa015.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa015.png" name="头发116"/>
-		<item id="82117" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa016.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa016.png" name="头发117"/>
-		<item id="82118" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa017.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa017.png" name="头发118"/>
-		<item id="82119" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa018.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa018.png" name="头发119"/>
-		<item id="82120" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa019.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa019.png" name="头发120"/>
-		<item id="82121" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa020.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa020.png" name="头发121"/>
-		<item id="82122" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa021.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa021.png" name="头发122"/>
-		<item id="82123" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa022.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa022.png" name="头发123"/>
-		<item id="82124" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa01.png" name="头发124"/>
-		<item id="82125" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa02.png" name="头发125"/>
-		<item id="82126" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa03.png" name="头发126"/>
-		<item id="82127" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa04.png" name="头发127"/>
-		<item id="82128" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa05.png" name="头发128"/>
-		<item id="82129" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa06.png" name="头发129"/>
-		<item id="82130" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa07.png" name="头发130"/>
-		<item id="82131" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa08.png" name="头发131"/>
-		<item id="82132" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa09.png" name="头发132"/>
-		<item id="82133" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa010.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa010.png" name="头发133"/>
-		<item id="82134" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa011.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa011.png" name="头发134"/>
-		<item id="82135" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa012.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa012.png" name="头发135"/>
-		<item id="82136" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/9girl-toufa013.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/9girl-toufa013.png" name="头发136"/>
-		<item id="82137" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa014.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa014.png" name="头发137"/>
-		<item id="82138" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa015.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa015.png" name="头发138"/>
-		<item id="82139" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa016.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa016.png" name="头发139"/>
-		<item id="82140" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa017.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa017.png" name="头发140"/>
-		<item id="82141" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa018.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa018.png" name="头发141"/>
-		<item id="82142" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa019.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa019.png" name="头发142"/>
-		<item id="82143" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa020.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa020.png" name="头发143"/>
-		<item id="82144" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa021.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa021.png" name="头发144"/>
-		<item id="82145" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa022.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa022.png" name="头发145"/>
-		<item id="82146" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa01.png" name="头发146"/>
-		<item id="82147" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa02.png" name="头发147"/>
-		<item id="82148" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa03.png" name="头发148"/>
-		<item id="82149" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa04.png" name="头发149"/>
-		<item id="82150" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa05.png" name="头发150"/>
-		<item id="82151" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa06.png" name="头发151"/>
-		<item id="82152" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa07.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa07.png" name="头发152"/>
-		<item id="82153" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa08.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa08.png" name="头发153"/>
-		<item id="82154" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa09.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa09.png" name="头发154"/>
-		<item id="82155" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa010.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa010.png" name="头发155"/>
-		<item id="82156" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa011.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa011.png" name="头发156"/>
-		<item id="82157" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa012.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa012.png" name="头发157"/>
-		<item id="82158" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/10girl-toufa013.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/10girl-toufa013.png" name="头发158"/>
+		<item id="83001" icon="Texture/Aries/Item/2145_Elf_BlackHead_Girl01.png" name="帽子1"/>
+		<item id="83002" icon="Texture/Aries/Item/1231_FireHat1.png" name="帽子2"/>
+		<item id="83003" icon="Texture/Aries/Item/1232_IceHat1.png" name="帽子3"/>
+		<item id="83004" icon="Texture/Aries/Item/1233_StormHat1.png" name="帽子4"/>
+		<item id="83005" icon="Texture/Aries/Item/1234_DeathHat1.png" name="帽子5"/>
+		<item id="83006" icon="Texture/Aries/Item/1235_LifeHat1.png" name="帽子6"/>
+		<item id="83007" icon="Texture/Aries/Item/1236_CommonHat1.png" name="帽子7"/>
+		<item id="83008" icon="Texture/Aries/Item/1237_CommonHat2.png" name="帽子8"/>
+		<item id="83009" icon="Texture/Aries/Item/1238_CommonHat3.png" name="帽子9"/>
+		<item id="83010" icon="Texture/Aries/Item/1239_CommonHat4.png" name="帽子10"/>
+		<item id="83011" icon="Texture/Aries/Item/1240_CommonHat5.png" name="帽子11"/>
+		<item id="83012" icon="Texture/Aries/Item/1278_RedCutyHat.png" name="帽子12"/>
+		<item id="83013" icon="Texture/Aries/Item/1281_MagicGentleHat.png" name="帽子13"/>
+		<item id="83014" icon="Texture/Aries/Item/1284_GloryWarriorHat.png" name="帽子14"/>
+		<item id="83015" icon="Texture/Aries/Item/1287_MagicProtectionHat.png" name="帽子15"/>
+		<item id="83016" icon="Texture/Aries/Item/1301_FireHat2.png" name="帽子16"/>
+		<item id="83017" icon="Texture/Aries/Item/1302_IceHat2.png" name="帽子17"/>
+		<item id="83018" icon="Texture/Aries/Item/1303_StormHat2.png" name="帽子18"/>
+		<item id="83019" icon="Texture/Aries/Item/1304_DeathHat2.png" name="帽子19"/>
+		<item id="83020" icon="Texture/Aries/Item/1305_LifeHat2.png" name="帽子20"/>
+		<item id="83021" icon="Texture/Aries/Item/1334_FireHat4.png" name="帽子21"/>
+		<item id="83022" icon="Texture/Aries/Item/1335_IceHat4.png" name="帽子22"/>
+		<item id="83023" icon="Texture/Aries/Item/1336_StormHat4.png" name="帽子23"/>
+		<item id="83024" icon="Texture/Aries/Item/1337_DeathHat4.png" name="帽子24"/>
+		<item id="83025" icon="Texture/Aries/Item/1338_LifeHat4.png" name="帽子25"/>
+		<item id="83026" icon="Texture/Aries/Item/1339_FireHat5.png" name="帽子26"/>
+		<item id="83027" icon="Texture/Aries/Item/1340_IceHat5.png" name="帽子27"/>
+		<item id="83028" icon="Texture/Aries/Item/1341_StormHat5.png" name="帽子28"/>
+		<item id="83029" icon="Texture/Aries/Item/1342_DeathHat5.png" name="帽子29"/>
+		<item id="83030" icon="Texture/Aries/Item/1343_LifeHat5.png" name="帽子30"/>
+		<item id="83031" icon="Texture/Aries/Item/1344_CommonHat7.png" name="帽子31"/>
+		<item id="83032" icon="Texture/Aries/Item/1345_CommonHat8.png" name="帽子32"/>
+		<item id="83033" icon="Texture/Aries/Item/1450_ShopCommonHat01.png" name="帽子33"/>
+		<item id="83034" icon="Texture/Aries/Item/1451_ShopCommonHat02.png" name="帽子34"/>
+		<item id="83035" icon="Texture/Aries/Item/1452_ShopCommonHat03.png" name="帽子35"/>
+		<item id="83036" icon="Texture/Aries/Item/1470_NewbieHat.png" name="帽子36"/>
+		<item id="83037" icon="Texture/Aries/Item/1473_ClownHat.png" name="帽子37"/>
+		<item id="83038" icon="Texture/Aries/Item/1476_PricessClownHat.png" name="帽子38"/>
+		<item id="83039" icon="Texture/Aries/Item/1483_ForeignLandsHat.png" name="帽子39"/>
+		<item id="83040" icon="Texture/Aries/Item/1522_EgyptFireHat1.png" name="帽子40"/>
+		<item id="83041" icon="Texture/Aries/Item/1523_EgyptIceHat1.png" name="帽子41"/>
+		<item id="83042" icon="Texture/Aries/Item/1524_EgyptStormHat1.png" name="帽子42"/>
+		<item id="83043" icon="Texture/Aries/Item/1525_EgyptDeathHat1.png" name="帽子43"/>
+		<item id="83044" icon="Texture/Aries/Item/1526_EgyptLifeHat1.png" name="帽子44"/>
+		<item id="83045" icon="Texture/Aries/Item/1612_ShopFireHatLv22.png" name="帽子45"/>
+		<item id="83046" icon="Texture/Aries/Item/1613_ShopIceHatLv22.png" name="帽子46"/>
+		<item id="83047" icon="Texture/Aries/Item/1614_ShopStormHatLv22.png" name="帽子47"/>
+		<item id="83048" icon="Texture/Aries/Item/1615_ShopDeathHatLv22.png" name="帽子48"/>
+		<item id="83049" icon="Texture/Aries/Item/1616_ShopLifeHatLv22.png" name="帽子49"/>
+		<item id="83050" icon="Texture/Aries/Item/1617_ShopNewYearsGalHat.png" name="帽子50"/>
+		<item id="83051" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" name="帽子51"/>
+		<item id="83052" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" name="帽子52"/>
+		<item id="83053" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" name="帽子53"/>
+		<item id="83054" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" name="帽子54"/>
+		<item id="83055" icon="Texture/Aries/Item/1720_Shop201161HatGirl.png" name="帽子55"/>
+		<item id="83056" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" name="帽子56"/>
+		<item id="83057" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" name="帽子57"/>
+		<item id="83058" icon="Texture/Aries/Item/1822_IceHatS2.png" name="帽子58"/>
+		<item id="83059" icon="Texture/Aries/Item/1833_FireHatS2.png" name="帽子59"/>
+		<item id="83060" icon="Texture/Aries/Item/1840_StormHatS2.png" name="帽子60"/>
+		<item id="83061" icon="Texture/Aries/Item/1848_Lifehats2.png" name="帽子61"/>
+		<item id="83062" icon="Texture/Aries/Item/1856_DeathHatS2.png" name="帽子62"/>
+		<item id="83063" icon="Texture/Aries/Item/2009_Colorful_TheKingsHat.png" name="帽子63"/>
+		<item id="83064" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="帽子64"/>
+		<item id="83065" icon="Texture/Aries/Item/2075_FireHatS3.png" name="帽子65"/>
+		<item id="83066" icon="Texture/Aries/Item/2082_IceHatS3.png" name="帽子66"/>
+		<item id="83067" icon="Texture/Aries/Item/2089_StormHatS3.png" name="帽子67"/>
+		<item id="83068" icon="Texture/Aries/Item/2096_LifeHatS3.png" name="帽子68"/>
+		<item id="83069" icon="Texture/Aries/Item/2103_DeathHatS3.png" name="帽子69"/>
+		<item id="83070" icon="Texture/Aries/Item/2112_HalloweenPumpkinHead.png" name="帽子70"/>
+		<item id="83071" icon="Texture/Aries/Item/2115_ChristmasHatRed.png" name="帽子71"/>
+		<item id="83072" icon="Texture/Aries/Item/2116_ChristmasHatGreen.png" name="帽子72"/>
+		<item id="83073" icon="Texture/Aries/Item/2135_Elf_BrownHead_Girl01.png" name="帽子73"/>
+		<item id="83074" icon="Texture/Aries/Item/2140_Elf_BrownHead_Boy01.png" name="帽子74"/>
+		<item id="83075" icon="Texture/Aries/Item/2150_Elf_BlackHead_Boy01.png" name="帽子75"/>
+		<item id="83076" icon="Texture/Aries/Item/2155_Elf_WhiteHead_Girl01.png" name="帽子76"/>
+		<item id="83077" icon="Texture/Aries/Item/2160_Elf_WhiteHead_Boy01.png" name="帽子77"/>
+		<item id="83078" icon="Texture/Aries/Item/2165_Ragnarok_GrayHead_Boy01.png" name="帽子78"/>
+		<item id="83079" icon="Texture/Aries/Item/2166_Ragnarok_RedHead_Boy02.png" name="帽子79"/>
+		<item id="83080" icon="Texture/Aries/Item/2167_Ragnarok_GreenHead_Boy03.png" name="帽子80"/>
+		<item id="83081" icon="Texture/Aries/Item/2168_Ragnarok_GrayHead_Girl01.png" name="帽子81"/>
+		<item id="83082" icon="Texture/Aries/Item/2169_Ragnarok_RedHead_Girl02.png" name="帽子82"/>
+		<item id="83083" icon="Texture/Aries/Item/2170_Ragnarok_GreenHead_Girl03.png" name="帽子83"/>
+		<item id="83084" icon="Texture/Aries/Item/2171_Spinage_BrownHead_Boy01.png" name="帽子84"/>
+		<item id="83085" icon="Texture/Aries/Item/2172_Spinage_RedHead_Boy02.png" name="帽子85"/>
+		<item id="83086" icon="Texture/Aries/Item/2173_Spinage_BlackHead_Boy03.png" name="帽子86"/>
+		<item id="83087" icon="Texture/Aries/Item/2174_Spinage_BrownHead_Girl01.png" name="帽子87"/>
+		<item id="83088" icon="Texture/Aries/Item/2175_Spinage_RedHead_Girl02.png" name="帽子88"/>
+		<item id="83089" icon="Texture/Aries/Item/2176_Spinage_BlackHead_Girl03.png" name="帽子89"/>
+		<item id="83090" icon="Texture/Aries/Item/2177_Errantry_GrayHead_Boy01.png" name="帽子90"/>
+		<item id="83091" icon="Texture/Aries/Item/2178_Errantry_GreenHead_Boy02.png" name="帽子91"/>
+		<item id="83092" icon="Texture/Aries/Item/2179_Errantry_RedHead_Boy03.png" name="帽子92"/>
+		<item id="83093" icon="Texture/Aries/Item/2180_Errantry_GrayHead_Girl01.png" name="帽子93"/>
+		<item id="83094" icon="Texture/Aries/Item/2181_Errantry_GreenHead_Girl02.png" name="帽子94"/>
+		<item id="83095" icon="Texture/Aries/Item/2182_Errantry_GrayHead_Girl03.png" name="帽子95"/>
+		<item id="83096" icon="Texture/Aries/Item/2182_Errantry_RedHead_Girl03.png" name="帽子96"/>
+		<item id="83097" icon="Texture/Aries/Item/2183_HeroCrown_Fire.png" name="帽子97"/>
+		<item id="83098" icon="Texture/Aries/Item/2184_HeroCrown_Ice.png" name="帽子98"/>
+		<item id="83099" icon="Texture/Aries/Item/2185_HeroCrown_Storm.png" name="帽子99"/>
+		<item id="83100" icon="Texture/Aries/Item/2186_HeroCrown_Life.png" name="帽子100"/>
+		<item id="83101" icon="Texture/Aries/Item/2187_HeroCrown_Death.png" name="帽子101"/>
+		<item id="83102" icon="Texture/Aries/Item/2188_MainCrown_Fire.png" name="帽子102"/>
+		<item id="83103" icon="Texture/Aries/Item/2189_MainCrown_Ice.png" name="帽子103"/>
+		<item id="83104" icon="Texture/Aries/Item/2190_MainCrown_Storm.png" name="帽子104"/>
+		<item id="83105" icon="Texture/Aries/Item/2191_MainCrown_Life.png" name="帽子105"/>
+		<item id="83106" icon="Texture/Aries/Item/2192_MainCrown_Death.png" name="帽子106"/>
+		<item id="83107" icon="Texture/Aries/Item/2234_FireHatS4_Boy.png" name="帽子107"/>
+		<item id="83108" icon="Texture/Aries/Item/2241_IceHatS4_Boy.png" name="帽子108"/>
+		<item id="83109" icon="Texture/Aries/Item/2248_StormHatS4_Boy.png" name="帽子109"/>
+		<item id="83110" icon="Texture/Aries/Item/2255_LifeHatS4_Boy.png" name="帽子110"/>
+		<item id="83111" icon="Texture/Aries/Item/2262_DeathHatS4_Boy.png" name="帽子111"/>
+		<item id="83112" icon="Texture/Aries/Item/2269_FireHatS4_Girl.png" name="帽子112"/>
+		<item id="83113" icon="Texture/Aries/Item/2270_Spinage_PinkHead_Boy04.png" name="帽子113"/>
+		<item id="83114" icon="Texture/Aries/Item/2271_Spinage_GreenHead_Girl06.png" name="帽子114"/>
+		<item id="83115" icon="Texture/Aries/Item/2272_Spinage_yellowHead_Boy05.png" name="帽子115"/>
+		<item id="83116" icon="Texture/Aries/Item/2273_Spinage_GreenHead_Boy06.png" name="帽子116"/>
+		<item id="83117" icon="Texture/Aries/Item/2274_Spinage_PinkHead_Girl04.png" name="帽子117"/>
+		<item id="83118" icon="Texture/Aries/Item/2275_Spinage_YellowHead_Girl05.png" name="帽子118"/>
+		<item id="83119" icon="Texture/Aries/Item/2276_IceHatS4_Girl.png" name="帽子119"/>
+		<item id="83120" icon="Texture/Aries/Item/2283_StormHatS4_Girl.png" name="帽子120"/>
+		<item id="83121" icon="Texture/Aries/Item/2290_LifeHatS4_Girl.png" name="帽子121"/>
+		<item id="83122" icon="Texture/Aries/Item/2297_DeathHatS4_Girl.png" name="帽子122"/>
+		<item id="83123" icon="Texture/Aries/Item/2324_Demon_Prince.png" name="帽子123"/>
+		<item id="83124" icon="Texture/Aries/Item/2325_Demon_Princess.png" name="帽子124"/>
+		<item id="83125" icon="Texture/Aries/Item/2327_Demon_Prince_Special.png" name="帽子125"/>
+		<item id="83126" icon="Texture/Aries/Item/2328_Demon_Princess_Special.png" name="帽子126"/>
+		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="帽子127"/>
+		<item id="83128" icon="Texture/Aries/Item/2332_ChristmasTire_Princess.png" name="帽子128"/>
+		<item id="83129" icon="Texture/Aries/Item/2337_SendTheElves_Prince.png" name="帽子129"/>
+		<item id="83130" icon="Texture/Aries/Item/2338_SendTheElves_Princess.png" name="帽子130"/>
+		<item id="83131" icon="Texture/Aries/Item/2388_TheSpringFestival_Boy.png" name="帽子131"/>
+		<item id="83132" icon="Texture/Aries/Item/2389_TheSpringFestival_Girl.png" name="帽子132"/>
+		<item id="83133" icon="Texture/Aries/Item/2399_Panda_Boy.png" name="帽子133"/>
+		<item id="83134" icon="Texture/Aries/Item/2400_Panda_Girl.png" name="帽子134"/>
+		<item id="83135" icon="Texture/Aries/Item/2404_TheSpringHat_Boy.png" name="帽子135"/>
+		<item id="83136" icon="Texture/Aries/Item/2405_TheSpringHat_Girl.png" name="帽子136"/>
+		<item id="83137" icon="Texture/Aries/Item/2408_TheRedMushroom_Boy.png" name="帽子137"/>
+		<item id="83138" icon="Texture/Aries/Item/2409_TheRedMushroom_Girl.png" name="帽子138"/>
+		<item id="83139" icon="Texture/Aries/Item/2410_AncientRoyalCrown.png" name="帽子139"/>
+		<item id="83140" icon="Texture/Aries/Item/2411_AncientRoyalCrown_Relive.png" name="帽子140"/>
+		<item id="83141" icon="Texture/Aries/Item/2416_KnightCaptainHelmet_Boy.png" name="帽子141"/>
+		<item id="83142" icon="Texture/Aries/Item/2417_KnightCaptainHelmet_Girl.png" name="帽子142"/>
+		<item id="83143" icon="Texture/Aries/Item/2434_TheSpringFestival_Boy.png" name="帽子143"/>
+		<item id="83144" icon="Texture/Aries/Item/2435_ShopSpringHatGirl.png" name="帽子144"/>
+		<item id="83145" icon="Texture/Aries/Item/1011_Hat_PoliceUniformHat_U.png" name="帽子145"/>
+		<item id="82001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_01.png" name="头发1"/>
+		<item id="82002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2Avatar_girl_hair_01.png" name="头发2"/>
+		<item id="82003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_01.png" name="头发3"/>
+		<item id="82004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_02.png" name="头发4"/>
+		<item id="82005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_03.png" name="头发5"/>
+		<item id="82006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_04.png" name="头发6"/>
+		<item id="82007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_05.png" name="头发7"/>
+		<item id="82008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_06.png" name="头发8"/>
+		<item id="82009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_07.png" name="头发9"/>
+		<item id="82010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_08.png" name="头发10"/>
+		<item id="82011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_09.png" name="头发11"/>
+		<item id="82012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_10.png" name="头发12"/>
+		<item id="82013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_11.png" name="头发13"/>
+		<item id="82014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_12.png" name="头发14"/>
+		<item id="82015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_13.png" name="头发15"/>
+		<item id="82016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_14.png" name="头发16"/>
+		<item id="82017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_15.png" name="头发17"/>
+		<item id="82018" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_16.png" name="头发18"/>
+		<item id="82019" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3Avatar_boy_hair_17.png" name="头发19"/>
+		<item id="82020" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_01.png" name="头发20"/>
+		<item id="82021" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_02.png" name="头发21"/>
+		<item id="82022" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_03.png" name="头发22"/>
+		<item id="82023" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_04.png" name="头发23"/>
+		<item id="82024" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_05.png" name="头发24"/>
+		<item id="82025" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_06.png" name="头发25"/>
+		<item id="82026" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_07.png" name="头发26"/>
+		<item id="82027" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_08.png" name="头发27"/>
+		<item id="82028" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_09.png" name="头发28"/>
+		<item id="82029" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_10.png" name="头发29"/>
+		<item id="82030" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_11.png" name="头发30"/>
+		<item id="82031" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_12.png" name="头发31"/>
+		<item id="82032" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_13.png" name="头发32"/>
+		<item id="82033" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_14.png" name="头发33"/>
+		<item id="82034" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_15.png" name="头发34"/>
+		<item id="82035" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_16.png" name="头发35"/>
+		<item id="82036" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4Avatar_boy_hair_17.png" name="头发36"/>
+		<item id="82037" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_01.png" name="头发37"/>
+		<item id="82038" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_02.png" name="头发38"/>
+		<item id="82039" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_03.png" name="头发39"/>
+		<item id="82040" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_04.png" name="头发40"/>
+		<item id="82041" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_05.png" name="头发41"/>
+		<item id="82042" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_06.png" name="头发42"/>
+		<item id="82043" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_07.png" name="头发43"/>
+		<item id="82044" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_08.png" name="头发44"/>
+		<item id="82045" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_09.png" name="头发45"/>
+		<item id="82046" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_10.png" name="头发46"/>
+		<item id="82047" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_11.png" name="头发47"/>
+		<item id="82048" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_12.png" name="头发48"/>
+		<item id="82049" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_13.png" name="头发49"/>
+		<item id="82050" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_14.png" name="头发50"/>
+		<item id="82051" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_15.png" name="头发51"/>
+		<item id="82052" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_16.png" name="头发52"/>
+		<item id="82053" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5Avatar_boy_hair_17.png" name="头发53"/>
+		<item id="82054" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_01.png" name="头发54"/>
+		<item id="82055" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_02.png" name="头发55"/>
+		<item id="82056" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_03.png" name="头发56"/>
+		<item id="82057" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_04.png" name="头发57"/>
+		<item id="82058" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_05.png" name="头发58"/>
+		<item id="82059" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_06.png" name="头发59"/>
+		<item id="82060" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_07.png" name="头发60"/>
+		<item id="82061" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_08.png" name="头发61"/>
+		<item id="82062" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_09.png" name="头发62"/>
+		<item id="82063" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_10.png" name="头发63"/>
+		<item id="82064" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_11.png" name="头发64"/>
+		<item id="82065" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_12.png" name="头发65"/>
+		<item id="82066" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_13.png" name="头发66"/>
+		<item id="82067" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_14.png" name="头发67"/>
+		<item id="82068" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_15.png" name="头发68"/>
+		<item id="82069" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_16.png" name="头发69"/>
+		<item id="82070" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6Avatar_boy_hair_17.png" name="头发70"/>
+		<item id="82071" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa014.png" name="头发71"/>
+		<item id="82072" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa015.png" name="头发72"/>
+		<item id="82073" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa016.png" name="头发73"/>
+		<item id="82074" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa017.png" name="头发74"/>
+		<item id="82075" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa018.png" name="头发75"/>
+		<item id="82076" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa019.png" name="头发76"/>
+		<item id="82077" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa020.png" name="头发77"/>
+		<item id="82078" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa021.png" name="头发78"/>
+		<item id="82079" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa022.png" name="头发79"/>
+		<item id="82080" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa01.png" name="头发80"/>
+		<item id="82081" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa02.png" name="头发81"/>
+		<item id="82082" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa03.png" name="头发82"/>
+		<item id="82083" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa04.png" name="头发83"/>
+		<item id="82084" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa05.png" name="头发84"/>
+		<item id="82085" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa06.png" name="头发85"/>
+		<item id="82086" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa07.png" name="头发86"/>
+		<item id="82087" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa08.png" name="头发87"/>
+		<item id="82088" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa09.png" name="头发88"/>
+		<item id="82089" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa010.png" name="头发89"/>
+		<item id="82090" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa011.png" name="头发90"/>
+		<item id="82091" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa012.png" name="头发91"/>
+		<item id="82092" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7girl-toufa013.png" name="头发92"/>
+		<item id="82093" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa014.png" name="头发93"/>
+		<item id="82094" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa015.png" name="头发94"/>
+		<item id="82095" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa016.png" name="头发95"/>
+		<item id="82096" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa017.png" name="头发96"/>
+		<item id="82097" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa018.png" name="头发97"/>
+		<item id="82098" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa019.png" name="头发98"/>
+		<item id="82099" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa020.png" name="头发99"/>
+		<item id="82100" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa021.png" name="头发100"/>
+		<item id="82101" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa022.png" name="头发101"/>
+		<item id="82102" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa01.png" name="头发102"/>
+		<item id="82103" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa02.png" name="头发103"/>
+		<item id="82104" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa03.png" name="头发104"/>
+		<item id="82105" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa04.png" name="头发105"/>
+		<item id="82106" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa05.png" name="头发106"/>
+		<item id="82107" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa06.png" name="头发107"/>
+		<item id="82108" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa07.png" name="头发108"/>
+		<item id="82109" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa08.png" name="头发109"/>
+		<item id="82110" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa09.png" name="头发110"/>
+		<item id="82111" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa010.png" name="头发111"/>
+		<item id="82112" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa011.png" name="头发112"/>
+		<item id="82113" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa012.png" name="头发113"/>
+		<item id="82114" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8girl-toufa013.png" name="头发114"/>
+		<item id="82115" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa014.png" name="头发115"/>
+		<item id="82116" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa015.png" name="头发116"/>
+		<item id="82117" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa016.png" name="头发117"/>
+		<item id="82118" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa017.png" name="头发118"/>
+		<item id="82119" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa018.png" name="头发119"/>
+		<item id="82120" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa019.png" name="头发120"/>
+		<item id="82121" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa020.png" name="头发121"/>
+		<item id="82122" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa021.png" name="头发122"/>
+		<item id="82123" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa022.png" name="头发123"/>
+		<item id="82124" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa01.png" name="头发124"/>
+		<item id="82125" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa02.png" name="头发125"/>
+		<item id="82126" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa03.png" name="头发126"/>
+		<item id="82127" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa04.png" name="头发127"/>
+		<item id="82128" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa05.png" name="头发128"/>
+		<item id="82129" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa06.png" name="头发129"/>
+		<item id="82130" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa07.png" name="头发130"/>
+		<item id="82131" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa08.png" name="头发131"/>
+		<item id="82132" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa09.png" name="头发132"/>
+		<item id="82133" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa010.png" name="头发133"/>
+		<item id="82134" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa011.png" name="头发134"/>
+		<item id="82135" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa012.png" name="头发135"/>
+		<item id="82136" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9girl-toufa013.png" name="头发136"/>
+		<item id="82137" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa014.png" name="头发137"/>
+		<item id="82138" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa015.png" name="头发138"/>
+		<item id="82139" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa016.png" name="头发139"/>
+		<item id="82140" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa017.png" name="头发140"/>
+		<item id="82141" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa018.png" name="头发141"/>
+		<item id="82142" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa019.png" name="头发142"/>
+		<item id="82143" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa020.png" name="头发143"/>
+		<item id="82144" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa021.png" name="头发144"/>
+		<item id="82145" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa022.png" name="头发145"/>
+		<item id="82146" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa01.png" name="头发146"/>
+		<item id="82147" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa02.png" name="头发147"/>
+		<item id="82148" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa03.png" name="头发148"/>
+		<item id="82149" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa04.png" name="头发149"/>
+		<item id="82150" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa05.png" name="头发150"/>
+		<item id="82151" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa06.png" name="头发151"/>
+		<item id="82152" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa07.png" name="头发152"/>
+		<item id="82153" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa08.png" name="头发153"/>
+		<item id="82154" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa09.png" name="头发154"/>
+		<item id="82155" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa010.png" name="头发155"/>
+		<item id="82156" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa011.png" name="头发156"/>
+		<item id="82157" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa012.png" name="头发157"/>
+		<item id="82158" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10girl-toufa013.png" name="头发158"/>
 
 	</category>
-	
+
+	<!--暂时废止，内容与头饰放在一起
 	<category name="hat" text="帽子">
 		<item id="83001"/>
 	</category>
+	-->
 
 	<category name="shirt" text="衣服">
-		<item id="84001"/>
-		<item id="84002"/>
-		<item id="84003"/>
-		<item id="84004"/>
-		<item id="84005"/>
-		<item id="84006"/>
-		<item id="84007"/>
+	<item id="84001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_body_11.png" name="衣服1"/>
+	<item id="84002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_body_656.png" name="衣服2"/>
+	<item id="84003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_body_xiaofu.png" name="衣服3"/>
+	<item id="84004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_girl_B_body_06.png" name="衣服4"/>
+	<item id="84005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_girl_body_01.png" name="衣服5"/>
+	<item id="84006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_girl_body_xiaofu.png" name="衣服6"/>
+	<item id="84007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/caomei_boy_body.png" name="衣服7"/>
+	<item id="84008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/girl_body.png" name="衣服8"/>
+	<item id="84009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/jingcha_body.png" name="衣服9"/>
+	<item id="84010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shangren_body.png" name="衣服10"/>
+	<item id="84011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shizhuang_body.png" name="衣服11"/>
+	<item id="84012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/xizhuang.png" name="衣服12"/>
+	<item id="84013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/xunlian_body.png" name="衣服13"/>
+	<item id="84014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_body_.png" name="衣服14"/>
+	<item id="84015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_body_01.png" name="衣服15"/>
 	</category>
 
 	<category name="pants" text="裤子">
-		<item id="85001"/>
-		<item id="85002"/>
-		<item id="85003"/>
-		<item id="85004"/>
+	<item id="85001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_leg_.png" name="裤子1"/>
+	<item id="85002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_leg_01.png" name="裤子2"/>
+	<item id="85003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_leg_03.png" name="裤子3"/>
+	<item id="85004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_leg_11.png" name="裤子4"/>
+	<item id="85005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_boy_leg_xiaofu.png" name="裤子5"/>
+	<item id="85006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_girl_leg_03.png" name="裤子6"/>
+	<item id="85007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Avatar_girl_leg_xiaofu.png" name="裤子7"/>
+	<item id="85008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/caome_boy_leg.png" name="裤子8"/>
+	<item id="85009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/jingcha_leg.png" name="裤子9"/>
+	<item id="85010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shangren_boy_leg.png" name="裤子10"/>
+	<item id="85011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shangren_girl_leg.png" name="裤子11"/>
+	<item id="85012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/xizhuangku.png" name="裤子12"/>
+	<item id="85013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/xunlian_leg.png" name="裤子13"/>
 	</category>
 	
 	<category name="back" text="背部">
-		<item id="86001"/>
+	<item id="86001" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" name="背部1"/>
+	<item id="86002" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" name="背部2"/>
+	<item id="86003" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="背部3"/>
+	<item id="86004" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="背部4"/>
+	<item id="86005" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="背部5"/>
+	<item id="86006" icon="Texture/Aries/Item/1482_ShiningBack.png" name="背部6"/>
+	<item id="86007" icon="Texture/Aries/Item/1106_CandyBag.png" name="背部7"/>
+	<item id="86008" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" name="背部8"/>
+	<item id="86009" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" name="背部9"/>
+	<item id="86010" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" name="背部10"/>
+	<item id="86011" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" name="背部11"/>
+	<item id="86012" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="背部12"/>
+	<item id="86013" icon="Texture/Aries/Item/1735_ColiseumFireBackS1.png" name="背部13"/>
+	<item id="86014" icon="Texture/Aries/Item/1736_ColiseumIceBackS1.png" name="背部14"/>
+	<item id="86015" icon="Texture/Aries/Item/1737_ColiseumStormBackS1.png" name="背部15"/>
+	<item id="86016" icon="Texture/Aries/Item/1738_ColiseumDeathBackS1.png" name="背部16"/>
+	<item id="86017" icon="Texture/Aries/Item/1739_ColiseumLifeBackS1.png" name="背部17"/>
+	<item id="86018" icon="Texture/Aries/Item/1795_Backpacks.png" name="背部18"/>
+	<item id="86019" icon="Texture/Aries/Item/1796_SwimmingLaps.png" name="背部19"/>
+	<item id="86020" icon="Texture/Aries/Item/1812_AngelWings.png" name="背部20"/>
+	<item id="86021" icon="Texture/Aries/Item/1820_IceBackS2.png" name="背部21"/>
+	<item id="86022" icon="Texture/Aries/Item/1832_FireBackS2.png" name="背部22"/>
+	<item id="86023" icon="Texture/Aries/Item/1839_StormBackS2.png" name="背部23"/>
+	<item id="86024" icon="Texture/Aries/Item/1844_LifeBackS2.png" name="背部24"/>
+	<item id="86025" icon="Texture/Aries/Item/1851_DeathBackS2.png" name="背部25"/>
+	<item id="86026" icon="Texture/Aries/Item/1859_ChristmasCandyBag.png" name="背部26"/>
+	<item id="86027" icon="Texture/Aries/Item/2045_ShopSpringCombatBackGirl.png" name="背部27"/>
+	<item id="86028" icon="Texture/Aries/Item/2049_ShopSpringCombatBackBoy.png" name="背部28"/>
+	<item id="86029" icon="Texture/Aries/Item/2076_FireBackS3.png" name="背部29"/>
+	<item id="86030" icon="Texture/Aries/Item/2083_IceBackS3.png" name="背部30"/>
+	<item id="86031" icon="Texture/Aries/Item/2090_StormBackS3.png" name="背部31"/>
+	<item id="86032" icon="Texture/Aries/Item/2097_LifeBackS3.png" name="背部32"/>
+	<item id="86033" icon="Texture/Aries/Item/2104_DeathBackS3.png" name="背部33"/>
+	<item id="86034" icon="Texture/Aries/Item/2235_FireBackS4.png" name="背部34"/>
+	<item id="86035" icon="Texture/Aries/Item/2242_IceBackS4.png" name="背部35"/>
+	<item id="86036" icon="Texture/Aries/Item/2249_StormBackS4.png" name="背部36"/>
+	<item id="86037" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="背部37"/>
+	<item id="86038" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="背部38"/>
+	<item id="86039" icon="Texture/Aries/Item/2392_DeadRabbit.png" name="背部39"/>
 	</category>
 
 	<category name="right_hand_equipment" text="手持">
-		<item id="87001"/>
+		<item id="87001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1022_LargeLollipop.png" name="手持1"/>
+		<item id="87002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1147_Detector.png" name="手持2"/>
+		<item id="87003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1156_YuanXiaoTorch.png" name="手持3"/>
+		<item id="87004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1157_GucciChisel.png" name="手持4"/>
+		<item id="87005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1187_BluePinwheel.anim.png" name="手持5"/>
+		<item id="87006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1188_PinkPinwheel.anim.png" name="手持6"/>
+		<item id="87007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1189_OrangePinwheel.anim.png" name="手持7"/>
+		<item id="87008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1266_CommonNewbieWand.anim.png" name="手持8"/>
+		<item id="87009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1266_CommonNewbieWand.png" name="手持9"/>
+		<item id="87010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1267_FireWand_5.png" name="手持10"/>
+		<item id="87011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1268_IceWand_5.png" name="手持11"/>
+		<item id="87012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1269_StoemWand_5.png" name="手持12"/>
+		<item id="87013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1269_StormWand_5.png" name="手持13"/>
+		<item id="87014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1270_LifeWand_5.png" name="手持14"/>
+		<item id="87015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1271_DeathWand_5.png" name="手持15"/>
+		<item id="87016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1272_FireWand_10.png" name="手持16"/>
+		<item id="87017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1273_IceWand_10.png" name="手持17"/>
+		<item id="87018" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1274_StormWand_10.png" name="手持18"/>
+		<item id="87019" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1275_LifeWand_10.png" name="手持19"/>
+		<item id="87020" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1275_StormWand_10.png" name="手持20"/>
+		<item id="87021" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1276_DeathWand_10.png" name="手持21"/>
+		<item id="87022" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1277_haliluya.anim.png" name="手持22"/>
+		<item id="87023" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1290_VIPStaff1.anim.png" name="手持23"/>
+		<item id="87024" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1291_VIPStaff2.anim.png" name="手持24"/>
+		<item id="87025" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1292_VIPStaff3.anim.png" name="手持25"/>
+		<item id="87026" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1293_VIPStaff4.anim.png" name="手持26"/>
+		<item id="87027" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1294_VIPStaff5.anim.png" name="手持27"/>
+		<item id="87028" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1295_VIPStaff6.anim.png" name="手持28"/>
+		<item id="87029" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1296_VIPStaff7.anim.png" name="手持29"/>
+		<item id="87030" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1297_VIPStaff8.anim.png" name="手持30"/>
+		<item id="87031" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1298_VIPStaff9.anim.png" name="手持31"/>
+		<item id="87032" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1299_VIPStaff10.anim.png" name="手持32"/>
+		<item id="87033" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1300_VIPStaff11.anim.png" name="手持33"/>
+		<item id="87034" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1445_ShopFireWand01.png" name="手持34"/>
+		<item id="87035" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1446_ShopIceWand01.png" name="手持35"/>
+		<item id="87036" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1447_ShopStormWand01.png" name="手持36"/>
+		<item id="87037" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1448_ShopLifeWand01.png" name="手持37"/>
+		<item id="87038" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1449_ShopDeathWand01.png" name="手持38"/>
+		<item id="87039" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1465_FireWand_15.png" name="手持39"/>
+		<item id="87040" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1466_IceWand_15.png" name="手持40"/>
+		<item id="87041" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1467_StormWand_15.png" name="手持41"/>
+		<item id="87042" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1468_LifeWand_15.png" name="手持42"/>
+		<item id="87043" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1469_DeathWand_15.png" name="手持43"/>
+		<item id="87044" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1512_ShopFireWand02.png" name="手持44"/>
+		<item id="87045" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1513_ShopIceWand02.png" name="手持45"/>
+		<item id="87046" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1514_ShopStormWand02.png" name="手持46"/>
+		<item id="87047" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1515_ShopDeathWand02.png" name="手持47"/>
+		<item id="87048" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1516_ShopLifeWand02.png" name="手持48"/>
+		<item id="87049" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1517_FireWand20.png" name="手持49"/>
+		<item id="87050" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1518_IceWand20.png" name="手持50"/>
+		<item id="87051" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1519_StormWand20.png" name="手持51"/>
+		<item id="87052" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1520_DeathWand20.png" name="手持52"/>
+		<item id="87053" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1521_LifeWand20.png" name="手持53"/>
+		<item id="87054" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1607_FireWand25.png" name="手持54"/>
+		<item id="87055" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1608_IceWand25.png" name="手持55"/>
+		<item id="87056" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1609_StormWand25.png" name="手持56"/>
+		<item id="87057" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1610_DeathWand25.png" name="手持57"/>
+		<item id="87058" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1611_LifeWand25.png" name="手持58"/>
+		<item id="87059" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1645_ShopFireWand03.png" name="手持59"/>
+		<item id="87060" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1646_ShopIceWand03.png" name="手持60"/>
+		<item id="87061" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1647_ShopStormWand03.png" name="手持61"/>
+		<item id="87062" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1648_ShopDeathWand03.png" name="手持62"/>
+		<item id="87063" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1649_ShopLifeWand03.png" name="手持63"/>
+		<item id="87064" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1650_ShopNewYearsRoseWand.png" name="手持64"/>
+		<item id="87065" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1684_ShopFireWand04.anim.png" name="手持65"/>
+		<item id="87066" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1685_ShopIceWand04.anim.png" name="手持66"/>
+		<item id="87067" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1686_ShopStormWand04.anim.png" name="手持67"/>
+		<item id="87068" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1687_ShopDeathWand04.anim.png" name="手持68"/>
+		<item id="87069" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1688_ShopLifeWand04.anim.png" name="手持69"/>
+		<item id="87070" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1747_ColiseumFireWandS1.anim.png" name="手持70"/>
+		<item id="87071" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1748_ColiseumIceWandS1.anim.png" name="手持71"/>
+		<item id="87072" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1749_ColiseumStormWandS1.anim.png" name="手持72"/>
+		<item id="87073" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1750_ColiseumDeathWandS1.anim.png" name="手持73"/>
+		<item id="87074" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1751_ColiseumLifeWandS1.anim.png" name="手持74"/>
+		<item id="87075" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1788_MagicCrystalWand.anim.png" name="手持75"/>
+		<item id="87076" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1807_FirstFireRightHand.png" name="手持76"/>
+		<item id="87077" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1808_FirstIceRightHand.png" name="手持77"/>
+		<item id="87078" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1809_FirstStormRightHand.png" name="手持78"/>
+		<item id="87079" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1810_FirstLifeRightHand.png" name="手持79"/>
+		<item id="87080" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1811_FirstDeathRightHand.png" name="手持80"/>
+		<item id="87081" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1823_IceRightHandS2.anim.png" name="手持81"/>
+		<item id="87082" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1831_FireRightHandS2.anim.png" name="手持82"/>
+		<item id="87083" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1841_StormRightHandS2.anim.png" name="手持83"/>
+		<item id="87084" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1849_LifeRightHandS2.anim.png" name="手持84"/>
+		<item id="87085" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1858_DeathRightHandS2.anim.png" name="手持85"/>
+		<item id="87086" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1860_IceRightHandS2_Power.anim.png" name="手持86"/>
+		<item id="87087" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1861_FireRightHandS2_Power.anim.png" name="手持87"/>
+		<item id="87088" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1862_StormRightHandS2_Power.anim.png" name="手持88"/>
+		<item id="87089" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1863_LifeRightHandS2_Power.anim.png" name="手持89"/>
+		<item id="87090" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1864_DeathRightHandS2_Power.anim.png" name="手持90"/>
+		<item id="87091" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1865_MagicCrystalWand_Power.anim.png" name="手持91"/>
+		<item id="87092" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1908_RightHand_Normal_Level10.anim.png" name="手持92"/>
+		<item id="87093" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1912_RightHand_Legend_Level10.anim.png" name="手持93"/>
+		<item id="87094" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1913_RightHand_Normal_Level15.anim.png" name="手持94"/>
+		<item id="87095" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1917_RightHand_Legend_Level15.anim.png" name="手持95"/>
+		<item id="87096" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1918_RightHand_Normal_Level25.anim.png" name="手持96"/>
+		<item id="87097" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1922_RightHand_Legend_Level25.anim.png" name="手持97"/>
+		<item id="87098" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1923_RightHand_Normal_Level35.anim.png" name="手持98"/>
+		<item id="87099" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1927_RightHand_Legend_Level35.anim.png" name="手持99"/>
+		<item id="87100" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1928_RightHand_Normal_Level45.anim.png" name="手持100"/>
+		<item id="87101" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1934_RightHand_Legend_Level45.anim.png" name="手持101"/>
+		<item id="87102" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1935_RightHand_Normal_LifeLevel50.anim.png" name="手持102"/>
+		<item id="87103" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1944_RightHand_Legend_LifeLevel50.anim.png" name="手持103"/>
+		<item id="87104" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1945_RightHand_Normal_IceLevel50.anim.png" name="手持104"/>
+		<item id="87105" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1954_RightHand_Legend_IceLevel50.anim.png" name="手持105"/>
+		<item id="87106" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1955_RightHand_Normal_FireLevel50.anim.png" name="手持106"/>
+		<item id="87107" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1964_RightHand_Legend_FireLevel50.anim.png" name="手持107"/>
+		<item id="87108" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1965_RightHand_Normal_StormLevel50.anim.png" name="手持108"/>
+		<item id="87109" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1974_RightHand_Legend_StormLevel50.anim.png" name="手持109"/>
+		<item id="87110" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1975_RightHand_Normal_DeathLevel50.anim.png" name="手持110"/>
+		<item id="87111" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1984_RightHand_Legend_DeathLevel50.anim.png" name="手持111"/>
+		<item id="87112" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2051_GoldAcinus.anim.png" name="手持112"/>
+		<item id="87113" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2052_SilveryAcinus.anim.png" name="手持113"/>
+		<item id="87114" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2053_StrawberryAcinus.anim.png" name="手持114"/>
+		<item id="87115" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2054_SeawaterAcinus.anim.png" name="手持115"/>
+		<item id="87116" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21001_RedAcinus.png" name="手持116"/>
+		<item id="87117" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21002_YellowAcinus.png" name="手持117"/>
+		<item id="87118" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21003_BlueAcinus.png" name="手持118"/>
+		<item id="87119" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21004_GreenAcinus.png" name="手持119"/>
+		<item id="87120" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21005_MorningGlory.png" name="手持120"/>
+		<item id="87121" icon="Texture/Aries/Creator/keepwork/Avatar/icons/21006_FirstAidBox.png" name="手持121"/>
+		<item id="87122" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2117_ChristmasLolipop.anim.png" name="手持122"/>
+		<item id="87123" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2119_TheStrongest_FireLevel55.anim.png" name="手持123"/>
+		<item id="87124" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2120_TheStrongest_IceLevel55.anim.png" name="手持124"/>
+		<item id="87125" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2121_TheStrongest_StormLevel55.anim.png" name="手持125"/>
+		<item id="87126" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2122_TheStrongest_LifeLevel55.anim.png" name="手持126"/>
+		<item id="87127" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2123_TheStrongest_DeathLevel55.anim.png" name="手持127"/>
+		<item id="87128" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2129_FinedayPig_Shield.anim.png" name="手持128"/>
+		<item id="87129" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2130_SugarFree_PorkMeat.anim.png" name="手持129"/>
+		<item id="87130" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2131_AngryDemon_Hammer.anim.png" name="手持130"/>
+		<item id="87131" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2132_FinedayPig_Shield_Max.anim.png" name="手持131"/>
+		<item id="87132" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2133_SugarFree_PorkMeat_Max.anim.png" name="手持132"/>
+		<item id="87133" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2134_AngryDemon_Hammer_Max.anim.png" name="手持133"/>
+		<item id="87134" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2202_TheStrongest_FireLevel55_Left.anim.png" name="手持134"/>
+		<item id="87135" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2203_TheStrongest_IceLevel55_Left.anim.png" name="手持135"/>
+		<item id="87136" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2204_TheStrongest_StormLevel55_Left.anim.png" name="手持136"/>
+		<item id="87137" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2205_TheStrongest_LifeLevel55_Left.anim.png" name="手持137"/>
+		<item id="87138" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2206_TheStrongest_DeathLevel55_Left.anim.png" name="手持138"/>
+		<item id="87139" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2207_TheStrongest_FireLevel55_Left_EVO.anim.png" name="手持139"/>
+		<item id="87140" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2208_TheStrongest_IceLevel55_Left_EVO.anim.png" name="手持140"/>
+		<item id="87141" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2209_TheStrongest_StormLevel55_Left_EVO.anim.png" name="手持141"/>
+		<item id="87142" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2210_TheStrongest_LifeLevel55_Left_EVO.anim.png" name="手持142"/>
+		<item id="87143" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2211_TheStrongest_DeathLevel55_Left_EVO.anim.png" name="手持143"/>
+		<item id="87144" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2212_TheStrongest_FireLevel55_Left_Final.anim.png" name="手持144"/>
+		<item id="87145" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2213_TheStrongest_IceLevel55_Left_Final.anim.png" name="手持145"/>
+		<item id="87146" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2214_TheStrongest_StormLevel55_Left_Final.anim.png" name="手持146"/>
+		<item id="87147" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2215_TheStrongest_LifeLevel55_Left_Final.anim.png" name="手持147"/>
+		<item id="87148" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2216_TheStrongest_DeathLevel55_Left_Final.anim.png" name="手持148"/>
+		<item id="87149" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2304_FireMagicWandS4.anim.png" name="手持149"/>
+		<item id="87150" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2305_IceMagicWandS4.anim.png" name="手持150"/>
+		<item id="87151" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2306_StormMagicWandS4.anim.png" name="手持151"/>
+		<item id="87152" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2307_LifeMagicWandS4.anim.png" name="手持152"/>
+		<item id="87153" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2308_DeathMagicWandS4.anim.png" name="手持153"/>
+		<item id="87154" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2309_FireLeftHandS4.anim.png" name="手持154"/>
+		<item id="87155" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2310_IceLeftHandS4.anim.png" name="手持155"/>
+		<item id="87156" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2311_StormLeftHandS4.anim.png" name="手持156"/>
+		<item id="87157" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2312_LifeLeftHandS4.anim.png" name="手持157"/>
+		<item id="87158" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2313_DeathLeftHandS4.anim.png" name="手持158"/>
+		<item id="87159" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2326_TheStrongest_Harpoon_Left.anim.png" name="手持159"/>
+		<item id="87160" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2329_TheChristmas_Cane_Left.anim.png" name="手持160"/>
+		<item id="87161" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2330_TheChristmas_Cane_GreenLeft.anim.png" name="手持161"/>
+		<item id="87162" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2383_FireMagicWandS4_VIP.anim.png" name="手持162"/>
+		<item id="87163" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2384_IceMagicWandS4_VIP.anim.png" name="手持163"/>
+		<item id="87164" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2385_StormMagicWandS4_VIP.anim.png" name="手持164"/>
+		<item id="87165" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2386_LifeMagicWandS4_VIP.anim.png" name="手持165"/>
+		<item id="87166" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2387_DeathMagicWandS4_VIP.anim.png" name="手持166"/>
+		<item id="87167" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2395_ValentinesDay_BlueFlower_Left.png" name="手持167"/>
+		<item id="87168" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2396_ValentinesDay_RedFlower_Left.png" name="手持168"/>
+		<item id="87169" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2397_ValentinesDay_PurpleFlower_Left.png" name="手持169"/>
+		<item id="87170" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2398_ValentinesDay_OrangeFlower_Left.png" name="手持170"/>
+		<item id="87171" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2406_Umbrella01_Left.anim.png" name="手持171"/>
+		<item id="87172" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2407_Umbrella02_Left.anim.png" name="手持172"/>
+		<item id="87173" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2412_Dream_Flower_Left.anim.png" name="手持173"/>
+		<item id="87174" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2422_icecreram_green_Left.png" name="手持174"/>
+		<item id="87175" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2423_icecreram_write_Left.png" name="手持175"/>
+		<item id="87176" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2424_icecreram_brown_Left.png" name="手持176"/>
+		<item id="87177" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2425_lolly_green_Left.png" name="手持177"/>
+		<item id="87178" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2426_lolly_yellow_Left.png" name="手持178"/>
+		<item id="87179" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2427_lolly_pink_Left.png" name="手持179"/>
+		<item id="87180" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2428_TheDragonBoat_Left.png" name="手持180"/>
+		<item id="87181" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2429_Dream2_Flower_Left.anim.png" name="手持181"/>
+		<item id="87182" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2430_Dream_Flower_Left.anim.png" name="手持182"/>
+		<item id="87183" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2431_Dream_Flower_Left.anim.png" name="手持183"/>
+		<item id="87184" icon="Texture/Aries/Creator/keepwork/Avatar/icons/blue.png" name="手持184"/>
+		<item id="87185" icon="Texture/Aries/Creator/keepwork/Avatar/icons/Lollipop.png" name="手持185"/>
+		<item id="87186" icon="Texture/Aries/Creator/keepwork/Avatar/icons/red.png" name="手持186"/>
+		<item id="87187" icon="Texture/Aries/Creator/keepwork/Avatar/icons/yellow.png" name="手持187"/>
+
 	</category>
 
 	<category name="mouth" text="嘴巴">
-		<item id="88001" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_08_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_08_01.png" name="嘴巴1"/>
-		<item id="88002" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_fps10_a001.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_fps10_a001.png" name="嘴巴2"/>
-		<item id="88003" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_fps10_a003.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_fps10_a003.png" name="嘴巴3"/>
-		<item id="88004" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_01_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_01_01.png" name="嘴巴4"/>
-		<item id="88005" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_02_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_02_01.png" name="嘴巴5"/>
-		<item id="88006" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_03_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_03_01.png" name="嘴巴6"/>
-		<item id="88007" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_fps10_a002.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_fps10_a002.png" name="嘴巴7"/>
-		<item id="88008" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_fps10_a003.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_fps10_a003.png" name="嘴巴8"/>
-		<item id="88009" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_fps10_a004.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_fps10_a004.png" name="嘴巴9"/>
-		<item id="88010" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl_fps10_c001.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl_fps10_c001.png" name="嘴巴10"/>
-		<item id="88011" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl3_fps10_a001.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl3_fps10_a001.png" name="嘴巴11"/>
-		<item id="88012" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_girl3_fps10_a002.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_girl3_fps10_a002.png" name="嘴巴12"/>
-		<item id="88013" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_mask.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_mask.png" name="口罩"/>
-		<item id="88014" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_01.png" name="嘴巴14"/>
-		<item id="88015" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_02.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_02.png" name="嘴巴15"/>
-		<item id="88016" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_03.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_03.png" name="嘴巴16"/>
-		<item id="88017" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_04.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_04.png" name="嘴巴17"/>
-		<item id="88018" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_05.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_05.png" name="嘴巴18"/>
-		<item id="88019" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_06.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_06.png" name="嘴巴19"/>
-		<item id="88020" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_01_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_01_01.png" name="嘴巴20"/>
-		<item id="88021" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_02_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_02_01.png" name="嘴巴21"/>
-		<item id="88022" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_03_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_03_01.png" name="嘴巴22"/>
-		<item id="88023" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_04_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_04_01.png" name="嘴巴23"/>
-		<item id="88024" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_05_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_05_01.png" name="嘴巴24"/>
-		<item id="88025" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_06_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_06_01.png" name="嘴巴25"/>
-		<item id="88026" icon1="Texture/Aries/Creator/keepwork/Avatar/big_icons/mouth_boy_07_01.png" icon2="Texture/Aries/Creator/keepwork/Avatar/small_icons/mouth_boy_07_01.png" name="嘴巴26"/>
+		<item id="88001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_08_01.png" name="嘴巴1"/>
+		<item id="88002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a001.png" name="嘴巴2"/>
+		<item id="88003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a003.png" name="嘴巴3"/>
+		<item id="88004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_01_01.png" name="嘴巴4"/>
+		<item id="88005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_02_01.png" name="嘴巴5"/>
+		<item id="88006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_03_01.png" name="嘴巴6"/>
+		<item id="88007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a002.png" name="嘴巴7"/>
+		<item id="88008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a003.png" name="嘴巴8"/>
+		<item id="88009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a004.png" name="嘴巴9"/>
+		<item id="88010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_c001.png" name="嘴巴10"/>
+		<item id="88011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl3_fps10_a001.png" name="嘴巴11"/>
+		<item id="88012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl3_fps10_a002.png" name="嘴巴12"/>
+		<item id="88013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_mask.png" name="口罩"/>
+		<item id="88014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_01.png" name="嘴巴14"/>
+		<item id="88015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_02.png" name="嘴巴15"/>
+		<item id="88016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_03.png" name="嘴巴16"/>
+		<item id="88017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_04.png" name="嘴巴17"/>
+		<item id="88018" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_05.png" name="嘴巴18"/>
+		<item id="88019" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_06.png" name="嘴巴19"/>
+		<item id="88020" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_01.png" name="嘴巴20"/>
+		<item id="88021" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_02_01.png" name="嘴巴21"/>
+		<item id="88022" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_03_01.png" name="嘴巴22"/>
+		<item id="88023" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_04_01.png" name="嘴巴23"/>
+		<item id="88024" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01.png" name="嘴巴24"/>
+		<item id="88025" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01.png" name="嘴巴25"/>
+		<item id="88026" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01.png" name="嘴巴26"/>
 	</category>
 
+	<!--暂时废止
 	<category name="mount" text="坐骑">
-		<!--
 		<item id="89001"/>
-		-->
 	</category>
+	-->
 
 </customcharlist>
