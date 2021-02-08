@@ -133,4 +133,5 @@ HttpWrapper.Create("keepwork.world.unfavorite", "%MAIN%/core/v0/favorites", "DEL
 -- 是否已收藏
 HttpWrapper.Create("keepwork.world.is_favorited", "%MAIN%/core/v0/favorites/exist", "GET", true)
 
-
+-- 查询
+HttpWrapper.Create("keepwork.world.search", "%MAIN%/core/v0/projects/search", "POST", true)

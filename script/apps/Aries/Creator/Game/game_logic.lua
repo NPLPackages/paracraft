@@ -644,7 +644,9 @@ function GameLogic.LoadGame()
 		local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar");
 		SwfLoadingBar.ShowForLightCalculation(function()
 			GameLogic.Resume();
-			System.os.options.DisableInput(false);
+			SwfLoadingBar.ShowForCodeTicks(function()
+				System.os.options.DisableInput(false);	
+			end)
 		end);
 	else
 		GameLogic.Resume();

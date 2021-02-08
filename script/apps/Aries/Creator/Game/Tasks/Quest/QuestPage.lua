@@ -596,16 +596,6 @@ function QuestPage.GetReward(task_id)
 		return
 	end
 
-	-- 先加上探索力
-	if task_data.exp and task_data.exp > 0 then
-		QuestAction.AddExp(task_data.exp, function()
-			local exp = QuestAction.GetExp()
-			QuestPage.ProgressToExp(true, exp)
-			QuestPage.HandleGiftData()
-			QuestPage.OnRefreshGiftGridView()
-		end)
-	end
-
 	local quest_data = QuestPage.GetQuestData(task_data.task_id)
 
 	if quest_data == nil then
@@ -613,6 +603,16 @@ function QuestPage.GetReward(task_id)
 	end
 
 	if task_data.task_type == "loop" then
+		-- 先加上探索力
+		if task_data.exp and task_data.exp > 0 then
+			QuestAction.AddExp(task_data.exp, function()
+				local exp = QuestAction.GetExp()
+				QuestPage.ProgressToExp(true, exp)
+				QuestPage.HandleGiftData()
+				QuestPage.OnRefreshGiftGridView()
+			end)
+		end
+
 		local childrens = quest_data.questItemContainer.children or {}
 		
 		for i, v in ipairs(childrens) do

@@ -8,7 +8,7 @@
 <PlayerAssets>
 <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
 <category name="common">
-  <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="测试换装人物" isTest="true" hidden="true"/>
+  <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="可换装人物"/>
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
   <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" school="false"/>
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
@@ -20,7 +20,7 @@
   <asset filename="character/CC/03animals/pigeon/pigeon.x" name="pigeon" displayname="鸽子"/>
   <asset filename="character/CC/03animals/frog/frog.x" name="frog" displayname="青蛙"/>
   <asset filename="character/CC/03animals/dog/dog.x" name="dog" displayname="狗"/>
-  <asset filename="character/CC/01char/MainChar/MainChar.x" name="ccs" displayname="可换装人物" hidden="true"/>
+  <!--asset filename="character/CC/01char/MainChar/MainChar.x" name="ccs" displayname="可换装人物" hidden="true"/-->
   <asset filename="character/CC/02human/Camera/Camera.x" name="camera" displayname="摄影机" />
   <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
   <asset filename="character/CC/05effect/whitecloud.x" name="whitecloud" displayname="白云" physics="false"/>
@@ -74,7 +74,7 @@
 </category>
 <category name="people">
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
-  <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="测试换装人物" isTest="true" hidden="true"/>
+  <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="可换装人物"/>
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
   <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
   <asset filename="character/CC/02human/keepwork/avatar/pp.x" name="papa" displayname="帕帕" />

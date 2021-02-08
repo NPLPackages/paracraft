@@ -54,6 +54,12 @@ local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Tea
 local QuestCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestCoursePage.lua");
 -- template.goto_world = ["ONLINE","RELEASE","LOCAL"]
 
+QuestAction.VersionToKey = {
+	ONLINE = 1,
+	RELEASE = 2,
+	LOCAL = 3,
+}
+
 QuestAction.DailyTaskData = {
     time_stamp = 0,
     is_auto_open_view = false,
@@ -67,6 +73,8 @@ QuestAction.DailyTaskData = {
     },
     visit_paraworld_list = {},
     visit_world_list = {},
+    play_course_times = 0,
+    course_world_id = 0,
 }
 QuestAction.task_gsid = 40003
 
@@ -93,10 +101,16 @@ function QuestAction.GetGoToWorldId(target_id)
     local template = QuestAction.GetItemTemplate(target_id);
     if(template)then
         return template:GetCurVersionValue("goto_world");
-        
     end
 end
 
+function QuestAction.GetVersionValue(target_id, key)
+    key = key or "goto_world"
+    local template = QuestAction.GetItemTemplate(target_id);
+    if(template)then
+        return template:GetCurVersionValue(key);
+    end
+end
 --[[
 	desc: 用于设置任务进度
 	param:
@@ -108,7 +122,7 @@ function QuestAction.SetValue(id,value)
     if(not id)then
         return
     end
-    -- print("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrQuestAction.SetValue", id,value)
+    
     QuestProvider:GetInstance():SetValue(id,value);
 end
 
@@ -148,6 +162,7 @@ function QuestAction.DoFinish(quest_gsid)
         return
     end
     local item = QuestProvider:GetInstance():CreateOrGetQuestItemContainer(quest_gsid);
+    -- 
     if(item)then
         item:DoFinish();
     end
@@ -209,6 +224,8 @@ function QuestAction.OpenPage(name)
     elseif name == 'growth_diary' then
         local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
         ParacraftLearningRoomDailyPage.DoCheckin();     
+    elseif name == 'ai_course' then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
     end
 end
 
@@ -361,14 +378,17 @@ end
 
 function QuestAction.GetClientData()
 	local clientData = KeepWorkItemManager.GetClientData(QuestAction.task_gsid) or {};
-	local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
-	if is_new_day then
+    local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
+    if is_new_day then
+        course_world_id = clientData.course_world_id
+
 		clientData = QuestAction.DailyTaskData
 		clientData.time_stamp = time_stamp
         clientData.is_auto_open_view = false
         clientData.exp = 0
+        clientData.play_course_times = 0
+        clientData.course_world_id = course_world_id
     end
-    
 	return clientData
 end
 
@@ -379,7 +399,11 @@ function QuestAction.CheckIsNewDay(clientData)
 	end
     local time_stamp = clientData.time_stamp or 0;
 	-- 获取今日凌晨的时间戳 1603949593
-    local cur_time_stamp = os.time()
+    local cur_time_stamp = QuestAction.GetServerTime() or 0
+    if cur_time_stamp == nil or cur_time_stamp == 0 then
+        cur_time_stamp = os.time()
+    end
+    
 	local day_time_stamp = commonlib.timehelp.GetWeeHoursTimeStamp(cur_time_stamp)
 
 	-- 天数改变 清除数据
@@ -410,8 +434,6 @@ function QuestAction.GetDailyTaskValue(task_id)
 end
 
 function QuestAction.GetDailyTaskFinishValue(task_id)
-    
-
     local quest_datas = QuestProvider:GetInstance().templates_map
     for k, v in pairs(quest_datas) do
         if v.id == task_id and type(v.finished_value) == "number" then
@@ -588,6 +610,6 @@ function QuestAction.OpenCampCourseView()
     end)
 end
 
-function QuestAction.CanFinish()
-    -- body
+function QuestAction.CanFinishCampCourse()
+    return QuestCoursePage.CheckIsAllCourseFinish()
 end

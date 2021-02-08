@@ -183,7 +183,7 @@ function MobPropertyPage.OnChangeAssetFile(skin)
 	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"), skin);
 end
 
-function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile)
+function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 	entity = entity or MobPropertyPage.GetEntity();
 	obj = obj or entity:GetInnerObject();
 	

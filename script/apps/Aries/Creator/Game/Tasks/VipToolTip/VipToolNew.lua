@@ -30,6 +30,7 @@ end
 function VipToolNew.Show(from)
     VipToolNew.from = from or "main_icon"
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+		VipToolNew.ShowPage()
         return
     end
     local username = commonlib.getfield("System.User.username")
@@ -113,7 +114,14 @@ end
 
 function VipToolNew.InitData()
     local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-    local qrcode = string.format("%s/p/qr/purchase?userId=%s&from=%s",KeepworkService:GetKeepworkUrl(), Mod.WorldShare.Store:Get('user/userId'), VipToolNew.from);
+	local userid = Mod.WorldShare.Store:Get('user/userId')
+    local qrcode;
+	if(userid) then
+		qrcode = string.format("%s/p/qr/purchase?userId=%s&from=%s",KeepworkService:GetKeepworkUrl(), userid, VipToolNew.from);
+	else
+		qrcode = string.format("%s/p/qr/buyFor?from=%s",KeepworkService:GetKeepworkUrl(), VipToolNew.from);
+	end
+
     local ret;
     ret, VipToolNew.qrcode = QREncode.qrcode(qrcode)
 end

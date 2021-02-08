@@ -16,8 +16,9 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/PageCtrl.lua");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
-local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Notice/Notice.lua");
+local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua");
 local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
+local MacroCodeCampAward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampAward.lua");
 local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
 local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
 local DockPage = NPL.export();
@@ -44,9 +45,10 @@ DockPage.top_line_2 = {
     { label = L"", },
     { label = L"活动公告", id = "notice", enabled2 = true, bg ="Texture/Aries/Creator/keepwork/dock/btn2_gonggao_32bits.png#0 0 85 75"},
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_chengzhangriji_32bits.png#0 0 85 75", },
-    { label = L"实战提升", id = "week_quest", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_shizhan_32bits.png#0 0 85 75", },
+    { label = L"智能课", id = "ai_course", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_zhinengke_32bits.png#0 0 85 75", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn2_ketang_32bits.png#0 0 85 75", },
 }
+
 DockPage.top_line_3 = {
     { label = L"", },
     { label = L"", },
@@ -89,13 +91,18 @@ function DockPage.Show()
     end)
 
     -- 每次登陆判断是否弹出活动框
-    if Notice and Notice.CheckCanShow() then
+    if Notice and Notice.CheckCanShow() and not MacroCodeCampActIntro.CheckIsInWinCamp() then
         Notice.Show(0)
     end
 
-    if MacroCodeCampActIntro.CheckCanShow() then
+    --冬令营弹框判断
+    if MacroCodeCampActIntro.CheckCanShow() and MacroCodeCampActIntro.CheckIsInWinCamp() and not MacroCodeCampAward.CheckCanShow() then
         MacroCodeCampActIntro.ShowView()
     end
+    if (MacroCodeCampActIntro.CheckIsInWinCamp()) then        
+        MacroCodeCampAward.ShowView()
+    end
+    
 
     DockPage.isShowTaskIconEffect = true
 
@@ -151,6 +158,9 @@ function DockPage.OnClickTop(id)
     elseif(id == "week_quest")then
         local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
         TeachingQuestLinkPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.week_quest");
+    elseif(id == "ai_course")then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.week_quest");
     elseif(id == "codewar")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");

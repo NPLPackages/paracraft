@@ -46,7 +46,7 @@ function WaterFlood:ctor()
 			self.min_y = by;
 		end
 		
-		GameLogic.PlayAnimation({animationName = "RaiseTerrain",facingTarget = {x=tx, y=ty, z=tz},});
+		GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 	end
 end
 

@@ -187,6 +187,30 @@ function Macros.CameraMove(camobjDist, LiftupAngle, CameraRotY)
 	end
 end
 
+function Macros.PrepareLastCameraView()
+	local lastCamera = Macros:GetLastCameraParams();
+	if(lastCamera) then
+		local camobjDist, LiftupAngle, CameraRotY = ParaCamera.GetEyePos();
+		local lookatX, lookatY, lookatZ = ParaCamera.GetLookAtPos();
+		local diff = math.abs(lastCamera.camobjDist - camobjDist) + math.abs(lastCamera.LiftupAngle - LiftupAngle) + math.abs(lastCamera.CameraRotY - CameraRotY);
+		if(diff > 0.001) then
+			ParaCamera.SetEyePos(lastCamera.camobjDist, lastCamera.LiftupAngle, lastCamera.CameraRotY)
+		end
+		local x, y, z = lastCamera.lookatX, lastCamera.lookatY, lastCamera.lookatZ;
+		if(x and y and z) then
+			x, y, z = Macros.ComputePosition(x, y, z)
+			local diff = math.abs(x - lookatX) + math.abs(y - lookatY) + math.abs(z - lookatZ);
+			if(diff > 0.001) then
+				ParaCamera.SetLookAtPos(x, y, z);
+				local focusEntity = EntityManager.GetFocus();
+				if(focusEntity and focusEntity:isa(EntityManager.EntityCamera) and not focusEntity:IsControlledExternally()) then
+					focusEntity:SetPosition(x, y, z);
+				end
+			end
+		end
+	end
+end
+
 -- @param x,y,z: camera look at position. if nil it will default to last camera lookat call. 
 function Macros.CameraLookat(x, y, z)
 	local lastCamera = Macros:GetLastCameraParams();

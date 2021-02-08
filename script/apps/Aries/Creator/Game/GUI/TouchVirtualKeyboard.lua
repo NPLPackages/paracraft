@@ -70,7 +70,7 @@ function TouchVirtualKeyboard:ctor()
 		},
 		{
 			{col=1, },
-			{name="CapsLock", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_CAPITAL},
+			{name="CapsLock", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_CAPSLOCK},
 			{name="A", char="a",char2="A",col=1, vKey = DIK_SCANCODE.DIK_A},
 			{name="S", char="s",char2="S",col=1, vKey = DIK_SCANCODE.DIK_S},
 			{name="D", char="d",char2="D",col=1, vKey = DIK_SCANCODE.DIK_D},

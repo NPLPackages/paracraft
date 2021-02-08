@@ -143,9 +143,11 @@ Commands["menu"] = {
 			local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 			task:Run();
 		elseif(name == "window.changeskin") then
+			--[[
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");
 			local SkinPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SkinPage");
 			SkinPage.ShowPage();
+			]]
 		elseif(name == "online.server") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 			local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");

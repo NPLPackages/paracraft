@@ -10,6 +10,14 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show();
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
 local Notice = NPL.export();
+
+local httpwrapper_version = HttpWrapper.GetDevVersion();
+local campIds = {
+    ONLINE = 41570,
+    RELEASE = 1471,
+}
+
+
 Notice.isSelectShowToday = true;
 Notice.nSelectIndex = 1;
 Notice.tblNoticeDt = {};
@@ -20,8 +28,7 @@ Notice.mainData = {}
 Notice.rendData = {}
 
 function Notice.OnInit()
-    page = document:GetPageCtrl();
-    page.OnClose = Notice.CloseView  
+    page = document:GetPageCtrl(); 
 end
 
 --处理获得的数据
@@ -132,6 +139,10 @@ function Notice.CloseView()
     Notice.servertime = 0
     Notice.mainData = {}
     Notice.SaveLocalData()
+    if page then
+        page:CloseWindow()
+        page = nil
+    end
 end
 
 
@@ -167,10 +178,60 @@ end
 --点击公告图片，此处需要添加埋点事件
 function Notice.OnImageBgClick(data)
     --(data,true)
-    local name = data.name
+    local name = data.name    
     if string.find(name, "创造周末") and string.find(name, "创造周末") > 0 then
         local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
         ActWeek.ShowView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
+        return
+    end
+    if string.find(name, "冬令营活动") and string.find(name, "冬令营活动") > 0 then
+        Notice.CloseView()
+        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+        local world_id = WorldCommon.GetWorldTag("kpProjectId");  
+        local campId = campIds[httpwrapper_version]
+        if tonumber(world_id) ~= campId then
+            GameLogic.RunCommand(string.format("/loadworld -force -s %d", campId));
+            GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'go_to_camp' });
+        end        
+        return
+    end
+    if string.find(name, "人工智能") and string.find(name, "人工智能") > 0 then
+        Notice.CloseView()
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board2', fromName = 'AI_class' });
+        return
+    end
+    if string.find(name, "换装系统") and string.find(name, "换装系统") > 0 then
+        Notice.CloseView()
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'clothes_sys' });
+        return
+    end
+    if string.find(name, "新年资源库") and string.find(name, "新年资源库") > 0 then
+        Notice.CloseView()
+        local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+        KeepWorkMallPage.Show();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board4', fromName = 'sf_res' });
+        return
+    end
+    if string.find(name, "实名认证奖励") and string.find(name, "实名认证奖励") > 0 then
+        Notice.CloseView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'realname' });
+        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            GameLogic.GetFilters():apply_filters(
+                'show_certificate',
+                function(result)
+                    if (result) then
+                        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                        DockPage.page:Refresh(0.01)
+                        GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                    end
+                end)
+        else
+           _guihelper.MessageBox("您已经完成了实名认证~") 
+        end
         return
     end
 

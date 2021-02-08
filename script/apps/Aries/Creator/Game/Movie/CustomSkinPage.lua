@@ -33,13 +33,13 @@ local currentSkin;
 
 CustomSkinPage.category_ds = {
 	{tex1 = "zi_toubu2_28X14_32bits", tex2 = "zi_toubu1_28X14_32bits", name = "head"},
-	{tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye"},
 	{tex1 = "zi_toushi1_28X14_32bits", tex2 = "zi_toushi2_28X14_32bits", name = "hair"},
+	{tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye"},
 	{tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth"},
 	{tex1 = "zi_yifu1_28X14_32bits", tex2 = "zi_yifu2_28X14_32bits", name = "shirt"},
 	{tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants"},
-	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment"},
 	{tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back"},
+	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment"},
 };
 CustomSkinPage.category_index = 1;
 CustomSkinPage.model_index = 1;
@@ -54,13 +54,13 @@ end
 function CustomSkinPage.ShowPage(OnClose)
 	currentModelFile = CustomCharItems.defaultModelFile;
 	currentSkin = PlayerAssetFile:GetDefaultCustomGeosets();
-	CustomSkinPage.category_index = 1;
+	CustomSkinPage.category_index = 2;
 	CustomSkinPage.model_index = 1;
 	CustomSkinPage.Current_Item_DS = {};
 	CustomSkinPage.Current_Model_DS = {};
 	CustomSkinPage.Current_Icon_DS = {};
 	for i = 1, #CustomSkinPage.category_ds do
-		CustomSkinPage.Current_Icon_DS[i] = {}; 
+		CustomSkinPage.Current_Icon_DS[i] = {id = "", icon = "", name = ""}; 
 	end
 
 	local params = {
@@ -94,13 +94,24 @@ function CustomSkinPage.ShowPage(OnClose)
 			CustomSkinPage.model_index = 1;
 			for i = 1, data.count do
 				local actor = data.rows[i];
-				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name};
+				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name, alias = actor.equipment.alias or string.format(L"新建模型%d", actor.id)};
 			end
 			if (CustomSkinPage.Current_Model_DS[1].asset ~= currentModelFile) then
 				currentModelFile = CustomSkinPage.Current_Model_DS[1].asset;
 				page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
 			end
 			currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
+
+			local items = CustomCharItems:GetUsedItemsBySkin(currentSkin);
+			for _, item in ipairs(items) do
+				local index = CustomSkinPage.GetIconIndexFromName(item.name);
+				if (index > 0) then
+					CustomSkinPage.Current_Icon_DS[index].id = item.id;
+					CustomSkinPage.Current_Icon_DS[index].name = item.name;
+					CustomSkinPage.Current_Icon_DS[index].icon = item.icon;
+				end
+			end
+
 		--else
 			--CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
 		end
@@ -108,11 +119,20 @@ function CustomSkinPage.ShowPage(OnClose)
 	end);
 end
 
+function CustomSkinPage.GetIconIndexFromName(name)
+	for i = 1, #CustomSkinPage.category_ds do
+		if (CustomSkinPage.category_ds[i].name == name) then
+			return i;
+		end
+	end
+	return -1;
+end
+
 function CustomSkinPage.SelectModel(index)
 	if (CustomSkinPage.model_index ~= index) then
 		CustomSkinPage.model_index = index;
 		CustomSkinPage.UpdateModel(CustomSkinPage.Current_Model_DS[index])
-		CustomSkinPage.OnChangeCategory(1);
+		CustomSkinPage.OnChangeCategory(2);
 	end
 end
 
@@ -132,6 +152,20 @@ end
 function CustomSkinPage.UpdateModel(model)
 	currentModelFile = model.asset;
 	currentSkin = model.skin;
+	for i = 1, #CustomSkinPage.category_ds do
+		CustomSkinPage.Current_Icon_DS[i].id = "";
+		CustomSkinPage.Current_Icon_DS[i].name = "";
+		CustomSkinPage.Current_Icon_DS[i].icon = "";
+	end
+	local items = CustomCharItems:GetUsedItemsBySkin(currentSkin);
+	for _, item in ipairs(items) do
+		local index = CustomSkinPage.GetIconIndexFromName(item.name);
+		if (index > 0) then
+			CustomSkinPage.Current_Icon_DS[index].id = item.id;
+			CustomSkinPage.Current_Icon_DS[index].name = item.name;
+			CustomSkinPage.Current_Icon_DS[index].icon = item.icon;
+		end
+	end
 end
 
 function CustomSkinPage.Refresh()
@@ -153,13 +187,9 @@ end
 
 function CustomSkinPage.UpdateCustomGeosets(index)
 	local item = CustomSkinPage.Current_Item_DS[index];
-	commonlib.echo(item);
-	commonlib.echo(CustomSkinPage.Current_Icon_DS);
-	--[[
 	if (CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id == item.id) then
 		return;
 	end
-	]]
 
 	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
 	if (item.geoset) then
@@ -173,12 +203,27 @@ function CustomSkinPage.UpdateCustomGeosets(index)
 		local id, filename = string.match(item.attachment, "(%d+):(.*)");
 		skinTable.attachments[tonumber(id)] = filename;
 	end
+	currentSkin = CustomCharItems:SkinTableToString(skinTable);
 
 	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id = item.id;
 	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].name= item.name;
 	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].icon = item.icon;
-	currentSkin = CustomCharItems:SkinTableToString(skinTable);
 	CustomSkinPage.Refresh();
+end
+
+function CustomSkinPage.RemoveSkin(index)
+	local iconItem = CustomSkinPage.Current_Icon_DS[index];
+	if (iconItem and iconItem.id and iconItem.id ~= "") then
+		local item = CustomCharItems:GetItemById(iconItem.id);
+		local skin = CustomCharItems:RemoveItemInSkin(currentSkin, item);
+		if (currentSkin ~= skin) then
+			currentSkin = skin;
+			iconItem.id = "";
+			iconItem.name = "";
+			iconItem.icon = "";
+			CustomSkinPage.Refresh();
+		end
+	end
 end
 
 function CustomSkinPage.CreateNewActor()
@@ -188,6 +233,7 @@ function CustomSkinPage.CreateNewActor()
 		if (err == 200) then
 			model.id = data.id;
 			model.name = data.name;
+			model.alias = string.format(L"新建模型%d", model.id);
 			CustomSkinPage.Current_Model_DS[index] = model;
 			CustomSkinPage.Refresh();
 		end
@@ -197,7 +243,7 @@ end
 function CustomSkinPage.OnClickSave()
 	local model = CustomSkinPage.Current_Model_DS[CustomSkinPage.model_index];
 	if (model) then
-		local equipment = {asset = currentModelFile, skin = currentSkin};
+		local equipment = {asset = currentModelFile, skin = currentSkin, alias = model.alias};
 		keepwork.actors.modify({router_params = {id = model.id}, name = model.name, equipment = equipment}, function(err, msg, data)
 			if (err == 200) then
 				model.skin = currentSkin;
@@ -207,11 +253,29 @@ function CustomSkinPage.OnClickSave()
 end
 
 function CustomSkinPage.OnClickOK()
-	page:CloseWindow();
+	GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+		if(isVip) then
+			currentSkin = CustomCharItems:SkinStringToItemIds(currentSkin);
+			page:CloseWindow();
+		end
+	end)
 end
 
 function CustomSkinPage.OnClose()
 	currentModelFile = nil;
 	currentSkin = nil;
 	page:CloseWindow();
+end
+
+function CustomSkinPage.RenameModel(name)
+	local model = CustomSkinPage.Current_Model_DS[CustomSkinPage.model_index];
+	if (model) then
+		local equipment = {asset = model.asset, skin = model.skin, alias = name};
+		keepwork.actors.modify({router_params = {id = model.id}, name = model.name, equipment = equipment}, function(err, msg, data)
+			if (err == 200) then
+				model.alias = name;
+				CustomSkinPage.Refresh();
+			end
+		end);
+	end
 end

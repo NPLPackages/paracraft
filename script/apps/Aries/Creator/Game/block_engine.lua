@@ -179,6 +179,10 @@ function BlockEngine.OnLoadBlockRegion()
 	end
 	BlockEngine.SetRegionLoaded(msg.x, msg.y)
 	
+	local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+	local region = EntityManager.GetRegionContainer(msg.x*512, msg.y*512);
+	region:SetModified();
+
 	if(BlockEngine:IsRemote()) then
 		return;
 	end
@@ -190,8 +194,8 @@ function BlockEngine.OnLoadBlockRegion()
 	ParaTerrain.GetBlocksInRegion(startChunkX, startChunkY, startChunkZ, endChunkX, endChunkY, endChunkZ, block.attributes.onload, results);
 	
 	if(results.count and results.count>0) then
-		local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-		local region = EntityManager.GetRegionContainer(msg.x*512, msg.y*512);
+		region:LoadFromFile();		
+		
 		LOG.std(nil, "system", "BlockEngine", "calling onload for %d blocks in region %d %d", results.count, msg.x, msg.y);
 
 		local results_x, results_y, results_z, results_tempId, results_data = results.x, results.y, results.z, results.tempId, results.data;

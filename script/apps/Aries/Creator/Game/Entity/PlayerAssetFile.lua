@@ -171,19 +171,26 @@ function PlayerAssetFile:GetDefaultCustomGeosets()
 end
 
 function PlayerAssetFile:RefreshCustomGeosets(player, skin)
-	if (not skin or (not skin:match("^%d+#"))) then
+	if (not skin or skin == "") then
 		skin = self:GetDefaultCustomGeosets();
+	elseif (not skin:match("^%d+#")) then
+		skin = CustomCharItems:ItemIdsToSkinString(skin);
 	end
+
 	local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
 	if (not geosets) then
 		geosets = skin;
 	end
 
+	local use_hair = false;
 	local charater = player:ToCharacter();
 	if (geosets) then
 		local geoset;
 		for geoset in string.gfind(geosets, "([^#]+)") do
 			local id = tonumber(geoset);
+			if (id > 0 and id < 100) then
+				use_hair = true;
+			end
 			charater:SetCharacterSlot(math.floor(id / 100), id % 100);
 		end
 	end
@@ -196,16 +203,23 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	end
 
 	if (attachments) then
+		charater:RemoveAttachment(1, 1);
+		charater:RemoveAttachment(11, 11);
+		charater:RemoveAttachment(15, 15);
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
-			local meshModel;
-			if (string.find(filename, "anim.x")) then
-				meshModel = ParaAsset.LoadParaX("", filename);
+			if (use_hair and id == 11) then
+				charater:RemoveAttachment(11, 11);
 			else
-				meshModel = ParaAsset.LoadStaticMesh("", filename);
-			end
-			if (meshModel) then
-				charater:AddAttachment(meshModel, id, id);
+				local meshModel;
+				if (string.find(filename, "anim.x")) then
+					meshModel = ParaAsset.LoadParaX("", filename);
+				else
+					meshModel = ParaAsset.LoadStaticMesh("", filename);
+				end
+				if (meshModel) then
+					charater:AddAttachment(meshModel, id, id);
+				end
 			end
 		end
 	end

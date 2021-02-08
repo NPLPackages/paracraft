@@ -77,6 +77,13 @@ function MacroCodeCampActIntro.GetQRCodeUrl()
     return url
 end
 
+function MacroCodeCampActIntro.CheckIsInWinCamp()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local world_id = WorldCommon.GetWorldTag("kpProjectId");    
+    local campId = MacroCodeCampActIntro.campIds[httpwrapper_version]
+    return tonumber(world_id) == campId
+end
+
 function MacroCodeCampActIntro.ShowQRCode()  
     -- if QRCodeWnd then
     --     QRCodeWnd:Show(parent_root);        

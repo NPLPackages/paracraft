@@ -33,13 +33,13 @@ function RegionContainer:init(x,z, filename)
 end
 
 -- set modified and dirty
+-- region container is set modified when region is loaded. 
 function RegionContainer:SetModified()
 	self.is_dirty = true;
 end
 
--- TODO: always return true for the moment
 function RegionContainer:IsModified()
-	return true;
+	return self.is_dirty;
 end
 
 function RegionContainer:GetEntities()

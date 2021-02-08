@@ -20,6 +20,7 @@ local keyMaps = {
 	["EQUALS"] = "= +",
 	["ESCAPE"] = "ESC",
 	["DELETE"] = "DEL",
+	["CAPSLOCK"] = "CapsLk",
 	["LSHIFT"] = "SHIFT",
 	["RSHIFT"] = "SHIFT",
 	["shift"] = "SHIFT",

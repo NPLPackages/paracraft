@@ -93,7 +93,9 @@ function Macros.KeyPress(button)
 	local event = KeyEvent:init("keyPressEvent")
 	SetKeyEventFromButtonText(event, button)
 	local ctx = GameLogic.GetSceneContext()
-	ctx:keyPressEvent(event);
+	ctx:handleKeyEvent(event);
+
+	MacroPlayer.Focus();
 end
 
 -- System.Window's key down event
@@ -114,6 +116,7 @@ function Macros.WindowKeyPress(ctrlName, button)
 				Application:sendEvent(window:focusWidget(), event);
 			end
 			
+			MacroPlayer.Focus();
 		end
 	end
 end
@@ -130,6 +133,8 @@ function Macros.WindowInputMethod(ctrlName, commitString)
 
 			local event = InputMethodEvent:new():init(commitString);
 			Application:sendEvent(window:focusWidget(), event);
+
+			MacroPlayer.Focus();
 		end
 	end
 end

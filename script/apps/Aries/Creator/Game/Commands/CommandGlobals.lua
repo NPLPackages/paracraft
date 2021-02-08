@@ -692,3 +692,25 @@ e.g.
 		end
 	end,
 };
+
+Commands["vip"] = {
+	name="vip", 
+	quick_ref="/vip [show] [category_name]", 
+	desc=[[show vip window for the given category. Both online and off users are supported.
+e.g.
+/vip
+/vip show lesson_video
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local cmdName;
+		cmdName, cmd_text = CmdParser.ParseString(cmd_text);		
+		cmdName = cmdName or "show";
+		if(cmdName == "show") then
+			local category_name
+			category_name, cmd_text = CmdParser.ParseString(cmd_text);
+			local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+            VipToolNew.Show(category_name)
+		end
+	end,
+};
+

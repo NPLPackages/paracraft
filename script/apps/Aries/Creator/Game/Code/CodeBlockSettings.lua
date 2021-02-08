@@ -36,7 +36,7 @@ function CodeBlockSettings.Show()
 				x = -width/2,
 				y = -height/2,
 				width = 400,
-				height = 400,
+				height = 500,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end

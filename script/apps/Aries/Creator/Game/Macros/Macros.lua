@@ -94,6 +94,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroVoice.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroControl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
+local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -547,8 +549,6 @@ function Macros:BeginPlay()
 
 	self.isPlaying = true;
 	Macros.SetNextKeyPressWithMouseMove(nil, nil)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
-	local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 	MacroPlayer.ShowPage();
 	self:LockInput()
 
@@ -619,6 +619,7 @@ function Macros:PlayMacros(macros, fromLine, speed)
 			self.isPlaying = true;
 			self.curLine = fromLine
 			local isAsync = nil;
+			MacroPlayer.Focus();
 			GameLogic.GetFilters():apply_filters("Macro_PlayMacro", fromLine, macros);
 			m:Run(function()
 				if(isAsync) then
@@ -757,8 +758,6 @@ function Macros:CheckAddCameraView()
 end
 
 function Macros.AutoCompleteTrigger()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
-	local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 	MacroPlayer.AutoCompleteTrigger();
 end
 

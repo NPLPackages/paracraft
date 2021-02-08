@@ -830,6 +830,8 @@ function QuestCoursePage.ToGraduate(task_data)
 	local codeEntity = BlockEngine:GetBlockEntity(19211, 1, 19189)
 	if codeEntity then
 		GameLogic.QuestAction.SetValue(task_data.id, 1);
+		GameLogic.QuestAction.DoFinish(60020)
+		
 		QuestCoursePage.Close()
 		codeEntity:Restart();
 	end

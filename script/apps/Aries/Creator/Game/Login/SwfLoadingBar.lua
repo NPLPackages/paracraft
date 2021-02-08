@@ -36,6 +36,19 @@ function SwfLoadingBar.ShowForLightCalculation(onFinishCallback)
 	SwfLoadingBar.mytimer:Change(300, 300);
 end
 
+-- some code block may take several seconds to load, so we will at least wait for the scene to render 15 frames before showing the user interface. 
+function SwfLoadingBar.ShowForCodeTicks(onFinishCallback)
+	SwfLoadingBar.onFinishCallback = onFinishCallback;
+	SwfLoadingBarPage.ShowPage({ top = -50, show_background = true, worldname = WorldCommon.GetWorldTag("name") });
+	SwfLoadingBar.ShowProgress(L"正在加载代码方块, 请耐心等待...", 85);
+	SwfLoadingBar.tracking_target = "CodeCalculation";
+	
+	SwfLoadingBar.mytimer = SwfLoadingBar.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+		SwfLoadingBar.OnTick();
+	end})
+	SwfLoadingBar.mytimer:Change(300, 300);
+end
+
 function SwfLoadingBar.OnTick()
 	if(SwfLoadingBar.tracking_target == "LightCalculation") then
 		local attr = ParaTerrain.GetBlockAttributeObject();
@@ -50,12 +63,13 @@ function SwfLoadingBar.OnTick()
 			SwfLoadingBar.lighting_tickcount = SwfLoadingBar.lighting_tickcount + 1;
 			if(SwfLoadingBar.lighting_tickcount > 3*3) then
 				-- at most wait 3 seconds. 
-				SwfLoadingBar.ClosePage();
+				SwfLoadingBar.OnFinish()
 				return;
 			end
 			
 			if(nDirtyBlockCount == 0) then
-				SwfLoadingBar.ShowProgress(nil, 100);
+				SwfLoadingBar.ShowProgress(nil, 99);
+				SwfLoadingBar.OnFinish()
 			else
 				if(SwfLoadingBar.percentage > 50) then
 					if(SwfLoadingBar.percentage < 99) then
@@ -69,6 +83,10 @@ function SwfLoadingBar.OnTick()
 				SwfLoadingBar.ShowProgress(string.format(L"正在计算光照信息, 请耐心等待... (%d)", nDirtyBlockCount), SwfLoadingBar.percentage);
 			end
 		end
+	elseif(SwfLoadingBar.tracking_target == "CodeCalculation") then
+		-- wait 15 ticks
+		SwfLoadingBar.percentage = 100 - math.max(0, (15 - GameLogic.GetTickCount()));
+		SwfLoadingBar.ShowProgress(string.format(L"正在加载代码方块, 请耐心等待...(%d)", GameLogic.GetTickCount()), SwfLoadingBar.percentage);
 	end
 end
 
@@ -119,7 +137,7 @@ function SwfLoadingBar.ShowProgress(msg, percentage, step)
 		end
 	end
 	if(not msg) then
-		SwfLoadingBar.percentage = 100;
+		SwfLoadingBar.percentage = percentage or 100;
 	end
 	
 	local p = SwfLoadingBar.percentage or 0;

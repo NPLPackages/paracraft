@@ -63,7 +63,7 @@ function FillLine:Run()
 		end
 
 		local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
-		GameLogic.PlayAnimation({animationName = "RaiseTerrain",facingTarget = {x=tx, y=ty, z=tz},});
+		GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 
 		TaskManager.AddTask(self);
 	end	

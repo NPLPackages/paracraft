@@ -33,7 +33,7 @@ function ExtrudeBlocks:Run()
 		self.history = {};
 		self.step = 1;
 
-		GameLogic.PlayAnimation({animationName = "RaiseTerrain",});
+		GameLogic.PlayAnimation({animationName = "Create",});
 
 		local dx = self.dx or 0;
 		local dy = self.dy or 0;

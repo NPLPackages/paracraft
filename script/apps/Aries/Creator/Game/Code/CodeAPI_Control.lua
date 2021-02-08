@@ -12,13 +12,57 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
+
+
+-- check if the given actor is sentient with the given player. 
+-- i.e. the current player is in the sentient radius of the actor. 
+function env_imp.IsActorSentientWithPlayer(actor)
+	if(actor) then
+		local radius = actor:GetSentientRadius()
+		if(radius > 0) then
+			local player = EntityManager.GetPlayer()
+			if(player) then
+				local entity = actor:GetEntity();
+				if(entity) then
+					local x, y, z = entity:GetPosition();
+					local distSq = player:GetDistanceSq(x,y,z);
+					radius = radius * BlockEngine.blocksize;
+					if(distSq > radius*radius) then
+						return false;
+					end
+				end
+			end
+		end
+	end
+	return true;
+end
+local IsActorSentientWithPlayer = env_imp.IsActorSentientWithPlayer;
 
 -- wait some time
 -- @param seconds: in seconds, if nil, it is one tick or env_imp.GetDefaultTick(self)
 function env_imp:wait(seconds)
 	seconds = seconds or env_imp.GetDefaultTick(self);
 	if(self.co) then
+		if(not IsActorSentientWithPlayer(self.actor)) then
+			-- we will check every 1 second until it is sentient again
+			local checkSentientInterval = 1000;
+			local actor = self.actor;
+			local function CheckSentient_()
+				self.co:SetTimeout(checkSentientInterval, function()
+					if(IsActorSentientWithPlayer(actor)) then
+						env_imp.resume(self);
+					else
+						CheckSentient_()
+					end
+				end)
+			end
+			CheckSentient_()
+
+			env_imp.yield(self);
+			return
+		end
 		self.co:SetTimeout(math.floor(seconds*1000), function()
 			env_imp.resume(self);
 		end) 

@@ -923,6 +923,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 					-- if (not KeepWorkItemManager.IsVip()) then
                     -- end
 				else
+                    _guihelper.CloseMessageBox();
 					_guihelper.MessageBox(L"此世界禁止飞行哦！");
 				end
 			end

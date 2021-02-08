@@ -27,6 +27,12 @@ end
             <input type="button" style="margin-left:5px" class="button" uiname="CodeBlockSettings.btnChangeLang" name="btnChangeLang" value='<%=L"自定义语言..."%>' onclick="CodeBlockSettings.OnClickCustomLanguage"/>
         </div>
     </div>
+    <!--<div style="margin-bottom:10px;">
+        <input type="checkbox" uiname="CodeBlockSettings.isAutoActiveActor" name="isAutoActiveActor" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAutoActiveActor"/>
+        <div uiname="CodeBlockSettings.isAutoActiveActorFor" for="isAutoActiveActor" style="float:left;margin-left:5px;" >
+            <%=L"当玩家进入角色的可视范围时，才运行代码"%>
+        </div>
+    </div>-->
     <div style="margin-bottom:10px;">
         <input type="checkbox" uiname="CodeBlockSettings.allowClientExecution" name="allowClientExecution" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowClientExecution"/>
         <div uiname="CodeBlockSettings.allowClientExecutionFor"  for="allowClientExecution" style="float:left;margin-left:5px;" >

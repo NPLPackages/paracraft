@@ -116,17 +116,34 @@ function QuestProvider:OnInit()
                 end)
 
                 if exid == GameLogic.QuestAction.end_exid then
-                    _guihelper.MessageBox("恭喜您顺利结业，证书已发放，点击确定前往查看", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
-                    _guihelper.MsgBoxClick_CallBack = function(res)
-                        if(res == _guihelper.DialogResult.OK) then
-                            local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-                            user_page.ShowUserInfoPage({username=System.User.keepworkUsername, HeaderTabIndex="honor"});
-                        end
-                    end
+                    -- _guihelper.MessageBox("恭喜您顺利结业，证书已发放，点击确定前往查看", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+                    -- _guihelper.MsgBoxClick_CallBack = function(res)
+                    --     if(res == _guihelper.DialogResult.OK) then
+                    --         local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+                    --         user_page.ShowUserInfoPage({username=System.User.keepworkUsername, HeaderTabIndex="honor"});
+                    --     end
+                    -- end
                 end
             end
             
-            -- body
+            -- 探索力处理
+            for i, quest_item in ipairs(event.quest_item_container.children) do
+                if quest_item.template and quest_item.template.exp then
+                    GameLogic.QuestAction.AddExp(quest_item.template.exp, function()
+                        if i == #event.quest_item_container.children then
+                            local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+                            if QuestPage and QuestPage.IsOpen() then
+                                local exp = GameLogic.QuestAction.GetExp()
+                                QuestPage.ProgressToExp(true, exp)
+                                QuestPage.HandleGiftData()
+                                QuestPage.OnRefreshGiftGridView()
+                            end
+                        end
+                    end)
+                end
+            end
+
+
         end
     end, nil, "QuestProvider_OnFinished")
 
@@ -315,8 +332,12 @@ function QuestProvider:FillQuestItemTemplateBy_Virtual_Condition(exid)
                     quest_template.task_type = v.task_type;
                     quest_template.custom_show = v.custom_show;
                     quest_template.exp = v.exp;
-                    quest_template.order = v.order;
+                    quest_template.order = v.order
                     quest_template.visible = v.visible
+                    quest_template.belong = v.belong
+                    quest_template.course_level = v.course_level
+                    quest_template.command = v.command
+                    quest_template.level_name = v.level_name
                     self:AddQuestItemTemplate(quest_template);
                 end
             end
@@ -554,7 +575,7 @@ function QuestProvider:UpdateServerTime()
     },function(err, msg, data)
         if(err == 200)then
             self.server_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-            local time = System.options.isDevMode and 3000 or 60000
+            local time = System.options.isDevMode and 3000 or 10000
             commonlib.TimerManager.SetTimeout(function()  
                 self:UpdateServerTime()
             end, time)

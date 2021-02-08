@@ -38,6 +38,10 @@ function QuestItemTemplate:ctor()
     self.exp = nil;  -- exp for gift
     self.order = nil -- "order" be use to sort task
     self.visible = nil -- be able to vis
+    self.belong = nil
+    self.course_level = nil
+    self.command = nil
+    self.level_name = nil
 end
 
 function QuestItemTemplate:GetUniqueKey()
@@ -61,6 +65,10 @@ function QuestItemTemplate:GetData()
         exp = self.exp,
         order = self.order,
         visible = self.visible,
+        belong = self.belong,
+        course_level = self.course_level,
+        command = self.command,
+        level_name = self.level_name,
     }
     return data;
 end

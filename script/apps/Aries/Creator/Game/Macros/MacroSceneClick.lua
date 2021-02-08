@@ -111,6 +111,7 @@ end
 --@param mouse_button: "left", "right", default to "left", such as "ctrl+left"
 --@param angleX, angleY
 function Macros.SceneClick(button, angleX, angleY)
+	Macros.PrepareLastCameraView()
 	-- mouse_x, mouse_y, mouse_button are global variables
 	mouse_x, mouse_y, mouse_button = Macros.MouseAngleToScreenPos(angleX, angleY, button)
 	ParaUI.SetMousePosition(mouse_x, mouse_y);
@@ -130,6 +131,7 @@ end
 
 -- mouse drag
 function Macros.SceneDrag(button, startAngleX, startAngleY, endAngleX, endAngleY, duration)
+	Macros.PrepareLastCameraView()
 	local emulatedKeys = Keyboard:GetEmulatedKeys()
 	SetKeyboardFromButtonText(emulatedKeys, button)
 	if(Keyboard:IsAltKeyPressed() or Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
@@ -197,6 +199,7 @@ end
 --@param angleX, angleY
 -- @return nil or {OnFinish=function() end}
 function Macros.SceneClickTrigger(button, angleX, angleY)
+	Macros.PrepareLastCameraView()
 	local mouseX, mouseY = Macros.MouseAngleToScreenPos(angleX, angleY, button)
 
 	local callback = {};
@@ -209,6 +212,7 @@ function Macros.SceneClickTrigger(button, angleX, angleY)
 end
 
 function Macros.SceneDragTrigger(button, startAngleX, startAngleY, endAngleX, endAngleY)
+	Macros.PrepareLastCameraView()
 	local startX, startY = Macros.MouseAngleToScreenPos(startAngleX, startAngleY)
 	local endX, endY = Macros.MouseAngleToScreenPos(endAngleX, endAngleY)
 

@@ -502,8 +502,25 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 			end
 			local timer = env_imp.getPlayTimer(self)
 			if(timer) then
-				timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
-				timer:Change(0, deltaTime);
+				local radius = actor:GetSentientRadius()
+				if(radius > 0) then
+					-- we will check every 1 second until it is sentient again
+					local checkSentientInterval = 1000;
+					timer.callbackFunc = self.co:MakeCallbackFunc(function(timer)
+						if(not env_imp.IsActorSentientWithPlayer(actor)) then
+							timer:Change(checkSentientInterval, checkSentientInterval);
+						else
+							frameMove_(timer)
+							if(timer.period ~= deltaTime) then
+								timer:Change(deltaTime, deltaTime);
+							end
+						end
+					end);
+					timer:Change(0, deltaTime);
+				else
+					timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					timer:Change(0, deltaTime);
+				end
 			end
 		end
 	end
@@ -566,8 +583,25 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 			end
 			local timer = env_imp.getPlayTimer(self, boneName)
 			if(timer) then
-				timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
-				timer:Change(0, deltaTime);
+				local radius = actor:GetSentientRadius()
+				if(radius > 0) then
+					-- we will check every 1 second until it is sentient again
+					local checkSentientInterval = 1000;
+					timer.callbackFunc = self.co:MakeCallbackFunc(function(timer)
+						if(not env_imp.IsActorSentientWithPlayer(actor)) then
+							timer:Change(checkSentientInterval, checkSentientInterval);
+						else
+							frameMove_(timer)
+							if(timer.period ~= deltaTime) then
+								timer:Change(deltaTime, deltaTime);
+							end
+						end
+					end);
+					timer:Change(0, deltaTime);
+				else
+					timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					timer:Change(0, deltaTime);
+				end
 			end
 		end
 	end

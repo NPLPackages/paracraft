@@ -11,6 +11,8 @@
             <![CDATA[
             CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
             CustomSkinPage.OnInit();
+            local page = document:GetPageCtrl();
+            local isEditable = false;
 
             function DS_Items(index)
                 if(index == nil) then
@@ -41,28 +43,58 @@
             end
 
             function GetBigIconStyle(tex)
-                return string.format("margin-left:41px;margin-top:24px;width:64px;height:64px;background:url(%s);", tex);
+                return string.format("margin-left:32px;margin-top:16px;width:64px;height:64px;background:url(%s);", tex or "");
             end
 
             function GetSmallIconStyle1(tex)
-                return string.format("float:left;margin-left:0px;width:40px;height:40px;background:url(%s);", tex);
+                return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
             end
 
             function GetSmallIconStyle2(tex)
-                return string.format("float:left;margin-left:218px;width:40px;height:40px;background:url(%s);", tex);
+                return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
             end
 
             function GetModelName(index)
                 if (index > 0) then
-                    return string.format(L"套装%d", index)
+                    local model = CustomSkinPage.Current_Model_DS[CustomSkinPage.model_index];
+                    if (model) then
+                        return model.alias;
+                    else
+                        return L"新建套装";
+                    end
                 else
-                    return L"新建套装";
                 end
             end
 
             function IsOdd(index)
-                commonlib.echo(index);
                 return (index % 2) ~= 0;
+            end
+
+            function IsEditable()
+                return isEditable;
+            end
+
+            function SetEditable()
+                isEditable = true;
+                CustomSkinPage.Refresh();
+            end
+
+            function FinishEditing()
+                local name = page:GetValue("model_name");
+                if (name == nil or name == "") then
+                    return;
+                end
+                if (commonlib.utf8.len(name) > 10) then
+                    _guihelper.MessageBox(L"输入的名称太长，请控制在10个字以内");
+                    return;
+                end
+                isEditable = false;
+                CustomSkinPage.RenameModel(name);
+            end
+
+            function CancelEditing()
+                isEditable = false;
+                CustomSkinPage.Refresh();
             end
 
             ]]>
@@ -70,7 +102,7 @@
         <kp:window width="1190" height="580" title='<%=L"套装"%>' uiname_onclose="CustomSkinPage.OnClose" onclose="CustomSkinPage.OnClose">
             <div style="position:relative;margin-top:40px;">
                 <div style="float:left;margin-left:12px;margin-top:12px;width:225px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
-                    <div style="width:225px;height:460px;">
+                    <div style="width:225px;height:390px;">
                         <pe:gridview style="margin-left:9px;margin-top:4px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="44"
                                      DataSource='<%=DS_Models%>'>
                             <Columns>
@@ -79,7 +111,7 @@
                                         <%=Eval("index")%>
                                     </div>
                                     <div name='<%=Eval("index")%>' onclick="CustomSkinPage.SelectModel" style="float:left;margin-left:2px;margin-top:8px;width:124px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
-                                        <%=GetModelName(Eval("index"))%>
+                                        <%=Eval("alias")%>
                                     </div>
                                     <div name='<%=Eval("index")%>' onclick="CustomSkinPage.DeleteModel" style="float:left;margin-left:2px;margin-top:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_shanchu_36X36_32bits.png#0 0 36 36);"></div>
                                 </div>
@@ -88,25 +120,37 @@
                             </EmptyDataTemplate>
                         </pe:gridview>
                     </div>
-                    <div style="margin-top:2px;width:225px;height:42px;">
-                        <input type="button" style="margin-left:10px;min-width:100px;height:42px;font-size:14px;base-font-size:14px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_lv_64X42_32bits.png#0 0 64 42:8 8 8 8);" onclick="CustomSkinPage.CreateNewActor" value='<%=L"新建套装"%>' />
-                        <input type="button" style="margin-left:5px;min-width:100px;height:42px;font-size:14px;base-font-size:14px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_lv_64X42_32bits.png#0 0 64 42:8 8 8 8);" onclick="CustomSkinPage.OnClickOK" value='<%=L"使用"%>' />
+                    <div style="margin-top:0px;width:225px;height:42px;">
+                        <input type="button" align="center" style="margin-top:0px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.CreateNewActor" value='<%=L"新建套装"%>' />
+                        <input type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClickSave" value='<%=L"保存"%>' />
                     </div>
                 </div>
                 <div style="float:left;margin-left:10px;margin-top:12px;width:334px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/renwukuangbj_334X512_32bits.png#0 0 334 512);">
-                    <div style="margin-top:16px;width:334px;height:30px;font-size:18px;base-font-size:18px;color:#ffffff;text-align:center;"><%=GetModelName(CustomSkinPage.model_index)%></div>
+                    <pe:if condition='<%=IsEditable()%>'>
+                        <div style="margin-top:16px;width:334px;height:30px;">
+                            <input type="text" name="model_name" EmptyText='<%=L"请输入新的名称"%>' style="width:160px;height:26px;margin-left:60px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
+                            <input type="button" style="width:40px;height:26px;margin-left:10px;color:#ffffff;" value='<%=L"确定" %>' class="mc_blue_button_with_fillet" onclick="FinishEditing()" />
+                            <input type="button" style="width:40px;height:26px;margin-left:5px;color:#ffffff;" value='<%=L"取消" %>' class="mc_blue_button_with_fillet" onclick="CancelEditing()" />
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=not IsEditable()%>'>
+                        <div style="margin-top:16px;width:334px;height:30px;">
+                            <div style="float:left;margin-left:0px;font-size:18px;base-font-size:18px;text-align:center;color:#ffffff;"><%=GetModelName(CustomSkinPage.model_index)%></div>
+                            <input type="button" style="float:left;margin-left:5px;width:25px;height:26px;background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_bianji_24X24_32bits.png#0 0 26 26);" onclick="SetEditable()" />
+                        </div>
+                    </pe:if>
                     <div style="margin-top:20px;width:334px;height:300px;">
                         <div style="width:334px;height:50px;margin-top:10px;">
                             <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
                                 <div style="margin-left:9px;margin-top:11px;width:31px;height:27px;background:url(Texture/Aries/Creator/keepwork/Avatar/5mianbu_31X27_32bits.png#0 0 31 27);"></div>
                             </div>
                             <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
-                                <div style="margin-left:6px;margin-top:16px;width:37px;height:18px;background:url(Texture/Aries/Creator/keepwork/Avatar/10yanjing_37X18_32bits.png#0 0 37 18);"></div>
+                                <div style="margin-left:7px;margin-top:13px;width:36px;height:24px;background:url(Texture/Aries/Creator/keepwork/Avatar/6toushi_36X24_32bits.png#0 0 36 24);"></div>
                             </div>
                         </div>
                         <div style="width:334px;height:50px;margin-top:10px;">
                             <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
-                                <div style="margin-left:7px;margin-top:13px;width:36px;height:24px;background:url(Texture/Aries/Creator/keepwork/Avatar/6toushi_36X24_32bits.png#0 0 36 24);"></div>
+                                <div style="margin-left:6px;margin-top:16px;width:37px;height:18px;background:url(Texture/Aries/Creator/keepwork/Avatar/10yanjing_37X18_32bits.png#0 0 37 18);"></div>
                             </div>
                             <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
                                 <div style="margin-left:9px;margin-top:17px;width:32px;height:15px;background:url(Texture/Aries/Creator/keepwork/Avatar/9zuiba_32X15_32bits.png#0 0 32 15);"></div>
@@ -122,23 +166,33 @@
                         </div>
                         <div style="width:334px;height:50px;margin-top:10px;">
                             <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
-                                <div style="margin-left:8px;margin-top:7px;width:33px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/8shouchi_33X35_32bits.png#0 0 33 35);"></div>
+                                <div style="margin-left:12px;margin-top:10px;width:30px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/4beibu_30X30_32bits.png#0 0 30 30);"></div>
                             </div>
                             <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
-                                <div style="margin-left:12px;margin-top:10px;width:30px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/4beibu_30X30_32bits.png#0 0 30 30);"></div>
+                                <div style="margin-left:8px;margin-top:7px;width:33px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/8shouchi_33X35_32bits.png#0 0 33 35);"></div>
                             </div>
                         </div>
                     </div>
                     <div style="margin-top:-300px;width:334px;height:300px;">
-                        <pe:gridview style="margin-left:15px;margin-top:15px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
+                        <pe:gridview style="margin-left:10px;margin-top:10px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
                                      DataSource='<%=DS_Icons%>'>
                             <Columns>
-                                <pe:if condition='<%=IsOdd(Eval("index"))%>'>
-                                    <div style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
-                                    </div>
+                                <pe:if condition='<%=Eval("icon") ~= ""%>'>
+                                    <pe:if condition='<%=IsOdd(Eval("index"))%>'>
+                                        <div name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:0px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
+                                        <div name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
+                                            </div>
+                                        </div>
+                                    </pe:if>
                                 </pe:if>
-                                <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
-                                    <div style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
+                                <pe:if condition='<%=Eval("icon") == ""%>'>
+                                    <div style="float:left;margin-left:0px;width:50px;height:50px;">
                                     </div>
                                 </pe:if>
                             </Columns>
@@ -148,11 +202,11 @@
                     </div>
                     <div style="margin-left:40px;margin-top:-300px;width:256px;height:256px;">
                         <div>
-                            <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarCharacter" style="width:256px;height:256px;" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="0.9" DefaultLiftupAngle="0.1"/>
+                            <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarCharacter" style="width:256px;height:256px;" IsInteractive="false" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="0.9" DefaultLiftupAngle="0.1"/>
                         </div>
                     </div>
-                    <input type="button" align="center" style="margin-top:10px;min-width:160px;height:50px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="CustomSkinPage.OnClickOK()" value='<%=L"保存"%>' />
-                    <input type="button" align="center" style="margin-top:10px;min-width:160px;height:50px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClose()" value='<%=L"取消"%>' />
+                    <input type="button" align="center" style="margin-top:22px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="CustomSkinPage.OnClickOK()" value='<%=L"使用"%>' />
+                    <input type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClose()" value='<%=L"取消"%>' />
                 </div>
                 <div style="float:left;margin-left:4px;margin-top:12px;width:590px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
                     <div style="width:580px;height:36px;margin-left:2px;margin-top:10px;">
@@ -176,8 +230,10 @@
                                      DataSource='<%=DS_Items%>'>
                             <Columns>
                                 <div style="float:left;width:146px;height:140px;background:url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/wupingbj_146X140_32bits.png#0 0 146 140);">
-                                    <div name='<%= Eval("index")%>' onclick="CustomSkinPage.UpdateCustomGeosets" style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
-                                    <div style="margin-top:18px;width:146px;text-align:center;">
+                                    <div name='<%= Eval("index")%>' onclick="CustomSkinPage.UpdateCustomGeosets" style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
+                                        <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                                    </div>
+                                    <div style="margin-top:2px;width:146px;text-align:center;">
                                         <%=Eval("name")%>
                                     </div>
                                 </div>

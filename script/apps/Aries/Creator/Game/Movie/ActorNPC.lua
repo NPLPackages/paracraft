@@ -624,6 +624,18 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end);
+		elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+			local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+			CustomSkinPage.ShowPage(function(filename, skin)
+				if (filename and skin) then
+					self:AddKeyFrameByName(keyname, nil, skin);
+					self:FrameMovePlaying(0);
+					if(callbackFunc) then
+						callbackFunc(true);
+					end
+				end
+			end);
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 			local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");

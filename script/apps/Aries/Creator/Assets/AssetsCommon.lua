@@ -176,6 +176,6 @@ function AssetsCommon.OnCreateObject(obj_params)
 			});
 			
 		-- play "RaiseTerrain" animation
-		Map3DSystem.Animation.SendMeMessage({type = Map3DSystem.msg.ANIMATION_Character,obj_params = nil, animationName = "RaiseTerrain",});
+		Map3DSystem.Animation.SendMeMessage({type = Map3DSystem.msg.ANIMATION_Character,obj_params = nil, animationName = "Create",});
 	end		
 end

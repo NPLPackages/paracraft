@@ -39,6 +39,7 @@ Actor:Property({"entityClass", "EntityCodeActor"});
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
 Actor:Property({"playSpeed", 1, "GetPlaySpeed", "SetPlaySpeed", auto=true});
+Actor:Property({"sentientRadius", -1, "GetSentientRadius", "SetSentientRadius", auto=true});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- the itemstack(TimeSeries) is changed
 Actor:Signal("dataSourceChanged");
@@ -998,6 +999,7 @@ local internalValues = {
 	["time"] = {setter = Actor.SetTime, getter = Actor.GetTime, isVariable = true}, 
 	["physicsRadius"] = {setter = Actor.SetPhysicsRadius, getter = Actor.GetPhysicsRadius, isVariable = false}, 
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
+	["sentientRadius"] = {setter = Actor.SetSentientRadius, getter = Actor.GetSentientRadius, isVariable = false}, 
 	["isBlocker"] = {setter = Actor.SetIsBlocker, getter = Actor.GetIsBlocker, isVariable = false}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 

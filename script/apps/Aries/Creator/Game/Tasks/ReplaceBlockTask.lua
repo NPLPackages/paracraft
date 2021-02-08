@@ -67,7 +67,7 @@ function ReplaceBlock:Run()
 				self.blocks[#(self.blocks)+1] = {self.blockX, self.blockY, self.blockZ};
 
 				local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
-				GameLogic.PlayAnimation({animationName = "RaiseTerrain",facingTarget = {x=tx, y=ty, z=tz},});
+				GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 				TaskManager.AddTask(self);
 			end
 		end

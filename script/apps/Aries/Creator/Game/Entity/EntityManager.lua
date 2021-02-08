@@ -643,7 +643,6 @@ function EntityManager.GetRegionContainer(bx,bz)
 	else
 		region = RegionContainer:new():init(x,z);
 		regions[x*128+z] = region;
-		region:LoadFromFile();		
 		return region;
 	end
 end

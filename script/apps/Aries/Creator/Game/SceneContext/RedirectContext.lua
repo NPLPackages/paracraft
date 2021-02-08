@@ -230,7 +230,7 @@ function RedirectContext:mouseReleaseEvent(event)
 		return
 	end
 	if(self.is_click) then
-		local result = Game.SelectionManager:GetPickingResult();
+		local result = self:CheckMousePick();
 		if(event.mouse_button == "left") then
 			self:handleLeftClickScene(event, result)
 		elseif(event.mouse_button == "right") then

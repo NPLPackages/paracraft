@@ -196,6 +196,7 @@ function EditLightTask:handleLeftClickScene(event, result)
 	else
 		EditLightTask.CancelSelection()
 	end
+	event:accept();
 end
 
 function EditLightTask:handleRightClickScene(event, result)
@@ -209,6 +210,7 @@ function EditLightTask:handleRightClickScene(event, result)
 
 		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x, blockY = y, blockZ = z, entityPlayer = EntityManager.GetPlayer(), block_id = 264, side = result.side, from_block_id = result.block_id, side_region=side_region })
 		task:Run();
+		event:accept();
 	end
 end
 
@@ -224,8 +226,10 @@ function EditLightTask:keyPressEvent(event)
 	local dik_key = event.keyname;
 	if(dik_key == "DIK_Z")then
 		UndoManager.Undo();
+		event:accept();
 	elseif(dik_key == "DIK_Y")then
 		UndoManager.Redo();
+		event:accept();
 	end
 	self:GetSceneContext():keyPressEvent(event);
 end

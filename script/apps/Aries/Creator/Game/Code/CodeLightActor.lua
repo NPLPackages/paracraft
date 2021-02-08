@@ -25,6 +25,7 @@ Actor:Property({"entityClass", "EntityCodeActor"});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- frame move interval in milliseconds
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
+Actor:Property({"sentientRadius", -1, "GetSentientRadius", "SetSentientRadius", auto=true});
 Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
 Actor:Property({"playSpeed", 1, "GetPlaySpeed", "SetPlaySpeed", auto=true});
 Actor:Signal("dataSourceChanged");
@@ -567,6 +568,7 @@ local internalValues = {
 	["color"] = {setter = Actor.SetColor, getter = Actor.GetColor, isVariable = false}, 
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
+	["sentientRadius"] = {setter = Actor.SetSentientRadius, getter = Actor.GetSentientRadius, isVariable = false}, 
 	-- tricky: pitch and roll are reversed
 	["pitch"] = {setter = Actor.SetRollDegree, getter = Actor.GetRollDegree, isVariable = false}, 
 	["roll"] = {setter = Actor.SetPitchDegree, getter = Actor.GetPitchDegree, isVariable = false}, 

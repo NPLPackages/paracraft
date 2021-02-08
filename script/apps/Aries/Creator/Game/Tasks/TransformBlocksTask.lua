@@ -45,7 +45,7 @@ function TransformBlocks:Run()
 	if(self.blocks and #(self.blocks) > 0 ) then
 		self.finished = true;
 		
-		GameLogic.PlayAnimation({animationName = "RaiseTerrain",});
+		GameLogic.PlayAnimation({animationName = "Create",});
 
 		local final_blocks = {};
 
