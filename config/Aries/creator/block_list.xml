@@ -258,6 +258,8 @@ uid: unique id used in macro recording
     <block name="dog"/>
     <block name="chicken"/>
     <block name="CodeBlock" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
+    <block name="AgentSignBlock"/>
+    <block name="AgentItem"/>
 	</category>
 	
   <category name="gear" text="机关">

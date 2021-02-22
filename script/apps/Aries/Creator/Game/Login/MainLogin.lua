@@ -170,7 +170,8 @@ function MainLogin:UpdateCoreClient()
 			local gamename = "Paracraft"
 			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
 
-			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在检查版本...', 30000, nil, nil, nil, nil, '_ct', true)
+			-- Removed by LiXizhi: this could take a long time when there is no network, so we just disabled the popup dialog. 
+			--GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在检查版本...', 30000, nil, nil, nil, nil, '_ct', true)
 
 			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
 			updater:check(nil, function(bSucceed)

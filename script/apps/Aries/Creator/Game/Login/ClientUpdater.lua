@@ -56,6 +56,7 @@ function ClientUpdater:GetUpdateConfigFilename()
 	return ParaWorldLoginDocker.GetAppConfigByName(self.appname)
 end
 
+-- copy assets from package at first time
 function ClientUpdater:CopyAssetsToWritablePath()
 	local version = ParaIO.open(ParaIO.GetWritablePath() .. 'apps/haqi/version.txt', "r");
 
@@ -91,9 +92,7 @@ function ClientUpdater:Check(callbackFunc)
 		return
 	end
 
-	if System.os.GetPlatform() == 'android' then
-		self:CopyAssetsToWritablePath()
-	end
+	self:CopyAssetsToWritablePath()
 
 	self.autoUpdater:check(nil, function(bSucceed)
 		if(not callbackFunc) then
@@ -101,57 +100,6 @@ function ClientUpdater:Check(callbackFunc)
 		end
 
 		if(bSucceed) then
-			-- we will not update for mac if software version heighter then remote version
-			if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == "ios" then
-				local function CompareVersion(a, b)
-					-- a < b return -1
-					-- a == b return 0
-					-- a > b return 1
-					-- format error return nil
-					local function GetVersions(versionStr)
-						local result = {};
-						for s in string.gfind(versionStr, "%d+") do
-							table.insert(result, tonumber(s));
-						end
-						return result;
-					end
-				
-					local aVersionList = GetVersions(a);
-					local bVersionList = GetVersions(b);
-				
-					if (#aVersionList < 3 or #bVersionList < 3) then
-						return nil;
-					end
-
-					if (aVersionList[1] < bVersionList[1])then
-						return -1;
-					elseif (aVersionList[1] == bVersionList[1]) then
-						if (aVersionList[2] < bVersionList[2]) then
-							return -1;
-						elseif (aVersionList[2] == bVersionList[2]) then
-							if (aVersionList[3] < bVersionList[3]) then
-								return -1;
-							elseif (aVersionList[3] == bVersionList[3]) then
-								return 0;
-							else
-								return 1;
-							end
-						else
-							return 1;
-						end
-					else
-						return 1;
-					end
-				end
-
-				local compareResult = CompareVersion(self:GetCurrentVersion(), self.autoUpdater:getLatestVersion())
-
-				if (compareResult == 1 or compareResult == 0) then
-					callbackFunc(false, self:GetCurrentVersion());
-					return true
-				end
-			end
-
 			if(self.autoUpdater:isNeedUpdate())then
 				callbackFunc(true, self.autoUpdater:getLatestVersion());
 			else

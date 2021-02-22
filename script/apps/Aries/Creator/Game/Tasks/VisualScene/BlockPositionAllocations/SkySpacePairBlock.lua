@@ -16,7 +16,7 @@ function SkySpacePairBlock:ctor()
     self.start_y = 250;
     self.start_z = 19200;
 
-    self.max_hight = 20;
+    self.max_height = 20;
 
     self.stride = 32;
     self.gap = 1;
@@ -28,21 +28,21 @@ function SkySpacePairBlock:getNextPairPosition()
     
     local index = self.index + 1;
     local plane_size = self.stride * self.stride;
-    local hight = math.floor(index / plane_size );
+    local height = math.floor(index / plane_size );
 
-    if(hight > self.max_hight)then
+    if(height > self.max_height)then
 	    LOG.std(nil, "error", "SkySpacePairBlock:getNextPairPosition failed by index:", index);
         return
     end
     -- start index as 0
-    local row = math.floor((index - (hight * plane_size)) / self.stride);
+    local row = math.floor((index - (height * plane_size)) / self.stride);
     -- start index as 0
     local col = math.mod(index,self.stride);
     
 
     local next_x = self.start_x + col * (1 + self.gap);
     local next_z = self.start_z + row * (2 + self.gap);
-    local next_y = self.start_y + hight  * (1 + self.gap);
+    local next_y = self.start_y + height  * (1 + self.gap);
 
     local block_pos_1 = { next_x, next_y, next_z }
     local block_pos_2 = { next_x, next_y, next_z + 1 }

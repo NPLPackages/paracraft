@@ -44,6 +44,11 @@ function env_imp:registerBroadcastEvent(text, callbackFunc)
 	env_imp.checkyield(self);
 end
 
+-- @param text: any text, like "paracraft.macroplaform.GetIcon"
+function env_imp:registerAgentEvent(text, callbackFunc)
+	self.codeblock:RegisterAgentEvent(text, callbackFunc);
+end
+
 -- broadcast a global message.
 -- @param msg: if nil, default to current actor's name
 function env_imp:broadcast(text, msg)

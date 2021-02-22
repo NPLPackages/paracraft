@@ -133,6 +133,9 @@ local function Aries_load_config(filename)
 	System.options.cur_url = ParaEngine.GetAppCommandLineByParam("cur_url", "");
 	LOG.std(nil, "debug", "cur_url", System.options.cur_url);
 
+	-- make rest http 2 worker threads
+	System.os.options.SetWorkerThreadsCount(2, 2);
+
 	-- External authentication string. 
 	System.options.url = ParaEngine.GetAppCommandLineByParam("url", "");
 	if(System.options.url ~="") then

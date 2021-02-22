@@ -229,7 +229,8 @@ function Macros.WindowKeyPressTrigger(ctrlName, button)
 	end
 end
 
-
-
+function Macros.SetClipboard(text)
+	ParaMisc.CopyTextToClipboard(text);
+end
 
 

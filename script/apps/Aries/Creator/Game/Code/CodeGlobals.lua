@@ -514,7 +514,7 @@ function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 				end;
 			end
 		end
-		event:DispatchEvent({type="msg", msg=msg, onFinishedCallback=onFinishedCallback});
+		return event:DispatchEvent({type="msg", msg=msg, onFinishedCallback=onFinishedCallback});
 	else
 		if(onFinishedCallback) then
 			onFinishedCallback();
@@ -527,7 +527,7 @@ end
 function CodeGlobals:BroadcastTextEventTo(dest, text, msg)
 	local event = self:GetTextEvent(text);
 	if(event) then
-		event:DispatchEvent({type="msg", dest=dest, msg=msg});
+		return event:DispatchEvent({type="msg", dest=dest, msg=msg});
 	end
 end
 

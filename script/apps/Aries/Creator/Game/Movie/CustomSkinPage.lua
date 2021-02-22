@@ -53,7 +53,7 @@ end
 
 function CustomSkinPage.ShowPage(OnClose)
 	currentModelFile = CustomCharItems.defaultModelFile;
-	currentSkin = PlayerAssetFile:GetDefaultCustomGeosets();
+	currentSkin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
 	CustomSkinPage.category_index = 2;
 	CustomSkinPage.model_index = 1;
 	CustomSkinPage.Current_Item_DS = {};
@@ -191,19 +191,7 @@ function CustomSkinPage.UpdateCustomGeosets(index)
 		return;
 	end
 
-	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
-	if (item.geoset) then
-		skinTable.geosets[math.floor(item.geoset/100) + 1] = item.geoset % 100;
-	end
-	if (item.texture) then
-		local id, filename = string.match(item.texture, "(%d+):(.*)");
-		skinTable.textures[tonumber(id)] = filename;
-	end
-	if (item.attachment) then
-		local id, filename = string.match(item.attachment, "(%d+):(.*)");
-		skinTable.attachments[tonumber(id)] = filename;
-	end
-	currentSkin = CustomCharItems:SkinTableToString(skinTable);
+	currentSkin = CustomCharItems:AddItemToSkin(currentSkin, item);
 
 	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id = item.id;
 	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].name= item.name;
@@ -214,8 +202,7 @@ end
 function CustomSkinPage.RemoveSkin(index)
 	local iconItem = CustomSkinPage.Current_Icon_DS[index];
 	if (iconItem and iconItem.id and iconItem.id ~= "") then
-		local item = CustomCharItems:GetItemById(iconItem.id);
-		local skin = CustomCharItems:RemoveItemInSkin(currentSkin, item);
+		local skin = CustomCharItems:RemoveItemInSkin(currentSkin, iconItem.id);
 		if (currentSkin ~= skin) then
 			currentSkin = skin;
 			iconItem.id = "";
@@ -228,7 +215,7 @@ end
 
 function CustomSkinPage.CreateNewActor()
 	local index = #CustomSkinPage.Current_Model_DS+1;
-	local model = {asset = CustomCharItems.defaultModelFile, skin = PlayerAssetFile:GetDefaultCustomGeosets()};
+	local model = {asset = CustomCharItems.defaultModelFile, skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)};
 	keepwork.actors.add({name = guid.uuid(), equipment = model}, function(err, msg, data)
 		if (err == 200) then
 			model.id = data.id;
@@ -243,19 +230,22 @@ end
 function CustomSkinPage.OnClickSave()
 	local model = CustomSkinPage.Current_Model_DS[CustomSkinPage.model_index];
 	if (model) then
-		local equipment = {asset = currentModelFile, skin = currentSkin, alias = model.alias};
-		keepwork.actors.modify({router_params = {id = model.id}, name = model.name, equipment = equipment}, function(err, msg, data)
-			if (err == 200) then
-				model.skin = currentSkin;
-			end
-		end);
+		if (model.skin ~= currentSkin) then
+			local equipment = {asset = currentModelFile, skin = currentSkin, alias = model.alias};
+			keepwork.actors.modify({router_params = {id = model.id}, name = model.name, equipment = equipment}, function(err, msg, data)
+				if (err == 200) then
+					model.skin = currentSkin;
+				end
+			end);
+		end
 	end
 end
 
 function CustomSkinPage.OnClickOK()
+	currentSkin = CustomCharItems:ChangeSkinStringToItems(currentSkin);
+	CustomSkinPage.OnClickSave();
 	GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
 		if(isVip) then
-			currentSkin = CustomCharItems:SkinStringToItemIds(currentSkin);
 			page:CloseWindow();
 		end
 	end)

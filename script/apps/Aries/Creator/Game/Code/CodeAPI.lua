@@ -94,6 +94,7 @@ local s_env_methods = {
 	"registerBlockClickEvent",
 	"registerTickEvent",
 	"registerStopEvent",
+	"registerAgentEvent",
 	"broadcast",
 	"broadcastAndWait",
 	"broadcastTo",

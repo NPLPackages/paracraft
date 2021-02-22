@@ -240,7 +240,7 @@ function env_imp:ask(text, buttons, cb)
 		type_ = "buttons";
 	end
 	
-	local bAsyn = type(cb) == "function";
+	local bAsync = type(cb) == "function";
 
 	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 	local Screen = commonlib.gettable("System.Windows.Screen");
@@ -255,7 +255,7 @@ function env_imp:ask(text, buttons, cb)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 	local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 
-	if bAsyn then
+	if bAsync then
 		-- deprecated: use run() in parallel instead. 
 		if(text or buttons) then
 			
@@ -294,18 +294,18 @@ function env_imp:ask(text, buttons, cb)
 				GameLogic:event(event);
 			end
 		
-			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false});
+			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"});
 		else
 			EnterTextDialog.OnClose();
 			cb();
 		end
 	else
-	
+		
 		if(text or buttons) then
 			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFuncAsync(function(result)
 				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
 				env_imp.resume(self);
-			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false})
+			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"})
 			env_imp.yield(self)
 		else
 			self.co:SetTimeout(0.02, function()

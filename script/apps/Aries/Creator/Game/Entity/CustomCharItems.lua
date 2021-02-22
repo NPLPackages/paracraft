@@ -103,6 +103,9 @@ function CustomCharItems:Init()
 end
 
 function CustomCharItems:GetModelItems(filename, category, skin, avatar)
+	if (not skin:match("^%d+#")) then
+		skin = CustomCharItems:ItemIdsToSkinString(skin);
+	end
 	for type, names in pairs(models) do
 		for _, name in ipairs(names) do
 			if (name == filename) then
@@ -262,29 +265,47 @@ function CustomCharItems:ItemIdsToSkinString(idString)
 	return skin;
 end
 
+function CustomCharItems:ChangeSkinStringToItems(skin)
+	if (skin:match("^%d+#")) then
+		skin = CustomCharItems:SkinStringToItemIds(skin);
+	end
+	return skin;
+end
 
 function CustomCharItems:GetUsedItemsBySkin(skin)
 	local usedItems = {};
 	if (not skin) then return usedItems end;
-	local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
-	if (textures) then
-		for tex in textures:gmatch("([^;]+)") do
-			if (string.find(CustomCharItems.defaultSkinString, tex) == nil) then
-				for _, item in ipairs(items) do
-					if (item.data.texture == tex) then
-						usedItems[#usedItems+1] = {id = item.data.id, name = item.data.category, icon = item.data.icon};
-						break;
+	if (skin:match("^%d+#")) then
+		local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
+		if (textures) then
+			for tex in textures:gmatch("([^;]+)") do
+				if (string.find(CustomCharItems.defaultSkinString, tex) == nil) then
+					for _, item in ipairs(items) do
+						if (item.data.texture == tex) then
+							usedItems[#usedItems+1] = {id = item.data.id, name = item.data.category, icon = item.data.icon};
+							break;
+						end
 					end
 				end
 			end
 		end
-	end
 
-	if (attachments) then
-		for att in attachments:gmatch("([^;]+)") do
-			for _, item in ipairs(items) do
-				if (item.data.attachment == att) then
-					usedItems[#usedItems+1] = {id = item.data.id, name = item.data.category, icon = item.data.icon};
+		if (attachments) then
+			for att in attachments:gmatch("([^;]+)") do
+				for _, item in ipairs(items) do
+					if (item.data.attachment == att) then
+						usedItems[#usedItems+1] = {id = item.data.id, name = item.data.category, icon = item.data.icon};
+					end
+				end
+			end
+		end
+	else
+		local itemIds = commonlib.split(skin, ";");
+		if (itemIds and #itemIds > 0) then
+			for _, id in ipairs(itemIds) do
+				local data = self:GetItemById(id);
+				if (data) then
+					usedItems[#usedItems+1] = {id = id, name = data.category, icon = data.icon};
 				end
 			end
 		end
@@ -309,43 +330,64 @@ function CustomCharItems:AddItemToSkinTable(skinTable, item)
 	end
 end
 
-function CustomCharItems:RemoveItemInSkin(skin, item)
+function CustomCharItems:AddItemToSkin(skin, item)
 	local currentSkin = skin;
-	if (item) then
-		if (item.geoset) then
-			local str = tostring(item.geoset);
-			if (item.geoset < 100) then
-				currentSkin = string.gsub(currentSkin, str.."#", "1#");
-			elseif (item.geoset < 200) then
-			elseif (item.geoset < 300) then
-				currentSkin = string.gsub(currentSkin, str, "201");
-			elseif (item.geoset < 400) then
-				currentSkin = string.gsub(currentSkin, str, "301");
-			elseif (item.geoset < 500) then
-				currentSkin = string.gsub(currentSkin, str, "401");
-			elseif (item.geoset < 600) then
-				currentSkin = string.gsub(currentSkin, str, "501");
-			elseif (item.geoset < 700) then
-			elseif (item.geoset < 800) then
-			elseif (item.geoset < 900) then
-				currentSkin = string.gsub(currentSkin, str, "801");
-			elseif (item.geoset < 1000) then
-				currentSkin = string.gsub(currentSkin, str, "901");
-			else
+	if (skin:match("^%d+#")) then
+		local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
+		CustomCharItems:AddItemToSkinTable(skinTable, item);
+		currentSkin = CustomCharItems:SkinTableToString(skinTable);
+	else
+		if (item and item.id) then
+			currentSkin = currentSkin..item.id..";";
+		end
+	end
+	return currentSkin;
+end
+
+function CustomCharItems:RemoveItemInSkin(skin, itemId)
+	local currentSkin = skin;
+	if (skin:match("^%d+#")) then
+		local item = CustomCharItems:GetItemById(itemId);
+		if (item) then
+			if (item.geoset) then
+				local str = tostring(item.geoset);
+				if (item.geoset < 100) then
+					currentSkin = string.gsub(currentSkin, str.."#", "1#");
+				elseif (item.geoset < 200) then
+				elseif (item.geoset < 300) then
+					currentSkin = string.gsub(currentSkin, str, "201");
+				elseif (item.geoset < 400) then
+					currentSkin = string.gsub(currentSkin, str, "301");
+				elseif (item.geoset < 500) then
+					currentSkin = string.gsub(currentSkin, str, "401");
+				elseif (item.geoset < 600) then
+					currentSkin = string.gsub(currentSkin, str, "501");
+				elseif (item.geoset < 700) then
+				elseif (item.geoset < 800) then
+				elseif (item.geoset < 900) then
+					currentSkin = string.gsub(currentSkin, str, "801");
+				elseif (item.geoset < 1000) then
+					currentSkin = string.gsub(currentSkin, str, "901");
+				else
+				end
+			end
+			if (item.texture) then
+				local id, tex = string.match(item.texture, "(%d+):([^;]+)");
+				id = tonumber(id);
+				currentSkin = string.gsub(currentSkin, tex, CustomCharItems.defaultSkinTable.textures[id]);
+			end
+			if (item.attachment) then
+				local id, tex = string.match(item.attachment, "(%d+):([^;]+)");
+				id = tonumber(id);
+				if (id == 11) then
+					currentSkin = string.gsub(currentSkin, "0#", "1#");
+				end
+				currentSkin = string.gsub(currentSkin, item.attachment..";", "");
 			end
 		end
-		if (item.texture) then
-			local id, tex = string.match(item.texture, "(%d+):([^;]+)");
-			id = tonumber(id);
-			currentSkin = string.gsub(currentSkin, tex, CustomCharItems.defaultSkinTable.textures[id]);
-		end
-		if (item.attachment) then
-			local id, tex = string.match(item.attachment, "(%d+):([^;]+)");
-			id = tonumber(id);
-			if (id == 11) then
-				currentSkin = string.gsub(currentSkin, "0#", "1#");
-			end
-			currentSkin = string.gsub(currentSkin, item.attachment..";", "");
+	else
+		if (itemId) then
+			currentSkin = string.gsub(skin, itemId..";", "", 1);
 		end
 	end
 	return currentSkin;

@@ -210,6 +210,7 @@ end)
 },
 },
 
+
 {
 	type = "registerTickEvent", 
 	message0 = L"每%1帧执行",
@@ -579,6 +580,96 @@ broadcastTo("Alice", "Hello", {text="hello"})
 registerStopEvent(function()
     tip("stopped")
 end)
+]]}},
+},
+
+{
+	type = "registerAgentEvent", 
+	message0 = L"当收到%1智能消息时(%2)",
+	message1 = "%1",
+	arg0 = {
+		{
+			name = "msg",
+			type = "input_value",
+			shadow = { type = "agentEventTypes", value = "TryCreate",},
+			text = "GetIcon", 
+		},
+		{
+			name = "param1",
+			type = "field_input",
+			text = "msg", 
+		},
+	},
+    arg1 = {
+        {
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+    },
+	category = "Events", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "registerAgentEvent",
+	func_description = 'registerAgentEvent(%s, function(%s)\\n%send)',
+    ToPython = function(self)
+		local input = self:getFieldAsString('input')
+		if input == '' then
+			input = 'pass'
+		end
+		return string.format('def registerAgentEvent_func(msg):\n    %s\nregisterAgentEvent("%s", registerAgentEvent_func)\n', input, self:getFieldValue('msg'));
+	end,
+	ToNPL = function(self)
+		return string.format('registerAgentEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+registerAgentEvent("TryCreate", function(msg)
+    setBlock(msg.x, msg.y, msg.z, 62)
+end)
+registerAgentEvent("OnSelect", function(msg)
+    tip("you selected agent item")
+end)
+registerAgentEvent("OnDeSelect", function(msg)
+    tip("you de-selected agent item")
+end)
+registerAgentEvent("GetIcon", function()
+    return "Texture/blocks/items/apple.png"
+end)
+registerAgentEvent("OnClickInHand", function(msg)
+    tip("you clicked me!")
+end)
+]]}},
+},
+
+{
+	type = "agentEventTypes", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_dropdown",
+			options = {
+				{ L"TryCreate", "TryCreate" },
+				{ L"OnSelect", "OnSelect" },
+				{ L"OnDeSelect", "OnDeSelect" },
+				{ L"GetIcon", "GetIcon" },
+				{ L"OnClickInHand", "OnClickInHand" },
+			},
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Events", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '"%s"',
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = false, code = [[
 ]]}},
 },
 

@@ -166,6 +166,21 @@ function TimeSeries:RemoveKeysInTimeRange(fromTime, toTime)
 	end
 end
 
+function TimeSeries:RenameVariable(fromName, toName)
+	if(fromName and toName and fromName~=toName) then
+		if(self.children) then
+			self.children[fromName], self.children[toName] = self.children[toName], self.children[fromName];
+		end
+		if(self.data) then
+			self.data[fromName], self.data[toName] = self.data[toName], self.data[fromName];
+		end
+		local index = self.key_index_map[fromName]
+		self.key_index_map[toName] = index;
+		self.key_index_map[fromName] = nil;
+		self.key_array[index] = toName;
+	end
+end
+
 -- add a new variable to the time series. It there is an existing variable, the old one will be replaced. 
 -- @param params: {name="", type="Linear"|"Discrete"}. It is actually passed to the new function of AnimBlock. More info see AnimBlock. 
 function TimeSeries:CreateVariable(params)

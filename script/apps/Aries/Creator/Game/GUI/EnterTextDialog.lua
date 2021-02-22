@@ -55,8 +55,12 @@ end
 -- @param options: only used when type is "select" or "buttons". 
 -- when type_ is "select": it is {{value="0", text="zero"},{value="1"}}
 -- when type_ is "buttons": it is {"text1", "text2", "text3"}, result is button Index 
--- @param showParams: nil or {align="_ct", x, y, width, height, isTopLevel=false}
+-- @param showParams: nil or {align="_ct", x, y, width, height, isTopLevel=false, url=customPageUrl}
 function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, showParams)
+	if(page) then
+		EnterTextDialog.OnClose();
+	end
+
 	EnterTextDialog.result = nil;
 	EnterTextDialog.text = text;
 	if(type_ == true) then
@@ -72,7 +76,7 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 	EnterTextDialog.options = options;
 	showParams = showParams or {};
 	local params = {
-		url = "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
+		url = showParams.url or "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
 		name = "EnterTextDialog.ShowPage", 
 		isShowTitleBar = false,
 		DestroyOnClose = true,

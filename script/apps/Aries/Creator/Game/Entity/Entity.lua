@@ -2159,6 +2159,20 @@ function Entity:PickItem(itemStack, fromBlockX, fromBlockY, fromBlockZ)
 	end
 end
 
+function Entity:SetBagSize(size)
+	if(not size or size == 0) then
+		self.inventory = nil;
+		self.inventoryView = nil;
+	else
+		if(not self.inventory) then
+			self.inventory = InventoryBase:new():Init(size);
+			self.inventory:SetClient();
+		else
+			self.inventory:SetSlotCount(size);
+		end
+	end
+end
+
 -- create the rule bag if not exist. 
 -- @param size: if nil or 0, it will destory the rule bag. otherwise it will resize the rule bag
 function Entity:SetRuleBagSize(size)

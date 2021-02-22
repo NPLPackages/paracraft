@@ -202,10 +202,10 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 		end
 	end
 
+	charater:RemoveAttachment(2, 2);
+	charater:RemoveAttachment(11, 11);
+	charater:RemoveAttachment(15, 15);
 	if (attachments) then
-		charater:RemoveAttachment(1, 1);
-		charater:RemoveAttachment(11, 11);
-		charater:RemoveAttachment(15, 15);
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
 			if (use_hair and id == 11) then

@@ -376,24 +376,6 @@ function Entity:SetSkin(skin)
 	end
 end
 
-function Entity:CheckAndRemoveAttachment(player)
-	local player = player or self:GetInnerObject();
-	if (player) then
-		if (PlayerAssetFile:HasCustomGeosets(self:GetMainAssetPath())) then
-			local skin = self:GetSkin();
-			local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
-			local charater = player:ToCharacter();
-
-			if (attachments) then
-				for id, filename in attachments:gmatch("(%d+):([^;]+)") do
-					id = tonumber(id);
-					charater:RemoveAttachment(id);
-				end
-			end
-		end
-	end
-end
-
 -- refresh the client's model according to current inventory settings, such as 
 -- armor and hand tool. 
 function Entity:RefreshClientModel(bForceRefresh, playerObj)

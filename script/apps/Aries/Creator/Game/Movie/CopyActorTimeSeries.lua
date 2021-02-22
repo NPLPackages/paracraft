@@ -176,7 +176,8 @@ end
 
 -- @param varNames: array of var names to copy
 -- @param isRelativePos: whether to use relative positioning
-function CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, isRelativePos)
+-- @param selectionOnly: whether to copy selected bones only. 
+function CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, isRelativePos, selectionOnly)
 	if(actor) then
 		local itemStack = actor:GetItemStack();
 		local v = {};
@@ -188,6 +189,19 @@ function CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTi
 				if(ts) then
 					if(ts.SaveToTable) then
 						var = ts:SaveToTable();
+						-- only copy selected bone variables
+						if(selectionOnly and var and name == "bones") then
+							local boneVar = actor:GetBonesVariable():GetSelectedBone();
+							if(boneVar) then
+								local varsSelected = {isContainer = true}
+								for name, value in pairs(var) do
+									if(boneVar:GetVarByName(name)) then
+										varsSelected[name] = value
+									end
+								end
+								var = varsSelected;
+							end
+						end
 					end
 				else
 					local varMulti = actor:GetEditableVariableByName(name);
@@ -366,6 +380,44 @@ function CopyActorTimeSeries.PasteToActor(actor, destVar, pasteFromTime)
 			local ts = TimeSeries:new();
 			ts:LoadFromTable(obj.data);
 
+			-- check if we are pasting on to the selected bone. 
+			if(destVar and destVar.name == "bones") then
+				if(destVar:GetSelectedBone()) then
+					local tsBones = ts:GetChild("bones");
+					if(tsBones) then
+						if(tsBones:GetVariableCount() <= 3) then
+							local selectedBone = destVar:GetSelectedBone()
+							local lastBoneBaseName;
+							for i=1, tsBones:GetVariableCount() do
+								local boneName = tsBones:GetVariableName(i)
+								local boneBaseName;
+								boneBaseName = boneBaseName or boneName:match("^(.+)_rot$")
+								boneBaseName = boneBaseName or boneName:match("^(.+)_trans$")
+								boneBaseName = boneBaseName or boneName:match("^(.+)_scale$")
+								if( (boneBaseName or lastBoneBaseName) ~= boneBaseName) then
+									lastBoneBaseName = nil;
+									break;
+								end
+								lastBoneBaseName = boneBaseName;
+							end
+							if(lastBoneBaseName) then
+								-- tricky: we will rename the clipboard bone name to the selected bone names
+								for i=1, tsBones:GetVariableCount() do
+									local boneName = tsBones:GetVariableName(i)
+									if(boneName:match("^(.+)_rot$")) then
+										tsBones:RenameVariable(boneName, selectedBone:GetRotName())
+									elseif(boneName:match("^(.+)_trans$")) then
+										tsBones:RenameVariable(boneName, selectedBone:GetTransName())
+									elseif(boneName:match("^(.+)_scale$")) then
+										tsBones:RenameVariable(boneName, selectedBone:GetScaleName())
+									end
+								end	
+							end
+						end
+					end
+				end
+			end
+
 			if(obj.isRelativePos and obj.bx and actor:GetMovieClipEntity()) then
 				local bx, by, bz = actor:GetMovieClipEntity():GetBlockPos()
 				local offset_x, offset_y, offset_z = BlockEngine:real_min(bx - obj.bx), BlockEngine:real_min(by - obj.by), BlockEngine:real_min(bz - obj.bz);
@@ -426,7 +478,7 @@ end
 function CopyActorTimeSeries.CopyVarInRangeStarted(var, actor, fromTime, toTime)
 	local varNames = {};
 	varNames[#varNames+1] = var.name;
-	return CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime)
+	return CopyActorTimeSeries.CopyActorTimeSeries(actor, varNames, fromTime, toTime, nil, true)
 end
 
 function CopyActorTimeSeries.PasteVarInRangeStarted(var, actor, fromTime)

@@ -805,7 +805,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	NeuronManager.SaveToFile(bSaveToLastSaveFolder);
 	EntityManager.SaveToFile(bSaveToLastSaveFolder==true);
 	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
-	DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.UpdataWorld)
+	-- DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.UpdataWorld)
 
 	ModManager:OnWorldSave();
 	GameLogic.world_revision:UpdateWorldFileSize();

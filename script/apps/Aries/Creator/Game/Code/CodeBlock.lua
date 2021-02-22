@@ -918,6 +918,36 @@ function CodeBlock:RegisterTickEvent(ticks, callbackFunc)
 	return event;
 end
 
+function CodeBlock:RegisterAgentEvent(text, callbackFunc)
+	-- tricky: since we need to return value immediately, like GetIcon, we will disable auto wait feature in agent callback functions.
+	self:SetAutoWait(false);
+
+	if(self.entityCode) then
+		local filename = self.entityCode:GetFilename();
+		if(filename and filename ~= "") then
+			text = format("%s.%s", filename, text);
+		end
+	end
+
+	local event = self:CreateEvent("onAgent"..text);
+	if(not event) then
+		return
+	end
+	event:SetIsFireForAllActors(false);
+	event:SetFunction(callbackFunc);
+	local function onEvent_(_, msg)
+		return event:Fire(msg and msg.msg, msg and msg.onFinishedCallback, true);
+	end
+	
+	event.UnRegisterTextEvent = function()
+		GameLogic.GetCodeGlobal():UnregisterTextEvent(text, onEvent_);
+	end
+	
+	event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
+	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
+	return event;
+end
+
 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	local event = self:CreateEvent("onText"..text);
@@ -931,12 +961,11 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 			for i, actor in ipairs(self:GetActors()) do
 				if(msg.dest == actor:GetName()) then
 					-- only activate the first matching actor
-					event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback);
-					break;
+					return event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback);
 				end
 			end
 		else
-			event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+			return event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
 		end
 	end
 	
