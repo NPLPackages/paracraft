@@ -459,6 +459,7 @@ end
 
 function MsgCenter.ChangeMsgState()
 	if #MsgStateList == 0 then
+		DockPage.HandMsgCenterMsgData()
 		return
 	end
 	keepwork.msgcenter.status({

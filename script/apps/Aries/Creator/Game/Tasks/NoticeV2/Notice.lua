@@ -41,7 +41,7 @@ function Notice.GetPageData(data)
                 if a.priority < b.priority then
                     return true;
                 elseif a.priority == b.priority then
-                    if Notice.GetTimeStamp(a.createdAt) < Notice.GetTimeStamp(b.createdAt) then
+                    if commonlib.timehelp.GetTimeStampByDateTime(a.createdAt) < commonlib.timehelp.GetTimeStampByDateTime(b.createdAt) then
                         return true;
                     end
                     return false;
@@ -80,14 +80,6 @@ function Notice.GetPageData(data)
     end
     --commonlib.echo(Notice.tblNoticeDt,true)
     --commonlib.echo(data,true)
-end
-
-function Notice.GetTimeStamp(strTime)
-    strTime = strTime or "";
-    local year, month, day, hour, min, sec = strTime:match("^(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)"); 
-    local time_stamp = os.time({day=tonumber(day), month=tonumber(month), year=tonumber(year), hour=tonumber(hour) + 8}); -- 这个时间是带时区的 要加8小时
-    time_stamp = time_stamp + min * 60 + sec;
-    return time_stamp;
 end
 
 function Notice.Show(nType)
@@ -185,14 +177,14 @@ function Notice.OnImageBgClick(data)
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
         return
     end
-    if string.find(name, "冬令营活动") and string.find(name, "冬令营活动") > 0 then
+    if string.find(name, "冬令营") and string.find(name, "冬令营") > 0 then
         Notice.CloseView()
         local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
         local world_id = WorldCommon.GetWorldTag("kpProjectId");  
         local campId = campIds[httpwrapper_version]
         if tonumber(world_id) ~= campId then
             GameLogic.RunCommand(string.format("/loadworld -force -s %d", campId));
-            GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'go_to_camp' });
+            GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'go_to_camp' });
         end        
         return
     end
@@ -218,14 +210,14 @@ function Notice.OnImageBgClick(data)
     end
     if string.find(name, "实名认证奖励") and string.find(name, "实名认证奖励") > 0 then
         Notice.CloseView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'realname' });
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'realname' });
         if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
             GameLogic.GetFilters():apply_filters(
                 'show_certificate',
                 function(result)
                     if (result) then
                         local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
-                        DockPage.page:Refresh(0.01)
+                        DockPage.RefreshPage(0.01)
                         GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
                     end
                 end)
@@ -238,7 +230,7 @@ function Notice.OnImageBgClick(data)
     local url = data.url;
     if(url and #url ~= 0 and Notice.IsValidUrl(url)) then 
         ParaGlobal.ShellExecute("open",url, "","", 1);
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement" ,{ from='board6', fromName = 'act_url_'..url});
     else
         return 
     end    

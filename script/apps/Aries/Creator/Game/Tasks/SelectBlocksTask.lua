@@ -20,6 +20,7 @@ NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/math/ShapeAABB.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformWnd.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local TransformWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.TransformWnd");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -1323,7 +1324,7 @@ function SelectBlocks.TransformSelection(trans)
 		local self = cur_instance;
 		local mExtents = cur_instance.aabb.mExtents;
 
-		local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
+		local shift_pressed = Keyboard:IsShiftKeyPressed()
 		if(trans.method == "extrude" or shift_pressed) then
 			-- if shift is pressed, we will extrude	
 			SelectBlocks.ExtrudeSelection(trans.dx, trans.dy, trans.dz);

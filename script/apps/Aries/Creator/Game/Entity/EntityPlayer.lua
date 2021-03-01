@@ -22,6 +22,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerHeadController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovable.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local PlayerHeadController = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerHeadController");
@@ -510,6 +512,8 @@ function Entity:MoveEntity(deltaTime)
 	end
 	deltaTime = math.min(0.3, deltaTime);
 	self:CheckCollision(deltaTime);
+	local player = self:GetInnerObject();
+	PlayerAssetFile:ShowWingAttachment(player, self:GetSkinId(), GameLogic.GetPlayerController():IsInAir());
 end
 
 -- called every framemove by the ridden entity, instead of framemove.
@@ -780,7 +784,7 @@ function Entity:ToggleFly(bFly)
 		
 		player:SetField("CanFly",true);
 		player:SetField("AlwaysFlying",true);
-		player:ToCharacter():SetSpeedScale(GameLogic.options.FlySpeedScale * (self.speedscale or 1));
+		player:ToCharacter():SetSpeedScale(self:GetCurrentSpeedScale());
 		--tricky: this prevent switching back to walking immediately
 		player:SetField("VerticalSpeed", self:GetSpeedScale());
 
@@ -860,6 +864,11 @@ function Entity:GetCurrentSpeedScale()
 	local speed;
 	if(self:IsFlying()) then
 		speed = GameLogic.options.FlySpeedScale;
+		if (System.User.isVip) then
+			speed = speed * 1.2;
+		else
+			speed = speed * 0.8;
+		end
 	elseif(GameLogic.IsRunning) then
 		speed = GameLogic.options.RunSpeedScale;
 	else

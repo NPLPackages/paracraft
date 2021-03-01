@@ -174,8 +174,10 @@ end
 function ParaWorldMinimapWnd.OnClickEnableSound()
 	if (ParaAudio.GetVolume()>0) then
 		ParaAudio.SetVolume(0);
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.enable_sound", {enable = false});
 	else
 		ParaAudio.SetVolume(1);
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.enable_sound", {enable = true});
 	end
 	if (pageWnd) then
 		pageWnd:Refresh(0);
@@ -185,4 +187,5 @@ end
 function ParaWorldMinimapWnd.OnClickEvnTime()
 	local ParaWorldEnvTime = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldEnvTime.lua");
 	ParaWorldEnvTime.ShowPage();
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.env_time");
 end

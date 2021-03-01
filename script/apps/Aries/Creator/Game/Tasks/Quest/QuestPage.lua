@@ -322,10 +322,10 @@ end
 
 function QuestPage.UpdataWorld()
 	if(mouse_button == "right") then
+		GameLogic.GetFilters():apply_filters('show_console_page')
+	else
 		-- the new version
 		GameLogic.GetFilters():apply_filters('show_create_page')
-	else
-		GameLogic.GetFilters():apply_filters('show_console_page')
 	end
 end
 
@@ -631,7 +631,7 @@ function QuestPage.GetReward(task_id)
 			quest_data.questItemContainer:DoFinish()
 		end
 		-- local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
-		-- DockPage.page:Refresh(0.01)
+		-- DockPage.RefreshPage(0.01)
 	end
 
 	-- local quest_data = QuestPage.GetQuestData(task_id)

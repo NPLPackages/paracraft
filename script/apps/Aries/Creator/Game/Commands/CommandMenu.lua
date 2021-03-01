@@ -142,6 +142,8 @@ Commands["menu"] = {
 			local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
 			local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 			task:Run();
+		elseif(name == "window.explore") then
+			GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
 		elseif(name == "window.changeskin") then
 			--[[
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");
@@ -184,6 +186,9 @@ Commands["menu"] = {
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/videoguide");
 		elseif(name == "help.learn") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/s");
+		elseif(name == "help.dailycheck") then
+			local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+			ParacraftLearningRoomDailyPage.DoCheckin();
 		elseif(name == "help.ask") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then

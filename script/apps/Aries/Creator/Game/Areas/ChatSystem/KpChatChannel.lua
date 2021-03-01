@@ -21,6 +21,7 @@ end);
 http://yapi.kp-para.cn/project/60/interface/api/1952
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatHelper.lua");
@@ -37,12 +38,17 @@ local KpChatChannel = NPL.export();
 KpChatChannel.worldId_pending = nil;
 KpChatChannel.worldId = nil;
 KpChatChannel.client = nil;
+KpChatChannel.try_connect_cnt = 0;
+KpChatChannel.try_connect_max_cnt = 5;
+KpChatChannel.try_connect_waiting_seconds = 0;
+KpChatChannel.try_connect_waiting_max_seconds = 15;
 
 function KpChatChannel.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
     end
 	LOG.std("", "info", "KpChatChannel", "StaticInit");
+    KpChatChannel.try_connect_cnt = 0;
 
 	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
 
@@ -57,20 +63,13 @@ function KpChatChannel.OnWorldLoaded()
 	LOG.std(nil, "info", "KpChatChannel", "OnWorldLoaded: %s",tostring(id));
     TipRoadManager:Clear();
     if(id)then
-        id = tonumber(id);
-        KpChatChannel.worldId_pending = id;
-        -- connect chat channel
-        KpChatChannel.OnKeepWorkLogin_Callback();
+        KpChatChannel.TryToConnect();
     else
         KpChatChannel.Clear();
     end
 end
 function KpChatChannel.OnKeepWorkLogin_Callback()
-    if(KpChatChannel.worldId_pending)then
-        KpChatChannel.Connect(nil,nil,function()
-            KpChatChannel.JoinWorld(KpChatChannel.worldId_pending);
-        end);
-    end        
+    KpChatChannel.TryToConnect();
 end
 function KpChatChannel.OnKeepWorkLogout_Callback()
     KpChatChannel.LeaveWorld(KpChatChannel.worldId_pending);
@@ -106,8 +105,8 @@ function KpChatChannel.GetRoom()
         return room
     end
 end
+
 function KpChatChannel.Connect(url,options,onopen_callback)
-    
     if(not KeepWorkItemManager.GetToken())then
         return
     end
@@ -126,6 +125,60 @@ function KpChatChannel.Connect(url,options,onopen_callback)
     end
     KpChatChannel.client:Connect(url,nil,{ token = KeepWorkItemManager.GetToken(), });
 end
+function KpChatChannel.ClearReconnectAction()
+    KpChatChannel.try_connect_waiting_seconds = 0;
+    KpChatChannel.try_connect_cnt = 0;
+    if(KpChatChannel.reconnect_timer)then
+        KpChatChannel.reconnect_timer:Change();
+    end
+end
+function KpChatChannel.TryToConnect()
+    if(not KpChatChannel.reconnect_timer)then
+        KpChatChannel.reconnect_timer = commonlib.Timer:new({callbackFunc = function(timer)
+            if(KpChatChannel.IsConnected())then
+                KpChatChannel.ClearReconnectAction();
+                return
+            end
+            KpChatChannel.try_connect_waiting_seconds = KpChatChannel.try_connect_waiting_seconds + 1;
+            if(KpChatChannel.try_connect_waiting_seconds > KpChatChannel.try_connect_waiting_max_seconds)then
+                if(KpChatChannel.try_connect_cnt > KpChatChannel.try_connect_max_cnt)then
+                    KpChatChannel.ClearReconnectAction();
+                    return
+                end
+                KpChatChannel.try_connect_waiting_seconds = 0;
+                KpChatChannel.ReConnect();
+            end
+            if(KpChatChannel.try_connect_cnt > KpChatChannel.try_connect_max_cnt)then
+                KpChatChannel.ClearReconnectAction();
+                return
+            end
+            LOG.std("", "info", "KpChatChannel", "waiting: %d/%d, try cnt: %d/%d",KpChatChannel.try_connect_waiting_seconds, KpChatChannel.try_connect_waiting_max_seconds, KpChatChannel.try_connect_cnt, KpChatChannel.try_connect_max_cnt);
+        end})
+    end
+    KpChatChannel.try_connect_waiting_seconds = 0;
+    KpChatChannel.try_connect_cnt = 0;
+    KpChatChannel.ReConnect();
+    KpChatChannel.reconnect_timer:Change(0, 1000);
+end
+function KpChatChannel.ReConnect()
+    KpChatChannel.try_connect_cnt = KpChatChannel.try_connect_cnt + 1;
+    if(KpChatChannel.try_connect_cnt > KpChatChannel.try_connect_max_cnt)then
+        return
+    end
+    local id = WorldCommon.GetWorldTag("kpProjectId");
+    if(id)then
+        id = tonumber(id);
+        KpChatChannel.worldId_pending = id;
+        LOG.std("", "info", "KpChatChannel", "try to connect: %d/%d",KpChatChannel.try_connect_cnt, KpChatChannel.try_connect_max_cnt);
+        if(KpChatChannel.worldId_pending)then
+            KpChatChannel.Connect(nil,nil,function()
+                KpChatChannel.ClearReconnectAction();
+                KpChatChannel.JoinWorld(KpChatChannel.worldId_pending);
+            end);
+        end     
+    end
+	
+end
 function KpChatChannel.OnOpen(self)
 	local userId = KpChatChannel.GetUserId();
 	LOG.std("", "info", "KpChatChannel", "OnOpen userId:%s", tostring(userId));
@@ -137,8 +190,13 @@ function KpChatChannel.OnOpen(self)
     TipRoadManager:CreateRoads();
     
 end
-function KpChatChannel.OnClose(self)
-	LOG.std("", "info", "KpChatChannel", "OnClose");
+function KpChatChannel.OnClose(self, msg)
+    msg = msg or {};
+	LOG.std("", "info", "KpChatChannel", "Connection is closed, from = %s", msg.from);
+    if(msg.from == "ping")then
+        KpChatChannel.TryToConnect();
+        return
+    end
     KpChatChannel.Clear();
 end
 -- erase date if timestamp is in same day

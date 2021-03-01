@@ -79,7 +79,7 @@ function Entity:GetDisplayName()
 end
 
 function Entity:Refresh()
-	local hasText = self.cmd and self.cmd~=""
+	local hasText = self:GetDisplayName() ~= ""
 	if(hasText and not self.wasDeleted) then
 		-- only create C++ object when cmd is not empty
 		if(not self.obj) then
@@ -122,6 +122,7 @@ function Entity:Refresh()
 				end
 			else
 				self:SetHeadOnDisplay(nil)
+				text = self:GetDisplayName() or text;
 				Text3DDisplay.ShowText3DDisplay(true, obj, text, self.text_color, self.text_offset, -1.57);
 			end
 		else

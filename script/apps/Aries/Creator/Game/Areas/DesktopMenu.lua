@@ -79,6 +79,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		]]
 		{text = L"窗口", order=6, mode="edit", name = "window",children = 
 			{
+				{text = L"探索...",name = "window.explore", onclick=nil},
 				--{text = L"角色换装...",name = "window.changeskin", onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
 				{text = L"资源...",name = "window.mall",onclick=nil},
@@ -100,6 +101,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"新手引导",name = "help.userintroduction", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"学习资源",name = "help.learn", onclick=nil},
+				{text = L"成长日记...",name = "help.dailycheck", onclick=nil},
 				{text = L"提问",name = "help.ask", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},

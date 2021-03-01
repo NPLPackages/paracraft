@@ -114,6 +114,10 @@
   <asset filename="character/CC/artwar/game/red_soldier.x" displayname="小兵_红方" name="hong_xiaobing"/>
   <asset filename="character/CC/artwar/game/blue_archer.x" displayname="弓兵_蓝方" name="lan_gongbing"/>
   <asset filename="character/CC/artwar/game/blue_soldier.x" displayname="小兵_蓝方" name="lan_xiaobing"/>
+
+  <asset filename="character/CC/artwar/game/Blue_Army_gun.x" displayname="敌军士兵_持枪" name="Blue_Army_gun"/>
+  <asset filename="character/CC/artwar/game/Red_Army_gun.x" displayname="红军士兵_持枪" name="Red_Army_gun"/>
+  <asset filename="character/CC/artwar/game/Red_Army_knife.x" displayname="红军士兵_持刀" name="Red_Army_knife"/>
   -->
   <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia"/>
   <!-- 9-27更新 -->
@@ -156,7 +160,13 @@
   <asset filename="character/CC/artwar/movie/bio_man.x" displayname="防疫员" name="bio_man"/> 
   <asset filename="character/CC/artwar/movie/nurse.x" displayname="护士" name="nurse"/> 
   <asset filename="character/CC/artwar/movie/doctor.x" displayname="医生" name="doctor"/> 
-
+<!--   2-24更新 -->  
+  <asset filename="character/CC/artwar/movie/Blue_Army_boss.x" displayname="敌军长官" name="Blue_Army_boss"/> 
+  <asset filename="character/CC/artwar/movie/Red_Army_boss.x" displayname="红军长官" name="Red_Army_boss"/> 
+  <asset filename="character/CC/artwar/movie/Blue_Army_xiaobing.x" displayname="敌军士兵" name="Blue_Army_xiaobing"/> 
+  <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing"/> 
+<!--   <asset filename="character/CC/artwar/movie/pufuqianjin_Blue_Army.x" displayname="匍匐敌军" name="pufuqianjin_Blue_Army"/> 
+  <asset filename="character/CC/artwar/movie/pufuqianjin_Red_Army.x" displayname="匍匐红军" name="pufuqianjin_Red_Army"/>  -->
 
 <!--   <asset filename="character/CC/artwar/movie/boy_air_force.x" displayname="男空军" name="boy_air_force"/> 
   <asset filename="character/CC/artwar/movie/girl_air_force.x" displayname="女空军" name="girl_air_force"/> 
@@ -1075,6 +1085,13 @@
   <asset filename="character/CC/artwar/furnitures/food2.x" displayname="食物2" name="food2"/>
   <asset filename="character/CC/artwar/furnitures/food3.x" displayname="食物3" name="food3"/>
   <asset filename="character/CC/artwar/furnitures/temperature_measuring_gun.x" displayname="测温枪" name="temperature_measuring_gun"/>
+  <asset filename="character/CC/artwar/furnitures/machine_gun.x" displayname="机枪" name="machine_gun"/>
+  <asset filename="character/CC/artwar/furnitures/Machete.x" displayname="大砍刀" name="Machete"/>
+  <asset filename="character/CC/artwar/furnitures/gun.x" displayname="冲锋枪" name="gun"/>  
+  <asset filename="character/CC/artwar/furnitures/Sandbags_1.x" displayname="沙袋1" name="Sandbags_1"/>
+  <asset filename="character/CC/artwar/furnitures/Sandbags_2.x" displayname="沙袋2" name="Sandbags_2"/>
+  <asset filename="character/CC/artwar/furnitures/Sandbags_3.x" displayname="沙袋3" name="Sandbags_3"/>
+  <asset filename="character/CC/artwar/furnitures/ammunition_chest.x" displayname="弹药箱" name="ammunition_chest"/>
 
 
 </category>

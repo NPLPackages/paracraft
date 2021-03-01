@@ -54,6 +54,7 @@ function EditEntityPage.GetItemName()
 	else
 		name = name..":"..(type_name or "");
 	end
+	name = name:gsub("[\r\n].*", "");
 	name = commonlib.Encoding.EncodeHTMLInnerText(name:sub(1,50));
 	return name;
 end

@@ -526,7 +526,6 @@ function MainLogin:ShowLoginModePage()
 	self:AutoAdjustUIScalingForTouchDevice(function()
 		self:CheckShowTouchVirtualKeyboard();
 	end);
-	
 
 	if(System.options.cmdline_world and System.options.cmdline_world~="") then
 		System.options.loginmode = "local";
@@ -555,7 +554,7 @@ function MainLogin:ShowLoginModePage()
 		options:SetSchoolMode();
 	end
 
-	if(GameLogic.GetFilters():apply_filters("ShowLoginModePage", {})) then
+	if(GameLogic.GetFilters():apply_filters("cellar.main_login.show_login_mode_page", {})) then
 		System.App.Commands.Call("File.MCMLWindowFrame", {
 			url = "script/apps/Aries/Creator/Game/Login/SelectLoginModePage.html", 
 			name = "ShowLoginModePage", 

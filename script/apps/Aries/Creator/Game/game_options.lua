@@ -336,6 +336,7 @@ function options:OnLoadWorld()
 	self:EnableAsyncAssetLoader(true);
 	-- refresh sky
 	GameLogic.GetSkyEntity():Refresh();
+	self.remoteFolderName = nil;
 
 	if(System.options.mc) then
 		local mainAssetFilename = self:GetMainPlayerAssetName();
@@ -1271,3 +1272,17 @@ function options:SetWorldOption(option, bValue)
 	end
 	WorldCommon.SetWorldTag(option, bValue);
 end
+
+-- such as "[username]/[worldname]/"
+function options:GetRemoteWorldFolder()
+	if(not self.remoteFolderName) then
+		local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+		if(currentEnterWorld and currentEnterWorld.user) then
+			self.remoteFolderName = format("%s/%s/", currentEnterWorld.user.username, currentEnterWorld.foldername);
+		else
+			self.remoteFolderName = "/";
+		end
+	end
+	return self.remoteFolderName;
+end
+

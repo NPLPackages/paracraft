@@ -541,34 +541,34 @@
 		<item id="86015" icon="Texture/Aries/Item/1737_ColiseumStormBackS1.png" name="背部15"/>
 		<item id="86016" icon="Texture/Aries/Item/1738_ColiseumDeathBackS1.png" name="背部16"/>
 		<item id="86017" icon="Texture/Aries/Item/1739_ColiseumLifeBackS1.png" name="背部17"/>
-		<item id="86010" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" name="背部10"/>
-		<item id="86011" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" name="背部11"/>
-		<item id="86027" icon="Texture/Aries/Item/2045_ShopSpringCombatBackGirl.png" name="背部27"/>
-		<item id="86028" icon="Texture/Aries/Item/2049_ShopSpringCombatBackBoy.png" name="背部28"/>
+		<item id="86010" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" name="背部10" wing="true"/>
+		<item id="86011" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" name="背部11" wing="true"/>
+		<item id="86027" icon="Texture/Aries/Item/2045_ShopSpringCombatBackGirl.png" name="背部27" wing="true"/>
+		<item id="86028" icon="Texture/Aries/Item/2049_ShopSpringCombatBackBoy.png" name="背部28" wing="true"/>
 
-		<item id="86001" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" name="背部1"/>
-		<item id="86002" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" name="背部2"/>
-		<item id="86003" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="背部3"/>
-		<item id="86004" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="背部4"/>
-		<item id="86005" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="背部5"/>
-		<item id="86006" icon="Texture/Aries/Item/1482_ShiningBack.png" name="背部6"/>
-		<item id="86012" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="背部12"/>
-		<item id="86020" icon="Texture/Aries/Item/1812_AngelWings.png" name="背部20"/>
-		<item id="86021" icon="Texture/Aries/Item/1820_IceBackS2.png" name="背部21"/>
-		<item id="86022" icon="Texture/Aries/Item/1832_FireBackS2.png" name="背部22"/>
-		<item id="86023" icon="Texture/Aries/Item/1839_StormBackS2.png" name="背部23"/>
-		<item id="86024" icon="Texture/Aries/Item/1844_LifeBackS2.png" name="背部24"/>
-		<item id="86025" icon="Texture/Aries/Item/1851_DeathBackS2.png" name="背部25"/>
-		<item id="86029" icon="Texture/Aries/Item/2076_FireBackS3.png" name="背部29"/>
-		<item id="86030" icon="Texture/Aries/Item/2083_IceBackS3.png" name="背部30"/>
-		<item id="86031" icon="Texture/Aries/Item/2090_StormBackS3.png" name="背部31"/>
-		<item id="86032" icon="Texture/Aries/Item/2097_LifeBackS3.png" name="背部32"/>
-		<item id="86033" icon="Texture/Aries/Item/2104_DeathBackS3.png" name="背部33"/>
-		<item id="86034" icon="Texture/Aries/Item/2235_FireBackS4.png" name="背部34"/>
-		<item id="86035" icon="Texture/Aries/Item/2242_IceBackS4.png" name="背部35"/>
-		<item id="86036" icon="Texture/Aries/Item/2249_StormBackS4.png" name="背部36"/>
-		<item id="86037" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="背部37"/>
-		<item id="86038" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="背部38"/>
+		<item id="86001" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" name="背部1" wing="true"/>
+		<item id="86002" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" name="背部2" wing="true"/>
+		<item id="86003" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="背部3" wing="true"/>
+		<item id="86004" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="背部4" wing="true"/>
+		<item id="86005" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="背部5" wing="true"/>
+		<item id="86006" icon="Texture/Aries/Item/1482_ShiningBack.png" name="背部6" wing="true"/>
+		<item id="86012" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="背部12" wing="true"/>
+		<item id="86020" icon="Texture/Aries/Item/1812_AngelWings.png" name="背部20" wing="true"/>
+		<item id="86021" icon="Texture/Aries/Item/1820_IceBackS2.png" name="背部21" wing="true"/>
+		<item id="86022" icon="Texture/Aries/Item/1832_FireBackS2.png" name="背部22" wing="true"/>
+		<item id="86023" icon="Texture/Aries/Item/1839_StormBackS2.png" name="背部23" wing="true"/>
+		<item id="86024" icon="Texture/Aries/Item/1844_LifeBackS2.png" name="背部24" wing="true"/>
+		<item id="86025" icon="Texture/Aries/Item/1851_DeathBackS2.png" name="背部25" wing="true"/>
+		<item id="86029" icon="Texture/Aries/Item/2076_FireBackS3.png" name="背部29" wing="true"/>
+		<item id="86030" icon="Texture/Aries/Item/2083_IceBackS3.png" name="背部30" wing="true"/>
+		<item id="86031" icon="Texture/Aries/Item/2090_StormBackS3.png" name="背部31" wing="true"/>
+		<item id="86032" icon="Texture/Aries/Item/2097_LifeBackS3.png" name="背部32" wing="true"/>
+		<item id="86033" icon="Texture/Aries/Item/2104_DeathBackS3.png" name="背部33" wing="true"/>
+		<item id="86034" icon="Texture/Aries/Item/2235_FireBackS4.png" name="背部34" wing="true"/>
+		<item id="86035" icon="Texture/Aries/Item/2242_IceBackS4.png" name="背部35" wing="true"/>
+		<item id="86036" icon="Texture/Aries/Item/2249_StormBackS4.png" name="背部36" wing="true"/>
+		<item id="86037" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="背部37" wing="true"/>
+		<item id="86038" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="背部38" wing="true"/>
 	</category>
 
 	<category name="right_hand_equipment" text="手持">

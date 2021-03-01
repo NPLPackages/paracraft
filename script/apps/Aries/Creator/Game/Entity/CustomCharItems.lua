@@ -90,6 +90,7 @@ function CustomCharItems:Init()
 						data.icon = item.icon;
 						data.name = item.name;
 						data.category = name;
+						data.wing = node.attr.wing;
 					end
 					groups[#groups+1] = item;
 				end
@@ -227,6 +228,15 @@ function CustomCharItems:SkinStringToItemIds(skin)
 	if (not skin) then return "" end;
 	local idString = "80001;";
 	local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
+	local use_hair = false;
+	if (geosets) then
+		for geoset in string.gfind(geosets, "([^#]+)") do
+			local id = tonumber(geoset);
+			if (id > 0 and id < 100) then
+				use_hair = true;
+			end
+		end
+	end
 	if (textures) then
 		for tex in textures:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
@@ -242,7 +252,11 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		for att in attachments:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
 				if (item.data.attachment == att) then
-					idString = idString..item.data.id..";";
+					local id, filename = string.match(item.data.attachment, "(%d+):(.*)");
+					id = tonumber(id);
+					if (not use_hair or id ~= 11) then
+						idString = idString..item.data.id..";";
+					end
 				end
 			end
 		end
@@ -270,6 +284,15 @@ function CustomCharItems:ChangeSkinStringToItems(skin)
 		skin = CustomCharItems:SkinStringToItemIds(skin);
 	end
 	return skin;
+end
+
+function CustomCharItems:IsWing(attachment)
+	for _, item in ipairs(items) do
+		if (item.data and item.data.wing == "true" and string.find(item.data.attachment, attachment)) then
+			return true;
+		end
+	end
+	return false;
 end
 
 function CustomCharItems:GetUsedItemsBySkin(skin)
@@ -332,14 +355,14 @@ end
 
 function CustomCharItems:AddItemToSkin(skin, item)
 	local currentSkin = skin;
-	if (skin:match("^%d+#")) then
-		local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
-		CustomCharItems:AddItemToSkinTable(skinTable, item);
-		currentSkin = CustomCharItems:SkinTableToString(skinTable);
-	else
-		if (item and item.id) then
-			currentSkin = currentSkin..item.id..";";
-		end
+	if (not skin:match("^%d+#")) then
+		currentSkin = CustomCharItems:ItemIdsToSkinString(skin);
+	end
+	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
+	CustomCharItems:AddItemToSkinTable(skinTable, item);
+	currentSkin = CustomCharItems:SkinTableToString(skinTable);
+	if (not skin:match("^%d+#")) then
+		currentSkin = CustomCharItems:SkinStringToItemIds(currentSkin);
 	end
 	return currentSkin;
 end

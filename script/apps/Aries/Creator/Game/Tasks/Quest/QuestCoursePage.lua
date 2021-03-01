@@ -323,10 +323,10 @@ end
 
 function QuestCoursePage.UpdataWorld()
 	if(mouse_button == "right") then
+		GameLogic.GetFilters():apply_filters('show_console_page')
+	else
 		-- the new version
 		GameLogic.GetFilters():apply_filters('show_create_page')
-	else
-		GameLogic.GetFilters():apply_filters('show_console_page')
 	end
 end
 

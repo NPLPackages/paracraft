@@ -139,7 +139,9 @@ function KpQuickWord.SendQuickword(node)
         if(channel == ChatChannel.EnumChannels.KpBroadCast)then
 
             KpQuickWord.ShowPage(node.Text,function(id)
-                txt = string.format("%sID:%s",node.Text,tostring(id));
+                txt = string.format([[
+					%sID:<input type="button" value="%s" name="%s" onclick="MyCompany.Aries.Creator.ChatSystem.KpChatHelper.ToWorld" style="float:left;color:#fced4b;background:url()" />
+				]],node.Text,tostring(id), id);
 	            ChatChannel.SendMessage(channel, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
             end)
         else

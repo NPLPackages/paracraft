@@ -68,3 +68,8 @@ function KpChatHelper.ShowComplainPage(id)
         UserComplainPage.ShowPage(UserComplainPage.Types.CHAT,input_msg);
     end
 end
+
+function KpChatHelper.ToWorld(id)
+    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+    CommandManager:RunCommand(string.format('/loadworld -force -s %s', id))
+end

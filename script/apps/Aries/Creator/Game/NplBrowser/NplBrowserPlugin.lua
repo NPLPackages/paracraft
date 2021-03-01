@@ -34,7 +34,7 @@ local WebView = commonlib.gettable("System.os.WebView");
 local default_window_title = default_window_title;
 local default_id = "nplbrowser_wnd";
 local default_dll_name = "cef3/NplCefPlugin.dll";
-local debug = ParaEngine.GetAppCommandLineByParam("debug", false);
+local debug = ParaEngine.GetAppCommandLineByParam("cef_debug", false);
 if(debug == true or debug =="true" or debug == "True")then
     default_dll_name = "cef3/NplCefPlugin_d.dll";
 end

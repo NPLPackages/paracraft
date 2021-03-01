@@ -235,7 +235,7 @@ function QuestAction.AchieveTask(task_id, value, fresh_dock)
     if fresh_dock then
         local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
         DockPage.isShowTaskIconEffect = true
-        DockPage.page:Refresh(0.01)
+        DockPage.RefreshPage(0.01)
     end
 end
 function QuestAction.GetLabel(task_id, task_data)

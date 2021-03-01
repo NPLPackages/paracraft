@@ -17,7 +17,7 @@ NPL.load("(gl)script/kids/3DMapSystemUI/CCS/ccs.lua");
 local CCS = commonlib.gettable("Map3DSystem.UI.CCS");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
-
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 
@@ -185,7 +185,6 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	local use_hair = false;
 	local charater = player:ToCharacter();
 	if (geosets) then
-		local geoset;
 		for geoset in string.gfind(geosets, "([^#]+)") do
 			local id = tonumber(geoset);
 			if (id > 0 and id < 100) then
@@ -220,6 +219,47 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 				if (meshModel) then
 					charater:AddAttachment(meshModel, id, id);
 				end
+			end
+		end
+	end
+end
+
+function PlayerAssetFile:ShowWingAttachment(player, skin, show)
+	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	if (generatorName ~= "paraworld") then
+		return;
+	end
+
+	if (not skin or skin == "") then
+		return;
+	end
+
+	skin = CustomCharItems:ChangeSkinStringToItems(skin);
+	local charater = player:ToCharacter();
+	local itemIds = commonlib.split(skin, ";");
+	if (itemIds and #itemIds > 0) then
+		for i = 1, #itemIds do
+			local item = CustomCharItems:GetItemById(itemIds[i]);
+			if (item.wing == "true") then
+				if (show) then
+					if (item.attachment) then
+						local id, filename = string.match(item.attachment, "(%d+):(.*)");
+						id = tonumber(id);
+						local meshModel;
+						if (string.find(filename, "anim.x")) then
+							meshModel = ParaAsset.LoadParaX("", filename);
+						else
+							meshModel = ParaAsset.LoadStaticMesh("", filename);
+						end
+						if (meshModel) then
+							charater:AddAttachment(meshModel, id, id);
+						end
+					end
+				else
+					charater:RemoveAttachment(15, 15);
+				end
+
+				break;
 			end
 		end
 	end

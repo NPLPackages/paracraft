@@ -203,6 +203,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         if(not res)then
             LOG.std(nil, "debug","HttpWrapper input", input);
             System.os.GetUrl(input, function(err, msg, data)
+                HttpWrapper.ShowErrorTip(err);      
                 -- only cache method == "GET"
                 if(method == "GET" and postFunc)then
                     postFunc(self, err, msg, data);
@@ -224,4 +225,12 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
 		end
 	});
 	commonlib.setfield(fullname, o);
+end
+function HttpWrapper.ShowErrorTip(err)
+    if(err ~= 0)then
+        return
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+    GameLogic.AddBBS("desktop", L"网络异常", 3000, "255 0 0"); 
 end

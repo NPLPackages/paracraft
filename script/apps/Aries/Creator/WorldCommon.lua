@@ -408,6 +408,8 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 end
 
 function WorldCommon.ReplaceWorld(targetProjectId)
+	local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+	WorldCommon.sourceWorldFolderName = currentEnterWorld and currentEnterWorld.foldername or WorldCommon.GetWorldTag("name");
 	WorldCommon.sourceWorldName = WorldCommon.GetWorldTag("name");
 	WorldCommon.destWorldId = targetProjectId;
 	GameLogic:Connect("WorldLoaded", WorldCommon, WorldCommon.OnWorldLoaded, "UniqueConnection");
@@ -422,14 +424,20 @@ function WorldCommon.ReplaceWorldImp()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
-	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(WorldCommon.sourceWorldName).. "/";
+	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/";
 	WorldCommon.SaveWorldAsImp(targetFolder, function(result)
 		if (result) then
 			_guihelper.MessageBox(string.format(L"替换成功，即将进入【%s】。", WorldCommon.sourceWorldName));
 		end
+		local sourceWorldName = WorldCommon.sourceWorldName
 		WorldCommon.sourceWorldName = nil
 		commonlib.TimerManager.SetTimeout(function()
 			WorldCommon.OpenWorld(targetFolder, true);
+
+			commonlib.TimerManager.SetTimeout(function()
+				WorldCommon.SetWorldTag("name", sourceWorldName);
+				WorldCommon.SaveWorldTag()
+			end, 2000);
 		end, 2000);
 	end);
 end

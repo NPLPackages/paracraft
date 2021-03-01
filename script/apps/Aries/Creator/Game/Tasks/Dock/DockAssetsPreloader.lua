@@ -240,7 +240,10 @@ function DockAssetsPreloader.FillAssets(loader)
     end
 end
 function DockAssetsPreloader.GetDownloadList()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
     local list = {};
+	table.insert(list, {filename = CustomCharItems.defaultModelFile, filesize = 1});
     for k,v in ipairs(assets) do
         table.insert(list,{
             filename = v,

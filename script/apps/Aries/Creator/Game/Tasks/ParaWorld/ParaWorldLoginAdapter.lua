@@ -64,12 +64,13 @@ function ParaWorldLoginAdapter.GetDefaultWorldID()
 end
 -- search a world id to login
 function ParaWorldLoginAdapter:SearchWorldID(callback)
-    if (System.User.isVipSchool) then
-        if(callback)then
-            callback(self.campIds[HttpWrapper.GetDevVersion()]);
-        end
-        return;
-    end
+    -- if (System.User.isVipSchool) then
+    --     if(callback)then
+    --         callback(self.campIds[HttpWrapper.GetDevVersion()]);
+    --     end
+    --     return;
+    -- end
+
     --[[
         {
           {

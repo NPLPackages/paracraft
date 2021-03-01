@@ -26,7 +26,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|
-mod|physics|vision|quickselectbar|tips|map] [on|off]], 
+mod|physics|vision|quickselectbar|tips|map|dock] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -112,6 +112,9 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Show();
+		elseif(name == "dock") then
+			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+			DockPage.Show(true);
 		end
 	end,
 };
@@ -121,7 +124,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
-vision|ui|keyboard|quickselectbar|tips|map|info]], 
+vision|ui|keyboard|quickselectbar|tips|map|info|dock]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -173,6 +176,9 @@ vision|ui|keyboard|quickselectbar|tips|map|info]],
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Close();
+		elseif(name == "dock") then
+			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+			DockPage.Hide();
 		end
 	end,
 };

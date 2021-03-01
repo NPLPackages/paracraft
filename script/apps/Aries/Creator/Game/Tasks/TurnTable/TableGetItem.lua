@@ -83,10 +83,10 @@ end
 function TableGetItem.OpenCrteate()
 	page:CloseWindow();
 	if(mouse_button == "right") then
+		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_console_page')
+	else
 		-- the new version
 		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page')
-	else
-		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_console_page')
 	end
 end
 

@@ -636,6 +636,7 @@ function ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback)
 end
 
 function ParaWorldSites.LoadMiniWorldOnPos(x, z, callback)
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mini_map.click_map", { x = x, y = z });
 	function loadMiniWorld(row, column, center, callback)
 		if (row < 1 or column < 1 or row > 10 or column > 10) then
 			ParaWorldSites.LoadMiniWorldInRandom(row, column, center, callback);

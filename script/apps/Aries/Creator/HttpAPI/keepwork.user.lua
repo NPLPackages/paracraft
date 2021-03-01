@@ -96,3 +96,7 @@ HttpWrapper.Create("keepwork.user.total_orgs", "%MAIN%/accounting/org/totalOrgs"
 -- 用户荣誉列表
 -- http://yapi.kp-para.cn/project/32/interface/api/3817
 HttpWrapper.Create("keepwork.user.honors", "%MAIN%/core/v0/users/honors","GET",true);
+
+-- 获取socketio地址
+-- http://yapi.kp-para.cn/project/60/interface/api/3862
+HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/core/v0/app/availableHost","GET",true);
