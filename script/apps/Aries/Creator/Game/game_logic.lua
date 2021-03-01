@@ -1412,7 +1412,7 @@ function GameLogic.DoJump()
 		end
 	else
 		local player = EntityManager.GetFocus();
-		if(player and not GameLogic.GetPlayerController():IsInAir()) then
+		if(player) then
 			player:Jump();
 		end
 	end

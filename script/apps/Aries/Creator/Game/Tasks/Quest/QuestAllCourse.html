@@ -1,0 +1,169 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="QuestAllCourse.lua"><![CDATA[
+local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua");
+QuestAllCourse.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    QuestAllCourse.CloseView()
+end
+
+function TeacherListData(index)
+    if(index == nil) then    
+        return #QuestAllCourse.TeacherListData;
+    else
+        return QuestAllCourse.TeacherListData[index];
+    end
+end
+
+function LevelListData(index)
+    if(index == nil) then    
+        return #QuestAllCourse.LevelListData;
+    else
+        return QuestAllCourse.LevelListData[index];
+    end
+end
+
+function CourseListData(index)
+    if(index == nil) then    
+        return #QuestAllCourse.CourseListData;
+    else
+        return QuestAllCourse.CourseListData[index];
+    end
+end
+
+function SelectTeacher(index)
+    QuestAllCourse.SelectTeacher(index)
+end
+
+function IsSelectTeacher(index)
+    return QuestAllCourse.IsSelectTeacher(index)
+end
+
+function SelectLevel(index)
+    QuestAllCourse.SelectLevel(index)
+end
+
+function IsSelectLevel(index)
+    return QuestAllCourse.IsSelectLevel(index)
+end
+
+function SelectCourse(index)
+    print("ffffffff", index)
+    QuestAllCourse.SelectCourse(index)
+end
+
+function IsSelectCourse(index)
+    return QuestAllCourse.IsSelectCourse(index)
+end
+
+function RunCommand(index)
+    QuestAllCourse.RunCommand(index)
+end
+
+function getUrl(url)
+    return url
+end
+
+]]></script>
+<div style="width: 926px;height: 562px; background: url(Texture/Aries/Creator/keepwork/AiCourse/bjk_926X562_32bits.png#0 0 926 562);">
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:878px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
+    <div name="left_containt" style="float:left;width:182px;height:562px;margin-top:0px;background:">
+        <div style="float:left;width:180px;height:524px;margin-top:58px;margin-left: 20px; background:">
+            <pe:gridview name="teacher_list" style="margin-left:0px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="50"
+                        DataSource='<%=TeacherListData%>'>
+                <Columns>
+                    <div style="width: 165px; height: 80px;">
+                        <input zorder="1" type="button" onclick="SelectTeacher" name='<%=Eval("index")%>' style="position: relative; width: 165px;height: 80px;background: ;"/>
+                        <pe:if condition='<%=IsSelectTeacher(Eval("index"))%>'>
+                            <div style="position: relative; width: 163px;height: 70px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_1_163X70_32bits.png#0 0 163 70)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectTeacher(Eval("index"))%>'>
+                            <div style="position: relative; width: 146px;height: 70px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_2_146X70_32bits.png#0 0 146 70)"></div>
+                        </pe:if>
+
+                        <img style="margin-left: 12px;margin-top: 4px; float: left;" src='<%=getUrl(Eval("icon"))%>' width="55" height="55"/>
+                        <div style="float: left;margin-top: 10px;margin-left: 8px;">
+                            <div style="base-font-size:14px;font-size: 14px;color: #ffffff;"><%=Eval("name")%></div>
+                            <div style="base-font-size:12px;font-size: 12px;margin-top: 6px; "><%=Eval("desc")%></div>
+                        </div>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+    </div>
+
+    <div name="right_containt" style="float:left;width:720px;height:610px;margin-top:0px;">
+        <div style="width:720px;height:45px;margin-top:10px;;">
+            <pe:gridview name="level_list" style="margin-left:5px;" CellPadding="0" AllowPaging="false" ItemsPerLine="10" DefaultNodeHeight="45"
+                        DataSource='<%=LevelListData%>'>
+                <Columns>
+                    <div style="width: 142px; height: 42px;">
+                        <input type="button" zorder="1" onclick="SelectLevel" name='<%=Eval("index")%>' style="position: relative; width: 142px;height: 42px;background: ;"/>
+                        <pe:if condition='<%=IsSelectLevel(Eval("index"))%>'>
+                            <div style="position: relative; width: 138px;height: 42px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_qiehuan1_138X42_32bits.png#0 0 138 42)">
+                                <div style="width: 138px;text-align: center;margin-top:12px;">
+                                    <div style="base-font-size:16px;font-size: 16px;color: #171717;font-weight: bold;"><%=Eval("name")%></div>
+                                </div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectLevel(Eval("index"))%>'>
+                            <div style="position: relative; width: 138px;height: 42px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_qiehuan2_138X42_32bits.png#0 0 138 42)">
+                                <div style="width: 138px;text-align: center;margin-top:12px;">
+                                    <div style="base-font-size:16px;font-size: 16px;color: #e4e4e4;"><%=Eval("name")%></div>
+                                </div>
+                            </div>
+                        </pe:if>
+                        
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+        <div style="width:725px;height:480px;margin-top:0px;">
+            <pe:gridview name="course_list" style="margin-left:5px;" CellPadding="0" AllowPaging="true" pagesize="8" ItemsPerLine="2 " DefaultNodeHeight="50"
+                        DataSource='<%=CourseListData%>'>
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:725px;margin-top:2px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:18px;height:22px;margin-left:318px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan2_18X22_32bits.png#0 0 18 22);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#ffffff;text-align:center;width:45px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:18px;height:22px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan1_18X22_32bits.png#0 0 18 22)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <div style="width: 360px; height: 110px;">
+                        <input zorder="1" type="button" onclick="SelectCourse" name='<%=Eval("index")%>' style="position: relative; width: 360px;height: 110px;background: ;"/>
+                        <pe:if condition='<%=IsSelectCourse(Eval("index"))%>'>
+                            <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k2_358X108_32bits.png#0 0 358 108)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectCourse(Eval("index"))%>'>
+                            <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k1_358X108_32bits.png#0 0 358 108)"></div>
+                        </pe:if>
+                        <!-- <div style="<%= 'width: 256px;height: 128px;background: url(' .. (Eval('imageUrl') and Eval('imageUrl') or '') .. ')' %>"></div> -->
+                        <!-- <div style="width: 262px;height: 174px;background: url(http://qiniu-dev.keepwork.com/2-259c3c28-751c-4fa0-afa6-b41c7cac3e1b.jpg?e=4765940093&token=LYZsjH0681n9sWZqCM4E2KmU6DsJOE7CAM4O3eJq:StoKBEd96QeX9_ar8PRPRBCe0MY=);"></div> -->
+                        <!-- <img zorder="10" src='http://api.keepwork.com/ts-storage/siteFiles/15270/raw#商城商品1.png' width="256" height="128"/> -->
+                        <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=getUrl(Eval("imageUrl"))%>' width="128" height="86"/>
+                        <div style="width: 130px; float: left;base-font-size:16px;font-size: 16px;margin-top: 37px;margin-left: 14px;"><%=Eval("name")%></div>
+                        <input zorder="1" name='<%=Eval("index")%>' onclick="SelectCourse" type="button" style="margin-left: 5px; width:52px;height:52px;margin-top:28px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_jinru_52X52_32bits.png#0 0 52 52)"/>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

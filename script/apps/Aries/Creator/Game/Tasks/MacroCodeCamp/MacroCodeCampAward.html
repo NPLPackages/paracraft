@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local MacroCodeCampAward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampAward.lua");
+    MacroCodeCampAward.OnInit()
+    function ClosePage()
+        --Page:CloseWindow();
+        MacroCodeCampAward.CloseView()
+    end
+]]></script>
+<div style=" width: 780px; height: 512px; background: url(Texture/Aries/Creator/keepwork/WinterCamp/wincamp_award_32bits.png#0 0 780 512);">
+    <div style="width: 780x; height: 60px;">
+        <input type="button" style="margin-left: 750px; margin-top: 10px; width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/Noticev2/guanbi_32bits.png);" onclick="ClosePage()"/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

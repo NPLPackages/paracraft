@@ -1,0 +1,66 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Agent/AgentEditorPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="AgentEditorPage.lua"><![CDATA[
+AgentEditorPage = commonlib.gettable("MyCompany.Aries.Game.Agent.AgentEditorPage");
+AgentEditorPage.OnInit()
+
+function GetUpdateMethodDS()
+    return AgentEditorPage.updateMethods;
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"Agent编辑器"%>' style="width:200px;" uiname_onclose="AgentEditorPage.CloseWindow" onclose="AgentEditorPage.CloseWindow">
+    <div style="margin-right:5px;margin-bottom:10px;" class="default">
+        <div style="margin:3px;">
+            <pe:mc_block block_id='271' style="width:32px;height:32px;float:left;"/>
+            <div style="float:left;margin-left:5px;font-size:10px;margin-top:12px;color:#808080"><%=L"方块数"%></div><pe:label name="blockCount" style="margin-top:10px;margin-left:5px;color:#808080">0</pe:label>
+        </div>
+        <div style="margin:3px;">
+            <div><%=L"智能模块名称:"%></div>
+            <div><input name="agentPackageName" uiname="AgentEditorPage.agentPackageName" style="height:24px" EmptyText="mycompany.myname"/></div>
+        </div>
+        <div style="margin:3px;">
+            <div><%=L"版本号:"%></div>
+            <div><input name="agentPackageVersion" uiname="AgentEditorPage.agentPackageVersion" style="height:24px" EmptyText="1.0"/></div>
+        </div>
+        <div style="margin:3px;">
+            <div style="float:left"><%=L"更新方式:"%></div>
+            <div style="float:left">
+                <select uiname="AgentEditorPage.updateMethod" name="updateMethod" style="margin-top:0px;height:22px" AllowUserEdit="false" DataSource="<%=GetUpdateMethodDS()%>"></select>
+            </div>
+        </div>
+        <div style="margin:3px;">
+            <div><%=L"依赖:"%></div>
+            <div><input name="agentDependencies" uiname="AgentEditorPage.agentDependencies" style="height:24px" /></div>
+        </div>
+        <div style="margin:3px;">
+            <div><%=L"外部文件:"%></div>
+            <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
+                <input name="agentExternalFiles" uiname="AgentEditorPage.agentExternalFiles" rows="4" ShowLineNumber="true" UseSystemControl="true" />
+            </div>
+        </div>
+        <div style="margin:3px;">
+            <div>
+                <input name="isGlobal" uiname="AgentEditorPage.isGlobal" onclick="AgentEditorPage.OnChangeGlobal" type="checkbox" style="margin-top:2px"/>
+                <div style="float:left;margin-left:5px;" for="isGlobal" uiname="AgentEditorPage.isGlobalFor"><%=L"是否全局"%></div>
+            </div>
+        </div>
+        <div style="margin:3px;">
+            <div><%=L"url地址:"%><input type="button" class="button" name="OK" uiname="AgentEditorPage.OnClickOpenFolder" value='...' style="margin-left:5px;" onclick="AgentEditorPage.OnClickOpenFolder"/></div>
+            <div><pe:label name="agentUrl" uiname="AgentEditorPage.agentUrl" style="height:36px;color:#808080;font-size:10px" /></div>
+        </div>
+        <hr />
+        <div style="margin-top:3px;">
+            <input type="button" class="button" name="OK" uiname="AgentEditorPage.OK" value='<%=L"确定" %>' align="right" style="min-width:80px;margin-right:10px;" onclick="AgentEditorPage.OnClickOK"/>
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
