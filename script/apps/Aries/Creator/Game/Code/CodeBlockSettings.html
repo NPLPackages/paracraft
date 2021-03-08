@@ -53,6 +53,12 @@ end
         </div>
     </div>
     <div style="margin-bottom:10px;">
+        <input type="checkbox" uiname="CodeBlockSettings.isUseNplBlockly" name="isUseNplBlockly" style="margin-top:2px" onclick="CodeBlockSettings.OnSetUseNplBlockly"/>
+        <div for="isUseNplBlockly" uiname="CodeBlockSettings.isUseNplBlocklyFor" style="float:left;margin-left:5px;" >
+            <%=L"启用 NPL 图块编辑器"%>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;">
         <input type="button" align="right" style="min-width:80px" class="button" uiname="CodeBlockSettings.close" name="close" value='<%=L"关闭"%>' onclick="ClosePage"/>
     </div>
 </div>

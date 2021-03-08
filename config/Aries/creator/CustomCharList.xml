@@ -89,159 +89,160 @@
 	</category>
 	
 	<category name="hair" text="头饰">
-		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="帽子127"/>
-		<item id="83128" icon="Texture/Aries/Item/2332_ChristmasTire_Princess.png" name="帽子128"/>
-		<item id="83001" icon="Texture/Aries/Item/2145_Elf_BlackHead_Girl01.png" name="帽子1"/>
-		<item id="83012" icon="Texture/Aries/Item/1278_RedCutyHat.png" name="帽子12"/>
-		<item id="83013" icon="Texture/Aries/Item/1281_MagicGentleHat.png" name="帽子13"/>
-		<item id="83035" icon="Texture/Aries/Item/1452_ShopCommonHat03.png" name="帽子35"/>
-		<item id="83036" icon="Texture/Aries/Item/1470_NewbieHat.png" name="帽子36"/>
-		<item id="83037" icon="Texture/Aries/Item/1473_ClownHat.png" name="帽子37"/>
-		<item id="83038" icon="Texture/Aries/Item/1476_PricessClownHat.png" name="帽子38"/>
-		<item id="83039" icon="Texture/Aries/Item/1483_ForeignLandsHat.png" name="帽子39"/>
-		<item id="83050" icon="Texture/Aries/Item/1617_ShopNewYearsGalHat.png" name="帽子50"/>
-		<item id="83051" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" name="帽子51"/>
-		<item id="83052" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" name="帽子52"/>
-		<item id="83053" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" name="帽子53"/>
-		<item id="83054" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" name="帽子54"/>
-		<item id="83055" icon="Texture/Aries/Item/1720_Shop201161HatGirl.png" name="帽子55"/>
-		<item id="83056" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" name="帽子56"/>
-		<item id="83057" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" name="帽子57"/>
-		<item id="83063" icon="Texture/Aries/Item/2009_Colorful_TheKingsHat.png" name="帽子63"/>
-		<item id="83064" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="帽子64"/>
-		<item id="83065" icon="Texture/Aries/Item/2075_FireHatS3.png" name="帽子65"/>
-		<item id="83066" icon="Texture/Aries/Item/2082_IceHatS3.png" name="帽子66"/>
-		<item id="83067" icon="Texture/Aries/Item/2089_StormHatS3.png" name="帽子67"/>
-		<item id="83068" icon="Texture/Aries/Item/2096_LifeHatS3.png" name="帽子68"/>
-		<item id="83069" icon="Texture/Aries/Item/2103_DeathHatS3.png" name="帽子69"/>
-		<item id="83070" icon="Texture/Aries/Item/2112_HalloweenPumpkinHead.png" name="帽子70"/>
-		<item id="83129" icon="Texture/Aries/Item/2337_SendTheElves_Prince.png" name="帽子129"/>
-		<item id="83130" icon="Texture/Aries/Item/2338_SendTheElves_Princess.png" name="帽子130"/>
-		<item id="83131" icon="Texture/Aries/Item/2388_TheSpringFestival_Boy.png" name="帽子131"/>
-		<item id="83132" icon="Texture/Aries/Item/2389_TheSpringFestival_Girl.png" name="帽子132"/>
-		<item id="83133" icon="Texture/Aries/Item/2399_Panda_Boy.png" name="帽子133"/>
-		<item id="83134" icon="Texture/Aries/Item/2400_Panda_Girl.png" name="帽子134"/>
-		<item id="83143" icon="Texture/Aries/Item/2434_TheSpringFestival_Boy.png" name="帽子143"/>
+		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="麋鹿角"/>
+		<item id="83128" icon="Texture/Aries/Item/2332_ChristmasTire_Princess.png" name="驯鹿角"/>
+		<item id="83001" icon="Texture/Aries/Item/2145_Elf_BlackHead_Girl01.png" name="灰白狐耳"/>
+		<item id="83012" icon="Texture/Aries/Item/1278_RedCutyHat.png" name="魔术绒线帽"/>
+		<item id="83013" icon="Texture/Aries/Item/1281_MagicGentleHat.png" name="红色礼帽"/>
+		<item id="83035" icon="Texture/Aries/Item/1452_ShopCommonHat03.png" name="黄色草帽"/>
+		<item id="83036" icon="Texture/Aries/Item/1470_NewbieHat.png" name="羽饰头冠"/>
+		<item id="83037" icon="Texture/Aries/Item/1473_ClownHat.png" name="小丑帽"/>
+		<item id="83038" icon="Texture/Aries/Item/1476_PricessClownHat.png" name="迷你小丑帽"/>
+		<item id="83039" icon="Texture/Aries/Item/1483_ForeignLandsHat.png" name="蒙面头巾"/>
+		<item id="83050" icon="Texture/Aries/Item/1617_ShopNewYearsGalHat.png" name="兔耳装饰"/>
+		<item id="83051" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" name="兔子头套"/>
+		<item id="83052" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" name="灯笼头套"/>
+		<item id="83053" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" name="白色头纱"/>
+		<item id="83054" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" name="绿色花环"/>
+		<item id="83055" icon="Texture/Aries/Item/1720_Shop201161HatGirl.png" name="双髻头饰"/>
+		<item id="83056" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" name="浮潜眼睛"/>
+		<item id="83057" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" name="条纹草帽"/>
+		<item id="83063" icon="Texture/Aries/Item/2009_Colorful_TheKingsHat.png" name="黄色草帽"/>
+		<item id="83064" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="红色花环"/>
+		<item id="83065" icon="Texture/Aries/Item/2075_FireHatS3.png" name="恶魔之角"/>
+		<item id="83066" icon="Texture/Aries/Item/2082_IceHatS3.png" name="寒冰头饰"/>
+		<item id="83067" icon="Texture/Aries/Item/2089_StormHatS3.png" name="半遮面具"/>
+		<item id="83068" icon="Texture/Aries/Item/2096_LifeHatS3.png" name="白色发饰"/>
+		<item id="83069" icon="Texture/Aries/Item/2103_DeathHatS3.png" name="野蛮人头盔"/>
+		<item id="83070" icon="Texture/Aries/Item/2112_HalloweenPumpkinHead.png" name="南瓜头"/>
+		<item id="83129" icon="Texture/Aries/Item/2337_SendTheElves_Prince.png" name="棕色发饰"/>
+		<item id="83130" icon="Texture/Aries/Item/2338_SendTheElves_Princess.png" name="紫色发带"/>
+		<item id="83131" icon="Texture/Aries/Item/2388_TheSpringFestival_Boy.png" name="狐蝠耳饰"/>
+		<item id="83132" icon="Texture/Aries/Item/2389_TheSpringFestival_Girl.png" name="兔子头饰"/>
+		<item id="83133" icon="Texture/Aries/Item/2399_Panda_Boy.png" name="大熊猫头饰"/>
+		<item id="83134" icon="Texture/Aries/Item/2400_Panda_Girl.png" name="小熊猫头饰"/>
+		<item id="83143" icon="Texture/Aries/Item/2434_TheSpringFestival_Boy.png" name="狐蝠耳饰"/>
+		<!--
 		<item id="83144" icon="Texture/Aries/Item/2435_ShopSpringHatGirl.png" name="帽子144"/>
-
-		<item id="83002" icon="Texture/Aries/Item/1231_FireHat1.png" name="帽子2"/>
-		<item id="83003" icon="Texture/Aries/Item/1232_IceHat1.png" name="帽子3"/>
-		<item id="83004" icon="Texture/Aries/Item/1233_StormHat1.png" name="帽子4"/>
-		<item id="83005" icon="Texture/Aries/Item/1234_DeathHat1.png" name="帽子5"/>
-		<item id="83006" icon="Texture/Aries/Item/1235_LifeHat1.png" name="帽子6"/>
-		<item id="83007" icon="Texture/Aries/Item/1236_CommonHat1.png" name="帽子7"/>
-		<item id="83008" icon="Texture/Aries/Item/1237_CommonHat2.png" name="帽子8"/>
-		<item id="83009" icon="Texture/Aries/Item/1238_CommonHat3.png" name="帽子9"/>
-		<item id="83010" icon="Texture/Aries/Item/1239_CommonHat4.png" name="帽子10"/>
-		<item id="83011" icon="Texture/Aries/Item/1240_CommonHat5.png" name="帽子11"/>
-		<item id="83014" icon="Texture/Aries/Item/1284_GloryWarriorHat.png" name="帽子14"/>
-		<item id="83015" icon="Texture/Aries/Item/1287_MagicProtectionHat.png" name="帽子15"/>
-		<item id="83016" icon="Texture/Aries/Item/1301_FireHat2.png" name="帽子16"/>
-		<item id="83017" icon="Texture/Aries/Item/1302_IceHat2.png" name="帽子17"/>
-		<item id="83018" icon="Texture/Aries/Item/1303_StormHat2.png" name="帽子18"/>
-		<item id="83019" icon="Texture/Aries/Item/1304_DeathHat2.png" name="帽子19"/>
-		<item id="83020" icon="Texture/Aries/Item/1305_LifeHat2.png" name="帽子20"/>
-		<item id="83021" icon="Texture/Aries/Item/1334_FireHat4.png" name="帽子21"/>
-		<item id="83022" icon="Texture/Aries/Item/1335_IceHat4.png" name="帽子22"/>
-		<item id="83023" icon="Texture/Aries/Item/1336_StormHat4.png" name="帽子23"/>
-		<item id="83024" icon="Texture/Aries/Item/1337_DeathHat4.png" name="帽子24"/>
-		<item id="83025" icon="Texture/Aries/Item/1338_LifeHat4.png" name="帽子25"/>
-		<item id="83026" icon="Texture/Aries/Item/1339_FireHat5.png" name="帽子26"/>
-		<item id="83027" icon="Texture/Aries/Item/1340_IceHat5.png" name="帽子27"/>
-		<item id="83028" icon="Texture/Aries/Item/1341_StormHat5.png" name="帽子28"/>
-		<item id="83029" icon="Texture/Aries/Item/1342_DeathHat5.png" name="帽子29"/>
-		<item id="83030" icon="Texture/Aries/Item/1343_LifeHat5.png" name="帽子30"/>
-		<item id="83031" icon="Texture/Aries/Item/1344_CommonHat7.png" name="帽子31"/>
-		<item id="83032" icon="Texture/Aries/Item/1345_CommonHat8.png" name="帽子32"/>
-		<item id="83033" icon="Texture/Aries/Item/1450_ShopCommonHat01.png" name="帽子33"/>
-		<item id="83034" icon="Texture/Aries/Item/1451_ShopCommonHat02.png" name="帽子34"/>
-		<item id="83040" icon="Texture/Aries/Item/1522_EgyptFireHat1.png" name="帽子40"/>
-		<item id="83041" icon="Texture/Aries/Item/1523_EgyptIceHat1.png" name="帽子41"/>
-		<item id="83042" icon="Texture/Aries/Item/1524_EgyptStormHat1.png" name="帽子42"/>
-		<item id="83043" icon="Texture/Aries/Item/1525_EgyptDeathHat1.png" name="帽子43"/>
-		<item id="83044" icon="Texture/Aries/Item/1526_EgyptLifeHat1.png" name="帽子44"/>
-		<item id="83045" icon="Texture/Aries/Item/1612_ShopFireHatLv22.png" name="帽子45"/>
-		<item id="83046" icon="Texture/Aries/Item/1613_ShopIceHatLv22.png" name="帽子46"/>
-		<item id="83047" icon="Texture/Aries/Item/1614_ShopStormHatLv22.png" name="帽子47"/>
-		<item id="83048" icon="Texture/Aries/Item/1615_ShopDeathHatLv22.png" name="帽子48"/>
-		<item id="83049" icon="Texture/Aries/Item/1616_ShopLifeHatLv22.png" name="帽子49"/>
-		<item id="83058" icon="Texture/Aries/Item/1822_IceHatS2.png" name="帽子58"/>
-		<item id="83059" icon="Texture/Aries/Item/1833_FireHatS2.png" name="帽子59"/>
-		<item id="83060" icon="Texture/Aries/Item/1840_StormHatS2.png" name="帽子60"/>
-		<item id="83061" icon="Texture/Aries/Item/1848_Lifehats2.png" name="帽子61"/>
-		<item id="83062" icon="Texture/Aries/Item/1856_DeathHatS2.png" name="帽子62"/>
-		<item id="83071" icon="Texture/Aries/Item/2115_ChristmasHatRed.png" name="帽子71"/>
-		<item id="83072" icon="Texture/Aries/Item/2116_ChristmasHatGreen.png" name="帽子72"/>
-		<item id="83073" icon="Texture/Aries/Item/2135_Elf_BrownHead_Girl01.png" name="帽子73"/>
-		<item id="83074" icon="Texture/Aries/Item/2140_Elf_BrownHead_Boy01.png" name="帽子74"/>
-		<item id="83075" icon="Texture/Aries/Item/2150_Elf_BlackHead_Boy01.png" name="帽子75"/>
-		<item id="83076" icon="Texture/Aries/Item/2155_Elf_WhiteHead_Girl01.png" name="帽子76"/>
-		<item id="83077" icon="Texture/Aries/Item/2160_Elf_WhiteHead_Boy01.png" name="帽子77"/>
-		<item id="83078" icon="Texture/Aries/Item/2165_Ragnarok_GrayHead_Boy01.png" name="帽子78"/>
-		<item id="83079" icon="Texture/Aries/Item/2166_Ragnarok_RedHead_Boy02.png" name="帽子79"/>
+		-->
+		<item id="83002" icon="Texture/Aries/Item/1231_FireHat1.png" name="布制罩帽"/>
+		<item id="83003" icon="Texture/Aries/Item/1232_IceHat1.png" name="布制罩帽"/>
+		<item id="83004" icon="Texture/Aries/Item/1233_StormHat1.png" name="布制罩帽"/>
+		<item id="83005" icon="Texture/Aries/Item/1234_DeathHat1.png" name="布制罩帽"/>
+		<item id="83006" icon="Texture/Aries/Item/1235_LifeHat1.png" name="布制罩帽"/>
+		<item id="83014" icon="Texture/Aries/Item/1284_GloryWarriorHat.png" name="布制罩帽"/>
+		<item id="83015" icon="Texture/Aries/Item/1287_MagicProtectionHat.png" name="布制罩帽"/>
+		<item id="83007" icon="Texture/Aries/Item/1236_CommonHat1.png" name="布制宽沿帽"/>
+		<item id="83008" icon="Texture/Aries/Item/1237_CommonHat2.png" name="布制宽沿帽"/>
+		<item id="83009" icon="Texture/Aries/Item/1238_CommonHat3.png" name="布制宽沿帽"/>
+		<item id="83010" icon="Texture/Aries/Item/1239_CommonHat4.png" name="布制宽沿帽"/>
+		<item id="83011" icon="Texture/Aries/Item/1240_CommonHat5.png" name="布制宽沿帽"/>
+		<item id="83016" icon="Texture/Aries/Item/1301_FireHat2.png" name="羽饰草帽"/>
+		<item id="83017" icon="Texture/Aries/Item/1302_IceHat2.png" name="羽饰草帽"/>
+		<item id="83018" icon="Texture/Aries/Item/1303_StormHat2.png" name="羽饰草帽"/>
+		<item id="83019" icon="Texture/Aries/Item/1304_DeathHat2.png" name="羽饰草帽"/>
+		<item id="83020" icon="Texture/Aries/Item/1305_LifeHat2.png" name="羽饰草帽"/>
+		<item id="83021" icon="Texture/Aries/Item/1334_FireHat4.png" name="魔法草帽"/>
+		<item id="83022" icon="Texture/Aries/Item/1335_IceHat4.png" name="魔法草帽"/>
+		<item id="83023" icon="Texture/Aries/Item/1336_StormHat4.png" name="魔法草帽"/>
+		<item id="83024" icon="Texture/Aries/Item/1337_DeathHat4.png" name="魔法草帽"/>
+		<item id="83025" icon="Texture/Aries/Item/1338_LifeHat4.png" name="魔法草帽"/>
+		<item id="83026" icon="Texture/Aries/Item/1339_FireHat5.png" name="小丑帽"/>
+		<item id="83027" icon="Texture/Aries/Item/1340_IceHat5.png" name="小丑帽"/>
+		<item id="83028" icon="Texture/Aries/Item/1341_StormHat5.png" name="小丑帽"/>
+		<item id="83029" icon="Texture/Aries/Item/1342_DeathHat5.png" name="小丑帽"/>
+		<item id="83030" icon="Texture/Aries/Item/1343_LifeHat5.png" name="小丑帽"/>
+		<item id="83031" icon="Texture/Aries/Item/1344_CommonHat7.png" name="蓝色睡帽"/>
+		<item id="83032" icon="Texture/Aries/Item/1345_CommonHat8.png" name="蓝色草帽"/>
+		<item id="83033" icon="Texture/Aries/Item/1450_ShopCommonHat01.png" name="黑色头巾"/>
+		<item id="83034" icon="Texture/Aries/Item/1451_ShopCommonHat02.png" name="黄色草帽"/>
+		<item id="83040" icon="Texture/Aries/Item/1522_EgyptFireHat1.png" name="响铃罩帽"/>
+		<item id="83041" icon="Texture/Aries/Item/1523_EgyptIceHat1.png" name="响铃罩帽"/>
+		<item id="83042" icon="Texture/Aries/Item/1524_EgyptStormHat1.png" name="响铃罩帽"/>
+		<item id="83043" icon="Texture/Aries/Item/1525_EgyptDeathHat1.png" name="响铃罩帽"/>
+		<item id="83044" icon="Texture/Aries/Item/1526_EgyptLifeHat1.png" name="响铃罩帽"/>
+		<item id="83045" icon="Texture/Aries/Item/1612_ShopFireHatLv22.png" name="彩色头巾"/>
+		<item id="83046" icon="Texture/Aries/Item/1613_ShopIceHatLv22.png" name="彩色头巾"/>
+		<item id="83047" icon="Texture/Aries/Item/1614_ShopStormHatLv22.png" name="彩色头巾"/>
+		<item id="83048" icon="Texture/Aries/Item/1615_ShopDeathHatLv22.png" name="彩色头巾"/>
+		<item id="83049" icon="Texture/Aries/Item/1616_ShopLifeHatLv22.png" name="彩色头巾"/>
+		<item id="83058" icon="Texture/Aries/Item/1822_IceHatS2.png" name="骨制头盔"/>
+		<item id="83059" icon="Texture/Aries/Item/1833_FireHatS2.png" name="骨制头盔"/>
+		<item id="83060" icon="Texture/Aries/Item/1840_StormHatS2.png" name="骨制头盔"/>
+		<item id="83061" icon="Texture/Aries/Item/1848_Lifehats2.png" name="骨制头盔"/>
+		<item id="83062" icon="Texture/Aries/Item/1856_DeathHatS2.png" name="骨制头盔"/>
+		<item id="83071" icon="Texture/Aries/Item/2115_ChristmasHatRed.png" name="红色毛线帽"/>
+		<item id="83072" icon="Texture/Aries/Item/2116_ChristmasHatGreen.png" name="绿色毛线帽"/>
+		<item id="83073" icon="Texture/Aries/Item/2135_Elf_BrownHead_Girl01.png" name="狐狸耳饰"/>
+		<item id="83074" icon="Texture/Aries/Item/2140_Elf_BrownHead_Boy01.png" name="狐狸耳饰"/>
+		<item id="83075" icon="Texture/Aries/Item/2150_Elf_BlackHead_Boy01.png" name="狐狸耳饰"/>
+		<item id="83076" icon="Texture/Aries/Item/2155_Elf_WhiteHead_Girl01.png" name="狐狸耳饰"/>
+		<item id="83077" icon="Texture/Aries/Item/2160_Elf_WhiteHead_Boy01.png" name="狐狸耳饰"/>
+		<item id="83078" icon="Texture/Aries/Item/2165_Ragnarok_GrayHead_Boy01.png" name="发芽的头饰"/>
+		<item id="83079" icon="Texture/Aries/Item/2166_Ragnarok_RedHead_Boy02.png" name="发芽的头饰"/>
 		<!--缺图标
 		<item id="83080" icon="Texture/Aries/Item/2167_Ragnarok_GreenHead_Boy03.png" name="帽子80"/>
 		-->
-		<item id="83081" icon="Texture/Aries/Item/2168_Ragnarok_GrayHead_Girl01.png" name="帽子81"/>
-		<item id="83082" icon="Texture/Aries/Item/2169_Ragnarok_RedHead_Girl02.png" name="帽子82"/>
+		<item id="83081" icon="Texture/Aries/Item/2168_Ragnarok_GrayHead_Girl01.png" name="发芽的头饰"/>
+		<item id="83082" icon="Texture/Aries/Item/2169_Ragnarok_RedHead_Girl02.png" name="发芽的头饰"/>
 		<!--缺图标
 		<item id="83083" icon="Texture/Aries/Item/2170_Ragnarok_GreenHead_Girl03.png" name="帽子83"/>
 		-->
-		<item id="83084" icon="Texture/Aries/Item/2171_Spinage_BrownHead_Boy01.png" name="帽子84"/>
-		<item id="83085" icon="Texture/Aries/Item/2172_Spinage_RedHead_Boy02.png" name="帽子85"/>
-		<item id="83086" icon="Texture/Aries/Item/2173_Spinage_BlackHead_Boy03.png" name="帽子86"/>
-		<item id="83087" icon="Texture/Aries/Item/2174_Spinage_BrownHead_Girl01.png" name="帽子87"/>
-		<item id="83088" icon="Texture/Aries/Item/2175_Spinage_RedHead_Girl02.png" name="帽子88"/>
-		<item id="83089" icon="Texture/Aries/Item/2176_Spinage_BlackHead_Girl03.png" name="帽子89"/>
-		<item id="83090" icon="Texture/Aries/Item/2177_Errantry_GrayHead_Boy01.png" name="帽子90"/>
-		<item id="83091" icon="Texture/Aries/Item/2178_Errantry_GreenHead_Boy02.png" name="帽子91"/>
+		<item id="83084" icon="Texture/Aries/Item/2171_Spinage_BrownHead_Boy01.png" name="爆炸头"/>
+		<item id="83085" icon="Texture/Aries/Item/2172_Spinage_RedHead_Boy02.png" name="爆炸头"/>
+		<item id="83086" icon="Texture/Aries/Item/2173_Spinage_BlackHead_Boy03.png" name="爆炸头"/>
+		<item id="83087" icon="Texture/Aries/Item/2174_Spinage_BrownHead_Girl01.png" name="爆炸头"/>
+		<item id="83088" icon="Texture/Aries/Item/2175_Spinage_RedHead_Girl02.png" name="爆炸头"/>
+		<item id="83089" icon="Texture/Aries/Item/2176_Spinage_BlackHead_Girl03.png" name="爆炸头"/>
+		<item id="83090" icon="Texture/Aries/Item/2177_Errantry_GrayHead_Boy01.png" name="高发髻"/>
+		<item id="83091" icon="Texture/Aries/Item/2178_Errantry_GreenHead_Boy02.png" name="高发髻"/>
 		<!--缺图标
 		<item id="83092" icon="Texture/Aries/Item/2179_Errantry_RedHead_Boy03.png" name="帽子92"/>
 		-->
-		<item id="83093" icon="Texture/Aries/Item/2180_Errantry_GrayHead_Girl01.png" name="帽子93"/>
-		<item id="83094" icon="Texture/Aries/Item/2181_Errantry_GreenHead_Girl02.png" name="帽子94"/>
+		<item id="83093" icon="Texture/Aries/Item/2180_Errantry_GrayHead_Girl01.png" name="高发髻"/>
+		<item id="83094" icon="Texture/Aries/Item/2181_Errantry_GreenHead_Girl02.png" name="高发髻"/>
 		<!--缺图标
 		<item id="83095" icon="Texture/Aries/Item/2182_Errantry_GrayHead_Girl03.png" name="帽子95"/>
 		<item id="83096" icon="Texture/Aries/Item/2182_Errantry_RedHead_Girl03.png" name="帽子96"/>
 		-->
-		<item id="83097" icon="Texture/Aries/Item/2183_HeroCrown_Fire.png" name="帽子97"/>
-		<item id="83098" icon="Texture/Aries/Item/2184_HeroCrown_Ice.png" name="帽子98"/>
-		<item id="83099" icon="Texture/Aries/Item/2185_HeroCrown_Storm.png" name="帽子99"/>
-		<item id="83100" icon="Texture/Aries/Item/2186_HeroCrown_Life.png" name="帽子100"/>
-		<item id="83101" icon="Texture/Aries/Item/2187_HeroCrown_Death.png" name="帽子101"/>
-		<item id="83102" icon="Texture/Aries/Item/2188_MainCrown_Fire.png" name="帽子102"/>
-		<item id="83103" icon="Texture/Aries/Item/2189_MainCrown_Ice.png" name="帽子103"/>
-		<item id="83104" icon="Texture/Aries/Item/2190_MainCrown_Storm.png" name="帽子104"/>
-		<item id="83105" icon="Texture/Aries/Item/2191_MainCrown_Life.png" name="帽子105"/>
-		<item id="83106" icon="Texture/Aries/Item/2192_MainCrown_Death.png" name="帽子106"/>
-		<item id="83107" icon="Texture/Aries/Item/2234_FireHatS4_Boy.png" name="帽子107"/>
-		<item id="83108" icon="Texture/Aries/Item/2241_IceHatS4_Boy.png" name="帽子108"/>
-		<item id="83109" icon="Texture/Aries/Item/2248_StormHatS4_Boy.png" name="帽子109"/>
-		<item id="83110" icon="Texture/Aries/Item/2255_LifeHatS4_Boy.png" name="帽子110"/>
-		<item id="83111" icon="Texture/Aries/Item/2262_DeathHatS4_Boy.png" name="帽子111"/>
-		<item id="83112" icon="Texture/Aries/Item/2269_FireHatS4_Girl.png" name="帽子112"/>
-		<item id="83113" icon="Texture/Aries/Item/2270_Spinage_PinkHead_Boy04.png" name="帽子113"/>
-		<item id="83114" icon="Texture/Aries/Item/2271_Spinage_GreenHead_Girl06.png" name="帽子114"/>
-		<item id="83115" icon="Texture/Aries/Item/2272_Spinage_yellowHead_Boy05.png" name="帽子115"/>
-		<item id="83116" icon="Texture/Aries/Item/2273_Spinage_GreenHead_Boy06.png" name="帽子116"/>
-		<item id="83117" icon="Texture/Aries/Item/2274_Spinage_PinkHead_Girl04.png" name="帽子117"/>
-		<item id="83118" icon="Texture/Aries/Item/2275_Spinage_YellowHead_Girl05.png" name="帽子118"/>
-		<item id="83119" icon="Texture/Aries/Item/2276_IceHatS4_Girl.png" name="帽子119"/>
-		<item id="83120" icon="Texture/Aries/Item/2283_StormHatS4_Girl.png" name="帽子120"/>
-		<item id="83121" icon="Texture/Aries/Item/2290_LifeHatS4_Girl.png" name="帽子121"/>
-		<item id="83122" icon="Texture/Aries/Item/2297_DeathHatS4_Girl.png" name="帽子122"/>
-		<item id="83123" icon="Texture/Aries/Item/2324_Demon_Prince.png" name="帽子123"/>
-		<item id="83124" icon="Texture/Aries/Item/2325_Demon_Princess.png" name="帽子124"/>
-		<item id="83125" icon="Texture/Aries/Item/2327_Demon_Prince_Special.png" name="帽子125"/>
-		<item id="83126" icon="Texture/Aries/Item/2328_Demon_Princess_Special.png" name="帽子126"/>
-		<item id="83135" icon="Texture/Aries/Item/2404_TheSpringHat_Boy.png" name="帽子135"/>
-		<item id="83136" icon="Texture/Aries/Item/2405_TheSpringHat_Girl.png" name="帽子136"/>
-		<item id="83137" icon="Texture/Aries/Item/2408_TheRedMushroom_Boy.png" name="帽子137"/>
-		<item id="83138" icon="Texture/Aries/Item/2409_TheRedMushroom_Girl.png" name="帽子138"/>
-		<item id="83139" icon="Texture/Aries/Item/2410_AncientRoyalCrown.png" name="帽子139"/>
-		<item id="83140" icon="Texture/Aries/Item/2411_AncientRoyalCrown_Relive.png" name="帽子140"/>
-		<item id="83141" icon="Texture/Aries/Item/2416_KnightCaptainHelmet_Boy.png" name="帽子141"/>
-		<item id="83142" icon="Texture/Aries/Item/2417_KnightCaptainHelmet_Girl.png" name="帽子142"/>
+		<item id="83097" icon="Texture/Aries/Item/2183_HeroCrown_Fire.png" name="头冠"/>
+		<item id="83098" icon="Texture/Aries/Item/2184_HeroCrown_Ice.png" name="头冠"/>
+		<item id="83099" icon="Texture/Aries/Item/2185_HeroCrown_Storm.png" name="头冠"/>
+		<item id="83100" icon="Texture/Aries/Item/2186_HeroCrown_Life.png" name="头冠"/>
+		<item id="83101" icon="Texture/Aries/Item/2187_HeroCrown_Death.png" name="头冠"/>
+		<item id="83102" icon="Texture/Aries/Item/2188_MainCrown_Fire.png" name="头冠"/>
+		<item id="83103" icon="Texture/Aries/Item/2189_MainCrown_Ice.png" name="头冠"/>
+		<item id="83104" icon="Texture/Aries/Item/2190_MainCrown_Storm.png" name="头冠"/>
+		<item id="83105" icon="Texture/Aries/Item/2191_MainCrown_Life.png" name="头冠"/>
+		<item id="83106" icon="Texture/Aries/Item/2192_MainCrown_Death.png" name="头冠"/>
+		<item id="83107" icon="Texture/Aries/Item/2234_FireHatS4_Boy.png" name="角冠"/>
+		<item id="83108" icon="Texture/Aries/Item/2241_IceHatS4_Boy.png" name="角冠"/>
+		<item id="83109" icon="Texture/Aries/Item/2248_StormHatS4_Boy.png" name="角冠"/>
+		<item id="83110" icon="Texture/Aries/Item/2255_LifeHatS4_Boy.png" name="角冠"/>
+		<item id="83111" icon="Texture/Aries/Item/2262_DeathHatS4_Boy.png" name="角冠"/>
+		<item id="83112" icon="Texture/Aries/Item/2269_FireHatS4_Girl.png" name="角冠"/>
+		<item id="83113" icon="Texture/Aries/Item/2270_Spinage_PinkHead_Boy04.png" name="爆炸头"/>
+		<item id="83114" icon="Texture/Aries/Item/2271_Spinage_GreenHead_Girl06.png" name="爆炸头"/>
+		<item id="83115" icon="Texture/Aries/Item/2272_Spinage_yellowHead_Boy05.png" name="爆炸头"/>
+		<item id="83116" icon="Texture/Aries/Item/2273_Spinage_GreenHead_Boy06.png" name="爆炸头"/>
+		<item id="83117" icon="Texture/Aries/Item/2274_Spinage_PinkHead_Girl04.png" name="爆炸头"/>
+		<item id="83118" icon="Texture/Aries/Item/2275_Spinage_YellowHead_Girl05.png" name="爆炸头"/>
+		<item id="83119" icon="Texture/Aries/Item/2276_IceHatS4_Girl.png" name="角冠"/>
+		<item id="83120" icon="Texture/Aries/Item/2283_StormHatS4_Girl.png" name="角冠"/>
+		<item id="83121" icon="Texture/Aries/Item/2290_LifeHatS4_Girl.png" name="角冠"/>
+		<item id="83122" icon="Texture/Aries/Item/2297_DeathHatS4_Girl.png" name="角冠"/>
+		<item id="83123" icon="Texture/Aries/Item/2324_Demon_Prince.png" name="魔术礼帽"/>
+		<item id="83124" icon="Texture/Aries/Item/2325_Demon_Princess.png" name="魔术礼帽"/>
+		<item id="83125" icon="Texture/Aries/Item/2327_Demon_Prince_Special.png" name="魔术礼帽"/>
+		<item id="83126" icon="Texture/Aries/Item/2328_Demon_Princess_Special.png" name="魔术礼帽"/>
+		<item id="83135" icon="Texture/Aries/Item/2404_TheSpringHat_Boy.png" name="蓝色草帽"/>
+		<item id="83136" icon="Texture/Aries/Item/2405_TheSpringHat_Girl.png" name="红色草帽"/>
+		<item id="83137" icon="Texture/Aries/Item/2408_TheRedMushroom_Boy.png" name="龙角头饰"/>
+		<item id="83138" icon="Texture/Aries/Item/2409_TheRedMushroom_Girl.png" name="龙角头饰"/>
+		<item id="83139" icon="Texture/Aries/Item/2410_AncientRoyalCrown.png" name="冠军头冠"/>
+		<item id="83140" icon="Texture/Aries/Item/2411_AncientRoyalCrown_Relive.png" name="冠军头冠"/>
+		<item id="83141" icon="Texture/Aries/Item/2416_KnightCaptainHelmet_Boy.png" name="骑士头盔"/>
+		<item id="83142" icon="Texture/Aries/Item/2417_KnightCaptainHelmet_Girl.png" name="骑士头盔"/>
 		<!--帽子诡异，难看
 		<item id="83145" icon="Texture/Aries/Item/1011_PoliceUniformHat.png" name="帽子145"/>
 		-->
@@ -527,90 +528,90 @@
 	</category>
 	
 	<category name="back" text="背部">
-		<item id="86008" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" name="背部8"/>
-		<item id="86009" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" name="背部9"/>
+		<item id="86008" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" name="黑色书包"/>
+		<item id="86009" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" name="白色书包"/>
 		<!--
 		<item id="86007" icon="Texture/Aries/Item/1106_CandyBag.png" name="背部7"/>
 		-->
-		<item id="86018" icon="Texture/Aries/Item/1795_Backpacks.png" name="背部18"/>
-		<item id="86019" icon="Texture/Aries/Item/1796_SwimmingLaps.png" name="背部19"/>
-		<item id="86026" icon="Texture/Aries/Item/1106_CandyBag.png" name="背部26"/>
-		<item id="86039" icon="Texture/Aries/Item/2392_DeadRabbit.png" name="背部39"/>
-		<item id="86013" icon="Texture/Aries/Item/1735_ColiseumFireBackS1.png" name="背部13"/>
-		<item id="86014" icon="Texture/Aries/Item/1736_ColiseumIceBackS1.png" name="背部14"/>
-		<item id="86015" icon="Texture/Aries/Item/1737_ColiseumStormBackS1.png" name="背部15"/>
-		<item id="86016" icon="Texture/Aries/Item/1738_ColiseumDeathBackS1.png" name="背部16"/>
-		<item id="86017" icon="Texture/Aries/Item/1739_ColiseumLifeBackS1.png" name="背部17"/>
-		<item id="86010" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" name="背部10" wing="true"/>
-		<item id="86011" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" name="背部11" wing="true"/>
-		<item id="86027" icon="Texture/Aries/Item/2045_ShopSpringCombatBackGirl.png" name="背部27" wing="true"/>
-		<item id="86028" icon="Texture/Aries/Item/2049_ShopSpringCombatBackBoy.png" name="背部28" wing="true"/>
+		<item id="86018" icon="Texture/Aries/Item/1795_Backpacks.png" name="潜水衣"/>
+		<item id="86019" icon="Texture/Aries/Item/1796_SwimmingLaps.png" name="游泳圈"/>
+		<item id="86026" icon="Texture/Aries/Item/1106_CandyBag.png" name="糖果背包"/>
+		<item id="86039" icon="Texture/Aries/Item/2392_DeadRabbit.png" name="兔子背包"/>
+		<item id="86013" icon="Texture/Aries/Item/1735_ColiseumFireBackS1.png" name="凤羽披风"/>
+		<item id="86014" icon="Texture/Aries/Item/1736_ColiseumIceBackS1.png" name="凤羽披风"/>
+		<item id="86015" icon="Texture/Aries/Item/1737_ColiseumStormBackS1.png" name="凤羽披风"/>
+		<item id="86016" icon="Texture/Aries/Item/1738_ColiseumDeathBackS1.png" name="凤羽披风"/>
+		<item id="86017" icon="Texture/Aries/Item/1739_ColiseumLifeBackS1.png" name="凤羽披风"/>
+		<item id="86010" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" name="蝴蝶之翼" wing="true"/>
+		<item id="86011" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" name="蝴蝶之翼" wing="true"/>
+		<item id="86027" icon="Texture/Aries/Item/2045_ShopSpringCombatBackGirl.png" name="蝴蝶之翼" wing="true"/>
+		<item id="86028" icon="Texture/Aries/Item/2049_ShopSpringCombatBackBoy.png" name="蝴蝶之翼" wing="true"/>
 
-		<item id="86001" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" name="背部1" wing="true"/>
-		<item id="86002" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" name="背部2" wing="true"/>
-		<item id="86003" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="背部3" wing="true"/>
-		<item id="86004" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="背部4" wing="true"/>
-		<item id="86005" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="背部5" wing="true"/>
-		<item id="86006" icon="Texture/Aries/Item/1482_ShiningBack.png" name="背部6" wing="true"/>
-		<item id="86012" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="背部12" wing="true"/>
-		<item id="86020" icon="Texture/Aries/Item/1812_AngelWings.png" name="背部20" wing="true"/>
-		<item id="86021" icon="Texture/Aries/Item/1820_IceBackS2.png" name="背部21" wing="true"/>
-		<item id="86022" icon="Texture/Aries/Item/1832_FireBackS2.png" name="背部22" wing="true"/>
-		<item id="86023" icon="Texture/Aries/Item/1839_StormBackS2.png" name="背部23" wing="true"/>
-		<item id="86024" icon="Texture/Aries/Item/1844_LifeBackS2.png" name="背部24" wing="true"/>
-		<item id="86025" icon="Texture/Aries/Item/1851_DeathBackS2.png" name="背部25" wing="true"/>
-		<item id="86029" icon="Texture/Aries/Item/2076_FireBackS3.png" name="背部29" wing="true"/>
-		<item id="86030" icon="Texture/Aries/Item/2083_IceBackS3.png" name="背部30" wing="true"/>
-		<item id="86031" icon="Texture/Aries/Item/2090_StormBackS3.png" name="背部31" wing="true"/>
-		<item id="86032" icon="Texture/Aries/Item/2097_LifeBackS3.png" name="背部32" wing="true"/>
-		<item id="86033" icon="Texture/Aries/Item/2104_DeathBackS3.png" name="背部33" wing="true"/>
-		<item id="86034" icon="Texture/Aries/Item/2235_FireBackS4.png" name="背部34" wing="true"/>
-		<item id="86035" icon="Texture/Aries/Item/2242_IceBackS4.png" name="背部35" wing="true"/>
-		<item id="86036" icon="Texture/Aries/Item/2249_StormBackS4.png" name="背部36" wing="true"/>
-		<item id="86037" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="背部37" wing="true"/>
-		<item id="86038" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="背部38" wing="true"/>
+		<item id="86001" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" name="蝙蝠之翼" wing="true"/>
+		<item id="86002" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" name="蝙蝠之翼" wing="true"/>
+		<item id="86003" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="蝙蝠之翼" wing="true"/>
+		<item id="86004" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="蝙蝠之翼" wing="true"/>
+		<item id="86005" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="蝙蝠之翼" wing="true"/>
+		<item id="86006" icon="Texture/Aries/Item/1482_ShiningBack.png" name="骨翼" wing="true"/>
+		<item id="86012" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="大恶魔之翼" wing="true"/>
+		<item id="86020" icon="Texture/Aries/Item/1812_AngelWings.png" name="大天使之翼" wing="true"/>
+		<item id="86021" icon="Texture/Aries/Item/1820_IceBackS2.png" name="魔龙之翼" wing="true"/>
+		<item id="86022" icon="Texture/Aries/Item/1832_FireBackS2.png" name="魔龙之翼" wing="true"/>
+		<item id="86023" icon="Texture/Aries/Item/1839_StormBackS2.png" name="魔龙之翼" wing="true"/>
+		<item id="86024" icon="Texture/Aries/Item/1844_LifeBackS2.png" name="魔龙之翼" wing="true"/>
+		<item id="86025" icon="Texture/Aries/Item/1851_DeathBackS2.png" name="魔龙之翼" wing="true"/>
+		<item id="86029" icon="Texture/Aries/Item/2076_FireBackS3.png" name="元素之翼" wing="true"/>
+		<item id="86030" icon="Texture/Aries/Item/2083_IceBackS3.png" name="元素之翼" wing="true"/>
+		<item id="86031" icon="Texture/Aries/Item/2090_StormBackS3.png" name="元素之翼" wing="true"/>
+		<item id="86032" icon="Texture/Aries/Item/2097_LifeBackS3.png" name="元素之翼" wing="true"/>
+		<item id="86033" icon="Texture/Aries/Item/2104_DeathBackS3.png" name="元素之翼" wing="true"/>
+		<item id="86034" icon="Texture/Aries/Item/2235_FireBackS4.png" name="元素之翼" wing="true"/>
+		<item id="86035" icon="Texture/Aries/Item/2242_IceBackS4.png" name="元素之翼" wing="true"/>
+		<item id="86036" icon="Texture/Aries/Item/2249_StormBackS4.png" name="元素之翼" wing="true"/>
+		<item id="86037" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="元素之翼" wing="true"/>
+		<item id="86038" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="元素之翼" wing="true"/>
 	</category>
 
 	<category name="right_hand_equipment" text="手持">
-		<item id="87001" icon="Texture/Aries/Item/1022_LargeLollipop.png" name="手持1"/>
-		<item id="87002" icon="Texture/Aries/Item/1147_Detector.png" name="手持2"/>
-		<item id="87003" icon="Texture/Aries/Item/1156_YuanXiaoTorch.png" name="手持3"/>
-		<item id="87004" icon="Texture/Aries/Item/1157_GucciChisel.png" name="手持4"/>
-		<item id="87005" icon="Texture/Aries/Item/1187_BluePinwheel.png" name="手持5"/>
-		<item id="87006" icon="Texture/Aries/Item/1188_PinkPinwheel.png" name="手持6"/>
-		<item id="87007" icon="Texture/Aries/Item/1189_OrangePinwheel.png" name="手持7"/>
-		<item id="87064" icon="Texture/Aries/Item/1650_ShopNewYearsRoseWand.png" name="手持64"/>
-		<item id="87120" icon="Texture/Aries/Item/21005_MorningGlory.png" name="手持120"/>
-		<item id="87121" icon="Texture/Aries/Item/21006_FirstAidBox.png" name="手持121"/>
-		<item id="87122" icon="Texture/Aries/Item/2117_ChristmasLolipop.png" name="手持122"/>
-		<item id="87159" icon="Texture/Aries/Item/2326_TheStrongest_Harpoon_Left.png" name="手持159"/>
-		<item id="87160" icon="Texture/Aries/Item/2329_TheChristmas_Cane_Left.png" name="手持160"/>
-		<item id="87161" icon="Texture/Aries/Item/2330_TheChristmas_Cane_GreenLeft.png" name="手持161"/>
-		<item id="87167" icon="Texture/Aries/Item/2395_ValentinesDay_BlueFlower_Left.png" name="手持167"/>
-		<item id="87168" icon="Texture/Aries/Item/2396_ValentinesDay_RedFlower_Left.png" name="手持168"/>
-		<item id="87169" icon="Texture/Aries/Item/2397_ValentinesDay_PurpleFlower_Left.png" name="手持169"/>
-		<item id="87170" icon="Texture/Aries/Item/2398_ValentinesDay_OrangeFlower_Left.png" name="手持170"/>
-		<item id="87171" icon="Texture/Aries/Item/2406_Umbrella01_Left.png" name="手持171"/>
-		<item id="87173" icon="Texture/Aries/Item/2412_Dream_Flower_Left.png" name="手持173"/>
-		<item id="87174" icon="Texture/Aries/Item/2422_icecreram_green_Left.png" name="手持174"/>
-		<item id="87175" icon="Texture/Aries/Item/2423_icecreram_write_Left.png" name="手持175"/>
-		<item id="87176" icon="Texture/Aries/Item/2424_icecreram_brown_Left.png" name="手持176"/>
-		<item id="87177" icon="Texture/Aries/Item/2425_lolly_green_Left.png" name="手持177"/>
-		<item id="87179" icon="Texture/Aries/Item/2427_lolly_pink_Left.png" name="手持179"/>
-		<item id="87180" icon="Texture/Aries/Item/2428_TheDragonBoat_Left.png" name="手持180"/>
-		<item id="87181" icon="Texture/Aries/Item/2429_Dream2_Flower_Left.png" name="手持181"/>
-		<item id="87182" icon="Texture/Aries/Item/2430_GirlHeart_Flower_Left.png" name="手持182"/>
-		<item id="87183" icon="Texture/Aries/Item/2431_Dream_Flower_Left.png" name="手持183"/>
-		<item id="87112" icon="Texture/Aries/Item/2051_GoldAcinus.png" name="手持112"/>
-		<item id="87113" icon="Texture/Aries/Item/2052_SilveryAcinus.png" name="手持113"/>
-		<item id="87114" icon="Texture/Aries/Item/2053_StrawberryAcinus.png" name="手持114"/>
-		<item id="87115" icon="Texture/Aries/Item/2054_SeawaterAcinus.png" name="手持115"/>
-		<item id="87116" icon="Texture/Aries/Item/21001_RedAcinus.png" name="手持116"/>
-		<item id="87117" icon="Texture/Aries/Item/21002_YellowAcinus.png" name="手持117"/>
-		<item id="87118" icon="Texture/Aries/Item/21003_BlueAcinus.png" name="手持118"/>
-		<item id="87119" icon="Texture/Aries/Item/21004_GreenAcinus.png" name="手持119"/>
-		<item id="87128" icon="Texture/Aries/Item/2129_FinedayPig_Shield.png" name="手持128"/>
-		<item id="87129" icon="Texture/Aries/Item/2130_SugarFree_PorkMeat.png" name="手持129"/>
+		<item id="87001" icon="Texture/Aries/Item/1022_LargeLollipop.png" name="棒棒糖"/>
+		<item id="87002" icon="Texture/Aries/Item/1147_Detector.png" name="放大镜"/>
+		<item id="87003" icon="Texture/Aries/Item/1156_YuanXiaoTorch.png" name="火炬"/>
+		<item id="87004" icon="Texture/Aries/Item/1157_GucciChisel.png" name="镐头"/>
+		<item id="87005" icon="Texture/Aries/Item/1187_BluePinwheel.png" name="花瓣风车"/>
+		<item id="87006" icon="Texture/Aries/Item/1188_PinkPinwheel.png" name="花瓣风车"/>
+		<item id="87007" icon="Texture/Aries/Item/1189_OrangePinwheel.png" name="风车"/>
+		<item id="87064" icon="Texture/Aries/Item/1650_ShopNewYearsRoseWand.png" name="玫瑰花"/>
+		<item id="87120" icon="Texture/Aries/Item/21005_MorningGlory.png" name="三色花"/>
+		<item id="87121" icon="Texture/Aries/Item/21006_FirstAidBox.png" name="医疗箱"/>
+		<item id="87122" icon="Texture/Aries/Item/2117_ChristmasLolipop.png" name="棒棒糖"/>
+		<item id="87159" icon="Texture/Aries/Item/2326_TheStrongest_Harpoon_Left.png" name="咸鱼"/>
+		<item id="87160" icon="Texture/Aries/Item/2329_TheChristmas_Cane_Left.png" name="权杖"/>
+		<item id="87161" icon="Texture/Aries/Item/2330_TheChristmas_Cane_GreenLeft.png" name="权杖"/>
+		<item id="87167" icon="Texture/Aries/Item/2395_ValentinesDay_BlueFlower_Left.png" name="花束"/>
+		<item id="87168" icon="Texture/Aries/Item/2396_ValentinesDay_RedFlower_Left.png" name="花束"/>
+		<item id="87169" icon="Texture/Aries/Item/2397_ValentinesDay_PurpleFlower_Left.png" name="花束"/>
+		<item id="87170" icon="Texture/Aries/Item/2398_ValentinesDay_OrangeFlower_Left.png" name="花束"/>
+		<item id="87171" icon="Texture/Aries/Item/2406_Umbrella01_Left.png" name="马头权杖"/>
+		<item id="87173" icon="Texture/Aries/Item/2412_Dream_Flower_Left.png" name="花束"/>
+		<item id="87174" icon="Texture/Aries/Item/2422_icecreram_green_Left.png" name="冰激凌"/>
+		<item id="87175" icon="Texture/Aries/Item/2423_icecreram_write_Left.png" name="冰激凌"/>
+		<item id="87176" icon="Texture/Aries/Item/2424_icecreram_brown_Left.png" name="冰激凌"/>
+		<item id="87177" icon="Texture/Aries/Item/2425_lolly_green_Left.png" name="冰棍"/>
+		<item id="87179" icon="Texture/Aries/Item/2427_lolly_pink_Left.png" name="冰棍"/>
+		<item id="87180" icon="Texture/Aries/Item/2428_TheDragonBoat_Left.png" name="船桨"/>
+		<item id="87181" icon="Texture/Aries/Item/2429_Dream2_Flower_Left.png" name="花束"/>
+		<item id="87182" icon="Texture/Aries/Item/2430_GirlHeart_Flower_Left.png" name="花束"/>
+		<item id="87183" icon="Texture/Aries/Item/2431_Dream_Flower_Left.png" name="花束"/>
+		<item id="87112" icon="Texture/Aries/Item/2051_GoldAcinus.png" name="魔法杖"/>
+		<item id="87113" icon="Texture/Aries/Item/2052_SilveryAcinus.png" name="魔法杖"/>
+		<item id="87114" icon="Texture/Aries/Item/2053_StrawberryAcinus.png" name="魔法杖"/>
+		<item id="87115" icon="Texture/Aries/Item/2054_SeawaterAcinus.png" name="魔法杖"/>
+		<item id="87116" icon="Texture/Aries/Item/21001_RedAcinus.png" name="魔法杖"/>
+		<item id="87117" icon="Texture/Aries/Item/21002_YellowAcinus.png" name="魔法杖"/>
+		<item id="87118" icon="Texture/Aries/Item/21003_BlueAcinus.png" name="魔法杖"/>
+		<item id="87119" icon="Texture/Aries/Item/21004_GreenAcinus.png" name="魔法杖"/>
+		<item id="87128" icon="Texture/Aries/Item/2129_FinedayPig_Shield.png" name="盾牌"/>
+		<item id="87129" icon="Texture/Aries/Item/2130_SugarFree_PorkMeat.png" name="吃剩的肉"/>
 
 		<item id="87009" icon="Texture/Aries/Item/1266_CommonNewbieWand.png" name="手持9" avatarMode="false"/>
 		<item id="87010" icon="Texture/Aries/Item/1267_FireWand_5.png" name="手持10" avatarMode="false"/>

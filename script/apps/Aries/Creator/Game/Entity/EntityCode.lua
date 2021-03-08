@@ -128,6 +128,23 @@ function Entity:GetBlocklyNPLCode()
 	return self.blockly_nplcode;
 end
 
+function Entity:SetNPLBlocklyXMLCode(blockly_xmlcode)
+	self.npl_blockly_xmlcode = blockly_xmlcode;
+end
+
+function Entity:GetNPLBlocklyXMLCode()
+	return self.npl_blockly_xmlcode or "";
+end
+
+function Entity:SetNPLBlocklyNPLCode(blockly_nplcode)
+	self.npl_blockly_nplcode = blockly_nplcode;
+	self:SetCommand(blockly_nplcode);
+end
+
+function Entity:GetNPLBlocklyNPLCode()
+	return self.npl_blockly_nplcode or "";
+end
+
 function Entity:SetNPLCode(nplcode)
 	self.nplcode = nplcode;
 	self:SetCommand(nplcode);
@@ -160,7 +177,7 @@ function Entity:SetBlocklyEditMode(bEnabled)
 	if(self.isBlocklyEditMode~=bEnabled) then
 		self.isBlocklyEditMode = bEnabled;
 		if(bEnabled)  then
-			self:SetCommand(self:GetBlocklyNPLCode());
+			self:SetCommand(self.isUseNplBlockly and self:GetNPLBlocklyNPLCode() or self:GetBlocklyNPLCode());
 		else
 			self:SetCommand(self:GetNPLCode());
 		end
@@ -168,11 +185,20 @@ function Entity:SetBlocklyEditMode(bEnabled)
 	end
 end
 
+function Entity:IsUseNplBlockly()
+	return self.isUseNplBlockly;
+end
+
+function Entity:SetUseNplBlockly(bEnabled)
+	self.isUseNplBlockly = bEnabled;
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
+	node.attr.isUseNplBlockly = self:IsUseNplBlockly();
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
 	end
@@ -192,11 +218,14 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self:GetCodeLanguageType() ~= "" and self:GetCodeLanguageType() ~= nil) then
 		node.attr.codeLanguageType = self:GetCodeLanguageType();
 	end
-	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
+
+	if((self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") or self:GetNPLBlocklyXMLCode()~="") then
 		local blocklyNode = {name="blockly", };
 		node[#node+1] = blocklyNode;
 		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
 		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
+		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self:GetNPLBlocklyXMLCode())}
+		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self:GetNPLBlocklyNPLCode()) }
 		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
 			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
 		end
@@ -221,7 +250,7 @@ function Entity:LoadFromXMLNode(node)
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 	self.codeLanguageType = node.attr.codeLanguageType;
-	
+	self.isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
     
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
@@ -248,6 +277,10 @@ function Entity:LoadFromXMLNode(node)
 						self:SetBlocklyXMLCode(code);
 					elseif(sub_node.name == "nplcode") then
 						self:SetBlocklyNPLCode(code);
+					elseif(sub_node.name == "npl_xmlcode") then
+						self:SetNPLBlocklyXMLCode(code);
+					elseif(sub_node.name == "npl_nplcode") then
+						self:SetNPLBlocklyNPLCode(code);
 					elseif(sub_node.name == "code") then
 						self:SetNPLCode(code);
 					end
@@ -266,7 +299,7 @@ function Entity:LoadFromXMLNode(node)
 		self.nplcode = self:GetCommand();
 	end
 	if(self.isBlocklyEditMode) then
-		self:SetCommand(self:GetBlocklyNPLCode());
+		self:SetCommand(self.isUseNplBlockly and self:GetNPLBlocklyNPLCode() or self:GetBlocklyNPLCode());
 	else
 		self:SetCommand(self:GetNPLCode());
 	end

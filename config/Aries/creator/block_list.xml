@@ -345,6 +345,8 @@ uid: unique id used in macro recording
     
     <block name="InvisibleBlock" />
     <block name="InvisibleGlowStone" />
+  
+    <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
   </category>
   <category name="others" text="其他">
   </category>

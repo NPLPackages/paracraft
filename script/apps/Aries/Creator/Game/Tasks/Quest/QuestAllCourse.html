@@ -56,8 +56,11 @@ function IsSelectLevel(index)
 end
 
 function SelectCourse(index)
-    print("ffffffff", index)
     QuestAllCourse.SelectCourse(index)
+end
+
+function GotoClass(index)
+    QuestAllCourse.GotoClass(index)
 end
 
 function IsSelectCourse(index)
@@ -153,7 +156,7 @@ end
                         <!-- <img zorder="10" src='http://api.keepwork.com/ts-storage/siteFiles/15270/raw#商城商品1.png' width="256" height="128"/> -->
                         <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=getUrl(Eval("imageUrl"))%>' width="128" height="86"/>
                         <div style="width: 130px; float: left;base-font-size:16px;font-size: 16px;margin-top: 37px;margin-left: 14px;"><%=Eval("name")%></div>
-                        <input zorder="1" name='<%=Eval("index")%>' onclick="SelectCourse" type="button" style="margin-left: 5px; width:52px;height:52px;margin-top:28px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_jinru_52X52_32bits.png#0 0 52 52)"/>
+                        <input zorder="1" name='<%=Eval("index")%>' onclick="GotoClass" type="button" style="margin-left: 5px; width:52px;height:52px;margin-top:28px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_jinru_52X52_32bits.png#0 0 52 52)"/>
                     </div>
                 </Columns>
             </pe:gridview>

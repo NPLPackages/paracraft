@@ -263,12 +263,20 @@ function MacroPlayer.AnimCursorBtn(bRestart)
 			local mouseX, mouseY = ParaUI.GetMousePosition();
 			
 			local totalTicks = 30;
+			local stopTicks = 10;
 			cursorTick = bRestart and 0 or (cursorTick + 1);
-			local progress = (totalTicks - cursorTick) / totalTicks;
-			if(cursorTick >= totalTicks) then
+			local progress = (totalTicks - math.min(totalTicks, cursorTick)) / totalTicks;
+			if(cursorTick >= (totalTicks+stopTicks)) then
 				cursorTick = 0;
 			end
 			local diffDistance = math.sqrt((mouseX - x)^2 + (mouseY - y)^2)
+
+			local maxDistance = 32
+			if( diffDistance > maxDistance) then
+				-- if too far away, we will begin from maxDistance
+				progress = progress * (maxDistance / diffDistance);
+			end
+
 			if( diffDistance > 16 ) then
 				cursorBtn.visible = true;
 				cursorBtn.translationx = math.floor((mouseX - x) * progress + 0.5);
@@ -403,6 +411,7 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 	if(page) then
 		local cursor = page:FindControl("cursorClick");
 		if(cursor) then
+			cursor.candrag = false;
 			cursor.visible = bShow;
 			if(bShow) then
 				MacroPlayer.SetTopLevel();
@@ -496,15 +505,15 @@ function MacroPlayer.CheckButton(button)
 		-- since, some mouse does not have a middle button, we will pass anyway, but tell the user about it. 
 		GameLogic.AddBBS("Macro", L"按鼠标中键", 5000, "255 0 0");
 	end
-	if(button:match("ctrl") and not (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL))) then
+	if((not button:match("ctrl")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL))) then
 		isOK = false
 		reason = "keyboardButtonWrong"
 	end
-	if(button:match("shift") and not (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT))) then
+	if((not button:match("shift")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT))) then
 		isOK = false
 		reason = "keyboardButtonWrong"
 	end
-	if(button:match("alt") and not (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU))) then
+	if((not button:match("alt")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU))) then
 		isOK = false
 		reason = "keyboardButtonWrong"
 	end
@@ -562,13 +571,13 @@ function MacroPlayer.OnKeyDown(event)
 		return
 	end
 	local isOK = true;
-	if(button:match("ctrl") and not event.ctrl_pressed) then
+	if((not button:match("ctrl")) ~= (not event.ctrl_pressed)) then
 		isOK = false
 	end
-	if(button:match("shift") and not event.shift_pressed) then
+	if((not button:match("shift")) ~= (not event.shift_pressed)) then
 		isOK = false
 	end
-	if(button:match("alt") and not event.alt_pressed) then
+	if((not button:match("alt")) ~= (not event.alt_pressed)) then
 		isOK = false
 	end
 	local keyname = button:match("(DIK_[%w_]+)");
@@ -716,6 +725,9 @@ function MacroPlayer.ShowDrag(bShow, startX, startY, endX, endY, button)
 		if(dragPoints) then
 			dragPoints.visible = bShow;
 			if(bShow) then
+				local curPoint = page:FindControl("cursorClick");
+				curPoint.candrag = true;
+
 				local startPoint = page:FindControl("startPoint")
 				local width = 24;
 				startPoint.x = startX - width;
@@ -742,8 +754,8 @@ function MacroPlayer.SetDragTrigger(startX, startY, endX, endY, button, callback
 		end
 		MacroPlayer.expectedDragButton = button;
 		MacroPlayer.SetTriggerCallback(callbackFunc)
-		MacroPlayer.ShowDrag(true, startX, startY, endX, endY, button)
 		MacroPlayer.ShowCursor(true, startX, startY, button)
+		MacroPlayer.ShowDrag(true, startX, startY, endX, endY, button)
 		MacroPlayer.AutoAdjustControlPosition(startX, startY, endX, endY)
 	end
 end

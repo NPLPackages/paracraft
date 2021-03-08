@@ -7,12 +7,12 @@ local DockExitPage = NPL.export()
 DockExitPage.callback = nil
 local page = nil
 function DockExitPage.ShowPage(callback)
-    local viewwidth = 520
-    local viewheight = 320
+    local viewwidth = 270
+    local viewheight = 500
     DockExitPage.callback = callback
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/Dock/DockExitPage.html",
-        name = "Notice.Show", 
+        name = "DockExitPage.Show", 
         isShowTitleBar = false,
         DestroyOnClose = true,
         style = CommonCtrl.WindowFrame.ContainerStyle,

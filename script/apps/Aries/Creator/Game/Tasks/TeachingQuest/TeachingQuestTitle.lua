@@ -92,10 +92,12 @@ function TeachingQuestTitle.OnWorldLoaded()
 					GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 				end, 1000)
 			else
+				--[[
 				_guihelper.MessageBox(L"本世界只能拥有入场券的用户可以访问。即将退出世界！");
 				commonlib.TimerManager.SetTimeout(function()  
 					GameLogic.RunCommand("/leaveworld")
 				end, 3000)
+				]]
 			end
 		end
 	end

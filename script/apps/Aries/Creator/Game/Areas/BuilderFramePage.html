@@ -147,7 +147,7 @@ end
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=Eval("tooltip") or L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>

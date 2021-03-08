@@ -390,7 +390,7 @@ function DockPage.RenderButton_1(index)
                 return DockPage.HasMsgCenterUnReadMsg();
             end
         </script>
-        <kp:redtip style="position:relative;margin-left:53px;margin-top:-74px;" onupdate='<%%= HasMsgCenterUnReadMsg()%%>' ></kp:redtip>
+        <kp:redtip style="position:relative;margin-left:66px;margin-top:-66px;" onupdate='<%%= HasMsgCenterUnReadMsg()%%>' ></kp:redtip>
         ]],"");
     elseif (id == "user_tip") then
         -- 任务
@@ -446,7 +446,17 @@ function DockPage.RenderButton_2(index)
     local node = DockPage.top_line_2[index];
     local tip_str = "";
     local id = node.id;   
-    
+    if(id == "checkin")then
+        tip_str = string.format([[
+        <script type="text/npl" refresh="false">
+            local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua")
+            function HasCheckedToday()
+                return (not ParacraftLearningRoomDailyPage.HasCheckedToday());
+            end
+        </script>
+        <kp:redtip style="position:relative;margin-left:66px;margin-top:-66px;" onupdate='<%%= HasCheckedToday()%%>' ></kp:redtip>
+        ]],"");
+    end
     local s = string.format([[
         <input type="button" name='%s' onclick="OnClickTop" style="width:100px;height:80px;background:url(%s)"/>
         %s

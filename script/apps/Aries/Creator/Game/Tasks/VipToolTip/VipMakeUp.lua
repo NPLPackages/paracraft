@@ -93,7 +93,7 @@ function VipMakeUp.OnCreate()
     local qrcode_height = 250
     local block_size = qrcode_width / #VipMakeUp.qrcode
 
-    local qrcode = ParaUI.CreateUIObject("container", "qrcode", "_lt", 385, 176, qrcode_width, qrcode_height);
+    local qrcode = ParaUI.CreateUIObject("container", "qrcode_make_up", "_lt", 385, 176, qrcode_width, qrcode_height);
     qrcode:SetField("OwnerDraw", true); -- enable owner draw paint event
     qrcode:SetField("SelfPaint", true);
     qrcode:SetScript("ondraw", function(test)

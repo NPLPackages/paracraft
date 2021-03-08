@@ -249,12 +249,17 @@ function Entity:GetDisplayName()
 	end
 end
 
-function Entity:GetAgentFilename()
+-- @param bIsSaving: if true, we are saving agent file, if false, we are loading. 
+function Entity:GetAgentFilename(bIsSaving)
 	local name = self:GetAgentName();
 	if(name and name~="") then
 		local url = self:GetAgentUrl()
 		if(url and url:match("^Mod/Agents/")) then
-			return ParaIO.GetWritablePath().."npl_packages/Agents/"..url;
+			if(bIsSaving) then
+				return ParaIO.GetWritablePath().."npl_packages/Agents/"..url;
+			else
+				return url;
+			end
 		else
 			return Files.WorldPathToFullPath("agents/"..name..".xml");
 		end
@@ -262,7 +267,7 @@ function Entity:GetAgentFilename()
 end
 
 function Entity:SaveToAgentFile(filename)
-	filename = filename or self:GetAgentFilename()
+	filename = filename or self:GetAgentFilename(true)
 	
 	if(filename) then
 		-- save to local agent file
@@ -306,7 +311,7 @@ function Entity:ComputeAgentUrl()
 	else
 		local remoteFolderName = GameLogic.options:GetRemoteWorldFolder();
 		if(remoteFolderName) then
-			local url = format("%sagents/%s.xml", remoteFolderName, self:GetAgentName());
+			local url = format("@%s:%sagents/%s.xml", GameLogic.options:GetProjectId(), remoteFolderName, self:GetAgentName());
 			return url;
 		end
 	end
@@ -369,8 +374,50 @@ function Entity:UpdateAgent()
 	end
 end
 
+-- @return nil or {version="", agentName="", agentUrl="", ...}
+function Entity:GetAgentInfoFromDiskFile(filename)
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(xmlRoot) then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(root_node) then
+			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+			if(node and node[1]) then
+				local blocks = NPL.LoadTableFromString(node[1]);
+				if(blocks and #blocks>=1) then
+					local b = blocks[1];
+					if(b and b[4] == self:GetBlockId() and b[6]) then
+						local serverData = b[6]
+						if(serverData and serverData.attr) then
+							return serverData.attr;
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function Entity:IsNewerThanVersion(version)
+	local myVersion = self:GetVersion();
+	if(myVersion and version) then
+		myVersion = tonumber(myVersion)
+		version = tonumber(version)
+		if(myVersion and version) then
+			if(myVersion < version) then
+				return false;
+			end
+		end
+	end
+	return true;
+end
+
 function Entity:UpdateAgentFromDiskFile(filename)
 	if(ParaIO.DoesFileExist(filename)) then
+		local agentInfo = self:GetAgentInfoFromDiskFile(filename);
+		if(agentInfo and self:IsNewerThanVersion(agentInfo.version)) then
+			-- do not update if current agent file is newer
+			return;
+		end
 		commonlib.TimerManager.SetTimeout(function()  
 			Entity.isUpdating = true;
 			local x, y, z = self:GetBlockPos();

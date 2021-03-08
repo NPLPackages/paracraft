@@ -513,7 +513,7 @@ function Entity:MoveEntity(deltaTime)
 	deltaTime = math.min(0.3, deltaTime);
 	self:CheckCollision(deltaTime);
 	local player = self:GetInnerObject();
-	PlayerAssetFile:ShowWingAttachment(player, self:GetSkinId(), GameLogic.GetPlayerController():IsInAir());
+	PlayerAssetFile:ShowWingAttachment(player, self:GetSkinId(), player:GetAnimation() == 38);
 end
 
 -- called every framemove by the ridden entity, instead of framemove.

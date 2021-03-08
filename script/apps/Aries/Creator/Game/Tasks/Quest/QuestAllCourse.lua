@@ -405,6 +405,17 @@ function QuestAllCourse.SelectCourse(index)
     -- 刷新课程列表控件
     QuestAllCourse.FreshGridView("course_list")
 
+    -- QuestAllCourse.RunCommand(index)
+end
+
+function QuestAllCourse.GotoClass(index)
+    -- if index == QuestAllCourse.SelectCourseIndex then
+    --     return
+    -- end
+    QuestAllCourse.SelectCourseIndex = index
+    -- 刷新课程列表控件
+    QuestAllCourse.FreshGridView("course_list")
+
     QuestAllCourse.RunCommand(index)
 end
 

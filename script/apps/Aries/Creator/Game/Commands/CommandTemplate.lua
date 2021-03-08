@@ -104,6 +104,10 @@ default name is "default"
 
 			local fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
 			
+			if(not fullpath and ParaIO.DoesFileExist(filename, true)) then
+				fullpath = filename;
+			end
+
 			if(fullpath) then
 				local task = BlockTemplate:new(
 					{

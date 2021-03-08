@@ -155,6 +155,9 @@ function ItemClient.LoadGlobalBlockList()
 						if(attr.icon) then
 							itemDS.icon = attr.icon;
 						end
+						if(attr.tooltip or attr.tip) then
+							itemDS.tooltip = attr.tooltip or attr.tip;
+						end
 						if(attr.to_id) then
 							local to_id = tonumber(attr.to_id);
 							local id;

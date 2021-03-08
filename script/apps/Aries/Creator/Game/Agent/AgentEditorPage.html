@@ -52,7 +52,10 @@ end
             </div>
         </div>
         <div style="margin:3px;">
-            <div><%=L"url地址:"%><input type="button" class="button" name="OK" uiname="AgentEditorPage.OnClickOpenFolder" value='...' style="margin-left:5px;" onclick="AgentEditorPage.OnClickOpenFolder"/></div>
+            <div><%=L"url地址:"%>
+                <input type="button" class="button" name="btnOpenFolder" uiname="AgentEditorPage.OnClickOpenFolder" value='...' style="margin-left:5px;" onclick="AgentEditorPage.OnClickOpenFolder"/>
+                <input type="button" class="button" name="btnUpdateFromRemote" uiname="AgentEditorPage.OnClickUpdateFromRemote" tooltip="下载远程版本" value='↓' style="margin-left:5px;" onclick="AgentEditorPage.OnClickUpdateFromRemote"/>
+            </div>
             <div><pe:label name="agentUrl" uiname="AgentEditorPage.agentUrl" style="height:36px;color:#808080;font-size:10px" /></div>
         </div>
         <hr />

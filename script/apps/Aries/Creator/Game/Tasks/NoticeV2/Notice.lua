@@ -161,7 +161,8 @@ end
 
 function Notice.IsValidUrl(url)
     local isValid = false
-    if string.find(url, "http://") or string.find(url, "https://") or string.find(url, "ftp://") then
+    local str_url = url or ""
+    if string.find(str_url, "http://") or string.find(str_url, "https://") or string.find(str_url, "ftp://") then
         isValid = true
     end
     return isValid
