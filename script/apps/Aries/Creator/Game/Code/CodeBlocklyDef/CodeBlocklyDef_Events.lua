@@ -656,6 +656,7 @@ end)
 				{ L"OnSelect", "OnSelect" },
 				{ L"OnDeSelect", "OnDeSelect" },
 				{ L"GetIcon", "GetIcon" },
+				{ L"GetTooltip", "GetTooltip" },
 				{ L"OnClickInHand", "OnClickInHand" },
 			},
 		},

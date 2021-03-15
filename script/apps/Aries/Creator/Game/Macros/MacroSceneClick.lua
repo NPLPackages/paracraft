@@ -87,7 +87,8 @@ end
 
 function Macros.MouseAngleToScreenPos(angleX, angleY, button)
 	local viewport = ViewportManager:GetSceneViewport();
-	local curScreenWidth, curScreenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+	local curScreenWidth = Screen:GetWidth() - math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+	local curScreenHeight = Screen:GetHeight() - math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
 
 	local curFov = Cameras:GetCurrent():GetFieldOfView()
 	local curAspectRatio = Cameras:GetCurrent():GetAspectRatio()

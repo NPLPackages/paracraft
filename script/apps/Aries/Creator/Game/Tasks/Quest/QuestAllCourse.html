@@ -71,8 +71,23 @@ function RunCommand(index)
     QuestAllCourse.RunCommand(index)
 end
 
-function getUrl(url)
-    return url
+function GetWorldIconUrl(index)
+    return QuestAllCourse.GetWorldIconUrl(index)
+end
+
+function HasWork(index)
+    return QuestAllCourse.HasWork(index)
+end
+
+function ClickWork(index)
+    QuestAllCourse.ClickWork(index)
+end
+
+function GetTooltip(s)
+    if(s and s~= "")then
+        s = string.format("script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s=%s",s);
+        return s;
+    end
 end
 
 ]]></script>
@@ -92,10 +107,10 @@ end
                             <div style="position: relative; width: 146px;height: 70px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_2_146X70_32bits.png#0 0 146 70)"></div>
                         </pe:if>
 
-                        <img style="margin-left: 12px;margin-top: 4px; float: left;" src='<%=getUrl(Eval("icon"))%>' width="55" height="55"/>
+                        <img style="margin-left: 12px;margin-top: 4px; float: left;" src='<%=Eval("icon")%>' width="55" height="55"/>
                         <div style="float: left;margin-top: 10px;margin-left: 8px;">
                             <div style="base-font-size:14px;font-size: 14px;color: #ffffff;"><%=Eval("name")%></div>
-                            <div style="base-font-size:12px;font-size: 12px;margin-top: 6px; "><%=Eval("desc")%></div>
+                            <div style="base-font-size:12px;font-size: 12px;margin-top: 6px; "><%=Eval("description")%></div>
                         </div>
                     </div>
                 </Columns>
@@ -144,19 +159,48 @@ end
                 </PagerTemplate>
                 <Columns>
                     <div style="width: 360px; height: 110px;">
+                        <pe:if condition='<%=Eval("IsLock")%>'>
+                            <!-- <input zorder="2" type="button" onclick="" name='<%=Eval("index")%>'  style="position: relative; width: 360px;height: 110px;background: ;"/> -->
+                            <img zorder="4" class="invalid_mask" style="position:relative;margin-left:0px;margin-top:0px;width:360px;height:110px;" bindtooltip='<%=GetTooltip(Eval("lock_desc"))%>'/>
+
+                            <div zorder="2" style="position: relative; margin-left: 5px; margin-top: 5px; width: 349px;height: 99px; background:url(Texture/Aries/Creator/keepwork/AiCourse/heidi_32X32_32bits.png#0 0 32 32:4 4 4 4)">
+                                <div zorder="3" style="margin-top: 5px;margin-left: 290px; width: 46px;height: 46px; background:url(Texture/Aries/Creator/keepwork/AiCourse/suo_46X46_32bits.png#0 0 46 46)"> </div>
+                            </div>
+                        </pe:if>
+
                         <input zorder="1" type="button" onclick="SelectCourse" name='<%=Eval("index")%>' style="position: relative; width: 360px;height: 110px;background: ;"/>
+
                         <pe:if condition='<%=IsSelectCourse(Eval("index"))%>'>
                             <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k2_358X108_32bits.png#0 0 358 108)"></div>
                         </pe:if>
                         <pe:if condition='<%=not IsSelectCourse(Eval("index"))%>'>
                             <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k1_358X108_32bits.png#0 0 358 108)"></div>
                         </pe:if>
+
+                        <pe:if condition='<%=Eval("isVip") == 1 %>'>
+                            <div zorder="5" style="position: relative; width: 48px;height: 53px; margin-top: -5px;margin-left: -8px; background:url(Texture/Aries/Creator/keepwork/AiCourse/VIP_48X53_32bits.png#0 0 48 53)"></div>
+                        </pe:if>
                         <!-- <div style="<%= 'width: 256px;height: 128px;background: url(' .. (Eval('imageUrl') and Eval('imageUrl') or '') .. ')' %>"></div> -->
                         <!-- <div style="width: 262px;height: 174px;background: url(http://qiniu-dev.keepwork.com/2-259c3c28-751c-4fa0-afa6-b41c7cac3e1b.jpg?e=4765940093&token=LYZsjH0681n9sWZqCM4E2KmU6DsJOE7CAM4O3eJq:StoKBEd96QeX9_ar8PRPRBCe0MY=);"></div> -->
                         <!-- <img zorder="10" src='http://api.keepwork.com/ts-storage/siteFiles/15270/raw#商城商品1.png' width="256" height="128"/> -->
-                        <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=getUrl(Eval("imageUrl"))%>' width="128" height="86"/>
-                        <div style="width: 130px; float: left;base-font-size:16px;font-size: 16px;margin-top: 37px;margin-left: 14px;"><%=Eval("name")%></div>
-                        <input zorder="1" name='<%=Eval("index")%>' onclick="GotoClass" type="button" style="margin-left: 5px; width:52px;height:52px;margin-top:28px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_jinru_52X52_32bits.png#0 0 52 52)"/>
+                        <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=GetWorldIconUrl(Eval("index"))%>' width="128" height="86"/>
+                        <div style="width: 134px; height: 110px; float: left;">
+                            <div style="width: 134px; float: left;base-font-size:16px;font-size: 16px;margin-top: 12px;margin-left: 12px;position: relative;"><%=Eval("name")%></div>
+                            <div style="width: 134px; float: left;base-font-size:14px;font-size: 14px;margin-top: 58px;margin-left: 12px;color: #ff7529;position: relative;"><%=Eval("level_desc")%></div>
+                            <div style="width: 134px; float: left;base-font-size:12px;font-size: 12px;margin-top: 80px;margin-left: 12px;color: #999999;position: relative;"><%=Eval("time_desc")%></div>
+                        </div>
+                        <div style="width: 70px; height: 110px; float: left;">
+                            <!-- <div style="margin-left: 5px; width:64px;height:30px;margin-top:28px;">
+                                <input zorder="0" name='<%=Eval("index")%>' value="去上课" onclick="GotoClass" type="button" style="font-size: 14px;position: relative; width:64px;height:30px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn1_64X30_32bits.png#0 0 64 30)"/>
+                                <div ClickThrough="true" style="position: relative;margin-top: 4px;margin-left: 16px;">去上课</div>
+                            </div> -->
+                            <input zorder="1" name='<%=Eval("index")%>' tooltip="进入课程" value="" onclick="GotoClass" type="button" style="font-size: 12px; margin-left: 20px; width:46px;height:46px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn2_46X46_32bits.png#0 0 46 46)"/>
+                            <pe:if condition='<%=HasWork(Eval("index"))%>'>
+                                <input zorder="1" name='<%=Eval("index")%>' tooltip="进入作业"  value="" onclick="ClickWork" type="button" style="font-size: 12px; margin-left: 20px; width:46px;height:46px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn1_46X46_32bits.png#0 0 46 46)"/>
+                            </pe:if>
+                            
+                        </div>
+                        
                     </div>
                 </Columns>
             </pe:gridview>

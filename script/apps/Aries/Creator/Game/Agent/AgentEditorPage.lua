@@ -5,8 +5,8 @@ Date: 2021/2/17
 Desc: it defines properties of agent package
 use the lib:
 ------------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/AgentEditorPage.lua");
-local AgentEditorPage = commonlib.gettable("MyCompany.Aries.Game.GUI.AgentEditorPage");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Agent/AgentEditorPage.lua");
+local AgentEditorPage = commonlib.gettable("MyCompany.Aries.Game.Agent.AgentEditorPage");
 AgentEditorPage.ShowPage();
 -------------------------------------------------------
 ]]
@@ -36,6 +36,7 @@ function AgentEditorPage.OnInit()
 		page:SetValue("agentExternalFiles", cur_entity:GetAgentExternalFiles())
 		page:SetValue("agentUrl", cur_entity:GetAgentUrl())
 		page:SetValue("isGlobal", cur_entity:IsGlobal() == true)
+		page:SetValue("isPhantom", cur_entity:IsPhantom() == true)
 
 		local updateMethod = cur_entity:GetUpdateMethod();
 		for i, item in ipairs(AgentEditorPage.updateMethods) do
@@ -108,12 +109,14 @@ function AgentEditorPage.OnClickOK()
 		local agentExternalFiles = page:GetValue("agentExternalFiles");
 		local agentUrl = page:GetValue("agentUrl");
 		local isGlobal = page:GetValue("isGlobal");
+		local isPhantom = page:GetValue("isPhantom");
 		local updateMethod = page:GetValue("updateMethod");
 		local bAgentChanged = false;
 		bAgentChanged = bAgentChanged or (entity:GetVersion() ~= version);
 		entity:SetVersion(version);
 		bAgentChanged = bAgentChanged or (entity:IsGlobal() ~= isGlobal);
 		entity:SetGlobal(isGlobal);
+		entity:SetPhantom(isPhantom);
 		if(agentName~=entity:GetAgentName()) then
 			bAgentChanged = true;
 			entity:SetAgentName(agentName);
@@ -137,12 +140,21 @@ function AgentEditorPage.OnClickOK()
 	page:CloseWindow();
 end
 
+function AgentEditorPage.OnAgentNameChanged()
+	local entity = AgentEditorPage.GetEntity();
+	if(entity and page) then
+		local name = page:GetValue("agentPackageName");
+		local url = entity:ComputeAgentUrl(name)
+		page:SetValue("agentUrl", url or "")
+	end
+end
+
 function AgentEditorPage.OnChangeGlobal()
 	local entity = AgentEditorPage.GetEntity();
 	if(entity and page) then
-		entity:SetGlobal(page:GetValue("isGlobal") == true);
-		entity:ResetAgentUrl()
-		page:SetValue("agentUrl", entity:GetAgentUrl())
+		local name = page:GetValue("agentPackageName");
+		local url = entity:ComputeAgentUrl(name, page:GetValue("isGlobal") == true)
+		page:SetValue("agentUrl", url)
 	end
 end
 

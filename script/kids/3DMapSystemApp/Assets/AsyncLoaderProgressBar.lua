@@ -274,12 +274,13 @@ function AsyncLoaderProgressBar:UpdateDownloadSpeed()
 			end
 			-- echo({self.remaining_bytes, self.remaining_bytes_real, delta_bytes, current_bytes})
 
-			if(self.download_speed>0 or self.remaining_bytes>0) then
+			if(self.remaining_bytes>0) then
 				if(self.start_download_time) then
 					self.download_duration = cur_time - self.start_download_time;
 				else
 					self.start_download_time = cur_time;
 				end
+				
 				local nRemainingBytes = self:GetRemainingBytes();
 				if(nRemainingBytes > 0) then
 					if(self.download_speed>0) then

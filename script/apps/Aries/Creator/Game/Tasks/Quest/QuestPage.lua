@@ -18,19 +18,6 @@ local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.Quest
 -- end)
 
 -- local QuestDateCondition = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestDateCondition");
--- keepwork.user.server_time({},function(err, msg, data)
--- 	if(err == 200)then
--- 		QuestDateCondition.cur_time = data.now;
--- 		QuestDateCondition.values = {
--- 			{date="2021-1-12",duration = "10:00:00-12:00:00"},
--- 			{date="2021-1-12",duration = "14:00:00-16:00:00"},
--- 			{date="2021-1-12",duration = "20:00:00-22:00:00"},
--- 		}
--- 		QuestDateCondition.strict = true;
--- 		QuestDateCondition.endtime = "2021-01-13 11:28:21"
--- 		print(QuestDateCondition:IsValid())
--- 	end
--- end)
 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
@@ -103,19 +90,17 @@ function QuestPage.OnInit()
 	page.OnCreate = QuestPage.OnCreate()
 end
 
+function QuestPage.GetPageCtrl()
+	return page 
+end
+
 function QuestPage.OnCreate()
 end
 
 function QuestPage.Show(show_exid_t)
 	QuestPage.show_exid_t = show_exid_t
 	if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
-		keepwork.user.server_time({
-			cache_policy = "access plus 10 seconds",
-		},function(err, msg, data)
-			if(err == 200)then
-				QuestPage.ShowView()
-			end
-		end)
+		QuestPage.ShowView()
     end
 end
 
@@ -202,7 +187,7 @@ function QuestPage.ShowView()
 				y = -view_height/2,
 				width = view_width,
 				height = view_height,
-				isTopLevel = true
+				-- isTopLevel = true
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 

@@ -15,8 +15,12 @@ NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PainterContext = commonlib.gettable("System.Core.PainterContext");
+local SizeEvent = commonlib.gettable("System.Windows.SizeEvent");
+
 local HeadonDisplay = commonlib.inherit(commonlib.gettable("System.Windows.Window"), commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay"));
 HeadonDisplay:Property({"bIsBillBoard", false, "IsBillBoarded", "SetBillBoarded", auto=true});
+-- default to 0, it can also be 1 or 2. so that multiple headon display can be shown at the same time.  
+HeadonDisplay:Property({"headonIndex", 0, "GetHeadonIndex", "SetHeadonIndex", auto=true});
 
 local template_name = "HeadonDisplay_mcmlv2"
 local template_3d_name = "HeadonDisplay_3d_mcmlv2"
@@ -36,31 +40,64 @@ function DummyObject:Init(obj)
 end
 function DummyObject:Destroy()
 	all_instances[self.obj.id] = nil
-	self.obj:Destroy();
+	if(not self.obj.bReuseWindow) then
+		self.obj:Destroy();
+	end
 	local parent = self:GetParent();
 	if(parent) then
 		local obj = parent:GetInnerObject()
 		if(obj) then
-			obj:ShowHeadOnDisplay(false,0);
+			obj:ShowHeadOnDisplay(false, self.obj:GetHeadonIndex());
 		end
 	end
 	return DummyObject._super.Destroy(self)
 end
 
+function DummyObject:GetHeadonDisplayObj()
+	return self.obj;
+end
 
 -- @param parentEntity: should be an entity
-function HeadonDisplay:Init(parentEntity)
-	if(parentEntity.headonEntity) then
-		parentEntity.headonEntity:Destroy();
+-- @param headonIndex: default to 0, it can also be 1 or 2. so that multiple headon display can be shown at the same time.  
+function HeadonDisplay:Init(parentEntity, headonIndex)
+	headonIndex = headonIndex or 0;
+	local lastEntity = parentEntity:GetHeadonEntity(headonIndex)
+	if(lastEntity) then
+		lastEntity:Destroy();
 	end
 	self.painter = System.Core.PainterContext:new();
-
+	self:SetHeadonIndex(headonIndex);
 	local dummyObj = DummyObject:new():Init(self)
 	dummyObj:SetParent(parentEntity)
 	self.dummyObj = dummyObj;
-	parentEntity.headonEntity = dummyObj;
+	parentEntity:SetHeadonEntity(headonIndex, dummyObj);
 	return self;
 end
+
+function HeadonDisplay:RefreshShow(parentEntity, params)
+	if(self.dummyObj) then
+		self.dummyObj:Init(self);
+		self.dummyObj:SetParent(parentEntity)
+
+		self.name = params.name;
+		self.pageGlobalTable = params.pageGlobalTable;
+		self.is3D = params.is3D
+		self.url = nil;
+
+		local obj = parentEntity:GetInnerObject()
+		if(obj) then
+			local headonIndex = self:GetHeadonIndex();
+			obj:ShowHeadOnDisplay(true, headonIndex);
+		end
+
+		if(params.bDelayedRendering ~= false) then
+			self.delayedRenderParams = {url = params.url, left = params.left, top = params.top, width = params.width, height = params.height, alignment = params.alignment};
+			return
+		end
+		self:ShowWithParamsImp(params);
+	end
+end
+
 
 function HeadonDisplay:CloseWindow()
 	HeadonDisplay._super.CloseWindow(self, true);
@@ -97,64 +134,87 @@ function HeadonDisplay:SetHeadOn3DScalingEnabled(bEnabled)
 	end
 end
 
-
 -- @param params: {url="", alignment, x,y,width, height, allowDrag,zorder, enable_esc_key, DestroyOnClose, parent, pageGlobalTable, 
---	is3D, offset, facing}
+--	is3D, offset, facing, bDelayedRendering:bool}
 -- pageGlobalTable can be a custom page environment table, if nil, it will be the global _G. 
--- is3D£º if true, it is 3d UI, default is false
+-- is3D: if true, it is 3d UI, default is false
+-- bDelayedRendering: if true or nil, we will only render the page when the parent entity is visible. 
 function HeadonDisplay:ShowWithParams(params)
 	self.name = params.name;
 	self.pageGlobalTable = params.pageGlobalTable;
 	self.is3D = params.is3D
-	
+	self.bReuseWindow = params.bReuseWindow;
+
 	local parentEntity = self:GetParentEntity();
 	if(not parentEntity) then
 		return
 	end
 	local obj = parentEntity:GetInnerObject()
 	if(obj) then
-		obj:ShowHeadOnDisplay(true,0);
+		local headonIndex = self:GetHeadonIndex();
+		obj:ShowHeadOnDisplay(true, headonIndex);
 		if(self:Is3DUI())  then
 			HeadonDisplay.InitHeadonTemplate3D();
-			obj:SetHeadOnUITemplateName(template_3d_name,0);
+			obj:SetHeadOnUITemplateName(template_3d_name, headonIndex);
 			local offset = params.offset;
 			if(offset) then
-				obj:SetHeadOnOffset(offset.x or 0, offset.y or 0, offset.z or 0, 0);
+				obj:SetHeadOnOffset(offset.x or 0, offset.y or 0, offset.z or 0, headonIndex);
 			end
 			-- setting 3d facing will automatically make the text control to render in 3d. 
 			obj:SetField("HeadOn3DFacing", params.facing or 0);
 		else
 			HeadonDisplay.InitHeadonTemplate();
-			obj:SetHeadOnUITemplateName(template_name,0);
+			obj:SetHeadOnUITemplateName(template_name, headonIndex);
 		end
-		obj:SetHeadOnText(self.id, 0);
+		obj:SetHeadOnText(self.id, headonIndex);
+	end
+	
+	self:SetDestroyOnClose(params.DestroyOnClose)
+
+	if(not self:isCreated()) then
+		self:create_sys();
 	end
 
+	if(params.bDelayedRendering ~= false) then
+		self.delayedRenderParams = {url = params.url, left = params.left, top = params.top, width = params.width, height = params.height, alignment = params.alignment};
+		return
+	end
+	
+	self:ShowWithParamsImp(params);
+end
+
+
+function HeadonDisplay:RenderDelayedParams()
+	if(self.delayedRenderParams) then
+		self:ShowWithParamsImp(self.delayedRenderParams)
+		self.delayedRenderParams = nil;
+	end
+end
+
+function HeadonDisplay:ShowWithParamsImp(params)
 	-- load component if url has changed
 	if(self.url ~= params.url) then
 		self.url = params.url;
 		if(params.url) then
-			self:LoadComponent(params.url);
+			self:setGeometry(0, 0, 1000, 1000);
+			local page = self:LoadComponent(params.url);
+			if(page) then
+				self.pageWidth, self.pageHeight = page:GetUsedSize();
+			end
 			self:urlChanged(self.url);
 		end
 	end
-	if(not self:isCreated()) then
-		self:create_sys();
-	end
+	
 	local bShow = true;
 	if(bShow) then
 		local nativeWnd = self:GetNativeWindow();
 		if(nativeWnd) then
 			-- reposition/attach to parent
-			local left, top, width, height, alignment = params.left, params.top, params.width, params.height, params.alignment or "_lt";
-			self:SetAlignment(alignment);
-			local x, y, width, height = nativeWnd:GetAbsPosition();
+			self:SetAlignment(params.alignment or "_lt");
 			self.screen_x, self.screen_y = 0, 0;
-			-- update geometry
-			self:setGeometry(x, y, width, height);
 		end
 	end
-	self:SetDestroyOnClose(params.DestroyOnClose)
+	
 	-- show the window
 	self:show();
 	if(self:Is3DUI())  then
@@ -237,6 +297,7 @@ function HeadonDisplay.onDraw(obj)
 	local id = obj.text;
 	local self = all_instances[id];
 	if(self) then
+		self:RenderDelayedParams();
 		if(self:IsBillBoarded()) then
 			self.painterContext:LoadBillboardMatrix();
 		end

@@ -42,10 +42,8 @@ function TurnTable.OnInit()
 end
 
 function TurnTable.Show()
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = TurnTable.GetTimeStamp(data.now)
-        TurnTable.ShowView()
-    end)
+    server_time = GameLogic.QuestAction.GetServerTime()
+    TurnTable.ShowView()
 end
 
 function TurnTable.ShowView()
@@ -104,21 +102,19 @@ function TurnTable.FreshView()
     parent:AddChild(draw_bt);
 
     
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = TurnTable.GetTimeStamp(data.now)
+    server_time = GameLogic.QuestAction.GetServerTime()
 
-        local draw_bt = ParaUI.GetUIObject("TurnTable.DrawBt")
-        local state = TurnTable.GetDrawState()
-        if state == TurnTable.DrawState.can_draw then
-            draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang_106x116_32bits.png; 0 0 106 116";
-        elseif state == TurnTable.DrawState.can_not_draw then
-            draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang2_106x116_32bits.png; 0 0 106 116";
-            draw_bt.onclick = "";
-        else
-            draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang3_106x116_32bits.png; 0 0 106 116";
-            draw_bt.onclick = "";
-        end
-    end)
+    local draw_bt = ParaUI.GetUIObject("TurnTable.DrawBt")
+    local state = TurnTable.GetDrawState()
+    if state == TurnTable.DrawState.can_draw then
+        draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang_106x116_32bits.png; 0 0 106 116";
+    elseif state == TurnTable.DrawState.can_not_draw then
+        draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang2_106x116_32bits.png; 0 0 106 116";
+        draw_bt.onclick = "";
+    else
+        draw_bt.background = "Texture/Aries/Creator/keepwork/TurnTable/btn_choujiang3_106x116_32bits.png; 0 0 106 116";
+        draw_bt.onclick = "";
+    end
 end
 
 function TurnTable.GetDesc()
@@ -160,52 +156,50 @@ function TurnTable.HandleData()
 end
 
 function TurnTable.StartDraw()
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = TurnTable.GetTimeStamp(data.now)
-        if TurnTable.IsInDraw then
-            return
-        end
+    server_time = GameLogic.QuestAction.GetServerTime()
+    if TurnTable.IsInDraw then
+        return
+    end
 
-        math.randomseed(os.time())
-        local random_num = math.random(1, 100)
-        local index = nil
-    
-        for i, v in ipairs(TurnTable.RewardData) do
-            if random_num <= v.value then
-                index = i
-                break
+    math.randomseed(os.time())
+    local random_num = math.random(1, 100)
+    local index = nil
+
+    for i, v in ipairs(TurnTable.RewardData) do
+        if random_num <= v.value then
+            index = i
+            break
+        end
+    end
+
+    if index == nil then
+        return
+    end
+    TurnTable.DrawData = TurnTable.RewardData[index]
+    local circle_num = 7
+    local action_time = 2
+
+    local rad_iterval = 2 * math.pi / #TurnTable.RewardData
+    -- local radian = circle_num * math.pi + rad_iterval * index
+    local radian =  - (circle_num * 2 * math.pi + rad_iterval * (index - 1))
+    TurnTable.radian = radian
+    TurnTable.IsInDraw = true
+    local tween=CommonCtrl.Tween:new{
+        obj=ParaUI.GetUIObject("TurnTable.BG"),
+        prop="rotation",
+        begin=0,
+        change=	radian,
+        duration=action_time,
+        -- MotionFinish = TurnTable.MotionFinish,
+            }
+        tween.func=CommonCtrl.TweenEquations.easeNone;
+        tween:Start();
+        
+        commonlib.TimerManager.SetTimeout(function()
+            if page and page:IsVisible() then
+                TurnTable.MotionFinish()
             end
-        end
-    
-        if index == nil then
-            return
-        end
-        TurnTable.DrawData = TurnTable.RewardData[index]
-        local circle_num = 7
-        local action_time = 2
-    
-        local rad_iterval = 2 * math.pi / #TurnTable.RewardData
-        -- local radian = circle_num * math.pi + rad_iterval * index
-        local radian =  - (circle_num * 2 * math.pi + rad_iterval * (index - 1))
-        TurnTable.radian = radian
-        TurnTable.IsInDraw = true
-        local tween=CommonCtrl.Tween:new{
-            obj=ParaUI.GetUIObject("TurnTable.BG"),
-            prop="rotation",
-            begin=0,
-            change=	radian,
-            duration=action_time,
-            -- MotionFinish = TurnTable.MotionFinish,
-                }
-            tween.func=CommonCtrl.TweenEquations.easeNone;
-            tween:Start();
-            
-            commonlib.TimerManager.SetTimeout(function()
-                if page and page:IsVisible() then
-                    TurnTable.MotionFinish()
-                end
-            end, action_time * 1000);
-    end)
+        end, action_time * 1000);
 end
 
 -- 检测今天是否抽过奖了
@@ -235,46 +229,44 @@ function TurnTable.GetWeeHours(time)
 end
 
 function TurnTable.MotionFinish()
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = TurnTable.GetTimeStamp(data.now)
-        TurnTable.IsInDraw = false
-        if TurnTable.DrawData.exid then
-            local exid = TurnTable.DrawData.exid
-            local callback = function()
-                GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.turnable')
-                if exid == 0 then
-                    local desc = string.format("恭喜你抽中%s探索力", TurnTable.DrawData.exp)
-                    GameLogic.AddBBS(nil, desc);
-                else
-                    local desc = string.format("恭喜你抽中%s知识豆", TurnTable.DrawData.bean_num)
-                    GameLogic.AddBBS(nil, desc);
-                end
-                GameLogic.GetPlayerController():SaveRemoteData("TurnTableDrawTime", TurnTable.GetWeeHours(server_time), 0);
-    
-                TurnTable.OnRefresh()
-            end
-    
+    server_time = GameLogic.QuestAction.GetServerTime()
+    TurnTable.IsInDraw = false
+    if TurnTable.DrawData.exid then
+        local exid = TurnTable.DrawData.exid
+        local callback = function()
+            GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.turnable')
             if exid == 0 then
-                if QuestPage.IsVisible() then
-                    QuestPage.RefreshData()
-                end
-                
-                QuestAction.AddExp(TurnTable.DrawData.exp, function()
-                    if QuestPage.IsVisible() then
-                        local exp = QuestAction.GetExp()
-                        QuestPage.ProgressToExp(true, exp)
-                        QuestPage.HandleGiftData()
-                        QuestPage.OnRefreshGiftGridView()
-                    end
-
-                    callback()
-                end)
-                
+                local desc = string.format("恭喜你抽中%s探索力", TurnTable.DrawData.exp)
+                GameLogic.AddBBS(nil, desc);
             else
-                KeepWorkItemManager.DoExtendedCost(exid, callback);
+                local desc = string.format("恭喜你抽中%s知识豆", TurnTable.DrawData.bean_num)
+                GameLogic.AddBBS(nil, desc);
             end
+            GameLogic.GetPlayerController():SaveRemoteData("TurnTableDrawTime", TurnTable.GetWeeHours(server_time), 0);
+
+            TurnTable.OnRefresh()
         end
-    end)
+
+        if exid == 0 then
+            if QuestPage.IsVisible() then
+                QuestPage.RefreshData()
+            end
+            
+            QuestAction.AddExp(TurnTable.DrawData.exp, function()
+                if QuestPage.IsVisible() then
+                    local exp = QuestAction.GetExp()
+                    QuestPage.ProgressToExp(true, exp)
+                    QuestPage.HandleGiftData()
+                    QuestPage.OnRefreshGiftGridView()
+                end
+
+                callback()
+            end)
+            
+        else
+            KeepWorkItemManager.DoExtendedCost(exid, callback);
+        end
+    end
 end
 
 function TurnTable.GetDrawState()

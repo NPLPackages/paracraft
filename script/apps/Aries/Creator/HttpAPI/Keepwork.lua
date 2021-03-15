@@ -5,7 +5,7 @@ Date: 2020/12/22
 Desc: 后端数据语义化
 Use Lib: 
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
+local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 ]]
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
@@ -122,11 +122,14 @@ end
 function Keepwork:OnLogin()
     self.isLogin = true;
 
+    self:Reset();  -- 重置数据
+
     if (self:IsFirstLoginParacraft()) then
         self:FirstLoginCallback();
     end
 
     self:CheckUserQRCode();
+    -- self:IsPrefectUserInfo();
 end
 
 -- 用户退出
@@ -137,4 +140,39 @@ end
 -- 是否登录
 function Keepwork:IsLogin()
     return self.isLogin;
+end
+
+-- 重置数据
+function Keepwork:Reset()
+    self.isExitPrefectUserInfoItem = false;
+    self.isPrefectUserInfo = false;
+end
+
+-- 是否领取完善信息奖励
+function Keepwork:IsExitPrefectUserInfoItem()
+    if (self.isExitPrefectUserInfoItem) then return true end 
+    self.isExitPrefectUserInfoItem = KeepWorkItemManager.HasGSItem(60054);
+    return self.isExitPrefectUserInfoItem;
+end
+
+-- 用户信息是否完善
+function Keepwork:IsPrefectUserInfo()
+    if (self.isPrefectUserInfo or self.isExitPrefectUserInfoItem) then return true end
+
+    local userinfo = self:GetUserInfo();
+    if (not userinfo.schoolId or userinfo.schoolId == 0) then return false end
+    if (not userinfo.sex or userinfo.sex == "") then return false end
+    if (not userinfo.region or userinfo.region.hasChildren ~= 0) then return false end
+    local info = userinfo.info;
+    if (not info.name or info.name == "") then return false end
+    if (not info.mailName or info.mailName == "") then return false end
+    if (not info.mailAddress or info.mailAddress == "") then return false end
+    if (not info.mailPhone or tostring(info.mailPhone) == "") then return false end
+    if (not info.mailRegion or info.mailRegion.hasChildren ~= 0) then return false end
+
+    GameLogic.QuestAction.AchieveTask("40051_60054_1", 1, true);  -- 标记任务完成
+
+    self.isExitPrefectUserInfoItem = true;
+    self.isPrefectUserInfo = true;
+    return true;
 end

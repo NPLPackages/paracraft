@@ -36,6 +36,8 @@ local ds_category_blocks = {};
 
 local custom_block_ids = {};
 
+local named_blocks = {};
+
 -- the first custom block id
 local custom_block_id_begin = 2000;
 local custom_block_id_max_count = 3000;
@@ -179,15 +181,26 @@ end
 -- add a block at the given index. 
 -- @param index: if nil, it will be added to last block. 
 -- @param category_name: default to "static"
+-- @param blockName: usually nil, if provided, we will ensure that there is only one such item in the list. 
 -- @return blockDsItem
-function ItemClient.AddBlock(block_id, index, category_name)
+function ItemClient.AddBlock(block_id, index, category_name, blockName)
 	local item = ItemClient.CreateGetByBlockID(block_id);
-
+	
 	local blockDSItem = { __index = item, block_id = block_id };
 	setmetatable(blockDSItem, blockDSItem);
 
 	local ds_blocks = ItemClient.GetBlockDS(category_name);
 	index = index or (#ds_blocks+1);
+
+	if(blockName) then
+		local item = named_blocks[blockName]
+		if(item) then
+			return item
+		else
+			named_blocks[blockName] = blockDSItem;
+		end
+	end
+
 	ds_blocks[index] = blockDSItem;	
 	return blockDSItem
 end
@@ -366,6 +379,8 @@ function ItemClient.CreateByBlockID(block_id, item_class)
 end
 
 function ItemClient.OnLeaveWorld()
+	named_blocks = {};
+
 	-- custom_block_ids
 	local block_ids;
 	for id, item in pairs(custom_block_ids) do

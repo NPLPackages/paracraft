@@ -60,7 +60,7 @@ function env_imp:isTouching(objName)
 		if(objName==nil) then
 			return actor:IsTouchingBlock();
 		elseif(type(objName) == "string") then
-			if(objName == "@a") then
+			if(objName == "@a" or objName == "@p") then
 				return actor:IsTouchingPlayers();
 			elseif(objName == "block") then
 				return actor:IsTouchingBlock();

@@ -417,7 +417,10 @@ end
 function MainLogin:CheckCommandLine()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 	local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
-	UrlProtocolHandler:CheckInstallUrlProtocol();
+	if(not System.options.cmdline_world or System.options.cmdline_world=="") then
+		-- only install url protocol when the world is empty
+		UrlProtocolHandler:CheckInstallUrlProtocol();
+	end
 	UrlProtocolHandler:ParseCommand(ParaEngine.GetAppCommandLine());
 	if(System.options.servermode) then
 		-- TODO: for server only world
@@ -544,8 +547,8 @@ function MainLogin:ShowLoginModePage()
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
 
-		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
-		ClassManager.StaticInit();
+		--local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		--ClassManager.StaticInit();
 	end
 
 	if(not System.options.isSchool) then

@@ -40,6 +40,8 @@ end
 -- @param world: WorldManager, if nil, it means a local generator. 
 -- @param seed: a number
 function ParaWorldMiniChunkGenerator:Init(world, seed)
+	print("pppppppppppppppppppppppppppppppppppppppppppp")
+	print(commonlib.debugstack())
 	ParaWorldMiniChunkGenerator._super.Init(self, world, seed);
 	return self;
 end
@@ -118,6 +120,7 @@ function ParaWorldMiniChunkGenerator:ShowBlockTip(count)
 end
 
 function ParaWorldMiniChunkGenerator:OnLoadWorld()
+
 	local filename = self:GetTemplateFilepath();
 	local count = self:GetBlockCountInTemplate(filename)
 	if(count) then

@@ -18,7 +18,7 @@ local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local QuestAllCourse = NPL.export();
 local QuestMessageBox = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestMessageBox.lua");
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
-
+local page
 local server_time = 0
 local VersionToKey = {
 	ONLINE = 1,
@@ -38,10 +38,9 @@ QuestAllCourse.SelectLevelIndex = 1
 QuestAllCourse.SelectCourseIndex = 0
 
 QuestAllCourse.TeacherListData = {
-    {belong_name="teacher_fang", name="方老师", desc="冬令营导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren1_46X50_32bits.png#0 0 55 55", order = -1,},
-    {belong_name="papa", name="帕帕", desc="编程导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren2_55X55_32bits.png#0 0 55 55", order = -1},
-    {belong_name="lala", name="拉拉", desc="建筑导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren3_55X55_32bits.png#0 0 55 55", order = -1},
-    {belong_name="kaka", name="卡卡", desc="动画导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren4_55X55_32bits.png#0 0 55 55", order = -1},
+    -- {belong_name="papa", name="帕帕", desc="编程导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren2_55X55_32bits.png#0 0 55 55", order = -1},
+    -- {belong_name="lala", name="拉拉", desc="建筑导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren3_55X55_32bits.png#0 0 55 55", order = -1},
+    -- {belong_name="kaka", name="卡卡", desc="动画导师", icon="Texture/Aries/Creator/keepwork/AiCourse/ren4_55X55_32bits.png#0 0 55 55", order = -1},
 }
 
 QuestAllCourse.NpcData = {
@@ -69,8 +68,13 @@ function QuestAllCourse.Show(target_world_id)
     --     _guihelper.MessageBox("人工智能课程即日开启，敬请期待", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
     --     return
     -- end
+    if page and page:IsVisible() then
+        return
+    end
+
+    local client_data = QuestAction.GetClientData()
+
     if target_world_id == nil then
-        local client_data = QuestAction.GetClientData()
         local course_world_id = client_data.course_world_id or 0
         course_world_id = tonumber(course_world_id)
         if course_world_id > 0 then
@@ -79,62 +83,60 @@ function QuestAllCourse.Show(target_world_id)
     end
 
     QuestAllCourse.target_world_id = target_world_id
+    QuestAllCourse.target_teacher_id = client_data.course_teacher_id
+    QuestAllCourse.target_level_id = client_data.course_level_id
 
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-        QuestAction.SetServerTime(server_time)
-        QuestAllCourse.ShowView()
-    end)
-end
-
-function QuestAllCourse.ShowView()
-    if page and page:IsVisible() then
-        return
-    end
-
-    local open_callback = function()
-        QuestAllCourse.RefreshTeacherListData()
-
-        QuestAllCourse.SelectTargetWorld()
-        QuestAllCourse.RefreshLevelListData()
-        QuestAllCourse.RefreshCourseListData()
+    local params = {
+        url = "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.html",
+        name = "QuestAllCourse.Show", 
+        isShowTitleBar = false,
+        DestroyOnClose = true,
+        style = CommonCtrl.WindowFrame.ContainerStyle,
+        allowDrag = true,
+        enable_esc_key = true,
+        zorder = 0,
+        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+        directPosition = true,
         
-        local params = {
-            url = "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.html",
-            name = "QuestAllCourse.Show", 
-            isShowTitleBar = false,
-            DestroyOnClose = true,
-            style = CommonCtrl.WindowFrame.ContainerStyle,
-            allowDrag = true,
-            enable_esc_key = true,
-            zorder = 0,
-            app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-            directPosition = true,
+        align = "_ct",
+        x = -926/2,
+        y = -562/2,
+        width = 926,
+        height = 562,
+    };
+    System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+    keepwork.quest_course_catalogs.get({}, function(err2, msg2, data2)
+        -- print(">>>>>>>>>>>>>>>>>>课程目录列表", err2)
+        -- echo(data2, true)
+        if err2 == 200 then
+            QuestAllCourse.CatalogsData = data2
+
+            QuestAllCourse.RefreshTeacherListData()
+            QuestAllCourse.SetSelectTeacherIndex()
             
-            align = "_ct",
-            x = -926/2,
-            y = -562/2,
-            width = 926,
-            height = 562,
-        };
-        System.App.Commands.Call("File.MCMLWindowFrame", params);
-    end
-
-    QuestAllCourse.RefreshAllData(open_callback)
-    
-    commonlib.TimerManager.SetTimeout(function()
-
-        if page and page:IsVisible() then
-            if QuestAllCourse.target_page then
-                local node = page:GetNode("course_list");
-                pe_gridview.GotoPage(node, "course_list", QuestAllCourse.target_page);
-                QuestAllCourse.target_page = nil
-            end
-
-            QuestAllCourse.CreateTeacherNpc()
+            QuestAllCourse.RefreshLevelListData()
+            QuestAllCourse.SetSelectLevelIndex()
+            
+            -- QuestAllCourse.RefreshCourseListData()
+            QuestAction.RequestCompleteCourseIdList(function()
+                QuestAllCourse.RefreshCourseListData(function()
+                    -- 刷新课程列表控件
+                    -- QuestAllCourse.FreshGridView("course_list")
+                    QuestAllCourse.OnRefresh()
+                    commonlib.TimerManager.SetTimeout(function()
+                        if page and page:IsVisible() then
+                            if QuestAllCourse.target_page then
+                                local node = page:GetNode("course_list");
+                                pe_gridview.GotoPage(node, "course_list", QuestAllCourse.target_page);
+                                QuestAllCourse.target_page = nil
+                            end
+                        end
+                    end, 100); 
+                end)
+            end)
         end
-    end, 100); 
-
+    end)
 end
 
 function QuestAllCourse.FreshView()
@@ -152,7 +154,7 @@ function QuestAllCourse.CloseView()
 end
 
 function QuestAllCourse.ClearData()
-    -- QuestAllCourse.TeacherListData = {}
+    QuestAllCourse.TeacherListData = {}
     QuestAllCourse.LevelListData = {}
     QuestAllCourse.CourseListData = {}
     
@@ -160,6 +162,8 @@ function QuestAllCourse.ClearData()
     QuestAllCourse.SelectLevelIndex = 1
     QuestAllCourse.SelectCourseIndex = 0
     QuestAllCourse.target_world_id = nil
+    QuestAllCourse.target_teacher_id = nil
+    QuestAllCourse.target_level_id = nil
 end
 
 ------------------------------------------------------------数据处理------------------------------------------------------------
@@ -245,24 +249,29 @@ function QuestAllCourse.RefreshAllData(callback)
 end
 
 function QuestAllCourse.RefreshTeacherListData()
-    -- QuestAllCourse.TeacherListData = {}
-    -- QuestAllCourse.SelectTeacherIndex = 0
-    if QuestAllCourse.TeacherListData[1].order == -1 then
-        for index = #QuestAllCourse.TeacherListData, 1, -1 do
-            local data = QuestAllCourse.TeacherListData[index]
-            
-            if QuestAllCourse.TeacherTableData[data.belong_name] == nil then
-                
-                table.remove(QuestAllCourse.TeacherListData, index)
-            else
-                data.order = QuestAllCourse.TeacherTableData[data.belong_name].order or 0
-            end
-        end
-    
-        table.sort(QuestAllCourse.TeacherListData,function(a,b)
-            return a.order < b.order
-        end)
+    if QuestAllCourse.CatalogsData == nil then
+        return
     end
+
+    QuestAllCourse.TeacherListData = QuestAllCourse.CatalogsData
+    -- QuestAllCourse.SelectTeacherIndex = 0
+
+    -- if QuestAllCourse.TeacherListData[1].order == -1 then
+    --     for index = #QuestAllCourse.TeacherListData, 1, -1 do
+    --         local data = QuestAllCourse.TeacherListData[index]
+            
+    --         if QuestAllCourse.TeacherTableData[data.belong_name] == nil then
+                
+    --             table.remove(QuestAllCourse.TeacherListData, index)
+    --         else
+    --             data.order = QuestAllCourse.TeacherTableData[data.belong_name].order or 0
+    --         end
+    --     end
+    
+    --     table.sort(QuestAllCourse.TeacherListData,function(a,b)
+    --         return a.order < b.order
+    --     end)
+    -- end
 end
 
 function QuestAllCourse.RefreshLevelListData()
@@ -271,81 +280,133 @@ function QuestAllCourse.RefreshLevelListData()
     if select_teacher_data == nil then
         return
     end
-    local teacher_data = QuestAllCourse.TeacherTableData[select_teacher_data.belong_name]
-    if teacher_data == nil then
-        return
-    end
+    -- local teacher_data = QuestAllCourse.TeacherTableData[select_teacher_data.belong_name]
+    -- if teacher_data == nil then
+    --     return
+    -- end
 
-    QuestAllCourse.LevelListData = {}
-    if teacher_data.all_course_data then
-        local data = {name = "全部", type_index = "all_course_data", belong_name = select_teacher_data.belong_name}
-        QuestAllCourse.LevelListData[#QuestAllCourse.LevelListData + 1] = data
-    end
+    QuestAllCourse.LevelListData = commonlib.copy(select_teacher_data.children)
 
-    -- 预定5个
-    for level = 1, 5 do
-        if teacher_data[level] then
-            local level_name = "二级"
-            for i, v in ipairs(teacher_data[level]) do
-                if v.level_name then
-                    level_name = v.level_name
-                    break
-                end
-            end
-            
-            -- local data = {name = string.format("%s级", level), type_index = level, belong_name = select_teacher_data.belong_name}
-            local data = {name = level_name, type_index = level, belong_name = select_teacher_data.belong_name}
-            QuestAllCourse.LevelListData[#QuestAllCourse.LevelListData + 1] = data
-        end
-    end
-
-
+    local all_course_data = commonlib.copy(select_teacher_data.children[1]) or {}
+    all_course_data.name = "全部"
+    all_course_data.id = select_teacher_data.id
+    table.insert(QuestAllCourse.LevelListData, 1, all_course_data)
 end
 
-function QuestAllCourse.RefreshCourseListData()
-    
+function QuestAllCourse.RefreshCourseListData(callback)
+    QuestAllCourse.CourseListData = {}
+
     local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
     if select_level_data == nil then
         return
     end
 
-    local teacher_data = QuestAllCourse.TeacherTableData[select_level_data.belong_name]
-    local course_data = teacher_data[select_level_data.type_index]
-    if course_data == nil then
-        return
-    end
-    local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
-    local target_index = QuestAction.VersionToKey[httpwrapper_version]
-
     QuestAllCourse.SelectCourseIndex = 0
-    if QuestAllCourse.TargetCourseIndex then
-        QuestAllCourse.SelectCourseIndex = QuestAllCourse.TargetCourseIndex
-        QuestAllCourse.TargetCourseIndex = nil
-    end
-    QuestAllCourse.CourseListData = {}
-    for i, v in ipairs(course_data) do
-        local data = {}
-        local world_id = QuestAllCourse.ExidToWorldId[v.exid]
-        world_id = world_id and tonumber(world_id) or 0
-        data.imageUrl = ""
-        if QuestAllCourse.CourseWorldData[world_id] then
-            data.imageUrl = QuestAllCourse.CourseWorldData[world_id].imageUrl
-        end
-        local exchange_data = KeepWorkItemManager.GetExtendedCostTemplate(v.exid)
-        data.name = exchange_data.name
-        data.desc = exchange_data.desc
-        data.world_id = world_id
-        data.exid = v.exid
-        if v.command and #v.command > 0 then
-            data.command = v.command[target_index]
-        end
 
-        QuestAllCourse.CourseListData[#QuestAllCourse.CourseListData + 1] = data
-    end
+    local id = select_level_data.id
 
-    
-    -- echo(QuestAllCourse.CourseListData, true)
-    -- QuestAllCourse.CourseListData = course_data
+    if QuestAllCourse.target_level_id then
+        id = QuestAllCourse.target_level_id
+        QuestAllCourse.target_teacher_id = nil
+        QuestAllCourse.target_level_id = nil
+    end
+    keepwork.quest_course.get({
+        aiCatalogId = id,
+    }, function(err, msg, data)
+        -- print("bbbbbbbbbbbbbbbbbbbbbbbbbb", id)
+        -- echo(data, true)
+        if err == 200 then
+            QuestAllCourse.CourseListData = data.rows
+            local world_id_list = {}
+            local level_desc_list = {
+                [1] = "低",
+                [2] = "中",
+                [3] = "高",
+            }
+            for k, v in pairs(QuestAllCourse.CourseListData) do
+                -- 处理有target_world_id
+                if v.projectId == QuestAllCourse.target_world_id then
+                    QuestAllCourse.SelectCourseIndex = k
+                    QuestAllCourse.target_page = math.ceil(QuestAllCourse.SelectCourseIndex / 8)
+                    QuestAllCourse.target_world_id = nil
+                end
+
+                if v.icon == nil or v.icon == "" then
+                    world_id_list[#world_id_list + 1] = v.projectId
+                end
+
+                -- 判断是否解锁
+                v.IsLock = false
+                
+                if v.preCourseIds and #v.preCourseIds > 0 then
+                    local need_unlock_list = {}
+                    
+                    for k2, v2 in pairs(v.preCourses) do
+                        if not QuestAction.HasCompleteCourse(v2.id) then
+                            need_unlock_list[#need_unlock_list + 1] = v2
+                        end
+                    end
+
+                    v.IsLock = #need_unlock_list > 0
+
+                    if v.IsLock then
+                        local name_desc = ""
+                        for i, v2 in ipairs(need_unlock_list) do
+                            name_desc = name_desc .. string.format("《%s》 ", v2.name)
+                        end
+
+                        v.lock_desc = string.format("<div>课程锁定中</div>需要完成%s学习才能解锁此课程哦", name_desc)
+                    end
+                end
+
+                
+
+                -- 难度
+                v.level_desc = ""
+                if v.level and v.level ~= "" then
+                    v.level_desc = string.format("难度: %s", level_desc_list[v.level])
+                end
+
+                -- 时间
+                v.time_desc = ""
+                if v.beginAt and v.endAt then
+                    local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(v.beginAt)
+                    local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(v.endAt)
+
+                    local begain_time_desc = os.date("%m月%d日",begain_time_stamp)
+                    local end_time_desc = os.date("%m月%d日",end_time_stamp)
+
+                    v.time_desc = string.format("%s-%s", begain_time_desc, end_time_desc)
+                end
+            end
+
+            QuestAllCourse.CourseWorldData = {}
+            if #world_id_list > 0 then
+                keepwork.world.search({
+                    type = 1,
+                    id = {["$in"] = world_id_list},
+                },function(err, msg, data)
+                    -- print("获取关注列表结果", err, msg)
+                    -- commonlib.echo(data, true)
+                    if err == 200 then
+                        for k, v in pairs(data.rows) do
+                            if QuestAllCourse.CourseWorldData[v.id] == nil then
+                                QuestAllCourse.CourseWorldData[v.id] = {imageUrl = v.extra.imageUrl}
+                            end
+                        end
+                        
+                        if callback then
+                            callback()
+                        end
+                    end
+                end)
+            else
+                if callback then
+                    callback()
+                end
+            end
+        end
+    end)
 end
 ----------------------------------------------------------数据处理/end----------------------------------------------------------
 
@@ -365,12 +426,14 @@ function QuestAllCourse.SelectTeacher(index)
     -- 刷新等级列表控件
     QuestAllCourse.FreshGridView("level_list")
     -- 刷新课程列表数据
-    QuestAllCourse.RefreshCourseListData()
+    QuestAllCourse.RefreshCourseListData(function()
+        -- 刷新课程列表控件
+        QuestAllCourse.FreshGridView("course_list")
+    end)
 
-    -- 刷新课程列表控件
-    QuestAllCourse.FreshGridView("course_list")
 
-    QuestAllCourse.CreateTeacherNpc()
+
+    -- QuestAllCourse.CreateTeacherNpc()
 end
 
 function QuestAllCourse.IsSelectTeacher(index)
@@ -390,7 +453,10 @@ function QuestAllCourse.SelectLevel(index)
     QuestAllCourse.RefreshCourseListData()
 
     -- 刷新课程列表控件
-    QuestAllCourse.FreshGridView("course_list")
+    QuestAllCourse.RefreshCourseListData(function()
+        -- 刷新课程列表控件
+        QuestAllCourse.FreshGridView("course_list")
+    end)
 end
 
 function QuestAllCourse.IsSelectLevel(index)
@@ -425,64 +491,108 @@ end
 
 function QuestAllCourse.RunCommand(index)
     local data = QuestAllCourse.CourseListData[index]
-
-    if data and data.command then
+    
+    if data and data.projectId then
+        local command = string.format("/loadworld -s -force %s", data.projectId)
         local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
-        if System.User.isVip then
-            page:CloseWindow()
-            QuestAllCourse.CloseView()
-            local client_data = QuestAction.GetClientData()
-            client_data.course_world_id = data.world_id
-            KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-            
-            GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1) 
-            CommandManager:RunCommand(data.command)
-        else
-            local client_data = QuestAction.GetClientData()
-            if client_data.play_course_times == nil then
-                client_data.play_course_times = 0
-            end
+        local function enter_world()
+            local server_time = GameLogic.QuestAction.GetServerTime()
 
-            if client_data.play_course_times <= 0 then
-                local function sure_callback()
-                    page:CloseWindow()
-                    QuestAllCourse.CloseView()
-
-                    local client_data = QuestAction.GetClientData()
-                    client_data.play_course_times = client_data.play_course_times + 1
-                    client_data.course_world_id = data.world_id
-                    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-
-                    GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
-                    CommandManager:RunCommand(data.command)
+            if data.beginAt and data.endAt then
+                local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.beginAt)
+                local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.endAt)
+                if server_time < begain_time_stamp then
+                    _guihelper.MessageBox("还没到上课时间哦，请在上课时间内来学习吧。")
+                    return
                 end
 
-                local desc = string.format('您要消耗今天的次数，学习<div style="float: left; color: #ff0000;">%s</div>？', data.name)
-                QuestMessageBox.Show(desc, sure_callback)
-            else
-                local client_data = QuestAction.GetClientData()
-                local course_world_id = client_data.course_world_id or 0
-                course_world_id = tonumber(course_world_id)
-                -- 使用过之后 如果id相同 则可进入
-                if course_world_id == 0 or course_world_id == tonumber(data.world_id) then
-                    if course_world_id == 0 then
-                        client_data.course_world_id = data.world_id
-                        KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-                    end
+                if server_time > end_time_stamp then
+                    _guihelper.MessageBox("已错过上课时间，你可以继续做作业，或去学习其他课程。")
+                    return
+                end
+            end
 
+            keepwork.quest_complete_course.get({
+                aiCourseId = data.id,
+            }, function(err2, msg2, data2)
+                -- print("ttttttttttttttt", err2, data.id)
+                -- echo(data2, true)
+                if err2 == 200 then
+                    local work_data = data.aiHomework or {}
+                    
+                    local client_data = QuestAction.GetClientData()
+                    client_data.course_world_id = data.projectId
+        
+                    if client_data.play_course_times == nil then
+                        client_data.play_course_times = 0
+                    end
+                    client_data.play_course_times = client_data.play_course_times + 1
+        
+                    local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
+                    client_data.course_teacher_id = select_teacher_data.id
+        
+                    local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
+                    client_data.course_level_id = select_level_data.id
+
+                    client_data.course_id = data.id
+                    client_data.home_work_id = work_data.id or -1
+                    client_data.is_home_work = false
+                    
+                    client_data.course_step = 0
+                    if data2.userAiCourse and data2.userAiCourse.progress then
+                        client_data.course_step = data2.userAiCourse.progress.stepNum or 0
+                    end
+        
+                    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
+                    
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
-
+        
                     GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
-                    CommandManager:RunCommand(data.command)
-                else
-                    local function sure_callback()
-                        local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                        VipToolNew.Show("AI_lesson")
-                    end
+                    CommandManager:RunCommand(command)
+                end
+            end)
+        end
+
+        if System.User.isVip then
+            enter_world()
+        else
+            -- 需要vip才能进
+            if data.isVip == 1 then
+                -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                -- VipToolNew.Show("AI_lesson")
+                local function sure_callback()
+                    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                    VipToolNew.Show("AI_lesson")
+                end
+
+                local desc = "是否开通会员学习？"
+                local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"
+                QuestMessageBox.Show(desc, sure_callback, desc2)
+            else
+                local client_data = QuestAction.GetClientData()
+                if client_data.play_course_times == nil then
+                    client_data.play_course_times = 0
+                end
     
-                    local desc = "您已消耗今天的次数。是否开通会员学习？"
-                    QuestMessageBox.Show(desc, sure_callback)
+                if client_data.play_course_times <= 0 then
+                    local desc = string.format('您要消耗今天的次数，学习<div style="float: left; color: #ff0000;">%s</div>？', data.name)
+                    QuestMessageBox.Show(desc, enter_world, nil, "成为会员即可不受限制学习所有课程。")
+                else
+                    local course_world_id = client_data.course_world_id or 0
+                    course_world_id = tonumber(course_world_id)
+                    -- 使用过之后 如果id相同 则可进入
+                    if course_world_id == 0 or course_world_id == tonumber(data.projectId) then
+                        enter_world()
+                    else
+                        local function sure_callback()
+                            local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                            VipToolNew.Show("AI_lesson")
+                        end
+        
+                        local desc = "您已消耗今天的次数。是否开通会员学习？"
+                        QuestMessageBox.Show(desc, sure_callback)
+                    end
                 end
             end
         end
@@ -491,30 +601,24 @@ end
 
 ----------------------------------------------------------点击事件/end----------------------------------------------------------
 
-function QuestAllCourse.SelectTargetWorld()
-    if QuestAllCourse.target_world_id then
-        -- 默认全部类别
-        -- 找到对应课程
+function QuestAllCourse.SetSelectTeacherIndex()
+    if QuestAllCourse.target_teacher_id then
         for k, v in pairs(QuestAllCourse.TeacherListData) do
-            local all_course_data = QuestAllCourse.TeacherTableData[v.belong_name] and QuestAllCourse.TeacherTableData[v.belong_name].all_course_data or {}
-            for k2, v2 in pairs(all_course_data) do
-                local world_id = QuestAllCourse.ExidToWorldId[v2.exid] or 0
-                
-                if world_id == QuestAllCourse.target_world_id then
-                    QuestAllCourse.SelectTeacherIndex = k
-                    QuestAllCourse.TargetCourseIndex = k2
-
-                    QuestAllCourse.target_page = math.ceil(QuestAllCourse.TargetCourseIndex / 1)
-                    break
-                end
+            if v.id == QuestAllCourse.target_teacher_id then
+                QuestAllCourse.SelectTeacherIndex = k
+                break
             end
         end
-        
-        -- 找到对应页数
+    end
+end
 
-        -- 找到对应老师
-
-        QuestAllCourse.target_world_id = nil
+function QuestAllCourse.SetSelectLevelIndex()
+    if QuestAllCourse.target_level_id then
+        for k2, v2 in pairs(QuestAllCourse.LevelListData) do
+            if v2.id == QuestAllCourse.target_level_id then
+                QuestAllCourse.SelectLevelIndex = k2
+            end
+        end
     end
     
 end
@@ -694,4 +798,107 @@ function QuestAllCourse.GetNpcDataByKey(key)
     local select_teacher_name = select_teacher_data.belong_name
     local show_npc_data = QuestAllCourse.NpcData[select_teacher_name]
     return show_npc_data[key]
+end
+
+function QuestAllCourse.GetWorldIconUrl(index)
+    local data = QuestAllCourse.CourseListData[index]
+    if data == nil then
+        return
+    end
+
+    if data.icon and data.icon ~= "" then
+        return data.icon
+    end
+
+    if data.projectId and QuestAllCourse.CourseWorldData[data.projectId] then
+        return QuestAllCourse.CourseWorldData[data.projectId].imageUrl
+    end
+
+    return ""
+end
+
+function QuestAllCourse.HasWork(index)
+    local data = QuestAllCourse.CourseListData[index]
+    if data == nil then
+        return false
+    end
+
+    return data.aiHomework ~= nil
+end
+
+function QuestAllCourse.ClickWork(index)
+    local data = QuestAllCourse.CourseListData[index]
+    if data == nil then
+        return false
+    end
+
+    if data.aiHomework == nil then
+        return
+    end
+
+    local work_data = data.aiHomework
+    -- 判断作业是否激活
+    keepwork.quest_complete_homework.get({
+        aiHomeworkId = work_data.id,
+    },function(err, message, data2)
+        if err == 200 then
+            local userAiHomework = data2.userAiHomework
+            if userAiHomework == nil then
+                local desc = string.format("需要先学习完《%s》才能开始作业哦", data.name)
+                -- GameLogic.AddBBS(nil, desc, 5000, "255 0 0");
+                _guihelper.MessageBox(desc)
+                return
+            end
+            local server_time = GameLogic.QuestAction.GetServerTime()
+            local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+
+            -- 入校课程的话 需要每天四点半之后才能做
+            if data.isForSchool == 1 then
+                local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+                if server_time < limit_time_stamp then
+                    -- GameLogic.AddBBS(nil, "16:30之后才能做作业哦", 5000, "255 0 0");
+                    _guihelper.MessageBox("16:30之后才能做作业哦")
+                    return
+                end
+            end
+
+            local type = work_data.type -- 0：更新世界类型，1：更新家园，2：作业世界
+            if type == 0 then
+                page:CloseWindow()
+                QuestAllCourse.CloseView()
+                GameLogic.GetFilters():apply_filters('show_create_page')
+            elseif type == 1 then
+                local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+        
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+                local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+                LocalLoadWorld.CreateGetHomeWorld();
+        
+                GameLogic.GetFilters():apply_filters('check_and_updated_before_enter_my_home', function()
+                    GameLogic.RunCommand("/loadworld home");
+                end)
+            else
+                if work_data.projectId then
+                    local command = string.format("/loadworld -s -force %s", work_data.projectId)
+                    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+                    local client_data = QuestAction.GetClientData()
+                    client_data.course_world_id = work_data.projectId
+                    client_data.course_id = work_data.aiCourseId
+                    client_data.home_work_id = work_data.id
+                    client_data.is_home_work = true
+                    if userAiHomework and userAiHomework.progress then
+                        client_data.course_step = userAiHomework.progress.stepNum or 0
+                    end
+                    
+                    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
+                    
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+        
+                    CommandManager:RunCommand(command)
+                end
+            end
+
+        end
+    end)
 end

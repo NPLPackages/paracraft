@@ -234,6 +234,12 @@ function EditModelTask:GetModelFileInHand()
 	end
 end
 
+function EditModelTask:GetOnClickEventInHand()
+	if(self.itemInHand) then
+		return self.itemInHand:GetDataField("onclickEvent");
+	end
+end
+
 function EditModelTask.OnClickChangeModelFile()
 	local self = EditModelTask.GetInstance();
 	if(self and self.itemInHand) then
@@ -280,6 +286,19 @@ function EditModelTask.OnScalingChanged(text)
 			if(scaling and scaling >= (modelEntity.minScale or 0.1) and scaling <= (modelEntity.maxScale or 10)) then
 				modelEntity:setScale(scaling);
 			end
+		end
+	end
+end
+
+function EditModelTask.OnChangeOnClickEvent(text)
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and modelEntity.SetOnClickEvent and text) then
+			if(text == "") then
+				text = nil
+			end
+			modelEntity:SetOnClickEvent(text)
 		end
 	end
 end

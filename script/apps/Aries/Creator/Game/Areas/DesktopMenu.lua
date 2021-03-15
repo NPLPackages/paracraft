@@ -86,7 +86,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"背包...",name = "window.userbag",onclick=nil},
 				-- {text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
-				{text = L"短视频分享...",name = "window.videosharing", cmd="/share"},
+				--{text = L"短视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},
 				-- {text = L"位置坐标...",name = "window.pos",onclick=nil},
@@ -113,6 +113,12 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				--{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},
 				{text = L"关于Paracraft...",name = "help.about", onclick=nil},
 				-- {text = L"致谢",name = "help.Credits", onclick=nil},
+			},
+		},
+		{text = L"分享", order=8, name = "share",children = 
+			{
+				{text = L"短视频分享...",name = "share.videosharing", cmd="/share"},
+				{text = L"全景图分享...",name = "share.panoramasharing", onclick=nil},
 			},
 		},
 		--[[

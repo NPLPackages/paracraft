@@ -136,11 +136,13 @@ end
 Files.cache = {};
 -- map from long path to the shortest path
 Files.reverse_cache = {};
+Files.loadedAssetFiles = {};
 
 -- call this function when world is loaded. 
 function Files:ClearFindFileCache()
 	self.reverse_cache = {};
 	self.cache = {};
+	self.loadedAssetFiles = {};
 	Files.ClearWorldSearchPaths()
 end
 
@@ -185,6 +187,20 @@ function Files:UnloadAllUnusedAssets()
 					end
 				end	
 			end
+		end
+	end
+end
+
+
+function Files:IsAssetFileLoaded(filename)
+	if(self.loadedAssetFiles[filename]) then
+		return true;
+	else
+		if(ParaAsset.LoadParaX("", filename):GetAttributeObject():GetField("IsLoaded", false)) then
+			self.loadedAssetFiles[filename] = true;
+			return true;
+		else
+			return false;
 		end
 	end
 end

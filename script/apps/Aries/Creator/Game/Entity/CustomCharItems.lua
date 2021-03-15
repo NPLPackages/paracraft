@@ -83,6 +83,7 @@ function CustomCharItems:Init()
 					item.icon = node.attr.icon;
 					item.name = node.attr.name;
 					item.avatarMode = node.attr.avatarMode;
+					item.debug = node.attr.debug;
 					local data = self:GetItemById(item.id);
 					if (data) then
 						data.id = item.id;
@@ -135,12 +136,15 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 		local itemList = {};
 		for _, item in ipairs(groups) do
 			if ((avatar and item.avatarMode ~= "false") or (not avatar)) then
-				local data = self:GetItemById(item.id, modelType);
-				if (data and (checkGeoset[1] == 0 or checkGeoset[1] == data.geoset or checkGeoset[2] == data.geoset)) then
-					data.id = item.id;
-					data.icon = item.icon;
-					data.name = item.name;
-					itemList[#itemList+1] = data;
+				local debug = ParaEngine.GetAppCommandLineByParam("debug", false);
+				if (item.debug ~= "true" or (debug == "true" and item.debug == "true" and not avatar)) then
+					local data = self:GetItemById(item.id, modelType);
+					if (data and (checkGeoset[1] == 0 or checkGeoset[1] == data.geoset or checkGeoset[2] == data.geoset)) then
+						data.id = item.id;
+						data.icon = item.icon;
+						data.name = item.name;
+						itemList[#itemList+1] = data;
+					end
 				end
 			end
 		end
@@ -235,12 +239,29 @@ function CustomCharItems:SkinStringToItemIds(skin)
 			if (id > 0 and id < 100) then
 				use_hair = true;
 			end
+			if (id > 300 and id < 400) then
+				for _, item in ipairs(items) do
+					if (item.data.geoset == id) then
+						idString = item.data.id..";";
+						break;
+					end
+				end
+			end
 		end
 	end
 	if (textures) then
+		function checkItem(item)
+			for geoset in string.gfind(geosets, "([^#]+)") do
+				local id = tonumber(geoset);
+				if (item.data.geoset == id) then
+					return true;
+				end
+			end
+			return false;
+		end
 		for tex in textures:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
-				if (item.data.texture == tex) then
+				if (item.data.texture == tex and checkItem(item)) then
 					idString = idString..item.data.id..";";
 					break;
 				end

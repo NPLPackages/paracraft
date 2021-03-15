@@ -33,6 +33,7 @@ Entity:Property({"scale", 1, "getScale", "setScale"});
 Entity:Property({"minScale", 0.02});
 Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
+Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
 
 -- class name
@@ -204,6 +205,9 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.offsetZ) then
 			self.offsetPos[3] = tonumber(attr.offsetZ);
 		end
+		if(attr.onclickEvent) then
+			self:SetOnClickEvent(attr.onclickEvent);
+		end
 	end
 end
 
@@ -238,6 +242,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self.offsetPos[3]~=0) then
 		node.attr.offsetZ = self.offsetPos[3];
+	end
+	if(self.onclickEvent) then
+		node.attr.onclickEvent = self.onclickEvent
 	end
 	return node;
 end
@@ -297,18 +304,24 @@ end
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
-		if(mouse_button=="left") then
+		if(mouse_button=="left" or self.onclickEvent) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
 		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 			self:OpenEditor("entity", entity);
 			return true;
 		end
 	else
-		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			self:OpenEditor("entity", entity);
+		if(self.onclickEvent) then
+			local x, y, z = self:GetBlockPos();
+			GameLogic.RunCommand(format("/sendevent %s {x=%d, y=%d, z=%d}", self.onclickEvent, x, y, z))
 			return true;
-		elseif(mouse_button=="left") then
-			self:OnActivated(entity);
+		else
+			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+				self:OpenEditor("entity", entity);
+				return true;
+			elseif(mouse_button=="left") then
+				self:OnActivated(entity);
+			end
 		end
 	end
 

@@ -226,6 +226,9 @@ function QuestAction.OpenPage(name)
         ParacraftLearningRoomDailyPage.DoCheckin();     
     elseif name == 'ai_course' then
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
+    elseif name == 'user' then
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        page.ShowUserInfoPage({username = System.User.keepworkUsername});
     end
 end
 
@@ -386,7 +389,9 @@ function QuestAction.GetClientData()
 	local clientData = KeepWorkItemManager.GetClientData(QuestAction.task_gsid) or {};
     local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
     if is_new_day then
-        course_world_id = clientData.course_world_id
+        local course_world_id = clientData.course_world_id
+        QuestAction.DailyTaskData.course_teacher_id = clientData.course_teacher_id
+        QuestAction.DailyTaskData.target_level_id = clientData.course_level_id
 
 		clientData = QuestAction.DailyTaskData
 		clientData.time_stamp = time_stamp
@@ -587,7 +592,11 @@ function QuestAction.GetCourseSecondDay(gsid)
 end
 
 function QuestAction.GetServerTime()
-    return QuestProvider:GetInstance():GetServerTime();
+    if System.options.isDevMode then
+        return os.time()
+    end
+    local timp_stamp = GameLogic.GetFilters():apply_filters('store_get', 'world/currentServerTime')
+    return timp_stamp
 end
 
 function QuestAction.ShowSpeciapTask()
@@ -596,26 +605,134 @@ function QuestAction.ShowSpeciapTask()
     
 end
 
-function QuestAction.SetServerTime(server_time_stamp)
-    QuestProvider:GetInstance():SetServerTime(server_time_stamp)
-end
-
 function QuestAction.OpenCampCourseView()
-    keepwork.user.server_time({
-    },function(err, msg, data)
-        if(err == 200)then
-            local server_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-            QuestProvider:GetInstance():SetServerTime(server_time_stamp)
-			local begain_day_weehours = os.time(QuestCoursePage.begain_time_t)
-            if server_time_stamp < begain_day_weehours then
-                QuestAction.ShowSpeciapTask()
-            else
-                QuestAction.ShowCourseView()
-			end
-        end
-    end)
+    local server_time_stamp = GameLogic.QuestAction.GetServerTime()
+    local begain_day_weehours = os.time(QuestCoursePage.begain_time_t)
+    if server_time_stamp < begain_day_weehours then
+        QuestAction.ShowSpeciapTask()
+    else
+        QuestAction.ShowCourseView()
+    end
 end
 
 function QuestAction.CanFinishCampCourse()
     return QuestCoursePage.CheckIsAllCourseFinish()
+end
+
+function QuestAction.RequestAiHomeWork(cb)
+    keepwork.quest_work_list.get({
+        status = 0, -- 0,未完成；1已完成
+    },function(err, msg, data)
+        if err == 200 then
+            local list_data = {}
+            for i, v in ipairs(data.rows) do
+                if v.aiHomework then
+                    list_data[#list_data + 1] = v
+                end
+            end
+            QuestAction.AiHomeworkList = list_data
+            if cb then
+                cb()
+            end
+        end
+    end)
+end
+
+function QuestAction.GetAiHomeWork()
+    return QuestAction.AiHomeworkList
+end
+
+function QuestAction.RequestCompleteCourseIdList(cb)
+    keepwork.quest_all_complete_course.get({}, function(err, msg, data)
+        -- print(">>>>>>>>>>>>完成的课程列表")
+        -- echo(data, true)
+        if err == 200 then
+
+            QuestAction.CompleteCourseIdList = {}
+            for k, v in pairs(data) do
+                QuestAction.CompleteCourseIdList[v] = 1
+            end
+
+            if cb then
+                cb(data)
+            end
+        end
+    end)
+end
+
+function QuestAction.GetCompleteCourseIdList()
+    return QuestAction.CompleteCourseIdList
+end
+
+function QuestAction.HasCompleteCourse(id)
+    if id == nil or nil == QuestAction.CompleteCourseIdList then
+        return false
+    end
+
+    return QuestAction.CompleteCourseIdList[id] ~= nil
+end
+
+function QuestAction.CompleteAiHomeWork()
+    if QuestAction.AiHomeworkList == nil then
+        return
+    end
+
+    local server_time = GameLogic.QuestAction.GetServerTime()
+    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+
+    -- 用来做ai课程作业的完成
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local world_generator = WorldCommon.GetWorldTag("world_generator");
+    local last_key = nil
+    local function complete_homework(id, key)
+        keepwork.quest_complete_homework.set({
+            aiHomeworkId = id,
+            grades = 0,
+            status = 1,
+        },function(err, message, data)
+            -- print(">>>>>>>>>>>>>>>>>>>完成作业返回", err)
+            -- echo(data, true)
+            if err == 200 then
+                if key == last_key then
+                    GameLogic.QuestAction.RequestAiHomeWork(function()
+                        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                        if DockPage.IsShow() then
+                            DockPage.FreshHomeWorkIcon()
+                        end
+                    end)
+                end
+            end
+        end)
+    end
+    if world_generator == "paraworldMini" then
+        for k, v in pairs(QuestAction.AiHomeworkList) do
+            if v.aiHomeworkId and v.aiHomework and v.aiHomework.type == 1 then
+                if v.aiHomework.aiCourse and v.aiHomework.aiCourse.isForSchool == 1 then
+                    local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+                    if server_time >= limit_time_stamp then
+                        last_key = k
+                        complete_homework(v.aiHomeworkId, k)
+                    end
+                else
+                    last_key = k
+                    complete_homework(v.aiHomeworkId, k)
+                end
+            end
+        end
+    else
+        for k, v in pairs(QuestAction.AiHomeworkList) do
+            if v.aiHomeworkId and v.aiHomework and v.aiHomework.type == 0 then
+                if v.aiHomework.aiCourse and v.aiHomework.aiCourse.isForSchool == 1 then
+                    local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+                    if server_time >= limit_time_stamp then
+                        last_key = k
+                        complete_homework(v.aiHomeworkId, k)
+                    end
+                else
+                    last_key = k
+                    complete_homework(v.aiHomeworkId, k)
+                end
+            end
+        end
+    end
 end

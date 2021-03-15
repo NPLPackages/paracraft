@@ -22,6 +22,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerVia
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
@@ -122,6 +123,23 @@ function CodeGlobals:ctor()
 				end
 			end
 			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData, 3, entity_data);
+		end,
+		-- similar to setBlock, except that we will add to history to allow undo/redo
+		createBlock = function(x,y,z, blockId, blockData, entity_data)
+			if(type(blockId) == "string") then
+				local id, data = blockId:match("^(%d+):?(%d*)");
+				if(id) then
+					blockId = tonumber(id)
+					if(data and data~="") then
+						blockData = tonumber(data);
+					end
+				else
+					return
+				end
+			end
+			--local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, blocks = {{0,0,0,blockId, blockData, entity_data}}})
+			local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = blockId, data = blockData, itemStack = ItemStack:new():Init(blockId, 1, entity_data)})
+			task:Run();
 		end,
 		-- similar to commonlib.gettable(tabNames) but in page scope.
 		-- @param tabNames: table names like "models.users"

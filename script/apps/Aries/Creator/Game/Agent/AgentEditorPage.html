@@ -14,6 +14,7 @@ AgentEditorPage.OnInit()
 function GetUpdateMethodDS()
     return AgentEditorPage.updateMethods;
 end
+
 ]]></script>
 <aries:window mode="thin" title='<%=L"Agent编辑器"%>' style="width:200px;" uiname_onclose="AgentEditorPage.CloseWindow" onclose="AgentEditorPage.CloseWindow">
     <div style="margin-right:5px;margin-bottom:10px;" class="default">
@@ -23,11 +24,11 @@ end
         </div>
         <div style="margin:3px;">
             <div><%=L"智能模块名称:"%></div>
-            <div><input name="agentPackageName" uiname="AgentEditorPage.agentPackageName" style="height:24px" EmptyText="mycompany.myname"/></div>
+            <div><input name="agentPackageName" uiname="AgentEditorPage.agentPackageName" onchange="AgentEditorPage.OnAgentNameChanged" style="height:24px" EmptyText="mycompany.myname"/></div>
         </div>
         <div style="margin:3px;">
-            <div><%=L"版本号:"%></div>
-            <div><input name="agentPackageVersion" uiname="AgentEditorPage.agentPackageVersion" style="height:24px" EmptyText="1.0"/></div>
+            <div style="float:left"><%=L"版本号:"%></div>
+            <div style="float:left"><input name="agentPackageVersion" uiname="AgentEditorPage.agentPackageVersion" style="height:24px" EmptyText="1.0"/></div>
         </div>
         <div style="margin:3px;">
             <div style="float:left"><%=L"更新方式:"%></div>
@@ -36,8 +37,8 @@ end
             </div>
         </div>
         <div style="margin:3px;">
-            <div><%=L"依赖:"%></div>
-            <div><input name="agentDependencies" uiname="AgentEditorPage.agentDependencies" style="height:24px" /></div>
+            <div style="float:left"><%=L"依赖:"%></div>
+            <div style="float:left"><input name="agentDependencies" uiname="AgentEditorPage.agentDependencies" style="height:24px" /></div>
         </div>
         <div style="margin:3px;">
             <div><%=L"外部文件:"%></div>
@@ -49,6 +50,10 @@ end
             <div>
                 <input name="isGlobal" uiname="AgentEditorPage.isGlobal" onclick="AgentEditorPage.OnChangeGlobal" type="checkbox" style="margin-top:2px"/>
                 <div style="float:left;margin-left:5px;" for="isGlobal" uiname="AgentEditorPage.isGlobalFor"><%=L"是否全局"%></div>
+            </div>
+            <div>
+                <input name="isPhantom" uiname="AgentEditorPage.isPhantom" type="checkbox" style="margin-top:2px"/>
+                <div style="float:left;margin-left:5px;" for="isPhantom" uiname="AgentEditorPage.isPhantomFor" tooltip='<%=L"所有方块不在场景中显示"%>'><%=L"幽灵模式"%></div>
             </div>
         </div>
         <div style="margin:3px;">

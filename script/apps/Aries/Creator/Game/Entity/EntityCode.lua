@@ -372,6 +372,14 @@ function Entity:IsSearchable()
 	return true;
 end
 
+function Entity:GetBlockEngine()
+	return self.blockEngine or BlockEngine;
+end
+
+function Entity:SetBlockEngine(blockEngine)
+	self.blockEngine = blockEngine;
+end
+
 -- only search in 4 horizontal directions for a maximum distance of 16
 -- find nearby movie entity, multiple code block next to each other can share the same movie block.
 function Entity:FindNearByMovieEntity()
@@ -381,6 +389,7 @@ function Entity:FindNearByMovieEntity()
 		local id = self:GetBlockId();
 		local blocks;
 		local totalCodeBlockCount = 0;
+		local BlockEngine = self:GetBlockEngine();
 		for side = 0, 3 do
 			local dx, dy, dz = Direction.GetOffsetBySide(side);
 			local x,y,z = cx+dx, cy+dy, cz+dz;
@@ -408,6 +417,7 @@ end
 function Entity:FindNearByMovieEntityImp(blocks, distance, entity_map, totalCodeBlockCount)
 	local id = self:GetBlockId();
 	local new_blocks;
+	local BlockEngine = self:GetBlockEngine();
 	for _, idx in ipairs(blocks) do
 		local cx, cy, cz = BlockEngine:FromSparseIndex(idx);
 		local movieEntity = self:GetNearByMovieEntity(cx, cy, cz);
@@ -439,6 +449,7 @@ end
 
 -- only search in 4 horizontal directions
 function Entity:GetNearByMovieEntity(cx, cy, cz)
+	local BlockEngine = self:GetBlockEngine();
 	cx, cy, cz = cx or self.bx, cy or self.by, cz or self.bz;
 	for side = 0, 3 do
 		local dx, dy, dz = Direction.GetOffsetBySide(side);
@@ -533,6 +544,7 @@ end
 -- get all nearby code entities that should be started as a group, include current one.
 -- @return {idx to true} map
 function Entity:GetAllNearbyCodeEntities()
+	local BlockEngine = self:GetBlockEngine();
 	local id = self:GetBlockId();
 	local x, y, z = self.bx, self.by, self.bz;
 	local blockTemplate = BlockEngine:GetBlock(x,y,z);
@@ -554,6 +566,7 @@ function Entity:GetAllNearbyCodeEntitiesImp(blocks, entity_map, all_blocks, dist
 	if(distance>=16) then
 		return entity_map;
 	end
+	local BlockEngine = self:GetBlockEngine();
 	local new_blocks;
 	for _, idx in pairs(blocks) do
 		local cx, cy, cz = BlockEngine:FromSparseIndex(idx);
@@ -586,6 +599,8 @@ function Entity:ForEachNearbyCodeEntity(callbackFunc)
 	local blocks = self:GetAllNearbyCodeEntities()
 	if(blocks) then
 		local id = self:GetBlockId();
+		local BlockEngine = self:GetBlockEngine();
+	
 		for _, idx in ipairs(blocks) do
 			local x, y, z = BlockEngine:FromSparseIndex(idx);
 			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
@@ -628,6 +643,8 @@ function Entity:Restart()
 		end
 		local id = self:GetBlockId();
 		local blocks2;
+		local BlockEngine = self:GetBlockEngine();
+	
 		for _, idx in ipairs(blocks) do
 			local x, y, z = BlockEngine:FromSparseIndex(idx);
 			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
@@ -680,6 +697,8 @@ function Entity:AutoCreateMovieEntity()
 	local movieEntity = self:FindNearByMovieEntity();
 	if(not movieEntity) then
 		local cx, cy, cz = self:GetBlockPos();
+		local BlockEngine = self:GetBlockEngine();
+	
 		for side = 3, 0, -1 do
 			local dx, dy, dz = Direction.GetOffsetBySide(side);
 			local x,y,z = cx+dx, cy+dy, cz+dz;
@@ -716,6 +735,7 @@ function Entity:SetLastCommandResult(last_result)
 	if(self.last_output ~= output) then
 		self.last_output = output;
 		local x, y, z = self:GetBlockPos();
+		local BlockEngine = self:GetBlockEngine();
 		BlockEngine:NotifyNeighborBlocksChange(x, y, z, BlockEngine:GetBlockId(x, y, z));
 	end
 end
@@ -823,6 +843,8 @@ function Entity:UpdateBlockColor()
 	else
 		colorData = self.isAllowClientExecution and client_side_color or 0;	
 	end
+	local BlockEngine = self:GetBlockEngine();
+	
 	local old_data = BlockEngine:GetBlockData(self.bx, self.by, self.bz) or 0;	
 	local data = colorData + mathlib.bit.band(old_data, 0x00FF);
 	if(old_data ~= data) then

@@ -18,6 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 
 -- paraWorld
@@ -177,6 +178,11 @@ end
 
 function ParaWorldLoginAdapter.CheckAndReset()
 	commonlib.TimerManager.SetTimeout(function()
+		local generatorName = WorldCommon.GetWorldTag("world_generator");
+		if (generatorName ~= "paraworld") then
+			return;
+		end
+
 		ParaWorldLoginAdapter.MainWorldId = ParaWorldLoginAdapter.GetDefaultWorldID();
 		ParaWorldLoginAdapter.ParaWorldId = nil;
 		local projectId = GameLogic.options:GetProjectId();
@@ -211,5 +217,5 @@ function ParaWorldLoginAdapter.CheckAndReset()
 				end
 			end);
 		end);
-	end, 1000);
+	end, 2000);
 end

@@ -366,8 +366,12 @@ function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		self.skin = skin;
 		if(skin) then
-			if(not self.isCustomModel and not self.hasCustomGeosets and not self:FindSkinFiles(skin)) then
-				LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
+			if (not self.isCustomModel and not self.hasCustomGeosets) then
+				if (skin:match("^%d+;") and EntityManager.GetPlayer() == self) then
+					self.skin = nil;
+				elseif (not self:FindSkinFiles(skin)) then
+					LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
+				end
 			end
 			self:RefreshClientModel();
 		else
@@ -437,6 +441,7 @@ function Entity:RefreshSkin(player)
 				end
 			elseif(skin:match("^%d+#")) then
 				-- ignore ccs skins
+			elseif(skin:match("^%d+;")) then
 			else
 				player:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
 				skins[2] = skins[2] or {};

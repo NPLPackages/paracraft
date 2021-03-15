@@ -218,9 +218,7 @@ function CustomSkinPage.CreateNewActor()
 	local model = {asset = CustomCharItems.defaultModelFile, skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)};
 	keepwork.actors.add({name = guid.uuid(), equipment = model}, function(err, msg, data)
 		if (err == 200) then
-			model.id = data.id;
-			model.name = data.name;
-			model.alias = string.format(L"新建模型%d", model.id);
+			local model = {asset = data.equipment.asset, skin = data.equipment.skin, id = data.id, name = data.name, alias = string.format(L"新建模型%d", data.id)};
 			CustomSkinPage.Current_Model_DS[index] = model;
 			CustomSkinPage.Refresh();
 		end

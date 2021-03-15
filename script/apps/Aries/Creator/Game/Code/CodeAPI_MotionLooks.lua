@@ -14,6 +14,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/ide/System/Scene/Cameras/AutoCamera.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Cameras = commonlib.gettable("System.Scene.Cameras");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -377,6 +378,18 @@ function env_imp:anim(anim_id, duration)
 			-- this ensures that actor are not bound to current bone position in the movie block
 			self.actor:UnbindAnimInstance();
 		end
+
+		-- verify that the main asset of player is loaded, otherwise we may need to wait
+		local filename = entity:GetMainAssetPath();
+		if(filename and not duration and not Files:IsAssetFileLoaded(filename)) then
+			for i=1, 10 do
+				env_imp.wait(self, 0.1);
+				if(Files:IsAssetFileLoaded(filename)) then
+					break;
+				end
+			end
+		end
+		
 		entity:SetAnimation(anim_id);
 
 		if(duration) then
@@ -843,6 +856,16 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 				channel:Stop();	
 			end
 		end)
+	end
+
+	local actor = env_imp.GetActor(self);
+	if(actor) then
+		local radius = actor:GetSentientRadius()
+		if(radius > 0) then
+			channel:SetSentientChecker(function() 
+				return env_imp.IsActorSentientWithPlayer(actor);
+			end)
+		end
 	end
 
 	if(not bLoop and channel:IsPlaying()) then

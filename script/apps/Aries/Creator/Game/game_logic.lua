@@ -250,8 +250,8 @@ function GameLogic.InitCommon()
 			ParacraftCI.StaticInit();
 		end
 	
-		local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
-		ClassManager.StaticInit();
+		--local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+		--ClassManager.StaticInit();
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
@@ -1757,7 +1757,7 @@ end
 -- @param bOpenUIIfNot: if true, we will display a message box asking user to login and guide the user to activate VIP if not. 
 -- @param callbackFunc: only called if user is vip and bOpenUIIfNot is true
 -- return true if the user is vip
-function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
+function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc, uiType)
 	local bEnabled = 
 		GameLogic.GetFilters():apply_filters(
 			"KeepworkPermission",
@@ -1768,7 +1768,8 @@ function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc)
 				if type(callbackFunc) == "function" then
 					callbackFunc(result);
 				end
-			end
+			end,
+			uiType
 		);
 
 	if not bEnabled then

@@ -27,6 +27,10 @@ function VipToolNew.OnInit()
     page.OnCreate = VipToolNew.OnCreate
 end
 
+function VipToolNew.GetPageCtrl()
+    return page 
+end 
+
 function VipToolNew.Show(from)
     VipToolNew.from = from or "main_icon"
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then

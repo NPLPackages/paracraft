@@ -22,9 +22,11 @@ function QuestMessageBox.CloseView()
 	-- body
 end
 
-function QuestMessageBox.Show(desc, sure_callback)
+function QuestMessageBox.Show(desc, sure_callback, desc2, desc3)
 	QuestMessageBox.sure_callback = sure_callback
 	QuestMessageBox.desc = desc or ""
+	QuestMessageBox.desc2 = desc2 or "非会员每天可以体验1节人工智能课程"
+	QuestMessageBox.desc3 = desc3 or ""
 	QuestMessageBox.ShowView()
 end
 
@@ -76,6 +78,14 @@ function QuestMessageBox.OpenVip()
     VipToolNew.Show("AI_lesson")
 end
 
-function QuestMessageBox.GetDesc2()
+function QuestMessageBox.GetDesc1()
 	return QuestMessageBox.desc
+end
+
+function QuestMessageBox.GetDesc2()
+	return QuestMessageBox.desc2
+end
+
+function QuestMessageBox.GetDesc3()
+	return QuestMessageBox.desc3
 end

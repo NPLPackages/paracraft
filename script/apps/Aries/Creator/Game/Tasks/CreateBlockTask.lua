@@ -58,7 +58,7 @@ function CreateBlock:TryCreateSingleBlock()
 				end
 			end
 		else
-			isUsed = item:TryCreate(nil, EntityManager.GetPlayer(), self.blockX,self.blockY,self.blockZ, self.side, self.data, self.side_region);
+			isUsed = item:TryCreate(self.itemStack, EntityManager.GetPlayer(), self.blockX,self.blockY,self.blockZ, self.side, self.data, self.side_region);
 		end
 			
 		return isUsed;

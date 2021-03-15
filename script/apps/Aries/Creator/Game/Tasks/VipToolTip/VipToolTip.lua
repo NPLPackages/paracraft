@@ -18,6 +18,7 @@ local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua
 local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
 local VipToolTip = NPL.export()
 VipToolTip.onlyRecharge = false;
+local page
 
 function VipToolTip:Init(bEnable, callback)
     if VipToolTip then
@@ -36,6 +37,10 @@ function VipToolTip:Init(bEnable, callback)
     else
         self:CheckVip(bEnable)
     end
+end
+
+function VipToolTip:GetPageCtrl()
+    return page
 end
 
 function VipToolTip:CheckVip(bEnable)

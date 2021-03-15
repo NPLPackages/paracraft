@@ -75,6 +75,10 @@ function MsgCenter.OnInit()
 	page.OnClose = MsgCenter.CloseView
 end
 
+function MsgCenter.GetPageCtrl()
+	return page
+end
+
 function MsgCenter.Show()
     if(GameLogic.GetFilters():apply_filters('is_signed_in'))then
         MsgCenter.ShowView()

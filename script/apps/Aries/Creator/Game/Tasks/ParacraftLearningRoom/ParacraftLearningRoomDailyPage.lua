@@ -177,6 +177,11 @@ ParacraftLearningRoomDailyPage.max_lesson = 0 --最大课程数，添加或者�
 function ParacraftLearningRoomDailyPage.OnInit()
 	page = document:GetPageCtrl();
 end
+
+function ParacraftLearningRoomDailyPage.GetPageCtrl()
+	return page
+end
+
 function ParacraftLearningRoomDailyPage.LoadLessonsConfig()
     if(not ParacraftLearningRoomDailyPage.is_loaded_lessons)then
         ParacraftLearningRoomDailyPage.lessons_title = {};

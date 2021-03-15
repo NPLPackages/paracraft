@@ -147,7 +147,6 @@ e.g.
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
 
-
 		cmd_text = GameLogic.GetFilters():apply_filters("cmd_loadworld", cmd_text, options);
 
 		if(not cmd_text) then

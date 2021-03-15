@@ -55,42 +55,38 @@ function ActWeek.ShowView()
         return
     end
     GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.weekend')
-    keepwork.user.server_time({},function(err, msg, data)
-        if err == 200 then
-            server_time = ActWeek.GetTimeStamp(data.now)
-            local act_state = ActWeek.GetActState()
-            if act_state ~= ActWeek.ActState.going then
-                if act_state == ActWeek.ActState.not_start then
-                    GameLogic.AddBBS(nil, L"活动尚未开始，敬请关注");
-                end
-                if act_state == ActWeek.ActState.act_end then
-                    GameLogic.AddBBS(nil, L"活动已结束，感谢您的参与");
-                end
-                return
-            end
-    
-            local view_width = 870
-            local view_height = 523
-            local params = {
-                url = "script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.html",
-                name = "ActWeek.ShowView", 
-                isShowTitleBar = false,
-                DestroyOnClose = true,
-                style = CommonCtrl.WindowFrame.ContainerStyle,
-                allowDrag = true,
-                enable_esc_key = true,
-                zorder = 0,
-                app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-                directPosition = true,
-                    align = "_ct",
-                    x = -view_width/2 - 80,
-                    y = -view_height/2,
-                    width = view_width,
-                    height = view_height,
-            };
-            System.App.Commands.Call("File.MCMLWindowFrame", params);
+    server_time = GameLogic.QuestAction.GetServerTime()
+    local act_state = ActWeek.GetActState()
+    if act_state ~= ActWeek.ActState.going then
+        if act_state == ActWeek.ActState.not_start then
+            GameLogic.AddBBS(nil, L"活动尚未开始，敬请关注");
         end
-    end)
+        if act_state == ActWeek.ActState.act_end then
+            GameLogic.AddBBS(nil, L"活动已结束，感谢您的参与");
+        end
+        return
+    end
+
+    local view_width = 870
+    local view_height = 523
+    local params = {
+        url = "script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.html",
+        name = "ActWeek.ShowView", 
+        isShowTitleBar = false,
+        DestroyOnClose = true,
+        style = CommonCtrl.WindowFrame.ContainerStyle,
+        allowDrag = true,
+        enable_esc_key = true,
+        zorder = 0,
+        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+        directPosition = true,
+            align = "_ct",
+            x = -view_width/2 - 80,
+            y = -view_height/2,
+            width = view_width,
+            height = view_height,
+    };
+    System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
 function ActWeek.FlushView()
@@ -170,20 +166,21 @@ function ActWeek.GetActState()
 end
 
 function ActWeek.GetServerTime(callback)
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = ActWeek.GetTimeStamp(data.now)
-        if callback then
-            callback()
-        end
-    end)
+    server_time = GameLogic.QuestAction.GetServerTime()
+    if callback then
+        callback()
+    end
 end
 
--- 完成活动目标
+-- 完成活动目标 上传世界
 function ActWeek.AchieveActTarget()
     -- 得先判断有没登录
     if(not GameLogic.GetFilters():apply_filters('is_signed_in'))then
         return
 	end
+
+    GameLogic.QuestAction.CompleteAiHomeWork()
+
 
     -- 判断任务状态
     local client_data = KeepWorkItemManager.GetClientData(ActWeek.act_gisd);
@@ -197,30 +194,28 @@ function ActWeek.AchieveActTarget()
         return
     end
 
-    keepwork.user.server_time({}, function(err, msg, data)
-        server_time = ActWeek.GetTimeStamp(data.now)
+    server_time = GameLogic.QuestAction.GetServerTime()
 
-        local act_state = ActWeek.GetActState()
-        if act_state ~= ActWeek.ActState.going then
-            return
+    local act_state = ActWeek.GetActState()
+    if act_state ~= ActWeek.ActState.going then
+        return
+    end
+
+    -- 判断是不是周末
+    local week_day = ActWeek.GetWeekNum(server_time)
+    if week_day ~= 6 and week_day ~= 7 then
+    -- if week_day ~= 3 then
+        return
+    end
+
+    client_data[1].get_reward_state = ActWeek.GetRewardState.can_get
+    client_data[2].get_reward_state = ActWeek.GetRewardState.can_get
+
+    KeepWorkItemManager.SetClientData(ActWeek.act_gisd, client_data, function()
+        GameLogic.AddBBS(nil, L"恭喜你达成创造周末活动目标");
+        if ActWeek then
+            ActWeek.FlushView()
         end
-
-        -- 判断是不是周末
-        local week_day = ActWeek.GetWeekNum(server_time)
-        if week_day ~= 6 and week_day ~= 7 then
-        -- if week_day ~= 3 then
-            return
-        end
-
-        client_data[1].get_reward_state = ActWeek.GetRewardState.can_get
-        client_data[2].get_reward_state = ActWeek.GetRewardState.can_get
-
-        KeepWorkItemManager.SetClientData(ActWeek.act_gisd, client_data, function()
-            GameLogic.AddBBS(nil, L"恭喜你达成创造周末活动目标");
-            if ActWeek then
-                ActWeek.FlushView()
-            end
-        end)
     end)
 end
 

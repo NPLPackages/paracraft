@@ -30,6 +30,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
 local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local CodeUIActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIActor");
 local CodeLightActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeLightActor");
 local CodeEvent = commonlib.gettable("MyCompany.Aries.Game.Code.CodeEvent");
@@ -945,6 +946,21 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 	
 	event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
 	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
+
+	local agentName = text:match("^(.+)%.GetIcon$");
+	if(agentName) then
+		local icon = callbackFunc();
+		icon =  icon and Files.GetWorldFilePath(icon)
+		if(icon) then
+			local itemDS = ItemClient.AddBlock(block_types.names.AgentItem, nil, "tool", agentName);
+			if(itemDS) then
+				itemDS.icon = icon;
+				itemDS.server_data = {name = agentName};
+				itemDS.tooltip = agentName;
+			end
+		end
+	end
+
 	return event;
 end
 
@@ -1290,11 +1306,7 @@ function CodeBlock:RunCommand(cmd_name, cmd_text)
 	if(handlerFunc) then
 		handlerFunc(self, cmd_text);
 	else
-		if (GameLogic.GameMode:CanUseCommand() or GameLogic.GetMode() == "editor") then
-			return GameLogic.RunCommand(cmd_name, cmd_text, self:GetEntity());
-		else
-			GameLogic.AddBBS(nil, L"当前模式不允许使用命令", 3000, "255 0 0");
-		end
+		return GameLogic.RunCommand(cmd_name, cmd_text, self:GetEntity());
 	end
 end
 

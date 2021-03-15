@@ -108,10 +108,14 @@ function MacroPlayer.OnViewportChange()
 			page.keyboardWnd:Destroy();
 			page.keyboardWnd = nil;
 		end
-		local m = Macros:PeekNextMacro(0)
-		if(m and m:IsTrigger()) then
-			m:RunAgain()
-		end
+		commonlib.TimerManager.SetTimeout(function()  
+			if(MacroPlayer.triggerCallbackFunc) then
+				local m = Macros:PeekNextMacro(0)
+				if(m and m:IsTrigger()) then
+					m:RunAgain()
+				end
+			end
+		end, 300)
 	end
 end
 

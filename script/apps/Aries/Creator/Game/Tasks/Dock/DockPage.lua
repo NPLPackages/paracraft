@@ -20,12 +20,16 @@ local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notic
 local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
 local ActRedhatExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActRedhat/ActRedhatExchange.lua")
 local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
+local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
 DockPage.RefuseFansList = {}
 DockPage.IsShowClassificationPage = false
 DockPage.isShowTaskIconEffect = true
+DockPage.showPages = {}
 DockPage.hide_vip_world_ids = {
     ONLINE = { 18626 },
     RELEASE = { 1236 },
@@ -43,7 +47,7 @@ DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
-    { label = L"", },    
+    { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_ketang_32bits.png#0 0 100 80", },
 }
@@ -82,6 +86,7 @@ function DockPage.Show(bCommand)
     -- 每次登陆判断是否弹出活动框
     if Notice and Notice.CheckCanShow() and not MacroCodeCampActIntro.CheckIsInWinCamp() and not bCommand then
         Notice.Show(0)
+        table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
     end
     --冬令营弹框判断 活动下线
     if MacroCodeCampActIntro.CheckCanShow() and not bCommand then
@@ -96,6 +101,7 @@ function DockPage.Show(bCommand)
     -- ActWeek.GetServerTime(function()
     --     DockPage.RefreshPage(0.01)
     -- end)
+    GameLogic.QuestAction.RequestAiHomeWork(DockPage.FreshHomeWorkIcon)
 end
 
 function DockPage.RefreshPage(time)
@@ -198,56 +204,66 @@ function DockPage.CloseLastShowPage(id)
     if(not id)then
         return
     end
-    local visible;
-    if(DockPage.last_page_ctrl)then
-        if(id == "character" or DockPage.last_page_ctrl_id == "character")then
-            visible = (DockPage.last_page_ctrl.window ~= nil);
-        else
-            visible = DockPage.last_page_ctrl:IsVisible();
-        end
-        if(visible)then
-            DockPage.last_page_ctrl:CloseWindow();
-            DockPage.last_page_ctrl = nil;
-            if(DockPage.last_page_ctrl_id)then
-                if(DockPage.last_page_ctrl_id == id)then
-                    DockPage.last_page_ctrl_id = nil;
-                    return true
+    print("DockPage.CloseLastShowPage",id)
+    for k,v in pairs(DockPage.showPages) do
+        if v[1] then
+            local page = nil
+            if v[1] == "vip" then
+                page =VipToolNew.GetPageCtrl()
+            elseif v[1] == "explore" then
+                GameLogic.GetFilters():apply_filters("cellar.explorer.close")
+            elseif v[1] == "study" then
+                page = QuestAllCourse.GetPageCtrl()
+            elseif v[1] == "notice" then
+                page = Notice.GetPageCtrl()
+            elseif v[1] == "user_tip" then
+                page = QuestPage.GetPageCtrl()
+            else
+                page = v[2]              
+            end
+            local visible
+            if page then              
+                visible = page:IsVisible();
+                if visible then
+                    page:CloseWindow()
+                    page = nil
+                    if id == v[1] then
+                        v[1] = nil
+                        return true
+                    end
                 end
             end
         end
-    else
-        DockPage.last_page_ctrl_id = nil;
     end
+    DockPage.showPages = {}
 end
 
 function DockPage.OnClickTop(id)
+    if(DockPage.CloseLastShowPage(id))then
+        return
+    end
     if(id == "checkin")then
         ParacraftLearningRoomDailyPage.DoCheckin();
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.checkin");
-    elseif(id == "week_quest")then
-        local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
-        TeachingQuestLinkPage.ShowPage();
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.week_quest");
+        table.insert(DockPage.showPages,{id,ParacraftLearningRoomDailyPage.GetPageCtrl()})
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.checkin");    
     elseif(id == "codewar")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
         StudyPage.clickArtOfWar();
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.code_war");
-    elseif(id == "web_keepwork_home")then
-	    ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com", "", 1); 
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
-    elseif(id == "user_tip")then
-        local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.code_war");    
+    elseif(id == "user_tip")then        
         QuestPage.Show();
-        
+        table.insert(DockPage.showPages,{id,QuestPage.GetPageCtrl()})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
         DockPage.isShowTaskIconEffect = false
         DockPage.RefreshPage(0.01)
     elseif(id == "msg_center")then
         local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
         MsgCenter.Show();
+        table.insert(DockPage.showPages,{id,MsgCenter.GetPageCtrl()})
     elseif(id == "notice")then
         if Notice then
-            Notice.Show(1);
+            Notice.Show(1); 
+            table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
         end
     elseif (id == 'present') then
         if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
@@ -262,12 +278,21 @@ function DockPage.OnClickTop(id)
                 end
             );
         end
-    elseif (id == 'find_hat') then
-        if ActRedhatExchange then
-            ActRedhatExchange.ShowView()
-        end
-    elseif (id == 'act_week') then
-        ActWeek.ShowView()
+    -- elseif (id == 'find_hat') then
+    --     if ActRedhatExchange then
+    --         ActRedhatExchange.ShowView()
+    --     end
+    -- elseif (id == 'act_week') then
+    --     ActWeek.ShowView()
+    -- elseif(id == "week_quest")then
+    --     local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
+    --     TeachingQuestLinkPage.ShowPage();
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.week_quest");
+    -- elseif(id == "web_keepwork_home")then
+    --     ParaGlobal.ShellExecute("open", "explorer.exe", "https://keepwork.com", "", 1); 
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
+    elseif (id == 'homework') then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestWork.lua").Show();
     end
 end
 function DockPage.OnClick(id)
@@ -279,11 +304,7 @@ function DockPage.OnClick(id)
         local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
         last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
-    elseif(id == "bag")then
-        local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
-        UserBagPage.ShowPage();
-        last_page_ctrl = UserBagPage.GetPageCtrl();
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.bag");
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
     elseif(id == "work")then
 		if(mouse_button == "right") then
             -- the new version            
@@ -291,14 +312,16 @@ function DockPage.OnClick(id)
         else
             last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page')
         end
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.work");
     elseif(id == "explore")then
         last_page_ctrl = GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.explore");
-    elseif(id == "study")then
-        local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+    elseif(id == "study")then        
         QuestAllCourse.Show();
         last_page_ctrl = QuestAllCourse.GetPageCtrl()
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.study");
     elseif(id == "home")then
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.home");
@@ -317,6 +340,7 @@ function DockPage.OnClick(id)
             last_page_ctrl = FriendsPage.GetPageCtrl();
             DockPage.last_page_ctrl = last_page_ctrl;
             DockPage.last_page_ctrl_id = id;
+            table.insert(DockPage.showPages,{id,last_page_ctrl})
         end
         FriendsPage.Show();
 
@@ -337,11 +361,15 @@ function DockPage.OnClick(id)
                 end
             end)
         end);
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school");              
     elseif(id == "vip")then
         -- ParacraftLearningRoomDailyPage.OnVIP("dock");
-        local VipToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolTip.lua")
-        VipToolTip:Init(true)
+        -- local VipToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolTip.lua")
+        -- VipToolTip:Init(true)        
+        VipToolNew.Show()
+        last_page_ctrl = VipToolNew.GetPageCtrl()        
+        table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.vip");
     elseif(id == "mall")then
         local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
@@ -349,6 +377,7 @@ function DockPage.OnClick(id)
             last_page_ctrl = KeepWorkMallPage.GetPageCtrl();
             DockPage.last_page_ctrl = last_page_ctrl;
             DockPage.last_page_ctrl_id = id;
+            table.insert(DockPage.showPages,{id,last_page_ctrl})
         end
         KeepWorkMallPage.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.mall");
@@ -367,7 +396,6 @@ function DockPage.OnClick(id)
     end
     DockPage.last_page_ctrl = last_page_ctrl;
     DockPage.last_page_ctrl_id = id;
-    
 end
 
 function DockPage.FindUIControl(name)
@@ -704,4 +732,31 @@ function DockPage.CanShowCampVip()
     end
 
     return false
+end
+
+function DockPage.FreshHomeWorkIcon()
+    local ai_homework = GameLogic.QuestAction.GetAiHomeWork()
+    if #ai_homework > 0 then
+        local has_icon = false
+        for key, v in pairs(DockPage.top_line_2) do
+            if v.id == "homework" then
+                has_icon = true
+                v.enabled2 = true
+            end
+        end
+
+        if not has_icon then
+            table.insert(DockPage.top_line_2, 1, { label = L"作业", id = "homework", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", })
+        end
+        
+        DockPage.RefreshPage()
+    else
+        for key, v in pairs(DockPage.top_line_2) do
+            if v.id == "homework" then
+                v.enabled2 = false
+            end
+        end
+
+        DockPage.RefreshPage()
+    end
 end

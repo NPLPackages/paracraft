@@ -512,8 +512,23 @@ function Entity:MoveEntity(deltaTime)
 	end
 	deltaTime = math.min(0.3, deltaTime);
 	self:CheckCollision(deltaTime);
-	local player = self:GetInnerObject();
-	PlayerAssetFile:ShowWingAttachment(player, self:GetSkinId(), player:GetAnimation() == 38);
+	-- self:CheckWings();
+end
+
+function Entity:CheckWings()
+	if (EntityManager.GetPlayer() == self) then
+		self:ShowWings(self.bFlying)
+	end
+end
+
+function Entity:ShowWings(bShowWings)
+	if(self.bShowWings ~= bShowWings) then
+		self.bShowWings = bShowWings;
+		local player = self:GetInnerObject();
+		if(player) then
+			PlayerAssetFile:ShowWingAttachment(player, self:GetSkinId(), bShowWings);
+		end			
+	end
 end
 
 -- called every framemove by the ridden entity, instead of framemove.

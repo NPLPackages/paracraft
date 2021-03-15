@@ -45,11 +45,15 @@ function MakeApp:Run()
 		_guihelper.MessageBox(L"此功能需要使用Windows操作系统");
 		return
 	end
+
+	--[[
 	GameLogic.IsVip("MakeApp", true, function(result) 
 		if(result) then  
 			self:RunImp()
 		end
 	end)
+	]]
+	self:RunImp();
 end
 
 function MakeApp:MakeApp()
@@ -72,7 +76,7 @@ end
 
 function MakeApp:GenerateFiles()
 	ParaIO.CreateDirectory(self:GetBinDir())
-	if(self:MakeStartupExe() and self:CopyWorldFiles()) then
+	if(self:MakeStartupExe() and self:CopyWorldFiles() and self:GenerateHelpFile()) then
 		if(self:CopyParacraftFiles()) then
 			return true;
 		end
@@ -90,6 +94,26 @@ function MakeApp:MakeStartupExe()
 		file:WriteString("cd bin\n");
 		local worldPath = Files.ResolveFilePath(GameLogic.GetWorldDirectory()).relativeToRootPath or GameLogic.GetWorldDirectory()
 		file:WriteString("start ParaEngineClient.exe noclientupdate=\"true\" world=\"%~dp0data/\"");
+		file:close();
+		return true;
+	end
+end
+
+function MakeApp:GenerateHelpFile()
+	local file = ParaIO.open(self.output_folder..commonlib.Encoding.Utf8ToDefault(L"使用指南")..".html", "w")
+	if(file:IsValid()) then
+		file:WriteString([[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<META HTTP-EQUIV="Refresh" CONTENT="1; URL=https://keepwork.com/official/docs/tutorials/exe_Instruction">
+<title>Paracraft App</title>
+</head>
+<body>
+<p>Powered by NPL and paracraft</p>
+<p>Page will be redirected in 3 seconds</p>
+</body>
+</html>
+]]);
 		file:close();
 		return true;
 	end
@@ -156,17 +180,21 @@ function MakeApp:GetZipFile()
 end
 
 function MakeApp:MakeZipInstaller()
-	local zipfile = self:GetZipFile();
-	ParaIO.DeleteFile(zipfile)
-	local writer = ParaIO.CreateZip(zipfile,"");
 	local output_folder = self.output_folder;
 	local result = commonlib.Files.Find({}, self.output_folder, 10, 5000, function(item)
+		return true;
+		--no need to check zipfile
+		--[[
 		local ext = commonlib.Files.GetFileExtension(item.filename);
 		if(ext) then
 			return (ext ~= "zip")
 		end
+		]]
 	end)
 	
+	local zipfile = self:GetZipFile();
+	ParaIO.DeleteFile(zipfile)
+	local writer = ParaIO.CreateZip(zipfile,"");
 	local appFolder = "ParacraftApp/";
 	for i, item in ipairs(result) do
 		local filename = item.filename;

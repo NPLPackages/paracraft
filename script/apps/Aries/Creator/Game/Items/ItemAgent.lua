@@ -4,6 +4,7 @@ Author(s): LiXizhi
 Date: 2021/2/17
 Desc: Agent item is a special item that is defined in code blocks. The appearance and functions of the agent item 
 are implemented by registerAgentEvent in code blocks. Agent Item is usually listed in the inventory of agent sign block. 
+If Agent Item's GetIcon function is implemented and has a valid icon file, we will also add the agent to the block lists' tools category. 
 
 use the lib:
 ------------------------------------------------------------
@@ -30,13 +31,34 @@ function ItemAgent:ctor()
 	self.m_bIsOwnerDrawIcon = true;
 end
  
+ 
+-- return true if items are the same. 
+-- @param left, right: type of ItemStack or nil. 
+function ItemAgent:CompareItems(left, right)
+	if(ItemAgent._super.CompareItems(self, left, right)) then
+		if(left and right and left:GetDataField("name") == right:GetDataField("name")) then
+			return true;
+		end
+	end
+end
+
 function ItemAgent:GetAgentName(itemStack)
-	return itemStack and itemStack:GetDataField("tooltip");
+	return itemStack and itemStack:GetDataField("name") or itemStack:GetDataField("tooltip");
 end
 
 function ItemAgent:SetAgentName(itemStack, name)
 	if(itemStack) then
-		itemStack:SetDataField("tooltip", name);
+		itemStack:SetDataField("name", name);
+	end
+end
+
+function ItemAgent:GetTooltipFromItemStack(itemStack)
+	if(itemStack) then
+		local name = itemStack:GetDataField("name");
+		if(name) then
+			local tooltip = GameLogic.GetCodeGlobal():BroadcastTextEvent(name..".GetTooltip")
+			return tooltip or name
+		end
 	end
 end
 

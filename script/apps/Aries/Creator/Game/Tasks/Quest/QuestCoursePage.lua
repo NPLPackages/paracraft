@@ -88,115 +88,102 @@ function QuestCoursePage.Show(is_make_up)
     if(not GameLogic.GetFilters():apply_filters('is_signed_in'))then
         return
     end
-	keepwork.user.server_time({}, function(err, msg, data)
-		if err == 200 then
-			server_time = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-			today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-			QuestAction.SetServerTime(server_time)
+	server_time = GameLogic.QuestAction.GetServerTime()
+	today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
 
-			local begain_day_weehours = os.time(QuestCoursePage.begain_time_t)
-			if server_time < begain_day_weehours then
-				GameLogic.QuestAction.ShowDialogPage({"还没到课程开启时间哟！", "从1月28日起，每天记得在10:30 13:30 16:00 18:00 19:00过来听课吧！"})
-				return
-			end
+	local begain_day_weehours = os.time(QuestCoursePage.begain_time_t)
+	if server_time < begain_day_weehours then
+		GameLogic.QuestAction.ShowDialogPage({"还没到课程开启时间哟！", "从1月28日起，每天记得在10:30 13:30 16:00 18:00 19:00过来听课吧！"})
+		return
+	end
 
-			-- 如果是补课的话 判断下是否在不建议的时间段 正常课程的前45分钟之后 就属于不建议时间段
-			if not QuestCoursePage.IsGraduateTime(server_time) then
-				if QuestCoursePage.is_make_up then
-					for i, v in ipairs(QuestCoursePage.CourseTimeLimit) do
-						local begain_time_stamp = today_weehours + v.begain_time.min * 60 + v.begain_time.hour * 3600 - 45 * 60
-						local end_time_stamp = today_weehours + v.end_time.min * 60 + v.end_time.hour * 3600
-				
-						if server_time >= begain_time_stamp and server_time <= end_time_stamp then
-							-- _guihelper.MessageBox("现在补课可能会耽误新课程的正常学习，请稍后再来", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
-							-- _guihelper.MsgBoxClick_CallBack = function(res)
-							-- 	if(res == _guihelper.DialogResult.OK) then
-							-- 		QuestCoursePage.ShowView()
-							-- 	end
-							-- end
+	-- 如果是补课的话 判断下是否在不建议的时间段 正常课程的前45分钟之后 就属于不建议时间段
+	if not QuestCoursePage.IsGraduateTime(server_time) then
+		if QuestCoursePage.is_make_up then
+			for i, v in ipairs(QuestCoursePage.CourseTimeLimit) do
+				local begain_time_stamp = today_weehours + v.begain_time.min * 60 + v.begain_time.hour * 3600 - 45 * 60
+				local end_time_stamp = today_weehours + v.end_time.min * 60 + v.end_time.hour * 3600
+		
+				if server_time >= begain_time_stamp and server_time <= end_time_stamp then
+					-- _guihelper.MessageBox("现在补课可能会耽误新课程的正常学习，请稍后再来", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+					-- _guihelper.MsgBoxClick_CallBack = function(res)
+					-- 	if(res == _guihelper.DialogResult.OK) then
+					-- 		QuestCoursePage.ShowView()
+					-- 	end
+					-- end
 
-							-- GameLogic.QuestAction.ShowDialogPage(L"现在补课可能会耽误新课程的正常学习，请稍后再来", function()
-							-- 	QuestCoursePage.ShowView()
-							-- end)
-							QuestCoursePage.ShowView()
-							return
-						end
-					end
-				else
-					local course_time_state, next_time_index = QuestCoursePage.CheckCourseTimeState(server_time)
-					if course_time_state ~= QuestCoursePage.ToCourseState.in_time then
-						if course_time_state == QuestCoursePage.ToCourseState.late then
-							next_time_index = next_time_index or 0
-							local next_time_data = QuestCoursePage.CourseTimeLimit[next_time_index]
-							local cur_time_data = QuestCoursePage.CourseTimeLimit[next_time_index - 1]
-							if next_time_data and cur_time_data then
-								local hour = next_time_data.begain_time.hour >= 10 and next_time_data.begain_time.hour or "0" .. next_time_data.begain_time.hour
-								local min = next_time_data.begain_time.min >= 10 and next_time_data.begain_time.min or "0" .. next_time_data.begain_time.min
-								local next_time = string.format("%s:%s", hour, min)
-
-								local next_time_stamp = today_weehours + next_time_data.begain_time.min * 60 + next_time_data.begain_time.hour * 3600
-								
-								local second_limit = 10 * 60
-								local left_time = next_time_stamp - server_time
-								local pre_desc = "您已迟到"
-								if left_time < second_limit then
-									local min = math.ceil( left_time / 60 )  -- 取整数
-									-- local sec = math.fmod( left_time, 60 )    -- 取余数
-									pre_desc = string.format("课程%s分钟后开始", min)
-								else
-									local cur_hour = cur_time_data.begain_time.hour >= 10 and cur_time_data.begain_time.hour or "0" .. cur_time_data.begain_time.hour
-									local cur_min = cur_time_data.begain_time.min >= 10 and cur_time_data.begain_time.min or "0" .. cur_time_data.begain_time.min
-									pre_desc = string.format("您已错过本堂课(%s:%s)", cur_hour, cur_min)
-								end
-								
-								local desc = string.format(L"%s，请下一堂课(%s)再来，切记不可再迟到了哟！", pre_desc, next_time)
-								GameLogic.QuestAction.ShowDialogPage(desc)
-							else
-								GameLogic.QuestAction.ShowDialogPage(L"您已迟到，请下一堂课再来，切记不可再迟到了哟！")
-							end
-							-- GameLogic.QuestAction.ShowDialogPage(L"您已迟到，请下一堂课再来，切记不可再迟到了哟！")
-						elseif course_time_state == QuestCoursePage.ToCourseState.before then
-							local first_time_data = QuestCoursePage.CourseTimeLimit[1]
-							local hour = first_time_data.begain_time.hour >= 10 and first_time_data.begain_time.hour or "0" .. first_time_data.begain_time.hour
-							local min = first_time_data.begain_time.min >= 10 and first_time_data.begain_time.min or "0" .. first_time_data.begain_time.min
-							local next_time = string.format("%s:%s", hour, min)
-							GameLogic.QuestAction.ShowDialogPage(string.format("今日课程还未开始，请在门口课程表上指定的开始时间(%s)来上课哟！", next_time))
-						elseif course_time_state == QuestCoursePage.ToCourseState.finish then
-							GameLogic.QuestAction.ShowDialogPage(L"今日课程已经结束，请在门口课程表上指定的时间段内前来上课哟！")
-						else
-							GameLogic.QuestAction.ShowDialogPage(L"请在门口课程表上指定的时间段内前来上课哟！")
-						end
-						
-						return
-					end
+					-- GameLogic.QuestAction.ShowDialogPage(L"现在补课可能会耽误新课程的正常学习，请稍后再来", function()
+					-- 	QuestCoursePage.ShowView()
+					-- end)
+					QuestCoursePage.ShowView()
+					return
 				end
 			end
+		else
+			local course_time_state, next_time_index = QuestCoursePage.CheckCourseTimeState(server_time)
+			if course_time_state ~= QuestCoursePage.ToCourseState.in_time then
+				if course_time_state == QuestCoursePage.ToCourseState.late then
+					next_time_index = next_time_index or 0
+					local next_time_data = QuestCoursePage.CourseTimeLimit[next_time_index]
+					local cur_time_data = QuestCoursePage.CourseTimeLimit[next_time_index - 1]
+					if next_time_data and cur_time_data then
+						local hour = next_time_data.begain_time.hour >= 10 and next_time_data.begain_time.hour or "0" .. next_time_data.begain_time.hour
+						local min = next_time_data.begain_time.min >= 10 and next_time_data.begain_time.min or "0" .. next_time_data.begain_time.min
+						local next_time = string.format("%s:%s", hour, min)
 
-			QuestCoursePage.ShowView()
+						local next_time_stamp = today_weehours + next_time_data.begain_time.min * 60 + next_time_data.begain_time.hour * 3600
+						
+						local second_limit = 10 * 60
+						local left_time = next_time_stamp - server_time
+						local pre_desc = "您已迟到"
+						if left_time < second_limit then
+							local min = math.ceil( left_time / 60 )  -- 取整数
+							-- local sec = math.fmod( left_time, 60 )    -- 取余数
+							pre_desc = string.format("课程%s分钟后开始", min)
+						else
+							local cur_hour = cur_time_data.begain_time.hour >= 10 and cur_time_data.begain_time.hour or "0" .. cur_time_data.begain_time.hour
+							local cur_min = cur_time_data.begain_time.min >= 10 and cur_time_data.begain_time.min or "0" .. cur_time_data.begain_time.min
+							pre_desc = string.format("您已错过本堂课(%s:%s)", cur_hour, cur_min)
+						end
+						
+						local desc = string.format(L"%s，请下一堂课(%s)再来，切记不可再迟到了哟！", pre_desc, next_time)
+						GameLogic.QuestAction.ShowDialogPage(desc)
+					else
+						GameLogic.QuestAction.ShowDialogPage(L"您已迟到，请下一堂课再来，切记不可再迟到了哟！")
+					end
+					-- GameLogic.QuestAction.ShowDialogPage(L"您已迟到，请下一堂课再来，切记不可再迟到了哟！")
+				elseif course_time_state == QuestCoursePage.ToCourseState.before then
+					local first_time_data = QuestCoursePage.CourseTimeLimit[1]
+					local hour = first_time_data.begain_time.hour >= 10 and first_time_data.begain_time.hour or "0" .. first_time_data.begain_time.hour
+					local min = first_time_data.begain_time.min >= 10 and first_time_data.begain_time.min or "0" .. first_time_data.begain_time.min
+					local next_time = string.format("%s:%s", hour, min)
+					GameLogic.QuestAction.ShowDialogPage(string.format("今日课程还未开始，请在门口课程表上指定的开始时间(%s)来上课哟！", next_time))
+				elseif course_time_state == QuestCoursePage.ToCourseState.finish then
+					GameLogic.QuestAction.ShowDialogPage(L"今日课程已经结束，请在门口课程表上指定的时间段内前来上课哟！")
+				else
+					GameLogic.QuestAction.ShowDialogPage(L"请在门口课程表上指定的时间段内前来上课哟！")
+				end
+				
+				return
+			end
 		end
-	end)
+	end
+
+	QuestCoursePage.ShowView()
 end
 
 function QuestCoursePage.RefreshData()
 	if page == nil or not page:IsVisible() then
 		return
 	end
-	
-	keepwork.user.server_time({}, function(err, msg, data)
-		if err == 200 then
-			if not QuestCoursePage.IsVisible() then
-				return
-			end
 
-			server_time = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-			today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+	server_time = GameLogic.QuestAction.GetServerTime()
+	today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
 
-			QuestCoursePage.HandleTaskData()
-			QuestCoursePage.HandleCourseData()
-			QuestCoursePage.OnRefreshGridView()
-			QuestCoursePage.OnRefreshGiftGridView()
-		end
-	end)
+	QuestCoursePage.HandleTaskData()
+	QuestCoursePage.HandleCourseData()
+	QuestCoursePage.OnRefreshGridView()
+	QuestCoursePage.OnRefreshGiftGridView()
 end
 
 function QuestCoursePage.ShowView()
@@ -616,143 +603,139 @@ function QuestCoursePage.GetReward(task_id)
 end
 
 function QuestCoursePage.Goto(task_id)
-	keepwork.user.server_time({}, function(err, msg, data)
-		if err == 200 then
-			server_time = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-			today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-			local task_data = QuestCoursePage.GetQuestData(task_id)
-			if task_data == nil then
-				return
-			end
+	server_time = GameLogic.QuestAction.GetServerTime()
+	today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+	local task_data = QuestCoursePage.GetQuestData(task_id)
+	if task_data == nil then
+		return
+	end
 
-			if task_id == QuestAction.is_always_exist_exid then
-				QuestCoursePage.ToGraduate(task_data)
-				return
-			end
+	if task_id == QuestAction.is_always_exist_exid then
+		QuestCoursePage.ToGraduate(task_data)
+		return
+	end
 
-			local show_vip_view = function(desc, form)
-				_guihelper.MessageBox(desc, nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
-				_guihelper.MsgBoxClick_CallBack = function(res)
-					if(res == _guihelper.DialogResult.OK) then
-						-- GameLogic.GetFilters():apply_filters("VipNotice", true, form,function()
-						-- 	QuestCoursePage.Goto(task_id)
-						-- end);
-						-- local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
-						-- MacroCodeCampActIntro.ShowView(true)
-						
-						VipToolNew.Show(form)
-						GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.vip.funnel.open', { from = form })
-					else
-					end
-				end
-			end
-
-			if task_data.task_state == QuestCoursePage.TaskState.can_not_go then
-				return
-			end
-
-			if QuestCoursePage.is_make_up then
-				if not System.User.isVip then
-					show_vip_view("对不起，只有会员才能重新体验课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_resign")
-					return
-				end	
-			else
-				-- 是否五校用户
-				if not System.User.isVipSchool then
-					-- 是否vip
-					if not System.User.isVip then
-						show_vip_view("对不起，本功能暂时只对会员开放。立即加入会员，一起学习生长吧！", "vip_wintercamp1_join")
-						return
-					end
-				end
-
-				-- 时间判断
-				local course_time_state = QuestCoursePage.CheckCourseTimeState(server_time)
-				if course_time_state ~= QuestCoursePage.ToCourseState.in_time then
-					if course_time_state == QuestCoursePage.ToCourseState.late then
-						GameLogic.AddBBS(nil, L"您已迟到，请下一堂课再来，切记不可再迟到了哟！");
-					else
-						GameLogic.AddBBS(nil, L"请在门口课程表上指定的时间段内前来上课哟！");
-					end
-					
-					return
-				end
+	local show_vip_view = function(desc, form)
+		_guihelper.MessageBox(desc, nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+		_guihelper.MsgBoxClick_CallBack = function(res)
+			if(res == _guihelper.DialogResult.OK) then
+				-- GameLogic.GetFilters():apply_filters("VipNotice", true, form,function()
+				-- 	QuestCoursePage.Goto(task_id)
+				-- end);
+				-- local MacroCodeCampActIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MacroCodeCamp/MacroCodeCampActIntro.lua");
+				-- MacroCodeCampActIntro.ShowView(true)
 				
-				if not System.User.isVip then
-					if task_data.is_finish then
-						show_vip_view("对不起，您已免费体验过今日的课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_replay")
-						return
-					end
+				VipToolNew.Show(form)
+				GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.vip.funnel.open', { from = form })
+			else
+			end
+		end
+	end
 
-					-- local value = QuestAction.GetValue(task_data.id) or 0
-					-- if value >= 1 then
-					-- 	show_vip_view("对不起，您已免费体验过今日的课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_replay")
-					-- 	return
-					-- end
-				end	
+	if task_data.task_state == QuestCoursePage.TaskState.can_not_go then
+		return
+	end
+
+	if QuestCoursePage.is_make_up then
+		if not System.User.isVip then
+			show_vip_view("对不起，只有会员才能重新体验课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_resign")
+			return
+		end	
+	else
+		-- 是否五校用户
+		if not System.User.isVipSchool then
+			-- 是否vip
+			if not System.User.isVip then
+				show_vip_view("对不起，本功能暂时只对会员开放。立即加入会员，一起学习生长吧！", "vip_wintercamp1_join")
+				return
+			end
+		end
+
+		-- 时间判断
+		local course_time_state = QuestCoursePage.CheckCourseTimeState(server_time)
+		if course_time_state ~= QuestCoursePage.ToCourseState.in_time then
+			if course_time_state == QuestCoursePage.ToCourseState.late then
+				GameLogic.AddBBS(nil, L"您已迟到，请下一堂课再来，切记不可再迟到了哟！");
+			else
+				GameLogic.AddBBS(nil, L"请在门口课程表上指定的时间段内前来上课哟！");
+			end
+			
+			return
+		end
+		
+		if not System.User.isVip then
+			if task_data.is_finish then
+				show_vip_view("对不起，您已免费体验过今日的课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_replay")
+				return
 			end
 
-			local function user_behavior()
-				local value = QuestAction.GetValue(task_data.id) or 0
-				if value == 0 then
-					GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.winter_camp.lessons.hour_of_code', { from = task_id })
-				end
-			end
+			-- local value = QuestAction.GetValue(task_data.id) or 0
+			-- if value >= 1 then
+			-- 	show_vip_view("对不起，您已免费体验过今日的课程。立即加入会员，无限次体验全部课程！", "vip_wintercamp1_replay")
+			-- 	return
+			-- end
+		end	
+	end
 
-			local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
-			local target_index = VersionToKey[httpwrapper_version]
-			if task_data.goto_world and #task_data.goto_world > 0 then
-				local world_id = task_data.goto_world[target_index]
-				if world_id then
-					if QuestAction.IsJionWinterCamp() then
+	local function user_behavior()
+		local value = QuestAction.GetValue(task_data.id) or 0
+		if value == 0 then
+			GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.promotion.winter_camp.lessons.hour_of_code', { from = task_id })
+		end
+	end
+
+	local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
+	local target_index = VersionToKey[httpwrapper_version]
+	if task_data.goto_world and #task_data.goto_world > 0 then
+		local world_id = task_data.goto_world[target_index]
+		if world_id then
+			if QuestAction.IsJionWinterCamp() then
+				user_behavior()
+				-- GameLogic.QuestAction.SetValue(task_data.id, 1);
+				QuestCoursePage.EnterWorld(world_id)
+			else
+				KeepWorkItemManager.DoExtendedCost(QuestAction.winter_camp_jion_exid, function()
+					keepwork.wintercamp.joincamp({
+						gsId=QuestAction.winter_camp_jion_gsid,        
+					},function(err, msg, data)
+						if err == 200 then
+							user_behavior()
+							-- GameLogic.QuestAction.SetValue(task_data.id, 1);
+							QuestCoursePage.EnterWorld(world_id)
+						end
+					end)							
+				end);
+			end
+		end
+
+	elseif task_data.click and task_data.click ~= "" then
+		if QuestAction.IsJionWinterCamp() then
+			if string.find(task_data.click, "loadworld ") then
+				page:CloseWindow()
+				QuestCoursePage.CloseView()
+			end
+			NPL.DoString(task_data.click)
+			user_behavior()
+			-- GameLogic.QuestAction.SetValue(task_data.id, 1);
+		else
+			KeepWorkItemManager.DoExtendedCost(QuestAction.winter_camp_jion_exid, function()
+				keepwork.wintercamp.joincamp({
+					gsId=QuestAction.winter_camp_jion_gsid,        
+				},function(err, msg, data)
+					if err == 200 then
+						if string.find(task_data.click, "loadworld ") then
+							page:CloseWindow()
+							QuestCoursePage.CloseView()
+						end
+						NPL.DoString(task_data.click)
 						user_behavior()
 						-- GameLogic.QuestAction.SetValue(task_data.id, 1);
-						QuestCoursePage.EnterWorld(world_id)
-					else
-						KeepWorkItemManager.DoExtendedCost(QuestAction.winter_camp_jion_exid, function()
-							keepwork.wintercamp.joincamp({
-								gsId=QuestAction.winter_camp_jion_gsid,        
-							},function(err, msg, data)
-								if err == 200 then
-									user_behavior()
-									-- GameLogic.QuestAction.SetValue(task_data.id, 1);
-									QuestCoursePage.EnterWorld(world_id)
-								end
-							end)							
-						end);
 					end
-				end
-
-			elseif task_data.click and task_data.click ~= "" then
-				if QuestAction.IsJionWinterCamp() then
-					if string.find(task_data.click, "loadworld ") then
-						page:CloseWindow()
-						QuestCoursePage.CloseView()
-					end
-					NPL.DoString(task_data.click)
-					user_behavior()
-					-- GameLogic.QuestAction.SetValue(task_data.id, 1);
-				else
-					KeepWorkItemManager.DoExtendedCost(QuestAction.winter_camp_jion_exid, function()
-						keepwork.wintercamp.joincamp({
-							gsId=QuestAction.winter_camp_jion_gsid,        
-						},function(err, msg, data)
-							if err == 200 then
-								if string.find(task_data.click, "loadworld ") then
-									page:CloseWindow()
-									QuestCoursePage.CloseView()
-								end
-								NPL.DoString(task_data.click)
-								user_behavior()
-								-- GameLogic.QuestAction.SetValue(task_data.id, 1);
-							end
-						end)							
-					end);
-				end
-			end
-			GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.quest_action.click_go_button')
+				end)							
+			end);
 		end
-	end)
+	end
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.quest_action.click_go_button')
 end
 
 function QuestCoursePage.GetQuestData(task_id)

@@ -31,6 +31,10 @@ function Notice.OnInit()
     page = document:GetPageCtrl(); 
 end
 
+function Notice.GetPageCtrl()
+    return page
+end
+
 --处理获得的数据
 function Notice.GetPageData(data)
     --print("Notice.GetPageData====================")

@@ -42,7 +42,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/DataWatcher.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketEntityEffect.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
 NPL.load("(gl)script/ide/mathlib.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
+local HeadonDisplay = commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay");
 local Color = commonlib.gettable("System.Core.Color");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local DataWatcher = commonlib.gettable("MyCompany.Aries.Game.Common.DataWatcher");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
@@ -604,22 +607,44 @@ end
 function Entity:IsShowHeadOnDisplay()
 end
 
+function Entity:GetHeadonEntity(index)
+	return self.headonEntities and self.headonEntities[index or 0];
+end
+
+function Entity:SetHeadonEntity(index, entity)
+	self.headonEntities = self.headonEntities or {};
+	self.headonEntities[index or 0] = entity;
+end
+
 -- display a mcml v2 url or xmlnode on top of the entity. 
 -- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), pageGlobalTable, is3D:bool}
 -- if nil, it will remove head on display
+-- @param headonIndex: default to 0, it can also be 1 or 2. so that multiple headon display can be shown at the same time.  
 -- @return the headon display object if created
-function Entity:SetHeadOnDisplay(params)
+function Entity:SetHeadOnDisplay(params, headonIndex)
 	if(not params) then
-		if(self.headonEntity) then
-			self.headonEntity:Destroy();
-			self.headonEntity = nil;
+		local lastEntity = self:GetHeadonEntity(headonIndex)
+		if(lastEntity) then
+			lastEntity:Destroy();
+			-- self:SetHeadonEntity(headonIndex, nil)
 		end
 	else
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
-		local HeadonDisplay = commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay");
-		local gui = HeadonDisplay:new():Init(self);
-		gui:Show(params);
-		return gui;
+		if(params.bReuseWindow) then
+			local lastEntity = self:GetHeadonEntity(headonIndex)
+			if(lastEntity) then
+				local gui = lastEntity:GetHeadonDisplayObj()
+				gui:RefreshShow(self, params)
+				return gui;
+			else
+				local gui = HeadonDisplay:new():Init(self, headonIndex);
+				gui:Show(params);
+				return gui;
+			end
+		else
+			local gui = HeadonDisplay:new():Init(self, headonIndex);
+			gui:Show(params);
+			return gui;
+		end
 	end
 end
 
@@ -1057,26 +1082,79 @@ function Entity:GetWorldServer()
     return GameLogic.GetWorld();
 end
 
+local isUseHeadonSay = true;
+local sHeadonSayTemplate = nil;
+
 -- let the entity say something on top of its head for some seconds. 
 -- @param text: text to show
--- @param duration: in seconds. default to 4
+-- @param duration: in seconds. default to 4. if -1, it means permanent. 
 -- @param bAbove3D: default to nil, if true, headon UI will be displayed above all 3D objects. if false or nil, it just renders the UI with z buffer test enabled. 
 -- return true if we actually said something, otherwise nil.
 function Entity:Say(text, duration, bAbove3D)
 	if(text and text~="") then
+		duration = duration or 4;
+		if(self.lastSayText ~= text) then
+			self.lastSayText = text;
+		elseif(duration <0) then
+			-- duplicated text
+			if(isUseHeadonSay) then
+				return true;
+			end
+		end
 		if(GameLogic.isServer and self:IsServerEntity()) then
 			local packet = Packets.PacketEntityFunction:new():Init(self, "say", {text=text, duration=duration, bAbove3D=bAbove3D});
 			self:GetWorldServer():GetEntityTracker():SendPacketToAllPlayersTrackingEntity(self, packet)
 		end
-		local obj = self:GetInnerObject();
-		if(obj) then
-			headon_speech.Speek(obj, text, duration or 4, bAbove3D, nil, nil, -1000);
-			return true;
+
+		if(isUseHeadonSay) then
+			if(not sHeadonSayTemplate) then
+				local bg = headon_speech.dialog_bg:gsub(";", "#")
+				local text_color = Color.ConvertRGBAStringToColor(headon_speech.text_color);
+				local fontSize = tonumber(headon_speech.default_font:match(";%s*(%d+)") or 14);
+				local maxWidth = headon_speech.max_width + headon_speech.padding * 2
+				sHeadonSayTemplate = format([[<pe:mcml>
+<div style="width:%dpx;height:100px;margin-left:%dpx;margin-top:-100px;">
+	<div align="center" valign="bottom" style="background:url(%s);min-width:40px;color:%s;font-size:%dpx;padding:%dpx;padding-bottom:%dpx;"><script>document.write(text)</script></div>
+</div>
+</pe:mcml>]], maxWidth, -maxWidth/2, bg, text_color, fontSize, headon_speech.padding, headon_speech.padding_bottom);
+				sHeadonSayTemplate = ParaXML.LuaXML_ParseString(sHeadonSayTemplate);
+			end
+			
+			self:SetHeadOnDisplay({url=commonlib.clone(sHeadonSayTemplate), 
+				pageGlobalTable = function(tab, name)
+					if(name == "document") then
+						return document;
+					elseif(name == "text") then
+						return text;
+					end
+				end,
+				bReuseWindow = true,
+			}, 1)
+			if(duration > 0) then
+				self.timerSay = self.timerSay or commonlib.Timer:new({callbackFunc = function(timer)
+					self:Say(nil);
+				end})
+				self.timerSay:Change(duration*1000);
+			end
+		else
+			local obj = self:GetInnerObject();
+			if(obj) then
+				headon_speech.Speek(obj, text, duration, bAbove3D, nil, nil, -1000);
+				return true;
+			end
 		end
 	else
-		local obj = self:GetInnerObject();
-		if(obj) then
-			headon_speech.SpeakClear(obj);
+		self.lastSayText = nil;
+		if(isUseHeadonSay) then
+			self:SetHeadOnDisplay(nil, 1);
+			if(self.timerSay) then
+				self.timerSay:Change();
+			end
+		else
+			local obj = self:GetInnerObject();
+			if(obj) then
+				headon_speech.SpeakClear(obj);
+			end
 		end
 	end
 end

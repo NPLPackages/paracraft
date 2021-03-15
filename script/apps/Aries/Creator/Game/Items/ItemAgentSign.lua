@@ -26,18 +26,18 @@ block_types.RegisterItemClass("ItemAgentSign", ItemAgentSign);
 function ItemAgentSign:PickItemFromPosition(x,y,z)
 	local entity = self:GetBlock():GetBlockEntity(x,y,z);
 	if(entity) then
-		if(entity.cmd and entity.cmd~="") then
-			local itemStack = ItemStack:new():Init(self.id, 1);
-			-- transfer filename from entity to item stack. 
-			itemStack:SetTooltip(entity.cmd);
-			itemStack:SetDataField("agentPackageName", entity:GetAgentName());
-			itemStack:SetDataField("agentPackageVersion", entity:GetVersion());
-			itemStack:SetDataField("agentDependencies", entity:GetAgentDependencies());
-			itemStack:SetDataField("agentExternalFiles", entity:GetAgentExternalFiles());
-			itemStack:SetDataField("agentUrl", entity:GetAgentUrl());
-			itemStack:SetDataField("isGlobal", entity:IsGlobal());
-			return itemStack;
-		end
+		local itemStack = ItemStack:new():Init(self.id, 1);
+		-- transfer filename from entity to item stack. 
+		itemStack:SetTooltip(entity.cmd or "");
+		itemStack:SetDataField("agentPackageName", entity:GetAgentName());
+		itemStack:SetDataField("agentPackageVersion", entity:GetVersion());
+		itemStack:SetDataField("agentDependencies", entity:GetAgentDependencies());
+		itemStack:SetDataField("agentExternalFiles", entity:GetAgentExternalFiles());
+		itemStack:SetDataField("updateMethod", entity:GetUpdateMethod());
+		itemStack:SetDataField("agentUrl", entity:GetAgentUrl());
+		itemStack:SetDataField("isGlobal", entity:IsGlobal());
+		itemStack:SetDataField("isPhantom", entity:IsPhantom());
+		return itemStack;
 	end
 	return ItemAgentSign._super.PickItemFromPosition(self, x,y,z);
 end
@@ -57,7 +57,7 @@ function ItemAgentSign:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 	local text = itemStack:GetDataField("tooltip");
 
 	local res = ItemAgentSign._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
-	if(res and text and text~="") then
+	if(res) then
 		local entity = self:GetBlock():GetBlockEntity(x,y,z);
 		if(entity and entity:GetBlockId() == self.id) then
 			entity.cmd = text;
@@ -65,11 +65,18 @@ function ItemAgentSign:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 			entity:SetVersion(itemStack:GetDataField("agentPackageVersion"))
 			entity:SetAgentDependencies(itemStack:GetDataField("agentDependencies"))
 			entity:SetAgentExternalFiles(itemStack:GetDataField("agentExternalFiles"))
+			entity:SetUpdateMethod(itemStack:GetDataField("updateMethod"))
 			entity:SetAgentUrl(itemStack:GetDataField("agentUrl"))
 			entity:SetGlobal(itemStack:GetDataField("isGlobal"))
+			entity:SetPhantom(itemStack:GetDataField("isPhantom"))
 			entity:Refresh();
 			commonlib.TimerManager.SetTimeout(function()  
-				entity:LoadFromAgentFile();
+				local filename = entity:GetExistingAgentFilename()
+				if(filename) then
+					entity:LoadFromAgentFile(filename);
+				else
+					entity:UpdateFromRemoteSource(nil);
+				end
 			end, 10)
 		end
 	end

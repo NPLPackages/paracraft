@@ -46,6 +46,7 @@ function MovieChannel:Init(name)
 end
 
 function MovieChannel:Destroy()
+	self:ResetSentientChecker()
 	self:Reset();
 	MovieChannel._super.Destroy(self);
 end
@@ -101,6 +102,10 @@ function MovieChannel:UseCamera()
 end
 
 function MovieChannel:Pause()
+	if(self.sentientPaused) then
+		self.sentientPaused = nil;
+		self.sentientTimer:Change();
+	end
 	if(self:GetCurrentMovieClip()) then
 		self:GetCurrentMovieClip():Pause();
 	end
@@ -181,6 +186,38 @@ function MovieChannel:GetSpeed()
 	return self.Speed or 1;
 end
 
+-- one can provide sentient checker function to auto pause the movie when the player is too far away, etc. 
+-- @param sentientCheckerFunc: function() end return true if we are sentient, otherwise false. 
+-- @param checkSentientInterval: default to 300 ms
+function MovieChannel:SetSentientChecker(sentientCheckerFunc, checkSentientInterval)
+	self.sentientCheckerFunc = sentientCheckerFunc;
+	self.checkSentientInterval = checkSentientInterval or 300;
+end
+
+function MovieChannel:CheckSentient()
+	if(self.sentientCheckerFunc) then
+		if(not self.sentientCheckerFunc()) then
+			self.sentientPaused = true;
+			local movieClip = self:GetCurrentMovieClip();
+			movieClip:Pause();
+			self.sentientTimer = self.sentientTimer or commonlib.Timer:new({callbackFunc = function(timer)
+				if(self:CheckSentient()) then
+					self.sentientPaused = nil;
+					movieClip:Resume();
+					timer:Change()
+				end
+			end})
+			self.sentientTimer:Change(self.checkSentientInterval, self.checkSentientInterval)
+			return false;
+		elseif(self.sentientPaused) then
+			self.sentientPaused = nil;
+			local movieClip = self:GetCurrentMovieClip();
+			movieClip:Resume();
+		end
+	end
+	return true;
+end
+
 function MovieChannel:OnMovieTimeChange()
 	local movieClip = self:GetCurrentMovieClip();
 	if(movieClip) then
@@ -191,12 +228,15 @@ function MovieChannel:OnMovieTimeChange()
 					movieClip:SetTime(self.playFromTime + (delta % (self.playToTime - self.playFromTime)))
 					movieClip:Resume();	
 				end
+				self:CheckSentient()
 			else
 				if(movieClip:GetTime() >= self.playToTime) then
 					movieClip:Pause();
 					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
 					movieClip:SetTime(self.playToTime);
 					self:FireFinished();
+				else
+					self:CheckSentient()
 				end
 			end
 		else
@@ -212,19 +252,30 @@ function MovieChannel:OnMovieTimeChange()
 					end
 					movieClip:Resume();	
 				end
+				self:CheckSentient()
 			else
 				if(movieClip:GetTime() <= self.playToTime) then
 					movieClip:Pause();
 					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
 					movieClip:SetTime(self.playToTime);
 					self:FireFinished();
+				else
+					self:CheckSentient()
 				end
 			end
 		end
 	end
 end
 
+function MovieChannel:ResetSentientChecker()
+	if(self.sentientTimer) then
+		self.sentientTimer:Change();
+		self.sentientPaused = nil;
+	end
+end
+
 function MovieChannel:FireFinished()
+	self:ResetSentientChecker()
 	self:finished(); -- signal
 	self:Disconnect("finished")
 end

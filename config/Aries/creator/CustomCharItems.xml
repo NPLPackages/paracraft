@@ -444,6 +444,23 @@ model id
     <item id="83143" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/v3/Item/ObjectComponents/Head/2434_TheSpringFestival_Boy.anim.x"></attachment></item>
     <item id="83144" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/v3/Item/ObjectComponents/Head/2435_ShopSpringHatGirl.anim.x"></attachment></item>
     <item id="83145" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/v3/Item/ObjectComponents/Head/1011_Hat_PoliceUniformHat_U.anim.x"></attachment></item>
+    <!--20210305新加-->
+    <item id="83146" model="actor;"><geoset category="0" id="11"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_11_maozi_hair_01.png"></texture></item>
+    <item id="83147" model="actor;"><geoset category="0" id="12"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_12_Avatar_boy_hair_11.png"></texture></item>
+    <item id="83148" model="actor;"><geoset category="0" id="13"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_13_Avatar_boy_hair_guiguzi.png"></texture></item>
+    <!-- 废止
+    <item id="83149" model="actor;"><geoset category="0" id="14"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunb_hair_1.png"></texture></item>
+    -->
+    <item id="83150" model="actor;"><geoset category="0" id="15"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_15_junshi.png"></texture></item>
+    <item id="83151" model="actor;"><geoset category="0" id="16"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_16_tou.png"></texture></item>
+    <item id="83152" model="actor;"><geoset category="0" id="17"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_17_qiuxuezhe-pangjuasn.png"></texture></item>
+    <!--20210309新加-->
+    <item id="83153" model="actor;"><geoset category="0" id="14"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunbing_qiuxue.png"></texture></item>
+    <item id="83154" model="actor;"><geoset category="0" id="14"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunwu.png"></texture></item>
+    <item id="83155" model="actor;"><geoset category="0" id="18"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_18_qiuxuezhe_pangjuan.png"></texture></item>
+    <item id="83156" model="actor;"><geoset category="0" id="18"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_18_qiuxuezheUV.png"></texture></item>
+    <item id="83157" model="actor;"><geoset category="0" id="19"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunbing_qiuxue.png"></texture></item>
+    <item id="83158" model="actor;"><geoset category="0" id="19"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunwu.png"></texture></item>
 
     
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
@@ -487,6 +504,20 @@ model id
     <item id="84038" model="actor;"><geoset category="8" id="4"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_04_paozinv1.png"></texture></item>
     <item id="84039" model="actor;"><geoset category="8" id="4"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_04_paozinv2.png"></texture></item>
     <item id="84040" model="actor;"><geoset category="8" id="4"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_04_qun02.png"></texture></item>
+    <!--20210305新加-->
+    <item id="84041" model="actor;"><geoset category="8" id="5"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_05_junshi.png"></texture></item>
+    <item id="84042" model="actor;"><geoset category="8" id="5"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_05_LAlaoyeye.png"></texture></item>
+    <item id="84043" model="actor;"><geoset category="8" id="5"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_05_xianren.png"></texture></item>
+    <!--20210309新加-->
+    <item id="84044" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_06_Avatar_boy_body.png"></texture></item>
+    <item id="84045" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_06_Avatar_boy_body_656.png"></texture></item>
+    <item id="84046" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_06_Avatar_boy_body_buyi.png"></texture></item>
+    <item id="84047" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_06_Avatar_boy_body_xiaofu.png"></texture></item>
+    <item id="84048" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_06_shouwenyi.png"></texture></item>
+    
+    <item id="84049" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_junshi.png"></texture></item>
+    <item id="84050" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_LAlaoyeye.png"></texture></item>
+    <item id="84051" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_xianren.png"></texture></item>
 
     
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
@@ -552,6 +583,15 @@ model id
     <item id="85060" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_xiangyu02.png"></texture></item>
     <item id="85061" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_xiangyu03.png"></texture></item>
     <item id="85062" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_xiangyu04.png"></texture></item>
+    <!--20210305新加-->
+    <item id="85063" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_656.png"></texture></item>
+    <item id="85064" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_buyi.png"></texture></item>
+    <item id="85065" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_lieren.png"></texture></item>
+    <item id="85066" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_shouwen.png"></texture></item>
+    <item id="85067" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_656.png"></texture></item>
+    <item id="85068" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_buyi.png"></texture></item>
+    <item id="85069" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_lieren.png"></texture></item>
+    <item id="85070" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_shouwen.png"></texture></item>
 
     
     <!--      86000 86999  背部  attachment id="15"    -->

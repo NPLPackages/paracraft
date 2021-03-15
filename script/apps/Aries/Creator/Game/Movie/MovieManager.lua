@@ -168,20 +168,21 @@ end
 -- set currently activate movie clip. 
 function MovieManager:SetActiveMovieClip(movie_clip)
 	if(movie_clip ~= self.current_movieclip) then
-		if(self.current_movieclip) then
+		local lastMovieClip = self.current_movieclip
+		if(lastMovieClip) then
 			-- exit movie capturing when the whole movie is finished. no more clips to play
 			if(not movie_clip) then
 				if(self:IsCapturing()) then
 					self:EndCapture();
-					self.current_movieclip:RefreshPlayModeUI();	
+					lastMovieClip:RefreshPlayModeUI();	
 				end
 			end
-			self.current_movieclip:OnDeactivated(movie_clip);
+			lastMovieClip:OnDeactivated(movie_clip);
 		end
 
-		self:RemoveMovieClip(self.current_movieclip);
-		self:AddMovieClip(movie_clip);
 		self.current_movieclip = movie_clip;
+		self:RemoveMovieClip(lastMovieClip);
+		self:AddMovieClip(movie_clip);
 		
 		if(movie_clip) then
 			self:TryPushMovieMode(movie_clip);
@@ -203,6 +204,9 @@ end
 
 function MovieManager:RemoveMovieClip(movieclip)
 	if(movieclip) then
+		if(self.current_movieclip == movieclip) then
+			self:SetActiveMovieClip(nil);
+		end
 		self.active_clips:removeByValue(movieclip);
 	end
 end

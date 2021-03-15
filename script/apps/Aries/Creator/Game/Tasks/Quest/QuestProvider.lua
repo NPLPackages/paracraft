@@ -49,6 +49,7 @@ local QuestItemContainer = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.
 local QuestItem = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestItem");
 local QuestItemTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestItemTemplate");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local QuestProvider = commonlib.inherit(commonlib.gettable("commonlib.EventSystem"),commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider"))
 
 QuestProvider.Events = {
@@ -72,7 +73,6 @@ function QuestProvider:GetInstance()
     return QuestProvider.provider_instance;
 end
 function QuestProvider:OnInit()
-    self:UpdateServerTime()
 
     QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnInit,function(__, event)
     end, nil, "QuestProvider_OnInit")
@@ -146,6 +146,9 @@ function QuestProvider:OnInit()
 
         end
     end, nil, "QuestProvider_OnFinished")
+    GameLogic.GetFilters():add_filter("AICourse.ActivateHomework", QuestProvider.OnActivateHomework);
+    GameLogic.GetFilters():add_filter("AICourse.SetStep", QuestProvider.SetStep);
+    GameLogic.GetFilters():add_filter("AICourse.GetStep", QuestProvider.GetStep);
 
     QuestProvider:GetInstance():OnInit__();
 
@@ -570,23 +573,141 @@ function QuestProvider:GetQuestItems(isDump)
     return result;
 end
 
-function QuestProvider:UpdateServerTime()
-    keepwork.user.server_time({
-    },function(err, msg, data)
-        if(err == 200)then
-            self.server_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.now, true)
-            local time = System.options.isDevMode and 3000 or 10000
-            commonlib.TimerManager.SetTimeout(function()  
-                self:UpdateServerTime()
-            end, time)
+function QuestProvider.SetStep(stepNum, allStepNum)
+    
+    local client_data = GameLogic.QuestAction.GetClientData()
+    local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+    projectId = tonumber(projectId)
+    if projectId ~= client_data.course_world_id then
+        return
+    end
+
+    local is_home_work = client_data.is_home_work
+    -- 要是课程已经完成了 不再继续后面的逻辑
+    if client_data.course_step and client_data.course_step >= 10 then
+        return
+    end
+
+    client_data.course_step = stepNum
+    KeepWorkItemManager.SetClientData(GameLogic.QuestAction.task_gsid, client_data)
+    -- print(">>>>>>>>>>>>>>>>>>>是否作业", is_home_work)
+    -- 判断是课程还是作业
+    if is_home_work then
+        local status = 0
+        local progress = {}
+        if stepNum == 10 then
+            status = 1
         end
+        progress.stepNum = stepNum
+        -- print(">>>>>>>>>>>>>>>>>>>完成作业", status, stepNum)
+        keepwork.quest_complete_homework.set({
+            aiHomeworkId = client_data.home_work_id,
+            grades = stepNum,
+            status = status,
+            progress = progress,
+        },function(err, message, data)
+            if err == 200 then
+                if status == 1 then
+                    GameLogic.QuestAction.RequestAiHomeWork(function()
+                        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                        if DockPage.IsShow() then
+                            DockPage.FreshHomeWorkIcon()
+                        end
+                    end)
+                end
+            end
+        end)
+    else
+
+        local status = 0
+        local progress = {}
+        if stepNum == 10 then
+            status = 1
+        end
+
+        progress.stepNum = stepNum
+
+        keepwork.quest_complete_course.set({
+            aiCourseId = client_data.course_id,
+            status = status,
+            progress = progress
+        },function(err, message, data)
+            -- print(">>>>>>>>>>>>>>>>>>>>>>ai课程设置进度", projectId, stepNum)
+            if err == 200 then
+                if status == 1 then
+                    GameLogic.QuestAction.RequestAiHomeWork(function()
+                        GameLogic.QuestAction.RequestCompleteCourseIdList(function()
+                            local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                            if DockPage.IsShow() then
+                                DockPage.FreshHomeWorkIcon()
+                            end
+                        end)
+                    end)
+                    
+                end
+            end
+        end)
+    end
+end
+
+function QuestProvider.GetStep(projectId)
+    if projectId == nil then
+        projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+        projectId = tonumber(projectId)
+    end
+
+    local client_data = GameLogic.QuestAction.GetClientData()
+    if projectId ~= client_data.course_world_id then
+        return 0
+    end
+    
+    return client_data.course_step or 0
+end
+
+function QuestProvider.OnActivateHomework()
+    
+    local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+    projectId = tonumber(projectId)
+    local client_data = GameLogic.QuestAction.GetClientData()
+    if projectId ~= client_data.course_world_id then
+        return
+    end
+
+    if client_data.home_work_id == nil or client_data.home_work_id < 0 then
+        return
+    end
+
+    keepwork.quest_complete_homework.get({
+        aiHomeworkId = client_data.home_work_id,
+    },function(err, message, data)
+        -- print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>查询作业", err)
+        -- echo(data, true)
+        if err == 200 then
+            local userAiHomework = data.userAiHomework
+            if userAiHomework then
+                return
+            end
+
+            keepwork.quest_complete_homework.set({
+                aiHomeworkId = client_data.home_work_id,
+                grades = 0,
+                progress = {},
+                status = 0,
+            },function(err2, message2, data2)
+                -- print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>激活作业", err)
+                -- echo(data, true)
+                if err == 200 then
+                    GameLogic.QuestAction.RequestAiHomeWork(function()
+                        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                        if DockPage.IsShow() then
+                            DockPage.FreshHomeWorkIcon()
+                        end
+                    end)
+                end
+            end)
+        end
+
     end)
-end
 
-function QuestProvider:GetServerTime()
-    return self.server_time_stamp or 0
-end
 
-function QuestProvider:SetServerTime(server_time_stamp)
-    self.server_time_stamp = server_time_stamp or 0
 end

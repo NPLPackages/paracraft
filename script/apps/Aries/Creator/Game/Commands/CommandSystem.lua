@@ -86,3 +86,73 @@ Commands["texture"] = {
 	end,
 };
 
+Commands["profiler"] = {
+	name="profiler", 
+	quick_ref="/profiler [-options] [-start|stop|duration_seconds] [filename]", 
+	desc=[[start profiler (requires luajit 2.1 or above)
+@param -options: default to "-4si4m1". 
+@param duration_seconds: auto start and stop profile in these interval seconds. default to 5. 
+@param filename: default to "temp/profile.txt". Each line is a function that takes most CPU ranked by percentage. 
+
+/profiler    same as below: run for the next 5 seconds
+/profiler -4si4m1    samples four stack levels deep in 4ms intervals and shows a split view of the CPU consuming functions and their callers with a 1% threshold.
+/profiler -G
+/profiler -5 temp/profile.txt
+/profiler -10    profile for 10 seconds 
+/profiler -start temp/profile.txt
+/profiler -stop
+
+
+-Options:
+f — Stack dump: function name, otherwise module:line. This is the default mode.
+F — Stack dump: ditto, but dump module:name.
+l — Stack dump: module:line.
+<number> — stack dump depth (callee ← caller). Default: 1.
+-<number> — Inverse stack dump depth (caller → callee).
+s — Split stack dump after first stack level. Implies depth ≥ 2 or depth ≤ -2.
+p — Show full path for module names.
+v — Show VM states.
+z — Show zones.
+r — Show raw sample counts. Default: show percentages.
+a — Annotate excerpts from source code files.
+A — Annotate complete source code files.
+G — Produce raw output suitable for graphical tools.
+m<number> — Minimum sample percentage to be shown. Default: 3%.
+i<number> — Sampling interval in milliseconds. Default: 10ms.
+
+]] , 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local options, start, stop, duration_seconds, filename;
+		local option_name = "";
+		while (option_name and cmd_text) do
+			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option_name == "start") then
+				start = true;
+			elseif(option_name == "stop") then
+				stop = true;
+			elseif(option_name and option_name:match("^%d+$")) then
+				duration_seconds = tonumber(option_name);
+			elseif(option_name) then
+				options = option_name;
+			end
+		end
+		options = options or "4si4m1"
+		duration_seconds = duration_seconds or 5
+		filename = filename or "temp/profile.txt"
+
+		local p = NPL.load("script/ide/Debugger/JITProfiler.lua")
+		if(not p) then
+			return
+		end
+		if(start) then
+			p.start(options, filename)
+		elseif(stop) then
+			p.stop();
+		elseif(duration_seconds) then
+			p.start(options, filename)
+			commonlib.TimerManager.SetTimeout(function()
+				p.stop() 
+			end, duration_seconds*1000)
+		end
+	end,
+};

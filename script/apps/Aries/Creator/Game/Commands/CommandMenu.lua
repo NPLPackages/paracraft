@@ -228,6 +228,8 @@ Commands["menu"] = {
 			GameLogic.RunCommand("/open https://github.com/LiXizhi/ParaCraft/issues");
 		elseif(name == "help.donate") then
 			GameLogic.RunCommand("/open "..L"http://www.nplproject.com/paracraft-donation");
+		elseif(name == "share.panoramasharing") then
+			GameLogic.GetFilters():apply_filters("show_panorama");
 		elseif(name:match("^community")) then
 			local username = System.User.keepworkUsername
 			if(username) then

@@ -110,7 +110,7 @@ function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 		if(block_template) then
 			data = data or block_template:GetMetaDataFromEnv(x, y, z, side, side_region);
 			
-			local xml_data = {attr = {filename = local_filename} };
+			local xml_data = {attr = {filename = local_filename, onclickEvent=itemStack:GetDataField("onclickEvent")} };
 			if(BlockEngine:SetBlock(x, y, z, block_id, data, 3, xml_data)) then
 				block_template:play_create_sound();
 
@@ -133,6 +133,9 @@ function ItemBlockModel:PickItemFromPosition(x,y,z)
 				local itemStack = ItemStack:new():Init(self.id, 1);
 				-- transfer filename from entity to item stack. 
 				itemStack:SetTooltip(filename);
+				if(entity.onclickEvent) then
+					itemStack:SetDataField("onclickEvent", entity.onclickEvent);
+				end
 				return itemStack;
 			end
 		end
@@ -235,6 +238,7 @@ function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 		painter:SetPen("#33333380");
 		painter:DrawRect(0,0, width, 14);
 		painter:SetPen("#ffffff");
+		painter:SetFont("System;12")
 		painter:DrawText(1,0, filename);
 	end
 end

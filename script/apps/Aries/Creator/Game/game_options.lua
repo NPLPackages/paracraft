@@ -344,9 +344,7 @@ function options:OnLoadWorld()
 			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
 		local mainSkins = self:GetMainPlayerSkins();
-		if (mainSkins) then
-			EntityManager.GetPlayer():SetSkin(mainSkins);
-		end
+		EntityManager.GetPlayer():SetSkin(mainSkins);
 		
 		player:SetScale(1);
 		self.jump_up_speed = 5*1.3;
@@ -759,9 +757,7 @@ end
 
 function options:SetMainPlayerSkins(value)
 	local key = "Paracraft_System_MainPlayer_Skins";
-	if(value == nil) then
-		-- Do nothing:
-	elseif(self:GetMainPlayerSkins() ~= value) then
+	if(self:GetMainPlayerSkins() ~= value) then
 		GameLogic.GetPlayerController():SaveRemoteData(key, value);
 	end
 end

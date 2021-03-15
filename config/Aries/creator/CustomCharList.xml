@@ -1,5 +1,6 @@
 <!--
 	换装件在人物面板是否可见的配置，加avatarMode="false"这个属性就可以了
+	仅开发模式可见的物品debug="true"
 -->
 
 <customcharlist>
@@ -246,6 +247,25 @@
 		<!--帽子诡异，难看
 		<item id="83145" icon="Texture/Aries/Item/1011_PoliceUniformHat.png" name="帽子145"/>
 		-->
+		<!--20210305新加-->
+		<item id="83146" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83146_32bits.png" name="形象" debug="true"/>
+		<item id="83147" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83147_32bits.png" name="形象" debug="true"/>
+		<item id="83148" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83148_32bits.png" name="形象1"/>
+		<!-- 废止
+		<item id="83149" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83149_32bits.png" name="帽子"/>
+		-->
+		<item id="83150" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83150_32bits.png" name="形象2"/>
+		<item id="83151" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83151_32bits.png" name="形象3"/>
+		<item id="83152" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83152_32bits.png" name="形象4"/>
+  		<!--20210309新加-->
+		<item id="83153" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83153_32bits.png" name="形象5"/>
+		<item id="83154" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83154_32bits.png" name="形象6"/>
+		<item id="83155" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83155_32bits.png" name="形象7"/>
+		<item id="83156" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83156_32bits.png" name="形象8"/>
+		<item id="83157" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83157_32bits.png" name="形象9"/>
+		<item id="83158" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83158_32bits.png" name="形象10"/>
+	
+
 		<item id="82001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_00.png" name="头发1"/>
 		<item id="82002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_01.png" name="头发2"/>
 		<item id="82003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_02.png" name="头发3"/>
@@ -460,6 +480,21 @@
 		<item id="84038" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv1.png" name="衣服38"/>
 		<item id="84039" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv2.png" name="衣服39"/>
 		<item id="84040" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_qun02.png" name="衣服40"/>
+		<!--20210305新加-->
+		<item id="84041" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84041_32bits.png" name="衣服41"/>
+		<item id="84042" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84042_32bits.png" name="衣服42"/>
+		<item id="84043" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84043_32bits.png" name="衣服43"/>
+		<!--20210309新加-->
+		<item id="84044" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84044_32bits.png" name="衣服44"/>
+		<item id="84045" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84045_32bits.png" name="衣服45"/>
+		<item id="84046" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84046_32bits.png" name="衣服46"/>
+		<item id="84047" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84047_32bits.png" name="衣服47"/>
+		<item id="84048" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84048_32bits.png" name="衣服48"/>
+		
+		<item id="84049" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84049_32bits.png" name="衣服49"/>
+		<item id="84050" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84050_32bits.png" name="衣服50"/>
+		<item id="84051" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84051_32bits.png" name="衣服51"/>
+
 	</category>
 
 	<category name="pants" text="裤子">
@@ -525,6 +560,15 @@
 		<item id="85060" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu02.png" name="裤子60"/>
 		<item id="85061" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu03.png" name="裤子61"/>
 		<item id="85062" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu04.png" name="裤子62"/>
+		<!--20210305新加-->
+		<item id="85063" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85063_32bits.png" name="裤子63"/>
+		<item id="85064" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85064_32bits.png" name="裤子64"/>
+		<item id="85065" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85065_32bits.png" name="裤子65"/>
+		<item id="85066" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85066_32bits.png" name="裤子66"/>
+		<item id="85067" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85067_32bits.png" name="裤子67"/>
+		<item id="85068" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85068_32bits.png" name="裤子68"/>
+		<item id="85069" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85069_32bits.png" name="裤子69"/>
+		<item id="85070" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85070_32bits.png" name="裤子70"/>
 	</category>
 	
 	<category name="back" text="背部">
