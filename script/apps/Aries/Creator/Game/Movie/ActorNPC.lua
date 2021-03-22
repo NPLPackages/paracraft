@@ -1491,19 +1491,36 @@ end
 
 -- set the local bone time
 -- @param boneName: a precise bone name or regular expression, like "hand" or ".*hand"
+-- if "*", we will improve performance by advancing the global biped's time variable. 
 -- @param time: if nil or -1, it will remove bone time. 
 function Actor:SetBoneTime(boneName, time)
 	local var = self:GetBonesVariable();
 	if(var) then
-		local variables = var:GetVariables();
-		if(variables[boneName]) then
-			variables[boneName]:SetTime(time);
-		else
-			for name, bone in pairs(variables) do
-				if(name:match(boneName)) then
-					bone:SetTime(time);
+		if(boneName == "*") then
+			if(var.hasUniqueBoneTime) then
+				var.hasUniqueBoneTime = false
+				for name, bone in pairs(var:GetVariables()) do
+					bone:SetTime(-1);
 				end
 			end
+			if(self.entity) then
+				local obj = self.entity:GetInnerObject();
+				if(obj) then
+					obj:SetField("Time", time); 
+				end
+			end
+		else
+			var.hasUniqueBoneTime = true;
+			local variables = var:GetVariables();
+			if(variables[boneName]) then
+				variables[boneName]:SetTime(time);
+			else
+				for name, bone in pairs(variables) do
+					if(name:match(boneName)) then
+						bone:SetTime(time);
+					end
+				end
+			end	
 		end
 	end
 end

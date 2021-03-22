@@ -507,6 +507,11 @@ function Actor:KeyTransform()
 	self:EndUpdate();
 end
 
+-- camera object itself always has the at least 30FPS 
+function Actor:GetTickIntervalByCameraDist(minInterval, maxInterval)
+	return minInterval or 33;
+end
+
 function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	local curTime = self:GetTime();
 	local h,m,s = commonlib.timehelp.SecondsToHMS(curTime/1000);

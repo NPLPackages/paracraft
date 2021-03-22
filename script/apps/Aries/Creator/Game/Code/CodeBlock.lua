@@ -952,7 +952,7 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 		local icon = callbackFunc();
 		icon =  icon and Files.GetWorldFilePath(icon)
 		if(icon) then
-			local itemDS = ItemClient.AddBlock(block_types.names.AgentItem, nil, "tool", agentName);
+			local itemDS = ItemClient.AddBlock(block_types.names.AgentItem, nil, "tool", agentName, true);
 			if(itemDS) then
 				itemDS.icon = icon;
 				itemDS.server_data = {name = agentName};

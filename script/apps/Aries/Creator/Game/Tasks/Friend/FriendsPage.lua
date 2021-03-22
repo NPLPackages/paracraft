@@ -30,8 +30,9 @@ local DateTool = os.date
 local TopBtListType = {
 	RecentContact = 1,
 	Friend = 2,
-	Following = 3,
-	Followers = 4,
+	ClassMate = 3,
+	Following = 4,
+	Followers = 5,
 }
 
 function FriendsPage.OnInit()
@@ -40,6 +41,7 @@ function FriendsPage.OnInit()
 
 	TypeToCb[TopBtListType.RecentContact] = FriendsPage.GetRecentContactLlist
 	TypeToCb[TopBtListType.Friend] = FriendsPage.GetFriendsLlist
+	TypeToCb[TopBtListType.ClassMate] = FriendsPage.GetClassMateLlist
 	TypeToCb[TopBtListType.Following] = FriendsPage.GetFollowingLlist
 	TypeToCb[TopBtListType.Followers] = FriendsPage.GetFollowersLlist
 end
@@ -74,7 +76,7 @@ function FriendsPage.Show()
 				zorder = -1,
 				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 				directPosition = true,
-					align = "_lt",
+					align = "_ctl",
 					x = 10,
 					y = 10/2,
 					width = 330,
@@ -152,6 +154,23 @@ function FriendsPage.GetFriendsLlist(search_text)
         }
 	},function(err, msg, data)
 		-- commonlib.echo(data, true)
+		if err == 200 then
+			FriendsPage.SetListDataAndFlushGridView(data.rows)
+		end
+	end)
+end
+
+function FriendsPage.GetClassMateLlist(search_text)
+	search_text = search_text or ""
+	keepwork.user.classmates({
+		username=search_text,
+        headers = {
+            ["x-per-page"] = 200,
+            ["x-page"] = 1,
+        }
+	},function(err, msg, data)
+		--print("xxxxxxxxxxxxx", err)
+		--commonlib.echo(data, true)
 		if err == 200 then
 			FriendsPage.SetListDataAndFlushGridView(data.rows)
 		end
@@ -642,4 +661,19 @@ function FriendsPage.UpdataUnAllLoadMsg()
 		end, true);
 	end, 30000)
 
+end
+
+function FriendsPage.IsShowJoinSchool()
+	local profile = KeepWorkItemManager.GetProfile()
+	local has_join_school = profile.schoolId and profile.schoolId > 0
+	return FriendsPage.index == TopBtListType.ClassMate and not has_join_school
+end
+
+function FriendsPage.JionSchool()
+	GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+		KeepWorkItemManager.LoadProfile(false, function()
+			FriendsPage.FlushCurDataAndView()
+			FriendsPage.OnRefresh()
+		end)
+	end);
 end

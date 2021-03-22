@@ -119,6 +119,7 @@ end
 
 function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 	local checkGeoset = {0, 0};
+	--[[
 	if (category == "shirt") then
 		if ((string.find(skin, "901#") ~= nil and string.find(skin, "Avatar_boy_leg_default") == nil) or string.find(skin, "903")) then
 			checkGeoset[1] = 801;
@@ -130,6 +131,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 			checkGeoset[2] = 903;
 		end
 	end
+	]]
 
 	local groups = category_items[category];
 	if (groups) then
@@ -250,10 +252,10 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		end
 	end
 	if (textures) then
-		function checkItem(item)
+		function checkItem(item, geosets)
 			for geoset in string.gfind(geosets, "([^#]+)") do
 				local id = tonumber(geoset);
-				if (item.data.geoset == id) then
+				if (item.data.geoset == id or item.data.geoset == nil) then
 					return true;
 				end
 			end
@@ -261,7 +263,7 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		end
 		for tex in textures:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
-				if (item.data.texture == tex and checkItem(item)) then
+				if (item.data.texture == tex and checkItem(item, geosets)) then
 					idString = idString..item.data.id..";";
 					break;
 				end

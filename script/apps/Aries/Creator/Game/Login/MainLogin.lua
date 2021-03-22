@@ -30,6 +30,7 @@ MainLogin.state = {
 	HasInitedTexture = nil,
 	
 	IsPreloadedTextures = nil, -- added by leio
+	IsPreloadedSocketIOUrl = nil, -- added by leio
 
 	IsLoadMainWorldRequested = nil,
 	IsCreateNewWorldRequested = nil,
@@ -74,6 +75,7 @@ function MainLogin:start(init_callback)
 
 
 		PreloadTextures = self.PreloadTextures,
+		PreloadedSocketIOUrl = self.PreloadedSocketIOUrl,
 
 		-- connect main world
 		LoadMainWorld = self.LoadMainWorld,
@@ -143,6 +145,8 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("HasInitedTexture");
 	elseif(not state.IsPreloadedTextures) then
 		self:Invoke_handler("PreloadTextures");
+	elseif(not state.IsPreloadedSocketIOUrl) then
+		self:Invoke_handler("PreloadedSocketIOUrl");
 	else
 		-- already signed in 
 		if(not state.IsLoadMainWorldRequested) then	
@@ -634,6 +638,17 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 		end
 		return true;
 	end
+end
+
+function MainLogin:PreloadedSocketIOUrl()
+	if(System.options.servermode) then
+		self:next_step({IsPreloadedSocketIOUrl = true});
+        return
+	end
+	local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+	KpChatChannel.PreloadSocketIOUrl(function()
+		self:next_step({IsPreloadedSocketIOUrl = true});
+	end);
 end
 function MainLogin:PreloadTextures()
 	if(System.options.servermode) then

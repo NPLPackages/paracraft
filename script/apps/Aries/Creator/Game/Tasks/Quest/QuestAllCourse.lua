@@ -25,6 +25,11 @@ local VersionToKey = {
 	RELEASE = 2,
 	LOCAL = 3,
 }
+
+local SchoolClassIdList = {
+    RELEASE = 33,
+    ONLINE = 5
+}
 QuestAllCourse.AllCourseListData = {}
 -- QuestAllCourse.TeacherListData = {}
 QuestAllCourse.LevelListData = {}
@@ -107,9 +112,17 @@ function QuestAllCourse.Show(target_world_id)
     System.App.Commands.Call("File.MCMLWindowFrame", params);
 
     keepwork.quest_course_catalogs.get({}, function(err2, msg2, data2)
-        -- print(">>>>>>>>>>>>>>>>>>课程目录列表", err2)
-        -- echo(data2, true)
         if err2 == 200 then
+            -- HOME 或者 SCHOOL
+            if GameLogic.GetFilters():apply_filters('service.session.get_user_where') == "SCHOOL" then
+                local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
+                local school_class_id = SchoolClassIdList[httpwrapper_version]
+                if school_class_id then
+                    QuestAllCourse.target_teacher_id = school_class_id
+                    QuestAllCourse.target_level_id = school_class_id
+                end
+            end
+
             QuestAllCourse.CatalogsData = data2
 
             QuestAllCourse.RefreshTeacherListData()
@@ -126,11 +139,21 @@ function QuestAllCourse.Show(target_world_id)
                     QuestAllCourse.OnRefresh()
                     commonlib.TimerManager.SetTimeout(function()
                         if page and page:IsVisible() then
+                            local mcmlNode = page:GetNode("course_list");
                             if QuestAllCourse.target_page then
-                                local node = page:GetNode("course_list");
-                                pe_gridview.GotoPage(node, "course_list", QuestAllCourse.target_page);
+                                pe_gridview.GotoPage(mcmlNode, "course_list", QuestAllCourse.target_page);
                                 QuestAllCourse.target_page = nil
                             end
+
+                            local tree_view = mcmlNode:GetChild("pe:treeview");
+                            local tree_view_control = tree_view.control
+                            local _parent = ParaUI.GetUIObject(tree_view_control.name);
+                            local main = _parent:GetChild(tree_view_control.mainName);
+                            main:SetScript("onmousewheel", function()
+                                local page_index = mcmlNode:GetAttribute("pageindex") or 1
+                                local target_page = page_index + mouse_wheel
+                                pe_gridview.GotoPage(mcmlNode, "course_list", target_page);
+                            end)
                         end
                     end, 100); 
                 end)
@@ -364,8 +387,21 @@ function QuestAllCourse.RefreshCourseListData(callback)
                 -- 难度
                 v.level_desc = ""
                 if v.level and v.level ~= "" then
-                    v.level_desc = string.format("难度: %s", level_desc_list[v.level])
+                    -- v.level_desc = string.format("难度: %s", level_desc_list[v.level])
+                    v.level_start_div = ""
+                    -- v.level = 5
+                    v.level_start_desc = string.format('<div style="text-align: center;">课程难度：%s星</div>', v.level)
+                    for index = 1, v.level do
+                        v.level_start_div = v.level_start_div .. [[
+                        <div zorder="1" style="float: left; width: 26px;height: 26px; background:">
+                            <div zorder="1" style="position:relative;width: 26px;height: 26px; background:url(Texture/Aries/Creator/keepwork/AiCourse/xing_26X26_32bits.png#0 0 26 26)"></div>
+                            <img zorder="4" onclick="SelectCourse" name='<%=Eval("index")%>' class="invalid_mask" style="position:relative;margin-left:0px;margin-top:0px;width:26px;height:26px;" bindtooltip='<%=GetTooltip(Eval("level_start_desc"))%>'/>
+                        </div>
+                        ]]
+                    end
                 end
+
+                
 
                 -- 时间
                 v.time_desc = ""
@@ -429,6 +465,8 @@ function QuestAllCourse.SelectTeacher(index)
     QuestAllCourse.RefreshCourseListData(function()
         -- 刷新课程列表控件
         QuestAllCourse.FreshGridView("course_list")
+        local mcmlNode = page:GetNode("course_list");
+        pe_gridview.GotoPage(mcmlNode, "course_list", 1);
     end)
 
 
@@ -492,107 +530,129 @@ end
 function QuestAllCourse.RunCommand(index)
     local data = QuestAllCourse.CourseListData[index]
     
-    if data and data.projectId then
-        local command = string.format("/loadworld -s -force %s", data.projectId)
-        local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
-        local function enter_world()
-            local server_time = GameLogic.QuestAction.GetServerTime()
+    if data == nil or data.projectId == nil then
+        return
+    end
 
-            if data.beginAt and data.endAt then
-                local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.beginAt)
-                local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.endAt)
-                if server_time < begain_time_stamp then
-                    _guihelper.MessageBox("还没到上课时间哦，请在上课时间内来学习吧。")
-                    return
-                end
+    -- 校园课程 放开次数限制
+    local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
+    local school_class_id = SchoolClassIdList[httpwrapper_version]
+    local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
 
-                if server_time > end_time_stamp then
-                    _guihelper.MessageBox("已错过上课时间，你可以继续做作业，或去学习其他课程。")
-                    return
-                end
+    local command = string.format("/loadworld -s -force %s", data.projectId)
+    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+    local function enter_world()
+        local server_time = GameLogic.QuestAction.GetServerTime()
+
+        if data.beginAt and data.endAt then
+            local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.beginAt)
+            local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.endAt)
+            if server_time < begain_time_stamp then
+                _guihelper.MessageBox("还没到上课时间哦，请在上课时间内来学习吧。")
+                return
             end
 
-            keepwork.quest_complete_course.get({
-                aiCourseId = data.id,
-            }, function(err2, msg2, data2)
-                -- print("ttttttttttttttt", err2, data.id)
-                -- echo(data2, true)
-                if err2 == 200 then
-                    local work_data = data.aiHomework or {}
-                    
-                    local client_data = QuestAction.GetClientData()
-                    client_data.course_world_id = data.projectId
-        
-                    if client_data.play_course_times == nil then
-                        client_data.play_course_times = 0
-                    end
-                    client_data.play_course_times = client_data.play_course_times + 1
-        
-                    local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
-                    client_data.course_teacher_id = select_teacher_data.id
-        
-                    local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
-                    client_data.course_level_id = select_level_data.id
-
-                    client_data.course_id = data.id
-                    client_data.home_work_id = work_data.id or -1
-                    client_data.is_home_work = false
-                    
-                    client_data.course_step = 0
-                    if data2.userAiCourse and data2.userAiCourse.progress then
-                        client_data.course_step = data2.userAiCourse.progress.stepNum or 0
-                    end
-        
-                    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-                    
-                    page:CloseWindow()
-                    QuestAllCourse.CloseView()
-        
-                    GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
-                    CommandManager:RunCommand(command)
-                end
-            end)
+            if server_time > end_time_stamp then
+                _guihelper.MessageBox("已错过上课时间，你可以继续做作业，或去学习其他课程。")
+                return
+            end
         end
 
-        if System.User.isVip then
-            enter_world()
-        else
-            -- 需要vip才能进
-            if data.isVip == 1 then
-                -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                -- VipToolNew.Show("AI_lesson")
-                local function sure_callback()
-                    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                    VipToolNew.Show("AI_lesson")
-                end
-
-                local desc = "是否开通会员学习？"
-                local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"
-                QuestMessageBox.Show(desc, sure_callback, desc2)
-            else
+        keepwork.quest_complete_course.get({
+            aiCourseId = data.id,
+        }, function(err2, msg2, data2)
+            -- print("ttttttttttttttt", err2, data.id)
+            -- echo(data2, true)
+            if err2 == 200 then
+                local work_data = data.aiHomework or {}
+                
                 local client_data = QuestAction.GetClientData()
-                if client_data.play_course_times == nil then
-                    client_data.play_course_times = 0
+                client_data.course_world_id = data.projectId
+                
+                -- if client_data.course_world_id_list == nil then
+                --     client_data.course_world_id_list = {}
+                -- end        
+
+                -- if select_teacher_data.id ~= school_class_id then
+                --     client_data.course_world_id_list[tostring(data.projectId)] = 1
+                -- end
+
+                local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
+                client_data.course_teacher_id = select_teacher_data.id
+    
+                local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
+                client_data.course_level_id = select_level_data.id
+
+                client_data.course_id = data.id
+                client_data.home_work_id = work_data.id or -1
+                client_data.is_home_work = false
+                
+                client_data.course_step = 0
+                if data2.userAiCourse and data2.userAiCourse.progress then
+                    client_data.course_step = data2.userAiCourse.progress.stepNum or 0
                 end
     
-                if client_data.play_course_times <= 0 then
+                KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
+                
+                page:CloseWindow()
+                QuestAllCourse.CloseView()
+    
+                GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
+                CommandManager:RunCommand(command)
+            end
+        end)
+    end
+
+    if System.User.isVip then
+        enter_world()
+    else
+        -- 需要vip才能进
+        if data.isVip == 1 then
+            -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+            -- VipToolNew.Show("AI_lesson")
+            local function sure_callback()
+                local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                VipToolNew.Show("AI_lesson")
+            end
+
+            local desc = "是否开通会员学习？"
+            local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"
+            QuestMessageBox.Show(desc, sure_callback, desc2)
+        else
+            local client_data = QuestAction.GetClientData()
+
+            local has_enter = true -- 是否进去过
+            -- if client_data.course_world_id_list and client_data.course_world_id_list[tostring(data.projectId)] ~= nil then
+            --     has_enter = true
+            -- end
+            
+            -- if school_class_id and select_teacher_data.id == school_class_id then
+            --     has_enter = true
+            -- end
+
+            if has_enter then
+                enter_world()
+            else
+                local play_course_times = 0
+                -- if client_data.course_world_id_list ~= nil then
+                --     for k, v in pairs(client_data.course_world_id_list) do
+                --         play_course_times = play_course_times + 1
+                --     end
+                -- end
+                
+                local limit_course_times = 1
+
+                if play_course_times < limit_course_times then
                     local desc = string.format('您要消耗今天的次数，学习<div style="float: left; color: #ff0000;">%s</div>？', data.name)
                     QuestMessageBox.Show(desc, enter_world, nil, "成为会员即可不受限制学习所有课程。")
                 else
-                    local course_world_id = client_data.course_world_id or 0
-                    course_world_id = tonumber(course_world_id)
-                    -- 使用过之后 如果id相同 则可进入
-                    if course_world_id == 0 or course_world_id == tonumber(data.projectId) then
-                        enter_world()
-                    else
-                        local function sure_callback()
-                            local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                            VipToolNew.Show("AI_lesson")
-                        end
-        
-                        local desc = "您已消耗今天的次数。是否开通会员学习？"
-                        QuestMessageBox.Show(desc, sure_callback)
+                    local function sure_callback()
+                        local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                        VipToolNew.Show("AI_lesson")
                     end
+    
+                    local desc = "您已消耗今天的次数。是否开通会员学习？"
+                    QuestMessageBox.Show(desc, sure_callback)
                 end
             end
         end
@@ -849,6 +909,27 @@ function QuestAllCourse.ClickWork(index)
                 _guihelper.MessageBox(desc)
                 return
             end
+
+            if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+                _guihelper.MessageBox("学习人工智能课程需要先完成实名认证，快去认证吧。", function()	
+                    GameLogic.GetFilters():apply_filters(
+                        'show_certificate',
+                        function(result)
+                            if (result) then
+                                local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                                if DockPage.IsShow() then
+                                    DockPage.RefreshPage(0.01)
+                                end
+                                
+                                GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                                QuestAllCourse.ClickWork(index)
+                            end
+                        end
+                    );
+                end)
+                return
+            end
+
             local server_time = GameLogic.QuestAction.GetServerTime()
             local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
 
@@ -886,6 +967,7 @@ function QuestAllCourse.ClickWork(index)
                     client_data.course_id = work_data.aiCourseId
                     client_data.home_work_id = work_data.id
                     client_data.is_home_work = true
+                    client_data.course_step = 0
                     if userAiHomework and userAiHomework.progress then
                         client_data.course_step = userAiHomework.progress.stepNum or 0
                     end

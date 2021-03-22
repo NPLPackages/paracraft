@@ -233,9 +233,8 @@ Commands["rain"] = {
 	quick_ref="/rain [0-10]", 
 	desc="change weather to raining. second parameter is intensity" , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local strength = cmd_text:match("%d*");
-
-		if(strength) then
+		local strength = cmd_text:match("(%d*)");
+		if (strength) then
 			strength = tonumber(strength);
 		end
 		GameLogic.GetSkyEntity():SetRain(strength);
@@ -245,15 +244,23 @@ Commands["rain"] = {
 
 Commands["snow"] = {
 	name="snow", 
-	quick_ref="/snow [0-10]", 
-	desc="change weather to snow. second parameter is intensity" , 
+	quick_ref="/snow [0-10] [1-100]", 
+	desc="change weather to raining. second parameter is intensity, third parameter is speed" , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local strength = cmd_text:match("%d*");
-
-		if(strength) then
+		local strength = cmd_text:match("(%d*)");
+		local speed;
+		if (strength) then
 			strength = tonumber(strength);
+			local _, s = cmd_text:match("(%d*)[%s,]+(%d*)");
+			if (s) then
+				speed = tonumber(s);
+				if (speed < 1 or speed > 100) then
+					speed = 1;
+				end
+			end
 		end
-		GameLogic.GetSkyEntity():SetSnow(strength);
+
+		GameLogic.GetSkyEntity():SetSnow(strength, speed);
 	end,
 };
 

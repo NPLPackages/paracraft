@@ -259,6 +259,10 @@ function SystemSettingsPage.InitPageParams()
     local bOpened = KpChatChannel.BulletScreenIsOpened()
 	UpdateCheckBox("btn_BulletScreen", bOpened);
 
+	-- FPS
+	UpdateCheckBox("btn_AutoFPS", GameLogic.options:IsAutoMovieFPS());
+
+
 	-- 鼠标设置
 	-- local profile = KeepWorkItemManager.GetProfile() or {}
 	local mouse_select_list = Game.PlayerController:LoadRemoteData("SystemSettingsPage.mouse_select_list", nil)
@@ -1261,6 +1265,14 @@ function SystemSettingsPage.OnClickBulletScreen()
 	end
     KpChatChannel.SetBulletScreen(value)
 end
+
+function SystemSettingsPage.OnClickAutoMovieFPS()
+	if(page) then
+		GameLogic.options:SetAutoMovieFPS(not GameLogic.options:IsAutoMovieFPS())
+		UpdateCheckBox("btn_AutoFPS", GameLogic.options:IsAutoMovieFPS());
+	end
+end
+
 function SystemSettingsPage.OnClearMemory()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");

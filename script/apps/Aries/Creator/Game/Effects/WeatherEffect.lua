@@ -39,6 +39,14 @@ function WeatherEffect:SetStrength(indexOrType,strength_value)
 	self:RefreshItem(item);
 end
 
+function WeatherEffect:SetEffectOptions(indexOrType,strength_value,speed_value)
+	local item = self:GetWeatherItem(indexOrType)
+	item.opening = (strength_value and strength_value > 0);
+	item.strength = strength_value;
+	item.speed = speed_value or 1;
+	self:RefreshItem(item);
+end
+
 -- private: get the C++ effect object. 
 function WeatherEffect:CreateGetWeatherEffect()
 	local att = ParaScene.GetAttributeObject("WeatherEffect");
@@ -67,6 +75,7 @@ function WeatherEffect:RefreshItem(item)
 		att:SetField("Texture", item.texture);
 		att:SetField("TextureRowsCols", item.textureRowsCols);
 		att:SetField("SpawnRadius", item.spawnRadius);
+		att:SetField("speed", item.speed or 1);
 	end
 end
 

@@ -92,7 +92,7 @@ end
 
 ]]></script>
 <div style="width: 926px;height: 562px; background: url(Texture/Aries/Creator/keepwork/AiCourse/bjk_926X562_32bits.png#0 0 926 562);">
-    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:878px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:892px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
     <div name="left_containt" style="float:left;width:182px;height:562px;margin-top:0px;background:">
         <div style="float:left;width:180px;height:524px;margin-top:58px;margin-left: 20px; background:">
             <pe:gridview name="teacher_list" style="margin-left:0px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="50"
@@ -168,7 +168,8 @@ end
                             </div>
                         </pe:if>
 
-                        <input zorder="1" type="button" onclick="SelectCourse" name='<%=Eval("index")%>' style="position: relative; width: 360px;height: 110px;background: ;"/>
+                        <img zorder="1" class="invalid_mask" onclick="SelectCourse" name='<%=Eval("index")%>' style="position:relative;margin-left:0px;margin-top:0px;width:360px;height:110px;" bindtooltip='<%=GetTooltip(Eval("description"))%>'/>
+                        <!-- <input zorder="1" type="button" onclick="SelectCourse" name='<%=Eval("index")%>' style="position: relative; width: 360px;height: 110px;background: ;"/> -->
 
                         <pe:if condition='<%=IsSelectCourse(Eval("index"))%>'>
                             <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k2_358X108_32bits.png#0 0 358 108)"></div>
@@ -186,8 +187,12 @@ end
                         <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=GetWorldIconUrl(Eval("index"))%>' width="128" height="86"/>
                         <div style="width: 134px; height: 110px; float: left;">
                             <div style="width: 134px; float: left;base-font-size:16px;font-size: 16px;margin-top: 12px;margin-left: 12px;position: relative;"><%=Eval("name")%></div>
-                            <div style="width: 134px; float: left;base-font-size:14px;font-size: 14px;margin-top: 58px;margin-left: 12px;color: #ff7529;position: relative;"><%=Eval("level_desc")%></div>
-                            <div style="width: 134px; float: left;base-font-size:12px;font-size: 12px;margin-top: 80px;margin-left: 12px;color: #999999;position: relative;"><%=Eval("time_desc")%></div>
+                            <div style="width: 134px; float: left;base-font-size:14px;font-size: 14px;margin-top: 58px;margin-left: 12px;color: #ff7529;position: relative;">
+                                <%=Eval("level_start_div")%>
+                                
+                            </div>
+                            
+                            <div style="width: 134px; float: left;base-font-size:12px;font-size: 12px;margin-top: 83px;margin-left: 12px;color: #999999;position: relative;"><%=Eval("time_desc")%></div>
                         </div>
                         <div style="width: 70px; height: 110px; float: left;">
                             <!-- <div style="margin-left: 5px; width:64px;height:30px;margin-top:28px;">

@@ -126,6 +126,17 @@ function Actor:GetPosVariable()
 	end
 end
 
+-- @param minInterval: default to 50
+-- @param maxInterval: default to 200
+-- @return between 50 to 200 FPS, the closer to main camera, the smaller the interval
+function Actor:GetTickIntervalByCameraDist(minInterval, maxInterval)
+	if(self:HasScreenPos()) then
+		return minInterval or 33;
+	else
+		return Actor._super.GetTickIntervalByCameraDist(self, minInterval, maxInterval);
+	end
+end
+
 -- get rotate multi variable
 function Actor:GetRotateVariable()
 	local var = self:GetCustomVariable("rot_variable");

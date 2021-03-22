@@ -104,6 +104,14 @@ function ClickHead(name, mcmlNode)
     user_page.ShowUserInfoPage({username=data.username});
 end
 
+function IsShowJoinSchool()
+    return FriendsPage.IsShowJoinSchool()
+end
+
+function JionSchool()
+    FriendsPage.JionSchool()
+end
+
 ]]></script>
 <kp:window name="iframe" mode="lite" width="330" height="583" title='<%= L"好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
@@ -114,138 +122,184 @@ end
         </div>
     
         <div>
-            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7">
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 3">
                 <pe:if condition='<%= IsSelected(1)%>'>
-                    <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
-                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15);"></div> 
+                    <input type="button" name="1" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:url();"/>
+                    <div style="position:relative;width:68;height:2 ;margin-left: 1; margin-top:40px;background-color: #fead19;"></div>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:64;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi6_32bits.png#0 0 64 16);"></div> 
                 </pe:if>
                 <pe:if condition='<%= not IsSelected(1)%>'>
-                    <input type="button" name="1" onclick="OnChange" tooltip='<%=L"最近联系"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
-                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/friends/zi_zuijinlianxi_62X15_32bits.png#0 0 62 15);"></div> 
+                    <input type="button" name="1" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:64;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi1_32bits.png#0 0 64 16);"></div> 
                 </pe:if>
             </div>
-            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 3;">
                 <pe:if condition='<%= IsSelected(2)%>'>
-                    <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
-                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0);"></div>
+                    <input type="button" name="2" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:url();"/>
+                    <div style="position:relative;width:68;height:2 ;margin-left: 1; margin-top:40px;background-color: #fead19;"></div>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:64;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi7_32bits.png#0 0 64 16:0 0 0 0);"></div>
                   </pe:if>
                   <pe:if condition='<%= not IsSelected(2)%>'>
-                    <input type="button" name="2" onclick="OnChange" tooltip='<%=L"好友"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
-                    <div zorder="1" style="margin-left: 7; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi_wodehaoyou_62X15_32bits.png#0 0 63 16:0 0 0 0);"></div>
+                    <input type="button" name="2" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi2_32bits.png#0 0 64 16:0 0 0 0);"></div>
                   </pe:if>
             </div>
-    
-            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
+
+            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 3;">
                 <pe:if condition='<%= IsSelected(3)%>'>
-                    <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
-                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0);"></div>
+                    <input type="button" name="3" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:url();"/>
+                    <div style="position:relative;width:68;height:2 ;margin-left: 1; margin-top:40px;background-color: #fead19;"></div>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:64;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi8_32bits.png#0 0 64 16:0 0 0 0);"></div>
                   </pe:if>
                   <pe:if condition='<%= not IsSelected(3)%>'>
-                    <input type="button" name="3" onclick="OnChange" tooltip='<%=L"关注"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
-                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_guanzhu_62X15_32bits.png#0 0 30 14:0 0 0 0);"></div>
+                    <input type="button" name="3" onclick="OnChange" style="position:relative;width:72px;height:35px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 4; margin-top:8px;width:63;height:16;background:url(Texture/Aries/Creator/keepwork/friends/zi3_32bits.png#0 0 64 16:0 0 0 0);"></div>
+                  </pe:if>
+            </div>            
+    
+            <div style="float: left;width:36px;height:30px;margin-top: 10;margin-left: 11;">
+                <pe:if condition='<%= IsSelected(4)%>'>
+                    <input type="button" name="4" onclick="OnChange" style="position:relative;width:36px;height:35px; margin-left:2px;color:#ffffff;background:url();"/>
+                    <div style="position:relative;width:30;height:2 ;margin-left: 1; margin-top:40px;background-color: #fead19;"></div>
+                    <div zorder="1" style="margin-left: 0; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi9_32bits.png#0 0 30 14:0 0 0 0);"></div>
+                  </pe:if>
+                  <pe:if condition='<%= not IsSelected(4)%>'>
+                    <input type="button" name="4" onclick="OnChange" style="position:relative;width:36px;height:35px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 0; margin-top:8px;width:30;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi4_32bits.png#0 0 30 14:0 0 0 0);"></div>
                   </pe:if>
             </div>
     
-            <div style="float: left;width:72px;height:30px;margin-top: 10;margin-left: 7;">
-                <pe:if condition='<%= IsSelected(4)%>'>
-                    <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_qiehuan_36X30_32bits.png#0 0 36 30:15 15 15 15);"/>
-                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0);"></div>
+            <div style="float: left;width:36px;height:30px;margin-top: 10;margin-left: 11;">
+                <pe:if condition='<%= IsSelected(5)%>'>
+                    <input type="button" name="5" onclick="OnChange" style="position:relative;width:36px;height:35px; margin-left:2px;color:#ffffff;background:url();"/>
+                    <div style="position:relative;width:32;height:2 ;margin-left: 0; margin-top:40px;background-color: #fead19;"></div>
+                    <div zorder="1" style="margin-left: 0; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi10_32bits.png#0 0 32 14:0 0 0 0);"></div>
                   </pe:if>
-                  <pe:if condition='<%= not IsSelected(4)%>'>
-                    <input type="button" name="4" onclick="OnChange" tooltip='<%=L"粉丝"%>' style="position:relative;width:72px;height:30px; margin-left:2px;color:#ffffff;background:;"/>
-                    <div zorder="1" style="margin-left: 22; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_fensi_62X15_32bits.png#0 0 32 14:0 0 0 0);"></div>
+                  <pe:if condition='<%= not IsSelected(5)%>'>
+                    <input type="button" name="5" onclick="OnChange" style="position:relative;width:36px;height:35px; margin-left:2px;color:#ffffff;background:;"/>
+                    <div zorder="1" style="margin-left: 0; margin-top:8px;width:32;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi5_32bits.png#0 0 32 14:0 0 0 0);"></div>
                   </pe:if>
             </div>
             
         </div>
     </div>
-
-    <div type ="box" style="width:326px;height:421px;background:;">
-           <div style="margin-top:0px;">
-            <pe:gridview style="margin:0px;width:340px;height:421px;" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
-                DataSource='<%=DS_Items%>'>
-	            <Columns>
-                        <div style="color:#ffffff">
-                            <a style="width:320x;height:66px;margin:0px;padding:0px;background:;"
-                               onclick="ClickItem" param1='<%= XPath("this") %>'>
-                                <input type="button" Normal_BG="" name='<%= XPath("this") %>' onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='Texture/Aries/Creator/keepwork/friends/bjxuanzhong_16X16_32bits.png' alwaysmouseover="true" style="margin-left: -6; position:relative;margin-top:0px;width:326px;height:66px;background:;" />
-                                <div style="position:relative;margin-left:0px;margin-top:8px;padding-left:5px;padding-top:2px;width:240px;height:66px;">
-                                    <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
-                                        onclick="ClickItem" param1='<%=Eval("nid")%>'>
-                                        <aries:onlinestatus width="240" height="26" nid='<%=Eval("nid")%>' />
-                                    </a> -->
-                                    <div style="float: left;margin-left:0px;margin-top:0px;">
-                                        <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46" onclick="ClickHead" param1='<%= XPath("this") %>'/>
-                                    </div>
-                                    <div onclick="ClickHead" param1='<%= XPath("this") %>' style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
-                                        <%=GetNmae(XPath("this")) %>
-                                    </div>
-                                    <pe:if condition='<%=IsSelected(1)%>'>
-                                        <div style="float: left;margin-left:38px;margin-top:0px;">
-                                            <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
-                                                <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
-                                            </div>
-    
-                                            <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
-                                                <div style="margin-left: 82; margin-top:5px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
-                                                    <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
-                                                        <%=GetUnReadMsgNum(Eval("id")) %>
-                                                    </div>
-                                                    
-                                                </div>
-                                            </pe:if>
-                                        </div>
-                                    </pe:if>
-
-                                    <pe:if condition='<%=IsSelected(2)%>'>
-                                        <div style="float: left;margin-left:38px;margin-top:0px;">
-                                            <!-- <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
-                                                <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
-                                            </div> -->
-    
-                                            <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
-                                                <div style="margin-left: 82; margin-top:16px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
-                                                    <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
-                                                        <%=GetUnReadMsgNum(Eval("id")) %>
-                                                    </div>
-                                                    
-                                                </div>
-                                            </pe:if>
-                                        </div>
-                                    </pe:if>
-
-                                    <pe:if condition='<%=IsSelected(3)%>'>
-                                        <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
-                                            <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
-                                            <pe:if condition='<%= Eval("isFriend") %>'>
-                                                <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
-                                            </pe:if>
-                                            <pe:if condition='<%= not Eval("isFriend") %>'>
-                                                <div zorder="1" style="margin-left: 13; margin-top:5px;width:44;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_yiguanzhu_40X13_32bits.png#0 0 44 14:0 0 0 0);"></div>
-                                            </pe:if>
-                                        </div>
-                                    </pe:if>
-                                    <pe:if condition='<%=IsSelected(4)%>'>
-                                        <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
-                                            <input type="button" onclick="OnFollowOrUnFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
-                                            <pe:if condition='<%= Eval("isFriend") %>'>
-                                                <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
-                                            </pe:if>
-                                            <pe:if condition='<%= not Eval("isFriend") %>'>
-                                                <div zorder="1" style="margin-left: 18; margin-top:5px;width:26;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_huiguan_26X12_32bits.png#0 0 26 14:0 0 0 0);"></div>
-                                            </pe:if>
-                                        </div>
-                                    </pe:if>
-                                    <!-- <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' /> -->
-                                </div>
-                            </a>
-                        </div>
-                </Columns>
-	            <EmptyDataTemplate>
-	            </EmptyDataTemplate>
-            </pe:gridview>
+    <pe:if condition='<%=IsShowJoinSchool()%>'>
+        <div style="width: 330px;height: 421px;">
+            <div style="width: 232px;height: 41px;margin-top: 130px;margin-left: 46px;background:url(Texture/Aries/Creator/keepwork/friends/zi11_232X41_32bits.png#0 0 232 41);"></div>
+            <input type="button" value="加入学校" onclick="JionSchool" style="width:103px;height:32px; margin-top: 16px; margin-left:106px;base-font-size:12px;font-size: 12px; background:url(Texture/Aries/Creator/keepwork/friends/btn_lan_32X32_32bits.png#0 0 32 32:4 4 4 4);"/>
         </div>
-    </div>
+    </pe:if>
+
+    <pe:if condition='<%=not IsShowJoinSchool()%>'>
+        <div type ="box" style="width:326px;height:421px;background:;">
+            <div style="margin-top:0px;">
+             <pe:gridview style="margin:0px;width:340px;height:421px;" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                 DataSource='<%=DS_Items%>'>
+                 <Columns>
+                         <div style="color:#ffffff">
+                             <a style="width:320x;height:66px;margin:0px;padding:0px;background:;"
+                                onclick="ClickItem" param1='<%= XPath("this") %>'>
+                                 <input type="button" Normal_BG="" name='<%= XPath("this") %>' onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='Texture/Aries/Creator/keepwork/friends/bjxuanzhong_16X16_32bits.png' alwaysmouseover="true" style="margin-left: -6; position:relative;margin-top:0px;width:326px;height:66px;background:;" />
+                                 <div style="position:relative;margin-left:0px;margin-top:8px;padding-left:5px;padding-top:2px;width:240px;height:66px;">
+                                     <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
+                                         onclick="ClickItem" param1='<%=Eval("nid")%>'>
+                                         <aries:onlinestatus width="240" height="26" nid='<%=Eval("nid")%>' />
+                                     </a> -->
+                                     <div style="float: left;margin-left:0px;margin-top:0px;">
+                                         <img zorder="0" src='<%=Eval("portrait")%>'width="46" height="46" onclick="ClickHead" param1='<%= XPath("this") %>'/>
+                                     </div>
+                                     <div onclick="ClickHead" param1='<%= XPath("this") %>' style="float: left;margin-left:8px;margin-top:11px;width:100px;color:#000000">
+                                         <%=GetNmae(XPath("this")) %>
+                                     </div>
+                                     <pe:if condition='<%=IsSelected(1)%>'>
+                                         <div style="float: left;margin-left:38px;margin-top:0px;">
+                                             <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
+                                                 <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
+                                             </div>
+     
+                                             <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
+                                                 <div style="margin-left: 82; margin-top:5px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
+                                                     <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
+                                                         <%=GetUnReadMsgNum(Eval("id")) %>
+                                                     </div>
+                                                     
+                                                 </div>
+                                             </pe:if>
+                                         </div>
+                                     </pe:if>
+ 
+                                     <pe:if condition='<%=IsSelected(2)%>'>
+                                         <div style="float: left;margin-left:38px;margin-top:0px;">
+                                             <!-- <div style="margin-left:0px;margin-top:0px;width:100px;font-size:14pt;color:#000000;text-align: right;">
+                                                 <%=GetTimeDesc(Eval("last_msg_time_stamp")) %>
+                                             </div> -->
+     
+                                             <pe:if condition='<%= IsShowRedPoint(Eval("id")) %>'>
+                                                 <div style="margin-left: 82; margin-top:16px;width:16;height:14; background:url(Texture/Aries/Creator/keepwork/friends/shuzidi_16X14_32bits.png#0 0 16 14:4 4 4 4);">
+                                                     <div style="text-align: center;color: #ffffff;margin-top: -2;font-size: 12;">
+                                                         <%=GetUnReadMsgNum(Eval("id")) %>
+                                                     </div>
+                                                     
+                                                 </div>
+                                             </pe:if>
+                                         </div>
+                                     </pe:if>
+                                     <pe:if condition='<%=IsSelected(3)%>'>
+                                         <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
+                                             <pe:if condition='<%= Eval("relation") == 1 %>'>
+                                                <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                                 <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14);"></div>
+                                             </pe:if>
+                                             <pe:if condition='<%= Eval("relation") == 2 %>'>
+                                                <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                                 <div zorder="1" style="margin-left: 13; margin-top:5px;width:44;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_yiguanzhu_40X13_32bits.png#0 0 44 14);"></div>
+                                             </pe:if>
+
+                                             <pe:if condition='<%= Eval("relation") == 3 %>'>
+                                                <input type="button" onclick="OnFollowOrUnFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                                 <div zorder="1" style="margin-left: 18; margin-top:5px;width:26;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_huiguan_26X12_32bits.png#0 0 26 14);"></div>
+                                             </pe:if>
+
+                                             <pe:if condition='<%= not Eval("relation") %>'>
+                                                <input type="button" onclick="OnFollowOrUnFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                                 <div zorder="1" style="margin-left: 20; margin-top:5px;width:26;height:13;background:url(Texture/Aries/Creator/keepwork/friends/zi_yiguanzhu_40X13_32bits.png#14 0 26 13);"></div>
+                                             </pe:if>
+                                         </div>
+                                     </pe:if>
+
+                                     <pe:if condition='<%=IsSelected(4)%>'>
+                                         <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
+                                             <input type="button" onclick="OnCancelFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                             <pe:if condition='<%= Eval("isFriend") %>'>
+                                                 <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
+                                             </pe:if>
+                                             <pe:if condition='<%= not Eval("isFriend") %>'>
+                                                 <div zorder="1" style="margin-left: 13; margin-top:5px;width:44;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_yiguanzhu_40X13_32bits.png#0 0 44 14:0 0 0 0);"></div>
+                                             </pe:if>
+                                         </div>
+                                     </pe:if>
+                                     <pe:if condition='<%=IsSelected(5)%>'>
+                                         <div style="float: left;margin-left:68px;margin-top:12px;font-size:12pt;color:#000000;text-align: right;">
+                                             <input type="button" onclick="OnFollowOrUnFollow" name='<%= XPath("this") %>' style="position:relative;width: 66;height: 24; color: #ffffff;background:url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X24_32bits.png#0 0 32 24:10 10 10 10)" class="mc_dark_grey_button_with_fillet"/>
+                                             <pe:if condition='<%= Eval("isFriend") %>'>
+                                                 <div zorder="1" style="margin-left: 6; margin-top:5px;width:55;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_xianghuguanzhu_55X14_32bits.png#0 0 55 14:0 0 0 0);"></div>
+                                             </pe:if>
+                                             <pe:if condition='<%= not Eval("isFriend") %>'>
+                                                 <div zorder="1" style="margin-left: 18; margin-top:5px;width:26;height:14;background:url(Texture/Aries/Creator/keepwork/friends/zi_huiguan_26X12_32bits.png#0 0 26 14:0 0 0 0);"></div>
+                                             </pe:if>
+                                         </div>
+                                     </pe:if>
+                                     <!-- <input type="button" zorder="1" style="float:right;margin-left:-5px;margin-top:-1px;width:32px;height:32px;background:Texture/Aries/Friends/FriendsWnd_Phone2_32bits.png" onclick="OnClickPhone()" name='<%=Eval("nid")%>' /> -->
+                                 </div>
+                             </a>
+                         </div>
+                 </Columns>
+                 <EmptyDataTemplate>
+                 </EmptyDataTemplate>
+             </pe:gridview>
+         </div>
+     </div>
+    </pe:if>
 
     <div type ="box" style="width: 330;height: 36; margin-top:3px;margin-left: -2px;background: url(Texture/Aries/Creator/keepwork/friends/bj2_64X32_32bits.png#0 0 64 32:20 10 20 10);">
         <input type="button" name="add" onclick="AddFriend" tooltip="添加好友" style="width: 25;height: 25; color: #ffffff;margin-left: 25px;margin-top: 7; background: url(Texture/Aries/Creator/keepwork/friends/btn_tianjianhaoyou_25X25_32bits.png#0 0 25 25:0 0 0 0);" />

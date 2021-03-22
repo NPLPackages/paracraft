@@ -90,6 +90,12 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+  		<!--20210318新加-->
+		<item id="83159" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83159_panda_hat_32bits.png" name="熊猫猫猫头"/>
+		<item id="83160" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83160_brown_cat_hat_32bits.png" name="棕色猫猫头"/>
+		<item id="83161" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83161_yellow_cat_hat_32bits.png" name="黄色猫猫头"/>
+		<item id="83162" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83162_blue_cat_hat_32bits.png" name="蓝色猫猫头"/>
+		<!--起始数据-->
 		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="麋鹿角"/>
 		<item id="83128" icon="Texture/Aries/Item/2332_ChristmasTire_Princess.png" name="驯鹿角"/>
 		<item id="83001" icon="Texture/Aries/Item/2145_Elf_BlackHead_Girl01.png" name="灰白狐耳"/>
@@ -104,12 +110,13 @@
 		<item id="83051" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" name="兔子头套"/>
 		<item id="83052" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" name="灯笼头套"/>
 		<item id="83053" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" name="白色头纱"/>
+		<item id="83064" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="红色花环"/>
 		<item id="83054" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" name="绿色花环"/>
+		<item id="83144" icon="Texture/Aries/Item/2435_ShopSpringHatGirl.png" name="绿色花环"/>
 		<item id="83055" icon="Texture/Aries/Item/1720_Shop201161HatGirl.png" name="双髻头饰"/>
 		<item id="83056" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" name="浮潜眼睛"/>
 		<item id="83057" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" name="条纹草帽"/>
 		<item id="83063" icon="Texture/Aries/Item/2009_Colorful_TheKingsHat.png" name="黄色草帽"/>
-		<item id="83064" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="红色花环"/>
 		<item id="83065" icon="Texture/Aries/Item/2075_FireHatS3.png" name="恶魔之角"/>
 		<item id="83066" icon="Texture/Aries/Item/2082_IceHatS3.png" name="寒冰头饰"/>
 		<item id="83067" icon="Texture/Aries/Item/2089_StormHatS3.png" name="半遮面具"/>
@@ -123,9 +130,6 @@
 		<item id="83133" icon="Texture/Aries/Item/2399_Panda_Boy.png" name="大熊猫头饰"/>
 		<item id="83134" icon="Texture/Aries/Item/2400_Panda_Girl.png" name="小熊猫头饰"/>
 		<item id="83143" icon="Texture/Aries/Item/2434_TheSpringFestival_Boy.png" name="狐蝠耳饰"/>
-		<!--
-		<item id="83144" icon="Texture/Aries/Item/2435_ShopSpringHatGirl.png" name="帽子144"/>
-		-->
 		<item id="83002" icon="Texture/Aries/Item/1231_FireHat1.png" name="布制罩帽"/>
 		<item id="83003" icon="Texture/Aries/Item/1232_IceHat1.png" name="布制罩帽"/>
 		<item id="83004" icon="Texture/Aries/Item/1233_StormHat1.png" name="布制罩帽"/>
@@ -181,14 +185,8 @@
 		<item id="83077" icon="Texture/Aries/Item/2160_Elf_WhiteHead_Boy01.png" name="狐狸耳饰"/>
 		<item id="83078" icon="Texture/Aries/Item/2165_Ragnarok_GrayHead_Boy01.png" name="发芽的头饰"/>
 		<item id="83079" icon="Texture/Aries/Item/2166_Ragnarok_RedHead_Boy02.png" name="发芽的头饰"/>
-		<!--缺图标
-		<item id="83080" icon="Texture/Aries/Item/2167_Ragnarok_GreenHead_Boy03.png" name="帽子80"/>
-		-->
 		<item id="83081" icon="Texture/Aries/Item/2168_Ragnarok_GrayHead_Girl01.png" name="发芽的头饰"/>
 		<item id="83082" icon="Texture/Aries/Item/2169_Ragnarok_RedHead_Girl02.png" name="发芽的头饰"/>
-		<!--缺图标
-		<item id="83083" icon="Texture/Aries/Item/2170_Ragnarok_GreenHead_Girl03.png" name="帽子83"/>
-		-->
 		<item id="83084" icon="Texture/Aries/Item/2171_Spinage_BrownHead_Boy01.png" name="爆炸头"/>
 		<item id="83085" icon="Texture/Aries/Item/2172_Spinage_RedHead_Boy02.png" name="爆炸头"/>
 		<item id="83086" icon="Texture/Aries/Item/2173_Spinage_BlackHead_Boy03.png" name="爆炸头"/>
@@ -197,15 +195,8 @@
 		<item id="83089" icon="Texture/Aries/Item/2176_Spinage_BlackHead_Girl03.png" name="爆炸头"/>
 		<item id="83090" icon="Texture/Aries/Item/2177_Errantry_GrayHead_Boy01.png" name="高发髻"/>
 		<item id="83091" icon="Texture/Aries/Item/2178_Errantry_GreenHead_Boy02.png" name="高发髻"/>
-		<!--缺图标
-		<item id="83092" icon="Texture/Aries/Item/2179_Errantry_RedHead_Boy03.png" name="帽子92"/>
-		-->
 		<item id="83093" icon="Texture/Aries/Item/2180_Errantry_GrayHead_Girl01.png" name="高发髻"/>
 		<item id="83094" icon="Texture/Aries/Item/2181_Errantry_GreenHead_Girl02.png" name="高发髻"/>
-		<!--缺图标
-		<item id="83095" icon="Texture/Aries/Item/2182_Errantry_GrayHead_Girl03.png" name="帽子95"/>
-		<item id="83096" icon="Texture/Aries/Item/2182_Errantry_RedHead_Girl03.png" name="帽子96"/>
-		-->
 		<item id="83097" icon="Texture/Aries/Item/2183_HeroCrown_Fire.png" name="头冠"/>
 		<item id="83098" icon="Texture/Aries/Item/2184_HeroCrown_Ice.png" name="头冠"/>
 		<item id="83099" icon="Texture/Aries/Item/2185_HeroCrown_Storm.png" name="头冠"/>
@@ -244,16 +235,10 @@
 		<item id="83140" icon="Texture/Aries/Item/2411_AncientRoyalCrown_Relive.png" name="冠军头冠"/>
 		<item id="83141" icon="Texture/Aries/Item/2416_KnightCaptainHelmet_Boy.png" name="骑士头盔"/>
 		<item id="83142" icon="Texture/Aries/Item/2417_KnightCaptainHelmet_Girl.png" name="骑士头盔"/>
-		<!--帽子诡异，难看
-		<item id="83145" icon="Texture/Aries/Item/1011_PoliceUniformHat.png" name="帽子145"/>
-		-->
 		<!--20210305新加-->
 		<item id="83146" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83146_32bits.png" name="形象" debug="true"/>
 		<item id="83147" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83147_32bits.png" name="形象" debug="true"/>
 		<item id="83148" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83148_32bits.png" name="形象1"/>
-		<!-- 废止
-		<item id="83149" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83149_32bits.png" name="帽子"/>
-		-->
 		<item id="83150" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83150_32bits.png" name="形象2"/>
 		<item id="83151" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83151_32bits.png" name="形象3"/>
 		<item id="83152" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83152_32bits.png" name="形象4"/>
@@ -441,6 +426,9 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+		<!--20210318新加衣服，活动用-->
+		<item id="84052" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_84052_32bits.png" name="黄色海魂衫"/>
+		<!--起始数据-->
 		<item id="84001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_.png" name="衣服1"/>
 		<item id="84002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_01.png" name="衣服2"/>
 		<item id="84003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_011.png" name="衣服3"/>
@@ -490,7 +478,6 @@
 		<item id="84046" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84046_32bits.png" name="衣服46"/>
 		<item id="84047" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84047_32bits.png" name="衣服47"/>
 		<item id="84048" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84048_32bits.png" name="衣服48"/>
-		
 		<item id="84049" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84049_32bits.png" name="衣服49"/>
 		<item id="84050" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84050_32bits.png" name="衣服50"/>
 		<item id="84051" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84051_32bits.png" name="衣服51"/>
@@ -498,6 +485,10 @@
 	</category>
 
 	<category name="pants" text="裤子">
+		<!--20210318新加裤子，活动用-->
+		<item id="85071" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_01_Avatar_85071_32bits.png" name="海魂裤"/>
+		<item id="85072" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_02_Avatar_85071_32bits.png" name="海魂裤"/>
+		<!--起始数据-->
 		<item id="85001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_00Avatar_boy_body_01kuku2.png" name="裤子1"/>
 		<item id="85002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_.png" name="裤子2"/>
 		<item id="85003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_01.png" name="裤子3"/>

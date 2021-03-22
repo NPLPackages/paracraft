@@ -17,6 +17,10 @@ KpChatChannel.Connect(nil,nil,function()
     KpChatChannel.JoinWorld(id);
 end);
 
+-- test preloading url
+KpChatChannel.PreloadSocketIOUrl();
+
+
 -- api declaration:
 http://yapi.kp-para.cn/project/60/interface/api/1952
 -------------------------------------------------------
@@ -25,6 +29,7 @@ NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatHelper.lua");
+NPL.load("(gl)script/ide/timer.lua");
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
@@ -43,6 +48,47 @@ KpChatChannel.try_connect_max_cnt = 5;
 KpChatChannel.try_connect_waiting_seconds = 0;
 KpChatChannel.try_connect_waiting_max_seconds = 15;
 
+function KpChatChannel.GetPreloadSocketIOUrl()
+	return KpChatChannel.preload_socketio_url;
+end
+function KpChatChannel.PreloadSocketIOUrl(callback)
+	if(not KpChatChannel.preload_socketio_url)then
+		local callback_is_finished = false;
+		local function do_callback()
+			if(not callback_is_finished)then
+				callback_is_finished = true
+				if(callback)then
+					callback();
+				end
+			end
+		end
+		LOG.std(nil, "info", "Before KpChatChannel.PreloadSocketIOUrl");
+		keepwork.app.availableHost({},function(err, msg, data)
+			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl err code", err);
+			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl msg", msg);
+			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl data", data);
+			if(err == 200 and data)then
+				KpChatChannel.preload_socketio_url = data;
+				do_callback();
+				return
+			end
+			do_callback();
+			
+		end)
+
+		if(not KpChatChannel.timer_preload_url)then
+			KpChatChannel.timer_preload_url = commonlib.Timer:new({callbackFunc = function(timer)
+				do_callback();
+			end})
+		end
+		-- waiting max time is 10 seconds
+		KpChatChannel.timer_preload_url:Change(10000, nil)
+	else
+		if(callback)then
+			callback();
+		end
+	end
+end
 function KpChatChannel.StaticInit()
     if(not KeepWorkItemManager.IsEnabled())then
         return
@@ -79,7 +125,7 @@ function KpChatChannel.GetUrl()
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
     local httpwrapper_version = HttpWrapper.GetDevVersion();
 
-    url = GameLogic.GetFilters():apply_filters('get_socket_url');
+    url = KpChatChannel.GetPreloadSocketIOUrl() or GameLogic.GetFilters():apply_filters('get_socket_url');
     if(not url)then
 	    LOG.std(nil, "error", "KpChatChannel", "read url failed by httpwrapper_version: %s",httpwrapper_version);
     else

@@ -163,7 +163,7 @@ function Keepwork:IsPrefectUserInfo()
     if (not userinfo.schoolId or userinfo.schoolId == 0) then return false end
     if (not userinfo.sex or userinfo.sex == "") then return false end
     if (not userinfo.region or userinfo.region.hasChildren ~= 0) then return false end
-    local info = userinfo.info;
+    local info = userinfo.info or {};
     if (not info.name or info.name == "") then return false end
     if (not info.mailName or info.mailName == "") then return false end
     if (not info.mailAddress or info.mailAddress == "") then return false end

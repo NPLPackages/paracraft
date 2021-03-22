@@ -98,6 +98,8 @@ function MacroPlayer.OnPageClosed()
 	end
 	MacroPlayer.lastSavedTextPosition = nil;
 	MacroPlayer.lastSavedTipPos = nil;
+
+	GameLogic.RunCommand("/ggs user visible")
 end
 
 function MacroPlayer.OnViewportChange()
@@ -121,6 +123,7 @@ end
 
 -- @param duration: in seconds
 function MacroPlayer.ShowPage()
+	GameLogic.RunCommand("/ggs user hidden")
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Macros/MacroPlayer.html", 
 		name = "MacroPlayerTask.ShowPage", 
@@ -964,6 +967,18 @@ function MacroPlayer.AttachWindow(window)
 		end
 	end
 	return false
+end
+
+function MacroPlayer.ShowWindow(bShow)
+	if(page) then
+		if(MacroPlayer.attachedWnd) then
+			if(bShow) then
+				MacroPlayer.attachedWnd:show()
+			else
+				MacroPlayer.attachedWnd:hide()
+			end
+		end
+	end
 end
 
 -- @return nil if no movement is required, or x, y if moved. 

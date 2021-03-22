@@ -47,7 +47,7 @@ Commands["echo"] = {
 	quick_ref="/echo any text message", 
 	desc="" , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		LOG.std(nil, "info", "echo cmd", cmd_text);
+		-- LOG.std(nil, "info", "echo cmd", cmd_text);
 		GameLogic.AppendChat(cmd_text)
 	end,
 };
@@ -713,4 +713,23 @@ e.g.
 		end
 	end,
 };
+
+Commands["options"] = {
+	name="options", 
+	quick_ref="/options [name] [value]", 
+	desc=[[modify current GameLogic.options
+e.g.
+/options AutoMovieFPS off
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local name;
+		name, cmd_text = CmdParser.ParseString(cmd_text);		
+		if(name == "AutoMovieFPS") then
+			local value;
+			value, cmd_text = CmdParser.ParseBool(cmd_text)
+			GameLogic.options:SetAutoMovieFPS(value)
+		end
+	end,
+};
+
 

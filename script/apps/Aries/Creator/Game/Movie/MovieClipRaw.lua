@@ -16,10 +16,13 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local Ticks = commonlib.gettable("MyCompany.Aries.Game.Common.Ticks");
 local MovieClipRaw = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipRaw"));
 MovieClipRaw:Property("Name", "MovieClipRaw");
 MovieClipRaw:Property({"bReuseActor", nil, "IsReuseActor", "SetReuseActor", auto=true});
 MovieClipRaw:Property({"Speed", 1.0, "GetSpeed", "SetSpeed", auto=true});
+MovieClipRaw:Property({"FPS", nil, "GetFPS", "SetFPS"});
+MovieClipRaw:Property({"isAutoFPS", false, "IsAutoFPS", "SetAutoFPS", auto=true});
 MovieClipRaw:Signal("timeChanged");
 
 
@@ -33,6 +36,9 @@ end
 
 -- @param entity: movie clip entity. 
 function MovieClipRaw:Init(entity)
+	-- TODO: just testing low frame rate
+	-- self:SetFPS(5)
+
 	self.entity = entity;
 	if(entity) then
 		return self;
@@ -256,6 +262,68 @@ function MovieClipRaw:UpdateActors(deltaTime)
 	end
 end
 
+-- @return delta time or nil if it is not a tick
+function MovieClipRaw:IsTick(deltaTime)
+	if(self.ticks) then
+		local bIsTick, interval = self.ticks:IsTickReal(deltaTime)
+		if(bIsTick) then
+			return interval;
+		else
+			return
+		end
+	else
+		return deltaTime;
+	end
+end
+
+function MovieClipRaw:SetFPS(fps)
+	if(self.fps ~= fps) then
+		self.fps = fps;
+		if(fps) then
+			self.ticks = self.ticks or Ticks:new();
+			self.ticks:SetFPS(fps, true);
+		else
+			self.ticks = nil;
+		end
+	end
+end
+
+function MovieClipRaw:GetFPS()
+	return self.fps;
+end
+
+-- only set FPS when there is no camera object. 
+-- we will use the highest FPS of all actors to be the FPS of the movie clip. 
+function MovieClipRaw:AutoSetFPS(deltaTime)
+	if(not self:HasCamera()) then
+		local intervalTicks = 500;
+		local minTicks = deltaTime or 33;
+		local hasNPC;
+		for i, actor in ipairs(self.actors) do
+			if(actor.class_name == "ActorNPC") then
+				hasNPC = true
+				intervalTicks = math.min(intervalTicks, actor:GetTickIntervalByCameraDist(minTicks, 500))
+				if(minTicks == intervalTicks) then
+					break;
+				end
+			end
+		end
+		if(hasNPC) then
+			local fps = math.floor(1000 / intervalTicks + 1)
+			self:SetFPS(fps)
+		else
+			if(self.fps) then
+				self:SetFPS(nil)
+			end
+		end
+	else
+		if(self.fps) then
+			self:SetFPS(nil)
+		end
+	end
+end
+
+
 -- called every framemove when activated.  
 -- @param deltaTime: in milli seconds. 
 function MovieClipRaw:FrameMove(deltaTime)
@@ -263,6 +331,16 @@ function MovieClipRaw:FrameMove(deltaTime)
 		-- always return when paused
 		return
 	end
+
+	if(self:IsAutoFPS()) then
+		self:AutoSetFPS(deltaTime);
+	end
+
+	deltaTime = self:IsTick(deltaTime)
+	if(not deltaTime) then
+		return;
+	end
+	
 
 	local cur_time = self:GetTime() + deltaTime*self:GetSpeed();
 	self:SetTime(cur_time);

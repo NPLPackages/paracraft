@@ -182,11 +182,12 @@ end
 -- @param index: if nil, it will be added to last block. 
 -- @param category_name: default to "static"
 -- @param blockName: usually nil, if provided, we will ensure that there is only one such item in the list. 
+-- @param isWorldOnly: if true, the item will be removed when world is loaded
 -- @return blockDsItem
-function ItemClient.AddBlock(block_id, index, category_name, blockName)
+function ItemClient.AddBlock(block_id, index, category_name, blockName, isWorldOnly)
 	local item = ItemClient.CreateGetByBlockID(block_id);
 	
-	local blockDSItem = { __index = item, block_id = block_id };
+	local blockDSItem = { __index = item, block_id = block_id, isWorldOnly=isWorldOnly};
 	setmetatable(blockDSItem, blockDSItem);
 
 	local ds_blocks = ItemClient.GetBlockDS(category_name);
@@ -397,6 +398,17 @@ function ItemClient.OnLeaveWorld()
 	for key, item in pairs(items) do
 		if(item and item.OnLeaveWorld) then
 			item:OnLeaveWorld();
+		end
+	end
+
+	-- first remove all world only blocks
+	local ds = ItemClient.GetBlockDS("tool")
+	if(ds) then
+		for i=#ds, 1, -1  do
+			local item = ds[i];
+			if(item.isWorldOnly) then
+				commonlib.removeArrayItem(ds, i);
+			end
 		end
 	end
 end

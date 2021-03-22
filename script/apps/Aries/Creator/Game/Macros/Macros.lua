@@ -66,7 +66,7 @@ voice("text to speech")
 sound("1.mp3")
 text("bottom line big text", 5000)
 broadcast("globalGameEvent")
-
+ShowWindow(false)
 ```
 
 ## How to make UI control recordable?
@@ -112,6 +112,7 @@ local lastPlayerPos = {pos = {x=0, y=0, z=0}, facing=0, recorded=false};
 local lastCameraPos = {camobjDist=10, LiftupAngle=0, CameraRotY=0, recorded = false, lookatX=0, lookatY = 0, lookatZ = 0};
 local startTime = 0;
 local idleStartTime = 0;
+local pause = {};
 
 local isInited;
 function Macros:Init()
@@ -415,7 +416,10 @@ function Macros:AddMacro(text, ...)
 			text = text.."()";
 		end
 	end
-	local idleTime = commonlib.TimerManager.GetCurrentTime() - idleStartTime;
+	if (self:IsPause()) then self:Restore() end 
+	local idleTime = commonlib.TimerManager.GetCurrentTime() - idleStartTime - self:GetPauseTime();
+	self:SetPauseTime(0); -- 清除暂停时间
+
 	if(idleTime > 100) then
 		idleStartTime = commonlib.TimerManager.GetCurrentTime();
 		self:AddMacro("Idle", idleTime);
@@ -454,6 +458,34 @@ function Macros:AddMacro(text, ...)
 	else
 		GameLogic.AddBBS("Macro", format("Unknown macro: %s", text), 5000, "255 0 0");
 	end
+end
+
+-- 引入宏录制暂停机制, 避免播放时等待时间过长, 暂停后最好引入一层透明遮罩, 避免误操作
+function Macros:IsPause()
+	return pause.isPause;
+end
+
+function Macros:Pause()
+	pause.isPause = true;
+	pause.startPauseTime = commonlib.TimerManager.GetCurrentTime();
+	pause.endPauseTime = nil;
+	pause.pauseTime = 0;
+	-- 引入遮罩 UI
+end
+
+function Macros:Restore()
+	if (not pause.isPause) then return end
+	pause.isPause = false;
+	pause.endPauseTime = commonlib.TimerManager.GetCurrentTime();
+	pause.pauseTime = pause.endPauseTime - pause.startPauseTime;
+end
+
+function Macros:GetPauseTime()
+	return pause.pauseTime or 0;
+end
+
+function Macros:SetPauseTime(pauseTime)
+	pause.pauseTime = pauseTime or 0;
 end
 
 local MaxNonVIPMacroAllowed = 3000;
@@ -584,6 +616,8 @@ function Macros:BeginPlay()
 	self:LockInput()
 
 	GameLogic.GetFilters():add_filter("ShowExitDialog", Macros.OnShowExitDialog);
+	
+	GameLogic.GetFilters():apply_filters("Macro_BeginPlay");
 end
 
 function Macros.OnShowExitDialog(p1)

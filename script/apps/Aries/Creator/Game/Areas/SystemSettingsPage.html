@@ -389,6 +389,12 @@ end
                             <input name='btn_BulletScreen' value='' type="button" onclick='SystemSettingsPage.OnClickBulletScreen' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
                         </div>
                     </div>
+                    <div style="height:25px;margin-top:5px;">
+                        <div style="float:left;margin-left:5px;width:120px;height:20px;text-align:right;font-size:12px;" ><%=L"自动调整电影帧率" %></div>
+                        <div style="float:left;margin-top:-2px;margin-left:20px;">
+                            <input name='btn_AutoFPS' value='' type="button" onclick='SystemSettingsPage.OnClickAutoMovieFPS' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                        </div>
+                    </div>
                 </pe:if>
                 <!--
                 <pe:if condition='<%=GetCategoryDSIndex() == 5 %>' >

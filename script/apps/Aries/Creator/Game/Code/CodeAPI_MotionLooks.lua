@@ -366,34 +366,54 @@ function env_imp:scaleTo(scalePercentage)
 end
 
 
--- set animation id
+-- anim(id, durationMs): play a predefined animation by id, and wait durationMs(can be nil). 
+-- anim(name, durationMs): play a user defined anim by name, and wait durationMs(can be nil). 
+-- anim(name, fromTime, toTime, isLooped): define a new animation by name
 -- @param anim_id: 0 for standing (default), 4 for walk. 
--- @param duration: default to 1 tick
-function env_imp:anim(anim_id, duration)
+function env_imp:anim(anim_id, param1, toTime, isLooped)
 	anim_id = anim_id or 0;
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		entity:EnableAnimation(true);
-		if(self.actor.UnbindAnimInstance) then
-			-- this ensures that actor are not bound to current bone position in the movie block
-			self.actor:UnbindAnimInstance();
-		end
+		if(type(anim_id) == "number") then
+			entity:EnableAnimation(true);
+			if(self.actor.UnbindAnimInstance) then
+				-- this ensures that actor are not bound to current bone position in the movie block
+				self.actor:UnbindAnimInstance();
+			end
 
-		-- verify that the main asset of player is loaded, otherwise we may need to wait
-		local filename = entity:GetMainAssetPath();
-		if(filename and not duration and not Files:IsAssetFileLoaded(filename)) then
-			for i=1, 10 do
-				env_imp.wait(self, 0.1);
-				if(Files:IsAssetFileLoaded(filename)) then
-					break;
+			-- verify that the main asset of player is loaded, otherwise we may need to wait
+			local filename = entity:GetMainAssetPath();
+			if(filename and not duration and not Files:IsAssetFileLoaded(filename)) then
+				for i=1, 10 do
+					env_imp.wait(self, 0.1);
+					if(Files:IsAssetFileLoaded(filename)) then
+						break;
+					end
+				end
+			end
+		
+			entity:SetAnimation(anim_id);
+
+			if(entity.animDef) then
+				env_imp.playBone(self, "*");
+			end
+		elseif(type(anim_id) == "string") then
+			if(param1 and toTime) then
+				-- define a new animation by name
+				-- anim(name, fromTime, toTime, isLooped)
+				entity.animDef = entity.animDef or {}
+				entity.animDef[anim_id] = {param1, toTime, isLooped}
+				return
+			else
+				local anim = entity.animDef and entity.animDef[anim_id]
+				if(anim) then
+					env_imp.playBone(self, "*", anim[1], anim[2], anim[3])
 				end
 			end
 		end
-		
-		entity:SetAnimation(anim_id);
 
-		if(duration) then
-			env_imp.wait(self, duration);
+		if(param1 and not toTime) then
+			env_imp.wait(self, param1);
 		end
 	end
 end
@@ -461,7 +481,7 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
                     if(not speed or speed <= 0)then
 			            speed = actor:GetPlaySpeed();
                     end
-					local delta = timer:GetDelta() * speed;
+					local delta = timer:GetDelta(500) * speed;
 					time = time + delta;
 					if(time >= timeTo) then
 						if(isLooping) then
@@ -524,14 +544,22 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 							timer:Change(checkSentientInterval, checkSentientInterval);
 						else
 							frameMove_(timer)
-							if(timer.period ~= deltaTime) then
-								timer:Change(deltaTime, deltaTime);
+							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							if(timer.dueTime == checkSentientInterval) then
+								timer:Change(deltaTime, timer.period);
 							end
 						end
 					end);
 					timer:Change(0, deltaTime);
 				else
-					timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					if(GameLogic.options:IsAutoMovieFPS()) then
+						timer.callbackFunc = self.co:MakeCallbackFunc(function(timer)
+							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							frameMove_(timer);
+						end);
+					else
+						timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					end
 					timer:Change(0, deltaTime);
 				end
 			end
@@ -539,20 +567,29 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 	end
 end
 
+
 -- same as play(), but looping
 function env_imp:playLoop(timeFrom, timeTo)
 	env_imp.play(self, timeFrom, timeTo, true);
 	env_imp.checkyield(self);
 end
 
+
 -- play a bone's time series animation in the movie block.
 -- this function will return immediately.
--- @param boneName: bone name
--- @param timeFrom: time in milliseconds, default to 0.
--- @param timeTo: if nil, default to timeFrom
+-- @param boneName: bone name, if "*", we will improve performance by advancing the global biped's time variable. 
+-- @param timeFrom: time in milliseconds. if nil, it will stop the bone animation. 
+-- @param timeTo: if nil, default to timeFrom. this will also stop previous timer
 -- @param isLooping: default to false.
 function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
-	timeFrom = timeFrom or 0;
+	if(not timeFrom and not timeTo) then
+		local timer = env_imp.getPlayTimer(self, boneName, true)
+		if(timer) then
+			timer:Change()
+		end
+		return
+	end
+
 	local time = timeFrom;
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
@@ -563,11 +600,11 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 			return
 		end
 		actor:SetBoneTime(boneName, time);
-
+		
 		if(timeTo and timeTo>timeFrom) then
 			local deltaTime = math.floor(env_imp.GetDefaultTick(self)*1000);
 			local function frameMove_(timer)
-				local delta = timer:GetDelta() * actor:GetPlaySpeed();
+				local delta = timer:GetDelta(500) * actor:GetPlaySpeed();
 				time = time + delta;
 				if(time >= timeTo) then
 					if(isLooping) then
@@ -605,16 +642,29 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 							timer:Change(checkSentientInterval, checkSentientInterval);
 						else
 							frameMove_(timer)
-							if(timer.period ~= deltaTime) then
-								timer:Change(deltaTime, deltaTime);
+							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							if(timer.dueTime == checkSentientInterval) then
+								timer:Change(deltaTime, timer.period);
 							end
 						end
 					end);
 					timer:Change(0, deltaTime);
 				else
-					timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					if(GameLogic.options:IsAutoMovieFPS()) then
+						timer.callbackFunc = self.co:MakeCallbackFunc(function(timer)
+							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							frameMove_(timer);
+						end);
+					else
+						timer.callbackFunc = self.co:MakeCallbackFunc(frameMove_);
+					end
 					timer:Change(0, deltaTime);
 				end
+			end
+		else
+			local timer = env_imp.getPlayTimer(self, boneName, true)
+			if(timer) then
+				timer:Change()
 			end
 		end
 	end
@@ -622,38 +672,47 @@ end
 
 -- create or get timer for play back. 
 -- @param name: if nil, it is the default timer for play method, other named timers are support supported such as for bone animations. 
-function env_imp:getPlayTimer(name)
-	if(name) then
-		if(not self.actor.playTimers) then
-			self.actor.playTimers = {};
-			self.actor:Connect("beforeRemoved", function(actor)
-				if(actor.playTimers) then
-					for _, timer in pairs(actor.playTimers) do
-						self.codeblock:KillTimer(timer);
+-- @param bGetOnly: if true, we will try get existing timer without creating new ones
+function env_imp:getPlayTimer(name, bGetOnly)
+	if(not bGetOnly) then
+		if(name) then
+			if(not self.actor.playTimers) then
+				self.actor.playTimers = {};
+				self.actor:Connect("beforeRemoved", function(actor)
+					if(actor.playTimers) then
+						for _, timer in pairs(actor.playTimers) do
+							self.codeblock:KillTimer(timer);
+						end
+						actor.playTimers = nil;
 					end
-					actor.playTimers = nil;
-				end
-			end)
+				end)
+			end
+			local timer = self.actor.playTimers[name]
+			if(not timer) then
+				timer = self.codeblock:SetTimer();
+				self.actor.playTimers[name] = timer
+			end
+			return timer;
+		else
+			local timer = self.actor.playTimer
+			if(not timer) then
+				timer = self.codeblock:SetTimer();
+				self.actor.playTimer = timer
+				self.actor:Connect("beforeRemoved", function(actor)
+					if(actor.playTimer) then
+						self.codeblock:KillTimer(actor.playTimer);
+						actor.playTimer = nil;
+					end
+				end)
+			end
+			return timer;
 		end
-		local timer = self.actor.playTimers[name]
-		if(not timer) then
-			timer = self.codeblock:SetTimer();
-			self.actor.playTimers[name] = timer
+	elseif(self.actor) then
+		if(name) then
+			return self.actor.playTimers and self.actor.playTimers[name]
+		else
+			return self.actor.playTimer
 		end
-		return timer;
-	else
-		local timer = self.actor.playTimer
-		if(not timer) then
-			timer = self.codeblock:SetTimer();
-			self.actor.playTimer = timer
-			self.actor:Connect("beforeRemoved", function(actor)
-				if(actor.playTimer) then
-					self.codeblock:KillTimer(actor.playTimer);
-					actor.playTimer = nil;
-				end
-			end)
-		end
-		return timer;
 	end
 end
 
@@ -826,7 +885,7 @@ end
 function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 	name = GetMovieChannelName_(name, self.codeblock)
 	local channel = MovieManager:CreateGetMovieChannel(name);
-
+	
 	if(not channel:GetStartBlockPosition()) then
 		local movieEntity = self.codeblock:GetMovieEntity();
 		if(movieEntity) then

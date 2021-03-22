@@ -136,6 +136,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	isMouseLeftDragEnabled = false,
 	-- the player asset path
 	mainPlayerAssetPath = nil,
+	-- lower movie frame rate, when actors are far from current camera, only affect those without camera actor
+	isAutoMovieFPS = true,
 });
 
 -- load default setting on application start. 
@@ -329,6 +331,7 @@ function options:OnLoadWorld()
 	self.NormalDensity = self.DefaultDensity;
 	self.AllowRunning = true;
 	self.PickingDist = 50;
+	self.isAutoMovieFPS = true;
 	self:SetViewBobbing(nil);
 	self:SetEnableVibration(nil);
 	self:SetDisableShaderCommand(nil);
@@ -1273,7 +1276,7 @@ end
 function options:GetRemoteWorldFolder()
 	if(not self.remoteFolderName) then
 		local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
-		if(currentEnterWorld and currentEnterWorld.user) then
+		if(currentEnterWorld and currentEnterWorld.user and currentEnterWorld.user.username and currentEnterWorld.foldername) then
 			self.remoteFolderName = format("%s/%s/", currentEnterWorld.user.username, currentEnterWorld.foldername);
 		else
 			self.remoteFolderName = "/";
@@ -1282,3 +1285,12 @@ function options:GetRemoteWorldFolder()
 	return self.remoteFolderName;
 end
 
+
+-- lower movie frame rate, when actors are far from current camera, only affect those without camera actor
+function options:SetAutoMovieFPS(isAutoMovieFPS)
+	self.isAutoMovieFPS = isAutoMovieFPS
+end
+
+function options:IsAutoMovieFPS()
+	return self.isAutoMovieFPS
+end

@@ -242,19 +242,21 @@ function ParaWorldSites.GotoSelectWorld()
 	local item = ParaWorldSites.currentItem;
 	if (item) then
 		local gen = GameLogic.GetBlockGenerator();
-		local x, y = 5 - item.x, 5 - item.y;
-		local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
-		bx = bx + 64;
-		bz = bz + 64;
-		local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
-		y = y or by;
-		GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
-		ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
-			local cx, _, cz = gen:GetWorldCenter();
-			local bornX = bx + x - cx;
-			local bornZ = bz + z - cz;
-			GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
-		end);
+		if(gen and gen.GetBlockOriginByGridXY) then
+			local x, y = 5 - item.x, 5 - item.y;
+			local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
+			bx = bx + 64;
+			bz = bz + 64;
+			local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
+			y = y or by;
+			GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
+			ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
+				local cx, _, cz = gen:GetWorldCenter();
+				local bornX = bx + x - cx;
+				local bornZ = bz + z - cz;
+				GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
+			end);
+		end
 	else
 		GameLogic.RunCommand("/home");
 	end
@@ -301,36 +303,40 @@ function ParaWorldSites.OnClickItem(index)
 						ParaWorldSites.ShowAdminSeat(item, index);
 					else
 						local gen = GameLogic.GetBlockGenerator();
-						local x, y = 5 - item.x, 5 - item.y;
-						local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
-						bx = bx + 64;
-						bz = bz + 64;
-						local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
-						y = y or by;
-						GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
-						ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
-							local cx, _, cz = gen:GetWorldCenter();
-							local bornX = bx + x - cx;
-							local bornZ = bz + z - cz;
-							GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
-						end);
+						if(gen and gen.GetBlockOriginByGridXY) then
+							local x, y = 5 - item.x, 5 - item.y;
+							local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
+							bx = bx + 64;
+							bz = bz + 64;
+							local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
+							y = y or by;
+							GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
+							ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
+								local cx, _, cz = gen:GetWorldCenter();
+								local bornX = bx + x - cx;
+								local bornZ = bz + z - cz;
+								GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
+							end);
+						end
 					end
 				end);
 			else
 				local gen = GameLogic.GetBlockGenerator();
-				local x, y = 5 - item.x, 5 - item.y;
-				local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
-				bx = bx + 64;
-				bz = bz + 64;
-				local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
-				y = y or by;
-				GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
-				ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
-					local cx, _, cz = gen:GetWorldCenter();
-					local bornX = bx + x - cx;
-					local bornZ = bz + z - cz;
-					GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
-				end);
+				if(gen and gen.GetBlockOriginByGridXY) then
+					local x, y = 5 - item.x, 5 - item.y;
+					local bx, by, bz = gen:GetBlockOriginByGridXY(x, y);
+					bx = bx + 64;
+					bz = bz + 64;
+					local y = ParaWorldMinimapSurface:GetHeightByWorldPos(bx, bz)
+					y = y or by;
+					GameLogic.RunCommand(format("/goto %d %d %d", bx, y+1, bz));
+					ParaWorldSites.LoadMiniWorldOnSeat(item.x, item.y, true, function(x, y, z)
+						local cx, _, cz = gen:GetWorldCenter();
+						local bornX = bx + x - cx;
+						local bornZ = bz + z - cz;
+						GameLogic.RunCommand(format("/goto %d %d %d", bornX, y, bornZ));
+					end);
+				end
 			end
 		else
 			ParaWorldSites.currentName = item.name or L"空地";
@@ -735,8 +741,10 @@ function ParaWorldSites.CreateArrow(param, mcmlNode)
 	if (player) then
 		local x, y, z = player:GetBlockPos();
 		local gen = GameLogic.GetBlockGenerator();
-		local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
-		row, column = 5 - gridX, 5 - gridY;
+		if(gen and gen.FromWorldPosToGridXY) then
+			local gridX, gridY = gen:FromWorldPosToGridXY(x, z);
+			row, column = 5 - gridX, 5 - gridY;
+		end
 	end
 	local _this = ParaUI.CreateUIObject("container", "ParaWorldSites_Arrow", "_lt", param.left,param.top,26,26);
 	_this.background = "Texture/Aries/Creator/keepwork/map/maparrow_32bits.png";

@@ -53,6 +53,7 @@ Entity.IsSimulatedSky = true;
 Entity.filename = "";
 Entity.rainStrength = 0;
 Entity.snowStrength = 0;
+Entity.snowSpeed = 1;
 Entity.default_skyfilename = "model/blockworld/Sky/sky.x";
 Entity.maxSubMeshCount = 1;
 
@@ -92,6 +93,7 @@ function Entity:SaveToXMLNode(node, bSort)
 	local attr = node.attr;
 	attr.snowStrength = self:GetSnowStrength();
 	attr.rainStrength = self:GetRainStrength();
+	attr.snowSpeed = self:GetSnowSpeed();
 	attr.filename = self.filename;
 	attr.skyTexture = self.skyTexture;
 	attr.IsSimulatedSky = self.IsSimulatedSky;
@@ -103,6 +105,7 @@ function Entity:LoadFromXMLNode(node)
 	local attr = node.attr;
 	self.snowStrength = tonumber(attr.snowStrength);
 	self.rainStrength = tonumber(attr.rainStrength);
+	self.snowSpeed = tonumber(attr.snowSpeed);
 	self.filename = attr.filename;
 	self.skyTexture = attr.skyTexture;
 	if(attr.IsSimulatedSky) then
@@ -245,7 +248,7 @@ end
 
 function Entity:RefreshWeather()
 	WeatherEffect:SetStrength(1, self:GetRainStrength());
-	WeatherEffect:SetStrength(2, self:GetSnowStrength());
+	WeatherEffect:SetEffectOptions(2, self:GetSnowStrength(), self:GetSnowSpeed());
 end
 
 -- called every frame
@@ -274,7 +277,7 @@ function Entity:GetRainStrength()
 end
 
 -- @param strength: [0-10], if nil, it will toggle snowing. 
-function Entity:SetSnow(strength)
+function Entity:SetSnow(strength, speed)
 	if(not strength) then
 		-- toggle rain
 		strength = if_else(self.snowStrength > 0, 0, 3);
@@ -283,6 +286,7 @@ function Entity:SetSnow(strength)
 	if(self.snowStrength > 0) then
 		self.rainStrength = 0;
 	end
+	self.snowSpeed = speed or 1;
 	self:Refresh();
 end
 
@@ -292,6 +296,10 @@ end
 
 function Entity:GetSnowStrength()
 	return self.snowStrength;
+end
+
+function Entity:GetSnowSpeed()
+	return self.snowSpeed;
 end
 
 function Entity:FrameMove(deltaTime)

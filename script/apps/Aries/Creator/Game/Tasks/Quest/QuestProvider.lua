@@ -595,7 +595,7 @@ function QuestProvider.SetStep(stepNum, allStepNum)
     if is_home_work then
         local status = 0
         local progress = {}
-        if stepNum == 10 then
+        if stepNum == 10 or stepNum == allStepNum then
             status = 1
         end
         progress.stepNum = stepNum
@@ -621,7 +621,7 @@ function QuestProvider.SetStep(stepNum, allStepNum)
 
         local status = 0
         local progress = {}
-        if stepNum == 10 then
+        if stepNum == 10 or stepNum == allStepNum then
             status = 1
         end
 

@@ -922,3 +922,21 @@ function Actor:BecomeAgent(entity)
 		MovieManager:AddActorName(entity.name or "");
 	end
 end
+
+-- @param minInterval: default to 50
+-- @param maxInterval: default to 200
+-- @return between 50 to 200 FPS, the closer to main camera, the smaller the interval
+function Actor:GetTickIntervalByCameraDist(minInterval, maxInterval)
+	local eyePos = GameLogic.GetEyePosition()
+	local entity = self:GetEntity();
+	if(entity) then
+		local dist =  math.sqrt(entity:GetDistanceSq(eyePos[1], eyePos[2], eyePos[3]) or 0);
+		-- from [15,70] meters to [minInterval, maxInterval] ms. 
+		if(dist < 15) then
+			return minInterval or 50;
+		else
+			return math.min((minInterval or 50) + (dist-15) * 5, maxInterval or 200)
+		end
+	end
+	return minInterval;
+end

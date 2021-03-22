@@ -1291,7 +1291,7 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 		width = width,
 		minScreenWidth = 1600, --1600  1920
 		minScreenHeight = 900, -- 900 1080
-		macroName = "UICodeBlockWindow",
+		windowName = "UICodeBlockWindow",
 	});
 end
 

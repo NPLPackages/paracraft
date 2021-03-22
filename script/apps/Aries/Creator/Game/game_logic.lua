@@ -1020,6 +1020,13 @@ function GameLogic.GetTickCount()
 	return GameLogic.tickCount or 0;
 end
 
+GameLogic.eye_pos = {0, 0, 0};
+
+-- @return {x, y, z} array
+function GameLogic.GetEyePosition()
+	return GameLogic.eye_pos;
+end
+
 -- called 30 FPS framemove.
 function GameLogic.FrameMove(timer)
 	if(GameLogic.IsPaused()) then
@@ -1036,6 +1043,8 @@ function GameLogic.FrameMove(timer)
 			return
 		end
 	end
+
+	GameLogic.eye_pos = System.Scene.Cameras:GetCurrent():GetEyePosition()
 
 	GameLogic.lastGameTime = GameLogic.gameFRC:GetField("Time", 0);
 	GameLogic.tickCount = (GameLogic.tickCount or 0) + 1;

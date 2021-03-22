@@ -165,6 +165,12 @@ function Macros.AttachWindow(window)
 	return MacroPlayer.AttachWindow(window)
 end
 
+-- show or hide attached window, so that the user can skip or exit. 
+-- one may want to hide in certain conditions like during movie playing. 
+function Macros.ShowWindow(bShow)
+	MacroPlayer.ShowWindow(bShow)
+end
+
 -- show virtual keyboard with button 
 -- @param: "ctrl+DIK_E"
 function Macros.ShowKeyboard(bShow, button)

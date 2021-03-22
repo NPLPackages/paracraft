@@ -50,6 +50,10 @@ HttpWrapper.Create("keepwork.user.following", "%MAIN%/core/v0/users/following", 
 -- 获取用户粉丝
 HttpWrapper.Create("keepwork.user.followers", "%MAIN%/core/v0/users/followers", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/3997
+-- 获取用户同学
+HttpWrapper.Create("keepwork.user.classmates", "%MAIN%/core/v0/users/classmates", "GET", true)
+
 -- 查询
 HttpWrapper.Create("keepwork.user.search", "%MAIN%/core/v0/users/search", "POST", true)
 
@@ -102,5 +106,5 @@ HttpWrapper.Create("keepwork.user.honors", "%MAIN%/core/v0/users/honors","GET",t
 HttpWrapper.Create("keepwork.user.set_class", "%MAIN%/core/v0/users/classes","PUT",true);
 
 -- 获取socketio地址
--- http://yapi.kp-para.cn/project/60/interface/api/3862
-HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/core/v0/app/availableHost","GET",true);
+-- http://yapi.kp-para.cn/project/165/interface/api/3992
+HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/push-manage/v0/app/availableHost","GET",true);

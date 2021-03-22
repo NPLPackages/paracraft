@@ -293,6 +293,11 @@ model id
     <item id="82168" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/710_girl_toufa020.png"></texture></item>
     <item id="82169" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/710_girl_toufa021.png"></texture></item>
     <item id="82170" model="actor;"><geoset category="0" id="10"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/710_girl_toufa022.png"></texture></item>
+    <!--20210318新加活动头饰-->
+    <item id="82171" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/82171_panda_hat.anim.x"></attachment></item>
+    <item id="82172" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
+    <item id="82173" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
+    <item id="82174" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
 
 
 
@@ -461,6 +466,12 @@ model id
     <item id="83156" model="actor;"><geoset category="0" id="18"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_18_qiuxuezheUV.png"></texture></item>
     <item id="83157" model="actor;"><geoset category="0" id="19"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunbing_qiuxue.png"></texture></item>
     <item id="83158" model="actor;"><geoset category="0" id="19"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/hair_14_sunwu.png"></texture></item>
+    <!--20210318新加活动头饰-->
+    <item id="83159" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83159_panda_hat.anim.x"></attachment></item>
+    <item id="83160" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83160_brown_cat_hat.anim.x"></attachment></item>
+    <item id="83161" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83161_yellow_cat_hat.anim.x"></attachment></item>
+    <item id="83162" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83162_blue_cat_hat.anim.x"></attachment></item>
+
 
     
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
@@ -518,6 +529,8 @@ model id
     <item id="84049" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_junshi.png"></texture></item>
     <item id="84050" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_LAlaoyeye.png"></texture></item>
     <item id="84051" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_xianren.png"></texture></item>
+    <!--20210318新加衣服，活动用-->
+    <item id="84052" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_84052.png"></texture></item>
 
     
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
@@ -592,6 +605,9 @@ model id
     <item id="85068" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_buyi.png"></texture></item>
     <item id="85069" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_lieren.png"></texture></item>
     <item id="85070" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_03_04_Avatar_boy_leg_shouwen.png"></texture></item>
+    <!--20210318新加裤子，活动用-->
+    <item id="85071" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_01_02_Avatar_85071.png"></texture></item>
+    <item id="85072" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_01_02_Avatar_85071.png"></texture></item>
 
     
     <!--      86000 86999  背部  attachment id="15"    -->

@@ -176,10 +176,9 @@ end
 function Notice.OnImageBgClick(data)
     --(data,true)
     local name = data.name    
-    if string.find(name, "创造周末") and string.find(name, "创造周末") > 0 then
-        local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWeek.lua")
-        ActWeek.ShowView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement");
+    if string.find(name, "活动课") and string.find(name, "活动课") > 0 then
+        GameLogic.RunCommand(string.format("/loadworld -force -s %d", 49966));
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'AI_act_class' });
         return
     end
     if string.find(name, "冬令营") and string.find(name, "冬令营") > 0 then
@@ -206,7 +205,7 @@ function Notice.OnImageBgClick(data)
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'clothes_sys' });
         return
     end
-    if string.find(name, "新年资源库") and string.find(name, "新年资源库") > 0 then
+    if string.find(name, "资源库") and string.find(name, "资源库") > 0 then
         Notice.CloseView()
         local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
         KeepWorkMallPage.Show();

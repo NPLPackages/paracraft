@@ -85,7 +85,11 @@ function MovieChannel:CreateGetStartMovieClip()
 		local blockEntity = EntityManager.GetBlockEntity(self.startX, self.startY, self.startZ);
 		if(blockEntity and blockEntity.GetMovieClip) then
 			self.clips = {}
-			self.clips[1] = MovieClipRaw:new():Init(blockEntity);
+			local movieClip = MovieClipRaw:new():Init(blockEntity);
+			if(GameLogic.options:IsAutoMovieFPS()) then
+				movieClip:SetAutoFPS(true);
+			end
+			self.clips[1] = movieClip;
 			self.curClipIndex = 1;
 		end
 	end

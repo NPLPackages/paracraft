@@ -1154,6 +1154,54 @@ wait(2)
 setOutput(0)
 ]]}},
 },
+{
+	type = "alert", 
+	message0 = L"弹出提示弹框%1",
+	arg0 = {
+		{
+			name = "alert_text",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "你好", 
+		},		
+	},	
+	message1 = "%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+		},
+	},
+	message2 = "%1",
+	arg2 = {
+		{
+			name = "pos_mode",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "ct", 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	hide_in_toolbox = true,
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "alert",
+	func_description = 'alert("%s",function()\\n    %s\\nend ,"%s")',
+	ToNPL = function(self)
+		return string.format('alert("%s",function()\n    %s\nend ,"%s")\n', self:getFieldAsString('alert_text'),self:getFieldAsString('input'),self:getFieldAsString('pos_mode'));
+	end,
+	examples = {{desc = L"弹框类型如下", canRun = false, code = [[
+--ct:居中显示  ctb:居中靠下显示  ctt：居中靠上显示  ctl：居中靠左显示
+--ctr：居中靠右显示  lb：左下显示  lt：左上显示  rb：右下显示 rt：右上显示
+alert("你好, function()
+end, "ct")
+alert("你好,function()
+end)
+alert("你好)
+]]}},
+},
 
 };
 function CodeBlocklyDef_Control.GetCmds()

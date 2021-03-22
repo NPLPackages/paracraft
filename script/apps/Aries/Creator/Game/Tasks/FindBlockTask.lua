@@ -349,7 +349,7 @@ function FindBlockTask.FilterResult(text)
 		text = string.lower(text);
 		local resultFiltered = {};
 		for i, result in ipairs(FindBlockTask.resultDS) do
-			if(result.attr.lowerText:match(text)) then
+			if(result.attr.lowerText:find(text, 1, true)) then
 				resultFiltered[#resultFiltered+1] = result;
 			end
 		end

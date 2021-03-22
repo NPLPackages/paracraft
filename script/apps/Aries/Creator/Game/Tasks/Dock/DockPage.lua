@@ -23,6 +23,7 @@ local ActWeek = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActWeek/ActWe
 local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
 local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
 local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
+local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -47,6 +48,7 @@ DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
     { label = L"", },
+    --{ label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_ketang_32bits.png#0 0 100 80", },
@@ -155,10 +157,6 @@ function DockPage.InitTopIconData()
     end
     DockPage.top_line_1 = temp_top1
     DockPage.top_line_2 = temp_top2
-
-    -- print("222222222222222222222222222222222222233333333333333")
-    -- echo(temp_top1,true)
-    -- echo(temp_top2,true)
 end
 
 function DockPage.InitButton()
@@ -216,6 +214,8 @@ function DockPage.CloseLastShowPage(id)
                 page = QuestAllCourse.GetPageCtrl()
             elseif v[1] == "notice" then
                 page = Notice.GetPageCtrl()
+            elseif v[1] == "invitefriend"then
+                page = InviteFriend.GetPageCtrl()
             elseif v[1] == "user_tip" then
                 page = QuestPage.GetPageCtrl()
             else
@@ -293,6 +293,9 @@ function DockPage.OnClickTop(id)
     --     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
     elseif (id == 'homework') then
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestWork.lua").Show();
+    elseif (id == 'invitefriend') then        
+        InviteFriend.ShowView()
+        table.insert(DockPage.showPages,{id,InviteFriend.GetPageCtrl()})
     end
 end
 function DockPage.OnClick(id)

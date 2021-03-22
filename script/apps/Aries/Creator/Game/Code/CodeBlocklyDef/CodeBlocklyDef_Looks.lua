@@ -156,15 +156,17 @@ tip("")
 		return string.format('anim(%d)\n', self:getFieldValue('animId'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
-anim(4)
+anim(4) -- walking 
+anim(5) -- running
 move(-2,0,0,1)
-anim(0)
+anim(0, 500) -- standing and wait 500 ms
 ]]},
-{desc = L"常用动作编号", canRun = true, code = [[
--- 0: standing
--- 4: walking 
--- 5: running
--- check movie block for more ids
+{desc = L"定义新动作", canRun = true, code = [[
+-- anim(name, fromTime, toTime, isLooped)
+anim("dance1", 0, 2000, true)
+anim("dance2", 2000, 3000)
+-- play a user defined animation by name
+anim("dance1")
 ]]}
 },
 },
@@ -273,8 +275,8 @@ stop()
 		{
 			name = "boneName",
 			type = "input_value",
-            shadow = { type = "text", value = "Root",},
-			text = "Root", 
+            shadow = { type = "text", value = "*",},
+			text = "*", 
 		},
 		{
 			name = "timeFrom",
@@ -310,6 +312,10 @@ stop()
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 playBone("Neck", 2000)
+-- play all bones, this is fast
+playBone("*", 1000, 2000, true)
+wait(1)
+playBone("*") -- stop it
 -- regular expression supported
 playBone(".*UpperArm", 5000, 7000)
 playBone(".*Forearm", 5000, 7000)

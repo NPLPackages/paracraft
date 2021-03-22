@@ -1814,7 +1814,6 @@ function Entity:IsOnGround()
 end
 
 local motion_fps = 20;
-local inverse_motion_fps = 1/motion_fps;
 
 -- check to see if we should tick. For example, some function may be called with deltaTime in 30fps, 
 -- however, we only want to process at 20FPS, such as physics, we can use this function is easily limit function calling rate. 
