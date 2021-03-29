@@ -151,7 +151,7 @@ function QuestAllCourse.Show(target_world_id)
                             local main = _parent:GetChild(tree_view_control.mainName);
                             main:SetScript("onmousewheel", function()
                                 local page_index = mcmlNode:GetAttribute("pageindex") or 1
-                                local target_page = page_index + mouse_wheel
+                                local target_page = page_index - mouse_wheel
                                 pe_gridview.GotoPage(mcmlNode, "course_list", target_page);
                             end)
                         end

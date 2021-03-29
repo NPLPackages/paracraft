@@ -161,14 +161,22 @@ end
 
 
 -- @param window: attach a mcml v2 window object to it, usually from CodeBlock's window() function
-function Macros.AttachWindow(window)
-	return MacroPlayer.AttachWindow(window)
+function Macros.AttachWindow(window, name, zorder)
+	return MacroPlayer.AttachWindow(window, name, zorder)
+end
+
+function Macros.DetachWindow(name)
+	MacroPlayer.DetachWindow(name)
+end
+
+function Macros.GetWindow(name)
+	return MacroPlayer.GetWindow(name)
 end
 
 -- show or hide attached window, so that the user can skip or exit. 
 -- one may want to hide in certain conditions like during movie playing. 
-function Macros.ShowWindow(bShow)
-	MacroPlayer.ShowWindow(bShow)
+function Macros.ShowWindow(bShow, name)
+	MacroPlayer.ShowWindow(bShow, name)
 end
 
 -- show virtual keyboard with button 

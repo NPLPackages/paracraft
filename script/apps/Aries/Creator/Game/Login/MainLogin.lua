@@ -645,10 +645,14 @@ function MainLogin:PreloadedSocketIOUrl()
 		self:next_step({IsPreloadedSocketIOUrl = true});
         return
 	end
-	local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-	KpChatChannel.PreloadSocketIOUrl(function()
+	if(System.options.cmdline_world) then
 		self:next_step({IsPreloadedSocketIOUrl = true});
-	end);
+	else
+		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+		KpChatChannel.PreloadSocketIOUrl(function()
+			self:next_step({IsPreloadedSocketIOUrl = true});
+		end);
+	end
 end
 function MainLogin:PreloadTextures()
 	if(System.options.servermode) then

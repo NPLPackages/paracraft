@@ -181,13 +181,13 @@ end
 -- add a block at the given index. 
 -- @param index: if nil, it will be added to last block. 
 -- @param category_name: default to "static"
--- @param blockName: usually nil, if provided, we will ensure that there is only one such item in the list. 
+-- @param blockName: This is uid or unique id. usually nil, if provided, we will ensure that there is only one such item in the list. 
 -- @param isWorldOnly: if true, the item will be removed when world is loaded
 -- @return blockDsItem
 function ItemClient.AddBlock(block_id, index, category_name, blockName, isWorldOnly)
 	local item = ItemClient.CreateGetByBlockID(block_id);
 	
-	local blockDSItem = { __index = item, block_id = block_id, isWorldOnly=isWorldOnly};
+	local blockDSItem = { __index = item, block_id = block_id, uid = blockName, isWorldOnly=isWorldOnly};
 	setmetatable(blockDSItem, blockDSItem);
 
 	local ds_blocks = ItemClient.GetBlockDS(category_name);

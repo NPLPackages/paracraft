@@ -717,11 +717,23 @@ function Macros:Stop()
 		self:UnlockInput();
 
 		local player = EntityManager.GetPlayer();
+		local lookX, lookY, lookZ = ParaCamera.GetLookAtPos()
+
 		player:SetFocus();
 		local obj = player:GetInnerObject();
 		if(obj) then
 			if(obj.ToCharacter) then
 				obj:ToCharacter():SetFocus();
+
+				if(not GameLogic.IsReadOnly()) then
+					-- tricky restore player position according to previous camera lookat position. 
+					commonlib.TimerManager.SetTimeout(function()  
+						local lookX1, lookY1, lookZ1 = ParaCamera.GetLookAtPos()
+						local x, y, z = obj:GetPosition()
+						local lookatHeight = lookY1 - y;
+						player:SetPosition(lookX, lookY-lookatHeight, lookZ)
+					end, 1)
+				end
 			end
 		end
 

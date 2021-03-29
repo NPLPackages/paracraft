@@ -72,6 +72,12 @@ function MacroPlayer.OnPageClosed()
 		MacroPlayer.attachedWnd:CloseWindow();
 		MacroPlayer.attachedWnd = nil;
 	end
+	if(MacroPlayer.attachedWindows) then
+		for name, wnd in pairs(MacroPlayer.attachedWindows) do
+			wnd:CloseWindow();
+		end
+		MacroPlayer.attachedWindows = nil;
+	end
 	if(page) then
 		if(page.keyboardWnd) then
 			page.keyboardWnd:Show(false);
@@ -333,12 +339,14 @@ function MacroPlayer.ShowKeyboard(bShow, button)
 	if(page) then
 		local parent = MacroPlayer.GetRootUIObject()
 
-		if(not page.keyboardWnd) then
+		if(not page.keyboardWnd and bShow) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/VirtualKeyboard.lua");
 			local VirtualKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.VirtualKeyboard");
 			page.keyboardWnd = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 400, 1024);
 		end
-		page.keyboardWnd:Show(bShow);
+		if(page.keyboardWnd) then
+			page.keyboardWnd:Show(bShow);
+		end
 		
 		if(bShow and button and button~="") then
 			count = page.keyboardWnd:ShowButtons(button)
@@ -952,15 +960,23 @@ function MacroPlayer.SetMouseWheelTrigger(mouseWheelDelta, mouseX, mouseY, callb
 end
 
 -- @param window: attach a mcml v2 window object to it, usually from CodeBlock's window() function
-function MacroPlayer.AttachWindow(window)
+-- @param name: this can be nil. if not there can only be one named window at a time. 
+-- @param zorder: default to 1000, relative to macro player parent
+function MacroPlayer.AttachWindow(window, name, zorder)
 	if(window) then
 		MacroPlayer.ShowController(false);
 		local parent = MacroPlayer.GetRootUIObject()
 		if(parent) then
 			local win = window:GetNativeWindow()
 			if(win) then
-				MacroPlayer.attachedWnd = window;
-				win.zorder = 1000;
+				if(not name) then
+					MacroPlayer.attachedWnd = window;
+				else
+					MacroPlayer.attachedWindows = MacroPlayer.attachedWindows or {}
+					MacroPlayer.attachedWindows[name] = window
+				end
+				zorder = zorder or 1000
+				win.zorder = zorder;
 				parent:AddChild(win)
 				return true
 			end
@@ -969,13 +985,46 @@ function MacroPlayer.AttachWindow(window)
 	return false
 end
 
-function MacroPlayer.ShowWindow(bShow)
-	if(page) then
+function MacroPlayer.DetachWindow(name)
+	if(not name) then
 		if(MacroPlayer.attachedWnd) then
-			if(bShow) then
-				MacroPlayer.attachedWnd:show()
-			else
-				MacroPlayer.attachedWnd:hide()
+			MacroPlayer.attachedWnd:CloseWindow();
+			MacroPlayer.attachedWnd = nil;
+		end
+	else
+		if(MacroPlayer.attachedWindows and MacroPlayer.attachedWindows[name]) then
+			MacroPlayer.attachedWindows[name]:CloseWindow();
+			MacroPlayer.attachedWindows[name] = nil
+		end
+	end
+end
+
+function MacroPlayer.GetWindow(name)
+	if(not name) then
+		return MacroPlayer.attachedWnd
+	else
+		return MacroPlayer.attachedWindows and MacroPlayer.attachedWindows[name]
+	end
+end
+
+function MacroPlayer.ShowWindow(bShow, name)
+	if(page) then
+		if(not name) then
+			if(MacroPlayer.attachedWnd) then
+				if(bShow) then
+					MacroPlayer.attachedWnd:show()
+				else
+					MacroPlayer.attachedWnd:hide()
+				end
+			end
+		else
+			local wnd = MacroPlayer.attachedWindows and MacroPlayer.attachedWindows[name]
+			if(wnd) then
+				if(bShow) then
+					wnd:show()
+				else
+					wnd:hide()
+				end
 			end
 		end
 	end

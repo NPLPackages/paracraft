@@ -47,8 +47,7 @@ DockPage.top_line_1 = {
 DockPage.top_line_2 = {
     { label = L"", },
     { label = L"", },
-    { label = L"", },
-    --{ label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
+    { label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_ketang_32bits.png#0 0 100 80", },
@@ -637,10 +636,15 @@ function DockPage.HasMsgCenterUnReadMsg()
     return DockPage.GetMsgCenterUnReadNum() > 0
 end
 
-function DockPage.HandMsgCenterMsgData(is_need_repeat)
+function DockPage.HandMsgCenterMsgData(msgType)
     if not DockPage.is_show then
         return
-    end  
+    end 
+    
+    if msgType == "emailMsg" then
+
+        return 
+    end
 
     keepwork.msgcenter.unReadCount({
     },function(err, msg, data)

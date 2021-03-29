@@ -213,6 +213,13 @@ local function _isMatch(blockIndex, blockX, blockY, blockZ)
 	return true;
 end
 
+local dir_side_to_data = {
+ [0] = {[0] = -24, [1] = -24, [2] = 3, [3] = 0, [4] = -22, [5] = -24},
+ [1] = {[0] = -23, [1] = -23, [2] = 2, [3] = 1, [4] = -22, [5] = -23},
+ [2] = {[0] = 3, [1] = 2, [2] = -18, [3] = -18, [4] = -19, [5] = -18},
+ [3] = {[0] = 0, [1] = 1, [2] = -17, [3] = -17, [4] = -20, [5] = -17},
+};
+
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
 	local data = nil;
 	for i = 0, 23 do
@@ -221,6 +228,12 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 			break;
 		end
 	end
+
+	if (not data and side < 4) then
+		local dir = Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+		data = 24 + dir_side_to_data[side][dir];
+	end
+
 	if not data then
 		NPL.load("(gl)script/ide/math/math3d.lua");
 		local math3d = commonlib.gettable("mathlib.math3d");

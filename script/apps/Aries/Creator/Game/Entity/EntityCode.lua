@@ -198,7 +198,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
-	node.attr.isUseNplBlockly = self:IsUseNplBlockly();
+	if(self:IsUseNplBlockly()) then
+		node.attr.isUseNplBlockly = true;
+	end
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
 	end

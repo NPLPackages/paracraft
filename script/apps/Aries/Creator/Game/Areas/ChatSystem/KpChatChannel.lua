@@ -64,13 +64,16 @@ function KpChatChannel.PreloadSocketIOUrl(callback)
 		end
 		LOG.std(nil, "info", "Before KpChatChannel.PreloadSocketIOUrl");
 		keepwork.app.availableHost({},function(err, msg, data)
-			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl err code", err);
-			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl msg", msg);
-			LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl data", data);
+			
 			if(err == 200 and data)then
+				LOG.std(nil, "info", "KpChatChannel.PreloadSocketIOUrl succeed");
 				KpChatChannel.preload_socketio_url = data;
 				do_callback();
 				return
+			else
+				LOG.std(nil, "warn", "KpChatChannel.PreloadSocketIOUrl err code", err);
+				LOG.std(nil, "warn", "KpChatChannel.PreloadSocketIOUrl msg", msg);
+				LOG.std(nil, "warn", "KpChatChannel.PreloadSocketIOUrl data", data);
 			end
 			do_callback();
 			
