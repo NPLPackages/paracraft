@@ -79,6 +79,11 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 	OpenFileDialog.ShowPage(title, function(result)
 		if(result) then
 			local cmd_text = result;
+			if(result ~= commonlib.Encoding.DefaultToUtf8(result)) then
+				_guihelper.MessageBox(L"文件名必须是英文字母与数字的组合");
+				return 
+			end
+
 			local filename, start_time;
 
 			filename, start_time = cmd_text:match("^(.+)[%s:]+([%d%.]+)%s*$");
@@ -90,8 +95,11 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			
+			
+
 			if(filename~="" and not Files.GetWorldFilePath(filename) and not ParaIO.DoesFileExist(filename, true)) then
-				_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
+				_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", commonlib.Encoding.DefaultToUtf8(filename)));
 			else
 				local value = {filename, start_time};
 				self:AddKeyFrameByName(keyname, nil, value);

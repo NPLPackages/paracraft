@@ -46,7 +46,8 @@ float2 screenParam;
 float centerDepthSmooth = 15.f;
 // between [0,1]
 float rainStrength = 0.f;
-float EyeBrightness = 0.5;
+float EyeBrightness = 0.2f;
+float EyeContrast = 0.5f;
 float ViewAspect;
 float TanHalfFOV;
 float cameraFarPlane;
@@ -937,11 +938,21 @@ void AddRainFogScatter(float2 texcoord, inout float3 color, in BloomDataStruct b
 
 float3 TonemapReinhard_Good(float3 color)
 {
-	const float averageLuminance = 0.00003f;
-	const float contrast = 0.9f;
-	float3 value = pow(color.rgb, contrast);
-	value = value / (value + EyeBrightness.xxx);
-	color.rgb = value;
+	const float gamma = 2.2f;
+
+	float3 value = pow(color.rgb, EyeContrast.x * 2);
+
+	// exposure tone mapping
+	// mapping brightness region 0-1 to exposure region 0-10
+	float exposure = EyeBrightness.x * 10;
+	value = 1.0f - exp(-value * exposure);
+
+	// reinhard tone mapping
+	//value = value / (value + 1.0f);
+
+	// gamma correction
+	color.rgb = pow(value, (1.0f / gamma));
+
 	return color;
 }
 
@@ -975,15 +986,13 @@ float4 FinalPS(VSOutput input) :COLOR
 		color.xyz = lerp(color.xyz, pow(g_FogColor.xyz, 2.2f), 1.0 - clamp((FogEnd - eyeDist) / (FogEnd - FogStart), 0.0, 1.0));
 
 	// vignette effect: darken edges
-	Vignette(color, texCoord);
+	//Vignette(color, texCoord);
 
 #ifdef SHOW_DEBUG_VIEW
 	color = lerp(lerp(bloomData.bloom.rgb, color, float(texCoord.y<0.5)), lerp(tex2D(compositeSampler, texCoord).rgb, tex2D(colorSampler, texCoord).rgb, float(texCoord.y<0.5)), float(texCoord.x<0.5)); // DEBUG: show bloom texture and result
 #endif
 
 	color = TonemapReinhard_Good(color);
-	//Put color back into gamma space for correct display
-	color.rgb = pow(color.rgb, (1.0f / 2.2f));
 
 	return float4(color, 1.0f);
 }

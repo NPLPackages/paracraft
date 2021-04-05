@@ -256,25 +256,38 @@ function CodeBlockWindow:OnCodeChange()
 	end
 end
 
-function CodeBlockWindow.RestoreCursorPosition()
-	if(self.entity and self.entity.cursorPos) then
-		commonlib.TimerManager.SetTimeout(function()  
-			local ctrl = CodeBlockWindow.GetTextControl();
-			if(ctrl) then
-				if(self.entity and self.entity.cursorPos) then
-					local cursorPos = self.entity.cursorPos;
-					ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
-					ctrl:setFocus("OtherFocusReason")
-					local window = ctrl:GetWindow()
-					if(window) then
+function CodeBlockWindow.RestoreCursorPositionImp()
+	commonlib.TimerManager.SetTimeout(function()  
+		local ctrl = CodeBlockWindow.GetTextControl();
+		if(ctrl) then
+			--[[
+			-- uncomment this to auto set focus to the window
+			commonlib.TimerManager.SetTimeout(function()  
+				local window = ctrl:GetWindow()
+				if(window) then
+					if(not GameLogic.Macros:IsPlaying()) then
+						window:SetFocus_sys()
+						window:handleActivateEvent(true);
+					else
 						window.isEmulatedFocus = true;
 						window:handleActivateEvent(true);
 						window.isEmulatedFocus = nil;
 					end
 				end
+				ctrl:setFocus("OtherFocusReason")
+			end, 200);
+			]]
+			if(self.entity and self.entity.cursorPos) then
+				local cursorPos = self.entity.cursorPos;
+				ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
+				ctrl:SetFromLine(cursorPos.fromLine or 0)
 			end
-		end, 200);
-	end
+		end
+	end, 10);
+end
+
+function CodeBlockWindow.RestoreCursorPosition()
+	CodeBlockWindow.RequestRestoreCursor = true;
 end
 
 function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
@@ -450,6 +463,7 @@ function CodeBlockWindow.UpdateCodeToEntity()
 			local ctl = CodeBlockWindow.GetTextControl();
 			if(ctl) then
 				entity.cursorPos = ctl:CursorPos();
+				entity.cursorPos.fromLine = ctl:GetFromLine()
 			end
 		end
 	end
@@ -978,6 +992,10 @@ function CodeBlockWindow.UpdateEditModeUI()
 		textCtrl:Connect("keyPressed", CodeIntelliSense, CodeIntelliSense.OnUserKeyPress, "UniqueConnection");
 		
 		CodeIntelliSense.Close()
+		if(CodeBlockWindow.RequestRestoreCursor) then
+			CodeBlockWindow.RequestRestoreCursor = false;
+			CodeBlockWindow.RestoreCursorPositionImp()
+		end
 	end
 end
 

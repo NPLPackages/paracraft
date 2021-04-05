@@ -5,7 +5,12 @@
 <script type="text/npl" src="script/ide/MessageBox.lua" refresh="false"><![CDATA[
 function ClosePage()
     -- _guihelper.CloseMessageBox();
-    _guihelper.OnMessageBoxClick("Cancel");
+    if _guihelper.values and _guihelper.values.options and _guihelper.values.options.closeNoCancel then
+        _guihelper.CloseMessageBox()
+    else
+        _guihelper.OnMessageBoxClick("Cancel");
+    end
+    
 end
 ]]></script>
 <kp:window  mode="lite" width="630" height="250" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_tishi_32bits.png" title='<%= (_guihelper.values.options.title) %>' uiname_onclose="DefaultMessageBox.ClosePage" onclose="ClosePage">

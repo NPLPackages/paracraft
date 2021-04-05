@@ -63,3 +63,7 @@ HttpWrapper.Create("keepwork.quest_complete_course.get", "%MAIN%/core/v0/ai/user
 -- http://yapi.kp-para.cn/project/32/interface/api/3907
 -- 查询ai作业
 HttpWrapper.Create("keepwork.quest_complete_homework.get", "%MAIN%/core/v0/ai/userAiHomework", "GET", true)
+
+-- http://yapi.kp-para.cn/project/32/interface/api/1417
+-- 查询权限
+HttpWrapper.Create("keepwork.permissions.check", "%MAIN%/core/v0/permissions/check", "GET", true)

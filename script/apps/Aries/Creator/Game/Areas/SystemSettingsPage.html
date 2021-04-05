@@ -30,7 +30,10 @@ end
 
 function OnChangeTabview(index)
     SystemSettingsPage.category_ds_index = tonumber(index);
-    Page:Refresh(0.01);
+    Page:Refresh(0);
+    if (SystemSettingsPage.category_ds_index == 2) then
+        Page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+    end
 end
 
 function GetDS(index)
@@ -246,6 +249,16 @@ end
                             <input name='btn_SoundVolume' value="" type="button" onclick='SystemSettingsPage.OnClickChangeSoundVolume' style="width:100px;height:20px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
                         </div>
                     </div>
+                    <div style="height:25px;margin-top:10px;">
+                        <div style="float:left;margin-left:-8px;width:30px;height:20px;font-size:12px;"><%=L"设备" %></div>
+                        <div style="float:left;margin-top:-1px;margin-left:0px;">
+                            <select name="AudioDevice" style="width:240px;height:23px" DataSource="<%=SystemSettingsPage.GetAudioDevices()%>" onselect="SystemSettingsPage.OnSelectAudioDevice">
+                            </select>
+                        </div>
+                        <div style="float:left;margin-top:0px;margin-left:6px;">
+                            <input name="btn_ResetDevice" value="重置" type="button" onclick="SystemSettingsPage.OnClickResetAudioDevice" style="width:40px;height:22px;font-size:12px;" class="mc_light_grey_button_with_fillet" />
+                        </div>
+                   </div>
                 </pe:if>
                 <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
                     <div style="height:25px;margin-top:4px;">

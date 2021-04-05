@@ -18,7 +18,8 @@ FancyV1:Property({"name", "Fancy",});
 FancyV1:Property({"BloomEffect", false, "HasBloomEffect", "EnableBloomEffect", auto=true});
 FancyV1:Property({"DepthOfViewEffect", false, "HasDepthOfViewEffect", "EnableDepthOfViewEffect", auto=true});
 FancyV1:Property({"DepthOfViewFactor", 0.01, "GetDepthOfViewFactor", "SetDepthOfViewFactor", auto=true});
-FancyV1:Property({"EyeBrightness", 0.5, auto=true, desc="(0-1), used for HDR tone mapping"});
+FancyV1:Property({"EyeBrightness", 0.2, auto=true, desc="(0-1), used for HDR tone mapping"});
+FancyV1:Property({"EyeContrast", 0.5, auto=true, desc="(0-1), used for HDR tone mapping"});
 FancyV1:Property({"BloomScale", 1.1, "GetBloomScale", "SetBloomScale", auto=true});
 FancyV1:Property({"BloomCount", 2, "GetBloomCount", "SetBloomCount", auto=true});
 FancyV1:Property({"AOFactor", 0.8, "GetAOFactor", "SetAOFactor", auto=true});
@@ -301,6 +302,7 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetFloat("FogEnd", GameLogic.options:GetFogEnd());
 		params:SetFloat("CloudThickness", GameLogic.options:GetCloudThickness());
 		params:SetFloat("EyeBrightness", self:GetEyeBrightness());
+		params:SetFloat("EyeContrast", self:GetEyeContrast());
 		
 		local effectLevel = 0;
 		local UseSunlightShadowMap = attr:GetField("HasSunlightShadowMap", false)

@@ -192,6 +192,7 @@ end
 
 local ignoreBtnList = {
 	["MacroRecorder.Stop"] = true,
+	["MacroRecorder.AddSubTitle"] = true,
 	["_click_to_continue_delay_"] = true,
 	["_g_GlobalDragCanvas"] = true,
 }
@@ -397,9 +398,17 @@ local cameraViewMacros = {
 	["ButtonClick"] = true,
 }
 
+function Macros:ClearIdleTime()
+	idleStartTime = commonlib.TimerManager.GetCurrentTime();
+	self:SetPauseTime(0);
+end
+
 -- @param text: macro command text or just macro function name
 -- @param ...: additional input parameters to macro function name
 function Macros:AddMacro(text, ...)
+	if (self:IsPause()) then 
+		return 
+	end 
 	local args = {...}
 	if(#args > 0) then
 		local params;
@@ -576,6 +585,9 @@ function Macros:PrepareInitialBuildState()
     GameLogic.RunCommand("/clearbag");
     GameLogic.RunCommand("/camerayaw 3.14");
 	GameLogic.RunCommand("/hide info");
+	GameLogic.RunCommand("/fps 0");
+	GameLogic.options:SetFieldOfView()
+	
     local player = GameLogic.EntityManager.GetPlayer()
     player:ToggleFly(false)
     lastPlayerX, lastPlayerY, lastPlayerZ = player:GetBlockPos();
@@ -640,6 +652,18 @@ end
 function Macros:PeekNextMacro(nOffset)
 	if(self.macros and self.curLine) then
 		return self.macros[self.curLine + (nOffset or 1)];
+	end
+end
+
+function Macros:GetLastMacro(nOffset)
+	if(self.macros) then
+		return self.macros[#(self.macros) + (nOffset or 0)];
+	end
+end
+
+function Macros:PopMacro()
+	if(self.macros) then
+		self.macros[#(self.macros)] = nil;
 	end
 end
 

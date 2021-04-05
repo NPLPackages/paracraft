@@ -244,7 +244,6 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	if (myHomeWorldName == currentWorldName and WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		local function uploadMiniWorld(projectId)
 			keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
-				commonlib.echo(data);
 				if (data and type(data) == "table") then
 					for i = 1, #data do
 						local world = data[i];

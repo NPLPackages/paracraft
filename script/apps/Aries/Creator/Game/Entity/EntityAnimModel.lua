@@ -148,7 +148,7 @@ end
 function Entity:SaveModelAs()
 	local filename = self:GetFilename();
 	local result = Files.ResolveFilePath(filename)
-	local old_value = commonlib.Encoding.DefaultToUtf8(result.relativeToWorldPath or filename);
+	local old_value = result.relativeToWorldPath or filename;
 
 	self:TakeCurrentModel();
 
@@ -156,7 +156,6 @@ function Entity:SaveModelAs()
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 	OpenFileDialog.ShowPage(L"输入新的文件名", function(result)
 		if(result and result~="") then
-			result = commonlib.Encoding.Utf8ToDefault(result);
 			if(result~=old_value) then
 				local filename = result;
 				if(self:IsXFile() and not filename:match("%.x$")) then

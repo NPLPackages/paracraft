@@ -570,8 +570,16 @@ function MacroPlayer.OnClickCursor()
 			GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标", 5000, "255 0 0");
 			Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标")
 		elseif(reason == "mouseButtonWrong") then
-			GameLogic.AddBBS("Macro", L"请点击正确的鼠标按键", 5000, "255 0 0");
-			Macros.voice("请点击正确的鼠标按键")
+			if(MacroPlayer.expectedButton:match("left")) then
+				GameLogic.AddBBS("Macro", L"请点击鼠标左键, 不是右键", 5000, "255 0 0");
+				Macros.voice("请点击正确的鼠标按键")
+			elseif(MacroPlayer.expectedButton:match("right")) then
+				GameLogic.AddBBS("Macro", L"请点击鼠标右键, 不是左键", 5000, "255 0 0");
+				Macros.voice("请点击正确的鼠标按键")
+			else
+				GameLogic.AddBBS("Macro", L"请点击正确的鼠标按键", 5000, "255 0 0");
+				Macros.voice("请点击正确的鼠标按键")
+			end
 		end
 	end
 end

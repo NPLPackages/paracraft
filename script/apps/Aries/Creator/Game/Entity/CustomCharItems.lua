@@ -263,7 +263,7 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		end
 		for tex in textures:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
-				if (item.data.texture == tex and checkItem(item, geosets)) then
+				if (item.data.texture == tex and checkItem(item, geosets) and item.data.id) then
 					idString = idString..item.data.id..";";
 					break;
 				end
@@ -274,7 +274,7 @@ function CustomCharItems:SkinStringToItemIds(skin)
 	if (attachments) then
 		for att in attachments:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
-				if (item.data.attachment == att) then
+				if (item.data.attachment == att and item.data.id) then
 					local id, filename = string.match(item.data.attachment, "(%d+):(.*)");
 					id = tonumber(id);
 					if (not use_hair or id ~= 11) then

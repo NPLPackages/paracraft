@@ -24,7 +24,7 @@ local ParacraftLearningRoomDailyPage = NPL.export()
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 141;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 164;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -168,6 +168,29 @@ Paracraft由多少行代码构成的
 打字练习6
 跟随我
 示教系统（上）
+示教系统（下）
+人工智能冬令营
+隐形方块
+text命令
+多人联网ggs命令
+ggs同步消息
+关卡与事件
+人物头顶文字
+ask提问
+loadworld命令
+sky命令
+time命令
+可换装人物
+say头顶说话
+设置角色的感知半径
+用感知半径配合电影播放
+anim函数
+hide隐藏角色
+宏示教舞台（上）
+宏示教舞台（下）
+自定义物品AgentItem（上）
+自定义物品AgentItem（中）
+自定义物品AgentItem（下）
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

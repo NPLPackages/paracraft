@@ -98,7 +98,7 @@ local page;
 function SystemSettingsPage.OnInit()
 	SystemSettingsPage.category_ds = {
 		{text=L"视频", name="show"},
-		{text=L"游戏", name="gameparma"},
+		{text=L"声音", name="audioparam"},
 		{text=L"控制", name="operation"},
 		{text=L"其他", name="others"},
 		--{text=L"世界", name="world"},
@@ -810,6 +810,35 @@ function SystemSettingsPage.OnClickEnableSound()
 	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
 end
 
+function SystemSettingsPage.OnClickResetAudioDevice()
+	AudioEngine.ResetAudioDevice();
+	SystemSettingsPage.currentAudioDevice = nil;
+	page:Refresh(0);
+	page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+end
+
+function SystemSettingsPage.GetAudioDevices()
+	local deviceList = {};
+	local devices = ParaEngine.GetAttributeObject():GetField("AudioDeviceName", "");
+	if (devices and devices ~= "") then
+		local names = commonlib.split(devices, ";");
+		for i = 1, #names do
+			deviceList[#deviceList + 1] = {text = commonlib.Encoding.DefaultToUtf8(names[i]), value = names[i]};
+		end
+	end
+	if (not SystemSettingsPage.currentAudioDevice and #deviceList > 0) then
+		SystemSettingsPage.currentAudioDevice = deviceList[1].value;
+	end
+	return deviceList;
+end
+
+function SystemSettingsPage.OnSelectAudioDevice(name, value)
+	if (value ~= SystemSettingsPage.currentAudioDevice) then
+		AudioEngine.ResetAudioDevice(value);
+		SystemSettingsPage.currentAudioDevice = value;
+	end
+end
+
 function SystemSettingsPage.OnClickEnableShader()
 	local cur_state = SystemSettingsPage.setting_ds["enable_deferred_shading"];
 	local next_state = not cur_state;
@@ -1205,6 +1234,7 @@ function SystemSettingsPage.ShowPage()
 	--CreatorDesktop.params.bShow = bShow;
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	--SystemSettingsPage.InitPageParams()
+	page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
 end
 
 function SystemSettingsPage.OnCancel()

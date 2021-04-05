@@ -49,7 +49,7 @@ end
             <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
             <input uiname="CodeBlockWindow.code" name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' 
                 ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
-                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:18" fontsize="14"/>
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
     </pe:container>
     <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
         <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>

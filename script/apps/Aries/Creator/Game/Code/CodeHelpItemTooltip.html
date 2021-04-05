@@ -117,10 +117,10 @@
             </div>
         </pe:if><br />
         <div style="background-color:#cec8a8">
-            <textarea name="code" rows='<%=GetNPLCodeLineCount() or 1%>' AlwaysShowCurLineBackground="false" language="npl" value='<%=GetNPLCode()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:16;padding-top:2px;padding-bottom:2px;" fontsize="12" />
+            <textarea name="code" rows='<%=GetNPLCodeLineCount() or 1%>' AlwaysShowCurLineBackground="false" language="npl" value='<%=GetNPLCode()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:17;padding-top:2px;padding-bottom:2px;font-family:Consolas" fontsize="13" />
         </div>
         <div style="background-color:#dddede">
-            <input name="exampleCode" rows="20" AlwaysShowCurLineBackground="false" language="npl" height="100%" value='<%=GetExamples()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:16;" fontsize="12"/>
+            <input name="exampleCode" rows="20" AlwaysShowCurLineBackground="false" language="npl" height="100%" value='<%=GetExamples()%>' UseSystemControl="true" CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
         </div>
     </pe:if>
     <pe:if condition="<%=IsShortTip()%>">

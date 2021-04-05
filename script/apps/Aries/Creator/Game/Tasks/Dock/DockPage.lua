@@ -24,6 +24,7 @@ local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip
 local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
 local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
+local EmailManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailManager.lua");
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -41,7 +42,7 @@ DockPage.top_line_1 = {
     { label = L"", },    
     { label = L"实名礼包", id = "present", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_libao_32bits.png#0 0 100 80", }, 
     { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_renwu1_32bits.png#0 0 100 80", },    
-    { label = L"消息中心", id = "msg_center", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_xiaoxi_32bits.png#0 0 100 80", }, 
+    { label = L"消息中心", id = "msg_center", enabled = true, bg="Texture/Aries/Creator/keepwork/Email/btn3_xiaoxi_32bits.png#0 0 100 80", }, 
     { label = L"活动公告", id = "notice", enabled = true, bg ="Texture/Aries/Creator/keepwork/dock/btn3_gonggao_32bits.png#0 0 100 80"},    
 }
 DockPage.top_line_2 = {
@@ -256,9 +257,11 @@ function DockPage.OnClickTop(id)
         DockPage.isShowTaskIconEffect = false
         DockPage.RefreshPage(0.01)
     elseif(id == "msg_center")then
-        local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
-        MsgCenter.Show();
-        table.insert(DockPage.showPages,{id,MsgCenter.GetPageCtrl()})
+        -- local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
+        -- MsgCenter.Show();
+        local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
+        Email.Show();
+        table.insert(DockPage.showPages,{id,Email.GetPageCtrl()})
     elseif(id == "notice")then
         if Notice then
             Notice.Show(1); 
@@ -633,19 +636,15 @@ function DockPage.ChangeFriendRedTipState(state)
 end
 
 function DockPage.HasMsgCenterUnReadMsg()
-    return DockPage.GetMsgCenterUnReadNum() > 0
+    return DockPage.GetMsgCenterUnReadNum() > 0 or EmailManager.IsHaveNew()
 end
 
-function DockPage.HandMsgCenterMsgData(msgType)
+function DockPage.HandMsgCenterMsgData()
     if not DockPage.is_show then
         return
     end 
     
-    if msgType == "emailMsg" then
-
-        return 
-    end
-
+    EmailManager.Init(true) --获取邮件
     keepwork.msgcenter.unReadCount({
     },function(err, msg, data)
         if err == 200 then
@@ -659,13 +658,6 @@ function DockPage.HandMsgCenterMsgData(msgType)
             end 
         end
     end)
-
-    -- if is_need_repeat then
-    --     commonlib.TimerManager.SetTimeout(function()          
-    --         DockPage.HandMsgCenterMsgData(true)
-    --     end, 60000)
-    -- end
-
 end
 
 function DockPage.SetMsgCenterUnReadNum(num)

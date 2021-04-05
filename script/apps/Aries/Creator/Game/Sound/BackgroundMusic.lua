@@ -74,6 +74,7 @@ function BackgroundMusic:GetMusic(filename)
 		audio_src = AudioEngine.CreateGet(filename);
 		audio_src.loop = true;
 		audio_src.file = filename;
+		audio_src.isBackgroundMusic = true;
 	end
 	
 	return audio_src;
@@ -138,6 +139,7 @@ function BackgroundMusic:PlayOnChannel(name, audio_src)
 				channels[name]:stop();
 			end
 			channels[name] = audio_src;
+			audio_src.channel = name;
 			audio_src:play2d();
 			return true;
 		end

@@ -32,7 +32,8 @@ Macros.broadcast = Macros.Broadcast
 -- @param text: show big one line text at the bottom, if nil, it will remove the tip. 
 -- @param duration: milli seconds. if nil, it is forever
 -- @param position: nil default to "bottom", can also be "center", "top"
-function Macros.Text(text, duration, position)
+-- @param voiceType: voice type, default to play a kid's voice
+function Macros.Text(text, duration, position, voiceType)
 	MacroPlayer.ShowText(text, duration, position)
 end
 Macros.text = Macros.Text;

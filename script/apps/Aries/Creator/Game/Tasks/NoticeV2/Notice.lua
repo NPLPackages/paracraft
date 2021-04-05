@@ -82,8 +82,8 @@ function Notice.GetPageData(data)
     for i = Notice.nSelectIndex,Notice.nSelectIndex + 3 do 
         Notice.rendData[i] = Notice.tblNoticeDt[i]
     end
-    --commonlib.echo(Notice.tblNoticeDt,true)
-    --commonlib.echo(data,true)
+    -- commonlib.echo(Notice.tblNoticeDt,true)
+    -- commonlib.echo(data,true)
 end
 
 function Notice.Show(nType)
@@ -176,33 +176,24 @@ end
 function Notice.OnImageBgClick(data)
     --(data,true)
     local name = data.name    
-    if string.find(name, "活动课") and string.find(name, "活动课") > 0 then
-        GameLogic.RunCommand(string.format("/loadworld -force -s %d", 49966));
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'AI_act_class' });
-        return
-    end
-    if string.find(name, "冬令营") and string.find(name, "冬令营") > 0 then
+    if string.find(name, "邀请好友") and string.find(name, "邀请好友") > 0 then
         Notice.CloseView()
-        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-        local world_id = WorldCommon.GetWorldTag("kpProjectId");  
-        local campId = campIds[httpwrapper_version]
-        if tonumber(world_id) ~= campId then
-            GameLogic.RunCommand(string.format("/loadworld -force -s %d", campId));
-            GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'go_to_camp' });
-        end        
+        local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
+        InviteFriend.ShowView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'invite_friend' });
         return
     end
+    
     if string.find(name, "人工智能") and string.find(name, "人工智能") > 0 then
         Notice.CloseView()
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board2', fromName = 'AI_class' });
         return
     end
-    if string.find(name, "换装系统") and string.find(name, "换装系统") > 0 then
+    if string.find(name, "探索界面") and string.find(name, "探索界面") > 0 then
         Notice.CloseView()
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'clothes_sys' });
+        GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'explore' });
         return
     end
     if string.find(name, "资源库") and string.find(name, "资源库") > 0 then
@@ -212,24 +203,15 @@ function Notice.OnImageBgClick(data)
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board4', fromName = 'sf_res' });
         return
     end
-    if string.find(name, "实名认证奖励") and string.find(name, "实名认证奖励") > 0 then
+
+    if string.find(name, "换装系统") and string.find(name, "换装系统") > 0 then
         Notice.CloseView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'realname' });
-        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-            GameLogic.GetFilters():apply_filters(
-                'show_certificate',
-                function(result)
-                    if (result) then
-                        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
-                        DockPage.RefreshPage(0.01)
-                        GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
-                    end
-                end)
-        else
-           _guihelper.MessageBox("您已经完成了实名认证~") 
-        end
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'clothes_sys' });
         return
     end
+    
 
     local url = data.url;
     if(url and #url ~= 0 and Notice.IsValidUrl(url)) then 

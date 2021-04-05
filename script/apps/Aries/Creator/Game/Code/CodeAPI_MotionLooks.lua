@@ -42,6 +42,7 @@ function env_imp:say(text, duration)
 		else
 			GameLogic.AddBBS("codeblock", text, 10000);
 		end
+		env_imp.checkyield(self, 20);
 	end
 end
 
@@ -181,8 +182,13 @@ function env_imp:move(dx,dy,dz, duration)
 end
 
 -- same as moveTo, except that we use real coordinate in block unit
-function env_imp:setPos(x, y, z)
-	local actor = self.actor;
+function env_imp:setPos(x, y, z, objName)
+	local actor
+	if(not objName) then
+		actor = self.actor;
+	else
+		actor = GameLogic.GetCodeGlobal():GetActorByName(objName);
+	end
 	if(actor) then
 		x,y,z = BlockEngine:real_min(x, y, z);
 		actor:SetPosition(x, y, z);
@@ -565,13 +571,13 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 			end
 		end
 	end
+	env_imp.checkyield(self, 10);
 end
 
 
 -- same as play(), but looping
 function env_imp:playLoop(timeFrom, timeTo)
 	env_imp.play(self, timeFrom, timeTo, true);
-	env_imp.checkyield(self);
 end
 
 
@@ -668,6 +674,7 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 			end
 		end
 	end
+	env_imp.checkyield(self, 10);
 end
 
 -- create or get timer for play back. 
@@ -936,7 +943,7 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 		end);
 		channel:Connect("finished", callbackFunc);
 
-		env_imp.yield(self);
+		env_imp.yield(self, 10);
 	end
 end
 

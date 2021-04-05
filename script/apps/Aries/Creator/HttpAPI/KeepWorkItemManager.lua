@@ -136,6 +136,8 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
         local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
         QuestProvider:OnInit();
+
+		GameLogic.ResetABPath();
     end)            
     return res;
 end

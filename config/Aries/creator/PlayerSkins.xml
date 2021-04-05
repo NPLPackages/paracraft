@@ -123,6 +123,21 @@
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_si.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_ai.png" />
       <skin name="" filename="Texture/blocks/Paperman/eye/eye_sunbin_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_boy_zhengchang.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_fanpai_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_fanpai_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_fanpai_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_fanpai_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_fanpai_zhengchang.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_ai.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_le.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_nu.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_xi.png" />
+      <skin name="" filename="Texture/blocks/Paperman/eye/eye_girl_zhengchang.png" />
     </group>
     <group name="paperman_mouth">
       <skin name="" filename="Texture/blocks/Paperman/mouth/mouth_01.png" />

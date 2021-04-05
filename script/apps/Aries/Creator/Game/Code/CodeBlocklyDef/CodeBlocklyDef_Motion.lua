@@ -659,6 +659,7 @@ setPos(x, y+0.5, z)
 	examples = {{desc = "", canRun = true, code = [[
 local x, y, z = getPos()
 setPos(x, y+0.5, z)
+setPos(x, y+0.5, z, "actorName")
 ]]}},
 },
 {

@@ -441,6 +441,8 @@ function options:OnLoadWorld()
 			GameLogic.RunCommand("/leaveworld")
 		end, 3000)
 	end
+
+	GameLogic.RunCommand('/shader 1')
 end
 
 function options:ResetWindowTitle()
@@ -1105,22 +1107,37 @@ function options:GetCurrentLanguage()
 	return Translation.GetCurrentLanguage();
 end
 
--- set brightness factor (0-1) used in HDR shader 3, 4. default value is 0.5. the larger the more detail in brighter region. 
+-- set brightness factor (0-1) used in HDR shader 3, 4. default value is 0.5.
 function options:GetEyeBrightness()
 	local effect = GameLogic.GetShaderManager():GetEffect("Fancy");
 	if(effect) then
 		return effect:GetEyeBrightness();
 	end
-	return 0.4;
+	return 0.2;
 end
 
--- set brightness factor (0-1) used in HDR shader 3, 4. default value is 0.5. the larger the more detail in brighter region. 
+-- set brightness(exposure) factor (0-1) used in HDR shader 3, 4. default value is 0.2.
 function options:SetEyeBrightness(factor)
-	factor = factor or 0.5;
-	if(factor > 0 and factor<1) then
+	factor = factor or 0.2;
+
+	if(factor > 0 and factor < 1) then
 		local effect = GameLogic.GetShaderManager():GetEffect("Fancy");
+	
 		if(effect) then
 			effect:SetEyeBrightness(factor);
+		end
+	end
+end
+
+-- set brightness(exposure) factor (0-1) used in HDR shader 3, 4. default value is 0.2.
+function options:SetEyeContrast(factor)
+	factor = factor or 0.5;
+
+	if(factor > 0 and factor < 1) then
+		local effect = GameLogic.GetShaderManager():GetEffect("Fancy");
+	
+		if(effect) then
+			effect:SetEyeContrast(factor);
 		end
 	end
 end
@@ -1293,4 +1310,13 @@ end
 
 function options:IsAutoMovieFPS()
 	return self.isAutoMovieFPS
+end
+
+-- @param fov: if nil, it defaults to GameLogic.options.normal_fov
+function options:SetFieldOfView(fov)
+	fov = fov or GameLogic.options.normal_fov;
+	if(ParaCamera.GetAttributeObject():GetField("FieldOfView", fov) ~= fov) then
+		ParaCamera.GetAttributeObject():SetField("FieldOfView", fov);
+		return true;
+	end
 end

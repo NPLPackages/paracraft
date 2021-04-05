@@ -82,19 +82,31 @@ Commands["dof"] = {
 Commands["brightness"] = {
 	name="brightness", 
 	quick_ref="/brightness [0-1]", 
-	desc=[[set brightness factor (0-1) used in HDR shader 3, 4. default value is 0.5. the larger the more detail in brighter region. 
+	desc=[[set brightness(exposure) factor (0-1) used in HDR shader 3, 4. default value is 0.2.
 /brightness 0.1    more detail with dark colors
-/brightness 0.8    more detail with bright colors
+/brightness 0.5    more detail with bright colors
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local factor;
-		factor, cmd_text = CmdParser.ParseInt(cmd_text);	
-		factor = factor or 0.5;
-		if(factor > 0 and factor<1) then
-			GameLogic.options:SetEyeBrightness(factor);
-		end
+		factor, cmd_text = CmdParser.ParseNumber(cmd_text);	
+		GameLogic.options:SetEyeBrightness(factor);
 	end,
 };
+
+Commands["contrast"] = {
+	name="contrast", 
+	quick_ref="/contrast [0-1]", 
+	desc=[[set contrast factor (0-1) used in HDR shader 3, 4. default value is 0.5.
+/contrast 0.3    low contrast
+/contrast 0.8    high contrast
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local factor;
+		factor, cmd_text = CmdParser.ParseNumber(cmd_text);	
+		GameLogic.options:SetEyeContrast(factor);
+	end,
+};
+
 
 --[[
 

@@ -135,11 +135,15 @@ function Entity:OpenEditor(editor_name, entity)
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
 			if(result and result ~= old_value) then
+				if(result ~= commonlib.Encoding.DefaultToUtf8(result)) then
+					_guihelper.MessageBox(L"文件名必须是英文字母与数字的组合");
+					return 
+				end
 				local filename = result;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 				if(filename~="" and not filename:match("^%d+$") and not Files.GetWorldFilePath(filename)) then
-					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", filename));
+					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", commonlib.Encoding.DefaultToUtf8(filename)));
 				else
 					self.cmd = filename;
 				end

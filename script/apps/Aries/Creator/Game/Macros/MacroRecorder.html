@@ -11,8 +11,9 @@
 MacroRecorder = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroRecorder")
 MacroRecorder.OnInit();
 ]]></script>
-<div style="background-color:#00000080;width:64px;height:32px;">
+<div style="background-color:#00000080;width:96px;height:32px;">
     <input uiname="MacroRecorder.Stop" type="button" name="Stop" tooltip="结束并退出录制" style="margin-left:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/rec_off.png)" onclick="MacroRecorder.OnStop()"/>
+    <input uiname="MacroRecorder.AddSubTitle" type="button" name="AddSubTitle" tooltip="添加语音字幕" style="margin-left:0px;width:32px;height:32px;background:url(Texture/blocks/items/textframe.png)" onclick="MacroRecorder.OnClickAddSubTitle()"/>
     <pe:label name="text" style="margin-left:5px;margin-top:5px;color:#ff0000"></pe:label>
 </div>
 </pe:mcml> 

@@ -235,8 +235,9 @@ end
 
 -- calling this function 100 times will automatically yield and resume until next tick (1/30 seconds)
 -- we will automatically insert this function into while and for loop. One can also call this manually
-function env_imp:checkyield()
-	self.check_count = self.check_count + 1;
+-- @param count: default to 1. heavy operations can make this larger
+function env_imp:checkyield(count)
+	self.check_count = self.check_count + (count or 1);
 	if(self.check_count > 100) then
 		if(self.codeblock:IsAutoWait()) then
 			env_imp.wait(self, env_imp.GetDefaultTick(self));

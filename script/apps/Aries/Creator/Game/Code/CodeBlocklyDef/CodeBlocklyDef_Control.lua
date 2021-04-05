@@ -1172,15 +1172,6 @@ setOutput(0)
 			type = "input_statement",
 		},
 	},
-	message2 = "%1",
-	arg2 = {
-		{
-			name = "pos_mode",
-			type = "input_value",
-            shadow = { type = "text", value = "",},
-			text = "ct", 
-		},
-	},
 	category = "Control", 
 	helpUrl = "", 
 	hide_in_toolbox = true,
@@ -1188,18 +1179,14 @@ setOutput(0)
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "alert",
-	func_description = 'alert("%s",function()\\n    %s\\nend ,"%s")',
+	func_description = 'alert("%s",function()\\n    %s\\nend)',
 	ToNPL = function(self)
-		return string.format('alert("%s",function()\n    %s\nend ,"%s")\n', self:getFieldAsString('alert_text'),self:getFieldAsString('input'),self:getFieldAsString('pos_mode'));
+		return string.format('alert("%s",function()\n    %s\nend)\n', self:getFieldAsString('alert_text'),self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"弹框类型如下", canRun = false, code = [[
---ct:居中显示  ctb:居中靠下显示  ctt：居中靠上显示  ctl：居中靠左显示
---ctr：居中靠右显示  lb：左下显示  lt：左上显示  rb：右下显示 rt：右上显示
-alert("你好, function()
-end, "ct")
-alert("你好,function()
-end)
-alert("你好)
+	examples = {{desc = L"弹框", canRun = false, code = [[
+	alert("你好",function()
+	end)
+	alert("你好")
 ]]}},
 },
 

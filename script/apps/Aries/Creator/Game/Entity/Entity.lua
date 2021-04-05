@@ -2395,11 +2395,11 @@ end
 function Entity:IsStaticBlocker()
 end
 
---@param dx,dy,dz: if nil, they default to 0. 
+-- @param dx,dy,dz: if nil, they default to 0. 
 -- @param filterEntityFunc: nil or a function(destEntity, entity) end, this function should return true for destEntity's collision to be considered.
 -- Entity.CanBeCollidedWith and Entity.IsVisible are good choices for this function. 
 -- @return dx,dy,dz: return the smallest push out according to current overlapping status 
-function Entity:CalculatePushOut(dx,dy,dz, entityFileterFunc)
+function Entity:CalculatePushOut(dx,dy,dz, entityFilterFunc)
 	dx = dx or 0;
 	dy = dy or 0;
 	dz = dz or 0;
@@ -2408,7 +2408,7 @@ function Entity:CalculatePushOut(dx,dy,dz, entityFileterFunc)
 	end
 	local boundingBox = self:GetCollisionAABB();
 	local aabb = boundingBox:clone_from_pool():AddCoord(dx, dy, dz)
-	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self, entityFileterFunc);
+	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self, entityFilterFunc);
 
 	local deltaX, deltaY, deltaZ = 0, 0, 0;
 	for i= 1, listCollisions:size() do

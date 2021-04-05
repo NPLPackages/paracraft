@@ -71,3 +71,8 @@ function MacroRecorder.OnStop()
 	Macros:Stop();
 end
 
+function MacroRecorder.OnClickAddSubTitle()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroAddSubTitle.lua");
+	local MacroAddSubTitle = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroAddSubTitle");
+	MacroAddSubTitle.ShowPage();
+end

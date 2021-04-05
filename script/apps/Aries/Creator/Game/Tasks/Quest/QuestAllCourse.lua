@@ -68,7 +68,7 @@ function QuestAllCourse.GetPageCtrl()
     return page
 end
 
-function QuestAllCourse.Show(target_world_id)
+function QuestAllCourse.Show(target_course_id)
     -- if not System.options.isDevMode then
     --     _guihelper.MessageBox("人工智能课程即日开启，敬请期待", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
     --     return
@@ -79,15 +79,15 @@ function QuestAllCourse.Show(target_world_id)
 
     local client_data = QuestAction.GetClientData()
 
-    if target_world_id == nil then
-        local course_world_id = client_data.course_world_id or 0
-        course_world_id = tonumber(course_world_id)
-        if course_world_id > 0 then
-            target_world_id = course_world_id
+    if target_course_id == nil then
+        local course_id = client_data.course_id or 0
+        course_id = tonumber(course_id)
+        if course_id > 0 then
+            target_course_id = course_id
         end
     end
 
-    QuestAllCourse.target_world_id = target_world_id
+    QuestAllCourse.target_course_id = target_course_id
     QuestAllCourse.target_teacher_id = client_data.course_teacher_id
     QuestAllCourse.target_level_id = client_data.course_level_id
 
@@ -113,49 +113,55 @@ function QuestAllCourse.Show(target_world_id)
 
     keepwork.quest_course_catalogs.get({}, function(err2, msg2, data2)
         if err2 == 200 then
-            -- HOME 或者 SCHOOL
-            if GameLogic.GetFilters():apply_filters('service.session.get_user_where') == "SCHOOL" then
-                local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
-                local school_class_id = SchoolClassIdList[httpwrapper_version]
-                if school_class_id then
-                    QuestAllCourse.target_teacher_id = school_class_id
-                    QuestAllCourse.target_level_id = school_class_id
+            -- 检查是否有查看预制版本的权利
+            keepwork.permissions.check({
+                featureName = "test_ai",
+            }, function(err3, msg3, data3)
+                QuestAllCourse.permissions_check = data3.data
+                -- HOME 或者 SCHOOL
+                if GameLogic.GetFilters():apply_filters('service.session.get_user_where') == "SCHOOL" then
+                    local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
+                    local school_class_id = SchoolClassIdList[httpwrapper_version]
+                    if school_class_id then
+                        QuestAllCourse.target_teacher_id = school_class_id
+                        QuestAllCourse.target_level_id = school_class_id
+                    end
                 end
-            end
-
-            QuestAllCourse.CatalogsData = data2
-
-            QuestAllCourse.RefreshTeacherListData()
-            QuestAllCourse.SetSelectTeacherIndex()
-            
-            QuestAllCourse.RefreshLevelListData()
-            QuestAllCourse.SetSelectLevelIndex()
-            
-            -- QuestAllCourse.RefreshCourseListData()
-            QuestAction.RequestCompleteCourseIdList(function()
-                QuestAllCourse.RefreshCourseListData(function()
-                    -- 刷新课程列表控件
-                    -- QuestAllCourse.FreshGridView("course_list")
-                    QuestAllCourse.OnRefresh()
-                    commonlib.TimerManager.SetTimeout(function()
-                        if page and page:IsVisible() then
-                            local mcmlNode = page:GetNode("course_list");
-                            if QuestAllCourse.target_page then
-                                pe_gridview.GotoPage(mcmlNode, "course_list", QuestAllCourse.target_page);
-                                QuestAllCourse.target_page = nil
+    
+                QuestAllCourse.CatalogsData = data2
+    
+                QuestAllCourse.RefreshTeacherListData()
+                QuestAllCourse.SetSelectTeacherIndex()
+                
+                QuestAllCourse.RefreshLevelListData()
+                QuestAllCourse.SetSelectLevelIndex()
+                
+                -- QuestAllCourse.RefreshCourseListData()
+                QuestAction.RequestCompleteCourseIdList(function()
+                    QuestAllCourse.RefreshCourseListData(function()
+                        -- 刷新课程列表控件
+                        -- QuestAllCourse.FreshGridView("course_list")
+                        QuestAllCourse.OnRefresh()
+                        commonlib.TimerManager.SetTimeout(function()
+                            if page and page:IsVisible() then
+                                local mcmlNode = page:GetNode("course_list");
+                                if QuestAllCourse.target_page then
+                                    pe_gridview.GotoPage(mcmlNode, "course_list", QuestAllCourse.target_page);
+                                    QuestAllCourse.target_page = nil
+                                end
+    
+                                local tree_view = mcmlNode:GetChild("pe:treeview");
+                                local tree_view_control = tree_view.control
+                                local _parent = ParaUI.GetUIObject(tree_view_control.name);
+                                local main = _parent:GetChild(tree_view_control.mainName);
+                                main:SetScript("onmousewheel", function()
+                                    local page_index = mcmlNode:GetAttribute("pageindex") or 1
+                                    local target_page = page_index - mouse_wheel
+                                    pe_gridview.GotoPage(mcmlNode, "course_list", target_page);
+                                end)
                             end
-
-                            local tree_view = mcmlNode:GetChild("pe:treeview");
-                            local tree_view_control = tree_view.control
-                            local _parent = ParaUI.GetUIObject(tree_view_control.name);
-                            local main = _parent:GetChild(tree_view_control.mainName);
-                            main:SetScript("onmousewheel", function()
-                                local page_index = mcmlNode:GetAttribute("pageindex") or 1
-                                local target_page = page_index - mouse_wheel
-                                pe_gridview.GotoPage(mcmlNode, "course_list", target_page);
-                            end)
-                        end
-                    end, 100); 
+                        end, 100); 
+                    end)
                 end)
             end)
         end
@@ -184,7 +190,7 @@ function QuestAllCourse.ClearData()
     QuestAllCourse.SelectTeacherIndex = 1
     QuestAllCourse.SelectLevelIndex = 1
     QuestAllCourse.SelectCourseIndex = 0
-    QuestAllCourse.target_world_id = nil
+    QuestAllCourse.target_course_id = nil
     QuestAllCourse.target_teacher_id = nil
     QuestAllCourse.target_level_id = nil
 end
@@ -347,16 +353,16 @@ function QuestAllCourse.RefreshCourseListData(callback)
                 [3] = "高",
             }
             for k, v in pairs(QuestAllCourse.CourseListData) do
-                -- 处理有target_world_id
-                if v.projectId == QuestAllCourse.target_world_id then
+                -- 处理有target_course_id
+                if v.id == QuestAllCourse.target_course_id then
                     QuestAllCourse.SelectCourseIndex = k
                     QuestAllCourse.target_page = math.ceil(QuestAllCourse.SelectCourseIndex / 8)
-                    QuestAllCourse.target_world_id = nil
+                    QuestAllCourse.target_course_id = nil
                 end
 
-                if v.icon == nil or v.icon == "" then
-                    world_id_list[#world_id_list + 1] = v.projectId
-                end
+                -- if v.icon == nil or v.icon == "" then
+                --     world_id_list[#world_id_list + 1] = v.projectId
+                -- end
 
                 -- 判断是否解锁
                 v.IsLock = false
@@ -512,7 +518,7 @@ function QuestAllCourse.SelectCourse(index)
     -- QuestAllCourse.RunCommand(index)
 end
 
-function QuestAllCourse.GotoClass(index)
+function QuestAllCourse.GotoClass(index, is_pre)
     -- if index == QuestAllCourse.SelectCourseIndex then
     --     return
     -- end
@@ -520,17 +526,18 @@ function QuestAllCourse.GotoClass(index)
     -- 刷新课程列表控件
     QuestAllCourse.FreshGridView("course_list")
 
-    QuestAllCourse.RunCommand(index)
+    QuestAllCourse.RunCommand(index, is_pre)
 end
 
 function QuestAllCourse.IsSelectCourse(index)
     return QuestAllCourse.SelectCourseIndex == index
 end
 
-function QuestAllCourse.RunCommand(index)
+function QuestAllCourse.RunCommand(index, is_pre)
+    is_pre = is_pre or false
     local data = QuestAllCourse.CourseListData[index]
     
-    if data == nil or data.projectId == nil then
+    if data == nil then
         return
     end
 
@@ -539,7 +546,7 @@ function QuestAllCourse.RunCommand(index)
     local school_class_id = SchoolClassIdList[httpwrapper_version]
     local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
 
-    local command = string.format("/loadworld -s -force %s", data.projectId)
+    -- local command = string.format("/loadworld -s -force %s", data.projectId)
     local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
     local function enter_world()
         local server_time = GameLogic.QuestAction.GetServerTime()
@@ -567,15 +574,7 @@ function QuestAllCourse.RunCommand(index)
                 local work_data = data.aiHomework or {}
                 
                 local client_data = QuestAction.GetClientData()
-                client_data.course_world_id = data.projectId
-                
-                -- if client_data.course_world_id_list == nil then
-                --     client_data.course_world_id_list = {}
-                -- end        
-
-                -- if select_teacher_data.id ~= school_class_id then
-                --     client_data.course_world_id_list[tostring(data.projectId)] = 1
-                -- end
+                -- client_data.course_world_id = data.projectId
 
                 local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
                 client_data.course_teacher_id = select_teacher_data.id
@@ -593,12 +592,39 @@ function QuestAllCourse.RunCommand(index)
                 end
     
                 KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-                
-                page:CloseWindow()
-                QuestAllCourse.CloseView()
     
                 GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
-                CommandManager:RunCommand(command)
+                -- print("ssssssssssss")
+                -- echo(data, true)
+
+                if not QuestAllCourse.permissions_check then
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
+                    return
+                end
+                
+                
+                if data.preProjectReleaseId and data.preProjectReleaseId > 0 and data.projectReleaseId and data.projectReleaseId > 0 then
+					_guihelper.MessageBox("选择你要进入的版本", function(res)
+                        page:CloseWindow()
+                        QuestAllCourse.CloseView()
+                        if res == _guihelper.DialogResult.OK then
+                            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
+                        else
+                            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, true, data.preProjectReleaseId)
+                        end
+					end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil, { ok = L"正式版", cancel = L"预发布版", title = L"版本选择", closeNoCancel = true})
+                elseif data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, true, data.preProjectReleaseId)
+                elseif data.projectReleaseId and data.projectReleaseId > 0 then
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
+                end                
+                -- CommandManager:RunCommand(command)
             end
         end)
     end
@@ -614,7 +640,6 @@ function QuestAllCourse.RunCommand(index)
                 local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
                 VipToolNew.Show("AI_lesson")
             end
-
             local desc = "是否开通会员学习？"
             local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"
             QuestMessageBox.Show(desc, sure_callback, desc2)
@@ -870,9 +895,9 @@ function QuestAllCourse.GetWorldIconUrl(index)
         return data.icon
     end
 
-    if data.projectId and QuestAllCourse.CourseWorldData[data.projectId] then
-        return QuestAllCourse.CourseWorldData[data.projectId].imageUrl
-    end
+    -- if data.projectId and QuestAllCourse.CourseWorldData[data.projectId] then
+    --     return QuestAllCourse.CourseWorldData[data.projectId].imageUrl
+    -- end
 
     return ""
 end
@@ -886,7 +911,8 @@ function QuestAllCourse.HasWork(index)
     return data.aiHomework ~= nil
 end
 
-function QuestAllCourse.ClickWork(index)
+function QuestAllCourse.ClickWork(index, is_pre)
+    is_pre = is_pre or false
     local data = QuestAllCourse.CourseListData[index]
     if data == nil then
         return false
@@ -922,7 +948,7 @@ function QuestAllCourse.ClickWork(index)
                                 end
                                 
                                 GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
-                                QuestAllCourse.ClickWork(index)
+                                QuestAllCourse.ClickWork(index, is_pre)
                             end
                         end
                     );
@@ -935,52 +961,137 @@ function QuestAllCourse.ClickWork(index)
 
             -- 入校课程的话 需要每天四点半之后才能做
             if data.isForSchool == 1 then
-                local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
-                if server_time < limit_time_stamp then
-                    -- GameLogic.AddBBS(nil, "16:30之后才能做作业哦", 5000, "255 0 0");
-                    _guihelper.MessageBox("16:30之后才能做作业哦")
-                    return
+                
+                -- 判断是不是周末
+                local week_day = QuestAllCourse.GetWeekNum(server_time)
+                if week_day ~= 6 and week_day ~= 7 then
+                    local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+                    if server_time < limit_time_stamp then
+                        -- GameLogic.AddBBS(nil, "16:30之后才能做作业哦", 5000, "255 0 0");
+                        _guihelper.MessageBox("16:30之后才能做作业哦")
+                        return
+                    end
                 end
             end
 
             local type = work_data.type -- 0：更新世界类型，1：更新家园，2：作业世界
+            local client_data = QuestAction.GetClientData()
+            -- client_data.course_world_id = work_data.projectId
+            client_data.course_id = work_data.aiCourseId
+            local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
+            client_data.course_teacher_id = select_teacher_data.id
+
+            local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
+            client_data.course_level_id = select_level_data.id
+
             if type == 0 then
+                KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
                 page:CloseWindow()
                 QuestAllCourse.CloseView()
                 GameLogic.GetFilters():apply_filters('show_create_page')
             elseif type == 1 then
                 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-        
+                KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
                 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
                 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
                 LocalLoadWorld.CreateGetHomeWorld();
-        
+                page:CloseWindow()
+                QuestAllCourse.CloseView()
                 GameLogic.GetFilters():apply_filters('check_and_updated_before_enter_my_home', function()
                     GameLogic.RunCommand("/loadworld home");
                 end)
             else
-                if work_data.projectId then
-                    local command = string.format("/loadworld -s -force %s", work_data.projectId)
-                    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
-                    local client_data = QuestAction.GetClientData()
-                    client_data.course_world_id = work_data.projectId
-                    client_data.course_id = work_data.aiCourseId
-                    client_data.home_work_id = work_data.id
-                    client_data.is_home_work = true
-                    client_data.course_step = 0
-                    if userAiHomework and userAiHomework.progress then
-                        client_data.course_step = userAiHomework.progress.stepNum or 0
-                    end
-                    
-                    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
-                    
+                -- local command = string.format("/loadworld -s -force %s", work_data.projectId)
+                local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+
+                client_data.home_work_id = work_data.id
+                client_data.is_home_work = true
+                client_data.course_step = 0
+                if userAiHomework and userAiHomework.progress then
+                    client_data.course_step = userAiHomework.progress.stepNum or 0
+                end
+                
+                KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
+
+                if not QuestAllCourse.permissions_check then
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
-        
-                    CommandManager:RunCommand(command)
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, false, work_data.projectReleaseId)
+                    return
                 end
+                
+                if work_data.preProjectReleaseId and work_data.preProjectReleaseId > 0 and work_data.projectReleaseId and work_data.projectReleaseId > 0 then
+					_guihelper.MessageBox("选择你要进入的版本", function(res)
+                        page:CloseWindow()
+                        QuestAllCourse.CloseView()
+                        if res == _guihelper.DialogResult.OK then
+                            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, false, work_data.projectReleaseId)
+                        else
+                            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, true, work_data.preProjectReleaseId)
+                        end
+					end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil, { ok = L"正式版", cancel = L"预发布版", title = L"版本选择", closeNoCancel = true})
+                elseif data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, true, work_data.preProjectReleaseId)
+                elseif data.projectReleaseId and data.projectReleaseId > 0 then
+                    page:CloseWindow()
+                    QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, false, work_data.projectReleaseId)
+                end  
+                -- CommandManager:RunCommand(command)
             end
 
         end
     end)
+end
+
+--根据时间戳获取星期几
+function QuestAllCourse.GetWeekNum(time_stamp)
+    time_stamp = time_stamp or 0
+    local weekNum = os.date("*t",time_stamp).wday  -1
+    if weekNum == 0 then
+        weekNum = 7
+    end
+    return weekNum
+end
+
+function QuestAllCourse.IsShowCourseCheckTag(index)
+    if not QuestAllCourse.permissions_check then
+        return false
+    end
+    local data = QuestAllCourse.CourseListData[index]
+    if data == nil then
+        return
+    end
+    
+    if data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+        return true
+    end
+
+    local work_data = data.aiHomework or {}
+    if work_data.preProjectReleaseId and work_data.preProjectReleaseId > 0 then
+        return true
+    end
+end
+
+function QuestAllCourse.GetCourseCheckDesc(index)
+    local data = QuestAllCourse.CourseListData[index]
+    if data == nil then
+        return
+    end
+
+    local work_data = data.aiHomework or {}
+
+    if work_data.preProjectReleaseId and work_data.preProjectReleaseId > 0 and data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+        return "预发布课程+作业"
+    end
+
+    if data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+        return "预发布课程"
+    end
+
+    if work_data.preProjectReleaseId and work_data.preProjectReleaseId > 0 then
+        return "预发布作业"
+    end
 end

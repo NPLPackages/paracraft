@@ -118,6 +118,8 @@
   <asset filename="character/CC/artwar/game/Blue_Army_gun.x" displayname="敌军士兵_持枪" name="Blue_Army_gun"/>
   <asset filename="character/CC/artwar/game/Red_Army_gun.x" displayname="红军士兵_持枪" name="Red_Army_gun"/>
   <asset filename="character/CC/artwar/game/Red_Army_knife.x" displayname="红军士兵_持刀" name="Red_Army_knife"/>
+
+
   -->
   <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia"/>
   <!-- 9-27更新 -->
@@ -164,7 +166,9 @@
   <asset filename="character/CC/artwar/movie/Blue_Army_boss.x" displayname="敌军长官" name="Blue_Army_boss"/> 
   <asset filename="character/CC/artwar/movie/Red_Army_boss.x" displayname="红军长官" name="Red_Army_boss"/> 
   <asset filename="character/CC/artwar/movie/Blue_Army_xiaobing.x" displayname="敌军士兵" name="Blue_Army_xiaobing"/> 
-  <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing"/> 
+  <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing"/>
+  <asset filename="character/CC/artwar/movie/Red_Army_nv1.x" displayname="红军女士兵1" name="Red_Army_nv1"/> 
+  <asset filename="character/CC/artwar/movie/Red_Army_nv2.x" displayname="红军女士兵2" name="Red_Army_nv2"/> 
 <!--   <asset filename="character/CC/artwar/movie/pufuqianjin_Blue_Army.x" displayname="匍匐敌军" name="pufuqianjin_Blue_Army"/> 
   <asset filename="character/CC/artwar/movie/pufuqianjin_Red_Army.x" displayname="匍匐红军" name="pufuqianjin_Red_Army"/>  -->
 
@@ -1012,6 +1016,32 @@
   <asset filename="character/CC/artwar/furnitures/fountain3.x" displayname="喷水池" name="fountain3"/>
   <asset filename="character/CC/artwar/furnitures/closestool.x" displayname="马桶" name="closestool"/>
   <asset filename="character/CC/artwar/furnitures/incense_burner.x" displayname="丹炉" name="incense_burner"/>
+
+ <!-- 红色用品 -->
+  <asset filename="character/CC/artwar/furnitures/bi.x" displayname="笔" name="bi"/>
+  <asset filename="character/CC/artwar/furnitures/canzhuo.x" displayname="餐桌" name="canzhuo"/>
+  <asset filename="character/CC/artwar/furnitures/chaji.x" displayname="茶几" name="chaji"/>
+  <asset filename="character/CC/artwar/furnitures/chuang_mu.x" displayname="木床" name="chuang_mu"/>
+  <asset filename="character/CC/artwar/furnitures/chuang_tie.x" displayname="铁床" name="chuang_tie"/>
+  <asset filename="character/CC/artwar/furnitures/men1_guan.x" displayname="门1关" name="men1_guan"/>
+  <asset filename="character/CC/artwar/furnitures/men1_kai.x" displayname="门1开" name="men1_kai"/>
+  <asset filename="character/CC/artwar/furnitures/men2_guan.x" displayname="门2关" name="men2_guan"/>
+  <asset filename="character/CC/artwar/furnitures/men2_kai.x" displayname="门2开" name="men2_kai"/>
+  <asset filename="character/CC/artwar/furnitures/men3_guan.x" displayname="门3关" name="men3_guan"/>
+  <asset filename="character/CC/artwar/furnitures/men3_kai.x" displayname="门3开" name="men3_kai"/>
+  <asset filename="character/CC/artwar/furnitures/moshuiping.x" displayname="墨水瓶" name="moshuiping"/>
+  <asset filename="character/CC/artwar/furnitures/shafa_dan.x" displayname="单人沙发" name="shafa_dan"/>
+  <asset filename="character/CC/artwar/furnitures/shafa_duo.x" displayname="双人沙发" name="shafa_duo"/>
+  <asset filename="character/CC/artwar/furnitures/shugui_guan.x" displayname="书柜关" name="shugui_guan"/>
+  <asset filename="character/CC/artwar/furnitures/shugui_kai.x" displayname="书柜开" name="shugui_kai"/>
+  <asset filename="character/CC/artwar/furnitures/shujia.x" displayname="书架" name="shujia"/>
+  <asset filename="character/CC/artwar/furnitures/shuzhuo.x" displayname="书桌" name="shuzhuo"/>
+  <asset filename="character/CC/artwar/furnitures/shuzhuo_man.x" displayname="书桌满" name="shuzhuo_man"/>
+  <asset filename="character/CC/artwar/furnitures/taideng.x" displayname="台灯" name="taideng"/>
+  <asset filename="character/CC/artwar/furnitures/yizi_bei.x" displayname="靠背椅" name="yizi_bei"/>
+  <asset filename="character/CC/artwar/furnitures/yizi_fang.x" displayname="方椅子" name="yizi_fang"/>
+  <asset filename="character/CC/artwar/furnitures/yizi_yuan.x" displayname="圆椅子" name="yizi_yuan"/>
+  <asset filename="character/CC/artwar/furnitures/zhibi.x" displayname="纸笔" name="zhibi"/>
  <!--  <asset filename="character/CC/artwar/furnitures/baozhi_off.x" displayname="报纸_安全" name="baozhi_off"/>
   <asset filename="character/CC/artwar/furnitures/baozhi_on.x" displayname="报纸_危险" name="baozhi_on"/>
   <asset filename="character/CC/artwar/furnitures/cd_on.x" displayname="插电板_危险1" name="cd_on"/>

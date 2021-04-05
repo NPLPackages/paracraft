@@ -1812,3 +1812,29 @@ function GameLogic.OnCodeError(errorMessage, stackInfo)
 		end
 	end
 end
+
+local testCases = ""; 
+function GameLogic.AppendABPath(test_case)
+	if (test_case and not string.find(testCases, test_case)) then
+		testCases = testCases..test_case..";";
+	end
+end
+
+function GameLogic.GetABPath()
+	return testCases;
+end
+
+function GameLogic.ResetABPath()
+	testCases = "";
+end
+
+-- select by percentage, not accurate
+function GameLogic.IsInABTest(percent)
+	local divisor = math.floor(1 / percent);
+	local name_hash = ParaMisc.md5(System.User.username);
+	if (string.len(name_hash) == 32) then
+		local num = tonumber(string.sub(name_hash, 25));
+		return (num % divisor == 0);
+	end
+	return false;
+end

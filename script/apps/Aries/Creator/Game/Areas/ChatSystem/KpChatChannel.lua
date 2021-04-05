@@ -437,10 +437,13 @@ function KpChatChannel.OnMsg(self, msg)
             end
 
             -- 消息中心
-            if payload and (payload.msgType =="interactionMsg" or payload.msgType =="orgMsg" or payload.msgType =="sysMsg") then
+            if payload and (payload.msgType =="interactionMsg" 
+                or payload.msgType =="orgMsg" 
+                or payload.msgType =="sysMsg"
+                or payload.msgType =="emailMsg") then
                 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
                 if DockPage then
-                    DockPage.HandMsgCenterMsgData()
+                    DockPage.HandMsgCenterMsgData(payload.msgType)
                 end
             end
         end

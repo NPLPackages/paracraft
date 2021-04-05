@@ -576,13 +576,22 @@ end
 function QuestProvider.SetStep(stepNum, allStepNum)
     
     local client_data = GameLogic.QuestAction.GetClientData()
-    local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
-    projectId = tonumber(projectId)
-    if projectId ~= client_data.course_world_id then
+    -- local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+    -- projectId = tonumber(projectId)
+    -- if projectId ~= client_data.course_world_id then
+    --     return
+    -- end
+
+    local is_home_work = client_data.is_home_work
+
+    if not is_home_work and client_data.course_id == nil then
         return
     end
 
-    local is_home_work = client_data.is_home_work
+    if is_home_work and client_data.home_work_id == nil then
+        return
+    end
+
     -- 要是课程已经完成了 不再继续后面的逻辑
     if client_data.course_step and client_data.course_step >= 10 then
         return
@@ -650,28 +659,28 @@ function QuestProvider.SetStep(stepNum, allStepNum)
     end
 end
 
-function QuestProvider.GetStep(projectId)
-    if projectId == nil then
-        projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
-        projectId = tonumber(projectId)
-    end
+function QuestProvider.GetStep()
+    -- if projectId == nil then
+    --     projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+    --     projectId = tonumber(projectId)
+    -- end
 
     local client_data = GameLogic.QuestAction.GetClientData()
-    if projectId ~= client_data.course_world_id then
-        return 0
-    end
+    -- if projectId ~= client_data.course_world_id then
+    --     return 0
+    -- end
     
     return client_data.course_step or 0
 end
 
 function QuestProvider.OnActivateHomework()
     
-    local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
-    projectId = tonumber(projectId)
+    -- local projectId = WorldCommon.GetWorldTag("kpProjectId") or 0
+    -- projectId = tonumber(projectId)
     local client_data = GameLogic.QuestAction.GetClientData()
-    if projectId ~= client_data.course_world_id then
-        return
-    end
+    -- if projectId ~= client_data.course_world_id then
+    --     return
+    -- end
 
     if client_data.home_work_id == nil or client_data.home_work_id < 0 then
         return

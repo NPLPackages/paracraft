@@ -63,6 +63,10 @@ function GotoClass(index)
     QuestAllCourse.GotoClass(index)
 end
 
+function GotoPreClass(index)
+    QuestAllCourse.GotoClass(index, true)
+end
+
 function IsSelectCourse(index)
     return QuestAllCourse.IsSelectCourse(index)
 end
@@ -83,6 +87,10 @@ function ClickWork(index)
     QuestAllCourse.ClickWork(index)
 end
 
+function ClickPreWork(index)
+    QuestAllCourse.ClickWork(index, true)
+end
+
 function GetTooltip(s)
     if(s and s~= "")then
         s = string.format("script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s=%s",s);
@@ -90,11 +98,19 @@ function GetTooltip(s)
     end
 end
 
+function IsShowCourseCheckTag(index)
+    return QuestAllCourse.IsShowCourseCheckTag(index)    
+end
+
+function GetCourseCheckDesc(index)
+    return QuestAllCourse.GetCourseCheckDesc(index)
+end
+
 ]]></script>
 <div style="width: 926px;height: 562px; background: url(Texture/Aries/Creator/keepwork/AiCourse/bjk_926X562_32bits.png#0 0 926 562);">
     <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:892px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
     <div name="left_containt" style="float:left;width:182px;height:562px;margin-top:0px;background:">
-        <div style="float:left;width:180px;height:524px;margin-top:58px;margin-left: 20px; background:">
+        <div style="float:left;width:180px;height:480px;margin-top:58px;margin-left: 20px; background:">
             <pe:gridview name="teacher_list" style="margin-left:0px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="50"
                         DataSource='<%=TeacherListData%>'>
                 <Columns>
@@ -181,6 +197,17 @@ end
                         <pe:if condition='<%=Eval("isVip") == 1 %>'>
                             <div zorder="5" style="position: relative; width: 48px;height: 53px; margin-top: -5px;margin-left: -8px; background:url(Texture/Aries/Creator/keepwork/AiCourse/VIP_48X53_32bits.png#0 0 48 53)"></div>
                         </pe:if>
+
+                        <pe:if condition='<%=IsShowCourseCheckTag(Eval("index"))%>'>
+                            <div zorder="1" style="position: relative; font-size: 12px; margin-left: 12px; width:128px;height:26px;margin-top:72px; background-color: #414141; color: #ffffff;">   
+                                <pe:container zorder="1" width="128" height="26" style="background:" onclick="">
+                                    <div style="text-align: center;color: #ffffff;margin-top: 4px;font-size: 13px;">
+                                        <%=GetCourseCheckDesc(Eval("index"))%>
+                                    </div>
+                                </pe:container>
+                            </div>
+                        </pe:if>
+
                         <!-- <div style="<%= 'width: 256px;height: 128px;background: url(' .. (Eval('imageUrl') and Eval('imageUrl') or '') .. ')' %>"></div> -->
                         <!-- <div style="width: 262px;height: 174px;background: url(http://qiniu-dev.keepwork.com/2-259c3c28-751c-4fa0-afa6-b41c7cac3e1b.jpg?e=4765940093&token=LYZsjH0681n9sWZqCM4E2KmU6DsJOE7CAM4O3eJq:StoKBEd96QeX9_ar8PRPRBCe0MY=);"></div> -->
                         <!-- <img zorder="10" src='http://api.keepwork.com/ts-storage/siteFiles/15270/raw#商城商品1.png' width="256" height="128"/> -->
@@ -189,7 +216,6 @@ end
                             <div style="width: 134px; float: left;base-font-size:16px;font-size: 16px;margin-top: 12px;margin-left: 12px;position: relative;"><%=Eval("name")%></div>
                             <div style="width: 134px; float: left;base-font-size:14px;font-size: 14px;margin-top: 58px;margin-left: 12px;color: #ff7529;position: relative;">
                                 <%=Eval("level_start_div")%>
-                                
                             </div>
                             
                             <div style="width: 134px; float: left;base-font-size:12px;font-size: 12px;margin-top: 83px;margin-left: 12px;color: #999999;position: relative;"><%=Eval("time_desc")%></div>

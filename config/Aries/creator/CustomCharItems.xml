@@ -611,6 +611,7 @@ model id
 
     
     <!--      86000 86999  背部  attachment id="15"    -->
+    <!--第一批数据-->
     <item id="86001" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1425_FireExchangeBack03.anim.x"></attachment></item>
     <item id="86002" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1426_IceExchangeBack03.anim.x"></attachment></item>
     <item id="86003" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1427_StormExchangeBack03.anim.x"></attachment></item>
@@ -650,6 +651,8 @@ model id
     <item id="86037" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/2256_LifeBackS4.anim.x"></attachment></item>
     <item id="86038" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/2263_DeathBackS4.anim.x"></attachment></item>
     <item id="86039" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/2392_DeadRabbit.anim.x"></attachment></item>
+    <!--20210324添加3月活动物品-->
+    <item id="86040" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86040_shubao.anim.x"></attachment></item>
     
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>
