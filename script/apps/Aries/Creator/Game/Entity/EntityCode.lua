@@ -925,5 +925,6 @@ function Entity:OpenAtLine(line, pos)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 	self.cursorPos = {line = line or 1, pos = pos or 1};
-	CodeBlockWindow.RestoreCursorPosition();
+	CodeBlockWindow.RestoreCursorPosition(true);
+	CodeBlockWindow.SetFocusToTextControl()
 end

@@ -15,6 +15,8 @@ GameLogic.Macros.Text("bottom line big text", 5000, "center")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
 -- @param text: mcml text, if nil, it will remove the tip. 
 function Macros.Tip(text)
@@ -35,6 +37,7 @@ Macros.broadcast = Macros.Broadcast
 -- @param voiceType: voice type, default to play a kid's voice
 function Macros.Text(text, duration, position, voiceType)
 	MacroPlayer.ShowText(text, duration, position)
+	SoundManager:PlayText(text,  voiceType)
 end
 Macros.text = Macros.Text;
 

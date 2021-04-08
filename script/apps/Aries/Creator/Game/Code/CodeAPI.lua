@@ -130,7 +130,7 @@ local s_env_methods = {
 	"playSound",
 	"stopSound",
 	"playMusic",
-
+	"playText",
     --------------- NplMicroRobot
     "start_NplMicroRobot",
     -- Motion

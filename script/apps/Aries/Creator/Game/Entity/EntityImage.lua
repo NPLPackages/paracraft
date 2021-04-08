@@ -600,6 +600,7 @@ function Entity:SaveToXMLNode(node, bSort)
 			end
 		end
 	end
+	return node
 end
 
 function Entity:LoadFromXMLNode(node)

@@ -40,3 +40,14 @@ function env_imp:playMusic(filename)
 	GameLogic.RunCommand("/music "..(filename or ""));
 	env_imp.checkyield(self);
 end
+
+-- play a text 
+-- @param text: the text to play
+-- @param voiceNarrator: the narrator of the voice
+function env_imp:playText(text, duration, voiceNarrator)
+	SoundManager:PlayText(text, voiceNarrator);	
+	if duration then
+		env_imp.wait(self, duration);
+	end
+	
+end

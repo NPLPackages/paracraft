@@ -268,6 +268,41 @@ stopSound("levelup2")
 },
 },
 
+{
+	type = "playText", 
+	message0 = L"朗读文字%1",
+	arg0 = {
+		{
+			name = "filename",
+			type = "input_value",
+			shadow = { type = "text", value = "你好",},
+			text = "你好",
+		},
+	},
+	category = "Sound", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "playText",
+	func_description = 'playText(%s)',
+	ToNPL = function(self)
+		return string.format('playText("%s")\n', self:getFieldAsString('filename'));
+	end,
+	examples = {{desc = "使用文本播放语音", canRun = true, code = [[
+playText("欢迎来到我的世界")
+]]},
+{desc = "参数2可以延迟执行后面的代码", canRun = true, code = [[
+playText("你好", 2)
+tip("你好")
+]]},
+{desc = "参数3可以选择不同的声音 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫，默认为度丫丫(女童音)", canRun = true, code = [[
+playText("你好", 1, 1)
+tip("你好")
+]]},
+},
+},
+
 
 };
 function CodeBlocklyDef_Sound.GetCmds()

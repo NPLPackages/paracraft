@@ -78,37 +78,25 @@ Commands["music"] = {
 
 Commands["voice"] = {
 	name="voice", 
-	quick_ref="/voice [-speed number] [-lang zh] [-male|female] text", 
-	desc=[[Using the free baidu tts(text-to-speech) service to play a given text in human voice
+	quick_ref="/voice [-voiceNarrator number] text", 
+	desc=[[play a given text in human voice
 You must have internet connection to use this.
 /voice 你好 Paracraft
-/voice -speed 2  欢迎使用Paracraft
+/voice -voiceNarrator 2  欢迎使用Paracraft
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local speed, lang;
+		local voiceNarrator;
 		local option = true;
 		while(option) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
-			if(option == "speed") then
-				speed, cmd_text = CmdParser.ParseInt(cmd_text);
-			elseif(option == "lang") then
-				lang, cmd_text = CmdParser.ParseString(cmd_text);
+			if(option == "voiceNarrator") then
+				voiceNarrator, cmd_text = CmdParser.ParseInt(cmd_text);
 			end
 		end
-		speed = speed or 5;
-		lang = lang or "zh";
-
-		if(cmd_text~="") then
-			local url = format("https://tts.baidu.com/text2audio?per=1&lan=%s&ie=UTF-8&spd=%d&text=%s", lang, speed, commonlib.Encoding.url_encode(cmd_text));
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
-			local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
-			HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
-				if(diskfilename) then
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
-					local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
-					SoundManager:PlaySound(diskfilename:match("[^/\\]+$"), diskfilename);
-				end
-			end)
+		if cmd_text and cmd_text ~= "" then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+			local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+			SoundManager:PlayText(cmd_text, voiceNarrator);
 		end
 	end,
 };

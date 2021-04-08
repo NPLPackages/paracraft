@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local AskPop = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/AskPop/AskPop.lua");
+    AskPop.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+        AskPop.RunCallFunc()
+    end
+
+    function getFontStyle()
+        return AskPop.GetFontStyle()
+    end
+
+    function getFont()
+        return AskPop.str
+    end
+]]></script>
+<div style=" width: 655px; height: 177px; background: url(Texture/Aries/Creator/keepwork/macro/kdi_655X177_32bits.png#0 0 655 177);">
+    <div style="width: 660x; height: 60px;">
+        <input type="button" style="margin-left: 622px; margin-top: 54px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <input type="button" style="margin-left: 584px; margin-top: 64px; width:61px;height:28px;background: url(Texture/Aries/Creator/keepwork/macro/btn_61X28_32bits.png#0 0 61 28);" onclick="ClosePage()"/>
+    </div>
+    <div style='<%=getFontStyle()%>'><%=getFont()%></div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -80,6 +80,9 @@ HttpWrapper.default_prepFunc,
 HttpWrapper.default_postFunc
 )
 
+--http://yapi.kp-para.cn/project/151/interface/api/4067
+-- 下载合成声音
+HttpWrapper.Create("keepwork.user.playtext", "%MAIN%/ts-storage/text2audio", "POST", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/3212
 -- 使用兑换码激活会员

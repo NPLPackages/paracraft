@@ -21,6 +21,7 @@ local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local MacroPlayer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer"));
 local page;
+local TouchMiniKeyboard, TouchVirtualKeyboardIcon = nil, nil;
 
 function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
@@ -154,6 +155,14 @@ function MacroPlayer.ShowPage()
 		MacroPlayer.OnPageClosed();
 		page = nil;
 	end;
+	if (System.os.IsTouchMode() or IsDevEnv) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+		TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+		TouchMiniKeyboard = TouchMiniKeyboard.GetSingleton();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
+		TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
+		TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton();
+	end
 end
 
 function MacroPlayer.HideAll(bSkipTips)
@@ -582,6 +591,36 @@ function MacroPlayer.OnClickCursor()
 			end
 		end
 	end
+end
+
+function MacroPlayer.IsTouchVirtualKeyboardIconEvent()
+	local left, top, width, height = TouchVirtualKeyboardIcon.left, TouchVirtualKeyboardIcon.top, TouchVirtualKeyboardIcon.width, TouchVirtualKeyboardIcon.height;
+	return left < mouse_x and mouse_x < (left + width) and top < mouse_y and mouse_y < (top + height);
+end
+function MacroPlayer.OnTouch(event)
+	if (not TouchMiniKeyboard) then return end
+	event = event or msg;
+	TouchMiniKeyboard:OnTouch(event);
+	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnTouch(event) end 
+	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnTouch(event) end
+end
+function MacroPlayer.OnMouseDown(event)
+	if (not TouchMiniKeyboard) then return end
+	TouchMiniKeyboard:OnMouseDown(event);
+	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseDown(event) end 
+	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseDown(event) end
+end
+function MacroPlayer.OnMouseMove(event)
+	if (not TouchMiniKeyboard) then return end
+	TouchMiniKeyboard:OnMouseMove(event);
+	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseMove(event) end 
+	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseMove(event) end
+end
+function MacroPlayer.OnMouseUp(event)
+	if (not TouchMiniKeyboard) then return end
+	TouchMiniKeyboard:OnMouseUp(event);
+	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseUp(event) end 
+	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseUp(event) end
 end
 
 function MacroPlayer.OnKeyDown(event)

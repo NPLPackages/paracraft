@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/QuestWorkCode.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="QuestWorkCode.lua"><![CDATA[
+local QuestWorkCode = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestWorkCode.lua");
+QuestWorkCode.OnInit()
+KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
+function ClosePage()
+    Page:CloseWindow();
+    QuestWorkCode.CloseView()
+end
+
+function GetUrl()
+    return QuestWorkCode.wxcode_img_url
+end
+
+]]></script>
+<kp:window name="iframe" width="632" height="413" icon=""   onclose="ClosePage">
+    <div style="position: relative; margin-top: 8px;margin-left: 24px; width: 144px;height: 25px;background: url(Texture/Aries/Creator/keepwork/QuestWork/zi3_144X25_32bits.png#0 0 144 25);"></div>
+    <div style="color:#ffffff;width:960;height:630px" class="kp_window_container">
+        <div style="margin-top: 15px;margin-left: 27px; width: 488px;height: 51px;background: url(Texture/Aries/Creator/keepwork/QuestWork/zi11_488X51_32bits.png#0 0 488 51);"></div>
+        <div style="margin-top: 55px;margin-left: 224px;width: 184px;height: 224px;background: url(Texture/Aries/Creator/keepwork/QuestWork/erweima_184X224_32bits.png#0 0 184 224);">
+            <img style="margin-left: 15px;margin-top: 56px; float: left;" src='<%=GetUrl()%>' width="155" height="155"/>
+        </div>
+        
+     </div>
+</kp:window>
+    </pe:mcml>
+</body>
+</html>
+

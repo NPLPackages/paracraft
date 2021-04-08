@@ -206,8 +206,8 @@ function CodeBlockWindow:OnViewportChange()
 			_this:Reposition("_mr", 0, self.top, self.width, self.bottom);
 			if(page) then
 				CodeBlockWindow.UpdateCodeToEntity();
-				page:Rebuild();
 				CodeBlockWindow.RestoreCursorPosition()
+				page:Rebuild();
 				GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 			end
 
@@ -256,38 +256,50 @@ function CodeBlockWindow:OnCodeChange()
 	end
 end
 
+function CodeBlockWindow.SetFocusToTextControl()
+	commonlib.TimerManager.SetTimeout(function()  
+		local ctrl = CodeBlockWindow.GetTextControl();
+		if(ctrl) then
+			local window = ctrl:GetWindow()
+			if(window) then
+				if(not GameLogic.Macros:IsPlaying()) then
+					window:SetFocus_sys()
+					window:handleActivateEvent(true);
+				else
+					window.isEmulatedFocus = true;
+					window:handleActivateEvent(true);
+					window.isEmulatedFocus = nil;
+				end
+			end
+			ctrl:setFocus("OtherFocusReason")
+		end
+	end, 400);
+end
+
 function CodeBlockWindow.RestoreCursorPositionImp()
 	commonlib.TimerManager.SetTimeout(function()  
 		local ctrl = CodeBlockWindow.GetTextControl();
 		if(ctrl) then
-			--[[
-			-- uncomment this to auto set focus to the window
-			commonlib.TimerManager.SetTimeout(function()  
-				local window = ctrl:GetWindow()
-				if(window) then
-					if(not GameLogic.Macros:IsPlaying()) then
-						window:SetFocus_sys()
-						window:handleActivateEvent(true);
-					else
-						window.isEmulatedFocus = true;
-						window:handleActivateEvent(true);
-						window.isEmulatedFocus = nil;
-					end
-				end
-				ctrl:setFocus("OtherFocusReason")
-			end, 200);
-			]]
 			if(self.entity and self.entity.cursorPos) then
 				local cursorPos = self.entity.cursorPos;
 				ctrl:moveCursor(cursorPos.line, cursorPos.pos, false, true);
-				ctrl:SetFromLine(cursorPos.fromLine or 0)
+				if(cursorPos.fromLine) then
+					ctrl:SetFromLine(cursorPos.fromLine)
+				else
+					ctrl:SetFromLine(math.max(1, cursorPos.line-10))
+				end
 			end
 		end
 	end, 10);
 end
 
-function CodeBlockWindow.RestoreCursorPosition()
+function CodeBlockWindow.RestoreCursorPosition(bImmediate)
 	CodeBlockWindow.RequestRestoreCursor = true;
+	if(bImmediate) then
+		if(page) then
+			page:Refresh(0.01);
+		end
+	end
 end
 
 function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
@@ -463,7 +475,9 @@ function CodeBlockWindow.UpdateCodeToEntity()
 			local ctl = CodeBlockWindow.GetTextControl();
 			if(ctl) then
 				entity.cursorPos = ctl:CursorPos();
-				entity.cursorPos.fromLine = ctl:GetFromLine()
+				if(entity.cursorPos) then
+					entity.cursorPos.fromLine = ctl:GetFromLine()
+				end
 			end
 		end
 	end
@@ -1310,8 +1324,8 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 		x = 0, y = 45,
 		height = height - 45 - 54,
 		width = width,
-		minScreenWidth = 1600, --1600  1920
-		minScreenHeight = 900, -- 900 1080
+		-- minScreenWidth = 1600, --1600  1920
+		-- minScreenHeight = 900, -- 900 1080
 		windowName = "UICodeBlockWindow",
 	});
 end

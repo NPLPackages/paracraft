@@ -41,10 +41,10 @@ end
         <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"镜像"%>' uiname="SelectBlocksTask.btn_mirror" name="btn_mirror" tooltip='<%=L"Alt+左键设定参考点"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
         <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"变换"%>' tooltip='<%=L"shift+左键移动到鼠标所在位置\nShift+点击下方箭头拉伸(-/+)\n放大/缩小(Ctrl -/+)"%>' uiname="SelectBlocksTask.btn_transform" name="btn_transform" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
         <pe:if condition='<%=SelectBlocks.selected_count == 1 %>'>
-            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"编程"%>' tooltip='<%=L"进入编程模式"%>' name="NeuronMode" onclick="SelectBlocks.EnterNeuronEditMode" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"编程"%>' tooltip='<%=L"进入编程模式"%>' name="NeuronMode" uiname="SelectBlocksTask.EnterNeuronEditMode" onclick="SelectBlocks.EnterNeuronEditMode" class="mc_light_grey_button_with_fillet"/>
         </pe:if>
         <pe:if condition='<%=SelectBlocks.selected_count == 1 and GameLogic.options.has_real_terrain==true %>'>
-            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"地表"%>' tooltip='<%=L"将选中的块变成实数地表"%>' name="RealTerrainToBlocks" onclick="SelectBlocks.ConvertBlocksToRealTerrain" class="mc_light_grey_button_with_fillet"/>    
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"地表"%>' tooltip='<%=L"将选中的块变成实数地表"%>' name="RealTerrainToBlocks" uiname="SelectBlocksTask.ConvertBlocksToRealTerrain" onclick="SelectBlocks.ConvertBlocksToRealTerrain" class="mc_light_grey_button_with_fillet"/>    
         </pe:if>
     </div>
     <div style="margin-left:12px;margin-top:4px;height:60px;">

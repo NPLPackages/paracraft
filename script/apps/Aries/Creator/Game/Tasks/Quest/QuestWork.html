@@ -1,0 +1,207 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/QuestWork.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="QuestWork.lua"><![CDATA[
+local QuestWork = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestWork.lua");
+QuestWork.OnInit()
+KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
+function ClosePage()
+    Page:CloseWindow();
+    QuestWork.CloseView()
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #QuestWork.WorkData;
+    else
+        return QuestWork.WorkData[index];
+    end
+end
+
+function GiftDsItem(index)
+    if(index == nil) then
+        return #QuestWork.GiftData;
+    else
+        return QuestWork.GiftData[index];
+    end
+end
+
+function ClickItem(name,mcmlNode)
+    local attr = mcmlNode:GetAttribute("param1")
+
+    local click_cb = attr.click_cb
+
+    if click_cb and type(click_cb) == 'string' then
+        if click_cb == 'GrowthDiary' then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.daily_task.growth_diary");
+        elseif click_cb == 'WeekWork' then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.daily_task.week_work");
+        elseif click_cb == 'Classroom' then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.daily_task.class_room");
+        elseif click_cb == 'UpdataWorld' then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.daily_task.update_world");
+        elseif click_cb == 'VisitWorld' then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.daily_task.visit_world");
+        end
+    end
+
+    if QuestWork[click_cb] then
+        QuestWork[click_cb]()
+    end
+end
+
+function GetCompletePro(data)
+    return QuestWork.GetCompletePro(data)
+end
+
+function GetGiftItemIcon(item_data)
+    local gsid = item_data.gsId or 998
+    local path = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png#32 0 65 64", gsid)
+    return path
+end
+
+function GetGiftItemGId(item_data)
+    local gsid = item_data.gsId or 998
+    return gsid
+end
+
+
+function IsLastGift(index)
+    return index == #QuestWork.GiftData
+end
+
+function GetReward(name, mcmlNode)
+    local param = mcmlNode:GetAttribute("param1")
+    QuestWork.GetReward(param)
+end
+
+function ToWork(name, mcmlNode)
+print("dddddddd")
+    local param = mcmlNode:GetAttribute("param1")
+    
+    QuestWork.ToWork(param)
+end
+
+function Share(name, mcmlNode)
+    local param = mcmlNode:GetAttribute("param1")
+    QuestWork.Share(param)
+end
+
+function OnClikcGift(name, mcmlNode)
+    local param = mcmlNode:GetAttribute("param1")
+    QuestWork.OnClikcGift(param)
+end
+
+function IsNotTask()
+    return false
+    --return #QuestWork.WorkData == 0
+end
+
+function IsRoleModel(item_data)
+    return QuestWork.IsRoleModel(item_data)
+end
+
+function IsShowExpIcon(data)
+    return data.reward_exp ~= nil
+end
+
+function GetItemDesc(data)
+    if data.reward_exp then
+        return "探索力"
+    end
+
+    if data.goods and data.goods.gsId then
+        --local itemTemplate = KeepWorkItemManager.GetItemTemplate(data.goods.gsId) or {};
+        --return itemTemplate.desc
+        return data.goods.name
+    end
+    return ""
+end
+
+function IsSelected(index)
+    return QuestWork.TypeIndex == index
+end
+
+function OnChangeType(index)
+    QuestWork.OnChangeType(index)
+end
+
+]]></script>
+<kp:window name="iframe" width="960" height="580" icon="Texture/Aries/Creator/keepwork/Quest/biaoti_renwu2_32bits.png#0 0 128 64"   onclose="ClosePage">
+    <div style="color:#ffffff;width:960;height:630px" class="kp_window_container">
+        <!-- <div style="color: #101010;margin-left: 15px;margin-top: 12px;width: 661px;height: 23px; background: Texture/Aries/Creator/keepwork/Quest/zi_renwu_661X23_32bits.png#0 0 661 23;"></div> -->
+        <div style="float: left;width:90px;height:34px;margin-top: 10;margin-left: 7">
+            <pe:if condition='<%= IsSelected(1)%>'>
+                <input type="button" name="1" onclick="OnChangeType" style="position:relative;width:90px;height:34px; margin-top: -2px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/QuestWork/btn_qiehuan_90X34_32bits.png#0 0 32 16:8 10 8 4);"/>
+                <div zorder="1" style="margin-left: 24; margin-top:10px;width:46;height:14;background:url(Texture/Aries/Creator/keepwork/QuestWork/zi9_46X14_32bits.png#0 0 46 14);"></div> 
+            </pe:if>
+            <pe:if condition='<%= not IsSelected(1)%>'>
+                <input type="button" name="1" onclick="OnChangeType" style="position:relative;width:90px;height:32px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/QuestWork/btn_qiehuan2_86X32_32bits.png#0 0 32 16:8 10 8 4));"/>
+                <div zorder="1" style="margin-left: 24; margin-top:10px;width:46;height:14;background:url(Texture/Aries/Creator/keepwork/QuestWork/zi10_46X14_32bits.png#0 0 46 14);"></div> 
+            </pe:if>
+        </div>
+        <div style="float: left;width:86px;height:34px;margin-top: 10;margin-left: 7;">
+            <pe:if condition='<%= IsSelected(2)%>'>
+                <input type="button" name="2" onclick="OnChangeType" style="position:relative;width:86px;height:34px; margin-top: -2px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/QuestWork/btn_qiehuan_90X34_32bits.png#0 0 32 16:8 10 8 4));"/>
+                <div zorder="1" style="margin-left: 14; margin-top:10px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/QuestWork/zi7_62X15_32bits.png#0 0 62 15);"></div>
+              </pe:if>
+              <pe:if condition='<%= not IsSelected(2)%>'>
+                <input type="button" name="2" onclick="OnChangeType" style="position:relative;width:86px;height:32; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/QuestWork/btn_qiehuan2_86X32_32bits.png#0 0 32 16:8 10 8 4));"/>
+                <div zorder="1" style="margin-left: 14; margin-top:10px;width:62;height:15;background:url(Texture/Aries/Creator/keepwork/QuestWork/zi8_62X15_32bits.png#0 0 62 15);"></div>
+              </pe:if>
+        </div>
+        
+        <pe:if condition='<%=IsNotTask()%>'>
+            <div style="margin-top: 140px;margin-left: 360px; width: 277px;height: 87px;background:Texture/Aries/Creator/keepwork/Quest/zi_zanshi_277X87_32bits.png#0 0 277 87;"></div>
+        </pe:if>
+        
+        <div type ="box" style="width:960px;height:400px;margin-left: 4px;margin-top: 0px;float: left;">
+            <pe:gridview style="margin:0px;width:960px;height:400px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                DataSource='<%=Button_DS_Items%>'>
+                <Columns>
+                        <div name="item_root" style="color:#ffffff;width: 926px;height: 90px;float: left;">
+                           <div style="position:relative;margin-left:0px;margin-top:0px;">
+                               <img zorder="-1" src='Texture/Aries/Creator/keepwork/Quest/bjtiao_226X90_32bits.png#0 0 226 90:195 20 16 20'width="926" height="90"/>
+                           </div>
+                           <input type="button" name="canvas" value="" onclick="" param1 = '' style="position:relative;margin-left:0px;margin-top:0px;width: 926px; height: 90; background:url()" />
+                           <div style="width: 430px; height:90px; float: left;">
+                               <div style="width: 360px; height:45px;">
+                                   <div style="width: 360px;base-font-size:20px; font-size:20px; margin-left: 45px; margin-top: 14px;color:#000000;float: left;font-weight: bold;"><%=Eval("name") %></div>
+                               </div>
+                               
+                               <div style="base-font-size:12px; font-size:12px; margin-left: 48px; margin-top: 2px;color:#666666;"><%=Eval("desc") %></div>
+                           </div>
+
+                           <div style="width: 170px; height:90px; float: left;">
+                               <div style="width: 160px;height:90px;float: left">
+                                   <div style="width: 160px;height:90px;base-font-size:16px; font-size:16px; margin-left: 18px; margin-top: 33px;color:#666666;text-align: center;"><%=Eval("time_desc") %></div>
+                               </div>
+                               <div style="width: 240px;height:90px;float: left;">
+                               </div>
+                           </div>
+
+                           <div name="button_list" style="width: 325px; height:90px; float: left;">
+                                <input type="button" value="分享" onclick="Share" param1 = '<%=Eval("index") %>' style="float: left;base-font-size:24px;font-size: 24px; margin-left: 10px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54)" />
+                                <input type="button" value="前往" onclick="ToWork" param1 = '<%=Eval("index") %>' style="float: left;base-font-size:24px;font-size: 24px; margin-left: 20px; margin-top: 20px;width: 134px;height: 54px; background:url(Texture/Aries/Creator/keepwork/Quest/btn_lvse_134X54_32bits.png#0 0 134 54)" />
+                           </div>
+                        </div>
+
+                        
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+     </div>
+</kp:window>
+    </pe:mcml>
+</body>
+</html>
+

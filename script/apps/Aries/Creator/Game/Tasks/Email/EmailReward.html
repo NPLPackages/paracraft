@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local EmailReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailReward.lua");
+    EmailReward.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<div style=" width: 440px; height: 310px; background: url(Texture/Aries/Creator/keepwork/Email/tipbj_32bits.png#0 0 32 32: 14 14 14 14);">
+    <div style="width: 300x; height: 60px;">
+        <input type="button" style="margin-left: 410px; margin-top: 6px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <div style="color: #ffffff; font-size: 16px; base-font-size: 16px; margin-top: -20px; text-align: center; font-weight: bold;">领取成功</div>
+        <input type="button" value="确定" style="margin-left: 160px; margin-top: 210px; width:114px;height:44px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="ClosePage()"/>
+    </div>
+    <div name = "content">
+
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

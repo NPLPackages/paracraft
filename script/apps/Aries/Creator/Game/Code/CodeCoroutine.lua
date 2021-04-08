@@ -49,6 +49,15 @@ function CodeCoroutine:RemoveTimer(timer)
 	end
 end
 
+function CodeCoroutine:GetFreeTimer()
+	-- only check one timer, in most cases, coroutine has just one wait timer. 
+	local timer = self.timers and next(self.timers);
+	if(timer and timer.isFreeTimer) then
+		return timer;
+	end
+end
+
+
 function CodeCoroutine:KillAllTimers()
 	if(self.timers) then
 		for timer, _ in pairs(self.timers) do
@@ -97,15 +106,39 @@ function CodeCoroutine:SetTimer(callbackFunc, dueTime, period)
 	return timer;
 end
 
+
 function CodeCoroutine:SetTimeout(duration, callbackFunc)
-	local timer = self:GetCodeBlock():SetTimeout(duration, function(timer)
-		self:SetCurrentCodeContext()
-		self:RemoveTimer(timer);
-		if(callbackFunc and not self.isStopped) then
-			callbackFunc(timer);
-		end
-	end);
-	self:AddTimer(timer);
+	local timer = self:GetFreeTimer()
+	if(timer) then
+		timer.timeoutCallbackFunc = callbackFunc;
+		timer.isFreeTimer = false;
+		timer:Change(duration)
+	else
+		timer = self:GetCodeBlock():SetTimer(function(timer)
+			if(timer.isFreeTimer) then
+				timer.isFreeTimer = false;
+				timer.timeoutCallbackFunc = nil;
+				self:GetCodeBlock():KillTimer(timer)
+				self:RemoveTimer(timer);
+			else
+				timer.isFreeTimer = true
+				
+				-- we will wait at least 1000 to see this timer will be reused again. 
+				timer:Change(1000);
+
+				local callback = timer.timeoutCallbackFunc;
+				if(callback and not self.isStopped) then
+					timer.timeoutCallbackFunc = nil;
+					self:SetCurrentCodeContext()
+					callback(timer);
+				end
+			end
+		end, duration);
+		timer.timeoutCallbackFunc = callbackFunc;
+		timer.isFreeTimer = false;
+		self:AddTimer(timer);
+	end
+
 	return timer;
 end
 

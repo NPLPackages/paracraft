@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua");
+    InviteFriend.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetDS()        
+        return InviteFriend.exchanges
+    end
+
+    function isCanExchange(index)
+        return InviteFriend.CheckIsExchange(index)
+    end
+
+    function CheckExchanged(index)
+        return InviteFriend.CheckExchanged(index)
+    end
+
+    function getInviteNumStr()
+        return "当前邀请人数："..InviteFriend.invitenum
+    end
+
+    function getMyInviteCode()
+        return InviteFriend.invitecode
+    end
+
+    function OnClick()
+        local code = Page:GetValue("code")
+        InviteFriend.ClickOk(code)
+    end
+
+    function OnClickExchange(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        InviteFriend.ClickExchange(data)
+    end
+
+    function OnClickCopy()
+        InviteFriend.CopyToClipboard()
+    end
+
+    function OnClickReal()
+        InviteFriend.ClickRealName()
+    end
+
+    function isRealName()
+        return GameLogic.GetFilters():apply_filters('service.session.is_real_name')
+    end
+    
+]]></script>
+<div style=" width: 770px; height: 460px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/BJTU_751X407_32bits.png#0 0 767 457);">
+    <div style="width: 750x; height: 60px;">
+        <input type="button" style="margin-left: 710px; margin-top: 20px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <pe:if condition='<%=isRealName()%>'>
+            <div style=" margin-left: 250px; margin-top: 100px; width: 464px; height: 36px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/zi2_436X36_32bits.png#0 0 464 36);"></div>
+        </pe:if>
+        <pe:if condition='<%=not isRealName()%>'>
+            <div style=" margin-left: 250px; margin-top: 100px; width: 464px; height: 36px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/zi1_443X36_32bits.png#0 0 464 36);"></div>
+            <input type="button" style="margin-left: 386px; margin-top: -40px; width: 56px;height: 25px;background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn6_56X25_32bits.png#0 0 56 25);" onclick="OnClickReal()" />
+        </pe:if>
+    </div>
+
+    <div style="margin-top: 133px; margin-left: 300px;">
+        <div style="margin-left: 130px;color: #ffffff;">
+            <input name="code"   type="text" style="font-size: 16px;base-font-size: 16px; height: 31px;margin-left: 4px; width: 232px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/kuang_232X31_32bits.png#0 0 31 32:14 14 14 14);" EmptyText='<%= L"请输入邀请码" %>' />
+            <input type="button" onclick="OnClick" style="height: 35px; width: 84px; margin-left: 156px; margin-top: -34px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn1_84X35_32bits.png#0 0 84 35);"/>
+        </div>
+        <div style="margin-top: 130px; margin-left: -70px;">
+            <pe:repeat DataSource="<%=GetDS()%>">
+                <pe:repeatitem >
+                    <pe:if condition='<%=not isCanExchange(Eval("index"))%>'>
+                        <input type="button" style="float:left; margin-left: 36px;width: 84px;height: 35px;background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn5_84X35_32bits.png#0 0 84 35);" />
+                    </pe:if>
+                    <pe:if condition='<%=isCanExchange(Eval("index"))%>'>
+                        <pe:if condition='<%=not CheckExchanged(Eval("index"))%>'>
+                            <input type="button"  onclick="OnClickExchange" param1='<%= XPath("this") %>' style="float:left; margin-left: 36px;width: 84px;height: 35px;background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn3_84X35_32bits.png#0 0 84 35);" />
+                        </pe:if>
+                        <pe:if condition='<%=CheckExchanged(Eval("index"))%>'>
+                            <input type="button" style="float:left; margin-left: 36px;width: 84px;height: 35px;background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn4_84X35_32bits.png#0 0 84 35);" />
+                        </pe:if>
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+    </div>
+
+    <div style="margin-top: 22px;">
+        <div style="font-size: 14px; base-font-size: 14px; color: #ffffff; margin-left: 250px; "><%=getInviteNumStr()%></div>
+        <div style="font-size: 14px; base-font-size: 14px; color: #ffffff; margin-left: 594px; margin-top: -20px;"><%=getMyInviteCode()%></div>
+        <input type="button" onclick="OnClickCopy" style="height: 29px; width: 73px; margin-left: 674px; margin-top: -24px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/btn2_73X29_32bits.png#0 0 73 29);"/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -192,6 +192,7 @@ function ParaWorldSites.InitSitesNumber()
 	-- counterclockwise, start from row=5, column=4
 	-- first down to radius unit, then right to radius unit, up to radius unit, last left to radius unit
 	-- radius from 3 to 9, 3 5 7 9
+	--[[
 	local index = 1;
 	local corner1, corner2 = 4, 7;
 	for radius = 3, 9, 2 do
@@ -217,6 +218,35 @@ function ParaWorldSites.InitSitesNumber()
 		end
 		corner1 = corner1 - 1;
 		corner2 = corner2 + 1;
+	end
+	]]
+
+	-- clockwise, start from row=7, column=4
+	local index = 1;
+	local corner1, corner2 = 7, 4;
+	for radius = 3, 9, 2 do
+		-- down
+		for i = 1, radius do
+			ParaWorldSites.SitesNumber[index] = {row=corner2+i, column=corner1};
+			index = index + 1;
+		end
+		-- left
+		for i = 1, radius do
+			ParaWorldSites.SitesNumber[index] = {row=corner1, column=corner1-i};
+			index = index + 1;
+		end
+		-- up
+		for i = 1, radius do
+			ParaWorldSites.SitesNumber[index] = {row=corner1-i, column=corner2};
+			index = index + 1;
+		end
+		-- right
+		for i = 1, radius do
+			ParaWorldSites.SitesNumber[index] = {row=corner2, column=corner2+i};
+			index = index + 1;
+		end
+		corner1 = corner1 + 1;
+		corner2 = corner2 - 1;
 	end
 end
 

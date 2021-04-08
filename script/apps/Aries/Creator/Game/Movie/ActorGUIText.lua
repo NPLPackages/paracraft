@@ -20,6 +20,8 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorGUIText"));
 
@@ -33,6 +35,7 @@ local default_values = {
 	textanim = "",
 	textbg = nil,
 	bgcolor = "",
+	voicenarrator = -1,
 }
 Actor.default_values = default_values;
 
@@ -134,6 +137,9 @@ function Actor:AddKeyFrameOfText(values)
 		end
 		if(values.bgcolor == default_values.bgcolor) then
 			values.bgcolor = nil;
+		end
+		if(values.voicenarrator == default_values.voicenarrator) then
+			values.voicenarrator = nil;
 		end
 	end
 	self:AddKeyFrameByName("text", nil, values);
@@ -247,7 +253,7 @@ function Actor:GetTextImagePathByName(filename)
 end
 
 -- update UI text with given values. 
-function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor)
+function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor, voicenarrator)
 	local obj = self:GetTextObj(true);
 	if(not obj) then
 		return
@@ -255,8 +261,17 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 	local bg_obj = obj.parent;
 
 	if(text and text~="" ) then
+		local play_text = GameLogic:GetText(text)
+		if voicenarrator and voicenarrator >= 0 then
+			if obj.text == nil or obj.text ~= play_text or not obj.visible or obj.voicenarrator ~= voicenarrator then
+				SoundManager:PlayText(play_text, voicenarrator)
+			end
+
+			obj.voicenarrator = voicenarrator
+		end
+
 		obj.visible = true;
-		obj.text = GameLogic:GetText(text);
+		obj.text = play_text;
 		_guihelper.SetFontColor(obj, fontcolor or default_values.fontcolor);
 		
 		if(textalpha and textalpha~=1) then
@@ -360,6 +375,6 @@ function Actor:FrameMovePlaying(deltaTime)
 				text = text:gsub("#", "\n");
 			end
 		end
-		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor);
+		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor, values.voicenarrator);
 	end
 end

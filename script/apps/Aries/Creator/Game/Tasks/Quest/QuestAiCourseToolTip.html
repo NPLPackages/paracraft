@@ -1,0 +1,22 @@
+﻿<!-- "script/apps/Aries/Desktop/QuestArea/QuestArea.tooltip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+local page = document:GetPageCtrl();
+
+local s = page:GetRequestParam("s");
+function getStr()
+    return s;
+end
+
+]]></script>
+<div>
+    <div class="kp_tooltip_bg" style="padding:10px;padding-bottom:15px;margin-top:-7px;width:200px;color: #ffffff;font-size: 14px;">
+        <%=getStr() %>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

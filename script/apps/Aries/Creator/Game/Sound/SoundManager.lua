@@ -17,7 +17,10 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+local UniString = commonlib.gettable("System.Core.UniString")
+local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
+local Diskfolder = "temp/PlayText"
 
 -- @param filename: sound name or a table array of sound names. 
 function SoundManager:Init()
@@ -103,6 +106,7 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
             AudioEngine.Stop(sound_name);
         end
 		local new_sound = AudioEngine.CreateGet(sound_name);
+
 		new_sound.file = filename or (new_sound.file~="" and new_sound.file or Files.GetWorldFilePath(sound_name));
 		if(not new_sound.file) then
 			LOG.std(nil, "warn", "SoundManager", "sound: %s does not exist. \n", sound_name);
@@ -114,6 +118,7 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
 			new_sound:seek(from_time);
 		end
 		new_sound:play2d(volume, pitch);
+
 		self.playingSounds[sound_name] = new_sound;
     end
 end
@@ -224,4 +229,163 @@ function SoundManager:CancelVibrate()
 	if(MobileDevice and MobileDevice.vibrate and GameLogic.options:IsVibrationEnabled()) then
 		MobileDevice.cancelVibrate();
 	end
+end
+
+
+-- @param text: 合成文本
+-- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫，默认为度丫丫(女童音)
+-- @param nTimeoutMS: 时间限制 超过该时间则不播放声音 单位：秒
+function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
+	if nil == text or text == "" then
+		return
+	end
+	voiceNarrator = voiceNarrator or 4
+	nTimeoutMS = nTimeoutMS or 7
+
+	local start_timestamp = os.time()
+	self:PrepareText(text,  voiceNarrator, function(file_path)
+		if os.time() - start_timestamp > nTimeoutMS then
+			return
+		end
+
+		self:PlaySound("playtext" .. voiceNarrator, file_path)
+	end)
+end
+
+-- @param text: 合成文本
+-- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫，默认为度丫丫(女童音)
+-- @param callbackFunc: 下载声音后的回调函数
+function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
+	if nil == text or text == "" then
+		return
+	end
+	
+	local text_lenth = UniString.GetTextLength(text)
+	if text_lenth > 200 then
+		GameLogic.AddBBS(nil, L"该文本超过字数上限，最多200个文字");
+		return
+	end
+
+	voiceNarrator = voiceNarrator or 4
+	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voiceNarrator))
+	-- 检测是否有本地文件
+	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
+	if file_path then
+		callbackFunc(file_path)
+		return
+	end
+
+	if GameLogic.IsVip() or GameLogic.IsReadOnly() then
+		-- 判断cdn上有无缓存
+		local httpwrapper_version = HttpWrapper.GetDevVersion();
+		local url = httpwrapper_version == "ONLINE" and "http://qiniu-audio.keepwork.com" or "http://qiniu-audio-dev.keepwork.com"
+		url = string.format("%s/%s?%s", url, md5_value, math.random(1, 100))
+
+		System.os.GetUrl(url, function(err, msg, data)
+			if err == 200 then
+				local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, data)
+				callbackFunc(file_path)
+			else
+				self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
+					local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
+					callbackFunc(file_path)
+				end)
+			end
+		end);
+	elseif not GameLogic.IsReadOnly() then
+		self:DownloadSoundByBaiDu("您需要成为会员才能播放这段文字", callbackFunc)
+	end
+end
+
+function SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
+	local filename = md5_value .. ".mp3"
+	NPL.load("(gl)script/ide/Files.lua");
+
+	local file_path = string.format("%s/%s/", Diskfolder, voiceNarrator)
+	local result = commonlib.Files.Find({}, file_path, 0, 1000, filename)
+	if(#result>=1) then
+		return file_path .. result[1].filename;
+	end	
+end
+
+function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
+	local filename = md5_value .. ".mp3"
+	local file_path = string.format("%s/%s/%s", Diskfolder, voiceNarrator, filename)
+	ParaIO.CreateDirectory(file_path)
+	local file = ParaIO.open(file_path, "w");
+	if(file) then
+		file:write(data, #data);
+		file:close();
+	end
+
+	return file_path
+end
+
+function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
+	keepwork.user.playtext({
+		text = text,
+		key = md5_value,
+		options = {per = voiceNarrator},
+	}, function(err, msg, data)
+		if err == 200 then
+			System.os.GetUrl(data.data, function(download_err, download_msg, download_data)
+				if download_err == 200 then
+					callback(download_data)
+				end
+			end);
+		end
+	end)
+end
+
+function SoundManager:DownloadSoundByBaiDu(text, callback, speed, lang)
+	speed = speed or 5;
+	lang = lang or "zh";
+
+	if(text~="") then
+		local url = format("https://tts.baidu.com/text2audio?per=1&lan=%s&ie=UTF-8&spd=%d&text=%s", lang, speed, commonlib.Encoding.url_encode(text));
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+		local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+		HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
+			if(diskfilename) then
+				callback(diskfilename)
+			end
+		end)
+	end
+end
+
+function SoundManager:GetSoundDuration(channel_name, filename)
+    local sound_name = channel_name;
+	local sound = self.playingSounds[sound_name];
+	if(filename) then
+		local filename_ = Files.GetWorldFilePath(filename);
+		if(filename_) then
+			filename = filename_;
+		else
+			local soundTemplate = AudioEngine.Get(filename)
+			if(soundTemplate) then
+				filename = soundTemplate.file;
+			else
+				filename = nil;
+			end
+		end
+	end
+	
+    if (sound) then
+        if(filename and sound.file ~= filename) then
+			sound:SetFileName(filename);
+		end
+
+		local source = sound:GetSource()
+		return source.TotalAudioTime or 0
+    else
+		local new_sound = AudioEngine.CreateGet(sound_name);
+
+		new_sound.file = filename or (new_sound.file~="" and new_sound.file or Files.GetWorldFilePath(sound_name));
+		if(not new_sound.file) then
+			LOG.std(nil, "warn", "SoundManager", "sound: %s does not exist. \n", sound_name);
+			return 
+		end
+		local source = new_sound:GetSource()
+		return source.TotalAudioTime or 0
+    end
 end

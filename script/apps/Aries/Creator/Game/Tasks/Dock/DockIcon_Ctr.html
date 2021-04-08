@@ -1,0 +1,37 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Dock/DockIcon_Ctr.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="DockIcon_Ctr.lua"><![CDATA[
+local DockIcon_Ctr = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockIcon_Ctr.lua");
+DockIcon_Ctr.OnInit()
+
+function OnClickMall()
+    local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+    if not KeepWorkMallPage.isOpen then
+        KeepWorkMallPage.Show();
+    else
+        KeepWorkMallPage.Close()
+    end
+end
+
+function IsShowMallIcon()
+    return not System.options.isCodepku and GameLogic.GameMode:IsEditor() and GameLogic.options:GetProjectId() ~= "29477" and DockIcon_Ctr.IsHomeWorld() and not System.options.IsMobilePlatform
+end
+]]></script>
+<pe:container alignment="_ctr" ClickThrough="true" style="position:relative;height:90px; background:;">
+    <pe:if condition='<%=IsShowMallIcon()%>'>
+        <div ClickThrough="true" style="float:right;margin-right:0px;">
+            <input type="button" name='mall' onclick="OnClickMall" style="width:182px;height:68px;background:url(Texture/Aries/Creator/keepwork/dock/btn_ziyuan_32bits.png#0 0 182 68)"/>
+        </div>  
+    </pe:if>    
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,126 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParametricMake/ParametricPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+    <script type="text/npl" src="">
+<![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParametricMake/ParametricPage.lua");
+local ParametricPage = commonlib.gettable("ParametricMake.ParametricPage");
+ParametricPage.onInit();
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParametricMake/ParametricMake.lua");
+local ParametricMake = commonlib.gettable("ParametricMake.ParametricMake");
+local page_ctrl = document:GetPageCtrl();
+local name = page_ctrl:GetRequestParam("name");
+local m = ParametricMake.createOrGet(name) or {}
+local node = m.node or {};
+commonlib.echo("=========node.raw_props");
+commonlib.echo(node.raw_props,true);
+function getName()
+    return node.name;
+end
+function getProps()
+    
+    return node.raw_props or {}
+end
+function onClose()
+    page_ctrl:CloseWindow(true);
+end
+function getProp(index)
+    if(node.raw_props)then
+        return node.raw_props[index];
+    end
+end
+function getPropValue(index)
+    local p = getProp(index);
+    if(p)then
+        return tostring(p.value);
+    end
+end
+function onTextChange(name,mcmlNode,uiobj)
+    local p = node:getProperty(name);
+    if(p and uiobj)then
+        p.value = uiobj.text;
+    end
+end
+function isNumber(name)
+    return node:isNumber(name);
+end
+function isString(name)
+    return node:isString(name);
+end
+function isEnum(name)
+    return node:isEnum(name);
+end
+function getOutputDroplist(index)
+    local p = getProp(index);
+    if(p)then
+        return ParametricPage.outputDroplist(node,p);
+    end
+end
+function onRebuildPage()
+    m:run();
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParametricMake/ParametricPage.lua");
+    local ParametricPage = commonlib.gettable("ParametricMake.ParametricPage");
+    ParametricPage.show("firstUIMaker","_lt", 0, 0, 400, 600);
+end
+function onChangeEnum(name, v)
+    commonlib.echo("============name");
+    commonlib.echo(name);
+    commonlib.echo("============v");
+    commonlib.echo(v);
+        node.props[name] = v;
+        onRebuildPage()
+end
+function toJson()
+    commonlib.echo("=================node:toJson()");
+    commonlib.echo(node:toJson(),true);
+end
+]]>
+    </script>
+    <div>
+        <div>
+            <input type="button" value="Close" onclick="onClose"/>
+        </div>
+        <div>
+            <%=getName()%>
+        </div>
+        <div>
+            <input type="button" value="Check" onclick="toJson" />
+            <pe:repeat DataSource="<%=getProps()%>">
+                <pe:repeatitem >
+                    <pe:if condition='<%= isNumber(Eval("name")) or isString(Eval("name")) %>'>
+                        <div>
+                            <div style="float:left;">
+                                <span><%= Eval("label")%></span><span>:</span>
+                            </div>
+                            <div style="float:left;">
+                                <input type="text" name='<%=Eval("name")%>' onkeyup="onTextChange" value='<%=getPropValue(Eval("index"))%>' />
+                            </div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%= isEnum(Eval("name")) %>'>
+                        <div>
+                            <div style="float:left;">
+                                <span><%= Eval("label")%></span><span>:</span>
+                            </div>
+                            <div style="float:left;">
+                                <%= getOutputDroplist(Eval("index"))%>
+                            </div>
+                        </div>
+                    </pe:if>        
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        
+    </div>
+
+
+</pe:mcml>
+</body>
+</html>

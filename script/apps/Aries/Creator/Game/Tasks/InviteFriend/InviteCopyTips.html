@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local InviteCopyTips = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteCopyTips.lua");
+    InviteCopyTips.OnInit()
+    function ClosePage()
+        InviteCopyTips.isShow = false
+        Page:CloseWindow();
+    end
+
+]]></script>
+<div style=" width: 350px; height: 168px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/tanchuang_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+    <div style="width: 350px;">
+        <input type="button" style="margin-left: 320px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+
+    <div style="text-align: center; margin-top: 10px; font-size: 14px; base-font-size: 14px; color: #FFFFFF;">复制成功，快去QQ粘贴文字发送给你的好友吧！</div>
+
+    <input type="button" class="" value="确定" style="font-size: 16px ;base-font-size: 16px ;margin-left:120px;margin-top: 44px; width:114px;height:44px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16)" onclick="ClosePage()"/>
+
+</div>
+</pe:mcml>
+</body>
+</html>

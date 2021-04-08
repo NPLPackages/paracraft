@@ -30,55 +30,58 @@ end
     MouseCursor3 = { width = 48, height=48, position="relative", background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"},
 }
 </style>
-<pe:container name="cursorClick" candrag="true" ondragbegin="MacroPlayer.OnDragBegin" ondragmove="MacroPlayer.OnDragMove" ondragend="MacroPlayer.OnDragEnd" style="width:32px;height:32px;position:relative;background:url()" onclick="MacroPlayer.OnClickCursor">
-    <img enabled="false" class="MouseCursor2"/>
-    <input name="cursorBtn" type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/cursor_big_32bits.png#0 0 42 42);width:42px;height:42px;margin-left:12px;margin-top:15px;" />
-    <div style="margin-top:32px;">
-        <img name="mouseBtn" style="position:relative;width:32px;height:32px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)" />
-        <pe:container name="altKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png)">ALT</pe:container>
-        <pe:container name="ctrlKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">CTRL</pe:container>
-        <pe:container name="shiftKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">SHIFT</pe:container>
-    </div>
+<pe:container style="background-color: #00000000;" alignment="_fi" ontouch="MacroPlayer.OnTouch">
+    <pe:container name="cursorClick" candrag="true" ondragbegin="MacroPlayer.OnDragBegin" ondragmove="MacroPlayer.OnDragMove" ondragend="MacroPlayer.OnDragEnd" style="width:32px;height:32px;position:relative;background:url()" onclick="MacroPlayer.OnClickCursor">
+        <img enabled="false" class="MouseCursor2"/>
+        <input name="cursorBtn" type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/cursor_big_32bits.png#0 0 42 42);width:42px;height:42px;margin-left:12px;margin-top:15px;" />
+        <div style="margin-top:32px;">
+            <img name="mouseBtn" style="position:relative;width:32px;height:32px;background:url(Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png)" />
+            <pe:container name="altKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png)">ALT</pe:container>
+            <pe:container name="ctrlKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:46px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">CTRL</pe:container>
+            <pe:container name="shiftKey" style="position:relative;background-color:#f5c4bd;color:#000000;text-align:center;width:60px;height:32px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)">SHIFT</pe:container>
+        </div>
+    </pe:container>
+    <pe:container name="dragPoints" style="width:32px;height:32px;position:relative;background:url()">
+        <img name="startPoint" class="MouseCursor3" />
+        <img name="endPoint" class="MouseCursor3" />
+    </pe:container>
+    <pe:container name="keyPress" alignment="_ctt" style="margin-left:-60px;margin-top:50px;height:32px;position:relative;background:url()">
+        <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding-left:8px;padding-right:8px;padding:5px;height:32px;">请用键盘按</div>
+        <div style="float:left;">
+            <input type="button" name="key1" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+            <input type="button" name="key2" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+            <input type="button" name="key3" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
+        </div>
+    </pe:container>
+    <pe:container name="editBox" alignment="_ctt" style="margin-top:10px;height:32px;position:relative;background:url()">
+        <div style="float:left;background-color:#00000080;color:#ffffff;padding:5px;height:32px;">在文本框中输入：
+            <pe:label name="editboxText" style="width:150px;color:#ffcccc"/>
+        </div>
+    </pe:container>
+    <pe:container name="mouseWheel" alignment="_lt" zorder="-3" style="position:relative;background:url()">
+        <div style="margin-left:-85px;margin-top:-64px">
+            <img name="mouseBtn" style="position:relative;margin-top:32px;margin-left:-16px;width:64px;height:64px;background:url(Texture/Aries/Quest/TutorialMouse_MiddleClick_32bits.png)" />
+            <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding:5px;height:32px;">在目标位置滚动鼠标滚轮</div>
+        </div>
+    </pe:container>
+    <pe:container name="KeyInput" style="height:1px;width:1px;position:relative;background:url()">
+    </pe:container>
+    <pe:container name="progressController" style="position:relative;background-color:#00000080;margin-left:10px;margin-top:10px;height:32px;color:#ffffff">
+        <div style="float:left"><pe:progressbar name="progress" Minimum = "0" Value = "0" Maximum = "100" Step = "1" style="margin-left:5px;margin-top:5px;width:100px;height:16px;"/></div>
+        <input name="next" type="button" tooltip="下一步" style="margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/next_off.png)" onclick="MacroPlayer.AutoCompleteTrigger()"/>
+        <input name="stop" type="button" tooltip="停止示教宏播放" style="margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/stop_off.png)" onclick="MacroPlayer.OnClickStop()"/>
+    </pe:container>
+    <pe:container class="mc_item" name="tipWnd" style="position:relative;margin-top:80px;margin:10px;padding:5px;width:360px;">
+        <div style="float:left;width:80px;height:20px;margin-left:-15px;margin-top:-40px;"><pe:canvas3d miniscenegraphname="DownloadWorld128" DefaultRotY="-0.9" DefaultCameraObjectDist="4" IsInteractive="false" RenderTargetSize="128" style="width:80px;height:80px;" value='<%=GetModelParams()%>' /></div>
+        <pe:label name="tipText" style="font-size:14;text-align:center;color:#f5c4bd;height:36px;"></pe:label>
+    </pe:container>
+    <pe:container name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:60px;position:relative;background:url();" width="100%">
+        <div style="background-color:#00000080" width="100%" height="100%">
+            <input type="button" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/>
+        </div>
+    </pe:container>
 </pe:container>
-<pe:container name="dragPoints" style="width:32px;height:32px;position:relative;background:url()">
-    <img name="startPoint" class="MouseCursor3" />
-    <img name="endPoint" class="MouseCursor3" />
-</pe:container>
-<pe:container name="keyPress" alignment="_ctt" style="margin-left:-60px;margin-top:50px;height:32px;position:relative;background:url()">
-    <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding-left:8px;padding-right:8px;padding:5px;height:32px;">请用键盘按</div>
-    <div style="float:left;">
-        <input type="button" name="key1" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
-        <input type="button" name="key2" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
-        <input type="button" name="key3" style="position:relative;text-valign:top;font-size:16px;background-color:#f5c4bd;color:#000000;width:60px;margin-top:-8px;height:40px;background:url(Texture/Aries/Quest/keyboard_btn.png:10 10 10 16)" />
-    </div>
-</pe:container>
-<pe:container name="editBox" alignment="_ctt" style="margin-top:10px;height:32px;position:relative;background:url()">
-    <div style="float:left;background-color:#00000080;color:#ffffff;padding:5px;height:32px;">在文本框中输入：
-        <pe:label name="editboxText" style="width:150px;color:#ffcccc"/>
-    </div>
-</pe:container>
-<pe:container name="mouseWheel" alignment="_lt" zorder="-3" style="position:relative;background:url()">
-    <div style="margin-left:-85px;margin-top:-64px">
-        <img name="mouseBtn" style="position:relative;margin-top:32px;margin-left:-16px;width:64px;height:64px;background:url(Texture/Aries/Quest/TutorialMouse_MiddleClick_32bits.png)" />
-        <div style="float:left;background:url(Texture/Aries/common/whitebg32_32bits.png: 8 8 8 8);color:#2a94c8;padding:5px;height:32px;">在目标位置滚动鼠标滚轮</div>
-    </div>
-</pe:container>
-<pe:container name="KeyInput" style="height:1px;width:1px;position:relative;background:url()">
-</pe:container>
-<pe:container name="progressController" style="position:relative;background-color:#00000080;margin-left:10px;margin-top:10px;height:32px;color:#ffffff">
-    <div style="float:left"><pe:progressbar name="progress" Minimum = "0" Value = "0" Maximum = "100" Step = "1" style="margin-left:5px;margin-top:5px;width:100px;height:16px;"/></div>
-    <input name="next" type="button" tooltip="下一步" style="margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/next_off.png)" onclick="MacroPlayer.AutoCompleteTrigger()"/>
-    <input name="stop" type="button" tooltip="停止示教宏播放" style="margin-top:0px;width:32px;height:32px;background:url(Texture/Aries/Creator/player/stop_off.png)" onclick="MacroPlayer.OnClickStop()"/>
-</pe:container>
-<pe:container class="mc_item" name="tipWnd" style="position:relative;margin-top:80px;margin:10px;padding:5px;width:360px;">
-    <div style="float:left;width:80px;height:20px;margin-left:-15px;margin-top:-40px;"><pe:canvas3d miniscenegraphname="DownloadWorld128" DefaultRotY="-0.9" DefaultCameraObjectDist="4" IsInteractive="false" RenderTargetSize="128" style="width:80px;height:80px;" value='<%=GetModelParams()%>' /></div>
-    <pe:label name="tipText" style="font-size:14;text-align:center;color:#f5c4bd;height:36px;"></pe:label>
-</pe:container>
-<pe:container name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:60px;position:relative;background:url();" width="100%">
-    <div style="background-color:#00000080" width="100%" height="100%">
-        <input type="button" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/>
-    </div>
-</pe:container>
+
 <% MacroPlayer.OnInitEnd();%>
 </pe:mcml> 
 </body>

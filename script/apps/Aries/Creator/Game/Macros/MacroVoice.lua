@@ -51,12 +51,6 @@ end
 
 -- @param filename play a mp3 or ogg file name
 function Macros.sound(filename)
-	if(Macros.IsAutoPlay()) then
-		return
-	end
-	if(filename) then
-		GameLogic.RunCommand("sound", format("macroplayer %s", filename))
-	end
 end
 
 

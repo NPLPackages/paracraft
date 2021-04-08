@@ -21,9 +21,12 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
 local EditMovieTextPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditMovieTextPage");
 
+local default_narrator = -1
 local page;
 function EditMovieTextPage.OnInit()
 	page = document:GetPageCtrl();
@@ -34,6 +37,7 @@ end
 function EditMovieTextPage.ShowPage(title, OnClose, last_values)
 	EditMovieTextPage.result = last_values;
 	EditMovieTextPage.title = title;
+	default_narrator = -1
 	
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html", 
@@ -89,6 +93,7 @@ function EditMovieTextPage.OnOK()
 			textanim = page:GetValue("textanim"),
 			bganim = page:GetValue("bganim"),
 			textbg = page:GetValue("textbg"),
+			voicenarrator = page:GetValue("voicenarrator"),
 			bgcolor = bgcolor,
 		};
 		page:CloseWindow();
@@ -121,7 +126,101 @@ function EditMovieTextPage.UpdateUIFromValue(values)
 		if(values.bgcolor) then
 			page:SetValue("bgcolor", values.bgcolor);
 		end
+		if(values.voicenarrator) then
+			page:SetValue("voicenarrator", values.voicenarrator);
+			default_narrator = values.voicenarrator
+			EditMovieTextPage.UpdateSoundDesc()
+		end
+		
 	end
+end
+
+function EditMovieTextPage.OnClickSelcetNarrator(name, value)
+	if value == default_narrator then
+		return
+	end
+
+	if value >= 0 and not System.User.isVip then
+		page:SetValue("voicenarrator", default_narrator);
+		local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+		VipToolNew.Show("recorder")
+		return
+	end
+end
+
+function EditMovieTextPage.OnListeningTest()
+	local text = page:GetValue("text") or "";
+	text = text:gsub("\r?\n", "#");
+
+	if text == "" then
+		page:SetValue("SoundDesc", "")
+		GameLogic.AddBBS(nil, L"请先输入文字", 15000, "255 0 0");
+		return
+	end
+
+	local voicenarrator = page:GetValue("voicenarrator", -1)
+	if not voicenarrator or voicenarrator < 0 then
+		page:SetValue("SoundDesc", "")
+		GameLogic.AddBBS(nil, L"请选择播音员", 15000, "255 0 0");
+		return
+	end
+
+	local is_cb_retrun = false
+	local nTimeoutMS = 7
+	local start_timestamp = os.time()
+	Mod.WorldShare.MsgBox:Show(L"请稍候...")
+	SoundManager:PrepareText(text,  voicenarrator, function(file_path)
+		is_cb_retrun = true
+		Mod.WorldShare.MsgBox:Close()
+		
+		if os.time() - start_timestamp > nTimeoutMS then
+			GameLogic.AddBBS(nil, L"合成声音超时，请重新尝试", 15000, "255 0 0");
+			return
+		end
+		
+		SoundManager:PlaySound("playtext" .. voicenarrator, file_path)
+		EditMovieTextPage.UpdateSoundDesc()
+	end)
+
+	commonlib.TimerManager.SetTimeout(function()  
+		if not is_cb_retrun then
+			Mod.WorldShare.MsgBox:Close()
+		end
+	end, nTimeoutMS * 1000);
+end
+
+function EditMovieTextPage.OnTextChange()
+	if not System.User.isVip then
+		page:SetValue("voicenarrator", -1);
+	end
+end
+
+function EditMovieTextPage.UpdateSoundDesc()
+	local text = page:GetValue("text") or "";
+	text = text:gsub("\r?\n", "#")
+
+	if text == "" then
+		page:SetValue("SoundDesc", "")
+		return
+	end
+
+	local voicenarrator = page:GetValue("voicenarrator", -1)
+	if not voicenarrator or voicenarrator < 0 then
+		page:SetValue("SoundDesc", "")
+		return
+	end
+
+	local channel_name = "playtext" .. voicenarrator
+
+	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voicenarrator))
+	local filename = md5_value .. ".mp3"
+	local file_path = string.format("%s/%s/%s", "temp/PlayText", voicenarrator, filename)
+	local duration = SoundManager:GetSoundDuration(channel_name, file_path)
+	
+	if duration and duration > 0 then
+		page:SetValue("SoundDesc", string.format("时长%.1f秒", duration))
+	end
+	
 end
 
 function EditMovieTextPage.OnReset()

@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local InviteSuccess = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteSuccess.lua");
+    InviteSuccess.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<div style=" width: 414px; height: 274px; background: url(Texture/Aries/Creator/keepwork/InviteFriend/jiangzhuang_414X274_32bits.png#0 0 414 274);">
+    <div style="width: 414px; height: 60px;">
+        <input type="button" style="margin-left: 380px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+
+    <div style="text-align: center; margin-top: 56px; font-size: 24px; base-font-size: 24px; color: #681E0F; font-weight: bold;"><%=L"好友的召唤"%></div>
+
+</div>
+</pe:mcml>
+</body>
+</html>
