@@ -63,7 +63,7 @@ loadtemplate("aaa.bmax")
 loadtemplate("abc.bmax", "-r")
 tip("some text")
 voice("text to speech")
-sound("1.mp3")
+playsound("1.mp3")
 text("bottom line big text", 5000)
 broadcast("globalGameEvent")
 ShowWindow(false)
@@ -95,6 +95,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroControl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
@@ -107,12 +108,15 @@ local Screen = commonlib.gettable("System.Windows.Screen");
 local KeyFrameCtrl = commonlib.gettable("MyCompany.Aries.Game.Movie.KeyFrameCtrl");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
 local lastPlayerPos = {pos = {x=0, y=0, z=0}, facing=0, recorded=false};
 local lastCameraPos = {camobjDist=10, LiftupAngle=0, CameraRotY=0, recorded = false, lookatX=0, lookatY = 0, lookatZ = 0};
 local startTime = 0;
 local idleStartTime = 0;
 local pause = {};
+local end_preplaytext_index = 0
+local has_playtext = false
 
 local isInited;
 function Macros:Init()
@@ -410,15 +414,26 @@ function Macros:AddMacro(text, ...)
 		return 
 	end 
 	local args = {...}
-	if(#args > 0) then
+	local argCount = select('#', ...);
+	if(argCount > 0) then
 		local params;
-		for _, param in ipairs(args) do
+		-- skip nil values
+		for i = argCount, 1, -1 do 
+			if args[i] == nil then
+				argCount = argCount - 1
+			else
+				break
+			end
+		end
+		for i = 1, argCount do  -->获取参数总数
+			local param = args[i]; -->读取参数
 			if(params) then
-				params = params..","..commonlib.serialize_compact(param);
+				param = param == nil and "nil" or commonlib.serialize_compact(param)
+				params = params..",".. param;
 			else
 				params = commonlib.serialize_compact(param);
 			end
-		end
+		end 
 		text = format("%s(%s)", text, params or "");
 	else
 		if(not text:match("%(")) then
@@ -598,6 +613,10 @@ function Macros:PrepareInitialBuildState()
     CreatorDesktop.OnChangeTabview(1)
     CreatorDesktop.ShowNewPage(false)
     
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	CodeBlockWindow:SetBigCodeWindowSize(false);
+
     NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
     local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
     OpenAssetFileDialog.OnChangeCategory(2);
@@ -612,10 +631,12 @@ function Macros:PrepareInitialBuildState()
 end
 
 -- @param text: text lines of macros. if nil, it will play from clipboard
-function Macros:Play(text, speed)
+function Macros:Play(text, speed)	
 	text = text or ParaMisc.GetTextFromClipboard() or "";
 	local macros = self:LoadMacrosFromText(text)
 	self:PlayMacros(macros, 1, speed);
+	self:InitPrePlaytextData()
+	self:PreparePlayText(5)
 end
 
 function Macros:BeginPlay()
@@ -719,6 +740,11 @@ function Macros:PlayMacros(macros, fromLine, speed)
 					isAsync = false;
 				end
 			end)
+
+			if m.name == "text" then
+				self:PreparePlayText()
+			end
+
 			if(isAsync == false) then
 				fromLine = fromLine + 1;
 			else
@@ -879,4 +905,44 @@ function Macros:MarkMousePress(event)
 	lastMouseDownEvent.y = event.y;
 	lastMouseDownEvent.mouse_button = event.mouse_button;
 	lastMouseDownEvent.clickTime = commonlib.TimerManager.GetCurrentTime();
+end
+
+function Macros:InitPrePlaytextData()
+	end_preplaytext_index = 0
+	has_playtext = false
+end
+
+function Macros:PreparePlayText(prepare_nums)
+	if self.macros == nil then
+		return
+	end
+
+	prepare_nums = prepare_nums or 1
+	if (prepare_nums == 1 and not has_playtext) or (end_preplaytext_index >= #self.macros) then
+		return
+	end
+
+	local pre_count = 0
+	for i = end_preplaytext_index + 1, #self.macros do
+		local item = self.macros[i]
+		if item then
+			if item.name == "text" and item.params then
+				local params = type(item.params) == "table" and item.params or commonlib.split(item.params,",")
+				local text = params[1] or ""
+				if text ~= "" then
+					SoundManager:PrepareText(text,  params[4])
+					pre_count = pre_count + 1
+				end
+			end
+			
+			if pre_count >= prepare_nums then
+				end_preplaytext_index = i
+				break
+			end
+		end
+	end
+
+	if pre_count > 0 then
+		has_playtext = true
+	end
 end

@@ -49,5 +49,4 @@ function env_imp:playText(text, duration, voiceNarrator)
 	if duration then
 		env_imp.wait(self, duration);
 	end
-	
 end

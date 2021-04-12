@@ -162,6 +162,11 @@ function getTime()
     return "时间："..Email.GetTimeDescByAtTime(cur_email_content.updatedAt)
 end
 
+function getEx()
+    local str = Email.GetEmailContent(cur_email_content.content)
+    return str
+end
+
 function ClickName(name, mcmlNode)
     local data = mcmlNode:GetAttribute("param1")
     local server_data = data.server_data or {}
@@ -254,7 +259,9 @@ end
                                     <pe:gridview  ItemsPerLine="1" AllowPaging="false" CellPadding="0"  DefaultNodeHeight="160"
                                         DataSource="<%=getEmailContent%>">
                                         <Columns>
-                                            <div style="margin-top: 20px; min-height: 160px; margin-left: 36px;width: 466px;font-size: 14px;base-font-size: 14px;color: #141717;"><%=cur_email_content.content%></div>           
+                                            <div style="margin-top: 20px; min-height: 160px; margin-left: 36px;width: 466px;font-size: 14px;base-font-size: 14px;color: #141717;">
+                                                <%=getEx()%>
+                                            </div>           
                                         </Columns>
                                     </pe:gridview>
                                 </div>

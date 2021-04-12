@@ -8,7 +8,7 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show();
 --]]
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
-
+local DockPopupControl = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPopupControl.lua")
 local Notice = NPL.export();
 
 local httpwrapper_version = HttpWrapper.GetDevVersion();
@@ -135,6 +135,7 @@ function Notice.CloseView()
     Notice.servertime = 0
     Notice.mainData = {}
     Notice.SaveLocalData()
+    DockPopupControl.StopPopup()
     if page then
         page:CloseWindow()
         page = nil

@@ -215,19 +215,23 @@ function MacroPlayer.InvokeTriggerCallback()
 	end
 end
 
-local nStartTime = 0;
+MacroPlayer.TipStartTime = 0;
 MacroPlayer.ShowTipTime = 5000;
+function MacroPlayer.ResetTipTime(nDeltaMilliSeconds)
+	MacroPlayer.TipStartTime = commonlib.TimerManager.GetCurrentTime() + (nDeltaMilliSeconds or 0)
+end
+
 function MacroPlayer.SetTriggerCallback(callback)
 	if(callback) then
 		GameLogic.AddBBS("Macro", nil);
 		if(Macros.IsShowButtonTip() and not Macros.IsAutoPlay()) then
-			nStartTime = commonlib.TimerManager.GetCurrentTime();
+			MacroPlayer.TipStartTime = commonlib.TimerManager.GetCurrentTime();
 			MacroPlayer.waitActionTimer = MacroPlayer.waitActionTimer or commonlib.Timer:new({callbackFunc = function(timer)
 				if(page and MacroPlayer.triggerCallbackFunc) then
-					local elapsedTime = commonlib.TimerManager.GetCurrentTime() - nStartTime;
+					local elapsedTime = commonlib.TimerManager.GetCurrentTime() - MacroPlayer.TipStartTime;
 					if(elapsedTime > MacroPlayer.ShowTipTime) then
 						MacroPlayer.ShowMoreTips();
-						nStartTime = commonlib.TimerManager.GetCurrentTime() + MacroPlayer.ShowTipTime;
+						MacroPlayer.TipStartTime = commonlib.TimerManager.GetCurrentTime() + MacroPlayer.ShowTipTime;
 					end
 				else
 					timer:Change();
@@ -548,14 +552,17 @@ function MacroPlayer.OnClickCursor()
 	if(MacroPlayer.expectedDragButton) then
 		GameLogic.AddBBS("Macro", L"按住鼠标左键不要放手， 同时拖动鼠标到目标点", 5000, "255 0 0");
 		Macros.voice("按住鼠标左键不要放手， 同时拖动鼠标到目标点")
+		MacroPlayer.ResetTipTime()
 		return;
 	elseif(MacroPlayer.expectedKeyButton and not MacroPlayer.expectedEditBoxText) then
 		GameLogic.AddBBS("Macro", L"鼠标移动到这里，但不要点击", 5000, "255 0 0");
 		Macros.voice("鼠标移动到这里，但不要点击")
+		MacroPlayer.ResetTipTime()
 		return
 	elseif(MacroPlayer.expectedMouseWheelDelta) then
 		GameLogic.AddBBS("Macro", L"不要点击鼠标, 而是滚动鼠标中间的滚轮", 5000, "255 0 0");
 		Macros.voice("不要点击鼠标, 而是滚动鼠标中间的滚轮")
+		MacroPlayer.ResetTipTime()
 		return
 	end
 	
@@ -565,6 +572,7 @@ function MacroPlayer.OnClickCursor()
 			if(not MacroPlayer.expectedButton) then
 				GameLogic.AddBBS("Macro", L"请按照指示输入文字", 5000, "255 0 0");
 				Macros.voice("请按照指示输入文字")
+				MacroPlayer.ResetTipTime()
 				return;
 			else
 				MacroPlayer.expectedEditBoxText = nil;
@@ -576,18 +584,48 @@ function MacroPlayer.OnClickCursor()
 		MacroPlayer.InvokeTriggerCallback()
 	elseif(MacroPlayer.expectedButton and reason) then
 		if(reason == "keyboardButtonWrong") then
-			GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标", 5000, "255 0 0");
-			Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标")
+			if(MacroPlayer.expectedButton:match("left")) then
+				GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标左键", 5000, "255 0 0");
+				Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标左键")
+			elseif(MacroPlayer.expectedButton:match("right")) then
+				GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标右键", 5000, "255 0 0");
+				Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标右键")
+			else
+				GameLogic.AddBBS("Macro", L"请按住键盘的指定按钮不要松手，同时点击鼠标", 5000, "255 0 0");
+				Macros.voice("请按住键盘的指定按钮不要松手，同时点击鼠标")
+			end
+			MacroPlayer.ResetTipTime()
 		elseif(reason == "mouseButtonWrong") then
 			if(MacroPlayer.expectedButton:match("left")) then
 				GameLogic.AddBBS("Macro", L"请点击鼠标左键, 不是右键", 5000, "255 0 0");
-				Macros.voice("请点击正确的鼠标按键")
+				Macros.voice("请点击鼠标左键, 不是右键")
 			elseif(MacroPlayer.expectedButton:match("right")) then
 				GameLogic.AddBBS("Macro", L"请点击鼠标右键, 不是左键", 5000, "255 0 0");
-				Macros.voice("请点击正确的鼠标按键")
+				Macros.voice("请点击鼠标右键, 不是左键")
 			else
 				GameLogic.AddBBS("Macro", L"请点击正确的鼠标按键", 5000, "255 0 0");
 				Macros.voice("请点击正确的鼠标按键")
+			end
+			MacroPlayer.ResetTipTime()
+		end
+	end
+end
+
+function MacroPlayer.OnClick()
+	if(not System.options.IsMobilePlatform) then
+		if(MacroPlayer.expectedDragButton) then
+			GameLogic.AddBBS("Macro", L"找到蓝色圆圈，按住鼠标左键不要放手，同时拖动蓝色圆圈到目标点", 5000, "255 0 0");
+			Macros.voice("找到蓝色圆圈，按住鼠标左键不要放手，同时拖动蓝色圆圈到目标点")
+			MacroPlayer.ResetTipTime(5000)
+		elseif(MacroPlayer.expectedButton) then
+			if(MacroPlayer.expectedButton:match("left")) then
+				GameLogic.AddBBS("Macro", L"请用鼠标左键点击屏幕蓝色圆圈的中心", 5000, "255 0 0");
+				Macros.voice("请用鼠标左键点击屏幕蓝色圆圈的中心")
+				MacroPlayer.ResetTipTime()
+			elseif(MacroPlayer.expectedButton:match("right")) then
+				GameLogic.AddBBS("Macro", L"请用鼠标右键点击屏幕蓝色圆圈的中心", 5000, "255 0 0");
+				Macros.voice("请用鼠标右键点击屏幕蓝色圆圈的中心")
+				MacroPlayer.ResetTipTime()
 			end
 		end
 	end
@@ -664,6 +702,7 @@ function MacroPlayer.OnKeyDown(event)
 			isOK = false
 			GameLogic.AddBBS("Macro", L"请将鼠标移动到目标点，再按键盘", 5000, "255 0 0");
 			Macros.voice("请将鼠标移动到目标点，再按键盘")
+			MacroPlayer.ResetTipTime()
 		end
 	end
 
@@ -842,7 +881,7 @@ function MacroPlayer.OnDragMove()
 
 	MacroPlayer.isDragButtonCorrect = MacroPlayer.isDragButtonCorrect and MacroPlayer.CheckButton(MacroPlayer.expectedDragButton);
 	if(not MacroPlayer.isDragButtonCorrect) then
-		GameLogic.AddBBS("Macro", L"拖动鼠标时需要按正确的按键", 5000, "255 0 0");
+		GameLogic.AddBBS("Macro", L"拖动鼠标时需要同时按下正确的键盘按键", 5000, "255 0 0");
 	end
 end
 
@@ -861,10 +900,12 @@ function MacroPlayer.OnDragEnd()
 			-- tell the user to drag to the target location. 
 			GameLogic.AddBBS("Macro", L"请拖动鼠标到目标点", 5000, "255 0 0");
 			Macros.voice("请拖动鼠标到目标点")
+			MacroPlayer.ResetTipTime()
 		end
 	else
-		GameLogic.AddBBS("Macro", L"拖动鼠标时需要按正确的按键", 5000, "255 0 0");
-		Macros.voice("拖动鼠标时需要按正确的按键")
+		GameLogic.AddBBS("Macro", L"拖动鼠标时需要同时按下正确的键盘按键", 5000, "255 0 0");
+		Macros.voice("拖动鼠标时需要同时按下正确的键盘按键")
+		MacroPlayer.ResetTipTime()
 	end
 	if(Macros.IsShowButtonTip()) then
 		MacroPlayer.AnimDragBtn(true)
@@ -945,6 +986,7 @@ function MacroPlayer.OnMouseWheel()
 		else
 			GameLogic.AddBBS("Macro", L"请向另外一个方向滚动鼠标中间的滚轮", 5000, "255 0 0");
 			Macros.voice("请向另外一个方向滚动鼠标中间的滚轮")
+			MacroPlayer.ResetTipTime()
 		end
 	end
 end

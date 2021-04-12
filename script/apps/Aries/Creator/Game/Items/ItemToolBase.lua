@@ -27,6 +27,9 @@ local ItemToolBase = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.
 
 ItemToolBase:Property({"tool_name", nil, "GetToolName", "SetToolName"})
 ItemToolBase:Property({"position", {0,0,0}, "GetPosition", "SetPosition"})
+-- true to allow item task in game mode
+ItemToolBase:Property({"allowTaskInGameMode", nil, auto=true})
+
 
 block_types.RegisterItemClass("ItemToolBase", ItemToolBase);
 
@@ -70,7 +73,7 @@ end
 function ItemToolBase:OnSelect(itemStack)
 	self:DeleteTask();
 	self:SetCurrentItemStack(itemStack);
-	if(not GameLogic.GameMode:IsEditor()) then
+	if(not GameLogic.GameMode:IsEditor() and not self.allowTaskInGameMode) then
 		return;
 	end
 	self.curTask = self:CreateTask(itemStack);

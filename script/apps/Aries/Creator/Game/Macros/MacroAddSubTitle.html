@@ -15,15 +15,15 @@ function OnClearText()
 end
 function GetTextPosDS()
     return {
-        {value="", text=L"自动"},
+        {value="", text=L"自动", selected=true},
         {value="top", text=L"屏幕上方"},
         {value="center", text=L"屏幕中间"},
-        {value="bottom", text=L"屏幕下方", selected=true},
+        {value="bottom", text=L"屏幕下方"},
     };
 end
 function GetDurationDS()
     return {
-        {value="", text="永久", selected=true},
+        {value="", text=L"永久", selected=true},
         {value="2000", text=L"2000毫秒"},
         {value="3000", text=L"3000毫秒"},
         {value="4000", text=L"4000毫秒"},
@@ -34,8 +34,8 @@ function GetDurationDS()
 end
 function GetVoiceType()
     return {
-        {value=-1, text=L"无", selected=true},
-        {value=4, text=L"女童声"},
+        {value=-1, text=L"无"},
+        {value=4, text=L"女童声"..L"(默认)", selected=true},
         {value=0, text=L"女声",},
         {value=1, text=L"男声"},
         {value=3, text=L"男声2"},

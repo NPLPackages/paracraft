@@ -191,6 +191,10 @@ hide隐藏角色
 自定义物品AgentItem（上）
 自定义物品AgentItem（中）
 自定义物品AgentItem（下）
+playSound播放音乐(上）
+playSound播放音乐(下）
+playBone骨骼动画
+自定义动画anim
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

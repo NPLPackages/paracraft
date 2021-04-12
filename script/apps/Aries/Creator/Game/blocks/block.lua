@@ -859,7 +859,11 @@ end
 -- get the item stack when this block is broken & dropped. 
 function block:GetDroppedItemStack(x,y,z, bForceDrop)
 	if(bForceDrop or (not GameLogic.isRemote and GameLogic.GameMode:CanDropItem())) then
-		return ItemStack:new():Init(self.id, 1);
+		local item = ItemStack:new():Init(self.id, 1);
+		if(self:HasColorData()) then
+			item:SetPreferredBlockData(BlockEngine:GetBlockData(x,y,z));
+		end
+		return item
 	end
 end
 

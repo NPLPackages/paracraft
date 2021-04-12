@@ -300,7 +300,7 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 		params:SetFloat("DepthOfViewFactor", self:GetDepthOfViewFactor());
 		params:SetFloat("FogStart", GameLogic.options:GetFogStart());
 		params:SetFloat("FogEnd", GameLogic.options:GetFogEnd());
-		params:SetFloat("CloudThickness", GameLogic.options:GetCloudThickness());
+		params:SetFloat("CloudThickness", GameLogic.options:GetCloudThickness()^2);
 		params:SetFloat("EyeBrightness", self:GetEyeBrightness());
 		params:SetFloat("EyeContrast", self:GetEyeContrast());
 		

@@ -1057,6 +1057,10 @@ function options:SetCloudThickness(cloud)
 end
 
 function options:GetCloudThickness()
+	if(not self.CloudThickness) then
+		local att = ParaScene.GetAttributeObjectSky();
+		self.CloudThickness = att:GetField("CloudThickness", 0.4);
+	end
 	return self.CloudThickness or 0;
 end
 

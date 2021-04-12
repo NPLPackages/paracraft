@@ -234,13 +234,16 @@ Commands["panorama"] = {
 			ParaEngine.ForceRender()
 			ParaEngine.ForceRender()
 	
+			-- set time out twice beacause tick
 			commonlib.TimerManager.SetTimeout(function()
-				local filepath = string.format("%sScreen Shots/%s.jpg", rootPath, name)
-				ParaMovie.TakeScreenShot(filepath, _height, _height)
-				ParaUI.DestroyUIObject(c)
-
-				chain()
-			end, 1000)
+				commonlib.TimerManager.SetTimeout(function()
+					local filepath = string.format("%sScreen Shots/%s.jpg", rootPath, name)
+					ParaMovie.TakeScreenShot(filepath, _height, _height)
+					ParaUI.DestroyUIObject(c)
+	
+					chain()
+				end, 1000)
+			end, 1)
 		end
 
 		function delay(time, chain)

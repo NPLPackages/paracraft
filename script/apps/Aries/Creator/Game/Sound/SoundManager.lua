@@ -20,7 +20,7 @@ local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager
 local UniString = commonlib.gettable("System.Core.UniString")
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
-local Diskfolder = "temp/PlayText"
+local Diskfolder = nil
 
 -- @param filename: sound name or a table array of sound names. 
 function SoundManager:Init()
@@ -242,9 +242,9 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 	voiceNarrator = voiceNarrator or 4
 	nTimeoutMS = nTimeoutMS or 7
 
-	local start_timestamp = os.time()
+	local start_timestamp = commonlib.TimerManager.GetCurrentTime();
 	self:PrepareText(text,  voiceNarrator, function(file_path)
-		if os.time() - start_timestamp > nTimeoutMS then
+		if (commonlib.TimerManager.GetCurrentTime() - start_timestamp)/1000 > nTimeoutMS then
 			return
 		end
 
@@ -271,46 +271,54 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	-- 检测是否有本地文件
 	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 	if file_path then
-		callbackFunc(file_path)
+		if callbackFunc then
+			callbackFunc(file_path)
+		end
 		return
 	end
 
-	if GameLogic.IsVip() or GameLogic.IsReadOnly() then
-		-- 判断cdn上有无缓存
-		local httpwrapper_version = HttpWrapper.GetDevVersion();
-		local url = httpwrapper_version == "ONLINE" and "http://qiniu-audio.keepwork.com" or "http://qiniu-audio-dev.keepwork.com"
-		url = string.format("%s/%s?%s", url, md5_value, math.random(1, 100))
+	-- 判断cdn上有无缓存
+	local httpwrapper_version = HttpWrapper.GetDevVersion();
+	local url = httpwrapper_version == "ONLINE" and "http://qiniu-audio.keepwork.com" or "http://qiniu-audio-dev.keepwork.com"
+	url = string.format("%s/%s?%s", url, md5_value, math.random(1, 100))
 
-		System.os.GetUrl(url, function(err, msg, data)
-			if err == 200 then
-				local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, data)
+	System.os.GetUrl(url, function(err, msg, data)
+		if err == 200 then
+			local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, data)
+			if callbackFunc then
 				callbackFunc(file_path)
-			else
-				self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
-					local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
-					callbackFunc(file_path)
-				end)
 			end
-		end);
-	elseif not GameLogic.IsReadOnly() then
-		self:DownloadSoundByBaiDu("您需要成为会员才能播放这段文字", callbackFunc)
-	end
+		else
+			self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
+				local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
+				if callbackFunc then
+					callbackFunc(file_path)
+				end
+			end)
+		end
+	end);
+
+	-- if GameLogic.IsVip() or GameLogic.IsReadOnly() then
+
+	-- elseif not GameLogic.IsReadOnly() then
+	-- 	self:DownloadSoundByBaiDu("您需要成为会员才能播放这段文字", callbackFunc)
+	-- end
 end
 
 function SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 	local filename = md5_value .. ".mp3"
 	NPL.load("(gl)script/ide/Files.lua");
-
-	local file_path = string.format("%s/%s/", Diskfolder, voiceNarrator)
-	local result = commonlib.Files.Find({}, file_path, 0, 1000, filename)
-	if(#result>=1) then
-		return file_path .. result[1].filename;
-	end	
+	local disk_folder = self:GetPlayTextDiskFolder()
+	local file_path = string.format("%s/%s/%s", disk_folder, voiceNarrator, filename)
+	if ParaIO.DoesFileExist(file_path, true) then
+		return file_path
+	end
 end
 
 function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
 	local filename = md5_value .. ".mp3"
-	local file_path = string.format("%s/%s/%s", Diskfolder, voiceNarrator, filename)
+	local disk_folder = self:GetPlayTextDiskFolder()
+	local file_path = string.format("%s/%s/%s", disk_folder, voiceNarrator, filename)
 	ParaIO.CreateDirectory(file_path)
 	local file = ParaIO.open(file_path, "w");
 	if(file) then
@@ -388,4 +396,12 @@ function SoundManager:GetSoundDuration(channel_name, filename)
 		local source = new_sound:GetSource()
 		return source.TotalAudioTime or 0
     end
+end
+
+function SoundManager:GetPlayTextDiskFolder()
+    if(not DiskFolder) then
+		DiskFolder = ParaIO.GetWritablePath().."temp/PlayText"
+   end
+    
+	return DiskFolder
 end

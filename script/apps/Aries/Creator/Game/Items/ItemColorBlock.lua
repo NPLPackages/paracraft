@@ -29,6 +29,7 @@ local band = mathlib.bit.band;
 local bor = mathlib.bit.bor;
 
 local ItemColorBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorBlock"));
+ItemColorBlock:Property({"allowTaskInGameMode", true, auto=true})
 
 block_types.RegisterItemClass("ItemColorBlock", ItemColorBlock);
 
@@ -67,7 +68,15 @@ end
 function ItemColorBlock:GetPenColor(itemStack)
 	itemStack = itemStack or self:GetSelectedItemStack();
 	if(itemStack) then
-		return Color.ToValue(itemStack:GetDataField("color") or self.pen_color);
+		local color = itemStack.color32
+		if(not color) then
+			local data = itemStack:GetPreferredBlockData();
+			if(data) then 
+				color = self:DataToColor(data);
+			end
+			itemStack.color32 = color or self.pen_color
+		end
+		return Color.ToValue(color);
 	else
 		return self.pen_color;
 	end
@@ -80,7 +89,11 @@ function ItemColorBlock:SetPenColor(color)
 		self.pen_color = color;
 		local itemStack = self:GetSelectedItemStack();
 		if(itemStack) then
-			itemStack:SetDataField("color", color);
+			local data = self:ColorToData(color);
+			if(data) then
+				itemStack:SetPreferredBlockData(data)
+			end
+			itemStack.color32 = color
 		end
 	end
 end
@@ -197,7 +210,7 @@ end
 -- virtual function: when selected in right hand
 function ItemColorBlock:OnSelect(itemStack)
 	if(itemStack) then
-		local color = itemStack:GetDataField("color")
+		local color = itemStack.color32
 		if(color) then
 			color = Color.ToValue(color);
 		end
@@ -332,6 +345,16 @@ function ItemColorBlock:DrawIcon(painter, width, height, itemStack)
 	painter:DrawRect(0,0,width, height);
 	painter:SetPen("#ffffff");	
 	painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
+
+	if(itemStack) then
+		if(itemStack.count>1) then
+			-- draw count at the corner: no clipping, right aligned, single line
+			painter:SetPen("#000000");	
+			painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
+			painter:SetPen("#ffffff");	
+			painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
+		end
+	end
 end
 
 -- virtual function: 

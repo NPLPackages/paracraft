@@ -159,20 +159,16 @@ function EditMovieTextPage.OnListeningTest()
 	end
 
 	local voicenarrator = page:GetValue("voicenarrator", -1)
+	voicenarrator = tonumber(voicenarrator)
 	if not voicenarrator or voicenarrator < 0 then
 		page:SetValue("SoundDesc", "")
 		GameLogic.AddBBS(nil, L"请选择播音员", 15000, "255 0 0");
 		return
 	end
 
-	local is_cb_retrun = false
 	local nTimeoutMS = 7
 	local start_timestamp = os.time()
-	Mod.WorldShare.MsgBox:Show(L"请稍候...")
 	SoundManager:PrepareText(text,  voicenarrator, function(file_path)
-		is_cb_retrun = true
-		Mod.WorldShare.MsgBox:Close()
-		
 		if os.time() - start_timestamp > nTimeoutMS then
 			GameLogic.AddBBS(nil, L"合成声音超时，请重新尝试", 15000, "255 0 0");
 			return
@@ -181,12 +177,6 @@ function EditMovieTextPage.OnListeningTest()
 		SoundManager:PlaySound("playtext" .. voicenarrator, file_path)
 		EditMovieTextPage.UpdateSoundDesc()
 	end)
-
-	commonlib.TimerManager.SetTimeout(function()  
-		if not is_cb_retrun then
-			Mod.WorldShare.MsgBox:Close()
-		end
-	end, nTimeoutMS * 1000);
 end
 
 function EditMovieTextPage.OnTextChange()
@@ -205,6 +195,7 @@ function EditMovieTextPage.UpdateSoundDesc()
 	end
 
 	local voicenarrator = page:GetValue("voicenarrator", -1)
+	voicenarrator = tonumber(voicenarrator)
 	if not voicenarrator or voicenarrator < 0 then
 		page:SetValue("SoundDesc", "")
 		return
@@ -214,7 +205,7 @@ function EditMovieTextPage.UpdateSoundDesc()
 
 	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voicenarrator))
 	local filename = md5_value .. ".mp3"
-	local file_path = string.format("%s/%s/%s", "temp/PlayText", voicenarrator, filename)
+	local file_path = string.format("%s/%s/%s", SoundManager:GetPlayTextDiskFolder(), voicenarrator, filename)
 	local duration = SoundManager:GetSoundDuration(channel_name, file_path)
 	
 	if duration and duration > 0 then

@@ -18,6 +18,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local page;
 
+MacroAddSubTitle.lastVoiceType = 4; -- default to girl voice
+
 function MacroAddSubTitle.OnInit()
 	page = document:GetPageCtrl();
 end
@@ -51,7 +53,7 @@ function MacroAddSubTitle.ShowPage()
 	end;
 
 	-- restore last values
-	page:SetValue("voiceType", MacroAddSubTitle.lastVoiceType or -1);
+	page:SetValue("voiceType", MacroAddSubTitle.lastVoiceType or 4);
 end
 
 function MacroAddSubTitle.OnClose()
@@ -96,6 +98,9 @@ function MacroAddSubTitle.OnOK()
 	-- we shall change idle time to 0
 	Macros:ClearIdleTime()
 	
+	if(voiceType == 4) then
+		voiceType = nil;
+	end
 	Macros:AddMacro("text", text, duration, position, voiceType);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroShowSubTitle.lua");
@@ -104,20 +109,20 @@ function MacroAddSubTitle.OnOK()
 end
 
 function MacroAddSubTitle.OnClickSelcetNarrator(name, value)
-	if value == MacroAddSubTitle.lastVoiceType then
-		return
-	end
+	-- if value == MacroAddSubTitle.lastVoiceType then
+	-- 	return
+	-- end
 
-	if value >= 0 and not System.User.isVip then
-		page:SetValue("voiceType", MacroAddSubTitle.lastVoiceType or -1);
-		local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-		VipToolNew.Show("recorder")
-		return
-	end
+	-- if value >= 0 and not System.User.isVip then
+	-- 	page:SetValue("voiceType", MacroAddSubTitle.lastVoiceType or -1);
+	-- 	local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+	-- 	VipToolNew.Show("recorder")
+	-- 	return
+	-- end
 end
 
 function MacroAddSubTitle.OnTextChange()
-	if not System.User.isVip then
-		page:SetValue("voiceType", -1);
-	end
+	-- if not System.User.isVip then
+	-- 	page:SetValue("voiceType", -1);
+	-- end
 end

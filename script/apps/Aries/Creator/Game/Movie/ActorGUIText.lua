@@ -263,11 +263,10 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 	if(text and text~="" ) then
 		local play_text = GameLogic:GetText(text)
 		if voicenarrator and voicenarrator >= 0 then
-			if obj.text == nil or obj.text ~= play_text or not obj.visible or obj.voicenarrator ~= voicenarrator then
+			if obj.text ~= play_text or not obj.visible or self.voicenarrator ~= voicenarrator then
 				SoundManager:PlayText(play_text, voicenarrator)
 			end
-
-			obj.voicenarrator = voicenarrator
+			self.voicenarrator = voicenarrator
 		end
 
 		obj.visible = true;

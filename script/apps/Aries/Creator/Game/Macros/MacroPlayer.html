@@ -30,7 +30,7 @@ end
     MouseCursor3 = { width = 48, height=48, position="relative", background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"},
 }
 </style>
-<pe:container style="background-color: #00000000;" alignment="_fi" ontouch="MacroPlayer.OnTouch">
+<pe:container style="background-color: #00000000;" alignment="_fi" ontouch="MacroPlayer.OnTouch" onclick="MacroPlayer.OnClick">
     <pe:container name="cursorClick" candrag="true" ondragbegin="MacroPlayer.OnDragBegin" ondragmove="MacroPlayer.OnDragMove" ondragend="MacroPlayer.OnDragEnd" style="width:32px;height:32px;position:relative;background:url()" onclick="MacroPlayer.OnClickCursor">
         <img enabled="false" class="MouseCursor2"/>
         <input name="cursorBtn" type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/cursor_big_32bits.png#0 0 42 42);width:42px;height:42px;margin-left:12px;margin-top:15px;" />

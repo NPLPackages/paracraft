@@ -471,7 +471,8 @@ model id
     <item id="83160" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83160_brown_cat_hat.anim.x"></attachment></item>
     <item id="83161" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83161_yellow_cat_hat.anim.x"></attachment></item>
     <item id="83162" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83162_blue_cat_hat.anim.x"></attachment></item>
-
+    <!--20210408新加-->
+    <item id="83163" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83163_killer_hat.anim.x"></attachment></item>
 
     
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
@@ -531,6 +532,8 @@ model id
     <item id="84051" model="actor;"><geoset category="8" id="7"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_07_xianren.png"></texture></item>
     <!--20210318新加衣服，活动用-->
     <item id="84052" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_84052.png"></texture></item>
+    <!--20210408新加-->
+    <item id="84053" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84053_killer_shirt_01.png"></texture></item>
 
     
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
@@ -608,6 +611,9 @@ model id
     <!--20210318新加裤子，活动用-->
     <item id="85071" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_01_02_Avatar_85071.png"></texture></item>
     <item id="85072" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/pants_01_02_Avatar_85071.png"></texture></item>
+    <!--20210408新加-->
+    <item id="85073" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85073_killer_pants_03_04.png"></texture></item>
+    <item id="85074" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85073_killer_pants_03_04.png"></texture></item>
 
     
     <!--      86000 86999  背部  attachment id="15"    -->

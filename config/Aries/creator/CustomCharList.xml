@@ -90,6 +90,8 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+  		<!--20210408新加-->
+		<item id="83163" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83163_killer_hat_32bits.png" name="黑色面罩"/>
   		<!--20210318新加-->
 		<item id="83159" gsid="82000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83159_panda_hat_32bits.png" name="熊猫猫猫头"/>
 		<!-- 20210324 临时下线
@@ -428,6 +430,8 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+		<!--20210408新加衣服-->
+		<item id="84053" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84053_killer_shirt_01_32bits.png" name="夜行衣"/>
 		<!--20210318新加衣服，活动用-->
 		<item id="84052"  gsid="83000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_84052_32bits.png" name="黄色海魂衫"/>
 		<!--起始数据-->
@@ -487,6 +491,9 @@
 	</category>
 
 	<category name="pants" text="裤子">
+		<!--20210408新加-->
+		<item id="85073" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85073_killer_pants_icon.png" name="夜行裤"/>
+		<item id="85074" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85074_killer_pants_icon.png" name="夜行裤"/>
 		<!--20210318新加裤子，活动用-->
 		<item id="85071"  gsid="84000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_01_Avatar_85071_32bits.png" name="海魂裤"/>
 		<item id="85072"  gsid="84001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_02_Avatar_85071_32bits.png" name="海魂裤(蓝)"/>

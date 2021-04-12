@@ -518,3 +518,16 @@ function Email.GetStrWithLength(str,length)
 	end
 	
 end
+
+function Email.GetEmailContent(str)
+	-- print(str)
+	local str = string.gsub(str,"<br>","<br />")
+	str = string.gsub(str,"&nbsp"," ")
+	str = string.gsub(str,"<p>","")
+	str = string.gsub(str,"</p>","")
+	str = string.gsub(str,";","")
+	str = string.gsub(str,"&lt","<")
+	str = string.gsub(str,"&gt",">")
+	--print(str)
+	return str
+end

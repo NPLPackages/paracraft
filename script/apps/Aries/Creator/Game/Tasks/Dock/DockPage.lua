@@ -25,6 +25,7 @@ local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/
 local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
 local EmailManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailManager.lua");
+local DockPopupControl = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPopupControl.lua")
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -85,15 +86,7 @@ function DockPage.Show(bCommand)
         DockPage.HandMsgCenterMsgData();
     end)
 
-    -- 每次登陆判断是否弹出活动框
-    if Notice and Notice.CheckCanShow() and not MacroCodeCampActIntro.CheckIsInWinCamp() and not bCommand then
-        Notice.Show(0)
-        table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
-    end
-    --冬令营弹框判断 活动下线
-    if MacroCodeCampActIntro.CheckCanShow() and not bCommand then
-        MacroCodeCampActIntro.ShowView()
-    end
+    DockPopupControl.StartPopup(bCommand)
 
     DockPage.isShowTaskIconEffect = true
 
