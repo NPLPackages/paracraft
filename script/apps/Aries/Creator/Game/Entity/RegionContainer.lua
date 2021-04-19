@@ -78,7 +78,7 @@ function RegionContainer:SetExternalRegion(externalRegion)
 	self.externalRegion = externalRegion;
 end
 
-function ExternalRegion:GetWorldDirectory()
+function RegionContainer:GetWorldDirectory()
 	return self.externalRegion and self.externalRegion:GetWorldDirectory() or GameLogic.GetWorldDirectory();
 end
 
