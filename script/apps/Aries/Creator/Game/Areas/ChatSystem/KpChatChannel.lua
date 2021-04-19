@@ -144,7 +144,8 @@ function KpChatChannel.GetSchoolRoom()
     local school = KeepWorkItemManager.GetSchool();
     local id = school.id;
     if(id)then
-        local room = string.format("__world_school_%s__",tostring(id));
+        --local room = string.format("__world_school_%s__",tostring(id));
+        local room = string.format("__school_%s__",tostring(id));
         return room
     end
 end

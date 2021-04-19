@@ -47,7 +47,7 @@ end
 -- Called whenever this item is equipped and the right mouse button is pressed.
 -- @return the new item stack to put in the position.
 function ItemCode:OnItemRightClick(itemStack, entityPlayer)
-	local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+	local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 	if(ctrl_pressed or GameLogic.GameMode:CanDirectClickToActivateItem()) then
 		-- in game mode, right click will trigger the command, in editor mode, Ctrl+right click will trigger. 
 		self:OnActivate(itemStack, entityPlayer);

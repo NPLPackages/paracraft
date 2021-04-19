@@ -1,0 +1,289 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/Rank.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Rank.lua"><![CDATA[
+local Rank = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua");
+Rank.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Rank.CloseView()
+end
+
+function TreeItems(index)
+    return Rank.RankTypeData
+end
+
+function TypeBeExpand(expanded)
+    if(expanded and expanded == true) then
+        return true;
+    else
+        return false;
+    end
+end
+
+function ItemBeSelected(index)
+    return Rank.cur_select_item_index == index
+end
+
+function ChangeMenuType(index)
+    Rank.ChangeMenuType(tonumber(index)) 
+end
+
+function ChangeItem(index, mcmlNode)
+    local data = mcmlNode:GetAttribute("param1")
+    Rank.ChangeItem(data) 
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #Rank.RankData;
+    else
+        return Rank.RankData[index];
+    end
+end
+
+function RewardDataItems(index)
+    if(index == nil) then
+        return #Rank.RewardData;
+    else
+        return Rank.RewardData[index];
+    end
+end
+
+function GetGiftItemGId(item_data)
+    local gsid = item_data.gsId or 998
+    return gsid
+end
+
+function IsRoleModel(item_data)
+    return Rank.IsRoleModel(item_data)
+end
+
+function GetSelectItemTypeIndex()
+    return Rank.GetSelectItemTypeIndex()
+end
+
+function GetMyData(name)
+    return Rank.SelfRankData[name]
+end
+
+function ShowLastRank()
+    Rank.ShowLastRank()
+end
+
+function IsShowLastRank()
+    return Rank.is_show_last_rank
+end
+
+function IsShowEmpty()
+    return #Rank.RankData == 0 and Rank.is_show_last_rank
+end
+
+function GetRankDesc()
+    return Rank.GetRankDesc()
+end
+
+function GetItemDesc(data)
+    if data.goods and data.goods.name then
+        return data.goods.name
+    end
+    return ""
+end
+
+function GetRecudedNumberDesc(num)
+    return Rank.GetRecudedNumberDesc(num)
+end
+]]></script>
+<kp:window name="iframe" width="958" height="585" icon="Texture/Aries/Creator/keepwork/rank/biaoti_232X62_32bits.png" icon_width="232" icon_height = "62" onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="width: 130px;height: 544px; float: left;" >
+            <pe:treeview name="rank_menu" DataSource='<%=TreeItems()%>' OnClick="" ItemToggleSize="0" style="height:460px;margin-left:10px;margin-top:4px;background:" VerticalScrollBarOffsetX="6">
+                <NodeTemplates>
+                    <NodeTemplate DataType="type">
+                        <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="type_template">
+                        <input type="button" onclick="ChangeMenuType" value='' zorder="5" name='<%=XPath("this|index") %>' style="position:relative;margin-left:0px;width:108px;height:36px;background:" />
+                        <div style="margin-left:0px;margin-top:9px;height:36px;width:96px;background:">
+                            <input type="button" onclick="ChangeMenuType" value='' zorder="5" name='<%=XPath("this|index") %>' style="position:relative;margin-left:0px;width:108px;height:36px;background:" />
+                            <!-- <div style="position:relative;margin-left: 18px;margin-top: 2px; text-align:center;color: #181818;"><%=XPath("this|text") %></div> -->
+                            <pe:if condition='<%=XPath("this|expanded")%>'>
+                                <div zorder="-1" style="position:relative;width:108px;height:36px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+                                <div zorder="-2" style="position:relative;margin-left: 1px; width:106px;height:40px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan5_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+                                <div style="align:right;position:relative;margin-right:10px;margin-top:13px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan2_14X8_32bits.png#0 0 14 8);"></div>
+                            </pe:if>
+                            
+                            <pe:if condition='<%=not XPath("this|expanded")%>'>
+                                <div zorder="-1" style="position:relative;width:108px;height:36px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+                                <div style="align:right; position:relative;margin-right:10px;margin-top:13px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan_14X8_32bits.png#0 0 14 8);"></div>
+                            </pe:if>
+
+                            <img style="margin-top: 10px;margin-left: 20px;" src='<%=XPath("this|img") %>' width="32" height="16"/>
+                        </div>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="item">
+                        <div zorder="-1" style="margin-left:-16px;margin-top:0px;height:34px;width:108px;background:">                            
+                            <div zorder="-2" style="position:relative;width:106px;height:41px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan4_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+                            <input type="button"  onclick="ChangeItem" value='' zorder="5" name='<%=XPath("this|index") %>' param1='<%= XPath("this") %>' style="position:relative;margin-left:0px;width:108px;height:34px;font-weight:bold;background:" />
+                            <pe:if condition='<%= ItemBeSelected(XPath("this|index")) %>'>
+                                <div style="position:relative;text-align:center;color: #fcce39;margin-top: 7px;font-size: 14px;"><%=XPath("this|name") %></div>
+                                <div zorder="-1" style="position:relative;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan3_32X32_32bits.png#0 0 32 32:8 8 8 8);"></div>
+                            </pe:if>
+
+                            <pe:if condition='<%=not ItemBeSelected(XPath("this|index")) %>'>
+                                <div style="position:relative;text-align:center;color: #c0c0c0;margin-top: 7px;font-size: 14px;"><%=XPath("this|name") %></div>
+                            </pe:if>
+                            <!-- <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index")) %>'>
+                                <input type="button" value='<%=XPath("this|text") %>' name='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-left: 3px; width:96px;height:32px;color:#181818;text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+                            </pe:if> -->
+                        </div>
+                    </NodeTemplate>
+                </NodeTemplates>
+            </pe:treeview>
+        </div>
+        <div style="width: 586px;height: 544px; background:; float: left;" >
+            <pe:if condition='<%=IsShowEmpty() %>'>
+                <div style="position:relative;text-align:center;color: #000000;margin-top: 240px;base-font-size:24px;font-size: 24px;">抱歉，上个月还没有榜单呢</div>
+            </pe:if>
+            <div style="margin-left: 8px;margin-top: 10px;width: 564px;height: 28px;background: url(Texture/Aries/Creator/keepwork/rank/di1_64X62_32bits.png#0 0 64 28:13 13 13 13);">
+                <div style="float: left; margin-left: 38px;margin-top: 7px;width: 31px;height: 15px;background: url(Texture/Aries/Creator/keepwork/rank/zi5_63X15_32bits.png#0 0 31 15);"></div>
+                <pe:if condition='<%=GetSelectItemTypeIndex() == 1 %>'>
+                    <div style="float: left; margin-left: 110px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi9_63X15_32bits.png#0 0 64 16);"></div>
+                </pe:if>
+                <pe:if condition='<%=GetSelectItemTypeIndex() == 2 %>'>
+                    <div style="float: left; margin-left: 110px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi6_63X15_32bits.png#0 0 64 16);"></div>
+                </pe:if>
+                <pe:if condition='<%=GetSelectItemTypeIndex() == 3 %>'>
+                    <div style="float: left; margin-left: 110px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi10_63X15_32bits.png#0 0 64 16);"></div>
+                </pe:if>
+
+                <div style="float: left; margin-left: 114px;margin-top: 7px;width: 32px;height: 15px;background: url(Texture/Aries/Creator/keepwork/rank/zi7_63X15_32bits.png#0 0 32 15);"></div>
+                <div style="float: left; margin-left: 100px;margin-top: 7px;width: 31px;height: 15px;background: url(Texture/Aries/Creator/keepwork/rank/zi8_63X15_32bits.png#0 0 31 15);"></div>
+            </div>
+            <div type ="box" style="width:600px;height:405px;margin-left: 0px;margin-top: 0px;float: left;">
+                <pe:gridview style="width:600px;height:405px;float:left" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                    DataSource='<%=Button_DS_Items%>'>
+                    <Columns>
+                            <!-- <div name="item_root" style="color:#ffffff;width: 570px;height: 90px;float: left;">
+                            </div>                -->
+                            <div style="margin-left: 0px;margin-top: 0px;width: 570px;height: 54px;background:">
+                                <pe:if condition='<%=Eval("is_my_rank")%>'>
+                                    <div zorder="-1" style="position:relative;margin-left: 0px;margin-top: 0px;width: 570px;height: 54px;background: url(Texture/Aries/Creator/keepwork/rank/tiao3_32X32_32bits.png#0 0 32 32:13 13 13 13);"></div>
+                                </pe:if>
+                                <pe:if condition='<%=not Eval("is_my_rank")%>'>
+                                    <div zorder="-1" style="position:relative;margin-left: 0px;margin-top: 0px;width: 570px;height: 54px;background: url(Texture/Aries/Creator/keepwork/rank/tiao1_32X32_32bits.png#0 0 32 32:13 13 13 13);"></div>
+                                </pe:if>
+                                
+                                <div style="position:relative;width: 60px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 27px;"><%=Eval("rank")%></div>
+                                <pe:if condition='<%=Eval("rank") == 1 %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 9px;margin-left: 34px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/1_42X37_32bits.png#0 0 42 37);"></div>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("rank") == 2 %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 9px;margin-left: 34px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/2_42X37_32bits.png#0 0 42 37);"></div>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("rank") == 3 %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 9px;margin-left: 34px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/3_42X37_32bits.png#0 0 42 37);"></div>
+                                </pe:if>
+
+                                <div tooltip='<%=Eval("tool_name")%>' style="position:relative;width: 240px;height: 24px; text-align: center; color: #000000;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 98px;"><%=Eval("name")%></div>
+                                <div tooltip='<%=Eval("tool_score")%>' style="position:relative;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 342px;"><%=GetRecudedNumberDesc(Eval("score"))%></div>
+
+                                <pe:if condition='<%=Eval("icon_type") == "rise" %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 504px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
+                                </pe:if>
+
+                                <pe:if condition='<%=Eval("icon_type") == "low" %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 504px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
+                                </pe:if>
+
+                                <pe:if condition='<%=Eval("icon_type") == "none" %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 505px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
+                                </pe:if>
+
+                                <pe:if condition='<%=Eval("icon_type") == "new" %>'>
+                                    <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 491px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
+                                </pe:if>
+                            </div>          
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+
+            <div style="margin-left: 7px;margin-top: 18px;width: 570px;height: 74px;background: url(Texture/Aries/Creator/keepwork/rank/tiao1_32X32_32bits.png#0 0 32 32:13 13 13 13);">
+                <div zorder="1" style="position:relative;margin-top: 5px;margin-left: 5px;width:116px;height:26px;background:url(Texture/Aries/Creator/keepwork/rank/biaoqian_116X26_32bits.png#0 0 116 26);"></div>
+                <div style="position:relative;width: 570px;height: 54px;margin-top: 15px;">
+                    
+                    <div style="position:relative;width: 60px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 27px;"><%=GetMyData("rank")%></div>
+    
+                    <div tooltip='<%=GetMyData("tool_name")%>' style="position:relative;width: 240px;height: 24px; text-align: center; color: #000000;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 98px;"><%=GetMyData("name")%></div>
+                    <div tooltip='<%=GetMyData("tool_score")%>' style="position:relative;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 342px;"><%=GetRecudedNumberDesc(GetMyData("score"))%></div>
+    
+                    <pe:if condition='<%=GetMyData("icon_type") == "rise" %>'>
+                        <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 504px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
+                    </pe:if>
+    
+                    <pe:if condition='<%=GetMyData("icon_type") == "low" %>'>
+                        <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 504px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
+                    </pe:if>
+    
+                    <pe:if condition='<%=GetMyData("icon_type") == "none" %>'>
+                        <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 505px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
+                    </pe:if>
+    
+                    <pe:if condition='<%=GetMyData("icon_type") == "new" %>'>
+                        <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 491px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
+                    </pe:if>
+                </div>
+            </div>  
+        </div> 
+        <div style="width: 238px;height: 544px; background:; float: left;" >
+            <div style="margin-top: 6px;margin-left: 6px; width: 226px;height: 526px;background: url(Texture/Aries/Creator/keepwork/rank/youk_226X526_32bits.png#0 0 226 526);">
+                <div style="margin-top: 18px;margin-left:20px; width: 63px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi11_63X16_32bits.png#0 0 63 16);"></div>
+                <div style="width: 180px;height: 110px;font-size: 12px;color: #000000;margin-left: 20px;margin-top: 6px;line-height:18px;"><%=GetRankDesc()%></div>
+                <div style="margin-top: 18px;margin-left:20px; width: 63px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi1_63X16_32bits.png#0 0 63 16);"></div>
+                <div style="width: 180px;height: 85px;font-size: 12px;color: #000000;margin-left: 20px;margin-top: 6px;line-height:18px;">榜单显示前1000名，若出现分数相同情况，则以达到该分数的先后顺序进行排序。奖励发放前200名。</div>
+                <div style="margin-top: 18px;margin-left:20px; width: 63px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi2_63X16_32bits.png#0 0 63 16);"></div>
+
+                <div type ="box" style="width:230px;height:150px;margin-left: 12px;margin-top: 20px;background:;">
+                    <pe:gridview style="width:230px;height:150px;float:left" RememberScrollPos="true" name="" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight = "35" 
+                        DataSource='<%=RewardDataItems%>'>
+                        <Columns>
+                                <!-- <div name="item_root" style="color:#ffffff;width: 570px;height: 90px;float: left;">
+                                </div>                -->
+                                <div style="margin-left: 0px;margin-top: 0px;width: 60px;height: 60px;background: url(Texture/Aries/Creator/keepwork/rank/wupingk_60X60_32bits.png#0 0 60 60);">
+                                    <div zorder="1" tooltip='<%=GetItemDesc(XPath("this"))%>' style="width: 60px; height: 60px; position: relative;"></div>
+                                    <pe:if condition = '<%=IsRoleModel(Eval("goods"))%>'>
+                                        <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 3px;margin-left: 12px; position: relative; width:72px;height:72px;"/>
+                                    </pe:if>
+                                    <pe:if condition = '<%=not IsRoleModel(Eval("goods")) %>'>
+                                        <kp:item gsid='<%=GetGiftItemGId(Eval("goods")) %>' isclickable='false' style="margin-top: 12px;margin-left: -5px; position: relative; width:72px;height:36px;"/>
+                                    </pe:if>
+                                    <div style="margin-top: 38px;margin-left: 34px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount") %></div>  
+                                </div>          
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+
+                <pe:if condition='<%=not IsShowLastRank() %>'>
+                    <input type="button" onclick="ShowLastRank" style="position:relative;margin-left:116px;margin-top: 5px; width:96px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn_shangqi_96X29_32bits.png#0 0 96 29)" />
+                </pe:if>
+                <pe:if condition='<%=IsShowLastRank() %>'>
+                    <input type="button" onclick="ShowLastRank" style="position:relative;margin-left:116px;margin-top: 5px; width:96px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn_benqi_96X29_32bits.png#0 0 96 29)" />
+                </pe:if>
+            </div>
+        </div>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

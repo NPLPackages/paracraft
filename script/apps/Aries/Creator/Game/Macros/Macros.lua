@@ -669,7 +669,7 @@ function Macros.OnShowExitDialog(p1)
 end
 
 -- peek next macro in execution. Usually used by Idle macro to merge with triggers
--- @param nOffset: nil or 1 or 2.  if 2, it will return the next's next macro. 
+-- @param nOffset: nil or 1 or 2.  if 2, it will return the next's next macro. -1 tp return previous macro
 function Macros:PeekNextMacro(nOffset)
 	if(self.macros and self.curLine) then
 		return self.macros[self.curLine + (nOffset or 1)];

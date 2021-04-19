@@ -47,6 +47,12 @@ function MiniWorldUserInfo.ShowInMiniWorld()
 	end);
 end
 
+function MiniWorldUserInfo.ClosePage()
+	if (page) then
+		page:CloseWindow();
+	end
+end
+
 function MiniWorldUserInfo.ShowPage(world)
 	worldParams = world;
 	local params = {

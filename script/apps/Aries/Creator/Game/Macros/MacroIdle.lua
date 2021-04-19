@@ -25,6 +25,23 @@ function Macros.Idle(timeMs, bForceWait)
 		local nextMacro = Macros:PeekNextMacro(1)
 		if(nextMacro) then
 			local nextNextMacro = Macros:PeekNextMacro(2)
+			
+			if(nextMacro.name == "WindowKeyPressTrigger") then
+				local previousMacro = Macros:PeekNextMacro(-1)
+				if(previousMacro and previousMacro.name == "WindowKeyPress") then
+					-- ignore idle timer, if we are typing continously
+					return
+				end
+			end
+
+			if(nextMacro.name == "EditBoxTrigger") then
+				local previousMacro = Macros:PeekNextMacro(-1)
+				if(previousMacro and previousMacro.name == "EditBoxKeyup") then
+					-- ignore idle timer, if we are typing continously
+					return
+				end
+			end
+
 			-- also merge CameraLookat and Trigger. 
 			if(nextMacro:IsTrigger() or 
 				(nextMacro.name == "CameraMove") or (nextMacro.name == "PlayerMove") or 

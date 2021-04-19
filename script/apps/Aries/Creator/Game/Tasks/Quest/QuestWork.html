@@ -134,9 +134,10 @@ function OnChangeType(index)
 end
 
 ]]></script>
-<kp:window name="iframe" width="960" height="580" icon="Texture/Aries/Creator/keepwork/Quest/biaoti_renwu2_32bits.png#0 0 128 64"   onclose="ClosePage">
+<kp:window name="iframe" width="960" height="580" onclose="ClosePage">
+    <div style="position: relative; margin-left: 0px;margin-top: -5px;width: 144px;height: 42px; background: Texture/Aries/Creator/keepwork/QuestWork/biaoti_zuoye_32bits.png#0 0 144 42;"></div>
     <div style="color:#ffffff;width:960;height:630px" class="kp_window_container">
-        <!-- <div style="color: #101010;margin-left: 15px;margin-top: 12px;width: 661px;height: 23px; background: Texture/Aries/Creator/keepwork/Quest/zi_renwu_661X23_32bits.png#0 0 661 23;"></div> -->
+        
         <div style="float: left;width:90px;height:34px;margin-top: 10;margin-left: 7">
             <pe:if condition='<%= IsSelected(1)%>'>
                 <input type="button" name="1" onclick="OnChangeType" style="position:relative;width:90px;height:34px; margin-top: -2px; margin-left:2px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/QuestWork/btn_qiehuan_90X34_32bits.png#0 0 32 16:8 10 8 4);"/>

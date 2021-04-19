@@ -12,6 +12,7 @@ local RegionContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.R
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local RegionContainer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer"));
 
@@ -30,6 +31,17 @@ function RegionContainer:init(x,z, filename)
 		self.filename = filename;
 	end
 	return self;
+end
+
+function RegionContainer:RemoveAll()
+	local allEntities = {}
+	for entity, _ in pairs(self.entities) do
+		allEntities[#allEntities+1] = entity;
+	end
+	for _, entity in ipairs(allEntities) do
+		entity:Destroy()
+	end
+	self.entities = {};
 end
 
 -- set modified and dirty
@@ -52,6 +64,31 @@ end
 
 function RegionContainer:Remove(entity)
 	self.entities[entity] = nil;
+end
+
+function RegionContainer:IsFromExternalWorld()
+	return self.externalRegion ~= nil;
+end
+
+function RegionContainer:GetExternalRegion()
+	return self.externalRegion;
+end
+
+function RegionContainer:SetExternalRegion(externalRegion)
+	self.externalRegion = externalRegion;
+end
+
+function ExternalRegion:GetWorldDirectory()
+	return self.externalRegion and self.externalRegion:GetWorldDirectory() or GameLogic.GetWorldDirectory();
+end
+
+
+-- @param filename: if nil, we will use default name under blockWorld.lastsave folder. 
+function RegionContainer:SetRegionFileName(filename)
+	if(not filename) then
+		filename = format("%sblockWorld.lastsave/%d_%d.region.xml", ParaWorld.GetWorldDirectory(), self.region_x, self.region_z);
+	end
+	self.filename = filename;
 end
 
 function RegionContainer:GetRegionFileName()

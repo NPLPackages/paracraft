@@ -27,4 +27,5 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.qrcode.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.wintercamp.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.invitefriend.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.email.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.rank.lua");
 

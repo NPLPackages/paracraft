@@ -181,3 +181,19 @@ function AgentEditorPage.OnClickUpdateFromRemote()
 		end
 	end
 end
+
+function AgentEditorPage.OnClickAddRefFile()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	OpenFileDialog.ShowPage(L"添加引用文件", function(result)
+		if(result and result~="") then
+			local agentExternalFiles = page:GetValue("agentExternalFiles", "")
+			if(agentExternalFiles == "") then
+				agentExternalFiles = result;
+			else
+				agentExternalFiles = result.."\n"..agentExternalFiles;
+			end
+			page:SetValue("agentExternalFiles", agentExternalFiles)
+		end
+	end, nil, nil, "*.*")
+end

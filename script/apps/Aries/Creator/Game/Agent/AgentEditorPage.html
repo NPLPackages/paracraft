@@ -41,7 +41,9 @@ end
             <div style="float:left"><input name="agentDependencies" uiname="AgentEditorPage.agentDependencies" style="height:24px" /></div>
         </div>
         <div style="margin:3px;">
-            <div><%=L"外部文件:"%></div>
+            <div><%=L"外部文件:"%>
+                <input type="button" class="button" name="btnAddReferenceFile" uiname="AgentEditorPage.OnClickAddRefFile" value='...' style="margin-left:5px;" onclick="AgentEditorPage.OnClickAddRefFile"/>
+            </div>
             <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
                 <input name="agentExternalFiles" uiname="AgentEditorPage.agentExternalFiles" rows="4" ShowLineNumber="true" UseSystemControl="true" />
             </div>

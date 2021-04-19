@@ -202,7 +202,7 @@ end
 -- virtual function: when selected in right hand
 function ItemBlockModel:OnSelect(itemStack)
 	ItemBlockModel._super.OnSelect(self, itemStack);
-	GameLogic.SetStatus(L"Ctrl+左键选择方块与骨骼, 左键点击物品图标保存模型");
+	GameLogic.SetStatus(L"Ctrl+右键点击模型编辑命令, 右键点击编辑模型");
 end
 
 function ItemBlockModel:OnDeSelect()

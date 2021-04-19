@@ -233,7 +233,8 @@ end
 
 
 -- @param text: 合成文本
--- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫，默认为度丫丫(女童音)
+-- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫；度逍遥（精品）=5003，
+--度小鹿=5118，度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5，默认为度丫丫(女童音)
 -- @param nTimeoutMS: 时间限制 超过该时间则不播放声音 单位：秒
 function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 	if nil == text or text == "" then
@@ -248,7 +249,9 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 			return
 		end
 
-		self:PlaySound("playtext" .. voiceNarrator, file_path)
+		local channel = "playtext" .. voiceNarrator
+		self:SetPlayTextChannel(channel)
+		self:PlaySound(channel, file_path)
 	end)
 end
 
@@ -303,6 +306,17 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	-- elseif not GameLogic.IsReadOnly() then
 	-- 	self:DownloadSoundByBaiDu("您需要成为会员才能播放这段文字", callbackFunc)
 	-- end
+end
+
+function SoundManager:StopPlayText()
+	if self.playtext_sound_channel then
+		self:StopSound(self.playtext_sound_channel)
+		self.playtext_sound_channel = nil
+	end
+end
+
+function SoundManager:SetPlayTextChannel(channel)
+	self.playtext_sound_channel = channel
 end
 
 function SoundManager:GetTempSoundFile(voiceNarrator, md5_value)

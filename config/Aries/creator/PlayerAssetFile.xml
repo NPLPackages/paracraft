@@ -118,6 +118,7 @@
   <asset filename="character/CC/artwar/game/Blue_Army_gun.x" displayname="敌军士兵_持枪" name="Blue_Army_gun"/>
   <asset filename="character/CC/artwar/game/Red_Army_gun.x" displayname="红军士兵_持枪" name="Red_Army_gun"/>
   <asset filename="character/CC/artwar/game/Red_Army_knife.x" displayname="红军士兵_持刀" name="Red_Army_knife"/>
+  <asset filename="character/CC/artwar/game/tufei_game.x" displayname="土匪_持刀" name="tufei_game"/>  
 
 
   -->
@@ -169,6 +170,8 @@
   <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing"/>
   <asset filename="character/CC/artwar/movie/Red_Army_nv1.x" displayname="红军女士兵1" name="Red_Army_nv1"/> 
   <asset filename="character/CC/artwar/movie/Red_Army_nv2.x" displayname="红军女士兵2" name="Red_Army_nv2"/> 
+  <asset filename="character/CC/artwar/movie/tufei_movie.x" displayname="土匪" name="tufei_movie"/> 
+  <asset filename="character/CC/artwar/movie/Red_Army_master.x" displayname="政委" name="Red_Army_master"/>  
 <!--   <asset filename="character/CC/artwar/movie/pufuqianjin_Blue_Army.x" displayname="匍匐敌军" name="pufuqianjin_Blue_Army"/> 
   <asset filename="character/CC/artwar/movie/pufuqianjin_Red_Army.x" displayname="匍匐红军" name="pufuqianjin_Red_Army"/>  -->
 
@@ -1122,6 +1125,13 @@
   <asset filename="character/CC/artwar/furnitures/Sandbags_2.x" displayname="沙袋2" name="Sandbags_2"/>
   <asset filename="character/CC/artwar/furnitures/Sandbags_3.x" displayname="沙袋3" name="Sandbags_3"/>
   <asset filename="character/CC/artwar/furnitures/ammunition_chest.x" displayname="弹药箱" name="ammunition_chest"/>
+<!--
+  <asset filename="character/CC/artwar/furnitures/gongchan_logo1.x" displayname="红色标志1" name="gongchan_logo1"/>
+  <asset filename="character/CC/artwar/furnitures/gongchan_logo2.x" displayname="红色标志2" name="gongchan_logo2"/>
+  <asset filename="character/CC/artwar/furnitures/gongchan_logo3.x" displayname="红色标志3" name="gongchan_logo3"/>
+  <asset filename="character/CC/artwar/furnitures/gongchan_logo4.x" displayname="红色标志4" name="gongchan_logo4"/> -->
+  <asset filename="character/CC/artwar/furnitures/dilei.x" displayname="地雷" name="dilei"/>
+  <asset filename="character/CC/artwar/furnitures/bilu.x" displayname="壁炉" name="bilu"/>
 
 
 </category>

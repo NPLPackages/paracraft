@@ -88,6 +88,8 @@ function Entity:Refresh()
 			if(obj) then
 				-- making it using custom renderer since we are using chunk buffer to render. 
 				obj:SetAttribute(0x20000, true);
+				-- make it solid, so that it is rendered before water blocks
+				obj:SetField("HeadOnSolid", true);
 			end	
 		end
 	end

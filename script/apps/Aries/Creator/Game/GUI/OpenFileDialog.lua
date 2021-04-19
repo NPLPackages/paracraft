@@ -73,6 +73,14 @@ function OpenFileDialog.GetFilters(filterName)
 		return {
 			{L"全部文件(*.xml)",  "*.xml"},
 		};
+	elseif(filterName == "*.*") then
+		return {
+			{L"bmax模型(*.bmax)",  "*.bmax"},
+			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
+			{L"mp3(*.mp3)",  "*.mp3"},
+			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
+			{L"图片(*.jpg,*.png)",  "*.jpg;*.png"},
+		};
 	elseif(filterName == "localworlds") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 		local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")

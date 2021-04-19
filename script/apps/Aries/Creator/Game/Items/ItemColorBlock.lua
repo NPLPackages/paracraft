@@ -74,7 +74,8 @@ function ItemColorBlock:GetPenColor(itemStack)
 			if(data) then 
 				color = self:DataToColor(data);
 			end
-			itemStack.color32 = color or self.pen_color
+			color = color or self.pen_color
+			itemStack.color32 = color
 		end
 		return Color.ToValue(color);
 	else

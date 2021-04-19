@@ -347,7 +347,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+	local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 	if(ctrl_pressed) then
 		Entity._super.OpenEditor(self, editor_name, entity);
 	else

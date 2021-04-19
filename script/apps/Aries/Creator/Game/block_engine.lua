@@ -162,9 +162,9 @@ function BlockEngine.IsRegionLoaded(regionX, regionY)
 	return custom_model_load_map[region_id]
 end
 
-function BlockEngine.SetRegionLoaded(regionX, regionY)
+function BlockEngine.SetRegionLoaded(regionX, regionY, bLoaded)
 	local region_id = regionX*100000+regionY;
-	custom_model_load_map[region_id] = true;
+	custom_model_load_map[region_id] = bLoaded ~= false;
 end
 
 function BlockEngine.OnLoadBlockRegion()

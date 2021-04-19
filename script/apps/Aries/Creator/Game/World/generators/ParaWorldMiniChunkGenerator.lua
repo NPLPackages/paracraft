@@ -40,8 +40,6 @@ end
 -- @param world: WorldManager, if nil, it means a local generator. 
 -- @param seed: a number
 function ParaWorldMiniChunkGenerator:Init(world, seed)
-	print("pppppppppppppppppppppppppppppppppppppppppppp")
-	print(commonlib.debugstack())
 	ParaWorldMiniChunkGenerator._super.Init(self, world, seed);
 	return self;
 end
@@ -133,7 +131,8 @@ function ParaWorldMiniChunkGenerator:OnLoadWorld()
 	if(self:GetTotalCount() < 10) then
 		local revision = GameLogic.options:GetRevision();
 		if (not GameLogic.IsReadOnly() and (not revision or revision < 2)) then
-			self:ShowCreateFromTemplateWnd()
+			-- Note: disabled by LiXizhi
+			-- self:ShowCreateFromTemplateWnd()
 		end
 	end
 
@@ -192,6 +191,10 @@ end
 
 
 function ParaWorldMiniChunkGenerator:OnLockTimer()
+	if(GameLogic.Macros:IsPlaying() or GameLogic.Macros:IsRecording()) then
+		return
+	end
+
 	local player = EntityManager.GetPlayer()
 	local x, y, z = player:GetBlockPos();
 	local minX, minY, minZ = self:GetPivot();
@@ -239,36 +242,28 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 		return
 	end
 
-	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
-	local currentWorldName = WorldCommon.GetWorldTag("name");
-	if (myHomeWorldName == currentWorldName and WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
-		local function uploadMiniWorld(projectId)
-			keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
-				if (data and type(data) == "table") then
-					for i = 1, #data do
-						local world = data[i];
-						if (world.projectId == projectId) then
-							--[[
-							local worldName = world.worldName;
-							if (world.extra and world.extra.worldTagName) then
-								worldName = world.extra.worldTagName;
+	local function uploadMiniWorld(projectId)
+		keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
+			if (data and type(data) == "table") then
+				for i = 1, #data do
+					local world = data[i];
+					if (world.projectId == projectId) then
+						local player = EntityManager.GetPlayer()
+						local x, y, z = player:GetBlockPos();
+						keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
+							block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)
+							if (err == 200) then
+								_guihelper.MessageBox(L"上传成功！");
 							end
-							]]
-							local player = EntityManager.GetPlayer()
-							local x, y, z = player:GetBlockPos();
-							keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
-								block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)
-								if (err == 200) then
-									_guihelper.MessageBox(L"上传成功！");
-								end
-							end);
-							break;
-						end
+						end);
+						break;
 					end
 				end
-			end);
-		end
+			end
+		end);
+	end
 
+	local function showSaveTip()
 		_guihelper.MessageBox(L"世界已保存，是否要上传迷你地块？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes)then
 				GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true, function(res)
@@ -281,6 +276,21 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 				end);
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
+	end
+
+	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
+	local currentWorldName = WorldCommon.GetWorldTag("name");
+	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
+		if myHomeWorldName == currentWorldName then
+			showSaveTip()
+		else
+			if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+				local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua") 
+    			RealNameTip.ShowView()
+				return 
+			end
+			showSaveTip()
+		end		
 	end
 end
 

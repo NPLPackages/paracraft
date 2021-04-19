@@ -75,6 +75,7 @@ function EditMovieTextPage.GetTitle()
 end
 
 function EditMovieTextPage.OnOK()
+	SoundManager:StopPlayText()
 	if(page) then
 		local text = page:GetValue("text");
 		if(text) then
@@ -142,8 +143,11 @@ function EditMovieTextPage.OnClickSelcetNarrator(name, value)
 
 	if value >= 0 and not System.User.isVip then
 		page:SetValue("voicenarrator", default_narrator);
-		local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-		VipToolNew.Show("recorder")
+		GameLogic.IsVip("PlyText", true, function(result)
+			if result then
+				page:SetValue("voicenarrator", value);
+			end
+		end)
 		return
 	end
 end
@@ -174,7 +178,10 @@ function EditMovieTextPage.OnListeningTest()
 			return
 		end
 		
-		SoundManager:PlaySound("playtext" .. voicenarrator, file_path)
+		SoundManager:StopPlayText()
+		local channel = "playtext" .. voicenarrator
+		SoundManager:SetPlayTextChannel(channel)
+		SoundManager:PlaySound(channel, file_path)
 		EditMovieTextPage.UpdateSoundDesc()
 	end)
 end

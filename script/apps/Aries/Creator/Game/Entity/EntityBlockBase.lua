@@ -81,7 +81,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		return true;
 	else
 		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+			local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 			if(ctrl_pressed) then
 				-- ctrl+right click to activate the entity in editor mode, such as for CommandEntity. 
 				self:OnActivated(entity);

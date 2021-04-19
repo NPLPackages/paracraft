@@ -138,9 +138,9 @@ end
 
 function getReward(index)
     if index == nil then
-        return #cur_email_content.rewards
+        return cur_email_content.rewards and #cur_email_content.rewards or 0
     else
-        return cur_email_content.rewards[index]
+        return cur_email_content.rewards and cur_email_content.rewards[index] or {}
     end
     
 end

@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua");
+    RealNameTip.OnInit()
+    function ClosePage()
+        RealNameTip.CloseView()
+    end
+
+    function ClickShowReal()
+        RealNameTip.ClickShowRealGift()
+    end
+]]></script>
+<div style=" width: 909px; height: 621px; background: url(Texture\Aries\Creator\keepwork\macro/bjk3_909X621_32bits.png#0 0 909 621);">
+    <div style="width: 900x; height: 60px;">
+        <input type="button" style="margin-left: 800px; margin-top: 18px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+    <div style="margin-top: 230px;">
+        <input type="button" style="margin-left: 160px; margin-top: 24px; width:154px;height:54px;background: url(Texture\Aries\Creator\keepwork\macro/btn_6_1_76X36_32bits.png#0 0 154 54);" onclick="ClickShowReal()"/>
+        <input type="button" style="margin-left: 40px; margin-top: 24px; width:154px;height:54px;background: url(Texture\Aries\Creator\keepwork\macro/btn_7_1_76X36_32bits.png#0 0 154 54);" onclick="ClosePage()"/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

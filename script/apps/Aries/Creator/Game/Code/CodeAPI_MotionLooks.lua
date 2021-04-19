@@ -986,7 +986,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 --				end
 				return value;
 			end
-			self.codeblock:SetAutoWait(false)
+			-- self.codeblock:SetAutoWait(false)
 
 			local my_window;
 			if(alignment == "headon" or alignment == "headon3D") then

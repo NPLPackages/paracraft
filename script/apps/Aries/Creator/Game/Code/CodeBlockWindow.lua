@@ -108,6 +108,9 @@ function CodeBlockWindow.Show(bShow)
 		if(self.entity) then
 			EntityManager.SetLastTriggerEntity(self.entity)
 		end
+		if (self.IsSupportNplBlockly()) then
+			self.OpenBlocklyEditor();
+		end
 		GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 	end
 end
@@ -157,11 +160,12 @@ end
 
 -- @return width, height, margin_right, margin_bottom, margin_top
 function CodeBlockWindow:CalculateMargins()
-	local MAX_3DCANVAS_WIDTH = 800;
+	-- local MAX_3DCANVAS_WIDTH = 800;
+	local MAX_3DCANVAS_WIDTH = 600;
 	local MIN_CODEWINDOW_WIDTH = 200+350;
 	local viewport = ViewportManager:GetSceneViewport();
 	local width = math.max(math.floor(Screen:GetWidth() * 1/3), MIN_CODEWINDOW_WIDTH);
-	local halfScreenWidth = math.floor(Screen:GetWidth()/2);
+	local halfScreenWidth = math.floor(Screen:GetWidth() * 11 / 20);  -- 50% 55%  
 	if(halfScreenWidth > MAX_3DCANVAS_WIDTH) then
 		width = halfScreenWidth;
 	elseif((Screen:GetWidth() - width) > MAX_3DCANVAS_WIDTH) then
@@ -331,7 +335,10 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 		self.entity = entity;
 
 		-- 切换实体, 若为blockly编辑模式则重新打开 (npl blocly 已经存在就继续存在)
-		if (CodeBlockWindow.IsBlocklyEditMode() and NplBlocklyEditorPage) then CodeBlockWindow.ShowNplBlocklyEditorPage() end
+		CodeBlockWindow.CloseNplBlocklyEditorPage();
+		if (CodeBlockWindow.IsSupportNplBlockly()) then 
+			CodeBlockWindow.OpenBlocklyEditor()
+		end
 
 		if(page) then
 			page:Refresh(0.01);
@@ -376,7 +383,9 @@ function CodeBlockWindow:OnMessage(msg)
 end
 
 function CodeBlockWindow.GetCodeFromEntity()
-	if (self.IsSupportNplBlockly()) then return self.entity:GetNPLBlocklyNPLCode() end
+	if (self.IsSupportNplBlockly()) then 
+		return self.entity:GetNPLBlocklyNPLCode(); 
+	end
 
 	if(self.entity) then
 		return self.entity:GetCommand();
@@ -1170,7 +1179,6 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 end
 
 function CodeBlockWindow.OnOpenBlocklyEditor()
-	local code = CodeBlockWindow.GetCodeFromEntity();
 	CodeBlockWindow.OpenBlocklyEditor()
 end
 
@@ -1303,6 +1311,10 @@ function CodeBlockWindow.UpdateNplBlocklyCode()
 end
 
 function CodeBlockWindow.ShowNplBlocklyEditorPage()
+	if(CodeBlockWindow.IsNPLBrowserVisible()) then
+		CodeBlockWindow.SetNplBrowserVisible(false);
+	end
+
 	if (NplBlocklyEditorPage) then 
 		NplBlocklyEditorPage:CloseWindow();
 		NplBlocklyEditorPage = nil;

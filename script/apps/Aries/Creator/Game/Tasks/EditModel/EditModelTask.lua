@@ -188,7 +188,7 @@ end
 function EditModelTask:handleRightClickScene(event, result)
 	local modelEntity = self:PickModelAtMouse();
 	if(modelEntity) then
-		local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+		local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 		if(ctrl_pressed) then
 			modelEntity:OpenEditor("entity", modelEntity);
 		else

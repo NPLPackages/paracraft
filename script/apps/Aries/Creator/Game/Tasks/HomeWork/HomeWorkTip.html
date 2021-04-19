@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="HomeWorkTip.lua" ><![CDATA[
+    local HomeWorkTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HomeWork/HomeWorkTip.lua");
+    HomeWorkTip.OnInit()
+    function ClosePage()        
+        HomeWorkTip.CloseView()
+        HomeWorkTip.GoNextPage()
+    end
+
+    function GetDesc()
+        if isCanDo() then
+            return  string.format("你的课后练习《%s》已激活，请及时完成。",HomeWorkTip.homeWork_Name)
+        else
+            return string.format("你的课后练习《%s》已激活，请放学后进行(16:30之后)。",HomeWorkTip.homeWork_Name)
+        end        
+    end
+
+    function GotoHomeWork()
+        HomeWorkTip.ToWork()
+    end
+
+    function isCanDo()
+        return HomeWorkTip.CheckCanDoHomeWork()
+    end
+]]></script>
+<div style=" width: 600px; height: 340px; background: url(Texture/Aries/Creator/keepwork/Quest/diban_595X340_32bits.png#0 0 600 340);">
+    <div style="font-size: 20px; base-font-size: 20px; color: #101010; font-weight: bold; width: 360px; margin-left: 200px; margin-top: 120px;">
+        <%=GetDesc()%>
+    </div>
+    <div style="width: 400x; height: 100px; margin-left: 170px; margin-top: 10px;">
+        <pe:if condition="<%=isCanDo()%>">
+            <input type="button" value="开始练习" style="font-size: 20px; base-font-size: 20px; font-weight: bold; margin-top: 30px; width:180px;height:70px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="GotoHomeWork()"/>
+            <input type="button" value="取消" style="font-size: 20px; base-font-size: 20px; font-weight: bold; margin-left: 20px; margin-top: 30px; width:180px;height:70px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="ClosePage()"/>
+        </pe:if>
+        <pe:if condition="<%=not isCanDo()%>">
+            <input type="button" value="晚点再来看看" style="margin-left: 100px; font-size: 20px; base-font-size: 20px; font-weight: bold;  margin-top: 30px; width:180px;height:70px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="ClosePage()"/>
+        </pe:if>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

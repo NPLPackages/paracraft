@@ -26,6 +26,8 @@ local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/Quest
 local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
 local EmailManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailManager.lua");
 local DockPopupControl = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPopupControl.lua")
+local RankPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua")
+
 local DockPage = NPL.export();
 local UserData = nil
 DockPage.FriendsFansData = nil
@@ -40,7 +42,7 @@ DockPage.hide_vip_world_ids = {
 DockPage.is_show = true;
 DockPage.top_line_1 = {
     { label = L"", },
-    { label = L"", },    
+    { label = L"荣誉榜", id = "rank", enabled = true, bg="Texture/Aries/Creator/keepwork/rank/btn3_rongyu_32bits.png#0 0 100 80", },  
     { label = L"实名礼包", id = "present", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_libao_32bits.png#0 0 100 80", }, 
     { label = L"成长任务", id = "user_tip", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_renwu1_32bits.png#0 0 100 80", },    
     { label = L"消息中心", id = "msg_center", enabled = true, bg="Texture/Aries/Creator/keepwork/Email/btn3_xiaoxi_32bits.png#0 0 100 80", }, 
@@ -288,10 +290,14 @@ function DockPage.OnClickTop(id)
     --     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.web_keepwork_home");
     elseif (id == 'homework') then
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestWork.lua").Show();
-    elseif (id == 'invitefriend') then        
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.homework");
+    elseif (id == 'invitefriend') then
         InviteFriend.ShowView()
         table.insert(DockPage.showPages,{id,InviteFriend.GetPageCtrl()})
-    end
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.invitefriend");
+    elseif (id == 'rank') then        
+        RankPage.Show();
+        table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})    end
 end
 function DockPage.OnClick(id)
     if(DockPage.CloseLastShowPage(id))then
@@ -304,19 +310,15 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
         table.insert(DockPage.showPages,{id,last_page_ctrl})
     elseif(id == "work")then
-		if(mouse_button == "right") then
-            -- the new version            
-            last_page_ctrl = GameLogic.GetFilters():apply_filters('show_console_page')
-        else
-            last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page')
-        end
+		last_page_ctrl = GameLogic.GetFilters():apply_filters('show_create_page');
         table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.work");
     elseif(id == "explore")then
         last_page_ctrl = GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
         table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.explore");
-    elseif(id == "study")then        
+    elseif(id == "study")then
+        echo('111111', true)      
         QuestAllCourse.Show();
         last_page_ctrl = QuestAllCourse.GetPageCtrl()
         table.insert(DockPage.showPages,{id,last_page_ctrl})

@@ -76,10 +76,17 @@ end
 function GetVoiceNarratorDS()
     return {
         {value=-1, text=L"无", selected=true},
-        {value=4, text=L"女童声"},
         {value=0, text=L"女声",},
         {value=1, text=L"男声"},
-        {value=3, text=L"男声2"},
+        {value=3, text=L"度逍遥"},
+        {value=4, text=L"度丫丫"},        
+        {value=5003, text=L"度逍遥2"},
+        {value=5118, text=L"度小鹿"},
+        {value=106, text=L"度博文"},
+        {value=110, text=L"度小童"},
+        {value=111, text=L"度小萌"},
+        {value=103, text=L"度米朵"},
+        {value=5, text=L"度小娇"},
     };
 end
 
@@ -138,14 +145,15 @@ end
     <div style="margin-top:10px;">
         <input type="button" uiname="EditMovieTextPage.Reset" name="Reset" style="margin-left:40px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
         <input type="button" uiname="EditMovieTextPage.ClearText" name="ClearText" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearText" value='<%=L"清除文字"%>' />
-        <div style="float:left;margin-left:35px;">
+        <div style="float:left;margin-left:20px;">
+            <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
             <%=L"播音员:"%>
             <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
             </select>
         </div>
 
         <input type="button" name="ListeningTest" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnListeningTest" value='<%=L"试听"%>' />
-        <label name="SoundDesc" style="float:left;margin-left:12px;width: 90px;"/>
+        <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;"/>
         <input type="button" uiname="EditMovieTextPage.OK" name="OK" DefaultButton="true" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnOK" value='<%=L"确定"%>' />
     </div>
 </div>

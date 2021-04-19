@@ -128,13 +128,17 @@ end
 
 -- @param bAskPermission: true to ask for user permission
 function Entity:UpdateFromRemoteSource(bAskPermission)
-	local function DoUpdate_(filename, bDeployLocally) 
+	local function DoUpdate_(filename, deployFiles) 
 		local function DoUpdateImp_()
-			if(bDeployLocally and not GameLogic.IsReadOnly()) then
-				local localFilename = self:GetAgentFilename(true)
-				if(localFilename ~= filename) then
-					if(not ParaIO.CopyFile(filename, localFilename, true)) then
-						LOG.std(nil, "warn", "Agent", "failed to copy file: from %s to %s", filename, localFilename);
+			if(deployFiles and not GameLogic.IsReadOnly()) then
+				for _, fileItem in ipairs(deployFiles) do
+					if(fileItem.localfile ~= fileItem.filepath) then
+						ParaIO.CreateDirectory(fileItem.localfile);
+						if(ParaIO.CopyFile(fileItem.filepath, fileItem.localfile, true)) then
+							LOG.std(nil, "info", "Agent", "copy file: from %s to %s", fileItem.filepath, fileItem.localfile);
+						else
+							LOG.std(nil, "warn", "Agent", "failed to copy file: from %s to %s", fileItem.filepath, fileItem.localfile);
+						end
 					end
 				end
 			end
@@ -158,21 +162,50 @@ function Entity:UpdateFromRemoteSource(bAskPermission)
 		if(url) then
 			local username, worldname, subpath = url:match("^@%d+:([^/]+)/([^/]+)/(.*)")
 			if(username) then
-				GameLogic.GetFilters():apply_filters('get_single_file', projectId, subpath, function(content)
-					if(content) then
-						local tmpFolder = ParaIO.GetWritablePath()..format("temp/agents/@%d/", projectId);
-						ParaIO.CreateDirectory(tmpFolder);
-						local filename = tmpFolder..self:GetAgentName()..".xml";
-						local file = ParaIO.open(filename, "w");
-						if (file:IsValid()) then
-							file:write(content, #content);
-							file:close();
-							DoUpdate_(filename, true)
-						end
-					else
-						LOG.std(nil, "warn", "Agent", "failed to download remote file: %d:%s", projectId, subpath);
+				local files = {};
+				local deployFiles = {};
+				files[#files+1] = subpath;
+				if(self.agentExternalFiles) then
+					for file in self.agentExternalFiles:gmatch("[^\r\n]+") do
+						files[#files+1] = file;
 					end
-				end)
+				end
+				local function DownloadNextFile_(index)
+					index = index or 1;
+					local filename = files[index];
+					if(not filename) then
+						return true;
+					end
+					GameLogic.GetFilters():apply_filters('get_single_file', projectId, filename, function(content)
+						if(content) then
+							local tmpFolder = ParaIO.GetWritablePath()..format("temp/agents/@%d/", projectId);
+							local filepath
+							if(index == 1) then
+								filepath = tmpFolder..self:GetAgentName()..".xml";
+								deployFiles[#deployFiles+1] = {localfile = self:GetAgentFilename(true), filepath = filepath};
+							else
+								filepath = tmpFolder..filename;
+								deployFiles[#deployFiles+1] = {localfile = Files.WorldPathToFullPath(filename), filepath = filepath};
+							end
+							ParaIO.CreateDirectory(filepath);
+							local file = ParaIO.open(filepath, "w");
+							if (file:IsValid()) then
+								file:write(content, #content);
+								file:close();
+								commonlib.TimerManager.SetTimeout(function()  
+									if(DownloadNextFile_(index + 1)) then
+										DoUpdate_(deployFiles[1].filepath, deployFiles)
+									end	
+								end, 1)
+							else
+								LOG.std(nil, "warn", "Agent", "failed to write to file: %s", filepath);	
+							end
+						else
+							LOG.std(nil, "warn", "Agent", "failed to download remote file: %d:%s", projectId, subpath);
+						end
+					end)
+				end
+				DownloadNextFile_();
 			end
 		end
 	else

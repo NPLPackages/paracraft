@@ -124,7 +124,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
-vision|ui|keyboard|quickselectbar|tips|map|info|dock]], 
+vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -179,6 +179,9 @@ vision|ui|keyboard|quickselectbar|tips|map|info|dock]],
 		elseif(name == "dock") then
 			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 			DockPage.Hide();
+		elseif (name == "miniuserinfo") then
+			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
+			MiniWorldUserInfo.ClosePage()
 		end
 	end,
 };

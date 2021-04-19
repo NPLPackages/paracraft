@@ -377,7 +377,10 @@ function QuestAllCourse.RefreshCourseListData(callback)
                     end
 
                     v.IsLock = #need_unlock_list > 0
-
+                    if QuestAllCourse.permissions_check then
+                        v.IsLock = false
+                    end
+                    
                     if v.IsLock then
                         local name_desc = ""
                         for i, v2 in ipairs(need_unlock_list) do
@@ -541,6 +544,8 @@ function QuestAllCourse.RunCommand(index, is_pre)
         return
     end
 
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.knowledge.select_course", {data = data});  
+
     -- 校园课程 放开次数限制
     local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
     local school_class_id = SchoolClassIdList[httpwrapper_version]
@@ -551,17 +556,19 @@ function QuestAllCourse.RunCommand(index, is_pre)
     local function enter_world()
         local server_time = GameLogic.QuestAction.GetServerTime()
 
-        if data.beginAt and data.endAt then
-            local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.beginAt)
-            local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.endAt)
-            if server_time < begain_time_stamp then
-                _guihelper.MessageBox("还没到上课时间哦，请在上课时间内来学习吧。")
-                return
-            end
-
-            if server_time > end_time_stamp then
-                _guihelper.MessageBox("已错过上课时间，你可以继续做作业，或去学习其他课程。")
-                return
+        if not QuestAllCourse.permissions_check then
+            if data.beginAt and data.endAt then
+                local begain_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.beginAt)
+                local end_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(data.endAt)
+                if server_time < begain_time_stamp then
+                    _guihelper.MessageBox("还没到上课时间哦，请在上课时间内来学习吧。")
+                    return
+                end
+    
+                if server_time > end_time_stamp then
+                    _guihelper.MessageBox("已错过上课时间，你可以继续做作业，或去学习其他课程。")
+                    return
+                end
             end
         end
 
@@ -610,6 +617,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
                         page:CloseWindow()
                         QuestAllCourse.CloseView()
                         if res == _guihelper.DialogResult.OK then
+                            GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.knowledge.select_course', { from = data.name })
                             GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
                         else
                             GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, true, data.preProjectReleaseId)
@@ -622,6 +630,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
                 elseif data.projectReleaseId and data.projectReleaseId > 0 then
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.knowledge.select_course', { from = data.name })
                     GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
                 end                
                 -- CommandManager:RunCommand(command)
@@ -629,7 +638,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
         end)
     end
 
-    if System.User.isVip then
+    if System.User.isVip or QuestAllCourse.permissions_check then
         enter_world()
     else
         -- 需要vip才能进
@@ -929,47 +938,50 @@ function QuestAllCourse.ClickWork(index, is_pre)
     },function(err, message, data2)
         if err == 200 then
             local userAiHomework = data2.userAiHomework
-            if userAiHomework == nil then
-                local desc = string.format("需要先学习完《%s》才能开始作业哦", data.name)
-                -- GameLogic.AddBBS(nil, desc, 5000, "255 0 0");
-                _guihelper.MessageBox(desc)
-                return
-            end
-
-            if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-                _guihelper.MessageBox("学习人工智能课程需要先完成实名认证，快去认证吧。", function()	
-                    GameLogic.GetFilters():apply_filters(
-                        'show_certificate',
-                        function(result)
-                            if (result) then
-                                local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
-                                if DockPage.IsShow() then
-                                    DockPage.RefreshPage(0.01)
+            if not QuestAllCourse.permissions_check then
+                if userAiHomework == nil then
+                    local desc = string.format("需要先学习完《%s》才能开始作业哦", data.name)
+                    -- GameLogic.AddBBS(nil, desc, 5000, "255 0 0");
+                    _guihelper.MessageBox(desc)
+                    return
+                end
+    
+                if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+                    _guihelper.MessageBox("学习人工智能课程需要先完成实名认证，快去认证吧。", function()	
+                        GameLogic.GetFilters():apply_filters(
+                            'show_certificate',
+                            function(result)
+                                if (result) then
+                                    local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+                                    if DockPage.IsShow() then
+                                        DockPage.RefreshPage(0.01)
+                                    end
+                                    
+                                    GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                                    QuestAllCourse.ClickWork(index, is_pre)
                                 end
-                                
-                                GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
-                                QuestAllCourse.ClickWork(index, is_pre)
                             end
+                        );
+                    end)
+                    return
+                end
+
+                local server_time = GameLogic.QuestAction.GetServerTime()
+                local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+    
+                -- 入校课程的话 需要每天四点半之后才能做
+                if data.isForSchool == 1 then
+                    
+                    -- 判断是不是周末
+                    local week_day = QuestAllCourse.GetWeekNum(server_time)
+                    if week_day ~= 6 and week_day ~= 7 then
+                        local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+                        local limit_time_end_stamp = today_weehours + 22 * 60 * 60 + 30 * 60
+                        if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
+                            -- GameLogic.AddBBS(nil, "16:30之后才能做作业哦", 5000, "255 0 0");
+                            _guihelper.MessageBox("16:30之后才能做课后练习")
+                            return
                         end
-                    );
-                end)
-                return
-            end
-
-            local server_time = GameLogic.QuestAction.GetServerTime()
-            local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-
-            -- 入校课程的话 需要每天四点半之后才能做
-            if data.isForSchool == 1 then
-                
-                -- 判断是不是周末
-                local week_day = QuestAllCourse.GetWeekNum(server_time)
-                if week_day ~= 6 and week_day ~= 7 then
-                    local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
-                    if server_time < limit_time_stamp then
-                        -- GameLogic.AddBBS(nil, "16:30之后才能做作业哦", 5000, "255 0 0");
-                        _guihelper.MessageBox("16:30之后才能做作业哦")
-                        return
                     end
                 end
             end

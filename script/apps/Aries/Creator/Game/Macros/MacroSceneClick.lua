@@ -117,6 +117,9 @@ function Macros.SceneClick(button, angleX, angleY)
 	mouse_x, mouse_y, mouse_button = Macros.MouseAngleToScreenPos(angleX, angleY, button)
 	ParaUI.SetMousePosition(mouse_x, mouse_y);
 
+	local emulatedKeys = Keyboard:GetEmulatedKeys()
+	SetKeyboardFromButtonText(emulatedKeys, button)
+
 	local event = MouseEvent:init("mousePressEvent");
 	SetMouseEventFromButtonText(event, button)
 	local ctx = GameLogic.GetSceneContext()
@@ -127,6 +130,9 @@ function Macros.SceneClick(button, angleX, angleY)
 	SetMouseEventFromButtonText(event, button)
 	ctx:handleMouseEvent(event);
 	
+	-- clear all keyboard emulations
+	SetKeyboardFromButtonText(emulatedKeys, "")
+
 	return Macros.Idle(1);
 end
 
