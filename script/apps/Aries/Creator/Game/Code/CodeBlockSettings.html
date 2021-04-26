@@ -54,9 +54,13 @@ end
     </div>
     <div style="margin-bottom:10px;">
         <input type="checkbox" uiname="CodeBlockSettings.isUseNplBlockly" name="isUseNplBlockly" style="margin-top:2px" onclick="CodeBlockSettings.OnSetUseNplBlockly"/>
-        <div for="isUseNplBlockly" uiname="CodeBlockSettings.isUseNplBlocklyFor" style="float:left;margin-left:5px;" >
-            <%=L"启用 NPL 图块编辑器"%>
-        </div>
+        <div for="isUseNplBlockly" uiname="CodeBlockSettings.isUseNplBlocklyFor" style="float:left;margin-left:5px;" ><%=L"启用 NPL 图块编辑器"%></div>
+        <input type="button" style="min-width:80px; margin-left: 10px;" class="button" uiname="CodeBlockSettings.BlockToolboxBtn" name="BlockToolboxBtn" value='<%=L"定制工具栏图块"%>' onclick="CodeBlockSettings.ClickBlockToolboxBtn"/>
+    </div>
+    <div style="margin-bottom:10px;">
+        <input type="checkbox" uiname="CodeBlockSettings.isUseCustomBlock" name="isUseCustomBlock" style="margin-top:2px" onclick="CodeBlockSettings.OnSetUseCustomBlock"/>
+        <div for="isUseCustomBlock" uiname="CodeBlockSettings.isUseCustomBlockFor" style="float:left;margin-left:5px;" ><%=L"启用定制图块(仅在 NPL 图块编辑器中生效)"%></div>
+        <input type="button" style="min-width:80px; margin-left: 10px;" class="button" uiname="CodeBlockSettings.CustomBlockBtn" name="CustomBlockBtn" value='<%=L"定制图块"%>' onclick="CodeBlockSettings.ClickCustomBlockBtn"/>
     </div>
     <div style="margin-bottom:10px;">
         <input type="button" align="right" style="min-width:80px" class="button" uiname="CodeBlockSettings.close" name="close" value='<%=L"关闭"%>' onclick="ClosePage"/>

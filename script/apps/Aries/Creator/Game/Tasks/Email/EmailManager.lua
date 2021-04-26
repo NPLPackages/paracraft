@@ -106,8 +106,6 @@ function EmailManager.UpdateEmailList(isNeedSort)
         EmailManager.email_list = id_list
     end
 
-    
-    -- EmailManager.event:dispatchEvent("EVENT_EMAIL_UPDATE")
     if isNeedSort == nil then
         Email.SetEmailList(EmailManager.email_list)
         return
@@ -157,6 +155,13 @@ function EmailManager.ReadEamil(id)
     },function(err, msg, data)
         if err == 200 then
             EmailManager.cur_email_content = data.data
+            --echo(EmailManager.cur_email_content,true)
+            if EmailManager.cur_email_content and EmailManager.cur_email_content[1] then
+                local content = EmailManager.cur_email_content[1]
+                if not content.rewards then
+                    content.rewards = {}
+                end
+            end
             EmailManager.RefreshEmail()            
         end
     end)

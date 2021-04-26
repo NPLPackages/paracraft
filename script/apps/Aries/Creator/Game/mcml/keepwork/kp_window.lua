@@ -36,6 +36,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local icon = mcmlNode:GetAttributeWithCode("icon", nil, true)
 	local iconWidth = mcmlNode:GetNumber("icon_width") or 128
 	local iconHeight = mcmlNode:GetNumber("icon_height") or 64
+	local help_type = mcmlNode:GetAttributeWithCode("help_type", nil, true)
 	local parent_width, parent_height = w, h;
 	
 	local title_height = 28;
@@ -46,10 +47,12 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	_parent = _this;
 	local _parent_window = _this;
 
+	local is_create_icon = false
 	 if(icon and icon ~= "" and not title)then
         _this = ParaUI.CreateUIObject("container", "icon", "_lt", 5, -22, iconWidth, iconHeight);
 	    _this.background = icon;
 	    _parent:AddChild(_this);
+		is_create_icon = true
     end
 
 	_this = ParaUI.CreateUIObject("button", "window_title_text", "_lt", 10, 5, w, title_height);
@@ -60,6 +63,18 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	_guihelper.SetUIFontFormat(_this, 36)
 	_guihelper.SetButtonFontColor(_this, "#FCFCFC", "#FCFCFC");
 	_parent:AddChild(_this);
+
+	if help_type and help_type ~= "" then
+		local help_icon_x = mcmlNode:GetNumber("help_icon_x") or iconWidth
+		_this = ParaUI.CreateUIObject("button", "window_help_type", "_lt", help_icon_x, 5, 32, 32);	
+		
+		_this.background = "Texture/Aries/Creator/keepwork/Help/btn_32X32_32bits.png;0 0 32 32";
+		_parent:AddChild(_this);
+
+		_this:SetScript("onclick", function()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Help/HelpPage.lua").Show(help_type);
+		end);
+	end
 
 	local onclose = mcmlNode:GetString("onclose");
 

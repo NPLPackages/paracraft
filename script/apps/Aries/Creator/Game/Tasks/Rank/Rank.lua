@@ -7,10 +7,11 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua").Show();
 --]]
+local page
 local Rank = NPL.export();
 local pe_treeview = commonlib.gettable("Map3DSystem.mcml_controls.pe_treeview");
+local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-
 -- {
 --     name: '院校综合榜',
 --     code: 'orgComprehensive',
@@ -132,19 +133,19 @@ function Rank.InitData()
                 name="item",attr={name="院校综合榜",code="orgComprehensive", exid = 31000},
             },
             {
-                name="item",attr={name="院校势力榜", code="orgPower", exid = 31010},
+                name="item",attr={name="院校人数榜", code="orgPower", exid = 31010},
             },
             {
-                name="item",attr={name="院校创作力", code="orgCreate", exid = 31020},
+                name="item",attr={name="院校创作榜", code="orgCreate", exid = 31020},
             },
             {
-                name="item",attr={name="好学校园榜", code="orgStudy", exid = 31030},
+                name="item",attr={name="院校学习榜", code="orgStudy", exid = 31030},
             },
         },
         {
             name="type",attr={img="Texture/Aries/Creator/keepwork/rank/zi4_30X15_32bits.png"},
             {
-                name="item",attr={name="顶流大牛榜", code="personTop", exid = 31040},
+                name="item",attr={name="作品达人榜", code="personTop", exid = 31040},
             },
             {
                 name="item",attr={name="作品点赞榜", code="personWorld", exid = 31050},
@@ -196,7 +197,7 @@ function Rank.HandleRankData(data)
         data.rank = v.rank
         data.tool_name = ""
         data.is_my_rank = selfRank and selfRank.rank == data.rank
-
+        
         if v.object then
             if v.object.name then
                 data.tool_name = v.object.name
@@ -205,6 +206,9 @@ function Rank.HandleRankData(data)
             elseif v.object.username then
                 data.tool_name = v.object.username
             end
+            data.object = v.object
+            data.portrait = v.object.portrait
+            data.username = v.object.username
         end
         data.name = Rank.GetLimitLabel(data.tool_name)
         
@@ -226,7 +230,9 @@ function Rank.HandleRankData(data)
     end
 
     local MyData = {}
-    
+
+    local profile = KeepWorkItemManager.GetProfile()
+    MyData.portrait = profile.portrait
     if selfRank then
         MyData.rank = selfRank.rank
         MyData.tool_name = ""
@@ -255,7 +261,7 @@ function Rank.HandleRankData(data)
     else
         MyData.rank = "1000+"
         MyData.name = "-"
-        local profile = KeepWorkItemManager.GetProfile()
+        
         if Rank.GetSelectItemTypeIndex() == 1 then
             MyData.name = profile.school and profile.school.name or "-"
         elseif Rank.GetSelectItemTypeIndex() == 2 then
@@ -343,6 +349,8 @@ function Rank.GetRankListData(cb)
         ["x-page"] = 1,
     },function(err, msg, data)
         Rank.server_list_data = data
+        -- print("cccccccc")
+        -- echo(data, true)
         Rank.HandleRankData()
 
         if err == 200 then
@@ -419,4 +427,14 @@ function Rank.GetRecudedNumberDesc(number)
     local int_num = math.floor(num/10000)
     local float_num = math.floor((num - int_num * 10000)/1000)
     return string.format("%s.%s万", int_num, float_num)
+end
+
+function Rank.ToWorld(index)
+    local data = Rank.RankData[index]
+    local id = data.object and data.object.id
+    CommandManager:RunCommand(format('/loadworld -force %d', id))
+end
+
+function Rank.ShowReward()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/RankReward.lua").Show(Rank.cur_select_item_data.exid);
 end

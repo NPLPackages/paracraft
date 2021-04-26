@@ -138,9 +138,9 @@ end
 
 function getReward(index)
     if index == nil then
-        return cur_email_content.rewards and #cur_email_content.rewards or 0
+        return #cur_email_content.rewards 
     else
-        return cur_email_content.rewards and cur_email_content.rewards[index] or {}
+        return cur_email_content.rewards[index]
     end
     
 end
@@ -187,7 +187,7 @@ function getEmailTitle(str)
 end
 
 ]]></script>
-<kp:window name="iframe" width="1040" height="600" icon="Texture/Aries/Creator/keepwork/Email/biaoti_youjian_32bits.png"   onclose="ClosePage">
+<kp:window name="iframe" width="1040" height="600" icon="Texture/Aries/Creator/keepwork/Email/biaoti_youjian_32bits.png"  help_type ="email"  onclose="ClosePage">
     <div style="color:#ffffff;width:1040px;height:600px" class="kp_window_container">
         <div type ="box" style="width:110px;height:500px;margin-left: 10px;margin-top: 0px;float: left;">
              <pe:gridview style="margin:0px;width:110px;height:500px;float:left" RememberScrollPos="false" name="button_gridview" CellPadding="12" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
@@ -265,8 +265,6 @@ end
                                         </Columns>
                                     </pe:gridview>
                                 </div>
-                                
-                                <!-- <div style="margin-top: 20px; min-height: 160px; margin-left: 36px;width: 466px;font-size: 14px;base-font-size: 14px;color: #141717;"><%=cur_email_content.content%></div>            -->
                             </div>
                             <div style="width: 500px; height: 2px; margin-left: 516px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/Email/fengexian_32bits.png#0 0 4 2:2 1 3 0);"></div>
                             <div name ="email_reward" style="width: 466px; height: 100px; float: left;">

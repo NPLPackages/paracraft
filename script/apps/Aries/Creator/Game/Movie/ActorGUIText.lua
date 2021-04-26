@@ -52,7 +52,7 @@ function Actor:Init(itemStack, movieclipEntity, movieclip)
 	end
 	local timeseries = self.TimeSeries;
 	timeseries:CreateVariableIfNotExist("text", "Discrete");
-
+	self:PrePlayText()
 	return self;
 end
 
@@ -345,7 +345,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	if(not curTime or self:Islocked()) then
 		return
 	end
-	
+
 	local text, fontsize, fontcolor, textpos, bgalpha, textalpha, bgcolor;
 	
 	local values = self:GetValue("text", curTime);
@@ -354,6 +354,8 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(self:GetTextOrder() ~= self:GetCurrentTextOrder()) then
 			return;
 		end
+
+		
 
 		local fromTime, toTime = var:getTimeRange(1, curTime);
 		
@@ -376,4 +378,20 @@ function Actor:FrameMovePlaying(deltaTime)
 		end
 		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor, values.voicenarrator);
 	end
+end
+
+function Actor:PrePlayText()
+	local var = self:GetVariable("text");
+	if var then
+		local lastTime = var:GetLastTime() or 0
+		local key_table = var:GetKeys_Iter(1, -1, lastTime)
+		if key_table then
+			for index, values in key_table do
+				if values.text and values.text ~= "" and values.voicenarrator and values.voicenarrator >= 0 then
+					SoundManager:PrepareText(values.text,  values.voicenarrator)
+				end
+			end
+		end
+	end
+
 end

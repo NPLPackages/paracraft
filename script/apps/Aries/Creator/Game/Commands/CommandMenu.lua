@@ -17,6 +17,8 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
+local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -123,6 +125,14 @@ Commands["menu"] = {
 			end
 		elseif(name == "file.exit") then
 			MyCompany.Aries.Creator.Game.Desktop.OnLeaveWorld(nil, true);
+		elseif(name == "edit.undo") then
+			if(GameMode:IsAllowGlobalEditorKey()) then
+				UndoManager.Undo();
+			end
+		elseif(name == "edit.redo") then
+			if(GameMode:IsAllowGlobalEditorKey()) then
+				UndoManager.Redo();
+			end
 		elseif(name == "window.texturepack") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 			local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");

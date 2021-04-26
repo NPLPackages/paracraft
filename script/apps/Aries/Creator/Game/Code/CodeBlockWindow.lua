@@ -329,13 +329,12 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 			self.entity:Disconnect("remotelyUpdated", self, self.OnCodeChange);
 			if(not bNoCodeUpdate) then
 				CodeBlockWindow.UpdateCodeToEntity();
-				CodeBlockWindow.UpdateNplBlocklyCode();
 			end
 		end
-		self.entity = entity;
-
-		-- 切换实体, 若为blockly编辑模式则重新打开 (npl blocly 已经存在就继续存在)
+		-- 先关闭NPL blockly, 关闭会冲刷代码, 所以一定要在entity切换前关闭
 		CodeBlockWindow.CloseNplBlocklyEditorPage();
+		self.entity = entity;
+		-- 切换实体, 若为blockly编辑模式则重新打开 (npl blocly 已经存在就继续存在)
 		if (CodeBlockWindow.IsSupportNplBlockly()) then 
 			CodeBlockWindow.OpenBlocklyEditor()
 		end
@@ -1326,7 +1325,9 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
 	local width, height = self:CalculateMargins();
 	NplBlocklyEditorPage = Page.Show({
+		BlocklyType = entity:IsUseCustomBlock() and "custom" or "npl",
 		xmltext = entity:GetNPLBlocklyXMLCode() or "",
+		ToolBoxXmlText = entity:GetNplBlocklyToolboxXmlText(),
 		OnChange = function()
 			CodeBlockWindow.UpdateNplBlocklyCode();
 		end

@@ -736,3 +736,7 @@ function QuestAction.CompleteAiHomeWork()
         end
     end
 end
+
+function QuestAction.ShowLoaclAiCourse()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestLocalAICourse.lua").Show();-- body
+end

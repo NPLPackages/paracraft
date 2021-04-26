@@ -106,8 +106,13 @@ function GetCourseCheckDesc(index)
     return QuestAllCourse.GetCourseCheckDesc(index)
 end
 
+function ClickHelp()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Help/HelpPage.lua").Show("ai_course");
+end
+
 ]]></script>
 <div style="width: 926px;height: 562px; background: url(Texture/Aries/Creator/keepwork/AiCourse/bjk_926X562_32bits.png#0 0 926 562);">
+    <input type="button" zorder="10" value="" onclick="ClickHelp" style="position: relative; margin-top: 8px; margin-left:125px;width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/Help/btn_32X32_32bits.png#0 0 32 32);"/>
     <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:892px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
     <div name="left_containt" style="float:left;width:182px;height:562px;margin-top:0px;background:">
         <div style="float:left;width:180px;height:480px;margin-top:58px;margin-left: 20px; background:">

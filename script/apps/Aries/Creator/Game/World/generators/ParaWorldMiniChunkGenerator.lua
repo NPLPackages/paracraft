@@ -241,7 +241,8 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	if(self.count > self.MaxAllowedBlock) then
 		return
 	end
-
+	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
+	local currentWorldName = WorldCommon.GetWorldTag("name");
 	local function uploadMiniWorld(projectId)
 		keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 			if (data and type(data) == "table") then
@@ -252,7 +253,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 						local x, y, z = player:GetBlockPos();
 						keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
 							block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)
-							if (err == 200) then
+								if (err == 200) then
 								_guihelper.MessageBox(L"上传成功！");
 							end
 						end);
@@ -265,10 +266,10 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 
 	local function showSaveTip()
 		_guihelper.MessageBox(L"世界已保存，是否要上传迷你地块？", function(res)
-			if(res and res == _guihelper.DialogResult.Yes)then
-				GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true, function(res)
+			if(res and res == _guihelper.DialogResult.Yes)then -- SaveWorldPage.ShowSharePage
+				GameLogic.GetFilters():apply_filters("cellar.share_world.init", function(res)
 					if (res) then
-						local currentWorld = GameLogic.GetFilters():apply_filters('current_world');
+						local currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')--apply_filters('current_world');
 						if (currentWorld and currentWorld.kpProjectId) then
 							uploadMiniWorld(tonumber(currentWorld.kpProjectId));
 						end
@@ -277,9 +278,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
 	end
-
-	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
-	local currentWorldName = WorldCommon.GetWorldTag("name");
+	
 	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		if myHomeWorldName == currentWorldName then
 			showSaveTip()

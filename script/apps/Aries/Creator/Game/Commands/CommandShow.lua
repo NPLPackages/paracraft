@@ -26,7 +26,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|
-mod|physics|vision|quickselectbar|tips|map|dock] [on|off]], 
+mod|physics|vision|quickselectbar|tips|map|dock|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -115,6 +115,9 @@ Other show filters:
 		elseif(name == "dock") then
 			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 			DockPage.Show(true);
+		elseif (name == "miniuserinfo") then
+			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
+			MiniWorldUserInfo.ShowInMiniWorld();
 		end
 	end,
 };

@@ -112,6 +112,10 @@ function ParaWorldMinimapWnd.OnClickSpawnpoint()
 end
 
 function ParaWorldMinimapWnd.OnLocalWorldInfo()
+	if (not GameLogic.GetFilters():apply_filters('is_signed_in')) then
+		GameLogic.GetFilters():apply_filters('show_login_page');
+		return;
+	end
 	--_guihelper.MessageBox(L"入驻并行世界的功能将在9.11日开放。 快去建设自己的家园吧, 将你的家园安放在大世界周围的地块中");
 	if (ParaWorldLoginAdapter.ParaWorldId) then
 		local ParaWorldSites = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSites.lua");

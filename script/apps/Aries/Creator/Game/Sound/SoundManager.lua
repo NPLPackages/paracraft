@@ -310,7 +310,11 @@ end
 
 function SoundManager:StopPlayText()
 	if self.playtext_sound_channel then
-		self:StopSound(self.playtext_sound_channel)
+		local sound_name = self.playtext_sound_channel;
+		if (self.playingSounds[sound_name]) then
+			AudioEngine.Stop(sound_name);
+			self.playingSounds[sound_name] = nil;
+		end
 		self.playtext_sound_channel = nil
 	end
 end

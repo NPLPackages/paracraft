@@ -430,6 +430,9 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+		<!--20210422新加衣服-->
+		<item id="84054" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84054_soldier_blue_32bits.png" name="蓝色盔甲"/>
+		<item id="84055" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84055_soldier_red_32bits.png" name="红色盔甲"/>
 		<!--20210408新加衣服-->
 		<item id="84053" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84053_killer_shirt_01_32bits.png" name="夜行衣"/>
 		<!--20210318新加衣服，活动用-->

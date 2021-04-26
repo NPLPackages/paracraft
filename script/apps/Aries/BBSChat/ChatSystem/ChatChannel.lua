@@ -435,6 +435,15 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inpu
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
+	if(generatorName == "paraworld")then
+		local localVersion = ParaEngine.GetAppCommandLineByParam("localVersion", "");
+		localVersion = string.upper(localVersion)
+		if(localVersion == "SCHOOL")then
+			_guihelper.MessageBox(L"很抱歉，现在不能聊天！");
+			return
+		end
+		
+	end
     if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
         if(inputType ~= ChatChannel.InputTypes.FromQuickWord)then
 			_guihelper.MessageBox(L"这个频道只能发快捷语言！");

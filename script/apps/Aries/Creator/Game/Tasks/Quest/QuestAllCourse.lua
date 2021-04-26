@@ -5,7 +5,8 @@ Date: 2021/2/2
 Desc:  
 Use Lib:
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
+local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+QuestAllCourse.permissions_check = true
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
@@ -544,8 +545,6 @@ function QuestAllCourse.RunCommand(index, is_pre)
         return
     end
 
-    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.knowledge.select_course", {data = data});  
-
     -- 校园课程 放开次数限制
     local httpwrapper_version = HttpWrapper.GetDevVersion() or "ONLINE"
     local school_class_id = SchoolClassIdList[httpwrapper_version]
@@ -607,6 +606,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
                 if not QuestAllCourse.permissions_check then
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
+                    GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.knowledge.select_course', { from = data.name })
                     GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', data.id, false, data.projectReleaseId)
                     return
                 end
@@ -1042,11 +1042,12 @@ function QuestAllCourse.ClickWork(index, is_pre)
                             GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, true, work_data.preProjectReleaseId)
                         end
 					end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil,nil,nil,nil, { ok = L"正式版", cancel = L"预发布版", title = L"版本选择", closeNoCancel = true})
-                elseif data.preProjectReleaseId and data.preProjectReleaseId > 0 then
+                elseif work_data.preProjectReleaseId and work_data.preProjectReleaseId > 0 then
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
+                    
                     GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, true, work_data.preProjectReleaseId)
-                elseif data.projectReleaseId and data.projectReleaseId > 0 then
+                elseif work_data.projectReleaseId and work_data.projectReleaseId > 0 then
                     page:CloseWindow()
                     QuestAllCourse.CloseView()
                     GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_homework_world', work_data.id, false, work_data.projectReleaseId)

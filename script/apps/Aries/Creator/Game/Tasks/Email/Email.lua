@@ -508,6 +508,7 @@ function Email.SetEmailList(email_list)
 end
 
 function Email.GetStrWithLength(str,length)
+	--print("GetStrWithLength=====",str,length)
 	local length = length or 0
 	local str = str or ""
 	local nStrLength = ParaMisc.GetUnicodeCharNum(str);
@@ -528,6 +529,7 @@ function Email.GetEmailContent(str)
 	str = string.gsub(str,";","")
 	str = string.gsub(str,"&lt","<")
 	str = string.gsub(str,"&gt",">")
+	str = string.gsub(str,"\\"," ")
 	--print(str)
 	return str
 end

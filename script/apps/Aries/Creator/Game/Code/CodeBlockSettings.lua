@@ -49,6 +49,7 @@ function CodeBlockSettings.OnInit()
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
 		page:SetValue("isUseNplBlockly", type(entity.IsUseNplBlockly) == "function" and entity:IsUseNplBlockly() == true);
+		page:SetValue("isUseCustomBlock", type(entity.IsUseCustomBlock) == "function" and entity:IsUseCustomBlock() == true);
 		
 		local languageFile = entity:GetLanguageConfigFile();
 		if(languageFile == "" or languageFile == "NPL" or languageFile=="npl") then
@@ -110,4 +111,40 @@ function CodeBlockSettings.OnSetUseNplBlockly(value)
 	if(entity and type(entity.SetUseNplBlockly) == "function") then
 		entity:SetUseNplBlockly(value == true);
 	end
+end
+
+function CodeBlockSettings.ClickBlockToolboxBtn()
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if (not entity or type(entity.IsUseNplBlockly) ~= "function" or not entity:IsUseNplBlockly()) then return end 
+	if(page) then page:CloseWindow() end
+	
+	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+	Page.Show({
+		text = entity:GetNplBlocklyToolboxXmlText() or "",
+		OnConfirm = function(text)
+			entity:SetNplBlocklyToolboxXmlText(text);
+		end
+	}, {
+		draggable = false,
+		url = "%ui%/Blockly/Pages/Toolbox.html",
+	});
+end
+
+function CodeBlockSettings.OnSetUseCustomBlock(value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity and type(entity.SetUseCustomBlock) == "function") then
+		entity:SetUseCustomBlock(value == true);
+	end
+end
+
+function CodeBlockSettings.ClickCustomBlockBtn()
+	if(page) then page:CloseWindow() end
+	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+	Page.Show({
+	}, {
+		draggable = false,
+		width = 1200,
+		height = 1000,
+		url = "%ui%/Blockly/Pages/BlocklyFactory.html",
+	});
 end

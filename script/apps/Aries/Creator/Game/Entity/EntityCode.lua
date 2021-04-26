@@ -32,6 +32,7 @@ Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "Set
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
 Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFileMirror"})
 Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
+Entity:Property("NplBlocklyToolboxXmlText");
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
@@ -193,6 +194,14 @@ function Entity:SetUseNplBlockly(bEnabled)
 	self.isUseNplBlockly = bEnabled;
 end
 
+function Entity:SetUseCustomBlock(bEnabled)
+	self.isUseCustomBlock = bEnabled;
+end
+
+function Entity:IsUseCustomBlock()
+	return self.isUseCustomBlock;
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
@@ -200,6 +209,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
 	if(self:IsUseNplBlockly()) then
 		node.attr.isUseNplBlockly = true;
+	end
+	if(self:IsUseCustomBlock()) then
+		node.attr.isUseCustomBlock = true;
 	end
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
@@ -228,6 +240,7 @@ function Entity:SaveToXMLNode(node, bSort)
 		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
 		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self:GetNPLBlocklyXMLCode())}
 		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self:GetNPLBlocklyNPLCode()) }
+		blocklyNode[#blocklyNode+1] = {name="npl_toolbox_xml_text", self:TextToXmlInnerNode(self:GetNplBlocklyToolboxXmlText()) }
 		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
 			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
 		end
@@ -253,7 +266,8 @@ function Entity:LoadFromXMLNode(node)
 	self.languageConfigFile = node.attr.languageConfigFile;
 	self.codeLanguageType = node.attr.codeLanguageType;
 	self.isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
-    
+    self.isUseCustomBlock = (node.attr.isUseCustomBlock == "true" or node.attr.isUseCustomBlock == true);
+	
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
 		self.delayLoad = node.attr.delayLoad;
@@ -285,6 +299,8 @@ function Entity:LoadFromXMLNode(node)
 						self:SetNPLBlocklyNPLCode(code);
 					elseif(sub_node.name == "code") then
 						self:SetNPLCode(code);
+					elseif(sub_node.name == "npl_toolbox_xml_text") then
+						self:SetNplBlocklyToolboxXmlText(code);
 					end
 				end
 			end

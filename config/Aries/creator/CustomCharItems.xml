@@ -534,6 +534,9 @@ model id
     <item id="84052" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_84052.png"></texture></item>
     <!--20210408新加-->
     <item id="84053" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84053_killer_shirt_01.png"></texture></item>
+    <!--20210422新加-->
+    <item id="84054" model="actor;"><geoset category="8" id="8"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84054_soldier_blue.png"></texture></item>
+    <item id="84055" model="actor;"><geoset category="8" id="8"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84055_soldier_red.png"></texture></item>
 
     
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
