@@ -361,7 +361,9 @@ Commands["loadregion"] = {
 	quick_ref="/loadregion [x y z] [radius]", 
 	desc=[[force loading a given region that contains a given point.
 /loadregion ~ ~ ~
+/loadregion 19200,4,19200
 /loadregion 20000 128 20000 200
+
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
@@ -371,8 +373,8 @@ Commands["loadregion"] = {
 		if(x) then
 			radius, cmd_text = CmdParser.ParseInt(cmd_text);
 			radius = radius or 0;
-			for i = x-radius, x+radius do
-				for j = z-radius, z+radius do
+			for i = math.floor((x-radius)/512)*512, math.floor((x+radius)/512)*512, 512 do
+				for j = math.floor((z-radius)/512)*512, math.floor((z+radius)/512)*512, 512 do
 					ParaBlockWorld.LoadRegion(GameLogic.GetBlockWorld(), i, y, j);
 				end
 			end
@@ -492,5 +494,147 @@ Commands["resetworld"] = {
 			WorldCommon.ReplaceWorld(cmd_text);
 		end
 
+	end,
+};
+
+Commands["clearregion"] = {
+	name="clearregion", 
+	quick_ref="/clearregion [x y z] [radius]", 
+	desc=[[force clear everything in a region
+/clearregion ~ ~ ~  clear the region containing the current player
+/clearregion 20000 128 20000 200
+/clearregion 37 37
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
+		local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
+
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		local x, y, z, radius;
+		x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity or EntityManager.GetPlayer());
+		if(x) then
+			radius, cmd_text = CmdParser.ParseInt(cmd_text);
+			radius = radius or 0;
+			for i = math.floor((x-radius)/512)*512, math.floor((x+radius)/512)*512, 512 do
+				for j = math.floor((z-radius)/512)*512, math.floor((z+radius)/512)*512, 512 do
+					local x = math.floor(i / 512)
+					local y = math.floor(j / 512)
+					if(x and y and x < 64 and y < 64 and x>=0 and y>=0) then
+						local region = ExternalRegion:new():Init(nil, x, y)
+						region:ClearRegion()
+					end
+				end
+			end
+		else
+			x, cmd_text = CmdParser.ParseInt(cmd_text);
+			y, cmd_text = CmdParser.ParseInt(cmd_text);
+			if(x and y and x < 64 and y < 64 and x>=0 and y>=0) then
+				local region = ExternalRegion:new():Init(nil, x, y)
+				region:ClearRegion()
+			end
+		end
+	end,
+};
+
+Commands["copyregion"] = {
+	name="copyregion", 
+	quick_ref="/copyregion [-silent|s] fromX fromY toX toY [toWorldName]", 
+	desc=[[copy everything from one region to another region
+/copyregion 37 37 37 38
+-- silently copy region(37,37) to region(37,38) of another world
+/copyregion -s 37 37 37 38 lixizhi_main
+/copyregion -s 37 37 37 38 c:/temp/absolut_world_path/
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if(GameLogic.IsReadOnly()) then
+			LOG.std(nil, "warn", "copyregion", "access denied in read only world");
+			return
+		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
+		local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
+
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		local fromX, fromY, toX, toY, toWorldName
+		fromX, cmd_text = CmdParser.ParseInt(cmd_text);
+		fromY, cmd_text = CmdParser.ParseInt(cmd_text);
+		toX, cmd_text = CmdParser.ParseInt(cmd_text);
+		toY, cmd_text = CmdParser.ParseInt(cmd_text);
+		toWorldName, cmd_text = CmdParser.ParseFilename(cmd_text);
+		if(toWorldName) then
+			if(not toWorldName:match("[/\\]")) then
+				toWorldName = GameLogic.GetWorldDirectory():gsub("[^/]+/?$", commonlib.Encoding.Utf8ToDefault(toWorldName))
+			end
+			-- TODO: check if the world exists and we own the world, for copy right reasons
+		end
+		if(fromX and fromY and toX and toY) then
+			if(fromX < 64 and fromY < 64 and toX < 64 and toY < 64) then
+				local function CopyRegion_()
+					local region = ExternalRegion:new():Init(nil, fromX, fromY)
+					region:SaveAs(toWorldName, toX, toY)
+
+					if(not toWorldName) then
+						local region = ExternalRegion:new():Init(nil, toX, toY)
+						region:Load()
+					end
+				end
+				if(options.s or options.silent) then
+					CopyRegion_()
+				else
+					_guihelper.MessageBox(L"[警告] 操作不可逆, 建议先备份世界后再进行。是否任然继续？", function()
+						CopyRegion_()
+					end)
+				end
+			end
+		end
+	end,
+};
+
+
+Commands["loadregionex"] = {
+	name="loadregionex", 
+	quick_ref="/loadregionex [world_name] x y", 
+	desc=[[load all blocks from "world_path" to region(x,y) of current world.
+/loadregionex course_world 37 37
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local world_path;
+		world_name, cmd_text = CmdParser.ParseFilename(cmd_text);
+		local x, y;
+		x, cmd_text = CmdParser.ParseInt(cmd_text);
+		y, cmd_text = CmdParser.ParseInt(cmd_text);
+		if(world_name and x and y) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
+			local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
+			local worldpath = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(world_name);
+			local region = ExternalRegion:new():Init(worldpath, x, y);
+			region:Load();
+		end
+	end,
+};
+
+
+Commands["saveregionex"] = {
+	name="saveregionex", 
+	quick_ref="/saveregionex [world_name] x y", 
+	desc=[[save all blocks in region(x,y) of current world to "world_name".
+/saveregionex course_world 37 37
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local world_name;
+		world_name, cmd_text = CmdParser.ParseFilename(cmd_text);
+		local x, y;
+		x, cmd_text = CmdParser.ParseInt(cmd_text);
+		y, cmd_text = CmdParser.ParseInt(cmd_text);
+		if(world_name and x and y) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
+			local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
+			local worldpath = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(world_name);
+			local region = ExternalRegion:new():Init(worldpath, x, y);
+			region:Save();
+		end
 	end,
 };

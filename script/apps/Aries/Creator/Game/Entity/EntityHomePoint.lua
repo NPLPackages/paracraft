@@ -144,6 +144,16 @@ function Entity:GetDisplayName()
 	return "home";
 end
 
+function Entity:GetText()
+	return self:GetCommand()
+end
+
+function Entity:FindFile(text, bExactMatch)
+	local code = self:GetText()
+	if(code) then
+		return mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
+	end
+end
 
 -- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 
 -- @return nil or array of item stack.

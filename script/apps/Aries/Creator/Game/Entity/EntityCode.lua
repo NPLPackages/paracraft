@@ -548,6 +548,7 @@ function Entity:CloseEditor()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
     CodeBlockWindow.Close()
+	CodeBlockWindow.SetCodeEntity(nil);
 end
 
 function Entity:IsEditorOpen()

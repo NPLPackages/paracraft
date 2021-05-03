@@ -88,6 +88,7 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 	end
 
 	if(setting == "CreateBlock") then
+		-- usually right mouse button
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.isFaceMode = true;
 			self.op_mode = "create";

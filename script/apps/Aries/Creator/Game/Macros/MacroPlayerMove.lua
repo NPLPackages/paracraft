@@ -11,6 +11,7 @@ local Macros = commonlib.gettable("MyCompany.Aries.Game.Macros");
 -------------------------------------------------------
 ]]
 local mathlib = commonlib.gettable("mathlib");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
@@ -125,6 +126,10 @@ function Macros.CameraMove(camobjDist, LiftupAngle, CameraRotY)
 	else
 		lastCamera.camobjDist, lastCamera.LiftupAngle, lastCamera.CameraRotY = camobjDist, LiftupAngle, CameraRotY
 	end
+
+	if(MovieManager:HasActiveCameraPlaying()) then
+		return Macros.Idle(1);
+	end
 	
 	local isFirstCameraMove = Macros:FindNextMacro("CameraMove") == Macros:PeekNextMacro(0);
 	if(Macros.AnimateCameraMove and not isFirstCameraMove) then
@@ -219,6 +224,10 @@ function Macros.CameraLookat(x, y, z)
 	else
 		lastCamera.lookatX, lastCamera.lookatY, lastCamera.lookatZ = x, y, z;
 	end
+	if(MovieManager:HasActiveCameraPlaying()) then
+		return Macros.Idle(1);
+	end
+
 	if(x) then
 		x, y, z = Macros.ComputePosition(x, y, z)
 		

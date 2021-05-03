@@ -26,6 +26,7 @@ Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableAct
 -- frame move interval in milliseconds
 Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Actor:Property({"sentientRadius", -1, "GetSentientRadius", "SetSentientRadius", auto=true});
+Actor:Property({"isRelativePlay", true, "IsRelativePlay", "SetRelativePlay", auto=true});
 Actor:Signal("dataSourceChanged");
 Actor:Signal("clicked", function(actor, mouseButton) end);
 Actor:Signal("beforeRemoved", function(self) end);
@@ -268,19 +269,21 @@ end
 -- this allows us to play animation in movie block from current movie time to be relative to current entity's position
 -- @param time: if nil, it means the current time. 
 function Actor:ResetOffsetPosAndRotation()
-	local curTime = self:GetTime();
-	local entity = self.entity;
+	if(self:IsRelativePlay()) then
+		local curTime = self:GetTime();
+		local entity = self.entity;
 
-	if(not entity or not curTime or entity:IsScreenMode()) then
-		return
+		if(not entity or not curTime or entity:IsScreenMode()) then
+			return
+		end
+		local eX, eY, eZ = entity:GetPosition();
+		local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
+		if(not new_x) then
+			new_x, new_y, new_z = eX, eY, eZ;
+		end;
+		self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
+		self:SetOffsetYaw(entity:GetFacing() - (yaw or 0), yaw);
 	end
-	local eX, eY, eZ = entity:GetPosition();
-	local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
-	if(not new_x) then
-		new_x, new_y, new_z = eX, eY, eZ;
-	end;
-	self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
-	self:SetOffsetYaw(entity:GetFacing() - (yaw or 0), yaw);
 end
 
 function Actor:ComputeScaling(curTime)
@@ -312,17 +315,21 @@ function Actor:GetOffsetPos()
 end
 
 function Actor:ComputePosAndRotation(curTime)
-	local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
+	if(self:IsRelativePlay()) then
+		local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
 	
-	if(new_x) then
-		yaw = yaw or 0;
-		local dx,dy,dz = new_x - self.fromPos[1], new_y - self.fromPos[2],  new_z - self.fromPos[3];
-		if((dx~=0 or dy~=0 or dz~=0) and self.offsetYaw ~=0) then
-			dx, dy, dz = math3d.vec3Rotate(dx,dy,dz, 0, self.offsetYaw, 0);
-			new_x, new_y, new_z = self.fromPos[1] + dx, self.fromPos[2] + dy, self.fromPos[3] + dz;
+		if(new_x) then
+			yaw = yaw or 0;
+			local dx,dy,dz = new_x - self.fromPos[1], new_y - self.fromPos[2],  new_z - self.fromPos[3];
+			if((dx~=0 or dy~=0 or dz~=0) and self.offsetYaw ~=0) then
+				dx, dy, dz = math3d.vec3Rotate(dx,dy,dz, 0, self.offsetYaw, 0);
+				new_x, new_y, new_z = self.fromPos[1] + dx, self.fromPos[2] + dy, self.fromPos[3] + dz;
+			end
+			dx, dy, dz = self:GetOffsetPos();
+			return new_x+dx, new_y+dy, new_z+dz, self:GetOffsetYaw() + yaw, roll, pitch;
 		end
-		dx, dy, dz = self:GetOffsetPos();
-		return new_x+dx, new_y+dy, new_z+dz, self:GetOffsetYaw() + yaw, roll, pitch;
+	else
+		return Actor._super.ComputePosAndRotation(self, curTime);
 	end
 end
 
@@ -648,6 +655,7 @@ local internalValues = {
 	["text"] = {setter = Actor.SetDisplayText, getter = Actor.GetDisplayText, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
 	["sentientRadius"] = {setter = Actor.SetSentientRadius, getter = Actor.GetSentientRadius, isVariable = false}, 
+	["isRelativePlay"] = {setter = Actor.SetRelativePlay, getter = Actor.IsRelativePlay, isVariable = false}, 
 	-- tricky: pitch and roll are reversed
 	["pitch"] = {setter = Actor.SetRollDegree, getter = Actor.GetRollDegree, isVariable = false}, 
 	["roll"] = {setter = Actor.SetPitchDegree, getter = Actor.GetPitchDegree, isVariable = false}, 

@@ -240,7 +240,7 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 	if nil == text or text == "" then
 		return
 	end
-	voiceNarrator = voiceNarrator or 4
+	voiceNarrator = voiceNarrator or 10012
 	nTimeoutMS = nTimeoutMS or 7
 
 	local start_timestamp = commonlib.TimerManager.GetCurrentTime();
@@ -269,7 +269,7 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 		return
 	end
 
-	voiceNarrator = voiceNarrator or 4
+	voiceNarrator = voiceNarrator or 10012
 	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voiceNarrator))
 	-- 检测是否有本地文件
 	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)

@@ -1304,7 +1304,22 @@ function MyCompany.Aries.OnExec(app, commandName, params)
 			if(System.options.mc) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/GameDesktop.lua");
 				local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
-				Desktop.Restart();
+
+				local restart_code;
+
+				if (type(params) == "table" and params.startup_msg) then
+					if (type(params.startup_msg) == "table") then
+						params.startup_msg = commonlib.serialize_compact(params.startup_msg);
+					elseif (type(params.startup_msg) == "string") then
+						params.startup_msg = string.format("%q", params.startup_msg);
+					else
+						params.startup_msg = tostring(params.startup_msg);
+					end
+
+					restart_code = string.format([[commonlib.setfield("RestartTable", %s);]], params.startup_msg);
+				end
+
+				Desktop.Restart(nil, nil, restart_code);
 				return;
 			end
 			MyCompany.Aries.Desktop.Dock.LeaveTown(function() 

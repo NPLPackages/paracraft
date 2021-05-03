@@ -237,6 +237,7 @@ function EditNeuronBlockPage:handleLeftClickScene(event)
 				self:UpdateBlockNumber();
 			end
 		end
+		event:accept();
 	end
 end
 
@@ -247,6 +248,7 @@ function EditNeuronBlockPage:handleRightClickScene(event)
 		if(x~=self.blockX or y~=self.blockY or z~=self.blockZ) then
 			-- right click to switch to another neuron
 			self:SelectNeuron(x, y, z);	
+			event:accept();
 		end
 	end
 end

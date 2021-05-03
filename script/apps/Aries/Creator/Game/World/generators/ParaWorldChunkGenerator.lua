@@ -583,6 +583,10 @@ function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 	ParaWorldMinimapWnd:RefreshMap(0.5)
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/CourseWorldMinimapWnd.lua");
+	local CourseWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.CourseWorldMinimapWnd");
+	CourseWorldMinimapWnd:RefreshMap(0.5)
+
 	if(hasDelayedCodeBlocks and lastGridParams and lastGridParams.x == gridX and lastGridParams.y == gridY) then
 		ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)
 	end

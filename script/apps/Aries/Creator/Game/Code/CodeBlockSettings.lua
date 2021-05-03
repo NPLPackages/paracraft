@@ -30,6 +30,7 @@ function CodeBlockSettings.Show()
 			enable_esc_key = true,
 			bShow = true,
 			isTopLevel = true,
+			zorder = 200,
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",

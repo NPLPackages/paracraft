@@ -94,11 +94,11 @@
 		<item id="83163" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83163_killer_hat_32bits.png" name="黑色面罩"/>
   		<!--20210318新加-->
 		<item id="83159" gsid="82000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83159_panda_hat_32bits.png" name="熊猫猫猫头"/>
-		<!-- 20210324 临时下线
-		<item id="83160" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83160_brown_cat_hat_32bits.png" name="棕色猫猫头"/>
-		<item id="83161" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83161_yellow_cat_hat_32bits.png" name="黄色猫猫头"/>
-		<item id="83162" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83162_blue_cat_hat_32bits.png" name="蓝色猫猫头"/>
-		-->
+		<!-- 20210429五一道具-->
+		<item id="83160" gsid="82001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83160_brown_cat_hat_32bits.png" name="棕色猫猫头"/>
+		<item id="83161" gsid="82002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83161_yellow_cat_hat_32bits.png" name="黄色猫猫头"/>
+		<item id="83162" gsid="82003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83162_blue_cat_hat_32bits.png" name="蓝色猫猫头"/>
+		
 		<!--起始数据-->
 		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="麋鹿角"/>
 		<item id="83128" icon="Texture/Aries/Item/2332_ChristmasTire_Princess.png" name="驯鹿角"/>

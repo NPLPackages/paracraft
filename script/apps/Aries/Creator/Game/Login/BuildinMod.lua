@@ -128,6 +128,14 @@ local buildInModList = {
 		version = "1.0.0",
 		homepage = "https://github.com/tatfook/GeneralGameServerMod",
 	},
+	{
+		name = "Microbit", 
+		package_path = "npl_packages/ParacraftBuildinMod/", 
+		displayName = L"Microbit", 
+		text=L"系统内置插件",
+		version = "1.0.0",
+		homepage = "https://github.com/tatfook/Microbit",
+	},
 	-- TODO: add more preinstalled paracraft mod package here
 }
 

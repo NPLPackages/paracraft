@@ -68,7 +68,7 @@ function AddFriendsPage.SearchFriend(text)
 
     local search_text = "%" .. text .. "%"
 	keepwork.user.search({
-        ["$or"] = {username = {["$like"]=search_text}, cellphone = text}
+        ["$or"] = {username = {["$like"]=search_text}, nickname = {["$like"]=search_text}, cellphone = text}
 	},function(search_err, search_msg, search_data)
         commonlib.echo(search_data, true)
 

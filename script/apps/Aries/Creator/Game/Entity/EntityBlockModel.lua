@@ -90,6 +90,14 @@ function Entity:GetModelDiskFilePath(filename)
 	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
 end
 
+function Entity:GetDisplayName()
+	local displayName = Entity._super.GetDisplayName(self);
+	if(not displayName) then
+		displayName = self:GetModelFile();
+	end
+	return displayName;
+end
+
 -- the title text to display (can be mcml)
 function Entity:GetBagTitle()
 	return L"背包";

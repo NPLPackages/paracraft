@@ -10,6 +10,7 @@ local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRe
 local region = ExternalRegion:new():Init("worlds/DesignHouse/lixizhi_main", 37, 37)
 region:Load();
 region:Save();
+region:SaveAs(nil, 37, 38)
 -----------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldFileProvider.lua");
@@ -22,6 +23,7 @@ local ExternalRegion = commonlib.inherit(nil, commonlib.gettable("MyCompany.Arie
 function ExternalRegion:ctor()
 end
 
+-- @param worldpath: if nil, it will be current working directory
 function ExternalRegion:Init(worldpath, regionX, regionY)
 	local fileprovider = WorldFileProvider:new():Init(worldpath);
 	local baseDir = fileprovider:GetBlockWorldDirectory()
@@ -64,6 +66,18 @@ end
 function ExternalRegion:ClearRegion()
 	local attrRegion = self:GetRegionAttr()
 	attrRegion:CallField("DeleteAllBlocks");
+
+	for i = 0, 31 do
+		for j = 0, 31 do
+			local x = self.regionX * 512 + i *16 + 8;
+			local y = self.regionY * 512 + j *16 + 8;
+			local timeStamp = ParaTerrain.GetChunkColumnTimeStamp(x, y);
+			if(timeStamp <= 0) then
+				ParaTerrain.SetChunkColumnTimeStamp(x, y, 1);
+			end
+		end
+	end
+	
 	self.regionContainer:RemoveAll();
 	BlockEngine.SetRegionLoaded(self.regionX, self.regionY, false)
 end
@@ -96,4 +110,22 @@ function ExternalRegion:Save()
 	attrRegion:SetField("SaveToFile", self.regionRawFilename);
 	self.regionContainer:SaveToFile();
 	-- TODO: we need to find a way to save bmax files to dest directory during Block template saving
+end
+
+-- better backup the world before this
+-- @param worldpath: if nil, it will be current working directory
+function ExternalRegion:SaveAs(worldpath, regionX, regionY)
+	if(self.regionX ~= regionX or self.regionY ~= regionY or (worldpath and worldpath~=GameLogic.GetWorldDirectory())) then
+		local fileprovider = WorldFileProvider:new():Init(worldpath);
+		local baseDir = fileprovider:GetBlockWorldDirectory()
+		local worldDir = fileprovider:GetWorldDirectory()
+		local regionRawFilename = format("%s%d_%d.raw", baseDir, regionX, regionY)
+		local regionEntityFilename = format("%s%d_%d.region.xml", baseDir, regionX, regionY)
+		if(self.regionContainer:SaveToAnotherRegion(regionEntityFilename, regionX, regionY)) then
+			LOG.std(nil, "info", "ExternalRegion", "successfully save from %s to %s", self.regionEntityFilename, regionEntityFilename);
+		end
+		if(ParaIO.CopyFile(self.regionRawFilename, regionRawFilename, true)) then
+			LOG.std(nil, "info", "ExternalRegion", "successfully copy from %s to %s", self.regionRawFilename, regionRawFilename);
+		end
+	end
 end

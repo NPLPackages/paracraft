@@ -1067,7 +1067,7 @@ end
 
 -- create a clone of some code block's actor
 -- @param name: if nil or "myself", it means clone myself
--- @param msg: any mesage that is forwared to clone event
+-- @param msg: any mesage that is forwarded to clone event
 function CodeBlock:CreateClone(name, msg)
 	if(not name or name == "myself") then
 		self:CloneMyself(msg);

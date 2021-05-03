@@ -248,12 +248,14 @@ function CodeBlockWindow.HighlightCodeEntity(entity)
 end
 
 function CodeBlockWindow:OnEntityRemoved()
-	CodeBlockWindow.SetCodeEntity(nil);
+	CodeBlockWindow.SetCodeEntity(nil, nil, true);
 end
 
 function CodeBlockWindow:OnCodeChange()
 	if(not CodeBlockWindow.IsVisible()) then
-		CodeBlockWindow.SetCodeEntity(nil, true);
+		if(CodeBlockWindow.SetCodeEntity(nil, true, true)) then
+			return
+		end
 	end
 	if(page) then
 		page:Refresh(0.01);
@@ -306,7 +308,7 @@ function CodeBlockWindow.RestoreCursorPosition(bImmediate)
 	end
 end
 
-function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
+function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate, bDelayRefresh)
 	CodeBlockWindow.HighlightCodeEntity(entity);
 	local isEntityChanged = false;
 	if(self.entity ~= entity) then
@@ -339,9 +341,6 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 			CodeBlockWindow.OpenBlocklyEditor()
 		end
 
-		if(page) then
-			page:Refresh(0.01);
-		end
 		CodeBlockWindow.RestoreCursorPosition();
 		isEntityChanged = true;
 	end
@@ -375,6 +374,12 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate)
 	if(not entity) then
 		CodeBlockWindow.CloseEditorWindow()
 	end
+	if(isEntityChanged) then
+		if(page) then
+			page:Refresh(bDelayRefresh and 0.01 or 0);
+		end
+	end
+	return isEntityChanged
 end
 
 function CodeBlockWindow:OnMessage(msg)
@@ -859,7 +864,8 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
 		CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
-		
+		if (NplBlocklyEditorPage) then CodeBlockWindow.ShowNplBlocklyEditorPage() end
+
 		local sceneContext = self:GetSceneContext();
 		if(sceneContext) then
 			local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(entity)
@@ -1091,7 +1097,10 @@ function CodeBlockWindow.GetBlockEditorUrl()
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
 	end
-
+	if(codeConfigType == "microbit")then
+		local Microbit = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Microbit/Microbit.lua");
+		request_url = Microbit.GetWebEditorUrl();
+	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
 	local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
 	local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)	end)
@@ -1117,7 +1126,6 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 
         codeLanguageType = entity:GetCodeLanguageType();
 	end
-	
 	if (CodeBlockWindow.IsSupportNplBlockly()) then
 		if (NplBlocklyEditorPage) then
 			CodeBlockWindow.CloseNplBlocklyEditorPage();
@@ -1131,6 +1139,10 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	local request_url = "npl://blockeditor"
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
+	end
+	if(codeConfigType == "microbit")then
+		local Microbit = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Microbit/Microbit.lua");
+		request_url = Microbit.GetWebEditorUrl();
 	end
 	local function OpenInternalBrowser_()
 		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
@@ -1321,11 +1333,13 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 
 	local entity = CodeBlockWindow.GetCodeEntity();
 	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
+	
+	CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
 
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
 	local width, height = self:CalculateMargins();
 	NplBlocklyEditorPage = Page.Show({
-		BlocklyType = entity:IsUseCustomBlock() and "custom" or "npl",
+		BlocklyType = entity:IsUseCustomBlock() and "" or "npl",
 		xmltext = entity:GetNPLBlocklyXMLCode() or "",
 		ToolBoxXmlText = entity:GetNplBlocklyToolboxXmlText(),
 		OnChange = function()

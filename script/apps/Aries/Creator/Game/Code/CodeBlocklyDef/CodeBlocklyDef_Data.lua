@@ -388,6 +388,7 @@ end
 				{ L"增加速度", "addVelocity" },
 				{ L"摩擦系数", "surfaceDecay" },
 				{ L"空气阻力", "airDecay" },
+				{ L"相对位置播放", "isRelativePlay" },
 				
 				{ L"父角色", "parent" },
 				{ L"父角色位移", "parentOffset" },

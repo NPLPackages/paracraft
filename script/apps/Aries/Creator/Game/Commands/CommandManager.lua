@@ -78,6 +78,7 @@ function CommandManager:Init()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandQuest.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWiki.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDiff.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTerrain.lua");
 
 	GameLogic.GetFilters():apply_filters("register_command", Commands, SlashCommand.GetSingleton());
 

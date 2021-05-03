@@ -95,6 +95,12 @@ function FindBlockTask:FindFileImp(text)
 		end
 	end
 	local entities = EntityManager.FindEntities({category="b", }) or {};
+
+	local homeEntity = GameLogic.GetHomeEntity()
+	if(homeEntity) then
+		entities[#entities+1] = homeEntity;
+	end
+
 	for _, entity in ipairs(entities) do
 		if(entity.FindFile) then
 			local bFound, filename, filenames = entity:FindFile(text)
@@ -254,14 +260,16 @@ end
 function FindBlockTask.SetResults(entities)
 	if(entities) then
 		local resultDS = {};
+		local results = {};
 		local regions = {};
 		for i, entity in ipairs(entities) do
 			local item = entity:GetItemClass()
 			local name = entity:GetDisplayName();
 			if(item and name and name~="") then
 				name = name:gsub("\r?\n"," ")
-				resultDS[#resultDS+1] = {name="block", attr={index=i,name=name, lowerText = string.lower(name), icon = item:GetIcon()}};
-				
+				local index = #resultDS+1
+				resultDS[index] = {name="block", attr={index=index,name=name, lowerText = string.lower(name), icon = item:GetIcon()}};
+				results[index] = entity;
 				local x, y, z = entity:GetBlockPos();
 				local container = EntityManager.GetRegion(x, z);
 				if(container) then
@@ -276,7 +284,7 @@ function FindBlockTask.SetResults(entities)
 			end
 		end
 		FindBlockTask.resultDS = resultDS;
-		FindBlockTask.results = entities;
+		FindBlockTask.results = results;
 
 		if(not GameLogic.IsReadOnly() and not GameLogic.isRemote) then
 			-- save to history file if anything in the region changes
@@ -321,11 +329,11 @@ function FindBlockTask.SetResults(entities)
 			for id, entities in pairs(history) do
 				if(not ids[id]) then
 					for _, entity in ipairs(entities) do
-						local i = #resultDS+1;
 						local item = ItemClient.GetItem(entity.id)
 						if(item) then
-							resultDS[i] = {name="block", attr={index=i,name=entity.text, lowerText = string.lower(entity.text), icon = item:GetIcon()}};
-							FindBlockTask.results[i] = entity;
+							local i = #results+1;
+							results[i] = entity;
+							resultDS[#resultDS+1] = {name="block", attr={index=i,name=entity.text, lowerText = string.lower(entity.text), icon = item:GetIcon()}};
 						end
 					end
 				end
@@ -379,12 +387,25 @@ function FindBlockTask.OnClickItem(treenode)
 	local item = treenode.mcmlNode:GetPreValue("this")
 	local index = item.index;
 
-	FindBlockTask.SetSelectedIndex(index)
-	FindBlockTask.SetSelectedResultIndex(index)
+	FindBlockTask.SetSelectedIndexByResultIndex(index)
 	FindBlockTask.GotoItemAtIndex(index);
 	
 	if(mouse_button == "left") then
 		FindBlockTask.OnClose()
+	end
+end
+
+function FindBlockTask.SetSelectedIndexByResultIndex(index)
+	local ds = FindBlockTask.GetDataSource()
+	if(ds) then
+		for i, item in ipairs(ds) do
+			if(item.attr.index == index) then
+				if(FindBlockTask.selectedIndex ~= i) then
+					FindBlockTask.SetSelectedIndex(i)
+				end
+				break;
+			end
+		end
 	end
 end
 

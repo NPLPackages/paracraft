@@ -104,6 +104,68 @@ function RegionContainer:GetRegionFileName()
 	return self.filename;
 end
 
+function RegionContainer:SaveToAnotherRegion(filename, regionX, regionY)
+	if(not filename or filename == self:GetRegionFileName() or not regionX or not regionY) then
+		return
+	end
+	if(self.region_x == regionX and self.region_z == regionY and (not filename or filename == self:GetRegionFileName())) then
+		return self:SaveToFile(filename)
+	end
+
+	local offsetX = (regionX - self.region_x) * 512;
+	local offsetZ = (regionY - self.region_z) * 512;
+
+	if(not next(self.entities)) then
+		if(not ParaIO.DoesAssetFileExist(filename, true))then
+			return;
+		end
+	end
+
+	local root = {name='entities', attr={file_version="0.1"} }
+	local sortEntities = {};
+	
+	local x, y, z, posValue;
+	for entity in pairs(self.entities) do 
+		if( entity:IsPersistent() and entity:IsRegional() and not entity:IsDead()) then
+			local node = {name='entity', attr={}};
+
+			-- for movie blocks
+			if(entity.OffsetActorPositions) then
+				entity:OffsetActorPositions(offsetX, 0, offsetZ);
+			end
+
+			entity:SaveToXMLNode(node, true);
+
+			if(entity.OffsetActorPositions) then
+				entity:OffsetActorPositions(-offsetX, 0, -offsetZ);
+			end
+			
+			x, y, z = entity:GetBlockPos();
+			x = x + offsetX;
+			z = z + offsetZ;
+
+			if(entity:IsBlockEntity()) then
+				node.attr.bx = x;
+				node.attr.bz = z;
+			end
+
+			posValue = (x or 0) * 100000000 +  (y or 0) * 1000000 + (z or 0);
+			table.insert(sortEntities, {pos = posValue, node = node});
+		end
+	end
+	
+	table.sort(sortEntities, function(a, b)
+		return a.pos < b.pos;
+	end);
+	
+	for _, entity in ipairs(sortEntities) do
+		table.insert(root, entity.node);
+	end
+	
+	local bSucceed = self:SaveXMLDataToFile(root, filename)
+	return bSucceed;
+end
+
 function RegionContainer:SaveToFile(filename)
 	filename = filename or self:GetRegionFileName();
 	local filename = self:GetRegionFileName();
@@ -139,22 +201,23 @@ function RegionContainer:SaveToFile(filename)
 		table.insert(root, entity.node);
 	end
 
-	
-	local bSuccessed = false;
-	if(root) then
-		
-		local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
-		
-		--NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
-		--local Encoding = commonlib.gettable("System.Encoding");
-		--print(Encoding.sha1(xml_data, "hex"));
-		
+	local bSucceed = self:SaveXMLDataToFile(root, filename)
+	if bSucceed then
+		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
+	end
+end
+
+-- return true if succeed
+function RegionContainer:SaveXMLDataToFile(xmlRoot, filename)
+	local bSucceed = false;
+	if(xmlRoot) then
+		local xml_data = commonlib.Lua2XmlString(xmlRoot, true, true) or "";
 		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
 			if (writer:IsValid()) then
 				writer:ZipAddData("data", xml_data);
 				writer:close();
-				bSuccessed = true;
+				bSucceed = true;
 			end
 		else
 			local file = ParaIO.open(filename, "w");
@@ -162,14 +225,11 @@ function RegionContainer:SaveToFile(filename)
 				file:WriteString(xml_data);
 				file:close();
 				
-				bSuccessed = true;
+				bSucceed = true;
 			end
 		end
 	end
-	
-	if bSuccessed then
-		GameLogic.GetFilters():apply_filters("OnSaveBlockRegion", true, self.region_x, self.region_z, "region.xml");
-	end
+	return bSucceed;
 end
 
 function RegionContainer:LoadFromFile(filename)

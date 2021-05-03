@@ -28,7 +28,7 @@ local ignoreList = {[9]=true,[253]=true,[110]=true,[216]=true,[217]=true,[196]=t
 -- dynamic water to still water
 local replaceList = {[75]=76,};
 -- max allowed blocks
-ParaWorldMiniChunkGenerator.MaxAllowedBlock = 200000;
+ParaWorldMiniChunkGenerator.MaxAllowedBlock = 400000;
 
 local road_block_id = 71;
 local ground_block_id = 62;
@@ -113,7 +113,7 @@ function ParaWorldMiniChunkGenerator:ShowBlockTip(count)
 	if(count < self.MaxAllowedBlock) then
 		GameLogic.AddBBS("paraworld", format(L"剩余空间%d%%", math.floor((self.MaxAllowedBlock - count)/self.MaxAllowedBlock * 100)), 5000, "0 255 0");
 	else
-		GameLogic.AddBBS("paraworld", L"方块数量大于20万块，请删除一定方块后上传", 5000, "255 0 0");
+		GameLogic.AddBBS("paraworld", L"方块数量大于40万块，请删除一定方块后上传", 5000, "255 0 0");
 	end
 end
 

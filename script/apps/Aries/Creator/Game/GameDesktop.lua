@@ -495,7 +495,10 @@ function Desktop.ForceExit(bRestart)
 		if(bRestart) then
 			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 			Game.Exit();
-			System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
+
+			local restartTable = commonlib.gettable('RestartTable');
+
+			System.App.Commands.Call("Profile.Aries.Restart", {method="soft", startup_msg = restartTable });
 		else
 			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 			ClassManager.OnExitApp();
@@ -522,9 +525,9 @@ end
 -- Desktop.Restart("haqi")
 -- Desktop.Restart("paracraft")
 -- @param appName: nil default to "paracraft", it can also be "haqi"
-function Desktop.Restart(appName)
+function Desktop.Restart(appName, additional_commandline_params, additional_restart_code)
 	GameLogic.BeforeRestart(appName);
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
-	ParaWorldLoginDocker.Restart(appName)
+	ParaWorldLoginDocker.Restart(appName, additional_commandline_params, additional_restart_code)
 end

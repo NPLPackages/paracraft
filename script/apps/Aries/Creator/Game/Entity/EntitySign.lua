@@ -84,7 +84,7 @@ function Entity:Refresh()
 		-- only create C++ object when cmd is not empty
 		if(not self.obj) then
 			-- Node: we do not draw the model, it is only used for drawing UI overlay. 
-			obj = self:CreateInnerObject("model/blockworld/TextFrame/TextFrame.x", nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
+			local obj = self:CreateInnerObject("model/blockworld/TextFrame/TextFrame.x", nil, BlockEngine.half_blocksize, BlockEngine.blocksize);
 			if(obj) then
 				-- making it using custom renderer since we are using chunk buffer to render. 
 				obj:SetAttribute(0x20000, true);
@@ -385,6 +385,7 @@ function Entity:CloseEditor()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
     CodeBlockWindow.Close()
+	CodeBlockWindow.SetCodeEntity(nil);
 end
 
 function Entity:SetAllowClientExecution(bAllow)

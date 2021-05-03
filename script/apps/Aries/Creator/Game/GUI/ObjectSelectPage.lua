@@ -11,6 +11,7 @@ ObjectSelectPage.SelectByScreenRect(left, top, width, height);
 ObjectSelectPage.SelectEntities({})
 -------------------------------------------------------
 ]]
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -107,13 +108,24 @@ function ObjectSelectPage.UpdateView(includeMyself)
 	local ctl = CommonCtrl.GetControl(self.name.."treeView");
 	if(ctl) then
 		ctl.RootNode:ClearAllChildren();
-		local k,obj;
 		local player_id = ParaScene.GetPlayer():GetID();
 		for k,obj in ipairs(result) do
 			if(obj and obj:IsValid())then
 				local id = obj:GetID();
 				local name = obj.name or "";
-				local node = CommonCtrl.TreeNode:new({ Name = name, ID = id,})
+				local displayName;
+				local blockId = 0
+				local entity = ObjectSelectPage.GetBlockEntityByObjectId(id, name)
+				if(not entity) then
+					entity = EntityManager.GetEntityByObjectID(id);
+				end
+				if(entity) then
+					displayName = entity:GetDisplayName();
+					blockId = entity:GetBlockId();
+				end
+
+				displayName = displayName or (tostring(id)..":"..tostring(name));
+				local node = CommonCtrl.TreeNode:new({ Name = name, ID = id, displayName = displayName, blockId = blockId})
 				if(not includeMyself and id == player_id)then
 					
 				else
@@ -125,6 +137,9 @@ function ObjectSelectPage.UpdateView(includeMyself)
 		ctl:Update();
 	end
 	self.objList = objList;
+	if(#objList == 0) then
+		ObjectSelectPage.CloseWindow()
+	end
 end
 
 function ObjectSelectPage.DeleteAll()
@@ -136,29 +151,41 @@ function ObjectSelectPage.DeleteAll()
 		end
 	end
 end
+
+function ObjectSelectPage.GetBlockEntityByObjectId(id, name)
+	local entity = EntityManager.GetEntityByObjectID(id);
+	if(not entity and name) then
+		local x, y, z = name:match("^(%d+),(%d+),(%d+)$");
+		if(x and y and z) then
+			x,y,z = tonumber(x), tonumber(y), tonumber(z);
+			entity = EntityManager.GetBlockEntity(x,y,z)
+		end
+	end
+	if(entity) then
+		if(entity:IsBlockEntity()) then
+			return entity;
+		end
+	end
+end
+
 function ObjectSelectPage.SelectedObject(id)
 	local self = ObjectSelectPage;
 	if(not id)then return end
 	local obj = ParaScene.GetObject(id);
 	if(obj and obj:IsValid())then
-		local entity = EntityManager.GetEntityByObjectID(id);
+		local entity = ObjectSelectPage.GetBlockEntityByObjectId(id, obj.name)
 		if(entity) then
+			local x, y, z = entity:GetBlockPos();
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+			local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+			local task = MyCompany.Aries.Game.Tasks.SelectBlocks:new({blockX = x,blockY = y, blockZ = z, blocks=nil})
+			task:Run();
+		elseif(EntityManager.GetEntityByObjectID(id)) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
 			task:Run();
 		else
-			local x, y, z = obj.name:match("^(%d+),(%d+),(%d+)$");
-			if(x and y and z) then
-				x,y,z = tonumber(x), tonumber(y), tonumber(z);
-				local block_id = BlockEngine:GetBlockId(x,y,z);
-				if(block_id) then
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.SelectBlocks:new({blockX = x,blockY = y, blockZ = z})
-					task:Run();
-				end
-			else
-				ParaSelection.AddObject(obj,1);
-			end
+			ParaSelection.AddObject(obj,1);
 		end
 	end
 end
@@ -170,7 +197,13 @@ function ObjectSelectPage.DeleteObj(id)
 	if(obj and obj:IsValid())then
 		local entity = EntityManager.GetEntityByObjectID(id);
 		if(entity) then
-			entity:SetDead();
+			if(entity:IsBlockEntity()) then
+				local bx, by, bz = entity:GetBlockPos();
+				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = bx,blockY = by, blockZ = bz, })
+				task:Run();
+			else
+				entity:SetDead();
+			end
 		else
 			if(not obj:CheckAttribute(0x8000)) then
 				-- OBJ_SKIP_PICKING = 0x1<<15:
@@ -180,7 +213,8 @@ function ObjectSelectPage.DeleteObj(id)
 				local x, y, z = obj.name:match("^(%d+),(%d+),(%d+)$");
 				if(x and y and z) then
 					x,y,z = tonumber(x), tonumber(y), tonumber(z);
-					BlockEngine:SetBlockToAir(x,y,z);
+					local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = x,blockY = y, blockZ = z, })
+					task:Run();
 				end
 			end
 		end
@@ -237,12 +271,30 @@ function ObjectSelectPage.DrawSingleSelectionNodeHandler(_parent,treeNode)
 		left = left + treeNode.TreeView.DefaultIndentation*(treeNode.Level-1) + 2;
 	end	
 	if(treeNode.ID ~= nil) then
-		_this=ParaUI.CreateUIObject("button","b","_lt", left, 0 , nodeWidth - left-2, height - 1);
+		if(treeNode.blockId ~= 0) then
+			_this=ParaUI.CreateUIObject("button","b","_lt", left, 3 , 16, 16);
+			_guihelper.SetUIColor(_this, "255 255 255 255");
+			local background = "";
+			local item = ItemClient.GetItem(treeNode.blockId)
+			if(item) then
+				background = item:GetIcon();
+			end
+			_this.background = background;
+			_parent:AddChild(_this);
+			left = left + 16 + 2;
+		end
+		_this=ParaUI.CreateUIObject("button","b","_lt", left, 0 , nodeWidth - left-2 - 40, height - 1);
 		_this.background = System.mcml_controls.pe_css.default["button_lightgrey"].background;
 		_parent:AddChild(_this);
 			
 		_this.onclick = string.format(";MyCompany.Aries.Game.GUI.ObjectSelectPage.OnSelectNode(%q, %q)", treeNode.TreeView.name, treeNode:GetNodePath());
-		_this.text = " "..tostring(treeNode.ID)..":"..tostring(treeNode.Name);
+		local displayName = treeNode.displayName:sub(1, 40);
+		_this.text = displayName;
+		local tooltip = treeNode.displayName:sub(1, 256)
+		_this.tooltip = tooltip
+		_this:SetField("TextOffsetX", 5)
+		
+
 		_guihelper.SetUIFontFormat(_this, 36);
 			
 		_this=ParaUI.CreateUIObject("button","b","_rt", -38, top, 16, 16);

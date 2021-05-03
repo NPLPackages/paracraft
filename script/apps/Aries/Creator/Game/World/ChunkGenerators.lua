@@ -37,6 +37,7 @@ function ChunkGenerators:RegisterBuildinGenerators()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/NatureV1ChunkGenerator.lua");
 	local NatureV1ChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.NatureV1ChunkGenerator");
 	ChunkGenerators:Register("custom", NatureV1ChunkGenerator);
+	ChunkGenerators:Register("nature", NatureV1ChunkGenerator);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/NullChunkGenerator.lua");
 	local NullChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.NullChunkGenerator");

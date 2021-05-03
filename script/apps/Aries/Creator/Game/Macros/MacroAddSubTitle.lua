@@ -18,7 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local page;
 
-MacroAddSubTitle.lastVoiceType = 4; -- default to girl voice
+MacroAddSubTitle.lastVoiceType = 10012; -- default to girl voice
 
 function MacroAddSubTitle.OnInit()
 	page = document:GetPageCtrl();

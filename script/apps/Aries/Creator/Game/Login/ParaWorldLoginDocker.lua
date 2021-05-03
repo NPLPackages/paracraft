@@ -532,11 +532,11 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 	-- ViewportManager:GetSceneViewport():SetPosition("_fi", 0,0,0,0);
 	-- ViewportManager:GetSceneViewport():Apply();
 
+	-- System.options.cmdline_world=""; -- 支持手机直接进入世界
 	local restart_code = [[
 	ParaUI.ResetUI();
 	ParaScene.Reset();
 	NPL.load("(gl)script/apps/Aries/main_loop.lua");
-	System.options.cmdline_world="";
 	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
 ]];
 	if(additional_restart_code) then

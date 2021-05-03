@@ -392,7 +392,7 @@ function QuestAction.GetClientData()
         local course_world_id = clientData.course_world_id
         QuestAction.DailyTaskData.course_teacher_id = clientData.course_teacher_id
         QuestAction.DailyTaskData.target_level_id = clientData.course_level_id
-
+        QuestAction.DailyTaskData.ask_times = clientData.ask_times
 		clientData = QuestAction.DailyTaskData
 		clientData.time_stamp = time_stamp
         clientData.is_auto_open_view = false
@@ -737,6 +737,90 @@ function QuestAction.CompleteAiHomeWork()
     end
 end
 
-function QuestAction.ShowLoaclAiCourse()
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestLocalAICourse.lua").Show();-- body
+function QuestAction.AddAskTimes()
+	local clientData = QuestAction.GetClientData()
+    local ask_times = clientData.ask_times or 0
+    clientData.ask_times = ask_times + 1
+    
+    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
+end
+
+function QuestAction.GetAskTimes()
+	local clientData = QuestAction.GetClientData()
+    local ask_times = clientData.ask_times or 0
+    return ask_times
+end
+
+function QuestAction.GenerateActivationCodes(count, private_key)
+    count = count or 5
+    private_key = "yang1" 
+    local key_num = 0
+    for index = 1, #private_key do
+        key_num = mathlib.bit.lshift(key_num, 6) + QuestAction.CharToBase64(string.byte(private_key, index))
+    end
+    print("ccccccccccccccc", key_num)
+    -- for i = 1, count do
+    --     local key = QuestAction.EncodeKeys(private_key, i, 20210421)
+    --     print("ccccccccc", key)
+    --     QuestAction.DecodeKeys(key)
+    -- end
+end
+
+function QuestAction.EncodeKeys(nKey1, nKey2, nKey3)
+    nKey2 = mathlib.bit.band(0xffffff, nKey2)
+    nKey3 = mathlib.bit.band(0xffffff, nKey2)
+    -- print("cccccccccccc", mathlib.bit.band(0xffffff, 100), mathlib.bit.band(math.random(1, 1000), 0xff))
+    local part1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3)
+    local part2 = mathlib.bit.lshift(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 8)
+    part2 = part2 + nKey3
+    local num_a = mathlib.bit.rshift(part1, 16)
+    local num_b = mathlib.bit.band(part1, 0xffff)
+    local num_c = mathlib.bit.rshift(part2, 16)
+    local num_d = mathlib.bit.band(part2, 0xffff)
+
+    return string.format("%sx-%sx-%sx-%sx", num_a, num_b, num_c, num_d)
+end
+
+function QuestAction.DecodeKeys(sActivationCode)
+    local parts = commonlib.split(sActivationCode,"x-");
+
+	local nKey3 = mathlib.bit.band(0xff, parts[4])
+	local nKey1 = mathlib.bit.lshift(parts[1], 16)+parts[2];
+	nKey1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3);
+	local nKey2 = mathlib.bit.lshift(parts[3], 8)+mathlib.bit.rshift(parts[4], 8);
+	nKey2 = mathlib.bit.band(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 0x00ffffff);
+
+end
+
+function QuestAction.SYMETRIC_ENCODE_32_BY_8(a, k)
+    
+    local encode_a = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 24))), 0xff000000)
+    local encode_b = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 16))), 0x00ff0000)
+    local encode_c = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 8))), 0x0000ff00)
+    local encode_d = mathlib.bit.band(mathlib.bit.bxor(a, k), 0x000000ff)
+
+
+    -- local encode_b = mathlib.bit.band((a^(mathlib.bit.lshift(k, 16))), 0x00ff0000)
+    -- local encode_c = mathlib.bit.band((a^(mathlib.bit.lshift(k, 8)))), 0x0000ff00)
+    -- local encode_d = mathlib.bit.band((a^(mathlib.bit.lshift(k)))), 0x000000ff)
+    return  encode_a + encode_b + encode_c + encode_d
+end
+
+function QuestAction.CharToBase64(byte)
+    local n = 0
+    if byte >= string.byte('0') and byte <= string.byte('9') then
+        n=byte - string.byte('0')
+    elseif byte>= string.byte('a') and byte <= string.byte('z') then
+        n=10+byte - string.byte('a')
+    elseif byte >= string.byte('A') and byte <= string.byte('Z') then
+        n=36+byte - string.byte('A')
+    elseif byte == string.byte('.') then
+        n=63;
+    end
+
+    return n
+end
+
+function QuestAction.isValidActivationCode()
+    -- body
 end

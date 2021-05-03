@@ -150,6 +150,11 @@ function QuestProvider:OnInit()
     GameLogic.GetFilters():add_filter("AICourse.SetStep", QuestProvider.SetStep);
     GameLogic.GetFilters():add_filter("AICourse.GetStep", QuestProvider.GetStep);
 
+    GameLogic.GetFilters():add_filter("beacame_vip", function()
+        local Act51AskAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua")
+        Act51AskAlert.CheckGetVipItem()
+    end);
+
     QuestProvider:GetInstance():OnInit__();
 
 end

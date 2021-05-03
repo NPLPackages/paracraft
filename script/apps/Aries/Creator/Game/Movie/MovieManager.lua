@@ -196,6 +196,16 @@ function MovieManager:SetActiveMovieClip(movie_clip)
 	end
 end
 
+-- check if there is an active camera playing
+function MovieManager:HasActiveCameraPlaying()
+	for i=1, #self.active_clips do
+		local movieClip = self.active_clips[i];
+		if(movieClip and movieClip:HasCamera() and movieClip:IsPlaying()) then
+			return true
+		end
+	end
+end
+
 function MovieManager:AddMovieClip(movieclip)
 	if(movieclip) then
 		self.active_clips:add(movieclip);

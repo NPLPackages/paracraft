@@ -73,6 +73,11 @@ function ItemColorBlock:GetPenColor(itemStack)
 			local data = itemStack:GetPreferredBlockData();
 			if(data) then 
 				color = self:DataToColor(data);
+			else
+				color = itemStack:GetDataField("color")
+				if(color) then
+					color = Color.ToValue(color)
+				end
 			end
 			color = color or self.pen_color
 			itemStack.color32 = color
@@ -216,8 +221,17 @@ function ItemColorBlock:OnSelect(itemStack)
 			color = Color.ToValue(color);
 		end
 		if(not color) then
-			local data = itemStack:GetPreferredBlockData() or 0;
-			color = self:DataToColor(data);
+			local data = itemStack:GetPreferredBlockData();
+			if(data) then
+				color = self:DataToColor(data);
+			else
+				color = itemStack:GetDataField("color")
+				if(color) then
+					color = Color.ToValue(color)
+				else
+					color = 0;
+				end
+			end
 		end
 		self:SetPenColor(color)
 	end

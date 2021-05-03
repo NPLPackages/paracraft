@@ -96,6 +96,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
@@ -823,10 +824,7 @@ function Macros:Tick_RecordPlayerMove()
 			--self:AddMacro("CameraLookat", lookatX, lookatY, lookatZ);
 		end
 	elseif(focusEntity and focusEntity:isa(EntityManager.EntityCamera) and not focusEntity:IsControlledExternally()) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
-		local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
-		local movieClip = MovieManager:GetActiveMovieClip()
-		if(movieClip and movieClip:IsPlaying() and movieClip:HasCamera()) then
+		if(MovieManager:HasActiveCameraPlaying()) then
 			-- do not record when movie clip is playing with a camera. 
 		else
 			self:CheckAddCameraView();	

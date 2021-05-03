@@ -170,10 +170,14 @@ function env_imp:move(dx,dy,dz, duration)
 					shouldBe = (curTime+stepTime - startTime) / duration;
 				end
 				local cur_x,cur_y,cur_z = actor:GetPosition();
-				local sx, sy, sz = x + shouldBe*dx, y + shouldBe*dy, z + shouldBe*dz
-				local dx1, dy1, dz1 = sx - cur_x, sy - cur_y, sz - cur_z;
-				env_imp.move(self, dx1*BlockEngine.blocksize_inverse,dy1*BlockEngine.blocksize_inverse,dz1*BlockEngine.blocksize_inverse)
-				if(shouldBe == 1) then
+				if(cur_x) then
+					local sx, sy, sz = x + shouldBe*dx, y + shouldBe*dy, z + shouldBe*dz
+					local dx1, dy1, dz1 = sx - cur_x, sy - cur_y, sz - cur_z;
+					env_imp.move(self, dx1*BlockEngine.blocksize_inverse,dy1*BlockEngine.blocksize_inverse,dz1*BlockEngine.blocksize_inverse)
+					if(shouldBe == 1) then
+						break;
+					end
+				else
 					break;
 				end
 			end

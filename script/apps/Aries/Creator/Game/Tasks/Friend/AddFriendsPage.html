@@ -71,13 +71,19 @@ function GetNmae(data)
 	name = name or ""
     return name
 end
+
+function ClickHead(name, mcmlNode)
+    local data = mcmlNode:GetAttribute("param1")
+    local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
+    user_page.ShowUserInfoPage({username=data.username});
+end
 ]]></script>
 <kp:window name="iframe" mode="lite" width="560" height="207" title='<%= L"添加好友"%>' onclose="ClosePage">
     <div style="color:#ffffff;padding-left:2px;padding-top:39px;padding-right:2px;padding-bottom:2px;">
 
     <div style="margin-left:33px;margin-top:5px;width:560;">
         <div style="float: left;width:440;height:26px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
-            <input type="text" EmptyText='<%=L"搜索: 输入对方账号或手机"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;wid;height:25px;background:;" onkeyup="OnSearch" />
+            <input type="text" EmptyText='<%=L"搜索: 输入对方账号、昵称或手机"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;wid;height:25px;background:;" onkeyup="OnSearch" />
         </div>
 
         <input type="button" value='搜索' onclick="SearchFriend" tooltip="搜索" style="float: left;color: #000000;margin-left: -7; margin-top: 0;font-size: 14pt;width: 55;height: 27; background:url(Texture/Aries/Creator/keepwork/friends/btn_shousuo_36X28_32bits.png#0 0 32 32:8 8 8 8)" />
@@ -98,9 +104,9 @@ end
                                         <aries:onlinestatus width="550" height="26" nid='<%=Eval("nid")%>' />
                                     </a> -->
                                     <div style="float: left;margin-left:0px;margin-top:0px;">
-                                        <img zorder="0" src='<%=GetIcon(XPath("this"))%>'width="46" height="46"/>
+                                        <img zorder="0" src='<%=GetIcon(XPath("this"))%>'width="46" height="46" onclick="ClickHead" param1='<%= XPath("this") %>'/>
                                     </div>
-                                    <div style="float: left;margin-left:16px;margin-top:8px;width:120px;color:#000000">
+                                    <div onclick="ClickHead" param1='<%= XPath("this") %>' style="float: left;margin-left:16px;margin-top:8px;width:120px;color:#000000">
                                         <%=GetNmae(XPath("this")) %>
                                     </div>
                                     <div style="float: left;margin-left:267px;margin-top:10px;font-size:12pt;color:#000000;text-align: right;">

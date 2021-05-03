@@ -21,6 +21,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local CodeCoroutine = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine"));
 CodeCoroutine:Signal("finished");
+-- for debugging purposes
+CodeCoroutine:Property({"description", nil, "GetDescription", "SetDescription", auto=true});
 
 function CodeCoroutine:ctor()
 end

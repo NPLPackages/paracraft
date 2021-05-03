@@ -96,7 +96,7 @@ function GetVoiceNarratorDS()
         {value=10007, text=L"一菲"},
         {value=10008, text=L"小果"},
         --{value=10009, text=L"John"},
-        {value=10010, text=L"小梅"},
+        {value=10010, text=L"小梅(粤语)"},
         {value=10011, text=L"千雪"},
         {value=10012, text=L"楠楠"},
         {value=10013, text=L"芳芳"},
@@ -158,9 +158,9 @@ end
         </div>
     </div>
     <div style="margin-top:10px;">
-        <input type="button" uiname="EditMovieTextPage.Reset" name="Reset" style="margin-left:40px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
+        <input type="button" uiname="EditMovieTextPage.Reset" name="Reset" style="margin-left:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
         <input type="button" uiname="EditMovieTextPage.ClearText" name="ClearText" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearText" value='<%=L"清除文字"%>' />
-        <div style="float:left;margin-left:20px;">
+        <div style="float:left;margin-left:10px;">
             <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
             <%=L"播音员:"%>
             <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>

@@ -43,7 +43,11 @@ function Entity:init()
 	end
 	return self;
 end
-		
+
+function Entity:GetDisplayName()
+	local actor = self:GetActor()
+	return actor and actor:GetName() or self:GetName();
+end		
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);

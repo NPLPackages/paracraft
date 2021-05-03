@@ -39,17 +39,16 @@ function CodeWindow:GetPageEventFilterFunc(pageEnv)
 			return function(p1, p2, p3, p4, p5)
 				local co = self.pageFunctions[pFunc]
 				if(not co or co:IsFinished()) then
-					local last_co = self.co;
 					local co = CodeCoroutine:new():Init(pageEnv.codeblock);
+					-- co:SetDescription("CodeWindowPageFunction"); -- for debugging purposes
 					self.pageFunctions[pFunc] = co;
-					co:SetActor(pageEnv.actor);
+					-- we need to set current code context before accessing pageEnv.actor
+					-- because we do not know the current code context, therefore the following function should not be called
+					-- co:SetActor(pageEnv.actor);
 					co:SetFunction(function()
 						pFunc(p1, p2, p3, p4, p5);
 					end);
 					co:Run();
-					if(last_co) then
-						last_co:SetCurrentCodeContext();
-					end
 				end
 			end
 		end

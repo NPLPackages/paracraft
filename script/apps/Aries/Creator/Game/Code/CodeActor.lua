@@ -40,6 +40,7 @@ Actor:Property({"frameMoveInterval", 30, "GetFrameMoveInterval", "SetFrameMoveIn
 Actor:Property({"time", 0, "GetTime", "SetTime", auto=true});
 Actor:Property({"playSpeed", 1, "GetPlaySpeed", "SetPlaySpeed", auto=true});
 Actor:Property({"sentientRadius", -1, "GetSentientRadius", "SetSentientRadius", auto=true});
+Actor:Property({"isRelativePlay", true, "IsRelativePlay", "SetRelativePlay", auto=true});
 Actor:Property({"enableActorPicking", false, "IsActorPickingEnabled", "EnableActorPicking", auto=false});
 -- the itemstack(TimeSeries) is changed
 Actor:Signal("dataSourceChanged");
@@ -418,20 +419,22 @@ end
 -- this allows us to play animation in movie block from current movie time to be relative to current entity's position
 -- @param time: if nil, it means the current time. 
 function Actor:ResetOffsetPosAndRotation()
-	local curTime = self:GetTime();
-	local entity = self.entity;
+	if(self:IsRelativePlay()) then
+		local curTime = self:GetTime();
+		local entity = self.entity;
 
-	if(not entity or not curTime) then
-		return
+		if(not entity or not curTime) then
+			return
+		end
+		local eX, eY, eZ = entity:GetPosition();
+		local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
+		if(not new_x) then
+			new_x, new_y, new_z = eX, eY, eZ;
+		end;
+		local obj = entity:GetInnerObject();
+		self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
+		self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0), yaw);
 	end
-	local eX, eY, eZ = entity:GetPosition();
-	local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
-	if(not new_x) then
-		new_x, new_y, new_z = eX, eY, eZ;
-	end;
-	local obj = entity:GetInnerObject();
-	self:SetOffsetPos(eX - new_x, eY - new_y, eZ - new_z, new_x, new_y, new_z);
-	self:SetOffsetYaw(obj:GetField("yaw", 0) - (yaw or 0), yaw);
 end
 
 function Actor:ComputeScaling(curTime)
@@ -463,17 +466,21 @@ function Actor:GetOffsetPos()
 end
 
 function Actor:ComputePosAndRotation(curTime)
-	local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
+	if(self:IsRelativePlay()) then
+		local new_x, new_y, new_z, yaw, roll, pitch = Actor._super.ComputePosAndRotation(self, curTime);
 	
-	if(new_x) then
-		yaw = yaw or 0;
-		local dx,dy,dz = new_x - self.fromPos[1], new_y - self.fromPos[2],  new_z - self.fromPos[3];
-		if((dx~=0 or dy~=0 or dz~=0) and self.offsetYaw ~=0) then
-			dx, dy, dz = math3d.vec3Rotate(dx,dy,dz, 0, self.offsetYaw, 0);
-			new_x, new_y, new_z = self.fromPos[1] + dx, self.fromPos[2] + dy, self.fromPos[3] + dz;
+		if(new_x) then
+			yaw = yaw or 0;
+			local dx,dy,dz = new_x - self.fromPos[1], new_y - self.fromPos[2],  new_z - self.fromPos[3];
+			if((dx~=0 or dy~=0 or dz~=0) and self.offsetYaw ~=0) then
+				dx, dy, dz = math3d.vec3Rotate(dx,dy,dz, 0, self.offsetYaw, 0);
+				new_x, new_y, new_z = self.fromPos[1] + dx, self.fromPos[2] + dy, self.fromPos[3] + dz;
+			end
+			dx, dy, dz = self:GetOffsetPos();
+			return new_x+dx, new_y+dy, new_z+dz, self:GetOffsetYaw() + yaw, roll, pitch;
 		end
-		dx, dy, dz = self:GetOffsetPos();
-		return new_x+dx, new_y+dy, new_z+dz, self:GetOffsetYaw() + yaw, roll, pitch;
+	else
+		return Actor._super.ComputePosAndRotation(self, curTime);
 	end
 end
 
@@ -1013,6 +1020,7 @@ local internalValues = {
 	["opacity"] = {setter = Actor.SetOpacity, getter = Actor.GetOpacity, isVariable = false}, 
 	["selectionEffect"] = {setter = Actor.SetSelectionEffect, getter = Actor.GetSelectionEffect, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
+	["isRelativePlay"] = {setter = Actor.SetRelativePlay, getter = Actor.IsRelativePlay, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["playSpeed"] = {setter = Actor.SetPlaySpeed, getter = Actor.GetPlaySpeed, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 

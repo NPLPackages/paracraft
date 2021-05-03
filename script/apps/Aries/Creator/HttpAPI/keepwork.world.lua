@@ -135,3 +135,8 @@ HttpWrapper.Create("keepwork.world.is_favorited", "%MAIN%/core/v0/favorites/exis
 
 -- 查询
 HttpWrapper.Create("keepwork.world.search", "%MAIN%/core/v0/projects/search", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4127
+-- 获取子项目接口
+HttpWrapper.Create("keepwork.world.by_parent_id", "%MAIN%/core/v0/projects/getByParentId", "GET", true)
+

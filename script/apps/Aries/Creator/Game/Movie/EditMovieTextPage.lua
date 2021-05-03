@@ -141,7 +141,7 @@ function EditMovieTextPage.OnClickSelcetNarrator(name, value)
 		return
 	end
 
-	if value >= 0 and not System.User.isVip then
+	if value >= 0 and not System.User.isVip and not GameLogic.Macros:IsPlaying() then
 		page:SetValue("voicenarrator", default_narrator);
 		GameLogic.IsVip("PlyText", true, function(result)
 			if result then

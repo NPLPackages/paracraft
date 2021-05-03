@@ -318,7 +318,6 @@ function DockPage.OnClick(id)
         table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.explore");
     elseif(id == "study")then
-        echo('111111', true)      
         QuestAllCourse.Show();
         last_page_ctrl = QuestAllCourse.GetPageCtrl()
         table.insert(DockPage.showPages,{id,last_page_ctrl})
@@ -688,6 +687,9 @@ function DockPage.CheckIsTaskCompelete()
        DockPage.RefreshPage(0.01)
 
        GameLogic.QuestAction.SetDailyTaskValue("40008_1",1)
+
+       local Act51AskAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua")
+       Act51AskAlert.CheckGetVipItem()
     end, 1000)
 end
 
