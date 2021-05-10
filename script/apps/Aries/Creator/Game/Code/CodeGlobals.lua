@@ -511,7 +511,7 @@ function CodeGlobals:HandleGameEvent(event)
 			msg = event.cmd_text;
 		end
 
-		textEvent:DispatchEvent({type="msg", msg = msg,});
+		textEvent:DispatchEvent({type="msg", msg = msg, dest = event.dest});
 	end
 end
 

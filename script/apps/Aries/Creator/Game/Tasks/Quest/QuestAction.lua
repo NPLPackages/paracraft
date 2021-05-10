@@ -753,22 +753,38 @@ end
 
 function QuestAction.GenerateActivationCodes(count, private_key)
     count = count or 5
-    private_key = "yang1" 
-    local key_num = 0
-    for index = 1, #private_key do
-        key_num = mathlib.bit.lshift(key_num, 6) + QuestAction.CharToBase64(string.byte(private_key, index))
+    private_key = QuestAction.GetCurrentSearchKey("yang1")
+
+
+    local key_list = ""
+    for i = 1, count do
+        local key = QuestAction.EncodeKeys(private_key, 1001, mathlib.bit.band(math.random(10, 9999), 0xff))
+        key_list = key_list .. key .. "\n"
+        -- print("ccccccccc", key)
+        QuestAction.DecodeKeys(key)
     end
-    print("ccccccccccccccc", key_num)
-    -- for i = 1, count do
-    --     local key = QuestAction.EncodeKeys(private_key, i, 20210421)
-    --     print("ccccccccc", key)
-    --     QuestAction.DecodeKeys(key)
-    -- end
+
+    -- local filename = os.time()
+    local date = os.date("%Y-%m-%d")
+    local filename = os.date("%H%M%S") .. ".txt"
+    print("cccc", filename)
+    local folder_path = string.format("%s/%s", ParaIO.GetWritablePath().."temp/Key", date)
+    local file_path = string.format("%s/%s", folder_path, filename)
+	ParaIO.CreateDirectory(file_path)
+	local file = ParaIO.open(file_path, "w");
+
+	if(file) then
+		file:write(key_list, #key_list);
+		file:close();
+	end
+    -- ccccccccc	C:\yang\work_pro\paracraft_dev\npl_packages\Agents\Mod\Agents\
+    local path = string.gsub(folder_path, "/", "\\")
+    ParaGlobal.ShellExecute("open", "explorer.exe", path, "", 1)
 end
 
 function QuestAction.EncodeKeys(nKey1, nKey2, nKey3)
     nKey2 = mathlib.bit.band(0xffffff, nKey2)
-    nKey3 = mathlib.bit.band(0xffffff, nKey2)
+    nKey3 = mathlib.bit.band(0xff, nKey3)
     -- print("cccccccccccc", mathlib.bit.band(0xffffff, 100), mathlib.bit.band(math.random(1, 1000), 0xff))
     local part1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3)
     local part2 = mathlib.bit.lshift(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 8)
@@ -789,7 +805,6 @@ function QuestAction.DecodeKeys(sActivationCode)
 	nKey1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3);
 	local nKey2 = mathlib.bit.lshift(parts[3], 8)+mathlib.bit.rshift(parts[4], 8);
 	nKey2 = mathlib.bit.band(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 0x00ffffff);
-
 end
 
 function QuestAction.SYMETRIC_ENCODE_32_BY_8(a, k)
@@ -821,6 +836,45 @@ function QuestAction.CharToBase64(byte)
     return n
 end
 
+function QuestAction.Base64ToChar(num)
+    local char = ""
+    if num < 10 then
+        char = string.char(string.byte('0') + num)
+    elseif num < 36 then
+        char = string.char(string.byte('a') + num)
+    elseif num < 62 then
+        char = string.char(string.byte('A') + num)
+    else
+        char = '.'
+    end
+
+    return char
+end
+
 function QuestAction.isValidActivationCode()
     -- body
+end
+
+function QuestAction.GetCurrentSearchKey(serach_key)
+    local key_num = 0
+    for index = 1, #serach_key do
+        key_num = mathlib.bit.lshift(key_num, 6) + QuestAction.CharToBase64(string.byte(serach_key, index))
+    end
+    
+    return key_num
+end
+
+function QuestAction.DecodeSearchKey(key_num)
+    local str = ""
+    while (key_num > 0) do
+        local rshift = mathlib.bit.rshift(key_num, 6)
+        local byte = key_num - rshift
+        -- print("bbbb", key_num , rshift)
+        local char = QuestAction.Base64ToChar(byte)
+
+        str = char .. str
+        key_num = rshift
+    end
+
+    print("dddddddddddd", str)
 end

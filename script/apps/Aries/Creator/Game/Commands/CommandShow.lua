@@ -26,7 +26,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|
-mod|physics|vision|quickselectbar|tips|map|dock|miniuserinfo] [on|off]], 
+mod|physics|vision|quickselectbar|tips|map|dock|miniuserinfo|camera] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -79,6 +79,11 @@ Other show filters:
 			end
 		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(true);
+		elseif(name == "camera" ) then
+			local entity = EntityManager.GetFocus();
+			if(entity and entity:isa(EntityManager.EntityCamera)) then
+				entity:SetVisible(true);	
+			end
 		elseif(name == "physics") then
 			if(bIsShow == nil) then
 				bIsShow = true;
@@ -127,7 +132,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
-vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo]], 
+vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
@@ -157,6 +162,11 @@ vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo]],
 			GameLogic.options:ShowTouchPad(false);
 		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(false);
+		elseif(name == "camera" ) then
+			local entity = EntityManager.GetFocus();
+			if(entity and entity:isa(EntityManager.EntityCamera)) then
+				entity:SetVisible(false);	
+			end
 		elseif(name == "vision") then
 			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
 			if(memoryContext) then

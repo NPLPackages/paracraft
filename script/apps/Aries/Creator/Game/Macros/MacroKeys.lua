@@ -14,6 +14,8 @@ local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local keyMaps = {
 	["SLASH"] = "/ ?",
 	["MINUS"] = "- _",
+	--["SUBTRACT"] = "-",
+	--["ADD"] = "+",
 	["PERIOD"] = ". >",
 	["COMMA"] = ", <",
 	["SPACE"] = L"空格",
@@ -127,6 +129,7 @@ end
 local isLetterMap = {
 ["SLASH"] = true,
 ["MINUS"] = true,
+["ADD"] = true,
 ["PERIOD"] = true,
 ["COMMA"] = true,
 ["SPACE"] = true,

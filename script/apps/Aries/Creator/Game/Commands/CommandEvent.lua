@@ -18,6 +18,7 @@ Commands["sendevent"] = {
 	quick_ref="/sendevent [@entityname] event_name [cmd_text]", 
 	desc=[[ send a custom event to given entity
 @param entityname: if not specified, it means a global event, which is handled by home point entity. 
+it will try scene entity first, and then code block actor name.
 @param cmd_text: additional parameter saved to event.cmd_text. 
 Examples:
 /sendevent start 
@@ -26,9 +27,8 @@ Examples:
 ]], 
 	category="logic",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		-- sendevent entity
-		local targetEntity, eventname;
-		targetEntity, cmd_text = CmdParser.ParsePlayer(cmd_text, fromEntity);
+		local targetEntity, eventname, _, playerName;
+		targetEntity, cmd_text, _, playerName = CmdParser.ParsePlayer(cmd_text, fromEntity);
 		eventname, cmd_text = CmdParser.ParseString(cmd_text);
 		if(eventname) then
 			local event = Event:new():init(eventname);	
@@ -36,6 +36,10 @@ Examples:
 			if(targetEntity) then
 				targetEntity:event(event);
 			else
+				if(playerName and playerName ~= "") then
+					-- try sending to code block actor with the exact name
+					event.dest = playerName
+				end
 				GameLogic:event(event);
 			end
 		end

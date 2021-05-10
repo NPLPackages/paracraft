@@ -163,7 +163,7 @@ function MainLogin:UpdateCoreClient()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
-	
+
 	local testCoreClient = false
 	if(not testCoreClient and platform=="win32")then
 		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
@@ -179,7 +179,7 @@ function MainLogin:UpdateCoreClient()
 
 			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
 			updater:check(nil, function(bSucceed)
-				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+				-- GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
 
 				if(bSucceed and updater:isNeedUpdate()) then
 					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, updater, gamename) then

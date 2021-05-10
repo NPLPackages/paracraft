@@ -37,7 +37,7 @@ commonlib.add_interface(CmdParser, commonlib.gettable("System.Util.CmdParser"));
 
 -- @param cmd_text:  @p or @[playername]. if @p it is the last triggering entity or current player. 
 -- if @self, it is the fromEntity. if @a, it means closest nearby player. 
--- return player_entity, cmd_text_remain, hasInputName
+-- return player_entity, cmd_text_remain, hasInputName, inputName
 function CmdParser.ParsePlayer(cmd_text, fromEntity)
 	local player_name, cmd_text_remain = cmd_text:match("^%s*@(%S+)%s*(.*)$");
 	if(player_name == "p") then
@@ -49,7 +49,7 @@ function CmdParser.ParsePlayer(cmd_text, fromEntity)
 		-- @a the closest player entity
 		return EntityManager.GetPlayer(), cmd_text_remain;
 	elseif(player_name) then
-		return EntityManager.GetEntity(player_name), cmd_text_remain;
+		return EntityManager.GetEntity(player_name), cmd_text_remain, true, player_name;
 	end
 	return nil, cmd_text, cmd_text_remain~=nil and cmd_text_remain~=cmd_text;
 end

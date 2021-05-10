@@ -31,6 +31,9 @@ end
 }
 </style>
 <pe:container style="background-color: #00000000;" alignment="_fi" ontouch="MacroPlayer.OnTouch" onclick="MacroPlayer.OnClick">
+    <pe:container name="debugInfoWnd" alignment="_lt" zorder="-2" style="margin-top:170px;margin-left:10px;width:500px;height:300px;position:relative;background:url();display:none;">
+        <input type="text" ReadOnly="true" ShowLineNumber="true" UseSystemControl="true" rows="7" language="npl" height="100%" name="debugText" enabled="false" value="" CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
+    </pe:container>
     <pe:container name="cursorClick" candrag="true" ondragbegin="MacroPlayer.OnDragBegin" ondragmove="MacroPlayer.OnDragMove" ondragend="MacroPlayer.OnDragEnd" style="width:32px;height:32px;position:relative;background:url()" onclick="MacroPlayer.OnClickCursor">
         <img enabled="false" class="MouseCursor2"/>
         <input name="cursorBtn" type="button" enabled="false" style="position:relative;background:url(Texture/Aries/Cursor/cursor_big_32bits.png#0 0 42 42);width:42px;height:42px;margin-left:12px;margin-top:15px;" />

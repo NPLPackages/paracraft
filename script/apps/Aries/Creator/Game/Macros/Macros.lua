@@ -576,9 +576,11 @@ function Macros:LoadMacrosFromText(text)
 	end
 	Macros:Init();
 	local macros = {};
-	for line in text:gmatch("[^\r\n]+") do
+	local lineNumber = 0;
+	for line in text:gmatch("([^\r\n]*)\r?\n?") do
+		lineNumber = lineNumber + 1;
 		line = line:gsub("^%s+", "")
-		local m = Macro:new():Init(line);
+		local m = Macro:new():Init(line, lineNumber);
 		if(m:IsValid()) then
 			macros[#macros+1] = m;
 		end
@@ -943,4 +945,17 @@ function Macros:PreparePlayText(prepare_nums)
 	if pre_count > 0 then
 		has_playtext = true
 	end
+end
+
+function Macros:GetLinesAsText()
+	local out = {};
+	for _, m in ipairs(self.macros) do
+		local lineNo = m:GetLineNumber()
+		while(lineNo > (#out + 1)) do
+			out[#out+1] = "";
+		end
+		out[#out+1] = m:ToString();
+	end
+	local text = table.concat(out, "\n");
+	return text or "";
 end

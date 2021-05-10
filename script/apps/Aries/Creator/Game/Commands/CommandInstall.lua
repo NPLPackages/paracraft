@@ -210,9 +210,17 @@ e.g.
 /makeapp 
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
 		local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
 		local task = MyCompany.Aries.Game.Tasks.MakeApp:new()
-		task:Run();
+
+		if (options.android) then
+			task:Run(MakeApp.mode.android);
+		else
+			task:Run();
+		end
 	end,
 };

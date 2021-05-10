@@ -237,7 +237,7 @@ end
 --度小鹿=5118，度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5，默认为度丫丫(女童音)
 -- @param nTimeoutMS: 时间限制 超过该时间则不播放声音 单位：秒
 function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
-	if nil == text or text == "" then
+	if nil == text or text == "" or text == '""' then
 		return
 	end
 	voiceNarrator = voiceNarrator or 10012
@@ -259,7 +259,7 @@ end
 -- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-度逍遥，4为情感合成-度丫丫，默认为度丫丫(女童音)
 -- @param callbackFunc: 下载声音后的回调函数
 function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
-	if nil == text or text == "" then
+	if nil == text or text == "" or text == '""' then
 		return
 	end
 	
@@ -286,7 +286,7 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	url = string.format("%s/%s?%s", url, md5_value, math.random(1, 100))
 
 	System.os.GetUrl(url, function(err, msg, data)
-		if err == 200 then
+		if err == 200 and data then
 			local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, data)
 			if callbackFunc then
 				callbackFunc(file_path)

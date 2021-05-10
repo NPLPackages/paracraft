@@ -19,13 +19,19 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local MakeApp = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp"));
 
-
+MakeApp.mode = {
+	android = 0
+}
 
 function MakeApp:ctor()
 end
 
+function MakeApp:RunImp(mode)
+	if (mode == self.mode.android) then
+		self:MakeAndroidApp()
+		return
+	end
 
-function MakeApp:RunImp()
 	local name = WorldCommon.GetWorldTag("name");
 	self.name = name
 	local dirName = commonlib.Encoding.Utf8ToDefault(name)
@@ -40,7 +46,7 @@ function MakeApp:RunImp()
 	end, _guihelper.MessageBoxButtons.YesNo);
 end
 
-function MakeApp:Run()
+function MakeApp:Run(...)
 	if(System.os.GetPlatform()~="win32") then
 		_guihelper.MessageBox(L"此功能需要使用Windows操作系统");
 		return
@@ -53,7 +59,7 @@ function MakeApp:Run()
 		end
 	end)
 	]]
-	self:RunImp();
+	self:RunImp(...);
 end
 
 function MakeApp:MakeApp()
@@ -64,6 +70,47 @@ function MakeApp:MakeApp()
 			return true;
 		end
 	end
+end
+
+function MakeApp:MakeAndroidApp()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+	local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
+
+	local apkUrl = 'https://cdn.keepwork.com/paracraft/android/paracraft.apk?ver=2.0.0';
+
+	local fileDownloader = FileDownloader:new();
+	fileDownloader.isSilent = true
+	
+	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在获取基础文件，请稍候...', 30000, nil, 350)
+
+	commonlib.TimerManager.SetTimeout(function()
+		fileDownloader:Init('paracraft.apk', apkUrl, 'temp/paracraft.apk', function(result)
+			if (result) then
+				fileDownloader:DeleteCacheFile()
+				ParaIO.MoveFile('temp/paracraft.apk', 'temp/paracraft.zip')
+
+				GameLogic.GetFilters():apply_filters(
+					'service.local_service.move_zip_to_folder',
+					'temp/paracraft_android/',
+					'temp/paracraft.zip',
+					function()
+						-- TODO: copy world worlds folder
+						-- TODO: update config.txt file
+
+						GameLogic.GetFilters():apply_filters(
+							'service.local_service.move_folder_to_zip',
+							'temp/paracraft_android/',
+							'temp/paracraft_new.apk',
+							function()
+								echo('finish!!!', true)
+								GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+							end
+						)
+					end
+				)
+			end
+		end);
+	end, 500)
 end
 
 function MakeApp:GetOutputDir()

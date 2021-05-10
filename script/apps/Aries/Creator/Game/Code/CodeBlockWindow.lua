@@ -559,6 +559,8 @@ end
 
 
 function CodeBlockWindow.OnClickCompileAndRun()
+	ParaUI.GetUIObject("root"):Focus();
+	
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if(codeEntity) then
 		if(codeEntity:GetCodeLanguageType() == "python") then

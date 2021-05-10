@@ -27,6 +27,7 @@ function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
 	GameLogic.GetFilters():add_filter("Macro_EndPlay", MacroPlayer.OnEndPlay);
 	GameLogic.GetFilters():add_filter("Macro_PlayMacro", MacroPlayer.OnPlayMacro);
+	MacroPlayer.isShowDebugWnd = false;
 end
 
 function MacroPlayer.OnInitEnd()
@@ -50,6 +51,7 @@ function MacroPlayer.OnInitEnd()
 		KeyInput:Focus();
 	end
 	MacroPlayer.HideAll()
+	MacroPlayer.ShowDebugInfoWnd(false);
 	local cursorClick = page:FindControl("cursorClick");
 	if(cursorClick) then
 		cursorClick:SetScript("onmousewheel", function()
@@ -342,6 +344,47 @@ function MacroPlayer.AnimKeyPressBtn(bRestart)
 				MacroPlayer.AnimKeyPressBtn()
 			end})
 			MacroPlayer.animKeyPressTimer:Change(100);
+		end
+	end
+end
+
+-- @return textcontrol, multilineEditBox control.
+function  MacroPlayer.GetTextControl()
+	if(page) then
+		local textAreaCtrl = page:FindControl("debugText");
+		local textCtrl = textAreaCtrl and textAreaCtrl.ctrlEditbox;
+		if(textCtrl) then
+			return textCtrl:ViewPort(), textCtrl;
+		end
+	end
+end
+
+function MacroPlayer.ShowDebugInfoWnd(bShow)
+	if(page) then
+		MacroPlayer.isShowDebugWnd = bShow;
+		local debugInfoWnd = page:FindControl("debugInfoWnd");
+		if(debugInfoWnd) then
+			debugInfoWnd.visible = bShow == true;
+			if(bShow) then
+				local text = GameLogic.Macros:GetLinesAsText()
+				local textCtrl = MacroPlayer.GetTextControl()
+				if(textCtrl) then
+					textCtrl:SetText(text)
+					MacroPlayer.UpdateDebugInfo()
+				end
+			end
+		end
+	end	
+end
+
+function MacroPlayer.UpdateDebugInfo()
+	if(page and MacroPlayer.isShowDebugWnd) then
+		local textCtrl = MacroPlayer.GetTextControl()
+		if(textCtrl) then
+			local m = Macros:PeekNextMacro()
+			local line = m and m:GetLineNumber() or 1;
+			textCtrl:moveCursor(line, 0, false, true)
+			textCtrl:moveCursor(line, 40, true, true)
 		end
 	end
 end
@@ -662,6 +705,10 @@ function MacroPlayer.OnMouseUp(event)
 end
 
 function MacroPlayer.OnKeyDown(event)
+	if(not GameLogic.IsReadOnly() and event.keyname == "DIK_F3") then
+		MacroPlayer.ShowDebugInfoWnd(not MacroPlayer.isShowDebugWnd)
+	end
+	
 	if(Macros.IsAutoPlay()) then
 		MacroPlayer.DoAutoPlay();
 		return
@@ -733,6 +780,11 @@ end
 function MacroPlayer.SetKeyPressTrigger(button, targetText, callbackFunc)
 	if(page) then
 		MacroPlayer.CheckDoAutoPlay(callbackFunc)
+		if(button == "DIK_ADD") then
+			button = "shift+DIK_EQUALS"
+		elseif(button == "DIK_SUBTRACT") then
+			button = "DIK_MINUS"
+		end
 		MacroPlayer.expectedKeyButton = button;
 		local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
 		if(mouseX and mouseY) then
@@ -941,6 +993,7 @@ function MacroPlayer.ShowText(text, duration, position)
 			page:SetValue("text", "")
 		end
 		if(duration) then
+			duration = tonumber(duration);
 			MacroPlayer.textTimer = MacroPlayer.textTimer or commonlib.Timer:new({callbackFunc = function(timer)
 				MacroPlayer.ShowText(nil)
 			end})
@@ -1136,6 +1189,7 @@ end
 --@param x1, y1, x2, y2: screen position that should not be covered by a control window. 
 -- if all are nil, we will restore all controls to their default position. 
 function MacroPlayer.AutoAdjustControlPosition(x1, y1, x2, y2)
+	MacroPlayer.UpdateDebugInfo()
 	if(MacroPlayer.attachedWnd) then
 		local wnd = MacroPlayer.attachedWnd
 		if(x1 and y1) then

@@ -22,7 +22,9 @@ function Macro:ctor()
 end
 
 -- @param text: a line of macro command
-function Macro:Init(text)
+-- @param lineNumber
+function Macro:Init(text, lineNumber)
+	self.lineNumber = lineNumber;
 	if(text) then
 		if(not text:match("^%-%-")) then
 			local name, params = text:match("(%w[%w%.]*)%((.*)%)");
@@ -42,8 +44,20 @@ function Macro:Init(text)
 	return self;
 end
 
+function Macro:GetLineNumber()
+	return self.lineNumber;
+end
+
+function Macro:GetLineText()
+	if(self.lineNumber) then
+		return format("%d: %s", self.lineNumber, self:ToString())	
+	else
+		return self:ToString();
+	end
+end
+
 function Macro:ToString()
-	return format("%s(%s)", self.name, self.params or "")
+	return format("%s(%s)", self.name, self.paramsText or self.params or "")
 end
 
 function Macro:IsValid()
@@ -68,6 +82,7 @@ end
 -- nil or an array of parameters
 function Macro:GetParams()
 	if(type(self.params) == "string") then
+		self.paramsText = self.params;
 		self.params = NPL.LoadTableFromString("{"..self.params.."}");
 	end
 	return self.params;

@@ -54,6 +54,11 @@ end
 local function SetKeyEventFromButtonText(event, button)
 	-- mouse_button is a global variable
 	event.isEmulated= true;
+	if(button == "DIK_ADD") then
+		button = "shift+DIK_EQUALS";
+	elseif(button == "DIK_SUBSTRACT") then
+		button = "DIK_MINUS";
+	end
 	event.keyname = button:match("(DIK_[%w_]+)");
 	event.shift_pressed = button:match("shift") and true 
 	event.alt_pressed = button:match("alt") and true

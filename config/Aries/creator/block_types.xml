@@ -561,7 +561,7 @@ Sound related:
   </block>
   <!--this is the default player, to change default player model and skin, replace it here-->
   <block id="30002" name="player" text="主角" searchkey="" tooltip="" item_class="ItemNPC" icon="Texture/blocks/items/skull_steve.png" hp="100" respawn_time="300000">
-    <model assetfile="character/CC/01char/char_male.x" skin="Texture/blocks/human/boy_blue_shirt01.png" ></model>
+    <model assetfile="character/CC/02human/paperman/boy01.x" skin="" ></model>
   </block>
 
   <!--example of creating other liquid blocks like water. you need a pairs of blocks, with associated blocks directed to each other-->

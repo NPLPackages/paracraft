@@ -112,7 +112,11 @@ end
 
 
 function Entity:SetBlocklyXMLCode(blockly_xmlcode)
-	self.blockly_xmlcode = blockly_xmlcode;
+	if (self:IsUseNplBlockly()) then
+		self:SetNPLBlocklyXMLCode(blockly_xmlcode or "");
+	else
+		self.blockly_xmlcode = blockly_xmlcode;
+	end
 end
 
 function Entity:GetBlocklyXMLCode()
@@ -121,8 +125,12 @@ end
 
 
 function Entity:SetBlocklyNPLCode(blockly_nplcode)
-	self.blockly_nplcode = blockly_nplcode;
-	self:SetCommand(blockly_nplcode);
+	if (self:IsUseNplBlockly()) then
+		self:SetNPLBlocklyNPLCode(blockly_nplcode or "");
+	else
+		self.blockly_nplcode = blockly_nplcode;
+		self:SetCommand(blockly_nplcode);
+	end
 end
 
 function Entity:GetBlocklyNPLCode()
