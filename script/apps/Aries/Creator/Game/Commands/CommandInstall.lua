@@ -201,24 +201,52 @@ examples:
 	end,
 };
 
+Commands["signtool"] = {
+	name="signtool", 
+	quick_ref="/signtool [filename]", 
+	desc=[[only used internally, code signing executable files.
+If no files are provided, we will sign all default files
+e.g.
+/signtool
+/signtool D:\lxzsrc\ParaEngine\ParaWorld\Paracraft.exe
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local result;
+		if(not cmd_text:match("%w")) then
+			result = System.os.run("start bin\\SignParaEngineClient.bat");
+		else
+			local filename = cmd_text;
+			result = System.os.run("start bin\\SignParaEngineClient.bat "..filename);
+		end
+		if(result) then
+			_guihelper.MessageBox(result);
+		end
+	end,
+};
+
 
 Commands["makeapp"] = {
 	name="makeapp", 
-	quick_ref="/makeapp", 
-	desc=[[make current world into a standalone app file (zip)
+	quick_ref="/makeapp [zip|clean] [-android|windows]", 
+	desc=[[make current world into a standalone app.
+It can be windows exe file or android apk file.
 e.g.
 /makeapp 
+/makeapp -android  clean and rebuild android apk file
+/makeapp zip -android  only zip everything under temp/paracraft_android folder
+/makeapp clean -android  clean everything under temp/paracraft_android folder
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local options;
-		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		local method, option;
+		method, cmd_text = CmdParser.ParseWord(cmd_text);
+		option, cmd_text = CmdParser.ParseOption(cmd_text);
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
 		local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
 		local task = MyCompany.Aries.Game.Tasks.MakeApp:new()
 
-		if (options.android) then
-			task:Run(MakeApp.mode.android);
+		if (option == 'android') then
+			task:Run(MakeApp.mode.android, method);
 		else
 			task:Run();
 		end

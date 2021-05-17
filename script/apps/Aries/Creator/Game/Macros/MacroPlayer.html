@@ -30,7 +30,7 @@ end
     MouseCursor3 = { width = 48, height=48, position="relative", background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"},
 }
 </style>
-<pe:container style="background-color: #00000000;" alignment="_fi" ontouch="MacroPlayer.OnTouch" onclick="MacroPlayer.OnClick">
+<pe:container style="background-color: #00000000;" name = "root" alignment="_fi" ontouch="MacroPlayer.OnTouch" onclick="MacroPlayer.OnClick">
     <pe:container name="debugInfoWnd" alignment="_lt" zorder="-2" style="margin-top:170px;margin-left:10px;width:500px;height:300px;position:relative;background:url();display:none;">
         <input type="text" ReadOnly="true" ShowLineNumber="true" UseSystemControl="true" rows="7" language="npl" height="100%" name="debugText" enabled="false" value="" CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
     </pe:container>
@@ -78,9 +78,9 @@ end
         <div style="float:left;width:80px;height:20px;margin-left:-15px;margin-top:-40px;"><pe:canvas3d miniscenegraphname="DownloadWorld128" DefaultRotY="-0.9" DefaultCameraObjectDist="4" IsInteractive="false" RenderTargetSize="128" style="width:80px;height:80px;" value='<%=GetModelParams()%>' /></div>
         <pe:label name="tipText" style="font-size:14;text-align:center;color:#f5c4bd;height:36px;"></pe:label>
     </pe:container>
-    <pe:container name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:60px;position:relative;background:url();" width="100%">
+    <pe:container ClickThrough="true" name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:60px;position:relative;background:url();" width="100%">
         <div style="background-color:#00000080" width="100%" height="100%">
-            <input type="button" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/>
+            <input type="button" ClickThrough="true" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/>
         </div>
     </pe:container>
 </pe:container>

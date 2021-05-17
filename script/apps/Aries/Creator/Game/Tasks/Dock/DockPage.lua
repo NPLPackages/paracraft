@@ -713,6 +713,75 @@ function DockPage.ShowCampIcon()
     end
 end
 
+function DockPage.IsInSchoolAndInLearnTime()
+    local where = GameLogic.GetFilters():apply_filters('service.session.get_user_where')
+    if where == "SCHOOL" then
+        if not DockPage.CheckCanIsShowVipTime() then
+            return false
+        end
+    end
+    return true
+end
+
+--根据时间戳获取星期几
+function DockPage.GetWeekNum(time_stamp)
+    time_stamp = time_stamp or 0
+    local weekNum = os.date("*t",time_stamp).wday  -1
+    if weekNum == 0 then
+        weekNum = 7
+    end
+    return weekNum
+end
+
+function DockPage.GetMonthAndDay(time_stamp)
+    local year = os.date("%Y", time_stamp)	
+    local month = os.date("%m", time_stamp)
+	local day = os.date("%d", time_stamp)
+
+    return tonumber(year),tonumber(month),tonumber(day)
+end
+
+function DockPage.IsWinterAndSummer(server_time)
+    local year,month,day = DockPage.GetMonthAndDay(server_time)
+    local isHoliday = false
+    local time_stamp1 = os.time({year = year, month = 1, day = 15, hour=0, minute=0, second=0})
+    local time_stamp2 = os.time({year = year, month = 2, day = 26, hour=0, minute=0, second=0})
+    if server_time >= time_stamp1 and server_time <= time_stamp2 then
+        isHoliday = true
+    end
+    time_stamp1 = os.time({year = year, month = 7, day = 1, hour=0, minute=0, second=0})
+    time_stamp2 = os.time({year = year, month = 9, day = 2, hour=0, minute=0, second=0})
+    if server_time >= time_stamp1 and server_time <= time_stamp2 then
+        isHoliday = true
+    end
+    --寒假
+    -- if (month == 1 and day >= 15) or (month == 2 and day <= 25) then
+    --     isHoliday = true
+    -- end
+    
+    -- --暑假
+    -- if (month == 7 and day >= 1) or month == 8  or  (month == 9 and day ==1) then
+    --     isHoliday = true
+    -- end
+    return isHoliday
+end
+
+function DockPage.CheckCanIsShowVipTime()
+    local server_time = GameLogic.QuestAction.GetServerTime()
+    if DockPage.IsWinterAndSummer(server_time) then
+        return true
+    end
+    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+    local week_day = DockPage.GetWeekNum(server_time)
+    if week_day ~= 6 and week_day ~= 7  then
+        local limit_time_stamp = today_weehours + 16 * 60 * 60 + 30 * 60
+        if server_time < limit_time_stamp then
+            return false
+        end
+    end
+    return true
+end
+
 function DockPage.CanShowCampVip()
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
     local world_id = WorldCommon.GetWorldTag("kpProjectId");

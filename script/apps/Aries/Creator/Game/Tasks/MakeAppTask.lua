@@ -26,9 +26,9 @@ MakeApp.mode = {
 function MakeApp:ctor()
 end
 
-function MakeApp:RunImp(mode)
+function MakeApp:RunImp(mode, ...)
 	if (mode == self.mode.android) then
-		self:MakeAndroidApp()
+		self:MakeAndroidApp(...)
 		return
 	end
 
@@ -72,45 +72,242 @@ function MakeApp:MakeApp()
 	end
 end
 
-function MakeApp:MakeAndroidApp()
+function MakeApp:MakeAndroidApp(method)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
 	local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
 
-	local apkUrl = 'https://cdn.keepwork.com/paracraft/android/paracraft.apk?ver=2.0.0';
+	local function downloadApk(callback)
+		local apkUrl = 'https://cdn.keepwork.com/paracraft/android/paracraft.apk?ver=2.0.2';
 
-	local fileDownloader = FileDownloader:new();
-	fileDownloader.isSilent = true
-	
-	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在获取基础文件，请稍候...', 30000, nil, 350)
+		local fileDownloader = FileDownloader:new();
+		fileDownloader.isSilent = true
 
-	commonlib.TimerManager.SetTimeout(function()
-		fileDownloader:Init('paracraft.apk', apkUrl, 'temp/paracraft.apk', function(result)
-			if (result) then
-				fileDownloader:DeleteCacheFile()
-				ParaIO.MoveFile('temp/paracraft.apk', 'temp/paracraft.zip')
+		GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在获取基础文件，请稍候...', 30000, nil, 350)
 
-				GameLogic.GetFilters():apply_filters(
-					'service.local_service.move_zip_to_folder',
-					'temp/paracraft_android/',
-					'temp/paracraft.zip',
-					function()
-						-- TODO: copy world worlds folder
-						-- TODO: update config.txt file
+		commonlib.TimerManager.SetTimeout(function()
+			fileDownloader:Init('paracraft.apk', apkUrl, 'temp/paracraft.apk', function(result)
+				if (result) then
+					fileDownloader:DeleteCacheFile()
+					ParaIO.MoveFile('temp/paracraft.apk', 'temp/paracraft.zip')
 
-						GameLogic.GetFilters():apply_filters(
-							'service.local_service.move_folder_to_zip',
-							'temp/paracraft_android/',
-							'temp/paracraft_new.apk',
-							function()
-								echo('finish!!!', true)
-								GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
-							end
-						)
+					GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+
+					if (callback and type(callback) == 'function') then
+						callback()
 					end
-				)
+				end
+			end)
+		end, 500)
+	end
+
+	local function unzipApk(callback)
+		GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在解压，请稍候...', 30000, nil, 350)
+
+		GameLogic.GetFilters():apply_filters(
+			'service.local_service.move_zip_to_folder',
+			'temp/paracraft_android/',
+			'temp/paracraft.zip',
+			function()
+				ParaIO.DeleteFile('temp/paracraft_android/META-INF/')
+
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+
+				if (callback and type(callback) == 'function') then
+					callback()
+				end
 			end
-		end);
-	end, 500)
+		)
+	end
+
+	local function generateApk(callback)
+		GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在打包，请稍候...', 30000, nil, 350)
+
+		-- remove old generate apk
+		ParaIO.DeleteFile('temp/paracraft_new.apk')
+
+		local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')
+
+		if currentEnterWorld then
+			-- copy world
+			local fileList = GameLogic.GetFilters():apply_filters('service.local_service.load_files', currentEnterWorld.worldpath, true, true)
+
+			if not fileList or type(fileList) ~= 'table' or #fileList == 0 then
+				return
+			end
+
+			local apkWorldPath = 'temp/paracraft_android/assets/worlds/DesignHouse/' ..
+								 commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '/'
+
+			ParaIO.CreateDirectory(apkWorldPath)
+
+			for key, item in ipairs(fileList) do
+				local relativePath = commonlib.Encoding.Utf8ToDefault(item.filename)
+
+				if item.filesize == 0 then
+					local folderPath = apkWorldPath .. relativePath .. '/'
+
+					ParaIO.CreateDirectory(folderPath)
+				else
+					local filePath = apkWorldPath .. relativePath
+
+					ParaIO.CopyFile(item.file_path, filePath, true)
+				end
+			end
+
+			-- update config.txt file
+			local writeFile = ParaIO.open('temp/paracraft_android/assets/config.txt', "w")
+
+			if (writeFile:IsValid()) then
+				local content = 
+					'cmdline=noupdate="true" mc="true" debug="main" bootstrapper="script/apps/Aries/main_loop.lua" ' .. 
+					'world="' .. 'worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '"'
+				writeFile:write(content, #content)
+				writeFile:close()
+			end
+		end
+
+		GameLogic.GetFilters():apply_filters(
+			'service.local_service.move_folder_to_zip',
+			'temp/paracraft_android/',
+			'temp/paracraft_new.apk',
+			function()
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+
+				if (callback and type(callback) == 'function') then
+					callback()
+				end
+			end
+		)
+	end
+
+	local function signApk()
+		local function sign()
+			if (not ParaIO.DoesFileExist('temp/sign_android_app.bat')) then
+				local file = ParaIO.open('temp/sign_android_app.bat', "w")
+	
+				if (file:IsValid()) then
+					file:WriteString("@echo off\n");
+					file:WriteString("temp\\jre-windows\\bin\\jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore temp\\personal-key.keystore -storepass paracraft temp\\paracraft_new.apk paracraft\n");
+					file:WriteString("echo APK SIGNED!GET APK FILE AT your_paracraft/temp/paracraft_new.apk \n")
+					file:WriteString("pause\n")
+					file:WriteString("exit\n")
+				end
+	
+				file:close();
+			end
+	
+			System.os.run('start temp\\sign_android_app.bat')
+		end
+
+		if (not ParaIO.DoesFileExist('temp/jre-windows/')) then
+			local function downloadJre(callback)
+				local jreTool = 'https://cdn.keepwork.com/paracraft/android/jre-windows.zip';
+	
+				local fileDownloader = FileDownloader:new();
+				fileDownloader.isSilent = true;
+	
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在获取Jre Runtime，请稍候...', 30000, nil, 400)
+				commonlib.TimerManager.SetTimeout(function()
+					fileDownloader:Init('jre-windows.zip', jreTool, 'temp/jre-windows.zip', function(result)
+						if (result) then
+							fileDownloader:DeleteCacheFile()
+		
+							GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+							GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在解压Jre Runtime，请稍候...', 30000, nil, 400)
+	
+							GameLogic.GetFilters():apply_filters(
+								'service.local_service.move_zip_to_folder',
+								'temp/jre-windows/',
+								'temp/jre-windows.zip',
+								function()
+									GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+	
+									if callback and type(callback) == 'function' then
+										callback()
+									end
+								end
+							)
+						end
+					end)
+				end, 500)
+			end
+
+			local function downloadLicense(callback)
+				local jreTool = 'https://cdn.keepwork.com/paracraft/android/personal-key.keystore';
+	
+				local fileDownloader = FileDownloader:new();
+				fileDownloader.isSilent = true;
+	
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在获取Certification，请稍候...', 30000, nil, 400)
+				commonlib.TimerManager.SetTimeout(function()
+					fileDownloader:Init('personal-key.keystore', jreTool, 'temp/personal-key.keystore', function(result)
+						if (result) then
+							fileDownloader:DeleteCacheFile()
+		
+							GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+	
+							if callback and type(callback) == 'function' then
+								callback()
+							end
+						end
+					end)
+				end, 500)
+			end
+
+			downloadJre(function()
+				downloadLicense(function()
+					sign()
+				end)
+			end)
+		else
+			sign()
+		end
+	end
+
+	local function clean()
+		ParaIO.DeleteFile('temp/personal-key.keystore')
+		ParaIO.DeleteFile('temp/jre-windows/')
+		ParaIO.DeleteFile('temp/paracraft_android/')
+		ParaIO.DeleteFile('temp/paracraft_new.apk')
+		ParaIO.DeleteFile('temp/paracraft.zip')
+		ParaIO.DeleteFile('temp/sign_android_app.bat')
+		ParaIO.DeleteFile('temp/jre-windows.zip')
+	end
+
+	local function zip()
+		if ParaIO.DoesFileExist('temp/paracraft_android/') then
+			generateApk(function()
+				signApk()
+			end)
+		else
+			downloadApk(function()
+				unzipApk(function()
+					generateApk(function()
+						signApk()
+					end)
+				end)
+			end)
+		end
+	end
+
+	if (method == 'zip') then
+		zip()
+
+		return
+	end
+
+	if (method == 'clean') then
+		clean()
+		return
+	end
+
+	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在清理，请稍候...', 30000, nil, 400)
+	commonlib.TimerManager.SetTimeout(function()
+		clean()
+		commonlib.TimerManager.SetTimeout(function()
+			zip()
+		end, 5000)
+	end, 1000)
 end
 
 function MakeApp:GetOutputDir()

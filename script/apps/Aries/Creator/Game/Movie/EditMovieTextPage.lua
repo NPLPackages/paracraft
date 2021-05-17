@@ -210,7 +210,7 @@ function EditMovieTextPage.UpdateSoundDesc()
 
 	local channel_name = "playtext" .. voicenarrator
 
-	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voicenarrator))
+	local md5_value = SoundManager:GetPlayTextMd5(text, voiceNarrator)
 	local filename = md5_value .. ".mp3"
 	local file_path = string.format("%s/%s/%s", SoundManager:GetPlayTextDiskFolder(), voicenarrator, filename)
 	local duration = SoundManager:GetSoundDuration(channel_name, file_path)

@@ -22,6 +22,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local MacroPlayer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer"));
 local page;
 local TouchMiniKeyboard, TouchVirtualKeyboardIcon = nil, nil;
+local TouchMiniRightKeyboard
 
 function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
@@ -157,14 +158,28 @@ function MacroPlayer.ShowPage()
 		MacroPlayer.OnPageClosed();
 		page = nil;
 	end;
-	if (System.os.IsTouchMode() or IsDevEnv) then
+	if (System.os.IsTouchMode() or IsDevEnv or System.options.isDevMode) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 		TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 		TouchMiniKeyboard = TouchMiniKeyboard.GetSingleton();
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 		TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon");
 		TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton();
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniRightKeyboard.lua");
+		TouchMiniRightKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniRightKeyboard");
+		TouchMiniRightKeyboard = TouchMiniRightKeyboard.GetSingleton();
 	end
+
+	if System.options.isDevMode then
+		-- local pro_mcml_node = page:GetNode("root")
+		-- local pro_ui_object = ParaUI.GetUIObject(pro_mcml_node.uiobject_id)
+		
+		-- pro_ui_object:SetScript("onmousedown", function() MacroPlayer.OnMouseDown({type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		-- pro_ui_object:SetScript("onmouseup", function() MacroPlayer.OnMouseUp({type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		-- pro_ui_object:SetScript("onmousemove", function() MacroPlayer.OnMouseMove({type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+	end
+
 end
 
 function MacroPlayer.HideAll(bSkipTips)
@@ -190,11 +205,19 @@ function MacroPlayer.OnPlayMacro(fromLine, macros)
 	if(page) then
 		page:SetValue("progress", progress);
 	end
+	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+		TouchMiniKeyboard:UpdateIconVisible()
+	end
+
 	return fromLine;
 end
 
 function MacroPlayer.OnEndPlay()
 	MacroPlayer.CloseWindow();
+	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+		TouchMiniKeyboard:UpdateIconVisible()
+		TouchMiniKeyboard:ClearAllKeyDown()
+	end
 end
 
 function MacroPlayer.CloseWindow()
@@ -219,6 +242,9 @@ end
 
 MacroPlayer.TipStartTime = 0;
 MacroPlayer.ShowTipTime = 5000;
+if System.os.IsTouchMode() then
+	MacroPlayer.ShowTipTime = 2000
+end
 function MacroPlayer.ResetTipTime(nDeltaMilliSeconds)
 	MacroPlayer.TipStartTime = commonlib.TimerManager.GetCurrentTime() + (nDeltaMilliSeconds or 0)
 end
@@ -257,17 +283,30 @@ end
 -- called every MacroPlayer.ShowTipTime time, when user is not responding correctly
 function MacroPlayer.ShowMoreTips()
 	if(MacroPlayer.expectedKeyButton) then
-		local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
-		if(mouseX and mouseY) then
-			-- key press at given scene location. 
-		else
-			local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
-			if(count and count > 1) then
-				GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
-				Macros.voice("你需要同时按下2个按键")
+		local count = TouchMiniKeyboard and TouchMiniKeyboard:ShowMacroTip(MacroPlayer.expectedKeyButton) or 0
+		if count <= 0 then
+			local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
+		
+			if(mouseX and mouseY) then
+				-- key press at given scene location. 
+			else
+				local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
+				if(count and count > 1) then
+					GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
+					Macros.voice("你需要同时按下2个按键")
+				end
 			end
 		end
 	end
+
+	if MacroPlayer.expectedButton then
+		local count = TouchMiniKeyboard and TouchMiniKeyboard:ShowMacroTip(MacroPlayer.expectedButton) or 0
+		if(count and count > 1) then
+			GameLogic.AddBBS("Macro", format(L"你需要同时按下%d个按键", count), 5000, "0 255 0");
+			Macros.voice("你需要同时按下2个按键")
+		end
+	end
+
 	if(MacroPlayer.expectedDragButton) then
 		Macros.voice("按住鼠标左键不要放手， 同时拖动鼠标到目标点")
 		GameLogic.AddBBS("Macro", format(L"按住鼠标左键不要放手， 同时拖动鼠标到目标点", count), 5000, "0 255 0");
@@ -679,29 +718,54 @@ function MacroPlayer.IsTouchVirtualKeyboardIconEvent()
 	return left < mouse_x and mouse_x < (left + width) and top < mouse_y and mouse_y < (top + height);
 end
 function MacroPlayer.OnTouch(event)
+	if page and page.keyboardWnd ~= nil and page.keyboardWnd:IsVisible() then
+		page.keyboardWnd:OnTouch(msg)
+		return
+	end
 	if (not TouchMiniKeyboard) then return end
-	event = event or msg;
-	TouchMiniKeyboard:OnTouch(event);
-	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnTouch(event) end 
-	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnTouch(event) end
+
+	TouchMiniKeyboard:OnTouch(msg);
+	-- TouchMiniRightKeyboard:OnTouch(msg)
+	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnTouch(msg) end 
+	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnTouch(msg) end
+
 end
 function MacroPlayer.OnMouseDown(event)
-	if (not TouchMiniKeyboard) then return end
-	TouchMiniKeyboard:OnMouseDown(event);
-	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseDown(event) end 
-	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseDown(event) end
+	if page.keyboardWnd and page.keyboardWnd:IsVisible() then
+		page.keyboardWnd:OnMouseDown(event)
+		return
+	end
+
+	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+		TouchMiniKeyboard:OnMouseDown(event);
+		if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseDown(event) end 
+		if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseDown(event) end
+	end
+
 end
 function MacroPlayer.OnMouseMove(event)
-	if (not TouchMiniKeyboard) then return end
-	TouchMiniKeyboard:OnMouseMove(event);
-	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseMove(event) end 
-	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseMove(event) end
+	if page.keyboardWnd and page.keyboardWnd:IsVisible() then
+		page.keyboardWnd:OnMouseMove(event)
+		return
+	end
+	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+		TouchMiniKeyboard:OnMouseMove(event);
+		if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseMove(event) end 
+		if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseMove(event) end
+	end
+
 end
 function MacroPlayer.OnMouseUp(event)
-	if (not TouchMiniKeyboard) then return end
-	TouchMiniKeyboard:OnMouseUp(event);
-	if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseUp(event) end 
-	if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseUp(event) end
+	if page.keyboardWnd and page.keyboardWnd:IsVisible() then
+		page.keyboardWnd:OnMouseUp(event)
+		return
+	end
+	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+		TouchMiniKeyboard:OnMouseUp(event);
+		if (MacroPlayer.IsTouchVirtualKeyboardIconEvent()) then TouchVirtualKeyboardIcon:OnMouseUp(event) end 
+		if (TouchVirtualKeyboardIcon:GetKeyBoard():IsVisible()) then TouchVirtualKeyboardIcon:GetKeyBoard():OnMouseUp(event) end
+	end
+
 end
 
 function MacroPlayer.OnKeyDown(event)

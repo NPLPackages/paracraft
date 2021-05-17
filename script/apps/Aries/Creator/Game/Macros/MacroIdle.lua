@@ -12,6 +12,8 @@ GameLogic.Macros.Idle(1000)
 -------------------------------------
 -- single Macro base
 -------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 
 -- milliseconds between triggers
@@ -47,6 +49,26 @@ function Macros.Idle(timeMs, bForceWait)
 				(nextMacro.name == "CameraMove") or (nextMacro.name == "PlayerMove") or 
 				(nextNextMacro and nextNextMacro:IsTrigger() and nextMacro.name == "CameraLookat")) then
 				return Macros.Idle(DefaultTriggerInterval, true);
+			end
+
+			if (nextMacro.name == "CameraLookat" or nextMacro.name == "Idle") then
+				local previousMacro = Macros:PeekNextMacro(-1)
+				if(previousMacro and previousMacro.name == "text") then
+					local params = type(previousMacro.params) == "table" and previousMacro.params or commonlib.split(item.params,",")
+					local text = params[1] or ""
+					local voiceNarrator = params[4] or 10012;
+					voiceNarrator = tonumber(voiceNarrator);
+					if text ~= "" and voiceNarrator ~= nil then
+						local sound_name = "playtext" .. voiceNarrator;
+						local md5_value = SoundManager:GetPlayTextMd5(text, voiceNarrator)
+						local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
+						if (file_path) then
+							local t = SoundManager:GetSoundDuration(sound_name, file_path);
+							return Macros.Idle(t * 1000 + DefaultTriggerInterval, true);
+						end
+						return Macros.Idle(1000, true);
+					end
+				end
 			end
 		end
 	end

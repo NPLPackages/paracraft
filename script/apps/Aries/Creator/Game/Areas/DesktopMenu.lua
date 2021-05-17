@@ -40,6 +40,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{Type = "Separator"},
 				{text = L"分享上传...",name = "file.uploadworld",onclick=nil},
 				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp"},
+				{text = L"生成APK", name = "file.makeapk", cmd="/makeapp -android"},
 				{text = L"备份...",name = "file.worldrevision",onclick=nil},
 				{text = L"打开本地目录",name = "file.openworlddir",onclick=nil},
 				{Type = "Separator"},

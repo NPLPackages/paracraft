@@ -30,6 +30,7 @@ local BaseContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseCo
 ]]
 NPL.load("(gl)script/ide/System/Core/SceneContext.lua");
 NPL.load("(gl)script/kids/3DMapSystemApp/mcml/pe_hotkey.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local hotkey_manager = commonlib.gettable("System.mcml_controls.hotkey_manager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -43,6 +44,7 @@ local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManag
 local ModManager = commonlib.gettable("Mod.ModManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local vector3d = commonlib.gettable("mathlib.vector3d");
+local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 
 local BaseContext = commonlib.inherit(commonlib.gettable("System.Core.SceneContext"), commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"));
 
@@ -556,6 +558,14 @@ end
 -- virtual: 
 function BaseContext:mouseReleaseEvent(event)
 	self.is_click = self:EndMouseClickCheck(event); 
+
+	if event.mouse_button == "left" and (System.options.isDevMode or System.os.IsTouchMode()) then
+		local mini_keyboard_instance = TouchMiniKeyboard:GetSingleton()
+		if mini_keyboard_instance:GetRMBLockState() == TouchMiniKeyboard.RMBLockStateList.LockMiddle then
+			event.mouse_button = "middle"
+		end
+	end
+
 
 	if GameLogic.GetFilters():apply_filters("BaseContextMouseReleaseEvent", false, event) then
 		return

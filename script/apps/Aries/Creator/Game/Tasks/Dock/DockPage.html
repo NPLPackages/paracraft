@@ -44,6 +44,9 @@
         return DockPage.RenderButton_2(index);
     end
     function CanShowVip()
+        if not DockPage.IsInSchoolAndInLearnTime() then
+            return false
+        end
         local list = DockPage.hide_vip_world_ids[HttpWrapper.GetDevVersion()];
         if(list)then
 			local projectId = GameLogic.options:GetProjectId();
@@ -124,14 +127,23 @@
             <!--学校-->
             <input type="button" name='school' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_xuexiao_32bits.png#0 0 85 80)"/>
         </div>  
-        <div  style="float:right;margin-right:-7px;">
-            <!--好友-->
-            <input type="button" name='friends' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
-            <pe:if condition="<%=CanShowFriendRedTip()%>">
-                <kp:redtip style="position:relative;margin-left:72px;margin-top:-76px;" value="true" ></kp:redtip>
-            </pe:if>                
-        </div>                     
+        <pe:if condition="<%=not CanShowVip()%>">
+            <div  style="float:right;margin-right:7px;">
+                <!--好友-->
+                <input type="button" name='friends' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
+                <pe:if condition="<%=CanShowFriendRedTip()%>">
+                    <kp:redtip style="position:relative;margin-left:72px;margin-top:-76px;" value="true" ></kp:redtip>
+                </pe:if>                
+            </div>  
+        </pe:if>                    
         <pe:if condition="<%=CanShowVip()%>">
+            <div  style="float:right;margin-right:-7px;">
+                <!--好友-->
+                <input type="button" name='friends' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
+                <pe:if condition="<%=CanShowFriendRedTip()%>">
+                    <kp:redtip style="position:relative;margin-left:72px;margin-top:-76px;" value="true" ></kp:redtip>
+                </pe:if>                
+            </div>  
             <div  style="float:right;margin-right:7px;">
                 <!--会员-->
                 <input type="button" name='vip' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_huiyuan_32bits.png#0 0 85 80)"/>
@@ -139,13 +151,6 @@
         </pe:if> 
     </pe:container>
     <pe:container ClickThrough="true" alignment="_ctr" style="position:relative;height:90px; background:;">
-        <pe:if condition="<%=CanShowCampVip()%>">
-            <div style="float:right;margin-right:7px;">
-                <!--vip补课-->
-                <img ClickThrough="true" name='vip_make_up' onclick="OnClick" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="82" height="82"/>
-                <input type="button" name='vip_make_up' onclick="OnClick" style="width:91px;height:89px;background:url(Texture/Aries/Creator/keepwork/dock/buketequan_91X89_32bits.png#0 0 91 89)"/>
-            </div>
-        </pe:if>
         <div style="float:right;margin-right:0px;">
             <!--资源-->
             <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->

@@ -22,6 +22,10 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 
 local Diskfolder = nil
 
+local VoiceNarratorDefaulSpd = {
+	[10012] = 7,
+}
+
 -- @param filename: sound name or a table array of sound names. 
 function SoundManager:Init()
 	-- mapping from name to sound 
@@ -270,7 +274,7 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	end
 
 	voiceNarrator = voiceNarrator or 10012
-	local md5_value = ParaMisc.md5(string.format("%s_%s", text, voiceNarrator))
+	local md5_value = self:GetPlayTextMd5(text, voiceNarrator)
 	-- 检测是否有本地文件
 	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 	if file_path then
@@ -348,10 +352,11 @@ function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
 end
 
 function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
+	local spd = VoiceNarratorDefaulSpd[voiceNarrator] or 5
 	keepwork.user.playtext({
 		text = text,
 		key = md5_value,
-		options = {per = voiceNarrator},
+		options = {per = voiceNarrator, spd = spd},
 	}, function(err, msg, data)
 		if err == 200 then
 			System.os.GetUrl(data.data, function(download_err, download_msg, download_data)
@@ -414,6 +419,15 @@ function SoundManager:GetSoundDuration(channel_name, filename)
 		local source = new_sound:GetSource()
 		return source.TotalAudioTime or 0
     end
+end
+
+function SoundManager:GetPlayTextMd5(text, voiceNarrator)
+	local spd = VoiceNarratorDefaulSpd[voiceNarrator]
+	if spd and spd ~= 5 then
+		return ParaMisc.md5(string.format("%s_%s_%s", text, voiceNarrator, spd))
+	end
+	
+	return ParaMisc.md5(string.format("%s_%s", text, voiceNarrator, spd))
 end
 
 function SoundManager:GetPlayTextDiskFolder()

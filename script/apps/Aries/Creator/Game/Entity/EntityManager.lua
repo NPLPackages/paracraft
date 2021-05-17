@@ -471,10 +471,15 @@ function EntityManager.GetEntitiesInBlock(bx, by, bz)
 end
 
 -- get the block entity excluding other entity
+-- Please note, we can still get block entity like movie or code block even if the block region is unloaded. 
 function EntityManager.GetBlockEntity(bx, by, bz)
-	local block = BlockEngine:GetBlock(bx, by, bz);
-	if(block) then
-		return block:GetBlockEntity(bx, by, bz);
+	local entities = EntityManager.GetEntitiesInBlock(bx, by, bz);
+	if(entities) then
+		for entity,_ in pairs(entities) do
+			if(entity:IsBlockEntity()) then
+				return entity;
+			end
+		end
 	end
 end
 

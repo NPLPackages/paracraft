@@ -123,6 +123,9 @@ Other show filters:
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ShowInMiniWorld();
+		elseif (name == "world2in1") then
+			local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+			World2In1.ShowPage();
 		end
 	end,
 };
@@ -195,6 +198,9 @@ vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]],
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ClosePage()
+		elseif (name == "world2in1") then
+			local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+			World2In1.HidePage();
 		end
 	end,
 };

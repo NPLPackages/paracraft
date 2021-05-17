@@ -421,12 +421,39 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	-- do not load the last output like command block. movieclip does not cache the output. since its output signal only last 0.5 seconds 
+	if node then
+		local attr = node.attr;
+		if attr then
+			if(attr.extend_data) then
+				self.extend_data = NPL.LoadTableFromString(attr.extend_data);
+			end
+		end
+	end
+
 	self.last_output = nil;
 end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
+	if node then
+		local attr = node.attr
+		if(self.extend_data and attr) then
+			
+			attr.extend_data = commonlib.serialize_compact(self.extend_data, bSort);
+		end
+	end
+
 	return node;
+end
+
+function Entity:SetExtendData(key, value)
+	if self.extend_data == nil then
+		self.extend_data = {}
+	end
+
+	if self.extend_data[key] == nil then
+		self.extend_data[key] = value
+	end
 end
 
 -- enable or disable camera. 

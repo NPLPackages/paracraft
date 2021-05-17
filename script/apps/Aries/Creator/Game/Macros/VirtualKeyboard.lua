@@ -8,8 +8,8 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/VirtualKeyboard.lua");
 local VirtualKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.VirtualKeyboard");
-local kb = VirtualKeyboard:new():Init("MacroVirtualKeyboard");
-kb:SetTransparency(0.5)
+local kb = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 400, 1024);
+--kb:SetTransparency(0.5)
 kb:Show(true);
 ------------------------------------------------------------
 ]]
@@ -17,7 +17,7 @@ NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Screen = commonlib.gettable("System.Windows.Screen");
-
+local TouchSession = commonlib.gettable("MyCompany.Aries.Game.Common.TouchSession")
 local VirtualKeyboard = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.GUI.VirtualKeyboard"));
 VirtualKeyboard:Property("Name", "VirtualKeyboard");
 VirtualKeyboard.name = "default_MacroVirtualKeyboard";
@@ -29,100 +29,100 @@ function VirtualKeyboard:ctor()
 	self.keylayout = {
 		-- row 1
 		{
-			{name="Esc", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_ESCAPE},
+			{name="Esc", col=1, colorid=2, click_to_close=true, vKey = DIK_SCANCODE.DIK_ESCAPE, click_only = true},
 			{col=1, },
-			{name="F1", char="F1",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F1, },
-			{name="F2", char="F2",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F2, },
-			{name="F3", char="F3",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F3, },
-			{name="F4", char="F4",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F4, },
+			{name="F1", char="F1",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F1, click_only = true},
+			{name="F2", char="F2",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F2, click_only = true},
+			{name="F3", char="F3",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F3, click_only = true},
+			{name="F4", char="F4",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F4, click_only = true},
 			{col=0.5, },
-			{name="F5", char="F5",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F5, },
-			{name="F6", char="F6",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F6, },
-			{name="F7", char="F7",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F7, },
-			{name="F8", char="F8",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F8, },
+			{name="F5", char="F5",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F5, click_only = true},
+			{name="F6", char="F6",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F6, click_only = true},
+			{name="F7", char="F7",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F7, click_only = true},
+			{name="F8", char="F8",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F8, click_only = true},
 			{col=0.5, },
-			{name="F9", char="F9",  col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F9, },
-			{name="F10", char="F10",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F10, },
-			{name="F11", char="F11",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F11, },
-			{name="F12", char="F12",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F12, },
-			{name="Ins", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_INSERT},
+			{name="F9", char="F9",  col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F9, click_only = true},
+			{name="F10", char="F10",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F10, click_only = true},
+			{name="F11", char="F11",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F11, click_only = true},
+			{name="F12", char="F12",col=1, colorid=2, vKey = DIK_SCANCODE.DIK_F12, click_only = true},
+			{name="Ins", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_INSERT, click_only = true},
 		},
 		{
-			{name="`", char="`",col=1, name2 = "~", char2 = "~", vKey = DIK_SCANCODE.DIK_GRAVE},
-			{name="1", char="1",col=1, name2 = "!", char2 = "!", vKey = DIK_SCANCODE.DIK_1},
-			{name="2", char="2",col=1, name2 = "@", char2 = "@", vKey = DIK_SCANCODE.DIK_2},
-			{name="3", char="3",col=1, name2 = "#", char2 = "#", vKey = DIK_SCANCODE.DIK_3},
-			{name="4", char="4",col=1, name2 = "$", char2 = "$", vKey = DIK_SCANCODE.DIK_4},
-			{name="5", char="5",col=1, name2 = "%", char2 = "%", vKey = DIK_SCANCODE.DIK_5},
-			{name="6", char="6",col=1, name2 = "^", char2 = "^", vKey = DIK_SCANCODE.DIK_6},
-			{name="7", char="7",col=1, name2 = "&", char2 = "&", vKey = DIK_SCANCODE.DIK_7},
-			{name="8", char="8",col=1, name2 = "*", char2 = "*", vKey = DIK_SCANCODE.DIK_8},
-			{name="9", char="9",col=1, name2 = "(", char2 = "(", vKey = DIK_SCANCODE.DIK_9},
-			{name="0", char="0",col=1, name2 = ")", char2 = ")", vKey = DIK_SCANCODE.DIK_0},
-			{name="-", char="-",col=1, name2 = "_", char2 = "_", vKey = DIK_SCANCODE.DIK_MINUS},
-			{name="=", char="=",col=1, name2 = "+", char2 = "+", vKey = DIK_SCANCODE.DIK_EQUALS},
-			{name="Backspace", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_BACKSPACE},
-			{name="Del", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_DELETE},
+			{name="`", char="`",col=1, name2 = "~", char2 = "~", vKey = DIK_SCANCODE.DIK_GRAVE, click_only = true},
+			{name="1", char="1",col=1, name2 = "!", char2 = "!", vKey = DIK_SCANCODE.DIK_1, click_only = true},
+			{name="2", char="2",col=1, name2 = "@", char2 = "@", vKey = DIK_SCANCODE.DIK_2, click_only = true},
+			{name="3", char="3",col=1, name2 = "#", char2 = "#", vKey = DIK_SCANCODE.DIK_3, click_only = true},
+			{name="4", char="4",col=1, name2 = "$", char2 = "$", vKey = DIK_SCANCODE.DIK_4, click_only = true},
+			{name="5", char="5",col=1, name2 = "%", char2 = "%", vKey = DIK_SCANCODE.DIK_5, click_only = true},
+			{name="6", char="6",col=1, name2 = "^", char2 = "^", vKey = DIK_SCANCODE.DIK_6, click_only = true},
+			{name="7", char="7",col=1, name2 = "&", char2 = "&", vKey = DIK_SCANCODE.DIK_7, click_only = true},
+			{name="8", char="8",col=1, name2 = "*", char2 = "*", vKey = DIK_SCANCODE.DIK_8, click_only = true},
+			{name="9", char="9",col=1, name2 = "(", char2 = "(", vKey = DIK_SCANCODE.DIK_9, click_only = true},
+			{name="0", char="0",col=1, name2 = ")", char2 = ")", vKey = DIK_SCANCODE.DIK_0, click_only = true},
+			{name="-", char="-",col=1, name2 = "_", char2 = "_", vKey = DIK_SCANCODE.DIK_MINUS, click_only = true},
+			{name="=", char="=",col=1, name2 = "+", char2 = "+", vKey = DIK_SCANCODE.DIK_EQUALS, click_only = true},
+			{name="Backspace", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_BACKSPACE, click_only = true},
+			{name="Del", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_DELETE, click_only = true},
 		},
 		{
-			{name="Tab", col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_TAB},
-			{name="Q", char="q",char2="Q",col=1, vKey = DIK_SCANCODE.DIK_Q},
-			{name="W", char="w",char2="W",col=1, vKey = DIK_SCANCODE.DIK_W},
-			{name="E", char="e",char2="E",col=1, vKey = DIK_SCANCODE.DIK_E},
-			{name="R", char="r",char2="R",col=1, vKey = DIK_SCANCODE.DIK_R},
-			{name="T", char="t",char2="T",col=1, vKey = DIK_SCANCODE.DIK_T},
-			{name="Y", char="y",char2="Y",col=1, vKey = DIK_SCANCODE.DIK_Y},
-			{name="U", char="u",char2="U",col=1, vKey = DIK_SCANCODE.DIK_U},
-			{name="I", char="i",char2="I",col=1, vKey = DIK_SCANCODE.DIK_I},
-			{name="O", char="o",char2="O",col=1, vKey = DIK_SCANCODE.DIK_O},
-			{name="P", char="p",char2="P",col=1, vKey = DIK_SCANCODE.DIK_P},
-			{name="[", char="[",char2="{",col=1, name2 = "{", vKey = DIK_SCANCODE.DIK_LBRACKET},
-			{name="]", char="]",char2="}",col=1, name2 = "}", vKey = DIK_SCANCODE.DIK_RBRACKET},
-			{name="\\",char="\\", col=1.5, name2 = "|", vKey = DIK_SCANCODE.DIK_BACKSLASH},
-			{name="PgUp", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_PAGE_UP},
+			{name="Tab", col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_TAB, click_only = true},
+			{name="Q", char="q",char2="Q",col=1, vKey = DIK_SCANCODE.DIK_Q, click_only = true},
+			{name="W", char="w",char2="W",col=1, vKey = DIK_SCANCODE.DIK_W, click_only = true},
+			{name="E", char="e",char2="E",col=1, vKey = DIK_SCANCODE.DIK_E, click_only = true},
+			{name="R", char="r",char2="R",col=1, vKey = DIK_SCANCODE.DIK_R, click_only = true},
+			{name="T", char="t",char2="T",col=1, vKey = DIK_SCANCODE.DIK_T, click_only = true},
+			{name="Y", char="y",char2="Y",col=1, vKey = DIK_SCANCODE.DIK_Y, click_only = true},
+			{name="U", char="u",char2="U",col=1, vKey = DIK_SCANCODE.DIK_U, click_only = true},
+			{name="I", char="i",char2="I",col=1, vKey = DIK_SCANCODE.DIK_I, click_only = true},
+			{name="O", char="o",char2="O",col=1, vKey = DIK_SCANCODE.DIK_O, click_only = true},
+			{name="P", char="p",char2="P",col=1, vKey = DIK_SCANCODE.DIK_P, click_only = true},
+			{name="[", char="[",char2="{",col=1, name2 = "{", vKey = DIK_SCANCODE.DIK_LBRACKET, click_only = true},
+			{name="]", char="]",char2="}",col=1, name2 = "}", vKey = DIK_SCANCODE.DIK_RBRACKET, click_only = true},
+			{name="\\",char="\\", col=1.5, name2 = "|", vKey = DIK_SCANCODE.DIK_BACKSLASH, click_only = true},
+			{name="PgUp", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_PAGE_UP, click_only = true},
 		},
 		{
-			{name="CapsLock", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_CAPSLOCK},
-			{name="A", char="a",char2="A",col=1, vKey = DIK_SCANCODE.DIK_A},
-			{name="S", char="s",char2="S",col=1, vKey = DIK_SCANCODE.DIK_S},
-			{name="D", char="d",char2="D",col=1, vKey = DIK_SCANCODE.DIK_D},
-			{name="F", char="f",char2="F",col=1, vKey = DIK_SCANCODE.DIK_F},
-			{name="G", char="g",char2="G",col=1, vKey = DIK_SCANCODE.DIK_G},
-			{name="H", char="h",char2="H",col=1, vKey = DIK_SCANCODE.DIK_H},
-			{name="J", char="j",char2="J",col=1, vKey = DIK_SCANCODE.DIK_J},
-			{name="K", char="k",char2="K",col=1, vKey = DIK_SCANCODE.DIK_K},
-			{name="L", char="l",char2="L",col=1, vKey = DIK_SCANCODE.DIK_L},
-			{name=";", char=";",char2=":",col=1, name2 = ":", vKey = DIK_SCANCODE.DIK_SEMICOLON},
-			{name="'", char="'",char2="\"",col=1, name2 = "\"", vKey = DIK_SCANCODE.DIK_APOSTROPHE},
-			{name="Enter", char="\r",char2="\r", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_RETURN},
-			{name="PgDn", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_PAGE_DOWN},
+			{name="CapsLock", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_CAPSLOCK, click_only = true},
+			{name="A", char="a",char2="A",col=1, vKey = DIK_SCANCODE.DIK_A, click_only = true},
+			{name="S", char="s",char2="S",col=1, vKey = DIK_SCANCODE.DIK_S, click_only = true},
+			{name="D", char="d",char2="D",col=1, vKey = DIK_SCANCODE.DIK_D, click_only = true},
+			{name="F", char="f",char2="F",col=1, vKey = DIK_SCANCODE.DIK_F, click_only = true},
+			{name="G", char="g",char2="G",col=1, vKey = DIK_SCANCODE.DIK_G, click_only = true},
+			{name="H", char="h",char2="H",col=1, vKey = DIK_SCANCODE.DIK_H, click_only = true},
+			{name="J", char="j",char2="J",col=1, vKey = DIK_SCANCODE.DIK_J, click_only = true},
+			{name="K", char="k",char2="K",col=1, vKey = DIK_SCANCODE.DIK_K, click_only = true},
+			{name="L", char="l",char2="L",col=1, vKey = DIK_SCANCODE.DIK_L, click_only = true},
+			{name=";", char=";",char2=":",col=1, name2 = ":", vKey = DIK_SCANCODE.DIK_SEMICOLON, click_only = true},
+			{name="'", char="'",char2="\"",col=1, name2 = "\"", vKey = DIK_SCANCODE.DIK_APOSTROPHE, click_only = true},
+			{name="Enter", char="\r",char2="\r", col=2, colorid=2, vKey = DIK_SCANCODE.DIK_RETURN, click_only = true},
+			{name="PgDn", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_PAGE_DOWN, click_only = true},
 		},
 		{
-			{name="Shift", combo=true, dragcombo=true, col=2.5, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT},
-			{name="Z", char="z",char2="Z",col=1, vKey = DIK_SCANCODE.DIK_Z},
-			{name="X", char="x",char2="X",col=1, vKey = DIK_SCANCODE.DIK_X},
-			{name="C", char="c",char2="C",col=1, vKey = DIK_SCANCODE.DIK_C},
-			{name="V", char="v",char2="V",col=1, vKey = DIK_SCANCODE.DIK_V},
-			{name="B", char="b",char2="B",col=1, vKey = DIK_SCANCODE.DIK_B},
-			{name="N", char="n",char2="N",col=1, vKey = DIK_SCANCODE.DIK_N},
-			{name="M", char="m",char2="M",col=1, vKey = DIK_SCANCODE.DIK_M},
-			{name=",", char=",",char2="<",col=1, name2 = "<", vKey = DIK_SCANCODE.DIK_COMMA},
-			{name=".", char=".",char2=">",col=1, name2 = ">", vKey = DIK_SCANCODE.DIK_PERIOD},
-			{name="/", char="/",char2="?",col=1, name2 = "?", vKey = DIK_SCANCODE.DIK_SLASH},
+			{name="Shift", combo=true, dragcombo=true, col=2.5, colorid=2, vKey = DIK_SCANCODE.DIK_LSHIFT, click_only = false},
+			{name="Z", char="z",char2="Z",col=1, vKey = DIK_SCANCODE.DIK_Z, click_only = true},
+			{name="X", char="x",char2="X",col=1, vKey = DIK_SCANCODE.DIK_X, click_only = true},
+			{name="C", char="c",char2="C",col=1, vKey = DIK_SCANCODE.DIK_C, click_only = true},
+			{name="V", char="v",char2="V",col=1, vKey = DIK_SCANCODE.DIK_V, click_only = true},
+			{name="B", char="b",char2="B",col=1, vKey = DIK_SCANCODE.DIK_B, click_only = true},
+			{name="N", char="n",char2="N",col=1, vKey = DIK_SCANCODE.DIK_N, click_only = true},
+			{name="M", char="m",char2="M",col=1, vKey = DIK_SCANCODE.DIK_M, click_only = true},
+			{name=",", char=",",char2="<",col=1, name2 = "<", vKey = DIK_SCANCODE.DIK_COMMA, click_only = true},
+			{name=".", char=".",char2=">",col=1, name2 = ">", vKey = DIK_SCANCODE.DIK_PERIOD, click_only = true},
+			{name="/", char="/",char2="?",col=1, name2 = "?", vKey = DIK_SCANCODE.DIK_SLASH, click_only = true},
 			{col=0.5, },
-			{name="Home", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_HOME},
-			{name="↑", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_UP},
-			{name="End", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_END},
+			{name="Home", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_HOME, click_only = true},
+			{name="↑", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_UP, click_only = true},
+			{name="End", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_END, click_only = true},
 		},
 		{
-			{name="CTRL", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL},
-			{name="ALT", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU},
-			{name="Space", char=" ", char2=" ",col=7, vKey = DIK_SCANCODE.DIK_SPACE},
-			{name="Alt", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RMENU},
-			{name="Ctrl", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RCONTROL},
-			{name="←", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LEFT},
-			{name="↓", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_DOWN},
-			{name="→", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_RIGHT},
+			{name="CTRL", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, click_only = false},
+			{name="ALT", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, click_only = true},
+			{name="Space", char=" ", char2=" ",col=7, vKey = DIK_SCANCODE.DIK_SPACE, click_only = true},
+			{name="Alt", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RMENU, click_only = true},
+			{name="Ctrl", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RCONTROL, click_only = true},
+			{name="←", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LEFT, click_only = true},
+			{name="↓", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_DOWN, click_only = true},
+			{name="→", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_RIGHT, click_only = true},
 		},
 	};
 
@@ -290,12 +290,72 @@ function VirtualKeyboard:GetUIControl()
 		_guihelper.SetUIColor(_parent, "#000000");
 		_parent:AttachToRoot();
 		_parent.zorder = self.zorder;
+		_parent:SetScript("ontouch", function() self:OnTouch(msg) end);
+		_parent:SetScript("onmousedown", function() self:OnMouseDown() end);
+		_parent:SetScript("onmouseup", function() self:OnMouseUp() end);
+		_parent:SetScript("onmousemove", function() self:OnMouseMove() end);
 
 		self.id = _parent.id;
 	else
 		_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
 	end
 	return _parent;
+end
+
+-- simulate the touch event with id=-1
+function VirtualKeyboard:OnMouseDown()
+	local touch = {type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0};
+	self:OnTouch(touch);
+end
+
+-- simulate the touch event
+function VirtualKeyboard:OnMouseUp()
+	local touch = {type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0};
+	self:OnTouch(touch);
+end
+
+-- simulate the touch event
+function VirtualKeyboard:OnMouseMove()
+	local touch = {type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0};
+	self:OnTouch(touch);
+end
+
+-- handleTouchEvent
+function VirtualKeyboard:OnTouch(touch)
+	-- handle the touch
+	local touch_session = TouchSession.GetTouchSession(touch);
+	-- let us track it with an item. 
+	
+	local btnItem = self:GetButtonItem(touch.x, touch.y);
+	if(touch.type == "WM_POINTERDOWN") then
+		if(btnItem) then
+			touch_session:SetField("keydownBtn", btnItem);
+			
+			self:SetKeyState(btnItem, true);
+		end
+	elseif(touch.type == "WM_POINTERUP") then
+		local keydownBtn = touch_session:GetField("keydownBtn");
+		if(keydownBtn) then
+			if(btnItem and btnItem~=keydownBtn and keydownBtn.dragcombo) then
+				self:SetKeyState(btnItem, true);
+				self:SetKeyState(btnItem, false);
+			end
+			self:SetKeyState(keydownBtn, false);
+		end
+	end
+end
+
+-- get button item by global touch screen position. 
+function VirtualKeyboard:GetButtonItem(x, y)
+	x = x - self.left;
+	y = y - self.top;
+	for row = 1, #self.keylayout do
+		for _, item in ipairs(self.keylayout[row]) do
+			if (item.top and item.top <= y and y<=item.bottom and item.left <=x and x<=item.right) then
+				return item;
+			end
+		end
+	end
 end
 
 function VirtualKeyboard:IsCapital()
@@ -308,7 +368,7 @@ function VirtualKeyboard:GetChar(btnItem)
 	end
 end
 
-function VirtualKeyboard:SetKeyState(btnItem, isDown)
+function VirtualKeyboard:SetKeyState(btnItem, isDown, is_remind)
 	local parent = self:GetUIControl();
 	local keyBtn = parent:GetChild(btnItem.name);
 	btnItem.isKeyDown = isDown;
@@ -318,6 +378,32 @@ function VirtualKeyboard:SetKeyState(btnItem, isDown)
 	else
 		-- key up event
 		_guihelper.SetUIColor(keyBtn, self.colors[btnItem.colorid or 1].normal);
+	end
+
+	
+	if not is_remind then
+		-- self:SendRawKeyEvent(btnItem, isDown);
+
+		if(btnItem.click_only) then
+			-- only send click event
+			if(not isDown and not btnItem.isDragged) then
+				self:SendRawKeyEvent(btnItem, true);
+				self:SendRawKeyEvent(btnItem, false);
+			end
+		else
+			self:SendRawKeyEvent(btnItem, isDown);
+		end
+
+		if(btnItem.click_to_close and not isDown) then
+			self:Show(false);
+		end
+	end
+
+end
+
+function VirtualKeyboard:SendRawKeyEvent(btnItem, isDown)
+	if(btnItem.vKey) then
+		Keyboard:SendKeyEvent(isDown and "keyDownEvent" or "keyUpEvent", btnItem.vKey);
 	end
 end
 
@@ -394,12 +480,12 @@ end
 
 function VirtualKeyboard:ShowButtons(button)
 	if(button) then
-		self:ClearAllKeyDown()
+		-- self:ClearAllKeyDown()
 		local count = 0
 		for text in button:gmatch("([%w_]+)") do
 			local item = self:GetButtonByName(text)
 			if(item) then
-				self:SetKeyState(item, true)
+				self:SetKeyState(item, true, true)
 				count = count + 1;
 			end
 		end

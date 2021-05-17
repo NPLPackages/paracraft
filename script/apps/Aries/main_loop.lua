@@ -211,7 +211,9 @@ local function Aries_load_config(filename)
 			ParaEngine.GetAttributeObject():SetField("Icon", "icon.ico");
 		else		
 			ParaEngine.GetAttributeObject():SetField("Icon", ":IDR_PARAWORLD_ICO");
-		end				
+		end
+	else
+		ParaEngine.GetAttributeObject():SetField("Icon", ":IDR_HAQI_ICO");
 	end
 
 	System.options.is_client = true;

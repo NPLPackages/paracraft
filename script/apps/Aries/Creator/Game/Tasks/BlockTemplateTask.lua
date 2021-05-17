@@ -365,7 +365,8 @@ function BlockTemplate:SaveTemplateToString()
 		if(select_task) then
 			local pivot = select_task:GetPivotPoint();
 			if(self.auto_pivot) then
-				pivot = select_task:GetSelectionPivot();
+				local x,y,z = select_task:GetSelectionPivot();
+				pivot = {x,y,z}
 			end
 			self.params.pivot = string.format("%d,%d,%d",pivot[1],pivot[2],pivot[3]);
 			self.blocks = select_task:GetCopyOfBlocks(pivot);

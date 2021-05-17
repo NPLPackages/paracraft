@@ -107,7 +107,7 @@ function HomeWorkTip.ToWork()
     end
 
     if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-        _guihelper.MessageBox("学习人工智能课程需要先完成实名认证，快去认证吧。", function()	
+        _guihelper.MessageBox("课后练习需完成实名认证才可进行，快去认证吧。", function()	
             GameLogic.GetFilters():apply_filters(
                 'show_certificate',
                 function(result)
